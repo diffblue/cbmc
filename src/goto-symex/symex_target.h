@@ -29,27 +29,26 @@ public:
   struct sourcet
   {
     unsigned thread_nr;
+    irep_idt function;
     goto_programt::const_targett pc;
     bool is_set;
 
-    sourcet():
-      thread_nr(0),
-      is_set(false)
+    sourcet() : thread_nr(0), function(irep_idt()), is_set(false)
+    {
+    }
+
+    sourcet(const irep_idt &_function, goto_programt::const_targett _pc)
+      : thread_nr(0), function(_function), pc(_pc), is_set(true)
     {
     }
 
     explicit sourcet(
-      goto_programt::const_targett _pc):
-      thread_nr(0),
-      pc(_pc),
-      is_set(true)
-    {
-    }
-
-    explicit sourcet(const goto_programt &_goto_program):
-      thread_nr(0),
-      pc(_goto_program.instructions.begin()),
-      is_set(true)
+      const irep_idt &_function,
+      const goto_programt &_goto_program)
+      : thread_nr(0),
+        function(_function),
+        pc(_goto_program.instructions.begin()),
+        is_set(true)
     {
     }
   };
@@ -111,7 +110,6 @@ public:
   // record return from a function
   virtual void function_return(
     const exprt &guard,
-    const irep_idt &function_identifier,
     const sourcet &source)=0;
 
   // just record a location

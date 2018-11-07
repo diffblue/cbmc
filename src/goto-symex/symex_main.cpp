@@ -121,12 +121,13 @@ void goto_symext::rewrite_quantifiers(exprt &expr, statet &state)
 void goto_symext::initialize_entry_point(
   statet &state,
   const get_goto_functiont &get_goto_function,
+  const irep_idt &function_identifier,
   const goto_programt::const_targett pc,
   const goto_programt::const_targett limit)
 {
   PRECONDITION(!state.threads.empty());
   PRECONDITION(!state.call_stack().empty());
-  state.source=symex_targett::sourcet(pc);
+  state.source = symex_targett::sourcet(function_identifier, pc);
   state.top().end_of_function=limit;
   state.top().calling_location.pc=state.top().end_of_function;
   state.symex_target=&target;
@@ -250,22 +251,29 @@ void goto_symext::resume_symex_from_saved_state(
 void goto_symext::symex_instruction_range(
   statet &state,
   const goto_functionst &goto_functions,
+  const irep_idt &function_identifier,
   const goto_programt::const_targett first,
   const goto_programt::const_targett limit)
 {
   symex_instruction_range(
-    state, get_function_from_goto_functions(goto_functions), first, limit);
+    state,
+    get_function_from_goto_functions(goto_functions),
+    function_identifier,
+    first,
+    limit);
 }
 
 void goto_symext::symex_instruction_range(
   statet &state,
   const get_goto_functiont &get_goto_function,
+  const irep_idt &function_identifier,
   const goto_programt::const_targett first,
   const goto_programt::const_targett limit)
 {
-  initialize_entry_point(state, get_goto_function, first, limit);
+  initialize_entry_point(
+    state, get_goto_function, function_identifier, first, limit);
   ns = namespacet(outer_symbol_table, state.symbol_table);
-  while(state.source.pc->function!=limit->function || state.source.pc!=limit)
+  while(state.source.function != limit->function || state.source.pc != limit)
     symex_threaded_step(state, get_goto_function);
 }
 
@@ -296,6 +304,7 @@ void goto_symext::symex_from_entry_point_of(
   initialize_entry_point(
     state,
     get_goto_function,
+    goto_functionst::entry_point(),
     start_function->body.instructions.begin(),
     prev(start_function->body.instructions.end()));
 

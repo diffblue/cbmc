@@ -29,7 +29,7 @@ void show_program(const namespacet &ns, const symex_target_equationt &equation)
   {
     std::cout << "// " << step.source.pc->location_number << " ";
     std::cout << step.source.pc->source_location.as_string() << "\n";
-    const irep_idt &function = step.source.pc->function;
+    const irep_idt &function = step.source.function;
 
     if(step.is_assignment())
     {

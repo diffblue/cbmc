@@ -153,7 +153,7 @@ void update_internal_field(
   }
 
   // set internal field to _start function-return step
-  if(SSA_step.source.pc->function==goto_functionst::entry_point())
+  if(SSA_step.source.function == goto_functionst::entry_point())
   {
     // "__CPROVER_*" function calls in __CPROVER_start are already marked as
     // internal. Don't mark any other function calls (i.e. "main"), function
@@ -299,13 +299,14 @@ void build_goto_trace(
 
       goto_trace_step.thread_nr = SSA_step.source.thread_nr;
       goto_trace_step.pc = SSA_step.source.pc;
+      goto_trace_step.function = SSA_step.source.function;
       goto_trace_step.comment = SSA_step.comment;
       goto_trace_step.type = SSA_step.type;
       goto_trace_step.hidden = SSA_step.hidden;
       goto_trace_step.format_string = SSA_step.format_string;
       goto_trace_step.io_id = SSA_step.io_id;
       goto_trace_step.formatted = SSA_step.formatted;
-      goto_trace_step.function_identifier = SSA_step.function_identifier;
+      goto_trace_step.called_function = SSA_step.called_function;
       goto_trace_step.function_arguments = SSA_step.converted_function_arguments;
 
       for(auto &arg : goto_trace_step.function_arguments)

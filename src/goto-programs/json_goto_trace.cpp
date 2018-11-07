@@ -277,10 +277,14 @@ void convert_return(
   json_call_return["internal"] = jsont::json_boolean(step.internal);
   json_call_return["thread"] = json_numbert(std::to_string(step.thread_nr));
 
-  const symbolt &symbol = ns.lookup(step.function_identifier);
+  const irep_idt &function_identifier =
+    (step.type == goto_trace_stept::typet::FUNCTION_CALL) ? step.called_function
+                                                          : step.function;
+
+  const symbolt &symbol = ns.lookup(function_identifier);
   json_objectt &json_function = json_call_return["function"].make_object();
   json_function["displayName"] = json_stringt(symbol.display_name());
-  json_function["identifier"] = json_stringt(step.function_identifier);
+  json_function["identifier"] = json_stringt(function_identifier);
   json_function["sourceLocation"] = json(symbol.location);
 
   if(!location.is_null())

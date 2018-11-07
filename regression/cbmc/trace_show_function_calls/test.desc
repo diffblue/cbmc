@@ -4,7 +4,7 @@ main.c
 ^EXIT=10$
 ^SIGNAL=0$
 Function call: function_to_call\(-2147483647\) \(depth 2\)
-Function return: function_to_call \(depth 1\)
+Function return from function_to_call \(depth 1\)
 Function call: function_to_call\(-2\) \(depth 2\)
 ^VERIFICATION FAILED$
 --

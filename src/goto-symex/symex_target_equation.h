@@ -81,7 +81,6 @@ public:
   // record return from a function
   virtual void function_return(
     const exprt &guard,
-    const irep_idt &function_identifier,
     const sourcet &source);
 
   // just record a location
@@ -231,8 +230,8 @@ public:
     std::list<exprt> io_args;
     std::list<exprt> converted_io_args;
 
-    // for function call/return
-    irep_idt function_identifier;
+    // for function calls: the function that is called
+    irep_idt called_function;
 
     // for function calls
     std::vector<exprt> ssa_function_arguments,

@@ -83,8 +83,8 @@ void goto_trace_stept::output(
 
   if(is_assert() || is_assume() || is_goto())
     out << " (" << cond_value << ')';
-  else if(is_function_call() || is_function_return())
-    out << ' ' << function_identifier;
+  else if(is_function_call())
+    out << ' ' << called_function;
 
   if(hidden)
     out << " hidden";
@@ -344,8 +344,7 @@ void show_full_goto_trace(
         out << "  " << messaget::red << step.comment << messaget::reset << '\n';
 
         if(step.pc->is_assert())
-          out << "  " << from_expr(ns, step.pc->function, step.pc->guard)
-              << '\n';
+          out << "  " << from_expr(ns, step.function, step.pc->guard) << '\n';
 
         out << '\n';
       }
@@ -360,8 +359,7 @@ void show_full_goto_trace(
           out << "  " << step.pc->source_location << '\n';
 
         if(step.pc->is_assume())
-          out << "  " << from_expr(ns, step.pc->function, step.pc->guard)
-              << '\n';
+          out << "  " << from_expr(ns, step.function, step.pc->guard) << '\n';
 
         out << '\n';
       }
@@ -431,7 +429,8 @@ void show_full_goto_trace(
         {
           if(l_it!=step.io_args.begin())
             out << ';';
-          out << ' ' << from_expr(ns, step.pc->function, *l_it);
+
+          out << ' ' << from_expr(ns, step.function, *l_it);
 
           // the binary representation
           out << " (" << trace_numeric_value(*l_it, ns, options) << ')';
@@ -453,7 +452,8 @@ void show_full_goto_trace(
       {
         if(l_it!=step.io_args.begin())
           out << ';';
-        out << ' ' << from_expr(ns, step.pc->function, *l_it);
+
+        out << ' ' << from_expr(ns, step.function, *l_it);
 
         // the binary representation
         out << " (" << trace_numeric_value(*l_it, ns, options) << ')';
@@ -466,7 +466,7 @@ void show_full_goto_trace(
       function_depth++;
       if(options.show_function_calls)
       {
-        out << "\n#### Function call: " << step.function_identifier;
+        out << "\n#### Function call: " << step.called_function;
         out << '(';
 
         bool first = true;
@@ -477,7 +477,7 @@ void show_full_goto_trace(
           else
             out << ", ";
 
-          out << from_expr(ns, step.function_identifier, arg);
+          out << from_expr(ns, step.function, arg);
         }
 
         out << ") (depth " << function_depth << ") ####\n";
@@ -488,8 +488,8 @@ void show_full_goto_trace(
       function_depth--;
       if(options.show_function_calls)
       {
-        out << "\n#### Function return: " << step.function_identifier
-            << " (depth " << function_depth << ") ####\n";
+        out << "\n#### Function return from " << step.function << " (depth "
+            << function_depth << ") ####\n";
       }
       break;
 
@@ -561,7 +561,7 @@ void show_goto_stack_trace(
     }
     else if(step.is_function_call())
     {
-      out << "  " << step.function_identifier;
+      out << "  " << step.called_function;
       out << '(';
 
       bool first = true;
@@ -572,7 +572,7 @@ void show_goto_stack_trace(
         else
           out << ", ";
 
-        out << from_expr(ns, step.function_identifier, arg);
+        out << from_expr(ns, step.function, arg);
       }
 
       out << ')';

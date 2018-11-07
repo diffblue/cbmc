@@ -148,11 +148,13 @@ public:
   /// procedure.
   /// \param state Symex state to start with.
   /// \param goto_functions GOTO model to symex.
+  /// \param function_identifier The function with the instruction range
   /// \param first Entry point in form of a first instruction.
   /// \param limit Final instruction, which itself will not be symexed.
   virtual void symex_instruction_range(
     statet &,
     const goto_functionst &,
+    const irep_idt &function_identifier,
     goto_programt::const_targett first,
     goto_programt::const_targett limit);
 
@@ -162,11 +164,13 @@ public:
   /// procedure.
   /// \param state Symex state to start with.
   /// \param get_goto_function retrieves a function body
+  /// \param function_identifier The function with the instruction range
   /// \param first Entry point in form of a first instruction.
   /// \param limit Final instruction, which itself will not be symexed.
   virtual void symex_instruction_range(
     statet &state,
     const get_goto_functiont &get_goto_function,
+    const irep_idt &function_identifier,
     goto_programt::const_targett first,
     goto_programt::const_targett limit);
 
@@ -183,13 +187,15 @@ protected:
   /// Initialise the symbolic execution and the given state with <code>pc</code>
   /// as entry point.
   /// \param state Symex state to initialise.
-  /// \param goto_functions GOTO model to symex.
+  /// \param get_goto_function producer for GOTO functions
+  /// \param function_identifier The function in which the instructions are
   /// \param pc first instruction to symex
   /// \param limit final instruction, which itself will not
   /// be symexed.
   void initialize_entry_point(
     statet &state,
     const get_goto_functiont &get_goto_function,
+    const irep_idt &function_identifier,
     goto_programt::const_targett pc,
     goto_programt::const_targett limit);
 

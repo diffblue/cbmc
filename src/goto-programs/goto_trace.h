@@ -86,6 +86,9 @@ public:
   enum class assignment_typet { STATE, ACTUAL_PARAMETER };
   assignment_typet assignment_type;
 
+  // The instruction that created this step
+  // (function calls are in the caller, function returns are in the callee)
+  irep_idt function;
   goto_programt::const_targett pc;
 
   // this transition done by given thread number
@@ -113,8 +116,8 @@ public:
   io_argst io_args;
   bool formatted;
 
-  // for function call/return
-  irep_idt function_identifier;
+  // for function calls
+  irep_idt called_function;
 
   // for function call
   std::vector<exprt> function_arguments;

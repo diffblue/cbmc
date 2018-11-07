@@ -65,10 +65,11 @@ void symex_bmct::symex_step(
 
   goto_symext::symex_step(get_goto_function, state);
 
-  if(record_coverage &&
-     // avoid an invalid iterator in state.source.pc
-     (!cur_pc->is_end_function() ||
-      cur_pc->function!=goto_functionst::entry_point()))
+  if(
+    record_coverage &&
+    // avoid an invalid iterator in state.source.pc
+    (!cur_pc->is_end_function() ||
+     state.source.function != goto_functionst::entry_point()))
   {
     // forward goto will effectively be covered via phi function,
     // which does not invoke symex_step; as symex_step is called
