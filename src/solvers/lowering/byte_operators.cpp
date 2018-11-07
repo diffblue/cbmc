@@ -18,6 +18,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "flatten_byte_extract_exceptions.h"
 
+// clang-format off
+
 /// rewrite an object into its individual bytes
 /// \par parameters: src  object to unpack
 /// little_endian  true, iff assumed endianness is little-endian
@@ -664,3 +666,4 @@ exprt flatten_byte_operators(
   else
     return tmp;
 }
+// clang-format on
