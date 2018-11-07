@@ -230,6 +230,12 @@ bool ci_lazy_methodst::handle_virtual_methods_with_no_callees(
   const std::unordered_set<exprt, irep_hash> &virtual_function_calls,
   symbol_tablet &symbol_table)
 {
+  ci_lazy_methods_neededt lazy_methods_loader(
+    methods_to_convert_later,
+    instantiated_classes,
+    symbol_table,
+    pointer_type_selector);
+
   bool any_new_classes = false;
   for(const exprt &virtual_function_call : virtual_function_calls)
   {
@@ -246,8 +252,12 @@ bool ci_lazy_methodst::handle_virtual_methods_with_no_callees(
     // Add the call class to instantiated_classes and assert that it
     // didn't already exist
     const irep_idt &call_class = virtual_function_call.get(ID_C_class);
-    auto ret_class = instantiated_classes.insert(call_class);
-    CHECK_RETURN(ret_class.second);
+    bool added_class = instantiated_classes.count(call_class) == 0;
+    CHECK_RETURN(added_class);
+
+    lazy_methods_loader.add_all_needed_classes(
+      to_pointer_type(
+        to_java_method_type(virtual_function_call.type()).get_this()->type()));
     any_new_classes = true;
 
     // Check that `get_virtual_method_target` returns a method now
