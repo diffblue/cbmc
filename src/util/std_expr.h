@@ -4949,7 +4949,7 @@ inline const cond_exprt &to_cond_expr(const exprt &expr)
 {
   PRECONDITION(expr.id() == ID_cond);
   DATA_INVARIANT(
-    expr.operands().size() % 2 != 0, "cond must have even number of operands");
+    expr.operands().size() % 2 == 0, "cond must have even number of operands");
   return static_cast<const cond_exprt &>(expr);
 }
 
