@@ -138,12 +138,12 @@ SRC = $(BOOLEFORCE_SRC) \
       flattening/bv_utils.cpp \
       flattening/c_bit_field_replacement_type.cpp \
       flattening/equality.cpp \
-      flattening/flatten_byte_operators.cpp \
       flattening/functions.cpp \
       flattening/pointer_logic.cpp \
       floatbv/float_bv.cpp \
       floatbv/float_utils.cpp \
       floatbv/float_approximation.cpp \
+      lowering/byte_operators.cpp \
       lowering/popcount.cpp \
       miniBDD/miniBDD.cpp \
       prop/bdd_expr.cpp \

@@ -16,10 +16,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 #include <util/throw_with_nested.h>
 
+#include <solvers/lowering/expr_lowering.h>
+#include <solvers/lowering/flatten_byte_extract_exceptions.h>
+
 #include "bv_conversion_exceptions.h"
 #include "bv_endianness_map.h"
-#include "flatten_byte_extract_exceptions.h"
-#include "flatten_byte_operators.h"
 
 bvt map_bv(const bv_endianness_mapt &map, const bvt &src)
 {

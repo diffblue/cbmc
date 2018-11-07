@@ -6,7 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include "flatten_byte_operators.h"
+#include "expr_lowering.h"
 
 #include <util/arith_tools.h>
 #include <util/byte_operators.h>
@@ -17,6 +17,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/simplify_expr.h>
 
 #include "flatten_byte_extract_exceptions.h"
+
+// clang-format off
 
 /// rewrite an object into its individual bytes
 /// \par parameters: src  object to unpack
@@ -664,3 +666,4 @@ exprt flatten_byte_operators(
   else
     return tmp;
 }
+// clang-format on
