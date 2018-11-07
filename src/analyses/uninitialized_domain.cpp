@@ -29,6 +29,7 @@ void uninitialized_domaint::transform(
   if(has_values.is_false())
     return;
 
+  // clang-format off
   if(from->is_decl())
     {
       const irep_idt &identifier=
@@ -50,6 +51,7 @@ void uninitialized_domaint::transform(
       for(const auto &expr : read)
         assign(expr);
     }
+    // clang-format on
 }
 
 void uninitialized_domaint::assign(const exprt &lhs)

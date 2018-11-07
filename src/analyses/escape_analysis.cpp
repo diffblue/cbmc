@@ -457,6 +457,7 @@ void escape_analysist::instrument(
 
       const goto_programt::instructiont &instruction=*i_it;
 
+      // clang-format off
       if(instruction.type == ASSIGN)
         {
           const code_assignt &code_assign=to_code_assign(instruction.code);
@@ -521,6 +522,7 @@ void escape_analysist::instrument(
             i_it++;
           }
         }
+        // clang-format on
     }
 
     Forall_goto_program_instructions(i_it, f_it->second.body)

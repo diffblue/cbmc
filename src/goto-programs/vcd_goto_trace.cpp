@@ -113,6 +113,7 @@ void output_vcd(
 
   for(const auto &step : goto_trace.steps)
   {
+    // clang-format off
     if(step.is_assignment())
       {
         auto lhs_object=step.get_lhs_object();
@@ -145,5 +146,6 @@ void output_vcd(
           }
         }
       }
+      // clang-format on
   }
 }

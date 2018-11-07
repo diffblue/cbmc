@@ -325,6 +325,7 @@ bool boolbvt::type_conversion(
   case bvtypet::IS_UNSIGNED:
   case bvtypet::IS_SIGNED:
   case bvtypet::IS_C_ENUM:
+    // clang-format off
     switch(src_bvtype)
     {
     case bvtypet::IS_FLOAT: // float to integer
@@ -448,6 +449,7 @@ bool boolbvt::type_conversion(
           return false;
         }
     }
+    // clang-format on
     break;
 
   case bvtypet::IS_VERILOG_UNSIGNED:
