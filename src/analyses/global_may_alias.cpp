@@ -103,32 +103,31 @@ void global_may_alias_domaint::transform(
 
   const goto_programt::instructiont &instruction=*from;
 
-  // clang-format off
   switch(instruction.type)
   {
   case ASSIGN:
-    {
-      const code_assignt &code_assign=to_code_assign(instruction.code);
+  {
+    const code_assignt &code_assign = to_code_assign(instruction.code);
 
-      std::set<irep_idt> rhs_aliases;
-      get_rhs_aliases(code_assign.rhs(), rhs_aliases);
-      assign_lhs_aliases(code_assign.lhs(), rhs_aliases);
-    }
+    std::set<irep_idt> rhs_aliases;
+    get_rhs_aliases(code_assign.rhs(), rhs_aliases);
+    assign_lhs_aliases(code_assign.lhs(), rhs_aliases);
     break;
+  }
 
   case DECL:
-    {
-      const code_declt &code_decl=to_code_decl(instruction.code);
-      aliases.isolate(code_decl.get_identifier());
-    }
+  {
+    const code_declt &code_decl = to_code_decl(instruction.code);
+    aliases.isolate(code_decl.get_identifier());
     break;
+  }
 
   case DEAD:
-    {
-      const code_deadt &code_dead=to_code_dead(instruction.code);
-      aliases.isolate(code_dead.get_identifier());
-    }
+  {
+    const code_deadt &code_dead = to_code_dead(instruction.code);
+    aliases.isolate(code_dead.get_identifier());
     break;
+  }
 
   case FUNCTION_CALL:
   case GOTO:
@@ -149,7 +148,6 @@ void global_may_alias_domaint::transform(
   case NO_INSTRUCTION_TYPE:
     break;
   }
-  // clang-format on
 }
 
 void global_may_alias_domaint::output(

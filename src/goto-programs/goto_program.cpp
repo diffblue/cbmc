@@ -271,7 +271,6 @@ std::list<exprt> expressions_read(
 {
   std::list<exprt> dest;
 
-  // clang-format off
   switch(instruction.type)
   {
   case ASSUME:
@@ -286,23 +285,22 @@ std::list<exprt> expressions_read(
     break;
 
   case FUNCTION_CALL:
-    {
-      const code_function_callt &function_call =
-        instruction.get_function_call();
-      forall_expr(it, function_call.arguments())
-        dest.push_back(*it);
-      if(function_call.lhs().is_not_nil())
-        parse_lhs_read(function_call.lhs(), dest);
-    }
+  {
+    const code_function_callt &function_call = instruction.get_function_call();
+    forall_expr(it, function_call.arguments())
+      dest.push_back(*it);
+    if(function_call.lhs().is_not_nil())
+      parse_lhs_read(function_call.lhs(), dest);
     break;
+  }
 
   case ASSIGN:
-    {
-      const code_assignt &assignment = instruction.get_assign();
-      dest.push_back(assignment.rhs());
-      parse_lhs_read(assignment.lhs(), dest);
-    }
+  {
+    const code_assignt &assignment = instruction.get_assign();
+    dest.push_back(assignment.rhs());
+    parse_lhs_read(assignment.lhs(), dest);
     break;
+  }
 
   case CATCH:
   case THROW:
@@ -320,7 +318,6 @@ std::list<exprt> expressions_read(
   case NO_INSTRUCTION_TYPE:
     break;
   }
-  // clang-format on
 
   return dest;
 }

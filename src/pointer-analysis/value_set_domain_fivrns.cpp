@@ -30,7 +30,6 @@ bool value_set_domain_fivrnst::transform(
     to_l->function << " " << to_l->location_number << '\n';
 #endif
 
-  // clang-format off
   switch(from_l->type)
   {
   case END_FUNCTION:
@@ -44,13 +43,12 @@ bool value_set_domain_fivrnst::transform(
     break;
 
   case FUNCTION_CALL:
-    {
-      const code_function_callt &code=
-        to_code_function_call(from_l->code);
+  {
+    const code_function_callt &code = to_code_function_call(from_l->code);
 
-      value_set.do_function_call(function_to, code.arguments(), ns);
-      break;
-    }
+    value_set.do_function_call(function_to, code.arguments(), ns);
+    break;
+  }
 
   case CATCH:
   case THROW:
@@ -69,7 +67,6 @@ bool value_set_domain_fivrnst::transform(
   case NO_INSTRUCTION_TYPE:
     break;
   }
-  // clang-format on
 
   return value_set.handover();
 }

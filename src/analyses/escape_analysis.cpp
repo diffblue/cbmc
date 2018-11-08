@@ -457,72 +457,60 @@ void escape_analysist::instrument(
 
       const goto_programt::instructiont &instruction=*i_it;
 
-      // clang-format off
       if(instruction.type == ASSIGN)
-        {
-          const code_assignt &code_assign=to_code_assign(instruction.code);
+      {
+        const code_assignt &code_assign = to_code_assign(instruction.code);
 
-          std::set<irep_idt> cleanup_functions;
-          operator[](i_it).check_lhs(code_assign.lhs(), cleanup_functions);
-          insert_cleanup(
-            f_it->second,
-            i_it,
-            code_assign.lhs(),
-            cleanup_functions,
-            false,
-            ns);
-        }
+        std::set<irep_idt> cleanup_functions;
+        operator[](i_it).check_lhs(code_assign.lhs(), cleanup_functions);
+        insert_cleanup(
+          f_it->second, i_it, code_assign.lhs(), cleanup_functions, false, ns);
+      }
       else if(instruction.type == DEAD)
+      {
+        const code_deadt &code_dead = to_code_dead(instruction.code);
+
+        std::set<irep_idt> cleanup_functions1;
+
+        escape_domaint &d = operator[](i_it);
+
+        const escape_domaint::cleanup_mapt::const_iterator m_it =
+          d.cleanup_map.find("&" + id2string(code_dead.get_identifier()));
+
+        // does it have a cleanup function for the object?
+        if(m_it != d.cleanup_map.end())
         {
-          const code_deadt &code_dead=to_code_dead(instruction.code);
-
-          std::set<irep_idt> cleanup_functions1;
-
-          escape_domaint &d=operator[](i_it);
-
-          const escape_domaint::cleanup_mapt::const_iterator m_it=
-            d.cleanup_map.find("&"+id2string(code_dead.get_identifier()));
-
-          // does it have a cleanup function for the object?
-          if(m_it!=d.cleanup_map.end())
-          {
-            cleanup_functions1.insert(
-              m_it->second.cleanup_functions.begin(),
-              m_it->second.cleanup_functions.end());
-          }
-
-          std::set<irep_idt> cleanup_functions2;
-
-          d.check_lhs(code_dead.symbol(), cleanup_functions2);
-
-          insert_cleanup(
-            f_it->second,
-            i_it,
-            code_dead.symbol(),
-            cleanup_functions1,
-            true,
-            ns);
-          insert_cleanup(
-            f_it->second,
-            i_it,
-            code_dead.symbol(),
-            cleanup_functions2,
-            false,
-            ns);
-
-          for(const auto &c : cleanup_functions1)
-          {
-            (void)c;
-            i_it++;
-          }
-
-          for(const auto &c : cleanup_functions2)
-          {
-            (void)c;
-            i_it++;
-          }
+          cleanup_functions1.insert(
+            m_it->second.cleanup_functions.begin(),
+            m_it->second.cleanup_functions.end());
         }
-        // clang-format on
+
+        std::set<irep_idt> cleanup_functions2;
+
+        d.check_lhs(code_dead.symbol(), cleanup_functions2);
+
+        insert_cleanup(
+          f_it->second, i_it, code_dead.symbol(), cleanup_functions1, true, ns);
+        insert_cleanup(
+          f_it->second,
+          i_it,
+          code_dead.symbol(),
+          cleanup_functions2,
+          false,
+          ns);
+
+        for(const auto &c : cleanup_functions1)
+        {
+          (void)c;
+          i_it++;
+        }
+
+        for(const auto &c : cleanup_functions2)
+        {
+          (void)c;
+          i_it++;
+        }
+      }
     }
 
     Forall_goto_program_instructions(i_it, f_it->second.body)

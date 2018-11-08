@@ -64,7 +64,6 @@ void interval_domaint::transform(
   ai_baset &,
   const namespacet &ns)
 {
-  // clang-format off
   const goto_programt::instructiont &instruction=*from;
   switch(instruction.type)
   {
@@ -81,33 +80,33 @@ void interval_domaint::transform(
     break;
 
   case GOTO:
+  {
+    // Comparing iterators is safe as the target must be within the same list
+    // of instructions because this is a GOTO.
+    locationt next = from;
+    next++;
+    if(from->get_target() != next) // If equal then a skip
     {
-      // Comparing iterators is safe as the target must be within the same list
-      // of instructions because this is a GOTO.
-      locationt next=from;
-      next++;
-      if(from->get_target() != next) // If equal then a skip
-      {
-        if(next == to)
-          assume(not_exprt(instruction.get_condition()), ns);
-        else
-          assume(instruction.get_condition(), ns);
-      }
+      if(next == to)
+        assume(not_exprt(instruction.get_condition()), ns);
+      else
+        assume(instruction.get_condition(), ns);
     }
     break;
+  }
 
   case ASSUME:
     assume(instruction.get_condition(), ns);
     break;
 
   case FUNCTION_CALL:
-    {
-      const code_function_callt &code_function_call=
-        to_code_function_call(instruction.code);
-      if(code_function_call.lhs().is_not_nil())
-        havoc_rec(code_function_call.lhs());
-    }
+  {
+    const code_function_callt &code_function_call =
+      to_code_function_call(instruction.code);
+    if(code_function_call.lhs().is_not_nil())
+      havoc_rec(code_function_call.lhs());
     break;
+  }
 
   case CATCH:
   case THROW:
@@ -125,7 +124,6 @@ void interval_domaint::transform(
   case NO_INSTRUCTION_TYPE:
     break;
   }
-  // clang-format on
 }
 
 /// Sets *this to the mathematical join between the two domains. This can be

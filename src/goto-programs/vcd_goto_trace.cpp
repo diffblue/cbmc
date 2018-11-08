@@ -113,39 +113,41 @@ void output_vcd(
 
   for(const auto &step : goto_trace.steps)
   {
-    // clang-format off
     if(step.is_assignment())
+    {
+      auto lhs_object = step.get_lhs_object();
+      if(lhs_object.has_value())
       {
-        auto lhs_object=step.get_lhs_object();
-        if(lhs_object.has_value())
+        irep_idt identifier = lhs_object->get_identifier();
+        const typet &type = lhs_object->type();
+
+        out << '#' << timestamp << "\n";
+        timestamp++;
+
+        const auto number = n.number(identifier);
+
+        // booleans are special in VCD
+        if(type.id() == ID_bool)
         {
-          irep_idt identifier=lhs_object->get_identifier();
-          const typet &type=lhs_object->type();
-
-          out << '#' << timestamp << "\n";
-          timestamp++;
-
-          const auto number=n.number(identifier);
-
-          // booleans are special in VCD
-          if(type.id()==ID_bool)
-          {
-            if(step.full_lhs_value.is_true())
-              out << "1" << "V" << number << "\n";
-            else if(step.full_lhs_value.is_false())
-              out << "0" << "V" << number << "\n";
-            else
-              out << "x" << "V" << number << "\n";
-          }
+          if(step.full_lhs_value.is_true())
+            out << "1"
+                << "V" << number << "\n";
+          else if(step.full_lhs_value.is_false())
+            out << "0"
+                << "V" << number << "\n";
           else
-          {
-            std::string binary=as_vcd_binary(step.full_lhs_value, ns);
+            out << "x"
+                << "V" << number << "\n";
+        }
+        else
+        {
+          std::string binary = as_vcd_binary(step.full_lhs_value, ns);
 
-            if(!binary.empty())
-              out << "b" << binary << " V" << number << " " << "\n";
-          }
+          if(!binary.empty())
+            out << "b" << binary << " V" << number << " "
+                << "\n";
         }
       }
-      // clang-format on
+    }
   }
 }

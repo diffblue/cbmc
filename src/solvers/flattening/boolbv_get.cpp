@@ -245,7 +245,6 @@ exprt boolbvt::bv_get_rec(
     value=ch+value;
   }
 
-  // clang-format off
   switch(bvtype)
   {
   case bvtypet::IS_UNKNOWN:
@@ -268,13 +267,13 @@ exprt boolbvt::bv_get_rec(
     break;
 
   case bvtypet::IS_RANGE:
-    {
-      mp_integer int_value=binary2integer(value, false);
-      mp_integer from=string2integer(type.get_string(ID_from));
+  {
+    mp_integer int_value = binary2integer(value, false);
+    mp_integer from = string2integer(type.get_string(ID_from));
 
-      return constant_exprt(integer2string(int_value + from), type);
-    }
+    return constant_exprt(integer2string(int_value + from), type);
     break;
+  }
 
   case bvtypet::IS_C_BIT_FIELD:
   case bvtypet::IS_VERILOG_UNSIGNED:
@@ -292,7 +291,6 @@ exprt boolbvt::bv_get_rec(
     return constant_exprt(bvrep, type);
   }
   }
-  // clang-format on
 
   UNREACHABLE;
 }

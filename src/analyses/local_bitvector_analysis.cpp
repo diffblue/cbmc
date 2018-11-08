@@ -266,48 +266,47 @@ void local_bitvector_analysist::build()
     auto &loc_info_src=loc_infos[loc_nr];
     auto loc_info_dest=loc_infos[loc_nr];
 
-    // clang-format off
     switch(instruction.type)
     {
     case ASSIGN:
-      {
-        const code_assignt &code_assign=to_code_assign(instruction.code);
-        assign_lhs(
-          code_assign.lhs(), code_assign.rhs(), loc_info_src, loc_info_dest);
-      }
+    {
+      const code_assignt &code_assign = to_code_assign(instruction.code);
+      assign_lhs(
+        code_assign.lhs(), code_assign.rhs(), loc_info_src, loc_info_dest);
       break;
+    }
 
     case DECL:
-      {
-        const code_declt &code_decl=to_code_decl(instruction.code);
-        assign_lhs(
-          code_decl.symbol(),
-          exprt(ID_uninitialized),
-          loc_info_src,
-          loc_info_dest);
-      }
+    {
+      const code_declt &code_decl = to_code_decl(instruction.code);
+      assign_lhs(
+        code_decl.symbol(),
+        exprt(ID_uninitialized),
+        loc_info_src,
+        loc_info_dest);
       break;
+    }
 
     case DEAD:
-      {
-        const code_deadt &code_dead=to_code_dead(instruction.code);
-        assign_lhs(
-          code_dead.symbol(),
-          exprt(ID_uninitialized),
-          loc_info_src,
-          loc_info_dest);
-      }
+    {
+      const code_deadt &code_dead = to_code_dead(instruction.code);
+      assign_lhs(
+        code_dead.symbol(),
+        exprt(ID_uninitialized),
+        loc_info_src,
+        loc_info_dest);
       break;
+    }
 
     case FUNCTION_CALL:
-      {
-        const code_function_callt &code_function_call=
-          to_code_function_call(instruction.code);
-        if(code_function_call.lhs().is_not_nil())
-          assign_lhs(
-            code_function_call.lhs(), nil_exprt(), loc_info_src, loc_info_dest);
-      }
+    {
+      const code_function_callt &code_function_call =
+        to_code_function_call(instruction.code);
+      if(code_function_call.lhs().is_not_nil())
+        assign_lhs(
+          code_function_call.lhs(), nil_exprt(), loc_info_src, loc_info_dest);
       break;
+    }
 
     case CATCH:
     case THROW:
@@ -327,7 +326,6 @@ void local_bitvector_analysist::build()
     case NO_INSTRUCTION_TYPE:
       break;
     }
-    // clang-format on
 
     for(const auto &succ : node.successors)
     {
