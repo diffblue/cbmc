@@ -41,10 +41,10 @@ digraph G {
 }
 \enddot
 
-The \ref cbmc-user-manual "CBMC User Manual" describes CBMC from a user
-perspective. Each node in the diagram above links to the appropriate
-class or module documentation, describing that particular stage in the
-CBMC pipeline.
+The [CPROVER User Manual](http://www.cprover.org/cprover-manual/) describes
+CBMC from a user perspective. Each node in the diagram above links to the
+appropriate class or module documentation, describing that particular stage
+in the CBMC pipeline.
 CPROVER is structured in a similar fashion to a compiler. It has
 language specific front-ends which perform limited syntactic analysis
 and then convert to an intermediate format. The intermediate format can
