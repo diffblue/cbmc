@@ -59,5 +59,7 @@
 /jbmc/regression/
 
 /scripts/ @diffblue/devops @thk123 @forejtv @peterschrammel
+/scripts/expected_doxygen_warnings.txt
+
 /.travis.yml @diffblue/devops @thk123 @forejtv @peterschrammel
 /appveyor.yml @diffblue/devops @thk123 @forejtv @peterschrammel
