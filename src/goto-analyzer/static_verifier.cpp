@@ -167,19 +167,21 @@ static void static_verifier_console(
     if(last_function_id != result.function_id)
     {
       if(!last_function_id.empty())
-        m.result() << '\n';
+        m.status() << '\n';
       last_function_id = result.function_id;
       const auto &symbol = ns.lookup(last_function_id);
-      m.result() << "******** Function " << symbol.display_name();
+      m.status() << messaget::underline << "Function " << symbol.display_name();
       function_file = symbol.location.get_file();
       if(!function_file.empty())
-        m.result() << ' ' << function_file;
+        m.status() << ' ' << function_file;
       if(!symbol.location.get_line().empty())
-        m.result() << ':' << symbol.location.get_line();
-      m.result() << '\n';
+        m.status() << ':' << symbol.location.get_line();
+      m.status() << messaget::reset << messaget::eom;
     }
 
-    m.result() << '[' << result.source_location.get_property_id() << ']';
+    m.result() << messaget::faint << '['
+               << result.source_location.get_property_id() << ']'
+               << messaget::reset;
 
     if(
       !result.source_location.get_file().empty() &&
