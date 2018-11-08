@@ -67,7 +67,7 @@ cbmc file1.c --show-properties --bounds-check --pointer-check
 The two options `--bounds-check` and `--pointer-check` instruct CBMC to
 look for errors related to pointers and array bounds. CBMC will print
 the list of properties it checks. Note that it lists, among others, a
-property labelled with "object bounds in argv" together with the location
+property labelled with "pointer outside object bounds in argv" together with the location
 of the faulty array access. As you can see, CBMC largely determines the
 property it needs to check itself. This is realized by means of a
 preliminary static analysis, which relies on computing a fixed point on
@@ -110,7 +110,7 @@ property for the object bounds of `argv` does not hold, and will thus
 print a line as follows:
 
 ```plaintext
-[main.pointer_dereference.6] dereference failure: object bounds in argv[(signed long int)2]: FAILURE
+[main.pointer_dereference.6] dereference failure: pointer outside object bounds in argv[(signed long int)2]: FAILURE
 ```
 
 ### Counterexample Traces
