@@ -92,29 +92,23 @@ protected:
   /// recursive call
   std::vector<recursion_unwind_handlert> recursion_unwind_handlers;
 
-  //
-  // overloaded from goto_symext
-  //
-  virtual void symex_step(
-    const get_goto_functiont &get_goto_function,
-    statet &state);
+  void symex_step(const get_goto_functiont &get_goto_function, statet &state)
+    override;
 
-  virtual void merge_goto(
-    const statet::goto_statet &goto_state,
-    statet &state);
+  void
+  merge_goto(const statet::goto_statet &goto_state, statet &state) override;
 
-  // for loop unwinding
-  virtual bool should_stop_unwind(
+  bool should_stop_unwind(
     const symex_targett::sourcet &source,
     const goto_symex_statet::call_stackt &context,
-    unsigned unwind);
+    unsigned unwind) override;
 
-  virtual bool get_unwind_recursion(
+  bool get_unwind_recursion(
     const irep_idt &identifier,
     const unsigned thread_nr,
-    unsigned unwind);
+    unsigned unwind) override;
 
-  virtual void no_body(const irep_idt &identifier);
+  void no_body(const irep_idt &identifier) override;
 
   std::unordered_set<irep_idt> body_warnings;
 
