@@ -14,8 +14,7 @@ and an a set of header files.
 
 2.  **Windows:** The Windows version of CBMC requires the preprocessor
     `cl.exe`, which is part of Microsoft Visual Studio. We recommend the
-    free [Visual Studio Community
-    2013](http://www.visualstudio.com/en-us/products/visual-studio-community-vs).
+    free [Visual Studio Community](http://www.visualstudio.com/en-us/products/visual-studio-community-vs).
 
 3.  **MacOS:** Install the [XCode Command Line
     Utilities](http://developer.apple.com/technologies/xcode.html) prior
