@@ -8,7 +8,9 @@
 #include <goto-programs/goto_functions.h>
 
 #include <util/cout_message.h>
+#include <util/cmdline.h>
 #include <util/graph.h>
+#include <util/options.h>
 
 #include <forward_list>
 #include <limits>
@@ -67,7 +69,10 @@
 class dispatch_loop_detectort
 {
 public:
-  explicit dispatch_loop_detectort(const goto_functionst &, messaget &log);
+  dispatch_loop_detectort(
+    const goto_functionst &,
+    const optionst &,
+    messaget &log);
 
   /// \return `true` on failure, `false` otherwise
   bool detect_dispatch_loops();
@@ -543,10 +548,13 @@ public:
       return std::get<2>(members);
     }
   };
+
+  static void set_front_end_options(const cmdlinet &, optionst &);
 };
 
 #define OPT_DISPATCH_LOOP_DETECTION                                            \
-  "(dispatch-loop-graph)(dispatch-loop-location)"
+  "(dispatch-loop-graph)(dispatch-loop-location)"                              \
+  "(dispatch-function-search-depth)"
 
 #define HELP_DISPATCH_LOOP_DETECTION                                           \
   " --dispatch-loop-graph        print a DOT graph showing the dispatch "      \

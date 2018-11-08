@@ -475,7 +475,10 @@ path_strategy_choosert::path_strategy_choosert()
          // NOLINTNEXTLINE(whitespace/braces)
          [](const path_storaget::strategy_contextt &ctx)
            -> std::unique_ptr<path_storaget> {
-           dispatch_loop_detectort detector(ctx.goto_functions, ctx.log);
+           dispatch_loop_detectort detector(
+              ctx.goto_functions,
+              ctx.options,
+              ctx.log);
            if(detector.detect_dispatch_loops())
            {
              ctx.log.warning() << "No dispatch loop detected. Using strategy "

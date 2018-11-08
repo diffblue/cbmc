@@ -63,10 +63,14 @@ public:
   struct strategy_contextt
   {
     const goto_functionst &goto_functions;
+    const optionst &options;
     messaget &log;
 
-    strategy_contextt(const goto_functionst &gf, messaget &log)
-      : goto_functions(gf), log(log)
+    strategy_contextt(
+      const goto_functionst &gf,
+      const optionst &opts,
+      messaget &log)
+      : goto_functions(gf), options(opts), log(log)
     {
     }
   };

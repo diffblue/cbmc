@@ -213,7 +213,9 @@ int goto_instrument_parse_optionst::doit()
       cmdline.isset("dispatch-loop-location") ||
       cmdline.isset("dispatch-loop-graph"))
     {
-      dispatch_loop_detectort det(goto_model.goto_functions, *this);
+      dispatch_loop_detectort::set_front_end_options(cmdline, options);
+
+      dispatch_loop_detectort det(goto_model.goto_functions, options, *this);
       if(det.detect_dispatch_loops())
       {
         status() << "Unable to construct dispatch loop graph" << eom;

@@ -41,10 +41,14 @@ Author: Kareem Khazem <karkhaz@karkhaz.com>
 
 dispatch_loop_detectort::dispatch_loop_detectort(
   const goto_functionst &gf,
+  const optionst &options,
   messaget &log)
   : goto_functions(gf),
     log(log),
-    search_depth(2),
+    search_depth(
+      options.is_set("dispatch-function-search-depth") ?
+        options.get_signed_int_option("dispatch-function-search-depth") :
+        2),
     NO_LIMIT(std::numeric_limits<std::size_t>::max()),
     key(
       R"(a -> b -> c -> d -> e [color="#ffffff"];)"
@@ -108,6 +112,10 @@ dispatch_loop_detectort::dispatch_loop_detectort(
       {std::regex(R"(\s+$)" RE_FLAGS), ""},
     })
 {
+  if(search_depth == 0)
+    log.warning() << "No dispatch loops will be detected with search_depth "
+                  << "set to 0. Set it to 1 to search only `main()` for loops"
+                  << log.eom;
 }
 
 bool dispatch_loop_detectort::detect_dispatch_loops()
@@ -1536,5 +1544,17 @@ void dispatch_loop_detectort::dispatch_loopt::get_all_nodes(
     case block_nodet::typet::SWITCH_CASE:
       INVARIANT(false, "SWITCH_CASEs should have been converted to BRANCHes");
     }
+  }
+}
+
+void dispatch_loop_detectort::set_front_end_options(
+  const cmdlinet &cmdline,
+  optionst &opts)
+{
+  if(cmdline.isset("dispatch-function-search-depth"))
+  {
+    opts.set_option("dispatch-function-search-depth",
+                    std::stoi(
+                      cmdline.get_value("dispatch-function-search-depth")));
   }
 }

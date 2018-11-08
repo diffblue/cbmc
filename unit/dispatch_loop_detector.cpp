@@ -282,7 +282,7 @@ void _check(
   ret = cbmc_parse_optionst::get_goto_program(gm, opts, cmdline, log, mh);
   REQUIRE(ret == -1);
 
-  dispatch_loop_detectort det(gm.goto_functions, log);
+  dispatch_loop_detectort det(gm.goto_functions, opts, log);
   REQUIRE(det.detect_dispatch_loops() == 0);
 
   if(det.found_dispatch_loop_location())
