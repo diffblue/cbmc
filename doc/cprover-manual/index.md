@@ -12,17 +12,19 @@
 
 ## 4. [Test Suite Generation](test-suite/)
 
-## 5. Modeling
+## 5. [Program Properties](properties/)
+
+## 6. Modeling
 
 [Nondeterminism](modeling/nondeterminism/),
 [Assumptions](modeling/assumptions/),
 [Pointers](modeling/pointers/),
 [Floating Point](modeling/floating-point/)
 
-## 6. Build Systems
+## 7. Build Systems
 
 [Integration into Build Systems with goto-cc](goto-cc/),
 [Integration with Visual Studio builds](visual-studio/)
 
-## 7. [The CPROVER API Reference](api/)
+## 8. [The CPROVER API Reference](api/)
 
