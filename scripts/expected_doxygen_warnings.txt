@@ -20,7 +20,7 @@
 /cbmc/src/solvers/refinement/string_refinement.cpp:1511: warning: argument 'stream' of command @param is not found in the argument list of compute_inverse_function(const exprt &qvar, const exprt &val, const exprt &f)
 /cbmc/src/solvers/refinement/string_refinement.cpp:239: warning: Invalid list item found
 /cbmc/src/solvers/refinement/string_refinement.cpp:1823: warning: argument 'stream' of command @param is not found in the argument list of instantiate(const string_constraintt &axiom, const exprt &str, const exprt &val)
-/cbmc/src/solvers/refinement/string_refinement.cpp:112: warning: The following parameters of instantiate(const string_not_contains_constraintt &axiom, const index_set_pairt &index_set, const string_constraint_generatort &generator, const std::map< string_not_contains_constraintt, symbol_exprt > &witnesses) are not documented:
+/cbmc/src/solvers/refinement/string_refinement.cpp:112: warning: The following parameters of instantiate(const string_not_contains_constraintt &axiom, const index_set_pairt &index_set, const string_constraint_generatort &generator, const std::unordered_map< string_not_contains_constraintt, symbol_exprt > &witnesses) are not documented:
   parameter 'witnesses'
 /cbmc/src/solvers/refinement/string_refinement.cpp:1052: warning: The following parameters of substitute_array_access(const with_exprt &expr, const exprt &index, const bool left_propagate) are not documented:
   parameter 'left_propagate'
@@ -95,9 +95,6 @@
 /cbmc/src/goto-programs/goto_program.cpp:21: warning: argument 'instruction' of command @param is not found in the argument list of goto_programt::output_instruction(const namespacet &ns, const irep_idt &identifier, std::ostream &out, const instructionst::value_type &it) const
 /cbmc/src/goto-programs/goto_program.h:560: warning: The following parameters of goto_programt::output_instruction(const namespacet &ns, const irep_idt &identifier, std::ostream &out, const instructionst::value_type &it) const are not documented:
   parameter 'it'
-/cbmc/src/goto-symex/goto_symex.h:179: warning: argument 'goto_functions' of command @param is not found in the argument list of goto_symext::initialize_entry_point(statet &state, const get_goto_functiont &get_goto_function, goto_programt::const_targett pc, goto_programt::const_targett limit)
-/cbmc/src/goto-symex/goto_symex.h:185: warning: The following parameters of goto_symext::initialize_entry_point(statet &state, const get_goto_functiont &get_goto_function, goto_programt::const_targett pc, goto_programt::const_targett limit) are not documented:
-  parameter 'get_goto_function'
 /cbmc/src/goto-instrument/wmm/goto2graph.h:260: warning: The following parameters of instrumentert::cfg_visitort::visit_cfg_function(value_setst &value_sets, memory_modelt model, bool no_dependencies, loop_strategyt duplicate_body, const irep_idt &function, std::set< nodet > &ending_vertex) are not documented:
   parameter 'model'
   parameter 'no_dependencies'
@@ -171,3 +168,5 @@
 /cbmc/src/pointer-analysis/dereference.h:26: warning: argument '_options' of command @param is not found in the argument list of dereferencet::dereferencet(const namespacet &_ns)
 /cbmc/src/pointer-analysis/dereference.h:26: warning: argument '_dereference_callback' of command @param is not found in the argument list of dereferencet::dereferencet(const namespacet &_ns)
 /cbmc/src/goto-programs/rebuild_goto_start_function.cpp:22: warning: argument '_message_handler' of command @param is not found in the argument list of rebuild_goto_start_function_baset< maybe_lazy_goto_modelt >::rebuild_goto_start_function_baset(const optionst &options, maybe_lazy_goto_modelt &goto_model, message_handlert &message_handler)
+/cbmc/src/solvers/README.md:4: warning: @copydetails or @copydoc target 'check_axioms(const string_axiomst &axioms, string_constraint_generatort &generator, const std::function<exprt(const exprt &)> &get, messaget::mstreamt &stream, const namespacet &ns, bool use_counter_example, const union_find_replacet &symbol_resolve, const std::map<string_not_contains_constraintt, symbol_exprt> &not_contain_witnesses)' not found
+/cbmc/src/solvers/README.md:428: warning: unable to resolve link to `check_axioms(const string_axiomst &axioms, string_constraint_generatort &generator, const std::function<exprt(const exprt &)> &get, messaget::mstreamt &stream, const namespacet &ns, bool use_counter_example, const union_find_replacet &symbol_resolve, const std::map<string_not_contains_constraintt, symbol_exprt> &not_contain_witnesses)' for \link command
