@@ -164,20 +164,23 @@ When running the previous example, you will have noted that CBMC unwinds
 the `for` loop in the program. As CBMC performs Bounded Model Checking,
 all loops have to have a finite upper run-time bound in order to
 guarantee that all bugs are found. CBMC can optionally check that enough
-unwinding is performed. As an example, consider the program binsearch.c:
+unwinding is performed. As an example, consider the program
+[binsearch.c](https://raw.githubusercontent.com/diffblue/cbmc/develop/doc/cprover-manual/binsearch1.c):
 
 ```C
-int binsearch(int x) {
+int binsearch(int x)
+{
   int a[16];
-  signed low=0, high=16;
+  signed low = 0, high = 16;
 
-  while(low<high) {
-    signed middle=low+((high-low)>>1);
+  while(low < high)
+  {
+    signed middle = low + ((high - low) >> 1);
 
-    if(a[middle]<x)
-      high=middle;
-    else if(a[middle]>x)
-      low=middle+1;
+    if(a[middle] < x)
+      high = middle;
+    else if(a[middle] > x)
+      low = middle + 1;
     else // a[middle]==x
       return middle;
   }
