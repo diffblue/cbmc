@@ -42,12 +42,16 @@ definitions from the various .c files, just like a linker. But instead
 of producing a binary for execution, CBMC performs symbolic simulation
 on the program.
 
-As an example, consider the following simple program, named file1.c:
+As an example, consider the following simple program, named
+[file1.c](https://raw.githubusercontent.com/diffblue/cbmc/develop/doc/cprover-manual/file1.c):
 
 ```C
-int puts(const char *s) { }
+int puts(const char *s)
+{
+}
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{
   puts(argv[2]);
 }
 ```
