@@ -2152,8 +2152,6 @@ bool simplify_exprt::simplify_node(exprt &expr)
     result=simplify_invalid_pointer(expr) && result;
   else if(expr.id()==ID_object_size)
     result=simplify_object_size(expr) && result;
-  else if(expr.id()==ID_good_pointer)
-    result=simplify_good_pointer(expr) && result;
   else if(expr.id()==ID_div)
     result=simplify_div(expr) && result;
   else if(expr.id()==ID_mod)

@@ -690,19 +690,3 @@ bool simplify_exprt::simplify_object_size(exprt &expr)
 
   return result;
 }
-
-bool simplify_exprt::simplify_good_pointer(exprt &expr)
-{
-  if(expr.operands().size()!=1)
-    return true;
-
-  // we expand the definition
-  exprt def=good_pointer_def(expr.op0(), ns);
-
-  // recursive call
-  simplify_node(def);
-
-  expr.swap(def);
-
-  return false;
-}

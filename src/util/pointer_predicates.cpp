@@ -63,60 +63,11 @@ exprt dead_object(const exprt &pointer, const namespacet &ns)
   return same_object(pointer, deallocated_symbol.symbol_expr());
 }
 
-exprt dynamic_size(const namespacet &ns)
-{
-  return ns.lookup(CPROVER_PREFIX "malloc_size").symbol_expr();
-}
-
 exprt dynamic_object(const exprt &pointer)
 {
   exprt dynamic_expr(ID_dynamic_object, bool_typet());
   dynamic_expr.copy_to_operands(pointer);
   return dynamic_expr;
-}
-
-exprt good_pointer(const exprt &pointer)
-{
-  return unary_exprt(ID_good_pointer, pointer, bool_typet());
-}
-
-exprt good_pointer_def(
-  const exprt &pointer,
-  const namespacet &ns)
-{
-  const pointer_typet &pointer_type=to_pointer_type(ns.follow(pointer.type()));
-  const typet &dereference_type=pointer_type.subtype();
-
-  const or_exprt good_dynamic_tmp1(
-    not_exprt(malloc_object(pointer, ns)),
-    and_exprt(
-      not_exprt(dynamic_object_lower_bound(pointer, ns, nil_exprt())),
-      not_exprt(
-        dynamic_object_upper_bound(
-          pointer, ns, size_of_expr(dereference_type, ns)))));
-
-  const and_exprt good_dynamic_tmp2(
-    not_exprt(deallocated(pointer, ns)), good_dynamic_tmp1);
-
-  const or_exprt good_dynamic(
-    not_exprt(dynamic_object(pointer)), good_dynamic_tmp2);
-
-  const not_exprt not_null(null_pointer(pointer));
-
-  const not_exprt not_invalid(invalid_pointer(pointer));
-
-  const or_exprt bad_other(
-    object_lower_bound(pointer, ns, nil_exprt()),
-    object_upper_bound(
-      pointer, ns, size_of_expr(dereference_type, ns)));
-
-  const or_exprt good_other(dynamic_object(pointer), not_exprt(bad_other));
-
-  return and_exprt(
-    not_null,
-    not_invalid,
-    good_dynamic,
-    good_other);
 }
 
 exprt null_object(const exprt &pointer)
@@ -141,47 +92,6 @@ exprt null_pointer(const exprt &pointer)
 exprt invalid_pointer(const exprt &pointer)
 {
   return unary_exprt(ID_invalid_pointer, pointer, bool_typet());
-}
-
-exprt dynamic_object_lower_bound(
-  const exprt &pointer,
-  const namespacet &ns,
-  const exprt &offset)
-{
-  return object_lower_bound(pointer, ns, offset);
-}
-
-exprt dynamic_object_upper_bound(
-  const exprt &pointer,
-  const namespacet &ns,
-  const exprt &access_size)
-{
-  // this is
-  // POINTER_OFFSET(p)+access_size>__CPROVER_malloc_size
-
-  exprt malloc_size=dynamic_size(ns);
-
-  exprt object_offset=pointer_offset(pointer);
-
-  // need to add size
-  irep_idt op=ID_ge;
-  exprt sum=object_offset;
-
-  if(access_size.is_not_nil())
-  {
-    op=ID_gt;
-
-    if(ns.follow(object_offset.type())!=
-       ns.follow(access_size.type()))
-      object_offset.make_typecast(access_size.type());
-    sum=plus_exprt(object_offset, access_size);
-  }
-
-  if(ns.follow(sum.type())!=
-     ns.follow(malloc_size.type()))
-    sum.make_typecast(malloc_size.type());
-
-  return binary_relation_exprt(sum, op, malloc_size);
 }
 
 exprt object_upper_bound(

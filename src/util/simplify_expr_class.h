@@ -99,7 +99,6 @@ public:
   bool simplify_dynamic_object(exprt &expr);
   bool simplify_invalid_pointer(exprt &expr);
   bool simplify_same_object(exprt &expr);
-  bool simplify_good_pointer(exprt &expr);
   bool simplify_object(exprt &expr);
   bool simplify_unary_minus(exprt &expr);
   bool simplify_unary_plus(exprt &expr);
