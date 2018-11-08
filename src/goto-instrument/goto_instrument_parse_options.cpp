@@ -125,7 +125,8 @@ int goto_instrument_parse_optionst::doit()
 
     get_goto_program();
 
-    instrument_goto_program();
+    optionst options;
+    instrument_goto_program(options);
 
     {
       bool unwind_given=cmdline.isset("unwind");
@@ -909,10 +910,8 @@ void goto_instrument_parse_optionst::get_goto_program()
   config.set_from_symbol_table(goto_model.symbol_table);
 }
 
-void goto_instrument_parse_optionst::instrument_goto_program()
+void goto_instrument_parse_optionst::instrument_goto_program(optionst &options)
 {
-  optionst options;
-
   // disable simplify when adding various checks?
   if(cmdline.isset("no-simplify"))
     options.set_option("simplify", false);
