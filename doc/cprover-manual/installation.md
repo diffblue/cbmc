@@ -27,10 +27,11 @@ and the directories that contain the header files. You must run CBMC
 from within the *Visual Studio Command Prompt*.
 
 Note that the distribution files for the [Eclipse
-plugin](installation-plugin.shtml) include the CBMC executable.
-Therefore, if you intend to run CBMC exclusively within Eclipse, you can
-skip the installation of the CBMC executable. However, you still have to
-install the compiler environment as described above.
+plugin](http://www.cprover.org/eclipse-plugin/)
+include the CBMC executable.  Therefore, if you intend to run CBMC
+exclusively within Eclipse, you can skip the installation of the CBMC
+executable.  However, you still have to install the compiler environment as
+described above.
 
 ### Installing the CBMC Binaries
 
