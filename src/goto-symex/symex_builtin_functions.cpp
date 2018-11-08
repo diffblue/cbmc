@@ -177,8 +177,8 @@ void goto_symext::symex_allocate(
   }
   else
   {
-    exprt nondet = build_symex_nondet(object_type);
-    code_assignt assignment(value_symbol.symbol_expr(), nondet);
+    const exprt nondet = build_symex_nondet(object_type);
+    const code_assignt assignment(value_symbol.symbol_expr(), nondet);
     symex_assign(state, assignment);
   }
 
