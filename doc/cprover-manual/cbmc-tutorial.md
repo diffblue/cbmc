@@ -1,23 +1,5 @@
 [CPROVER Manual TOC](../../)
 
-## Bounded Model Checking with CBMC
-
-CBMC implements a technique called *Bounded Model Checking* (BMC). In
-BMC, the transition relation for a complex state machine and its
-specification are jointly unwound to obtain a Boolean formula, which is
-then checked for satisfiability by using an efficient SAT procedure. If
-the formula is satisfiable, a counterexample is extracted from the
-output of the SAT procedure. If the formula is not satisfiable, the
-program can be unwound more to determine if a longer counterexample
-exists.
-
-In many engineering domains, real-time guarantees are a strict
-requirement. An example is software embedded in automotive controllers.
-As a consequence, the loop constructs in these types of programs often
-have a strict bound on the number of iterations. CBMC is able to
-formally verify such bounds by means of *unwinding assertions*. Once
-this bound is established, CBMC is able to prove the absence of errors.
-
 ### Example: Buffer Overflows
 
 In order to give a brief overview of the capabilities of CBMC
