@@ -209,40 +209,48 @@ obtained with the option `--property`.
 
 ### Unbounded Loops
 
-CBMC can also be used for programs with unbounded loops. In this case,
-CBMC is used for bug hunting only; CBMC does not attempt to find all
-bugs. The following program (lock-example.c) is an example of a program
-with a user-specified property:
+CBMC can also be used for programs with unbounded loops.  In this case, CBMC
+is used for bug hunting only; CBMC does not attempt to find all bugs.  The
+following program
+([lock-example.c](https://raw.githubusercontent.com/diffblue/cbmc/develop/doc/cprover-manual/lock-example.c))
+is an example of a program with a user-specified property:
 
 ```C
 _Bool nondet_bool();
 _Bool LOCK = 0;
 
-_Bool lock() {
-  if(nondet_bool()) {
+_Bool lock()
+{
+  if(nondet_bool())
+  {
     assert(!LOCK);
-    LOCK=1;
-    return 1; }
+    LOCK = 1;
+    return 1;
+  }
 
   return 0;
 }
 
-void unlock() {
+void unlock()
+{
   assert(LOCK);
-  LOCK=0;
+  LOCK = 0;
 }
 
-int main() {
+int main()
+{
   unsigned got_lock = 0;
   int times;
 
-  while(times > 0) {
-    if(lock()) {
+  while(times > 0)
+  {
+    if(lock())
+    {
       got_lock++;
       /* critical section */
     }
 
-    if(got_lock!=0)
+    if(got_lock != 0)
       unlock();
 
     got_lock--;
