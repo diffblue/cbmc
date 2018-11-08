@@ -22,23 +22,24 @@ void goto_symext::do_simplify(exprt &expr)
     simplify(expr, ns);
 }
 
-nondet_symbol_exprt goto_symext::build_symex_nondet(typet &type)
+nondet_symbol_exprt build_symex_nondet(typet &type, unsigned &nondet_count)
 {
   irep_idt identifier = "symex::nondet" + std::to_string(nondet_count++);
   nondet_symbol_exprt new_expr(identifier, type);
   return new_expr;
 }
 
-void goto_symext::replace_nondet(exprt &expr)
+void replace_nondet(exprt &expr, unsigned &nondet_count)
 {
   if(expr.id()==ID_side_effect &&
      expr.get(ID_statement)==ID_nondet)
   {
-    nondet_symbol_exprt new_expr = build_symex_nondet(expr.type());
+    nondet_symbol_exprt new_expr =
+      build_symex_nondet(expr.type(), nondet_count);
     new_expr.add_source_location()=expr.source_location();
     expr.swap(new_expr);
   }
   else
     Forall_operands(it, expr)
-      replace_nondet(*it);
+      replace_nondet(*it, nondet_count);
 }

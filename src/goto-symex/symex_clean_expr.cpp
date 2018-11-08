@@ -140,7 +140,7 @@ void goto_symext::clean_expr(
   statet &state,
   const bool write)
 {
-  replace_nondet(expr);
+  replace_nondet(expr, nondet_count);
   dereference(expr, state, write);
 
   // make sure all remaining byte extract operations use the root
