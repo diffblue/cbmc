@@ -64,7 +64,7 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
   const namespacet &ns,
   bool use_counter_example,
   const union_find_replacet &symbol_resolve,
-  const std::map<string_not_contains_constraintt, symbol_exprt>
+  const std::unordered_map<string_not_contains_constraintt, symbol_exprt>
     &not_contain_witnesses);
 
 static void initial_index_set(
@@ -113,7 +113,8 @@ static std::vector<exprt> instantiate(
   const string_not_contains_constraintt &axiom,
   const index_set_pairt &index_set,
   const string_constraint_generatort &generator,
-  const std::map<string_not_contains_constraintt, symbol_exprt> &witnesses);
+  const std::unordered_map<string_not_contains_constraintt, symbol_exprt>
+    &witnesses);
 
 static optionalt<exprt> get_array(
   const std::function<exprt(const exprt &)> &super_get,
@@ -231,7 +232,7 @@ static std::vector<exprt> generate_instantiations(
   const string_constraint_generatort &generator,
   const index_set_pairt &index_set,
   const string_axiomst &axioms,
-  const std::map<string_not_contains_constraintt, symbol_exprt>
+  const std::unordered_map<string_not_contains_constraintt, symbol_exprt>
     &not_contain_witnesses)
 {
   std::vector<exprt> lemmas;
@@ -716,16 +717,17 @@ decision_proceduret::resultt string_refinementt::dec_solve()
     generator.constraints.not_contains.end(),
     std::back_inserter(axioms.not_contains),
     [&](string_not_contains_constraintt axiom) {
-      symbol_resolve.replace_expr(axiom);
+      replace(symbol_resolve, axiom);
       return axiom;
     });
 
   // Used to store information about witnesses for not_contains constraints
-  std::map<string_not_contains_constraintt, symbol_exprt> not_contain_witnesses;
+  std::unordered_map<string_not_contains_constraintt, symbol_exprt>
+    not_contain_witnesses;
   for(const auto &nc_axiom : axioms.not_contains)
   {
     const auto &witness_type = [&] {
-      const auto &rtype = to_array_type(nc_axiom.s0().type());
+      const auto &rtype = to_array_type(nc_axiom.s0.type());
       const typet &index_type = rtype.size().type();
       return array_typet(index_type, infinity_exprt(index_type));
     }();
@@ -1194,12 +1196,12 @@ static exprt negation_of_not_contains_constraint(
 {
   // If the for all is vacuously true, the negation is false.
   const auto lbe =
-    numeric_cast_v<mp_integer>(get(constraint.exists_lower_bound()));
+    numeric_cast_v<mp_integer>(get(constraint.exists_lower_bound));
   const auto ube =
-    numeric_cast_v<mp_integer>(get(constraint.exists_upper_bound()));
+    numeric_cast_v<mp_integer>(get(constraint.exists_upper_bound));
   const auto univ_bounds = and_exprt(
-    binary_relation_exprt(get(constraint.univ_lower_bound()), ID_le, univ_var),
-    binary_relation_exprt(get(constraint.univ_upper_bound()), ID_gt, univ_var));
+    binary_relation_exprt(get(constraint.univ_lower_bound), ID_le, univ_var),
+    binary_relation_exprt(get(constraint.univ_upper_bound), ID_gt, univ_var));
 
   // The negated existential becomes an universal, and this is the unrolling of
   // that universal quantifier.
@@ -1209,12 +1211,12 @@ static exprt negation_of_not_contains_constraint(
   {
     const constant_exprt i_expr = from_integer(i, univ_var.type());
     const exprt s0_char =
-      get(index_exprt(constraint.s0(), plus_exprt(univ_var, i_expr)));
-    const exprt s1_char = get(index_exprt(constraint.s1(), i_expr));
+      get(index_exprt(constraint.s0, plus_exprt(univ_var, i_expr)));
+    const exprt s1_char = get(index_exprt(constraint.s1, i_expr));
     conjuncts.push_back(equal_exprt(s0_char, s1_char));
   }
   const exprt equal_strings = conjunction(conjuncts);
-  return and_exprt(univ_bounds, get(constraint.premise()), equal_strings);
+  return and_exprt(univ_bounds, get(constraint.premise), equal_strings);
 }
 
 /// Debugging function which outputs the different steps an axiom goes through
@@ -1249,7 +1251,7 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
   const namespacet &ns,
   bool use_counter_example,
   const union_find_replacet &symbol_resolve,
-  const std::map<string_not_contains_constraintt, symbol_exprt>
+  const std::unordered_map<string_not_contains_constraintt, symbol_exprt>
     &not_contain_witnesses)
 {
   const auto eom=messaget::eom;
@@ -1317,7 +1319,7 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
   {
     const string_not_contains_constraintt &nc_axiom=axioms.not_contains[i];
     const symbol_exprt univ_var = generator.fresh_symbol(
-      "not_contains_univ_var", nc_axiom.s0().length().type());
+      "not_contains_univ_var", nc_axiom.s0.length().type());
     const exprt negated_axiom = negation_of_not_contains_constraint(
       nc_axiom, univ_var, [&](const exprt &expr) {
         return simplify_expr(get(expr), ns); });
@@ -1742,8 +1744,8 @@ static void initial_index_set(
   const namespacet &ns,
   const string_not_contains_constraintt &axiom)
 {
-  auto it=axiom.premise().depth_begin();
-  const auto end=axiom.premise().depth_end();
+  auto it = axiom.premise.depth_begin();
+  const auto end = axiom.premise.depth_end();
   while(it!=end)
   {
     if(it->id() == ID_index && is_char_type(it->type()))
@@ -1761,9 +1763,8 @@ static void initial_index_set(
   }
 
   const minus_exprt kminus1(
-    axiom.exists_upper_bound(),
-    from_integer(1, axiom.exists_upper_bound().type()));
-  add_to_index_set(index_set, ns, axiom.s1().content(), kminus1);
+    axiom.exists_upper_bound, from_integer(1, axiom.exists_upper_bound.type()));
+  add_to_index_set(index_set, ns, axiom.s1.content(), kminus1);
 }
 
 /// Add to the index set all the indices that appear in the formula
@@ -1887,10 +1888,11 @@ static std::vector<exprt> instantiate(
   const string_not_contains_constraintt &axiom,
   const index_set_pairt &index_set,
   const string_constraint_generatort &generator,
-  const std::map<string_not_contains_constraintt, symbol_exprt> &witnesses)
+  const std::unordered_map<string_not_contains_constraintt, symbol_exprt>
+    &witnesses)
 {
-  const array_string_exprt &s0 = axiom.s0();
-  const array_string_exprt &s1 = axiom.s1();
+  const array_string_exprt &s0 = axiom.s0;
+  const array_string_exprt &s1 = axiom.s1;
 
   const auto &index_set0=index_set.cumulative.find(s0.content());
   const auto &index_set1=index_set.cumulative.find(s1.content());

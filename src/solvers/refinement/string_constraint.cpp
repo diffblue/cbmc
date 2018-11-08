@@ -46,3 +46,43 @@ string_constraintt::string_constraintt(
     "String constraints must have non-negative upper bound.\n" +
       upper_bound.pretty());
 }
+
+/// Used for debug printing.
+/// \param [in] expr: constraint to render
+/// \return rendered string
+std::string to_string(const string_not_contains_constraintt &expr)
+{
+  std::ostringstream out;
+  out << "forall x in [" << format(expr.univ_lower_bound) << ", "
+      << format(expr.univ_upper_bound) << "). " << format(expr.premise)
+      << " => ("
+      << "exists y in [" << format(expr.exists_lower_bound) << ", "
+      << format(expr.exists_upper_bound) << "). " << format(expr.s0)
+      << "[x+y] != " << format(expr.s1) << "[y])";
+  return out.str();
+}
+
+void replace(
+  const union_find_replacet &replace_map,
+  string_not_contains_constraintt &constraint)
+{
+  replace_map.replace_expr(constraint.univ_lower_bound);
+  replace_map.replace_expr(constraint.univ_upper_bound);
+  replace_map.replace_expr(constraint.premise);
+  replace_map.replace_expr(constraint.exists_lower_bound);
+  replace_map.replace_expr(constraint.exists_upper_bound);
+  replace_map.replace_expr(constraint.s0);
+  replace_map.replace_expr(constraint.s1);
+}
+
+bool operator==(
+  const string_not_contains_constraintt &left,
+  const string_not_contains_constraintt &right)
+{
+  return left.univ_upper_bound == right.univ_upper_bound &&
+         left.univ_lower_bound == right.univ_lower_bound &&
+         left.exists_lower_bound == right.exists_lower_bound &&
+         left.exists_upper_bound == right.exists_upper_bound &&
+         left.premise == right.premise && left.s0 == right.s0 &&
+         left.s1 == right.s1;
+}

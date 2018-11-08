@@ -142,17 +142,16 @@ std::pair<exprt, string_constraintst> add_axioms_for_index_of_string(
 
   // string_not contains_constraintt are formulas of the form:
   // forall x in [lb,ub[. p(x) => exists y in [lb,ub[. s1[x+y] != s2[y]
-  string_not_contains_constraintt a4(
-    from_index,
-    offset,
-    contains,
-    from_integer(0, index_type),
-    needle.length(),
-    haystack,
-    needle);
+  const string_not_contains_constraintt a4 = {from_index,
+                                              offset,
+                                              contains,
+                                              from_integer(0, index_type),
+                                              needle.length(),
+                                              haystack,
+                                              needle};
   constraints.not_contains.push_back(a4);
 
-  string_not_contains_constraintt a5(
+  const string_not_contains_constraintt a5 = {
     from_index,
     plus_exprt( // Add 1 for inclusive upper bound.
       minus_exprt(haystack.length(), needle.length()),
@@ -161,7 +160,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_index_of_string(
     from_integer(0, index_type),
     needle.length(),
     haystack,
-    needle);
+    needle};
   constraints.not_contains.push_back(a5);
 
   const implies_exprt a6(
@@ -241,24 +240,24 @@ std::pair<exprt, string_constraintst> add_axioms_for_last_index_of_string(
     from_index,
     length_diff);
 
-  string_not_contains_constraintt a4(
+  const string_not_contains_constraintt a4 = {
     plus_exprt(offset, from_integer(1, index_type)),
     plus_exprt(end_index, from_integer(1, index_type)),
     contains,
     from_integer(0, index_type),
     needle.length(),
     haystack,
-    needle);
+    needle};
   constraints.not_contains.push_back(a4);
 
-  string_not_contains_constraintt a5(
+  string_not_contains_constraintt a5 = {
     from_integer(0, index_type),
     plus_exprt(end_index, from_integer(1, index_type)),
     not_exprt(contains),
     from_integer(0, index_type),
     needle.length(),
     haystack,
-    needle);
+    needle};
   constraints.not_contains.push_back(a5);
 
   const implies_exprt a6(

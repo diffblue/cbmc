@@ -200,7 +200,7 @@ SCENARIO("instantiate_not_contains",
 
     std::string axioms;
     std::vector<string_not_contains_constraintt> nc_axioms;
-    std::map<string_not_contains_constraintt, symbol_exprt> witnesses;
+    std::unordered_map<string_not_contains_constraintt, symbol_exprt> witnesses;
 
     std::accumulate(
       constraints.universal.begin(),
@@ -216,12 +216,12 @@ SCENARIO("instantiate_not_contains",
       constraints.not_contains.end(),
       axioms,
       [&](const std::string &accu, string_not_contains_constraintt sc) {
-        simplify(sc, ns);
+        simplify(sc.premise, ns);
+        simplify(sc.s0, ns);
+        simplify(sc.s1, ns);
         witnesses[sc] = generator.fresh_symbol("w", t.witness_type());
         nc_axioms.push_back(sc);
-        std::string s;
-        java_lang->from_expr(sc, s, ns);
-        return accu + s + "\n\n";
+        return accu + to_string(sc) + "\n\n";
       });
 
     axioms = std::accumulate(
@@ -280,26 +280,23 @@ SCENARIO("instantiate_not_contains",
     //   { .=1, .={ (char)'a' } }[x+y] != { .=1, .={ (char)'b' } }[y]
     // )
     // which is vacuously true.
-    string_not_contains_constraintt vacuous(
-      from_integer(0),
-      from_integer(0),
-      true_exprt(),
-      from_integer(0),
-      from_integer(1),
-      a_array,
-      a_array);
+    const string_not_contains_constraintt vacuous = {from_integer(0),
+                                                     from_integer(0),
+                                                     true_exprt(),
+                                                     from_integer(0),
+                                                     from_integer(1),
+                                                     a_array,
+                                                     a_array};
 
     // Create witness for axiom
     symbol_tablet symtab;
     const namespacet empty_ns(symtab);
     string_constraint_generatort generator(ns);
-    std::map<string_not_contains_constraintt, symbol_exprt> witnesses;
+    std::unordered_map<string_not_contains_constraintt, symbol_exprt> witnesses;
     witnesses[vacuous] = generator.fresh_symbol("w", t.witness_type());
 
     INFO("Original axiom:\n");
-    std::string s;
-    java_lang->from_expr(vacuous, s, ns);
-    INFO(s + "\n\n");
+    INFO(to_string(vacuous) + "\n\n");
 
     WHEN("we instantiate and simplify")
     {
@@ -335,26 +332,23 @@ SCENARIO("instantiate_not_contains",
     //   { .=1, .={ (char)'a' } }[x+y] != { .=1, .={ (char)'b' } }[y]
     // )
     // which is false.
-    string_not_contains_constraintt trivial(
-      from_integer(0),
-      from_integer(1),
-      true_exprt(),
-      from_integer(0),
-      from_integer(0),
-      a_array,
-      b_array);
+    const string_not_contains_constraintt trivial = {from_integer(0),
+                                                     from_integer(1),
+                                                     true_exprt(),
+                                                     from_integer(0),
+                                                     from_integer(0),
+                                                     a_array,
+                                                     b_array};
 
     // Create witness for axiom
     symbol_tablet symtab;
     const namespacet ns(symtab);
     string_constraint_generatort generator(ns);
-    std::map<string_not_contains_constraintt, symbol_exprt> witnesses;
+    std::unordered_map<string_not_contains_constraintt, symbol_exprt> witnesses;
     witnesses[trivial] = generator.fresh_symbol("w", t.witness_type());
 
     INFO("Original axiom:\n");
-    std::string s;
-    java_lang->from_expr(trivial, s, ns);
-    INFO(s + "\n\n");
+    INFO(to_string(trivial) + "\n\n");
 
     WHEN("we instantiate and simplify")
     {
@@ -391,26 +385,23 @@ SCENARIO("instantiate_not_contains",
     //   { .=1, .={ (char)'a' } }[x+y] != { .=0, .={ } }[y]
     // )
     // which is false.
-    string_not_contains_constraintt trivial(
-      from_integer(0),
-      from_integer(1),
-      true_exprt(),
-      from_integer(0),
-      from_integer(0),
-      a_array,
-      empty_array);
+    const string_not_contains_constraintt trivial = {from_integer(0),
+                                                     from_integer(1),
+                                                     true_exprt(),
+                                                     from_integer(0),
+                                                     from_integer(0),
+                                                     a_array,
+                                                     empty_array};
 
     // Create witness for axiom
     symbol_tablet symtab;
     const namespacet empty_ns(symtab);
     string_constraint_generatort generator(ns);
-    std::map<string_not_contains_constraintt, symbol_exprt> witnesses;
+    std::unordered_map<string_not_contains_constraintt, symbol_exprt> witnesses;
     witnesses[trivial] = generator.fresh_symbol("w", t.witness_type());
 
     INFO("Original axiom:\n");
-    std::string s;
-    java_lang->from_expr(trivial, s, ns);
-    INFO(s + "\n\n");
+    INFO(to_string(trivial) + "\n\n");
 
     WHEN("we instantiate and simplify")
     {
@@ -449,27 +440,24 @@ SCENARIO("instantiate_not_contains",
     //   { .=2, .={ (char)'a', (char)'b'}[y]
     // )
     // which is false (for x = 0).
-    string_not_contains_constraintt trivial(
-      from_integer(0),
-      from_integer(2),
-      true_exprt(),
-      from_integer(0),
-      from_integer(2),
-      ab_array,
-      ab_array);
+    const string_not_contains_constraintt trivial = {from_integer(0),
+                                                     from_integer(2),
+                                                     true_exprt(),
+                                                     from_integer(0),
+                                                     from_integer(2),
+                                                     ab_array,
+                                                     ab_array};
 
     // Create witness for axiom
     symbol_tablet symtab;
     const namespacet empty_ns(symtab);
 
     string_constraint_generatort generator(ns);
-    std::map<string_not_contains_constraintt, symbol_exprt> witnesses;
+    std::unordered_map<string_not_contains_constraintt, symbol_exprt> witnesses;
     witnesses[trivial] = generator.fresh_symbol("w", t.witness_type());
 
     INFO("Original axiom:\n");
-    std::string s;
-    java_lang->from_expr(trivial, s, ns);
-    INFO(s + "\n\n");
+    INFO(to_string(trivial) + "\n\n");
 
     WHEN("we instantiate and simplify")
     {
@@ -506,26 +494,23 @@ SCENARIO("instantiate_not_contains",
     //   { .=2, .={ (char)'a', (char)'b'}[y]
     // )
     // which is true.
-    string_not_contains_constraintt trivial(
-      from_integer(0),
-      from_integer(2),
-      true_exprt(),
-      from_integer(0),
-      from_integer(2),
-      ab_array,
-      cd_array);
+    const string_not_contains_constraintt trivial = {from_integer(0),
+                                                     from_integer(2),
+                                                     true_exprt(),
+                                                     from_integer(0),
+                                                     from_integer(2),
+                                                     ab_array,
+                                                     cd_array};
 
     // Create witness for axiom
     symbol_tablet symtab;
     const namespacet empty_ns(symtab);
     string_constraint_generatort generator(ns);
-    std::map<string_not_contains_constraintt, symbol_exprt> witnesses;
+    std::unordered_map<string_not_contains_constraintt, symbol_exprt> witnesses;
     witnesses[trivial] = generator.fresh_symbol("w", t.witness_type());
 
     INFO("Original axiom:\n");
-    std::string s;
-    java_lang->from_expr(trivial, s, ns);
-    INFO(s + "\n\n");
+    INFO(to_string(trivial) + "\n\n");
 
     WHEN("we instantiate and simplify")
     {
