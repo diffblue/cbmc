@@ -458,7 +458,7 @@ void goto_symext::symex_trace(
 {
   PRECONDITION(code.arguments().size() >= 2);
 
-  int debug_thresh = unsafe_string2int(debug_level);
+  int debug_thresh = unsafe_string2int(symex_config.debug_level);
 
   mp_integer debug_lvl;
   optionalt<mp_integer> maybe_debug =

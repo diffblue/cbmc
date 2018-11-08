@@ -17,7 +17,7 @@ unsigned goto_symext::dynamic_counter=0;
 
 void goto_symext::do_simplify(exprt &expr)
 {
-  if(simplify_opt)
+  if(symex_config.simplify_opt)
     simplify(expr, ns);
 }
 

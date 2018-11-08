@@ -247,9 +247,9 @@ void goto_symext::symex_assign_symbol(
     ssa_lhs,
     ssa_rhs,
     ns,
-    simplify_opt,
-    constant_propagation,
-    allow_pointer_unsoundness);
+    symex_config.simplify_opt,
+    symex_config.constant_propagation,
+    symex_config.allow_pointer_unsoundness);
 
   exprt ssa_full_lhs=full_lhs;
   ssa_full_lhs=add_to_lhs(ssa_full_lhs, ssa_lhs);
