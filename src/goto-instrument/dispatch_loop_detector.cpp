@@ -49,6 +49,10 @@ dispatch_loop_detectort::dispatch_loop_detectort(
       options.is_set("dispatch-function-search-depth") ?
         options.get_signed_int_option("dispatch-function-search-depth") :
         2),
+    loop_decision_distance(
+      options.is_set("dispatch-loop-decision-distance") ?
+        options.get_signed_int_option("dispatch-loop-decision-distance") :
+        2),
     NO_LIMIT(std::numeric_limits<std::size_t>::max()),
     key(
       R"(a -> b -> c -> d -> e [color="#ffffff"];)"
@@ -116,6 +120,12 @@ dispatch_loop_detectort::dispatch_loop_detectort(
     log.warning() << "No dispatch loops will be detected with search_depth "
                   << "set to 0. Set it to 1 to search only `main()` for loops"
                   << log.eom;
+
+  if(loop_decision_distance == 0)
+    log.warning() << "No dispatch loops will be detected with "
+                  << "loop_decision_distance set to 0. Set it to 1 to search "
+                  << "only for loops whose decision is directly nested inside "
+                  << "the loop" << log.eom;
 }
 
 bool dispatch_loop_detectort::detect_dispatch_loops()
@@ -1067,89 +1077,127 @@ void dispatch_loop_detectort::make_dispatch_branches_into_champions(
   }
 }
 
+int dispatch_loop_detectort::distance_to_champion_descendants(
+  const grapht<block_nodet>::node_indext &idx,
+  const int distance,
+  std::unordered_set<grapht<block_nodet>::node_indext> &seen)
+{
+  if(distance == 0)
+    return 0;
+  if(seen.find(idx) != seen.end())
+    return 0;
+  seen.insert(idx);
+  const std::size_t new_distance = distance - 1;
+  for(const auto &succ : graph.get_successors(idx))
+  {
+    if(graph[succ].champion)
+      return 1;
+    else if(graph[succ].type == block_nodet::typet::LOOP)
+      continue;
+    else
+    {
+      int succ_distance = distance_to_champion_descendants(
+        succ, new_distance, seen);
+      if(succ_distance != 0)
+        return succ_distance + 1;
+    }
+  }
+  return 0;
+}
+
 void dispatch_loop_detectort::find_dispatch_loop(
   const std::set<block_nodet::node_indext> &all_nodes)
 {
+  grapht<block_nodet>::node_indext closest_loop;
+  int closest_loop_distance = graph.size() + 1;
   for(const auto &loop : all_nodes)
   {
     if(graph[loop].type != block_nodet::typet::LOOP)
       continue;
-    for(const auto &succ : graph.get_successors(loop))
+    std::unordered_set<grapht<block_nodet>::node_indext> seen;
+    int distance = distance_to_champion_descendants(
+      loop, loop_decision_distance, seen);
+    if(distance != 0 && distance < closest_loop_distance)
     {
-      if(graph[succ].champion)
+      closest_loop_distance = distance;
+      closest_loop = loop;
+    }
+  }
+
+  log.debug() << "Closest loop is at file " << graph[closest_loop].file
+              << " line " << graph[closest_loop].line_begin << log.eom;
+
+  // Identify the goto program instruction that corresponds to this loop, using
+  // Clang's version of `closest_loop`'s location.
+
+  goto_programt::const_targett first_instruction;
+  goto_programt::const_targett subsequent_instruction;
+  std::set<goto_programt::const_targett> loop_set;
+  std::size_t lowest_line = std::numeric_limits<std::size_t>::max();
+
+  forall_goto_functions(f_it, goto_functions)
+  {
+    natural_loopst natural_loop;
+    natural_loop(f_it->second.body);
+    forall_goto_program_instructions(ins, f_it->second.body)
+    {
+      const source_locationt &current_loc =
+        ins->code.source_location().is_not_nil()
+          ? ins->code.source_location()
+          : ins->source_location;
+      if(current_loc.is_nil())
+        continue;
+
+      std::string ins_path = concat_dir_file(
+        id2string(current_loc.get_working_directory()),
+        id2string(current_loc.get_file()));
+      if(ins_path != graph[closest_loop].file)
+        continue;
+
+      // Find the natural loop whose head line number is the lowest line
+      // less than or equal to the line that Clang reports as being the
+      // beginning of the loop.
+      for(const auto &pair : natural_loop.loop_map)
       {
-        // `loop` is the graph index of a loop whose child is the
-        // dispatch-loop-decision. Identify the goto program instruction that
-        // corresponds to this loop, using Clang's version of `loop`'s location.
-
-        goto_programt::const_targett first_instruction;
-        goto_programt::const_targett subsequent_instruction;
-        std::set<goto_programt::const_targett> loop_set;
-        std::size_t lowest_line = std::numeric_limits<std::size_t>::max();
-
-        forall_goto_functions(f_it, goto_functions)
+        const source_locationt &loop_head_loc =
+          pair.first->code.source_location().is_not_nil()
+            ? pair.first->code.source_location()
+            : pair.first->source_location;
+        if(loop_head_loc.is_nil())
+          continue;
+        const std::size_t loop_head_line =
+          std::stol(loop_head_loc.get_line().c_str());
+        if(
+          loop_head_line >= graph[closest_loop].line_begin &&
+          loop_head_line < lowest_line)
         {
-          natural_loopst natural_loop;
-          natural_loop(f_it->second.body);
-          forall_goto_program_instructions(ins, f_it->second.body)
-          {
-            const source_locationt &current_loc =
-              ins->code.source_location().is_not_nil()
-                ? ins->code.source_location()
-                : ins->source_location;
-            if(current_loc.is_nil())
-              continue;
-
-            std::string ins_path = concat_dir_file(
-              id2string(current_loc.get_working_directory()),
-              id2string(current_loc.get_file()));
-            if(ins_path != graph[loop].file)
-              continue;
-
-            // Find the natural loop whose head line number is the lowest line
-            // less than or equal to the line that Clang reports as being the
-            // beginning of the loop.
-            for(const auto &pair : natural_loop.loop_map)
-            {
-              const source_locationt &loop_head_loc =
-                pair.first->code.source_location().is_not_nil()
-                  ? pair.first->code.source_location()
-                  : pair.first->source_location;
-              if(loop_head_loc.is_nil())
-                continue;
-              const std::size_t loop_head_line =
-                std::stol(loop_head_loc.get_line().c_str());
-              if(
-                loop_head_line >= graph[loop].line_begin &&
-                loop_head_line < lowest_line)
-              {
-                lowest_line = loop_head_line;
-                first_instruction = pair.first;
-                loop_set = pair.second;
-              }
-            }
-          }
+          lowest_line = loop_head_line;
+          first_instruction = pair.first;
+          loop_set = pair.second;
         }
-
-        if(lowest_line == std::numeric_limits<std::size_t>::max())
-        {
-          log.warning() << "Identified dispatch loop (LOC '"
-                        << graph[loop].label << "', file '" << graph[loop].file
-                        << "', lines " << graph[loop].line_begin << "-"
-                        << graph[loop].line_end << ") but could not find a "
-                        << "matching goto-program instruction." << log.eom;
-        }
-        else
-        {
-          graph[loop].champion = true;
-          _found_dispatch_loop_location = true;
-          graph[loop]._first_instruction = first_instruction;
-          _dispatch_loop_location = first_instruction->source_location;
-          find_subsequent_instruction(loop, loop_set);
-        }
-        return;
       }
     }
+  }
+
+  if(lowest_line == std::numeric_limits<std::size_t>::max())
+  {
+    log.warning() << "Identified dispatch loop (LOC '"
+                  << graph[closest_loop].label << "', file '"
+                  << graph[closest_loop].file << "', lines "
+                  << graph[closest_loop].line_begin << "-"
+                  << graph[closest_loop].line_end << ") but could not find a "
+                  << "matching goto-program instruction." << log.eom;
+  }
+  else
+  {
+    log.debug() << "Identified instruction of dispatch loop as "
+                << first_instruction->source_location.as_string()
+                << log.eom;
+    graph[closest_loop].champion = true;
+    _found_dispatch_loop_location = true;
+    graph[closest_loop]._first_instruction = first_instruction;
+    _dispatch_loop_location = first_instruction->source_location;
+    find_subsequent_instruction(closest_loop, loop_set);
   }
 }
 
@@ -1556,5 +1604,12 @@ void dispatch_loop_detectort::set_front_end_options(
     opts.set_option("dispatch-function-search-depth",
                     std::stoi(
                       cmdline.get_value("dispatch-function-search-depth")));
+  }
+
+  if(cmdline.isset("dispatch-loop-decision-distance"))
+  {
+    opts.set_option("dispatch-loop-decision-distance",
+                    std::stoi(
+                      cmdline.get_value("dispatch-loop-decision-distance")));
   }
 }

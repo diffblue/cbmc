@@ -136,6 +136,15 @@ protected:
   /// rather than 0.
   const std::size_t search_depth;
 
+  /// \brief How many nodes should we allow between a loop and a decision?
+  ///
+  /// "Nodes" in this context consist of every node type in block_nodet::typet.
+  /// If this constant is set to 1, then we will only detect dispatch loops
+  /// where the decision block is directly nested within a loop; if set to 2,
+  /// then the decision block may be further nested within another block, or it
+  /// might be located in a function called by the loop, etc.
+  const std::size_t loop_decision_distance;
+
   const std::size_t NO_LIMIT;
 
   /// \brief Nodes of a simplified control-flow graph
@@ -377,6 +386,22 @@ protected:
 
   void find_dispatch_loop(const std::set<block_nodet::node_indext> &);
 
+  /// \brief What is the graph distance between this node and a champion node?
+  ///
+  /// This function should initially be called with the index of a loop node,
+  /// which by definition will not be a champion node when this function is
+  /// called. Thus a return value of zero means "there are no champion
+  /// descendants", and a return value of 1 means "there is a champion that is a
+  /// direct successor of this node".
+  ///
+  /// \return 0 if there does not exist a champion node within the specified
+  ///         bound. A positive integer indicating how many edges must be
+  ///         followed to reach a champion node otherwise.
+  int distance_to_champion_descendants(
+    const grapht<block_nodet>::node_indext &,
+    const int,
+    std::unordered_set<grapht<block_nodet>::node_indext> &);
+
   /// \brief Look for the first instruction that comes after the loop
   ///
   /// This is called the "subsequent instruction". The set `loop_set` now
@@ -554,7 +579,7 @@ public:
 
 #define OPT_DISPATCH_LOOP_DETECTION                                            \
   "(dispatch-loop-graph)(dispatch-loop-location)"                              \
-  "(dispatch-function-search-depth)"
+  "(dispatch-function-search-depth)(dispatch-loop-decision-distance)"
 
 #define HELP_DISPATCH_LOOP_DETECTION                                           \
   " --dispatch-loop-graph        print a DOT graph showing the dispatch "      \
