@@ -56,7 +56,8 @@ public:
     path_storaget &path_storage)
     : should_pause_symex(false),
       max_depth(options.get_unsigned_int_option("depth")),
-      doing_path_exploration(options.is_set("paths")),
+      worklist_wants_instruction_callback(
+        path_storage.wants_instruction_callback()),
       allow_pointer_unsoundness(
         options.get_bool_option("allow-pointer-unsoundness")),
       language_mode(),
@@ -75,6 +76,9 @@ public:
       guard_identifier("goto_symex::\\guard"),
       path_storage(path_storage),
       path_segment_vccs(0),
+      doing_path_exploration(options.is_set("paths")),
+      exploration_strategy(
+        options.is_set("paths") ? options.get_option("paths") : ""),
       _total_vccs(std::numeric_limits<unsigned>::max()),
       _remaining_vccs(std::numeric_limits<unsigned>::max())
   {
@@ -211,7 +215,7 @@ protected:
     statet &);
 
   const unsigned max_depth;
-  const bool doing_path_exploration;
+  const bool worklist_wants_instruction_callback;
   const bool allow_pointer_unsoundness;
 
 public:
@@ -490,6 +494,9 @@ public:
   std::size_t path_segment_vccs;
 
 protected:
+  const bool doing_path_exploration;
+  const std::string exploration_strategy;
+
   /// @{\name Statistics
   ///
   /// The actual number of total and remaining VCCs should be assigned to

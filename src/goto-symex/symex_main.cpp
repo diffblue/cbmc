@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "goto_symex.h"
 
 #include <cassert>
+#include <iostream>
 #include <memory>
 
 #include <util/exception_utils.h>
@@ -300,6 +301,10 @@ void goto_symext::symex_from_entry_point_of(
   }
 
   statet state;
+  state.doing_path_exploration =
+    doing_path_exploration &&
+    path_strategy_choosert::start_symex_with_path_exploration(
+      exploration_strategy);
 
   initialize_entry_point(
     state,
@@ -329,7 +334,10 @@ void goto_symext::symex_step(
 
   const goto_programt::instructiont &instruction=*state.source.pc;
 
-  if(!doing_path_exploration)
+  if(worklist_wants_instruction_callback)
+    path_storage.notify_next_instruction(state.source.pc, state);
+
+  if(!state.doing_path_exploration)
     merge_gotos(state);
 
   // depth exceeded?

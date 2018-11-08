@@ -26,8 +26,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <analyses/goto_check.h>
 
-#include <goto-programs/generate_function_bodies.h>
 #include "aggressive_slicer.h"
+#include "dispatch_loop_detector.h"
+#include <goto-programs/generate_function_bodies.h>
 
 #include "count_eloc.h"
 
@@ -80,6 +81,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(show-symbol-table)(show-points-to)(show-rw-set)" \
   "(cav11)" \
   OPT_TIMESTAMP \
+  OPT_DISPATCH_LOOP_DETECTION \
   "(show-natural-loops)(accelerate)(havoc-loops)" \
   "(error-label):(string-abstraction)" \
   "(verbosity):(version)(xml-ui)(json-ui)(show-loops)" \
@@ -128,7 +130,7 @@ protected:
   virtual void register_languages();
 
   void get_goto_program();
-  void instrument_goto_program();
+  void instrument_goto_program(optionst &);
 
   void do_indirect_call_and_rtti_removal(bool force=false);
   void do_remove_const_function_pointers_only();

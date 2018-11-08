@@ -266,6 +266,52 @@ SCENARIO("path strategies")
          symex_eventt::result(symex_eventt::enumt::FAILURE)});
     }
   }
+  GIVEN("Dispatch loop program")
+  {
+    std::function<void(optionst &)> callback = [](optionst &opts) {
+      opts.set_option("unwind", 1);
+    };
+
+    c =
+#include "dispatch-loop-detector/if_with_assertion.c"
+      ;
+
+    GIVEN("a basic loop dispatch program with an if-else block")
+    {
+      std::function<void(optionst &)> opts_callback = [](optionst &opts) {
+        opts.set_option("unwind", 2U);
+      };
+      check_with_strategy(
+        "dispatch",
+        callback,
+        c,
+        {// do_pink()
+         symex_eventt::resume(symex_eventt::enumt::NEXT, 94),
+         // Now resume from the else-if, and immediately add two new cases to
+         // the queue queue: the else-if call, and the else call
+         symex_eventt::resume(symex_eventt::enumt::JUMP, 96),
+         // Do the else-if call. This is do_red(), which fails
+         symex_eventt::resume(symex_eventt::enumt::NEXT, 98),
+         symex_eventt::result(symex_eventt::enumt::FAILURE),
+         // Else branch
+         symex_eventt::resume(symex_eventt::enumt::JUMP, 102),
+         // Same thing again, but on the second loop iteration
+         symex_eventt::resume(symex_eventt::enumt::NEXT, 94),
+         symex_eventt::resume(symex_eventt::enumt::NEXT, 94),
+         symex_eventt::resume(symex_eventt::enumt::NEXT, 94),
+         symex_eventt::resume(symex_eventt::enumt::JUMP, 96),
+         symex_eventt::resume(symex_eventt::enumt::JUMP, 96),
+         symex_eventt::resume(symex_eventt::enumt::NEXT, 98),
+         symex_eventt::resume(symex_eventt::enumt::JUMP, 96),
+         symex_eventt::resume(symex_eventt::enumt::NEXT, 98),
+         symex_eventt::resume(symex_eventt::enumt::JUMP, 102),
+         symex_eventt::resume(symex_eventt::enumt::NEXT, 98),
+         symex_eventt::resume(symex_eventt::enumt::JUMP, 102),
+         symex_eventt::resume(symex_eventt::enumt::JUMP, 102),
+
+         symex_eventt::result(symex_eventt::enumt::FAILURE)});
+    }
+  }
 }
 
 // In theory, there should be no need to change the code below when adding new
@@ -367,14 +413,17 @@ void _check_with_strategy(
   mh.set_verbosity(0);
   messaget log(mh);
 
-  path_strategy_choosert chooser;
-  REQUIRE(chooser.is_valid_strategy(strategy));
-  std::unique_ptr<path_storaget> worklist = chooser.get(strategy);
-
   goto_modelt gm;
   int ret;
   ret = cbmc_parse_optionst::get_goto_program(gm, opts, cmdline, log, mh);
   REQUIRE(ret == -1);
+
+  path_strategy_choosert chooser;
+  REQUIRE(chooser.is_valid_strategy(strategy));
+  const path_storaget::strategy_contextt strategy_context(
+    gm.goto_functions, opts, log);
+  std::unique_ptr<path_storaget> worklist =
+    chooser.get(strategy, strategy_context);
 
   cbmc_solverst solvers(opts, gm.get_symbol_table(), mh, false);
   std::unique_ptr<cbmc_solverst::solvert> cbmc_solver = solvers.get_solver();

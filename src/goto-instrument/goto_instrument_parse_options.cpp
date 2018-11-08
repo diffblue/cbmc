@@ -125,7 +125,8 @@ int goto_instrument_parse_optionst::doit()
 
     get_goto_program();
 
-    instrument_goto_program();
+    optionst options;
+    instrument_goto_program(options);
 
     {
       bool unwind_given=cmdline.isset("unwind");
@@ -206,6 +207,53 @@ int goto_instrument_parse_optionst::doit()
         // after having generated the log above
         remove_skip(goto_model);
       }
+    }
+
+    if(
+      cmdline.isset("dispatch-loop-location") ||
+      cmdline.isset("dispatch-loop-graph"))
+    {
+      dispatch_loop_detectort::set_front_end_options(cmdline, options);
+
+      dispatch_loop_detectort det(goto_model.goto_functions, options, *this);
+      if(det.detect_dispatch_loops())
+      {
+        status() << "Unable to construct dispatch loop graph" << eom;
+        return CPROVER_EXIT_INTERNAL_ERROR;
+      }
+
+      if(cmdline.isset("dispatch-loop-graph"))
+      {
+        status() << "digraph G {\n";
+        status() << "subgraph cluster_key {\n";
+        status() << det.key << "\n";
+        status() << "}\n";
+        det.graph.output_dot(status());
+        status() << "}" << eom;
+        return CPROVER_EXIT_SUCCESS;
+      }
+
+      if(!det.found_dispatch_loop_location())
+      {
+        status() << "Did not find dispatch loop" << eom;
+        return CPROVER_EXIT_INTERNAL_ERROR;
+      }
+
+      dispatch_loop_detectort::dispatch_loopt loop(det);
+      std::stringstream ss;
+      ss << "Dispatch loop begins on location #"
+         << loop.first_instruction()->location_number << " at "
+         << loop.first_instruction()->source_location.as_string()
+         << "\nThe instruction following the loop is at location #"
+         << loop.subsequent_instruction()->location_number << " at "
+         << loop.subsequent_instruction()->source_location.as_string()
+         << "\nThe dispatch cases are:";
+      for(const auto d_case : loop.cases())
+        ss << "\n  #" << d_case->location_number << " at "
+           << d_case->source_location.as_string();
+
+      status() << ss.str() << eom;
+      return CPROVER_EXIT_SUCCESS;
     }
 
     if(cmdline.isset("show-threaded"))
@@ -909,10 +957,9 @@ void goto_instrument_parse_optionst::get_goto_program()
   config.set_from_symbol_table(goto_model.symbol_table);
 }
 
-void goto_instrument_parse_optionst::instrument_goto_program()
+void goto_instrument_parse_optionst::instrument_goto_program(
+  optionst &options)
 {
-  optionst options;
-
   // disable simplify when adding various checks?
   if(cmdline.isset("no-simplify"))
     options.set_option("simplify", false);
@@ -1572,6 +1619,7 @@ void goto_instrument_parse_optionst::help()
     " --show-local-safe-pointers   show pointer expressions that are trivially dominated by a not-null check\n" // NOLINT(*)
     " --show-safe-dereferences     show pointer expressions that are trivially dominated by a not-null check\n" // NOLINT(*)
     "                              *and* used as a dereference operand\n" // NOLINT(*)
+    HELP_DISPATCH_LOOP_DETECTION
     "\n"
     "Safety checks:\n"
     " --no-assertions              ignore user assertions\n"
