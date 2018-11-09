@@ -734,11 +734,11 @@ bool simplify_exprt::simplify_bitwise(exprt &expr)
     std::function<bool(bool, bool)> f;
 
     if(expr.id()==ID_bitand)
-      f = [](bool a, bool b) { return a & b; };
+      f = [](bool a, bool b) { return a && b; };
     else if(expr.id()==ID_bitor)
-      f = [](bool a, bool b) { return a | b; };
+      f = [](bool a, bool b) { return a || b; };
     else if(expr.id()==ID_bitxor)
-      f = [](bool a, bool b) { return a ^ b; };
+      f = [](bool a, bool b) { return a != b; };
     else
       UNREACHABLE;
 
