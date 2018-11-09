@@ -384,8 +384,7 @@ bool c_preprocess_visual_studio(
 
   // _popen isn't very reliable on WIN32
   // that's why we use run()
-  int result =
-    run("cl", {"cl", "@" + command_file_name()}, "", outstream, stderr_file());
+  int result = run("cl", {"cl", "@" + command_file_name()}, outstream);
 
   // errors/warnings
   std::ifstream stderr_stream(stderr_file());
@@ -654,9 +653,11 @@ bool c_preprocess_gcc_clang(
 
   // the file that is to be preprocessed
   argv.push_back(file);
+  argv.push_back("2>");
+  argv.push_back(stderr_file());
 
   // execute clang or gcc
-  result = run(argv[0], argv, "", outstream, stderr_file());
+  result = run(argv[0], argv, outstream);
 
   // errors/warnings
   std::ifstream stderr_stream(stderr_file());
@@ -723,11 +724,13 @@ bool c_preprocess_arm(
 
   // the file that is to be preprocessed
   argv.push_back(file);
+  argv.push_back("2>");
+  argv.push_back(stderr_file());
 
   int result;
 
   // execute armcc
-  result = run(argv[0], argv, "", outstream, stderr_file());
+  result = run(argv[0], argv, outstream);
 
   // errors/warnings
   std::ifstream stderr_stream(stderr_file());

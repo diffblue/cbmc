@@ -29,8 +29,6 @@ int run(
 int run(
   const std::string &what,
   const std::vector<std::string> &argv,
-  const std::string &std_input,
-  std::ostream &std_output,
-  const std::string &std_error);
+  std::ostream &std_output);
 
 #endif // CPROVER_UTIL_RUN_H

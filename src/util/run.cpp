@@ -475,14 +475,12 @@ static std::string shell_quote(const std::string &src)
 int run(
   const std::string &what,
   const std::vector<std::string> &argv,
-  const std::string &std_input,
-  std::ostream &std_output,
-  const std::string &std_error)
+  std::ostream &std_output)
 {
   #ifdef _WIN32
   temporary_filet tmpi("tmp.stdout", "");
 
-  int result = run(what, argv, std_input, tmpi(), std_error);
+  int result = run(what, argv, "", tmpi(), "");
 
   std::ifstream instream(tmpi());
 
