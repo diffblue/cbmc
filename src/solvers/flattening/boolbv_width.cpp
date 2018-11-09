@@ -153,7 +153,7 @@ const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
 
     mp_integer total = vector_size * sub_width;
     if(total > (1 << 30)) // realistic limit
-      analysis_exceptiont("vector too large for flattening");
+      throw analysis_exceptiont("vector too large for flattening");
 
     entry.total_width = numeric_cast_v<std::size_t>(vector_size * sub_width);
   }
