@@ -148,7 +148,6 @@ protected:
   // tweaks for arrays
   bool use_array_theory(const exprt &);
   void flatten_array(const exprt &);
-  void unflatten_array(const exprt &);
 
   // specific expressions go here
   void convert_byte_update(const byte_update_exprt &expr);
@@ -172,14 +171,11 @@ protected:
   void convert_mod(const mod_exprt &expr);
   void convert_index(const index_exprt &expr);
   void convert_member(const member_exprt &expr);
-  void convert_overflow(const exprt &expr);
+
   void convert_with(const with_exprt &expr);
   void convert_update(const exprt &expr);
 
   std::string convert_identifier(const irep_idt &identifier);
-
-  // introduces a let-expression for operands
-  exprt convert_operands(const exprt &);
 
   // auxiliary methods
   void find_symbols(const exprt &expr);

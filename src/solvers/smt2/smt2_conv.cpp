@@ -4092,11 +4092,6 @@ void smt2_convt::unflatten(
   }
 }
 
-void smt2_convt::convert_overflow(const exprt &)
-{
-  UNREACHABLE;
-}
-
 void smt2_convt::set_to(const exprt &expr, bool value)
 {
   PRECONDITION(expr.type().id() == ID_bool);
