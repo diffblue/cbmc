@@ -1,0 +1,8 @@
+CORE
+indirect/IndirectVirtualCall.class
+--function indirect.IndirectVirtualCall.main
+function java::indirect\.TestEnum\.<clinit>:\(\)V$
+^EXIT=10$
+^SIGNAL=0$
+--
+^Invariant check failed$
