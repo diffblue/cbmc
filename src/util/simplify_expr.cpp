@@ -1558,24 +1558,33 @@ optionalt<std::string> simplify_exprt::expr2bits(
 
   if(expr.id()==ID_constant)
   {
+    const auto &value = to_constant_expr(expr).get_value();
+
     if(type.id()==ID_unsignedbv ||
        type.id()==ID_signedbv ||
-       type.id()==ID_c_enum ||
-       type.id()==ID_c_enum_tag ||
        type.id()==ID_floatbv ||
        type.id()==ID_fixedbv)
     {
       const auto width = to_bitvector_type(type).get_width();
-      const auto &bvrep = to_constant_expr(expr).get_value();
 
       endianness_mapt map(type, little_endian, ns);
 
       std::string result(width, ' ');
 
       for(std::string::size_type i = 0; i < width; ++i)
-        result[map.map_bit(i)] = get_bvrep_bit(bvrep, width, i) ? '1' : '0';
+        result[map.map_bit(i)] = get_bvrep_bit(value, width, i) ? '1' : '0';
 
       return result;
+    }
+    else if(type.id() == ID_c_enum_tag)
+    {
+      const typet &c_enum_type = ns.follow_tag(to_c_enum_tag_type(type));
+      return expr2bits(constant_exprt(value, c_enum_type), little_endian);
+    }
+    else if(type.id() == ID_c_enum)
+    {
+      return expr2bits(
+        constant_exprt(value, to_c_enum_type(type).subtype()), little_endian);
     }
   }
   else if(expr.id()==ID_union)
