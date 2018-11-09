@@ -11,8 +11,16 @@ Date: August 2012
 #include "run.h"
 
 #ifdef _WIN32
+// clang-format off
+#include <util/pragma_push.def>
+#ifdef _MSC_VER
+#pragma warning(disable:4668)
+  // using #if/#elif on undefined macro
+#endif
 #include <process.h>
 #include <windows.h>
+#include <util/pragma_pop.def>
+// clang-format on
 #else
 
 #include <cstring>
