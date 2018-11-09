@@ -2,6 +2,7 @@
 # running tests in parallel, it is important that these directories are
 # listed with decreasing runtimes (i.e. longest running at the top)
 DIRS = cbmc \
+       cbmc-library \
        goto-analyzer \
        ansi-c \
        goto-instrument \
