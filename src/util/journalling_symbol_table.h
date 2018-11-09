@@ -100,6 +100,11 @@ public:
     return result;
   }
 
+  std::size_t next_unused_suffix(const std::string &prefix) const override
+  {
+    return base_symbol_table.next_unused_suffix(prefix);
+  }
+
   virtual std::pair<symbolt &, bool> insert(symbolt symbol) override
   {
     std::pair<symbolt &, bool> result =
