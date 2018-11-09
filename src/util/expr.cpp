@@ -283,9 +283,9 @@ const source_locationt &exprt::find_source_location() const
 
   forall_operands(it, (*this))
   {
-    const source_locationt &l=it->find_source_location();
-    if(l.is_not_nil())
-      return l;
+    const source_locationt &op_l = it->find_source_location();
+    if(op_l.is_not_nil())
+      return op_l;
   }
 
   return static_cast<const source_locationt &>(get_nil_irep());
