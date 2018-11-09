@@ -646,7 +646,6 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
       else if(expr_type_id==ID_floatbv)
       {
         // float to double or double to float
-        ieee_floatt f(to_constant_expr(expr.op0()));
         f.change_spec(ieee_float_spect(to_floatbv_type(expr_type)));
         expr=f.to_expr();
         return false;
