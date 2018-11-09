@@ -101,5 +101,5 @@ exprt convert_float_literal(const std::string &src)
     return complex_exprt(zero_real_component, result, complex_type);
   }
 
-  return result;
+  return std::move(result);
 }

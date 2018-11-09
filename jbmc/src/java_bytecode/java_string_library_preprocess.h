@@ -21,6 +21,7 @@ Date:   March 2017
 #include <util/string_expr.h>
 
 #include <util/ieee_float.h> // should get rid of this
+#include <util/optional.h>
 
 #include <array>
 #include <unordered_set>
@@ -324,7 +325,7 @@ private:
     symbol_table_baset &symbol_table,
     code_blockt &code);
 
-  exprt get_primitive_value_of_object(
+  optionalt<symbol_exprt> get_primitive_value_of_object(
     const exprt &object,
     irep_idt type_name,
     const source_locationt &loc,
