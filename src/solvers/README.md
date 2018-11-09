@@ -353,8 +353,8 @@ This is done by generate_instantiations(messaget::mstreamt &stream, const string
 
 \subsection axiom-check Axiom check
 
-\copydetails check_axioms(const string_axiomst &axioms, string_constraint_generatort &generator, const std::function<exprt(const exprt &)> &get, messaget::mstreamt &stream, const namespacet &ns, bool use_counter_example, const union_find_replacet &symbol_resolve, const std::map<string_not_contains_constraintt, symbol_exprt> &not_contain_witnesses)
-\link check_axioms(const string_axiomst &axioms, string_constraint_generatort &generator, const std::function<exprt(const exprt &)> &get, messaget::mstreamt &stream, const namespacet &ns, bool use_counter_example, const union_find_replacet &symbol_resolve, const std::map<string_not_contains_constraintt, symbol_exprt> &not_contain_witnesses)
+\copydetails check_axioms(const string_axiomst &axioms, string_constraint_generatort &generator, const std::function<exprt(const exprt &)> &get, messaget::mstreamt &stream, const namespacet &ns, bool use_counter_example, const union_find_replacet &symbol_resolve, const std::unordered_map<string_not_contains_constraintt, symbol_exprt> &not_contain_witnesses)
+\link check_axioms(const string_axiomst &axioms, string_constraint_generatort &generator, const std::function<exprt(const exprt &)> &get, messaget::mstreamt &stream, const namespacet &ns, bool use_counter_example, const union_find_replacet &symbol_resolve, const std::unordered_map<string_not_contains_constraintt, symbol_exprt> &not_contain_witnesses)
   (See function documentation...) \endlink
 
 \section floatbv Floatbv Directory
