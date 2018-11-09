@@ -200,9 +200,9 @@ bool simplify_exprt::simplify_index(exprt &expr)
       plus_exprt final_offset(array.op1(), offset);
       simplify_node(final_offset);
 
-      exprt result(array.id(), expr.type());
-      result.add_to_operands(array.op0(), final_offset);
-      expr.swap(result);
+      exprt result_expr(array.id(), expr.type());
+      result_expr.add_to_operands(array.op0(), final_offset);
+      expr.swap(result_expr);
 
       simplify_rec(expr);
 
