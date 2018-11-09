@@ -103,7 +103,7 @@ std::pair<exprt, string_constraintst> add_axioms_from_bool(
   // a4 : forall i < |"false"|. !eq => res[i]="false"[i]
 
   std::string str_true="true";
-  implies_exprt a1(eq, res.axiom_for_has_length(str_true.length()));
+  const implies_exprt a1(eq, length_eq(res, str_true.length()));
   constraints.existential.push_back(a1);
 
   for(std::size_t i=0; i<str_true.length(); i++)
@@ -114,7 +114,7 @@ std::pair<exprt, string_constraintst> add_axioms_from_bool(
   }
 
   std::string str_false="false";
-  implies_exprt a3(not_exprt(eq), res.axiom_for_has_length(str_false.length()));
+  const implies_exprt a3(not_exprt(eq), length_eq(res, str_false.length()));
   constraints.existential.push_back(a3);
 
   for(std::size_t i=0; i<str_false.length(); i++)
@@ -244,7 +244,7 @@ std::pair<exprt, string_constraintst> add_axioms_from_int_hex(
 
   size_t max_size=8;
   constraints.existential.push_back(
-    and_exprt(res.axiom_for_length_gt(0), res.axiom_for_length_le(max_size)));
+    and_exprt(length_gt(res, 0), length_le(res, max_size)));
 
   for(size_t size=1; size<=max_size; size++)
   {
@@ -267,7 +267,7 @@ std::pair<exprt, string_constraintst> add_axioms_from_int_hex(
       all_numbers=and_exprt(all_numbers, is_number);
     }
 
-    equal_exprt premise(res.axiom_for_has_length(size));
+    const equal_exprt premise = length_eq(res, size);
     constraints.existential.push_back(
       implies_exprt(premise, and_exprt(equal_exprt(i, sum), all_numbers)));
 
@@ -331,7 +331,7 @@ std::pair<exprt, string_constraintst> add_axioms_from_char(
   const array_string_exprt &res,
   const exprt &c)
 {
-  const and_exprt lemma(equal_exprt(res[0], c), res.axiom_for_has_length(1));
+  const and_exprt lemma(equal_exprt(res[0], c), length_eq(res, 1));
   return {from_integer(0, get_return_code_type()), {{lemma}}};
 }
 
@@ -363,7 +363,7 @@ string_constraintst add_axioms_for_correct_number_format(
     is_digit_with_radix(chr, strict_formatting, radix_as_char, radix_ul);
 
   // |str| > 0
-  const exprt non_empty=str.axiom_for_length_ge(from_integer(1, index_type));
+  const exprt non_empty = length_ge(str, from_integer(1, index_type));
   constraints.existential.push_back(non_empty);
 
   if(strict_formatting)
@@ -383,11 +383,11 @@ string_constraintst add_axioms_for_correct_number_format(
   // str[0]='+' or '-' ==> |str| > 1
   const implies_exprt contains_digit(
     or_exprt(starts_with_minus, starts_with_plus),
-    str.axiom_for_length_ge(from_integer(2, index_type)));
+    length_ge(str, from_integer(2, index_type)));
   constraints.existential.push_back(contains_digit);
 
   // |str| <= max_size
-  constraints.existential.push_back(str.axiom_for_length_le(max_size));
+  constraints.existential.push_back(length_le(str, max_size));
 
   // forall 1 <= i < |str| . is_digit_with_radix(str[i], radix)
   // We unfold the above because we know that it will be used for all i up to
@@ -396,7 +396,7 @@ string_constraintst add_axioms_for_correct_number_format(
   {
     /// index < length => is_digit_with_radix(str[index], radix)
     const implies_exprt character_at_index_is_digit(
-      str.axiom_for_length_ge(from_integer(index+1, index_type)),
+      length_ge(str, from_integer(index + 1, index_type)),
       is_digit_with_radix(
         str[index], strict_formatting, radix_as_char, radix_ul));
     constraints.existential.push_back(character_at_index_is_digit);
@@ -408,8 +408,7 @@ string_constraintst add_axioms_for_correct_number_format(
 
     // no_leading_zero : str[0] = '0' => |str| = 1
     const implies_exprt no_leading_zero(
-      equal_exprt(chr, zero_char),
-      str.axiom_for_has_length(from_integer(1, index_type)));
+      equal_exprt(chr, zero_char), length_eq(str, from_integer(1, index_type)));
     constraints.existential.push_back(no_leading_zero);
 
     // no_leading_zero_after_minus : str[0]='-' => str[1]!='0'
@@ -455,7 +454,7 @@ string_constraintst add_axioms_for_characters_in_integer_string(
   /// add_axioms_for_correct_number_format which say that the string must
   /// contain at least one digit, so we don't have to worry about "+" or "-".
   constraints.existential.push_back(
-    implies_exprt(str.axiom_for_has_length(1), equal_exprt(input_int, sum)));
+    implies_exprt(length_eq(str, 1), equal_exprt(input_int, sum)));
 
   for(size_t size=2; size<=max_string_length; size++)
   {
@@ -493,7 +492,7 @@ string_constraintst add_axioms_for_characters_in_integer_string(
     }
     sum=new_sum;
 
-    const equal_exprt premise=str.axiom_for_has_length(size);
+    const equal_exprt premise = length_eq(str, size);
 
     if(!digit_constraints.empty())
     {
