@@ -646,11 +646,11 @@ void ieee_floatt::align()
 }
 
 void ieee_floatt::divide_and_round(
-  mp_integer &fraction,
-  const mp_integer &factor)
+  mp_integer &dividend,
+  const mp_integer &divisor)
 {
-  mp_integer remainder=fraction%factor;
-  fraction/=factor;
+  const mp_integer remainder = dividend % divisor;
+  dividend /= divisor;
 
   if(remainder!=0)
   {
@@ -658,19 +658,19 @@ void ieee_floatt::divide_and_round(
     {
     case ROUND_TO_EVEN:
       {
-        mp_integer factor_middle=factor/2;
-        if(remainder<factor_middle)
+        mp_integer divisor_middle = divisor / 2;
+        if(remainder < divisor_middle)
         {
           // crop
         }
-        else if(remainder>factor_middle)
+        else if(remainder > divisor_middle)
         {
-          ++fraction;
+          ++dividend;
         }
         else // exactly in the middle -- go to even
         {
-          if((fraction%2)!=0)
-            ++fraction;
+          if((dividend % 2) != 0)
+            ++dividend;
         }
       }
       break;
@@ -681,12 +681,12 @@ void ieee_floatt::divide_and_round(
 
     case ROUND_TO_MINUS_INF:
       if(sign_flag)
-        ++fraction;
+        ++dividend;
       break;
 
     case ROUND_TO_PLUS_INF:
       if(!sign_flag)
-        ++fraction;
+        ++dividend;
       break;
 
     default:
