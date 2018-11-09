@@ -93,6 +93,8 @@ class invariant_failedt
   const std::string reason;
 
 public:
+  virtual ~invariant_failedt() = default;
+
   virtual std::string what() const noexcept;
 
   invariant_failedt(
