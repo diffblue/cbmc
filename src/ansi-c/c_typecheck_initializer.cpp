@@ -107,7 +107,7 @@ exprt c_typecheck_baset::do_initializer_rec(
       if(mp_integer(tmp.operands().size())>array_size)
       {
         // cut off long strings. gcc does a warning for this
-        tmp.operands().resize(integer2size_t(array_size));
+        tmp.operands().resize(numeric_cast_v<std::size_t>(array_size));
         tmp.type()=type;
       }
       else if(mp_integer(tmp.operands().size())<array_size)
@@ -123,7 +123,7 @@ exprt c_typecheck_baset::do_initializer_rec(
                   << to_string(full_type.subtype()) << "'" << eom;
           throw 0;
         }
-        tmp.operands().resize(integer2size_t(array_size), *zero);
+        tmp.operands().resize(numeric_cast_v<std::size_t>(array_size), *zero);
       }
     }
 
@@ -167,7 +167,7 @@ exprt c_typecheck_baset::do_initializer_rec(
       if(mp_integer(tmp2.operands().size())>array_size)
       {
         // cut off long strings. gcc does a warning for this
-        tmp2.operands().resize(integer2size_t(array_size));
+        tmp2.operands().resize(numeric_cast_v<std::size_t>(array_size));
         tmp2.type()=type;
       }
       else if(mp_integer(tmp2.operands().size())<array_size)
@@ -183,7 +183,7 @@ exprt c_typecheck_baset::do_initializer_rec(
                   << to_string(full_type.subtype()) << "'" << eom;
           throw 0;
         }
-        tmp2.operands().resize(integer2size_t(array_size), *zero);
+        tmp2.operands().resize(numeric_cast_v<std::size_t>(array_size), *zero);
       }
     }
 
@@ -323,7 +323,7 @@ void c_typecheck_baset::designator_enter(
         throw 0;
       }
 
-      entry.size=integer2size_t(array_size);
+      entry.size = numeric_cast_v<std::size_t>(array_size);
       entry.subtype=array_type.subtype();
     }
   }
@@ -341,7 +341,7 @@ void c_typecheck_baset::designator_enter(
       throw 0;
     }
 
-    entry.size=integer2size_t(vector_size);
+    entry.size = numeric_cast_v<std::size_t>(vector_size);
     entry.subtype=vector_type.subtype();
   }
   else
@@ -410,7 +410,8 @@ exprt::operandst::const_iterator c_typecheck_baset::do_designated_initializer(
                     << to_string(full_type.subtype()) << "'" << eom;
             throw 0;
           }
-          dest->operands().resize(integer2size_t(index) + 1, *zero);
+          dest->operands().resize(
+            numeric_cast_v<std::size_t>(index) + 1, *zero);
 
           // todo: adjust type!
         }
@@ -424,7 +425,7 @@ exprt::operandst::const_iterator c_typecheck_baset::do_designated_initializer(
         }
       }
 
-      dest=&(dest->operands()[integer2size_t(index)]);
+      dest = &(dest->operands()[numeric_cast_v<std::size_t>(index)]);
     }
     else if(full_type.id()==ID_struct)
     {
@@ -730,8 +731,8 @@ designatort c_typecheck_baset::make_designator(
         throw 0;
       }
 
-      entry.index=integer2size_t(index);
-      entry.size=integer2size_t(size);
+      entry.index = numeric_cast_v<std::size_t>(index);
+      entry.size = numeric_cast_v<std::size_t>(size);
       entry.subtype=full_type.subtype();
     }
     else if(full_type.id()==ID_struct ||

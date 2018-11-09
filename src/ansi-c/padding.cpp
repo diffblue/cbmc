@@ -214,7 +214,7 @@ static void add_padding_msvc(struct_typet &type, const namespacet &ns)
           {
             const mp_integer pad_bytes = a - displacement;
             std::size_t pad_bits =
-              integer2size_t(pad_bytes * config.ansi_c.char_width);
+              numeric_cast_v<std::size_t>(pad_bytes * config.ansi_c.char_width);
             it = pad(components, it, pad_bits);
             offset += pad_bytes;
           }
@@ -262,7 +262,7 @@ static void add_padding_msvc(struct_typet &type, const namespacet &ns)
   {
     const mp_integer pad_bytes = a - displacement;
     const std::size_t pad_bits =
-      integer2size_t(pad_bytes * config.ansi_c.char_width);
+      numeric_cast_v<std::size_t>(pad_bytes * config.ansi_c.char_width);
     pad(components, components.end(), pad_bits);
     offset += pad_bytes;
   }
@@ -392,7 +392,7 @@ static void add_padding_gcc(struct_typet &type, const namespacet &ns)
       {
         const mp_integer pad_bytes = a - displacement;
         const std::size_t pad_bits =
-          integer2size_t(pad_bytes * config.ansi_c.char_width);
+          numeric_cast_v<std::size_t>(pad_bytes * config.ansi_c.char_width);
         it = pad(components, it, pad_bits);
         offset += pad_bytes;
       }
@@ -433,7 +433,7 @@ static void add_padding_gcc(struct_typet &type, const namespacet &ns)
     {
       mp_integer pad_bytes = max_alignment - displacement;
       std::size_t pad_bits =
-        integer2size_t(pad_bytes * config.ansi_c.char_width);
+        numeric_cast_v<std::size_t>(pad_bytes * config.ansi_c.char_width);
       pad(components, components.end(), pad_bits);
     }
   }
@@ -491,7 +491,7 @@ void add_padding(union_typet &type, const namespacet &ns)
       max_alignment_bits-(size_bits%max_alignment_bits);
 
     unsignedbv_typet padding_type(
-      integer2size_t(size_bits+padding_bits));
+      numeric_cast_v<std::size_t>(size_bits + padding_bits));
 
     struct_typet::componentt component;
     component.type()=padding_type;

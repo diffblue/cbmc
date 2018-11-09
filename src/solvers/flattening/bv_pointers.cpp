@@ -640,7 +640,8 @@ exprt bv_pointerst::bv_get_rec(
   constant_exprt result(bvrep, type);
 
   pointer_logict::pointert pointer;
-  pointer.object=integer2size_t(binary2integer(value_addr, false));
+  pointer.object =
+    numeric_cast_v<std::size_t>(binary2integer(value_addr, false));
   pointer.offset=binary2integer(value_offset, true);
 
   // we add the elaborated expression as operand

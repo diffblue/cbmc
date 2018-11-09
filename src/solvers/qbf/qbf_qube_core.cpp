@@ -14,7 +14,6 @@ Author: CM Wintersteiger
 
 #include <util/arith_tools.h>
 #include <util/invariant.h>
-#include <util/mp_arith.h>
 
 qbf_qube_coret::qbf_qube_coret() : qdimacs_coret()
 {

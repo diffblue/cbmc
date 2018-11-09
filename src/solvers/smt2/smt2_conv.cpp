@@ -478,7 +478,7 @@ exprt smt2_convt::parse_rec(const irept &src, const typet &_type)
     // split into object and offset
     mp_integer pow=power(2, width-config.bv_encoding.object_bits);
     pointer_logict::pointert ptr;
-    ptr.object=integer2size_t(v/pow);
+    ptr.object = numeric_cast_v<std::size_t>(v / pow);
     ptr.offset=v%pow;
     return pointer_logic.pointer_expr(ptr, to_pointer_type(type));
   }

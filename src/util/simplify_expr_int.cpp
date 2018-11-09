@@ -1144,7 +1144,8 @@ bool simplify_exprt::simplify_extractbits(extractbits_exprt &expr)
     std::string svalue=id2string(value);
 
     std::string extracted_value = svalue.substr(
-      integer2size_t(*width - start - 1), integer2size_t(start - end + 1));
+      numeric_cast_v<std::size_t>(*width - start - 1),
+      numeric_cast_v<std::size_t>(start - end + 1));
 
     constant_exprt result(extracted_value, expr.type());
     expr.swap(result);

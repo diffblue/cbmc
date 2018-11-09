@@ -537,8 +537,8 @@ bool remove_const_function_pointerst::try_resolve_index_of(
         if(try_resolve_index_value(index_expr.index(), value))
         {
           expressionst array_out_functions;
-          const exprt &func_expr=
-            potential_array_expr.operands()[integer2size_t(value)];
+          const exprt &func_expr =
+            potential_array_expr.operands()[numeric_cast_v<std::size_t>(value)];
           bool value_const=false;
           bool resolved_value=
             try_resolve_expression(func_expr, array_out_functions, value_const);

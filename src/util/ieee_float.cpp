@@ -202,7 +202,8 @@ std::string ieee_floatt::to_string_decimal(std::size_t precision) const
       // pad with zeros from the front, if needed
       while(mp_integer(tmp.size())<=position) tmp="0"+tmp;
 
-      std::size_t dot=tmp.size()-integer2size_t(position);
+      const std::size_t dot =
+        tmp.size() - numeric_cast_v<std::size_t>(position);
       result+=std::string(tmp, 0, dot)+'.';
       result+=std::string(tmp, dot, std::string::npos);
 

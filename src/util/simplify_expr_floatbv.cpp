@@ -199,7 +199,8 @@ bool simplify_exprt::simplify_floatbv_typecast(exprt &expr)
         {
           ieee_floatt result(to_constant_expr(casted_expr));
           result.rounding_mode =
-            (ieee_floatt::rounding_modet)integer2size_t(rounding_mode_index);
+            (ieee_floatt::rounding_modet)numeric_cast_v<std::size_t>(
+              rounding_mode_index);
           result.change_spec(
             ieee_float_spect(to_floatbv_type(dest_type)));
           expr=result.to_expr();
@@ -212,7 +213,8 @@ bool simplify_exprt::simplify_floatbv_typecast(exprt &expr)
           {
             ieee_floatt result(to_constant_expr(casted_expr));
             result.rounding_mode =
-              (ieee_floatt::rounding_modet)integer2size_t(rounding_mode_index);
+              (ieee_floatt::rounding_modet)numeric_cast_v<std::size_t>(
+                rounding_mode_index);
             mp_integer value=result.to_integer();
             expr=from_integer(value, dest_type);
             return false;
@@ -229,7 +231,8 @@ bool simplify_exprt::simplify_floatbv_typecast(exprt &expr)
           {
             ieee_floatt result(to_floatbv_type(dest_type));
             result.rounding_mode =
-              (ieee_floatt::rounding_modet)integer2size_t(rounding_mode_index);
+              (ieee_floatt::rounding_modet)numeric_cast_v<std::size_t>(
+                rounding_mode_index);
             result.from_integer(value);
             expr=result.to_expr();
             return false;
@@ -313,8 +316,8 @@ bool simplify_exprt::simplify_floatbv_op(exprt &expr)
     mp_integer rounding_mode;
     if(!to_integer(op2, rounding_mode))
     {
-      v0.rounding_mode=
-        (ieee_floatt::rounding_modet)integer2size_t(rounding_mode);
+      v0.rounding_mode =
+        (ieee_floatt::rounding_modet)numeric_cast_v<std::size_t>(rounding_mode);
       v1.rounding_mode=v0.rounding_mode;
 
       ieee_floatt result=v0;

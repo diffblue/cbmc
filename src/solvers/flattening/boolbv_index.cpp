@@ -221,8 +221,8 @@ bvt boolbvt::convert_index(const index_exprt &expr)
         mp_integer offset=i*width;
 
         for(std::size_t j=0; j<width; j++)
-          equal_bv[j]=prop.lequal(bv[j],
-                             array_bv[integer2size_t(offset+j)]);
+          equal_bv[j] = prop.lequal(
+            bv[j], array_bv[numeric_cast_v<std::size_t>(offset + j)]);
 
         prop.l_set_to_true(
           prop.limplies(convert(index_equality), prop.land(equal_bv)));
@@ -255,7 +255,7 @@ bvt boolbvt::convert_index(const index_exprt &expr)
 
         for(std::size_t j=0; j<width; j++)
         {
-          literalt l=array_bv[integer2size_t(offset+j)];
+          literalt l = array_bv[numeric_cast_v<std::size_t>(offset + j)];
 
           if(i==0) // this initializes bv
             bv[j]=l;
@@ -313,7 +313,7 @@ bvt boolbvt::convert_index(
     // If not there are large improvements possible as above
 
     for(std::size_t i=0; i<width; i++)
-      bv[i]=tmp[integer2size_t(offset+i)];
+      bv[i] = tmp[numeric_cast_v<std::size_t>(offset + i)];
   }
   else if(
     array.id() == ID_member || array.id() == ID_index ||

@@ -53,7 +53,7 @@ bvt boolbvt::convert_byte_update(const byte_update_exprt &expr)
       if(little_endian)
       {
         for(std::size_t i=0; i<update_width; i++)
-          bv[integer2size_t(offset+i)]=value_bv[i];
+          bv[numeric_cast_v<std::size_t>(offset + i)] = value_bv[i];
       }
       else
       {
