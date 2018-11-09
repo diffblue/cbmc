@@ -14,8 +14,8 @@
 #include <util/symbol_table.h>
 
 symbol_exprt generate_nondet_int(
-  int64_t min_value,
-  int64_t max_value,
+  const mp_integer &min_value,
+  const mp_integer &max_value,
   const std::string &name_prefix,
   const typet &int_type,
   const irep_idt &mode,
