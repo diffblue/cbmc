@@ -72,9 +72,7 @@ public:
   ///
   /// The validation mode indicates whether well-formedness check failures are
   /// reported via DATA_INVARIANT violations or exceptions.
-  static void check(
-    const codet &code,
-    const validation_modet vm = validation_modet::INVARIANT)
+  static void check(const codet &, const validation_modet)
   {
   }
 
@@ -89,7 +87,7 @@ public:
   /// reported via DATA_INVARIANT violations or exceptions.
   static void validate(
     const codet &code,
-    const namespacet &ns,
+    const namespacet &,
     const validation_modet vm = validation_modet::INVARIANT)
   {
     check_code(code, vm);
@@ -105,7 +103,7 @@ public:
   /// reported via DATA_INVARIANT violations or exceptions.
   static void validate_full(
     const codet &code,
-    const namespacet &ns,
+    const namespacet &,
     const validation_modet vm = validation_modet::INVARIANT)
   {
     check_code(code, vm);

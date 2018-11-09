@@ -225,13 +225,13 @@ public:
   small_shared_two_way_pointeet() = default;
 
   // The use count shall be unaffected
-  small_shared_two_way_pointeet(const small_shared_two_way_pointeet &rhs)
+  small_shared_two_way_pointeet(const small_shared_two_way_pointeet &)
   {
   }
 
   // The use count shall be unaffected
   small_shared_two_way_pointeet &
-  operator=(const small_shared_two_way_pointeet &rhs)
+  operator=(const small_shared_two_way_pointeet &)
   {
     return *this;
   }

@@ -78,7 +78,7 @@ private:
   ///        << "\"]";
   ///     return ss.str();
   ///
-  virtual std::string dot_attributes(const node_indext &idx) const
+  virtual std::string dot_attributes(const node_indext &) const
   {
     return "";
   }

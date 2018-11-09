@@ -16,7 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 template<class VST>
 void value_set_domain_templatet<VST>::transform(
   const namespacet &ns,
-  const irep_idt &function_from,
+  const irep_idt &,
   locationt from_l,
   const irep_idt &function_to,
   locationt to_l)

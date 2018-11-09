@@ -70,7 +70,7 @@ public:
     return true;
   }
 
-  bool merge(const instruction_counter_domaint &b, locationt from, locationt to)
+  bool merge(const instruction_counter_domaint &b, locationt, locationt)
   {
     if(b.is_bottom())
       return false;

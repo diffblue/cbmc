@@ -63,7 +63,7 @@ public:
     const namespacet &ns) = 0;
 
   virtual void
-  output(std::ostream &out, const ai_baset &ai, const namespacet &ns) const
+  output(std::ostream &, const ai_baset &, const namespacet &) const
   {
   }
 
@@ -102,7 +102,7 @@ public:
   /// simplification
 
   /// return true if unchanged
-  virtual bool ai_simplify(exprt &condition, const namespacet &ns) const
+  virtual bool ai_simplify(exprt &condition, const namespacet &) const
   {
     (void)condition; // unused parameter
     return true;

@@ -166,9 +166,9 @@ void escape_domaint::get_rhs_aliases_address_of(
 }
 
 void escape_domaint::transform(
-  const irep_idt &function_from,
+  const irep_idt &,
   locationt from,
-  const irep_idt &function_to,
+  const irep_idt &,
   locationt,
   ai_baset &,
   const namespacet &)

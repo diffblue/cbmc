@@ -91,7 +91,7 @@ public:
 
   void adjust_assign_rhs_values(
     const exprt &expr,
-    const namespacet &ns,
+    const namespacet &,
     object_mapt &dest) const override
   {
     // Always add an ID_unknown to reads from variables containing
@@ -109,7 +109,7 @@ public:
 
   void apply_assign_side_effects(
     const exprt &lhs,
-    const exprt &rhs,
+    const exprt &,
     const namespacet &ns) override
   {
     // Whenever someone touches the variable "cause", null the

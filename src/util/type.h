@@ -87,9 +87,7 @@ public:
   ///
   /// The validation mode indicates whether well-formedness check failures are
   /// reported via DATA_INVARIANT violations or exceptions.
-  static void check(
-    const typet &type,
-    const validation_modet vm = validation_modet::INVARIANT)
+  static void check(const typet &, const validation_modet)
   {
   }
 
@@ -103,7 +101,7 @@ public:
   /// reported via DATA_INVARIANT violations or exceptions.
   static void validate(
     const typet &type,
-    const namespacet &ns,
+    const namespacet &,
     const validation_modet vm = validation_modet::INVARIANT)
   {
     check_type(type, vm);

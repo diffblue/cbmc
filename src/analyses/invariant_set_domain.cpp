@@ -14,9 +14,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/simplify_expr.h>
 
 void invariant_set_domaint::transform(
-  const irep_idt &function_from,
+  const irep_idt &,
   locationt from_l,
-  const irep_idt &function_to,
+  const irep_idt &,
   locationt to_l,
   ai_baset &,
   const namespacet &ns)
