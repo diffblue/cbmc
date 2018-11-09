@@ -89,6 +89,18 @@ public:
     return goto_functions.function_map.find(id) !=
            goto_functions.function_map.end();
   }
+
+  /// Check that the goto model is well-formed
+  ///
+  /// The validation mode indicates whether well-formedness check failures are
+  /// reported via DATA_INVARIANT violations or exceptions.
+  void validate(const validation_modet vm) const
+  {
+    symbol_table.validate();
+
+    const namespacet ns(symbol_table);
+    goto_functions.validate(ns, vm);
+  }
 };
 
 /// Class providing the abstract GOTO model interface onto an unrelated

@@ -11,6 +11,7 @@ Author: Fotis Koutoulakis, fotis.koutoulakis@diffblue.com
 
 #include <string>
 
+#include "invariant.h"
 #include "source_location.h"
 
 /// Base class for exceptions thrown in the cprover project.
@@ -88,16 +89,53 @@ private:
 class incorrect_goto_program_exceptiont : public cprover_exception_baset
 {
 public:
+  explicit incorrect_goto_program_exceptiont(std::string message);
+
+  template <typename Diagnostic, typename... Diagnostics>
   incorrect_goto_program_exceptiont(
     std::string message,
-    source_locationt source_location);
-  explicit incorrect_goto_program_exceptiont(std::string message);
+    Diagnostic &&diagnostic,
+    Diagnostics &&... diagnostics);
+
+  template <typename... Diagnostics>
+  incorrect_goto_program_exceptiont(
+    std::string message,
+    source_locationt source_location,
+    Diagnostics &&... diagnostics);
+
   std::string what() const override;
 
 private:
   std::string message;
   source_locationt source_location;
+
+  std::string diagnostics;
 };
+
+template <typename Diagnostic, typename... Diagnostics>
+incorrect_goto_program_exceptiont::incorrect_goto_program_exceptiont(
+  std::string message,
+  Diagnostic &&diagnostic,
+  Diagnostics &&... diagnostics)
+  : message(std::move(message)),
+    source_location(),
+    diagnostics(detail::assemble_diagnostics(
+      std::forward<Diagnostic>(diagnostic),
+      std::forward<Diagnostics>(diagnostics)...))
+{
+}
+
+template <typename... Diagnostics>
+incorrect_goto_program_exceptiont::incorrect_goto_program_exceptiont(
+  std::string message,
+  source_locationt source_location,
+  Diagnostics &&... diagnostics)
+  : message(std::move(message)),
+    source_location(std::move(source_location)),
+    diagnostics(
+      detail::assemble_diagnostics(std::forward<Diagnostics>(diagnostics)...))
+{
+}
 
 /// Thrown when we encounter an instruction, parameters to an instruction etc.
 /// in a goto program that has some theoretically valid semantics,

@@ -20,10 +20,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/invariant.h>
 #include <util/namespace.h>
-#include <util/symbol_table.h>
 #include <util/source_location.h>
-#include <util/std_expr.h>
 #include <util/std_code.h>
+#include <util/std_expr.h>
+#include <util/symbol_table.h>
+
+enum class validation_modet;
 
 /// The type of an instruction in a GOTO program.
 enum goto_program_instruction_typet
@@ -398,6 +400,12 @@ public:
     /// only be evaluated in the context of a goto_programt (see
     /// goto_programt::equals).
     bool equals(const instructiont &other) const;
+
+    /// Check that the instruction is well-formed
+    ///
+    /// The validation mode indicates whether well-formedness check failures are
+    /// reported via DATA_INVARIANT violations or exceptions.
+    void validate(const namespacet &ns, const validation_modet vm) const;
   };
 
   // Never try to change this to vector-we mutate the list while iterating
@@ -677,6 +685,18 @@ public:
   /// the same number of instructions, each pair of instructions compares equal,
   /// and relative jumps have the same distance.
   bool equals(const goto_programt &other) const;
+
+  /// Check that the goto program is well-formed
+  ///
+  /// The validation mode indicates whether well-formedness check failures are
+  /// reported via DATA_INVARIANT violations or exceptions.
+  void validate(const namespacet &ns, const validation_modet vm) const
+  {
+    for(const instructiont &ins : instructions)
+    {
+      ins.validate(ns, vm);
+    }
+  }
 };
 
 /// Get control-flow successors of a given instruction. The instruction is

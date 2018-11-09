@@ -12,9 +12,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <list>
 
+#include "base_type.h"
+#include "expr.h"
 #include "expr_cast.h"
 #include "invariant.h"
 #include "std_expr.h"
+#include "validate.h"
+#include "validate_code.h"
 
 /// Data structure for representing an arbitrary statement in a program. Every
 /// specific type of statement (e.g. block of statements, assignment,
@@ -59,6 +63,53 @@ public:
   codet &last_statement();
   const codet &last_statement() const;
   class code_blockt &make_block();
+
+  /// Check that the code statement is well-formed (shallow checks only, i.e.,
+  /// enclosed statements, subexpressions, etc. are not checked)
+  ///
+  /// Subclasses may override this function to provide specific well-formedness
+  /// checks for the corresponding types.
+  ///
+  /// The validation mode indicates whether well-formedness check failures are
+  /// reported via DATA_INVARIANT violations or exceptions.
+  static void check(
+    const codet &code,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+  }
+
+  /// Check that the code statement is well-formed, assuming that all its
+  /// enclosed statements, subexpressions, etc. have all ready been checked for
+  /// well-formedness.
+  ///
+  /// Subclasses may override this function to provide specific well-formedness
+  /// checks for the corresponding types.
+  ///
+  /// The validation mode indicates whether well-formedness check failures are
+  /// reported via DATA_INVARIANT violations or exceptions.
+  static void validate(
+    const codet &code,
+    const namespacet &ns,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    check_code(code, vm);
+  }
+
+  /// Check that the code statement is well-formed (full check, including checks
+  /// of all subexpressions)
+  ///
+  /// Subclasses may override this function to provide specific well-formedness
+  /// checks for the corresponding types.
+  ///
+  /// The validation mode indicates whether well-formedness check failures are
+  /// reported via DATA_INVARIANT violations or exceptions.
+  static void validate_full(
+    const codet &code,
+    const namespacet &ns,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    check_code(code, vm);
+  }
 };
 
 namespace detail // NOLINT
@@ -236,6 +287,39 @@ public:
   {
     return op1();
   }
+
+  static void check(
+    const codet &code,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    DATA_CHECK(
+      code.operands().size() == 2, "assignment must have two operands");
+  }
+
+  static void validate(
+    const codet &code,
+    const namespacet &ns,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    check(code, vm);
+
+    DATA_CHECK(
+      base_type_eq(code.op0().type(), code.op1().type(), ns),
+      "lhs and rhs of assignment must have same type");
+  }
+
+  static void validate_full(
+    const codet &code,
+    const namespacet &ns,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    for(const exprt &op : code.operands())
+    {
+      validate_full_expr(op, ns, vm);
+    }
+
+    validate(code, ns, vm);
+  }
 };
 
 template<> inline bool can_cast_expr<code_assignt>(const exprt &base)
@@ -251,16 +335,14 @@ inline void validate_expr(const code_assignt & x)
 inline const code_assignt &to_code_assign(const codet &code)
 {
   PRECONDITION(code.get_statement() == ID_assign);
-  DATA_INVARIANT(
-    code.operands().size() == 2, "assignment must have two operands");
+  code_assignt::check(code);
   return static_cast<const code_assignt &>(code);
 }
 
 inline code_assignt &to_code_assign(codet &code)
 {
   PRECONDITION(code.get_statement() == ID_assign);
-  DATA_INVARIANT(
-    code.operands().size() == 2, "assignment must have two operands");
+  code_assignt::check(code);
   return static_cast<code_assignt &>(code);
 }
 

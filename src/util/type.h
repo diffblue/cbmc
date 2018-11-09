@@ -13,7 +13,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_UTIL_TYPE_H
 #define CPROVER_UTIL_TYPE_H
 
+class namespacet;
+
 #include "source_location.h"
+#include "validate_types.h"
+#include "validation_mode.h"
 
 /// The type of an expression, extends irept. Types may have subtypes. This is
 /// modeled with two subs named “subtype” (a single type) and “subtypes”
@@ -73,6 +77,59 @@ public:
   const typet &find_type(const irep_namet &name) const
   {
     return static_cast<const typet &>(find(name));
+  }
+
+  /// Check that the type is well-formed (shallow checks only, i.e., subtypes
+  /// are not checked)
+  ///
+  /// Subclasses may override this function to provide specific well-formedness
+  /// checks for the corresponding types.
+  ///
+  /// The validation mode indicates whether well-formedness check failures are
+  /// reported via DATA_INVARIANT violations or exceptions.
+  static void check(
+    const typet &type,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+  }
+
+  /// Check that the type is well-formed, assuming that its subtypes have
+  /// already been checked for well-formedness.
+  ///
+  /// Subclasses may override this function to provide specific well-formedness
+  /// checks for the corresponding types.
+  ///
+  /// The validation mode indicates whether well-formedness check failures are
+  /// reported via DATA_INVARIANT violations or exceptions.
+  static void validate(
+    const typet &type,
+    const namespacet &ns,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    check_type(type, vm);
+  }
+
+  /// Check that the type is well-formed (full check, including checks of
+  /// subtypes)
+  ///
+  /// Subclasses may override this function, though in most cases the provided
+  /// implementation should be sufficient.
+  ///
+  /// The validation mode indicates whether well-formedness check failures are
+  /// reported via DATA_INVARIANT violations or exceptions.
+  static void validate_full(
+    const typet &type,
+    const namespacet &ns,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    // check subtypes
+    for(const irept &sub : type.get_sub())
+    {
+      const typet &subtype = static_cast<const typet &>(sub);
+      validate_full_type(subtype, ns, vm);
+    }
+
+    validate_type(type, ns, vm);
   }
 };
 

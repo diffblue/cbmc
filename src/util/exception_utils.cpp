@@ -55,25 +55,23 @@ std::string deserialization_exceptiont::what() const
 }
 
 incorrect_goto_program_exceptiont::incorrect_goto_program_exceptiont(
-  std::string message,
-  source_locationt source_location)
-  : message(std::move(message)), source_location(std::move(source_location))
-{
-}
-
-std::string incorrect_goto_program_exceptiont::what() const
-{
-  if(source_location.is_nil())
-    return message;
-  else
-    return message + " (at: " + source_location.as_string() + ")";
-}
-
-incorrect_goto_program_exceptiont::incorrect_goto_program_exceptiont(
   std::string message)
   : message(std::move(message))
 {
   source_location.make_nil();
+}
+
+std::string incorrect_goto_program_exceptiont::what() const
+{
+  std::string ret(message);
+
+  if(!source_location.is_nil())
+    ret += " (at: " + source_location.as_string() + ")";
+
+  if(!diagnostics.empty())
+    ret += "\n" + diagnostics;
+
+  return ret;
 }
 
 unsupported_operation_exceptiont::unsupported_operation_exceptiont(

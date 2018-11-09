@@ -101,9 +101,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_ANALYZER_GOTO_ANALYZER_PARSE_OPTIONS_H
 #define CPROVER_GOTO_ANALYZER_GOTO_ANALYZER_PARSE_OPTIONS_H
 
-#include <util/ui_message.h>
 #include <util/parse_options.h>
 #include <util/timestamper.h>
+#include <util/ui_message.h>
+#include <util/validation_interface.h>
 
 #include <langapi/language.h>
 
@@ -148,6 +149,7 @@ class optionst;
   "(show)(verify)(simplify):" \
   "(location-sensitive)(concurrent)" \
   "(no-simplify-slicing)" \
+  OPT_VALIDATE \
 // clang-format on
 
 class goto_analyzer_parse_optionst:

@@ -14,9 +14,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_UTIL_STD_TYPES_H
 
 #include "expr.h"
-#include "mp_arith.h"
-#include "invariant.h"
 #include "expr_cast.h"
+#include "invariant.h"
+#include "mp_arith.h"
+#include "validate.h"
 
 #include <unordered_map>
 
@@ -1143,6 +1144,13 @@ public:
   {
     set(ID_width, width);
   }
+
+  static void check(
+    const typet &type,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    DATA_CHECK(!type.get(ID_width).empty(), "bitvector type must have width");
+  }
 };
 
 /// Check whether a reference to a typet is a \ref bitvector_typet.
@@ -1245,6 +1253,13 @@ public:
   constant_exprt smallest_expr() const;
   constant_exprt zero_expr() const;
   constant_exprt largest_expr() const;
+
+  static void check(
+    const typet &type,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    bitvector_typet::check(type, vm);
+  }
 };
 
 /// Check whether a reference to a typet is a \ref unsignedbv_typet.
@@ -1254,12 +1269,6 @@ template <>
 inline bool can_cast_type<unsignedbv_typet>(const typet &type)
 {
   return type.id() == ID_unsignedbv;
-}
-
-inline void validate_type(const unsignedbv_typet &type)
-{
-  DATA_INVARIANT(
-    !type.get(ID_width).empty(), "unsigned bitvector type must have width");
 }
 
 /// \brief Cast a typet to an \ref unsignedbv_typet
@@ -1273,18 +1282,16 @@ inline void validate_type(const unsignedbv_typet &type)
 inline const unsignedbv_typet &to_unsignedbv_type(const typet &type)
 {
   PRECONDITION(can_cast_type<unsignedbv_typet>(type));
-  const unsignedbv_typet &ret = static_cast<const unsignedbv_typet &>(type);
-  validate_type(ret);
-  return ret;
+  unsignedbv_typet::check(type);
+  return static_cast<const unsignedbv_typet &>(type);
 }
 
 /// \copydoc to_unsignedbv_type(const typet &)
 inline unsignedbv_typet &to_unsignedbv_type(typet &type)
 {
   PRECONDITION(can_cast_type<unsignedbv_typet>(type));
-  unsignedbv_typet &ret = static_cast<unsignedbv_typet &>(type);
-  validate_type(ret);
-  return ret;
+  unsignedbv_typet::check(type);
+  return static_cast<unsignedbv_typet &>(type);
 }
 
 /// Fixed-width bit-vector with two's complement interpretation
