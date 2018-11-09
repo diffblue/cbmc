@@ -152,8 +152,7 @@ void show_properties_json(
   json_arrayt json_properties;
 
   for(const auto &fct : goto_functions.function_map)
-    if(!fct.second.is_inlined())
-      convert_properties_json(json_properties, ns, fct.first, fct.second.body);
+    convert_properties_json(json_properties, ns, fct.first, fct.second.body);
 
   json_objectt json_result;
   json_result["properties"] = json_properties;
@@ -170,8 +169,7 @@ void show_properties(
     show_properties_json(ns, message_handler, goto_functions);
   else
     for(const auto &fct : goto_functions.function_map)
-      if(!fct.second.is_inlined())
-        show_properties(ns, fct.first, message_handler, ui, fct.second.body);
+      show_properties(ns, fct.first, message_handler, ui, fct.second.body);
 }
 
 void show_properties(
