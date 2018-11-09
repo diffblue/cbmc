@@ -2,7 +2,7 @@
 
 /// \file Tests that irep sharing works correctly
 
-#include <testing-utils/catch.hpp>
+#include <testing-utils/use_catch.h>
 #include <util/irep.h>
 
 #ifdef SHARING

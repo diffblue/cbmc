@@ -6,10 +6,10 @@ Author: Diffblue Ltd.
 
 \*******************************************************************/
 
-#include <testing-utils/catch.hpp>
-#include <util/message.h>
 #include <sstream>
 #include <string.h>
+#include <testing-utils/use_catch.h>
+#include <util/message.h>
 
 TEST_CASE("Copy a messaget")
 {

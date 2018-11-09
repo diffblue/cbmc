@@ -9,7 +9,7 @@ Author: Diffblue Ltd.
 #include <java-testing-utils/load_java_class.h>
 #include <java-testing-utils/require_goto_statements.h>
 #include <java-testing-utils/require_type.h>
-#include <testing-utils/catch.hpp>
+#include <testing-utils/use_catch.h>
 
 SCENARIO(
   "Generics class with mutually recursive_generic parameters",

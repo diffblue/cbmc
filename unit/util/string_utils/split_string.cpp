@@ -9,7 +9,7 @@ Author: Diffblue Ltd.
 /// \file
 /// split_string Unit Tests
 
-#include <testing-utils/catch.hpp>
+#include <testing-utils/use_catch.h>
 #include <util/string_utils.h>
 
 struct expected_resultst

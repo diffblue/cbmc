@@ -6,7 +6,7 @@ Author: Daniel Kroening
 
 \*******************************************************************/
 
-#include <testing-utils/catch.hpp>
+#include <testing-utils/use_catch.h>
 
 #include <util/exception_utils.h>
 #include <util/file_util.h>

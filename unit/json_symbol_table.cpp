@@ -23,8 +23,8 @@
 #include <util/options.h>
 #include <util/symbol_table.h>
 
-#include <testing-utils/catch.hpp>
 #include <testing-utils/message.h>
+#include <testing-utils/use_catch.h>
 
 #include <iosfwd>
 

@@ -8,8 +8,8 @@ Author: Diffblue Ltd.
 
 #include <fstream>
 #include <json/json_parser.h>
-#include <testing-utils/catch.hpp>
 #include <testing-utils/message.h>
+#include <testing-utils/use_catch.h>
 #include <util/tempfile.h>
 
 SCENARIO("Loading JSON files")

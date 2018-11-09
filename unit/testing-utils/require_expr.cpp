@@ -14,7 +14,7 @@ Author: Diffblue Ltd.
 
 #include "require_expr.h"
 
-#include <testing-utils/catch.hpp>
+#include <testing-utils/use_catch.h>
 #include <util/arith_tools.h>
 #include <util/std_code.h>
 

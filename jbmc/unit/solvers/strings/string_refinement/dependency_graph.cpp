@@ -7,7 +7,7 @@ Author: Diffblue Ltd.
 
 \*******************************************************************/
 
-#include <testing-utils/catch.hpp>
+#include <testing-utils/use_catch.h>
 
 #include <java_bytecode/java_types.h>
 #include <solvers/strings/string_refinement_util.h>

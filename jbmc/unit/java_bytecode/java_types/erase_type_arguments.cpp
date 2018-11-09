@@ -6,8 +6,8 @@ Author: Diffblue Ltd.
 
 \*******************************************************************/
 
-#include <testing-utils/catch.hpp>
 #include <java_bytecode/java_types.h>
+#include <testing-utils/use_catch.h>
 
 SCENARIO("erase_type_arguments", "[core][java_types]")
 {

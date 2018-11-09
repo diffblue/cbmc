@@ -6,8 +6,8 @@ Author: Chris Smowton, chris@smowton.net
 
 \*******************************************************************/
 
-#include <testing-utils/catch.hpp>
 #include <testing-utils/message.h>
+#include <testing-utils/use_catch.h>
 
 #include <goto-programs/goto_inline.h>
 #include <goto-programs/initialize_goto_model.h>

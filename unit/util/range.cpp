@@ -8,7 +8,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 #include <vector>
 
-#include <testing-utils/catch.hpp>
+#include <testing-utils/use_catch.h>
 #include <util/range.h>
 
 /// Trivial example template function requiring a container to have a

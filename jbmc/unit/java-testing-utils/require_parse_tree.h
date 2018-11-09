@@ -14,7 +14,7 @@ Author: Diffblue Ltd.
 
 #include <java_bytecode/java_bytecode_parse_tree.h>
 
-#include <testing-utils/catch.hpp>
+#include <testing-utils/use_catch.h>
 
 // NOLINTNEXTLINE(readability/namespace)
 namespace require_parse_tree

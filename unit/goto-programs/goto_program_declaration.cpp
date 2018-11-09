@@ -6,8 +6,10 @@ Author: Diffblue Ltd.
 
 \*******************************************************************/
 
+#include <testing-utils/use_catch.h>
+
 #include <goto-programs/goto_function.h>
-#include <testing-utils/catch.hpp>
+
 #include <util/arith_tools.h>
 
 SCENARIO(

@@ -6,7 +6,8 @@ Author: Diffblue Ltd.
 
 \*******************************************************************/
 
-#include <testing-utils/catch.hpp>
+#include <testing-utils/use_catch.h>
+
 #include <util/json.h>
 #include <util/optional.h>
 #include <util/optional_utils.h>

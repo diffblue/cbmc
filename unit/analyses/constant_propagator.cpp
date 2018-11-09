@@ -6,8 +6,8 @@ Author: Diffblue Ltd
 
 \*******************************************************************/
 
-#include <testing-utils/catch.hpp>
 #include <testing-utils/message.h>
+#include <testing-utils/use_catch.h>
 
 #include <analyses/constant_propagator.h>
 

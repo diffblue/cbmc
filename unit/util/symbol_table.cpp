@@ -2,7 +2,7 @@
 
 /// \file Tests for symbol_tablet
 
-#include <testing-utils/catch.hpp>
+#include <testing-utils/use_catch.h>
 #include <util/exception_utils.h>
 #include <util/journalling_symbol_table.h>
 

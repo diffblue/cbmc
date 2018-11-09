@@ -9,7 +9,7 @@ Author: Diffblue Ltd.
 /// \file
 /// Unit tests for miniBDD
 
-#include <testing-utils/catch.hpp>
+#include <testing-utils/use_catch.h>
 
 #include <solvers/flattening/boolbv.h>
 #include <solvers/miniBDD/miniBDD.h>

@@ -6,8 +6,8 @@ Author: Diffblue Ltd.
 
 \*******************************************************************/
 
-#include <testing-utils/catch.hpp>
 #include <java_bytecode/expr2java.h>
+#include <testing-utils/use_catch.h>
 
 TEST_CASE(
   "expr2java tests",

@@ -8,7 +8,7 @@ Author: Diffblue Ltd.
 
 #include "require_type.h"
 
-#include <testing-utils/catch.hpp>
+#include <testing-utils/use_catch.h>
 #include <util/base_type.h>
 #include <util/namespace.h>
 #include <util/symbol_table.h>

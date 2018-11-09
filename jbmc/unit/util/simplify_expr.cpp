@@ -6,7 +6,7 @@ Author: Michael Tautschnig
 
 \*******************************************************************/
 
-#include <testing-utils/catch.hpp>
+#include <testing-utils/use_catch.h>
 
 #include <java_bytecode/java_types.h>
 #include <util/config.h>

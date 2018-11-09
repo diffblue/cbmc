@@ -8,10 +8,10 @@ Author: Diffblue Ltd.
 
 #include <algorithm>
 
-#include <testing-utils/catch.hpp>
 #include <java-testing-utils/load_java_class.h>
-#include <testing-utils/run_test_with_compilers.h>
 #include <java-testing-utils/require_type.h>
+#include <testing-utils/run_test_with_compilers.h>
+#include <testing-utils/use_catch.h>
 
 SCENARIO(
   "Static lambdas in class symbol",

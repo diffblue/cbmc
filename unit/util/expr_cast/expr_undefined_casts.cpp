@@ -12,11 +12,10 @@ Author: Nathan Phillips <Nathan.Phillips@diffblue.com>
 // This could have a unit test that consisted of trying to compile the file
 // and checking that the compiler gave the right error messages.
 
-#include <catch.hpp>
-#include <util/std_expr.h>
+#include <testing-utils/use_catch.h>
 #include <util/std_code.h>
+#include <util/std_expr.h>
 #include <util/std_types.h>
-
 
 SCENARIO("expr_dynamic_cast",
   "[core][utils][expr_cast][expr_dynamic_cast]")

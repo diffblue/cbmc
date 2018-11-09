@@ -6,7 +6,7 @@ Author: Vojtech Forejt, forejtv@diffblue.com
 
 \*******************************************************************/
 
-#include <testing-utils/catch.hpp>
+#include <testing-utils/use_catch.h>
 
 #include <vector>
 #include <string>

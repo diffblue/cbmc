@@ -6,9 +6,11 @@ Author: Diffblue Ltd.
 
 \*******************************************************************/
 
-#include <goto-symex/symex_target_equation.h>
-#include <testing-utils/catch.hpp>
+#include <testing-utils/use_catch.h>
+
 #include <util/arith_tools.h>
+
+#include <goto-symex/symex_target_equation.h>
 
 SCENARIO("Validation of well-formed SSA steps", "[core][goto-symex][validate]")
 {

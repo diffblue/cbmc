@@ -12,7 +12,7 @@ Author: Diffblue Ltd.
 #include <testing-utils/message.h>
 #include <util/message.h>
 
-#include <testing-utils/catch.hpp>
+#include <testing-utils/use_catch.h>
 
 static void check_class_structure(
   const java_bytecode_parse_treet::classt &loaded_class)

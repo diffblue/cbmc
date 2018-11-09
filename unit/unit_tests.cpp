@@ -7,7 +7,7 @@ Author: Diffblue Ltd.
 \*******************************************************************/
 
 #define CATCH_CONFIG_MAIN
-#include <testing-utils/catch.hpp>
+#include <testing-utils/use_catch.h>
 #include <util/irep.h>
 
 // Debug printer for irept

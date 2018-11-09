@@ -2,7 +2,7 @@
 
 /// \file Tests for depth_iteratort and friends
 
-#include <testing-utils/catch.hpp>
+#include <testing-utils/use_catch.h>
 #include <util/expr.h>
 #include <util/expr_iterator.h>
 
