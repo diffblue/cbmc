@@ -738,20 +738,6 @@ void jbmc_parse_optionst::process_goto_function(
     // Java virtual functions -> explicit dispatch tables:
     remove_virtual_functions(function);
 
-    if(using_symex_driven_loading)
-    {
-      // remove exceptions
-      // If using symex-driven function loading we need to do this now so that
-      // symex doesn't have to cope with exception-handling constructs; however
-      // the results are slightly worse than running it in whole-program mode
-      // (e.g. dead catch sites will be retained)
-      remove_exceptions(
-        goto_function.body,
-        symbol_table,
-        *class_hierarchy.get(),
-        get_message_handler());
-    }
-
     auto function_is_stub = [&symbol_table, &model](const irep_idt &id) {
       return symbol_table.lookup_ref(id).value.is_nil() &&
              !model.can_produce_function(id);
@@ -767,6 +753,20 @@ void jbmc_parse_optionst::process_goto_function(
       get_message_handler(),
       object_factory_params,
       ID_java);
+
+    if(using_symex_driven_loading)
+    {
+      // remove exceptions
+      // If using symex-driven function loading we need to do this now so that
+      // symex doesn't have to cope with exception-handling constructs; however
+      // the results are slightly worse than running it in whole-program mode
+      // (e.g. dead catch sites will be retained)
+      remove_exceptions(
+        goto_function.body,
+        symbol_table,
+        *class_hierarchy.get(),
+        get_message_handler());
+    }
 
     // add generic checks
     goto_check(ns, options, ID_java, function.get_goto_function());
