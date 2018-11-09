@@ -24,8 +24,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 void static_lifetime_init(
   symbol_tablet &symbol_table,
-  const source_locationt &source_location,
-  message_handlert &message_handler)
+  const source_locationt &source_location)
 {
   PRECONDITION(symbol_table.has_symbol(INITIALIZE_FUNCTION));
 
