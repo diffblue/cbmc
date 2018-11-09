@@ -104,25 +104,31 @@ public:
     write_header();
   }
 
-  virtual ~smt2_convt() { }
-  virtual resultt dec_solve();
+  ~smt2_convt() override = default;
+  resultt dec_solve() override;
 
   bool use_FPA_theory;
   bool use_datatypes;
   bool use_array_of_bool;
   bool emit_set_logic;
 
-  // overloading interfaces
-  virtual literalt convert(const exprt &expr);
-  virtual void set_frozen(literalt) { /* not needed */ }
-  virtual void set_to(const exprt &expr, bool value);
-  virtual exprt get(const exprt &expr) const;
-  virtual std::string decision_procedure_text() const { return "SMT2"; }
-  virtual void print_assignment(std::ostream &) const;
-  virtual tvt l_get(literalt l) const;
-  virtual void set_assumptions(const bvt &bv) { assumptions=bv; }
+  literalt convert(const exprt &expr) override;
+  void set_frozen(literalt) override
+  { /* not needed */
+  }
+  void set_to(const exprt &expr, bool value) override;
+  exprt get(const exprt &expr) const override;
+  std::string decision_procedure_text() const override
+  {
+    return "SMT2";
+  }
+  void print_assignment(std::ostream &out) const override;
+  tvt l_get(literalt l) const override;
+  void set_assumptions(const bvt &bv) override
+  {
+    assumptions = bv;
+  }
 
-  // new stuff
   void convert_expr(const exprt &);
   void convert_type(const typet &);
   void convert_literal(const literalt);
