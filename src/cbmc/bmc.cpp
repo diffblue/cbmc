@@ -308,7 +308,7 @@ safety_checkert::resultt bmct::execute(
 
     if(options.get_bool_option("show-vcc"))
     {
-      show_vcc(options, ui_message_handler, ns, equation);
+      show_vcc(options, ui_message_handler, equation);
       return safety_checkert::resultt::SAFE; // to indicate non-error
     }
 
@@ -443,7 +443,7 @@ void bmct::show()
 {
   if(options.get_bool_option("show-vcc"))
   {
-    show_vcc(options, ui_message_handler, ns, equation);
+    show_vcc(options, ui_message_handler, equation);
   }
 
   if(options.get_bool_option("program-only"))

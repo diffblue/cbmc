@@ -14,14 +14,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/ui_message.h>
 
-class namespacet;
 class optionst;
 class symex_target_equationt;
 
 void show_vcc(
   const optionst &options,
   ui_message_handlert &ui_message_handler,
-  const namespacet &ns,
   const symex_target_equationt &equation);
 
 #endif // CPROVER_GOTO_SYMEX_SHOW_VCC_H
