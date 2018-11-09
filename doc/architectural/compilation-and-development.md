@@ -197,7 +197,9 @@ The doxygen documentation can be [accessed online](http://cprover.diffblue.com).
 To build it locally, run `scripts/run_doxygen.sh`.  HTML output will be created
 in `doc/html/`. The index page is `doc/html/index.html`.  This script will
 filter out expected warning messages from doxygen, so that new problems are more
-obvious.  In the event that any change fixes an old warning, then the
+obvious.  It is important to use the correct version of doxygen, as specified
+in `run_doxygen.sh`, so that there are no unexpected changes to the list of
+expected warnings.  In the event that any change fixes an old warning, then the 
 corresponding line(s) should be deleted from
 `scripts/expected_doxygen_warnings.txt`.  We want to avoid adding any more
 warnings to this list of expected warnings, but that can be done to work around
