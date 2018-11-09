@@ -526,6 +526,8 @@ goto_programt::const_targett goto_program2codet::convert_do_while(
   simplify(d.cond(), ns);
   d.body()=code_blockt();
 
+  copy_source_location(loop_end->targets.front(), d);
+
   loop_last_stack.push_back(std::make_pair(loop_end, true));
 
   for( ; target!=loop_end; ++target)
@@ -577,6 +579,9 @@ goto_programt::const_targett goto_program2codet::convert_goto_while(
   goto_programt::const_targett after_loop=loop_end;
   ++after_loop;
   assert(after_loop!=goto_program.instructions.end());
+
+  copy_source_location(target, w);
+
   if(target->get_target()==after_loop)
   {
     w.cond()=not_exprt(target->guard);
@@ -615,6 +620,8 @@ goto_programt::const_targett goto_program2codet::convert_goto_while(
     simplify(i.cond(), ns);
     i.then_case()=code_breakt();
 
+    copy_source_location(target, i);
+
     w.body().move_to_operands(i);
   }
 
@@ -630,6 +637,8 @@ goto_programt::const_targett goto_program2codet::convert_goto_while(
     f.iter()=w.body().operands().back();
     w.body().operands().pop_back();
     f.iter().id(ID_side_effect);
+
+    copy_source_location(target, f);
 
     f.body().swap(w.body());
 
@@ -651,6 +660,8 @@ goto_programt::const_targett goto_program2codet::convert_goto_while(
 
       w.body().operands().pop_back();
       d.body().swap(w.body());
+
+      copy_source_location(target, d);
 
       d.swap(w);
     }
@@ -910,6 +921,8 @@ goto_programt::const_targett goto_program2codet::convert_goto_switch(
   s.value()=to_equal_expr(eq_cand).lhs();
   s.body()=code_blockt();
 
+  copy_source_location(target, s);
+
   // find the cases or fall back to convert_goto_if
   cases_listt cases;
   goto_programt::const_targett first_target=
@@ -1098,6 +1111,8 @@ goto_programt::const_targett goto_program2codet::convert_goto_if(
   code_ifthenelset i;
   i.then_case()=code_blockt();
 
+  copy_source_location(target, i);
+
   // some nesting of loops and branches we might not be able to deal with
   if(target->is_backwards_goto() ||
       (upper_bound!=goto_program.instructions.end() &&
@@ -1181,6 +1196,8 @@ goto_programt::const_targett goto_program2codet::convert_goto_break_continue(
       simplify(i.cond(), ns);
       i.then_case().swap(cont);
 
+      copy_source_location(target, i);
+
       dest.move_to_operands(i);
     }
     else
@@ -1212,6 +1229,8 @@ goto_programt::const_targett goto_program2codet::convert_goto_break_continue(
     i.cond()=target->guard;
     simplify(i.cond(), ns);
     i.then_case().swap(brk);
+
+    copy_source_location(target, i);
 
     if(i.cond().is_true())
       dest.move_to_operands(i.then_case());
@@ -1277,6 +1296,8 @@ goto_programt::const_targett goto_program2codet::convert_goto_goto(
     i.cond()=target->guard;
     simplify(i.cond(), ns);
     i.then_case().swap(goto_code);
+
+    copy_source_location(target, i);
 
     dest.move_to_operands(i);
   }
@@ -2020,4 +2041,14 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
       }
     }
   }
+}
+
+void goto_program2codet::copy_source_location(
+  goto_programt::const_targett src,
+  codet &dst)
+{
+  if(src->code.source_location().is_not_nil())
+    dst.add_source_location() = src->code.source_location();
+  else if(src->source_location.is_not_nil())
+    dst.add_source_location() = src->source_location;
 }
