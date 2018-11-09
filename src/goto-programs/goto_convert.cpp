@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "goto_convert.h"
 
 #include <util/arith_tools.h>
+#include <util/c_types.h>
 #include <util/cprover_prefix.h>
 #include <util/exception_utils.h>
 #include <util/expr_util.h>
@@ -20,8 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
 #include <util/symbol_table.h>
-
-#include <util/c_types.h>
+#include <util/symbol_table_builder.h>
 
 #include "goto_convert_class.h"
 #include "destructor.h"
@@ -1939,7 +1939,9 @@ void goto_convert(
   message_handlert &message_handler,
   const irep_idt &mode)
 {
-  goto_convertt goto_convert(symbol_table, message_handler);
+  symbol_table_buildert symbol_table_builder =
+    symbol_table_buildert::wrap(symbol_table);
+  goto_convertt goto_convert(symbol_table_builder, message_handler);
   goto_convert.goto_convert(code, dest, mode);
 }
 
