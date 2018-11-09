@@ -5,7 +5,7 @@ set -e
 script_folder=$(dirname "$0")
 absolute_repository_root=$(git rev-parse --show-toplevel)
 mode=$1
-modes="CPPLINT | DOXYGEN"
+modes="CPPLINT"
 
 if [[ "$#" -gt 3 ]]
 then
@@ -38,23 +38,6 @@ then
     exit 1
   else
     cmd='${script_folder}/cpplint.py --filter=-whitespace/operators,-readability/identifier_spacing $file 2>&1 >/dev/null'
-  fi
-elif [[ "$mode" == "DOXYGEN" ]]
-then
-  doxygen=doxygen
-  doxygenlogdir="doc/html"
-  doxygenlog="$doxygenlogdir/doxygen.log"
-  suppress_warnings=(
-    "warning: Included by graph for .* not generated, too many nodes. Consider increasing DOT_GRAPH_MAX_NODES.")
-  if ! $doxygen --version &>/dev/null
-  then
-    echo "Doxygen is not installed on this PC"
-    echo "Please install before running this script"
-    exit 1
-  else
-    mkdir -p $doxygenlogdir && cd src && $doxygen &> ../$doxygenlog && cd ..
-    suppress_warnings_regex=$(IFS="|" ; echo "${suppress_warnings[*]}")
-    cmd='grep -Ev "$suppress_warnings_regex" $doxygenlog'
   fi
 else
   echo "Mode $mode not recognized"
