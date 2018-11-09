@@ -1171,7 +1171,8 @@ codet java_string_library_preprocesst::make_assign_function_from_call(
 /// \return An expression contaning a symbol `tmp_type_name` where `type_name`
 ///         is the given argument (ie. boolean, char etc.). Which represents the
 ///         primitive value contained in the given object.
-exprt java_string_library_preprocesst::get_primitive_value_of_object(
+optionalt<symbol_exprt>
+java_string_library_preprocesst::get_primitive_value_of_object(
   const exprt &object,
   irep_idt type_name,
   const source_locationt &loc,
@@ -1222,7 +1223,7 @@ exprt java_string_library_preprocesst::get_primitive_value_of_object(
     object_type=symbol_typet("java::java.lang.Double");
   }
   else if(type_name==ID_void)
-    return nil_exprt();
+    return {};
   else
     UNREACHABLE;
 
@@ -1398,9 +1399,12 @@ exprt java_string_library_preprocesst::make_argument_for_format(
     }
     else if(name==ID_int || name==ID_float || name==ID_char || name==ID_boolean)
     {
-      exprt value=get_primitive_value_of_object(
+      const auto value = get_primitive_value_of_object(
         arg_i, name, loc, symbol_table, code_not_null);
-      code_not_null.add(code_assignt(field_expr, value), loc);
+      if(value.has_value())
+        code_not_null.add(code_assignt(field_expr, *value), loc);
+      else
+        code_not_null.add(code_assignt(field_expr, nil_exprt()), loc);
     }
     else
     {
