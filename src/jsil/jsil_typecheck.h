@@ -14,9 +14,10 @@ Author: Michael Tautschnig, tautschn@amazon.com
 
 #include <unordered_set>
 
-#include <util/typecheck.h>
 #include <util/namespace.h>
 #include <util/std_code.h>
+#include <util/symbol_table_base.h>
+#include <util/typecheck.h>
 
 class symbol_exprt;
 class codet;
@@ -34,12 +35,12 @@ class jsil_typecheckt:public typecheckt
 {
 public:
   jsil_typecheckt(
-    symbol_tablet &_symbol_table,
-    message_handlert &_message_handler):
-    typecheckt(_message_handler),
-    symbol_table(_symbol_table),
-    ns(symbol_table),
-    proc_name()
+    symbol_table_baset &_symbol_table,
+    message_handlert &_message_handler)
+    : typecheckt(_message_handler),
+      symbol_table(_symbol_table),
+      ns(symbol_table),
+      proc_name()
   {
   }
 
@@ -49,7 +50,7 @@ public:
   virtual void typecheck_expr(exprt &expr);
 
 protected:
-  symbol_tablet &symbol_table;
+  symbol_table_baset &symbol_table;
   const namespacet ns;
   // prefix to variables which is set in typecheck_declaration
   irep_idt proc_name;

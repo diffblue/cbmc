@@ -28,13 +28,13 @@ class linkingt:public typecheckt
 {
 public:
   linkingt(
-    symbol_tablet &_main_symbol_table,
-    symbol_tablet &_src_symbol_table,
-    message_handlert &_message_handler):
-    typecheckt(_message_handler),
-    main_symbol_table(_main_symbol_table),
-    src_symbol_table(_src_symbol_table),
-    ns(_main_symbol_table)
+    symbol_table_baset &_main_symbol_table,
+    symbol_table_baset &_src_symbol_table,
+    message_handlert &_message_handler)
+    : typecheckt(_message_handler),
+      main_symbol_table(_main_symbol_table),
+      src_symbol_table(_src_symbol_table),
+      ns(_main_symbol_table)
   {
   }
 
@@ -167,8 +167,8 @@ protected:
     const struct_typet &old_type,
     const struct_typet &new_type);
 
-  symbol_tablet &main_symbol_table;
-  symbol_tablet &src_symbol_table;
+  symbol_table_baset &main_symbol_table;
+  symbol_table_baset &src_symbol_table;
 
   namespacet ns;
 
