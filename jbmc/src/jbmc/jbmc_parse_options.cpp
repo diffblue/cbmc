@@ -748,9 +748,8 @@ void jbmc_parse_optionst::process_goto_function(
       remove_exceptions(
         goto_function.body,
         symbol_table,
-        class_hierarchy.get(),
-        get_message_handler(),
-        remove_exceptions_typest::REMOVE_ADDED_INSTANCEOF);
+        *class_hierarchy.get(),
+        get_message_handler());
     }
 
     auto function_is_stub = [&symbol_table, &model](const irep_idt &id) {
@@ -891,12 +890,8 @@ bool jbmc_parse_optionst::process_goto_functions(
       return false;
 
     // remove catch and throw
-    // (introduces instanceof but request it is removed)
     remove_exceptions(
-      goto_model,
-      class_hierarchy.get(),
-      get_message_handler(),
-      remove_exceptions_typest::REMOVE_ADDED_INSTANCEOF);
+      goto_model, *class_hierarchy.get(), get_message_handler());
 
     // instrument library preconditions
     instrument_preconditions(goto_model);
