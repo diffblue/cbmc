@@ -114,11 +114,12 @@ SCENARIO("call_graph",
 
     WHEN("A call graph is constructed with call-site tracking")
     {
-      call_grapht call_graph_from_goto_functions(goto_model, true);
+      call_grapht call_graph_from_goto_functions_tracking(goto_model, true);
       THEN("We expect two callsites for the A -> B edge, one for all others")
       {
-        const auto &check_callsites=call_graph_from_goto_functions.callsites;
-        for(const auto &edge : call_graph_from_goto_functions.edges)
+        const auto &check_callsites =
+          call_graph_from_goto_functions_tracking.callsites;
+        for(const auto &edge : call_graph_from_goto_functions_tracking.edges)
         {
           if(edge==call_grapht::edgest::value_type("A", "B"))
             REQUIRE(check_callsites.at(edge).size()==2);
@@ -128,7 +129,8 @@ SCENARIO("call_graph",
       }
       WHEN("Such a graph is inverted")
       {
-        call_grapht inverted=call_graph_from_goto_functions.get_inverted();
+        call_grapht inverted =
+          call_graph_from_goto_functions_tracking.get_inverted();
         THEN("The callsite data should be discarded")
         {
           REQUIRE(inverted.callsites.empty());
@@ -284,9 +286,9 @@ SCENARIO("call_graph",
 
     WHEN("The call graph, with call sites, is exported as a grapht")
     {
-      call_grapht call_graph_from_goto_functions(goto_model, true);
-      call_grapht::directed_grapht exported=
-        call_graph_from_goto_functions.get_directed_graph();
+      call_grapht call_graph_from_goto_functions_tracking(goto_model, true);
+      call_grapht::directed_grapht exported =
+        call_graph_from_goto_functions_tracking.get_directed_graph();
 
       typedef call_grapht::directed_grapht::node_indext node_indext;
       std::map<irep_idt, node_indext> nodes_by_name;
