@@ -139,7 +139,7 @@ SCENARIO("irept_memory", "[core][utils][irept]")
       REQUIRE(irep.find("a_new_element").id() == "some_id");
 
       irept irep2("second_irep");
-      irept &e2 = irep.add("a_new_element", irep2);
+      irep.add("a_new_element", irep2);
       REQUIRE(irep.find("a_new_element").id() == "second_irep");
       REQUIRE(irep.get_named_sub().size() == 1);
 
