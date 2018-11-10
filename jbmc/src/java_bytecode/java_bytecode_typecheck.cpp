@@ -90,7 +90,7 @@ bool java_bytecode_typecheck(
   message_handlert &message_handler,
   const namespacet &ns)
 {
-  #if 0
+#if 0
   symbol_tablet symbol_table;
   java_bytecode_parse_treet java_bytecode_parse_tree;
 
@@ -119,7 +119,12 @@ bool java_bytecode_typecheck(
   }
 
   return java_bytecode_typecheck.get_error_found();
-  #endif
+#else
+  // unused parameters
+  (void)expr;
+  (void)message_handler;
+  (void)ns;
+#endif
 
   // fail for now
   return true;

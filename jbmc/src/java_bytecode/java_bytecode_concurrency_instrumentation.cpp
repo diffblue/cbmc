@@ -342,6 +342,7 @@ static void instrument_end_thread(
   const symbol_tablet &symbol_table)
 {
   PRECONDITION(f_code.arguments().size() == 1);
+  (void)symbol_table; // unused parameter
 
   // Build id, used to construct appropriate labels.
   // Note: java does not have labels so this should be safe

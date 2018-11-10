@@ -182,6 +182,7 @@ void uncaught_exceptions_analysist::collect_uncaught_exceptions(
 void uncaught_exceptions_analysist::output(
   const goto_functionst &goto_functions) const
 {
+  (void)goto_functions; // unused parameter
 #ifdef DEBUG
   forall_goto_functions(it, goto_functions)
   {

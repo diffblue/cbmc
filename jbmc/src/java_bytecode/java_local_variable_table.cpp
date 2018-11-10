@@ -549,6 +549,8 @@ static void merge_variable_table_entries(
             << merge_into.var.name << "; new live range "
             << merge_into.var.start_pc << '-'
             << merge_into.var.start_pc + merge_into.var.length << '\n';
+#else
+  (void)debug_out; // unused parameter
 #endif
 
   // Nuke the now-subsumed var-table entries:

@@ -29,6 +29,7 @@ pointer_typet select_pointer_typet::convert_pointer_type(
     &generic_parameter_specialization_map,
   const namespacet &ns) const
 {
+  (void)ns; // unused parameter
   // if we have a map of generic parameters -> types and the pointer is
   // a generic parameter, specialize it with concrete types
   if(!generic_parameter_specialization_map.empty())
@@ -229,5 +230,8 @@ std::set<symbol_typet> select_pointer_typet::get_parameter_alternative_types(
   const irep_idt &parameter_name,
   const namespacet &ns) const
 {
+  // unused parameters
+  (void)function_name;
+  (void)parameter_name;
   return {};
 }

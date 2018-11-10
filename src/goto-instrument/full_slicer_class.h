@@ -99,6 +99,8 @@ protected:
   {
 #ifdef DEBUG_FULL_SLICERT
     cfg[entry].required_by.insert(reason->location_number);
+#else
+    (void)reason; // unused parameter
 #endif
     queue.push(entry);
   }

@@ -14,9 +14,9 @@ Author: Daniel Kroening
 
 #include <unordered_set>
 
-#include <goto-programs/goto_model.h>
+#include <util/message.h>
 
-class message_handlert;
+#include <goto-programs/goto_model.h>
 
 class cover_blocks_baset
 {
@@ -49,6 +49,9 @@ public:
     const goto_programt &goto_program,
     message_handlert &message_handler)
   {
+    // unused parameters
+    (void)goto_program;
+    (void)message_handler;
   }
 };
 

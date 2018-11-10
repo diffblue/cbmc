@@ -70,6 +70,8 @@ tvt java_enum_static_init_unwind_handler(
   unsigned &unwind_max,
   const symbol_tablet &symbol_table)
 {
+  (void)loop_number; // unused parameter
+
   const irep_idt enum_function_id = find_enum_function_on_stack(context);
   if(enum_function_id.empty())
     return tvt::unknown();

@@ -328,7 +328,8 @@ void local_may_aliast::build(const goto_functiont &goto_function)
 
   loc_infos.resize(cfg.nodes.size());
 
-  #if 0
+  (void)goto_function; // unused parameter
+#if 0
   // feed in sufficiently bad defaults
   for(code_typet::parameterst::const_iterator
       it=goto_function.type.parameters().begin();
@@ -340,9 +341,9 @@ void local_may_aliast::build(const goto_functiont &goto_function)
       loc_infos[0].points_to[objects.number(identifier)].objects.insert(
         unknown_object);
   }
-  #endif
+#endif
 
-  #if 0
+#if 0
   for(localst::locals_mapt::const_iterator
       l_it=locals.locals_map.begin();
       l_it!=locals.locals_map.end();
@@ -352,7 +353,7 @@ void local_may_aliast::build(const goto_functiont &goto_function)
       loc_infos[0].aliases.make_union(
         objects.number(l_it->second), unknown_object);
   }
-  #endif
+#endif
 
   while(!work_queue.empty())
   {

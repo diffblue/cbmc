@@ -93,6 +93,10 @@ int hybrid_binary(
   }
 
 #else
+  // unused parameters
+  (void)compiler_or_linker;
+  (void)goto_binary_file;
+  (void)output_file;
   message.error() << "binary merging not implemented for this platform"
                   << messaget::eom;
   result = 1;
