@@ -927,10 +927,11 @@ void c_typecheck_baset::typecheck_side_effect_statement_expression(
 
     code_function_callt &fc=to_code_function_call(last);
 
-    const auto &return_type = to_code_type(fc.function().type()).return_type();
-
     side_effect_expr_function_callt sideeffect(
-      fc.function(), fc.arguments(), return_type, fc.source_location());
+      fc.function(),
+      fc.arguments(),
+      to_code_type(fc.function().type()).return_type(),
+      fc.source_location());
 
     expr.type()=sideeffect.type();
 
@@ -1987,7 +1988,7 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
         // This is an undeclared function that's not a builtin.
         // Let's just add it.
         // We do a bit of return-type guessing, but just a bit.
-        typet return_type=signed_int_type();
+        typet guessed_return_type = signed_int_type();
 
         // The following isn't really right and sound, but there
         // are too many idiots out there who use malloc and the like
@@ -1996,14 +1997,16 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
            identifier=="realloc" ||
            identifier=="reallocf" ||
            identifier=="valloc")
-          return_type=pointer_type(void_type()); // void *
+        {
+          guessed_return_type = pointer_type(void_type()); // void *
+        }
 
         symbolt new_symbol;
 
         new_symbol.name=identifier;
         new_symbol.base_name=identifier;
         new_symbol.location=expr.source_location();
-        new_symbol.type = code_typet({}, return_type);
+        new_symbol.type = code_typet({}, guessed_return_type);
         new_symbol.type.set(ID_C_incomplete, true);
 
         // TODO: should also guess some argument types
