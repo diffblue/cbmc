@@ -154,6 +154,6 @@ std::pair<exprt, string_constraintst> add_axioms_for_concat_code_point(
   const array_string_exprt code_point =
     array_pool.fresh_string(index_type, char_type);
   return combine_results(
-    add_axioms_for_code_point(fresh_symbol, code_point, f.arguments()[3]),
+    add_axioms_for_code_point(code_point, f.arguments()[3]),
     add_axioms_for_concat(fresh_symbol, res, s1, code_point));
 }

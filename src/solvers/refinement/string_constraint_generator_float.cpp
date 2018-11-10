@@ -221,8 +221,8 @@ std::pair<exprt, string_constraintst> add_axioms_for_string_of_float(
   const mod_exprt fractional_part(shifted, max_non_exponent_notation);
   const array_string_exprt fractional_part_str =
     array_pool.fresh_string(index_type, char_type);
-  auto result1 = add_axioms_for_fractional_part(
-    fresh_symbol, fractional_part_str, fractional_part, 6);
+  auto result1 =
+    add_axioms_for_fractional_part(fractional_part_str, fractional_part, 6);
 
   // The axiom added to convert to integer should always be satisfiable even
   // when the preconditions are not satisfied.
@@ -247,14 +247,12 @@ std::pair<exprt, string_constraintst> add_axioms_for_string_of_float(
 
 /// Add axioms for representing the fractional part of a floating point starting
 /// with a dot
-/// \param fresh_symbol: generator of fresh symbols
 /// \param res: string expression for the result
 /// \param int_expr: an integer expression
 /// \param max_size: a maximal size for the string, this includes the
 ///   potential minus sign and therefore should be greater than 2
 /// \return code 0 on success
 std::pair<exprt, string_constraintst> add_axioms_for_fractional_part(
-  symbol_generatort &fresh_symbol,
   const array_string_exprt &res,
   const exprt &int_expr,
   size_t max_size)
@@ -478,7 +476,7 @@ std::pair<exprt, string_constraintst> add_axioms_from_float_scientific_notation(
   array_string_exprt string_fractional_part =
     array_pool.fresh_string(index_type, char_type);
   auto result2 = add_axioms_for_fractional_part(
-    fresh_symbol, string_fractional_part, fractional_part_shifted, 6);
+    string_fractional_part, fractional_part_shifted, 6);
 
   // string_expr_with_fractional_part =
   //   concat(string_with_do, string_fractional_part)

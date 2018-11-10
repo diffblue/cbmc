@@ -221,7 +221,7 @@ allocates a new string before calling a primitive.
   \copybrief add_axioms_for_char_at(symbol_generatort &fresh_symbol, const function_application_exprt &f, array_poolt &array_pool)
   \link  add_axioms_for_char_at More... \endlink
   * `cprover_string_length` :
-  \copybrief add_axioms_for_length(symbol_generatort &fresh_symbol,const function_application_exprt &f, array_poolt &array_pool)
+  \copybrief add_axioms_for_length(const function_application_exprt &f, array_poolt &array_pool)
   \link add_axioms_for_length More... \endlink
 
 \subsection comparisons Comparisons:

@@ -267,11 +267,9 @@ std::pair<exprt, string_constraintst> add_axioms_for_is_suffix(
   bool swap_arguments,
   array_poolt &array_pool);
 std::pair<exprt, string_constraintst> add_axioms_for_length(
-  symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
   array_poolt &array_pool);
 std::pair<exprt, string_constraintst> add_axioms_for_empty_string(
-  symbol_generatort &fresh_symbol,
   const function_application_exprt &f);
 
 std::pair<exprt, string_constraintst> add_axioms_for_copy(
@@ -438,7 +436,6 @@ std::pair<exprt, string_constraintst> add_axioms_for_string_of_float(
   array_poolt &array_pool,
   const namespacet &ns);
 std::pair<exprt, string_constraintst> add_axioms_for_fractional_part(
-  symbol_generatort &fresh_symbol,
   const array_string_exprt &res,
   const exprt &i,
   size_t max_size);
@@ -491,11 +488,9 @@ std::pair<exprt, string_constraintst> add_axioms_for_trim(
   array_poolt &array_pool);
 
 std::pair<exprt, string_constraintst> add_axioms_for_code_point(
-  symbol_generatort &fresh_symbol,
   const array_string_exprt &res,
   const exprt &code_point);
 std::pair<exprt, string_constraintst> add_axioms_for_char_literal(
-  symbol_generatort &fresh_symbol,
   const function_application_exprt &f);
 
 /// Add axioms corresponding the String.codePointCount java function
