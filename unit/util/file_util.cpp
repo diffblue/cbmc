@@ -27,7 +27,7 @@ TEST_CASE("concat_dir_file functionality", "[core][util][file_util]")
   #endif
 
   #ifdef _WIN32
-  const std::string qualified_path = "z:\some\path\foo.txt";
+  const std::string qualified_path = "z:\\some\\path\\foo.txt";
   #else
   const std::string qualified_path = "/some/path/foo.txt";
   #endif
