@@ -41,9 +41,6 @@ Date: January 2012
 #include <windows.h>
 #include <direct.h>
 #include <util/unicode.h>
-#define chdir _chdir
-#define popen _popen
-#define pclose _pclose
 #include <util/pragma_pop.def>
 #endif
 
