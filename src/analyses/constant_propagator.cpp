@@ -29,7 +29,7 @@ Author: Peter Schrammel
 #include <array>
 
 void constant_propagator_domaint::assign_rec(
-  valuest &values,
+  valuest &dest_values,
   const exprt &lhs,
   const exprt &rhs,
   const namespacet &ns,
@@ -44,17 +44,17 @@ void constant_propagator_domaint::assign_rec(
   const symbol_exprt &s=to_symbol_expr(lhs);
 
   exprt tmp=rhs;
-  partial_evaluate(tmp, ns);
+  partial_evaluate(dest_values, tmp, ns);
 
   if(tmp.is_constant())
   {
     DATA_INVARIANT(
       base_type_eq(ns.lookup(s).type, tmp.type(), ns),
       "type of constant to be replaced should match");
-    values.set_to(s, tmp);
+    dest_values.set_to(s, tmp);
   }
   else
-    values.set_to_top(s);
+    dest_values.set_to_top(s);
 }
 
 void constant_propagator_domaint::transform(
@@ -117,7 +117,7 @@ void constant_propagator_domaint::transform(
       g = from->guard;
     else
       g = not_exprt(from->guard);
-    partial_evaluate(g, ns);
+    partial_evaluate(values, g, ns);
     if(g.is_false())
      values.set_to_bottom();
     else
@@ -289,7 +289,7 @@ bool constant_propagator_domaint::ai_simplify(
   exprt &condition,
   const namespacet &ns) const
 {
-  return partial_evaluate(condition, ns);
+  return partial_evaluate(values, condition, ns);
 }
 
 
@@ -531,30 +531,36 @@ bool constant_propagator_domaint::merge(
 
 /// Attempt to evaluate expression using domain knowledge
 /// This function changes the expression that is passed into it.
+/// \param known_values: The constant values under which to evaluate \p expr
 /// \param expr The expression to evaluate
 /// \param ns The namespace for symbols in the expression
 /// \return True if the expression is unchanged, false otherwise
 bool constant_propagator_domaint::partial_evaluate(
+  const valuest &known_values,
   exprt &expr,
-  const namespacet &ns) const
+  const namespacet &ns)
 {
   // if the current rounding mode is top we can
   // still get a non-top result by trying all rounding
   // modes and checking if the results are all the same
-  if(!values.is_constant(symbol_exprt(ID_cprover_rounding_mode_str)))
+  if(!known_values.is_constant(symbol_exprt(ID_cprover_rounding_mode_str)))
   {
-    return partial_evaluate_with_all_rounding_modes(expr, ns);
+    return partial_evaluate_with_all_rounding_modes(known_values, expr, ns);
   }
-  return replace_constants_and_simplify(expr, ns);
+  return replace_constants_and_simplify(known_values, expr, ns);
 }
 
 /// Attempt to evaluate an expression in all rounding modes.
 ///
-/// If the result is the same for all rounding modes, change
+/// \param known_values: The constant values under which to evaluate \p expr
+/// \param expr The expression to evaluate
+/// \param ns The namespace for symbols in the expression
+/// \return If the result is the same for all rounding modes, change
 /// expr to that result and return false. Otherwise, return true.
 bool constant_propagator_domaint::partial_evaluate_with_all_rounding_modes(
+  const valuest &known_values,
   exprt &expr,
-  const namespacet &ns) const
+  const namespacet &ns)
 { // NOLINTNEXTLINE (whitespace/braces)
   auto rounding_modes = std::array<ieee_floatt::rounding_modet, 4>{
     // NOLINTNEXTLINE (whitespace/braces)
@@ -566,12 +572,12 @@ bool constant_propagator_domaint::partial_evaluate_with_all_rounding_modes(
   exprt first_result;
   for(std::size_t i = 0; i < rounding_modes.size(); ++i)
   {
-    constant_propagator_domaint child(*this);
-    child.values.set_to(
+    valuest tmp_values = known_values;
+    tmp_values.set_to(
       symbol_exprt(ID_cprover_rounding_mode_str, integer_typet()),
       from_integer(rounding_modes[i], integer_typet()));
     exprt result = expr;
-    if(child.replace_constants_and_simplify(result, ns))
+    if(replace_constants_and_simplify(tmp_values, result, ns))
     {
       return true;
     }
@@ -589,10 +595,11 @@ bool constant_propagator_domaint::partial_evaluate_with_all_rounding_modes(
 }
 
 bool constant_propagator_domaint::replace_constants_and_simplify(
+  const valuest &known_values,
   exprt &expr,
-  const namespacet &ns) const
+  const namespacet &ns)
 {
-  bool did_not_change_anything = values.replace_const.replace(expr);
+  bool did_not_change_anything = known_values.replace_const.replace(expr);
   did_not_change_anything &= simplify(expr, ns);
   return did_not_change_anything;
 }
@@ -623,12 +630,12 @@ void constant_propagator_ait::replace(
 
     if(it->is_goto() || it->is_assume() || it->is_assert())
     {
-      d.partial_evaluate(it->guard, ns);
+      constant_propagator_domaint::partial_evaluate(d.values, it->guard, ns);
     }
     else if(it->is_assign())
     {
       exprt &rhs=to_code_assign(it->code).rhs();
-      d.partial_evaluate(rhs, ns);
+      constant_propagator_domaint::partial_evaluate(d.values, rhs, ns);
 
       if(rhs.id()==ID_constant)
         rhs.add_source_location() =
@@ -637,21 +644,21 @@ void constant_propagator_ait::replace(
     else if(it->is_function_call())
     {
       exprt &function = to_code_function_call(it->code).function();
-      d.partial_evaluate(function, ns);
+      constant_propagator_domaint::partial_evaluate(d.values, function, ns);
 
       exprt::operandst &args=
         to_code_function_call(it->code).arguments();
 
       for(auto &arg : args)
       {
-        d.partial_evaluate(arg, ns);
+        constant_propagator_domaint::partial_evaluate(d.values, arg, ns);
       }
     }
     else if(it->is_other())
     {
       if(it->code.get_statement()==ID_expression)
       {
-        d.partial_evaluate(it->code, ns);
+        constant_propagator_domaint::partial_evaluate(d.values, it->code, ns);
       }
     }
   }
