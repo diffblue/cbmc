@@ -345,7 +345,8 @@ void c_typecheck_baset::typecheck_custom_type(typet &type)
     exprt f_expr=
       static_cast<const exprt &>(type.find(ID_f));
 
-    source_locationt source_location=f_expr.find_source_location();
+    const source_locationt fraction_source_location =
+      f_expr.find_source_location();
 
     typecheck_expr(f_expr);
 
@@ -354,14 +355,14 @@ void c_typecheck_baset::typecheck_custom_type(typet &type)
     mp_integer f_int;
     if(to_integer(f_expr, f_int))
     {
-      error().source_location=source_location;
+      error().source_location = fraction_source_location;
       error() << "failed to convert number of fraction bits to constant" << eom;
       throw 0;
     }
 
     if(f_int<0 || f_int>size_int)
     {
-      error().source_location=source_location;
+      error().source_location = fraction_source_location;
       error() << "fixedbv fraction width invalid" << eom;
       throw 0;
     }
@@ -376,7 +377,8 @@ void c_typecheck_baset::typecheck_custom_type(typet &type)
     exprt f_expr=
       static_cast<const exprt &>(type.find(ID_f));
 
-    source_locationt source_location=f_expr.find_source_location();
+    const source_locationt fraction_source_location =
+      f_expr.find_source_location();
 
     typecheck_expr(f_expr);
 
@@ -385,14 +387,14 @@ void c_typecheck_baset::typecheck_custom_type(typet &type)
     mp_integer f_int;
     if(to_integer(f_expr, f_int))
     {
-      error().source_location=source_location;
+      error().source_location = fraction_source_location;
       error() << "failed to convert number of fraction bits to constant" << eom;
       throw 0;
     }
 
     if(f_int<1 || f_int+1>=size_int)
     {
-      error().source_location=source_location;
+      error().source_location = fraction_source_location;
       error() << "floatbv fraction width invalid" << eom;
       throw 0;
     }
@@ -506,7 +508,7 @@ void c_typecheck_baset::typecheck_code_type(code_typet &type)
 void c_typecheck_baset::typecheck_array_type(array_typet &type)
 {
   exprt &size=type.size();
-  source_locationt source_location=size.find_source_location();
+  const source_locationt size_source_location = size.find_source_location();
 
   // check subtype
   typecheck_type(type.subtype());
@@ -558,7 +560,7 @@ void c_typecheck_baset::typecheck_array_type(array_typet &type)
       mp_integer s;
       if(to_integer(tmp_size, s))
       {
-        error().source_location=source_location;
+        error().source_location = size_source_location;
         error() << "failed to convert constant: "
                 << tmp_size.pretty() << eom;
         throw 0;
@@ -566,7 +568,7 @@ void c_typecheck_baset::typecheck_array_type(array_typet &type)
 
       if(s<0)
       {
-        error().source_location=source_location;
+        error().source_location = size_source_location;
         error() << "array size must not be negative, "
                    "but got " << s << eom;
         throw 0;
@@ -604,7 +606,6 @@ void c_typecheck_baset::typecheck_array_type(array_typet &type)
       }
 
       // Need to pull out! We insert new symbol.
-      source_locationt source_location=size.find_source_location();
       unsigned count=0;
       irep_idt temp_identifier;
       std::string suffix;
@@ -626,7 +627,7 @@ void c_typecheck_baset::typecheck_array_type(array_typet &type)
       new_symbol.type=size.type();
       new_symbol.type.set(ID_C_constant, true);
       new_symbol.value=size;
-      new_symbol.location=source_location;
+      new_symbol.location = size_source_location;
       new_symbol.mode = mode;
 
       symbol_table.add(new_symbol);
@@ -637,12 +638,12 @@ void c_typecheck_baset::typecheck_array_type(array_typet &type)
       symbol_expr.type()=new_symbol.type;
 
       code_declt declaration(symbol_expr);
-      declaration.add_source_location()=source_location;
+      declaration.add_source_location() = size_source_location;
 
       code_assignt assignment;
       assignment.lhs()=symbol_expr;
       assignment.rhs()=size;
-      assignment.add_source_location()=source_location;
+      assignment.add_source_location() = size_source_location;
 
       // store the code
       clean_code.push_back(declaration);
