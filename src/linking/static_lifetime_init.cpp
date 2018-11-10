@@ -99,9 +99,9 @@ void static_lifetime_init(
     {
       // C standard 6.9.2, paragraph 5
       // adjust the type to an array of size 1
-      symbolt &symbol=*symbol_table.get_writeable(identifier);
-      symbol.type=type;
-      symbol.type.set(ID_size, from_integer(1, size_type()));
+      symbolt &writable_symbol = *symbol_table.get_writeable(identifier);
+      writable_symbol.type = type;
+      writable_symbol.type.set(ID_size, from_integer(1, size_type()));
     }
 
     if(type.id()==ID_incomplete_struct ||
