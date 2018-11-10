@@ -136,10 +136,10 @@ std::pair<exprt, string_constraintst> add_axioms_for_is_empty(
 
   symbol_exprt is_empty = fresh_symbol("is_empty");
   array_string_exprt s0 = get_string_expr(array_pool, f.arguments()[0]);
-  std::vector<exprt> constraints;
-  constraints.push_back(implies_exprt(is_empty, length_eq(s0, 0)));
-  constraints.push_back(implies_exprt(length_eq(s0, 0), is_empty));
-  return {typecast_exprt(is_empty, f.type()), {constraints}};
+  string_constraintst constraints;
+  constraints.existential = {implies_exprt(is_empty, length_eq(s0, 0)),
+                             implies_exprt(length_eq(s0, 0), is_empty)};
+  return {typecast_exprt(is_empty, f.type()), std::move(constraints)};
 }
 
 /// Test if the target is a suffix of the string

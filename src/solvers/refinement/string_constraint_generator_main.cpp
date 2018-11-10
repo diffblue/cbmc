@@ -571,8 +571,9 @@ std::pair<exprt, string_constraintst> add_axioms_for_char_at(
   PRECONDITION(f.arguments().size() == 2);
   array_string_exprt str = get_string_expr(array_pool, f.arguments()[0]);
   symbol_exprt char_sym = fresh_symbol("char", str.type().subtype());
-  const exprt constraint = equal_exprt(char_sym, str[f.arguments()[1]]);
-  return {char_sym, {{constraint}}};
+  string_constraintst constraints;
+  constraints.existential = {equal_exprt(char_sym, str[f.arguments()[1]])};
+  return {std::move(char_sym), std::move(constraints)};
 }
 
 exprt minimum(const exprt &a, const exprt &b)
