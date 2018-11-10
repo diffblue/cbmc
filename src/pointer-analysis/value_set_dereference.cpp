@@ -401,7 +401,6 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
     tmp_guard.add(result.pointer_guard);
 
     const typet &object_type=ns.follow(object.type());
-    const exprt &root_object=o.root_object();
     const typet &root_object_type=ns.follow(root_object.type());
 
     exprt root_object_subexpression=root_object;
