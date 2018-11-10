@@ -53,9 +53,8 @@ using fdt = int;
 /// open given file to replace either stdin, stderr, stdout
 static fdt stdio_redirection(int fd, const std::string &file)
 {
-  fdt result_fd;
-
 #ifdef _WIN32
+  fdt result_fd = INVALID_HANDLE_VALUE;
   std::string name;
 
   SECURITY_ATTRIBUTES SecurityAttributes;
@@ -142,7 +141,7 @@ static fdt stdio_redirection(int fd, const std::string &file)
     UNREACHABLE;
   }
 
-  result_fd = open(file.c_str(), flags, mode);
+  const fdt result_fd = open(file.c_str(), flags, mode);
 
   if(result_fd == -1)
     perror(("Failed to open " + name + " file " + file).c_str());
