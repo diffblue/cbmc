@@ -26,6 +26,7 @@ Module: Non-deterministic object init and choice for CBMC
 ///   function id)
 /// \param int_type: The type of the int used to non-deterministically choose
 ///   one of the switch cases.
+/// \param mode: Mode (language) of the symbol to be generated.
 /// \param source_location: The location to mark the generated int with.
 /// \param symbol_table: The global symbol table.
 /// \param instructions [out]: Output instructions are written to
@@ -78,6 +79,7 @@ symbol_exprt generate_nondet_int(
 /// \param switch_cases: List of codet objects to execute in each switch case.
 /// \param int_type: The type of the int used to non-deterministically choose
 ///   one of the switch cases.
+/// \param mode: Mode (language) of the symbol to be generated.
 /// \param source_location: The location to mark the generated int with.
 /// \param symbol_table: The global symbol table.
 /// \return Returns a nondet-switch choosing between switch_cases. The resulting
