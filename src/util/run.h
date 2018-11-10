@@ -18,6 +18,12 @@ Date: August 2012
 
 int run(const std::string &what, const std::vector<std::string> &argv);
 
+/// This runs the executable given by the file name \p what.
+/// Control returns when execution has finished.
+/// Stdin, stdout and stderr may be redirected from/to a given file.
+/// Give the empty string to retain the default handle.
+/// Any shell-meta characters in the executable, \p argv and the I/O
+/// redirect files are escaped as needed.
 int run(
   const std::string &what,
   const std::vector<std::string> &argv,
@@ -25,7 +31,13 @@ int run(
   const std::string &std_output,
   const std::string &std_error);
 
-/// A variant that streams the stdout of the child into an ostream
+/// This runs the executable given by the file name \p what.
+/// Control returns when execution has finished.
+/// Stdin and stderr may be redirected from/to a given file.
+/// Give the empty string to retain the default handle.
+/// Any output to stdout is stored in the \p std_output stream buffer.
+/// Any shell-meta characters in the executable, \p argv and the I/O
+/// redirect files are escaped as needed.
 int run(
   const std::string &what,
   const std::vector<std::string> &argv,
