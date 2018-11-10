@@ -301,7 +301,7 @@ public:
   bool ieee_not_equal(const ieee_floatt &other) const;
 
 protected:
-  void divide_and_round(mp_integer &fraction, const mp_integer &factor);
+  void divide_and_round(mp_integer &dividend, const mp_integer &divisor);
   void align();
   void next_representable(bool greater);
 
