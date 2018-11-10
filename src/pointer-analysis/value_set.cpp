@@ -1057,13 +1057,9 @@ void value_sett::get_reference_set_rec(
         insert(dest, exprt(ID_unknown, expr.type()));
       else
       {
-        index_exprt index_expr(expr.type());
-        index_expr.array()=object;
-        index_expr.index()=from_integer(0, index_type());
-
-        // adjust type?
-        if(ns.follow(object.type())!=array_type)
-          index_expr.make_typecast(array.type());
+        const index_exprt deref_index_expr(
+          typecast_exprt::conditional_cast(object, array_type),
+          from_integer(0, index_type()));
 
         offsett o = a_it->second;
         mp_integer i;
@@ -1083,7 +1079,7 @@ void value_sett::get_reference_set_rec(
         else
           o.reset();
 
-        insert(dest, index_expr, o);
+        insert(dest, deref_index_expr, o);
       }
     }
 
