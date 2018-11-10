@@ -521,15 +521,14 @@ require_type::require_lambda_method_handles(
     class_type.lambda_method_handles();
   REQUIRE(lambda_method_handles.size() == expected_identifiers.size());
 
-  REQUIRE(
-    std::equal(
-      lambda_method_handles.begin(),
-      lambda_method_handles.end(),
-      expected_identifiers.begin(),
-      [](
-        const symbol_exprt &lambda_method_handle,
-        const std::string &expected_identifier) { //NOLINT
-        return lambda_method_handle.get_identifier() == expected_identifier;
-      }));
+  REQUIRE(std::equal(
+    lambda_method_handles.begin(),
+    lambda_method_handles.end(),
+    expected_identifiers.begin(),
+    [](
+      const irept &lambda_method_handle,
+      const std::string &expected_identifier) { //NOLINT
+      return lambda_method_handle.id() == expected_identifier;
+    }));
   return lambda_method_handles;
 }

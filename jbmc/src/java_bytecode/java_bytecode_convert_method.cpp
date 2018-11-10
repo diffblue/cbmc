@@ -316,11 +316,11 @@ optionalt<symbolt> java_bytecode_convert_methodt::get_lambda_method_symbol(
   const java_class_typet::java_lambda_method_handlest &lambda_method_handles,
   const size_t index)
 {
-  const symbol_exprt &lambda_method_handle = lambda_method_handles.at(index);
+  const irept &lambda_method_handle = lambda_method_handles.at(index);
   // If the lambda method handle has an unknown type, it does not refer to
-  // any symbol (it is a symbol expression with empty identifier)
-  if(!lambda_method_handle.get_identifier().empty())
-    return symbol_table.lookup_ref(lambda_method_handle.get_identifier());
+  // any symbol (it has an empty identifier)
+  if(!lambda_method_handle.id().empty())
+    return symbol_table.lookup_ref(lambda_method_handle.id());
   return {};
 }
 
