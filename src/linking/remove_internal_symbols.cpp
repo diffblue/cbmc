@@ -21,18 +21,18 @@ Author: Daniel Kroening
 
 static void get_symbols(
   const namespacet &ns,
-  const symbolt &symbol,
+  const symbolt &in_symbol,
   find_symbols_sett &dest)
 {
   std::vector<const symbolt *> working_set;
 
-  working_set.push_back(&symbol);
+  working_set.push_back(&in_symbol);
 
   while(!working_set.empty())
   {
-    const symbolt *s = working_set.back();
+    const symbolt *current_symbol_ptr = working_set.back();
     working_set.pop_back();
-    const symbolt &symbol = *s;
+    const symbolt &symbol = *current_symbol_ptr;
 
     if(!dest.insert(symbol.name).second)
       continue;
