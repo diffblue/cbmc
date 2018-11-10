@@ -305,9 +305,11 @@ add_axioms_for_format_specifier(
       add_axioms_from_bool(res, get_component_in_struct(arg, ID_boolean));
     return {res, std::move(return_code.second)};
   case format_specifiert::STRING:
-    return {
-      get_string_expr(array_pool, get_component_in_struct(arg, "string_expr")),
-      {}};
+  {
+    auto string_expr =
+      get_string_expr(array_pool, get_component_in_struct(arg, "string_expr"));
+    return {std::move(string_expr), {}};
+  }
   case format_specifiert::HASHCODE:
     return_code = add_axioms_for_string_of_int(
       res, get_component_in_struct(arg, "hashcode"), 0, ns);
