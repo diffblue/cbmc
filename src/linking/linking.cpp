@@ -40,7 +40,6 @@ bool casting_replace_symbolt::replace_symbol_expr(symbol_exprt &s) const
 }
 
 std::string linkingt::expr_to_string(
-  const namespacet &ns,
   const irep_idt &identifier,
   const exprt &expr) const
 {
@@ -48,7 +47,6 @@ std::string linkingt::expr_to_string(
 }
 
 std::string linkingt::type_to_string(
-  const namespacet &ns,
   const irep_idt &identifier,
   const typet &type) const
 {
@@ -72,7 +70,6 @@ static const typet &follow_tags_symbols(
 }
 
 std::string linkingt::type_to_string_verbose(
-  const namespacet &ns,
   const symbolt &symbol,
   const typet &type) const
 {
@@ -91,7 +88,7 @@ std::string linkingt::type_to_string_verbose(
     {
       const typet &subtype = c.type();
       result+="  ";
-      result+=type_to_string(ns, symbol.name, subtype);
+      result += type_to_string(symbol.name, subtype);
       result+=' ';
 
       if(!c.get_base_name().empty())
@@ -108,15 +105,15 @@ std::string linkingt::type_to_string_verbose(
   }
   else if(followed.id()==ID_pointer)
   {
-    return type_to_string_verbose(ns, symbol, followed.subtype())+" *";
+    return type_to_string_verbose(symbol, followed.subtype()) + " *";
   }
   else if(followed.id()==ID_incomplete_struct ||
           followed.id()==ID_incomplete_union)
   {
-    return type_to_string(ns, symbol.name, type)+"   (incomplete)";
+    return type_to_string(symbol.name, type) + "   (incomplete)";
   }
 
-  return type_to_string(ns, symbol.name, type);
+  return type_to_string(symbol.name, type);
 }
 
 void linkingt::detailed_conflict_report_rec(
@@ -256,8 +253,8 @@ void linkingt::detailed_conflict_report_rec(
     if(t1.subtype()!=t2.subtype())
     {
       msg="enum value types are different (";
-      msg+=type_to_string(ns, old_symbol.name, t1.subtype())+'/';
-      msg+=type_to_string(ns, new_symbol.name, t2.subtype())+')';
+      msg += type_to_string(old_symbol.name, t1.subtype()) + '/';
+      msg += type_to_string(new_symbol.name, t2.subtype()) + ')';
     }
     else if(members1.size()!=members2.size())
     {
@@ -359,13 +356,12 @@ void linkingt::detailed_conflict_report_rec(
   if(!msg.empty())
   {
     error() << '\n';
-    error() << "reason for conflict at "
-            << expr_to_string(ns, "", conflict_path)
+    error() << "reason for conflict at " << expr_to_string("", conflict_path)
             << ": " << msg << '\n';
 
     error() << '\n';
-    error() << type_to_string_verbose(ns, old_symbol, t1) << '\n';
-    error() << type_to_string_verbose(ns, new_symbol, t2) << '\n';
+    error() << type_to_string_verbose(old_symbol, t1) << '\n';
+    error() << type_to_string_verbose(new_symbol, t2) << '\n';
   }
 
   #ifdef DEBUG
@@ -383,12 +379,12 @@ void linkingt::link_error(
   error() << "error: " << msg << " `"
           << old_symbol.display_name()
           << "'" << '\n';
-  error() << "old definition in module `" << old_symbol.module
-          << "' " << old_symbol.location << '\n'
-          << type_to_string_verbose(ns, old_symbol) << '\n';
-  error() << "new definition in module `" << new_symbol.module
-          << "' " << new_symbol.location << '\n'
-          << type_to_string_verbose(ns, new_symbol) << eom;
+  error() << "old definition in module `" << old_symbol.module << "' "
+          << old_symbol.location << '\n'
+          << type_to_string_verbose(old_symbol) << '\n';
+  error() << "new definition in module `" << new_symbol.module << "' "
+          << new_symbol.location << '\n'
+          << type_to_string_verbose(new_symbol) << eom;
 }
 
 void linkingt::link_warning(
@@ -401,12 +397,12 @@ void linkingt::link_warning(
   warning() << "warning: " << msg << " \""
             << old_symbol.display_name()
             << "\"" << '\n';
-  warning() << "old definition in module " << old_symbol.module
-            << " " << old_symbol.location << '\n'
-            << type_to_string_verbose(ns, old_symbol) << '\n';
-  warning() << "new definition in module " << new_symbol.module
-            << " " << new_symbol.location << '\n'
-            << type_to_string_verbose(ns, new_symbol) << eom;
+  warning() << "old definition in module " << old_symbol.module << " "
+            << old_symbol.location << '\n'
+            << type_to_string_verbose(old_symbol) << '\n';
+  warning() << "new definition in module " << new_symbol.module << " "
+            << new_symbol.location << '\n'
+            << type_to_string_verbose(new_symbol) << eom;
 }
 
 irep_idt linkingt::rename(const irep_idt id)
@@ -1040,16 +1036,12 @@ void linkingt::duplicate_object_symbol(
 
         warning() << "warning: conflicting initializers for"
                   << " variable \"" << old_symbol.name << "\"\n";
-        warning() << "using old value in module "
-                  << old_symbol.module << " "
+        warning() << "using old value in module " << old_symbol.module << " "
                   << old_symbol.value.find_source_location() << '\n'
-                  << expr_to_string(ns, old_symbol.name, tmp_old)
-                  << '\n';
-        warning() << "ignoring new value in module "
-                  << new_symbol.module << " "
+                  << expr_to_string(old_symbol.name, tmp_old) << '\n';
+        warning() << "ignoring new value in module " << new_symbol.module << " "
                   << new_symbol.value.find_source_location() << '\n'
-                  << expr_to_string(ns, new_symbol.name, tmp_new)
-                  << eom;
+                  << expr_to_string(new_symbol.name, tmp_new) << eom;
       }
     }
   }
