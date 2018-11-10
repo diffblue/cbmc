@@ -36,11 +36,11 @@ SCENARIO("journalling_symbol_table_writer",
     const symbol_tablet &read_symbol_table=symbol_table;
 
     irep_idt symbol_name="Test";
-    symbolt symbol;
-    symbol.name=symbol_name;
 
     WHEN("A symbol is inserted into the symbol table")
     {
+      symbolt symbol;
+      symbol.name = symbol_name;
       auto result=symbol_table.insert(symbol);
       THEN("The insert should succeed")
       {
@@ -69,8 +69,6 @@ SCENARIO("journalling_symbol_table_writer",
       }
       WHEN("Adding the same symbol again")
       {
-        symbolt symbol;
-        symbol.name=symbol_name;
         auto result=symbol_table.insert(symbol);
         THEN("The insert should fail")
         {
@@ -80,6 +78,8 @@ SCENARIO("journalling_symbol_table_writer",
     }
     WHEN("Moving a symbol into the symbol table")
     {
+      symbolt symbol;
+      symbol.name = symbol_name;
       symbolt *symbol_in_table;
       auto result=symbol_table.move(symbol, symbol_in_table);
       THEN("The move should succeed")
@@ -105,8 +105,6 @@ SCENARIO("journalling_symbol_table_writer",
       }
       WHEN("Moving the same symbol again")
       {
-        symbolt symbol;
-        symbol.name=symbol_name;
         symbolt *symbol_in_table2;
         auto result=symbol_table.move(symbol, symbol_in_table2);
         THEN("The move should fail")
@@ -121,6 +119,8 @@ SCENARIO("journalling_symbol_table_writer",
     }
     WHEN("Adding a symbol to the symbol table")
     {
+      symbolt symbol;
+      symbol.name = symbol_name;
       auto result=symbol_table.add(symbol);
       THEN("The add should succeed")
       {
@@ -145,8 +145,6 @@ SCENARIO("journalling_symbol_table_writer",
       }
       WHEN("Adding the same symbol again")
       {
-        symbolt symbol;
-        symbol.name=symbol_name;
         auto result=symbol_table.add(symbol);
         THEN("The insert should fail")
         {
@@ -156,6 +154,8 @@ SCENARIO("journalling_symbol_table_writer",
     }
     WHEN("Updating an existing symbol")
     {
+      symbolt symbol;
+      symbol.name = symbol_name;
       base_symbol_table.add(symbol);
       symbolt *writeable=symbol_table.get_writeable(symbol_name);
 
@@ -184,20 +184,22 @@ SCENARIO("journalling_symbol_table_writer",
     }
     WHEN("Removing a non-existent symbol")
     {
-      irep_idt symbol_name="DoesNotExist";
-      bool ret=symbol_table.remove(symbol_name);
+      irep_idt no_such_symbol_name = "DoesNotExist";
+      bool ret = symbol_table.remove(no_such_symbol_name);
       THEN("The remove operation should fail")
       {
         REQUIRE(ret);
       }
       THEN("The symbol we failed to remove should appear in neither journal")
       {
-        REQUIRE(symbol_table.get_updated().count(symbol_name)==0);
-        REQUIRE(symbol_table.get_removed().count(symbol_name)==0);
+        REQUIRE(symbol_table.get_updated().count(no_such_symbol_name) == 0);
+        REQUIRE(symbol_table.get_removed().count(no_such_symbol_name) == 0);
       }
     }
     WHEN("Removing an existing symbol added via the journalling writer")
     {
+      symbolt symbol;
+      symbol.name = symbol_name;
       symbol_table.add(symbol);
       bool ret=symbol_table.remove(symbol_name);
       THEN("The remove operation should succeed")
@@ -212,6 +214,8 @@ SCENARIO("journalling_symbol_table_writer",
     }
     WHEN("Removing an existing symbol added outside the journalling writer")
     {
+      symbolt symbol;
+      symbol.name = symbol_name;
       base_symbol_table.add(symbol);
       bool ret=symbol_table.remove(symbol_name);
       THEN("The remove operation should succeed")
@@ -227,6 +231,8 @@ SCENARIO("journalling_symbol_table_writer",
     }
     WHEN("Removing an existing symbol using an iterator (added via writer)")
     {
+      symbolt symbol;
+      symbol.name = symbol_name;
       symbol_table.add(symbol);
       auto erase_iterator=read_symbol_table.symbols.find(symbol_name);
       symbol_table.erase(erase_iterator);
@@ -238,6 +244,8 @@ SCENARIO("journalling_symbol_table_writer",
     }
     WHEN("Removing an existing symbol using an iterator (added via base)")
     {
+      symbolt symbol;
+      symbol.name = symbol_name;
       base_symbol_table.add(symbol);
       auto erase_iterator=read_symbol_table.symbols.find(symbol_name);
       symbol_table.erase(erase_iterator);
@@ -249,6 +257,8 @@ SCENARIO("journalling_symbol_table_writer",
     }
     WHEN("Re-adding a symbol previously removed")
     {
+      symbolt symbol;
+      symbol.name = symbol_name;
       auto result=symbol_table.add(symbol);
       symbol_table.remove(symbol.name);
       auto result2=symbol_table.add(symbol);
