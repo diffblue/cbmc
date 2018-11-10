@@ -439,13 +439,13 @@ void c_typecheck_baset::typecheck_code_type(code_typet &type)
         code_typet::parametert parameter;
 
         // first fix type
-        typet &type=parameter.type();
-        type=declaration.full_type(declaration.declarator());
+        typet &param_type = parameter.type();
+        param_type = declaration.full_type(declaration.declarator());
         std::list<codet> tmp_clean_code;
         tmp_clean_code.swap(clean_code); // ignore side-effects
-        typecheck_type(type);
+        typecheck_type(param_type);
         tmp_clean_code.swap(clean_code);
-        adjust_function_parameter(type);
+        adjust_function_parameter(param_type);
 
         // adjust the identifier
         irep_idt identifier=declaration.declarator().get_name();
@@ -459,7 +459,7 @@ void c_typecheck_baset::typecheck_code_type(code_typet &type)
         else
         {
           // make visible now, later parameters might use it
-          parameter_map[identifier]=type;
+          parameter_map[identifier] = param_type;
           parameter.set_base_name(declaration.declarator().get_base_name());
           parameter.add_source_location()=
             declaration.declarator().source_location();
