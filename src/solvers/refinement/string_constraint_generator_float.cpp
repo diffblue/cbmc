@@ -232,8 +232,8 @@ std::pair<exprt, string_constraintst> add_axioms_for_string_of_float(
   // part of the float.
   const array_string_exprt integer_part_str =
     array_pool.fresh_string(index_type, char_type);
-  auto result2 = add_axioms_for_string_of_int(
-    fresh_symbol, integer_part_str, integer_part, 8, ns);
+  auto result2 =
+    add_axioms_for_string_of_int(integer_part_str, integer_part, 8, ns);
 
   auto result3 = add_axioms_for_concat(
     fresh_symbol, res, integer_part_str, fractional_part_str);
@@ -458,7 +458,7 @@ std::pair<exprt, string_constraintst> add_axioms_from_float_scientific_notation(
   array_string_exprt string_expr_integer_part =
     array_pool.fresh_string(index_type, char_type);
   auto result1 = add_axioms_for_string_of_int(
-    fresh_symbol, string_expr_integer_part, dec_significand_int, 3, ns);
+    string_expr_integer_part, dec_significand_int, 3, ns);
   minus_exprt fractional_part(
     dec_significand, floatbv_of_int_expr(dec_significand_int, float_spec));
 
@@ -505,8 +505,8 @@ std::pair<exprt, string_constraintst> add_axioms_from_float_scientific_notation(
   // exponent_string = string_of_int(decimal_exponent)
   const array_string_exprt exponent_string =
     array_pool.fresh_string(index_type, char_type);
-  auto result6 = add_axioms_for_string_of_int(
-    fresh_symbol, exponent_string, decimal_exponent, 3, ns);
+  auto result6 =
+    add_axioms_for_string_of_int(exponent_string, decimal_exponent, 3, ns);
 
   // string_expr = concat(string_expr_with_E, exponent_string)
   auto result7 = add_axioms_for_concat(

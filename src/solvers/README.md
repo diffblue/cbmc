@@ -302,8 +302,8 @@ allocates a new string before calling a primitive.
     \copybrief add_axioms_from_float_scientific_notation
     \link add_axioms_from_float_scientific_notation More... \endlink
   * `cprover_string_of_char` :
-    \copybrief add_axioms_from_char(symbol_generatort &fresh_symbol, const function_application_exprt &f, array_poolt &array_pool)
-    \link add_axioms_from_char(symbol_generatort &fresh_symbol, const function_application_exprt &f, array_poolt &array_pool) More... \endlink
+    \copybrief add_axioms_from_char(const function_application_exprt &f, array_poolt &array_pool)
+    \link add_axioms_from_char(const function_application_exprt &f, array_poolt &array_pool) More... \endlink
   * `cprover_string_parse_int` :
     \copybrief add_axioms_for_parse_int
     \link add_axioms_for_parse_int More... \endlink

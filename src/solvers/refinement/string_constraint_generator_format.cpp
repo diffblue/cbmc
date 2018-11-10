@@ -274,11 +274,11 @@ add_axioms_for_format_specifier(
   {
   case format_specifiert::DECIMAL_INTEGER:
     return_code = add_axioms_for_string_of_int(
-      fresh_symbol, res, get_component_in_struct(arg, ID_int), 0, ns);
+      res, get_component_in_struct(arg, ID_int), 0, ns);
     return {res, std::move(return_code.second)};
   case format_specifiert::HEXADECIMAL_INTEGER:
-    return_code = add_axioms_from_int_hex(
-      fresh_symbol, res, get_component_in_struct(arg, ID_int));
+    return_code =
+      add_axioms_from_int_hex(res, get_component_in_struct(arg, ID_int));
     return {res, std::move(return_code.second)};
   case format_specifiert::SCIENTIFIC:
     return_code = add_axioms_from_float_scientific_notation(
@@ -297,12 +297,12 @@ add_axioms_for_format_specifier(
       ns);
     return {res, std::move(return_code.second)};
   case format_specifiert::CHARACTER:
-    return_code = add_axioms_from_char(
-      fresh_symbol, res, get_component_in_struct(arg, ID_char));
+    return_code =
+      add_axioms_from_char(res, get_component_in_struct(arg, ID_char));
     return {res, std::move(return_code.second)};
   case format_specifiert::BOOLEAN:
-    return_code = add_axioms_from_bool(
-      fresh_symbol, res, get_component_in_struct(arg, ID_boolean));
+    return_code =
+      add_axioms_from_bool(res, get_component_in_struct(arg, ID_boolean));
     return {res, std::move(return_code.second)};
   case format_specifiert::STRING:
     return {
@@ -310,7 +310,7 @@ add_axioms_for_format_specifier(
       {}};
   case format_specifiert::HASHCODE:
     return_code = add_axioms_for_string_of_int(
-      fresh_symbol, res, get_component_in_struct(arg, "hashcode"), 0, ns);
+      res, get_component_in_struct(arg, "hashcode"), 0, ns);
     return {res, std::move(return_code.second)};
   case format_specifiert::LINE_SEPARATOR:
     // TODO: the constant should depend on the system: System.lineSeparator()
