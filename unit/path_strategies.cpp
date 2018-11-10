@@ -376,15 +376,16 @@ void _check_with_strategy(
   ret = cbmc_parse_optionst::get_goto_program(gm, opts, cmdline, log, mh);
   REQUIRE(ret == -1);
 
-  cbmc_solverst solvers(opts, gm.get_symbol_table(), mh, false);
-  std::unique_ptr<cbmc_solverst::solvert> cbmc_solver = solvers.get_solver();
-  prop_convt &pc = cbmc_solver->prop_conv();
+  cbmc_solverst initial_solvers(opts, gm.get_symbol_table(), mh, false);
+  std::unique_ptr<cbmc_solverst::solvert> cbmc_solver =
+    initial_solvers.get_solver();
+  prop_convt &initial_pc = cbmc_solver->prop_conv();
   std::function<bool(void)> callback = []() { return false; };
 
   safety_checkert::resultt overall_result = safety_checkert::resultt::SAFE;
   std::size_t expected_results_cnt = 0;
 
-  bmct bmc(opts, gm.get_symbol_table(), mh, pc, *worklist, callback);
+  bmct bmc(opts, gm.get_symbol_table(), mh, initial_pc, *worklist, callback);
   safety_checkert::resultt tmp_result = bmc.run(gm);
 
   if(tmp_result != safety_checkert::resultt::PAUSED)
