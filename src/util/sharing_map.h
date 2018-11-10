@@ -487,19 +487,19 @@ SHARING_MAPT(std::size_t)
 
       for(const auto &l : ll)
       {
-        const unsigned use_count = l.data.use_count();
-        void *raw_ptr = l.data.get();
+        const unsigned leaf_use_count = l.data.use_count();
+        void *leaf_raw_ptr = l.data.get();
 
-        if(use_count >= 2)
+        if(leaf_use_count >= 2)
         {
-          if(marked.find(raw_ptr) != marked.end())
+          if(marked.find(leaf_raw_ptr) != marked.end())
           {
             continue;
           }
 
           if(mark)
           {
-            marked.insert(raw_ptr);
+            marked.insert(leaf_raw_ptr);
           }
         }
 
