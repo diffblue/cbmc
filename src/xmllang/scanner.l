@@ -6,6 +6,14 @@
 
 %{
 
+#if defined _MSC_VER
+// signed/unsigned mismatch
+#pragma warning(disable:4365)
+// macro re-definition: flex conditonally defines INT32_MAX et al. and thus
+// they are set before library headers get to define them
+#pragma warning(disable:4005)
+#endif
+
 #include <cctype>
 #include <cstring>
 #include <cstdlib>
