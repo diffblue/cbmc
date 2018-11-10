@@ -32,8 +32,8 @@ public:
   attributest attributes;
   elementst elements;
 
-  elementst::const_iterator find(const std::string &name) const;
-  elementst::iterator find(const std::string &name);
+  elementst::const_iterator find(const std::string &key) const;
+  elementst::iterator find(const std::string &key);
 
   void set_attribute(
     const std::string &attribute,
@@ -83,10 +83,10 @@ public:
     return "";
   }
 
-  xmlt &new_element(const std::string &name)
+  xmlt &new_element(const std::string &key)
   {
     elements.push_back(xmlt());
-    elements.back().name=name;
+    elements.back().name = key;
     return elements.back();
   }
 
