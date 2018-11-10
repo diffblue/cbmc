@@ -75,22 +75,22 @@ exprt value_set_dereferencet::dereference(
   // type of the object
   const typet &type=pointer.type().subtype();
 
-  #if 0
+#if 0
   std::cout << "DEREF: " << format(pointer) << '\n';
-  #endif
+#endif
 
   // collect objects the pointer may point to
   value_setst::valuest points_to_set;
 
   dereference_callback.get_value_set(pointer, points_to_set);
 
-  #if 0
+#if 0
   for(value_setst::valuest::const_iterator
       it=points_to_set.begin();
       it!=points_to_set.end();
       it++)
     std::cout << "P: " << format(*it) << '\n';
-  #endif
+#endif
 
   // get the values of these
 
@@ -103,13 +103,13 @@ exprt value_set_dereferencet::dereference(
   {
     valuet value = build_reference_to(*it, pointer);
 
-    #if 0
+#if 0
     std::cout << "V: " << format(value.pointer_guard) << " --> ";
     std::cout << format(value.value);
     if(value.ignore)
       std::cout << " (ignored)";
     std::cout << '\n';
-    #endif
+#endif
 
     if(!value.ignore)
       values.push_back(value);
