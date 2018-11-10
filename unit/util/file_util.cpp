@@ -20,17 +20,17 @@ TEST_CASE("concat_dir_file functionality", "[core][util][file_util]")
   const std::string path = concat_dir_file(temp_dir.path, "bla.txt");
 
   REQUIRE(path.size() > temp_dir.path.size() + std::string("bla.txt").size());
-  #ifdef _WIN32
+#ifdef _WIN32
   REQUIRE(path.find('\\') != std::string::npos);
-  #else
+#else
   REQUIRE(path.find('/') != std::string::npos);
-  #endif
+#endif
 
-  #ifdef _WIN32
+#ifdef _WIN32
   const std::string qualified_path = "z:\\some\\path\\foo.txt";
-  #else
+#else
   const std::string qualified_path = "/some/path/foo.txt";
-  #endif
+#endif
   const std::string path2 = concat_dir_file(temp_dir.path, qualified_path);
   REQUIRE(path2 == qualified_path);
 }
@@ -39,11 +39,11 @@ TEST_CASE("is_directory functionality", "[core][util][file_util]")
 {
   temp_dirt temp_dir("testXXXXXX");
 
-  #ifdef _WIN32
+#ifdef _WIN32
   std::ofstream outfile(widen(temp_dir("file")));
-  #else
+#else
   std::ofstream outfile(temp_dir("file"));
-  #endif
+#endif
 
   outfile.close();
 
