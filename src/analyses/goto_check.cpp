@@ -1577,8 +1577,8 @@ void goto_checkt::goto_check(
       }
       else if(statement==ID_printf)
       {
-        forall_operands(it, i.code)
-          check(*it);
+        for(const auto &op : i.code.operands())
+          check(op);
       }
     }
     else if(i.is_assign())
@@ -1625,8 +1625,8 @@ void goto_checkt::goto_check(
         }
       }
 
-      forall_operands(it, code_function_call)
-        check(*it);
+      for(const auto &op : code_function_call.operands())
+        check(op);
 
       // the call might invalidate any assertion
       assertions.clear();
