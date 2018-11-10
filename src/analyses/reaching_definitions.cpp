@@ -80,10 +80,10 @@ void rd_range_domaint::transform(
     transform_start_thread(ns, *rd);
   // do argument-to-parameter assignments
   else if(from->is_function_call())
-    transform_function_call(ns, function_from, from, function_to, to, *rd);
+    transform_function_call(ns, function_from, from, function_to, *rd);
   // cleanup parameters
   else if(from->is_end_function())
-    transform_end_function(ns, function_from, from, function_to, to, *rd);
+    transform_end_function(ns, function_from, from, to, *rd);
   // lhs assignments
   else if(from->is_assign())
     transform_assign(ns, from, from, *rd);
@@ -171,7 +171,6 @@ void rd_range_domaint::transform_function_call(
   const irep_idt &function_from,
   locationt from,
   const irep_idt &function_to,
-  locationt to,
   reaching_definitions_analysist &rd)
 {
   const code_function_callt &code=to_code_function_call(from->code);
@@ -234,7 +233,6 @@ void rd_range_domaint::transform_end_function(
   const namespacet &ns,
   const irep_idt &function_from,
   locationt from,
-  const irep_idt &function_to,
   locationt to,
   reaching_definitions_analysist &rd)
 {
