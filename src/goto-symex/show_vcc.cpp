@@ -26,7 +26,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 void show_vcc_plain(
   messaget::mstreamt &out,
-  const namespacet &ns,
   const symex_target_equationt &equation)
 {
   bool has_threads = equation.has_threads();
@@ -103,7 +102,6 @@ void show_vcc_plain(
 
 void show_vcc_json(
   std::ostream &out,
-  const namespacet &ns,
   const symex_target_equationt &equation)
 {
   json_objectt json_result;
@@ -163,7 +161,6 @@ void show_vcc_json(
 void show_vcc(
   const optionst &options,
   ui_message_handlert &ui_message_handler,
-  const namespacet &ns,
   const symex_target_equationt &equation)
 {
   messaget msg(ui_message_handler);
@@ -190,7 +187,7 @@ void show_vcc(
     return;
 
   case ui_message_handlert::uit::JSON_UI:
-    show_vcc_json(out, ns, equation);
+    show_vcc_json(out, equation);
     break;
 
   case ui_message_handlert::uit::PLAIN:
@@ -200,12 +197,12 @@ void show_vcc(
                    << messaget::eom;
       stream_message_handlert mout_handler(out);
       messaget mout(mout_handler);
-      show_vcc_plain(mout.status(), ns, equation);
+      show_vcc_plain(mout.status(), equation);
     }
     else
     {
       msg.status() << "VERIFICATION CONDITIONS:\n" << messaget::eom;
-      show_vcc_plain(msg.status(), ns, equation);
+      show_vcc_plain(msg.status(), equation);
     }
     break;
   }
