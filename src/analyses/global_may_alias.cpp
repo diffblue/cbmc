@@ -109,9 +109,9 @@ void global_may_alias_domaint::transform(
     {
       const code_assignt &code_assign=to_code_assign(instruction.code);
 
-      std::set<irep_idt> aliases;
-      get_rhs_aliases(code_assign.rhs(), aliases);
-      assign_lhs_aliases(code_assign.lhs(), aliases);
+      std::set<irep_idt> rhs_aliases;
+      get_rhs_aliases(code_assign.rhs(), rhs_aliases);
+      assign_lhs_aliases(code_assign.lhs(), rhs_aliases);
     }
     break;
 
