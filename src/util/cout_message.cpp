@@ -201,12 +201,12 @@ void gcc_message_handlert::print(
       if(in)
       {
         const auto line_number = std::stoull(id2string(line));
-        std::string line;
+        std::string source_line;
         for(std::size_t l = 0; l < line_number; l++)
-          std::getline(in, line);
+          std::getline(in, source_line);
 
         if(in)
-          out << ' ' << line << '\n'; // gcc adds a space, clang doesn't
+          out << ' ' << source_line << '\n'; // gcc adds a space, clang doesn't
       }
     }
 
