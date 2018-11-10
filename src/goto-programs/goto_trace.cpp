@@ -539,11 +539,10 @@ void show_full_goto_trace(
   }
 }
 
-void show_goto_stack_trace(
+static void show_goto_stack_trace(
   messaget::mstreamt &out,
   const namespacet &ns,
-  const goto_tracet &goto_trace,
-  const trace_optionst &options)
+  const goto_tracet &goto_trace)
 {
   // map from thread number to a call stack
   std::map<unsigned, std::vector<goto_tracet::stepst::const_iterator>>
@@ -622,7 +621,7 @@ void show_goto_trace(
   const trace_optionst &options)
 {
   if(options.stack_trace)
-    show_goto_stack_trace(out, ns, goto_trace, options);
+    show_goto_stack_trace(out, ns, goto_trace);
   else
     show_full_goto_trace(out, ns, goto_trace, options);
 }
