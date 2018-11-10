@@ -106,7 +106,7 @@ void c_typecheck_baset::typecheck_type(typet &type)
   else if(type.id()==ID_gcc_attribute_mode)
   {
     // get that mode
-    irep_idt mode=type.get(ID_size);
+    const irep_idt gcc_attr_mode = type.get(ID_size);
 
     // A list of all modes is at
     // http://www.delorie.com/gnu/docs/gcc/gccint_53.html
@@ -132,43 +132,57 @@ void c_typecheck_baset::typecheck_type(typet &type)
 
       typet result;
 
-      if(mode=="__QI__") // 8 bits
+      if(gcc_attr_mode == "__QI__") // 8 bits
+      {
         if(is_signed)
           result=signed_char_type();
         else
           result=unsigned_char_type();
-      else if(mode=="__byte__") // 8 bits
+      }
+      else if(gcc_attr_mode == "__byte__") // 8 bits
+      {
         if(is_signed)
           result=signed_char_type();
         else
           result=unsigned_char_type();
-      else if(mode=="__HI__") // 16 bits
+      }
+      else if(gcc_attr_mode == "__HI__") // 16 bits
+      {
         if(is_signed)
           result=signed_short_int_type();
         else
           result=unsigned_short_int_type();
-      else if(mode=="__SI__") // 32 bits
+      }
+      else if(gcc_attr_mode == "__SI__") // 32 bits
+      {
         if(is_signed)
           result=signed_int_type();
         else
           result=unsigned_int_type();
-      else if(mode=="__word__") // long int, we think
+      }
+      else if(gcc_attr_mode == "__word__") // long int, we think
+      {
         if(is_signed)
           result=signed_long_int_type();
         else
           result=unsigned_long_int_type();
-      else if(mode=="__pointer__") // we think this is size_t/ssize_t
+      }
+      else if(gcc_attr_mode == "__pointer__") // size_t/ssize_t, we think
+      {
         if(is_signed)
           result=signed_size_type();
         else
           result=size_type();
-      else if(mode=="__DI__") // 64 bits
+      }
+      else if(gcc_attr_mode == "__DI__") // 64 bits
       {
         if(config.ansi_c.long_int_width==64)
+        {
           if(is_signed)
             result=signed_long_int_type();
           else
             result=unsigned_long_int_type();
+        }
         else
         {
           assert(config.ansi_c.long_long_int_width==64);
@@ -179,12 +193,15 @@ void c_typecheck_baset::typecheck_type(typet &type)
             result=unsigned_long_long_int_type();
         }
       }
-      else if(mode=="__TI__") // 128 bits
+      else if(gcc_attr_mode == "__TI__") // 128 bits
+      {
         if(is_signed)
           result=gcc_signed_int128_type();
         else
           result=gcc_unsigned_int128_type();
-      else if(mode=="__V2SI__") // vector of 2 ints, deprecated by gcc
+      }
+      else if(gcc_attr_mode == "__V2SI__") // vector of 2 ints, deprecated
+      {
         if(is_signed)
           result=vector_typet(
             signed_int_type(),
@@ -193,7 +210,9 @@ void c_typecheck_baset::typecheck_type(typet &type)
           result=vector_typet(
             unsigned_int_type(),
             from_integer(2, size_type()));
-      else if(mode=="__V4SI__") // vector of 4 ints, deprecated by gcc
+      }
+      else if(gcc_attr_mode == "__V4SI__") // vector of 4 ints, deprecated
+      {
         if(is_signed)
           result=vector_typet(
             signed_int_type(),
@@ -202,6 +221,7 @@ void c_typecheck_baset::typecheck_type(typet &type)
           result=vector_typet(
             unsigned_int_type(),
             from_integer(4, size_type()));
+      }
       else // give up, just use subtype
         result=type.subtype();
 
@@ -221,19 +241,19 @@ void c_typecheck_baset::typecheck_type(typet &type)
     {
       typet result;
 
-      if(mode=="__SF__") // 32 bits
+      if(gcc_attr_mode == "__SF__") // 32 bits
         result=float_type();
-      else if(mode=="__DF__") // 64 bits
+      else if(gcc_attr_mode == "__DF__") // 64 bits
         result=double_type();
-      else if(mode=="__TF__") // 128 bits
+      else if(gcc_attr_mode == "__TF__") // 128 bits
         result=gcc_float128_type();
-      else if(mode=="__V2SF__") // vector of 2 floats, deprecated by gcc
+      else if(gcc_attr_mode == "__V2SF__") // deprecated vector of 2 floats
         result=vector_typet(float_type(), from_integer(2, size_type()));
-      else if(mode=="__V2DF__") // vector of 2 doubles, deprecated by gcc
+      else if(gcc_attr_mode == "__V2DF__") // deprecated vector of 2 doubles
         result=vector_typet(double_type(), from_integer(2, size_type()));
-      else if(mode=="__V4SF__") // vector of 4 floats, deprecated by gcc
+      else if(gcc_attr_mode == "__V4SF__") // deprecated vector of 4 floats
         result=vector_typet(float_type(), from_integer(4, size_type()));
-      else if(mode=="__V4DF__") // vector of 4 doubles, deprecated by gcc
+      else if(gcc_attr_mode == "__V4DF__") // deprecated vector of 4 doubles
         result=vector_typet(double_type(), from_integer(4, size_type()));
       else // give up, just use subtype
         result=type.subtype();
@@ -248,11 +268,11 @@ void c_typecheck_baset::typecheck_type(typet &type)
       // gcc allows this, but clang doesn't -- see enums above
       typet result;
 
-      if(mode=="__SC__") // 32 bits
+      if(gcc_attr_mode == "__SC__") // 32 bits
         result=float_type();
-      else if(mode=="__DC__") // 64 bits
+      else if(gcc_attr_mode == "__DC__") // 64 bits
         result=double_type();
-      else if(mode=="__TC__") // 128 bits
+      else if(gcc_attr_mode == "__TC__") // 128 bits
         result=gcc_float128_type();
       else // give up, just use subtype
         result=type.subtype();
@@ -265,9 +285,9 @@ void c_typecheck_baset::typecheck_type(typet &type)
     else
     {
       error().source_location=type.source_location();
-      error() << "attribute mode `" << mode
-              << "' applied to inappropriate type `"
-              << to_string(type) << "'" << eom;
+      error() << "attribute mode `" << gcc_attr_mode
+              << "' applied to inappropriate type `" << to_string(type) << "'"
+              << eom;
       throw 0;
     }
   }
