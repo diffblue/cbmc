@@ -668,11 +668,11 @@ bool simplify_exprt::simplify_object_size(exprt &expr)
 
       if(size.is_not_nil())
       {
-        typet type=expr.type();
+        const typet &expr_type = expr.type();
 
-        if(size.type()!=type)
+        if(size.type() != expr_type)
         {
-          size.make_typecast(type);
+          size.make_typecast(expr_type);
           simplify_node(size);
         }
 
