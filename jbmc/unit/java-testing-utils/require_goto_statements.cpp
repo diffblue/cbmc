@@ -447,7 +447,7 @@ require_goto_statements::require_struct_array_component_assignment(
     array_component_reference_assignment_rhs.type().id() == ID_pointer);
   const typet &array =
     to_pointer_type(array_component_reference_assignment_rhs.type()).subtype();
-  PRECONDITION(is_java_array_tag(array.get(ID_identifier)));
+  PRECONDITION(is_java_array_tag(to_symbol_type(array)));
   REQUIRE(array.get(ID_identifier) == array_type_name);
 
   return component_reference_tmp_name;

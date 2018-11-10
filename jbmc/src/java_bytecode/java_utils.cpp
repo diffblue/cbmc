@@ -23,7 +23,7 @@ bool java_is_array_type(const typet &type)
 {
   if(type.id() != ID_struct)
     return false;
-  return is_java_array_tag(to_struct_type(type).get_tag());
+  return is_java_array_tag(symbol_typet(to_struct_type(type).get_tag()));
 }
 
 unsigned java_local_variable_slots(const typet &t)

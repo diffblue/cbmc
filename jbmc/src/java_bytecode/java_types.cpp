@@ -129,8 +129,7 @@ reference_typet java_array_type(const char subtype)
 const typet &java_array_element_type(const symbol_typet &array_symbol)
 {
   DATA_INVARIANT(
-    is_java_array_tag(array_symbol.get_identifier()),
-    "Symbol should have array tag");
+    is_java_array_tag(array_symbol), "Symbol should have array tag");
   return array_symbol.find_type(ID_element_type);
 }
 
@@ -139,8 +138,7 @@ const typet &java_array_element_type(const symbol_typet &array_symbol)
 typet &java_array_element_type(symbol_typet &array_symbol)
 {
   DATA_INVARIANT(
-    is_java_array_tag(array_symbol.get_identifier()),
-    "Symbol should have array tag");
+    is_java_array_tag(array_symbol), "Symbol should have array tag");
   return array_symbol.add_type(ID_element_type);
 }
 
@@ -154,7 +152,7 @@ bool is_java_array_type(const typet &type)
     return false;
   }
   const auto &subtype_symbol = to_symbol_type(type.subtype());
-  return is_java_array_tag(subtype_symbol.get_identifier());
+  return is_java_array_tag(subtype_symbol);
 }
 
 /// Checks whether the given type is a multi-dimensional array pointer type,
@@ -171,9 +169,9 @@ bool is_multidim_java_array_type(const typet &type)
 /// \param tag Tag of a struct
 /// \return True if the given string is a Java array tag, i.e., has a prefix
 /// of java::array[
-bool is_java_array_tag(const irep_idt& tag)
+bool is_java_array_tag(const symbol_typet &tag)
 {
-  return has_prefix(id2string(tag), "java::array[");
+  return has_prefix(id2string(tag.get_identifier()), "java::array[");
 }
 
 /// Constructs a type indicated by the given character:
@@ -807,7 +805,7 @@ bool equal_java_types(const typet &type1, const typet &type2)
     const symbol_typet &subtype_symbol2 = to_symbol_type(type2.subtype());
     if(
       subtype_symbol1.get_identifier() == subtype_symbol2.get_identifier() &&
-      is_java_array_tag(subtype_symbol1.get_identifier()))
+      is_java_array_tag(subtype_symbol1))
     {
       const typet &array_element_type1 =
         java_array_element_type(subtype_symbol1);
@@ -851,14 +849,16 @@ void get_dependencies_from_generic_parameters_rec(
   else if(t.id() == ID_symbol_type)
   {
     const symbol_typet &symbol_type = to_symbol_type(t);
-    const irep_idt class_name(symbol_type.get_identifier());
-    if(is_java_array_tag(class_name))
+    if(is_java_array_tag(symbol_type))
     {
       get_dependencies_from_generic_parameters(
         java_array_element_type(symbol_type), refs);
     }
     else
+    {
+      const irep_idt &class_name = symbol_type.get_identifier();
       refs.insert(strip_java_namespace_prefix(class_name));
+    }
   }
 }
 
@@ -987,11 +987,13 @@ std::string pretty_java_type(const typet &type)
     if(type.subtype().id() == ID_symbol_type)
     {
       const auto &symbol_type = to_symbol_type(type.subtype());
-      const irep_idt &id = symbol_type.get_identifier();
-      if(is_java_array_tag(id))
+      if(is_java_array_tag(symbol_type))
         return pretty_java_type(java_array_element_type(symbol_type)) + "[]";
       else
+      {
+        const irep_idt &id = symbol_type.get_identifier();
         return id2string(strip_java_namespace_prefix(id));
+      }
     }
     else
       return "?";

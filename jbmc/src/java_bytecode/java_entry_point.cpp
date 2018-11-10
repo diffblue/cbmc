@@ -152,7 +152,7 @@ static void java_static_lifetime_init(
           name_str.substr(0, name_str.size() - strlen(JAVA_CLASS_MODEL_SUFFIX));
         const symbolt &class_symbol = symbol_table.lookup_ref(class_name);
 
-        bool class_is_array = is_java_array_tag(sym.name);
+        bool class_is_array = is_java_array_tag(symbol_typet(sym.name));
 
         exprt name_literal(ID_java_string_literal);
         name_literal.set(ID_value, to_class_type(class_symbol.type).get_tag());
