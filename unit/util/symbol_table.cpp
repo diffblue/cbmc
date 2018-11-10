@@ -18,6 +18,7 @@ TEST_CASE("Iterating through a symbol table", "[core][utils][symbol_tablet]")
   int counter = 0;
   for(auto &entry : symbol_table)
   {
+    (void)entry; // we are just testing iteration here
     ++counter;
   }
 
