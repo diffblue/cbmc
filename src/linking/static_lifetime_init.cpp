@@ -115,7 +115,6 @@ void static_lifetime_init(
 
     if(symbol.value.is_nil())
     {
-      const namespacet ns(symbol_table);
       const auto zero = zero_initializer(symbol.type, symbol.location, ns);
       CHECK_RETURN(zero.has_value());
       rhs = *zero;
