@@ -1968,8 +1968,6 @@ std::string expr2ct::convert_constant(
   }
   else if(type.id()==ID_pointer)
   {
-    const irep_idt &value=to_constant_expr(src).get_value();
-
     if(value==ID_NULL)
     {
       dest="NULL";
