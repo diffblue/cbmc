@@ -133,42 +133,56 @@ void c_typecheck_baset::typecheck_type(typet &type)
       typet result;
 
       if(gcc_attr_mode == "__QI__") // 8 bits
+      {
         if(is_signed)
           result=signed_char_type();
         else
           result=unsigned_char_type();
+      }
       else if(gcc_attr_mode == "__byte__") // 8 bits
+      {
         if(is_signed)
           result=signed_char_type();
         else
           result=unsigned_char_type();
+      }
       else if(gcc_attr_mode == "__HI__") // 16 bits
+      {
         if(is_signed)
           result=signed_short_int_type();
         else
           result=unsigned_short_int_type();
+      }
       else if(gcc_attr_mode == "__SI__") // 32 bits
+      {
         if(is_signed)
           result=signed_int_type();
         else
           result=unsigned_int_type();
+      }
       else if(gcc_attr_mode == "__word__") // long int, we think
+      {
         if(is_signed)
           result=signed_long_int_type();
         else
           result=unsigned_long_int_type();
+      }
       else if(gcc_attr_mode == "__pointer__") // size_t/ssize_t, we think
+      {
         if(is_signed)
           result=signed_size_type();
         else
           result=size_type();
+      }
       else if(gcc_attr_mode == "__DI__") // 64 bits
       {
         if(config.ansi_c.long_int_width==64)
+        {
           if(is_signed)
             result=signed_long_int_type();
           else
             result=unsigned_long_int_type();
+        }
         else
         {
           assert(config.ansi_c.long_long_int_width==64);
@@ -180,11 +194,14 @@ void c_typecheck_baset::typecheck_type(typet &type)
         }
       }
       else if(gcc_attr_mode == "__TI__") // 128 bits
+      {
         if(is_signed)
           result=gcc_signed_int128_type();
         else
           result=gcc_unsigned_int128_type();
+      }
       else if(gcc_attr_mode == "__V2SI__") // vector of 2 ints, deprecated
+      {
         if(is_signed)
           result=vector_typet(
             signed_int_type(),
@@ -193,7 +210,9 @@ void c_typecheck_baset::typecheck_type(typet &type)
           result=vector_typet(
             unsigned_int_type(),
             from_integer(2, size_type()));
+      }
       else if(gcc_attr_mode == "__V4SI__") // vector of 4 ints, deprecated
+      {
         if(is_signed)
           result=vector_typet(
             signed_int_type(),
@@ -202,6 +221,7 @@ void c_typecheck_baset::typecheck_type(typet &type)
           result=vector_typet(
             unsigned_int_type(),
             from_integer(4, size_type()));
+      }
       else // give up, just use subtype
         result=type.subtype();
 
