@@ -127,7 +127,7 @@ void goto_symext::symex_allocate(
     if(object_type.id()==ID_array &&
        !to_array_type(object_type).size().is_constant())
     {
-      exprt &size=to_array_type(object_type).size();
+      exprt &array_size = to_array_type(object_type).size();
 
       auxiliary_symbolt size_symbol;
 
@@ -137,12 +137,12 @@ void goto_symext::symex_allocate(
       size_symbol.type=tmp_size.type();
       size_symbol.mode = mode;
       size_symbol.type.set(ID_C_constant, true);
-      size_symbol.value = size;
+      size_symbol.value = array_size;
 
       state.symbol_table.add(size_symbol);
 
-      code_assignt assignment(size_symbol.symbol_expr(), size);
-      size=assignment.lhs();
+      code_assignt assignment(size_symbol.symbol_expr(), array_size);
+      array_size = assignment.lhs();
 
       symex_assign(state, assignment);
     }
