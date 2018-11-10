@@ -94,7 +94,7 @@ SCENARIO("ai_domain_baset::ai_simplify_lhs",
       signedbv_typet(32), from_integer(array_size, size_type()));
 
     // Verify the results of the setup
-    REQUIRE_FALSE(compile_failed);\
+    REQUIRE_FALSE(compile_failed);
     REQUIRE(simplifiable_expression.id()==ID_plus);
     exprt simplified_version=simplify_expr(simplifiable_expression, ns);
     REQUIRE(simplified_version.id()==ID_constant);
