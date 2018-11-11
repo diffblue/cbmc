@@ -80,7 +80,7 @@ public:
 protected:
   const namespacet &ns;
   std::unique_ptr<local_bitvector_analysist> local_bitvector_analysis;
-  goto_programt::const_targett t;
+  goto_programt::const_targett current_target;
 
   void check_rec(
     const exprt &expr,
@@ -289,11 +289,8 @@ void goto_checkt::undefined_shift_check(
     if(width_expr.is_nil())
       throw "no number for width for operator "+expr.id_string();
 
-    binary_relation_exprt inequality(
-      expr.distance(), ID_lt, width_expr);
-
     add_guarded_claim(
-      inequality,
+      binary_relation_exprt(expr.distance(), ID_lt, width_expr),
       "shift distance too large",
       "undefined-shift",
       expr.find_source_location(),
@@ -965,7 +962,7 @@ goto_checkt::address_check(const exprt &address, const exprt &size)
   const auto &pointer_type = to_pointer_type(address.type());
 
   local_bitvector_analysist::flagst flags =
-    local_bitvector_analysis->get(t, address);
+    local_bitvector_analysis->get(current_target, address);
 
   // For Java, we only need to check for null
   if(mode == ID_java)
@@ -1535,7 +1532,7 @@ void goto_checkt::goto_check(
 
   Forall_goto_program_instructions(it, goto_program)
   {
-    t=it;
+    current_target = it;
     goto_programt::instructiont &i=*it;
 
     new_code.clear();
@@ -1606,8 +1603,8 @@ void goto_checkt::goto_check(
       {
         exprt pointer=code_function_call.arguments()[0];
 
-        local_bitvector_analysist::flagst flags=
-          local_bitvector_analysis->get(t, pointer);
+        local_bitvector_analysist::flagst flags =
+          local_bitvector_analysis->get(current_target, pointer);
 
         if(flags.is_unknown() || flags.is_null())
         {
