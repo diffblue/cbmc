@@ -739,8 +739,6 @@ void goto_inlinet::output_inline_map(
     goto_functionst::function_mapt::const_iterator f_it=
       goto_functions.function_map.find(id);
 
-    std::string call="-";
-
     if(f_it!=goto_functions.function_map.end() &&
        !call_list.empty())
     {
