@@ -282,11 +282,11 @@ void goto_convertt::do_scanf(
 
               copy(array_copy_statement, OTHER, dest);
               #else
-              const index_exprt lhs(
+              const index_exprt new_lhs(
                 dereference_exprt(ptr, type), from_integer(0, index_type()));
               const side_effect_expr_nondett rhs(
                 type.subtype(), function.source_location());
-              code_assignt assign(lhs, rhs);
+              code_assignt assign(new_lhs, rhs);
               assign.add_source_location()=function.source_location();
               copy(assign, ASSIGN, dest);
               #endif
@@ -294,10 +294,10 @@ void goto_convertt::do_scanf(
             else
             {
               // make it nondet for now
-              const dereference_exprt lhs(ptr, type);
+              const dereference_exprt new_lhs(ptr, type);
               const side_effect_expr_nondett rhs(
                 type, function.source_location());
-              code_assignt assign(lhs, rhs);
+              code_assignt assign(new_lhs, rhs);
               assign.add_source_location()=function.source_location();
               copy(assign, ASSIGN, dest);
             }
