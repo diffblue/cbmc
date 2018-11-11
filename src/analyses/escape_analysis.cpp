@@ -192,9 +192,9 @@ void escape_domaint::transform(
       get_rhs_cleanup(code_assign.rhs(), cleanup_functions);
       assign_lhs_cleanup(code_assign.lhs(), cleanup_functions);
 
-      std::set<irep_idt> aliases;
-      get_rhs_aliases(code_assign.rhs(), aliases);
-      assign_lhs_aliases(code_assign.lhs(), aliases);
+      std::set<irep_idt> rhs_aliases;
+      get_rhs_aliases(code_assign.rhs(), rhs_aliases);
+      assign_lhs_aliases(code_assign.lhs(), rhs_aliases);
     }
     break;
 
@@ -238,9 +238,9 @@ void escape_domaint::transform(
               std::set<irep_idt> lhs_set;
               get_rhs_aliases(lhs, lhs_set);
 
-              for(const auto &lhs : lhs_set)
+              for(const auto &l : lhs_set)
               {
-                cleanup_map[lhs].cleanup_functions.insert(cleanup_function);
+                cleanup_map[l].cleanup_functions.insert(cleanup_function);
               }
             }
           }
