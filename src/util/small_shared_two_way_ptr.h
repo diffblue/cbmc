@@ -272,7 +272,7 @@ public:
 
   bool is_derived_v() const
   {
-    return use_count_ & ~mask;
+    return (use_count_ & ~mask) != 0;
   }
 
   bool is_same_type(const small_shared_two_way_pointeet &other) const
