@@ -7,9 +7,7 @@
 
 #include "bigint.hh"
 
-
-BigInt
-pow (BigInt const &x, std::size_t y)
+BigInt pow(BigInt const &x, std::size_t y)
 {
   BigInt a = x;
   BigInt r = 1;

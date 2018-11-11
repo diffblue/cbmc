@@ -24,13 +24,11 @@ typedef BigInt::onedig_t onedig_t;
 typedef BigInt::twodig_t twodig_t;
 
 static const unsigned small	 = BigInt::small;
-static const std::size_t single_bits = sizeof (onedig_t) * CHAR_BIT;
+static const std::size_t single_bits = sizeof(onedig_t) * CHAR_BIT;
 static const twodig_t base       = twodig_t (1) << single_bits;
 static const twodig_t single_max = base - 1;
 
-
-inline std::size_t
-adjust_size (std::size_t size)
+inline std::size_t adjust_size(std::size_t size)
 {
   // Always allocate at least something greater than an ullong_t.
   if (size <= small)
@@ -54,25 +52,26 @@ adjust_size (std::size_t size)
 
 // Compare unsigned digit strings, returns -1/0/+1.
 
-inline int
-digit_cmp (onedig_t const *a, onedig_t const *b, std::size_t n)
+inline int digit_cmp(onedig_t const *a, onedig_t const *b, std::size_t n)
 {
-  for (std::size_t i = n; i > 0; --i)
-    {
-      if (a[i - 1] < b[i - 1])
-	return -1;
-      else if (a[i - 1] > b[i - 1])
-	return 1;
-    }
+  for(std::size_t i = n; i > 0; --i)
+  {
+    if(a[i - 1] < b[i - 1])
+      return -1;
+    else if(a[i - 1] > b[i - 1])
+      return 1;
+  }
   return 0;
 }
 
 
 // Add unsigned digit strings, return carry. Assumes l1 >= l2!
-static _fast onedig_t
-digit_add (onedig_t const *d1, std::size_t l1,
-	   onedig_t const *d2, std::size_t l2,
-	   onedig_t *r)			// May be same as d1 or d2.
+static _fast onedig_t digit_add(
+  onedig_t const *d1,
+  std::size_t l1,
+  onedig_t const *d2,
+  std::size_t l2,
+  onedig_t *r) // May be same as d1 or d2.
 {
   twodig_t c = 0;
   std::size_t i = 0;
@@ -100,10 +99,12 @@ digit_add (onedig_t const *d1, std::size_t l1,
 
 
 // Subtract unsigned digit strings, return carry. Assumes l1 >= l2!
-static _fast void
-digit_sub (onedig_t const *d1, std::size_t l1,
-	   onedig_t const *d2, std::size_t l2,
-	   onedig_t *r)			// May be same as d1 or d2.
+static _fast void digit_sub(
+  onedig_t const *d1,
+  std::size_t l1,
+  onedig_t const *d2,
+  std::size_t l2,
+  onedig_t *r) // May be same as d1 or d2.
 {
   twodig_t c = 1;
   std::size_t i = 0;
@@ -131,16 +132,15 @@ digit_sub (onedig_t const *d1, std::size_t l1,
 
 // Multiply unsigned digit string by single digit, replaces argument
 // with product and returns overflowing digit.
-static _fast onedig_t
-digit_mul (onedig_t *b, std::size_t l, onedig_t d)
+static _fast onedig_t digit_mul(onedig_t *b, std::size_t l, onedig_t d)
 {
   twodig_t p = 0;
-  for (std::size_t i = l; i > 0; --i)
-    {
-      p += twodig_t (d) * twodig_t (*b);
-      *b++ = onedig_t (p);
-      p >>= single_bits;
-    }
+  for(std::size_t i = l; i > 0; --i)
+  {
+    p += twodig_t(d) * twodig_t(*b);
+    *b++ = onedig_t(p);
+    p >>= single_bits;
+  }
   return onedig_t (p);
 }
 
@@ -148,41 +148,42 @@ digit_mul (onedig_t *b, std::size_t l, onedig_t d)
 // Multiply two digit strings. Writes result into a third digit string
 // which must have the appropriate size and must not be same as one of
 // the arguments.
-static _fast void
-digit_mul (onedig_t const *a, std::size_t la,
-	   onedig_t const *b, std::size_t lb,
-	   onedig_t *r)			// Must not be same as a or b.
+static _fast void digit_mul(
+  onedig_t const *a,
+  std::size_t la,
+  onedig_t const *b,
+  std::size_t lb,
+  onedig_t *r) // Must not be same as a or b.
 {
   memset (r, 0, (la + lb) * sizeof (onedig_t));
-  for (std::size_t i = 0; i < la; i++)
+  for(std::size_t i = 0; i < la; i++)
+  {
+    onedig_t d = a[i];
+    twodig_t p = 0;
+    for(std::size_t j = 0; j < lb; j++)
     {
-      onedig_t d = a[i];
-      twodig_t p = 0;
-      for (std::size_t j = 0; j < lb; j++)
-	{
-	  p += r[j] + twodig_t (d) * b[j];
-	  r[j] = onedig_t (p);
-	  p >>= single_bits;
-	}
-      r[lb] = onedig_t (p);
-      ++r;
+      p += r[j] + twodig_t(d) * b[j];
+      r[j] = onedig_t(p);
+      p >>= single_bits;
     }
+    r[lb] = onedig_t(p);
+    ++r;
+  }
 }
 
 
 // Divide unsigned digit string by single digit, replaces argument
 // with quotient and returns remainder.
-static _fast onedig_t
-digit_div (onedig_t *b, std::size_t l, onedig_t d)
+static _fast onedig_t digit_div(onedig_t *b, std::size_t l, onedig_t d)
 {
   twodig_t r = 0;
-  for (std::size_t i = l; i > 0; --i)
-    {
-      r <<= single_bits;
-      r |= b[i - 1];
-      b[i - 1] = onedig_t (r / d);
-      r %= d;
-    }
+  for(std::size_t i = l; i > 0; --i)
+  {
+    r <<= single_bits;
+    r |= b[i - 1];
+    b[i - 1] = onedig_t(r / d);
+    r %= d;
+  }
   return onedig_t (r);
 }
 
@@ -219,16 +220,16 @@ multiply_and_subtract(onedig_t *r, onedig_t const *y, std::size_t l, onedig_t q)
 {
   twodig_t p = 0;
   twodig_t h = 1;
-  for (std::size_t i = 0; i < l; i++)
-    {
-      p += twodig_t (q) * y[i];
-      h += r[i];
-      h += single_max;
-      h -= onedig_t (p);
-      r[i] = onedig_t (h);
-      p >>= single_bits;
-      h >>= single_bits;
-    }
+  for(std::size_t i = 0; i < l; i++)
+  {
+    p += twodig_t(q) * y[i];
+    h += r[i];
+    h += single_max;
+    h -= onedig_t(p);
+    r[i] = onedig_t(h);
+    p >>= single_bits;
+    h >>= single_bits;
+  }
   h += r[l];
   h += single_max;
   h -= p;
@@ -238,45 +239,47 @@ multiply_and_subtract(onedig_t *r, onedig_t const *y, std::size_t l, onedig_t q)
 
 // Add back divisor digits to dividend, corresponds to a correction of
 // the guessed quotient digit by -1.
-static _fast void
-add_back (onedig_t *r, onedig_t const *y, std::size_t l)
+static _fast void add_back(onedig_t *r, onedig_t const *y, std::size_t l)
 {
   twodig_t h = 0;
-  for (std::size_t i = 0; i < l; i++)
-    {
-      h += r[i];
-      h += y[i];
-      r[i] = onedig_t (h);
-      h >>= single_bits;
-    }
+  for(std::size_t i = 0; i < l; i++)
+  {
+    h += r[i];
+    h += y[i];
+    r[i] = onedig_t(h);
+    h >>= single_bits;
+  }
   r[l] = 0;
 }
 
 // Divide two digit strings. Divides r by y/yl. Stores quotient in
 // q/ql and leaves the remainder in r. Size of r is yl+ql.
-static _fast void
-digit_div (onedig_t *r, const onedig_t *y, std::size_t yl, onedig_t *q, std::size_t ql)
+static _fast void digit_div(
+  onedig_t *r,
+  const onedig_t *y,
+  std::size_t yl,
+  onedig_t *q,
+  std::size_t ql)
 {
   r += ql;
   --r;
-  for (std::size_t i = ql; i > 0; --r, --i)
+  for(std::size_t i = ql; i > 0; --r, --i)
+  {
+    onedig_t qh = guess_q(r + yl, y + yl - 1);
+    if(multiply_and_subtract(r, y, yl, qh) == 0)
     {
-      onedig_t qh = guess_q (r + yl, y + yl - 1);
-      if (multiply_and_subtract (r, y, yl, qh) == 0)
-	{
-	  --qh;
-	  add_back (r, y, yl);
-	}
-      if (q != 0)
-	q[i - 1] = qh;
+      --qh;
+      add_back(r, y, yl);
     }
+    if(q != 0)
+      q[i - 1] = qh;
+  }
 }
 
 
 // Newly allocate uninitialized space for specified number of digits.
 
-inline void
-BigInt::allocate (std::size_t digits)
+inline void BigInt::allocate(std::size_t digits)
 {
   size = adjust_size (digits);
   length = 0;
@@ -287,8 +290,7 @@ BigInt::allocate (std::size_t digits)
 // Used in assignment: When smaller than specified digits, allocate
 // anew. Don`t bother to keep the contents.
 
-inline void
-BigInt::reallocate (std::size_t digits)
+inline void BigInt::reallocate(std::size_t digits)
 {
   if (digits > size)
     {
@@ -302,8 +304,7 @@ BigInt::reallocate (std::size_t digits)
 
 // Increase size keeping the contents.
 
-inline void
-BigInt::resize (std::size_t digits)
+inline void BigInt::resize(std::size_t digits)
 {
   if (digits > size)
     {
@@ -341,8 +342,7 @@ BigInt::adjust()
 
 // Store unsigned elementary integer type into string of onedig_t.
 
-inline void
-digit_set (ullong_t ul, onedig_t d[small], std::size_t &l)
+inline void digit_set(ullong_t ul, onedig_t d[small], std::size_t &l)
 {
   l = 0;
   if (ul)
@@ -394,11 +394,8 @@ BigInt::~BigInt()
     }
 }
 
-BigInt::BigInt (onedig_t *dig, std::size_t len, bool pos)
-  : size (0),
-    length (len),
-    digit (dig),
-    positive (pos)
+BigInt::BigInt(onedig_t *dig, std::size_t len, bool pos)
+  : size(0), length(len), digit(dig), positive(pos)
 {}
 
 BigInt::BigInt()
@@ -507,11 +504,11 @@ BigInt::scan_on (char const *s, onedig_t b)
       if (c < '0')
 	return s;
       else if (c <= '9')
-	dig = (onedig_t)(c - '0');
+        dig = (onedig_t)(c - '0');
       else if (c < 'A')
 	return s;
       else if (c <= 'Z')
-	dig = (onedig_t)(c - 'A' + 10);
+        dig = (onedig_t)(c - 'A' + 10);
       else
 	return s;
       if (dig >= b)
@@ -550,9 +547,7 @@ BigInt::scan (char const *s, onedig_t b)
   return scan_on (s, b);
 }
 
-
-std::size_t
-BigInt::digits (onedig_t b) const
+std::size_t BigInt::digits(onedig_t b) const
 {
   int bits = -1;
   while (b)
@@ -560,9 +555,7 @@ BigInt::digits (onedig_t b) const
   return (single_bits * length + bits - 1) / bits;
 }
 
-
-char *
-BigInt::as_string (char *p, std::size_t l, onedig_t b) const
+char *BigInt::as_string(char *p, std::size_t l, onedig_t b) const
 {
   if (l < 2)
     return 0;				// Not enough room for number.
@@ -601,8 +594,7 @@ BigInt::as_string (char *p, std::size_t l, onedig_t b) const
   return p + l;
 }
 
-bool
-BigInt::dump (unsigned char *p, std::size_t n)
+bool BigInt::dump(unsigned char *p, std::size_t n)
 {
   // Access most significant digit.
   onedig_t *t = digit + length;
@@ -616,9 +608,9 @@ BigInt::dump (unsigned char *p, std::size_t n)
     }
   // Determine number m of characters needed.
   onedig_t d = *--t;
-  std::size_t i = sizeof (onedig_t);
+  std::size_t i = sizeof(onedig_t);
   while (--i && (d >> i * CHAR_BIT) == 0);
-  const std::size_t m = ++i + (t - digit) * sizeof (onedig_t);
+  const std::size_t m = ++i + (t - digit) * sizeof(onedig_t);
   // Fill in leading zeroes.
   if (m > n)
     {
@@ -632,7 +624,7 @@ BigInt::dump (unsigned char *p, std::size_t n)
   for (;;)
     {
       while (i--)
-	*p++ = (unsigned char)(d >> i * CHAR_BIT);
+        *p++ = (unsigned char)(d >> i * CHAR_BIT);
       if (t <= digit)
 	break;
       d = *--t;
@@ -641,8 +633,7 @@ BigInt::dump (unsigned char *p, std::size_t n)
   return true;
 }
 
-void
-BigInt::load (unsigned char const *p, std::size_t n)
+void BigInt::load(unsigned char const *p, std::size_t n)
 {
   // Skip leading zeroes.
   while (n > 0 && *p == 0)
@@ -683,8 +674,8 @@ BigInt::is_long() const
     return false;
   // There is exactly one good signed number n with abs (n) having the
   // topmost bit set: The most negative number.
-  for (std::size_t l = length - 1; l > 0; --l)
-    if (digit[l - 1] != 0)
+  for(std::size_t l = length - 1; l > 0; --l)
+    if(digit[l - 1] != 0)
       return false;
   return true;
 }
@@ -692,11 +683,11 @@ BigInt::is_long() const
 ullong_t BigInt::to_ulong() const
 {
   ullong_t ul = 0;
-  for (std::size_t i = length; i > 0; --i)
-    {
-      ul <<= single_bits;
-      ul |= digit[i - 1];
-    }
+  for(std::size_t i = length; i > 0; --i)
+  {
+    ul <<= single_bits;
+    ul |= digit[i - 1];
+  }
   return ul;
 }
 
@@ -753,7 +744,7 @@ BigInt::compare (llong_t b) const
 
   onedig_t dig[small];
   std::size_t len;
-  digit_set (ullong_t(-b), dig, len);
+  digit_set(ullong_t(-b), dig, len);
   if (length < len)
     return 1;
   if (length > len)
@@ -776,8 +767,7 @@ BigInt::compare (BigInt const &b) const
 
 // Auxiliary method for all adding and subtracting.
 
-void
-BigInt::add (onedig_t const *dig, std::size_t len, bool pos)
+void BigInt::add(onedig_t const *dig, std::size_t len, bool pos)
 {
   // Make sure the result fits into this, even with carry.
   resize ((length > len ? length : len) + 1);
@@ -829,8 +819,7 @@ BigInt::add (onedig_t const *dig, std::size_t len, bool pos)
 
 // Auxiliary method for multiplication.
 
-void
-BigInt::mul (onedig_t const *dig, std::size_t len, bool pos)
+void BigInt::mul(onedig_t const *dig, std::size_t len, bool pos)
 {
   if (len < 2)
     {
@@ -1266,21 +1255,23 @@ BigInt::operator%= (BigInt const &y)
 }
 
 // Not part of original BigInt.
-std::size_t
-BigInt::floorPow2 () const
+std::size_t BigInt::floorPow2() const
 {
-  std::size_t i = length;    // Start on the last value
-  while (i > 0 && digit[i - 1] == 0) {
+  std::size_t i = length; // Start on the last value
+  while(i > 0 && digit[i - 1] == 0)
+  {
     --i;               // Skip zeros
   }
-  if (i == 0) {
+  if(i == 0)
+  {
     return 0;          // Special case
   }
 
   twodig_t power = 1;
   std::size_t count = 0;
 
-  while ((power << 1) <= (twodig_t)digit[i - 1]) {
+  while((power << 1) <= (twodig_t)digit[i - 1])
+  {
     ++count, power <<= 1;
   }
 
@@ -1288,8 +1279,8 @@ BigInt::floorPow2 () const
 }
 
 // Not part of original BigInt.
-void
-BigInt::setPower2 (std::size_t exponent) {
+void BigInt::setPower2(std::size_t exponent)
+{
   std::size_t digitOffset = exponent / single_bits;
   std::size_t bitOffset = exponent % single_bits;
   std::size_t digitsNeeded = 1 + digitOffset;
