@@ -269,7 +269,7 @@ mp_integer bitwise_xor(const mp_integer &a, const mp_integer &b)
   if(a.is_ulong() && b.is_ulong())
     return a.to_ulong() ^ b.to_ulong();
 
-  return bitwise(a, b, [](bool a, bool b) { return a ^ b; });
+  return bitwise(a, b, [](bool a, bool b) { return a != b; });
 }
 
 /// arithmetic left shift bitwise operations only make sense on native objects,
