@@ -138,9 +138,9 @@ void convert_decl(
       type_string = from_type(ns, identifier, symbol->type);
 
     json_assignment["mode"] = json_stringt(symbol->mode);
-    exprt simplified = simplify_expr(step.full_lhs_value, ns);
+    const exprt simplified_expr = simplify_expr(step.full_lhs_value, ns);
 
-    full_lhs_value = json(simplified, ns, symbol->mode);
+    full_lhs_value = json(simplified_expr, ns, symbol->mode);
   }
   else
   {
