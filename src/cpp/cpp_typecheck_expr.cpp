@@ -874,7 +874,7 @@ void cpp_typecheckt::typecheck_expr_explicit_typecast(exprt &expr)
       ::zero_initializer(expr.type(), expr.find_source_location(), *this);
     if(!new_expr.has_value())
     {
-      err_location(expr.find_source_location());
+      error().source_location = expr.find_source_location();
       error() << "cannot zero-initialize `" << to_string(expr.type()) << "'"
               << eom;
       throw 0;
