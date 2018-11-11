@@ -1627,7 +1627,7 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
             statement=="lookupswitch")
     {
       PRECONDITION(op.size() == 1 && results.empty());
-      c = convert_switch(address_map, op, i_it->args, i_it->source_location);
+      c = convert_switch(op, i_it->args, i_it->source_location);
     }
     else if(statement=="pop" || statement=="pop2")
     {
@@ -1913,7 +1913,6 @@ codet java_bytecode_convert_methodt::convert_pop(
 }
 
 code_switcht java_bytecode_convert_methodt::convert_switch(
-  java_bytecode_convert_methodt::address_mapt &address_map,
   const exprt::operandst &op,
   const java_bytecode_parse_treet::instructiont::argst &args,
   const source_locationt &location)
