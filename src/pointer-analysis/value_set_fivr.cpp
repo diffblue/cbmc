@@ -824,17 +824,17 @@ void value_set_fivrt::get_reference_set(
 
   forall_objects(it, object_map.read())
   {
-    const exprt &expr=object_numbering[it->first];
+    const exprt &object = object_numbering[it->first];
 
-    if(expr.type().id()=="#REF#")
+    if(object.type().id() == "#REF#")
     {
-      const irep_idt &ident=expr.get(ID_identifier);
+      const irep_idt &ident = object.get(ID_identifier);
       valuest::const_iterator vit=values.find(ident);
       if(vit==values.end())
       {
         // Assume the variable never was assigned,
         // so assume it's reference set is unknown.
-        dest.insert(exprt(ID_unknown, expr.type()));
+        dest.insert(exprt(ID_unknown, object.type()));
       }
       else
       {
@@ -853,8 +853,8 @@ void value_set_fivrt::get_reference_set(
             t_it->second.reset();
         }
 
-        forall_objects(it, omt.read())
-          dest.insert(to_expr(it));
+        forall_objects(it2, omt.read())
+          dest.insert(to_expr(it2));
       }
     }
     else
