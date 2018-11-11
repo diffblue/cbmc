@@ -502,7 +502,7 @@ BigInt::scan_on (char const *s, onedig_t b)
   for (char c = *s; c; c = *++s)
     {
       // Convert digit. Use 0..9A..Z for singles up to 36. Ignoring case.
-      c = (char)toupper (c);
+      c = static_cast<char>(toupper(c));
       onedig_t dig;
       if (c < '0')
 	return s;
@@ -585,7 +585,7 @@ BigInt::as_string (char *p, std::size_t l, onedig_t b) const
       if (l == 0)
 	return 0;
       onedig_t r = digit_div (dig, len, b);
-      p[--l] = (char)(r < 10 ? r + '0' : 'A' + r - 10);
+      p[--l] = static_cast<char>(r < 10 ? r + '0' : 'A' + r - 10);
       if (dig[len-1] == 0)
 	--len;
     }
