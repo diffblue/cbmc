@@ -222,9 +222,7 @@ void rd_range_domaint::transform_function_call(
   else
   {
     // handle return values of undefined functions
-    const code_function_callt &code=to_code_function_call(from->code);
-
-    if(code.lhs().is_not_nil())
+    if(to_code_function_call(from->code).lhs().is_not_nil())
       transform_assign(ns, from, from, rd);
   }
 }
