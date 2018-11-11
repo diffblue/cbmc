@@ -1,5 +1,5 @@
 // $Id: bigint-func.cc,v 1.1.1.1 2002-06-13 22:00:30 kroening Exp $
-
+// Author: Dirk Zoller
 // References:
 //
 // [1] Hüttenhofer/Lesch/Peyerimhoff, Mathematik in Anwendung mit C++
