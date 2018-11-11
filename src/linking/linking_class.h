@@ -112,25 +112,21 @@ protected:
     const symbolt &new_symbol);
 
   std::string expr_to_string(
-    const namespacet &ns,
     const irep_idt &identifier,
     const exprt &expr) const;
 
   std::string type_to_string(
-    const namespacet &ns,
     const irep_idt &identifier,
     const typet &type) const;
 
   std::string type_to_string_verbose(
-    const namespacet &ns,
     const symbolt &symbol,
     const typet &type) const;
 
   std::string type_to_string_verbose(
-    const namespacet &ns,
     const symbolt &symbol) const
   {
-    return type_to_string_verbose(ns, symbol, symbol.type);
+    return type_to_string_verbose(symbol, symbol.type);
   }
 
   void detailed_conflict_report_rec(
