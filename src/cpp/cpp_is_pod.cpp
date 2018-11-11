@@ -49,11 +49,14 @@ bool cpp_typecheckt::cpp_is_pod(const typet &type) const
         if(c.get_bool(ID_is_virtual))
           return false;
 
-        const typet &return_type=to_code_type(sub_type).return_type();
+        const typet &comp_return_type = to_code_type(sub_type).return_type();
 
-        if(return_type.id()==ID_constructor ||
-           return_type.id()==ID_destructor)
+        if(
+          comp_return_type.id() == ID_constructor ||
+          comp_return_type.id() == ID_destructor)
+        {
           return false;
+        }
       }
       else if(c.get(ID_access) != ID_public && !c.get_bool(ID_is_static))
         return false;
