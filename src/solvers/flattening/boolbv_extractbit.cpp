@@ -85,6 +85,4 @@ literalt boolbvt::convert_extractbit(const extractbit_exprt &expr)
       return literal;
     }
   }
-
-  return SUB::convert_rest(expr);
 }
