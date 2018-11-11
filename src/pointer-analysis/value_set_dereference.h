@@ -113,10 +113,7 @@ private:
   /// \param what: value set entry to convert to an expression: either
   ///   ID_unknown, ID_invalid, or an object_descriptor_exprt giving a referred
   ///   object and offset.
-  /// \param mode: whether the pointer is being read or written; used to create
-  ///   pointer validity checks if need be
   /// \param pointer: pointer expression that may point to `what`
-  /// \param guard: guard under which the pointer is dereferenced
   /// \return
   ///    * If we were explicitly instructed to ignore `what` as a possible
   ///        pointer target: a `valuet` with `ignore` = true, and `value` and
@@ -128,11 +125,7 @@ private:
   ///        `{.value = global, .pointer_guard = (pointer_expr == &global)}`
   ///    * Otherwise, if we couldn't build an expression (e.g. for `what` ==
   ///        ID_unknown), a `valuet` with nil `value` and `ignore` == false.
-  valuet build_reference_to(
-    const exprt &what,
-    const modet mode,
-    const exprt &pointer,
-    const guardt &guard);
+  valuet build_reference_to(const exprt &what, const exprt &pointer);
 
   bool get_value_guard(
     const exprt &symbol,
@@ -141,22 +134,13 @@ private:
 
   static const exprt &get_symbol(const exprt &object);
 
-  bool memory_model(
-    exprt &value,
-    const typet &type,
-    const guardt &guard,
-    const exprt &offset);
+  bool memory_model(exprt &value, const typet &type, const exprt &offset);
 
-  bool memory_model_conversion(
-    exprt &value,
-    const typet &type,
-    const guardt &guard,
-    const exprt &offset);
+  bool memory_model_conversion(exprt &value, const typet &type);
 
   bool memory_model_bytes(
     exprt &value,
     const typet &type,
-    const guardt &guard,
     const exprt &offset);
 };
 

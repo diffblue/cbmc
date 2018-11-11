@@ -75,22 +75,22 @@ exprt value_set_dereferencet::dereference(
   // type of the object
   const typet &type=pointer.type().subtype();
 
-  #if 0
+#if 0
   std::cout << "DEREF: " << format(pointer) << '\n';
-  #endif
+#endif
 
   // collect objects the pointer may point to
   value_setst::valuest points_to_set;
 
   dereference_callback.get_value_set(pointer, points_to_set);
 
-  #if 0
+#if 0
   for(value_setst::valuest::const_iterator
       it=points_to_set.begin();
       it!=points_to_set.end();
       it++)
     std::cout << "P: " << format(*it) << '\n';
-  #endif
+#endif
 
   // get the values of these
 
@@ -101,15 +101,15 @@ exprt value_set_dereferencet::dereference(
       it!=points_to_set.end();
       it++)
   {
-    valuet value=build_reference_to(*it, mode, pointer, guard);
+    valuet value = build_reference_to(*it, pointer);
 
-    #if 0
+#if 0
     std::cout << "V: " << format(value.pointer_guard) << " --> ";
     std::cout << format(value.value);
     if(value.ignore)
       std::cout << " (ignored)";
     std::cout << '\n';
-    #endif
+#endif
 
     if(!value.ignore)
       values.push_back(value);
@@ -270,9 +270,7 @@ bool value_set_dereferencet::dereference_type_compare(
 
 value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
   const exprt &what,
-  const modet mode,
-  const exprt &pointer_expr,
-  const guardt &guard)
+  const exprt &pointer_expr)
 {
   const typet &dereference_type=
     ns.follow(pointer_expr.type()).subtype();
@@ -397,9 +395,6 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
       result.pointer_guard=same_object(pointer_expr, object_pointer);
     }
 
-    guardt tmp_guard(guard);
-    tmp_guard.add(result.pointer_guard);
-
     const typet &object_type=ns.follow(object.type());
     const typet &root_object_type=ns.follow(root_object.type());
 
@@ -491,7 +486,7 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
       else
         offset=o.offset();
 
-      if(memory_model(result.value, dereference_type, tmp_guard, offset))
+      if(memory_model(result.value, dereference_type, offset))
       {
         // ok, done
       }
@@ -518,7 +513,6 @@ static bool is_a_bv_type(const typet &type)
 bool value_set_dereferencet::memory_model(
   exprt &value,
   const typet &to_type,
-  const guardt &guard,
   const exprt &offset)
 {
   // we will allow more or less arbitrary pointer type cast
@@ -542,7 +536,7 @@ bool value_set_dereferencet::memory_model(
       {
       }
       else
-        return memory_model_conversion(value, to_type, guard, offset);
+        return memory_model_conversion(value, to_type);
     }
   }
 
@@ -552,19 +546,17 @@ bool value_set_dereferencet::memory_model(
      to_type.id()==ID_pointer)
   {
     if(pointer_offset_bits(from_type, ns) == pointer_offset_bits(to_type, ns))
-      return memory_model_conversion(value, to_type, guard, offset);
+      return memory_model_conversion(value, to_type);
   }
 
   // otherwise, we will stitch it together from bytes
 
-  return memory_model_bytes(value, to_type, guard, offset);
+  return memory_model_bytes(value, to_type, offset);
 }
 
 bool value_set_dereferencet::memory_model_conversion(
   exprt &value,
-  const typet &to_type,
-  const guardt &guard,
-  const exprt &offset)
+  const typet &to_type)
 {
   // only doing type conversion
   // just do the typecast
@@ -575,7 +567,6 @@ bool value_set_dereferencet::memory_model_conversion(
 bool value_set_dereferencet::memory_model_bytes(
   exprt &value,
   const typet &to_type,
-  const guardt &guard,
   const exprt &offset)
 {
   const typet from_type=value.type();
