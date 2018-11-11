@@ -306,7 +306,7 @@ void cpp_typecheckt::zero_initializer(
     const auto value = ::zero_initializer(final_type, source_location, *this);
     if(!value.has_value())
     {
-      err_location(source_location);
+      error().source_location = source_location;
       error() << "cannot zero-initialize `" << to_string(final_type) << "'"
               << eom;
       throw 0;
