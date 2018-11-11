@@ -488,16 +488,16 @@ void c_typecheck_baset::typecheck_code_type(code_typet &type)
   // "A function declarator shall not specify a return type that
   // is a function type or an array type."
 
-  const typet &return_type=follow(type.return_type());
+  const typet &decl_return_type = follow(type.return_type());
 
-  if(return_type.id()==ID_array)
+  if(decl_return_type.id() == ID_array)
   {
     error().source_location=type.source_location();
     error() << "function must not return array" << eom;
     throw 0;
   }
 
-  if(return_type.id()==ID_code)
+  if(decl_return_type.id() == ID_code)
   {
     error().source_location=type.source_location();
     error() << "function must not return function type" << eom;
