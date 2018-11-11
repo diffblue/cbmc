@@ -302,18 +302,18 @@ void c_typecheck_baset::typecheck_decl(codet &code)
     }
     else
     {
-      code_declt code(symbol.symbol_expr());
-      code.add_source_location()=symbol.location;
-      code.symbol().add_source_location()=symbol.location;
+      code_declt decl(symbol.symbol_expr());
+      decl.add_source_location() = symbol.location;
+      decl.symbol().add_source_location() = symbol.location;
 
       // add initializer, if any
       if(symbol.value.is_not_nil())
       {
-        code.operands().resize(2);
-        code.op1()=symbol.value;
+        decl.operands().resize(2);
+        decl.op1() = symbol.value;
       }
 
-      new_code.push_back(code);
+      new_code.push_back(decl);
     }
   }
 
