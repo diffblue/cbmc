@@ -203,14 +203,14 @@ std::set<exprt> custom_bitvector_analysist::aliases(
   {
     exprt pointer=to_dereference_expr(src).pointer();
 
-    std::set<exprt> pointer_set=
+    const std::set<exprt> alias_set =
       local_may_alias_factory(loc).get(loc, pointer);
 
     std::set<exprt> result;
 
-    for(const auto &pointer : pointer_set)
-      if(pointer.type().id()==ID_pointer)
-        result.insert(dereference_exprt(pointer));
+    for(const auto &alias : alias_set)
+      if(alias.type().id() == ID_pointer)
+        result.insert(dereference_exprt(alias));
 
     result.insert(src);
 
@@ -261,8 +261,7 @@ void custom_bitvector_domaint::assign_struct_rec(
     {
       dereference_exprt lhs_deref(lhs);
       dereference_exprt rhs_deref(rhs);
-      vectorst rhs_vectors=get_rhs(rhs_deref);
-      assign_lhs(lhs_deref, rhs_vectors);
+      assign_lhs(lhs_deref, get_rhs(rhs_deref));
     }
   }
 }
@@ -378,9 +377,9 @@ void custom_bitvector_domaint::transform(
                 // may alias other stuff
                 std::set<exprt> lhs_set=cba.aliases(deref, from);
 
-                for(const auto &lhs : lhs_set)
+                for(const auto &l : lhs_set)
                 {
-                  set_bit(lhs, bit_nr, mode);
+                  set_bit(l, bit_nr, mode);
                 }
               }
             }
@@ -436,8 +435,7 @@ void custom_bitvector_domaint::transform(
               {
                 dereference_exprt lhs_deref(p);
                 dereference_exprt rhs_deref(*arg_it);
-                vectorst rhs_vectors=get_rhs(rhs_deref);
-                assign_lhs(lhs_deref, rhs_vectors);
+                assign_lhs(lhs_deref, get_rhs(rhs_deref));
               }
 
               ++arg_it;
@@ -511,9 +509,9 @@ void custom_bitvector_domaint::transform(
             // may alias other stuff
             std::set<exprt> lhs_set=cba.aliases(deref, from);
 
-            for(const auto &lhs : lhs_set)
+            for(const auto &l : lhs_set)
             {
-              set_bit(lhs, bit_nr, mode);
+              set_bit(l, bit_nr, mode);
             }
           }
         }
