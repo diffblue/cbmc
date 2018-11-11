@@ -293,7 +293,6 @@ protected:
 
   void save_stack_entries(
     const std::string &,
-    const typet &,
     code_blockt &,
     const bytecode_write_typet,
     const irep_idt &);

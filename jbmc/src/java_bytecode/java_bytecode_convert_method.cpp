@@ -2535,7 +2535,6 @@ code_blockt java_bytecode_convert_methodt::convert_putstatic(
 
   save_stack_entries(
     "stack_static_field",
-    symbol_expr.type(),
     block,
     bytecode_write_typet::STATIC_FIELD,
     symbol_expr.get_identifier());
@@ -2550,7 +2549,6 @@ code_blockt java_bytecode_convert_methodt::convert_putfield(
   code_blockt block;
   save_stack_entries(
     "stack_field",
-    op[1].type(),
     block,
     bytecode_write_typet::FIELD,
     arg0.get(ID_component_name));
@@ -2684,7 +2682,6 @@ code_blockt java_bytecode_convert_methodt::convert_iinc(
   const exprt &locvar = variable(arg0, 'i', address, NO_CAST);
   save_stack_entries(
     "stack_iinc",
-    java_int_type(),
     block,
     bytecode_write_typet::VARIABLE,
     to_symbol_expr(locvar).get_identifier());
@@ -2850,7 +2847,6 @@ code_blockt java_bytecode_convert_methodt::convert_store(
 
   save_stack_entries(
     "stack_store",
-    toassign.type(),
     block,
     bytecode_write_typet::VARIABLE,
     var_name);
@@ -2884,7 +2880,7 @@ code_blockt java_bytecode_convert_methodt::convert_astore(
   block.add_source_location() = location;
 
   save_stack_entries(
-    "stack_astore", element_type, block, bytecode_write_typet::ARRAY_REF, "");
+    "stack_astore", block, bytecode_write_typet::ARRAY_REF, "");
 
   code_assignt array_put(element, op[2]);
   array_put.add_source_location() = location;
@@ -3132,13 +3128,11 @@ irep_idt java_bytecode_convert_methodt::get_static_field(
 /// Create temporary variables if a write instruction can have undesired side-
 /// effects.
 /// \param tmp_var_prefix: The prefix string to use for new temporary variables
-/// \param tmp_var_type: The type of the temporary variable.
 /// \param[out] block: The code block the assignment is added to if required.
 /// \param write_type: The enumeration type of the write instruction.
 /// \param identifier: The identifier of the symbol in the write instruction.
 void java_bytecode_convert_methodt::save_stack_entries(
   const std::string &tmp_var_prefix,
-  const typet &tmp_var_type,
   code_blockt &block,
   const bytecode_write_typet write_type,
   const irep_idt &identifier)
