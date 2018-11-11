@@ -493,8 +493,25 @@ int run(
   #else
   std::string command;
 
+  bool first = true;
+
+  // note we use 'what' instead of 'argv[0]' as the name of the executable
   for(const auto &arg : argv)
-    command += " " + shell_quote(arg);
+  {
+    if(first) // this is argv[0]
+    {
+      command += shell_quote(what);
+      first = false;
+    }
+    else
+      command += " " + shell_quote(arg);
+  }
+
+  if(!std_input.empty())
+    command += " < " + shell_quote(std_input);
+
+  if(!std_error.empty())
+    command += " 2> " + shell_quote(std_error);
 
   FILE *stream=popen(command.c_str(), "r");
 
