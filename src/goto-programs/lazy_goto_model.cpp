@@ -247,16 +247,16 @@ void lazy_goto_modelt::load_all_functions() const
 bool lazy_goto_modelt::finalize()
 {
   messaget msg(message_handler);
-  journalling_symbol_tablet symbol_table=
-    journalling_symbol_tablet::wrap(this->symbol_table);
-  if(language_files.final(symbol_table))
+  journalling_symbol_tablet j_symbol_table =
+    journalling_symbol_tablet::wrap(symbol_table);
+  if(language_files.final(j_symbol_table))
   {
     msg.error() << "CONVERSION ERROR" << messaget::eom;
     return true;
   }
-  for(const irep_idt &updated_symbol_id : symbol_table.get_updated())
+  for(const irep_idt &updated_symbol_id : j_symbol_table.get_updated())
   {
-    if(symbol_table.lookup_ref(updated_symbol_id).is_function())
+    if(j_symbol_table.lookup_ref(updated_symbol_id).is_function())
     {
       // Re-convert any that already exist
       goto_functions.unload(updated_symbol_id);
