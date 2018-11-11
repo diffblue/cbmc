@@ -29,25 +29,25 @@ public:
 
   enum lookup_kindt { SCOPE_ONLY, QUALIFIED, RECURSIVE };
 
-  id_sett lookup(const irep_idt &base_name, lookup_kindt kind)
+  id_sett lookup(const irep_idt &base_name_to_lookup, lookup_kindt kind)
   {
     id_sett result;
-    lookup_rec(base_name, kind, result);
+    lookup_rec(base_name_to_lookup, kind, result);
     return result;
   }
 
   id_sett lookup(
-    const irep_idt &base_name,
+    const irep_idt &base_name_to_lookup,
     lookup_kindt kind,
-    cpp_idt::id_classt id_class)
+    cpp_idt::id_classt identifier_class)
   {
     id_sett result;
-    lookup_rec(base_name, kind, id_class, result);
+    lookup_rec(base_name_to_lookup, kind, identifier_class, result);
     return result;
   }
 
   id_sett
-  lookup_identifier(const irep_idt &identifier, cpp_idt::id_classt id_class);
+  lookup_identifier(const irep_idt &id, cpp_idt::id_classt identifier_class);
 
   cpp_idt &insert(const irep_idt &_base_name)
   {
@@ -72,7 +72,7 @@ public:
     return it->second;
   }
 
-  bool contains(const irep_idt &base_name);
+  bool contains(const irep_idt &base_name_to_lookup);
 
   bool is_root_scope() const
   {
