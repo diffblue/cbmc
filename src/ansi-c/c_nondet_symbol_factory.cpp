@@ -58,6 +58,19 @@ public:
     const exprt &expr,
     const std::size_t depth = 0,
     recursion_sett recursion_set = recursion_sett());
+
+private:
+  /// Generate initialisation code for each array element
+  /// \param assignments: The code block to add code to
+  /// \param expr: An expression of array type
+  /// \param depth: The struct recursion depth
+  /// \param recursion_set: The struct recursion set
+  /// \see gen_nondet_init For the meaning of the last 2 parameters
+  void gen_nondet_array_init(
+    code_blockt &assignments,
+    const exprt &expr,
+    std::size_t depth,
+    const recursion_sett &recursion_set);
 };
 
 /// Create a symbol for a pointer to point to
@@ -201,6 +214,10 @@ void symbol_factoryt::gen_nondet_init(
       gen_nondet_init(assignments, me, depth, recursion_set);
     }
   }
+  else if(type.id() == ID_array)
+  {
+    gen_nondet_array_init(assignments, expr, depth, recursion_set);
+  }
   else
   {
     // If type is a ID_c_bool then add the following code to assignments:
@@ -213,6 +230,25 @@ void symbol_factoryt::gen_nondet_init(
     assign.add_source_location()=loc;
 
     assignments.add(std::move(assign));
+  }
+}
+
+void symbol_factoryt::gen_nondet_array_init(
+  code_blockt &assignments,
+  const exprt &expr,
+  std::size_t depth,
+  const recursion_sett &recursion_set)
+{
+  auto const &array_type = to_array_type(expr.type());
+  auto const array_size = numeric_cast_v<size_t>(array_type.size());
+  DATA_INVARIANT(array_size > 0, "Arrays should have positive size");
+  for(size_t index = 0; index < array_size; ++index)
+  {
+    gen_nondet_init(
+      assignments,
+      index_exprt(expr, from_integer(index, size_type())),
+      depth,
+      recursion_set);
   }
 }
 
