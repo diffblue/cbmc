@@ -613,8 +613,8 @@ void cpp_typecheckt::typecheck_compound_declarator(
 
         // change the type of the 'this' pointer
         code_typet &code_type=to_code_type(func_symb.type);
-        code_typet::parametert &arg= code_type.parameters().front();
-        arg.type().subtype().set(ID_identifier, virtual_base);
+        code_typet::parametert &this_parameter = code_type.parameters().front();
+        this_parameter.type().subtype().set(ID_identifier, virtual_base);
 
         // create symbols for the parameters
         code_typet::parameterst &args=code_type.parameters();
