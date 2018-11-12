@@ -105,7 +105,7 @@ int linker_script_merget::add_linker_script_definitions()
     return fail;
   }
 
-  fail = compiler.write_object_file(goto_binary, original_goto_model);
+  fail = compiler.write_bin_object_file(goto_binary, original_goto_model);
 
   if(fail!=0)
     error() << "Could not write linkerscript-augmented binary" << eom;

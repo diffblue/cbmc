@@ -71,8 +71,6 @@ public:
 
   bool parse_source(const std::string &);
 
-  bool write_object_file(const std::string &, const goto_modelt &);
-
   bool write_bin_object_file(const std::string &, const goto_modelt &);
 
   /// \brief Has this compiler written any object files?
