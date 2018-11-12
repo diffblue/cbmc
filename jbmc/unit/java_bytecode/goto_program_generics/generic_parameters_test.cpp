@@ -71,7 +71,6 @@ SCENARIO(
             {},
             "array_field",
             "java::array[reference]",
-            "java::IWrapper",
             entry_point_code,
             symbol_table);
         }

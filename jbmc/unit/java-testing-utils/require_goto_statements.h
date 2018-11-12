@@ -91,7 +91,6 @@ const irep_idt &require_struct_array_component_assignment(
   const optionalt<irep_idt> &superclass_name,
   const irep_idt &array_component_name,
   const irep_idt &array_type_name,
-  const irep_idt &array_component_element_type_name,
   const std::vector<codet> &entry_point_instructions,
   const symbol_tablet &symbol_table);
 

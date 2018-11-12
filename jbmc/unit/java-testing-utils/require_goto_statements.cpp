@@ -383,7 +383,6 @@ const irep_idt &require_goto_statements::require_struct_component_assignment(
 /// \param superclass_name The name of its superclass (if given)
 /// \param array_component_name The name of the array field of the superclass
 /// \param array_type_name The type of the array, e.g., java::array[reference]
-/// \param array_component_element_type_name The element type of the array
 /// \param entry_point_instructions The statements to look through
 /// \param symbol_table: A symbol table to enable type lookups
 /// \return The identifier of the variable assigned to the field
@@ -393,7 +392,6 @@ require_goto_statements::require_struct_array_component_assignment(
   const optionalt<irep_idt> &superclass_name,
   const irep_idt &array_component_name,
   const irep_idt &array_type_name,
-  const irep_idt &array_component_element_type_name,
   const std::vector<codet> &entry_point_instructions,
   const symbol_tablet &symbol_table)
 {
