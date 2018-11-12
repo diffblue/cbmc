@@ -155,7 +155,7 @@ void cpp_typecheckt::add_base_components(
 
     const symbolt &symb = lookup(b.type());
 
-    const bool is_virtual = b.get_bool(ID_virtual);
+    const bool is_virtual_base = b.get_bool(ID_virtual);
 
     // recursive call
     add_base_components(
@@ -164,7 +164,7 @@ void cpp_typecheckt::add_base_components(
       to,
       bases,
       vbases,
-      is_virtual);
+      is_virtual_base);
   }
 
   // add the components
