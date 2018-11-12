@@ -232,12 +232,11 @@ protected:
   std::string template_suffix(
     const cpp_template_args_tct &template_args);
 
-  void convert_parameters(
-    const irep_idt &mode,
-    code_typet &function_type);
+  void
+  convert_parameters(const irep_idt &current_mode, code_typet &function_type);
 
   void convert_parameter(
-    const irep_idt &mode,
+    const irep_idt &current_mode,
     code_typet::parametert &parameter);
 
   //

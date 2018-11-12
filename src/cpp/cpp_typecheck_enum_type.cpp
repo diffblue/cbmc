@@ -58,7 +58,7 @@ void cpp_typecheckt::typecheck_enum_body(symbolt &enum_symbol)
     symbol.value=value_expr;
     symbol.location=
       static_cast<const source_locationt &>(it->find(ID_C_source_location));
-    symbol.mode=ID_cpp;
+    symbol.mode = enum_symbol.mode;
     symbol.module=module;
     symbol.type=enum_tag_type;
     symbol.is_type=false;

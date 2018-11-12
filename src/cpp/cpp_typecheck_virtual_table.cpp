@@ -71,7 +71,7 @@ void cpp_typecheckt::do_virtual_table(const symbolt &symbol)
       id2string(vt_symb_type.name) + "@"+ id2string(symbol.name);
     vt_symb_var.base_name=
       id2string(vt_symb_type.base_name) + "@" + id2string(symbol.base_name);
-    vt_symb_var.mode=ID_cpp;
+    vt_symb_var.mode = symbol.mode;
     vt_symb_var.module=module;
     vt_symb_var.location=vt_symb_type.location;
     vt_symb_var.type = struct_tag_typet(vt_symb_type.name);
