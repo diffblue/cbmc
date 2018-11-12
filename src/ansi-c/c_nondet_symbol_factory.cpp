@@ -58,6 +58,13 @@ public:
     const exprt &expr,
     const std::size_t depth = 0,
     recursion_sett recursion_set = recursion_sett());
+
+private:
+  void gen_nondet_array_init(
+    code_blockt &assignments,
+    const exprt &expr,
+    std::size_t depth,
+    const recursion_sett &recursion_set);
 };
 
 /// Create a symbol for a pointer to point to
@@ -201,6 +208,10 @@ void symbol_factoryt::gen_nondet_init(
       gen_nondet_init(assignments, me, depth, recursion_set);
     }
   }
+  else if(type.id() == ID_array)
+  {
+    gen_nondet_array_init(assignments, expr, depth, recursion_set);
+  }
   else
   {
     // If type is a ID_c_bool then add the following code to assignments:
@@ -213,6 +224,25 @@ void symbol_factoryt::gen_nondet_init(
     assign.add_source_location()=loc;
 
     assignments.add(std::move(assign));
+  }
+}
+
+void symbol_factoryt::gen_nondet_array_init(
+  code_blockt &assignments,
+  const exprt &expr,
+  std::size_t depth,
+  const recursion_sett &recursion_set)
+{
+  auto const &array_type = to_array_type(expr.type());
+  auto const array_size = numeric_cast_v<mp_integer>(array_type.size());
+  DATA_INVARIANT(array_size >= 0, "Arrays should have non-negative size");
+  for(auto index = mp_integer(0); index < array_size; ++index)
+  {
+    gen_nondet_init(
+      assignments,
+      index_exprt{expr, from_integer(index, size_type())},
+      depth,
+      recursion_set);
   }
 }
 

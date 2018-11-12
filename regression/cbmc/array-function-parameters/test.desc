@@ -1,0 +1,5 @@
+CORE
+test.c
+--function test --min-null-tree-depth 2
+\[test.assertion.1\] line \d+ assertion Test.lists\[1\]->next: SUCCESS
+--
