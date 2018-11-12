@@ -7,6 +7,7 @@ Author: Daniel Poetzl
 \*******************************************************************/
 
 #include "string_utils.h"
+#include "exception_utils.h"
 #include "invariant.h"
 
 #include <cassert>
@@ -109,7 +110,14 @@ void split_string(
   std::vector<std::string> result;
 
   split_string(s, delim, result, strip);
-  CHECK_RETURN(result.size() == 2);
+  if(result.size() != 2)
+  {
+    throw deserialization_exceptiont{"expected string `" + s +
+                                     "' to contain two substrings "
+                                     "delimited by " +
+                                     delim + " but has " +
+                                     std::to_string(result.size())};
+  }
 
   left=result[0];
   right=result[1];
