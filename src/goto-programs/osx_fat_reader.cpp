@@ -88,5 +88,7 @@ bool osx_fat_readert::extract_gb(
 {
   PRECONDITION(has_gb_arch);
 
-  return run("lipo", {"lipo", "-thin", "hppa7100LC", "-output", dest, source});
+  return run(
+           "lipo", {"lipo", "-thin", "hppa7100LC", "-output", dest, source}) !=
+         0;
 }
