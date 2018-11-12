@@ -135,7 +135,11 @@ bool read_goto_binary(
     if(osx_fat_reader.has_gb())
     {
       temporary_filet tempname("tmp.goto-binary", ".gb");
-      osx_fat_reader.extract_gb(filename, tempname());
+      if(osx_fat_reader.extract_gb(filename, tempname()))
+      {
+        message.error() << "failed to extract goto binary" << messaget::eom;
+        return true;
+      }
 
       std::ifstream temp_in(tempname(), std::ios::binary);
       if(!temp_in)
