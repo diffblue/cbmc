@@ -781,8 +781,7 @@ cpp_scopet &cpp_typecheckt::typecheck_template_parameters(
     {
       // The type is not checked, as it might depend
       // on earlier parameters.
-      typet type=declaration.type();
-      parameter=symbol_exprt(identifier, type);
+      parameter = symbol_exprt(identifier, declaration.type());
     }
 
     // There might be a default type or default value.
