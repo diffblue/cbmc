@@ -81,7 +81,7 @@ static bool read_bin_goto_object_v4(
 
   count=irepconverter.read_gb_word(in); // # of functions
 
-  for(std::size_t i=0; i<count; i++)
+  for(std::size_t fct_index = 0; fct_index < count; ++fct_index)
   {
     irep_idt fname=irepconverter.read_gb_string(in);
     goto_functionst::goto_functiont &f = functions.function_map[fname];
@@ -94,7 +94,7 @@ static bool read_bin_goto_object_v4(
     bool hidden=false;
 
     std::size_t ins_count = irepconverter.read_gb_word(in); // # of instructions
-    for(std::size_t i=0; i<ins_count; i++)
+    for(std::size_t ins_index = 0; ins_index < ins_count; ++ins_index)
     {
       goto_programt::targett itarget = f.body.add_instruction();
       goto_programt::instructiont &instruction=*itarget;
