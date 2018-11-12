@@ -940,7 +940,7 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
       // type parameters in it). Needs to be checked in scope
       // of template.
       {
-        cpp_save_scopet cpp_saved_scope(cpp_scopes);
+        cpp_save_scopet cpp_saved_scope_before_parameter_typecheck(cpp_scopes);
         cpp_idt *template_scope=cpp_scopes.id_map[template_symbol.name];
         INVARIANT_STRUCTURED(
           template_scope!=nullptr,

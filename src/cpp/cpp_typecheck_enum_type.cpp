@@ -197,7 +197,7 @@ void cpp_typecheckt::typecheck_enum_type(typet &type)
     scope_identifier.id_class=cpp_idt::id_classt::CLASS;
     scope_identifier.is_scope = true;
 
-    cpp_save_scopet save_scope(cpp_scopes);
+    cpp_save_scopet save_scope_before_enum_typecheck(cpp_scopes);
 
     if(new_symbol->type.get_bool(ID_C_class))
       cpp_scopes.go_to(scope_identifier);
