@@ -30,7 +30,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "compute_called_functions.h"
 #include "remove_const_function_pointers.h"
 
-class remove_function_pointerst:public messaget
+class remove_function_pointerst
 {
 public:
   remove_function_pointerst(
@@ -59,6 +59,7 @@ public:
     const functionst &functions);
 
 protected:
+  messaget log;
   const namespacet ns;
   symbol_tablet &symbol_table;
   bool add_safety_assertion;
@@ -103,13 +104,14 @@ protected:
 remove_function_pointerst::remove_function_pointerst(
   message_handlert &_message_handler,
   symbol_tablet &_symbol_table,
-  bool _add_safety_assertion, bool only_resolve_const_fps,
-  const goto_functionst &goto_functions):
-  messaget(_message_handler),
-  ns(_symbol_table),
-  symbol_table(_symbol_table),
-  add_safety_assertion(_add_safety_assertion),
-  only_resolve_const_fps(only_resolve_const_fps)
+  bool _add_safety_assertion,
+  bool only_resolve_const_fps,
+  const goto_functionst &goto_functions)
+  : log(_message_handler),
+    ns(_symbol_table),
+    symbol_table(_symbol_table),
+    add_safety_assertion(_add_safety_assertion),
+    only_resolve_const_fps(only_resolve_const_fps)
 {
   for(const auto &s : symbol_table.symbols)
     compute_address_taken_functions(s.second.value, address_taken);
@@ -297,15 +299,16 @@ void remove_function_pointerst::remove_function_pointer(
   const auto does_remove_const = const_removal_check();
   if(does_remove_const.first)
   {
-    warning().source_location = does_remove_const.second;
-    warning() << "cast from const to non-const pointer found, only worst case"
-              << " function pointer removal will be done." << eom;
+    log.warning().source_location = does_remove_const.second;
+    log.warning() << "cast from const to non-const pointer found, "
+                  << "only worst case function pointer removal will be done."
+                  << messaget::eom;
     found_functions=false;
   }
   else
   {
     remove_const_function_pointerst fpr(
-    get_message_handler(), ns, symbol_table);
+      log.get_message_handler(), ns, symbol_table);
 
     found_functions=fpr(pointer, functions);
 
@@ -448,14 +451,13 @@ void remove_function_pointerst::remove_function_pointer(
   target->type=OTHER;
 
   // report statistics
-  statistics().source_location=target->source_location;
-  statistics() << "replacing function pointer by "
-               << functions.size() << " possible targets" << eom;
+  log.statistics().source_location = target->source_location;
+  log.statistics() << "replacing function pointer by " << functions.size()
+                   << " possible targets" << messaget::eom;
 
   // list the names of functions when verbosity is at debug level
-  conditional_output(
-    debug(),
-    [&functions](mstreamt &mstream) {
+  log.conditional_output(
+    log.debug(), [&functions](messaget::mstreamt &mstream) {
       mstream << "targets: ";
 
       bool first = true;
@@ -468,7 +470,7 @@ void remove_function_pointerst::remove_function_pointer(
         first = false;
       }
 
-      mstream << eom;
+      mstream << messaget::eom;
     });
 }
 
