@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "invariant.h"
 #include "json.h"
+#include "ostream_redactedt.h"
 #include "source_location.h"
 
 class xmlt;
@@ -185,7 +186,7 @@ public:
 
   virtual ~messaget();
 
-  class mstreamt:public std::ostringstream
+  class mstreamt : public ostream_redactedt
   {
   public:
     mstreamt(
@@ -236,7 +237,7 @@ public:
     template <class T>
     mstreamt &operator << (const T &x)
     {
-      static_cast<std::ostream &>(*this) << x;
+      redact(x);
       return *this;
     }
 

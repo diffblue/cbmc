@@ -29,7 +29,7 @@ ui_message_handlert::ui_message_handlert(
     _ui(__ui),
     always_flush(always_flush),
     time(timestampert::make(clock_type)),
-    out(std::cout),
+    out(ostream_redacted_cout),
     json_stream(nullptr)
 {
   switch(_ui)

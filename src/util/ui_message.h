@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "cout_message.h"
 #include "json_stream.h"
+#include "ostream_redactedt.h"
 #include "timestamper.h"
 
 class ui_message_handlert : public message_handlert
@@ -46,7 +47,7 @@ protected:
   uit _ui;
   const bool always_flush;
   std::unique_ptr<const timestampert> time;
-  std::ostream &out;
+  ostream_redactedt &out;
   std::unique_ptr<json_stream_arrayt> json_stream;
 
   ui_message_handlert(

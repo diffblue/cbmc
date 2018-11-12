@@ -20,6 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/exception_utils.h>
 #include <util/exit_codes.h>
 #include <util/invariant.h>
+#include <util/ostream_redactedt.h>
 #include <util/unicode.h>
 #include <util/version.h>
 
@@ -403,7 +404,10 @@ int cbmc_parse_optionst::doit()
 {
   if(cmdline.isset("version"))
   {
-    std::cout << CBMC_VERSION << '\n';
+    //redact, but disable for next
+    ostream_redacted_cout<< redact_off_next << CBMC_VERSION << '\n';
+    //always disable redaction for next is also possible
+    ostream_redact_off_cout<<CBMC_VERSION << '\n';
     return CPROVER_EXIT_SUCCESS;
   }
 
