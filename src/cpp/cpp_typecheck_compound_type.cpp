@@ -621,15 +621,16 @@ void cpp_typecheckt::typecheck_compound_declarator(
         std::size_t i=0;
         for(auto &arg : args)
         {
-          irep_idt base_name=arg.get_base_name();
+          irep_idt param_base_name = arg.get_base_name();
 
-          if(base_name.empty())
-            base_name="arg"+std::to_string(i++);
+          if(param_base_name.empty())
+            param_base_name = "arg" + std::to_string(i++);
 
           symbolt arg_symb;
-          arg_symb.name=id2string(func_symb.name) + "::"+ id2string(base_name);
-          arg_symb.base_name=base_name;
-          arg_symb.pretty_name=base_name;
+          arg_symb.name =
+            id2string(func_symb.name) + "::" + id2string(param_base_name);
+          arg_symb.base_name = param_base_name;
+          arg_symb.pretty_name = param_base_name;
           arg_symb.mode=ID_cpp;
           arg_symb.location=func_symb.location;
           arg_symb.type=arg.type();
