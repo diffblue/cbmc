@@ -79,7 +79,7 @@ bool compilet::doit()
 {
   goto_model.goto_functions.clear();
 
-  add_compiler_specific_defines(config);
+  add_compiler_specific_defines();
 
   // Parse command line for source and object file names
   for(const auto &arg : cmdline.args)
@@ -681,7 +681,7 @@ compilet::function_body_count(const goto_functionst &functions) const
   return count;
 }
 
-void compilet::add_compiler_specific_defines(configt &config) const
+void compilet::add_compiler_specific_defines() const
 {
   config.ansi_c.defines.push_back(
     std::string("__GOTO_CC_VERSION__=") + CBMC_VERSION);

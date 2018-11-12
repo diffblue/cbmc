@@ -96,7 +96,7 @@ protected:
 
   std::size_t function_body_count(const goto_functionst &) const;
 
-  void add_compiler_specific_defines(class configt &config) const;
+  void add_compiler_specific_defines() const;
 
   void convert_symbols(goto_functionst &dest);
 
