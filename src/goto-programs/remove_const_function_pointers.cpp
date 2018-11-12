@@ -697,11 +697,10 @@ bool remove_const_function_pointerst::try_resolve_dereference(
         address_of_exprt address_expr=to_address_of_expr(pointer_val);
         bool object_const=false;
         expressionst out_object_values;
-        bool resolved=
-          try_resolve_expression(
-            address_expr.object(), out_object_values, object_const);
+        const bool resolved_address = try_resolve_expression(
+          address_expr.object(), out_object_values, object_const);
 
-        if(resolved)
+        if(resolved_address)
         {
           out_expressions.insert(
             out_expressions.end(),
