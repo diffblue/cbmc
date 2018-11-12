@@ -267,18 +267,18 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
     {
       // maybe the name of the member collides with a parameter of the
       // constructor
-      symbol_expr.make_nil();
-      cpp_typecheck_fargst fargs;
       exprt dereference(
         ID_dereference, cpp_scopes.current_scope().this_expr.type().subtype());
       dereference.copy_to_operands(cpp_scopes.current_scope().this_expr);
-      fargs.add_object(dereference);
+      cpp_typecheck_fargst deref_fargs;
+      deref_fargs.add_object(dereference);
 
       {
         cpp_save_scopet cpp_saved_scope(cpp_scopes);
         cpp_scopes.go_to(
           *(cpp_scopes.id_map[cpp_scopes.current_scope().class_identifier]));
-        symbol_expr=resolve(member, cpp_typecheck_resolvet::wantt::VAR, fargs);
+        symbol_expr =
+          resolve(member, cpp_typecheck_resolvet::wantt::VAR, deref_fargs);
       }
 
       if(
