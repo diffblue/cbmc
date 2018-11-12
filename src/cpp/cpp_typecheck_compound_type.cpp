@@ -192,9 +192,9 @@ void cpp_typecheckt::typecheck_compound_type(
       if(symbol.type.id()=="incomplete_"+type.id_string())
       {
         // a previously incomplete struct/union becomes complete
-        symbolt &symbol=*symbol_table.get_writeable(symbol_name);
-        symbol.type.swap(type);
-        typecheck_compound_body(symbol);
+        symbolt &writeable_symbol = *symbol_table.get_writeable(symbol_name);
+        writeable_symbol.type.swap(type);
+        typecheck_compound_body(writeable_symbol);
       }
       else if(symbol.type.get_bool(ID_C_is_anonymous))
       {
