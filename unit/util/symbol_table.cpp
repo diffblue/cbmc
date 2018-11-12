@@ -69,10 +69,10 @@ SCENARIO("journalling_symbol_table_writer",
       }
       WHEN("Adding the same symbol again")
       {
-        auto result=symbol_table.insert(symbol);
+        const auto result_re_insert = symbol_table.insert(symbol);
         THEN("The insert should fail")
         {
-          REQUIRE(!result.second);
+          REQUIRE(!result_re_insert.second);
         }
       }
     }
@@ -106,10 +106,10 @@ SCENARIO("journalling_symbol_table_writer",
       WHEN("Moving the same symbol again")
       {
         symbolt *symbol_in_table2;
-        auto result=symbol_table.move(symbol, symbol_in_table2);
+        const auto result_move = symbol_table.move(symbol, symbol_in_table2);
         THEN("The move should fail")
         {
-          REQUIRE(result);
+          REQUIRE(result_move);
         }
         THEN("The returned pointer should match the previous move result")
         {
@@ -145,10 +145,10 @@ SCENARIO("journalling_symbol_table_writer",
       }
       WHEN("Adding the same symbol again")
       {
-        auto result=symbol_table.add(symbol);
+        auto result_add_2 = symbol_table.add(symbol);
         THEN("The insert should fail")
         {
-          REQUIRE(result);
+          REQUIRE(result_add_2);
         }
       }
     }
@@ -259,16 +259,16 @@ SCENARIO("journalling_symbol_table_writer",
     {
       symbolt symbol;
       symbol.name = symbol_name;
-      auto result=symbol_table.add(symbol);
+      const auto result_add_1 = symbol_table.add(symbol);
       symbol_table.remove(symbol.name);
-      auto result2=symbol_table.add(symbol);
+      const auto result_add_2 = symbol_table.add(symbol);
       THEN("The first add should succeed")
       {
-        REQUIRE(!result);
+        REQUIRE(!result_add_1);
       }
       THEN("The second add should succeed")
       {
-        REQUIRE(!result);
+        REQUIRE(!result_add_2);
       }
       THEN("The symbol should be journalled as updated but not removed")
       {
