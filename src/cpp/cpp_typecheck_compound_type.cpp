@@ -1591,8 +1591,9 @@ bool cpp_typecheckt::check_component_access(
   const irep_idt &struct_identifier=
     struct_union_type.get(ID_name);
 
-  cpp_scopet *pscope=&(cpp_scopes.current_scope());
-  while(!(pscope->is_root_scope()))
+  for(cpp_scopet *pscope = &(cpp_scopes.current_scope());
+      !(pscope->is_root_scope());
+      pscope = &(pscope->get_parent()))
   {
     if(pscope->is_class())
     {
@@ -1608,7 +1609,6 @@ bool cpp_typecheckt::check_component_access(
 
       else break;
     }
-    pscope=&(pscope->get_parent());
   }
 
   // check friendship
@@ -1621,17 +1621,15 @@ bool cpp_typecheckt::check_component_access(
     const cpp_scopet &friend_scope =
       cpp_scopes.get_scope(friend_symb.get(ID_identifier));
 
-    cpp_scopet *pscope=&(cpp_scopes.current_scope());
-
-    while(!(pscope->is_root_scope()))
+    for(cpp_scopet *pscope = &(cpp_scopes.current_scope());
+        !(pscope->is_root_scope());
+        pscope = &(pscope->get_parent()))
     {
       if(friend_scope.identifier==pscope->identifier)
         return false; // ok
 
       if(pscope->is_class())
         break;
-
-      pscope=&(pscope->get_parent());
     }
   }
 
