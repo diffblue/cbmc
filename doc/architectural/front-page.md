@@ -57,8 +57,8 @@ Overview of Documentation
 
 ### For users:
 
-* The \ref cbmc-user-manual "CBMC User Manual" details the capabilities of
-  CBMC and describes how to install and use these tools. It
+* The [CPROVER User Manual](http://www.cprover.org/cprover-manual/) details the
+  capabilities of CBMC and describes how to install and use these tools. It
   also covers the underlying theory and prerequisite concepts behind how
   these tools work.
 

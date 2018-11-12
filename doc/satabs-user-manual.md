@@ -16,7 +16,7 @@ integer overflow. CBMC and SATABS are therefore able to detect a class
 of bugs that has so far gone unnoticed by many other verification tools.
 This manual also covers some variants of CBMC, which includes HW-CBMC
 for
-\ref man_hard-soft-introduction "hardware/software co-verification".
+[hardware/software co-verification](http://www.cprover.org/cprover-manual/hwsw.html).
 
 ## Automatic Program Verification with SATABS
 
@@ -132,7 +132,8 @@ installed the current version.
 CBMC and SATABS have their own requirements. As an example, both CBMC
 and SATABS require a suitable preprocessor and a set of header files.
 As first step, you should therefore follow the installation instructions
-for \ref man_install-cbmc "CBMC" and \ref man_install-satabs "SATABS".
+for [CBMC](http://www.cprover.org/cprover-manual/installation-cbmc.html)
+and [SATABS](http://www.cprover.org/cprover-manual/installation-satabs.html).
 
 Important note for Windows users: Visual Studio's `cl.exe` relies on a
 complex set of environment variables to identify the target architecture
@@ -586,9 +587,9 @@ We now use static analysis to generate array bounds checks for Aeon:
     satabs *.c --pointer-check --bounds-check --show-properties
 
 SATABS will show about 300 properties in various functions (read
-\ref man_instrumentation-properties "this" for more information on the
-property instrumentation). Now consider the first few lines of the
-`main` function of Aeon:
+[this](http://www.cprover.org/cprover-manual/properties.html) for
+more information on the property instrumentation).
+Now consider the first few lines of the `main` function of Aeon:
 
     int main(int argc, char **argv)
     {
@@ -696,6 +697,7 @@ this fact defeat the purpose of static verification?
 We can make the job easier: after reducing the value of `MAX_LEN` in
 `aeon.h` to a small value, say to 10, SATABS provides a counterexample
 trace that demonstrates how the buffer overflow be reproduced. If you
-use the Eclipse plugin (as described \ref man_install-eclipse "here"),
+use the Eclipse plugin (as described
+[here](http://www.cprover.org/cprover-manual/installation-plugin.html)),
 you can step through this counterexample. The trace contains the string
 that is returned by `getenv`.
