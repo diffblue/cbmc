@@ -98,15 +98,6 @@ protected:
   void fix_return_type(
     code_function_callt &function_call,
     goto_programt &dest);
-
-  void
-  compute_address_taken_in_symbols(std::unordered_set<irep_idt> &address_taken)
-  {
-    const symbol_tablet &symbol_table=ns.get_symbol_table();
-
-    for(const auto &s : symbol_table.symbols)
-      compute_address_taken_functions(s.second.value, address_taken);
-  }
 };
 
 remove_function_pointerst::remove_function_pointerst(
@@ -120,7 +111,9 @@ remove_function_pointerst::remove_function_pointerst(
   add_safety_assertion(_add_safety_assertion),
   only_resolve_const_fps(only_resolve_const_fps)
 {
-  compute_address_taken_in_symbols(address_taken);
+  for(const auto &s : symbol_table.symbols)
+    compute_address_taken_functions(s.second.value, address_taken);
+
   compute_address_taken_functions(goto_functions, address_taken);
 
   // build type map
