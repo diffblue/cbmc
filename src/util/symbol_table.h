@@ -111,9 +111,7 @@ public:
   }
 
   /// Check that the symbol table is well-formed
-  void validate() const
-  {
-  }
+  void validate(const validation_modet vm = validation_modet::INVARIANT) const;
 };
 
 #endif // CPROVER_UTIL_SYMBOL_TABLE_H

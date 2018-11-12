@@ -3,6 +3,7 @@
 /// \file Tests for symbol_tablet
 
 #include <testing-utils/catch.hpp>
+#include <util/exception_utils.h>
 #include <util/journalling_symbol_table.h>
 
 TEST_CASE("Iterating through a symbol table", "[core][utils][symbol_tablet]")
@@ -23,6 +24,76 @@ TEST_CASE("Iterating through a symbol table", "[core][utils][symbol_tablet]")
   }
 
   REQUIRE(counter == 1);
+}
+
+SCENARIO(
+  "symbol_table_validity_checks",
+  "[core][utils][symbol_table_validity_checks]")
+{
+  GIVEN("A valid symbol table")
+  {
+    symbol_tablet symbol_table;
+
+    symbolt symbol;
+    irep_idt symbol_name = "Test";
+    symbol.name = symbol_name;
+    symbol.base_name = "TestBase";
+    symbol.module = "TestModule";
+
+    symbol_table.insert(symbol);
+
+    THEN("validate() should return")
+    {
+      symbol_table.validate(validation_modet::EXCEPTION);
+    }
+    WHEN("A symbol name is transformed without updating the symbol table")
+    {
+      symbolt &transformed_symbol = symbol_table.get_writeable_ref(symbol_name);
+      transformed_symbol.name = "TransformTest";
+
+      THEN("validate() should throw an exception")
+      {
+        REQUIRE_THROWS_AS(
+          symbol_table.validate(validation_modet::EXCEPTION),
+          incorrect_goto_program_exceptiont);
+      }
+      // Reset symbol to a valid name after the previous test
+      transformed_symbol.name = symbol_name;
+    }
+    WHEN(
+      "A symbol base_name is transformed without updating the base_name "
+      "mapping")
+    {
+      symbolt &transformed_symbol = symbol_table.get_writeable_ref(symbol_name);
+      // Transform the symbol
+      transformed_symbol.base_name = "TransformTestBase";
+
+      THEN("validate() should throw an exception")
+      {
+        REQUIRE_THROWS_AS(
+          symbol_table.validate(validation_modet::EXCEPTION),
+          incorrect_goto_program_exceptiont);
+      }
+      // Reset symbol to a valid base_name after the previous test
+      transformed_symbol.base_name = "TestBase";
+    }
+    WHEN(
+      "A symbol module identifier is transformed without updating the module "
+      "mapping")
+    {
+      symbolt &transformed_symbol = symbol_table.get_writeable_ref(symbol_name);
+      transformed_symbol.module = "TransformTestModule";
+
+      THEN("validate() should throw an exception")
+      {
+        REQUIRE_THROWS_AS(
+          symbol_table.validate(validation_modet::EXCEPTION),
+          incorrect_goto_program_exceptiont);
+      }
+      // Reset symbol to a valid module name
+      transformed_symbol.module = "TestModule";
+    }
+  }
 }
 
 SCENARIO("journalling_symbol_table_writer",
