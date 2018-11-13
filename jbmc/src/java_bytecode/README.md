@@ -55,7 +55,33 @@ behavior to provide more sophisticated type selection.
 
 \subsection java-bytecode-generic-specialization Generic specialization
 
-To be documented.
+In Java, generics are checked at compile-time for type-correctness. The generic
+type information is then removed in a process called type erasure. However,
+throwing away all this type information would be very inconvenient for our
+analysis. Therefore, when we initialize variables that have generic type we
+dynamically replace the generic parameters with their specialized types rather
+than using only the raw type. For example, consider a generic class
+`MyGeneric<T>` with a field `T myField`. When initializing a variable
+`MyGeneric<Integer> mg` we change the type of its field `mg.myField` from
+`MyGeneric::T` to `Integer`. Generic specialization is applied during pointer
+type selection (see \ref java-bytecode-pointer-type-selection).
+
+The generic specialization relies on a map that stores the concrete types of all
+generic parameters in the current scope. The map is maintained in \ref
+java_object_factoryt::generic_parameter_specialization_map. Note that not all
+generic parameters need to have a concrete type, e.g., when the method under
+test is generic. The types are removed from the map when the scope changes. In
+different depths of the scope the parameters can be specialized with different
+types so we keep a stack of types for each parameter.
+
+We use the map in \ref select_pointer_typet::specialize_generics to
+retrieve the concrete type of generic parameters such as `MyGeneric::T` and of
+arrays of generic parameters such as `MyGeneric::T[]`. Special attention
+is paid to breaking infinite recursion when searching the map, e.g.,
+`MyGeneric::T` being specialized with `MyOtherGeneric::U` and vice versa. More
+complicated generic types such as `MyGeneric<T>` are specialized indirectly
+within \ref java_object_factoryt. Their concrete types are already stored in the
+map and are retrieved when needed, e.g., to initialize their fields.
 
 \section java-bytecode-parsing Java bytecode parsing (parser, convert_class, convert_method)
 
