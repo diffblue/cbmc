@@ -112,7 +112,7 @@ list which tests it will run without actually running them.
 \subsubsection compilation-and-development-subsubsection-running-regression-tests-directly-with-test-pl Running regression tests directly with `test.pl`
 
 It can be useful to run a single test folder in isolation. This can be done by
-running `test.pl` directly. The way that `test.pl` is run varies between the
+running `regression/test.pl` directly. The way that `test.pl` is run varies between the
 different modules, and can be ascertained by looking at the `test` target in
 the makefile. The simple case is when there isn't a file called `chain.sh`.
 Then you can directly run `test.pl` on a single test folder with the
