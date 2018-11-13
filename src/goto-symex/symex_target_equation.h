@@ -29,26 +29,29 @@ class decision_proceduret;
 class namespacet;
 class prop_convt;
 
+/// Inheriting the interface of symex_targett this class represents the SSA
+/// form of the input program as a list of \ref SSA_stept. It further extends
+/// the base class by providing a conversion interface for decision procedures.
 class symex_target_equationt:public symex_targett
 {
 public:
   virtual ~symex_target_equationt() = default;
 
-  // read event
+  /// \copydoc symex_targett::shared_read()
   virtual void shared_read(
     const exprt &guard,
     const ssa_exprt &ssa_object,
     unsigned atomic_section_id,
     const sourcet &source);
 
-  // write event
+  /// \copydoc symex_targett::shared_write()
   virtual void shared_write(
     const exprt &guard,
     const ssa_exprt &ssa_object,
     unsigned atomic_section_id,
     const sourcet &source);
 
-  // assignment to a variable - lhs must be symbol
+  /// \copydoc symex_targett::assignment()
   virtual void assignment(
     const exprt &guard,
     const ssa_exprt &ssa_lhs,
@@ -58,20 +61,20 @@ public:
     const sourcet &source,
     assignment_typet assignment_type);
 
-  // declare fresh variable - lhs must be symbol
+  /// \copydoc symex_targett::decl()
   virtual void decl(
     const exprt &guard,
     const ssa_exprt &ssa_lhs,
     const sourcet &source,
     assignment_typet assignment_type);
 
-  // note the death of a variable - lhs must be symbol
+  /// \copydoc symex_targett::dead()
   virtual void dead(
     const exprt &guard,
     const ssa_exprt &ssa_lhs,
     const sourcet &source);
 
-  // record a function call
+  /// \copydoc symex_targett::function_call()
   virtual void function_call(
     const exprt &guard,
     const irep_idt &function_identifier,
@@ -79,23 +82,23 @@ public:
     const sourcet &source,
     bool hidden);
 
-  // record return from a function
+  /// \copydoc symex_targett::function_return()
   virtual void
   function_return(const exprt &guard, const sourcet &source, bool hidden);
 
-  // just record a location
+  /// \copydoc symex_targett::location()
   virtual void location(
     const exprt &guard,
     const sourcet &source);
 
-  // output
+  /// \copydoc symex_targett::output()
   virtual void output(
     const exprt &guard,
     const sourcet &source,
-    const irep_idt &fmt,
+    const irep_idt &output_id,
     const std::list<exprt> &args);
 
-  // output, formatted
+  /// \copydoc symex_targett::output_fmt()
   virtual void output_fmt(
     const exprt &guard,
     const sourcet &source,
@@ -103,71 +106,140 @@ public:
     const irep_idt &fmt,
     const std::list<exprt> &args);
 
-  // input
+  /// \copydoc symex_targett::input()
   virtual void input(
     const exprt &guard,
     const sourcet &source,
     const irep_idt &input_id,
     const std::list<exprt> &args);
 
-  // record an assumption
+  /// \copydoc symex_targett::assumption()
   virtual void assumption(
     const exprt &guard,
     const exprt &cond,
     const sourcet &source);
 
-  // record an assertion
+  /// \copydoc symex_targett::assertion()
   virtual void assertion(
     const exprt &guard,
     const exprt &cond,
     const std::string &msg,
     const sourcet &source);
 
-  // record a goto
+  /// \copydoc symex_targett::goto_instruction()
   virtual void goto_instruction(
     const exprt &guard,
     const exprt &cond,
     const sourcet &source);
 
-  // record a (global) constraint
+  /// \copydoc symex_targett::constraint()
   virtual void constraint(
     const exprt &cond,
     const std::string &msg,
     const sourcet &source);
 
-  // record thread spawn
+  /// \copydoc symex_targett::spawn()
   virtual void spawn(
     const exprt &guard,
     const sourcet &source);
 
-  // record memory barrier
+  /// \copydoc symex_targett::memory_barrier()
   virtual void memory_barrier(
     const exprt &guard,
     const sourcet &source);
 
-  // record atomic section
+  /// \copydoc symex_targett::atomic_begin()
   virtual void atomic_begin(
     const exprt &guard,
     unsigned atomic_section_id,
     const sourcet &source);
+
+  /// \copydoc symex_targett::atomic_end()
   virtual void atomic_end(
     const exprt &guard,
     unsigned atomic_section_id,
     const sourcet &source);
 
+  /// Interface method to initiate the conversion into a decision procedure
+  /// format. The method iterates over the equation, i.e. over the SSA steps and
+  /// converts each type of step separately.
+  /// \param prop_conv: A handle to a particular decision procedure interface
   void convert(prop_convt &prop_conv);
+
+  /// Converts assignments: set the equality _lhs==rhs_ to _True_.
+  /// \param decision_procedure: A handle to a particular decision procedure
+  ///  interface
   void convert_assignments(decision_proceduret &decision_procedure) const;
+
+  /// Converts declarations: these are effectively ignored by the decision
+  /// procedure.
+  /// \param prop_conv: A handle to a particular decision procedure interface
   void convert_decls(prop_convt &prop_conv) const;
+
+  /// Converts assumptions: convert the expression the assumption represents.
+  /// \param prop_conv: A handle to a particular decision procedure interface
   void convert_assumptions(prop_convt &prop_conv);
+
+  /// Converts assertions: build a disjunction of negated assertions.
+  /// \param prop_conv: A handle to a particular decision procedure interface
   void convert_assertions(prop_convt &prop_conv);
+
+  /// Converts constraints: set the represented condition to _True_.
+  /// \param decision_procedure: A handle to a particular decision procedure
+  ///  interface
   void convert_constraints(decision_proceduret &decision_procedure) const;
+
+  /// Converts goto instructions: convert the expression representing the
+  /// condition of this goto.
+  /// \param prop_conv: A handle to a particular decision procedure interface
   void convert_goto_instructions(prop_convt &prop_conv);
+
+  /// Converts guards: convert the expression the guard represents.
+  /// \param prop_conv: A handle to a particular decision procedure interface
   void convert_guards(prop_convt &prop_conv);
+
+  /// Converts function calls: for each argument build an equality between its
+  /// symbol and the argument itself.
+  /// \param decision_procedure: A handle to a particular decision procedure
+  ///  interface
   void convert_function_calls(decision_proceduret &decision_procedure);
+
+  /// Converts I/O: for each argument build an equality between its
+  /// symbol and the argument itself.
+  /// \param decision_procedure: A handle to a particular decision procedure
+  ///  interface
   void convert_io(decision_proceduret &decision_procedure);
 
   exprt make_expression() const;
 
+  /// Single SSA step in the equation. Its `type` is defined as
+  /// goto_trace_stept::typet. Every SSA step has a `source` to identify its
+  /// origin in the input GOTO program and a `guard` expression which holds
+  /// the path condition required to reach this step: they limit the scope of
+  /// this step.
+  ///
+  /// SSA steps that represent assignments and declarations also store the
+  /// left- and right-hand sides of the assignment. The left-hand side
+  /// `ssa_lhs` is required to be of type ssa_exprt: in SSA form, variables
+  /// are only assigned once, see \ref static-single-assignment. To achieve
+  /// that, we annotate the original name with 3 types of levels, see
+  /// ssa_exprt. The assignment step also represents the left-hand side in two
+  /// other _full_ forms: `ssa_full_lhs` and `original_full_lhs`, which store
+  /// the original expressions from the input GOTO program before removing
+  /// array indexes, pointers, etc. The `ssa_full_lhs` uses the level-annotated
+  /// names.
+  ///
+  /// Assumptions, assertions, goto steps, and constraints have `cond_expr`
+  /// which represent the condition guarding this step, i.e. what must hold for
+  /// this step to be taken. Both `guard` and `cond_expr` will later be
+  /// translated into verification condition for the SAT/SMT solver (or some
+  /// other decision procedure), to be referred by their respective literals.
+  /// Constraints usually arise from external conditions, such as memory models
+  /// or partial orders: they represent assumptions with global effect.
+  ///
+  /// Function calls store `called_function` name as well as a vector of
+  /// arguments `ssa_function_arguments`. The `converted` version of a
+  /// variable will contain its version for the SAT/SMT conversion.
   class SSA_stept
   {
   public:
