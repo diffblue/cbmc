@@ -19,6 +19,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "value_sets.h"
 #include "value_set_dereference.h"
 
+/// Wrapper for functions removing dereferences in expressions contained in
+/// a goto program.
 class goto_program_dereferencet:protected dereference_callbackt
 {
 public:
