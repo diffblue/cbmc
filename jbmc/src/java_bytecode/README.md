@@ -248,9 +248,179 @@ for(tmp_index = 0; tmp_index < dim_size; ++tmp_index)
 
 `remove_java_new` is then recursively applied to the new `subarray`.
 
-\section java-bytecode-remove-exceptions remove_exceptions
+\section java-bytecode-remove-exceptions Remove exceptions
 
-To be documented.
+When \ref remove_exceptions is called on the \ref goto_modelt, the
+goto model contains complex instructions (\ref goto_program_instruction_typet)
+such as `CATCH-POP`, `CATCH-PUSH` and `THROW`. In order to analyze the goto 
+model, the instructions must be simplified to use more basic instructions - this
+is called "lowering". This class lowers the `CATCH` and `THROW` instructions.
+
+`THROW` instructions are replaced by assigning to `@inflight_exception` and a
+goto to end of the function. `CATCH` instructions are replaced by a check of
+the `@inflight_exception` and setting it to null.
+
+\subsection throw THROW
+
+Consider a simple method `testException(I)V`:
+
+```java
+public class TestExceptions {
+    int field;
+    public void testException(int i) throws Exception {
+        if (i < 0) {
+            throw new Exception();
+        }
+        field = i;
+    }
+}
+```
+
+The goto for `testException(I)V` before `remove_exceptions` (removing comments
+and replacing irrelevant parts with `...`) is:
+
+```
+TestExceptions.testException(int) /* java::TestExceptions.testException:(I)V */
+  IF i >= 0 THEN GOTO 3
+  struct java.lang.Exception *new_tmp0;
+  new_tmp0 = new struct java.lang.Exception;
+  IF !(new_tmp0 == null) THEN GOTO 1
+
+...
+
+1: SKIP
+  new_tmp0 . java.lang.Exception.<init>:()V();
+
+...
+
+2: SKIP
+  THROW: throw(new_tmp0)
+  dead new_tmp0;
+
+...
+
+```
+where there is a `THROW` instruction to be replaced.
+
+After passing the goto model through `remove_exceptions`, it is:
+
+```
+TestExceptions.testException(int) /* java::TestExceptions.testException:(I)V */
+  IF i >= 0 THEN GOTO 4
+  struct java.lang.Exception *new_tmp0;
+  new_tmp0 = new struct java.lang.Exception;
+  IF !(new_tmp0 == null) THEN GOTO 1
+
+...
+
+1: new_tmp0 . java.lang.Exception.<init>:()V();
+  IF @inflight_exception == null THEN GOTO 2 // it is because we've not used it yet
+
+...
+
+2: IF !(new_tmp0 == null) THEN GOTO 3
+
+...
+
+3: @inflight_exception = (void *)new_tmp0;
+  dead new_tmp0;
+
+...
+
+```
+where now instead of the instruction `THROW`, the global variable
+`@inflight_exception` holds the thrown exception in a separate goto statement.
+
+\subsection catch CATCH-PUSH, CATCH-POP and EXCEPTION LANDING PAD
+
+Consider the method `catchSomething(I)V` that tries the above method
+`testException(I)V` and catches the exception:
+
+```java
+public class TestExceptions {
+    int field;
+    public void testException(int i) throws Exception {
+        if (i < 0) {
+            throw new Exception();
+        }
+        field = i;
+    }
+    public void catchSomething(int i) {
+        try {
+            testException(i);
+        } catch (Exception e) {
+        }
+    }
+}
+```
+
+The goto model before `remove_exceptions` is:
+```
+TestExceptions.catchSomething(int) /* java::TestExceptions.catchSomething:(I)V */
+
+...
+
+  CATCH-PUSH ->2
+
+...
+
+1: SKIP
+  this . com.diffblue.regression.TestExceptions.testException:(I)V(i);
+  CATCH-POP
+  GOTO 3
+2: void *anonlocal::2a;
+  struct java.lang.Exception *caught_exception_tmp0;
+  EXCEPTION LANDING PAD (struct java.lang.Exception * caught_exception_tmp0)
+  anonlocal::2a = (void *)caught_exception_tmp0;
+  dead caught_exception_tmp0;
+  dead anonlocal::2a;
+
+...
+
+```
+The `CATCH-PUSH` instruction signifies the start of the try block, the
+`CATCH-POP` instruction signifies the end of the try block, and the `EXCEPTION
+LANDING PAD` signifies beginning of the catch block.
+
+After `remove_exceptions` the goto model is:
+
+```
+TestExceptions.catchSomething(int) /* java::TestExceptions.catchSomething:(I)V */
+
+...
+
+  this . com.diffblue.regression.TestExceptions.testException:(I)V(i);
+  IF @inflight_exception == null THEN GOTO 3 // true if testException does not throw, method terminates normally
+  IF !(@inflight_exception == null) THEN GOTO 1 // true if testException throws, enters catch block
+
+...
+
+1: __CPROVER_string class_identifier_tmp;
+  class_identifier_tmp = ((struct java.lang.Object *)@inflight_exception)->@class_identifier;
+  instanceof_result_tmp = class_identifier_tmp == "java::java.lang.Exception" || ... ; // TRUE
+  dead class_identifier_tmp;
+2: IF instanceof_result_tmp THEN GOTO 4
+
+...
+
+3: ASSERT false // block 3
+  GOTO 5
+4: void *anonlocal::2a; // The catch block
+  struct java.lang.Exception *caught_exception_tmp0;
+  ASSERT false // block 4
+  caught_exception_tmp0 = (struct java.lang.Exception *)@inflight_exception;
+  @inflight_exception = null;
+  anonlocal::2a = (void *)caught_exception_tmp0;
+  dead caught_exception_tmp0;
+  dead anonlocal::2a;
+5: ASSERT false // block 5
+6: END_FUNCTION
+```
+where the `CATCH-PUSH` has been replaced by a check on the `@inflight_exception`
+variable and goto statements, the `CATCH-POP` replaced by a check on the class
+of the exception and a goto statement, and the `EXCEPTION LANDING PAD` replaced
+by a section that assigns the exception to a local variable and sets the
+`@inflight_exception` back to null.
 
 \section java-bytecode-remove-instanceof Remove instanceof
 
