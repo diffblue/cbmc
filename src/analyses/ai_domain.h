@@ -46,7 +46,7 @@ public:
   ///    (this also needs to set the LHS, if applicable)
   ///
   /// "this" is the domain before the instruction "from"
-  /// "from" is the instruction to be interpretted
+  /// "from" is the instruction to be interpreted
   /// "to" is the next instruction (for GOTO, FUNCTION_CALL, END_FUNCTION)
   ///
   /// PRECONDITION(from.is_dereferenceable(), "Must not be _::end()")

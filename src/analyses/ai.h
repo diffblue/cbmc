@@ -25,7 +25,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "ai_domain.h"
 
-/// The basic interface of an abstract interpreter.  This should be enough
+/// The basic interface of an abstract interpreter. This should be enough
 /// to create, run and query an abstract interpreter.
 // don't use me -- I am just a base class
 // use ait instead

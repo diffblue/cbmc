@@ -86,7 +86,7 @@ jsont ai_baset::output_json(
 }
 
 /// Output the domains for a single function as JSON
-/// \par parameters: The namespace, goto_program and it's identifier
+/// \par parameters: The namespace, goto_program and its identifier
 /// \return The JSON object
 jsont ai_baset::output_json(
   const namespacet &ns,
@@ -145,7 +145,7 @@ xmlt ai_baset::output_xml(
 }
 
 /// Output the domains for a single function as XML
-/// \par parameters: The namespace, goto_program and it's identifier
+/// \par parameters: The namespace, goto_program and its identifier
 /// \return The XML object
 xmlt ai_baset::output_xml(
   const namespacet &ns,
@@ -341,7 +341,7 @@ bool ai_baset::do_function_call(
 
   if(!goto_function.body_available())
   {
-    // if we don't have a body, we just do an edige call -> return
+    // if we don't have a body, we just do an edge call -> return
     std::unique_ptr<statet> tmp_state(make_temporary_state(get_state(l_call)));
     tmp_state->transform(
       calling_function_identifier,
