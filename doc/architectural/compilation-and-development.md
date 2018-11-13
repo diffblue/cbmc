@@ -90,8 +90,8 @@ folders.
 
 \subsubsection compilation-and-development-subsubsection-running-regression-tests-with-ctest Running regression tests with CTest
 
-If you have compiled using CMake then you can run the regression tests (and
-the unit tests) using CTest.
+If you have compiled using CMake then you can run the regression tests using
+CTest. (Note: this will also run the unit tests.)
 
 Here are two example commands, to be run from the `build/` directory:
 
@@ -132,7 +132,9 @@ When there is a file called `chain.sh` then the command should look like
 
     <absolute-path-to-test.pl> -p -c '<absolute-path-to-chain-sh> <arg-1> ... <arg-n>' <test-folder>
 
-Note the single quotes - it will not work without them. What to put for the
+Note that the test binary and its initial command line arguments are a single
+value for the -c option, so they must be be wrapped in quotes if they contain
+any unescaped spaces. What to put for the
 arguments  `<arg-1>` to `<arg-n>` varies from module to module. To find
 out, look in `chain.sh` and see what arguments it expects. You can also look in
 the `Makefile` and see how it calls `chain.sh` in the `test` target.
@@ -143,15 +145,29 @@ the `Makefile` and see how it calls `chain.sh` in the `test` target.
 The unit tests are contained in the `unit/` folder. They are written using the
 [Catch](https://github.com/philsquared/Catch) unit test framework.
 
-To run the unit tests for CBMC, go to `unit/` and run
+If you have compiled with `make`, you can run the unit tests for CBMC directly
+by going to `unit/`, running `make` to compile the unit tests and then
+`make test` to run them. You can run the unit tests for JBMC directly by going
+to `jbmc/unit/` and running the same commands.
+
+If you have compiled with CMake, you can run the unit tests for CBMC directly
+by going to `unit/` and running
 
     ../<build-folder>/bin/unit
 
-To run the unit tests for JBMC, go to `jbmc/unit/` and run
+and you can run the unit tests for JBMC directly by going to `jbmc/unit/` and
+running
 
     ../../<build-folder>/bin/java-unit
 
-The unit tests are also included in CTest as `unit` and `java-unit`.
+If you have compiled with CMake you can also run the unit tests through CTest,
+with the names `unit` and `java-unit`. So, from the `build/` directory, run
+
+    ctest -V -L CORE -R ^unit
+    ctest -V -L CORE -R java-unit
+
+to run the CBMC unit tests and the JBMC unit tests respectively. (The `^` is
+needed to make it a regular expression that matches `unit` but not `java-unit`.)
 
 Note that some tests run which are expected to fail - see the summary at
 the end of the run to see how many tests passed, how many failed which were
