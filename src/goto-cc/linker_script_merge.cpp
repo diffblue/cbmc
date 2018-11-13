@@ -480,11 +480,13 @@ int linker_script_merget::ls_data2instructions(
       symbol_exprt end_sym(d["end-symbol"].value, pointer_type(char_type()));
       linker_values[d["end-symbol"].value]=std::make_pair(end_sym, array_end);
 
-      auto it=std::find_if(data["addresses"].array.begin(),
-                           data["addresses"].array.end(),
-                           [&d](const jsont &add)
-                           { return add["sym"].value==d["end-symbol"].value; });
-      if(it==data["addresses"].array.end())
+      auto entry = std::find_if(
+        data["addresses"].array.begin(),
+        data["addresses"].array.end(),
+        [&d](const jsont &add) {
+          return add["sym"].value == d["end-symbol"].value;
+        });
+      if(entry == data["addresses"].array.end())
       {
         error() << "Could not find address corresponding to symbol '"
                 << d["end-symbol"].value << "' (end of section)" << eom;
@@ -493,9 +495,9 @@ int linker_script_merget::ls_data2instructions(
       source_locationt  end_loc;
       end_loc.set_file(linker_script);
       std::ostringstream end_comment;
-      end_comment << "Pointer to end of object section '"
-                  << d["section"].value << "'. Original address in object file"
-                  << " is " << (*it)["val"].value;
+      end_comment << "Pointer to end of object section '" << d["section"].value
+                  << "'. Original address in object file"
+                  << " is " << (*entry)["val"].value;
       end_loc.set_comment(end_comment.str());
       end_sym.add_source_location()=end_loc;
 
