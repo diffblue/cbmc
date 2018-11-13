@@ -61,7 +61,8 @@ void ai_baset::output(
 }
 
 /// Output the domains for the whole program as JSON
-/// \par parameters: The namespace and goto_functions
+/// \param ns: The namespace
+/// \param goto_functions: The goto functions
 /// \return The JSON object
 jsont ai_baset::output_json(
   const namespacet &ns,
@@ -86,7 +87,10 @@ jsont ai_baset::output_json(
 }
 
 /// Output the domains for a single function as JSON
-/// \par parameters: The namespace, goto_program and its identifier
+/// \param ns: The namespace
+/// \param goto_program: The goto program
+/// \param identifier: the identifier used to find a symbol to identify the
+///   source language
 /// \return The JSON object
 jsont ai_baset::output_json(
   const namespacet &ns,
@@ -117,7 +121,8 @@ jsont ai_baset::output_json(
 }
 
 /// Output the domains for the whole program as XML
-/// \par parameters: The namespace and goto_functions
+/// \param ns: The namespace
+/// \param goto_functions: The goto functions
 /// \return The XML object
 xmlt ai_baset::output_xml(
   const namespacet &ns,
@@ -145,7 +150,10 @@ xmlt ai_baset::output_xml(
 }
 
 /// Output the domains for a single function as XML
-/// \par parameters: The namespace, goto_program and its identifier
+/// \param ns: The namespace
+/// \param goto_program: The goto program
+/// \param identifier: the identifier used to find a symbol to identify the
+///   source language
 /// \return The XML object
 xmlt ai_baset::output_xml(
   const namespacet &ns,
