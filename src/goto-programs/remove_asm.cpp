@@ -1,7 +1,7 @@
 /*******************************************************************\
 
-Module: Remove 'asm' statements by compiling into suitable standard
-        code
+Module: Remove 'asm' statements by compiling them into suitable
+        standard goto program instructions
 
 Author: Daniel Kroening
 
@@ -10,7 +10,8 @@ Date:   December 2014
 \*******************************************************************/
 
 /// \file
-/// Remove 'asm' statements by compiling into suitable standard code
+/// Remove 'asm' statements by compiling them into suitable standard goto
+/// program instructions
 
 #include "remove_asm.h"
 
@@ -61,6 +62,13 @@ protected:
     goto_programt &dest);
 };
 
+/// Adds a call to a library function that implements the given gcc-style inline
+/// assembly statement
+///
+/// \param function_base_name: Name of the function to call
+/// \param code: gcc-style inline assembly statement to translate to function
+///   call
+/// \param dest: Goto program to append the function call to
 void remove_asmt::gcc_asm_function_call(
   const irep_idt &function_base_name,
   const code_asmt &code,
@@ -128,6 +136,13 @@ void remove_asmt::gcc_asm_function_call(
   }
 }
 
+/// Adds a call to a library function that implements the given msc-style inline
+/// assembly statement
+///
+/// \param function_base_name: Name of the function to call
+/// \param code: msc-style inline assembly statement to translate to function
+///   call
+/// \param dest: Goto program to append the function call to
 void remove_asmt::msc_asm_function_call(
   const irep_idt &function_base_name,
   const code_asmt &code,
@@ -171,7 +186,12 @@ void remove_asmt::msc_asm_function_call(
   }
 }
 
-/// removes assembler
+/// Translates the given inline assembly code (which must be in either gcc or
+/// msc style) to non-assembly goto program instructions
+///
+/// \param instruction: The goto program instruction containing the inline
+///   assembly statements
+/// \param dest: The goto program to append the new instructions to
 void remove_asmt::process_instruction(
   goto_programt::instructiont &instruction,
   goto_programt &dest)
@@ -188,7 +208,11 @@ void remove_asmt::process_instruction(
     DATA_INVARIANT(false, "unexpected assembler flavor");
 }
 
-/// removes gcc assembler
+/// Translates the given inline assembly code (in gcc style) to non-assembly
+/// goto program instructions
+///
+/// \param code: The inline assembly code statement to translate
+/// \param dest: The goto program to append the new instructions to
 void remove_asmt::process_instruction_gcc(
   const code_asmt &code,
   goto_programt &dest)
@@ -349,7 +373,11 @@ void remove_asmt::process_instruction_gcc(
     dest.destructive_append(tmp_dest);
 }
 
-/// removes msc assembler
+/// Translates the given inline assembly code (in msc style) to non-assembly
+/// goto program instructions
+///
+/// \param code: The inline assembly code statement to translate
+/// \param dest: The goto program to append the new instructions to
 void remove_asmt::process_instruction_msc(
   const code_asmt &code,
   goto_programt &dest)
@@ -449,7 +477,10 @@ void remove_asmt::process_instruction_msc(
     dest.destructive_append(tmp_dest);
 }
 
-/// removes assembler
+/// Replaces inline assembly instructions in the goto function by non-assembly
+/// goto program instructions
+///
+/// \param goto_function: The goto function
 void remove_asmt::process_function(
   goto_functionst::goto_functiont &goto_function)
 {
@@ -478,14 +509,23 @@ void remove_asmt::process_function(
     remove_skip(goto_function.body);
 }
 
-/// removes assembler
+/// \copybrief remove_asm(goto_modelt &)
+///
+/// \param goto_functions: The goto functions
+/// \param symbol_table: The symbol table
 void remove_asm(goto_functionst &goto_functions, symbol_tablet &symbol_table)
 {
   remove_asmt rem(symbol_table, goto_functions);
   rem();
 }
 
-/// removes assembler
+/// Replaces inline assembly instructions in the goto program (i.e.,
+/// instructions of kind `OTHER` with a `code` member of type `code_asmt`) with
+/// an appropriate (sequence of) non-assembly goto program instruction(s). At
+/// present only a small number of x86 and Power instructions are supported.
+/// Unrecognised assembly instructions are ignored.
+///
+/// \param goto_model: The goto model
 void remove_asm(goto_modelt &goto_model)
 {
   remove_asm(goto_model.goto_functions, goto_model.symbol_table);
