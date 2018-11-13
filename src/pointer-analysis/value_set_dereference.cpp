@@ -32,9 +32,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/simplify_expr.h>
 #include <util/ssa_expr.h>
 
-// global data, horrible
-unsigned int value_set_dereferencet::invalid_counter=0;
-
 const exprt &value_set_dereferencet::get_symbol(const exprt &expr)
 {
   if(expr.id()==ID_member || expr.id()==ID_index)
