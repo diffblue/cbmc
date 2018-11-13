@@ -20,6 +20,8 @@ else
   BUILD_ENV_ := $(BUILD_ENV)
 endif
 
+AR = ar
+
 ifeq ($(filter-out Unix MinGW OSX OSX_Universal FreeBSD,$(BUILD_ENV_)),)
   # Linux-ish
   LIBEXT = .a
@@ -62,7 +64,7 @@ ifeq ($(filter-out OSX OSX_Universal,$(BUILD_ENV_)),)
   endif
 else ifeq ($(filter-out FreeBSD,$(BUILD_ENV_)),)
   CP_CXXFLAGS +=
-  LINKLIB = ar rcT $@ $^
+  LINKLIB = $(AR) rcT $@ $^
   LINKBIN = $(CXX) $(LINKFLAGS) -o $@ -Wl,--start-group $^ -Wl,--end-group $(LIBS)
   LINKNATIVE = $(HOSTCXX) -o $@ $^
   ifeq ($(origin CC),default)
@@ -72,7 +74,7 @@ else ifeq ($(filter-out FreeBSD,$(BUILD_ENV_)),)
     CXX    = clang++
   endif
 else
-  LINKLIB = ar rcT $@ $^
+  LINKLIB = $(AR) rcT $@ $^
   LINKBIN = $(CXX) $(LINKFLAGS) -o $@ -Wl,--start-group $^ -Wl,--end-group $(LIBS)
   LINKNATIVE = $(HOSTCXX) -o $@ $^
   ifeq ($(origin CC),default)
@@ -106,7 +108,7 @@ else ifeq ($(BUILD_ENV_),Cygwin)
   # Cygwin-g++ has problems with statically linking exception code.
   # If linking fails, remove -static.
   LINKFLAGS = -static -std=c++11
-  LINKLIB = ar rcT $@ $^
+  LINKLIB = $(AR) rcT $@ $^
   LINKBIN = $(CXX) $(LINKFLAGS) -o $@ -Wl,--start-group $^ -Wl,--end-group $(LIBS)
   LINKNATIVE = $(HOSTCXX) -std=c++11 -o $@ $^ -static
 ifeq ($(origin CC),default)
