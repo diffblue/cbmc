@@ -22,7 +22,7 @@ FreeBSD 11, MacOS X and Windows.
 
 There is also support for compiling using CMake. Instructions are
 available in
-[COMPILING.md](https://github.com/diffblue/cbmc/blob/develop/COMPILING.md#working-with-cmake-experimental)
+[COMPILING.md](https://github.com/diffblue/cbmc/blob/develop/COMPILING.md#working-with-cmake)
 in the root of the CBMC repository.
 
 
