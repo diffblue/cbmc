@@ -35,6 +35,14 @@ reaching_definitions_analysist::reaching_definitions_analysist(
 
 reaching_definitions_analysist::~reaching_definitions_analysist()=default;
 
+/// Given the passed variable name `identifier` it collects data from
+/// `bv_container` for each `ID` in `values[identifier]` and stores them into
+/// `export_cache[identifier]`. Namely, for each `reaching_definitiont` instance
+/// `rd` obtained from `bv_container` it associates `rd.definition_at` with the
+/// bit-range `(rd.bit_begin, rd.bit_end)`.
+///
+/// This function is only used to fill in the cache `export_cache` for the
+/// `output` method.
 void rd_range_domaint::populate_cache(const irep_idt &identifier) const
 {
   assert(bv_container);
@@ -126,6 +134,8 @@ void rd_range_domaint::transform(
 #endif
 }
 
+/// Computes an instance obtained from a `*this` by transformation over `DEAD v`
+/// GOTO instruction. The operation simply removes `v` from `this->values`.
 void rd_range_domaint::transform_dead(
   const namespacet &,
   locationt from)
@@ -465,6 +475,10 @@ void rd_range_domaint::kill_inf(
 #endif
 }
 
+/// A utility function which updates internal data structures by inserting a
+/// new reaching definition record, for the variable name `identifier`, written
+/// in given GOTO instruction referenced by `from`, at the range of bits defined
+/// by `range_start` and `range_end`.
 bool rd_range_domaint::gen(
   locationt from,
   const irep_idt &identifier,
