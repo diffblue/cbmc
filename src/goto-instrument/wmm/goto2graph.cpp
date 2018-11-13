@@ -210,9 +210,13 @@ void instrumentert::cfg_visitort::visit_cfg_function(
     /* a:=b -o-> Rb -po-> Wa */
     else if(instruction.is_assign())
     {
-      visit_cfg_assign(value_sets, ns, i_it, no_dependencies
+      visit_cfg_assign(
+        value_sets,
+        i_it,
+        no_dependencies
 #ifdef LOCAL_MAY
-        , local_may
+        ,
+        local_may
 #endif
       ); // NOLINT(whitespace/parens)
     }
@@ -783,7 +787,6 @@ void instrumentert::cfg_visitort::visit_cfg_asm_fence(
 
 void instrumentert::cfg_visitort::visit_cfg_assign(
   value_setst &value_sets,
-  namespacet &ns,
   goto_programt::instructionst::iterator &i_it,
   bool no_dependencies
 #ifdef LOCAL_MAY
