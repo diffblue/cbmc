@@ -74,8 +74,6 @@ public:
     const guardt &guard,
     const modet mode);
 
-  typedef std::unordered_set<exprt, irep_hash> expr_sett;
-
 private:
   const namespacet &ns;
   symbol_tablet &new_symbol_table;
