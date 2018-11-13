@@ -1242,12 +1242,8 @@ void acceleration_utilst::extract_polynomial(
       continue;
     }
 
-    for(expr_listt::iterator it=terms.begin();
-        it!=terms.end();
-        ++it)
+    for(const auto &term : terms)
     {
-      exprt term=*it;
-
       if(degrees.find(term)!=degrees.end())
       {
         degrees[term]++;
