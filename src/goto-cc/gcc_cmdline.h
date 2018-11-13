@@ -29,7 +29,7 @@ public:
 protected:
   typedef std::vector<std::string> argst;
 
-  bool parse_arguments(const argst &args, bool in_spec_file);
+  bool parse_arguments(const argst &args_to_parse, bool in_spec_file);
   void parse_specs();
   void parse_specs_line(const std::string &line, bool in_spec_file);
 };
