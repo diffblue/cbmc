@@ -20,8 +20,11 @@ class guardt;
 class exprt;
 class symbolt;
 
-/*! \brief TO_BE_DOCUMENTED
-*/
+/// Base class for pointer value set analysis.
+/// Implemented by goto_program_dereferencet.
+/// This exists so that `value_set_dereferencet` can contain a reference to
+/// `goto_program_derefencet` which cannot be done directly because
+/// `goto_program_derefencet` contains a `value_set_dereferencet`.
 class dereference_callbackt
 {
 public:
