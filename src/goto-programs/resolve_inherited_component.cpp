@@ -16,8 +16,8 @@
 ///
 resolve_inherited_componentt::resolve_inherited_componentt(
   const symbol_tablet &symbol_table,
-  const class_hierarchyt &clas_hierarchy)
-  : class_hierarchy(clas_hierarchy), symbol_table(symbol_table)
+  const class_hierarchyt &class_hierarchy)
+  : class_hierarchy(class_hierarchy), symbol_table(symbol_table)
 {
   // We require the class_hierarchy to be already populated if we are being
   // supplied it.

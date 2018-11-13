@@ -569,7 +569,7 @@ public:
     const namespacet &ns,
     const irep_idt &identifier,
     std::ostream &out,
-    const instructionst::value_type &it) const;
+    const instructionst::value_type &instruction) const;
 
   /// Compute the target numbers
   void compute_target_numbers();

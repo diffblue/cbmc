@@ -76,16 +76,6 @@
 /cbmc/src/ansi-c/expr2c_class.h:54: warning: The following parameters of expr2ct::convert_struct_type(const typet &src, const std::string &qualifiers_str, const std::string &declarator_str) are not documented:
   parameter 'qualifiers_str'
   parameter 'declarator_str'
-/cbmc/src/goto-programs/goto_convert_class.h:584: warning: The following parameters of goto_convertt::generate_thread_block(const code_blockt &thread_body, goto_programt &dest, const irep_idt &mode) are not documented:
-  parameter 'mode'
-/cbmc/src/goto-programs/goto_model.h:150: warning: argument 'goto_model' of command @param is not found in the argument list of goto_model_functiont::goto_model_functiont(journalling_symbol_tablet &symbol_table, goto_functionst &goto_functions, const irep_idt &function_id, goto_functionst::goto_functiont &goto_function)
-/cbmc/src/goto-programs/goto_model.h:155: warning: The following parameters of goto_model_functiont::goto_model_functiont(journalling_symbol_tablet &symbol_table, goto_functionst &goto_functions, const irep_idt &function_id, goto_functionst::goto_functiont &goto_function) are not documented:
-  parameter 'symbol_table'
-  parameter 'goto_functions'
-  parameter 'function_id'
-/cbmc/src/goto-programs/goto_program.cpp:21: warning: argument 'instruction' of command @param is not found in the argument list of goto_programt::output_instruction(const namespacet &ns, const irep_idt &identifier, std::ostream &out, const instructionst::value_type &it) const
-/cbmc/src/goto-programs/goto_program.h:560: warning: The following parameters of goto_programt::output_instruction(const namespacet &ns, const irep_idt &identifier, std::ostream &out, const instructionst::value_type &it) const are not documented:
-  parameter 'it'
 /cbmc/src/goto-instrument/wmm/goto2graph.h:260: warning: The following parameters of instrumentert::cfg_visitort::visit_cfg_function(value_setst &value_sets, memory_modelt model, bool no_dependencies, loop_strategyt duplicate_body, const irep_idt &function, std::set< nodet > &ending_vertex) are not documented:
   parameter 'model'
   parameter 'no_dependencies'
@@ -127,21 +117,12 @@
 /cbmc/src/langapi/language.cpp:121: warning: argument 'parameter_type' of command @param is not found in the argument list of languaget::build_stub_parameter_symbol(const symbolt &function_symbol, size_t parameter_index, const code_typet::parametert &parameter)
 /cbmc/src/langapi/language.h:176: warning: The following parameters of languaget::build_stub_parameter_symbol(const symbolt &function_symbol, size_t parameter_index, const code_typet::parametert &parameter) are not documented:
   parameter 'parameter'
-/cbmc/src/goto-programs/rebuild_goto_start_function.h:31: warning: The following parameters of rebuild_goto_start_function_baset::rebuild_goto_start_function_baset(const optionst &options, maybe_lazy_goto_modelt &goto_model, message_handlert &message_handler) are not documented:
-  parameter 'options'
-  parameter 'message_handler'
-/cbmc/src/goto-programs/rebuild_goto_start_function.cpp:37: warning: argument 'entry_function' of command @param is not found in the argument list of rebuild_goto_start_function_baset< maybe_lazy_goto_modelt >::operator()(void)
 /cbmc/jbmc/src/java_bytecode/remove_exceptions.cpp:47: warning: Found unknown command `\class_identifier'
-/cbmc/src/goto-programs/resolve_inherited_component.cpp:13: warning: argument 'class_hierarchy' of command @param is not found in the argument list of resolve_inherited_componentt::resolve_inherited_componentt(const symbol_tablet &symbol_table, const class_hierarchyt &clas_hierarchy)
-/cbmc/src/goto-programs/resolve_inherited_component.h:24: warning: The following parameters of resolve_inherited_componentt::resolve_inherited_componentt(const symbol_tablet &symbol_table, const class_hierarchyt &clas_hierarchy) are not documented:
-  parameter 'clas_hierarchy'
 /cbmc/jbmc/src/java_bytecode/select_pointer_type.h:50: warning: The following parameters of select_pointer_typet::specialize_generics(const pointer_typet &pointer_type, const generic_parameter_specialization_mapt &generic_parameter_specialization_map, generic_parameter_recursion_trackingt &visited_nodes) const are not documented:
   parameter 'visited_nodes'
 /cbmc/src/solvers/refinement/string_refinement.cpp:2099: warning: argument 'expr' of command @param is not found in the argument list of string_constraintt::universal_only_in_index(const string_constraintt &constr)
 /cbmc/src/solvers/refinement/string_refinement.cpp:2106: warning: The following parameters of string_constraintt::universal_only_in_index(const string_constraintt &constr) are not documented:
   parameter 'constr'
-/cbmc/src/goto-programs/goto_trace.cpp:132: warning: The following parameters of numeric_representation(const constant_exprt &expr, const namespacet &ns, const trace_optionst &options) are not documented:
-  parameter 'ns'
 /cbmc/jbmc/src/java_bytecode/README.md:26: warning: unable to resolve reference to `java-bytecode-remove-instance-of' for \ref command
 /cbmc/jbmc/src/java_bytecode/README.md:89: warning: explicit link request to 'define' could not be resolved
 /cbmc/jbmc/src/java_bytecode/README.md:89: warning: explicit link request to 'define' could not be resolved
@@ -152,4 +133,3 @@
 /cbmc/src/pointer-analysis/dereference.h:26: warning: argument '_new_symbol_table' of command @param is not found in the argument list of dereferencet::dereferencet(const namespacet &_ns)
 /cbmc/src/pointer-analysis/dereference.h:26: warning: argument '_options' of command @param is not found in the argument list of dereferencet::dereferencet(const namespacet &_ns)
 /cbmc/src/pointer-analysis/dereference.h:26: warning: argument '_dereference_callback' of command @param is not found in the argument list of dereferencet::dereferencet(const namespacet &_ns)
-/cbmc/src/goto-programs/rebuild_goto_start_function.cpp:22: warning: argument '_message_handler' of command @param is not found in the argument list of rebuild_goto_start_function_baset< maybe_lazy_goto_modelt >::rebuild_goto_start_function_baset(const optionst &options, maybe_lazy_goto_modelt &goto_model, message_handlert &message_handler)

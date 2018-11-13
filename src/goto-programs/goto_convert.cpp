@@ -1971,9 +1971,10 @@ void goto_convert(
 /// E: END_THREAD
 /// Z: SKIP
 ///
-/// \param thread_body: sequence of codet's that can be executed
-///   in parallel.
-/// \param [out] dest: resulting goto-instructions.
+/// \param thread_body: Sequence of codet's that can be executed
+///   in parallel
+/// \param [out] dest: Resulting goto-instructions
+/// \param mode: Language mode
 void goto_convertt::generate_thread_block(
   const code_blockt &thread_body,
   goto_programt &dest,
