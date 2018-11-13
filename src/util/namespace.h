@@ -27,10 +27,20 @@ class union_tag_typet;
 class struct_tag_typet;
 class c_enum_tag_typet;
 
+/// Basic interface for a namespace. This is not used
+/// in practice, as the one being used is \ref namespacet
+/// which uses two symbol tables, and \ref multi_namespacet
+/// which can combine more than two.
 class namespace_baset
 {
 public:
   // service methods
+
+  /// Lookup a symbol in the namespace.
+  /// \param name: The name of the symbol to lookup.
+  /// \return: A reference to the symbol found.
+  /// \remarks: It is a PRECONDITION that the symbol name exists
+  ///   in the namespace.
   const symbolt &lookup(const irep_idt &name) const
   {
     const symbolt *symbol;
@@ -74,8 +84,11 @@ public:
   virtual bool lookup(const irep_idt &name, const symbolt *&symbol) const=0;
 };
 
-/*! \brief TO_BE_DOCUMENTED
-*/
+/// A namespacet is essentially one or two symbol tables bound
+/// together, to allow for symbol lookups in them. The basic
+/// idea is that you might want to combine a value table and
+/// a type table, so that for a variable you can lookup both
+/// of these essential properties, in one structure.
 class namespacet:public namespace_baset
 {
 public:
@@ -101,13 +114,14 @@ public:
 
   using namespace_baset::lookup;
 
-  /// See namespace_baset::lookup(). Note that \ref namespacet has two symbol
-  /// tables.
+  /// See documentation for namespace_baset::lookup(). Note that
+  /// \ref namespacet has two symbol tables.
   bool lookup(const irep_idt &name, const symbolt *&symbol) const override;
 
   /// See documentation for namespace_baset::smallest_unused_suffix().
   std::size_t smallest_unused_suffix(const std::string &prefix) const override;
 
+  /// Return first symbol table registered with the namespace.
   const symbol_tablet &get_symbol_table() const
   {
     return *symbol_table1;
@@ -117,6 +131,10 @@ protected:
   const symbol_tablet *symbol_table1, *symbol_table2;
 };
 
+/// A multi namespace is essentially a namespace,
+/// with a list of namespaces. It's difference with
+/// \ref namespacet is that it can use more than two
+/// symbol tables to lookup symbols in.
 class multi_namespacet:public namespacet
 {
 public:
@@ -134,9 +152,15 @@ public:
   // these do the actual lookup
   using namespace_baset::lookup;
 
+  /// See documentation for namespace_baset::lookup().
   bool lookup(const irep_idt &name, const symbolt *&symbol) const override;
+  /// See documentation for namespace_baset::smallest_unused_suffix().
   std::size_t smallest_unused_suffix(const std::string &prefix) const override;
 
+  /// Add symbol table to the list of symbol tables this multi-namespace
+  /// is working with.
+  /// \param symbol_table: Reference to the symbol table to be added to this
+  /// namespace.
   void add(const symbol_tablet &symbol_table)
   {
     symbol_table_list.push_back(&symbol_table);

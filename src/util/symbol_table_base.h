@@ -54,7 +54,7 @@ public:
 
   /// Check whether a symbol exists in the symbol table
   /// \param name: The name of the symbol to look for
-  /// \return true if the symbol exists
+  /// \return True if the symbol exists
   bool has_symbol(const irep_idt &name) const
   {
     return symbols.find(name) != symbols.end();
@@ -62,7 +62,7 @@ public:
 
   /// Find a symbol in the symbol table for read-only access.
   /// \param name: The name of the symbol to look for
-  /// \return a pointer to the found symbol if it exists, nullptr otherwise.
+  /// \return A pointer to the found symbol if it exists, nullptr otherwise.
   const symbolt *lookup(const irep_idt &name) const
   {
     symbolst::const_iterator it = symbols.find(name);
@@ -80,12 +80,12 @@ public:
 
   /// Find a symbol in the symbol table for read-write access.
   /// \param name: The name of the symbol to look for
-  /// \return a pointer to the found symbol if it exists, nullptr otherwise.
+  /// \return A pointer to the found symbol if it exists, nullptr otherwise.
   virtual symbolt *get_writeable(const irep_idt &name) = 0;
 
   /// Find a symbol in the symbol table for read-write access.
-  /// \param name: The name of the symbol to look for
-  /// \return A reference to the symbol
+  /// \param name: The name of the symbol to look for.
+  /// \return A reference to the symbol.
   /// \throw `std::out_of_range` if no such symbol exists
   symbolt &get_writeable_ref(const irep_idt &name)
   {
@@ -100,10 +100,11 @@ public:
   /// \remark: This is a nicer interface than move and achieves the same
   /// result as both move and add
   /// \param symbol: The symbol to be added to the symbol table - can be
-  /// moved or copied in
-  /// \return Returns a reference to the newly inserted symbol or to the
-  /// existing symbol if a symbol with the same name already exists in the
-  /// symbol table, along with a bool that is true if a new symbol was inserted.
+  ///   moved or copied in.
+  /// \return: Returns a reference to the newly inserted symbol or to the
+  ///   existing symbol if a symbol with the same name already exists in the
+  ///   symbol table, along with a bool that is true if a new symbol was
+  ///   inserted.
   virtual std::pair<symbolt &, bool> insert(symbolt symbol) = 0;
   virtual bool move(symbolt &symbol, symbolt *&new_symbol) = 0;
 
@@ -183,12 +184,11 @@ public:
 
     /// Whereas the dereference operator gives a constant reference to the
     /// current symbol, this method allows users to get a writeable reference
-    /// to the symbol
-    /// \remarks
-    /// This method calls the on_get_writeable method first to give derived
-    /// symbol table classes the opportunity to note that this symbol is being
-    /// written to before it is accessed.
-    /// \returns a non-const reference to the current symbol
+    /// to the symbol.
+    /// \remarks This method calls the on_get_writeable method first to give
+    ///   derived symbol table classes the opportunity to note that this
+    ///   symbol is being written to before it is accessed.
+    /// \return A non-const reference to the current symbol.
     symbolt &get_writeable_symbol()
     {
       if(on_get_writeable)

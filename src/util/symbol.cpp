@@ -13,6 +13,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "source_location.h"
 #include "std_expr.h"
 
+/// Dump the state of a symbol object to a given output stream.
+/// \param out: The stream to output object state to.
 void symbolt::show(std::ostream &out) const
 {
   out << "  " << name << '\n';
@@ -66,6 +68,10 @@ void symbolt::show(std::ostream &out) const
   out << '\n';
 }
 
+/// Overload of stream operator to work with symbols.
+/// \param out: A given stream to dump symbol state to.
+/// \param symbol: The symbol whose state is about to be dumped.
+/// \return The output stream.
 std::ostream &operator<<(std::ostream &out,
                          const symbolt &symbol)
 {
@@ -73,6 +79,8 @@ std::ostream &operator<<(std::ostream &out,
   return out;
 }
 
+/// Swap values between two symbols.
+/// \param b: The second symbol to swap values with.
 void symbolt::swap(symbolt &b)
 {
   #define SYM_SWAP1(x) x.swap(b.x)
@@ -106,8 +114,9 @@ void symbolt::swap(symbolt &b)
   SYM_SWAP2(is_volatile);
 }
 
-/// produces a symbol_exprt for a symbol
-/// \return symbol_exprt
+/// Produces a symbol_exprt for a symbol
+/// \return A new symbol_exprt with the name and
+///   type of the symbol object.
 symbol_exprt symbolt::symbol_expr() const
 {
   return symbol_exprt(name, type);
