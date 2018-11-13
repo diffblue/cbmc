@@ -232,7 +232,7 @@ void cpp_typecheckt::do_not_typechecked()
         symbol.value.get_bool(ID_is_used))
       {
         assert(symbol.type.id()==ID_code);
-        symbolt &symbol=*symbol_table.get_writeable(named_symbol.first);
+        exprt value = symbol.value;
 
         if(symbol.base_name=="operator=")
         {
@@ -240,19 +240,21 @@ void cpp_typecheckt::do_not_typechecked()
           declarator.add_source_location() = symbol.location;
           default_assignop_value(
             lookup(symbol.type.get(ID_C_member_name)), declarator);
-          symbol.value.swap(declarator.value());
-          convert_function(symbol);
+          value.swap(declarator.value());
           cont=true;
         }
         else if(symbol.value.operands().size()==1)
         {
-          exprt tmp = symbol.value.op0();
-          symbol.value.swap(tmp);
-          convert_function(symbol);
+          value = symbol.value.op0();
           cont=true;
         }
         else
           UNREACHABLE; // Don't know what to do!
+
+        symbolt &writable_symbol =
+          *symbol_table.get_writeable(named_symbol.first);
+        writable_symbol.value.swap(value);
+        convert_function(writable_symbol);
       }
     }
   }
