@@ -1021,7 +1021,6 @@ bool shared_bufferst::is_buffered_in_general(
 /// variables (non necessarily shared themselves) whose value could be changed
 /// as effect of a read delay
 void shared_bufferst::affected_by_delay(
-  symbol_tablet &symbol_table,
   value_setst &value_sets,
   goto_functionst &goto_functions)
 {
