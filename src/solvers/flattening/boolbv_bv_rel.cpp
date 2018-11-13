@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <solvers/floatbv/float_utils.h>
 
+/// Flatten <, >, <= and >= expressions.
 literalt boolbvt::convert_bv_rel(const exprt &expr)
 {
   const exprt::operandst &operands=expr.operands();

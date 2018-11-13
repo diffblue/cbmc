@@ -108,6 +108,9 @@ bool boolbvt::literal(
   INVARIANT(false, "expression should have a corresponding literal");
 }
 
+/// Convert expression to vector of literalts, using an internal
+/// cache to speed up conversion if available. Also assert the resultant
+/// vector is of a specific size, and freeze any elements if appropriate.
 const bvt &
 boolbvt::convert_bv(const exprt &expr, optionalt<std::size_t> expected_width)
 {
@@ -148,6 +151,8 @@ boolbvt::convert_bv(const exprt &expr, optionalt<std::size_t> expected_width)
   return cache_result.first->second;
 }
 
+/// Print that the expression of x has failed conversion,
+/// then return a vector of x's width.
 bvt boolbvt::conversion_failed(const exprt &expr)
 {
   ignoring(expr);

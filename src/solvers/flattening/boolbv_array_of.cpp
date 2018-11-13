@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/invariant.h>
 #include <util/std_types.h>
 
+/// Flatten arrays constructed from a single element.
 bvt boolbvt::convert_array_of(const array_of_exprt &expr)
 {
   DATA_INVARIANT(
