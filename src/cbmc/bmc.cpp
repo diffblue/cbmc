@@ -126,8 +126,7 @@ void bmct::do_conversion()
   freeze_program_variables();
 }
 
-decision_proceduret::resultt
-bmct::run_decision_procedure(prop_convt &prop_conv)
+decision_proceduret::resultt bmct::run_decision_procedure()
 {
   status() << "Passing problem to "
            << prop_conv.decision_procedure_text() << eom;
@@ -345,7 +344,7 @@ safety_checkert::resultt bmct::execute(
     }
 
     if(!options.is_set("paths") || symex.path_segment_vccs > 0)
-      return decide(goto_functions, prop_conv);
+      return decide(goto_functions);
 
     return safety_checkert::resultt::PAUSED;
   }
@@ -428,16 +427,14 @@ safety_checkert::resultt bmct::run(
   return execute(goto_model);
 }
 
-safety_checkert::resultt bmct::decide(
-  const goto_functionst &goto_functions,
-  prop_convt &prop_conv)
+safety_checkert::resultt bmct::decide(const goto_functionst &goto_functions)
 {
   prop_conv.set_message_handler(get_message_handler());
 
   if(options.get_bool_option("stop-on-fail"))
-    return stop_on_fail(prop_conv);
+    return stop_on_fail();
   else
-    return all_properties(goto_functions, prop_conv);
+    return all_properties(goto_functions);
 }
 
 void bmct::show()
@@ -453,9 +450,9 @@ void bmct::show()
   }
 }
 
-safety_checkert::resultt bmct::stop_on_fail(prop_convt &prop_conv)
+safety_checkert::resultt bmct::stop_on_fail()
 {
-  switch(run_decision_procedure(prop_conv))
+  switch(run_decision_procedure())
   {
   case decision_proceduret::resultt::D_UNSATISFIABLE:
     report_success();
