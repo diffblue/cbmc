@@ -151,7 +151,7 @@ the end of the run to see how many tests passed, how many failed which were
 expected to and how many tests failed which were not expected to.
 
 For more information on the structure of `unit/` and how to tag tests, see
-[the section on unit tests in `Compiling.md` in the root of the CBMC
+[the section on unit tests in `CODING_STANDARD.md` in the root of the CBMC
 repository](https://github.com/diffblue/cbmc/blob/develop/CODING_STANDARD.md#unit-tests)
 
 
