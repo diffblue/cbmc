@@ -52,6 +52,9 @@ public:
       &generic_parameter_specialization_map,
     const namespacet &ns) const;
 
+  /// Get alternative types for a method parameter. For the base class we
+  /// just return an empty set. Derived classes can override this behaviour
+  /// to provide more sophisticated alternative type identification.
   virtual std::set<symbol_typet> get_parameter_alternative_types(
     const irep_idt &function_name,
     const irep_idt &parameter_name,
