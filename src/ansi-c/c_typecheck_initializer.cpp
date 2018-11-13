@@ -350,8 +350,6 @@ void c_typecheck_baset::designator_enter(
   designator.push_entry(entry);
 }
 
-/// \param pre:initialized result, designator
-/// \return sets result
 exprt::operandst::const_iterator c_typecheck_baset::do_designated_initializer(
   exprt &result,
   designatort &designator,

@@ -33,14 +33,6 @@
 /cbmc/src/solvers/flattening/bv_utils.h:134: warning: The following parameters of bv_utilst::equal(const bvt &op0, const bvt &op1) are not documented:
   parameter 'op0'
   parameter 'op1'
-/cbmc/src/ansi-c/c_typecheck_initializer.cpp:347: warning: argument 'pre' of command @param is not found in the argument list of c_typecheck_baset::do_designated_initializer(exprt &result, designatort &designator, const exprt &initializer_list, exprt::operandst::const_iterator init_it, bool force_constant)
-/cbmc/src/ansi-c/c_typecheck_initializer.cpp:347: warning: argument 'initialized' of command @param is not found in the argument list of c_typecheck_baset::do_designated_initializer(exprt &result, designatort &designator, const exprt &initializer_list, exprt::operandst::const_iterator init_it, bool force_constant)
-/cbmc/src/ansi-c/c_typecheck_base.h:98: warning: The following parameters of c_typecheck_baset::do_designated_initializer(exprt &result, designatort &designator, const exprt &initializer_list, exprt::operandst::const_iterator init_it, bool force_constant) are not documented:
-  parameter 'result'
-  parameter 'designator'
-  parameter 'initializer_list'
-  parameter 'init_it'
-  parameter 'force_constant'
 /cbmc/src/ansi-c/c_typecheck_expr.cpp:2779: warning: argument 'type' of command @param is not found in the argument list of c_typecheck_baset::typecheck_function_call_arguments(side_effect_expr_function_callt &expr)
 /cbmc/src/ansi-c/c_typecheck_expr.cpp:2779: warning: argument 'checked' of command @param is not found in the argument list of c_typecheck_baset::typecheck_function_call_arguments(side_effect_expr_function_callt &expr)
 /cbmc/src/ansi-c/c_typecheck_base.h:195: warning: The following parameters of c_typecheck_baset::typecheck_function_call_arguments(side_effect_expr_function_callt &expr) are not documented:
