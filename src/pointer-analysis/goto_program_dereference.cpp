@@ -371,6 +371,7 @@ void goto_program_dereferencet::pointer_checks(
   dereference_program(goto_functions, true);
 }
 
+/// \deprecated
 void remove_pointers(
   goto_programt &goto_program,
   symbol_tablet &symbol_table,
@@ -402,6 +403,7 @@ void remove_pointers(
     goto_program_dereference.dereference_program(it->second.body);
 }
 
+/// \deprecated
 void pointer_checks(
   goto_programt &goto_program,
   symbol_tablet &symbol_table,
@@ -414,6 +416,7 @@ void pointer_checks(
   goto_program_dereference.pointer_checks(goto_program);
 }
 
+/// \deprecated
 void pointer_checks(
   goto_functionst &goto_functions,
   symbol_tablet &symbol_table,
