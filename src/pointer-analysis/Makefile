@@ -1,6 +1,5 @@
 SRC = add_failed_symbols.cpp \
       dereference.cpp \
-      dereference_callback.cpp \
       goto_program_dereference.cpp \
       pointer_offset_sum.cpp \
       rewrite_index.cpp \

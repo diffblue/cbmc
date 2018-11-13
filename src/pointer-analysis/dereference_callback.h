@@ -25,7 +25,7 @@ class symbolt;
 class dereference_callbackt
 {
 public:
-  virtual ~dereference_callbackt();
+  virtual ~dereference_callbackt() = default;
 
   virtual void get_value_set(
     const exprt &expr,

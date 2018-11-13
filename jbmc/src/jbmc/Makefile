@@ -13,7 +13,6 @@ OBJ += ../$(CPROVER_DIR)/src/ansi-c/ansi-c$(LIBEXT) \
       ../$(CPROVER_DIR)/src/pointer-analysis/value_set_domain_fi$(OBJEXT) \
       ../$(CPROVER_DIR)/src/pointer-analysis/value_set_fi$(OBJEXT) \
       ../$(CPROVER_DIR)/src/pointer-analysis/value_set_dereference$(OBJEXT) \
-      ../$(CPROVER_DIR)/src/pointer-analysis/dereference_callback$(OBJEXT) \
       ../$(CPROVER_DIR)/src/pointer-analysis/add_failed_symbols$(OBJEXT) \
       ../$(CPROVER_DIR)/src/pointer-analysis/rewrite_index$(OBJEXT) \
       ../$(CPROVER_DIR)/src/pointer-analysis/goto_program_dereference$(OBJEXT) \
