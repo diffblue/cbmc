@@ -76,13 +76,15 @@ public:
   /// \param pointer_type pointer to be specialized
   /// \param generic_parameter_specialization_map map of types for all generic
   /// parameters in the current scope
+  /// \param visited_nodes set of parameter names already considered in
+  ///   recursion, used to avoid infinite recursion
   /// \return pointer type where generic parameters are replaced with concrete
   /// types, if set in the current scope
   pointer_typet specialize_generics(
     const pointer_typet &pointer_type,
     const generic_parameter_specialization_mapt
       &generic_parameter_specialization_map,
-    generic_parameter_recursion_trackingt &visited) const;
+    generic_parameter_recursion_trackingt &visited_nodes) const;
 };
 
 #endif // CPROVER_JAVA_BYTECODE_SELECT_POINTER_TYPE_H
