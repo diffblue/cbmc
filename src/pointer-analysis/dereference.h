@@ -75,10 +75,6 @@ private:
     const typet &object_type,
     const typet &dereference_type) const;
 
-  void offset_sum(
-    exprt &dest,
-    const exprt &offset) const;
-
   exprt read_object(
     const exprt &object,
     const exprt &offset,
