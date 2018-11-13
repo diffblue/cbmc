@@ -116,13 +116,13 @@ running `regression/test.pl` directly. The way that `test.pl` is run varies betw
 different modules, and can be ascertained by looking at the `test` target in
 the makefile. The simple case is when there isn't a file called `chain.sh`.
 Then you can directly run `test.pl` on a single test folder with the
-following command (from the module directory):
+following command from the module directory (note that it is recommended to
+use absolute paths as it avoids many issues):
 
     <absolute-path-to-test.pl> -p -c <absolute-path-to-binary> <test-folder>
 
 `-p` makes it print a log of failed tests and `-c` tells it where to find the
-binary to run, e.g. `cbmc`, `jbmc` or `goto-analyzer`
-(the path does not have to be absolute, but it is recommended).
+binary to run, e.g. `cbmc`, `jbmc` or `goto-analyzer`.
 If `<test-folder>` is not provided then all test directories are run. The
 `--help` option lists all command line options, including `-j` for running
 multiple tests in parallel and `-C`, `-T`, `-F` and `-K` for controlling
