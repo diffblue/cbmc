@@ -129,9 +129,6 @@
   parameter 'message_handler'
 /cbmc/src/goto-programs/rebuild_goto_start_function.cpp:37: warning: argument 'entry_function' of command @param is not found in the argument list of rebuild_goto_start_function_baset< maybe_lazy_goto_modelt >::operator()(void)
 /cbmc/jbmc/src/java_bytecode/remove_exceptions.cpp:47: warning: Found unknown command `\class_identifier'
-/cbmc/src/goto-programs/resolve_inherited_component.cpp:13: warning: argument 'class_hierarchy' of command @param is not found in the argument list of resolve_inherited_componentt::resolve_inherited_componentt(const symbol_tablet &symbol_table, const class_hierarchyt &clas_hierarchy)
-/cbmc/src/goto-programs/resolve_inherited_component.h:24: warning: The following parameters of resolve_inherited_componentt::resolve_inherited_componentt(const symbol_tablet &symbol_table, const class_hierarchyt &clas_hierarchy) are not documented:
-  parameter 'clas_hierarchy'
 /cbmc/jbmc/src/java_bytecode/select_pointer_type.h:50: warning: The following parameters of select_pointer_typet::specialize_generics(const pointer_typet &pointer_type, const generic_parameter_specialization_mapt &generic_parameter_specialization_map, generic_parameter_recursion_trackingt &visited_nodes) const are not documented:
   parameter 'visited_nodes'
 /cbmc/src/solvers/refinement/string_refinement.cpp:2099: warning: argument 'expr' of command @param is not found in the argument list of string_constraintt::universal_only_in_index(const string_constraintt &constr)
