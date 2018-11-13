@@ -315,7 +315,7 @@ bool disjunctive_polynomial_accelerationt::accelerate(
   }
 
   // Add in any array assignments we can do now.
-  if(!utils.do_arrays(assigns, polynomials, loop_counter, stashed, program))
+  if(!utils.do_arrays(assigns, polynomials, stashed, program))
   {
     // We couldn't model some of the array assignments with polynomials...
     // Unfortunately that means we just have to bail out.
