@@ -13,7 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/simplify_expr.h>
 
-unsigned goto_symext::nondet_count=0;
 unsigned goto_symext::dynamic_counter=0;
 
 void goto_symext::do_simplify(exprt &expr)
@@ -22,7 +21,7 @@ void goto_symext::do_simplify(exprt &expr)
     simplify(expr, ns);
 }
 
-nondet_symbol_exprt build_symex_nondet(typet &type, unsigned &nondet_count)
+nondet_symbol_exprt symex_nondet_generatort::operator()(typet &type)
 {
   irep_idt identifier = "symex::nondet" + std::to_string(nondet_count++);
   nondet_symbol_exprt new_expr(identifier, type);

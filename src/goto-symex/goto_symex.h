@@ -38,6 +38,16 @@ class namespacet;
 class side_effect_exprt;
 class typecast_exprt;
 
+/// Functor generating fresh nondet symbols
+class symex_nondet_generatort
+{
+public:
+  nondet_symbol_exprt operator()(typet &type);
+
+private:
+  unsigned nondet_count = 0;
+};
+
 /// \brief The main class for the forward symbolic simulator
 ///
 /// Higher-level architectural information on symbolic execution is
@@ -399,7 +409,7 @@ protected:
   virtual void symex_input(statet &, const codet &);
   virtual void symex_output(statet &, const codet &);
 
-  static unsigned nondet_count;
+  symex_nondet_generatort build_symex_nondet;
   static unsigned dynamic_counter;
 
   void rewrite_quantifiers(exprt &, statet &);
@@ -448,8 +458,6 @@ public:
     return _remaining_vccs;
   }
 };
-
-nondet_symbol_exprt build_symex_nondet(typet &type, unsigned &nondet_count);
 
 void symex_transition(goto_symext::statet &state);
 
