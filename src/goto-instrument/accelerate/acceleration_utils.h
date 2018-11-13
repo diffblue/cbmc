@@ -154,8 +154,6 @@ public:
   const goto_functionst &goto_functions;
   exprt &loop_counter;
   nil_exprt nil;
-
-  static int num_symbols;
 };
 
 #endif // CPROVER_GOTO_INSTRUMENT_ACCELERATE_ACCELERATION_UTILS_H
