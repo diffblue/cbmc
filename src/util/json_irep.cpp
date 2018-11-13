@@ -19,7 +19,7 @@ Author: Thomas Kiley, thomas.kiley@diffblue.com
 
 /// To convert to JSON from an irep structure by recursively generating JSON
 /// for the different sub trees.
-/// \param include_comments: when writing JSON, should the comments
+/// \param _include_comments: when writing JSON, should the comments
 /// sub tree be included.
 json_irept::json_irept(bool _include_comments):
   include_comments(_include_comments)
@@ -95,7 +95,7 @@ void json_irept::convert_named_sub_tree(
 }
 
 /// Deserialize a JSON irep representation.
-/// \param input: json object to convert
+/// \param in: json object to convert
 /// \return result - irep equivalent of input
 irept json_irept::convert_from_json(const jsont &in) const
 {

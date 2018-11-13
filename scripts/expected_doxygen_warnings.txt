@@ -121,12 +121,6 @@
   parameter 'function_id'
 /cbmc/jbmc/src/java_bytecode/java_string_library_preprocess.h:160: warning: The following parameters of java_string_library_preprocesst::make_string_format_code(const java_method_typet &type, const source_locationt &loc, const irep_idt &function_id, symbol_table_baset &symbol_table) are not documented:
   parameter 'function_id'
-/cbmc/src/util/json_irep.cpp:21: warning: argument 'include_comments' of command @param is not found in the argument list of json_irept::json_irept(bool _include_comments)
-/cbmc/src/util/json_irep.h:23: warning: The following parameters of json_irept::json_irept(bool _include_comments) are not documented:
-  parameter '_include_comments'
-/cbmc/src/util/json_irep.cpp:98: warning: argument 'input' of command @param is not found in the argument list of json_irept::convert_from_json(const jsont &in) const
-/cbmc/src/util/json_irep.h:25: warning: The following parameters of json_irept::convert_from_json(const jsont &in) const are not documented:
-  parameter 'in'
 /cbmc/src/langapi/language_file.cpp:51: warning: argument 'should_generate_stubs' of command @param is not found in the argument list of language_filest::set_should_generate_opaque_method_stubs(bool stubs_enabled)
 /cbmc/src/langapi/language_file.h:104: warning: The following parameters of language_filest::set_should_generate_opaque_method_stubs(bool stubs_enabled) are not documented:
   parameter 'stubs_enabled'
