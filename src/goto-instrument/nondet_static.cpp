@@ -73,11 +73,11 @@ void nondet_static(
   goto_functionst &goto_functions,
   const irep_idt &fct_name)
 {
-  goto_functionst::function_mapt::iterator
-    i_it=goto_functions.function_map.find(fct_name);
-  assert(i_it!=goto_functions.function_map.end());
+  goto_functionst::function_mapt::iterator fct_entry =
+    goto_functions.function_map.find(fct_name);
+  CHECK_RETURN(fct_entry != goto_functions.function_map.end());
 
-  goto_programt &init=i_it->second.body;
+  goto_programt &init = fct_entry->second.body;
 
   Forall_goto_program_instructions(i_it, init)
   {
