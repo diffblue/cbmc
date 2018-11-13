@@ -128,6 +128,3 @@
   parameter 'class_symbol_name'
 /cbmc/jbmc/src/java_bytecode/ci_lazy_methods_needed.h:38: warning: The following parameters of ci_lazy_methods_neededt::add_needed_method(const irep_idt &method_symbol_name) are not documented:
   parameter 'method_symbol_name'
-/cbmc/src/pointer-analysis/dereference.h:26: warning: argument '_new_symbol_table' of command @param is not found in the argument list of dereferencet::dereferencet(const namespacet &_ns)
-/cbmc/src/pointer-analysis/dereference.h:26: warning: argument '_options' of command @param is not found in the argument list of dereferencet::dereferencet(const namespacet &_ns)
-/cbmc/src/pointer-analysis/dereference.h:26: warning: argument '_dereference_callback' of command @param is not found in the argument list of dereferencet::dereferencet(const namespacet &_ns)
