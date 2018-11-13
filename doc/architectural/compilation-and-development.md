@@ -128,8 +128,14 @@ If `<test-folder>` is not provided then all test directories are run. The
 multiple tests in parallel and `-C`, `-T`, `-F` and `-K` for controlling
 whether `CORE`, `THOROUGH`, `FUTURE` or `KNOWNBUG` tests are run.
 
-When there is a file called `chain.sh` then `test.pl` is called with
-`-c ../chain.sh`, followed by arguments which vary from module to module.
+When there is a file called `chain.sh` then the command should look like
+
+    <absolute-path-to-test.pl> -p -c '<absolute-path-to-chain-sh> <arg-1> ... <arg-n>' <test-folder>
+
+Note the single quotes - it will not work without them. What to put for the
+arguments  `<arg-1>` to `<arg-n>` varies from module to module. To find
+out, look in `chain.sh` and see what arguments it expects. You can also look in
+the `Makefile` and see how it calls `chain.sh` in the `test` target.
 
 
 \subsection compilation-and-development-subsection-unit-tests Unit tests
