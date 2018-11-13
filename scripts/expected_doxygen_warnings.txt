@@ -33,10 +33,6 @@
 /cbmc/src/solvers/flattening/bv_utils.h:134: warning: The following parameters of bv_utilst::equal(const bvt &op0, const bvt &op1) are not documented:
   parameter 'op0'
   parameter 'op1'
-/cbmc/src/ansi-c/c_typecheck_expr.cpp:2779: warning: argument 'type' of command @param is not found in the argument list of c_typecheck_baset::typecheck_function_call_arguments(side_effect_expr_function_callt &expr)
-/cbmc/src/ansi-c/c_typecheck_expr.cpp:2779: warning: argument 'checked' of command @param is not found in the argument list of c_typecheck_baset::typecheck_function_call_arguments(side_effect_expr_function_callt &expr)
-/cbmc/src/ansi-c/c_typecheck_base.h:195: warning: The following parameters of c_typecheck_baset::typecheck_function_call_arguments(side_effect_expr_function_callt &expr) are not documented:
-  parameter 'expr'
 /cbmc/jbmc/src/java_bytecode/ci_lazy_methods.h:100: warning: The following parameters of ci_lazy_methodst::ci_lazy_methodst(const symbol_tablet &symbol_table, const irep_idt &main_class, const std::vector< irep_idt > &main_jar_classes, const std::vector< load_extra_methodst > &lazy_methods_extra_entry_points, java_class_loadert &java_class_loader, const std::vector< irep_idt > &extra_instantiated_classes, const select_pointer_typet &pointer_type_selector, message_handlert &message_handler, const synthetic_methods_mapt &synthetic_methods) are not documented:
   parameter 'synthetic_methods'
 /cbmc/src/goto-instrument/wmm/event_graph.h:506: warning: The following parameters of event_grapht::explore_copy_segment(std::set< event_idt > &explored, event_idt begin, event_idt end) const are not documented:
