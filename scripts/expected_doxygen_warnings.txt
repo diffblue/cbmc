@@ -83,9 +83,6 @@
   parameter 'symbol_table'
   parameter 'goto_functions'
   parameter 'function_id'
-/cbmc/src/goto-programs/goto_program.cpp:21: warning: argument 'instruction' of command @param is not found in the argument list of goto_programt::output_instruction(const namespacet &ns, const irep_idt &identifier, std::ostream &out, const instructionst::value_type &it) const
-/cbmc/src/goto-programs/goto_program.h:560: warning: The following parameters of goto_programt::output_instruction(const namespacet &ns, const irep_idt &identifier, std::ostream &out, const instructionst::value_type &it) const are not documented:
-  parameter 'it'
 /cbmc/src/goto-instrument/wmm/goto2graph.h:260: warning: The following parameters of instrumentert::cfg_visitort::visit_cfg_function(value_setst &value_sets, memory_modelt model, bool no_dependencies, loop_strategyt duplicate_body, const irep_idt &function, std::set< nodet > &ending_vertex) are not documented:
   parameter 'model'
   parameter 'no_dependencies'
