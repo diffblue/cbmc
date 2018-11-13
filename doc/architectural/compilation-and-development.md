@@ -118,7 +118,7 @@ the makefile. The simple case is when there isn't a file called `chain.sh`.
 Then you can directly run `test.pl` on a single test folder with the
 following command (from the module directory):
 
-    ../test.pl -p -c <absolute-path-to-binary> <test-folder>
+    <absolute-path-to-test.pl> -p -c <absolute-path-to-binary> <test-folder>
 
 `-p` makes it print a log of failed tests and `-c` tells it where to find the
 binary to run (the path does not have to be absolute, but it is recommended).
