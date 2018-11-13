@@ -81,11 +81,12 @@ void instrumentert::instrument_with_strategy(instrumentation_strategyt strategy)
 }
 
 void inline instrumentert::instrument_all_inserter(
-  const std::set<event_grapht::critical_cyclet> &set_of_cycles)
+  const std::set<event_grapht::critical_cyclet> &subset_of_cycles)
 {
-  for(std::set<event_grapht::critical_cyclet>::const_iterator
-    it=(set_of_cycles).begin();
-    it!=(set_of_cycles).end(); ++it)
+  for(std::set<event_grapht::critical_cyclet>::const_iterator it =
+        subset_of_cycles.begin();
+      it != subset_of_cycles.end();
+      ++it)
   {
     for(std::set<event_grapht::critical_cyclet::delayt>::const_iterator
       p_it=it->unsafe_pairs.begin();
@@ -109,15 +110,16 @@ void inline instrumentert::instrument_all_inserter(
 }
 
 void inline instrumentert::instrument_one_event_per_cycle_inserter(
-  const std::set<event_grapht::critical_cyclet> &set_of_cycles)
+  const std::set<event_grapht::critical_cyclet> &subset_of_cycles)
 {
   /* to keep track of the delayed pair, and to avoid the instrumentation
      of two pairs in a same cycle */
   std::set<event_grapht::critical_cyclet::delayt> delayed;
 
-  for(std::set<event_grapht::critical_cyclet>::iterator
-    it=set_of_cycles.begin();
-    it!=set_of_cycles.end(); ++it)
+  for(std::set<event_grapht::critical_cyclet>::iterator it =
+        subset_of_cycles.begin();
+      it != subset_of_cycles.end();
+      ++it)
   {
     /* cycle with already a delayed pair? */
     bool next=false;
@@ -189,7 +191,7 @@ unsigned inline instrumentert::cost(
 }
 
 void inline instrumentert::instrument_minimum_interference_inserter(
-  const std::set<event_grapht::critical_cyclet> &set_of_cycles)
+  const std::set<event_grapht::critical_cyclet> &subset_of_cycles)
 {
   /* Idea:
      We solve this by a linear programming approach,
@@ -216,10 +218,10 @@ void inline instrumentert::instrument_minimum_interference_inserter(
 #ifdef HAVE_GLPK
   /* first, identify all the unsafe pairs */
   std::set<event_grapht::critical_cyclet::delayt> edges;
-  for(std::set<event_grapht::critical_cyclet>::iterator
-    C_j=set_of_cycles.begin();
-    C_j!=set_of_cycles.end();
-    ++C_j)
+  for(std::set<event_grapht::critical_cyclet>::iterator C_j =
+        subset_of_cycles.begin();
+      C_j != subset_of_cycles.end();
+      ++C_j)
     for(std::set<event_grapht::critical_cyclet::delayt>::const_iterator e_i=
       C_j->unsafe_pairs.begin();
       e_i!=C_j->unsafe_pairs.end();
@@ -236,8 +238,8 @@ void inline instrumentert::instrument_minimum_interference_inserter(
   glp_set_prob_name(lp, "instrumentation optimisation");
   glp_set_obj_dir(lp, GLP_MIN);
 
-  message.debug() << "edges: "<<edges.size()<<" cycles:"<<set_of_cycles.size()
-    << messaget::eom;
+  message.debug() << "edges: " << edges.size()
+                  << " cycles:" << subset_of_cycles.size() << messaget::eom;
 
   /* sets the variables and coefficients */
   glp_add_cols(lp, edges.size());
@@ -256,12 +258,12 @@ void inline instrumentert::instrument_minimum_interference_inserter(
   }
 
   /* sets the constraints (soundness): one per cycle */
-  glp_add_rows(lp, set_of_cycles.size());
+  glp_add_rows(lp, subset_of_cycles.size());
   i=0;
-  for(std::set<event_grapht::critical_cyclet>::iterator
-    C_j=set_of_cycles.begin();
-    C_j!=set_of_cycles.end();
-    ++C_j)
+  for(std::set<event_grapht::critical_cyclet>::iterator C_j =
+        subset_of_cycles.begin();
+      C_j != subset_of_cycles.end();
+      ++C_j)
   {
     ++i;
     std::string name="C_"+std::to_string(i);
@@ -269,7 +271,7 @@ void inline instrumentert::instrument_minimum_interference_inserter(
     glp_set_row_bnds(lp, i, GLP_LO, 1.0, 0.0); /* >= 1*/
   }
 
-  const std::size_t mat_size=set_of_cycles.size()*edges.size();
+  const std::size_t mat_size = subset_of_cycles.size() * edges.size();
   message.debug() << "size of the system: " << mat_size
     << messaget::eom;
   std::vector<int> imat(mat_size+1);
@@ -287,10 +289,10 @@ void inline instrumentert::instrument_minimum_interference_inserter(
     ++e_i)
   {
     row=1;
-    for(std::set<event_grapht::critical_cyclet>::iterator
-      C_j=set_of_cycles.begin();
-      C_j!=set_of_cycles.end();
-      ++C_j)
+    for(std::set<event_grapht::critical_cyclet>::iterator C_j =
+          subset_of_cycles.begin();
+        C_j != subset_of_cycles.end();
+        ++C_j)
     {
       imat[i]=row;
       jmat[i]=col;
@@ -344,7 +346,7 @@ void inline instrumentert::instrument_minimum_interference_inserter(
 
   glp_delete_prob(lp);
 #else
-  (void)set_of_cycles; // unused parameter
+  (void)subset_of_cycles; // unused parameter
   throw "sorry, minimum interference option requires glpk; "
         "please recompile goto-instrument with glpk";
 #endif
