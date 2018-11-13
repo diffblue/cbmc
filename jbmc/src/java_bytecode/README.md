@@ -39,9 +39,21 @@ To be documented.
 
 \subsection java-bytecode-pointer-type-selection Pointer type selection
 
-To be documented.
+In Java, all variables that are of a non-primitive type are pointers to
+an object. When initializing such variables using \ref java_object_factoryt,
+e.g., as input arguments for the method under test, we may need to select the
+correct pointer type. For example, abstract classes can be replaced with their
+concrete implementations and type parameters in generic types can be replaced
+with their specialized types.
 
-\subsection java-bytecode-genereic-substitution Generic substitution
+The class \ref select_pointer_typet offers the basic interface for this
+functionality, in particular see
+\ref select_pointer_typet::convert_pointer_type. Note that this class only
+implements generic specialization (see \ref
+java-bytecode-generic-specialization), derived classes can override this
+behavior to provide more sophisticated type selection.
+
+\subsection java-bytecode-generic-specialization Generic specialization
 
 To be documented.
 
