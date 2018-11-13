@@ -68,9 +68,7 @@ protected:
   DEPRECATED("Unused")
   virtual bool is_valid_object(const irep_idt &identifier);
 
-  virtual bool has_failed_symbol(
-    const exprt &expr,
-    const symbolt *&symbol);
+  bool has_failed_symbol(const exprt &expr, const symbolt *&symbol) override;
 
   DEPRECATED("Unused")
   virtual void dereference_failure(
@@ -78,7 +76,7 @@ protected:
     const std::string &msg,
     const guardt &guard);
 
-  virtual void get_value_set(const exprt &expr, value_setst::valuest &dest);
+  void get_value_set(const exprt &expr, value_setst::valuest &dest) override;
 
   void dereference_instruction(
     goto_programt::targett target,
