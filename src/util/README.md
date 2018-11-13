@@ -241,8 +241,8 @@ Symbols have:
 * A mode, which indicates the source language frontend responsible for creating
   them. This is mainly used in pretty-printing the symbol table, to indicate
   the appropriate language frontend to use rendering the symbol's value and/or
-  type. For example, mode == ID_C == "C" indicates that \ref ansi_ct, the C
-  front-end, should be used to pretty-print, which in turn delegates to
+  type. For example, mode == ID_C == "C" indicates that \ref ansi_c_languaget,
+  the C front-end, should be used to pretty-print, which in turn delegates to
   \ref expr2ct.
 * A base-name and pretty-name, which are a short and user-friendly version of
   the symbol's definitive name respectively.
