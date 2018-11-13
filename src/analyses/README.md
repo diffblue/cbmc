@@ -69,7 +69,25 @@ To be documented.
 
 \subsection analyses-escape Escape analysis (escape_analysist)
 
-To be documented.
+This is a simple [https://en.wikipedia.org/wiki/Escape_analysis](escape analysis).
+It is intended to implement `__CPROVER_cleanup` instructions, which say that a given
+cleanup function should be run when a particular object goes out of scope. Examples of
+its usage can be seen in `ansi-c/library/stdio.c` and `ansi-c/library/pthread_lib.c`,
+where it is used to introduce assertions that a `FILE*` going out of scope has been
+`fclose`'d or similarly that a `pthread_mutex*` has been properly destroyed.
+
+For example `f = fopen("/tmp/hello", "wb"); __CPROVER_cleanup(f, check_closed);`
+should result in a call to `check_closed(f)` or `check_closed()` (depending on
+whether it has an argument) when `f` and all its aliases go out of scope.
+
+The alias analysis is a simple union-find algorithm, and can introduce cleanup calls
+too soon (i.e. before all aliases are really gone), so this overestimates the possible
+problems caused by escaping pointers.
+
+Note this differs from a typical escape analysis, which would conservatively
+(over-)estimate the objects that may be reachable when (e.g.) a function exits;
+this *underestimates* the reachable objects in order to favour false positives
+over false negatives when testing for missing close operations.
 
 \subsection analyses-global-may-alias Global may-alias analysis (global_may_aliast)
 
