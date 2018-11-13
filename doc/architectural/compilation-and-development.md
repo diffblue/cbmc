@@ -22,7 +22,7 @@ FreeBSD 11, MacOS X and Windows.
 
 There is also support for compiling using CMake. Instructions are
 available in
-[COMPILING.md](https://github.com/diffblue/cbmc/blob/develop/COMPILING.md#working-with-cmake-experimental)
+[COMPILING.md](https://github.com/diffblue/cbmc/blob/develop/COMPILING.md#working-with-cmake)
 in the root of the CBMC repository.
 
 
@@ -93,7 +93,7 @@ folders.
 If you have compiled using CMake then you can run the regression tests (and
 the unit tests) using CTest.
 
-Here are two example commands, to be run from the build directory:
+Here are two example commands, to be run from the `build/` directory:
 
     ctest -V -L CORE -R cpp
     ctest -V -L CORE -R cpp -E cbmc-cpp
@@ -112,7 +112,7 @@ list which tests it will run without actually running them.
 \subsubsection compilation-and-development-subsubsection-running-regression-tests-directly-with-test-pl Running regression tests directly with `test.pl`
 
 It can be useful to run a single test folder in isolation. This can be done by
-running `test.pl` directly. The way that `test.pl` is run varies between the
+running `regression/test.pl` directly. The way that `test.pl` is run varies between the
 different modules, and can be ascertained by looking at the `test` target in
 the makefile. The simple case is when there isn't a file called `chain.sh`.
 Then you can directly run `test.pl` on a single test folder with the
@@ -151,7 +151,7 @@ the end of the run to see how many tests passed, how many failed which were
 expected to and how many tests failed which were not expected to.
 
 For more information on the structure of `unit/` and how to tag tests, see
-[the section on unit tests in `Compiling.md` in the root of the CBMC
+[the section on unit tests in `CODING_STANDARD.md` in the root of the CBMC
 repository](https://github.com/diffblue/cbmc/blob/develop/CODING_STANDARD.md#unit-tests)
 
 
