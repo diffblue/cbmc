@@ -122,11 +122,6 @@ private:
   ///        ID_unknown), a `valuet` with nil `value` and `ignore` == false.
   valuet build_reference_to(const exprt &what, const exprt &pointer);
 
-  bool get_value_guard(
-    const exprt &symbol,
-    const exprt &premise,
-    exprt &value);
-
   static const exprt &get_symbol(const exprt &object);
 
   bool memory_model(exprt &value, const typet &type, const exprt &offset);
