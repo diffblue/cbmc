@@ -92,10 +92,6 @@ private:
     const typet &object_type,
     const typet &dereference_type) const;
 
-  void offset_sum(
-    exprt &dest,
-    const exprt &offset) const;
-
   /// Return value for `build_reference_to`; see that method for documentation.
   class valuet
   {
