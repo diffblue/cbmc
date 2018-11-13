@@ -28,31 +28,31 @@ const char *non_ms_link_options[]=
   "--verbosity"
 };
 
-bool ms_link_cmdlinet::parse(const std::vector<std::string> &options)
+bool ms_link_cmdlinet::parse(const std::vector<std::string> &arguments)
 {
-  for(std::size_t i = 0; i < options.size(); i++)
+  for(std::size_t i = 0; i < arguments.size(); i++)
   {
     // is it a non-link option?
-    if(std::string(options[i], 0, 2) == "--")
+    if(std::string(arguments[i], 0, 2) == "--")
     {
-      process_non_link_option(options[i]);
+      process_non_link_option(arguments[i]);
 
-      if(options[i] == "--verbosity")
+      if(arguments[i] == "--verbosity")
       {
-        if(i < options.size() - 1)
+        if(i < arguments.size() - 1)
         {
-          set(options[i], options[i + 1]);
+          set(arguments[i], arguments[i + 1]);
           i++; // skip ahead
         }
       }
     }
-    else if(!options[i].empty() && options[i][0] == '@')
+    else if(!arguments[i].empty() && arguments[i][0] == '@')
     {
       // potentially recursive
-      process_response_file(std::string(options[i], 1, std::string::npos));
+      process_response_file(std::string(arguments[i], 1, std::string::npos));
     }
     else
-      process_link_option(options[i]);
+      process_link_option(arguments[i]);
   }
 
   return false;
@@ -65,13 +65,13 @@ bool ms_link_cmdlinet::parse(int argc, const char **argv)
 {
   // should really use "wide" argv from wmain()
 
-  std::vector<std::string> options;
+  std::vector<std::string> arguments;
 
   // skip argv[0]
   for(int i = 1; i < argc; i++)
-    options.push_back(argv[i]);
+    arguments.push_back(argv[i]);
 
-  return parse(options);
+  return parse(arguments);
 }
 
 static std::istream &my_wgetline(std::istream &in, std::wstring &dest)
@@ -182,7 +182,7 @@ void ms_link_cmdlinet::process_response_file_line(const std::string &line)
   if(line[0] == '#')
     return; // comment
 
-  std::vector<std::string> options;
+  std::vector<std::string> arguments;
   std::string option;
   bool in_quotes = false;
   for(std::size_t i = 0; i < line.size(); i++)
@@ -192,7 +192,7 @@ void ms_link_cmdlinet::process_response_file_line(const std::string &line)
     if(ch == ' ' && !in_quotes)
     {
       if(!option.empty())
-        options.push_back(option);
+        arguments.push_back(option);
       option.clear();
     }
     else if(ch == '"')
@@ -204,9 +204,9 @@ void ms_link_cmdlinet::process_response_file_line(const std::string &line)
   }
 
   if(!option.empty())
-    options.push_back(option);
+    arguments.push_back(option);
 
-  parse(options);
+  parse(arguments);
 }
 
 /// \return none
