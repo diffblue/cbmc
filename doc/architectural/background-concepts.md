@@ -547,14 +547,14 @@ the name of an older incarnation of the variable.
 We illustrate this transformation by first showing how the body of the
 `for` loop of `factorial` is transformed. We currently have:
 
-```
+```_
 expression: fac.1 *= i.1
 expression: i.1 ++
 ```
 
 We now give a second number to each variable, counting the number of
 assignments so far. Thus, the SSA version of this code turns out to be
-```
+```_
 expression: fac.1.2 = fac1.1 * i.1.1
 expression: i.1.2 = i.1.1 + 1
 ```
@@ -696,8 +696,8 @@ is to encode both the program and the set of states using an appropriate logic,
 mostly *propositional logic* and (fragments of) *first-order logic*.
 
 In the following, we will quickly discuss propositional logic, in combination
-with SAT solving, and show how to build a simple bounded model checker for
-a finite-state program. Actual bounded model checking for software requires
+with SAT solving, and show how to build a simple bounded model checker.
+Actual bounded model checking for software requires
 a number of additional steps and concepts, which will be introduced as required
 later on.
 
@@ -764,16 +764,395 @@ Next, try running minisat on the following formula:
 ''(*x* or *y*) and (*x* or not *y*) and (not *x*) and *y*''
 What changed? Why?
 
+\subsubsection bitvector_subsubsection Using SAT to reason about data: Bit vectors
+
+So far, we have seen how to reason about simple propositional formulas. This
+seems to be quite far from our goal of reasoning about the behavior of programs.
+As a first step, let us see how we can lift SAT-based reasoning to reasoning about
+data such as machine integers.
+
+Remember the `factorial` function. It starts with the line
+```C
+unsigned long fac = 1;
+```
+Now, suppose that `fac` will be represented as a binary number with 64 bits (this
+is standard on, e.g., Linux). So,
+if we wish to reason about the contents of the variable `fac`, we might as well
+represent it as a vector of 64 propositional variables, say `fac`<sub>0</sub> to
+`fac`<sub>63</sub>, where
+`fac` = 2<sup>63</sup> `fac`<sub>63</sub> + ... + 2<sup>0</sup> `fac`<sub>0</sub>.
+We can then assert that `fac`=1 using
+the propositional formula
+`fac`<sub>63</sub> = 0 and ... and `fac`<sub>1</sub> = 0 and `fac`<sub>0</sub> = 1,
+where we define the formula A = B as ''(A or not B) and (B or not A)''.
+
+We call this a *bit vector* representation. Compare the Wikipedia page on
+[Binary numbers](https://en.wikipedia.org/wiki/Binary_number).
+
+Bit vector representations can also be used to describe operations on binary
+numbers. For instance, suppose we have two four-bit numbers A_3, ... A_0
+(representing a number A) and B_3, ..., B_0 (representing a number b)
+and wish to add them. As detailed on the page on
+[Binary adders](https://en.wikipedia.org/wiki/Adder_(electronics)),
+we define three additional bit vectors, the *carries* C<sub>0</sub>, ..., C<sub>3</sub>,
+the *partial sum* P<sub>0</sub>, ..., P<sub>4</sub> and
+the *sum* S<sub>0</sub>, ..., S<sub>4</sub> , representing a number S such that
+S=A+B.
+Note that the sum vector has one bit more - why? How
+is this related to arithmetic overflow in C?
+
+For convenience, we first define the *half-adder*. This is given as two
+formulas, HA_S(A,B) = (A and not B) or (B and not A), which gives the
+sum of the bits A and B, and HA_C(A,B) = A and B, which indicates
+whether the result of the sum was too big to fit into one bit (so we carry
+a one to the next bit).
+
+Using the half-adder formulas, we can define the *full adder*, again given as
+two formulas, one for sum and the other for carry. We have
+FA_S(A,B,C_in) = HA(HA(A,B),C_in), giving the sum of A, B and C_in,
+and FA_C(A,B,C_in) = HA_C(A,B) or (C_in and HA_S(A,B)), which states
+whether the result is too big to fit into a bit. Note that the full adder
+has an additional input for carries; in the following step, we will use it
+to chain the full adders together to compute the actual sum.
+
+Using the helper variables we have above, we can give the sum of the four-bit
+numbers as
+> C_0 = FA_C(A_0,B_0,0) and C_1 = FA_C(A_1,B_1,C_0) and
+> C_2 = FA_C(A_2,B_2,C_1) and C_3 = FA_C(A_3,B_3,C_2) and
+> S_0 = FA_S(A_0,B_0,0) and S_1 = FA_S(A_1,B_1,C_0) and
+> and S_2 = FA_S(A_2,B_2,C_1) and S_3 = FA_S(A_3,B_3,C_2)
+> and S_3 = FA_S(0,0,C_3).
+
+Other arithmetic operations on binary numbers can be expressed using propositional
+logic as well; the details can be found in the linked articles, as well
+as [Two's complement](https://en.wikipedia.org/wiki/Two%27s_complement) for
+handling signed integers and [IEEE 754](https://en.wikipedia.org/wiki/IEEE_754)
+for floating point numbers.
+
+In the following, we will simply write formulas such as S=A+B, with the
+understanding that this is internally represented using the appropriate bit
+vectors.
+
 \subsubsection bmc_subsubsection How bounded model checking works
 
-TODO This section needs to be written on the next documentation day.
+At this point, we can start considering how to express program behavior in
+propositional logic.
 
-The following content needs to be added:
+Let us start with a very simple program:
+```C
+int sum(int a, int b)
+{
+  return a + b;
+}
+```
+To describe the behavior of this program, we introduce the appropriately-sized
+bit vectors A and B, and an additional helper vector return. The A and
+B bit vectors reflect the values of the parameters `a` and `b`, while
+return contains the return value of the function. As we have seen above, we
+can describe the value of `a+b` as A+B -- remember that this is an
+abbreviation for a moderately complex formula on bit vectors!
 
-- How does it work? Encoding of state as propositions/first-order
-  propositions, step function and composition of step functions.
-- Solve question: is there a model for this formula?
-- Traces
+From the semantics of the `return` instruction, we know that this program will
+return the value `a+b`, so we can describe its behavior as return = A+B.
+
+Let us consider a slightly more complex program.
+```C
+int calculate(int x)
+{
+  int y = x * x;
+  y = y + x;
+  return y;
+}
+```
+We again introduce several bit vectors. For the parameter `x`, we introduce a
+bit vector X, and for the return value, return. But we also have to deal
+with the (local) variable `y`, which gets two assignments. Furthermore, we
+now have a program with three instructions.
+
+Thinking about the approach so far, we find that we cannot directly translate
+`y=y+x` into a propositional formula: On the left-hand side of the `=`, we
+have the ''new'' value of `y`, while the right-hand side uses the ''old'' value.
+But propositional formulas do not distinguish between ''old'' and ''new'' values,
+so we need to find a way to distinguish between the two. The easiest solution
+is to use the Static Single Assignment form described in section \ref SSA_section.
+We transform the program into SSA (slightly simplifying the notation):
+```C
+int calculate(int x.1)
+{
+  int y.1 = x.1 * x.1;
+  y.2 = y.1 + x.1;
+  return y.2;
+}
+```
+In this form, we know that each variable is assigned to at most once.
+To capture the behavior of this program, we translate it statement-by-statement
+into a propositional formula. We introduce two bit vectors Y1 and Y2 to
+stand for `y.1` and `y.2` (we map X to `x.1` and return to the return
+value). `int y.1 = x.1 * x.1` becomes Y1 = X * X, `y.2 = y.1 + x.1` becomes
+Y2 = Y1 + X and `return y.2` becomes return = Y2.
+
+To tie the three formulas together into a description of the whole program,
+we note that the three instructions form a single basic block, so we know they
+are always executed as a unit. In this case, it is sufficient to simply connect
+them with ''and'': Y1 = X * X and Y2 = Y1 + X and return = Y2. Note that thanks
+to SSA, we do not need to pay attention to control flow here.
+
+One example of non-trivial control flow are `if` statements. Consider the
+following example:
+```C
+int max(int a, int b)
+{
+  int result;
+  if (a < b)
+    result = b;
+  else
+    result = a;
+  return result;
+}
+```
+Bringing this into SSA form, we have the following program (we write `Phi` for &Phi;):
+```C
+int max(int a, int b)
+{
+  int result;
+  if (a < b)
+    result.1 = b;
+  else
+    result.2 = a;
+  return Phi(result.1,result.2);
+}
+```
+We again introduce bit vectors A (for parameter `a`), B (for parameters `b`),
+R1 (for `result.1`), R2 (for `result.2`) and
+return (for the return value). The interesting question in this case is
+how we can handle the &Phi; node: so far, it is a ''magic'' operator that selects
+the correct value.
+
+As a first step, we modify the SSA form slightly by introducing an additional
+propositional variable C that tracks which branch of the `if` was taken.
+We call this variable the *code guard variable*, or *guard* for short.
+Additionally, we add C to the &Phi; node as a new first parameter, describing
+which input to use as a result.
+The corresponding program looks something like this:
+```C
+int max(int a, int b)
+{
+  int result;
+  bit C; /* Track which branch was taken */
+  C = a < b;
+  /* if (C) - not needed anymore thanks to SSA */
+    result.1 = b;
+  /* else */
+    result.2 = a;
+  return Phi(C,result.1,result.2);
+}
+```
+For the encoding of the program, we introduce the implication junctor, written
+&rArr;, where ''A &rArr; B'' is equivalent to ''(not A) or B''.
+It can be understood as ''if A holds, B must hold as well''.
+
+With these ingredients, we can encode the program. First of all, we translate
+the basic statements of the program:
+- `C = a<b` maps to C = A&lt;B, for an appropriate formula A&lt;B.
+- `result.1 = b` becomes R1 = B, and `result.2 = a` becomes R2 = A.
+
+Finally, the &Phi; node is again resolved using the &rArr; junctor: we
+can encode the `return` statement as
+(C &rArr; return = R1) and ((not C) &rArr; return = R2).
+
+At this point, it remains to tie the statements together; we find that we can
+again simply connect them with ''and''. We get:
+> C = a&lt;b and R1 = B and R2 = A and
+> (C &rArr; return = R1) and ((not C) &rArr; return = R2).
+
+So far, we have only discussed how to encode the behavior of programs
+as propositional formulas. To actually reason about programs, we also need to
+a way to describe the property we want to prove. To do this, we introduce a
+primitive `ASSERT`. Let `e` be some expression; then `ASSERT(e)` is supposed
+to do nothing if `e` evaluates to true, and to abort the program if `e`
+evaluates to false.
+
+For instance, we can add prove that `max(a,b) <= a` by modifying the `max`
+function into
+```C
+int max(int a, int b)
+{
+  int result;
+  if (a < b)
+    result = b;
+  else
+    result = a;
+  ASSERT(result <= a);
+  return result;
+}
+```
+
+The corresponding SSA would be
+```C
+int max(int a, int b)
+{
+  int result;
+  bit C; /* Track which branch was taken */
+  C = a < b;
+  result.1 = b;
+  result.2 = a;
+  ASSERT(Phi(C,result.1,result.2) <= a);
+  return Phi(C,result.1,result.2);
+}
+```
+We translate `ASSERT(Phi(C,result.1,result.2) <= a)` into
+> &Phi;(C,result.1,result.2) &lt;= a
+The resulting formula would be
+> C = a&lt;b and R1 = B and R2 = A and
+> (C &rArr; R1 &lt;= A) and ((not C) &rArr; R2 &lt;= A).
+> (C &rArr; return = R1) and ((not C) &rArr; return = R2).
+
+We can extend this approach quite straightforwardly to other constructs, but
+one obvious problem remains: We have not described how to handle loops. This
+turns out to be a substantial issue for theoretical reasons: Programs without
+loop (and without recursive functions) always run for a limited amount of
+execution steps, so we can easily write down formulas that, essentially,
+track their entire execution history. But programs with loops can take
+arbitrarily many steps, or even run into infinite loops, so we cannot describe
+their behavior using a finite propositional formula in the way we have
+done above.
+
+There are multiple approaches to deal with this problem, all with different
+trade-offs. CBMC chooses bounded model checking as the underlying approach.
+The idea is that we only consider program
+executions that are, in some measure, ''shorter'' than a given bound. This bound
+then implies an upper bound on the size of the required formulas, which makes
+the problem tractable.
+
+To make this concrete, let's go back to the factorial example. We consider
+the function in the following form (in CPROVER, we actually use a `goto`-based
+IR, but the `while`-based version is a bit simpler to understand):
+```C
+unsigned long factorial(unsigned n) {
+  unsigned long fac = 1;
+  unsigned int i = 1;
+  while (i <= n) {
+    fac *= i;
+    i = i+1;
+  }
+  return fac;
+}
+```
+We set the following ''length bound'': The loops in the program are allowed to
+be executed at most three times; we will ignore all other executions. With this
+in mind, we observe that the following two classes of programs behave
+exactly the same:
+```C
+/* Execute this loop at most n+1 times */
+while (e) {
+  body;
+}
+```
+and
+```C
+if (e) {
+  body;
+  /* Execute this loop at most n times */
+  while (e) {
+    body;
+  }
+}
+```
+This transformation is known as [loop unrolling](https://en.wikipedia.org/wiki/Loop_unrolling)
+or *unwinding*:
+We can always replace a loopby an
+`if` that checks if we should execute, a copy of the loop body and the
+loop statement.
+
+So, to reason about the `factorial` function, we unroll the loop three times
+and then replace the loop with `ASSERT(!(condition))`. We get:
+```C
+unsigned long factorial(unsigned n) {
+  unsigned long fac = 1;
+  unsigned int i = 1;
+  if (i <= n) {
+    fac *= i;
+    i = i+1;
+    if (i <= n) {
+      fac *= i;
+      i = i+1;
+      if (i <= n) {
+        fac *= i;
+        i = i+1;
+        ASSERT(!(i <= n));
+    }
+  }
+  return fac;
+}
+```
+Since this program is now in a simpler form without loops, we can use the
+techniques we learned above to transform it into a propositional formula.
+First, we transform into SSA (with code guard variables already included):
+```C
+unsigned long factorial(unsigned n) {
+  unsigned long fac.1 = 1;
+  unsigned int i.1 = 1;
+  bit C1 = i.1 <= n;
+  /* if (C1) { */
+  fac.2 = fac.1 * i.1;
+  i.2 = i.1+1;
+  bit C2 = i.2 <= n;
+  /* if (C2) { */
+  fac.3 = fac.2 * i.2;
+  i.3 = i.2+1;
+  bit C3 = i.3 <= n;
+  /* if (C3) { */
+  fac.4 = fac.3 * i.3;
+  i.4 = i.3+1;
+  ASSERT(!(i.4 <= n));
+  /* }}} */
+  return Phi(C1, Phi(C2, Phi(C3, fac.4, fac.3), fac.2), fac.1);
+}
+```
+Note that we may be missing
+possible executions of the program due to this translation; we come back to
+this point later.
+
+The corresponding propositional formula can then be written as (check
+that this is equivalent to the formula you would be getting by following
+the translation procedure described above):
+
+> fac.1 = 1 and i.1 = 1 and C1 = i.1 &lt;= n and
+> fac.2 = fac.1 * i.1 and i.2 = i.1 + 1 and C2 = i.2 &lt;= n and
+> fac.3 = fac.2 * i.2 and i.3 = i.2 + 1 and C3 = i.3 &lt;= n and
+> fac.4 = fac.3 * i.3 and i.4 = i.3 + 1 and C4 = i.4 &lt;= n and
+> not (i.4 <= n) and
+> ((C1 and C2 and C3) &rArr; result = fac.4) and
+> ((C1 and C2 and not C3) &rArr; result = fac.3) and
+> ((C1 and not C2) &rArr; result = fac.2) and
+> ((not C1) &rArr; result = fac.1)
+In the following, we reference this formula as FA(n, result).
+
+At this point, we know how to encode programs as propositional formulas.
+Our goal was to reason about programs, and in particular, to check whether
+a certain property holds. Suppose, for example, that we want to check if there
+is a way that the `factorial` function returns `6`. One way to do this is to
+look at the following propositional formula: FA(n, result) and result = 6.
+If this formula has a model (i.e., if we can find a satisfying assignment to
+all variables, and in particular, to n), we can extract the required value
+for the parameter `n` from that model. As we have discussed above, this can
+be done using a SAT solver: If you run, say, MiniSAT on this formula, you will
+get a model that translates to n=3.
+
+Be aware that this method has very clear limits: We know that the factorial of
+`5` is `120`, but with the formula above, evaluating
+''FA(n, result) and result=120'' would yield ''unsatisfiable''! This is because
+we limited the number of loop iterations, and to reach 120, we have to execute
+the loop more than three times. In particular, a ''VERIFICATION SUCCESSFUL''
+message, as output by CBMC, must always be interpreted keeping the bounds
+that were used in mind.
+
+In the case that we found a model, we can get even more information: We can
+even reconstruct the program execution that would lead to the requested result.
+This can be achieved by tracing the SSA, using the guard variables to decide
+which branches of `if` statements to take. In this way, we can simulate the
+behavior of the program. Writing down the steps of this simulation yields a
+*trace*, which described how the corresponding program execution would look like.
 
 \subsubsection smt_etc_subsubsection Where to go from here
 
