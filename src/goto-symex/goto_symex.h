@@ -451,8 +451,6 @@ public:
 
 nondet_symbol_exprt build_symex_nondet(typet &type, unsigned &nondet_count);
 
-void replace_nondet(exprt &, unsigned &);
-
 void symex_transition(goto_symext::statet &state);
 
 void symex_transition(

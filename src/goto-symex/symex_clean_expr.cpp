@@ -135,6 +135,22 @@ static void adjust_byte_extract_rec(exprt &expr, const namespacet &ns)
   }
 }
 
+static void replace_nondet(exprt &expr, unsigned &nondet_count)
+{
+  if(expr.id() == ID_side_effect && expr.get(ID_statement) == ID_nondet)
+  {
+    nondet_symbol_exprt new_expr =
+      build_symex_nondet(expr.type(), nondet_count);
+    new_expr.add_source_location() = expr.source_location();
+    expr.swap(new_expr);
+  }
+  else
+  {
+    Forall_operands(it, expr)
+      replace_nondet(*it, nondet_count);
+  }
+}
+
 void goto_symext::clean_expr(
   exprt &expr,
   statet &state,
