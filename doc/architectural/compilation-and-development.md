@@ -93,7 +93,7 @@ folders.
 If you have compiled using CMake then you can run the regression tests (and
 the unit tests) using CTest.
 
-Here are two example commands, to be run from the build directory:
+Here are two example commands, to be run from the `build/` directory:
 
     ctest -V -L CORE -R cpp
     ctest -V -L CORE -R cpp -E cbmc-cpp
