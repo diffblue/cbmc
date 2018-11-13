@@ -127,6 +127,7 @@ void goto_trace_stept::output(
 /// options.base_prefix to be true appends either 0b or 0x to the number
 /// to indicate the base
 /// \param expr: expression to get numeric representation from
+/// \param ns: namespace for symbol type lookups
 /// \param options: configuration options
 /// \return a string with the numeric representation
 static std::string numeric_representation(

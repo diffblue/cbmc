@@ -20,10 +20,11 @@
 
 /// To rebuild the _start function in the event the program was compiled into
 /// GOTO with a different entry function selected.
+/// \param options: Command-line options
 /// \param goto_model: The goto functions (to replace the body of the _start
 ///   function) and symbol table (to replace the _start function symbol) of the
 ///   program.
-/// \param _message_handler: The message handler to report any messages with
+/// \param message_handler: The message handler to report any messages with
 template <typename maybe_lazy_goto_modelt>
 rebuild_goto_start_function_baset<maybe_lazy_goto_modelt>::
   rebuild_goto_start_function_baset(
@@ -38,8 +39,6 @@ rebuild_goto_start_function_baset<maybe_lazy_goto_modelt>::
 /// GOTO with a different entry function selected. It works by discarding the
 /// _start symbol and GOTO function and calling on the relevant languaget to
 /// generate the _start function again.
-/// \param entry_function: The name of the entry function that should be
-/// called from _start
 /// \return Returns true if either the symbol is not found, or something went
 ///   wrong with generating the start_function. False otherwise.
 template<typename maybe_lazy_goto_modelt>
