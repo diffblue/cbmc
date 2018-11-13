@@ -76,7 +76,7 @@ CI, should succeed), `THOROUGH` (takes too long to be run in CI, should
 succeed), `FUTURE` (will succeed when a planned feature is added) or
 `KNOWNBUG` (will succeed when a bug is fixed).
 
-\subsubsection compilation-and-development-subsubsection-running-regression-tests-with-make Running regression tests with `make`
+\subsubsection compilation-and-development-subsubsection-running-regression-tests-with-make Running regression tests with make
 
 If you have compiled using `make` then you can run the regression tests
 using `make test`. Run it from `regression/` to run all the regression tests,
@@ -88,7 +88,7 @@ If you have not compiled using `make` then this won't work, because the
 makefile is expecting to find binaries like `cbmc` and `jbmc` in the source
 folders.
 
-\subsubsection compilation-and-development-subsubsection-running-regression-tests-with-ctest Running regression tests with `ctest`
+\subsubsection compilation-and-development-subsubsection-running-regression-tests-with-ctest Running regression tests with CTest
 
 If you have compiled using CMake then you can run the regression tests (and
 the unit tests) using CTest.
@@ -109,7 +109,7 @@ So the first command will run all the CORE tests in `regression/cbmc/cpp` and
 list which tests it will run without actually running them.
 
 
-\subsubsection compilation-and-development-subsubsection-running-individual-regression-tests-directly-with-test-pl Running individual regression tests directly with `test.pl`
+\subsubsection compilation-and-development-subsubsection-running-individual-regression-tests-directly-with-test-pl Running individual regression tests directly with test.pl
 
 It can be useful to run a single test folder in isolation. This can be done by
 running `regression/test.pl` directly. The way that `test.pl` is run varies between the
