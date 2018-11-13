@@ -95,10 +95,15 @@ protected:
 #if 0
   const std::set<irep_idt> *valid_local_variables;
 #endif
-  source_locationt dereference_location;
   goto_programt::const_targett current_target;
 
+  /// Unused
+  source_locationt dereference_location;
+
+  /// Unused
   std::set<exprt> assertions;
+
+  /// Unused
   goto_programt new_code;
 };
 
