@@ -109,7 +109,7 @@ So the first command will run all the CORE tests in `regression/cbmc/cpp` and
 list which tests it will run without actually running them.
 
 
-\subsubsection compilation-and-development-subsubsection-running-regression-tests-directly-with-test-pl Running regression tests directly with `test.pl`
+\subsubsection compilation-and-development-subsubsection-running-individual-regression-tests-directly-with-test-pl Running individual regression tests directly with `test.pl`
 
 It can be useful to run a single test folder in isolation. This can be done by
 running `regression/test.pl` directly. The way that `test.pl` is run varies between the
