@@ -84,7 +84,7 @@ protected:
     goto_programt::targett &loop_header,
     goto_programt::targett &back_jump,
     path_acceleratort &accelerator,
-    subsumed_patht &subsumed);
+    subsumed_patht &subsumed_path);
 
   void set_dirty_vars(path_acceleratort &accelerator);
   void add_dirty_checks();
