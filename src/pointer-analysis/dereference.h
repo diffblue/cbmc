@@ -18,18 +18,11 @@ Author: Daniel Kroening, kroening@kroening.com
 class if_exprt;
 class typecast_exprt;
 
-/*! \brief TO_BE_DOCUMENTED
-*/
+/// Wrapper for a function which dereference a pointer-expression.
 class dereferencet
 {
 public:
-  /*! \brief Constructor
-   * \param _ns Namespace
-   * \param _new_symbol_table A symbol_table to store new symbols in
-   * \param _options Options, in particular whether pointer checks are
-            to be performed
-   * \param _dereference_callback Callback object for error reporting
-  */
+  /// \param _ns: Namespace
   explicit dereferencet(
     const namespacet &_ns):
     ns(_ns)
@@ -38,14 +31,9 @@ public:
 
   ~dereferencet() { }
 
-  /*!
-   * The operator '()' dereferences the
-   * given pointer-expression.
-   *
-   * \param pointer A pointer-typed expression, to
-            be dereferenced.
-  */
-
+  /// Dereference the given pointer-expression.
+  /// \param pointer: A pointer-typed expression, to be dereferenced.
+  /// \return Object after dereferencing.
   exprt operator()(const exprt &pointer);
 
 private:
@@ -81,6 +69,10 @@ private:
     const typet &type);
 };
 
+/// Dereference the given pointer-expression.
+/// \param pointer: A pointer-typed expression, to be dereferenced.
+/// \param ns: namespace
+/// \return Object after dereferencing.
 inline exprt dereference(const exprt &pointer, const namespacet &ns)
 {
   dereferencet dereference_object(ns);

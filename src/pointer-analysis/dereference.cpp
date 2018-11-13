@@ -25,8 +25,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/c_types.h>
 
-/// \par parameters: expression, to be dereferenced
-/// \return returns object after dereferencing
 exprt dereferencet::operator()(const exprt &pointer)
 {
   if(pointer.type().id()!=ID_pointer)
@@ -46,6 +44,9 @@ exprt dereferencet::operator()(const exprt &pointer)
     type);
 }
 
+/// \return Expression equivalent to `byte_extract(object, offset)` and of type
+///   `type`. The expression is potentially simplified so that for instance in
+///   the case of an array, `object[offset]` can be returned.
 exprt dereferencet::read_object(
   const exprt &object,
   const exprt &offset,
@@ -151,6 +152,8 @@ exprt dereferencet::read_object(
     byte_extract_id(), object, simplified_offset, dest_type);
 }
 
+/// Attempt to dereference the object at address `address + offset` and of
+/// type `type`. Throws an exception if unsuccessful.
 exprt dereferencet::dereference_rec(
   const exprt &address,
   const exprt &offset,
@@ -205,6 +208,13 @@ exprt dereferencet::dereference_rec(
   }
 }
 
+/// Attempt to dereference the object at address `expr + offset` and of
+/// type `type`. Throws an exception if unsuccessful.
+///
+/// This is done by dereferencing both the true and false cases of the if
+/// expression and putting the result together in a new if expression with the
+/// same condition.
+/// \return the dereferenced object
 exprt dereferencet::dereference_if(
   const if_exprt &expr,
   const exprt &offset,
@@ -217,6 +227,9 @@ exprt dereferencet::dereference_if(
   return if_exprt(expr.cond(), true_case, false_case);
 }
 
+/// Attempt to dereference the object at address `expr + offset` and of
+/// type `type`. Throws an exception if unsuccessful. This assumes `expr` is
+/// a `plus_exprt` but does not check for it.
 exprt dereferencet::dereference_plus(
   const exprt &expr,
   const exprt &offset,
@@ -252,6 +265,14 @@ exprt dereferencet::dereference_plus(
   return dereference_rec(pointer, new_offset, type);
 }
 
+/// Attempt to dereference the object at address `expr + offset` and of
+/// type `type`. Throws an exception if unsuccessful.
+///
+/// If `expr` is a typecast of the form `(type)ptr`:
+///   - if `ptr` is of pointer type, dereference `ptr + offset`
+///   - if `ptr` is of integer type, return an integer_dereference expression
+///   - otherwise throw an exception
+/// \return The dereferenced object.
 exprt dereferencet::dereference_typecast(
   const typecast_exprt &expr,
   const exprt &offset,
@@ -281,6 +302,8 @@ exprt dereferencet::dereference_typecast(
     throw "dereferencet: unexpected cast";
 }
 
+/// Check that it is ok to cast an object of type `object_type` to
+/// `deference_type`.
 bool dereferencet::type_compatible(
   const typet &object_type,
   const typet &dereference_type) const
