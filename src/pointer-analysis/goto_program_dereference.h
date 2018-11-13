@@ -63,12 +63,14 @@ protected:
   value_setst &value_sets;
   value_set_dereferencet dereference;
 
+  DEPRECATED("Unused")
   virtual bool is_valid_object(const irep_idt &identifier);
 
   virtual bool has_failed_symbol(
     const exprt &expr,
     const symbolt *&symbol);
 
+  DEPRECATED("Unused")
   virtual void dereference_failure(
     const std::string &property,
     const std::string &msg,
@@ -108,17 +110,20 @@ void remove_pointers(
   goto_modelt &,
   value_setst &);
 
+DEPRECATED("Unused")
 void remove_pointers(
   goto_functionst &,
   symbol_tablet &,
   value_setst &);
 
+DEPRECATED("Unused")
 void pointer_checks(
   goto_programt &,
   symbol_tablet &,
   const optionst &,
   value_setst &);
 
+DEPRECATED("Unused")
 void pointer_checks(
   goto_functionst &,
   symbol_tablet &,
