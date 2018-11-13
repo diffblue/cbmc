@@ -140,7 +140,184 @@ To be documented.
 
 \section java-bytecode-concurrency-instrumentation Concurrency instrumentation
 
-To be documented.
+Relevant code:
+
+  - \ref java_bytecode_concurrency_instrumentation.h
+  - \ref java_bytecode_concurrency_instrumentation.cpp
+  - \ref java_static_initializers.h
+  - \ref java_static_initializers.cpp
+  - \ref java_bytecode_convert_method.cpp
+
+Concurrency instrumentation for Java programs is disabled by default. It can
+be enabled by specifying the `--java-threading` command line flag.
+
+Thread-blocks have special semantics, in the sense that unlike basic blocks
+they can be executed independently.  JBMC treats a sequence of codet's
+surrounded with calls to `CProver.startThread:(I)V` and `CProver.endThread:(I)V` as
+a thread-block. These functions take one argument, an integer, that is used to
+associate the start of a thread (i.e: calls to `CProver.startThread:(I)V`) to the
+end of the thread (i.e: calls to `CProver.endThread:(I)V`). JBMC assumes that
+calls to the these functions are well-formed, more specifically, each call to
+`CProver.startThread:(I)V` must have an associated call to `CProver.endThread:(I)V`.
+
+The instrumentation process (described here) will transform the aforementioned
+function calls, synchronized blocks/methods and calls to
+`java.lang.Thread.getCurrentThreadID:()I` into appropriate codet. As part of
+this process a new variable per thread  is created  along with a single global
+variable that is used keep track of thread identifiers. These
+variables are needed to handle calls to
+`java.lang.Thread.getCurrentThreadID:()I`.
+
+Hold on, how do we go from Java threads to `CProver.startThread:(I)V` and
+`CProver.endThread:(I)V`? Well, two ways
+
+  - You are free to use the CProver API and manually and insert calls to the
+    `CProver.startThread:(I)V` and `CProver.endThread:(I)V`.
+  - Models! Which provide a mock implementation of the `java.lang.Thread`
+    class.
+
+Note: instrumentation of Java static initializers changes when the
+`--java-threading` flag is specified, this is because the static initializer of
+every class needs to be carefully synchronized to prevent superfluous
+interleavings.
+
+Note': conversation of synchronized methods (`void synchronized test(){ ... }`) and
+synchronized blocks (`synchronized(lock) { ... }`) are dealt with differently as
+they are represented differently in bytecode. One is a flag, while the other
+has explicit instructions.
+
+\subsection converting-thread-blocks Converting Thread Blocks
+
+JBMC will iterate through the symbol table to find and instrument
+thread-blocks.  Specifically, function calls to `CProver.startThread:(I)V` are
+transformed into a `codet(id=ID_start_thread, destination=I)`, which carries a target label in
+the field `destination`. Similarly `CProver.endThread(I)V` is transformed into
+a `codet(id=ID_end_thread)`.
+
+For each new thread a thread local variable `__CPROVER__thread_id` is created.
+The new id is obtained by incrementing a global variable
+`__CPROVER__next_thread_id`.
+
+The semantics of `codet(id=ID_start_thread, destination=I)` roughly corresponds to: spawn the
+current thread, continue the execution of the current thread in the next line,
+and continue the execution of the new thread at the destination.
+
+Example, the following Java code:
+
+```java
+    CProver.startThread(333);
+    ...  // thread body
+    CProver.endThread(333);
+```
+
+is transformed into the following codet:
+
+```C
+  codet(id=ID_start_thread, destination=__CPROVER_THREAD_ENTRY_333)
+  codet(id=ID_goto, destination=__CPROVER_THREAD_EXIT_333)
+  codet(id=ID_label, label=__CPROVER_THREAD_ENTRY_333)
+  codet(id=ID_atomic_begin)
+  __CPROVER__next_thread_id += 1;
+  __CPROVER__thread_id = __CPROVER__next_thread_id;
+  ... // thread body
+  codet(id=ID_end_thread)
+  codet(id=ID_label, label=__CPROVER_THREAD_EXIT_333)
+```
+
+The ID of the thread is made accessible to the Java program by having calls
+to the function `CProver.getCurrentThreadID()I` replaced by the variable
+`__CPROVER__thread_id`.
+
+Example, the following Java code:
+
+```java
+  int g = java.lang.thead.getCurrentThreadID();
+```
+
+is transformed into the following codet:
+
+```C
+  code_assignt(lhs=g, rhs=__CPROVER__thread_id)
+```
+
+\subsection converting-synchronized-blocks Converting Synchronized Blocks
+
+Synchronized blocks make it impossible for two synchronized blocks on the same
+object to interleave.
+
+Converting synchronized blocks is rather straightforward as there is a specific
+bytecode instruction to indicate the start (`monitorenter`) and end (`monitorexit`)
+of a synchronized block.
+
+`monitorenter` is converted to a call to
+`java::java.lang.Object.monitorenter:(Ljava/lang/Object;)V`.
+
+`monitorexit` is converted to a call to
+`java::java.lang.Object.monitorexit:(Ljava/lang/Object;)V`.
+
+\subsection converting-synchronized-methods Converting Synchronized Methods
+
+Synchronized methods make it impossible for two invocations of the same method
+on the same object to interleave.
+
+A method is considered to be synchronized and thus subject to the following
+process, if the symbol that represents it has the irep_id `is_synchronized`
+specified. In Java this corresponds to the `synchronized` keyword in the
+declaration of a method.
+
+Unlike synchronized blocks Java synchronized methods do not have explicit calls
+to the instructions `monitorenter` and `monitorexit` (or equivalents), instead
+the JVM interprets the synchronized flag  and internally implements
+locking/unlocking on the object.
+
+To emulate this behaviour JBMC will iterate through the symbol table to find
+synchronized methods. It will then  insert a call to our model of `monitorenter`
+(`java::java.lang.Object.monitorenter:(Ljava/lang/Object;)V`) at the beginning
+of the method and calls to our model of `monitorexit`
+(`java::java.lang.Object.monitorexit:(Ljava/lang/Object;)V`) is instrumented at
+each return instruction.  We wrap the entire body of the method with an
+exception handler that will call our model of `monitorexit` if the method returns
+exceptionally.
+
+Example, the following Java code:
+
+```java
+synchronized int amethod(int p)
+ {
+   int x = 0;
+   if(p == 0)
+     return -1;
+   x = p / 10
+   return x
+ }
+```
+
+The codet version of the above is too verbose be shown here. Instead the following code depicts
+our equivalent Java code interpretation of the above:
+
+```java
+int amethod(int p)
+{
+ try
+ {
+   java::java.lang.Object.monitorenter(this);
+   int x = 0;
+   if(p == 0)
+   {
+     java::java.lang.Object.monitorexit(this);
+     return -1;
+   }
+   java::java.lang.Object.monitorexit(this);
+   return x
+ }
+ catch(java::java.lang.Throwable e)
+ {
+   // catch every exception, including errors!
+   java::java.lang.Object.monitorexit(this);
+   throw e;
+ }
+}
+```
 
 \section java-bytecode-remove-java-new Remove `new`, `newarray` and `multianewarray` bytecode operators
 
