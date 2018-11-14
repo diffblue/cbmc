@@ -1117,11 +1117,13 @@ typet smt2_parsert::function_signature_declaration()
 
 void smt2_parsert::command(const std::string &c)
 {
-  if(c=="declare-const")
+  if(c == "declare-const" || c == "declare-var")
   {
+    // declare-var appears to be a synonym for declare-const that is
+    // accepted by Z3 and CVC4
     if(next_token()!=SYMBOL)
     {
-      error() << "expected a symbol after declare-const" << eom;
+      error() << "expected a symbol after " << c << eom;
       ignore_command();
       return;
     }
@@ -1135,9 +1137,9 @@ void smt2_parsert::command(const std::string &c)
       return;
     }
 
-    auto &entry=id_map[id];
-    entry.type=sort();
-    entry.definition=nil_exprt();
+    auto &entry = id_map[id];
+    entry.type = sort();
+    entry.definition = nil_exprt();
   }
   else if(c=="declare-fun")
   {
