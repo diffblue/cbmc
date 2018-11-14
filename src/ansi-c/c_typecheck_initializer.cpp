@@ -40,7 +40,7 @@ void c_typecheck_baset::do_initializer(
     // we don't allow initialisation with symbols of array type
     if(result.id()!=ID_array)
     {
-      err_location(result);
+      error().source_location = result.source_location();
       error() << "invalid array initializer " << to_string(result)
               << eom;
       throw 0;
@@ -60,7 +60,7 @@ exprt c_typecheck_baset::do_initializer_rec(
 
   if(full_type.id()==ID_incomplete_struct)
   {
-    err_location(value);
+    error().source_location = value.source_location();
     error() << "type `" << to_string(full_type)
             << "' is still incomplete -- cannot initialize" << eom;
     throw 0;
@@ -91,7 +91,7 @@ exprt c_typecheck_baset::do_initializer_rec(
       mp_integer array_size;
       if(to_integer(to_array_type(full_type).size(), array_size))
       {
-        err_location(value);
+        error().source_location = value.source_location();
         error() << "array size needs to be constant, got "
                 << to_string(to_array_type(full_type).size()) << eom;
         throw 0;
@@ -99,7 +99,7 @@ exprt c_typecheck_baset::do_initializer_rec(
 
       if(array_size<0)
       {
-        err_location(value);
+        error().source_location = value.source_location();
         error() << "array size must not be negative" << eom;
         throw 0;
       }
@@ -118,7 +118,7 @@ exprt c_typecheck_baset::do_initializer_rec(
           zero_initializer(full_type.subtype(), value.source_location(), *this);
         if(!zero.has_value())
         {
-          err_location(value);
+          error().source_location = value.source_location();
           error() << "cannot zero-initialize array with subtype `"
                   << to_string(full_type.subtype()) << "'" << eom;
           throw 0;
@@ -151,7 +151,7 @@ exprt c_typecheck_baset::do_initializer_rec(
       mp_integer array_size;
       if(to_integer(to_array_type(full_type).size(), array_size))
       {
-        err_location(value);
+        error().source_location = value.source_location();
         error() << "array size needs to be constant, got "
                 << to_string(to_array_type(full_type).size()) << eom;
         throw 0;
@@ -159,7 +159,7 @@ exprt c_typecheck_baset::do_initializer_rec(
 
       if(array_size<0)
       {
-        err_location(value);
+        error().source_location = value.source_location();
         error() << "array size must not be negative" << eom;
         throw 0;
       }
@@ -178,7 +178,7 @@ exprt c_typecheck_baset::do_initializer_rec(
           zero_initializer(full_type.subtype(), value.source_location(), *this);
         if(!zero.has_value())
         {
-          err_location(value);
+          error().source_location = value.source_location();
           error() << "cannot zero-initialize array with subtype `"
                   << to_string(full_type.subtype()) << "'" << eom;
           throw 0;
@@ -193,7 +193,7 @@ exprt c_typecheck_baset::do_initializer_rec(
   if(full_type.id()==ID_array &&
      to_array_type(full_type).size().is_nil())
   {
-    err_location(value);
+    error().source_location = value.source_location();
     error() << "type `" << to_string(full_type)
             << "' cannot be initialized with `" << to_string(value)
             << "'" << eom;
@@ -202,7 +202,7 @@ exprt c_typecheck_baset::do_initializer_rec(
 
   if(value.id()==ID_designated_initializer)
   {
-    err_location(value);
+    error().source_location = value.source_location();
     error() << "type `" << to_string(full_type)
             << "' cannot be initialized with designated initializer"
             << eom;
@@ -317,7 +317,7 @@ void c_typecheck_baset::designator_enter(
 
       if(to_integer(array_type.size(), array_size))
       {
-        err_location(array_type.size());
+        error().source_location = array_type.size().source_location();
         error() << "array has non-constant size `"
                 << to_string(array_type.size()) << "'" << eom;
         throw 0;
@@ -335,7 +335,7 @@ void c_typecheck_baset::designator_enter(
 
     if(to_integer(vector_type.size(), vector_size))
     {
-      err_location(vector_type.size());
+      error().source_location = vector_type.size().source_location();
       error() << "vector has non-constant size `"
               << to_string(vector_type.size()) << "'" << eom;
       throw 0;
@@ -405,7 +405,7 @@ exprt::operandst::const_iterator c_typecheck_baset::do_designated_initializer(
             full_type.subtype(), value.source_location(), *this);
           if(!zero.has_value())
           {
-            err_location(value);
+            error().source_location = value.source_location();
             error() << "cannot zero-initialize array with subtype `"
                     << to_string(full_type.subtype()) << "'" << eom;
             throw 0;
@@ -417,7 +417,7 @@ exprt::operandst::const_iterator c_typecheck_baset::do_designated_initializer(
         }
         else
         {
-          err_location(value);
+          error().source_location = value.source_location();
           error() << "array index designator " << index
                   << " out of bounds (" << dest->operands().size()
                   << ")" << eom;
@@ -434,7 +434,7 @@ exprt::operandst::const_iterator c_typecheck_baset::do_designated_initializer(
 
       if(index>=dest->operands().size())
       {
-        err_location(value);
+        error().source_location = value.source_location();
         error() << "structure member designator " << index
                 << " out of bounds (" << dest->operands().size()
                 << ")" << eom;
@@ -475,7 +475,7 @@ exprt::operandst::const_iterator c_typecheck_baset::do_designated_initializer(
           zero_initializer(component.type(), value.source_location(), *this);
         if(!zero.has_value())
         {
-          err_location(value);
+          error().source_location = value.source_location();
           error() << "cannot zero-initialize union component of type `"
                   << to_string(component.type()) << "'" << eom;
           throw 0;
@@ -540,7 +540,7 @@ exprt::operandst::const_iterator c_typecheck_baset::do_designated_initializer(
           zero_initializer(component.type(), value.source_location(), *this);
         if(!zero.has_value())
         {
-          err_location(value);
+          error().source_location = value.source_location();
           error() << "cannot zero-initialize union component of type `"
                   << to_string(component.type()) << "'" << eom;
           throw 0;
@@ -621,7 +621,7 @@ exprt::operandst::const_iterator c_typecheck_baset::do_designated_initializer(
       }
       else
       {
-        err_location(value);
+        error().source_location = value.source_location();
         error() << "cannot initialize type `"
           << to_string(dest_type) << "' using value `"
           << to_string(value) << "'" << eom;
@@ -704,7 +704,7 @@ designatort c_typecheck_baset::make_designator(
     {
       if(d_op.id()!=ID_index)
       {
-        err_location(d_op);
+        error().source_location = d_op.source_location();
         error() << "expected array index designator" << eom;
         throw 0;
       }
@@ -717,7 +717,7 @@ designatort c_typecheck_baset::make_designator(
 
       if(to_integer(tmp_index, index))
       {
-        err_location(d_op.op0());
+        error().source_location = d_op.op0().source_location();
         error() << "expected constant array index designator" << eom;
         throw 0;
       }
@@ -726,7 +726,7 @@ designatort c_typecheck_baset::make_designator(
         size=0;
       else if(to_integer(to_array_type(full_type).size(), size))
       {
-        err_location(d_op.op0());
+        error().source_location = d_op.op0().source_location();
         error() << "expected constant array size" << eom;
         throw 0;
       }
@@ -743,7 +743,7 @@ designatort c_typecheck_baset::make_designator(
 
       if(d_op.id()!=ID_member)
       {
-        err_location(d_op);
+        error().source_location = d_op.source_location();
         error() << "expected member designator" << eom;
         throw 0;
       }
@@ -804,7 +804,7 @@ designatort c_typecheck_baset::make_designator(
 
         if(!found)
         {
-          err_location(d_op);
+          error().source_location = d_op.source_location();
           error() << "failed to find struct component `"
                   << component_name << "' in initialization of `"
                   << to_string(struct_union_type) << "'" << eom;
@@ -814,7 +814,7 @@ designatort c_typecheck_baset::make_designator(
     }
     else
     {
-      err_location(d_op);
+      error().source_location = d_op.source_location();
       error() << "designated initializers cannot initialize `"
               << to_string(full_type) << "'" << eom;
       throw 0;
@@ -847,7 +847,7 @@ exprt c_typecheck_baset::do_initializer_list(
     const auto zero = zero_initializer(type, value.source_location(), *this);
     if(!zero.has_value())
     {
-      err_location(value.source_location());
+      error().source_location = value.source_location();
       error() << "cannot zero-initialize `" << to_string(full_type) << "'"
               << eom;
       throw 0;
@@ -868,7 +868,7 @@ exprt c_typecheck_baset::do_initializer_list(
       const auto zero = zero_initializer(type, value.source_location(), *this);
       if(!zero.has_value())
       {
-        err_location(value.source_location());
+        error().source_location = value.source_location();
         error() << "cannot zero-initialize `" << to_string(full_type) << "'"
                 << eom;
         throw 0;
@@ -901,7 +901,7 @@ exprt c_typecheck_baset::do_initializer_list(
     if(value.operands().size()==1)
       return do_initializer_rec(value.op0(), type, force_constant);
 
-    err_location(value);
+    error().source_location = value.source_location();
     error() << "cannot initialize `" << to_string(full_type)
             << "' with an initializer list" << eom;
     throw 0;
