@@ -14,12 +14,10 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 /// add axioms for the conversion of an integer representing a java
 /// code point to a utf-16 string
-/// \param fresh_symbol: generator of fresh symbols
 /// \param res: array of characters corresponding to the result fo the function
 /// \param code_point: an expression representing a java code point
 /// \return integer expression equal to zero
 std::pair<exprt, string_constraintst> add_axioms_for_code_point(
-  symbol_generatort &fresh_symbol,
   const array_string_exprt &res,
   const exprt &code_point)
 {

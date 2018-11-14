@@ -57,12 +57,10 @@ std::pair<exprt, string_constraintst> add_axioms_for_constant(
 }
 
 /// Add axioms to say that the returned string expression is empty
-/// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with arguments integer `length` and character
 ///           pointer `ptr`.
 /// \return integer expression equal to zero
 std::pair<exprt, string_constraintst> add_axioms_for_empty_string(
-  symbol_generatort &fresh_symbol,
   const function_application_exprt &f)
 {
   PRECONDITION(f.arguments().size() == 2);

@@ -374,9 +374,9 @@ string_constraint_generatort::add_axioms_for_function_application(
   const irep_idt &id = get_function_name(expr);
 
   if(id==ID_cprover_char_literal_func)
-    return add_axioms_for_char_literal(fresh_symbol, expr);
+    return add_axioms_for_char_literal(expr);
   else if(id==ID_cprover_string_length_func)
-    return add_axioms_for_length(fresh_symbol, expr, array_pool);
+    return add_axioms_for_length(expr, array_pool);
   else if(id==ID_cprover_string_equal_func)
     return add_axioms_for_equals(fresh_symbol, expr, array_pool);
   else if(id==ID_cprover_string_equals_ignore_case_func)
@@ -436,7 +436,7 @@ string_constraint_generatort::add_axioms_for_function_application(
   else if(id==ID_cprover_string_trim_func)
     return add_axioms_for_trim(fresh_symbol, expr, array_pool);
   else if(id==ID_cprover_string_empty_string_func)
-    return add_axioms_for_empty_string(fresh_symbol, expr);
+    return add_axioms_for_empty_string(expr);
   else if(id==ID_cprover_string_copy_func)
     return add_axioms_for_copy(fresh_symbol, expr, array_pool);
   else if(id==ID_cprover_string_of_int_hex_func)
@@ -507,12 +507,10 @@ std::pair<exprt, string_constraintst> add_axioms_for_copy(
 /// Length of a string
 ///
 /// Returns the length of the string argument of the given function application
-/// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with argument string `str`
 /// \param array_pool: pool of arrays representing strings
 /// \return expression `|str|`
 std::pair<exprt, string_constraintst> add_axioms_for_length(
-  symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
   array_poolt &array_pool)
 {
@@ -529,11 +527,9 @@ exprt is_positive(const exprt &x)
 }
 
 /// add axioms stating that the returned value is equal to the argument
-/// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with one character argument
 /// \return a new character expression
 std::pair<exprt, string_constraintst> add_axioms_for_char_literal(
-  symbol_generatort &fresh_symbol,
   const function_application_exprt &f)
 {
   const function_application_exprt::argumentst &args=f.arguments();
