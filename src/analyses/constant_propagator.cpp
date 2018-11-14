@@ -232,19 +232,15 @@ void constant_propagator_domaint::transform(
 /// handles equalities and conjunctions containing equalities
 bool constant_propagator_domaint::two_way_propagate_rec(
   const exprt &expr,
-  const namespacet &,
+  const namespacet &ns,
   const constant_propagator_ait *cp)
 {
 #ifdef DEBUG
   std::cout << "two_way_propagate_rec: " << format(expr) << '\n';
-#else
-  (void)expr; // unused parameter
 #endif
 
   bool change=false;
 
-  // this seems to be buggy at present
-#if 0
   if(expr.id()==ID_and)
   {
     // need a fixed point here to get the most out of it
@@ -265,14 +261,11 @@ bool constant_propagator_domaint::two_way_propagate_rec(
 
     // two-way propagation
     valuest copy_values=values;
-    assign_rec(copy_values, lhs, rhs, ns);
+    assign_rec(copy_values, lhs, rhs, ns, cp);
     if(!values.is_constant(rhs) || values.is_constant(lhs))
-       assign_rec(values, rhs, lhs, ns);
+      assign_rec(values, rhs, lhs, ns, cp);
     change = values.meet(copy_values, ns);
   }
-#else
-  (void)cp;   // unused parameter
-#endif
 
 #ifdef DEBUG
   std::cout << "two_way_propagate_rec: " << change << '\n';
