@@ -3,18 +3,32 @@
 
 # Folder analyses
 
-This contains the abstract interpretation framework `ai.h` and several
-static analyses that instantiate it.
+This contains the abstract interpretation frameworks and several
+static analyses that instantiate them.
 
 \section analyses-frameworks Frameworks:
 
+There are currently three abstract interpretation frameworks provided in this
+directory. \ref analyses-ait, \ref analyses-flow-insensitive-analysis, and the
+deprecated and obsolete \ref analyses-static-analysist.
+
 \subsection analyses-ait Abstract interpreter framework (ait)
 
-To be documented.
+This abstract interpretation framework is the focus of current active
+development, and is where most scalability improvements will happen.
+It should be used as the basis for any new development work. This framework
+is provided by \ref ait. This analysis framework is currently location sensitive
+(meaning there is one abstract domain per code location) and is designed to be
+run after the function pointer removal and return removal passes. There is
+ongoing work to make this framework also support context sensitivity.
 
 \subsection analyses-static-analysist Old Abstract interpreter framework (static_analysist)
 
-This is obsolete.
+The obsolete static analysis framework \ref static_analysist is only used by
+\ref value_set_analysist. This abstract interpretation framework is deprecated in
+favour of \ref analyses-ait, and should not be used as the basis for new code.
+This framework is location sensitive (one domain per code location), but is able
+to be run before function pointer removal and return removal phases.
 
 \subsection analyses-flow-insensitive-analysis Flow-insensitive analysis (flow_insensitive_analysist)
 
