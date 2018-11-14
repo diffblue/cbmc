@@ -131,8 +131,6 @@ void object_descriptor_exprt::build(
     offset()=from_integer(0, index_type());
 
   build_object_descriptor_rec(ns, expr, *this);
-
-  POSTCONDITION(root_object().type().id() != ID_empty);
 }
 
 shift_exprt::shift_exprt(
