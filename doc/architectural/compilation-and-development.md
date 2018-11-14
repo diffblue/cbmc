@@ -117,7 +117,8 @@ different modules, and can be ascertained by looking at the `test` target in
 the makefile. The simple case is when there isn't a file called `chain.sh`.
 Then you can directly run `test.pl` on a single test folder with the
 following command from the module directory (note that it is recommended to
-use absolute paths as it avoids many issues):
+use absolute paths as it avoids many issues, e.g. the path to the binary
+should be relative to `<test-folder>`):
 
     <absolute-path-to-test.pl> -p -c <absolute-path-to-binary> <test-folder>
 
