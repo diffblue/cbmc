@@ -10,24 +10,20 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_UTIL_SYMBOL_H
 #define CPROVER_UTIL_SYMBOL_H
 
-/*! \file util/symbol.h
- * \brief Symbol table entry
- *
- * \author Daniel Kroening <kroening@kroening.com>
- * \date   Sun Jul 31 21:54:44 BST 2011
-*/
+/// \file util/symbol.h
+/// \brief Symbol table entry
+/// \author Daniel Kroening <kroening@kroening.com>
+/// \date   Sun Jul 31 21:54:44 BST 2011
 
 #include <iosfwd>
 
 #include "expr.h"
 #include "invariant.h"
 
-/*! \brief Symbol table entry.
-    \ingroup gr_symbol_table
-
-    This is a symbol in the symbol table, stored in an
-    object of type symbol_tablet.
-*/
+/// \brief Symbol table entry.
+/// \ingroup gr_symbol_table
+/// This is a symbol in the symbol table, stored in an
+/// object of type symbol_tablet.
 class symbolt
 {
 public:
@@ -55,6 +51,7 @@ public:
   /// Language-specific display name
   irep_idt pretty_name;
 
+  /// Return language specific display name if present.
   const irep_idt &display_name() const
   {
     return pretty_name.empty()?name:pretty_name;
@@ -74,6 +71,7 @@ public:
     clear();
   }
 
+  /// Zero initialise a symbol object.
   void clear()
   {
     type.make_nil();
@@ -127,11 +125,9 @@ public:
 
 std::ostream &operator<<(std::ostream &out, const symbolt &symbol);
 
-/*! \brief Symbol table entry describing a data type
-    \ingroup gr_symbol_table
-
-    This is a symbol generated as part of type checking.
-*/
+/// \brief Symbol table entry describing a data type
+/// \ingroup gr_symbol_table
+/// This is a symbol generated as part of type checking.
 class type_symbolt:public symbolt
 {
 public:
@@ -142,12 +138,10 @@ public:
   }
 };
 
-/*! \brief Internally generated symbol table entry
-    \ingroup gr_symbol_table
-
-    This is a symbol generated as part of translation to or
-    modification of the intermediate representation.
-*/
+/// \brief Internally generated symbol table entry
+/// \ingroup gr_symbol_table
+/// This is a symbol generated as part of translation to or
+/// modification of the intermediate representation.
 class auxiliary_symbolt:public symbolt
 {
 public:
@@ -169,11 +163,9 @@ public:
   }
 };
 
-/*! \brief Symbol table entry of function parameter
-    \ingroup gr_symbol_table
-
-    This is a symbol generated as part of type checking.
-*/
+/// \brief Symbol table entry of function parameter
+/// \ingroup gr_symbol_table
+/// This is a symbol generated as part of type checking.
 class parameter_symbolt:public symbolt
 {
 public:

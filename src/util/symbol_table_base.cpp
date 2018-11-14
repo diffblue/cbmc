@@ -33,8 +33,8 @@ bool symbol_table_baset::remove(const irep_idt &name)
   return false;
 }
 
-/// Print the contents of the symbol table
-/// \param out: The ostream to direct output to
+/// Print the contents of the symbol table.
+/// \param out: The ostream to direct output to.
 void symbol_table_baset::show(std::ostream &out) const
 {
   std::vector<irep_idt> sorted_names;
@@ -52,7 +52,7 @@ void symbol_table_baset::show(std::ostream &out) const
     out << symbols.at(name);
 }
 
-/// Print the contents of the symbol table
+/// Print the contents of the symbol table.
 /// \param out: The ostream to direct output to
 /// \param symbol_table: The symbol table to print out
 std::ostream &

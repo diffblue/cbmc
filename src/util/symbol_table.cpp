@@ -6,14 +6,14 @@
 #include <util/invariant.h>
 #include <util/validate.h>
 
-/// Move or copy a new symbol to the symbol table
-/// \remark: This is a nicer interface than move and achieves the same
-/// result as both move and add
+/// Move or copy a new symbol to the symbol table.
+/// \remarks This is a nicer interface than move and achieves the same
+///   result as both move and add.
 /// \param symbol: The symbol to be added to the symbol table - can be
-/// moved or copied in
+///   moved or copied in.
 /// \return Returns a reference to the newly inserted symbol or to the
-/// existing symbol if a symbol with the same name already exists in the
-/// symbol table, along with a bool that is true if a new symbol was inserted.
+///   existing symbol if a symbol with the same name already exists in the
+///   symbol table, along with a bool that is true if a new symbol was inserted.
 std::pair<symbolt &, bool> symbol_tablet::insert(symbolt symbol)
 {
   // Add the symbol to the table or retrieve existing symbol with the same name
@@ -81,7 +81,7 @@ bool symbol_tablet::move(symbolt &symbol, symbolt *&new_symbol)
   return !result.second;
 }
 
-/// Remove a symbol from the symbol table
+/// Remove a symbol from the symbol table.
 /// \param entry: an iterator pointing at the symbol to remove
 void symbol_tablet::erase(const symbolst::const_iterator &entry)
 {
@@ -118,8 +118,8 @@ void symbol_tablet::erase(const symbolst::const_iterator &entry)
 }
 
 /// Check whether the symbol table is in a valid state
-/// \param vm Determine whether to throw exceptions or trigger INVARIANT
-///   when validation fails
+/// \param vm: Determine whether to throw exceptions or trigger INVARIANT
+///   when validation fails.
 void symbol_tablet::validate(const validation_modet vm) const
 {
   // Check that identifiers are mapped to the correct symbol
