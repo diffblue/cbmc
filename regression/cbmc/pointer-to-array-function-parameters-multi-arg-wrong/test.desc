@@ -1,0 +1,6 @@
+CORE
+test.c
+--function is_prefix_of --pointers-to-treat-as-array string,prefix --associated-array-sizes string:string_size,prefix:prefix_size --pointer-check --unwind 10
+EXIT=10
+SIGNAL=0
+VERIFICATION FAILED

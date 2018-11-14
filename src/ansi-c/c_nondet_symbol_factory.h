@@ -22,7 +22,8 @@ symbol_exprt c_nondet_symbol_factory(
   symbol_tablet &symbol_table,
   const irep_idt base_name,
   const typet &type,
-  const source_locationt &,
-  const c_object_factory_parameterst &object_factory_parameters);
+  const source_locationt &loc,
+  const c_object_factory_parameterst &object_factory_parameters,
+  std::map<irep_idt, irep_idt> &deferred_array_sizes);
 
 #endif // CPROVER_ANSI_C_C_NONDET_SYMBOL_FACTORY_H

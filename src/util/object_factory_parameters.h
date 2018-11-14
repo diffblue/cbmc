@@ -75,7 +75,7 @@ struct object_factory_parameterst
   irep_idt function_id;
 
   /// Assigns the parameters from given options
-  void set(const optionst &);
+  virtual void set(const optionst &);
 };
 
 void parse_object_factory_options(const cmdlinet &, optionst &);

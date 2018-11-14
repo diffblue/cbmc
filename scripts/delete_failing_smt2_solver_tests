@@ -114,6 +114,7 @@ rm Unwinding_Locality1/test.desc
 rm address_space_size_limit1/test.desc
 rm address_space_size_limit3/test.desc
 rm argv1/test.desc
+rm array-function-parameters/test.desc
 rm array-tests/test.desc
 rm big-endian-array1/test.desc
 rm bounds_check1/test.desc
@@ -172,6 +173,11 @@ rm pointer-function-parameters-struct-non-recursive/test.desc
 rm pointer-function-parameters-struct-simple-recursion/test.desc
 rm pointer-function-parameters-struct-simple-recursion-2/test.desc
 rm pointer-function-parameters-struct-simple-recursion-3/test.desc
+rm pointer-to-array-function-parameters-max-size/test.desc
+rm pointer-to-array-function-parameters-multi-arg-right/test.desc
+rm pointer-to-array-function-parameters-multi-arg-wrong/test.desc
+rm pointer-to-array-function-parameters-with-size/test.desc
+rm pointer-to-array-function-parameters/test.desc
 rm read1/test.desc
 rm realloc1/test.desc
 rm realloc2/test.desc

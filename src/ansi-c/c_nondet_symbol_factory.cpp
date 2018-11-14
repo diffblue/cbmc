@@ -18,11 +18,14 @@ Author: Diffblue Ltd.
 #include <util/fresh_symbol.h>
 #include <util/namespace.h>
 #include <util/nondet_bool.h>
+#include <util/std_code.h>
 #include <util/std_expr.h>
 #include <util/std_types.h>
 #include <util/string_constant.h>
 
 #include <goto-programs/goto_functions.h>
+#include <util/array_name.h>
+#include <util/optional_utils.h>
 
 class symbol_factoryt
 {
@@ -31,6 +34,7 @@ class symbol_factoryt
   const source_locationt &loc;
   namespacet ns;
   const c_object_factory_parameterst &object_factory_params;
+  std::map<irep_idt, irep_idt> &deferred_array_sizes;
 
   typedef std::set<irep_idt> recursion_sett;
 
@@ -39,12 +43,14 @@ public:
     std::vector<const symbolt *> &_symbols_created,
     symbol_tablet &_symbol_table,
     const source_locationt &loc,
-    const c_object_factory_parameterst &object_factory_params)
+    const c_object_factory_parameterst &object_factory_params,
+    std::map<irep_idt, irep_idt> &deferred_array_sizes)
     : symbols_created(_symbols_created),
       symbol_table(_symbol_table),
       loc(loc),
       ns(_symbol_table),
-      object_factory_params(object_factory_params)
+      object_factory_params(object_factory_params),
+      deferred_array_sizes(deferred_array_sizes)
   {}
 
   exprt allocate_object(
@@ -60,11 +66,53 @@ public:
     recursion_sett recursion_set = recursion_sett());
 
 private:
+  /// Add a new variable symbol to the symbol table
+  /// \param type: The type of the new variable
+  /// \param prefix: This forms the first part of the parameter, for debugging purposes
+  ///               Must be a valid identifier prefix
+  /// \return A reference to the newly created symbol table entry
+  symbolt &new_tmp_symbol(const typet &type, const std::string &prefix);
   void gen_nondet_array_init(
     code_blockt &assignments,
     const exprt &expr,
     std::size_t depth,
     const recursion_sett &recursion_set);
+
+  /// Generate code to nondet-initialize each element of an array
+  /// \param assignments: The code block the initialization statements
+  ///                     are written to
+  /// \param array: The expression representing the array type
+  ///               (TODO: Should probably just be a plain exprt to allow
+  ///                      arbitrarily nested expressions)
+  /// \param depth: Struct initialisation recursion depth, \see gen_nondet_init
+  /// \param recursion_set: Struct initialisation recursion set, \see gen_nondet_init
+  void gen_nondet_size_array_init(
+    code_blockt &assignments,
+    const symbol_exprt &array,
+    const size_t depth,
+    const recursion_sett &recursion_set);
+
+  /// Remember to initialise a variable representing array size to the given
+  /// concrete size.
+  /// When generating array initialisation code we often have the case where we
+  /// have a pointer that should be initialised to be pointing to some array,
+  /// and some integer type variable that should hold its size. Sometimes when
+  /// generating the array initialisation code we haven't "seen" the size
+  /// variable yet (i.e. it is not yet in the symbol table and doesn't have
+  /// initialisation code generated for it yet). If that's the case we remember
+  /// that we have to set it to the right size later with this method.
+  /// \param associated_size_name: The of variable that should be set to the right size
+  /// \param array_size_name: The name of the variable that holds the size
+  void defer_size_initialization(
+    irep_idt associated_size_name,
+    irep_idt array_size_name);
+
+  /// Return the name of a variable holding an array size if one is associated
+  /// with the given symbol name
+  optionalt<dstringt> get_deferred_size(irep_idt symbol_name) const;
+
+  /// Lookup symbol expression in symbol table and get its base name
+  const irep_idt &get_symbol_base_name(const symbol_exprt &symbol_expr) const;
 };
 
 /// Create a symbol for a pointer to point to
@@ -127,6 +175,22 @@ void symbol_factoryt::gen_nondet_init(
 
   if(type.id()==ID_pointer)
   {
+    if(expr.id() == ID_symbol)
+    {
+      auto const &symbol_expr = to_symbol_expr(expr);
+      const auto &symbol_name = get_symbol_base_name(symbol_expr);
+      if(object_factory_params.should_be_treated_as_array(symbol_name))
+      {
+        gen_nondet_size_array_init(
+          assignments, symbol_expr, depth, recursion_set);
+        return;
+      }
+      else if(object_factory_params.is_array_size_parameter(symbol_name))
+      {
+        // skip, we'll handle this during array initialisation
+        return;
+      }
+    }
     // dereferenced type
     const pointer_typet &pointer_type=to_pointer_type(type);
     const typet &subtype=ns.follow(pointer_type.subtype());
@@ -222,8 +286,143 @@ void symbol_factoryt::gen_nondet_init(
                                        : side_effect_expr_nondett(type, loc);
     code_assignt assign(expr, rhs);
     assign.add_source_location()=loc;
-
+    if(expr.id() == ID_symbol)
+    {
+      auto const &symbol_expr = to_symbol_expr(expr);
+      auto const associated_array_size =
+        get_deferred_size(get_symbol_base_name(symbol_expr));
+      if(associated_array_size.has_value())
+      {
+        assign.rhs() = typecast_exprt{
+          symbol_table.lookup_ref(associated_array_size.value()).symbol_expr(),
+          symbol_expr.type()};
+      }
+    }
     assignments.add(std::move(assign));
+  }
+}
+
+const irep_idt &
+symbol_factoryt::get_symbol_base_name(const symbol_exprt &symbol_expr) const
+{
+  return symbol_table.lookup_ref(symbol_expr.get_identifier()).base_name;
+}
+
+void symbol_factoryt::gen_nondet_size_array_init(
+  code_blockt &assignments,
+  const symbol_exprt &array,
+  const size_t depth,
+  const symbol_factoryt::recursion_sett &recursion_set)
+{
+  // This works on dynamic arrays, so the thing we assign to is a pointer
+  // rather than an array with a fixed size
+  PRECONDITION(array.type().id() == ID_pointer);
+  // Create code like this:
+  // size_t cond;
+  // size_t actual_size;
+  // T* array;
+  // if(cond < 1) {
+  //   actual_size = 1;
+  //   array = calloc(actual_size, sizeof(T));
+  //   for(size_t i = 0; i < actual_size; ++i) {
+  //      array[i] = nondet();
+  //   }
+  // } else if(cond < 2) {
+  //   ....
+  // }
+  // ...
+  // else {
+  //   actual_size = max_array_size;
+  //   ...
+  // }
+  auto const max_array_size =
+    std::size_t{object_factory_params.max_dynamic_array_size};
+  auto const &array_name = get_symbol_base_name(array);
+  auto const &size_cond_symbol = new_tmp_symbol(size_type(), "size_cond");
+  auto const &size_symbol = new_tmp_symbol(size_type(), "size");
+
+  auto const &element_type = array.type().subtype();
+  code_ifthenelset initialization_if_then_else;
+  auto *current_if_then_else = &initialization_if_then_else;
+
+  for(std::size_t i = 1; i < max_array_size; ++i)
+  {
+    auto const &array_size = from_integer(i, size_type());
+    auto array_type = array_typet{element_type, array_size};
+
+    auto &static_array = new_tmp_symbol(
+      array_type, id2string(array_name) + "_" + std::to_string(i));
+    static_array.is_static_lifetime = true;
+
+    const constant_exprt &size_expr = array_size;
+
+    current_if_then_else->cond() = binary_exprt(
+      size_cond_symbol.symbol_expr(), ID_lt, size_expr, bool_typet{});
+    code_blockt then_case;
+    then_case.add(code_assignt(size_symbol.symbol_expr(), size_expr));
+    gen_nondet_array_init(
+      then_case, static_array.symbol_expr(), depth, recursion_set);
+    then_case.add(code_assignt(
+      array,
+      address_of_exprt(
+        index_exprt(
+          static_array.symbol_expr(),
+          from_integer(0, size_type()),
+          array_type.subtype()),
+        pointer_type(array_type.subtype()))));
+    current_if_then_else->then_case() = then_case;
+    if(i + 1 < max_array_size)
+    {
+      current_if_then_else->else_case() = code_ifthenelset{};
+      current_if_then_else = reinterpret_cast<code_ifthenelset *>(
+        &current_if_then_else->else_case());
+    }
+    else
+    {
+      // generate an else case instead of another if on the final case
+      auto const &array_size = from_integer(i + 1, size_type());
+      auto array_type = array_typet{element_type, array_size};
+
+      auto &static_array = new_tmp_symbol(
+        array_type, id2string(array_name) + "_" + std::to_string(i + 1));
+      static_array.is_static_lifetime = true;
+
+      const constant_exprt &size_expr = array_size;
+      code_blockt else_case;
+      else_case.add(code_assignt(size_symbol.symbol_expr(), size_expr));
+      gen_nondet_array_init(
+        else_case, static_array.symbol_expr(), depth, recursion_set);
+      else_case.add(code_assignt(
+        array,
+        address_of_exprt(
+          index_exprt(
+            static_array.symbol_expr(),
+            from_integer(0, size_type()),
+            array_type.subtype()),
+          pointer_type(array_type.subtype()))));
+      current_if_then_else->else_case() = else_case;
+    }
+  }
+  assignments.add(initialization_if_then_else);
+  auto const associated_size =
+    object_factory_params.get_associated_size_variable(array_name);
+  if(associated_size.has_value())
+  {
+    auto const associated_size_symbol =
+      symbol_table.lookup(associated_size.value());
+    if(associated_size_symbol != nullptr)
+    {
+      assignments.add(
+        code_assignt{associated_size_symbol->symbol_expr(),
+                     typecast_exprt{size_symbol.symbol_expr(),
+                                    associated_size_symbol->type}});
+    }
+    else
+    {
+      // we've not seen the associated size symbol yet, so we have
+      // to defer setting it to when we do get there...
+      defer_size_initialization(associated_size.value(), size_symbol.base_name);
+    }
   }
 }
 
@@ -246,6 +445,37 @@ void symbol_factoryt::gen_nondet_array_init(
   }
 }
 
+symbolt &
+symbol_factoryt::new_tmp_symbol(const typet &type, const std::string &prefix)
+{
+  auto &symbol = get_fresh_aux_symbol(
+    type,
+    id2string(object_factory_params.function_id),
+    prefix,
+    loc,
+    ID_C,
+    symbol_table);
+  symbols_created.push_back(&symbol);
+  return symbol;
+}
+
+void symbol_factoryt::defer_size_initialization(
+  irep_idt associated_size_name,
+  irep_idt array_size_name)
+{
+  auto succeeded =
+    deferred_array_sizes.insert({associated_size_name, array_size_name});
+  INVARIANT(
+    succeeded.second,
+    "each size parameter should have a unique associated array");
+}
+
+optionalt<dstringt>
+symbol_factoryt::get_deferred_size(irep_idt symbol_name) const
+{
+  return optional_lookup(deferred_array_sizes, symbol_name);
+}
+
 /// Creates a symbol and generates code so that it can vary over all possible
 /// values for its type. For pointers this involves allocating symbols which it
 /// can point to.
@@ -263,7 +493,8 @@ symbol_exprt c_nondet_symbol_factory(
   const irep_idt base_name,
   const typet &type,
   const source_locationt &loc,
-  const c_object_factory_parameterst &object_factory_parameters)
+  const c_object_factory_parameterst &object_factory_parameters,
+  std::map<irep_idt, irep_idt> &deferred_array_sizes)
 {
   irep_idt identifier=id2string(goto_functionst::entry_point())+
     "::"+id2string(base_name);
@@ -286,7 +517,11 @@ symbol_exprt c_nondet_symbol_factory(
   symbols_created.push_back(main_symbol_ptr);
 
   symbol_factoryt state(
-    symbols_created, symbol_table, loc, object_factory_parameters);
+    symbols_created,
+    symbol_table,
+    loc,
+    object_factory_parameters,
+    deferred_array_sizes);
   code_blockt assignments;
   state.gen_nondet_init(assignments, main_symbol_expr);
 

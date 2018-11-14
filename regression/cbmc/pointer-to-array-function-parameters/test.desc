@@ -1,0 +1,18 @@
+CORE
+test.c
+--function test --pointers-to-treat-as-array arr --pointer-check
+\[test.pointer_dereference.1\] line \d+ dereference failure: pointer NULL in arr\[\(signed long int\)0\]: SUCCESS
+\[test.pointer_dereference.2\] line \d+ dereference failure: pointer invalid in arr\[\(signed long int\)0\]: SUCCESS
+\[test.pointer_dereference.3\] line \d+ dereference failure: deallocated dynamic object in arr\[\(signed long int\)0\]: SUCCESS
+\[test.pointer_dereference.4\] line \d+ dereference failure: dead object in arr\[\(signed long int\)0\]: SUCCESS
+\[test.pointer_dereference.5\] line \d+ dereference failure: pointer outside dynamic object bounds in arr\[\(signed long int\)0\]: SUCCESS
+\[test.pointer_dereference.6\] line \d+ dereference failure: pointer outside object bounds in arr\[\(signed long int\)0\]: SUCCESS
+\[test.pointer_dereference.7\] line \d+ dereference failure: invalid integer address in arr\[\(signed long int\)0\]: SUCCESS
+\[test.pointer_dereference.8\] line \d+ dereference failure: pointer NULL in arr\[\(signed long int\)10\]: SUCCESS
+\[test.pointer_dereference.9\] line \d+ dereference failure: pointer invalid in arr\[\(signed long int\)10\]: SUCCESS
+\[test.pointer_dereference.10\] line \d+ dereference failure: deallocated dynamic object in arr\[\(signed long int\)10\]: SUCCESS
+\[test.pointer_dereference.11\] line \d+ dereference failure: dead object in arr\[\(signed long int\)10\]: SUCCESS
+\[test.pointer_dereference.12\] line \d+ dereference failure: pointer outside dynamic object bounds in arr\[\(signed long int\)10\]: SUCCESS
+\[test.pointer_dereference.13\] line \d+ dereference failure: pointer outside object bounds in arr\[\(signed long int\)10\]: FAILURE
+\[test.pointer_dereference.14\] line \d+ dereference failure: invalid integer address in arr\[\(signed long int\)10\]: SUCCESS
+--
