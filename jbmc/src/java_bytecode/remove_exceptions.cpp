@@ -46,7 +46,7 @@ Date:   December 2016
 /// (in instruction->code.exception_list()) and a corresponding GOTO program
 /// target for each (in instruction->targets).
 /// Thrown instructions are currently always matched to tags using
-/// java_instanceof, optionally lowered to a check on the @class_identifier
+/// java_instanceof, optionally lowered to a check on the `@class_identifier`
 /// field, so a language frontend wanting to use this class must use
 /// exceptions with a Java-compatible structure.
 ///

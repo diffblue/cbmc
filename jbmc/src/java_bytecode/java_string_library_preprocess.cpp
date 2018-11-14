@@ -562,6 +562,7 @@ refined_string_exprt java_string_library_preprocesst::make_nondet_string_expr(
 /// declare a new String and allocate it
 /// \param type: a type for string
 /// \param loc: a location in the program
+/// \param function_id: function the fresh string is created in
 /// \param symbol_table: symbol table
 /// \param code: code block to which allocation instruction will be added
 /// \return a new string
@@ -928,6 +929,7 @@ java_string_library_preprocesst::string_literal_to_string_expr(
 /// Provide code for the String.valueOf(F) function.
 /// \param type: type of the function call
 /// \param loc: location in the program_invocation_name
+/// \param function_id: function the generated code will be added to
 /// \param symbol_table: symbol table
 /// \return Code corresponding to the Java conversion of floats to strings.
 codet java_string_library_preprocesst::make_float_to_string_code(
@@ -1065,14 +1067,14 @@ codet java_string_library_preprocesst::make_float_to_string_code(
 /// \param ignore_first_arg: boolean flag telling that the first argument should
 ///   not be part of the arguments of the call (but only used to be assigned the
 ///   result)
-/// \return code for the String.<init>(args) function:
-/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/// cprover_string_length = fun(arg).length;
-/// cprover_string_array = fun(arg).data;
-/// this->length = cprover_string_length;
-/// this->data = cprover_string_array;
-/// cprover_string = {.=cprover_string_length, .=cprover_string_array};
-/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/// \return code for the `String.<init>(args)` function:
+///
+///     cprover_string_length = fun(arg).length;
+///     cprover_string_array = fun(arg).data;
+///     this->length = cprover_string_length;
+///     this->data = cprover_string_array;
+///     cprover_string = {.=cprover_string_length, .=cprover_string_array};
+///
 codet java_string_library_preprocesst::make_init_function_from_call(
   const irep_idt &function_name,
   const java_method_typet &type,
@@ -1314,6 +1316,7 @@ exprt java_string_library_preprocesst::get_object_at_index(
 /// \param index: index of the desired argument
 /// \param structured_type: type for arguments of the internal format function
 /// \param loc: a location in the source
+/// \param function_id: function the generated expression will be used in
 /// \param symbol_table: the symbol table
 /// \param code: code block to which we are adding some assignments
 /// \return An expression of type `structured_type` representing the possible
@@ -1422,6 +1425,7 @@ exprt java_string_library_preprocesst::make_argument_for_format(
 /// 10 arguments
 /// \param type: type of the function call
 /// \param loc: location in the program_invocation_name
+/// \param function_id: function the generated code will be used in
 /// \param symbol_table: symbol table
 /// \return Code implementing the Java String.format function.
 ///         Since the exact class of the arguments is not known, we give as
@@ -1478,6 +1482,7 @@ codet java_string_library_preprocesst::make_string_format_code(
 /// function.
 /// \param type: type of the function called
 /// \param loc: location in the source
+/// \param function_id: function the generated code will be added to
 /// \param symbol_table: the symbol table
 /// \return Code corresponding to
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1627,6 +1632,7 @@ codet java_string_library_preprocesst::make_string_returning_function_from_call(
 /// object.
 /// \param type: type of the function
 /// \param loc: location in the source
+/// \param function_id: function the generated code will be added to
 /// \param symbol_table: symbol table
 /// \return Code corresponding to:
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1772,9 +1778,7 @@ void java_string_library_preprocesst::get_all_function_names(
 
 /// Should be called to provide code for string functions that are used in the
 /// code but for which no implementation is provided.
-/// \param function_id: name of the function
-/// \param type: its type
-/// \param loc: location in the program
+/// \param symbol: symbol of the function to provide code for
 /// \param symbol_table: a symbol table
 /// \return Code for the body of the String functions if they are part of the
 ///   supported String functions, nil_exprt otherwise.

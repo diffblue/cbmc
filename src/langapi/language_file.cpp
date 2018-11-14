@@ -49,7 +49,7 @@ void language_filest::show_parse(std::ostream &out)
 }
 
 /// Turn on or off stub generation for all the languages
-/// \param should_generate_stubs: Should stub generation be enabled
+/// \param stubs_enabled: Should stub generation be enabled
 void language_filest::set_should_generate_opaque_method_stubs(
   bool stubs_enabled)
 {

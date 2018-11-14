@@ -126,7 +126,7 @@ irep_idt languaget::generate_opaque_stub_body(
 /// \param function_symbol: the symbol of an opaque function
 /// \param parameter_index: the index of the parameter within the the parameter
 ///   list
-/// \param parameter_type: the type of the parameter
+/// \param parameter: the parameter description, including its type and name
 /// \return A named symbol to be added to the symbol table representing one of
 ///   the parameters in this opaque function.
 parameter_symbolt languaget::build_stub_parameter_symbol(

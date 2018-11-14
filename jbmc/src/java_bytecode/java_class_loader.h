@@ -43,13 +43,6 @@ public:
 
   parse_tree_with_overlayst &operator()(const irep_idt &class_name);
 
-  /// Given a \p class_name (e.g. "java.lang.Thread") try to load the
-  /// corresponding .class file by first scanning all .jar files whose
-  /// pathname is stored in \ref jar_files, and if that doesn't work, then scan
-  /// the actual filesystem using `config.java.classpath` as class path. Uses
-  /// \p limit to limit the class files that it might (directly or indirectly)
-  /// load and returns a default-constructed parse tree when unable to find the
-  /// .class file.
   parse_tree_with_overlayst &get_parse_tree(
     java_class_loader_limitt &class_loader_limit,
     const irep_idt &class_name);

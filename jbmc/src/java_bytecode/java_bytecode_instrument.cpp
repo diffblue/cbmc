@@ -263,7 +263,7 @@ code_ifthenelset java_bytecode_instrumentt::check_class_cast(
 /// Exceptions are thrown when the `throw_runtime_exceptions` flag is set.
 /// Otherwise, assertions are emitted.
 /// \param expr: the checked expression
-/// `original_loc: source location in the original code
+/// \param original_loc: source location in the original code
 /// \return Based on the value of the flag `throw_runtime_exceptions`,
 /// it returns code that either throws an NullPointerException or emits an
 /// assertion checking the subtype relation
@@ -351,9 +351,9 @@ void java_bytecode_instrumentt::prepend_instrumentation(
   }
 }
 
-/// Augments `expr` with instrumentation in the form of either
+/// Augments `code` with instrumentation in the form of either
 /// assertions or runtime exceptions
-/// \param `expr` the expression to be instrumented
+/// \param code: the expression to be instrumented
 void java_bytecode_instrumentt::instrument_code(codet &code)
 {
   source_locationt old_source_location=code.source_location();
@@ -543,8 +543,8 @@ optionalt<codet> java_bytecode_instrumentt::instrument_expr(const exprt &expr)
     return std::move(result);
 }
 
-/// Instruments `expr`
-/// \param expr: the expression to be instrumented
+/// Instruments `code`
+/// \param code: the expression to be instrumented
 void java_bytecode_instrumentt::operator()(codet &code)
 {
   instrument_code(code);

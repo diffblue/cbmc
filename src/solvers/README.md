@@ -348,8 +348,8 @@ allocates a new string before calling a primitive.
 
 \subsection instantiation Instantiation
 
-This is done by generate_instantiations(messaget::mstreamt &stream, const string_constraint_generatort &generator, const index_set_pairt &index_set, const string_axiomst &axioms, const std::map<string_not_contains_constraintt, symbol_exprt> &not_contain_witnesses).
-\copydetails generate_instantiations(messaget::mstreamt &stream, const string_constraint_generatort &generator, const index_set_pairt &index_set, const string_axiomst &axioms, const std::map<string_not_contains_constraintt, symbol_exprt> &not_contain_witnesses).
+This is done by generate_instantiations(const index_set_pairt &index_set, const string_axiomst &axioms, const std::unordered_map<string_not_contains_constraintt, symbol_exprt> &not_contain_witnesses).
+\copydetails generate_instantiations(const index_set_pairt &index_set, const string_axiomst &axioms, const std::unordered_map<string_not_contains_constraintt, symbol_exprt> &not_contain_witnesses).
 
 \subsection axiom-check Axiom check
 

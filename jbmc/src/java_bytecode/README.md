@@ -267,7 +267,7 @@ for(tmp_index = 0; tmp_index < dim_size; ++tmp_index)
 
 When \ref remove_exceptions is called on the \ref goto_modelt, the
 goto model contains complex instructions (\ref goto_program_instruction_typet)
-such as `CATCH-POP`, `CATCH-PUSH` and `THROW`. In order to analyze the goto 
+such as `CATCH-POP`, `CATCH-PUSH` and `THROW`. In order to analyze the goto
 model, the instructions must be simplified to use more basic instructions - this
 is called "lowering". This class lowers the `CATCH` and `THROW` instructions.
 

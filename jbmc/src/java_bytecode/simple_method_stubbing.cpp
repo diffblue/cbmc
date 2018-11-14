@@ -66,6 +66,8 @@ protected:
 ///   type.
 /// \param ptr: pointer to the memory to initialize
 /// \param loc: source location to set for the opaque method stub
+/// \param function_id: name of the function we're generated stub code for; used
+///   to ensure any generated temporaries are created in the correct scope.
 /// \param [out] parent_block: The parent block in which the new instructions
 ///   will be added.
 /// \param insert_before_index: The position in which the new instructions
