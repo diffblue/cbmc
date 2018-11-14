@@ -78,7 +78,7 @@ public:
   /// and domains may refuse to implement it.
   virtual void make_top() = 0;
 
-  /// a reasonable entry-point state
+  /// Make this domain a reasonable entry-point state
   virtual void make_entry() = 0;
 
   virtual bool is_bottom() const = 0;

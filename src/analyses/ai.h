@@ -27,8 +27,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /// The basic interface of an abstract interpreter. This should be enough
 /// to create, run and query an abstract interpreter.
-// don't use me -- I am just a base class
-// use ait instead
+///
+/// Note: this is just a base class. \ref ait should be used instead.
 class ai_baset
 {
 public:
@@ -43,7 +43,7 @@ public:
   {
   }
 
-  /// Running the interpreter
+  /// Run abstract interpretation on a single function
   void operator()(
     const irep_idt &function_identifier,
     const goto_programt &goto_program,
@@ -56,6 +56,7 @@ public:
     finalize();
   }
 
+  /// Run abstract interpretation on a whole program
   void operator()(
     const goto_functionst &goto_functions,
     const namespacet &ns)
@@ -66,6 +67,7 @@ public:
     finalize();
   }
 
+  /// Run abstract interpretation on a whole program
   void operator()(const goto_modelt &goto_model)
   {
     const namespacet ns(goto_model.symbol_table);
@@ -75,6 +77,7 @@ public:
     finalize();
   }
 
+  /// Run abstract interpretation on a single function
   void operator()(
     const irep_idt &function_identifier,
     const goto_functionst::goto_functiont &goto_function,
@@ -87,17 +90,23 @@ public:
     finalize();
   }
 
-  /// Accessing individual domains at particular locations
-  /// (without needing to know what kind of domain or history is used)
-  /// A pointer to a copy as the method should be const and
-  /// there are some non-trivial cases including merging domains, etc.
-  /// Intended for users of the abstract interpreter; don't use internally.
-
-  /// Returns the abstract state before the given instruction
+  /// Get the abstract state before the given instruction, without needing to
+  /// know what kind of domain or history is used. Note: intended for
+  /// users of the abstract interpreter; don't use internally.
   /// PRECONDITION(l is dereferenceable)
+  /// \param l: The location we want the domain before
+  /// \return The domain before `l`. We return a pointer to a copy as the method
+  ///   should be const and there are some non-trivial cases including merging
+  ///   domains, etc.
   virtual std::unique_ptr<statet> abstract_state_before(locationt l) const = 0;
 
-  /// Returns the abstract state after the given instruction
+  /// Get the abstract state after the given instruction, without needing to
+  /// know what kind of domain or history is used. Note: intended for
+  /// users of the abstract interpreter; don't use internally.
+  /// \param l: The location we want the domain after
+  /// \return The domain after `l`. We return a pointer to a copy as the method
+  ///   should be const and there are some non-trivial cases including merging
+  ///   domains, etc.
   virtual std::unique_ptr<statet> abstract_state_after(locationt l) const
   {
     /// PRECONDITION(l is dereferenceable && std::next(l) is dereferenceable)
@@ -106,16 +115,18 @@ public:
     return abstract_state_before(std::next(l));
   }
 
-  /// Resets the domain
+  /// Reset the domain
   virtual void clear()
   {
   }
 
+  /// Output the domains for a whole program
   virtual void output(
     const namespacet &ns,
     const goto_functionst &goto_functions,
     std::ostream &out) const;
 
+  /// Output the domains for a whole program
   void output(
     const goto_modelt &goto_model,
     std::ostream &out) const
@@ -124,6 +135,7 @@ public:
     output(ns, goto_model.goto_functions, out);
   }
 
+  /// Output the domains for a function
   void output(
     const namespacet &ns,
     const goto_programt &goto_program,
@@ -132,6 +144,7 @@ public:
     output(ns, goto_program, "", out);
   }
 
+  /// Output the domains for a function
   void output(
     const namespacet &ns,
     const goto_functionst::goto_functiont &goto_function,
@@ -140,11 +153,12 @@ public:
     output(ns, goto_function.body, "", out);
   }
 
-
+  /// Output the domains for the whole program as JSON
   virtual jsont output_json(
     const namespacet &ns,
     const goto_functionst &goto_functions) const;
 
+  /// Output the domains for a whole program as JSON
   jsont output_json(
     const goto_modelt &goto_model) const
   {
@@ -152,6 +166,7 @@ public:
     return output_json(ns, goto_model.goto_functions);
   }
 
+  /// Output the domains for a single function as JSON
   jsont output_json(
     const namespacet &ns,
     const goto_programt &goto_program) const
@@ -159,6 +174,7 @@ public:
     return output_json(ns, goto_program, "");
   }
 
+  /// Output the domains for a single function as JSON
   jsont output_json(
     const namespacet &ns,
     const goto_functionst::goto_functiont &goto_function) const
@@ -166,11 +182,12 @@ public:
     return output_json(ns, goto_function.body, "");
   }
 
-
+  /// Output the domains for the whole program as XML
   virtual xmlt output_xml(
     const namespacet &ns,
     const goto_functionst &goto_functions) const;
 
+  /// Output the domains for the whole program as XML
   xmlt output_xml(
     const goto_modelt &goto_model) const
   {
@@ -178,6 +195,7 @@ public:
     return output_xml(ns, goto_model.goto_functions);
   }
 
+  /// Output the domains for a single function as XML
   xmlt output_xml(
     const namespacet &ns,
     const goto_programt &goto_program) const
@@ -185,6 +203,7 @@ public:
     return output_xml(ns, goto_program, "");
   }
 
+  /// Output the domains for a single function as XML
   xmlt output_xml(
     const namespacet &ns,
     const goto_functionst::goto_functiont &goto_function) const
@@ -193,37 +212,65 @@ public:
   }
 
 protected:
-  // overload to add a factory
-  virtual void initialize(const goto_programt &);
-  virtual void initialize(const goto_functionst::goto_functiont &);
-  virtual void initialize(const goto_functionst &);
+  /// Initialize all the domains for a single function. Overloaded this to add a
+  /// factory.
+  virtual void initialize(const goto_programt &goto_program);
 
-  // override to add a cleanup step after fixedpoint has run
+  /// Initialize all the domains for a single function. Overloaded this to add a
+  /// factory.
+  virtual void initialize(const goto_functionst::goto_functiont &goto_function);
+
+  /// Initialize all the domains for a whole program. Overloaded this to add a
+  /// factory.
+  virtual void initialize(const goto_functionst &goto_functions);
+
+  /// Override this to add a cleanup step after fixedpoint has run
   virtual void finalize();
 
-  void entry_state(const goto_programt &);
-  void entry_state(const goto_functionst &);
+  /// Ensure the entry point to a single function has a reasonable state
+  void entry_state(const goto_programt &goto_functions);
 
+  /// Ensure the entry point to a whole program has a reasonable state
+  void entry_state(const goto_functionst &goto_program);
+
+  /// Output the domains for a single function
+  /// \param ns: The namespace
+  /// \param goto_program: The goto program
+  /// \param identifier: the identifier used to find a symbol to identify the
+  ///   source language
+  /// \param out: The ostream to direct output to
   virtual void output(
     const namespacet &ns,
     const goto_programt &goto_program,
     const irep_idt &identifier,
     std::ostream &out) const;
 
+  /// Output the domains for a single function as JSON
+  /// \param ns: The namespace
+  /// \param goto_program: The goto program
+  /// \param identifier: the identifier used to find a symbol to identify the
+  ///   source language
+  /// \return The JSON object
   virtual jsont output_json(
     const namespacet &ns,
     const goto_programt &goto_program,
     const irep_idt &identifier) const;
 
+  /// Output the domains for a single function as XML
+  /// \param ns: The namespace
+  /// \param goto_program: The goto program
+  /// \param identifier: the identifier used to find a symbol to identify the
+  ///   source language
+  /// \return The XML object
   virtual xmlt output_xml(
     const namespacet &ns,
     const goto_programt &goto_program,
     const irep_idt &identifier) const;
 
-
-  // the work-queue is sorted by location number
+  /// The work queue, sorted by location number
   typedef std::map<unsigned, locationt> working_sett;
 
+  /// Get the next location from the work queue
   locationt get_next(working_sett &working_set);
 
   void put_in_working_set(
@@ -234,7 +281,8 @@ protected:
       std::pair<unsigned, locationt>(l->location_number, l));
   }
 
-  // true = found something new
+  /// Run the fixedpoint algorithm until it reaches a fixed point
+  /// \return True if we found something new
   bool fixedpoint(
     const irep_idt &function_identifier,
     const goto_programt &goto_program,
@@ -253,10 +301,10 @@ protected:
     const goto_functionst &goto_functions,
     const namespacet &ns);
 
-  // Visit performs one step of abstract interpretation from location l
-  // Depending on the instruction type it may compute a number of "edges"
-  // or applications of the abstract transformer
-  // true = found something new
+  /// Perform one step of abstract interpretation from location l
+  /// Depending on the instruction type it may compute a number of "edges"
+  /// or applications of the abstract transformer
+  /// \return True if the state was changed
   bool visit(
     const irep_idt &function_identifier,
     locationt l,
@@ -389,10 +437,11 @@ protected:
   }
 
 private:
-  // to enforce that domainT is derived from ai_domain_baset
+  /// This function exists to enforce that `domainT` is derived from
+  /// \ref ai_domain_baset
   void dummy(const domainT &s) { const statet &x=s; (void)x; }
 
-  // not implemented in sequential analyses
+  /// This function should not be implemented in sequential analyses
   bool merge_shared(const statet &, locationt, locationt, const namespacet &)
     override
   {

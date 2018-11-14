@@ -60,10 +60,6 @@ void ai_baset::output(
   }
 }
 
-/// Output the domains for the whole program as JSON
-/// \param ns: The namespace
-/// \param goto_functions: The goto functions
-/// \return The JSON object
 jsont ai_baset::output_json(
   const namespacet &ns,
   const goto_functionst &goto_functions) const
@@ -120,10 +116,6 @@ jsont ai_baset::output_json(
   return std::move(contents);
 }
 
-/// Output the domains for the whole program as XML
-/// \param ns: The namespace
-/// \param goto_functions: The goto functions
-/// \return The XML object
 xmlt ai_baset::output_xml(
   const namespacet &ns,
   const goto_functionst &goto_functions) const
