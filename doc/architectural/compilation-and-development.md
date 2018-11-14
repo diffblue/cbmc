@@ -76,7 +76,7 @@ CI, should succeed), `THOROUGH` (takes too long to be run in CI, should
 succeed), `FUTURE` (will succeed when a planned feature is added) or
 `KNOWNBUG` (will succeed when a bug is fixed).
 
-\subsubsection compilation-and-development-subsubsection-running-regression-tests-with-make Running regression tests with `make`
+\subsubsection compilation-and-development-subsubsection-running-regression-tests-with-make Running regression tests with make
 
 If you have compiled using `make` then you can run the regression tests
 using `make test`. Run it from `regression/` to run all the regression tests,
@@ -88,10 +88,10 @@ If you have not compiled using `make` then this won't work, because the
 makefile is expecting to find binaries like `cbmc` and `jbmc` in the source
 folders.
 
-\subsubsection compilation-and-development-subsubsection-running-regression-tests-with-ctest Running regression tests with `ctest`
+\subsubsection compilation-and-development-subsubsection-running-regression-tests-with-ctest Running regression tests with CTest
 
-If you have compiled using CMake then you can run the regression tests (and
-the unit tests) using CTest.
+If you have compiled using CMake then you can run the regression tests using
+CTest. (Note: this will also run the unit tests.)
 
 Here are two example commands, to be run from the `build/` directory:
 
@@ -109,26 +109,36 @@ So the first command will run all the CORE tests in `regression/cbmc/cpp` and
 list which tests it will run without actually running them.
 
 
-\subsubsection compilation-and-development-subsubsection-running-regression-tests-directly-with-test-pl Running regression tests directly with `test.pl`
+\subsubsection compilation-and-development-subsubsection-running-individual-regression-tests-directly-with-test-pl Running individual regression tests directly with test.pl
 
 It can be useful to run a single test folder in isolation. This can be done by
 running `regression/test.pl` directly. The way that `test.pl` is run varies between the
 different modules, and can be ascertained by looking at the `test` target in
 the makefile. The simple case is when there isn't a file called `chain.sh`.
 Then you can directly run `test.pl` on a single test folder with the
-following command (from the module directory):
+following command from the module directory (note that it is recommended to
+use absolute paths as it avoids many issues, e.g. the path to the binary
+should be relative to `<test-folder>`):
 
-    ../test.pl -p -c <absolute-path-to-binary> <test-folder>
+    <absolute-path-to-test.pl> -p -c <absolute-path-to-binary> <test-folder>
 
 `-p` makes it print a log of failed tests and `-c` tells it where to find the
-binary to run (the path does not have to be absolute, but it is recommended).
+binary to run, e.g. `cbmc`, `jbmc` or `goto-analyzer`.
 If `<test-folder>` is not provided then all test directories are run. The
 `--help` option lists all command line options, including `-j` for running
 multiple tests in parallel and `-C`, `-T`, `-F` and `-K` for controlling
 whether `CORE`, `THOROUGH`, `FUTURE` or `KNOWNBUG` tests are run.
 
-When there is a file called `chain.sh` then `test.pl` is called with
-`-c ../chain.sh`, followed by arguments which vary from module to module.
+When there is a file called `chain.sh` then the command should look like
+
+    <absolute-path-to-test.pl> -p -c '<absolute-path-to-chain-sh> <arg-1> ... <arg-n>' <test-folder>
+
+Note that the test binary and its initial command line arguments are a single
+value for the -c option, so they must be be wrapped in quotes if they contain
+any unescaped spaces. What to put for the
+arguments  `<arg-1>` to `<arg-n>` varies from module to module. To find
+out, look in `chain.sh` and see what arguments it expects. You can also look in
+the `Makefile` and see how it calls `chain.sh` in the `test` target.
 
 
 \subsection compilation-and-development-subsection-unit-tests Unit tests
@@ -136,15 +146,29 @@ When there is a file called `chain.sh` then `test.pl` is called with
 The unit tests are contained in the `unit/` folder. They are written using the
 [Catch](https://github.com/philsquared/Catch) unit test framework.
 
-To run the unit tests for CBMC, go to `unit/` and run
+If you have compiled with `make`, you can run the unit tests for CBMC directly
+by going to `unit/`, running `make` to compile the unit tests and then
+`make test` to run them. You can run the unit tests for JBMC directly by going
+to `jbmc/unit/` and running the same commands.
+
+If you have compiled with CMake, you can run the unit tests for CBMC directly
+by going to `unit/` and running
 
     ../<build-folder>/bin/unit
 
-To run the unit tests for JBMC, go to `jbmc/unit/` and run
+and you can run the unit tests for JBMC directly by going to `jbmc/unit/` and
+running
 
     ../../<build-folder>/bin/java-unit
 
-The unit tests are also included in CTest as `unit` and `java-unit`.
+If you have compiled with CMake you can also run the unit tests through CTest,
+with the names `unit` and `java-unit`. So, from the `build/` directory, run
+
+    ctest -V -L CORE -R ^unit
+    ctest -V -L CORE -R java-unit
+
+to run the CBMC unit tests and the JBMC unit tests respectively. (The `^` is
+needed to make it a regular expression that matches `unit` but not `java-unit`.)
 
 Note that some tests run which are expected to fail - see the summary at
 the end of the run to see how many tests passed, how many failed which were
