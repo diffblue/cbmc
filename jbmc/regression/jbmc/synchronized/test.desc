@@ -1,10 +1,9 @@
-KNOWNBUG
+CORE
 Sync.class
-
+--java-threading --throw-runtime-exceptions --cp `../../../../scripts/format_classpath.sh . ../../../src/java_bytecode/library/core-models.jar`
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
 --
 ^warning: ignoring
 --
-See #1236 for details of this test.
