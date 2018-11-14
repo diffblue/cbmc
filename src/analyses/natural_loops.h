@@ -25,6 +25,7 @@ Author: Georg Weissenbacher, georg@weissenbacher.name
 #include <set>
 
 #include <goto-programs/goto_model.h>
+#include <util/const_cast_iterator.h>
 
 #include "cfg_dominators.h"
 
@@ -42,8 +43,45 @@ Author: Georg Weissenbacher, georg@weissenbacher.name
 ///         [function] is_backwards_goto() returning a bool.
 ///         [function] get_target() which returns an object that needs:
 ///             [field] location_number which returns an unsigned int.
+class natural_loops_baset
+{
+public:
+  void operator()(const goto_programt &program)
+  {
+    compute(program);
+  }
+
+  const cfg_dominatorst &get_dominator_info() const
+  {
+    return cfg_dominators;
+  }
+
+protected:
+  cfg_dominatorst cfg_dominators;
+  typedef cfg_dominatorst::cfgt::nodet nodet;
+
+  typedef goto_programt::const_targett targett;
+
+  std::map<targett, std::set<targett>> compute(const goto_programt &program);
+  std::set<targett> compute_natural_loop(targett, targett);
+};
+
+template<typename Container, typename ConstIterator>
+typename Container::const_iterator get_iterator(
+  const Container &, const ConstIterator ci)
+{
+  return ci;
+}
+
+template<typename Container, typename ConstIterator>
+typename Container::iterator get_iterator(
+  Container &container, const ConstIterator ci)
+{
+  return get_nonconst_iterator(container, ci);
+}
+
 template<class P, class T>
-class natural_loops_templatet
+class natural_loops_templatet : public natural_loops_baset
 {
 public:
   typedef std::set<T> natural_loopt;
@@ -53,125 +91,25 @@ public:
 
   loop_mapt loop_map;
 
+  natural_loops_templatet() = default;
   void operator()(P &program)
   {
-    compute(program);
-  }
-
-  void output(std::ostream &) const;
-
-  const cfg_dominators_templatet<P, T, false> &get_dominator_info() const
-  {
-    return cfg_dominators;
-  }
-
-  natural_loops_templatet()
-  {
-  }
-
-  explicit natural_loops_templatet(P &program)
-  {
-    compute(program);
-  }
-
-protected:
-  cfg_dominators_templatet<P, T, false> cfg_dominators;
-  typedef typename cfg_dominators_templatet<P, T, false>::cfgt::nodet nodet;
-
-  void compute(P &program);
-  void compute_natural_loop(T, T);
-};
-
-/// A concretized version of
-/// \ref natural_loops_templatet<const goto_programt, goto_programt::const_targett>
-class natural_loopst:
-    public natural_loops_templatet<const goto_programt,
-                                   goto_programt::const_targett>
-{
-};
-
-typedef natural_loops_templatet<goto_programt, goto_programt::targett>
-    natural_loops_mutablet;
-
-void show_natural_loops(
-  const goto_modelt &,
-  std::ostream &out);
-
-#ifdef DEBUG
-#include <iostream>
-#endif
-
-/// Finds all back-edges and computes the natural loops
-template<class P, class T>
-void natural_loops_templatet<P, T>::compute(P &program)
-{
-  cfg_dominators(program);
-
-#ifdef DEBUG
-  cfg_dominators.output(std::cout);
-#endif
-
-  // find back-edges m->n
-  for(T m_it=program.instructions.begin();
-      m_it!=program.instructions.end();
-      ++m_it)
-  {
-    if(m_it->is_backwards_goto())
+    for(const auto &found_loop : compute(program))
     {
-      const auto &target=m_it->get_target();
-
-      if(target->location_number<=m_it->location_number)
-      {
-        const nodet &node=
-          cfg_dominators.cfg[cfg_dominators.cfg.entry_map[m_it]];
-
-        #ifdef DEBUG
-        std::cout << "Computing loop for "
-                  << m_it->location_number << " -> "
-                  << target->location_number << "\n";
-        #endif
-
-        if(node.dominators.find(target)!=node.dominators.end())
-          compute_natural_loop(m_it, target);
-      }
+      auto &loop =
+        loop_map[get_iterator(program.instructions, found_loop.first)];
+      for(auto instruction_iter : found_loop.second)
+        loop.insert(get_iterator(program.instructions, instruction_iter));
     }
   }
-}
 
-/// Computes the natural loop for a given back-edge (see Muchnick section 7.4)
-template<class P, class T>
-void natural_loops_templatet<P, T>::compute_natural_loop(T m, T n)
-{
-  assert(n->location_number<=m->location_number);
-
-  std::stack<T> stack;
-
-  natural_loopt &loop=loop_map[n];
-
-  loop.insert(n);
-  loop.insert(m);
-
-  if(n!=m)
-    stack.push(m);
-
-  while(!stack.empty())
+  natural_loops_templatet(P &program)
   {
-    T p=stack.top();
-    stack.pop();
-
-    const nodet &node=
-      cfg_dominators.cfg[cfg_dominators.cfg.entry_map[p]];
-
-    for(const auto &edge : node.in)
-    {
-      T q=cfg_dominators.cfg[edge.first].PC;
-      std::pair<typename natural_loopt::const_iterator, bool> result=
-          loop.insert(q);
-      if(result.second)
-        stack.push(q);
-    }
+    (*this)(program);
   }
-}
+
+  void output(std::ostream &stream) const;
+};
 
 /// Print all natural loops that were found
 template<class P, class T>
@@ -192,5 +130,16 @@ void natural_loops_templatet<P, T>::output(std::ostream &out) const
     out << " }\n";
   }
 }
+
+typedef
+  natural_loops_templatet<const goto_programt, goto_programt::const_targett>
+  natural_loopst;
+
+typedef natural_loops_templatet<goto_programt, goto_programt::targett>
+    natural_loops_mutablet;
+
+void show_natural_loops(
+  const goto_modelt &,
+  std::ostream &out);
 
 #endif // CPROVER_ANALYSES_NATURAL_LOOPS_H
