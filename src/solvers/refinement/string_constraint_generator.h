@@ -198,7 +198,6 @@ std::pair<exprt, string_constraintst> add_axioms_for_insert(
   const array_string_exprt &s2,
   const exprt &offset);
 std::pair<exprt, string_constraintst> add_axioms_for_string_of_int_with_radix(
-  symbol_generatort &fresh_symbol,
   const array_string_exprt &res,
   const exprt &input_int,
   const exprt &radix,
@@ -355,38 +354,30 @@ std::pair<exprt, string_constraintst> add_axioms_from_literal(
   array_poolt &array_pool);
 
 std::pair<exprt, string_constraintst> add_axioms_for_string_of_int(
-  symbol_generatort &fresh_symbol,
   const array_string_exprt &res,
   const exprt &input_int,
   size_t max_size,
   const namespacet &ns);
 std::pair<exprt, string_constraintst> add_axioms_from_int_hex(
-  symbol_generatort &fresh_symbol,
   const array_string_exprt &res,
   const exprt &i);
 std::pair<exprt, string_constraintst> add_axioms_from_int_hex(
-  symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
   array_poolt &array_pool);
 std::pair<exprt, string_constraintst> add_axioms_from_long(
-  symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
   array_poolt &array_pool,
   const namespacet &ns);
 std::pair<exprt, string_constraintst> add_axioms_from_bool(
-  symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
   array_poolt &array_pool);
 std::pair<exprt, string_constraintst> add_axioms_from_bool(
-  symbol_generatort &fresh_symbol,
   const array_string_exprt &res,
   const exprt &i);
 std::pair<exprt, string_constraintst> add_axioms_from_char(
-  symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
   array_poolt &array_pool);
 std::pair<exprt, string_constraintst> add_axioms_from_char(
-  symbol_generatort &fresh_symbol,
   const array_string_exprt &res,
   const exprt &i);
 std::pair<exprt, string_constraintst> add_axioms_for_index_of(

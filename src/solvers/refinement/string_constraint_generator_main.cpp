@@ -440,7 +440,7 @@ string_constraint_generatort::add_axioms_for_function_application(
   else if(id==ID_cprover_string_copy_func)
     return add_axioms_for_copy(fresh_symbol, expr, array_pool);
   else if(id==ID_cprover_string_of_int_hex_func)
-    return add_axioms_from_int_hex(fresh_symbol, expr, array_pool);
+    return add_axioms_from_int_hex(expr, array_pool);
   else if(id==ID_cprover_string_of_float_func)
     return add_axioms_for_string_of_float(fresh_symbol, expr, array_pool, ns);
   else if(id==ID_cprover_string_of_float_scientific_notation_func)
@@ -449,11 +449,11 @@ string_constraint_generatort::add_axioms_for_function_application(
   else if(id==ID_cprover_string_of_double_func)
     return add_axioms_from_double(fresh_symbol, expr, array_pool, ns);
   else if(id==ID_cprover_string_of_long_func)
-    return add_axioms_from_long(fresh_symbol, expr, array_pool, ns);
+    return add_axioms_from_long(expr, array_pool, ns);
   else if(id==ID_cprover_string_of_bool_func)
-    return add_axioms_from_bool(fresh_symbol, expr, array_pool);
+    return add_axioms_from_bool(expr, array_pool);
   else if(id==ID_cprover_string_of_char_func)
-    return add_axioms_from_char(fresh_symbol, expr, array_pool);
+    return add_axioms_from_char(expr, array_pool);
   else if(id==ID_cprover_string_set_length_func)
     return add_axioms_for_set_length(fresh_symbol, expr, array_pool);
   else if(id==ID_cprover_string_delete_func)

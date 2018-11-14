@@ -156,7 +156,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_insert_int(
   const typet &char_type = s1.content().type().subtype();
   const array_string_exprt s2 = array_pool.fresh_string(index_type, char_type);
   return combine_results(
-    add_axioms_for_string_of_int(fresh_symbol, s2, f.arguments()[4], 0, ns),
+    add_axioms_for_string_of_int(s2, f.arguments()[4], 0, ns),
     add_axioms_for_insert(fresh_symbol, res, s1, s2, offset));
 }
 
@@ -182,7 +182,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_insert_bool(
   const typet &char_type = s1.content().type().subtype();
   const array_string_exprt s2 = array_pool.fresh_string(index_type, char_type);
   return combine_results(
-    add_axioms_from_bool(fresh_symbol, s2, f.arguments()[4]),
+    add_axioms_from_bool(s2, f.arguments()[4]),
     add_axioms_for_insert(fresh_symbol, res, s1, s2, offset));
 }
 
@@ -207,7 +207,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_insert_char(
   const typet &char_type = s1.content().type().subtype();
   const array_string_exprt s2 = array_pool.fresh_string(index_type, char_type);
   return combine_results(
-    add_axioms_from_char(fresh_symbol, s2, f.arguments()[4]),
+    add_axioms_from_char(s2, f.arguments()[4]),
     add_axioms_for_insert(fresh_symbol, res, s1, s2, offset));
 }
 

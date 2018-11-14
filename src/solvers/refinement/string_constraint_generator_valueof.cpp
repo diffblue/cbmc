@@ -37,14 +37,12 @@ static unsigned long to_integer_or_default(
 
 /// Add axioms corresponding to the String.valueOf(J) java function.
 /// \deprecated should use add_axioms_from_int instead
-/// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with one long argument
 /// \param array_pool: pool of arrays representing strings
 /// \param ns: namespace
 /// \return a new string expression
 DEPRECATED("should use add_axioms_for_string_of_int instead")
 std::pair<exprt, string_constraintst> add_axioms_from_long(
-  symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
   array_poolt &array_pool,
   const namespacet &ns)
@@ -54,40 +52,35 @@ std::pair<exprt, string_constraintst> add_axioms_from_long(
     char_array_of_pointer(array_pool, f.arguments()[1], f.arguments()[0]);
   if(f.arguments().size() == 4)
     return add_axioms_for_string_of_int_with_radix(
-      fresh_symbol, res, f.arguments()[2], f.arguments()[3], 0, ns);
+      res, f.arguments()[2], f.arguments()[3], 0, ns);
   else
-    return add_axioms_for_string_of_int(
-      fresh_symbol, res, f.arguments()[2], 0, ns);
+    return add_axioms_for_string_of_int(res, f.arguments()[2], 0, ns);
 }
 
 /// Add axioms corresponding to the String.valueOf(Z) java function.
 /// \deprecated This is Java specific and should be implemented in Java instead
-/// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with a Boolean argument
 /// \param array_pool: pool of arrays representing strings
 /// \return a new string expression
 DEPRECATED("This is Java specific and should be implemented in Java instead")
 std::pair<exprt, string_constraintst> add_axioms_from_bool(
-  symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
   array_poolt &array_pool)
 {
   PRECONDITION(f.arguments().size() == 3);
   const array_string_exprt res =
     char_array_of_pointer(array_pool, f.arguments()[1], f.arguments()[0]);
-  return add_axioms_from_bool(fresh_symbol, res, f.arguments()[2]);
+  return add_axioms_from_bool(res, f.arguments()[2]);
 }
 
 /// Add axioms stating that the returned string equals "true" when the Boolean
 /// expression is true and "false" when it is false.
 /// \deprecated This is Java specific and should be implemented in Java instead
-/// \param fresh_symbol: generator of fresh symbols
 /// \param res: string expression for the result
 /// \param b: Boolean expression
 /// \return code 0 on success
 DEPRECATED("This is Java specific and should be implemented in Java instead")
 std::pair<exprt, string_constraintst> add_axioms_from_bool(
-  symbol_generatort &fresh_symbol,
   const array_string_exprt &res,
   const exprt &b)
 {
@@ -130,7 +123,6 @@ std::pair<exprt, string_constraintst> add_axioms_from_bool(
 /// Add axioms enforcing that the string corresponds to the result
 /// of String.valueOf(I) or String.valueOf(J) Java functions applied
 /// on the integer expression.
-/// \param fresh_symbol: generator of fresh symbols
 /// \param res: string expression for the result
 /// \param input_int: a signed integer expression
 /// \param max_size: a maximal size for the string representation (default 0,
@@ -138,7 +130,6 @@ std::pair<exprt, string_constraintst> add_axioms_from_bool(
 /// \param ns: namespace
 /// \return code 0 on success
 std::pair<exprt, string_constraintst> add_axioms_for_string_of_int(
-  symbol_generatort &fresh_symbol,
   const array_string_exprt &res,
   const exprt &input_int,
   size_t max_size,
@@ -146,13 +137,12 @@ std::pair<exprt, string_constraintst> add_axioms_for_string_of_int(
 {
   const constant_exprt radix=from_integer(10, input_int.type());
   return add_axioms_for_string_of_int_with_radix(
-    fresh_symbol, res, input_int, radix, max_size, ns);
+    res, input_int, radix, max_size, ns);
 }
 
 /// Add axioms enforcing that the string corresponds to the result
 /// of String.valueOf(II) or String.valueOf(JI) Java functions applied
 /// on the integer expression.
-/// \param fresh_symbol: generator of fresh symbols
 /// \param res: string expression for the result
 /// \param input_int: a signed integer expression
 /// \param radix: the radix to use
@@ -161,7 +151,6 @@ std::pair<exprt, string_constraintst> add_axioms_for_string_of_int(
 /// \param ns: namespace
 /// \return code 0 on success
 std::pair<exprt, string_constraintst> add_axioms_for_string_of_int_with_radix(
-  symbol_generatort &fresh_symbol,
   const array_string_exprt &res,
   const exprt &input_int,
   const exprt &radix,
@@ -220,13 +209,11 @@ static exprt int_of_hex_char(const exprt &chr)
 /// Add axioms stating that the string `res` corresponds to the integer
 /// argument written in hexadecimal.
 /// \deprecated use add_axioms_from_int_with_radix instead
-/// \param fresh_symbol: generator of fresh symbols
 /// \param res: string expression for the result
 /// \param i: an integer argument
 /// \return code 0 on success
 DEPRECATED("use add_axioms_for_string_of_int_with_radix instead")
 std::pair<exprt, string_constraintst> add_axioms_from_int_hex(
-  symbol_generatort &fresh_symbol,
   const array_string_exprt &res,
   const exprt &i)
 {
@@ -280,54 +267,48 @@ std::pair<exprt, string_constraintst> add_axioms_from_int_hex(
 }
 
 /// Add axioms corresponding to the Integer.toHexString(I) java function
-/// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with an integer argument
 /// \param array_pool: pool of arrays representing strings
 /// \return code 0 on success
 std::pair<exprt, string_constraintst> add_axioms_from_int_hex(
-  symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
   array_poolt &array_pool)
 {
   PRECONDITION(f.arguments().size() == 3);
   const array_string_exprt res =
     char_array_of_pointer(array_pool, f.arguments()[1], f.arguments()[0]);
-  return add_axioms_from_int_hex(fresh_symbol, res, f.arguments()[2]);
+  return add_axioms_from_int_hex(res, f.arguments()[2]);
 }
 
 /// Conversion from char to string
 ///
 // NOLINTNEXTLINE
-/// \copybrief add_axioms_from_char(symbol_generatort &fresh_symbol, const array_string_exprt &res, const exprt &c)
+/// \copybrief add_axioms_from_char(const array_string_exprt &res, const exprt &c)
 // NOLINTNEXTLINE
-/// \link add_axioms_from_char(symbol_generatort &fresh_symbol, const array_string_exprt &res, const exprt &c)
+/// \link add_axioms_from_char(const array_string_exprt &res, const exprt &c)
 ///    (More...) \endlink
-/// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with arguments integer `|res|`, character
 ///           pointer `&res[0]` and character `c`
 /// \param array_pool: pool of arrays representing strings
 /// \return code 0 on success
 std::pair<exprt, string_constraintst> add_axioms_from_char(
-  symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
   array_poolt &array_pool)
 {
   PRECONDITION(f.arguments().size() == 3);
   const array_string_exprt res =
     char_array_of_pointer(array_pool, f.arguments()[1], f.arguments()[0]);
-  return add_axioms_from_char(fresh_symbol, res, f.arguments()[2]);
+  return add_axioms_from_char(res, f.arguments()[2]);
 }
 
 /// Add axiom stating that string `res` has length 1 and the character
 /// it contains equals `c`.
 ///
 /// This axiom is: \f$ |{\tt res}| = 1 \land {\tt res}[0] = {\tt c} \f$.
-/// \param fresh_symbol: generator of fresh symbols
 /// \param res: array of characters expression
 /// \param c: character expression
 /// \return code 0 on success
 std::pair<exprt, string_constraintst> add_axioms_from_char(
-  symbol_generatort &fresh_symbol,
   const array_string_exprt &res,
   const exprt &c)
 {

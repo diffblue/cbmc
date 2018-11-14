@@ -112,7 +112,6 @@ static exprt instantiate(
 static std::vector<exprt> instantiate(
   const string_not_contains_constraintt &axiom,
   const index_set_pairt &index_set,
-  const string_constraint_generatort &generator,
   const std::unordered_map<string_not_contains_constraintt, symbol_exprt>
     &witnesses);
 
@@ -226,10 +225,9 @@ static void display_index_set(
 ///     \f$\forall x. P(x) \Rightarrow \exists y .s_0[x+y] \ne s_1[y]) \f$ we
 ///     need to look at the index set of both `s_0` and `s_1`.
 // NOLINTNEXTLINE(whitespace/line_length)
-///     (See `instantiate(const string_not_contains_constraintt&,const index_set_pairt&,const string_constraint_generatort&,const std::map<string_not_contains_constraintt, symbol_exprt>&)`
+///     (See `instantiate(const string_not_contains_constraintt&,const index_set_pairt&,const std::map<string_not_contains_constraintt, symbol_exprt>&)`
 ///      for details)
 static std::vector<exprt> generate_instantiations(
-  const string_constraint_generatort &generator,
   const index_set_pairt &index_set,
   const string_axiomst &axioms,
   const std::unordered_map<string_not_contains_constraintt, symbol_exprt>
@@ -247,7 +245,7 @@ static std::vector<exprt> generate_instantiations(
   for(const auto &nc_axiom : axioms.not_contains)
   {
     for(const auto &instance :
-        instantiate(nc_axiom, index_set, generator, not_contain_witnesses))
+        instantiate(nc_axiom, index_set, not_contain_witnesses))
       lemmas.push_back(instance);
   }
   return lemmas;
@@ -771,8 +769,8 @@ decision_proceduret::resultt string_refinementt::dec_solve()
   initial_index_set(index_sets, ns, axioms);
   update_index_set(index_sets, ns, current_constraints);
   current_constraints.clear();
-  const auto instances = generate_instantiations(
-    generator, index_sets, axioms, not_contain_witnesses);
+  const auto instances =
+    generate_instantiations(index_sets, axioms, not_contain_witnesses);
   for(const auto &instance : instances)
     add_lemma(instance);
 
@@ -829,8 +827,8 @@ decision_proceduret::resultt string_refinementt::dec_solve()
         }
       }
       current_constraints.clear();
-      const auto instances = generate_instantiations(
-        generator, index_sets, axioms, not_contain_witnesses);
+      const auto instances =
+        generate_instantiations(index_sets, axioms, not_contain_witnesses);
       for(const auto &instance : instances)
         add_lemma(instance);
     }
@@ -1882,12 +1880,11 @@ static exprt instantiate(
 /// entailed by a (transformed) axiom.
 /// \param [in] axiom: the axiom to instantiate
 /// \param index_set: set of indexes
-/// \param generator: constraint generator object
+/// \param witnesses: \p axiom's witnesses for non-containment
 /// \return the lemmas produced through instantiation
 static std::vector<exprt> instantiate(
   const string_not_contains_constraintt &axiom,
   const index_set_pairt &index_set,
-  const string_constraint_generatort &generator,
   const std::unordered_map<string_not_contains_constraintt, symbol_exprt>
     &witnesses)
 {

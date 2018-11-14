@@ -20,8 +20,6 @@
 /cbmc/src/solvers/refinement/string_refinement.cpp:1511: warning: argument 'stream' of command @param is not found in the argument list of compute_inverse_function(const exprt &qvar, const exprt &val, const exprt &f)
 /cbmc/src/solvers/refinement/string_refinement.cpp:239: warning: Invalid list item found
 /cbmc/src/solvers/refinement/string_refinement.cpp:1823: warning: argument 'stream' of command @param is not found in the argument list of instantiate(const string_constraintt &axiom, const exprt &str, const exprt &val)
-/cbmc/src/solvers/refinement/string_refinement.cpp:112: warning: The following parameters of instantiate(const string_not_contains_constraintt &axiom, const index_set_pairt &index_set, const string_constraint_generatort &generator, const std::unordered_map< string_not_contains_constraintt, symbol_exprt > &witnesses) are not documented:
-  parameter 'witnesses'
 /cbmc/src/solvers/refinement/string_refinement.cpp:1052: warning: The following parameters of substitute_array_access(const with_exprt &expr, const exprt &index, const bool left_propagate) are not documented:
   parameter 'left_propagate'
 /cbmc/doc/architectural/howto.md:260: warning: found </div> at different nesting level (6) than expected (3)
