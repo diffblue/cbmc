@@ -36,26 +36,55 @@ void constant_propagator_domaint::assign_rec(
   const namespacet &ns,
   const constant_propagator_ait *cp)
 {
-  if(lhs.id()!=ID_symbol)
-    return;
-
-  if(cp && !cp->should_track_value(lhs, ns))
-    return;
-
-  const symbol_exprt &s=to_symbol_expr(lhs);
-
-  exprt tmp=rhs;
-  partial_evaluate(dest_values, tmp, ns);
-
-  if(dest_values.is_constant(tmp))
+  if(lhs.id() == ID_dereference)
   {
-    DATA_INVARIANT(
-      base_type_eq(ns.lookup(s).type, tmp.type(), ns),
-      "type of constant to be replaced should match");
-    dest_values.set_to(s, tmp);
+    const bool have_dirty = (cp != nullptr);
+
+    if(have_dirty)
+      dest_values.set_dirty_to_top(cp->dirty, ns);
+    else
+      dest_values.set_to_top();
+  }
+  else if(lhs.id() == ID_index)
+  {
+    const index_exprt &index_expr = to_index_expr(lhs);
+    with_exprt new_rhs(index_expr.array(), index_expr.index(), rhs);
+    assign_rec(dest_values, index_expr.array(), new_rhs, ns, cp);
+  }
+  else if(lhs.id() == ID_member)
+  {
+    const member_exprt &member_expr = to_member_expr(lhs);
+    with_exprt new_rhs(member_expr.compound(), exprt(ID_member_name), rhs);
+    new_rhs.where().set(ID_component_name, member_expr.get_component_name());
+    assign_rec(dest_values, member_expr.compound(), new_rhs, ns, cp);
+  }
+  else if(lhs.id() == ID_symbol)
+  {
+    if(cp && !cp->should_track_value(lhs, ns))
+      return;
+
+    const symbol_exprt &s = to_symbol_expr(lhs);
+
+    exprt tmp = rhs;
+    partial_evaluate(dest_values, tmp, ns);
+
+    if(dest_values.is_constant(tmp))
+    {
+      DATA_INVARIANT(
+        base_type_eq(ns.lookup(s).type, tmp.type(), ns),
+        "type of constant to be replaced should match");
+      dest_values.set_to(s, tmp);
+    }
+    else
+      dest_values.set_to_top(s);
   }
   else
-    dest_values.set_to_top(s);
+  {
+    // it's an assignment, but we don't really know what object is being written
+    // to on the left-hand side - bail and set all values to top to be on the
+    // safe side in terms of soundness
+    dest_values.set_to_top();
+  }
 }
 
 void constant_propagator_domaint::transform(
