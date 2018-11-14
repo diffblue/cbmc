@@ -38,12 +38,18 @@ void constant_propagator_domaint::assign_rec(
 {
   if(lhs.id() == ID_dereference)
   {
-    const bool have_dirty = (cp != nullptr);
+    exprt eval_lhs = lhs;
+    if(partial_evaluate(dest_values, eval_lhs, ns))
+    {
+      const bool have_dirty = (cp != nullptr);
 
-    if(have_dirty)
-      dest_values.set_dirty_to_top(cp->dirty, ns);
+      if(have_dirty)
+        dest_values.set_dirty_to_top(cp->dirty, ns);
+      else
+        dest_values.set_to_top();
+    }
     else
-      dest_values.set_to_top();
+      assign_rec(dest_values, eval_lhs, rhs, ns, cp);
   }
   else if(lhs.id() == ID_index)
   {
