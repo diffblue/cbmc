@@ -59,6 +59,7 @@
 /jbmc/regression/
 
 /scripts/ @diffblue/devops @thk123 @forejtv @peterschrammel
+/scripts/delete_failing_smt2_solver_tests
 /scripts/expected_doxygen_warnings.txt
 
 /.travis.yml @diffblue/devops @thk123 @forejtv @peterschrammel
