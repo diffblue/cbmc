@@ -88,6 +88,26 @@ lazy_goto_modelt::lazy_goto_modelt(lazy_goto_modelt &&other)
 }
 //! @endcond
 
+/// Performs initial symbol table and `language_filest` initialization from
+/// a given commandline and parsed options. This is much the same as the
+/// initial parsing phase of `initialize_goto_model`, except that all function
+/// bodies may be left blank until `get_goto_function` is called for the first
+/// time. This *must* be called before `get_goto_function` is called.
+///
+/// Whether they are in fact left blank depends on the language front-end
+/// responsible for a particular function: it may be fully eager, in which case
+/// only the `goto_convert` phase is performed lazily, or fully lazy, in which
+/// case no function has a body until `get_goto_function` is called, or anything
+/// in between. At the time of writing only Java-specific frontend programs use
+/// `lazy_goto_modelt`, so only `java_bytecode_languaget` is relevant, and that
+/// front-end supplies practically all methods lazily, apart from
+/// `__CPROVER__start` and `__CPROVER_initialize`. In general check whether a
+/// language implements `languaget::convert_lazy_method`; any method not handled
+/// there must be populated eagerly. See `lazy_goto_modelt::get_goto_function`
+/// for more detail.
+/// \param cmdline: command-line arguments specifying source files and GOTO
+///   binaries to load
+/// \param options: options to pass on to the language front-ends
 void lazy_goto_modelt::initialize(
   const cmdlinet &cmdline,
   const optionst &options)

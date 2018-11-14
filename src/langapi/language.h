@@ -86,14 +86,20 @@ public:
     (void)modules; // unused parameter
   }
 
-  // add lazy functions provided to set
-
+  /// Should fill `methods` with the symbol identifiers of all methods this
+  /// `languaget` can provide a body for, but doesn't populate that body in
+  /// languaget::typecheck (i.e. there is no need to mention methods whose
+  /// bodies are eagerly generated). It should be prepared to handle a
+  /// `convert_lazy_method` call for any symbol added to `methods`.
   virtual void methods_provided(std::unordered_set<irep_idt> &methods) const
   {
     (void)methods; // unused parameter
   }
 
-  // populate a lazy method
+  /// Requests this `languaget` should populate the body of method `function_id`
+  /// in `symbol_table`. This will only be called if `methods_provided`
+  /// advertised the given `function_id` could be provided by this `languaget`
+  /// instance.
   virtual void
   convert_lazy_method(
     const irep_idt &function_id, symbol_table_baset &symbol_table)
