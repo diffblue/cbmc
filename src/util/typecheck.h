@@ -23,23 +23,6 @@ public:
 
   virtual ~typecheckt() { }
 
-  // not pretty, but makes transition easier
-  void err_location(const source_locationt &loc)
-  {
-    messaget::error().source_location=loc;
-  }
-
-  // not pretty, but makes transition easier
-  void err_location(const exprt &src)
-  {
-    err_location(src.find_source_location());
-  }
-
-  void err_location(const typet &src)
-  {
-    err_location(src.source_location());
-  }
-
 protected:
   // main function -- overload this one
   virtual void typecheck()=0;
