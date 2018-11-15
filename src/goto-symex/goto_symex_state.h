@@ -108,20 +108,17 @@ public:
 
     void restore_from(const current_namest &other)
     {
-      current_namest::iterator it=current_names.begin();
-      for(current_namest::const_iterator
-          ito=other.begin();
-          ito!=other.end();
-          ++ito)
+      auto it = current_names.begin();
+      for(const auto &pair : other)
       {
-        while(it!=current_names.end() && it->first<ito->first)
+        while(it != current_names.end() && it->first < pair.first)
           ++it;
-        if(it==current_names.end() || ito->first<it->first)
-          current_names.insert(it, *ito);
+        if(it == current_names.end() || pair.first < it->first)
+          current_names.insert(it, pair);
         else if(it!=current_names.end())
         {
-          PRECONDITION(it->first == ito->first);
-          it->second=ito->second;
+          PRECONDITION(it->first == pair.first);
+          it->second = pair.second;
           ++it;
         }
       }
