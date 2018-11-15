@@ -24,20 +24,18 @@ class optionst;
 class modet;
 class symbolt;
 
-/*! \brief TO_BE_DOCUMENTED
-*/
+/// Wrapper for a function dereferencing pointer expressions using a value set.
 class value_set_dereferencet
 {
 public:
-  /*! \brief Constructor
-   * \param _ns Namespace
-   * \param _new_symbol_table A symbol_table to store new symbols in
-   * \param _dereference_callback Callback object for error reporting
-   * \param _language_mode Mode for any new symbols created to represent
-            a dereference failure
-   * \param _exclude_null_derefs Ignore value-set entries that indicate a given
-            dereference may follow a null pointer
-  */
+  /// \param _ns Namespace
+  /// \param _new_symbol_table A symbol_table to store new symbols in
+  /// \param _dereference_callback Callback object for getting the set of
+  ///        objects a given pointer may point to.
+  /// \param _language_mode Mode for any new symbols created to represent
+  ///         a dereference failure
+  /// \param _exclude_null_derefs Ignore value-set entries that indicate a given
+  ///        dereference may follow a null pointer
   value_set_dereferencet(
     const namespacet &_ns,
     symbol_tablet &_new_symbol_table,
@@ -55,26 +53,18 @@ public:
 
   enum class modet { READ, WRITE };
 
-  /*!
-   * The method 'dereference' dereferences the
-   * given pointer-expression. Any errors are
-   * reported to the callback method given in the
-   * constructor.
-   *
-   * \param pointer A pointer-typed expression, to
-            be dereferenced.
-   * \param guard A guard, which is assumed to hold when
-            dereferencing.
-   * \param mode Indicates whether the dereferencing
-            is a load or store.
-  */
-
+  /// Dereference the given pointer-expression. Any errors are
+  /// reported to the callback method given in the constructor.
+  /// \param pointer A pointer-typed expression, to
+  ///        be dereferenced.
+  /// \param guard A guard, which is assumed to hold when
+  ///        dereferencing.
+  /// \param mode Indicates whether the dereferencing
+  ///        is a load or store (unused).
   virtual exprt dereference(
     const exprt &pointer,
     const guardt &guard,
     const modet mode);
-
-  typedef std::unordered_set<exprt, irep_hash> expr_sett;
 
 private:
   const namespacet &ns;
@@ -86,15 +76,10 @@ private:
   /// Flag indicating whether `value_set_dereferencet::dereference` should
   /// disregard an apparent attempt to dereference NULL
   const bool exclude_null_derefs;
-  static unsigned invalid_counter;
 
   bool dereference_type_compare(
     const typet &object_type,
     const typet &dereference_type) const;
-
-  void offset_sum(
-    exprt &dest,
-    const exprt &offset) const;
 
   /// Return value for `build_reference_to`; see that method for documentation.
   class valuet
@@ -109,28 +94,7 @@ private:
     }
   };
 
-  /// Get a guard and expression to access `what` under `guard`.
-  /// \param what: value set entry to convert to an expression: either
-  ///   ID_unknown, ID_invalid, or an object_descriptor_exprt giving a referred
-  ///   object and offset.
-  /// \param pointer: pointer expression that may point to `what`
-  /// \return
-  ///    * If we were explicitly instructed to ignore `what` as a possible
-  ///        pointer target: a `valuet` with `ignore` = true, and `value` and
-  ///        `pointer_guard` set to nil.
-  ///    * If we could build an expression corresponding to `what`:
-  ///        A `valuet` with non-nil `value`, and `pointer_guard` set to an
-  ///        appropriate check to determine if `pointer_expr` really points to
-  ///        `what` (for example, we might return
-  ///        `{.value = global, .pointer_guard = (pointer_expr == &global)}`
-  ///    * Otherwise, if we couldn't build an expression (e.g. for `what` ==
-  ///        ID_unknown), a `valuet` with nil `value` and `ignore` == false.
   valuet build_reference_to(const exprt &what, const exprt &pointer);
-
-  bool get_value_guard(
-    const exprt &symbol,
-    const exprt &premise,
-    exprt &value);
 
   static const exprt &get_symbol(const exprt &object);
 

@@ -19,6 +19,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "value_sets.h"
 #include "value_set_dereference.h"
 
+/// Wrapper for functions removing dereferences in expressions contained in
+/// a goto program.
 class goto_program_dereferencet:protected dereference_callbackt
 {
 public:
@@ -63,18 +65,18 @@ protected:
   value_setst &value_sets;
   value_set_dereferencet dereference;
 
+  DEPRECATED("Unused")
   virtual bool is_valid_object(const irep_idt &identifier);
 
-  virtual bool has_failed_symbol(
-    const exprt &expr,
-    const symbolt *&symbol);
+  bool has_failed_symbol(const exprt &expr, const symbolt *&symbol) override;
 
+  DEPRECATED("Unused")
   virtual void dereference_failure(
     const std::string &property,
     const std::string &msg,
     const guardt &guard);
 
-  virtual void get_value_set(const exprt &expr, value_setst::valuest &dest);
+  void get_value_set(const exprt &expr, value_setst::valuest &dest) override;
 
   void dereference_instruction(
     goto_programt::targett target,
@@ -91,10 +93,15 @@ protected:
 #if 0
   const std::set<irep_idt> *valid_local_variables;
 #endif
-  source_locationt dereference_location;
   goto_programt::const_targett current_target;
 
+  /// Unused
+  source_locationt dereference_location;
+
+  /// Unused
   std::set<exprt> assertions;
+
+  /// Unused
   goto_programt new_code;
 };
 
@@ -108,17 +115,20 @@ void remove_pointers(
   goto_modelt &,
   value_setst &);
 
+DEPRECATED("Unused")
 void remove_pointers(
   goto_functionst &,
   symbol_tablet &,
   value_setst &);
 
+DEPRECATED("Unused")
 void pointer_checks(
   goto_programt &,
   symbol_tablet &,
   const optionst &,
   value_setst &);
 
+DEPRECATED("Unused")
 void pointer_checks(
   goto_functionst &,
   symbol_tablet &,

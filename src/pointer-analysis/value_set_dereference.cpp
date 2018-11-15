@@ -32,9 +32,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/simplify_expr.h>
 #include <util/ssa_expr.h>
 
-// global data, horrible
-unsigned int value_set_dereferencet::invalid_counter=0;
-
+/// \return The compound for a member expression, the array for an index
+///   expression, `expr` otherwise.
 const exprt &value_set_dereferencet::get_symbol(const exprt &expr)
 {
   if(expr.id()==ID_member || expr.id()==ID_index)
@@ -43,9 +42,6 @@ const exprt &value_set_dereferencet::get_symbol(const exprt &expr)
   return expr;
 }
 
-/// \par parameters: expression dest, to be dereferenced under given guard,
-/// and given mode
-/// \return returns pointer after dereferencing
 exprt value_set_dereferencet::dereference(
   const exprt &pointer,
   const guardt &guard,
@@ -196,18 +192,18 @@ exprt value_set_dereferencet::dereference(
   return value;
 }
 
+/// Check if the two types have matching number of ID_pointer levels, with
+/// the dereference type eventually pointing to void; then this is ok
+/// for example:
+/// - dereference_type=void is ok (no matter what object_type is);
+/// - object_type=(int *), dereference_type=(void *) is ok;
+/// - object_type=(int **), dereference_type=(void **) is ok;
+/// - object_type=(int **), dereference_type=(void *) is ok;
+/// - object_type=(int *), dereference_type=(void **) is not ok;
 bool value_set_dereferencet::dereference_type_compare(
   const typet &object_type,
   const typet &dereference_type) const
 {
-  // check if the two types have matching number of ID_pointer levels, with
-  // the dereference type eventually pointing to void; then this is ok
-  // for example:
-  // - dereference_type=void is ok (no matter what object_type is);
-  // - object_type=(int *), dereference_type=(void *) is ok;
-  // - object_type=(int **), dereference_type=(void **) is ok;
-  // - object_type=(int **), dereference_type=(void *) is ok;
-  // - object_type=(int *), dereference_type=(void **) is not ok;
   const typet *object_unwrapped = &object_type;
   const typet *dereference_unwrapped = &dereference_type;
   while(object_unwrapped->id() == ID_pointer &&
@@ -268,6 +264,20 @@ bool value_set_dereferencet::dereference_type_compare(
   return false;
 }
 
+/// \param what: value set entry to convert to an expression: either
+///   ID_unknown, ID_invalid, or an object_descriptor_exprt giving a referred
+///   object and offset.
+/// \param pointer_expr: pointer expression that may point to `what`
+/// \return a `valuet` object containing `guard`, `value` and `ignore` fields.
+///   The `ignore` field is true for a `null` object when `exclude_null_derefs`
+///   is true and integer addresses in java mode.
+///   The guard is an appropriate check to determine whether `pointer_expr`
+///   really points to `what`.
+///   The value corresponds to the dereferenced pointer_expr assuming it is
+///   pointing to the object described by `what`.
+///   For example, we might return
+///   `{.value = global, .pointer_guard = (pointer_expr == &global),
+///     .ignore = false}`
 value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
   const exprt &what,
   const exprt &pointer_expr)
@@ -510,6 +520,14 @@ static bool is_a_bv_type(const typet &type)
          type.id()==ID_c_enum_tag;
 }
 
+/// Replace `value` by an expression of type `to_type` corresponding to the
+/// value at memory address `value + offset`.
+///
+/// If `value` is a bitvector or pointer of the same size as `to_type`,
+/// make `value` into the typecast expression `(to_type)value`.
+/// Otherwise perform the same operation as
+/// value_set_dereferencet::memory_model_bytes
+/// \return true on success
 bool value_set_dereferencet::memory_model(
   exprt &value,
   const typet &to_type,
@@ -554,6 +572,8 @@ bool value_set_dereferencet::memory_model(
   return memory_model_bytes(value, to_type, offset);
 }
 
+/// Make `value` into a typecast expression: `(to_type)value`
+/// \return true
 bool value_set_dereferencet::memory_model_conversion(
   exprt &value,
   const typet &to_type)
@@ -564,6 +584,14 @@ bool value_set_dereferencet::memory_model_conversion(
   return true;
 }
 
+/// Replace `value` by an expression of type `to_type` corresponding to the
+/// value at memory address `value + offset`.
+///
+/// If the type of value is an array of bitvectors of size 1 byte, and `to_type`
+/// also is bitvector of size 1 byte, then the resulting expression is
+/// `value[offset]` or `(to_type)value[offset]` when typecast is required.
+/// Otherwise the expression is `byte_extract(value, offset)`.
+/// \return false if the conversion cannot be made
 bool value_set_dereferencet::memory_model_bytes(
   exprt &value,
   const typet &to_type,
