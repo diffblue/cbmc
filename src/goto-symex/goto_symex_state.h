@@ -57,10 +57,6 @@ public:
   symex_targett::sourcet source;
   symex_target_equationt *symex_target;
 
-  // we have a two-level renaming
-
-  typedef std::map<irep_idt, irep_idt> original_identifierst;
-
   // we remember all L1 renamings
   typedef std::set<irep_idt> l1_historyt;
   l1_historyt l1_history;
