@@ -2794,8 +2794,8 @@ exprt c_typecheck_baset::do_special_functions(
     return nil_exprt();
 }
 
-/// \param type:checked arguments, type-checked function
-/// \return type-adjusted function arguments
+/// Typecheck the parameters in a function call expression, and where
+/// necessary, make implicit casts around parameters explicit.
 void c_typecheck_baset::typecheck_function_call_arguments(
   side_effect_expr_function_callt &expr)
 {

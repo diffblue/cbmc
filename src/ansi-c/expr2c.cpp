@@ -668,8 +668,8 @@ std::string expr2ct::convert_rec(
 
 /// To generate C-like string for defining the given struct
 /// \param src: the struct type being converted
-/// \param qualifiers: any qualifiers on the type
-/// \param declarator: the declarator on the type
+/// \param qualifiers_str: any qualifiers on the type
+/// \param declarator_str: the declarator on the type
 /// \return Returns a type declaration for a struct, containing the body of the
 ///   struct and in that body the padding parameters.
 std::string expr2ct::convert_struct_type(
@@ -746,8 +746,8 @@ std::string expr2ct::convert_struct_type(
 /// To generate a C-like type declaration of an array. Includes the size of the
 /// array in the []
 /// \param src: The array type to convert
-/// qualifier
-/// declarator_str
+/// \param qualifiers: Any qualifiers on the type
+/// \param declarator_str: Previously computed string denoting the array symbol
 /// \return A C-like type declaration of an array
 std::string expr2ct::convert_array_type(
   const typet &src,
@@ -761,8 +761,8 @@ std::string expr2ct::convert_array_type(
 /// To generate a C-like type declaration of an array. Optionally can include or
 /// exclude the size of the array in the []
 /// \param src: The array type to convert
-/// qualifier
-/// declarator_str
+/// \param qualifiers: Any qualifiers on the type
+/// \param declarator_str: Previously computed string denoting the array symbol
 /// \param inc_size_if_possible: Should the generated string include the size of
 ///   the array (if it is known).
 /// \return A C-like type declaration of an array
@@ -2035,7 +2035,8 @@ std::string expr2ct::convert_struct(
 /// To generate a C-like string representing a struct. Can optionally include
 /// the padding parameters.
 /// \param src: The struct declaration expression
-/// precedence
+/// \param [out] precedence: Precedence of the top level operator in the
+///   resulting string, used to decide about adding parentheses
 /// \param include_padding_components: Should the generated C code include the
 ///   padding members added to structs for GOTOs benefit
 /// \return A string representation of the struct expression

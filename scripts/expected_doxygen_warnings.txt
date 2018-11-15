@@ -33,18 +33,6 @@
 /cbmc/src/solvers/flattening/bv_utils.h:134: warning: The following parameters of bv_utilst::equal(const bvt &op0, const bvt &op1) are not documented:
   parameter 'op0'
   parameter 'op1'
-/cbmc/src/ansi-c/c_typecheck_initializer.cpp:347: warning: argument 'pre' of command @param is not found in the argument list of c_typecheck_baset::do_designated_initializer(exprt &result, designatort &designator, const exprt &initializer_list, exprt::operandst::const_iterator init_it, bool force_constant)
-/cbmc/src/ansi-c/c_typecheck_initializer.cpp:347: warning: argument 'initialized' of command @param is not found in the argument list of c_typecheck_baset::do_designated_initializer(exprt &result, designatort &designator, const exprt &initializer_list, exprt::operandst::const_iterator init_it, bool force_constant)
-/cbmc/src/ansi-c/c_typecheck_base.h:98: warning: The following parameters of c_typecheck_baset::do_designated_initializer(exprt &result, designatort &designator, const exprt &initializer_list, exprt::operandst::const_iterator init_it, bool force_constant) are not documented:
-  parameter 'result'
-  parameter 'designator'
-  parameter 'initializer_list'
-  parameter 'init_it'
-  parameter 'force_constant'
-/cbmc/src/ansi-c/c_typecheck_expr.cpp:2779: warning: argument 'type' of command @param is not found in the argument list of c_typecheck_baset::typecheck_function_call_arguments(side_effect_expr_function_callt &expr)
-/cbmc/src/ansi-c/c_typecheck_expr.cpp:2779: warning: argument 'checked' of command @param is not found in the argument list of c_typecheck_baset::typecheck_function_call_arguments(side_effect_expr_function_callt &expr)
-/cbmc/src/ansi-c/c_typecheck_base.h:195: warning: The following parameters of c_typecheck_baset::typecheck_function_call_arguments(side_effect_expr_function_callt &expr) are not documented:
-  parameter 'expr'
 /cbmc/jbmc/src/java_bytecode/ci_lazy_methods.h:100: warning: The following parameters of ci_lazy_methodst::ci_lazy_methodst(const symbol_tablet &symbol_table, const irep_idt &main_class, const std::vector< irep_idt > &main_jar_classes, const std::vector< load_extra_methodst > &lazy_methods_extra_entry_points, java_class_loadert &java_class_loader, const std::vector< irep_idt > &extra_instantiated_classes, const select_pointer_typet &pointer_type_selector, message_handlert &message_handler, const synthetic_methods_mapt &synthetic_methods) are not documented:
   parameter 'synthetic_methods'
 /cbmc/src/goto-instrument/wmm/event_graph.h:506: warning: The following parameters of event_grapht::explore_copy_segment(std::set< event_idt > &explored, event_idt begin, event_idt end) const are not documented:
@@ -61,19 +49,6 @@
   parameter 'has_to_be_unsafe'
   parameter 'var_to_avoid'
   parameter 'model'
-/cbmc/src/ansi-c/expr2c_class.h:66: warning: The following parameters of expr2ct::convert_array_type(const typet &src, const qualifierst &qualifiers, const std::string &declarator_str) are not documented:
-  parameter 'qualifiers'
-  parameter 'declarator_str'
-/cbmc/src/ansi-c/expr2c_class.h:71: warning: The following parameters of expr2ct::convert_array_type(const typet &src, const qualifierst &qualifiers, const std::string &declarator_str, bool inc_size_if_possible) are not documented:
-  parameter 'qualifiers'
-  parameter 'declarator_str'
-/cbmc/src/ansi-c/expr2c_class.h:264: warning: The following parameters of expr2ct::convert_struct(const exprt &src, unsigned &precedence, bool include_padding_components) are not documented:
-  parameter 'precedence'
-/cbmc/src/ansi-c/expr2c.cpp:671: warning: argument 'qualifiers' of command @param is not found in the argument list of expr2ct::convert_struct_type(const typet &src, const std::string &qualifiers_str, const std::string &declarator_str)
-/cbmc/src/ansi-c/expr2c.cpp:671: warning: argument 'declarator' of command @param is not found in the argument list of expr2ct::convert_struct_type(const typet &src, const std::string &qualifiers_str, const std::string &declarator_str)
-/cbmc/src/ansi-c/expr2c_class.h:54: warning: The following parameters of expr2ct::convert_struct_type(const typet &src, const std::string &qualifiers_str, const std::string &declarator_str) are not documented:
-  parameter 'qualifiers_str'
-  parameter 'declarator_str'
 /cbmc/src/goto-instrument/wmm/goto2graph.h:260: warning: The following parameters of instrumentert::cfg_visitort::visit_cfg_function(value_setst &value_sets, memory_modelt model, bool no_dependencies, loop_strategyt duplicate_body, const irep_idt &function, std::set< nodet > &ending_vertex) are not documented:
   parameter 'model'
   parameter 'no_dependencies'
