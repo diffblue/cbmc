@@ -106,8 +106,18 @@ pointer_typet select_pointer_typet::specialize_generics(
 }
 
 /// Return the first concrete type instantiation if any such exists. This method
-/// is only to be called when the `specialize_generics` cannot find an
-/// instantiation due to a loop in its recursion.
+/// is only to be called when \ref select_pointer_typet::specialize_generics
+/// cannot find an instantiation due to a loop in its recursion.
+///
+/// Example:
+/// `class MyGeneric<T,U> { MyGeneric<U,T> gen; T t;}`
+/// When instantiating `MyGeneric<Integer,String> my` we need to for example
+/// resolve the type of `my.gen.t`. The map would in this context contain
+/// - T -> (Integer, U)
+/// - U -> (String, T)
+///
+/// Note that the top of the stacks for T and U create a recursion T -> U,
+/// U-> T. We want to break it and specialize `T my.gen.t` to `String my.gen.t`.
 /// \param parameter_name The name of the generic parameter type we want to have
 ///   instantiated
 /// \param generic_parameter_specialization_map Map of type names to
