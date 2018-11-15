@@ -90,9 +90,11 @@ public:
     finalize();
   }
 
-  /// Get the abstract state before the given instruction, without needing to
-  /// know what kind of domain or history is used. Note: intended for
-  /// users of the abstract interpreter; don't use internally.
+  /// Get a copy of the abstract state before the given instruction, without
+  /// needing to know what kind of domain or history is used. Note: intended
+  /// for users of the abstract interpreter; derived classes should
+  /// use \ref get_state or \ref find_state to access the actual underlying
+  /// state.
   /// PRECONDITION(l is dereferenceable)
   /// \param l: The location we want the domain before
   /// \return The domain before `l`. We return a pointer to a copy as the method
@@ -100,9 +102,11 @@ public:
   ///   domains, etc.
   virtual std::unique_ptr<statet> abstract_state_before(locationt l) const = 0;
 
-  /// Get the abstract state after the given instruction, without needing to
-  /// know what kind of domain or history is used. Note: intended for
-  /// users of the abstract interpreter; don't use internally.
+  /// Get a copy of the abstract state after the given instruction, without
+  /// needing to know what kind of domain or history is used. Note: intended
+  /// for users of the abstract interpreter; derived classes should
+  /// use \ref get_state or \ref find_state to access the actual underlying
+  /// state.
   /// \param l: The location we want the domain after
   /// \return The domain after `l`. We return a pointer to a copy as the method
   ///   should be const and there are some non-trivial cases including merging
@@ -212,16 +216,15 @@ public:
   }
 
 protected:
-  /// Initialize all the domains for a single function. Overloaded this to add a
-  /// factory.
+  /// Initialize all the domains for a single function. Override this to do
+  /// custom per-domain initialization.
   virtual void initialize(const goto_programt &goto_program);
 
-  /// Initialize all the domains for a single function. Overloaded this to add a
-  /// factory.
+  /// Initialize all the domains for a single function.
   virtual void initialize(const goto_functionst::goto_functiont &goto_function);
 
-  /// Initialize all the domains for a whole program. Overloaded this to add a
-  /// factory.
+  /// Initialize all the domains for a whole program. Override this to do custom
+  /// per-analysis initialization.
   virtual void initialize(const goto_functionst &goto_functions);
 
   /// Override this to add a cleanup step after fixedpoint has run
@@ -341,8 +344,16 @@ protected:
     locationt from,
     locationt to,
     const namespacet &ns)=0;
+
+  /// Get the state for the given location, creating it in a default way if it
+  /// doesn't exist
   virtual statet &get_state(locationt l)=0;
+
+  /// Get the state for the given location if it already exists; throw an
+  /// exception if it doesn't
   virtual const statet &find_state(locationt l) const=0;
+
+  /// Make a copy of a state
   virtual std::unique_ptr<statet> make_temporary_state(const statet &s)=0;
 };
 
