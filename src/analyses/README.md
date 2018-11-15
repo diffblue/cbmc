@@ -105,7 +105,13 @@ over false negatives when testing for missing close operations.
 
 \subsection analyses-global-may-alias Global may-alias analysis (global_may_aliast)
 
-To be documented.
+This is a pointer alias analysis (analysing the memory locations a pointer
+expression may point to, and finding when two pointer expressions refer to 
+the same storage locations). It is flow-insensitive, meaning that it computes
+what memory locations pointer expressions may refer to at any time during the program
+execution. It's called may-alias, because it looks for aliasing that may occur
+during program execution (compared to analysis for aliasing that must occur). It's
+an over-approximating analysis.
 
 \subsection analyses-rwt Read-write range analysis (goto_rwt)
 
