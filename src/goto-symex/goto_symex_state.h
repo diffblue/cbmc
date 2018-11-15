@@ -92,7 +92,10 @@ public:
 protected:
   void rename_address(exprt &expr, const namespacet &ns, levelt level);
 
-  void set_ssa_indices(ssa_exprt &expr, const namespacet &ns, levelt level=L2);
+  void set_l0_indices(ssa_exprt &expr, const namespacet &ns);
+  void set_l1_indices(ssa_exprt &expr, const namespacet &ns);
+  void set_l2_indices(ssa_exprt &expr, const namespacet &ns);
+
   // only required for value_set.assign
   void get_l1_name(exprt &expr) const;
 
