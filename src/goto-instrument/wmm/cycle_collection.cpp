@@ -147,7 +147,6 @@ event_grapht::critical_cyclet event_grapht::graph_explorert::extract_cycle(
 }
 
 /// see event_grapht::collect_cycles
-/// \param get_po_only: used for po-transitivity
 bool event_grapht::graph_explorert::backtrack(
   std::set<critical_cyclet> &set_of_cycles,
   event_idt source,
