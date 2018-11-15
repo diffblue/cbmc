@@ -81,10 +81,8 @@ public:
 
     void get_variables(std::unordered_set<ssa_exprt, irep_hash> &vars) const
     {
-      for(current_namest::const_iterator it=current_names.begin();
-          it!=current_names.end();
-          it++)
-        vars.insert(it->second.first);
+      for(const auto &pair : current_names)
+        vars.insert(pair.second.first);
     }
   };
 
