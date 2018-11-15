@@ -29,8 +29,8 @@
 
 ; We can prove a bitwise version of deMorgan's law
 
-(declare-const x (_ BitVec 64))
-(declare-const y (_ BitVec 64))
+(declare-const x (_ BitVec 64)) ; nullary function
+(declare-var y (_ BitVec 64)) ; alternative syntax for declare-const
 (define-fun d01 () Bool (= (bvand (bvnot x) (bvnot y)) (bvnot (bvor x y))))
 
 ; There is a fast way to check that fixed size numbers are powers of two
