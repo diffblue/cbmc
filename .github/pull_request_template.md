@@ -4,6 +4,7 @@ Thank you for your contribution. Please make sure your pull request fulfils all 
 
 - [ ] Each commit message has a non-empty body, explaining why the change was made.
 - [ ] Methods or procedures I have added are documented, following the guidelines provided in CODING_STANDARD.md.
+- [ ] The feature or user visible behaviour I have added or modified has been documented in the User Guide in doc/cprover-manual/
 - [ ] Regression or unit tests are included, or existing tests cover the modified code (in this case I have detailed which ones those are in the commit message).
 - [ ] My commit message includes data points confirming performance improvements (if claimed).
 - [ ] My PR is restricted to a single feature or bugfix.
