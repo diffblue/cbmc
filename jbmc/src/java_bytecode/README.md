@@ -20,7 +20,7 @@ into a basic `codet` representation.
 - \ref java-bytecode-runtime-exceptions "Add runtime exceptions"
 - \ref java-bytecode-remove-java-new "Remove `new` calls"
 - \ref java-bytecode-remove-exceptions "Remove thrown exceptions"
-- \ref java-bytecode-remove-instance-of
+- \ref java-bytecode-remove-instanceof
 - As well as other non-Java specific transformations (see \ref goto-programs for
     details on these)
 
@@ -96,8 +96,11 @@ The JVM specification defines different access flags, e.g., `final`, `static`,
 itself, its fields or methods. All access flags are represented as bits, the set
 of bits that are defined for one entity is represented as disjunction of those
 values. Each of these values is defined as a constant with a name prefixed with
-`ACC_` in JBMC, e.g., as `#define ACC_PUBLIC 0x0001` or `#define ACC_ENUM
-0x4000`.
+`ACC_` in JBMC, e.g., as
+@code
+#define ACC_PUBLIC 0x0001
+#define ACC_ENUM 0x4000
+@endcode
 
 \subsection java-class-constant-pool Constant Pool
 
