@@ -91,14 +91,9 @@
 /cbmc/src/langapi/language.h:176: warning: The following parameters of languaget::build_stub_parameter_symbol(const symbolt &function_symbol, size_t parameter_index, const code_typet::parametert &parameter) are not documented:
   parameter 'parameter'
 /cbmc/jbmc/src/java_bytecode/remove_exceptions.cpp:47: warning: Found unknown command `\class_identifier'
-/cbmc/jbmc/src/java_bytecode/select_pointer_type.h:50: warning: The following parameters of select_pointer_typet::specialize_generics(const pointer_typet &pointer_type, const generic_parameter_specialization_mapt &generic_parameter_specialization_map, generic_parameter_recursion_trackingt &visited_nodes) const are not documented:
-  parameter 'visited_nodes'
 /cbmc/src/solvers/refinement/string_refinement.cpp:2099: warning: argument 'expr' of command @param is not found in the argument list of string_constraintt::universal_only_in_index(const string_constraintt &constr)
 /cbmc/src/solvers/refinement/string_refinement.cpp:2106: warning: The following parameters of string_constraintt::universal_only_in_index(const string_constraintt &constr) are not documented:
   parameter 'constr'
-/cbmc/jbmc/src/java_bytecode/README.md:26: warning: unable to resolve reference to `java-bytecode-remove-instance-of' for \ref command
-/cbmc/jbmc/src/java_bytecode/README.md:89: warning: explicit link request to 'define' could not be resolved
-/cbmc/jbmc/src/java_bytecode/README.md:89: warning: explicit link request to 'define' could not be resolved
 /cbmc/jbmc/src/java_bytecode/ci_lazy_methods_needed.h:40: warning: The following parameters of ci_lazy_methods_neededt::add_needed_class(const irep_idt &class_symbol_name) are not documented:
   parameter 'class_symbol_name'
 /cbmc/jbmc/src/java_bytecode/ci_lazy_methods_needed.h:38: warning: The following parameters of ci_lazy_methods_neededt::add_needed_method(const irep_idt &method_symbol_name) are not documented:

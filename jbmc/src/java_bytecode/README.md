@@ -20,7 +20,7 @@ into a basic `codet` representation.
 - \ref java-bytecode-runtime-exceptions "Add runtime exceptions"
 - \ref java-bytecode-remove-java-new "Remove `new` calls"
 - \ref java-bytecode-remove-exceptions "Remove thrown exceptions"
-- \ref java-bytecode-remove-instance-of
+- \ref java-bytecode-remove-instanceof
 - As well as other non-Java specific transformations (see \ref goto-programs for
     details on these)
 
@@ -39,9 +39,21 @@ To be documented.
 
 \subsection java-bytecode-pointer-type-selection Pointer type selection
 
-To be documented.
+In Java, all variables that are of a non-primitive type are pointers to
+an object. When initializing such variables using \ref java_object_factoryt,
+e.g., as input arguments for the method under test, we may need to select the
+correct pointer type. For example, abstract classes can be replaced with their
+concrete implementations and type parameters in generic types can be replaced
+with their specialized types.
 
-\subsection java-bytecode-genereic-substitution Generic substitution
+The class \ref select_pointer_typet offers the basic interface for this
+functionality, in particular see
+\ref select_pointer_typet::convert_pointer_type. Note that this class only
+implements generic specialization (see \ref
+java-bytecode-generic-specialization), derived classes can override this
+behavior to provide more sophisticated type selection.
+
+\subsection java-bytecode-generic-specialization Generic specialization
 
 To be documented.
 
@@ -84,8 +96,11 @@ The JVM specification defines different access flags, e.g., `final`, `static`,
 itself, its fields or methods. All access flags are represented as bits, the set
 of bits that are defined for one entity is represented as disjunction of those
 values. Each of these values is defined as a constant with a name prefixed with
-`ACC_` in JBMC, e.g., as `#define ACC_PUBLIC 0x0001` or `#define ACC_ENUM
-0x4000`.
+`ACC_` in JBMC, e.g., as
+@code
+#define ACC_PUBLIC 0x0001
+#define ACC_ENUM 0x4000
+@endcode
 
 \subsection java-class-constant-pool Constant Pool
 
