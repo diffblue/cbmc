@@ -315,8 +315,8 @@ The deserialisation does the oposite process and it is implemented in
 \subsubsection irep-serialization-strings Serialization of Strings
 
 A string is encoded as classic 0-terminated C string. However,
-characters `0` and `\\` are escaped by writing additional `\\` 
-before them. 
+characters `0` and `\\` are escaped by writing additional `\\`
+before them.
 
 This is implmented in the function `::write_gb_string` and the
 deserialisation is implemented in `irep_serializationt::read_gb_string`.
@@ -329,3 +329,59 @@ serialisation queries save only that integer hash code of the string.
 
 \subsubsection irep-serialization-ireps Serialization of `irept` Instances
 
+<br>
+\subsection CProver-output CProver output - printing.
+
+CProver output can be in plain text, json or xml format.
+All of CProver output should use the built-in messaging infrastructure,
+which filters messages by 'verbosity'. Default verbosity filtering is set
+to the maximum level (10), i.e. all messages are printed. Error messages
+have the lowest level of verbosity (level 1) while debug messages have
+the highest level (level 10). Intermediate levels (in order of
+increasing 'verbosity') are for warnings, results, status/phase information,
+statistical information and progress information
+(more information on these verbosity levels can be found in
+\ref messaget in the `message.h` header).
+
+Key classes related to the messaging infrastructure can be found in
+the `message.h` header. \ref messaget provides messages (with a built-in
+verbosity level), which are then processed by subclasses
+of \ref message_handlert.  These filter messages according to verbosity
+level and direct output to an appropriate location.
+An important group of subclasses is \ref stream_message_handlert and
+its subtypes, which direct messages to an output stream
+(`std::cout` & `std::cerr`, `std::clog` is not used). In particular,
+messages of verbosity level less than 3 are directed to `std::cerr`,
+while others go to `std::cout` (this may change, but you should be
+aware that not all messages are necessarily directed to only
+`std::cout` or `std::cerr`).
+Another key \ref message_handlert subclass is
+ui_message_handlert - which provides output in plain text,
+json or xml formats.
+
+\subsubsection CProver-legacy-output CProver legacy output
+Although all output should use the messaging interface - there are a
+few locations where this is not yet implemented. These should
+_not_ be extended - but it may be helpful to be aware of where this happens.
+
+* Output from invariants / exceptions
+
+    Invariants output to `std::cerr` - and provide a backtrace and optionally
+    some diagnostic information.
+    For more information on invariants, see `invariant.h`
+
+    Exceptions have a standard `what()` interface.
+    Best current practice for exceptions is for the output of `what()` to be
+    routed via a message with verbosity level 1 (as returned by
+    `messaget::error()`). The message is then processed by a message_handler.
+    Where plain text output (versus json or xml output) is
+    chosen,  exceptions print (indirectly) to `std::cerr`. Json and xml
+    output always goes to `std::cout`. There are still a few locations where
+    exceptions print directly to std::cerr. These should _not_ be extended.
+    More information on exceptions can be found in `exception_utils.h`.
+
+* Direct output via `std::cout` & `std::cerr`
+
+    These are in the process of being removed - no new output should go
+    via `std::cout` or `std::cerr`, but should instead use the
+    \ref messaget and \ref message_handlert infrastructure.
