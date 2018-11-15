@@ -69,8 +69,7 @@ public:
 
     unsigned current_count(const irep_idt &identifier) const
     {
-      current_namest::const_iterator it=
-        current_names.find(identifier);
+      const auto it = current_names.find(identifier);
       return it==current_names.end()?0:it->second.second;
     }
 
@@ -235,8 +234,7 @@ public:
 
     unsigned level2_current_count(const irep_idt &identifier) const
     {
-      level2t::current_namest::const_iterator it=
-        level2_current_names.find(identifier);
+      const auto it = level2_current_names.find(identifier);
       return it==level2_current_names.end()?0:it->second.second;
     }
   };
