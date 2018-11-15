@@ -330,10 +330,9 @@ void goto_symext::pop_frame(statet &state)
     state.level1.restore_from(frame.old_level1);
 
     // clear function-locals from L2 renaming
-    for(goto_symex_statet::renaming_levelt::current_namest::iterator
-        c_it=state.level2.current_names.begin();
-        c_it!=state.level2.current_names.end();
-       ) // no ++c_it
+    for(renaming_levelt::current_namest::iterator c_it =
+          state.level2.current_names.begin();
+        c_it != state.level2.current_names.end();) // no ++c_it
     {
       const irep_idt l1_o_id=c_it->second.first.get_l1_object_identifier();
       // could use iteration over local_objects as l1_o_id is prefix
@@ -345,8 +344,7 @@ void goto_symext::pop_frame(statet &state)
         ++c_it;
         continue;
       }
-      goto_symex_statet::renaming_levelt::current_namest::iterator
-        cur=c_it;
+      renaming_levelt::current_namest::iterator cur = c_it;
       ++c_it;
       state.level2.current_names.erase(cur);
     }
@@ -393,7 +391,7 @@ void goto_symext::locality(
     const irep_idt l0_name=ssa.get_identifier();
 
     // save old L1 name for popping the frame
-    statet::level1t::current_namest::const_iterator c_it=
+    symex_level1t::current_namest::const_iterator c_it =
       state.level1.current_names.find(l0_name);
 
     if(c_it!=state.level1.current_names.end())

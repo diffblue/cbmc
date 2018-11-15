@@ -27,6 +27,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <pointer-analysis/value_set.h>
 #include <goto-programs/goto_function.h>
 
+#include "renaming_level.h"
 #include "symex_target_equation.h"
 
 // central data structure: state
@@ -60,81 +61,9 @@ public:
   // we remember all L1 renamings
   std::set<irep_idt> l1_history;
 
-  struct renaming_levelt
-  {
-    virtual ~renaming_levelt() = default;
-
-    typedef std::map<irep_idt, std::pair<ssa_exprt, unsigned> > current_namest;
-    current_namest current_names;
-
-    unsigned current_count(const irep_idt &identifier) const
-    {
-      const auto it = current_names.find(identifier);
-      return it==current_names.end()?0:it->second.second;
-    }
-
-    void increase_counter(const irep_idt &identifier)
-    {
-      PRECONDITION(current_names.find(identifier) != current_names.end());
-      ++current_names[identifier].second;
-    }
-
-    void get_variables(std::unordered_set<ssa_exprt, irep_hash> &vars) const
-    {
-      for(const auto &pair : current_names)
-        vars.insert(pair.second.first);
-    }
-  };
-
-  // level 0 -- threads!
-  // renaming built for one particular interleaving
-  struct level0t:public renaming_levelt
-  {
-    void operator()(
-      ssa_exprt &ssa_expr,
-      const namespacet &ns,
-      unsigned thread_nr);
-
-    level0t() = default;
-    ~level0t() override = default;
-  } level0;
-
-  // level 1 -- function frames
-  // this is to preserve locality in case of recursion
-
-  struct level1t:public renaming_levelt
-  {
-    void operator()(ssa_exprt &ssa_expr);
-
-    void restore_from(const current_namest &other)
-    {
-      auto it = current_names.begin();
-      for(const auto &pair : other)
-      {
-        while(it != current_names.end() && it->first < pair.first)
-          ++it;
-        if(it == current_names.end() || pair.first < it->first)
-          current_names.insert(it, pair);
-        else if(it!=current_names.end())
-        {
-          PRECONDITION(it->first == pair.first);
-          it->second = pair.second;
-          ++it;
-        }
-      }
-    }
-
-    level1t() = default;
-    ~level1t() override = default;
-  } level1;
-
-  // level 2 -- SSA
-
-  struct level2t:public renaming_levelt
-  {
-    level2t() = default;
-    ~level2t() override = default;
-  } level2;
+  symex_level0t level0;
+  symex_level1t level1;
+  symex_level2t level2;
 
   // this maps L1 names to (L2) constants
   class propagationt
@@ -193,7 +122,7 @@ public:
   {
   public:
     unsigned depth;
-    level2t::current_namest level2_current_names;
+    symex_level2t::current_namest level2_current_names;
     value_sett value_set;
     guardt guard;
     symex_targett::sourcet source;
