@@ -1112,7 +1112,6 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
         func_expr.function().swap(member_func);
         typecheck_side_effect_function_call(func_expr);
 
-        exprt tmp_expr;
         if(standard_conversion_sequence(func_expr, type, tmp_expr, tmp_rank))
         {
           // check if it's ambiguous

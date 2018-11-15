@@ -1224,7 +1224,6 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_namespace(
   cpp_save_scopet save_scope(cpp_typecheck.cpp_scopes);
   resolve_scope(cpp_name, base_name, template_args);
 
-  const source_locationt &source_location=cpp_name.source_location();
   bool qualified=cpp_name.is_qualified();
 
   auto id_set = cpp_typecheck.cpp_scopes.current_scope().lookup(
@@ -1373,7 +1372,6 @@ exprt cpp_typecheck_resolvet::resolve(
             << cpp_typecheck.cpp_scopes.current_scope().prefix << std::endl;
 #endif
 
-  const source_locationt &source_location=cpp_name.source_location();
   bool qualified=cpp_name.is_qualified();
 
   // do __CPROVER scope

@@ -60,25 +60,25 @@ void cpp_typecheckt::typecheck_try_catch(codet &code)
     else
     {
       // This is (one of) the catch clauses.
-      codet &code = to_code_block(to_code(op));
+      code_blockt &catch_block = to_code_block(to_code(op));
 
       // look at the catch operand
-      assert(!code.operands().empty());
+      auto &statements = catch_block.statements();
+      PRECONDITION(!statements.empty());
 
-      if(to_code(code.op0()).get_statement()==ID_ellipsis)
+      if(statements.front().get_statement() == ID_ellipsis)
       {
-        code.operands().erase(code.operands().begin());
+        statements.erase(statements.begin());
 
         // do body
-        typecheck_code(code);
+        typecheck_code(catch_block);
       }
       else
       {
         // turn references into non-references
         {
-          assert(to_code(code.op0()).get_statement()==ID_decl);
-          cpp_declarationt &cpp_declaration=
-            to_cpp_declaration(to_code_decl(to_code(code.op0())).symbol());
+          code_declt &decl = to_code_decl(statements.front());
+          cpp_declarationt &cpp_declaration = to_cpp_declaration(decl.symbol());
 
           assert(cpp_declaration.declarators().size()==1);
           cpp_declaratort &declarator=cpp_declaration.declarators().front();
@@ -88,16 +88,16 @@ void cpp_typecheckt::typecheck_try_catch(codet &code)
         }
 
         // typecheck the body
-        typecheck_code(code);
+        typecheck_code(catch_block);
 
         // the declaration is now in a decl_block
-
-        assert(!code.operands().empty());
-        assert(to_code(code.op0()).get_statement()==ID_decl_block);
+        CHECK_RETURN(!catch_block.statements().empty());
+        CHECK_RETURN(
+          catch_block.statements().front().get_statement() == ID_decl_block);
 
         // get the declaration
-        const code_declt &code_decl=
-          to_code_decl(to_code(code.op0().op0()));
+        const code_declt &code_decl =
+          to_code_decl(to_code(catch_block.statements().front().op0()));
 
         // get the type
         const typet &type = code_decl.symbol().type();
@@ -267,18 +267,18 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
     {
       // maybe the name of the member collides with a parameter of the
       // constructor
-      symbol_expr.make_nil();
-      cpp_typecheck_fargst fargs;
       exprt dereference(
         ID_dereference, cpp_scopes.current_scope().this_expr.type().subtype());
       dereference.copy_to_operands(cpp_scopes.current_scope().this_expr);
-      fargs.add_object(dereference);
+      cpp_typecheck_fargst deref_fargs;
+      deref_fargs.add_object(dereference);
 
       {
         cpp_save_scopet cpp_saved_scope(cpp_scopes);
         cpp_scopes.go_to(
           *(cpp_scopes.id_map[cpp_scopes.current_scope().class_identifier]));
-        symbol_expr=resolve(member, cpp_typecheck_resolvet::wantt::VAR, fargs);
+        symbol_expr =
+          resolve(member, cpp_typecheck_resolvet::wantt::VAR, deref_fargs);
       }
 
       if(

@@ -486,8 +486,6 @@ void goto_inlinet::expand_function_call(
   }
   else // no body available
   {
-    const irep_idt identifier = function.get_identifier();
-
     if(no_body_set.insert(identifier).second) // newly inserted
     {
       warning().source_location = function.find_source_location();

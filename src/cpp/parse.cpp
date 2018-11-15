@@ -4169,7 +4169,6 @@ bool Parser::rInitializeExpr(exprt &expr)
        t==TOK_MSC_IF_NOT_EXISTS)
     {
       // TODO
-      cpp_tokent tk;
       exprt name;
       lex.get_token(tk);
       if(lex.get_token(tk)!='(')
@@ -4467,7 +4466,6 @@ bool Parser::rClassSpec(typet &spec)
 
     if(lex.LookAhead(0)==TOK_GCC_ATTRIBUTE)
     {
-      cpp_tokent tk;
       lex.get_token(tk);
 
       if(!rAttribute(spec))

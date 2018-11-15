@@ -192,9 +192,9 @@ void cpp_typecheckt::typecheck_compound_type(
       if(symbol.type.id()=="incomplete_"+type.id_string())
       {
         // a previously incomplete struct/union becomes complete
-        symbolt &symbol=*symbol_table.get_writeable(symbol_name);
-        symbol.type.swap(type);
-        typecheck_compound_body(symbol);
+        symbolt &writeable_symbol = *symbol_table.get_writeable(symbol_name);
+        writeable_symbol.type.swap(type);
+        typecheck_compound_body(writeable_symbol);
       }
       else if(symbol.type.get_bool(ID_C_is_anonymous))
       {
@@ -613,23 +613,24 @@ void cpp_typecheckt::typecheck_compound_declarator(
 
         // change the type of the 'this' pointer
         code_typet &code_type=to_code_type(func_symb.type);
-        code_typet::parametert &arg= code_type.parameters().front();
-        arg.type().subtype().set(ID_identifier, virtual_base);
+        code_typet::parametert &this_parameter = code_type.parameters().front();
+        this_parameter.type().subtype().set(ID_identifier, virtual_base);
 
         // create symbols for the parameters
         code_typet::parameterst &args=code_type.parameters();
         std::size_t i=0;
         for(auto &arg : args)
         {
-          irep_idt base_name=arg.get_base_name();
+          irep_idt param_base_name = arg.get_base_name();
 
-          if(base_name.empty())
-            base_name="arg"+std::to_string(i++);
+          if(param_base_name.empty())
+            param_base_name = "arg" + std::to_string(i++);
 
           symbolt arg_symb;
-          arg_symb.name=id2string(func_symb.name) + "::"+ id2string(base_name);
-          arg_symb.base_name=base_name;
-          arg_symb.pretty_name=base_name;
+          arg_symb.name =
+            id2string(func_symb.name) + "::" + id2string(param_base_name);
+          arg_symb.base_name = param_base_name;
+          arg_symb.pretty_name = param_base_name;
           arg_symb.mode=ID_cpp;
           arg_symb.location=func_symb.location;
           arg_symb.type=arg.type();
@@ -1591,8 +1592,9 @@ bool cpp_typecheckt::check_component_access(
   const irep_idt &struct_identifier=
     struct_union_type.get(ID_name);
 
-  cpp_scopet *pscope=&(cpp_scopes.current_scope());
-  while(!(pscope->is_root_scope()))
+  for(cpp_scopet *pscope = &(cpp_scopes.current_scope());
+      !(pscope->is_root_scope());
+      pscope = &(pscope->get_parent()))
   {
     if(pscope->is_class())
     {
@@ -1608,7 +1610,6 @@ bool cpp_typecheckt::check_component_access(
 
       else break;
     }
-    pscope=&(pscope->get_parent());
   }
 
   // check friendship
@@ -1621,17 +1622,15 @@ bool cpp_typecheckt::check_component_access(
     const cpp_scopet &friend_scope =
       cpp_scopes.get_scope(friend_symb.get(ID_identifier));
 
-    cpp_scopet *pscope=&(cpp_scopes.current_scope());
-
-    while(!(pscope->is_root_scope()))
+    for(cpp_scopet *pscope = &(cpp_scopes.current_scope());
+        !(pscope->is_root_scope());
+        pscope = &(pscope->get_parent()))
     {
       if(friend_scope.identifier==pscope->identifier)
         return false; // ok
 
       if(pscope->is_class())
         break;
-
-      pscope=&(pscope->get_parent());
     }
   }
 
