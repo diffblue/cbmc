@@ -71,8 +71,6 @@ public:
   public:
     typedef std::map<irep_idt, exprt> valuest;
     valuest values;
-    void operator()(exprt &expr);
-
     void remove(const irep_idt &identifier)
     {
       values.erase(identifier);

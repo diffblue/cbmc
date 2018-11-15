@@ -253,27 +253,6 @@ void goto_symex_statet::assignment(
   #endif
 }
 
-void goto_symex_statet::propagationt::operator()(exprt &expr)
-{
-  if(expr.id()==ID_symbol)
-  {
-    valuest::const_iterator it =
-      values.find(to_symbol_expr(expr).get_identifier());
-    if(it!=values.end())
-      expr=it->second;
-  }
-  else if(expr.id()==ID_address_of)
-  {
-    // ignore
-  }
-  else
-  {
-    // do this recursively
-    Forall_operands(it, expr)
-      operator()(*it);
-  }
-}
-
 void goto_symex_statet::set_ssa_indices(
   ssa_exprt &ssa_expr,
   const namespacet &ns,
