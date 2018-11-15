@@ -58,8 +58,7 @@ public:
   symex_target_equationt *symex_target;
 
   // we remember all L1 renamings
-  typedef std::set<irep_idt> l1_historyt;
-  l1_historyt l1_history;
+  std::set<irep_idt> l1_history;
 
   struct renaming_levelt
   {
