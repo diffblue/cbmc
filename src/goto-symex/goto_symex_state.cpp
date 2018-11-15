@@ -227,9 +227,9 @@ void goto_symex_statet::assignment(
   // for value propagation -- the RHS is L2
 
   if(!is_shared && record_value && goto_symex_is_constantt()(rhs))
-    propagation.values[l1_identifier]=rhs;
+    propagation[l1_identifier] = rhs;
   else
-    propagation.remove(l1_identifier);
+    propagation.erase(l1_identifier);
 
   {
     // update value sets
@@ -322,10 +322,9 @@ void goto_symex_statet::rename(
       {
         // We also consider propagation if we go up to L2.
         // L1 identifiers are used for propagation!
-        propagationt::valuest::const_iterator p_it=
-          propagation.values.find(ssa.get_identifier());
+        auto p_it = propagation.find(ssa.get_identifier());
 
-        if(p_it!=propagation.values.end())
+        if(p_it != propagation.end())
           expr=p_it->second; // already L2
         else
           set_ssa_indices(ssa, ns, L2);

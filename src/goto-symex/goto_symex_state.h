@@ -65,17 +65,8 @@ public:
   symex_level1t level1;
   symex_level2t level2;
 
-  // this maps L1 names to (L2) constants
-  class propagationt
-  {
-  public:
-    typedef std::map<irep_idt, exprt> valuest;
-    valuest values;
-    void remove(const irep_idt &identifier)
-    {
-      values.erase(identifier);
-    }
-  } propagation;
+  // Map L1 names to (L2) constants
+  std::map<irep_idt, exprt> propagation;
 
   enum levelt { L0=0, L1=1, L2=2 };
 
@@ -124,7 +115,7 @@ public:
     value_sett value_set;
     guardt guard;
     symex_targett::sourcet source;
-    propagationt propagation;
+    std::map<irep_idt, exprt> propagation;
     unsigned atomic_section_id;
     std::unordered_map<irep_idt, local_safe_pointerst> safe_pointers;
     unsigned total_vccs, remaining_vccs;

@@ -413,10 +413,9 @@ void goto_symext::phi_function(
     exprt goto_state_rhs=*it, dest_state_rhs=*it;
 
     {
-      goto_symex_statet::propagationt::valuest::const_iterator p_it=
-        goto_state.propagation.values.find(l1_identifier);
+      const auto p_it = goto_state.propagation.find(l1_identifier);
 
-      if(p_it!=goto_state.propagation.values.end())
+      if(p_it != goto_state.propagation.end())
         goto_state_rhs=p_it->second;
       else
         to_ssa_expr(goto_state_rhs).set_level_2(
@@ -424,10 +423,9 @@ void goto_symext::phi_function(
     }
 
     {
-      goto_symex_statet::propagationt::valuest::const_iterator p_it=
-        dest_state.propagation.values.find(l1_identifier);
+      const auto p_it = dest_state.propagation.find(l1_identifier);
 
-      if(p_it!=dest_state.propagation.values.end())
+      if(p_it != dest_state.propagation.end())
         dest_state_rhs=p_it->second;
       else
         to_ssa_expr(dest_state_rhs).set_level_2(
