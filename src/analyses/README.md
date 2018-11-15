@@ -56,7 +56,28 @@ that work with the \ref grapht representation.
 
 \subsection analyses-dominator Dominator analysis (cfg_dominators_templatet)
 
-To be documented.
+A [https://en.wikipedia.org/wiki/Dominator_(graph_theory)](dominator analysis)
+for a GOTO model or GOTO functions collection. Briefly, if a CFG node is
+dominated by {A, B, C} then in order to reach this node control must have flowed
+through all of A, B and C; similarly if it is post-dominated by {D, E, F} then
+after we pass through this node we will inevitably reach all of D, E and F
+eventually if the program terminates.
+
+This is useful for e.g. checking against introducing a redundant check: if we
+have a `const int *x` parameter and wish to introduce a null check at node Y,
+then we can also mark it checked at all the nodes that Y dominates, as at those
+program points it has necessarily already been checked.
+
+This analysis defines `cfg_dominatorst` (dominator analysis) and
+`cfg_post_dominatorst` (post-dominator analysis). Run these analyses using
+`operator()(const goto_programt &)`. Alternatively, the template can be
+instantiated with a different type that can be used with
+`procedure_local_cfg_baset` -- this is done by `natural_loops_mutablet`
+using (non-const) `goto_programt`, and by `java_bytecode_convert_methodt` to
+apply the dominator algorithm to its Java bytecode representation.
+
+`cfg_dominators_templatet::output` is a good place to check how to query the
+dominators it has found.
 
 \subsection analyses-constant-propagation Constant propagation (\ref constant_propagator_ait)
 
