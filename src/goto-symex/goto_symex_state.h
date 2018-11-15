@@ -62,7 +62,7 @@ public:
 
   struct renaming_levelt
   {
-    virtual ~renaming_levelt() { }
+    virtual ~renaming_levelt() = default;
 
     typedef std::map<irep_idt, std::pair<ssa_exprt, unsigned> > current_namest;
     current_namest current_names;
@@ -97,8 +97,8 @@ public:
       const namespacet &ns,
       unsigned thread_nr);
 
-    level0t() { }
-    virtual ~level0t() { }
+    level0t() = default;
+    ~level0t() override = default;
   } level0;
 
   // level 1 -- function frames
@@ -129,16 +129,16 @@ public:
       }
     }
 
-    level1t() { }
-    virtual ~level1t() { }
+    level1t() = default;
+    ~level1t() override = default;
   } level1;
 
   // level 2 -- SSA
 
   struct level2t:public renaming_levelt
   {
-    level2t() { }
-    virtual ~level2t() { }
+    level2t() = default;
+    ~level2t() override = default;
   } level2;
 
   // this maps L1 names to (L2) constants
