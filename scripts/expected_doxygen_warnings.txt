@@ -15,26 +15,10 @@
   template <>
   satcheck_minisat2_baset< Minisat::SimpSolver >::~satcheck_minisat2_baset()
 
-/cbmc/src/solvers/refinement/string_constraint_generator_transformation.cpp:255: warning: The following parameters of to_char_pair(exprt expr1, exprt expr2, std::function< array_string_exprt(const exprt &)> get_string_expr) are not documented:
-  parameter 'get_string_expr'
-/cbmc/src/solvers/refinement/string_refinement.cpp:1511: warning: argument 'stream' of command @param is not found in the argument list of compute_inverse_function(const exprt &qvar, const exprt &val, const exprt &f)
 /cbmc/src/solvers/refinement/string_refinement.cpp:239: warning: Invalid list item found
-/cbmc/src/solvers/refinement/string_refinement.cpp:1823: warning: argument 'stream' of command @param is not found in the argument list of instantiate(const string_constraintt &axiom, const exprt &str, const exprt &val)
-/cbmc/src/solvers/refinement/string_refinement.cpp:1052: warning: The following parameters of substitute_array_access(const with_exprt &expr, const exprt &index, const bool left_propagate) are not documented:
-  parameter 'left_propagate'
 /cbmc/doc/architectural/howto.md:260: warning: found </div> at different nesting level (6) than expected (3)
 /cbmc/doc/architectural/howto.md:261: warning: end of comment block while expecting command </div>
-/cbmc/src/solvers/README.md:4: warning: @copydetails or @copydoc target 'generate_instantiations(messaget::mstreamt &stream, const string_constraint_generatort &generator, const index_set_pairt &index_set, const string_axiomst &axioms, const std::map<string_not_contains_constraintt, symbol_exprt> &not_contain_witnesses).' not found
-/cbmc/src/cbmc/bmc.cpp:473: warning: argument 'message' of command @param is not found in the argument list of bmct::do_language_agnostic_bmc(const path_strategy_choosert &path_strategy_chooser, const optionst &opts, abstract_goto_modelt &model, ui_message_handlert &ui, std::function< void(bmct &, const symbol_tablet &)> driver_configure_bmc=nullptr, std::function< bool(void)> callback_after_symex=nullptr)
-/cbmc/src/cbmc/bmc.h:124: warning: The following parameters of bmct::do_language_agnostic_bmc(const path_strategy_choosert &path_strategy_chooser, const optionst &opts, abstract_goto_modelt &model, ui_message_handlert &ui, std::function< void(bmct &, const symbol_tablet &)> driver_configure_bmc=nullptr, std::function< bool(void)> callback_after_symex=nullptr) are not documented:
-  parameter 'path_strategy_chooser'
-/cbmc/src/solvers/flattening/bv_utils.cpp:1113: warning: argument 'Bit' of command @param is not found in the argument list of bv_utilst::equal(const bvt &op0, const bvt &op1)
-/cbmc/src/solvers/flattening/bv_utils.cpp:1113: warning: argument 'vectors' of command @param is not found in the argument list of bv_utilst::equal(const bvt &op0, const bvt &op1)
-/cbmc/src/solvers/flattening/bv_utils.h:134: warning: The following parameters of bv_utilst::equal(const bvt &op0, const bvt &op1) are not documented:
-  parameter 'op0'
-  parameter 'op1'
-/cbmc/jbmc/src/java_bytecode/ci_lazy_methods.h:100: warning: The following parameters of ci_lazy_methodst::ci_lazy_methodst(const symbol_tablet &symbol_table, const irep_idt &main_class, const std::vector< irep_idt > &main_jar_classes, const std::vector< load_extra_methodst > &lazy_methods_extra_entry_points, java_class_loadert &java_class_loader, const std::vector< irep_idt > &extra_instantiated_classes, const select_pointer_typet &pointer_type_selector, message_handlert &message_handler, const synthetic_methods_mapt &synthetic_methods) are not documented:
-  parameter 'synthetic_methods'
+/cbmc/src/solvers/README.md:434: warning: Invalid list item found
 /cbmc/src/goto-instrument/wmm/event_graph.h:506: warning: The following parameters of event_grapht::explore_copy_segment(std::set< event_idt > &explored, event_idt begin, event_idt end) const are not documented:
   parameter 'explored'
 /cbmc/src/goto-instrument/wmm/cycle_collection.cpp:149: warning: argument 'get_po_only' of command @param is not found in the argument list of event_grapht::graph_explorert::backtrack(std::set< critical_cyclet > &set_of_cycles, event_idt source, event_idt vertex, bool unsafe_met, event_idt po_trans, bool same_var_pair, bool lwfence_met, bool has_to_be_unsafe, irep_idt var_to_avoid, memory_modelt model)
@@ -53,48 +37,3 @@
   parameter 'model'
   parameter 'no_dependencies'
   parameter 'duplicate_body'
-/cbmc/jbmc/src/java_bytecode/java_bytecode_instrument.cpp:60: warning: The following parameters of java_bytecode_instrumentt::check_null_dereference(const exprt &expr, const source_locationt &original_loc) are not documented:
-  parameter 'original_loc'
-/cbmc/jbmc/src/java_bytecode/java_bytecode_instrument.cpp:354: warning: argument 'tt' of command @param is not found in the argument list of java_bytecode_instrumentt::instrument_code(codet &code)
-/cbmc/jbmc/src/java_bytecode/java_bytecode_instrument.cpp:354: warning: argument 'expr' of command @param is not found in the argument list of java_bytecode_instrumentt::instrument_code(codet &code)
-/cbmc/jbmc/src/java_bytecode/java_bytecode_instrument.cpp:354: warning: argument 'tt' of command @param is not found in the argument list of java_bytecode_instrumentt::instrument_code(codet &code)
-/cbmc/jbmc/src/java_bytecode/java_bytecode_instrument.cpp:73: warning: The following parameters of java_bytecode_instrumentt::instrument_code(codet &code) are not documented:
-  parameter 'code'
-/cbmc/jbmc/src/java_bytecode/java_bytecode_instrument.cpp:546: warning: argument 'expr' of command @param is not found in the argument list of java_bytecode_instrumentt::operator()(codet &code)
-/cbmc/jbmc/src/java_bytecode/java_bytecode_instrument.cpp:39: warning: The following parameters of java_bytecode_instrumentt::operator()(codet &code) are not documented:
-  parameter 'code'
-/cbmc/jbmc/src/java_bytecode/java_class_loader.cpp:104: warning: unable to resolve reference to `jar_files' for \ref command
-/cbmc/jbmc/src/java_bytecode/simple_method_stubbing.cpp:38: warning: The following parameters of java_simple_method_stubst::create_method_stub_at(const typet &expected_type, const exprt &ptr, const source_locationt &loc, const irep_idt &function_id, code_blockt &parent_block, unsigned insert_before_index, bool is_constructor, bool update_in_place) are not documented:
-  parameter 'function_id'
-/cbmc/jbmc/src/java_bytecode/java_string_library_preprocess.h:250: warning: The following parameters of java_string_library_preprocesst::allocate_fresh_string(const typet &type, const source_locationt &loc, const irep_idt &function_id, symbol_table_baset &symbol_table, code_blockt &code) are not documented:
-  parameter 'function_id'
-/cbmc/jbmc/src/java_bytecode/java_string_library_preprocess.cpp:1835: warning: argument 'function_id' of command @param is not found in the argument list of java_string_library_preprocesst::code_for_function(const symbolt &symbol, symbol_table_baset &symbol_table)
-/cbmc/jbmc/src/java_bytecode/java_string_library_preprocess.cpp:1835: warning: argument 'type' of command @param is not found in the argument list of java_string_library_preprocesst::code_for_function(const symbolt &symbol, symbol_table_baset &symbol_table)
-/cbmc/jbmc/src/java_bytecode/java_string_library_preprocess.cpp:1835: warning: argument 'loc' of command @param is not found in the argument list of java_string_library_preprocesst::code_for_function(const symbolt &symbol, symbol_table_baset &symbol_table)
-/cbmc/jbmc/src/java_bytecode/java_string_library_preprocess.h:52: warning: The following parameters of java_string_library_preprocesst::code_for_function(const symbolt &symbol, symbol_table_baset &symbol_table) are not documented:
-  parameter 'symbol'
-/cbmc/jbmc/src/java_bytecode/java_string_library_preprocess.h:332: warning: The following parameters of java_string_library_preprocesst::make_argument_for_format(const exprt &argv, std::size_t index, const struct_typet &structured_type, const source_locationt &loc, const irep_idt &function_id, symbol_table_baset &symbol_table, code_blockt &code) are not documented:
-  parameter 'function_id'
-/cbmc/jbmc/src/java_bytecode/java_string_library_preprocess.h:166: warning: The following parameters of java_string_library_preprocesst::make_copy_string_code(const java_method_typet &type, const source_locationt &loc, const irep_idt &function_id, symbol_table_baset &symbol_table) are not documented:
-  parameter 'function_id'
-/cbmc/jbmc/src/java_bytecode/java_string_library_preprocess.h:148: warning: The following parameters of java_string_library_preprocesst::make_float_to_string_code(const java_method_typet &type, const source_locationt &loc, const irep_idt &function_id, symbol_table_baset &symbol_table) are not documented:
-  parameter 'function_id'
-/cbmc/jbmc/src/java_bytecode/java_string_library_preprocess.cpp:1085: warning: Unsupported xml/html tag <init> found
-/cbmc/jbmc/src/java_bytecode/java_string_library_preprocess.h:184: warning: The following parameters of java_string_library_preprocesst::make_object_get_class_code(const java_method_typet &type, const source_locationt &loc, const irep_idt &function_id, symbol_table_baset &symbol_table) are not documented:
-  parameter 'function_id'
-/cbmc/jbmc/src/java_bytecode/java_string_library_preprocess.h:160: warning: The following parameters of java_string_library_preprocesst::make_string_format_code(const java_method_typet &type, const source_locationt &loc, const irep_idt &function_id, symbol_table_baset &symbol_table) are not documented:
-  parameter 'function_id'
-/cbmc/src/langapi/language_file.cpp:51: warning: argument 'should_generate_stubs' of command @param is not found in the argument list of language_filest::set_should_generate_opaque_method_stubs(bool stubs_enabled)
-/cbmc/src/langapi/language_file.h:104: warning: The following parameters of language_filest::set_should_generate_opaque_method_stubs(bool stubs_enabled) are not documented:
-  parameter 'stubs_enabled'
-/cbmc/src/langapi/language.cpp:121: warning: argument 'parameter_type' of command @param is not found in the argument list of languaget::build_stub_parameter_symbol(const symbolt &function_symbol, size_t parameter_index, const code_typet::parametert &parameter)
-/cbmc/src/langapi/language.h:176: warning: The following parameters of languaget::build_stub_parameter_symbol(const symbolt &function_symbol, size_t parameter_index, const code_typet::parametert &parameter) are not documented:
-  parameter 'parameter'
-/cbmc/jbmc/src/java_bytecode/remove_exceptions.cpp:47: warning: Found unknown command `\class_identifier'
-/cbmc/src/solvers/refinement/string_refinement.cpp:2099: warning: argument 'expr' of command @param is not found in the argument list of string_constraintt::universal_only_in_index(const string_constraintt &constr)
-/cbmc/src/solvers/refinement/string_refinement.cpp:2106: warning: The following parameters of string_constraintt::universal_only_in_index(const string_constraintt &constr) are not documented:
-  parameter 'constr'
-/cbmc/jbmc/src/java_bytecode/ci_lazy_methods_needed.h:40: warning: The following parameters of ci_lazy_methods_neededt::add_needed_class(const irep_idt &class_symbol_name) are not documented:
-  parameter 'class_symbol_name'
-/cbmc/jbmc/src/java_bytecode/ci_lazy_methods_needed.h:38: warning: The following parameters of ci_lazy_methods_neededt::add_needed_method(const irep_idt &method_symbol_name) are not documented:
-  parameter 'method_symbol_name'

@@ -19,7 +19,7 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 
 /// Notes `method_symbol_name` is referenced from some reachable function, and
 /// should therefore be elaborated.
-/// \param: `method_symbol_name`: method name; must exist in symbol table.
+/// \param method_symbol_name: method name; must exist in symbol table.
 void ci_lazy_methods_neededt::add_needed_method(
   const irep_idt &method_symbol_name)
 {
@@ -47,7 +47,7 @@ void ci_lazy_methods_neededt::add_clinit_call(
 /// Notes class `class_symbol_name` will be instantiated, or a static field
 /// belonging to it will be accessed. Also notes that its static initializer is
 /// therefore reachable.
-/// \param: `class_symbol_name`: class name; must exist in symbol table.
+/// \param class_symbol_name: class name; must exist in symbol table.
 /// \return Returns true if `class_symbol_name` is new (not seen before).
 bool ci_lazy_methods_neededt::add_needed_class(
   const irep_idt &class_symbol_name)

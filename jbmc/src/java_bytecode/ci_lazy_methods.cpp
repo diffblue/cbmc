@@ -30,6 +30,10 @@
 ///   implementation for `List` interface.
 /// \param pointer_type_selector: selector to handle correct pointer types
 /// \param message_handler: the message handler to use for output
+/// \param synthetic_methods: map from synthetic method names to the type of
+///   synthetic method (e.g. stub class static initialiser). Indicates that
+///   these method bodies are produced internally, rather than generated from
+///   Java bytecode.
 ci_lazy_methodst::ci_lazy_methodst(
   const symbol_tablet &symbol_table,
   const irep_idt &main_class,

@@ -99,7 +99,6 @@ static void update_index_set(
 /// For instance, if `axiom` corresponds to \f$\forall q.\ s[q+x]='a' \land
 /// t[q]='b'\f$, `instantiate(axiom,s,v)` would return an expression for
 /// \f$s[v]='a' \land t[v-x]='b'\f$.
-/// \param stream: output stream
 /// \param axiom: a universally quantified formula
 /// \param str: an array of char variable
 /// \param val: an index expression
@@ -1050,13 +1049,13 @@ void debug_model(
 /// 'if' expressions. e.g. for an array access arr[index], where: `arr :=
 /// array_of(12) with {0:=24} with {2:=42}` the constructed expression will be:
 /// `index==0 ? 24 : index==2 ? 42 : 12`
-/// If `left_propagate` is set to true, the expression will look like
-/// `index<=0 ? 24 : index<=2 ? 42 : 12`
 /// \param expr: A (possibly nested) 'with' expression on an `array_of`
 ///   expression. The function checks that the expression is of the form
 ///   `with_expr(with_expr(...(array_of(...)))`. This is the form in which
 ///   array valuations coming from the underlying solver are given.
 /// \param index: An index with which to build the equality condition
+/// \param left_propagate: If set to true, the expression will look like
+/// `index<=0 ? 24 : index<=2 ? 42 : 12`
 /// \return An expression containing no 'with' expression
 static exprt substitute_array_access(
   const with_exprt &expr,
@@ -1517,7 +1516,6 @@ exprt simplify_sum(const exprt &f)
   return sum_over_map(map, f.type());
 }
 
-/// \param stream: an output stream
 /// \param qvar: a symbol representing a universally quantified variable
 /// \param val: an expression
 /// \param f: an expression containing `+` and `-`
@@ -2108,7 +2106,7 @@ is_linear_arithmetic_expr(const exprt &expr, const symbol_exprt &var)
 /// expressions in the body of a string constraint. This function returns true
 /// if this is the case and false otherwise.
 /// \related string_constraintt
-/// \param [in] expr: The string constraint to check
+/// \param [in] constr: The string constraint to check
 /// \return true if the universal variable only occurs in index expressions,
 ///   false otherwise.
 static bool universal_only_in_index(const string_constraintt &constr)

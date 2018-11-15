@@ -1110,7 +1110,8 @@ literalt bv_utilst::equal_const(const bvt &var, const bvt &constant)
 #endif
 
 /// Bit-blasting ID_equal and use in other encodings.
-/// \param Bit:vectors for the two things to compare.
+/// \param op0: Lhs bitvector to compare
+/// \param op1: Rhs bitvector to compare
 /// \return The literal that is true if and only if they are equal.
 literalt bv_utilst::equal(const bvt &op0, const bvt &op1)
 {

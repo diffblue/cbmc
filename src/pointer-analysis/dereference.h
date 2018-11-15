@@ -22,7 +22,6 @@ class typecast_exprt;
 class dereferencet
 {
 public:
-  /// \param _ns: Namespace
   explicit dereferencet(
     const namespacet &_ns):
     ns(_ns)

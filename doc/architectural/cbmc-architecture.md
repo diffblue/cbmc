@@ -1,4 +1,4 @@
-\ingroup module_hidden 
+\ingroup module_hidden
 \page cbmc-architecture CBMC Architecture
 
 \author Martin Brain, Peter Schrammel
@@ -33,7 +33,7 @@ digraph G {
   2 [label="preprocessing,\nparsing" URL="\ref preprocessing"];
   3 [label="language\ntype-checking" URL="\ref type-checking"];
   4 [label="goto\nconversion" URL="\ref goto-conversion"];
-  5 [label="instrumentation" URL="\ref instrumentation"];
+  5 [label="instrumentation" URL="\ref section-goto-transforms"];
   6 [label="symbolic\nexecution" URL="\ref symbolic-execution"];
   7 [label="SAT/SMT\nencoding" URL="\ref sat-smt-encoding"];
   8 [label="decision\nprocedure" URL="\ref decision-procedure"];

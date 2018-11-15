@@ -97,7 +97,10 @@ static bool is_overlay_class(const java_bytecode_parse_treet::classt &c)
 }
 
 /// Check through all the places class parse trees can appear and returns the
-/// first implementation it finds plus any overlay class implementations
+/// first implementation it finds plus any overlay class implementations.
+/// Uses \p class_loader_limit to limit the class files that it might (directly
+/// or indirectly) load and returns a default-constructed parse tree when unable
+/// to find the .class file.
 /// \param class_loader_limit: Filter to decide whether to load classes
 /// \param class_name: Name of class to load
 /// \returns The list of valid implementations, including overlays

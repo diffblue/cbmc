@@ -250,6 +250,9 @@ std::pair<exprt, string_constraintst> add_axioms_for_trim(
 /// Otherwise return empty optional
 /// \param expr1 First expression
 /// \param expr2 Second expression
+/// \param get_string_expr: Function that yields an array_string_exprt
+///   corresponding to either `expr1` or `expr2`, for the case where they are
+///   not primitive chars.
 /// \return Optional pair of two expressions
 static optionalt<std::pair<exprt, exprt>> to_char_pair(
   exprt expr1,

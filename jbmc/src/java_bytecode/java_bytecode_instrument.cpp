@@ -258,12 +258,12 @@ code_ifthenelset java_bytecode_instrumentt::check_class_cast(
   return conditional_check;
 }
 
-/// Checks whether `expr` is null and throws NullPointerException/
+/// Checks whether \p expr is null and throws NullPointerException/
 /// generates an assertion when necessary;
 /// Exceptions are thrown when the `throw_runtime_exceptions` flag is set.
 /// Otherwise, assertions are emitted.
 /// \param expr: the checked expression
-/// `original_loc: source location in the original code
+/// \param original_loc: source location in the original code
 /// \return Based on the value of the flag `throw_runtime_exceptions`,
 /// it returns code that either throws an NullPointerException or emits an
 /// assertion checking the subtype relation
@@ -287,7 +287,7 @@ codet java_bytecode_instrumentt::check_null_dereference(
   return create_fatal_assertion(not_exprt(equal_expr), check_loc);
 }
 
-/// Checks whether `length`>=0 and throws NegativeArraySizeException/
+/// Checks whether \p length >= 0 and throws NegativeArraySizeException/
 /// generates an assertion when necessary;
 /// Exceptions are thrown when the `throw_runtime_exceptions` flag is set.
 /// Otherwise, assertions are emitted.
@@ -316,8 +316,8 @@ codet java_bytecode_instrumentt::check_array_length(
   return create_fatal_assertion(ge_zero, check_loc);
 }
 
-/// Checks whether `expr` requires instrumentation, and if so adds it
-/// to `block`.
+/// Checks whether \p expr requires instrumentation, and if so adds it
+/// to \p block.
 /// \param [out] block: block where instrumentation will be added
 /// \param expr: expression to instrument
 void java_bytecode_instrumentt::add_expr_instrumentation(
@@ -333,8 +333,8 @@ void java_bytecode_instrumentt::add_expr_instrumentation(
   }
 }
 
-/// Appends `code` to `instrumentation` and overwrites reference `code`
-/// with the augmented block if `instrumentation` is non-empty.
+/// Appends \p code to \p instrumentation and overwrites reference \p code
+/// with the augmented block if \p instrumentation is non-empty.
 /// \param [in, out] code: code being instrumented
 /// \param instrumentation: instrumentation code block to prepend
 void java_bytecode_instrumentt::prepend_instrumentation(
@@ -351,9 +351,9 @@ void java_bytecode_instrumentt::prepend_instrumentation(
   }
 }
 
-/// Augments `expr` with instrumentation in the form of either
+/// Augments \p code with instrumentation in the form of either
 /// assertions or runtime exceptions
-/// \param `expr` the expression to be instrumented
+/// \param code: the expression to be instrumented
 void java_bytecode_instrumentt::instrument_code(codet &code)
 {
   source_locationt old_source_location=code.source_location();
@@ -464,11 +464,11 @@ void java_bytecode_instrumentt::instrument_code(codet &code)
     merge_source_location_rec(code, old_source_location);
 }
 
-/// Computes the instrumentation for `expr` in the form of
+/// Computes the instrumentation for \p expr in the form of
 /// either assertions or runtime exceptions.
 /// \param expr: the expression for which we compute
 /// instrumentation
-/// \return: The instrumentation for `expr` if required
+/// \return: The instrumentation for \p expr if required
 optionalt<codet> java_bytecode_instrumentt::instrument_expr(const exprt &expr)
 {
   code_blockt result;
@@ -543,16 +543,16 @@ optionalt<codet> java_bytecode_instrumentt::instrument_expr(const exprt &expr)
     return std::move(result);
 }
 
-/// Instruments `expr`
-/// \param expr: the expression to be instrumented
+/// Instruments \p code
+/// \param code: the expression to be instrumented
 void java_bytecode_instrumentt::operator()(codet &code)
 {
   instrument_code(code);
 }
 
-/// Instruments the code attached to `symbol` with
+/// Instruments the code attached to \p symbol with
 /// runtime exceptions or corresponding assertions.
-/// Exceptions are thrown when the `throw_runtime_exceptions` flag is set.
+/// Exceptions are thrown when the \p throw_runtime_exceptions flag is set.
 /// Otherwise, assertions are emitted.
 /// \param symbol_table: global symbol table (may gain exception type stubs and
 ///   similar)
@@ -603,7 +603,7 @@ void java_bytecode_instrument_uncaught_exceptions(
 
 /// Instruments all the code in the symbol_table with
 /// runtime exceptions or corresponding assertions.
-/// Exceptions are thrown when the `throw_runtime_exceptions` flag is set.
+/// Exceptions are thrown when the \p throw_runtime_exceptions flag is set.
 /// Otherwise, assertions are emitted.
 /// \param symbol_table: global symbol table, all of whose code members
 ///   will be annotated (may gain exception type stubs and similar)
