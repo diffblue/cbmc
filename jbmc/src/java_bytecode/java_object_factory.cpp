@@ -479,7 +479,7 @@ void initialize_nondet_string_fields(
     array_pointer, data_expr, symbol_table, loc, function_id, code);
 
   add_array_to_length_association(
-    data_expr, length_expr, symbol_table, loc, code);
+    data_expr, length_expr, symbol_table, loc, function_id, code);
 
   struct_expr.operands()[struct_type.component_number("data")] = array_pointer;
 

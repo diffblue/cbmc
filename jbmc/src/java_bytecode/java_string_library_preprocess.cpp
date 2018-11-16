@@ -567,7 +567,7 @@ refined_string_exprt java_string_library_preprocesst::make_nondet_string_expr(
     array_pointer, nondet_array_expr, symbol_table, loc, function_id, code);
 
   add_array_to_length_association(
-    nondet_array_expr, str.length(), symbol_table, loc, code);
+    nondet_array_expr, str.length(), symbol_table, loc, function_id, code);
 
   code.add(code_assignt(str.content(), array_pointer), loc);
 
@@ -713,12 +713,14 @@ void add_pointer_to_array_association(
 /// \param length: integer expression
 /// \param symbol_table: the symbol table
 /// \param loc: source location
+/// \param function_id: name of the function in which the code will be added
 /// \param [out] code: code block to which declaration and calls get added
 void add_array_to_length_association(
   const exprt &array,
   const exprt &length,
   symbol_table_baset &symbol_table,
   const source_locationt &loc,
+  const irep_idt &function_id,
   code_blockt &code)
 {
   const symbolt &return_sym = get_fresh_aux_symbol(

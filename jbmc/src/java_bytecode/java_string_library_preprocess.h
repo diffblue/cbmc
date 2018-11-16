@@ -362,6 +362,7 @@ void add_array_to_length_association(
   const exprt &length,
   symbol_table_baset &symbol_table,
   const source_locationt &loc,
+  const irep_idt &function_id,
   code_blockt &code);
 
 void add_character_set_constraint(
