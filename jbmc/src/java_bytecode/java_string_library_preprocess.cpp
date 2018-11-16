@@ -430,11 +430,13 @@ refined_string_exprt java_string_library_preprocesst::replace_char_array(
 /// given type
 /// \param type: a type for refined strings
 /// \param loc: a location in the program
+/// \param function_id: name of the function in which the code will be added
 /// \param symbol_table: symbol table
 /// \return a new symbol
 symbol_exprt java_string_library_preprocesst::fresh_string(
   const typet &type,
   const source_locationt &loc,
+  const irep_idt &function_id,
   symbol_table_baset &symbol_table)
 {
   symbolt string_symbol=get_fresh_aux_symbol(
@@ -531,7 +533,7 @@ exprt java_string_library_preprocesst::allocate_fresh_string(
   symbol_table_baset &symbol_table,
   code_blockt &code)
 {
-  const exprt str = fresh_string(type, loc, symbol_table);
+  const exprt str = fresh_string(type, loc, function_id, symbol_table);
 
   allocate_objectst allocate_objects(ID_java, loc, function_id, symbol_table);
 

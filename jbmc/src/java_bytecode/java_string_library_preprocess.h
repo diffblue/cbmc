@@ -222,6 +222,7 @@ private:
   symbol_exprt fresh_string(
     const typet &type,
     const source_locationt &loc,
+    const irep_idt &function_id,
     symbol_table_baset &symbol_table);
 
   refined_string_exprt decl_string_expr(
