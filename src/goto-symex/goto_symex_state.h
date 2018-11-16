@@ -225,11 +225,8 @@ public:
     void level2_get_variables(
       std::unordered_set<ssa_exprt, irep_hash> &vars) const
     {
-      for(level2t::current_namest::const_iterator
-          it=level2_current_names.begin();
-          it!=level2_current_names.end();
-          it++)
-        vars.insert(it->second.first);
+      for(const auto &pair : level2_current_names)
+        vars.insert(pair.second.first);
     }
 
     unsigned level2_current_count(const irep_idt &identifier) const
