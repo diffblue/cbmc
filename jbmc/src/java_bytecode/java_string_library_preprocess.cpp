@@ -286,6 +286,7 @@ exprt::operandst java_string_library_preprocesst::process_parameters(
 ///   sequence
 /// \param loc: location in the source
 /// \param symbol_table: symbol table
+/// \param function_id: name of the function in which the code will be added
 /// \param init_code: code block, in which declaration will be added:
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 /// char *cprover_string_content;
@@ -300,6 +301,7 @@ java_string_library_preprocesst::convert_exprt_to_string_exprt(
   const exprt &expr_to_process,
   const source_locationt &loc,
   symbol_table_baset &symbol_table,
+  const irep_idt &function_id,
   code_blockt &init_code)
 {
   PRECONDITION(implements_java_char_sequence_pointer(expr_to_process.type()));
@@ -332,7 +334,8 @@ exprt::operandst java_string_library_preprocesst::process_operands(
   {
     if(implements_java_char_sequence_pointer(p.type()))
       ops.push_back(
-        convert_exprt_to_string_exprt(p, loc, symbol_table, init_code));
+        convert_exprt_to_string_exprt(
+          p, loc, symbol_table, loc.get_function(), init_code));
     else if(is_java_char_array_pointer_type(p.type()))
       ops.push_back(replace_char_array(p, loc, symbol_table, init_code));
     else
@@ -364,14 +367,16 @@ java_string_library_preprocesst::process_equals_function_operands(
   PRECONDITION(implements_java_char_sequence_pointer(op0.type()));
 
   ops.push_back(
-    convert_exprt_to_string_exprt(op0, loc, symbol_table, init_code));
+    convert_exprt_to_string_exprt(
+      op0, loc, symbol_table, loc.get_function(), init_code));
 
   // TODO: Manage the case where we have a non-String Object (this should
   // probably be handled upstream. At any rate, the following code should be
   // protected with assertions on the type of op1.
   const typecast_exprt tcast(op1, to_pointer_type(op0.type()));
   ops.push_back(
-    convert_exprt_to_string_exprt(tcast, loc, symbol_table, init_code));
+    convert_exprt_to_string_exprt(
+      tcast, loc, symbol_table, loc.get_function(), init_code));
   return ops;
 }
 
@@ -587,42 +592,42 @@ exprt java_string_library_preprocesst::allocate_fresh_string(
 
 /// assign the result of a function call
 /// \param lhs: an expression
-/// \param function_name: the name of the function
+/// \param function_id: the name of the function
 /// \param arguments: a list of arguments
 /// \param symbol_table: a symbol table
 /// \return the following code:
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/// lhs = <function_name>(arguments)
+/// lhs = <function_id>(arguments)
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 static codet code_assign_function_application(
   const exprt &lhs,
-  const irep_idt &function_name,
+  const irep_idt &function_id,
   const exprt::operandst &arguments,
   symbol_table_baset &symbol_table)
 {
   return code_assignt(
     lhs,
     make_function_application(
-      function_name, arguments, lhs.type(), symbol_table));
+      function_id, arguments, lhs.type(), symbol_table));
 }
 
 /// return the result of a function call
-/// \param function_name: the name of the function
+/// \param function_id: the name of the function
 /// \param arguments: a list of arguments
 /// \param type: the return type
 /// \param symbol_table: a symbol table
 /// \return the following code:
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/// return <function_name>(arguments)
+/// return <function_id>(arguments)
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 codet java_string_library_preprocesst::code_return_function_application(
-  const irep_idt &function_name,
+  const irep_idt &function_id,
   const exprt::operandst &arguments,
   const typet &type,
   symbol_table_baset &symbol_table)
 {
   return code_returnt(
-    make_function_application(function_name, arguments, type, symbol_table));
+    make_function_application(function_id, arguments, type, symbol_table));
 }
 
 /// Declare a fresh symbol of type array of character with infinite size.
@@ -756,10 +761,10 @@ void add_character_set_constraint(
 }
 
 /// Create a refined_string_exprt `str` whose content and length are fresh
-/// symbols, calls the string primitive with name `function_name`.
+/// symbols, calls the string primitive with name `function_id`.
 /// In the arguments of the primitive `str` takes the place of the result and
 /// the following arguments are given by parameter `arguments.
-/// \param function_name: the name of the function
+/// \param function_id: the name of the function
 /// \param arguments: arguments of the function
 /// \param loc: source location
 /// \param symbol_table: symbol table
@@ -768,11 +773,11 @@ void add_character_set_constraint(
 /// int return_code;
 /// int str.length;
 /// char str.data[str.length]
-/// return_code = <function_name>(str.length, str.data, arguments)
+/// return_code = <function_id>(str.length, str.data, arguments)
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 /// \return refined string expression `str`
 refined_string_exprt java_string_library_preprocesst::string_expr_of_function(
-  const irep_idt &function_name,
+  const irep_idt &function_id,
   const exprt::operandst &arguments,
   const source_locationt &loc,
   symbol_table_baset &symbol_table,
@@ -781,8 +786,8 @@ refined_string_exprt java_string_library_preprocesst::string_expr_of_function(
   // int return_code;
   const symbolt &return_code_sym = get_fresh_aux_symbol(
     java_int_type(),
-    std::string("return_code_") + function_name.c_str(),
-    std::string("return_code_") + function_name.c_str(),
+    std::string("return_code_") + function_id.c_str(),
+    std::string("return_code_") + function_id.c_str(),
     loc,
     ID_java,
     symbol_table);
@@ -790,7 +795,7 @@ refined_string_exprt java_string_library_preprocesst::string_expr_of_function(
   code.add(code_declt(return_code), loc);
 
   const refined_string_exprt string_expr =
-    make_nondet_string_expr(loc, function_name, symbol_table, code);
+    make_nondet_string_expr(loc, function_id, symbol_table, code);
 
   // args is { str.length, str.content, arguments... }
   exprt::operandst args;
@@ -798,10 +803,10 @@ refined_string_exprt java_string_library_preprocesst::string_expr_of_function(
   args.push_back(string_expr.content());
   args.insert(args.end(), arguments.begin(), arguments.end());
 
-  // return_code = <function_name>_data(args)
+  // return_code = <function_id>_data(args)
   code.add(
     code_assign_function_application(
-      return_code, function_name, args, symbol_table),
+      return_code, function_id, args, symbol_table),
     loc);
 
   return string_expr;
@@ -1070,7 +1075,7 @@ code_blockt java_string_library_preprocesst::make_float_to_string_code(
 }
 
 /// Generate the goto code for string initialization.
-/// \param function_name: name of the function to be called
+/// \param function_id: name of the function to be called
 /// \param type: the type of the function call
 /// \param loc: location in program
 /// \param symbol_table: the symbol table to populate
@@ -1085,7 +1090,7 @@ code_blockt java_string_library_preprocesst::make_float_to_string_code(
 ///     cprover_string = {.=cprover_string_length, .=cprover_string_array};
 ///
 code_blockt java_string_library_preprocesst::make_init_function_from_call(
-  const irep_idt &function_name,
+  const irep_idt &function_id,
   const java_method_typet &type,
   const source_locationt &loc,
   symbol_table_baset &symbol_table,
@@ -1109,7 +1114,7 @@ code_blockt java_string_library_preprocesst::make_init_function_from_call(
 
   // string_expr <- function(arg1)
   const refined_string_exprt string_expr =
-    string_expr_of_function(function_name, args, loc, symbol_table, code);
+    string_expr_of_function(function_id, args, loc, symbol_table, code);
 
   // arg_this <- string_expr
   code.add(
@@ -1122,14 +1127,14 @@ code_blockt java_string_library_preprocesst::make_init_function_from_call(
 
 /// Call a cprover internal function, assign the result to object `this` and
 /// return it.
-/// \param function_name: name of the function to be called
+/// \param function_id: name of the function to be called
 /// \param type: the type of the function call
 /// \param loc: location in program
 /// \param symbol_table: the symbol table to populate
 /// \return Code calling function with the given function name.
 code_blockt
 java_string_library_preprocesst::make_assign_and_return_function_from_call(
-  const irep_idt &function_name,
+  const irep_idt &function_id,
   const java_method_typet &type,
   const source_locationt &loc,
   symbol_table_baset &symbol_table)
@@ -1140,22 +1145,21 @@ java_string_library_preprocesst::make_assign_and_return_function_from_call(
   PRECONDITION(!params[0].get_identifier().empty());
   code_blockt code;
   code.add(
-    make_assign_function_from_call(function_name, type, loc, symbol_table),
-    loc);
+    make_assign_function_from_call(function_id, type, loc, symbol_table), loc);
   const symbol_exprt arg_this(params[0].get_identifier(), params[0].type());
   code.add(code_returnt(arg_this), loc);
   return code;
 }
 
 /// Call a cprover internal function and assign the result to object `this`.
-/// \param function_name: name of the function to be called
+/// \param function_id: name of the function to be called
 /// \param type: the type of the function call
 /// \param loc: location in program
 /// \param symbol_table: the symbol table to populate
 /// \return Code assigning result of a call to the function with given function
 ///   name.
 code_blockt java_string_library_preprocesst::make_assign_function_from_call(
-  const irep_idt &function_name,
+  const irep_idt &function_id,
   const java_method_typet &type,
   const source_locationt &loc,
   symbol_table_baset &symbol_table)
@@ -1163,7 +1167,7 @@ code_blockt java_string_library_preprocesst::make_assign_function_from_call(
   // This is similar to initialization function except we do not ignore
   // the first argument
   return make_init_function_from_call(
-    function_name, type, loc, symbol_table, false);
+    function_id, type, loc, symbol_table, false);
 }
 
 /// Adds to the code an assignment of the form
@@ -1574,16 +1578,16 @@ code_blockt java_string_library_preprocesst::make_object_get_class_code(
 
 /// Provide code for a function that calls a function from the solver and simply
 /// returns it.
-/// \param function_name: name of the function to be called
+/// \param function_id: name of the function to be called
 /// \param type: type of the function
 /// \param loc: location in the source
 /// \param symbol_table: symbol table
 /// \return Code corresponding to:
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~
-/// return function_name(args)
+/// return function_id(args)
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~
 code_blockt java_string_library_preprocesst::make_function_from_call(
-  const irep_idt &function_name,
+  const irep_idt &function_id,
   const java_method_typet &type,
   const source_locationt &loc,
   symbol_table_baset &symbol_table)
@@ -1593,27 +1597,27 @@ code_blockt java_string_library_preprocesst::make_function_from_call(
     process_parameters(type.parameters(), loc, symbol_table, code);
   code.add(
     code_return_function_application(
-      function_name, args, type.return_type(), symbol_table),
+      function_id, args, type.return_type(), symbol_table),
     loc);
   return code;
 }
 
 /// Provide code for a function that calls a function from the solver and return
 /// the string_expr result as a Java string.
-/// \param function_name: name of the function to be called
+/// \param function_id: name of the function to be called
 /// \param type: type of the function
 /// \param loc: location in the source
 /// \param symbol_table: symbol table
 /// \return Code corresponding to:
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/// string_expr = function_name(args)
+/// string_expr = function_id(args)
 /// string = new String
 /// string = string_expr_to_string(string)
 /// return string
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 code_blockt
 java_string_library_preprocesst::make_string_returning_function_from_call(
-  const irep_idt &function_name,
+  const irep_idt &function_id,
   const java_method_typet &type,
   const source_locationt &loc,
   symbol_table_baset &symbol_table)
@@ -1627,11 +1631,11 @@ java_string_library_preprocesst::make_string_returning_function_from_call(
 
   // String expression that will hold the result
   const refined_string_exprt string_expr =
-    string_expr_of_function(function_name, arguments, loc, symbol_table, code);
+    string_expr_of_function(function_id, arguments, loc, symbol_table, code);
 
   // Assign to string
   const exprt str = allocate_fresh_string(
-    type.return_type(), loc, function_name, symbol_table, code);
+    type.return_type(), loc, function_id, symbol_table, code);
   code.add(
     code_assign_string_expr_to_java_string(
       str, string_expr, symbol_table, true),

@@ -21,11 +21,12 @@ refined_string_exprt convert_exprt_to_string_exprt_unit_test(
   java_string_library_preprocesst &preprocess,
   const exprt &deref,
   const source_locationt &loc,
+  const irep_idt &function_id,
   symbol_tablet &symbol_table,
   code_blockt &init_code)
 {
   return preprocess.convert_exprt_to_string_exprt(
-    deref, loc, symbol_table, init_code);
+    deref, loc, symbol_table, function_id, init_code);
 }
 
 TEST_CASE("Convert exprt to string exprt")
@@ -33,6 +34,7 @@ TEST_CASE("Convert exprt to string exprt")
   GIVEN("A location, a string expression, and a symbol table")
   {
     source_locationt loc;
+    loc.set_function("function_name");
     symbol_tablet symbol_table;
     namespacet ns(symbol_table);
     code_blockt code;
@@ -45,9 +47,9 @@ TEST_CASE("Convert exprt to string exprt")
     {
       refined_string_exprt string_expr =
         convert_exprt_to_string_exprt_unit_test(
-          preprocess, expr, loc, symbol_table, code);
+          preprocess, expr, loc, "function_id", symbol_table, code);
 
-      THEN("The type of the returd expression is that of refined strings")
+      THEN("The type of the returned expression is that of refined strings")
       {
         REQUIRE(string_expr.id() == ID_struct);
         REQUIRE(is_refined_string_type(string_expr.type()));

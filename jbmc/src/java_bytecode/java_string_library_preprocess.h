@@ -193,6 +193,7 @@ private:
     java_string_library_preprocesst &preprocess,
     const exprt &deref,
     const source_locationt &loc,
+    const irep_idt &function_id,
     symbol_tablet &symbol_table,
     code_blockt &init_code);
 
@@ -200,6 +201,7 @@ private:
     const exprt &deref,
     const source_locationt &loc,
     symbol_table_baset &symbol_table,
+    const irep_idt &function_name,
     code_blockt &init_code);
 
   exprt::operandst process_operands(
