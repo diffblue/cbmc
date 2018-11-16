@@ -306,7 +306,7 @@ java_string_library_preprocesst::convert_exprt_to_string_exprt(
 {
   PRECONDITION(implements_java_char_sequence_pointer(expr_to_process.type()));
   const refined_string_exprt string_expr =
-    decl_string_expr(loc, symbol_table, init_code);
+    decl_string_expr(loc, function_id, symbol_table, init_code);
   code_assign_java_string_to_string_expr(
     string_expr, expr_to_process, loc, symbol_table, init_code);
   return string_expr;
@@ -496,11 +496,13 @@ symbol_exprt java_string_library_preprocesst::fresh_string(
 /// Add declaration of a refined string expr whose content and length are
 /// fresh symbols.
 /// \param loc: source location
+/// \param function_id: name of the function in which the string is defined
 /// \param symbol_table: the symbol table
 /// \param [out] code: code block to which the declaration is added
 /// \return refined string expr with fresh content and length symbols
 refined_string_exprt java_string_library_preprocesst::decl_string_expr(
   const source_locationt &loc,
+  const irep_idt &function_id,
   symbol_table_baset &symbol_table,
   code_blockt &code)
 {
@@ -542,7 +544,8 @@ refined_string_exprt java_string_library_preprocesst::make_nondet_string_expr(
   code_blockt &code)
 {
   /// \todo refactor with initialize_nonddet_string_struct
-  const refined_string_exprt str = decl_string_expr(loc, symbol_table, code);
+  const refined_string_exprt str =
+    decl_string_expr(loc, function_id, symbol_table, code);
 
   const side_effect_expr_nondett nondet_length(str.length().type(), loc);
   code.add(code_assignt(str.length(), nondet_length), loc);
@@ -1671,7 +1674,7 @@ code_blockt java_string_library_preprocesst::make_copy_string_code(
 
   // String expression that will hold the result
   const refined_string_exprt string_expr =
-    decl_string_expr(loc, symbol_table, code);
+    decl_string_expr(loc, function_id, symbol_table, code);
 
   // Assign the argument to string_expr
   const java_method_typet::parametert &op = type.parameters()[0];
@@ -1718,7 +1721,7 @@ code_blockt java_string_library_preprocesst::make_copy_constructor_code(
 
   // String expression that will hold the result
   const refined_string_exprt string_expr =
-    decl_string_expr(loc, symbol_table, code);
+    decl_string_expr(loc, function_id, symbol_table, code);
 
   // Assign argument to a string_expr
   const java_method_typet::parameterst &params = type.parameters();

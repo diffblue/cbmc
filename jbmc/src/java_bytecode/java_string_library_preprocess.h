@@ -234,6 +234,7 @@ private:
 
   refined_string_exprt decl_string_expr(
     const source_locationt &loc,
+    const irep_idt &function_id,
     symbol_table_baset &symbol_table,
     code_blockt &code);
 
@@ -251,13 +252,13 @@ private:
     code_blockt &code);
 
   codet code_return_function_application(
-    const irep_idt &function_name,
+    const irep_idt &function_id,
     const exprt::operandst &arguments,
     const typet &type,
     symbol_table_baset &symbol_table);
 
   refined_string_exprt string_expr_of_function(
-    const irep_idt &function_name,
+    const irep_idt &function_id,
     const exprt::operandst &arguments,
     const source_locationt &loc,
     symbol_table_baset &symbol_table,
@@ -290,32 +291,32 @@ private:
     code_blockt &code);
 
   code_blockt make_function_from_call(
-    const irep_idt &function_name,
+    const irep_idt &function_id,
     const java_method_typet &type,
     const source_locationt &loc,
     symbol_table_baset &symbol_table);
 
   code_blockt make_init_function_from_call(
-    const irep_idt &function_name,
+    const irep_idt &function_id,
     const java_method_typet &type,
     const source_locationt &loc,
     symbol_table_baset &symbol_table,
     bool is_constructor = true);
 
   code_blockt make_assign_and_return_function_from_call(
-    const irep_idt &function_name,
+    const irep_idt &function_id,
     const java_method_typet &type,
     const source_locationt &loc,
     symbol_table_baset &symbol_table);
 
   code_blockt make_assign_function_from_call(
-    const irep_idt &function_name,
+    const irep_idt &function_id,
     const java_method_typet &type,
     const source_locationt &loc,
     symbol_table_baset &symbol_table);
 
   code_blockt make_string_returning_function_from_call(
-    const irep_idt &function_name,
+    const irep_idt &function_id,
     const java_method_typet &type,
     const source_locationt &loc,
     symbol_table_baset &symbol_table);
