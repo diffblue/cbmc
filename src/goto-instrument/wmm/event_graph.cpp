@@ -68,6 +68,7 @@ void event_grapht::print_graph()
 
 /// copies the segment
 /// \param begin: top of the subgraph
+/// \param explored: set of segments which have already been explored
 /// \param end: bottom of the subgraph
 void event_grapht::explore_copy_segment(std::set<event_idt> &explored,
   event_idt begin, event_idt end) const

@@ -257,15 +257,19 @@ protected:
     }
 
     /// TODO: move the visitor outside, and inherit
+    /// \param value_sets: Value_sets and options
+    /// \param model: Memory model
+    /// \param no_dependencies: Option to disable dependency analysis
+    /// \param duplicate_body: Control which loop body segments should
+    ///   be duplicated
+    /// \param function: Function to analyse
+    /// \param ending_vertex: Outcoming edges
     virtual void visit_cfg_function(
-      /// value_sets and options
       value_setst &value_sets,
       memory_modelt model,
       bool no_dependencies,
       loop_strategyt duplicate_body,
-      /// function to analyse
       const irep_idt &function,
-      /// outcoming edges
       std::set<nodet> &ending_vertex);
 
     bool inline local(const irep_idt &i);

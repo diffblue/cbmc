@@ -19,21 +19,3 @@
 /cbmc/doc/architectural/howto.md:260: warning: found </div> at different nesting level (6) than expected (3)
 /cbmc/doc/architectural/howto.md:261: warning: end of comment block while expecting command </div>
 /cbmc/src/solvers/README.md:434: warning: Invalid list item found
-/cbmc/src/goto-instrument/wmm/event_graph.h:506: warning: The following parameters of event_grapht::explore_copy_segment(std::set< event_idt > &explored, event_idt begin, event_idt end) const are not documented:
-  parameter 'explored'
-/cbmc/src/goto-instrument/wmm/cycle_collection.cpp:149: warning: argument 'get_po_only' of command @param is not found in the argument list of event_grapht::graph_explorert::backtrack(std::set< critical_cyclet > &set_of_cycles, event_idt source, event_idt vertex, bool unsafe_met, event_idt po_trans, bool same_var_pair, bool lwfence_met, bool has_to_be_unsafe, irep_idt var_to_avoid, memory_modelt model)
-/cbmc/src/goto-instrument/wmm/event_graph.h:315: warning: The following parameters of event_grapht::graph_explorert::backtrack(std::set< critical_cyclet > &set_of_cycles, event_idt source, event_idt vertex, bool unsafe_met, event_idt po_trans, bool same_var_pair, bool lwfence_met, bool has_to_be_unsafe, irep_idt var_to_avoid, memory_modelt model) are not documented:
-  parameter 'set_of_cycles'
-  parameter 'source'
-  parameter 'vertex'
-  parameter 'unsafe_met'
-  parameter 'po_trans'
-  parameter 'same_var_pair'
-  parameter 'lwfence_met'
-  parameter 'has_to_be_unsafe'
-  parameter 'var_to_avoid'
-  parameter 'model'
-/cbmc/src/goto-instrument/wmm/goto2graph.h:260: warning: The following parameters of instrumentert::cfg_visitort::visit_cfg_function(value_setst &value_sets, memory_modelt model, bool no_dependencies, loop_strategyt duplicate_body, const irep_idt &function, std::set< nodet > &ending_vertex) are not documented:
-  parameter 'model'
-  parameter 'no_dependencies'
-  parameter 'duplicate_body'

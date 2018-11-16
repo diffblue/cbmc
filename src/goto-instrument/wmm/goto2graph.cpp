@@ -145,14 +145,11 @@ unsigned instrumentert::goto2graph_cfg(
 }
 
 void instrumentert::cfg_visitort::visit_cfg_function(
-    /* value_sets and options */
     value_setst &value_sets,
     memory_modelt model,
     bool no_dependencies,
     loop_strategyt replicate_body,
-    /* function to analyse */
     const irep_idt &function,
-    /* outcoming edges */
     std::set<instrumentert::cfg_visitort::nodet> &ending_vertex)
 {
   /* flow: egraph */
