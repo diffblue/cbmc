@@ -85,7 +85,7 @@ jsont ai_baset::output_json(
 /// Output the domains for a single function as JSON
 /// \param ns: The namespace
 /// \param goto_program: The goto program
-/// \param identifier: the identifier used to find a symbol to identify the
+/// \param identifier: The identifier used to find a symbol to identify the
 ///   source language
 /// \return The JSON object
 jsont ai_baset::output_json(
@@ -144,7 +144,7 @@ xmlt ai_baset::output_xml(
 /// Output the domains for a single function as XML
 /// \param ns: The namespace
 /// \param goto_program: The goto program
-/// \param identifier: the identifier used to find a symbol to identify the
+/// \param identifier: The identifier used to find a symbol to identify the
 ///   source language
 /// \return The XML object
 xmlt ai_baset::output_xml(
@@ -341,7 +341,7 @@ bool ai_baset::do_function_call(
 
   if(!goto_function.body_available())
   {
-    // if we don't have a body, we just do an edge call -> return
+    // If we don't have a body, we just do an edge call -> return
     std::unique_ptr<statet> tmp_state(make_temporary_state(get_state(l_call)));
     tmp_state->transform(
       calling_function_identifier,

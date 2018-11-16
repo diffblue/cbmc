@@ -96,10 +96,10 @@ public:
   /// use \ref get_state or \ref find_state to access the actual underlying
   /// state.
   /// PRECONDITION(l is dereferenceable)
-  /// \param l: The location we want the domain before
-  /// \return The domain before `l`. We return a pointer to a copy as the method
-  ///   should be const and there are some non-trivial cases including merging
-  ///   domains, etc.
+  /// \param l: The location before which we want the abstract state
+  /// \return The abstract state before `l`. We return a pointer to a copy as
+  ///   the method should be const and there are some non-trivial cases
+  ///   including merging abstract states, etc.
   virtual std::unique_ptr<statet> abstract_state_before(locationt l) const = 0;
 
   /// Get a copy of the abstract state after the given instruction, without
@@ -107,10 +107,10 @@ public:
   /// for users of the abstract interpreter; derived classes should
   /// use \ref get_state or \ref find_state to access the actual underlying
   /// state.
-  /// \param l: The location we want the domain after
-  /// \return The domain after `l`. We return a pointer to a copy as the method
-  ///   should be const and there are some non-trivial cases including merging
-  ///   domains, etc.
+  /// \param l: The location before which we want the abstract state
+  /// \return The abstract state after `l`. We return a pointer to a copy as
+  ///   the method should be const and there are some non-trivial cases
+  ///   including merging abstract states, etc.
   virtual std::unique_ptr<statet> abstract_state_after(locationt l) const
   {
     /// PRECONDITION(l is dereferenceable && std::next(l) is dereferenceable)
@@ -119,18 +119,18 @@ public:
     return abstract_state_before(std::next(l));
   }
 
-  /// Reset the domain
+  /// Reset the abstract state
   virtual void clear()
   {
   }
 
-  /// Output the domains for a whole program
+  /// Output the abstract states for a whole program
   virtual void output(
     const namespacet &ns,
     const goto_functionst &goto_functions,
     std::ostream &out) const;
 
-  /// Output the domains for a whole program
+  /// Output the abstract states for a whole program
   void output(
     const goto_modelt &goto_model,
     std::ostream &out) const
@@ -139,7 +139,7 @@ public:
     output(ns, goto_model.goto_functions, out);
   }
 
-  /// Output the domains for a function
+  /// Output the abstract states for a function
   void output(
     const namespacet &ns,
     const goto_programt &goto_program,
@@ -148,7 +148,7 @@ public:
     output(ns, goto_program, "", out);
   }
 
-  /// Output the domains for a function
+  /// Output the abstract states for a function
   void output(
     const namespacet &ns,
     const goto_functionst::goto_functiont &goto_function,
@@ -157,12 +157,12 @@ public:
     output(ns, goto_function.body, "", out);
   }
 
-  /// Output the domains for the whole program as JSON
+  /// Output the abstract states for the whole program as JSON
   virtual jsont output_json(
     const namespacet &ns,
     const goto_functionst &goto_functions) const;
 
-  /// Output the domains for a whole program as JSON
+  /// Output the abstract states for a whole program as JSON
   jsont output_json(
     const goto_modelt &goto_model) const
   {
@@ -170,7 +170,7 @@ public:
     return output_json(ns, goto_model.goto_functions);
   }
 
-  /// Output the domains for a single function as JSON
+  /// Output the abstract states for a single function as JSON
   jsont output_json(
     const namespacet &ns,
     const goto_programt &goto_program) const
@@ -178,7 +178,7 @@ public:
     return output_json(ns, goto_program, "");
   }
 
-  /// Output the domains for a single function as JSON
+  /// Output the abstract states for a single function as JSON
   jsont output_json(
     const namespacet &ns,
     const goto_functionst::goto_functiont &goto_function) const
@@ -186,12 +186,12 @@ public:
     return output_json(ns, goto_function.body, "");
   }
 
-  /// Output the domains for the whole program as XML
+  /// Output the abstract states for the whole program as XML
   virtual xmlt output_xml(
     const namespacet &ns,
     const goto_functionst &goto_functions) const;
 
-  /// Output the domains for the whole program as XML
+  /// Output the abstract states for the whole program as XML
   xmlt output_xml(
     const goto_modelt &goto_model) const
   {
@@ -199,7 +199,7 @@ public:
     return output_xml(ns, goto_model.goto_functions);
   }
 
-  /// Output the domains for a single function as XML
+  /// Output the abstract states for a single function as XML
   xmlt output_xml(
     const namespacet &ns,
     const goto_programt &goto_program) const
@@ -207,7 +207,7 @@ public:
     return output_xml(ns, goto_program, "");
   }
 
-  /// Output the domains for a single function as XML
+  /// Output the abstract states for a single function as XML
   xmlt output_xml(
     const namespacet &ns,
     const goto_functionst::goto_functiont &goto_function) const
@@ -216,30 +216,33 @@ public:
   }
 
 protected:
-  /// Initialize all the domains for a single function. Override this to do
-  /// custom per-domain initialization.
+  /// Initialize all the abstract states for a single function. Override this to
+  /// do custom per-domain initialization.
   virtual void initialize(const goto_programt &goto_program);
 
-  /// Initialize all the domains for a single function.
+  /// Initialize all the abstract states for a single function.
   virtual void initialize(const goto_functionst::goto_functiont &goto_function);
 
-  /// Initialize all the domains for a whole program. Override this to do custom
-  /// per-analysis initialization.
+  /// Initialize all the abstract states for a whole program. Override this to
+  /// do custom per-analysis initialization.
   virtual void initialize(const goto_functionst &goto_functions);
 
-  /// Override this to add a cleanup step after fixedpoint has run
+  /// Override this to add a cleanup or post-processing step after fixedpoint
+  /// has run
   virtual void finalize();
 
-  /// Ensure the entry point to a single function has a reasonable state
-  void entry_state(const goto_programt &goto_functions);
+  /// Set the abstract state of the entry location of a single function to the
+  /// entry state required by the analysis
+  void entry_state(const goto_programt &goto_program);
 
-  /// Ensure the entry point to a whole program has a reasonable state
-  void entry_state(const goto_functionst &goto_program);
+  /// Set the abstract state of the entry location of a whole program to the
+  /// entry state required by the analysis
+  void entry_state(const goto_functionst &goto_functions);
 
-  /// Output the domains for a single function
+  /// Output the abstract states for a single function
   /// \param ns: The namespace
   /// \param goto_program: The goto program
-  /// \param identifier: the identifier used to find a symbol to identify the
+  /// \param identifier: The identifier used to find a symbol to identify the
   ///   source language
   /// \param out: The ostream to direct output to
   virtual void output(
@@ -248,10 +251,10 @@ protected:
     const irep_idt &identifier,
     std::ostream &out) const;
 
-  /// Output the domains for a single function as JSON
+  /// Output the abstract states for a single function as JSON
   /// \param ns: The namespace
   /// \param goto_program: The goto program
-  /// \param identifier: the identifier used to find a symbol to identify the
+  /// \param identifier: The identifier used to find a symbol to identify the
   ///   source language
   /// \return The JSON object
   virtual jsont output_json(
@@ -259,10 +262,10 @@ protected:
     const goto_programt &goto_program,
     const irep_idt &identifier) const;
 
-  /// Output the domains for a single function as XML
+  /// Output the abstract states for a single function as XML
   /// \param ns: The namespace
   /// \param goto_program: The goto program
-  /// \param identifier: the identifier used to find a symbol to identify the
+  /// \param identifier: The identifier used to find a symbol to identify the
   ///   source language
   /// \return The XML object
   virtual xmlt output_xml(
