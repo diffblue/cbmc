@@ -185,6 +185,7 @@ private:
   exprt::operandst process_parameters(
     const java_method_typet::parameterst &params,
     const source_locationt &loc,
+    const irep_idt &function_name,
     symbol_table_baset &symbol_table,
     code_blockt &init_code);
 
@@ -207,6 +208,7 @@ private:
   exprt::operandst process_operands(
     const exprt::operandst &operands,
     const source_locationt &loc,
+    const irep_idt &function_name,
     symbol_table_baset &symbol_table,
     code_blockt &init_code);
 

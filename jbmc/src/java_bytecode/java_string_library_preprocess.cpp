@@ -265,6 +265,7 @@ symbol_exprt java_string_library_preprocesst::fresh_array(
 /// calls string_refine_preprocesst::process_operands with a list of parameters.
 /// \param params: a list of function parameters
 /// \param loc: location in the source
+/// \param function_id: name of the function in which the code will be added
 /// \param symbol_table: symbol table
 /// \param init_code: code block, in which declaration of some arguments may be
 ///   added
@@ -272,13 +273,14 @@ symbol_exprt java_string_library_preprocesst::fresh_array(
 exprt::operandst java_string_library_preprocesst::process_parameters(
   const java_method_typet::parameterst &params,
   const source_locationt &loc,
+  const irep_idt &function_id,
   symbol_table_baset &symbol_table,
   code_blockt &init_code)
 {
   exprt::operandst ops;
   for(const auto &p : params)
     ops.emplace_back(symbol_exprt(p.get_identifier(), p.type()));
-  return process_operands(ops, loc, symbol_table, init_code);
+  return process_operands(ops, loc, function_id, symbol_table, init_code);
 }
 
 /// Creates a string_exprt from the input exprt representing a char sequence
@@ -319,6 +321,7 @@ java_string_library_preprocesst::convert_exprt_to_string_exprt(
 /// for char array references.
 /// \param operands: a list of expressions
 /// \param loc: location in the source
+/// \param function_id: name of the function in which the code will be added
 /// \param symbol_table: symbol table
 /// \param init_code: code block, in which declaration of some arguments may be
 ///   added
@@ -326,6 +329,7 @@ java_string_library_preprocesst::convert_exprt_to_string_exprt(
 exprt::operandst java_string_library_preprocesst::process_operands(
   const exprt::operandst &operands,
   const source_locationt &loc,
+  const irep_idt &function_id,
   symbol_table_baset &symbol_table,
   code_blockt &init_code)
 {
@@ -335,7 +339,7 @@ exprt::operandst java_string_library_preprocesst::process_operands(
     if(implements_java_char_sequence_pointer(p.type()))
       ops.push_back(
         convert_exprt_to_string_exprt(
-          p, loc, symbol_table, loc.get_function(), init_code));
+          p, loc, symbol_table, function_id, init_code));
     else if(is_java_char_array_pointer_type(p.type()))
       ops.push_back(replace_char_array(p, loc, symbol_table, init_code));
     else
@@ -1113,7 +1117,7 @@ code_blockt java_string_library_preprocesst::make_init_function_from_call(
 
   // Processing parameters
   const exprt::operandst args =
-    process_parameters(params, loc, symbol_table, code);
+    process_parameters(params, loc, function_id, symbol_table, code);
 
   // string_expr <- function(arg1)
   const refined_string_exprt string_expr =
@@ -1456,8 +1460,8 @@ code_blockt java_string_library_preprocesst::make_string_format_code(
 {
   PRECONDITION(type.parameters().size()==2);
   code_blockt code;
-  exprt::operandst args=process_parameters(
-    type.parameters(), loc, symbol_table, code);
+  exprt::operandst args =
+    process_parameters(type.parameters(), loc, function_id, symbol_table, code);
   INVARIANT(args.size()==2, "String.format should have two arguments");
 
   // The argument can be:
@@ -1597,7 +1601,7 @@ code_blockt java_string_library_preprocesst::make_function_from_call(
 {
   code_blockt code;
   const exprt::operandst args =
-    process_parameters(type.parameters(), loc, symbol_table, code);
+    process_parameters(type.parameters(), loc, function_id, symbol_table, code);
   code.add(
     code_return_function_application(
       function_id, args, type.return_type(), symbol_table),
@@ -1630,7 +1634,7 @@ java_string_library_preprocesst::make_string_returning_function_from_call(
 
   // Calling the function
   const exprt::operandst arguments =
-    process_parameters(type.parameters(), loc, symbol_table, code);
+    process_parameters(type.parameters(), loc, function_id, symbol_table, code);
 
   // String expression that will hold the result
   const refined_string_exprt string_expr =
