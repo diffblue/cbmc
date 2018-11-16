@@ -476,7 +476,7 @@ void initialize_nondet_string_fields(
     index_exprt(data_expr, from_integer(0, java_int_type())));
 
   add_pointer_to_array_association(
-    array_pointer, data_expr, symbol_table, loc, code);
+    array_pointer, data_expr, symbol_table, loc, function_id, code);
 
   add_array_to_length_association(
     data_expr, length_expr, symbol_table, loc, code);

@@ -354,6 +354,7 @@ void add_pointer_to_array_association(
   const exprt &array,
   symbol_table_baset &symbol_table,
   const source_locationt &loc,
+  const irep_idt &function_id,
   code_blockt &code);
 
 void add_array_to_length_association(

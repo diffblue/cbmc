@@ -478,7 +478,7 @@ refined_string_exprt java_string_library_preprocesst::replace_char_array(
     char_array, array_typet(java_char_type(), infinity_exprt(java_int_type())));
 
   add_pointer_to_array_association(
-    string_expr.content(), inf_array, symbol_table, loc, code);
+    string_expr.content(), inf_array, symbol_table, loc, function_id, code);
 
   return string_expr;
 }
@@ -564,7 +564,7 @@ refined_string_exprt java_string_library_preprocesst::make_nondet_string_expr(
     index_exprt(nondet_array_expr, from_integer(0, java_int_type())));
 
   add_pointer_to_array_association(
-    array_pointer, nondet_array_expr, symbol_table, loc, code);
+    array_pointer, nondet_array_expr, symbol_table, loc, function_id, code);
 
   add_array_to_length_association(
     nondet_array_expr, str.length(), symbol_table, loc, code);
@@ -677,12 +677,14 @@ exprt make_nondet_infinite_char_array(
 /// \param array: a character array expression
 /// \param symbol_table: the symbol table
 /// \param loc: source location
+/// \param function_id: name of the function in which the code will be added
 /// \param [out] code: code block to which declaration and calls get added
 void add_pointer_to_array_association(
   const exprt &pointer,
   const exprt &array,
   symbol_table_baset &symbol_table,
   const source_locationt &loc,
+  const irep_idt &function_id,
   code_blockt &code)
 {
   PRECONDITION(array.type().id() == ID_array);
