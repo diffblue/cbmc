@@ -229,8 +229,10 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
   }
   else if(cmdline.isset("intervals") || cmdline.isset("non-null"))
   {
-    // For backwards compatibility either of these on their own means show
-    options.set_option("show", true);
+    // Partial backwards compatability, just giving these domains without
+    // a task will work.  However it will use the general default of verify
+    // rather than their historical default of show.
+    options.set_option("verify", true);
     options.set_option("general-analysis", true);
   }
 
