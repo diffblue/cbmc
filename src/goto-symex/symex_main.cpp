@@ -144,7 +144,7 @@ void goto_symext::initialize_entry_point(
 
   state.dirty.populate_dirty_for_function(pc->function, entry_point_function);
 
-  symex_transition(state, state.source.pc);
+  symex_transition(state, state.source.pc, false);
 }
 
 void goto_symext::symex_threaded_step(
@@ -167,7 +167,7 @@ void goto_symext::symex_threaded_step(
     std::cout << "********* Now executing thread " << t << '\n';
 #endif
     state.switch_to_thread(t);
-    symex_transition(state, state.source.pc);
+    symex_transition(state, state.source.pc, false);
   }
 }
 
@@ -246,43 +246,6 @@ void goto_symext::resume_symex_from_saved_state(
       state,
       get_goto_function,
       new_symbol_table);
-}
-
-void goto_symext::symex_instruction_range(
-  statet &state,
-  const goto_functionst &goto_functions,
-  const irep_idt &function_identifier,
-  const goto_programt::const_targett first,
-  const goto_programt::const_targett limit)
-{
-  symex_instruction_range(
-    state,
-    get_function_from_goto_functions(goto_functions),
-    function_identifier,
-    first,
-    limit);
-}
-
-void goto_symext::symex_instruction_range(
-  statet &state,
-  const get_goto_functiont &get_goto_function,
-  const irep_idt &function_identifier,
-  const goto_programt::const_targett first,
-  const goto_programt::const_targett limit)
-{
-  initialize_entry_point(
-    state, get_goto_function, function_identifier, first, limit);
-  ns = namespacet(outer_symbol_table, state.symbol_table);
-  while(state.source.function != limit->function || state.source.pc != limit)
-    symex_threaded_step(state, get_goto_function);
-}
-
-void goto_symext::symex_from_entry_point_of(
-  const goto_functionst &goto_functions,
-  symbol_tablet &new_symbol_table)
-{
-  symex_from_entry_point_of(
-    get_function_from_goto_functions(goto_functions), new_symbol_table);
 }
 
 void goto_symext::symex_from_entry_point_of(

@@ -105,7 +105,7 @@ void symex_bmct::merge_goto(
     symex_coverage.covered(prev_pc, state.source.pc);
 }
 
-bool symex_bmct::get_unwind(
+bool symex_bmct::should_stop_unwind(
   const symex_targett::sourcet &source,
   const goto_symex_statet::call_stackt &context,
   unsigned unwind)

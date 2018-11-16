@@ -16,7 +16,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "value_sets.h"
 
-class guardt;
 class exprt;
 class symbolt;
 

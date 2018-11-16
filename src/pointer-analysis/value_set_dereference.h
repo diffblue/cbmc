@@ -21,7 +21,6 @@ Author: Daniel Kroening, kroening@kroening.com
 class symbol_tablet;
 class guardt;
 class optionst;
-class modet;
 class symbolt;
 
 /// Wrapper for a function dereferencing pointer expressions using a value set.

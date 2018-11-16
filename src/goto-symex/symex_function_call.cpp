@@ -27,7 +27,7 @@ bool goto_symext::get_unwind_recursion(
 }
 
 void goto_symext::parameter_assignments(
-  const irep_idt function_identifier,
+  const irep_idt &function_identifier,
   const goto_functionst::goto_functiont &goto_function,
   statet &state,
   const exprt::operandst &arguments)
@@ -311,7 +311,7 @@ void goto_symext::symex_function_call_code(
 
   state.source.is_set=true;
   state.source.function = identifier;
-  symex_transition(state, goto_function.body.instructions.begin());
+  symex_transition(state, goto_function.body.instructions.begin(), false);
 }
 
 /// pop one call frame
@@ -323,7 +323,7 @@ void goto_symext::pop_frame(statet &state)
     statet::framet &frame=state.top();
 
     // restore program counter
-    symex_transition(state, frame.calling_location.pc);
+    symex_transition(state, frame.calling_location.pc, false);
     state.source.function = frame.calling_location.function;
 
     // restore L1 renaming
@@ -368,7 +368,7 @@ void goto_symext::symex_end_of_function(statet &state)
 /// preserves locality of local variables of a given function by applying L1
 /// renaming to the local identifiers
 void goto_symext::locality(
-  const irep_idt function_identifier,
+  const irep_idt &function_identifier,
   statet &state,
   const goto_functionst::goto_functiont &goto_function)
 {

@@ -80,23 +80,11 @@ public:
   {
   }
 
-  virtual ~goto_symext()
-  {
-  }
+  virtual ~goto_symext() = default;
 
   typedef
     std::function<const goto_functionst::goto_functiont &(const irep_idt &)>
     get_goto_functiont;
-
-  /// \brief symex entire program starting from entry point
-  ///
-  /// The state that goto_symext maintains has a large memory footprint.
-  /// This method deallocates the state as soon as symbolic execution
-  /// has completed, so use it if you don't care about having the state
-  /// around afterwards.
-  virtual void symex_from_entry_point_of(
-    const goto_functionst &goto_functions,
-    symbol_tablet &new_symbol_table);
 
   /// \brief symex entire program starting from entry point
   ///
@@ -115,7 +103,7 @@ public:
   virtual void resume_symex_from_saved_state(
     const get_goto_functiont &get_goto_function,
     const statet &saved_state,
-    symex_target_equationt *const saved_equation,
+    symex_target_equationt *saved_equation,
     symbol_tablet &new_symbol_table);
 
   //// \brief symex entire program starting from entry point
@@ -141,38 +129,6 @@ public:
     statet &,
     const get_goto_functiont &,
     symbol_tablet &);
-
-  /// Symexes from the first instruction and the given state, terminating as
-  /// soon as the last instruction is reached.  This is useful to explicitly
-  /// symex certain ranges of a program, e.g. in an incremental decision
-  /// procedure.
-  /// \param state Symex state to start with.
-  /// \param goto_functions GOTO model to symex.
-  /// \param function_identifier The function with the instruction range
-  /// \param first Entry point in form of a first instruction.
-  /// \param limit Final instruction, which itself will not be symexed.
-  virtual void symex_instruction_range(
-    statet &,
-    const goto_functionst &,
-    const irep_idt &function_identifier,
-    goto_programt::const_targett first,
-    goto_programt::const_targett limit);
-
-  /// Symexes from the first instruction and the given state, terminating as
-  /// soon as the last instruction is reached.  This is useful to explicitly
-  /// symex certain ranges of a program, e.g. in an incremental decision
-  /// procedure.
-  /// \param state Symex state to start with.
-  /// \param get_goto_function retrieves a function body
-  /// \param function_identifier The function with the instruction range
-  /// \param first Entry point in form of a first instruction.
-  /// \param limit Final instruction, which itself will not be symexed.
-  virtual void symex_instruction_range(
-    statet &state,
-    const get_goto_functiont &get_goto_function,
-    const irep_idt &function_identifier,
-    goto_programt::const_targett first,
-    goto_programt::const_targett limit);
 
   /// \brief Have states been pushed onto the workqueue?
   ///
@@ -215,8 +171,6 @@ protected:
   const bool allow_pointer_unsoundness;
 
 public:
-  // these bypass the target maps
-  virtual void symex_step_goto(statet &, bool taken);
 
   /// language_mode: ID_java, ID_C or another language identifier
   /// if we know the source language in use, irep_idt() otherwise.
@@ -263,13 +217,9 @@ protected:
   void initialize_auto_object(const exprt &, statet &);
   void process_array_expr(exprt &);
   exprt make_auto_object(const typet &, statet &);
-  virtual void dereference(exprt &, statet &, const bool write);
+  virtual void dereference(exprt &, statet &, bool write);
 
-  void dereference_rec(
-    exprt &,
-    statet &,
-    guardt &,
-    const bool write);
+  void dereference_rec(exprt &, statet &, guardt &, bool write);
 
   void dereference_rec_address_of(
     exprt &,
@@ -292,13 +242,13 @@ protected:
   virtual void symex_transition(
     statet &,
     goto_programt::const_targett to,
-    bool is_backwards_goto=false);
+    bool is_backwards_goto);
 
   virtual void symex_transition(statet &state)
   {
     goto_programt::const_targett next=state.source.pc;
     ++next;
-    symex_transition(state, next);
+    symex_transition(state, next, false);
   }
 
   virtual void symex_goto(statet &);
@@ -334,7 +284,7 @@ protected:
 
   // determine whether to unwind a loop -- true indicates abort,
   // with false we continue.
-  virtual bool get_unwind(
+  virtual bool should_stop_unwind(
     const symex_targett::sourcet &source,
     const goto_symex_statet::call_stackt &context,
     unsigned unwind);
@@ -369,23 +319,19 @@ protected:
 
   virtual bool get_unwind_recursion(
     const irep_idt &identifier,
-    const unsigned thread_nr,
+    unsigned thread_nr,
     unsigned unwind);
 
   void parameter_assignments(
-    const irep_idt function_identifier,
+    const irep_idt &function_identifier,
     const goto_functionst::goto_functiont &,
     statet &,
     const exprt::operandst &arguments);
 
   void locality(
-    const irep_idt function_identifier,
+    const irep_idt &function_identifier,
     statet &,
     const goto_functionst::goto_functiont &);
-
-  void add_end_of_function(
-    exprt &code,
-    const irep_idt &identifier);
 
   nondet_symbol_exprt build_symex_nondet(typet &type);
 
@@ -471,7 +417,6 @@ protected:
   static unsigned nondet_count;
   static unsigned dynamic_counter;
 
-  void read(exprt &);
   void replace_nondet(exprt &);
   void rewrite_quantifiers(exprt &, statet &);
 

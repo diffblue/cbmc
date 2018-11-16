@@ -32,8 +32,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/simplify_expr.h>
 #include <util/ssa_expr.h>
 
-/// \return The compound for a member expression, the array for an index
-///   expression, `expr` otherwise.
 const exprt &value_set_dereferencet::get_symbol(const exprt &expr)
 {
   if(expr.id()==ID_member || expr.id()==ID_index)
