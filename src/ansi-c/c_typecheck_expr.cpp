@@ -24,6 +24,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_offset_size.h>
 #include <util/pointer_predicates.h>
 #include <util/prefix.h>
+#include <util/range.h>
 #include <util/simplify_expr.h>
 #include <util/string_constant.h>
 
@@ -288,8 +289,8 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
     // already fine, just set some type
     expr.type()=void_type();
   }
-  else if(expr.id()==ID_forall ||
-          expr.id()==ID_exists)
+  else if(
+    expr.id() == ID_forall || expr.id() == ID_exists || expr.id() == ID_lambda)
   {
     // These have two operands.
     // op0 is a tuple with declarations,
@@ -315,13 +316,24 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
       throw 0;
     }
 
-    expr.type() = bool_typet();
-
     // replace declarations by symbol expressions
     for(auto &binding : bindings)
       binding = to_code_decl(to_code(binding)).symbol();
 
-    implicit_typecast_bool(where);
+    if(expr.id() == ID_lambda)
+    {
+      mathematical_function_typet::domaint domain;
+
+      for(auto &binding : bindings)
+        domain.push_back(binding.type());
+
+      expr.type() = mathematical_function_typet(domain, where.type());
+    }
+    else
+    {
+      expr.type() = bool_typet();
+      implicit_typecast_bool(where);
+    }
   }
   else if(expr.id()==ID_label)
   {
@@ -720,7 +732,8 @@ void c_typecheck_baset::typecheck_expr_operands(exprt &expr)
   {
     typecheck_code(to_side_effect_expr_statement_expression(expr).statement());
   }
-  else if(expr.id()==ID_forall || expr.id()==ID_exists)
+  else if(
+    expr.id() == ID_forall || expr.id() == ID_exists || expr.id() == ID_lambda)
   {
     // These introduce new symbols, which need to be added to the symbol table
     // before the second operand is typechecked.
@@ -2009,6 +2022,41 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
   typecheck_expr(f_op);
 
   const typet f_op_type = f_op.type();
+
+  if(f_op_type.id() == ID_mathematical_function)
+  {
+    const auto &mathematical_function_type =
+      to_mathematical_function_type(f_op_type);
+
+    // check number of arguments
+    if(expr.arguments().size() != mathematical_function_type.domain().size())
+    {
+      error().source_location = f_op.source_location();
+      error() << "expected " << mathematical_function_type.domain().size()
+              << " arguments but got " << expr.arguments().size() << eom;
+      throw 0;
+    }
+
+    // check the types of the arguments
+    for(auto &p :
+        make_range(expr.arguments()).zip(mathematical_function_type.domain()))
+    {
+      if(p.first.type() != p.second)
+      {
+        error().source_location = p.first.source_location();
+        error() << "expected argument of type " << to_string(p.second)
+                << " but got " << to_string(p.first.type()) << eom;
+        throw 0;
+      }
+    }
+
+    function_application_exprt function_application(f_op, expr.arguments());
+
+    function_application.add_source_location() = expr.source_location();
+
+    expr.swap(function_application);
+    return;
+  }
 
   if(f_op_type.id()!=ID_pointer)
   {
