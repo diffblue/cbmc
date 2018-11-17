@@ -1,5 +1,5 @@
 CORE
 A.class
---function 'A.me2:()V' --java-threading --cp `../../../../scripts/format_classpath.sh . ../../../src/java_bytecode/library/core-models.jar`
+--function 'A.me2:()V' --java-threading --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
 ^SIGNAL=0$
 ^VERIFICATION FAILED$

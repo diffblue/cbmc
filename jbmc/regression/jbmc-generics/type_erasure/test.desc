@@ -1,6 +1,6 @@
 CORE
 TestClass.class
---function TestClass.testFunction --classpath `../../../../scripts/format_classpath.sh . ../../../src/java_bytecode/library/core-models.jar`
+--function TestClass.testFunction --classpath `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
 EXIT=0
 SIGNAL=0
 VERIFICATION SUCCESSFUL

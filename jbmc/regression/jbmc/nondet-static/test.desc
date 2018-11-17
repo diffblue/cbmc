@@ -1,6 +1,6 @@
 CORE symex-driven-lazy-loading-expected-failure
 My.class
---function "My.<init>" --nondet-static --cp `../../../../scripts/format_classpath.sh . ../../../src/java_bytecode/library/core-models.jar`
+--function "My.<init>" --nondet-static --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
 ^EXIT=10$
 ^SIGNAL=0$
 file My\.java line 104 function java::My\.\<init\>:\(I\)V.*FAILURE$

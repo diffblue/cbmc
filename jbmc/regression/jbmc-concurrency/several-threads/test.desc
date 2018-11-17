@@ -1,6 +1,6 @@
 CORE
 A.class
---function A.me --cp `../../../../scripts/format_classpath.sh . ../../../src/java_bytecode/library/core-models.jar` --java-threading
+--function A.me --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar` --java-threading
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL
