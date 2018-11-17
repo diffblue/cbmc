@@ -1,6 +1,6 @@
 CORE
 NondetEnumOpaqueReturn.class
---function NondetEnumOpaqueReturn.canChooseBlue --cp `../../../../scripts/format_classpath.sh . ../../../src/java_bytecode/library/core-models.jar`
+--function NondetEnumOpaqueReturn.canChooseBlue --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
 ^VERIFICATION FAILED$
 --
 --
