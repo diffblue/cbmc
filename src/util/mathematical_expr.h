@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file util/mathematical_expr.h
 /// API to expression classes for 'mathematical' expressions
 
+#include "mathematical_types.h"
 #include "std_expr.h"
 
 /// Transition system, consisting of state invariant, initial state predicate,
@@ -432,6 +433,87 @@ inline exists_exprt &to_exists_expr(exprt &expr)
   exists_exprt &ret = static_cast<exists_exprt &>(expr);
   validate_expr(static_cast<const quantifier_exprt &>(ret));
   return ret;
+}
+
+/// \brief A (mathematical) lambda expression (an "abstraction" in lambda
+/// calculus terminology)
+class lambda_exprt : public binary_exprt
+{
+public:
+  using variablest = std::vector<symbol_exprt>;
+
+  /// construct the lambda expression -- the type is derived from
+  /// the types of the variables and the expression
+  lambda_exprt(const variablest &_variables, exprt _where);
+
+  mathematical_function_typet &type()
+  {
+    return static_cast<mathematical_function_typet &>(binary_exprt::type());
+  }
+
+  const mathematical_function_typet &type() const
+  {
+    return static_cast<const mathematical_function_typet &>(
+      binary_exprt::type());
+  }
+
+  variablest &variables()
+  {
+    return (variablest &)static_cast<tuple_exprt &>(op0()).operands();
+  }
+
+  const variablest &variables() const
+  {
+    return (variablest &)static_cast<const tuple_exprt &>(op0()).operands();
+  }
+
+  exprt &where()
+  {
+    return op1();
+  }
+
+  const exprt &where() const
+  {
+    return op1();
+  }
+};
+
+/// \brief Cast an exprt to a \ref lambda_exprt
+///
+/// \a expr must be known to be \ref lambda_exprt.
+///
+/// \param expr: Source expression
+/// \return Object of type \ref lambda_exprt
+inline const lambda_exprt &to_lambda_expr(const exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_lambda);
+  DATA_INVARIANT(expr.operands().size() == 2, "lambda must have two operands");
+  DATA_INVARIANT(
+    expr.type().id() == ID_mathematical_function,
+    "lambda must have right type");
+  return static_cast<const lambda_exprt &>(expr);
+}
+
+/// \copydoc to_lambda_expr(const exprt &)
+inline lambda_exprt &to_lambda_expr(exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_lambda);
+  DATA_INVARIANT(expr.operands().size() == 2, "lambda must have two operands");
+  DATA_INVARIANT(
+    expr.type().id() == ID_mathematical_function,
+    "lambda must have right type");
+  return static_cast<lambda_exprt &>(expr);
+}
+
+template <>
+inline bool can_cast_expr<lambda_exprt>(const exprt &base)
+{
+  return base.id() == ID_lambda;
+}
+
+inline void validate_expr(const lambda_exprt &value)
+{
+  validate_operands(value, 2, "lambda must have two operands");
 }
 
 #endif // CPROVER_UTIL_MATHEMATICAL_EXPR_H

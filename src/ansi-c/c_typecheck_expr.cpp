@@ -287,8 +287,8 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
     // already fine, just set some type
     expr.type()=void_type();
   }
-  else if(expr.id()==ID_forall ||
-          expr.id()==ID_exists)
+  else if(
+    expr.id() == ID_forall || expr.id() == ID_exists || expr.id() == ID_lambda)
   {
     // These have two operands.
     // op0 is a tuple with declarations,
@@ -314,13 +314,20 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
       throw 0;
     }
 
-    expr.type() = bool_typet();
-
     // replace declarations by symbol expressions
     for(auto &binding : bindings)
       binding = to_code_decl(to_code(binding)).symbol();
 
-    implicit_typecast_bool(where);
+    if(expr.id() == ID_lambda)
+    {
+      expr.type() =
+        mathematical_function_typet({expr.op0().type()}, expr.op1().type());
+    }
+    else
+    {
+      expr.type() = bool_typet();
+      implicit_typecast_bool(expr.op1());
+    }
   }
   else if(expr.id()==ID_label)
   {
@@ -715,7 +722,8 @@ void c_typecheck_baset::typecheck_expr_operands(exprt &expr)
   {
     typecheck_code(to_side_effect_expr_statement_expression(expr).statement());
   }
-  else if(expr.id()==ID_forall || expr.id()==ID_exists)
+  else if(
+    expr.id() == ID_forall || expr.id() == ID_exists || expr.id() == ID_lambda)
   {
     // These introduce new symbols, which need to be added to the symbol table
     // before the second operand is typechecked.

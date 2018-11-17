@@ -189,6 +189,7 @@ extern char *yyansi_ctext;
 %token TOK_EXISTS      "exists"
 %token TOK_ACSL_FORALL "\\forall"
 %token TOK_ACSL_EXISTS "\\exists"
+%token TOK_ACSL_LAMBDA "\\lambda"
 %token TOK_ACSL_LET    "\\let"
 %token TOK_ARRAY_OF    "array_of"
 %token TOK_CPROVER_BITVECTOR "__CPROVER_bitvector"
