@@ -11,11 +11,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "smt2_parser.h"
 
+#include <util/message.h>
 #include <util/namespace.h>
-#include <util/symbol_table.h>
-#include <util/cout_message.h>
-#include <util/simplify_expr.h>
 #include <util/replace_symbol.h>
+#include <util/simplify_expr.h>
+#include <util/symbol_table.h>
 
 #include <solvers/sat/satcheck.h>
 #include <solvers/flattening/boolbv.h>
@@ -216,12 +216,39 @@ void smt2_solvert::command(const std::string &c)
   }
 }
 
+class smt2_message_handlert : public message_handlert
+{
+public:
+  void print(unsigned level, const std::string &message) override
+  {
+    message_handlert::print(level, message);
+
+    if(level < 4) // errors
+      std::cout << "(error \"" << message << "\")\n";
+    else
+      std::cout << "; " << message << '\n';
+  }
+
+  void print(unsigned level, const xmlt &xml) override
+  {
+  }
+
+  void print(unsigned level, const jsont &json) override
+  {
+  }
+
+  void flush(unsigned) override
+  {
+    std::cout << std::flush;
+  }
+};
+
 int solver(std::istream &in)
 {
   symbol_tablet symbol_table;
   namespacet ns(symbol_table);
 
-  console_message_handlert message_handler;
+  smt2_message_handlert message_handler;
   messaget message(message_handler);
 
   // this is our default verbosity

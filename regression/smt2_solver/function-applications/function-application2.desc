@@ -3,5 +3,5 @@ function-application2.smt2
 
 ^EXIT=134$
 ^SIGNAL=0$
-^line 5: type mismatch in function definition: expected `\(_ BitVec 16\)' but got `\(_ BitVec 8\)'$
+^\(error "line 5: type mismatch in function definition: expected `\(_ BitVec 16\)' but got `\(_ BitVec 8\)'"\)$
 --
