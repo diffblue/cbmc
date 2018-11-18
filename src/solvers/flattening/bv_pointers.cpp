@@ -269,6 +269,10 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
   {
     return SUB::convert_if(to_if_expr(expr));
   }
+  else if(expr.id()==ID_cond)
+  {
+    return SUB::convert_cond(to_cond_expr(expr));
+  }
   else if(expr.id()==ID_index)
   {
     return SUB::convert_index(to_index_expr(expr));
