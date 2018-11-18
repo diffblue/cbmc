@@ -42,12 +42,16 @@ definitions from the various .c files, just like a linker. But instead
 of producing a binary for execution, CBMC performs symbolic simulation
 on the program.
 
-As an example, consider the following simple program, named file1.c:
+As an example, consider the following simple program, named
+[file1.c](https://raw.githubusercontent.com/diffblue/cbmc/develop/doc/cprover-manual/file1.c):
 
 ```C
-int puts(const char *s) { }
+int puts(const char *s)
+{
+}
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{
   puts(argv[2]);
 }
 ```
@@ -63,7 +67,7 @@ cbmc file1.c --show-properties --bounds-check --pointer-check
 The two options `--bounds-check` and `--pointer-check` instruct CBMC to
 look for errors related to pointers and array bounds. CBMC will print
 the list of properties it checks. Note that it lists, among others, a
-property labelled with "object bounds in argv" together with the location
+property labelled with "pointer outside object bounds in argv" together with the location
 of the faulty array access. As you can see, CBMC largely determines the
 property it needs to check itself. This is realized by means of a
 preliminary static analysis, which relies on computing a fixed point on
@@ -106,7 +110,7 @@ property for the object bounds of `argv` does not hold, and will thus
 print a line as follows:
 
 ```plaintext
-[main.pointer_dereference.6] dereference failure: object bounds in argv[(signed long int)2]: FAILURE
+[main.pointer_dereference.6] dereference failure: pointer outside object bounds in argv[(signed long int)2]: FAILURE
 ```
 
 ### Counterexample Traces
@@ -160,20 +164,23 @@ When running the previous example, you will have noted that CBMC unwinds
 the `for` loop in the program. As CBMC performs Bounded Model Checking,
 all loops have to have a finite upper run-time bound in order to
 guarantee that all bugs are found. CBMC can optionally check that enough
-unwinding is performed. As an example, consider the program binsearch.c:
+unwinding is performed. As an example, consider the program
+[binsearch.c](https://raw.githubusercontent.com/diffblue/cbmc/develop/doc/cprover-manual/binsearch1.c):
 
 ```C
-int binsearch(int x) {
+int binsearch(int x)
+{
   int a[16];
-  signed low=0, high=16;
+  signed low = 0, high = 16;
 
-  while(low<high) {
-    signed middle=low+((high-low)>>1);
+  while(low < high)
+  {
+    signed middle = low + ((high - low) >> 1);
 
-    if(a[middle]<x)
-      high=middle;
-    else if(a[middle]>x)
-      low=middle+1;
+    if(a[middle] < x)
+      high = middle;
+    else if(a[middle] > x)
+      low = middle + 1;
     else // a[middle]==x
       return middle;
   }
@@ -202,40 +209,48 @@ obtained with the option `--property`.
 
 ### Unbounded Loops
 
-CBMC can also be used for programs with unbounded loops. In this case,
-CBMC is used for bug hunting only; CBMC does not attempt to find all
-bugs. The following program (lock-example.c) is an example of a program
-with a user-specified property:
+CBMC can also be used for programs with unbounded loops.  In this case, CBMC
+is used for bug hunting only; CBMC does not attempt to find all bugs.  The
+following program
+([lock-example.c](https://raw.githubusercontent.com/diffblue/cbmc/develop/doc/cprover-manual/lock-example.c))
+is an example of a program with a user-specified property:
 
 ```C
 _Bool nondet_bool();
 _Bool LOCK = 0;
 
-_Bool lock() {
-  if(nondet_bool()) {
+_Bool lock()
+{
+  if(nondet_bool())
+  {
     assert(!LOCK);
-    LOCK=1;
-    return 1; }
+    LOCK = 1;
+    return 1;
+  }
 
   return 0;
 }
 
-void unlock() {
+void unlock()
+{
   assert(LOCK);
-  LOCK=0;
+  LOCK = 0;
 }
 
-int main() {
+int main()
+{
   unsigned got_lock = 0;
   int times;
 
-  while(times > 0) {
-    if(lock()) {
+  while(times > 0)
+  {
+    if(lock())
+    {
       got_lock++;
       /* critical section */
     }
 
-    if(got_lock!=0)
+    if(got_lock != 0)
       unlock();
 
     got_lock--;

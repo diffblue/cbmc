@@ -14,8 +14,7 @@ and an a set of header files.
 
 2.  **Windows:** The Windows version of CBMC requires the preprocessor
     `cl.exe`, which is part of Microsoft Visual Studio. We recommend the
-    free [Visual Studio Community
-    2013](http://www.visualstudio.com/en-us/products/visual-studio-community-vs).
+    free [Visual Studio Community](http://www.visualstudio.com/en-us/products/visual-studio-community-vs).
 
 3.  **MacOS:** Install the [XCode Command Line
     Utilities](http://developer.apple.com/technologies/xcode.html) prior
@@ -27,10 +26,11 @@ and the directories that contain the header files. You must run CBMC
 from within the *Visual Studio Command Prompt*.
 
 Note that the distribution files for the [Eclipse
-plugin](installation-plugin.shtml) include the CBMC executable.
-Therefore, if you intend to run CBMC exclusively within Eclipse, you can
-skip the installation of the CBMC executable. However, you still have to
-install the compiler environment as described above.
+plugin](http://www.cprover.org/eclipse-plugin/)
+include the CBMC executable.  Therefore, if you intend to run CBMC
+exclusively within Eclipse, you can skip the installation of the CBMC
+executable.  However, you still have to install the compiler environment as
+described above.
 
 ### Installing the CBMC Binaries
 
