@@ -18,9 +18,8 @@ Author: Daniel Kroening, kroening@kroening.com
 class smt2_parsert:public smt2_tokenizert
 {
 public:
-  explicit smt2_parsert(std::istream &_in):
-    smt2_tokenizert(_in),
-    exit(false)
+  explicit smt2_parsert(std::istream &_in)
+    : smt2_tokenizert(_in), exit(false), parenthesis_level(0)
   {
   }
 
@@ -43,8 +42,16 @@ public:
   using id_mapt=std::map<irep_idt, idt>;
   id_mapt id_map;
 
+  /// This skips tokens until all bracketed expressions are closed
+  void skip_to_end_of_list();
+
 protected:
   bool exit;
+
+  // we override next_token to track the parenthesis level
+  std::size_t parenthesis_level;
+  tokent next_token() override;
+
   void command_sequence();
 
   virtual void command(const std::string &);

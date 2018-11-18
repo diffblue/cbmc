@@ -12,6 +12,25 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/arith_tools.h>
 
+smt2_parsert::tokent smt2_parsert::next_token()
+{
+  const auto token = smt2_tokenizert::next_token();
+
+  if(token == OPEN)
+    parenthesis_level++;
+  else if(token == CLOSE)
+    parenthesis_level--;
+
+  return token;
+}
+
+void smt2_parsert::skip_to_end_of_list()
+{
+  while(parenthesis_level > 0)
+    if(next_token() == END_OF_FILE)
+      return;
+}
+
 void smt2_parsert::command_sequence()
 {
   exit=false;

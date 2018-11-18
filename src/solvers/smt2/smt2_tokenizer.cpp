@@ -198,8 +198,15 @@ smt2_tokenizert::tokent smt2_tokenizert::get_string_literal()
 smt2_tokenizert::tokent smt2_tokenizert::next_token()
 {
   if(peeked)
-    return peeked=false, token;
+    peeked = false;
+  else
+    get_token_from_stream();
 
+  return token;
+}
+
+void smt2_tokenizert::get_token_from_stream()
+{
   char ch;
 
   while(in->get(ch))
@@ -231,38 +238,51 @@ smt2_tokenizert::tokent smt2_tokenizert::next_token()
 
     case '(':
       // produce sub-expression
-      return token=OPEN;
+      token = OPEN;
+      return;
 
     case ')':
       // done with sub-expression
-      return token=CLOSE;
+      token = CLOSE;
+      return;
 
     case '|': // quoted symbol
-      return token=get_quoted_symbol();
+      token = get_quoted_symbol();
+      return;
 
     case '"': // string literal
-      return token=get_string_literal();
+      token = get_string_literal();
+      return;
 
     case ':': // keyword
-      return token=get_simple_symbol();
+      token = get_simple_symbol();
+      return;
 
     case '#':
       if(in->get(ch))
       {
         if(ch=='b')
-          return token=get_bin_numeral();
+        {
+          token = get_bin_numeral();
+          return;
+        }
         else if(ch=='x')
-          return token=get_hex_numeral();
+        {
+          token = get_hex_numeral();
+          return;
+        }
         else
         {
           error() << "unknown numeral token" << eom;
-          return token=ERROR;
+          token=ERROR;
+          return;
         }
       }
       else
       {
         error() << "unexpected EOF in numeral token" << eom;
-        return token=ERROR;
+        token=ERROR;
+        return;
       }
       break;
 
@@ -270,21 +290,24 @@ smt2_tokenizert::tokent smt2_tokenizert::next_token()
       if(isdigit(ch))
       {
         in->unget();
-        return token=get_decimal_numeral();
+        token = get_decimal_numeral();
+        return;
       }
       else if(is_simple_symbol_character(ch))
       {
         in->unget();
-        return token=get_simple_symbol();
+        token = get_simple_symbol();
+        return;
       }
       else
       {
         // illegal character, error
         error() << "unexpected character `" << ch << '\'' << eom;
-        return token=ERROR;
+        token=ERROR;
+        return;
       }
     }
   }
 
-  return token=END_OF_FILE;
+  token = END_OF_FILE;
 }
