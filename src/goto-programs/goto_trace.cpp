@@ -504,6 +504,12 @@ void show_full_goto_trace(
 
   for(const auto &step : goto_trace.steps)
   {
+    // update function depth, including for hidden calls and returns
+    if(step.is_function_call())
+      function_depth++;
+    else if(step.is_function_return())
+      function_depth--;
+
     // hide the hidden ones
     if(step.hidden)
       continue;
@@ -643,7 +649,6 @@ void show_full_goto_trace(
       break;
 
     case goto_trace_stept::typet::FUNCTION_CALL:
-      function_depth++;
       if(options.show_function_calls)
       {
         out << "\n#### Function call: " << step.called_function;
@@ -665,7 +670,6 @@ void show_full_goto_trace(
       break;
 
     case goto_trace_stept::typet::FUNCTION_RETURN:
-      function_depth--;
       if(options.show_function_calls)
       {
         out << "\n#### Function return from " << step.function_id << " (depth "
