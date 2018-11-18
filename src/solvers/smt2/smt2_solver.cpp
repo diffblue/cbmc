@@ -127,11 +127,10 @@ void smt2_solvert::expand_function_applications(exprt &expr)
 
 void smt2_solvert::command(const std::string &c)
 {
-  try
   {
-    if(c=="assert")
+    if(c == "assert")
     {
-      exprt e=expression();
+      exprt e = expression();
       if(e.is_not_nil())
       {
         expand_function_applications(e);
@@ -139,7 +138,7 @@ void smt2_solvert::command(const std::string &c)
         solver.set_to_true(e);
       }
     }
-    else if(c=="check-sat")
+    else if(c == "check-sat")
     {
       switch(solver())
       {
@@ -158,14 +157,14 @@ void smt2_solvert::command(const std::string &c)
         status = NOT_SOLVED;
       }
     }
-    else if(c=="check-sat-assuming")
+    else if(c == "check-sat-assuming")
     {
-      std::cout << "not yet implemented\n";
+      throw error("not yet implemented");
     }
-    else if(c=="display")
+    else if(c == "display")
     {
       // this is a command that Z3 appears to implement
-      exprt e=expression();
+      exprt e = expression();
       if(e.is_not_nil())
         std::cout << smt2_format(e) << '\n';
     }
@@ -174,16 +173,16 @@ void smt2_solvert::command(const std::string &c)
       std::vector<exprt> ops;
 
       if(next_token() != OPEN)
-        throw "get-value expects list as argument";
+        throw error("get-value expects list as argument");
 
       while(peek() != CLOSE && peek() != END_OF_FILE)
         ops.push_back(expression()); // any term
 
       if(next_token() != CLOSE)
-        throw "get-value expects ')' at end of list";
+        throw error("get-value expects ')' at end of list");
 
       if(status != SAT)
-        throw "model is not available";
+        throw error("model is not available");
 
       std::vector<exprt> values;
       values.reserve(ops.size());
@@ -191,14 +190,14 @@ void smt2_solvert::command(const std::string &c)
       for(const auto &op : ops)
       {
         if(op.id() != ID_symbol)
-          throw "get-value expects symbol";
+          throw error("get-value expects symbol");
 
         const auto &identifier = to_symbol_expr(op).get_identifier();
 
         const auto id_map_it = id_map.find(identifier);
 
         if(id_map_it == id_map.end())
-          throw "unexpected symbol " + id2string(identifier);
+          throw error("unexpected symbol " + id2string(identifier));
 
         exprt value;
 
@@ -208,7 +207,7 @@ void smt2_solvert::command(const std::string &c)
           value = solver.get(id_map_it->second.definition);
 
         if(value.is_nil())
-          throw "no value for " + id2string(identifier);
+          throw error("no value for " + id2string(identifier));
 
         values.push_back(value);
       }
@@ -226,19 +225,19 @@ void smt2_solvert::command(const std::string &c)
 
       std::cout << ")\n";
     }
-    else if(c=="simplify")
+    else if(c == "simplify")
     {
       // this is a command that Z3 appears to implement
-      exprt e=expression();
+      exprt e = expression();
       if(e.is_not_nil())
       {
         const symbol_tablet symbol_table;
         const namespacet ns(symbol_table);
-        exprt e_simplified=simplify_expr(e, ns);
+        exprt e_simplified = simplify_expr(e, ns);
         std::cout << smt2_format(e) << '\n';
       }
     }
-    #if 0
+#if 0
     // TODO:
     | ( declare-const hsymboli hsorti )
     | ( declare-datatype hsymboli hdatatype_deci)
@@ -265,17 +264,9 @@ void smt2_solvert::command(const std::string &c)
     | ( reset-assertions )
     | ( set-info hattributei )
     | ( set-option hoptioni )
-    #endif  
+#endif
     else
       smt2_parsert::command(c);
-  }
-  catch(const char *error)
-  {
-    std::cout << "error: " << error << '\n';
-  }
-  catch(const std::string &error)
-  {
-    std::cout << "error: " << error << '\n';
   }
 }
 
@@ -324,10 +315,25 @@ int solver(std::istream &in)
 
   smt2_solvert smt2_solver(in, boolbv);
   smt2_solver.set_message_handler(message_handler);
+  bool error_found = false;
 
-  smt2_solver.parse();
+  while(!smt2_solver.exit)
+  {
+    try
+    {
+      smt2_solver.parse();
+    }
+    catch(const smt2_solvert::smt2_errort &error)
+    {
+      smt2_solver.skip_to_end_of_list();
+      error_found = true;
+      messaget message(message_handler);
+      message.error().source_location.set_line(error.get_line_no());
+      message.error() << error.what() << messaget::eom;
+    }
+  }
 
-  if(!smt2_solver)
+  if(error_found)
     return 20;
   else
     return 0;

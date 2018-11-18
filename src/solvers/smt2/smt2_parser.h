@@ -26,7 +26,7 @@ public:
   bool parse() override
   {
     command_sequence();
-    return !ok;
+    return false;
   }
 
   struct idt
@@ -42,12 +42,12 @@ public:
   using id_mapt=std::map<irep_idt, idt>;
   id_mapt id_map;
 
+  bool exit;
+
   /// This skips tokens until all bracketed expressions are closed
   void skip_to_end_of_list();
 
 protected:
-  bool exit;
-
   // we override next_token to track the parenthesis level
   std::size_t parenthesis_level;
   tokent next_token() override;

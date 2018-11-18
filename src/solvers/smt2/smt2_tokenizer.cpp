@@ -159,8 +159,7 @@ smt2_tokenizert::tokent smt2_tokenizert::get_quoted_symbol()
   }
 
   // Hmpf. Eof before end of quoted symbol. This is an error.
-  error() << "EOF within quoted symbol" << eom;
-  return ERROR;
+  throw error("EOF within quoted symbol");
 }
 
 smt2_tokenizert::tokent smt2_tokenizert::get_string_literal()
@@ -191,8 +190,7 @@ smt2_tokenizert::tokent smt2_tokenizert::get_string_literal()
   }
 
   // Hmpf. Eof before end of string literal. This is an error.
-  error() << "EOF within string literal" << eom;
-  return ERROR;
+  throw error("EOF within string literal");
 }
 
 smt2_tokenizert::tokent smt2_tokenizert::next_token()
@@ -272,18 +270,10 @@ void smt2_tokenizert::get_token_from_stream()
           return;
         }
         else
-        {
-          error() << "unknown numeral token" << eom;
-          token=ERROR;
-          return;
-        }
+          throw error("unknown numeral token");
       }
       else
-      {
-        error() << "unexpected EOF in numeral token" << eom;
-        token=ERROR;
-        return;
-      }
+        throw error("unexpected EOF in numeral token");
       break;
 
     default: // likely a simple symbol or a numeral
@@ -302,9 +292,9 @@ void smt2_tokenizert::get_token_from_stream()
       else
       {
         // illegal character, error
-        error() << "unexpected character `" << ch << '\'' << eom;
-        token=ERROR;
-        return;
+        std::ostringstream msg;
+        msg << "unexpected character `" << ch << '\'';
+        throw error(msg.str());
       }
     }
   }
