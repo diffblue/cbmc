@@ -147,6 +147,7 @@ class optionst;
   "(constants)" \
   "(dependence-graph)" \
   "(show)(verify)(simplify):" \
+  "(show-on-source)" \
   "(location-sensitive)(concurrent)" \
   "(no-simplify-slicing)" \
   OPT_VALIDATE \

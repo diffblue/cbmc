@@ -57,11 +57,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/unicode.h>
 #include <util/version.h>
 
-#include "taint_analysis.h"
-#include "unreachable_instructions.h"
+#include "show_on_source.h"
 #include "static_show_domain.h"
 #include "static_simplifier.h"
 #include "static_verifier.h"
+#include "taint_analysis.h"
+#include "unreachable_instructions.h"
 
 goto_analyzer_parse_optionst::goto_analyzer_parse_optionst(
   int argc,
@@ -189,6 +190,11 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
   if(cmdline.isset("show"))
   {
     options.set_option("show", true);
+    options.set_option("general-analysis", true);
+  }
+  else if(cmdline.isset("show-on-source"))
+  {
+    options.set_option("show-on-source", true);
     options.set_option("general-analysis", true);
   }
   else if(cmdline.isset("verify"))
@@ -634,6 +640,11 @@ int goto_analyzer_parse_optionst::perform_analysis(const optionst &options)
       static_show_domain(goto_model, *analyzer, options, out);
       return CPROVER_EXIT_SUCCESS;
     }
+    else if(options.get_bool_option("show-on-source"))
+    {
+      show_on_source(goto_model, *analyzer, get_message_handler());
+      return CPROVER_EXIT_SUCCESS;
+    }
     else if(options.get_bool_option("verify"))
     {
       result = static_verifier(goto_model,
@@ -807,7 +818,8 @@ void goto_analyzer_parse_optionst::help()
     " goto-analyzer file.c ...     source file names\n"
     "\n"
     "Task options:\n"
-    " --show                       display the abstract domains\n"
+    " --show                       display the abstract states on the goto program\n" // NOLINT(*)
+    " --show-on-source             display the abstract states on the source\n"
     // NOLINTNEXTLINE(whitespace/line_length)
     " --verify                     use the abstract domains to check assertions\n"
     // NOLINTNEXTLINE(whitespace/line_length)
