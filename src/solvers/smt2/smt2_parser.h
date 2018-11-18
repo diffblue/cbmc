@@ -43,6 +43,15 @@ public:
   using id_mapt=std::map<irep_idt, idt>;
   id_mapt id_map;
 
+  struct smt2_format
+  {
+    explicit smt2_format(const typet &_type) : type(_type)
+    {
+    }
+
+    const typet type;
+  };
+
 protected:
   bool exit;
   void command_sequence();
@@ -81,5 +90,7 @@ protected:
   /// Apply typecast to unsignedbv to given expression
   exprt cast_bv_to_unsigned(const exprt &);
 };
+
+std::ostream &operator<<(std::ostream &, const smt2_parsert::smt2_format &);
 
 #endif // CPROVER_SOLVERS_SMT2_SMT2_PARSER_H

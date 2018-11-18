@@ -10,6 +10,22 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/arith_tools.h>
 
+std::ostream &operator<<(std::ostream &out, const smt2_parsert::smt2_format &f)
+{
+  if(f.type.id() == ID_unsignedbv)
+    out << "(_ BitVec " << to_unsignedbv_type(f.type).get_width() << ')';
+  else if(f.type.id() == ID_bool)
+    out << "Bool";
+  else if(f.type.id() == ID_integer)
+    out << "Int";
+  else if(f.type.id() == ID_real)
+    out << "Real";
+  else
+    out << "? " << f.type.id();
+
+  return out;
+}
+
 void smt2_parsert::command_sequence()
 {
   exit=false;
@@ -360,8 +376,8 @@ exprt smt2_parsert::multi_ary(irep_idt id, const exprt::operandst &op)
       {
         error() << "expression must have operands with matching types,"
                    " but got `"
-                << op[0].type().pretty()
-                << "' and `" << op[i].type().pretty() << '\'' << eom;
+                << smt2_format(op[0].type()) << "' and `"
+                << smt2_format(op[i].type()) << '\'' << eom;
         return nil_exprt();
       }
     }
@@ -385,8 +401,8 @@ exprt smt2_parsert::binary_predicate(irep_idt id, const exprt::operandst &op)
     {
       error() << "expression must have operands with matching types,"
                  " but got `"
-              << op[0].type().pretty()
-              << "' and `" << op[1].type().pretty() << '\'' << eom;
+              << smt2_format(op[0].type()) << "' and `"
+              << smt2_format(op[1].type()) << '\'' << eom;
       return nil_exprt();
     }
 
@@ -1186,6 +1202,26 @@ void smt2_parsert::command(const std::string &c)
 
     auto signature=function_signature_definition();
     exprt body=expression();
+
+    // check type of body
+    if(signature.id() == ID_mathematical_function)
+    {
+      const auto &f_signature = to_mathematical_function_type(signature);
+      if(body.type() != f_signature.codomain())
+      {
+        error() << "type mismatch in function definition: expected `"
+                << smt2_format(f_signature.codomain()) << "' but got `"
+                << smt2_format(body.type()) << '\'' << eom;
+        return;
+      }
+    }
+    else if(body.type() != signature)
+    {
+      error() << "type mismatch in function definition: expected `"
+              << smt2_format(signature) << "' but got `"
+              << smt2_format(body.type()) << '\'' << eom;
+      return;
+    }
 
     // set up the entry
     auto &entry=id_map[id];
