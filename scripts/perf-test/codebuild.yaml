@@ -32,9 +32,14 @@ Resources:
                     Version: 2012-10-17
                     Statement:
                         - Action:
+                            - "s3:GetObject"
                             - "s3:PutObject"
                           Effect: Allow
                           Resource: !Join ["/", [!Sub "arn:aws:s3:::${S3Bucket}", "*"]]
+                        - Action:
+                            - "s3:ListBucket"
+                          Effect: Allow
+                          Resource: !Sub "arn:aws:s3:::${S3Bucket}"
                         - Action:
                             - "logs:CreateLogGroup"
                             - "logs:CreateLogStream"
@@ -65,16 +70,31 @@ Resources:
                                 - echo "deb http://ppa.launchpad.net/ubuntu-toolchain-r/test/ubuntu trusty main" > /etc/apt/sources.list.d/toolchain.list
                                 - apt-key adv --keyserver keyserver.ubuntu.com --recv-keys BA9EF27F
                                 - apt-get update -y
-                                - apt-get install -y libwww-perl g++-5 flex bison git openjdk-7-jdk
+                                - apt-get install -y libwww-perl g++-5 flex bison git openjdk-7-jdk ccache
                                 - update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 1
                                 - update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-5 1
+                                - |
+                                  cd /root/
+                                  aws s3 cp \
+                                  s3://${S3Bucket}/release-build-cache/ccache.zip \
+                                  ccache.zip && unzip ccache.zip || true
+                                  cd $CODEBUILD_SRC_DIR
                         build:
                             commands:
                                 - echo ${Repository} > COMMIT_INFO
                                 - git rev-parse --short HEAD >> COMMIT_INFO
                                 - git log HEAD^..HEAD >> COMMIT_INFO
                                 - make -C src minisat2-download glucose-download cadical-download
-                                - make -C src -j8
+                                - export CCACHE_NOHASHDIR=1 ; make -C src CXX="ccache g++" -j8
+                                - ccache -s
+                        post_build:
+                            commands:
+                                - |
+                                  cd /root/
+                                  zip -r ccache.zip .ccache
+                                  aws s3 cp ccache.zip \
+                                  s3://${S3Bucket}/release-build-cache/ccache.zip
+                                  cd $CODEBUILD_SRC_DIR
                     artifacts:
                         files:
                             - src/cbmc/cbmc
@@ -107,16 +127,31 @@ Resources:
                                 - echo "deb http://ppa.launchpad.net/ubuntu-toolchain-r/test/ubuntu trusty main" > /etc/apt/sources.list.d/toolchain.list
                                 - apt-key adv --keyserver keyserver.ubuntu.com --recv-keys BA9EF27F
                                 - apt-get update -y
-                                - apt-get install -y libwww-perl g++-5 flex bison git openjdk-7-jdk
+                                - apt-get install -y libwww-perl g++-5 flex bison git openjdk-7-jdk ccache
                                 - update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 1
                                 - update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-5 1
+                                - |
+                                  cd /root/
+                                  aws s3 cp \
+                                  s3://${S3Bucket}/profiling-build-cache/ccache.zip \
+                                  ccache.zip && unzip ccache.zip || true
+                                  cd $CODEBUILD_SRC_DIR
                         build:
                             commands:
                                 - echo ${Repository} > COMMIT_INFO
                                 - git rev-parse --short HEAD >> COMMIT_INFO
                                 - git log HEAD^..HEAD >> COMMIT_INFO
                                 - make -C src minisat2-download glucose-download cadical-download
-                                - make -C src -j8 CXXFLAGS="-O2 -pg -g -finline-limit=4" LINKFLAGS="-pg"
+                                - export CCACHE_NOHASHDIR=1 ; make -C src CXX="ccache g++" -j8 CXXFLAGS="-O2 -pg -g -finline-limit=4" LINKFLAGS="-pg"
+                                - ccache -s
+                        post_build:
+                            commands:
+                                - |
+                                  cd /root/
+                                  zip -r ccache.zip .ccache
+                                  aws s3 cp ccache.zip \
+                                  s3://${S3Bucket}/profiling-build-cache/ccache.zip
+                                  cd $CODEBUILD_SRC_DIR
                     artifacts:
                         files:
                             - src/cbmc/cbmc
