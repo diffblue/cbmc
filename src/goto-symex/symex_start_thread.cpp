@@ -52,8 +52,7 @@ void goto_symext::symex_start_thread(statet &state)
   // create a copy of the local variables for the new thread
   statet::framet &frame=state.top();
 
-  for(renaming_levelt::current_namest::const_iterator c_it =
-        state.level2.current_names.begin();
+  for(auto c_it = state.level2.current_names.begin();
       c_it != state.level2.current_names.end();
       ++c_it)
   {

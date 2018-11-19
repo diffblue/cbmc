@@ -48,7 +48,7 @@ void symex_level1t::operator()(ssa_exprt &ssa_expr)
 
   const irep_idt l0_name = ssa_expr.get_l1_object_identifier();
 
-  current_namest::const_iterator it = current_names.find(l0_name);
+  const auto it = current_names.find(l0_name);
   if(it == current_names.end())
     return;
 
