@@ -194,14 +194,8 @@ public:
     // loop and recursion unwinding
     struct loop_infot
     {
-      loop_infot():
-        count(0),
-        is_recursion(false)
-      {
-      }
-
-      unsigned count;
-      bool is_recursion;
+      unsigned count = 0;
+      bool is_recursion = false;
     };
     std::unordered_map<irep_idt, loop_infot> loop_iterations;
   };
