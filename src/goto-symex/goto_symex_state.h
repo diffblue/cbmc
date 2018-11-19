@@ -264,8 +264,7 @@ public:
     unsigned atomic_section_id = 0;
   };
 
-  typedef std::vector<threadt> threadst;
-  threadst threads;
+  std::vector<threadt> threads;
 
   bool l2_thread_read_encoding(ssa_exprt &expr, const namespacet &ns);
   bool l2_thread_write_encoding(const ssa_exprt &expr, const namespacet &ns);
