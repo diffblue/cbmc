@@ -178,6 +178,8 @@ rm pointer-to-array-function-parameters-multi-arg-right/test.desc
 rm pointer-to-array-function-parameters-multi-arg-wrong/test.desc
 rm pointer-to-array-function-parameters-with-size/test.desc
 rm pointer-to-array-function-parameters/test.desc
+rm pointer-to-char-array-function-parameters/test.desc
+rm pointer-to-string-function-parameters/test.desc
 rm read1/test.desc
 rm realloc1/test.desc
 rm realloc2/test.desc
