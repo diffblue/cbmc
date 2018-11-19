@@ -59,6 +59,11 @@ void c_object_factory_parameterst::set(const optionst &options)
   {
     max_dynamic_array_size =
       options.get_unsigned_int_option("max-dynamic-array-size");
+    if(max_dynamic_array_size == 0)
+    {
+      throw invalid_command_line_argument_exceptiont(
+        "Max dynamic array size must be >= 1", "--max-dynamic-array-size");
+    }
   }
   if(options.is_set("associated-array-sizes"))
   {
