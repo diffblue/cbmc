@@ -147,6 +147,18 @@ inline void *__builtin_alloca(__CPROVER_size_t alloca_size)
   return res;
 }
 
+/* FUNCTION: alloca */
+
+#undef alloca
+
+void *__builtin_alloca(__CPROVER_size_t alloca_size);
+
+inline void *alloca(__CPROVER_size_t alloca_size)
+{
+  __CPROVER_HIDE:;
+  return __builtin_alloca(alloca_size);
+}
+
 /* FUNCTION: free */
 
 #undef free
