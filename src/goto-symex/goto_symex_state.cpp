@@ -840,19 +840,3 @@ void goto_symex_statet::get_l1_name(exprt &expr) const
     Forall_operands(it, expr)
       get_l1_name(*it);
 }
-
-void goto_symex_statet::switch_to_thread(unsigned t)
-{
-  PRECONDITION(source.thread_nr < threads.size());
-  PRECONDITION(t < threads.size());
-
-  // save PC
-  threads[source.thread_nr].pc=source.pc;
-  threads[source.thread_nr].atomic_section_id=atomic_section_id;
-
-  // get new PC
-  source.thread_nr=t;
-  source.pc=threads[t].pc;
-
-  guard=threads[t].guard;
-}
