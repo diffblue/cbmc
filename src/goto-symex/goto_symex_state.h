@@ -255,9 +255,8 @@ public:
 
   unsigned total_vccs, remaining_vccs;
 
-  class threadt
+  struct threadt
   {
-  public:
     goto_programt::const_targett pc;
     guardt guard;
     call_stackt call_stack;
