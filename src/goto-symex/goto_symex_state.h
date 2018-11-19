@@ -173,9 +173,8 @@ public:
 
   // stack frames -- these are used for function calls and
   // for exceptions
-  class framet
+  struct framet
   {
-  public:
     // function calls
     irep_idt function_identifier;
     goto_state_mapt goto_state_map;
