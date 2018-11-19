@@ -18,8 +18,20 @@ Author: Daniel Kroening
 #include <util/ssa_expr.h>
 
 #include <langapi/language_util.h>
+#include <langapi/mode.h>
+
+#include <ansi-c/expr2c.h>
 
 #include "goto_program.h"
+
+static std::string
+expr_to_string(const namespacet &ns, const irep_idt &id, const exprt &expr)
+{
+  if(get_mode_from_identifier(ns, id) == ID_C)
+    return expr2c(expr, ns, expr2c_configurationt::clean_configuration);
+  else
+    return from_expr(ns, id, expr);
+}
 
 void graphml_witnesst::remove_l0_l1(exprt &expr)
 {
@@ -129,11 +141,11 @@ std::string graphml_witnesst::convert_assign_rec(
     exprt clean_rhs=assign.rhs();
     remove_l0_l1(clean_rhs);
 
-    std::string lhs=from_expr(ns, identifier, assign.lhs());
+    std::string lhs = expr_to_string(ns, identifier, assign.lhs());
     if(lhs.find('$')!=std::string::npos)
       lhs="\\result";
 
-    result=lhs+" = "+from_expr(ns, identifier, clean_rhs)+";";
+    result = lhs + " = " + expr_to_string(ns, identifier, clean_rhs) + ";";
   }
 
   return result;
@@ -286,8 +298,9 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
         {
           xmlt &val=edge.new_element("data");
           val.set_attribute("key", "assumption");
-          val.data = from_expr(ns, it->function_id, it->full_lhs) + " = " +
-                     from_expr(ns, it->function_id, it->full_lhs_value) + ";";
+          val.data = expr_to_string(ns, it->function_id, it->full_lhs) + " = " +
+                     expr_to_string(ns, it->function_id, it->full_lhs_value) +
+                     ";";
 
           xmlt &val_s=edge.new_element("data");
           val_s.set_attribute("key", "assumption.scope");
