@@ -486,6 +486,8 @@ symbol_factoryt::get_deferred_size(irep_idt symbol_name) const
 /// \param loc: The location to assign to generated code
 /// \param object_factory_parameters configuration parameters for the object
 ///   factory
+/// \param deferred_array_sizes A map of size parameter name -> symbol
+///        that holds the value the parameter should be assigned to
 /// \return Returns the symbol_exprt for the symbol created
 symbol_exprt c_nondet_symbol_factory(
   code_blockt &init_code,
