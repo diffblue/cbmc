@@ -67,20 +67,16 @@ void goto_symext::symex_atomic_end(statet &state)
       state.source);
   }
 
-  for(goto_symex_statet::written_in_atomic_sectiont::const_iterator
-      w_it=state.written_in_atomic_section.begin();
-      w_it!=state.written_in_atomic_section.end();
-      ++w_it)
+  for(const auto &pair : state.written_in_atomic_section)
   {
-    ssa_exprt w=w_it->first;
+    ssa_exprt w = pair.first;
     w.set_level_2(state.level2.current_count(w.get_identifier()));
 
     // guard is the disjunction over writes
-    PRECONDITION(!w_it->second.empty());
-    guardt write_guard(w_it->second.front());
-    for(std::list<guardt>::const_iterator
-        it=++(w_it->second.begin());
-        it!=w_it->second.end();
+    PRECONDITION(!pair.second.empty());
+    guardt write_guard(pair.second.front());
+    for(std::list<guardt>::const_iterator it = ++(pair.second.begin());
+        it != pair.second.end();
         ++it)
       write_guard|=*it;
     exprt write_guard_expr=write_guard.as_expr();
