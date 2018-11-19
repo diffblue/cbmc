@@ -187,8 +187,7 @@ public:
 
     symex_renaming_levelt::current_namest old_level1;
 
-    typedef std::set<irep_idt> local_objectst;
-    local_objectst local_objects;
+    std::set<irep_idt> local_objects;
 
     framet():
       return_value(nil_exprt()),
