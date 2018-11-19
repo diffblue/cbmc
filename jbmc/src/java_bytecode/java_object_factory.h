@@ -78,7 +78,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_code.h>
 #include <util/symbol_table.h>
 
-/// Selects the kind of allocation used by java_object_factory et al.
+/// Selects the kind of allocation used by the object factories
 enum class allocation_typet
 {
   /// Allocate global objects
