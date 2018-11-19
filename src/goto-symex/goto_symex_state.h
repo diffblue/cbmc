@@ -197,8 +197,7 @@ public:
     }
 
     // exceptions
-    typedef std::map<irep_idt, goto_programt::targett> catch_mapt;
-    catch_mapt catch_map;
+    std::map<irep_idt, goto_programt::targett> catch_map;
 
     // loop and recursion unwinding
     struct loop_infot
