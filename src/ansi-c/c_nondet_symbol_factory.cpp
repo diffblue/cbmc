@@ -547,7 +547,7 @@ void symbol_factoryt::gen_nondet_printable_char_init(
                        bool_typet{}),
                      binary_exprt(
                        char_selector_expr,
-                       ID_lt,
+                       ID_le,
                        from_integer(upper_bound, char_type()),
                        bool_typet{})};
   };
