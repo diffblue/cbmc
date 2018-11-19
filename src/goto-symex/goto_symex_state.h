@@ -181,18 +181,12 @@ public:
     symex_targett::sourcet calling_location;
 
     goto_programt::const_targett end_of_function;
-    exprt return_value;
-    bool hidden_function;
+    exprt return_value = nil_exprt();
+    bool hidden_function = false;
 
     symex_renaming_levelt::current_namest old_level1;
 
     std::set<irep_idt> local_objects;
-
-    framet():
-      return_value(nil_exprt()),
-      hidden_function(false)
-    {
-    }
 
     // exceptions
     std::map<irep_idt, goto_programt::targett> catch_map;
