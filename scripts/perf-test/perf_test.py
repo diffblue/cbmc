@@ -640,8 +640,8 @@ def main():
                         KeyName=args.ssh_key_name, PublicKeyMaterial=pk)
 
     # build a unique id for this performance test run
-    perf_test_id = str(datetime.datetime.utcnow().isoformat(
-        sep='-', timespec='seconds')) + '-' + args.commit_id
+    perf_test_id = str(datetime.datetime.utcnow().strftime(
+        '%Y-%m-%d-%H:%M:%S')) + '-' + args.commit_id
     perf_test_id = re.sub('[:/_\.\^~ ]', '-', perf_test_id)
     logger.info('global: Preparing performance test ' + perf_test_id)
 
