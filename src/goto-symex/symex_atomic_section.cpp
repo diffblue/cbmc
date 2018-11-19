@@ -45,20 +45,16 @@ void goto_symext::symex_atomic_end(statet &state)
   const unsigned atomic_section_id=state.atomic_section_id;
   state.atomic_section_id=0;
 
-  for(goto_symex_statet::read_in_atomic_sectiont::const_iterator
-      r_it=state.read_in_atomic_section.begin();
-      r_it!=state.read_in_atomic_section.end();
-      ++r_it)
+  for(const auto &pair : state.read_in_atomic_section)
   {
-    ssa_exprt r=r_it->first;
-    r.set_level_2(r_it->second.first);
+    ssa_exprt r = pair.first;
+    r.set_level_2(pair.second.first);
 
     // guard is the disjunction over reads
-    PRECONDITION(!r_it->second.second.empty());
-    guardt read_guard(r_it->second.second.front());
-    for(std::list<guardt>::const_iterator
-        it=++(r_it->second.second.begin());
-        it!=r_it->second.second.end();
+    PRECONDITION(!pair.second.second.empty());
+    guardt read_guard(pair.second.second.front());
+    for(std::list<guardt>::const_iterator it = ++(pair.second.second.begin());
+        it != pair.second.second.end();
         ++it)
       read_guard|=*it;
     exprt read_guard_expr=read_guard.as_expr();
