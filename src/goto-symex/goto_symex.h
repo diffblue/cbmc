@@ -38,6 +38,16 @@ class namespacet;
 class side_effect_exprt;
 class typecast_exprt;
 
+/// Functor generating fresh nondet symbols
+class symex_nondet_generatort
+{
+public:
+  nondet_symbol_exprt operator()(typet &type);
+
+private:
+  unsigned nondet_count = 0;
+};
+
 /// \brief The main class for the forward symbolic simulator
 ///
 /// Higher-level architectural information on symbolic execution is
@@ -238,19 +248,6 @@ protected:
 
   const irep_idt guard_identifier;
 
-  // symex
-  virtual void symex_transition(
-    statet &,
-    goto_programt::const_targett to,
-    bool is_backwards_goto);
-
-  virtual void symex_transition(statet &state)
-  {
-    goto_programt::const_targett next=state.source.pc;
-    ++next;
-    symex_transition(state, next, false);
-  }
-
   virtual void symex_goto(statet &);
   virtual void symex_start_thread(statet &);
   virtual void symex_atomic_begin(statet &);
@@ -333,8 +330,6 @@ protected:
     statet &,
     const goto_functionst::goto_functiont &);
 
-  nondet_symbol_exprt build_symex_nondet(typet &type);
-
   // exceptions
   void symex_throw(statet &);
   void symex_catch(statet &);
@@ -414,10 +409,9 @@ protected:
   virtual void symex_input(statet &, const codet &);
   virtual void symex_output(statet &, const codet &);
 
-  static unsigned nondet_count;
+  symex_nondet_generatort build_symex_nondet;
   static unsigned dynamic_counter;
 
-  void replace_nondet(exprt &);
   void rewrite_quantifiers(exprt &, statet &);
 
   path_storaget &path_storage;
@@ -464,5 +458,12 @@ public:
     return _remaining_vccs;
   }
 };
+
+void symex_transition(goto_symext::statet &state);
+
+void symex_transition(
+  goto_symext::statet &,
+  goto_programt::const_targett to,
+  bool is_backwards_goto);
 
 #endif // CPROVER_GOTO_SYMEX_GOTO_SYMEX_H

@@ -22,8 +22,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <analyses/dirty.h>
 
-void goto_symext::symex_transition(
-  statet &state,
+void symex_transition(
+  goto_symext::statet &state,
   goto_programt::const_targett to,
   bool is_backwards_goto)
 {
@@ -34,7 +34,7 @@ void goto_symext::symex_transition(
     // 1. the transition from state.source.pc to "to" is not a backwards goto
     // or
     // 2. we are arriving from an outer loop
-    statet::framet &frame=state.top();
+    goto_symext::statet::framet &frame = state.top();
     const goto_programt::instructiont &instruction=*to;
     for(const auto &i_e : instruction.incoming_edges)
       if(i_e->is_goto() && i_e->is_backwards_goto() &&
@@ -44,6 +44,13 @@ void goto_symext::symex_transition(
   }
 
   state.source.pc=to;
+}
+
+void symex_transition(goto_symext::statet &state)
+{
+  goto_programt::const_targett next = state.source.pc;
+  ++next;
+  symex_transition(state, next, false);
 }
 
 void goto_symext::vcc(
