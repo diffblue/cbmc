@@ -78,6 +78,18 @@ private:
     std::size_t depth,
     const recursion_sett &recursion_set);
 
+  void gen_nondet_string_init(
+    code_blockt &assignments,
+    const exprt &expr,
+    std::size_t depth,
+    const recursion_sett &recursion_set);
+
+  void gen_nondet_printable_char_init(
+    code_blockt &assignments,
+    const exprt &expr,
+    std::size_t depth,
+    const recursion_sett &recursion_set);
+
   /// Generate code to nondet-initialize each element of an array
   /// \param assignments: The code block the initialization statements
   ///                     are written to
@@ -113,6 +125,8 @@ private:
 
   /// Lookup symbol expression in symbol table and get its base name
   const irep_idt &get_symbol_base_name(const symbol_exprt &symbol_expr) const;
+
+  bool is_string_array(const exprt &expr) const;
 };
 
 /// Create a symbol for a pointer to point to
@@ -179,7 +193,9 @@ void symbol_factoryt::gen_nondet_init(
     {
       auto const &symbol_expr = to_symbol_expr(expr);
       const auto &symbol_name = get_symbol_base_name(symbol_expr);
-      if(object_factory_params.should_be_treated_as_array(symbol_name))
+      if(
+        object_factory_params.should_be_treated_as_array(symbol_name) ||
+        object_factory_params.should_be_treated_as_string(symbol_name))
       {
         gen_nondet_size_array_init(
           assignments, symbol_expr, depth, recursion_set);
@@ -317,6 +333,7 @@ void symbol_factoryt::gen_nondet_size_array_init(
   // This works on dynamic arrays, so the thing we assign to is a pointer
   // rather than an array with a fixed size
   PRECONDITION(array.type().id() == ID_pointer);
+  PRECONDITION(object_factory_params.max_dynamic_array_size >= 1);
   // Create code like this:
   // size_t cond;
   // size_t actual_size;
@@ -342,57 +359,32 @@ void symbol_factoryt::gen_nondet_size_array_init(
   auto const &size_symbol = new_tmp_symbol(size_type(), "size");
 
   auto const &element_type = array.type().subtype();
-  code_ifthenelset initialization_if_then_else;
-  auto *current_if_then_else = &initialization_if_then_else;
+  const bool is_string = is_string_array(array);
 
-  for(std::size_t i = 1; i < max_array_size; ++i)
-  {
-    auto const &array_size = from_integer(i, size_type());
-    auto array_type = array_typet{element_type, array_size};
-
-    auto &static_array = new_tmp_symbol(
-      array_type, id2string(array_name) + "_" + std::to_string(i));
-    static_array.is_static_lifetime = true;
-
-    const constant_exprt &size_expr = array_size;
-
-    current_if_then_else->cond() = binary_exprt(
-      size_cond_symbol.symbol_expr(), ID_lt, size_expr, bool_typet{});
-    code_blockt then_case;
-    then_case.add(code_assignt(size_symbol.symbol_expr(), size_expr));
-    gen_nondet_array_init(
-      then_case, static_array.symbol_expr(), depth, recursion_set);
-    then_case.add(code_assignt(
-      array,
-      address_of_exprt(
-        index_exprt(
-          static_array.symbol_expr(),
-          from_integer(0, size_type()),
-          array_type.subtype()),
-        pointer_type(array_type.subtype()))));
-    current_if_then_else->then_case() = then_case;
-    if(i + 1 < max_array_size)
-    {
-      current_if_then_else->else_case() = code_ifthenelset{};
-      current_if_then_else = reinterpret_cast<code_ifthenelset *>(
-        &current_if_then_else->else_case());
-    }
-    else
-    {
+  auto initialize_nth_array =
+    [&](std::size_t current_array_size, code_blockt &block) {
       // generate an else case instead of another if on the final case
-      auto const &array_size = from_integer(i + 1, size_type());
+      auto const &array_size = from_integer(current_array_size, size_type());
       auto array_type = array_typet{element_type, array_size};
 
       auto &static_array = new_tmp_symbol(
-        array_type, id2string(array_name) + "_" + std::to_string(i + 1));
+        array_type,
+        id2string(array_name) + "_" + std::to_string(current_array_size));
       static_array.is_static_lifetime = true;
 
       const constant_exprt &size_expr = array_size;
-      code_blockt else_case;
-      else_case.add(code_assignt(size_symbol.symbol_expr(), size_expr));
-      gen_nondet_array_init(
-        else_case, static_array.symbol_expr(), depth, recursion_set);
-      else_case.add(code_assignt(
+      block.add(code_assignt(size_symbol.symbol_expr(), size_expr));
+      if(is_string)
+      {
+        gen_nondet_string_init(
+          block, static_array.symbol_expr(), depth, recursion_set);
+      }
+      else
+      {
+        gen_nondet_array_init(
+          block, static_array.symbol_expr(), depth, recursion_set);
+      }
+      block.add(code_assignt(
         array,
         address_of_exprt(
           index_exprt(
@@ -400,10 +392,24 @@ void symbol_factoryt::gen_nondet_size_array_init(
             from_integer(0, size_type()),
             array_type.subtype()),
           pointer_type(array_type.subtype()))));
-      current_if_then_else->else_case() = else_case;
-    }
+    };
+
+  codet initialization = code_blockt();
+  initialize_nth_array(max_array_size, to_code_block(initialization));
+  for(std::size_t i = max_array_size - 1; i >= 1; --i)
+  {
+    code_ifthenelset if_then_else;
+    if_then_else.cond() = binary_exprt(
+      size_cond_symbol.symbol_expr(),
+      ID_lt,
+      from_integer(i, size_type()),
+      bool_typet());
+    if_then_else.then_case() = code_blockt();
+    initialize_nth_array(i, to_code_block(if_then_else.then_case()));
+    initialization.swap(if_then_else.else_case());
+    initialization = std::move(if_then_else);
   }
-  assignments.add(initialization_if_then_else);
+  assignments.add(initialization);
   auto const associated_size =
     object_factory_params.get_associated_size_variable(array_name);
   if(associated_size.has_value())
@@ -435,8 +441,10 @@ void symbol_factoryt::gen_nondet_array_init(
   auto const &array_type = to_array_type(expr.type());
   auto const array_size = numeric_cast_v<mp_integer>(array_type.size());
   DATA_INVARIANT(array_size >= 0, "Arrays should have non-negative size");
+
   for(auto index = mp_integer(0); index < array_size; ++index)
   {
+    // just initialise to some random value
     gen_nondet_init(
       assignments,
       index_exprt{expr, from_integer(index, size_type())},
@@ -474,6 +482,85 @@ optionalt<dstringt>
 symbol_factoryt::get_deferred_size(irep_idt symbol_name) const
 {
   return optional_lookup(deferred_array_sizes, symbol_name);
+}
+
+bool symbol_factoryt::is_string_array(const exprt &expr) const
+{
+  if(expr.id() != ID_symbol)
+  {
+    return false;
+  }
+  auto const &symbol_expr = to_symbol_expr(expr);
+  return object_factory_params.should_be_treated_as_string(
+    get_symbol_base_name(symbol_expr));
+}
+
+void symbol_factoryt::gen_nondet_string_init(
+  code_blockt &assignments,
+  const exprt &expr,
+  std::size_t depth,
+  const symbol_factoryt::recursion_sett &recursion_set)
+{
+  auto const &array_type = to_array_type(expr.type());
+  PRECONDITION(array_type.subtype() == char_type());
+  auto const array_size = numeric_cast_v<mp_integer>(array_type.size());
+  DATA_INVARIANT(array_size > 0, "Arrays should have positive size");
+  auto array_value_at = [&](mp_integer index) {
+    return index_exprt{expr, from_integer(index, size_type()), char_type()};
+  };
+  for(auto index = mp_integer(0); index < array_size - 1; ++index)
+  {
+    gen_nondet_printable_char_init(
+      assignments, array_value_at(index), depth, recursion_set);
+  }
+  // last char should be a 0 to terminate a C string
+  assignments.add(
+    code_assignt(array_value_at(array_size - 1), from_integer(0, char_type())));
+}
+
+void symbol_factoryt::gen_nondet_printable_char_init(
+  code_blockt &assignments,
+  const exprt &expr,
+  std::size_t depth,
+  const symbol_factoryt::recursion_sett &recursion_set)
+{
+  PRECONDITION(expr.type() == char_type());
+  // generate code like this:
+  // char c; //placeholder for result character
+  // char nondet_character;
+  // if(nondet_character >= '\t' && nondet_character <= '\n'
+  //   || nondet_character >= ' ' && nondet_character <= '~') {
+  //   c = nondet_character;
+  // } else {
+  //   c = '\r';
+  // }
+  auto const &char_selector =
+    new_tmp_symbol(char_type(), "nondet_char_selector");
+  auto const &char_selector_expr = char_selector.symbol_expr();
+  auto const set_to_selector = code_assignt{expr, char_selector_expr};
+
+  auto const make_range_condition = [&](char lower_bound, char upper_bound) {
+    return and_exprt{binary_exprt(
+                       char_selector_expr,
+                       ID_ge,
+                       from_integer(lower_bound, char_type()),
+                       bool_typet{}),
+                     binary_exprt(
+                       char_selector_expr,
+                       ID_lt,
+                       from_integer(upper_bound, char_type()),
+                       bool_typet{})};
+  };
+
+  auto const set_to_cr = code_assignt{expr, from_integer('\r', char_type())};
+
+  auto printable_char_if = code_ifthenelset{};
+  printable_char_if.cond() =
+    or_exprt{make_range_condition(' ', '~'), make_range_condition('\t', '\n')};
+  printable_char_if.then_case() = set_to_selector;
+  printable_char_if.else_case() = set_to_cr;
+
+  assignments.add(std::move(printable_char_if));
 }
 
 /// Creates a symbol and generates code so that it can vary over all possible

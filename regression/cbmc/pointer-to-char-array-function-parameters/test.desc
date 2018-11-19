@@ -1,0 +1,10 @@
+CORE
+test.c
+--function test --pointers-to-treat-as-array string --associated-array-sizes string:string_size --unwind 4
+^EXIT=10$
+^SIGNAL=0$
+VERIFICATION FAILED
+--
+--
+Identical to the pointers-to-treat-as-string test, but should fail because
+we say our "string" should be a normal character array rather than a string.

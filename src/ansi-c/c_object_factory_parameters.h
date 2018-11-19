@@ -27,6 +27,7 @@ struct c_object_factory_parameterst final : public object_factory_parameterst
   bool should_be_treated_as_array(irep_idt id) const;
   bool is_array_size_parameter(irep_idt id) const;
   optionalt<irep_idt> get_associated_size_variable(irep_idt array_id) const;
+  bool should_be_treated_as_string(irep_idt array_id) const;
 
   void set(const optionst &options) override;
 
@@ -36,6 +37,7 @@ private:
   std::set<irep_idt> pointers_to_treat_as_array;
   std::set<irep_idt> variables_that_hold_array_sizes;
   std::map<irep_idt, irep_idt> array_name_to_associated_array_size_variable;
+  std::set<irep_idt> pointers_to_treat_as_string;
 };
 
 /// Parse the c object factory parameters from a given command line

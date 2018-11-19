@@ -940,11 +940,15 @@ void cbmc_parse_optionst::help()
     "                              NULL in a recursively nondet initialized struct\n" /* NOLINT(*) */ \
     " --pointers-to-treat-as-array <identifier,...>  Comma separated list of\n" \
     "                               identifiers that should be initialized as arrays\n" /* NOLINT(*) */ \
+    " --pointers-to-treat-as-string <identifier,...> Comma separated list of\n" \
+    "                               identifiers that should be initialized as 0\n" \
+    "                               terminated strings\n" \
     " --associated-array-sizes <identifier:identifier...>\n"
     "                               comma separated list of colon separated pairs\n"
     "                               of identifiers; The first should be the name\n"
     "                               of an array pointer \n"
-    "                               (see --pointers-to-treat-as-array),\n"
+    "                               (see --pointers-to-treat-as-array or\n"
+    "                                --pointers-to-treat-as-string)\n,"
     "                               the second an integer parameter that\n"
     "                               should hold its size\n"
     " --max-dynamic-array-size <size>  max size for dynamically allocated arrays\n"

@@ -1,0 +1,6 @@
+CORE
+test.c
+--function test --pointers-to-treat-as-string string --associated-array-sizes string:string_size --unwind 4
+^EXIT=0$
+^SIGNAL=0$
+VERIFICATION SUCCESS
