@@ -59,7 +59,7 @@ struct symex_configt final
   bool simplify_opt;
   bool unwinding_assertions;
   bool partial_loops;
-  std::string debug_level;
+  mp_integer debug_level;
 
   explicit symex_configt(const optionst &options);
 };
