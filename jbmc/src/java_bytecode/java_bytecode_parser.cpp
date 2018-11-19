@@ -32,9 +32,10 @@ Author: Daniel Kroening, kroening@kroening.com
 class java_bytecode_parsert:public parsert
 {
 public:
-  java_bytecode_parsert()
+  explicit java_bytecode_parsert(bool skip_instructions)
+    : skip_instructions(skip_instructions)
   {
-    get_bytecodes();
+    populate_bytecode_mnemonics_table();
   }
 
   virtual bool parse();
@@ -78,6 +79,7 @@ protected:
   };
 
   std::vector<bytecodet> bytecodes;
+  const bool skip_instructions = false;
 
   pool_entryt &pool_entry(u2 index)
   {
@@ -101,8 +103,13 @@ protected:
     return java_type_from_string(id2string(pool_entry(index).s));
   }
 
-  void get_bytecodes()
+  void populate_bytecode_mnemonics_table()
   {
+    // This is only useful for rbytecodes, which in turn is only useful to
+    // parse method instructions.
+    if(skip_instructions)
+      return;
+
     // pre-hash the mnemonics, so we do this only once
     bytecodes.resize(256);
     for(const bytecode_infot *p=bytecode_info; p->mnemonic!=nullptr; p++)
@@ -951,6 +958,9 @@ void java_bytecode_parsert::rfields(classt &parsed_class)
 void java_bytecode_parsert::rbytecode(
   methodt::instructionst &instructions)
 {
+  INVARIANT(
+    bytecodes.size() == 256, "bytecode mnemonics should have been populated");
+
   u4 code_length=read_u4();
 
   u4 address;
@@ -1215,7 +1225,7 @@ void java_bytecode_parsert::rmethod_attribute(methodt &method)
 
   irep_idt attribute_name=pool_entry(attribute_name_index).s;
 
-  if(attribute_name=="Code")
+  if(attribute_name == "Code" && !skip_instructions)
   {
     UNUSED_u2(max_stack);
     UNUSED_u2(max_locals);
@@ -1861,9 +1871,12 @@ void java_bytecode_parsert::rmethod(classt &parsed_class)
 }
 
 optionalt<java_bytecode_parse_treet>
-java_bytecode_parse(std::istream &istream, message_handlert &message_handler)
+java_bytecode_parse(
+  std::istream &istream,
+  message_handlert &message_handler,
+  bool skip_instructions)
 {
-  java_bytecode_parsert java_bytecode_parser;
+  java_bytecode_parsert java_bytecode_parser(skip_instructions);
   java_bytecode_parser.in=&istream;
   java_bytecode_parser.set_message_handler(message_handler);
 
@@ -1878,7 +1891,10 @@ java_bytecode_parse(std::istream &istream, message_handlert &message_handler)
 }
 
 optionalt<java_bytecode_parse_treet>
-java_bytecode_parse(const std::string &file, message_handlert &message_handler)
+java_bytecode_parse(
+  const std::string &file,
+  message_handlert &message_handler,
+  bool skip_instructions)
 {
   std::ifstream in(file, std::ios::binary);
 
@@ -1890,7 +1906,7 @@ java_bytecode_parse(const std::string &file, message_handlert &message_handler)
     return {};
   }
 
-  return java_bytecode_parse(in, message_handler);
+  return java_bytecode_parse(in, message_handler, skip_instructions);
 }
 
 /// Parses the local variable type table of a method. The LVTT holds generic
