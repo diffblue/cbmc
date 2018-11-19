@@ -234,10 +234,9 @@ public:
   unsigned atomic_section_id;
   typedef std::pair<unsigned, std::list<guardt> > a_s_r_entryt;
   typedef std::list<guardt> a_s_w_entryt;
-  typedef std::unordered_map<ssa_exprt, a_s_w_entryt, irep_hash>
-    written_in_atomic_sectiont;
   std::unordered_map<ssa_exprt, a_s_r_entryt, irep_hash> read_in_atomic_section;
-  written_in_atomic_sectiont written_in_atomic_section;
+  std::unordered_map<ssa_exprt, a_s_w_entryt, irep_hash>
+    written_in_atomic_section;
 
   unsigned total_vccs, remaining_vccs;
 
