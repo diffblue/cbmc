@@ -211,8 +211,7 @@ public:
       unsigned count;
       bool is_recursion;
     };
-    typedef std::unordered_map<irep_idt, loop_infot> loop_iterationst;
-    loop_iterationst loop_iterations;
+    std::unordered_map<irep_idt, loop_infot> loop_iterations;
   };
 
   typedef std::vector<framet> call_stackt;
