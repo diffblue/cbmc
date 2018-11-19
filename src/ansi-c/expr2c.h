@@ -36,17 +36,22 @@ struct expr2c_configurationt final
   /// This is the string that will be printed for the false boolean expression
   std::string false_string;
 
+  /// This is the string that will be printed for null pointers
+  std::string null_pointer_string;
+
   expr2c_configurationt(
     const bool include_struct_padding_components,
     const bool print_struct_body_in_type,
     const bool include_array_size,
     std::string true_string,
-    std::string false_string)
+    std::string false_string,
+    const std::string &null_pointer_string)
     : include_struct_padding_components(include_struct_padding_components),
       print_struct_body_in_type(print_struct_body_in_type),
       include_array_size(include_array_size),
       true_string(std::move(true_string)),
-      false_string(std::move(false_string))
+      false_string(std::move(false_string)),
+      null_pointer_string(null_pointer_string)
   {
   }
 

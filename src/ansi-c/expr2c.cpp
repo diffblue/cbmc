@@ -39,7 +39,8 @@ expr2c_configurationt expr2c_configurationt::default_configuration
   true,
   true,
   "TRUE",
-  "FALSE"
+  "FALSE",
+  "NULL"
 };
 
 expr2c_configurationt expr2c_configurationt::clean_configuration
@@ -48,6 +49,7 @@ expr2c_configurationt expr2c_configurationt::clean_configuration
   false,
   false,
   "1",
+  "0",
   "0"
 };
 
@@ -1972,14 +1974,14 @@ std::string expr2ct::convert_constant(
   {
     if(value==ID_NULL)
     {
-      dest="0";
+      dest = configuration.null_pointer_string;
       if(type.subtype().id()!=ID_empty)
         dest="(("+convert(type)+")"+dest+")";
     }
     else if(value==std::string(value.size(), '0') &&
             config.ansi_c.NULL_is_zero)
     {
-      dest="0";
+      dest = configuration.null_pointer_string;
       if(type.subtype().id()!=ID_empty)
         dest="(("+convert(type)+")"+dest+")";
     }
