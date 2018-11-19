@@ -55,3 +55,21 @@ void symex_level1t::operator()(ssa_exprt &ssa_expr)
   // rename!
   ssa_expr.set_level_1(it->second.second);
 }
+
+void symex_level1t::restore_from(const renaming_levelt::current_namest &other)
+{
+  auto it = current_names.begin();
+  for(const auto &pair : other)
+  {
+    while(it != current_names.end() && it->first < pair.first)
+      ++it;
+    if(it == current_names.end() || pair.first < it->first)
+      current_names.insert(it, pair);
+    else if(it != current_names.end())
+    {
+      PRECONDITION(it->first == pair.first);
+      it->second = pair.second;
+      ++it;
+    }
+  }
+}

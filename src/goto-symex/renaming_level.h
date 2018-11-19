@@ -62,23 +62,7 @@ struct symex_level1t : public renaming_levelt
 {
   void operator()(ssa_exprt &ssa_expr);
 
-  void restore_from(const current_namest &other)
-  {
-    auto it = current_names.begin();
-    for(const auto &pair : other)
-    {
-      while(it != current_names.end() && it->first < pair.first)
-        ++it;
-      if(it == current_names.end() || pair.first < it->first)
-        current_names.insert(it, pair);
-      else if(it != current_names.end())
-      {
-        PRECONDITION(it->first == pair.first);
-        it->second = pair.second;
-        ++it;
-      }
-    }
-  }
+  void restore_from(const current_namest &other);
 
   symex_level1t() = default;
   ~symex_level1t() override = default;
