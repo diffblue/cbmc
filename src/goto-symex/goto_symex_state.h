@@ -280,7 +280,6 @@ public:
   /// \brief This state is saved, with the PC pointing to the next instruction
   /// of a GOTO
   bool has_saved_next_instruction;
-  bool saved_target_is_backwards;
 
 private:
   /// \brief Dangerous, do not use

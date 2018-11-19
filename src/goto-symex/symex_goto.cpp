@@ -184,7 +184,6 @@ void goto_symext::symex_goto(statet &state)
     path_storaget::patht next_instruction(target, state);
     next_instruction.state.saved_target = state_pc;
     next_instruction.state.has_saved_next_instruction = true;
-    next_instruction.state.saved_target_is_backwards = backward;
 
     path_storaget::patht jump_target(target, state);
     jump_target.state.saved_target = new_state_pc;
@@ -192,7 +191,6 @@ void goto_symext::symex_goto(statet &state)
     // `forward` tells us where the branch we're _currently_ executing is
     // pointing to; this needs to be inverted for the branch that we're saving,
     // so let its truth value for `backwards` be the same as ours for `forward`.
-    jump_target.state.saved_target_is_backwards = !backward;
 
     log.debug() << "Saving next instruction '"
                 << next_instruction.state.saved_target->source_location << "'"
