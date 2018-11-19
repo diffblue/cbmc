@@ -193,6 +193,15 @@ def prepare_sns_s3(session, email, bucket_name):
         logger.info('us-east-1: SNS topic artifact_uploaded set up')
 
     prepare_s3(session, bucket_name, artifact_uploaded_arn)
+    s3 = session.client('s3', region_name='us-east-1')
+    s3.upload_file(
+            Bucket=bucket_name,
+            Key='ec2-terminate.sh',
+            Filename=same_dir('ec2-terminate.sh'))
+    s3.upload_file(
+            Bucket=bucket_name,
+            Key='run-on-ec2.sh',
+            Filename=same_dir('run-on-ec2.sh'))
 
     return instance_terminated_arn
 
