@@ -261,12 +261,7 @@ public:
     guardt guard;
     call_stackt call_stack;
     std::map<irep_idt, unsigned> function_frame;
-    unsigned atomic_section_id;
-
-    threadt():
-      atomic_section_id(0)
-    {
-    }
+    unsigned atomic_section_id = 0;
   };
 
   typedef std::vector<threadt> threadst;
