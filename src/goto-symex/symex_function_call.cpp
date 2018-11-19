@@ -231,7 +231,7 @@ void goto_symext::symex_function_call_code(
   const bool stop_recursing=get_unwind_recursion(
     identifier,
     state.source.thread_nr,
-    state.top().loop_iterations[identifier].count);
+    top(state).loop_iterations[identifier].count);
 
   // see if it's too much
   if(stop_recursing)
@@ -282,8 +282,8 @@ void goto_symext::symex_function_call_code(
   }
 
   // produce a new frame
-  PRECONDITION(!state.call_stack().empty());
-  goto_symex_statet::framet &frame=state.new_frame();
+  PRECONDITION(!call_stack(state).empty());
+  goto_symex_statet::framet &frame=new_frame(state);
 
   // preserve locality of local variables
   locality(identifier, state, goto_function);
@@ -297,7 +297,7 @@ void goto_symext::symex_function_call_code(
   frame.function_identifier=identifier;
   frame.hidden_function=goto_function.is_hidden();
 
-  const goto_symex_statet::framet &p_frame=state.previous_frame();
+  const goto_symex_statet::framet &p_frame=new_frame(state);
   for(goto_symex_statet::framet::loop_iterationst::const_iterator
       it=p_frame.loop_iterations.begin();
       it!=p_frame.loop_iterations.end();
@@ -317,10 +317,10 @@ void goto_symext::symex_function_call_code(
 /// pop one call frame
 void goto_symext::pop_frame(statet &state)
 {
-  PRECONDITION(!state.call_stack().empty());
+  PRECONDITION(!call_stack(state).empty());
 
   {
-    statet::framet &frame=state.top();
+    statet::framet &frame=top(state);
 
     // restore program counter
     symex_transition(state, frame.calling_location.pc, false);
@@ -352,7 +352,7 @@ void goto_symext::pop_frame(statet &state)
     }
   }
 
-  state.pop_frame();
+  pop_frame(state);
 }
 
 /// do function call by inlining
@@ -380,7 +380,7 @@ void goto_symext::locality(
 
   get_local_identifiers(goto_function, local_identifiers);
 
-  statet::framet &frame=state.top();
+  statet::framet &frame=top(state);
 
   for(std::set<irep_idt>::const_iterator
       it=local_identifiers.begin();
@@ -426,7 +426,7 @@ void goto_symext::locality(
 
 void goto_symext::return_assignment(statet &state)
 {
-  statet::framet &frame=state.top();
+  statet::framet &frame=top(state);
 
   const goto_programt::instructiont &instruction=*state.source.pc;
   PRECONDITION(instruction.is_return());

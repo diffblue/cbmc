@@ -27,14 +27,14 @@ void symex_transition(
   goto_programt::const_targett to,
   bool is_backwards_goto)
 {
-  if(!state.call_stack().empty())
+  if(!call_stack(state).empty())
   {
     // initialize the loop counter of any loop we are newly entering
     // upon this transition; we are entering a loop if
     // 1. the transition from state.source.pc to "to" is not a backwards goto
     // or
     // 2. we are arriving from an outer loop
-    goto_symext::statet::framet &frame = state.top();
+    goto_symext::statet::framet &frame = top(state);
     const goto_programt::instructiont &instruction=*to;
     for(const auto &i_e : instruction.incoming_edges)
       if(i_e->is_goto() && i_e->is_backwards_goto() &&
@@ -133,10 +133,10 @@ void goto_symext::initialize_entry_point(
   const goto_programt::const_targett limit)
 {
   PRECONDITION(!state.threads.empty());
-  PRECONDITION(!state.call_stack().empty());
+  PRECONDITION(!call_stack(state).empty());
   state.source = symex_targett::sourcet(function_identifier, pc);
-  state.top().end_of_function=limit;
-  state.top().calling_location.pc=state.top().end_of_function;
+  top(state).end_of_function=limit;
+  top(state).calling_location.pc=top(state).end_of_function;
   state.symex_target=&target;
 
   INVARIANT(
@@ -166,7 +166,7 @@ void goto_symext::symex_threaded_step(
     return;
 
   // is there another thread to execute?
-  if(state.call_stack().empty() &&
+  if(call_stack(state).empty() &&
      state.source.thread_nr+1<state.threads.size())
   {
     unsigned t=state.source.thread_nr+1;
@@ -209,12 +209,12 @@ void goto_symext::symex_with_state(
   // goto-program.
   ns = namespacet(outer_symbol_table, state.symbol_table);
 
-  PRECONDITION(state.top().end_of_function->is_end_function());
+  PRECONDITION(top(state).end_of_function->is_end_function());
 
   symex_threaded_step(state, get_goto_function);
   if(should_pause_symex)
     return;
-  while(!state.call_stack().empty())
+  while(!call_stack(state).empty())
   {
     state.has_saved_jump_target = false;
     state.has_saved_next_instruction = false;
@@ -295,7 +295,7 @@ void goto_symext::symex_step(
   #endif
 
   PRECONDITION(!state.threads.empty());
-  PRECONDITION(!state.call_stack().empty());
+  PRECONDITION(!call_stack(state).empty());
 
   const goto_programt::instructiont &instruction=*state.source.pc;
 

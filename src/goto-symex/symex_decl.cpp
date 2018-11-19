@@ -81,7 +81,7 @@ void goto_symext::symex_decl(statet &state, const symbol_exprt &expr)
   // and if the statement itself is hidden
   bool hidden=
     ns.lookup(expr.get_identifier()).is_auxiliary ||
-    state.top().hidden_function ||
+    top(state).hidden_function ||
     state.source.pc->source_location.get_hide();
 
   target.decl(

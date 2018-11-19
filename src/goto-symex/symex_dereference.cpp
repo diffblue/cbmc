@@ -384,7 +384,7 @@ void goto_symext::dereference(
   // in order to distinguish addresses of local variables
   // from different frames. Would be enough to rename
   // symbols whose address is taken.
-  PRECONDITION(!state.call_stack().empty());
+  PRECONDITION(!call_stack(state).empty());
   state.rename(expr, ns, goto_symex_statet::L1);
 
   // start the recursion!

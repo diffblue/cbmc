@@ -23,7 +23,7 @@ Author: Daniel Kroening, kroening@kroening.com
 void goto_symext::symex_goto(statet &state)
 {
   const goto_programt::instructiont &instruction=*state.source.pc;
-  statet::framet &frame=state.top();
+  statet::framet &frame=top(state);
 
   exprt old_guard=instruction.guard;
   clean_expr(old_guard, state, false);
@@ -82,7 +82,7 @@ void goto_symext::symex_goto(statet &state)
       frame.loop_iterations[goto_programt::loop_id(*state.source.pc)].count;
     unwind++;
 
-    if(should_stop_unwind(state.source, state.call_stack(), unwind))
+    if(should_stop_unwind(state.source, call_stack(state), unwind))
     {
       loop_bound_exceeded(state, new_guard);
 
@@ -211,7 +211,7 @@ void goto_symext::symex_goto(statet &state)
 
   // put into state-queue
   statet::goto_state_listt &goto_state_list=
-    state.top().goto_state_map[new_state_pc];
+    top(state).goto_state_map[new_state_pc];
 
   goto_state_list.push_back(statet::goto_statet(state));
 
@@ -298,7 +298,7 @@ void goto_symext::symex_goto(statet &state)
 
 void goto_symext::merge_gotos(statet &state)
 {
-  statet::framet &frame=state.top();
+  statet::framet &frame=top(state);
 
   // first, see if this is a target at all
   statet::goto_state_mapt::iterator state_map_it=

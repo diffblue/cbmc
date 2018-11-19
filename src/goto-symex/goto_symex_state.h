@@ -312,34 +312,6 @@ public:
 
   typedef std::vector<framet> call_stackt;
 
-  call_stackt &call_stack()
-  {
-    PRECONDITION(source.thread_nr < threads.size());
-    return threads[source.thread_nr].call_stack;
-  }
-
-  const call_stackt &call_stack() const
-  {
-    PRECONDITION(source.thread_nr < threads.size());
-    return threads[source.thread_nr].call_stack;
-  }
-
-  framet &top()
-  {
-    PRECONDITION(!call_stack().empty());
-    return call_stack().back();
-  }
-
-  const framet &top() const
-  {
-    PRECONDITION(!call_stack().empty());
-    return call_stack().back();
-  }
-
-  framet &new_frame() { call_stack().push_back(framet()); return top(); }
-  void pop_frame() { call_stack().pop_back(); }
-  const framet &previous_frame() { return *(--(--call_stack().end())); }
-
   // threads
   unsigned atomic_section_id;
   typedef std::pair<unsigned, std::list<guardt> > a_s_r_entryt;
@@ -404,5 +376,84 @@ private:
   /// private copy constructor as a delegate.
   goto_symex_statet(const goto_symex_statet &other) = default;
 };
+
+inline std::vector<goto_symex_statet::framet> &call_stack(
+  std::vector<goto_symex_statet::threadt> &threads,
+  const std::size_t thread_nr)
+{
+  PRECONDITION(thread_nr < threads.size());
+  return threads[thread_nr].call_stack;
+}
+
+inline const std::vector<goto_symex_statet::framet> &call_stack(
+  const std::vector<goto_symex_statet::threadt> &threads,
+  const std::size_t thread_nr)
+{
+  PRECONDITION(thread_nr < threads.size());
+  return threads[thread_nr].call_stack;
+}
+
+inline const std::vector<goto_symex_statet::framet> &call_stack(
+  const goto_symex_statet &state)
+{
+  return call_stack(state.threads, state.source.thread_nr);
+}
+
+inline goto_symex_statet::framet &top(
+  std::vector<goto_symex_statet::threadt> &threads,
+  const std::size_t thread_nr)
+{
+  auto &call_stack = ::call_stack(threads, thread_nr);
+  PRECONDITION(!call_stack.empty());
+  return call_stack.back();
+}
+
+inline const goto_symex_statet::framet &top(
+  const std::vector<goto_symex_statet::threadt> &threads,
+  const std::size_t thread_nr)
+{
+  const auto &call_stack = ::call_stack(threads, thread_nr);
+  PRECONDITION(!call_stack.empty());
+  return call_stack.back();
+}
+
+inline const goto_symex_statet::framet &top(
+  const goto_symex_statet &state)
+{
+  return top(state.threads, state.source.thread_nr);
+}
+
+inline goto_symex_statet::framet &top(
+  goto_symex_statet &state)
+{
+  return top(state.threads, state.source.thread_nr);
+}
+
+inline goto_symex_statet::framet &new_frame(
+  std::vector<goto_symex_statet::threadt> &threads,
+  const std::size_t thread_nr)
+{
+  call_stack(threads, thread_nr).emplace_back();
+  return top(threads, thread_nr);
+}
+
+inline goto_symex_statet::framet &new_frame(goto_symex_statet &state)
+{
+  return new_frame(state.threads, state.source.thread_nr);
+}
+
+inline void pop_frame(
+  std::vector<goto_symex_statet::threadt> &threads,
+  const std::size_t thread_nr)
+{
+  call_stack(threads, thread_nr).pop_back();
+}
+
+inline const goto_symex_statet::framet &previous_frame(
+  const std::vector<goto_symex_statet::threadt> &threads,
+  const std::size_t thread_nr)
+{
+  return *(--(--call_stack(threads, thread_nr).end()));
+}
 
 #endif // CPROVER_GOTO_SYMEX_GOTO_SYMEX_STATE_H

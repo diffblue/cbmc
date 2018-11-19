@@ -33,7 +33,7 @@ goto_symex_statet::goto_symex_statet()
     dirty()
 {
   threads.resize(1);
-  new_frame();
+  new_frame(threads, source.thread_nr);
 }
 
 goto_symex_statet::~goto_symex_statet()=default;
