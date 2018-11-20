@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/exception_utils.h>
 #include <util/invariant.h>
 #include <util/pointer_offset_size.h>
+#include <util/range.h>
 #include <util/std_expr.h>
 
 #include <analyses/dirty.h>
@@ -357,15 +358,27 @@ void goto_symext::phi_function(
   const statet::goto_statet &goto_state,
   statet &dest_state)
 {
-  // go over all variables to see what changed
-  std::unordered_set<ssa_exprt, irep_hash> variables;
+  auto ssa_of_current_name =
+    [&](const std::pair<irep_idt, std::pair<ssa_exprt, unsigned>> &pair) {
+      return pair.second.first;
+    };
 
-  goto_state.level2_get_variables(variables);
-  dest_state.level2.get_variables(variables);
+  auto dest_state_names_range =
+    make_range(dest_state.level2.current_names)
+      .filter(
+        [&](const std::pair<irep_idt, std::pair<ssa_exprt, unsigned>> &pair) {
+          // We ignore the identifiers that are already in goto_state names
+          return goto_state.level2_current_names.count(pair.first) == 0;
+        })
+      .map<const ssa_exprt>(ssa_of_current_name);
+
+  // go over all variables to see what changed
+  auto all_current_names_range = make_range(goto_state.level2_current_names)
+                                   .map<const ssa_exprt>(ssa_of_current_name)
+                                   .concat(dest_state_names_range);
 
   guardt diff_guard;
-
-  if(!variables.empty())
+  if(!all_current_names_range.empty())
   {
     diff_guard=goto_state.guard;
 
@@ -373,10 +386,9 @@ void goto_symext::phi_function(
     diff_guard-=dest_state.guard;
   }
 
-  for(std::unordered_set<ssa_exprt, irep_hash>::const_iterator
-      it=variables.begin();
-      it!=variables.end();
-      it++)
+  for(auto it = all_current_names_range.begin();
+      it != all_current_names_range.end();
+      ++it)
   {
     const irep_idt l1_identifier=it->get_identifier();
     const irep_idt &obj_identifier=it->get_object_name();
