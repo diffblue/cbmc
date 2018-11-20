@@ -70,7 +70,7 @@ Resources:
                                 - echo "deb http://ppa.launchpad.net/ubuntu-toolchain-r/test/ubuntu trusty main" > /etc/apt/sources.list.d/toolchain.list
                                 - apt-key adv --keyserver keyserver.ubuntu.com --recv-keys BA9EF27F
                                 - apt-get update -y
-                                - apt-get install -y libwww-perl g++-5 flex bison git openjdk-7-jdk ccache
+                                - apt-get install -y libwww-perl g++-5 flex bison git ccache
                                 - update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 1
                                 - update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-5 1
                                 - |
@@ -127,7 +127,7 @@ Resources:
                                 - echo "deb http://ppa.launchpad.net/ubuntu-toolchain-r/test/ubuntu trusty main" > /etc/apt/sources.list.d/toolchain.list
                                 - apt-key adv --keyserver keyserver.ubuntu.com --recv-keys BA9EF27F
                                 - apt-get update -y
-                                - apt-get install -y libwww-perl g++-5 flex bison git openjdk-7-jdk ccache
+                                - apt-get install -y libwww-perl g++-5 flex bison git ccache
                                 - update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 1
                                 - update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-5 1
                                 - |
