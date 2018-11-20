@@ -185,7 +185,7 @@ public:
     exprt return_value;
     bool hidden_function;
 
-    renaming_levelt::current_namest old_level1;
+    symex_renaming_levelt::current_namest old_level1;
 
     typedef std::set<irep_idt> local_objectst;
     local_objectst local_objects;

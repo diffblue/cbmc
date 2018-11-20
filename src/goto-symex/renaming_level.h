@@ -22,9 +22,9 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 /// expression and a counter.
 /// This is extended by the different symex_level structures which are used
 /// during symex to ensure static single assignment (SSA) form.
-struct renaming_levelt
+struct symex_renaming_levelt
 {
-  virtual ~renaming_levelt() = default;
+  virtual ~symex_renaming_levelt() = default;
 
   /// Map identifier to ssa_exprt and counter
   typedef std::map<irep_idt, std::pair<ssa_exprt, unsigned>> current_namest;
@@ -55,7 +55,7 @@ struct renaming_levelt
 /// Functor to set the level 0 renaming of SSA expressions.
 /// Level 0 corresponds to threads.
 /// The renaming is built for one particular interleaving.
-struct symex_level0t : public renaming_levelt
+struct symex_level0t : public symex_renaming_levelt
 {
   void
   operator()(ssa_exprt &ssa_expr, const namespacet &ns, unsigned thread_nr);
@@ -67,7 +67,7 @@ struct symex_level0t : public renaming_levelt
 /// Functor to set the level 1 renaming of SSA expressions.
 /// Level 1 corresponds to function frames.
 /// This is to preserve locality in case of recursion
-struct symex_level1t : public renaming_levelt
+struct symex_level1t : public symex_renaming_levelt
 {
   void operator()(ssa_exprt &ssa_expr);
 
@@ -81,7 +81,7 @@ struct symex_level1t : public renaming_levelt
 /// Functor to set the level 2 renaming of SSA expressions.
 /// Level 2 corresponds to SSA.
 /// This is to ensure each variable is only assigned once.
-struct symex_level2t : public renaming_levelt
+struct symex_level2t : public symex_renaming_levelt
 {
   symex_level2t() = default;
   ~symex_level2t() override = default;

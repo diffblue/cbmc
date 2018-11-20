@@ -56,7 +56,8 @@ void symex_level1t::operator()(ssa_exprt &ssa_expr)
   ssa_expr.set_level_1(it->second.second);
 }
 
-void symex_level1t::restore_from(const renaming_levelt::current_namest &other)
+void symex_level1t::restore_from(
+  const symex_renaming_levelt::current_namest &other)
 {
   auto it = current_names.begin();
   for(const auto &pair : other)
