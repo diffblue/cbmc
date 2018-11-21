@@ -16,6 +16,7 @@ Date: June 2003
 
 #include "goto_function.h"
 
+#include "validate_goto_model.h"
 #include <util/cprover_prefix.h>
 
 /// A collection of goto functions
@@ -111,8 +112,12 @@ public:
   ///
   /// The validation mode indicates whether well-formedness check failures are
   /// reported via DATA_INVARIANT violations or exceptions.
-  void validate(const namespacet &ns, const validation_modet vm) const
+  void validate(
+    const namespacet &ns,
+    const validation_modet vm,
+    const goto_model_validation_optionst &goto_model_validation_options) const
   {
+    validate_goto_model(*this, vm, goto_model_validation_options);
     for(const auto &entry : function_map)
     {
       const goto_functiont &goto_function = entry.second;

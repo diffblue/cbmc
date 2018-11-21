@@ -25,25 +25,26 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/class_hierarchy.h>
 #include <goto-programs/goto_convert_functions.h>
-#include <goto-programs/remove_calls_no_body.h>
-#include <goto-programs/remove_function_pointers.h>
-#include <goto-programs/remove_virtual_functions.h>
-#include <goto-programs/remove_skip.h>
 #include <goto-programs/goto_inline.h>
-#include <goto-programs/show_properties.h>
-#include <goto-programs/set_properties.h>
-#include <goto-programs/read_goto_binary.h>
-#include <goto-programs/write_goto_binary.h>
 #include <goto-programs/interpreter.h>
-#include <goto-programs/string_abstraction.h>
-#include <goto-programs/string_instrumentation.h>
-#include <goto-programs/loop_ids.h>
 #include <goto-programs/link_to_library.h>
 #include <goto-programs/remove_returns.h>
-#include <goto-programs/remove_unused_functions.h>
+#include <goto-programs/loop_ids.h>
 #include <goto-programs/parameter_assignments.h>
-#include <goto-programs/slice_global_inits.h>
+#include <goto-programs/read_goto_binary.h>
+#include <goto-programs/remove_calls_no_body.h>
+#include <goto-programs/remove_function_pointers.h>
+#include <goto-programs/remove_skip.h>
+#include <goto-programs/remove_unused_functions.h>
+#include <goto-programs/remove_virtual_functions.h>
+#include <goto-programs/set_properties.h>
+#include <goto-programs/show_properties.h>
 #include <goto-programs/show_symbol_table.h>
+#include <goto-programs/slice_global_inits.h>
+#include <goto-programs/string_abstraction.h>
+#include <goto-programs/string_instrumentation.h>
+#include <goto-programs/validate_goto_model.h>
+#include <goto-programs/write_goto_binary.h>
 
 #include <pointer-analysis/value_set_analysis.h>
 #include <pointer-analysis/goto_program_dereference.h>
@@ -134,7 +135,8 @@ int goto_instrument_parse_optionst::doit()
 
       if(validate_only || cmdline.isset("validate-goto-model"))
       {
-        goto_model.validate(validation_modet::EXCEPTION);
+        goto_model.validate(
+          validation_modet::EXCEPTION, goto_model_validation_optionst{});
 
         if(validate_only)
         {
@@ -147,7 +149,8 @@ int goto_instrument_parse_optionst::doit()
 
     if(cmdline.isset("validate-goto-model"))
     {
-      goto_model.validate(validation_modet::INVARIANT);
+      goto_model.validate(
+        validation_modet::INVARIANT, goto_model_validation_optionst{});
     }
 
     {

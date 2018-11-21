@@ -46,6 +46,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-checker/stop_on_fail_verifier.h>
 #include <goto-checker/stop_on_fail_verifier_with_fault_localization.h>
 
+#include <goto-instrument/cover.h>
+#include <goto-instrument/full_slicer.h>
+#include <goto-instrument/nondet_static.h>
+#include <goto-instrument/reachability_slicer.h>
 #include <goto-programs/adjust_float_expressions.h>
 #include <goto-programs/initialize_goto_model.h>
 #include <goto-programs/instrument_preconditions.h>
@@ -53,24 +57,23 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/loop_ids.h>
 #include <goto-programs/mm_io.h>
 #include <goto-programs/read_goto_binary.h>
+#include <goto-programs/remove_complex.h>
 #include <goto-programs/remove_function_pointers.h>
 #include <goto-programs/remove_returns.h>
 #include <goto-programs/remove_vector.h>
 #include <goto-programs/remove_complex.h>
 #include <goto-programs/remove_unused_functions.h>
 #include <goto-programs/remove_skip.h>
+#include <goto-programs/remove_unused_functions.h>
+#include <goto-programs/remove_vector.h>
 #include <goto-programs/rewrite_union.h>
 #include <goto-programs/set_properties.h>
 #include <goto-programs/show_goto_functions.h>
-#include <goto-programs/show_symbol_table.h>
 #include <goto-programs/show_properties.h>
+#include <goto-programs/show_symbol_table.h>
 #include <goto-programs/string_abstraction.h>
 #include <goto-programs/string_instrumentation.h>
-
-#include <goto-instrument/reachability_slicer.h>
-#include <goto-instrument/full_slicer.h>
-#include <goto-instrument/nondet_static.h>
-#include <goto-instrument/cover.h>
+#include <goto-programs/validate_goto_model.h>
 
 #include <goto-symex/path_storage.h>
 
@@ -550,7 +553,13 @@ int cbmc_parse_optionst::doit()
 
   if(cmdline.isset("validate-goto-model"))
   {
-    goto_model.validate(validation_modet::INVARIANT);
+    goto_model_validation_optionst goto_model_validation_options;
+    goto_model_validation_options.function_pointer_calls_removed = true;
+    goto_model_validation_options.check_returns_removed = true;
+    goto_model_validation_options.check_called_functions = true;
+    goto_model_validation_options.check_last_instruction = true;
+    goto_model.validate(
+      validation_modet::INVARIANT, goto_model_validation_options);
   }
 
   if(
