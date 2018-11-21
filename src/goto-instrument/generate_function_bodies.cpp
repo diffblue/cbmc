@@ -157,11 +157,13 @@ public:
   havoc_generate_function_bodiest(
     std::vector<irep_idt> globals_to_havoc,
     std::regex parameters_to_havoc,
+    const c_object_factory_parameterst &object_factory_parameters,
     message_handlert &message_handler)
     : generate_function_bodiest(),
       messaget(message_handler),
       globals_to_havoc(std::move(globals_to_havoc)),
-      parameters_to_havoc(std::move(parameters_to_havoc))
+      parameters_to_havoc(std::move(parameters_to_havoc)),
+      object_factory_parameters(object_factory_parameters)
   {
   }
 
@@ -321,6 +323,7 @@ protected:
 private:
   const std::vector<irep_idt> globals_to_havoc;
   std::regex parameters_to_havoc;
+  const c_object_factory_parameterst &object_factory_parameters;
 };
 
 class generate_function_bodies_errort : public std::runtime_error
@@ -336,13 +339,17 @@ public:
 /// \see generate_function_bodies for the syntax of the options parameter
 std::unique_ptr<generate_function_bodiest> generate_function_bodies_factory(
   const std::string &options,
+  const c_object_factory_parameterst &object_factory_parameters,
   const symbol_tablet &symbol_table,
   message_handlert &message_handler)
 {
   if(options.empty() || options == "nondet-return")
   {
     return util_make_unique<havoc_generate_function_bodiest>(
-      std::vector<irep_idt>{}, std::regex{}, message_handler);
+      std::vector<irep_idt>{},
+      std::regex{},
+      object_factory_parameters,
+      message_handler);
   }
 
   if(options == "assume-false")
@@ -411,7 +418,10 @@ std::unique_ptr<generate_function_bodiest> generate_function_bodies_factory(
       }
     }
     return util_make_unique<havoc_generate_function_bodiest>(
-      std::move(globals_to_havoc), std::move(params_regex), message_handler);
+      std::move(globals_to_havoc),
+      std::move(params_regex),
+      object_factory_parameters,
+      message_handler);
   }
   throw generate_function_bodies_errort("Can't parse \"" + options + "\"");
 }

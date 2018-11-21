@@ -12,6 +12,7 @@ Author: Diffblue Ltd.
 #include <memory>
 #include <regex>
 
+#include <ansi-c/c_object_factory_parameters.h>
 #include <goto-programs/goto_function.h>
 #include <goto-programs/goto_model.h>
 #include <util/cmdline.h>
@@ -59,6 +60,7 @@ private:
 
 std::unique_ptr<generate_function_bodiest> generate_function_bodies_factory(
   const std::string &options,
+  const c_object_factory_parameterst &object_factory_parameters,
   const symbol_tablet &symbol_table,
   message_handlert &message_handler);
 
