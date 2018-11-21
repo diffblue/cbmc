@@ -25,78 +25,28 @@ Author: Diffblue Ltd.
 
 #include <goto-programs/goto_functions.h>
 
-class symbol_factoryt
-{
-  symbol_tablet &symbol_table;
-  const source_locationt &loc;
-  namespacet ns;
-  const c_object_factory_parameterst &object_factory_params;
-
-  allocate_objectst allocate_objects;
-
-  typedef std::set<irep_idt> recursion_sett;
-
-public:
-  symbol_factoryt(
-    symbol_tablet &_symbol_table,
-    const source_locationt &loc,
-    const c_object_factory_parameterst &object_factory_params)
-    : symbol_table(_symbol_table),
-      loc(loc),
-      ns(_symbol_table),
-      object_factory_params(object_factory_params),
-      allocate_objects(ID_C, loc, loc.get_function(), symbol_table)
-  {}
-
-  void gen_nondet_init(
-    code_blockt &assignments,
-    const exprt &expr,
-    const std::size_t depth = 0,
-    recursion_sett recursion_set = recursion_sett());
-
-  void add_created_symbol(const symbolt *symbol_ptr)
-  {
-    allocate_objects.add_created_symbol(symbol_ptr);
-  }
-
-  void declare_created_symbols(code_blockt &init_code)
-  {
-    allocate_objects.declare_created_symbols(init_code);
-  }
-
-  void mark_created_symbols_as_input(code_blockt &init_code)
-  {
-    allocate_objects.mark_created_symbols_as_input(init_code);
-  }
-
-private:
-  /// Generate initialisation code for each array element
-  /// \param assignments: The code block to add code to
-  /// \param expr: An expression of array type
-  /// \param depth: The struct recursion depth
-  /// \param recursion_set: The struct recursion set
-  /// \see gen_nondet_init For the meaning of the last 2 parameters
-  void gen_nondet_array_init(
-    code_blockt &assignments,
-    const exprt &expr,
-    std::size_t depth,
-    const recursion_sett &recursion_set);
-};
-
 /// Creates a nondet for expr, including calling itself recursively to make
 /// appropriate symbols to point to if expr is a pointer.
 /// \param assignments: The code block to add code to
 /// \param expr: The expression which we are generating a non-determinate value
 ///   for
-/// \param depth: number of pointers followed so far during initialisation
-/// \param recursion_set: names of structs seen so far on current pointer chain
+/// \param depth number of pointers followed so far during initialisation
+/// \param recursion_set names of structs seen so far on current pointer chain
+/// \param assign_const Indicates whether const objects should be nondet
+///   initialized
 void symbol_factoryt::gen_nondet_init(
   code_blockt &assignments,
   const exprt &expr,
   const std::size_t depth,
-  recursion_sett recursion_set)
+  recursion_sett recursion_set,
+  const bool assign_const)
 {
   const typet &type = expr.type();
+
+  if(!assign_const && expr.type().get_bool(ID_C_constant))
+  {
+    return;
+  }
 
   if(type.id()==ID_pointer)
   {
@@ -120,10 +70,10 @@ void symbol_factoryt::gen_nondet_init(
 
     code_blockt non_null_inst;
 
-    exprt init_expr = allocate_objects.allocate_automatic_local_object(
-      non_null_inst, expr, subtype);
+    exprt init_expr =
+      allocate_objects.allocate_object(non_null_inst, expr, subtype, lifetime);
 
-    gen_nondet_init(non_null_inst, init_expr, depth + 1, recursion_set);
+    gen_nondet_init(non_null_inst, init_expr, depth + 1, recursion_set, true);
 
     if(depth < object_factory_params.min_null_tree_depth)
     {
@@ -165,12 +115,18 @@ void symbol_factoryt::gen_nondet_init(
     for(const auto &component : struct_type.components())
     {
       const typet &component_type = component.type();
+
+      if(!assign_const && component_type.get_bool(ID_C_constant))
+      {
+        continue;
+      }
+
       const irep_idt name = component.get_name();
 
       member_exprt me(expr, name, component_type);
       me.add_source_location() = loc;
 
-      gen_nondet_init(assignments, me, depth, recursion_set);
+      gen_nondet_init(assignments, me, depth, recursion_set, assign_const);
     }
   }
   else if(type.id() == ID_array)
@@ -221,6 +177,8 @@ void symbol_factoryt::gen_nondet_array_init(
 /// \param loc: The location to assign to generated code
 /// \param object_factory_parameters: configuration parameters for the object
 ///   factory
+/// \param lifetime: Lifetime of the allocated object (AUTOMATIC_LOCAL,
+///   STATIC_GLOBAL, or DYNAMIC)
 /// \return Returns the symbol_exprt for the symbol created
 symbol_exprt c_nondet_symbol_factory(
   code_blockt &init_code,
@@ -228,7 +186,8 @@ symbol_exprt c_nondet_symbol_factory(
   const irep_idt base_name,
   const typet &type,
   const source_locationt &loc,
-  const c_object_factory_parameterst &object_factory_parameters)
+  const c_object_factory_parameterst &object_factory_parameters,
+  const lifetimet lifetime)
 {
   irep_idt identifier=id2string(goto_functionst::entry_point())+
     "::"+id2string(base_name);
@@ -247,7 +206,8 @@ symbol_exprt c_nondet_symbol_factory(
   bool moving_symbol_failed=symbol_table.move(main_symbol, main_symbol_ptr);
   CHECK_RETURN(!moving_symbol_failed);
 
-  symbol_factoryt state(symbol_table, loc, object_factory_parameters);
+  symbol_factoryt state(symbol_table, loc, object_factory_parameters, lifetime);
+
   code_blockt assignments;
   state.gen_nondet_init(assignments, main_symbol_expr);
 
