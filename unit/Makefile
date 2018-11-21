@@ -104,6 +104,7 @@ BMC_DEPS =../src/cbmc/all_properties$(OBJEXT) \
 CPROVER_LIBS =../src/ansi-c/ansi-c$(LIBEXT) \
               ../src/cpp/cpp$(LIBEXT) \
               ../src/json/json$(LIBEXT) \
+              ../src/json-symtab-language/json-symtab-language$(LIBEXT) \
               ../src/linking/linking$(LIBEXT) \
               ../src/util/util$(LIBEXT) \
               ../src/big-int/big-int$(LIBEXT) \
