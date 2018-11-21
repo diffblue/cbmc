@@ -794,8 +794,8 @@ void stub_global_initializer_factoryt::create_stub_global_initializer_symbols(
     const irep_idt static_init_name = clinit_function_name(it->first);
 
     INVARIANT(
-      symbol_table.lookup_ref(it->first).type.get_bool(ID_incomplete_class),
-      "only incomplete classes should be given synthetic static initialisers");
+      to_java_class_type(symbol_table.lookup_ref(it->first).type).get_is_stub(),
+      "only stub classes should be given synthetic static initialisers");
     INVARIANT(
       !symbol_table.has_symbol(static_init_name),
       "a class cannot be both incomplete, and so have stub static fields, and "

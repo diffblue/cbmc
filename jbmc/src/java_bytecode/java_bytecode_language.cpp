@@ -317,11 +317,12 @@ static void infer_opaque_type_fields(
           class_symbol != nullptr,
           "all types containing fields should have been loaded");
 
-        const class_typet *class_type = &to_class_type(class_symbol->type);
+        const java_class_typet *class_type =
+          &to_java_class_type(class_symbol->type);
         const irep_idt &component_name = fieldref.get(ID_component_name);
         while(!class_type->has_component(component_name))
         {
-          if(class_type->get_bool(ID_incomplete_class))
+          if(class_type->get_is_stub())
           {
             // Accessing a field of an incomplete (opaque) type.
             symbolt &writable_class_symbol =
@@ -344,7 +345,7 @@ static void infer_opaque_type_fields(
                 + "') should have an opaque superclass");
             const auto &superclass_type = class_type->bases().front().type();
             class_symbol_id = superclass_type.get_identifier();
-            class_type = &to_class_type(ns.follow(superclass_type));
+            class_type = &to_java_class_type(ns.follow(superclass_type));
           }
         }
       }
@@ -525,8 +526,8 @@ static irep_idt get_any_incomplete_ancestor_for_stub_static_field(
   const symbol_tablet &symbol_table,
   const class_hierarchyt &class_hierarchy)
 {
-  // Depth-first search: return the first ancestor with ID_incomplete_class, or
-  // irep_idt() if none found.
+  // Depth-first search: return the first stub ancestor, or irep_idt() if none
+  // found.
   std::vector<irep_idt> classes_to_check;
   classes_to_check.push_back(start_class_id);
 
@@ -536,8 +537,10 @@ static irep_idt get_any_incomplete_ancestor_for_stub_static_field(
     classes_to_check.pop_back();
 
     // Exclude java.lang.Object because it can
-    if(symbol_table.lookup_ref(to_check).type.get_bool(ID_incomplete_class) &&
-       to_check != "java::java.lang.Object")
+    if(
+      to_java_class_type(symbol_table.lookup_ref(to_check).type)
+        .get_is_stub() &&
+      to_check != "java::java.lang.Object")
     {
       return to_check;
     }

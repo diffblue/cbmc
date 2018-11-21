@@ -194,7 +194,7 @@ SCENARIO(
 
     const symbolt &opaque_class_symbol =
       symbol_table.lookup_ref("java::OpaqueClass");
-    REQUIRE(opaque_class_symbol.type.get_bool(ID_incomplete_class));
+    REQUIRE(to_java_class_type(opaque_class_symbol.type).get_is_stub());
 
     WHEN("Looking at the parameterless constructor")
     {

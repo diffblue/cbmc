@@ -171,6 +171,16 @@ class java_class_typet:public class_typet
     set(ID_final, is_final);
   }
 
+  void set_is_stub(const bool &is_stub)
+  {
+    set(ID_incomplete_class, true);
+  }
+
+  bool get_is_stub() const
+  {
+    return get_bool(ID_incomplete_class);
+  }
+
   // it may be better to introduce a class like
   // class java_lambda_method_handlet : private irept
   // {

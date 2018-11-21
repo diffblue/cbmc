@@ -154,7 +154,7 @@ goto_modelt load_goto_model_from_java_class(
   // if this fails it indicates the class was not loaded
   // Check your working directory and the class path is correctly configured
   // as this often indicates that one of these is wrong.
-  REQUIRE_FALSE(class_type.get_bool(ID_incomplete_class));
+  REQUIRE_FALSE(to_java_class_type(class_type).get_is_stub());
   return std::move(*maybe_goto_model);
 }
 

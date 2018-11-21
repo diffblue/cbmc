@@ -11,6 +11,7 @@
 
 #include <algorithm>
 
+#include <java_bytecode/java_types.h>
 #include <util/expr_iterator.h>
 
 /// Check the full tree of expr for any symbol_exprts that have an identifier id
@@ -85,8 +86,8 @@ SCENARIO(
     THEN("Type OpaqueParent3 should be opaque")
     {
       REQUIRE(
-        symbol_table.lookup_ref("java::OpaqueParent3").type.get_bool(
-          ID_incomplete_class));
+        to_java_class_type(symbol_table.lookup_ref("java::OpaqueParent3").type)
+          .get_is_stub());
     }
     THEN("A static field 'OpaqueParent3.x' should exist")
     {
@@ -111,13 +112,13 @@ SCENARIO(
 
   WHEN("A class with an opaque interface uses an inherited static field 'x'")
   {
-    symbol_tablet symbol_table=
+    symbol_tablet symbol_table =
       load_java_class("Test4", "./java_bytecode/inherited_static_fields");
     THEN("Type OpaqueInterface4 should be opaque")
     {
-      REQUIRE(
-        symbol_table.lookup_ref("java::OpaqueInterface4").type.get_bool(
-          ID_incomplete_class));
+      REQUIRE(to_java_class_type(
+                symbol_table.lookup_ref("java::OpaqueInterface4").type)
+                .get_is_stub());
     }
     THEN("A static field 'OpaqueInterface4.x' should exist")
     {
@@ -147,14 +148,14 @@ SCENARIO(
     THEN("Type OpaqueParent5 should be opaque")
     {
       REQUIRE(
-        symbol_table.lookup_ref("java::OpaqueParent5").type.get_bool(
-          ID_incomplete_class));
+        to_java_class_type(symbol_table.lookup_ref("java::OpaqueParent5").type)
+          .get_is_stub());
     }
     THEN("Type OpaqueInterface5 should be opaque")
     {
-      REQUIRE(
-        symbol_table.lookup_ref("java::OpaqueInterface5").type.get_bool(
-          ID_incomplete_class));
+      REQUIRE(to_java_class_type(
+                symbol_table.lookup_ref("java::OpaqueInterface5").type)
+                .get_is_stub());
     }
     THEN("One or other parent (not both) should gain a static field 'x'")
     {
