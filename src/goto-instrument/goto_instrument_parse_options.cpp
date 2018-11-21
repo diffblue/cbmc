@@ -1185,6 +1185,19 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     remove_skip(goto_model);
   }
 
+  if(cmdline.isset("generate-function-body"))
+  {
+    auto generate_implementation = generate_function_bodies_factory(
+      cmdline.get_value("generate-function-body-options"),
+      goto_model.symbol_table,
+      *message_handler);
+    generate_function_bodies(
+      std::regex(cmdline.get_value("generate-function-body")),
+      *generate_implementation,
+      goto_model,
+      *message_handler);
+  }
+
   // add generic checks, if needed
   goto_check(options, goto_model);
 
@@ -1485,19 +1498,6 @@ void goto_instrument_parse_optionst::instrument_goto_program()
         goto_model.symbol_table,
         get_message_handler()))
       throw 0;
-  }
-
-  if(cmdline.isset("generate-function-body"))
-  {
-    auto generate_implementation = generate_function_bodies_factory(
-      cmdline.get_value("generate-function-body-options"),
-      goto_model.symbol_table,
-      *message_handler);
-    generate_function_bodies(
-      std::regex(cmdline.get_value("generate-function-body")),
-      *generate_implementation,
-      goto_model,
-      *message_handler);
   }
 
   // aggressive slicer
