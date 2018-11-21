@@ -199,7 +199,7 @@ symbol_exprt get_or_create_string_literal_symbol(
     }
     new_symbol.value = literal_init;
   }
-  else if(jls_struct.get_bool(ID_incomplete_class))
+  else if(to_java_class_type(jls_struct).get_is_stub())
   {
     // Case where java.lang.String was stubbed, and so directly defines
     // @class_identifier

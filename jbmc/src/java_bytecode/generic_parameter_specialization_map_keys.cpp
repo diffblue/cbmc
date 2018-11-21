@@ -110,7 +110,7 @@ void generic_parameter_specialization_map_keyst::insert_pairs_for_pointer(
     // together. Currently an incomplete class is never marked as generic. If
     // this changes in TG-1996 then the condition below should be updated.
     if(
-      !pointer_subtype_struct.get_bool(ID_incomplete_class) &&
+      !to_java_class_type(pointer_subtype_struct).get_is_stub() &&
       (is_java_generic_class_type(pointer_subtype_struct) ||
        is_java_implicitly_generic_class_type(pointer_subtype_struct)))
     {
@@ -153,7 +153,7 @@ void generic_parameter_specialization_map_keyst::insert_pairs_for_symbol(
   // this changes in TG-1996 then the condition below should be updated.
   if(
     is_java_generic_symbol_type(symbol_type) &&
-    !symbol_struct.get_bool(ID_incomplete_class) &&
+    !to_java_class_type(symbol_struct).get_is_stub() &&
     (is_java_generic_class_type(symbol_struct) ||
      is_java_implicitly_generic_class_type(symbol_struct)))
   {

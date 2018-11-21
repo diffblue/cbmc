@@ -243,11 +243,11 @@ class_typet require_type::require_complete_class(const typet &class_type)
 {
   REQUIRE(class_type.id() == ID_struct);
 
-  const class_typet &class_class_type = to_class_type(class_type);
-  REQUIRE(class_class_type.is_class());
-  REQUIRE_FALSE(class_class_type.get_bool(ID_incomplete_class));
+  const java_class_typet &java_class_type = to_java_class_type(class_type);
+  REQUIRE(java_class_type.is_class());
+  REQUIRE_FALSE(java_class_type.get_is_stub());
 
-  return class_class_type;
+  return java_class_type;
 }
 
 /// Checks that the given type is an incomplete class.
@@ -257,11 +257,11 @@ class_typet require_type::require_incomplete_class(const typet &class_type)
 {
   REQUIRE(class_type.id() == ID_struct);
 
-  const class_typet &class_class_type = to_class_type(class_type);
-  REQUIRE(class_class_type.is_class());
-  REQUIRE(class_class_type.get_bool(ID_incomplete_class));
+  const java_class_typet &java_class_type = to_java_class_type(class_type);
+  REQUIRE(java_class_type.is_class());
+  REQUIRE(java_class_type.get_is_stub());
 
-  return class_class_type;
+  return java_class_type;
 }
 
 /// Verify that a class is a valid java generic class.
