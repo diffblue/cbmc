@@ -386,12 +386,10 @@ void goto_symext::phi_function(
     diff_guard-=dest_state.guard;
   }
 
-  for(auto it = all_current_names_range.begin();
-      it != all_current_names_range.end();
-      ++it)
+  for(const auto &ssa : all_current_names_range)
   {
-    const irep_idt l1_identifier=it->get_identifier();
-    const irep_idt &obj_identifier=it->get_object_name();
+    const irep_idt l1_identifier = ssa.get_identifier();
+    const irep_idt &obj_identifier = ssa.get_object_name();
 
     if(obj_identifier==guard_identifier)
       continue; // just a guard, don't bother
@@ -416,11 +414,12 @@ void goto_symext::phi_function(
     // may have been introduced by symex_start_thread (and will
     // only later be removed from level2.current_names by pop_frame
     // once the thread is executed)
-    if(!it->get_level_0().empty() &&
-       it->get_level_0()!=std::to_string(dest_state.source.thread_nr))
+    if(
+      !ssa.get_level_0().empty() &&
+      ssa.get_level_0() != std::to_string(dest_state.source.thread_nr))
       continue;
 
-    exprt goto_state_rhs=*it, dest_state_rhs=*it;
+    exprt goto_state_rhs = ssa, dest_state_rhs = ssa;
 
     {
       const auto p_it = goto_state.propagation.find(l1_identifier);
@@ -466,7 +465,7 @@ void goto_symext::phi_function(
       do_simplify(rhs);
     }
 
-    ssa_exprt new_lhs=*it;
+    ssa_exprt new_lhs = ssa;
     const bool record_events=dest_state.record_events;
     dest_state.record_events=false;
     dest_state.assignment(new_lhs, rhs, ns, true, true);
