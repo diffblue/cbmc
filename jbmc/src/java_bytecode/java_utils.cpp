@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <set>
 #include <unordered_set>
+#include <regex>
 
 bool java_is_array_type(const typet &type)
 {
@@ -436,3 +437,17 @@ const std::unordered_set<std::string> cprover_methods_to_ignore
   "endThread",
   "getCurrentThreadID"
 };
+
+optionalt<std::pair<std::string, std::string>>
+get_class_and_method_name_from_identifier(irep_idt java_bytecode_id)
+{
+  std::string java_bytecode_string = id2string(java_bytecode_id);
+  std::replace(
+    java_bytecode_string.begin(), java_bytecode_string.end(), '$', '.');
+  static const std::regex regex("^java::([\\w.]+)\\.([<>\\w]+):.*$");
+  std::smatch matches;
+  std::regex_match(java_bytecode_string, matches, regex);
+  if(matches.size() != 3)
+    return {};
+  return std::pair<std::string, std::string>(matches[1], matches[2]);
+}

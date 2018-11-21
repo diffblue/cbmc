@@ -113,4 +113,8 @@ bool is_non_null_library_global(const irep_idt &);
 
 extern const std::unordered_set<std::string> cprover_methods_to_ignore;
 
+/// Get class and method name from the java bytecode identifier of the method
+optionalt<std::pair<std::string, std::string>>
+get_class_and_method_name_from_identifier(irep_idt java_bytecode_id);
+
 #endif // CPROVER_JAVA_BYTECODE_JAVA_UTILS_H
