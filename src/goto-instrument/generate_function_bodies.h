@@ -32,7 +32,7 @@ protected:
   /// \param function_name: Identifier of function
   virtual void generate_function_body_impl(
     goto_functiont &function,
-    const symbol_tablet &symbol_table,
+    symbol_tablet &symbol_table,
     const irep_idt &function_name) const = 0;
 
 public:
