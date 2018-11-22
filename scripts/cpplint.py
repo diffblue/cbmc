@@ -6265,9 +6265,6 @@ def CheckNamespaceOrUsing(filename, clean_lines, linenum, error):
       if '{' in current_line:
         break
       current_linenum+=1
-  if Match(r'^using\s', line):
-    error(filename, linenum, 'readability/namespace', 4,
-          'Do not use using')
 
 def CheckForEndl(filename, clean_lines, linenum, error):
   """Check that the line does not contain std::endl."""
