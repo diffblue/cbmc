@@ -52,9 +52,8 @@ void goto_symext::symex_start_thread(statet &state)
   // create a copy of the local variables for the new thread
   statet::framet &frame=state.top();
 
-  for(goto_symex_statet::renaming_levelt::current_namest::const_iterator
-      c_it=state.level2.current_names.begin();
-      c_it!=state.level2.current_names.end();
+  for(auto c_it = state.level2.current_names.begin();
+      c_it != state.level2.current_names.end();
       ++c_it)
   {
     const irep_idt l1_o_id=c_it->second.first.get_l1_object_identifier();

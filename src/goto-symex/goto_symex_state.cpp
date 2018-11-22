@@ -38,50 +38,6 @@ goto_symex_statet::goto_symex_statet()
 
 goto_symex_statet::~goto_symex_statet()=default;
 
-void goto_symex_statet::level0t::operator()(
-  ssa_exprt &ssa_expr,
-  const namespacet &ns,
-  unsigned thread_nr)
-{
-  // already renamed?
-  if(!ssa_expr.get_level_0().empty())
-    return;
-
-  const irep_idt &obj_identifier=ssa_expr.get_object_name();
-
-  // guards are not L0-renamed
-  if(obj_identifier=="goto_symex::\\guard")
-    return;
-
-  const symbolt *s;
-  const bool found_l0 = !ns.lookup(obj_identifier, s);
-  INVARIANT(found_l0, "level0: failed to find " + id2string(obj_identifier));
-
-  // don't rename shared variables or functions
-  if(s->type.id()==ID_code ||
-     s->is_shared())
-    return;
-
-  // rename!
-  ssa_expr.set_level_0(thread_nr);
-}
-
-void goto_symex_statet::level1t::operator()(ssa_exprt &ssa_expr)
-{
-  // already renamed?
-  if(!ssa_expr.get_level_1().empty())
-    return;
-
-  const irep_idt l0_name=ssa_expr.get_l1_object_identifier();
-
-  current_namest::const_iterator it=current_names.find(l0_name);
-  if(it==current_names.end())
-    return;
-
-  // rename!
-  ssa_expr.set_level_1(it->second.second);
-}
-
 /// write to a variable
 static bool check_renaming(const exprt &expr);
 
@@ -255,7 +211,7 @@ void goto_symex_statet::assignment(
   if(level2.current_names.find(l1_identifier)==level2.current_names.end())
     level2.current_names[l1_identifier]=std::make_pair(lhs, 0);
   level2.increase_counter(l1_identifier);
-  set_ssa_indices(lhs, ns, L2);
+  set_l2_indices(lhs, ns);
 
   // in case we happen to be multi-threaded, record the memory access
   bool is_shared=l2_thread_write_encoding(lhs, ns);
@@ -271,9 +227,9 @@ void goto_symex_statet::assignment(
   // for value propagation -- the RHS is L2
 
   if(!is_shared && record_value && goto_symex_is_constantt()(rhs))
-    propagation.values[l1_identifier]=rhs;
+    propagation[l1_identifier] = rhs;
   else
-    propagation.remove(l1_identifier);
+    propagation.erase(l1_identifier);
 
   {
     // update value sets
@@ -297,58 +253,34 @@ void goto_symex_statet::assignment(
   #endif
 }
 
-void goto_symex_statet::propagationt::operator()(exprt &expr)
+void goto_symex_statet::set_l0_indices(
+  ssa_exprt &ssa_expr,
+  const namespacet &ns)
 {
-  if(expr.id()==ID_symbol)
-  {
-    valuest::const_iterator it =
-      values.find(to_symbol_expr(expr).get_identifier());
-    if(it!=values.end())
-      expr=it->second;
-  }
-  else if(expr.id()==ID_address_of)
-  {
-    // ignore
-  }
-  else
-  {
-    // do this recursively
-    Forall_operands(it, expr)
-      operator()(*it);
-  }
+  level0(ssa_expr, ns, source.thread_nr);
 }
 
-void goto_symex_statet::set_ssa_indices(
+void goto_symex_statet::set_l1_indices(
   ssa_exprt &ssa_expr,
-  const namespacet &ns,
-  levelt level)
+  const namespacet &ns)
 {
-  switch(level)
-  {
-  case L0:
-    level0(ssa_expr, ns, source.thread_nr);
-    break;
+  if(!ssa_expr.get_level_2().empty())
+    return;
+  if(!ssa_expr.get_level_1().empty())
+    return;
+  level0(ssa_expr, ns, source.thread_nr);
+  level1(ssa_expr);
+}
 
-  case L1:
-    if(!ssa_expr.get_level_2().empty())
-      return;
-    if(!ssa_expr.get_level_1().empty())
-      return;
-    level0(ssa_expr, ns, source.thread_nr);
-    level1(ssa_expr);
-    break;
-
-  case L2:
-    if(!ssa_expr.get_level_2().empty())
-      return;
-    level0(ssa_expr, ns, source.thread_nr);
-    level1(ssa_expr);
-    ssa_expr.set_level_2(level2.current_count(ssa_expr.get_identifier()));
-    break;
-
-  default:
-    UNREACHABLE;
-  }
+void goto_symex_statet::set_l2_indices(
+  ssa_exprt &ssa_expr,
+  const namespacet &ns)
+{
+  if(!ssa_expr.get_level_2().empty())
+    return;
+  level0(ssa_expr, ns, source.thread_nr);
+  level1(ssa_expr);
+  ssa_expr.set_level_2(level2.current_count(ssa_expr.get_identifier()));
 }
 
 void goto_symex_statet::rename(
@@ -363,15 +295,21 @@ void goto_symex_statet::rename(
   {
     ssa_exprt &ssa=to_ssa_expr(expr);
 
-    if(level==L0 || level==L1)
+    if(level == L0)
     {
-      set_ssa_indices(ssa, ns, level);
+      set_l0_indices(ssa, ns);
+      rename(expr.type(), ssa.get_identifier(), ns, level);
+      ssa.update_type();
+    }
+    else if(level == L1)
+    {
+      set_l1_indices(ssa, ns);
       rename(expr.type(), ssa.get_identifier(), ns, level);
       ssa.update_type();
     }
     else if(level==L2)
     {
-      set_ssa_indices(ssa, ns, L1);
+      set_l1_indices(ssa, ns);
       rename(expr.type(), ssa.get_identifier(), ns, level);
       ssa.update_type();
 
@@ -387,13 +325,12 @@ void goto_symex_statet::rename(
       {
         // We also consider propagation if we go up to L2.
         // L1 identifiers are used for propagation!
-        propagationt::valuest::const_iterator p_it=
-          propagation.values.find(ssa.get_identifier());
+        auto p_it = propagation.find(ssa.get_identifier());
 
-        if(p_it!=propagation.values.end())
+        if(p_it != propagation.end())
           expr=p_it->second; // already L2
         else
-          set_ssa_indices(ssa, ns, L2);
+          set_l2_indices(ssa, ns);
       }
     }
   }
@@ -519,7 +456,7 @@ bool goto_symex_statet::l2_thread_read_encoding(
       cond=or_exprt(no_write.op(), cond);
 
     if_exprt tmp(cond, ssa_l1, ssa_l1);
-    set_ssa_indices(to_ssa_expr(tmp.true_case()), ns, L2);
+    set_l2_indices(to_ssa_expr(tmp.true_case()), ns);
 
     if(a_s_read.second.empty())
     {
@@ -551,7 +488,7 @@ bool goto_symex_statet::l2_thread_read_encoding(
       source,
       symex_targett::assignment_typet::PHI);
 
-    set_ssa_indices(ssa_l1, ns, L2);
+    set_l2_indices(ssa_l1, ns);
     expr=ssa_l1;
 
     a_s_read.second.push_back(guard);
@@ -567,14 +504,14 @@ bool goto_symex_statet::l2_thread_read_encoding(
   // No event and no fresh index, but avoid constant propagation
   if(!record_events)
   {
-    set_ssa_indices(ssa_l1, ns, L2);
+    set_l2_indices(ssa_l1, ns);
     expr=ssa_l1;
     return true;
   }
 
   // produce a fresh L2 name
   level2.increase_counter(l1_identifier);
-  set_ssa_indices(ssa_l1, ns, L2);
+  set_l2_indices(ssa_l1, ns);
   expr=ssa_l1;
 
   // and record that
@@ -636,7 +573,7 @@ void goto_symex_statet::rename_address(
     ssa_exprt &ssa=to_ssa_expr(expr);
 
     // only do L1!
-    set_ssa_indices(ssa, ns, L1);
+    set_l1_indices(ssa, ns);
 
     rename(expr.type(), ssa.get_identifier(), ns, level);
     ssa.update_type();

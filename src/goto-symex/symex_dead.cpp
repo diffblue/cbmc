@@ -49,7 +49,7 @@ void goto_symext::symex_dead(statet &state)
   const irep_idt &l1_identifier=ssa_lhs.get_identifier();
 
   // prevent propagation
-  state.propagation.remove(l1_identifier);
+  state.propagation.erase(l1_identifier);
 
   // L2 renaming
   if(state.level2.current_names.find(l1_identifier)!=

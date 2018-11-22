@@ -27,6 +27,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <pointer-analysis/value_set.h>
 #include <goto-programs/goto_function.h>
 
+#include "renaming_level.h"
 #include "symex_target_equation.h"
 
 // central data structure: state
@@ -57,109 +58,15 @@ public:
   symex_targett::sourcet source;
   symex_target_equationt *symex_target;
 
-  // we have a two-level renaming
-
-  typedef std::map<irep_idt, irep_idt> original_identifierst;
-
   // we remember all L1 renamings
-  typedef std::set<irep_idt> l1_historyt;
-  l1_historyt l1_history;
+  std::set<irep_idt> l1_history;
 
-  struct renaming_levelt
-  {
-    virtual ~renaming_levelt() { }
+  symex_level0t level0;
+  symex_level1t level1;
+  symex_level2t level2;
 
-    typedef std::map<irep_idt, std::pair<ssa_exprt, unsigned> > current_namest;
-    current_namest current_names;
-
-    unsigned current_count(const irep_idt &identifier) const
-    {
-      current_namest::const_iterator it=
-        current_names.find(identifier);
-      return it==current_names.end()?0:it->second.second;
-    }
-
-    void increase_counter(const irep_idt &identifier)
-    {
-      PRECONDITION(current_names.find(identifier) != current_names.end());
-      ++current_names[identifier].second;
-    }
-
-    void get_variables(std::unordered_set<ssa_exprt, irep_hash> &vars) const
-    {
-      for(current_namest::const_iterator it=current_names.begin();
-          it!=current_names.end();
-          it++)
-        vars.insert(it->second.first);
-    }
-  };
-
-  // level 0 -- threads!
-  // renaming built for one particular interleaving
-  struct level0t:public renaming_levelt
-  {
-    void operator()(
-      ssa_exprt &ssa_expr,
-      const namespacet &ns,
-      unsigned thread_nr);
-
-    level0t() { }
-    virtual ~level0t() { }
-  } level0;
-
-  // level 1 -- function frames
-  // this is to preserve locality in case of recursion
-
-  struct level1t:public renaming_levelt
-  {
-    void operator()(ssa_exprt &ssa_expr);
-
-    void restore_from(const current_namest &other)
-    {
-      current_namest::iterator it=current_names.begin();
-      for(current_namest::const_iterator
-          ito=other.begin();
-          ito!=other.end();
-          ++ito)
-      {
-        while(it!=current_names.end() && it->first<ito->first)
-          ++it;
-        if(it==current_names.end() || ito->first<it->first)
-          current_names.insert(it, *ito);
-        else if(it!=current_names.end())
-        {
-          PRECONDITION(it->first == ito->first);
-          it->second=ito->second;
-          ++it;
-        }
-      }
-    }
-
-    level1t() { }
-    virtual ~level1t() { }
-  } level1;
-
-  // level 2 -- SSA
-
-  struct level2t:public renaming_levelt
-  {
-    level2t() { }
-    virtual ~level2t() { }
-  } level2;
-
-  // this maps L1 names to (L2) constants
-  class propagationt
-  {
-  public:
-    typedef std::map<irep_idt, exprt> valuest;
-    valuest values;
-    void operator()(exprt &expr);
-
-    void remove(const irep_idt &identifier)
-    {
-      values.erase(identifier);
-    }
-  } propagation;
+  // Map L1 names to (L2) constants
+  std::map<irep_idt, exprt> propagation;
 
   enum levelt { L0=0, L1=1, L2=2 };
 
@@ -185,7 +92,10 @@ public:
 protected:
   void rename_address(exprt &expr, const namespacet &ns, levelt level);
 
-  void set_ssa_indices(ssa_exprt &expr, const namespacet &ns, levelt level=L2);
+  void set_l0_indices(ssa_exprt &expr, const namespacet &ns);
+  void set_l1_indices(ssa_exprt &expr, const namespacet &ns);
+  void set_l2_indices(ssa_exprt &expr, const namespacet &ns);
+
   // only required for value_set.assign
   void get_l1_name(exprt &expr) const;
 
@@ -204,11 +114,11 @@ public:
   {
   public:
     unsigned depth;
-    level2t::current_namest level2_current_names;
+    symex_level2t::current_namest level2_current_names;
     value_sett value_set;
     guardt guard;
     symex_targett::sourcet source;
-    propagationt propagation;
+    std::map<irep_idt, exprt> propagation;
     unsigned atomic_section_id;
     std::unordered_map<irep_idt, local_safe_pointerst> safe_pointers;
     unsigned total_vccs, remaining_vccs;
@@ -231,17 +141,13 @@ public:
     void level2_get_variables(
       std::unordered_set<ssa_exprt, irep_hash> &vars) const
     {
-      for(level2t::current_namest::const_iterator
-          it=level2_current_names.begin();
-          it!=level2_current_names.end();
-          it++)
-        vars.insert(it->second.first);
+      for(const auto &pair : level2_current_names)
+        vars.insert(pair.second.first);
     }
 
     unsigned level2_current_count(const irep_idt &identifier) const
     {
-      level2t::current_namest::const_iterator it=
-        level2_current_names.find(identifier);
+      const auto it = level2_current_names.find(identifier);
       return it==level2_current_names.end()?0:it->second.second;
     }
   };
@@ -279,7 +185,7 @@ public:
     exprt return_value;
     bool hidden_function;
 
-    renaming_levelt::current_namest old_level1;
+    symex_renaming_levelt::current_namest old_level1;
 
     typedef std::set<irep_idt> local_objectst;
     local_objectst local_objects;

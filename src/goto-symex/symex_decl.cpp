@@ -63,7 +63,7 @@ void goto_symext::symex_decl(statet &state, const symbol_exprt &expr)
   }
 
   // prevent propagation
-  state.propagation.remove(l1_identifier);
+  state.propagation.erase(l1_identifier);
 
   // L2 renaming
   // inlining may yield multiple declarations of the same identifier
