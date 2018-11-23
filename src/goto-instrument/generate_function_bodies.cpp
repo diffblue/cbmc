@@ -8,12 +8,16 @@ Author: Diffblue Ltd.
 
 #include "generate_function_bodies.h"
 
+#include <ansi-c/c_nondet_symbol_factory.h>
+#include <ansi-c/c_object_factory_parameters.h>
+
+#include <goto-programs/goto_convert.h>
+#include <goto-programs/remove_skip.h>
+
 #include <util/arith_tools.h>
 #include <util/format_expr.h>
 #include <util/make_unique.h>
 #include <util/string_utils.h>
-
-#include "remove_skip.h"
 
 void generate_function_bodiest::generate_function_body(
   goto_functiont &function,
@@ -305,9 +309,8 @@ protected:
     {
       auto return_instruction = add_instruction();
       return_instruction->make_return();
-      return_instruction->code = code_returnt(
-        side_effect_expr_nondett(
-          function.type.return_type(), function_symbol.location));
+      return_instruction->code = code_returnt(side_effect_expr_nondett(
+        function.type.return_type(), function_symbol.location));
     }
     auto end_function_instruction = add_instruction();
     end_function_instruction->make_end_function();

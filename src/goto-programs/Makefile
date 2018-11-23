@@ -6,7 +6,6 @@ SRC = adjust_float_expressions.cpp \
       destructor.cpp \
       elf_reader.cpp \
       format_strings.cpp \
-      generate_function_bodies.cpp \
       goto_asm.cpp \
       goto_clean_expr.cpp \
       goto_convert.cpp \

@@ -27,8 +27,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <analyses/goto_check.h>
 
-#include <goto-programs/generate_function_bodies.h>
 #include "aggressive_slicer.h"
+#include "generate_function_bodies.h"
 
 #include "count_eloc.h"
 
