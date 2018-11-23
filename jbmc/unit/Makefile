@@ -36,6 +36,7 @@ SRC += java_bytecode/ci_lazy_methods/lazy_load_lambdas.cpp \
        java_bytecode/java_bytecode_parse_generics/parse_lvtt_generic_local_vars.cpp \
        java_bytecode/java_bytecode_parse_lambdas/java_bytecode_convert_class_lambda_method_handles.cpp \
        java_bytecode/java_bytecode_parse_lambdas/java_bytecode_parse_lambda_method_table.cpp \
+       java_bytecode/java_bytecode_parser/parse_class_without_instructions.cpp \
        java_bytecode/java_bytecode_parser/parse_java_annotations.cpp \
        java_bytecode/java_bytecode_parser/parse_java_attributes.cpp \
        java_bytecode/java_bytecode_parser/parse_java_class.cpp \
