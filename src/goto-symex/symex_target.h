@@ -107,12 +107,12 @@ public:
     const exprt &guard,
     const irep_idt &function_identifier,
     const std::vector<exprt> &ssa_function_arguments,
-    const sourcet &source) = 0;
+    const sourcet &source,
+    bool hidden) = 0;
 
   // record return from a function
-  virtual void function_return(
-    const exprt &guard,
-    const sourcet &source)=0;
+  virtual void
+  function_return(const exprt &guard, const sourcet &source, bool hidden) = 0;
 
   // just record a location
   virtual void location(

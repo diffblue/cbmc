@@ -160,6 +160,8 @@ void goto_symext::initialize_entry_point(
 
   const goto_functiont &entry_point_function = get_goto_function(pc->function);
 
+  state.top().hidden_function = entry_point_function.is_hidden();
+
   auto emplace_safe_pointers_result =
     state.safe_pointers.emplace(pc->function, local_safe_pointerst{ns});
   if(emplace_safe_pointers_result.second)

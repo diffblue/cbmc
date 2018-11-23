@@ -202,6 +202,9 @@ bool generate_ansi_c_start_function(
   PRECONDITION(!symbol.value.is_nil());
   code_blockt init_code;
 
+  // add 'HIDE' label
+  init_code.add(code_labelt(CPROVER_PREFIX "HIDE", code_skipt()));
+
   // build call to initialization function
 
   {
