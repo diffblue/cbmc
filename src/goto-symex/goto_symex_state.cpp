@@ -774,3 +774,26 @@ void goto_symex_statet::get_l1_name(exprt &expr) const
     Forall_operands(it, expr)
       get_l1_name(*it);
 }
+
+/// Dumps the current state of symex, printing the function name and location
+/// number for each stack frame in the currently active thread.
+/// This is for use from the debugger or in debug code; please don't delete it
+/// just because it isn't called at present.
+/// \param out: stream to write to
+void goto_symex_statet::print_backtrace(std::ostream &out) const
+{
+  out << source.pc->function << " " << source.pc->location_number << "\n";
+
+  for(auto stackit = threads[source.thread_nr].call_stack.rbegin(),
+           stackend = threads[source.thread_nr].call_stack.rend();
+      stackit != stackend;
+      ++stackit)
+  {
+    const auto &frame = *stackit;
+    if(frame.calling_location.is_set)
+    {
+      out << frame.calling_location.pc->function << " "
+          << frame.calling_location.pc->location_number << "\n";
+    }
+  }
+}
