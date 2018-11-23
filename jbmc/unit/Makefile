@@ -19,6 +19,7 @@ SRC += java_bytecode/ci_lazy_methods/lazy_load_lambdas.cpp \
        java_bytecode/java_bytecode_convert_method/convert_initalizers.cpp \
        java_bytecode/java_bytecode_convert_method/convert_invoke_dynamic.cpp \
        java_bytecode/java_bytecode_convert_method/convert_method.cpp \
+       java_bytecode/java_bytecode_instrument/virtual_call_null_checks.cpp \
        java_bytecode/java_bytecode_parse_generics/parse_bounded_generic_inner_classes.cpp \
        java_bytecode/java_bytecode_parse_generics/parse_derived_generic_class.cpp \
        java_bytecode/java_bytecode_parse_generics/parse_functions_with_generics.cpp \
