@@ -181,6 +181,7 @@ protected:
   void undefined_shift_check(const shift_exprt &, const guardt &);
   void pointer_rel_check(const binary_exprt &, const guardt &);
   void pointer_overflow_check(const exprt &, const guardt &);
+  void memory_leak_check(const irep_idt &function_id);
 
   /// Generates VCCs for the validity of the given dereferencing operation.
   /// \param expr the expression to be checked
@@ -2045,6 +2046,28 @@ optionalt<exprt> goto_check_ct::expand_pointer_checks(exprt expr)
     return {};
 }
 
+void goto_check_ct::memory_leak_check(const irep_idt &function_id)
+{
+  const symbolt &leak = ns.lookup(CPROVER_PREFIX "memory_leak");
+  const symbol_exprt leak_expr = leak.symbol_expr();
+
+  // add self-assignment to get helpful counterexample output
+  new_code.add(goto_programt::make_assignment(leak_expr, leak_expr));
+
+  source_locationt source_location;
+  source_location.set_function(function_id);
+
+  equal_exprt eq(leak_expr, null_pointer_exprt(to_pointer_type(leak.type)));
+
+  add_guarded_property(
+    eq,
+    "dynamically allocated memory never freed",
+    "memory-leak",
+    source_location,
+    eq,
+    identity);
+}
+
 void goto_check_ct::goto_check(
   const irep_idt &function_identifier,
   goto_functiont &goto_function)
@@ -2225,24 +2248,7 @@ void goto_check_ct::goto_check(
         function_identifier == goto_functionst::entry_point() &&
         enable_memory_leak_check)
       {
-        const symbolt &leak = ns.lookup(CPROVER_PREFIX "memory_leak");
-        const symbol_exprt leak_expr = leak.symbol_expr();
-
-        // add self-assignment to get helpful counterexample output
-        new_code.add(goto_programt::make_assignment(leak_expr, leak_expr));
-
-        source_locationt source_location;
-        source_location.set_function(function_identifier);
-
-        equal_exprt eq(
-          leak_expr, null_pointer_exprt(to_pointer_type(leak.type)));
-        add_guarded_property(
-          eq,
-          "dynamically allocated memory never freed",
-          "memory-leak",
-          source_location,
-          eq,
-          identity);
+        memory_leak_check(function_identifier);
       }
     }
 
