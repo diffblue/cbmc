@@ -475,17 +475,18 @@ def seed_queue(session, region, queue, task_set):
     # set up the tasks
     logger = logging.getLogger('perf_test')
 
-    all_tasks = ['ConcurrencySafety-Main', 'DefinedBehavior-Arrays',
-                 'DefinedBehavior-TerminCrafted', 'MemSafety-Arrays',
+    all_tasks = ['ConcurrencySafety-Main',
+                 'MemSafety-Arrays',
                  'MemSafety-Heap', 'MemSafety-LinkedLists',
-                 'MemSafety-Other', 'MemSafety-TerminCrafted',
-                 'Overflows-BitVectors', 'Overflows-Other',
+                 'MemSafety-MemCleanup',
+                 'MemSafety-Other',
+                 'NoOverflows-BitVectors', 'NoOverflows-Other',
                  'ReachSafety-Arrays', 'ReachSafety-BitVectors',
                  'ReachSafety-ControlFlow', 'ReachSafety-ECA',
                  'ReachSafety-Floats', 'ReachSafety-Heap',
                  'ReachSafety-Loops', 'ReachSafety-ProductLines',
                  'ReachSafety-Recursive', 'ReachSafety-Sequentialized',
-                 'Systems_BusyBox_MemSafety', 'Systems_BusyBox_Overflows',
+                 'Systems_BusyBox_MemSafety', 'Systems_BusyBox_NoOverflows',
                  'Systems_DeviceDriversLinux64_ReachSafety',
                  'Termination-MainControlFlow', 'Termination-MainHeap',
                  'Termination-Other']
