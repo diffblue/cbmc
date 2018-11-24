@@ -1,6 +1,6 @@
 #include <stdlib.h>
 
-extern void __VERIFIER_error() __attribute__ ((__noreturn__));
+extern void __VERIFIER_error() __attribute__((__noreturn__));
 
 int main()
 {
@@ -11,6 +11,8 @@ int main()
     exit(1);
   if(*p == 2)
     _Exit(1);
+  if(*p == 3)
+    __VERIFIER_error();
   free(p);
   return 0;
 }

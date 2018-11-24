@@ -1708,7 +1708,8 @@ void goto_checkt::goto_check(
       if(
         enable_memory_leak_check && simplified_guard.is_false() &&
         (i.function == "abort" || i.function == "exit" ||
-         i.function == "_Exit"))
+         i.function == "_Exit" ||
+         (i.labels.size() == 1 && i.labels.front() == "__VERIFIER_abort")))
       {
         memory_leak_check(i.function);
       }

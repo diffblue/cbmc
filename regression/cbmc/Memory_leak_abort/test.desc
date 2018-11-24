@@ -1,6 +1,6 @@
 CORE
 main.c
---memory-leak-check
+--memory-leak-check --no-assertions
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
@@ -8,5 +8,7 @@ _Exit\.memory-leak\.1.*FAILURE
 __CPROVER__start\.memory-leak\.1.*SUCCESS
 abort\.memory-leak\.1.*FAILURE
 exit\.memory-leak\.1.*FAILURE
+main\.memory-leak\.1.*FAILURE
 --
+main\.assertion\.1.*FAILURE
 ^warning: ignoring
