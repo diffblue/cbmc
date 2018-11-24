@@ -1,0 +1,10 @@
+CORE
+main.c
+--compact-trace
+activate-multi-line-match
+^EXIT=10$
+^SIGNAL=0$
+^↳ main\.c:10 main\(\)\n  12: x=1 .*$
+^↳ main.c:13 bar\(0\)\n  13: bar_a=0 .*\n  5: x=2 .*\n  6: x=3 .*$
+--
+^warning: ignoring

@@ -200,6 +200,7 @@ struct trace_optionst
   bool base_prefix;
   bool show_function_calls;
   bool show_code;
+  bool compact_trace;
   bool stack_trace;
 
   static const trace_optionst default_options;
@@ -211,6 +212,7 @@ struct trace_optionst
     base_prefix = hex_representation;
     show_function_calls = options.get_bool_option("trace-show-function-calls");
     show_code = options.get_bool_option("trace-show-code");
+    compact_trace = options.get_bool_option("compact-trace");
     stack_trace = options.get_bool_option("stack-trace");
   };
 
@@ -222,6 +224,7 @@ private:
     base_prefix = false;
     show_function_calls = false;
     show_code = false;
+    compact_trace = false;
     stack_trace = false;
   };
 };
@@ -250,6 +253,7 @@ void trace_value(
   "(trace-show-function-calls)"                                                \
   "(trace-show-code)"                                                          \
   "(trace-hex)"                                                                \
+  "(compact-trace)"                                                            \
   "(stack-trace)"
 
 #define HELP_GOTO_TRACE                                                        \
@@ -257,6 +261,7 @@ void trace_value(
   " --trace-show-function-calls  show function calls in plain trace\n"         \
   " --trace-show-code            show original code in plain trace\n"          \
   " --trace-hex                  represent plain trace values in hex\n"        \
+  " --compact-trace              give a compact trace\n"                       \
   " --stack-trace                give a stack trace only\n"
 
 #define PARSE_OPTIONS_GOTO_TRACE(cmdline, options)                             \
@@ -268,6 +273,8 @@ void trace_value(
     options.set_option("trace-show-code", true);                               \
   if(cmdline.isset("trace-hex"))                                               \
     options.set_option("trace-hex", true);                                     \
+  if(cmdline.isset("compact-trace"))                                           \
+    options.set_option("compact-trace", true);                                 \
   if(cmdline.isset("stack-trace"))                                             \
     options.set_option("stack-trace", true);
 
