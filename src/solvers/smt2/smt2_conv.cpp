@@ -2710,19 +2710,18 @@ void smt2_convt::convert_constant(const constant_exprt &expr)
      expr_type.id()==ID_incomplete_c_enum ||
      expr_type.id()==ID_c_bit_field)
   {
-    mp_integer value=binary2integer(id2string(expr.get_value()), false);
+    const std::size_t width = boolbv_width(expr_type);
 
-    std::size_t width=boolbv_width(expr_type);
+    const mp_integer value = bvrep2integer(expr.get_value(), width, false);
 
     out << "(_ bv" << value
         << " " << width << ")";
   }
   else if(expr_type.id()==ID_fixedbv)
   {
-    fixedbv_spect spec(to_fixedbv_type(expr_type));
+    const fixedbv_spect spec(to_fixedbv_type(expr_type));
 
-    std::string v_str=id2string(expr.get_value());
-    mp_integer v=binary2integer(v_str, false);
+    const mp_integer v = bvrep2integer(expr.get_value(), spec.width, false);
 
     out << "(_ bv" << v << " " << spec.width << ")";
   }

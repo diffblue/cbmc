@@ -1,24 +1,18 @@
 #!/bin/sh
 
 cd regression/cbmc
-rm Address_of2/test.desc
 rm Anonymous_Struct3/test.desc
 rm Array_Initialization2/test.desc
 rm Array_operations1/test.desc
-rm BV_Arithmetic6/test.desc
 rm Bitfields1/test.desc
 rm Bitfields3/test.desc
 rm Boolean_Guards1/test.desc
 rm Computed-Goto1/test.desc
-rm Division2/test.desc
 rm Empty_struct1/test.desc
-rm Endianness3/test.desc
 rm Endianness4/test.desc
 rm Endianness6/test.desc
 rm Endianness7/test.desc
-rm Fixedbv3/test.desc
-rm Fixedbv5/test.desc
-rm Fixedbv6/test.desc
+rm Fixedbv8/test.desc
 rm Float-div2/test.desc
 rm Float-div3/test.desc
 rm Float-no-simp1/test.desc
@@ -47,7 +41,6 @@ rm Float6/test.desc
 rm Float8/test.desc
 rm Free2/test.desc
 rm Function1/test.desc
-rm Function_Pointer3/test.desc
 rm Initialization6/test.desc
 rm Linking4/test.desc
 rm Linking7/test.desc
@@ -67,6 +60,7 @@ rm Multi_Dimensional_Array4/test.desc
 rm Multi_Dimensional_Array6/test.desc
 rm Multiple_Properties1/test.desc
 rm Overflow_Leftshift1/test.desc
+rm Overflow_Multiplication1/test.desc
 rm Overflow_Subtraction1/test.desc
 rm Pointer_Arithmetic1/test.desc
 rm Pointer_Arithmetic10/test.desc
@@ -84,7 +78,6 @@ rm Pointer_byte_extract5/no-simplify.desc
 rm Pointer_byte_extract5/test.desc
 rm Pointer_byte_extract7/test.desc
 rm Pointer_byte_extract9/test.desc
-rm Pointer_difference1/test.desc
 rm Promotion3/test.desc
 rm Promotion4/test.desc
 rm Quantifiers-assertion/test.desc
@@ -105,6 +98,7 @@ rm Struct_Bytewise1/test.desc
 rm Struct_Bytewise2/test.desc
 rm Struct_Initialization2/test.desc
 rm Struct_Padding1/test.desc
+rm Typecast1/test.desc
 rm Undefined_Shift1/test.desc
 rm Union_Initialization1/test.desc
 rm Unwinding_Locality1/test.desc
@@ -121,8 +115,10 @@ rm byte_update4/test.desc
 rm byte_update5/test.desc
 rm byte_update6/test.desc
 rm byte_update7/test.desc
+rm byte_update8/test.desc
+rm byte_update9/test.desc
+rm compact-trace/test.desc
 rm dynamic_size1/stack_object.desc
-rm dynamic_size1/test.desc
 rm equality_through_array1/test.desc
 rm equality_through_array2/test.desc
 rm equality_through_array3/test.desc
@@ -155,7 +151,6 @@ rm integer-assignments1/test.desc
 rm little-endian-array1/test.desc
 rm memory_allocation1/test.desc
 rm memset1/test.desc
-rm memset3/test.desc
 rm mm_io1/test.desc
 rm no_nondet_static/test.desc
 rm null1/test.desc
@@ -173,7 +168,6 @@ rm trace_address_arithmetic1/test.desc
 rm trace_options_json_extended/extended.desc
 rm trace_options_json_extended/non-extended.desc
 rm trace_show_function_calls/test.desc
-rm uncaught_exceptions_analysis1/test.desc
 rm uniform_array1/test.desc
 rm union11/union_list.desc
 rm union5/test.desc
