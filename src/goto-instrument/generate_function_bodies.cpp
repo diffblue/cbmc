@@ -16,6 +16,7 @@ Author: Diffblue Ltd.
 
 #include <util/arith_tools.h>
 #include <util/format_expr.h>
+#include <util/fresh_symbol.h>
 #include <util/make_unique.h>
 #include <util/string_utils.h>
 
@@ -271,11 +272,46 @@ protected:
 
     if(function.type.return_type() != void_typet())
     {
+      typet type(function.type.return_type());
+      type.remove(ID_C_constant);
+
+      symbolt &aux_symbol = get_fresh_aux_symbol(
+        type,
+        id2string(function_name),
+        "return_value",
+        function_symbol.location,
+        ID_C,
+        symbol_table);
+
+      aux_symbol.is_static_lifetime = false;
+
+      auto decl_instruction = add_instruction();
+      decl_instruction->make_decl();
+      decl_instruction->code = code_declt(aux_symbol.symbol_expr());
+
+      goto_programt dest;
+
+      havoc_expr_rec(
+        aux_symbol.symbol_expr(),
+        0,
+        function_symbol.location,
+        symbol_table,
+        dest);
+
+      function.body.destructive_append(dest);
+
+      exprt return_expr = typecast_exprt::conditional_cast(
+        aux_symbol.symbol_expr(), function.type.return_type());
+
       auto return_instruction = add_instruction();
       return_instruction->make_return();
-      return_instruction->code = code_returnt(side_effect_expr_nondett(
-        function.type.return_type(), function_symbol.location));
+      return_instruction->code = code_returnt(return_expr);
+
+      auto dead_instruction = add_instruction();
+      dead_instruction->make_dead();
+      dead_instruction->code = code_deadt(aux_symbol.symbol_expr());
     }
+
     auto end_function_instruction = add_instruction();
     end_function_instruction->make_end_function();
 
