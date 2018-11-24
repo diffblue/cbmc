@@ -55,6 +55,8 @@ public:
     enable_bounds_check = _options.get_bool_option("bounds-check");
     enable_pointer_check = _options.get_bool_option("pointer-check");
     enable_memory_leak_check = _options.get_bool_option("memory-leak-check");
+    enable_memory_cleanup_check =
+      _options.get_bool_option("memory-cleanup-check");
     enable_div_by_zero_check = _options.get_bool_option("div-by-zero-check");
     enable_enum_range_check = _options.get_bool_option("enum-range-check");
     enable_signed_overflow_check =
@@ -257,6 +259,7 @@ protected:
   bool enable_bounds_check;
   bool enable_pointer_check;
   bool enable_memory_leak_check;
+  bool enable_memory_cleanup_check;
   bool enable_div_by_zero_check;
   bool enable_enum_range_check;
   bool enable_signed_overflow_check;
@@ -276,6 +279,7 @@ protected:
     {"bounds-check", &enable_bounds_check},
     {"pointer-check", &enable_pointer_check},
     {"memory-leak-check", &enable_memory_leak_check},
+    {"memory-cleanup-check", &enable_memory_cleanup_check},
     {"div-by-zero-check", &enable_div_by_zero_check},
     {"enum-range-check", &enable_enum_range_check},
     {"signed-overflow-check", &enable_signed_overflow_check},
@@ -2218,6 +2222,19 @@ void goto_check_ct::goto_check(
     {
       // this has no successor
       assertions.clear();
+    }
+    else if(i.is_assume())
+    {
+      // These are further 'exit points' of the program
+      const exprt simplified_guard = simplify_expr(i.condition(), ns);
+      if(
+        enable_memory_cleanup_check && simplified_guard.is_false() &&
+        (function_identifier == "abort" || function_identifier == "exit" ||
+         function_identifier == "_Exit" ||
+         (i.labels.size() == 1 && i.labels.front() == "__VERIFIER_abort")))
+      {
+        memory_leak_check(function_identifier);
+      }
     }
     else if(i.is_dead())
     {
