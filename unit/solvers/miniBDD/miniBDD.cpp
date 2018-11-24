@@ -61,7 +61,7 @@ public:
     return to_literal(to_bdd(a) & to_bdd(b));
   }
 
-  literalt lor(literalt a, literalt b) override
+  literalt lor(literalt, literalt) override
   {
     UNREACHABLE;
     return {};
@@ -92,19 +92,19 @@ public:
     return to_literal(to_bdd(a) ^ to_bdd(b));
   }
 
-  literalt lxor(const bvt &bv) override
+  literalt lxor(const bvt &) override
   {
     UNREACHABLE;
     return {};
   }
 
-  literalt lnand(literalt a, literalt b) override
+  literalt lnand(literalt, literalt) override
   {
     UNREACHABLE;
     return {};
   }
 
-  literalt lnor(literalt a, literalt b) override
+  literalt lnor(literalt, literalt) override
   {
     UNREACHABLE;
     return {};
@@ -115,19 +115,19 @@ public:
     return to_literal(to_bdd(a)==to_bdd(b));
   }
 
-  literalt limplies(literalt a, literalt b) override
+  literalt limplies(literalt, literalt) override
   {
     UNREACHABLE;
     return {};
   }
 
-  literalt lselect(literalt a, literalt b, literalt c) override
+  literalt lselect(literalt, literalt, literalt) override
   {
     UNREACHABLE;
     return {};
   }
 
-  void lcnf(const bvt &bv) override
+  void lcnf(const bvt &) override
   {
     UNREACHABLE;
   }
@@ -153,7 +153,7 @@ public:
     return {};
   }
 
-  tvt l_get(literalt a) const override
+  tvt l_get(literalt) const override
   {
     UNREACHABLE;
     return {};

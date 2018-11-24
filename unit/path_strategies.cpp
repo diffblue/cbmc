@@ -64,7 +64,7 @@ SCENARIO("path strategies")
   std::string c;
   GIVEN("a simple conditional program")
   {
-    std::function<void(optionst &)> opts_callback = [](optionst &opts) {};
+    std::function<void(optionst &)> opts_callback = [](optionst &) {};
 
     c =
       "/*  1 */  int main()      \n"
@@ -94,7 +94,7 @@ SCENARIO("path strategies")
 
   GIVEN("a program with nested conditionals")
   {
-    std::function<void(optionst &)> opts_callback = [](optionst &opts) {};
+    std::function<void(optionst &)> opts_callback = [](optionst &) {};
 
     c =
       "/*  1 */  int main()            \n"
@@ -229,7 +229,7 @@ SCENARIO("path strategies")
     std::function<void(optionst &)> halt_callback = [](optionst &opts) {
       opts.set_option("stop-on-fail", true);
     };
-    std::function<void(optionst &)> no_halt_callback = [](optionst &opts) {};
+    std::function<void(optionst &)> no_halt_callback = [](optionst &) {};
 
     c =
       "/*  1 */  int main()      \n"

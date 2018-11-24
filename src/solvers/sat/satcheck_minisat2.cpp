@@ -156,6 +156,7 @@ static Minisat::Solver *solver_to_interrupt=nullptr;
 
 static void interrupt_solver(int signum)
 {
+  (void)signum; // unused parameter -- just removing the name trips up cpplint
   solver_to_interrupt->interrupt();
 }
 

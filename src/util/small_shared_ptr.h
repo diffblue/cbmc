@@ -185,17 +185,17 @@ public:
   small_shared_pointeet() = default;
 
   // These can't be `= default` because we need the use_count_ to be unaffected
-  small_shared_pointeet(const small_shared_pointeet &rhs)
+  small_shared_pointeet(const small_shared_pointeet &)
   {
   }
-  small_shared_pointeet &operator=(const small_shared_pointeet &rhs)
+  small_shared_pointeet &operator=(const small_shared_pointeet &)
   {
     return *this;
   }
-  small_shared_pointeet(small_shared_pointeet &&rhs)
+  small_shared_pointeet(small_shared_pointeet &&)
   {
   }
-  small_shared_pointeet &operator=(small_shared_pointeet &&rhs)
+  small_shared_pointeet &operator=(small_shared_pointeet &&)
   {
     return *this;
   }

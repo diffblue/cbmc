@@ -782,7 +782,7 @@ public:
 
   static void validate(
     const exprt &expr,
-    const namespacet &ns,
+    const namespacet &,
     const validation_modet vm = validation_modet::INVARIANT)
   {
     check(expr, vm);

@@ -80,7 +80,7 @@ SCENARIO("has_subtype", "[core][utils][has_subtype]")
     THEN("has_subtype terminates")
     {
       REQUIRE_FALSE(
-        has_subtype(struct_type, [&](const typet &t) { return false; }, ns));
+        has_subtype(struct_type, [&](const typet &) { return false; }, ns));
     }
     THEN("symbol type is a subtype")
     {
