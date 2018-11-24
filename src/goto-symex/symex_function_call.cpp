@@ -125,7 +125,21 @@ void goto_symext::parameter_assignments(
         }
       }
 
-      symex_assign(state, code_assignt(lhs, rhs));
+      assignment_typet assignment_type;
+
+      // We hide if we are in a hidden function.
+      if(state.top().hidden_function)
+        assignment_type =
+          symex_targett::assignment_typet::HIDDEN_ACTUAL_PARAMETER;
+      else
+        assignment_type =
+          symex_targett::assignment_typet::VISIBLE_ACTUAL_PARAMETER;
+
+      clean_expr(lhs, state, true);
+      clean_expr(rhs, state, false);
+
+      guardt guard;
+      symex_assign_rec(state, lhs, nil_exprt(), rhs, guard, assignment_type);
     }
 
     if(it1!=arguments.end())
