@@ -154,6 +154,24 @@ void goto_symext::initialize_entry_point(
   symex_transition(state, state.source.pc, false);
 }
 
+static void
+switch_to_thread(goto_symex_statet &state, const unsigned int thread_nb)
+{
+  PRECONDITION(state.source.thread_nr < state.threads.size());
+  PRECONDITION(thread_nb < state.threads.size());
+
+  // save PC
+  state.threads[state.source.thread_nr].pc = state.source.pc;
+  state.threads[state.source.thread_nr].atomic_section_id =
+    state.atomic_section_id;
+
+  // get new PC
+  state.source.thread_nr = thread_nb;
+  state.source.pc = state.threads[thread_nb].pc;
+
+  state.guard = state.threads[thread_nb].guard;
+}
+
 void goto_symext::symex_threaded_step(
   statet &state, const get_goto_functiont &get_goto_function)
 {
@@ -173,7 +191,7 @@ void goto_symext::symex_threaded_step(
 #if 0
     std::cout << "********* Now executing thread " << t << '\n';
 #endif
-    state.switch_to_thread(t);
+    switch_to_thread(state, t);
     symex_transition(state, state.source.pc, false);
   }
 }

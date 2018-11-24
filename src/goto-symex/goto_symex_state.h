@@ -283,7 +283,6 @@ public:
   void populate_dirty_for_function(
     const irep_idt &id, const goto_functiont &);
 
-  void switch_to_thread(unsigned t);
   bool record_events;
   incremental_dirtyt dirty;
 
