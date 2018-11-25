@@ -136,6 +136,12 @@ void ansi_c_internal_additions(std::string &code)
     CPROVER_PREFIX "bool " CPROVER_PREFIX "threads_exited["
       CPROVER_PREFIX "constant_infinity_uint];\n"
     "unsigned long " CPROVER_PREFIX "next_thread_id=0;\n"
+    CPROVER_PREFIX "thread_local const void* " CPROVER_PREFIX "thread_keys["
+      CPROVER_PREFIX "constant_infinity_uint];\n"
+    CPROVER_PREFIX "thread_local void (*" CPROVER_PREFIX "thread_key_dtors["
+      CPROVER_PREFIX "constant_infinity_uint])(void *);\n"
+    CPROVER_PREFIX "thread_local unsigned long "
+      CPROVER_PREFIX "next_thread_key = 0;\n"
     "extern unsigned char " CPROVER_PREFIX "memory["
       CPROVER_PREFIX "constant_infinity_uint];\n"
 

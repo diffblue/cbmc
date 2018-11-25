@@ -3,7 +3,7 @@ main.c
 --constants --simplify out.gb
 ^EXIT=0$
 ^SIGNAL=0$
-^Simplified:  assert: 1, assume: 0, goto: 1, assigns: 5, function calls: 0$
-^Unmodified:  assert: 0, assume: 0, goto: 0, assigns: 12, function calls: 2$
+^Simplified:  assert: 1, assume: 0, goto: 1, assigns: 6, function calls: 0$
+^Unmodified:  assert: 0, assume: 0, goto: 0, assigns: 15, function calls: 2$
 --
 ^warning: ignoring
