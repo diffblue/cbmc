@@ -236,13 +236,13 @@ void goto_symext::symex_function_call_code(
   // see if it's too much
   if(stop_recursing)
   {
-    if(partial_loops)
+    if(symex_config.partial_loops)
     {
       // it's ok, ignore
     }
     else
     {
-      if(unwinding_assertions)
+      if(symex_config.unwinding_assertions)
         vcc(false_exprt(), "recursion unwinding assertion", state);
 
       // add to state guard to prevent further assignments

@@ -458,8 +458,6 @@ void goto_symext::symex_trace(
 {
   PRECONDITION(code.arguments().size() >= 2);
 
-  int debug_thresh = unsafe_string2int(debug_level);
-
   mp_integer debug_lvl;
   optionalt<mp_integer> maybe_debug =
     numeric_cast<mp_integer>(code.arguments()[0]);
@@ -473,7 +471,7 @@ void goto_symext::symex_trace(
       code.arguments()[1].op0().id() == ID_string_constant,
     "CBMC_trace expects string constant as second argument");
 
-  if(mp_integer(debug_thresh)>=debug_lvl)
+  if(symex_config.debug_level >= debug_lvl)
   {
     std::list<exprt> vars;
 

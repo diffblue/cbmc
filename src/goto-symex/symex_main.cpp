@@ -18,9 +18,25 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/make_unique.h>
 #include <util/replace_symbol.h>
 #include <util/std_expr.h>
+#include <util/string2int.h>
 #include <util/symbol_table.h>
 
 #include <analyses/dirty.h>
+
+symex_configt::symex_configt(const optionst &options)
+  : max_depth(options.get_unsigned_int_option("depth")),
+    doing_path_exploration(options.is_set("paths")),
+    allow_pointer_unsoundness(
+      options.get_bool_option("allow-pointer-unsoundness")),
+    constant_propagation(options.get_bool_option("propagation")),
+    self_loops_to_assumptions(
+      options.get_bool_option("self-loops-to-assumptions")),
+    simplify_opt(options.get_bool_option("simplify")),
+    unwinding_assertions(options.get_bool_option("unwinding-assertions")),
+    partial_loops(options.get_bool_option("partial-loops")),
+    debug_level(unsafe_string2int(options.get_option("debug-level")))
+{
+}
 
 void symex_transition(
   goto_symext::statet &state,
@@ -317,11 +333,11 @@ void goto_symext::symex_step(
 
   const goto_programt::instructiont &instruction=*state.source.pc;
 
-  if(!doing_path_exploration)
+  if(!symex_config.doing_path_exploration)
     merge_gotos(state);
 
   // depth exceeded?
-  if(max_depth != 0 && state.depth > max_depth)
+  if(symex_config.max_depth != 0 && state.depth > symex_config.max_depth)
     state.guard.add(false_exprt());
   state.depth++;
 
