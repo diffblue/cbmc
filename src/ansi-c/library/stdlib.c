@@ -128,6 +128,7 @@ inline void *malloc(__CPROVER_size_t malloc_size)
 /* FUNCTION: __builtin_alloca */
 
 __CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
+extern void *__CPROVER_alloca_object;
 
 inline void *__builtin_alloca(__CPROVER_size_t alloca_size)
 {
@@ -143,6 +144,10 @@ inline void *__builtin_alloca(__CPROVER_size_t alloca_size)
   __CPROVER_malloc_object=record_malloc?res:__CPROVER_malloc_object;
   __CPROVER_malloc_size=record_malloc?alloca_size:__CPROVER_malloc_size;
   __CPROVER_malloc_is_new_array=record_malloc?0:__CPROVER_malloc_is_new_array;
+
+  // record alloca to detect invalid free
+  __CPROVER_bool record_alloca = __VERIFIER_nondet___CPROVER_bool();
+  __CPROVER_alloca_object = record_alloca ? res : __CPROVER_alloca_object;
 
   return res;
 }
@@ -164,6 +169,7 @@ __CPROVER_HIDE:;
 #undef free
 
 __CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
+extern void *__CPROVER_alloca_object;
 
 inline void free(void *ptr)
 {
@@ -184,6 +190,11 @@ inline void free(void *ptr)
                          __CPROVER_malloc_object!=ptr ||
                          !__CPROVER_malloc_is_new_array,
                          "free called for new[] object");
+
+  // catch people who try to use free(...) with alloca
+  __CPROVER_precondition(
+    ptr == 0 || __CPROVER_alloca_object != ptr,
+    "free called for stack-allocated object");
 
   if(ptr!=0)
   {
