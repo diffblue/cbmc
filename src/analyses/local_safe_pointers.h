@@ -71,7 +71,7 @@ public:
     const dereference_exprt &deref,
     goto_programt::const_targett program_point)
   {
-    return is_non_null_at_program_point(deref.op0(), program_point);
+    return is_non_null_at_program_point(deref.op(), program_point);
   }
 
   void output(std::ostream &stream, const goto_programt &program);

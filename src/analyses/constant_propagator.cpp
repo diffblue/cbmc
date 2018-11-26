@@ -631,7 +631,8 @@ void constant_propagator_ait::replace(
       d.partial_evaluate(rhs, ns);
 
       if(rhs.id()==ID_constant)
-        rhs.add_source_location()=it->code.op0().source_location();
+        rhs.add_source_location() =
+          to_code_assign(it->code).lhs().source_location();
     }
     else if(it->is_function_call())
     {

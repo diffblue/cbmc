@@ -47,7 +47,7 @@ void goto_symext::process_array_expr(exprt &expr)
   else if(expr.id()==ID_address_of)
   {
     // strip
-    exprt tmp=to_address_of_expr(expr).op0();
+    exprt tmp = to_address_of_expr(expr).object();
     expr.swap(tmp);
     process_array_expr(expr);
   }

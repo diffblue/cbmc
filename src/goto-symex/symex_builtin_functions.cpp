@@ -281,12 +281,13 @@ irep_idt get_string_argument_rec(const exprt &src)
     PRECONDITION(src.operands().size() == 1);
     if(src.op0().id()==ID_index)
     {
-      PRECONDITION(src.op0().operands().size() == 2);
+      const auto &index_expr = to_index_expr(src.op0());
 
-      if(src.op0().op0().id()==ID_string_constant &&
-         src.op0().op1().is_zero())
+      if(
+        index_expr.array().id() == ID_string_constant &&
+        index_expr.index().is_zero())
       {
-        const exprt &fmt_str=src.op0().op0();
+        const exprt &fmt_str = index_expr.array();
         return fmt_str.get_string(ID_value);
       }
     }
