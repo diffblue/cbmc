@@ -1,0 +1,10 @@
+CORE
+main.c
+--pointer-check
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+free called for stack-allocated object: FAILURE$
+^\*\* 1 of 12 failed
+--
+^warning: ignoring
