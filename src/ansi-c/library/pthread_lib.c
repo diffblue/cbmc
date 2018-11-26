@@ -636,8 +636,8 @@ inline int pthread_cond_wait(
   #endif
 
   __CPROVER_atomic_begin();
-  __CPROVER_assume(*((unsigned *)cond));
-  (*((unsigned *)cond))--;
+  if(*((unsigned *)cond))
+    (*((unsigned *)cond))--;
   __CPROVER_atomic_end();
 
   return 0; // we never fail
