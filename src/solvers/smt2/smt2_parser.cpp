@@ -427,6 +427,39 @@ exprt smt2_parsert::function_application()
         throw error(msg.str());
       }
     }
+    else if(buffer == "!")
+    {
+      // these are "term attributes"
+      const auto term = expression();
+
+      while(peek() == KEYWORD)
+      {
+        next_token(); // eat the keyword
+        if(buffer == "named")
+        {
+          // 'named terms' must be Boolean
+          if(term.type().id() != ID_bool)
+            throw error("named terms must be Boolean");
+
+          if(next_token() == SYMBOL)
+          {
+            const symbol_exprt symbol_expr(buffer, bool_typet());
+            auto &named_term = named_terms[symbol_expr.get_identifier()];
+            named_term.term = term;
+            named_term.name = symbol_expr;
+          }
+          else
+            throw error("invalid name attribute, expected symbol");
+        }
+        else
+          throw error("unknown term attribute");
+      }
+
+      if(next_token() != CLOSE)
+        throw error("expected ')' at end of term attribute");
+      else
+        return term;
+    }
     else
     {
       // non-indexed symbol; hash it
