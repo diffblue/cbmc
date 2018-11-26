@@ -407,15 +407,12 @@ bool goto_symex_statet::l2_thread_read_encoding(
     guardt write_guard;
     write_guard.add(false_exprt());
 
-    written_in_atomic_sectiont::const_iterator a_s_writes=
-      written_in_atomic_section.find(ssa_l1);
+    const auto a_s_writes = written_in_atomic_section.find(ssa_l1);
     if(a_s_writes!=written_in_atomic_section.end())
     {
-      for(a_s_w_entryt::const_iterator it=a_s_writes->second.begin();
-          it!=a_s_writes->second.end();
-          ++it)
+      for(const auto &guard_in_list : a_s_writes->second)
       {
-        guardt g=*it;
+        guardt g = guard_in_list;
         g-=guard;
         if(g.is_true())
           // there has already been a write to l1_identifier within
@@ -423,7 +420,7 @@ bool goto_symex_statet::l2_thread_read_encoding(
           // that implies the current one
           return false;
 
-        write_guard|=*it;
+        write_guard |= guard_in_list;
       }
     }
 

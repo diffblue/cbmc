@@ -298,12 +298,11 @@ void goto_symext::symex_function_call_code(
   frame.hidden_function=goto_function.is_hidden();
 
   const goto_symex_statet::framet &p_frame=state.previous_frame();
-  for(goto_symex_statet::framet::loop_iterationst::const_iterator
-      it=p_frame.loop_iterations.begin();
-      it!=p_frame.loop_iterations.end();
-      ++it)
-    if(it->second.is_recursion)
-      frame.loop_iterations.insert(*it);
+  for(const auto &pair : p_frame.loop_iterations)
+  {
+    if(pair.second.is_recursion)
+      frame.loop_iterations.insert(pair);
+  }
 
   // increase unwinding counter
   frame.loop_iterations[identifier].is_recursion=true;

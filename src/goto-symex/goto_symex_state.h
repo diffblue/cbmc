@@ -173,47 +173,31 @@ public:
 
   // stack frames -- these are used for function calls and
   // for exceptions
-  class framet
+  struct framet
   {
-  public:
     // function calls
     irep_idt function_identifier;
     goto_state_mapt goto_state_map;
     symex_targett::sourcet calling_location;
 
     goto_programt::const_targett end_of_function;
-    exprt return_value;
-    bool hidden_function;
+    exprt return_value = nil_exprt();
+    bool hidden_function = false;
 
     symex_renaming_levelt::current_namest old_level1;
 
-    typedef std::set<irep_idt> local_objectst;
-    local_objectst local_objects;
-
-    framet():
-      return_value(nil_exprt()),
-      hidden_function(false)
-    {
-    }
+    std::set<irep_idt> local_objects;
 
     // exceptions
-    typedef std::map<irep_idt, goto_programt::targett> catch_mapt;
-    catch_mapt catch_map;
+    std::map<irep_idt, goto_programt::targett> catch_map;
 
     // loop and recursion unwinding
     struct loop_infot
     {
-      loop_infot():
-        count(0),
-        is_recursion(false)
-      {
-      }
-
-      unsigned count;
-      bool is_recursion;
+      unsigned count = 0;
+      bool is_recursion = false;
     };
-    typedef std::unordered_map<irep_idt, loop_infot> loop_iterationst;
-    loop_iterationst loop_iterations;
+    std::unordered_map<irep_idt, loop_infot> loop_iterations;
   };
 
   typedef std::vector<framet> call_stackt;
@@ -249,39 +233,26 @@ public:
   // threads
   unsigned atomic_section_id;
   typedef std::pair<unsigned, std::list<guardt> > a_s_r_entryt;
-  typedef std::unordered_map<ssa_exprt, a_s_r_entryt, irep_hash>
-    read_in_atomic_sectiont;
   typedef std::list<guardt> a_s_w_entryt;
-  typedef std::unordered_map<ssa_exprt, a_s_w_entryt, irep_hash>
-    written_in_atomic_sectiont;
-  read_in_atomic_sectiont read_in_atomic_section;
-  written_in_atomic_sectiont written_in_atomic_section;
+  std::unordered_map<ssa_exprt, a_s_r_entryt, irep_hash> read_in_atomic_section;
+  std::unordered_map<ssa_exprt, a_s_w_entryt, irep_hash>
+    written_in_atomic_section;
 
   unsigned total_vccs, remaining_vccs;
 
-  class threadt
+  struct threadt
   {
-  public:
     goto_programt::const_targett pc;
     guardt guard;
     call_stackt call_stack;
     std::map<irep_idt, unsigned> function_frame;
-    unsigned atomic_section_id;
-
-    threadt():
-      atomic_section_id(0)
-    {
-    }
+    unsigned atomic_section_id = 0;
   };
 
-  typedef std::vector<threadt> threadst;
-  threadst threads;
+  std::vector<threadt> threads;
 
   bool l2_thread_read_encoding(ssa_exprt &expr, const namespacet &ns);
   bool l2_thread_write_encoding(const ssa_exprt &expr, const namespacet &ns);
-
-  void populate_dirty_for_function(
-    const irep_idt &id, const goto_functiont &);
 
   bool record_events;
   incremental_dirtyt dirty;
@@ -294,7 +265,6 @@ public:
   /// \brief This state is saved, with the PC pointing to the next instruction
   /// of a GOTO
   bool has_saved_next_instruction;
-  bool saved_target_is_backwards;
 
 private:
   /// \brief Dangerous, do not use
