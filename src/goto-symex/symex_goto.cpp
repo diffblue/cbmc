@@ -25,6 +25,13 @@ void goto_symext::symex_goto(statet &state)
   const goto_programt::instructiont &instruction=*state.source.pc;
   statet::framet &frame=state.top();
 
+  if(state.guard.is_false())
+  {
+    // next instruction
+    symex_transition(state);
+    return; // nothing to do
+  }
+
   exprt old_guard=instruction.guard;
   clean_expr(old_guard, state, false);
 
@@ -32,11 +39,9 @@ void goto_symext::symex_goto(statet &state)
   state.rename(new_guard, ns);
   do_simplify(new_guard);
 
-  if(new_guard.is_false() ||
-     state.guard.is_false())
+  if(new_guard.is_false())
   {
-    if(!state.guard.is_false())
-      target.location(state.guard.as_expr(), state.source);
+    target.location(state.guard.as_expr(), state.source);
 
     // next instruction
     symex_transition(state);
