@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/base_type.h>
 #include <util/c_types.h>
+#include <util/format_type.h>
 #include <util/pointer_offset_size.h>
 #include <util/simplify_expr.h>
 
@@ -166,7 +167,13 @@ void value_sett::output(
         if(o.type().is_nil())
           result+=", ?";
         else
-          result+=", "+from_type(ns, identifier, o.type());
+        {
+          std::stringstream s;
+          // Format the type in brief form --
+          // "struct A" not "struct { int member; ... }"
+          format_rec(s, o.type(), true);
+          result += ", " + s.str();
+        }
 
         result+='>';
       }

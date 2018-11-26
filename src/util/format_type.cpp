@@ -13,10 +13,19 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ostream>
 
 /// format a \ref struct_typet
-static std::ostream &format_rec(std::ostream &os, const struct_typet &src)
+static std::ostream &format_rec(
+  std::ostream &os,
+  const struct_typet &src,
+  bool brief)
 {
-  os << "struct"
-     << " {";
+  os << "struct ";
+  if(brief && !src.get_tag().empty())
+  {
+    os << src.get_tag();
+    return os;
+  }
+
+  os << "{";
   bool first = true;
 
   for(const auto &c : src.components())
@@ -33,10 +42,19 @@ static std::ostream &format_rec(std::ostream &os, const struct_typet &src)
 }
 
 /// format a \ref union_typet
-static std::ostream &format_rec(std::ostream &os, const union_typet &src)
+static std::ostream &format_rec(
+  std::ostream &os,
+  const union_typet &src,
+  bool brief)
 {
-  os << "union"
-     << " {";
+  os << "union ";
+  if(brief && !src.get_tag().empty())
+  {
+    os << src.get_tag();
+    return os;
+  }
+
+  os << "{";
   bool first = true;
 
   for(const auto &c : src.components())
@@ -55,7 +73,7 @@ static std::ostream &format_rec(std::ostream &os, const union_typet &src)
 // The below generates a string in a generic syntax
 // that is inspired by C/C++/Java, and is meant for debugging
 // purposes.
-std::ostream &format_rec(std::ostream &os, const typet &type)
+std::ostream &format_rec(std::ostream &os, const typet &type, bool brief)
 {
   const auto &id = type.id();
 
@@ -70,9 +88,9 @@ std::ostream &format_rec(std::ostream &os, const typet &type)
       return os << format(t.subtype()) << "[]";
   }
   else if(id == ID_struct)
-    return format_rec(os, to_struct_type(type));
+    return format_rec(os, to_struct_type(type), brief);
   else if(id == ID_union)
-    return format_rec(os, to_union_type(type));
+    return format_rec(os, to_union_type(type), brief);
   else if(id == ID_union_tag)
     return os << "union " << to_union_tag_type(type).get_identifier();
   else if(id == ID_struct_tag)

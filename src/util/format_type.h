@@ -14,6 +14,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 //! Formats a type in a generic syntax
 //! that is inspired by C/C++/Java, and is meant for debugging
-std::ostream &format_rec(std::ostream &, const typet &);
+std::ostream &format_rec(std::ostream &, const typet &, bool brief = false);
 
 #endif // CPROVER_UTIL_FORMAT_TYPE_H
