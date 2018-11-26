@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/exception_utils.h>
 #include <util/invariant.h>
 #include <util/pointer_offset_size.h>
+#include <util/range.h>
 #include <util/std_expr.h>
 
 #include <analyses/dirty.h>
@@ -362,15 +363,27 @@ void goto_symext::phi_function(
   const statet::goto_statet &goto_state,
   statet &dest_state)
 {
-  // go over all variables to see what changed
-  std::unordered_set<ssa_exprt, irep_hash> variables;
+  auto ssa_of_current_name =
+    [&](const std::pair<irep_idt, std::pair<ssa_exprt, unsigned>> &pair) {
+      return pair.second.first;
+    };
 
-  goto_state.level2_get_variables(variables);
-  dest_state.level2.get_variables(variables);
+  auto dest_state_names_range =
+    make_range(dest_state.level2.current_names)
+      .filter(
+        [&](const std::pair<irep_idt, std::pair<ssa_exprt, unsigned>> &pair) {
+          // We ignore the identifiers that are already in goto_state names
+          return goto_state.level2_current_names.count(pair.first) == 0;
+        })
+      .map<const ssa_exprt>(ssa_of_current_name);
+
+  // go over all variables to see what changed
+  auto all_current_names_range = make_range(goto_state.level2_current_names)
+                                   .map<const ssa_exprt>(ssa_of_current_name)
+                                   .concat(dest_state_names_range);
 
   guardt diff_guard;
-
-  if(!variables.empty())
+  if(!all_current_names_range.empty())
   {
     diff_guard=goto_state.guard;
 
@@ -378,13 +391,10 @@ void goto_symext::phi_function(
     diff_guard-=dest_state.guard;
   }
 
-  for(std::unordered_set<ssa_exprt, irep_hash>::const_iterator
-      it=variables.begin();
-      it!=variables.end();
-      it++)
+  for(const auto &ssa : all_current_names_range)
   {
-    const irep_idt l1_identifier=it->get_identifier();
-    const irep_idt &obj_identifier=it->get_object_name();
+    const irep_idt l1_identifier = ssa.get_identifier();
+    const irep_idt &obj_identifier = ssa.get_object_name();
 
     if(obj_identifier==guard_identifier)
       continue; // just a guard, don't bother
@@ -409,11 +419,12 @@ void goto_symext::phi_function(
     // may have been introduced by symex_start_thread (and will
     // only later be removed from level2.current_names by pop_frame
     // once the thread is executed)
-    if(!it->get_level_0().empty() &&
-       it->get_level_0()!=std::to_string(dest_state.source.thread_nr))
+    if(
+      !ssa.get_level_0().empty() &&
+      ssa.get_level_0() != std::to_string(dest_state.source.thread_nr))
       continue;
 
-    exprt goto_state_rhs=*it, dest_state_rhs=*it;
+    exprt goto_state_rhs = ssa, dest_state_rhs = ssa;
 
     {
       const auto p_it = goto_state.propagation.find(l1_identifier);
@@ -459,7 +470,7 @@ void goto_symext::phi_function(
       do_simplify(rhs);
     }
 
-    ssa_exprt new_lhs=*it;
+    ssa_exprt new_lhs = ssa;
     const bool record_events=dest_state.record_events;
     dest_state.record_events=false;
     dest_state.assignment(new_lhs, rhs, ns, true, true);
