@@ -301,6 +301,7 @@ inline void pthread_exit(void *value_ptr)
 {
   __CPROVER_HIDE:;
   if(value_ptr!=0) (void)*(char*)value_ptr;
+#if 0
   for(unsigned long i = 0; i < __CPROVER_next_thread_key; ++i)
   {
     const void *key = __CPROVER_thread_keys[i];
@@ -308,6 +309,7 @@ inline void pthread_exit(void *value_ptr)
     if(__CPROVER_thread_key_dtors[i] && key)
       __CPROVER_thread_key_dtors[i](key);
   }
+#endif
   __CPROVER_threads_exited[__CPROVER_thread_id]=1;
   __CPROVER_assume(0);
 }
@@ -539,7 +541,7 @@ extern __CPROVER_thread_local unsigned long __CPROVER_next_thread_key;
 
 inline void __spawned_thread(
   unsigned long this_thread_id,
-  void (**thread_key_dtors)(void*),
+  // void (**thread_key_dtors)(void*),
   unsigned long next_thread_key,
   void * (*start_routine)(void *),
   void *arg)
@@ -547,8 +549,10 @@ inline void __spawned_thread(
   __CPROVER_HIDE:;
   __CPROVER_thread_id = this_thread_id;
   __CPROVER_next_thread_key = next_thread_key;
+#if 0
   for(unsigned long i = 0; i < __CPROVER_next_thread_key; ++i)
     __CPROVER_thread_key_dtors[i] = thread_key_dtors[i];
+#endif
   #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
   // Clear all locked mutexes; locking must happen in same thread.
   __CPROVER_clear_must(0, "mutex-locked");
@@ -557,6 +561,7 @@ inline void __spawned_thread(
   start_routine(arg);
   __CPROVER_fence("WWfence", "RRfence", "RWfence", "WRfence",
                   "WWcumul", "RRcumul", "RWcumul", "WRcumul");
+#if 0
   for(unsigned long i = 0; i < __CPROVER_next_thread_key; ++i)
   {
     const void *key = __CPROVER_thread_keys[i];
@@ -564,6 +569,7 @@ inline void __spawned_thread(
     if(__CPROVER_thread_key_dtors[i] && key)
       __CPROVER_thread_key_dtors[i](key);
   }
+#endif
   __CPROVER_threads_exited[this_thread_id] = 1;
 }
 
@@ -589,11 +595,15 @@ inline int pthread_create(
   if(attr) (void)*attr;
 
   unsigned long next_thread_key = __CPROVER_next_thread_key;
-  void (**thread_key_dtors)(void*) = __CPROVER_thread_key_dtors;
+  // void (**thread_key_dtors)(void*) = __CPROVER_thread_key_dtors;
 
   __CPROVER_ASYNC_1:
     __spawned_thread(
-      this_thread_id, thread_key_dtors, next_thread_key, start_routine, arg);
+      this_thread_id,
+      // thread_key_dtors,
+      next_thread_key,
+      start_routine,
+      arg);
 
   return 0;
 }
@@ -863,7 +873,8 @@ inline int pthread_key_create(pthread_key_t *key, void (*destructor)(void*))
 {
   __CPROVER_HIDE:;
   __CPROVER_thread_keys[__CPROVER_next_thread_key] = 0;
-  __CPROVER_thread_key_dtors[__CPROVER_next_thread_key] = destructor;
+  // __CPROVER_thread_key_dtors[__CPROVER_next_thread_key] = destructor;
+  __CPROVER_precondition(destructor == 0, "destructors are not yet supported");
   *key = __CPROVER_next_thread_key++;
   return 0;
 }
