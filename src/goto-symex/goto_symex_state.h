@@ -230,6 +230,8 @@ public:
   void pop_frame() { call_stack().pop_back(); }
   const framet &previous_frame() { return *(--(--call_stack().end())); }
 
+  void print_backtrace(std::ostream &) const;
+
   // threads
   unsigned atomic_section_id;
   typedef std::pair<unsigned, std::list<guardt> > a_s_r_entryt;
