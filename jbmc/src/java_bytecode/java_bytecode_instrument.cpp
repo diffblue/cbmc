@@ -445,6 +445,9 @@ void java_bytecode_instrumentt::instrument_code(codet &code)
     const java_method_typet &function_type =
       to_java_method_type(code_function_call.function().type());
 
+    for(const auto &arg : code_function_call.arguments())
+      add_expr_instrumentation(block, arg);
+
     // Check for a null this-argument of a virtual call:
     if(function_type.has_this())
     {
@@ -452,9 +455,6 @@ void java_bytecode_instrumentt::instrument_code(codet &code)
         code_function_call.arguments()[0],
         code_function_call.source_location()));
     }
-
-    for(const auto &arg : code_function_call.arguments())
-      add_expr_instrumentation(block, arg);
 
     prepend_instrumentation(code, block);
   }

@@ -1,0 +1,17 @@
+CORE
+Test.class
+--function Test.main
+^EXIT=10$
+^SIGNAL=0$
+\[java::Test\.main:\(I\)V\.null-pointer-exception\.3\] line 6.*SUCCESS
+\[java::Test\.main:\(I\)V\.null-pointer-exception\.2\] line 6.*FAILURE
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+This is testing the construct "something->field . some_method()"
+That requires a null check against "something" (for the deref to read 'field')
+and another one against "something->field" (for the instance method call).
+If they're made in the correct order (check "something" first) then one of the
+null checks cannot fail in this particular scenario; if they're made in the
+wrong order ("something->field" first) then they can both fail.
