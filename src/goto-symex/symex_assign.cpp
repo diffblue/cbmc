@@ -38,16 +38,19 @@ void goto_symext::symex_assign(
 
     if(statement==ID_function_call)
     {
+      const auto &function_call =
+        to_side_effect_expr_function_call(side_effect_expr);
+
       DATA_INVARIANT(
         !side_effect_expr.operands().empty(),
         "function call stamement expects non-empty list of side effects");
 
       DATA_INVARIANT(
-        side_effect_expr.op0().id() == ID_symbol,
+        function_call.function().id() == ID_symbol,
         "expected symbol as function");
 
-      const irep_idt &identifier=
-        to_symbol_expr(side_effect_expr.op0()).get_identifier();
+      const irep_idt &identifier =
+        to_symbol_expr(function_call.function()).get_identifier();
 
       throw unsupported_operation_exceptiont(
         "symex_assign: unexpected function call: " + id2string(identifier));
@@ -297,12 +300,12 @@ void goto_symext::symex_assign_typecast(
 {
   // these may come from dereferencing on the lhs
   exprt rhs_typecasted=rhs;
-  rhs_typecasted.make_typecast(lhs.op0().type());
+  rhs_typecasted.make_typecast(lhs.op().type());
 
   exprt new_full_lhs=add_to_lhs(full_lhs, lhs);
 
   symex_assign_rec(
-    state, lhs.op0(), new_full_lhs, rhs_typecasted, guard, assignment_type);
+    state, lhs.op(), new_full_lhs, rhs_typecasted, guard, assignment_type);
 }
 
 void goto_symext::symex_assign_array(
@@ -365,12 +368,12 @@ void goto_symext::symex_assign_struct_member(
   // lhs must be member operand, which
   // takes one operand, which must be a structure.
 
-  exprt lhs_struct=lhs.op0();
+  exprt lhs_struct = lhs.op();
 
   // typecasts involved? C++ does that for inheritance.
   if(lhs_struct.id()==ID_typecast)
   {
-    if(to_typecast_expr(lhs_struct).op0().id() == ID_null_object)
+    if(to_typecast_expr(lhs_struct).op().id() == ID_null_object)
     {
       // ignore, and give up
       return;
@@ -378,7 +381,7 @@ void goto_symext::symex_assign_struct_member(
     else
     {
       // remove the type cast, we assume that the member is there
-      exprt tmp=lhs_struct.op0();
+      exprt tmp = to_typecast_expr(lhs_struct).op();
       const typet &op0_type=ns.follow(tmp.type());
 
       if(op0_type.id()==ID_struct)
@@ -414,7 +417,7 @@ void goto_symext::symex_assign_struct_member(
   //   a'==a WITH [c:=e]
 
   with_exprt new_rhs(lhs_struct, exprt(ID_member_name), rhs);
-  new_rhs.op1().set(ID_component_name, component_name);
+  new_rhs.where().set(ID_component_name, component_name);
 
   exprt new_full_lhs=add_to_lhs(full_lhs, lhs);
 

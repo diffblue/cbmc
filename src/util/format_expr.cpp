@@ -154,10 +154,10 @@ static std::ostream &format_rec(std::ostream &os, const unary_exprt &src)
   else
     return os << src.pretty();
 
-  if(src.op0().has_operands())
-    return os << '(' << format(src.op0()) << ')';
+  if(src.op().has_operands())
+    return os << '(' << format(src.op()) << ')';
   else
-    return os << format(src.op0());
+    return os << format(src.op());
 }
 
 /// This formats a constant

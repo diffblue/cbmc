@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/arith_tools.h>
 #include <util/exception_utils.h>
+#include <util/expr_util.h>
 #include <util/format_expr.h>
 #include <util/guard.h>
 #include <util/simplify_expr.h>
@@ -344,10 +345,7 @@ void symex_slice_by_tracet::compute_ts_back(
         exprt u_rhs=exprt(ID_and, typet(ID_bool));
         if((semantics!=":suffix") || (j != 0))
         {
-          u_rhs.operands().reserve(2);
-          u_rhs.copy_to_operands(guard);
-          u_rhs.copy_to_operands(merge[j]);
-          u_rhs.op0().make_not();
+          u_rhs.add_to_operands(boolean_negate(guard), merge[j]);
         }
         else
         {
@@ -455,14 +453,14 @@ void symex_slice_by_tracet::slice_SSA_steps(
       if(it->ssa_rhs.id()==ID_if)
       {
         conds_seen++;
-        exprt cond_copy(it->ssa_rhs.op0());
+        exprt cond_copy(to_if_expr(it->ssa_rhs).cond());
         simplify(cond_copy, ns);
 
         if(implications.count(cond_copy)!=0)
         {
           sliced_conds++;
-          exprt t_copy1(it->ssa_rhs.op1());
-          exprt t_copy2(it->ssa_rhs.op1());
+          exprt t_copy1(to_if_expr(it->ssa_rhs).true_case());
+          exprt t_copy2(to_if_expr(it->ssa_rhs).true_case());
           it->ssa_rhs=t_copy1;
           it->cond_expr.op1().swap(t_copy2);
         }
@@ -473,8 +471,8 @@ void symex_slice_by_tracet::slice_SSA_steps(
           if(implications.count(cond_copy)!=0)
           {
             sliced_conds++;
-            exprt f_copy1(it->ssa_rhs.op2());
-            exprt f_copy2(it->ssa_rhs.op2());
+            exprt f_copy1(to_if_expr(it->ssa_rhs).false_case());
+            exprt f_copy2(to_if_expr(it->ssa_rhs).false_case());
             it->ssa_rhs=f_copy1;
             it->cond_expr.op1().swap(f_copy2);
           }

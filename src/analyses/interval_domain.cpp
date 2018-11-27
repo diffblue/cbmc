@@ -339,25 +339,25 @@ void interval_domaint::assume_rec(
      cond.id()==ID_gt || cond.id()==ID_ge ||
      cond.id()==ID_equal || cond.id()==ID_notequal)
   {
-    assert(cond.operands().size()==2);
+    const auto &rel = to_binary_relation_expr(cond);
 
     if(negation) // !x<y  ---> x>=y
     {
-      if(cond.id()==ID_lt)
-        assume_rec(cond.op0(), ID_ge, cond.op1());
-      else if(cond.id()==ID_le)
-        assume_rec(cond.op0(), ID_gt, cond.op1());
-      else if(cond.id()==ID_gt)
-        assume_rec(cond.op0(), ID_le, cond.op1());
-      else if(cond.id()==ID_ge)
-        assume_rec(cond.op0(), ID_lt, cond.op1());
-      else if(cond.id()==ID_equal)
-        assume_rec(cond.op0(), ID_notequal, cond.op1());
-      else if(cond.id()==ID_notequal)
-        assume_rec(cond.op0(), ID_equal, cond.op1());
+      if(rel.id() == ID_lt)
+        assume_rec(rel.op0(), ID_ge, rel.op1());
+      else if(rel.id() == ID_le)
+        assume_rec(rel.op0(), ID_gt, rel.op1());
+      else if(rel.id() == ID_gt)
+        assume_rec(rel.op0(), ID_le, rel.op1());
+      else if(rel.id() == ID_ge)
+        assume_rec(rel.op0(), ID_lt, rel.op1());
+      else if(rel.id() == ID_equal)
+        assume_rec(rel.op0(), ID_notequal, rel.op1());
+      else if(rel.id() == ID_notequal)
+        assume_rec(rel.op0(), ID_equal, rel.op1());
     }
     else
-      assume_rec(cond.op0(), cond.id(), cond.op1());
+      assume_rec(rel.op0(), rel.id(), rel.op1());
   }
   else if(cond.id()==ID_not)
   {

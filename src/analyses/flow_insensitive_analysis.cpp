@@ -317,24 +317,15 @@ bool flow_insensitive_analysis_baset::do_function_call_rec(
   }
   else if(function.id()==ID_if)
   {
-    if(function.operands().size()!=3)
-      throw "if takes three arguments";
+    const auto &if_expr = to_if_expr(function);
+
+    new_data = do_function_call_rec(
+      l_call, if_expr.true_case(), arguments, state, goto_functions);
 
     new_data =
       do_function_call_rec(
-        l_call,
-        function.op1(),
-        arguments,
-        state,
-        goto_functions);
-
-    new_data =
-      do_function_call_rec(
-        l_call,
-        function.op2(),
-        arguments,
-        state,
-        goto_functions) || new_data;
+        l_call, if_expr.false_case(), arguments, state, goto_functions) ||
+      new_data;
   }
   else if(function.id()==ID_dereference)
   {

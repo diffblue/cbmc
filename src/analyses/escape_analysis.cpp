@@ -142,7 +142,7 @@ void escape_domaint::get_rhs_aliases(
   }
   else if(rhs.id()==ID_address_of)
   {
-    get_rhs_aliases_address_of(to_address_of_expr(rhs).op0(), alias_set);
+    get_rhs_aliases_address_of(to_address_of_expr(rhs).op(), alias_set);
   }
 }
 
