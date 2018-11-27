@@ -137,8 +137,10 @@ bool ansi_c_languaget::generate_support_functions(
   // function body parsing, or else generate-stubs moved to the
   // final phase.
   generate_opaque_method_stubs(symbol_table);
+
   // This creates __CPROVER_start and __CPROVER_initialize:
-  return ansi_c_entry_point(symbol_table, get_message_handler());
+  return ansi_c_entry_point(
+    symbol_table, get_message_handler(), object_factory_params);
 }
 
 void ansi_c_languaget::show_parse(std::ostream &out)

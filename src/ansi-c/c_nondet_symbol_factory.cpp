@@ -11,65 +11,40 @@ Author: Diffblue Ltd.
 
 #include "c_nondet_symbol_factory.h"
 
+#include <ansi-c/c_object_factory_parameters.h>
+
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/fresh_symbol.h>
 #include <util/namespace.h>
+#include <util/nondet_bool.h>
 #include <util/std_expr.h>
 #include <util/std_types.h>
 #include <util/string_constant.h>
 
 #include <goto-programs/goto_functions.h>
 
-/// Create a new temporary static symbol
-/// \param symbol_table: The symbol table to create the symbol in
-/// \param loc: The location to assign to the symbol
-/// \param type: The type of symbol to create
-/// \param static_lifetime: Whether the symbol should have a static lifetime
-/// \param prefix: The prefix to use for the symbol's basename
-/// \return Returns a reference to the new symbol
-static const symbolt &c_new_tmp_symbol(
-  symbol_tablet &symbol_table,
-  const source_locationt &loc,
-  const typet &type,
-  const bool static_lifetime,
-  const std::string &prefix="tmp")
-{
-  symbolt &tmp_symbol = get_fresh_aux_symbol(
-    type, id2string(loc.get_function()), prefix, loc, ID_C, symbol_table);
-  tmp_symbol.is_static_lifetime=static_lifetime;
-
-  return tmp_symbol;
-}
-
-/// \param type: Desired type (C_bool or plain bool)
-/// \param loc: source location
-/// \return nondet expr of that type
-static exprt c_get_nondet_bool(const typet &type, const source_locationt &loc)
-{
-  // We force this to 0 and 1 and won't consider other values
-  return typecast_exprt(side_effect_expr_nondett(bool_typet(), loc), type);
-}
-
 class symbol_factoryt
 {
   std::vector<const symbolt *> &symbols_created;
   symbol_tablet &symbol_table;
   const source_locationt &loc;
-  const bool assume_non_null;
   namespacet ns;
+  const c_object_factory_parameterst &object_factory_params;
+
+  typedef std::set<irep_idt> recursion_sett;
 
 public:
   symbol_factoryt(
     std::vector<const symbolt *> &_symbols_created,
     symbol_tablet &_symbol_table,
     const source_locationt &loc,
-    const bool _assume_non_null):
-      symbols_created(_symbols_created),
+    const c_object_factory_parameterst &object_factory_params)
+    : symbols_created(_symbols_created),
       symbol_table(_symbol_table),
       loc(loc),
-      assume_non_null(_assume_non_null),
-      ns(_symbol_table)
+      ns(_symbol_table),
+      object_factory_params(object_factory_params)
   {}
 
   exprt allocate_object(
@@ -78,7 +53,11 @@ public:
     const typet &allocate_type,
     const bool static_lifetime);
 
-  void gen_nondet_init(code_blockt &assignments, const exprt &expr);
+  void gen_nondet_init(
+    code_blockt &assignments,
+    const exprt &expr,
+    const std::size_t depth = 0,
+    recursion_sett recursion_set = recursion_sett());
 };
 
 /// Create a symbol for a pointer to point to
@@ -95,12 +74,14 @@ exprt symbol_factoryt::allocate_object(
   const typet &allocate_type,
   const bool static_lifetime)
 {
-  const symbolt &aux_symbol=
-    c_new_tmp_symbol(
-      symbol_table,
-      loc,
-      allocate_type,
-      static_lifetime);
+  symbolt &aux_symbol = get_fresh_aux_symbol(
+    allocate_type,
+    id2string(loc.get_function()),
+    "tmp",
+    loc,
+    ID_C,
+    symbol_table);
+  aux_symbol.is_static_lifetime = static_lifetime;
   symbols_created.push_back(&aux_symbol);
 
   const typet &allocate_type_resolved=ns.follow(allocate_type);
@@ -127,9 +108,13 @@ exprt symbol_factoryt::allocate_object(
 /// \param assignments: The code block to add code to
 /// \param expr: The expression which we are generating a non-determinate value
 ///   for
+/// \param depth number of pointers followed so far during initialisation
+/// \param recursion_set names of structs seen so far on current pointer chain
 void symbol_factoryt::gen_nondet_init(
   code_blockt &assignments,
-  const exprt &expr)
+  const exprt &expr,
+  const std::size_t depth,
+  recursion_sett recursion_set)
 {
   const typet &type=ns.follow(expr.type());
 
@@ -138,6 +123,22 @@ void symbol_factoryt::gen_nondet_init(
     // dereferenced type
     const pointer_typet &pointer_type=to_pointer_type(type);
     const typet &subtype=ns.follow(pointer_type.subtype());
+
+    if(subtype.id() == ID_struct)
+    {
+      const struct_typet &struct_type = to_struct_type(subtype);
+      const irep_idt struct_tag = struct_type.get_tag();
+
+      if(
+        recursion_set.find(struct_tag) != recursion_set.end() &&
+        depth >= object_factory_params.max_nondet_tree_depth)
+      {
+        code_assignt c(expr, null_pointer_exprt(pointer_type));
+        assignments.add(std::move(c));
+
+        return;
+      }
+    }
 
     code_blockt non_null_inst;
 
@@ -152,9 +153,9 @@ void symbol_factoryt::gen_nondet_init(
     {
       init_expr=dereference_exprt(allocated, allocated.type().subtype());
     }
-    gen_nondet_init(non_null_inst, init_expr);
+    gen_nondet_init(non_null_inst, init_expr, depth + 1, recursion_set);
 
-    if(assume_non_null)
+    if(depth < object_factory_params.min_null_tree_depth)
     {
       // Add the following code to assignments:
       // <expr> = <aoe>;
@@ -181,14 +182,32 @@ void symbol_factoryt::gen_nondet_init(
       assignments.add(std::move(null_check));
     }
   }
-  // TODO(OJones): Add support for structs and arrays
+  else if(type.id() == ID_struct)
+  {
+    const struct_typet &struct_type = to_struct_type(type);
+
+    const irep_idt struct_tag = struct_type.get_tag();
+
+    recursion_set.insert(struct_tag);
+
+    for(const auto &component : struct_type.components())
+    {
+      const typet &component_type = component.type();
+      const irep_idt name = component.get_name();
+
+      member_exprt me(expr, name, component_type);
+      me.add_source_location() = loc;
+
+      gen_nondet_init(assignments, me, depth, recursion_set);
+    }
+  }
   else
   {
     // If type is a ID_c_bool then add the following code to assignments:
     //   <expr> = NONDET(_BOOL);
     // Else add the following code to assignments:
     //   <expr> = NONDET(type);
-    exprt rhs = type.id() == ID_c_bool ? c_get_nondet_bool(type, loc)
+    exprt rhs = type.id() == ID_c_bool ? get_nondet_bool(type, loc)
                                        : side_effect_expr_nondett(type, loc);
     code_assignt assign(expr, rhs);
     assign.add_source_location()=loc;
@@ -205,7 +224,8 @@ void symbol_factoryt::gen_nondet_init(
 /// \param base_name: The name to use for the symbol created
 /// \param type: The type for the symbol created
 /// \param loc: The location to assign to generated code
-/// \param allow_null: Whether to allow a null value when type is a pointer
+/// \param object_factory_parameters configuration parameters for the object
+///   factory
 /// \return Returns the symbol_exprt for the symbol created
 symbol_exprt c_nondet_symbol_factory(
   code_blockt &init_code,
@@ -213,7 +233,7 @@ symbol_exprt c_nondet_symbol_factory(
   const irep_idt base_name,
   const typet &type,
   const source_locationt &loc,
-  bool allow_null)
+  const c_object_factory_parameterst &object_factory_parameters)
 {
   irep_idt identifier=id2string(goto_functionst::entry_point())+
     "::"+id2string(base_name);
@@ -236,10 +256,7 @@ symbol_exprt c_nondet_symbol_factory(
   symbols_created.push_back(main_symbol_ptr);
 
   symbol_factoryt state(
-    symbols_created,
-    symbol_table,
-    loc,
-    !allow_null);
+    symbols_created, symbol_table, loc, object_factory_parameters);
   code_blockt assignments;
   state.gen_nondet_init(assignments, main_symbol_expr);
 

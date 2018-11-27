@@ -368,7 +368,12 @@ bool compilet::link()
     goto_model.goto_functions.function_map.erase(
       goto_functionst::entry_point());
 
-    if(ansi_c_entry_point(goto_model.symbol_table, get_message_handler()))
+    const bool error = ansi_c_entry_point(
+      goto_model.symbol_table,
+      get_message_handler(),
+      c_object_factory_parameterst());
+
+    if(error)
       return true;
 
     // entry_point may (should) add some more functions.

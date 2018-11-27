@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/cmdline.h>
 #include <util/config.h>
 #include <util/message.h>
+#include <util/object_factory_parameters.h>
 #include <util/unicode.h>
 
 #include <langapi/mode.h>

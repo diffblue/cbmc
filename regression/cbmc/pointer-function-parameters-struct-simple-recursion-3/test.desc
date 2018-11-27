@@ -1,0 +1,13 @@
+CORE
+main.c
+--function func --min-null-tree-depth 2 --max-nondet-tree-depth 10 --cover branch
+^EXIT=0$
+^SIGNAL=0$
+\[func.coverage.2\] file main.c line .* function func block 1 branch false: SATISFIED
+\[func.coverage.3\] file main.c line .* function func block 1 branch true: FAILED
+\[func.coverage.4\] file main.c line .* function func block 2 branch false: SATISFIED
+\[func.coverage.5\] file main.c line .* function func block 2 branch true: FAILED
+\[func.coverage.6\] file main.c line .* function func block 3 branch false: SATISFIED
+\[func.coverage.7\] file main.c line .* function func block 3 branch true: SATISFIED
+--
+^warning: ignoring

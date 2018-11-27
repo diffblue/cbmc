@@ -109,7 +109,7 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
 
   jbmc_parse_optionst::set_default_options(options);
   parse_java_language_options(cmdline, options);
-  parse_object_factory_options(cmdline, options);
+  parse_java_object_factory_options(cmdline, options);
 
   if(cmdline.isset("show-symex-strategies"))
   {

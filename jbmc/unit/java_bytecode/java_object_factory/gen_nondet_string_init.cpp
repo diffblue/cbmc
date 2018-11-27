@@ -46,7 +46,7 @@ SCENARIO(
     symbol_typet java_string_type("java::java.lang.String");
     symbol_exprt expr("arg", java_string_type);
 
-    object_factory_parameterst object_factory_parameters;
+    java_object_factory_parameterst object_factory_parameters;
     object_factory_parameters.max_nondet_string_length = 20;
     object_factory_parameters.function_id = "test";
 

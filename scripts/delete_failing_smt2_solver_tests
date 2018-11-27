@@ -156,6 +156,11 @@ rm no_nondet_static/test.desc
 rm null1/test.desc
 rm pointer-function-parameters/test.desc
 rm pointer-function-parameters-2/test.desc
+rm pointer-function-parameters-struct-mutual-recursion/test.desc
+rm pointer-function-parameters-struct-non-recursive/test.desc
+rm pointer-function-parameters-struct-simple-recursion/test.desc
+rm pointer-function-parameters-struct-simple-recursion-2/test.desc
+rm pointer-function-parameters-struct-simple-recursion-3/test.desc
 rm scanf1/test.desc
 rm simple_assert/test.desc
 rm stack-trace/test.desc

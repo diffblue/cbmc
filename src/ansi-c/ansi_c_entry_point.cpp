@@ -22,7 +22,8 @@ Author: Daniel Kroening, kroening@kroening.com
 exprt::operandst build_function_environment(
   const code_typet::parameterst &parameters,
   code_blockt &init_code,
-  symbol_tablet &symbol_table)
+  symbol_tablet &symbol_table,
+  const c_object_factory_parameterst &object_factory_parameters)
 {
   exprt::operandst main_arguments;
   main_arguments.resize(parameters.size());
@@ -35,14 +36,13 @@ exprt::operandst build_function_environment(
     const irep_idt base_name=p.get_base_name().empty()?
       ("argument#"+std::to_string(param_number)):p.get_base_name();
 
-    main_arguments[param_number]=
-      c_nondet_symbol_factory(
-        init_code,
-        symbol_table,
-        base_name,
-        p.type(),
-        p.source_location(),
-        true);
+    main_arguments[param_number] = c_nondet_symbol_factory(
+      init_code,
+      symbol_table,
+      base_name,
+      p.type(),
+      p.source_location(),
+      object_factory_parameters);
   }
 
   return main_arguments;
@@ -111,7 +111,8 @@ void record_function_outputs(
 
 bool ansi_c_entry_point(
   symbol_tablet &symbol_table,
-  message_handlert &message_handler)
+  message_handlert &message_handler,
+  const c_object_factory_parameterst &object_factory_parameters)
 {
   // check if entry point is already there
   if(symbol_table.symbols.find(goto_functionst::entry_point())!=
@@ -179,9 +180,9 @@ bool ansi_c_entry_point(
 
   static_lifetime_init(symbol_table, symbol.location);
 
-  return generate_ansi_c_start_function(symbol, symbol_table, message_handler);
+  return generate_ansi_c_start_function(
+    symbol, symbol_table, message_handler, object_factory_parameters);
 }
-
 
 /// Generate a _start function for a specific function
 /// \param symbol: The symbol for the function that should be
@@ -189,11 +190,14 @@ bool ansi_c_entry_point(
 /// \param symbol_table: The symbol table for the program. The new _start
 ///   function symbol will be added to this table
 /// \param message_handler: The message handler
+/// \param object_factory_parameters configuration parameters for the object
+///   factory
 /// \return Returns false if the _start method was generated correctly
 bool generate_ansi_c_start_function(
   const symbolt &symbol,
   symbol_tablet &symbol_table,
-  message_handlert &message_handler)
+  message_handlert &message_handler,
+  const c_object_factory_parameterst &object_factory_parameters)
 {
   PRECONDITION(!symbol.value.is_nil());
   code_blockt init_code;
@@ -423,11 +427,8 @@ bool generate_ansi_c_start_function(
   else
   {
     // produce nondet arguments
-    call_main.arguments()=
-      build_function_environment(
-        parameters,
-        init_code,
-        symbol_table);
+    call_main.arguments() = build_function_environment(
+      parameters, init_code, symbol_table, object_factory_parameters);
   }
 
   init_code.add(std::move(call_main));

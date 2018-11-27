@@ -30,7 +30,7 @@ class java_object_factoryt
   /// methods in this class.
   const source_locationt &loc;
 
-  const object_factory_parameterst object_factory_parameters;
+  const java_object_factory_parameterst object_factory_parameters;
 
   /// This is employed in conjunction with the depth above. Every time the
   /// non-det generator visits a type, the type is added to this set. We forbid
@@ -83,7 +83,7 @@ public:
   java_object_factoryt(
     std::vector<const symbolt *> &_symbols_created,
     const source_locationt &loc,
-    const object_factory_parameterst _object_factory_parameters,
+    const java_object_factory_parameterst _object_factory_parameters,
     symbol_table_baset &_symbol_table,
     const select_pointer_typet &pointer_type_selector)
     : symbols_created(_symbols_created),
@@ -1212,7 +1212,7 @@ void java_object_factoryt::gen_nondet_init(
   {
     // types different from pointer or structure:
     // bool, int, float, byte, char, ...
-    exprt rhs = type.id() == ID_c_bool ? get_nondet_bool(type)
+    exprt rhs = type.id() == ID_c_bool ? get_nondet_bool(type, loc)
                                        : side_effect_expr_nondett(type, loc);
     code_assignt assign(expr, rhs);
     assign.add_source_location()=loc;
@@ -1536,7 +1536,7 @@ exprt object_factory(
   const irep_idt base_name,
   code_blockt &init_code,
   symbol_table_baset &symbol_table,
-  object_factory_parameterst parameters,
+  java_object_factory_parameterst parameters,
   allocation_typet alloc_type,
   const source_locationt &loc,
   const select_pointer_typet &pointer_type_selector)
@@ -1629,7 +1629,7 @@ void gen_nondet_init(
   const source_locationt &loc,
   bool skip_classid,
   allocation_typet alloc_type,
-  const object_factory_parameterst &object_factory_parameters,
+  const java_object_factory_parameterst &object_factory_parameters,
   const select_pointer_typet &pointer_type_selector,
   update_in_placet update_in_place)
 {
@@ -1666,7 +1666,7 @@ exprt object_factory(
   const irep_idt base_name,
   code_blockt &init_code,
   symbol_tablet &symbol_table,
-  const object_factory_parameterst &object_factory_parameters,
+  const java_object_factory_parameterst &object_factory_parameters,
   allocation_typet alloc_type,
   const source_locationt &location)
 {
@@ -1690,7 +1690,7 @@ void gen_nondet_init(
   const source_locationt &loc,
   bool skip_classid,
   allocation_typet alloc_type,
-  const object_factory_parameterst &object_factory_parameters,
+  const java_object_factory_parameterst &object_factory_parameters,
   update_in_placet update_in_place)
 {
   select_pointer_typet pointer_type_selector;

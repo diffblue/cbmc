@@ -44,7 +44,7 @@ static goto_programt get_gen_nondet_init_instructions(
   const source_locationt &source_loc,
   symbol_table_baset &symbol_table,
   message_handlert &message_handler,
-  const object_factory_parameterst &object_factory_parameters,
+  const java_object_factory_parameterst &object_factory_parameters,
   const irep_idt &mode)
 {
   code_blockt gen_nondet_init_code;
@@ -82,7 +82,7 @@ static std::pair<goto_programt::targett, bool> insert_nondet_init_code(
   const goto_programt::targett &target,
   symbol_table_baset &symbol_table,
   message_handlert &message_handler,
-  object_factory_parameterst object_factory_parameters,
+  java_object_factory_parameterst object_factory_parameters,
   const irep_idt &mode)
 {
   const auto next_instr = std::next(target);
@@ -172,7 +172,7 @@ void convert_nondet(
   goto_programt &goto_program,
   symbol_table_baset &symbol_table,
   message_handlert &message_handler,
-  const object_factory_parameterst &object_factory_parameters,
+  const java_object_factory_parameterst &object_factory_parameters,
   const irep_idt &mode)
 {
   bool changed = false;
@@ -200,10 +200,10 @@ void convert_nondet(
 void convert_nondet(
   goto_model_functiont &function,
   message_handlert &message_handler,
-  const object_factory_parameterst &object_factory_parameters,
+  const java_object_factory_parameterst &object_factory_parameters,
   const irep_idt &mode)
 {
-  object_factory_parameterst parameters = object_factory_parameters;
+  java_object_factory_parameterst parameters = object_factory_parameters;
   parameters.function_id = function.get_function_id();
   convert_nondet(
     function.get_goto_function().body,
@@ -219,7 +219,7 @@ void convert_nondet(
   goto_functionst &goto_functions,
   symbol_table_baset &symbol_table,
   message_handlert &message_handler,
-  const object_factory_parameterst &object_factory_parameters)
+  const java_object_factory_parameterst &object_factory_parameters)
 {
   const namespacet ns(symbol_table);
 
@@ -229,7 +229,7 @@ void convert_nondet(
 
     if(symbol.mode==ID_java)
     {
-      object_factory_parameterst parameters = object_factory_parameters;
+      java_object_factory_parameterst parameters = object_factory_parameters;
       parameters.function_id = f_it.first;
       convert_nondet(
         f_it.second.body,
@@ -248,7 +248,7 @@ void convert_nondet(
 void convert_nondet(
   goto_modelt &goto_model,
   message_handlert &message_handler,
-  const object_factory_parameterst& object_factory_parameters)
+  const java_object_factory_parameterst &object_factory_parameters)
 {
   convert_nondet(
     goto_model.goto_functions,

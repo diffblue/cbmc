@@ -197,7 +197,7 @@ static void clinit_wrapper_do_recursive_calls(
   const irep_idt &class_name,
   code_blockt &init_body,
   const bool nondet_static,
-  const object_factory_parameterst &object_factory_parameters,
+  const java_object_factory_parameterst &object_factory_parameters,
   const select_pointer_typet &pointer_type_selector)
 {
   const symbolt &class_symbol = symbol_table.lookup_ref(class_name);
@@ -226,7 +226,7 @@ static void clinit_wrapper_do_recursive_calls(
   // used in get_stub_initializer_body and java_static_lifetime_init.
   if(nondet_static)
   {
-    object_factory_parameterst parameters = object_factory_parameters;
+    java_object_factory_parameterst parameters = object_factory_parameters;
     parameters.function_id = clinit_wrapper_name(class_name);
 
     std::vector<irep_idt> nondet_ids;
@@ -449,7 +449,7 @@ code_blockt get_thread_safe_clinit_wrapper_body(
   const irep_idt &function_id,
   symbol_table_baset &symbol_table,
   const bool nondet_static,
-  const object_factory_parameterst &object_factory_parameters,
+  const java_object_factory_parameterst &object_factory_parameters,
   const select_pointer_typet &pointer_type_selector)
 {
   const symbolt &wrapper_method_symbol = symbol_table.lookup_ref(function_id);
@@ -645,7 +645,7 @@ code_ifthenelset get_clinit_wrapper_body(
   const irep_idt &function_id,
   symbol_table_baset &symbol_table,
   const bool nondet_static,
-  const object_factory_parameterst &object_factory_parameters,
+  const java_object_factory_parameterst &object_factory_parameters,
   const select_pointer_typet &pointer_type_selector)
 {
   // Assume that class C extends class C' and implements interfaces
@@ -843,7 +843,7 @@ void stub_global_initializer_factoryt::create_stub_global_initializer_symbols(
 code_blockt stub_global_initializer_factoryt::get_stub_initializer_body(
   const irep_idt &function_id,
   symbol_table_baset &symbol_table,
-  const object_factory_parameterst &object_factory_parameters,
+  const java_object_factory_parameterst &object_factory_parameters,
   const select_pointer_typet &pointer_type_selector)
 {
   const symbolt &stub_initializer_symbol = symbol_table.lookup_ref(function_id);
@@ -862,7 +862,7 @@ code_blockt stub_global_initializer_factoryt::get_stub_initializer_body(
     class_globals.first != class_globals.second,
     "class with synthetic clinit should have at least one global to init");
 
-  object_factory_parameterst parameters = object_factory_parameters;
+  java_object_factory_parameterst parameters = object_factory_parameters;
   parameters.function_id = function_id;
 
   for(auto it = class_globals.first; it != class_globals.second; ++it)

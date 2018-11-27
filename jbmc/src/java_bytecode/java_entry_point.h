@@ -25,7 +25,7 @@ bool java_entry_point(
   class message_handlert &message_handler,
   bool assume_init_pointers_not_null,
   bool assert_uncaught_exceptions,
-  const object_factory_parameterst &object_factory_parameters,
+  const java_object_factory_parameterst &object_factory_parameters,
   const select_pointer_typet &pointer_type_selector,
   bool string_refinement_enabled);
 
@@ -76,7 +76,7 @@ bool generate_java_start_function(
   class message_handlert &message_handler,
   bool assume_init_pointers_not_null,
   bool assert_uncaught_exceptions,
-  const object_factory_parameterst &object_factory_parameters,
+  const java_object_factory_parameterst &object_factory_parameters,
   const select_pointer_typet &pointer_type_selector);
 
 #endif // CPROVER_JAVA_BYTECODE_JAVA_ENTRY_POINT_H

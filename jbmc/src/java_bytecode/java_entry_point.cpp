@@ -122,7 +122,7 @@ static void java_static_lifetime_init(
   symbol_table_baset &symbol_table,
   const source_locationt &source_location,
   bool assume_init_pointers_not_null,
-  object_factory_parameterst object_factory_parameters,
+  java_object_factory_parameterst object_factory_parameters,
   const select_pointer_typet &pointer_type_selector,
   bool string_refinement_enabled,
   message_handlert &message_handler)
@@ -218,7 +218,7 @@ static void java_static_lifetime_init(
                                     is_non_null_library_global(sym.name) ||
                                     assume_init_pointers_not_null;
 
-        object_factory_parameterst parameters = object_factory_parameters;
+        java_object_factory_parameterst parameters = object_factory_parameters;
         if(not_allow_null && !is_class_model)
           parameters.min_null_tree_depth = 1;
 
@@ -278,7 +278,7 @@ exprt::operandst java_build_arguments(
   code_blockt &init_code,
   symbol_table_baset &symbol_table,
   bool assume_init_pointers_not_null,
-  object_factory_parameterst object_factory_parameters,
+  java_object_factory_parameterst object_factory_parameters,
   const select_pointer_typet &pointer_type_selector)
 {
   const java_method_typet::parameterst &parameters =
@@ -307,7 +307,7 @@ exprt::operandst java_build_arguments(
     // be null
     bool is_this=(param_number==0) && parameters[param_number].get_this();
 
-    object_factory_parameterst parameters = object_factory_parameters;
+    java_object_factory_parameterst parameters = object_factory_parameters;
     // only pointer must be non-null
     if(assume_init_pointers_not_null || is_this)
       parameters.min_null_tree_depth = 1;
@@ -598,7 +598,7 @@ bool java_entry_point(
   message_handlert &message_handler,
   bool assume_init_pointers_not_null,
   bool assert_uncaught_exceptions,
-  const object_factory_parameterst &object_factory_parameters,
+  const java_object_factory_parameterst &object_factory_parameters,
   const select_pointer_typet &pointer_type_selector,
   bool string_refinement_enabled)
 {
@@ -654,7 +654,7 @@ bool generate_java_start_function(
   message_handlert &message_handler,
   bool assume_init_pointers_not_null,
   bool assert_uncaught_exceptions,
-  const object_factory_parameterst &object_factory_parameters,
+  const java_object_factory_parameterst &object_factory_parameters,
   const select_pointer_typet &pointer_type_selector)
 {
   messaget message(message_handler);
