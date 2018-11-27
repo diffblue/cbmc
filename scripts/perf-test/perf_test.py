@@ -275,26 +275,27 @@ def select_region(session, mode, region, instance_type):
         logger.info('global: Lowest spot price: {} ({}): {}'.format(
             min_region, min_az, min_price))
 
-    # http://aws-ubuntu.herokuapp.com/
-    # 20180306 - Ubuntu 16.04 LTS (xenial) - hvm:ebs-ssd
+    # https://cloud-images.ubuntu.com/locator/ec2/
+    # 20181124 - Ubuntu 18.04 LTS (bionic) - hvm:ebs-ssd
     AMI_ids = {
         "Mappings": {
             "RegionMap": {
-                "ap-northeast-1": { "64": "ami-0d74386b" },
-                "ap-northeast-2": { "64": "ami-a414b9ca" },
-                "ap-south-1": { "64": "ami-0189d76e" },
-                "ap-southeast-1": { "64": "ami-52d4802e" },
-                "ap-southeast-2": { "64": "ami-d38a4ab1" },
-                "ca-central-1": { "64": "ami-ae55d2ca" },
-                "eu-central-1": { "64": "ami-7c412f13" },
-                "eu-west-1": { "64": "ami-f90a4880" },
-                "eu-west-2": { "64": "ami-f4f21593" },
-                "eu-west-3": { "64": "ami-0e55e373" },
-                "sa-east-1": { "64": "ami-423d772e" },
-                "us-east-1": { "64": "ami-43a15f3e" },
-                "us-east-2": { "64": "ami-916f59f4" },
-                "us-west-1": { "64": "ami-925144f2" },
-                "us-west-2": { "64": "ami-4e79ed36" }
+                "ap-northeast-1": { "64": "ami-0fd02119f1653c976" },
+                "ap-northeast-2": { "64": "ami-096560874cb404a4d" },
+                "ap-northeast-3": { "64": "ami-064d6dc91cdb4daa8" },
+                "ap-south-1": { "64": "ami-01187fe59c07cd350" },
+                "ap-southeast-1": { "64": "ami-0efb24bbbf33a2fd7" },
+                "ap-southeast-2": { "64": "ami-03932cb7d3a1a69af" },
+                "ca-central-1": { "64": "ami-0388b9f812caf5c3f" },
+                "eu-central-1": { "64": "ami-080d06f90eb293a27" },
+                "eu-west-1": { "64": "ami-02790d1ebf3b5181d" },
+                "eu-west-2": { "64": "ami-06328f1e652dc7605" },
+                "eu-west-3": { "64": "ami-0697abcfa8916e673" },
+                "sa-east-1": { "64": "ami-04fb8967affdf73b6" },
+                "us-east-1": { "64": "ami-0d2505740b82f7948" },
+                "us-east-2": { "64": "ami-0cf8cc36b8c81c6de" },
+                "us-west-1": { "64": "ami-09c5eca75eed8245a" },
+                "us-west-2": { "64": "ami-0f05ad41860678734" }
             }
         }
     }
