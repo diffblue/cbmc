@@ -17,7 +17,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/expr_util.h>
 #include <util/invariant.h>
 #include <util/pointer_offset_size.h>
-#include <util/range.h>
 #include <util/std_expr.h>
 
 #include <analyses/dirty.h>
@@ -517,26 +516,9 @@ void goto_symext::phi_function(
   const statet::goto_statet &goto_state,
   statet &dest_state)
 {
-  auto ssa_of_current_name =
-    [&](const std::pair<irep_idt, std::pair<ssa_exprt, unsigned>> &pair) {
-      return pair.second.first;
-    };
-
-  auto dest_state_names_range =
-    make_range(dest_state.level2.current_names)
-      .filter(
-        [&](const std::pair<irep_idt, std::pair<ssa_exprt, unsigned>> &pair) {
-          // We ignore the identifiers that are already in goto_state names
-          return goto_state.level2_current_names.count(pair.first) == 0;
-        })
-      .map<const ssa_exprt>(ssa_of_current_name);
-
-  // go over all variables to see what changed
-  auto all_current_names_range = make_range(goto_state.level2_current_names)
-                                   .map<const ssa_exprt>(ssa_of_current_name)
-                                   .concat(dest_state_names_range);
-
-  if(all_current_names_range.empty())
+  if(
+    goto_state.level2_current_names.empty() &&
+    dest_state.level2.current_names.empty())
     return;
 
   guardt diff_guard = goto_state.guard;
