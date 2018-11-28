@@ -299,8 +299,9 @@ std::ostream &format_rec(std::ostream &os, const exprt &expr)
   else if(id == ID_if)
   {
     const auto &if_expr = to_if_expr(expr);
-    return os << format(if_expr.cond()) << '?' << format(if_expr.true_case())
-              << ':' << format(if_expr.false_case());
+    return os << "(" << format(if_expr.cond()) << " ? "
+              << format(if_expr.true_case()) << " : "
+              << format(if_expr.false_case()) << ")";
   }
   else if(id == ID_code)
   {
