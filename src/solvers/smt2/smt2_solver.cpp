@@ -6,10 +6,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "smt2_parser.h"
+
+#include "smt2_format.h"
+
 #include <fstream>
 #include <iostream>
-
-#include "smt2_parser.h"
 
 #include <util/message.h>
 #include <util/namespace.h>
@@ -23,11 +25,8 @@ Author: Daniel Kroening, kroening@kroening.com
 class smt2_solvert:public smt2_parsert
 {
 public:
-  smt2_solvert(
-    std::istream &_in,
-    decision_proceduret &_solver):
-    smt2_parsert(_in),
-    solver(_solver)
+  smt2_solvert(std::istream &_in, decision_proceduret &_solver)
+    : smt2_parsert(_in), solver(_solver), status(NOT_SOLVED)
   {
   }
 
@@ -39,6 +38,13 @@ protected:
   void expand_function_applications(exprt &);
 
   std::set<irep_idt> constants_done;
+
+  enum
+  {
+    NOT_SOLVED,
+    SAT,
+    UNSAT
+  } status;
 };
 
 void smt2_solvert::define_constants(const exprt &expr)
@@ -139,14 +145,17 @@ void smt2_solvert::command(const std::string &c)
       {
       case decision_proceduret::resultt::D_SATISFIABLE:
         std::cout << "sat\n";
+        status = SAT;
         break;
 
       case decision_proceduret::resultt::D_UNSATISFIABLE:
         std::cout << "unsat\n";
+        status = UNSAT;
         break;
 
       case decision_proceduret::resultt::D_ERROR:
         std::cout << "error\n";
+        status = NOT_SOLVED;
       }
     }
     else if(c=="check-sat-assuming")
@@ -161,6 +170,63 @@ void smt2_solvert::command(const std::string &c)
       {
         std::cout << e.pretty() << '\n'; // need to do an 'smt2_format'
       }
+    }
+    else if(c == "get-value")
+    {
+      std::vector<exprt> ops;
+
+      if(next_token() != OPEN)
+        throw "get-value expects list as argument";
+
+      while(peek() != CLOSE && peek() != END_OF_FILE)
+        ops.push_back(expression()); // any term
+
+      if(next_token() != CLOSE)
+        throw "get-value expects ')' at end of list";
+
+      if(status != SAT)
+        throw "model is not available";
+
+      std::vector<exprt> values;
+      values.reserve(ops.size());
+
+      for(const auto &op : ops)
+      {
+        if(op.id() != ID_symbol)
+          throw "get-value expects symbol";
+
+        const auto &identifier = to_symbol_expr(op).get_identifier();
+
+        const auto id_map_it = id_map.find(identifier);
+
+        if(id_map_it == id_map.end())
+          throw "unexpected symbol " + id2string(identifier);
+
+        exprt value;
+
+        if(id_map_it->second.definition.is_nil())
+          value = solver.get(op);
+        else
+          value = solver.get(id_map_it->second.definition);
+
+        if(value.is_nil())
+          throw "no value for " + id2string(identifier);
+
+        values.push_back(value);
+      }
+
+      std::cout << '(';
+
+      for(std::size_t op_nr = 0; op_nr < ops.size(); op_nr++)
+      {
+        if(op_nr != 0)
+          std::cout << "\n ";
+
+        std::cout << '(' << smt2_format(ops[op_nr]) << ' '
+                  << smt2_format(values[op_nr]) << ')';
+      }
+
+      std::cout << ")\n";
     }
     else if(c=="simplify")
     {
@@ -195,7 +261,6 @@ void smt2_solvert::command(const std::string &c)
     | ( get-proof )
     | ( get-unsat-assumptions )
     | ( get-unsat-core )
-    | ( get-value ( htermi + ) )
     | ( pop hnumerali )
     | ( push hnumerali )
     | ( reset )

@@ -185,6 +185,7 @@ SRC = $(BOOLEFORCE_SRC) \
       sat/resolution_proof.cpp \
       smt2/smt2_conv.cpp \
       smt2/smt2_dec.cpp \
+      smt2/smt2_format.cpp \
       smt2/smt2_parser.cpp \
       smt2/smt2_tokenizer.cpp \
       smt2/smt2irep.cpp \
