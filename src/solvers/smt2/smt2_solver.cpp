@@ -167,9 +167,7 @@ void smt2_solvert::command(const std::string &c)
       // this is a command that Z3 appears to implement
       exprt e=expression();
       if(e.is_not_nil())
-      {
-        std::cout << e.pretty() << '\n'; // need to do an 'smt2_format'
-      }
+        std::cout << smt2_format(e) << '\n';
     }
     else if(c == "get-value")
     {
@@ -237,7 +235,7 @@ void smt2_solvert::command(const std::string &c)
         const symbol_tablet symbol_table;
         const namespacet ns(symbol_table);
         exprt e_simplified=simplify_expr(e, ns);
-        std::cout << e.pretty() << '\n'; // need to do an 'smt2_format'
+        std::cout << smt2_format(e) << '\n';
       }
     }
     #if 0
