@@ -376,14 +376,12 @@ void goto_symext::phi_function(
                                    .map<const ssa_exprt>(ssa_of_current_name)
                                    .concat(dest_state_names_range);
 
-  guardt diff_guard;
-  if(!all_current_names_range.empty())
-  {
-    diff_guard=goto_state.guard;
+  if(all_current_names_range.empty())
+    return;
 
-    // this gets the diff between the guards
-    diff_guard-=dest_state.guard;
-  }
+  guardt diff_guard = goto_state.guard;
+  // this gets the diff between the guards
+  diff_guard -= dest_state.guard;
 
   for(const auto &ssa : all_current_names_range)
   {
