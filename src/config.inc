@@ -12,6 +12,9 @@ endif
 #CXXFLAGS += -O2 -DNDEBUG
 #CXXFLAGS += -O0 -g
 
+# With GCC this adds function names in stack backtraces
+#LINKFLAGS="-rdynamic"
+
 # If GLPK is available; this is used by goto-instrument and musketeer.
 #LIB_GLPK = -lglpk
 
