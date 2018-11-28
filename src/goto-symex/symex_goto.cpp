@@ -354,6 +354,39 @@ void goto_symext::merge_value_sets(
   dest.value_set.make_union(src.value_set);
 }
 
+/// Applies f to `(k, ssa, i, j)` if the first map maps k to (ssa, i) and
+/// the second to (ssa', j). If the first map has an entry for k but not the
+/// second one then j is 0, and when the first map has no entry for k then i = 0
+static void for_each2(
+  const std::map<irep_idt, std::pair<ssa_exprt, unsigned>> &first_map,
+  const std::map<irep_idt, std::pair<ssa_exprt, unsigned>> &second_map,
+  const std::function<void(const ssa_exprt &, unsigned, unsigned)> &f)
+{
+  auto second_it = second_map.begin();
+  for(const auto &first_pair : first_map)
+  {
+    while(second_it != second_map.end() && second_it->first < first_pair.first)
+    {
+      f(second_it->second.first, 0, second_it->second.second);
+      ++second_it;
+    }
+    const ssa_exprt &ssa = first_pair.second.first;
+    const unsigned count = first_pair.second.second;
+    if(second_it != second_map.end() && second_it->first == first_pair.first)
+    {
+      f(ssa, count, second_it->second.second);
+      ++second_it;
+    }
+    else
+      f(ssa, count, 0);
+  }
+  while(second_it != second_map.end())
+  {
+    f(second_it->second.first, 0, second_it->second.second);
+    ++second_it;
+  }
+}
+
 /// Helper function for \c phi_function which merges the names of an identifier
 /// for two different states.
 /// \param goto_state: first state
@@ -366,7 +399,8 @@ void goto_symext::merge_value_sets(
 ///   added to the target be simplified
 /// \param[out] target: equation that will receive the resulting assignment
 /// \param ssa: SSA expression to merge
-/// \param goto_count: current level 2 count in \p goto_state of \p l1_identifier
+/// \param goto_count: current level 2 count in \p goto_state of
+///   \p l1_identifier
 /// \param dest_count: level 2 count in \p dest_state of \p l1_identifier
 static void merge_names(
   const goto_symext::statet::goto_statet &goto_state,
@@ -509,23 +543,23 @@ void goto_symext::phi_function(
   // this gets the diff between the guards
   diff_guard -= dest_state.guard;
 
-  for(const auto &ssa : all_current_names_range)
-  {
-    const unsigned goto_count = goto_state.level2_current_count(l1_identifier);
-    const unsigned dest_count = dest_state.level2.current_count(l1_identifier);
-    merge_names(
-      goto_state,
-      dest_state,
-      ns,
-      diff_guard,
-      guard_identifier,
-      log,
-      symex_config.simplify_opt,
-      target,
-      ssa,
-      goto_count,
-      dest_count);
-  }
+  for_each2(
+    goto_state.level2_current_names,
+    dest_state.level2.current_names,
+    [&](const ssa_exprt &ssa, unsigned goto_count, unsigned dest_count) {
+      merge_names(
+        goto_state,
+        dest_state,
+        ns,
+        diff_guard,
+        guard_identifier,
+        log,
+        symex_config.simplify_opt,
+        target,
+        ssa,
+        goto_count,
+        dest_count);
+    });
 }
 
 void goto_symext::loop_bound_exceeded(
