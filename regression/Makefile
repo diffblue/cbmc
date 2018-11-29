@@ -8,7 +8,6 @@ DIRS = cbmc \
        goto-instrument \
        cpp \
        cbmc-cover \
-       goto-instrument-typedef \
        smt2_solver \
        strings \
        invariants \

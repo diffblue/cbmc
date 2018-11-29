@@ -13,11 +13,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <algorithm>
 #include <iostream>
-#include <memory>
+#include <sstream>
 
-#include <langapi/language.h>
-#include <langapi/mode.h>
-
+#include <util/format_expr.h>
+#include <util/format_type.h>
 #include <util/json_irep.h>
 
 #include "goto_model.h"
@@ -44,23 +43,12 @@ void show_symbol_table_brief_plain(
   {
     const symbolt &symbol=ns.lookup(id);
 
-    std::unique_ptr<languaget> ptr;
-
-    if(symbol.mode=="")
-      ptr=get_default_language();
-    else
-    {
-      ptr=get_language_from_mode(symbol.mode);
-      if(ptr==nullptr)
-        throw "symbol "+id2string(symbol.name)+" has unknown mode";
-    }
-
-    std::string type_str;
+    out << symbol.name;
 
     if(symbol.type.is_not_nil())
-      ptr->from_type(symbol.type, type_str, ns);
+      out << ' ' << format(symbol.type);
 
-    out << symbol.name << " " << type_str << '\n';
+    out << '\n';
   }
 }
 
@@ -84,35 +72,19 @@ void show_symbol_table_plain(
   {
     const symbolt &symbol=ns.lookup(id);
 
-    std::unique_ptr<languaget> ptr;
-
-    if(symbol.mode=="")
-    {
-      ptr=get_default_language();
-    }
-    else
-    {
-      ptr=get_language_from_mode(symbol.mode);
-    }
-
-    if(!ptr)
-      throw "symbol "+id2string(symbol.name)+" has unknown mode";
-
-    std::string type_str, value_str;
-
-    if(symbol.type.is_not_nil())
-      ptr->from_type(symbol.type, type_str, ns);
-
-    if(symbol.value.is_not_nil())
-      ptr->from_expr(symbol.value, value_str, ns);
-
     out << "Symbol......: " << symbol.name << '\n' << std::flush;
     out << "Pretty name.: " << symbol.pretty_name << '\n';
     out << "Module......: " << symbol.module << '\n';
     out << "Base name...: " << symbol.base_name << '\n';
     out << "Mode........: " << symbol.mode << '\n';
-    out << "Type........: " << type_str << '\n';
-    out << "Value.......: " << value_str << '\n';
+    out << "Type........: ";
+    if(symbol.type.is_not_nil())
+      out << format(symbol.type);
+    out << '\n';
+    out << "Value.......: ";
+    if(symbol.value.is_not_nil())
+      out << format(symbol.value);
+    out << '\n';
     out << "Flags.......:";
 
     if(symbol.is_lvalue)
@@ -172,36 +144,22 @@ static void show_symbol_table_json_ui(
   {
     const symbolt &symbol = id_and_symbol.second;
 
-    std::unique_ptr<languaget> ptr;
-
-    if(symbol.mode=="")
-    {
-      ptr=get_default_language();
-    }
-    else
-    {
-      ptr=get_language_from_mode(symbol.mode);
-    }
-
-    if(!ptr)
-      throw "symbol "+id2string(symbol.name)+" has unknown mode";
-
-    std::string type_str, value_str;
-
-    if(symbol.type.is_not_nil())
-      ptr->from_type(symbol.type, type_str, ns);
-
-    if(symbol.value.is_not_nil())
-      ptr->from_expr(symbol.value, value_str, ns);
-
     json_objectt symbol_json;
     symbol_json["prettyName"] = json_stringt(symbol.pretty_name);
     symbol_json["baseName"] = json_stringt(symbol.base_name);
     symbol_json["mode"] = json_stringt(symbol.mode);
     symbol_json["module"] = json_stringt(symbol.module);
 
-    symbol_json["prettyType"] = json_stringt(type_str);
-    symbol_json["prettyValue"] = json_stringt(value_str);
+    std::ostringstream type_str, value_str;
+
+    if(symbol.type.is_not_nil())
+      type_str << format(symbol.type);
+
+    if(symbol.value.is_not_nil())
+      value_str << format(symbol.value);
+
+    symbol_json["prettyType"] = json_stringt(type_str.str());
+    symbol_json["prettyValue"] = json_stringt(value_str.str());
 
     symbol_json["type"] = irep_converter.convert_from_irep(symbol.type);
     symbol_json["value"] = irep_converter.convert_from_irep(symbol.value);
@@ -247,24 +205,10 @@ static void show_symbol_table_brief_json_ui(
   {
     const symbolt &symbol = id_and_symbol.second;
 
-    std::unique_ptr<languaget> ptr;
-
-    if(symbol.mode=="")
-    {
-      ptr=get_default_language();
-    }
-    else
-    {
-      ptr=get_language_from_mode(symbol.mode);
-    }
-
-    if(!ptr)
-      throw "symbol "+id2string(symbol.name)+" has unknown mode";
-
-    std::string type_str, value_str;
+    std::ostringstream type_str, value_str;
 
     if(symbol.type.is_not_nil())
-      ptr->from_type(symbol.type, type_str, ns);
+      type_str << format(symbol.type);
 
     json_objectt symbol_json;
     symbol_json["prettyName"] = json_stringt(symbol.pretty_name);
@@ -272,7 +216,7 @@ static void show_symbol_table_brief_json_ui(
     symbol_json["mode"] = json_stringt(symbol.mode);
     symbol_json["module"] = json_stringt(symbol.module);
 
-    symbol_json["prettyType"] = json_stringt(type_str);
+    symbol_json["prettyType"] = json_stringt(type_str.str());
 
     symbol_json["type"] = irep_converter.convert_from_irep(symbol.type);
 
