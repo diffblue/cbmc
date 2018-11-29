@@ -25,7 +25,7 @@ template <typename iteratort, typename outputt>
 class map_iteratort
 {
 public:
-  using difference_type = void; // Requiered by STL
+  using difference_type = typename iteratort::difference_type;
   using value_type = outputt;
   using pointer = const outputt *;
   using reference = const outputt &;
@@ -109,7 +109,7 @@ template <typename iteratort>
 class filter_iteratort
 {
 public:
-  using difference_type = void; // Required by STL
+  using difference_type = typename iteratort::difference_type;
   using value_type = typename iteratort::value_type;
   using pointer = const value_type *;
   using reference = const value_type &;
@@ -194,7 +194,7 @@ template <typename first_iteratort, typename second_iteratort>
 struct concat_iteratort
 {
 public:
-  using difference_type = void; // Requiered by STL
+  using difference_type = typename first_iteratort::difference_type;
   using value_type = typename first_iteratort::value_type;
   using pointer = const value_type *;
   using reference = const value_type &;
