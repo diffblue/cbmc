@@ -264,7 +264,7 @@ void trace_value(
   if(lhs_object.has_value())
     identifier=lhs_object->get_identifier();
 
-  out << "  " << from_expr(ns, identifier, full_lhs) << '=';
+  out << from_expr(ns, identifier, full_lhs) << '=';
 
   if(value.is_nil())
     out << "(assignment removed)";
@@ -348,6 +348,136 @@ bool is_index_member_symbol(const exprt &src)
     return false;
 }
 
+/// \brief show a compact variant of the goto trace on the console
+/// \param out the output stream
+/// \param ns the namespace
+/// \param goto_trace the trace to be shown
+/// \param options any options, e.g., numerical representation
+void show_compact_goto_trace(
+  messaget::mstreamt &out,
+  const namespacet &ns,
+  const goto_tracet &goto_trace,
+  const trace_optionst &options)
+{
+  std::size_t function_depth = 0;
+
+  for(const auto &step : goto_trace.steps)
+  {
+    if(step.is_function_call())
+      function_depth++;
+    else if(step.is_function_return())
+      function_depth--;
+
+    // hide the hidden ones
+    if(step.hidden)
+      continue;
+
+    switch(step.type)
+    {
+    case goto_trace_stept::typet::ASSERT:
+      if(!step.cond_value)
+      {
+        out << '\n';
+        out << messaget::red << "Violated property:" << messaget::reset << '\n';
+        if(!step.pc->source_location.is_nil())
+          out << "  " << state_location(step, ns) << '\n';
+
+        out << "  " << messaget::red << step.comment << messaget::reset << '\n';
+
+        if(step.pc->is_assert())
+          out << "  " << from_expr(ns, step.function, step.pc->guard) << '\n';
+
+        out << '\n';
+      }
+      break;
+
+    case goto_trace_stept::typet::ASSIGNMENT:
+      if(
+        step.assignment_type ==
+        goto_trace_stept::assignment_typet::ACTUAL_PARAMETER)
+      {
+        break;
+      }
+
+      out << "  ";
+
+      if(!step.pc->source_location.get_line().empty())
+      {
+        out << messaget::faint << step.pc->source_location.get_line() << ':'
+            << messaget::reset << ' ';
+      }
+
+      trace_value(
+        out,
+        ns,
+        step.get_lhs_object(),
+        step.full_lhs,
+        step.full_lhs_value,
+        options);
+      break;
+
+    case goto_trace_stept::typet::FUNCTION_CALL:
+      // downwards arrow
+      out << '\n' << messaget::faint << u8"\u21b3" << messaget::reset << ' ';
+      if(!step.pc->source_location.get_file().empty())
+      {
+        out << messaget::faint << step.pc->source_location.get_file();
+
+        if(!step.pc->source_location.get_line().empty())
+        {
+          out << messaget::faint << ':' << step.pc->source_location.get_line();
+        }
+
+        out << messaget::reset << ' ';
+      }
+
+      {
+        // show the display name
+        const auto &f_symbol = ns.lookup(step.called_function);
+        out << f_symbol.display_name();
+      }
+
+      out << '(';
+
+      {
+        bool first = true;
+        for(auto &arg : step.function_arguments)
+        {
+          if(first)
+            first = false;
+          else
+            out << ", ";
+
+          out << from_expr(ns, step.function, arg);
+        }
+      }
+      out << ")\n";
+      break;
+
+    case goto_trace_stept::typet::FUNCTION_RETURN:
+      // upwards arrow
+      out << messaget::faint << u8"\u21b5" << messaget::reset << '\n';
+      break;
+
+    case goto_trace_stept::typet::ASSUME:
+    case goto_trace_stept::typet::LOCATION:
+    case goto_trace_stept::typet::GOTO:
+    case goto_trace_stept::typet::DECL:
+    case goto_trace_stept::typet::OUTPUT:
+    case goto_trace_stept::typet::INPUT:
+    case goto_trace_stept::typet::SPAWN:
+    case goto_trace_stept::typet::MEMORY_BARRIER:
+    case goto_trace_stept::typet::ATOMIC_BEGIN:
+    case goto_trace_stept::typet::ATOMIC_END:
+    case goto_trace_stept::typet::DEAD:
+      break;
+
+    default:
+      UNREACHABLE;
+    }
+  }
+}
+
 void show_full_goto_trace(
   messaget::mstreamt &out,
   const namespacet &ns,
@@ -419,13 +549,14 @@ void show_full_goto_trace(
           show_state_header(out, ns, step, step.step_nr, options);
         }
 
-       trace_value(
-         out,
-         ns,
-         step.get_lhs_object(),
-         step.full_lhs,
-         step.full_lhs_value,
-         options);
+        out << "  ";
+        trace_value(
+          out,
+          ns,
+          step.get_lhs_object(),
+          step.full_lhs,
+          step.full_lhs_value,
+          options);
       }
       break;
 
@@ -437,6 +568,7 @@ void show_full_goto_trace(
         show_state_header(out, ns, step, step.step_nr, options);
       }
 
+      out << "  ";
       trace_value(
         out, ns, step.get_lhs_object(), step.full_lhs, step.full_lhs_value, options);
       break;
@@ -623,6 +755,8 @@ void show_goto_trace(
 {
   if(options.stack_trace)
     show_goto_stack_trace(out, ns, goto_trace);
+  else if(options.compact_trace)
+    show_compact_goto_trace(out, ns, goto_trace, options);
   else
     show_full_goto_trace(out, ns, goto_trace, options);
 }
