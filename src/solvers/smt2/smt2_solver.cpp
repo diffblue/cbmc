@@ -225,6 +225,13 @@ void smt2_solvert::command(const std::string &c)
 
       std::cout << ")\n";
     }
+    else if(c == "echo")
+    {
+      if(next_token() != STRING_LITERAL)
+        throw error("expected string literal");
+
+      std::cout << smt2_format(constant_exprt(buffer, string_typet())) << '\n';
+    }
     else if(c == "simplify")
     {
       // this is a command that Z3 appears to implement
@@ -248,8 +255,6 @@ void smt2_solvert::command(const std::string &c)
     | ( define-fun-rec hfunction_def i )
     | ( define-funs-rec ( hfunction_deci n+1 ) ( htermi n+1 ) )
     | ( define-sort hsymboli ( hsymboli ??? ) hsorti )
-    | ( echo hstringi )
-    | ( exit )
     | ( get-assertions )
     | ( get-assignment )
     | ( get-info hinfo_flag i )

@@ -57,6 +57,23 @@ std::ostream &smt2_format_rec(std::ostream &out, const exprt &expr)
     {
       out << value;
     }
+    else if(expr_type.id() == ID_string)
+    {
+      const auto &value_string = id2string(value);
+
+      out << '"';
+
+      for(const auto &c : value_string)
+      {
+        // " is the only escape sequence
+        if(c == '"')
+          out << '"' << '"';
+        else
+          out << c;
+      }
+
+      out << '"';
+    }
     else
       DATA_INVARIANT(false, "unhandled constant: " + expr_type.id_string());
   }

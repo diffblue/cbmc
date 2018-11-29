@@ -1,0 +1,9 @@
+CORE
+echo1.smt2
+
+^EXIT=20$
+^SIGNAL=0$
+\(error "line 2: expected string literal"\)
+"whatnot"
+"what""not"
+--
