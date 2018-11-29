@@ -241,14 +241,14 @@ std::ostream &format_rec(std::ostream &os, const exprt &expr)
     id == ID_byte_extract_little_endian || id == ID_byte_extract_big_endian)
   {
     const auto &byte_extract_expr = to_byte_extract_expr(expr);
-    return os << id << "(" << format(byte_extract_expr.op()) << ", "
+    return os << id << '(' << format(byte_extract_expr.op()) << ", "
               << format(byte_extract_expr.offset()) << ", "
               << format(byte_extract_expr.type()) << ')';
   }
   else if(id == ID_byte_update_little_endian || id == ID_byte_update_big_endian)
   {
     const auto &byte_update_expr = to_byte_update_expr(expr);
-    return os << id << "(" << format(byte_update_expr.op()) << ", "
+    return os << id << '(' << format(byte_update_expr.op()) << ", "
               << format(byte_update_expr.offset()) << ", "
               << format(byte_update_expr.value()) << ", "
               << format(byte_update_expr.type()) << ')';
@@ -299,9 +299,9 @@ std::ostream &format_rec(std::ostream &os, const exprt &expr)
   else if(id == ID_if)
   {
     const auto &if_expr = to_if_expr(expr);
-    return os << "(" << format(if_expr.cond()) << " ? "
+    return os << '(' << format(if_expr.cond()) << " ? "
               << format(if_expr.true_case()) << " : "
-              << format(if_expr.false_case()) << ")";
+              << format(if_expr.false_case()) << ')';
   }
   else if(id == ID_code)
   {
