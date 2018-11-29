@@ -777,7 +777,9 @@ public:
     const validation_modet vm = validation_modet::INVARIANT)
   {
     DATA_CHECK(
-      expr.operands().size() == 2, "binary expression must have two operands");
+      vm,
+      expr.operands().size() == 2,
+      "binary expression must have two operands");
   }
 
   static void validate(
@@ -859,6 +861,7 @@ public:
     binary_exprt::validate(expr, ns, vm);
 
     DATA_CHECK(
+      vm,
       expr.type().id() == ID_bool,
       "result of binary predicate expression should be of type bool");
   }
@@ -901,6 +904,7 @@ public:
 
     // check types
     DATA_CHECK(
+      vm,
       base_type_eq(expr.op0().type(), expr.op1().type(), ns),
       "lhs and rhs of binary relation expression should have same type");
   }

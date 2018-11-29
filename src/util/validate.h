@@ -15,18 +15,13 @@ Author: Daniel Poetzl
 #include "validation_mode.h"
 
 /// This macro takes a condition which denotes a well-formedness criterion on
-/// goto programs, expressions, instructions, etc. When invoking the macro, a
-/// variable named `vm` of type `const validation_modet` should be in scope. It
-/// indicates whether DATA_INVARIANT() is used to check the condition, or if an
-/// exception is thrown when the condition does not hold.
-#define DATA_CHECK(condition, message)                                         \
+/// goto programs, expressions, instructions, etc. The first parameter should be
+/// of type `validate_modet` and indicates whether DATA_INVARIANT() is used to
+/// check the condition, or if an exception is thrown when the condition does
+/// not hold.
+#define DATA_CHECK(vm, condition, message)                                     \
   do                                                                           \
   {                                                                            \
-    static_assert(                                                             \
-      std::is_same<decltype(vm), const validation_modet>::value,               \
-      "when invoking the macro DATA_CHECK(), a variable named `vm` of type "   \
-      "`const validation_modet` should be in scope which indicates the "       \
-      "validation mode (see `validate.h`");                                    \
     switch(vm)                                                                 \
     {                                                                          \
     case validation_modet::INVARIANT:                                          \
@@ -39,14 +34,9 @@ Author: Daniel Poetzl
     }                                                                          \
   } while(0)
 
-#define DATA_CHECK_WITH_DIAGNOSTICS(condition, message, ...)                   \
+#define DATA_CHECK_WITH_DIAGNOSTICS(vm, condition, message, ...)               \
   do                                                                           \
   {                                                                            \
-    static_assert(                                                             \
-      std::is_same<decltype(vm), const validation_modet>::value,               \
-      "when invoking the macro DATA_CHECK_WITH_DIAGNOSTICS(), a variable "     \
-      "named `vm` of type `const validation_modet` should be in scope which "  \
-      "indicates the validation mode (see `validate.h`");                      \
     switch(vm)                                                                 \
     {                                                                          \
     case validation_modet::INVARIANT:                                          \
