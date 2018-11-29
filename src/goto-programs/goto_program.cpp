@@ -706,9 +706,11 @@ void goto_programt::instructiont::validate(
     break;
   case ASSIGN:
     DATA_CHECK(
+      vm,
       code.get_statement() == ID_assign,
       "assign instruction should contain an assign statement");
-    DATA_CHECK(targets.empty(), "assign instruction should not have a target");
+    DATA_CHECK(
+      vm, targets.empty(), "assign instruction should not have a target");
     break;
   case DECL:
     break;

@@ -291,7 +291,7 @@ public:
     const validation_modet vm = validation_modet::INVARIANT)
   {
     DATA_CHECK(
-      code.operands().size() == 2, "assignment must have two operands");
+      vm, code.operands().size() == 2, "assignment must have two operands");
   }
 
   static void validate(
@@ -302,6 +302,7 @@ public:
     check(code, vm);
 
     DATA_CHECK(
+      vm,
       base_type_eq(code.op0().type(), code.op1().type(), ns),
       "lhs and rhs of assignment must have same type");
   }
