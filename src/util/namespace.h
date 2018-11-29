@@ -26,6 +26,7 @@ class c_enum_typet;
 class union_tag_typet;
 class struct_tag_typet;
 class c_enum_tag_typet;
+class symbol_table_baset;
 
 /// Basic interface for a namespace. This is not used
 /// in practice, as the one being used is \ref namespacet
@@ -93,20 +94,20 @@ class namespacet:public namespace_baset
 {
 public:
   // constructors
-  explicit namespacet(const symbol_tablet &_symbol_table)
+  explicit namespacet(const symbol_table_baset &_symbol_table)
   { symbol_table1=&_symbol_table; symbol_table2=nullptr; }
 
   namespacet(
-    const symbol_tablet &_symbol_table1,
-    const symbol_tablet &_symbol_table2)
+    const symbol_table_baset &_symbol_table1,
+    const symbol_table_baset &_symbol_table2)
   {
     symbol_table1=&_symbol_table1;
     symbol_table2=&_symbol_table2;
   }
 
   namespacet(
-    const symbol_tablet *_symbol_table1,
-    const symbol_tablet *_symbol_table2)
+    const symbol_table_baset *_symbol_table1,
+    const symbol_table_baset *_symbol_table2)
   {
     symbol_table1=_symbol_table1;
     symbol_table2=_symbol_table2;
@@ -122,13 +123,13 @@ public:
   std::size_t smallest_unused_suffix(const std::string &prefix) const override;
 
   /// Return first symbol table registered with the namespace.
-  const symbol_tablet &get_symbol_table() const
+  const symbol_table_baset &get_symbol_table() const
   {
     return *symbol_table1;
   }
 
 protected:
-  const symbol_tablet *symbol_table1, *symbol_table2;
+  const symbol_table_baset *symbol_table1, *symbol_table2;
 };
 
 /// A multi namespace is essentially a namespace,
@@ -143,8 +144,8 @@ public:
   {
   }
 
-  explicit multi_namespacet(
-    const symbol_tablet &symbol_table):namespacet(nullptr, nullptr)
+  explicit multi_namespacet(const symbol_table_baset &symbol_table)
+    : namespacet(nullptr, nullptr)
   {
     add(symbol_table);
   }
@@ -161,13 +162,13 @@ public:
   /// is working with.
   /// \param symbol_table: Reference to the symbol table to be added to this
   /// namespace.
-  void add(const symbol_tablet &symbol_table)
+  void add(const symbol_table_baset &symbol_table)
   {
     symbol_table_list.push_back(&symbol_table);
   }
 
 protected:
-  typedef std::vector<const symbol_tablet *> symbol_table_listt;
+  typedef std::vector<const symbol_table_baset *> symbol_table_listt;
   symbol_table_listt symbol_table_list;
 };
 

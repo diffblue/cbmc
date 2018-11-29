@@ -11,9 +11,10 @@
 #include "goto_functions.h"
 #include "goto_convert_functions.h"
 
-#include <util/message.h>
 #include <langapi/language_file.h>
 #include <util/journalling_symbol_table.h>
+#include <util/message.h>
+#include <util/symbol_table_builder.h>
 
 /// Provides a wrapper for a map of lazily loaded goto_functiont.
 /// This incrementally builds a goto-functions object, while permitting
@@ -142,8 +143,11 @@ private:
   // const first
   reference ensure_function_loaded_internal(const key_type &name) const
   {
+    symbol_table_buildert symbol_table_builder =
+      symbol_table_buildert::wrap(symbol_table);
+
     journalling_symbol_tablet journalling_table =
-      journalling_symbol_tablet::wrap(symbol_table);
+      journalling_symbol_tablet::wrap(symbol_table_builder);
     reference named_function=ensure_entry_converted(name, journalling_table);
     mapped_type function=named_function.second;
     if(processed_functions.count(name)==0)

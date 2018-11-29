@@ -44,7 +44,27 @@ public:
 
   virtual ~symbol_table_baset();
 
-public:
+  /// Find smallest unused integer i so that prefix + std::to_string(i)
+  /// does not exist in the list \p symbols.
+  /// \param prefix: A string denoting the prefix we want to find the
+  ///   smallest suffix of.
+  /// \param start_number: The starting suffix number to search from.
+  /// \return The small unused suffix size.
+  std::size_t
+  next_unused_suffix(const std::string &prefix, std::size_t start_number) const
+  {
+    while(this->symbols.find(prefix + std::to_string(start_number)) !=
+          symbols.end())
+      ++start_number;
+
+    return start_number;
+  }
+
+  virtual std::size_t next_unused_suffix(const std::string &prefix) const
+  {
+    return next_unused_suffix(prefix, 0);
+  }
+
   /// Permits implicit cast to const symbol_tablet &
   operator const symbol_tablet &() const
   {

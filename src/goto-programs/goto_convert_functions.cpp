@@ -11,10 +11,11 @@ Date: June 2003
 #include "goto_convert_functions.h"
 
 #include <util/base_type.h>
+#include <util/fresh_symbol.h>
+#include <util/prefix.h>
 #include <util/std_code.h>
 #include <util/symbol_table.h>
-#include <util/prefix.h>
-#include <util/fresh_symbol.h>
+#include <util/symbol_table_builder.h>
 
 #include "goto_inline.h"
 
@@ -217,10 +218,11 @@ void goto_convert(
   goto_modelt &goto_model,
   message_handlert &message_handler)
 {
+  symbol_table_buildert symbol_table_builder =
+    symbol_table_buildert::wrap(goto_model.symbol_table);
+
   goto_convert(
-    goto_model.symbol_table,
-    goto_model.goto_functions,
-    message_handler);
+    symbol_table_builder, goto_model.goto_functions, message_handler);
 }
 
 void goto_convert(
@@ -228,7 +230,11 @@ void goto_convert(
   goto_functionst &functions,
   message_handlert &message_handler)
 {
-  goto_convert_functionst goto_convert_functions(symbol_table, message_handler);
+  symbol_table_buildert symbol_table_builder =
+    symbol_table_buildert::wrap(symbol_table);
+
+  goto_convert_functionst goto_convert_functions(
+    symbol_table_builder, message_handler);
 
   goto_convert_functions.goto_convert(functions);
 }
@@ -239,7 +245,11 @@ void goto_convert(
   goto_functionst &functions,
   message_handlert &message_handler)
 {
-  goto_convert_functionst goto_convert_functions(symbol_table, message_handler);
+  symbol_table_buildert symbol_table_builder =
+    symbol_table_buildert::wrap(symbol_table);
+
+  goto_convert_functionst goto_convert_functions(
+    symbol_table_builder, message_handler);
 
   goto_convert_functions.convert_function(
     identifier, functions.function_map[identifier]);

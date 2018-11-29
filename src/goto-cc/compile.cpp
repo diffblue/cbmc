@@ -22,6 +22,7 @@ Date: June 2006
 #include <util/file_util.h>
 #include <util/get_base_name.h>
 #include <util/suffix.h>
+#include <util/symbol_table_builder.h>
 #include <util/tempdir.h>
 #include <util/unicode.h>
 #include <util/version.h>
@@ -697,29 +698,32 @@ void compilet::add_compiler_specific_defines(configt &config) const
 
 void compilet::convert_symbols(goto_functionst &dest)
 {
+  symbol_table_buildert symbol_table_builder =
+    symbol_table_buildert::wrap(goto_model.symbol_table);
+
   goto_convert_functionst converter(
-    goto_model.symbol_table, get_message_handler());
+    symbol_table_builder, get_message_handler());
 
   // the compilation may add symbols!
 
   symbol_tablet::symbolst::size_type before=0;
 
-  while(before != goto_model.symbol_table.symbols.size())
+  while(before != symbol_table_builder.symbols.size())
   {
-    before = goto_model.symbol_table.symbols.size();
+    before = symbol_table_builder.symbols.size();
 
     typedef std::set<irep_idt> symbols_sett;
     symbols_sett symbols;
 
-    for(const auto &named_symbol : goto_model.symbol_table.symbols)
+    for(const auto &named_symbol : symbol_table_builder.symbols)
       symbols.insert(named_symbol.first);
 
     // the symbol table iterators aren't stable
     for(const auto &symbol : symbols)
     {
       symbol_tablet::symbolst::const_iterator s_it =
-        goto_model.symbol_table.symbols.find(symbol);
-      CHECK_RETURN(s_it != goto_model.symbol_table.symbols.end());
+        symbol_table_builder.symbols.find(symbol);
+      CHECK_RETURN(s_it != symbol_table_builder.symbols.end());
 
       if(
         s_it->second.is_function() && !s_it->second.is_compiled() &&
@@ -727,7 +731,7 @@ void compilet::convert_symbols(goto_functionst &dest)
       {
         debug() << "Compiling " << s_it->first << eom;
         converter.convert_function(s_it->first, dest.function_map[s_it->first]);
-        goto_model.symbol_table.get_writeable_ref(symbol).set_compiled();
+        symbol_table_builder.get_writeable_ref(symbol).set_compiled();
       }
     }
   }

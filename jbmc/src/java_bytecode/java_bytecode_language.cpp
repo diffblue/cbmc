@@ -19,6 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/string2int.h>
 #include <util/suffix.h>
 #include <util/symbol_table.h>
+#include <util/symbol_table_builder.h>
 
 #include <json/json_parser.h>
 
@@ -790,8 +791,11 @@ bool java_bytecode_languaget::typecheck(
       break;
     case LAZY_METHODS_MODE_EAGER:
       {
+        symbol_table_buildert symbol_table_builder =
+          symbol_table_buildert::wrap(symbol_table);
+
         journalling_symbol_tablet journalling_symbol_table =
-          journalling_symbol_tablet::wrap(symbol_table);
+          journalling_symbol_tablet::wrap(symbol_table_builder);
 
         // Convert all synthetic methods:
         for(const auto &function_id_and_type : synthetic_methods)
@@ -842,6 +846,9 @@ bool java_bytecode_languaget::generate_support_functions(
 {
   PRECONDITION(language_options_initialized);
 
+  symbol_table_buildert symbol_table_builder =
+    symbol_table_buildert::wrap(symbol_table);
+
   main_function_resultt res=
     get_main_symbol(symbol_table, main_class, get_message_handler());
   if(!res.is_success())
@@ -849,11 +856,11 @@ bool java_bytecode_languaget::generate_support_functions(
 
   // Load the main function into the symbol table to get access to its
   // parameter names
-  convert_lazy_method(res.main_function.name, symbol_table);
+  convert_lazy_method(res.main_function.name, symbol_table_builder);
 
   // generate the test harness in __CPROVER__start and a call the entry point
   return java_entry_point(
-    symbol_table,
+    symbol_table_builder,
     main_class,
     get_message_handler(),
     assume_inputs_non_null,
@@ -880,12 +887,15 @@ bool java_bytecode_languaget::do_ci_lazy_method_conversion(
   symbol_tablet &symbol_table,
   method_bytecodet &method_bytecode)
 {
+  symbol_table_buildert symbol_table_builder =
+    symbol_table_buildert::wrap(symbol_table);
+
   const method_convertert method_converter =
-    [this, &symbol_table]
-      (const irep_idt &function_id, ci_lazy_methods_neededt lazy_methods_needed)
-    {
+    [this, &symbol_table_builder](
+      const irep_idt &function_id,
+      ci_lazy_methods_neededt lazy_methods_needed) {
       return convert_single_method(
-        function_id, symbol_table, std::move(lazy_methods_needed));
+        function_id, symbol_table_builder, std::move(lazy_methods_needed));
     };
 
   ci_lazy_methodst method_gather(
