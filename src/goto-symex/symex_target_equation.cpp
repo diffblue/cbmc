@@ -211,7 +211,8 @@ void symex_target_equationt::function_call(
   const exprt &guard,
   const irep_idt &function_identifier,
   const std::vector<exprt> &ssa_function_arguments,
-  const sourcet &source)
+  const sourcet &source,
+  const bool hidden)
 {
   SSA_steps.push_back(SSA_stept());
   SSA_stept &SSA_step=SSA_steps.back();
@@ -221,6 +222,7 @@ void symex_target_equationt::function_call(
   SSA_step.source = source;
   SSA_step.called_function = function_identifier;
   SSA_step.ssa_function_arguments = ssa_function_arguments;
+  SSA_step.hidden = hidden;
 
   merge_ireps(SSA_step);
 }
@@ -228,7 +230,8 @@ void symex_target_equationt::function_call(
 /// just record a location
 void symex_target_equationt::function_return(
   const exprt &guard,
-  const sourcet &source)
+  const sourcet &source,
+  const bool hidden)
 {
   SSA_steps.push_back(SSA_stept());
   SSA_stept &SSA_step=SSA_steps.back();
@@ -236,6 +239,7 @@ void symex_target_equationt::function_return(
   SSA_step.guard = guard;
   SSA_step.type = goto_trace_stept::typet::FUNCTION_RETURN;
   SSA_step.source = source;
+  SSA_step.hidden = hidden;
 
   merge_ireps(SSA_step);
 }

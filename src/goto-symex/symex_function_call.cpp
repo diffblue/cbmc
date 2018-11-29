@@ -258,16 +258,19 @@ void goto_symext::symex_function_call_code(
   for(auto &a : arguments)
     state.rename(a, ns);
 
+  // we hide the call if the caller and callee are both hidden
+  const bool hidden = state.top().hidden_function && goto_function.is_hidden();
+
   // record the call
   target.function_call(
-    state.guard.as_expr(), identifier, arguments, state.source);
+    state.guard.as_expr(), identifier, arguments, state.source, hidden);
 
   if(!goto_function.body_available())
   {
     no_body(identifier);
 
     // record the return
-    target.function_return(state.guard.as_expr(), state.source);
+    target.function_return(state.guard.as_expr(), state.source, hidden);
 
     if(call.lhs().is_not_nil())
     {
@@ -354,8 +357,10 @@ void goto_symext::pop_frame(statet &state)
 /// do function call by inlining
 void goto_symext::symex_end_of_function(statet &state)
 {
+  const bool hidden = state.top().hidden_function;
+
   // first record the return
-  target.function_return(state.guard.as_expr(), state.source);
+  target.function_return(state.guard.as_expr(), state.source, hidden);
 
   // then get rid of the frame
   pop_frame(state);
