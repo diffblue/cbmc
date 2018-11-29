@@ -162,17 +162,21 @@ std::string escape(const std::string &s)
 
 /// Replace all occurrences of a string inside a string
 /// \param [out] str: string to search
-/// \param from: string to replace
+/// \param from: string to replace; must be non-empty
 /// \param to: string to replace with
 /// Copyright notice:
 /// Attributed to Gauthier Boaglio
 /// Source: https://stackoverflow.com/a/24315631/7501486
 /// Used under MIT license
+/// Note that this is quadratic in str.size() if from.size() != to.size().
+/// There is no guarantee that it is linear in str.size() if
+/// from.size() == to.size().
 void replace_all(
   std::string &str,
   const std::string &from,
   const std::string &to)
 {
+  PRECONDITION(!from.empty());
   size_t start_pos = 0;
   while((start_pos = str.find(from, start_pos)) != std::string::npos)
   {
