@@ -59,11 +59,9 @@ std::ostream &smt2_format_rec(std::ostream &out, const exprt &expr)
     }
     else if(expr_type.id() == ID_string)
     {
-      const auto &value_string = id2string(value);
-
       out << '"';
 
-      for(const auto &c : value_string)
+      for(const auto &c : value)
       {
         // " is the only escape sequence
         if(c == '"')
