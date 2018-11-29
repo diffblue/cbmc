@@ -1,7 +1,7 @@
 CORE
 function-application2.smt2
 
-^EXIT=134$
+^EXIT=20$
 ^SIGNAL=0$
 ^\(error "line 5: type mismatch in function definition: expected `\(_ BitVec 16\)' but got `\(_ BitVec 8\)'"\)$
 --

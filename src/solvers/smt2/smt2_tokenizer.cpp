@@ -159,8 +159,7 @@ smt2_tokenizert::tokent smt2_tokenizert::get_quoted_symbol()
   }
 
   // Hmpf. Eof before end of quoted symbol. This is an error.
-  error() << "EOF within quoted symbol" << eom;
-  return ERROR;
+  throw error("EOF within quoted symbol");
 }
 
 smt2_tokenizert::tokent smt2_tokenizert::get_string_literal()
@@ -191,15 +190,21 @@ smt2_tokenizert::tokent smt2_tokenizert::get_string_literal()
   }
 
   // Hmpf. Eof before end of string literal. This is an error.
-  error() << "EOF within string literal" << eom;
-  return ERROR;
+  throw error("EOF within string literal");
 }
 
 smt2_tokenizert::tokent smt2_tokenizert::next_token()
 {
   if(peeked)
-    return peeked=false, token;
+    peeked = false;
+  else
+    get_token_from_stream();
 
+  return token;
+}
+
+void smt2_tokenizert::get_token_from_stream()
+{
   char ch;
 
   while(in->get(ch))
@@ -231,60 +236,68 @@ smt2_tokenizert::tokent smt2_tokenizert::next_token()
 
     case '(':
       // produce sub-expression
-      return token=OPEN;
+      token = OPEN;
+      return;
 
     case ')':
       // done with sub-expression
-      return token=CLOSE;
+      token = CLOSE;
+      return;
 
     case '|': // quoted symbol
-      return token=get_quoted_symbol();
+      token = get_quoted_symbol();
+      return;
 
     case '"': // string literal
-      return token=get_string_literal();
+      token = get_string_literal();
+      return;
 
     case ':': // keyword
-      return token=get_simple_symbol();
+      token = get_simple_symbol();
+      return;
 
     case '#':
       if(in->get(ch))
       {
         if(ch=='b')
-          return token=get_bin_numeral();
-        else if(ch=='x')
-          return token=get_hex_numeral();
-        else
         {
-          error() << "unknown numeral token" << eom;
-          return token=ERROR;
+          token = get_bin_numeral();
+          return;
         }
+        else if(ch=='x')
+        {
+          token = get_hex_numeral();
+          return;
+        }
+        else
+          throw error("unknown numeral token");
       }
       else
-      {
-        error() << "unexpected EOF in numeral token" << eom;
-        return token=ERROR;
-      }
+        throw error("unexpected EOF in numeral token");
       break;
 
     default: // likely a simple symbol or a numeral
       if(isdigit(ch))
       {
         in->unget();
-        return token=get_decimal_numeral();
+        token = get_decimal_numeral();
+        return;
       }
       else if(is_simple_symbol_character(ch))
       {
         in->unget();
-        return token=get_simple_symbol();
+        token = get_simple_symbol();
+        return;
       }
       else
       {
         // illegal character, error
-        error() << "unexpected character `" << ch << '\'' << eom;
-        return token=ERROR;
+        std::ostringstream msg;
+        msg << "unexpected character `" << ch << '\'';
+        throw error(msg.str());
       }
     }
   }
 
-  return token=END_OF_FILE;
+  token = END_OF_FILE;
 }
