@@ -151,6 +151,17 @@ public:
     return no;
   }
 
+  // iterators for the underlying string
+  std::string::const_iterator begin() const
+  {
+    return as_string().begin();
+  }
+
+  std::string::const_iterator end() const
+  {
+    return as_string().end();
+  }
+
 private:
   #ifdef __GNUC__
   constexpr
