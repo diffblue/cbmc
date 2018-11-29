@@ -17,6 +17,8 @@ Author: Daniel Kroening
 
 #include <util/arith_tools.h>
 #include <util/format_expr.h>
+#include <util/range.h>
+#include <util/string_utils.h>
 #include <util/symbol.h>
 
 #include <langapi/language_util.h>
@@ -437,21 +439,17 @@ void show_compact_goto_trace(
         out << f_symbol.display_name();
       }
 
-      out << '(';
-
       {
-        bool first = true;
-        for(auto &arg : step.function_arguments)
-        {
-          if(first)
-            first = false;
-          else
-            out << ", ";
+        auto arg_strings = make_range(step.function_arguments)
+                             .map<std::string>([&ns, &step](const exprt &arg) {
+                               return from_expr(ns, step.function, arg);
+                             });
 
-          out << from_expr(ns, step.function, arg);
-        }
+        out << '(';
+        join_strings(out, arg_strings.begin(), arg_strings.end(), ", ");
+        out << ")\n";
       }
-      out << ")\n";
+
       break;
 
     case goto_trace_stept::typet::FUNCTION_RETURN:
