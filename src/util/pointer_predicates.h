@@ -12,6 +12,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_UTIL_POINTER_PREDICATES_H
 #define CPROVER_UTIL_POINTER_PREDICATES_H
 
+#define SYMEX_DYNAMIC_PREFIX "symex_dynamic::"
+
 class exprt;
 class namespacet;
 class typet;

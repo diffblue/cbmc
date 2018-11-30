@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/invariant_utils.h>
 #include <util/optional.h>
 #include <util/pointer_offset_size.h>
+#include <util/pointer_predicates.h>
 #include <util/prefix.h>
 #include <util/simplify_expr.h>
 #include <util/string2int.h>
@@ -135,7 +136,8 @@ void goto_symext::symex_allocate(
 
       size_symbol.base_name=
         "dynamic_object_size"+std::to_string(dynamic_counter);
-      size_symbol.name="symex_dynamic::"+id2string(size_symbol.base_name);
+      size_symbol.name =
+        SYMEX_DYNAMIC_PREFIX + id2string(size_symbol.base_name);
       size_symbol.type=tmp_size.type();
       size_symbol.mode = mode;
       size_symbol.type.set(ID_C_constant, true);
@@ -154,7 +156,7 @@ void goto_symext::symex_allocate(
   symbolt value_symbol;
 
   value_symbol.base_name="dynamic_object"+std::to_string(dynamic_counter);
-  value_symbol.name="symex_dynamic::"+id2string(value_symbol.base_name);
+  value_symbol.name = SYMEX_DYNAMIC_PREFIX + id2string(value_symbol.base_name);
   value_symbol.is_lvalue=true;
   value_symbol.type = *object_type;
   value_symbol.type.set(ID_C_dynamic, true);
@@ -405,7 +407,7 @@ void goto_symext::symex_cpp_new(
   symbol.base_name=
     do_array?"dynamic_"+count_string+"_array":
              "dynamic_"+count_string+"_value";
-  symbol.name="symex_dynamic::"+id2string(symbol.base_name);
+  symbol.name = SYMEX_DYNAMIC_PREFIX + id2string(symbol.base_name);
   symbol.is_lvalue=true;
   if(code.get(ID_statement)==ID_cpp_new_array ||
      code.get(ID_statement)==ID_cpp_new)
