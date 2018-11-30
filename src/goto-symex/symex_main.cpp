@@ -34,7 +34,8 @@ symex_configt::symex_configt(const optionst &options)
     simplify_opt(options.get_bool_option("simplify")),
     unwinding_assertions(options.get_bool_option("unwinding-assertions")),
     partial_loops(options.get_bool_option("partial-loops")),
-    debug_level(unsafe_string2int(options.get_option("debug-level")))
+    debug_level(unsafe_string2int(options.get_option("debug-level"))),
+    run_validation_checks(options.get_bool_option("validate-ssa-equation"))
 {
 }
 
@@ -306,6 +307,8 @@ void goto_symext::symex_from_entry_point_of(
   }
 
   statet state;
+
+  state.run_validation_checks = symex_config.run_validation_checks;
 
   initialize_entry_point(
     state,

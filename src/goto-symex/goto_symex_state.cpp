@@ -121,32 +121,6 @@ static bool check_renaming(const exprt &expr)
   return false;
 }
 
-static void assert_l1_renaming(const exprt &expr)
-{
-  #if 1
-  if(check_renaming_l1(expr))
-  {
-    std::cerr << expr.pretty() << '\n';
-    UNREACHABLE;
-  }
-  #else
-  (void)expr;
-  #endif
-}
-
-static void assert_l2_renaming(const exprt &expr)
-{
-  #if 1
-  if(check_renaming(expr))
-  {
-    std::cerr << expr.pretty() << '\n';
-    UNREACHABLE;
-  }
-  #else
-  (void)expr;
-  #endif
-}
-
 class goto_symex_is_constantt : public is_constantt
 {
 protected:
@@ -197,15 +171,18 @@ void goto_symex_statet::assignment(
   // the type might need renaming
   rename(lhs.type(), l1_identifier, ns);
   lhs.update_type();
-  assert_l1_renaming(lhs);
+  if(run_validation_checks)
+  {
+    DATA_INVARIANT(!check_renaming_l1(lhs), "lhs renaming failed on l1");
+  }
 
-  #if 0
+#if 0
   PRECONDITION(l1_identifier != get_original_name(l1_identifier)
       || l1_identifier=="goto_symex::\\guard"
       || ns.lookup(l1_identifier).is_shared()
       || has_prefix(id2string(l1_identifier), "symex::invalid_object")
       || has_prefix(id2string(l1_identifier), "symex_dynamic::dynamic_object"));
-  #endif
+#endif
 
   // do the l2 renaming
   if(level2.current_names.find(l1_identifier)==level2.current_names.end())
@@ -216,8 +193,11 @@ void goto_symex_statet::assignment(
   // in case we happen to be multi-threaded, record the memory access
   bool is_shared=l2_thread_write_encoding(lhs, ns);
 
-  assert_l2_renaming(lhs);
-  assert_l2_renaming(rhs);
+  if(run_validation_checks)
+  {
+    DATA_INVARIANT(!check_renaming(lhs), "lhs renaming failed on l2");
+    DATA_INVARIANT(!check_renaming(rhs), "rhs renaming failed on l2");
+  }
 
   // see #305 on GitHub for a simple example and possible discussion
   if(is_shared && lhs.type().id() == ID_pointer && !allow_pointer_unsoundness)
@@ -240,8 +220,11 @@ void goto_symex_statet::assignment(
     ssa_exprt l1_lhs(lhs);
     get_l1_name(l1_lhs);
 
-    assert_l1_renaming(l1_lhs);
-    assert_l1_renaming(l1_rhs);
+    if(run_validation_checks)
+    {
+      DATA_INVARIANT(!check_renaming_l1(l1_lhs), "lhs renaming failed on l1");
+      DATA_INVARIANT(!check_renaming_l1(l1_rhs), "rhs renaming failed on l1");
+    }
 
     value_set.assign(l1_lhs, l1_rhs, ns, rhs_is_simplified, is_shared);
   }

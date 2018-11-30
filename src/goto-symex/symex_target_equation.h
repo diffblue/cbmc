@@ -267,6 +267,8 @@ public:
       std::ostream &out) const;
 
     void output(std::ostream &out) const;
+
+    void validate(const namespacet &ns, const validation_modet vm) const;
   };
 
   std::size_t count_assertions() const
@@ -321,6 +323,12 @@ public:
         return true;
 
     return false;
+  }
+
+  void validate(const namespacet &ns, const validation_modet vm) const
+  {
+    for(const SSA_stept &step : SSA_steps)
+      step.validate(ns, vm);
   }
 
 protected:

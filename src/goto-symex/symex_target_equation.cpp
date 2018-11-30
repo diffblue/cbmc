@@ -978,3 +978,63 @@ void symex_target_equationt::SSA_stept::output(std::ostream &out) const
 
   out << "Guard: " << format(guard) << '\n';
 }
+
+/// Check that the SSA step is well-formed
+/// \param ns namespace to lookup identifiers
+/// \param vm validation mode to be used for reporting failures
+void symex_target_equationt::SSA_stept::validate(
+  const namespacet &ns,
+  const validation_modet vm) const
+{
+  validate_full_expr(guard, ns, vm);
+
+  switch(type)
+  {
+  case goto_trace_stept::typet::ASSERT:
+  case goto_trace_stept::typet::ASSUME:
+  case goto_trace_stept::typet::GOTO:
+  case goto_trace_stept::typet::CONSTRAINT:
+    validate_full_expr(cond_expr, ns, vm);
+    break;
+  case goto_trace_stept::typet::ASSIGNMENT:
+  case goto_trace_stept::typet::DECL:
+    validate_full_expr(ssa_lhs, ns, vm);
+    validate_full_expr(ssa_full_lhs, ns, vm);
+    validate_full_expr(original_full_lhs, ns, vm);
+    validate_full_expr(ssa_rhs, ns, vm);
+    DATA_CHECK(
+      vm,
+      base_type_eq(ssa_lhs.get_original_expr(), ssa_rhs, ns),
+      "Type inequality in SSA assignment\nlhs-type: " +
+        ssa_lhs.get_original_expr().type().id_string() +
+        "\nrhs-type: " + ssa_rhs.type().id_string());
+    break;
+  case goto_trace_stept::typet::INPUT:
+  case goto_trace_stept::typet::OUTPUT:
+    for(const auto &expr : io_args)
+      validate_full_expr(expr, ns, vm);
+    break;
+  case goto_trace_stept::typet::FUNCTION_CALL:
+    for(const auto &expr : ssa_function_arguments)
+      validate_full_expr(expr, ns, vm);
+  case goto_trace_stept::typet::FUNCTION_RETURN:
+  {
+    const symbolt *symbol;
+    DATA_CHECK(
+      vm,
+      called_function.empty() || !ns.lookup(called_function, symbol),
+      "unknown function identifier " + id2string(called_function));
+  }
+  break;
+  case goto_trace_stept::typet::NONE:
+  case goto_trace_stept::typet::LOCATION:
+  case goto_trace_stept::typet::DEAD:
+  case goto_trace_stept::typet::SHARED_READ:
+  case goto_trace_stept::typet::SHARED_WRITE:
+  case goto_trace_stept::typet::SPAWN:
+  case goto_trace_stept::typet::MEMORY_BARRIER:
+  case goto_trace_stept::typet::ATOMIC_BEGIN:
+  case goto_trace_stept::typet::ATOMIC_END:
+    break;
+  }
+}

@@ -139,6 +139,27 @@ public:
   /* Used to determine whether or not an identifier can be built
    * before trying and getting an exception */
   static bool can_build_identifier(const exprt &src);
+
+  static void check(
+    const exprt &expr,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    DATA_CHECK(
+      vm, !expr.has_operands(), "SSA expression should not have operands");
+    DATA_CHECK(
+      vm, expr.id() == ID_symbol, "SSA expression symbols are symbols");
+    DATA_CHECK(vm, expr.get_bool(ID_C_SSA_symbol), "wrong SSA expression ID");
+  }
+
+  static void validate(
+    const exprt &expr,
+    const namespacet &ns,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    check(expr, vm);
+    validate_full_expr(
+      static_cast<const exprt &>(expr.find(ID_expression)), ns, vm);
+  }
 };
 
 /*! \brief Cast a generic exprt to an \ref ssa_exprt

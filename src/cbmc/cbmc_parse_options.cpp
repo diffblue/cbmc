@@ -398,6 +398,11 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
       "symex-coverage-report",
       cmdline.get_value("symex-coverage-report"));
 
+  if(cmdline.isset("validate-ssa-equation"))
+  {
+    options.set_option("validate-ssa-equation", true);
+  }
+
   PARSE_OPTIONS_GOTO_TRACE(cmdline, options);
 }
 
