@@ -2,31 +2,33 @@
 
 inline char *__builtin___strcpy_chk(char *dst, const char *src, __CPROVER_size_t s)
 {
-  __CPROVER_HIDE:;
-  #ifdef __CPROVER_STRING_ABSTRACTION
-  __CPROVER_precondition(__CPROVER_is_zero_string(src),
-                         "strcpy zero-termination of 2nd argument");
-  __CPROVER_precondition(__CPROVER_buffer_size(dst)>__CPROVER_zero_string_length(src),
-                         "strcpy buffer overflow");
-  __CPROVER_precondition(__CPROVER_buffer_size(dst)==s,
-                         "builtin object size");
-  dst[__CPROVER_zero_string_length(src)]=0;
-  __CPROVER_is_zero_string(dst)=1;
-  __CPROVER_zero_string_length(dst)=__CPROVER_zero_string_length(src);
-  #else
-  __CPROVER_precondition(__CPROVER_POINTER_OBJECT(dst)!=
-                         __CPROVER_POINTER_OBJECT(src),
-                         "strcpy src/dst overlap");
-  __CPROVER_size_t i=0;
+__CPROVER_HIDE:;
+
+#ifdef __CPROVER_STRING_ABSTRACTION
+  __CPROVER_precondition(
+    __CPROVER_is_zero_string(src), "strcpy zero-termination of 2nd argument");
+  __CPROVER_precondition(
+    __CPROVER_buffer_size(dst) > __CPROVER_zero_string_length(src),
+    "strcpy buffer overflow");
+  __CPROVER_precondition(
+    __CPROVER_buffer_size(dst) == s, "builtin object size");
+  dst[__CPROVER_zero_string_length(src)] = 0;
+  __CPROVER_is_zero_string(dst) = 1;
+  __CPROVER_zero_string_length(dst) = __CPROVER_zero_string_length(src);
+#else
+  __CPROVER_precondition(
+    __CPROVER_POINTER_OBJECT(dst) != __CPROVER_POINTER_OBJECT(src) ||
+      (src >= dst + s) || (dst >= src + s),
+    "strcpy src/dst overlap");
+  __CPROVER_size_t i = 0;
   char ch;
   do
   {
-    ch=src[i];
-    dst[i]=ch;
+    ch = src[i];
+    dst[i] = ch;
     i++;
-  }
-  while(i<s && ch!=(char)0);
-  #endif
+  } while(i < s && ch != (char)0);
+#endif
   return dst;
 }
 
@@ -34,40 +36,44 @@ inline char *__builtin___strcpy_chk(char *dst, const char *src, __CPROVER_size_t
 
 __inline char *__builtin___strcat_chk(char *dst, const char *src, __CPROVER_size_t s)
 {
-  __CPROVER_HIDE:;
-  #ifdef __CPROVER_STRING_ABSTRACTION
+__CPROVER_HIDE:;
+
+#ifdef __CPROVER_STRING_ABSTRACTION
   __CPROVER_size_t new_size;
-  __CPROVER_precondition(__CPROVER_is_zero_string(dst),
-                         "strcat zero-termination of 1st argument");
-  __CPROVER_precondition(__CPROVER_is_zero_string(src),
-                         "strcat zero-termination of 2nd argument");
-  __CPROVER_precondition(__CPROVER_buffer_size(dst)==s,
-                         "builtin object size");
-  new_size=__CPROVER_zero_string_length(dst)+__CPROVER_zero_string_length(src);
-  __CPROVER_assert(__CPROVER_buffer_size(dst)>new_size,
-                   "strcat buffer overflow");
-  __CPROVER_size_t old_size=__CPROVER_zero_string_length(dst);
+  __CPROVER_precondition(
+    __CPROVER_is_zero_string(dst), "strcat zero-termination of 1st argument");
+  __CPROVER_precondition(
+    __CPROVER_is_zero_string(src), "strcat zero-termination of 2nd argument");
+  __CPROVER_precondition(
+    __CPROVER_buffer_size(dst) == s, "builtin object size");
+  new_size =
+    __CPROVER_zero_string_length(dst) + __CPROVER_zero_string_length(src);
+  __CPROVER_assert(
+    __CPROVER_buffer_size(dst) > new_size, "strcat buffer overflow");
+  __CPROVER_size_t old_size = __CPROVER_zero_string_length(dst);
   //"  for(size_t i=0; i<__CPROVER_zero_string_length(src); i++)
   //"    dst[old_size+i];
-  dst[new_size]=0;
-  __CPROVER_is_zero_string(dst)=1;
-  __CPROVER_zero_string_length(dst)=new_size;
-  #else
-  __CPROVER_precondition(__CPROVER_POINTER_OBJECT(dst)!=
-                         __CPROVER_POINTER_OBJECT(src),
-                         "strcat src/dst overlap");
-  __CPROVER_size_t i=0;
-  while(dst[i]!=0) i++;
+  dst[new_size] = 0;
+  __CPROVER_is_zero_string(dst) = 1;
+  __CPROVER_zero_string_length(dst) = new_size;
+#else
+  __CPROVER_precondition(
+    __CPROVER_POINTER_OBJECT(dst) != __CPROVER_POINTER_OBJECT(src) ||
+      (src >= dst + s) || (dst >= src + s),
+    "strcat src/dst overlap");
+  __CPROVER_size_t i = 0;
+  while(dst[i] != 0)
+    i++;
 
-  __CPROVER_size_t j=0;
+  __CPROVER_size_t j = 0;
   char ch = 1;
   for(; i < s && ch != (char)0; ++i, ++j)
   {
-    ch=src[j];
-    dst[i]=ch;
+    ch = src[j];
+    dst[i] = ch;
   }
   dst[i] = '\0';
-  #endif
+#endif
   return dst;
 }
 
@@ -76,31 +82,34 @@ __inline char *__builtin___strcat_chk(char *dst, const char *src, __CPROVER_size
 __inline char *__builtin___strncat_chk(
   char *dst, const char *src, __CPROVER_size_t n, __CPROVER_size_t s)
 {
-  __CPROVER_HIDE:;
-  #ifdef __CPROVER_STRING_ABSTRACTION
+__CPROVER_HIDE:;
+#ifdef __CPROVER_STRING_ABSTRACTION
   __CPROVER_size_t additional, new_size;
-  __CPROVER_precondition(__CPROVER_is_zero_string(dst),
-                         "strncat zero-termination of 1st argument");
-  __CPROVER_precondition(__CPROVER_is_zero_string(src) ||
-                         __CPROVER_buffer_size(src)>=n,
-                         "strncat zero-termination of 2nd argument");
-  __CPROVER_precondition(__CPROVER_buffer_size(dst)==s,
-                         "builtin object size");
-  additional=(n<__CPROVER_zero_string_length(src))?n:__CPROVER_zero_string_length(src);
-  new_size=__CPROVER_is_zero_string(dst)+additional;
-  __CPROVER_assert(__CPROVER_buffer_size(dst)>new_size,
-                   "strncat buffer overflow");
-  __CPROVER_size_t dest_len=__CPROVER_zero_string_length(dst);
+  __CPROVER_precondition(
+    __CPROVER_is_zero_string(dst), "strncat zero-termination of 1st argument");
+  __CPROVER_precondition(
+    __CPROVER_is_zero_string(src) || __CPROVER_buffer_size(src) >= n,
+    "strncat zero-termination of 2nd argument");
+  __CPROVER_precondition(
+    __CPROVER_buffer_size(dst) == s, "builtin object size");
+  additional = (n < __CPROVER_zero_string_length(src))
+                 ? n
+                 : __CPROVER_zero_string_length(src);
+  new_size = __CPROVER_is_zero_string(dst) + additional;
+  __CPROVER_assert(
+    __CPROVER_buffer_size(dst) > new_size, "strncat buffer overflow");
+  __CPROVER_size_t dest_len = __CPROVER_zero_string_length(dst);
   __CPROVER_size_t i;
-  for (i = 0 ; i < n && i<__CPROVER_zero_string_length(src) ; i++)
+  for(i = 0; i < n && i < __CPROVER_zero_string_length(src); i++)
     dst[dest_len + i] = src[i];
   dst[dest_len + i] = 0;
-  __CPROVER_is_zero_string(dst)=1;
-  __CPROVER_zero_string_length(dst)=new_size;
-  #else
-  __CPROVER_precondition(__CPROVER_POINTER_OBJECT(dst)!=
-                         __CPROVER_POINTER_OBJECT(src),
-                         "strncat src/dst overlap");
+  __CPROVER_is_zero_string(dst) = 1;
+  __CPROVER_zero_string_length(dst) = new_size;
+#else
+  __CPROVER_precondition(
+    __CPROVER_POINTER_OBJECT(dst) != __CPROVER_POINTER_OBJECT(src) ||
+      (src >= dst + s) || (dst >= src + s),
+    "strncat src/dst overlap");
 
   __CPROVER_size_t i = 0;
   while(dst[i] != 0)
@@ -114,7 +123,7 @@ __inline char *__builtin___strncat_chk(
     dst[i] = ch;
   }
   dst[i] = '\0';
-  #endif
+#endif
   return dst;
 }
 
@@ -129,30 +138,29 @@ __inline char *__builtin___strncat_chk(
 
 inline char *strcpy(char *dst, const char *src)
 {
-  __CPROVER_HIDE:;
-  #ifdef __CPROVER_STRING_ABSTRACTION
-  __CPROVER_precondition(__CPROVER_is_zero_string(src),
-                         "strcpy zero-termination of 2nd argument");
-  __CPROVER_precondition(__CPROVER_buffer_size(dst)>
-                         __CPROVER_zero_string_length(src),
-                         "strcpy buffer overflow");
-  dst[__CPROVER_zero_string_length(src)]=0;
-  __CPROVER_is_zero_string(dst)=1;
-  __CPROVER_zero_string_length(dst)=__CPROVER_zero_string_length(src);
-  #else
-  __CPROVER_precondition(__CPROVER_POINTER_OBJECT(dst)!=
-                         __CPROVER_POINTER_OBJECT(src),
-                         "strcpy src/dst overlap");
-  __CPROVER_size_t i=0;
+__CPROVER_HIDE:;
+#ifdef __CPROVER_STRING_ABSTRACTION
+  __CPROVER_precondition(
+    __CPROVER_is_zero_string(src), "strcpy zero-termination of 2nd argument");
+  __CPROVER_precondition(
+    __CPROVER_buffer_size(dst) > __CPROVER_zero_string_length(src),
+    "strcpy buffer overflow");
+  dst[__CPROVER_zero_string_length(src)] = 0;
+  __CPROVER_is_zero_string(dst) = 1;
+  __CPROVER_zero_string_length(dst) = __CPROVER_zero_string_length(src);
+#else
+  __CPROVER_precondition(
+    __CPROVER_POINTER_OBJECT(dst) != __CPROVER_POINTER_OBJECT(src),
+    "strcpy src/dst overlap");
+  __CPROVER_size_t i = 0;
   char ch;
   do
   {
-    ch=src[i];
-    dst[i]=ch;
+    ch = src[i];
+    dst[i] = ch;
     i++;
-  }
-  while(ch!=(char)0);
-  #endif
+  } while(ch != (char)0);
+#endif
   return dst;
 }
 
@@ -167,31 +175,32 @@ inline char *strcpy(char *dst, const char *src)
 
 inline char *strncpy(char *dst, const char *src, size_t n)
 {
-  __CPROVER_HIDE:;
-  #ifdef __CPROVER_STRING_ABSTRACTION
-  __CPROVER_precondition(__CPROVER_is_zero_string(src),
-                         "strncpy zero-termination of 2nd argument");
-  __CPROVER_precondition(__CPROVER_buffer_size(dst)>=n,
-                         "strncpy buffer overflow");
-  __CPROVER_is_zero_string(dst)=__CPROVER_zero_string_length(src)<n;
-  __CPROVER_zero_string_length(dst)=__CPROVER_zero_string_length(src);
-  #else
-  __CPROVER_precondition(__CPROVER_POINTER_OBJECT(dst)!=
-                         __CPROVER_POINTER_OBJECT(src),
-                         "strncpy src/dst overlap");
-  __CPROVER_size_t i=0;
+__CPROVER_HIDE:;
+#ifdef __CPROVER_STRING_ABSTRACTION
+  __CPROVER_precondition(
+    __CPROVER_is_zero_string(src), "strncpy zero-termination of 2nd argument");
+  __CPROVER_precondition(
+    __CPROVER_buffer_size(dst) >= n, "strncpy buffer overflow");
+  __CPROVER_is_zero_string(dst) = __CPROVER_zero_string_length(src) < n;
+  __CPROVER_zero_string_length(dst) = __CPROVER_zero_string_length(src);
+#else
+  __CPROVER_precondition(
+    __CPROVER_POINTER_OBJECT(dst) != __CPROVER_POINTER_OBJECT(src) ||
+      (src >= dst + n) || (dst >= src + n),
+    "strncpy src/dst overlap");
+  __CPROVER_size_t i = 0;
   char ch;
   _Bool end;
 
   // We use a single loop to make bounds checking etc easier.
   // Note that strncpy _always_ writes 'n' characters into 'dst'.
-  for(end=0; i<n; i++)
+  for(end = 0; i < n; i++)
   {
-    ch=end?0:src[i];
-    dst[i]=ch;
-    end=end || ch==(char)0;
+    ch = end ? 0 : src[i];
+    dst[i] = ch;
+    end = end || ch == (char)0;
   }
-  #endif
+#endif
   return dst;
 }
 
@@ -204,34 +213,35 @@ inline char *strncpy(char *dst, const char *src, size_t n)
 
 inline char *__builtin___strncpy_chk(char *dst, const char *src, size_t n, size_t object_size)
 {
-  __CPROVER_HIDE:;
-  #ifdef __CPROVER_STRING_ABSTRACTION
-  __CPROVER_precondition(__CPROVER_is_zero_string(src),
-                         "strncpy zero-termination of 2nd argument");
-  __CPROVER_precondition(__CPROVER_buffer_size(dst)>=n,
-                         "strncpy buffer overflow");
-  __CPROVER_precondition(__CPROVER_buffer_size(dst)==object_size,
-                         "strncpy object size");
-  __CPROVER_is_zero_string(dst)=__CPROVER_zero_string_length(src)<n;
-  __CPROVER_zero_string_length(dst)=__CPROVER_zero_string_length(src);
-  #else
-  __CPROVER_precondition(__CPROVER_POINTER_OBJECT(dst)!=
-                         __CPROVER_POINTER_OBJECT(src),
-                         "strncpy src/dst overlap");
-  __CPROVER_size_t i=0;
+__CPROVER_HIDE:;
+#ifdef __CPROVER_STRING_ABSTRACTION
+  __CPROVER_precondition(
+    __CPROVER_is_zero_string(src), "strncpy zero-termination of 2nd argument");
+  __CPROVER_precondition(
+    __CPROVER_buffer_size(dst) >= n, "strncpy buffer overflow");
+  __CPROVER_precondition(
+    __CPROVER_buffer_size(dst) == object_size, "strncpy object size");
+  __CPROVER_is_zero_string(dst) = __CPROVER_zero_string_length(src) < n;
+  __CPROVER_zero_string_length(dst) = __CPROVER_zero_string_length(src);
+#else
+  __CPROVER_precondition(
+    __CPROVER_POINTER_OBJECT(dst) != __CPROVER_POINTER_OBJECT(src) ||
+      (src >= dst + n) || (dst >= src + n),
+    "strncpy src/dst overlap");
+  __CPROVER_size_t i = 0;
   char ch;
   _Bool end;
   (void)object_size;
 
   // We use a single loop to make bounds checking etc easier.
   // Note that strncpy _always_ writes 'n' characters into 'dst'.
-  for(end=0; i<n; i++)
+  for(end = 0; i < n; i++)
   {
-    ch=end?0:src[i];
-    dst[i]=ch;
-    end=end || ch==(char)0;
+    ch = end ? 0 : src[i];
+    dst[i] = ch;
+    end = end || ch == (char)0;
   }
-  #endif
+#endif
   return dst;
 }
 
@@ -246,8 +256,8 @@ inline char *__builtin___strncpy_chk(char *dst, const char *src, size_t n, size_
 
 inline char *strcat(char *dst, const char *src)
 {
-  __CPROVER_HIDE:;
-  #ifdef __CPROVER_STRING_ABSTRACTION
+__CPROVER_HIDE:;
+#ifdef __CPROVER_STRING_ABSTRACTION
   __CPROVER_size_t new_size;
   __CPROVER_precondition(__CPROVER_is_zero_string(dst),
                          "strcat zero-termination of 1st argument");
@@ -262,22 +272,23 @@ inline char *strcat(char *dst, const char *src)
   dst[new_size]=0;
   __CPROVER_is_zero_string(dst)=1;
   __CPROVER_zero_string_length(dst)=new_size;
-  #else
-  __CPROVER_precondition(__CPROVER_POINTER_OBJECT(dst)!=
-                         __CPROVER_POINTER_OBJECT(src),
-                         "strcat src/dst overlap");
-  __CPROVER_size_t i=0;
-  while(dst[i]!=0) i++;
+#else
+  __CPROVER_precondition(
+    __CPROVER_POINTER_OBJECT(dst) != __CPROVER_POINTER_OBJECT(src),
+    "strcat src/dst overlap");
+  __CPROVER_size_t i = 0;
+  while(dst[i] != 0)
+    i++;
 
-  __CPROVER_size_t j=0;
+  __CPROVER_size_t j = 0;
   char ch = 1;
   for(; ch != (char)0; ++i, ++j)
   {
-    ch=src[j];
-    dst[i]=ch;
+    ch = src[j];
+    dst[i] = ch;
   }
   dst[i] = '\0';
-  #endif
+#endif
   return dst;
 }
 
@@ -292,29 +303,32 @@ inline char *strcat(char *dst, const char *src)
 
 inline char *strncat(char *dst, const char *src, size_t n)
 {
-  __CPROVER_HIDE:;
-  #ifdef __CPROVER_STRING_ABSTRACTION
+__CPROVER_HIDE:;
+#ifdef __CPROVER_STRING_ABSTRACTION
   __CPROVER_size_t additional, new_size;
-  __CPROVER_precondition(__CPROVER_is_zero_string(dst),
-                         "strncat zero-termination of 1st argument");
-  __CPROVER_precondition(__CPROVER_is_zero_string(src) ||
-                         __CPROVER_buffer_size(src)>=n,
-                         "strncat zero-termination of 2nd argument");
-  additional=(n<__CPROVER_zero_string_length(src))?n:__CPROVER_zero_string_length(src);
-  new_size=__CPROVER_is_zero_string(dst)+additional;
-  __CPROVER_assert(__CPROVER_buffer_size(dst)>new_size,
-                   "strncat buffer overflow");
-  __CPROVER_size_t dest_len=__CPROVER_zero_string_length(dst);
+  __CPROVER_precondition(
+    __CPROVER_is_zero_string(dst), "strncat zero-termination of 1st argument");
+  __CPROVER_precondition(
+    __CPROVER_is_zero_string(src) || __CPROVER_buffer_size(src) >= n,
+    "strncat zero-termination of 2nd argument");
+  additional = (n < __CPROVER_zero_string_length(src))
+                 ? n
+                 : __CPROVER_zero_string_length(src);
+  new_size = __CPROVER_is_zero_string(dst) + additional;
+  __CPROVER_assert(
+    __CPROVER_buffer_size(dst) > new_size, "strncat buffer overflow");
+  __CPROVER_size_t dest_len = __CPROVER_zero_string_length(dst);
   __CPROVER_size_t i;
-  for (i = 0 ; i < n && i<__CPROVER_zero_string_length(src) ; i++)
+  for(i = 0; i < n && i < __CPROVER_zero_string_length(src); i++)
     dst[dest_len + i] = src[i];
   dst[dest_len + i] = 0;
-  __CPROVER_is_zero_string(dst)=1;
-  __CPROVER_zero_string_length(dst)=new_size;
-  #else
-  __CPROVER_precondition(__CPROVER_POINTER_OBJECT(dst)!=
-                         __CPROVER_POINTER_OBJECT(src),
-                         "strncat src/dst overlap");
+  __CPROVER_is_zero_string(dst) = 1;
+  __CPROVER_zero_string_length(dst) = new_size;
+#else
+  __CPROVER_precondition(
+    __CPROVER_POINTER_OBJECT(dst) != __CPROVER_POINTER_OBJECT(src) ||
+      (src >= dst + n) || (dst >= src + n),
+    "strncat src/dst overlap");
 
   __CPROVER_size_t i = 0;
   while(dst[i] != 0)
@@ -328,7 +342,7 @@ inline char *strncat(char *dst, const char *src, size_t n)
     dst[i] = ch;
   }
   dst[i] = '\0';
-  #endif
+#endif
   return dst;
 }
 
@@ -577,30 +591,35 @@ inline char *strdup(const char *str)
 
 void *memcpy(void *dst, const void *src, size_t n)
 {
-  __CPROVER_HIDE:
-  #ifdef __CPROVER_STRING_ABSTRACTION
-  __CPROVER_precondition(__CPROVER_buffer_size(src)>=n,
-                         "memcpy buffer overflow");
-  __CPROVER_precondition(__CPROVER_buffer_size(dst)>=n,
-                         "memcpy buffer overflow");
+__CPROVER_HIDE:;
+
+#ifdef __CPROVER_STRING_ABSTRACTION
+  __CPROVER_precondition(
+    __CPROVER_buffer_size(src) >= n, "memcpy buffer overflow");
+  __CPROVER_precondition(
+    __CPROVER_buffer_size(dst) >= n, "memcpy buffer overflow");
   //  for(size_t i=0; i<n ; i++) dst[i]=src[i];
-  if(__CPROVER_is_zero_string(src) &&
-     n > __CPROVER_zero_string_length(src))
+  if(__CPROVER_is_zero_string(src) && n > __CPROVER_zero_string_length(src))
   {
-    __CPROVER_is_zero_string(dst)=1;
-    __CPROVER_zero_string_length(dst)=__CPROVER_zero_string_length(src);
+    __CPROVER_is_zero_string(dst) = 1;
+    __CPROVER_zero_string_length(dst) = __CPROVER_zero_string_length(src);
   }
   else if(!(__CPROVER_is_zero_string(dst) &&
             n <= __CPROVER_zero_string_length(dst)))
-    __CPROVER_is_zero_string(dst)=0;
-  #else
-  __CPROVER_precondition(__CPROVER_POINTER_OBJECT(dst)!=
-                         __CPROVER_POINTER_OBJECT(src),
-                         "memcpy src/dst overlap");
-  __CPROVER_precondition(__CPROVER_r_ok(src, n),
-                         "memcpy source region readable");
-  __CPROVER_precondition(__CPROVER_w_ok(dst, n),
-                         "memcpy destination region writeable");
+  {
+    __CPROVER_is_zero_string(dst) = 0;
+  }
+
+#else
+  __CPROVER_precondition(
+    __CPROVER_POINTER_OBJECT(dst) != __CPROVER_POINTER_OBJECT(src) ||
+      ((const char *)src >= (const char *)dst + n) ||
+      ((const char *)dst >= (const char *)src + n),
+    "memcpy src/dst overlap");
+  __CPROVER_precondition(
+    __CPROVER_r_ok(src, n), "memcpy source region readable");
+  __CPROVER_precondition(
+    __CPROVER_w_ok(dst, n), "memcpy destination region writeable");
 
   if(n > 0)
   {
@@ -609,7 +628,8 @@ void *memcpy(void *dst, const void *src, size_t n)
     __CPROVER_array_copy(src_n, (char *)src);
     __CPROVER_array_replace((char *)dst, src_n);
   }
-  #endif
+#endif
+
   return dst;
 }
 
@@ -617,32 +637,35 @@ void *memcpy(void *dst, const void *src, size_t n)
 
 void *__builtin___memcpy_chk(void *dst, const void *src, __CPROVER_size_t n, __CPROVER_size_t size)
 {
-  __CPROVER_HIDE:
-  #ifdef __CPROVER_STRING_ABSTRACTION
-  __CPROVER_precondition(__CPROVER_buffer_size(src)>=n,
-                         "memcpy buffer overflow");
-  __CPROVER_precondition(__CPROVER_buffer_size(dst)>=n,
-                         "memcpy buffer overflow");
-  __CPROVER_precondition(__CPROVER_buffer_size(dst)==s,
-                         "builtin object size");
+__CPROVER_HIDE:
+#ifdef __CPROVER_STRING_ABSTRACTION
+  __CPROVER_precondition(
+    __CPROVER_buffer_size(src) >= n, "memcpy buffer overflow");
+  __CPROVER_precondition(
+    __CPROVER_buffer_size(dst) >= n, "memcpy buffer overflow");
+  __CPROVER_precondition(
+    __CPROVER_buffer_size(dst) == s, "builtin object size");
   //  for(size_t i=0; i<n ; i++) dst[i]=src[i];
-  if(__CPROVER_is_zero_string(src) &&
-     n > __CPROVER_zero_string_length(src))
+  if(__CPROVER_is_zero_string(src) && n > __CPROVER_zero_string_length(src))
   {
-    __CPROVER_is_zero_string(dst)=1;
-    __CPROVER_zero_string_length(dst)=__CPROVER_zero_string_length(src);
+    __CPROVER_is_zero_string(dst) = 1;
+    __CPROVER_zero_string_length(dst) = __CPROVER_zero_string_length(src);
   }
   else if(!(__CPROVER_is_zero_string(dst) &&
             n <= __CPROVER_zero_string_length(dst)))
-    __CPROVER_is_zero_string(dst)=0;
-  #else
-  __CPROVER_precondition(__CPROVER_POINTER_OBJECT(dst)!=
-                         __CPROVER_POINTER_OBJECT(src),
-                         "memcpy src/dst overlap");
-  __CPROVER_precondition(__CPROVER_r_ok(src, n),
-                         "memcpy source region readable");
-  __CPROVER_precondition(__CPROVER_w_ok(dst, n),
-                         "memcpy destination region writeable");
+  {
+    __CPROVER_is_zero_string(dst) = 0;
+  }
+#else
+  __CPROVER_precondition(
+    __CPROVER_POINTER_OBJECT(dst) != __CPROVER_POINTER_OBJECT(src) ||
+      ((const char *)src >= (const char *)dst + n) ||
+      ((const char *)dst >= (const char *)src + n),
+    "memcpy src/dst overlap");
+  __CPROVER_precondition(
+    __CPROVER_r_ok(src, n), "memcpy source region readable");
+  __CPROVER_precondition(
+    __CPROVER_w_ok(dst, n), "memcpy destination region writeable");
   (void)size;
 
   if(n > 0)
@@ -652,7 +675,7 @@ void *__builtin___memcpy_chk(void *dst, const void *src, __CPROVER_size_t n, __C
     __CPROVER_array_copy(src_n, (char *)src);
     __CPROVER_array_replace((char *)dst, src_n);
   }
-  #endif
+#endif
   return dst;
 }
 
