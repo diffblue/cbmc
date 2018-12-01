@@ -99,8 +99,6 @@ private:
 
   bool memory_model(exprt &value, const typet &type, const exprt &offset);
 
-  bool memory_model_conversion(exprt &value, const typet &type);
-
   bool memory_model_bytes(
     exprt &value,
     const typet &type,
