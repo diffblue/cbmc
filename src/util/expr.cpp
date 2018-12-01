@@ -112,14 +112,6 @@ void exprt::make_bool(bool value)
   set(ID_value, value?ID_true:ID_false);
 }
 
-/// Replace the expression by a Boolean expression representing true.
-/// \deprecated use constructors instead
-void exprt::make_true()
-{
-  *this=exprt(ID_constant, typet(ID_bool));
-  set(ID_value, ID_true);
-}
-
 /// Return whether the expression represents a Boolean.
 /// \return True if is a Boolean, false otherwise.
 bool exprt::is_boolean() const

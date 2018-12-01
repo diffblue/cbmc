@@ -102,7 +102,6 @@ void symex_slice_by_tracet::slice_by_trace(
   slice_SSA_steps(equation, implications); // Slice based on implications
 
   guardt t_guard;
-  t_guard.make_true();
   symex_targett::sourcet empty_source;
   equation.SSA_steps.push_front(symex_target_equationt::SSA_stept());
   symex_target_equationt::SSA_stept &SSA_step=equation.SSA_steps.front();
@@ -505,7 +504,6 @@ void symex_slice_by_tracet::assign_merges(
     merge_sym.set_level_2(merge_count);
     merge_count--;
     guardt t_guard;
-    t_guard.make_true();
     symex_targett::sourcet empty_source;
 
     exprt merge_copy(*i);

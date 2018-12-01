@@ -474,7 +474,7 @@ bool interval_domaint::ai_simplify(
     if(!a.join(d))                        // If d (this) is included in a...
     {                                     // Then the condition is always true
       unchanged=condition.is_true();
-      condition.make_true();
+      condition = true_exprt();
     }
   }
   else if(condition.id()==ID_symbol)
@@ -487,7 +487,7 @@ bool interval_domaint::ai_simplify(
     if(d.is_bottom())                     // If there there are none...
     {                                     // Then the condition is always true
       unchanged=condition.is_true();
-      condition.make_true();
+      condition = true_exprt();
     }
   }
 

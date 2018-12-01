@@ -14,14 +14,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <iosfwd>
 
-#include "expr.h"
+#include "std_expr.h"
 
 class guardt:public exprt
 {
 public:
   guardt()
   {
-    make_true();
+    *this = true_exprt();
   }
 
   guardt &operator=(const exprt &e)
