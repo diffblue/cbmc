@@ -1,0 +1,8 @@
+CORE
+arrays1.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^sat$
+^\(\(array2 \(store .* \(_ bv1 16\) \(_ bv16 8\)\)\)\)$
+--
