@@ -323,7 +323,7 @@ inline int pthread_join(pthread_t thread, void **value_ptr)
 
   #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
   __CPROVER_assert(__CPROVER_get_must(&thread, "pthread-id"),
-                   "phtread_join must be given valid thread ID");
+                   "pthread_join must be given valid thread ID");
   #endif
 
   if((unsigned long)thread>__CPROVER_next_thread_id) return ESRCH;
@@ -359,7 +359,7 @@ inline int _pthread_join(pthread_t thread, void **value_ptr)
 
   #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
   __CPROVER_assert(__CPROVER_get_must(&thread, "pthread-id"),
-                   "phtread_join must be given valid thread ID");
+                   "pthread_join must be given valid thread ID");
   #endif
 
   if((unsigned long)thread>__CPROVER_next_thread_id) return ESRCH;
