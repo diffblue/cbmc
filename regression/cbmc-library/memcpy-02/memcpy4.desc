@@ -1,0 +1,13 @@
+CORE
+memcpy4.c
+--pointer-check
+^EXIT=10$
+^SIGNAL=0$
+^\[.*] line 8 memcpy src/dst overlap: SUCCESS$
+^\[.*] line 11 memcpy src/dst overlap: FAILURE$
+^\[.*] line 14 memcpy src/dst overlap: SUCCESS$
+^\[.*] line 17 memcpy src/dst overlap: SUCCESS$
+^\[.*] line 17 memcpy destination region writeable: FAILURE$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
