@@ -401,6 +401,13 @@ int solver(std::istream &in)
       message.error().source_location.set_line(error.get_line_no());
       message.error() << error.what() << messaget::eom;
     }
+    catch(const analysis_exceptiont &error)
+    {
+      smt2_solver.skip_to_end_of_list();
+      error_found = true;
+      messaget message(message_handler);
+      message.error() << error.what() << messaget::eom;
+    }
   }
 
   if(error_found)
