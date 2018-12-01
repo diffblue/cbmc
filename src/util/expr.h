@@ -213,7 +213,6 @@ public:
   }
 
   void make_typecast(const typet &_type);
-  void make_not();
 
   void make_true();
   void make_false();
