@@ -37,12 +37,11 @@ static exprt simplify_json_expr(
 
     if(type.id()==ID_pointer)
     {
-      const irep_idt &value=to_constant_expr(src).get_value();
+      const constant_exprt &c = to_constant_expr(src);
 
       if(
-        value != ID_NULL &&
-        (value != std::string(value.size(), '0') ||
-         !config.ansi_c.NULL_is_zero) &&
+        c.get_value() != ID_NULL &&
+        (!c.value_is_zero_string() || !config.ansi_c.NULL_is_zero) &&
         src.operands().size() == 1 &&
         to_unary_expr(src).op().id() != ID_constant)
       // try to simplify the constant pointer
