@@ -232,23 +232,24 @@ struct java_bytecode_parse_treet
     typedef std::vector<u2> u2_valuest;
     struct lambda_method_handlet
     {
-      method_handle_typet handle_type;
+      method_handle_typet handle_type = method_handle_typet::UNKNOWN_HANDLE;
       irep_idt lambda_method_name;
       irep_idt lambda_method_ref;
       irep_idt interface_type;
       irep_idt method_type;
       u2_valuest u2_values;
-      lambda_method_handlet() : handle_type(method_handle_typet::UNKNOWN_HANDLE)
+      lambda_method_handlet() = default;
+
+      /// Construct a lambda method handle with parameters \p params.
+      explicit lambda_method_handlet(const u2_valuest &params)
+        : u2_values(params)
       {
       }
 
-      static lambda_method_handlet
-      create_unknown_handle(const u2_valuest params)
+      /// Construct a lambda method handle with parameters \p params.
+      explicit lambda_method_handlet(u2_valuest &&params)
+        : u2_values(std::move(params))
       {
-        lambda_method_handlet lambda_method_handle;
-        lambda_method_handle.handle_type = method_handle_typet::UNKNOWN_HANDLE;
-        lambda_method_handle.u2_values = std::move(params);
-        return lambda_method_handle;
       }
 
       bool is_unknown_handle() const
@@ -285,7 +286,9 @@ struct java_bytecode_parse_treet
       return methods.back();
     }
 
-    void add_method_handle(size_t bootstrap_index, lambda_method_handlet handle)
+    void add_method_handle(
+      size_t bootstrap_index,
+      const lambda_method_handlet &handle)
     {
       lambda_method_handle_map[{name, bootstrap_index}] = handle;
     }

@@ -2145,7 +2145,6 @@ void java_bytecode_parsert::store_unknown_method_handle(
   size_t bootstrap_method_index,
   java_bytecode_parsert::u2_valuest u2_values) const
 {
-  const lambda_method_handlet lambda_method_handle =
-    lambda_method_handlet::create_unknown_handle(move(u2_values));
+  const lambda_method_handlet lambda_method_handle(std::move(u2_values));
   parsed_class.add_method_handle(bootstrap_method_index, lambda_method_handle);
 }
