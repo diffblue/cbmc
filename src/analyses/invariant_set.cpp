@@ -13,16 +13,17 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <iostream>
 
-#include <util/base_exceptions.h>
-#include <util/symbol_table.h>
-#include <util/namespace.h>
 #include <util/arith_tools.h>
-#include <util/std_expr.h>
-#include <util/simplify_expr.h>
+#include <util/base_exceptions.h>
 #include <util/base_type.h>
-#include <util/std_types.h>
-
 #include <util/c_types.h>
+#include <util/expr_util.h>
+#include <util/namespace.h>
+#include <util/simplify_expr.h>
+#include <util/std_expr.h>
+#include <util/std_types.h>
+#include <util/symbol_table.h>
+
 #include <langapi/language_util.h>
 
 void inv_object_storet::output(std::ostream &out) const
@@ -758,10 +759,9 @@ void invariant_sett::nnf(exprt &expr, bool negate)
       nnf(tmp, !negate);
       expr.swap(tmp);
     }
-    else
+    else if(negate)
     {
-      if(negate)
-        expr.make_not();
+      expr = boolean_negate(expr);
     }
   }
   else if(expr.id()==ID_le)
@@ -812,10 +812,9 @@ void invariant_sett::nnf(exprt &expr, bool negate)
     if(negate)
       expr.id(ID_equal);
   }
-  else
+  else if(negate)
   {
-    if(negate)
-      expr.make_not();
+    expr = boolean_negate(expr);
   }
 }
 

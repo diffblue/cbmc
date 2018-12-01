@@ -11,6 +11,8 @@ Author: Daniel Kroening
 
 #include "cover_instrument.h"
 
+#include <util/expr_util.h>
+
 #include <langapi/language_util.h>
 
 #include <algorithm>
@@ -73,7 +75,7 @@ void collect_mcdc_controlling_rec(
           new_conditions.push_back(conjunction(o));
           result.insert(conjunction(new_conditions));
 
-          o[i].make_not();
+          o[i] = boolean_negate(op);
           new_conditions.back() = conjunction(o);
           result.insert(conjunction(new_conditions));
         }

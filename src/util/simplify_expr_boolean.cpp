@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <unordered_set>
 
 #include "expr.h"
+#include "expr_util.h"
 #include "invariant.h"
 #include "namespace.h"
 #include "std_expr.h"
@@ -35,7 +36,7 @@ bool simplify_exprt::simplify_boolean(exprt &expr)
     // turn a => b into !a || b
 
     expr.id(ID_or);
-    expr.op0().make_not();
+    expr.op0() = boolean_negate(expr.op0());
     simplify_node(expr.op0());
     simplify_node(expr);
     return false;
@@ -80,7 +81,7 @@ bool simplify_exprt::simplify_boolean(exprt &expr)
     {
       exprt tmp(operands.front());
       if(negate)
-        tmp.make_not();
+        tmp = boolean_negate(operands.front());
       expr.swap(tmp);
       return false;
     }
@@ -195,7 +196,7 @@ bool simplify_exprt::simplify_not(exprt &expr)
 
     Forall_operands(it, expr)
     {
-      it->make_not();
+      *it = boolean_negate(*it);
       simplify_node(*it);
     }
 

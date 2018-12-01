@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "invariant_set_domain.h"
 
+#include <util/expr_util.h>
 #include <util/simplify_expr.h>
 
 void invariant_set_domaint::transform(
@@ -32,7 +33,7 @@ void invariant_set_domaint::transform(
       goto_programt::const_targett next=from_l;
       next++;
       if(next==to_l)
-        tmp.make_not();
+        tmp = boolean_negate(from_l->guard);
 
       simplify(tmp, ns);
       invariant_set.strengthen(tmp);

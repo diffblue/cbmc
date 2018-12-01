@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/exception_utils.h>
+#include <util/expr_util.h>
 #include <util/pointer_predicates.h>
 #include <util/type_eq.h>
 
@@ -1273,8 +1274,7 @@ goto_programt::targett string_abstractiont::value_assignments_if(
 
   goto_else->function=target->function;
   goto_else->source_location=target->source_location;
-  goto_else->make_goto(else_target, rhs.cond());
-  goto_else->guard.make_not();
+  goto_else->make_goto(else_target, boolean_negate(rhs.cond()));
 
   goto_out->function=target->function;
   goto_out->source_location=target->source_location;

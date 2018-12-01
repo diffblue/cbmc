@@ -12,10 +12,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "goto_convert_class.h"
 
 
+#include <util/cprover_prefix.h>
+#include <util/expr_util.h>
+#include <util/prefix.h>
 #include <util/replace_expr.h>
 #include <util/source_location.h>
-#include <util/cprover_prefix.h>
-#include <util/prefix.h>
 #include <util/std_expr.h>
 
 #include <util/c_types.h>
@@ -135,8 +136,7 @@ void goto_convertt::do_function_call_if(
 
   // v: if(!c) goto y;
   v->make_goto(y);
-  v->guard=function.cond();
-  v->guard.make_not();
+  v->guard = boolean_negate(function.cond());
   v->source_location=function.cond().source_location();
 
   // w: f();

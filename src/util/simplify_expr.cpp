@@ -1105,9 +1105,7 @@ bool simplify_exprt::simplify_if(if_exprt &expr)
       else if(truevalue.is_false() && falsevalue.is_true())
       {
         // a?0:1 <-> !a
-        exprt tmp;
-        tmp.swap(cond);
-        tmp.make_not();
+        exprt tmp = boolean_negate(cond);
         simplify_node(tmp);
         expr.swap(tmp);
         return false;
@@ -1123,8 +1121,7 @@ bool simplify_exprt::simplify_if(if_exprt &expr)
       else if(falsevalue.is_true())
       {
         // a?b:1 <-> !a OR b
-        or_exprt tmp(cond, truevalue);
-        tmp.op0().make_not();
+        or_exprt tmp(boolean_negate(cond), truevalue);
         simplify_node(tmp.op0());
         simplify_node(tmp);
         expr.swap(tmp);
@@ -1141,8 +1138,7 @@ bool simplify_exprt::simplify_if(if_exprt &expr)
       else if(truevalue.is_false())
       {
         // a?0:b <-> !a && b
-        and_exprt tmp(cond, falsevalue);
-        tmp.op0().make_not();
+        and_exprt tmp(boolean_negate(cond), falsevalue);
         simplify_node(tmp.op0());
         simplify_node(tmp);
         expr.swap(tmp);

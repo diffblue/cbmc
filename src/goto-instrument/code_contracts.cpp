@@ -13,6 +13,7 @@ Date: February 2016
 
 #include "code_contracts.h"
 
+#include <util/expr_util.h>
 #include <util/fresh_symbol.h>
 #include <util/replace_symbol.h>
 
@@ -158,7 +159,7 @@ static void check_apply_invariants(
   if(loop_head->is_goto())
     loop_end->guard.make_false();
   else
-    loop_end->guard.make_not();
+    loop_end->guard = boolean_negate(loop_end->guard);
 }
 
 void code_contractst::apply_contract(

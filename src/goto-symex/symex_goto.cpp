@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <algorithm>
 
 #include <util/exception_utils.h>
+#include <util/expr_util.h>
 #include <util/invariant.h>
 #include <util/pointer_offset_size.h>
 #include <util/range.h>
@@ -242,8 +243,7 @@ void goto_symext::symex_goto(statet &state)
     {
       symbol_exprt guard_symbol_expr=
         symbol_exprt(guard_identifier, bool_typet());
-      exprt new_rhs=new_guard;
-      new_rhs.make_not();
+      exprt new_rhs = boolean_negate(new_guard);
 
       ssa_exprt new_lhs(guard_symbol_expr);
       state.rename(new_lhs, ns, goto_symex_statet::L1);
@@ -266,8 +266,7 @@ void goto_symext::symex_goto(statet &state)
         original_source,
         symex_targett::assignment_typet::GUARD);
 
-      guard_expr=guard_symbol_expr;
-      guard_expr.make_not();
+      guard_expr = boolean_negate(guard_symbol_expr);
       state.rename(guard_expr, ns);
     }
 
@@ -276,10 +275,7 @@ void goto_symext::symex_goto(statet &state)
       if(!backward)
         state.guard.add(guard_expr);
       else
-      {
-        guard_expr.make_not();
-        state.guard.add(guard_expr);
-      }
+        state.guard.add(boolean_negate(guard_expr));
     }
     else
     {
@@ -287,14 +283,12 @@ void goto_symext::symex_goto(statet &state)
       if(!backward)
       {
         new_state.guard.add(guard_expr);
-        guard_expr.make_not();
-        state.guard.add(guard_expr);
+        state.guard.add(boolean_negate(guard_expr));
       }
       else
       {
         state.guard.add(guard_expr);
-        guard_expr.make_not();
-        new_state.guard.add(guard_expr);
+        new_state.guard.add(boolean_negate(guard_expr));
       }
     }
   }

@@ -980,8 +980,7 @@ void goto_convertt::convert_for(
 
   // v: if(!c) goto z;
   v->make_goto(z);
-  v->guard=cond;
-  v->guard.make_not();
+  v->guard = boolean_negate(cond);
   v->source_location=cond.source_location();
 
   // do the w label

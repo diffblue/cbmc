@@ -88,14 +88,12 @@ void symex_slice_by_tracet::slice_by_trace(
 
     if(g_copy.id()==ID_symbol || g_copy.id() == ID_not)
     {
-      g_copy.make_not();
-      simplify(g_copy, ns);
+      g_copy = simplify_expr(boolean_negate(g_copy), ns);
       implications.insert(g_copy);
     }
     else if(g_copy.id()==ID_and)
     {
-      exprt copy_last(g_copy.operands().back());
-      copy_last.make_not();
+      exprt copy_last = boolean_negate(g_copy.operands().back());
       simplify(copy_last, ns);
       implications.insert(copy_last);
     }
@@ -408,8 +406,7 @@ void symex_slice_by_tracet::slice_SSA_steps(
 
     if((guard.id()==ID_symbol) || (guard.id() == ID_not))
     {
-      guard.make_not();
-      simplify(guard, ns);
+      guard = simplify_expr(boolean_negate(guard), ns);
 
       if(implications.count(guard)!=0)
       {
@@ -426,8 +423,7 @@ void symex_slice_by_tracet::slice_SSA_steps(
     {
       Forall_operands(git, guard)
       {
-        exprt neg_expr=*git;
-        neg_expr.make_not();
+        exprt neg_expr = boolean_negate(*git);
         simplify(neg_expr, ns);
 
         if(implications.count(neg_expr)!=0)
@@ -466,8 +462,7 @@ void symex_slice_by_tracet::slice_SSA_steps(
         }
         else
         {
-          cond_copy.make_not();
-          simplify(cond_copy, ns);
+          cond_copy = simplify_expr(boolean_negate(cond_copy), ns);
           if(implications.count(cond_copy)!=0)
           {
             sliced_conds++;
@@ -622,8 +617,7 @@ bool symex_slice_by_tracet::implies_false(const exprt e)
       i=imps.begin();
       i!=imps.end(); i++)
   {
-    exprt i_copy(*i);
-    i_copy.make_not();
+    exprt i_copy = boolean_negate(*i);
     simplify(i_copy, ns);
     if(imps.count(i_copy)!=0)
       return true;

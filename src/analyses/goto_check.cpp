@@ -861,11 +861,9 @@ void goto_checkt::nan_check(
   else
     UNREACHABLE;
 
-  isnan.make_not();
-
   add_guarded_claim(
-    isnan,
-    "NaN on "+expr.id_string(),
+    boolean_negate(isnan),
+    "NaN on " + expr.id_string(),
     "NaN",
     expr.find_source_location(),
     expr,

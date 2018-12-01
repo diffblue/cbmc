@@ -15,8 +15,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 #include <memory>
 
-#include <util/std_expr.h>
+#include <util/expr_util.h>
 #include <util/std_code.h>
+#include <util/std_expr.h>
 
 #include "is_threaded.h"
 
@@ -31,11 +32,7 @@ exprt static_analysis_baset::get_guard(
   next++;
 
   if(next==to)
-  {
-    exprt tmp(from->guard);
-    tmp.make_not();
-    return tmp;
-  }
+    return boolean_negate(from->guard);
 
   return from->guard;
 }
