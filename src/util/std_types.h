@@ -1149,7 +1149,8 @@ public:
     const typet &type,
     const validation_modet vm = validation_modet::INVARIANT)
   {
-    DATA_CHECK(!type.get(ID_width).empty(), "bitvector type must have width");
+    DATA_CHECK(
+      vm, !type.get(ID_width).empty(), "bitvector type must have width");
   }
 };
 

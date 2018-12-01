@@ -130,6 +130,7 @@ void symbol_tablet::validate(const validation_modet vm) const
 
     // Check that symbols[id].name == id
     DATA_CHECK_WITH_DIAGNOSTICS(
+      vm,
       symbol.name == symbol_key,
       "Symbol table entry must map to a symbol with the correct identifier",
       "Symbol table key '",
@@ -152,6 +153,7 @@ void symbol_tablet::validate(const validation_modet vm) const
           }) != symbol_base_map.end();
 
       DATA_CHECK_WITH_DIAGNOSTICS(
+        vm,
         base_map_matches_symbol,
         "The base_name of a symbol should map to itself",
         "Symbol table key '",
@@ -174,6 +176,7 @@ void symbol_tablet::validate(const validation_modet vm) const
           }) != symbol_module_map.end();
 
       DATA_CHECK_WITH_DIAGNOSTICS(
+        vm,
         module_map_matches_symbol,
         "Symbol table module map should map to symbol",
         "Symbol table key '",
@@ -188,6 +191,7 @@ void symbol_tablet::validate(const validation_modet vm) const
   for(auto base_map_entry : symbol_base_map)
   {
     DATA_CHECK_WITH_DIAGNOSTICS(
+      vm,
       has_symbol(base_map_entry.second),
       "Symbol table base_name map entries must map to a symbol name",
       "base_name map entry '",
@@ -201,6 +205,7 @@ void symbol_tablet::validate(const validation_modet vm) const
   for(auto module_map_entry : symbol_module_map)
   {
     DATA_CHECK_WITH_DIAGNOSTICS(
+      vm,
       has_symbol(module_map_entry.second),
       "Symbol table module map entries must map to a symbol name",
       "base_name map entry '",
