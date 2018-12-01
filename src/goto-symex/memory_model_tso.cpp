@@ -81,9 +81,8 @@ void memory_model_tsot::program_order(
       event_listt::const_iterator next=e_it;
       ++next;
 
-      exprt mb_guard_r, mb_guard_w;
-      mb_guard_r.make_false();
-      mb_guard_w.make_false();
+      exprt mb_guard_r = false_exprt();
+      exprt mb_guard_w = false_exprt();
 
       for(event_listt::const_iterator
           e_it2=next;

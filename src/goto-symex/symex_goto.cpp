@@ -224,7 +224,7 @@ void goto_symext::symex_goto(statet &state)
   // adjust guards
   if(new_guard.is_true())
   {
-    state.guard.make_false();
+    state.guard = false_exprt();
   }
   else
   {

@@ -216,7 +216,6 @@ public:
   void make_not();
 
   void make_true();
-  void make_false();
   void make_bool(bool value);
 
   bool is_constant() const;

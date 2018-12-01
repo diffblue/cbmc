@@ -156,7 +156,7 @@ static void check_apply_invariants(
   loop_end->targets.clear();
   loop_end->type=ASSUME;
   if(loop_head->is_goto())
-    loop_end->guard.make_false();
+    loop_end->guard = false_exprt();
   else
     loop_end->guard.make_not();
 }
