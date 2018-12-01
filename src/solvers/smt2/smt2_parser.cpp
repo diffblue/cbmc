@@ -839,7 +839,7 @@ exprt smt2_parsert::expression()
           symbol_exprt symbol_expr(final_id, id_it->second.type);
           if(quoted_symbol)
             symbol_expr.set(ID_C_quoted, true);
-          return symbol_expr;
+          return std::move(symbol_expr);
         }
 
         std::ostringstream msg;
