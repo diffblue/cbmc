@@ -639,6 +639,12 @@ void bmct::perform_symbolic_execution(
   goto_symext::get_goto_functiont get_goto_function)
 {
   symex.symex_from_entry_point_of(get_goto_function, symex_symbol_table);
+
+  if(options.get_bool_option("validate-ssa-equation"))
+  {
+    symex.validate(ns, validation_modet::INVARIANT);
+  }
+
   INVARIANT(
     options.get_bool_option("paths") || path_storage.empty(),
     "Branch points were saved even though we should have been "

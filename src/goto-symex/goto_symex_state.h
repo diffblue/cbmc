@@ -268,6 +268,9 @@ public:
   /// of a GOTO
   bool has_saved_next_instruction;
 
+  /// \brief Should the additional validation checks be run?
+  bool run_validation_checks;
+
 private:
   /// \brief Dangerous, do not use
   ///

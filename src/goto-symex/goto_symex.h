@@ -61,6 +61,12 @@ struct symex_configt final
   bool partial_loops;
   mp_integer debug_level;
 
+  /// \brief Should the additional validation checks be run?
+  ///
+  /// If this flag is set the checks for renaming (both level1 and level2) are
+  /// executed in the goto_symex_statet (in the assignment method).
+  bool run_validation_checks;
+
   explicit symex_configt(const optionst &options);
 };
 
@@ -454,6 +460,11 @@ public:
       "symex_threaded_step should have been executed at least once before "
       "attempting to read remaining_vccs");
     return _remaining_vccs;
+  }
+
+  void validate(const namespacet &ns, const validation_modet vm) const
+  {
+    target.validate(ns, vm);
   }
 };
 

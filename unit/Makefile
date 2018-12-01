@@ -16,6 +16,7 @@ SRC += analyses/ai/ai.cpp \
        analyses/does_remove_const/is_type_at_least_as_const_as.cpp \
        compound_block_locations.cpp \
        goto-programs/goto_trace_output.cpp \
+       goto-symex/ssa_equation.cpp \
        interpreter/interpreter.cpp \
        json/json_parser.cpp \
        path_strategies.cpp \
