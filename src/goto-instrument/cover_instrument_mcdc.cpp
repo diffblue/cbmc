@@ -281,25 +281,24 @@ std::set<signed> sign_of_expr(const exprt &e, const exprt &E)
   // In the general case, we analyze each operand of ''E''.
   std::vector<exprt> ops;
   collect_operands(E, ops);
-  for(auto &x : ops)
+  for(const auto &x : ops)
   {
-    exprt y(x);
-    if(y == e)
+    if(x == e)
       signs.insert(+1);
-    else if(y.id() == ID_not)
+    else if(x.id() == ID_not)
     {
-      y.make_not();
-      if(y == e)
+      const exprt &x_op = to_not_expr(x).op();
+      if(x_op == e)
         signs.insert(-1);
-      if(!is_condition(y))
+      if(!is_condition(x_op))
       {
-        std::set<signed> re = sign_of_expr(e, y);
+        std::set<signed> re = sign_of_expr(e, x_op);
         signs.insert(re.begin(), re.end());
       }
     }
-    else if(!is_condition(y))
+    else if(!is_condition(x))
     {
-      std::set<signed> re = sign_of_expr(e, y);
+      std::set<signed> re = sign_of_expr(e, x);
       signs.insert(re.begin(), re.end());
     }
   }
@@ -422,9 +421,7 @@ bool eval_expr(const std::map<exprt, signed> &atomic_exprs, const exprt &src)
   // src is NOT
   else if(src.id() == ID_not)
   {
-    exprt no_op(src);
-    no_op.make_not();
-    return !eval_expr(atomic_exprs, no_op);
+    return !eval_expr(atomic_exprs, to_not_expr(src).op());
   }
   else // if(is_condition(src))
   {
