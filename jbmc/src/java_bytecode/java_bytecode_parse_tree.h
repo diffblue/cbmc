@@ -301,7 +301,6 @@ struct java_bytecode_parse_treet
     }
 
     void output(std::ostream &out) const;
-
   };
 
   classt parsed_class;
