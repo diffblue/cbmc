@@ -835,7 +835,12 @@ exprt smt2_parsert::expression()
         const irep_idt final_id=rename_id(identifier);
         auto id_it=id_map.find(final_id);
         if(id_it!=id_map.end())
-          return symbol_exprt(final_id, id_it->second.type);
+        {
+          symbol_exprt symbol_expr(final_id, id_it->second.type);
+          if(quoted_symbol)
+            symbol_expr.set(ID_C_quoted, true);
+          return symbol_expr;
+        }
 
         std::ostringstream msg;
         msg << "1 unknown symbol " << identifier;
