@@ -189,7 +189,7 @@ symbol_exprt java_bytecode_convert_methodt::tmp_variable(
   return result;
 }
 
-/// Returns a symbol_exprt indicating a local variable suitable to load/store
+/// Returns an expression indicating a local variable suitable to load/store
 /// from a bytecode at address `address` a value of type `type_char` stored in
 /// the JVM's slot `arg`.
 ///
@@ -204,7 +204,8 @@ symbol_exprt java_bytecode_convert_methodt::tmp_variable(
 ///   Indicates whether we should return the original symbol_exprt or a
 ///   typecast_exprt if the type of the symbol_exprt does not equal that
 ///   represented by `type_char`.
-const exprt java_bytecode_convert_methodt::variable(
+/// \return symbol_exprt or type-cast symbol_exprt
+exprt java_bytecode_convert_methodt::variable(
   const exprt &arg,
   char type_char,
   size_t address,
