@@ -120,9 +120,7 @@ java_class_loadert::get_parse_tree(
   if(!class_loader_limit.load_class_file(class_name_to_jar_file(class_name)))
   {
     debug() << "not loading " << class_name << " because of limit" << eom;
-    java_bytecode_parse_treet parse_tree;
-    parse_tree.parsed_class.name = class_name;
-    parse_trees.push_back(std::move(parse_tree));
+    parse_trees.emplace_back(class_name);
     return parse_trees;
   }
 
@@ -179,9 +177,7 @@ java_class_loadert::get_parse_tree(
 
   // Not found or failed to load
   warning() << "failed to load class `" << class_name << '\'' << eom;
-  java_bytecode_parse_treet parse_tree;
-  parse_tree.parsed_class.name=class_name;
-  parse_trees.push_back(std::move(parse_tree));
+  parse_trees.emplace_back(class_name);
   return parse_trees;
 }
 
