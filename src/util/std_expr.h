@@ -351,6 +351,7 @@ public:
     add_to_operands(_op);
   }
 
+  DEPRECATED("use unary_exprt(id, op, type) instead")
   unary_exprt(
     const irep_idt &_id,
     const typet &_type):exprt(_id, _type)
@@ -632,6 +633,7 @@ inline void validate_expr(const bswap_exprt &value)
 class predicate_exprt:public exprt
 {
 public:
+  DEPRECATED("use predicate_exprt(id) instead")
   predicate_exprt():exprt(irep_idt(), bool_typet())
   {
   }
@@ -641,6 +643,7 @@ public:
   {
   }
 
+  DEPRECATED("use unary_predicate_exprt(id, op) instead")
   predicate_exprt(
     const irep_idt &_id,
     const exprt &_op):exprt(_id, bool_typet())
@@ -648,6 +651,7 @@ public:
     add_to_operands(_op);
   }
 
+  DEPRECATED("use binary_predicate_exprt(op1, id, op2) instead")
   predicate_exprt(
     const irep_idt &_id,
     const exprt &_op0,
@@ -662,10 +666,12 @@ public:
 class unary_predicate_exprt:public unary_exprt
 {
 public:
+  DEPRECATED("use unary_predicate_exprt(id, op) instead")
   unary_predicate_exprt():unary_exprt(irep_idt(), bool_typet())
   {
   }
 
+  DEPRECATED("use unary_predicate_exprt(id, op) instead")
   explicit unary_predicate_exprt(const irep_idt &_id):
     unary_exprt(_id, bool_typet())
   {
@@ -684,6 +690,7 @@ public:
 class sign_exprt:public unary_predicate_exprt
 {
 public:
+  DEPRECATED("use sign_exprt(op) instead")
   sign_exprt()
   {
   }
@@ -743,6 +750,7 @@ public:
     operands().resize(2);
   }
 
+  DEPRECATED("use binary_exprt(lhs, id, rhs, type) instead")
   binary_exprt(
     const irep_idt &_id,
     const typet &_type):exprt(_id, _type)
@@ -827,10 +835,12 @@ template<> inline bool can_cast_expr<binary_exprt>(const exprt &base)
 class binary_predicate_exprt:public binary_exprt
 {
 public:
+  DEPRECATED("use binary_predicate_exprt(lhs, id, rhs) instead")
   binary_predicate_exprt():binary_exprt(irep_idt(), bool_typet())
   {
   }
 
+  DEPRECATED("use binary_predicate_exprt(lhs, id, rhs) instead")
   explicit binary_predicate_exprt(const irep_idt &_id):
     binary_exprt(_id, bool_typet())
   {
@@ -868,10 +878,12 @@ public:
 class binary_relation_exprt:public binary_predicate_exprt
 {
 public:
+  DEPRECATED("use binary_relation_exprt(lhs, id, rhs) instead")
   binary_relation_exprt()
   {
   }
 
+  DEPRECATED("use binary_relation_exprt(lhs, id, rhs) instead")
   explicit binary_relation_exprt(const irep_idt &id):
     binary_predicate_exprt(id)
   {
@@ -3962,6 +3974,7 @@ public:
   {
   }
 
+  DEPRECATED("use isnan_exprt(op) instead")
   isnan_exprt():unary_predicate_exprt(ID_isnan)
   {
   }
@@ -4007,6 +4020,7 @@ public:
   {
   }
 
+  DEPRECATED("use isinf_exprt(op) instead")
   isinf_exprt():unary_predicate_exprt(ID_isinf)
   {
   }
@@ -4056,6 +4070,7 @@ public:
   {
   }
 
+  DEPRECATED("use isfinite_exprt(op) instead")
   isfinite_exprt():unary_predicate_exprt(ID_isfinite)
   {
   }
@@ -4101,6 +4116,7 @@ public:
   {
   }
 
+  DEPRECATED("use isnormal_exprt(op) instead")
   isnormal_exprt():unary_predicate_exprt(ID_isnormal)
   {
   }
@@ -4141,6 +4157,7 @@ inline void validate_expr(const isnormal_exprt &value)
 class ieee_float_equal_exprt:public binary_relation_exprt
 {
 public:
+  DEPRECATED("use ieee_float_equal_exprt(lhs, rhs) instead")
   ieee_float_equal_exprt():binary_relation_exprt(ID_ieee_float_equal)
   {
   }
@@ -4191,6 +4208,7 @@ inline void validate_expr(const ieee_float_equal_exprt &value)
 class ieee_float_notequal_exprt:public binary_relation_exprt
 {
 public:
+  DEPRECATED("use ieee_float_notequal_exprt(lhs, rhs) instead")
   ieee_float_notequal_exprt():
     binary_relation_exprt(ID_ieee_float_notequal)
   {
@@ -4243,6 +4261,7 @@ inline void validate_expr(const ieee_float_notequal_exprt &value)
 class ieee_float_op_exprt:public exprt
 {
 public:
+  DEPRECATED("use ieee_float_op_exprt(lhs, id, rhs, rm) instead")
   ieee_float_op_exprt()
   {
     operands().resize(3);

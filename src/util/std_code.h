@@ -576,6 +576,7 @@ code_blockt create_fatal_assertion(
 class code_ifthenelset:public codet
 {
 public:
+  DEPRECATED("use code_ifthenelset(condition, then_code[, else_code]) instead")
   code_ifthenelset():codet(ID_ifthenelse)
   {
     operands().resize(3);
@@ -837,6 +838,7 @@ inline code_dowhilet &to_code_dowhile(codet &code)
 class code_fort:public codet
 {
 public:
+  DEPRECATED("use code_fort(init, cond, iter, body) instead")
   code_fort():codet(ID_for)
   {
     operands().resize(4);
@@ -1874,6 +1876,7 @@ static inline const code_landingpadt &to_code_landingpad(const codet &code)
 class code_try_catcht:public codet
 {
 public:
+  DEPRECATED("use code_try_catcht(try_code) instead")
   code_try_catcht():codet(ID_try_catch)
   {
     operands().resize(1);
