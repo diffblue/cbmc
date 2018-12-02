@@ -42,6 +42,15 @@ public:
   using id_mapt=std::map<irep_idt, idt>;
   id_mapt id_map;
 
+  struct named_termt
+  {
+    exprt term;
+    symbol_exprt name;
+  };
+
+  using named_termst = std::map<irep_idt, named_termt>;
+  named_termst named_terms;
+
   bool exit;
 
   /// This skips tokens until all bracketed expressions are closed

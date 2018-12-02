@@ -232,6 +232,36 @@ void smt2_solvert::command(const std::string &c)
 
       std::cout << smt2_format(constant_exprt(buffer, string_typet())) << '\n';
     }
+    else if(c == "get-assignment")
+    {
+      // print satisfying assignment for all named expressions
+
+      if(status != SAT)
+        throw error("model is not available");
+
+      bool first = true;
+
+      std::cout << '(';
+      for(const auto &named_term : named_terms)
+      {
+        const symbol_tablet symbol_table;
+        const namespacet ns(symbol_table);
+        const auto value =
+          simplify_expr(solver.get(named_term.second.term), ns);
+
+        if(value.is_constant())
+        {
+          if(first)
+            first = false;
+          else
+            std::cout << '\n' << ' ';
+
+          std::cout << '(' << smt2_format(named_term.second.name) << ' '
+                    << smt2_format(value) << ')';
+        }
+      }
+      std::cout << ')' << '\n';
+    }
     else if(c == "simplify")
     {
       // this is a command that Z3 appears to implement
@@ -256,7 +286,6 @@ void smt2_solvert::command(const std::string &c)
     | ( define-funs-rec ( hfunction_deci n+1 ) ( htermi n+1 ) )
     | ( define-sort hsymboli ( hsymboli ??? ) hsorti )
     | ( get-assertions )
-    | ( get-assignment )
     | ( get-info hinfo_flag i )
     | ( get-model )
     | ( get-option hkeywordi )

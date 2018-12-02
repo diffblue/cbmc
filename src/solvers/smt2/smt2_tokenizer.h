@@ -60,6 +60,7 @@ protected:
     STRING_LITERAL,
     NUMERAL,
     SYMBOL,
+    KEYWORD,
     OPEN,
     CLOSE
   };

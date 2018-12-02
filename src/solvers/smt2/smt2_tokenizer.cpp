@@ -254,7 +254,13 @@ void smt2_tokenizert::get_token_from_stream()
 
     case ':': // keyword
       token = get_simple_symbol();
-      return;
+      if(token == SYMBOL)
+      {
+        token = KEYWORD;
+        return;
+      }
+      else
+        throw error("expecting symbol after colon");
 
     case '#':
       if(in->get(ch))
