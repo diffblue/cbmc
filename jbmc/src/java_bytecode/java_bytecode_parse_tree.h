@@ -199,6 +199,11 @@ struct java_bytecode_parse_treet
   {
     classt() = default;
 
+    /// Create a class \p name.
+    explicit classt(const irep_idt &name) : name(name)
+    {
+    }
+
     // Disallow copy construction and copy assignment, but allow move
     // construction and move assignment.
     #ifndef _MSC_VER // Ommit this on MS VC2013 as move is not supported.
@@ -296,7 +301,6 @@ struct java_bytecode_parse_treet
     }
 
     void output(std::ostream &out) const;
-
   };
 
   classt parsed_class;
@@ -307,9 +311,14 @@ struct java_bytecode_parse_treet
   typedef std::set<irep_idt> class_refst;
   class_refst class_refs;
 
-  bool loading_successful;
+  bool loading_successful = false;
 
-  java_bytecode_parse_treet():loading_successful(false)
+  /// An empty bytecode parse tree, no class name set
+  java_bytecode_parse_treet() = default;
+
+  /// Create a blank parse tree for class \p class_name.
+  explicit java_bytecode_parse_treet(const irep_idt &class_name)
+    : parsed_class(class_name)
   {
   }
 };
