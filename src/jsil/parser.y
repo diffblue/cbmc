@@ -418,7 +418,7 @@ literal: TOK_IDENTIFIER
        }
        | TOK_FALSE
        {
-         newstack($$).make_false();
+         newstack($$) = false_exprt();
        }
        | TOK_FLOATING
        | TOK_STRING

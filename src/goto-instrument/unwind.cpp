@@ -122,8 +122,7 @@ void goto_unwindt::unwind(
     t--;
     assert(t->is_backwards_goto());
 
-    exprt exit_cond;
-    exit_cond.make_false(); // default is false
+    exprt exit_cond = false_exprt(); // default is false
 
     if(!t->guard.is_true()) // cond in backedge
     {

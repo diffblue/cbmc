@@ -34,8 +34,7 @@ exprt get_quantifier_var_min(
 {
   PRECONDITION(quantifier_expr.id() == ID_or || quantifier_expr.id() == ID_and);
 
-  exprt res;
-  res.make_false();
+  exprt res = false_exprt();
   if(quantifier_expr.id()==ID_or)
   {
     /**
@@ -81,8 +80,7 @@ exprt get_quantifier_var_max(
   const exprt &quantifier_expr)
 {
   PRECONDITION(quantifier_expr.id() == ID_or || quantifier_expr.id() == ID_and);
-  exprt res;
-  res.make_false();
+  exprt res = false_exprt();
   if(quantifier_expr.id()==ID_or)
   {
     /**
