@@ -842,6 +842,20 @@ public:
     operands().resize(4);
   }
 
+  /// A statement describing a for loop with initializer \p _init, loop
+  /// condition \p _cond, increment \p _iter, and body \p _body.
+  code_fort(
+    const exprt &_init,
+    const exprt &_cond,
+    const exprt &_iter,
+    const codet &_body)
+    : codet(ID_for)
+  {
+    reserve_operands(4);
+    add_to_operands(_init, _cond, _iter);
+    add_to_operands(_body);
+  }
+
   // nil or a statement
   const exprt &init() const
   {
