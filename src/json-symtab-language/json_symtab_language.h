@@ -29,11 +29,9 @@ public:
 
   void show_parse(std::ostream &out) override;
 
-  bool to_expr(
-    const std::string &code,
-    const std::string &module,
-    exprt &expr,
-    const namespacet &ns) override
+  bool
+  to_expr(const std::string &, const std::string &, exprt &, const namespacet &)
+    override
   {
     UNIMPLEMENTED;
   }
