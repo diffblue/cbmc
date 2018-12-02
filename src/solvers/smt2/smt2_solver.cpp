@@ -262,6 +262,43 @@ void smt2_solvert::command(const std::string &c)
       }
       std::cout << ')' << '\n';
     }
+    else if(c == "get-model")
+    {
+      // print a model for all identifiers
+
+      if(status != SAT)
+        throw error("model is not available");
+
+      const symbol_tablet symbol_table;
+      const namespacet ns(symbol_table);
+
+      bool first = true;
+
+      std::cout << '(';
+      for(const auto &id : id_map)
+      {
+        const symbol_exprt name(id.first, id.second.type);
+        const auto value = simplify_expr(solver.get(name), ns);
+
+        if(value.is_not_nil())
+        {
+          if(first)
+            first = false;
+          else
+            std::cout << '\n' << ' ';
+
+          std::cout << "(define-fun " << smt2_format(name) << ' ';
+
+          if(id.second.type.id() == ID_mathematical_function)
+            throw error("models for functions unimplemented");
+          else
+            std::cout << "() " << smt2_format(id.second.type);
+
+          std::cout << ' ' << smt2_format(value) << ')';
+        }
+      }
+      std::cout << ')' << '\n';
+    }
     else if(c == "simplify")
     {
       // this is a command that Z3 appears to implement
@@ -287,7 +324,6 @@ void smt2_solvert::command(const std::string &c)
     | ( define-sort hsymboli ( hsymboli ??? ) hsorti )
     | ( get-assertions )
     | ( get-info hinfo_flag i )
-    | ( get-model )
     | ( get-option hkeywordi )
     | ( get-proof )
     | ( get-unsat-assumptions )
