@@ -536,10 +536,12 @@ bool value_set_dereferencet::memory_model(
   const typet from_type=value.type();
 
   // first, check if it's really just a type coercion,
-  // i.e., both have exactly the same (constant) size
+  // i.e., both have exactly the same (constant) size,
+  // for bit-vector types or pointers
 
-  if(is_a_bv_type(from_type) &&
-     is_a_bv_type(to_type))
+  if(
+    (is_a_bv_type(from_type) && is_a_bv_type(to_type)) ||
+    (from_type.id() == ID_pointer && to_type.id() == ID_pointer))
   {
     if(pointer_offset_bits(from_type, ns) == pointer_offset_bits(to_type, ns))
     {
@@ -547,39 +549,19 @@ bool value_set_dereferencet::memory_model(
       // cast to float or fixed-point,
       // or cast from float or fixed-point
 
-      if(to_type.id()==ID_fixedbv || to_type.id()==ID_floatbv ||
-         from_type.id()==ID_fixedbv || from_type.id()==ID_floatbv)
+      if(
+        to_type.id() != ID_fixedbv && to_type.id() != ID_floatbv &&
+        from_type.id() != ID_fixedbv && from_type.id() != ID_floatbv)
       {
+        value = typecast_exprt::conditional_cast(value, to_type);
+        return true;
       }
-      else
-        return memory_model_conversion(value, to_type);
     }
-  }
-
-  // we are willing to do the same for pointers
-
-  if(from_type.id()==ID_pointer &&
-     to_type.id()==ID_pointer)
-  {
-    if(pointer_offset_bits(from_type, ns) == pointer_offset_bits(to_type, ns))
-      return memory_model_conversion(value, to_type);
   }
 
   // otherwise, we will stitch it together from bytes
 
   return memory_model_bytes(value, to_type, offset);
-}
-
-/// Make `value` into a typecast expression: `(to_type)value`
-/// \return true
-bool value_set_dereferencet::memory_model_conversion(
-  exprt &value,
-  const typet &to_type)
-{
-  // only doing type conversion
-  // just do the typecast
-  value.make_typecast(to_type);
-  return true;
 }
 
 /// Replace `value` by an expression of type `to_type` corresponding to the
