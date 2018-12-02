@@ -1841,11 +1841,11 @@ public:
   {
   }
 
-  explicit union_exprt(
+  union_exprt(
     const irep_idt &_component_name,
     const exprt &_value,
-    const typet &_type):
-    unary_exprt(ID_union, _value, _type)
+    const typet &_type)
+    : unary_exprt(ID_union, _value, _type)
   {
     set_component_name(_component_name);
   }
@@ -1963,9 +1963,11 @@ public:
   {
   }
 
-  explicit complex_exprt(
-    const exprt &_real, const exprt &_imag, const complex_typet &_type):
-    binary_exprt(_real, ID_complex, _imag, _type)
+  complex_exprt(
+    const exprt &_real,
+    const exprt &_imag,
+    const complex_typet &_type)
+    : binary_exprt(_real, ID_complex, _imag, _type)
   {
   }
 
@@ -4550,9 +4552,8 @@ public:
   {
   }
 
-  explicit concatenation_exprt(
-    const exprt &_op0, const exprt &_op1, const typet &_type):
-    exprt(ID_concatenation, _type)
+  concatenation_exprt(const exprt &_op0, const exprt &_op1, const typet &_type)
+    : exprt(ID_concatenation, _type)
   {
     add_to_operands(_op0, _op1);
   }
