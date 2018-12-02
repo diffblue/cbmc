@@ -7766,16 +7766,13 @@ bool Parser::rTryStatement(codet &statement)
     if(lex.get_token(try_token)!=TOK_TRY)
       return false;
 
-    statement=codet(ID_try_catch);
-    statement.operands().reserve(2);
-    set_location(statement, try_token);
-
     codet body;
 
     if(!rCompoundStatement(body))
       return false;
 
-    statement.move_to_operands(body);
+    statement = code_try_catcht(std::move(body));
+    set_location(statement, try_token);
   }
 
   // iterate while there are catch clauses

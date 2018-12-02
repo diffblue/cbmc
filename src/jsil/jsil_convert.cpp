@@ -89,8 +89,7 @@ bool jsil_convertt::convert_code(const symbolt &symbol, codet &code)
         to_symbol_expr(a.rhs().op1()).get_identifier();
       code_gotot g(c_target);
 
-      code_try_catcht t_c;
-      t_c.try_code().swap(t);
+      code_try_catcht t_c(std::move(t));
       // Adding empty symbol to catch decl
       code_declt d(symbol_exprt("decl_symbol"));
       t_c.add_catch(d, g);

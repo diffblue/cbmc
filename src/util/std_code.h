@@ -1865,6 +1865,12 @@ public:
     operands().resize(1);
   }
 
+  /// A statement representing try \p _try_code catch ...
+  explicit code_try_catcht(const codet &_try_code) : codet(ID_try_catch)
+  {
+    add_to_operands(_try_code);
+  }
+
   codet &try_code()
   {
     return static_cast<codet &>(op0());
