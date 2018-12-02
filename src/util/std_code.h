@@ -1650,7 +1650,7 @@ public:
   {
   }
 
-  explicit side_effect_expr_throwt(
+  side_effect_expr_throwt(
     const irept &exception_list,
     const typet &type,
     const source_locationt &loc)
