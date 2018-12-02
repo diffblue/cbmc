@@ -145,34 +145,3 @@ code_blockt create_fatal_assertion(
 
   return result;
 }
-
-side_effect_exprt::side_effect_exprt(
-  const irep_idt &statement,
-  const typet &_type,
-  const source_locationt &loc)
-  : exprt(ID_side_effect, _type)
-{
-  set_statement(statement);
-  add_source_location() = loc;
-}
-
-side_effect_expr_nondett::side_effect_expr_nondett(
-  const typet &_type,
-  const source_locationt &loc)
-  : side_effect_exprt(ID_nondet, _type, loc)
-{
-  set_nullable(true);
-}
-
-side_effect_expr_function_callt::side_effect_expr_function_callt(
-  const exprt &_function,
-  const exprt::operandst &_arguments,
-  const typet &_type,
-  const source_locationt &loc)
-  : side_effect_exprt(ID_function_call, _type, loc)
-{
-  operands().resize(2);
-  op1().id(ID_arguments);
-  function() = _function;
-  arguments() = _arguments;
-}
