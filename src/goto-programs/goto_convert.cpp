@@ -952,7 +952,7 @@ void goto_convertt::convert_for(
   // do the x label
   goto_programt tmp_x;
 
-  if(code.op2().is_nil())
+  if(code.iter().is_nil())
   {
     tmp_x.add_instruction(SKIP);
     tmp_x.instructions.back().source_location=code.source_location();
