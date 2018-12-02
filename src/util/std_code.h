@@ -1443,7 +1443,12 @@ public:
   side_effect_exprt(
     const irep_idt &statement,
     const typet &_type,
-    const source_locationt &loc);
+    const source_locationt &loc)
+    : exprt(ID_side_effect, _type)
+  {
+    set_statement(statement);
+    add_source_location() = loc;
+  }
 
   const irep_idt &get_statement() const
   {
@@ -1508,7 +1513,11 @@ public:
     set_nullable(true);
   }
 
-  side_effect_expr_nondett(const typet &_type, const source_locationt &loc);
+  side_effect_expr_nondett(const typet &_type, const source_locationt &loc)
+    : side_effect_exprt(ID_nondet, _type, loc)
+  {
+    set_nullable(true);
+  }
 
   void set_nullable(bool nullable)
   {
@@ -1592,7 +1601,12 @@ public:
     const exprt &_function,
     const exprt::operandst &_arguments,
     const typet &_type,
-    const source_locationt &loc);
+    const source_locationt &loc)
+    : side_effect_exprt(ID_function_call, _type, loc)
+  {
+    add_to_operands(_function, exprt(ID_arguments));
+    arguments() = _arguments;
+  }
 
   exprt &function()
   {
