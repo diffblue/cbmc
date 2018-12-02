@@ -72,6 +72,8 @@ def parse_args():
                         help='Non-default CodeBuild template to use')
     parser.add_argument('-W', '--witness-check', action='store_true',
                         help='Run witness checks after benchmarking')
+    parser.add_argument('-C', '--compare-to', default=[], action='append',
+                        help='Include past results in tables [may repeat]')
 
     args = parser.parse_args()
 
@@ -517,7 +519,7 @@ def seed_queue(session, region, queue, task_set):
 def run_perf_test(
         session, mode, region, az, ami, instance_type, sqs_arn, sqs_url,
         parallel, snapshot_id, instance_terminated_arn, bucket_name,
-        perf_test_id, price, ssh_key_name, witness_check):
+        perf_test_id, price, ssh_key_name, witness_check, compare_to):
     # create an EC2 instance and trigger benchmarking
     logger = logging.getLogger('perf_test')
 
@@ -589,6 +591,10 @@ def run_perf_test(
                 {
                     'ParameterKey': 'WitnessCheck',
                     'ParameterValue': str(witness_check)
+                },
+                {
+                    'ParameterKey': 'CompareTo',
+                    'ParameterValue': ':'.join(compare_to)
                 }
             ],
             Capabilities=['CAPABILITY_NAMED_IAM'])
@@ -685,7 +691,7 @@ def main():
             session, args.mode, region, az, ami, args.instance_type,
             sqs_arn, sqs_url, args.parallel, snapshot_id,
             instance_terminated_arn, bucket_name, perf_test_id, price,
-            args.ssh_key_name, args.witness_check)
+            args.ssh_key_name, args.witness_check, args.compare_to)
 
     return 0
 

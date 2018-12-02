@@ -41,6 +41,9 @@ Parameters:
     WitnessCheck:
         Type: String
 
+    CompareTo:
+        Type: String
+
 Conditions:
     UseSpot: !Not [!Equals [!Ref MaxPrice, ""]]
 
@@ -68,6 +71,10 @@ Resources:
                             - "s3:GetObject"
                           Effect: Allow
                           Resource: !Join ["/", [!Sub "arn:aws:s3:::${S3Bucket}", "*"]]
+                        - Action:
+                            - "s3:ListBucket"
+                          Effect: Allow
+                          Resource: !Sub "arn:aws:s3:::${S3Bucket}"
                         - Action:
                             - "sns:Publish"
                           Effect: Allow
@@ -169,6 +176,7 @@ Resources:
                     sed -i 's#:S3BUCKET:#${S3Bucket}#g' /root/run-on-ec2.sh
                     sed -i 's#:PERFTESTID:#${PerfTestId}#g' /root/run-on-ec2.sh
                     sed -i 's#:INSTANCETYPE:#${InstanceType}#g' /root/run-on-ec2.sh
+                    sed -i 's#:COMPARETO:#${CompareTo}#g' /root/run-on-ec2.sh
                     . /root/run-on-ec2.sh
 
     AutoScalingGroup:

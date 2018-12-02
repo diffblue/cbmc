@@ -201,12 +201,21 @@ do
       cd ..
     done
 
+    compare_to=""
     if [ x:WITNESSCHECK: = xTrue ]
     then
-      ../benchexec/bin/table-generator logs-$t/*xml.bz2 *-logs-$t/*.xml.bz2 -o logs-$t/
-    else
-      ../benchexec/bin/table-generator logs-$t/*xml.bz2 -o logs-$t/
+      compare_to="*-logs-$t/*.xml.bz2"
     fi
+    for c in $(echo :COMPARETO: | sed 's/:/ /g')
+    do
+      if aws s3 ls s3://:S3BUCKET:/$c/$cfg/logs-$t/
+      then
+        aws s3 sync s3://:S3BUCKET:/$c/$cfg/logs-$t logs-$t-$c
+        compare_to="$compare_to logs-$t-$c/*.xml.bz2"
+      fi
+    done
+
+    ../benchexec/bin/table-generator logs-$t/*xml.bz2 $compare_to -o logs-$t/
     aws s3 cp logs-$t s3://:S3BUCKET:/:PERFTESTID:/$cfg/logs-$t/ --recursive
     for wc in *-witnesses.xml
     do
