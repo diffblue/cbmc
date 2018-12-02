@@ -677,9 +677,6 @@ public:
   {
   }
 
-protected:
-  using exprt::op1; // hide
-  using exprt::op2; // hide
 };
 
 /// \brief Sign of an expression
