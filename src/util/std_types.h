@@ -121,9 +121,7 @@ public:
   class componentt:public exprt
   {
   public:
-    componentt()
-    {
-    }
+    componentt() = default;
 
     componentt(const irep_idt &_name, const typet &_type)
     {
