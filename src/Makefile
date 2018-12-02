@@ -42,24 +42,23 @@ cpp.dir: ansi-c.dir linking.dir
 
 languages: util.dir langapi.dir \
            cpp.dir ansi-c.dir xmllang.dir assembler.dir \
-           jsil.dir json-symtab-language.dir
+           jsil.dir json.dir json-symtab-language.dir
 
 solvers.dir: util.dir langapi.dir
 
 goto-instrument.dir: languages goto-programs.dir pointer-analysis.dir \
-                     goto-symex.dir linking.dir analyses.dir solvers.dir \
-                     json.dir
+                     goto-symex.dir linking.dir analyses.dir solvers.dir
 
 cbmc.dir: languages solvers.dir goto-symex.dir analyses.dir \
           pointer-analysis.dir goto-programs.dir linking.dir \
           goto-instrument.dir
 
 goto-analyzer.dir: languages analyses.dir goto-programs.dir linking.dir \
-                   json.dir goto-instrument.dir
+                   goto-instrument.dir
 
 goto-diff.dir: languages goto-programs.dir pointer-analysis.dir \
                linking.dir analyses.dir goto-instrument.dir \
-               solvers.dir json.dir goto-symex.dir
+               solvers.dir goto-symex.dir
 
 goto-cc.dir: languages goto-programs.dir linking.dir
 
