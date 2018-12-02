@@ -82,7 +82,7 @@ mp_integer bv_arithmetict::pack() const
   return value+power(2, spec.width);
 }
 
-exprt bv_arithmetict::to_expr() const
+constant_exprt bv_arithmetict::to_expr() const
 {
   return constant_exprt(integer2bvrep(value, spec.width), spec.to_type());
 }
@@ -180,10 +180,8 @@ void bv_arithmetict::change_spec(const bv_spect &dest_spec)
   adjust();
 }
 
-void bv_arithmetict::from_expr(const exprt &expr)
+void bv_arithmetict::from_expr(const constant_exprt &expr)
 {
-  PRECONDITION(expr.is_constant());
   spec=bv_spect(expr.type());
-  value = bvrep2integer(
-    to_constant_expr(expr).get_value(), spec.width, spec.is_signed);
+  value = bvrep2integer(expr.get_value(), spec.width, spec.is_signed);
 }

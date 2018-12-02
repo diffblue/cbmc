@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "mp_arith.h"
 #include "format_spec.h"
 
+class constant_exprt;
 class exprt;
 class typet;
 
@@ -60,7 +61,7 @@ public:
   {
   }
 
-  explicit bv_arithmetict(const exprt &expr)
+  explicit bv_arithmetict(const constant_exprt &expr)
   {
     from_expr(expr);
   }
@@ -91,8 +92,8 @@ public:
   std::string format(const format_spect &format_spec) const;
 
   // expressions
-  exprt to_expr() const;
-  void from_expr(const exprt &expr);
+  constant_exprt to_expr() const;
+  void from_expr(const constant_exprt &expr);
 
   bv_arithmetict &operator/=(const bv_arithmetict &other);
   bv_arithmetict &operator*=(const bv_arithmetict &other);
