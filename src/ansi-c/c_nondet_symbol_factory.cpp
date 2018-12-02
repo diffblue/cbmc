@@ -187,10 +187,10 @@ void symbol_factoryt::gen_nondet_init(
       auto set_null_inst=code_assignt(expr, null_pointer_exprt(pointer_type));
       set_null_inst.add_source_location()=loc;
 
-      code_ifthenelset null_check;
-      null_check.cond() = side_effect_expr_nondett(bool_typet(), loc);
-      null_check.then_case()=set_null_inst;
-      null_check.else_case()=non_null_inst;
+      code_ifthenelset null_check(
+        side_effect_expr_nondett(bool_typet(), loc),
+        std::move(set_null_inst),
+        std::move(non_null_inst));
 
       assignments.add(std::move(null_check));
     }

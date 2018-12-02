@@ -510,12 +510,12 @@ code_blockt get_thread_safe_clinit_wrapper_body(
 
   // if(C::__CPROVER_PREFIX_clinit_thread_local_state == INIT_COMPLETE) return;
   {
-    code_ifthenelset conditional;
-    conditional.cond() = gen_clinit_eqexpr(
-      clinit_thread_local_state_sym.symbol_expr(),
-      clinit_statest::INIT_COMPLETE);
-    conditional.then_case() = code_returnt();
-    function_body.add(conditional);
+    code_ifthenelset conditional(
+      gen_clinit_eqexpr(
+        clinit_thread_local_state_sym.symbol_expr(),
+        clinit_statest::INIT_COMPLETE),
+      code_returnt());
+    function_body.add(std::move(conditional));
   }
 
   // C::__CPROVER_PREFIX_clinit_thread_local_state = INIT_COMPLETE;
@@ -550,25 +550,21 @@ code_blockt get_thread_safe_clinit_wrapper_body(
   //   init_complete = true;
   // }
   {
-    code_ifthenelset not_init_conditional;
-    code_blockt then_block;
-    not_init_conditional.cond() = gen_clinit_eqexpr(
-      clinit_state_sym.symbol_expr(), clinit_statest::NOT_INIT);
-    then_block.add(
-      gen_clinit_assign(
-        clinit_state_sym.symbol_expr(), clinit_statest::IN_PROGRESS));
-    then_block.add(code_assignt(init_complete.symbol_expr(), false_exprt()));
-    not_init_conditional.then_case() = then_block;
+    code_ifthenelset init_conditional(
+      gen_clinit_eqexpr(
+        clinit_state_sym.symbol_expr(), clinit_statest::INIT_COMPLETE),
+      code_blockt({code_assignt(init_complete.symbol_expr(), true_exprt())}));
 
-    code_ifthenelset init_conditional;
-    code_blockt init_conditional_body;
-    init_conditional.cond() = gen_clinit_eqexpr(
-      clinit_state_sym.symbol_expr(), clinit_statest::INIT_COMPLETE);
-    init_conditional_body.add(
-      code_assignt(init_complete.symbol_expr(), true_exprt()));
-    init_conditional.then_case() = init_conditional_body;
-    not_init_conditional.else_case() = init_conditional;
-    function_body.add(not_init_conditional);
+    code_ifthenelset not_init_conditional(
+      gen_clinit_eqexpr(
+        clinit_state_sym.symbol_expr(), clinit_statest::NOT_INIT),
+      code_blockt(
+        {gen_clinit_assign(
+           clinit_state_sym.symbol_expr(), clinit_statest::IN_PROGRESS),
+         code_assignt(init_complete.symbol_expr(), false_exprt())}),
+      std::move(init_conditional));
+
+    function_body.add(std::move(not_init_conditional));
   }
 
   // ATOMIC_END
@@ -578,10 +574,8 @@ code_blockt get_thread_safe_clinit_wrapper_body(
 
   // if(init_complete) return;
   {
-    code_ifthenelset conditional;
-    conditional.cond() = init_complete.symbol_expr();
-    conditional.then_case() = code_returnt();
-    function_body.add(conditional);
+    code_ifthenelset conditional(init_complete.symbol_expr(), code_returnt());
+    function_body.add(std::move(conditional));
   }
 
   // Initialize the super-class C' and
@@ -680,12 +674,6 @@ code_ifthenelset get_clinit_wrapper_body(
     already_run_symbol.symbol_expr(),
     false_exprt());
 
-  // the entire body of the function is an if-then-else
-  code_ifthenelset wrapper_body;
-
-  // add the condition to the if
-  wrapper_body.cond() = check_already_run;
-
   // add the "already-run = false" statement
   code_assignt set_already_run(already_run_symbol.symbol_expr(), true_exprt());
   code_blockt init_body({set_already_run});
@@ -698,9 +686,8 @@ code_ifthenelset get_clinit_wrapper_body(
     object_factory_parameters,
     pointer_type_selector);
 
-  wrapper_body.then_case() = init_body;
-
-  return wrapper_body;
+  // the entire body of the function is an if-then-else
+  return code_ifthenelset(std::move(check_already_run), std::move(init_body));
 }
 
 

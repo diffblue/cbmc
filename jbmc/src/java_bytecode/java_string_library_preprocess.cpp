@@ -1065,12 +1065,11 @@ code_blockt java_string_library_preprocesst::make_float_to_string_code(
     str, string_expr_list[0], symbol_table, true);
   for(std::size_t i=1; i<condition_list.size(); i++)
   {
-    code_ifthenelset ife;
-    ife.cond()=condition_list[i];
-    ife.then_case() = code_assign_string_expr_to_java_string(
-      str, string_expr_list[i], symbol_table, true);
-    ife.else_case()=tmp_code;
-    tmp_code=ife;
+    tmp_code = code_ifthenelset(
+      condition_list[i],
+      code_assign_string_expr_to_java_string(
+        str, string_expr_list[i], symbol_table, true),
+      tmp_code);
   }
   code.add(tmp_code, loc);
 

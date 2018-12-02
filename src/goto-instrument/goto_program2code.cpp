@@ -614,11 +614,8 @@ goto_programt::const_targett goto_program2codet::convert_goto_while(
   }
   else if(!loop_end->guard.is_true())
   {
-    code_ifthenelset i;
-
-    i.cond()=not_exprt(loop_end->guard);
+    code_ifthenelset i(not_exprt(loop_end->guard), code_breakt());
     simplify(i.cond(), ns);
-    i.then_case()=code_breakt();
 
     copy_source_location(target, i);
 
@@ -1103,11 +1100,6 @@ goto_programt::const_targett goto_program2codet::convert_goto_if(
       end_if=before_else->get_target();
   }
 
-  code_ifthenelset i;
-  i.then_case()=code_blockt();
-
-  copy_source_location(target, i);
-
   // some nesting of loops and branches we might not be able to deal with
   if(target->is_backwards_goto() ||
       (upper_bound!=goto_program.instructions.end() &&
@@ -1119,7 +1111,8 @@ goto_programt::const_targett goto_program2codet::convert_goto_if(
       return convert_goto_goto(target, dest);
   }
 
-  i.cond()=not_exprt(target->guard);
+  code_ifthenelset i(not_exprt(target->guard), code_blockt());
+  copy_source_location(target, i);
   simplify(i.cond(), ns);
 
   if(has_else)
@@ -1182,21 +1175,15 @@ goto_programt::const_targett goto_program2codet::convert_goto_break_continue(
   if(target->get_target()==loop_end &&
      loop_last_stack.back().second)
   {
-    code_continuet cont;
+    code_ifthenelset i(target->guard, code_continuet());
+    simplify(i.cond(), ns);
 
-    if(!target->guard.is_true())
-    {
-      code_ifthenelset i;
-      i.cond()=target->guard;
-      simplify(i.cond(), ns);
-      i.then_case().swap(cont);
+    copy_source_location(target, i);
 
-      copy_source_location(target, i);
-
-      dest.move_to_operands(i);
-    }
+    if(i.cond().is_true())
+      dest.move_to_operands(i.then_case());
     else
-      dest.move_to_operands(cont);
+      dest.move_to_operands(i);
 
     return target;
   }
@@ -1218,12 +1205,8 @@ goto_programt::const_targett goto_program2codet::convert_goto_break_continue(
 
   if(target->get_target()==after_loop)
   {
-    code_breakt brk;
-
-    code_ifthenelset i;
-    i.cond()=target->guard;
+    code_ifthenelset i(target->guard, code_breakt());
     simplify(i.cond(), ns);
-    i.then_case().swap(brk);
 
     copy_source_location(target, i);
 
@@ -1285,19 +1268,15 @@ goto_programt::const_targett goto_program2codet::convert_goto_goto(
 
   code_gotot goto_code(label.str());
 
-  if(!target->guard.is_true())
-  {
-    code_ifthenelset i;
-    i.cond()=target->guard;
-    simplify(i.cond(), ns);
-    i.then_case().swap(goto_code);
+  code_ifthenelset i(target->guard, std::move(goto_code));
+  simplify(i.cond(), ns);
 
-    copy_source_location(target, i);
+  copy_source_location(target, i);
 
-    dest.move_to_operands(i);
-  }
+  if(i.cond().is_true())
+    dest.move_to_operands(i.then_case());
   else
-    dest.move_to_operands(goto_code);
+    dest.move_to_operands(i);
 
   return target;
 }

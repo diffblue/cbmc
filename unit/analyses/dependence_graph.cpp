@@ -68,23 +68,16 @@ SCENARIO("dependence_graph", "[core][analyses][dependence_graph]")
     code_declt declare_x(x_symbol.symbol_expr());
     a_body.move_to_operands(declare_x);
 
-    code_ifthenelset if_block;
-
-    if_block.cond() =
-      equal_exprt(
-        side_effect_expr_nondett(int_type),
-        from_integer(0, int_type));
-
-    code_blockt then_block;
     code_function_callt call(symbol_exprt("b", void_function_type));
-    then_block.move_to_operands(call);
     code_assignt assign_x(
       x_symbol.symbol_expr(), from_integer(1, int_type));
-    then_block.move_to_operands(assign_x);
 
-    if_block.then_case() = then_block;
+    code_ifthenelset if_block(
+      equal_exprt(
+        side_effect_expr_nondett(int_type), from_integer(0, int_type)),
+      code_blockt({call, assign_x}));
 
-    a_body.move_to_operands(if_block);
+    a_body.add(std::move(if_block));
 
     goto_model.symbol_table.add(
       create_void_function_symbol(goto_functionst::entry_point(), a_body));

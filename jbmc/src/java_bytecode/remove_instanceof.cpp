@@ -134,13 +134,6 @@ bool remove_instanceoft::lower_instanceof(
   // possible values of T.
   // (http://docs.oracle.com/javase/specs/jls/se7/html/jls-15.html#jls-15.20.2)
 
-  code_ifthenelset is_null_branch;
-  is_null_branch.cond() =
-    equal_exprt(
-      check_ptr, null_pointer_exprt(to_pointer_type(check_ptr.type())));
-  is_null_branch.then_case() =
-    code_assignt(instanceof_result_sym.symbol_expr(), false_exprt());
-
   code_blockt else_block;
   else_block.add(code_declt(clsid_tmp_sym.symbol_expr()));
   else_block.add(code_assignt(clsid_tmp_sym.symbol_expr(), object_clsid));
@@ -155,7 +148,11 @@ bool remove_instanceoft::lower_instanceof(
   else_block.add(
     code_assignt(instanceof_result_sym.symbol_expr(), disjunction(or_ops)));
 
-  is_null_branch.else_case() = std::move(else_block);
+  const code_ifthenelset is_null_branch(
+    equal_exprt(
+      check_ptr, null_pointer_exprt(to_pointer_type(check_ptr.type()))),
+    code_assignt(instanceof_result_sym.symbol_expr(), false_exprt()),
+    std::move(else_block));
 
   // Replace the instanceof construct with instanceof_result:
   expr = instanceof_result_sym.symbol_expr();
