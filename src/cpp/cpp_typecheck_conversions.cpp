@@ -949,12 +949,12 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
 
         // TODO: ellipsis
 
-        const irept &parameters=comp_type.find(ID_parameters);
+        const auto &parameters = to_code_type(comp_type).parameters();
 
-        if(parameters.get_sub().size() != 2)
+        if(parameters.size() != 2)
           continue;
 
-        exprt curr_arg1=static_cast<const exprt&> (parameters.get_sub()[1]);
+        exprt curr_arg1 = parameters[1];
         typet arg1_type=curr_arg1.type();
 
         if(is_reference(arg1_type))
