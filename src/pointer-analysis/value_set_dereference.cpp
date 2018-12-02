@@ -32,14 +32,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/simplify_expr.h>
 #include <util/ssa_expr.h>
 
-const exprt &value_set_dereferencet::get_symbol(const exprt &expr)
-{
-  if(expr.id()==ID_member || expr.id()==ID_index)
-    return get_symbol(expr.op0());
-
-  return expr;
-}
-
 exprt value_set_dereferencet::dereference(
   const exprt &pointer,
   const guardt &guard,
