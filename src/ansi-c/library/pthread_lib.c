@@ -319,12 +319,13 @@ extern unsigned long __CPROVER_next_thread_id;
 
 inline int pthread_join(pthread_t thread, void **value_ptr)
 {
-  __CPROVER_HIDE:;
+__CPROVER_HIDE:;
 
-  #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
-  __CPROVER_assert(__CPROVER_get_must(&thread, "pthread-id"),
-                   "phtread_join must be given valid thread ID");
-  #endif
+#ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
+  __CPROVER_assert(
+    __CPROVER_get_must(&thread, "pthread-id"),
+    "pthread_join must be given valid thread ID");
+#endif
 
   if((unsigned long)thread>__CPROVER_next_thread_id) return ESRCH;
   if((unsigned long)thread==__CPROVER_thread_id) return EDEADLK;
@@ -355,12 +356,13 @@ extern unsigned long __CPROVER_next_thread_id;
 
 inline int _pthread_join(pthread_t thread, void **value_ptr)
 {
-  __CPROVER_HIDE:;
+__CPROVER_HIDE:;
 
-  #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
-  __CPROVER_assert(__CPROVER_get_must(&thread, "pthread-id"),
-                   "phtread_join must be given valid thread ID");
-  #endif
+#ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
+  __CPROVER_assert(
+    __CPROVER_get_must(&thread, "pthread-id"),
+    "pthread_join must be given valid thread ID");
+#endif
 
   if((unsigned long)thread>__CPROVER_next_thread_id) return ESRCH;
   if((unsigned long)thread==__CPROVER_thread_id) return EDEADLK;
