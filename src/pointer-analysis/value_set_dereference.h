@@ -95,8 +95,6 @@ private:
 
   valuet build_reference_to(const exprt &what, const exprt &pointer);
 
-  static const exprt &get_symbol(const exprt &object);
-
   bool memory_model(exprt &value, const typet &type, const exprt &offset);
 
   bool memory_model_bytes(
