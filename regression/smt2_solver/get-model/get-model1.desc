@@ -1,0 +1,8 @@
+CORE
+get-model1.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^sat$
+^\(\(define-fun var_x \(\) \(_ BitVec 8\) \(_ bv1 8\)\)$
+--
