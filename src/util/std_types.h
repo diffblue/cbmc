@@ -1828,6 +1828,7 @@ inline vector_typet &to_vector_type(typet &type)
 class complex_typet:public type_with_subtypet
 {
 public:
+  DEPRECATED("use complex_typet(type) instead")
   complex_typet():type_with_subtypet(ID_complex)
   {
   }

@@ -135,7 +135,9 @@ public:
 class type_with_subtypet:public typet
 {
 public:
+  DEPRECATED("use type_with_subtypet(id, subtype) instead")
   explicit type_with_subtypet(const irep_idt &_id):typet(_id) { }
+
   type_with_subtypet(const irep_idt &_id, const typet &_subtype):
     typet(_id)
   {
@@ -169,8 +171,10 @@ class type_with_subtypest:public typet
 public:
   typedef std::vector<typet> subtypest;
 
+  DEPRECATED("use type_with_subtypest(id, subtypes) instead")
   type_with_subtypest() { }
 
+  DEPRECATED("use type_with_subtypest(id, subtypes) instead")
   explicit type_with_subtypest(const irep_idt &_id):typet(_id) { }
 
   type_with_subtypest(const irep_idt &_id, const subtypest &_subtypes)
