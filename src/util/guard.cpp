@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <ostream>
 
+#include "expr_util.h"
 #include "invariant.h"
 #include "simplify_utils.h"
 #include "std_expr.h"
@@ -27,8 +28,7 @@ void guardt::guard_expr(exprt &dest) const
   {
     if(dest.is_false())
     {
-      dest=as_expr();
-      dest.make_not();
+      dest = boolean_negate(as_expr());
     }
     else
     {
@@ -110,8 +110,7 @@ guardt &operator |= (guardt &g1, const guardt &g2)
 
   if(g1.id()!=ID_and || g2.id()!=ID_and)
   {
-    exprt tmp(g2);
-    tmp.make_not();
+    exprt tmp(boolean_negate(g2));
 
     if(tmp==g1)
       g1.make_true();
@@ -166,8 +165,7 @@ guardt &operator |= (guardt &g1, const guardt &g2)
 
   g1=conjunction(op1);
 
-  exprt tmp(and_expr2);
-  tmp.make_not();
+  exprt tmp(boolean_negate(and_expr2));
 
   if(tmp!=and_expr1)
   {

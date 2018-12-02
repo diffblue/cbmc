@@ -78,38 +78,6 @@ void exprt::make_typecast(const typet &_type)
   swap(new_expr);
 }
 
-/// Negate the expression.
-/// Simplifications:
-///   - If the expression is trivially true, make it false, and vice versa.
-///   - If the expression is an `ID_not`, remove the not.
-/// \deprecated use constructors instead
-void exprt::make_not()
-{
-  if(is_true())
-  {
-    *this=false_exprt();
-    return;
-  }
-  else if(is_false())
-  {
-    *this=true_exprt();
-    return;
-  }
-
-  exprt new_expr;
-
-  if(id()==ID_not && operands().size()==1)
-  {
-    new_expr.swap(operands().front());
-  }
-  else
-  {
-    new_expr = not_exprt(*this);
-  }
-
-  swap(new_expr);
-}
-
 /// Return whether the expression is a constant.
 /// \return True if is a constant, false otherwise
 bool exprt::is_constant() const

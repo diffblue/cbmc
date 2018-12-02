@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "branch.h"
 
 #include <util/cprover_prefix.h>
+#include <util/expr_util.h>
 #include <util/prefix.h>
 
 #include "function.h"
@@ -48,7 +49,7 @@ void branch(
          !i_it->guard.is_constant())
       {
         // negate condition
-        i_it->guard.make_not();
+        i_it->guard = boolean_negate(i_it->guard);
 
         goto_programt::targett t1=body.insert_after(i_it);
         t1->make_function_call(

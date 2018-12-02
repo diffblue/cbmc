@@ -392,13 +392,13 @@ bool simplify_exprt::simplify_ieee_float_relation(exprt &expr)
   if(expr.op0()==expr.op1())
   {
     // x!=x is the same as saying isnan(op)
-    isnan_exprt isnan(expr.op0());
+    exprt isnan = isnan_exprt(expr.op0());
 
     if(expr.id()==ID_ieee_float_notequal)
     {
     }
     else if(expr.id()==ID_ieee_float_equal)
-      isnan.make_not();
+      isnan = not_exprt(isnan);
     else
       UNREACHABLE;
 

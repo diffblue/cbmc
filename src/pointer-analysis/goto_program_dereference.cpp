@@ -76,7 +76,7 @@ void goto_program_dereferencet::dereference_failure(
 
   if(assertions.insert(guard_expr).second)
   {
-    guard_expr.make_not();
+    guard_expr = boolean_negate(guard_expr);
 
     // first try simplifier on it
     if(options.get_bool_option("simplify"))
@@ -127,11 +127,7 @@ void goto_program_dereferencet::dereference_rec(
         dereference_rec(op, guard, value_set_dereferencet::modet::READ);
 
       if(expr.id()==ID_or)
-      {
-        exprt tmp(op);
-        tmp.make_not();
-        guard.add(tmp);
-      }
+        guard.add(boolean_negate(op));
       else
         guard.add(op);
     }
@@ -169,9 +165,7 @@ void goto_program_dereferencet::dereference_rec(
     if(o2)
     {
       guardt old_guard=guard;
-      exprt tmp(expr.op0());
-      tmp.make_not();
-      guard.add(tmp);
+      guard.add(boolean_negate(expr.op0()));
       dereference_rec(expr.op2(), guard, mode);
       guard.swap(old_guard);
     }

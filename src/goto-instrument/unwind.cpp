@@ -16,8 +16,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 #endif
 
+#include <util/expr_util.h>
 #include <util/std_expr.h>
 #include <util/string_utils.h>
+
 #include <goto-programs/goto_functions.h>
 
 #include "loop_utils.h"
@@ -126,8 +128,7 @@ void goto_unwindt::unwind(
 
     if(!t->guard.is_true()) // cond in backedge
     {
-      exit_cond=t->guard;
-      exit_cond.make_not();
+      exit_cond = boolean_negate(t->guard);
     }
     else if(loop_head->is_goto())
     {

@@ -11,8 +11,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "custom_bitvector_analysis.h"
 
-#include <util/xml_expr.h>
+#include <util/expr_util.h>
 #include <util/simplify_expr.h>
+#include <util/xml_expr.h>
 
 #include <langapi/language_util.h>
 
@@ -527,7 +528,7 @@ void custom_bitvector_domaint::transform(
       // Comparing iterators is safe as the target must be within the same list
       // of instructions because this is a GOTO.
       if(to!=from->get_target())
-        guard.make_not();
+        guard = boolean_negate(guard);
 
       exprt result=eval(guard, cba);
       exprt result2=simplify_expr(result, ns);
