@@ -57,9 +57,18 @@ public:
   // constructors
   exprt() { }
   explicit exprt(const irep_idt &_id):irept(_id) { }
-  exprt(const irep_idt &_id, const typet &_type):irept(_id)
+
+  exprt(irep_idt _id, typet _type)
+    : irept(std::move(_id), {{ID_type, std::move(_type)}}, {})
   {
-    add(ID_type, _type);
+  }
+
+  exprt(irep_idt _id, typet _type, operandst &&_operands)
+    : irept(
+        std::move(_id),
+        {{ID_type, std::move(_type)}},
+        std::move((irept::subt &&) _operands))
+  {
   }
 
   /// Return the type of the expression
@@ -324,7 +333,13 @@ class expr_protectedt : public exprt
 {
 protected:
   // constructors
-  expr_protectedt(const irep_idt &_id, const typet &_type) : exprt(_id, _type)
+  expr_protectedt(irep_idt _id, typet _type)
+    : exprt(std::move(_id), std::move(_type))
+  {
+  }
+
+  expr_protectedt(irep_idt _id, typet _type, operandst _operands)
+    : exprt(std::move(_id), std::move(_type), std::move(_operands))
   {
   }
 
