@@ -151,7 +151,7 @@ protected:
     NO_CAST
   };
 
-  const exprt variable(
+  exprt variable(
     const exprt &arg,
     char type_char,
     size_t address,
