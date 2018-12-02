@@ -266,8 +266,6 @@ goto_programt::targett remove_java_newt::lower_java_new_array(
     t_decl->make_decl(decl);
     t_decl->source_location = location;
 
-    code_fort for_loop;
-
     side_effect_exprt sub_java_new = rhs;
     sub_java_new.operands().erase(sub_java_new.operands().begin());
 
@@ -304,10 +302,11 @@ goto_programt::targett remove_java_newt::lower_java_new_array(
       deref_expr, typecast_exprt(init_sym, deref_expr.type()));
     for_body.add(std::move(assign_subarray));
 
-    for_loop.init() = code_assignt(tmp_i, from_integer(0, tmp_i.type()));
-    for_loop.cond() = binary_relation_exprt(tmp_i, ID_lt, rhs.op0());
-    for_loop.iter() = inc;
-    for_loop.body() = for_body;
+    const code_fort for_loop(
+      code_assignt(tmp_i, from_integer(0, tmp_i.type())),
+      binary_relation_exprt(tmp_i, ID_lt, rhs.op0()),
+      std::move(inc),
+      std::move(for_body));
 
     goto_convert(for_loop, symbol_table, tmp, get_message_handler(), ID_java);
 

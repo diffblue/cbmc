@@ -628,13 +628,8 @@ goto_programt::const_targett goto_program2codet::convert_goto_while(
   if(w.body().has_operands() &&
      to_code(w.body().operands().back()).get_statement()==ID_assign)
   {
-    code_fort f;
+    code_fort f(nil_exprt(), w.cond(), w.body().operands().back(), codet());
 
-    f.init().make_nil();
-
-    f.cond()=w.cond();
-
-    f.iter()=w.body().operands().back();
     w.body().operands().pop_back();
     f.iter().id(ID_side_effect);
 
