@@ -1293,17 +1293,14 @@ dereference_exprt java_string_library_preprocesst::get_object_at_index(
 /// char tmp_char;
 /// boolean tmp_boolean;
 /// Object* arg_i=get_object_at_index(argv, index)
-/// if(arg_i!=NULL)
+/// if(arg_i.@class_identifier=="java::java.lang.String")
 /// {
-///   if(arg_i.@class_identifier=="java::java.lang.String")
-///   {
-///     arg_i_string_expr = (string_expr)((String*)arg_i_as_string)
-///   }
-///   tmp_int=((Integer)arg_i)->value
-///   tmp_float=((Float)arg_i)->value
-///   tmp_char=((Char)arg_i)->value
-///   tmp_boolean=((Boolean)arg_i)->value
+///   arg_i_string_expr = (string_expr)((String*)arg_i_as_string)
 /// }
+/// tmp_int=((Integer)arg_i)->value
+/// tmp_float=((Float)arg_i)->value
+/// tmp_char=((Char)arg_i)->value
+/// tmp_boolean=((Boolean)arg_i)->value
 /// arg_i_struct = { string_expr=arg_i_string_expr;
 ///   integer=tmp_int; float=tmp_float; char=tmp_char; boolean=tmp_boolean}
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1373,10 +1370,6 @@ struct_exprt java_string_library_preprocesst::make_argument_for_format(
         equal_exprt(arg_i, null_pointer_exprt(to_pointer_type(arg_i.type()))))),
     loc);
 
-  // if arg_i != null then [code_not_null]
-  code_ifthenelset code_avoid_null_arg;
-  code_avoid_null_arg.cond()=not_exprt(equal_exprt(
-    arg_i, null_pointer_exprt(to_pointer_type(arg_i.type()))));
   code_blockt code_not_null;
 
   // Assigning all the fields of arg_i_struct
