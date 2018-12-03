@@ -172,20 +172,18 @@ SCENARIO("test_value_set_analysis",
   {
     config.set_arch("none");
     config.main = "";
-    cmdlinet command_line;
 
     // This classpath is the default, but the config object
     // is global and previous unit tests may have altered it
-    command_line.set("java-cp-include-files", "CustomVSATest.class");
     config.java.classpath={"."};
-    command_line.args.push_back("pointer-analysis/CustomVSATest.jar");
+
+    optionst options;
+    options.set_option("java-cp-include-files", "CustomVSATest.class");
 
     register_language(new_java_bytecode_language);
-    optionst options;
-    parse_java_language_options(command_line, options);
 
-    goto_modelt goto_model =
-      initialize_goto_model(command_line, null_message_handler, options);
+    goto_modelt goto_model = initialize_goto_model(
+      {"pointer-analysis/CustomVSATest.jar"}, null_message_handler, options);
 
     null_message_handlert message_handler;
     remove_java_new(goto_model, message_handler);

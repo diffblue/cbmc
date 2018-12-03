@@ -14,10 +14,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <fstream>
 #include <iostream>
 
-#include <util/cmdline.h>
 #include <util/config.h>
 #include <util/message.h>
 #include <util/object_factory_parameters.h>
+#include <util/options.h>
 #include <util/unicode.h>
 
 #include <langapi/mode.h>
@@ -30,12 +30,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "read_goto_binary.h"
 
 goto_modelt initialize_goto_model(
-  const cmdlinet &cmdline,
+  const std::vector<std::string> &files,
   message_handlert &message_handler,
   const optionst &options)
 {
   messaget msg(message_handler);
-  const std::vector<std::string> &files=cmdline.args;
   if(files.empty())
   {
     throw invalid_command_line_argument_exceptiont(
@@ -124,7 +123,7 @@ goto_modelt initialize_goto_model(
 
   bool entry_point_generation_failed=false;
 
-  if(binaries_provided_start && cmdline.isset("function"))
+  if(binaries_provided_start && options.is_set("function"))
   {
     // Rebuild the entry-point, using the language annotation of the
     // existing __CPROVER_start function:
@@ -139,7 +138,7 @@ goto_modelt initialize_goto_model(
     if(binaries.empty())
     {
       // Enable/disable stub generation for opaque methods
-      bool stubs_enabled=cmdline.isset("generate-opaque-stubs");
+      bool stubs_enabled = options.is_set("generate-opaque-stubs");
       language_files.set_should_generate_opaque_method_stubs(stubs_enabled);
     }
 
@@ -166,7 +165,7 @@ goto_modelt initialize_goto_model(
     goto_model.goto_functions,
     message_handler);
 
-  if(cmdline.isset("validate-goto-model"))
+  if(options.is_set("validate-goto-model"))
   {
     goto_model.validate(validation_modet::EXCEPTION);
   }

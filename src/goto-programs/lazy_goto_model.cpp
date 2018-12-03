@@ -9,10 +9,10 @@
 
 #include <langapi/mode.h>
 
-#include <util/cmdline.h>
 #include <util/config.h>
 #include <util/exception_utils.h>
 #include <util/journalling_symbol_table.h>
+#include <util/options.h>
 #include <util/unicode.h>
 
 #include <langapi/language.h>
@@ -105,16 +105,14 @@ lazy_goto_modelt::lazy_goto_modelt(lazy_goto_modelt &&other)
 /// language implements `languaget::convert_lazy_method`; any method not handled
 /// there must be populated eagerly. See `lazy_goto_modelt::get_goto_function`
 /// for more detail.
-/// \param cmdline: command-line arguments specifying source files and GOTO
-///   binaries to load
+/// \param files: source files and GOTO binaries to load
 /// \param options: options to pass on to the language front-ends
 void lazy_goto_modelt::initialize(
-  const cmdlinet &cmdline,
+  const std::vector<std::string> &files,
   const optionst &options)
 {
   messaget msg(message_handler);
 
-  const std::vector<std::string> &files=cmdline.args;
   if(files.empty())
   {
     throw invalid_command_line_argument_exceptiont(
@@ -201,7 +199,7 @@ void lazy_goto_modelt::initialize(
 
   bool entry_point_generation_failed=false;
 
-  if(binaries_provided_start && cmdline.isset("function"))
+  if(binaries_provided_start && options.is_set("function"))
   {
     // Rebuild the entry-point, using the language annotation of the
     // existing __CPROVER_start function:
@@ -216,7 +214,7 @@ void lazy_goto_modelt::initialize(
     if(binaries.empty())
     {
       // Enable/disable stub generation for opaque methods
-      bool stubs_enabled=cmdline.isset("generate-opaque-stubs");
+      bool stubs_enabled = options.is_set("generate-opaque-stubs");
       language_files.set_should_generate_opaque_method_stubs(stubs_enabled);
     }
 
