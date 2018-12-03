@@ -101,8 +101,6 @@ public:
     file_map.clear();
   }
 
-  void set_should_generate_opaque_method_stubs(bool stubs_enabled);
-
   bool parse();
 
   void show_parse(std::ostream &out);

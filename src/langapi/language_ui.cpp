@@ -113,14 +113,6 @@ bool language_uit::final()
 {
   language_files.set_message_handler(*message_handler);
 
-  // TODO: This should be moved elsewhere because it is not used in
-  //       this repository.
-  // Enable/disable stub generation for opaque methods
-  bool stubs_enabled = false;
-  if(options != nullptr)
-    stubs_enabled = options->is_set("generate-opaque-stubs");
-  language_files.set_should_generate_opaque_method_stubs(stubs_enabled);
-
   if(language_files.final(symbol_table))
   {
     error() << "CONVERSION ERROR" << eom;
