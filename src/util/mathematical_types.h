@@ -59,33 +59,8 @@ class mathematical_function_typet : public type_with_subtypest
 {
 public:
   // the domain of the function is composed of zero, one, or
-  // many variables
-  class variablet : public irept
-  {
-  public:
-    // the identifier is optional
-    irep_idt get_identifier() const
-    {
-      return get(ID_identifier);
-    }
-
-    void set_identifier(const irep_idt &identifier)
-    {
-      return set(ID_identifier, identifier);
-    }
-
-    typet &type()
-    {
-      return static_cast<typet &>(add(ID_type));
-    }
-
-    const typet &type() const
-    {
-      return static_cast<const typet &>(find(ID_type));
-    }
-  };
-
-  using domaint = std::vector<variablet>;
+  // many variables, given by their type
+  using domaint = std::vector<typet>;
 
   mathematical_function_typet(const domaint &_domain, const typet &_codomain)
     : type_with_subtypest(ID_mathematical_function)
@@ -105,11 +80,9 @@ public:
     return (const domaint &)to_type_with_subtypes(subtypes()[0]).subtypes();
   }
 
-  variablet &add_variable()
+  void add_variable(const typet &_type)
   {
-    auto &d = domain();
-    d.push_back(variablet());
-    return d.back();
+    domain().push_back(_type);
   }
 
   /// Return the codomain, i.e., the set of values that the function maps to

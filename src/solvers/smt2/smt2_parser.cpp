@@ -987,18 +987,21 @@ typet smt2_parsert::sort()
   }
 }
 
-typet smt2_parsert::function_signature_definition()
+smt2_parsert::signature_with_parameter_idst
+smt2_parsert::function_signature_definition()
 {
   if(next_token()!=OPEN)
     throw error("expected '(' at beginning of signature");
 
   if(peek()==CLOSE)
   {
+    // no parameters
     next_token(); // eat the ')'
-    return sort();
+    return signature_with_parameter_idst(sort());
   }
 
   mathematical_function_typet::domaint domain;
+  std::vector<irep_idt> parameters;
 
   while(peek()!=CLOSE)
   {
@@ -1008,14 +1011,12 @@ typet smt2_parsert::function_signature_definition()
     if(next_token()!=SYMBOL)
       throw error("expected symbol in parameter");
 
-    mathematical_function_typet::variablet var;
-    std::string id=buffer;
-    var.set_identifier(id);
-    var.type()=sort();
-    domain.push_back(var);
+    irep_idt id = buffer;
+    parameters.push_back(id);
+    domain.push_back(sort());
 
     auto &entry=id_map[id];
-    entry.type=var.type();
+    entry.type = domain.back();
     entry.definition=nil_exprt();
 
     if(next_token()!=CLOSE)
@@ -1026,7 +1027,8 @@ typet smt2_parsert::function_signature_definition()
 
   typet codomain = sort();
 
-  return mathematical_function_typet(domain, codomain);
+  return signature_with_parameter_idst(
+    mathematical_function_typet(domain, codomain), parameters);
 }
 
 typet smt2_parsert::function_signature_declaration()
@@ -1050,9 +1052,7 @@ typet smt2_parsert::function_signature_declaration()
     if(next_token()!=SYMBOL)
       throw error("expected symbol in parameter");
 
-    mathematical_function_typet::variablet var;
-    var.type()=sort();
-    domain.push_back(var);
+    domain.push_back(sort());
 
     if(next_token()!=CLOSE)
       throw error("expected ')' at end of parameter");
@@ -1161,9 +1161,9 @@ void smt2_parsert::command(const std::string &c)
     const auto body = expression();
 
     // check type of body
-    if(signature.id() == ID_mathematical_function)
+    if(signature.type.id() == ID_mathematical_function)
     {
-      const auto &f_signature = to_mathematical_function_type(signature);
+      const auto &f_signature = to_mathematical_function_type(signature.type);
       if(body.type() != f_signature.codomain())
       {
         std::ostringstream msg;
@@ -1173,19 +1173,20 @@ void smt2_parsert::command(const std::string &c)
         throw error(msg.str());
       }
     }
-    else if(body.type() != signature)
+    else if(body.type() != signature.type)
     {
       std::ostringstream msg;
       msg << "type mismatch in function definition: expected `"
-          << smt2_format(signature) << "' but got `" << smt2_format(body.type())
-          << '\'';
+          << smt2_format(signature.type) << "' but got `"
+          << smt2_format(body.type()) << '\'';
       throw error(msg.str());
     }
 
     // create the entry
-    auto &entry=id_map[id];
-    entry.type=signature;
-    entry.definition=body;
+    auto &entry = id_map[id];
+    entry.type = signature.type;
+    entry.parameters = signature.parameters;
+    entry.definition = body;
   }
   else if(c=="exit")
   {
