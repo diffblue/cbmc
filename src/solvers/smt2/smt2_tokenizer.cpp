@@ -41,6 +41,7 @@ smt2_tokenizert::tokent smt2_tokenizert::get_simple_symbol()
     else
     {
       in->unget(); // put back
+      quoted_symbol = false;
       return SYMBOL;
     }
   }
@@ -49,7 +50,10 @@ smt2_tokenizert::tokent smt2_tokenizert::get_simple_symbol()
   if(buffer.empty())
     return END_OF_FILE;
   else
+  {
+    quoted_symbol = false;
     return SYMBOL;
+  }
 }
 
 smt2_tokenizert::tokent smt2_tokenizert::get_decimal_numeral()
@@ -150,7 +154,10 @@ smt2_tokenizert::tokent smt2_tokenizert::get_quoted_symbol()
   while(in->get(ch))
   {
     if(ch=='|')
+    {
+      quoted_symbol = true;
       return SYMBOL; // done
+    }
 
     buffer+=ch;
 

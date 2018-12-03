@@ -53,6 +53,7 @@ public:
 
 protected:
   std::string buffer;
+  bool quoted_symbol = false;
   bool peeked;
   using tokent = enum {
     NONE,

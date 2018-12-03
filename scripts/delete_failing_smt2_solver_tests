@@ -136,8 +136,6 @@ rm gcc_vector1/test.desc
 rm gcc_vector2/test.desc
 rm graphml_witness1/test.desc
 rm havoc_object1/test.desc
-rm hex_trace/test.desc
-rm integer-assignments1/test.desc
 rm little-endian-array1/test.desc
 rm memcpy/memcpy4.desc
 rm memory_allocation1/test.desc
@@ -145,10 +143,7 @@ rm memset1/test.desc
 rm mm_io1/test.desc
 rm no_nondet_static/test.desc
 rm null1/test.desc
-rm pointer-function-parameters/test.desc
-rm pointer-function-parameters-2/test.desc
 rm pointer-function-parameters-struct-mutual-recursion/test.desc
-rm pointer-function-parameters-struct-non-recursive/test.desc
 rm pointer-function-parameters-struct-simple-recursion/test.desc
 rm pointer-function-parameters-struct-simple-recursion-2/test.desc
 rm pointer-function-parameters-struct-simple-recursion-3/test.desc
