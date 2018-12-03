@@ -55,10 +55,11 @@ class WarningsList(object):
             elif line.startswith('  '):
                 current.otherlines.append(line.strip())
             else:
-                # Assuming all warnings are of the form [path:line: warning:...]
+                # Warnings are usually of the form [path:line: warning:...]
                 # (and the warnings about too many nodes have been filtered out).
-                print('Error filtering warnings: Unexpected input format.')
-                print('  Input:' + line)
+                # Treat any unexpected input lines as warnings.
+                current = DoxygenWarning(line, '', line)
+                self.warnings_list.append(current)
 
     def contains(self, warning):
         """Check if a similar warning is in this list."""
