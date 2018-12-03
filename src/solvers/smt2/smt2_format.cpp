@@ -100,6 +100,14 @@ std::ostream &smt2_format_rec(std::ostream &out, const exprt &expr)
         << smt2_format(with_expr.where()) << ' '
         << smt2_format(with_expr.new_value()) << ')';
   }
+  else if(expr.id() == ID_array_of)
+  {
+    const auto &array_of_expr = to_array_of_expr(expr);
+
+    // This is an extension used by Z3
+    out << "((as const " << smt2_format(expr.type()) << ") "
+        << smt2_format(array_of_expr.what()) << ")))";
+  }
   else
     out << "? " << expr.id();
 

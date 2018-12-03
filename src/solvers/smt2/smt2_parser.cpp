@@ -460,6 +460,20 @@ exprt smt2_parsert::function_application()
       else
         return term;
     }
+    else if(buffer == "as")
+    {
+      // these are "qualified identifiers"
+      if(next_token() != SYMBOL)
+        throw error("'as' expects a symbol");
+
+      const irep_idt identifier = buffer;
+
+      const auto s = sort();
+
+      exprt qualified_identifier("qualified_identifier", s);
+      qualified_identifier.set(ID_identifier, identifier);
+      return qualified_identifier;
+    }
     else
     {
       // non-indexed symbol; hash it
