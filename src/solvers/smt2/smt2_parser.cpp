@@ -644,6 +644,31 @@ exprt smt2_parsert::function_application()
       {
         return binary(ID_implies, op);
       }
+      else if(id == "select")
+      {
+        // array index
+        if(op.size() != 2)
+          throw error("select takes two operands");
+
+        if(op[0].type().id() != ID_array)
+          throw error("select expects array operand");
+
+        return index_exprt(op[0], op[1]);
+      }
+      else if(id == "store")
+      {
+        // array update
+        if(op.size() != 3)
+          throw error("store takes three operands");
+
+        if(op[0].type().id() != ID_array)
+          throw error("store expects array operand");
+
+        if(to_array_type(op[0].type()).subtype() != op[2].type())
+          throw error("store expects value that matches array element type");
+
+        return with_exprt(op[0], op[1], op[2]);
+      }
       else
       {
         // rummage through id_map
@@ -944,10 +969,7 @@ typet smt2_parsert::sort()
       // we can turn arrays that map an unsigned bitvector type
       // to something else into our 'array_typet'
       if(domain.id() == ID_unsignedbv)
-      {
-        const auto size = to_unsignedbv_type(domain).largest_expr();
-        return array_typet(range, size);
-      }
+        return array_typet(range, infinity_exprt(domain));
       else
         throw error("unsupported array sort");
     }
@@ -1088,6 +1110,38 @@ void smt2_parsert::command(const std::string &c)
     auto &entry = id_map[id];
     entry.type = type;
     entry.definition = nil_exprt();
+  }
+  else if(c == "define-const")
+  {
+    if(next_token() != SYMBOL)
+      throw error("expected a symbol after define-const");
+
+    const irep_idt id = buffer;
+
+    if(id_map.find(id) != id_map.end())
+    {
+      std::ostringstream msg;
+      msg << "identifier `" << id << "' defined twice";
+      throw error(msg.str());
+    }
+
+    const auto type = sort();
+    const auto value = expression();
+
+    // check type of value
+    if(value.type() != type)
+    {
+      std::ostringstream msg;
+      msg << "type mismatch in constant definition: expected `"
+          << smt2_format(type) << "' but got `" << smt2_format(value.type())
+          << '\'';
+      throw error(msg.str());
+    }
+
+    // create the entry
+    auto &entry = id_map[id];
+    entry.type = type;
+    entry.definition = value;
   }
   else if(c=="define-fun")
   {

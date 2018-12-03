@@ -22,6 +22,12 @@ std::ostream &smt2_format_rec(std::ostream &out, const typet &type)
     out << "Int";
   else if(type.id() == ID_real)
     out << "Real";
+  else if(type.id() == ID_array)
+  {
+    const auto &array_type = to_array_type(type);
+    out << "(Array " << smt2_format(array_type.size().type()) << ' '
+        << smt2_format(array_type.subtype()) << ')';
+  }
   else
     out << "? " << type.id();
 
@@ -86,6 +92,13 @@ std::ostream &smt2_format_rec(std::ostream &out, const exprt &expr)
     }
     else
       out << identifier;
+  }
+  else if(expr.id() == ID_with && expr.type().id() == ID_array)
+  {
+    const auto &with_expr = to_with_expr(expr);
+    out << "(store " << smt2_format(with_expr.old()) << ' '
+        << smt2_format(with_expr.where()) << ' '
+        << smt2_format(with_expr.new_value()) << ')';
   }
   else
     out << "? " << expr.id();
