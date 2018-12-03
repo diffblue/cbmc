@@ -1089,6 +1089,38 @@ void smt2_parsert::command(const std::string &c)
     entry.type = type;
     entry.definition = nil_exprt();
   }
+  else if(c == "define-const")
+  {
+    if(next_token() != SYMBOL)
+      throw error("expected a symbol after define-const");
+
+    const irep_idt id = buffer;
+
+    if(id_map.find(id) != id_map.end())
+    {
+      std::ostringstream msg;
+      msg << "identifier `" << id << "' defined twice";
+      throw error(msg.str());
+    }
+
+    const auto type = sort();
+    const auto value = expression();
+
+    // check type of value
+    if(value.type() != type)
+    {
+      std::ostringstream msg;
+      msg << "type mismatch in constant definition: expected `"
+          << smt2_format(type) << "' but got `" << smt2_format(value.type())
+          << '\'';
+      throw error(msg.str());
+    }
+
+    // create the entry
+    auto &entry = id_map[id];
+    entry.type = type;
+    entry.definition = value;
+  }
   else if(c=="define-fun")
   {
     if(next_token()!=SYMBOL)
