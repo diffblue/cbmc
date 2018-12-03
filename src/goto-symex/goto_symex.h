@@ -397,6 +397,12 @@ protected:
     guardt &,
     assignment_typet);
 
+  /// Store the \p what expression by recursively descending into the operands
+  /// of \p lhs until the first operand \c op0 is _nil_: this _nil_ operand
+  /// is then replaced with \p what.
+  /// \param lhs: Non-symbol pointed-to expression
+  /// \param what: The expression to be added to the \p lhs
+  /// \return The resulting expression
   static exprt add_to_lhs(const exprt &lhs, const exprt &what);
 
   virtual void symex_gcc_builtin_va_arg_next(

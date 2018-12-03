@@ -8,6 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /// \file
 /// Symbolic Execution
+/// Implementation of functions to build SSA equation.
 
 #include "symex_target_equation.h"
 
@@ -27,7 +28,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "equation_conversion_exceptions.h"
 #include "goto_symex_state.h"
 
-/// read from a shared variable
 void symex_target_equationt::shared_read(
   const exprt &guard,
   const ssa_exprt &ssa_object,
@@ -46,7 +46,6 @@ void symex_target_equationt::shared_read(
   merge_ireps(SSA_step);
 }
 
-/// write to a sharedvariable
 void symex_target_equationt::shared_write(
   const exprt &guard,
   const ssa_exprt &ssa_object,
@@ -124,7 +123,6 @@ void symex_target_equationt::atomic_end(
   merge_ireps(SSA_step);
 }
 
-/// write to a variable
 void symex_target_equationt::assignment(
   const exprt &guard,
   const ssa_exprt &ssa_lhs,
@@ -155,7 +153,6 @@ void symex_target_equationt::assignment(
   merge_ireps(SSA_step);
 }
 
-/// declare a fresh variable
 void symex_target_equationt::decl(
   const exprt &guard,
   const ssa_exprt &ssa_lhs,
@@ -191,7 +188,6 @@ void symex_target_equationt::dead(
   // we currently don't record these
 }
 
-/// just record a location
 void symex_target_equationt::location(
   const exprt &guard,
   const sourcet &source)
@@ -206,7 +202,6 @@ void symex_target_equationt::location(
   merge_ireps(SSA_step);
 }
 
-/// just record a location
 void symex_target_equationt::function_call(
   const exprt &guard,
   const irep_idt &function_identifier,
@@ -227,7 +222,6 @@ void symex_target_equationt::function_call(
   merge_ireps(SSA_step);
 }
 
-/// just record a location
 void symex_target_equationt::function_return(
   const exprt &guard,
   const sourcet &source,
@@ -244,7 +238,6 @@ void symex_target_equationt::function_return(
   merge_ireps(SSA_step);
 }
 
-/// just record output
 void symex_target_equationt::output(
   const exprt &guard,
   const sourcet &source,
@@ -263,7 +256,6 @@ void symex_target_equationt::output(
   merge_ireps(SSA_step);
 }
 
-/// just record formatted output
 void symex_target_equationt::output_fmt(
   const exprt &guard,
   const sourcet &source,
@@ -285,7 +277,6 @@ void symex_target_equationt::output_fmt(
   merge_ireps(SSA_step);
 }
 
-/// just record input
 void symex_target_equationt::input(
   const exprt &guard,
   const sourcet &source,
@@ -304,7 +295,6 @@ void symex_target_equationt::input(
   merge_ireps(SSA_step);
 }
 
-/// record an assumption
 void symex_target_equationt::assumption(
   const exprt &guard,
   const exprt &cond,
@@ -321,7 +311,6 @@ void symex_target_equationt::assumption(
   merge_ireps(SSA_step);
 }
 
-/// record an assertion
 void symex_target_equationt::assertion(
   const exprt &guard,
   const exprt &cond,
@@ -340,7 +329,6 @@ void symex_target_equationt::assertion(
   merge_ireps(SSA_step);
 }
 
-/// record a goto instruction
 void symex_target_equationt::goto_instruction(
   const exprt &guard,
   const exprt &cond,
@@ -357,7 +345,6 @@ void symex_target_equationt::goto_instruction(
   merge_ireps(SSA_step);
 }
 
-/// record a constraint
 void symex_target_equationt::constraint(
   const exprt &cond,
   const std::string &msg,
@@ -399,9 +386,6 @@ void symex_target_equationt::convert(
   }
 }
 
-/// converts assignments
-/// \par parameters: decision procedure
-/// \return -
 void symex_target_equationt::convert_assignments(
   decision_proceduret &decision_procedure) const
 {
@@ -421,8 +405,6 @@ void symex_target_equationt::convert_assignments(
   }
 }
 
-/// converts declarations
-/// \return -
 void symex_target_equationt::convert_decls(
   prop_convt &prop_conv) const
 {
@@ -446,8 +428,6 @@ void symex_target_equationt::convert_decls(
   }
 }
 
-/// converts guards
-/// \return -
 void symex_target_equationt::convert_guards(
   prop_convt &prop_conv)
 {
@@ -478,8 +458,6 @@ void symex_target_equationt::convert_guards(
   }
 }
 
-/// converts assumptions
-/// \return -
 void symex_target_equationt::convert_assumptions(
   prop_convt &prop_conv)
 {
@@ -513,8 +491,6 @@ void symex_target_equationt::convert_assumptions(
   }
 }
 
-/// converts goto instructions
-/// \return -
 void symex_target_equationt::convert_goto_instructions(
   prop_convt &prop_conv)
 {
@@ -548,9 +524,6 @@ void symex_target_equationt::convert_goto_instructions(
   }
 }
 
-/// converts constraints
-/// \par parameters: decision procedure
-/// \return -
 void symex_target_equationt::convert_constraints(
   decision_proceduret &decision_procedure) const
 {
@@ -582,8 +555,6 @@ void symex_target_equationt::convert_constraints(
   }
 }
 
-/// converts assertions
-/// \return -
 void symex_target_equationt::convert_assertions(
   prop_convt &prop_conv)
 {
@@ -665,9 +636,6 @@ void symex_target_equationt::convert_assertions(
   prop_conv.set_to_true(disjunction(disjuncts));
 }
 
-/// converts function calls
-/// \par parameters: decision procedure
-/// \return -
 void symex_target_equationt::convert_function_calls(
   decision_proceduret &dec_proc)
 {
@@ -698,9 +666,6 @@ void symex_target_equationt::convert_function_calls(
     }
 }
 
-/// converts I/O
-/// \par parameters: decision procedure
-/// \return -
 void symex_target_equationt::convert_io(
   decision_proceduret &dec_proc)
 {
