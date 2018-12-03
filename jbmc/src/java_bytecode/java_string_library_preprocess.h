@@ -48,7 +48,7 @@ public:
   bool implements_function(const irep_idt &function_id) const;
   void get_all_function_names(std::unordered_set<irep_idt> &methods) const;
 
-  exprt
+  codet
   code_for_function(const symbolt &symbol, symbol_table_baset &symbol_table);
 
   codet replace_character_call(code_function_callt call)
@@ -145,37 +145,37 @@ private:
   // A set tells us what java types should be considered as string objects
   std::unordered_set<irep_idt> string_types;
 
-  codet make_float_to_string_code(
+  code_blockt make_float_to_string_code(
     const java_method_typet &type,
     const source_locationt &loc,
     const irep_idt &function_id,
     symbol_table_baset &symbol_table);
 
-  codet make_string_format_code(
+  code_blockt make_string_format_code(
     const java_method_typet &type,
     const source_locationt &loc,
     const irep_idt &function_id,
     symbol_table_baset &symbol_table);
 
-  codet make_copy_string_code(
+  code_blockt make_copy_string_code(
     const java_method_typet &type,
     const source_locationt &loc,
     const irep_idt &function_id,
     symbol_table_baset &symbol_table);
 
-  codet make_copy_constructor_code(
+  code_blockt make_copy_constructor_code(
     const java_method_typet &type,
     const source_locationt &loc,
     const irep_idt &function_id,
     symbol_table_baset &symbol_table);
 
-  codet make_string_length_code(
+  code_returnt make_string_length_code(
     const java_method_typet &type,
     const source_locationt &loc,
     const irep_idt &function_id,
     symbol_table_baset &symbol_table);
 
-  codet make_object_get_class_code(
+  code_blockt make_object_get_class_code(
     const java_method_typet &type,
     const source_locationt &loc,
     const irep_idt &function_id,
@@ -285,38 +285,38 @@ private:
     symbol_table_baset &symbol_table,
     code_blockt &code);
 
-  codet make_function_from_call(
+  code_blockt make_function_from_call(
     const irep_idt &function_name,
     const java_method_typet &type,
     const source_locationt &loc,
     symbol_table_baset &symbol_table);
 
-  codet make_init_function_from_call(
+  code_blockt make_init_function_from_call(
     const irep_idt &function_name,
     const java_method_typet &type,
     const source_locationt &loc,
     symbol_table_baset &symbol_table,
     bool ignore_first_arg = true);
 
-  codet make_assign_and_return_function_from_call(
+  code_blockt make_assign_and_return_function_from_call(
     const irep_idt &function_name,
     const java_method_typet &type,
     const source_locationt &loc,
     symbol_table_baset &symbol_table);
 
-  codet make_assign_function_from_call(
+  code_blockt make_assign_function_from_call(
     const irep_idt &function_name,
     const java_method_typet &type,
     const source_locationt &loc,
     symbol_table_baset &symbol_table);
 
-  codet make_string_returning_function_from_call(
+  code_blockt make_string_returning_function_from_call(
     const irep_idt &function_name,
     const java_method_typet &type,
     const source_locationt &loc,
     symbol_table_baset &symbol_table);
 
-  exprt make_argument_for_format(
+  struct_exprt make_argument_for_format(
     const exprt &argv,
     std::size_t index,
     const struct_typet &structured_type,
@@ -332,7 +332,7 @@ private:
     symbol_table_baset &symbol_table,
     code_blockt &code);
 
-  exprt get_object_at_index(const exprt &argv, std::size_t index);
+  dereference_exprt get_object_at_index(const exprt &argv, std::size_t index);
 };
 
 exprt make_nondet_infinite_char_array(
