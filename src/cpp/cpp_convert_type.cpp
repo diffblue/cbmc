@@ -234,20 +234,17 @@ void cpp_convert_typet::read_function_type(const typet &type)
     cpp_convert_plain_type(return_type);
 
   // take care of parameter types
-  irept &parameters=t.add(ID_parameters);
+  code_typet::parameterst &parameters = t.parameters();
 
   // see if we have an ellipsis
-  if(!parameters.get_sub().empty() &&
-     parameters.get_sub().back().id()==ID_ellipsis)
+  if(!parameters.empty() && parameters.back().id() == ID_ellipsis)
   {
-    parameters.set(ID_ellipsis, true);
-    parameters.get_sub().erase(--parameters.get_sub().end());
+    t.make_ellipsis();
+    parameters.pop_back();
   }
 
-  Forall_irep(it, parameters.get_sub())
+  for(auto &parameter_expr : parameters)
   {
-    exprt &parameter_expr=static_cast<exprt &>(*it);
-
     if(parameter_expr.id()==ID_cpp_declaration)
     {
       cpp_declarationt &declaration=to_cpp_declaration(parameter_expr);
@@ -264,7 +261,7 @@ void cpp_convert_typet::read_function_type(const typet &type)
       // do we have a declarator?
       if(declarator.is_nil())
       {
-        parameter_expr=exprt(ID_parameter, declaration.type());
+        parameter_expr = code_typet::parametert(declaration.type());
         parameter_expr.add_source_location()=type_location;
       }
       else
@@ -313,9 +310,8 @@ void cpp_convert_typet::read_function_type(const typet &type)
   }
 
   // if we just have one parameter of type void, remove it
-  if(parameters.get_sub().size()==1 &&
-     parameters.get_sub().front().find(ID_type).id()==ID_empty)
-    parameters.get_sub().clear();
+  if(parameters.size() == 1 && parameters.front().type().id() == ID_empty)
+    parameters.clear();
 }
 
 void cpp_convert_typet::write(typet &type)
