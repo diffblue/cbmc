@@ -77,6 +77,9 @@ void janalyzer_parse_optionst::get_command_line_options(optionst &options)
     exit(CPROVER_EXIT_USAGE_ERROR);
   }
 
+  if(cmdline.isset("function"))
+    options.set_option("function", cmdline.get_value("function"));
+
   parse_java_language_options(cmdline, options);
 
   // check assertions
@@ -352,7 +355,8 @@ int janalyzer_parse_optionst::doit()
 
   try
   {
-    goto_model = initialize_goto_model(cmdline, get_message_handler(), options);
+    goto_model =
+      initialize_goto_model(cmdline.args, get_message_handler(), options);
   }
 
   catch(const char *e)

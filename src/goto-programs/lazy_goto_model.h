@@ -13,7 +13,6 @@
 #include "lazy_goto_functions_map.h"
 #include "goto_convert_functions.h"
 
-class cmdlinet;
 class optionst;
 
 /// A GOTO model that produces function bodies on demand. It owns a
@@ -28,7 +27,7 @@ class optionst;
 /// The typical use case looks like:
 ///
 ///     lazy_goto_modelt model(...callback parameters...);
-///     model.initialize(cmdline, options);
+///     model.initialize(cmdline.args, options);
 ///     model.get_goto_function("needed_function1")
 ///     model.get_goto_function("needed_function2");
 ///     ...
@@ -179,7 +178,8 @@ public:
       message_handler);
   }
 
-  void initialize(const cmdlinet &cmdline, const optionst &options);
+  void
+  initialize(const std::vector<std::string> &files, const optionst &options);
 
   /// Eagerly loads all functions from the symbol table.
   void load_all_functions() const;

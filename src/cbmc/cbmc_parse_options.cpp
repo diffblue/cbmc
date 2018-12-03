@@ -111,6 +111,9 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   cbmc_parse_optionst::set_default_options(options);
   parse_c_object_factory_options(cmdline, options);
 
+  if(cmdline.isset("function"))
+    options.set_option("function", cmdline.get_value("function"));
+
   if(cmdline.isset("cover") && cmdline.isset("unwinding-assertions"))
   {
     error() << "--cover and --unwinding-assertions must not be given together"
@@ -403,6 +406,11 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("validate-ssa-equation", true);
   }
 
+  if(cmdline.isset("validate-goto-model"))
+  {
+    options.set_option("validate-goto-model", true);
+  }
+
   PARSE_OPTIONS_GOTO_TRACE(cmdline, options);
 }
 
@@ -594,7 +602,8 @@ int cbmc_parse_optionst::get_goto_program(
 
   try
   {
-    goto_model = initialize_goto_model(cmdline, ui_message_handler, options);
+    goto_model =
+      initialize_goto_model(cmdline.args, ui_message_handler, options);
 
     if(cmdline.isset("show-symbol-table"))
     {

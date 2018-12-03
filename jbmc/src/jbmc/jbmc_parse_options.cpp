@@ -108,6 +108,10 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
   }
 
   jbmc_parse_optionst::set_default_options(options);
+
+  if(cmdline.isset("function"))
+    options.set_option("function", cmdline.get_value("function"));
+
   parse_java_language_options(cmdline, options);
   parse_java_object_factory_options(cmdline, options);
 
@@ -550,7 +554,7 @@ int jbmc_parse_optionst::doit()
     // Use symex-driven lazy loading:
     lazy_goto_modelt lazy_goto_model=lazy_goto_modelt::from_handler_object(
       *this, options, get_message_handler());
-    lazy_goto_model.initialize(cmdline, options);
+    lazy_goto_model.initialize(cmdline.args, options);
 
     class_hierarchy =
       util_make_unique<class_hierarchyt>(lazy_goto_model.symbol_table);
@@ -630,7 +634,7 @@ int jbmc_parse_optionst::get_goto_program(
   {
     lazy_goto_modelt lazy_goto_model=lazy_goto_modelt::from_handler_object(
       *this, options, get_message_handler());
-    lazy_goto_model.initialize(cmdline, options);
+    lazy_goto_model.initialize(cmdline.args, options);
 
     class_hierarchy =
       util_make_unique<class_hierarchyt>(lazy_goto_model.symbol_table);

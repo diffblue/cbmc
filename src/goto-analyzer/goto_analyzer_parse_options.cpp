@@ -88,6 +88,9 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
     exit(CPROVER_EXIT_USAGE_ERROR);
   }
 
+  if(cmdline.isset("function"))
+    options.set_option("function", cmdline.get_value("function"));
+
   #if 0
   if(cmdline.isset("c89"))
     config.ansi_c.set_c89();
@@ -298,6 +301,11 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
       }
     }
   }
+
+  if(cmdline.isset("validate-goto-model"))
+  {
+    options.set_option("validate-goto-model", true);
+  }
 }
 
 /// For the task, build the appropriate kind of analyzer
@@ -390,7 +398,8 @@ int goto_analyzer_parse_optionst::doit()
 
   try
   {
-    goto_model = initialize_goto_model(cmdline, get_message_handler(), options);
+    goto_model =
+      initialize_goto_model(cmdline.args, get_message_handler(), options);
   }
 
   catch(const char *e)
