@@ -91,7 +91,7 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
   if(cmdline.isset("function"))
     options.set_option("function", cmdline.get_value("function"));
 
-  #if 0
+#if 0
   if(cmdline.isset("c89"))
     config.ansi_c.set_c89();
 
@@ -109,9 +109,9 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
 
   if(cmdline.isset("cpp11"))
     config.cpp.set_cpp11();
-  #endif
+#endif
 
-  #if 0
+#if 0
   // check assertions
   if(cmdline.isset("no-assertions"))
     options.set_option("assertions", false);
@@ -127,7 +127,7 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
   // magic error label
   if(cmdline.isset("error-label"))
     options.set_option("error-label", cmdline.get_values("error-label"));
-  #endif
+#endif
 
   // Select a specific analysis
   if(cmdline.isset("taint"))
