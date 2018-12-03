@@ -129,15 +129,6 @@ bool ansi_c_languaget::typecheck(
 bool ansi_c_languaget::generate_support_functions(
   symbol_tablet &symbol_table)
 {
-  // Note this can happen here because C doesn't currently
-  // support lazy loading at the symbol-table level, and therefore
-  // function bodies have already been populated and external stub
-  // symbols created during the typecheck() phase. If it gains lazy
-  // loading support then stubs will need to be created during
-  // function body parsing, or else generate-stubs moved to the
-  // final phase.
-  generate_opaque_method_stubs(symbol_table);
-
   // This creates __CPROVER_start and __CPROVER_initialize:
   return ansi_c_entry_point(
     symbol_table, get_message_handler(), object_factory_params);

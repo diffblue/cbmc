@@ -209,15 +209,6 @@ void lazy_goto_modelt::initialize(
   }
   else if(!binaries_provided_start)
   {
-    // Unsure of the rationale for only generating stubs when there are no
-    // GOTO binaries in play; simply mirroring old code in language_uit here.
-    if(binaries.empty())
-    {
-      // Enable/disable stub generation for opaque methods
-      bool stubs_enabled = options.is_set("generate-opaque-stubs");
-      language_files.set_should_generate_opaque_method_stubs(stubs_enabled);
-    }
-
     // Allow all language front-ends to try to provide the user-specified
     // (--function) entry-point, or some language-specific default:
     entry_point_generation_failed=
