@@ -354,6 +354,18 @@ void goto_symext::merge_value_sets(
   dest.value_set.make_union(src.value_set);
 }
 
+/// Helper function for \c phi_function which merges the names of an identifier
+/// for two different states.
+/// \param goto_state: first state
+/// \param[in, out] dest_state: second state
+/// \param ns: namespace
+/// \param diff_guard: difference between the guards of the two states
+/// \param guard_identifier: prefix used for goto symex guards
+/// \param[out] log: logger for debug messages
+/// \param do_simplify: should the right-hand-side of the assignment that is
+///   added to the target be simplified
+/// \param[out] target: equation that will receive the resulting assignment
+/// \param ssa: SSA expression to merge
 static void merge_names(
   const goto_symext::statet::goto_statet &goto_state,
   goto_symext::statet &dest_state,
