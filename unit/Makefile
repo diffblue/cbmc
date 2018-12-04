@@ -18,6 +18,7 @@ SRC += analyses/ai/ai.cpp \
        goto-programs/goto_program_assume.cpp \
        goto-programs/goto_program_dead.cpp \
        goto-programs/goto_program_declaration.cpp \
+       goto-programs/goto_program_function_call.cpp \
        goto-programs/goto_trace_output.cpp \
        goto-symex/ssa_equation.cpp \
        interpreter/interpreter.cpp \

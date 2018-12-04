@@ -35,6 +35,14 @@ void call_on_code(const codet &code, Args &&... args)
   {
     CALL_ON_CODE(code_deadt);
   }
+  else if(code.get_statement() == ID_function_call)
+  {
+    CALL_ON_CODE(code_function_callt);
+  }
+  else if(code.get_statement() == ID_return)
+  {
+    CALL_ON_CODE(code_returnt);
+  }
   else
   {
 #ifdef REPORT_UNIMPLEMENTED_CODE_CHECKS

@@ -715,6 +715,11 @@ void goto_programt::instructiont::validate(
   case ATOMIC_END:
     break;
   case RETURN:
+    DATA_CHECK_WITH_DIAGNOSTICS(
+      vm,
+      code.get_statement() == ID_return,
+      "return instruction should contain a return statement",
+      source_location);
     break;
   case ASSIGN:
     DATA_CHECK(
@@ -751,6 +756,11 @@ void goto_programt::instructiont::validate(
       source_location);
     break;
   case FUNCTION_CALL:
+    DATA_CHECK_WITH_DIAGNOSTICS(
+      vm,
+      code.get_statement() == ID_function_call,
+      "function call instruction should contain a call statement",
+      source_location);
     break;
   case THROW:
     break;
