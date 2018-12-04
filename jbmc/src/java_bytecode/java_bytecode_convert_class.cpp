@@ -897,25 +897,21 @@ void java_bytecode_convert_classt::add_array_types(symbol_tablet &symbol_table)
 
     code_declt declare_index(index_symexpr);
 
-    code_fort copy_loop;
-
-    copy_loop.init()=
-      code_assignt(index_symexpr, from_integer(0, index_symexpr.type()));
-    copy_loop.cond()=
-      binary_relation_exprt(index_symexpr, ID_lt, old_length);
-
     side_effect_exprt inc(ID_assign, typet(), location);
     inc.operands().resize(2);
     inc.op0()=index_symexpr;
     inc.op1()=plus_exprt(index_symexpr, from_integer(1, index_symexpr.type()));
-    copy_loop.iter()=inc;
 
     dereference_exprt old_cell(
       plus_exprt(old_data, index_symexpr), old_data.type().subtype());
     dereference_exprt new_cell(
       plus_exprt(new_data, index_symexpr), new_data.type().subtype());
-    code_assignt copy_cell(new_cell, old_cell);
-    copy_loop.body()=copy_cell;
+
+    const code_fort copy_loop(
+      code_assignt(index_symexpr, from_integer(0, index_symexpr.type())),
+      binary_relation_exprt(index_symexpr, ID_lt, old_length),
+      std::move(inc),
+      code_assignt(std::move(new_cell), std::move(old_cell)));
 
     member_exprt new_base_class(
       new_array, base_class_component.get_name(), base_class_component.type());

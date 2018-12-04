@@ -2801,16 +2801,16 @@ std::string expr2ct::convert_code_for(
   std::string dest=indent_str(indent);
   dest+="for(";
 
-  if(!src.op0().is_nil())
-    dest+=convert(src.op0());
+  if(!src.init().is_nil())
+    dest += convert(src.init());
   else
     dest+=' ';
   dest+="; ";
-  if(!src.op1().is_nil())
-    dest+=convert(src.op1());
+  if(!src.cond().is_nil())
+    dest += convert(src.cond());
   dest+="; ";
-  if(!src.op2().is_nil())
-    dest+=convert(src.op2());
+  if(!src.iter().is_nil())
+    dest += convert(src.iter());
 
   if(src.body().is_nil())
     dest+=");\n";
