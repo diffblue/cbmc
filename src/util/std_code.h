@@ -371,6 +371,19 @@ public:
   {
     return symbol().get_identifier();
   }
+
+  static void check(
+    const codet &code,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    DATA_CHECK(
+      vm, code.operands().size() == 1, "declaration must have one operand");
+    DATA_CHECK(
+      vm,
+      code.op0().id() == ID_symbol,
+      "declaring a non-symbol: " +
+        id2string(to_symbol_expr(code.op0()).get_identifier()));
+  }
 };
 
 template<> inline bool can_cast_expr<code_declt>(const exprt &base)
@@ -429,6 +442,21 @@ public:
   const irep_idt &get_identifier() const
   {
     return symbol().get_identifier();
+  }
+
+  static void check(
+    const codet &code,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    DATA_CHECK(
+      vm,
+      code.operands().size() == 1,
+      "removal (code_deadt) must have one operand");
+    DATA_CHECK(
+      vm,
+      code.op0().id() == ID_symbol,
+      "removing a non-symbol: " +
+        id2string(to_symbol_expr(code.op0()).get_identifier()) + "from scope");
   }
 };
 
@@ -510,6 +538,11 @@ inline code_assumet &to_code_assume(codet &code)
   return static_cast<code_assumet &>(code);
 }
 
+inline void validate_expr(const code_assumet &x)
+{
+  validate_operands(x, 1, "assume must have one operand");
+}
+
 /// A non-fatal assertion, which checks a condition then permits execution to
 /// continue.
 class code_assertt:public codet
@@ -555,6 +588,11 @@ inline code_assertt &to_code_assert(codet &code)
 {
   PRECONDITION(code.get_statement() == ID_assert);
   return static_cast<code_assertt &>(code);
+}
+
+inline void validate_expr(const code_assertt &x)
+{
+  validate_operands(x, 1, "assert must have one operand");
 }
 
 /// Create a fatal assertion, which checks a condition and then halts if it does
@@ -1046,6 +1084,51 @@ public:
   {
     return op2().operands();
   }
+
+  static void check(
+    const codet &code,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    DATA_CHECK(
+      vm,
+      code.operands().size() == 3,
+      "function calls must have three operands:\n1) expression to store the "
+      "returned values\n2) the function being called\n3) the vector of "
+      "arguments");
+  }
+
+  static void validate(
+    const codet &code,
+    const namespacet &ns,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    check(code, vm);
+
+    if(code.op0().id() == ID_nil)
+      DATA_CHECK(
+        vm,
+        to_code_type(code.op1().type()).return_type().id() == ID_empty,
+        "void function should not return value");
+    else
+      DATA_CHECK(
+        vm,
+        base_type_eq(
+          code.op0().type(), to_code_type(code.op1().type()).return_type(), ns),
+        "function returns expression of wrong type");
+  }
+
+  static void validate_full(
+    const codet &code,
+    const namespacet &ns,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    for(const exprt &op : code.operands())
+    {
+      validate_full_expr(op, ns, vm);
+    }
+
+    validate(code, ns, vm);
+  }
 };
 
 template<> inline bool can_cast_expr<code_function_callt>(const exprt &base)
@@ -1066,6 +1149,11 @@ inline code_function_callt &to_code_function_call(codet &code)
 {
   PRECONDITION(code.get_statement() == ID_function_call);
   return static_cast<code_function_callt &>(code);
+}
+
+inline void validate_expr(const code_function_callt &x)
+{
+  validate_operands(x, 3, "function calls must have three operands");
 }
 
 /// \ref codet representation of a "return from a function" statement.
@@ -1099,6 +1187,13 @@ public:
       return false; // backwards compatibility
     return return_value().is_not_nil();
   }
+
+  static void check(
+    const codet &code,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    DATA_CHECK(vm, code.operands().size() == 1, "return must have one operand");
+  }
 };
 
 template<> inline bool can_cast_expr<code_returnt>(const exprt &base)
@@ -1119,6 +1214,11 @@ inline code_returnt &to_code_return(codet &code)
 {
   PRECONDITION(code.get_statement() == ID_return);
   return static_cast<code_returnt &>(code);
+}
+
+inline void validate_expr(const code_returnt &x)
+{
+  validate_operands(x, 1, "return must have one operand");
 }
 
 /// \ref codet representation of a label for branch targets.
