@@ -2,14 +2,9 @@ include ../config.inc
 include ../common
 
 SRC = bigint-func.cc bigint.cc
-PRG = test-bigint$(EXEEXT)
-CLEANFILES = $(PRG) big-int$(LIBEXT) bigint-test$(OBJEXT) bigint-test.d
+CLEANFILES = big-int$(LIBEXT)
 
-all : $(PRG) big-int$(LIBEXT)
+all: big-int$(LIBEXT)
 
 big-int$(LIBEXT): $(OBJ)
 	$(LINKLIB)
-
-$(PRG): $(OBJ) bigint-test$(OBJEXT)
-	$(LINKBIN)
-
