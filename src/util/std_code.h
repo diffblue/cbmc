@@ -538,6 +538,11 @@ inline code_assumet &to_code_assume(codet &code)
   return static_cast<code_assumet &>(code);
 }
 
+inline void validate_expr(const code_assumet &x)
+{
+  validate_operands(x, 1, "assume must have one operand");
+}
+
 /// A non-fatal assertion, which checks a condition then permits execution to
 /// continue.
 class code_assertt:public codet
@@ -583,6 +588,11 @@ inline code_assertt &to_code_assert(codet &code)
 {
   PRECONDITION(code.get_statement() == ID_assert);
   return static_cast<code_assertt &>(code);
+}
+
+inline void validate_expr(const code_assertt &x)
+{
+  validate_operands(x, 1, "assert must have one operand");
 }
 
 /// Create a fatal assertion, which checks a condition and then halts if it does

@@ -685,8 +685,18 @@ void goto_programt::instructiont::validate(
   case GOTO:
     break;
   case ASSUME:
+    DATA_CHECK_WITH_DIAGNOSTICS(
+      vm,
+      targets.empty(),
+      "assume instruction should not have a target",
+      source_location);
     break;
   case ASSERT:
+    DATA_CHECK_WITH_DIAGNOSTICS(
+      vm,
+      targets.empty(),
+      "assert instruction should not have a target",
+      source_location);
     break;
   case OTHER:
     break;
