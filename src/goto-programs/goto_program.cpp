@@ -676,6 +676,8 @@ void goto_programt::instructiont::validate(
   validate_full_code(code, ns, vm);
   validate_full_expr(guard, ns, vm);
 
+  const symbolt *table_symbol;
+
   switch(type)
   {
   case NO_INSTRUCTION_TYPE:
@@ -713,8 +715,30 @@ void goto_programt::instructiont::validate(
       vm, targets.empty(), "assign instruction should not have a target");
     break;
   case DECL:
+    DATA_CHECK_WITH_DIAGNOSTICS(
+      vm,
+      code.get_statement() == ID_decl,
+      "declaration instructions should contain a declaration statement",
+      source_location);
+    DATA_CHECK_WITH_DIAGNOSTICS(
+      vm,
+      !ns.lookup(to_code_decl(code).get_identifier(), table_symbol),
+      "declared symbols should be known",
+      id2string(to_code_decl(code).get_identifier()),
+      source_location);
     break;
   case DEAD:
+    DATA_CHECK_WITH_DIAGNOSTICS(
+      vm,
+      code.get_statement() == ID_dead,
+      "dead instructions should contain a dead statement",
+      source_location);
+    DATA_CHECK_WITH_DIAGNOSTICS(
+      vm,
+      !ns.lookup(to_code_dead(code).get_identifier(), table_symbol),
+      "removed symbols should be known",
+      id2string(to_code_dead(code).get_identifier()),
+      source_location);
     break;
   case FUNCTION_CALL:
     break;

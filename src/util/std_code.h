@@ -371,6 +371,19 @@ public:
   {
     return symbol().get_identifier();
   }
+
+  static void check(
+    const codet &code,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    DATA_CHECK(
+      vm, code.operands().size() == 1, "declaration must have one operand");
+    DATA_CHECK(
+      vm,
+      code.op0().id() == ID_symbol,
+      "declaring a non-symbol: " +
+        id2string(to_symbol_expr(code.op0()).get_identifier()));
+  }
 };
 
 template<> inline bool can_cast_expr<code_declt>(const exprt &base)
@@ -429,6 +442,21 @@ public:
   const irep_idt &get_identifier() const
   {
     return symbol().get_identifier();
+  }
+
+  static void check(
+    const codet &code,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    DATA_CHECK(
+      vm,
+      code.operands().size() == 1,
+      "removal (code_deadt) must have one operand");
+    DATA_CHECK(
+      vm,
+      code.op0().id() == ID_symbol,
+      "removing a non-symbol: " +
+        id2string(to_symbol_expr(code.op0()).get_identifier()) + "from scope");
   }
 };
 
