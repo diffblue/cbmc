@@ -113,7 +113,7 @@ guardt &operator |= (guardt &g1, const guardt &g2)
     exprt tmp(boolean_negate(g2));
 
     if(tmp==g1)
-      g1.make_true();
+      g1 = true_exprt();
     else
       g1=or_exprt(g1, g2);
 

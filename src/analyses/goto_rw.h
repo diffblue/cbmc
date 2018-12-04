@@ -343,7 +343,7 @@ public:
     get_modet mode,
     const exprt &expr)
   {
-    guard.make_true();
+    guard = true_exprt();
 
     rw_range_set_value_sett::get_objects_rec(_target, mode, expr);
   }
