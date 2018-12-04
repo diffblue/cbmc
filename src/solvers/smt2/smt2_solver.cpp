@@ -103,17 +103,18 @@ void smt2_solvert::expand_function_applications(exprt &expr)
       const auto f_type=
         to_mathematical_function_type(f.type);
 
-      DATA_INVARIANT(f_type.domain().size()==
-                     app.arguments().size(),
-                     "number of function parameters");
+      const auto &domain = f_type.domain();
+
+      DATA_INVARIANT(
+        domain.size() == app.arguments().size(),
+        "number of function parameters");
 
       replace_symbolt replace_symbol;
 
       std::map<irep_idt, exprt> parameter_map;
-      for(std::size_t i=0; i<f_type.domain().size(); i++)
+      for(std::size_t i = 0; i < domain.size(); i++)
       {
-        const auto &var = f_type.domain()[i];
-        const symbol_exprt s(var.get_identifier(), var.type());
+        const symbol_exprt s(f.parameters[i], domain[i]);
         replace_symbol.insert(s, app.arguments()[i]);
       }
 
