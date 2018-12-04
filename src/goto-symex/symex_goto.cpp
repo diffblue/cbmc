@@ -366,6 +366,8 @@ void goto_symext::merge_value_sets(
 ///   added to the target be simplified
 /// \param[out] target: equation that will receive the resulting assignment
 /// \param ssa: SSA expression to merge
+/// \param goto_count: current level 2 count in \p goto_state of \p l1_identifier
+/// \param dest_count: level 2 count in \p dest_state of \p l1_identifier
 static void merge_names(
   const goto_symext::statet::goto_statet &goto_state,
   goto_symext::statet &dest_state,
@@ -375,7 +377,9 @@ static void merge_names(
   messaget &log,
   const bool do_simplify,
   symex_target_equationt &target,
-  const ssa_exprt &ssa)
+  const ssa_exprt &ssa,
+  const unsigned goto_count,
+  const unsigned dest_count)
 {
   const irep_idt l1_identifier = ssa.get_identifier();
   const irep_idt &obj_identifier = ssa.get_object_name();
@@ -383,9 +387,7 @@ static void merge_names(
   if(obj_identifier == guard_identifier)
     return; // just a guard, don't bother
 
-  if(
-    goto_state.level2_current_count(l1_identifier) ==
-    dest_state.level2.current_count(l1_identifier))
+  if(goto_count == dest_count)
     return; // not at all changed
 
   // changed!
@@ -417,8 +419,7 @@ static void merge_names(
     if(p_it != goto_state.propagation.end())
       goto_state_rhs = p_it->second;
     else
-      to_ssa_expr(goto_state_rhs)
-        .set_level_2(goto_state.level2_current_count(l1_identifier));
+      to_ssa_expr(goto_state_rhs).set_level_2(goto_count);
   }
 
   {
@@ -427,8 +428,7 @@ static void merge_names(
     if(p_it != dest_state.propagation.end())
       dest_state_rhs = p_it->second;
     else
-      to_ssa_expr(dest_state_rhs)
-        .set_level_2(dest_state.level2.current_count(l1_identifier));
+      to_ssa_expr(dest_state_rhs).set_level_2(dest_count);
   }
 
   exprt rhs;
@@ -441,11 +441,11 @@ static void merge_names(
     rhs = goto_state_rhs;
   else if(goto_state.guard.is_false())
     rhs = dest_state_rhs;
-  else if(goto_state.level2_current_count(l1_identifier) == 0)
+  else if(goto_count == 0)
   {
     rhs = dest_state_rhs;
   }
-  else if(dest_state.level2.current_count(l1_identifier) == 0)
+  else if(dest_count == 0)
   {
     rhs = goto_state_rhs;
   }
@@ -511,6 +511,8 @@ void goto_symext::phi_function(
 
   for(const auto &ssa : all_current_names_range)
   {
+    const unsigned goto_count = goto_state.level2_current_count(l1_identifier);
+    const unsigned dest_count = dest_state.level2.current_count(l1_identifier);
     merge_names(
       goto_state,
       dest_state,
@@ -520,7 +522,9 @@ void goto_symext::phi_function(
       log,
       symex_config.simplify_opt,
       target,
-      ssa);
+      ssa,
+      goto_count,
+      dest_count);
   }
 }
 
