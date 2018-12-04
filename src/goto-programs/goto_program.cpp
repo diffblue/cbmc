@@ -683,6 +683,17 @@ void goto_programt::instructiont::validate(
   case NO_INSTRUCTION_TYPE:
     break;
   case GOTO:
+    DATA_CHECK_WITH_DIAGNOSTICS(
+      vm,
+      has_target(),
+      "goto instruction expects at least one target",
+      source_location);
+    // get_target checks that targets.size()==1
+    DATA_CHECK_WITH_DIAGNOSTICS(
+      vm,
+      get_target()->is_target() && get_target()->target_number != 0,
+      "goto target has to be a target",
+      source_location);
     break;
   case ASSUME:
     DATA_CHECK_WITH_DIAGNOSTICS(
