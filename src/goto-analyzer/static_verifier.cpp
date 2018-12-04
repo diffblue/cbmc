@@ -107,7 +107,6 @@ static void static_verifier_xml(
 static void static_verifier_text(
   const std::vector<static_verifier_resultt> &results,
   const namespacet &ns,
-  messaget &m,
   std::ostream &out)
 {
   irep_idt last_function_id;
@@ -287,7 +286,7 @@ bool static_verifier(
   }
   else if(options.get_bool_option("text"))
   {
-    static_verifier_text(results, ns, m, out);
+    static_verifier_text(results, ns, out);
   }
   else
   {
