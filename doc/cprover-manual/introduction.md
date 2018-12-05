@@ -4,11 +4,11 @@
 
 Numerous tools to hunt down functional design flaws in silicon have been
 available for many years, mainly due to the enormous cost of hardware
-bugs. The use of such tools is wide-spread. In contrast, the market for
+bugs. The use of such tools is widespread. In contrast, the market for
 tools that address the need for quality software is still in its
 infancy.
 
-Research in software quality has an enormous breadth. We focus the
+Research in software quality has enormous breadth. We focus the
 presentation using two criteria:
 
 1.  We believe that any form of quality requires a specific *guarantee*,
@@ -40,4 +40,4 @@ formally verify such bounds by means of *unwinding assertions*. Once
 this bound is established, CBMC is able to prove the absence of errors.
 
 A more detailed description of how to apply CBMC to verify programs is
-in the [CBMC Tutorial](../cbmc/tutorial/).
+in our [CBMC Tutorial](../cbmc/tutorial/).
