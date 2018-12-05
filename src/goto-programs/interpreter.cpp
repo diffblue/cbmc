@@ -1031,7 +1031,7 @@ mp_integer interpretert::get_size(const typet &type)
     }
     return subtype_size;
   }
-  else if(type.id() == ID_symbol_type)
+  else if(type.id() == ID_symbol_type || type.id() == ID_struct_tag)
   {
     return get_size(ns.follow(type));
   }
