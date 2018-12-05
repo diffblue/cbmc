@@ -37,7 +37,7 @@ described above.
 1.  Download CBMC for your operating system. The binaries are available
     from http://www.cprover.org/cbmc/.
 2.  Unzip/untar the archive into a directory of your choice. We
-    recommend to add this directory to your `PATH` environment variable.
+    recommend you add this directory to your `PATH` environment variable.
 
 You are now ready to use CBMC. We recommend you follow the
 [tutorial](../cbmc/tutorial/).
@@ -53,10 +53,8 @@ Documentation](http://cprover.diffblue.com/compilation-and-development.html).
 
 We provide a graphical user interface to CBMC which is
 realized as a plugin to the Eclipse framework. Eclipse is available at
-http://www.eclipse.org. We do not provide installation instructions for
-Eclipse (basically, you only have to download the current version and
-extract the files to your hard-disk) and assume that you have already
-installed the current version.
+http://www.eclipse.org. Installation is very simple. Just download the
+latest version and extract the files.
 
 Important note for Windows users: Visual Studio's `cl.exe` relies on a
 complex set of environment variables to identify the target architecture
@@ -67,6 +65,6 @@ from within the *Visual Studio Command Prompt*.
 
 The installation instructions for the Eclipse Plugin, including the link
 to the download site, are available
-[here](http://www.cprover.org/eclipse-plugin/). This includes a small
-tutorial on how to use the Eclipse plugin.
+[here](http://www.cprover.org/eclipse-plugin/). This includes a short
+tutorial on the Eclipse plugin.
 
