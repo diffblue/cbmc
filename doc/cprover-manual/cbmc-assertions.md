@@ -4,16 +4,16 @@
 
 [Assertions](http://en.wikipedia.org/wiki/Assertion_%28computing%29) are
 statements within the program that attempt to capture the programmer's
-intent. The ANSI-C standard defines a header file
+intent. The ANSI C standard defines a header file
 [assert.h](http://en.wikipedia.org/wiki/Assert.h), which offers a macro
-`assert(cond)`. When executing a statement such as
+`assert(cond)`. When executing a statement such as:
 
 ```C
 assert(p!=NULL);
 ```
 
 the execution is aborted with an error message if the condition
-evaluates to *false*, i.e., if `p` is NULL in the example above. The
+evaluates to *false*, that is, if `p` is NULL in the example above. The
 CPROVER tools can check the validity of the programmer-annotated
 assertions statically. Specifically, the CPROVER tools will check that
 the assertions hold for *any* nondeterministic choice that the program
@@ -49,7 +49,7 @@ if(i>=0 && i<100)
 ```
 
 The nondeterministic choice will guess the element of the array that is
-nonzero. The code fragment above is therefore equivalent to
+nonzero. The code fragment above is therefore equivalent to:
 
 ```C
 int a[100], i;
