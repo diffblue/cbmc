@@ -2,13 +2,13 @@
 
 ### Example: Buffer Overflows
 
-In order to give a brief overview of the capabilities of CBMC
-we start with a small example. The issue of *[buffer
+To give a brief overview of the capabilities of CBMC
+we start with a simple example. The issue of *[buffer
 overflows](http://en.wikipedia.org/wiki/Buffer_overflow)* has obtained
-wide public attention. A buffer is a contiguously-allocated chunk of
+wide public attention. A buffer is a contiguously allocated chunk of
 memory, represented by an array or a pointer in C. Programs written in C
 do not provide automatic bounds checking on the buffer, which means a
-program can – accidentally or maliciously – write past a buffer. The
+program can – accidentally or deliberately – write beyond a buffer. The
 following example is a perfectly valid C program (in the sense that a
 compiler compiles it without any errors):
 
@@ -25,7 +25,7 @@ region can lead to unexpected behavior. In particular, such bugs can be
 exploited to overwrite the return address of a function, thus enabling
 the execution of arbitrary user-induced code. CBMC is able
 to detect this problem and reports that the "upper bound property" of
-the buffer is violated. CBMC is capable of checking these
+the buffer has been violated. CBMC is capable of checking these
 lower and upper bounds, even for arrays with dynamic size. A detailed
 discussion of the properties that CBMC can check
 automatically is \ref man_instrumentation-properties "here".
@@ -58,7 +58,7 @@ int main(int argc, char **argv)
 
 Of course, this program is faulty, as the `argv` array might have fewer
 than three elements, and then the array access `argv[2]` is out of
-bounds. Now, run CBMC as follows:
+bounds. Now, run CBMC:
 
 ```
 cbmc file1.c --show-properties --bounds-check --pointer-check
@@ -106,8 +106,7 @@ to a SAT solver (more background on this step is in the book on
 [Decision Procedures](http://www.decision-procedures.org/)). It then
 determines which of the properties that it has generated for the program
 hold and which do not. Using the SAT solver, CBMC detects that the
-property for the object bounds of `argv` does not hold, and will thus
-print a line as follows:
+property for the object bounds of `argv` does not hold, and will display:
 
 ```plaintext
 [main.pointer_dereference.6] dereference failure: pointer outside object bounds in argv[(signed long int)2]: FAILURE
@@ -117,11 +116,11 @@ print a line as follows:
 
 Let us have a closer look at this property and why it fails. To aid the
 understanding of the problem, CBMC can generate a *counterexample trace*
-for failed properties. To obtain this trace, run
+for failed properties. To obtain this trace, run:
 
     cbmc file1.c --bounds-check --trace
 
-CBMC then prints a counterexample trace, i.e., a program trace that
+CBMC then prints a counterexample trace, that is, a program trace that
 begins with `main` and ends in a state which violates the property. In
 our example, the program trace ends in the faulty array access. It also
 gives the values the input variables must have for the bug to occur. In
@@ -149,7 +148,7 @@ int sum() {
 }
 ```
 
-In order to set the entry point to the `sum` function, run
+To set the entry point to the `sum` function, run:
 
 ```plaintext
 cbmc file2.c --function sum --bounds-check
@@ -274,7 +273,7 @@ the argument is too small, CBMC will detect that not enough unwinding is
 done reports that an unwinding assertion has failed.
 
 Reconsider the example. For a loop unwinding bound of one, no bug is
-found. But already for a bound of two, CBMC detects a trace that
+found. But for a bound of two, CBMC detects a trace that
 violates an assertion. Without unwinding assertions, or when using the
 `--depth` command line switch, CBMC does not prove the program correct,
 but it can be helpful to find program bugs. The various command line
@@ -292,7 +291,7 @@ requirements:
     contain *declarations* of the functions that are to be used.
 2.  Appropriate *definitions* have to be provided.
 
-Most C compilers come with header files for the ANSI-C library
+Most C compilers come with header files for the ANSI C library
 functions. We briefly discuss how to obtain/install these library files.
 
 #### Linux
