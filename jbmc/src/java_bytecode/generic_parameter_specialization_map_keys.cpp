@@ -147,7 +147,8 @@ void generic_parameter_specialization_map_keyst::insert_pairs_for_symbol(
   // - an incomplete class or
   // - a class that is neither generic nor implicitly generic (this
   //  may be due to unsupported class signature)
-  // then ignore the generic types in the struct_tag_type and do not add any pairs.
+  // then ignore the generic types in the struct_tag_type and do not add any
+  // pairs.
   // TODO TG-1996 should decide how mocking and generics should work
   // together. Currently an incomplete class is never marked as generic. If
   // this changes in TG-1996 then the condition below should be updated.

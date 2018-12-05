@@ -917,10 +917,10 @@ void get_dependencies_from_generic_parameters(
 /// This assumes that the class named \p class_name_prefix extends or implements
 /// the class \p type, and that \p base_ref corresponds to a generic class.
 /// For instance since HashMap<K,V> extends Map<K,V> we would call
-/// `java_generic_struct_tag_typet(struct_tag_typet("Map"), "Ljava/util/Map<TK;TV;>;",
-/// "java.util.HashMap")` which generates a symbol type with identifier "Map",
-/// and two generic types with identifier "java.util.HashMap::K" and
-/// "java.util.HashMap::V" respectively.
+/// `java_generic_struct_tag_typet(struct_tag_typet("Map"),
+/// "Ljava/util/Map<TK;TV;>;", "java.util.HashMap")` which generates a symbol
+/// type with identifier "Map", and two generic types with identifier
+/// "java.util.HashMap::K" and "java.util.HashMap::V" respectively.
 java_generic_struct_tag_typet::java_generic_struct_tag_typet(
   const struct_tag_typet &type,
   const std::string &base_ref,
