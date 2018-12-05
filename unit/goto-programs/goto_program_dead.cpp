@@ -19,6 +19,10 @@ SCENARIO(
     symbol_tablet symbol_table;
     const signedbv_typet type1(32);
 
+    symbolt fun_symbol;
+    irep_idt fun_name = "foo";
+    fun_symbol.name = fun_name;
+
     symbolt var_symbol;
     irep_idt var_symbol_name = "a";
     var_symbol.type = type1;
@@ -31,6 +35,8 @@ SCENARIO(
     code_deadt removal(var_a);
     instructions.back().make_dead();
     instructions.back().code = removal;
+    instructions.back().function = fun_name;
+    symbol_table.insert(fun_symbol);
 
     WHEN("Removing known symbol")
     {
