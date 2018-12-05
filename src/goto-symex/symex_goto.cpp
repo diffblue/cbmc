@@ -21,6 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 
 #include <analyses/dirty.h>
+#include <util/simplify_expr.h>
 
 void goto_symext::symex_goto(statet &state)
 {
@@ -459,7 +460,8 @@ void goto_symext::phi_function(
     else
     {
       rhs=if_exprt(diff_guard.as_expr(), goto_state_rhs, dest_state_rhs);
-      do_simplify(rhs);
+      if(symex_config.simplify_opt)
+        simplify(rhs, ns);
     }
 
     ssa_exprt new_lhs = ssa;
