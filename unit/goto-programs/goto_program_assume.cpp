@@ -19,6 +19,9 @@ SCENARIO(
     symbol_tablet symbol_table;
     const typet type1 = signedbv_typet(32);
     symbolt symbol;
+    symbolt fun_symbol;
+    irep_idt fun_name = "foo";
+    fun_symbol.name = fun_name;
     irep_idt symbol_name = "a";
     symbol.name = symbol_name;
     symbol_exprt varx(symbol_name, type1);
@@ -31,8 +34,10 @@ SCENARIO(
 
     symbol.type = type1;
     symbol_table.insert(symbol);
+    symbol_table.insert(fun_symbol);
     namespacet ns(symbol_table);
     instructions.back().make_assertion(x_le_10);
+    instructions.back().function = fun_name;
 
     WHEN("Instruction has no targets")
     {

@@ -14,6 +14,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ostream>
 #include <iomanip>
 
+#include <util/expr_iterator.h>
+#include <util/find_symbols.h>
 #include <util/std_expr.h>
 #include <util/validate.h>
 
@@ -677,6 +679,45 @@ void goto_programt::instructiont::validate(
   validate_full_expr(guard, ns, vm);
 
   const symbolt *table_symbol;
+  DATA_CHECK_WITH_DIAGNOSTICS(
+    vm,
+    !ns.lookup(function, table_symbol),
+    id2string(function) + " not found",
+    source_location);
+
+  auto expr_symbol_finder = [&](const exprt &e) {
+    find_symbols_sett typetags;
+    find_type_symbols(e.type(), typetags);
+    find_symbols(e, typetags);
+    const symbolt *symbol;
+    for(const auto &identifier : typetags)
+    {
+      DATA_CHECK_WITH_DIAGNOSTICS(
+        vm,
+        !ns.lookup(identifier, symbol),
+        id2string(identifier) + " not found",
+        source_location);
+    }
+  };
+
+  auto &current_source_location = source_location;
+  auto type_finder =
+    [&ns, vm, &table_symbol, &current_source_location](const exprt &e) {
+      if(e.id() == ID_symbol)
+      {
+        const auto &goto_symbol_expr = to_symbol_expr(e);
+        const auto &goto_id = goto_symbol_expr.get_identifier();
+
+        if(!ns.lookup(goto_id, table_symbol))
+          DATA_CHECK_WITH_DIAGNOSTICS(
+            vm,
+            base_type_eq(goto_symbol_expr.type(), table_symbol->type, ns),
+            id2string(goto_id) + " type inconsistency\n" +
+              "goto program type: " + goto_symbol_expr.type().id_string() +
+              "\n" + "symbol table type: " + table_symbol->type.id_string(),
+            current_source_location);
+      }
+    };
 
   switch(type)
   {
@@ -708,6 +749,9 @@ void goto_programt::instructiont::validate(
       targets.empty(),
       "assert instruction should not have a target",
       source_location);
+
+    std::for_each(guard.depth_begin(), guard.depth_end(), expr_symbol_finder);
+    std::for_each(guard.depth_begin(), guard.depth_end(), type_finder);
     break;
   case OTHER:
     break;
@@ -772,6 +816,9 @@ void goto_programt::instructiont::validate(
       code.get_statement() == ID_function_call,
       "function call instruction should contain a call statement",
       source_location);
+
+    std::for_each(code.depth_begin(), code.depth_end(), expr_symbol_finder);
+    std::for_each(code.depth_begin(), code.depth_end(), type_finder);
     break;
   case THROW:
     break;

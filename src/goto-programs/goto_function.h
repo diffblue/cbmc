@@ -16,6 +16,7 @@ Date: May 2018
 
 #include <iosfwd>
 
+#include <util/find_symbols.h>
 #include <util/std_types.h>
 
 #include "goto_program.h"
@@ -118,6 +119,18 @@ public:
   void validate(const namespacet &ns, const validation_modet vm) const
   {
     body.validate(ns, vm);
+
+    find_symbols_sett typetags;
+    find_type_symbols(type, typetags);
+    const symbolt *symbol;
+    for(const auto &identifier : typetags)
+    {
+      DATA_CHECK(
+        vm,
+        !ns.lookup(identifier, symbol),
+        id2string(identifier) + " not found");
+    }
+
     validate_full_type(type, ns, vm);
   }
 };

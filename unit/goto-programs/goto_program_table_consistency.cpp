@@ -1,7 +1,6 @@
 /*******************************************************************\
 
   Module: Unit tests for goto_program::validate
-
   Author: Diffblue Ltd.
 
  \*******************************************************************/
@@ -11,57 +10,51 @@
 #include <util/arith_tools.h>
 
 SCENARIO(
-  "Validation of well-formed goto codes",
+  "Validation of consistent program/table pair",
   "[core][goto-programs][validate]")
 {
   GIVEN("A program with one assertion")
   {
     symbol_tablet symbol_table;
-    const typet type1 = signedbv_typet(32);
-    symbolt fun_symbol;
-    irep_idt fun_name = "foo";
-    fun_symbol.name = fun_name;
-
+    const typet type = signedbv_typet(32);
     symbolt symbol;
     irep_idt symbol_name = "a";
     symbol.name = symbol_name;
-    symbol_exprt varx(symbol_name, type1);
-    exprt val10 = from_integer(10, type1);
+    symbol_exprt varx(symbol_name, type);
+    symbolt function_symbol;
+    irep_idt function_name = "fun";
+    function_symbol.name = function_name;
+
+    exprt val10 = from_integer(10, type);
     binary_relation_exprt x_le_10(varx, ID_le, val10);
 
     goto_functiont goto_function;
     auto &instructions = goto_function.body.instructions;
     instructions.emplace_back(goto_program_instruction_typet::ASSERT);
     instructions.back().make_assertion(x_le_10);
-    instructions.back().function = fun_name;
+    instructions.back().function = function_symbol.name;
 
-    instructions.emplace_back(goto_program_instruction_typet::GOTO);
-    instructions.back().make_goto(instructions.begin());
-    instructions.back().function = fun_name;
-
-    symbol.type = type1;
-    symbol_table.insert(symbol);
-    symbol_table.insert(fun_symbol);
-    namespacet ns(symbol_table);
-
-    WHEN("Target is a target")
+    symbol_table.insert(function_symbol);
+    WHEN("Symbol table has the right symbol")
     {
-      instructions.front().target_number = 1;
+      symbol.type = type;
+      symbol_table.insert(symbol);
+      const namespacet ns(symbol_table);
       THEN("The consistency check succeeds")
       {
-        goto_function.body.validate(ns, validation_modet::INVARIANT);
+        goto_function.validate(ns, validation_modet::INVARIANT);
         REQUIRE(true);
       }
     }
-
-    WHEN("Target is not a target")
+    WHEN("Symbol table does not have the symbol")
     {
+      const namespacet ns(symbol_table);
       THEN("The consistency check fails")
       {
         bool caught = false;
         try
         {
-          goto_function.body.validate(ns, validation_modet::EXCEPTION);
+          goto_function.validate(ns, validation_modet::EXCEPTION);
         }
         catch(incorrect_goto_program_exceptiont &e)
         {

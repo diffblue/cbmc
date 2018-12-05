@@ -127,6 +127,15 @@ public:
     for(const auto &entry : function_map)
     {
       const goto_functiont &goto_function = entry.second;
+      const auto &function_name = entry.first;
+
+      DATA_CHECK(
+        vm,
+        goto_function.type == ns.lookup(function_name).type,
+        id2string(function_name) + " type inconsistency\ngoto program type: " +
+          goto_function.type.id_string() +
+          "\nsymbol table type: " + ns.lookup(function_name).type.id_string());
+
       goto_function.validate(ns, vm);
     }
   }
