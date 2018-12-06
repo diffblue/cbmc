@@ -19,7 +19,7 @@ within the object.
 In C, objects are simply continuous fragments of memory (this definition
 of "object" is not to be confused with the use of the term in
 object-oriented programming). Variables of any type are guaranteed to be
-stored as one object, irrespectively of their type. As an example, all
+stored as one object, irrespective of their type. As an example, all
 members of a struct or array belong to the same object. CPROVER simply
 assigns a number to each active object. The object number of a pointer
 `p` can be extracted using the expression `__CPROVER_POINTER_OBJECT(p)`.
@@ -28,7 +28,7 @@ which is not sound.
 
 The offset (the second member of the pair that forms a pointer) is
 relative to the beginning of the object; it uses byte granularity. As an
-example, the code fragment
+example, the code fragment:
 
 ```C
 unsigned array[10];
@@ -51,14 +51,14 @@ dynamically allocated objects have not yet been deallocated.
 
 Furthermore, the CPROVER tools check that dynamically allocated memory
 is not deallocated twice. The goto-instrument tool is also able to add
-checks for memory leaks, i.e., it detects dynamically allocated objects
+checks for memory leaks, that is, it detects dynamically allocated objects
 that are not deallocated once the program terminates.
 
 The CPROVER tools support pointer typecasts. Most casts are supported,
 with the following exceptions:
 
-1.  One notable exception is that pointers can only be accessed using a
-    pointer type. The conversion of a pointer into an integer-type using
+1.  Pointers can only be accessed using a
+    pointer type. The conversion of a pointer into an integer type using
     a pointer typecast is not supported.
 
 2.  Casts from integers to pointers yield a pointer that is either NULL
@@ -73,8 +73,8 @@ with the following exceptions:
 
 ### Pointers in Open Programs
 
-It is frequently desired to validate an open program, i.e., a fragment
-of a program. Some variables are left undefined. In case an undefined
+It is frequently desired to validate an open program (a fragment
+of a program). Some variables are left undefined. When an undefined
 pointer is dereferenced, CBMC assumes that the pointer points to a
 separate object of appropriate type with unbounded size. The object is
 assumed not to alias with any other object. This assumption may
