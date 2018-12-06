@@ -163,9 +163,7 @@ static exprt unpack_rec(
 
 /// rewrite byte extraction from an array to byte extraction from a
 /// concatenation of array index expressions
-exprt flatten_byte_extract(
-  const byte_extract_exprt &src,
-  const namespacet &ns)
+exprt lower_byte_extract(const byte_extract_exprt &src, const namespacet &ns)
 {
   // General notes about endianness and the bit-vector conversion:
   // A single byte with value 0b10001000 is stored (in irept) as
@@ -258,7 +256,7 @@ exprt flatten_byte_extract(
         tmp.type()=subtype;
         tmp.offset()=new_offset;
 
-        array.copy_to_operands(flatten_byte_extract(tmp, ns));
+        array.copy_to_operands(lower_byte_extract(tmp, ns));
       }
 
       return simplify_expr(array, ns);
@@ -357,7 +355,7 @@ exprt flatten_byte_extract(
   }
 }
 
-exprt flatten_byte_update(
+static exprt lower_byte_update(
   const byte_update_exprt &src,
   const namespacet &ns,
   bool negative_offset)
@@ -427,7 +425,7 @@ exprt flatten_byte_update(
             byte_extract_expr.op() = src.value();
             byte_extract_expr.offset()=i_expr;
 
-            new_value=flatten_byte_extract(byte_extract_expr, ns);
+            new_value=lower_byte_extract(byte_extract_expr, ns);
           }
 
           const plus_exprt where(src.offset(), i_expr);
@@ -499,7 +497,7 @@ exprt flatten_byte_update(
             byte_extract_expr.op() = src.value();
             byte_extract_expr.offset()=stored_value_offset;
 
-            new_value=flatten_byte_extract(byte_extract_expr, ns);
+            new_value=lower_byte_extract(byte_extract_expr, ns);
           }
 
           // Where does the value we just extracted align in this cell?
@@ -528,7 +526,7 @@ exprt flatten_byte_update(
           // Call recursively, the array is gone!
           // The last parameter indicates that the
           exprt flattened_byte_update_expr=
-            flatten_byte_update(byte_update_expr, ns, is_last_cell);
+            lower_byte_update(byte_update_expr, ns, is_last_cell);
 
           with_exprt with_expr(
             result, cell_index, flattened_byte_update_expr);
@@ -622,11 +620,11 @@ exprt flatten_byte_update(
   }
 }
 
-exprt flatten_byte_update(
+static exprt lower_byte_update(
   const byte_update_exprt &src,
   const namespacet &ns)
 {
-  return flatten_byte_update(src, ns, false);
+  return lower_byte_update(src, ns, false);
 }
 
 bool has_byte_operator(const exprt &src)
@@ -644,25 +642,23 @@ bool has_byte_operator(const exprt &src)
   return false;
 }
 
-exprt flatten_byte_operators(
-  const exprt &src,
-  const namespacet &ns)
+exprt lower_byte_operators(const exprt &src, const namespacet &ns)
 {
   exprt tmp=src;
 
   // destroys any sharing, should use hash table
   Forall_operands(it, tmp)
   {
-    exprt tmp=flatten_byte_operators(*it, ns);
+    exprt tmp=lower_byte_operators(*it, ns);
     it->swap(tmp);
   }
 
   if(src.id()==ID_byte_update_little_endian ||
      src.id()==ID_byte_update_big_endian)
-    return flatten_byte_update(to_byte_update_expr(tmp), ns);
+    return lower_byte_update(to_byte_update_expr(tmp), ns);
   else if(src.id()==ID_byte_extract_little_endian ||
           src.id()==ID_byte_extract_big_endian)
-    return flatten_byte_extract(to_byte_extract_expr(tmp), ns);
+    return lower_byte_extract(to_byte_extract_expr(tmp), ns);
   else
     return tmp;
 }

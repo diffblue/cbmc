@@ -596,7 +596,7 @@ void smt2_convt::convert_address_of_rec(
 void smt2_convt::convert_byte_extract(const byte_extract_exprt &expr)
 {
   // we just run the flattener
-  exprt flattened_expr=flatten_byte_extract(expr, ns);
+  exprt flattened_expr = lower_byte_extract(expr, ns);
   unflatten(wheret::BEGIN, expr.type());
   convert_expr(flattened_expr);
   unflatten(wheret::END, expr.type());
