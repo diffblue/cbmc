@@ -17,10 +17,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/expr_util.h>
 #include <util/invariant.h>
 #include <util/pointer_offset_size.h>
-#include <util/range.h>
 #include <util/std_expr.h>
 
 #include <analyses/dirty.h>
+#include <util/simplify_expr.h>
 
 void goto_symext::symex_goto(statet &state)
 {
@@ -353,138 +353,194 @@ void goto_symext::merge_value_sets(
   dest.value_set.make_union(src.value_set);
 }
 
+/// Applies f to `(k, ssa, i, j)` if the first map maps k to (ssa, i) and
+/// the second to (ssa', j). If the first map has an entry for k but not the
+/// second one then j is 0, and when the first map has no entry for k then i = 0
+static void for_each2(
+  const std::map<irep_idt, std::pair<ssa_exprt, unsigned>> &first_map,
+  const std::map<irep_idt, std::pair<ssa_exprt, unsigned>> &second_map,
+  const std::function<void(const ssa_exprt &, unsigned, unsigned)> &f)
+{
+  auto second_it = second_map.begin();
+  for(const auto &first_pair : first_map)
+  {
+    while(second_it != second_map.end() && second_it->first < first_pair.first)
+    {
+      f(second_it->second.first, 0, second_it->second.second);
+      ++second_it;
+    }
+    const ssa_exprt &ssa = first_pair.second.first;
+    const unsigned count = first_pair.second.second;
+    if(second_it != second_map.end() && second_it->first == first_pair.first)
+    {
+      f(ssa, count, second_it->second.second);
+      ++second_it;
+    }
+    else
+      f(ssa, count, 0);
+  }
+  while(second_it != second_map.end())
+  {
+    f(second_it->second.first, 0, second_it->second.second);
+    ++second_it;
+  }
+}
+
+/// Helper function for \c phi_function which merges the names of an identifier
+/// for two different states.
+/// \param goto_state: first state
+/// \param[in, out] dest_state: second state
+/// \param ns: namespace
+/// \param diff_guard: difference between the guards of the two states
+/// \param guard_identifier: prefix used for goto symex guards
+/// \param[out] log: logger for debug messages
+/// \param do_simplify: should the right-hand-side of the assignment that is
+///   added to the target be simplified
+/// \param[out] target: equation that will receive the resulting assignment
+/// \param ssa: SSA expression to merge
+/// \param goto_count: current level 2 count in \p goto_state of
+///   \p l1_identifier
+/// \param dest_count: level 2 count in \p dest_state of \p l1_identifier
+static void merge_names(
+  const goto_symext::statet::goto_statet &goto_state,
+  goto_symext::statet &dest_state,
+  const namespacet &ns,
+  const guardt &diff_guard,
+  const irep_idt &guard_identifier,
+  messaget &log,
+  const bool do_simplify,
+  symex_target_equationt &target,
+  const ssa_exprt &ssa,
+  const unsigned goto_count,
+  const unsigned dest_count)
+{
+  const irep_idt l1_identifier = ssa.get_identifier();
+  const irep_idt &obj_identifier = ssa.get_object_name();
+
+  if(obj_identifier == guard_identifier)
+    return; // just a guard, don't bother
+
+  if(goto_count == dest_count)
+    return; // not at all changed
+
+  // changed!
+
+  // shared variables are renamed on every access anyway, we don't need to
+  // merge anything
+  const symbolt &symbol = ns.lookup(obj_identifier);
+
+  // shared?
+  if(
+    dest_state.atomic_section_id == 0 && dest_state.threads.size() >= 2 &&
+    (symbol.is_shared() || (dest_state.dirty)(symbol.name)))
+    return; // no phi nodes for shared stuff
+
+  // don't merge (thread-)locals across different threads, which
+  // may have been introduced by symex_start_thread (and will
+  // only later be removed from level2.current_names by pop_frame
+  // once the thread is executed)
+  const irep_idt level_0 = ssa.get_level_0();
+  if(!level_0.empty() && level_0 != std::to_string(dest_state.source.thread_nr))
+    return;
+
+  exprt goto_state_rhs = ssa, dest_state_rhs = ssa;
+
+  {
+    const auto p_it = goto_state.propagation.find(l1_identifier);
+
+    if(p_it != goto_state.propagation.end())
+      goto_state_rhs = p_it->second;
+    else
+      to_ssa_expr(goto_state_rhs).set_level_2(goto_count);
+  }
+
+  {
+    const auto p_it = dest_state.propagation.find(l1_identifier);
+
+    if(p_it != dest_state.propagation.end())
+      dest_state_rhs = p_it->second;
+    else
+      to_ssa_expr(dest_state_rhs).set_level_2(dest_count);
+  }
+
+  exprt rhs;
+
+  // Don't add a conditional to the assignment when:
+  //  1. Either guard is false, so we can't follow that branch.
+  //  2. Either identifier is of generation zero, and so hasn't been
+  //     initialized and therefor an invalid target.
+  if(dest_state.guard.is_false())
+    rhs = goto_state_rhs;
+  else if(goto_state.guard.is_false())
+    rhs = dest_state_rhs;
+  else if(goto_count == 0)
+  {
+    rhs = dest_state_rhs;
+  }
+  else if(dest_count == 0)
+  {
+    rhs = goto_state_rhs;
+  }
+  else
+  {
+    rhs = if_exprt(diff_guard.as_expr(), goto_state_rhs, dest_state_rhs);
+    if(do_simplify)
+      simplify(rhs, ns);
+  }
+
+  ssa_exprt new_lhs = ssa;
+  const bool record_events = dest_state.record_events;
+  dest_state.record_events = false;
+  dest_state.assignment(new_lhs, rhs, ns, true, true);
+  dest_state.record_events = record_events;
+
+  log.conditional_output(
+    log.debug(), [ns, &new_lhs](messaget::mstreamt &mstream) {
+      mstream << "Assignment to " << new_lhs.get_identifier() << " ["
+              << pointer_offset_bits(new_lhs.type(), ns).value_or(0) << " bits]"
+              << messaget::eom;
+    });
+
+  target.assignment(
+    true_exprt(),
+    new_lhs,
+    new_lhs,
+    new_lhs.get_original_expr(),
+    rhs,
+    dest_state.source,
+    symex_targett::assignment_typet::PHI);
+}
+
 void goto_symext::phi_function(
   const statet::goto_statet &goto_state,
   statet &dest_state)
 {
-  auto ssa_of_current_name =
-    [&](const std::pair<irep_idt, std::pair<ssa_exprt, unsigned>> &pair) {
-      return pair.second.first;
-    };
+  if(
+    goto_state.level2_current_names.empty() &&
+    dest_state.level2.current_names.empty())
+    return;
 
-  auto dest_state_names_range =
-    make_range(dest_state.level2.current_names)
-      .filter(
-        [&](const std::pair<irep_idt, std::pair<ssa_exprt, unsigned>> &pair) {
-          // We ignore the identifiers that are already in goto_state names
-          return goto_state.level2_current_names.count(pair.first) == 0;
-        })
-      .map<const ssa_exprt>(ssa_of_current_name);
+  guardt diff_guard = goto_state.guard;
+  // this gets the diff between the guards
+  diff_guard -= dest_state.guard;
 
-  // go over all variables to see what changed
-  auto all_current_names_range = make_range(goto_state.level2_current_names)
-                                   .map<const ssa_exprt>(ssa_of_current_name)
-                                   .concat(dest_state_names_range);
-
-  guardt diff_guard;
-  if(!all_current_names_range.empty())
-  {
-    diff_guard=goto_state.guard;
-
-    // this gets the diff between the guards
-    diff_guard-=dest_state.guard;
-  }
-
-  for(const auto &ssa : all_current_names_range)
-  {
-    const irep_idt l1_identifier = ssa.get_identifier();
-    const irep_idt &obj_identifier = ssa.get_object_name();
-
-    if(obj_identifier==guard_identifier)
-      continue; // just a guard, don't bother
-
-    if(goto_state.level2_current_count(l1_identifier)==
-       dest_state.level2.current_count(l1_identifier))
-      continue; // not at all changed
-
-    // changed!
-
-    // shared variables are renamed on every access anyway, we don't need to
-    // merge anything
-    const symbolt &symbol=ns.lookup(obj_identifier);
-
-    // shared?
-    if(
-      dest_state.atomic_section_id == 0 && dest_state.threads.size() >= 2 &&
-      (symbol.is_shared() || (dest_state.dirty)(symbol.name)))
-      continue; // no phi nodes for shared stuff
-
-    // don't merge (thread-)locals across different threads, which
-    // may have been introduced by symex_start_thread (and will
-    // only later be removed from level2.current_names by pop_frame
-    // once the thread is executed)
-    if(
-      !ssa.get_level_0().empty() &&
-      ssa.get_level_0() != std::to_string(dest_state.source.thread_nr))
-      continue;
-
-    exprt goto_state_rhs = ssa, dest_state_rhs = ssa;
-
-    {
-      const auto p_it = goto_state.propagation.find(l1_identifier);
-
-      if(p_it != goto_state.propagation.end())
-        goto_state_rhs=p_it->second;
-      else
-        to_ssa_expr(goto_state_rhs).set_level_2(
-          goto_state.level2_current_count(l1_identifier));
-    }
-
-    {
-      const auto p_it = dest_state.propagation.find(l1_identifier);
-
-      if(p_it != dest_state.propagation.end())
-        dest_state_rhs=p_it->second;
-      else
-        to_ssa_expr(dest_state_rhs).set_level_2(
-          dest_state.level2.current_count(l1_identifier));
-    }
-
-    exprt rhs;
-
-    // Don't add a conditional to the assignment when:
-    //  1. Either guard is false, so we can't follow that branch.
-    //  2. Either identifier is of generation zero, and so hasn't been
-    //     initialized and therefor an invalid target.
-    if(dest_state.guard.is_false())
-      rhs=goto_state_rhs;
-    else if(goto_state.guard.is_false())
-      rhs=dest_state_rhs;
-    else if(goto_state.level2_current_count(l1_identifier) == 0)
-    {
-      rhs = dest_state_rhs;
-    }
-    else if(dest_state.level2.current_count(l1_identifier) == 0)
-    {
-      rhs = goto_state_rhs;
-    }
-    else
-    {
-      rhs=if_exprt(diff_guard.as_expr(), goto_state_rhs, dest_state_rhs);
-      do_simplify(rhs);
-    }
-
-    ssa_exprt new_lhs = ssa;
-    const bool record_events=dest_state.record_events;
-    dest_state.record_events=false;
-    dest_state.assignment(new_lhs, rhs, ns, true, true);
-    dest_state.record_events=record_events;
-
-    log.conditional_output(
-      log.debug(),
-      [this, &new_lhs](messaget::mstreamt &mstream) {
-        mstream << "Assignment to " << new_lhs.get_identifier()
-                << " [" << pointer_offset_bits(new_lhs.type(), ns).value_or(0) << " bits]"
-                << messaget::eom;
-      });
-
-    target.assignment(
-      true_exprt(),
-      new_lhs, new_lhs, new_lhs.get_original_expr(),
-      rhs,
-      dest_state.source,
-      symex_targett::assignment_typet::PHI);
-  }
+  for_each2(
+    goto_state.level2_current_names,
+    dest_state.level2.current_names,
+    [&](const ssa_exprt &ssa, unsigned goto_count, unsigned dest_count) {
+      merge_names(
+        goto_state,
+        dest_state,
+        ns,
+        diff_guard,
+        guard_identifier,
+        log,
+        symex_config.simplify_opt,
+        target,
+        ssa,
+        goto_count,
+        dest_count);
+    });
 }
 
 void goto_symext::loop_bound_exceeded(
