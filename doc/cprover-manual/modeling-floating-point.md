@@ -4,7 +4,7 @@
 
 The CPROVER tools support bit-accurate reasoning about IEEE-754
 floating-point and fixed-point arithmetic. The C standard contains a
-number of areas of implementation-defined behaviour with regard to
+number of areas of implementation-defined behavior with regard to
 floating-point arithmetic:
 
 -   CPROVER supports C99 Appendix F, and thus, the `__STD_IEC_559__`
@@ -39,11 +39,11 @@ floating-point arithmetic:
 
 -   Casts from int to float and float to float make use of the current
     rounding mode. Note that the standard requires that casts from float
-    to int use round-to-zero (i.e. truncation).
+    to int use round-to-zero (that is, truncation).
 
 ### x86 and Other Platform-specific Issues
 
-Not all platforms have the same implementation-defined behaviour as
+Not all platforms have the same implementation-defined behavior as
 CPROVER. This can cause mismatches between the verification environment
 and the execution environment. If this occurs, check the compiler manual
 for the choices listed above. There are two common cases that can cause
@@ -66,10 +66,10 @@ use the SSE/SSE2 instructions" and is thus better than `/arch:IA32`,
 which exclusively uses the x87 unit.
 
 The other common cause of discrepancy between CPROVER results and the
-actual platform are the use of unsafe optimisations. Some higher
+actual platform are the use of unsafe optimizations. Some higher
 optimisation levels enable transformations that are unsound with respect
 to the IEEE-754 standard. Consult the compiler manual and disable any
-optimisations that are described as unsafe (for example, the GCC options
+optimizations that are described as unsafe (for example, the GCC options
 `-ffast-math`). The options `-ffp-contract=off` (which replaces
 `-mno-fused-madd`), `-frounding-math` and `-fsignaling-nans` are needed
 for GCC to be strictly compliant with IEEE-754.
@@ -77,9 +77,9 @@ for GCC to be strictly compliant with IEEE-754.
 ### Rounding Mode
 
 CPROVER supports the four rounding modes given by IEEE-754 1985; round
-to nearest (ties to even), round up, round down and round towards zero.
+to nearest (ties to even), round up, round down, and round towards zero.
 By default, round to nearest is used. However, command line options
-(`--round-to-zero`, etc.) can be used to over-ride this. If more control
+(`--round-to-zero`, and so on) can be used to override this. If more control
 is needed, CPROVER has models of `fesetround` (for POSIX systems) and
 `_controlfp` (for Windows), which can be used to change the rounding
 mode during program execution. Furthermore, the inline assembly commands
@@ -91,7 +91,7 @@ this directly.
 
 ### Math Library
 
-CPROVER implements some of `math.h`, including `fabs`, `fpclassify` and
+CPROVER implements some of `math.h`, including `fabs`, `fpclassify`, and
 `signbit`. It has very limited support for elementary functions. Care
 must be taken when verifying properties that are dependent on these
 functions as the accuracy of implementations can vary considerably. The
@@ -101,7 +101,7 @@ is unknown.
 ### Fixed-point Arithmetic
 
 CPROVER also has support for fixed-point types. The `--fixedbv` flag
-switches `float`, `double` and `long   double` to fixed-point types. The
+switches `float`, `double`, and `long double` to fixed-point types. The
 length of these types is platform specific. The upper half of each type
 is the integer component and the lower half is the fractional part.
 
