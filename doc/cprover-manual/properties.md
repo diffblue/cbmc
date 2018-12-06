@@ -10,7 +10,7 @@ CBMC uses
 [assertions](http://en.wikipedia.org/wiki/Assertion_(computing)) to
 specify program properties. Assertions are properties of the state of
 the program when the program reaches a particular program location.
-Assertions are often written by the programmer by means of the `assert`
+Assertions are often written by the programmer using the `assert`
 macro.
 
 In addition to the assertions written by the programmer, assertions for
@@ -34,7 +34,7 @@ the following properties:
 -   **Pointer safety.** Search for `NULL`-pointer dereferences or
     dereferences of other invalid pointers.
 
--   **Memory leaks.** Check whether the program constructs dyanamically
+-   **Memory leaks.** Check whether the program constructs dynamically
     allocated data structures that are subsequently inaccessible.
 
 -   **Division by zero.** Check whether there is a division by zero in
@@ -48,7 +48,7 @@ the following properties:
 
 -   **Undefined shifts.** Check for shifts with excessive distance.
 
-We refrain from explaining the properties above in detail. Most of them
+We won't explain the properties in detail. Most of them
 relate to behaviors that are left undefined by the respective language
 semantics. For a discussion on why these behaviors are usually very
 undesirable, read [this](http://blog.regehr.org/archives/213) blog post
@@ -57,7 +57,7 @@ by John Regehr.
 All the properties described above are *reachability* properties. They
 are always of the form
 
-"*Is there a path through the program such that property ... is
+"*Is there a path through the program such that some property is
 violated?*"
 
 The counterexamples to such properties are always program paths. Users
@@ -101,8 +101,7 @@ resulting goto-binary with pointer checks.
 goto-cc expr.c -o in.gb   goto-instrument in.gb out.gb --pointer-check
 ```
 
-We can now get a list of the assertions that have been generated as
-follows:
+We can now get a list of the assertions that have been generated:
 
 ```
 goto-instrument out.gb --show-properties
@@ -115,20 +114,20 @@ trace for the NULL-pointer dereference:
 cbmc out.gb
 ```
 
-The goto-instrument program supports the following checks:
+The goto-instrument program supports these checks:
 
-Flag                         |  Check
------------------------------|----------------------------------------------
-`--no-assertions`            |  ignore user assertions
-`--bounds-check`             |  add array bounds checks
-`--div-by-zero-check`        |  add division by zero checks
-`--pointer-check`            |  add pointer checks
-`--signed-overflow-check`    |  add arithmetic over- and underflow checks
-`--unsigned-overflow-check`  |  add arithmetic over- and underflow checks
-`--undefined-shift-check`    |  add range checks for shift distances
-`--nan-check`                |  add floating-point NaN checks
-`--uninitialized-check`      |  add checks for uninitialized locals (experimental)
-`--error-label label`        |  check that given label is unreachable
+|Flag                          |  Check                                               |
+|------------------------------|------------------------------------------------------|
+| `--no-assertions`            |  ignore user assertions                              |
+| `--bounds-check`             |  add array bounds checks                             |
+| `--div-by-zero-check`        |  add division by zero checks                         |
+| `--pointer-check`            |  add pointer checks                                  |
+| `--signed-overflow-check`    |  add arithmetic over- and underflow checks           |
+| `--unsigned-overflow-check`  |  add arithmetic over- and underflow checks           |
+| `--undefined-shift-check`    |  add range checks for shift distances                |
+| `--nan-check`                |  add floating-point NaN checks                       |
+| `--uninitialized-check`      |  add checks for uninitialized locals (experimental)  |
+| `--error-label label`        |  check that given label is unreachable               |
 
 #### Generating function bodies
 
@@ -145,16 +144,15 @@ function with an existing definition, the `--remove-function-body` option can be
 used to remove the body of the function prior to generating a new one.
 
 The shape of the stub itself can be chosen with the
-`--generate-function-body-options` parameter, which can take the following
-values:
+`--generate-function-body-options` parameter, which can take these values:
 
- Option                      | Result
------------------------------|-------------------------------------------------------------
- `nondet-return`             | Do nothing and return a nondet result (this is the default)
- `assert-false`              | Make the body contain an assert(false)
- `assume-false`              | Make the body contain an assume(false)
- `assert-false-assume-false` | Combines assert-false and assume-false
- `havoc`                     | Set the contents of parameters and globals to nondet
+| Option                      | Result                                                      |
+|-----------------------------|-------------------------------------------------------------|
+| `nondet-return`             | Do nothing and return a nondet result (this is the default) |
+| `assert-false`              | Make the body contain an assert(false)                      |
+| `assume-false`              | Make the body contain an assume(false)                      |
+| `assert-false-assume-false` | Combines assert-false and assume-false                      |
+| `havoc`                     | Set the contents of parameters and globals to nondet        |
 
 The various combinations of assert-false and assume-false can be used to
 indicate that functions shouldn't be called, that they will never return or
@@ -192,7 +190,7 @@ int main(void)
 ```
 
 Now, we can compile the program and detect that the error functions are indeed
-called by invoking these commands
+called by invoking these commands:
 
 ```
     goto-cc error_example.c -o error_example.goto
@@ -217,7 +215,7 @@ Which gets us the output
 > ** 2 of 2 failed (2 iterations)
 > VERIFICATION FAILED
 
-As opposed to the verification success we would have gotten without the
+As opposed to the verification success we would have seen without the
 instrumentation step.
 
 The havoc option takes further parameters `globals` and `params` with this
