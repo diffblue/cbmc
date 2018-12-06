@@ -2,9 +2,9 @@
 
 ## Test Suite Generation with CBMC
 
-### A Small Tutorial with A Case Study
+### A Small Tutorial with a Case Study
 
-We assume that CBMC is installed on your system. If not so, follow
+We assume that CBMC is installed on your system. If not, follow
 \ref man_install-cbmc "these instructions".
 
 CBMC can be used to automatically generate test cases that satisfy a
@@ -24,14 +24,14 @@ suite generation functionality in CBMC, by means of a case study. The
 following program is an excerpt from a real-time embedded benchmark
 [PapaBench](https://www.irit.fr/recherches/ARCHI/MARCH/rubrique.php3?id_rubrique=97),
 and implements part of a fly-by-wire autopilot for an Unmanned Aerial
-Vehicle (UAV). It is adjusted mildly for our purposes.
+Vehicle (UAV). We have adjusted it slightly for our purposes.
 
 The aim of function `climb_pid_run` is to control the vertical climb of
 the UAV. Details on the theory behind this operation are documented in
 the [wiki](https://wiki.paparazziuav.org/wiki/Theory_of_Operation) for
-the Paparazzi UAV project. The behaviour of this simple controller,
+the Paparazzi UAV project. The behavior of this simple controller,
 supposing that the desired speed is 0.5 meters per second, is plotted in
-the Figure below.
+the figure below.
 
 ![The pid controller](https://github.com/diffblue/cbmc/raw/develop/doc/assets/pid.png "The pid controller")
 
@@ -115,7 +115,7 @@ the Figure below.
     77: }
 ```
 
-In order to test the PID controller, we construct a main control loop,
+To test the PID controller, we construct a main control loop,
 which repeatedly invokes the function `climb_pid_run` (line 69). This
 PID function has two input variables: the desired speed `desired_climb`
 and the estimated speed `estimated_z_dot`. In the beginning of each loop
@@ -126,25 +126,26 @@ guarantees that both values are bounded within a valid range. The
 and outputs of interest for generating test suites.
 
 To demonstrate the automatic test suite generation in CBMC, we call the
-following command and we are going to explain the command line options
-one by one.
+following command:
 
     cbmc pid.c --cover mcdc --unwind 6 --xml-ui
 
-The option `--cover mcdc` specifies the code coverage criterion. There
-are four conditional statements in the PID function: in line 41, line
-44, line 48 and line 49. To satisfy MC/DC, the test suite has to meet
+We'll describe those command line options one by one. The option `--cover mcdc`
+specifies the code coverage criterion. There
+are four conditional statements in the PID function: in lines 41,
+44, 48, and 49. To satisfy MC/DC, the test suite has to meet
 multiple requirements. For instance, each conditional statement needs to
 evaluate to *true* and *false*. Consider the condition
 `"pprz>=0 && pprz<=MAX_PPRZ"` in line 41. CBMC instruments three
 coverage goals to control the respective evaluated results of
-`"pprz>=0"` and `"pprz<=MAX_PPRZ"`. We list them in below and they
-satisfy the MC/DC rules. Note that `MAX_PPRZ` is defined as 16 \* 600 in
-line 06 of the program.
+`"pprz>=0"` and `"pprz<=MAX_PPRZ"`. They
+satisfy the MC/DC rules.
 
     !(pprz >= (float)0) && pprz <= (float)(16 * 600)  id="climb_pid_run.coverage.1"
     pprz >= (float)0 && !(pprz <= (float)(16 * 600))  id="climb_pid_run.coverage.2"
     pprz >= (float)0 && pprz <= (float)(16 * 600)     id="climb_pid_run.coverage.3"
+
+Note that `MAX_PPRZ` is defined as 16 \* 600 in line 06 of the program.
 
 The "id" of each coverage goal is automatically assigned by CBMC. For
 every coverage goal, a test suite (if there exists) that satisfies such
@@ -190,18 +191,17 @@ the coverage goals it is for are clearly described.
       (iteration 6) desired_climb=-1.000000f, estimator_z_dot=1.000000f
 
 The option `--unwind 6` unwinds the loop inside the main function body
-six times. In order to achieve the complete coverage on all the
+six times. To achieve complete coverage on all the
 instrumented goals in the PID function `climb_pid_run`, the loop must be
-unwound sufficient enough times. For example, `climb_pid_run` needs to
+unwound enough times. For example, `climb_pid_run` needs to
 be called at least six times for evaluating the condition
 `climb_sum_err>MAX_CLIMB_SUM_ERR` in line 48 to *true*. This corresponds
-to the Test 5. An introduction to the use of loop unwinding can be found
-in [Understanding Loop Unwinding](cbmc-loops.shtml).
+to Test 5. To learn more about loop unwinding take a look at [Understanding Loop Unwinding](cbmc-loops.shtml).
 
-In this small tutorial, we present the automatic test suite generation
+In this tutorial, we present the automatic test suite generation
 functionality of CBMC, by applying the MC/DC code coverage criterion to
 a PID controller case study. In addition to `--cover mcdc`, other
-coverage criteria like `branch`, `decision`, `path` etc. are also
+coverage criteria such as `branch`, `decision`, and `path`. are also
 available when calling CBMC.
 
 ### Coverage Criteria
