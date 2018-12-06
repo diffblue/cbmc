@@ -24,7 +24,7 @@ section on [Assumptions](../modeling/assumptions/).
 
 ```C
 void __CPROVER_r_ok(const void *, size_t size);
-void __CPROVER_w_ok(cosnt void *, size_t size);
+void __CPROVER_w_ok(const void *, size_t size);
 ```
 
 The function **\_\_CPROVER\_r_ok** returns true if reading the piece of
