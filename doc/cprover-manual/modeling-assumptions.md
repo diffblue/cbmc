@@ -19,14 +19,14 @@ unsigned int one_to_hundred()
 }
 ```
 
-The function above returns the desired integer from 1 to 100. You must
+This function returns the desired integer from 1 to 100. You must
 ensure that the condition given as an assumption is actually satisfiable
-by some nondeterministic choice, or otherwise the model checking step
+by some nondeterministic choice, otherwise the model checking step
 will pass vacuously.
 
-Also note that assumptions are never retroactive: They only affect
+Also note that assumptions are never retroactive. They only affect
 assertions (or other properties) that follow them in program order. This
-is best illustrated with an example. In the following fragment, the
+is best illustrated with an example. In the following fragment the
 assumption has no effect on the assertion, which means that the
 assertion will fail:
 
@@ -37,7 +37,7 @@ __CPROVER_assume(x==100);
 ```
 
 Assumptions do restrict the search space, but only for assertions that
-follow. As an example, the following program will pass:
+follow. As an example, this program will pass:
 
 ```C
 int main() {
@@ -52,7 +52,7 @@ int main() {
 ```
 
 Beware that nondeterminism cannot be used to obtain the effect of
-universal quantification in assumptions. As an example,
+universal quantification in assumptions. For example:
 
 ```C
 int main() {
@@ -68,6 +68,6 @@ int main() {
 }
 ```
 
-fails, as there is a choice of x and y which results in a counterexample
+This code fails, as there is a choice of x and y which results in a counterexample
 (any choice in which x and y are different).
 
