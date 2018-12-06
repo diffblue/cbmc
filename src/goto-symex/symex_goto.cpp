@@ -439,9 +439,8 @@ static void merge_names(
   // may have been introduced by symex_start_thread (and will
   // only later be removed from level2.current_names by pop_frame
   // once the thread is executed)
-  if(
-    !ssa.get_level_0().empty() &&
-    ssa.get_level_0() != std::to_string(dest_state.source.thread_nr))
+  const irep_idt level_0 = ssa.get_level_0();
+  if(!level_0.empty() && level_0 != std::to_string(dest_state.source.thread_nr))
     return;
 
   exprt goto_state_rhs = ssa, dest_state_rhs = ssa;
