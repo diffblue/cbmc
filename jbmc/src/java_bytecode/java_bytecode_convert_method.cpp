@@ -13,13 +13,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 #endif
 
+#include "bytecode_info.h"
 #include "java_bytecode_convert_method.h"
 #include "java_bytecode_convert_method_class.h"
-#include "bytecode_info.h"
 #include "java_static_initializers.h"
 #include "java_string_library_preprocess.h"
 #include "java_types.h"
 #include "java_utils.h"
+#include "pattern.h"
 #include "remove_exceptions.h"
 
 #include <util/arith_tools.h>
@@ -47,32 +48,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <limits>
 #include <regex>
 #include <unordered_set>
-
-/// Given a string of the format '?blah?', will return true when compared
-/// against a string that matches appart from any characters that are '?'
-/// in the original string. Equivalent to doing a regex match on '.blah.'
-class patternt
-{
-public:
-  explicit patternt(const char *_p):p(_p)
-  {
-  }
-
-  // match with '?'
-  bool operator==(const irep_idt &what) const
-  {
-    for(std::size_t i=0; i<what.size(); i++)
-      if(p[i]==0)
-        return false;
-      else if(p[i]!='?' && p[i]!=what[i])
-        return false;
-
-    return p[what.size()]==0;
-  }
-
-protected:
-  const char *p;
-};
 
 /// Iterates through the parameters of the function type \p ftype, finds a new
 /// new name for each parameter and renames them in `ftype.parameters()` as
