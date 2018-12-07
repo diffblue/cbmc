@@ -8,6 +8,9 @@ SRC = bytecode_info.cpp \
       jar_file.cpp \
       jar_pool.cpp \
       java_bmc_util.cpp \
+      java2goto.cpp \
+      java2goto_cfg.cpp \
+      java2goto_instructions.cpp \
       java_bytecode_convert_class.cpp \
       java_bytecode_convert_method.cpp \
       java_bytecode_concurrency_instrumentation.cpp \
@@ -70,3 +73,6 @@ library:
 
 java_bytecode$(LIBEXT): $(OBJ)
 	$(LINKLIB)
+
+java2goto$(EXEEXT): $(OBJ) java2goto_main$(OBJEXT) ../miniz/miniz$(OBJEXT) ../$(CPROVER_DIR)/src/util/util$(LIBEXT) ../$(CPROVER_DIR)/src/ansi-c/ansi-c$(LIBEXT) ../$(CPROVER_DIR)/src/json/json$(LIBEXT) ../$(CPROVER_DIR)/src/big-int/big-int$(LIBEXT) ../$(CPROVER_DIR)/src/goto-programs/goto-programs$(LIBEXT) ../$(CPROVER_DIR)/src/analyses/analyses$(LIBEXT) ../$(CPROVER_DIR)/src/langapi/langapi$(LIBEXT)
+	$(LINKBIN)
