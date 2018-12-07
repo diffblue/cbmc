@@ -40,9 +40,6 @@ json_objectt json_irept::convert_from_irep(const irept &irep) const
   convert_sub_tree("sub", irep.get_sub(), irep_object);
   convert_named_sub_tree("namedSub", irep.get_named_sub(), irep_object);
 
-  if(include_comments)
-    convert_named_sub_tree("comment", irep.get_comments(), irep_object);
-
   return irep_object;
 }
 
@@ -86,10 +83,11 @@ void json_irept::convert_named_sub_tree(
   {
     json_objectt sub_objects;
     for(const auto &sub_tree : sub_trees)
-    {
-      json_objectt sub_object=convert_from_irep(sub_tree.second);
-      sub_objects[id2string(sub_tree.first)]=sub_object;
-    }
+      if(include_comments || !irept::is_comment(sub_tree.first))
+      {
+        json_objectt sub_object = convert_from_irep(sub_tree.second);
+        sub_objects[id2string(sub_tree.first)] = sub_object;
+      }
     parent[sub_tree_id]=sub_objects;
   }
 }

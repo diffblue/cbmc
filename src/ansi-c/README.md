@@ -78,9 +78,9 @@ data structures. In particular, \ref exprt "expressions",
 An irep is a tree of ireps. A subtlety is that an irep is actually the
 root of _three_ (possibly empty) trees, i.e. it has three disjoint sets
 of children: \ref irept::get_sub() returns a list of children, and
-\ref irept::get_named_sub() and \ref irept::get_comments() each return an
-association from names to children. **Most clients never use these
-functions directly**, as subtypes of irept generally provide more
+\ref irept::get_named_sub() returns an association from names to children.
+**Most clients never use these functions directly**,
+as subtypes of irept generally provide more
 descriptive functions. For example, the operands of an
 \ref exprt "expression" (\ref exprt::op0() "op0", op1 etc) are
 really that expression's children; the

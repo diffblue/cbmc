@@ -99,11 +99,8 @@ const irept &get_nil_irep();
 ///
 /// * \ref irept::dt::named_sub : A map from `irep_namet` (a string) to \ref
 ///   irept. This is used for named children, i.e.  subexpressions, parameters,
-///   etc.
-///
-/// * \ref irept::dt::comments : Another map from `irep_namet` to \ref irept
-///   which is used for annotations and other ‘non-semantic’ information. Note
-///   that this map is ignored by the default \ref operator==.
+///   etc. Children whose name begins with '#' are ignored by the
+///   default \ref operator==.
 ///
 /// * \ref irept::dt::sub : A vector of \ref irept which is used to store
 ///   ordered but unnamed children.
@@ -318,8 +315,6 @@ public:
   const subt &get_sub() const { return read().sub; }
   named_subt &get_named_sub() { return write().named_sub; } // DANGEROUS
   const named_subt &get_named_sub() const { return read().named_sub; }
-  named_subt &get_comments() { return write().comments; } // DANGEROUS
-  const named_subt &get_comments() const { return read().comments; }
 
   std::size_t hash() const;
   std::size_t full_hash() const;
@@ -328,11 +323,13 @@ public:
 
   std::string pretty(unsigned indent=0, unsigned max_indent=0) const;
 
-protected:
+public:
   static bool is_comment(const irep_namet &name)
   { return !name.empty() && name[0]=='#'; }
 
-public:
+  /// count the number of named_sub elements that are not comments
+  static std::size_t number_of_non_comments(const named_subt &);
+
   class dt
   {
   private:
@@ -347,7 +344,6 @@ public:
     irep_idt data;
 
     named_subt named_sub;
-    named_subt comments;
     subt sub;
 
     #ifdef HASH_CODE
@@ -359,7 +355,6 @@ public:
       data.clear();
       sub.clear();
       named_sub.clear();
-      comments.clear();
       #ifdef HASH_CODE
       hash_code=0;
       #endif
@@ -370,7 +365,6 @@ public:
       d.data.swap(data);
       d.sub.swap(sub);
       d.named_sub.swap(named_sub);
-      d.comments.swap(comments);
       #ifdef HASH_CODE
       std::swap(d.hash_code, hash_code);
       #endif

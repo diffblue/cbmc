@@ -38,13 +38,6 @@ void irep_serializationt::write_irep(
     reference_convert(it->second, out);
   }
 
-  forall_named_irep(it, irep.get_comments())
-  {
-    out.put('C');
-    write_string_ref(out, it->first);
-    reference_convert(it->second, out);
-  }
-
   out.put(0); // terminator
 }
 
