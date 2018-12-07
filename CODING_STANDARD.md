@@ -209,6 +209,8 @@ Formatting is enforced using clang-format. For more information about this, see
   point to heap-allocated memory should be private data members of an object
   which safely manages the pointer. As such, `new` should only be used in
   constructors, and `delete` in destructors. Never use `malloc` or `free`.
+- Prefer brace style initialisation (i.e. `type_name{arguments...}`) over
+  parentheses for constructor calls
 
 # CProver conventions
 - Avoid if at all possible using irept methods like `get(ID_name)`, instead cast
