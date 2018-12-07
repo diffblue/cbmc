@@ -28,6 +28,14 @@ std::ostream &smt2_format_rec(std::ostream &out, const typet &type)
     out << "(Array " << smt2_format(array_type.size().type()) << ' '
         << smt2_format(array_type.subtype()) << ')';
   }
+  else if(type.id() == ID_floatbv)
+  {
+    const auto &floatbv_type = to_floatbv_type(type);
+    // the width of the mantissa needs to be increased by one to
+    // include the hidden bit
+    out << "(_ FloatingPoint " << floatbv_type.get_e() << ' '
+        << floatbv_type.get_f() + 1 << ')';
+  }
   else
     out << "? " << type.id();
 
@@ -77,6 +85,10 @@ std::ostream &smt2_format_rec(std::ostream &out, const exprt &expr)
       }
 
       out << '"';
+    }
+    else if(expr_type.id() == ID_floatbv)
+    {
+      out << value;
     }
     else
       DATA_INVARIANT(false, "unhandled constant: " + expr_type.id_string());

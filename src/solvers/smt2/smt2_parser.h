@@ -99,6 +99,10 @@ protected:
   void ignore_command();
   exprt expression();
   exprt function_application();
+  exprt function_application_ieee_float_op(
+    const irep_idt &,
+    const exprt::operandst &);
+  exprt function_application_fp(const exprt::operandst &);
   typet sort();
   exprt::operandst operands();
   typet function_signature_declaration();
