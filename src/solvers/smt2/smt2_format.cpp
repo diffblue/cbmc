@@ -100,6 +100,25 @@ std::ostream &smt2_format_rec(std::ostream &out, const exprt &expr)
         << smt2_format(with_expr.where()) << ' '
         << smt2_format(with_expr.new_value()) << ')';
   }
+  else if(expr.id() == ID_array_list)
+  {
+    const auto &array_list_expr = to_multi_ary_expr(expr);
+
+    for(std::size_t i = 0; i < array_list_expr.operands().size(); i += 2)
+      out << "(store ";
+
+    out << "((as const " << smt2_format(expr.type()) << ")) "
+        << smt2_format(from_integer(0, expr.type().subtype())) << ')';
+
+    for(std::size_t i = 0; i < array_list_expr.operands().size(); i += 2)
+    {
+      DATA_INVARIANT(
+        i < array_list_expr.operands().size() - 1,
+        "array_list has even number of operands");
+      out << ' ' << smt2_format(array_list_expr.operands()[i]) << ' '
+          << smt2_format(array_list_expr.operands()[i + 1]) << ')';
+    }
+  }
   else
     out << "? " << expr.id();
 
