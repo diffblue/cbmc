@@ -4541,31 +4541,33 @@ inline void validate_expr(const function_application_exprt &value)
   validate_operands(value, 2, "Function application must have two operands");
 }
 
-
 /// \brief Concatenation of bit-vector operands
 ///
 /// This expression takes any number of operands
-/// (a restriction to make this binary will happen in the future).
-/// The ordering of the operands is the same as in the _new_ SMT 1.x standard,
+/// The ordering of the operands is the same as in the SMT-LIB 2 standard,
 /// i.e., most-significant operands come first.
-class concatenation_exprt:public exprt
+class concatenation_exprt : public multi_ary_exprt
 {
 public:
-  DEPRECATED("use concatenation_exprt(op0, op1, type) instead")
-  concatenation_exprt():exprt(ID_concatenation)
+  DEPRECATED("use concatenation_exprt(op, type) instead")
+  concatenation_exprt() : multi_ary_exprt(ID_concatenation)
   {
   }
 
-  DEPRECATED("use concatenation_exprt(op0, op1, type) instead")
-  explicit concatenation_exprt(const typet &_type):
-    exprt(ID_concatenation, _type)
+  DEPRECATED("use concatenation_exprt(op, type) instead")
+  explicit concatenation_exprt(const typet &_type)
+    : multi_ary_exprt(ID_concatenation, _type)
   {
   }
 
   concatenation_exprt(const exprt &_op0, const exprt &_op1, const typet &_type)
-    : exprt(ID_concatenation, _type)
+    : multi_ary_exprt(_op0, ID_concatenation, _op1, _type)
   {
-    add_to_operands(_op0, _op1);
+  }
+
+  concatenation_exprt(operandst &&_operands, const typet &_type)
+    : multi_ary_exprt(ID_concatenation, std::move(_operands), _type)
+  {
   }
 };
 
