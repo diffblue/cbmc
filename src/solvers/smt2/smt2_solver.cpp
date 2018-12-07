@@ -34,7 +34,7 @@ protected:
   decision_proceduret &solver;
 
   void command(const std::string &) override;
-  void define_constants(const exprt &);
+  void define_constants();
   void expand_function_applications(exprt &);
 
   std::set<irep_idt> constants_done;
@@ -47,36 +47,28 @@ protected:
   } status;
 };
 
-void smt2_solvert::define_constants(const exprt &expr)
+void smt2_solvert::define_constants()
 {
-  for(const auto &op : expr.operands())
-    define_constants(op);
-
-  if(expr.id()==ID_symbol)
+  for(const auto &id : id_map)
   {
-    irep_idt identifier=to_symbol_expr(expr).get_identifier();
+    if(id.second.type.id() == ID_mathematical_function)
+      continue;
+
+    if(id.second.definition.is_nil())
+      continue;
+
+    const irep_idt &identifier = id.first;
 
     // already done?
     if(constants_done.find(identifier)!=constants_done.end())
-      return;
+      continue;
 
     constants_done.insert(identifier);
 
-    auto f_it=id_map.find(identifier);
-
-    if(f_it!=id_map.end())
-    {
-      const auto &f=f_it->second;
-
-      if(f.type.id()!=ID_mathematical_function &&
-         f.definition.is_not_nil())
-      {
-        exprt def=f.definition;
-        expand_function_applications(def);
-        define_constants(def); // recursive!
-        solver.set_to_true(equal_exprt(expr, def));
-      }
-    }
+    exprt def = id.second.definition;
+    expand_function_applications(def);
+    solver.set_to_true(
+      equal_exprt(symbol_exprt(identifier, id.second.type), def));
   }
 }
 
@@ -135,12 +127,14 @@ void smt2_solvert::command(const std::string &c)
       if(e.is_not_nil())
       {
         expand_function_applications(e);
-        define_constants(e);
         solver.set_to_true(e);
       }
     }
     else if(c == "check-sat")
     {
+      // add constant definitions as constraints
+      define_constants();
+
       switch(solver())
       {
       case decision_proceduret::resultt::D_SATISFIABLE:
@@ -200,12 +194,7 @@ void smt2_solvert::command(const std::string &c)
         if(id_map_it == id_map.end())
           throw error("unexpected symbol " + id2string(identifier));
 
-        exprt value;
-
-        if(id_map_it->second.definition.is_nil())
-          value = solver.get(op);
-        else
-          value = solver.get(id_map_it->second.definition);
+        const exprt value = solver.get(op);
 
         if(value.is_nil())
           throw error("no value for " + id2string(identifier));
