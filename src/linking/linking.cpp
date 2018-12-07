@@ -58,9 +58,7 @@ static const typet &follow_tags_symbols(
   const namespacet &ns,
   const typet &type)
 {
-  if(type.id() == ID_symbol_type)
-    return ns.follow(type);
-  else if(type.id()==ID_c_enum_tag)
+  if(type.id() == ID_c_enum_tag)
     return ns.follow_tag(to_c_enum_tag_type(type));
   else if(type.id()==ID_struct_tag)
     return ns.follow_tag(to_struct_tag_type(type));
@@ -796,10 +794,10 @@ bool linkingt::adjust_object_type_rec(
     return false;
 
   if(
-    t1.id() == ID_symbol_type || t1.id() == ID_struct_tag ||
-    t1.id() == ID_union_tag || t1.id() == ID_c_enum_tag)
+    t1.id() == ID_struct_tag || t1.id() == ID_union_tag ||
+    t1.id() == ID_c_enum_tag)
   {
-    const irep_idt &identifier=t1.get(ID_identifier);
+    const irep_idt &identifier = to_tag_type(t1).get_identifier();
 
     if(info.o_symbols.insert(identifier).second)
     {
@@ -813,10 +811,10 @@ bool linkingt::adjust_object_type_rec(
     return false;
   }
   else if(
-    t2.id() == ID_symbol_type || t2.id() == ID_struct_tag ||
-    t2.id() == ID_union_tag || t2.id() == ID_c_enum_tag)
+    t2.id() == ID_struct_tag || t2.id() == ID_union_tag ||
+    t2.id() == ID_c_enum_tag)
   {
-    const irep_idt &identifier=t2.get(ID_identifier);
+    const irep_idt &identifier = to_tag_type(t2).get_identifier();
 
     if(info.n_symbols.insert(identifier).second)
     {

@@ -33,19 +33,5 @@ bool type_eq(const typet &type1, const typet &type2, const namespacet &ns)
   if(type1==type2)
     return true;
 
-  if(const auto symbol_type1 = type_try_dynamic_cast<symbol_typet>(type1))
-  {
-    const symbolt &symbol = ns.lookup(*symbol_type1);
-    CHECK_RETURN(symbol.is_type);
-    return type_eq(symbol.type, type2, ns);
-  }
-
-  if(const auto symbol_type2 = type_try_dynamic_cast<symbol_typet>(type2))
-  {
-    const symbolt &symbol = ns.lookup(*symbol_type2);
-    CHECK_RETURN(symbol.is_type);
-    return type_eq(type1, symbol.type, ns);
-  }
-
   return false;
 }

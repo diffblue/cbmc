@@ -1030,9 +1030,9 @@ mp_integer interpretert::get_size(const typet &type)
     }
     return subtype_size;
   }
-  else if(type.id() == ID_symbol_type || type.id() == ID_struct_tag)
+  else if(type.id() == ID_struct_tag)
   {
-    return get_size(ns.follow(type));
+    return get_size(ns.follow_tag(to_struct_tag_type(type)));
   }
 
   return 1;

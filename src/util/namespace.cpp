@@ -34,17 +34,6 @@ const symbolt &namespace_baset::lookup(const symbol_exprt &expr) const
   return lookup(expr.get_identifier());
 }
 
-/// Generic lookup function for a symbol type in a symbol table.
-/// \param type: The symbol type to lookup.
-/// \return The symbol found in the namespace.
-/// \remarks The lookup function called assumes that the type symbol we are
-/// looking for exists in the symbol table. If it doesn't, it hits an
-/// INVARIANT.
-const symbolt &namespace_baset::lookup(const symbol_typet &type) const
-{
-  return lookup(type.get_identifier());
-}
-
 /// Generic lookup function for a tag type in a symbol table.
 /// \param type: The tag type to lookup.
 /// \return The symbol found in the namespace.
@@ -67,21 +56,7 @@ const typet &namespace_baset::follow(const typet &src) const
   if(src.id() == ID_struct_tag)
     return follow_tag(to_struct_tag_type(src));
 
-  if(src.id() != ID_symbol_type)
-    return src;
-
-  const symbolt *symbol = &lookup(to_symbol_type(src));
-
-  // let's hope it's not cyclic...
-  while(true)
-  {
-    DATA_INVARIANT(symbol->is_type, "symbol type points to type");
-
-    if(symbol->type.id() == ID_symbol_type)
-      symbol = &lookup(to_symbol_type(symbol->type));
-    else
-      return symbol->type;
-  }
+  return src;
 }
 
 /// Follow type tag of union type.

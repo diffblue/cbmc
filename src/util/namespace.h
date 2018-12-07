@@ -18,7 +18,6 @@ class exprt;
 class symbolt;
 class typet;
 class symbol_exprt;
-class symbol_typet;
 class tag_typet;
 class union_typet;
 class struct_typet;
@@ -55,7 +54,6 @@ public:
   }
 
   const symbolt &lookup(const symbol_exprt &) const;
-  const symbolt &lookup(const symbol_typet &) const;
   const symbolt &lookup(const tag_typet &) const;
 
   virtual ~namespace_baset();

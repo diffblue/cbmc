@@ -504,7 +504,6 @@ exprt::operandst::const_iterator c_typecheck_baset::do_designated_initializer(
 
     const typet &type=designator.back().subtype;
     const typet &full_type=follow(type);
-    CHECK_RETURN(full_type.id() != ID_symbol_type);
 
     // do we initialize a scalar?
     if(full_type.id()!=ID_struct &&
