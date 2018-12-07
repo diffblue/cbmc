@@ -31,10 +31,10 @@ SCENARIO("java_bytecode_convert_abstract_class",
       THEN("The symbol type should be abstract")
       {
         const symbolt &class_symbol=*new_symbol_table.lookup("java::I");
-        const typet &symbol_type=class_symbol.type;
+        const typet &struct_tag_type = class_symbol.type;
 
-        REQUIRE(symbol_type.id()==ID_struct);
-        class_typet class_type=to_class_type(symbol_type);
+        REQUIRE(struct_tag_type.id() == ID_struct);
+        class_typet class_type = to_class_type(struct_tag_type);
         REQUIRE(class_type.is_class());
         REQUIRE(class_type.is_abstract());
       }
@@ -46,10 +46,10 @@ SCENARIO("java_bytecode_convert_abstract_class",
       THEN("The symbol type should be abstract")
       {
         const symbolt &class_symbol=*new_symbol_table.lookup("java::A");
-        const typet &symbol_type=class_symbol.type;
+        const typet &struct_tag_type = class_symbol.type;
 
-        REQUIRE(symbol_type.id()==ID_struct);
-        class_typet class_type=to_class_type(symbol_type);
+        REQUIRE(struct_tag_type.id() == ID_struct);
+        class_typet class_type = to_class_type(struct_tag_type);
         REQUIRE(class_type.is_class());
         REQUIRE(class_type.is_abstract());
       }
@@ -61,10 +61,10 @@ SCENARIO("java_bytecode_convert_abstract_class",
       THEN("The symbol type should not be abstract")
       {
         const symbolt &class_symbol=*new_symbol_table.lookup("java::C");
-        const typet &symbol_type=class_symbol.type;
+        const typet &struct_tag_type = class_symbol.type;
 
-        REQUIRE(symbol_type.id()==ID_struct);
-        class_typet class_type=to_class_type(symbol_type);
+        REQUIRE(struct_tag_type.id() == ID_struct);
+        class_typet class_type = to_class_type(struct_tag_type);
         REQUIRE(class_type.is_class());
         REQUIRE_FALSE(class_type.is_abstract());
       }
@@ -79,10 +79,10 @@ SCENARIO("java_bytecode_convert_abstract_class",
       {
         const symbolt &class_symbol=
           *new_symbol_table.lookup("java::Implementor");
-        const typet &symbol_type=class_symbol.type;
+        const typet &struct_tag_type = class_symbol.type;
 
-        REQUIRE(symbol_type.id()==ID_struct);
-        class_typet class_type=to_class_type(symbol_type);
+        REQUIRE(struct_tag_type.id() == ID_struct);
+        class_typet class_type = to_class_type(struct_tag_type);
         REQUIRE(class_type.is_class());
         REQUIRE_FALSE(class_type.is_abstract());
       }
@@ -97,10 +97,10 @@ SCENARIO("java_bytecode_convert_abstract_class",
       {
         const symbolt &class_symbol=
           *new_symbol_table.lookup("java::Extender");
-        const typet &symbol_type=class_symbol.type;
+        const typet &struct_tag_type = class_symbol.type;
 
-        REQUIRE(symbol_type.id()==ID_struct);
-        class_typet class_type=to_class_type(symbol_type);
+        REQUIRE(struct_tag_type.id() == ID_struct);
+        class_typet class_type = to_class_type(struct_tag_type);
         REQUIRE(class_type.is_class());
         REQUIRE_FALSE(class_type.is_abstract());
       }

@@ -16,9 +16,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 void java_bytecode_typecheckt::typecheck_type(typet &type)
 {
-  if(type.id() == ID_symbol_type)
+  if(type.id() == ID_struct_tag)
   {
-    irep_idt identifier=to_symbol_type(type).get_identifier();
+    irep_idt identifier = to_struct_tag_type(type).get_identifier();
 
     auto type_symbol = symbol_table.lookup(identifier);
     DATA_INVARIANT(

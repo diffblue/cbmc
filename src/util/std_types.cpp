@@ -70,6 +70,35 @@ struct_union_typet::component_type(const irep_idt &component_name) const
   return c.type();
 }
 
+struct_tag_typet &struct_typet::baset::type()
+{
+  return to_struct_tag_type(exprt::type());
+}
+
+const struct_tag_typet &struct_typet::baset::type() const
+{
+  return to_struct_tag_type(exprt::type());
+}
+
+struct_typet::baset::baset(const struct_tag_typet &base) : exprt(ID_base, base)
+{
+}
+
+void struct_typet::add_base(const struct_tag_typet &base)
+{
+  bases().push_back(baset(base));
+}
+
+optionalt<struct_typet::baset> struct_typet::get_base(const irep_idt &id) const
+{
+  for(const auto &b : bases())
+  {
+    if(to_struct_tag_type(b.type()).get_identifier() == id)
+      return b;
+  }
+  return {};
+}
+
 /// Returns true if the struct is a prefix of \a other, i.e., if this struct
 /// has n components then the component types and names of this struct must
 /// match the first n components of \a other struct.

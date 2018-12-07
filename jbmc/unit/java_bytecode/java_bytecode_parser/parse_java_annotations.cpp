@@ -93,7 +93,7 @@ SCENARIO(
           to_symbol_expr(element_value_pair.value).get_identifier();
         const auto &java_type = java_type_from_string(id2string(id));
         const std::string &class_name =
-          id2string(to_symbol_type(java_type.subtype()).get_identifier());
+          id2string(to_struct_tag_type(java_type.subtype()).get_identifier());
         REQUIRE(id2string(class_name) == "java::java.lang.String");
       }
     }

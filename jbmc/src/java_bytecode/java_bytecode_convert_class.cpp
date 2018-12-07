@@ -338,7 +338,7 @@ void java_bytecode_convert_classt::convert(
 
   if(!c.super_class.empty())
   {
-    const symbol_typet base("java::" + id2string(c.super_class));
+    const struct_tag_typet base("java::" + id2string(c.super_class));
 
     // if the superclass is generic then the class has the superclass reference
     // including the generic info in its signature
@@ -350,7 +350,7 @@ void java_bytecode_convert_classt::convert(
     {
       try
       {
-        const java_generic_symbol_typet generic_base(
+        const java_generic_struct_tag_typet generic_base(
           base, superclass_ref.value(), qualified_classname);
         class_type.add_base(generic_base);
       }
@@ -378,7 +378,7 @@ void java_bytecode_convert_classt::convert(
   // interfaces are recorded as bases
   for(const auto &interface : c.implements)
   {
-    const symbol_typet base("java::" + id2string(interface));
+    const struct_tag_typet base("java::" + id2string(interface));
 
     // if the interface is generic then the class has the interface reference
     // including the generic info in its signature
@@ -390,7 +390,7 @@ void java_bytecode_convert_classt::convert(
     {
       try
       {
-        const java_generic_symbol_typet generic_base(
+        const java_generic_struct_tag_typet generic_base(
           base, interface_ref.value(), qualified_classname);
         class_type.add_base(generic_base);
       }
@@ -774,26 +774,27 @@ void java_bytecode_convert_classt::add_array_types(symbol_tablet &symbol_table)
 
   for(const char l : letters)
   {
-    symbol_typet symbol_type=
-      to_symbol_type(java_array_type(l).subtype());
+    struct_tag_typet struct_tag_type =
+      to_struct_tag_type(java_array_type(l).subtype());
 
-    const irep_idt &symbol_type_identifier=symbol_type.get_identifier();
-    if(symbol_table.has_symbol(symbol_type_identifier))
+    const irep_idt &struct_tag_type_identifier =
+      struct_tag_type.get_identifier();
+    if(symbol_table.has_symbol(struct_tag_type_identifier))
       return;
 
     java_class_typet class_type;
     // we have the base class, java.lang.Object, length and data
     // of appropriate type
-    class_type.set_tag(symbol_type_identifier);
+    class_type.set_tag(struct_tag_type_identifier);
     // Note that non-array types don't have "java::" at the beginning of their
     // tag, and their name is "java::" + their tag. Since arrays do have
     // "java::" at the beginning of their tag we set the name to be the same as
     // the tag.
-    class_type.set_name(symbol_type_identifier);
+    class_type.set_name(struct_tag_type_identifier);
 
     class_type.components().reserve(3);
     class_typet::componentt base_class_component(
-      "@java.lang.Object", symbol_typet("java::java.lang.Object"));
+      "@java.lang.Object", struct_tag_typet("java::java.lang.Object"));
     base_class_component.set_pretty_name("@java.lang.Object");
     base_class_component.set_base_name("@java.lang.Object");
     class_type.components().push_back(base_class_component);
@@ -809,7 +810,7 @@ void java_bytecode_convert_classt::add_array_types(symbol_tablet &symbol_table)
     data_component.set_base_name("data");
     class_type.components().push_back(data_component);
 
-    class_type.add_base(symbol_typet("java::java.lang.Object"));
+    class_type.add_base(struct_tag_typet("java::java.lang.Object"));
 
     INVARIANT(
       is_valid_java_array(class_type),
@@ -817,8 +818,8 @@ void java_bytecode_convert_classt::add_array_types(symbol_tablet &symbol_table)
       "object that doesn't match expectations");
 
     symbolt symbol;
-    symbol.name=symbol_type_identifier;
-    symbol.base_name=symbol_type.get(ID_C_base_name);
+    symbol.name = struct_tag_type_identifier;
+    symbol.base_name = struct_tag_type.get(ID_C_base_name);
     symbol.is_type=true;
     symbol.type = class_type;
     symbol.mode = ID_java;
@@ -827,13 +828,13 @@ void java_bytecode_convert_classt::add_array_types(symbol_tablet &symbol_table)
     // Also provide a clone method:
     // ----------------------------
 
-    const irep_idt clone_name=
-      id2string(symbol_type_identifier)+".clone:()Ljava/lang/Object;";
+    const irep_idt clone_name =
+      id2string(struct_tag_type_identifier) + ".clone:()Ljava/lang/Object;";
     java_method_typet::parametert this_param;
     this_param.set_identifier(id2string(clone_name)+"::this");
     this_param.set_base_name("this");
     this_param.set_this();
-    this_param.type()=java_reference_type(symbol_type);
+    this_param.type() = java_reference_type(struct_tag_type);
     const java_method_typet clone_type({this_param}, java_lang_object_type());
 
     parameter_symbolt this_symbol;
@@ -850,7 +851,7 @@ void java_bytecode_convert_classt::add_array_types(symbol_tablet &symbol_table)
     local_symbol.name=local_name;
     local_symbol.base_name="cloned_array";
     local_symbol.pretty_name=local_symbol.base_name;
-    local_symbol.type=java_reference_type(symbol_type);
+    local_symbol.type = java_reference_type(struct_tag_type);
     local_symbol.mode=ID_java;
     symbol_table.add(local_symbol);
     const auto &local_symexpr=local_symbol.symbol_expr();
@@ -860,9 +861,9 @@ void java_bytecode_convert_classt::add_array_types(symbol_tablet &symbol_table)
     source_locationt location;
     location.set_function(local_name);
     side_effect_exprt java_new_array(
-      ID_java_new_array, java_reference_type(symbol_type), location);
-    dereference_exprt old_array(this_symbol.symbol_expr(), symbol_type);
-    dereference_exprt new_array(local_symexpr, symbol_type);
+      ID_java_new_array, java_reference_type(struct_tag_type), location);
+    dereference_exprt old_array(this_symbol.symbol_expr(), struct_tag_type);
+    dereference_exprt new_array(local_symexpr, struct_tag_type);
     member_exprt old_length(
       old_array, length_component.get_name(), length_component.type());
     java_new_array.copy_to_operands(old_length);
@@ -923,8 +924,8 @@ void java_bytecode_convert_classt::add_array_types(symbol_tablet &symbol_table)
 
     symbolt clone_symbol;
     clone_symbol.name=clone_name;
-    clone_symbol.pretty_name=
-      id2string(symbol_type_identifier)+".clone:()";
+    clone_symbol.pretty_name =
+      id2string(struct_tag_type_identifier) + ".clone:()";
     clone_symbol.base_name="clone";
     clone_symbol.type=clone_type;
     clone_symbol.value=clone_body;
@@ -1053,9 +1054,10 @@ static void find_and_replace_parameters(
       find_and_replace_parameters(argument, replacement_parameters);
     }
   }
-  else if(is_java_generic_symbol_type(type))
+  else if(is_java_generic_struct_tag_type(type))
   {
-    java_generic_symbol_typet &generic_base = to_java_generic_symbol_type(type);
+    java_generic_struct_tag_typet &generic_base =
+      to_java_generic_struct_tag_type(type);
     std::vector<reference_typet> &gen_types = generic_base.generic_types();
     for(auto &gen_type : gen_types)
     {

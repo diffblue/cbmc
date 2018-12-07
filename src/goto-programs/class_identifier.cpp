@@ -55,7 +55,7 @@ static exprt build_class_identifier(
 /// \return Member expression to access a class identifier, as above.
 exprt get_class_identifier_field(
   const exprt &this_expr_in,
-  const symbol_typet &suggested_type,
+  const struct_tag_typet &suggested_type,
   const namespacet &ns)
 {
   // Get a pointer from which we can extract a clsid.
@@ -82,7 +82,7 @@ exprt get_class_identifier_field(
 void set_class_identifier(
   struct_exprt &expr,
   const namespacet &ns,
-  const symbol_typet &class_type)
+  const struct_tag_typet &class_type)
 {
   const struct_typet &struct_type=to_struct_type(ns.follow(expr.type()));
   const struct_typet::componentst &components=struct_type.components();

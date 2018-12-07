@@ -36,8 +36,8 @@ Date:   April 2017
 static irep_idt get_tag(const typet &type)
 {
   /// \todo Use follow instead of assuming tag to symbol relationship.
-  if(type.id() == ID_symbol_type)
-    return to_symbol_type(type).get_identifier();
+  if(type.id() == ID_struct_tag)
+    return to_struct_tag_type(type).get_identifier();
   else if(type.id() == ID_struct)
     return irep_idt("java::" + id2string(to_struct_type(type).get_tag()));
   else
@@ -214,7 +214,8 @@ void java_string_library_preprocesst::add_string_type(
   string_type.components().resize(3);
   string_type.components()[0].set_name("@java.lang.Object");
   string_type.components()[0].set_pretty_name("@java.lang.Object");
-  string_type.components()[0].type()=symbol_typet("java::java.lang.Object");
+  string_type.components()[0].type() =
+    struct_tag_typet("java::java.lang.Object");
   string_type.components()[1].set_name("length");
   string_type.components()[1].set_pretty_name("length");
   string_type.components()[1].type()=string_length_type();
@@ -222,11 +223,11 @@ void java_string_library_preprocesst::add_string_type(
   string_type.components()[2].set_pretty_name("data");
   string_type.components()[2].type() = pointer_type(java_char_type());
   string_type.set_access(ID_public);
-  string_type.add_base(symbol_typet("java::java.lang.Object"));
+  string_type.add_base(struct_tag_typet("java::java.lang.Object"));
 
   std::vector<irep_idt> bases = get_string_type_base_classes(class_name);
   for(const irep_idt &base_name : bases)
-    string_type.add_base(symbol_typet("java::" + id2string(base_name)));
+    string_type.add_base(struct_tag_typet("java::" + id2string(base_name)));
 
   symbolt tmp_string_symbol;
   tmp_string_symbol.name="java::"+id2string(class_name);
@@ -383,12 +384,12 @@ java_string_library_preprocesst::process_equals_function_operands(
 static const typet &
 get_data_type(const typet &type, const symbol_tablet &symbol_table)
 {
-  PRECONDITION(type.id() == ID_struct || type.id() == ID_symbol_type);
-  if(type.id() == ID_symbol_type)
+  PRECONDITION(type.id() == ID_struct || type.id() == ID_struct_tag);
+  if(type.id() == ID_struct_tag)
   {
     const symbolt &sym =
-      symbol_table.lookup_ref(to_symbol_type(type).get_identifier());
-    CHECK_RETURN(sym.type.id() != ID_symbol_type);
+      symbol_table.lookup_ref(to_struct_tag_type(type).get_identifier());
+    CHECK_RETURN(sym.type.id() != ID_struct_tag);
     return get_data_type(sym.type, symbol_table);
   }
   // else type id is ID_struct
@@ -403,12 +404,12 @@ get_data_type(const typet &type, const symbol_tablet &symbol_table)
 static const typet &
 get_length_type(const typet &type, const symbol_tablet &symbol_table)
 {
-  PRECONDITION(type.id() == ID_struct || type.id() == ID_symbol_type);
-  if(type.id() == ID_symbol_type)
+  PRECONDITION(type.id() == ID_struct || type.id() == ID_struct_tag);
+  if(type.id() == ID_struct_tag)
   {
     const symbolt &sym =
-      symbol_table.lookup_ref(to_symbol_type(type).get_identifier());
-    CHECK_RETURN(sym.type.id() != ID_symbol_type);
+      symbol_table.lookup_ref(to_struct_tag_type(type).get_identifier());
+    CHECK_RETURN(sym.type.id() != ID_struct_tag);
     return get_length_type(sym.type, symbol_table);
   }
   // else type id is ID_struct
@@ -881,9 +882,11 @@ void java_string_library_preprocesst::code_assign_java_string_to_string_expr(
   PRECONDITION(implements_java_char_sequence_pointer(rhs.type()));
 
   typet deref_type;
-  if(rhs.type().subtype().id() == ID_symbol_type)
-    deref_type=symbol_table.lookup_ref(
-      to_symbol_type(rhs.type().subtype()).get_identifier()).type;
+  if(rhs.type().subtype().id() == ID_struct_tag)
+    deref_type =
+      symbol_table
+        .lookup_ref(to_struct_tag_type(rhs.type().subtype()).get_identifier())
+        .type;
   else
     deref_type=rhs.type().subtype();
 
@@ -1180,48 +1183,48 @@ java_string_library_preprocesst::get_primitive_value_of_object(
   symbol_table_baset &symbol_table,
   code_blockt &code)
 {
-  optionalt<symbol_typet> object_type;
+  optionalt<struct_tag_typet> object_type;
 
   typet value_type;
   if(type_name==ID_boolean)
   {
     value_type=java_boolean_type();
-    object_type=symbol_typet("java::java.lang.Boolean");
+    object_type = struct_tag_typet("java::java.lang.Boolean");
   }
   else if(type_name==ID_char)
   {
     value_type=java_char_type();
-    object_type=symbol_typet("java::java.lang.Character");
+    object_type = struct_tag_typet("java::java.lang.Character");
   }
   else if(type_name==ID_byte)
   {
     value_type=java_byte_type();
-    object_type=symbol_typet("java::java.lang.Byte");
+    object_type = struct_tag_typet("java::java.lang.Byte");
   }
   else if(type_name==ID_short)
   {
     value_type=java_short_type();
-    object_type=symbol_typet("java::java.lang.Short");
+    object_type = struct_tag_typet("java::java.lang.Short");
   }
   else if(type_name==ID_int)
   {
     value_type=java_int_type();
-    object_type=symbol_typet("java::java.lang.Integer");
+    object_type = struct_tag_typet("java::java.lang.Integer");
   }
   else if(type_name==ID_long)
   {
     value_type=java_long_type();
-    object_type=symbol_typet("java::java.lang.Long");
+    object_type = struct_tag_typet("java::java.lang.Long");
   }
   else if(type_name==ID_float)
   {
     value_type=java_float_type();
-    object_type=symbol_typet("java::java.lang.Float");
+    object_type = struct_tag_typet("java::java.lang.Float");
   }
   else if(type_name==ID_double)
   {
     value_type=java_double_type();
-    object_type=symbol_typet("java::java.lang.Double");
+    object_type = struct_tag_typet("java::java.lang.Double");
   }
   else if(type_name==ID_void)
     return {};
@@ -1381,8 +1384,8 @@ struct_exprt java_string_library_preprocesst::make_argument_for_format(
 
     if(name=="string_expr")
     {
-      pointer_typet string_pointer=
-        java_reference_type(symbol_typet("java::java.lang.String"));
+      pointer_typet string_pointer =
+        java_reference_type(struct_tag_typet("java::java.lang.String"));
       typecast_exprt arg_i_as_string(arg_i, string_pointer);
       code_assign_java_string_to_string_expr(
         to_string_expr(field_expr),

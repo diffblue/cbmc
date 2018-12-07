@@ -140,7 +140,7 @@ bool require_java_generic_type_argument_expectation(
   case require_type::type_argument_kindt::Inst:
   {
     REQUIRE(!is_java_generic_parameter(type_argument));
-    REQUIRE(type_argument.subtype() == symbol_typet(expected.description));
+    REQUIRE(type_argument.subtype() == struct_tag_typet(expected.description));
     return true;
   }
   }
@@ -227,7 +227,7 @@ java_generic_parametert require_type::require_java_generic_parameter(
 /// \return The value passed in the first argument
 const typet &require_type::require_java_non_generic_type(
   const typet &type,
-  const optionalt<symbol_typet> &expect_subtype)
+  const optionalt<struct_tag_typet> &expect_subtype)
 {
   REQUIRE(!is_java_generic_parameter(type));
   REQUIRE(!is_java_generic_type(type));
@@ -447,11 +447,11 @@ require_type::require_complete_java_non_generic_class(const typet &class_type)
 /// \param type: The type to check
 /// \param identifier: The identifier the symbol type should have
 /// \return The cast version of the input type
-const symbol_typet &
-require_type::require_symbol(const typet &type, const irep_idt &identifier)
+const struct_tag_typet &
+require_type::require_struct_tag(const typet &type, const irep_idt &identifier)
 {
-  REQUIRE(type.id() == ID_symbol_type);
-  const symbol_typet &result = to_symbol_type(type);
+  REQUIRE(type.id() == ID_struct_tag);
+  const struct_tag_typet &result = to_struct_tag_type(type);
   if(identifier != "")
   {
     REQUIRE(result.get_identifier() == identifier);
@@ -462,21 +462,22 @@ require_type::require_symbol(const typet &type, const irep_idt &identifier)
 /// Verify a given type is a java generic symbol type
 /// \param type: The type to check
 /// \param identifier: The identifier to match
-/// \return The type, cast to a java_generic_symbol_typet
-java_generic_symbol_typet require_type::require_java_generic_symbol_type(
+/// \return The type, cast to a java_generic_struct_tag_typet
+java_generic_struct_tag_typet
+require_type::require_java_generic_struct_tag_type(
   const typet &type,
   const std::string &identifier)
 {
-  symbol_typet symbol_type = require_symbol(type, identifier);
-  REQUIRE(is_java_generic_symbol_type(type));
-  return to_java_generic_symbol_type(type);
+  struct_tag_typet struct_tag_type = require_struct_tag(type, identifier);
+  REQUIRE(is_java_generic_struct_tag_type(type));
+  return to_java_generic_struct_tag_type(type);
 }
 
 /// Verify a given type is a java generic symbol type, checking
 /// that it's associated type arguments match a given set of identifiers.
 /// Expected usage is something like this:
 ///
-/// require_java_generic_symbol_type(type, "java::Generic",
+/// require_java_generic_struct_tag_type(type, "java::Generic",
 ///   {{require_type::type_argument_kindt::Inst, "java::java.lang.Integer"},
 ///    {require_type::type_argument_kindt::Var, "T"}})
 ///
@@ -484,14 +485,15 @@ java_generic_symbol_typet require_type::require_java_generic_symbol_type(
 /// \param identifier: The identifier to match
 /// \param type_expectations: A set of type argument kinds and identifiers
 ///  which should be expected as the type arguments of the given generic type
-/// \return The given type, cast to a java_generic_symbol_typet
-java_generic_symbol_typet require_type::require_java_generic_symbol_type(
+/// \return The given type, cast to a java_generic_struct_tag_typet
+java_generic_struct_tag_typet
+require_type::require_java_generic_struct_tag_type(
   const typet &type,
   const std::string &identifier,
   const require_type::expected_type_argumentst &type_expectations)
 {
-  const java_generic_symbol_typet &generic_base_type =
-    require_java_generic_symbol_type(type, identifier);
+  const java_generic_struct_tag_typet &generic_base_type =
+    require_java_generic_struct_tag_type(type, identifier);
 
   const java_generic_typet::generic_type_argumentst &generic_type_arguments =
     generic_base_type.generic_types();

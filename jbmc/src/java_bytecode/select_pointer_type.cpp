@@ -82,10 +82,10 @@ pointer_typet select_pointer_typet::specialize_generics(
     visited_nodes.erase(parameter_name);
     return returned_type;
   }
-  else if(pointer_type.subtype().id() == ID_symbol_type)
+  else if(pointer_type.subtype().id() == ID_struct_tag)
   {
     // if the pointer is an array, recursively specialize its element type
-    const symbol_typet &array_subtype = to_symbol_type(pointer_type.subtype());
+    const auto &array_subtype = to_struct_tag_type(pointer_type.subtype());
     if(is_java_array_tag(array_subtype.get_identifier()))
     {
       const typet &array_element_type = java_array_element_type(array_subtype);
@@ -208,7 +208,8 @@ select_pointer_typet::get_recursively_instantiated_type(
   return inst_val;
 }
 
-std::set<symbol_typet> select_pointer_typet::get_parameter_alternative_types(
+std::set<struct_tag_typet>
+select_pointer_typet::get_parameter_alternative_types(
   const irep_idt &function_name,
   const irep_idt &parameter_name,
   const namespacet &) const

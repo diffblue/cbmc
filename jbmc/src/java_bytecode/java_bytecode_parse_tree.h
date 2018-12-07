@@ -117,7 +117,7 @@ struct java_bytecode_parse_treet
       std::size_t start_pc;
       std::size_t end_pc;
       std::size_t handler_pc;
-      symbol_typet catch_type;
+      struct_tag_typet catch_type;
     };
 
     typedef std::vector<exceptiont> exception_tablet;

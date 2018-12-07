@@ -36,8 +36,8 @@ bool is_char_type(const typet &type)
 
 bool is_char_array_type(const typet &type, const namespacet &ns)
 {
-  if(type.id() == ID_symbol_type)
-    return is_char_array_type(ns.follow(type), ns);
+  if(type.id() == ID_struct_tag)
+    return is_char_array_type(ns.follow_tag(to_struct_tag_type(type)), ns);
   return type.id() == ID_array && is_char_type(type.subtype());
 }
 

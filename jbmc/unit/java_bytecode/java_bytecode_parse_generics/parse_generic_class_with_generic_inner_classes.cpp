@@ -37,7 +37,7 @@ SCENARIO(
         require_type::require_component(java_generic_class, "field");
 
       require_type::require_pointer(
-        field_component.type(), symbol_typet(class_prefix + "$InnerClass"));
+        field_component.type(), struct_tag_typet(class_prefix + "$InnerClass"));
 
       THEN("The pointer should be generic")
       {
@@ -56,7 +56,7 @@ SCENARIO(
 
       require_type::require_pointer(
         field_component.type(),
-        symbol_typet(class_prefix + "$GenericInnerClass"));
+        struct_tag_typet(class_prefix + "$GenericInnerClass"));
 
       THEN("The pointer should be generic")
       {
@@ -78,7 +78,7 @@ SCENARIO(
 
       require_type::require_pointer(
         field_component.type(),
-        symbol_typet(class_prefix + "$GenericInnerClass"));
+        struct_tag_typet(class_prefix + "$GenericInnerClass"));
 
       THEN("The pointer should be generic")
       {
@@ -98,7 +98,7 @@ SCENARIO(
 
       require_type::require_pointer(
         field_component.type(),
-        symbol_typet(
+        struct_tag_typet(
           class_prefix + "$GenericInnerClass$DoublyNestedInnerClass"));
 
       THEN("The pointer should be generic")
@@ -121,7 +121,7 @@ SCENARIO(
 
       require_type::require_pointer(
         field_component.type(),
-        symbol_typet(
+        struct_tag_typet(
           class_prefix + "$GenericInnerClass$DoublyNestedInnerClass"));
 
       THEN("The pointer should be generic")
@@ -142,7 +142,7 @@ SCENARIO(
 
       require_type::require_pointer(
         field_component.type(),
-        symbol_typet(
+        struct_tag_typet(
           class_prefix + "$GenericInnerClass$DoublyNestedInnerGenericClass"));
 
       THEN("The pointer should be generic")
@@ -167,7 +167,7 @@ SCENARIO(
 
       require_type::require_pointer(
         field_component.type(),
-        symbol_typet(
+        struct_tag_typet(
           class_prefix + "$GenericInnerClass$DoublyNestedInnerGenericClass"));
 
       THEN("The pointer should be generic")
@@ -189,7 +189,7 @@ SCENARIO(
 
       require_type::require_pointer(
         field_component.type(),
-        symbol_typet(class_prefix + "$TwoParamInnerClass"));
+        struct_tag_typet(class_prefix + "$TwoParamInnerClass"));
 
       THEN("The pointer should be generic")
       {
@@ -213,7 +213,7 @@ SCENARIO(
 
       require_type::require_pointer(
         field_component.type(),
-        symbol_typet(class_prefix + "$TwoParamInnerClass"));
+        struct_tag_typet(class_prefix + "$TwoParamInnerClass"));
 
       THEN("The pointer should be generic")
       {
@@ -237,7 +237,7 @@ SCENARIO(
 
       require_type::require_pointer(
         field_component.type(),
-        symbol_typet(class_prefix + "$TwoParamInnerClass"));
+        struct_tag_typet(class_prefix + "$TwoParamInnerClass"));
 
       THEN("The pointer should be generic")
       {
@@ -263,7 +263,7 @@ SCENARIO(
 
       require_type::require_pointer(
         field_component.type(),
-        symbol_typet(
+        struct_tag_typet(
           class_prefix + "$GenericInnerClass$DoublyNestedInnerGenericClass"));
 
       THEN("The pointer should be GenericClassWithGenericInnerClasses")
@@ -324,7 +324,7 @@ SCENARIO(
       const auto &param_type =
         require_type::require_parameter(function_call, "input");
       require_type::require_pointer(
-        param_type.type(), symbol_typet(class_prefix + "$InnerClass"));
+        param_type.type(), struct_tag_typet(class_prefix + "$InnerClass"));
       require_type::require_java_generic_type(
         param_type.type(),
         {{require_type::type_argument_kindt::Var, class_prefix + "::T"}});
@@ -353,7 +353,7 @@ SCENARIO(
       const auto &param_type =
         require_type::require_parameter(function_call, "input");
       require_type::require_pointer(
-        param_type.type(), symbol_typet(class_prefix + "$InnerClass"));
+        param_type.type(), struct_tag_typet(class_prefix + "$InnerClass"));
       require_type::require_java_generic_type(
         param_type.type(),
         {{require_type::type_argument_kindt::Var, class_prefix + "::T"}});
@@ -361,7 +361,7 @@ SCENARIO(
       const auto &param_type2 =
         require_type::require_parameter(function_call, "input2");
       require_type::require_pointer(
-        param_type2.type(), symbol_typet(class_prefix + "$InnerClass"));
+        param_type2.type(), struct_tag_typet(class_prefix + "$InnerClass"));
       require_type::require_java_generic_type(
         param_type2.type(),
         {{require_type::type_argument_kindt::Var, class_prefix + "::T"}});
@@ -389,7 +389,8 @@ SCENARIO(
       const auto &param_type =
         require_type::require_parameter(function_call, "input");
       require_type::require_pointer(
-        param_type.type(), symbol_typet(class_prefix + "$GenericInnerClass"));
+        param_type.type(),
+        struct_tag_typet(class_prefix + "$GenericInnerClass"));
       require_type::require_java_generic_type(
         param_type.type(),
         {{require_type::type_argument_kindt::Var,
@@ -420,7 +421,8 @@ SCENARIO(
       const auto &param_type =
         require_type::require_parameter(function_call, "input");
       require_type::require_pointer(
-        param_type.type(), symbol_typet(class_prefix + "$GenericInnerClass"));
+        param_type.type(),
+        struct_tag_typet(class_prefix + "$GenericInnerClass"));
       require_type::require_java_generic_type(
         param_type.type(),
         {{require_type::type_argument_kindt::Var, class_prefix + "::T"},
@@ -451,7 +453,7 @@ SCENARIO(
         require_type::require_parameter(function_call, "input");
       require_type::require_pointer(
         param_type.type(),
-        symbol_typet(
+        struct_tag_typet(
           class_prefix + "$GenericInnerClass$DoublyNestedInnerClass"));
       require_type::require_java_generic_type(
         param_type.type(),
@@ -485,7 +487,7 @@ SCENARIO(
         require_type::require_parameter(function_call, "input");
       require_type::require_pointer(
         param_type.type(),
-        symbol_typet(
+        struct_tag_typet(
           class_prefix + "$GenericInnerClass$DoublyNestedInnerClass"));
       require_type::require_java_generic_type(
         param_type.type(),
@@ -517,7 +519,7 @@ SCENARIO(
         require_type::require_parameter(function_call, "input");
       require_type::require_pointer(
         param_type.type(),
-        symbol_typet(
+        struct_tag_typet(
           class_prefix + "$GenericInnerClass$DoublyNestedInnerGenericClass"));
       require_type::require_java_generic_type(
         param_type.type(),
@@ -553,7 +555,7 @@ SCENARIO(
         require_type::require_parameter(function_call, "input");
       require_type::require_pointer(
         param_type.type(),
-        symbol_typet(
+        struct_tag_typet(
           class_prefix + "$GenericInnerClass$DoublyNestedInnerGenericClass"));
       require_type::require_java_generic_type(
         param_type.type(),
@@ -584,7 +586,8 @@ SCENARIO(
       const auto &param_type =
         require_type::require_parameter(function_call, "input");
       require_type::require_pointer(
-        param_type.type(), symbol_typet(class_prefix + "$TwoParamInnerClass"));
+        param_type.type(),
+        struct_tag_typet(class_prefix + "$TwoParamInnerClass"));
       require_type::require_java_generic_type(
         param_type.type(),
         {{require_type::type_argument_kindt::Var,
@@ -617,7 +620,8 @@ SCENARIO(
       const auto &param_type =
         require_type::require_parameter(function_call, "input");
       require_type::require_pointer(
-        param_type.type(), symbol_typet(class_prefix + "$TwoParamInnerClass"));
+        param_type.type(),
+        struct_tag_typet(class_prefix + "$TwoParamInnerClass"));
       require_type::require_java_generic_type(
         param_type.type(),
         {{require_type::type_argument_kindt::Var,
@@ -650,7 +654,8 @@ SCENARIO(
       const auto &param_type =
         require_type::require_parameter(function_call, "input");
       require_type::require_pointer(
-        param_type.type(), symbol_typet(class_prefix + "$TwoParamInnerClass"));
+        param_type.type(),
+        struct_tag_typet(class_prefix + "$TwoParamInnerClass"));
       require_type::require_java_generic_type(
         param_type.type(),
         {{require_type::type_argument_kindt::Var, class_prefix + "::T"},
@@ -679,7 +684,7 @@ SCENARIO(
     {
       require_type::require_pointer(
         function_call.return_type(),
-        symbol_typet(class_prefix + "$InnerClass"));
+        struct_tag_typet(class_prefix + "$InnerClass"));
       require_type::require_java_generic_type(
         function_call.return_type(),
         {{require_type::type_argument_kindt::Var, class_prefix + "::T"}});
@@ -706,7 +711,7 @@ SCENARIO(
     {
       require_type::require_pointer(
         function_call.return_type(),
-        symbol_typet(class_prefix + "$GenericInnerClass"));
+        struct_tag_typet(class_prefix + "$GenericInnerClass"));
       require_type::require_java_generic_type(
         function_call.return_type(),
         {{require_type::type_argument_kindt::Var,
@@ -736,7 +741,7 @@ SCENARIO(
     {
       require_type::require_pointer(
         function_call.return_type(),
-        symbol_typet(class_prefix + "$GenericInnerClass"));
+        struct_tag_typet(class_prefix + "$GenericInnerClass"));
       require_type::require_java_generic_type(
         function_call.return_type(),
         {{require_type::type_argument_kindt::Var, class_prefix + "::T"},
@@ -765,7 +770,7 @@ SCENARIO(
     {
       require_type::require_pointer(
         function_call.return_type(),
-        symbol_typet(
+        struct_tag_typet(
           class_prefix + "$GenericInnerClass$DoublyNestedInnerClass"));
       require_type::require_java_generic_type(
         function_call.return_type(),
@@ -797,7 +802,7 @@ SCENARIO(
     {
       require_type::require_pointer(
         function_call.return_type(),
-        symbol_typet(
+        struct_tag_typet(
           class_prefix + "$GenericInnerClass$DoublyNestedInnerClass"));
       require_type::require_java_generic_type(
         function_call.return_type(),
@@ -827,7 +832,7 @@ SCENARIO(
     {
       require_type::require_pointer(
         function_call.return_type(),
-        symbol_typet(
+        struct_tag_typet(
           class_prefix + "$GenericInnerClass$DoublyNestedInnerGenericClass"));
       require_type::require_java_generic_type(
         function_call.return_type(),
@@ -861,7 +866,7 @@ SCENARIO(
     {
       require_type::require_pointer(
         function_call.return_type(),
-        symbol_typet(
+        struct_tag_typet(
           class_prefix + "$GenericInnerClass$DoublyNestedInnerGenericClass"));
       require_type::require_java_generic_type(
         function_call.return_type(),
@@ -892,7 +897,7 @@ SCENARIO(
     {
       require_type::require_pointer(
         function_call.return_type(),
-        symbol_typet(class_prefix + "$TwoParamInnerClass"));
+        struct_tag_typet(class_prefix + "$TwoParamInnerClass"));
       require_type::require_java_generic_type(
         function_call.return_type(),
         {{require_type::type_argument_kindt::Var,
@@ -924,7 +929,7 @@ SCENARIO(
     {
       require_type::require_pointer(
         function_call.return_type(),
-        symbol_typet(class_prefix + "$TwoParamInnerClass"));
+        struct_tag_typet(class_prefix + "$TwoParamInnerClass"));
       require_type::require_java_generic_type(
         function_call.return_type(),
         {{require_type::type_argument_kindt::Var,
@@ -956,7 +961,7 @@ SCENARIO(
     {
       require_type::require_pointer(
         function_call.return_type(),
-        symbol_typet(class_prefix + "$TwoParamInnerClass"));
+        struct_tag_typet(class_prefix + "$TwoParamInnerClass"));
       require_type::require_java_generic_type(
         function_call.return_type(),
         {{require_type::type_argument_kindt::Var, class_prefix + "::T"},

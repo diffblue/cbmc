@@ -340,7 +340,7 @@ const irep_idt &require_goto_statements::require_struct_component_assignment(
     {
       REQUIRE(component_assignment_rhs.type().id() == ID_pointer);
       REQUIRE(
-        to_symbol_type(
+        to_struct_tag_type(
           to_pointer_type(component_assignment_rhs.type()).subtype())
           .get(ID_identifier) == typecast_name.value());
     }
@@ -423,7 +423,8 @@ require_goto_statements::require_struct_array_component_assignment(
   // Check the type we are casting to matches the array type
   REQUIRE(component_assignment_rhs.type().id() == ID_pointer);
   REQUIRE(
-    to_symbol_type(to_pointer_type(component_assignment_rhs.type()).subtype())
+    to_struct_tag_type(
+      to_pointer_type(component_assignment_rhs.type()).subtype())
       .get(ID_identifier) == array_type_name);
 
   // Get the tmp_object name and find assignments to it, there should be only
