@@ -23,7 +23,6 @@
 /src/solvers/miniBDD @tautschnig @kroening
 /src/solvers/prop @martin-cs @kroening @tautschnig @peterschrammel
 /src/solvers/sat @martin-cs @kroening @tautschnig @peterschrammel
-/src/solvers/smt2 @martin-cs @tautschnig @peterschrammel
 /jbmc/src/miniz/ @smowton @mgudemann @peterschrammel
 
 
@@ -47,6 +46,7 @@
 /jbmc/src/janalyzer/ @smowton @mgudemann @cristina-david @cesaro @pkesseli @peterschrammel
 /jbmc/src/jdiff/ @smowton @mgudemann @cristina-david @cesaro @pkesseli @peterschrammel
 /src/cpp/ @kroening @tautschnig @peterschrammel
+/src/solvers/smt2 @kroening @martin-cs @tautschnig @peterschrammel @allredj @romainbrenguier
 
 
 # These files change frequently and changes are low-risk
