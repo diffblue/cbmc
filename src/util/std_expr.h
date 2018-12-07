@@ -973,20 +973,30 @@ template<> inline bool can_cast_expr<binary_relation_exprt>(const exprt &base)
 class multi_ary_exprt:public exprt
 {
 public:
-  DEPRECATED("use multi_ary_exprt(id, type) instead")
+  DEPRECATED("use multi_ary_exprt(id, op, type) instead")
   multi_ary_exprt()
   {
   }
 
-  DEPRECATED("use multi_ary_exprt(id, type) instead")
+  DEPRECATED("use multi_ary_exprt(id, op, type) instead")
   explicit multi_ary_exprt(const irep_idt &_id):exprt(_id)
+  {
+  }
+
+  DEPRECATED("use multi_ary_exprt(id, op, type) instead")
+  multi_ary_exprt(
+    const irep_idt &_id,
+    const typet &_type):exprt(_id, _type)
   {
   }
 
   multi_ary_exprt(
     const irep_idt &_id,
-    const typet &_type):exprt(_id, _type)
+    operandst &&_operands,
+    const typet &_type)
+    : exprt(_id, _type)
   {
+    operands() = std::move(_operands);
   }
 
   multi_ary_exprt(
