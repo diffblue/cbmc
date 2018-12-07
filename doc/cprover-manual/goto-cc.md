@@ -3,13 +3,13 @@
 ## Integration into Build Systems with goto-cc
 
 Existing software projects usually do not come in a single source file
-that may simply be passed to a model checker. They rather come in a
+that may simply be passed to a model checker. Rather, they come in a
 multitude of source files in different directories and refer to external
 libraries and system-wide options. A *build system* then collects the
 configuration options from the system and compiles the software
 according to build rules.
 
-The most prevalent build tool on Unix (-based) systems surely is the
+The most prevalent build tool on Unix-based systems is the
 `make` utility. This tool uses build rules given in a *Makefile* that
 comes with the software sources. Running software verification tools on
 projects like these is greatly simplified by a compiler that first
@@ -29,12 +29,12 @@ This example assumes a Unix-like machine.
 1.  Download the sources of wu-ftpd from
     [here](ftp://ftp.wu-ftpd.org/pub/wu-ftpd/wu-ftpd-current.tar.gz).
 
-2.  Unpack the sources by running ` tar xfz wu-ftpd-current.tar.gz`
+2.  Unpack the sources by running ` tar xfz wu-ftpd-current.tar.gz`.
 
-3.  Change to the source directory, by entering, e.g.,
-    `cd wu-ftpd-2.6.2`
+3.  Change to the source directory, for example by entering,
+    `cd wu-ftpd-2.6.2`.
 
-4.  Configure the project for verification by running
+4.  Configure the project for verification by running:
 
     `./configure YACC=byacc CC=goto-cc --host=none-none-none`
 
@@ -42,7 +42,7 @@ This example assumes a Unix-like machine.
     files in the `src` directory. Among them is a model for the main
     executable `ftpd`.
 
-6.  Run a model-checker, e.g., CBMC, on the model file:
+6.  Run a model-checker, for example CBMC, on the model file:
 
         `cbmc src/ftpd`
 
@@ -52,8 +52,8 @@ This example assumes a Unix-like machine.
 
 More elaborate build or configuration scripts often make use of features
 of the compiler or the system library to detect configuration options
-automatically, e.g., in a `configure` script. Replacing `gcc` by goto-cc
-at this stage may confuse the script, or detect wrong options. For
+automatically, for example, in a `configure` script. Replacing `gcc` by goto-cc
+at this stage may confuse the script, or detect incorrect options. For
 example, missing library functions do not cause goto-cc to throw an
 error (only to issue a warning). Because of this, configuration scripts
 sometimes falsely assume the availability of a system function or
@@ -61,11 +61,11 @@ library.
 
 In the case of this or similar problems, it is more advisable to
 configure the project using the normal routine, and replacing the
-compiler setting manually in the generated Makefiles, e.g., by replacing
+compiler setting manually in the generated Makefiles, for example, by replacing
 lines like `CC=gcc` by `CC=goto-cc`.
 
 A helpful command that accomplishes this task successfully for many
-projects is the following:
+projects is:
 
 ```plaintext
 for i in `find . -name Makefile`; do   sed -e 's/^\(\s*CC[ \t]*=\)\(.*$\)/\1goto-cc/g' -i $i done
@@ -81,7 +81,7 @@ is \ref man_instrumentation-vs "here".
 
 ### Linking Libraries
 
-Some software projects come with their own libraries; also, the goal may
+Some software projects come with their own libraries. Also, the goal may
 be to analyze a library by itself. For this purpose it is possible to
 use goto-cc to link multiple model files into a library of model files.
 An object file can then be linked against this model library. For this
@@ -103,16 +103,16 @@ The behavior of a C/C++ program depends on a number of parameters that
 are specific to the architecture the program was compiled for. The three
 most important architectural parameters are:
 
--   The width of the various scalar types; e.g., compare the value of
+-   The width of the various scalar types; for example, compare the value of
     `sizeof(long int)` on various machines.
--   The width of pointers; e.g., compare the value of `sizeof(int *)` on
+-   The width of pointers; for example, compare the value of `sizeof(int *)` on
     various machines.
 -   The [endianness](http://en.wikipedia.org/wiki/Endianness) of
     the architecture.
 
 In general, the CPROVER tools attempt to adopt the settings of the
 particular architecture the tool itself was compiled for. For example,
-when running a 64 bit binary of CBMC on Linux, the program will be
+when running a 64-bit binary of CBMC on Linux, the program will be
 processed assuming that `sizeof(long int)==8`.
 
 As a consequence of these architectural parameters, you may observe
@@ -126,7 +126,7 @@ following command-line arguments can be passed to the CPROVER tools:
     `--big-endian`.
 
 When using a goto binary, CBMC and the other tools read the
-configuration from the binary, i.e., the setting when running goto-cc is
+configuration from the binary. The setting when running goto-cc is
 the one that matters; the option given to the model checker is ignored
 in this case.
 
@@ -161,4 +161,3 @@ int main() {
   assert(0);
 }
 ```
-
