@@ -4,8 +4,8 @@
 
 ### Iteration-based Unwinding
 
-The basic idea of CBMC is to model the computation of the programs up to
-a particular depth. Technically, this is achieved by a process that
+The basic idea of CBMC is to model a program's execution up to a
+bounded number of steps. Technically, this is achieved by a process that
 essentially amounts to *unwinding loops*. This concept is best
 illustrated with a generic example:
 
@@ -47,7 +47,7 @@ The construction above is meant to produce a program that is trace
 equivalent with the original programs for those traces that contain up
 to five iterations of the loop.
 
-In many cases, CBMC is able to automatically determine an upper bound on
+In many cases, CBMC is able to determine automatically an upper bound on
 the number of loop iterations. This may even work when the number of
 loop unwindings is not constant. Consider the following example:
 
@@ -83,12 +83,12 @@ requires a limit of 101, and not 100.
 
 The setting given with `--unwind` is used globally, that is, for all
 loops in the program. In order to set individual limits for the loops,
-first use
+first use:
 
     --show-loops
 
 to obtain a list of all loops in the program. Then identify the loops
-you need to set a separate bound for, and note their loop ID. Then use
+you need to set a separate bound for, and note their loop ID. Then use:
 
     --unwindset L:B,L:B,...
 
@@ -138,8 +138,7 @@ execution time](http://en.wikipedia.org/wiki/Worst-case_execution_time)
 (WCET).
 
 In some cases, it is desirable to cut off very deep loops in favor of
-code that follows the loop. As an example, consider the following
-program:
+code that follows the loop. As an example, consider this program:
 
 ```C
 int main() {
@@ -159,18 +158,18 @@ to the later assertion, use the option
 This option will allow paths that execute loops only partially, enabling
 a counterexample for the assertion above even for small unwinding
 bounds. The disadvantage of using this option is that the resulting path
-may be spurious, i.e., may not exist in the original program.
+may be spurious, that is, it may not exist in the original program.
 
 ### Depth-based Unwinding
 
 The loop-based unwinding bound is not always appropriate. In particular,
 it is often difficult to control the size of the generated formula when
-using the `--unwind` option. The option
+using the `--unwind` option. The option:
 
     --depth nr
 
 specifies an unwinding bound in terms of the number of instructions that
-are executed on a given path, irrespectively of the number of loop
+are executed on a given path, irrespective of the number of loop
 iterations. Note that CBMC uses the number of instructions in the
 control-flow graph as the criterion, not the number of instructions in
 the source code.
