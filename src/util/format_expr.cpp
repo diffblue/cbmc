@@ -174,7 +174,9 @@ static std::ostream &format_rec(std::ostream &os, const constant_exprt &src)
     else
       return os << src.pretty();
   }
-  else if(type == ID_unsignedbv || type == ID_signedbv || type == ID_c_bool)
+  else if(
+    type == ID_unsignedbv || type == ID_signedbv || type == ID_c_bool ||
+    type == ID_c_bit_field)
     return os << *numeric_cast<mp_integer>(src);
   else if(type == ID_integer)
     return os << src.get_value();

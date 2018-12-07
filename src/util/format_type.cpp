@@ -83,6 +83,9 @@ std::ostream &format_rec(std::ostream &os, const typet &type)
     return os << "signedbv[" << to_signedbv_type(type).get_width() << ']';
   else if(id == ID_unsignedbv)
     return os << "unsignedbv[" << to_unsignedbv_type(type).get_width() << ']';
+  else if(id == ID_c_bit_field)
+    return os << "c_bit_field<" << format(to_c_bit_field_type(type).subtype())
+              << '>';
   else if(id == ID_floatbv)
     return os << "floatbv[" << to_floatbv_type(type).get_width() << ']';
   else if(id == ID_c_bool)
