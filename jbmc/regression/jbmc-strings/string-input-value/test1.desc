@@ -1,0 +1,11 @@
+CORE
+Test.class
+--verbosity 10 --string-input-value fo --string-input-value barr --function Test.checkStringInputValue --string-input-value "" --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
+^EXIT=10$
+^SIGNAL=0$
+assertion.1.*FAILURE
+assertion.2.*SUCCESS
+assertion.3.*SUCCESS
+assertion.4.*FAILURE
+assertion.5.*FAILURE
+assertion.6.*SUCCESS
