@@ -37,6 +37,10 @@ void object_factory_parameterst::set(const optionst &options)
   {
     string_printable = options.get_bool_option("string-printable");
   }
+  if(options.is_set("string-input-value"))
+  {
+    string_input_values = options.get_list_option("string-input-value");
+  }
   if(options.is_set("min-nondet-string-length"))
   {
     min_nondet_string_length =

@@ -259,6 +259,18 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("string-printable", true);
   }
 
+  if(cmdline.isset("string-input-value"))
+  {
+    if(cmdline.isset("no-refine-strings"))
+    {
+      warning() << "--string-input-value ignored due to --no-refine-strings"
+                << eom;
+    }
+    options.set_option(
+      "string-input-value",
+      cmdline.get_values("string-input-value"));
+  }
+
   if(
     cmdline.isset("no-refine-strings") &&
     cmdline.isset("max-nondet-string-length"))
