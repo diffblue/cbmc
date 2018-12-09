@@ -564,7 +564,7 @@ static mp_integer max_value(const typet &type)
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 /// Unit tests in `unit/java_bytecode/java_object_factory/` ensure
 /// it is the case.
-bool initialize_nondet_string_fields(
+void initialize_nondet_string_fields(
   struct_exprt &struct_expr,
   code_blockt &code,
   const std::size_t &min_nondet_string_length,
@@ -574,11 +574,9 @@ bool initialize_nondet_string_fields(
   symbol_table_baset &symbol_table,
   bool printable)
 {
-  if(!java_string_library_preprocesst::implements_java_char_sequence(
-       struct_expr.type()))
-  {
-    return false;
-  }
+  PRECONDITION(
+    java_string_library_preprocesst
+      ::implements_java_char_sequence(struct_expr.type()));
 
   namespacet ns(symbol_table);
 
@@ -589,8 +587,8 @@ bool initialize_nondet_string_fields(
   // (typically when string refinement is not activated), `struct_type`
   // just contains the standard Object fields (or may have some other model
   // entirely), and in particular has no length and data fields.
-  if(!struct_type.has_component("length") || !struct_type.has_component("data"))
-    return false;
+  PRECONDITION(
+    struct_type.has_component("length") && struct_type.has_component("data"));
 
   // We allow type StringBuffer and StringBuilder to be initialized
   // in the same way has String, because they have the same structure and
@@ -657,8 +655,6 @@ bool initialize_nondet_string_fields(
     add_character_set_constraint(
       array_pointer, length_expr, " -~", symbol_table, loc, code);
   }
-
-  return true;
 }
 
 /// Initializes a pointer \p expr of type \p pointer_type to a primitive-typed
@@ -1009,6 +1005,12 @@ void java_object_factoryt::gen_nondet_struct_init(
   {
     class_identifier = struct_tag;
 
+    const bool is_char_sequence =
+      java_string_library_preprocesst
+        ::implements_java_char_sequence(struct_type);
+    const bool has_length_and_data =
+      struct_type.has_component("length") && struct_type.has_component("data");
+
     // Add an initial all-zero write. Most of the fields of this will be
     // overwritten, but it helps to have a whole-structure write that analysis
     // passes can easily recognise leaves no uninitialised state behind.
@@ -1022,16 +1024,21 @@ void java_object_factoryt::gen_nondet_struct_init(
 
     // If the initialised type is a special-cased String type (one with length
     // and data fields introduced by string-library preprocessing), initialise
-    // those fields with nondet values:
-    skip_special_string_fields = initialize_nondet_string_fields(
-      to_struct_expr(*initial_object),
-      assignments,
-      object_factory_parameters.min_nondet_string_length,
-      object_factory_parameters.max_nondet_string_length,
-      loc,
-      object_factory_parameters.function_id,
-      symbol_table,
-      object_factory_parameters.string_printable);
+    // those fields with nondet values
+    if(is_char_sequence && has_length_and_data)
+    {
+      skip_special_string_fields = true;
+
+      initialize_nondet_string_fields(
+        to_struct_expr(*initial_object),
+        assignments,
+        object_factory_parameters.min_nondet_string_length,
+        object_factory_parameters.max_nondet_string_length,
+        loc,
+        object_factory_parameters.function_id,
+        symbol_table,
+        object_factory_parameters.string_printable);
+    }
 
     assignments.add(code_assignt(expr, *initial_object));
   }
