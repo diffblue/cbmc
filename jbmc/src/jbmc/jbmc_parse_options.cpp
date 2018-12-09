@@ -250,11 +250,13 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("refine-strings", false);
 
   if(cmdline.isset("string-printable"))
-    options.set_option("string-printable", true);
-
-  if(cmdline.isset("no-refine-strings") && cmdline.isset("string-printable"))
   {
-    warning() << "--string-printable ignored due to --no-refine-strings" << eom;
+    if(cmdline.isset("no-refine-strings"))
+    {
+      warning() << "--string-printable ignored due to --no-refine-strings"
+                << eom;
+    }
+    options.set_option("string-printable", true);
   }
 
   if(
