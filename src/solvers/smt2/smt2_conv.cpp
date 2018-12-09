@@ -325,7 +325,7 @@ constant_exprt smt2_convt::parse_literal(
           type.id()==ID_floatbv)
   {
     std::size_t width=boolbv_width(type);
-    return constant_exprt(integer2binary(value, width), type);
+    return constant_exprt(integer2bvrep(value, width), type);
   }
   else if(type.id()==ID_integer ||
           type.id()==ID_range)
@@ -2776,11 +2776,8 @@ void smt2_convt::convert_constant(const constant_exprt &expr)
     else
     {
       // produce corresponding bit-vector
-      ieee_float_spect spec(floatbv_type);
-
-      mp_integer v=binary2integer(
-        id2string(expr.get_value()), false);
-
+      const ieee_float_spect spec(floatbv_type);
+      const mp_integer v = bvrep2integer(expr.get_value(), spec.width(), false);
       out << "(_ bv" << v << " " << spec.width() << ")";
     }
   }
