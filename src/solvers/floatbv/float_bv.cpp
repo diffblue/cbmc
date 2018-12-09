@@ -105,7 +105,7 @@ exprt float_bvt::abs(const exprt &op, const ieee_float_spect &spec)
   // we mask away the sign bit, which is the most significant bit
   const mp_integer v = power(2, spec.width() - 1) - 1;
 
-  constant_exprt mask(integer2bvrep(v, spec.width()), op.type());
+  const constant_exprt mask(integer2bvrep(v, spec.width()), op.type());
 
   return bitand_exprt(op, mask);
 }
