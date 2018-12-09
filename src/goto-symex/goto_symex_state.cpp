@@ -765,6 +765,12 @@ void goto_symex_statet::get_l1_name(exprt &expr) const
 /// \param out: stream to write to
 void goto_symex_statet::print_backtrace(std::ostream &out) const
 {
+  if(threads[source.thread_nr].call_stack.empty())
+  {
+    out << "No stack!\n";
+    return;
+  }
+
   out << source.pc->function << " " << source.pc->location_number << "\n";
 
   for(auto stackit = threads[source.thread_nr].call_stack.rbegin(),
