@@ -410,15 +410,21 @@ void goto_symext::locality(
     // save old L1 name for popping the frame
     const auto c_it = state.level1.current_names.find(l0_name);
 
-    if(c_it!=state.level1.current_names.end())
+    if(c_it != state.level1.current_names.end())
+    {
       frame.old_level1[l0_name]=c_it->second;
+      c_it->second = std::make_pair(ssa, frame_nr);
+    }
+    else
+    {
+      state.level1.current_names.emplace(
+        l0_name, std::make_pair(ssa, frame_nr));
+    }
 
     // do L1 renaming -- these need not be unique, as
     // identifiers may be shared among functions
     // (e.g., due to inlining or other code restructuring)
 
-    state.level1.current_names[l0_name]=
-      std::make_pair(ssa, frame_nr);
     state.rename(ssa, ns, goto_symex_statet::L1);
 
     irep_idt l1_name=ssa.get_identifier();
