@@ -38,10 +38,9 @@ struct symex_renaming_levelt
   }
 
   /// Increase the counter corresponding to an identifier
-  void increase_counter(const irep_idt &identifier)
+  static void increase_counter(const current_namest::iterator &it)
   {
-    PRECONDITION(current_names.find(identifier) != current_names.end());
-    ++current_names[identifier].second;
+    ++it->second.second;
   }
 
   /// Add the \c ssa_exprt of current_names to vars
