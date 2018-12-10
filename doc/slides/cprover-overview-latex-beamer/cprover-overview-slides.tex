@@ -105,8 +105,7 @@
   \node[rectangle,fill=tachameleon!25!white] (solvers) [right of=engine4,xshift=2cm,yshift=-0.5cm]
    {\begin{tikzpicture}[node distance=0.75cm]
     \node[rectangle,fill=tachameleon!50!white] (sat)                { SAT };
-    \node[rectangle,fill=tachameleon!50!white] (smt1) [below of=sat] { SMT1 };
-    \node[rectangle,fill=tachameleon!50!white] (smt2) [below of=smt1] { SMT2 };
+    \node[rectangle,fill=tachameleon!50!white] (smt2) [below of=sat] { SMT2 };
     \node (decproc) [below of=smt2] { \tiny decision procedure };
     \end{tikzpicture}};
 
