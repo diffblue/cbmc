@@ -52,7 +52,7 @@ void goto_symext::symex_dead(statet &state)
   state.propagation.erase(l1_identifier);
 
   // L2 renaming
-  if(state.level2.current_names.find(l1_identifier)!=
-     state.level2.current_names.end())
-    state.level2.increase_counter(l1_identifier);
+  auto level2_it = state.level2.current_names.find(l1_identifier);
+  if(level2_it != state.level2.current_names.end())
+    symex_renaming_levelt::increase_counter(level2_it);
 }
