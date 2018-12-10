@@ -33,15 +33,11 @@ different decision procedures, roughly one per directory.
   including calling the conversions in `floatbv` as necessary. Is
   implemented as a simple conversion (with caching) and then a
   post-processing function that adds extra constraints. This is not used
-  by the SMT or CVC back-ends.
+  by the SMT2 back-ends.
 
 * dplib/:   Provides the `dplib_dect` object which used the decision
   procedure library from “Decision Procedures : An Algorithmic Point of
   View”.
-
-* cvc/:   Provides the `cvc_dect` type which interfaces to the old (pre
-  SMTLib) input format for the CVC family of solvers.  This format is
-  still supported by depreciated in favour of SMTLib 2.
 
 * smt1/:   Provides the `smt1_dect` type which converts the formulae to
   SMTLib version 1 and then invokes one of Boolector, CVC3, OpenSMT,

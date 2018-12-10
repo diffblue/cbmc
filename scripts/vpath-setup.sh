@@ -60,7 +60,7 @@ perl -p -i -e 's/^(irep_ids.cpp:)/#$1/' $DEST/src/util/Makefile
 # create sub-directories
 mkdir -p $DEST/src/ansi-c/library $DEST/src/ansi-c/literals
 mkdir -p $DEST/src/goto-instrument/{accelerate,wmm}
-mkdir -p $DEST/src/solvers/{cvc,flattening,floatbv,miniBDD,prop,qbf,refinement,sat,smt1,smt2}
+mkdir -p $DEST/src/solvers/{flattening,floatbv,miniBDD,prop,qbf,refinement,sat,smt1,smt2}
 
 # copy generated files for coverage reports
 for f in \
