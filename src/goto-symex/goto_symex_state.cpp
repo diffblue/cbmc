@@ -17,6 +17,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/base_exceptions.h>
 #include <util/exception_utils.h>
 #include <util/expr_util.h>
+#include <util/format.h>
+#include <util/format_expr.h>
 #include <util/invariant.h>
 #include <util/prefix.h>
 #include <util/std_expr.h>
@@ -784,5 +786,16 @@ void goto_symex_statet::print_backtrace(std::ostream &out) const
       out << frame.calling_location.pc->function << " "
           << frame.calling_location.pc->location_number << "\n";
     }
+  }
+}
+
+/// Print the constant propagation map in a human-friendly format.
+/// This is primarily for use from the debugger; please don't delete me just
+/// because there aren't any current callers.
+void goto_symex_statet::output_propagation_map(std::ostream &out)
+{
+  for(const auto &name_value : propagation)
+  {
+    out << name_value.first << " <- " << format(name_value.second) << "\n";
   }
 }

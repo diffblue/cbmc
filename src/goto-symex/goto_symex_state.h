@@ -67,6 +67,7 @@ public:
 
   // Map L1 names to (L2) constants
   std::map<irep_idt, exprt> propagation;
+  void output_propagation_map(std::ostream &);
 
   enum levelt { L0=0, L1=1, L2=2 };
 
