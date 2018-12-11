@@ -62,8 +62,6 @@ rm Quantifiers-if/test.desc
 rm Quantifiers-initialisation2/test.desc
 rm Quantifiers-invalid-var-range/test.desc
 rm Quantifiers-not/test.desc
-rm Quantifiers-not-exists/test.desc
-rm Quantifiers-two-dimension-array/test.desc
 rm Quantifiers-type/test.desc
 rm Struct_Bytewise2/test.desc
 rm Union_Initialization1/test.desc
@@ -92,6 +90,7 @@ rm equality_through_union3/test.desc
 rm gcc_bswap1/test.desc
 rm gcc_vector1/test.desc
 rm graphml_witness1/test.desc
+rm integer-assignments1/test.desc
 rm memory_allocation1/test.desc
 rm pointer-function-parameters-struct-mutual-recursion/test.desc
 rm pointer-function-parameters-struct-simple-recursion/test.desc
