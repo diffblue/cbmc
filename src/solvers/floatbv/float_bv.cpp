@@ -103,10 +103,9 @@ ieee_float_spect float_bvt::get_spec(const exprt &expr)
 exprt float_bvt::abs(const exprt &op, const ieee_float_spect &spec)
 {
   // we mask away the sign bit, which is the most significant bit
-  std::string mask_str(spec.width(), '1');
-  mask_str[0]='0';
+  const mp_integer v = power(2, spec.width() - 1) - 1;
 
-  constant_exprt mask(mask_str, op.type());
+  const constant_exprt mask(integer2bvrep(v, spec.width()), op.type());
 
   return bitand_exprt(op, mask);
 }
@@ -114,10 +113,9 @@ exprt float_bvt::abs(const exprt &op, const ieee_float_spect &spec)
 exprt float_bvt::negation(const exprt &op, const ieee_float_spect &spec)
 {
   // we flip the sign bit with an xor
-  std::string mask_str(spec.width(), '0');
-  mask_str[0]='1';
+  const mp_integer v = power(2, spec.width() - 1);
 
-  constant_exprt mask(mask_str, op.type());
+  constant_exprt mask(integer2bvrep(v, spec.width()), op.type());
 
   return bitxor_exprt(op, mask);
 }
@@ -150,10 +148,9 @@ exprt float_bvt::is_zero(const exprt &src)
   const floatbv_typet &type=to_floatbv_type(src.type());
   std::size_t width=type.get_width();
 
-  std::string mask_str(width, '1');
-  mask_str[0]='0';
+  const mp_integer v = power(2, width - 1) - 1;
 
-  constant_exprt mask(mask_str, src.type());
+  constant_exprt mask(integer2bvrep(v, width), src.type());
 
   ieee_floatt z(type);
   z.make_zero();
