@@ -157,28 +157,44 @@ static void static_verifier_text(
 static void static_verifier_console(
   const std::vector<static_verifier_resultt> &results,
   const namespacet &ns,
-  messaget &m,
-  std::ostream &out)
+  messaget &m)
 {
   irep_idt last_function_id;
+  irep_idt function_file;
 
   for(const auto &result : results)
   {
     if(last_function_id != result.function_id)
     {
       if(!last_function_id.empty())
-        out << '\n';
+        m.status() << '\n';
       last_function_id = result.function_id;
       const auto &symbol = ns.lookup(last_function_id);
-      out << "******** Function " << symbol.display_name() << '\n';
+      m.status() << messaget::underline << "Function " << symbol.display_name();
+      function_file = symbol.location.get_file();
+      if(!function_file.empty())
+        m.status() << ' ' << function_file;
+      if(!symbol.location.get_line().empty())
+        m.status() << ':' << symbol.location.get_line();
+      m.status() << messaget::reset << messaget::eom;
     }
 
-    m.result() << '[' << result.source_location.get_property_id() << ']' << ' ';
+    m.result() << messaget::faint << '['
+               << result.source_location.get_property_id() << ']'
+               << messaget::reset;
 
-    m.result() << result.source_location;
+    if(
+      !result.source_location.get_file().empty() &&
+      result.source_location.get_file() != function_file)
+    {
+      m.result() << " file " << result.source_location.get_file();
+    }
+
+    if(!result.source_location.get_line().empty())
+      m.result() << " line " << result.source_location.get_line();
 
     if(!result.source_location.get_comment().empty())
-      m.result() << ", " << result.source_location.get_comment();
+      m.result() << ' ' << result.source_location.get_comment();
 
     m.result() << ": ";
 
@@ -203,6 +219,9 @@ static void static_verifier_console(
 
     m.result() << messaget::eom;
   }
+
+  if(!results.empty())
+    m.result() << '\n';
 }
 
 /// Runs the analyzer and then prints out the domain
@@ -290,7 +309,7 @@ bool static_verifier(
   }
   else
   {
-    static_verifier_console(results, ns, m, out);
+    static_verifier_console(results, ns, m);
   }
 
   m.status() << m.bold << "Summary: "

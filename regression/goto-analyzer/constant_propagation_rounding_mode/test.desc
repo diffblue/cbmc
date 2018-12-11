@@ -3,7 +3,7 @@ main.c
 --constants --verify
 ^EXIT=0$
 ^SIGNAL=0$
-^\[main.assertion.1\] file main.c line 9 function main, assertion rounded_up - 0.1f >= 0: SUCCESS
-^\[main.assertion.2\] file main.c line 10 function main, assertion rounded_down - 0.1f < 0: SUCCESS
+^\[main.assertion.1\] line 9 assertion rounded_up - 0.1f >= 0: SUCCESS
+^\[main.assertion.2\] line 10 assertion rounded_down - 0.1f < 0: SUCCESS
 --
 ^warning: ignoring

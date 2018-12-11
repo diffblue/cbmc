@@ -1,8 +1,8 @@
 CORE
 main.c
---intervals --verify
+--intervals
 ^EXIT=0$
 ^SIGNAL=0$
-^\[main.assertion.1\] file main.c line 11 function main, assertion j\s*<\s*52: UNKNOWN$
+^\[main.assertion.1\] line 11 assertion j\s*<\s*52: UNKNOWN$
 --
 ^warning: ignoring
