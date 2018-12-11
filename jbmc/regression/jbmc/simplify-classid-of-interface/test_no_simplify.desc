@@ -1,0 +1,14 @@
+CORE
+Test.class
+--function Test.main --no-simplify --unwind 10
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+^Passing problem to
+--
+^warning: ignoring
+--
+This is just to check the "Passing problem to" line is printed when the solver
+is invoked -- the real test (test.desc) depends on that to check that its test
+code was analysed entirely by goto-symex. If the output format changes this test
+should notice that.

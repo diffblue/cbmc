@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "namespace.h"
 #include "pointer_offset_size.h"
 #include "std_expr.h"
+#include "type_eq.h"
 
 bool simplify_exprt::simplify_member(exprt &expr)
 {
@@ -239,6 +240,37 @@ bool simplify_exprt::simplify_member(exprt &expr)
       expr.op0() = op.op0();
       simplify_member(expr);
       return false;
+    }
+
+    // Try to translate into an equivalent member (perhaps nested) of the type
+    // being cast (for example, this might turn ((struct A)x).field1 into
+    // x.substruct.othersubstruct.field2, if field1 and field2 have the same
+    // type and offset with respect to x.
+    if(op_type.id() == ID_struct)
+    {
+      optionalt<mp_integer> requested_offset =
+        member_offset(to_struct_type(op_type), component_name, ns);
+      if(requested_offset.has_value())
+      {
+        exprt equivalent_member = get_subexpression_at_offset(
+          op.op0(), *requested_offset, expr.type(), ns);
+
+        // Guess: turning this into a byte-extract operation is not really an
+        // optimisation.
+        // The type_eq check is because get_subexpression_at_offset uses
+        // base_type_eq, whereas in the context of a simplifier we should not
+        // change the type of the expression.
+        if(
+          equivalent_member.is_not_nil() &&
+          equivalent_member.id() != ID_byte_extract_little_endian &&
+          equivalent_member.id() != ID_byte_extract_big_endian &&
+          type_eq(equivalent_member.type(), expr.type(), ns))
+        {
+          expr = equivalent_member;
+          simplify_rec(expr);
+          return false;
+        }
+      }
     }
   }
   else if(op.id()==ID_if)
