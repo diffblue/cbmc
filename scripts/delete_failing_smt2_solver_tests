@@ -87,8 +87,6 @@ rm equality_through_struct_containing_arrays2/test.desc
 rm equality_through_union1/test.desc
 rm equality_through_union2/test.desc
 rm equality_through_union3/test.desc
-rm gcc_bswap1/test.desc
-rm gcc_vector1/test.desc
 rm graphml_witness1/test.desc
 rm integer-assignments1/test.desc
 rm memory_allocation1/test.desc

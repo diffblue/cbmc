@@ -11,6 +11,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "smt2_format.h"
 
 #include <util/arith_tools.h>
+#include <util/range.h>
+
+#include <numeric>
 
 smt2_parsert::tokent smt2_parsert::next_token()
 {
@@ -612,15 +615,17 @@ exprt smt2_parsert::function_application()
       }
       else if(id=="concat")
       {
-        if(op.size()!=2)
-          throw error("concat takes two operands");
+        // add the widths
+        auto op_width = make_range(op).map([](const exprt &o) {
+          return to_unsignedbv_type(o.type()).get_width();
+        });
 
-        auto width0=to_unsignedbv_type(op[0].type()).get_width();
-        auto width1=to_unsignedbv_type(op[1].type()).get_width();
+        const std::size_t total_width =
+          std::accumulate(op_width.begin(), op_width.end(), 0);
 
-        unsignedbv_typet t(width0+width1);
+        const unsignedbv_typet t(total_width);
 
-        return binary_exprt(op[0], ID_concatenation, op[1], t);
+        return concatenation_exprt(std::move(op), t);
       }
       else if(id=="distinct")
       {
