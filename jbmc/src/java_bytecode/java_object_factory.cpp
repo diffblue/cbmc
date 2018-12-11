@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/expr_initializer.h>
 #include <util/fresh_symbol.h>
 #include <util/nondet_bool.h>
+#include <util/nondet.h>
 #include <util/pointer_offset_size.h>
 
 #include <goto-programs/class_identifier.h>
@@ -18,6 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "generic_parameter_specialization_map_keys.h"
 #include "java_root_class.h"
+#include "java_string_literals.h"
 
 class java_object_factoryt
 {
@@ -526,9 +528,11 @@ static mp_integer max_value(const typet &type)
   UNREACHABLE;
 }
 
-/// Check if a structure is a nondeterministic String structure, and if it is
-/// initialize its length and data fields.
-/// \param struct_expr [out]: struct that we may initialize
+/// Initialise length and data fields for a nondeterministic String structure.
+///
+/// If the structure is not a nondeterministic structure, the call results in
+/// a precondition violation.
+/// \param struct_expr [out]: struct that we initialize
 /// \param code: block to add pre-requisite declarations (e.g. to allocate a
 ///   data array)
 /// \param min_nondet_string_length: minimum length of strings to initialize
@@ -538,9 +542,6 @@ static mp_integer max_value(const typet &type)
 /// \param symbol_table: the symbol table
 /// \param printable: if true, the nondet string must consist of printable
 ///   characters only
-/// \return true if struct_expr's length and data fields have been set up,
-///         false if we took no action because struct_expr wasn't a CharSequence
-///         or didn't have the necessary fields.
 ///
 /// The code produced is of the form:
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -564,7 +565,7 @@ static mp_integer max_value(const typet &type)
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 /// Unit tests in `unit/java_bytecode/java_object_factory/` ensure
 /// it is the case.
-bool initialize_nondet_string_fields(
+void initialize_nondet_string_fields(
   struct_exprt &struct_expr,
   code_blockt &code,
   const std::size_t &min_nondet_string_length,
@@ -574,11 +575,9 @@ bool initialize_nondet_string_fields(
   symbol_table_baset &symbol_table,
   bool printable)
 {
-  if(!java_string_library_preprocesst::implements_java_char_sequence(
-       struct_expr.type()))
-  {
-    return false;
-  }
+  PRECONDITION(
+    java_string_library_preprocesst
+      ::implements_java_char_sequence(struct_expr.type()));
 
   namespacet ns(symbol_table);
 
@@ -589,8 +588,8 @@ bool initialize_nondet_string_fields(
   // (typically when string refinement is not activated), `struct_type`
   // just contains the standard Object fields (or may have some other model
   // entirely), and in particular has no length and data fields.
-  if(!struct_type.has_component("length") || !struct_type.has_component("data"))
-    return false;
+  PRECONDITION(
+    struct_type.has_component("length") && struct_type.has_component("data"));
 
   // We allow type StringBuffer and StringBuilder to be initialized
   // in the same way has String, because they have the same structure and
@@ -657,8 +656,6 @@ bool initialize_nondet_string_fields(
     add_character_set_constraint(
       array_pointer, length_expr, " -~", symbol_table, loc, code);
   }
-
-  return true;
 }
 
 /// Initializes a pointer \p expr of type \p pointer_type to a primitive-typed
@@ -943,6 +940,33 @@ symbol_exprt java_object_factoryt::gen_nondet_subtype_pointer_init(
   return new_symbol.symbol_expr();
 }
 
+/// Creates an alternate_casest vector in which each item contains an
+/// assignment of a string from \p string_input_values (or more precisely the
+/// literal symbol corresponding to the string) to \p expr.
+/// \param expr:
+///   Struct-typed lvalue expression to which we want to assign the strings.
+/// \param string_input_values:
+///   Strings to assign.
+/// \param symbol_table:
+///   The symbol table in which we'll lool up literal symbol
+/// \return A vector that can be passed to generate_nondet_switch
+alternate_casest get_string_input_values_code(
+  const exprt &expr,
+  const std::list<std::string> &string_input_values,
+  symbol_table_baset &symbol_table)
+{
+  alternate_casest cases;
+  for(const auto &val : string_input_values)
+  {
+    exprt name_literal(ID_java_string_literal);
+    name_literal.set(ID_value, val);
+    const symbol_exprt s =
+      get_or_create_string_literal_symbol(name_literal, symbol_table, true);
+    cases.push_back(code_assignt(expr, s));
+  }
+  return cases;
+}
+
 /// Initializes an object tree rooted at `expr`, allocating child objects as
 /// necessary and nondet-initializes their members, or if MUST_UPDATE_IN_PLACE
 /// is set, re-initializes already-allocated objects.
@@ -1009,31 +1033,67 @@ void java_object_factoryt::gen_nondet_struct_init(
   {
     class_identifier = struct_tag;
 
-    // Add an initial all-zero write. Most of the fields of this will be
-    // overwritten, but it helps to have a whole-structure write that analysis
-    // passes can easily recognise leaves no uninitialised state behind.
+    const bool is_char_sequence =
+      java_string_library_preprocesst
+        ::implements_java_char_sequence(struct_type);
+    const bool has_length_and_data =
+      struct_type.has_component("length") && struct_type.has_component("data");
+    const bool has_string_input_values =
+      !object_factory_parameters.string_input_values.empty();
 
-    // This code mirrors the `remove_java_new` pass:
-    auto initial_object = zero_initializer(struct_type, source_locationt(), ns);
-    CHECK_RETURN(initial_object.has_value());
-    irep_idt qualified_clsid = "java::" + id2string(class_identifier);
-    set_class_identifier(
-      to_struct_expr(*initial_object), ns, struct_tag_typet(qualified_clsid));
+    if(is_char_sequence && has_length_and_data && has_string_input_values)
+    { // We're dealing with a string and we should set fixed input values.
+      skip_special_string_fields = true;
 
-    // If the initialised type is a special-cased String type (one with length
-    // and data fields introduced by string-library preprocessing), initialise
-    // those fields with nondet values:
-    skip_special_string_fields = initialize_nondet_string_fields(
-      to_struct_expr(*initial_object),
-      assignments,
-      object_factory_parameters.min_nondet_string_length,
-      object_factory_parameters.max_nondet_string_length,
-      loc,
-      object_factory_parameters.function_id,
-      symbol_table,
-      object_factory_parameters.string_printable);
+      // We create a switch statement where each case is an assignment
+      // of one of the fixed input strings to the input variable in question
 
-    assignments.add(code_assignt(expr, *initial_object));
+      const alternate_casest cases =
+        get_string_input_values_code(
+          expr,
+          object_factory_parameters.string_input_values,
+          symbol_table);
+      assignments.add(generate_nondet_switch(
+        id2string(object_factory_parameters.function_id),
+        cases,
+        java_int_type(),
+        ID_java,
+        loc,
+        symbol_table));
+    }
+    else
+    {
+      // Add an initial all-zero write. Most of the fields of this will be
+      // overwritten, but it helps to have a whole-structure write that analysis
+      // passes can easily recognise leaves no uninitialised state behind.
+
+      // This code mirrors the `remove_java_new` pass:
+      auto initial_object =
+        zero_initializer(struct_type, source_locationt(), ns);
+      CHECK_RETURN(initial_object.has_value());
+      const irep_idt qualified_clsid = "java::" + id2string(class_identifier);
+      set_class_identifier(
+        to_struct_expr(*initial_object), ns, struct_tag_typet(qualified_clsid));
+
+      // If the initialised type is a special-cased String type (one with length
+      // and data fields introduced by string-library preprocessing), initialise
+      // those fields with nondet values
+      if(is_char_sequence && has_length_and_data)
+      { // We're dealing with a string
+        skip_special_string_fields = true;
+        initialize_nondet_string_fields(
+          to_struct_expr(*initial_object),
+          assignments,
+          object_factory_parameters.min_nondet_string_length,
+          object_factory_parameters.max_nondet_string_length,
+          loc,
+          object_factory_parameters.function_id,
+          symbol_table,
+          object_factory_parameters.string_printable);
+      }
+
+      assignments.add(code_assignt(expr, *initial_object));
+    }
   }
 
   for(const auto &component : components)
@@ -1061,8 +1121,7 @@ void java_object_factoryt::gen_nondet_struct_init(
     }
     else if(skip_special_string_fields && (name == "length" || name == "data"))
     {
-      // In this case these were set up by initialise_nondet_string_fields
-      // above.
+      // In this case these were set up above.
       continue;
     }
     else

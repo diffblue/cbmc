@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cstdint>
 #include <limits>
+#include <list>
 
 #include <util/irep.h>
 
@@ -68,6 +69,9 @@ struct object_factory_parameterst
 
   /// Force string content to be ASCII printable characters when set to true.
   bool string_printable = false;
+
+  /// Force one of finitely many explicitly given input strings
+  std::list<std::string> string_input_values;
 
   /// Function id, used as a prefix for identifiers of temporaries
   irep_idt function_id;

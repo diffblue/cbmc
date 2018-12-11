@@ -131,6 +131,21 @@ static void java_static_lifetime_init(
   code_blockt &code_block=to_code_block(to_code(initialize_symbol.value));
   object_factory_parameters.function_id = initialize_symbol.name;
 
+  // If there are strings given using --string-input-value, we need to add
+  // them to the symbol table now, so that they appear in __CPROVER_initialize
+  // and we can refer to them later when we initialize input values.
+  for(const auto &val : object_factory_parameters.string_input_values)
+  {
+    exprt my_literal(ID_java_string_literal);
+    my_literal.set(ID_value, val);
+    // We ignore the return value of the following call, we just need to
+    // make sure the string is in the symbol table.
+    get_or_create_string_literal_symbol(
+      my_literal,
+      symbol_table,
+      string_refinement_enabled);
+  }
+
   // We need to zero out all static variables, or nondet-initialize if they're
   // external. Iterate over a copy of the symtab, as its iterators are
   // invalidated by object_factory:
