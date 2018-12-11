@@ -29,8 +29,8 @@ SCENARIO("range tests", "[core][util][range]")
     }
     THEN("Use map to compute individual lengths")
     {
-      auto length_range = make_range(list).map<std::size_t>(
-        [](const std::string &s) { return s.length(); });
+      auto length_range =
+        make_range(list).map([](const std::string &s) { return s.length(); });
       auto it = length_range.begin();
       REQUIRE(*it == 3);
       ++it;
@@ -54,7 +54,7 @@ SCENARIO("range tests", "[core][util][range]")
       auto range =
         make_range(list)
           .filter([&](const std::string &s) -> bool { return s[0] == 'a'; })
-          .map<std::size_t>([&](const std::string &s) { return s.length(); });
+          .map([&](const std::string &s) { return s.length(); });
       // Note that everything is performed on the fly, so none of the filter
       // and map functions have been computed yet, and no intermediary container
       // is created.

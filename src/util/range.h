@@ -15,6 +15,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #define CPROVER_UTIL_RANGE_H
 
 #include <functional>
+#include <type_traits>
 
 #include <util/invariant.h>
 #include <util/make_unique.h>
@@ -300,13 +301,17 @@ public:
     return ranget<filter_iteratort<iteratort>>(filter_begin, filter_end);
   }
 
-  /// Template argument type `outputt` has to be specified when \p f is given as
-  /// a lambda.
-  template <typename outputt>
-  ranget<map_iteratort<iteratort, outputt>>
-  map(std::function<outputt(const value_typet &)> f)
+  /// The type of elements contained in the resulting range is deduced from the
+  /// return type of \p `f`.
+  template <typename functiont>
+  auto map(functiont &&f) -> ranget<map_iteratort<
+    iteratort,
+    typename std::result_of<functiont(value_typet)>::type>>
   {
-    auto shared_f = std::make_shared<decltype(f)>(std::move(f));
+    using outputt = typename std::result_of<functiont(value_typet)>::type;
+    auto shared_f = std::make_shared<
+      std::function<outputt(const typename iteratort::value_type &)>>(
+      std::forward<functiont>(f));
     auto map_begin =
       map_iteratort<iteratort, outputt>(begin(), end(), shared_f);
     auto map_end = map_iteratort<iteratort, outputt>(end(), end(), shared_f);

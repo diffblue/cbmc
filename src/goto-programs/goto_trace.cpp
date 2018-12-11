@@ -441,7 +441,7 @@ void show_compact_goto_trace(
 
       {
         auto arg_strings = make_range(step.function_arguments)
-                             .map<std::string>([&ns, &step](const exprt &arg) {
+                             .map([&ns, &step](const exprt &arg) {
                                return from_expr(ns, step.function, arg);
                              });
 
