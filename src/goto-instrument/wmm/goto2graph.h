@@ -125,11 +125,14 @@ protected:
       goto_programt::const_targett i_it);
     void inline visit_cfg_duplicate(goto_programt::const_targett targ,
       goto_programt::const_targett i_it);
-    void visit_cfg_assign(value_setst &value_sets, namespacet &ns,
-      goto_programt::instructionst::iterator &i_it, bool no_dependencies
-      #ifdef LOCAL_MAY
-      , local_may_aliast &local_may
-      #endif
+    void visit_cfg_assign(
+      value_setst &value_sets,
+      goto_programt::instructionst::iterator &i_it,
+      bool no_dependencies
+#ifdef LOCAL_MAY
+      ,
+      local_may_aliast &local_may
+#endif
     ); // NOLINT(whitespace/parens)
     void visit_cfg_fence(goto_programt::instructionst::iterator i_it);
     void visit_cfg_skip(goto_programt::instructionst::iterator i_it);

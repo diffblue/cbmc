@@ -155,9 +155,9 @@ void document_propertiest::get_code(
   dest="";
 
   const irep_idt &file=source_location.get_file();
-  const irep_idt &line=source_location.get_line();
+  const irep_idt &source_line = source_location.get_line();
 
-  if(file=="" || line=="")
+  if(file == "" || source_line == "")
     return;
 
   std::ifstream in(id2string(file));
@@ -170,7 +170,7 @@ void document_propertiest::get_code(
     return;
   }
 
-  int line_int=unsafe_string2int(id2string(line));
+  int line_int = unsafe_string2int(id2string(source_line));
 
   int line_start=line_int-3,
       line_end=line_int+3;

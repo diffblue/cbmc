@@ -222,8 +222,7 @@ void weak_memory(
   shared_buffers.cycles_r_loc = instrumenter.id2cycloc; // places in the cycles
 
   // for reads delays
-  shared_buffers.affected_by_delay(
-    goto_model.symbol_table, value_sets, goto_model.goto_functions);
+  shared_buffers.affected_by_delay(value_sets, goto_model.goto_functions);
 
   for(std::set<irep_idt>::iterator it=
     shared_buffers.affected_by_delay_set.begin();

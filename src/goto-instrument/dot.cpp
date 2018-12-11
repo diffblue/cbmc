@@ -264,8 +264,6 @@ void dott::output(std::ostream &out)
   out << "digraph G {\n";
   out << DOTGRAPHSETTINGS << '\n';
 
-  std::list<exprt> clusters;
-
   forall_goto_functions(it, goto_model.goto_functions)
     if(it->second.body_available())
       write_dot_subgraph(out, id2string(it->first), it->second.body);

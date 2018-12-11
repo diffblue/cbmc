@@ -120,14 +120,14 @@ void mutex_init_instrumentation(goto_modelt &goto_model)
 {
   // get pthread_mutex_lock
 
-  symbol_tablet::symbolst::const_iterator f_it=
+  symbol_tablet::symbolst::const_iterator lock_entry =
     goto_model.symbol_table.symbols.find("pthread_mutex_lock");
 
-  if(f_it==goto_model.symbol_table.symbols.end())
+  if(lock_entry == goto_model.symbol_table.symbols.end())
     return;
 
   // get type of lock argument
-  code_typet code_type=to_code_type(to_code_type(f_it->second.type));
+  code_typet code_type = to_code_type(to_code_type(lock_entry->second.type));
   if(code_type.parameters().size()!=1)
     return;
 

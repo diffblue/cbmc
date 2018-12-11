@@ -101,7 +101,6 @@ public:
 
   bool do_arrays(goto_programt::instructionst &loop_body,
                  std::map<exprt, polynomialt> &polynomials,
-                 exprt &loop_counter,
                  substitutiont &substitution,
                  scratch_programt &program);
   expr_pairst gather_array_assignments(
@@ -120,14 +119,12 @@ public:
   bool do_nonrecursive(
     goto_programt::instructionst &loop_body,
     std::map<exprt, polynomialt> &polynomials,
-    exprt &loop_counter,
     substitutiont &substitution,
     expr_sett &nonrecursive,
     scratch_programt &program);
   bool assign_array(
     const exprt &lhs,
     const exprt &rhs,
-    const exprt &loop_counter,
     scratch_programt &program);
 
   void gather_array_accesses(const exprt &expr, expr_sett &arrays);
@@ -157,8 +154,6 @@ public:
   const goto_functionst &goto_functions;
   exprt &loop_counter;
   nil_exprt nil;
-
-  static int num_symbols;
 };
 
 #endif // CPROVER_GOTO_INSTRUMENT_ACCELERATE_ACCELERATION_UTILS_H

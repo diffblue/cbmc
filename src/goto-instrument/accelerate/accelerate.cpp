@@ -183,15 +183,18 @@ void acceleratet::insert_accelerator(
   goto_programt::targett &loop_header,
   goto_programt::targett &back_jump,
   path_acceleratort &accelerator,
-  subsumed_patht &subsumed)
+  subsumed_patht &subsumed_path)
 {
   insert_looping_path(
-    loop_header, back_jump, accelerator.pure_accelerator, subsumed.accelerator);
+    loop_header,
+    back_jump,
+    accelerator.pure_accelerator,
+    subsumed_path.accelerator);
 
   if(!accelerator.overflow_path.instructions.empty())
   {
     insert_looping_path(
-      loop_header, back_jump, accelerator.overflow_path, subsumed.residue);
+      loop_header, back_jump, accelerator.overflow_path, subsumed_path.residue);
   }
 }
 

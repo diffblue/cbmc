@@ -184,7 +184,6 @@ public:
     goto_functionst &goto_functions);
 
   void affected_by_delay(
-    symbol_tablet &symbol_table,
     value_setst &value_sets,
     goto_functionst &goto_functions);
 

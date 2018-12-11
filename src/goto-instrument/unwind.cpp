@@ -57,9 +57,10 @@ void goto_unwindt::copy_segment(
   assert(goto_program.instructions.size()==target_vector.size());
 
   // adjust intra-segment gotos
-  for(std::size_t i=0; i<target_vector.size(); i++)
+  for(std::size_t target_index = 0; target_index < target_vector.size();
+      target_index++)
   {
-    goto_programt::targett t=target_vector[i];
+    goto_programt::targett t = target_vector[target_index];
 
     if(!t->is_goto())
       continue;

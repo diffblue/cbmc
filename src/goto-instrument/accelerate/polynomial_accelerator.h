@@ -133,7 +133,6 @@ protected:
   bool do_arrays(
     goto_programt::instructionst &loop_body,
     std::map<exprt, polynomialt> &polynomials,
-    exprt &loop_counter,
     substitutiont &substitution,
     scratch_programt &program);
   expr_pairst gather_array_assignments(

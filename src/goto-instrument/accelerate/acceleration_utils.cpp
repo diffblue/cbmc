@@ -556,7 +556,6 @@ acceleration_utilst::expr_pairst acceleration_utilst::gather_array_assignments(
 bool acceleration_utilst::do_arrays(
   goto_programt::instructionst &loop_body,
   std::map<exprt, polynomialt> &polynomials,
-  exprt &loop_counter,
   substitutiont &substitution,
   scratch_programt &program)
 {
@@ -881,7 +880,6 @@ bool acceleration_utilst::expr2poly(
 bool acceleration_utilst::do_nonrecursive(
   goto_programt::instructionst &body,
   std::map<exprt, polynomialt> &polynomials,
-  exprt &loop_counter,
   substitutiont &substitution,
   expr_sett &nonrecursive,
   scratch_programt &program)
@@ -1004,7 +1002,7 @@ bool acceleration_utilst::do_nonrecursive(
     const exprt &lhs=*it;
     const exprt &rhs=state[*it];
 
-    if(!assign_array(lhs, rhs, loop_counter, program))
+    if(!assign_array(lhs, rhs, program))
     {
 #ifdef DEBUG
       std::cout << "Failed to assign a nonrecursive array: " <<
@@ -1020,7 +1018,6 @@ bool acceleration_utilst::do_nonrecursive(
 bool acceleration_utilst::assign_array(
   const exprt &lhs,
   const exprt &rhs,
-  const exprt &loop_counter,
   scratch_programt &program)
 {
 #ifdef DEBUG
@@ -1245,12 +1242,8 @@ void acceleration_utilst::extract_polynomial(
       continue;
     }
 
-    for(expr_listt::iterator it=terms.begin();
-        it!=terms.end();
-        ++it)
+    for(const auto &term : terms)
     {
-      exprt term=*it;
-
       if(degrees.find(term)!=degrees.end())
       {
         degrees[term]++;
