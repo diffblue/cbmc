@@ -9,7 +9,6 @@ rm Empty_struct1/test.desc
 rm Endianness4/test.desc
 rm Endianness6/test.desc
 rm Endianness7/test.desc
-rm Fixedbv8/test.desc
 rm Float-div2/test.desc
 rm Float-div3/test.desc
 rm Float-no-simp1/test.desc
@@ -67,7 +66,6 @@ rm Quantifiers-not-exists/test.desc
 rm Quantifiers-two-dimension-array/test.desc
 rm Quantifiers-type/test.desc
 rm Struct_Bytewise2/test.desc
-rm Typecast1/test.desc
 rm Union_Initialization1/test.desc
 rm address_space_size_limit1/test.desc
 rm address_space_size_limit3/test.desc
