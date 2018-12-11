@@ -120,9 +120,7 @@ void ci_lazy_methods_neededt::initialize_instantiated_classes_from_pointer(
     for(const auto &generic_arg : generic_args)
     {
       if(!is_java_generic_parameter(generic_arg))
-      {
-        initialize_instantiated_classes_from_pointer(generic_arg, ns);
-      }
+        add_all_needed_classes(generic_arg);
     }
   }
 }
