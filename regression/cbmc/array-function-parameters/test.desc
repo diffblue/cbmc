@@ -1,0 +1,17 @@
+CORE
+test.c
+--function test --min-null-tree-depth 2 --max-nondet-tree-depth 2 --bounds-check
+\[test.assertion.1\] line \d+ assertion Test.lists\[0\]->next: SUCCESS
+\[test.assertion.2\] line \d+ assertion Test.lists\[1\]->next: SUCCESS
+\[test.assertion.3\] line \d+ assertion Test.lists\[2\]->next: SUCCESS
+\[test.assertion.4\] line \d+ assertion Test.lists\[3\]->next: SUCCESS
+\[test.assertion.5\] line \d+ assertion !Test.lists\[0\]->next->next: SUCCESS
+\[test.assertion.6\] line \d+ assertion !Test.lists\[1\]->next->next: SUCCESS
+\[test.assertion.7\] line \d+ assertion !Test.lists\[2\]->next->next: SUCCESS
+\[test.assertion.8\] line \d+ assertion !Test.lists\[3\]->next->next: SUCCESS
+\[test.assertion.9\] line \d+ assertion Test.lists\[0\] != Test.lists\[1\]: SUCCESS
+\[test.assertion.10\] line \d+ assertion Test.lists\[1\] != Test.lists\[2\]: SUCCESS
+\[test.assertion.11\] line \d+ assertion Test.lists\[2\] != Test.lists\[3\]: SUCCESS
+\[test.array_bounds.1\] line \d+ array `Test'.lists upper bound in Test.lists\[\(signed long int\)4\]: FAILURE
+\[test.assertion.12\] line \d+ assertion !Test.lists\[4\]: FAILURE
+--
