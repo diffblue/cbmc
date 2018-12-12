@@ -265,12 +265,14 @@ private:
     const exprt &lhs,
     const exprt &rhs_array,
     const exprt &rhs_length,
-    const symbol_table_baset &symbol_table);
+    const symbol_table_baset &symbol_table,
+    bool is_constructor);
 
   codet code_assign_string_expr_to_java_string(
     const exprt &lhs,
     const refined_string_exprt &rhs,
-    const symbol_table_baset &symbol_table);
+    const symbol_table_baset &symbol_table,
+    bool is_constructor);
 
   void code_assign_java_string_to_string_expr(
     const refined_string_exprt &lhs,
@@ -296,7 +298,7 @@ private:
     const java_method_typet &type,
     const source_locationt &loc,
     symbol_table_baset &symbol_table,
-    bool ignore_first_arg = true);
+    bool is_constructor = true);
 
   code_blockt make_assign_and_return_function_from_call(
     const irep_idt &function_name,

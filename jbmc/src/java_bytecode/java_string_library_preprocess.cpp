@@ -818,6 +818,9 @@ refined_string_exprt java_string_library_preprocesst::string_expr_of_function(
 /// \param rhs_array: pointer to the array to assign
 /// \param rhs_length: length of the array to assign
 /// \param symbol_table: symbol table
+/// \param is_constructor: the assignment happens in the context of a
+///   constructor, so the whole object should be initialised, not just its
+///   length and data fields.
 /// \return return the following code:
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 /// lhs = { {Object}, length=rhs_length, data=rhs_array }
@@ -826,30 +829,43 @@ codet java_string_library_preprocesst::code_assign_components_to_java_string(
   const exprt &lhs,
   const exprt &rhs_array,
   const exprt &rhs_length,
-  const symbol_table_baset &symbol_table)
+  const symbol_table_baset &symbol_table,
+  bool is_constructor)
 {
   PRECONDITION(implements_java_char_sequence_pointer(lhs.type()));
   dereference_exprt deref=checked_dereference(lhs, lhs.type().subtype());
 
-  // A String has a field Object with @clsid = String
-  const symbolt &jlo_symbol=*symbol_table.lookup("java::java.lang.Object");
-  const struct_typet &jlo_struct=to_struct_type(jlo_symbol.type);
-  struct_exprt jlo_init(jlo_struct);
-  irep_idt clsid = get_tag(lhs.type().subtype());
-  java_root_class_init(jlo_init, jlo_struct, clsid);
+  if(is_constructor)
+  {
+    // A String has a field Object with @clsid = String
+    const symbolt &jlo_symbol = *symbol_table.lookup("java::java.lang.Object");
+    const struct_typet &jlo_struct = to_struct_type(jlo_symbol.type);
+    struct_exprt jlo_init(jlo_struct);
+    irep_idt clsid = get_tag(lhs.type().subtype());
+    java_root_class_init(jlo_init, jlo_struct, clsid);
 
-  struct_exprt struct_rhs(deref.type());
-  struct_rhs.copy_to_operands(jlo_init);
-  struct_rhs.copy_to_operands(rhs_length);
-  struct_rhs.copy_to_operands(rhs_array);
-  return code_assignt(
-    checked_dereference(lhs, lhs.type().subtype()), struct_rhs);
+    struct_exprt struct_rhs(deref.type());
+    struct_rhs.copy_to_operands(jlo_init);
+    struct_rhs.copy_to_operands(rhs_length);
+    struct_rhs.copy_to_operands(rhs_array);
+    return code_assignt(
+      checked_dereference(lhs, lhs.type().subtype()), struct_rhs);
+  }
+  else
+  {
+    return code_blockt(
+      {code_assignt(get_length(deref, symbol_table), rhs_length),
+       code_assignt(get_data(deref, symbol_table), rhs_array)});
+  }
 }
 
 /// Produce code for an assignemnt of a string expr to a Java string.
 /// \param lhs: an expression representing a java string
 /// \param rhs: a string expression
 /// \param symbol_table: symbol table
+/// \param is_constructor: the assignment happens in the context of a
+///   constructor, so the whole object should be initialised, not just its
+///   length and data fields.
 /// \return return the following code:
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 /// lhs = { {Object}, length=rhs.length, data=rhs.data }
@@ -857,10 +873,11 @@ codet java_string_library_preprocesst::code_assign_components_to_java_string(
 codet java_string_library_preprocesst::code_assign_string_expr_to_java_string(
   const exprt &lhs,
   const refined_string_exprt &rhs,
-  const symbol_table_baset &symbol_table)
+  const symbol_table_baset &symbol_table,
+  bool is_constructor)
 {
   return code_assign_components_to_java_string(
-    lhs, rhs.content(), rhs.length(), symbol_table);
+    lhs, rhs.content(), rhs.length(), symbol_table, is_constructor);
 }
 
 /// \param lhs: a string expression
@@ -1044,14 +1061,14 @@ code_blockt java_string_library_preprocesst::make_float_to_string_code(
 
   // We do not check the condition of the first element in the list as it
   // will be reached only if all other conditions are not satisfied.
-  codet tmp_code=code_assign_string_expr_to_java_string(
-    str, string_expr_list[0], symbol_table);
+  codet tmp_code = code_assign_string_expr_to_java_string(
+    str, string_expr_list[0], symbol_table, true);
   for(std::size_t i=1; i<condition_list.size(); i++)
   {
     code_ifthenelset ife;
     ife.cond()=condition_list[i];
     ife.then_case() = code_assign_string_expr_to_java_string(
-      str, string_expr_list[i], symbol_table);
+      str, string_expr_list[i], symbol_table, true);
     ife.else_case()=tmp_code;
     tmp_code=ife;
   }
@@ -1067,9 +1084,8 @@ code_blockt java_string_library_preprocesst::make_float_to_string_code(
 /// \param type: the type of the function call
 /// \param loc: location in program
 /// \param symbol_table: the symbol table to populate
-/// \param ignore_first_arg: boolean flag telling that the first argument should
-///   not be part of the arguments of the call (but only used to be assigned the
-///   result)
+/// \param is_constructor: the function being made is a constructor, so the
+///   whole object should be initialised, not just its length and data fields.
 /// \return code for the `String.<init>(args)` function:
 ///
 ///     cprover_string_length = fun(arg).length;
@@ -1083,14 +1099,14 @@ code_blockt java_string_library_preprocesst::make_init_function_from_call(
   const java_method_typet &type,
   const source_locationt &loc,
   symbol_table_baset &symbol_table,
-  bool ignore_first_arg)
+  bool is_constructor)
 {
   java_method_typet::parameterst params = type.parameters();
 
   // The first parameter is the object to be initialized
   PRECONDITION(!params.empty());
   const symbol_exprt arg_this(params[0].get_identifier(), params[0].type());
-  if(ignore_first_arg)
+  if(is_constructor)
     params.erase(params.begin());
 
   // Holder for output code
@@ -1105,7 +1121,8 @@ code_blockt java_string_library_preprocesst::make_init_function_from_call(
 
   // arg_this <- string_expr
   code.add(
-    code_assign_string_expr_to_java_string(arg_this, string_expr, symbol_table),
+    code_assign_string_expr_to_java_string(
+      arg_this, string_expr, symbol_table, is_constructor),
     loc);
 
   return code;
@@ -1466,7 +1483,7 @@ code_blockt java_string_library_preprocesst::make_string_format_code(
     type.return_type(), loc, function_id, symbol_table, code);
   code.add(
     code_assign_string_expr_to_java_string(
-      java_string, string_expr, symbol_table),
+      java_string, string_expr, symbol_table, true),
     loc);
   code.add(code_returnt(java_string), loc);
   return code;
@@ -1535,7 +1552,8 @@ code_blockt java_string_library_preprocesst::make_object_get_class_code(
   exprt string1 = allocate_fresh_string(
     string_ptr_type, loc, function_id, symbol_table, code);
   code.add(
-    code_assign_string_expr_to_java_string(string1, string_expr1, symbol_table),
+    code_assign_string_expr_to_java_string(
+      string1, string_expr1, symbol_table, true),
     loc);
 
   // > class1 = Class.forName(string1)
@@ -1615,7 +1633,8 @@ java_string_library_preprocesst::make_string_returning_function_from_call(
   exprt str = allocate_fresh_string(
     type.return_type(), loc, function_name, symbol_table, code);
   code.add(
-    code_assign_string_expr_to_java_string(str, string_expr, symbol_table),
+    code_assign_string_expr_to_java_string(
+      str, string_expr, symbol_table, true),
     loc);
 
   // Return value
@@ -1659,7 +1678,8 @@ code_blockt java_string_library_preprocesst::make_copy_string_code(
   exprt str = allocate_fresh_string(
     type.return_type(), loc, function_id, symbol_table, code);
   code.add(
-    code_assign_string_expr_to_java_string(str, string_expr, symbol_table),
+    code_assign_string_expr_to_java_string(
+      str, string_expr, symbol_table, true),
     loc);
 
   // Return value
@@ -1702,7 +1722,8 @@ code_blockt java_string_library_preprocesst::make_copy_constructor_code(
   // Assign string_expr to `this` object
   symbol_exprt arg_this(params[0].get_identifier(), params[0].type());
   code.add(
-    code_assign_string_expr_to_java_string(arg_this, string_expr, symbol_table),
+    code_assign_string_expr_to_java_string(
+      arg_this, string_expr, symbol_table, true),
     loc);
 
   return code;
