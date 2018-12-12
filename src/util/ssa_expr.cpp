@@ -13,6 +13,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/arith_tools.h>
 
+/// If \p expr is a symbol "s" add to \p os "s!l0@l1#l2" and to \p l1_object_os
+/// "s!l0@l1".
+/// If \p expr is a member or index expression, recursively apply the procedure
+/// and add ".component_name" or "[index]" to \p os.
 static void build_ssa_identifier_rec(
   const exprt &expr,
   const irep_idt &l0,
