@@ -95,3 +95,14 @@ std::pair<irep_idt, irep_idt> ssa_exprt::build_identifier(
 
   return std::make_pair(irep_idt(oss.str()), irep_idt(l1_object_oss.str()));
 }
+
+void ssa_exprt::update_identifier()
+{
+  const irep_idt &l0 = get_level_0();
+  const irep_idt &l1 = get_level_1();
+  const irep_idt &l2 = get_level_2();
+
+  auto idpair = build_identifier(get_original_expr(), l0, l1, l2);
+  set_identifier(idpair.first);
+  set(ID_L1_object_identifier, idpair.second);
+}
