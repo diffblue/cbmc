@@ -97,9 +97,6 @@ protected:
   void set_l1_indices(ssa_exprt &expr, const namespacet &ns);
   void set_l2_indices(ssa_exprt &expr, const namespacet &ns);
 
-  // only required for value_set.assign
-  void get_l1_name(exprt &expr) const;
-
   // this maps L1 names to (L2) types
   typedef std::unordered_map<irep_idt, typet> l1_typest;
   l1_typest l1_types;
