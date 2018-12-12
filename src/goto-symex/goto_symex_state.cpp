@@ -222,7 +222,7 @@ void goto_symex_statet::assignment(
     get_l1_name(l1_rhs);
 
     ssa_exprt l1_lhs(lhs);
-    get_l1_name(l1_lhs);
+    l1_lhs.remove_level_2();
 
     if(run_validation_checks)
     {
