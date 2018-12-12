@@ -33,22 +33,10 @@ different decision procedures, roughly one per directory.
   including calling the conversions in `floatbv` as necessary. Is
   implemented as a simple conversion (with caching) and then a
   post-processing function that adds extra constraints. This is not used
-  by the SMT or CVC back-ends.
+  by the SMT2 back-ends.
 
-* dplib/:   Provides the `dplib_dect` object which used the decision
-  procedure library from “Decision Procedures : An Algorithmic Point of
-  View”.
-
-* cvc/:   Provides the `cvc_dect` type which interfaces to the old (pre
-  SMTLib) input format for the CVC family of solvers.  This format is
-  still supported by depreciated in favour of SMTLib 2.
-
-* smt1/:   Provides the `smt1_dect` type which converts the formulae to
-  SMTLib version 1 and then invokes one of Boolector, CVC3, OpenSMT,
-  Yices, MathSAT or Z3. Again, note that this format is depreciated.
-
-* smt2/:   Provides the `smt2_dect` type which functions in a similar
-  way to `smt1_dect`, calling Boolector, CVC3, MathSAT, Yices or Z3.
+* smt2/:   Provides the `smt2_dect` type which converts the formulae to
+  SMTLib 2 and then invokes one of Boolector, CVC3, CVC4, MathSAT, Yices or Z3.
   Note that the interaction with the solver is batched and uses
   temporary files rather than using the interactive command supported by
   SMTLib 2. With the `–fpa` option, this output mode will not flatten
