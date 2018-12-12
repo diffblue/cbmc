@@ -1,4 +1,7 @@
 SRC = bmc_util.cpp \
+      incremental_goto_checker.cpp \
+      goto_verifier.cpp \
+      properties.cpp \
       solver_factory.cpp \
       symex_coverage.cpp \
       symex_bmc.cpp \
