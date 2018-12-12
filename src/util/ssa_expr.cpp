@@ -82,7 +82,7 @@ bool ssa_exprt::can_build_identifier(const exprt &expr)
     return false;
 }
 
-std::pair<irep_idt, irep_idt> ssa_exprt::build_identifier(
+static std::pair<irep_idt, irep_idt> build_identifier(
   const exprt &expr,
   const irep_idt &l0,
   const irep_idt &l1,

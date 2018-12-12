@@ -121,12 +121,6 @@ public:
 
   void update_identifier();
 
-  static std::pair<irep_idt, irep_idt> build_identifier(
-    const exprt &src,
-    const irep_idt &l0,
-    const irep_idt &l1,
-    const irep_idt &l2);
-
   /* Used to determine whether or not an identifier can be built
    * before trying and getting an exception */
   static bool can_build_identifier(const exprt &src);
