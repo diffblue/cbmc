@@ -101,7 +101,7 @@ public:
   void remove_level_2()
   {
     remove(ID_L2);
-    update_identifier();
+    set_identifier(get_l1_object_identifier());
   }
 
   const irep_idt get_level_0() const
