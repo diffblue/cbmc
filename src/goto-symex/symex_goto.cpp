@@ -468,7 +468,7 @@ static void merge_names(
   // Don't add a conditional to the assignment when:
   //  1. Either guard is false, so we can't follow that branch.
   //  2. Either identifier is of generation zero, and so hasn't been
-  //     initialized and therefor an invalid target.
+  //     initialized and therefore an invalid target.
   if(dest_state.guard.is_false())
     rhs = goto_state_rhs;
   else if(goto_state.guard.is_false())
