@@ -13,6 +13,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/arith_tools.h>
 
+/// If \p expr is a symbol "s" add to \p os "s!l0@l1#l2" and to \p l1_object_os
+/// "s!l0@l1".
+/// If \p expr is a member or index expression, recursively apply the procedure
+/// and add ".component_name" or "[index]" to \p os.
 static void build_ssa_identifier_rec(
   const exprt &expr,
   const irep_idt &l0,
@@ -82,7 +86,7 @@ bool ssa_exprt::can_build_identifier(const exprt &expr)
     return false;
 }
 
-std::pair<irep_idt, irep_idt> ssa_exprt::build_identifier(
+static std::pair<irep_idt, irep_idt> build_identifier(
   const exprt &expr,
   const irep_idt &l0,
   const irep_idt &l1,
@@ -94,4 +98,15 @@ std::pair<irep_idt, irep_idt> ssa_exprt::build_identifier(
   build_ssa_identifier_rec(expr, l0, l1, l2, oss, l1_object_oss);
 
   return std::make_pair(irep_idt(oss.str()), irep_idt(l1_object_oss.str()));
+}
+
+void ssa_exprt::update_identifier()
+{
+  const irep_idt &l0 = get_level_0();
+  const irep_idt &l1 = get_level_1();
+  const irep_idt &l2 = get_level_2();
+
+  auto idpair = build_identifier(get_original_expr(), l0, l1, l2);
+  set_identifier(idpair.first);
+  set(ID_L1_object_identifier, idpair.second);
 }

@@ -25,6 +25,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <analyses/dirty.h>
 
+static void get_l1_name(exprt &expr);
+
 goto_symex_statet::goto_symex_statet()
   : depth(0),
     symex_target(nullptr),
@@ -220,7 +222,7 @@ void goto_symex_statet::assignment(
     get_l1_name(l1_rhs);
 
     ssa_exprt l1_lhs(lhs);
-    get_l1_name(l1_lhs);
+    l1_lhs.remove_level_2();
 
     if(run_validation_checks)
     {
@@ -750,7 +752,7 @@ void goto_symex_statet::get_original_name(typet &type) const
   }
 }
 
-void goto_symex_statet::get_l1_name(exprt &expr) const
+static void get_l1_name(exprt &expr)
 {
   // do not reset the type !
 

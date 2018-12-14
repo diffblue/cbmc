@@ -101,7 +101,7 @@ public:
   void remove_level_2()
   {
     remove(ID_L2);
-    update_identifier();
+    set_identifier(get_l1_object_identifier());
   }
 
   const irep_idt get_level_0() const
@@ -119,22 +119,7 @@ public:
     return get(ID_L2);
   }
 
-  void update_identifier()
-  {
-    const irep_idt &l0=get_level_0();
-    const irep_idt &l1=get_level_1();
-    const irep_idt &l2=get_level_2();
-
-    auto idpair=build_identifier(get_original_expr(), l0, l1, l2);
-    set_identifier(idpair.first);
-    set(ID_L1_object_identifier, idpair.second);
-  }
-
-  static std::pair<irep_idt, irep_idt> build_identifier(
-    const exprt &src,
-    const irep_idt &l0,
-    const irep_idt &l1,
-    const irep_idt &l2);
+  void update_identifier();
 
   /* Used to determine whether or not an identifier can be built
    * before trying and getting an exception */
