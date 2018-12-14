@@ -1630,37 +1630,10 @@ exprt value_sett::make_member(
   const struct_union_typet &struct_union_type=
     to_struct_union_type(ns.follow(src.type()));
 
-  if(src.id()==ID_struct ||
-     src.id()==ID_constant)
-  {
-    std::size_t no=struct_union_type.component_number(component_name);
-    assert(no<src.operands().size());
-    return src.operands()[no];
-  }
-  else if(src.id()==ID_with)
-  {
-    assert(src.operands().size()==3);
-
-    // see if op1 is the member we want
-    const exprt &member_operand=src.op1();
-
-    if(component_name==member_operand.get(ID_component_name))
-      // yes! just take op2
-      return src.op2();
-    else
-      // no! do this recursively
-      return make_member(src.op0(), component_name, ns);
-  }
-  else if(src.id()==ID_typecast)
-  {
-    // push through typecast
-    assert(src.operands().size()==1);
-    return make_member(src.op0(), component_name, ns);
-  }
-
-  // give up
   const typet &subtype = struct_union_type.component_type(component_name);
-  member_exprt member_expr(src, component_name, subtype);
+  exprt member_expr = member_exprt(src, component_name, subtype);
 
-  return std::move(member_expr);
+  simplify(member_expr, ns);
+
+  return member_expr;
 }
