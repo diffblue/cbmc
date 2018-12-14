@@ -1,0 +1,15 @@
+CORE
+main.c
+--pointer-check
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.2\] line 20 should fail: FAILURE$
+^\*\* 1 of 17 failed
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+Despite the large array inside the union, the test should complete within 10
+seconds. Simplify extractbits(concatenation(...)) is essential to make this
+possible. With 77236cc34 (Avoid nesting of ID_with/byte_update by rewriting
+byte_extract to use the root object) the test already is trivial, however.

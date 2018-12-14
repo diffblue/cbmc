@@ -1017,14 +1017,14 @@ goto_checkt::address_check(const exprt &address, const exprt &size)
     if(flags.is_unknown() || flags.is_dynamic_heap())
     {
       conditions.push_back(conditiont(
-        not_exprt(deallocated(address, ns)),
+        or_exprt(allocs, not_exprt(deallocated(address, ns))),
         "deallocated dynamic object"));
     }
 
     if(flags.is_unknown() || flags.is_dynamic_local())
     {
       conditions.push_back(conditiont(
-        not_exprt(dead_object(address, ns)), "dead object"));
+        or_exprt(allocs, not_exprt(dead_object(address, ns))), "dead object"));
     }
 
     if(flags.is_unknown() || flags.is_dynamic_heap())
@@ -1034,7 +1034,10 @@ goto_checkt::address_check(const exprt &address, const exprt &size)
         dynamic_object_upper_bound(address, ns, size));
 
       conditions.push_back(conditiont(
-        implies_exprt(malloc_object(address, ns), not_exprt(dynamic_bounds_violation)),
+        or_exprt(
+          allocs,
+          implies_exprt(
+            malloc_object(address, ns), not_exprt(dynamic_bounds_violation))),
         "pointer outside dynamic object bounds"));
     }
 
@@ -1047,7 +1050,11 @@ goto_checkt::address_check(const exprt &address, const exprt &size)
         object_upper_bound(address, ns, size));
 
       conditions.push_back(conditiont(
-        implies_exprt(not_exprt(dynamic_object(address)), not_exprt(object_bounds_violation)),
+        or_exprt(
+          allocs,
+          implies_exprt(
+            not_exprt(dynamic_object(address)),
+            not_exprt(object_bounds_violation))),
         "pointer outside object bounds"));
     }
 
