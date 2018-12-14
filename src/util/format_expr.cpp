@@ -294,7 +294,7 @@ std::ostream &format_rec(std::ostream &os, const exprt &expr)
       os << format(op);
     }
 
-    return os << '}';
+    return os << " }";
   }
   else if(id == ID_if)
   {
