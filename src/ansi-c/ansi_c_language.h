@@ -26,6 +26,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(pointers-to-treat-as-array):" \
   "(associated-array-sizes):" \
   "(max-dynamic-array-size):" \
+  "(pointers-to-treat-as-string):"
 
 #define HELP_ANSI_C_LANGUAGE \
   " --max-nondet-tree-depth N    limit size of nondet (e.g. input) object tree;\n" /* NOLINT(*) */\

@@ -25,6 +25,12 @@ void parse_c_object_factory_options(const cmdlinet &cmdline, optionst &options)
       "pointers-to-treat-as-array",
       cmdline.get_comma_separated_values("pointers-to-treat-as-array"));
   }
+  if(cmdline.isset("pointers-to-treat-as-string"))
+  {
+    options.set_option(
+      "pointers-to-treat-as-string",
+      cmdline.get_comma_separated_values("pointers-to-treat-as-string"));
+  }
   if(cmdline.isset("associated-array-sizes"))
   {
     options.set_option(
@@ -38,6 +44,13 @@ void parse_c_object_factory_options(const cmdlinet &cmdline, optionst &options)
   }
 }
 
+bool c_object_factory_parameterst::should_be_treated_as_array(irep_idt id) const
+{
+  return pointers_to_treat_as_array.find(id) !=
+           pointers_to_treat_as_array.end() ||
+         should_be_treated_as_string(id);
+}
+
 void c_object_factory_parameterst::set(const optionst &options)
 {
   object_factory_parameterst::set(options);
@@ -48,6 +61,16 @@ void c_object_factory_parameterst::set(const optionst &options)
     std::end(pointers_to_treat_as_array),
     std::inserter(
       this->pointers_to_treat_as_array, this->pointers_to_treat_as_array.end()),
+    id2string);
+
+  auto const &pointers_to_treat_as_string =
+    options.get_list_option("pointers-to-treat-as-string");
+  std::transform(
+    std::begin(pointers_to_treat_as_string),
+    std::end(pointers_to_treat_as_string),
+    std::inserter(
+      this->pointers_to_treat_as_string,
+      this->pointers_to_treat_as_string.end()),
     id2string);
 
   if(options.is_set("max-dynamic-array-size"))
@@ -117,8 +140,9 @@ optionalt<irep_idt> c_object_factory_parameterst::get_associated_size_variable(
     array_name_to_associated_array_size_variable, array_id);
 }
 
-bool c_object_factory_parameterst::should_be_treated_as_array(irep_idt id) const
+bool c_object_factory_parameterst::should_be_treated_as_string(
+  irep_idt id) const
 {
-  return pointers_to_treat_as_array.find(id) !=
-         pointers_to_treat_as_array.end();
+  return pointers_to_treat_as_string.find(id) !=
+         pointers_to_treat_as_string.end();
 }

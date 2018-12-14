@@ -84,6 +84,13 @@ public:
     std::size_t depth,
     const recursion_sett &recursion_set);
 
+  void gen_nondet_string_member_initialization(
+    code_blockt &assignments,
+    const exprt &array,
+    const exprt &array_size,
+    std::size_t depth,
+    const recursion_sett &recursion_set);
+
 private:
   /// Add a new variable symbol to the symbol table
   /// \param type: The type of the new variable
@@ -216,14 +223,29 @@ void symbol_factoryt::gen_nondet_init(
       using std::placeholders::_5;
       if(object_factory_params.should_be_treated_as_array(symbol_name))
       {
-        gen_array_initialization_t gen_array_initialization = std::bind(
-          &symbol_factoryt::gen_nondet_array_member_initialization,
-          this,
-          _1,
-          _2,
-          _3,
-          _4,
-          _5);
+        gen_array_initialization_t gen_array_initialization;
+        if(object_factory_params.should_be_treated_as_string(symbol_name))
+        {
+          gen_array_initialization = std::bind(
+            &symbol_factoryt::gen_nondet_string_member_initialization,
+            this,
+            _1,
+            _2,
+            _3,
+            _4,
+            _5);
+        }
+        else
+        {
+          gen_array_initialization = std::bind(
+            &symbol_factoryt::gen_nondet_array_member_initialization,
+            this,
+            _1,
+            _2,
+            _3,
+            _4,
+            _5);
+        }
         gen_nondet_size_array_init(
           assignments,
           symbol_expr,
@@ -522,6 +544,76 @@ void symbol_factoryt::gen_nondet_array_member_initialization(
                             size_type()}});
   array_member_init.body() = std::move(array_member_init_body);
   assignments.add(std::move(array_member_init));
+}
+
+void symbol_factoryt::gen_nondet_string_member_initialization(
+  code_blockt &assignments,
+  const exprt &array,
+  const exprt &array_size,
+  std::size_t depth,
+  const symbol_factoryt::recursion_sett &recursion_set)
+{
+  // for(size_t ix = 0; ix + 1 < array_size; ++ix) {
+  //   assume(arr[ix] == '\n'
+  //   || arr[ix] == '\t'
+  //   || arr[ix] == '\r'
+  //   || (32 <= arr[ix] && arr[ix] <= 126));
+  // }
+
+  auto const &array_index_symbol =
+    new_tmp_symbol(size_type(), CPROVER_PREFIX "array_index");
+  auto array_member_init = code_fort{};
+
+  array_member_init.init() = code_assignt{array_index_symbol.symbol_expr(),
+                                          from_integer(0, size_type())};
+
+  array_member_init.cond() = binary_exprt{
+    plus_exprt{array_index_symbol.symbol_expr(), from_integer(1, size_type())},
+    ID_lt,
+    array_size,
+    bool_typet{}};
+
+  auto const array_member = dereference_exprt{
+    plus_exprt{array, array_index_symbol.symbol_expr(), array.type()}};
+
+  auto array_member_init_body = code_blockt{};
+  array_member_init_body.add(code_assumet{typecast_exprt{
+    bitor_exprt{
+      typecast_exprt{equal_exprt{array_member, from_integer('\n', char_type())},
+                     signed_int_type()},
+      bitor_exprt{
+        typecast_exprt{
+          equal_exprt{array_member, from_integer('\t', char_type())},
+          signed_int_type()},
+        bitor_exprt{
+          typecast_exprt{
+            equal_exprt{array_member, from_integer('\r', char_type())},
+            signed_int_type()},
+          bitand_exprt{typecast_exprt{
+                         binary_relation_exprt{
+                           from_integer(32, char_type()), ID_le, array_member},
+                         signed_int_type()},
+                       typecast_exprt{
+                         binary_relation_exprt{
+                           array_member, ID_le, from_integer(126, char_type())},
+                         signed_int_type()}},
+        }}},
+    bool_typet{}}});
+  array_member_init_body.add(
+    code_assignt{array_index_symbol.symbol_expr(),
+                 plus_exprt{array_index_symbol.symbol_expr(),
+                            from_integer(1, size_type()),
+                            size_type()}});
+  array_member_init.body() = std::move(array_member_init_body);
+  assignments.add(std::move(array_member_init));
+
+  // array[array_size - 1] = '\0';
+  assignments.add(
+    code_assignt{dereference_exprt{plus_exprt{
+                   array,
+                   minus_exprt{array_size, from_integer(1, size_type())},
+                   array.type()}},
+                 from_integer(0, char_type())});
 }
 
 const symbolt &
