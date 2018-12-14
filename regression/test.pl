@@ -121,6 +121,9 @@ sub test($$$$$$$$$$) {
     $output .= "-";
     $output .= $output_suffix;
   }
+  if(our $opt_f) {
+    substr($options, 0, 0) = "$output "
+  }
   $output .= ".out";
 
   if($output eq $input) {
@@ -279,6 +282,7 @@ Usage: test.pl -c CMD [OPTIONS] [DIRECTORIES ...]
              testing of the same desc file with different commands or options,
              as runs with different suffixes will operate independently and keep
              independent logs.
+  -f         forward the test name to CMD
 
 test.pl expects a test.desc file in each subdirectory. The file test.desc
 follows the format specified below. Any line starting with // will be ignored.
@@ -313,9 +317,9 @@ use Getopt::Std;
 use Getopt::Long qw(:config pass_through bundling);
 $main::VERSION = 0.1;
 $Getopt::Std::STANDARD_HELP_VERSION = 1;
-our ($opt_c, $opt_i, $opt_j, $opt_n, $opt_p, $opt_h, $opt_C, $opt_T, $opt_F, $opt_K, $opt_s, %defines, @include_tags, @exclude_tags); # the variables for getopt
+our ($opt_c, $opt_f, $opt_i, $opt_j, $opt_n, $opt_p, $opt_h, $opt_C, $opt_T, $opt_F, $opt_K, $opt_s, %defines, @include_tags, @exclude_tags); # the variables for getopt
 GetOptions("D=s" => \%defines, "X=s" => \@exclude_tags, "I=s" => \@include_tags);
-getopts('c:i:j:nphCTFKs:') or &main::HELP_MESSAGE(\*STDOUT, "", $main::VERSION, "");
+getopts('c:f:i:j:nphCTFKs') or &main::HELP_MESSAGE(\*STDOUT, "", $main::VERSION, "");
 $opt_c or &main::HELP_MESSAGE(\*STDOUT, "", $main::VERSION, "");
 $opt_j = $opt_j || $ENV{'TESTPL_JOBS'} || 0;
 if($opt_j && $opt_j != 1 && !$has_thread_pool) {
