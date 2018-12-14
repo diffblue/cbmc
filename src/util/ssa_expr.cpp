@@ -32,6 +32,7 @@ static void build_ssa_identifier_rec(
     build_ssa_identifier_rec(member.struct_op(), l0, l1, l2, os, l1_object_os);
 
     os << '.' << member.get_component_name();
+    l1_object_os << '.' << member.get_component_name();
   }
   else if(expr.id()==ID_index)
   {
@@ -41,6 +42,7 @@ static void build_ssa_identifier_rec(
 
     const mp_integer idx = numeric_cast_v<mp_integer>(index.index());
     os << '[' << idx << ']';
+    l1_object_os << '[' << idx << ']';
   }
   else if(expr.id()==ID_symbol)
   {
