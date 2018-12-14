@@ -1,0 +1,6 @@
+CORE
+test.c
+--function test --pointers-to-treat-as-array arr --pointer-check --unwind 20
+\[test.pointer_dereference.5\] line \d+ dereference failure: pointer outside dynamic object bounds in arr\[\(signed long int\)0\]: SUCCESS
+\[test.pointer_dereference.12\] line \d+ dereference failure: pointer outside dynamic object bounds in arr\[\(signed long int\)10\]: FAILURE
+--
