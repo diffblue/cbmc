@@ -1,16 +1,16 @@
 /*******************************************************************\
 
-Module: Bounded Model Checking for ANSI-C + HDL
+Module: Solver Factory
 
-Author: Daniel Kroening, kroening@kroening.com
+Author: Daniel Kroening, Peter Schrammel
 
 \*******************************************************************/
 
 /// \file
-/// Bounded Model Checking for ANSI-C + HDL
+/// Solver Factory
 
-#ifndef CPROVER_CBMC_CBMC_SOLVERS_H
-#define CPROVER_CBMC_CBMC_SOLVERS_H
+#ifndef CPROVER_GOTO_CHECKER_SOLVER_FACTORY_H
+#define CPROVER_GOTO_CHECKER_SOLVER_FACTORY_H
 
 #include <list>
 #include <map>
@@ -25,10 +25,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <solvers/smt2/smt2_dec.h>
 #include <goto-symex/symex_target_equation.h>
 
-class cbmc_solverst
+class solver_factoryt
 {
 public:
-  cbmc_solverst(
+  solver_factoryt(
     const optionst &_options,
     const symbol_tablet &_symbol_table,
     message_handlert &_message_handler,
@@ -113,7 +113,7 @@ public:
     return get_default();
   }
 
-  virtual ~cbmc_solverst()
+  virtual ~solver_factoryt()
   {
   }
 
@@ -137,4 +137,4 @@ protected:
   void no_incremental_check();
 };
 
-#endif // CPROVER_CBMC_CBMC_SOLVERS_H
+#endif // CPROVER_GOTO_CHECKER_SOLVER_FACTORY_H

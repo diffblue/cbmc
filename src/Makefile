@@ -6,6 +6,7 @@ DIRS = analyses \
        cpp \
        goto-analyzer \
        goto-cc \
+       goto-checker \
        goto-diff \
        goto-instrument \
        goto-programs \
@@ -49,9 +50,11 @@ solvers.dir: util.dir langapi.dir
 goto-instrument.dir: languages goto-programs.dir pointer-analysis.dir \
                      goto-symex.dir linking.dir analyses.dir solvers.dir
 
+goto-checker.dir: solvers.dir goto-symex.dir goto-programs.dir
+
 cbmc.dir: languages solvers.dir goto-symex.dir analyses.dir \
           pointer-analysis.dir goto-programs.dir linking.dir \
-          goto-instrument.dir
+          goto-instrument.dir goto-checker.dir
 
 goto-analyzer.dir: languages analyses.dir goto-programs.dir linking.dir \
                    goto-instrument.dir

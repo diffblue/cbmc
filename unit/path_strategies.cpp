@@ -18,7 +18,8 @@ Author: Kareem Khazem <karkhaz@karkhaz.com>, 2018
 
 #include <cbmc/bmc.h>
 #include <cbmc/cbmc_parse_options.h>
-#include <cbmc/cbmc_solvers.h>
+
+#include <goto-checker/solver_factory.h>
 
 #include <langapi/language_ui.h>
 #include <langapi/mode.h>
@@ -376,9 +377,8 @@ void _check_with_strategy(
   ret = cbmc_parse_optionst::get_goto_program(gm, opts, cmdline, log, mh);
   REQUIRE(ret == -1);
 
-  cbmc_solverst initial_solvers(opts, gm.get_symbol_table(), mh, false);
-  std::unique_ptr<cbmc_solverst::solvert> cbmc_solver =
-    initial_solvers.get_solver();
+  solver_factoryt solvers(opts, gm.get_symbol_table(), mh, false);
+  std::unique_ptr<solver_factoryt::solvert> cbmc_solver = solvers.get_solver();
   prop_convt &initial_pc = cbmc_solver->prop_conv();
   std::function<bool(void)> callback = []() { return false; };
 
@@ -403,7 +403,7 @@ void _check_with_strategy(
 
   while(!worklist->empty())
   {
-    cbmc_solverst solvers(opts, gm.get_symbol_table(), mh, false);
+    solver_factoryt solvers(opts, gm.get_symbol_table(), mh, false);
     cbmc_solver = solvers.get_solver();
     prop_convt &pc = cbmc_solver->prop_conv();
     path_storaget::patht &resume = worklist->peek();

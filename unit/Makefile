@@ -86,7 +86,6 @@ BMC_DEPS =../src/cbmc/all_properties$(OBJEXT) \
           ../src/cbmc/bmc_cover$(OBJEXT) \
           ../src/cbmc/cbmc_languages$(OBJEXT) \
           ../src/cbmc/cbmc_parse_options$(OBJEXT) \
-          ../src/cbmc/cbmc_solvers$(OBJEXT) \
           ../src/cbmc/counterexample_beautification$(OBJEXT) \
           ../src/cbmc/fault_localization$(OBJEXT) \
           ../src/cbmc/symex_bmc$(OBJEXT) \
@@ -119,6 +118,7 @@ CPROVER_LIBS =../src/ansi-c/ansi-c$(LIBEXT) \
               ../src/linking/linking$(LIBEXT) \
               ../src/util/util$(LIBEXT) \
               ../src/big-int/big-int$(LIBEXT) \
+              ../src/goto-checker/goto-checker$(LIBEXT) \
               ../src/goto-programs/goto-programs$(LIBEXT) \
               ../src/pointer-analysis/pointer-analysis$(LIBEXT) \
               ../src/langapi/langapi$(LIBEXT) \

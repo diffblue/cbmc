@@ -6,6 +6,7 @@ OBJ += ../$(CPROVER_DIR)/src/ansi-c/ansi-c$(LIBEXT) \
       ../java_bytecode/java_bytecode$(LIBEXT) \
       ../$(CPROVER_DIR)/src/linking/linking$(LIBEXT) \
       ../$(CPROVER_DIR)/src/big-int/big-int$(LIBEXT) \
+      ../$(CPROVER_DIR)/src/goto-checker/goto-checker$(LIBEXT) \
       ../$(CPROVER_DIR)/src/goto-programs/goto-programs$(LIBEXT) \
       ../$(CPROVER_DIR)/src/goto-symex/goto-symex$(LIBEXT) \
       ../$(CPROVER_DIR)/src/pointer-analysis/value_set$(OBJEXT) \
@@ -40,7 +41,6 @@ OBJ += ../$(CPROVER_DIR)/src/ansi-c/ansi-c$(LIBEXT) \
       ../$(CPROVER_DIR)/src/cbmc/all_properties$(OBJEXT) \
       ../$(CPROVER_DIR)/src/cbmc/bmc$(OBJEXT) \
       ../$(CPROVER_DIR)/src/cbmc/bmc_cover$(OBJEXT) \
-      ../$(CPROVER_DIR)/src/cbmc/cbmc_solvers$(OBJEXT) \
       ../$(CPROVER_DIR)/src/cbmc/counterexample_beautification$(OBJEXT) \
       ../$(CPROVER_DIR)/src/cbmc/fault_localization$(OBJEXT) \
       ../$(CPROVER_DIR)/src/cbmc/symex_bmc$(OBJEXT) \

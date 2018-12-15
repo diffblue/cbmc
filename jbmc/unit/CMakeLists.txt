@@ -23,7 +23,9 @@ target_link_libraries(java-unit
         testing-utils
         ansi-c
         solvers
+        goto-checker
         goto-programs
+        goto-symex
         goto-instrument-lib
         cbmc-lib
         json-symtab-language

@@ -13,6 +13,7 @@ target_link_libraries(cbmc-lib
     assembler
     big-int
     cpp
+    goto-checker
     goto-instrument-lib
     goto-programs
     goto-symex

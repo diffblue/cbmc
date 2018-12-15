@@ -34,8 +34,10 @@ target_link_libraries(
         testing-utils
         ansi-c
         solvers
+        goto-checker
         goto-programs
         goto-instrument-lib
+        goto-symex
         cbmc-lib
         json-symtab-language
 )
