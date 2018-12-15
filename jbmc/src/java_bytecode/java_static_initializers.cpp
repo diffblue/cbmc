@@ -259,7 +259,7 @@ static void clinit_wrapper_do_recursive_calls(
         symbol_table,
         source_locationt(),
         false,
-        allocation_typet::DYNAMIC,
+        lifetimet::DYNAMIC,
         parameters,
         pointer_type_selector,
         update_in_placet::NO_UPDATE_IN_PLACE);
@@ -870,7 +870,7 @@ code_blockt stub_global_initializer_factoryt::get_stub_initializer_body(
       symbol_table,
       location,
       false,
-      allocation_typet::DYNAMIC,
+      lifetimet::DYNAMIC,
       parameters,
       pointer_type_selector,
       update_in_placet::NO_UPDATE_IN_PLACE);

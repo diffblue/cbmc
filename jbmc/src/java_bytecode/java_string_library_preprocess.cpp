@@ -16,13 +16,14 @@ Date:   April 2017
 ///   java standard library. In particular methods from java.lang.String,
 ///   java.lang.StringBuilder, java.lang.StringBuffer.
 
+#include <util/allocate_objects.h>
 #include <util/arith_tools.h>
-#include <util/std_expr.h>
-#include <util/std_code.h>
+#include <util/c_types.h>
 #include <util/fresh_symbol.h>
 #include <util/refined_string_type.h>
+#include <util/std_code.h>
+#include <util/std_expr.h>
 #include <util/string_expr.h>
-#include <util/c_types.h>
 
 #include "java_types.h"
 #include "java_object_factory.h"
@@ -575,7 +576,14 @@ exprt java_string_library_preprocesst::allocate_fresh_string(
   code_blockt &code)
 {
   exprt str=fresh_string(type, loc, symbol_table);
-  allocate_dynamic_object_with_decl(str, symbol_table, loc, function_id, code);
+
+  allocate_objectst allocate_objects(ID_java, loc, function_id, symbol_table);
+
+  code_blockt tmp;
+  allocate_objects.allocate_dynamic_object(tmp, str, str.type().subtype());
+  allocate_objects.declare_created_symbols(code);
+  code.append(tmp);
+
   return str;
 }
 
@@ -1380,8 +1388,14 @@ struct_exprt java_string_library_preprocesst::make_argument_for_format(
     ID_java,
     symbol_table);
   symbol_exprt arg_i=object_symbol.symbol_expr();
-  allocate_dynamic_object_with_decl(
-    arg_i, symbol_table, loc, function_id, code);
+
+  allocate_objectst allocate_objects(ID_java, loc, function_id, symbol_table);
+
+  code_blockt tmp;
+  allocate_objects.allocate_dynamic_object(tmp, arg_i, arg_i.type().subtype());
+  allocate_objects.declare_created_symbols(code);
+  code.append(tmp);
+
   code.add(code_assignt(arg_i, obj), loc);
   code.add(
     code_assumet(
