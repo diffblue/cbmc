@@ -35,34 +35,35 @@ smt2_dect::solvert solver_factoryt::get_smt2_solver_type() const
   // we shouldn't get here if this option isn't set
   PRECONDITION(options.get_bool_option("smt2"));
 
-  smt2_dect::solvert s=smt2_dect::solvert::GENERIC;
+  smt2_dect::solvert s = smt2_dect::solvert::GENERIC;
 
   if(options.get_bool_option("boolector"))
-    s=smt2_dect::solvert::BOOLECTOR;
+    s = smt2_dect::solvert::BOOLECTOR;
   else if(options.get_bool_option("cprover-smt2"))
     s = smt2_dect::solvert::CPROVER_SMT2;
   else if(options.get_bool_option("mathsat"))
-    s=smt2_dect::solvert::MATHSAT;
+    s = smt2_dect::solvert::MATHSAT;
   else if(options.get_bool_option("cvc3"))
-    s=smt2_dect::solvert::CVC3;
+    s = smt2_dect::solvert::CVC3;
   else if(options.get_bool_option("cvc4"))
-    s=smt2_dect::solvert::CVC4;
+    s = smt2_dect::solvert::CVC4;
   else if(options.get_bool_option("yices"))
-    s=smt2_dect::solvert::YICES;
+    s = smt2_dect::solvert::YICES;
   else if(options.get_bool_option("z3"))
-    s=smt2_dect::solvert::Z3;
+    s = smt2_dect::solvert::Z3;
   else if(options.get_bool_option("generic"))
-    s=smt2_dect::solvert::GENERIC;
+    s = smt2_dect::solvert::GENERIC;
 
   return s;
 }
 
 std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_default()
 {
-  auto solver=util_make_unique<solvert>();
+  auto solver = util_make_unique<solvert>();
 
-  if(options.get_bool_option("beautify") ||
-     !options.get_bool_option("sat-preprocessor")) // no simplifier
+  if(
+    options.get_bool_option("beautify") ||
+    !options.get_bool_option("sat-preprocessor")) // no simplifier
   {
     // simplifier won't work with beautification
     solver->set_prop(util_make_unique<satcheck_no_simplifiert>());
@@ -76,9 +77,9 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_default()
 
   auto bv_pointers = util_make_unique<bv_pointerst>(ns, solver->prop());
 
-  if(options.get_option("arrays-uf")=="never")
+  if(options.get_option("arrays-uf") == "never")
     bv_pointers->unbounded_array = bv_pointerst::unbounded_arrayt::U_NONE;
-  else if(options.get_option("arrays-uf")=="always")
+  else if(options.get_option("arrays-uf") == "always")
     bv_pointers->unbounded_array = bv_pointerst::unbounded_arrayt::U_ALL;
 
   solver->set_prop_conv(std::move(bv_pointers));
@@ -91,10 +92,10 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_dimacs()
   no_beautification();
   no_incremental_check();
 
-  auto prop=util_make_unique<dimacs_cnft>();
+  auto prop = util_make_unique<dimacs_cnft>();
   prop->set_message_handler(message_handler);
 
-  std::string filename=options.get_option("outfile");
+  std::string filename = options.get_option("outfile");
 
   auto bv_dimacs = util_make_unique<bv_dimacst>(ns, *prop, filename);
   return util_make_unique<solvert>(std::move(bv_dimacs), std::move(prop));
@@ -102,8 +103,7 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_dimacs()
 
 std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_bv_refinement()
 {
-  std::unique_ptr<propt> prop=[this]() -> std::unique_ptr<propt>
-  {
+  std::unique_ptr<propt> prop = [this]() -> std::unique_ptr<propt> {
     // We offer the option to disable the SAT preprocessor
     if(options.get_bool_option("sat-preprocessor"))
     {
@@ -116,21 +116,20 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_bv_refinement()
   prop->set_message_handler(message_handler);
 
   bv_refinementt::infot info;
-  info.ns=&ns;
-  info.prop=prop.get();
+  info.ns = &ns;
+  info.prop = prop.get();
   info.output_xml = output_xml_in_refinement;
 
   // we allow setting some parameters
   if(options.get_bool_option("max-node-refinement"))
-    info.max_node_refinement=
+    info.max_node_refinement =
       options.get_unsigned_int_option("max-node-refinement");
 
-  info.refine_arrays=options.get_bool_option("refine-arrays");
-  info.refine_arithmetic=options.get_bool_option("refine-arithmetic");
+  info.refine_arrays = options.get_bool_option("refine-arrays");
+  info.refine_arithmetic = options.get_bool_option("refine-arithmetic");
 
   return util_make_unique<solvert>(
-    util_make_unique<bv_refinementt>(info),
-    std::move(prop));
+    util_make_unique<bv_refinementt>(info), std::move(prop));
 }
 
 /// the string refinement adds to the bit vector refinement specifications for
@@ -140,17 +139,17 @@ std::unique_ptr<solver_factoryt::solvert>
 solver_factoryt::get_string_refinement()
 {
   string_refinementt::infot info;
-  info.ns=&ns;
-  auto prop=util_make_unique<satcheck_no_simplifiert>();
+  info.ns = &ns;
+  auto prop = util_make_unique<satcheck_no_simplifiert>();
   prop->set_message_handler(message_handler);
-  info.prop=prop.get();
-  info.refinement_bound=DEFAULT_MAX_NB_REFINEMENT;
+  info.prop = prop.get();
+  info.refinement_bound = DEFAULT_MAX_NB_REFINEMENT;
   info.output_xml = output_xml_in_refinement;
   if(options.get_bool_option("max-node-refinement"))
-    info.max_node_refinement=
+    info.max_node_refinement =
       options.get_unsigned_int_option("max-node-refinement");
-  info.refine_arrays=options.get_bool_option("refine-arrays");
-  info.refine_arithmetic=options.get_bool_option("refine-arithmetic");
+  info.refine_arrays = options.get_bool_option("refine-arrays");
+  info.refine_arithmetic = options.get_bool_option("refine-arithmetic");
 
   return util_make_unique<solvert>(
     util_make_unique<string_refinementt>(info), std::move(prop));
@@ -161,11 +160,11 @@ solver_factoryt::get_smt2(smt2_dect::solvert solver)
 {
   no_beautification();
 
-  const std::string &filename=options.get_option("outfile");
+  const std::string &filename = options.get_option("outfile");
 
-  if(filename=="")
+  if(filename == "")
   {
-    if(solver==smt2_dect::solvert::GENERIC)
+    if(solver == smt2_dect::solvert::GENERIC)
     {
       throw invalid_command_line_argument_exceptiont(
         "required filename not provided",
@@ -181,11 +180,11 @@ solver_factoryt::get_smt2(smt2_dect::solvert solver)
       solver);
 
     if(options.get_bool_option("fpa"))
-      smt2_dec->use_FPA_theory=true;
+      smt2_dec->use_FPA_theory = true;
 
     return util_make_unique<solvert>(std::move(smt2_dec));
   }
-  else if(filename=="-")
+  else if(filename == "-")
   {
     auto smt2_conv = util_make_unique<smt2_convt>(
       ns,
@@ -196,7 +195,7 @@ solver_factoryt::get_smt2(smt2_dect::solvert solver)
       std::cout);
 
     if(options.get_bool_option("fpa"))
-      smt2_conv->use_FPA_theory=true;
+      smt2_conv->use_FPA_theory = true;
 
     smt2_conv->set_message_handler(message_handler);
 
@@ -204,11 +203,11 @@ solver_factoryt::get_smt2(smt2_dect::solvert solver)
   }
   else
   {
-    #ifdef _MSC_VER
-    auto out=util_make_unique<std::ofstream>(widen(filename));
-    #else
-    auto out=util_make_unique<std::ofstream>(filename);
-    #endif
+#ifdef _MSC_VER
+    auto out = util_make_unique<std::ofstream>(widen(filename));
+#else
+    auto out = util_make_unique<std::ofstream>(filename);
+#endif
 
     if(!*out)
     {
@@ -225,7 +224,7 @@ solver_factoryt::get_smt2(smt2_dect::solvert solver)
       *out);
 
     if(options.get_bool_option("fpa"))
-      smt2_conv->use_FPA_theory=true;
+      smt2_conv->use_FPA_theory = true;
 
     smt2_conv->set_message_handler(message_handler);
 

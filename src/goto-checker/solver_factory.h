@@ -18,12 +18,12 @@ Author: Daniel Kroening, Peter Schrammel
 
 #include <util/options.h>
 
+#include <goto-symex/symex_target_equation.h>
 #include <solvers/prop/prop.h>
 #include <solvers/prop/prop_conv.h>
 #include <solvers/sat/cnf.h>
 #include <solvers/sat/satcheck.h>
 #include <solvers/smt2/smt2_dec.h>
-#include <goto-symex/symex_target_equation.h>
 
 class solver_factoryt
 {
@@ -50,19 +50,18 @@ public:
     {
     }
 
-    explicit solvert(std::unique_ptr<prop_convt> p):prop_conv_ptr(std::move(p))
+    explicit solvert(std::unique_ptr<prop_convt> p)
+      : prop_conv_ptr(std::move(p))
     {
     }
 
-    solvert(std::unique_ptr<prop_convt> p1, std::unique_ptr<propt> p2):
-      prop_ptr(std::move(p2)),
-      prop_conv_ptr(std::move(p1))
+    solvert(std::unique_ptr<prop_convt> p1, std::unique_ptr<propt> p2)
+      : prop_ptr(std::move(p2)), prop_conv_ptr(std::move(p1))
     {
     }
 
-    solvert(std::unique_ptr<prop_convt> p1, std::unique_ptr<std::ofstream> p2):
-      ofstream_ptr(std::move(p2)),
-      prop_conv_ptr(std::move(p1))
+    solvert(std::unique_ptr<prop_convt> p1, std::unique_ptr<std::ofstream> p2)
+      : ofstream_ptr(std::move(p2)), prop_conv_ptr(std::move(p1))
     {
     }
 
@@ -80,17 +79,17 @@ public:
 
     void set_prop_conv(std::unique_ptr<prop_convt> p)
     {
-      prop_conv_ptr=std::move(p);
+      prop_conv_ptr = std::move(p);
     }
 
     void set_prop(std::unique_ptr<propt> p)
     {
-      prop_ptr=std::move(p);
+      prop_ptr = std::move(p);
     }
 
     void set_ofstream(std::unique_ptr<std::ofstream> p)
     {
-      ofstream_ptr=std::move(p);
+      ofstream_ptr = std::move(p);
     }
 
     // the objects are deleted in the opposite order they appear below
