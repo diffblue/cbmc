@@ -43,7 +43,7 @@ void goto_symext::symex_assign(
 
       DATA_INVARIANT(
         !side_effect_expr.operands().empty(),
-        "function call stamement expects non-empty list of side effects");
+        "function call statement expects non-empty list of side effects");
 
       DATA_INVARIANT(
         function_call.function().id() == ID_symbol,
