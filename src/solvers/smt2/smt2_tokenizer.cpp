@@ -305,9 +305,7 @@ void smt2_tokenizert::get_token_from_stream()
       else
       {
         // illegal character, error
-        std::ostringstream msg;
-        msg << "unexpected character `" << ch << '\'';
-        throw error(msg.str());
+        throw error() << "unexpected character `" << ch << '\'';
       }
     }
   }
