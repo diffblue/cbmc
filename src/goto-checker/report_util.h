@@ -25,4 +25,8 @@ void output_properties(
   const propertiest &properties,
   ui_message_handlert &ui_message_handler);
 
+void output_overall_result(
+  resultt result,
+  ui_message_handlert &ui_message_handler);
+
 #endif // CPROVER_GOTO_CHECKER_REPORT_UTIL_H

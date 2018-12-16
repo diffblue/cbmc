@@ -240,3 +240,24 @@ void output_properties(
   }
   }
 }
+
+void output_overall_result(
+  resultt result,
+  ui_message_handlert &ui_message_handler)
+{
+  switch(result)
+  {
+  case resultt::PASS:
+    report_success(ui_message_handler);
+    break;
+  case resultt::FAIL:
+    report_failure(ui_message_handler);
+    break;
+  case resultt::UNKNOWN:
+    report_inconclusive(ui_message_handler);
+    break;
+  case resultt::ERROR:
+    report_error(ui_message_handler);
+    break;
+  }
+}
