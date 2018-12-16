@@ -14,6 +14,8 @@ Date: Oct 2018
 #include "goto_functions.h"
 #include <util/invariant.h>
 
+namespace
+{
 class validate_goto_modelt
 {
 public:
@@ -76,6 +78,7 @@ private:
   const function_mapt &function_map;
   const goto_model_validation_optionst validation_options;
 };
+} // namespace
 
 void validate_goto_modelt::do_goto_program_checks(
   goto_model_validation_optionst validation_options)
