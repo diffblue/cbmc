@@ -106,3 +106,52 @@ TEST_CASE("expr2bits and bits2expr respect bit order")
     simp.bits2expr(*be, unsignedbv_typet(32), false);
   REQUIRE(deadbeef == should_be_deadbeef2);
 }
+
+TEST_CASE("Simplify extractbit")
+{
+  // this test does require a proper architecture to be set so that byte extract
+  // uses adequate endianness
+  const cmdlinet cmdline;
+  config.set(cmdline);
+
+  const symbol_tablet symbol_table;
+  const namespacet ns(symbol_table);
+
+  // binary: 1101 1110 1010 1101 1011 1110 1110 1111
+  //         ^MSB                               LSB^
+  //              bit23^                  bit4^
+  // extractbit and extractbits use offsets with respect to the
+  // least-significant bit, endianess does not impact them
+  const exprt deadbeef = from_integer(0xdeadbeef, unsignedbv_typet(32));
+
+  exprt eb1 = extractbit_exprt(deadbeef, 4);
+  bool unmodified = simplify(eb1, ns);
+
+  REQUIRE(!unmodified);
+  REQUIRE(eb1 == false_exprt());
+
+  exprt eb2 = extractbit_exprt(deadbeef, 23);
+  unmodified = simplify(eb2, ns);
+
+  REQUIRE(!unmodified);
+  REQUIRE(eb2 == true_exprt());
+}
+
+TEST_CASE("Simplify extractbits")
+{
+  // this test does require a proper architecture to be set so that byte extract
+  // uses adequate endianness
+  const cmdlinet cmdline;
+  config.set(cmdline);
+
+  const symbol_tablet symbol_table;
+  const namespacet ns(symbol_table);
+
+  const exprt deadbeef = from_integer(0xdeadbeef, unsignedbv_typet(32));
+
+  exprt eb = extractbits_exprt(deadbeef, 15, 8, unsignedbv_typet(8));
+  bool unmodified = simplify(eb, ns);
+
+  REQUIRE(!unmodified);
+  REQUIRE(eb == from_integer(0xbe, unsignedbv_typet(8)));
+}

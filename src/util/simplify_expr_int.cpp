@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "arith_tools.h"
 #include "base_type.h"
 #include "bv_arithmetic.h"
+#include "byte_operators.h"
 #include "config.h"
 #include "expr_util.h"
 #include "fixedbv.h"
@@ -845,28 +846,20 @@ bool simplify_exprt::simplify_extractbit(exprt &expr)
 
   const auto index_converted_to_int =
     numeric_cast<mp_integer>(extractbit_expr.index());
-  if(!index_converted_to_int.has_value())
+  if(
+    !index_converted_to_int.has_value() || *index_converted_to_int < 0 ||
+    *index_converted_to_int >= src_bit_width)
   {
     return true;
   }
-  const mp_integer index_as_int = index_converted_to_int.value();
+
   if(!extractbit_expr.src().is_constant())
     return true;
 
-  if(index_as_int < 0 || index_as_int >= src_bit_width)
-    return true;
-
-  const irep_idt &src_value =
-    to_constant_expr(extractbit_expr.src()).get_value();
-
-  std::string src_value_as_string = id2string(src_value);
-
-  if(src_value_as_string.size() != src_bit_width)
-    return true;
-
-  const bool bit =
-    (src_value_as_string[src_bit_width -
-                         numeric_cast_v<std::size_t>(index_as_int) - 1] == '1');
+  const bool bit = get_bvrep_bit(
+    to_constant_expr(extractbit_expr.src()).get_value(),
+    src_bit_width,
+    numeric_cast_v<std::size_t>(*index_converted_to_int));
 
   expr.make_bool(bit);
 
@@ -1136,18 +1129,19 @@ bool simplify_exprt::simplify_extractbits(extractbits_exprt &expr)
 
   if(expr.src().is_constant())
   {
-    const irep_idt &value = to_constant_expr(expr.src()).get_value();
+    const auto svalue = expr2bits(expr.src(), true);
 
-    if(value.size() != *width)
+    if(!svalue.has_value() || svalue->size() != *width)
       return true;
 
-    std::string svalue=id2string(value);
-
-    std::string extracted_value = svalue.substr(
-      numeric_cast_v<std::size_t>(*width - start - 1),
+    std::string extracted_value = svalue->substr(
+      numeric_cast_v<std::size_t>(end),
       numeric_cast_v<std::size_t>(start - end + 1));
 
-    constant_exprt result(extracted_value, expr.type());
+    exprt result = bits2expr(extracted_value, expr.type(), true);
+    if(result.is_nil())
+      return true;
+
     expr.swap(result);
 
     return false;

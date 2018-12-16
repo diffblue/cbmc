@@ -3085,12 +3085,14 @@ public:
   {
   }
 
+  /// Extract the \p _index-th least significant bit from \p _src.
   extractbit_exprt(
     const exprt &_src,
     const exprt &_index):binary_predicate_exprt(_src, ID_extractbit, _index)
   {
   }
 
+  /// \copydoc extractbit_exprt(const exprt &, const exprt &)
   extractbit_exprt(
     const exprt &_src,
     const std::size_t _index);
@@ -3161,7 +3163,11 @@ public:
     operands().resize(3);
   }
 
-  // the ordering upper-lower matches the SMT-LIB
+  /// Extract the bits [\p _lower .. \p _upper] from \p _src to produce a result
+  /// of type \p _type. Note that this specifies a closed interval, i.e., both
+  /// bits \p _lower and \p _upper are included. Indices count from the
+  /// least-significant bit, and are not affected by endianness.
+  /// The ordering upper-lower matches what SMT-LIB uses.
   extractbits_exprt(
     const exprt &_src,
     const exprt &_upper,
@@ -3171,6 +3177,8 @@ public:
     add_to_operands(_src, _upper, _lower);
   }
 
+  // NOLINTNEXTLINE(whitespace/line_length)
+  /// \copydoc extractbits_exprt(const exprt &, const exprt &, const exprt &, const typet &)
   extractbits_exprt(
     const exprt &_src,
     const std::size_t _upper,
