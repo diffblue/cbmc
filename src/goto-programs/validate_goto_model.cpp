@@ -110,6 +110,7 @@ void validate_goto_modelt::do_goto_program_checks(
 void validate_goto_modelt::entry_point_exists()
 {
   DATA_CHECK(
+    vm,
     function_map.find(goto_functionst::entry_point()) != function_map.end(),
     "an entry point must exist");
 }
@@ -125,6 +126,7 @@ void validate_goto_modelt::function_pointer_calls_removed()
         const code_function_callt &function_call =
           to_code_function_call(instr.code);
         DATA_CHECK(
+          vm,
           function_call.function().id() == ID_symbol,
           "no calls via function pointer should be present");
       }
@@ -138,22 +140,25 @@ void validate_goto_modelt::check_returns_removed()
   {
     const goto_functiont &goto_function = fun.second;
     DATA_CHECK(
+      vm,
       goto_function.type.return_type().id() == ID_empty,
       "functions must have empty return type");
 
     for(const auto &instr : goto_function.body.instructions)
     {
       DATA_CHECK(
-        !instr.is_return(), "no return instructions should be present");
+        vm, !instr.is_return(), "no return instructions should be present");
 
       if(instr.is_function_call())
       {
         const auto &function_call = to_code_function_call(instr.code);
         DATA_CHECK(
-          function_call.lhs().is_nil(), "function call return should be nil");
+          vm,
+          function_call.lhs().is_nil(),
+          "function call return should be nil");
 
         const auto &callee = to_code_type(function_call.function().type());
-        DATA_CHECK(callee.return_type().id() == ID_empty, "");
+        DATA_CHECK(vm, callee.return_type().id() == ID_empty, "");
       }
     }
   }
@@ -193,6 +198,7 @@ void validate_goto_modelt::check_called_functions()
           to_symbol_expr(function_call.function()).get_identifier();
 
         DATA_CHECK(
+          vm,
           function_map.find(identifier) != function_map.end(),
           "every function call callee must be in the function map");
       }
@@ -203,6 +209,7 @@ void validate_goto_modelt::check_called_functions()
       {
         for(auto &identifier : test_for_function_address.identifiers)
           DATA_CHECK(
+            vm,
             function_map.find(identifier) != function_map.end(),
             "every function whose address is taken must be in the "
             "function map");
@@ -219,6 +226,7 @@ void validate_goto_modelt::check_last_instruction()
     if(fun.second.body_available())
     {
       DATA_CHECK(
+        vm,
         fun.second.body.instructions.back().is_end_function(),
         "last instruction should be of end function type");
     }
@@ -234,10 +242,12 @@ void validate_goto_modelt::check_sourcecode_location()
     for(auto &instr : fun.second.body.instructions)
     {
       DATA_CHECK(
+        vm,
         instr.code.source_location().is_not_nil(),
         "each instruction \"code\" field, must have non nil source location");
 
       DATA_CHECK(
+        vm,
         instr.source_location.is_not_nil(),
         "each instruction source location must not be nil");
     }
