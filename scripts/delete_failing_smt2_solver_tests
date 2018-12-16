@@ -42,11 +42,9 @@ rm Malloc24/test.desc
 rm Memory_leak2/test.desc
 rm Multi_Dimensional_Array2/test.desc
 rm Overflow_Leftshift1/test.desc
-rm Overflow_Multiplication1/test.desc
 rm Overflow_Subtraction1/test.desc
 rm Pointer_Arithmetic10/test.desc
 rm Pointer_Arithmetic11/test.desc
-rm Pointer_Arithmetic12/test.desc
 rm Pointer_byte_extract2/test.desc
 rm Pointer_byte_extract3/test.desc
 rm Pointer_byte_extract4/test.desc
@@ -65,9 +63,6 @@ rm Quantifiers-type/test.desc
 rm Struct_Bytewise2/test.desc
 rm Union_Initialization1/test.desc
 rm address_space_size_limit1/test.desc
-rm address_space_size_limit3/test.desc
-rm argv1/test.desc
-rm argv1/test.desc
 rm array-function-parameters/test.desc
 rm array-tests/test.desc
 rm bounds_check1/test.desc
@@ -83,9 +78,6 @@ rm compact-trace/test.desc
 rm dynamic_size1/stack_object.desc
 rm equality_through_struct_containing_arrays1/test.desc
 rm equality_through_struct_containing_arrays2/test.desc
-rm equality_through_union1/test.desc
-rm equality_through_union2/test.desc
-rm equality_through_union3/test.desc
 rm graphml_witness1/test.desc
 rm integer-assignments1/test.desc
 rm memory_allocation1/test.desc
@@ -100,13 +92,9 @@ rm struct6/test.desc
 rm struct7/test.desc
 rm struct9/test.desc
 rm trace-values/trace-values.desc
-rm trace_address_arithmetic1/test.desc
 rm trace_show_function_calls/test.desc
-rm union11/union_list.desc
-rm union5/test.desc
 rm union6/test.desc
 rm union7/test.desc
-rm union8/test.desc
 rm union9/test.desc
 rm variable-access-to-constant-array/test.desc
 rm void_pointer2/test.desc
