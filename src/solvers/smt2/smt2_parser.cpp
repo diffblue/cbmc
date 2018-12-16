@@ -792,7 +792,7 @@ exprt smt2_parsert::function_application()
         }
 
         std::ostringstream msg;
-        msg << "2 unknown symbol " << id;
+        msg << "unknown function symbol " << id;
         throw error(msg.str());
       }
     }
@@ -1002,7 +1002,7 @@ exprt smt2_parsert::expression()
         }
 
         std::ostringstream msg;
-        msg << "1 unknown symbol " << identifier;
+        msg << "unknown expression " << identifier;
         throw error(msg.str());
       }
     }
