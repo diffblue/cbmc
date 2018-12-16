@@ -4268,8 +4268,9 @@ inline void validate_expr(const ieee_float_notequal_exprt &value)
   validate_operands(value, 2, "IEEE inequality must have two operands");
 }
 
-
 /// \brief IEEE floating-point operations
+/// These have two data operands (op0 and op1) and one rounding mode (op2).
+/// The type of the result is that of the data operands.
 class ieee_float_op_exprt:public exprt
 {
 public:
@@ -4283,8 +4284,8 @@ public:
     const exprt &_lhs,
     const irep_idt &_id,
     const exprt &_rhs,
-    const exprt &_rm):
-    exprt(_id)
+    const exprt &_rm)
+    : exprt(_id, _lhs.type())
   {
     add_to_operands(_lhs, _rhs, _rm);
   }

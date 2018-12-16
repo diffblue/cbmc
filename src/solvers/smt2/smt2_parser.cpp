@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "smt2_format.h"
 
 #include <util/arith_tools.h>
+#include <util/ieee_float.h>
 #include <util/range.h>
 
 #include <numeric>
@@ -398,6 +399,74 @@ exprt smt2_parsert::binary(irep_idt id, const exprt::operandst &op)
   return binary_exprt(op[0], id, op[1], op[0].type());
 }
 
+exprt smt2_parsert::function_application_ieee_float_op(
+  const irep_idt &id,
+  const exprt::operandst &op)
+{
+  if(op.size() != 3)
+  {
+    std::ostringstream message;
+    message << id << " takes three operands";
+    throw error(message);
+  }
+
+  if(op[1].type().id() != ID_floatbv || op[2].type().id() != ID_floatbv)
+  {
+    std::ostringstream message;
+    message << id << " takes FloatingPoint operands";
+    throw error(message);
+  }
+
+  if(op[1].type() != op[2].type())
+  {
+    std::ostringstream message;
+    message << id << " takes FloatingPoint operands with matching sort, "
+            << "but got " << smt2_format(op[1].type()) << " vs "
+            << smt2_format(op[2].type());
+    throw error(message);
+  }
+
+  // clang-format off
+  const irep_idt expr_id =
+    id == "fp.add" ? ID_floatbv_plus :
+    id == "fp.sub" ? ID_floatbv_minus :
+    id == "fp.mul" ? ID_floatbv_mult :
+    id == "fp.div" ? ID_floatbv_div :
+    throw error("unsupported floating-point operation");
+  // clang-format on
+
+  return std::move(ieee_float_op_exprt(op[1], expr_id, op[2], op[0]));
+}
+
+exprt smt2_parsert::function_application_fp(const exprt::operandst &op)
+{
+  // floating-point from bit-vectors
+  if(op.size() != 3)
+    throw error("fp takes three operands");
+
+  if(op[0].type().id() != ID_unsignedbv)
+    throw error("fp takes BitVec as first operand");
+
+  if(op[1].type().id() != ID_unsignedbv)
+    throw error("fp takes BitVec as second operand");
+
+  if(op[2].type().id() != ID_unsignedbv)
+    throw error("fp takes BitVec as third operand");
+
+  if(to_unsignedbv_type(op[0].type()).get_width() != 1)
+    throw error("fp takes BitVec of size 1 as first operand");
+
+  const auto width_e = to_unsignedbv_type(op[1].type()).get_width();
+  const auto width_f = to_unsignedbv_type(op[2].type()).get_width();
+
+  // stitch the bits together
+  concatenation_exprt c(bv_typet(width_e + width_f + 1));
+  c.operands() = {op[0], op[1], op[2]};
+
+  return std::move(
+    typecast_exprt(c, ieee_float_spect(width_f, width_e).to_type()));
+}
+
 exprt smt2_parsert::function_application()
 {
   switch(next_token())
@@ -674,6 +743,35 @@ exprt smt2_parsert::function_application()
 
         return with_exprt(op[0], op[1], op[2]);
       }
+      else if(id == "fp.isNaN")
+      {
+        if(op.size() != 1)
+          throw error("fp.isNaN takes one operand");
+
+        if(op[0].type().id() != ID_floatbv)
+          throw error("fp.isNaN takes FloatingPoint operand");
+
+        return unary_predicate_exprt(ID_isnan, op[0]);
+      }
+      else if(id == "fp.isInf")
+      {
+        if(op.size() != 1)
+          throw error("fp.isInf takes one operand");
+
+        if(op[0].type().id() != ID_floatbv)
+          throw error("fp.isInf takes FloatingPoint operand");
+
+        return unary_predicate_exprt(ID_isinf, op[0]);
+      }
+      else if(id == "fp")
+      {
+        return function_application_fp(op);
+      }
+      else if(
+        id == "fp.add" || id == "fp.mul" || id == "fp.sub" || id == "fp.div")
+      {
+        return function_application_ieee_float_op(id, op);
+      }
       else
       {
         // rummage through id_map
@@ -864,6 +962,32 @@ exprt smt2_parsert::expression()
         return true_exprt();
       else if(identifier==ID_false)
         return false_exprt();
+      else if(identifier == "roundNearestTiesToEven")
+      {
+        // we encode as 32-bit unsignedbv
+        return from_integer(ieee_floatt::ROUND_TO_EVEN, unsignedbv_typet(32));
+      }
+      else if(identifier == "roundNearestTiesToAway")
+      {
+        throw error("unsupported rounding mode");
+      }
+      else if(identifier == "roundTowardPositive")
+      {
+        // we encode as 32-bit unsignedbv
+        return from_integer(
+          ieee_floatt::ROUND_TO_PLUS_INF, unsignedbv_typet(32));
+      }
+      else if(identifier == "roundTowardNegative")
+      {
+        // we encode as 32-bit unsignedbv
+        return from_integer(
+          ieee_floatt::ROUND_TO_MINUS_INF, unsignedbv_typet(32));
+      }
+      else if(identifier == "roundTowardZero")
+      {
+        // we encode as 32-bit unsignedbv
+        return from_integer(ieee_floatt::ROUND_TO_ZERO, unsignedbv_typet(32));
+      }
       else
       {
         // rummage through id_map
@@ -958,6 +1082,24 @@ typet smt2_parsert::sort()
           throw error("expected ')' at end of sort");
 
         return unsignedbv_typet(width);
+      }
+      else if(buffer == "FloatingPoint")
+      {
+        if(next_token() != NUMERAL)
+          throw error("expected numeral as bit-width");
+
+        const auto width_e = std::stoll(buffer);
+
+        if(next_token() != NUMERAL)
+          throw error("expected numeral as bit-width");
+
+        const auto width_f = std::stoll(buffer);
+
+        // consume the ')'
+        if(next_token() != CLOSE)
+          throw error("expected ')' at end of sort");
+
+        return ieee_float_spect(width_f - 1, width_e).to_type();
       }
       else
       {
