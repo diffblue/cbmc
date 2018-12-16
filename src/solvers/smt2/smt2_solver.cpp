@@ -192,12 +192,12 @@ void smt2_solvert::command(const std::string &c)
         const auto id_map_it = id_map.find(identifier);
 
         if(id_map_it == id_map.end())
-          throw error("unexpected symbol " + id2string(identifier));
+          throw error() << "unexpected symbol `" << identifier << '\'';
 
         const exprt value = solver.get(op);
 
         if(value.is_nil())
-          throw error("no value for " + id2string(identifier));
+          throw error() << "no value for `" << identifier << '\'';
 
         values.push_back(value);
       }

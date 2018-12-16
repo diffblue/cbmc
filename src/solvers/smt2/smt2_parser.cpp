@@ -218,11 +218,7 @@ exprt smt2_parsert::let_expression()
 exprt smt2_parsert::quantifier_expression(irep_idt id)
 {
   if(next_token()!=OPEN)
-  {
-    std::ostringstream msg;
-    msg << "expected bindings after " << id;
-    throw error(msg.str());
-  }
+    throw error() << "expected bindings after " << id;
 
   std::vector<symbol_exprt> bindings;
 
@@ -257,11 +253,7 @@ exprt smt2_parsert::quantifier_expression(irep_idt id)
   exprt expr=expression();
 
   if(next_token()!=CLOSE)
-  {
-    std::ostringstream msg;
-    msg << "expected ')' after " << id;
-    throw error(msg.str());
-  }
+    throw error() << "expected ')' after " << id;
 
   exprt result=expr;
 
@@ -348,12 +340,10 @@ exprt smt2_parsert::multi_ary(irep_idt id, const exprt::operandst &op)
   {
     if(op[i].type() != op[0].type())
     {
-      std::ostringstream msg;
-      msg << "expression must have operands with matching types,"
-             " but got `"
-          << smt2_format(op[0].type()) << "' and `" << smt2_format(op[i].type())
-          << '\'';
-      throw error(msg.str());
+      throw error() << "expression must have operands with matching types,"
+                       " but got `"
+                    << smt2_format(op[0].type()) << "' and `"
+                    << smt2_format(op[i].type()) << '\'';
     }
   }
 
@@ -369,12 +359,10 @@ exprt smt2_parsert::binary_predicate(irep_idt id, const exprt::operandst &op)
 
   if(op[0].type() != op[1].type())
   {
-    std::ostringstream msg;
-    msg << "expression must have operands with matching types,"
-           " but got `"
-        << smt2_format(op[0].type()) << "' and `" << smt2_format(op[1].type())
-        << '\'';
-    throw error(msg.str());
+    throw error() << "expression must have operands with matching types,"
+                     " but got `"
+                  << smt2_format(op[0].type()) << "' and `"
+                  << smt2_format(op[1].type()) << '\'';
   }
 
   return binary_predicate_exprt(op[0], id, op[1]);
@@ -404,26 +392,16 @@ exprt smt2_parsert::function_application_ieee_float_op(
   const exprt::operandst &op)
 {
   if(op.size() != 3)
-  {
-    std::ostringstream message;
-    message << id << " takes three operands";
-    throw error(message);
-  }
+    throw error() << id << " takes three operands";
 
   if(op[1].type().id() != ID_floatbv || op[2].type().id() != ID_floatbv)
-  {
-    std::ostringstream message;
-    message << id << " takes FloatingPoint operands";
-    throw error(message);
-  }
+    throw error() << id << " takes FloatingPoint operands";
 
   if(op[1].type() != op[2].type())
   {
-    std::ostringstream message;
-    message << id << " takes FloatingPoint operands with matching sort, "
-            << "but got " << smt2_format(op[1].type()) << " vs "
-            << smt2_format(op[2].type());
-    throw error(message);
+    throw error() << id << " takes FloatingPoint operands with matching sort, "
+                  << "but got " << smt2_format(op[1].type()) << " vs "
+                  << smt2_format(op[2].type());
   }
 
   // clang-format off
@@ -494,9 +472,7 @@ exprt smt2_parsert::function_application()
       }
       else
       {
-        std::ostringstream msg;
-        msg << "unknown indexed identifier " << buffer;
-        throw error(msg.str());
+        throw error() << "unknown indexed identifier " << buffer;
       }
     }
     else if(buffer == "!")
@@ -791,9 +767,7 @@ exprt smt2_parsert::function_application()
             return symbol_exprt(final_id, id_it->second.type);
         }
 
-        std::ostringstream msg;
-        msg << "unknown function symbol " << id;
-        throw error(msg.str());
+        throw error() << "unknown function symbol `" << id << '\'';
       }
     }
     break;
@@ -847,29 +821,17 @@ exprt smt2_parsert::function_application()
                 id=="zero_extend")
         {
           if(next_token()!=NUMERAL)
-          {
-            std::ostringstream msg;
-            msg << "expected numeral after " << id;
-            throw error(msg.str());
-          }
+            throw error() << "expected numeral after " << id;
 
           auto index=std::stoll(buffer);
 
           if(next_token()!=CLOSE)
-          {
-            std::ostringstream msg;
-            msg << "expected ')' after " << id << " index";
-            throw error(msg.str());
-          }
+            throw error() << "expected ')' after " << id << " index";
 
           auto op=operands();
 
           if(op.size()!=1)
-          {
-            std::ostringstream msg;
-            msg << id << " takes one operand";
-            throw error(msg.str());
-          }
+            throw error() << id << " takes one operand";
 
           if(id=="rotate_left")
           {
@@ -911,9 +873,7 @@ exprt smt2_parsert::function_application()
         }
         else
         {
-          std::ostringstream msg;
-          msg << "unknown indexed identifier " << buffer;
-          throw error(msg.str());
+          throw error() << "unknown indexed identifier `" << buffer << '\'';
         }
       }
       else
@@ -1001,9 +961,7 @@ exprt smt2_parsert::expression()
           return std::move(symbol_expr);
         }
 
-        std::ostringstream msg;
-        msg << "unknown expression " << identifier;
-        throw error(msg.str());
+        throw error() << "unknown expression `" << identifier << '\'';
       }
     }
 
@@ -1054,11 +1012,7 @@ typet smt2_parsert::sort()
     else if(buffer=="Real")
       return real_typet();
     else
-    {
-      std::ostringstream msg;
-      msg << "unexpected sort: `" << buffer << '\'';
-      throw error(msg.str());
-    }
+      throw error() << "unexpected sort: `" << buffer << '\'';
 
   case OPEN:
     if(next_token()!=SYMBOL)
@@ -1102,11 +1056,7 @@ typet smt2_parsert::sort()
         return ieee_float_spect(width_f - 1, width_e).to_type();
       }
       else
-      {
-        std::ostringstream msg;
-        msg << "unexpected sort: `" << buffer << '\'';
-        throw error(msg.str());
-      }
+        throw error() << "unexpected sort: `" << buffer << '\'';
     }
     else if(buffer == "Array")
     {
@@ -1126,16 +1076,10 @@ typet smt2_parsert::sort()
         throw error("unsupported array sort");
     }
     else
-    {
-      std::ostringstream msg;
-      msg << "unexpected sort: `" << buffer << '\'';
-      throw error(msg.str());
-    }
+      throw error() << "unexpected sort: `" << buffer << '\'';
 
   default:
-    std::ostringstream msg;
-    msg << "unexpected token in a sort: `" << buffer << '\'';
-    throw error(msg.str());
+    throw error() << "unexpected token in a sort: `" << buffer << '\'';
   }
 }
 
@@ -1224,21 +1168,13 @@ void smt2_parsert::command(const std::string &c)
     // declare-var appears to be a synonym for declare-const that is
     // accepted by Z3 and CVC4
     if(next_token()!=SYMBOL)
-    {
-      std::ostringstream msg;
-      msg << "expected a symbol after `" << c << '\'';
-      throw error(msg.str());
-    }
+      throw error() << "expected a symbol after `" << c << '\'';
 
     irep_idt id = buffer;
     auto type = sort();
 
     if(id_map.find(id)!=id_map.end())
-    {
-      std::ostringstream msg;
-      msg << "identifier `" << id << "' defined twice";
-      throw error(msg.str());
-    }
+      throw error() << "identifier `" << id << "' defined twice";
 
     auto &entry = id_map[id];
     entry.type = type;
@@ -1253,11 +1189,7 @@ void smt2_parsert::command(const std::string &c)
     auto type = function_signature_declaration();
 
     if(id_map.find(id)!=id_map.end())
-    {
-      std::ostringstream msg;
-      msg << "identifier `" << id << "' defined twice";
-      throw error(msg.str());
-    }
+      throw error() << "identifier `" << id << "' defined twice";
 
     auto &entry = id_map[id];
     entry.type = type;
@@ -1271,11 +1203,7 @@ void smt2_parsert::command(const std::string &c)
     const irep_idt id = buffer;
 
     if(id_map.find(id) != id_map.end())
-    {
-      std::ostringstream msg;
-      msg << "identifier `" << id << "' defined twice";
-      throw error(msg.str());
-    }
+      throw error() << "identifier `" << id << "' defined twice";
 
     const auto type = sort();
     const auto value = expression();
@@ -1283,11 +1211,9 @@ void smt2_parsert::command(const std::string &c)
     // check type of value
     if(value.type() != type)
     {
-      std::ostringstream msg;
-      msg << "type mismatch in constant definition: expected `"
-          << smt2_format(type) << "' but got `" << smt2_format(value.type())
-          << '\'';
-      throw error(msg.str());
+      throw error() << "type mismatch in constant definition: expected `"
+                    << smt2_format(type) << "' but got `"
+                    << smt2_format(value.type()) << '\'';
     }
 
     // create the entry
@@ -1303,11 +1229,7 @@ void smt2_parsert::command(const std::string &c)
     const irep_idt id=buffer;
 
     if(id_map.find(id)!=id_map.end())
-    {
-      std::ostringstream msg;
-      msg << "identifier `" << id << "' defined twice";
-      throw error(msg.str());
-    }
+      throw error() << "identifier `" << id << "' defined twice";
 
     const auto signature = function_signature_definition();
     const auto body = expression();
@@ -1318,20 +1240,16 @@ void smt2_parsert::command(const std::string &c)
       const auto &f_signature = to_mathematical_function_type(signature.type);
       if(body.type() != f_signature.codomain())
       {
-        std::ostringstream msg;
-        msg << "type mismatch in function definition: expected `"
-            << smt2_format(f_signature.codomain()) << "' but got `"
-            << smt2_format(body.type()) << '\'';
-        throw error(msg.str());
+        throw error() << "type mismatch in function definition: expected `"
+                      << smt2_format(f_signature.codomain()) << "' but got `"
+                      << smt2_format(body.type()) << '\'';
       }
     }
     else if(body.type() != signature.type)
     {
-      std::ostringstream msg;
-      msg << "type mismatch in function definition: expected `"
-          << smt2_format(signature.type) << "' but got `"
-          << smt2_format(body.type()) << '\'';
-      throw error(msg.str());
+      throw error() << "type mismatch in function definition: expected `"
+                    << smt2_format(signature.type) << "' but got `"
+                    << smt2_format(body.type()) << '\'';
     }
 
     // create the entry

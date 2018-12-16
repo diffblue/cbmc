@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/exception_utils.h>
 #include <util/parser.h>
 
+#include <sstream>
 #include <string>
 
 class smt2_tokenizert:public parsert
@@ -27,18 +28,18 @@ public:
   {
   public:
     smt2_errort(const std::string &_message, unsigned _line_no)
-      : message(_message), line_no(_line_no)
+      : line_no(_line_no)
     {
+      message << _message;
     }
 
-    smt2_errort(std::string &&_message, unsigned _line_no)
-      : message(std::move(_message)), line_no(_line_no)
+    explicit smt2_errort(unsigned _line_no) : line_no(_line_no)
     {
     }
 
     std::string what() const override
     {
-      return message;
+      return message.str();
     }
 
     unsigned get_line_no() const
@@ -46,8 +47,13 @@ public:
       return line_no;
     }
 
+    std::ostringstream &message_ostream()
+    {
+      return message;
+    }
+
   protected:
-    const std::string message;
+    std::ostringstream message;
     unsigned line_no;
   };
 
@@ -85,14 +91,16 @@ protected:
   /// or the end of file is reached
   void skip_to_end_of_list();
 
-  smt2_errort error(std::string &&message)
+  /// generate an error exception, pre-filled with a message
+  smt2_errort error(const std::string &message)
   {
-    return smt2_errort(std::move(message), line_no);
+    return smt2_errort(message, line_no);
   }
 
-  smt2_errort error(const std::ostringstream &message)
+  /// generate an error exception
+  smt2_errort error()
   {
-    return smt2_errort(message.str(), line_no);
+    return smt2_errort(line_no);
   }
 
 private:
@@ -107,5 +115,14 @@ private:
   /// read a token from the input stream and store it in 'token'
   void get_token_from_stream();
 };
+
+/// add to the diagnostic information in the given smt2_tokenizer exception
+template <typename T>
+smt2_tokenizert::smt2_errort
+operator<<(smt2_tokenizert::smt2_errort &&e, const T &message)
+{
+  e.message_ostream() << message;
+  return std::move(e);
+}
 
 #endif // CPROVER_SOLVERS_SMT2_SMT2_PARSER_H
