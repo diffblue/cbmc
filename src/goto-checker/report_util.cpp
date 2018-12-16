@@ -73,6 +73,62 @@ void report_failure(ui_message_handlert &ui_message_handler)
   }
 }
 
+void report_inconclusive(ui_message_handlert &ui_message_handler)
+{
+  messaget msg(ui_message_handler);
+  msg.result() << "VERIFICATION INCONCLUSIVE" << messaget::eom;
+
+  switch(ui_message_handler.get_ui())
+  {
+  case ui_message_handlert::uit::PLAIN:
+    break;
+
+  case ui_message_handlert::uit::XML_UI:
+  {
+    xmlt xml("cprover-status");
+    xml.data = "INCONCLUSIVE";
+    msg.result() << xml;
+  }
+  break;
+
+  case ui_message_handlert::uit::JSON_UI:
+  {
+    json_objectt json_result;
+    json_result["cProverStatus"] = json_stringt("inconclusive");
+    msg.result() << json_result;
+  }
+  break;
+  }
+}
+
+void report_error(ui_message_handlert &ui_message_handler)
+{
+  messaget msg(ui_message_handler);
+  msg.result() << "VERIFICATION ERROR" << messaget::eom;
+
+  switch(ui_message_handler.get_ui())
+  {
+  case ui_message_handlert::uit::PLAIN:
+    break;
+
+  case ui_message_handlert::uit::XML_UI:
+  {
+    xmlt xml("cprover-status");
+    xml.data = "ERROR";
+    msg.result() << xml;
+  }
+  break;
+
+  case ui_message_handlert::uit::JSON_UI:
+  {
+    json_objectt json_result;
+    json_result["cProverStatus"] = json_stringt("error");
+    msg.result() << json_result;
+  }
+  break;
+  }
+}
+
 void output_properties(
   const propertiest &properties,
   ui_message_handlert &ui_message_handler)

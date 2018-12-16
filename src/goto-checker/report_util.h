@@ -18,6 +18,8 @@ class ui_message_handlert;
 
 void report_success(ui_message_handlert &);
 void report_failure(ui_message_handlert &);
+void report_inconclusive(ui_message_handlert &);
+void report_error(ui_message_handlert &);
 
 void output_properties(
   const propertiest &properties,
