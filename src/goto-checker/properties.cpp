@@ -145,6 +145,22 @@ count_properties(const propertiest &properties, property_statust status)
   return count;
 }
 
+bool is_property_to_check(property_statust status)
+{
+  return status == property_statust::NOT_CHECKED ||
+         status == property_statust::UNKNOWN;
+}
+
+bool has_properties_to_check(const propertiest &properties)
+{
+  for(const auto &property_pair : properties)
+  {
+    if(is_property_to_check(property_pair.second.status))
+      return true;
+  }
+  return false;
+}
+
 /// Update with the preference order
 /// 1. old non-UNKNOWN/non-NOT_CHECKED status
 /// 2. new non-UNKNOWN/non-NOT_CHECKED status
