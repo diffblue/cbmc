@@ -20,7 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <analyses/goto_check.h>
 
-#include <cbmc/bmc.h>
+#include <goto-checker/bmc_util.h>
 
 #include <goto-programs/class_hierarchy.h>
 #include <goto-programs/goto_trace.h>
@@ -33,7 +33,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <java_bytecode/java_bytecode_language.h>
 
-class bmct;
 class goto_functionst;
 class optionst;
 
