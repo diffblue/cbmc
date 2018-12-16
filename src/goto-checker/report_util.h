@@ -16,6 +16,9 @@ Author: Daniel Kroening, Peter Schrammel
 
 class ui_message_handlert;
 
+void report_success(ui_message_handlert &);
+void report_failure(ui_message_handlert &);
+
 void output_properties(
   const propertiest &properties,
   ui_message_handlert &ui_message_handler);

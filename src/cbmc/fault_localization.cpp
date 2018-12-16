@@ -27,6 +27,7 @@ Author: Peter Schrammel
 #include <goto-programs/xml_goto_trace.h>
 
 #include <goto-checker/bmc_util.h>
+#include <goto-checker/report_util.h>
 
 #include "counterexample_beautification.h"
 

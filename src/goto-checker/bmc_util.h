@@ -32,9 +32,6 @@ void convert_symex_target_equation(
   prop_convt &,
   message_handlert &);
 
-void report_failure(ui_message_handlert &);
-void report_success(ui_message_handlert &);
-
 void build_error_trace(
   goto_tracet &,
   const namespacet &,
