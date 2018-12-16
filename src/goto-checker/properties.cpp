@@ -88,3 +88,15 @@ propertiest initialize_properties(const abstract_goto_modelt &goto_model)
   }
   return properties;
 }
+
+std::size_t
+count_properties(const propertiest &properties, property_statust status)
+{
+  std::size_t count = 0;
+  for(const auto &property_pair : properties)
+  {
+    if(property_pair.second.status == status)
+      ++count;
+  }
+  return count;
+}
