@@ -1,16 +1,16 @@
 /*******************************************************************\
 
-Module: Bounded Model Checking for ANSI-C + HDL
+Module: Solver Factory
 
-Author: Daniel Kroening, kroening@kroening.com
+Author: Daniel Kroening, Peter Schrammel
 
 \*******************************************************************/
 
 /// \file
-/// Bounded Model Checking for ANSI-C + HDL
+/// Solver Factory
 
-#ifndef CPROVER_CBMC_CBMC_SOLVERS_H
-#define CPROVER_CBMC_CBMC_SOLVERS_H
+#ifndef CPROVER_GOTO_CHECKER_SOLVER_FACTORY_H
+#define CPROVER_GOTO_CHECKER_SOLVER_FACTORY_H
 
 #include <list>
 #include <map>
@@ -18,17 +18,17 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/options.h>
 
+#include <goto-symex/symex_target_equation.h>
 #include <solvers/prop/prop.h>
 #include <solvers/prop/prop_conv.h>
 #include <solvers/sat/cnf.h>
 #include <solvers/sat/satcheck.h>
 #include <solvers/smt2/smt2_dec.h>
-#include <goto-symex/symex_target_equation.h>
 
-class cbmc_solverst
+class solver_factoryt
 {
 public:
-  cbmc_solverst(
+  solver_factoryt(
     const optionst &_options,
     const symbol_tablet &_symbol_table,
     message_handlert &_message_handler,
@@ -50,19 +50,18 @@ public:
     {
     }
 
-    explicit solvert(std::unique_ptr<prop_convt> p):prop_conv_ptr(std::move(p))
+    explicit solvert(std::unique_ptr<prop_convt> p)
+      : prop_conv_ptr(std::move(p))
     {
     }
 
-    solvert(std::unique_ptr<prop_convt> p1, std::unique_ptr<propt> p2):
-      prop_ptr(std::move(p2)),
-      prop_conv_ptr(std::move(p1))
+    solvert(std::unique_ptr<prop_convt> p1, std::unique_ptr<propt> p2)
+      : prop_ptr(std::move(p2)), prop_conv_ptr(std::move(p1))
     {
     }
 
-    solvert(std::unique_ptr<prop_convt> p1, std::unique_ptr<std::ofstream> p2):
-      ofstream_ptr(std::move(p2)),
-      prop_conv_ptr(std::move(p1))
+    solvert(std::unique_ptr<prop_convt> p1, std::unique_ptr<std::ofstream> p2)
+      : ofstream_ptr(std::move(p2)), prop_conv_ptr(std::move(p1))
     {
     }
 
@@ -80,17 +79,17 @@ public:
 
     void set_prop_conv(std::unique_ptr<prop_convt> p)
     {
-      prop_conv_ptr=std::move(p);
+      prop_conv_ptr = std::move(p);
     }
 
     void set_prop(std::unique_ptr<propt> p)
     {
-      prop_ptr=std::move(p);
+      prop_ptr = std::move(p);
     }
 
     void set_ofstream(std::unique_ptr<std::ofstream> p)
     {
-      ofstream_ptr=std::move(p);
+      ofstream_ptr = std::move(p);
     }
 
     // the objects are deleted in the opposite order they appear below
@@ -113,7 +112,7 @@ public:
     return get_default();
   }
 
-  virtual ~cbmc_solverst()
+  virtual ~solver_factoryt()
   {
   }
 
@@ -137,4 +136,4 @@ protected:
   void no_incremental_check();
 };
 
-#endif // CPROVER_CBMC_CBMC_SOLVERS_H
+#endif // CPROVER_GOTO_CHECKER_SOLVER_FACTORY_H

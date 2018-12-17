@@ -32,7 +32,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <linking/static_lifetime_init.h>
 
-#include "cbmc_solvers.h"
+#include <goto-checker/solver_factory.h>
+
 #include "counterexample_beautification.h"
 #include "fault_localization.h"
 
@@ -519,13 +520,13 @@ int bmct::do_language_agnostic_bmc(
   try
   {
     {
-      cbmc_solverst solvers(
+      solver_factoryt solvers(
         opts,
         symbol_table,
         ui,
         ui.get_ui() == ui_message_handlert::uit::XML_UI);
-      std::unique_ptr<cbmc_solverst::solvert> cbmc_solver;
-      cbmc_solver = solvers.get_solver();
+      std::unique_ptr<solver_factoryt::solvert> cbmc_solver =
+        solvers.get_solver();
       prop_convt &pc = cbmc_solver->prop_conv();
       bmct bmc(opts, symbol_table, ui, pc, *worklist, callback_after_symex);
       if(driver_configure_bmc)
@@ -566,13 +567,13 @@ int bmct::do_language_agnostic_bmc(
 
     while(!worklist->empty())
     {
-      cbmc_solverst solvers(
+      solver_factoryt solvers(
         opts,
         symbol_table,
         ui,
         ui.get_ui() == ui_message_handlert::uit::XML_UI);
-      std::unique_ptr<cbmc_solverst::solvert> cbmc_solver;
-      cbmc_solver = solvers.get_solver();
+      std::unique_ptr<solver_factoryt::solvert> cbmc_solver =
+        solvers.get_solver();
       prop_convt &pc = cbmc_solver->prop_conv();
       path_storaget::patht &resume = worklist->peek();
       path_explorert pe(

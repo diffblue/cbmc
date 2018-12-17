@@ -4,7 +4,6 @@ SRC = all_properties.cpp \
       cbmc_languages.cpp \
       cbmc_main.cpp \
       cbmc_parse_options.cpp \
-      cbmc_solvers.cpp \
       counterexample_beautification.cpp \
       fault_localization.cpp \
       symex_bmc.cpp \
@@ -18,6 +17,7 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../json-symtab-language/json-symtab-language$(LIBEXT) \
       ../linking/linking$(LIBEXT) \
       ../big-int/big-int$(LIBEXT) \
+      ../goto-checker/goto-checker$(LIBEXT) \
       ../goto-programs/goto-programs$(LIBEXT) \
       ../goto-symex/goto-symex$(LIBEXT) \
       ../pointer-analysis/value_set$(OBJEXT) \

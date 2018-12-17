@@ -58,6 +58,7 @@ set_target_properties(
     goto-analyzer-lib
     goto-cc
     goto-cc-lib
+    goto-checker
     goto-diff
     goto-diff-lib
     goto-instrument

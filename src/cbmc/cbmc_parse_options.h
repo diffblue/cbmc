@@ -24,13 +24,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <analyses/goto_check.h>
 
+#include <goto-checker/solver_factory.h>
+
 #include <goto-programs/goto_trace.h>
 
 #include <solvers/refinement/string_refinement.h>
 
 #include "bmc.h"
 #include "xml_interface.h"
-#include "cbmc_solvers.h"
 
 class bmct;
 class goto_functionst;

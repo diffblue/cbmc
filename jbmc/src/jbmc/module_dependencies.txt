@@ -1,6 +1,7 @@
 analyses
 ansi-c # should go away
-cbmc # bmc.h
+cbmc # bmc.h - will go away
+goto-checker
 goto-instrument
 goto-programs
 goto-symex
