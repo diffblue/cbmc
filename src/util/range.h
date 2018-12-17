@@ -357,12 +357,11 @@ ranget<iteratort> make_range(iteratort begin, iteratort end)
   return ranget<iteratort>(begin, end);
 }
 
-template <
-  typename containert,
-  typename iteratort = typename containert::const_iterator>
-ranget<iteratort> make_range(const containert &container)
+template <typename containert>
+auto make_range(containert &container) -> ranget<decltype(container.begin())>
 {
-  return ranget<iteratort>(container.begin(), container.end());
+  return ranget<decltype(container.begin())>(
+    container.begin(), container.end());
 }
 
 #endif // CPROVER_UTIL_RANGE_H
