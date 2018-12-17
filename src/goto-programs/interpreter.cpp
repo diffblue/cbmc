@@ -625,11 +625,7 @@ exprt interpretert::get_value(
         return address_of_exprt(member_expr);
       }
 
-      index_exprt index_expr(
-        symbol_expr,
-        from_integer(offset, integer_typet()));
-
-      return std::move(index_expr);
+      return index_exprt(symbol_expr, from_integer(offset, integer_typet()));
     }
 
     error() << "interpreter: invalid pointer "

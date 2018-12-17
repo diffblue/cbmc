@@ -264,10 +264,10 @@ bool generate_ansi_c_start_function(
         // assume argc is at least one
         exprt one=from_integer(1, argc_symbol.type);
 
-        const binary_relation_exprt ge(argc_symbol.symbol_expr(), ID_ge, one);
+        binary_relation_exprt ge(
+          argc_symbol.symbol_expr(), ID_ge, std::move(one));
 
-        code_assumet assumption(ge);
-        init_code.add(std::move(assumption));
+        init_code.add(code_assumet(std::move(ge)));
       }
 
       {
@@ -277,11 +277,10 @@ bool generate_ansi_c_start_function(
 
         exprt bound_expr=from_integer(upper_bound, argc_symbol.type);
 
-        const binary_relation_exprt le(
-          argc_symbol.symbol_expr(), ID_le, bound_expr);
+        binary_relation_exprt le(
+          argc_symbol.symbol_expr(), ID_le, std::move(bound_expr));
 
-        code_assumet assumption(le);
-        init_code.add(std::move(assumption));
+        init_code.add(code_assumet(std::move(le)));
       }
 
       {
@@ -314,11 +313,10 @@ bool generate_ansi_c_start_function(
 
         exprt max_minus_one=from_integer(max-1, envp_size_symbol.type);
 
-        const binary_relation_exprt le(
-          envp_size_symbol.symbol_expr(), ID_le, max_minus_one);
+        binary_relation_exprt le(
+          envp_size_symbol.symbol_expr(), ID_le, std::move(max_minus_one));
 
-        code_assumet assumption(le);
-        init_code.add(std::move(assumption));
+        init_code.add(code_assumet(le));
       }
 
       {
@@ -362,18 +360,16 @@ bool generate_ansi_c_start_function(
         const symbolt &envp_size_symbol=ns.lookup("envp_size'");
 
         // assume envp[envp_size] is NULL
-        const null_pointer_exprt null(
-          to_pointer_type(envp_symbol.type.subtype()));
+        null_pointer_exprt null(to_pointer_type(envp_symbol.type.subtype()));
 
         index_exprt index_expr(
           envp_symbol.symbol_expr(), envp_size_symbol.symbol_expr());
         // disable bounds check on that one
         index_expr.set("bounds_check", false);
 
-        const equal_exprt is_null(index_expr, null);
+        equal_exprt is_null(std::move(index_expr), std::move(null));
 
-        code_assumet assumption2(is_null);
-        init_code.add(std::move(assumption2));
+        init_code.add(code_assumet(is_null));
       }
 
       {

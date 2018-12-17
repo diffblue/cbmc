@@ -413,7 +413,7 @@ exprt smt2_parsert::function_application_ieee_float_op(
     throw error("unsupported floating-point operation");
   // clang-format on
 
-  return std::move(ieee_float_op_exprt(op[1], expr_id, op[2], op[0]));
+  return ieee_float_op_exprt(op[1], expr_id, op[2], op[0]);
 }
 
 exprt smt2_parsert::function_application_fp(const exprt::operandst &op)
@@ -441,8 +441,7 @@ exprt smt2_parsert::function_application_fp(const exprt::operandst &op)
   concatenation_exprt c(bv_typet(width_e + width_f + 1));
   c.operands() = {op[0], op[1], op[2]};
 
-  return std::move(
-    typecast_exprt(c, ieee_float_spect(width_f, width_e).to_type()));
+  return typecast_exprt(c, ieee_float_spect(width_f, width_e).to_type());
 }
 
 exprt smt2_parsert::function_application()

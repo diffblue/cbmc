@@ -169,16 +169,12 @@ exprt boolbvt::bv_get_rec(
       // Any idea that's better than just returning the first component?
       std::size_t component_nr=0;
 
-      union_exprt value(union_type);
+      const typet &subtype = components[component_nr].type();
 
-      value.set_component_name(
-        components[component_nr].get_name());
-
-      const typet &subtype=components[component_nr].type();
-
-      value.op()=bv_get_rec(bv, unknown, offset, subtype);
-
-      return std::move(value);
+      return union_exprt(
+        components[component_nr].get_name(),
+        bv_get_rec(bv, unknown, offset, subtype),
+        union_type);
     }
     else if(type.id()==ID_vector)
     {
