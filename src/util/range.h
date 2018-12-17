@@ -142,6 +142,16 @@ public:
     return tmp;
   }
 
+  value_type &operator*()
+  {
+    return *underlying;
+  }
+
+  value_type *operator->()
+  {
+    return &(*underlying);
+  }
+
   const value_type &operator*() const
   {
     return *underlying;
