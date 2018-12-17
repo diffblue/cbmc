@@ -244,6 +244,20 @@ public:
     return tmp;
   }
 
+  value_type &operator*()
+  {
+    if(first_begin == first_end)
+      return *second_begin;
+    return *first_begin;
+  }
+
+  value_type *operator->()
+  {
+    if(first_begin == first_end)
+      return &(*second_begin);
+    return &(*first_begin);
+  }
+
   const value_type &operator*() const
   {
     if(first_begin == first_end)
