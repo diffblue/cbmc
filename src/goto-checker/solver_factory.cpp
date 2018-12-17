@@ -11,22 +11,27 @@ Author: Daniel Kroening, Peter Schrammel
 
 #include "solver_factory.h"
 
-#include <fstream>
 #include <iostream>
-#include <memory>
-#include <string>
 
 #include <util/exception_utils.h>
 #include <util/make_unique.h>
-#include <util/unicode.h>
+#include <util/message.h>
+#include <util/namespace.h>
+#include <util/options.h>
+#include <util/symbol_table.h>
 #include <util/version.h>
 
+#ifdef _MSC_VER
+#include <util/unicode.h>
+#endif
+
 #include <solvers/flattening/bv_dimacs.h>
+#include <solvers/prop/prop.h>
+#include <solvers/prop/prop_conv.h>
 #include <solvers/refinement/bv_refinement.h>
 #include <solvers/refinement/string_refinement.h>
 #include <solvers/sat/dimacs_cnf.h>
 #include <solvers/sat/satcheck.h>
-#include <solvers/smt2/smt2_dec.h>
 
 solver_factoryt::solver_factoryt(
   const optionst &_options,

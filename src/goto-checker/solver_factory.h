@@ -12,18 +12,16 @@ Author: Daniel Kroening, Peter Schrammel
 #ifndef CPROVER_GOTO_CHECKER_SOLVER_FACTORY_H
 #define CPROVER_GOTO_CHECKER_SOLVER_FACTORY_H
 
-#include <list>
-#include <map>
 #include <memory>
 
-#include <util/options.h>
-
-#include <goto-symex/symex_target_equation.h>
-#include <solvers/prop/prop.h>
-#include <solvers/prop/prop_conv.h>
-#include <solvers/sat/cnf.h>
-#include <solvers/sat/satcheck.h>
 #include <solvers/smt2/smt2_dec.h>
+
+class message_handlert;
+class namespacet;
+class optionst;
+class propt;
+class prop_convt;
+class symbol_tablet;
 
 class solver_factoryt
 {
