@@ -48,7 +48,7 @@ public:
     PRECONDITION(underlying != underlying_end);
     ++underlying;
     if(underlying != underlying_end)
-      current = util_make_unique<outputt>((*f)(*underlying));
+      current = std::make_shared<outputt>((*f)(*underlying));
     return *this;
   }
 
@@ -80,16 +80,7 @@ public:
       f(std::move(f))
   {
     if(this->underlying != this->underlying_end)
-      current = util_make_unique<outputt>((*this->f)(*this->underlying));
-  }
-
-  map_iteratort(const map_iteratort &other)
-    : underlying(other.underlying),
-      underlying_end(other.underlying_end),
-      f(other.f)
-  {
-    if(other.current != nullptr)
-      current = util_make_unique<outputt>(*other.current.get());
+      current = std::make_shared<outputt>((*this->f)(*this->underlying));
   }
 
 private:
@@ -101,7 +92,7 @@ private:
 
   /// Stores the result of \c f at the current position of the iterator.
   /// Equals nullptr if the iterator reached \c underlying_end.
-  std::unique_ptr<outputt> current = nullptr;
+  std::shared_ptr<outputt> current = nullptr;
 };
 
 /// Iterator which only stops at elements for which some given function \c f is
