@@ -32,13 +32,14 @@ void goto_convertt::convert_msc_try_finally(
     targets.set_leave(tmp.instructions.begin());
 
     // first put 'finally' code onto destructor stack
-    targets.destructor_stack.push_back(to_code(code.op1()));
+    node_indext old_stack_top = targets.destructor_stack.get_current_node();
+    targets.destructor_stack.add(to_code(code.op1()));
 
     // do 'try' code
     convert(to_code(code.op0()), dest, mode);
 
     // pop 'finally' from destructor stack
-    targets.destructor_stack.pop_back();
+    targets.destructor_stack.set_current_node(old_stack_top);
 
     // 'leave' target gets restored here
   }
@@ -74,14 +75,8 @@ void goto_convertt::convert_msc_leave(
     targets.leave_set, "leave without target", code.find_source_location());
 
   // need to process destructor stack
-  for(std::size_t d=targets.destructor_stack.size();
-      d!=targets.leave_stack_size;
-      d--)
-  {
-    codet d_code=targets.destructor_stack[d-1];
-    d_code.add_source_location()=code.source_location();
-    convert(d_code, dest, mode);
-  }
+  unwind_destructor_stack(
+    code.source_location(), dest, mode, targets.leave_stack_node);
 
   dest.add(
     goto_programt::make_goto(targets.leave_target, code.source_location()));
@@ -169,13 +164,15 @@ void goto_convertt::convert_CPROVER_try_catch(
   code_ifthenelset catch_code(exception_flag(mode), to_code(code.op1()));
   catch_code.add_source_location()=code.source_location();
 
-  targets.destructor_stack.push_back(std::move(catch_code));
+  // Store the point before the temp catch code.
+  node_indext old_stack_top = targets.destructor_stack.get_current_node();
+  targets.destructor_stack.add(catch_code);
 
   // now convert 'try' code
   convert(to_code(code.op0()), dest, mode);
 
   // pop 'catch' code off stack
-  targets.destructor_stack.pop_back();
+  targets.destructor_stack.set_current_node(old_stack_top);
 
   // add 'throw' target
   dest.destructive_append(tmp);
@@ -200,7 +197,7 @@ void goto_convertt::convert_CPROVER_throw(
   {
     // need to process destructor stack
     unwind_destructor_stack(
-      code.source_location(), targets.throw_stack_size, dest, mode);
+      code.source_location(), dest, mode, targets.throw_stack_node);
 
     // add goto
     dest.add(
@@ -209,7 +206,7 @@ void goto_convertt::convert_CPROVER_throw(
   else // otherwise, we do a return
   {
     // need to process destructor stack
-    unwind_destructor_stack(code.source_location(), 0, dest, mode);
+    unwind_destructor_stack(code.source_location(), dest, mode);
 
     // add goto
     dest.add(
@@ -228,13 +225,14 @@ void goto_convertt::convert_CPROVER_try_finally(
     code.find_source_location());
 
   // first put 'finally' code onto destructor stack
-  targets.destructor_stack.push_back(to_code(code.op1()));
+  node_indext old_stack_top = targets.destructor_stack.get_current_node();
+  targets.destructor_stack.add(to_code(code.op1()));
 
   // do 'try' code
   convert(to_code(code.op0()), dest, mode);
 
   // pop 'finally' from destructor stack
-  targets.destructor_stack.pop_back();
+  targets.destructor_stack.set_current_node(old_stack_top);
 
   // now add 'finally' code
   convert(to_code(code.op1()), dest, mode);
@@ -263,39 +261,47 @@ symbol_exprt goto_convertt::exception_flag(const irep_idt &mode)
   return symbol_exprt(id, bool_typet());
 }
 
-void goto_convertt::unwind_destructor_stack(
+/// Unwinds the destructor stack and creates destructors for each node between
+/// destructor_start_point and destructor_end_point (including the start,
+/// excluding the end).
+///
+/// If destructor_end_point isn't passed, it will unwind the whole stack.
+/// If destructor_start_point isn't passed, it will unwind from the current
+/// node.
+bool goto_convertt::unwind_destructor_stack(
   const source_locationt &source_location,
-  std::size_t final_stack_size,
   goto_programt &dest,
-  const irep_idt &mode)
+  const irep_idt &mode,
+  optionalt<node_indext> destructor_end_point,
+  optionalt<node_indext> destructor_start_point)
 {
-  unwind_destructor_stack(
-    source_location, final_stack_size, dest, targets.destructor_stack, mode);
+  return unwind_destructor_stack(
+    source_location,
+    dest,
+    targets.destructor_stack,
+    mode,
+    destructor_end_point,
+    destructor_start_point);
 }
 
-void goto_convertt::unwind_destructor_stack(
+bool goto_convertt::unwind_destructor_stack(
   const source_locationt &source_location,
-  std::size_t final_stack_size,
   goto_programt &dest,
-  destructor_stackt &destructor_stack,
-  const irep_idt &mode)
+  destructor_treet &destructor_stack,
+  const irep_idt &mode,
+  optionalt<node_indext> destructor_end_point,
+  optionalt<node_indext> destructor_start_point)
 {
-  // There might be exceptions happening in the exception
-  // handler. We thus pop off the stack, and then later
-  // one restore the original stack.
-  destructor_stackt old_stack=destructor_stack;
+  std::vector<codet> stack = destructor_stack.get_destructors(
+    destructor_end_point, destructor_start_point);
 
-  while(destructor_stack.size()>final_stack_size)
+  for(const codet &destructor : stack)
   {
-    codet d_code=destructor_stack.back();
-    d_code.add_source_location()=source_location;
-
-    // pop now to avoid doing this again
-    destructor_stack.pop_back();
-
+    // Copy, assign source location then convert.
+    codet d_code = destructor;
+    d_code.add_source_location() = source_location;
     convert(d_code, dest, mode);
   }
 
-  // Now restore old stack.
-  old_stack.swap(destructor_stack);
+  return !stack.empty();
 }

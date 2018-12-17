@@ -22,6 +22,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/message.h>
 
 #include "goto_program.h"
+#include "destructor_tree.h"
 
 class goto_convertt:public messaget
 {
@@ -333,20 +334,21 @@ protected:
   // exceptions
   //
 
-  typedef std::vector<codet> destructor_stackt;
-
   symbol_exprt exception_flag(const irep_idt &mode);
-  void unwind_destructor_stack(
-    const source_locationt &,
-    std::size_t stack_size,
+
+  bool unwind_destructor_stack(
+    const source_locationt &source_location,
     goto_programt &dest,
-    const irep_idt &mode);
-  void unwind_destructor_stack(
-    const source_locationt &,
-    std::size_t stack_size,
+    const irep_idt &mode,
+    optionalt<node_indext> destructor_start_point = {},
+    optionalt<node_indext> destructor_end_point = {});
+  bool unwind_destructor_stack(
+    const source_locationt &source_location,
     goto_programt &dest,
-    destructor_stackt &stack,
-    const irep_idt &mode);
+    destructor_treet &destructor_stack,
+    const irep_idt &mode,
+    optionalt<node_indext> destructor_start_point = {},
+    optionalt<node_indext> destructor_end_point = {});
 
   //
   // gotos
@@ -357,9 +359,9 @@ protected:
   void optimize_guarded_gotos(goto_programt &dest);
 
   typedef std::map<irep_idt,
-                   std::pair<goto_programt::targett, destructor_stackt>>
+                   std::pair<goto_programt::targett, node_indext>>
     labelst;
-  typedef std::list<std::pair<goto_programt::targett, destructor_stackt>>
+  typedef std::list<std::pair<goto_programt::targett, node_indext>>
     gotost;
   typedef std::list<goto_programt::targett> computed_gotost;
   typedef exprt::operandst caset;
@@ -374,7 +376,7 @@ protected:
     labelst labels;
     gotost gotos;
     computed_gotost computed_gotos;
-    destructor_stackt destructor_stack;
+    destructor_treet destructor_stack;
 
     casest cases;
     cases_mapt cases_map;
@@ -382,8 +384,8 @@ protected:
     goto_programt::targett return_target, break_target, continue_target,
       default_target, throw_target, leave_target;
 
-    std::size_t break_stack_size, continue_stack_size, throw_stack_size,
-                leave_stack_size;
+    node_indext break_stack_node, continue_stack_node, throw_stack_node,
+                leave_stack_node;
 
     targetst():
       return_set(false),
@@ -393,10 +395,10 @@ protected:
       default_set(false),
       throw_set(false),
       leave_set(false),
-      break_stack_size(0),
-      continue_stack_size(0),
-      throw_stack_size(0),
-      leave_stack_size(0)
+      break_stack_node(),
+      continue_stack_node(),
+      throw_stack_node(),
+      leave_stack_node()
     {
     }
 
@@ -404,14 +406,14 @@ protected:
     {
       break_set=true;
       break_target=_break_target;
-      break_stack_size=destructor_stack.size();
+      break_stack_node=destructor_stack.get_current_node();
     }
 
     void set_continue(goto_programt::targett _continue_target)
     {
       continue_set=true;
       continue_target=_continue_target;
-      continue_stack_size=destructor_stack.size();
+      continue_stack_node=destructor_stack.get_current_node();
     }
 
     void set_default(goto_programt::targett _default_target)
@@ -430,14 +432,14 @@ protected:
     {
       throw_set=true;
       throw_target=_throw_target;
-      throw_stack_size=destructor_stack.size();
+      throw_stack_node=destructor_stack.get_current_node();
     }
 
     void set_leave(goto_programt::targett _leave_target)
     {
       leave_set=true;
       leave_target=_leave_target;
-      leave_stack_size=destructor_stack.size();
+      leave_stack_node=destructor_stack.get_current_node();
     }
   } targets;
 
@@ -476,7 +478,7 @@ protected:
       default_set=targets.default_set;
       break_target=targets.break_target;
       default_target=targets.default_target;
-      break_stack_size=targets.destructor_stack.size();
+      break_stack_node=targets.destructor_stack.get_current_node();
       cases=targets.cases;
       cases_map=targets.cases_map;
     }
@@ -494,7 +496,7 @@ protected:
     goto_programt::targett break_target;
     goto_programt::targett default_target;
     bool break_set, default_set;
-    std::size_t break_stack_size;
+    node_indext break_stack_node;
 
     casest cases;
     cases_mapt cases_map;
@@ -508,7 +510,7 @@ protected:
     {
       throw_set=targets.throw_set;
       throw_target=targets.throw_target;
-      throw_stack_size=targets.destructor_stack.size();
+      throw_stack_node=targets.destructor_stack.get_current_node();
     }
 
     void restore(targetst &targets)
@@ -519,7 +521,7 @@ protected:
 
     goto_programt::targett throw_target;
     bool throw_set;
-    std::size_t throw_stack_size;
+    node_indext throw_stack_node;
   };
 
   struct leave_targett
@@ -530,7 +532,7 @@ protected:
     {
       leave_set=targets.leave_set;
       leave_target=targets.leave_target;
-      leave_stack_size=targets.destructor_stack.size();
+      leave_stack_node=targets.destructor_stack.get_current_node();
     }
 
     void restore(targetst &targets)
@@ -541,7 +543,7 @@ protected:
 
     goto_programt::targett leave_target;
     bool leave_set;
-    std::size_t leave_stack_size;
+    node_indext leave_stack_node;
   };
 
   exprt case_guard(
