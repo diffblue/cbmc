@@ -28,6 +28,78 @@ Author: Daniel Kroening, Peter Schrammel
 #include <solvers/sat/satcheck.h>
 #include <solvers/smt2/smt2_dec.h>
 
+solver_factoryt::solver_factoryt(
+  const optionst &_options,
+  const symbol_tablet &_symbol_table,
+  message_handlert &_message_handler,
+  bool _output_xml_in_refinement)
+  : options(_options),
+    symbol_table(_symbol_table),
+    ns(_symbol_table),
+    message_handler(_message_handler),
+    output_xml_in_refinement(_output_xml_in_refinement)
+{
+}
+
+solver_factoryt::solvert::solvert(std::unique_ptr<prop_convt> p)
+  : prop_conv_ptr(std::move(p))
+{
+}
+
+solver_factoryt::solvert::solvert(
+  std::unique_ptr<prop_convt> p1,
+  std::unique_ptr<propt> p2)
+  : prop_ptr(std::move(p2)), prop_conv_ptr(std::move(p1))
+{
+}
+
+solver_factoryt::solvert::solvert(
+  std::unique_ptr<prop_convt> p1,
+  std::unique_ptr<std::ofstream> p2)
+  : ofstream_ptr(std::move(p2)), prop_conv_ptr(std::move(p1))
+{
+}
+
+prop_convt &solver_factoryt::solvert::prop_conv() const
+{
+  PRECONDITION(prop_conv_ptr != nullptr);
+  return *prop_conv_ptr;
+}
+
+propt &solver_factoryt::solvert::prop() const
+{
+  PRECONDITION(prop_ptr != nullptr);
+  return *prop_ptr;
+}
+
+void solver_factoryt::solvert::set_prop_conv(std::unique_ptr<prop_convt> p)
+{
+  prop_conv_ptr = std::move(p);
+}
+
+void solver_factoryt::solvert::set_prop(std::unique_ptr<propt> p)
+{
+  prop_ptr = std::move(p);
+}
+
+void solver_factoryt::solvert::set_ofstream(std::unique_ptr<std::ofstream> p)
+{
+  ofstream_ptr = std::move(p);
+}
+
+std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_solver()
+{
+  if(options.get_bool_option("dimacs"))
+    return get_dimacs();
+  if(options.get_bool_option("refine"))
+    return get_bv_refinement();
+  else if(options.get_bool_option("refine-strings"))
+    return get_string_refinement();
+  if(options.get_bool_option("smt2"))
+    return get_smt2(get_smt2_solver_type());
+  return get_default();
+}
+
 /// Uses the options to pick an SMT 2.0 solver
 /// \return An smt2_dect::solvert giving the solver to use.
 smt2_dect::solvert solver_factoryt::get_smt2_solver_type() const
