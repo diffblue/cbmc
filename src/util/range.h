@@ -60,6 +60,16 @@ public:
     return tmp;
   }
 
+  value_type &operator*()
+  {
+    return *current.get();
+  }
+
+  value_type *operator->()
+  {
+    return &(*current.get());
+  }
+
   const value_type &operator*() const
   {
     return *current.get();
