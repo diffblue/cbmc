@@ -1,0 +1,15 @@
+CORE
+Test.class
+--function Test.main
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^Passing problem to
+^warning: ignoring
+--
+The "Passing problem to..." line is a sign that symex couldn't prove the
+assertion is valid by itself, which in turn probably indicates a weakness of the
+expression simplifier. The companion test_no_simplify.desc checks that the
+"Passing problem to" line is indeed present when we indeed resort to the SAT
+solver.

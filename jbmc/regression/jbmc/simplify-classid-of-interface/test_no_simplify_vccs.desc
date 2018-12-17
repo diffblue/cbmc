@@ -1,0 +1,11 @@
+CORE
+Test.class
+--function Test.main --no-simplify --unwind 10 --show-vcc
+^EXIT=0$
+^SIGNAL=0$
+"java::Impl1" = cast\(\{ \{ "java::Impl1"\}, 0\}, struct \{ struct \{ string @class_identifier \} @java.lang.Object \}\)\.@java.lang.Object\.@class_identifier
+--
+^warning: ignoring
+--
+This checks that the test generates the VCC testing the class-id that we're
+intending to simplify away in the main test.
