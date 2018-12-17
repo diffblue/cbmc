@@ -1,11 +1,11 @@
-KNOWNBUG
+CORE
 main.c
 module2.c
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
+line 21 assertion \*g\.a == 42: SUCCESS
+line 22 assertion \*g\.c == 41: FAILURE
 ^\*\* 1 of 2 failed
 --
 ^warning: ignoring
---
-This is either a bug in goto-symex or value_sett (where the invariant fails).
