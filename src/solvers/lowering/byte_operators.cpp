@@ -349,8 +349,7 @@ exprt lower_byte_extract(const byte_extract_exprt &src, const namespacet &ns)
     return simplify_expr(typecast_exprt(op.front(), src.type()), ns);
   else // width_bytes>=2
   {
-    concatenation_exprt concatenation(src.type());
-    concatenation.operands().swap(op);
+    concatenation_exprt concatenation(std::move(op), src.type());
     return simplify_expr(concatenation, ns);
   }
 }

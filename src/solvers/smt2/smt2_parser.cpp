@@ -438,10 +438,8 @@ exprt smt2_parsert::function_application_fp(const exprt::operandst &op)
   const auto width_f = to_unsignedbv_type(op[2].type()).get_width();
 
   // stitch the bits together
-  concatenation_exprt c(bv_typet(width_e + width_f + 1));
-  c.operands() = {op[0], op[1], op[2]};
-
-  return typecast_exprt(c, ieee_float_spect(width_f, width_e).to_type());
+  return concatenation_exprt(
+    exprt::operandst(op), ieee_float_spect(width_f, width_e).to_type());
 }
 
 exprt smt2_parsert::function_application()

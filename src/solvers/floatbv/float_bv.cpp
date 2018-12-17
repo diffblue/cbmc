@@ -1374,10 +1374,7 @@ exprt float_bvt::pack(
 
   // stitch all three together
   return concatenation_exprt(
-    sign_bit,
-      concatenation_exprt(
-      exponent, fraction,
-      unsignedbv_typet(spec.e+spec.f)),
+    {std::move(sign_bit), std::move(exponent), std::move(fraction)},
     spec.to_type());
 }
 
