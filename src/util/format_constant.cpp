@@ -10,10 +10,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "format_constant.h"
 
 #include "arith_tools.h"
+#include "expr.h"
 #include "fixedbv.h"
 #include "ieee_float.h"
-#include "expr.h"
 #include "std_expr.h"
+#include "string_constant.h"
 
 std::string format_constantt::operator()(const exprt &expr)
 {
@@ -40,7 +41,7 @@ std::string format_constantt::operator()(const exprt &expr)
     }
   }
   else if(expr.id()==ID_string_constant)
-    return expr.get_string(ID_value);
+    return id2string(to_string_constant(expr).get_value());
 
   return "(format-constant failed: "+expr.id_string()+")";
 }

@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "pointer_offset_size.h"
 #include "pointer_predicates.h"
 #include "std_expr.h"
+#include "string_constant.h"
 #include "threeval.h"
 
 static bool is_dereference_integer_object(
@@ -683,7 +684,8 @@ bool simplify_exprt::simplify_object_size(exprt &expr)
     else if(op.op0().id()==ID_string_constant)
     {
       typet type=expr.type();
-      expr=from_integer(op.op0().get(ID_value).size()+1, type);
+      expr =
+        from_integer(to_string_constant(op.op0()).get_value().size() + 1, type);
       return false;
     }
   }

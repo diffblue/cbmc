@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/expr_util.h>
 #include <util/simplify_expr.h>
+#include <util/string_constant.h>
 #include <util/xml_expr.h>
 
 #include <langapi/language_util.h>
@@ -182,10 +183,7 @@ unsigned custom_bitvector_analysist::get_bit_nr(
   else if(string_expr.id()==ID_index)
     return get_bit_nr(to_index_expr(string_expr).array());
   else if(string_expr.id()==ID_string_constant)
-  {
-    irep_idt value=string_expr.get(ID_value);
-    return bits.number(value);
-  }
+    return bits.number(to_string_constant(string_expr).get_value());
   else
     return bits.number("(unknown)");
 }

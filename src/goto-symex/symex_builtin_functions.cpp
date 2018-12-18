@@ -19,6 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_offset_size.h>
 #include <util/simplify_expr.h>
 #include <util/string2int.h>
+#include <util/string_constant.h>
 
 inline static typet c_sizeof_type_rec(const exprt &expr)
 {
@@ -288,7 +289,7 @@ irep_idt get_string_argument_rec(const exprt &src)
         index_expr.index().is_zero())
       {
         const exprt &fmt_str = index_expr.array();
-        return fmt_str.get_string(ID_value);
+        return to_string_constant(fmt_str).get_value();
       }
     }
   }
@@ -476,7 +477,7 @@ void goto_symext::symex_trace(
   {
     std::list<exprt> vars;
 
-    irep_idt event=code.arguments()[1].op0().get(ID_value);
+    irep_idt event = to_string_constant(code.arguments()[1].op0()).get_value();
 
     for(std::size_t j=2; j<code.arguments().size(); j++)
     {

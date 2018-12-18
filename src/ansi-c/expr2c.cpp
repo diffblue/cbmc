@@ -24,6 +24,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/lispirep.h>
 #include <util/namespace.h>
 #include <util/pointer_offset_size.h>
+#include <util/string_constant.h>
 #include <util/suffix.h>
 #include <util/symbol.h>
 
@@ -3867,7 +3868,8 @@ std::string expr2ct::convert_with_precedence(
     return convert_constant(to_constant_expr(src), precedence);
 
   else if(src.id()==ID_string_constant)
-    return '"'+MetaString(src.get_string(ID_value))+'"';
+    return '"' + MetaString(id2string(to_string_constant(src).get_value())) +
+           '"';
 
   else if(src.id()==ID_struct)
     return convert_struct(src, precedence);

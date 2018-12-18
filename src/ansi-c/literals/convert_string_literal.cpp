@@ -153,9 +153,6 @@ exprt convert_string_literal(const std::string &src)
       char_value[i]=value[i];
     }
 
-    string_constantt result;
-    result.set_value(char_value);
-
-    return std::move(result);
+    return string_constantt(char_value);
   }
 }
