@@ -18,7 +18,7 @@ void symbol_table_from_json(const jsont &in, symbol_tablet &symbol_table)
   if(!in.is_array())
     throw deserialization_exceptiont(
       "symbol_table_from_json: JSON input must be an array");
-  for(const auto &js_symbol : in.array)
+  for(const auto &js_symbol : to_json_array(in))
   {
     symbolt deserialized = symbol_from_json(js_symbol);
     if(symbol_table.add(deserialized))

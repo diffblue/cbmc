@@ -40,28 +40,25 @@ bool taint_parser(
     return true;
   }
 
-  for(jsont::arrayt::const_iterator
-      it=json.array.begin();
-      it!=json.array.end();
-      it++)
+  for(const auto &taint_spec : to_json_array(json))
   {
-    if(!it->is_object())
+    if(!taint_spec.is_object())
     {
       messaget message(message_handler);
       message.error() << "expecting an array of objects "
-                      << "in the taint file, but got "
-                      << *it << messaget::eom;
+                      << "in the taint file, but got " << taint_spec
+                      << messaget::eom;
       return true;
     }
 
     taint_parse_treet::rulet rule;
 
-    const std::string kind=(*it)["kind"].value;
-    const std::string function=(*it)["function"].value;
-    const std::string where=(*it)["where"].value;
-    const std::string taint=(*it)["taint"].value;
-    const std::string message=(*it)["message"].value;
-    const std::string id=(*it)["id"].value;
+    const std::string kind = taint_spec["kind"].value;
+    const std::string function = taint_spec["function"].value;
+    const std::string where = taint_spec["where"].value;
+    const std::string taint = taint_spec["taint"].value;
+    const std::string message = taint_spec["message"].value;
+    const std::string id = taint_spec["id"].value;
 
     if(kind=="source")
       rule.kind=taint_parse_treet::rulet::SOURCE;

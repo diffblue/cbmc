@@ -161,7 +161,7 @@ void java_bytecode_languaget::set_language_options(const optionst &options)
         throw "the JSON file has a wrong format";
 
       // add jars from JSON config file to classpath
-      for(const jsont &file_entry : include_files.array)
+      for(const jsont &file_entry : to_json_array(include_files))
       {
         DATA_INVARIANT(
           file_entry.is_string() && has_suffix(file_entry.value, ".jar"),

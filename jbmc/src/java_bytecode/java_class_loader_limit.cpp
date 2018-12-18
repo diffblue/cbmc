@@ -74,7 +74,7 @@ void java_class_loader_limitt::setup_class_load_limit(
     jsont include_files=json_cp_config["classFiles"];
     if(!include_files.is_null() && !include_files.is_array())
       throw "the JSON file has a wrong format";
-    for(const jsont &file_entry : include_files.array)
+    for(const jsont &file_entry : to_json_array(include_files))
     {
       assert(file_entry.is_string());
       set_matcher.insert(file_entry.value);

@@ -400,7 +400,7 @@ int linker_script_merget::ls_data2instructions(
 {
   goto_programt::instructionst initialize_instructions=gp.instructions;
   std::map<irep_idt, std::size_t> truncated_symbols;
-  for(auto &d : data["regions"].array)
+  for(auto &d : to_json_array(data["regions"]))
   {
     bool has_end=d["has-end-symbol"].is_true();
 
@@ -446,11 +446,13 @@ int linker_script_merget::ls_data2instructions(
 
     // Since the value of the pointer will be a random CBMC address, write a
     // note about the real address in the object file
-    auto it=std::find_if(data["addresses"].array.begin(),
-                         data["addresses"].array.end(),
-                         [&d](const jsont &add)
-                         { return add["sym"].value==d["start-symbol"].value; });
-    if(it==data["addresses"].array.end())
+    auto it = std::find_if(
+      to_json_array(data["addresses"]).begin(),
+      to_json_array(data["addresses"]).end(),
+      [&d](const jsont &add) {
+        return add["sym"].value == d["start-symbol"].value;
+      });
+    if(it == to_json_array(data["addresses"]).end())
     {
       error() << "Start: Could not find address corresponding to symbol '"
               << d["start-symbol"].value << "' (start of section)" << eom;
@@ -481,12 +483,12 @@ int linker_script_merget::ls_data2instructions(
       linker_values[d["end-symbol"].value]=std::make_pair(end_sym, array_end);
 
       auto entry = std::find_if(
-        data["addresses"].array.begin(),
-        data["addresses"].array.end(),
+        to_json_array(data["addresses"]).begin(),
+        to_json_array(data["addresses"]).end(),
         [&d](const jsont &add) {
           return add["sym"].value == d["end-symbol"].value;
         });
-      if(entry == data["addresses"].array.end())
+      if(entry == to_json_array(data["addresses"]).end())
       {
         error() << "Could not find address corresponding to symbol '"
                 << d["end-symbol"].value << "' (end of section)" << eom;
@@ -539,7 +541,7 @@ int linker_script_merget::ls_data2instructions(
   // address. These will have been declared extern too, so we need to give them
   // a value also. Here, we give them the actual value that they have in the
   // object file, since we're not assigning any object to them.
-  for(const auto &d : data["addresses"].array)
+  for(const auto &d : to_json_array(data["addresses"]))
   {
     auto it=linker_values.find(irep_idt(d["sym"].value));
     if(it!=linker_values.end())
@@ -591,7 +593,7 @@ int linker_script_merget::ls_data2instructions(
 #else
 {
   goto_programt::instructionst initialize_instructions=gp.instructions;
-  for(const auto &d : data["regions"].array)
+  for(const auto &d : to_json_array(data["regions"]))
   {
     unsigned start=safe_string2unsigned(d["start"].value);
     unsigned size=safe_string2unsigned(d["size"].value);
@@ -623,7 +625,7 @@ int linker_script_merget::ls_data2instructions(
     symbol_table.add(sym);
   }
 
-  for(const auto &d : data["addresses"].array)
+  for(const auto &d : to_json_array(data["addresses"]))
   {
     source_locationt loc;
     loc.set_file(linker_script);
@@ -738,38 +740,51 @@ int linker_script_merget::goto_and_object_mismatch(
 
 int linker_script_merget::linker_data_is_malformed(const jsont &data) const
 {
+  if(!data.is_object())
+    return true;
+
+  const json_objectt &data_object = to_json_object(data);
   return (
-    !(data.is_object() && data.object.find("regions") != data.object.end() &&
-      data.object.find("addresses") != data.object.end() &&
+    !(data_object.find("regions") != data_object.end() &&
+      data_object.find("addresses") != data_object.end() &&
       data["regions"].is_array() && data["addresses"].is_array() &&
       std::all_of(
-        data["addresses"].array.begin(),
-        data["addresses"].array.end(),
+        to_json_array(data["addresses"]).begin(),
+        to_json_array(data["addresses"]).end(),
         [](const jsont &j) {
-          return j.is_object() && j.object.find("val") != j.object.end() &&
-                 j.object.find("sym") != j.object.end() &&
-                 j["val"].is_number() && j["sym"].is_string();
+          if(!j.is_object())
+            return false;
+
+          const json_objectt &address = to_json_object(j);
+          return address.find("val") != address.end() &&
+                 address.find("sym") != address.end() &&
+                 address["val"].is_number() && address["sym"].is_string();
         }) &&
       std::all_of(
-        data["regions"].array.begin(),
-        data["regions"].array.end(),
+        to_json_array(data["regions"]).begin(),
+        to_json_array(data["regions"]).end(),
         [](const jsont &j) {
-          return j.is_object() && j.object.find("start") != j.object.end() &&
-                 j.object.find("size") != j.object.end() &&
-                 j.object.find("annot") != j.object.end() &&
-                 j.object.find("commt") != j.object.end() &&
-                 j.object.find("start-symbol") != j.object.end() &&
-                 j.object.find("has-end-symbol") != j.object.end() &&
-                 j.object.find("section") != j.object.end() &&
-                 j["start"].is_number() && j["size"].is_number() &&
-                 j["annot"].is_string() && j["start-symbol"].is_string() &&
-                 j["section"].is_string() && j["commt"].is_string() &&
-                 ((j["has-end-symbol"].is_true() &&
-                   j.object.find("end-symbol") != j.object.end() &&
-                   j["end-symbol"].is_string()) ||
-                  (j["has-end-symbol"].is_false() &&
-                   j.object.find("size-symbol") != j.object.end() &&
-                   j.object.find("end-symbol") == j.object.end() &&
-                   j["size-symbol"].is_string()));
+          if(!j.is_object())
+            return false;
+
+          const json_objectt &region = to_json_object(j);
+          return region.find("start") != region.end() &&
+                 region.find("size") != region.end() &&
+                 region.find("annot") != region.end() &&
+                 region.find("commt") != region.end() &&
+                 region.find("start-symbol") != region.end() &&
+                 region.find("has-end-symbol") != region.end() &&
+                 region.find("section") != region.end() &&
+                 region["start"].is_number() && region["size"].is_number() &&
+                 region["annot"].is_string() &&
+                 region["start-symbol"].is_string() &&
+                 region["section"].is_string() && region["commt"].is_string() &&
+                 ((region["has-end-symbol"].is_true() &&
+                   region.find("end-symbol") != region.end() &&
+                   region["end-symbol"].is_string()) ||
+                  (region["has-end-symbol"].is_false() &&
+                   region.find("size-symbol") != region.end() &&
+                   region.find("end-symbol") == region.end() &&
+                   region["size-symbol"].is_string()));
         })));
 }

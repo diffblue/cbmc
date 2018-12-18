@@ -197,7 +197,7 @@ void unreachable_instructions(
     }
   }
 
-  if(json && !json_result.array.empty())
+  if(json && !json_result.empty())
     os << json_result << '\n';
 }
 
@@ -239,7 +239,7 @@ bool static_unreachable_instructions(
     }
   }
 
-  if(options.get_bool_option("json") && !json_result.array.empty())
+  if(options.get_bool_option("json") && !json_result.empty())
     out << json_result << '\n';
   else if(options.get_bool_option("xml"))
     out << xml_result << '\n';
@@ -369,7 +369,7 @@ static void list_functions(
     }
   }
 
-  if(options.get_bool_option("json") && !json_result.array.empty())
+  if(options.get_bool_option("json") && !json_result.empty())
     os << json_result << '\n';
   else if(options.get_bool_option("xml"))
     os << xml_result << '\n';

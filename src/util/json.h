@@ -22,6 +22,10 @@ class json_arrayt;
 
 class jsont
 {
+protected:
+  typedef std::vector<jsont> arrayt;
+  typedef std::map<std::string, jsont> objectt;
+
 public:
   enum class kindt
   {
@@ -112,7 +116,17 @@ public:
 
   static const jsont null_json_object;
 
+  static void output_key(std::ostream &out, const std::string &key);
+
+  static void
+  output_object(std::ostream &out, const objectt &object, unsigned indent);
+
+  std::string value;
+
 protected:
+  arrayt array;
+  objectt object;
+
   static void escape_string(const std::string &, std::ostream &);
 
   explicit jsont(kindt _kind):kind(_kind)
@@ -122,19 +136,6 @@ protected:
   jsont(kindt _kind, std::string _value) : kind(_kind), value(std::move(_value))
   {
   }
-
-public:
-  // should become protected
-  typedef std::vector<jsont> arrayt;
-  arrayt array;
-
-  typedef std::map<std::string, jsont> objectt;
-  objectt object;
-  static void
-  output_object(std::ostream &out, const objectt &object, unsigned indent);
-  static void output_key(std::ostream &out, const std::string &key);
-
-  std::string value;
 };
 
 inline std::ostream &operator<<(std::ostream &out, const jsont &src)
@@ -160,9 +161,20 @@ public:
     return array.size();
   }
 
+  bool empty() const
+  {
+    return array.empty();
+  }
+
   jsont &push_back(const jsont &json)
   {
     array.push_back(json);
+    return array.back();
+  }
+
+  jsont &push_back(jsont &&json)
+  {
+    array.push_back(std::move(json));
     return array.back();
   }
 
@@ -178,32 +190,32 @@ public:
     array.emplace_back(std::forward<argumentst>(arguments)...);
   }
 
-  std::vector<jsont>::iterator begin()
+  arrayt::iterator begin()
   {
     return array.begin();
   }
 
-  std::vector<jsont>::const_iterator begin() const
+  arrayt::const_iterator begin() const
   {
     return array.begin();
   }
 
-  std::vector<jsont>::const_iterator cbegin() const
+  arrayt::const_iterator cbegin() const
   {
     return array.cbegin();
   }
 
-  std::vector<jsont>::iterator end()
+  arrayt::iterator end()
   {
     return array.end();
   }
 
-  std::vector<jsont>::const_iterator end() const
+  arrayt::const_iterator end() const
   {
     return array.end();
   }
 
-  std::vector<jsont>::const_iterator cend() const
+  arrayt::const_iterator cend() const
   {
     return array.cend();
   }
@@ -261,6 +273,48 @@ public:
     else
       return it->second;
   }
+
+  objectt::iterator find(const std::string &key)
+  {
+    return object.find(key);
+  }
+
+  objectt::const_iterator find(const std::string &key) const
+  {
+    return object.find(key);
+  }
+
+  objectt::iterator begin()
+  {
+    return object.begin();
+  }
+
+  objectt::const_iterator begin() const
+  {
+    return object.begin();
+  }
+
+  objectt::const_iterator cbegin() const
+  {
+    return object.cbegin();
+  }
+
+  objectt::iterator end()
+  {
+    return object.end();
+  }
+
+  objectt::const_iterator end() const
+  {
+    return object.end();
+  }
+
+  objectt::const_iterator cend() const
+  {
+    return object.cend();
+  }
+
+  typedef jsont value_type; // NOLINT(readability/identifiers)
 };
 
 class json_truet:public jsont
@@ -287,10 +341,34 @@ inline json_arrayt &jsont::make_array()
   return static_cast<json_arrayt &>(*this);
 }
 
+inline json_arrayt &to_json_array(jsont &json)
+{
+  PRECONDITION(json.kind == jsont::kindt::J_ARRAY);
+  return static_cast<json_arrayt &>(json);
+}
+
+inline const json_arrayt &to_json_array(const jsont &json)
+{
+  PRECONDITION(json.kind == jsont::kindt::J_ARRAY);
+  return static_cast<const json_arrayt &>(json);
+}
+
 inline json_objectt &jsont::make_object()
 {
   kind=kindt::J_OBJECT;
   return static_cast<json_objectt &>(*this);
+}
+
+inline json_objectt &to_json_object(jsont &json)
+{
+  PRECONDITION(json.kind == jsont::kindt::J_OBJECT);
+  return static_cast<json_objectt &>(json);
+}
+
+inline const json_objectt &to_json_object(const jsont &json)
+{
+  PRECONDITION(json.kind == jsont::kindt::J_OBJECT);
+  return static_cast<const json_objectt &>(json);
 }
 
 #endif // CPROVER_UTIL_JSON_H
