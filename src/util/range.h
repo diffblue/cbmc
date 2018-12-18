@@ -327,7 +327,11 @@ public:
   }
 
   /// The type of elements contained in the resulting range is deduced from the
-  /// return type of \p `f`.
+  /// return type of `f`.
+  /// Please note that the parameter to `f` must be a const reference. This is
+  /// a limitation of the current implementation. This means that you can't move
+  /// a value through `f`. `f` may take a move-only typed parameter by const
+  /// reference. 'f' may also construct and return a move-only typed value.
   template <typename functiont>
   auto map(functiont &&f) -> ranget<map_iteratort<
     iteratort,
