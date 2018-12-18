@@ -1373,8 +1373,10 @@ exprt float_bvt::pack(
     infinity_or_NaN, from_integer(-1, src.exponent.type()), src.exponent);
 
   // stitch all three together
-  return concatenation_exprt(
-    {std::move(sign_bit), std::move(exponent), std::move(fraction)},
+  return typecast_exprt(
+    concatenation_exprt(
+      {std::move(sign_bit), std::move(exponent), std::move(fraction)},
+      bv_typet(spec.f + spec.e + 1)),
     spec.to_type());
 }
 

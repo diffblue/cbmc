@@ -438,8 +438,9 @@ exprt smt2_parsert::function_application_fp(const exprt::operandst &op)
   const auto width_f = to_unsignedbv_type(op[2].type()).get_width();
 
   // stitch the bits together
-  return concatenation_exprt(
-    exprt::operandst(op), ieee_float_spect(width_f, width_e).to_type());
+  return typecast_exprt(
+    concatenation_exprt(exprt::operandst(op), bv_typet(width_f + width_e + 1)),
+    ieee_float_spect(width_f, width_e).to_type());
 }
 
 exprt smt2_parsert::function_application()
@@ -665,9 +666,8 @@ exprt smt2_parsert::function_application()
         const std::size_t total_width =
           std::accumulate(op_width.begin(), op_width.end(), 0);
 
-        const unsignedbv_typet t(total_width);
-
-        return concatenation_exprt(std::move(op), t);
+        return concatenation_exprt(
+          std::move(op), unsignedbv_typet(total_width));
       }
       else if(id=="distinct")
       {
