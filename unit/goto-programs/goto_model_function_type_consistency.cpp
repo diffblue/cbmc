@@ -22,6 +22,7 @@ SCENARIO(
     code_typet fun_type2({}, type2);
 
     symbolt function_symbol;
+    function_symbol.mode = "C";
     irep_idt function_symbol_name = "foo";
     function_symbol.name = function_symbol_name;
 
