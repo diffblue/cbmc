@@ -164,8 +164,8 @@ xmlt xml(
       std::size_t width=to_bitvector_type(type).get_width();
 
       result.name="integer";
-      result.set_attribute("binary",
-        id2string(to_constant_expr(expr).get_value()));
+      result.set_attribute(
+        "binary", integer2binary(numeric_cast_v<mp_integer>(expr), width));
       result.set_attribute("width", width);
 
       const typet &underlying_type = type.id() == ID_c_bit_field

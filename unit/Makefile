@@ -65,6 +65,7 @@ SRC += analyses/ai/ai.cpp \
        util/symbol_table.cpp \
        util/symbol.cpp \
        util/unicode.cpp \
+       util/xml_expr.cpp \
        # Empty last line
 
 INCLUDES= -I ../src/ -I.
