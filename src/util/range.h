@@ -48,7 +48,7 @@ public:
     PRECONDITION(underlying != underlying_end);
     ++underlying;
     if(underlying != underlying_end)
-      current = util_make_unique<outputt>((*f)(*underlying));
+      current = std::make_shared<outputt>((*f)(*underlying));
     return *this;
   }
 
@@ -58,6 +58,16 @@ public:
     map_iteratort tmp(*this);
     this->operator++();
     return tmp;
+  }
+
+  value_type &operator*()
+  {
+    return *current.get();
+  }
+
+  value_type *operator->()
+  {
+    return &(*current.get());
   }
 
   const value_type &operator*() const
@@ -80,16 +90,7 @@ public:
       f(std::move(f))
   {
     if(this->underlying != this->underlying_end)
-      current = util_make_unique<outputt>((*this->f)(*this->underlying));
-  }
-
-  map_iteratort(const map_iteratort &other)
-    : underlying(other.underlying),
-      underlying_end(other.underlying_end),
-      f(other.f)
-  {
-    if(other.current != nullptr)
-      current = util_make_unique<outputt>(*other.current.get());
+      current = std::make_shared<outputt>((*this->f)(*this->underlying));
   }
 
 private:
@@ -101,7 +102,7 @@ private:
 
   /// Stores the result of \c f at the current position of the iterator.
   /// Equals nullptr if the iterator reached \c underlying_end.
-  std::unique_ptr<outputt> current = nullptr;
+  std::shared_ptr<outputt> current = nullptr;
 };
 
 /// Iterator which only stops at elements for which some given function \c f is
@@ -140,6 +141,16 @@ public:
     filter_iteratort tmp(*this);
     this->operator++();
     return tmp;
+  }
+
+  value_type &operator*()
+  {
+    return *underlying;
+  }
+
+  value_type *operator->()
+  {
+    return &(*underlying);
   }
 
   const value_type &operator*() const
@@ -234,6 +245,20 @@ public:
     return tmp;
   }
 
+  value_type &operator*()
+  {
+    if(first_begin == first_end)
+      return *second_begin;
+    return *first_begin;
+  }
+
+  value_type *operator->()
+  {
+    if(first_begin == first_end)
+      return &(*second_begin);
+    return &(*first_begin);
+  }
+
   const value_type &operator*() const
   {
     if(first_begin == first_end)
@@ -302,7 +327,11 @@ public:
   }
 
   /// The type of elements contained in the resulting range is deduced from the
-  /// return type of \p `f`.
+  /// return type of `f`.
+  /// Please note that the parameter to `f` must be a const reference. This is
+  /// a limitation of the current implementation. This means that you can't move
+  /// a value through `f`. `f` may take a move-only typed parameter by const
+  /// reference. 'f' may also construct and return a move-only typed value.
   template <typename functiont>
   auto map(functiont &&f) -> ranget<map_iteratort<
     iteratort,
@@ -357,12 +386,11 @@ ranget<iteratort> make_range(iteratort begin, iteratort end)
   return ranget<iteratort>(begin, end);
 }
 
-template <
-  typename containert,
-  typename iteratort = typename containert::const_iterator>
-ranget<iteratort> make_range(const containert &container)
+template <typename containert>
+auto make_range(containert &container) -> ranget<decltype(container.begin())>
 {
-  return ranget<iteratort>(container.begin(), container.end());
+  return ranget<decltype(container.begin())>(
+    container.begin(), container.end());
 }
 
 #endif // CPROVER_UTIL_RANGE_H
