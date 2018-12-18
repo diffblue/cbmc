@@ -169,28 +169,40 @@ void validate_goto_modelt::check_called_functions()
   class test_for_function_addresst : public const_expr_visitort
   {
   public:
-    std::set<irep_idt> identifiers;
-
+    test_for_function_addresst(
+      const function_mapt &function_map,
+      const validation_modet &vm)
+      : function_map{function_map}, vm{vm}
+    {
+    }
     void operator()(const exprt &expr) override
     {
       if(expr.id() == ID_address_of)
       {
-        const exprt &pointee = to_address_of_expr(expr).object();
+        const auto &pointee = to_address_of_expr(expr).object();
         if(pointee.id() == ID_symbol)
-          identifiers.insert(to_symbol_expr(pointee).get_identifier());
+        {
+          const auto &identifier = to_symbol_expr(pointee).get_identifier();
+          DATA_CHECK(
+            vm,
+            function_map.find(identifier) != function_map.end(),
+            "every function whose address is taken must be in the "
+            "function map");
+        }
       }
     }
 
-    void clear()
-    {
-      identifiers.clear();
-    }
-  } test_for_function_address;
+  private:
+    const function_mapt &function_map;
+    const validation_modet &vm;
+  };
+  test_for_function_addresst test_for_function_address(function_map, vm);
 
   for(const auto &fun : function_map)
   {
     for(auto &instr : fun.second.body.instructions)
     {
+      // check functions that are called
       if(instr.is_function_call())
       {
         const auto &function_call = to_code_function_call(instr.code);
@@ -203,18 +215,9 @@ void validate_goto_modelt::check_called_functions()
           "every function call callee must be in the function map");
       }
 
+      // check functions of which the address is taken
       const exprt &src{instr.code};
       src.visit(test_for_function_address);
-      if(!test_for_function_address.identifiers.empty())
-      {
-        for(auto &identifier : test_for_function_address.identifiers)
-          DATA_CHECK(
-            vm,
-            function_map.find(identifier) != function_map.end(),
-            "every function whose address is taken must be in the "
-            "function map");
-      }
-      test_for_function_address.clear();
     }
   }
 }
