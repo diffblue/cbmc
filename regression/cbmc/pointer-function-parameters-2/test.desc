@@ -3,10 +3,18 @@ main.c
 --function fun --cover branch
 ^\*\* 7 of 7 covered \(100.0%\)$
 ^Test suite:$
-^a=\(\(signed int \*\*\)NULL\), tmp(\$\d+)?=[^,]*, tmp(\$\d+)?=[^,]*$
-^a=&tmp(\$\d+)?!0, tmp(\$\d+)?=\(\(signed int \*\)NULL\), tmp(\$\d+)?=[^,]*$
-^a=&tmp(\$\d+)?!0, tmp(\$\d+)?=&tmp\$\d+!0, tmp(\$\d+)?=(-[0-9]+|[012356789][0-9]*|4[0-9]+)$
-^a=&tmp(\$\d+)?!0, tmp(\$\d+)?=&tmp(\$\d+)?!0, tmp(\$\d+)?=4$
+a=\(\(signed int \*\*\)NULL\)
+tmp(\$\d+)?=[^,]*
+tmp(\$\d+)?=[^,]*
+a=&tmp(\$\d+)?!0
+tmp(\$\d+)?=\(\(signed int \*\)NULL\)
+tmp(\$\d+)?=[^,]*
+a=&tmp(\$\d+)?!0
+tmp(\$\d+)?=&tmp\$\d+!0
+tmp(\$\d+)?=(-[0-9]+|[012356789][0-9]*|4[0-9]+)
+a=&tmp(\$\d+)?!0
+tmp(\$\d+)?=&tmp(\$\d+)?!0
+tmp(\$\d+)?=4
 ^EXIT=0$
 ^SIGNAL=0$
 --
