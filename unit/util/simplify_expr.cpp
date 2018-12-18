@@ -16,6 +16,7 @@
 #include <util/namespace.h>
 #include <util/pointer_predicates.h>
 #include <util/simplify_expr.h>
+#include <util/simplify_expr_class.h>
 #include <util/std_expr.h>
 #include <util/symbol_table.h>
 
@@ -79,4 +80,29 @@ TEST_CASE("Simplify byte extract")
   exprt simp = simplify_expr(be, ns);
 
   REQUIRE(simp == s);
+}
+
+TEST_CASE("expr2bits and bits2expr respect bit order")
+{
+  symbol_tablet symbol_table;
+  namespacet ns(symbol_table);
+  simplify_exprt simp(ns);
+
+  exprt deadbeef = from_integer(0xdeadbeef, unsignedbv_typet(32));
+
+  const auto le = simp.expr2bits(deadbeef, true);
+  REQUIRE(le.has_value());
+  REQUIRE(le->size() == 32);
+
+  const exprt should_be_deadbeef1 =
+    simp.bits2expr(*le, unsignedbv_typet(32), true);
+  REQUIRE(deadbeef == should_be_deadbeef1);
+
+  const auto be = simp.expr2bits(deadbeef, false);
+  REQUIRE(be.has_value());
+  REQUIRE(be->size() == 32);
+
+  const exprt should_be_deadbeef2 =
+    simp.bits2expr(*be, unsignedbv_typet(32), false);
+  REQUIRE(deadbeef == should_be_deadbeef2);
 }
