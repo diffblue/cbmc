@@ -853,12 +853,12 @@ void java_object_factoryt::gen_nondet_pointer_init(
     //    <code from recursive call to gen_nondet_init() with
     //             tmp$<temporary_counter>>
     // }
-    code_ifthenelset null_check;
-    null_check.cond() = side_effect_expr_nondett(bool_typet(), location);
-    null_check.then_case()=set_null_inst;
-    null_check.else_case()=non_null_inst;
+    code_ifthenelset null_check(
+      side_effect_expr_nondett(bool_typet(), location),
+      std::move(set_null_inst),
+      std::move(non_null_inst));
 
-    new_object_assignments.add(null_check);
+    new_object_assignments.add(std::move(null_check));
   }
 
   // Similarly to above, maybe use a conditional if both the
@@ -872,13 +872,12 @@ void java_object_factoryt::gen_nondet_pointer_init(
     INVARIANT(update_in_place==update_in_placet::MAY_UPDATE_IN_PLACE,
       "No-update and must-update should have already been resolved");
 
-    code_ifthenelset update_check;
-    update_check.cond() =
-      side_effect_expr_nondett(bool_typet(), expr.source_location());
-    update_check.then_case()=update_in_place_assignments;
-    update_check.else_case()=new_object_assignments;
+    code_ifthenelset update_check(
+      side_effect_expr_nondett(bool_typet(), expr.source_location()),
+      std::move(update_in_place_assignments),
+      std::move(new_object_assignments));
 
-    assignments.add(update_check);
+    assignments.add(std::move(update_check));
   }
 }
 
@@ -1461,9 +1460,8 @@ void java_object_factoryt::gen_nondet_array_init(
   code_labelt init_done_label(done_name, code_skipt());
   code_gotot goto_done(done_name);
 
-  code_ifthenelset done_test;
-  done_test.cond()=equal_exprt(counter_expr, length_expr);
-  done_test.then_case()=goto_done;
+  const code_ifthenelset done_test(
+    equal_exprt(counter_expr, length_expr), goto_done);
 
   assignments.add(std::move(done_test));
 
@@ -1471,9 +1469,8 @@ void java_object_factoryt::gen_nondet_array_init(
   {
     // Add a redundant if(counter == max_length) break
     // that is easier for the unwinder to understand.
-    code_ifthenelset max_test;
-    max_test.cond()=equal_exprt(counter_expr, max_length_expr);
-    max_test.then_case()=goto_done;
+    code_ifthenelset max_test(
+      equal_exprt(counter_expr, max_length_expr), std::move(goto_done));
 
     assignments.add(std::move(max_test));
   }

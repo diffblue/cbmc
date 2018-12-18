@@ -577,12 +577,12 @@ void goto_convertt::convert_expression(
     // We do a special treatment for c?t:f
     // by compiling to if(c) t; else f;
     const if_exprt &if_expr=to_if_expr(expr);
-    code_ifthenelset tmp_code;
+    code_ifthenelset tmp_code(
+      if_expr.cond(),
+      code_expressiont(if_expr.true_case()),
+      code_expressiont(if_expr.false_case()));
     tmp_code.add_source_location()=expr.source_location();
-    tmp_code.cond()=if_expr.cond();
-    tmp_code.then_case()=code_expressiont(if_expr.true_case());
     tmp_code.then_case().add_source_location()=expr.source_location();
-    tmp_code.else_case()=code_expressiont(if_expr.false_case());
     tmp_code.else_case().add_source_location()=expr.source_location();
     convert_ifthenelse(tmp_code, dest, mode);
   }
@@ -1470,13 +1470,10 @@ void goto_convertt::convert_ifthenelse(
      !has_else)
   {
     // if(a && b) XX --> if(a) if(b) XX
-    code_ifthenelset new_if0, new_if1;
-    new_if0.cond()=code.cond().op0();
-    new_if1.cond()=code.cond().op1();
-    new_if0.add_source_location()=source_location;
-    new_if1.add_source_location()=source_location;
-    new_if1.then_case()=code.then_case();
-    new_if0.then_case()=new_if1;
+    code_ifthenelset new_if1(code.cond().op1(), code.then_case());
+    new_if1.add_source_location() = source_location;
+    code_ifthenelset new_if0(code.cond().op0(), std::move(new_if1));
+    new_if0.add_source_location() = source_location;
     return convert_ifthenelse(new_if0, dest, mode);
   }
 

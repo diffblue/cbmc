@@ -127,10 +127,10 @@ code_ifthenelset java_bytecode_instrumentt::throw_exception(
   side_effect_expr_throwt throw_expr(irept(), typet(), original_loc);
   throw_expr.copy_to_operands(new_symbol.symbol_expr());
 
-  code_ifthenelset if_code;
+  code_ifthenelset if_code(
+    cond, code_blockt({assign_new, code_expressiont(throw_expr)}));
+
   if_code.add_source_location()=original_loc;
-  if_code.cond()=cond;
-  if_code.then_case() = code_blockt({assign_new, code_expressiont(throw_expr)});
 
   return if_code;
 }
@@ -250,11 +250,9 @@ code_ifthenelset java_bytecode_instrumentt::check_class_cast(
     check_code=std::move(assert_class);
   }
 
-  code_ifthenelset conditional_check;
-  notequal_exprt op_not_null(null_check_op, null_pointer_exprt(voidptr));
-  conditional_check.cond()=std::move(op_not_null);
-  conditional_check.then_case()=std::move(check_code);
-  return conditional_check;
+  return code_ifthenelset(
+    notequal_exprt(std::move(null_check_op), null_pointer_exprt(voidptr)),
+    std::move(check_code));
 }
 
 /// Checks whether \p expr is null and throws NullPointerException/

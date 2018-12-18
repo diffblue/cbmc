@@ -168,12 +168,10 @@ void goto_convertt::convert_CPROVER_try_catch(
   targets.set_throw(tmp.instructions.begin());
 
   // now put 'catch' code onto destructor stack
-  code_ifthenelset catch_code;
-  catch_code.cond()=exception_flag();
+  code_ifthenelset catch_code(exception_flag(), to_code(code.op1()));
   catch_code.add_source_location()=code.source_location();
-  catch_code.then_case()=to_code(code.op1());
 
-  targets.destructor_stack.push_back(catch_code);
+  targets.destructor_stack.push_back(std::move(catch_code));
 
   // now convert 'try' code
   convert(to_code(code.op0()), dest, mode);

@@ -622,6 +622,23 @@ public:
     op2().make_nil();
   }
 
+  /// An if \p condition then \p then_code else \p else_code statement.
+  code_ifthenelset(
+    const exprt &condition,
+    const codet &then_code,
+    const codet &else_code)
+    : codet(ID_ifthenelse)
+  {
+    add_to_operands(condition, then_code, else_code);
+  }
+
+  /// An if \p condition then \p then_code statement (no "else" case).
+  code_ifthenelset(const exprt &condition, const codet &then_code)
+    : codet(ID_ifthenelse)
+  {
+    add_to_operands(condition, then_code, nil_exprt());
+  }
+
   const exprt &cond() const
   {
     return op0();

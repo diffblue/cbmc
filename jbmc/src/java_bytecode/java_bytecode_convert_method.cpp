@@ -2705,15 +2705,19 @@ code_ifthenelset java_bytecode_convert_methodt::convert_ifnull(
   const mp_integer &number,
   const source_locationt &location) const
 {
-  code_ifthenelset code_branch;
   const typecast_exprt lhs(op[0], java_reference_type(empty_typet()));
   const exprt rhs(null_pointer_exprt(to_pointer_type(lhs.type())));
-  code_branch.cond() = binary_relation_exprt(lhs, ID_equal, rhs);
+
   const method_offsett label_number = numeric_cast_v<method_offsett>(number);
-  code_branch.then_case() = code_gotot(label(std::to_string(label_number)));
+
+  code_ifthenelset code_branch(
+    binary_relation_exprt(lhs, ID_equal, rhs),
+    code_gotot(label(std::to_string(label_number))));
+
   code_branch.then_case().add_source_location() =
     address_map.at(label_number).source->source_location;
   code_branch.add_source_location() = location;
+
   return code_branch;
 }
 
@@ -2723,15 +2727,19 @@ code_ifthenelset java_bytecode_convert_methodt::convert_ifnonull(
   const mp_integer &number,
   const source_locationt &location) const
 {
-  code_ifthenelset code_branch;
   const typecast_exprt lhs(op[0], java_reference_type(empty_typet()));
   const exprt rhs(null_pointer_exprt(to_pointer_type(lhs.type())));
-  code_branch.cond() = binary_relation_exprt(lhs, ID_notequal, rhs);
+
   const method_offsett label_number = numeric_cast_v<method_offsett>(number);
-  code_branch.then_case() = code_gotot(label(std::to_string(label_number)));
+
+  code_ifthenelset code_branch(
+    binary_relation_exprt(lhs, ID_notequal, rhs),
+    code_gotot(label(std::to_string(label_number))));
+
   code_branch.then_case().add_source_location() =
     address_map.at(label_number).source->source_location;
   code_branch.add_source_location() = location;
+
   return code_branch;
 }
 
@@ -2742,18 +2750,20 @@ code_ifthenelset java_bytecode_convert_methodt::convert_if(
   const mp_integer &number,
   const source_locationt &location) const
 {
-  code_ifthenelset code_branch;
-  code_branch.cond() =
-    binary_relation_exprt(op[0], id, from_integer(0, op[0].type()));
+  const method_offsett label_number = numeric_cast_v<method_offsett>(number);
+
+  code_ifthenelset code_branch(
+    binary_relation_exprt(op[0], id, from_integer(0, op[0].type())),
+    code_gotot(label(std::to_string(label_number))));
+
   code_branch.cond().add_source_location() = location;
   code_branch.cond().add_source_location().set_function(method_id);
-  const method_offsett label_number = numeric_cast_v<method_offsett>(number);
-  code_branch.then_case() = code_gotot(label(std::to_string(label_number)));
   code_branch.then_case().add_source_location() =
     address_map.at(label_number).source->source_location;
   code_branch.then_case().add_source_location().set_function(method_id);
   code_branch.add_source_location() = location;
   code_branch.add_source_location().set_function(method_id);
+
   return code_branch;
 }
 
@@ -2764,15 +2774,16 @@ code_ifthenelset java_bytecode_convert_methodt::convert_if_cmp(
   const mp_integer &number,
   const source_locationt &location) const
 {
-  code_ifthenelset code_branch;
   const irep_idt cmp_op = get_if_cmp_operator(statement);
   binary_relation_exprt condition(
     op[0], cmp_op, typecast_exprt::conditional_cast(op[1], op[0].type()));
   condition.add_source_location() = location;
 
-  code_branch.cond() = condition;
   const method_offsett label_number = numeric_cast_v<method_offsett>(number);
-  code_branch.then_case() = code_gotot(label(std::to_string(label_number)));
+
+  code_ifthenelset code_branch(
+    std::move(condition), code_gotot(label(std::to_string(label_number))));
+
   code_branch.then_case().add_source_location() =
     address_map.at(label_number).source->source_location;
   code_branch.add_source_location() = location;
@@ -2797,15 +2808,16 @@ code_blockt java_bytecode_convert_methodt::convert_ret(
       c.add(g);
     else
     {
-      code_ifthenelset branch;
       auto address_ptr =
         from_integer(jsr_ret_targets[idx], unsignedbv_typet(64));
       address_ptr.type() = pointer_type(void_typet());
-      branch.cond() = equal_exprt(retvar, address_ptr);
+
+      code_ifthenelset branch(equal_exprt(retvar, address_ptr), std::move(g));
+
       branch.cond().add_source_location() = location;
-      branch.then_case() = g;
       branch.add_source_location() = location;
-      c.add(branch);
+
+      c.add(std::move(branch));
     }
   }
   return c;

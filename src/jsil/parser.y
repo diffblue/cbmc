@@ -235,10 +235,7 @@ instruction: TOK_LABEL TOK_IDENTIFIER
              code_gotot lt(to_symbol_expr(stack($5)).get_identifier());
              code_gotot lf(to_symbol_expr(stack($7)).get_identifier());
 
-             code_ifthenelset ite;
-             ite.cond().swap(stack($3));
-             ite.then_case().swap(lt);
-             ite.else_case().swap(lf);
+             code_ifthenelset ite(stack($3), std::move(lt), std::move(lf));
 
              newstack($$).swap(ite);
            }
