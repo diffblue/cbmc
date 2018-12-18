@@ -20,6 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/message.h>
 #include <util/std_code.h>
 #include <util/std_expr.h>
+#include <util/string_constant.h>
 #include <util/symbol_table.h>
 
 #include <goto-programs/format_strings.h>
@@ -399,8 +400,8 @@ void string_instrumentationt::do_format_string_read(
      format_arg.op0().id()==ID_index &&
      format_arg.op0().op0().id()==ID_string_constant)
   {
-    format_token_listt token_list=
-      parse_format_string(format_arg.op0().op0().get_string(ID_value));
+    format_token_listt token_list = parse_format_string(
+      id2string(to_string_constant(format_arg.op0().op0()).get_value()));
 
     std::size_t args=0;
 
@@ -502,8 +503,8 @@ void string_instrumentationt::do_format_string_write(
      format_arg.op0().id()==ID_index &&
      format_arg.op0().op0().id()==ID_string_constant) // constant format
   {
-    format_token_listt token_list=
-      parse_format_string(format_arg.op0().op0().get_string(ID_value));
+    format_token_listt token_list = parse_format_string(
+      id2string(to_string_constant(format_arg.op0().op0()).get_value()));
 
     std::size_t args=0;
 

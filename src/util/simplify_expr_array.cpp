@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "pointer_offset_size.h"
 #include "replace_expr.h"
 #include "std_expr.h"
+#include "string_constant.h"
 
 bool simplify_exprt::simplify_index(exprt &expr)
 {
@@ -137,7 +138,7 @@ bool simplify_exprt::simplify_index(exprt &expr)
   {
     const auto i = numeric_cast<mp_integer>(expr.op1());
 
-    const irep_idt &value=array.get(ID_value);
+    const std::string &value = id2string(to_string_constant(array).get_value());
 
     if(!i.has_value())
     {

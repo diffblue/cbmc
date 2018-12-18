@@ -13,12 +13,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cassert>
 
+#include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/config.h>
 #include <util/namespace.h>
 #include <util/simplify_expr.h>
-#include <util/arith_tools.h>
 #include <util/std_types.h>
+#include <util/string_constant.h>
 
 #include "gcc_types.h"
 
@@ -50,13 +51,13 @@ void ansi_c_convert_typet::read_rec(const typet &type)
   {
     if(type.has_subtype() &&
        type.subtype().id()==ID_string_constant)
-      c_storage_spec.asm_label=type.subtype().get(ID_value);
+      c_storage_spec.asm_label = to_string_constant(type.subtype()).get_value();
   }
   else if(type.id()==ID_section &&
           type.has_subtype() &&
           type.subtype().id()==ID_string_constant)
   {
-    c_storage_spec.section=type.subtype().get(ID_value);
+    c_storage_spec.section = to_string_constant(type.subtype()).get_value();
   }
   else if(type.id()==ID_const)
     c_qualifiers.is_constant=true;
@@ -230,7 +231,7 @@ void ansi_c_convert_typet::read_rec(const typet &type)
           type.has_subtype() &&
           type.subtype().id()==ID_string_constant)
   {
-    c_storage_spec.alias=type.subtype().get(ID_value);
+    c_storage_spec.alias = to_string_constant(type.subtype()).get_value();
   }
   else if(type.id()==ID_frontend_pointer)
   {

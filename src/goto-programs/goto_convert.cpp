@@ -20,6 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/prefix.h>
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
+#include <util/string_constant.h>
 #include <util/symbol_table.h>
 #include <util/symbol_table_builder.h>
 
@@ -1819,7 +1820,10 @@ bool goto_convertt::get_string_constant(
     simplify(index_op, ns);
 
     if(index_op.id()==ID_string_constant)
-      return value=index_op.get(ID_value), false;
+    {
+      value = to_string_constant(index_op).get_value();
+      return false;
+    }
     else if(index_op.id()==ID_array)
     {
       std::string result;
@@ -1839,7 +1843,10 @@ bool goto_convertt::get_string_constant(
   }
 
   if(expr.id()==ID_string_constant)
-    return value=expr.get(ID_value), false;
+  {
+    value = to_string_constant(expr).get_value();
+    return false;
+  }
 
   return true;
 }

@@ -543,8 +543,8 @@ std::pair<exprt, string_constraintst> add_axioms_for_char_literal(
      arg.op0().op0().operands().size()==2 &&
      arg.op0().op0().op0().id()==ID_string_constant)
   {
-    const string_constantt s=to_string_constant(arg.op0().op0().op0());
-    irep_idt sval=s.get_value();
+    const string_constantt &s = to_string_constant(arg.op0().op0().op0());
+    const std::string &sval = id2string(s.get_value());
     CHECK_RETURN(sval.size()==1);
     return {from_integer(unsigned(sval[0]), arg.type()), {}};
   }

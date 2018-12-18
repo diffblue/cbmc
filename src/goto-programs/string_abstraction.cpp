@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/exception_utils.h>
 #include <util/expr_util.h>
 #include <util/pointer_predicates.h>
+#include <util/string_constant.h>
 #include <util/type_eq.h>
 
 #include "pointer_arithmetic.h"
@@ -763,7 +764,8 @@ bool string_abstractiont::build(const exprt &object, exprt &dest, bool write)
 
   if(object.id()==ID_string_constant)
   {
-    const std::string &str_value = id2string(object.get(ID_value));
+    const std::string &str_value =
+      id2string(to_string_constant(object).get_value());
     // make sure we handle the case of a string constant with string-terminating
     // \0 in it
     const std::size_t str_len =
