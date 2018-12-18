@@ -146,8 +146,7 @@ void symbol_factoryt::gen_nondet_init(
         recursion_set.find(struct_tag) != recursion_set.end() &&
         depth >= object_factory_params.max_nondet_tree_depth)
       {
-        code_assignt c(expr, null_pointer_exprt(pointer_type));
-        assignments.add(std::move(c));
+        assignments.add(code_assignt(expr, null_pointer_exprt(pointer_type)));
 
         return;
       }

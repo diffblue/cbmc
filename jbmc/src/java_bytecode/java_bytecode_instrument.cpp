@@ -526,7 +526,7 @@ optionalt<codet> java_bytecode_instrumentt::instrument_expr(const exprt &expr)
           expr.get_bool(ID_java_member_access))
   {
     // Check pointer non-null before access:
-    const dereference_exprt dereference_expr=to_dereference_expr(expr);
+    const dereference_exprt &dereference_expr = to_dereference_expr(expr);
     codet null_dereference_check=
       check_null_dereference(
         dereference_expr.op0(),

@@ -1460,8 +1460,7 @@ void java_object_factoryt::gen_nondet_array_init(
   code_labelt init_done_label(done_name, code_skipt());
   code_gotot goto_done(done_name);
 
-  const code_ifthenelset done_test(
-    equal_exprt(counter_expr, length_expr), goto_done);
+  code_ifthenelset done_test(equal_exprt(counter_expr, length_expr), goto_done);
 
   assignments.add(std::move(done_test));
 

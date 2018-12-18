@@ -1249,8 +1249,7 @@ exprt character_refine_preprocesst::expr_of_to_lower_case(
   minus_exprt transformed(
     plus_exprt(chr, from_integer('a', type)), from_integer('A', type));
 
-  if_exprt res(expr_of_is_ascii_upper_case(chr, type), transformed, chr);
-  return std::move(res);
+  return if_exprt(expr_of_is_ascii_upper_case(chr, type), transformed, chr);
 }
 
 /// Converts function call to an assignment of an expression corresponding to
@@ -1292,7 +1291,7 @@ exprt character_refine_preprocesst::expr_of_to_title_case(
   or_exprt plus_8_set(
     plus_8_interval1, or_exprt(plus_8_interval2, plus_8_interval3));
 
-  if_exprt res(
+  return if_exprt(
     in_list_expr(chr, increment_list),
     plus_1,
     if_exprt(
@@ -1301,12 +1300,7 @@ exprt character_refine_preprocesst::expr_of_to_title_case(
       if_exprt(
         plus_8_set,
         plus_8,
-        if_exprt(
-          in_list_expr(chr, plus_9_list),
-          plus_9,
-          chr))));
-
-  return std::move(res);
+        if_exprt(in_list_expr(chr, plus_9_list), plus_9, chr))));
 }
 
 /// Converts function call to an assignment of an expression corresponding to
@@ -1342,8 +1336,7 @@ exprt character_refine_preprocesst::expr_of_to_upper_case(
   minus_exprt transformed(
     plus_exprt(chr, from_integer('A', type)), from_integer('a', type));
 
-  if_exprt res(expr_of_is_ascii_lower_case(chr, type), transformed, chr);
-  return std::move(res);
+  return if_exprt(expr_of_is_ascii_lower_case(chr, type), transformed, chr);
 }
 
 /// Converts function call to an assignment of an expression corresponding to
