@@ -72,6 +72,8 @@ def parse_args():
                         help='Non-default CodeBuild template to use')
     parser.add_argument('-W', '--witness-check', action='store_true',
                         help='Run witness checks after benchmarking')
+    parser.add_argument('-C', '--compare-to', default=[], action='append',
+                        help='Include past results in tables [may repeat]')
 
     args = parser.parse_args()
 
@@ -193,6 +195,15 @@ def prepare_sns_s3(session, email, bucket_name):
         logger.info('us-east-1: SNS topic artifact_uploaded set up')
 
     prepare_s3(session, bucket_name, artifact_uploaded_arn)
+    s3 = session.client('s3', region_name='us-east-1')
+    s3.upload_file(
+            Bucket=bucket_name,
+            Key='ec2-terminate.sh',
+            Filename=same_dir('ec2-terminate.sh'))
+    s3.upload_file(
+            Bucket=bucket_name,
+            Key='run-on-ec2.sh',
+            Filename=same_dir('run-on-ec2.sh'))
 
     return instance_terminated_arn
 
@@ -266,26 +277,27 @@ def select_region(session, mode, region, instance_type):
         logger.info('global: Lowest spot price: {} ({}): {}'.format(
             min_region, min_az, min_price))
 
-    # http://aws-ubuntu.herokuapp.com/
-    # 20180306 - Ubuntu 16.04 LTS (xenial) - hvm:ebs-ssd
+    # https://cloud-images.ubuntu.com/locator/ec2/
+    # 20181124 - Ubuntu 18.04 LTS (bionic) - hvm:ebs-ssd
     AMI_ids = {
         "Mappings": {
             "RegionMap": {
-                "ap-northeast-1": { "64": "ami-0d74386b" },
-                "ap-northeast-2": { "64": "ami-a414b9ca" },
-                "ap-south-1": { "64": "ami-0189d76e" },
-                "ap-southeast-1": { "64": "ami-52d4802e" },
-                "ap-southeast-2": { "64": "ami-d38a4ab1" },
-                "ca-central-1": { "64": "ami-ae55d2ca" },
-                "eu-central-1": { "64": "ami-7c412f13" },
-                "eu-west-1": { "64": "ami-f90a4880" },
-                "eu-west-2": { "64": "ami-f4f21593" },
-                "eu-west-3": { "64": "ami-0e55e373" },
-                "sa-east-1": { "64": "ami-423d772e" },
-                "us-east-1": { "64": "ami-43a15f3e" },
-                "us-east-2": { "64": "ami-916f59f4" },
-                "us-west-1": { "64": "ami-925144f2" },
-                "us-west-2": { "64": "ami-4e79ed36" }
+                "ap-northeast-1": { "64": "ami-0fd02119f1653c976" },
+                "ap-northeast-2": { "64": "ami-096560874cb404a4d" },
+                "ap-northeast-3": { "64": "ami-064d6dc91cdb4daa8" },
+                "ap-south-1": { "64": "ami-01187fe59c07cd350" },
+                "ap-southeast-1": { "64": "ami-0efb24bbbf33a2fd7" },
+                "ap-southeast-2": { "64": "ami-03932cb7d3a1a69af" },
+                "ca-central-1": { "64": "ami-0388b9f812caf5c3f" },
+                "eu-central-1": { "64": "ami-080d06f90eb293a27" },
+                "eu-west-1": { "64": "ami-02790d1ebf3b5181d" },
+                "eu-west-2": { "64": "ami-06328f1e652dc7605" },
+                "eu-west-3": { "64": "ami-0697abcfa8916e673" },
+                "sa-east-1": { "64": "ami-04fb8967affdf73b6" },
+                "us-east-1": { "64": "ami-0d2505740b82f7948" },
+                "us-east-2": { "64": "ami-0cf8cc36b8c81c6de" },
+                "us-west-1": { "64": "ami-09c5eca75eed8245a" },
+                "us-west-2": { "64": "ami-0f05ad41860678734" }
             }
         }
     }
@@ -466,17 +478,18 @@ def seed_queue(session, region, queue, task_set):
     # set up the tasks
     logger = logging.getLogger('perf_test')
 
-    all_tasks = ['ConcurrencySafety-Main', 'DefinedBehavior-Arrays',
-                 'DefinedBehavior-TerminCrafted', 'MemSafety-Arrays',
+    all_tasks = ['ConcurrencySafety-Main',
+                 'MemSafety-Arrays',
                  'MemSafety-Heap', 'MemSafety-LinkedLists',
-                 'MemSafety-Other', 'MemSafety-TerminCrafted',
-                 'Overflows-BitVectors', 'Overflows-Other',
+                 'MemSafety-MemCleanup',
+                 'MemSafety-Other',
+                 'NoOverflows-BitVectors', 'NoOverflows-Other',
                  'ReachSafety-Arrays', 'ReachSafety-BitVectors',
                  'ReachSafety-ControlFlow', 'ReachSafety-ECA',
                  'ReachSafety-Floats', 'ReachSafety-Heap',
                  'ReachSafety-Loops', 'ReachSafety-ProductLines',
                  'ReachSafety-Recursive', 'ReachSafety-Sequentialized',
-                 'Systems_BusyBox_MemSafety', 'Systems_BusyBox_Overflows',
+                 'Systems_BusyBox_MemSafety', 'Systems_BusyBox_NoOverflows',
                  'Systems_DeviceDriversLinux64_ReachSafety',
                  'Termination-MainControlFlow', 'Termination-MainHeap',
                  'Termination-Other']
@@ -506,7 +519,7 @@ def seed_queue(session, region, queue, task_set):
 def run_perf_test(
         session, mode, region, az, ami, instance_type, sqs_arn, sqs_url,
         parallel, snapshot_id, instance_terminated_arn, bucket_name,
-        perf_test_id, price, ssh_key_name, witness_check):
+        perf_test_id, price, ssh_key_name, witness_check, compare_to):
     # create an EC2 instance and trigger benchmarking
     logger = logging.getLogger('perf_test')
 
@@ -578,6 +591,10 @@ def run_perf_test(
                 {
                     'ParameterKey': 'WitnessCheck',
                     'ParameterValue': str(witness_check)
+                },
+                {
+                    'ParameterKey': 'CompareTo',
+                    'ParameterValue': ':'.join(compare_to)
                 }
             ],
             Capabilities=['CAPABILITY_NAMED_IAM'])
@@ -640,8 +657,8 @@ def main():
                         KeyName=args.ssh_key_name, PublicKeyMaterial=pk)
 
     # build a unique id for this performance test run
-    perf_test_id = str(datetime.datetime.utcnow().isoformat(
-        sep='-', timespec='seconds')) + '-' + args.commit_id
+    perf_test_id = str(datetime.datetime.utcnow().strftime(
+        '%Y-%m-%d-%H:%M:%S')) + '-' + args.commit_id
     perf_test_id = re.sub('[:/_\.\^~ ]', '-', perf_test_id)
     logger.info('global: Preparing performance test ' + perf_test_id)
 
@@ -674,7 +691,7 @@ def main():
             session, args.mode, region, az, ami, args.instance_type,
             sqs_arn, sqs_url, args.parallel, snapshot_id,
             instance_terminated_arn, bucket_name, perf_test_id, price,
-            args.ssh_key_name, args.witness_check)
+            args.ssh_key_name, args.witness_check, args.compare_to)
 
     return 0
 

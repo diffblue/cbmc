@@ -28,7 +28,7 @@ Resources:
                 apt-get -y update
                 apt-get install git
                 cd /mnt
-                git clone --depth 1 --branch svcomp18 \
+                git clone --depth 1 --branch svcomp19 \
                         https://github.com/sosy-lab/sv-benchmarks.git
                 git clone --depth 1 \
                         https://github.com/sosy-lab/benchexec.git
