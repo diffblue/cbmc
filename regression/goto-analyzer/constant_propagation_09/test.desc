@@ -1,9 +1,8 @@
-FUTURE
+CORE
 main.c
---constants --simplify out.gb
+--constants --verify
 ^EXIT=0$
 ^SIGNAL=0$
-^Simplified:  assert: 1, assume: 0, goto: 3, assigns: 4, function calls: 0$
-^Unmodified:  assert: 0, assume: 0, goto: 0, assigns: 11, function calls: 2$
+^\[main.assertion.1\] line 9 assertion a\[(\(signed( long)? long int\))?0\] == 0: FAILURE \(if reachable\)$
 --
 ^warning: ignoring

@@ -124,8 +124,6 @@ public:
     void set_dirty_to_top(const dirtyt &dirty, const namespacet &ns);
 
     bool is_constant(const exprt &expr) const;
-    bool is_array_constant(const exprt &expr) const;
-    bool is_constant_address_of(const exprt &expr) const;
 
     bool is_empty() const
     {
@@ -137,11 +135,14 @@ public:
 
   valuest values;
 
-  bool partial_evaluate(exprt &expr, const namespacet &ns) const;
+  static bool partial_evaluate(
+    const valuest &known_values,
+    exprt &expr,
+    const namespacet &ns);
 
 protected:
-  void assign_rec(
-    valuest &values,
+  static void assign_rec(
+    valuest &dest_values,
     const exprt &lhs,
     const exprt &rhs,
     const namespacet &ns,
@@ -152,11 +153,15 @@ protected:
     const namespacet &ns,
     const constant_propagator_ait *cp);
 
-  bool partial_evaluate_with_all_rounding_modes(
+  static bool partial_evaluate_with_all_rounding_modes(
+    const valuest &known_values,
     exprt &expr,
-    const namespacet &ns) const;
+    const namespacet &ns);
 
-  bool replace_constants_and_simplify(exprt &expr, const namespacet &ns) const;
+  static bool replace_constants_and_simplify(
+    const valuest &known_values,
+    exprt &expr,
+    const namespacet &ns);
 };
 
 class constant_propagator_ait:public ait<constant_propagator_domaint>

@@ -1,4 +1,4 @@
-KNOWNBUG
+FUTURE
 sensitivity_test_constants_pointer_to_constants_struct.c
 --variable --pointers --structs --verify
 ^EXIT=0$
