@@ -1696,6 +1696,8 @@ void java_bytecode_parsert::rinner_classes_attribute(
     // This is a marker that a class is anonymous.
     if(inner_name_index == 0)
       parsed_class.is_anonymous_class = true;
+    else
+      parsed_class.inner_name = pool_entry_lambda(inner_name_index).s;
     // Note that if outer_class_info_index == 0, the inner class is an anonymous
     // or local class, and is treated as private.
     if(outer_class_info_index == 0)
