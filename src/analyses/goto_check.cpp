@@ -992,12 +992,16 @@ goto_checkt::address_check(const exprt &address, const exprt &size)
       alloc_disjuncts.push_back(and_exprt(lb_check, ub_check));
     }
 
-    const exprt allocs = disjunction(alloc_disjuncts);
+    const exprt in_bounds_of_some_explicit_allocation =
+      disjunction(alloc_disjuncts);
 
     if(flags.is_unknown() || flags.is_null())
     {
       conditions.push_back(conditiont(
-        or_exprt(allocs, not_exprt(null_pointer(address))), "pointer NULL"));
+        or_exprt(
+          in_bounds_of_some_explicit_allocation,
+          not_exprt(null_pointer(address))),
+        "pointer NULL"));
     }
 
     if(flags.is_unknown())
@@ -1010,21 +1014,28 @@ goto_checkt::address_check(const exprt &address, const exprt &size)
     if(flags.is_uninitialized())
     {
       conditions.push_back(conditiont(
-        or_exprt(allocs, not_exprt(invalid_pointer(address))),
+        or_exprt(
+          in_bounds_of_some_explicit_allocation,
+          not_exprt(invalid_pointer(address))),
         "pointer uninitialized"));
     }
 
     if(flags.is_unknown() || flags.is_dynamic_heap())
     {
       conditions.push_back(conditiont(
-        not_exprt(deallocated(address, ns)),
+        or_exprt(
+          in_bounds_of_some_explicit_allocation,
+          not_exprt(deallocated(address, ns))),
         "deallocated dynamic object"));
     }
 
     if(flags.is_unknown() || flags.is_dynamic_local())
     {
       conditions.push_back(conditiont(
-        not_exprt(dead_object(address, ns)), "dead object"));
+        or_exprt(
+          in_bounds_of_some_explicit_allocation,
+          not_exprt(dead_object(address, ns))),
+        "dead object"));
     }
 
     if(flags.is_unknown() || flags.is_dynamic_heap())
@@ -1034,7 +1045,10 @@ goto_checkt::address_check(const exprt &address, const exprt &size)
         dynamic_object_upper_bound(address, ns, size));
 
       conditions.push_back(conditiont(
-        implies_exprt(malloc_object(address, ns), not_exprt(dynamic_bounds_violation)),
+        or_exprt(
+          in_bounds_of_some_explicit_allocation,
+          implies_exprt(
+            malloc_object(address, ns), not_exprt(dynamic_bounds_violation))),
         "pointer outside dynamic object bounds"));
     }
 
@@ -1047,14 +1061,19 @@ goto_checkt::address_check(const exprt &address, const exprt &size)
         object_upper_bound(address, ns, size));
 
       conditions.push_back(conditiont(
-        implies_exprt(not_exprt(dynamic_object(address)), not_exprt(object_bounds_violation)),
+        or_exprt(
+          in_bounds_of_some_explicit_allocation,
+          implies_exprt(
+            not_exprt(dynamic_object(address)),
+            not_exprt(object_bounds_violation))),
         "pointer outside object bounds"));
     }
 
     if(flags.is_unknown() || flags.is_integer_address())
     {
       conditions.push_back(conditiont(
-        implies_exprt(integer_address(address), allocs),
+        implies_exprt(
+          integer_address(address), in_bounds_of_some_explicit_allocation),
         "invalid integer address"));
     }
 
