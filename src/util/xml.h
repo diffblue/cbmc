@@ -27,6 +27,13 @@ public:
   typedef std::list<xmlt> elementst;
   typedef std::map<std::string, std::string> attributest;
 
+  xmlt(std::string &&_name, attributest &&_attributes, elementst &&_elements)
+    : name(std::move(_name)),
+      attributes(std::move(_attributes)),
+      elements(std::move(_elements))
+  {
+  }
+
   std::string name, data;
 
   attributest attributes;

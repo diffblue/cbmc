@@ -73,9 +73,11 @@ void show_properties(
     case ui_message_handlert::uit::XML_UI:
       {
         // use me instead
-        xmlt xml_property("property");
-        xml_property.set_attribute("name", id2string(property_id));
-        xml_property.set_attribute("class", id2string(property_class));
+        xmlt xml_property(
+          "property",
+          {{"name", id2string(property_id)},
+           {"class", id2string(property_class)}},
+          {});
 
         xmlt &property_l=xml_property.new_element();
         property_l=xml(source_location);

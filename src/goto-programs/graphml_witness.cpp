@@ -264,9 +264,11 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
     case goto_trace_stept::typet::ASSERT:
     case goto_trace_stept::typet::GOTO:
       {
-        xmlt edge("edge");
-        edge.set_attribute("source", graphml[from].node_name);
-        edge.set_attribute("target", graphml[to].node_name);
+        xmlt edge(
+          "edge",
+          {{"source", graphml[from].node_name},
+           {"target", graphml[to].node_name}},
+          {});
 
         {
           xmlt &data_f=edge.new_element("data");
@@ -302,9 +304,9 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
           val.data="["+(it->cond_value ? cond : neg_cond)+"]";
 
           #if 0
-          xmlt edge2("edge");
-          edge2.set_attribute("source", graphml[from].node_name);
-          edge2.set_attribute("target", graphml[sink].node_name);
+          xmlt edge2("edge", {
+                     {"source", graphml[from].node_name},
+                     {"target", graphml[sink].node_name}}, {});
 
           xmlt &data_f2=edge2.new_element("data");
           data_f2.set_attribute("key", "originfile");
@@ -447,9 +449,11 @@ void graphml_witnesst::operator()(const symex_target_equationt &equation)
     case goto_trace_stept::typet::ASSERT:
     case goto_trace_stept::typet::GOTO:
       {
-        xmlt edge("edge");
-        edge.set_attribute("source", graphml[from].node_name);
-        edge.set_attribute("target", graphml[to].node_name);
+        xmlt edge(
+          "edge",
+          {{"source", graphml[from].node_name},
+           {"target", graphml[to].node_name}},
+          {});
 
         {
           xmlt &data_f=edge.new_element("data");

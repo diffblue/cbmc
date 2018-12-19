@@ -124,11 +124,11 @@ xmlt ai_baset::output_xml(
 
   forall_goto_functions(f_it, goto_functions)
   {
-    xmlt function("function");
-    function.set_attribute("name", id2string(f_it->first));
-    function.set_attribute(
-      "body_available",
-      f_it->second.body_available() ? "true" : "false");
+    xmlt function(
+      "function",
+      {{"name", id2string(f_it->first)},
+       {"body_available", f_it->second.body_available() ? "true" : "false"}},
+      {});
 
     if(f_it->second.body_available())
     {
@@ -156,15 +156,11 @@ xmlt ai_baset::output_xml(
 
   forall_goto_program_instructions(i_it, goto_program)
   {
-    xmlt location;
-    location.set_attribute(
-      "location_number",
-      std::to_string(i_it->location_number));
-    location.set_attribute(
-      "source_location",
-      i_it->source_location.as_string());
-
-    location.new_element(abstract_state_before(i_it)->output_xml(*this, ns));
+    xmlt location(
+      "",
+      {{"location_number", std::to_string(i_it->location_number)},
+       {"source_location", i_it->source_location.as_string()}},
+      {abstract_state_before(i_it)->output_xml(*this, ns)});
 
     // Ideally we need output_instruction_xml
     std::ostringstream out;

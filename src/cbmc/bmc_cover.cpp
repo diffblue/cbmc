@@ -293,10 +293,12 @@ bool bmc_covert::operator()()
       {
         const goalt &goal=goal_pair.second;
 
-        xmlt xml_result("goal");
-        xml_result.set_attribute("id", id2string(goal_pair.first));
-        xml_result.set_attribute("description", goal.description);
-        xml_result.set_attribute("status", goal.satisfied?"SATISFIED":"FAILED");
+        xmlt xml_result(
+          "goal",
+          {{"id", id2string(goal_pair.first)},
+           {"description", goal.description},
+           {"status", goal.satisfied ? "SATISFIED" : "FAILED"}},
+          {});
 
         if(goal.source_location.is_not_nil())
           xml_result.new_element()=xml(goal.source_location);
