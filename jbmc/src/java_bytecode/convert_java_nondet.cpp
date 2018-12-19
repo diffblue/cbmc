@@ -55,7 +55,7 @@ static goto_programt get_gen_nondet_init_instructions(
     symbol_table,
     source_loc,
     skip_classid,
-    allocation_typet::DYNAMIC,
+    lifetimet::DYNAMIC,
     object_factory_parameters,
     update_in_placet::NO_UPDATE_IN_PLACE);
 

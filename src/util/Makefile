@@ -1,4 +1,5 @@
-SRC = arith_tools.cpp \
+SRC = allocate_objects.cpp \
+      arith_tools.cpp \
       array_name.cpp \
       base_type.cpp \
       bv_arithmetic.cpp \

@@ -23,11 +23,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 class java_object_factoryt
 {
-  /// Every new variable initialized by the code emitted by the methods of this
-  /// class gets a symbol in the symbol table, and such symbols are also added
-  /// to this vector.
-  std::vector<const symbolt *> &symbols_created;
-
   /// The source location for new statements emitted during the operation of the
   /// methods in this class.
   const source_locationt &loc;
@@ -61,6 +56,8 @@ class java_object_factoryt
   /// implementations.
   const select_pointer_typet &pointer_type_selector;
 
+  allocate_objectst allocate_objects;
+
   code_assignt get_null_assignment(
     const exprt &expr,
     const pointer_typet &ptr_type);
@@ -69,7 +66,7 @@ class java_object_factoryt
     code_blockt &assignments,
     const exprt &expr,
     const typet &target_type,
-    allocation_typet alloc_type,
+    lifetimet lifetime,
     size_t depth,
     update_in_placet update_in_place,
     const source_locationt &location);
@@ -83,24 +80,21 @@ class java_object_factoryt
 
 public:
   java_object_factoryt(
-    std::vector<const symbolt *> &_symbols_created,
     const source_locationt &loc,
     const java_object_factory_parameterst _object_factory_parameters,
     symbol_table_baset &_symbol_table,
     const select_pointer_typet &pointer_type_selector)
-    : symbols_created(_symbols_created),
-      loc(loc),
+    : loc(loc),
       object_factory_parameters(_object_factory_parameters),
       symbol_table(_symbol_table),
       ns(_symbol_table),
-      pointer_type_selector(pointer_type_selector)
+      pointer_type_selector(pointer_type_selector),
+      allocate_objects(
+        ID_java,
+        loc,
+        object_factory_parameters.function_id,
+        symbol_table)
   {}
-
-  exprt allocate_object(
-    code_blockt &assignments,
-    const exprt &,
-    const typet &,
-    allocation_typet alloc_type);
 
   void gen_nondet_array_init(
     code_blockt &assignments,
@@ -121,18 +115,22 @@ public:
     bool is_sub,
     irep_idt class_identifier,
     bool skip_classid,
-    allocation_typet alloc_type,
+    lifetimet lifetime,
     bool override_,
     const typet &override_type,
     size_t depth,
     update_in_placet,
     const source_locationt &location);
 
+  void add_created_symbol(const symbolt *symbol);
+
+  void declare_created_symbols(code_blockt &init_code);
+
 private:
   void gen_nondet_pointer_init(
     code_blockt &assignments,
     const exprt &expr,
-    allocation_typet alloc_type,
+    lifetimet lifetime,
     const pointer_typet &pointer_type,
     size_t depth,
     const update_in_placet &update_in_place,
@@ -144,7 +142,7 @@ private:
     bool is_sub,
     irep_idt class_identifier,
     bool skip_classid,
-    allocation_typet alloc_type,
+    lifetimet lifetime,
     const struct_typet &struct_type,
     size_t depth,
     const update_in_placet &update_in_place,
@@ -152,7 +150,7 @@ private:
 
   symbol_exprt gen_nondet_subtype_pointer_init(
     code_blockt &assignments,
-    allocation_typet alloc_type,
+    lifetimet lifetime,
     const pointer_typet &substitute_pointer_type,
     size_t depth,
     const source_locationt &location);
@@ -169,182 +167,6 @@ private:
     const exprt &instance_expr,
     const irep_idt &method_name);
 };
-
-/// Generates code for allocating a dynamic object. This is used in
-/// allocate_object() and also in the library preprocessing for allocating
-/// strings.
-/// \param target_expr: expression to which the necessary memory will be
-///   allocated, its type should be pointer to `allocate_type`
-/// \param allocate_type: type of the object allocated
-/// \param symbol_table: symbol table
-/// \param loc: location in the source
-/// \param function_id: function ID to associate with auxiliary variables
-/// \param output_code: code block to which the necessary code is added
-/// \param symbols_created: created symbols to be declared by the caller
-/// \param cast_needed: Boolean flags saying where we need to cast the malloc
-///   site
-/// \return Expression representing the malloc site allocated.
-exprt allocate_dynamic_object(
-  const exprt &target_expr,
-  const typet &allocate_type,
-  symbol_table_baset &symbol_table,
-  const source_locationt &loc,
-  const irep_idt &function_id,
-  code_blockt &output_code,
-  std::vector<const symbolt *> &symbols_created,
-  bool cast_needed)
-{
-  // build size expression
-  exprt object_size=size_of_expr(allocate_type, namespacet(symbol_table));
-
-  if(allocate_type.id()!=ID_empty)
-  {
-    INVARIANT(!object_size.is_nil(), "Size of Java objects should be known");
-    // malloc expression
-    side_effect_exprt malloc_expr(
-      ID_allocate, pointer_type(allocate_type), loc);
-    malloc_expr.copy_to_operands(object_size);
-    malloc_expr.copy_to_operands(false_exprt());
-    // create a symbol for the malloc expression so we can initialize
-    // without having to do it potentially through a double-deref, which
-    // breaks the to-SSA phase.
-    symbolt &malloc_sym = get_fresh_aux_symbol(
-      pointer_type(allocate_type),
-      id2string(function_id),
-      "malloc_site",
-      loc,
-      ID_java,
-      symbol_table);
-    symbols_created.push_back(&malloc_sym);
-    code_assignt assign(malloc_sym.symbol_expr(), malloc_expr);
-    assign.add_source_location()=loc;
-    output_code.add(assign);
-    exprt malloc_symbol_expr=malloc_sym.symbol_expr();
-    if(cast_needed)
-      malloc_symbol_expr=typecast_exprt(malloc_symbol_expr, target_expr.type());
-    code_assignt code(target_expr, malloc_symbol_expr);
-    code.add_source_location()=loc;
-    output_code.add(code);
-    return malloc_sym.symbol_expr();
-  }
-  else
-  {
-    // make null
-    null_pointer_exprt null_pointer_expr(to_pointer_type(target_expr.type()));
-    code_assignt code(target_expr, null_pointer_expr);
-    code.add_source_location()=loc;
-    output_code.add(code);
-    return exprt();
-  }
-}
-
-/// Generates code for allocating a dynamic object. This is a static version of
-/// allocate_dynamic_object that can be called from outside java_object_factory
-/// and which takes care of creating the associated declarations.
-/// \param target_expr: expression to which the necessary memory will be
-///   allocated
-/// \param symbol_table: symbol table
-/// \param loc: location in the source
-/// \param function_id: function ID to associate with auxiliary variables
-/// \param output_code: code block to which the necessary code is added
-/// \return the dynamic object created
-exprt allocate_dynamic_object_with_decl(
-  const exprt &target_expr,
-  symbol_table_baset &symbol_table,
-  const source_locationt &loc,
-  const irep_idt &function_id,
-  code_blockt &output_code)
-{
-  std::vector<const symbolt *> symbols_created;
-  code_blockt tmp_block;
-  const typet &allocate_type=target_expr.type().subtype();
-  const exprt dynamic_object = allocate_dynamic_object(
-    target_expr,
-    allocate_type,
-    symbol_table,
-    loc,
-    function_id,
-    tmp_block,
-    symbols_created,
-    false);
-
-  // Add the following code to output_code for each symbol that's been created:
-  //   <type> <identifier>;
-  for(const symbolt * const symbol_ptr : symbols_created)
-  {
-    code_declt decl(symbol_ptr->symbol_expr());
-    decl.add_source_location()=loc;
-    output_code.add(decl);
-  }
-
-  for(const auto &code : tmp_block.statements())
-    output_code.add(code);
-
-  return dynamic_object;
-}
-
-/// Installs a new symbol in the symbol table, pushing the corresponding symbolt
-/// object to the field `symbols_created` and emits to \p assignments a new
-/// assignment of the form `<target_expr> := address-of(new_object)`.  The
-/// \p allocate_type may differ from `target_expr.type()`, e.g. for target_expr
-/// having type int* and allocate_type being an int[10].
-///
-/// \param assignments: The code block to add code to.
-/// \param target_expr: The expression which we are allocating a symbol for.
-/// \param allocate_type:
-/// \param alloc_type: Allocation type (global, local or dynamic)
-/// \return An address_of_exprt of the newly allocated object.
-exprt java_object_factoryt::allocate_object(
-  code_blockt &assignments,
-  const exprt &target_expr,
-  const typet &allocate_type,
-  allocation_typet alloc_type)
-{
-  const typet &allocate_type_resolved=ns.follow(allocate_type);
-  const typet &target_type=ns.follow(target_expr.type().subtype());
-  bool cast_needed=allocate_type_resolved!=target_type;
-  switch(alloc_type)
-  {
-    case allocation_typet::LOCAL:
-    case allocation_typet::GLOBAL:
-    {
-      symbolt &aux_symbol = get_fresh_aux_symbol(
-        allocate_type,
-        id2string(object_factory_parameters.function_id),
-        "tmp_object_factory",
-        loc,
-        ID_java,
-        symbol_table);
-      if(alloc_type==allocation_typet::GLOBAL)
-        aux_symbol.is_static_lifetime=true;
-      symbols_created.push_back(&aux_symbol);
-
-      exprt object=aux_symbol.symbol_expr();
-      exprt aoe=address_of_exprt(object);
-      if(cast_needed)
-        aoe=typecast_exprt(aoe, target_expr.type());
-      code_assignt code(target_expr, aoe);
-      code.add_source_location()=loc;
-      assignments.add(code);
-      return aoe;
-    }
-    case allocation_typet::DYNAMIC:
-    {
-      return allocate_dynamic_object(
-        target_expr,
-        allocate_type,
-        symbol_table,
-        loc,
-        object_factory_parameters.function_id,
-        assignments,
-        symbols_created,
-        cast_needed);
-    }
-    default:
-      UNREACHABLE;
-      return exprt();
-  } // End switch
-}
 
 /// Returns a codet that assigns \p expr, of type \p ptr_type, a NULL value.
 code_assignt java_object_factoryt::get_null_assignment(
@@ -363,19 +185,19 @@ code_assignt java_object_factoryt::get_null_assignment(
 ///
 /// When in NO_UPDATE_IN_PLACE mode, the code emitted looks like:
 ///
-/// ```
-///   struct new_object obj; // depends on alloc_type
+/// \code
+///   struct new_object obj; // depends on lifetime
 ///   <expr> := &obj
 ///   // recursive initialization of obj in NO_UPDATE_IN_PLACE mode
-/// ```
+/// \endcode
 ///
 /// When in MUST_UPDATE_IN_PLACE mode, all code is emitted by a recursive call
 /// to gen_nondet_init in MUST_UPDATE_IN_PLACE mode, and looks like:
 ///
-/// ```
+/// \code
 ///   (*<expr>).some_int := NONDET(int)
 ///   (*<expr>).some_char := NONDET(char)
-/// ```
+/// \endcode
 /// It is illegal to call the function with MAY_UPDATE_IN_PLACE.
 ///
 /// \param[out] assignments:
@@ -387,8 +209,9 @@ code_assignt java_object_factoryt::get_null_assignment(
 ///   Structure type to initialize, which may not match `*expr` (for example,
 ///   `expr` might be have type void*). It cannot be a pointer to a primitive
 ///   type because Java does not allow so.
-/// \param alloc_type:
-///   Allocation type (global, local or dynamic)
+/// \param lifetime:
+///   Lifetime of the allocated objects (AUTOMATIC_LOCAL, STATIC_GLOBAL, or
+///   DYNAMIC)
 /// \param depth:
 ///   Number of times that a pointer has been dereferenced from the root of the
 ///   object tree that we are initializing.
@@ -402,7 +225,7 @@ void java_object_factoryt::gen_pointer_target_init(
   code_blockt &assignments,
   const exprt &expr,
   const typet &target_type,
-  allocation_typet alloc_type,
+  lifetimet lifetime,
   size_t depth,
   update_in_placet update_in_place,
   const source_locationt &location)
@@ -432,34 +255,29 @@ void java_object_factoryt::gen_pointer_target_init(
   // (return value of `allocate_object`), emit a statement of the form
   // `<expr> := address-of(<new-object>)` and recursively initialize such new
   // object.
-  exprt target;
+  exprt init_expr;
   if(update_in_place == update_in_placet::NO_UPDATE_IN_PLACE)
   {
-    target = allocate_object(assignments, expr, target_type, alloc_type);
-    INVARIANT(
-      target.type().id() == ID_pointer, "Pointer-typed expression expected");
+    init_expr = allocate_objects.allocate_object(
+      assignments, expr, target_type, lifetime, "tmp_object_factory");
   }
   else
   {
-    target = expr;
+    if(expr.id() == ID_address_of)
+      init_expr = expr.op0();
+    else
+    {
+      init_expr = dereference_exprt(expr);
+    }
   }
 
-  // we dereference the pointer and initialize the resulting object using a
-  // recursive call
-  exprt init_expr;
-  if(target.id() == ID_address_of)
-    init_expr = target.op0();
-  else
-  {
-    init_expr = dereference_exprt(target, target.type().subtype());
-  }
   gen_nondet_init(
     assignments,
     init_expr,
     false, // is_sub
     "",    // class_identifier
     false, // skip_classid
-    alloc_type,
+    lifetime,
     false,   // override
     typet(), // override type immaterial
     depth + 1,
@@ -667,8 +485,9 @@ void initialize_nondet_string_fields(
 ///   The code block we are building with initialization code.
 /// \param expr:
 ///   Pointer-typed lvalue expression to initialize.
-/// \param alloc_type:
-///   Allocation type (global, local or dynamic)
+/// \param lifetime:
+///   Lifetime of the allocated objects (AUTOMATIC_LOCAL, STATIC_GLOBAL, or
+///   DYNAMIC)
 /// \param depth:
 ///   Number of times that a pointer has been dereferenced from the root of the
 ///   object tree that we are initializing.
@@ -684,7 +503,7 @@ void initialize_nondet_string_fields(
 void java_object_factoryt::gen_nondet_pointer_init(
   code_blockt &assignments,
   const exprt &expr,
-  allocation_typet alloc_type,
+  lifetimet lifetime,
   const pointer_typet &pointer_type,
   size_t depth,
   const update_in_placet &update_in_place,
@@ -710,7 +529,7 @@ void java_object_factoryt::gen_nondet_pointer_init(
       replacement_pointer_type, ns.follow(replacement_pointer_type.subtype()));
 
     const symbol_exprt real_pointer_symbol = gen_nondet_subtype_pointer_init(
-      assignments, alloc_type, replacement_pointer_type, depth, location);
+      assignments, lifetime, replacement_pointer_type, depth, location);
 
     // Having created a pointer to object of type replacement_pointer_type
     // we now assign it back to the original pointer with a cast
@@ -798,7 +617,7 @@ void java_object_factoryt::gen_nondet_pointer_init(
       update_in_place_assignments,
       expr,
       subtype,
-      alloc_type,
+      lifetime,
       depth,
       update_in_placet::MUST_UPDATE_IN_PLACE,
       location);
@@ -821,7 +640,7 @@ void java_object_factoryt::gen_nondet_pointer_init(
     non_null_inst,
     expr,
     subtype,
-    alloc_type,
+    lifetime,
     depth,
     update_in_placet::NO_UPDATE_IN_PLACE,
     location);
@@ -884,7 +703,7 @@ void java_object_factoryt::gen_nondet_pointer_init(
 /// Generate codet assignments to initalize the selected concrete type.
 /// Generated code looks as follows (here A = replacement_pointer.subtype()):
 ///
-///   // allocate memory for a new object, depends on `alloc_type`
+///   // allocate memory for a new object, depends on `lifetime`
 ///   A { ... } tmp_object;
 ///
 ///   // non-det init all the fields of A
@@ -896,7 +715,9 @@ void java_object_factoryt::gen_nondet_pointer_init(
 ///
 /// \param assignments
 ///   A block of code where we append the generated code.
-/// \param alloc_type: Allocation type (global, local or dynamic)
+/// \param lifetime:
+///   Lifetime of the allocated objects (AUTOMATIC_LOCAL, STATIC_GLOBAL, or
+///   DYNAMIC)
 /// \param replacement_pointer
 ///   The type of the pointer we actually want to to create.
 /// \param depth:
@@ -909,7 +730,7 @@ void java_object_factoryt::gen_nondet_pointer_init(
 ///   pointer to object `tmp_object` (see above).
 symbol_exprt java_object_factoryt::gen_nondet_subtype_pointer_init(
   code_blockt &assignments,
-  allocation_typet alloc_type,
+  lifetimet lifetime,
   const pointer_typet &replacement_pointer,
   size_t depth,
   const source_locationt &location)
@@ -929,7 +750,7 @@ symbol_exprt java_object_factoryt::gen_nondet_subtype_pointer_init(
     false, // is_sub
     "",    // class_identifier
     false, // skip_classid
-    alloc_type,
+    lifetime,
     false,   // override
     typet(), // override_type
     depth,
@@ -984,8 +805,9 @@ alternate_casest get_string_input_values_code(
 ///   others.
 /// \param skip_classid:
 ///   If true, skip initializing `@class_identifier`.
-/// \param alloc_type:
-///   Allocation type (global, local or dynamic)
+/// \param lifetime:
+///   Lifetime of the allocated objects (AUTOMATIC_LOCAL, STATIC_GLOBAL, or
+///   DYNAMIC)
 /// \param struct_type:
 ///   The type of the struct we are initalizing.
 /// \param depth:
@@ -1003,7 +825,7 @@ void java_object_factoryt::gen_nondet_struct_init(
   bool is_sub,
   irep_idt class_identifier,
   bool skip_classid,
-  allocation_typet alloc_type,
+  lifetimet lifetime,
   const struct_typet &struct_type,
   size_t depth,
   const update_in_placet &update_in_place,
@@ -1142,7 +964,7 @@ void java_object_factoryt::gen_nondet_struct_init(
         _is_sub,
         class_identifier,
         false, // skip_classid
-        alloc_type,
+        lifetime,
         false,   // override
         typet(), // override_type
         depth,
@@ -1179,8 +1001,9 @@ void java_object_factoryt::gen_nondet_struct_init(
 ///   others.
 /// \param skip_classid:
 ///   If true, skip initializing `@class_identifier`.
-/// \param alloc_type:
-///   Allocation type (global, local or dynamic)
+/// \param lifetime:
+///   Lifetime of the allocated objects (AUTOMATIC_LOCAL, STATIC_GLOBAL, or
+///   DYNAMIC)
 /// \param override_:
 ///   If true, initialize with `override_type` instead of `expr.type()`. Used at
 ///   the moment for reference arrays, which are implemented as void* arrays but
@@ -1203,7 +1026,7 @@ void java_object_factoryt::gen_nondet_init(
   bool is_sub,
   irep_idt class_identifier,
   bool skip_classid,
-  allocation_typet alloc_type,
+  lifetimet lifetime,
   bool override_,
   const typet &override_type,
   size_t depth,
@@ -1230,7 +1053,7 @@ void java_object_factoryt::gen_nondet_init(
     gen_nondet_pointer_init(
       assignments,
       expr,
-      alloc_type,
+      lifetime,
       pointer_type,
       depth,
       update_in_place,
@@ -1260,7 +1083,7 @@ void java_object_factoryt::gen_nondet_init(
       is_sub,
       class_identifier,
       skip_classid,
-      alloc_type,
+      lifetime,
       struct_type,
       depth,
       update_in_place,
@@ -1277,6 +1100,16 @@ void java_object_factoryt::gen_nondet_init(
 
     assignments.add(assign);
   }
+}
+
+void java_object_factoryt::add_created_symbol(const symbolt *symbol_ptr)
+{
+  allocate_objects.add_created_symbol(symbol_ptr);
+}
+
+void java_object_factoryt::declare_created_symbols(code_blockt &init_code)
+{
+  allocate_objects.declare_created_symbols(init_code);
 }
 
 /// Nondeterministically initializes an int i in the range min <= i <= max,
@@ -1297,16 +1130,10 @@ const symbol_exprt java_object_factoryt::gen_nondet_int_init(
   const source_locationt &location)
 {
   PRECONDITION(min_value_expr.type() == max_value_expr.type());
-  // Allocate a new symbol for the int
-  const symbolt &int_symbol = get_fresh_aux_symbol(
-    min_value_expr.type(),
-    id2string(object_factory_parameters.function_id),
-    basename_prefix,
-    loc,
-    ID_java,
-    symbol_table);
-  symbols_created.push_back(&int_symbol);
-  const auto &int_symbol_expr = int_symbol.symbol_expr();
+
+  const symbol_exprt &int_symbol_expr =
+    allocate_objects.allocate_automatic_local_object(
+      min_value_expr.type(), basename_prefix);
 
   // Nondet-initialize it
   gen_nondet_init(
@@ -1314,11 +1141,11 @@ const symbol_exprt java_object_factoryt::gen_nondet_int_init(
     int_symbol_expr,
     false, // is_sub
     irep_idt(),
-    false,                   // skip_classid
-    allocation_typet::LOCAL, // immaterial, type is primitive
-    false,                   // override
-    typet(),                 // override type is immaterial
-    0,                       // depth is immaterial, always non-null
+    false,                      // skip_classid
+    lifetimet::AUTOMATIC_LOCAL, // immaterial, type is primitive
+    false,                      // override
+    typet(),                    // override type is immaterial
+    0,                          // depth is immaterial, always non-null
     update_in_placet::NO_UPDATE_IN_PLACE,
     location);
 
@@ -1420,32 +1247,20 @@ void java_object_factoryt::gen_nondet_array_init(
     init_array_expr=
       typecast_exprt(init_array_expr, pointer_type(element_type));
 
-  // Interpose a new symbol, as the goto-symex stage can't handle array indexing
-  // via a cast.
-  symbolt &array_init_symbol = get_fresh_aux_symbol(
-    init_array_expr.type(),
-    id2string(object_factory_parameters.function_id),
-    "array_data_init",
-    loc,
-    ID_java,
-    symbol_table);
-  symbols_created.push_back(&array_init_symbol);
-  const auto &array_init_symexpr=array_init_symbol.symbol_expr();
+  const symbol_exprt &array_init_symexpr =
+    allocate_objects.allocate_automatic_local_object(
+      init_array_expr.type(), "array_data_init");
+
   code_assignt data_assign(array_init_symexpr, init_array_expr);
   data_assign.add_source_location()=loc;
   assignments.add(data_assign);
 
-  // Emit init loop for(array_init_iter=0; array_init_iter!=array.length;
-  //                  ++array_init_iter) init(array[array_init_iter]);
-  symbolt &counter = get_fresh_aux_symbol(
-    length_expr.type(),
-    id2string(object_factory_parameters.function_id),
-    "array_init_iter",
-    loc,
-    ID_java,
-    symbol_table);
-  symbols_created.push_back(&counter);
-  exprt counter_expr=counter.symbol_expr();
+  const symbol_exprt &counter_expr =
+    allocate_objects.allocate_automatic_local_object(
+      length_expr.type(), "array_init_iter");
+
+  const symbolt &counter =
+    symbol_table.lookup_ref(counter_expr.get_identifier());
 
   exprt java_zero=from_integer(0, java_int_type());
   assignments.add(code_assignt(counter_expr, java_zero));
@@ -1492,7 +1307,7 @@ void java_object_factoryt::gen_nondet_array_init(
     irep_idt(), // class_identifier
     false,      // skip_classid
     // These are variable in number, so use dynamic allocator:
-    allocation_typet::DYNAMIC,
+    lifetimet::DYNAMIC,
     true, // override
     element_type,
     depth,
@@ -1552,29 +1367,6 @@ void java_object_factoryt::gen_nondet_enum_init(
   assignments.add(enum_assign);
 }
 
-/// Add code_declt instructions to `init_code` for every non-static symbol
-/// in `symbols_created`
-/// \param symbols_created: list of symbols
-/// \param loc: source location for new code_declt instances
-/// \param [out] init_code: gets code_declt for each symbol
-static void declare_created_symbols(
-  const std::vector<const symbolt *> &symbols_created,
-  const source_locationt &loc,
-  code_blockt &init_code)
-{
-  // Add the following code to init_code for each symbol that's been created:
-  //   <type> <identifier>;
-  for(const symbolt * const symbol_ptr : symbols_created)
-  {
-    if(!symbol_ptr->is_static_lifetime)
-    {
-      code_declt decl(symbol_ptr->symbol_expr());
-      decl.add_source_location()=loc;
-      init_code.add(decl);
-    }
-  }
-}
-
 /// Similar to `gen_nondet_init` below, but instead of allocating and
 /// non-deterministically initializing the the argument `expr` passed to that
 /// function, we create a static global object of type \p type and
@@ -1592,7 +1384,7 @@ exprt object_factory(
   code_blockt &init_code,
   symbol_table_baset &symbol_table,
   java_object_factory_parameterst parameters,
-  allocation_typet alloc_type,
+  lifetimet lifetime,
   const source_locationt &loc,
   const select_pointer_typet &pointer_type_selector)
 {
@@ -1614,10 +1406,7 @@ exprt object_factory(
   bool moving_symbol_failed=symbol_table.move(main_symbol, main_symbol_ptr);
   CHECK_RETURN(!moving_symbol_failed);
 
-  std::vector<const symbolt *> symbols_created;
-  symbols_created.push_back(main_symbol_ptr);
   java_object_factoryt state(
-    symbols_created,
     loc,
     parameters,
     symbol_table,
@@ -1629,14 +1418,15 @@ exprt object_factory(
     false, // is_sub
     "",    // class_identifier
     false, // skip_classid
-    alloc_type,
+    lifetime,
     false,   // override
     typet(), // override_type is immaterial
     1,       // initial depth
     update_in_placet::NO_UPDATE_IN_PLACE,
     loc);
 
-  declare_created_symbols(symbols_created, loc, init_code);
+  state.add_created_symbol(main_symbol_ptr);
+  state.declare_created_symbols(init_code);
 
   init_code.append(assignments);
   return object;
@@ -1661,9 +1451,9 @@ exprt object_factory(
 ///   Source location to which all generated code will be associated to.
 /// \param skip_classid:
 ///   If true, skip initializing field `@class_identifier`.
-/// \param alloc_type:
-///   Allocate new objects as global objects (GLOBAL) or as local variables
-///   (LOCAL) or using malloc (DYNAMIC).
+/// \param lifetime:
+///   Lifetime of the allocated objects (AUTOMATIC_LOCAL, STATIC_GLOBAL, or
+///   DYNAMIC)
 /// \param object_factory_parameters:
 ///   Parameters for the generation of non deterministic objects.
 /// \param pointer_type_selector:
@@ -1683,15 +1473,12 @@ void gen_nondet_init(
   symbol_table_baset &symbol_table,
   const source_locationt &loc,
   bool skip_classid,
-  allocation_typet alloc_type,
+  lifetimet lifetime,
   const java_object_factory_parameterst &object_factory_parameters,
   const select_pointer_typet &pointer_type_selector,
   update_in_placet update_in_place)
 {
-  std::vector<const symbolt *> symbols_created;
-
   java_object_factoryt state(
-    symbols_created,
     loc,
     object_factory_parameters,
     symbol_table,
@@ -1703,14 +1490,14 @@ void gen_nondet_init(
     false, // is_sub
     "",    // class_identifier
     skip_classid,
-    alloc_type,
+    lifetime,
     false,   // override
     typet(), // override_type is immaterial
     1,       // initial depth
     update_in_place,
     loc);
 
-  declare_created_symbols(symbols_created, loc, init_code);
+  state.declare_created_symbols(init_code);
 
   init_code.append(assignments);
 }
@@ -1722,7 +1509,7 @@ exprt object_factory(
   code_blockt &init_code,
   symbol_tablet &symbol_table,
   const java_object_factory_parameterst &object_factory_parameters,
-  allocation_typet alloc_type,
+  lifetimet lifetime,
   const source_locationt &location)
 {
   select_pointer_typet pointer_type_selector;
@@ -1732,7 +1519,7 @@ exprt object_factory(
     init_code,
     symbol_table,
     object_factory_parameters,
-    alloc_type,
+    lifetime,
     location,
     pointer_type_selector);
 }
@@ -1744,7 +1531,7 @@ void gen_nondet_init(
   symbol_table_baset &symbol_table,
   const source_locationt &loc,
   bool skip_classid,
-  allocation_typet alloc_type,
+  lifetimet lifetime,
   const java_object_factory_parameterst &object_factory_parameters,
   update_in_placet update_in_place)
 {
@@ -1755,7 +1542,7 @@ void gen_nondet_init(
     symbol_table,
     loc,
     skip_classid,
-    alloc_type,
+    lifetime,
     object_factory_parameters,
     pointer_type_selector,
     update_in_place);

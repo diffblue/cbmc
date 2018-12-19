@@ -59,7 +59,7 @@ SCENARIO(
         symbol_table,
         loc,
         false,
-        allocation_typet::DYNAMIC,
+        lifetimet::DYNAMIC,
         object_factory_parameters,
         update_in_placet::NO_UPDATE_IN_PLACE);
 

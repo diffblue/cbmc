@@ -123,7 +123,7 @@ void java_simple_method_stubst::create_method_stub_at(
     symbol_table,
     loc,
     is_constructor,
-    allocation_typet::DYNAMIC,
+    lifetimet::DYNAMIC,
     parameters,
     update_in_place ? update_in_placet::MUST_UPDATE_IN_PLACE
                     : update_in_placet::NO_UPDATE_IN_PLACE);
@@ -208,7 +208,7 @@ void java_simple_method_stubst::create_method_stub(symbolt &symbol)
           symbol_table,
           source_locationt(),
           false,
-          allocation_typet::LOCAL, // Irrelevant as type is primitive
+          lifetimet::AUTOMATIC_LOCAL, // Irrelevant as type is primitive
           parameters,
           update_in_placet::NO_UPDATE_IN_PLACE);
       }

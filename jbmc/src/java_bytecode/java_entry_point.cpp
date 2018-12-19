@@ -243,7 +243,7 @@ static void java_static_lifetime_init(
           symbol_table,
           source_location,
           false,
-          allocation_typet::GLOBAL,
+          lifetimet::STATIC_GLOBAL,
           parameters,
           pointer_type_selector,
           update_in_placet::NO_UPDATE_IN_PLACE);
@@ -348,7 +348,7 @@ exprt::operandst java_build_arguments(
         init_code,
         symbol_table,
         parameters,
-        allocation_typet::LOCAL,
+        lifetimet::AUTOMATIC_LOCAL,
         function.location,
         pointer_type_selector);
     }
@@ -394,7 +394,7 @@ exprt::operandst java_build_arguments(
           init_code_for_type,
           symbol_table,
           parameters,
-          allocation_typet::DYNAMIC,
+          lifetimet::DYNAMIC,
           function.location,
           pointer_type_selector);
         init_code_for_type.add(
