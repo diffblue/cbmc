@@ -312,8 +312,10 @@ std::pair<exprt, string_constraintst> add_axioms_from_char(
   const array_string_exprt &res,
   const exprt &c)
 {
-  const and_exprt lemma(equal_exprt(res[0], c), length_eq(res, 1));
-  return {from_integer(0, get_return_code_type()), {{lemma}}};
+  string_constraintst constraints;
+  constraints.existential = {
+    and_exprt(equal_exprt(res[0], c), length_eq(res, 1))};
+  return {from_integer(0, get_return_code_type()), std::move(constraints)};
 }
 
 /// Add axioms making the return value true if the given string is a correct
