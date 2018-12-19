@@ -2,10 +2,16 @@
 set -x -e
 
 # set up the additional volume
-sleep 10
-e2fsck -f -y /dev/xvdf
-resize2fs /dev/xvdf
-mount /dev/xvdf /mnt
+if lsblk | grep ^nvme
+then
+  e2fsck -f -y /dev/nvme0n1
+  resize2fs /dev/nvme0n1
+  mount /dev/nvme0n1 /mnt
+else
+  e2fsck -f -y /dev/xvdf
+  resize2fs /dev/xvdf
+  mount /dev/xvdf /mnt
+fi
 
 # install packages
 apt-get install -y git time wget binutils make jq
