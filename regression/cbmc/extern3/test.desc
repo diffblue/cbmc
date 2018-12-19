@@ -1,0 +1,10 @@
+CORE
+main.c
+
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+--
+The change to phi_function of 646cf29941499 failed to consider the case of
+extern variables, which we leave uninitialised.

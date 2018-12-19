@@ -473,11 +473,11 @@ static void merge_names(
     rhs = goto_state_rhs;
   else if(goto_state.guard.is_false())
     rhs = dest_state_rhs;
-  else if(goto_count == 0)
+  else if(goto_count == 0 && symbol.value.is_not_nil())
   {
     rhs = dest_state_rhs;
   }
-  else if(dest_count == 0)
+  else if(dest_count == 0 && symbol.value.is_not_nil())
   {
     rhs = goto_state_rhs;
   }
