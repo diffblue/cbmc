@@ -423,7 +423,14 @@ static void merge_names(
   if(goto_count == dest_count)
     return; // not at all changed
 
-  // changed!
+  // changed - but only on a branch that is now dead, and the other branch is
+  // uninitialized/invalid
+  if(
+    (dest_state.guard.is_false() && goto_count == 0) ||
+    (goto_state.guard.is_false() && dest_count == 0))
+  {
+    return;
+  }
 
   // shared variables are renamed on every access anyway, we don't need to
   // merge anything
@@ -473,11 +480,11 @@ static void merge_names(
     rhs = goto_state_rhs;
   else if(goto_state.guard.is_false())
     rhs = dest_state_rhs;
-  else if(goto_count == 0)
+  else if(goto_count == 0 && symbol.value.is_not_nil())
   {
     rhs = dest_state_rhs;
   }
-  else if(dest_count == 0)
+  else if(dest_count == 0 && symbol.value.is_not_nil())
   {
     rhs = goto_state_rhs;
   }
