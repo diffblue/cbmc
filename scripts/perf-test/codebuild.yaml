@@ -57,7 +57,7 @@ Resources:
                 Name: release
             Environment:
                 ComputeType: BUILD_GENERAL1_LARGE
-                Image: aws/codebuild/ubuntu-base:14.04
+                Image: ubuntu:18.04
                 Type: LINUX_CONTAINER
             Name: !Sub "perf-test-release-build-${PerfTestId}"
             ServiceRole: !Ref CodeBuildRole
@@ -67,12 +67,17 @@ Resources:
                     phases:
                         install:
                             commands:
-                                - echo "deb http://ppa.launchpad.net/ubuntu-toolchain-r/test/ubuntu trusty main" > /etc/apt/sources.list.d/toolchain.list
-                                - apt-key adv --keyserver keyserver.ubuntu.com --recv-keys BA9EF27F
-                                - apt-get update -y
-                                - apt-get install -y libwww-perl g++-5 flex bison git ccache
-                                - update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 1
-                                - update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-5 1
+                                - >
+                                  sed -i
+                                  's#/archive.ubuntu.com#/${AWS::Region}.ec2.archive.ubuntu.com#g'
+                                  /etc/apt/sources.list
+                                - apt-get update
+                                - >
+                                  DEBIAN_FRONTEND=noninteractive
+                                  apt-get install -y
+                                  build-essential g++-8 flex bison git
+                                  libwww-perl curl
+                                  ccache awscli
                                 - |
                                   cd /root/
                                   aws s3 cp \
@@ -114,7 +119,7 @@ Resources:
                 Name: profiling
             Environment:
                 ComputeType: BUILD_GENERAL1_LARGE
-                Image: aws/codebuild/ubuntu-base:14.04
+                Image: ubuntu:18.04
                 Type: LINUX_CONTAINER
             Name: !Sub "perf-test-profiling-build-${PerfTestId}"
             ServiceRole: !Ref CodeBuildRole
@@ -124,12 +129,17 @@ Resources:
                     phases:
                         install:
                             commands:
-                                - echo "deb http://ppa.launchpad.net/ubuntu-toolchain-r/test/ubuntu trusty main" > /etc/apt/sources.list.d/toolchain.list
-                                - apt-key adv --keyserver keyserver.ubuntu.com --recv-keys BA9EF27F
-                                - apt-get update -y
-                                - apt-get install -y libwww-perl g++-5 flex bison git ccache
-                                - update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 1
-                                - update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-5 1
+                                - >
+                                  sed -i
+                                  's#/archive.ubuntu.com#/${AWS::Region}.ec2.archive.ubuntu.com#g'
+                                  /etc/apt/sources.list
+                                - apt-get update
+                                - >
+                                  DEBIAN_FRONTEND=noninteractive
+                                  apt-get install -y
+                                  build-essential g++-8 flex bison git
+                                  libwww-perl curl
+                                  ccache awscli
                                 - |
                                   cd /root/
                                   aws s3 cp \
