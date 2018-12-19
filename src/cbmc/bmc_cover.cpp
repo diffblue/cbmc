@@ -365,7 +365,6 @@ bool bmc_covert::operator()()
       json_arrayt &tests_array=json_result["tests"].make_array();
       for(const auto &test : tests)
       {
-        json_objectt &result=tests_array.push_back().make_object();
         if(bmc.options.get_bool_option("trace"))
         {
           json_arrayt &json_trace = json_result["trace"].make_array();
@@ -379,20 +378,21 @@ bool bmc_covert::operator()()
           {
             if(step.is_input())
             {
-              json_objectt json_input;
-              json_input["id"] = json_stringt(step.io_id);
+              json_objectt json_input({{"id", json_stringt(step.io_id)}});
               if(step.io_args.size()==1)
                 json_input["value"]=
                   json(step.io_args.front(), bmc.ns, ID_unknown);
-              json_test.push_back(json_input);
+              json_test.push_back(std::move(json_input));
             }
           }
         }
-        json_arrayt &goal_refs=result["coveredGoals"].make_array();
+        json_arrayt goal_refs;
         for(const auto &goal_id : test.covered_goals)
         {
           goal_refs.push_back(json_stringt(goal_id));
         }
+        tests_array.push_back(
+          json_objectt({{"coveredGoals", std::move(goal_refs)}}));
       }
 
       break;

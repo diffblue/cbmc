@@ -176,8 +176,7 @@ void bmct::report_success(messaget &log, ui_message_handlert &handler)
 
   case ui_message_handlert::uit::JSON_UI:
     {
-      json_objectt json_result;
-      json_result["cProverStatus"]=json_stringt("success");
+      json_objectt json_result({{"cProverStatus", json_stringt("success")}});
       log.result() << json_result;
     }
     break;
@@ -208,8 +207,7 @@ void bmct::report_failure(messaget &log, ui_message_handlert &handler)
 
   case ui_message_handlert::uit::JSON_UI:
     {
-      json_objectt json_result;
-      json_result["cProverStatus"]=json_stringt("failure");
+      json_objectt json_result({{"cProverStatus", json_stringt("failure")}});
       log.result() << json_result;
     }
     break;

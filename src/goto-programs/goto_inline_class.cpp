@@ -881,26 +881,25 @@ jsont goto_inlinet::goto_inline_logt::output_inline_log_json() const
 
   for(const auto &it : log_map)
   {
-    json_objectt &object=json_inlined.push_back().make_object();
-
     goto_programt::const_targett start=it.first;
     const goto_inline_log_infot &info=it.second;
     goto_programt::const_targett end=info.end;
 
     PRECONDITION(start->location_number <= end->location_number);
 
-    object["call"]=json_numbert(std::to_string(info.call_location_number));
-    object["function"]=json_stringt(info.function.c_str());
+    json_arrayt json_orig(
+      {json_numbert(std::to_string(info.begin_location_number)),
+       json_numbert(std::to_string(info.end_location_number))});
+    json_arrayt json_new({json_numbert(std::to_string(start->location_number)),
+                          json_numbert(std::to_string(end->location_number))});
 
-    json_arrayt &json_orig=object["originalSegment"].make_array();
-    json_orig.push_back()=json_numbert(std::to_string(
-      info.begin_location_number));
-    json_orig.push_back()=json_numbert(std::to_string(
-      info.end_location_number));
+    json_objectt object(
+      {{"call", json_numbert(std::to_string(info.call_location_number))},
+       {"function", json_stringt(info.function.c_str())},
+       {"originalSegment", std::move(json_orig)},
+       {"inlinedSegment", std::move(json_new)}});
 
-    json_arrayt &json_new=object["inlinedSegment"].make_array();
-    json_new.push_back()=json_numbert(std::to_string(start->location_number));
-    json_new.push_back()=json_numbert(std::to_string(end->location_number));
+    json_inlined.push_back(std::move(object));
   }
 
   return std::move(json_result);

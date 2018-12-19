@@ -336,15 +336,16 @@ jsont goto_unwindt::unwind_logt::output_log_json() const
   for(location_mapt::const_iterator it=location_map.begin();
       it!=location_map.end(); it++)
   {
-    json_objectt &object=json_unwound.push_back().make_object();
-
     goto_programt::const_targett target=it->first;
     unsigned location_number=it->second;
 
-    object["originalLocationNumber"]=json_numbert(std::to_string(
-      location_number));
-    object["newLocationNumber"]=json_numbert(std::to_string(
-      target->location_number));
+    json_objectt object(
+      {{"originalLocationNumber",
+        json_numbert(std::to_string(location_number))},
+       {"newLocationNumber",
+        json_numbert(std::to_string(target->location_number))}});
+
+    json_unwound.push_back(std::move(object));
   }
 
   return std::move(json_result);

@@ -282,10 +282,10 @@ void convert_return(
                                                           : step.function;
 
   const symbolt &symbol = ns.lookup(function_identifier);
-  json_objectt &json_function = json_call_return["function"].make_object();
-  json_function["displayName"] = json_stringt(symbol.display_name());
-  json_function["identifier"] = json_stringt(function_identifier);
-  json_function["sourceLocation"] = json(symbol.location);
+  json_call_return["function"] =
+    json_objectt({{"displayName", json_stringt(symbol.display_name())},
+                  {"identifier", json_stringt(function_identifier)},
+                  {"sourceLocation", json(symbol.location)}});
 
   if(!location.is_null())
     json_call_return["sourceLocation"] = location;

@@ -352,13 +352,13 @@ bool taint_analysist::operator()(
 
         if(use_json)
         {
-          json_objectt json;
-          json["bugClass"] =
-            json_stringt(i_it->source_location.get_property_class());
-          json["file"] = json_stringt(i_it->source_location.get_file());
-          json["line"]=
-            json_numbert(id2string(i_it->source_location.get_line()));
-          json_result.push_back(json);
+          json_objectt json(
+            {{"bugClass",
+              json_stringt(i_it->source_location.get_property_class())},
+             {"file", json_stringt(i_it->source_location.get_file())},
+             {"line",
+              json_numbert(id2string(i_it->source_location.get_line()))}});
+          json_result.push_back(std::move(json));
         }
         else
         {
