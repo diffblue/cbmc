@@ -108,6 +108,8 @@ decision_proceduret::resultt bv_refinementt::prop_solve()
     case propt::resultt::P_UNSATISFIABLE: return resultt::D_UNSATISFIABLE;
     default: return resultt::D_ERROR;
   }
+
+  UNREACHABLE;
 }
 
 void bv_refinementt::check_SAT()

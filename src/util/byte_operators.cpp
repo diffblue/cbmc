@@ -23,6 +23,8 @@ irep_idt byte_extract_id()
   default:
     UNREACHABLE;
   }
+
+  UNREACHABLE;
 }
 
 irep_idt byte_update_id()
@@ -38,4 +40,6 @@ irep_idt byte_update_id()
   default:
     UNREACHABLE;
   }
+
+  UNREACHABLE;
 }

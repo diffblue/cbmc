@@ -11,11 +11,11 @@ Author: CM Wintersteiger
 
 #include "format_strings.h"
 
-#include <util/exception_utils.h>
-#include <util/std_types.h>
-#include <util/std_expr.h>
-
 #include <util/c_types.h>
+#include <util/exception_utils.h>
+#include <util/invariant.h>
+#include <util/std_expr.h>
+#include <util/std_types.h>
 
 #include <cctype>
 
@@ -293,4 +293,6 @@ typet get_type(const format_tokent &token)
   default:
     return nil_typet();
   }
+
+  UNREACHABLE;
 }

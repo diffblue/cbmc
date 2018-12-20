@@ -1102,6 +1102,8 @@ std::string configt::ansi_ct::os_to_string(ost os)
   case ost::OS_WIN: return "win";
   default: return "none";
   }
+
+  UNREACHABLE;
 }
 
 configt::ansi_ct::ost configt::ansi_ct::string_to_os(const std::string &os)

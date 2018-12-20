@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/arith_tools.h>
 #include <util/ieee_float.h>
+#include <util/invariant.h>
 #include <util/range.h>
 
 #include <numeric>
@@ -906,6 +907,8 @@ exprt smt2_parsert::function_application()
 
     return tmp;
   }
+
+  UNREACHABLE;
 }
 
 exprt smt2_parsert::expression()
@@ -997,6 +1000,8 @@ exprt smt2_parsert::expression()
   default:
     throw error("unexpected token in an expression");
   }
+
+  UNREACHABLE;
 }
 
 typet smt2_parsert::sort()
@@ -1080,6 +1085,8 @@ typet smt2_parsert::sort()
   default:
     throw error() << "unexpected token in a sort: `" << buffer << '\'';
   }
+
+  UNREACHABLE;
 }
 
 smt2_parsert::signature_with_parameter_idst

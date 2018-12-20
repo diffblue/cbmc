@@ -13,6 +13,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <ostream>
 
+#include <util/invariant.h>
+
 #include "cpp_scope.h"
 
 cpp_idt::cpp_idt():
@@ -111,4 +113,6 @@ std::ostream &operator<<(std::ostream &out, const cpp_idt::id_classt &id_class)
   case cpp_idt::id_classt::NAMESPACE:         return out<<"NAMESPACE";
   default: return out << "(OTHER)";
   }
+
+  UNREACHABLE;
 }
