@@ -59,8 +59,7 @@ void show_loop_ids(
           std::string id =
             id2string(function_identifier) + "." + std::to_string(loop_id);
 
-          xmlt xml_loop("loop");
-          xml_loop.set_attribute("name", id);
+          xmlt xml_loop("loop", {{"name", id}}, {});
           xml_loop.new_element("loop-id").data=id;
           xml_loop.new_element()=xml(it->source_location);
           std::cout << xml_loop << "\n";

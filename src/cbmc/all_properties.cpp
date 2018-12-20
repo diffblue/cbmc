@@ -250,9 +250,11 @@ void bmc_all_propertiest::report(const cover_goalst &cover_goals)
     {
       for(const auto &g : goal_map)
       {
-        xmlt xml_result("result");
-        xml_result.set_attribute("property", id2string(g.first));
-        xml_result.set_attribute("status", g.second.status_string());
+        xmlt xml_result(
+          "result",
+          {{"property", id2string(g.first)},
+           {"status", g.second.status_string()}},
+          {});
 
         if(g.second.status==goalt::statust::FAILURE)
           convert(bmc.ns, g.second.goto_trace, xml_result.new_element());

@@ -298,9 +298,7 @@ safety_checkert::resultt fault_localizationt::stop_on_fail()
     }
     case ui_message_handlert::uit::XML_UI:
     {
-      xmlt dest("fault-localization");
-      xmlt xml_diagnosis=report_xml(ID_nil);
-      dest.new_element().swap(xml_diagnosis);
+      xmlt dest("fault-localization", {}, {report_xml(ID_nil)});
       status() << dest;
       break;
     }
