@@ -52,7 +52,9 @@ void irep_hash_container_baset::pack(
 
   if(full)
   {
-    packed.reserve(1 + 1 + sub.size() + named_sub.size());
+    // we pack: the irep id, the sub size, the subs, the named-sub size, and
+    // each of the named subs with their ids
+    packed.reserve(1 + 1 + sub.size() + 1 + named_sub.size() * 2);
 
     packed.push_back(irep_id_hash()(irep.id()));
 
@@ -72,7 +74,9 @@ void irep_hash_container_baset::pack(
     const std::size_t non_comment_count =
       irept::number_of_non_comments(named_sub);
 
-    packed.reserve(1 + 1 + sub.size() + non_comment_count);
+    // we pack: the irep id, the sub size, the subs, the named-sub size, and
+    // each of the non-comment named subs with their ids
+    packed.reserve(1 + 1 + sub.size() + 1 + non_comment_count * 2);
 
     packed.push_back(irep_id_hash()(irep.id()));
 

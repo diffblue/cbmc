@@ -44,9 +44,9 @@ bool to_be_merged_irept::operator == (const to_be_merged_irept &other) const
   const irept::named_subt &o_named_sub=other.get_named_sub();
 
   if(sub.size()!=o_sub.size())
-    return true;
+    return false;
   if(named_sub.size()!=o_named_sub.size())
-    return true;
+    return false;
 
   {
     irept::subt::const_iterator s_it=sub.begin();
@@ -148,7 +148,7 @@ const irept &merge_irept::merged(const irept &irep)
     dest_named_sub[it->first]=merged(it->second); // recursive call
     #endif
 
-  return *irep_store.insert(new_irep).first;
+  return *irep_store.insert(std::move(new_irep)).first;
 }
 
 void merge_full_irept::operator()(irept &irep)
@@ -185,5 +185,5 @@ const irept &merge_full_irept::merged(const irept &irep)
     dest_named_sub[it->first]=merged(it->second); // recursive call
     #endif
 
-  return *irep_store.insert(new_irep).first;
+  return *irep_store.insert(std::move(new_irep)).first;
 }
