@@ -35,7 +35,7 @@ SCENARIO("irept_memory", "[core][utils][irept]")
       REQUIRE(sizeof(std::vector<int>) == 3 * sizeof(void *));
 #endif
 
-#ifndef SUB_IS_LIST
+#ifndef NAMED_SUB_IS_FORWARD_LIST
       const std::size_t named_size = sizeof(std::map<int, int>);
 #  ifndef _GLIBCXX_DEBUG
 #    ifdef __APPLE__

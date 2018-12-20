@@ -17,7 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "string_hash.h"
 #include "irep_hash.h"
 
-#ifdef SUB_IS_LIST
+#ifdef NAMED_SUB_IS_FORWARD_LIST
 #include <algorithm>
 #endif
 
@@ -31,7 +31,7 @@ irept nil_rep_storage;
 irept::dt irept::empty_d;
 #endif
 
-#ifdef SUB_IS_LIST
+#ifdef NAMED_SUB_IS_FORWARD_LIST
 static inline bool named_subt_order(
   const std::pair<irep_namet, irept> &a,
   const irep_namet &b)
@@ -203,7 +203,7 @@ const irep_idt &irept::get(const irep_namet &name) const
 {
   const named_subt &s = get_named_sub();
 
-#ifdef SUB_IS_LIST
+#ifdef NAMED_SUB_IS_FORWARD_LIST
   named_subt::const_iterator it=named_subt_lower_bound(s, name);
 
   if(it==s.end() ||
@@ -259,7 +259,7 @@ void irept::remove(const irep_namet &name)
 {
   named_subt &s = get_named_sub();
 
-#ifdef SUB_IS_LIST
+#ifdef NAMED_SUB_IS_FORWARD_LIST
   named_subt::iterator it=named_subt_lower_bound(s, name);
 
   if(it!=s.end() && it->first==name)
@@ -278,7 +278,7 @@ const irept &irept::find(const irep_namet &name) const
 {
   const named_subt &s = get_named_sub();
 
-#ifdef SUB_IS_LIST
+#ifdef NAMED_SUB_IS_FORWARD_LIST
   named_subt::const_iterator it=named_subt_lower_bound(s, name);
 
   if(it==s.end() ||
@@ -298,7 +298,7 @@ irept &irept::add(const irep_namet &name)
 {
   named_subt &s = get_named_sub();
 
-#ifdef SUB_IS_LIST
+#ifdef NAMED_SUB_IS_FORWARD_LIST
   named_subt::iterator it=named_subt_lower_bound(s, name);
 
   if(it==s.end() ||
@@ -320,7 +320,7 @@ irept &irept::add(const irep_namet &name, const irept &irep)
 {
   named_subt &s = get_named_sub();
 
-#ifdef SUB_IS_LIST
+#ifdef NAMED_SUB_IS_FORWARD_LIST
   named_subt::iterator it=named_subt_lower_bound(s, name);
 
   if(it==s.end() ||
@@ -429,7 +429,7 @@ bool irept::full_eq(const irept &other) const
   const irept::named_subt &i1_named_sub=get_named_sub();
   const irept::named_subt &i2_named_sub=other.get_named_sub();
 
-#ifdef SUB_IS_LIST
+#ifdef NAMED_SUB_IS_FORWARD_LIST
   if(
     std::distance(i1_named_sub.begin(), i1_named_sub.end()) !=
     std::distance(i2_named_sub.begin(), i2_named_sub.end()))
@@ -693,7 +693,7 @@ std::size_t irept::full_hash() const
     result=hash_combine(result, it->second.full_hash());
   }
 
-#ifdef SUB_IS_LIST
+#ifdef NAMED_SUB_IS_FORWARD_LIST
   const std::size_t named_sub_size =
     std::distance(named_sub.begin(), named_sub.end());
 #else
