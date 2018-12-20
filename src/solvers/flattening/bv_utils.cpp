@@ -818,8 +818,9 @@ bvt bv_utilst::multiplier(
   {
   case representationt::SIGNED: return signed_multiplier(op0, op1);
   case representationt::UNSIGNED: return unsigned_multiplier(op0, op1);
-  default: UNREACHABLE;
   }
+
+  UNREACHABLE;
 }
 
 bvt bv_utilst::multiplier_no_overflow(
@@ -833,8 +834,9 @@ bvt bv_utilst::multiplier_no_overflow(
     return signed_multiplier_no_overflow(op0, op1);
   case representationt::UNSIGNED:
     return unsigned_multiplier_no_overflow(op0, op1);
-  default: UNREACHABLE;
   }
+
+  UNREACHABLE;
 }
 
 void bv_utilst::signed_divider(
@@ -887,8 +889,6 @@ void bv_utilst::divider(
     signed_divider(op0, op1, result, remainer); break;
   case representationt::UNSIGNED:
     unsigned_divider(op0, op1, result, remainer); break;
-  default:
-    UNREACHABLE;
   }
 }
 

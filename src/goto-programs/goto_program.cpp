@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/expr_iterator.h>
 #include <util/find_symbols.h>
+#include <util/invariant.h>
 #include <util/std_expr.h>
 #include <util/validate.h>
 

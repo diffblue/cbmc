@@ -149,7 +149,7 @@ public:
 
 #ifdef __GNUC__
 #define CBMC_NORETURN __attribute((noreturn))
-#elif defined(_MSV_VER)
+#elif defined(_MSC_VER)
 #define CBMC_NORETURN __declspec(noreturn)
 #elif __cplusplus >= 201703L
 #define CBMC_NORETURN [[noreturn]]
@@ -391,8 +391,6 @@ CBMC_NORETURN void report_invariant_failure(
         __VA_ARGS__); /* NOLINT */                                             \
   } while(false)
 
-#endif // End CPROVER_DO_NOT_CHECK / CPROVER_ASSERT / ... if block
-
 // Short hand macros. The variants *_STRUCTURED below allow to specify a custom
 // exception, and are equivalent to INVARIANT_STRUCTURED.
 
@@ -425,6 +423,8 @@ CBMC_NORETURN void report_invariant_failure(
         __VA_ARGS__);                                                          \
     }                                                                          \
   } while(false)
+
+#endif // End CPROVER_DO_NOT_CHECK / CPROVER_ASSERT / ... if block
 
 // The condition should only contain (unmodified) inputs to the method. Inputs
 // include arguments passed to the function, as well as member variables that

@@ -46,7 +46,6 @@ std::size_t struct_union_typet::component_number(
   }
 
   UNREACHABLE;
-  return 0;
 }
 
 /// Get the reference to a component with given name.

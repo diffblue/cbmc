@@ -315,6 +315,8 @@ safety_checkert::resultt fault_localizationt::stop_on_fail()
 
     return safety_checkert::resultt::ERROR;
   }
+
+  UNREACHABLE;
 }
 
 void fault_localizationt::goal_covered(

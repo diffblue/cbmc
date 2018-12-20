@@ -138,21 +138,15 @@ bool remove_function_pointerst::arg_is_type_compatible(
      call_type.id()==ID_c_enum ||
      call_type.id()==ID_c_enum_tag)
   {
-    if(function_type.id()==ID_signedbv ||
-       function_type.id()==ID_unsigned ||
-       function_type.id()==ID_bool ||
-       function_type.id()==ID_pointer ||
-       function_type.id()==ID_c_enum ||
-       function_type.id()==ID_c_enum_tag)
-      return true;
-
-    return false;
+    return function_type.id() == ID_signedbv ||
+           function_type.id() == ID_unsigned || function_type.id() == ID_bool ||
+           function_type.id() == ID_pointer ||
+           function_type.id() == ID_c_enum ||
+           function_type.id() == ID_c_enum_tag;
   }
 
   return pointer_offset_bits(call_type, ns) ==
          pointer_offset_bits(function_type, ns);
-
-  return false;
 }
 
 bool remove_function_pointerst::is_type_compatible(

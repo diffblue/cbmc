@@ -480,6 +480,8 @@ decision_proceduret::resultt prop_conv_solvert::dec_solve()
     case propt::resultt::P_UNSATISFIABLE: return resultt::D_UNSATISFIABLE;
     default: return resultt::D_ERROR;
   }
+
+  UNREACHABLE;
 }
 
 exprt prop_conv_solvert::get(const exprt &expr) const

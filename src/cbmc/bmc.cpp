@@ -485,6 +485,8 @@ safety_checkert::resultt bmct::stop_on_fail(prop_convt &prop_conv)
 
     return resultt::ERROR;
   }
+
+  UNREACHABLE;
 }
 
 /// Perform core BMC, using an abstract model to supply GOTO function bodies
