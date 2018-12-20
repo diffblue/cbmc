@@ -26,6 +26,10 @@ SCENARIO(
         type_try_dynamic_cast<java_class_typet>(class_symbol->type);
       REQUIRE(class_type);
 
+      THEN("The inner class should have the name \"java::Outer$Inner\".")
+      {
+        REQUIRE(id2string(class_type->get_name()) == "java::Outer$Inner");
+      }
       THEN("The inner class should have the inner name \"Inner\".")
       {
         REQUIRE(id2string(class_type->get_inner_name()) == "Inner");
@@ -52,6 +56,10 @@ SCENARIO(
         type_try_dynamic_cast<java_class_typet>(class_symbol->type);
       REQUIRE(class_type);
 
+      THEN("The outer class should have the name \"java::Outer\".")
+      {
+        REQUIRE(id2string(class_type->get_name()) == "java::Outer");
+      }
       THEN("The outer class should not have an inner name.")
       {
         REQUIRE(id2string(class_type->get_inner_name()).empty());
@@ -78,6 +86,10 @@ SCENARIO(
         type_try_dynamic_cast<java_class_typet>(class_symbol->type);
       REQUIRE(class_type);
 
+      THEN("The anonymous class should have the name \"java::Outer$1\".")
+      {
+        REQUIRE(id2string(class_type->get_name()) == "java::Outer$1");
+      }
       THEN("The anonymous class should not have an inner name.")
       {
         REQUIRE(id2string(class_type->get_inner_name()).empty());
@@ -104,6 +116,10 @@ SCENARIO(
         type_try_dynamic_cast<java_class_typet>(class_symbol->type);
       REQUIRE(class_type);
 
+      THEN("The outer class should have the name \"java::Outer$RedHerring\".")
+      {
+        REQUIRE(id2string(class_type->get_name()) == "java::Outer$RedHerring");
+      }
       THEN("The outer class should not have an inner name.")
       {
         REQUIRE(id2string(class_type->get_inner_name()).empty());
