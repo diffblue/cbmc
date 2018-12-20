@@ -627,18 +627,6 @@ codet java_string_library_preprocesst::code_return_function_application(
   return code_returnt(fun_app);
 }
 
-/// Create code allocating object of size `size` and assigning it to `lhs`
-/// \param lhs : pointer which will be allocated
-/// \param size : size of the object
-/// \return code allocation object and assigning `lhs`
-static codet make_allocate_code(const symbol_exprt &lhs, const exprt &size)
-{
-  side_effect_exprt alloc(ID_allocate, lhs.type(), lhs.source_location());
-  alloc.add_to_operands(size);
-  alloc.add_to_operands(false_exprt());
-  return code_assignt(lhs, alloc);
-}
-
 /// Declare a fresh symbol of type array of character with infinite size.
 /// \param symbol_table: the symbol table
 /// \param loc: source location

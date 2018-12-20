@@ -1198,6 +1198,18 @@ void java_object_factoryt::allocate_nondet_length_array(
   assignments.add(assign);
 }
 
+/// Create code allocating object of size `size` and assigning it to `lhs`
+/// \param lhs : pointer which will be allocated
+/// \param size : size of the object
+/// \return code allocation object and assigning `lhs`
+codet make_allocate_code(const symbol_exprt &lhs, const exprt &size)
+{
+  side_effect_exprt alloc(ID_allocate, lhs.type(), lhs.source_location());
+  alloc.add_to_operands(size);
+  alloc.add_to_operands(false_exprt());
+  return code_assignt(lhs, alloc);
+}
+
 /// Create code to initialize a Java array whose size will be at most
 /// `max_nondet_array_length`. The code is emitted to \p assignments does as
 /// follows:

@@ -126,4 +126,6 @@ void gen_nondet_init(
   const java_object_factory_parameterst &object_factory_parameters,
   update_in_placet update_in_place);
 
+codet make_allocate_code(const symbol_exprt &lhs, const exprt &size);
+
 #endif // CPROVER_JAVA_BYTECODE_JAVA_OBJECT_FACTORY_H
