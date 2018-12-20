@@ -148,7 +148,7 @@ const irept &merge_irept::merged(const irept &irep)
     dest_named_sub[it->first]=merged(it->second); // recursive call
     #endif
 
-  return *irep_store.insert(new_irep).first;
+  return *irep_store.insert(std::move(new_irep)).first;
 }
 
 void merge_full_irept::operator()(irept &irep)
@@ -185,5 +185,5 @@ const irept &merge_full_irept::merged(const irept &irep)
     dest_named_sub[it->first]=merged(it->second); // recursive call
     #endif
 
-  return *irep_store.insert(new_irep).first;
+  return *irep_store.insert(std::move(new_irep)).first;
 }
