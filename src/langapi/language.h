@@ -12,17 +12,16 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_LANGAPI_LANGUAGE_H
 #define CPROVER_LANGAPI_LANGUAGE_H
 
-#include <unordered_set>
 #include <iosfwd>
-#include <string>
 #include <memory> // unique_ptr
+#include <set>
+#include <string>
+#include <unordered_set>
 
 #include <util/message.h>
 #include <util/std_types.h>
 #include <util/symbol.h>
 #include <util/symbol_table_base.h>
-
-#include <goto-programs/system_library_symbols.h>
 
 class symbol_tablet;
 class exprt;
@@ -188,7 +187,6 @@ public:
 
 protected:
   bool language_options_initialized=false;
-  system_library_symbolst system_symbols;
 };
 
 #endif // CPROVER_UTIL_LANGUAGE_H
