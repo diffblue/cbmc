@@ -44,9 +44,9 @@ bool to_be_merged_irept::operator == (const to_be_merged_irept &other) const
   const irept::named_subt &o_named_sub=other.get_named_sub();
 
   if(sub.size()!=o_sub.size())
-    return true;
+    return false;
   if(named_sub.size()!=o_named_sub.size())
-    return true;
+    return false;
 
   {
     irept::subt::const_iterator s_it=sub.begin();
