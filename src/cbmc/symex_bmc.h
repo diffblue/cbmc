@@ -105,7 +105,7 @@ protected:
 
   bool get_unwind_recursion(
     const irep_idt &identifier,
-    const unsigned thread_nr,
+    unsigned thread_nr,
     unsigned unwind) override;
 
   void no_body(const irep_idt &identifier) override;

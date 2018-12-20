@@ -153,7 +153,7 @@ bool symex_bmct::should_stop_unwind(
 
 bool symex_bmct::get_unwind_recursion(
   const irep_idt &id,
-  const unsigned thread_nr,
+  unsigned thread_nr,
   unsigned unwind)
 {
   tvt abort_unwind_decision;
