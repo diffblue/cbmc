@@ -18,10 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/exception_utils.h>
 #include <util/invariant.h>
 
-bool goto_symext::get_unwind_recursion(
-  const irep_idt &,
-  const unsigned,
-  unsigned)
+bool goto_symext::get_unwind_recursion(const irep_idt &, unsigned, unsigned)
 {
   return false;
 }
