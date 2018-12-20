@@ -35,7 +35,7 @@ SCENARIO("irept_memory", "[core][utils][irept]")
       REQUIRE(sizeof(std::vector<int>) == 3 * sizeof(void *));
 #endif
 
-#ifndef SUB_IS_LIST
+#ifndef NAMED_SUB_IS_FORWARD_LIST
       const std::size_t named_size = sizeof(std::map<int, int>);
 #  ifndef _GLIBCXX_DEBUG
 #    ifdef __APPLE__
@@ -47,9 +47,9 @@ SCENARIO("irept_memory", "[core][utils][irept]")
 #    endif
 #  endif
 #else
-      const std::size_t named_size = sizeof(std::list<int>);
+      const std::size_t named_size = sizeof(std::forward_list<int>);
 #  ifndef _GLIBCXX_DEBUG
-      REQUIRE(sizeof(std::list<int>) == 3 * sizeof(void *));
+      REQUIRE(sizeof(std::forward_list<int>) == sizeof(void *));
 #  endif
 #endif
 
@@ -140,12 +140,16 @@ SCENARIO("irept_memory", "[core][utils][irept]")
       irep.add("a_new_element", irep2);
       REQUIRE(!irept::is_comment("a_new_element"));
       REQUIRE(irep.find("a_new_element").id() == "second_irep");
-      REQUIRE(irep.get_named_sub().size() == 1);
+      std::size_t named_sub_size =
+        std::distance(irep.get_named_sub().begin(), irep.get_named_sub().end());
+      REQUIRE(named_sub_size == 1);
 
       irep.add("#a_comment", irep2);
       REQUIRE(irept::is_comment("#a_comment"));
       REQUIRE(irep.find("#a_comment").id() == "second_irep");
-      REQUIRE(irep.get_named_sub().size() == 2);
+      named_sub_size =
+        std::distance(irep.get_named_sub().begin(), irep.get_named_sub().end());
+      REQUIRE(named_sub_size == 2);
       REQUIRE(irept::number_of_non_comments(irep.get_named_sub()) == 1);
 
       irept bak(irep);
@@ -160,17 +164,23 @@ SCENARIO("irept_memory", "[core][utils][irept]")
 
       irep.move_to_named_sub("another_entry", irep2);
       REQUIRE(irep.get_sub().size() == 1);
-      REQUIRE(irep.get_named_sub().size() == 2);
+      named_sub_size =
+        std::distance(irep.get_named_sub().begin(), irep.get_named_sub().end());
+      REQUIRE(named_sub_size == 2);
 
       irept irep3;
       irep.move_to_named_sub("#a_comment", irep3);
       REQUIRE(irep.find("#a_comment").id().empty());
       REQUIRE(irep.get_sub().size() == 1);
-      REQUIRE(irep.get_named_sub().size() == 2);
+      named_sub_size =
+        std::distance(irep.get_named_sub().begin(), irep.get_named_sub().end());
+      REQUIRE(named_sub_size == 2);
 
       irept irep4;
       irep.move_to_named_sub("#another_comment", irep4);
-      REQUIRE(irep.get_named_sub().size() == 3);
+      named_sub_size =
+        std::distance(irep.get_named_sub().begin(), irep.get_named_sub().end());
+      REQUIRE(named_sub_size == 3);
     }
 
     THEN("Setting and getting works")
