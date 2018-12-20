@@ -642,7 +642,7 @@ void bmct::perform_symbolic_execution(
 
   if(options.get_bool_option("validate-ssa-equation"))
   {
-    symex.validate(ns, validation_modet::INVARIANT);
+    symex.validate(validation_modet::INVARIANT);
   }
 
   INVARIANT(
