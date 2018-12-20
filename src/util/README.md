@@ -14,15 +14,15 @@ CPROVER codebase.
 
 See detailed documentation at \ref irept.
 
-[irept](\ref irept)s are generic tree nodes. You
-should think of each node as holding a single string ([data](\ref irept::data),
-actually an \ref irep_idt) and lots of child nodes, some of which are numbered
-([sub](\ref irept::dt::sub)) and some of which are labelled, and the label
-can either start with a “\#” ([comments](\ref irept::dt::comments)) or without
-one ([named_sub](\ref irept::dt::named_sub)). The meaning of the “\#” is that
-this child shouldn't be counted when comparing two [irept](\ref irept)s for
-equality; this is usually used when making an advisory annotation which does
-not alter the semantics of the program.
+[irept](\ref irept)s are generic tree nodes.  You should think of each node
+as holding a single string ([data](\ref irept::data), actually an \ref
+irep_idt) and lots of child nodes, some of which are numbered ([sub](\ref
+irept::dt::sub)) and some of which are labelled ([named_sub](\ref
+irept::dt::named_sub)).  The the label can either start with a “\#” or
+without one.  The meaning of the “\#” is that this child shouldn't be
+considered when comparing two [irept](\ref irept)s for equality; this is
+usually used when making an advisory annotation which does not alter the
+semantics of the program.
 
 They are used to represent many kinds of structured objects throughout the
 CPROVER codebase, such as expressions, types and code. An \ref exprt represents
@@ -72,9 +72,8 @@ standard data structures as in irept.
 
 \subsection irep_idt_section Strings: dstringt, the string_container and the ID_*
 
-Within cbmc, strings are represented using \ref irep_idt, or \ref irep_namet
-for keys to [named_sub](\ref irept::dt::named_sub) or
-[comments](\ref irept::dt::comments). By default these are both
+Within cbmc, strings are represented using \ref irep_idt or \ref irep_namet
+for keys to [named_sub](\ref irept::dt::named_sub). By default these are both
 typedefed to \ref dstringt. For debugging purposes you can set `USE_STD_STRING`,
 in which case they are both typedefed to `std::string`. You can also easily
 convert an [irep_idt](\ref irep_idt) or [irep_namet](\ref irep_namet) to a
@@ -91,11 +90,10 @@ in `irep_ids.def` is `“IREP_ID_ONE(type)”`, so the string “type” has ind
 You can refer to this \ref irep_idt as `ID_type`. The other kind of line you
 see is \c "IREP_ID_TWO(C_source_location, #source_location)", which means the
 \ref irep_idt for the string “\#source_location” can be referred to as
-`ID_C_source_location`. The “C” is for comment, meaning that it should be
-stored in the [comments](\ref irept::dt::comments). Any strings that need
-to be stored as [irep_idt](\ref irep_idt)s which aren't in `irep_ids.def`
-are added to the end of the table when they are first encountered, and the
-same index is used for all instances.
+`ID_C_source_location`.  The “C” is for comment, meaning that it starts with
+“\#”.  Any strings that need to be stored as [irep_idt](\ref irep_idt)s
+which aren't in `irep_ids.def` are added to the end of the table when they
+are first encountered, and the same index is used for all instances.
 
 See documentation at \ref dstringt.
 
@@ -125,8 +123,8 @@ of size 2 (for the two arguments of minus).
 
 Recall that every \ref irept has one piece of data of its own, i.e. its
 [id()](\ref irept::id()), and all other information is in its
-[named_sub](\ref irept::dt::named_sub), [comments](\ref irept::dt::comments)
-or [sub](\ref irept::dt::sub). For [exprt](\ref exprt)s, the
+[named_sub](\ref irept::dt::named_sub) or [sub](\ref irept::dt::sub).
+For [exprt](\ref exprt)s, the
 [id()](\ref irept::id()) is used to specify why kind of \ref exprt this is,
 so a \ref minus_exprt has `ID_minus` as its [id()](\ref irept::id()). This
 means that a \ref minus_exprt can be passed wherever an \ref exprt is

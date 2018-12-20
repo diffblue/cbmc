@@ -49,32 +49,43 @@ void irep_hash_container_baset::pack(
 {
   const irept::subt &sub=irep.get_sub();
   const irept::named_subt &named_sub=irep.get_named_sub();
-  const irept::named_subt &comments=irep.get_comments();
-
-  packed.reserve(
-    1+1+sub.size()+named_sub.size()*2+
-    (full?comments.size()*2:0));
-
-  packed.push_back(irep_id_hash()(irep.id()));
-
-  packed.push_back(sub.size());
-  forall_irep(it, sub)
-    packed.push_back(number(*it));
-
-  packed.push_back(named_sub.size());
-  forall_named_irep(it, named_sub)
-  {
-    packed.push_back(irep_id_hash()(it->first)); // id
-    packed.push_back(number(it->second)); // sub-irep
-  }
 
   if(full)
   {
-    packed.push_back(comments.size());
-    forall_named_irep(it, comments)
+    packed.reserve(1 + 1 + sub.size() + named_sub.size());
+
+    packed.push_back(irep_id_hash()(irep.id()));
+
+    packed.push_back(sub.size());
+    forall_irep(it, sub)
+      packed.push_back(number(*it));
+
+    packed.push_back(named_sub.size());
+    for(const auto &sub_irep : named_sub)
     {
-      packed.push_back(irep_id_hash()(it->first)); // id
-      packed.push_back(number(it->second)); // sub-irep
+      packed.push_back(irep_id_hash()(sub_irep.first)); // id
+      packed.push_back(number(sub_irep.second));        // sub-irep
     }
+  }
+  else
+  {
+    const std::size_t non_comment_count =
+      irept::number_of_non_comments(named_sub);
+
+    packed.reserve(1 + 1 + sub.size() + non_comment_count);
+
+    packed.push_back(irep_id_hash()(irep.id()));
+
+    packed.push_back(sub.size());
+    forall_irep(it, sub)
+      packed.push_back(number(*it));
+
+    packed.push_back(non_comment_count);
+    for(const auto &sub_irep : named_sub)
+      if(!irept::is_comment(sub_irep.first))
+      {
+        packed.push_back(irep_id_hash()(sub_irep.first)); // id
+        packed.push_back(number(sub_irep.second));        // sub-irep
+      }
   }
 }

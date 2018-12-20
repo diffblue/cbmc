@@ -154,21 +154,11 @@ void irept::nonrecursive_destructor(dt *old_data)
     {
       stack.reserve(stack.size()+
                     d->named_sub.size()+
-                    d->comments.size()+
                     d->sub.size());
 
       for(named_subt::iterator
           it=d->named_sub.begin();
           it!=d->named_sub.end();
-          it++)
-      {
-        stack.push_back(it->second.data);
-        it->second.data=&empty_d;
-      }
-
-      for(named_subt::iterator
-          it=d->comments.begin();
-          it!=d->comments.end();
           it++)
       {
         stack.push_back(it->second.data);
@@ -211,10 +201,9 @@ void irept::move_to_sub(irept &irep)
 
 const irep_idt &irept::get(const irep_namet &name) const
 {
-  const named_subt &s=
-    is_comment(name)?get_comments():get_named_sub();
+  const named_subt &s = get_named_sub();
 
-  #ifdef SUB_IS_LIST
+#ifdef SUB_IS_LIST
   named_subt::const_iterator it=named_subt_lower_bound(s, name);
 
   if(it==s.end() ||
@@ -223,7 +212,7 @@ const irep_idt &irept::get(const irep_namet &name) const
     static const irep_idt empty;
     return empty;
   }
-  #else
+#else
   named_subt::const_iterator it=s.find(name);
 
   if(it==s.end())
@@ -231,7 +220,7 @@ const irep_idt &irept::get(const irep_namet &name) const
     static const irep_idt empty;
     return empty;
   }
-  #endif
+#endif
 
   return it->second.id();
 }
@@ -268,46 +257,43 @@ void irept::set(const irep_namet &name, const long long value)
 
 void irept::remove(const irep_namet &name)
 {
-  named_subt &s=
-    is_comment(name)?get_comments():get_named_sub();
+  named_subt &s = get_named_sub();
 
-  #ifdef SUB_IS_LIST
+#ifdef SUB_IS_LIST
   named_subt::iterator it=named_subt_lower_bound(s, name);
 
   if(it!=s.end() && it->first==name)
     s.erase(it);
-  #else
+#else
   s.erase(name);
-  #endif
+#endif
 }
 
 const irept &irept::find(const irep_namet &name) const
 {
-  const named_subt &s=
-    is_comment(name)?get_comments():get_named_sub();
+  const named_subt &s = get_named_sub();
 
-  #ifdef SUB_IS_LIST
+#ifdef SUB_IS_LIST
   named_subt::const_iterator it=named_subt_lower_bound(s, name);
 
   if(it==s.end() ||
      it->first!=name)
     return get_nil_irep();
-  #else
+#else
   named_subt::const_iterator it=s.find(name);
 
   if(it==s.end())
     return get_nil_irep();
-  #endif
+#endif
 
   return it->second;
 }
 
 irept &irept::add(const irep_namet &name)
 {
-  named_subt &s=
-    is_comment(name)?get_comments():get_named_sub();
+  named_subt &s = get_named_sub();
 
-  #ifdef SUB_IS_LIST
+#ifdef SUB_IS_LIST
   named_subt::iterator it=named_subt_lower_bound(s, name);
 
   if(it==s.end() ||
@@ -315,17 +301,16 @@ irept &irept::add(const irep_namet &name)
     it=s.insert(it, std::make_pair(name, irept()));
 
   return it->second;
-  #else
+#else
   return s[name];
-  #endif
+#endif
 }
 
 irept &irept::add(const irep_namet &name, const irept &irep)
 {
-  named_subt &s=
-    is_comment(name)?get_comments():get_named_sub();
+  named_subt &s = get_named_sub();
 
-  #ifdef SUB_IS_LIST
+#ifdef SUB_IS_LIST
   named_subt::iterator it=named_subt_lower_bound(s, name);
 
   if(it==s.end() ||
@@ -335,7 +320,7 @@ irept &irept::add(const irep_namet &name, const irept &irep)
     it->second=irep;
 
   return it->second;
-  #else
+#else
   std::pair<named_subt::iterator, bool> entry=
     s.insert(std::make_pair(name, irep));
 
@@ -343,7 +328,7 @@ irept &irept::add(const irep_namet &name, const irept &irep)
     entry.first->second=irep;
 
   return entry.first->second;
-  #endif
+#endif
 }
 
 #ifdef IREP_HASH_STATS
@@ -361,9 +346,7 @@ bool irept::operator==(const irept &other) const
     return true;
   #endif
 
-  if(id()!=other.id() ||
-     get_sub()!=other.get_sub() || // recursive call
-     get_named_sub()!=other.get_named_sub()) // recursive call
+  if(id() != other.id() || get_sub() != other.get_sub()) // recursive call
   {
     #ifdef IREP_HASH_STATS
     ++irep_cmp_ne_cnt;
@@ -371,8 +354,44 @@ bool irept::operator==(const irept &other) const
     return false;
   }
 
-  // comments are NOT checked
+  const auto &this_named_sub = get_named_sub();
+  const auto &other_named_sub = other.get_named_sub();
 
+  // walk in sync, ignoring comments, until end of both maps
+  named_subt::const_iterator this_it = this_named_sub.begin();
+  named_subt::const_iterator other_it = other_named_sub.begin();
+
+  while(this_it != this_named_sub.end() || other_it != other_named_sub.end())
+  {
+    if(this_it != this_named_sub.end() && is_comment(this_it->first))
+    {
+      this_it++;
+      continue;
+    }
+
+    if(other_it != other_named_sub.end() && is_comment(other_it->first))
+    {
+      other_it++;
+      continue;
+    }
+
+    if(
+      this_it == this_named_sub.end() ||   // reached end of 'this'
+      other_it == other_named_sub.end() || // reached the end of 'other'
+      this_it->first != other_it->first ||
+      this_it->second != other_it->second) // recursive call
+    {
+#ifdef IREP_HASH_STATS
+      ++irep_cmp_ne_cnt;
+#endif
+      return false;
+    }
+
+    this_it++;
+    other_it++;
+  }
+
+  // reached the end of both
   return true;
 }
 
@@ -390,12 +409,10 @@ bool irept::full_eq(const irept &other) const
   const irept::subt &i2_sub=other.get_sub();
   const irept::named_subt &i1_named_sub=get_named_sub();
   const irept::named_subt &i2_named_sub=other.get_named_sub();
-  const irept::named_subt &i1_comments=get_comments();
-  const irept::named_subt &i2_comments=other.get_comments();
 
-  if(i1_sub.size()!=i2_sub.size() ||
-     i1_named_sub.size()!=i2_named_sub.size() ||
-     i1_comments.size()!=i2_comments.size())
+  if(
+    i1_sub.size() != i2_sub.size() ||
+    i1_named_sub.size() != i2_named_sub.size())
     return false;
 
   for(std::size_t i=0; i<i1_sub.size(); i++)
@@ -407,16 +424,6 @@ bool irept::full_eq(const irept &other) const
     irept::named_subt::const_iterator i2_it=i2_named_sub.begin();
 
     for(; i1_it!=i1_named_sub.end(); i1_it++, i2_it++)
-      if(i1_it->first!=i2_it->first ||
-         !i1_it->second.full_eq(i2_it->second))
-        return false;
-  }
-
-  {
-    irept::named_subt::const_iterator i1_it=i1_comments.begin();
-    irept::named_subt::const_iterator i2_it=i2_comments.begin();
-
-    for(; i1_it!=i1_comments.end(); i1_it++, i2_it++)
       if(i1_it->first!=i2_it->first ||
          !i1_it->second.full_eq(i2_it->second))
         return false;
@@ -494,6 +501,7 @@ bool irept::ordering(const irept &other) const
 }
 
 /// defines ordering on the internal representation
+/// comments are ignored
 int irept::compare(const irept &i) const
 {
   int r;
@@ -504,6 +512,7 @@ int irept::compare(const irept &i) const
 
   const subt::size_type size=get_sub().size(),
         i_size=i.get_sub().size();
+
   if(size<i_size)
     return -1;
   if(size>i_size)
@@ -527,8 +536,9 @@ int irept::compare(const irept &i) const
               "Unequal lengths will return before this");
   }
 
-  const named_subt::size_type n_size=get_named_sub().size(),
-        i_n_size=i.get_named_sub().size();
+  const auto n_size = number_of_non_comments(get_named_sub()),
+             i_n_size = number_of_non_comments(i.get_named_sub());
+
   if(n_size<i_n_size)
     return -1;
   if(n_size>i_n_size)
@@ -537,12 +547,33 @@ int irept::compare(const irept &i) const
   {
     irept::named_subt::const_iterator it1, it2;
 
-    for(it1=get_named_sub().begin(),
-        it2=i.get_named_sub().begin();
-        it1!=get_named_sub().end() && it2!=i.get_named_sub().end();
-        it1++,
-        it2++)
+    // clang-format off
+    for(it1 = get_named_sub().begin(),
+        it2 = i.get_named_sub().begin();
+        it1 != get_named_sub().end() ||
+        it2 != i.get_named_sub().end();
+        ) // no iterator increments
+    // clang-format on
     {
+      if(it1 != get_named_sub().end() && is_comment(it1->first))
+      {
+        it1++;
+        continue;
+      }
+
+      if(it2 != i.get_named_sub().end() && is_comment(it2->first))
+      {
+        it2++;
+        continue;
+      }
+
+      // the case that both it1 and it2 are .end() is treated
+      // by the loop guard; furthermore, the number of non-comments
+      // must be the same
+      INVARIANT(it1 != get_named_sub().end(), "not at end of get_named_sub()");
+      INVARIANT(
+        it2 != i.get_named_sub().end(), "not at end of i.get_named_sub()");
+
       r=it1->first.compare(it2->first);
       if(r!=0)
         return r;
@@ -550,11 +581,14 @@ int irept::compare(const irept &i) const
       r=it1->second.compare(it2->second);
       if(r!=0)
         return r;
+
+      it1++;
+      it2++;
     }
 
-    INVARIANT(it1==get_named_sub().end() &&
-              it2==i.get_named_sub().end(),
-              "Unequal lengths will return before this");
+    INVARIANT(
+      it1 == get_named_sub().end() && it2 == i.get_named_sub().end(),
+      "Unequal number of non-comments will return before this");
   }
 
   // equal
@@ -571,6 +605,17 @@ bool irept::operator<(const irept &other) const
 unsigned long long irep_hash_cnt=0;
 #endif
 
+std::size_t irept::number_of_non_comments(const named_subt &named_sub)
+{
+  std::size_t result = 0;
+
+  for(const auto &n : named_sub)
+    if(!is_comment(n.first))
+      result++;
+
+  return result;
+}
+
 std::size_t irept::hash() const
 {
   #ifdef HASH_CODE
@@ -585,20 +630,24 @@ std::size_t irept::hash() const
 
   forall_irep(it, sub) result=hash_combine(result, it->hash());
 
+  std::size_t number_of_named_ireps = 0;
+
   forall_named_irep(it, named_sub)
-  {
-    result=hash_combine(result, hash_string(it->first));
-    result=hash_combine(result, it->second.hash());
-  }
+    if(!is_comment(it->first)) // this variant ignores comments
+    {
+      result = hash_combine(result, hash_string(it->first));
+      result = hash_combine(result, it->second.hash());
+      number_of_named_ireps++;
+    }
 
-  result=hash_finalize(result, named_sub.size()+sub.size());
+  result = hash_finalize(result, sub.size() + number_of_named_ireps);
 
-  #ifdef HASH_CODE
+#ifdef HASH_CODE
   read().hash_code=result;
-  #endif
-  #ifdef IREP_HASH_STATS
+#endif
+#ifdef IREP_HASH_STATS
   ++irep_hash_cnt;
-  #endif
+#endif
   return result;
 }
 
@@ -606,27 +655,19 @@ std::size_t irept::full_hash() const
 {
   const irept::subt &sub=get_sub();
   const irept::named_subt &named_sub=get_named_sub();
-  const irept::named_subt &comments=get_comments();
 
   std::size_t result=hash_string(id());
 
   forall_irep(it, sub) result=hash_combine(result, it->full_hash());
 
+  // this variant includes all named_sub elements
   forall_named_irep(it, named_sub)
   {
     result=hash_combine(result, hash_string(it->first));
     result=hash_combine(result, it->second.full_hash());
   }
 
-  forall_named_irep(it, comments)
-  {
-    result=hash_combine(result, hash_string(it->first));
-    result=hash_combine(result, it->second.full_hash());
-  }
-
-  result=hash_finalize(
-    result,
-    named_sub.size()+sub.size()+comments.size());
+  result = hash_finalize(result, named_sub.size() + sub.size());
 
   return result;
 }
@@ -651,18 +692,6 @@ std::string irept::pretty(unsigned indent, unsigned max_indent) const
   }
 
   forall_named_irep(it, get_named_sub())
-  {
-    result+="\n";
-    indent_str(result, indent);
-
-    result+="* ";
-    result+=id2string(it->first);
-    result+=": ";
-
-    result+=it->second.pretty(indent+2, max_indent);
-  }
-
-  forall_named_irep(it, get_comments())
   {
     result+="\n";
     indent_str(result, indent);

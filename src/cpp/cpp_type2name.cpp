@@ -36,30 +36,29 @@ static void irep2name(const irept &irep, std::string &result)
   if(irep.id()!="")
     result+=do_prefix(irep.id_string());
 
-  if(irep.get_named_sub().empty() &&
-     irep.get_sub().empty() &&
-     irep.get_comments().empty())
+  if(irep.get_named_sub().empty() && irep.get_sub().empty())
     return;
 
   result+='(';
   bool first=true;
 
   forall_named_irep(it, irep.get_named_sub())
-  {
-    if(first)
-      first=false;
-    else
-      result+=',';
+    if(!irept::is_comment(it->first))
+    {
+      if(first)
+        first = false;
+      else
+        result += ',';
 
-    result+=do_prefix(name2string(it->first));
+      result += do_prefix(name2string(it->first));
 
-    result+='=';
-    std::string tmp;
-    irep2name(it->second, tmp);
-    result+=tmp;
-  }
+      result += '=';
+      std::string tmp;
+      irep2name(it->second, tmp);
+      result += tmp;
+    }
 
-  forall_named_irep(it, irep.get_comments())
+  forall_named_irep(it, irep.get_named_sub())
     if(it->first==ID_C_constant ||
        it->first==ID_C_volatile ||
        it->first==ID_C_restricted)
