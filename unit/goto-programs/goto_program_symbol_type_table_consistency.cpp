@@ -10,8 +10,9 @@ Author: Diffblue Ltd.
 
 #include <util/arith_tools.h>
 
-#include <goto-programs/goto_function.h>
-
+#include <goto-programs/goto_function.h>        
+#include <goto-programs/validate_goto_model.h>
+        
 SCENARIO(
   "Validation of consistent program/table pair (type-wise)",
   "[core][goto-programs][validate]")
@@ -36,6 +37,8 @@ SCENARIO(
     auto &instructions = goto_function.body.instructions;
     instructions.emplace_back(goto_programt::make_assertion(x_le_10));
 
+    goto_model_validation_optionst validation_options;
+
     symbol_table.insert(function_symbol);
     WHEN("Symbol table has the right symbol type")
     {
@@ -45,7 +48,8 @@ SCENARIO(
 
       THEN("The consistency check succeeds")
       {
-        goto_function.validate(ns, validation_modet::INVARIANT);
+        goto_function.validate(
+          ns, validation_modet::INVARIANT, validation_options);
 
         REQUIRE(true);
       }
@@ -60,7 +64,7 @@ SCENARIO(
       THEN("The consistency check fails")
       {
         REQUIRE_THROWS_AS(
-          goto_function.validate(ns, validation_modet::EXCEPTION),
+          goto_function.validate(ns, validation_modet::EXCEPTION, validation_options),
           incorrect_goto_program_exceptiont);
       }
     }

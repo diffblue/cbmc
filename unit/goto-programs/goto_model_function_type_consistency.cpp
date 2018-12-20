@@ -11,6 +11,7 @@ Author: Diffblue Ltd.
 #include <util/arith_tools.h>
 
 #include <goto-programs/goto_model.h>
+#include <goto-programs/validate_goto_model.h>
 
 SCENARIO(
   "Validation of consistent program/table pair (function type)",
@@ -34,6 +35,8 @@ SCENARIO(
     goto_model.goto_functions.function_map[function_symbol.name].type =
       fun_type1;
 
+    goto_model_validation_optionst validation_options{false};
+
     WHEN("Symbol table has the right type")
     {
       function_symbol.type = fun_type1;
@@ -41,7 +44,7 @@ SCENARIO(
 
       THEN("The consistency check succeeds")
       {
-        goto_model.validate(validation_modet::INVARIANT);
+        goto_model.validate(validation_modet::INVARIANT, validation_options);
 
         REQUIRE(true);
       }
@@ -55,7 +58,7 @@ SCENARIO(
       THEN("The consistency check fails")
       {
         REQUIRE_THROWS_AS(
-          goto_model.validate(validation_modet::EXCEPTION),
+          goto_model.validate(validation_modet::EXCEPTION, validation_options),
           incorrect_goto_program_exceptiont);
       }
     }

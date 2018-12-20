@@ -8,9 +8,10 @@ Author: Diffblue Ltd.
 
 #include <testing-utils/use_catch.h>
 
-#include <util/arith_tools.h>
-
 #include <goto-programs/goto_function.h>
+#include <goto-programs/validate_goto_model.h>
+
+#include <util/arith_tools.h>
 
 SCENARIO(
   "Validation of well-formed goto codes",
@@ -43,12 +44,15 @@ SCENARIO(
     symbol_table.insert(fun_symbol);
     namespacet ns(symbol_table);
 
+    goto_model_validation_optionst validation_options;
+
     WHEN("Target is a target")
     {
       instructions.front().target_number = 1;
       THEN("The consistency check succeeds")
       {
-        goto_function.body.validate(ns, validation_modet::INVARIANT);
+        goto_function.body.validate(
+          ns, validation_modet::INVARIANT, validation_options);
         REQUIRE(true);
       }
     }
@@ -58,7 +62,7 @@ SCENARIO(
       THEN("The consistency check fails")
       {
         REQUIRE_THROWS_AS(
-          goto_function.body.validate(ns, validation_modet::EXCEPTION),
+          goto_function.body.validate(ns, validation_modet::EXCEPTION, validation_options),
           incorrect_goto_program_exceptiont);
       }
     }
