@@ -241,6 +241,18 @@ class java_class_typet:public class_typet
   {
     set(ID_name, name);
   }
+
+  /// Get the name of a java inner class.
+  const irep_idt &get_inner_name() const
+  {
+    return get(ID_inner_name);
+  }
+
+  /// Set the name of a java inner class.
+  void set_inner_name(const irep_idt &name)
+  {
+    set(ID_inner_name, name);
+  }
 };
 
 inline const java_class_typet &to_java_class_type(const typet &type)
