@@ -171,9 +171,9 @@ class java_class_typet:public class_typet
     set(ID_final, is_final);
   }
 
-  void set_is_stub(const bool &is_stub)
+  void set_is_stub(bool is_stub)
   {
-    set(ID_incomplete_class, true);
+    set(ID_incomplete_class, is_stub);
   }
 
   bool get_is_stub() const
