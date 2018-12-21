@@ -14,7 +14,7 @@ Author: Diffblue Ltd.
 
 /// Get the string length needed to print any value of the given type with the
 /// given radix.
-static size_t expected_length(const int radix, const typet &type)
+static size_t expected_length(unsigned long radix, const typet &type)
 {
   std::string longest("");
   if(radix==2)
