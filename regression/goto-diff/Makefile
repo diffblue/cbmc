@@ -1,10 +1,10 @@
 default: tests.log
 
 test:
-	@../test.pl -p -c ../../../src/goto-diff/goto-diff
+	@../test.pl -e -p -c ../../../src/goto-diff/goto-diff
 
 tests.log: ../test.pl
-	@../test.pl -p -c ../../../src/goto-diff/goto-diff
+	@../test.pl -e -p -c ../../../src/goto-diff/goto-diff
 
 show:
 	@for dir in *; do \

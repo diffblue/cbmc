@@ -15,10 +15,10 @@ else
 endif
 
 test:
-	@../test.pl -p -c "../chain.sh $(GOTO_CC_EXE) $(GOTO_HARNESS_EXE) $(CBMC_EXE) $(is_windows)"
+	@../test.pl -e -p -c "../chain.sh $(GOTO_CC_EXE) $(GOTO_HARNESS_EXE) $(CBMC_EXE) $(is_windows)"
 
 tests.log: ../test.pl
-	@../test.pl -p -c "../chain.sh $(GOTO_CC_EXE) $(GOTO_HARNESS_EXE) $(CBMC_EXE) $(is_windows)"
+	@../test.pl -e -p -c "../chain.sh $(GOTO_CC_EXE) $(GOTO_HARNESS_EXE) $(CBMC_EXE) $(is_windows)"
 
 show:
 	@for dir in *; do \

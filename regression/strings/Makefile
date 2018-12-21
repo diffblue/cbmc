@@ -1,16 +1,16 @@
 default: tests.log
 
 test:
-	@../test.pl -p -c ../../../src/cbmc/cbmc
+	@../test.pl -e -p -c ../../../src/cbmc/cbmc
 
 testfuture:
-	@../test.pl -p -c ../../../src/cbmc/cbmc -CF
+	@../test.pl -e -p -c ../../../src/cbmc/cbmc -CF
 
 testall:
-	@../test.pl -p -c ../../../src/cbmc/cbmc -CFTK
+	@../test.pl -e -p -c ../../../src/cbmc/cbmc -CFTK
 
 tests.log: ../test.pl
-	@../test.pl -p -c ../../../src/cbmc/cbmc
+	@../test.pl -e -p -c ../../../src/cbmc/cbmc
 
 show:
 	@for dir in *; do \

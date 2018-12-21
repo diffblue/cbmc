@@ -56,20 +56,24 @@ sub run($$$$$) {
   return $failed;
 }
 
-sub load($) {
-  my ($fname) = @_;
+sub load($$) {
+  my ($fname, $exit_signal_checks) = @_;
 
   open FILE, "<$fname";
   my @data = grep { !/^\/\// } <FILE>;
   close FILE;
 
   chomp @data;
+  if($exit_signal_checks) {
+    grep { /^\^EXIT=[\(\|\d]*\d+\)?\$$/ } @data or die "$fname: Missing EXIT test\n";
+    grep { /^\^SIGNAL=\d+\$$/ } @data or die "$fname: Missing SIGNAL test\n";
+  }
   return @data;
 }
 
-sub test($$$$$$$$$$) {
-  my ($name, $test, $t_level, $cmd, $ign, $dry_run, $defines, $include_tags, $exclude_tags, $output_suffix) = @_;
-  my ($level_and_tags, $input, $options, $grep_options, @results) = load("$test");
+sub test($$$$$$$$$$$) {
+  my ($name, $test, $t_level, $cmd, $ign, $dry_run, $defines, $include_tags, $exclude_tags, $output_suffix, $exit_signal_checks) = @_;
+  my ($level_and_tags, $input, $options, $grep_options, @results) = load("$test", $exit_signal_checks);
   my @keys = keys %{$defines};
   foreach my $key (@keys) {
     my $value = $defines->{$key};
@@ -265,6 +269,7 @@ Usage: test.pl -c CMD [OPTIONS] [DIRECTORIES ...]
   the current location will be used.
 
   -c CMD     run tests on CMD - required option
+  -e         require EXIT and SIGNAL patterns in test specifications
   -i <regex> options in test.desc matching the specified perl regex are ignored
   -j <num>   run <num> tests in parallel (requires Thread::Pool::Simple)
              if present, the environment variable TESTPL_JOBS is used as the default
@@ -307,6 +312,7 @@ where
                                   case then each of the rules will be matched over multiple lines (so can contain)
                                   the new line symbol (\\n) inside them.
   <required patterns>             one or more lines of regualar expressions that must occur in the output
+                                  if -e is set, the patterns ^EXIT=...\$ and ^SIGNAL=...\$ are mandatory
   <disallowed patterns>           one or more lines of expressions that must not occur in output
   <comment text>                  free form text
 
@@ -318,9 +324,9 @@ use Getopt::Std;
 use Getopt::Long qw(:config pass_through bundling);
 $main::VERSION = 0.1;
 $Getopt::Std::STANDARD_HELP_VERSION = 1;
-our ($opt_c, $opt_f, $opt_i, $opt_j, $opt_n, $opt_p, $opt_h, $opt_C, $opt_T, $opt_F, $opt_K, $opt_s, %defines, @include_tags, @exclude_tags); # the variables for getopt
+our ($opt_c, $opt_e, $opt_f, $opt_i, $opt_j, $opt_n, $opt_p, $opt_h, $opt_C, $opt_T, $opt_F, $opt_K, $opt_s, %defines, @include_tags, @exclude_tags); # the variables for getopt
 GetOptions("D=s" => \%defines, "X=s" => \@exclude_tags, "I=s" => \@include_tags);
-getopts('c:fi:j:nphCTFKs:') or &main::HELP_MESSAGE(\*STDOUT, "", $main::VERSION, "");
+getopts('c:efi:j:nphCTFKs:') or &main::HELP_MESSAGE(\*STDOUT, "", $main::VERSION, "");
 $opt_c or &main::HELP_MESSAGE(\*STDOUT, "", $main::VERSION, "");
 $opt_j = $opt_j || $ENV{'TESTPL_JOBS'} || 0;
 if($opt_j && $opt_j != 1 && !$has_thread_pool) {
@@ -336,6 +342,7 @@ $t_level += 8 if($opt_K);
 $t_level += 1 if($opt_C || 0 == $t_level);
 my $dry_run = $opt_n;
 my $log_suffix = $opt_s;
+my $exit_signal_checks = defined($opt_e);
 
 my $logfile_name = "tests";
 if($log_suffix) {
@@ -370,7 +377,7 @@ sub do_test($)
     defined($pool) or print "  Running $files[$_]";
     my $start_time = time();
     $failed_skipped = test(
-      $test, $files[$_], $t_level, $opt_c, $opt_i, $dry_run, \%defines, \@include_tags, \@exclude_tags, $log_suffix);
+      $test, $files[$_], $t_level, $opt_c, $opt_i, $dry_run, \%defines, \@include_tags, \@exclude_tags, $log_suffix, $exit_signal_checks);
     my $runtime = time() - $start_time;
 
     lock($skips);
