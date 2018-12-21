@@ -276,8 +276,12 @@ bool is_constantt::is_constant_address_of(const exprt &expr) const
 
     return is_constant(deref.pointer());
   }
-  else if(expr.id() == ID_string_constant)
+  else if(
+    expr.id() == ID_string_constant || expr.id() == ID_array ||
+    expr.id() == ID_struct || expr.id() == ID_union)
+  {
     return true;
+  }
 
   return false;
 }

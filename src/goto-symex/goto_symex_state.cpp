@@ -155,6 +155,8 @@ protected:
       */
       return false;
     }
+    else if(expr.id() == ID_nondet_symbol)
+      return true;
 
     return is_constantt::is_constant(expr);
   }
