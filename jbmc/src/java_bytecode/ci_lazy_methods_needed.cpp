@@ -34,10 +34,7 @@ void ci_lazy_methods_neededt::add_needed_method(
 /// __CPROVER_start in its initial setup, and because return values of opaque
 /// methods need to be considered in ci_lazy_methods too.
 /// \param class_id: The given class id
-/// \param symbol_table: Used to look up occurrences of static initializers
-void ci_lazy_methods_neededt::add_clinit_call(
-  const irep_idt &class_id,
-  const symbol_tablet &symbol_table)
+void ci_lazy_methods_neededt::add_clinit_call(const irep_idt &class_id)
 {
   const irep_idt &clinit_wrapper = clinit_wrapper_name(class_id);
   if(symbol_table.symbols.count(clinit_wrapper))
@@ -67,7 +64,7 @@ bool ci_lazy_methods_neededt::add_needed_class(
   const auto &class_type =
     to_java_class_type(ns.lookup(class_symbol_name).type);
   if(class_type.get_base("java::java.lang.Enum"))
-    add_clinit_call(class_symbol_name, symbol_table);
+    add_clinit_call(class_symbol_name);
 
   return true;
 }
