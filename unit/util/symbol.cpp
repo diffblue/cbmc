@@ -1,4 +1,10 @@
-/// Author: Diffblue Ltd.
+/*******************************************************************\
+
+Module: Unit tests of symbol_tablet
+
+Author: Diffblue Ltd.
+
+\*******************************************************************/
 
 /// \file Tests for symbol_tablet
 

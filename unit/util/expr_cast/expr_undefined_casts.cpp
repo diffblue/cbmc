@@ -1,6 +1,10 @@
-/*
-  Author: Nathan Phillips <Nathan.Phillips@diffblue.com>
-*/
+/*******************************************************************\
+
+Module: Unit tests of expr_dynamic_cast
+
+Author: Nathan Phillips <Nathan.Phillips@diffblue.com>
+
+\*******************************************************************/
 
 /// \file
 /// expr_dynamic_cast for types that don't have a cast

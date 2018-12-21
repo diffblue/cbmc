@@ -1,6 +1,10 @@
-/*
-  Author: Diffblue Ltd.
-*/
+/*******************************************************************\
+
+Module: Unit tests of split_string
+
+Author: Diffblue Ltd.
+
+\*******************************************************************/
 
 /// \file
 /// split_string Unit Tests
