@@ -30,9 +30,33 @@ code_function_callt make_void_call(const symbol_exprt &function)
   ret.function() = function;
   return ret;
 }
+
+bool test_for_fail(
+  goto_modelt &goto_model,
+  goto_model_validation_optionst &validation_options)
+{
+  REQUIRE_THROWS_AS(
+    validate_goto_model(
+      goto_model.goto_functions,
+      validation_modet::EXCEPTION,
+      validation_options),
+    incorrect_goto_program_exceptiont);
+  return true;
+}
+
+bool test_for_pass(
+  goto_modelt &goto_model,
+  goto_model_validation_optionst &validation_options)
+{
+  REQUIRE_NOTHROW(validate_goto_model(
+    goto_model.goto_functions,
+    validation_modet::EXCEPTION,
+    validation_options));
+  return true;
+}
 } // namespace
 
-SCENARIO("validate goto program")
+SCENARIO("Validation of a goto program", "[core][goto-programs][validate]")
 {
   goto_modelt goto_model;
 
@@ -117,12 +141,7 @@ SCENARIO("validate goto program")
     {
       goto_model_validation_optionst validation_options{false};
       validation_options.entry_point_exists = true;
-      REQUIRE_THROWS_AS(
-        validate_goto_model(
-          goto_model.goto_functions,
-          validation_modet::EXCEPTION,
-          validation_options),
-        incorrect_goto_program_exceptiont);
+      REQUIRE(test_for_fail(goto_model, validation_options));
     }
   }
 
@@ -133,10 +152,7 @@ SCENARIO("validate goto program")
     {
       goto_model_validation_optionst validation_options{false};
       validation_options.entry_point_exists = true;
-      REQUIRE_NOTHROW(validate_goto_model(
-        goto_model.goto_functions,
-        validation_modet::EXCEPTION,
-        validation_options));
+      REQUIRE(test_for_pass(goto_model, validation_options));
     }
   }
 
@@ -165,12 +181,7 @@ SCENARIO("validate goto program")
 
       goto_model_validation_optionst validation_options{false};
       validation_options.function_pointer_calls_removed = true;
-      REQUIRE_THROWS_AS(
-        validate_goto_model(
-          goto_model.goto_functions,
-          validation_modet::EXCEPTION,
-          validation_options),
-        incorrect_goto_program_exceptiont);
+      REQUIRE(test_for_fail(goto_model, validation_options));
     }
   }
 
@@ -182,10 +193,7 @@ SCENARIO("validate goto program")
 
       goto_model_validation_optionst validation_options{false};
       validation_options.function_pointer_calls_removed = true;
-      REQUIRE_NOTHROW(validate_goto_model(
-        goto_model.goto_functions,
-        validation_modet::EXCEPTION,
-        validation_options));
+      REQUIRE(test_for_pass(goto_model, validation_options));
     }
   }
 
@@ -204,12 +212,7 @@ SCENARIO("validate goto program")
 
       goto_model_validation_optionst validation_options{false};
       validation_options.check_returns_removed = true;
-      REQUIRE_THROWS_AS(
-        validate_goto_model(
-          goto_model.goto_functions,
-          validation_modet::EXCEPTION,
-          validation_options),
-        incorrect_goto_program_exceptiont);
+      REQUIRE(test_for_fail(goto_model, validation_options));
     }
   }
 
@@ -232,12 +235,7 @@ SCENARIO("validate goto program")
 
       goto_model_validation_optionst validation_options{false};
       validation_options.check_returns_removed = true;
-      REQUIRE_THROWS_AS(
-        validate_goto_model(
-          goto_model.goto_functions,
-          validation_modet::EXCEPTION,
-          validation_options),
-        incorrect_goto_program_exceptiont);
+      REQUIRE(test_for_fail(goto_model, validation_options));
     }
   }
 
@@ -271,12 +269,7 @@ SCENARIO("validate goto program")
 
       goto_model_validation_optionst validation_options{false};
       validation_options.check_returns_removed = true;
-      REQUIRE_THROWS_AS(
-        validate_goto_model(
-          goto_model.goto_functions,
-          validation_modet::EXCEPTION,
-          validation_options),
-        incorrect_goto_program_exceptiont);
+      REQUIRE(test_for_fail(goto_model, validation_options));
     }
   }
 
@@ -288,10 +281,7 @@ SCENARIO("validate goto program")
 
       goto_model_validation_optionst validation_options{false};
       validation_options.check_returns_removed = true;
-      REQUIRE_NOTHROW(validate_goto_model(
-        goto_model.goto_functions,
-        validation_modet::EXCEPTION,
-        validation_options));
+      REQUIRE(test_for_pass(goto_model, validation_options));
     }
   }
 
@@ -309,12 +299,7 @@ SCENARIO("validate goto program")
 
       goto_model_validation_optionst validation_options{false};
       validation_options.check_called_functions = true;
-      REQUIRE_THROWS_AS(
-        validate_goto_model(
-          goto_model.goto_functions,
-          validation_modet::EXCEPTION,
-          validation_options),
-        incorrect_goto_program_exceptiont);
+      REQUIRE(test_for_fail(goto_model, validation_options));
     }
   }
 
@@ -330,12 +315,7 @@ SCENARIO("validate goto program")
 
       goto_model_validation_optionst validation_options{false};
       validation_options.check_called_functions = true;
-      REQUIRE_THROWS_AS(
-        validate_goto_model(
-          goto_model.goto_functions,
-          validation_modet::EXCEPTION,
-          validation_options),
-        incorrect_goto_program_exceptiont);
+      REQUIRE(test_for_fail(goto_model, validation_options));
     }
   }
 
@@ -349,10 +329,7 @@ SCENARIO("validate goto program")
 
       goto_model_validation_optionst validation_options{false};
       validation_options.check_called_functions = true;
-      REQUIRE_NOTHROW(validate_goto_model(
-        goto_model.goto_functions,
-        validation_modet::EXCEPTION,
-        validation_options));
+      REQUIRE(test_for_pass(goto_model, validation_options));
     }
   }
 
@@ -362,18 +339,18 @@ SCENARIO("validate goto program")
     THEN("fail!")
     {
       goto_convert(goto_model, null_message_handler);
-      auto &function_map = goto_model.goto_functions.function_map;
-      auto it = function_map.find("f");
-      it->second.body.instructions.erase(
-        std::prev(it->second.body.instructions.end()));
+      auto &function_f = goto_model.goto_functions.function_map["f"];
+      function_f.body.instructions.erase(
+        std::prev(function_f.body.instructions.end()));
 
+      // goto_function.validate checks by default (if a function has a body)
+      // that the last instruction of a function body marks the function's end.
       goto_model_validation_optionst validation_options{false};
-      validation_options.check_last_instruction = true;
+      namespacet ns(goto_model.symbol_table);
+
       REQUIRE_THROWS_AS(
-        validate_goto_model(
-          goto_model.goto_functions,
-          validation_modet::EXCEPTION,
-          validation_options),
+        function_f.validate(
+          ns, validation_modet::EXCEPTION, validation_options),
         incorrect_goto_program_exceptiont);
     }
   }
@@ -383,59 +360,15 @@ SCENARIO("validate goto program")
     THEN("pass!")
     {
       goto_convert(goto_model, null_message_handler);
+      auto &function_f = goto_model.goto_functions.function_map["f"];
 
+      // goto_function.validate checks by default (if a function has a body)
+      // that the last instruction of a function body marks the function's end.
       goto_model_validation_optionst validation_options{false};
-      validation_options.check_last_instruction = true;
-      REQUIRE_NOTHROW(validate_goto_model(
-        goto_model.goto_functions,
-        validation_modet::EXCEPTION,
-        validation_options));
-    }
-  }
+      namespacet ns(goto_model.symbol_table);
 
-  WHEN("an instruction \"code\" field, has a non nil source location")
-  {
-    THEN("fail!")
-    {
-      goto_convert(goto_model, null_message_handler);
-      auto &function_map = goto_model.goto_functions.function_map;
-      auto it = function_map.find("f");
-
-      auto source_location =
-        it->second.body.instructions.front().code.source_location();
-      source_location.make_nil();
-
-      goto_model_validation_optionst validation_options{false};
-      validation_options.check_sourcecode_location = true;
-      REQUIRE_THROWS_AS(
-        validate_goto_model(
-          goto_model.goto_functions,
-          validation_modet::EXCEPTION,
-          validation_options),
-        incorrect_goto_program_exceptiont);
-    }
-  }
-
-  WHEN("an instruction source_location field is nil")
-  {
-    THEN("fail!")
-    {
-      goto_convert(goto_model, null_message_handler);
-      auto &function_map = goto_model.goto_functions.function_map;
-      auto it = function_map.find("f");
-
-      auto source_location =
-        it->second.body.instructions.front().source_location;
-      source_location.make_nil();
-
-      goto_model_validation_optionst validation_options{false};
-      validation_options.check_sourcecode_location = true;
-      REQUIRE_THROWS_AS(
-        validate_goto_model(
-          goto_model.goto_functions,
-          validation_modet::EXCEPTION,
-          validation_options),
-        incorrect_goto_program_exceptiont);
+      REQUIRE_NOTHROW(function_f.validate(
+        ns, validation_modet::EXCEPTION, validation_options));
     }
   }
 }

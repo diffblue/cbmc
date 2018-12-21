@@ -35,7 +35,10 @@ SCENARIO(
     goto_model.goto_functions.function_map[function_symbol.name].type =
       fun_type1;
 
-    goto_model_validation_optionst validation_options{false};
+    goto_model_validation_optionst validation_options;
+    // required as this test has no entry point, but calls the top-level
+    // 'goto_model.validate()'
+    validation_options.entry_point_exists = false;
 
     WHEN("Symbol table has the right type")
     {

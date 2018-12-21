@@ -553,11 +553,10 @@ int cbmc_parse_optionst::doit()
 
   if(cmdline.isset("validate-goto-model"))
   {
-    goto_model_validation_optionst goto_model_validation_options;
-    goto_model_validation_options.function_pointer_calls_removed = true;
-    goto_model_validation_options.check_returns_removed = true;
-    goto_model_validation_options.check_called_functions = true;
-    goto_model_validation_options.check_last_instruction = true;
+    goto_model_validation_optionst goto_model_validation_options{true};
+    // this option is temporarily disabled until all source locations
+    // are reliably set correctly
+    goto_model_validation_options.check_source_location = false;
     goto_model.validate(
       validation_modet::INVARIANT, goto_model_validation_options);
   }

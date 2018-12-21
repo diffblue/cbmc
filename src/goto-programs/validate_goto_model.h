@@ -18,16 +18,14 @@ struct goto_model_validation_optionst
   bool function_pointer_calls_removed;
   bool check_returns_removed;
   bool check_called_functions;
-  bool check_last_instruction;
-  bool check_sourcecode_location;
+  bool check_source_location;
 
   goto_model_validation_optionst()
     : entry_point_exists{true},
       function_pointer_calls_removed{false},
       check_returns_removed{false},
       check_called_functions{false},
-      check_last_instruction{false},
-      check_sourcecode_location{false}
+      check_source_location{false}
   {
   }
 
@@ -36,8 +34,7 @@ struct goto_model_validation_optionst
       function_pointer_calls_removed{options_value},
       check_returns_removed{options_value},
       check_called_functions{options_value},
-      check_last_instruction{options_value},
-      check_sourcecode_location{options_value}
+      check_source_location{options_value}
   {
   }
 };

@@ -674,7 +674,8 @@ bool goto_programt::instructiont::equals(const instructiont &other) const
 
 void goto_programt::instructiont::validate(
   const namespacet &ns,
-  const validation_modet vm) const
+  const validation_modet vm,
+  const goto_model_validation_optionst &goto_model_validation_options) const
 {
   validate_full_code(code, ns, vm);
   validate_full_expr(guard, ns, vm);
@@ -775,6 +776,25 @@ void goto_programt::instructiont::validate(
         }
       }
     };
+
+  if(goto_model_validation_options.check_source_location)
+  {
+    DATA_CHECK(
+      vm,
+      source_location.is_not_nil(),
+      "each instruction source location must not be nil");
+
+    DATA_CHECK(
+      vm,
+      code.source_location().is_not_nil(),
+      "each instruction \"code\" field, must have non nil source location");
+
+    DATA_CHECK(
+      vm,
+      source_location == code.source_location(),
+      "instruction source location and"
+      " instruction \"code\" field source location must be the same");
+  }
 
   const symbolt *table_symbol;
   switch(type)

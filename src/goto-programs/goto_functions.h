@@ -153,7 +153,7 @@ public:
         ++it;
       }
 
-      goto_function.validate(ns, vm);
+      goto_function.validate(ns, vm, goto_model_validation_options);
     }
   }
 };

@@ -33,10 +33,21 @@ void get_local_identifiers(
 ///
 /// The validation mode indicates whether well-formedness check failures are
 /// reported via DATA_INVARIANT violations or exceptions.
-void goto_functiont::validate(const namespacet &ns, const validation_modet vm)
-  const
+void goto_functiont::validate(
+  const namespacet &ns,
+  const validation_modet vm,
+  const goto_model_validation_optionst &goto_model_validation_options) const
 {
-  body.validate(ns, vm);
+  // function body must end with an END_FUNCTION instruction
+  if(body_available())
+  {
+    DATA_CHECK(
+      vm,
+      body.instructions.back().is_end_function(),
+      "last instruction should be of end function type");
+  }
+
+  body.validate(ns, vm, goto_model_validation_options);
 
   find_symbols_sett typetags;
   find_type_symbols(type, typetags);
@@ -61,3 +72,4 @@ void goto_functiont::validate(const namespacet &ns, const validation_modet vm)
 
   validate_full_type(type, ns, vm);
 }
+

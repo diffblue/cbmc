@@ -144,12 +144,14 @@ public:
   ///
   /// The validation mode indicates whether well-formedness check failures are
   /// reported via DATA_INVARIANT violations or exceptions.
-  void validate(const validation_modet vm) const override
+  void validate(
+    const validation_modet vm,
+    const goto_model_validation_optionst &goto_model_validation_options) const override
   {
     symbol_table.validate(vm);
 
     const namespacet ns(symbol_table);
-    goto_functions.validate(ns, vm);
+    goto_functions.validate(ns, vm,  goto_model_validation_options);
   }
 
 private:

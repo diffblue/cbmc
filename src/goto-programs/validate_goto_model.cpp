@@ -59,24 +59,8 @@ private:
   /// a corresponding entry exists in the function_map
   void check_called_functions();
 
-  /// Check that goto-programs that have a body end with an END_FUNCTION
-  /// instruction.
-  ///
-  /// NB functions that are only declared, and not used will not appear in the
-  /// function map. Functions that are declared only and used to e.g.
-  /// initialise a function pointer will have no body.
-  void check_last_instruction();
-
-  /// Check both
-  /// 1. every instruction \"code\" field, has a non nil source location"
-  /// 2. every instruction source_location field is nil
-  /// NB this check is not expected to pass until setting these locations is
-  /// patched up.
-  void check_sourcecode_location();
-
   const validation_modet vm;
   const function_mapt &function_map;
-  const goto_model_validation_optionst validation_options;
 };
 } // namespace
 
@@ -85,9 +69,6 @@ void validate_goto_modelt::do_goto_program_checks(
 {
   if(validation_options.entry_point_exists)
     entry_point_exists();
-
-  if(validation_options.check_last_instruction)
-    check_last_instruction();
 
   /// NB function pointer calls must have been removed before removing
   /// returns - so 'check_returns_removed' also enables
@@ -102,9 +83,6 @@ void validate_goto_modelt::do_goto_program_checks(
 
   if(validation_options.check_called_functions)
     check_called_functions();
-
-  if(validation_options.check_sourcecode_location)
-    check_sourcecode_location();
 }
 
 void validate_goto_modelt::entry_point_exists()
@@ -158,7 +136,10 @@ void validate_goto_modelt::check_returns_removed()
           "function call return should be nil");
 
         const auto &callee = to_code_type(function_call.function().type());
-        DATA_CHECK(vm, callee.return_type().id() == ID_empty, "");
+        DATA_CHECK(
+          vm,
+          callee.return_type().id() == ID_empty,
+          "called function must have empty return type");
       }
     }
   }
@@ -218,41 +199,6 @@ void validate_goto_modelt::check_called_functions()
       // check functions of which the address is taken
       const exprt &src{instr.code};
       src.visit(test_for_function_address);
-    }
-  }
-}
-
-void validate_goto_modelt::check_last_instruction()
-{
-  for(const auto &fun : function_map)
-  {
-    if(fun.second.body_available())
-    {
-      DATA_CHECK(
-        vm,
-        fun.second.body.instructions.back().is_end_function(),
-        "last instruction should be of end function type");
-    }
-  }
-}
-
-void validate_goto_modelt::check_sourcecode_location()
-{
-  // Assumption is that if every instruction is checked - then there is no
-  // need to check targets.
-  for(const auto &fun : function_map)
-  {
-    for(auto &instr : fun.second.body.instructions)
-    {
-      DATA_CHECK(
-        vm,
-        instr.code.source_location().is_not_nil(),
-        "each instruction \"code\" field, must have non nil source location");
-
-      DATA_CHECK(
-        vm,
-        instr.source_location.is_not_nil(),
-        "each instruction source location must not be nil");
     }
   }
 }
