@@ -1,8 +1,8 @@
 /*******************************************************************\
 
- Module: optional_utils unit tests
+Module: optional_utils unit tests
 
- Author: Diffblue Ltd.
+Author: Diffblue Ltd.
 
 \*******************************************************************/
 

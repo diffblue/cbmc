@@ -1,8 +1,8 @@
 /*******************************************************************\
 
- Module: GOTO Program Utilities
+Module: GOTO Program Utilities
 
- Author: Diffblue Ltd.
+Author: Diffblue Ltd.
 
 \*******************************************************************/
 

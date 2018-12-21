@@ -1,8 +1,8 @@
 /*******************************************************************\
 
- Module: Unit tests to parse a class without its methods' instructions
+Module: Unit tests to parse a class without its methods' instructions
 
- Author: Diffblue Ltd.
+Author: Diffblue Ltd.
 
 \*******************************************************************/
 

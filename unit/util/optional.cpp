@@ -1,8 +1,8 @@
 /*******************************************************************\
 
- Module: nonstd::optional unit tests
+Module: nonstd::optional unit tests
 
- Author: Diffblue Ltd.
+Author: Diffblue Ltd.
 
 \*******************************************************************/
 

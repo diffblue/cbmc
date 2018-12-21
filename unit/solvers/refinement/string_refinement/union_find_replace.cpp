@@ -1,9 +1,9 @@
 /*******************************************************************\
 
- Module: Unit tests for union_find_replacet in
-   solvers/refinement/string_refinement.cpp
+Module: Unit tests for union_find_replacet in
+        solvers/refinement/string_refinement.cpp
 
- Author: Diffblue Ltd.
+Author: Diffblue Ltd.
 
 \*******************************************************************/
 

@@ -1,8 +1,8 @@
 /*******************************************************************\
 
- Module: replace_symbolt unit tests
+Module: replace_symbolt unit tests
 
- Author: Michael Tautschnig
+Author: Michael Tautschnig
 
 \*******************************************************************/
 

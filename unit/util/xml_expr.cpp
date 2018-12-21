@@ -1,8 +1,8 @@
 /*******************************************************************\
 
- Module: Unit tests of expression to xmlt conversion
+Module: Unit tests of expression to xmlt conversion
 
- Author: Michael Tautschnig
+Author: Michael Tautschnig
 
 \*******************************************************************/
 

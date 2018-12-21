@@ -1,8 +1,8 @@
 /*******************************************************************\
 
- Module: Example Catch Tests
+Module: Example Catch Tests
 
- Author: Diffblue Ltd.
+Author: Diffblue Ltd.
 
 \*******************************************************************/
 

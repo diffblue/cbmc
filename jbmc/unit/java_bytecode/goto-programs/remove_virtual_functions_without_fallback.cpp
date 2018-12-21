@@ -1,9 +1,9 @@
 /*******************************************************************\
 
- Module: Unit tests for remove_virtual_functions pass running in
-         assume-false-if-no-match mode.
+Module: Unit tests for remove_virtual_functions pass running in
+        assume-false-if-no-match mode.
 
- Author: Diffblue Ltd.
+Author: Diffblue Ltd.
 
 \*******************************************************************/
 

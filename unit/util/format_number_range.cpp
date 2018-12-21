@@ -1,8 +1,8 @@
 /*******************************************************************\
 
- Module: format_number_range unit tests
+Module: format_number_range unit tests
 
- Author: Michael Tautschnig
+Author: Michael Tautschnig
 
 \*******************************************************************/
 

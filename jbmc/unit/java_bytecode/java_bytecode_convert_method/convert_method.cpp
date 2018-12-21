@@ -1,8 +1,8 @@
 /*******************************************************************\
 
- Module: Unit tests for converting methods.
+Module: Unit tests for converting methods.
 
- Author: Diffblue Limited.
+Author: Diffblue Limited.
 
 \*******************************************************************/
 

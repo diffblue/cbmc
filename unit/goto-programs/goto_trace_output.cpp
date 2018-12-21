@@ -1,8 +1,8 @@
 /*******************************************************************\
 
- Module: Unit tests for goto_trace_stept::output
+Module: Unit tests for goto_trace_stept::output
 
- Author: Diffblue Ltd.
+Author: Diffblue Ltd.
 
 \*******************************************************************/
 

@@ -1,8 +1,8 @@
 /*******************************************************************\
 
- Module: functions that are useful with optionalt
+Module: functions that are useful with optionalt
 
- Author: Diffblue Ltd.
+Author: Diffblue Ltd.
 
 \*******************************************************************/
 

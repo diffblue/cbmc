@@ -1,8 +1,8 @@
 /*******************************************************************\
 
- Module: Non-deterministic object init and choice for JBMC
+Module: Non-deterministic object init and choice for JBMC
 
- Author: Diffblue Ltd.
+Author: Diffblue Ltd.
 
 \*******************************************************************/
 

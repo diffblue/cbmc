@@ -1,8 +1,8 @@
 /*******************************************************************\
 
- Module: Unit tests for parsing generic classes
+Module: Unit tests for parsing generic classes
 
- Author: Diffblue Ltd.
+Author: Diffblue Ltd.
 
  Note: Created by fotis on 09/10/2017.
 

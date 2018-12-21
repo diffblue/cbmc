@@ -1,9 +1,9 @@
 /*******************************************************************\
 
- Module: Unit tests for sparse arrays
-   solvers/refinement/string_refinement.cpp
+Module: Unit tests for sparse arrays in
+        solvers/refinement/string_refinement.cpp
 
- Author: Diffblue Ltd.
+Author: Diffblue Ltd.
 
 \*******************************************************************/
 

@@ -1,8 +1,8 @@
 /*******************************************************************\
 
- Module: Unit tests for converting fields
+Module: Unit tests for converting fields
 
- Author: Diffblue Ltd.
+Author: Diffblue Ltd.
 
 \*******************************************************************/
 

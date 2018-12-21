@@ -1,9 +1,9 @@
 /*******************************************************************\
 
- Module: Unit tests for get_numeric_value_from_character in
-   solvers/refinement/string_constraint_generator_valueof.cpp
+Module: Unit tests for get_numeric_value_from_character in
+        solvers/refinement/string_constraint_generator_valueof.cpp
 
- Author: Diffblue Ltd.
+Author: Diffblue Ltd.
 
 \*******************************************************************/
 

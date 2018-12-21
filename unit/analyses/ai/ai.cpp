@@ -1,8 +1,8 @@
 /*******************************************************************\
 
- Module: Unit tests for ait
+Module: Unit tests for ait
 
- Author: Diffblue Ltd.
+Author: Diffblue Ltd.
 
 \*******************************************************************/
 

@@ -1,8 +1,8 @@
 /*******************************************************************\
 
- Module: Unit tests for ai_domain_baset::ai_simplify_lhs
+Module: Unit tests for ai_domain_baset::ai_simplify_lhs
 
- Author: Diffblue Ltd.
+Author: Diffblue Ltd.
 
 \*******************************************************************/
 
