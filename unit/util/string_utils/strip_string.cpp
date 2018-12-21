@@ -1,6 +1,10 @@
-/*
-  Author: Diffblue Ltd.
-*/
+/*******************************************************************\
+
+Module: Unit tests of strip_string
+
+Author: Diffblue Ltd.
+
+\*******************************************************************/
 
 /// \file
 /// strip_string Unit Tests
