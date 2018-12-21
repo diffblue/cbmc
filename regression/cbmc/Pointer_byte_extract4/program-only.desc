@@ -1,0 +1,12 @@
+CORE
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+: dynamic_object1#\d+\) WITH
+--
+The above pattern makes sure we don't have a conditional choice of objects
+within a "with" expression. We avoid having this by running the simplifier after
+dereferencing.
