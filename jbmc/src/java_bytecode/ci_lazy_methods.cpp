@@ -253,16 +253,40 @@ bool ci_lazy_methodst::handle_virtual_methods_with_no_callees(
     if(!candidate_target_methods.empty())
       continue;
 
-    // Add the call class to instantiated_classes and assert that it
-    // didn't already exist
-    const irep_idt &call_class = virtual_function_call.get(ID_C_class);
-    bool added_class = instantiated_classes.count(call_class) == 0;
-    CHECK_RETURN(added_class);
+    const java_method_typet &java_method_type =
+      to_java_method_type(virtual_function_call.type());
 
-    lazy_methods_loader.add_all_needed_classes(
-      to_pointer_type(
-        to_java_method_type(virtual_function_call.type()).get_this()->type()));
+    // Add the call class to instantiated_classes and assert that it
+    // didn't already exist. It can't be instantiated already, otherwise it
+    // would give a concrete definition of the called method, and
+    // candidate_target_methods would be non-empty.
+    const irep_idt &call_class = virtual_function_call.get(ID_C_class);
+    bool was_missing = instantiated_classes.count(call_class) == 0;
+    CHECK_RETURN(was_missing);
     any_new_classes = true;
+
+    const typet &this_type = java_method_type.get_this()->type();
+    if(
+      const pointer_typet *this_pointer_type =
+        type_try_dynamic_cast<pointer_typet>(this_type))
+    {
+      lazy_methods_loader.add_all_needed_classes(*this_pointer_type);
+    }
+
+    // That should in particular have added call_class to the possibly
+    // instantiated types.
+    bool still_missing = instantiated_classes.count(call_class) == 0;
+    CHECK_RETURN(!still_missing);
+
+    // Make sure we add our return type as required, as we may not have
+    // seen any concrete instances of it being created.
+    const typet &return_type = java_method_type.return_type();
+    if(
+      const pointer_typet *return_pointer_type =
+        type_try_dynamic_cast<pointer_typet>(return_type))
+    {
+      lazy_methods_loader.add_all_needed_classes(*return_pointer_type);
+    }
 
     // Check that `get_virtual_method_target` returns a method now
     const irep_idt &call_basename =
