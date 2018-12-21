@@ -76,11 +76,11 @@ SCENARIO(
         reverse.type(),
         {{require_type::type_argument_kindt::Var, "java::KeyValue::V"},
          {require_type::type_argument_kindt::Var, "java::KeyValue::K"}});
-    REQUIRE(next_type.subtype().id() == ID_struct_tag);
+    REQUIRE(reverse_type.subtype().id() == ID_struct_tag);
     const struct_tag_typet &reverse_symbol =
       to_struct_tag_type(reverse_type.subtype());
     REQUIRE(
-      symbol_table.lookup_ref(next_symbol.get_identifier()).name ==
+      symbol_table.lookup_ref(reverse_symbol.get_identifier()).name ==
       "java::KeyValue");
   }
   WHEN("The class of type `MutuallyRecursiveGenerics` is created")

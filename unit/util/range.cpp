@@ -105,9 +105,8 @@ SCENARIO(
     THEN("A range of made from the vector can be filtered.")
     {
       auto odds_filter = make_range(input).filter(is_odd);
-      std::size_t total = 0;
-      for(const auto &move_only : odds_filter)
-        total += 1;
+      const std::size_t total =
+        std::distance(odds_filter.begin(), odds_filter.end());
       REQUIRE(total == 5);
       auto iterator = odds_filter.begin();
       REQUIRE((iterator++)->value == 1);
