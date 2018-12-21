@@ -32,9 +32,8 @@ SCENARIO(
     THEN("The symbol type should be generic")
     {
       const symbolt &class_symbol = new_symbol_table.lookup_ref(inner_name);
-      const java_generic_class_typet &java_generic_class_type =
-        require_type::require_complete_java_generic_class(
-          class_symbol.type, {inner_name + "::E"});
+      require_type::require_complete_java_generic_class(
+        class_symbol.type, {inner_name + "::E"});
 
       THEN("The fields are of correct types")
       {
@@ -55,9 +54,8 @@ SCENARIO(
     {
       const symbolt &class_symbol =
         new_symbol_table.lookup_ref(boundedinner_name);
-      const java_generic_class_typet &java_generic_class_type =
-        require_type::require_complete_java_generic_class(
-          class_symbol.type, {boundedinner_name + "::NUM"});
+      require_type::require_complete_java_generic_class(
+        class_symbol.type, {boundedinner_name + "::NUM"});
 
       // TODO extend when bounds are parsed correctly - TG-1286
 
@@ -138,10 +136,9 @@ SCENARIO(
     {
       const symbolt &class_symbol =
         new_symbol_table.lookup_ref(twoelementinner_name);
-      const java_generic_class_typet &java_generic_class_type =
-        require_type::require_complete_java_generic_class(
-          class_symbol.type,
-          {twoelementinner_name + "::K", twoelementinner_name + "::V"});
+      require_type::require_complete_java_generic_class(
+        class_symbol.type,
+        {twoelementinner_name + "::K", twoelementinner_name + "::V"});
 
       // TODO extend when bounds are parsed correctly - TG-1286
 
