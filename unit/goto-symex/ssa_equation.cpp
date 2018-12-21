@@ -46,7 +46,9 @@ SCENARIO("Validation of well-formed SSA steps", "[core][goto-symex][validate]")
 
       THEN("The consistency check fails")
       {
-        REQUIRE_THROWS(equation.validate(ns, validation_modet::EXCEPTION));
+        REQUIRE_THROWS_AS(
+          equation.validate(ns, validation_modet::EXCEPTION),
+          incorrect_goto_program_exceptiont);
       }
     }
   }

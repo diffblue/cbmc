@@ -53,16 +53,9 @@ SCENARIO(
       instructions.back().targets.push_back(instructions.begin());
       THEN("The consistency check fails")
       {
-        bool caught = false;
-        try
-        {
-          goto_function.body.validate(ns, validation_modet::EXCEPTION);
-        }
-        catch(incorrect_goto_program_exceptiont &e)
-        {
-          caught = true;
-        }
-        REQUIRE(caught);
+        REQUIRE_THROWS_AS(
+          goto_function.body.validate(ns, validation_modet::EXCEPTION),
+          incorrect_goto_program_exceptiont);
       }
     }
   }
