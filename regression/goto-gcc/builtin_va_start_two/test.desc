@@ -1,0 +1,10 @@
+KNOWNBUG
+main.c
+
+^EXIT=1$
+^SIGNAL=0$
+expected to have two arguments
+--
+--
+The C front-end should catch the problem during type checking, and not leave it
+to goto-program conversion to detect the problem.
