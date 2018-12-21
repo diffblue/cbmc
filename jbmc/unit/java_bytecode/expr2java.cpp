@@ -95,7 +95,7 @@ TEST_CASE(
 
   SECTION("Hex float to string (print a comment)")
   {
-    const float value = std::strtod("0x1p+37f", nullptr);
+    const float value = std::strtof("0x1p+37f", nullptr);
 #ifndef _MSC_VER
     REQUIRE(
       floating_point_to_java_string(value) == "0x1p+37f /* 1.37439e+11 */");
