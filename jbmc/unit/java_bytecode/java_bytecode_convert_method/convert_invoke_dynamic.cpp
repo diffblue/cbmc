@@ -107,12 +107,6 @@ void validate_lambda_assignment(
     Catch::Matchers::Vector::ContainsElementMatcher<irep_idt>{
       tmp_class_identifier});
 
-  const java_class_typet::componentt super_class_component =
-    require_type::require_component(tmp_lambda_class_type, "@java.lang.Object");
-
-  const struct_tag_typet &super_class_type = require_type::require_struct_tag(
-    super_class_component.type(), "java::java.lang.Object");
-
   THEN("The function in the class should call the lambda method")
   {
     const irep_idt method_identifier =
