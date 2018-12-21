@@ -19,6 +19,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <map>
 #include <set>
 
+typedef uint16_t method_offsett;
+
 struct java_bytecode_parse_treet
 {
   // Disallow copy construction and copy assignment, but allow move construction
@@ -55,7 +57,7 @@ struct java_bytecode_parse_treet
   struct instructiont
   {
     source_locationt source_location;
-    unsigned address;
+    method_offsett address;
     u8 bytecode;
     typedef std::vector<exprt> argst;
     argst args;
@@ -112,9 +114,9 @@ struct java_bytecode_parse_treet
       {
       }
 
-      std::size_t start_pc;
-      std::size_t end_pc;
-      std::size_t handler_pc;
+      method_offsett start_pc;
+      method_offsett end_pc;
+      method_offsett handler_pc;
       struct_tag_typet catch_type;
     };
 
@@ -128,9 +130,9 @@ struct java_bytecode_parse_treet
       irep_idt name;
       std::string descriptor;
       std::optional<std::string> signature;
-      std::size_t index;
-      std::size_t start_pc;
-      std::size_t length;
+      method_offsett index;
+      method_offsett start_pc;
+      method_offsett length;
     };
 
     typedef std::vector<local_variablet> local_variable_tablet;

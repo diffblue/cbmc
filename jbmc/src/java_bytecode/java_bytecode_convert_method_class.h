@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_CONVERT_METHOD_CLASS_H
 
 #include "java_bytecode_convert_class.h"
+#include "java_utils.h"
 
 #include <util/expanding_vector.h>
 #include <util/message.h>
@@ -74,8 +75,6 @@ public:
     convert(class_symbol, method, method_context);
   }
 
-  typedef uint16_t method_offsett;
-
 protected:
   messaget log;
   symbol_table_baset &symbol_table;
@@ -126,8 +125,8 @@ public:
   {
   public:
     symbol_exprt symbol_expr;
-    size_t start_pc;
-    size_t length;
+    method_offsett start_pc;
+    method_offsett length;
     bool is_parameter = false;
     std::vector<holet> holes;
 
@@ -183,7 +182,7 @@ protected:
 
   // return corresponding reference of variable
   const variablet &find_variable_for_slot(
-    size_t address,
+    method_offsett address,
     variablest &var_list);
 
   // JVM local variables
@@ -193,7 +192,7 @@ protected:
     NO_CAST
   };
 
-  exprt variable(const exprt &arg, char type_char, size_t address);
+  exprt variable(const exprt &arg, char type_char, method_offsett address);
 
   // temporary variables
   std::list<symbol_exprt> tmp_vars;
