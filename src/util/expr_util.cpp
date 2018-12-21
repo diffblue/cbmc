@@ -241,7 +241,9 @@ bool is_constantt::is_constant(const exprt &expr) const
     expr.id() == ID_with || expr.id() == ID_struct || expr.id() == ID_union ||
     // byte_update works, byte_extract may be out-of-bounds
     expr.id() == ID_byte_update_big_endian ||
-    expr.id() == ID_byte_update_little_endian)
+    expr.id() == ID_byte_update_little_endian ||
+    // member works, index may be out-of-bounds
+    expr.id() == ID_member || expr.id() == ID_if)
   {
     return std::all_of(
       expr.operands().begin(), expr.operands().end(), [this](const exprt &e) {
@@ -276,8 +278,12 @@ bool is_constantt::is_constant_address_of(const exprt &expr) const
 
     return is_constant(deref.pointer());
   }
-  else if(expr.id() == ID_string_constant)
+  else if(
+    expr.id() == ID_string_constant || expr.id() == ID_array ||
+    expr.id() == ID_struct || expr.id() == ID_union)
+  {
     return true;
+  }
 
   return false;
 }
