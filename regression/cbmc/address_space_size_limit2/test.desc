@@ -1,5 +1,7 @@
 KNOWNBUG
 test.i
 --32 --object-bits 31 --unwind 11 --no-simplify
+^EXIT=10$
+^SIGNAL=0$
 dynamic object too large
 --

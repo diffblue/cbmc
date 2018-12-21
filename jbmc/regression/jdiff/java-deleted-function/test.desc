@@ -3,8 +3,8 @@ new.jar
 old.jar --json-ui
 // Enable multi-line checking
 activate-multi-line-match
-EXIT=0
-SIGNAL=0
+^EXIT=0$
+^SIGNAL=0$
   "deletedFunctions": \[\n      \{\n        "name": "java::Test\.foo:\(I\)I",\n        "sourceLocation": \{\n          "file": "Test\.java",\n          "function": "java::Test\.foo:\(I\)I",\n          "line": "4"\n        \}\n      \}\n    \],
   "modifiedFunctions": \[ \],
   "newFunctions": \[ \],

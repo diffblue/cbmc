@@ -2,6 +2,8 @@ CORE
 RefineStrings.class
 --function string_refinement.RefineStrings.constantComparison --show-vcc --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
 ^Generated [0-9]+ VCC\(s\), 0 remaining after simplification$
+^EXIT=0$
+^SIGNAL=0$
 --
 .*cprover_string_startswith_func*.
 --

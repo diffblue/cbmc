@@ -1,6 +1,8 @@
 CORE
 main.c
 --apply-code-contracts
+^EXIT=10$
+^SIGNAL=0$
 ^\[main.1\] .* Loop invariant violated before entry: SUCCESS$
 ^\[main.2\] .* Loop invariant not preserved: SUCCESS$
 ^\[main.assertion.1\] .* assertion r == 0: FAILURE$

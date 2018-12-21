@@ -2,6 +2,8 @@ KNOWNBUG
 test.txt
 
 ^Goodbye$
+^EXIT=0$
+^SIGNAL=0$
 --
 --
 This isn't really a known bug perse, instead this test should fail (since these

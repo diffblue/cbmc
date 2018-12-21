@@ -1,6 +1,8 @@
 CORE symex-driven-lazy-loading-expected-failure
 TestClass.class
 --function TestClass.testFunction --verbosity 10
+^EXIT=10$
+^SIGNAL=0$
 CI lazy methods: elaborate java::Foo\.cproverNondetInitialize:\(\)V
 CI lazy methods: elaborate java::Bar\.cproverNondetInitialize:\(\)V
 CI lazy methods: elaborate java::Baz\.cproverNondetInitialize:\(\)V

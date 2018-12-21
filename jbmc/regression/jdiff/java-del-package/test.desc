@@ -3,8 +3,8 @@ new.jar
 old.jar --json-ui
 // Enable multi-line checking
 activate-multi-line-match
-EXIT=0
-SIGNAL=0
+^EXIT=0$
+^SIGNAL=0$
   "deletedFunctions": \[\n      \{\n        "name": "java::foo\.Test\.<init>:\(\)V",\n        "sourceLocation": \{\n          "file": "foo/Test\.java",\n          "function": "java::foo\.Test\.<init>:\(\)V",\n          "line": "3"\n        \}\n      \},\n      \{\n        "name": "java::foo\.Test\.foo:\(I\)I",\n        "sourceLocation": \{\n          "file": "foo/Test\.java",\n          "function": "java::foo\.Test\.foo:\(I\)I",\n          "line": "5"\n        \}\n      \},\n      \{\n        "name": "java::foo\.Test\.bar:\(I\)I",\n        "sourceLocation": \{\n          "file": "foo/Test\.java",\n          "function": "java::foo\.Test\.bar:\(I\)I",\n          "line": "14"\n        \}\n      \}\n    \],
   "modifiedFunctions": \[ \],
   "newFunctions": \[\n      \{\n        "name": "java::Test\.<init>:\(\)V",\n        "sourceLocation": \{\n          "file": "Test\.java",\n          "function": "java::Test\.<init>:\(\)\V",\n          "line": "1"\n        \}\n      \},\n      \{\n        "name": "java::Test\.foo:\(I\)I",\n        "sourceLocation": \{\n          "file": "Test\.java",\n          "function": "java::Test\.foo:\(I\)I",\n          "line": "4"\n        \}\n      \},\n      \{\n        "name": "java::Test\.bar:\(I\)I",\n        "sourceLocation": \{\n          "file": "Test\.java",\n          "function": "java::Test.bar:\(I\)I",\n          "line": "12"\n        \}\n      \}\n    \],\n  

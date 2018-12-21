@@ -2,6 +2,7 @@ KNOWNBUG
 Test.class
 Test2.class
 ^EXIT=6$
+^SIGNAL=0$
 --
 Invariant check failed
 --

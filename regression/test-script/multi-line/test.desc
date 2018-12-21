@@ -3,6 +3,6 @@ test.txt
 
 activate-multi-line-match
 Hello\nWorld
-EXIT=0\n
-SIGNAL=0\n
+^EXIT=0$
+^SIGNAL=0$
 --
