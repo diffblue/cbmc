@@ -2,6 +2,8 @@ KNOWNBUG
 test.txt
 
 ^Hello$
+^EXIT=0$
+^SIGNAL=0$
 --
 ^World$
 --

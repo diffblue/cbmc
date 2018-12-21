@@ -5,4 +5,6 @@ block 1 \(lines main.c:main:3\): SATISFIED
 block 2 \(lines main.c:main:4\): SATISFIED
 block 3 \(lines main.c:main:4,6\): SATISFIED
 block 4 \(lines main.c:main:8\): FAILED
+^EXIT=0$
+^SIGNAL=0$
 --

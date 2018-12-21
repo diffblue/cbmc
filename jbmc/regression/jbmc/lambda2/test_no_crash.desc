@@ -1,8 +1,8 @@
 CORE symex-driven-lazy-loading-expected-failure
 SymStream.class
 --no-lazy-methods --show-goto-functions
-^EXIT=0
-^SIGNAL=0
+^EXIT=0$
+^SIGNAL=0$
 --
 --
 just to test that it doesn't crash in this situation, cf. TG-2684

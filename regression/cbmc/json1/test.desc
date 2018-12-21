@@ -2,8 +2,8 @@ CORE
 main.c
 --json-ui --stop-on-fail
 activate-multi-line-match
-EXIT=10
-SIGNAL=0
+^EXIT=10$
+^SIGNAL=0$
 \[\n  \{\n    "program": "CBMC .*"\n  \},\n  \{\n    "messageText": "CBMC .*",\n    "messageType": "STATUS-MESSAGE"\n  \},\n  \{\n    "messageText": "Parsing main\.c",\n    "messageType": "STATUS-MESSAGE"\n  \},
 \]\n  \},\n  \{\n    "messageText": "VERIFICATION FAILED",\n    "messageType": "STATUS-MESSAGE"\n  \},\n  \{\n    "cProverStatus": "failure"\n  \}\n\]
 --

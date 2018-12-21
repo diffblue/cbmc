@@ -2,6 +2,7 @@ CORE
 lib/test2.jar
 --main-class Test --classpath libs/test.jar
 ^EXIT=10$
+^SIGNAL=0$
 ^VERIFICATION FAILED$
 --
 --

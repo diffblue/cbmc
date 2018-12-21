@@ -2,9 +2,8 @@ CORE
 StaticMethodRef.class
 --function StaticMethodRef.Smr
 VERIFICATION FAILED
-EXIT=10
-SIGNAL=0
-^SIGNAL=0
+^EXIT=10$
+^SIGNAL=0$
 --
 --
 Tests that it doesn't crash when failing to read a `BootstrapMethods` entry and

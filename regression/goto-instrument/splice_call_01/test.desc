@@ -3,5 +3,5 @@ main.c
 --splice-call main,moo
 activate-multi-line-match
 moo\(\);\n.*function main.*
-EXIT=0
-SIGNAL=0
+^EXIT=0$
+^SIGNAL=0$

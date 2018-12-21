@@ -3,6 +3,8 @@ main.c
 --unwind 10 --show-goto-functions
 activate-multi-line-match
 (?P<comment_block>\/\/ [0-9]+ file main\.c line [0-9]+ function main)[\s]*dead newAlloc0;[\s]*(?P>comment_block)[\s]*dead pc;[\s]*(?P>comment_block)[\s]*dead literal;[\s]*(?P>comment_block)[\s]*9: END_FUNCTION
+^EXIT=0$
+^SIGNAL=0$
 --
 --
 Checks for:

@@ -2,8 +2,8 @@ CORE
 main.c
 --dependence-graph --show
 activate-multi-line-match
-EXIT=0
-SIGNAL=0
+^EXIT=0$
+^SIGNAL=0$
 // First assignment has a control dependency on the if
 \/\/ ([0-9]+).*\n.*IF.*i < 10.*THEN(.*\n)*Control dependencies: \1\n(.*\n){2,3}.*a = 1
 // Second assignment has a control dependency on the if

@@ -1,6 +1,8 @@
 KNOWNBUG
 Sync.class
 --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar` --java-threading
+^EXIT=0$
+^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
 --
 ^warning: ignoring

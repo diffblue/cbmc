@@ -3,8 +3,8 @@ new.jar
 old.jar
 // Enable multi-line checking
 activate-multi-line-match
-EXIT=0
-SIGNAL=0
+^EXIT=0$
+^SIGNAL=0$
 new functions:\nmodified functions:\n  Test\.java: java::Test\.f00:\(LA;\)LA;\ndeleted functions:
 --
 ^warning: ignoring

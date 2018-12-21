@@ -1,6 +1,8 @@
 CORE
 test.c
 --reachability-slice-fb --show-goto-functions --cover location --property foo.coverage.2
+^EXIT=0$
+^SIGNAL=0$
 = 1001
 = 1002
 = 1003

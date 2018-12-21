@@ -2,6 +2,6 @@ CORE symex-driven-lazy-loading-expected-failure
 HierarchyTest.class
 --show-class-hierarchy
 activate-multi-line-match
-EXIT=0
-SIGNAL=0
+^EXIT=0$
+^SIGNAL=0$
 java::HierarchyTest \(abstract\):\n *parents:\n *java::java\.lang\.Object\n *children:\n *java::HierarchyTestChild(1|2)\n *java::HierarchyTestChild(1|2)\njava::HierarchyTestGrandchild:\n *parents:\n *java::HierarchyTestChild1\n *java::HierarchyTestInterface1\n *java::HierarchyTestInterface2\n *children:\njava::HierarchyTestChild2:\n *parents:\n *java::HierarchyTest\n *children:\njava::HierarchyTestChild1:\n *parents:\n *java::HierarchyTest\n *children:\n *java::HierarchyTestGrandchild\njava::HierarchyTestInterface1 \(abstract\):\n *parents:\n *java::java\.lang\.Object\n *children:\n *java::HierarchyTestGrandchild\njava::HierarchyTestInterface2 \(abstract\):\n *parents:\n *java::java\.lang\.Object\n *children:\n *java::HierarchyTestGrandchild

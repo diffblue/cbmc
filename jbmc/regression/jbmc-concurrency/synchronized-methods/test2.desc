@@ -1,6 +1,8 @@
 CORE
 A.class
 --function 'A.me1:()V' --java-threading --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar` --show-goto-functions
+^EXIT=0$
+^SIGNAL=0$
 ATOMIC_BEGIN
 ATOMIC_END
 --

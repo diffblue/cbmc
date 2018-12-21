@@ -3,8 +3,8 @@ main.c
 --show-symbol-table
 // Enable multi-line checking
 activate-multi-line-match
-EXIT=0
-SIGNAL=0
+^EXIT=0$
+^SIGNAL=0$
 Base name\.+: fun\nMode\.+: C\nType\.+: MYINT \(\)
 Base name\.+: fun2\nMode\.+: C\nType\.+: ALTINT \(\)
 --

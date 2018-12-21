@@ -2,6 +2,7 @@ KNOWNBUG
 Test.class
 --classpath src
 ^EXIT=6$
+^SIGNAL=0$
 --
 Java main class: Test
 failed to open input file `Test.class'

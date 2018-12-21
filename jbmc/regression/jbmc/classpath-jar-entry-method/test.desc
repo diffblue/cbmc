@@ -1,8 +1,8 @@
 CORE
 jar_file.jar
 --function RelevantClass.entry --verbosity 10
-^EXIT=10
-^SIGNAL=0
+^EXIT=10$
+^SIGNAL=0$
 VERIFICATION FAILED
 Getting class `RelevantClass' from JAR jar_file.jar
 Getting class `RelatedClass' from JAR jar_file.jar

@@ -1,6 +1,8 @@
 CORE broken-smt-backend
 test.c
 --function test --min-null-tree-depth 2 --max-nondet-tree-depth 2 --bounds-check
+^EXIT=10$
+^SIGNAL=0$
 \[test.assertion.1\] line \d+ assertion Test.lists\[0\]->next: SUCCESS
 \[test.assertion.2\] line \d+ assertion Test.lists\[1\]->next: SUCCESS
 \[test.assertion.3\] line \d+ assertion Test.lists\[2\]->next: SUCCESS

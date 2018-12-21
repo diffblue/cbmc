@@ -3,6 +3,8 @@ main.c
 --unwind 10 --show-goto-functions
 activate-multi-line-match
 (?P<comment_block>\/\/ [0-9]+ file main\.c line [0-9]+ function main)[\s]*6: test newAlloc4;[\s]*(?P>comment_block)[\s]*newAlloc4 = \{ \.id=4 \};[\s]*(?P>comment_block)[\s]*test newAlloc6;[\s]*(?P>comment_block)[\s]*newAlloc6 = \{ \.id=6 \};[\s]*(?P>comment_block)[\s]*test newAlloc7;[\s]*(?P>comment_block)[\s]*newAlloc7 = \{ \.id=7 \};[\s]*(?P>comment_block)[\s]*GOTO 3
+^EXIT=0$
+^SIGNAL=0$
 --
 --
 Checks for:
