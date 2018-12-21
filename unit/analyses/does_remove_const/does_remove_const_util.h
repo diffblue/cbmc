@@ -1,8 +1,8 @@
 /*******************************************************************\
 
- Module: Does Remove Const Unit Tests
+Module: Does Remove Const Unit Tests
 
- Author: Diffblue Ltd.
+Author: Diffblue Ltd.
 
 \*******************************************************************/
 

@@ -1,8 +1,8 @@
 /*******************************************************************\
 
- Module: Unit test utilities
+Module: Unit test utilities
 
- Author: Diffblue Ltd.
+Author: Diffblue Ltd.
 
 \*******************************************************************/
 

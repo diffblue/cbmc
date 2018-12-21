@@ -1,8 +1,8 @@
 /*******************************************************************\
 
- Module: Unit tests for `instantiate_not_contains_`.
+Module: Unit tests for `instantiate_not_contains_`.
 
- Author: Jesse Sigal, jesse.sigal@diffblue.com
+Author: Jesse Sigal, jesse.sigal@diffblue.com
 
 \*******************************************************************/
 

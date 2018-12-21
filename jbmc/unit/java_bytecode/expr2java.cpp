@@ -1,8 +1,8 @@
 /*******************************************************************\
 
- Module: Unit tests for expr-to-java string conversion
+Module: Unit tests for expr-to-java string conversion
 
- Author: Diffblue Ltd.
+Author: Diffblue Ltd.
 
 \*******************************************************************/
 

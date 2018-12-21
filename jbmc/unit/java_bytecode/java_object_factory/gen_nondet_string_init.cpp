@@ -1,9 +1,9 @@
 /*******************************************************************\
 
- Module: Java string library preprocess.
-         Test for converting an expression to a string expression.
+Module: Java string library preprocess.
+        Test for converting an expression to a string expression.
 
- Author: Diffblue Ltd.
+Author: Diffblue Ltd.
 
 \*******************************************************************/
 

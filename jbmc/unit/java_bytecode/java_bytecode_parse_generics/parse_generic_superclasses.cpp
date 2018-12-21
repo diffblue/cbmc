@@ -1,10 +1,10 @@
 /*******************************************************************\
 
- Module: Unit tests for parsing classes with generic superclasses or interfaces
-         with unsupported signatures, falling back to using the raw type
-         descriptors
+Module: Unit tests for parsing classes with generic superclasses or
+        interfaces with unsupported signatures, falling back to using
+        the raw type descriptors
 
- Author: Diffblue Ltd.
+Author: Diffblue Ltd.
 
 \*******************************************************************/
 

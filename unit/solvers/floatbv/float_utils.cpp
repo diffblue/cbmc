@@ -1,8 +1,8 @@
 /*******************************************************************\
 
- Module: Unit tests for float utils and approximation
+Module: Unit tests for float utils and approximation
 
- Author: Daniel Kroening
+Author: Daniel Kroening
 
 \*******************************************************************/
 

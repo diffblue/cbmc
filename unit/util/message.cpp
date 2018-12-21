@@ -1,8 +1,8 @@
 /*******************************************************************\
 
- Module: Messaget tests
+Module: Messaget tests
 
- Author: Diffblue Ltd.
+Author: Diffblue Ltd.
 
 \*******************************************************************/
 

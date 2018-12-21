@@ -1,8 +1,8 @@
 /*******************************************************************\
 
- Module: exprt iterator module
+Module: exprt iterator module
 
- Author: Diffblue Ltd.
+Author: Diffblue Ltd.
 
 \*******************************************************************/
 

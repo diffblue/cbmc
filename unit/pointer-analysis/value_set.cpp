@@ -1,8 +1,8 @@
 /*******************************************************************\
 
- Module: Unit tests for value_sett
+Module: Unit tests for value_sett
 
- Author: Diffblue Ltd.
+Author: Diffblue Ltd.
 
 \*******************************************************************/
 

@@ -1,9 +1,9 @@
 /*******************************************************************\
 
- Module: Unit tests for interval_sparse_arrayt::concretizein
-   solvers/refinement/string_refinement_util.cpp
+Module: Unit tests for interval_sparse_arrayt::concretize in
+        solvers/refinement/string_refinement_util.cpp
 
- Author: Diffblue Ltd.
+Author: Diffblue Ltd.
 
 \*******************************************************************/
 

@@ -1,8 +1,8 @@
 /*******************************************************************\
 
- Module: Unit tests for converting invokedynamic instructions into codet
+Module: Unit tests for converting invokedynamic instructions into codet
 
- Author: Diffblue Ltd.
+Author: Diffblue Ltd.
 
 \*******************************************************************/
 

@@ -1,6 +1,9 @@
 /*******************************************************************\
- Module: Goto Programs
- Author: Thomas Kiley, thomas@diffblue.com
+
+Module: Goto Programs
+
+Author: Thomas Kiley, thomas@diffblue.com
+
 \*******************************************************************/
 
 /// \file

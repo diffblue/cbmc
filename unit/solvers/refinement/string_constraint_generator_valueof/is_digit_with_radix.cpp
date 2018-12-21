@@ -1,9 +1,9 @@
 /*******************************************************************\
 
- Module: Unit tests for is_digit_with_radix in
-   solvers/refinement/string_constraint_generator_valueof.cpp
+Module: Unit tests for is_digit_with_radix in
+        solvers/refinement/string_constraint_generator_valueof.cpp
 
- Author: Diffblue Ltd.
+Author: Diffblue Ltd.
 
 \*******************************************************************/
 

@@ -1,8 +1,8 @@
 /*******************************************************************\
 
- Module: Unit tests for class_hierarchyt output functions
+Module: Unit tests for class_hierarchyt output functions
 
- Author: Diffblue Ltd.
+Author: Diffblue Ltd.
 
 \*******************************************************************/
 

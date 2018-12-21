@@ -1,8 +1,8 @@
 /*******************************************************************\
 
- Module: Unit tests for goto_program::validate
+Module: Unit tests for goto_program::validate
 
- Author: Diffblue Ltd.
+Author: Diffblue Ltd.
 
 \*******************************************************************/
 

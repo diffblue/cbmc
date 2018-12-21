@@ -2,7 +2,7 @@
 
 Module: Non-deterministic object init and choice for CBMC
 
- Author: Diffblue Ltd.
+Author: Diffblue Ltd.
 
 \*******************************************************************/
 

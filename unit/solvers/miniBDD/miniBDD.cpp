@@ -1,8 +1,8 @@
 /*******************************************************************\
 
- Module: Unit tests for miniBDD
+Module: Unit tests for miniBDD
 
- Author: Diffblue Ltd.
+Author: Diffblue Ltd.
 
 \*******************************************************************/
 

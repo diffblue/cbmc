@@ -1,8 +1,8 @@
 /*******************************************************************\
 
- Module: Parameter indices test
+Module: Parameter indices test
 
- Author: Diffblue Ltd.
+Author: Diffblue Ltd.
 
 \*******************************************************************/
 

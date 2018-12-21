@@ -1,9 +1,9 @@
 /*******************************************************************\
 
- Module: Unit test to check Java virtual calls via a pointer
-         yield a correct sequence of not-null assumptions.
+Module: Unit test to check Java virtual calls via a pointer
+        yield a correct sequence of not-null assumptions.
 
- Author: Diffblue Limited.
+Author: Diffblue Limited.
 
 \*******************************************************************/
 

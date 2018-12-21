@@ -1,8 +1,8 @@
 /*******************************************************************\
 
- Module: Unit tests for converting inner classes
+Module: Unit tests for converting inner classes
 
- Author: Diffblue Ltd.
+Author: Diffblue Ltd.
 
 \*******************************************************************/
 

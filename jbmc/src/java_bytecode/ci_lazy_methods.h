@@ -1,8 +1,8 @@
 /*******************************************************************\
 
- Module: Java Bytecode
+Module: Java Bytecode
 
- Author: Diffblue Ltd.
+Author: Diffblue Ltd.
 
 \*******************************************************************/
 

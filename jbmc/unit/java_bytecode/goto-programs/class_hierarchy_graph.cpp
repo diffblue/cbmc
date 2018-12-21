@@ -1,8 +1,8 @@
 /*******************************************************************\
 
- Module: Unit tests for class_hierarchy_grapht
+Module: Unit tests for class_hierarchy_grapht
 
- Author: Diffblue Ltd.
+Author: Diffblue Ltd.
 
 \*******************************************************************/
 

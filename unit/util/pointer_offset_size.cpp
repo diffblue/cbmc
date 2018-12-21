@@ -1,8 +1,8 @@
 /*******************************************************************\
 
- Module: Unit tests of expression size/offset computation
+Module: Unit tests of expression size/offset computation
 
- Author: Michael Tautschnig
+Author: Michael Tautschnig
 
 \*******************************************************************/
 

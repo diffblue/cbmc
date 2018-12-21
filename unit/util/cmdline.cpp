@@ -1,8 +1,8 @@
 /*******************************************************************\
 
- Module: cmdlinet unit tests
+Module: cmdlinet unit tests
 
- Author: Diffblue Ltd.
+Author: Diffblue Ltd.
 
 \*******************************************************************/
 

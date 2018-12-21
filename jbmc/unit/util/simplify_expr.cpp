@@ -1,8 +1,8 @@
 /*******************************************************************\
 
- Module: Unit tests of the expression simplifier
+Module: Unit tests of the expression simplifier
 
- Author: Michael Tautschnig
+Author: Michael Tautschnig
 
 \*******************************************************************/
 

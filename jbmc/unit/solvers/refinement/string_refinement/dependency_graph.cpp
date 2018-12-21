@@ -1,9 +1,9 @@
 /*******************************************************************\
 
- Module: Unit tests for dependency graph
-   solvers/refinement/string_refinement.cpp
+Module: Unit tests for dependency graph in
+        solvers/refinement/string_refinement.cpp
 
- Author: Diffblue Ltd.
+Author: Diffblue Ltd.
 
 \*******************************************************************/
 

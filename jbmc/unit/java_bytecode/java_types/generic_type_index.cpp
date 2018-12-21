@@ -1,8 +1,8 @@
 /*******************************************************************\
 
- Module: Unit tests for java_types
+Module: Unit tests for java_types
 
- Author: Diffblue Ltd.
+Author: Diffblue Ltd.
 
 \*******************************************************************/
 

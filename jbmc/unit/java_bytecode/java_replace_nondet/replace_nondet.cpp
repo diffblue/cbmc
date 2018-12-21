@@ -1,9 +1,9 @@
 /*******************************************************************\
 
- Module: Tests for the replace nondet pass to make sure it works both
-         when remove_returns has been run before and after the call.
+Module: Tests for the replace nondet pass to make sure it works both
+        when remove_returns has been run before and after the call.
 
- Author: Diffblue Ltd.
+Author: Diffblue Ltd.
 
 \*******************************************************************/
 

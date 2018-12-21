@@ -1,9 +1,9 @@
 /*******************************************************************\
 
- Module: Unit tests for array pool
-   solvers/refinement/string_constraint_generator.h
+Module: Unit tests for array pool in
+        solvers/refinement/string_constraint_generator.h
 
- Author: Diffblue Ltd.
+Author: Diffblue Ltd.
 
 \*******************************************************************/
 

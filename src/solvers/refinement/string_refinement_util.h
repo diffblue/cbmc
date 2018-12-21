@@ -1,8 +1,8 @@
 /*******************************************************************\
 
- Module: String solver
+Module: String solver
 
- Author: Diffblue Ltd.
+Author: Diffblue Ltd.
 
 \*******************************************************************/
 

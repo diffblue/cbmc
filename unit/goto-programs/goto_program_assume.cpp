@@ -1,10 +1,10 @@
 /*******************************************************************\
 
-  Module: Unit tests for goto_program::validate
+Module: Unit tests for goto_program::validate
 
-  Author: Diffblue Ltd.
+Author: Diffblue Ltd.
 
- \*******************************************************************/
+\*******************************************************************/
 
 #include <goto-programs/goto_function.h>
 #include <testing-utils/catch.hpp>

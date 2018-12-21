@@ -1,8 +1,8 @@
 /*******************************************************************\
 
- Module: Unit tests for converting abstract classes
+Module: Unit tests for converting abstract classes
 
- Author: Diffblue Ltd.
+Author: Diffblue Ltd.
 
 \*******************************************************************/
 

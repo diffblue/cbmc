@@ -1,8 +1,8 @@
 /*******************************************************************\
 
- Module: Interpreter unit tests.
+Module: Interpreter unit tests.
 
- Author: Diffblue Ltd.
+Author: Diffblue Ltd.
 
 \*******************************************************************/
 

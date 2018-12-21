@@ -1,10 +1,10 @@
 /*******************************************************************\
 
-   Module: Unit tests for symex_target_equation::validate
+Module: Unit tests for symex_target_equation::validate
 
-   Author: Diffblue Ltd.
+Author: Diffblue Ltd.
 
- \*******************************************************************/
+\*******************************************************************/
 
 #include <goto-symex/symex_target_equation.h>
 #include <testing-utils/catch.hpp>

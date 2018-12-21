@@ -1,8 +1,8 @@
 /*******************************************************************\
 
- Module: Java Bytecode Language Conversion
+Module: Java Bytecode Language Conversion
 
- Author: Diffblue Ltd.
+Author: Diffblue Ltd.
 
 \*******************************************************************/
 #ifndef CPROVER_JAVA_BYTECODE_SELECT_POINTER_TYPE_H

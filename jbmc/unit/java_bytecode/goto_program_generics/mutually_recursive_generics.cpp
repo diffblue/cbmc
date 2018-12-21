@@ -1,8 +1,8 @@
 /*******************************************************************\
 
- Module: Unit tests for parsing mutually generic classes
+Module: Unit tests for parsing mutually generic classes
 
- Author: Diffblue Ltd.
+Author: Diffblue Ltd.
 
 \*******************************************************************/
 

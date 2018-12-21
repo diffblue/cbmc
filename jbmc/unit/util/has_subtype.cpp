@@ -1,8 +1,8 @@
 /*******************************************************************\
 
- Module: Unit tests for has_subtype in expr_util.cpp
+Module: Unit tests for has_subtype in expr_util.cpp
 
- Author: Diffblue Ltd.
+Author: Diffblue Ltd.
 
 \*******************************************************************/
 
