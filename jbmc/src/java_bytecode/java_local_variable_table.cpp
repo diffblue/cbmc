@@ -28,14 +28,12 @@ template <class T>
 struct procedure_local_cfg_baset<
   T,
   java_bytecode_convert_methodt::method_with_amapt,
-  java_bytecode_convert_methodt::method_offsett>
+  method_offsett>
   : public grapht<
-      cfg_base_nodet<T, java_bytecode_convert_methodt::method_offsett>>
+      cfg_base_nodet<T, method_offsett>>
 {
   typedef java_bytecode_convert_methodt::method_with_amapt method_with_amapt;
-  typedef std::map<java_bytecode_convert_methodt::method_offsett,
-                   java_bytecode_convert_methodt::method_offsett>
-    entry_mapt;
+  typedef std::map<method_offsett, method_offsett> entry_mapt;
   entry_mapt entry_map;
 
   procedure_local_cfg_baset() {}
@@ -47,7 +45,7 @@ struct procedure_local_cfg_baset<
     for(const auto &inst : amap)
     {
       // Map instruction PCs onto node indices:
-      entry_map[inst.first]=this->add_node();
+      entry_map[inst.first] = static_cast<method_offsett>(this->add_node());
       // Map back:
       (*this)[entry_map[inst.first]].PC=inst.first;
     }
@@ -85,14 +83,12 @@ struct procedure_local_cfg_baset<
     }
   }
 
-  java_bytecode_convert_methodt::method_offsett
-  get_first_node(const method_with_amapt &args) const
+  method_offsett get_first_node(const method_with_amapt &args) const
   {
     return args.second.begin()->first;
   }
 
-  java_bytecode_convert_methodt::method_offsett
-  get_last_node(const method_with_amapt &args) const
+  method_offsett get_last_node(const method_with_amapt &args) const
   {
     return (--args.second.end())->first;
   }
@@ -216,14 +212,13 @@ static bool is_store_to_slot(
 /// \param [out] var: A hole is added to `var`, unless it would be of zero size
 static void maybe_add_hole(
   local_variable_with_holest &var,
-  java_bytecode_convert_methodt::method_offsett from,
-  java_bytecode_convert_methodt::method_offsett to)
+  method_offsett from,
+  method_offsett to)
 {
   PRECONDITION(to>=from);
   if(to!=from)
     var.holes.push_back(
-      {from,
-       static_cast<java_bytecode_convert_methodt::method_offsett>(to - from)});
+      {from, static_cast<method_offsett>(to - from)});
 }
 
 /// See above
@@ -240,10 +235,17 @@ static void populate_variable_address_map(
 {
   for(auto it=firstvar, itend=varlimit; it!=itend; ++it)
   {
-    if(it->var.start_pc+it->var.length>live_variable_at_address.size())
-      live_variable_at_address.resize(it->var.start_pc+it->var.length);
+    if(
+      static_cast<std::size_t>(it->var.start_pc + it->var.length) >
+      live_variable_at_address.size())
+    {
+      live_variable_at_address.resize(
+        static_cast<std::size_t>(it->var.start_pc + it->var.length));
+    }
 
-    for(auto idx = it->var.start_pc, idxlim = it->var.start_pc + it->var.length;
+    for(method_offsett idx = it->var.start_pc,
+                       idxlim = static_cast<method_offsett>(
+                         it->var.start_pc + it->var.length);
         idx != idxlim;
         ++idx)
     {
@@ -310,7 +312,8 @@ static void populate_predecessor_map(
 #endif
 
     // Find the last instruction within the live range:
-    const auto end_pc = it->var.start_pc + it->var.length;
+    const auto end_pc =
+      static_cast<method_offsett>(it->var.start_pc + it->var.length);
     auto amapit=amap.find(end_pc);
     INVARIANT(
       amapit!=amap.begin(),
@@ -423,22 +426,20 @@ static void populate_predecessor_map(
 /// \return Returns the bytecode address of the closest common dominator of all
 ///   given variable table entries. In the worst case the function entry point
 ///   should always satisfy this criterion.
-static java_bytecode_convert_methodt::method_offsett get_common_dominator(
+static method_offsett get_common_dominator(
   const std::set<local_variable_with_holest *> &merge_vars,
   const java_cfg_dominatorst &dominator_analysis)
 {
   PRECONDITION(!merge_vars.empty());
 
-  auto first_pc =
-    std::numeric_limits<java_bytecode_convert_methodt::method_offsett>::max();
+  auto first_pc = std::numeric_limits<method_offsett>::max();
   for(auto v : merge_vars)
   {
     if(v->var.start_pc<first_pc)
       first_pc=v->var.start_pc;
   }
 
-  std::vector<java_bytecode_convert_methodt::method_offsett>
-    candidate_dominators;
+  std::vector<method_offsett> candidate_dominators;
   for(auto v : merge_vars)
   {
     const auto &dominator_nodeidx=
@@ -485,7 +486,7 @@ static java_bytecode_convert_methodt::method_offsett get_common_dominator(
 static void populate_live_range_holes(
   local_variable_with_holest &merge_into,
   const std::set<local_variable_with_holest *> &merge_vars,
-  java_bytecode_convert_methodt::method_offsett expanded_live_range_start)
+  method_offsett expanded_live_range_start)
 {
   std::vector<local_variable_with_holest *> sorted_by_startpc(
     merge_vars.begin(), merge_vars.end());
@@ -495,14 +496,16 @@ static void populate_live_range_holes(
     merge_into,
     expanded_live_range_start,
     sorted_by_startpc[0]->var.start_pc);
-  for(java_bytecode_convert_methodt::method_offsett idx = 0;
+  for(method_offsett idx = 0;
       idx < sorted_by_startpc.size() - 1;
       ++idx)
   {
     maybe_add_hole(
       merge_into,
-      sorted_by_startpc[idx]->var.start_pc+sorted_by_startpc[idx]->var.length,
-      sorted_by_startpc[idx+1]->var.start_pc);
+      static_cast<method_offsett>(
+        sorted_by_startpc[idx]->var.start_pc +
+        sorted_by_startpc[idx]->var.length),
+      sorted_by_startpc[static_cast<method_offsett>(idx + 1)]->var.start_pc);
   }
 }
 
@@ -533,16 +536,17 @@ static void merge_variable_table_entries(
   // as it was not visible in the original local variable table)
   populate_live_range_holes(merge_into, merge_vars, found_dominator);
 
-  java_bytecode_convert_methodt::method_offsett last_pc = 0;
+  method_offsett last_pc = 0;
   for(auto v : merge_vars)
   {
-    if(v->var.start_pc+v->var.length>last_pc)
-      last_pc=v->var.start_pc+v->var.length;
+    if(static_cast<method_offsett>(v->var.start_pc + v->var.length) > last_pc)
+      last_pc = static_cast<method_offsett>(v->var.start_pc + v->var.length);
   }
 
   // Apply the changes:
   merge_into.var.start_pc=found_dominator;
-  merge_into.var.length=last_pc-found_dominator;
+  merge_into.var.length =
+    static_cast<method_offsett>(last_pc - found_dominator);
 
 #ifdef DEBUG
   debug_out << "Merged " << merge_vars.size() << " variables named "
@@ -837,7 +841,7 @@ void java_bytecode_convert_methodt::setup_local_variables(
 ///   nothing covers `address`.
 const java_bytecode_convert_methodt::variablet &
 java_bytecode_convert_methodt::find_variable_for_slot(
-  size_t address,
+  method_offsett address,
   variablest &var_list)
 {
   for(const variablet &var : var_list)
@@ -865,6 +869,6 @@ java_bytecode_convert_methodt::find_variable_for_slot(
   size_t list_length=var_list.size();
   var_list.resize(list_length+1);
   var_list[list_length].start_pc=0;
-  var_list[list_length].length=std::numeric_limits<size_t>::max();
+  var_list[list_length].length = std::numeric_limits<method_offsett>::max();
   return var_list[list_length];
 }

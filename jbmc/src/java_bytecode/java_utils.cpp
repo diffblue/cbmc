@@ -46,12 +46,13 @@ unsigned java_local_variable_slots(const typet &t)
   return bitwidth == 64 ? 2u : 1u;
 }
 
-unsigned java_method_parameter_slots(const java_method_typet &t)
+method_offsett java_method_parameter_slots(const java_method_typet &t)
 {
-  unsigned slots=0;
+  method_offsett slots = 0;
 
   for(const auto &p : t.parameters())
-    slots+=java_local_variable_slots(p.type());
+    slots =
+      static_cast<method_offsett>(slots + java_local_variable_slots(p.type()));
 
   return slots;
 }

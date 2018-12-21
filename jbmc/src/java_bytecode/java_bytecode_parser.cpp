@@ -986,7 +986,7 @@ void java_bytecode_parsert::rbytecode(
     instructions.push_back(instructiont());
     instructiont &instruction=instructions.back();
     instruction.statement=bytecodes[bytecode].mnemonic;
-    instruction.address=start_of_instruction;
+    instruction.address=static_cast<method_offsett>(start_of_instruction);
     instruction.source_location
       .set_java_bytecode_index(std::to_string(bytecode_index));
 
@@ -1655,7 +1655,7 @@ void java_bytecode_parsert::rinner_classes_attribute(
 {
   std::string name = parsed_class.name.c_str();
   u2 number_of_classes = read_u2();
-  u4 number_of_bytes_to_be_read = number_of_classes * 8 + 2;
+  u4 number_of_bytes_to_be_read = static_cast<u4>(number_of_classes * 8 + 2);
   INVARIANT(
     number_of_bytes_to_be_read == attribute_length,
     "The number of bytes to be read for the InnerClasses attribute does not "
