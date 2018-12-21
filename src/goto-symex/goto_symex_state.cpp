@@ -217,7 +217,6 @@ void goto_symex_statet::assignment(
 
   {
     // update value sets
-    value_sett::expr_sett rhs_value_set;
     exprt l1_rhs(rhs);
     get_l1_name(l1_rhs);
 
