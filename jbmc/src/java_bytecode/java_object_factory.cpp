@@ -167,6 +167,14 @@ private:
     const exprt &instance_expr,
     const irep_idt &method_name);
 
+  void array_primitive_init_code(
+    code_blockt &assignments,
+    const exprt &init_array_expr,
+    const exprt &length_expr,
+    const typet &element_type,
+    const exprt &max_length_expr,
+    const source_locationt &location);
+
   void array_loop_init_code(
     code_blockt &assignments,
     const exprt &init_array_expr,
@@ -1220,7 +1228,57 @@ codet make_allocate_code(const symbol_exprt &lhs, const exprt &size)
   return code_assignt(lhs, alloc);
 }
 
-/// Create code to nondeterministically initialise each element of an array in a
+/// Create code to nondeterministically initialize arrays of primitive type.
+/// The code produced is of the form (for an array of type TYPE):
+/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+///     TYPE (*array_data_init)[max_length_expr];
+///     array_data_init =
+///       ALLOCATE(TYPE [max_length_expr], max_length_expr, false);
+///     *array_data_init = NONDET(TYPE [max_length_expr]);
+///     init_array_expr = *array_data_init;
+/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/// \param [out] assignments : Code block to which the initializing assignments
+///   will be appended.
+/// \param init_array_expr : array data
+/// \param length_expr : array length
+/// \param element_type: type of array elements
+/// \param max_length_expr : the (constant) size to which initialise the array
+/// \param location: Source location associated with nondet-initialization.
+void java_object_factoryt::array_primitive_init_code(
+  code_blockt &assignments,
+  const exprt &init_array_expr,
+  const exprt &length_expr,
+  const typet &element_type,
+  const exprt &max_length_expr,
+  const source_locationt &location)
+{
+  array_typet array_type(element_type, max_length_expr);
+
+  // TYPE (*array_data_init)[max_length_expr];
+  const symbol_exprt &tmp_finite_array_pointer =
+    allocate_objects.allocate_automatic_local_object(
+      pointer_type(array_type), "array_data_init");
+
+  // array_data_init = ALLOCATE(TYPE [max_length_expr], max_length_expr, false);
+  assignments.add(
+    make_allocate_code(
+      tmp_finite_array_pointer,
+      max_length_expr));
+
+  // *array_data_init = NONDET(TYPE [max_length_expr]);
+  const exprt nondet_data=side_effect_expr_nondett(array_type, loc);
+  const exprt data_pointer_deref=dereference_exprt(
+    tmp_finite_array_pointer,
+    array_type);
+  assignments.add(code_assignt(data_pointer_deref, nondet_data));
+
+  // init_array_expr = *array_data_init;
+  address_of_exprt tmp_nondet_pointer(
+    index_exprt(data_pointer_deref, from_integer(0, java_int_type())));
+  assignments.add(code_assignt(init_array_expr, tmp_nondet_pointer));
+}
+
+/// Create code to nondeterministically initialize each element of an array in a
 /// loop.
 /// The code produced is of the form (supposing an array of type OBJ):
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1389,16 +1447,31 @@ void java_object_factoryt::gen_nondet_array_init(
     init_array_expr =
       typecast_exprt(init_array_expr, pointer_type(element_type));
 
-  // Nondeterministically initialise each element of the array
-  array_loop_init_code(
-    assignments,
-    init_array_expr,
-    length_expr,
-    element_type,
-    max_length_expr,
-    depth,
-    update_in_place,
-    location);
+  if(element_type.id() == ID_pointer)
+  {
+    // For arrays of non-primitive types, nondeterministically initialize each
+    // element of the array
+    array_loop_init_code(
+      assignments,
+      init_array_expr,
+      length_expr,
+      element_type,
+      max_length_expr,
+      depth,
+      update_in_place,
+      location);
+  }
+  else
+  {
+    // Arrays of primitive types can be initialized with a single instruction
+    array_primitive_init_code(
+      assignments,
+      init_array_expr,
+      length_expr,
+      element_type,
+      max_length_expr,
+      location);
+  }
 }
 
 /// We nondet-initialize enums to be equal to one of the constants defined
