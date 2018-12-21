@@ -195,7 +195,6 @@ SCENARIO("instantiate_not_contains",
     string_constraint_generatort generator(ns);
     const auto pair = generator.add_axioms_for_function_application(
       generator.fresh_symbol, func);
-    const exprt &res = pair.first;
     const string_constraintst &constraints = pair.second;
 
     std::string axioms;
