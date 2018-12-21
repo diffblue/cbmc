@@ -377,8 +377,9 @@ void _check_with_strategy(
   ret = cbmc_parse_optionst::get_goto_program(gm, opts, cmdline, log, mh);
   REQUIRE(ret == -1);
 
-  solver_factoryt solvers(opts, gm.get_symbol_table(), mh, false);
-  std::unique_ptr<solver_factoryt::solvert> cbmc_solver = solvers.get_solver();
+  solver_factoryt initial_solvers(opts, gm.get_symbol_table(), mh, false);
+  std::unique_ptr<solver_factoryt::solvert> cbmc_solver =
+    initial_solvers.get_solver();
   prop_convt &initial_pc = cbmc_solver->prop_conv();
   std::function<bool(void)> callback = []() { return false; };
 
