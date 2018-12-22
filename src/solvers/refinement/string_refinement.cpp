@@ -1622,7 +1622,7 @@ static void update_index_set(
 /// An expression representing an array of characters can be in the form of an
 /// if expression for instance `cond?array1:(cond2:array2:array3)`.
 /// We return all the array expressions contained in `array_expr`.
-/// \param array_expr : an expression representing an array
+/// \param array_expr: an expression representing an array
 /// \param accu: a vector to which symbols and constant arrays contained in the
 ///   expression will be appended
 static void get_sub_arrays(const exprt &array_expr, std::vector<exprt> &accu)
