@@ -135,7 +135,6 @@ code_ifthenelset java_bytecode_instrumentt::throw_exception(
   return if_code;
 }
 
-
 /// Checks whether there is a division by zero
 /// and throws ArithmeticException if necessary.
 /// Exceptions are thrown when the `throw_runtime_exceptions`

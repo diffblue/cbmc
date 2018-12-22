@@ -693,7 +693,6 @@ code_ifthenelset get_clinit_wrapper_body(
   return code_ifthenelset(std::move(check_already_run), std::move(init_body));
 }
 
-
 /// Create static initializer wrappers for all classes that need them.
 /// \param symbol_table: global symbol table
 /// \param synthetic_methods: synthetic methods map. Will be extended noting

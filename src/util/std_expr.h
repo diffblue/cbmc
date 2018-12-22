@@ -829,7 +829,6 @@ template<> inline bool can_cast_expr<binary_exprt>(const exprt &base)
   return base.operands().size()==2;
 }
 
-
 /// \brief A base class for expressions that are predicates,
 ///   i.e., Boolean-typed, and that take exactly two arguments.
 class binary_predicate_exprt:public binary_exprt
@@ -3506,7 +3505,6 @@ inline void validate_expr(const if_exprt &value)
 {
   validate_operands(value, 3, "If-then-else must have three operands");
 }
-
 
 /// \brief Operator to update elements in structs and arrays
 /// \remark This expression will eventually be replaced by separate

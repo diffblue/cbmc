@@ -991,7 +991,6 @@ void bv_utilst::equal_const_register(const bvt &var)
   return;
 }
 
-
 /// The obvious recursive comparison, the interesting thing is that it is cached
 /// so the literals are shared between constants.
 /// \param Bit:vectors for a variable and a const to compare, note that

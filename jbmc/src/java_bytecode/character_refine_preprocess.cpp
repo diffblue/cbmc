@@ -125,7 +125,6 @@ codet character_refine_preprocesst::convert_compare(conversion_inputt &target)
   return code_assignt(result, expr);
 }
 
-
 /// Converts function call to an assignment of an expression corresponding to
 /// the java method Character.digit:(CI)I. The function call has one character
 /// argument and an optional integer radix argument. If the radix is not given
