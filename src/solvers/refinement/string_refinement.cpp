@@ -53,9 +53,9 @@ static optionalt<exprt> find_counter_example(
 ///   * we give lemma `b` to a fresh solver;
 ///   * if no counter-example to `b` is found, this means the constraint `a`
 ///     is satisfied by the valuation given by get.
-/// \return `true` if the current model satisfies all the axioms,
-///         `false` otherwise with a list of lemmas which are obtained by
-///         instantiating constraints at indexes given by counter-examples.
+/// \return `true` if the current model satisfies all the axioms, `false`
+///   otherwise with a list of lemmas which are obtained by instantiating
+///   constraints at indexes given by counter-examples.
 static std::pair<bool, std::vector<exprt>> check_axioms(
   const string_axiomst &axioms,
   string_constraint_generatort &generator,
@@ -308,7 +308,7 @@ void string_refinementt::set_to(const exprt &expr, bool value)
 /// \param ns: namespace
 /// \param stream: output stream
 /// \return union_find_replacet where char pointer that have been set equal
-///         by an equation are associated to the same element
+///   by an equation are associated to the same element
 static void add_equations_for_symbol_resolution(
   union_find_replacet &symbol_solver,
   const std::vector<equal_exprt> &equations,
@@ -845,7 +845,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
 /// Add the given lemma to the solver.
 /// \param lemma: a Boolean expression
 /// \param simplify_lemma: whether the lemma should be simplified before being
-///        given to the underlying solver.
+///   given to the underlying solver.
 void string_refinementt::add_lemma(
   const exprt &lemma,
   const bool simplify_lemma)
@@ -892,7 +892,7 @@ void string_refinementt::add_lemma(
 /// Get a model of an array and put it in a certain form.
 /// If the model is incomplete or if it is too big, return no value.
 /// \param super_get: function returning the valuation of an expression
-///        in a model
+///   in a model
 /// \param ns: namespace
 /// \param stream: output stream for warning messages
 /// \param arr: expression of type array representing a string
@@ -1162,9 +1162,9 @@ static void substitute_array_access_in_place(
 /// something like: `index <= 0 ? 24 : index <= 2 ? 42 : 12`
 /// \param expr: an expression containing array accesses
 /// \param symbol_generator: function which given a prefix and a type generates
-///        a fresh symbol of the given type
+///   a fresh symbol of the given type
 /// \param left_propagate: should values be propagated to the left in with
-///        expressions
+///   expressions
 /// \return an expression containing no array access
 exprt substitute_array_access(
   exprt expr,

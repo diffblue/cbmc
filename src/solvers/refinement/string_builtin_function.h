@@ -431,7 +431,7 @@ public:
 /// Functions that are not yet supported in this class but are supported by
 /// string_constraint_generatort.
 /// \note Ultimately this should be disappear, once all builtin function have
-///       a corresponding string_builtin_functiont class.
+///   a corresponding string_builtin_functiont class.
 class string_builtin_function_with_no_evalt : public string_builtin_functiont
 {
 public:

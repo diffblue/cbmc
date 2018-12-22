@@ -247,8 +247,8 @@ void merge(string_constraintst &result, string_constraintst other)
 /// \param start: index of the first character to constrain
 /// \param end: index at which we stop adding constraints
 /// \param char_set: a string of the form "<low_char>-<high_char>" where
-///        `<low_char>` and `<high_char>` are two characters, which represents
-///        the set of characters that are between `low_char` and `high_char`.
+///   `<low_char>` and `<high_char>` are two characters, which represents the
+///   set of characters that are between `low_char` and `high_char`.
 /// \return a string expression that is linked to the argument through axioms
 ///   that are added to the list
 string_constraintst add_constraint_on_characters(
@@ -283,8 +283,8 @@ string_constraintst add_constraint_on_characters(
 /// `char_set` if \f$low_char \le c \le high_char\f$.
 /// \param fresh_symbol: generator of fresh symbols
 /// \param f: a function application with arguments: integer `|s|`, character
-///           pointer `&s[0]`, string `char_set_string`,
-///           optional integers `start` and `end`
+///   pointer `&s[0]`, string `char_set_string`, optional integers `start` and
+///   `end`
 /// \param array_pool: pool of arrays representing strings
 /// \return integer expression whose value is zero
 std::pair<exprt, string_constraintst> add_axioms_for_constrain_characters(

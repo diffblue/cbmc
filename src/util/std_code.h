@@ -606,7 +606,7 @@ inline void validate_expr(const code_assertt &x)
 ///   conventionally this should have `comment` and `property_class` fields set
 ///   to indicate the nature of the assertion.
 /// \return A code block that asserts a condition then aborts if it does not
-///    hold.
+///   hold.
 code_blockt create_fatal_assertion(
   const exprt &condition, const source_locationt &source_location);
 

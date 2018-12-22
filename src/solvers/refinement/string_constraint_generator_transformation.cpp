@@ -31,7 +31,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 /// \todo We can reduce the number of constraints by merging 2 and 3.
 /// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with arguments integer `|res|`, character
-///           pointer `&res[0]`, refined_string `s1`, integer `k`
+///   pointer `&res[0]`, refined_string `s1`, integer `k`
 /// \param array_pool: pool of arrays representing strings
 /// \return integer expression equal to `0`
 std::pair<exprt, string_constraintst> add_axioms_for_set_length(
@@ -86,11 +86,11 @@ std::pair<exprt, string_constraintst> add_axioms_for_set_length(
 ///   tan the end index.
 /// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with arguments integer `|res|`, character
-///           pointer `&res[0]`, refined_string `str`, integer `start`,
-///           optional integer `end` with default value `|str|`.
+///   pointer `&res[0]`, refined_string `str`, integer `start`, optional integer
+///   `end` with default value `|str|`.
 /// \param array_pool: pool of arrays representing strings
 /// \return integer expression which is different from 0 when there is an
-///         exception to signal
+///   exception to signal
 std::pair<exprt, string_constraintst> add_axioms_for_substring(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
@@ -176,10 +176,10 @@ std::pair<exprt, string_constraintst> add_axioms_for_substring(
 /// \note Some of the constraints among 1, 2, 3, 4 and 5 seems to be redundant
 /// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with arguments integer `|res|`, character
-///           pointer `&res[0]`, refined_string `str`.
+///   pointer `&res[0]`, refined_string `str`.
 /// \param array_pool: pool of arrays representing strings
 /// \return integer expression which is different from 0 when there is an
-///         exception to signal
+///   exception to signal
 std::pair<exprt, string_constraintst> add_axioms_for_trim(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
@@ -290,8 +290,8 @@ static optionalt<std::pair<exprt, exprt>> to_char_pair(
 /// be fixed in the future)
 /// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with arguments integer `|res|`, character
-///           pointer `&res[0]`, refined_string `str`, character `old_char` and
-///           character `new_char`
+///   pointer `&res[0]`, refined_string `str`, character `old_char` and
+///   character `new_char`
 /// \param array_pool: pool of arrays representing strings
 /// \return an integer expression equal to 0
 std::pair<exprt, string_constraintst> add_axioms_for_replace(
@@ -404,8 +404,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_delete(
 ///   (More...) \endlink
 /// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with arguments integer `|res|`, character
-///           pointer `&res[0]`, refined_string `str`, integer `start`
-///           and integer `end`
+///   pointer `&res[0]`, refined_string `str`, integer `start` and integer `end`
 /// \param array_pool: pool of arrays representing strings
 /// \return an integer expression whose value is different from 0 to signal
 ///   an exception

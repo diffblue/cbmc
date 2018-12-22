@@ -139,7 +139,7 @@ void generic_parameter_specialization_map_keyst::insert_pairs_for_pointer(
 /// \param struct_tag_type: symbol type to get the specialized generic types
 ///   from
 /// \param symbol_struct: struct type of the symbol type, must be generic if
-/// the symbol is generic
+///   the symbol is generic
 void generic_parameter_specialization_map_keyst::insert_pairs_for_symbol(
   const struct_tag_typet &struct_tag_type,
   const typet &symbol_struct)

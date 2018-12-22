@@ -108,9 +108,9 @@ auto expr_try_dynamic_cast(TExpr &base)
 }
 
 /// \brief Try to cast a reference to a generic typet to a specific derived
-///    class
+///   class
 /// \tparam T: The reference or const reference type to \a TUnderlying to cast
-///    to
+///   to
 /// \tparam TType: The original type to cast from, either typet or const typet
 /// \param base: Reference to a generic \ref typet
 /// \return Ptr to object of type \a TUnderlying

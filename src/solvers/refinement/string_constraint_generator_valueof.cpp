@@ -286,9 +286,9 @@ std::pair<exprt, string_constraintst> add_axioms_from_int_hex(
 /// \copybrief add_axioms_from_char(const array_string_exprt &res, const exprt &c)
 // NOLINTNEXTLINE
 /// \link add_axioms_from_char(const array_string_exprt &res, const exprt &c)
-///    (More...) \endlink
+///   (More...) \endlink
 /// \param f: function application with arguments integer `|res|`, character
-///           pointer `&res[0]` and character `c`
+///   pointer `&res[0]` and character `c`
 /// \param array_pool: pool of arrays representing strings
 /// \return code 0 on success
 std::pair<exprt, string_constraintst> add_axioms_from_char(
@@ -408,7 +408,7 @@ string_constraintst add_axioms_for_correct_number_format(
 /// \param input_int: the integer represented by str
 /// \param type: the type for input_int
 /// \param strict_formatting: if true, don't allow a leading plus, redundant
-///                           zeros or upper case letters
+///   zeros or upper case letters
 /// \param str: input string
 /// \param max_string_length: the maximum length str can have
 /// \param radix: the radix, with the same type as input_int
@@ -502,7 +502,7 @@ string_constraintst add_axioms_for_characters_in_integer_string(
 /// to the value represented by `str`
 /// \param fresh_symbol: generator of fresh symbols
 /// \param f: a function application with arguments refined_string `str` and
-///          an optional integer for the radix
+///   an optional integer for the radix
 /// \param array_pool: pool of arrays representing strings
 /// \param ns: namespace
 /// \return integer expression equal to the value represented by `str`

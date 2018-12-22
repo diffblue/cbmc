@@ -19,11 +19,10 @@ Date: May 2018
 #include <string>
 
 /// \brief Merges a goto binary into an object file (e.g. ELF)
-/// \param compiler_or_linker: The name of the gcc or ld executable,
-///        used to deduce the name of objcopy
+/// \param compiler_or_linker: The name of the gcc or ld executable, used to
+///   deduce the name of objcopy
 /// \param goto_binary_file: The file name of the goto binary
-/// \param output_file: The name of the object file; the result is
-///        stored here.
+/// \param output_file: The name of the object file; the result is stored here.
 int hybrid_binary(
   const std::string &compiler_or_linker,
   const std::string &goto_binary_file,

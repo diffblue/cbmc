@@ -36,12 +36,12 @@ Author: Georg Weissenbacher, georg@weissenbacher.name
 /// their head - the target of the backwards goto jump.
 ///
 /// \tparam P: the program representation and needs:
-///     [field] instruction which is an iterable of type T.
-/// \tparam T: iterator of the particular node type, ex: std::list<...>::iterator.
-///     The object this iterator holds needs:
-///         [function] is_backwards_goto() returning a bool.
-///         [function] get_target() which returns an object that needs:
-///             [field] location_number which returns an unsigned int.
+///   * [field] instruction which is an iterable of type T.
+/// \tparam T: iterator of the particular node type, e.g.
+///   std::list<...>::iterator. The object this iterator holds needs:
+///   * [function] is_backwards_goto() returning a bool.
+///   * [function] get_target() which returns an object that needs:
+///     * [field] location_number which is an unsigned int.
 template<class P, class T>
 class natural_loops_templatet
 {

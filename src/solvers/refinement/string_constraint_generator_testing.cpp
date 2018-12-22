@@ -90,10 +90,10 @@ std::pair<exprt, string_constraintst> add_axioms_for_is_prefix(
 /// \todo Get rid of the boolean flag.
 /// \param fresh_symbol: generator of fresh symbols
 /// \param f: a function application with arguments refined_string `s0`,
-///           refined string `s1` and optional integer argument `offset`
-///           whose default value is 0
+///   refined string `s1` and optional integer argument `offset`whose default
+///   value is 0
 /// \param swap_arguments: a Boolean telling whether the prefix is the second
-///        argument or the first argument
+///   argument or the first argument
 /// \param array_pool: pool of arrays representing strings
 /// \return boolean expression `isprefix`
 std::pair<exprt, string_constraintst> add_axioms_for_is_prefix(
@@ -159,9 +159,9 @@ std::pair<exprt, string_constraintst> add_axioms_for_is_empty(
 /// \todo The primitive should be renamed `ends_with`.
 /// \param fresh_symbol: generator of fresh symbols
 /// \param f: a function application with arguments refined_string `s0`
-///           and refined_string  `s1`
+///   and refined_string  `s1`
 /// \param swap_arguments: boolean flag telling whether the suffix is the second
-///        argument or the first argument
+///   argument or the first argument
 /// \param array_pool: pool of arrays representing strings
 /// \return Boolean expression `issuffix`
 DEPRECATED("should use `strings_startwith(s0, s1, s1.length - s0.length)`")

@@ -92,7 +92,7 @@ void java_bytecode_parse_treet::annotationt::element_value_pairt::output(
 /// \param annotation_type_name: An irep_idt representing the name of the
 ///   annotation class, e.g. java::java.lang.SuppressWarnings
 /// \return The first annotation with the given name in annotations if one
-///    exists, an empty optionalt otherwise.
+///   exists, an empty optionalt otherwise.
 optionalt<java_bytecode_parse_treet::annotationt>
 java_bytecode_parse_treet::find_annotation(
   const annotationst &annotations,

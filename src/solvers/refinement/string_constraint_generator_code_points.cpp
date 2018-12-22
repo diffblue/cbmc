@@ -186,7 +186,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_code_point_before(
 /// String.codePointCount java function
 /// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with three arguments string `str`, integer
-///           `begin` and integer `end`.
+///   `begin` and integer `end`.
 /// \param array_pool: pool of arrays representing strings
 /// \return an integer expression
 std::pair<exprt, string_constraintst> add_axioms_for_code_point_count(

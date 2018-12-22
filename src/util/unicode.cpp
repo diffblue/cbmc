@@ -254,7 +254,7 @@ std::wstring utf8_to_utf16_native_endian(const std::string &in)
 
 /// \param ch: UTF-16 character in architecture-native endianness encoding
 /// \param result: stream to receive string in US-ASCII format, with \\uxxxx
-///                escapes for other characters
+///   escapes for other characters
 /// \param loc: locale to check for printable characters
 static void utf16_native_endian_to_java(
   const wchar_t ch,

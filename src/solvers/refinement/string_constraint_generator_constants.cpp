@@ -57,7 +57,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_constant(
 
 /// Add axioms to say that the returned string expression is empty
 /// \param f: function application with arguments integer `length` and character
-///           pointer `ptr`.
+///   pointer `ptr`.
 /// \return integer expression equal to zero
 std::pair<exprt, string_constraintst> add_axioms_for_empty_string(
   const function_application_exprt &f)
@@ -76,8 +76,8 @@ std::pair<exprt, string_constraintst> add_axioms_for_empty_string(
 /// \param arg: expression of type string typet
 /// \param guard: condition under which `res` should be equal to arg
 /// \return 0 if constraints were added, 1 if expression could not be handled
-///         and no constraint was added. Expression we can handle are of the
-///         form \f$ e := "<string constant>" | (expr)? e : e \f$
+///   and no constraint was added. Expression we can handle are of the form
+///   \f$ e := "<string constant>" | (expr)? e : e \f$
 std::pair<exprt, string_constraintst> add_axioms_for_cprover_string(
   symbol_generatort &fresh_symbol,
   const array_string_exprt &res,

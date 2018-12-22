@@ -39,7 +39,7 @@ void java_root_class(symbolt &class_symbol)
 /// \param [out] jlo: object to initialize
 /// \param root_type: type of the root class
 /// \param class_identifier: class identifier field, generally begins with
-///        "java::" prefix.
+///   "java::" prefix.
 void java_root_class_init(
   struct_exprt &jlo,
   const struct_typet &root_type,

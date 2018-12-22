@@ -271,7 +271,7 @@ void declare_function(
 /// \param type: return type of the function
 /// \param symbol_table: a symbol table
 /// \return a function application expression representing:
-///         `function_name(arguments)`
+///   `function_name(arguments)`
 exprt make_function_application(
   const irep_idt &function_name,
   const exprt::operandst &arguments,
@@ -304,7 +304,7 @@ irep_idt strip_java_namespace_prefix(const irep_idt &to_strip)
 /// pretty printed (java::java.lang.Integer -> Integer).
 /// \param fqn_java_type: The java type we want to pretty print.
 /// \return The pretty printed type if there was a match of the
-//  qualifiers, or the type as it was passed otherwise.
+/// qualifiers, or the type as it was passed otherwise.
 std::string pretty_print_java_type(const std::string &fqn_java_type)
 {
   std::string result(fqn_java_type);

@@ -132,7 +132,7 @@ codet character_refine_preprocesst::convert_compare(conversion_inputt &target)
 /// it is set to 36 by default.
 /// \param target: a position in a goto program
 /// \return code assigning the result of the Character.digit function to the
-///         left-hand-side of the given target
+///   left-hand-side of the given target
 codet character_refine_preprocesst::convert_digit_char(
   conversion_inputt &target)
 {

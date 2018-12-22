@@ -23,8 +23,8 @@ class cover_blocks_baset
 public:
   virtual ~cover_blocks_baset() = default;
   /// \param t: a goto instruction
-  /// \return the block number of the block
-  ///         the given goto instruction is part of
+  /// \return the block number of the block that the given goto instruction is
+  //    part of
   virtual std::size_t block_of(goto_programt::const_targett t) const = 0;
 
   /// \param block_nr: a block number

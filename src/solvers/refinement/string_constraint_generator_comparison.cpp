@@ -25,7 +25,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 ///          \lor (0 \le witness<|s_1| \land s_1[witness] \ne s_2[witness]) \f$
 /// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with arguments refined_string `s1` and
-///           refined_string `s2`
+///   refined_string `s2`
 /// \param pool: pool of arrays representing strings
 /// \return Boolean expression `eq`
 std::pair<exprt, string_constraintst> add_axioms_for_equals(
@@ -126,7 +126,7 @@ static exprt character_equals_ignore_case(
 ///          \land\lnot {\tt equal\_ignore\_case}(s_1[witness],s_2[witness]) \f$
 /// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with arguments refined_string `s1` and
-///           refined_string `s2`
+///   refined_string `s2`
 /// \param pool: pool of arrays representing strings
 /// \return Boolean expression `eq`
 std::pair<exprt, string_constraintst> add_axioms_for_equals_ignore_case(
@@ -234,8 +234,8 @@ string_constraint_generatort::add_axioms_for_hash_code(
 ///         \land res=|s1|-|s2|) \f$
 ///   * \f$ \forall i'<x. res\ne 0 \Rightarrow s1[i]=s2[i] \f$
 /// \param fresh_symbol: generator of fresh symbols
-/// \param f: function application with arguments refined_string `s1`
-///           and refined_string `s2`
+/// \param f: function application with arguments refined_string `s1` and
+///   refined_string `s2`
 /// \param pool: pool of arrays representing strings
 /// \return integer expression `res`
 std::pair<exprt, string_constraintst> add_axioms_for_compare_to(

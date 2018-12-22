@@ -330,8 +330,7 @@ public:
 };
 
 /// Create the type that actually generates the functions.
-/// \see generate_function_bodies for the syntax of the options
-///                               parameter
+/// \see generate_function_bodies for the syntax of the options parameter
 std::unique_ptr<generate_function_bodiest> generate_function_bodies_factory(
   const std::string &options,
   const symbol_tablet &symbol_table,
