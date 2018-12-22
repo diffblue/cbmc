@@ -677,7 +677,7 @@ std::vector<typename N::node_indext> grapht<N>::depth_limited_search(
 }
 
 /// Run recursive depth-limited search on the graph, starting
-// from multiple source nodes, to find the nodes reachable within n steps
+/// from multiple source nodes, to find the nodes reachable within n steps
 /// \param src: The nodes to start the search from.
 /// \param limit: limit on steps
 /// \param visited: vector of booleans indicating whether a node has been

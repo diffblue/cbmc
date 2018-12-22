@@ -158,8 +158,8 @@ bool is_java_array_type(const typet &type)
 }
 
 /// Checks whether the given type is a multi-dimensional array pointer type,
-// i.e., a pointer to an array type with element type also being a pointer to an
-/// array type.
+/// i.e., a pointer to an array type with element type also being a pointer to
+/// an array type.
 bool is_multidim_java_array_type(const typet &type)
 {
   return is_java_array_type(type) && is_java_array_type(java_array_element_type(

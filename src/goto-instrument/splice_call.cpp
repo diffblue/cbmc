@@ -11,7 +11,7 @@ Date: July 2017
 
 /// \file
 /// Prepend a nullary call to another function
-// useful for context/ environment setting in arbitrary nodes
+/// useful for context/ environment setting in arbitrary nodes
 
 #include "splice_call.h"
 

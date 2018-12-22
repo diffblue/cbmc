@@ -12,7 +12,7 @@ Author: Diffblue Ltd.
 #include <util/symbol_table.h>
 
 /// Runs a solver instance to verify whether an expression can only be
-//  non-negative.
+/// non-negative.
 /// \param expr: the expression to check for negativity
 /// \return true if `expr < 0` is unsatisfiable, false otherwise
 static bool cannot_be_neg(const exprt &expr)

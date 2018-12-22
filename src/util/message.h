@@ -137,7 +137,7 @@ protected:
 /// Common practice is to inherit from the \ref messaget class, to provide
 /// local infrastructure for messaging, by calling one of the utility
 /// methods, e.g. `debug()`, `warning()` etc. - which return a reference to a
-// new instance of `mstreamt` set with the appropriate level.
+/// new instance of `mstreamt` set with the appropriate level.
 /// Individual messages are stored in \ref mstreamt - an `ostringstream`
 /// subtype. \ref eomt is used to flush the internal string of \ref mstreamt.
 /// A static member `eom`, of \ref eomt type is provided.
