@@ -75,7 +75,7 @@ remove_virtual_functionst::remove_virtual_functionst(
 /// Replace specified virtual function call with a static call to its
 /// most derived implementation
 /// \param [in,out] goto_program: GOTO program to modify
-/// \param target iterator: to a function in the supplied GOTO program
+/// \param target: iterator to a function in the supplied GOTO program
 /// to replace. Must point to a virtual function call.
 /// \return Returns a pointer to the statement in the supplied GOTO
 /// program after replaced function call

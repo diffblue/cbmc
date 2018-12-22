@@ -587,7 +587,7 @@ exprt maximum(const exprt &a, const exprt &b)
 }
 
 /// Returns a non-negative version of the argument.
-/// \param  expr: expression of which we want a non-negative version
+/// \param expr: expression of which we want a non-negative version
 /// \return `max(0, expr)`
 exprt zero_if_negative(const exprt &expr)
 {

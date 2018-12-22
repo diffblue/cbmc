@@ -458,7 +458,7 @@ protected:
   /// recursive lookups for dereference operations etc.
   /// \param expr: query expression
   /// \param [out] dest: overwritten by the set of object numbers pointed to
-  /// \param ns; global namespace
+  /// \param ns: global namespace
   /// \param is_simplified: if false, simplify `expr` before reading.
   void get_value_set(
     const exprt &expr,
