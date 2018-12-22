@@ -495,7 +495,7 @@ symbol_exprt java_string_library_preprocesst::fresh_string(
 /// fresh symbols.
 /// \param loc: source location
 /// \param symbol_table: the symbol table
-/// \param code [out] : code block to which the declaration is added
+/// \param [out] code: code block to which the declaration is added
 /// \return refined string expr with fresh content and length symbols
 refined_string_exprt java_string_library_preprocesst::decl_string_expr(
   const source_locationt &loc,
@@ -631,7 +631,7 @@ codet java_string_library_preprocesst::code_return_function_application(
 /// \param symbol_table: the symbol table
 /// \param loc: source location
 /// \param function_id: name of the function containing the array
-/// \param code [out] : code block where the declaration gets added
+/// \param [out] code: code block where the declaration gets added
 /// \return created symbol expression
 exprt make_nondet_infinite_char_array(
   symbol_table_baset &symbol_table,
@@ -664,7 +664,7 @@ exprt make_nondet_infinite_char_array(
 /// \param array: a character array expression
 /// \param symbol_table: the symbol table
 /// \param loc: source location
-/// \param code [out] : code block to which declaration and calls get added
+/// \param [out] code: code block to which declaration and calls get added
 void add_pointer_to_array_association(
   const exprt &pointer,
   const exprt &array,
@@ -698,7 +698,7 @@ void add_pointer_to_array_association(
 /// \param length: integer expression
 /// \param symbol_table: the symbol table
 /// \param loc: source location
-/// \param code [out] : code block to which declaration and calls get added
+/// \param [out] code: code block to which declaration and calls get added
 void add_array_to_length_association(
   const exprt &array,
   const exprt &length,
@@ -733,7 +733,7 @@ void add_array_to_length_association(
 ///                  For instance "a-z" denotes all lower case ascii letters.
 /// \param symbol_table: the symbol table
 /// \param loc: source location
-/// \param code [out] : code block to which declaration and calls get added
+/// \param [out] code: code block to which declaration and calls get added
 void add_character_set_constraint(
   const exprt &pointer,
   const exprt &length,

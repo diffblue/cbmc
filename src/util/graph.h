@@ -819,7 +819,7 @@ void grapht<N>::tarjan(tarjant &t, node_indext v) const
 /// Lower-numbered SCCs are closer to the leaves, so in the particular case
 /// of a DAG, sorting by SCC number gives a topological sort, and for a cyclic
 /// graph the SCCs are topologically sorted but arbitrarily ordered internally.
-/// \param subgraph_nr [in, out]: should be pre-allocated with enough storage
+/// \param [in,out] subgraph_nr: should be pre-allocated with enough storage
 ///   for one entry per graph node. Will be populated with the SCC indices of
 ///   each node.
 /// \return the number of distinct SCCs.

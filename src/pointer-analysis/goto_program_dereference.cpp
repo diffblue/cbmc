@@ -20,7 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/options.h>
 
 /// \param expr: expression to check
-/// \param[out] symbol: symbol which gets assigned the value from the
+/// \param [out] symbol: symbol which gets assigned the value from the
 ///   `failed_symbol` comment
 /// \return true when `expr` is a symbol, whose type contains a `failed_symbol`
 ///   comment which exists in the namespace.
@@ -233,7 +233,7 @@ void goto_program_dereferencet::dereference_rec(
 /// Gets the value set corresponding to the current target and
 /// expression `expr`.
 /// \param expr: an expression
-/// \param[out] dest: gets the value set
+/// \param [out] dest: gets the value set
 void goto_program_dereferencet::get_value_set(
   const exprt &expr,
   value_setst::valuest &dest)

@@ -389,14 +389,14 @@ static void for_each2(
 /// Helper function for \c phi_function which merges the names of an identifier
 /// for two different states.
 /// \param goto_state: first state
-/// \param[in, out] dest_state: second state
+/// \param [in, out] dest_state: second state
 /// \param ns: namespace
 /// \param diff_guard: difference between the guards of the two states
 /// \param guard_identifier: prefix used for goto symex guards
-/// \param[out] log: logger for debug messages
+/// \param [out] log: logger for debug messages
 /// \param do_simplify: should the right-hand-side of the assignment that is
 ///   added to the target be simplified
-/// \param[out] target: equation that will receive the resulting assignment
+/// \param [out] target: equation that will receive the resulting assignment
 /// \param ssa: SSA expression to merge
 /// \param goto_count: current level 2 count in \p goto_state of
 ///   \p l1_identifier

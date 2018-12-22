@@ -457,7 +457,7 @@ protected:
   /// Reads the set of objects pointed to by `expr`, including making
   /// recursive lookups for dereference operations etc.
   /// \param expr: query expression
-  /// \param dest [out]: overwritten by the set of object numbers pointed to
+  /// \param [out] dest: overwritten by the set of object numbers pointed to
   /// \param ns; global namespace
   /// \param is_simplified: if false, simplify `expr` before reading.
   void get_value_set(

@@ -76,11 +76,11 @@ protected:
 /// Iterates through the parameters of the function type \p ftype, finds a new
 /// new name for each parameter and renames them in `ftype.parameters()` as
 /// well as in the \p symbol_table.
-/// \param[in,out] ftype:
+/// \param [in,out] ftype:
 ///   Function type whose parameters should be named.
 /// \param name_prefix:
 ///   Prefix for parameter names, typically the parent function's name.
-/// \param[in,out] symbol_table:
+/// \param [in,out] symbol_table:
 ///   Global symbol table.
 /// \return Assigns parameter names (side-effects on `ftype`) to function stub
 ///   parameters, which are initially nameless as method conversion hasn't
@@ -3142,7 +3142,7 @@ irep_idt java_bytecode_convert_methodt::get_static_field(
 /// Create temporary variables if a write instruction can have undesired side-
 /// effects.
 /// \param tmp_var_prefix: The prefix string to use for new temporary variables
-/// \param[out] block: The code block the assignment is added to if required.
+/// \param [out] block: The code block the assignment is added to if required.
 /// \param write_type: The enumeration type of the write instruction.
 /// \param identifier: The identifier of the symbol in the write instruction.
 void java_bytecode_convert_methodt::save_stack_entries(

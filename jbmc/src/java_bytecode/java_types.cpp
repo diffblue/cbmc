@@ -227,7 +227,7 @@ exprt java_bytecode_promotion(const exprt &expr)
 }
 
 /// Take a list of generic type arguments and parse them into the generic type.
-/// \param generic_type [out]: The existing generic type to add the information
+/// \param [out] generic_type: The existing generic type to add the information
 ///   to
 /// \param type_arguments: The string representing the generic type arguments
 ///   for a signature. For example `<TT;Ljava/lang/Foo;LList<LInteger;>;>`
@@ -868,7 +868,7 @@ void get_dependencies_from_generic_parameters_rec(
 /// must be loaded but only appear as generic type argument, not as a field
 /// reference.
 /// \param signature: the string representation of the signature to analyze
-/// \param refs [out]: the set to insert the names of the found dependencies
+/// \param [out] refs: the set to insert the names of the found dependencies
 void get_dependencies_from_generic_parameters(
   const std::string &signature,
   std::set<irep_idt> &refs)
@@ -904,7 +904,7 @@ void get_dependencies_from_generic_parameters(
 /// used to get information about class dependencies that must be loaded but
 /// only appear as generic type argument, not as a field reference.
 /// \param t: the type to analyze
-/// \param refs [out]: the set to insert the names of the found dependencies
+/// \param [out] refs: the set to insert the names of the found dependencies
 void get_dependencies_from_generic_parameters(
   const typet &t,
   std::set<irep_idt> &refs)

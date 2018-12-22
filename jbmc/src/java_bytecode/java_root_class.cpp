@@ -36,7 +36,7 @@ void java_root_class(symbolt &class_symbol)
 }
 
 /// Adds members for an object of the root class (usually java.lang.Object).
-/// \param jlo [out] : object to initialize
+/// \param [out] jlo: object to initialize
 /// \param root_type: type of the root class
 /// \param class_identifier: class identifier field, generally begins with
 ///        "java::" prefix.
