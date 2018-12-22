@@ -107,7 +107,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_cprover_string(
 /// \todo The name of the function should be changed to reflect what it does.
 /// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with an argument which is a string literal
-/// that is a constant with a string value.
+///   that is a constant with a string value.
 /// \param array_pool: pool of arrays representing strings
 /// \return string expression
 std::pair<exprt, string_constraintst> add_axioms_from_literal(

@@ -592,7 +592,7 @@ void get_reachable(
 /// node.
 /// \param src: The node to start the search from.
 /// \param forwards: true (false) if the forward (backward) reachability
-/// should be performed.
+///   should be performed.
 template<class N>
 std::vector<typename N::node_indext>
 grapht<N>::get_reachable(node_indext src, bool forwards) const
@@ -607,7 +607,7 @@ grapht<N>::get_reachable(node_indext src, bool forwards) const
 /// nodes.
 /// \param src: The nodes to start the search from.
 /// \param forwards: true (false) if the forward (backward) reachability
-/// should be performed.
+///   should be performed.
 template <class N>
 std::vector<typename N::node_indext> grapht<N>::get_reachable(
   const std::vector<node_indext> &src,

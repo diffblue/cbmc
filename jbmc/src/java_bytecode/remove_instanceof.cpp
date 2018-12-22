@@ -296,7 +296,7 @@ void remove_instanceof(
 /// \param class_hierarchy: class hierarchy analysis of goto_model's symbol
 ///   table
 /// \param message_handler: logging output
-/// symbols to.
+///   symbols to.
 void remove_instanceof(
   goto_modelt &goto_model,
   const class_hierarchyt &class_hierarchy,

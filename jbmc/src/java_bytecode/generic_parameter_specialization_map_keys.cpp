@@ -6,7 +6,7 @@
 
 /// \param type: Source type
 /// \return The vector of implicitly generic and (explicitly) generic type
-/// parameters of the given type.
+///   parameters of the given type.
 const std::vector<java_generic_parametert>
 get_all_generic_parameters(const typet &type)
 {
@@ -89,7 +89,7 @@ void generic_parameter_specialization_map_keyst::insert_pairs(
 /// from their stack on destruction; otherwise do nothing.
 /// \param pointer_type: pointer type to get the specialized generic types from
 /// \param pointer_subtype_struct: struct type to which the generic pointer
-/// points, must be generic if the pointer is generic
+///   points, must be generic if the pointer is generic
 void generic_parameter_specialization_map_keyst::insert_pairs_for_pointer(
   const pointer_typet &pointer_type,
   const typet &pointer_subtype_struct)

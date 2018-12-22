@@ -318,7 +318,7 @@ exprt expr_initializert<nondet>::expr_initializer_rec(
 /// \param source_location: Location to record in all created sub-expressions.
 /// \param ns: Namespace to perform type symbol/tag lookups.
 /// \return An expression if a constant expression of the input type can be
-/// built.
+///   built.
 optionalt<exprt> zero_initializer(
   const typet &type,
   const source_locationt &source_location,
@@ -338,7 +338,7 @@ optionalt<exprt> zero_initializer(
 /// \param source_location: Location to record in all created sub-expressions.
 /// \param ns: Namespace to perform type symbol/tag lookups.
 /// \return An expression if a non-deterministic expression of the input type
-/// can be built.
+///   can be built.
 optionalt<exprt> nondet_initializer(
   const typet &type,
   const source_locationt &source_location,

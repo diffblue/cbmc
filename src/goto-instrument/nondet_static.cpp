@@ -27,7 +27,7 @@ Date: November 2011
 /// \param symbol_expr: The symbol expression to analyze.
 /// \param ns: Namespace for resolving type information
 /// \return True if the symbol expression holds a static symbol which can be
-/// nondeterministically initialized, false otherwise.
+///   nondeterministically initialized, false otherwise.
 bool is_nondet_initializable_static(
   const symbol_exprt &symbol_expr,
   const namespacet &ns)

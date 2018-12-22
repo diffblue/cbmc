@@ -188,7 +188,7 @@ dereference_exprt checked_dereference(const exprt &expr, const typet &type)
 ///
 /// \param src: the source string to scan
 /// \param open_pos: the initial position of the opening delimiter from where to
-/// start the search
+///   start the search
 /// \param open_char: the opening delimiter
 /// \param close_char: the closing delimiter
 /// \returns the index of the matching corresponding closing delimiter in \p src
@@ -304,7 +304,7 @@ irep_idt strip_java_namespace_prefix(const irep_idt &to_strip)
 /// pretty printed (java::java.lang.Integer -> Integer).
 /// \param fqn_java_type: The java type we want to pretty print.
 /// \return The pretty printed type if there was a match of the
-/// qualifiers, or the type as it was passed otherwise.
+///   qualifiers, or the type as it was passed otherwise.
 std::string pretty_print_java_type(const std::string &fqn_java_type)
 {
   std::string result(fqn_java_type);

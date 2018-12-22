@@ -34,7 +34,7 @@ static std::regex build_regex_from_pattern(const std::string &pattern)
 /// is, does it have a colon separtor.
 /// \param pattern: The user provided pattern
 /// \return True if no descriptor is found (that is, the only : relates to the
-/// java:: prefix.
+///   java:: prefix.
 bool does_pattern_miss_descriptor(const std::string &pattern)
 {
   const size_t descriptor_index = pattern.rfind(':');

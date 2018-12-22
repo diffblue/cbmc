@@ -87,11 +87,11 @@ const std::vector<std::string> exception_needed_classes = {
 ///  conditional GOTO such that exc_name is thrown when
 ///  cond is met.
 /// \param cond: condition to be met in order
-/// to throw an exception
+///   to throw an exception
 /// \param original_loc: source location in the original program
 /// \param exc_name: the name of the exception to be thrown
 /// \return Returns the code initialising the throwing the
-/// exception
+///   exception
 code_ifthenelset java_bytecode_instrumentt::throw_exception(
   const exprt &cond,
   const source_locationt &original_loc,
@@ -140,8 +140,8 @@ code_ifthenelset java_bytecode_instrumentt::throw_exception(
 /// Exceptions are thrown when the `throw_runtime_exceptions`
 /// flag is set.
 /// \return Based on the value of the flag `throw_runtime_exceptions`,
-/// it returns code that either throws an ArithmeticException
-/// or asserts a nonzero denominator.
+///   it returns code that either throws an ArithmeticException
+///   or asserts a nonzero denominator.
 codet java_bytecode_instrumentt::check_arithmetic_exception(
   const exprt &denominator,
   const source_locationt &original_loc)
@@ -171,8 +171,8 @@ codet java_bytecode_instrumentt::check_arithmetic_exception(
 /// \param idx: index into the array
 /// \param original_loc: source location in the original code
 /// \return Based on the value of the flag `throw_runtime_exceptions`,
-/// it returns code that either throws an ArrayIndexOutPfBoundsException
-/// or emits an assertion checking the array access
+///   it returns code that either throws an ArrayIndexOutPfBoundsException
+///   or emits an assertion checking the array access
 codet java_bytecode_instrumentt::check_array_access(
   const exprt &array_struct,
   const exprt &idx,
@@ -214,8 +214,8 @@ codet java_bytecode_instrumentt::check_array_access(
 /// \param class2: the super class
 /// \param original_loc: source location in the original code
 /// \return Based on the value of the flag `throw_runtime_exceptions`,
-/// it returns code that either throws an ClassCastException or emits an
-/// assertion checking the subtype relation
+///   it returns code that either throws an ClassCastException or emits an
+///   assertion checking the subtype relation
 code_ifthenelset java_bytecode_instrumentt::check_class_cast(
   const exprt &class1,
   const exprt &class2,
@@ -261,8 +261,8 @@ code_ifthenelset java_bytecode_instrumentt::check_class_cast(
 /// \param expr: the checked expression
 /// \param original_loc: source location in the original code
 /// \return Based on the value of the flag `throw_runtime_exceptions`,
-/// it returns code that either throws an NullPointerException or emits an
-/// assertion checking the subtype relation
+///   it returns code that either throws an NullPointerException or emits an
+///   assertion checking the subtype relation
 codet java_bytecode_instrumentt::check_null_dereference(
   const exprt &expr,
   const source_locationt &original_loc)
@@ -290,8 +290,8 @@ codet java_bytecode_instrumentt::check_null_dereference(
 /// \param length: the checked length
 /// \param original_loc: source location in the original code
 /// \return Based on the value of the flag `throw_runtime_exceptions`,
-/// it returns code that either throws an NegativeArraySizeException
-/// or emits an assertion checking the subtype relation
+///   it returns code that either throws an NegativeArraySizeException
+///   or emits an assertion checking the subtype relation
 codet java_bytecode_instrumentt::check_array_length(
   const exprt &length,
   const source_locationt &original_loc)
@@ -462,8 +462,7 @@ void java_bytecode_instrumentt::instrument_code(codet &code)
 
 /// Computes the instrumentation for \p expr in the form of
 /// either assertions or runtime exceptions.
-/// \param expr: the expression for which we compute
-/// instrumentation
+/// \param expr: the expression for which we compute instrumentation
 /// \return: The instrumentation for \p expr if required
 optionalt<codet> java_bytecode_instrumentt::instrument_expr(const exprt &expr)
 {

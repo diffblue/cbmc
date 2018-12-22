@@ -1528,8 +1528,8 @@ void java_object_factoryt::gen_nondet_enum_init(
 /// The only new one is \p type, which is the type of the object to create.
 ///
 /// \return The object created, the \p symbol_table gains any new symbols
-/// created, and \p init_code gains any instructions requried to initialize
-/// either the returned value or its child objects
+///   created, and \p init_code gains any instructions required to initialize
+///   either the returned value or its child objects
 exprt object_factory(
   const typet &type,
   const irep_idt base_name,

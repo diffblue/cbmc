@@ -178,7 +178,7 @@ private:
 /// - returned superclass reference: B<TT;Ljava/lang/Integer;>;
 /// \param signature: Signature of the class
 /// \return Reference of the generic superclass, or empty if the superclass
-/// is not generic
+///   is not generic
 static optionalt<std::string>
 extract_generic_superclass_reference(const optionalt<std::string> &signature)
 {
@@ -218,7 +218,7 @@ extract_generic_superclass_reference(const optionalt<std::string> &signature)
 /// \param signature: Signature of the class
 /// \param interface_name: The interface name
 /// \return Reference of the generic interface, or empty if the interface
-/// is not generic
+///   is not generic
 static optionalt<std::string> extract_generic_interface_reference(
   const optionalt<std::string> &signature,
   const std::string &interface_name)

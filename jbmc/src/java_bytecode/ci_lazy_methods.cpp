@@ -498,7 +498,7 @@ void ci_lazy_methodst::get_virtual_method_targets(
 /// \param e: expression tree to search
 /// \param symbol_table: global symbol table
 /// \param [out] needed: Populated with global variable symbols referenced from
-/// `e` or its children.
+///   `e` or its children.
 void ci_lazy_methodst::gather_needed_globals(
   const exprt &e,
   const symbol_tablet &symbol_table,

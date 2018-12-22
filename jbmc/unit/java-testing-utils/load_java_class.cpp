@@ -83,7 +83,7 @@ symbol_tablet load_java_class(
 /// \param command_line: The command line used to configure the provided
 ///   language
 /// \return The goto model containing both the functions and the symbol table
-/// from loading this class.
+///   from loading this class.
 goto_modelt load_goto_model_from_java_class(
   const std::string &java_class_name,
   const std::string &class_path,

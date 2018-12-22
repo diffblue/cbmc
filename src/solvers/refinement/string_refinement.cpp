@@ -1055,7 +1055,7 @@ void debug_model(
 ///   array valuations coming from the underlying solver are given.
 /// \param index: An index with which to build the equality condition
 /// \param left_propagate: If set to true, the expression will look like
-/// `index<=0 ? 24 : index<=2 ? 42 : 12`
+///   `index<=0 ? 24 : index<=2 ? 42 : 12`
 /// \return An expression containing no 'with' expression
 static exprt substitute_array_access(
   const with_exprt &expr,
@@ -1519,7 +1519,7 @@ exprt simplify_sum(const exprt &f)
 /// \param qvar: a symbol representing a universally quantified variable
 /// \param val: an expression
 /// \param f: an expression containing `+` and `-`
-/// operations in which `qvar` should appear exactly once.
+///   operations in which `qvar` should appear exactly once.
 /// \return an expression corresponding of $f^{-1}(val)$ where $f$ is seen as
 ///   a function of $qvar$, i.e. the value that is necessary for `qvar` for `f`
 ///   to be equal to `val`. For instance, if `f` corresponds to the expression
@@ -2040,7 +2040,7 @@ exprt string_refinementt::get(const exprt &expr) const
 /// \param [in] axiom: the axiom to be checked
 /// \param [in] var: the variable whose evaluation will be stored in witness
 /// \return: the witness of the satisfying assignment if one
-/// exists. If UNSAT, then behaviour is undefined.
+///   exists. If UNSAT, then behaviour is undefined.
 static optionalt<exprt> find_counter_example(
   const namespacet &ns,
   const exprt &axiom,

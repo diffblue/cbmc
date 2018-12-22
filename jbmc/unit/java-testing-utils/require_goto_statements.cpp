@@ -60,7 +60,7 @@ require_goto_statements::require_entry_point_statements(
 /// \param superclass_name: The name of the superclass (if given)
 /// \param component_name: The name of the component of the superclass that
 /// \param symbol_table: A symbol table to enable type lookups
-/// should be assigned
+///   should be assigned
 /// \return: All the assignments to that component.
 require_goto_statements::pointer_assignment_locationt
 require_goto_statements::find_struct_component_assignments(
@@ -201,7 +201,7 @@ require_goto_statements::find_this_component_assignment(
 /// \param pointer_name: The name of the variable
 /// \param instructions: The instructions to look through
 /// \return: A structure that contains the null assignment if found, and a
-/// vector of all other assignments
+///   vector of all other assignments
 require_goto_statements::pointer_assignment_locationt
 require_goto_statements::find_pointer_assignments(
   const irep_idt &pointer_name,
@@ -295,7 +295,7 @@ const code_declt &require_goto_statements::require_declaration_of_name(
 /// \param component_name: The name of the field of the superclass
 /// \param component_type_name: The name of the required type of the field
 /// \param typecast_name: The name of the type to which the object is cast (if
-/// there is a typecast)
+///   there is a typecast)
 /// \param entry_point_instructions: The statements to look through
 /// \param symbol_table: A symbol table to enable type lookups
 /// \return The identifier of the variable assigned to the field

@@ -23,12 +23,12 @@ public:
   // Throws an exception if the file does not exist
   jar_filet &operator()(const std::string &jar_path);
 
-  /// Add a jar archive or retrieve from cache if already added
+  /// Add a jar archive or retrieve from cache if already added.
+  /// Note that this mocks the existence of a file which may
+  /// or may not exist since the actual data is retrieved from memory.
   /// \param buffer_name: name of the original file
   /// \param pmem: memory pointer to the contents of the file
   /// \param size: size of the memory buffer
-  /// Note that this mocks the existence of a file which may
-  /// or may not exist since  the actual data bis retrieved from memory.
   jar_filet &
   add_jar(const std::string &buffer_name, const void *pmem, size_t size);
 

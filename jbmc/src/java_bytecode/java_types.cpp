@@ -169,7 +169,7 @@ bool is_multidim_java_array_type(const typet &type)
 /// See above
 /// \param tag: Tag of a struct
 /// \return True if the given string is a Java array tag, i.e., has a prefix
-/// of java::array[
+///   of java::array[
 bool is_java_array_tag(const irep_idt& tag)
 {
   return has_prefix(id2string(tag), "java::array[");
@@ -449,8 +449,8 @@ build_class_name(const std::string &src, const std::string &class_name_prefix)
 /// \param starting_point: The string position where the opening 'L' we want to
 ///   find the closing ';' for.
 /// \return The string position corresponding to the matching ';'. For example:
-/// LA;, we would return 2. For LA<TT;>; we would return 7.
-/// See unit/java_bytecode/java_util_tests.cpp for more examples.
+///   LA;, we would return 2. For LA<TT;>; we would return 7.
+///   See unit/java_bytecode/java_util_tests.cpp for more examples.
 size_t find_closing_semi_colon_for_reference_type(
   const std::string src,
   size_t starting_point)
@@ -795,7 +795,7 @@ bool is_valid_java_array(const struct_typet &type)
 /// \param type1: First type to compare
 /// \param type2: Second type to compare
 /// \return True if the types are equal, including elemnt types if they are
-/// both arrays
+///   both arrays
 bool equal_java_types(const typet &type1, const typet &type2)
 {
   bool arrays_with_same_element_type = true;

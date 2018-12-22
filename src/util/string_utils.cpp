@@ -42,10 +42,10 @@ std::string strip_string(const std::string &s)
 /// \param delim: The character to use as the delimiter
 /// \param [out] result: The sub strings. Must be empty.
 /// \param strip: If true, strip_string will be used on each element, removing
-/// whitespace from the beginning and end of each element
+///   whitespace from the beginning and end of each element
 /// \param remove_empty: If true, all empty-string elements will be removed.
-/// This is applied after strip so whitespace only elements will be removed if
-/// both are set to true
+///   This is applied after strip so whitespace only elements will be removed if
+///   both are set to true.
 void split_string(
   const std::string &s,
   char delim,

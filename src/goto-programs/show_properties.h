@@ -47,7 +47,7 @@ void show_properties(
 /// \param goto_functions: program in which to search for
 ///   the property
 /// \return optional<source_locationt> the location of the
-/// property, if found.
+///   property, if found.
 optionalt<source_locationt> find_property(
     const irep_idt &property,
     const goto_functionst &goto_functions);

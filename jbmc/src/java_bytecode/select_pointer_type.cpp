@@ -160,7 +160,7 @@ select_pointer_typet::get_recursively_instantiated_type(
 /// \param parameter_name: The name of the generic parameter type we want to
 ///   have instantiated
 /// \param generic_parameter_specialization_map: Map of type names to
-/// specialization stack
+///   specialization stack
 /// \param visited: Tracks the visited parameter names
 /// \param depth: Stack depth to analyze
 /// \return if this type is not a generic type, it is returned as a valid

@@ -26,7 +26,7 @@ struct expected_resultst
 /// \param string: The string to split
 /// \param delimiter: The delimter to split on
 /// \param expected_results: The results expected for each of the versions of
-/// the method
+///   the method
 void run_on_all_variants(
   std::string string,
   char delimiter,

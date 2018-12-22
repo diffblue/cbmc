@@ -568,7 +568,7 @@ bool constant_propagator_domaint::partial_evaluate(
 /// \param expr: The expression to evaluate
 /// \param ns: The namespace for symbols in the expression
 /// \return If the result is the same for all rounding modes, change
-/// expr to that result and return false. Otherwise, return true.
+///   expr to that result and return false. Otherwise, return true.
 bool constant_propagator_domaint::partial_evaluate_with_all_rounding_modes(
   const valuest &known_values,
   exprt &expr,

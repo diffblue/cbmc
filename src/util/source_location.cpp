@@ -73,7 +73,7 @@ void source_locationt::merge(const source_locationt &from)
 
 /// Get a path to the file, including working directory.
 /// \return Full path unless the file name is empty or refers
-/// to a built-in, in which case {} is returned.
+///   to a built-in, in which case {} is returned.
 optionalt<std::string> source_locationt::full_path() const
 {
   const auto file = id2string(get_file());

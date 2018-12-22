@@ -346,8 +346,8 @@ void reachability_slicert::slice(goto_functionst &goto_functions)
 /// criterion given by all properties.
 /// \param goto_model: Goto program to slice
 /// \param include_forward_reachability: Determines if only instructions
-/// from which the criterion is reachable should be kept (false) or also
-/// those reachable from the criterion (true)
+///   from which the criterion is reachable should be kept (false) or also
+///   those reachable from the criterion (true)
 void reachability_slicer(
   goto_modelt &goto_model,
   const bool include_forward_reachability)
@@ -360,10 +360,10 @@ void reachability_slicer(
 /// Perform reachability slicing on goto_model for selected properties.
 /// \param goto_model: Goto program to slice
 /// \param properties: The properties relevant for the slicing (i.e. starting
-/// point for the search in the cfg)
+///   point for the search in the cfg)
 /// \param include_forward_reachability: Determines if only instructions
-/// from which the criterion is reachable should be kept (false) or also
-/// those reachable from the criterion (true)
+///   from which the criterion is reachable should be kept (false) or also
+///   those reachable from the criterion (true)
 void reachability_slicer(
   goto_modelt &goto_model,
   const std::list<std::string> &properties,
@@ -377,8 +377,8 @@ void reachability_slicer(
 /// Perform reachability slicing on goto_model for selected functions.
 /// \param goto_model: Goto program to slice
 /// \param functions_list: The functions relevant for the slicing (i.e. starting
-/// point for the search in the CFG). Anything that is reachable in the CFG
-/// starting from these functions will be kept.
+///   point for the search in the CFG). Anything that is reachable in the CFG
+///   starting from these functions will be kept.
 void function_path_reachability_slicer(
   goto_modelt &goto_model,
   const std::list<std::string> &functions_list)
@@ -410,7 +410,7 @@ void reachability_slicer(goto_modelt &goto_model)
 /// instructions from which the criterion is reachable will be kept.
 /// \param goto_model: Goto program to slice
 /// \param properties: The properties relevant for the slicing (i.e. starting
-/// point for the search in the cfg)
+///   point for the search in the cfg)
 void reachability_slicer(
   goto_modelt &goto_model,
   const std::list<std::string> &properties)

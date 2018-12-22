@@ -171,7 +171,7 @@ protected:
   /// \param function_identifier: The function in which the instructions are
   /// \param pc: first instruction to symex
   /// \param limit: final instruction, which itself will not
-  /// be symexed.
+  ///   be symexed.
   void initialize_entry_point(
     statet &state,
     const get_goto_functiont &get_goto_function,

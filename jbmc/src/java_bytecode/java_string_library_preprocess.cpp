@@ -33,7 +33,7 @@ Date:   April 2017
 #include "java_root_class.h"
 
 /// \return tag of a struct prefixed by "java::" or symbolic tag
-/// empty string if not symbol or struct
+///   empty string if not symbol or struct
 static irep_idt get_tag(const typet &type)
 {
   /// \todo Use follow instead of assuming tag to symbol relationship.

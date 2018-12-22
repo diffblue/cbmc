@@ -167,7 +167,7 @@ const std::set<array_string_exprt> &array_poolt::created_strings() const
 /// is infinite, a new integer symbol is created and stored in `array_pool`.
 /// This also adds the default axioms for `arr`.
 /// \param f: a function application with argument a character array `arr` and
-/// a character pointer `ptr`.
+///   a character pointer `ptr`.
 exprt string_constraint_generatort::associate_array_to_pointer(
   const function_application_exprt &f)
 {
@@ -188,7 +188,7 @@ exprt string_constraint_generatort::associate_array_to_pointer(
 /// Associate an integer length to a char array.
 /// This adds an axiom ensuring that `arr.length` and `length` are equal.
 /// \param f: a function application with argument a character array `arr` and
-/// a integer `length`.
+///   an integer `length`.
 /// \return integer expression equal to 0
 exprt string_constraint_generatort::associate_length_to_array(
   const function_application_exprt &f)
@@ -483,7 +483,7 @@ string_constraint_generatort::add_axioms_for_function_application(
 /// \deprecated should use substring instead
 /// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with one argument, which is a string,
-/// or three arguments: string, integer offset and count
+///   or three arguments: string, integer offset and count
 /// \param array_pool: pool of arrays representing strings
 /// \return a new string expression
 DEPRECATED("should use substring instead")
