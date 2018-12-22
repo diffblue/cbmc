@@ -70,13 +70,17 @@ Formatting is enforced using clang-format. For more information about this, see
   /// This sentence, until the first dot followed by whitespace, becomes
   /// the brief description. More detailed text follows. Feel free to
   /// break this into paragraphs to aid readability.
-  /// \param arg_name: This parameter doesn't need much description
-  /// \param [out] long_arg_name: This parameter is mutated by the function.
-  ///   Extra info about the parameter gets indented an extra two columns,
+  /// \param arg: This parameter doesn't need much description
+  /// \param long_arg: This parameter needs a long description. Extra
+  ///   information about the parameter gets indented an extra two columns,
   ///   like this.
+  /// \param [out] out_arg: This parameter is mutated by the function, and
+  ///   its value at the beginning of the function is not used
+  /// \param [in,out] in_out_arg: This parameter is mutated by the function, and
+  ///   its value at the beginning of the function is used
   /// \return The return value is literally the value returned by the
-  ///   function. For out-parameters, use "\param [out]".
-  return_typet my_function(argt arg_name, argt &long_arg_name)
+  ///   function. For out-parameters, use "\param [out]" or  "\param [in,out]".
+  ret_typet function(argt arg, argt long_arg, argt &out_arg, argt &in_out_arg)
   ```
 - The priority of documentation is readability. Therefore, feel free to use
   Doxygen features, or to add whitespace for multi-paragraph comment blocks if
