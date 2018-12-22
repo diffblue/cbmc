@@ -445,10 +445,10 @@ int jbmc_parse_optionst::doit()
   switch(ui_message_handler.get_ui())
   {
     case ui_message_handlert::uit::PLAIN:
-      conditional_output(debug(), [&options](messaget::mstreamt &mstream) {
-        mstream << "\nOptions: \n";
-        options.output(mstream);
-        mstream << messaget::eom;
+      conditional_output(debug(), [&options](messaget::mstreamt &debug_stream) {
+        debug_stream << "\nOptions: \n";
+        options.output(debug_stream);
+        debug_stream << messaget::eom;
       });
       break;
     case ui_message_handlert::uit::JSON_UI:
