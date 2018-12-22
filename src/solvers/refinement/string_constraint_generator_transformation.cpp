@@ -248,8 +248,8 @@ std::pair<exprt, string_constraintst> add_axioms_for_trim(
 /// If both expressions are characters, return pair of them
 /// If both expressions are 1-length strings, return first character of each
 /// Otherwise return empty optional
-/// \param expr1 First expression
-/// \param expr2 Second expression
+/// \param expr1: First expression
+/// \param expr2: Second expression
 /// \param get_string_expr: Function that yields an array_string_exprt
 ///   corresponding to either `expr1` or `expr2`, for the case where they are
 ///   not primitive chars.

@@ -19,14 +19,14 @@ class jar_poolt
 {
 public:
   /// Load jar archive or retrieve from cache if already loaded
-  /// \param jar_path name of the file
+  /// \param jar_path: name of the file
   // Throws an exception if the file does not exist
   jar_filet &operator()(const std::string &jar_path);
 
   /// Add a jar archive or retrieve from cache if already added
-  /// \param buffer_name name of the original file
-  /// \param pmem memory pointer to the contents of the file
-  /// \param size size of the memory buffer
+  /// \param buffer_name: name of the original file
+  /// \param pmem: memory pointer to the contents of the file
+  /// \param size: size of the memory buffer
   /// Note that this mocks the existence of a file which may
   /// or may not exist since  the actual data bis retrieved from memory.
   jar_filet &

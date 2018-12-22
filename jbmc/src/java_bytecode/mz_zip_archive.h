@@ -21,13 +21,13 @@ class mz_zip_archivet final
 {
 public:
   /// Open a zip archive
-  /// \param filename Path of the zip archive
+  /// \param filename: Path of the zip archive
   /// \throw Throws std::runtime_error if file cannot be opened
   explicit mz_zip_archivet(const std::string &filename);
 
   /// Loads a zip buffer
-  /// \param data pointer to the memory buffer
-  /// \param size size of the buffer
+  /// \param data: pointer to the memory buffer
+  /// \param size: size of the buffer
   /// \throw Throws std::runtime_error if file cannot be opened
   mz_zip_archivet(const void *data, size_t size);
 
@@ -43,11 +43,11 @@ public:
   /// Get number of files in the archive
   size_t get_num_files();
   /// Get file name of nth file in the archive
-  /// \param index id of the file in the archive
+  /// \param index: id of the file in the archive
   /// \return Name of the file in the archive
   std::string get_filename(size_t index);
   /// Get contents of nth file in the archive
-  /// \param index id of the file in the archive
+  /// \param index: id of the file in the archive
   /// \throw Throws std::runtime_error if file cannot be extracted
   /// \return Contents of the file in the archive
   std::string extract(size_t index);

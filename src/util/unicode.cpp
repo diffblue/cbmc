@@ -134,7 +134,7 @@ static void utf8_append_code(unsigned int c, std::string &result)
   }
 }
 
-/// \param s UTF-32 encoded wide string
+/// \param s: UTF-32 encoded wide string
 /// \return utf8-encoded string with the same unicode characters as the input.
 std::string
 utf32_native_endian_to_utf8(const std::basic_string<unsigned int> &s)

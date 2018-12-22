@@ -13,10 +13,10 @@ Author: Diffblue Ltd.
 /// Find in the parsed class a specific entry within the
 /// lambda_method_handle_map with a matching descriptor. Will fail if no
 /// matching lambda entry found.
-/// \param parsed_class the class to inspect
-/// \param lambda_method_ref the reference/descriptor of the lambda method
+/// \param parsed_class: the class to inspect
+/// \param lambda_method_ref: the reference/descriptor of the lambda method
 ///   to which this lambda entry points to, must be unique
-/// \param method_type the descriptor the lambda method should have
+/// \param method_type: the descriptor the lambda method should have
 /// \return
 require_parse_tree::lambda_method_handlet
 require_parse_tree::require_lambda_entry_for_descriptor(

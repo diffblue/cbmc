@@ -1230,7 +1230,7 @@ void configt::set_from_symbol_table(
 }
 
 /// Sets the number of bits used for object addresses
-/// \param symbol_table The symbol table
+/// \param symbol_table: The symbol table
 void configt::set_object_bits_from_symbol_table(
   const symbol_tablet &symbol_table)
 {

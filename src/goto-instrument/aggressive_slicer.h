@@ -56,8 +56,8 @@ public:
 
   /// \brief Adds a list of functions to the set of functions for the aggressive
   /// slicer to preserve
-  /// \param  function_list:  a list of functions in form
-  /// std::list<std::string>, as returned by get_cmdline_option.
+  /// \param function_list: a list of functions in form std::list<std::string>,
+  ///   as returned by get_cmdline_option.
   void preserve_functions(const std::list<std::string> &function_list)
   {
     for(const auto &f : function_list)
@@ -86,7 +86,7 @@ private:
   /// according to the configuration parameters set in the aggressive
   /// slicer, i.e., shortest path between two functions, or all direct paths.
   /// Inserts functions to preserve into the functions_to_keep set
-  /// \param destination_function name of destination function for slice
+  /// \param destination_function: name of destination function for slice
   void note_functions_to_keep(const irep_idt &destination_function);
 
   /// \brief Finds all functions that contain a property,

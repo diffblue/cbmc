@@ -28,9 +28,9 @@ Author:
 #include "osx_fat_reader.h"
 
 /// \brief Read a goto binary from a file, but do not update \ref config
-/// \param filename the file name of the goto binary
-/// \param dest the goto model returned
-/// \param message_handler for diagnostics
+/// \param filename: the file name of the goto binary
+/// \param dest: the goto model returned
+/// \param message_handler: for diagnostics
 /// \deprecated Use read_goto_binary(file, message_handler) instead
 /// \return true on failure, false on success
 bool read_goto_binary(
@@ -43,8 +43,8 @@ bool read_goto_binary(
 }
 
 /// \brief Read a goto binary from a file, but do not update \ref config
-/// \param filename the file name of the goto binary
-/// \param message_handler for diagnostics
+/// \param filename: the file name of the goto binary
+/// \param message_handler: for diagnostics
 /// \return goto model on success, {} on failure
 optionalt<goto_modelt>
 read_goto_binary(const std::string &filename, message_handlert &message_handler)
@@ -61,10 +61,10 @@ read_goto_binary(const std::string &filename, message_handlert &message_handler)
 }
 
 /// \brief Read a goto binary from a file, but do not update \ref config
-/// \param filename the file name of the goto binary
-/// \param symbol_table the symbol table from the goto binary
-/// \param goto_functions the goto functions from the goto binary
-/// \param message_handler for diagnostics
+/// \param filename: the file name of the goto binary
+/// \param symbol_table: the symbol table from the goto binary
+/// \param goto_functions: the goto functions from the goto binary
+/// \param message_handler: for diagnostics
 /// \return true on failure, false on success
 bool read_goto_binary(
   const std::string &filename,
@@ -227,9 +227,9 @@ bool is_goto_binary(const std::string &filename)
 }
 
 /// \brief reads an object file, and also updates config
-/// \param file_name file name of the goto binary
-/// \param dest the goto model returned
-/// \param message_handler for diagnostics
+/// \param file_name: file name of the goto binary
+/// \param dest: the goto model returned
+/// \param message_handler: for diagnostics
 /// \return true on error, false otherwise
 bool read_object_and_link(
   const std::string &file_name,

@@ -308,9 +308,9 @@ java_method_typet member_type_lazy(
 
 /// Retrieves the symbol of the lambda method associated with the given
 /// lambda method handle (bootstrap method).
-/// \param lambda_method_handles Vector of lambda method handles (bootstrap
+/// \param lambda_method_handles: Vector of lambda method handles (bootstrap
 ///   methods) of the class where the lambda is called
-/// \param index Index of the lambda method handle in the vector
+/// \param index: Index of the lambda method handle in the vector
 /// \return Symbol of the lambda method if the method handle has a known type
 optionalt<symbolt> java_bytecode_convert_methodt::get_lambda_method_symbol(
   const java_class_typet::java_lambda_method_handlest &lambda_method_handles,

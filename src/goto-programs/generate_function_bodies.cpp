@@ -446,11 +446,11 @@ std::unique_ptr<generate_function_bodiest> generate_function_bodies_factory(
 ///
 /// nondet-return: return nondet for non-void functions
 ///
-/// \param functions_regex Specifies the functions whose body should
-///                        be generated
-/// \param generate_function_body Specifies what kind of body to generate
-/// \param model The goto-model in which to generate the function bodies
-/// \param message_handler Destination for status/warning messages
+/// \param functions_regex: Specifies the functions whose body should be
+///   generated
+/// \param generate_function_body: Specifies what kind of body to generate
+/// \param model: The goto-model in which to generate the function bodies
+/// \param message_handler: Destination for status/warning messages
 void generate_function_bodies(
   const std::regex &functions_regex,
   const generate_function_bodiest &generate_function_body,

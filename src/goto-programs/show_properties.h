@@ -43,8 +43,8 @@ void show_properties(
 
 /// \brief Returns a source_locationt that corresponds
 /// to the property given by an irep_idt.
-/// \param property irep_idt that identifies property
-/// \param goto_functions  program in which to search for
+/// \param property: irep_idt that identifies property
+/// \param goto_functions:  program in which to search for
 ///   the property
 /// \return optional<source_locationt> the location of the
 /// property, if found.

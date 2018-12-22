@@ -90,7 +90,7 @@ reference_typet java_lang_object_type()
 /// Construct an array pointer type. It is a pointer to a symbol with identifier
 /// java::array[]. Its ID_element_type is set to the corresponding primitive
 /// type, or void* for arrays of references.
-/// \param subtype Character indicating the type of array
+/// \param subtype: Character indicating the type of array
 reference_typet java_array_type(const char subtype)
 {
   std::string subtype_str;
@@ -125,7 +125,7 @@ reference_typet java_array_type(const char subtype)
 }
 
 /// Return a const reference to the element type of a given java array type
-/// \param array_symbol The java array type
+/// \param array_symbol: The java array type
 const typet &java_array_element_type(const struct_tag_typet &array_symbol)
 {
   DATA_INVARIANT(
@@ -135,7 +135,7 @@ const typet &java_array_element_type(const struct_tag_typet &array_symbol)
 }
 
 /// Return a non-const reference to the element type of a given java array type
-/// \param array_symbol The java array type
+/// \param array_symbol: The java array type
 typet &java_array_element_type(struct_tag_typet &array_symbol)
 {
   DATA_INVARIANT(
@@ -167,7 +167,7 @@ bool is_multidim_java_array_type(const typet &type)
 }
 
 /// See above
-/// \param tag Tag of a struct
+/// \param tag: Tag of a struct
 /// \return True if the given string is a Java array tag, i.e., has a prefix
 /// of java::array[
 bool is_java_array_tag(const irep_idt& tag)
@@ -792,8 +792,8 @@ bool is_valid_java_array(const struct_typet &type)
 
 /// Compares the types, including checking element types if both types are
 /// arrays.
-/// \param type1 First type to compare
-/// \param type2 Second type to compare
+/// \param type1: First type to compare
+/// \param type2: Second type to compare
 /// \return True if the types are equal, including elemnt types if they are
 /// both arrays
 bool equal_java_types(const typet &type1, const typet &type2)
@@ -946,7 +946,7 @@ java_generic_struct_tag_typet::java_generic_struct_tag_typet(
 
 /// Check if this symbol has the given generic type. If yes, return its index
 /// in the vector of generic types.
-/// \param type The parameter type we are looking for.
+/// \param type: The parameter type we are looking for.
 /// \return The index of the type in the vector of generic types.
 optionalt<size_t> java_generic_struct_tag_typet::generic_type_index(
   const java_generic_parametert &type) const

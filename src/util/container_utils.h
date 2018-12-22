@@ -18,11 +18,11 @@ Author: Diffblue Ltd.
 /// `target.insert(source.begin(), source.end())` which has complexity
 /// O(n2 * log(n1 + n2)).
 ///
-/// \tparam T value type of the sets
-/// \tparam Compare comparison predicate of the sets
-/// \tparam Alloc allocator of the sets
-/// \param target first input set, will contain the result of the union
-/// \param source second input set
+/// \tparam T: value type of the sets
+/// \tparam Compare: comparison predicate of the sets
+/// \tparam Alloc: allocator of the sets
+/// \param target: first input set, will contain the result of the union
+/// \param source: second input set
 /// \return true iff `target` was changed
 template <class T, class Compare, class Alloc>
 bool util_inplace_set_union(

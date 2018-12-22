@@ -15,10 +15,10 @@ Author: Daniel Kroening, kroening@kroening.com
 /// Determine whether the instruction is semantically equivalent to a skip
 /// (no-op).  This includes a skip, but also if(false) goto ..., goto next;
 ///  next: ..., and (void)0.
-/// \param body  goto program containing the instruction
-/// \param it  instruction iterator that is tested for being a skip (or
+/// \param body: goto program containing the instruction
+/// \param it: instruction iterator that is tested for being a skip (or
 /// equivalent)
-/// \param ignore_labels  If the caller takes care of moving labels, then even
+/// \param ignore_labels: If the caller takes care of moving labels, then even
 /// skip statements carrying labels can be treated as skips (even though they
 /// may carry key information such as error labels).
 /// \return True, iff it is equivalent to a skip.
@@ -79,10 +79,10 @@ bool is_skip(
 }
 
 /// remove unnecessary skip statements
-/// \param goto_program  goto program containing the instructions to be cleaned
+/// \param goto_program:  goto program containing the instructions to be cleaned
 /// in the range [begin, end)
-/// \param begin  iterator pointing to first instruction to be considered
-/// \param end  iterator pointing beyond last instruction to be considered
+/// \param begin:  iterator pointing to first instruction to be considered
+/// \param end:  iterator pointing beyond last instruction to be considered
 void remove_skip(
   goto_programt &goto_program,
   goto_programt::targett begin,

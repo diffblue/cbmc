@@ -24,8 +24,8 @@ Date: November 2011
 #include <linking/static_lifetime_init.h>
 
 /// See the return.
-/// \param symbol_expr The symbol expression to analyze.
-/// \param ns Namespace for resolving type information
+/// \param symbol_expr: The symbol expression to analyze.
+/// \param ns: Namespace for resolving type information
 /// \return True if the symbol expression holds a static symbol which can be
 /// nondeterministically initialized, false otherwise.
 bool is_nondet_initializable_static(
@@ -65,9 +65,9 @@ bool is_nondet_initializable_static(
 /// Iterates over instructions in the specified function and replaces all values
 /// assigned to nondet-initializable static variables with nondeterministic
 /// values.
-/// \param ns Namespace for resolving type information.
-/// \param [out] goto_functions Existing goto-functions to be updated.
-/// \param fct_name Name of the goto-function to be updated.
+/// \param ns: Namespace for resolving type information.
+/// \param [out] goto_functions: Existing goto-functions to be updated.
+/// \param fct_name: Name of the goto-function to be updated.
 void nondet_static(
   const namespacet &ns,
   goto_functionst &goto_functions,
@@ -113,8 +113,8 @@ void nondet_static(
 
 /// Nondeterministically initializes global scope variables in
 /// CPROVER_initialize function.
-/// \param ns Namespace for resolving type information.
-/// \param [out] goto_functions Existing goto-functions to be updated.
+/// \param ns: Namespace for resolving type information.
+/// \param [out] goto_functions: Existing goto-functions to be updated.
 void nondet_static(
   const namespacet &ns,
   goto_functionst &goto_functions)
@@ -129,7 +129,7 @@ void nondet_static(
 /// scope variables, except for constants (such as string literals, final
 /// fields) and internal variables (such as CPROVER and symex variables,
 /// language specific internal variables).
-/// \param [out] goto_model Existing goto-model to be updated.
+/// \param [out] goto_model: Existing goto-model to be updated.
 void nondet_static(goto_modelt &goto_model)
 {
   const namespacet ns(goto_model.symbol_table);

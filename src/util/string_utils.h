@@ -41,12 +41,12 @@ std::string trim_from_last_delimiter(
   const char delim);
 
 /// Prints items to an stream, separated by a constant delimiter
-/// \tparam It An iterator type
-/// \tparam Delimiter A delimiter type which supports printing to ostreams
-/// \param os An ostream to write to
-/// \param b Iterator pointing to first item to print
-/// \param e Iterator pointing past last item to print
-/// \param delimiter Object to print between each item in the iterator range
+/// \tparam It: An iterator type
+/// \tparam Delimiter: A delimiter type which supports printing to ostreams
+/// \param os: An ostream to write to
+/// \param b: Iterator pointing to first item to print
+/// \param e: Iterator pointing past last item to print
+/// \param delimiter: Object to print between each item in the iterator range
 /// \return A reference to the ostream that was passed in
 template<typename Stream, typename It, typename Delimiter>
 Stream &join_strings(

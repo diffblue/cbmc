@@ -590,8 +590,8 @@ void get_reachable(
 
 /// Run depth-first search on the graph, starting from a single source
 /// node.
-/// \param src The node to start the search from.
-/// \param forwards true (false) if the forward (backward) reachability
+/// \param src: The node to start the search from.
+/// \param forwards: true (false) if the forward (backward) reachability
 /// should be performed.
 template<class N>
 std::vector<typename N::node_indext>
@@ -605,8 +605,8 @@ grapht<N>::get_reachable(node_indext src, bool forwards) const
 
 /// Run depth-first search on the graph, starting from multiple source
 /// nodes.
-/// \param src The nodes to start the search from.
-/// \param forwards true (false) if the forward (backward) reachability
+/// \param src: The nodes to start the search from.
+/// \param forwards: true (false) if the forward (backward) reachability
 /// should be performed.
 template <class N>
 std::vector<typename N::node_indext> grapht<N>::get_reachable(
@@ -642,8 +642,8 @@ std::vector<typename N::node_indext> grapht<N>::get_reachable(
 /// Run recursive depth-limited search on the graph, starting
 /// from multiple source nodes, to find the nodes reachable within n steps.
 /// This function initialises the search.
-/// \param src The node to start the search from.
-/// \param limit  limit on steps
+/// \param src: The node to start the search from.
+/// \param limit:  limit on steps
 /// \return a vector of reachable node indices
 template <class N>
 std::vector<typename N::node_indext> grapht<N>::depth_limited_search(
@@ -657,8 +657,8 @@ std::vector<typename N::node_indext> grapht<N>::depth_limited_search(
 /// Run recursive depth-limited search on the graph, starting
 /// from multiple source nodes, to find the nodes reachable within n steps.
 /// This function initialises the search.
-/// \param src The nodes to start the search from.
-/// \param limit  limit on steps
+/// \param src: The nodes to start the search from.
+/// \param limit:  limit on steps
 /// \return a vector of reachable node indices
 template <class N>
 std::vector<typename N::node_indext> grapht<N>::depth_limited_search(
@@ -678,9 +678,10 @@ std::vector<typename N::node_indext> grapht<N>::depth_limited_search(
 
 /// Run recursive depth-limited search on the graph, starting
 // from multiple source nodes, to find the nodes reachable within n steps
-/// \param src The nodes to start the search from.
-/// \param limit  limit on steps
-/// \param visited vector of booleans indicating whether a node has been visited
+/// \param src: The nodes to start the search from.
+/// \param limit:  limit on steps
+/// \param visited: vector of booleans indicating whether a node has been
+///   visited
 /// \return a vector of reachable node indices
 template <class N>
 std::vector<typename N::node_indext> grapht<N>::depth_limited_search(

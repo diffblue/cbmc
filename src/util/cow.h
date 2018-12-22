@@ -133,7 +133,7 @@ private:
 /// A helper class to store use-counts of copy-on-write objects.
 /// The suggested usage pattern is to have copy-on-write data types inherit
 /// from this class, and then to access them through a copy_on_writet.
-/// \tparam Num some numeric type, used to store a reference count
+/// \tparam Num: some numeric type, used to store a reference count
 template <typename Num>
 class copy_on_write_pointeet
 {

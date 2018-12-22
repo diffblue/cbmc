@@ -24,8 +24,8 @@ struct java_object_factory_parameterst final : public object_factory_parameterst
 };
 
 /// Parse the java object factory parameters from a given command line
-/// \param cmdline Command line
-/// \param [out] options The options object that will be updated
+/// \param cmdline: Command line
+/// \param [out] options: The options object that will be updated
 void parse_java_object_factory_options(
   const cmdlinet &cmdline,
   optionst &options);

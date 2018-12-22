@@ -235,7 +235,7 @@ exprt allocate_objectst::allocate_non_dynamic_object(
 
 /// Add a pointer to a symbol to the list of pointers to symbols created so far
 ///
-/// \param symbol_ptr pointer to a symbol in the symbol table
+/// \param symbol_ptr: pointer to a symbol in the symbol table
 void allocate_objectst::add_created_symbol(const symbolt *symbol_ptr)
 {
   symbols_created.push_back(symbol_ptr);
@@ -243,7 +243,7 @@ void allocate_objectst::add_created_symbol(const symbolt *symbol_ptr)
 
 /// Adds declarations for all non-static symbols created
 ///
-/// \param init_code code block to which to add the declarations
+/// \param init_code: code block to which to add the declarations
 void allocate_objectst::declare_created_symbols(code_blockt &init_code)
 {
   // Add the following code to init_code for each symbol that's been created:
@@ -261,7 +261,7 @@ void allocate_objectst::declare_created_symbols(code_blockt &init_code)
 
 /// Adds code to mark the created symbols as input
 ///
-/// \param init_code code block to which to add the generated code
+/// \param init_code: code block to which to add the generated code
 void allocate_objectst::mark_created_symbols_as_input(code_blockt &init_code)
 {
   // Add the following code to init_code for each symbol that's been created:

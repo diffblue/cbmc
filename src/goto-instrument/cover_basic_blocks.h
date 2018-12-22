@@ -22,18 +22,18 @@ class cover_blocks_baset
 {
 public:
   virtual ~cover_blocks_baset() = default;
-  /// \param t a goto instruction
+  /// \param t: a goto instruction
   /// \return the block number of the block
   ///         the given goto instruction is part of
   virtual std::size_t block_of(goto_programt::const_targett t) const = 0;
 
-  /// \param block_nr a block number
+  /// \param block_nr: a block number
   /// \return  the instruction selected for
   ///   instrumentation representative of the given block
   virtual optionalt<goto_programt::const_targett>
   instruction_of(std::size_t block_nr) const = 0;
 
-  /// \param block_nr a block number
+  /// \param block_nr: a block number
   /// \return  the source location selected for
   ///   instrumentation representative of the given block
   virtual const source_locationt &
@@ -43,8 +43,8 @@ public:
   virtual void output(std::ostream &out) const = 0;
 
   /// Output warnings about ignored blocks
-  /// \param goto_program The goto program
-  /// \param message_handler The message handler
+  /// \param goto_program: The goto program
+  /// \param message_handler: The message handler
   virtual void report_block_anomalies(
     const goto_programt &goto_program,
     message_handlert &message_handler)
@@ -60,26 +60,26 @@ class cover_basic_blockst final : public cover_blocks_baset
 public:
   explicit cover_basic_blockst(const goto_programt &_goto_program);
 
-  /// \param t a goto instruction
+  /// \param t: a goto instruction
   /// \return the block number of the block
   ///         the given goto instruction is part of
   std::size_t block_of(goto_programt::const_targett t) const override;
 
-  /// \param block_nr a block number
+  /// \param block_nr: a block number
   /// \return  the instruction selected for
   ///   instrumentation representative of the given block
   optionalt<goto_programt::const_targett>
   instruction_of(std::size_t block_nr) const override;
 
-  /// \param block_nr a block number
+  /// \param block_nr: a block number
   /// \return  the source location selected for
   ///   instrumentation representative of the given block
   const source_locationt &
   source_location_of(std::size_t block_nr) const override;
 
   /// Output warnings about ignored blocks
-  /// \param goto_program The goto program
-  /// \param message_handler The message handler
+  /// \param goto_program: The goto program
+  /// \param message_handler: The message handler
   void report_block_anomalies(
     const goto_programt &goto_program,
     message_handlert &message_handler) override;
@@ -133,16 +133,16 @@ private:
 public:
   explicit cover_basic_blocks_javat(const goto_programt &_goto_program);
 
-  /// \param t a goto instruction
+  /// \param t: a goto instruction
   /// \return block number the given goto instruction is part of
   std::size_t block_of(goto_programt::const_targett t) const override;
 
-  /// \param block_number a block number
+  /// \param block_number: a block number
   /// \return first instruction of the given block
   optionalt<goto_programt::const_targett>
   instruction_of(std::size_t block_number) const override;
 
-  /// \param block_number a block number
+  /// \param block_number: a block number
   /// \return source location corresponding to the given block
   const source_locationt &
   source_location_of(std::size_t block_number) const override;

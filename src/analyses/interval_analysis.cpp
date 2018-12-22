@@ -24,7 +24,7 @@ Author: Daniel Kroening, kroening@kroening.com
 /// conjunction.
 /// Example: interval [5,10] (for variable "x") translates into conjunction
 /// 5 <= x && x <= 10.
-/// \param interval_analysis Interval domain to be used for variable evaluation.
+/// \param interval_analysis: Interval domain to be used for variable evaluation
 /// \param [out] goto_function: Goto function to be analysed and instrumented.
 void instrument_intervals(
   const ait<interval_domaint> &interval_analysis,

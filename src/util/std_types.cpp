@@ -101,7 +101,7 @@ optionalt<struct_typet::baset> struct_typet::get_base(const irep_idt &id) const
 /// Returns true if the struct is a prefix of \a other, i.e., if this struct
 /// has n components then the component types and names of this struct must
 /// match the first n components of \a other struct.
-/// \param other Struct type to compare with.
+/// \param other: Struct type to compare with.
 bool struct_typet::is_prefix_of(const struct_typet &other) const
 {
   const componentst &ot_components=other.components();
@@ -217,8 +217,8 @@ constant_exprt unsignedbv_typet::largest_expr() const
 ///  - const int a;
 ///  - struct contains_constant_pointer {  int x; int * const p; };
 ///  - const int b[3];
-/// \param type The type we want to query constness of.
-/// \param ns The namespace, needed for resolution of symbols.
+/// \param type: The type we want to query constness of.
+/// \param ns: The namespace, needed for resolution of symbols.
 /// \return Whether passed in type is const or not.
 bool is_constant_or_has_constant_components(
   const typet &type,
