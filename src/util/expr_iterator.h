@@ -271,7 +271,7 @@ public:
   /// by the iterator.
   /// If the iterator is currently using a const root exprt then calls
   /// mutate_root to get a non-const root and copies it if it is shared
-  /// \returns A non-const reference to the element this iterator is
+  /// \return A non-const reference to the element this iterator is
   ///   currently pointing to
   exprt &mutate()
   {

@@ -488,7 +488,7 @@ size_t find_closing_semi_colon_for_reference_type(
 /// \param src: the string representation as used in the class file
 /// \param class_name_prefix: name of class to append to generic type
 ///   variables/parameters
-/// \returns internal type representation for GOTO programs
+/// \return internal type representation for GOTO programs
 typet java_type_from_string(
   const std::string &src,
   const std::string &class_name_prefix)
@@ -671,7 +671,7 @@ char java_char_from_type(const typet &type)
 ///
 /// For example for `HashMap<K, V>` a vector with two elements would be returned
 ///
-/// \returns vector of java types representing the generic type variables
+/// \return vector of java types representing the generic type variables
 std::vector<typet> java_generic_type_from_string(
   const std::string &class_name,
   const std::string &src)

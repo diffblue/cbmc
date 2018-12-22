@@ -191,7 +191,7 @@ dereference_exprt checked_dereference(const exprt &expr, const typet &type)
 ///   start the search
 /// \param open_char: the opening delimiter
 /// \param close_char: the closing delimiter
-/// \returns the index of the matching corresponding closing delimiter in \p src
+/// \return the index of the matching corresponding closing delimiter in \p src
 size_t find_closing_delimiter(
   const std::string &src,
   size_t open_pos,

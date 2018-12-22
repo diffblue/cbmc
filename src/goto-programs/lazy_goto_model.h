@@ -196,7 +196,7 @@ public:
   /// load new functions, it has let it go.
   /// Before freezing the functions all module-level passes are run
   /// \param model: The lazy_goto_modelt to freeze
-  /// \returns The frozen goto_modelt or an empty optional if freezing fails
+  /// \return The frozen goto_modelt or an empty optional if freezing fails
   static std::unique_ptr<goto_modelt> process_whole_model_and_freeze(
     lazy_goto_modelt &&model)
   {

@@ -324,7 +324,7 @@ static char nibble2hex(unsigned char nibble)
 /// construct a bit-vector representation from a functor
 /// \param width: the width of the bit-vector
 /// \param f: the functor -- the parameter is the bit index
-/// \returns new bitvector representation
+/// \return new bitvector representation
 irep_idt
 make_bvrep(const std::size_t width, const std::function<bool(std::size_t)> f)
 {
@@ -369,7 +369,7 @@ make_bvrep(const std::size_t width, const std::function<bool(std::size_t)> f)
 /// \param b: the representation of the second bit vector
 /// \param width: the width of the bit-vector
 /// \param f: the functor
-/// \returns new bitvector representation
+/// \return new bitvector representation
 irep_idt bvrep_bitwise_op(
   const irep_idt &a,
   const irep_idt &b,
@@ -386,7 +386,7 @@ irep_idt bvrep_bitwise_op(
 /// \param a: the bit-vector representation
 /// \param width: the width of the bit-vector
 /// \param f: the functor
-/// \returns new bitvector representation
+/// \return new bitvector representation
 irep_idt bvrep_bitwise_op(
   const irep_idt &a,
   const std::size_t width,

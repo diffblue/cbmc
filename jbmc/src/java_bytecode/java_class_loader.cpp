@@ -103,7 +103,7 @@ static bool is_overlay_class(const java_bytecode_parse_treet::classt &c)
 /// to find the .class file.
 /// \param class_loader_limit: Filter to decide whether to load classes
 /// \param class_name: Name of class to load
-/// \returns The list of valid implementations, including overlays
+/// \return The list of valid implementations, including overlays
 /// \remarks
 ///   Allows multiple definitions of the same class to appear on the
 ///   classpath, so long as all but the first definition are marked with the
