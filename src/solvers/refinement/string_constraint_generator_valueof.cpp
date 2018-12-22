@@ -555,7 +555,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_parse_int(
 /// radix is 10 then check if the character is in the range 0-9.
 /// \param chr: the character
 /// \param strict_formatting: if true, don't allow upper case characters
-/// \param radix_as_char:  the radix as an expression of the same type as chr
+/// \param radix_as_char: the radix as an expression of the same type as chr
 /// \param radix_ul: the radix, which should be between 2 and 36, or 0, in
 ///   which case the return value will work for any radix
 /// \return an expression for the condition
