@@ -28,13 +28,13 @@ public:
   virtual std::size_t block_of(goto_programt::const_targett t) const = 0;
 
   /// \param block_nr: a block number
-  /// \return  the instruction selected for
+  /// \return the instruction selected for
   ///   instrumentation representative of the given block
   virtual optionalt<goto_programt::const_targett>
   instruction_of(std::size_t block_nr) const = 0;
 
   /// \param block_nr: a block number
-  /// \return  the source location selected for
+  /// \return the source location selected for
   ///   instrumentation representative of the given block
   virtual const source_locationt &
   source_location_of(std::size_t block_nr) const = 0;
@@ -66,13 +66,13 @@ public:
   std::size_t block_of(goto_programt::const_targett t) const override;
 
   /// \param block_nr: a block number
-  /// \return  the instruction selected for
+  /// \return the instruction selected for
   ///   instrumentation representative of the given block
   optionalt<goto_programt::const_targett>
   instruction_of(std::size_t block_nr) const override;
 
   /// \param block_nr: a block number
-  /// \return  the source location selected for
+  /// \return the source location selected for
   ///   instrumentation representative of the given block
   const source_locationt &
   source_location_of(std::size_t block_nr) const override;
