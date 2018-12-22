@@ -1949,7 +1949,7 @@ void java_bytecode_parsert::parse_local_variable_type_table(methodt &method)
 /// Read method handle pointed to from constant pool entry at index, return type
 /// of method handle and name if lambda function is found.
 /// \param entry: the constant pool entry of the methodhandle_info structure
-/// \return: the method_handle type of the methodhandle_structure,
+/// \return the method_handle type of the methodhandle_structure,
 ///   either for a recognized bootstrap method or for a lambda function
 optionalt<java_bytecode_parsert::lambda_method_handlet>
 java_bytecode_parsert::parse_method_handle(const method_handle_infot &entry)

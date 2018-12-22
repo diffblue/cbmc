@@ -158,7 +158,7 @@ public:
   /// Lookup the key of a non-streaming JSON element.
   /// \param key: The key to be looked up inside the
   ///   attributes of the JSON object.
-  /// \return: The value that corresponds to the key
+  /// \return The value that corresponds to the key
   ///   if found, a null_json_object otherwise.
   const jsont &operator[](const std::string &key) const
   {

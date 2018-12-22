@@ -463,7 +463,7 @@ void java_bytecode_instrumentt::instrument_code(codet &code)
 /// Computes the instrumentation for \p expr in the form of
 /// either assertions or runtime exceptions.
 /// \param expr: the expression for which we compute instrumentation
-/// \return: The instrumentation for \p expr if required
+/// \return The instrumentation for \p expr if required
 optionalt<codet> java_bytecode_instrumentt::instrument_expr(const exprt &expr)
 {
   code_blockt result;

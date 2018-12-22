@@ -19,7 +19,7 @@ Author: Diffblue Ltd.
 /// Expand value of a function to include all child codets
 /// \param function_value: The value of the function (e.g. got by looking up
 ///  the function in the symbol table and getting the value)
-/// \return: All ID_code statements in the tree rooted at \p function_value
+/// \return All ID_code statements in the tree rooted at \p function_value
 std::vector<codet>
 require_goto_statements::get_all_statements(const exprt &function_value)
 {
@@ -61,7 +61,7 @@ require_goto_statements::require_entry_point_statements(
 /// \param component_name: The name of the component of the superclass that
 /// \param symbol_table: A symbol table to enable type lookups
 ///   should be assigned
-/// \return: All the assignments to that component.
+/// \return All the assignments to that component.
 require_goto_statements::pointer_assignment_locationt
 require_goto_statements::find_struct_component_assignments(
   const std::vector<codet> &statements,
@@ -200,7 +200,7 @@ require_goto_statements::find_this_component_assignment(
 /// instructions.
 /// \param pointer_name: The name of the variable
 /// \param instructions: The instructions to look through
-/// \return: A structure that contains the null assignment if found, and a
+/// \return A structure that contains the null assignment if found, and a
 ///   vector of all other assignments
 require_goto_statements::pointer_assignment_locationt
 require_goto_statements::find_pointer_assignments(

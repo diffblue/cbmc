@@ -520,7 +520,7 @@ SHARING_MAPT(std::size_t)
 /// \param begin: begin iterator
 /// \param end: end iterator
 /// \param f: function applied to the iterator to get a sharing map
-/// \return: sharing stats
+/// \return sharing stats
 SHARING_MAPT3(Iterator, , sharing_map_statst)
 ::get_sharing_stats(
   Iterator begin,
@@ -574,7 +574,7 @@ SHARING_MAPT3(Iterator, , sharing_map_statst)
 ///
 /// \param begin: begin iterator of a map
 /// \param end: end iterator of a map
-/// \return: sharing stats
+/// \return sharing stats
 SHARING_MAPT3(Iterator, , sharing_map_statst)
 ::get_sharing_stats_map(Iterator begin, Iterator end)
 {

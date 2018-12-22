@@ -39,7 +39,7 @@ public:
 
   /// Lookup a symbol in the namespace.
   /// \param name: The name of the symbol to lookup.
-  /// \return: A reference to the symbol found.
+  /// \return A reference to the symbol found.
   /// \remarks: It is a PRECONDITION that the symbol name exists
   ///   in the namespace.
   const symbolt &lookup(const irep_idt &name) const

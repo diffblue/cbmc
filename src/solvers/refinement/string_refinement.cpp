@@ -1185,7 +1185,7 @@ exprt substitute_array_access(
 /// \param constraint: the not_contains constraint to add the negation of
 /// \param univ_var: the universal variable for the negation of the axiom
 /// \param get: valuation function, the result should have been simplified
-/// \return: the negation of the axiom under the current evaluation
+/// \return the negation of the axiom under the current evaluation
 static exprt negation_of_not_contains_constraint(
   const string_not_contains_constraintt &constraint,
   const symbol_exprt &univ_var,
@@ -2039,7 +2039,7 @@ exprt string_refinementt::get(const exprt &expr) const
 /// \param ns: namespace
 /// \param [in] axiom: the axiom to be checked
 /// \param [in] var: the variable whose evaluation will be stored in witness
-/// \return: the witness of the satisfying assignment if one
+/// \return the witness of the satisfying assignment if one
 ///   exists. If UNSAT, then behaviour is undefined.
 static optionalt<exprt> find_counter_example(
   const namespacet &ns,

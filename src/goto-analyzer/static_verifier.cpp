@@ -230,7 +230,7 @@ static void static_verifier_console(
 /// \param options: the parsed user options
 /// \param message_handler: the system message handler
 /// \param out: output stream for the printing
-/// \return: false on success with the domain printed to out
+/// \return false on success with the domain printed to out
 bool static_verifier(
   const goto_modelt &goto_model,
   const ai_baset &ai,
