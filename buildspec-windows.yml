@@ -59,8 +59,6 @@ phases:
         cd ..
         cd jbmc/regression
         Remove-Item jbmc\VarLengthArrayTrace1 -Force -Recurse
-        Remove-Item jbmc\classpath1 -Force -Recurse
-        Remove-Item jbmc\jar-file3 -Force -Recurse
         cd ../..
 
       - |
