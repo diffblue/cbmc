@@ -170,7 +170,7 @@ do
   if [ $cfg != "profiling" ]
   then
     ../benchexec/bin/benchexec cbmc.xml --no-container \
-      --task $t -T 900s -M 15GB -o logs-$t/ -N $max_par -c 1
+      --task $t -T 900s -M 15GB -o logs-$t/ -N $max_par -c -1
     if [ -d logs-$t/cbmc.*.logfiles ]
     then
       cd logs-$t
@@ -234,7 +234,7 @@ do
   else
     rm -f gmon.sum gmon.out *.gmon.out.*
     ../benchexec/bin/benchexec cbmc.xml --no-container \
-      --task $t -T 600s -M 7GB -o logs-$t/ -N $max_par -c 1
+      --task $t -T 600s -M 7GB -o logs-$t/ -N $max_par -c -1
     if ls *.gmon.out.* >/dev/null 2>&1
     then
       gprof --sum ./cbmc-binary cbmc*.gmon.out.*
