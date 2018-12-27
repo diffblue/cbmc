@@ -419,11 +419,9 @@ bool goto_symex_statet::l2_thread_read_encoding(
     read_guard.add(false_exprt());
 
     a_s_r_entryt &a_s_read=read_in_atomic_section[ssa_l1];
-    for(std::list<guardt>::const_iterator it=a_s_read.second.begin();
-        it!=a_s_read.second.end();
-        ++it)
+    for(const auto &a_s_read_guard : a_s_read.second)
     {
-      guardt g=*it;
+      guardt g = a_s_read_guard; // copy
       g-=guard;
       if(g.is_true())
         // there has already been a read l1_identifier within
@@ -431,7 +429,7 @@ bool goto_symex_statet::l2_thread_read_encoding(
         // that implies the current one
         return false;
 
-      read_guard|=*it;
+      read_guard |= a_s_read_guard;
     }
 
     exprt cond=read_guard.as_expr();
@@ -672,15 +670,14 @@ void goto_symex_statet::rename(
     struct_union_typet &s_u_type=to_struct_union_type(type);
     struct_union_typet::componentst &components=s_u_type.components();
 
-    for(struct_union_typet::componentst::iterator
-        it=components.begin();
-        it!=components.end();
-        ++it)
+    for(auto &component : components)
+    {
       // be careful, or it might get cyclic
-      if(it->type().id()==ID_array)
-        rename(to_array_type(it->type()).size(), ns, level);
-      else if(it->type().id()!=ID_pointer)
-        rename(it->type(), irep_idt(), ns, level);
+      if(component.type().id() == ID_array)
+        rename(to_array_type(component.type()).size(), ns, level);
+      else if(component.type().id() != ID_pointer)
+        rename(component.type(), irep_idt(), ns, level);
+    }
   }
   else if(type.id()==ID_pointer)
   {
@@ -739,11 +736,8 @@ void goto_symex_statet::get_original_name(typet &type) const
     struct_union_typet &s_u_type=to_struct_union_type(type);
     struct_union_typet::componentst &components=s_u_type.components();
 
-    for(struct_union_typet::componentst::iterator
-        it=components.begin();
-        it!=components.end();
-        ++it)
-      get_original_name(it->type());
+    for(auto &component : components)
+      get_original_name(component.type());
   }
   else if(type.id()==ID_pointer)
   {
