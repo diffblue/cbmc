@@ -3,6 +3,7 @@ version: 0.2
 phases:
   install:
     commands:
+      - sed -i 's#/archive.ubuntu.com#/us-east-1.ec2.archive.ubuntu.com#g' /etc/apt/sources.list
       - add-apt-repository ppa:ubuntu-toolchain-r/test -y
       - apt-key adv --keyserver keyserver.ubuntu.com --recv-keys BA9EF27F
       - add-apt-repository ppa:openjdk-r/ppa -y
