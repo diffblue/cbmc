@@ -618,12 +618,63 @@ void goto_symex_statet::rename_address(
   }
 }
 
+static bool requires_renaming(const typet &type, const namespacet &ns)
+{
+  if(type.id() == ID_array)
+  {
+    const auto &array_type = to_array_type(type);
+    return requires_renaming(array_type.subtype(), ns) ||
+           !array_type.size().is_constant();
+  }
+  else if(
+    type.id() == ID_struct || type.id() == ID_union || type.id() == ID_class)
+  {
+    const struct_union_typet &s_u_type = to_struct_union_type(type);
+    const struct_union_typet::componentst &components = s_u_type.components();
+
+    for(auto &component : components)
+    {
+      // be careful, or it might get cyclic
+      if(component.type().id() != ID_pointer)
+        return requires_renaming(component.type(), ns);
+    }
+
+    return false;
+  }
+  else if(type.id() == ID_pointer)
+  {
+    return requires_renaming(to_pointer_type(type).subtype(), ns);
+  }
+  else if(type.id() == ID_symbol_type)
+  {
+    const symbolt &symbol = ns.lookup(to_symbol_type(type));
+    return requires_renaming(symbol.type, ns);
+  }
+  else if(type.id() == ID_union_tag)
+  {
+    const symbolt &symbol = ns.lookup(to_union_tag_type(type));
+    return requires_renaming(symbol.type, ns);
+  }
+  else if(type.id() == ID_struct_tag)
+  {
+    const symbolt &symbol = ns.lookup(to_struct_tag_type(type));
+    return requires_renaming(symbol.type, ns);
+  }
+
+  return false;
+}
+
 void goto_symex_statet::rename(
   typet &type,
   const irep_idt &l1_identifier,
   const namespacet &ns,
   levelt level)
 {
+  // check whether there are symbol expressions in the type; if not, there
+  // is no need to expand the struct/union tags in the type
+  if(!requires_renaming(type, ns))
+    return; // no action
+
   // rename all the symbols with their last known value
   // to the given level
 
