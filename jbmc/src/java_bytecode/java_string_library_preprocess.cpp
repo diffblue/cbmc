@@ -1254,9 +1254,9 @@ java_string_library_preprocesst::get_primitive_value_of_object(
     const auto maybe_symbol =
       symbol_table.lookup(object_type->get_identifier()))
   {
-    struct_typet struct_type=to_struct_type(maybe_symbol->type);
+    const struct_typet &struct_type = to_struct_type(maybe_symbol->type);
     // Check that the type has a value field
-    const struct_union_typet::componentt value_comp=
+    const struct_union_typet::componentt &value_comp =
       struct_type.get_component("value");
     if(!value_comp.is_nil())
     {
@@ -1454,17 +1454,16 @@ code_blockt java_string_library_preprocesst::make_string_format_code(
   // The argument can be:
   // a string, an integer, a floating point, a character, a boolean,
   // an object of which we take the hash code, or a date/time
-  struct_typet structured_type;
+  struct_typet structured_type({{"string_expr", refined_string_type},
+                                {ID_int, java_int_type()},
+                                {ID_float, java_float_type()},
+                                {ID_char, java_char_type()},
+                                {ID_boolean, java_boolean_type()},
+                                // TODO: hash_code not implemented for now
+                                {"hashcode", java_int_type()},
+                                // TODO: date_time type not implemented for now
+                                {"date_time", java_int_type()}});
   structured_type.set_tag(CPROVER_PREFIX "string_formatter_variant");
-  structured_type.components().emplace_back("string_expr", refined_string_type);
-  structured_type.components().emplace_back(ID_int, java_int_type());
-  structured_type.components().emplace_back(ID_float, java_float_type());
-  structured_type.components().emplace_back(ID_char, java_char_type());
-  structured_type.components().emplace_back(ID_boolean, java_boolean_type());
-  // TODO: hash_code not implemented for now
-  structured_type.components().emplace_back("hashcode", java_int_type());
-  // TODO: date_time type not implemented for now
-  structured_type.components().emplace_back("date_time", java_int_type());
 
   // We will process arguments so that each is converted to a `struct_exprt`
   // containing each possible type used in format specifiers.

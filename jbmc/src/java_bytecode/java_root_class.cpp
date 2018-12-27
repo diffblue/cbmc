@@ -25,10 +25,8 @@ void java_root_class(symbolt &class_symbol)
 
   {
     // the class identifier is used for stuff such as 'instanceof'
-    struct_typet::componentt component;
-    component.set_name("@class_identifier");
+    struct_typet::componentt component("@class_identifier", string_typet());
     component.set_pretty_name("@class_identifier");
-    component.type()=string_typet();
 
     // add at the beginning
     components.insert(components.begin(), component);

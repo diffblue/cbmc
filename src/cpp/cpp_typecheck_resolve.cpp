@@ -228,7 +228,7 @@ exprt cpp_typecheck_resolvet::convert_identifier(
     const struct_union_typet &struct_union_type=
       to_struct_union_type(compound_symbol.type);
 
-    const exprt component=
+    const exprt &component =
       struct_union_type.get_component(identifier.identifier);
 
     const typet &type=component.type();

@@ -47,29 +47,24 @@ SCENARIO(
   {
     // Create struct A { A *x; A *y }
 
-    struct_typet struct_A;
+    struct_typet struct_A({{"x", pointer_typet(struct_tag_typet("A"), 64)},
+                           {"y", pointer_typet(struct_tag_typet("A"), 64)}});
     struct_A.set_tag("A");
-    struct_A.components().resize(2);
+
+    auto &A_x = struct_A.components()[0];
+    auto &A_y = struct_A.components()[1];
+
+    A_x.set_base_name("x");
+    A_x.set_pretty_name("x");
+
+    A_y.set_base_name("y");
+    A_y.set_pretty_name("y");
 
     type_symbolt A_symbol(struct_A);
     A_symbol.name = "A";
     A_symbol.base_name = "A";
     A_symbol.pretty_name = "A";
 
-    auto &A_x = struct_A.components()[0];
-    auto &A_y = struct_A.components()[1];
-
-    A_x.set_name("x");
-    A_x.set_base_name("x");
-    A_x.set_pretty_name("x");
-    A_x.type() = pointer_typet(struct_tag_typet(A_symbol.name), 64);
-
-    A_y.set_name("y");
-    A_y.set_base_name("y");
-    A_y.set_pretty_name("y");
-    A_y.type() = pointer_typet(struct_tag_typet(A_symbol.name), 64);
-
-    A_symbol.type = struct_A;
     symbol_table.add(A_symbol);
 
     // Create global symbols struct A a1, a2, a3;

@@ -30,14 +30,13 @@ typet length_type()
 /// Make a struct with a pointer content and an integer length
 struct_exprt make_string_argument(std::string name)
 {
-  struct_typet type;
   const array_typet char_array(char_type(), infinity_exprt(length_type()));
-  type.components().emplace_back("length", length_type());
-  type.components().emplace_back("content", pointer_type(char_array));
+  struct_typet type(
+    {{"length", length_type()}, {"content", pointer_type(char_array)}});
 
-  const symbol_exprt length(name + "_length", length_type());
-  const symbol_exprt content(name + "_content", pointer_type(java_char_type()));
-  return struct_exprt({length, content}, type);
+  symbol_exprt length(name + "_length", length_type());
+  symbol_exprt content(name + "_content", pointer_type(java_char_type()));
+  return struct_exprt({std::move(length), std::move(content)}, std::move(type));
 }
 
 SCENARIO("dependency_graph", "[core][solvers][refinement][string_refinement]")

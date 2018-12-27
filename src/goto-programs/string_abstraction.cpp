@@ -101,23 +101,14 @@ string_abstractiont::string_abstractiont(
   ns(_symbol_table),
   temporary_counter(0)
 {
-  struct_typet s;
-
-  s.components().resize(3);
-
-  s.components()[0].set_name("is_zero");
+  struct_typet s({{"is_zero", build_type(whatt::IS_ZERO)},
+                  {"length", build_type(whatt::LENGTH)},
+                  {"size", build_type(whatt::SIZE)}});
   s.components()[0].set_pretty_name("is_zero");
-  s.components()[0].type()=build_type(whatt::IS_ZERO);
-
-  s.components()[1].set_name("length");
   s.components()[1].set_pretty_name("length");
-  s.components()[1].type()=build_type(whatt::LENGTH);
-
-  s.components()[2].set_name("size");
   s.components()[2].set_pretty_name("size");
-  s.components()[2].type()=build_type(whatt::SIZE);
 
-  string_struct=s;
+  string_struct = std::move(s);
 }
 
 typet string_abstractiont::build_type(whatt what)
