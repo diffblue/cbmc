@@ -1,4 +1,4 @@
-CORE
+KNOWNBUG
 Sync.class
 --java-threading --throw-runtime-exceptions --cp `../../../../scripts/format_classpath.sh . ../../../src/java_bytecode/library/core-models.jar`
 ^EXIT=0$
