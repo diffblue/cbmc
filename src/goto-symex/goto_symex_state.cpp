@@ -49,9 +49,7 @@ static bool check_renaming(const typet &type)
 {
   if(type.id()==ID_array)
     return check_renaming(to_array_type(type).size());
-  else if(type.id()==ID_struct ||
-          type.id()==ID_union ||
-          type.id()==ID_class)
+  else if(type.id() == ID_struct || type.id() == ID_union)
   {
     for(const auto &c : to_struct_union_type(type).components())
       if(check_renaming(c.type()))
@@ -663,9 +661,7 @@ void goto_symex_statet::rename(
     rename(array_type.subtype(), irep_idt(), ns, level);
     rename(array_type.size(), ns, level);
   }
-  else if(type.id()==ID_struct ||
-          type.id()==ID_union ||
-          type.id()==ID_class)
+  else if(type.id() == ID_struct || type.id() == ID_union)
   {
     struct_union_typet &s_u_type=to_struct_union_type(type);
     struct_union_typet::componentst &components=s_u_type.components();
@@ -729,9 +725,7 @@ void goto_symex_statet::get_original_name(typet &type) const
     get_original_name(array_type.subtype());
     get_original_name(array_type.size());
   }
-  else if(type.id()==ID_struct ||
-          type.id()==ID_union ||
-          type.id()==ID_class)
+  else if(type.id() == ID_struct || type.id() == ID_union)
   {
     struct_union_typet &s_u_type=to_struct_union_type(type);
     struct_union_typet::componentst &components=s_u_type.components();
