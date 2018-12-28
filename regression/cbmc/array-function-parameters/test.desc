@@ -12,6 +12,6 @@ test.c
 \[test.assertion.9\] line \d+ assertion Test.lists\[0\] != Test.lists\[1\]: SUCCESS
 \[test.assertion.10\] line \d+ assertion Test.lists\[1\] != Test.lists\[2\]: SUCCESS
 \[test.assertion.11\] line \d+ assertion Test.lists\[2\] != Test.lists\[3\]: SUCCESS
-\[test.array_bounds.1\] line \d+ array `Test'.lists upper bound in Test.lists\[\(signed long int\)4\]: FAILURE
+\[test.array_bounds.1\] line \d+ array `Test'.lists upper bound in Test.lists\[\(signed long( long)? int\)4\]: FAILURE
 \[test.assertion.12\] line \d+ assertion !Test.lists\[4\]: FAILURE
 --
