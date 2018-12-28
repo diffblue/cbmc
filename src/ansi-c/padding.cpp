@@ -190,6 +190,11 @@ static void add_padding_msvc(struct_typet &type, const namespacet &ns)
       const auto width = to_c_bit_field_type(it->type()).get_width();
       bit_field_bits += width;
     }
+    else if(
+      it->type().id() == ID_bool && underlying_bits == config.ansi_c.char_width)
+    {
+      ++bit_field_bits;
+    }
     else
     {
       // pad up any remaining bit field
@@ -199,6 +204,11 @@ static void add_padding_msvc(struct_typet &type, const namespacet &ns)
           underlying_bits - (bit_field_bits % underlying_bits);
         it = pad_bit_field(components, it, pad_bits);
         offset += (bit_field_bits + pad_bits) / config.ansi_c.char_width;
+        underlying_bits = bit_field_bits = 0;
+      }
+      else
+      {
+        offset += bit_field_bits / config.ansi_c.char_width;
         underlying_bits = bit_field_bits = 0;
       }
 
@@ -231,6 +241,7 @@ static void add_padding_msvc(struct_typet &type, const namespacet &ns)
       }
       else if(it->type().id() == ID_bool)
       {
+        underlying_bits = config.ansi_c.char_width;
         ++bit_field_bits;
       }
       else
@@ -252,6 +263,8 @@ static void add_padding_msvc(struct_typet &type, const namespacet &ns)
     pad_bit_field(components, components.end(), pad);
     offset += (bit_field_bits + pad) / config.ansi_c.char_width;
   }
+  else
+    offset += bit_field_bits / config.ansi_c.char_width;
 
   // alignment of the struct
   // Note that this is done even if the struct is packed.
