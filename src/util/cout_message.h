@@ -62,33 +62,4 @@ protected:
   bool use_SGR;
 };
 
-class gcc_message_handlert : public console_message_handlert
-{
-public:
-  void print(unsigned, const xmlt &) override
-  {
-  }
-
-  void print(unsigned, const jsont &) override
-  {
-  }
-
-  // aims to imitate the messages gcc prints
-  virtual void print(
-    unsigned level,
-    const std::string &message) override;
-
-  virtual void print(
-    unsigned level,
-    const std::string &message,
-    const source_locationt &location) override;
-
-private:
-  /// feed a command into a string
-  std::string string(const messaget::commandt &c) const
-  {
-    return command(c.command);
-  }
-};
-
 #endif // CPROVER_UTIL_COUT_MESSAGE_H
