@@ -4,6 +4,7 @@ SRC = armcc_cmdline.cpp \
       as_cmdline.cpp \
       as_mode.cpp \
       bcc_cmdline.cpp \
+      cl_message_handler.cpp \
       compile.cpp \
       cw_mode.cpp \
       gcc_cmdline.cpp \
