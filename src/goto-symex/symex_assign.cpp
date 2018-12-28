@@ -28,6 +28,9 @@ void goto_symext::symex_assign(
   exprt lhs=code.lhs();
   exprt rhs=code.rhs();
 
+  DATA_INVARIANT(
+    lhs.type() == rhs.type(), "assignments must be type consistent");
+
   clean_expr(lhs, state, true);
   clean_expr(rhs, state, false);
 
