@@ -3,7 +3,6 @@
 cd regression/cbmc
 rm Anonymous_Struct3/test.desc
 rm Array_operations1/test.desc
-rm Bitfields1/test.desc
 rm Bitfields3/test.desc
 rm Empty_struct1/test.desc
 rm Endianness4/test.desc

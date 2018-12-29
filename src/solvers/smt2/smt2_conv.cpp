@@ -3848,14 +3848,14 @@ void smt2_convt::convert_member(const member_exprt &expr)
     else
     {
       // we extract
-      std::size_t member_width=boolbv_width(expr.type());
-      const auto member_offset = ::member_offset(struct_type, name, ns);
+      const std::size_t member_width = boolbv_width(expr.type());
+      const auto member_offset = member_offset_bits(struct_type, name, ns);
 
       CHECK_RETURN_WITH_DIAGNOSTICS(
         member_offset.has_value(), "failed to get struct member offset");
 
-      out << "((_ extract " << ((*member_offset) * 8 + member_width - 1) << " "
-          << (*member_offset) * 8 << ") ";
+      out << "((_ extract " << (member_offset.value() + member_width - 1) << " "
+          << member_offset.value() << ") ";
       convert_expr(struct_op);
       out << ")";
     }
