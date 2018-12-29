@@ -3540,15 +3540,16 @@ void smt2_convt::convert_with(const with_exprt &expr)
 
       out << "(bvor ";
       out << "(bvand ";
-      out << "(bvlshr (_ bv" << power(2, array_width)-1 << " "
-          << array_width << ") ";
-      out << "distance?) ";
+      out << "(bvnot ";
+      out << "(bvshl (_ bv" << power(2, sub_width) - 1 << " " << array_width
+          << ") ";
+      out << "distance?)) "; // bvnot, bvlshl
       convert_expr(expr.old());
       out << ") "; // bvand
-      out << "(bvlshr ";
+      out << "(bvshl ";
       out << "((_ zero_extend " << array_width-sub_width << ") ";
       convert_expr(expr.new_value());
-      out << ") distance?)))"; // zero_extend, bvlshr, bvor, let
+      out << ") distance?)))"; // zero_extend, bvshl, bvor, let
     }
   }
   else if(expr_type.id()==ID_struct)
