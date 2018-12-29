@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 static_init_order.class
 --function static_init_order.test2 --java-threading
 ^EXIT=10$
