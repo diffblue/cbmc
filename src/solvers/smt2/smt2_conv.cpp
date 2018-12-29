@@ -4173,6 +4173,19 @@ void smt2_convt::find_symbols(const exprt &expr)
   // recursive call on type
   find_symbols(expr.type());
 
+  if(expr.id() == ID_exists || expr.id() == ID_forall)
+  {
+    // do not declare the quantified symbol, but record
+    // as 'bound symbol'
+    const auto &q_expr = to_quantifier_expr(expr);
+    const auto identifier = q_expr.symbol().get_identifier();
+    identifiert &id = identifier_map[identifier];
+    id.type = q_expr.symbol().type();
+    id.is_bound = true;
+    find_symbols(q_expr.where());
+    return;
+  }
+
   // recursive call on operands
   forall_operands(it, expr)
     find_symbols(*it);

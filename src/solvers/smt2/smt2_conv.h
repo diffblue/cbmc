@@ -284,10 +284,11 @@ protected:
   // keeps track of all non-Boolean symbols and their value
   struct identifiert
   {
+    bool is_bound;
     typet type;
     exprt value;
 
-    identifiert()
+    identifiert() : is_bound(false)
     {
       type.make_nil();
       value.make_nil();
