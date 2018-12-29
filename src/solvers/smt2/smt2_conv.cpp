@@ -3476,7 +3476,7 @@ void smt2_convt::convert_with(const with_exprt &expr)
   {
     std::size_t s=expr.operands().size();
 
-    // strip of the trailing two operands
+    // strip off the trailing two operands
     with_exprt tmp = expr;
     tmp.operands().resize(s-2);
 
@@ -3515,7 +3515,7 @@ void smt2_convt::convert_with(const with_exprt &expr)
       std::size_t sub_width=boolbv_width(array_type.subtype());
       std::size_t index_width=boolbv_width(expr.where().type());
 
-      // We mask out the updated bit with AND,
+      // We mask out the updated bits with AND,
       // and then OR-in the shifted new value.
 
       out << "(let ((distance? ";
