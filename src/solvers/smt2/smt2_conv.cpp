@@ -3476,7 +3476,7 @@ void smt2_convt::convert_with(const with_exprt &expr)
   {
     std::size_t s=expr.operands().size();
 
-    // strip of the trailing two operands
+    // strip off the trailing two operands
     with_exprt tmp = expr;
     tmp.operands().resize(s-2);
 
@@ -3515,7 +3515,7 @@ void smt2_convt::convert_with(const with_exprt &expr)
       std::size_t sub_width=boolbv_width(array_type.subtype());
       std::size_t index_width=boolbv_width(expr.where().type());
 
-      // We mask out the updated bit with AND,
+      // We mask out the updated bits with AND,
       // and then OR-in the shifted new value.
 
       out << "(let ((distance? ";
@@ -3540,15 +3540,16 @@ void smt2_convt::convert_with(const with_exprt &expr)
 
       out << "(bvor ";
       out << "(bvand ";
-      out << "(bvlshr (_ bv" << power(2, array_width)-1 << " "
-          << array_width << ") ";
-      out << "distance?) ";
+      out << "(bvnot ";
+      out << "(bvshl (_ bv" << power(2, sub_width) - 1 << " " << array_width
+          << ") ";
+      out << "distance?)) "; // bvnot, bvlshl
       convert_expr(expr.old());
       out << ") "; // bvand
-      out << "(bvlshr ";
+      out << "(bvshl ";
       out << "((_ zero_extend " << array_width-sub_width << ") ";
       convert_expr(expr.new_value());
-      out << ") distance?)))"; // zero_extend, bvlshr, bvor, let
+      out << ") distance?)))"; // zero_extend, bvshl, bvor, let
     }
   }
   else if(expr_type.id()==ID_struct)
@@ -3588,8 +3589,9 @@ void smt2_convt::convert_with(const with_exprt &expr)
 
       if(m.width==struct_width)
       {
-        // the struct is the same as the member, no concat needed
-        out << "?withop";
+        // the struct is the same as the member, no concat needed,
+        // ?withop won't be used
+        convert_expr(value);
       }
       else if(m.offset==0)
       {

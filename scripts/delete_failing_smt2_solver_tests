@@ -36,14 +36,12 @@ rm Float8/test.desc
 rm Linking4/test.desc
 rm Linking7/test.desc
 rm Linking7/member-name-mismatch.desc
-rm Malloc19/test.desc
 rm Malloc23/test.desc
 rm Malloc24/test.desc
 rm Memory_leak2/test.desc
 rm Multi_Dimensional_Array2/test.desc
 rm Overflow_Leftshift1/test.desc
 rm Overflow_Subtraction1/test.desc
-rm Pointer_Arithmetic10/test.desc
 rm Pointer_Arithmetic11/test.desc
 rm Pointer_byte_extract2/test.desc
 rm Pointer_byte_extract3/test.desc
@@ -87,7 +85,6 @@ rm pointer-function-parameters-struct-simple-recursion-2/test.desc
 rm pointer-function-parameters-struct-simple-recursion-3/test.desc
 rm scanf1/test.desc
 rm stack-trace/test.desc
-rm struct10/test.desc
 rm struct6/test.desc
 rm struct7/test.desc
 rm struct9/test.desc
