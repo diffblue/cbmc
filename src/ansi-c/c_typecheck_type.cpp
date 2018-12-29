@@ -766,7 +766,7 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
 
     typecheck_compound_body(to_struct_union_type(compound_symbol.type));
 
-    std::string typestr=type2name(compound_symbol.type);
+    std::string typestr = type2name(compound_symbol.type, *this);
     compound_symbol.base_name="#anon-"+typestr;
     compound_symbol.name="tag-#anon#"+typestr;
     identifier=compound_symbol.name;
