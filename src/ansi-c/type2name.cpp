@@ -26,12 +26,12 @@ static std::string type2name(
   const namespacet &ns,
   symbol_numbert &symbol_number);
 
-static std::string type2name_symbol(
-  const typet &type,
+static std::string type2name_tag(
+  const tag_typet &type,
   const namespacet &ns,
   symbol_numbert &symbol_number)
 {
-  const irep_idt &identifier=type.get(ID_identifier);
+  const irep_idt &identifier = type.get_identifier();
 
   const symbolt *symbol;
 
@@ -192,10 +192,10 @@ static std::string type2name(
     }
   }
   else if(
-    type.id() == ID_symbol_type || type.id() == ID_c_enum_tag ||
-    type.id() == ID_struct_tag || type.id() == ID_union_tag)
+    type.id() == ID_c_enum_tag || type.id() == ID_struct_tag ||
+    type.id() == ID_union_tag)
   {
-    result+=type2name_symbol(type, ns, symbol_number);
+    result += type2name_tag(to_tag_type(type), ns, symbol_number);
   }
   else if(type.id()==ID_struct ||
           type.id()==ID_union)
