@@ -87,13 +87,11 @@ void gcc_message_handlert::print(
   }
 }
 
-void gcc_message_handlert::print(
-  unsigned level,
-  const std::string &message)
+void gcc_message_handlert::print(unsigned level, const std::string &message)
 {
   message_handlert::print(level, message);
 
   // gcc appears to send everything to cerr
-  if(verbosity>=level)
+  if(verbosity >= level)
     std::cerr << message << '\n' << std::flush;
 }
