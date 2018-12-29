@@ -91,7 +91,6 @@ static std::string pointer_offset_bits_as_string(
   return integer2string(*bits);
 }
 
-static bool parent_is_sym_check=false;
 static std::string type2name(
   const typet &type,
   const namespacet &ns,
@@ -196,14 +195,11 @@ static std::string type2name(
     type.id() == ID_symbol_type || type.id() == ID_c_enum_tag ||
     type.id() == ID_struct_tag || type.id() == ID_union_tag)
   {
-    parent_is_sym_check=true;
     result+=type2name_symbol(type, ns, symbol_number);
   }
   else if(type.id()==ID_struct ||
           type.id()==ID_union)
   {
-    assert(parent_is_sym_check);
-    parent_is_sym_check=false;
     if(type.id()==ID_struct)
       result+="ST";
     if(type.id()==ID_union)
@@ -277,7 +273,6 @@ static std::string type2name(
 
 std::string type2name(const typet &type, const namespacet &ns)
 {
-  parent_is_sym_check=true;
   symbol_numbert symbol_number;
   return type2name(type, ns, symbol_number);
 }
