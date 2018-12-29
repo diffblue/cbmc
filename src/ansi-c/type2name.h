@@ -18,7 +18,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 class namespacet;
 
-std::string type2name(const typet &type);
 std::string type2name(const typet &type, const namespacet &ns);
 
 #endif // CPROVER_ANSI_C_TYPE2NAME_H

@@ -281,9 +281,3 @@ std::string type2name(const typet &type, const namespacet &ns)
   symbol_numbert symbol_number;
   return type2name(type, ns, symbol_number);
 }
-
-std::string type2name(const typet &type)
-{
-  symbol_tablet symbol_table;
-  return type2name(type, namespacet(symbol_table));
-}
