@@ -110,7 +110,7 @@ void goto_convertt::remove_assignment(
       // We convert c_enums to their underlying type, do the
       // operation, and then convert back
       const auto &enum_type = ns.follow_tag(to_c_enum_tag_type(op0_type));
-      auto underlying_type = to_c_enum_type(enum_type).subtype();
+      auto underlying_type = enum_type.subtype();
       auto op0 = typecast_exprt(expr.op0(), underlying_type);
       auto op1 = typecast_exprt(expr.op1(), underlying_type);
       binary_exprt tmp(op0, new_id, op1, underlying_type);

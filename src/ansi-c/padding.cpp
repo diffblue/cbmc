@@ -120,9 +120,9 @@ underlying_width(const c_bit_field_typet &type, const namespacet &ns)
     // These point to an enum, which has a sub-subtype,
     // which may be smaller or larger than int, and we thus have
     // to check.
-    const typet &c_enum_type = ns.follow_tag(to_c_enum_tag_type(subtype));
+    const auto &c_enum_type = ns.follow_tag(to_c_enum_tag_type(subtype));
 
-    if(c_enum_type.id() == ID_c_enum)
+    if(!c_enum_type.is_incomplete())
       return to_bitvector_type(c_enum_type.subtype()).get_width();
     else
       return {};

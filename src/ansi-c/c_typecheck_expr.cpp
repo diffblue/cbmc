@@ -1888,8 +1888,7 @@ void c_typecheck_baset::typecheck_expr_side_effect(side_effect_exprt &expr)
 
     if(final_type0.id()==ID_c_enum_tag)
     {
-      if(to_c_enum_type(follow_tag(to_c_enum_tag_type(final_type0)))
-           .is_incomplete())
+      if(follow_tag(to_c_enum_tag_type(final_type0)).is_incomplete())
       {
         error().source_location = expr.source_location();
         error() << "operator `" << statement
@@ -3159,7 +3158,7 @@ void c_typecheck_baset::typecheck_arithmetic_pointer(const exprt &expr)
 
   if(
     subtype.id() == ID_struct_tag &&
-    to_struct_type(follow_tag(to_struct_tag_type(subtype))).is_incomplete())
+    follow_tag(to_struct_tag_type(subtype)).is_incomplete())
   {
     error().source_location = expr.source_location();
     error() << "pointer arithmetic with unknown object size" << eom;
@@ -3167,7 +3166,7 @@ void c_typecheck_baset::typecheck_arithmetic_pointer(const exprt &expr)
   }
   else if(
     subtype.id() == ID_union_tag &&
-    to_union_type(follow_tag(to_union_tag_type(subtype))).is_incomplete())
+    follow_tag(to_union_tag_type(subtype)).is_incomplete())
   {
     error().source_location = expr.source_location();
     error() << "pointer arithmetic with unknown object size" << eom;
@@ -3371,8 +3370,7 @@ void c_typecheck_baset::typecheck_side_effect_assignment(
 
         if(underlying_type.id()==ID_c_enum_tag)
         {
-          const typet &c_enum_type=
-            follow_tag(to_c_enum_tag_type(underlying_type));
+          const auto &c_enum_type = to_c_enum_tag_type(underlying_type);
           underlying_type=c_enum_type.subtype();
         }
 

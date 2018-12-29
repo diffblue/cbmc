@@ -85,8 +85,7 @@ xmlt xml(
   else if(type.id()==ID_c_enum_tag)
   {
     // we return the base type
-    return xml(
-      to_c_enum_type(ns.follow_tag(to_c_enum_tag_type(type))).subtype(), ns);
+    return xml(ns.follow_tag(to_c_enum_tag_type(type)).subtype(), ns);
   }
   else if(type.id()==ID_fixedbv)
   {
