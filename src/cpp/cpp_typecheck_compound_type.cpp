@@ -189,7 +189,9 @@ void cpp_typecheckt::typecheck_compound_type(
 
     if(has_body)
     {
-      if(symbol.type.id()=="incomplete_"+type.id_string())
+      if(
+        symbol.type.id() == type.id() &&
+        to_struct_union_type(symbol.type).is_incomplete())
       {
         // a previously incomplete struct/union becomes complete
         symbolt &writeable_symbol = *symbol_table.get_writeable(symbol_name);
@@ -258,8 +260,10 @@ void cpp_typecheckt::typecheck_compound_type(
       typecheck_compound_body(*new_symbol);
     else
     {
-      typet new_type("incomplete_"+new_symbol->type.id_string());
+      struct_union_typet new_type(new_symbol->type.id());
       new_type.set(ID_tag, new_symbol->base_name);
+      new_type.make_incomplete();
+      new_type.add_source_location() = type.source_location();
       new_symbol->type.swap(new_type);
     }
   }

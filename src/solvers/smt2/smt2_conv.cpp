@@ -2711,7 +2711,6 @@ void smt2_convt::convert_constant(const constant_exprt &expr)
      expr_type.id()==ID_c_enum ||
      expr_type.id()==ID_c_enum_tag ||
      expr_type.id()==ID_c_bool ||
-     expr_type.id()==ID_incomplete_c_enum ||
      expr_type.id()==ID_c_bit_field)
   {
     const std::size_t width = boolbv_width(expr_type);

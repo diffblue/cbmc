@@ -145,13 +145,14 @@ const symbolt &cpp_typecheckt::class_template_symbol(
   if(s_it!=symbol_table.symbols.end())
     return s_it->second;
 
-  // Create as incomplete_struct, but mark as
+  // Create as incomplete struct, but mark as
   // "template_class_instance", to be elaborated later.
   symbolt new_symbol;
   new_symbol.name=identifier;
   new_symbol.pretty_name=template_symbol.pretty_name;
   new_symbol.location=template_symbol.location;
-  new_symbol.type=typet(ID_incomplete_struct);
+  new_symbol.type = struct_typet();
+  to_struct_type(new_symbol.type).make_incomplete();
   new_symbol.type.set(ID_tag, template_symbol.type.find(ID_tag));
   if(template_symbol.type.get_bool(ID_C_class))
     new_symbol.type.set(ID_C_class, true);
@@ -194,8 +195,7 @@ void cpp_typecheckt::elaborate_class_template(
   // Make a copy, as instantiate will destroy the symbol type!
   const typet t_type=symbol.type;
 
-  if(t_type.id()==ID_incomplete_struct &&
-     t_type.get_bool(ID_template_class_instance))
+  if(t_type.id() == ID_struct && t_type.get_bool(ID_template_class_instance))
   {
     instantiate_template(
       type.source_location(),

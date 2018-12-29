@@ -85,21 +85,15 @@ void c_typecheck_baset::typecheck_symbol(symbolt &symbol)
   }
 
   // set the pretty name
-  if(symbol.is_type &&
-     (final_type.id()==ID_struct ||
-      final_type.id()==ID_incomplete_struct))
+  if(symbol.is_type && final_type.id() == ID_struct)
   {
     symbol.pretty_name="struct "+id2string(symbol.base_name);
   }
-  else if(symbol.is_type &&
-          (final_type.id()==ID_union ||
-           final_type.id()==ID_incomplete_union))
+  else if(symbol.is_type && final_type.id() == ID_union)
   {
     symbol.pretty_name="union "+id2string(symbol.base_name);
   }
-  else if(symbol.is_type &&
-          (final_type.id()==ID_c_enum ||
-           final_type.id()==ID_incomplete_c_enum))
+  else if(symbol.is_type && final_type.id() == ID_c_enum)
   {
     symbol.pretty_name="enum "+id2string(symbol.base_name);
   }
@@ -176,12 +170,21 @@ void c_typecheck_baset::typecheck_redefinition_type(
   const typet &final_new=follow(new_symbol.type);
 
   // see if we had something incomplete before
-  if(final_old.id()==ID_incomplete_struct ||
-     final_old.id()==ID_incomplete_union ||
-     final_old.id()==ID_incomplete_c_enum)
+  if(
+    (final_old.id() == ID_struct &&
+     to_struct_type(final_old).is_incomplete()) ||
+    (final_old.id() == ID_union && to_union_type(final_old).is_incomplete()) ||
+    (final_old.id() == ID_c_enum && to_c_enum_type(final_old).is_incomplete()))
   {
-    // new one complete?
-    if("incomplete_"+final_new.id_string()==final_old.id_string())
+    // is the new one complete?
+    if(
+      final_new.id() == final_old.id() &&
+      ((final_new.id() == ID_struct &&
+        !to_struct_type(final_new).is_incomplete()) ||
+       (final_new.id() == ID_union &&
+        !to_union_type(final_new).is_incomplete()) ||
+       (final_new.id() == ID_c_enum &&
+        !to_c_enum_type(final_new).is_incomplete())))
     {
       // overwrite location
       old_symbol.location=new_symbol.location;
@@ -190,7 +193,7 @@ void c_typecheck_baset::typecheck_redefinition_type(
       old_symbol.type.swap(new_symbol.type);
     }
     else if(new_symbol.type.id()==old_symbol.type.id())
-      return;
+      return; // ignore
     else
     {
       error().source_location=new_symbol.location;
@@ -203,11 +206,15 @@ void c_typecheck_baset::typecheck_redefinition_type(
   else
   {
     // see if new one is just a tag
-    if(final_new.id()==ID_incomplete_struct ||
-       final_new.id()==ID_incomplete_union ||
-       final_new.id()==ID_incomplete_c_enum)
+    if(
+      (final_new.id() == ID_struct &&
+       to_struct_type(final_new).is_incomplete()) ||
+      (final_new.id() == ID_union &&
+       to_union_type(final_new).is_incomplete()) ||
+      (final_new.id() == ID_c_enum &&
+       to_c_enum_type(final_new).is_incomplete()))
     {
-      if("incomplete_"+final_old.id_string()==final_new.id_string())
+      if(final_old.id() == final_new.id())
       {
         // just ignore silently
       }
@@ -418,13 +425,6 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
       PRECONDITION(old_symbol.type.id() != ID_symbol_type);
       old_symbol.type=new_symbol.type;
     }
-    else if((final_old.id()==ID_incomplete_c_enum ||
-             final_old.id()==ID_c_enum) &&
-            (final_new.id()==ID_incomplete_c_enum ||
-             final_new.id()==ID_c_enum))
-    {
-      // this is ok for now
-    }
     else if(final_old.id()==ID_pointer &&
             follow(final_old).subtype().id()==ID_code &&
             to_code_type(follow(final_old).subtype()).has_ellipsis() &&
@@ -477,12 +477,10 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
       }
       else
       {
-        if(new_symbol.is_macro &&
-           (final_new.id()==ID_incomplete_c_enum ||
-            final_new.id()==ID_c_enum) &&
-            old_symbol.value.is_constant() &&
-            new_symbol.value.is_constant() &&
-            old_symbol.value.get(ID_value)==new_symbol.value.get(ID_value))
+        if(
+          new_symbol.is_macro && final_new.id() == ID_c_enum &&
+          old_symbol.value.is_constant() && new_symbol.value.is_constant() &&
+          old_symbol.value.get(ID_value) == new_symbol.value.get(ID_value))
         {
           // ignore
         }

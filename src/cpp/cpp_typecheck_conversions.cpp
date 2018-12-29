@@ -49,9 +49,15 @@ bool cpp_typecheckt::standard_conversion_lvalue_to_rvalue(
 {
   assert(expr.get_bool(ID_C_lvalue));
 
-  if(expr.type().id()==ID_code ||
-     expr.type().id()==ID_incomplete_struct ||
-     expr.type().id()==ID_incomplete_union)
+  if(expr.type().id() == ID_code)
+    return false;
+
+  if(
+    expr.type().id() == ID_struct &&
+    to_struct_type(expr.type()).is_incomplete())
+    return false;
+
+  if(expr.type().id() == ID_union && to_union_type(expr.type()).is_incomplete())
     return false;
 
   new_expr=expr;

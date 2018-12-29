@@ -427,7 +427,6 @@ bool cpp_typecheckt::overloadable(const exprt &expr)
       t=t.subtype();
 
     if(t.id()==ID_struct ||
-       t.id() == ID_incomplete_struct ||
        t.id()==ID_union ||
        t.id()==ID_c_enum || t.id() == ID_c_enum_tag)
       return true;
@@ -1110,15 +1109,6 @@ void cpp_typecheckt::typecheck_expr_member(
 
   const typet &followed_op0_type=follow(op0.type());
 
-  if(followed_op0_type.id()==ID_incomplete_struct ||
-     followed_op0_type.id()==ID_incomplete_union)
-  {
-    error().source_location=expr.find_source_location();
-    error() << "error: member operator got incomplete type "
-            << "on left hand side" << eom;
-    throw 0;
-  }
-
   if(followed_op0_type.id()!=ID_struct &&
      followed_op0_type.id()!=ID_union)
   {
@@ -1131,6 +1121,14 @@ void cpp_typecheckt::typecheck_expr_member(
 
   const struct_union_typet &type=
     to_struct_union_type(followed_op0_type);
+
+  if(type.is_incomplete())
+  {
+    error().source_location = expr.find_source_location();
+    error() << "error: member operator got incomplete type "
+            << "on left hand side" << eom;
+    throw 0;
+  }
 
   irep_idt struct_identifier=type.get(ID_name);
 

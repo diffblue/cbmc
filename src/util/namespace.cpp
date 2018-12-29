@@ -91,8 +91,7 @@ const typet &namespace_baset::follow_tag(const union_tag_typet &src) const
 {
   const symbolt &symbol=lookup(src.get_identifier());
   CHECK_RETURN(symbol.is_type);
-  CHECK_RETURN(
-    symbol.type.id() == ID_union || symbol.type.id() == ID_incomplete_union);
+  CHECK_RETURN(symbol.type.id() == ID_union);
   return symbol.type;
 }
 
@@ -103,8 +102,7 @@ const typet &namespace_baset::follow_tag(const struct_tag_typet &src) const
 {
   const symbolt &symbol=lookup(src.get_identifier());
   CHECK_RETURN(symbol.is_type);
-  CHECK_RETURN(
-    symbol.type.id() == ID_struct || symbol.type.id() == ID_incomplete_struct);
+  CHECK_RETURN(symbol.type.id() == ID_struct);
   return symbol.type;
 }
 
@@ -115,8 +113,7 @@ const typet &namespace_baset::follow_tag(const c_enum_tag_typet &src) const
 {
   const symbolt &symbol=lookup(src.get_identifier());
   CHECK_RETURN(symbol.is_type);
-  CHECK_RETURN(
-    symbol.type.id() == ID_c_enum || symbol.type.id() == ID_incomplete_c_enum);
+  CHECK_RETURN(symbol.type.id() == ID_c_enum);
   return symbol.type;
 }
 

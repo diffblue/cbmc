@@ -104,8 +104,9 @@ void static_lifetime_init(
       writable_symbol.type.set(ID_size, from_integer(1, size_type()));
     }
 
-    if(type.id()==ID_incomplete_struct ||
-       type.id()==ID_incomplete_union)
+    if(
+      (type.id() == ID_struct || type.id() == ID_union) &&
+      to_struct_union_type(type).is_incomplete())
       continue; // do not initialize
 
     if(symbol.value.id()==ID_nondet)

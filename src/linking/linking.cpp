@@ -82,35 +82,38 @@ std::string linkingt::type_to_string_verbose(
     const std::string &tag=followed.get_string(ID_tag);
     if(tag!="")
       result+=" "+tag;
-    result+=" {\n";
 
-    for(const auto &c : to_struct_union_type(followed).components())
+    if(to_struct_union_type(followed).is_incomplete())
     {
-      const typet &subtype = c.type();
-      result+="  ";
-      result += type_to_string(symbol.name, subtype);
-      result+=' ';
-
-      if(!c.get_base_name().empty())
-        result += id2string(c.get_base_name());
-      else
-        result += id2string(c.get_name());
-
-      result+=";\n";
+      result += "   (incomplete)";
     }
+    else
+    {
+      result += " {\n";
 
-    result+='}';
+      for(const auto &c : to_struct_union_type(followed).components())
+      {
+        const typet &subtype = c.type();
+        result += "  ";
+        result += type_to_string(symbol.name, subtype);
+        result += ' ';
+
+        if(!c.get_base_name().empty())
+          result += id2string(c.get_base_name());
+        else
+          result += id2string(c.get_name());
+
+        result += ";\n";
+      }
+
+      result += '}';
+    }
 
     return result;
   }
   else if(followed.id()==ID_pointer)
   {
     return type_to_string_verbose(symbol, followed.subtype()) + " *";
-  }
-  else if(followed.id()==ID_incomplete_struct ||
-          followed.id()==ID_incomplete_union)
-  {
-    return type_to_string(symbol.name, type) + "   (incomplete)";
   }
 
   return type_to_string(symbol.name, type);
@@ -837,15 +840,32 @@ bool linkingt::adjust_object_type_rec(
     // ignore
     return false;
   }
-  else if((t1.id()==ID_incomplete_struct && t2.id()==ID_struct) ||
-          (t1.id()==ID_incomplete_union && t2.id()==ID_union))
+  else if(
+    t1.id() == ID_struct && to_struct_type(t1).is_incomplete() &&
+    t2.id() == ID_struct && !to_struct_type(t2).is_incomplete())
   {
     info.set_to_new=true; // store new type
 
     return false;
   }
-  else if((t1.id()==ID_struct && t2.id()==ID_incomplete_struct) ||
-          (t1.id()==ID_union && t2.id()==ID_incomplete_union))
+  else if(
+    t1.id() == ID_union && to_union_type(t1).is_incomplete() &&
+    t2.id() == ID_union && !to_union_type(t2).is_incomplete())
+  {
+    info.set_to_new = true; // store new type
+
+    return false;
+  }
+  else if(
+    t1.id() == ID_struct && !to_struct_type(t1).is_incomplete() &&
+    t2.id() == ID_struct && to_struct_type(t2).is_incomplete())
+  {
+    // ignore
+    return false;
+  }
+  else if(
+    t1.id() == ID_union && !to_union_type(t1).is_incomplete() &&
+    t2.id() == ID_union && to_union_type(t2).is_incomplete())
   {
     // ignore
     return false;
@@ -1109,31 +1129,43 @@ void linkingt::duplicate_type_symbol(
   if(old_symbol.type==new_symbol.type)
     return;
 
-  if(old_symbol.type.id()==ID_incomplete_struct &&
-     new_symbol.type.id()==ID_struct)
+  if(
+    old_symbol.type.id() == ID_struct &&
+    to_struct_type(old_symbol.type).is_incomplete() &&
+    new_symbol.type.id() == ID_struct &&
+    !to_struct_type(new_symbol.type).is_incomplete())
   {
     old_symbol.type=new_symbol.type;
     old_symbol.location=new_symbol.location;
     return;
   }
 
-  if(old_symbol.type.id()==ID_struct &&
-     new_symbol.type.id()==ID_incomplete_struct)
+  if(
+    old_symbol.type.id() == ID_struct &&
+    !to_struct_type(old_symbol.type).is_incomplete() &&
+    new_symbol.type.id() == ID_struct &&
+    to_struct_type(new_symbol.type).is_incomplete())
   {
     // ok, keep old
     return;
   }
 
-  if(old_symbol.type.id()==ID_incomplete_union &&
-     new_symbol.type.id()==ID_union)
+  if(
+    old_symbol.type.id() == ID_union &&
+    to_union_type(old_symbol.type).is_incomplete() &&
+    new_symbol.type.id() == ID_union &&
+    !to_union_type(new_symbol.type).is_incomplete())
   {
     old_symbol.type=new_symbol.type;
     old_symbol.location=new_symbol.location;
     return;
   }
 
-  if(old_symbol.type.id()==ID_union &&
-     new_symbol.type.id()==ID_incomplete_union)
+  if(
+    old_symbol.type.id() == ID_union &&
+    !to_union_type(old_symbol.type).is_incomplete() &&
+    new_symbol.type.id() == ID_union &&
+    to_union_type(new_symbol.type).is_incomplete())
   {
     // ok, keep old
     return;
@@ -1183,20 +1215,32 @@ bool linkingt::needs_renaming_type(
   if(old_symbol.type==new_symbol.type)
     return false;
 
-  if(old_symbol.type.id()==ID_incomplete_struct &&
-     new_symbol.type.id()==ID_struct)
+  if(
+    old_symbol.type.id() == ID_struct &&
+    to_struct_type(old_symbol.type).is_incomplete() &&
+    new_symbol.type.id() == ID_struct &&
+    !to_struct_type(new_symbol.type).is_incomplete())
     return false; // not different
 
-  if(old_symbol.type.id()==ID_struct &&
-     new_symbol.type.id()==ID_incomplete_struct)
+  if(
+    old_symbol.type.id() == ID_struct &&
+    !to_struct_type(old_symbol.type).is_incomplete() &&
+    new_symbol.type.id() == ID_struct &&
+    to_struct_type(new_symbol.type).is_incomplete())
     return false; // not different
 
-  if(old_symbol.type.id()==ID_incomplete_union &&
-     new_symbol.type.id()==ID_union)
+  if(
+    old_symbol.type.id() == ID_union &&
+    to_union_type(old_symbol.type).is_incomplete() &&
+    new_symbol.type.id() == ID_union &&
+    !to_union_type(new_symbol.type).is_incomplete())
     return false; // not different
 
-  if(old_symbol.type.id()==ID_union &&
-     new_symbol.type.id()==ID_incomplete_union)
+  if(
+    old_symbol.type.id() == ID_union &&
+    !to_union_type(old_symbol.type).is_incomplete() &&
+    new_symbol.type.id() == ID_union &&
+    to_union_type(new_symbol.type).is_incomplete())
     return false; // not different
 
   if(old_symbol.type.id()==ID_array &&

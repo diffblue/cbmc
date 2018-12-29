@@ -178,10 +178,6 @@ const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
     entry.total_width = to_bitvector_type(type.subtype()).get_width();
     CHECK_RETURN(entry.total_width > 0);
   }
-  else if(type_id==ID_incomplete_c_enum)
-  {
-    // no width
-  }
   else if(type_id==ID_pointer)
     entry.total_width = type_checked_cast<pointer_typet>(type).get_width();
   else if(type_id == ID_symbol_type)

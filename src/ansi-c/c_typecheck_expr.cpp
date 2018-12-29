@@ -1361,8 +1361,7 @@ void c_typecheck_baset::typecheck_expr_rel(
     if(follow(o_type0)==follow(o_type1))
     {
       const typet &final_type=follow(o_type0);
-      if(final_type.id()!=ID_array &&
-         final_type.id()!=ID_incomplete_struct)
+      if(final_type.id() != ID_array)
       {
         adjust_float_rel(expr);
         return; // no promotion necessary
@@ -1524,22 +1523,6 @@ void c_typecheck_baset::typecheck_expr_member(exprt &expr)
 
   type = follow(type);
 
-  if(type.id()==ID_incomplete_struct)
-  {
-    error().source_location = expr.source_location();
-    error() << "member operator got incomplete struct type "
-               "on left hand side" << eom;
-    throw 0;
-  }
-
-  if(type.id()==ID_incomplete_union)
-  {
-    error().source_location = expr.source_location();
-    error() << "member operator got incomplete union type "
-               "on left hand side" << eom;
-    throw 0;
-  }
-
   if(type.id()!=ID_struct &&
      type.id()!=ID_union)
   {
@@ -1552,6 +1535,14 @@ void c_typecheck_baset::typecheck_expr_member(exprt &expr)
 
   const struct_union_typet &struct_union_type=
     to_struct_union_type(type);
+
+  if(struct_union_type.is_incomplete())
+  {
+    error().source_location = expr.source_location();
+    error() << "member operator got incomplete " << type.id()
+            << " type on left hand side" << eom;
+    throw 0;
+  }
 
   const irep_idt &component_name=
     expr.get(ID_component_name);
@@ -1897,8 +1888,8 @@ void c_typecheck_baset::typecheck_expr_side_effect(side_effect_exprt &expr)
 
     if(final_type0.id()==ID_c_enum_tag)
     {
-      if(follow_tag(to_c_enum_tag_type(final_type0)).id()==
-         ID_incomplete_c_enum)
+      if(to_c_enum_type(follow_tag(to_c_enum_tag_type(final_type0)))
+           .is_incomplete())
       {
         error().source_location = expr.source_location();
         error() << "operator `" << statement
@@ -3166,7 +3157,17 @@ void c_typecheck_baset::typecheck_arithmetic_pointer(const exprt &expr)
 
   typet subtype=type.subtype();
 
-  if(subtype.id()==ID_incomplete_struct)
+  if(
+    subtype.id() == ID_struct_tag &&
+    to_struct_type(follow_tag(to_struct_tag_type(subtype))).is_incomplete())
+  {
+    error().source_location = expr.source_location();
+    error() << "pointer arithmetic with unknown object size" << eom;
+    throw 0;
+  }
+  else if(
+    subtype.id() == ID_union_tag &&
+    to_union_type(follow_tag(to_union_tag_type(subtype))).is_incomplete())
   {
     error().source_location = expr.source_location();
     error() << "pointer arithmetic with unknown object size" << eom;

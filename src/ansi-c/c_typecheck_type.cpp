@@ -523,9 +523,11 @@ void c_typecheck_baset::typecheck_array_type(array_typet &type)
   }
 
   // we don't allow incomplete structs or unions as subtype
+  const typet &followed_subtype = follow(type.subtype());
+
   if(
-    follow(type.subtype()).id() == ID_incomplete_struct ||
-    follow(type.subtype()).id() == ID_incomplete_union)
+    (followed_subtype.id() == ID_struct || followed_subtype.id() == ID_union) &&
+    to_struct_union_type(followed_subtype).is_incomplete())
   {
     // ISO/IEC 9899 6.7.5.2
     error().source_location = type.source_location();
@@ -806,12 +808,8 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
 
       typet new_type=compound_symbol.type;
 
-      if(compound_symbol.type.id()==ID_struct)
-        compound_symbol.type.id(ID_incomplete_struct);
-      else if(compound_symbol.type.id()==ID_union)
-        compound_symbol.type.id(ID_incomplete_union);
-      else
-        UNREACHABLE;
+      // mark as incomplete
+      to_struct_union_type(compound_symbol.type).make_incomplete();
 
       symbolt *new_symbol;
       move_symbol(compound_symbol, new_symbol);
@@ -826,8 +824,9 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
     else
     {
       // yes, it exists already
-      if(s_it->second.type.id()==ID_incomplete_struct ||
-         s_it->second.type.id()==ID_incomplete_union)
+      if(
+        s_it->second.type.id() == type.id() &&
+        to_struct_union_type(s_it->second.type).is_incomplete())
       {
         // Maybe we got a body now.
         if(have_body)
@@ -852,9 +851,9 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
 
   typet tag_type;
 
-  if(type.id() == ID_union || type.id() == ID_incomplete_union)
+  if(type.id() == ID_union)
     tag_type = union_tag_typet(identifier);
-  else if(type.id() == ID_struct || type.id() == ID_incomplete_struct)
+  else if(type.id() == ID_struct)
     tag_type = struct_tag_typet(identifier);
   else
     UNREACHABLE;
@@ -1278,13 +1277,20 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
     // Yes.
     const symbolt &symbol=s_it->second;
 
-    if(symbol.type.id()==ID_incomplete_c_enum)
+    if(symbol.type.id() != ID_c_enum)
+    {
+      error().source_location = source_location;
+      error() << "use of tag that does not match previous declaration" << eom;
+      throw 0;
+    }
+
+    if(to_c_enum_type(symbol.type).is_incomplete())
     {
       // Ok, overwrite the type in the symbol table.
       // This gives us the members and the subtype.
       symbol_table.get_writeable_ref(symbol.name).type=enum_tag_symbol.type;
     }
-    else if(symbol.type.id()==ID_c_enum)
+    else
     {
       // We might already have the same anonymous enum, and this is
       // simply ok. Note that the C standard treats these as
@@ -1295,12 +1301,6 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
         error() << "redeclaration of enum tag" << eom;
         throw 0;
       }
-    }
-    else
-    {
-      error().source_location=source_location;
-      error() << "use of tag that does not match previous declaration" << eom;
-      throw 0;
     }
   }
   else
@@ -1341,8 +1341,7 @@ void c_typecheck_baset::typecheck_c_enum_tag_type(c_enum_tag_typet &type)
     // Yes.
     const symbolt &symbol=s_it->second;
 
-    if(symbol.type.id()!=ID_c_enum &&
-       symbol.type.id()!=ID_incomplete_c_enum)
+    if(symbol.type.id() != ID_c_enum)
     {
       error().source_location=source_location;
       error() << "use of tag that does not match previous declaration" << eom;
@@ -1352,9 +1351,9 @@ void c_typecheck_baset::typecheck_c_enum_tag_type(c_enum_tag_typet &type)
   else
   {
     // no, add it as an incomplete c_enum
-    typet new_type(ID_incomplete_c_enum);
-    new_type.subtype()=signed_int_type(); // default
+    c_enum_typet new_type(signed_int_type()); // default subtype
     new_type.add(ID_tag)=tag;
+    new_type.make_incomplete();
 
     symbolt enum_tag_symbol;
 
@@ -1424,10 +1423,10 @@ void c_typecheck_baset::typecheck_c_bit_field_type(c_bit_field_typet &type)
     // These point to an enum, which has a sub-subtype,
     // which may be smaller or larger than int, and we thus have
     // to check.
-    const typet &c_enum_type=
-      follow_tag(to_c_enum_tag_type(subtype));
+    const auto &c_enum_type =
+      to_c_enum_type(follow_tag(to_c_enum_tag_type(subtype)));
 
-    if(c_enum_type.id()==ID_incomplete_c_enum)
+    if(c_enum_type.is_incomplete())
     {
       error().source_location=type.source_location();
       error() << "bit field has incomplete enum type" << eom;

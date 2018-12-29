@@ -52,7 +52,6 @@ exprt expr_initializert<nondet>::expr_initializer_rec(
      type_id==ID_signedbv ||
      type_id==ID_pointer ||
      type_id==ID_c_enum ||
-     type_id==ID_incomplete_c_enum ||
      type_id==ID_c_bit_field ||
      type_id==ID_bool ||
      type_id==ID_c_bool ||

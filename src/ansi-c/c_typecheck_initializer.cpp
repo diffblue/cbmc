@@ -58,10 +58,12 @@ exprt c_typecheck_baset::do_initializer_rec(
 {
   const typet &full_type=follow(type);
 
-  if(full_type.id()==ID_incomplete_struct)
+  if(
+    (full_type.id() == ID_struct || full_type.id() == ID_union) &&
+    to_struct_union_type(full_type).is_incomplete())
   {
     error().source_location = value.source_location();
-    error() << "type `" << to_string(full_type)
+    error() << "type `" << to_string(type)
             << "' is still incomplete -- cannot initialize" << eom;
     throw 0;
   }

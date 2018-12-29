@@ -156,7 +156,6 @@ bool check_c_implicit_typecast(
           src_type_id==ID_signedbv ||
           src_type_id==ID_c_enum ||
           src_type_id==ID_c_enum_tag ||
-          src_type_id==ID_incomplete_c_enum ||
           src_type_id==ID_c_bool)
   {
     if(dest_type.id()==ID_unsignedbv ||
@@ -171,7 +170,6 @@ bool check_c_implicit_typecast(
        dest_type.id()==ID_pointer ||
        dest_type.id()==ID_c_enum ||
        dest_type.id()==ID_c_enum_tag ||
-       dest_type.id()==ID_incomplete_c_enum ||
        dest_type.id()==ID_complex)
       return false;
   }
@@ -345,9 +343,7 @@ c_typecastt::c_typet c_typecastt::get_c_type(
   {
     return PTR;
   }
-  else if(type.id()==ID_c_enum ||
-          type.id()==ID_c_enum_tag ||
-          type.id()==ID_incomplete_c_enum)
+  else if(type.id() == ID_c_enum || type.id() == ID_c_enum_tag)
   {
     return INT;
   }
