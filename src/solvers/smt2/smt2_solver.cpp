@@ -343,11 +343,11 @@ public:
       std::cout << "; " << message << '\n';
   }
 
-  void print(unsigned level, const xmlt &xml) override
+  void print(unsigned, const xmlt &) override
   {
   }
 
-  void print(unsigned level, const jsont &json) override
+  void print(unsigned, const jsont &) override
   {
   }
 
