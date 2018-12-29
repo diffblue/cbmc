@@ -1058,45 +1058,6 @@ inline array_typet &to_array_type(typet &type)
   return static_cast<array_typet &>(type);
 }
 
-/// Arrays without size
-class incomplete_array_typet:public type_with_subtypet
-{
-public:
-  incomplete_array_typet():type_with_subtypet(ID_incomplete_array)
-  {
-  }
-};
-
-/// Check whether a reference to a typet is a \ref incomplete_array_typet.
-/// \param type Source type.
-/// \return True if \p type is a \ref incomplete_array_typet.
-template <>
-inline bool can_cast_type<incomplete_array_typet>(const typet &type)
-{
-  return type.id() == ID_incomplete_array;
-}
-
-/// \brief Cast a typet to an \ref incomplete_array_typet
-///
-/// This is an unchecked conversion. \a type must be known to be \ref
-/// incomplete_array_typet. Will fail with a precondition violation if type
-/// doesn't match.
-///
-/// \param type Source type.
-/// \return Object of type \ref incomplete_array_typet.
-inline const incomplete_array_typet &to_incomplete_array_type(const typet &type)
-{
-  PRECONDITION(can_cast_type<incomplete_array_typet>(type));
-  return static_cast<const incomplete_array_typet &>(type);
-}
-
-/// \copydoc to_incomplete_array_type(const typet &)
-inline incomplete_array_typet &to_incomplete_array_type(typet &type)
-{
-  PRECONDITION(can_cast_type<incomplete_array_typet>(type));
-  return static_cast<incomplete_array_typet &>(type);
-}
-
 /// Base class of fixed-width bit-vector types
 ///
 /// Superclass of anything represented by bits, for example integers (in 32

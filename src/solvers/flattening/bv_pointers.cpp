@@ -125,7 +125,6 @@ bool bv_pointerst::convert_address_of_rec(
       CHECK_RETURN(bv.size()==bits);
     }
     else if(array_type.id()==ID_array ||
-            array_type.id()==ID_incomplete_array ||
             array_type.id()==ID_string_constant)
     {
       if(convert_address_of_rec(array, bv))

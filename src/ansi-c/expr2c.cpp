@@ -457,10 +457,9 @@ std::string expr2ct::convert_rec(
     new_declarator+=declarator;
 
     // Depending on precedences, we may add parentheses.
-    if(subtype_followed.id()==ID_code ||
-        (sizeof_nesting==0 &&
-         (subtype_followed.id()==ID_array ||
-          subtype_followed.id()==ID_incomplete_array)))
+    if(
+      subtype_followed.id() == ID_code ||
+      (sizeof_nesting == 0 && subtype_followed.id() == ID_array))
       new_declarator="("+new_declarator+")";
 
     return convert_rec(src.subtype(), sub_qualifiers, new_declarator);
@@ -468,13 +467,6 @@ std::string expr2ct::convert_rec(
   else if(src.id()==ID_array)
   {
     return convert_array_type(src, qualifiers, declarator);
-  }
-  else if(src.id()==ID_incomplete_array)
-  {
-    // The [] gets attached to the declarator.
-    // This won't parse without declarator.
-    return convert_rec(
-      src.subtype(), qualifiers, declarator+"[]");
   }
   else if(src.id() == ID_symbol_type)
   {
@@ -1962,8 +1954,7 @@ std::string expr2ct::convert_constant(
         dest+='l';
     }
   }
-  else if(type.id()==ID_array ||
-          type.id()==ID_incomplete_array)
+  else if(type.id() == ID_array)
   {
     dest=convert_array(src, precedence);
   }

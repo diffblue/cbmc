@@ -275,12 +275,6 @@ bool base_type_eqt::base_type_eq_rec(
 
     return true;
   }
-  else if(type1.id()==ID_incomplete_array)
-  {
-    return base_type_eq_rec(
-      to_incomplete_array_type(type1).subtype(),
-      to_incomplete_array_type(type2).subtype());
-  }
 
   // the below will go away
   typet tmp1(type1), tmp2(type2);
