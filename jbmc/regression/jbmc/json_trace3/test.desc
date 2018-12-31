@@ -4,7 +4,7 @@ Test.class
 activate-multi-line-match
 EXIT=10
 SIGNAL=0
-"lhs": "dynamic_2_array\[1L?\]",\n *"mode": "java",\n *"sourceLocation": \{\n *"bytecodeIndex": "18",\n *"file": "Test\.java",\n *"function": "java::Test\.main:\(\[J\)V",\n *"line": "8"\n *\},\n *"stepType": "assignment",\n *"thread": 0,\n *"value": \{\n *"binary": "0000000000000000000000000000000000000000000000000000000000000001",\n *"data": "1L",\n *"name": "integer",\n *"type": "long",\n *"width": 64
+"lhs": "dynamic_object3\[1L?\]",\n *"mode": "java",\n *"sourceLocation": \{\n *"bytecodeIndex": "18",\n *"file": "Test\.java",\n *"function": "java::Test\.main:\(\[J\)V",\n *"line": "8"\n *\},\n *"stepType": "assignment",\n *"thread": 0,\n *"value": \{\n *"binary": "0000000000000000000000000000000000000000000000000000000000000001",\n *"data": "1L",\n *"name": "integer",\n *"type": "long",\n *"width": 64
 --
 "name": "unknown"
 ^warning: ignoring
