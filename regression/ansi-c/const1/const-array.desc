@@ -1,4 +1,4 @@
-CORE
+KNOWNBUG
 const-array.c
  ^.*: .* is constant$
 ^   array\[1\] = 2;$
