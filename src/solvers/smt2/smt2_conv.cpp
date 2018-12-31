@@ -3611,7 +3611,7 @@ void smt2_convt::convert_with(const with_exprt &expr)
         // the member is at the end
         out << "(concat ";
         convert_expr(value);
-        out << "((_ extract " << (m.offset-1) << " 0) ?withop))";
+        out << " ((_ extract " << (m.offset - 1) << " 0) ?withop))";
       }
       else
       {
