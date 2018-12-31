@@ -556,10 +556,10 @@ void smt2_convt::convert_address_of_rec(
     const typet &struct_op_type=ns.follow(struct_op.type());
 
     DATA_INVARIANT(
-      struct_op_type.id() == ID_struct,
+      struct_op_type.id() == ID_struct || struct_op_type.id() == ID_struct_tag,
       "member expression operand shall have struct type");
 
-    const struct_typet &struct_type = to_struct_type(struct_op_type);
+    const struct_typet &struct_type = to_struct_type(ns.follow(struct_op_type));
 
     const irep_idt &component_name = member_expr.get_component_name();
 
@@ -2140,7 +2140,9 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
       else
         SMT2_TODO("can't convert non-constant integer to bitvector");
     }
-    else if(src_type.id()==ID_struct) // flatten a struct to a bit-vector
+    else if(
+      src_type.id() == ID_struct ||
+      src_type.id() == ID_struct_tag) // flatten a struct to a bit-vector
     {
       if(use_datatypes)
       {
@@ -2157,7 +2159,9 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
         convert_expr(src); // nothing else to do!
       }
     }
-    else if(src_type.id()==ID_union) // flatten a union
+    else if(
+      src_type.id() == ID_union ||
+      src_type.id() == ID_union_tag) // flatten a union
     {
       INVARIANT(
         boolbv_width(src_type) == boolbv_width(dest_type),
@@ -2570,7 +2574,7 @@ void smt2_convt::convert_floatbv_typecast(const floatbv_typecast_exprt &expr)
 
 void smt2_convt::convert_struct(const struct_exprt &expr)
 {
-  const struct_typet &struct_type=to_struct_type(expr.type());
+  const struct_typet &struct_type = to_struct_type(ns.follow(expr.type()));
 
   const struct_typet::componentst &components=
     struct_type.components();
@@ -2664,7 +2668,7 @@ void smt2_convt::flatten_array(const exprt &expr)
 
 void smt2_convt::convert_union(const union_exprt &expr)
 {
-  const union_typet &union_type=to_union_type(expr.type());
+  const union_typet &union_type = to_union_type(ns.follow(expr.type()));
   const exprt &op=expr.op();
 
   boolbv_widtht boolbv_width(ns);
@@ -3552,9 +3556,9 @@ void smt2_convt::convert_with(const with_exprt &expr)
       out << ") distance?)))"; // zero_extend, bvshl, bvor, let
     }
   }
-  else if(expr_type.id()==ID_struct)
+  else if(expr_type.id() == ID_struct || expr_type.id() == ID_struct_tag)
   {
-    const struct_typet &struct_type=to_struct_type(expr_type);
+    const struct_typet &struct_type = to_struct_type(ns.follow(expr_type));
 
     const exprt &index=expr.op1();
     const exprt &value=expr.op2();
@@ -3623,9 +3627,9 @@ void smt2_convt::convert_with(const with_exprt &expr)
       out << ")"; // let ?withop
     }
   }
-  else if(expr_type.id()==ID_union)
+  else if(expr_type.id() == ID_union || expr_type.id() == ID_union_tag)
   {
-    const union_typet &union_type=to_union_type(expr_type);
+    const union_typet &union_type = to_union_type(ns.follow(expr_type));
 
     const exprt &value=expr.op2();
 
@@ -3829,10 +3833,9 @@ void smt2_convt::convert_member(const member_exprt &expr)
   const typet &struct_op_type=ns.follow(struct_op.type());
   const irep_idt &name=member_expr.get_component_name();
 
-  if(struct_op_type.id()==ID_struct)
+  if(struct_op_type.id() == ID_struct || struct_op_type.id() == ID_struct_tag)
   {
-    const struct_typet &struct_type=
-      to_struct_type(struct_op_type);
+    const struct_typet &struct_type = to_struct_type(ns.follow(struct_op_type));
 
     INVARIANT(
       struct_type.has_component(name), "struct should have accessed component");
@@ -3862,7 +3865,8 @@ void smt2_convt::convert_member(const member_exprt &expr)
       out << ")";
     }
   }
-  else if(struct_op_type.id()==ID_union)
+  else if(
+    struct_op_type.id() == ID_union || struct_op_type.id() == ID_union_tag)
   {
     std::size_t width=boolbv_width(expr.type());
     CHECK_RETURN_WITH_DIAGNOSTICS(
@@ -3924,14 +3928,14 @@ void smt2_convt::flatten2bv(const exprt &expr)
   {
     convert_expr(expr);
   }
-  else if(type.id()==ID_struct)
+  else if(type.id() == ID_struct || type.id() == ID_struct_tag)
   {
     if(use_datatypes)
     {
       const std::string &smt_typename = datatype_map.at(type);
 
       // concatenate elements
-      const struct_typet &struct_type=to_struct_type(type);
+      const struct_typet &struct_type = to_struct_type(ns.follow(type));
 
       out << "(let ((?sflop ";
       convert_expr(expr);
@@ -4027,7 +4031,7 @@ void smt2_convt::unflatten(
       // nop, already a bv
     }
   }
-  else if(type.id()==ID_struct)
+  else if(type.id() == ID_struct || type.id() == ID_struct_tag)
   {
     if(use_datatypes)
     {
@@ -4042,7 +4046,7 @@ void smt2_convt::unflatten(
 
         out << "(mk-" << smt_typename;
 
-        const struct_typet &struct_type=to_struct_type(type);
+        const struct_typet &struct_type = to_struct_type(ns.follow(type));
 
         const struct_typet::componentst &components=
           struct_type.components();
@@ -4426,7 +4430,7 @@ void smt2_convt::convert_type(const typet &type)
   {
     out << "Bool";
   }
-  else if(type.id()==ID_struct)
+  else if(type.id() == ID_struct || type.id() == ID_struct_tag)
   {
     if(use_datatypes)
     {
@@ -4465,7 +4469,7 @@ void smt2_convt::convert_type(const typet &type)
     // member count.
     out << "Bool";
   }
-  else if(type.id()==ID_union)
+  else if(type.id() == ID_union || type.id() == ID_union_tag)
   {
     boolbv_widtht boolbv_width(ns);
 
@@ -4617,7 +4621,7 @@ void smt2_convt::find_symbols_rec(
       out << "))))\n";
     }
   }
-  else if(type.id()==ID_struct)
+  else if(type.id() == ID_struct)
   {
     // Cater for mutually recursive struct types
     bool need_decl=false;
@@ -4630,11 +4634,11 @@ void smt2_convt::find_symbols_rec(
       need_decl=true;
     }
 
-    const struct_typet::componentst &components=
+    const struct_typet::componentst &components =
       to_struct_type(type).components();
 
-     for(const auto &component : components)
-       find_symbols_rec(component.type(), recstack);
+    for(const auto &component : components)
+      find_symbols_rec(component.type(), recstack);
 
     // Declare the corresponding SMT type if we haven't already.
     if(need_decl)
@@ -4713,9 +4717,9 @@ void smt2_convt::find_symbols_rec(
       out << "\n";
     }
   }
-  else if(type.id()==ID_union)
+  else if(type.id() == ID_union)
   {
-    const union_typet::componentst &components=
+    const union_typet::componentst &components =
       to_union_type(type).components();
 
     for(const auto &component : components)
@@ -4743,6 +4747,28 @@ void smt2_convt::find_symbols_rec(
     {
       recstack.insert(id);
       find_symbols_rec(ns.follow(type), recstack);
+    }
+  }
+  else if(type.id() == ID_struct_tag)
+  {
+    const auto &struct_tag = to_struct_tag_type(type);
+    const irep_idt &id = struct_tag.get_identifier();
+
+    if(recstack.find(id) == recstack.end())
+    {
+      recstack.insert(id);
+      find_symbols_rec(ns.follow_tag(struct_tag), recstack);
+    }
+  }
+  else if(type.id() == ID_union_tag)
+  {
+    const auto &union_tag = to_union_tag_type(type);
+    const irep_idt &id = union_tag.get_identifier();
+
+    if(recstack.find(id) == recstack.end())
+    {
+      recstack.insert(id);
+      find_symbols_rec(ns.follow_tag(union_tag), recstack);
     }
   }
 }
