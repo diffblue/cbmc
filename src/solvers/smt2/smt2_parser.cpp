@@ -206,9 +206,8 @@ exprt smt2_parsert::let_expression()
     result=let;
   }
 
-  // remove bindings from id_map
-  for(const auto &b : bindings)
-    id_map.erase(b.first);
+  // we keep these in the id_map in order to retain globally
+  // unique identifiers
 
   // restore renamings
   renaming_map=old_renaming_map;
