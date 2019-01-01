@@ -29,6 +29,13 @@ bvt boolbvt::convert_floatbv_typecast(const floatbv_typecast_exprt &expr)
   if(src_type==dest_type) // redundant type cast?
     return bv0;
 
+  if(src_type.id() == ID_c_bit_field)
+  {
+    // go through underlying type
+    return convert_floatbv_typecast(floatbv_typecast_exprt(
+      typecast_exprt(op0, src_type.subtype()), op1, dest_type));
+  }
+
   float_utilst float_utils(prop);
 
   float_utils.set_rounding_mode(convert_bv(op1));
