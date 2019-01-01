@@ -25,8 +25,21 @@ exprt float_bvt::convert(const exprt &expr) const
     return not_exprt(is_equal(expr.op0(), expr.op1(), get_spec(expr.op0())));
   else if(expr.id()==ID_floatbv_typecast)
   {
-    const typet &src_type=expr.op0().type();
-    const typet &dest_type=expr.type();
+    const auto &floatbv_typecast_expr = to_floatbv_typecast_expr(expr);
+
+    const exprt &src = floatbv_typecast_expr.op();
+    const exprt &rm = floatbv_typecast_expr.rounding_mode();
+    const typet &src_type = src.type();
+    const typet &dest_type = floatbv_typecast_expr.type();
+
+    if(src_type.id() == ID_c_bit_field)
+    {
+      // go through underlying type
+      return convert(floatbv_typecast_exprt(
+        typecast_exprt(src, to_c_bit_field_type(src_type).subtype()),
+        rm,
+        dest_type));
+    }
 
     if(dest_type.id()==ID_signedbv &&
        src_type.id()==ID_floatbv) // float -> signed
@@ -60,10 +73,30 @@ exprt float_bvt::convert(const exprt &expr) const
     else
       return nil_exprt();
   }
-  else if(expr.id()==ID_typecast &&
-          expr.type().id()==ID_bool &&
-          expr.op0().type().id()==ID_floatbv)  // float -> bool
-    return not_exprt(is_zero(expr.op0()));
+  else if(expr.id() == ID_typecast)
+  {
+    const typet &src_type = expr.op0().type();
+    const typet &dest_type = expr.type();
+
+    if(
+      dest_type.id() == ID_bool && src_type.id() == ID_floatbv) // float -> bool
+    {
+      return not_exprt(is_zero(expr.op0()));
+    }
+    else if(
+      src_type.id() == ID_c_bool &&
+      dest_type.id() == ID_floatbv) // c_bool -> float
+    {
+      return from_c_bool(expr.op0(), get_spec(expr));
+    }
+    else if(
+      src_type.id() == ID_bool && dest_type.id() == ID_floatbv) // bool -> float
+    {
+      return from_bool(expr.op0(), get_spec(expr));
+    }
+    else
+      return nil_exprt();
+  }
   else if(expr.id()==ID_floatbv_plus)
     return add_sub(false, expr.op0(), expr.op1(), expr.op2(), get_spec(expr));
   else if(expr.id()==ID_floatbv_minus)
@@ -252,6 +285,24 @@ exprt float_bvt::from_unsigned_integer(
   result.sign=false_exprt();
 
   return rounder(result, rm, spec);
+}
+
+exprt float_bvt::from_bool(const exprt &src, const ieee_float_spect &spec) const
+{
+  ieee_floatt zero(spec);
+  zero.make_zero();
+  const auto zero_expr = zero.to_expr();
+  ieee_floatt one(spec);
+  one.build(1, 0);
+  const auto one_expr = one.to_expr();
+  return if_exprt(src, one_expr, zero_expr);
+}
+
+exprt float_bvt::from_c_bool(const exprt &src, const ieee_float_spect &spec)
+  const
+{
+  // we go via bool
+  return from_bool(typecast_exprt(src, bool_typet()), spec);
 }
 
 exprt float_bvt::to_signed_integer(

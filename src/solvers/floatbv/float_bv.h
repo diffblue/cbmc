@@ -55,6 +55,8 @@ public:
     const exprt &,
     const exprt &rm,
     const ieee_float_spect &) const;
+  exprt from_c_bool(const exprt &, const ieee_float_spect &) const;
+  exprt from_bool(const exprt &, const ieee_float_spect &) const;
   exprt from_signed_integer(
     const exprt &,
     const exprt &rm,
