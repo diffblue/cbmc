@@ -53,16 +53,15 @@ static bool have_to_adjust_float_expressions(const exprt &expr)
     if(dest_type.id()==ID_floatbv &&
        src_type.id()==ID_floatbv)
       return true;
-    else if(dest_type.id()==ID_floatbv &&
-            (src_type.id()==ID_c_bool ||
-             src_type.id()==ID_signedbv ||
-             src_type.id()==ID_unsignedbv ||
-             src_type.id()==ID_c_enum_tag))
+    else if(
+      dest_type.id() == ID_floatbv &&
+      (src_type.id() == ID_c_bit_field || src_type.id() == ID_signedbv ||
+       src_type.id() == ID_unsignedbv || src_type.id() == ID_c_enum_tag))
       return true;
-    else if((dest_type.id()==ID_signedbv ||
-             dest_type.id()==ID_unsignedbv ||
-             dest_type.id()==ID_c_enum_tag) &&
-             src_type.id()==ID_floatbv)
+    else if(
+      (dest_type.id() == ID_signedbv || dest_type.id() == ID_unsignedbv ||
+       dest_type.id() == ID_c_enum_tag || dest_type.id() == ID_c_bit_field) &&
+      src_type.id() == ID_floatbv)
       return true;
   }
 
@@ -136,21 +135,26 @@ void adjust_float_expressions(exprt &expr, const exprt &rounding_mode)
       expr.operands().resize(2);
       expr.op1()=rounding_mode;
     }
-    else if(dest_type.id()==ID_floatbv &&
-            (src_type.id()==ID_c_bool ||
-             src_type.id()==ID_signedbv ||
-             src_type.id()==ID_unsignedbv ||
-             src_type.id()==ID_c_enum_tag))
+    else if(
+      dest_type.id() == ID_floatbv &&
+      (src_type.id() == ID_signedbv || src_type.id() == ID_unsignedbv ||
+       src_type.id() == ID_c_enum_tag || src_type.id() == ID_c_bit_field))
     {
       // casts from integer to float-type might round
       expr.id(ID_floatbv_typecast);
       expr.operands().resize(2);
       expr.op1()=rounding_mode;
     }
-    else if((dest_type.id()==ID_signedbv ||
-             dest_type.id()==ID_unsignedbv ||
-             dest_type.id()==ID_c_enum_tag) &&
-             src_type.id()==ID_floatbv)
+    else if(
+      dest_type.id() == ID_floatbv &&
+      (src_type.id() == ID_c_bool || src_type.id() == ID_bool))
+    {
+      // casts from bool or c_bool to float-type do not need rounding
+    }
+    else if(
+      (dest_type.id() == ID_signedbv || dest_type.id() == ID_unsignedbv ||
+       dest_type.id() == ID_c_enum_tag || dest_type.id() == ID_c_bit_field) &&
+      src_type.id() == ID_floatbv)
     {
       // In C, casts from float to integer always round to zero,
       // irrespectively of the rounding mode that is currently set.
