@@ -30,6 +30,7 @@ Author: Daniel Kroening, kroening@kroening.com
 // #define DEBUGX
 
 #ifdef DEBUGX
+#include "format_expr.h"
 #include <iostream>
 #endif
 
@@ -2233,8 +2234,8 @@ bool simplify_exprt::simplify_node(exprt &expr)
      #endif
      )
   {
-    std::cout << "===== " << format(old) << "\n ---> " << format(expr)
-              << "\n";
+    std::cout << "===== " << old.id() << ": " << format(old) << '\n'
+              << " ---> " << format(expr) << '\n';
   }
   #endif
 
