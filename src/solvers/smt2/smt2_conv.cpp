@@ -812,6 +812,19 @@ std::string smt2_convt::type2id(const typet &type) const
   {
     return type2id(ns.follow_tag(to_c_enum_tag_type(type)).subtype());
   }
+  else if(type.id() == ID_c_bit_field)
+  {
+    const auto &c_bit_field_type = to_c_bit_field_type(type);
+    // use underlying type
+    if(c_bit_field_type.subtype().id() == ID_unsignedbv)
+      return type2id(unsignedbv_typet(c_bit_field_type.get_width()));
+    else if(c_bit_field_type.subtype().id() == ID_signedbv)
+      return type2id(signedbv_typet(c_bit_field_type.get_width()));
+    else if(c_bit_field_type.subtype().id() == ID_c_bool)
+      return type2id(c_bool_typet(c_bit_field_type.get_width()));
+    else
+      UNIMPLEMENTED;
+  }
   else
   {
     UNREACHABLE;
@@ -2352,46 +2365,28 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
   }
   else if(dest_type.id()==ID_floatbv)
   {
+    const auto &dest_floatbv_type = to_floatbv_type(dest_type);
+
     // Typecast from integer to floating-point should have be been
     // converted to ID_floatbv_typecast during symbolic execution,
     // adding the rounding mode.  See
     // smt2_convt::convert_floatbv_typecast.
-    // The exception is bool and c_bool to float.
+    // The exceptions are bool and c_bool to float,
+    // and non-semantic conversion.
 
-    if(src_type.id()==ID_bool)
+    if(src_type.id() == ID_bool || src_type.id() == ID_c_bool)
     {
-      constant_exprt val(irep_idt(), dest_type);
-
-      ieee_floatt a(to_floatbv_type(dest_type));
-
-      mp_integer significand;
-      mp_integer exponent;
-
-      out << "(ite ";
-      convert_expr(src);
-      out << " ";
-
-      significand = 1;
-      exponent = 0;
-      a.build(significand, exponent);
-      val.set(ID_value, integer2binary(a.pack(), a.spec.width()));
-
-      convert_constant(val);
-      out << " ";
-
-      significand = 0;
-      exponent = 0;
-      a.build(significand, exponent);
-      val.set(ID_value, integer2binary(a.pack(), a.spec.width()));
-
-      convert_constant(val);
-      out << ")";
+      convert_expr(float_bv(expr));
     }
-    else if(src_type.id()==ID_c_bool)
+    else if(src_type.id() == ID_bv)
     {
-      // turn into proper bool
-      const typecast_exprt tmp(src, bool_typet());
-      convert_typecast(typecast_exprt(tmp, dest_type));
+      if(to_bv_type(src_type).get_width() == dest_floatbv_type.get_width())
+      {
+        // preserve representation, this just changes the type
+        convert_expr(src);
+      }
+      else
+        UNEXPECTEDCASE("typecast bv -> float with wrong width");
     }
     else
       UNEXPECTEDCASE("Unknown typecast "+src_type.id_string()+" -> float");
@@ -2429,7 +2424,7 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
 void smt2_convt::convert_floatbv_typecast(const floatbv_typecast_exprt &expr)
 {
   const exprt &src=expr.op();
-  // const exprt &rounding_mode=expr.rounding_mode();
+  const exprt &rounding_mode = expr.rounding_mode();
   const typet &src_type=src.type();
   const typet &dest_type=expr.type();
 
@@ -2532,6 +2527,14 @@ void smt2_convt::convert_floatbv_typecast(const floatbv_typecast_exprt &expr)
           src,
           ns.follow_tag(to_c_enum_tag_type(src_type)).subtype());
       convert_floatbv_typecast(tmp);
+    }
+    else if(src_type.id() == ID_c_bit_field)
+    {
+      // go through underlying type
+      convert_floatbv_typecast(floatbv_typecast_exprt(
+        typecast_exprt(src, to_c_bit_field_type(src_type).subtype()),
+        rounding_mode,
+        dest_type));
     }
     else
       UNEXPECTEDCASE(
