@@ -123,7 +123,7 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
           address_of_exprt(
             lookup(resolved_expr.get(ID_component_name)).symbol_expr());
 
-        symbol.value.type().add("to-member") = resolved_expr.op0().type();
+        symbol.value.type().add(ID_to_member) = resolved_expr.op0().type();
       }
       else
         UNREACHABLE;
@@ -142,8 +142,8 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
 
     typecheck_expr(symbol.value);
 
-    if(symbol.value.type().find("to-member").is_not_nil())
-      symbol.type.add("to-member") = symbol.value.type().find("to-member");
+    if(symbol.value.type().find(ID_to_member).is_not_nil())
+      symbol.type.add(ID_to_member) = symbol.value.type().find(ID_to_member);
 
     if(symbol.value.id()==ID_initializer_list ||
        symbol.value.id()==ID_string_constant)
