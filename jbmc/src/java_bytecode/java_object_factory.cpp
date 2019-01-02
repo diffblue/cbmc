@@ -166,6 +166,24 @@ private:
     code_blockt &assignments,
     const exprt &instance_expr,
     const irep_idt &method_name);
+
+  void array_primitive_init_code(
+    code_blockt &assignments,
+    const exprt &init_array_expr,
+    const exprt &length_expr,
+    const typet &element_type,
+    const exprt &max_length_expr,
+    const source_locationt &location);
+
+  void array_loop_init_code(
+    code_blockt &assignments,
+    const exprt &init_array_expr,
+    const exprt &length_expr,
+    const typet &element_type,
+    const exprt &max_length_expr,
+    size_t depth,
+    update_in_placet update_in_place,
+    const source_locationt &location);
 };
 
 /// Returns a codet that assigns \p expr, of type \p ptr_type, a NULL value.
@@ -1198,55 +1216,113 @@ void java_object_factoryt::allocate_nondet_length_array(
   assignments.add(assign);
 }
 
-/// Create code to initialize a Java array whose size will be at most
-/// `max_nondet_array_length`. The code is emitted to \p assignments does as
-/// follows:
-/// 1. non-deterministically choose a length for the array
-/// 2. assume that such length is >=0 and <= max_length
-/// 3. loop through all elements of the array and initialize them
-void java_object_factoryt::gen_nondet_array_init(
+/// Create code allocating object of size `size` and assigning it to `lhs`
+/// \param lhs : pointer which will be allocated
+/// \param size : size of the object
+/// \return code allocation object and assigning `lhs`
+codet make_allocate_code(const symbol_exprt &lhs, const exprt &size)
+{
+  side_effect_exprt alloc(ID_allocate, lhs.type(), lhs.source_location());
+  alloc.add_to_operands(size);
+  alloc.add_to_operands(false_exprt());
+  return code_assignt(lhs, alloc);
+}
+
+/// Create code to nondeterministically initialize arrays of primitive type.
+/// The code produced is of the form (for an array of type TYPE):
+/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+///     TYPE (*array_data_init)[max_length_expr];
+///     array_data_init =
+///       ALLOCATE(TYPE [max_length_expr], max_length_expr, false);
+///     *array_data_init = NONDET(TYPE [max_length_expr]);
+///     init_array_expr = *array_data_init;
+/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/// \param [out] assignments : Code block to which the initializing assignments
+///   will be appended.
+/// \param init_array_expr : array data
+/// \param length_expr : array length
+/// \param element_type: type of array elements
+/// \param max_length_expr : the (constant) size to which initialise the array
+/// \param location: Source location associated with nondet-initialization.
+void java_object_factoryt::array_primitive_init_code(
   code_blockt &assignments,
-  const exprt &expr,
+  const exprt &init_array_expr,
+  const exprt &length_expr,
+  const typet &element_type,
+  const exprt &max_length_expr,
+  const source_locationt &location)
+{
+  array_typet array_type(element_type, max_length_expr);
+
+  // TYPE (*array_data_init)[max_length_expr];
+  const symbol_exprt &tmp_finite_array_pointer =
+    allocate_objects.allocate_automatic_local_object(
+      pointer_type(array_type), "array_data_init");
+
+  // array_data_init = ALLOCATE(TYPE [max_length_expr], max_length_expr, false);
+  assignments.add(
+    make_allocate_code(
+      tmp_finite_array_pointer,
+      max_length_expr));
+
+  // *array_data_init = NONDET(TYPE [max_length_expr]);
+  const exprt nondet_data=side_effect_expr_nondett(array_type, loc);
+  const exprt data_pointer_deref=dereference_exprt(
+    tmp_finite_array_pointer,
+    array_type);
+  assignments.add(code_assignt(data_pointer_deref, nondet_data));
+
+  // init_array_expr = *array_data_init;
+  address_of_exprt tmp_nondet_pointer(
+    index_exprt(data_pointer_deref, from_integer(0, java_int_type())));
+  assignments.add(code_assignt(init_array_expr, tmp_nondet_pointer));
+}
+
+/// Create code to nondeterministically initialize each element of an array in a
+/// loop.
+/// The code produced is of the form (supposing an array of type OBJ):
+/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+///        struct OBJ **array_data_init;
+///        int array_init_iter;
+///        array_data_init = (struct OBJ **)init_array_expr;
+///        array_init_iter = 0;
+///     2: IF array_init_iter == length_expr THEN GOTO 5
+///        IF array_init_iter == max_length_expr THEN GOTO 5
+///        IF !NONDET(__CPROVER_bool) THEN GOTO 3
+///        array_data_init[array_init_iter] = null;
+///        GOTO 4
+///     3: malloc_site = ALLOCATE(...);
+///        array_data_init[array_init_iter] = (struct OBJ *)malloc_site;
+///        *malloc_site = {...};
+///        malloc_site->value = NONDET(int);
+///     4: array_init_iter = array_init_iter + 1;
+///        GOTO 2
+///     5: ...
+/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/// \param [out] assignments : Code block to which the initializing assignments
+///   will be appended.
+/// \param init_array_expr : array data
+/// \param length_expr : array length
+/// \param element_type: type of array elements
+/// \param max_length_expr : max length, as specified by max-nondet-array-length
+/// \param depth: Number of times that a pointer has been dereferenced from the
+///   root of the object tree that we are initializing.
+/// \param update_in_place:
+///   NO_UPDATE_IN_PLACE: initialize `expr` from scratch
+///   MAY_UPDATE_IN_PLACE: generate a runtime nondet branch between the NO_
+///   and MUST_ cases.
+///   MUST_UPDATE_IN_PLACE: reinitialize an existing object
+/// \param location: Source location associated with nondet-initialization.
+void java_object_factoryt::array_loop_init_code(
+  code_blockt &assignments,
+  const exprt &init_array_expr,
+  const exprt &length_expr,
+  const typet &element_type,
+  const exprt &max_length_expr,
   size_t depth,
   update_in_placet update_in_place,
   const source_locationt &location)
 {
-  PRECONDITION(expr.type().id()==ID_pointer);
-  PRECONDITION(expr.type().subtype().id() == ID_struct_tag);
-  PRECONDITION(update_in_place!=update_in_placet::MAY_UPDATE_IN_PLACE);
-
-  const typet &type=ns.follow(expr.type().subtype());
-  const struct_typet &struct_type=to_struct_type(type);
-  const typet &element_type =
-    static_cast<const typet &>(expr.type().subtype().find(ID_element_type));
-
-  auto max_length_expr=from_integer(
-    object_factory_parameters.max_nondet_array_length, java_int_type());
-
-  // In NO_UPDATE_IN_PLACE mode we allocate a new array and recursively
-  // initialize its elements
-  if(update_in_place==update_in_placet::NO_UPDATE_IN_PLACE)
-  {
-    allocate_nondet_length_array(
-      assignments, expr, max_length_expr, element_type, location);
-  }
-
-  // Otherwise we're updating the array in place, and use the
-  // existing array allocation and length.
-
-  INVARIANT(
-    is_valid_java_array(struct_type),
-    "Java struct array does not conform to expectations");
-
-  dereference_exprt deref_expr(expr, expr.type().subtype());
-  const auto &comps=struct_type.components();
-  const member_exprt length_expr(deref_expr, "length", comps[1].type());
-  exprt init_array_expr=member_exprt(deref_expr, "data", comps[2].type());
-
-  if(init_array_expr.type()!=pointer_type(element_type))
-    init_array_expr=
-      typecast_exprt(init_array_expr, pointer_type(element_type));
-
   const symbol_exprt &array_init_symexpr =
     allocate_objects.allocate_automatic_local_object(
       init_array_expr.type(), "array_data_init");
@@ -1320,6 +1396,82 @@ void java_object_factoryt::gen_nondet_array_init(
   assignments.add(std::move(incr));
   assignments.add(std::move(goto_head));
   assignments.add(std::move(init_done_label));
+}
+
+/// Create code to initialize a Java array whose size will be at most
+/// `max_nondet_array_length`. The code is emitted to \p assignments does as
+/// follows:
+/// 1. non-deterministically choose a length for the array
+/// 2. assume that such length is >=0 and <= max_length
+/// 3. loop through all elements of the array and initialize them
+void java_object_factoryt::gen_nondet_array_init(
+  code_blockt &assignments,
+  const exprt &expr,
+  size_t depth,
+  update_in_placet update_in_place,
+  const source_locationt &location)
+{
+  PRECONDITION(expr.type().id() == ID_pointer);
+  PRECONDITION(expr.type().subtype().id() == ID_struct_tag);
+  PRECONDITION(update_in_place != update_in_placet::MAY_UPDATE_IN_PLACE);
+
+  const typet &type = ns.follow(expr.type().subtype());
+  const struct_typet &struct_type = to_struct_type(type);
+  const typet &element_type =
+    static_cast<const typet &>(expr.type().subtype().find(ID_element_type));
+
+  auto max_length_expr = from_integer(
+    object_factory_parameters.max_nondet_array_length, java_int_type());
+
+  // In NO_UPDATE_IN_PLACE mode we allocate a new array and recursively
+  // initialize its elements
+  if(update_in_place == update_in_placet::NO_UPDATE_IN_PLACE)
+  {
+    allocate_nondet_length_array(
+      assignments, expr, max_length_expr, element_type, location);
+  }
+
+  // Otherwise we're updating the array in place, and use the
+  // existing array allocation and length.
+
+  INVARIANT(
+    is_valid_java_array(struct_type),
+    "Java struct array does not conform to expectations");
+
+  dereference_exprt deref_expr(expr, expr.type().subtype());
+  const auto &comps = struct_type.components();
+  const member_exprt length_expr(deref_expr, "length", comps[1].type());
+  exprt init_array_expr = member_exprt(deref_expr, "data", comps[2].type());
+
+  if(init_array_expr.type() != pointer_type(element_type))
+    init_array_expr =
+      typecast_exprt(init_array_expr, pointer_type(element_type));
+
+  if(element_type.id() == ID_pointer)
+  {
+    // For arrays of non-primitive types, nondeterministically initialize each
+    // element of the array
+    array_loop_init_code(
+      assignments,
+      init_array_expr,
+      length_expr,
+      element_type,
+      max_length_expr,
+      depth,
+      update_in_place,
+      location);
+  }
+  else
+  {
+    // Arrays of primitive types can be initialized with a single instruction
+    array_primitive_init_code(
+      assignments,
+      init_array_expr,
+      length_expr,
+      element_type,
+      max_length_expr,
+      location);
+  }
 }
 
 /// We nondet-initialize enums to be equal to one of the constants defined
