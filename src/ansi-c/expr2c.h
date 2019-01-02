@@ -40,13 +40,13 @@ struct expr2c_configurationt final
     const bool include_struct_padding_components,
     const bool print_struct_body_in_type,
     const bool include_array_size,
-    std::string true_string,
-    std::string false_string)
+    const std::string &true_string,
+    const std::string &false_string)
     : include_struct_padding_components(include_struct_padding_components),
       print_struct_body_in_type(print_struct_body_in_type),
       include_array_size(include_array_size),
-      true_string(std::move(true_string)),
-      false_string(std::move(false_string))
+      true_string(true_string),
+      false_string(false_string)
   {
   }
 
