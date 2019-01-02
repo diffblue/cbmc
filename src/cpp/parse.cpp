@@ -5377,7 +5377,7 @@ bool Parser::rPmExpr(exprt &exp)
     exprt left;
     left.swap(exp);
 
-    exp=exprt("pointer-to-member");
+    exp = exprt(ID_pointer_to_member);
     exp.move_to_operands(left, right);
     set_location(exp, tk);
   }

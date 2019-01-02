@@ -53,7 +53,7 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
     typecheck_expr_cpp_name(expr, cpp_typecheck_fargst());
   else if(expr.id()=="cpp-this")
     typecheck_expr_this(expr);
-  else if(expr.id()=="pointer-to-member")
+  else if(expr.id() == ID_pointer_to_member)
     convert_pmop(expr);
   else if(expr.id() == ID_new_object)
   {
@@ -2605,8 +2605,8 @@ void cpp_typecheckt::typecheck_expr_dereference(exprt &expr)
 
 void cpp_typecheckt::convert_pmop(exprt &expr)
 {
-  assert(expr.id()=="pointer-to-member");
-  assert(expr.operands().size() == 2);
+  PRECONDITION(expr.id() == ID_pointer_to_member);
+  PRECONDITION(expr.operands().size() == 2);
 
   if(
     expr.op1().type().id() != ID_pointer ||
