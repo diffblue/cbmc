@@ -44,7 +44,10 @@ enum class clinit_statest
   INIT_COMPLETE
 };
 
-const typet clinit_states_type = java_byte_type();
+static typet clinit_states_type()
+{
+  return java_byte_type();
+}
 
 // Disable linter here to allow a std::string constant, since that holds
 // a length, whereas a cstr would require strlen every time.
@@ -158,7 +161,7 @@ static code_assignt
 gen_clinit_assign(const exprt &expr, const clinit_statest state)
 {
   mp_integer initv(static_cast<int>(state));
-  constant_exprt init_s = from_integer(initv, clinit_states_type);
+  constant_exprt init_s = from_integer(initv, clinit_states_type());
   return code_assignt(expr, init_s);
 }
 
@@ -174,7 +177,7 @@ static equal_exprt
 gen_clinit_eqexpr(const exprt &expr, const clinit_statest state)
 {
   mp_integer initv(static_cast<int>(state));
-  constant_exprt init_s = from_integer(initv, clinit_states_type);
+  constant_exprt init_s = from_integer(initv, clinit_states_type());
   return equal_exprt(expr, init_s);
 }
 
@@ -312,7 +315,7 @@ static void create_clinit_wrapper_symbols(
   if(thread_safe)
   {
     exprt not_init_value = from_integer(
-      static_cast<int>(clinit_statest::NOT_INIT), clinit_states_type);
+      static_cast<int>(clinit_statest::NOT_INIT), clinit_states_type());
 
     // Create two global static synthetic "fields" for the class "id"
     // these two variables hold the state of the class initialization algorithm
@@ -320,7 +323,7 @@ static void create_clinit_wrapper_symbols(
     add_new_variable_symbol(
       symbol_table,
       clinit_state_var_name(class_name),
-      clinit_states_type,
+      clinit_states_type(),
       not_init_value,
       false,
       true);
@@ -328,7 +331,7 @@ static void create_clinit_wrapper_symbols(
     add_new_variable_symbol(
       symbol_table,
       clinit_thread_local_state_var_name(class_name),
-      clinit_states_type,
+      clinit_states_type(),
       not_init_value,
       true,
       true);

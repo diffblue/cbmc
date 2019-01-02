@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 A.class
 --function 'A.me6:()V' --java-threading --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
 ^EXIT=0$

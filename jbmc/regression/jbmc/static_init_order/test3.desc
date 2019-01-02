@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 static_init_order.class
 --function static_init_order.test1 --trace --java-threading
 ^EXIT=0$
