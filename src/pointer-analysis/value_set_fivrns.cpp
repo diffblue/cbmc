@@ -316,9 +316,8 @@ void value_set_fivrnst::get_value_set_rec(
 
     const typet &type=ns.follow(expr.op0().type());
 
-    DATA_INVARIANT(type.id()==ID_array ||
-                   type.id()==ID_incomplete_array,
-                   "operand 0 of index expression must be an array");
+    DATA_INVARIANT(
+      type.id() == ID_array, "operand 0 of index expression must be an array");
 
     get_value_set_rec(expr.op0(), dest, "[]"+suffix, original_type, ns);
 
@@ -661,9 +660,8 @@ void value_set_fivrnst::get_reference_set_rec(
     const exprt &offset=expr.op1();
     const typet &array_type=ns.follow(array.type());
 
-    assert(array_type.id()==ID_array ||
-           array_type.id()==ID_incomplete_array);
-
+    DATA_INVARIANT(
+      array_type.id() == ID_array, "index takes array-typed operand");
 
     object_mapt array_references;
     get_reference_set(array, array_references, ns);
@@ -996,8 +994,8 @@ void value_set_fivrnst::assign_rec(
 
     const typet &type=ns.follow(lhs.op0().type());
 
-    DATA_INVARIANT(type.id()==ID_array || type.id()==ID_incomplete_array,
-                   "operand 0 of index expression must be an array");
+    DATA_INVARIANT(
+      type.id() == ID_array, "operand 0 of index expression must be an array");
 
     assign_rec(lhs.op0(), values_rhs, "[]"+suffix, ns, add_to_sets);
   }

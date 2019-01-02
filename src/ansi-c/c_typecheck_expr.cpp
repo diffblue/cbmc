@@ -3328,8 +3328,7 @@ void c_typecheck_baset::typecheck_side_effect_assignment(
     }
 
     // refuse to assign arrays
-    if(type0.id()==ID_array ||
-       type0.id()==ID_incomplete_array)
+    if(type0.id() == ID_array)
     {
       error().source_location = expr.source_location();
       error() << "direct assignments to arrays not permitted" << eom;

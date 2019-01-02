@@ -1101,8 +1101,6 @@ void goto_checkt::bounds_check(
 
   if(array_type.id()==ID_pointer)
     throw "index got pointer as array type";
-  else if(array_type.id()==ID_incomplete_array)
-    throw "index got incomplete array";
   else if(array_type.id()!=ID_array && array_type.id()!=ID_vector)
     throw "bounds check expected array or vector type, got "
       +array_type.id_string();

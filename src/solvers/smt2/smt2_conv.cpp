@@ -4564,10 +4564,6 @@ void smt2_convt::find_symbols_rec(
     find_symbols(array_type.size());
     find_symbols_rec(array_type.subtype(), recstack);
   }
-  else if(type.id()==ID_incomplete_array)
-  {
-    find_symbols_rec(type.subtype(), recstack);
-  }
   else if(type.id()==ID_complex)
   {
     find_symbols_rec(type.subtype(), recstack);
