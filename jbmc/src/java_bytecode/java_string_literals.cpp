@@ -204,6 +204,7 @@ symbol_exprt get_or_create_string_literal_symbol(
     // Case where java.lang.String was stubbed, and so directly defines
     // @class_identifier
     new_symbol.value = jlo_init;
+    new_symbol.value.type() = string_type;
   }
 
   bool add_failed = symbol_table.add(new_symbol);
