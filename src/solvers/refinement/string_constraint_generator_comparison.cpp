@@ -182,13 +182,11 @@ std::pair<exprt, string_constraintst> add_axioms_for_equals_ignore_case(
 /// These axioms are, for each string `s` on which hash was called:
 ///   * \f$ hash(str)=hash(s) \lor |str| \ne |s|
 ///       \lor (|str|=|s| \land \exists i<|s|.\ s[i]\ne str[i]) \f$
-/// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with argument refined_string `str`
 /// \param pool: pool of arrays representing strings
 /// \return integer expression `hash(str)`
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_hash_code(
-  symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
   array_poolt &pool)
 {
@@ -302,13 +300,11 @@ std::pair<exprt, string_constraintst> add_axioms_for_compare_to(
 /// Add axioms stating that the return value for two equal string should be the
 /// same
 /// \deprecated never tested
-/// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with one string argument
 /// \return a string expression
 DEPRECATED("never tested")
 std::pair<symbol_exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_intern(
-  symbol_generatort &fresh_symbol,
   const function_application_exprt &f)
 {
   PRECONDITION(f.arguments().size() == 1);

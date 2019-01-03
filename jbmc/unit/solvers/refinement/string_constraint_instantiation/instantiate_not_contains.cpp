@@ -191,8 +191,7 @@ SCENARIO("instantiate_not_contains",
 
     // Generating the corresponding axioms and simplifying, recording info
     string_constraint_generatort generator(empty_ns);
-    const auto pair = generator.add_axioms_for_function_application(
-      generator.fresh_symbol, func);
+    const auto pair = generator.add_axioms_for_function_application(func);
     const string_constraintst &constraints = pair.second;
 
     std::string axioms;

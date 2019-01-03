@@ -634,8 +634,8 @@ string_builtin_function_with_no_evalt::string_builtin_function_with_no_evalt(
 string_constraintst string_builtin_function_with_no_evalt::constraints(
   string_constraint_generatort &generator) const
 {
-  auto pair = generator.add_axioms_for_function_application(
-    generator.fresh_symbol, function_application);
+  auto pair =
+    generator.add_axioms_for_function_application(function_application);
   pair.second.existential.push_back(equal_exprt(pair.first, return_code));
   return pair.second;
 }
