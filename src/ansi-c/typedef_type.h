@@ -11,8 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/type.h>
 
-/*! \brief A typedef
-*/
+/// A typedef
 class typedef_typet : public typet
 {
 public:
@@ -32,25 +31,19 @@ public:
   }
 };
 
-/*! \brief Cast a generic typet to a \ref typedef_typet
- *
- * This is an unchecked conversion. \a type must be known to be \ref
- * typedef_typet.
- *
- * \param type Source type
- * \return Object of type \ref typedef_typet
- *
- * \ingroup gr_std_types
-*/
+/// Cast a generic typet to a \ref typedef_typet. This is an unchecked
+/// conversion. \a type must be known to be \ref typedef_typet.
+/// \param type: Source type
+/// \return Object of type \ref typedef_typet
+/// \ingroup gr_std_types
 inline const typedef_typet &to_typedef_type(const typet &type)
 {
   PRECONDITION(type.id() == ID_typedef_type);
   return static_cast<const typedef_typet &>(type);
 }
 
-/*! \copydoc to_typedef_type(const typet &)
- * \ingroup gr_std_types
-*/
+/// \copydoc to_typedef_type(const typet &)
+/// \ingroup gr_std_types
 inline typedef_typet &to_typedef_type(typet &type)
 {
   PRECONDITION(type.id() == ID_typedef_type);

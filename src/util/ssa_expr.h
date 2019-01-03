@@ -12,8 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "std_expr.h"
 
-/*! \brief Expression providing an SSA-renamed symbol of expressions
-*/
+/// Expression providing an SSA-renamed symbol of expressions
 class ssa_exprt:public symbol_exprt
 {
 public:
@@ -22,9 +21,8 @@ public:
     set(ID_C_SSA_symbol, true);
   }
 
-  /*! \brief Constructor
-   * \param expr Expression to be converted to SSA symbol
-  */
+  /// Constructor
+  /// \param expr: Expression to be converted to SSA symbol
   explicit ssa_exprt(const exprt &expr):
     symbol_exprt(expr.type())
   {
@@ -121,8 +119,8 @@ public:
 
   void update_identifier();
 
-  /* Used to determine whether or not an identifier can be built
-   * before trying and getting an exception */
+  /// Used to determine whether or not an identifier can be built before trying
+  /// and getting an exception
   static bool can_build_identifier(const exprt &src);
 
   static void check(
@@ -147,16 +145,11 @@ public:
   }
 };
 
-/*! \brief Cast a generic exprt to an \ref ssa_exprt
- *
- * This is an unchecked conversion. \a expr must be known to be \ref
- * ssa_exprt.
- *
- * \param expr Source expression
- * \return Object of type \ref ssa_exprt
- *
- * \ingroup gr_std_expr
-*/
+/// Cast a generic exprt to an \ref ssa_exprt. This is an unchecked conversion.
+/// \a expr must be known to be \ref  ssa_exprt.
+/// \param expr: Source expression
+/// \return Object of type \ref ssa_exprt
+/// \ingroup gr_std_expr
 inline const ssa_exprt &to_ssa_expr(const exprt &expr)
 {
   PRECONDITION(
@@ -165,9 +158,8 @@ inline const ssa_exprt &to_ssa_expr(const exprt &expr)
   return static_cast<const ssa_exprt &>(expr);
 }
 
-/*! \copydoc to_ssa_expr(const exprt &)
- * \ingroup gr_std_expr
-*/
+/// \copydoc to_ssa_expr(const exprt &)
+/// \ingroup gr_std_expr
 inline ssa_exprt &to_ssa_expr(exprt &expr)
 {
   PRECONDITION(
