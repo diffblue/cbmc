@@ -54,9 +54,9 @@ std::ostream &smt2_format_rec(std::ostream &out, const exprt &expr)
     {
       const std::size_t width = to_unsignedbv_type(expr_type).get_width();
 
-      const auto value = numeric_cast_v<mp_integer>(expr);
+      const auto int_value = numeric_cast_v<mp_integer>(expr);
 
-      out << "(_ bv" << value << " " << width << ")";
+      out << "(_ bv" << int_value << " " << width << ")";
     }
     else if(expr_type.id() == ID_bool)
     {
