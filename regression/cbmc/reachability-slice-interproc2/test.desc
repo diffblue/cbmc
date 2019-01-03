@@ -1,4 +1,4 @@
-CORE
+KNOWNBUG
 main.c
 --reachability-slice --show-goto-functions
 ^EXIT=0$

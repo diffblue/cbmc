@@ -1,4 +1,4 @@
-CORE
+KNOWNBUG
 main.c
 --function func --min-null-tree-depth 2 --max-nondet-tree-depth 10 --cover branch
 ^EXIT=0$

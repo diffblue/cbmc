@@ -1,13 +1,12 @@
-default: tests.log
+default: test
 
 test:
-	@../test.pl -p -c ../../../src/cbmc/cbmc -X smt-backend
+	@../test.pl -p -c "../../../src/cbmc/cbmc --validate-goto-model" -X smt-backend
 
 test-cprover-smt2:
 	@../test.pl -p -c "../../../src/cbmc/cbmc --cprover-smt2"
 
-tests.log: ../test.pl
-	@../test.pl -p -c ../../../src/cbmc/cbmc -X smt-backend
+tests.log: ../test.pl test
 
 show:
 	@for dir in *; do \
