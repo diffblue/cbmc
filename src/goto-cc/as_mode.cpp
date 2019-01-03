@@ -24,7 +24,6 @@ Author: Michael Tautschnig
 #include <cstring>
 
 #include <util/config.h>
-#include <util/cout_message.h>
 #include <util/get_base_name.h>
 #include <util/run.h>
 #include <util/tempdir.h>

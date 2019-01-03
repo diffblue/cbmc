@@ -7,7 +7,6 @@
 
 #include <functional>
 
-#include <util/cout_message.h>
 #include <util/json.h>
 
 #include "compile.h"

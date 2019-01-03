@@ -1,6 +1,7 @@
 CORE
 array-of-const.c
- ^.*: .* is constant$
+
+^.*: .* is constant$
 ^EXIT=(1|64)$
 ^SIGNAL=0$
 --

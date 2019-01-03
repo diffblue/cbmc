@@ -15,10 +15,9 @@ Date: June 2006
 #define CPROVER_GOTO_CC_GCC_MODE_H
 
 #include "compile.h"
+#include "gcc_message_handler.h"
 #include "gcc_version.h"
 #include "goto_cc_mode.h"
-
-#include <util/cout_message.h>
 
 #include <set>
 
