@@ -28,7 +28,9 @@ Author: Michael Tautschnig
 // signed/unsigned mismatch
 #endif
 
-#include "catch.hpp"
+#define INCLUDED_VIA_USE_CATCH_H
+
+#include <catch/catch.hpp>
 
 #ifdef _MSC_VER
 #include <util/pragma_pop.def>
