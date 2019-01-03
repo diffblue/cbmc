@@ -2960,6 +2960,29 @@ public:
   }
 };
 
+/// \brief Cast an exprt to a \ref shl_exprt
+///
+/// \a expr must be known to be \ref shl_exprt.
+///
+/// \param expr: Source expression
+/// \return Object of type \ref shl_exprt
+inline const shl_exprt &to_shl_expr(const exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_shl);
+  DATA_INVARIANT(
+    expr.operands().size() == 2, "Bit-wise shl must have two operands");
+  return static_cast<const shl_exprt &>(expr);
+}
+
+/// \copydoc to_shl_expr(const exprt &)
+inline shl_exprt &to_shl_expr(exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_shl);
+  DATA_INVARIANT(
+    expr.operands().size() == 2, "Bit-wise shl must have two operands");
+  return static_cast<shl_exprt &>(expr);
+}
+
 /// \brief Arithmetic right shift
 class ashr_exprt:public shift_exprt
 {
