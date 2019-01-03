@@ -191,18 +191,14 @@ symbol_exprt java_bytecode_convert_methodt::tmp_variable(
 /// Returns an expression indicating a local variable suitable to load/store
 /// from a bytecode at address `address` a value of type `type_char` stored in
 /// the JVM's slot `arg`.
-///
-/// \param arg
-///   The local variable slot
-/// \param type_char
-///   The type of the value stored in the slot pointed by `arg`.
-/// \param address
-///   Bytecode address used to find a variable that the LVT declares to be live
-///   and living in the slot pointed by `arg` for this bytecode.
-/// \param do_cast
-///   Indicates whether we should return the original symbol_exprt or a
-///   typecast_exprt if the type of the symbol_exprt does not equal that
-///   represented by `type_char`.
+/// \param arg: The local variable slot
+/// \param type_char: The type of the value stored in the slot pointed by `arg`
+/// \param address: Bytecode address used to find a variable that the LVT
+///   declares to be live and living in the slot pointed by `arg` for this
+///   bytecode
+/// \param do_cast: Indicates whether we should return the original symbol_exprt
+///   or a typecast_exprt if the type of the symbol_exprt does not equal that
+///   represented by `type_char`
 /// \return symbol_exprt or type-cast symbol_exprt
 exprt java_bytecode_convert_methodt::variable(
   const exprt &arg,
@@ -239,18 +235,12 @@ exprt java_bytecode_convert_methodt::variable(
 }
 
 /// Returns the member type for a method, based on signature or descriptor
-/// \param descriptor
-///   descriptor of the method
-/// \param signature
-///   signature of the method
-/// \param class_name
-///   string containing the name of the corresponding class
-/// \param method_name
-///   string containing the name of the method
-/// \param message_handler
-///   message handler to collect warnings
-/// \return
-///   the constructed member type
+/// \param descriptor: descriptor of the method
+/// \param signature: signature of the method
+/// \param class_name: string containing the name of the corresponding class
+/// \param method_name: string containing the name of the method
+/// \param message_handler: message handler to collect warnings
+/// \return the constructed member type
 java_method_typet member_type_lazy(
   const std::string &descriptor,
   const optionalt<std::string> &signature,
