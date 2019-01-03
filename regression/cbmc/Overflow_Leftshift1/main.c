@@ -17,5 +17,8 @@ int main()
   // overflow
   s = 1 << x;
 
+  // distance too far, not an overflow
+  s = s << 100;
+
   return 0;
 }

@@ -589,6 +589,81 @@ void goto_checkt::integer_overflow_check(
 
     return;
   }
+  else if(expr.id() == ID_shl)
+  {
+    if(type.id() == ID_signedbv)
+    {
+      const auto &shl_expr = to_shl_expr(expr);
+      const auto &op = shl_expr.op();
+      const auto &op_type = to_signedbv_type(type);
+      const auto op_width = op_type.get_width();
+      const auto &distance = shl_expr.distance();
+      const auto &distance_type = distance.type();
+
+      // a left shift of a negative value is undefined;
+      // yet this isn't an overflow
+      exprt neg_value_shift;
+
+      if(op_type.id() == ID_unsignedbv)
+        neg_value_shift = false_exprt();
+      else
+        neg_value_shift =
+          binary_relation_exprt(op, ID_lt, from_integer(0, op_type));
+
+      // a shift with negative distance is undefined;
+      // yet this isn't an overflow
+      exprt neg_dist_shift;
+
+      if(distance_type.id() == ID_unsignedbv)
+        neg_dist_shift = false_exprt();
+      else
+        neg_dist_shift =
+          binary_relation_exprt(op, ID_lt, from_integer(0, distance_type));
+
+      // shifting a non-zero value by more than its width is undefined;
+      // yet this isn't an overflow
+      const exprt dist_too_large = binary_predicate_exprt(
+        distance, ID_gt, from_integer(op_width, distance_type));
+
+      const exprt op_zero = equal_exprt(op, from_integer(0, op_type));
+
+      auto new_type = to_bitvector_type(op_type);
+      new_type.set_width(op_width * 2);
+
+      const exprt op_ext = typecast_exprt(op, new_type);
+
+      const exprt op_ext_shifted = shl_exprt(op_ext, distance);
+
+      // get top bits of the shifted operand
+      const exprt top_bits = extractbits_exprt(
+        op_ext_shifted,
+        new_type.get_width() - 1,
+        op_width - 1,
+        unsignedbv_typet(op_width + 1));
+
+      const exprt top_bits_zero =
+        equal_exprt(top_bits, from_integer(0, top_bits.type()));
+
+      // a negative distance shift isn't an overflow;
+      // a negative value shift isn't an overflow;
+      // a shift that's too far isn't an overflow;
+      // a shift of zero isn't overflow;
+      // else check the top bits
+      add_guarded_claim(
+        disjunction({neg_value_shift,
+                     neg_dist_shift,
+                     dist_too_large,
+                     op_zero,
+                     top_bits_zero}),
+        "arithmetic overflow on signed shl",
+        "overflow",
+        expr.find_source_location(),
+        expr,
+        guard);
+    }
+
+    return;
+  }
 
   exprt overflow("overflow-"+expr.id_string(), bool_typet());
   overflow.operands()=expr.operands();
