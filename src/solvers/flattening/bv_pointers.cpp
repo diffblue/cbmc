@@ -362,9 +362,9 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
       if(it->type().id()!=ID_unsignedbv &&
          it->type().id()!=ID_signedbv)
       {
-        bvt bv;
-        conversion_failed(plus_expr, bv);
-        return bv;
+        bvt failed_bv;
+        conversion_failed(plus_expr, failed_bv);
+        return failed_bv;
       }
 
       bv_utilst::representationt rep=
@@ -398,8 +398,6 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
       minus_expr.op0().type().id() == ID_pointer,
       "first operand should be of pointer type");
 
-    bvt bv;
-
     if(
       minus_expr.op1().type().id() != ID_unsignedbv &&
       minus_expr.op1().type().id() != ID_signedbv)
@@ -411,7 +409,7 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
 
     const unary_minus_exprt neg_op1(minus_expr.op1());
 
-    bv = convert_bv(minus_expr.op0());
+    bvt bv = convert_bv(minus_expr.op0());
 
     typet pointer_sub_type = minus_expr.op0().type().subtype();
     mp_integer element_size;
