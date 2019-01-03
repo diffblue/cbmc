@@ -85,12 +85,12 @@ void cpp_typecheckt::typecheck_type(typet &type)
     typecheck_type(type.subtype());
 
     // Check if it is a pointer-to-member
-    if(type.find("to-member").is_not_nil())
+    if(type.find(ID_to_member).is_not_nil())
     {
       // these can point either to data members or member functions
       // of a class
 
-      typet &class_object=static_cast<typet &>(type.add("to-member"));
+      typet &class_object = static_cast<typet &>(type.add(ID_to_member));
 
       if(class_object.id()==ID_cpp_name)
       {

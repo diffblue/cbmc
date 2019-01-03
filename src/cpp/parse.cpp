@@ -3771,7 +3771,7 @@ bool Parser::rPtrToMember(irept &ptr_to_mem)
   #endif
 
   typet ptm(ID_frontend_pointer); // width gets set during conversion
-  irept &name = ptm.add("to-member");
+  irept &name = ptm.add(ID_to_member);
   name=cpp_namet();
   irept::subt &components=name.get_sub();
 
@@ -5377,7 +5377,7 @@ bool Parser::rPmExpr(exprt &exp)
     exprt left;
     left.swap(exp);
 
-    exp=exprt("pointer-to-member");
+    exp = exprt(ID_pointer_to_member);
     exp.move_to_operands(left, right);
     set_location(exp, tk);
   }

@@ -259,12 +259,11 @@ std::string expr2cppt::convert_rec(
   {
     return "std::nullptr_t";
   }
-  else if(src.id()==ID_pointer &&
-          src.find("to-member").is_not_nil())
+  else if(src.id() == ID_pointer && src.find(ID_to_member).is_not_nil())
   {
     typet tmp=src;
     typet member;
-    member.swap(tmp.add("to-member"));
+    member.swap(tmp.add(ID_to_member));
 
     std::string dest="("+convert_rec(member, c_qualifierst(), "")+":: *)";
 

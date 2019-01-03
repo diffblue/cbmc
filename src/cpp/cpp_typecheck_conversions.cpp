@@ -480,12 +480,15 @@ bool cpp_typecheckt::standard_conversion_pointer(
     return true;
   }
 
-  if(type.find("to-member").is_not_nil())
+  if(type.find(ID_to_member).is_not_nil())
     return false;
 
-  if(expr.type().id() != ID_pointer ||
-     expr.type().find("to-member").is_not_nil())
+  if(
+    expr.type().id() != ID_pointer ||
+    expr.type().find(ID_to_member).is_not_nil())
+  {
     return false;
+  }
 
   typet sub_from=follow(expr.type().subtype());
   typet sub_to=follow(type.subtype());
@@ -559,13 +562,14 @@ bool cpp_typecheckt::standard_conversion_pointer_to_member(
   const typet &type,
   exprt &new_expr)
 {
-  if(type.id()!=ID_pointer ||
-     is_reference(type) ||
-     type.find("to-member").is_nil())
+  if(
+    type.id() != ID_pointer || is_reference(type) ||
+    type.find(ID_to_member).is_nil())
+  {
     return false;
+  }
 
-  if(expr.type().id() != ID_pointer ||
-     expr.type().find("to-member").is_nil())
+  if(expr.type().id() != ID_pointer || expr.type().find(ID_to_member).is_nil())
     return false;
 
   if(type.subtype()!=expr.type().subtype())
@@ -609,13 +613,11 @@ bool cpp_typecheckt::standard_conversion_pointer_to_member(
     return true;
   }
 
-  struct_typet from_struct =
-    to_struct_type(follow(static_cast<const typet &>
-      (expr.type().find("to-member"))));
+  struct_typet from_struct = to_struct_type(
+    follow(static_cast<const typet &>(expr.type().find(ID_to_member))));
 
   struct_typet to_struct =
-    to_struct_type(follow(static_cast<const typet &>
-      (type.find("to-member"))));
+    to_struct_type(follow(static_cast<const typet &>(type.find(ID_to_member))));
 
   if(subtype_typecast(to_struct, from_struct))
   {
@@ -1588,11 +1590,11 @@ bool cpp_typecheckt::cast_away_constness(
 
   if(is_reference(nt1))
     nt1.remove(ID_C_reference);
-  nt1.remove("to-member");
+  nt1.remove(ID_to_member);
 
   if(is_reference(nt2))
     nt2.remove(ID_C_reference);
-  nt2.remove("to-member");
+  nt2.remove(ID_to_member);
 
   // substitute final subtypes
   std::vector<typet> snt1;
@@ -1727,7 +1729,7 @@ bool cpp_typecheckt::dynamic_typecast(
   }
   else if(type.id()==ID_pointer)
   {
-    if(type.find("to-member").is_not_nil())
+    if(type.find(ID_to_member).is_not_nil())
       return false;
 
     if(type.subtype().id()==ID_empty)
@@ -1960,8 +1962,7 @@ bool cpp_typecheckt::static_typecast(
 
   if(type.id()==ID_pointer && e.type().id()==ID_pointer)
   {
-    if(type.find("to-member").is_nil()
-       && e.type().find("to-member").is_nil())
+    if(type.find(ID_to_member).is_nil() && e.type().find(ID_to_member).is_nil())
     {
       typet to=follow(type.subtype());
       typet from=follow(e.type().subtype());
@@ -1994,19 +1995,18 @@ bool cpp_typecheckt::static_typecast(
 
       return false;
     }
-    else if(type.find("to-member").is_not_nil() &&
-            e.type().find("to-member").is_not_nil())
+    else if(
+      type.find(ID_to_member).is_not_nil() &&
+      e.type().find(ID_to_member).is_not_nil())
     {
       if(type.subtype()!=e.type().subtype())
         return false;
 
-      struct_typet from_struct=
-        to_struct_type(
-          follow(static_cast<const typet&>(e.type().find("to-member"))));
+      struct_typet from_struct = to_struct_type(
+        follow(static_cast<const typet &>(e.type().find(ID_to_member))));
 
-      struct_typet to_struct=
-        to_struct_type(
-          follow(static_cast<const typet&>(type.find("to-member"))));
+      struct_typet to_struct = to_struct_type(
+        follow(static_cast<const typet &>(type.find(ID_to_member))));
 
       if(subtype_typecast(from_struct, to_struct))
       {
@@ -2016,17 +2016,17 @@ bool cpp_typecheckt::static_typecast(
       }
     }
     else if(
-      type.find("to-member").is_nil() &&
-      e.type().find("to-member").is_not_nil())
+      type.find(ID_to_member).is_nil() &&
+      e.type().find(ID_to_member).is_not_nil())
     {
       if(type.subtype() != e.type().subtype())
         return false;
 
       struct_typet from_struct = to_struct_type(
-        follow(static_cast<const typet &>(e.type().find("to-member"))));
+        follow(static_cast<const typet &>(e.type().find(ID_to_member))));
 
       new_expr = e;
-      new_expr.type().add("to-member") = from_struct;
+      new_expr.type().add(ID_to_member) = from_struct;
 
       return true;
     }

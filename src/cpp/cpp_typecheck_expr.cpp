@@ -53,7 +53,7 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
     typecheck_expr_cpp_name(expr, cpp_typecheck_fargst());
   else if(expr.id()=="cpp-this")
     typecheck_expr_this(expr);
-  else if(expr.id()=="pointer-to-member")
+  else if(expr.id() == ID_pointer_to_member)
     convert_pmop(expr);
   else if(expr.id() == ID_new_object)
   {
@@ -718,7 +718,7 @@ void cpp_typecheckt::typecheck_expr_address_of(exprt &expr)
     {
       // it's a pointer to member function
       const struct_tag_typet symbol(code_type.get(ID_C_member_name));
-      expr.op0().type().add("to-member")=symbol;
+      expr.op0().type().add(ID_to_member) = symbol;
 
       if(code_type.get_bool(ID_C_is_virtual))
       {
@@ -733,7 +733,7 @@ void cpp_typecheckt::typecheck_expr_address_of(exprt &expr)
     expr.op0().id() == ID_ptrmember && expr.op0().op0().id() == "cpp-this")
   {
     expr.type() = pointer_type(expr.op0().type());
-    expr.type().add("to-member") = expr.op0().op0().type().subtype();
+    expr.type().add(ID_to_member) = expr.op0().op0().type().subtype();
     return;
   }
 
@@ -1999,7 +1999,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
 
   if(expr.function().type().id()==ID_pointer)
   {
-    if(expr.function().type().find("to-member").is_not_nil())
+    if(expr.function().type().find(ID_to_member).is_not_nil())
     {
       const exprt &bound =
         static_cast<const exprt &>(expr.function().type().find(ID_C_bound));
@@ -2592,8 +2592,7 @@ void cpp_typecheckt::typecheck_expr_dereference(exprt &expr)
   exprt &op=expr.op0();
   const typet op_type=follow(op.type());
 
-  if(op_type.id()==ID_pointer &&
-     op_type.find("to-member").is_not_nil())
+  if(op_type.id() == ID_pointer && op_type.find(ID_to_member).is_not_nil())
   {
     error().source_location=expr.find_source_location();
     error() << "pointer-to-member must use "
@@ -2606,11 +2605,12 @@ void cpp_typecheckt::typecheck_expr_dereference(exprt &expr)
 
 void cpp_typecheckt::convert_pmop(exprt &expr)
 {
-  assert(expr.id()=="pointer-to-member");
-  assert(expr.operands().size() == 2);
+  PRECONDITION(expr.id() == ID_pointer_to_member);
+  PRECONDITION(expr.operands().size() == 2);
 
-  if(expr.op1().type().id()!=ID_pointer
-     || expr.op1().type().find("to-member").is_nil())
+  if(
+    expr.op1().type().id() != ID_pointer ||
+    expr.op1().type().find(ID_to_member).is_nil())
   {
     error().source_location=expr.source_location();
     error() << "pointer-to-member expected" << eom;
@@ -2620,7 +2620,7 @@ void cpp_typecheckt::convert_pmop(exprt &expr)
   typet t0=expr.op0().type().id()==ID_pointer ?
   expr.op0().type().subtype():  expr.op0().type();
 
-  typet t1((const typet&)expr.op1().type().find("to-member"));
+  typet t1((const typet &)expr.op1().type().find(ID_to_member));
 
   t0=follow(t0);
   t1=follow(t1);

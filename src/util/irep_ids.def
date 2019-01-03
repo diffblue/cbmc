@@ -720,6 +720,8 @@ IREP_ID_ONE(template_decls)
 IREP_ID_ONE(throw_decl)
 IREP_ID_ONE(typeid)
 IREP_ID_TWO(C_quoted, #quoted)
+IREP_ID_ONE(to_member)
+IREP_ID_ONE(pointer_to_member)
 
 // Projects depending on this code base that wish to extend the list of
 // available ids should provide a file local_irep_ids.def in their source tree
