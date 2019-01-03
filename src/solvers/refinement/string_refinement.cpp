@@ -768,9 +768,9 @@ decision_proceduret::resultt string_refinementt::dec_solve()
   initial_index_set(index_sets, ns, axioms);
   update_index_set(index_sets, ns, current_constraints);
   current_constraints.clear();
-  const auto instances =
+  const auto initial_instances =
     generate_instantiations(index_sets, axioms, not_contain_witnesses);
-  for(const auto &instance : instances)
+  for(const auto &instance : initial_instances)
     add_lemma(instance);
 
   while((loop_bound_--)>0)
