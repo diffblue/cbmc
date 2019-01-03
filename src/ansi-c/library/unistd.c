@@ -80,6 +80,21 @@ int pipe(int fildes[2])
   return 0;
 }
 
+/* FUNCTION: _pipe */
+
+#ifdef _WIN32
+#undef pipe
+int pipe(int fildes[2]);
+
+int _pipe(int *pfds, unsigned int psize, int textmode)
+{
+__CPROVER_HIDE:;
+  (void)psize;
+  (void)textmode;
+  return pipe(pfds);
+}
+#endif
+
 /* FUNCTION: close */
 
 extern struct __CPROVER_pipet __CPROVER_pipes[];
