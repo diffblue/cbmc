@@ -982,7 +982,7 @@ bool java_bytecode_convert_class(
 /// Example: if \p parameter has identifier `java::Outer$Inner::T` and
 /// there is a replacement parameter with identifier `java::Outer::T`, the
 /// identifier of \p parameter gets set to `java::Outer::T`.
-/// \param parameter
+/// \param parameter: The given generic type parameter
 /// \param replacement_parameters: vector of generic parameters (only viable
 ///   ones, i.e., only those that can actually appear here such as generic
 ///   parameters of outer classes of the class specified by the prefix of \p
