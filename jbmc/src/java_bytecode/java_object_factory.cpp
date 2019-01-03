@@ -170,7 +170,6 @@ private:
   void array_primitive_init_code(
     code_blockt &assignments,
     const exprt &init_array_expr,
-    const exprt &length_expr,
     const typet &element_type,
     const exprt &max_length_expr,
     const source_locationt &location);
@@ -1226,19 +1225,17 @@ codet make_allocate_code(const symbol_exprt &lhs, const exprt &size)
 /// \param [out] assignments : Code block to which the initializing assignments
 ///   will be appended.
 /// \param init_array_expr : array data
-/// \param length_expr : array length
 /// \param element_type: type of array elements
 /// \param max_length_expr : the (constant) size to which initialise the array
 /// \param location: Source location associated with nondet-initialization.
 void java_object_factoryt::array_primitive_init_code(
   code_blockt &assignments,
   const exprt &init_array_expr,
-  const exprt &length_expr,
   const typet &element_type,
   const exprt &max_length_expr,
   const source_locationt &location)
 {
-  array_typet array_type(element_type, max_length_expr);
+  const array_typet array_type(element_type, max_length_expr);
 
   // TYPE (*array_data_init)[max_length_expr];
   const symbol_exprt &tmp_finite_array_pointer =
@@ -1250,18 +1247,20 @@ void java_object_factoryt::array_primitive_init_code(
     make_allocate_code(
       tmp_finite_array_pointer,
       max_length_expr));
+  assignments.statements().back().add_source_location() = location;
 
   // *array_data_init = NONDET(TYPE [max_length_expr]);
-  const exprt nondet_data=side_effect_expr_nondett(array_type, loc);
-  const exprt data_pointer_deref=dereference_exprt(
-    tmp_finite_array_pointer,
-    array_type);
-  assignments.add(code_assignt(data_pointer_deref, nondet_data));
+  side_effect_expr_nondett nondet_data(array_type, loc);
+  const dereference_exprt data_pointer_deref(
+    tmp_finite_array_pointer, array_type);
+  assignments.add(code_assignt(data_pointer_deref, std::move(nondet_data)));
+  assignments.statements().back().add_source_location() = location;
 
   // init_array_expr = *array_data_init;
   address_of_exprt tmp_nondet_pointer(
     index_exprt(data_pointer_deref, from_integer(0, java_int_type())));
-  assignments.add(code_assignt(init_array_expr, tmp_nondet_pointer));
+  assignments.add(code_assignt(init_array_expr, std::move(tmp_nondet_pointer)));
+  assignments.statements().back().add_source_location() = location;
 }
 
 /// Create code to nondeterministically initialize each element of an array in a
@@ -1453,7 +1452,6 @@ void java_object_factoryt::gen_nondet_array_init(
     array_primitive_init_code(
       assignments,
       init_array_expr,
-      length_expr,
       element_type,
       max_length_expr,
       location);
