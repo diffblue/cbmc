@@ -47,7 +47,6 @@ phases:
         Remove-Item cbmc\byte_update5 -Force -Recurse
         Remove-Item cbmc\byte_update6 -Force -Recurse
         Remove-Item cbmc\byte_update7 -Force -Recurse
-        Remove-Item goto-gcc -Force -Recurse
         cd ..
         cd jbmc/regression
         Remove-Item jbmc\VarLengthArrayTrace1 -Force -Recurse
@@ -56,10 +55,6 @@ phases:
       - |
         $env:Path = "C:\tools\cygwin\bin;$env:Path"
         cmd /c 'call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64 && bash -c "make -C regression test BUILD_ENV=MSVC" '
-
-      - |
-        $env:Path = "C:\tools\cygwin\bin;$env:Path"
-        cmd /c 'call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64 && bash -c "make -C regression/goto-cl test BUILD_ENV=MSVC" '
 
       - |
         $env:Path = "C:\tools\cygwin\bin;$env:Path"

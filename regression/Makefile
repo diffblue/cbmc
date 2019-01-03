@@ -16,6 +16,7 @@ DIRS = cbmc \
        test-script \
        goto-analyzer-taint \
        goto-gcc \
+       goto-cl \
        goto-cc-cbmc \
        cbmc-cpp \
        goto-cc-goto-analyzer \
