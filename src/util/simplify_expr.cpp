@@ -115,7 +115,7 @@ simplify_exprt::resultt<> simplify_exprt::simplify_sign(const sign_exprt &expr)
       const auto value = numeric_cast<mp_integer>(expr.op());
       if(value.has_value())
       {
-        return make_boolean_expr(*value >= 0);
+        return make_boolean_expr(*value < 0);
       }
     }
   }
