@@ -55,7 +55,6 @@ phases:
         Remove-Item goto-gcc -Force -Recurse
         Remove-Item systemc -Force -Recurse
         Remove-Item goto-instrument\slice08 -Force -Recurse
-        Remove-Item goto-analyzer/constant_propagation_nondet_rounding_mode -Force -Recurse
         cd ..
         cd jbmc/regression
         Remove-Item jbmc\VarLengthArrayTrace1 -Force -Recurse
