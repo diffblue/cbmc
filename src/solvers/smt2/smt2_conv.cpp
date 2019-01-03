@@ -40,12 +40,12 @@ Author: Daniel Kroening, kroening@kroening.com
 // General todos
 #define SMT2_TODO(S) PRECONDITION_WITH_DIAGNOSTICS(false, "TODO: " S)
 
-void smt2_convt::print_assignment(std::ostream &out) const
+void smt2_convt::print_assignment(std::ostream &os) const
 {
   // Boolean stuff
 
   for(std::size_t v=0; v<boolean_assignment.size(); v++)
-    out << "b" << v << "=" << boolean_assignment[v] << "\n";
+    os << "b" << v << "=" << boolean_assignment[v] << "\n";
 
   // others
 }
@@ -93,20 +93,21 @@ void smt2_convt::write_header()
     out << "(set-logic " << logic << ")" << "\n";
 }
 
-void smt2_convt::write_footer(std::ostream &out)
+void smt2_convt::write_footer(std::ostream &os)
 {
-  out << "\n";
+  os << "\n";
 
   // add the assumptions, if any
   if(!assumptions.empty())
   {
-    out << "; assumptions\n";
+    os << "; assumptions\n";
 
     forall_literals(it, assumptions)
     {
-      out << "(assert ";
+      os << "(assert ";
       convert_literal(*it);
-      out << ")" << "\n";
+      os << ")"
+         << "\n";
     }
   }
 
@@ -114,20 +115,23 @@ void smt2_convt::write_footer(std::ostream &out)
   for(const auto &object : object_sizes)
     define_object_size(object.second, object.first);
 
-  out << "(check-sat)" << "\n";
-  out << "\n";
+  os << "(check-sat)"
+     << "\n";
+  os << "\n";
 
   if(solver!=solvert::BOOLECTOR)
   {
     for(const auto &id : smt2_identifiers)
-      out << "(get-value (|" << id << "|))" << "\n";
+      os << "(get-value (|" << id << "|))"
+         << "\n";
   }
 
-  out << "\n";
+  os << "\n";
 
-  out << "(exit)\n";
+  os << "(exit)\n";
 
-  out << "; end of SMT2 file" << "\n";
+  os << "; end of SMT2 file"
+     << "\n";
 }
 
 void smt2_convt::define_object_size(
@@ -1503,8 +1507,6 @@ void smt2_convt::convert_expr(const exprt &expr)
     DATA_INVARIANT(
       expr.operands().size() == 1, "width expression should have one operand");
 
-    boolbv_widtht boolbv_width(ns);
-
     std::size_t result_width=boolbv_width(expr.type());
     CHECK_RETURN(result_width != 0);
 
@@ -2671,8 +2673,6 @@ void smt2_convt::convert_union(const union_exprt &expr)
   const union_typet &union_type = to_union_type(ns.follow(expr.type()));
   const exprt &op=expr.op();
 
-  boolbv_widtht boolbv_width(ns);
-
   std::size_t total_width=boolbv_width(union_type);
   CHECK_RETURN_WITH_DIAGNOSTICS(
     total_width != 0, "failed to get union width for union");
@@ -3633,8 +3633,6 @@ void smt2_convt::convert_with(const with_exprt &expr)
 
     const exprt &value=expr.op2();
 
-    boolbv_widtht boolbv_width(ns);
-
     std::size_t total_width=boolbv_width(union_type);
     CHECK_RETURN_WITH_DIAGNOSTICS(
       total_width != 0, "failed to get union width for with");
@@ -4453,8 +4451,6 @@ void smt2_convt::convert_type(const typet &type)
     }
     else
     {
-      boolbv_widtht boolbv_width(ns);
-
       std::size_t width=boolbv_width(type);
       CHECK_RETURN_WITH_DIAGNOSTICS(
         width != 0, "failed to get width of vector");
@@ -4471,8 +4467,6 @@ void smt2_convt::convert_type(const typet &type)
   }
   else if(type.id() == ID_union || type.id() == ID_union_tag)
   {
-    boolbv_widtht boolbv_width(ns);
-
     std::size_t width=boolbv_width(type);
     CHECK_RETURN_WITH_DIAGNOSTICS(width != 0, "failed to get width of union");
 
@@ -4529,8 +4523,6 @@ void smt2_convt::convert_type(const typet &type)
     }
     else
     {
-      boolbv_widtht boolbv_width(ns);
-
       std::size_t width=boolbv_width(type);
       CHECK_RETURN_WITH_DIAGNOSTICS(
         width != 0, "failed to get width of complex");
@@ -4806,11 +4798,11 @@ void smt2_convt::collect_bindings(
   seen_expressionst &map,
   std::vector<exprt> &let_order)
 {
-  seen_expressionst::iterator it = map.find(expr);
+  seen_expressionst::iterator entry = map.find(expr);
 
-  if(it!=map.end())
+  if(entry != map.end())
   {
-    let_count_idt &count_id=it->second;
+    let_count_idt &count_id = entry->second;
     ++(count_id.count);
     return;
   }
