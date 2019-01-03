@@ -24,12 +24,12 @@ public:
 
   virtual ~bv_dimacst()
   {
-    write_dimacs(filename);
+    write_dimacs();
   }
 
 protected:
-  std::string filename;
-  bool write_dimacs(const std::string &filename);
+  const std::string filename;
+  bool write_dimacs();
   bool write_dimacs(std::ostream &);
 };
 
