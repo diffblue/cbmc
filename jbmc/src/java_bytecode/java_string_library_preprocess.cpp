@@ -1459,6 +1459,7 @@ code_blockt java_string_library_preprocesst::make_string_format_code(
   // a string, an integer, a floating point, a character, a boolean,
   // an object of which we take the hash code, or a date/time
   struct_typet structured_type;
+  structured_type.set_tag(CPROVER_PREFIX "string_formatter_variant");
   structured_type.components().emplace_back("string_expr", refined_string_type);
   structured_type.components().emplace_back(ID_int, java_int_type());
   structured_type.components().emplace_back(ID_float, java_float_type());
