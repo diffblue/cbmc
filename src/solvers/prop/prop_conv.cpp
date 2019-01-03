@@ -238,11 +238,10 @@ literalt prop_conv_solvert::convert_bool(const exprt &expr)
       "constraint_select_one should have at least two operands");
 
     std::vector<literalt> op_bv;
-    op_bv.resize(op.size());
+    op_bv.reserve(op.size());
 
-    unsigned i=0;
     forall_operands(it, expr)
-      op_bv[i++]=convert(*it);
+      op_bv.push_back(convert(*it));
 
     // add constraints
 
