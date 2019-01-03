@@ -49,8 +49,10 @@ SCENARIO("Loading JSON files")
           {
             REQUIRE_FALSE(valid_parse_error);
             REQUIRE(valid_json.is_object());
-            REQUIRE(valid_json.object.find("hello") != valid_json.object.end());
-            REQUIRE(valid_json.object["hello"].value == "world");
+
+            const json_objectt &json_object = to_json_object(valid_json);
+            REQUIRE(json_object.find("hello") != json_object.end());
+            REQUIRE(json_object["hello"].value == "world");
           }
         }
       }
@@ -64,8 +66,10 @@ SCENARIO("Loading JSON files")
       {
         REQUIRE_FALSE(valid_parse_error);
         REQUIRE(valid_json.is_object());
-        REQUIRE(valid_json.object.find("hello") != valid_json.object.end());
-        REQUIRE(valid_json.object["hello"].value == "world");
+
+        const json_objectt &json_object = to_json_object(valid_json);
+        REQUIRE(json_object.find("hello") != json_object.end());
+        REQUIRE(json_object["hello"].value == "world");
         AND_WHEN("Loading the invalid JSON file")
         {
           jsont invalid_json;

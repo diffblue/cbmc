@@ -90,7 +90,7 @@ key_value_pair:
         {
           jsont tmp;
           json_parser.pop(tmp);
-          json_parser.top().object[json_parser.top().value].swap(tmp);
+          to_json_object(json_parser.top())[json_parser.top().value].swap(tmp);
           json_parser.top().value.clear(); // end abuse
         }
         ;
@@ -109,7 +109,7 @@ array_value:
         {
           jsont tmp;
           json_parser.pop(tmp);
-          json_parser.top().array.push_back(tmp);
+          to_json_array(json_parser.top()).push_back(tmp);
         }
         ;
 

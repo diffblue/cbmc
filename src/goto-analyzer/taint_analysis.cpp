@@ -358,7 +358,7 @@ bool taint_analysist::operator()(
           json["file"] = json_stringt(i_it->source_location.get_file());
           json["line"]=
             json_numbert(id2string(i_it->source_location.get_line()));
-          json_result.array.push_back(json);
+          json_result.push_back(json);
         }
         else
         {

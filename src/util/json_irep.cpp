@@ -98,7 +98,7 @@ void json_irept::convert_named_sub_tree(
 irept json_irept::convert_from_json(const jsont &in) const
 {
   std::vector<std::string> have_keys;
-  for(const auto &keyval : in.object)
+  for(const auto &keyval : to_json_object(in))
     have_keys.push_back(keyval.first);
   std::sort(have_keys.begin(), have_keys.end());
   if(have_keys!=std::vector<std::string>{"comment", "id", "namedSub", "sub"})
@@ -110,13 +110,13 @@ irept json_irept::convert_from_json(const jsont &in) const
 
   irept out(in["id"].value);
 
-  for(const auto &sub : in["sub"].array)
+  for(const auto &sub : to_json_array(in["sub"]))
     out.get_sub().push_back(convert_from_json(sub));
 
-  for(const auto &named_sub : in["namedSub"].object)
+  for(const auto &named_sub : to_json_object(in["namedSub"]))
     out.add(named_sub.first)=convert_from_json(named_sub.second);
 
-  for(const auto &comment : in["comment"].object)
+  for(const auto &comment : to_json_object(in["comment"]))
     out.add(comment.first)=convert_from_json(comment.second);
 
   return out;
