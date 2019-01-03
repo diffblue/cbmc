@@ -24,21 +24,16 @@ DIRS = cbmc \
        contracts \
        # Empty last line
 
-# Tests under goto-gcc cannot be run on Windows, so appveyor.yml unlinks
-# the entire directory under Windows. This variable will contain the list
-# of directories that actually exist on the current platform.
-PLATFORM_DIRS = $(wildcard $(DIRS))
-
 # Run all test directories in sequence
 .PHONY: test
 test:
-	@for dir in $(PLATFORM_DIRS); do \
+	@for dir in $(DIRS); do \
 		$(MAKE) "$$dir" || exit 1; \
 	done;
 
 # Pattern to execute a single test suite directory
-.PHONY: $(PLATFORM_DIRS)
-$(PLATFORM_DIRS):
+.PHONY: $(DIRS)
+$(DIRS):
 	@echo "Running $@..." ;
 	$(MAKE) -C "$@" test || exit 1;
 
@@ -54,7 +49,7 @@ test-parallel:
 		--linebuffer \
 		--jobs $(JOBS) \
 		$(MAKE) "{}" \
-		::: $(PLATFORM_DIRS)
+		::: $(DIRS)
 
 
 .PHONY: clean
