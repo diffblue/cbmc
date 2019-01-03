@@ -13,6 +13,9 @@
 #error Do not include this file directly, use use_catch.h instead
 #endif
 
+// this is imported code, don't impose formatting rules
+// clang-format off
+
 #ifndef TWOBLUECUBES_SINGLE_INCLUDE_CATCH_HPP_INCLUDED
 #define TWOBLUECUBES_SINGLE_INCLUDE_CATCH_HPP_INCLUDED
 
@@ -11423,3 +11426,4 @@ using Catch::Detail::Approx;
 
 #endif // TWOBLUECUBES_SINGLE_INCLUDE_CATCH_HPP_INCLUDED
 
+// clang-format on
