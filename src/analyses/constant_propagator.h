@@ -146,7 +146,8 @@ protected:
     const exprt &lhs,
     const exprt &rhs,
     const namespacet &ns,
-    const constant_propagator_ait *cp);
+    const constant_propagator_ait *cp,
+    bool is_assignment);
 
   bool two_way_propagate_rec(
     const exprt &expr,
