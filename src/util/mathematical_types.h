@@ -101,7 +101,7 @@ public:
 
 /// Check whether a reference to a typet is a \ref mathematical_function_typet.
 /// \param type: Source type.
-/// \return True if \param type is a \ref mathematical_function_typet.
+/// \return True if \p type is a \ref mathematical_function_typet.
 template <>
 inline bool can_cast_type<mathematical_function_typet>(const typet &type)
 {
