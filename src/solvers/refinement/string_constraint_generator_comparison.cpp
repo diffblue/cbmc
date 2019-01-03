@@ -191,7 +191,7 @@ string_constraint_generatort::add_axioms_for_hash_code(
   array_poolt &pool)
 {
   PRECONDITION(f.arguments().size() == 1);
-  string_constraintst constraints;
+  string_constraintst hash_constraints;
   const array_string_exprt str = get_string_expr(pool, f.arguments()[0]);
   const typet &return_type = f.type();
   const typet &index_type = str.length().type();
@@ -210,9 +210,9 @@ string_constraint_generatort::add_axioms_for_hash_code(
       and_exprt(
         notequal_exprt(str[i], it.first[i]),
         and_exprt(length_gt(str, i), is_positive(i))));
-    constraints.existential.push_back(or_exprt(c1, or_exprt(c2, c3)));
+    hash_constraints.existential.push_back(or_exprt(c1, or_exprt(c2, c3)));
   }
-  return {hash, std::move(constraints)};
+  return {hash, std::move(hash_constraints)};
 }
 
 /// Lexicographic comparison of two strings
@@ -308,7 +308,7 @@ string_constraint_generatort::add_axioms_for_intern(
   const function_application_exprt &f)
 {
   PRECONDITION(f.arguments().size() == 1);
-  string_constraintst constraints;
+  string_constraintst intern_constraints;
   const array_string_exprt str = get_string_expr(array_pool, f.arguments()[0]);
   // For now we only enforce content equality and not pointer equality
   const typet &return_type=f.type();
@@ -326,14 +326,14 @@ string_constraint_generatort::add_axioms_for_intern(
   exprt::operandst disj;
   for(auto it : intern_of_string)
     disj.push_back(equal_exprt(intern, it.second));
-  constraints.existential.push_back(disjunction(disj));
+  intern_constraints.existential.push_back(disjunction(disj));
 
   // WARNING: the specification may be incomplete or incorrect
   for(auto it : intern_of_string)
     if(it.second!=str)
     {
       symbol_exprt i = fresh_symbol("index_intern", index_type);
-      constraints.existential.push_back(or_exprt(
+      intern_constraints.existential.push_back(or_exprt(
         equal_exprt(it.second, intern),
         or_exprt(
           notequal_exprt(str.length(), it.first.length()),
@@ -344,5 +344,5 @@ string_constraint_generatort::add_axioms_for_intern(
               and_exprt(length_gt(str, i), is_positive(i)))))));
     }
 
-  return {intern, std::move(constraints)};
+  return {intern, std::move(intern_constraints)};
 }
