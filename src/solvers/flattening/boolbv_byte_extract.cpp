@@ -103,7 +103,6 @@ bvt boolbvt::convert_byte_extract(const byte_extract_exprt &expr)
   }
 
   const exprt &op=expr.op();
-  const exprt &offset=expr.offset();
   PRECONDITION(
     expr.id() == ID_byte_extract_little_endian ||
     expr.id() == ID_byte_extract_big_endian);
@@ -145,9 +144,10 @@ bvt boolbvt::convert_byte_extract(const byte_extract_exprt &expr)
       // add implications
 
       equal_exprt equality;
-      equality.lhs()=offset; // index operand
+      equality.lhs() = expr.offset(); // index operand
 
-      typet constant_type=offset.type(); // type of index operand
+      // type of index operand
+      const typet &constant_type = expr.offset().type();
 
       bvt equal_bv;
       equal_bv.resize(width);
@@ -171,9 +171,10 @@ bvt boolbvt::convert_byte_extract(const byte_extract_exprt &expr)
     else
     {
       equal_exprt equality;
-      equality.lhs()=offset; // index operand
+      equality.lhs() = expr.offset(); // index operand
 
-      typet constant_type(offset.type()); // type of index operand
+      // type of index operand
+      const typet &constant_type = expr.offset().type();
 
       for(std::size_t i=0; i<bytes; i++)
       {
