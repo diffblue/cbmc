@@ -422,10 +422,12 @@ std::pair<exprt, string_constraintst> add_axioms_from_float_scientific_notation(
     int_type);
   array_exprt conversion_factor_table(
     array_typet(float_type, conversion_factor_table_size));
-  for(const auto &f : two_power_e_over_ten_power_d_table_negatives)
-    conversion_factor_table.copy_to_operands(constant_float(f, float_spec));
-  for(const auto &f : two_power_e_over_ten_power_d_table)
-    conversion_factor_table.copy_to_operands(constant_float(f, float_spec));
+  for(const auto &negative : two_power_e_over_ten_power_d_table_negatives)
+    conversion_factor_table.copy_to_operands(
+      constant_float(negative, float_spec));
+  for(const auto &positive : two_power_e_over_ten_power_d_table)
+    conversion_factor_table.copy_to_operands(
+      constant_float(positive, float_spec));
 
   // The index in the table, corresponding to exponent e is e+128
   plus_exprt shifted_index(bin_exponent, from_integer(128, int_type));
