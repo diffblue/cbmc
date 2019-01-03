@@ -1034,8 +1034,6 @@ static void find_and_replace_parameter(
 /// Example: class `Outer<T>` has an inner class `Inner` that has a field
 /// `t` of type `Generic<T>`. This function ensures that the parameter points to
 /// `java::Outer::T` instead of `java::Outer$Inner::T`.
-/// \param type
-/// \param replacement_parameters
 static void find_and_replace_parameters(
   typet &type,
   const std::vector<java_generic_parametert> &replacement_parameters)
@@ -1118,8 +1116,6 @@ void convert_java_annotations(
 /// any generic class. All uses of the implicit generic type parameters within
 /// the inner class are updated to point to the type parameters of the
 /// corresponding outer classes.
-/// \param class_name
-/// \param symbol_table
 void mark_java_implicitly_generic_class_type(
   const irep_idt &class_name,
   symbol_tablet &symbol_table)
