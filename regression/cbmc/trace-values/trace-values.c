@@ -1,3 +1,5 @@
+#include <stdlib.h>
+
 int global_var;
 
 struct S
