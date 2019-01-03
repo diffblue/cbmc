@@ -66,6 +66,8 @@ janalyzer_parse_optionst::janalyzer_parse_optionst(int argc, const char **argv)
 
 void janalyzer_parse_optionst::register_languages()
 {
+  // Need ansi C language for __CPROVER_rounding_mode
+  register_language(new_ansi_c_language);
   register_language(new_java_bytecode_language);
 }
 
