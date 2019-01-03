@@ -167,13 +167,16 @@ void smt2_solvert::command(const std::string &c)
     {
       std::vector<exprt> ops;
 
-      if(next_token() != OPEN)
+      if(next_token() != smt2_tokenizert::OPEN)
         throw error("get-value expects list as argument");
 
-      while(peek() != CLOSE && peek() != END_OF_FILE)
+      while(smt2_tokenizer.peek() != smt2_tokenizert::CLOSE &&
+            smt2_tokenizer.peek() != smt2_tokenizert::END_OF_FILE)
+      {
         ops.push_back(expression()); // any term
+      }
 
-      if(next_token() != CLOSE)
+      if(next_token() != smt2_tokenizert::CLOSE)
         throw error("get-value expects ')' at end of list");
 
       if(status != SAT)
@@ -217,10 +220,12 @@ void smt2_solvert::command(const std::string &c)
     }
     else if(c == "echo")
     {
-      if(next_token() != STRING_LITERAL)
+      if(next_token() != smt2_tokenizert::STRING_LITERAL)
         throw error("expected string literal");
 
-      std::cout << smt2_format(constant_exprt(buffer, string_typet())) << '\n';
+      std::cout << smt2_format(constant_exprt(
+                     smt2_tokenizer.get_buffer(), string_typet()))
+                << '\n';
     }
     else if(c == "get-assignment")
     {
@@ -374,7 +379,6 @@ int solver(std::istream &in)
   boolbv.set_message_handler(message_handler);
 
   smt2_solvert smt2_solver(in, boolbv);
-  smt2_solver.set_message_handler(message_handler);
   bool error_found = false;
 
   while(!smt2_solver.exit)
@@ -383,11 +387,10 @@ int solver(std::istream &in)
     {
       smt2_solver.parse();
     }
-    catch(const smt2_solvert::smt2_errort &error)
+    catch(const smt2_tokenizert::smt2_errort &error)
     {
       smt2_solver.skip_to_end_of_list();
       error_found = true;
-      messaget message(message_handler);
       message.error().source_location.set_line(error.get_line_no());
       message.error() << error.what() << messaget::eom;
     }
@@ -395,7 +398,6 @@ int solver(std::istream &in)
     {
       smt2_solver.skip_to_end_of_list();
       error_found = true;
-      messaget message(message_handler);
       message.error() << error.what() << messaget::eom;
     }
   }

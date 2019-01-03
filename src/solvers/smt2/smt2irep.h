@@ -14,6 +14,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/irep.h>
 
-irept smt2irep(std::istream &);
+class message_handlert;
+
+irept smt2irep(std::istream &, message_handlert &);
 
 #endif // CPROVER_SOLVERS_SMT2_SMT2IREP_H
