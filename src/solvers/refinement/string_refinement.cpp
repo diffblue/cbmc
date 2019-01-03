@@ -738,8 +738,8 @@ decision_proceduret::resultt string_refinementt::dec_solve()
   // Initial try without index set
   const auto get = [this](const exprt &expr) { return this->get(expr); };
   dependencies.clean_cache();
-  const decision_proceduret::resultt res=supert::dec_solve();
-  if(res==resultt::D_SATISFIABLE)
+  const decision_proceduret::resultt initial_result = supert::dec_solve();
+  if(initial_result == resultt::D_SATISFIABLE)
   {
     bool satisfied;
     std::vector<exprt> counter_examples;
@@ -762,7 +762,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
   else
   {
     debug() << "check_SAT: got UNSAT or ERROR" << eom;
-    return res;
+    return initial_result;
   }
 
   initial_index_set(index_sets, ns, axioms);
@@ -776,9 +776,9 @@ decision_proceduret::resultt string_refinementt::dec_solve()
   while((loop_bound_--)>0)
   {
     dependencies.clean_cache();
-    const decision_proceduret::resultt res=supert::dec_solve();
+    const decision_proceduret::resultt refined_result = supert::dec_solve();
 
-    if(res==resultt::D_SATISFIABLE)
+    if(refined_result == resultt::D_SATISFIABLE)
     {
       bool satisfied;
       std::vector<exprt> counter_examples;
@@ -833,8 +833,9 @@ decision_proceduret::resultt string_refinementt::dec_solve()
     }
     else
     {
-      debug() << "check_SAT: default return " << static_cast<int>(res) << eom;
-      return res;
+      debug() << "check_SAT: default return "
+              << static_cast<int>(refined_result) << eom;
+      return refined_result;
     }
   }
   debug() << "string_refinementt::dec_solve reached the maximum number"
