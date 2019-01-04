@@ -520,7 +520,7 @@ SHARING_MAPT(std::size_t)
 /// \param begin: begin iterator
 /// \param end: end iterator
 /// \param f: function applied to the iterator to get a sharing map
-/// \return: sharing stats
+/// \return sharing stats
 SHARING_MAPT3(Iterator, , sharing_map_statst)
 ::get_sharing_stats(
   Iterator begin,
@@ -574,7 +574,7 @@ SHARING_MAPT3(Iterator, , sharing_map_statst)
 ///
 /// \param begin: begin iterator of a map
 /// \param end: end iterator of a map
-/// \return: sharing stats
+/// \return sharing stats
 SHARING_MAPT3(Iterator, , sharing_map_statst)
 ::get_sharing_stats_map(Iterator begin, Iterator end)
 {
@@ -590,7 +590,7 @@ SHARING_MAPT3(Iterator, , sharing_map_statst)
 /// - Worst case: O(N * H * log(S))
 /// - Best case: O(N + H)
 ///
-/// \param[out] view: Empty view
+/// \param [out] view: Empty view
 SHARING_MAPT(void)::get_view(viewt &view) const
 {
   SM_ASSERT(view.empty());
@@ -645,7 +645,7 @@ SHARING_MAPT(void)
 /// The symbols N1, M1 refer to map A, and symbols N2, M2 refer to map B.
 ///
 /// \param other: other map
-/// \param[out] delta_view: Empty delta view
+/// \param [out] delta_view: Empty delta view
 /// \param only_common: Indicates if the returned delta view should only
 ///   contain key-value pairs for keys that exist in both maps
 SHARING_MAPT(void)

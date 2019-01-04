@@ -320,9 +320,9 @@ bool base_type_eqt::base_type_eq_rec(
 /// - `symbol_typet("a")` and `ns.lookup("a").type` will compare equal,
 /// - `struct_typet {symbol_typet("a")}` and `struct_typet {ns.lookup("a")
 ///   .type}` will also compare equal.
-/// \param type1 The first type to compare.
-/// \param type2 The second type to compare.
-/// \param ns The namespace, needed for resolution of symbols.
+/// \param type1: The first type to compare.
+/// \param type2: The second type to compare.
+/// \param ns: The namespace, needed for resolution of symbols.
 bool base_type_eq(
   const typet &type1,
   const typet &type2,
@@ -333,9 +333,9 @@ bool base_type_eq(
 }
 
 /// Check expressions for equality across all levels of hierarchy.
-/// \param expr1 The first expression to compare.
-/// \param expr2 The second expression to compare.
-/// \param ns The namespace, needed for resolution of symbols.
+/// \param expr1: The first expression to compare.
+/// \param expr2: The second expression to compare.
+/// \param ns: The namespace, needed for resolution of symbols.
 bool base_type_eq(
   const exprt &expr1,
   const exprt &expr2,

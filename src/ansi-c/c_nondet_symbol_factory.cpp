@@ -88,8 +88,8 @@ private:
 /// \param assignments: The code block to add code to
 /// \param expr: The expression which we are generating a non-determinate value
 ///   for
-/// \param depth number of pointers followed so far during initialisation
-/// \param recursion_set names of structs seen so far on current pointer chain
+/// \param depth: number of pointers followed so far during initialisation
+/// \param recursion_set: names of structs seen so far on current pointer chain
 void symbol_factoryt::gen_nondet_init(
   code_blockt &assignments,
   const exprt &expr,
@@ -218,7 +218,7 @@ void symbol_factoryt::gen_nondet_array_init(
 /// \param base_name: The name to use for the symbol created
 /// \param type: The type for the symbol created
 /// \param loc: The location to assign to generated code
-/// \param object_factory_parameters configuration parameters for the object
+/// \param object_factory_parameters: configuration parameters for the object
 ///   factory
 /// \return Returns the symbol_exprt for the symbol created
 symbol_exprt c_nondet_symbol_factory(

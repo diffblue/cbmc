@@ -590,9 +590,9 @@ void get_reachable(
 
 /// Run depth-first search on the graph, starting from a single source
 /// node.
-/// \param src The node to start the search from.
-/// \param forwards true (false) if the forward (backward) reachability
-/// should be performed.
+/// \param src: The node to start the search from.
+/// \param forwards: true (false) if the forward (backward) reachability
+///   should be performed.
 template<class N>
 std::vector<typename N::node_indext>
 grapht<N>::get_reachable(node_indext src, bool forwards) const
@@ -605,9 +605,9 @@ grapht<N>::get_reachable(node_indext src, bool forwards) const
 
 /// Run depth-first search on the graph, starting from multiple source
 /// nodes.
-/// \param src The nodes to start the search from.
-/// \param forwards true (false) if the forward (backward) reachability
-/// should be performed.
+/// \param src: The nodes to start the search from.
+/// \param forwards: true (false) if the forward (backward) reachability
+///   should be performed.
 template <class N>
 std::vector<typename N::node_indext> grapht<N>::get_reachable(
   const std::vector<node_indext> &src,
@@ -642,8 +642,8 @@ std::vector<typename N::node_indext> grapht<N>::get_reachable(
 /// Run recursive depth-limited search on the graph, starting
 /// from multiple source nodes, to find the nodes reachable within n steps.
 /// This function initialises the search.
-/// \param src The node to start the search from.
-/// \param limit  limit on steps
+/// \param src: The node to start the search from.
+/// \param limit: limit on steps
 /// \return a vector of reachable node indices
 template <class N>
 std::vector<typename N::node_indext> grapht<N>::depth_limited_search(
@@ -657,8 +657,8 @@ std::vector<typename N::node_indext> grapht<N>::depth_limited_search(
 /// Run recursive depth-limited search on the graph, starting
 /// from multiple source nodes, to find the nodes reachable within n steps.
 /// This function initialises the search.
-/// \param src The nodes to start the search from.
-/// \param limit  limit on steps
+/// \param src: The nodes to start the search from.
+/// \param limit: limit on steps
 /// \return a vector of reachable node indices
 template <class N>
 std::vector<typename N::node_indext> grapht<N>::depth_limited_search(
@@ -677,10 +677,11 @@ std::vector<typename N::node_indext> grapht<N>::depth_limited_search(
 }
 
 /// Run recursive depth-limited search on the graph, starting
-// from multiple source nodes, to find the nodes reachable within n steps
-/// \param src The nodes to start the search from.
-/// \param limit  limit on steps
-/// \param visited vector of booleans indicating whether a node has been visited
+/// from multiple source nodes, to find the nodes reachable within n steps
+/// \param src: The nodes to start the search from.
+/// \param limit: limit on steps
+/// \param visited: vector of booleans indicating whether a node has been
+///   visited
 /// \return a vector of reachable node indices
 template <class N>
 std::vector<typename N::node_indext> grapht<N>::depth_limited_search(
@@ -819,7 +820,7 @@ void grapht<N>::tarjan(tarjant &t, node_indext v) const
 /// Lower-numbered SCCs are closer to the leaves, so in the particular case
 /// of a DAG, sorting by SCC number gives a topological sort, and for a cyclic
 /// graph the SCCs are topologically sorted but arbitrarily ordered internally.
-/// \param subgraph_nr [in, out]: should be pre-allocated with enough storage
+/// \param [in,out] subgraph_nr: should be pre-allocated with enough storage
 ///   for one entry per graph node. Will be populated with the SCC indices of
 ///   each node.
 /// \return the number of distinct SCCs.

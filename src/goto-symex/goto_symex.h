@@ -166,12 +166,12 @@ protected:
 
   /// Initialise the symbolic execution and the given state with <code>pc</code>
   /// as entry point.
-  /// \param state Symex state to initialise.
-  /// \param get_goto_function producer for GOTO functions
-  /// \param function_identifier The function in which the instructions are
-  /// \param pc first instruction to symex
-  /// \param limit final instruction, which itself will not
-  /// be symexed.
+  /// \param state: Symex state to initialise.
+  /// \param get_goto_function: producer for GOTO functions
+  /// \param function_identifier: The function in which the instructions are
+  /// \param pc: first instruction to symex
+  /// \param limit: final instruction, which itself will not
+  ///   be symexed.
   void initialize_entry_point(
     statet &state,
     const get_goto_functiont &get_goto_function,
@@ -181,8 +181,8 @@ protected:
 
   /// Invokes symex_step and verifies whether additional threads can be
   /// executed.
-  /// \param state Current GOTO symex step.
-  /// \param get_goto_function function that retrieves function bodies
+  /// \param state: Current GOTO symex step.
+  /// \param get_goto_function: function that retrieves function bodies
   void symex_threaded_step(
     statet &, const get_goto_functiont &);
 

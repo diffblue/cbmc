@@ -29,7 +29,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 /// \param s2: array of characters expression
 /// \param offset: integer expression
 /// \return an expression expression which is different from zero if there is
-///         an exception to signal
+///   an exception to signal
 std::pair<exprt, string_constraintst> add_axioms_for_insert(
   symbol_generatort &fresh_symbol,
   const array_string_exprt &res,
@@ -97,12 +97,11 @@ exprt length_constraint_for_insert(
 /// is considered instead of `s2`.
 /// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with arguments integer `|res|`, character
-///           pointer `&res[0]`, refined_string `s1`, refined_string`s2`,
-///           integer `offset`, optional integer `start` and optional integer
-///           `end`
+///   pointer `&res[0]`, refined_string `s1`, refined_string`s2`, integer
+///   `offset`, optional integer `start` and optional integer `end`
 /// \param pool: pool of arrays representing strings
-/// \return an integer expression which is different from zero if there is
-///         an exception to signal
+/// \return an integer expression which is different from zero if there is an
+///   exception to signal
 std::pair<exprt, string_constraintst> add_axioms_for_insert(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,

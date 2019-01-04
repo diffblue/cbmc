@@ -638,8 +638,8 @@ bool constant_propagator_domaint::merge(
 /// Attempt to evaluate expression using domain knowledge
 /// This function changes the expression that is passed into it.
 /// \param known_values: The constant values under which to evaluate \p expr
-/// \param expr The expression to evaluate
-/// \param ns The namespace for symbols in the expression
+/// \param expr: The expression to evaluate
+/// \param ns: The namespace for symbols in the expression
 /// \return True if the expression is unchanged, false otherwise
 bool constant_propagator_domaint::partial_evaluate(
   const valuest &known_values,
@@ -659,10 +659,10 @@ bool constant_propagator_domaint::partial_evaluate(
 /// Attempt to evaluate an expression in all rounding modes.
 ///
 /// \param known_values: The constant values under which to evaluate \p expr
-/// \param expr The expression to evaluate
-/// \param ns The namespace for symbols in the expression
+/// \param expr: The expression to evaluate
+/// \param ns: The namespace for symbols in the expression
 /// \return If the result is the same for all rounding modes, change
-/// expr to that result and return false. Otherwise, return true.
+///   expr to that result and return false. Otherwise, return true.
 bool constant_propagator_domaint::partial_evaluate_with_all_rounding_modes(
   const valuest &known_values,
   exprt &expr,

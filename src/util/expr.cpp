@@ -225,7 +225,7 @@ bool exprt::is_one() const
 /// (non-recursively).
 /// If no source location is found, a nil `source_locationt` is returned.
 /// \return A source location if found in the expression or its operands, nil
-/// otherwise.
+///   otherwise.
 const source_locationt &exprt::find_source_location() const
 {
   const source_locationt &l=source_location();

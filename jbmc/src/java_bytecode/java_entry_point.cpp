@@ -606,7 +606,7 @@ main_function_resultt get_main_symbol(
 /// (deterministically) set to null. This is a source of underapproximation in
 /// our approach to test generation, and should perhaps be fixed in the future.
 ///
-/// \returns true if error occurred on entry point search
+/// \return true if error occurred on entry point search
 bool java_entry_point(
   symbol_table_baset &symbol_table,
   const irep_idt &main_class,
@@ -662,7 +662,7 @@ bool java_entry_point(
 /// \param assert_uncaught_exceptions: Add an uncaught-exception check
 /// \param object_factory_parameters: Parameters for creation of arguments
 /// \param pointer_type_selector: Logic for substituting types of pointers
-/// \returns true if error occurred on entry point search, false otherwise
+/// \return true if error occurred on entry point search, false otherwise
 bool generate_java_start_function(
   const symbolt &symbol,
   symbol_table_baset &symbol_table,

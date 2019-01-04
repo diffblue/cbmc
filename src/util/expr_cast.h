@@ -24,8 +24,8 @@ Author: Nathan Phillips <Nathan.Phillips@diffblue.com>
 ///
 ///   Implement template specializations of this function to enable casting
 ///
-/// \tparam T The exprt-derived class to check for
-/// \param base Reference to a generic \ref exprt
+/// \tparam T: The exprt-derived class to check for
+/// \param base: Reference to a generic \ref exprt
 /// \return true if \a base is of type \a T
 template<typename T> inline bool can_cast_expr(const exprt &base);
 
@@ -34,8 +34,8 @@ template<typename T> inline bool can_cast_expr(const exprt &base);
 ///
 ///   Implement template specializations of this function to enable casting
 ///
-/// \tparam T The typet-derived class to check for
-/// \param base Reference to a generic \ref typet
+/// \tparam T: The typet-derived class to check for
+/// \param base: Reference to a generic \ref typet
 /// \return true if \a base is of type \a T
 template <typename T>
 inline bool can_cast_type(const typet &base);
@@ -81,10 +81,10 @@ struct expr_try_dynamic_cast_return_typet final
 
 /// \brief Try to cast a reference to a generic exprt to a specific derived
 ///    class
-/// \tparam T The reference or const reference type to \a TUnderlying to cast
+/// \tparam T: The reference or const reference type to \a TUnderlying to cast
 ///    to
-/// \tparam TExpr The original type to cast from, either exprt or const exprt
-/// \param base Reference to a generic \ref exprt
+/// \tparam TExpr: The original type to cast from, either exprt or const exprt
+/// \param base: Reference to a generic \ref exprt
 /// \return Ptr to object of type \a TUnderlying
 ///   or nullptr if \a base is not an instance of \a TUnderlying
 template <typename T, typename TExpr>
@@ -108,11 +108,11 @@ auto expr_try_dynamic_cast(TExpr &base)
 }
 
 /// \brief Try to cast a reference to a generic typet to a specific derived
-///    class
-/// \tparam T The reference or const reference type to \a TUnderlying to cast
-///    to
-/// \tparam TType The original type to cast from, either typet or const typet
-/// \param base Reference to a generic \ref typet
+///   class
+/// \tparam T: The reference or const reference type to \a TUnderlying to cast
+///   to
+/// \tparam TType: The original type to cast from, either typet or const typet
+/// \param base: Reference to a generic \ref typet
 /// \return Ptr to object of type \a TUnderlying
 ///   or nullptr if \a base is not an instance of \a TUnderlying
 template <typename T, typename TType>
@@ -156,9 +156,10 @@ struct expr_dynamic_cast_return_typet final
 } // namespace detail
 
 /// \brief Cast a reference to a generic exprt to a specific derived class.
-/// \tparam T The reference or const reference type to \a TUnderlying to cast to
-/// \tparam TExpr The original type to cast from, either exprt or const exprt
-/// \param base Reference to a generic \ref exprt
+/// \tparam T: The reference or const reference type to \a TUnderlying to cast
+///   to
+/// \tparam TExpr: The original type to cast from, either exprt or const exprt
+/// \param base: Reference to a generic \ref exprt
 /// \return Reference to object of type \a T
 /// \throw std::bad_cast If \a base is not an instance of \a TUnderlying
 template<typename T, typename TExpr>
@@ -173,9 +174,10 @@ auto expr_dynamic_cast(TExpr &base)
 
 /// \brief Cast a reference to a generic exprt to a specific derived class.
 ///   Also assert that the expression has the expected type.
-/// \tparam T The reference or const reference type to \a TUnderlying to cast to
-/// \tparam TExpr The original type to cast from, either exprt or const exprt
-/// \param base Reference to a generic \ref exprt
+/// \tparam T: The reference or const reference type to \a TUnderlying to cast
+///   to
+/// \tparam TExpr: The original type to cast from, either exprt or const exprt
+/// \param base: Reference to a generic \ref exprt
 /// \return Reference to object of type \a T
 /// \throw std::bad_cast If \a base is not an instance of \a TUnderlying
 /// \remark If CBMC assertions (PRECONDITION) are set to abort then this will
@@ -190,9 +192,10 @@ auto expr_checked_cast(TExpr &base)
 
 /// \brief Cast a reference to a generic typet to a specific derived class and
 ///   checks that the type could be converted.
-/// \tparam T The reference or const reference type to \a TUnderlying to cast to
-/// \tparam TType The original type to cast from, either typet or const typet
-/// \param base Reference to a generic \ref typet
+/// \tparam T: The reference or const reference type to \a TUnderlying to cast
+///   to
+/// \tparam TType: The original type to cast from, either typet or const typet
+/// \param base: Reference to a generic \ref typet
 /// \return Reference to object of type \a T
 template <typename T, typename TType>
 auto type_checked_cast(TType &base) ->

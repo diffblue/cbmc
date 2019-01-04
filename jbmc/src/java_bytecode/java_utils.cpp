@@ -188,10 +188,10 @@ dereference_exprt checked_dereference(const exprt &expr, const typet &type)
 ///
 /// \param src: the source string to scan
 /// \param open_pos: the initial position of the opening delimiter from where to
-/// start the search
+///   start the search
 /// \param open_char: the opening delimiter
 /// \param close_char: the closing delimiter
-/// \returns the index of the matching corresponding closing delimiter in \p src
+/// \return the index of the matching corresponding closing delimiter in \p src
 size_t find_closing_delimiter(
   const std::string &src,
   size_t open_pos,
@@ -229,8 +229,8 @@ size_t find_closing_delimiter(
 
 /// Add the components in components_to_add to the class denoted by
 /// class symbol.
-/// \param class_symbol The symbol representing the class we want to modify.
-/// \param components_to_add The vector with the components we want to add.
+/// \param class_symbol: The symbol representing the class we want to modify.
+/// \param components_to_add: The vector with the components we want to add.
 void java_add_components_to_class(
   symbolt &class_symbol,
   const struct_union_typet::componentst &components_to_add)
@@ -271,7 +271,7 @@ void declare_function(
 /// \param type: return type of the function
 /// \param symbol_table: a symbol table
 /// \return a function application expression representing:
-///         `function_name(arguments)`
+///   `function_name(arguments)`
 exprt make_function_application(
   const irep_idt &function_name,
   const exprt::operandst &arguments,
@@ -302,9 +302,9 @@ irep_idt strip_java_namespace_prefix(const irep_idt &to_strip)
 
 /// Strip the package name from a java type, for the type to be
 /// pretty printed (java::java.lang.Integer -> Integer).
-/// \param fqn_java_type The java type we want to pretty print.
+/// \param fqn_java_type: The java type we want to pretty print.
 /// \return The pretty printed type if there was a match of the
-//  qualifiers, or the type as it was passed otherwise.
+///   qualifiers, or the type as it was passed otherwise.
 std::string pretty_print_java_type(const std::string &fqn_java_type)
 {
   std::string result(fqn_java_type);

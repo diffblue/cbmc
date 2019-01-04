@@ -206,8 +206,7 @@ protected:
   /// If overridden, this function should be called from the inheriting
   /// class by the override function
   /// \return true if element was successfully pushed onto the stack,
-  /// false otherwise
-  /// If returning false, child will not be iterated over
+  ///   false otherwise. If returning false, child will not be iterated over.
   bool push_expr(const exprt &expr)
   {
     m_stack.emplace_back(expr, expr.operands().begin(), expr.operands().end());
@@ -272,7 +271,7 @@ public:
   /// by the iterator.
   /// If the iterator is currently using a const root exprt then calls
   /// mutate_root to get a non-const root and copies it if it is shared
-  /// \returns A non-const reference to the element this iterator is
+  /// \return A non-const reference to the element this iterator is
   ///   currently pointing to
   exprt &mutate()
   {

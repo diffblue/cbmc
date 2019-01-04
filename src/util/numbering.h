@@ -16,7 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "invariant.h"
 #include "optional.h"
 
-/// \tparam Map a map from a key type to some numeric type
+/// \tparam Map: a map from a key type to some numeric type
 template <typename Map>
 class template_numberingt final
 {

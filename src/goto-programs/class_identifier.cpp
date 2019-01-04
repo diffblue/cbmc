@@ -74,10 +74,10 @@ exprt get_class_identifier_field(
 /// If expr has its components filled in then sets the `@class_identifier`
 /// member of the struct
 /// \remarks Follows through base class members until it gets to the object
-/// type that contains the `@class_identifier` member
+///   type that contains the `@class_identifier` member
 /// \param expr: An expression that represents a struct
 /// \param ns: The namespace used to resolve symbol references in the type of
-/// the struct
+///   the struct
 /// \param class_type: A symbol whose identifier is the name of the class
 void set_class_identifier(
   struct_exprt &expr,

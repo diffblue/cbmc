@@ -134,7 +134,7 @@ static void utf8_append_code(unsigned int c, std::string &result)
   }
 }
 
-/// \param s UTF-32 encoded wide string
+/// \param s: UTF-32 encoded wide string
 /// \return utf8-encoded string with the same unicode characters as the input.
 std::string
 utf32_native_endian_to_utf8(const std::basic_string<unsigned int> &s)
@@ -254,7 +254,7 @@ std::wstring utf8_to_utf16_native_endian(const std::string &in)
 
 /// \param ch: UTF-16 character in architecture-native endianness encoding
 /// \param result: stream to receive string in US-ASCII format, with \\uxxxx
-///                escapes for other characters
+///   escapes for other characters
 /// \param loc: locale to check for printable characters
 static void utf16_native_endian_to_java(
   const wchar_t ch,

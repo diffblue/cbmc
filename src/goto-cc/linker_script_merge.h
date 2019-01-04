@@ -157,11 +157,11 @@ protected:
   ///       converted to `foo` whose type is `char*`.
   int pointerize_linker_defined_symbols(goto_modelt &, const linker_valuest &);
 
-  /// \param expr an expr whose subexpressions may need to be pointerized
-  /// \param to_pointerize  The symbols that are contained in the subexpressions
-  ///                       that we will pointerize.
-  /// \param linker_values the names of symbols defined in linker scripts.
-  /// \param ns a namespace to look up types.
+  /// \param expr: an expr whose subexpressions may need to be pointerized
+  /// \param to_pointerize: The symbols that are contained in the subexpressions
+  ///   that we will pointerize.
+  /// \param linker_values: the names of symbols defined in linker scripts.
+  /// \param ns: a namespace to look up types.
   ///
   /// The subexpressions that we pointerize should be in one-to-one
   /// correspondence with the symbols in `to_pointerize`. Every time we
@@ -195,13 +195,12 @@ protected:
   /// `linker_values` map. The error messages of this function describe what it
   /// means for this constraint to be violated.
   ///
-  /// \param linker_defined_symbols the list of symbols that were extern with no
-  ///                               value in the goto-program)
-  /// \param linker_values  map from the names of linker-defined symbols from
-  ///                       the object file, to synthesized values for those
-  ///                       linker symbols.
-  /// \return `1` if there is some mismatch between the list and map, `0`
-  ///                if everything is OK.
+  /// \param linker_defined_symbols: the list of symbols that were extern with
+  ///   no value in the goto-program
+  /// \param linker_values: map from the names of linker-defined symbols from
+  ///   the object file, to synthesized values for those linker symbols.
+  /// \return `1` if there is some mismatch between the list and map, `0` if
+  ///   everything is OK.
   int goto_and_object_mismatch(
       const std::list<irep_idt> &linker_defined_symbols,
       const linker_valuest &linker_values);

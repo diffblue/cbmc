@@ -693,14 +693,13 @@ code_ifthenelset get_clinit_wrapper_body(
   return code_ifthenelset(std::move(check_already_run), std::move(init_body));
 }
 
-
 /// Create static initializer wrappers for all classes that need them.
 /// \param symbol_table: global symbol table
 /// \param synthetic_methods: synthetic methods map. Will be extended noting
 ///   that any wrapper belongs to this code, and so `get_clinit_wrapper_body`
 ///   should be used to produce the method body when required.
 /// \param thread_safe: if true state variables required to make the
-///    clinit_wrapper thread safe will be created.
+///   clinit_wrapper thread safe will be created.
 void create_static_initializer_wrappers(
   symbol_tablet &symbol_table,
   synthetic_methods_mapt &synthetic_methods,

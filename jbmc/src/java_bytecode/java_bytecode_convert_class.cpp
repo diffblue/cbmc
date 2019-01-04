@@ -176,9 +176,9 @@ private:
 /// - class: A<T> extends B<T, Integer> implements C, D<T>
 /// - signature: <T:Ljava/lang/Object;>B<TT;Ljava/lang/Integer;>;LC;LD<TT;>;
 /// - returned superclass reference: B<TT;Ljava/lang/Integer;>;
-/// \param signature Signature of the class
+/// \param signature: Signature of the class
 /// \return Reference of the generic superclass, or empty if the superclass
-/// is not generic
+///   is not generic
 static optionalt<std::string>
 extract_generic_superclass_reference(const optionalt<std::string> &signature)
 {
@@ -215,10 +215,10 @@ extract_generic_superclass_reference(const optionalt<std::string> &signature)
 /// - signature: <T:Ljava/lang/Object;>B<TT;Ljava/lang/Integer;>;LC;LD<TT;>;
 /// - returned interface reference for C: LC;
 /// - returned interface reference for D: LD<TT;>;
-/// \param signature Signature of the class
-/// \param interface_name The interface name
+/// \param signature: Signature of the class
+/// \param interface_name: The interface name
 /// \return Reference of the generic interface, or empty if the interface
-/// is not generic
+///   is not generic
 static optionalt<std::string> extract_generic_interface_reference(
   const optionalt<std::string> &signature,
   const std::string &interface_name)
@@ -982,8 +982,8 @@ bool java_bytecode_convert_class(
 /// Example: if \p parameter has identifier `java::Outer$Inner::T` and
 /// there is a replacement parameter with identifier `java::Outer::T`, the
 /// identifier of \p parameter gets set to `java::Outer::T`.
-/// \param parameter
-/// \param replacement_parameters vector of generic parameters (only viable
+/// \param parameter: The given generic type parameter
+/// \param replacement_parameters: vector of generic parameters (only viable
 ///   ones, i.e., only those that can actually appear here such as generic
 ///   parameters of outer classes of the class specified by the prefix of \p
 ///   parameter identifier)
@@ -1034,8 +1034,6 @@ static void find_and_replace_parameter(
 /// Example: class `Outer<T>` has an inner class `Inner` that has a field
 /// `t` of type `Generic<T>`. This function ensures that the parameter points to
 /// `java::Outer::T` instead of `java::Outer$Inner::T`.
-/// \param type
-/// \param replacement_parameters
 static void find_and_replace_parameters(
   typet &type,
   const std::vector<java_generic_parametert> &replacement_parameters)
@@ -1118,8 +1116,6 @@ void convert_java_annotations(
 /// any generic class. All uses of the implicit generic type parameters within
 /// the inner class are updated to point to the type parameters of the
 /// corresponding outer classes.
-/// \param class_name
-/// \param symbol_table
 void mark_java_implicitly_generic_class_type(
   const irep_idt &class_name,
   symbol_tablet &symbol_table)

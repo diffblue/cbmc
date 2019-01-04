@@ -50,9 +50,9 @@ public:
   /// Replace a call to a dynamic function at location
   /// target in the given goto-program by a case-split
   /// over a given set of functions
-  /// \param goto_program The goto program that contains target
-  /// \param target location with function call with function pointer
-  /// \param functions The set of functions to consider
+  /// \param goto_program: The goto program that contains target
+  /// \param target: location with function call with function pointer
+  /// \param functions: The set of functions to consider
   void remove_function_pointer(
     goto_programt &goto_program,
     goto_programt::targett target,
@@ -75,8 +75,8 @@ protected:
   /// Replace a call to a dynamic function at location
   /// target in the given goto-program by determining
   /// functions that have a compatible signature
-  /// \param goto_program The goto program that contains target
-  /// \param target location with function call with function pointer
+  /// \param goto_program: The goto program that contains target
+  /// \param target: location with function call with function pointer
   void remove_function_pointer(
     goto_programt &goto_program,
     goto_programt::targett target);

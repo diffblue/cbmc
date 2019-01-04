@@ -28,7 +28,7 @@ Date: May 2016
 /// \param goto_program: the goto program
 /// \param instrumenters: the instrumenters
 /// \param mode: mode of the function to instrument (for instance ID_C or
-///        ID_java)
+///   ID_java)
 /// \param message_handler: a message handler
 void instrument_cover_goals(
   goto_programt &goto_program,

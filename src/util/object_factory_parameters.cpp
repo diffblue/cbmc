@@ -49,8 +49,8 @@ void object_factory_parameterst::set(const optionst &options)
 }
 
 /// Parse the object factory parameters from a given command line
-/// \param cmdline Command line
-/// \param [out] options The options object that will be updated.
+/// \param cmdline: Command line
+/// \param [out] options: The options object that will be updated.
 void parse_object_factory_options(const cmdlinet &cmdline, optionst &options)
 {
   if(cmdline.isset("max-nondet-array-length"))

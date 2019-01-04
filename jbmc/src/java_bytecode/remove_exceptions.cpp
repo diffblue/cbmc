@@ -260,13 +260,13 @@ void remove_exceptionst::instrument_exception_handler(
 /// we note  that try1{ try2 {} catch2c {} catch2d {}} catch1a() {} catch1b{}
 /// must catch in the following order: 2c 2d 1a 1b hence the numerical index
 /// is reversed whereas the letter ordering remains the same.
-/// @param stack_catch exception table
-/// @param goto_program program being evaluated
-/// @param[out] universal_try returns the try block
-///        corresponding to the desired exception handler
-/// @param[out] universal_catch returns the catch block
-///        corresponding to the exception desired exception handler
-/// @return the desired exception handler
+/// \param stack_catch: exception table
+/// \param goto_program: program being evaluated
+/// \param [out] universal_try: returns the try block corresponding to the
+///   desired exception handler
+/// \param [out] universal_catch: returns the catch block corresponding to the
+///   exception desired exception handler
+/// \return the desired exception handler
 goto_programt::targett remove_exceptionst::find_universal_exception(
   const remove_exceptionst::stack_catcht &stack_catch,
   goto_programt &goto_program,

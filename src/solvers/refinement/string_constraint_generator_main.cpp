@@ -167,7 +167,7 @@ const std::set<array_string_exprt> &array_poolt::created_strings() const
 /// is infinite, a new integer symbol is created and stored in `array_pool`.
 /// This also adds the default axioms for `arr`.
 /// \param f: a function application with argument a character array `arr` and
-/// a character pointer `ptr`.
+///   a character pointer `ptr`.
 exprt string_constraint_generatort::associate_array_to_pointer(
   const function_application_exprt &f)
 {
@@ -188,7 +188,7 @@ exprt string_constraint_generatort::associate_array_to_pointer(
 /// Associate an integer length to a char array.
 /// This adds an axiom ensuring that `arr.length` and `length` are equal.
 /// \param f: a function application with argument a character array `arr` and
-/// a integer `length`.
+///   an integer `length`.
 /// \return integer expression equal to 0
 exprt string_constraint_generatort::associate_length_to_array(
   const function_application_exprt &f)
@@ -247,8 +247,8 @@ void merge(string_constraintst &result, string_constraintst other)
 /// \param start: index of the first character to constrain
 /// \param end: index at which we stop adding constraints
 /// \param char_set: a string of the form "<low_char>-<high_char>" where
-///        `<low_char>` and `<high_char>` are two characters, which represents
-///        the set of characters that are between `low_char` and `high_char`.
+///   `<low_char>` and `<high_char>` are two characters, which represents the
+///   set of characters that are between `low_char` and `high_char`.
 /// \return a string expression that is linked to the argument through axioms
 ///   that are added to the list
 string_constraintst add_constraint_on_characters(
@@ -283,8 +283,8 @@ string_constraintst add_constraint_on_characters(
 /// `char_set` if \f$low_char \le c \le high_char\f$.
 /// \param fresh_symbol: generator of fresh symbols
 /// \param f: a function application with arguments: integer `|s|`, character
-///           pointer `&s[0]`, string `char_set_string`,
-///           optional integers `start` and `end`
+///   pointer `&s[0]`, string `char_set_string`, optional integers `start` and
+///   `end`
 /// \param array_pool: pool of arrays representing strings
 /// \return integer expression whose value is zero
 std::pair<exprt, string_constraintst> add_axioms_for_constrain_characters(
@@ -483,7 +483,7 @@ string_constraint_generatort::add_axioms_for_function_application(
 /// \deprecated should use substring instead
 /// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with one argument, which is a string,
-/// or three arguments: string, integer offset and count
+///   or three arguments: string, integer offset and count
 /// \param array_pool: pool of arrays representing strings
 /// \return a new string expression
 DEPRECATED("should use substring instead")
@@ -587,7 +587,7 @@ exprt maximum(const exprt &a, const exprt &b)
 }
 
 /// Returns a non-negative version of the argument.
-/// \param  expr: expression of which we want a non-negative version
+/// \param expr: expression of which we want a non-negative version
 /// \return `max(0, expr)`
 exprt zero_if_negative(const exprt &expr)
 {

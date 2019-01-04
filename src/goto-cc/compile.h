@@ -81,8 +81,8 @@ public:
   /// \brief `__CPROVER_...` macros written to object files and their arities
   ///
   /// \return A mapping from every `__CPROVER` macro that this compiler
-  /// wrote to one or more object files, to how many parameters that
-  /// `__CPROVER` macro has.
+  ///   wrote to one or more object files, to how many parameters that
+  ///   `__CPROVER` macro has.
   void cprover_macro_arities(std::map<irep_idt,
                                       std::size_t> &cprover_macros) const
   {

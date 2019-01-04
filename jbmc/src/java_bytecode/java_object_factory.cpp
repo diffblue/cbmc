@@ -218,7 +218,7 @@ code_assignt java_object_factoryt::get_null_assignment(
 /// \endcode
 /// It is illegal to call the function with MAY_UPDATE_IN_PLACE.
 ///
-/// \param[out] assignments:
+/// \param [out] assignments:
 ///   A code_blockt where the initialization code will be emitted to.
 /// \param expr:
 ///   Pointer-typed lvalue expression to initialize.
@@ -368,7 +368,7 @@ static mp_integer max_value(const typet &type)
 ///
 /// If the structure is not a nondeterministic structure, the call results in
 /// a precondition violation.
-/// \param struct_expr [out]: struct that we initialize
+/// \param [out] struct_expr: struct that we initialize
 /// \param code: block to add pre-requisite declarations (e.g. to allocate a
 ///   data array)
 /// \param min_nondet_string_length: minimum length of strings to initialize
@@ -731,21 +731,16 @@ void java_object_factoryt::gen_nondet_pointer_init(
 ///   // assign `expr` with a suitably casted pointer to new_object
 ///   A * p = &tmp_object
 ///
-/// \param assignments
-///   A block of code where we append the generated code.
-/// \param lifetime:
-///   Lifetime of the allocated objects (AUTOMATIC_LOCAL, STATIC_GLOBAL, or
-///   DYNAMIC)
-/// \param replacement_pointer
-///   The type of the pointer we actually want to to create.
-/// \param depth:
-///   Number of times that a pointer has been dereferenced from the root of the
-///   object tree that we are initializing.
-/// \param location:
-///   Source location associated with nondet-initialization.
-/// \return
-///   A symbol expression of type \p replacement_pointer corresponding to a
-///   pointer to object `tmp_object` (see above).
+/// \param assignments: A block of code where we append the generated code
+/// \param lifetime: Lifetime of the allocated objects (AUTOMATIC_LOCAL,
+///   STATIC_GLOBAL, or DYNAMIC)
+/// \param replacement_pointer: The type of the pointer we actually want to
+///   create
+/// \param depth: Number of times that a pointer has been dereferenced from the
+///   root of the object tree that we are initializing
+/// \param location: Source location associated with nondet-initialization
+/// \return A symbol expression of type \p replacement_pointer corresponding to
+///   a pointer to object `tmp_object` (see above)
 symbol_exprt java_object_factoryt::gen_nondet_subtype_pointer_init(
   code_blockt &assignments,
   lifetimet lifetime,
@@ -811,32 +806,23 @@ alternate_casest get_string_input_values_code(
 /// After initialization calls validation method
 /// `expr.cproverNondetInitialize()` if it was provided by the user.
 ///
-/// \param assignments:
-///   The code block to append the new instructions to.
-/// \param expr
-///   Struct-typed lvalue expression to initialize.
-/// \param is_sub:
-///   If true, `expr` is a substructure of a larger object, which in Java
-///   necessarily means a base class.
-/// \param class_identifier:
-///   Name of the parent class. Used to initialize the `@class_identifier` among
-///   others.
-/// \param skip_classid:
-///   If true, skip initializing `@class_identifier`.
-/// \param lifetime:
-///   Lifetime of the allocated objects (AUTOMATIC_LOCAL, STATIC_GLOBAL, or
-///   DYNAMIC)
-/// \param struct_type:
-///   The type of the struct we are initalizing.
-/// \param depth:
-///   Number of times that a pointer has been dereferenced from the root of the
-///   object tree that we are initializing.
-/// \param update_in_place:
+/// \param assignments: The code block to append the new instructions to
+/// \param expr: Struct-typed lvalue expression to initialize
+/// \param is_sub: If true, `expr` is a substructure of a larger object, which
+///   in Java necessarily means a base class
+/// \param class_identifier: Name of the parent class. Used to initialize the
+///   `@class_identifier` among others
+/// \param skip_classid: If true, skip initializing `@class_identifier`
+/// \param lifetime: Lifetime of the allocated objects (AUTOMATIC_LOCAL,
+///   STATIC_GLOBAL, or DYNAMIC)
+/// \param struct_type: The type of the struct we are initializing
+/// \param depth: Number of times that a pointer has been dereferenced from the
+///   root of the object tree that we are initializing
+/// \param update_in_place: Enum instance with the following meaning.
 ///   NO_UPDATE_IN_PLACE: initialize `expr` from scratch
 ///   MUST_UPDATE_IN_PLACE: reinitialize an existing object
 ///   MAY_UPDATE_IN_PLACE: invalid input
-/// \param location:
-///   Source location associated with nondet-initialization.
+/// \param location: Source location associated with nondet-initialization
 void java_object_factoryt::gen_nondet_struct_init(
   code_blockt &assignments,
   const exprt &expr,
@@ -1181,7 +1167,7 @@ const symbol_exprt java_object_factoryt::gen_nondet_int_init(
 /// Allocates a fresh array and emits an assignment writing to \p lhs the
 /// address of the new array.  Single-use at the moment, but useful to keep as a
 /// separate function for downstream branches.
-/// \param[out] assignments:
+/// \param [out] assignments:
 ///   Code is emitted here.
 /// \param lhs:
 ///   Symbol to assign the new array structure.
@@ -1528,8 +1514,8 @@ void java_object_factoryt::gen_nondet_enum_init(
 /// The only new one is \p type, which is the type of the object to create.
 ///
 /// \return The object created, the \p symbol_table gains any new symbols
-/// created, and \p init_code gains any instructions requried to initialize
-/// either the returned value or its child objects
+///   created, and \p init_code gains any instructions required to initialize
+///   either the returned value or its child objects
 exprt object_factory(
   const typet &type,
   const irep_idt base_name,
@@ -1591,7 +1577,7 @@ exprt object_factory(
 ///
 /// \param expr:
 ///   Lvalue expression to initialize.
-/// \param[out] init_code:
+/// \param [out] init_code:
 ///   A code block where the initializing assignments will be appended to.
 ///   It gets an instruction sequence to initialize or reinitialize `expr` and
 ///   child objects it refers to.

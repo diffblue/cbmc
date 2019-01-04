@@ -177,7 +177,7 @@ bool operator>=(
 /// This approach provides us with shared_ptr-like semantics, but without the
 /// space overhead required by shared_ptr. The idea is similar to
 /// boost's intrusive_ptr.
-/// \tparam Num some numeric type, used to store a reference count
+/// \tparam Num: some numeric type, used to store a reference count
 template <typename Num>
 class small_shared_pointeet
 {

@@ -1580,7 +1580,7 @@ void java_bytecode_parsert::relement_value_pairs(
 /// Corresponds to the element_value structure
 /// Described in Java 8 specification 4.7.16.1
 /// https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.7.16.1
-/// \returns An exprt that represents the particular value of annotations field.
+/// \return An exprt that represents the particular value of annotations field.
 ///   This is usually one of: a byte, number of some sort, string, character,
 ///   enum, Class type, array or another annotation.
 exprt java_bytecode_parsert::get_relement_value()
@@ -1949,8 +1949,8 @@ void java_bytecode_parsert::parse_local_variable_type_table(methodt &method)
 /// Read method handle pointed to from constant pool entry at index, return type
 /// of method handle and name if lambda function is found.
 /// \param entry: the constant pool entry of the methodhandle_info structure
-/// \returns: the method_handle type of the methodhandle_structure,
-/// either for a recognized bootstrap method or for a lambda function
+/// \return the method_handle type of the methodhandle_structure,
+///   either for a recognized bootstrap method or for a lambda function
 optionalt<java_bytecode_parsert::lambda_method_handlet>
 java_bytecode_parsert::parse_method_handle(const method_handle_infot &entry)
 {
@@ -1994,7 +1994,7 @@ java_bytecode_parsert::parse_method_handle(const method_handle_infot &entry)
 
 /// Read all entries of the `BootstrapMethods` attribute of a class file.
 /// \param parsed_class: the class representation of the class file that is
-/// currently parsed
+///   currently parsed
 void java_bytecode_parsert::read_bootstrapmethods_entry(classt &parsed_class)
 {
   u2 num_bootstrap_methods = read_u2();

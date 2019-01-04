@@ -79,7 +79,7 @@ public:
 };
 
 /// Check whether a reference to a typet is a \ref symbol_typet.
-/// \param type Source type.
+/// \param type: Source type.
 /// \return True if \p type is a \ref symbol_typet.
 template <>
 inline bool can_cast_type<symbol_typet>(const typet &type)
@@ -93,7 +93,7 @@ inline bool can_cast_type<symbol_typet>(const typet &type)
 /// \ref symbol_typet. Will fail with a precondition violation if type
 /// doesn't match.
 ///
-/// \param type Source type.
+/// \param type: Source type.
 /// \return Object of type \ref symbol_typet.
 inline const symbol_typet &to_symbol_type(const typet &type)
 {
@@ -241,7 +241,7 @@ public:
 };
 
 /// Check whether a reference to a typet is a \ref struct_union_typet.
-/// \param type Source type.
+/// \param type: Source type.
 /// \return True if \p type is a \ref struct_union_typet.
 template <>
 inline bool can_cast_type<struct_union_typet>(const typet &type)
@@ -255,7 +255,7 @@ inline bool can_cast_type<struct_union_typet>(const typet &type)
 /// struct_union_typet. Will fail with a precondition violation if type
 /// doesn't match.
 ///
-/// \param type Source type
+/// \param type: Source type
 /// \return Object of type \ref struct_union_typet
 inline const struct_union_typet &to_struct_union_type(const typet &type)
 {
@@ -316,7 +316,7 @@ public:
   void add_base(const struct_tag_typet &base);
 
   /// Return the base with the given name, if exists.
-  /// \param id The name of the base we are looking for.
+  /// \param id: The name of the base we are looking for.
   /// \return The base if exists.
   optionalt<baset> get_base(const irep_idt &id) const;
 
@@ -330,7 +330,7 @@ public:
 };
 
 /// Check whether a reference to a typet is a \ref struct_typet.
-/// \param type Source type.
+/// \param type: Source type.
 /// \return True if \p type is a \ref struct_typet.
 template <>
 inline bool can_cast_type<struct_typet>(const typet &type)
@@ -344,7 +344,7 @@ inline bool can_cast_type<struct_typet>(const typet &type)
 /// struct_typet. Will fail with a precondition violation if type
 /// doesn't match.
 ///
-/// \param type Source type.
+/// \param type: Source type.
 /// \return Object of type \ref struct_typet.
 inline const struct_typet &to_struct_type(const typet &type)
 {
@@ -390,7 +390,7 @@ public:
 };
 
 /// Check whether a reference to a typet is a \ref class_typet.
-/// \param type Source type.
+/// \param type: Source type.
 /// \return True if \p type is a \ref class_typet.
 template <>
 inline bool can_cast_type<class_typet>(const typet &type)
@@ -404,7 +404,7 @@ inline bool can_cast_type<class_typet>(const typet &type)
 /// class_typet. Will fail with a precondition violation if type
 /// doesn't match.
 ///
-/// \param type Source type.
+/// \param type: Source type.
 /// \return Object of type \ref class_typet.
 inline const class_typet &to_class_type(const typet &type)
 {
@@ -431,7 +431,7 @@ public:
 };
 
 /// Check whether a reference to a typet is a \ref union_typet.
-/// \param type Source type.
+/// \param type: Source type.
 /// \return True if \p type is a \ref union_typet.
 template <>
 inline bool can_cast_type<union_typet>(const typet &type)
@@ -445,7 +445,7 @@ inline bool can_cast_type<union_typet>(const typet &type)
 /// union_typet. Will fail with a precondition violation if type
 /// doesn't match.
 ///
-/// \param type Source type.
+/// \param type: Source type.
 /// \return Object of type \ref union_typet
 inline const union_typet &to_union_type(const typet &type)
 {
@@ -483,7 +483,7 @@ public:
 };
 
 /// Check whether a reference to a typet is a \ref tag_typet.
-/// \param type Source type.
+/// \param type: Source type.
 /// \return True if \p type is a \ref tag_typet.
 template <>
 inline bool can_cast_type<tag_typet>(const typet &type)
@@ -498,7 +498,7 @@ inline bool can_cast_type<tag_typet>(const typet &type)
 /// tag_typet. Will fail with a precondition violation if type
 /// doesn't match.
 ///
-/// \param type Source type.
+/// \param type: Source type.
 /// \return Object of type \ref tag_typet.
 inline const tag_typet &to_tag_type(const typet &type)
 {
@@ -524,7 +524,7 @@ public:
 };
 
 /// Check whether a reference to a typet is a \ref struct_tag_typet.
-/// \param type Source type.
+/// \param type: Source type.
 /// \return True if \p type is a \ref struct_tag_typet.
 template <>
 inline bool can_cast_type<struct_tag_typet>(const typet &type)
@@ -538,7 +538,7 @@ inline bool can_cast_type<struct_tag_typet>(const typet &type)
 /// struct_tag_typet. Will fail with a precondition violation if type
 /// doesn't match.
 ///
-/// \param type Source type.
+/// \param type: Source type.
 /// \return Object of type \ref struct_tag_typet
 inline const struct_tag_typet &to_struct_tag_type(const typet &type)
 {
@@ -564,7 +564,7 @@ public:
 };
 
 /// Check whether a reference to a typet is a \ref union_tag_typet.
-/// \param type Source type.
+/// \param type: Source type.
 /// \return True if \p type is a \ref union_tag_typet.
 template <>
 inline bool can_cast_type<union_tag_typet>(const typet &type)
@@ -578,7 +578,7 @@ inline bool can_cast_type<union_tag_typet>(const typet &type)
 /// union_tag_typet. Will fail with a precondition violation if type
 /// doesn't match.
 ///
-/// \param type Source type.
+/// \param type: Source type.
 /// \return Object of type \ref union_tag_typet.
 inline const union_tag_typet &to_union_tag_type(const typet &type)
 {
@@ -614,7 +614,7 @@ public:
 };
 
 /// Check whether a reference to a typet is a \ref enumeration_typet.
-/// \param type Source type.
+/// \param type: Source type.
 /// \return True if \p type is a \ref enumeration_typet.
 template <>
 inline bool can_cast_type<enumeration_typet>(const typet &type)
@@ -628,7 +628,7 @@ inline bool can_cast_type<enumeration_typet>(const typet &type)
 /// enumeration_typet. Will fail with a precondition violation if type
 /// doesn't match.
 ///
-/// \param type Source type.
+/// \param type: Source type.
 /// \return Object of type \ref enumeration_typet.
 inline const enumeration_typet &to_enumeration_type(const typet &type)
 {
@@ -678,7 +678,7 @@ public:
 };
 
 /// Check whether a reference to a typet is a \ref c_enum_typet.
-/// \param type Source type.
+/// \param type: Source type.
 /// \return True if \p type is a \ref c_enum_typet.
 template <>
 inline bool can_cast_type<c_enum_typet>(const typet &type)
@@ -692,7 +692,7 @@ inline bool can_cast_type<c_enum_typet>(const typet &type)
 /// c_enum_typet. Will fail with a precondition violation if type
 /// doesn't match.
 ///
-/// \param type Source type.
+/// \param type: Source type.
 /// \return Object of type \ref c_enum_typet.
 inline const c_enum_typet &to_c_enum_type(const typet &type)
 {
@@ -718,7 +718,7 @@ public:
 };
 
 /// Check whether a reference to a typet is a \ref c_enum_tag_typet.
-/// \param type Source type.
+/// \param type: Source type.
 /// \return True if \p type is a \ref c_enum_tag_typet.
 template <>
 inline bool can_cast_type<c_enum_tag_typet>(const typet &type)
@@ -732,7 +732,7 @@ inline bool can_cast_type<c_enum_tag_typet>(const typet &type)
 /// c_enum_tag_typet. Will fail with a precondition violation if type
 /// doesn't match.
 ///
-/// \param type Source type.
+/// \param type: Source type.
 /// \return Object of type \ref c_enum_tag_typet.
 inline const c_enum_tag_typet &to_c_enum_tag_type(const typet &type)
 {
@@ -755,8 +755,8 @@ public:
   typedef std::vector<parametert> parameterst;
 
   /// Constructs a new code type, i.e., function type.
-  /// \param _parameters The vector of function parameters.
-  /// \param _return_type The return type.
+  /// \param _parameters: The vector of function parameters.
+  /// \param _return_type: The return type.
   code_typet(parameterst &&_parameters, typet &&_return_type) : typet(ID_code)
   {
     parameters().swap(_parameters);
@@ -764,8 +764,8 @@ public:
   }
 
   /// Constructs a new code type, i.e., function type.
-  /// \param _parameters The vector of function parameters.
-  /// \param _return_type The return type.
+  /// \param _parameters: The vector of function parameters.
+  /// \param _return_type: The return type.
   code_typet(parameterst &&_parameters, const typet &_return_type)
     : typet(ID_code)
   {
@@ -963,7 +963,7 @@ public:
 };
 
 /// Check whether a reference to a typet is a \ref code_typet.
-/// \param type Source type.
+/// \param type: Source type.
 /// \return True if \p type is a \ref code_typet.
 template <>
 inline bool can_cast_type<code_typet>(const typet &type)
@@ -977,7 +977,7 @@ inline bool can_cast_type<code_typet>(const typet &type)
 /// code_typet. Will fail with a precondition violation if type
 /// doesn't match.
 ///
-/// \param type Source type.
+/// \param type: Source type.
 /// \return Object of type \ref code_typet.
 inline const code_typet &to_code_type(const typet &type)
 {
@@ -1029,7 +1029,7 @@ public:
 };
 
 /// Check whether a reference to a typet is a \ref array_typet.
-/// \param type Source type.
+/// \param type: Source type.
 /// \return True if \p type is a \ref array_typet.
 template <>
 inline bool can_cast_type<array_typet>(const typet &type)
@@ -1043,7 +1043,7 @@ inline bool can_cast_type<array_typet>(const typet &type)
 /// array_typet. Will fail with a precondition violation if type
 /// doesn't match.
 ///
-/// \param type Source type.
+/// \param type: Source type.
 /// \return Object of type \ref array_typet.
 inline const array_typet &to_array_type(const typet &type)
 {
@@ -1095,7 +1095,7 @@ public:
 };
 
 /// Check whether a reference to a typet is a \ref bitvector_typet.
-/// \param type Source type.
+/// \param type: Source type.
 /// \return True if \p type is a \ref bitvector_typet.
 template <>
 inline bool can_cast_type<bitvector_typet>(const typet &type)
@@ -1114,7 +1114,7 @@ inline bool can_cast_type<bitvector_typet>(const typet &type)
 /// bitvector_typet. Will fail with a precondition violation if type
 /// doesn't match.
 ///
-/// \param type Source type.
+/// \param type: Source type.
 /// \return Object of type \ref bitvector_typet.
 inline const bitvector_typet &to_bitvector_type(const typet &type)
 {
@@ -1142,7 +1142,7 @@ public:
 };
 
 /// Check whether a reference to a typet is a \ref bv_typet.
-/// \param type Source type.
+/// \param type: Source type.
 /// \return True if \p type is a \ref bv_typet.
 template <>
 inline bool can_cast_type<bv_typet>(const typet &type)
@@ -1161,7 +1161,7 @@ inline void validate_type(const bv_typet &type)
 /// bv_typet. Will fail with a precondition violation if type
 /// doesn't match.
 ///
-/// \param type Source type.
+/// \param type: Source type.
 /// \return Object of type \ref bv_typet.
 inline const bv_typet &to_bv_type(const typet &type)
 {
@@ -1204,7 +1204,7 @@ public:
 };
 
 /// Check whether a reference to a typet is a \ref unsignedbv_typet.
-/// \param type Source type.
+/// \param type: Source type.
 /// \return True if \p type is a \ref unsignedbv_typet.
 template <>
 inline bool can_cast_type<unsignedbv_typet>(const typet &type)
@@ -1218,7 +1218,7 @@ inline bool can_cast_type<unsignedbv_typet>(const typet &type)
 /// unsignedbv_typet. Will fail with a precondition violation if type
 /// doesn't match.
 ///
-/// \param type Source type.
+/// \param type: Source type.
 /// \return Object of type \ref unsignedbv_typet.
 inline const unsignedbv_typet &to_unsignedbv_type(const typet &type)
 {
@@ -1252,7 +1252,7 @@ public:
 };
 
 /// Check whether a reference to a typet is a \ref signedbv_typet.
-/// \param type Source type.
+/// \param type: Source type.
 /// \return True if \p type is a \ref signedbv_typet.
 template <>
 inline bool can_cast_type<signedbv_typet>(const typet &type)
@@ -1272,7 +1272,7 @@ inline void validate_type(const signedbv_typet &type)
 /// signedbv_typet. Will fail with a precondition violation if type
 /// doesn't match.
 ///
-/// \param type Source type.
+/// \param type: Source type.
 /// \return Object of type \ref signedbv_typet.
 inline const signedbv_typet &to_signedbv_type(const typet &type)
 {
@@ -1316,7 +1316,7 @@ public:
 };
 
 /// Check whether a reference to a typet is a \ref fixedbv_typet.
-/// \param type Source type.
+/// \param type: Source type.
 /// \return True if \p type is a \ref fixedbv_typet.
 template <>
 inline bool can_cast_type<fixedbv_typet>(const typet &type)
@@ -1336,7 +1336,7 @@ inline void validate_type(const fixedbv_typet &type)
 /// fixedbv_typet. Will fail with a precondition violation if type
 /// doesn't match.
 ///
-/// \param type Source type.
+/// \param type: Source type.
 /// \return Object of type \ref fixedbv_typet.
 inline const fixedbv_typet &to_fixedbv_type(const typet &type)
 {
@@ -1378,7 +1378,7 @@ public:
 };
 
 /// Check whether a reference to a typet is a \ref floatbv_typet.
-/// \param type Source type.
+/// \param type: Source type.
 /// \return True if \p type is a \ref floatbv_typet.
 template <>
 inline bool can_cast_type<floatbv_typet>(const typet &type)
@@ -1398,7 +1398,7 @@ inline void validate_type(const floatbv_typet &type)
 /// floatbv_typet. Will fail with a precondition violation if type
 /// doesn't match.
 ///
-/// \param type Source type.
+/// \param type: Source type.
 /// \return Object of type \ref floatbv_typet.
 inline const floatbv_typet &to_floatbv_type(const typet &type)
 {
@@ -1433,7 +1433,7 @@ public:
 };
 
 /// Check whether a reference to a typet is a \ref c_bit_field_typet.
-/// \param type Source type.
+/// \param type: Source type.
 /// \return True if \p type is a \ref c_bit_field_typet.
 template <>
 inline bool can_cast_type<c_bit_field_typet>(const typet &type)
@@ -1447,7 +1447,7 @@ inline bool can_cast_type<c_bit_field_typet>(const typet &type)
 /// c_bit_field_typet. Will fail with a precondition violation if type
 /// doesn't match.
 ///
-/// \param type Source type.
+/// \param type: Source type.
 /// \return Object of type \ref c_bit_field_typet.
 inline const c_bit_field_typet &to_c_bit_field_type(const typet &type)
 {
@@ -1481,7 +1481,7 @@ public:
 };
 
 /// Check whether a reference to a typet is a \ref pointer_typet.
-/// \param type Source type.
+/// \param type: Source type.
 /// \return True if \p type is a \ref pointer_typet.
 template <>
 inline bool can_cast_type<pointer_typet>(const typet &type)
@@ -1500,7 +1500,7 @@ inline void validate_type(const pointer_typet &type)
 /// pointer_typet. Will fail with a precondition violation if type
 /// doesn't match.
 ///
-/// \param type Source type.
+/// \param type: Source type.
 /// \return Object of type \ref pointer_typet.
 inline const pointer_typet &to_pointer_type(const typet &type)
 {
@@ -1534,7 +1534,7 @@ public:
 };
 
 /// Check whether a reference to a typet is a \ref reference_typet.
-/// \param type Source type.
+/// \param type: Source type.
 /// \return True if \p type is a \ref reference_typet.
 template <>
 inline bool can_cast_type<reference_typet>(const typet &type)
@@ -1549,7 +1549,7 @@ inline bool can_cast_type<reference_typet>(const typet &type)
 /// reference_typet. Will fail with a precondition violation if type
 /// doesn't match.
 ///
-/// \param type Source type.
+/// \param type: Source type.
 /// \return Object of type \ref reference_typet.
 inline const reference_typet &to_reference_type(const typet &type)
 {
@@ -1579,7 +1579,7 @@ public:
 };
 
 /// Check whether a reference to a typet is a \ref c_bool_typet.
-/// \param type Source type.
+/// \param type: Source type.
 /// \return True if \p type is a \ref c_bool_typet.
 template <>
 inline bool can_cast_type<c_bool_typet>(const typet &type)
@@ -1598,7 +1598,7 @@ inline void validate_type(const c_bool_typet &type)
 /// c_bool_typet. Will fail with a precondition violation if type
 /// doesn't match.
 ///
-/// \param type Source type.
+/// \param type: Source type.
 /// \return Object of type \ref c_bool_typet.
 inline const c_bool_typet &to_c_bool_type(const typet &type)
 {
@@ -1629,7 +1629,7 @@ public:
 };
 
 /// Check whether a reference to a typet is a \ref string_typet.
-/// \param type Source type.
+/// \param type: Source type.
 /// \return True if \p type is a \ref string_typet.
 template <>
 inline bool can_cast_type<string_typet>(const typet &type)
@@ -1643,7 +1643,7 @@ inline bool can_cast_type<string_typet>(const typet &type)
 /// string_typet. Will fail with a precondition violation if type
 /// doesn't match.
 ///
-/// \param type Source type.
+/// \param type: Source type.
 /// \return Object of type \ref string_typet.
 inline const string_typet &to_string_type(const typet &type)
 {
@@ -1676,7 +1676,7 @@ public:
 };
 
 /// Check whether a reference to a typet is a \ref range_typet.
-/// \param type Source type.
+/// \param type: Source type.
 /// \return True if \p type is a \ref range_typet.
 template <>
 inline bool can_cast_type<range_typet>(const typet &type)
@@ -1690,7 +1690,7 @@ inline bool can_cast_type<range_typet>(const typet &type)
 /// range_typet. Will fail with a precondition violation if type
 /// doesn't match.
 ///
-/// \param type Source type.
+/// \param type: Source type.
 /// \return Object of type \ref range_typet.
 inline const range_typet &to_range_type(const typet &type)
 {
@@ -1735,7 +1735,7 @@ public:
 };
 
 /// Check whether a reference to a typet is a \ref vector_typet.
-/// \param type Source type.
+/// \param type: Source type.
 /// \return True if \p type is a \ref vector_typet.
 template <>
 inline bool can_cast_type<vector_typet>(const typet &type)
@@ -1749,7 +1749,7 @@ inline bool can_cast_type<vector_typet>(const typet &type)
 /// vector_typet. Will fail with a precondition violation if type
 /// doesn't match.
 ///
-/// \param type Source type.
+/// \param type: Source type.
 /// \return Object of type \ref vector_typet.
 inline const vector_typet &to_vector_type(const typet &type)
 {
@@ -1780,7 +1780,7 @@ public:
 };
 
 /// Check whether a reference to a typet is a \ref complex_typet.
-/// \param type Source type.
+/// \param type: Source type.
 /// \return True if \p type is a \ref complex_typet.
 template <>
 inline bool can_cast_type<complex_typet>(const typet &type)
@@ -1794,7 +1794,7 @@ inline bool can_cast_type<complex_typet>(const typet &type)
 /// complex_typet. Will fail with a precondition violation if type
 /// doesn't match.
 ///
-/// \param type Source type.
+/// \param type: Source type.
 /// \return Object of type \ref complex_typet.
 inline const complex_typet &to_complex_type(const typet &type)
 {

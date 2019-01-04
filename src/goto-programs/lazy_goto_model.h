@@ -146,7 +146,7 @@ public:
   /// \param handler: An object that defines the handlers
   /// \param options: The options passed to process_goto_functions
   /// \param message_handler: The message_handler to use for logging
-  /// \tparam THandler a type that defines methods process_goto_function and
+  /// \tparam THandler: a type that defines methods process_goto_function and
   /// process_goto_functions
   template<typename THandler>
   static lazy_goto_modelt from_handler_object(
@@ -196,7 +196,7 @@ public:
   /// load new functions, it has let it go.
   /// Before freezing the functions all module-level passes are run
   /// \param model: The lazy_goto_modelt to freeze
-  /// \returns The frozen goto_modelt or an empty optional if freezing fails
+  /// \return The frozen goto_modelt or an empty optional if freezing fails
   static std::unique_ptr<goto_modelt> process_whole_model_and_freeze(
     lazy_goto_modelt &&model)
   {

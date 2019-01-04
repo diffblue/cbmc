@@ -76,11 +76,11 @@ protected:
 /// Iterates through the parameters of the function type \p ftype, finds a new
 /// new name for each parameter and renames them in `ftype.parameters()` as
 /// well as in the \p symbol_table.
-/// \param[in,out] ftype:
+/// \param [in,out] ftype:
 ///   Function type whose parameters should be named.
 /// \param name_prefix:
 ///   Prefix for parameter names, typically the parent function's name.
-/// \param[in,out] symbol_table:
+/// \param [in,out] symbol_table:
 ///   Global symbol table.
 /// \return Assigns parameter names (side-effects on `ftype`) to function stub
 ///   parameters, which are initially nameless as method conversion hasn't
@@ -191,18 +191,14 @@ symbol_exprt java_bytecode_convert_methodt::tmp_variable(
 /// Returns an expression indicating a local variable suitable to load/store
 /// from a bytecode at address `address` a value of type `type_char` stored in
 /// the JVM's slot `arg`.
-///
-/// \param arg
-///   The local variable slot
-/// \param type_char
-///   The type of the value stored in the slot pointed by `arg`.
-/// \param address
-///   Bytecode address used to find a variable that the LVT declares to be live
-///   and living in the slot pointed by `arg` for this bytecode.
-/// \param do_cast
-///   Indicates whether we should return the original symbol_exprt or a
-///   typecast_exprt if the type of the symbol_exprt does not equal that
-///   represented by `type_char`.
+/// \param arg: The local variable slot
+/// \param type_char: The type of the value stored in the slot pointed by `arg`
+/// \param address: Bytecode address used to find a variable that the LVT
+///   declares to be live and living in the slot pointed by `arg` for this
+///   bytecode
+/// \param do_cast: Indicates whether we should return the original symbol_exprt
+///   or a typecast_exprt if the type of the symbol_exprt does not equal that
+///   represented by `type_char`
 /// \return symbol_exprt or type-cast symbol_exprt
 exprt java_bytecode_convert_methodt::variable(
   const exprt &arg,
@@ -239,18 +235,12 @@ exprt java_bytecode_convert_methodt::variable(
 }
 
 /// Returns the member type for a method, based on signature or descriptor
-/// \param descriptor
-///   descriptor of the method
-/// \param signature
-///   signature of the method
-/// \param class_name
-///   string containing the name of the corresponding class
-/// \param method_name
-///   string containing the name of the method
-/// \param message_handler
-///   message handler to collect warnings
-/// \return
-///   the constructed member type
+/// \param descriptor: descriptor of the method
+/// \param signature: signature of the method
+/// \param class_name: string containing the name of the corresponding class
+/// \param method_name: string containing the name of the method
+/// \param message_handler: message handler to collect warnings
+/// \return the constructed member type
 java_method_typet member_type_lazy(
   const std::string &descriptor,
   const optionalt<std::string> &signature,
@@ -308,9 +298,9 @@ java_method_typet member_type_lazy(
 
 /// Retrieves the symbol of the lambda method associated with the given
 /// lambda method handle (bootstrap method).
-/// \param lambda_method_handles Vector of lambda method handles (bootstrap
+/// \param lambda_method_handles: Vector of lambda method handles (bootstrap
 ///   methods) of the class where the lambda is called
-/// \param index Index of the lambda method handle in the vector
+/// \param index: Index of the lambda method handle in the vector
 /// \return Symbol of the lambda method if the method handle has a known type
 optionalt<symbolt> java_bytecode_convert_methodt::get_lambda_method_symbol(
   const java_class_typet::java_lambda_method_handlest &lambda_method_handles,
@@ -3142,7 +3132,7 @@ irep_idt java_bytecode_convert_methodt::get_static_field(
 /// Create temporary variables if a write instruction can have undesired side-
 /// effects.
 /// \param tmp_var_prefix: The prefix string to use for new temporary variables
-/// \param[out] block: The code block the assignment is added to if required.
+/// \param [out] block: The code block the assignment is added to if required.
 /// \param write_type: The enumeration type of the write instruction.
 /// \param identifier: The identifier of the symbol in the write instruction.
 void java_bytecode_convert_methodt::save_stack_entries(

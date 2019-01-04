@@ -74,11 +74,11 @@ remove_virtual_functionst::remove_virtual_functionst(
 
 /// Replace specified virtual function call with a static call to its
 /// most derived implementation
-/// \param goto_program [in/out]: GOTO program to modify
-/// \param target iterator: to a function in the supplied GOTO program
-/// to replace. Must point to a virtual function call.
+/// \param [in,out] goto_program: GOTO program to modify
+/// \param target: iterator to a function in the supplied GOTO program
+///   to replace. Must point to a virtual function call.
 /// \return Returns a pointer to the statement in the supplied GOTO
-/// program after replaced function call
+///   program after replaced function call
 goto_programt::targett remove_virtual_functionst::remove_virtual_function(
   goto_programt &goto_program,
   goto_programt::targett target)
@@ -105,7 +105,7 @@ goto_programt::targett remove_virtual_functionst::remove_virtual_function(
 }
 
 /// Create a concrete function call to replace a virtual one
-/// \param call [in,out]: the function call to update
+/// \param [in,out] call: the function call to update
 /// \param function_symbol: the function to be called
 /// \param ns: namespace
 static void create_static_function_call(
@@ -131,16 +131,16 @@ static void create_static_function_call(
 /// implementation. If there's a type mismatch between implementation
 /// and the instance type or if fallback_action is set to
 /// ASSUME_FALSE, then function is substituted with a call to ASSUME(false)
-/// \param goto_program [in/out]: GOTO program to modify
+/// \param [in,out] goto_program: GOTO program to modify
 /// \param target: Iterator to the GOTO instruction in the supplied
-/// GOTO program to be removed. Must point to a function call
+///   GOTO program to be removed. Must point to a function call
 /// \param functions: Dispatch table - all possible implementations of
-/// this function sorted from the least to the most derived
+///   this function sorted from the least to the most derived
 /// \param fallback_action: - ASSUME_FALSE to replace virtual function
-/// calls with ASSUME(false) or CALL_LAST_FUNCTION to replace them
-/// with the most derived matching call
+///   calls with ASSUME(false) or CALL_LAST_FUNCTION to replace them
+///   with the most derived matching call
 /// \return Returns a pointer to the statement in the supplied GOTO
-/// program after replaced function call
+///   program after replaced function call
 goto_programt::targett remove_virtual_functionst::remove_virtual_function(
   goto_programt &goto_program,
   goto_programt::targett target,
@@ -402,8 +402,8 @@ void remove_virtual_functionst::get_child_functions_rec(
 
 /// Used to get dispatch entries to call for the given function
 /// \param function: function that should be called
-/// \param[out] functions: is assigned a list of dispatch entries, i.e., pairs
-/// of class names and function symbol to call when encountering the class.
+/// \param [out] functions: is assigned a list of dispatch entries, i.e., pairs
+///   of class names and function symbol to call when encountering the class.
 void remove_virtual_functionst::get_functions(
   const exprt &function,
   dispatch_table_entriest &functions)
@@ -491,7 +491,7 @@ void remove_virtual_functionst::get_functions(
 /// \param class_id: Class identifier to look up
 /// \param component_name: Name of the function to look up
 /// \return nil_exprt instance on error and a symbol_exprt pointing to
-/// the method on success
+///   the method on success
 exprt remove_virtual_functionst::get_method(
   const irep_idt &class_id,
   const irep_idt &component_name) const
@@ -597,16 +597,16 @@ void remove_virtual_functions(goto_model_functiont &function)
 /// and the instance type or if fallback_action is set to
 /// ASSUME_FALSE, then function is substituted with a call to ASSUME(false)
 /// \param symbol_table: Symbol table
-/// \param goto_program [in/out]: GOTO program to modify
+/// \param [in,out] goto_program: GOTO program to modify
 /// \param instruction: Iterator to the GOTO instruction in the supplied
-/// GOTO program to be removed. Must point to a function call
+///   GOTO program to be removed. Must point to a function call
 /// \param dispatch_table: Dispatch table - all possible implementations of
-/// this function sorted from the least to the most derived
+///   this function sorted from the least to the most derived
 /// \param fallback_action: - ASSUME_FALSE to replace virtual function
-/// calls with ASSUME(false) or CALL_LAST_FUNCTION to replace them
-/// with the most derived matching call
+///   calls with ASSUME(false) or CALL_LAST_FUNCTION to replace them
+///   with the most derived matching call
 /// \return Returns a pointer to the statement in the supplied GOTO
-/// program after replaced function call
+///   program after replaced function call
 goto_programt::targett remove_virtual_function(
   symbol_tablet &symbol_table,
   goto_programt &goto_program,

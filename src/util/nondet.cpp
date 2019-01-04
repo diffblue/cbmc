@@ -29,7 +29,7 @@ Author: Diffblue Ltd.
 /// \param mode: Mode (language) of the symbol to be generated.
 /// \param source_location: The location to mark the generated int with.
 /// \param symbol_table: The global symbol table.
-/// \param instructions [out]: Output instructions are written to
+/// \param [out] instructions: Output instructions are written to
 ///   'instructions'. These declare, nondet-initialise and range-constrain (with
 ///   assume statements) a fresh integer.
 /// \return Returns a symbol expression for the resulting integer.

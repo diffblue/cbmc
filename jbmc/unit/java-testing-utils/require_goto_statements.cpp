@@ -19,7 +19,7 @@ Author: Diffblue Ltd.
 /// Expand value of a function to include all child codets
 /// \param function_value: The value of the function (e.g. got by looking up
 ///  the function in the symbol table and getting the value)
-/// \return: All ID_code statements in the tree rooted at \p function_value
+/// \return All ID_code statements in the tree rooted at \p function_value
 std::vector<codet>
 require_goto_statements::get_all_statements(const exprt &function_value)
 {
@@ -37,7 +37,7 @@ require_goto_statements::get_all_statements(const exprt &function_value)
   return statements;
 }
 
-/// \param symbol_table Symbol table for the test
+/// \param symbol_table: Symbol table for the test
 /// \return All codet statements of the __CPROVER_start function
 const std::vector<codet>
 require_goto_statements::require_entry_point_statements(
@@ -60,8 +60,8 @@ require_goto_statements::require_entry_point_statements(
 /// \param superclass_name: The name of the superclass (if given)
 /// \param component_name: The name of the component of the superclass that
 /// \param symbol_table: A symbol table to enable type lookups
-/// should be assigned
-/// \return: All the assignments to that component.
+///   should be assigned
+/// \return All the assignments to that component.
 require_goto_statements::pointer_assignment_locationt
 require_goto_statements::find_struct_component_assignments(
   const std::vector<codet> &statements,
@@ -150,8 +150,8 @@ require_goto_statements::find_struct_component_assignments(
 }
 
 /// Find assignment statements that set this->{component_name}
-/// \param statements The statements to look through
-/// \param component_name The name of the component whose assignments we are
+/// \param statements: The statements to look through
+/// \param component_name: The name of the component whose assignments we are
 ///   looking for.
 /// \return A collection of all non-null assignments to this component
 ///   and, if present, a null assignment.
@@ -200,8 +200,8 @@ require_goto_statements::find_this_component_assignment(
 /// instructions.
 /// \param pointer_name: The name of the variable
 /// \param instructions: The instructions to look through
-/// \return: A structure that contains the null assignment if found, and a
-/// vector of all other assignments
+/// \return A structure that contains the null assignment if found, and a
+///   vector of all other assignments
 require_goto_statements::pointer_assignment_locationt
 require_goto_statements::find_pointer_assignments(
   const irep_idt &pointer_name,
@@ -290,13 +290,13 @@ const code_declt &require_goto_statements::require_declaration_of_name(
 
 /// Checks that the component of the structure (possibly inherited from
 /// the superclass) is assigned an object of the given type.
-/// \param structure_name The name the variable
-/// \param superclass_name The name of its superclass (if given)
-/// \param component_name The name of the field of the superclass
-/// \param component_type_name The name of the required type of the field
-/// \param typecast_name The name of the type to which the object is cast (if
-/// there is a typecast)
-/// \param entry_point_instructions The statements to look through
+/// \param structure_name: The name the variable
+/// \param superclass_name: The name of its superclass (if given)
+/// \param component_name: The name of the field of the superclass
+/// \param component_type_name: The name of the required type of the field
+/// \param typecast_name: The name of the type to which the object is cast (if
+///   there is a typecast)
+/// \param entry_point_instructions: The statements to look through
 /// \param symbol_table: A symbol table to enable type lookups
 /// \return The identifier of the variable assigned to the field
 const irep_idt &require_goto_statements::require_struct_component_assignment(
@@ -379,11 +379,11 @@ const irep_idt &require_goto_statements::require_struct_component_assignment(
 
 /// Checks that the array component of the structure (possibly inherited from
 /// the superclass) is assigned an array with given element type.
-/// \param structure_name The name the variable
-/// \param superclass_name The name of its superclass (if given)
-/// \param array_component_name The name of the array field of the superclass
-/// \param array_type_name The type of the array, e.g., java::array[reference]
-/// \param entry_point_instructions The statements to look through
+/// \param structure_name: The name the variable
+/// \param superclass_name: The name of its superclass (if given)
+/// \param array_component_name: The name of the array field of the superclass
+/// \param array_type_name: The type of the array, e.g., java::array[reference]
+/// \param entry_point_instructions: The statements to look through
 /// \param symbol_table: A symbol table to enable type lookups
 /// \return The identifier of the variable assigned to the field
 const irep_idt &
@@ -454,8 +454,8 @@ require_goto_statements::require_struct_array_component_assignment(
 
 /// Checks that the input argument (of method under test) with given name is
 /// assigned a single non-null object in the entry point function.
-/// \param argument_name Name of the input argument of method under test
-/// \param entry_point_statements The statements to look through
+/// \param argument_name: Name of the input argument of method under test
+/// \param entry_point_statements: The statements to look through
 /// \return The identifier of the variable assigned to the input argument
 const irep_idt &
 require_goto_statements::require_entry_point_argument_assignment(

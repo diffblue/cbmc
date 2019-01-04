@@ -43,8 +43,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "load_method_by_regex.h"
 
 /// Parse options that are java bytecode specific.
-/// \param cmd Command line
-/// \param [out] options The options object that will be updated.
+/// \param cmd: Command line
+/// \param [out] options: The options object that will be updated.
 void parse_java_language_options(const cmdlinet &cmd, optionst &options)
 {
   options.set_option(

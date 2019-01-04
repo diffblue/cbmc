@@ -16,7 +16,7 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 /// Parse a goto program in json form.
 /// \param instream: The input stream
 /// \param path: A file path
-/// \return: boolean signifying success or failure of the parsing
+/// \return boolean signifying success or failure of the parsing
 bool json_symtab_languaget::parse(
   std::istream &instream,
   const std::string &path)
@@ -27,7 +27,7 @@ bool json_symtab_languaget::parse(
 /// Typecheck a goto program in json form.
 /// \param symbol_table: The symbol table containing symbols read from file.
 /// \param module: A useless parameter, there for interface consistency.
-/// \return: boolean signifying success or failure of the typechecking.
+/// \return boolean signifying success or failure of the typechecking.
 bool json_symtab_languaget::typecheck(
   symbol_tablet &symbol_table,
   const std::string &module)

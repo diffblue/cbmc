@@ -96,10 +96,10 @@ struct indicator_maskt<T, B, std::integral_constant<T, 0>>
 ///   * useful:  48 B
 ///   * total:   64 B
 ///
-/// \tparam T mapped type
-/// \tparam Ind unsigned integer type, used to map integer indices to internal
+/// \tparam T: mapped type
+/// \tparam Ind: unsigned integer type, used to map integer indices to internal
 ///   indices that index into the memory block that stores the mapped values
-/// \tparam Num gives range of valid indices, i.e., the valid indices are {0,
+/// \tparam Num: gives range of valid indices, i.e., the valid indices are {0,
 ///   ..., Num-1}, must satisfy Num * num_bits(Num-1) + Num < sizeof(Ind) * 8,
 ///   with num_bits(n) denoting the minimum number of bits required to represent
 ///   integer n

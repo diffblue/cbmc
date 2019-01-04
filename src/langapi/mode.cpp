@@ -76,7 +76,7 @@ get_mode_from_identifier(const namespacet &ns, const irep_idt &identifier)
 /// \param ns: a namespace
 /// \param identifier: an identifier
 /// \return the corresponding language if the mode is not `ID_unknown`, or
-///    the default language otherwise;
+///   the default language otherwise;
 /// Note: It is assumed as an invariant that languages of symbols in the symbol
 ///   table have been registered.
 std::unique_ptr<languaget>

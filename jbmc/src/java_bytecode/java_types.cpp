@@ -90,7 +90,7 @@ reference_typet java_lang_object_type()
 /// Construct an array pointer type. It is a pointer to a symbol with identifier
 /// java::array[]. Its ID_element_type is set to the corresponding primitive
 /// type, or void* for arrays of references.
-/// \param subtype Character indicating the type of array
+/// \param subtype: Character indicating the type of array
 reference_typet java_array_type(const char subtype)
 {
   std::string subtype_str;
@@ -125,7 +125,7 @@ reference_typet java_array_type(const char subtype)
 }
 
 /// Return a const reference to the element type of a given java array type
-/// \param array_symbol The java array type
+/// \param array_symbol: The java array type
 const typet &java_array_element_type(const struct_tag_typet &array_symbol)
 {
   DATA_INVARIANT(
@@ -135,7 +135,7 @@ const typet &java_array_element_type(const struct_tag_typet &array_symbol)
 }
 
 /// Return a non-const reference to the element type of a given java array type
-/// \param array_symbol The java array type
+/// \param array_symbol: The java array type
 typet &java_array_element_type(struct_tag_typet &array_symbol)
 {
   DATA_INVARIANT(
@@ -158,8 +158,8 @@ bool is_java_array_type(const typet &type)
 }
 
 /// Checks whether the given type is a multi-dimensional array pointer type,
-// i.e., a pointer to an array type with element type also being a pointer to an
-/// array type.
+/// i.e., a pointer to an array type with element type also being a pointer to
+/// an array type.
 bool is_multidim_java_array_type(const typet &type)
 {
   return is_java_array_type(type) && is_java_array_type(java_array_element_type(
@@ -167,9 +167,9 @@ bool is_multidim_java_array_type(const typet &type)
 }
 
 /// See above
-/// \param tag Tag of a struct
+/// \param tag: Tag of a struct
 /// \return True if the given string is a Java array tag, i.e., has a prefix
-/// of java::array[
+///   of java::array[
 bool is_java_array_tag(const irep_idt& tag)
 {
   return has_prefix(id2string(tag), "java::array[");
@@ -227,7 +227,7 @@ exprt java_bytecode_promotion(const exprt &expr)
 }
 
 /// Take a list of generic type arguments and parse them into the generic type.
-/// \param generic_type [out]: The existing generic type to add the information
+/// \param [out] generic_type: The existing generic type to add the information
 ///   to
 /// \param type_arguments: The string representing the generic type arguments
 ///   for a signature. For example `<TT;Ljava/lang/Foo;LList<LInteger;>;>`
@@ -449,8 +449,8 @@ build_class_name(const std::string &src, const std::string &class_name_prefix)
 /// \param starting_point: The string position where the opening 'L' we want to
 ///   find the closing ';' for.
 /// \return The string position corresponding to the matching ';'. For example:
-/// LA;, we would return 2. For LA<TT;>; we would return 7.
-/// See unit/java_bytecode/java_util_tests.cpp for more examples.
+///   LA;, we would return 2. For LA<TT;>; we would return 7.
+///   See unit/java_bytecode/java_util_tests.cpp for more examples.
 size_t find_closing_semi_colon_for_reference_type(
   const std::string src,
   size_t starting_point)
@@ -488,7 +488,7 @@ size_t find_closing_semi_colon_for_reference_type(
 /// \param src: the string representation as used in the class file
 /// \param class_name_prefix: name of class to append to generic type
 ///   variables/parameters
-/// \returns internal type representation for GOTO programs
+/// \return internal type representation for GOTO programs
 typet java_type_from_string(
   const std::string &src,
   const std::string &class_name_prefix)
@@ -671,7 +671,7 @@ char java_char_from_type(const typet &type)
 ///
 /// For example for `HashMap<K, V>` a vector with two elements would be returned
 ///
-/// \returns vector of java types representing the generic type variables
+/// \return vector of java types representing the generic type variables
 std::vector<typet> java_generic_type_from_string(
   const std::string &class_name,
   const std::string &src)
@@ -792,10 +792,10 @@ bool is_valid_java_array(const struct_typet &type)
 
 /// Compares the types, including checking element types if both types are
 /// arrays.
-/// \param type1 First type to compare
-/// \param type2 Second type to compare
+/// \param type1: First type to compare
+/// \param type2: Second type to compare
 /// \return True if the types are equal, including elemnt types if they are
-/// both arrays
+///   both arrays
 bool equal_java_types(const typet &type1, const typet &type2)
 {
   bool arrays_with_same_element_type = true;
@@ -868,7 +868,7 @@ void get_dependencies_from_generic_parameters_rec(
 /// must be loaded but only appear as generic type argument, not as a field
 /// reference.
 /// \param signature: the string representation of the signature to analyze
-/// \param refs [out]: the set to insert the names of the found dependencies
+/// \param [out] refs: the set to insert the names of the found dependencies
 void get_dependencies_from_generic_parameters(
   const std::string &signature,
   std::set<irep_idt> &refs)
@@ -904,7 +904,7 @@ void get_dependencies_from_generic_parameters(
 /// used to get information about class dependencies that must be loaded but
 /// only appear as generic type argument, not as a field reference.
 /// \param t: the type to analyze
-/// \param refs [out]: the set to insert the names of the found dependencies
+/// \param [out] refs: the set to insert the names of the found dependencies
 void get_dependencies_from_generic_parameters(
   const typet &t,
   std::set<irep_idt> &refs)
@@ -946,7 +946,7 @@ java_generic_struct_tag_typet::java_generic_struct_tag_typet(
 
 /// Check if this symbol has the given generic type. If yes, return its index
 /// in the vector of generic types.
-/// \param type The parameter type we are looking for.
+/// \param type: The parameter type we are looking for.
 /// \return The index of the type in the vector of generic types.
 optionalt<size_t> java_generic_struct_tag_typet::generic_type_index(
   const java_generic_parametert &type) const

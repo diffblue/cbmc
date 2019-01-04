@@ -25,9 +25,9 @@ Author: Daniel Kroening, kroening@kroening.com
 /// - `symbol_typet("a")` and `ns.lookup("a").type` will compare equal,
 /// - `struct_typet {symbol_typet("a")}` and `struct_typet {ns.lookup("a")
 ///   .type}` will not compare equal.
-/// \param type1 The first type to compare.
-/// \param type2 The second type to compare.
-/// \param ns The namespace, needed for resolution of symbols.
+/// \param type1: The first type to compare.
+/// \param type2: The second type to compare.
+/// \param ns: The namespace, needed for resolution of symbols.
 bool type_eq(const typet &type1, const typet &type2, const namespacet &ns)
 {
   if(type1==type2)

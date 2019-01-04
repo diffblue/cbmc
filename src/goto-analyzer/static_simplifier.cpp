@@ -25,7 +25,7 @@ Author: Martin Brain, martin.brain@cs.ox.ac.uk
 /// \param options: the parsed user options
 /// \param message_handler: the system message handler
 /// \param out: output stream for the simplified program
-/// \return: false on success with the domain printed to out
+/// \return false on success with the domain printed to out
 bool static_simplifier(
   goto_modelt &goto_model,
   const ai_baset &ai,

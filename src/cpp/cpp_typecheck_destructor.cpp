@@ -49,8 +49,6 @@ void cpp_typecheckt::default_dtor(
 }
 
 /// produces destructor code for a class object
-///
-///    Note:
 codet cpp_typecheckt::dtor(const symbolt &symbol)
 {
   assert(symbol.type.id()==ID_struct ||

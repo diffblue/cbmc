@@ -351,10 +351,10 @@ bool is_index_member_symbol(const exprt &src)
 }
 
 /// \brief show a compact variant of the goto trace on the console
-/// \param out the output stream
-/// \param ns the namespace
-/// \param goto_trace the trace to be shown
-/// \param options any options, e.g., numerical representation
+/// \param out: the output stream
+/// \param ns: the namespace
+/// \param goto_trace: the trace to be shown
+/// \param options: any options, e.g., numerical representation
 void show_compact_goto_trace(
   messaget::mstreamt &out,
   const namespacet &ns,

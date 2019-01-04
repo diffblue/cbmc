@@ -4,9 +4,9 @@
 
 #include <iterator>
 
-/// \param type Source type
+/// \param type: Source type
 /// \return The vector of implicitly generic and (explicitly) generic type
-/// parameters of the given type.
+///   parameters of the given type.
 const std::vector<java_generic_parametert>
 get_all_generic_parameters(const typet &type)
 {
@@ -37,8 +37,8 @@ get_all_generic_parameters(const typet &type)
 
 /// Add pairs to the controlled map. Own the keys and pop from their stack
 /// on destruction; otherwise do nothing.
-/// \param parameters generic parameters that are the keys of the pairs to add
-/// \param types a type to add for each parameter
+/// \param parameters: generic parameters that are the keys of the pairs to add
+/// \param types: a type to add for each parameter
 void generic_parameter_specialization_map_keyst::insert_pairs(
   const std::vector<java_generic_parametert> &parameters,
   const std::vector<reference_typet> &types)
@@ -87,9 +87,9 @@ void generic_parameter_specialization_map_keyst::insert_pairs(
 /// Add a pair of a parameter and its types for each generic parameter of the
 /// given generic pointer type to the controlled map. Own the keys and pop
 /// from their stack on destruction; otherwise do nothing.
-/// \param pointer_type pointer type to get the specialized generic types from
-/// \param pointer_subtype_struct struct type to which the generic pointer
-/// points, must be generic if the pointer is generic
+/// \param pointer_type: pointer type to get the specialized generic types from
+/// \param pointer_subtype_struct: struct type to which the generic pointer
+///   points, must be generic if the pointer is generic
 void generic_parameter_specialization_map_keyst::insert_pairs_for_pointer(
   const pointer_typet &pointer_type,
   const typet &pointer_subtype_struct)
@@ -136,9 +136,10 @@ void generic_parameter_specialization_map_keyst::insert_pairs_for_pointer(
 /// in the form of a symbol rather than a pointer (as opposed to the function
 /// insert_pairs_for_pointer). Own the keys and pop from their stack
 /// on destruction; otherwise do nothing.
-/// \param struct_tag_type symbol type to get the specialized generic types from
-/// \param symbol_struct struct type of the symbol type, must be generic if
-/// the symbol is generic
+/// \param struct_tag_type: symbol type to get the specialized generic types
+///   from
+/// \param symbol_struct: struct type of the symbol type, must be generic if
+///   the symbol is generic
 void generic_parameter_specialization_map_keyst::insert_pairs_for_symbol(
   const struct_tag_typet &struct_tag_type,
   const typet &symbol_struct)

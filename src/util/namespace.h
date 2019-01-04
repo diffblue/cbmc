@@ -39,7 +39,7 @@ public:
 
   /// Lookup a symbol in the namespace.
   /// \param name: The name of the symbol to lookup.
-  /// \return: A reference to the symbol found.
+  /// \return A reference to the symbol found.
   /// \remarks: It is a PRECONDITION that the symbol name exists
   ///   in the namespace.
   const symbolt &lookup(const irep_idt &name) const
@@ -81,7 +81,7 @@ public:
   /// returned. With multiple symbol tables, `symbol_table1` is searched first
   /// and then symbol_table2.
   /// \return False iff the requested symbol is found in at least one of the
-  /// tables.
+  ///   tables.
   virtual bool lookup(const irep_idt &name, const symbolt *&symbol) const=0;
 };
 
@@ -161,7 +161,7 @@ public:
   /// Add symbol table to the list of symbol tables this multi-namespace
   /// is working with.
   /// \param symbol_table: Reference to the symbol table to be added to this
-  /// namespace.
+  ///   namespace.
   void add(const symbol_table_baset &symbol_table)
   {
     symbol_table_list.push_back(&symbol_table);

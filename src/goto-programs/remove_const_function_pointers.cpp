@@ -47,7 +47,7 @@ remove_const_function_pointerst::remove_const_function_pointerst(
 /// variations within.
 /// \param base_expression: The function call through a function pointer
 /// \param out_functions: The functions that (symbols of type ID_code) the base
-/// expression could take.
+///   expression could take.
 /// \return Returns true if it was able to resolve the call, false if not. If it
 ///   returns true, out_functions will be populated by all the possible values
 ///   the function pointer could be.

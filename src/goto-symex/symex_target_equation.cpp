@@ -945,8 +945,8 @@ void symex_target_equationt::SSA_stept::output(std::ostream &out) const
 }
 
 /// Check that the SSA step is well-formed
-/// \param ns namespace to lookup identifiers
-/// \param vm validation mode to be used for reporting failures
+/// \param ns: namespace to lookup identifiers
+/// \param vm: validation mode to be used for reporting failures
 void symex_target_equationt::SSA_stept::validate(
   const namespacet &ns,
   const validation_modet vm) const

@@ -53,9 +53,9 @@ static optionalt<exprt> find_counter_example(
 ///   * we give lemma `b` to a fresh solver;
 ///   * if no counter-example to `b` is found, this means the constraint `a`
 ///     is satisfied by the valuation given by get.
-/// \return `true` if the current model satisfies all the axioms,
-///         `false` otherwise with a list of lemmas which are obtained by
-///         instantiating constraints at indexes given by counter-examples.
+/// \return `true` if the current model satisfies all the axioms, `false`
+///   otherwise with a list of lemmas which are obtained by instantiating
+///   constraints at indexes given by counter-examples.
 static std::pair<bool, std::vector<exprt>> check_axioms(
   const string_axiomst &axioms,
   string_constraint_generatort &generator,
@@ -308,7 +308,7 @@ void string_refinementt::set_to(const exprt &expr, bool value)
 /// \param ns: namespace
 /// \param stream: output stream
 /// \return union_find_replacet where char pointer that have been set equal
-///         by an equation are associated to the same element
+///   by an equation are associated to the same element
 static void add_equations_for_symbol_resolution(
   union_find_replacet &symbol_solver,
   const std::vector<equal_exprt> &equations,
@@ -845,7 +845,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
 /// Add the given lemma to the solver.
 /// \param lemma: a Boolean expression
 /// \param simplify_lemma: whether the lemma should be simplified before being
-///        given to the underlying solver.
+///   given to the underlying solver.
 void string_refinementt::add_lemma(
   const exprt &lemma,
   const bool simplify_lemma)
@@ -892,7 +892,7 @@ void string_refinementt::add_lemma(
 /// Get a model of an array and put it in a certain form.
 /// If the model is incomplete or if it is too big, return no value.
 /// \param super_get: function returning the valuation of an expression
-///        in a model
+///   in a model
 /// \param ns: namespace
 /// \param stream: output stream for warning messages
 /// \param arr: expression of type array representing a string
@@ -1055,7 +1055,7 @@ void debug_model(
 ///   array valuations coming from the underlying solver are given.
 /// \param index: An index with which to build the equality condition
 /// \param left_propagate: If set to true, the expression will look like
-/// `index<=0 ? 24 : index<=2 ? 42 : 12`
+///   `index<=0 ? 24 : index<=2 ? 42 : 12`
 /// \return An expression containing no 'with' expression
 static exprt substitute_array_access(
   const with_exprt &expr,
@@ -1162,9 +1162,9 @@ static void substitute_array_access_in_place(
 /// something like: `index <= 0 ? 24 : index <= 2 ? 42 : 12`
 /// \param expr: an expression containing array accesses
 /// \param symbol_generator: function which given a prefix and a type generates
-///        a fresh symbol of the given type
+///   a fresh symbol of the given type
 /// \param left_propagate: should values be propagated to the left in with
-///        expressions
+///   expressions
 /// \return an expression containing no array access
 exprt substitute_array_access(
   exprt expr,
@@ -1185,7 +1185,7 @@ exprt substitute_array_access(
 /// \param constraint: the not_contains constraint to add the negation of
 /// \param univ_var: the universal variable for the negation of the axiom
 /// \param get: valuation function, the result should have been simplified
-/// \return: the negation of the axiom under the current evaluation
+/// \return the negation of the axiom under the current evaluation
 static exprt negation_of_not_contains_constraint(
   const string_not_contains_constraintt &constraint,
   const symbol_exprt &univ_var,
@@ -1519,7 +1519,7 @@ exprt simplify_sum(const exprt &f)
 /// \param qvar: a symbol representing a universally quantified variable
 /// \param val: an expression
 /// \param f: an expression containing `+` and `-`
-/// operations in which `qvar` should appear exactly once.
+///   operations in which `qvar` should appear exactly once.
 /// \return an expression corresponding of $f^{-1}(val)$ where $f$ is seen as
 ///   a function of $qvar$, i.e. the value that is necessary for `qvar` for `f`
 ///   to be equal to `val`. For instance, if `f` corresponds to the expression
@@ -1622,7 +1622,7 @@ static void update_index_set(
 /// An expression representing an array of characters can be in the form of an
 /// if expression for instance `cond?array1:(cond2:array2:array3)`.
 /// We return all the array expressions contained in `array_expr`.
-/// \param array_expr : an expression representing an array
+/// \param array_expr: an expression representing an array
 /// \param accu: a vector to which symbols and constant arrays contained in the
 ///   expression will be appended
 static void get_sub_arrays(const exprt &array_expr, std::vector<exprt> &accu)
@@ -2039,8 +2039,8 @@ exprt string_refinementt::get(const exprt &expr) const
 /// \param ns: namespace
 /// \param [in] axiom: the axiom to be checked
 /// \param [in] var: the variable whose evaluation will be stored in witness
-/// \return: the witness of the satisfying assignment if one
-/// exists. If UNSAT, then behaviour is undefined.
+/// \return the witness of the satisfying assignment if one
+///   exists. If UNSAT, then behaviour is undefined.
 static optionalt<exprt> find_counter_example(
   const namespacet &ns,
   const exprt &axiom,

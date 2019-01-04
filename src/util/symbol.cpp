@@ -124,7 +124,7 @@ symbol_exprt symbolt::symbol_expr() const
 }
 
 /// Check that the instance object is well formed.
-/// \return: true if well-formed; false otherwise.
+/// \return true if well-formed; false otherwise.
 bool symbolt::is_well_formed() const
 {
   // Well-formedness criterion number 1 is for a symbol

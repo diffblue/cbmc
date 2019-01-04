@@ -270,7 +270,7 @@ static void populate_variable_address_map(
 ///   range of local variable table entries to consider
 /// \param live_variable_at_address:
 ///   map from bytecode address to table entry (drawn from firstvar-varlimit)
-//    live at that address
+///   live at that address
 /// \param amap:
 ///   map from bytecode address to instructions, this is the CFG of the java
 ///   method

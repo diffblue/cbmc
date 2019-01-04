@@ -57,13 +57,12 @@ bool has_subexpr(const exprt &, const irep_idt &);
 /// \param pred: a predicate
 /// \param ns: namespace for symbol type lookups
 /// \return true if one of the subtype of `type` satisfies predicate `pred`.
-///         The meaning of "subtype" is in the algebraic datatype sense:
-///         for example, the subtypes of a struct are the types of its
-///         components, the subtype of a pointer is the type it points to,
-///         etc...
-///         For instance in the type `t` defined by
-///         `{ int a; char[] b; double * c; { bool d} e}`, `int`, `char`,
-///         `double` and `bool` are subtypes of `t`.
+///   The meaning of "subtype" is in the algebraic datatype sense: for example,
+///   the subtypes of a struct are the types of its components, the subtype of
+///   a pointer is the type it points to, etc...
+///   For instance in the type `t` defined by
+///     `{ int a; char[] b; double * c; { bool d} e}`, `int`, `char`,
+///   `double` and `bool` are subtypes of `t`.
 bool has_subtype(
   const typet &type,
   const std::function<bool(const typet &)> &pred,

@@ -62,7 +62,7 @@ static symbolt add_or_get_symbol(
 /// Retrieve the first label identifier. This is used to mark the start of
 /// a thread block.
 /// /param id: unique thread block identifier
-/// /return: fully qualified label identifier
+/// /return fully qualified label identifier
 static const std::string get_first_label_id(const std::string &id)
 {
   return CPROVER_PREFIX "_THREAD_ENTRY_" + id;
@@ -71,7 +71,7 @@ static const std::string get_first_label_id(const std::string &id)
 /// Retrieve the second label identifier. This is used to mark the end of
 /// a thread block.
 /// /param id: unique thread block identifier
-/// /return: fully qualified label identifier
+/// /return fully qualified label identifier
 static const std::string get_second_label_id(const std::string &id)
 {
   return CPROVER_PREFIX "_THREAD_EXIT_" + id;
@@ -80,7 +80,7 @@ static const std::string get_second_label_id(const std::string &id)
 /// Retrieves a thread block identifier from a function call to
 /// CProver.startThread:(I)V or CProver.endThread:(I)V
 /// /param code: function call to CProver.startThread or CProver.endThread
-/// /return: unique thread block identifier
+/// /return unique thread block identifier
 static const std::string get_thread_block_identifier(
   const code_function_callt &f_code)
 {

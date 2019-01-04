@@ -206,11 +206,11 @@ void report_exception_to_stderr(const invariant_failedt &);
 /// reason.what() (which therefore includes the backtrace).
 /// In future this may throw `reason` instead of aborting.
 /// Template parameter ET: type of exception to construct
-/// \param file : C string giving the name of the file.
-/// \param function : C string giving the name of the function.
-/// \param line : The line number of the invariant
-/// \param condition : the condition this invariant is checking.
-/// \param params : (variadic) parameters to forward to ET's constructor
+/// \param file: C string giving the name of the file.
+/// \param function: C string giving the name of the function.
+/// \param line: The line number of the invariant
+/// \param condition: the condition this invariant is checking.
+/// \param params: (variadic) parameters to forward to ET's constructor
 ///  its backtrace member will be set before it is used.
 template <class ET, typename... Params>
 CBMC_NORETURN
@@ -240,11 +240,11 @@ CBMC_NORETURN
 /// It constructs an invariant_violatedt from reason and the
 /// backtrace, then aborts after printing the invariant's description.
 /// In future this may throw rather than aborting.
-/// \param file : C string giving the name of the file.
-/// \param function : C string giving the name of the function.
-/// \param line : The line number of the invariant
-/// \param reason : brief description of the invariant violation.
-/// \param condition : the condition this invariant is checking.
+/// \param file: C string giving the name of the file.
+/// \param function: C string giving the name of the function.
+/// \param line: The line number of the invariant
+/// \param reason: brief description of the invariant violation.
+/// \param condition: the condition this invariant is checking.
 CBMC_NORETURN
 inline void
 invariant_violated_string(

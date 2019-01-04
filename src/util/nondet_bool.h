@@ -15,8 +15,8 @@ Author: Chris Smowton, chris@smowton.net
 #include "std_expr.h"
 #include "std_types.h"
 
-/// \param type desired type (C_bool or plain bool)
-/// \param source_location source location
+/// \param type: desired type (C_bool or plain bool)
+/// \param source_location: source location
 /// \return nondet expr of that type
 inline exprt
 get_nondet_bool(const typet &type, const source_locationt &source_location)

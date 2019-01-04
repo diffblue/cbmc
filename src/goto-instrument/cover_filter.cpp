@@ -16,7 +16,7 @@ Author: Peter Schrammel
 /// Filter out functions that are not considered provided by the user
 /// \param identifier: a function name
 /// \param goto_function: a goto function
-/// \return: returns true if function is considered user-provided
+/// \return returns true if function is considered user-provided
 bool internal_functions_filtert::operator()(
   const irep_idt &identifier,
   const goto_functionst::goto_functiont &goto_function) const
@@ -46,7 +46,7 @@ bool internal_functions_filtert::operator()(
 /// Filter functions whose name match the regex
 /// \param identifier: a function name
 /// \param goto_function: a goto function
-/// \return: returns true if the function name matches
+/// \return returns true if the function name matches
 bool include_pattern_filtert::operator()(
   const irep_idt &identifier,
   const goto_functionst::goto_functiont &goto_function) const
@@ -63,7 +63,7 @@ bool include_pattern_filtert::operator()(
 /// These criteria are arbitrarily chosen.
 /// \param identifier: a function name
 /// \param goto_function: a goto function
-/// \return: returns true if non-trivial
+/// \return returns true if non-trivial
 bool trivial_functions_filtert::operator()(
   const irep_idt &identifier,
   const goto_functionst::goto_functiont &goto_function) const

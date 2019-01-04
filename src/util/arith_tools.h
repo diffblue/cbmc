@@ -117,8 +117,8 @@ public:
 /// Converts an expression to any integral type
 /// \tparam Target: type to convert to
 /// \param arg: expression to convert
-/// \return optional integer of type Target if conversion is possible,
-///         empty optional otherwise.
+/// \return optional integer of type Target if conversion is possible, empty
+///   optional otherwise.
 template <typename Target>
 optionalt<Target> numeric_cast(const exprt &arg)
 {

@@ -495,7 +495,7 @@ safety_checkert::resultt bmct::stop_on_fail(prop_convt &prop_conv)
 ///   large equation for the whole program or an equation per path
 /// \param opts: command-line options affecting BMC
 /// \param model: provides goto function bodies and the symbol table, perhaps
-//    creating those function bodies on demand.
+///   creating those function bodies on demand.
 /// \param ui: user-interface mode (plain text, XML output, JSON output, ...)
 /// \param driver_configure_bmc: function provided by the driver program,
 ///   which applies driver-specific configuration to a bmct before running.

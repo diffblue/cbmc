@@ -64,8 +64,8 @@ public:
   /// instruction with two successors. Thus, we always add a pair of paths to
   /// the path storage.
   ///
-  /// \param next_instruction the instruction following the goto instruction
-  /// \param jump_target the target instruction of the goto instruction
+  /// \param next_instruction: the instruction following the goto instruction
+  /// \param jump_target: the target instruction of the goto instruction
   virtual void
   push(const patht &next_instruction, const patht &jump_target) = 0;
 

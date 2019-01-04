@@ -42,7 +42,7 @@ exprt union_find_replacet::find(exprt expr) const
 }
 
 /// \return pairs of expression composed of expressions and a representative
-///         expression for the set they below to.
+///   expression for the set they below to.
 std::vector<std::pair<exprt, exprt>> union_find_replacet::to_vector() const
 {
   std::vector<std::pair<exprt, exprt>> equations;

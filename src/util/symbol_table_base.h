@@ -121,7 +121,7 @@ public:
   /// result as both move and add
   /// \param symbol: The symbol to be added to the symbol table - can be
   ///   moved or copied in.
-  /// \return: Returns a reference to the newly inserted symbol or to the
+  /// \return Returns a reference to the newly inserted symbol or to the
   ///   existing symbol if a symbol with the same name already exists in the
   ///   symbol table, along with a bool that is true if a new symbol was
   ///   inserted.

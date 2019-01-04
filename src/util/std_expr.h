@@ -629,7 +629,7 @@ inline void validate_expr(const bswap_exprt &value)
 }
 
 /// \brief A base class for expressions that are predicates,
-///        i.e., Boolean-typed.
+///   i.e., Boolean-typed.
 class predicate_exprt:public exprt
 {
 public:
@@ -662,7 +662,7 @@ public:
 };
 
 /// \brief A base class for expressions that are predicates,
-///        i.e., Boolean-typed, and that take exactly one argument.
+///   i.e., Boolean-typed, and that take exactly one argument.
 class unary_predicate_exprt:public unary_exprt
 {
 public:
@@ -829,9 +829,8 @@ template<> inline bool can_cast_expr<binary_exprt>(const exprt &base)
   return base.operands().size()==2;
 }
 
-
 /// \brief A base class for expressions that are predicates,
-///        i.e., Boolean-typed, and that take exactly two arguments.
+///   i.e., Boolean-typed, and that take exactly two arguments.
 class binary_predicate_exprt:public binary_exprt
 {
 public:
@@ -3507,10 +3506,9 @@ inline void validate_expr(const if_exprt &value)
   validate_operands(value, 3, "If-then-else must have three operands");
 }
 
-
 /// \brief Operator to update elements in structs and arrays
 /// \remark This expression will eventually be replaced by separate
-///         array and struct update operators.
+///   array and struct update operators.
 class with_exprt:public exprt
 {
 public:

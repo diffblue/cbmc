@@ -27,14 +27,14 @@ class symbolt;
 class value_set_dereferencet
 {
 public:
-  /// \param _ns Namespace
-  /// \param _new_symbol_table A symbol_table to store new symbols in
-  /// \param _dereference_callback Callback object for getting the set of
-  ///        objects a given pointer may point to.
-  /// \param _language_mode Mode for any new symbols created to represent
-  ///         a dereference failure
-  /// \param _exclude_null_derefs Ignore value-set entries that indicate a given
-  ///        dereference may follow a null pointer
+  /// \param _ns: Namespace
+  /// \param _new_symbol_table: A symbol_table to store new symbols in
+  /// \param _dereference_callback: Callback object for getting the set of
+  ///   objects a given pointer may point to.
+  /// \param _language_mode: Mode for any new symbols created to represent a
+  ///   dereference failure
+  /// \param _exclude_null_derefs: Ignore value-set entries that indicate a
+  //    given dereference may follow a null pointer
   value_set_dereferencet(
     const namespacet &_ns,
     symbol_tablet &_new_symbol_table,
@@ -54,12 +54,11 @@ public:
 
   /// Dereference the given pointer-expression. Any errors are
   /// reported to the callback method given in the constructor.
-  /// \param pointer A pointer-typed expression, to
+  /// \param pointer: A pointer-typed expression, to
   ///        be dereferenced.
-  /// \param guard A guard, which is assumed to hold when
-  ///        dereferencing.
-  /// \param mode Indicates whether the dereferencing
-  ///        is a load or store (unused).
+  /// \param guard: A guard, which is assumed to hold when dereferencing.
+  /// \param mode: Indicates whether the dereferencing is a load or store
+  //    (unused).
   virtual exprt dereference(
     const exprt &pointer,
     const guardt &guard,

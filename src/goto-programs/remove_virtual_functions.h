@@ -82,11 +82,11 @@ goto_programt::targett remove_virtual_function(
 /// Given a function expression representing a virtual method of a class,
 /// the function computes all overridden methods of that virtual method.
 /// \param function: The virtual function expression for which the overridden
-///                  methods will be searched for.
+///   methods will be searched for.
 /// \param symbol_table: A symbol table.
 /// \param class_hierarchy: A class hierarchy.
 /// \param [out] overridden_functions: Output collection into which all
-///                                    overridden functions will be stored.
+///   overridden functions will be stored.
 void collect_virtual_function_callees(
   const exprt &function,
   const symbol_tablet &symbol_table,

@@ -33,7 +33,7 @@ Date:   April 2017
 #include "java_root_class.h"
 
 /// \return tag of a struct prefixed by "java::" or symbolic tag
-/// empty string if not symbol or struct
+///   empty string if not symbol or struct
 static irep_idt get_tag(const typet &type)
 {
   /// \todo Use follow instead of assuming tag to symbol relationship.
@@ -286,7 +286,7 @@ exprt::operandst java_string_library_preprocesst::process_parameters(
 
 /// Creates a string_exprt from the input exprt representing a char sequence
 /// \param expr_to_process: an expression of a type which implements char
-///        sequence
+///   sequence
 /// \param loc: location in the source
 /// \param symbol_table: symbol table
 /// \param init_code: code block, in which declaration will be added:
@@ -297,7 +297,7 @@ exprt::operandst java_string_library_preprocesst::process_parameters(
 /// cprover_string_content = a->data;
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 /// \return the processed operand:
-///         {content=cprover_string_content, length=cprover_string_length}
+///   {content=cprover_string_content, length=cprover_string_length}
 refined_string_exprt
 java_string_library_preprocesst::convert_exprt_to_string_exprt(
   const exprt &expr_to_process,
@@ -495,7 +495,7 @@ symbol_exprt java_string_library_preprocesst::fresh_string(
 /// fresh symbols.
 /// \param loc: source location
 /// \param symbol_table: the symbol table
-/// \param code [out] : code block to which the declaration is added
+/// \param [out] code: code block to which the declaration is added
 /// \return refined string expr with fresh content and length symbols
 refined_string_exprt java_string_library_preprocesst::decl_string_expr(
   const source_locationt &loc,
@@ -631,7 +631,7 @@ codet java_string_library_preprocesst::code_return_function_application(
 /// \param symbol_table: the symbol table
 /// \param loc: source location
 /// \param function_id: name of the function containing the array
-/// \param code [out] : code block where the declaration gets added
+/// \param [out] code: code block where the declaration gets added
 /// \return created symbol expression
 exprt make_nondet_infinite_char_array(
   symbol_table_baset &symbol_table,
@@ -664,7 +664,7 @@ exprt make_nondet_infinite_char_array(
 /// \param array: a character array expression
 /// \param symbol_table: the symbol table
 /// \param loc: source location
-/// \param code [out] : code block to which declaration and calls get added
+/// \param [out] code: code block to which declaration and calls get added
 void add_pointer_to_array_association(
   const exprt &pointer,
   const exprt &array,
@@ -698,7 +698,7 @@ void add_pointer_to_array_association(
 /// \param length: integer expression
 /// \param symbol_table: the symbol table
 /// \param loc: source location
-/// \param code [out] : code block to which declaration and calls get added
+/// \param [out] code: code block to which declaration and calls get added
 void add_array_to_length_association(
   const exprt &array,
   const exprt &length,
@@ -729,11 +729,11 @@ void add_array_to_length_association(
 /// \param pointer: a character pointer expression
 /// \param length: length of the character sequence pointed by `pointer`
 /// \param char_set: character set given by a range expression consisting of
-///                  two characters separated by an hyphen.
-///                  For instance "a-z" denotes all lower case ascii letters.
+///   two characters separated by an hyphen. For instance "a-z" denotes all
+///   lower case ascii letters.
 /// \param symbol_table: the symbol table
 /// \param loc: source location
-/// \param code [out] : code block to which declaration and calls get added
+/// \param [out] code: code block to which declaration and calls get added
 void add_character_set_constraint(
   const exprt &pointer,
   const exprt &length,
@@ -1179,14 +1179,14 @@ code_blockt java_string_library_preprocesst::make_assign_function_from_call(
 /// Used to access the values of the arguments of `String.format`.
 /// \param object: an expression representing a reference to an object
 /// \param type_name: name of the corresponding primitive type, this can be
-///        one of the following: ID_boolean, ID_char, ID_byte, ID_short, ID_int,
-///        ID_long, ID_float, ID_double, ID_void
+///   one of the following: ID_boolean, ID_char, ID_byte, ID_short, ID_int,
+///   ID_long, ID_float, ID_double, ID_void
 /// \param loc: a location in the source
 /// \param symbol_table: the symbol table
 /// \param code: code block to which we are adding some assignments
-/// \return An expression contaning a symbol `tmp_type_name` where `type_name`
-///         is the given argument (ie. boolean, char etc.). Which represents the
-///         primitive value contained in the given object.
+/// \return An expression containing a symbol `tmp_type_name` where `type_name`
+///   is the given argument (ie. boolean, char etc.). Which represents the
+///   primitive value contained in the given object.
 optionalt<symbol_exprt>
 java_string_library_preprocesst::get_primitive_value_of_object(
   const exprt &object,
@@ -1439,10 +1439,9 @@ struct_exprt java_string_library_preprocesst::make_argument_for_format(
 /// \param loc: location in the program_invocation_name
 /// \param function_id: function the generated code will be used in
 /// \param symbol_table: symbol table
-/// \return Code implementing the Java String.format function.
-///         Since the exact class of the arguments is not known, we give as
-///         argument to the internal format function a structure containing
-///         the different possible types.
+/// \return Code implementing the Java String.format function. Since the exact
+///   class of the arguments is not known, we give as argument to the internal
+//    format function a structure containing the different possible types.
 code_blockt java_string_library_preprocesst::make_string_format_code(
   const java_method_typet &type,
   const source_locationt &loc,

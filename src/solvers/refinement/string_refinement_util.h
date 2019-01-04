@@ -39,10 +39,9 @@ bool is_char_pointer_type(const typet &type);
 /// \param type: a type
 /// \param ns: namespace
 /// \return true if a subtype of `type` is an pointer of characters.
-///         The meaning of "subtype" is in the algebraic datatype sense:
-///         for example, the subtypes of a struct are the types of its
-///         components, the subtype of a pointer is the type it points to,
-///         etc...
+///   The meaning of "subtype" is in the algebraic datatype sense: for example,
+///   the subtypes of a struct are the types of its components, the subtype of
+///   a pointer is the type it points to, etc...
 bool has_char_pointer_subtype(const typet &type, const namespacet &ns);
 
 /// \param expr: an expression

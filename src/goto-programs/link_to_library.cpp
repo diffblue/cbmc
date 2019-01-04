@@ -15,11 +15,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "goto_convert_functions.h"
 
 /// Complete missing function definitions using the \p library.
-/// \param goto_model  goto model that may contain function calls and symbols
+/// \param goto_model: goto model that may contain function calls and symbols
 ///   with missing function bodies
-/// \param message_handler  message handler to report library processing
+/// \param message_handler: message handler to report library processing
 ///   problems
-/// \param library  generator function that produces function definitions for a
+/// \param library: generator function that produces function definitions for a
 ///   given set of symbol names that have no body.
 void link_to_library(
   goto_modelt &goto_model,
@@ -36,13 +36,13 @@ void link_to_library(
 }
 
 /// Complete missing function definitions using the \p library.
-/// \param symbol_table  symbol table that may contain symbols with missing
+/// \param symbol_table: symbol table that may contain symbols with missing
 ///   function bodies
-/// \param goto_functions  goto functions that may contain function calls with
+/// \param goto_functions: goto functions that may contain function calls with
 ///   missing function bodies
-/// \param message_handler  message handler to report library processing
+/// \param message_handler: message handler to report library processing
 ///   problems
-/// \param library  generator function that produces function definitions for a
+/// \param library: generator function that produces function definitions for a
 ///   given set of symbol names that have no body.
 void link_to_library(
   symbol_tablet &symbol_table,

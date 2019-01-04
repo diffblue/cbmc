@@ -65,7 +65,7 @@ code_typet require_type::require_code(const typet &type)
 /// accepts a given number of parameters
 /// \param type: The type to check
 /// \param num_params: check the the given code_typet expects this
-/// number of parameters
+///   number of parameters
 /// \return The type cast to a code_typet
 code_typet
 require_type::require_code(const typet &type, const size_t num_params)
@@ -88,7 +88,7 @@ java_method_typet require_type::require_java_method(const typet &type)
 /// accepts a given number of parameters
 /// \param type: The type to check
 /// \param num_params: check the the given java_method_typet expects this
-/// number of parameters
+///   number of parameters
 /// \return The type cast to a java_method_typet
 java_method_typet
 require_type::require_java_method(const typet &type, const size_t num_params)
@@ -102,7 +102,7 @@ require_type::require_java_method(const typet &type, const size_t num_params)
 /// \param function_type: The type of the function
 /// \param param_name: The name of the parameter
 /// \return A reference to the parameter structure corresponding to this
-/// parameter name.
+///   parameter name.
 code_typet::parametert require_type::require_parameter(
   const code_typet &function_type,
   const irep_idt &param_name)
@@ -223,7 +223,7 @@ java_generic_parametert require_type::require_java_generic_parameter(
 /// Test a type to ensure it is not a java generics type.
 /// \param type: The type to test
 /// \param expect_subtype: Optionally, also test that the subtype of the given
-/// type matches this parameter
+///   type matches this parameter
 /// \return The value passed in the first argument
 const typet &require_type::require_java_non_generic_type(
   const typet &type,

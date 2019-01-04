@@ -17,7 +17,7 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 /// Return string value for a given key if present in the json object.
 /// \param in: The json object that is getting fetched as a string.
 /// \param key: The key for the json value to be fetched.
-/// \return: A string value for the corresponding key.
+/// \return A string value for the corresponding key.
 static const std::string &
 try_get_string(const jsont &in, const std::string &key)
 {
@@ -30,7 +30,7 @@ try_get_string(const jsont &in, const std::string &key)
 /// Return boolean value for a given key if present in the json object.
 /// \param in: The json object that is getting fetched as a boolean.
 /// \param key: The key for the json value to be fetched.
-/// \return: A boolean value for the corresponding key.
+/// \return A boolean value for the corresponding key.
 static bool try_get_bool(const jsont &in, const std::string &key)
 {
   if(!(in.is_true() || in.is_false()))
@@ -41,7 +41,7 @@ static bool try_get_bool(const jsont &in, const std::string &key)
 
 /// Deserialise a json object to a symbolt.
 /// \param in: The json object that is getting fetched as an object.
-/// \return: A symbolt representing the json object.
+/// \return A symbolt representing the json object.
 symbolt symbol_from_json(const jsont &in)
 {
   if(!in.is_object())

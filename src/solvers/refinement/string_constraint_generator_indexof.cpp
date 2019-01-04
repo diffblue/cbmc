@@ -284,8 +284,8 @@ std::pair<exprt, string_constraintst> add_axioms_for_last_index_of_string(
 /// \warning slow for string targets
 /// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with arguments refined_string `haystack`,
-///           refined_string or character `needle`, and optional integer
-///           `from_index` with default value `0`
+///   refined_string or character `needle`, and optional integer `from_index`
+///   with default value `0`
 /// \param array_pool: pool of arrays representing strings
 /// \return integer expression
 std::pair<exprt, string_constraintst> add_axioms_for_index_of(
@@ -342,7 +342,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_index_of(
 /// \param c: a character expression
 /// \param from_index: an integer expression
 /// \return integer expression `index` representing the last index of `needle`
-///         in `haystack` before or at `from_index`, or `-1` if there is none
+///   in `haystack` before or at `from_index`, or `-1` if there is none
 std::pair<exprt, string_constraintst> add_axioms_for_last_index_of(
   symbol_generatort &fresh_symbol,
   const array_string_exprt &str,
@@ -408,8 +408,8 @@ std::pair<exprt, string_constraintst> add_axioms_for_last_index_of(
 /// \warning slow for string targets
 /// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with arguments refined_string `haystack`,
-///           refined_string or character `needle`, and optional integer
-///           `from_index` with default value `|haystack|-1`
+///   refined_string or character `needle`, and optional integer
+///   `from_index` with default value `|haystack|-1`
 /// \param array_pool: pool of arrays representing strings
 /// \return an integer expression
 std::pair<exprt, string_constraintst> add_axioms_for_last_index_of(

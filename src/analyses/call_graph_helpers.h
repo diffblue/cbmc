@@ -55,7 +55,7 @@ std::set<irep_idt> get_reaching_functions(
 /// \param start_functions: set of start functions
 /// \param n: number of steps to consider
 /// \return set of functions that can be reached from the start function
-/// including the start function
+///   including the start function
 std::set<irep_idt> get_functions_reachable_within_n_steps(
   const call_grapht::directed_grapht &graph,
   const std::set<irep_idt> &start_functions,
@@ -67,7 +67,7 @@ std::set<irep_idt> get_functions_reachable_within_n_steps(
 /// \param start_function: single start function
 /// \param n: number of steps to consider
 /// \return set of functions that can be reached from the start function
-/// including the start function
+///   including the start function
 std::set<irep_idt> get_functions_reachable_within_n_steps(
   const call_grapht::directed_grapht &graph,
   const irep_idt &start_function,
