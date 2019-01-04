@@ -99,7 +99,7 @@ static bool read_goto_binary(
       for(unsigned i=0; i<elf_reader.number_of_sections; i++)
         if(elf_reader.section_name(i)=="goto-cc")
         {
-          in.seekg(elf_reader.section_offset(i));
+          in.seekg(std::streamoff{elf_reader.section_offset(i)});
           return read_bin_goto_object(
             in, filename, symbol_table, goto_functions, message_handler);
         }

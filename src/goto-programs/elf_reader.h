@@ -16,6 +16,8 @@ Author:
 #include <string>
 #include <vector>
 
+#include <util/narrow.h>
+
 // we follow
 // http://www.skyfree.org/linux/references/ELF_Format.pdf
 // http://downloads.openwatcom.org/ftp/devel/docs/elf-64-gen.pdf
@@ -143,9 +145,14 @@ public:
 
   std::streampos section_offset(std::size_t index) const
   {
-    return
-      elf_class==ELF32?elf32_section_header_table[index].sh_offset:
-                       elf64_section_header_table[index].sh_offset;
+    // Visual Studio insists on a type cast to std::streamoff, for an unknown
+    // reason
+    if(elf_class == ELF32)
+      return narrow_cast<std::streamoff>(
+        elf32_section_header_table[index].sh_offset);
+    else
+      return narrow_cast<std::streamoff>(
+        elf64_section_header_table[index].sh_offset);
   }
 
   bool has_section(const std::string &name) const;

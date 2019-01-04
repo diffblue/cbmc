@@ -111,7 +111,8 @@ static bool read_bin_goto_object(
                               irepconverter.read_gb_word(in);
       instruction.guard =
         static_cast<const exprt &>(irepconverter.reference_convert(in));
-      instruction.target_number = irepconverter.read_gb_word(in);
+      instruction.target_number =
+        narrow_cast<unsigned>(irepconverter.read_gb_word(in));
       if(instruction.is_target() &&
          rev_target_map.insert(
            rev_target_map.end(),
@@ -121,7 +122,8 @@ static bool read_bin_goto_object(
       std::size_t t_count = irepconverter.read_gb_word(in); // # of targets
       for(std::size_t i=0; i<t_count; i++)
         // just save the target numbers
-        target_map[itarget].push_back(irepconverter.read_gb_word(in));
+        target_map[itarget].push_back(
+          narrow_cast<unsigned>(irepconverter.read_gb_word(in)));
 
       std::size_t l_count = irepconverter.read_gb_word(in); // # of labels
 

@@ -13,6 +13,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cstring>
 
+#include "narrow.h"
+
 string_ptrt::string_ptrt(const char *_s):s(_s), len(strlen(_s))
 {
 }
@@ -38,7 +40,7 @@ unsigned string_containert::get(const char *s)
   if(it!=hash_table.end())
     return it->second;
 
-  size_t r=hash_table.size();
+  const unsigned r = narrow_cast<unsigned>(hash_table.size());
 
   // these are stable
   string_list.push_back(std::string(s));
@@ -61,7 +63,7 @@ unsigned string_containert::get(const std::string &s)
   if(it!=hash_table.end())
     return it->second;
 
-  size_t r=hash_table.size();
+  const unsigned r = narrow_cast<unsigned>(hash_table.size());
 
   // these are stable
   string_list.push_back(s);

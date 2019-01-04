@@ -303,7 +303,7 @@ int run(
   CloseHandle(piProcInfo.hProcess);
   CloseHandle(piProcInfo.hThread);
 
-  return exit_code;
+  return narrow_cast<int>(exit_code);
 
 #else
   int stdin_fd = stdio_redirection(STDIN_FILENO, std_input);

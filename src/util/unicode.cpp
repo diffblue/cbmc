@@ -205,7 +205,7 @@ std::wstring utf8_to_utf16_native_endian(const std::string &in)
     std::string::size_type i=0;
     while(i<in.size())
     {
-      unsigned char c=in[i++];
+      unsigned char c = narrow_cast<unsigned char>(in[i++]);
       unsigned int code=0;
       // the ifs that follow find out how many UTF8 characters (1-4) store the
       // next unicode character. This is determined by the few most
@@ -221,25 +221,25 @@ std::wstring utf8_to_utf16_native_endian(const std::string &in)
         // we should check that whatever follows first character starts with
         // bits 10.
         code = (c & 0x1Fu) << 6;
-        c=in[i++];
+        c = narrow_cast<unsigned char>(in[i++]);
         code += c & 0x3Fu;
       }
       else if(c<=0xEF && i+1<in.size())
       {
         code = (c & 0xFu) << 12;
-        c=in[i++];
+        c = narrow_cast<unsigned char>(in[i++]);
         code += (c & 0x3Fu) << 6;
-        c=in[i++];
+        c = narrow_cast<unsigned char>(in[i++]);
         code += c & 0x3Fu;
       }
       else if(c<=0xF7 && i+2<in.size())
       {
         code = (c & 0x7u) << 18;
-        c=in[i++];
+        c = narrow_cast<unsigned char>(in[i++]);
         code += (c & 0x3Fu) << 12;
-        c=in[i++];
+        c = narrow_cast<unsigned char>(in[i++]);
         code += (c & 0x3Fu) << 6;
-        c=in[i++];
+        c = narrow_cast<unsigned char>(in[i++]);
         code += c & 0x3Fu;
       }
       else

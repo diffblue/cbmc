@@ -34,6 +34,7 @@ Author: Daniel Kroening
 #include <cstring>
 
 #include "exception_utils.h"
+#include "narrow.h"
 
 #if defined(__linux__) || \
     defined(__FreeBSD_kernel__) || \
@@ -128,7 +129,7 @@ std::string get_temporary_file(
 
   char *t_ptr=strdup(t_template.c_str());
 
-  int fd=mkstemps(t_ptr, suffix.size());
+  int fd = mkstemps(t_ptr, narrow_cast<int>(suffix.size()));
 
   if(fd<0)
     throw system_exceptiont("Failed to open temporary file");

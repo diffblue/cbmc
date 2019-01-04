@@ -14,6 +14,8 @@ Author: Diffblue Ltd
 #define _LARGEFILE64_SOURCE 1
 #include <miniz/miniz.h>
 
+#include <util/narrow.h>
+
 // Original struct is an anonymous struct with a typedef, This is
 // required to remove internals from the header file
 class mz_zip_archive_statet final:public mz_zip_archive

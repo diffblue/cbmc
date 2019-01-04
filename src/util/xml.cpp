@@ -236,7 +236,8 @@ std::string xmlt::unescape(const std::string &str)
         result+='&';
       else if(tmp[0]=='#' && tmp[1]!='x')
       {
-        char c=unsafe_string2int(tmp.substr(1, tmp.size()-1));
+        char c =
+          narrow_cast<char>(unsafe_string2int(tmp.substr(1, tmp.size() - 1)));
         result+=c;
       }
       else
