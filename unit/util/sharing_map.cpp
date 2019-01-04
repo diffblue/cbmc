@@ -387,9 +387,8 @@ void sharing_map_sharing_stats_test()
   {
     std::set<void *> marked;
     smt sm;
-    int count = 0;
 
-    count = sm.count_unmarked_nodes(false, marked, false);
+    auto count = sm.count_unmarked_nodes(false, marked, false);
     REQUIRE(count == 0);
 
     count = sm.count_unmarked_nodes(true, marked, false);
