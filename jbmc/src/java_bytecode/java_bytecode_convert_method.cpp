@@ -1145,7 +1145,7 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
     exprt arg0=i_it->args.size()>=1?i_it->args[0]:nil_exprt();
     exprt arg1=i_it->args.size()>=2?i_it->args[1]:nil_exprt();
 
-    const bytecode_infot &bytecode_info=get_bytecode_info(statement);
+    const bytecode_infot &stmt_bytecode_info = get_bytecode_info(statement);
 
     // deal with _idx suffixes
     if(statement.size()>=2 &&
@@ -1203,9 +1203,9 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
       catch_instruction=catch_statement;
     }
 
-    exprt::operandst op=pop(bytecode_info.pop);
+    exprt::operandst op = pop(stmt_bytecode_info.pop);
     exprt::operandst results;
-    results.resize(bytecode_info.push, nil_exprt());
+    results.resize(stmt_bytecode_info.push, nil_exprt());
 
     if(statement=="aconst_null")
     {

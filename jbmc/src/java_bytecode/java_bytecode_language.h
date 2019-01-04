@@ -171,7 +171,7 @@ protected:
     symbol_table_baset &symbol_table,
     optionalt<ci_lazy_methods_neededt> needed_lazy_methods);
 
-  bool do_ci_lazy_method_conversion(symbol_tablet &, method_bytecodet &);
+  bool do_ci_lazy_method_conversion(symbol_tablet &);
   const select_pointer_typet &get_pointer_type_selector() const;
 
   irep_idt main_class;

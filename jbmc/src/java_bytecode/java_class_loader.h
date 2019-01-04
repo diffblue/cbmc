@@ -48,10 +48,10 @@ public:
     const irep_idt &class_name);
 
   /// Set the argument of the class loader limit \ref java_class_loader_limitt
-  /// \param java_cp_include_files: argument string for java_class_loader_limit
-  void set_java_cp_include_files(const std::string &java_cp_include_files)
+  /// \param cp_include_files: argument string for java_class_loader_limit
+  void set_java_cp_include_files(const std::string &cp_include_files)
   {
-    this->java_cp_include_files = java_cp_include_files;
+    java_cp_include_files = cp_include_files;
   }
   /// Sets a function that provides extra dependencies for a particular class.
   /// Currently used by the string preprocessor to note that even if we don't

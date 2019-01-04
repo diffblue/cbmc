@@ -322,15 +322,16 @@ exprt::operandst java_build_arguments(
     // be null
     bool is_this=(param_number==0) && parameters[param_number].get_this();
 
-    java_object_factory_parameterst parameters = object_factory_parameters;
+    java_object_factory_parameterst factory_parameters =
+      object_factory_parameters;
     // only pointer must be non-null
     if(assume_init_pointers_not_null || is_this)
-      parameters.min_null_tree_depth = 1;
+      factory_parameters.min_null_tree_depth = 1;
     // in main() also the array elements of the argument must be non-null
     if(is_main)
-      parameters.min_null_tree_depth = 2;
+      factory_parameters.min_null_tree_depth = 2;
 
-    parameters.function_id = goto_functionst::entry_point();
+    factory_parameters.function_id = goto_functionst::entry_point();
 
     namespacet ns(symbol_table);
 
@@ -347,7 +348,7 @@ exprt::operandst java_build_arguments(
         base_name,
         init_code,
         symbol_table,
-        parameters,
+        factory_parameters,
         lifetimet::AUTOMATIC_LOCAL,
         function.location,
         pointer_type_selector);
@@ -393,7 +394,7 @@ exprt::operandst java_build_arguments(
             id2string(type.get_identifier()),
           init_code_for_type,
           symbol_table,
-          parameters,
+          factory_parameters,
           lifetimet::DYNAMIC,
           function.location,
           pointer_type_selector);
