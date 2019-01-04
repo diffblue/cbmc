@@ -40,7 +40,6 @@ phases:
         cd regression
         # HACK disable failing tests
         Remove-Item ansi-c\Forward_Declaration2 -Force -Recurse
-        Remove-Item ansi-c\Incomplete_Type1 -Force -Recurse
         Remove-Item cbmc\Malloc23 -Force -Recurse
         Remove-Item cbmc\byte_update2 -Force -Recurse
         Remove-Item cbmc\byte_update3 -Force -Recurse
