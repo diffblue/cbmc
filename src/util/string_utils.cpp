@@ -7,8 +7,10 @@ Author: Daniel Poetzl
 \*******************************************************************/
 
 #include "string_utils.h"
+
 #include "exception_utils.h"
 #include "invariant.h"
+#include "narrow.h"
 
 #include <cassert>
 #include <cctype>
@@ -33,7 +35,8 @@ std::string strip_string(const std::string &s)
     =std::find_if_not(s.rbegin(), s.rend(), pred);
   std::string::size_type j=std::distance(right, s.rend())-1;
 
-  return s.substr(i, (j-i+1));
+  return s.substr(
+    narrow_cast<std::size_t>(i), narrow_cast<std::size_t>(j - i + 1));
 }
 
 /// Given a string s, split into a sequence of substrings when separated by
