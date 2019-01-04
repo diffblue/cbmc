@@ -135,7 +135,7 @@ void interpretert::command()
     return;
   }
 
-  char ch=tolower(command[0]);
+  char ch = static_cast<char>(tolower(static_cast<int>(command[0])));
   if(ch=='q')
     done=true;
   else if(ch=='h')
@@ -157,7 +157,7 @@ void interpretert::command()
   {
     json_arrayt json_steps;
     convert<json_arrayt>(ns, steps, json_steps);
-    ch=tolower(command[1]);
+    ch = static_cast<char>(tolower(command[1]));
     if(ch==' ')
     {
       std::ofstream file;
@@ -173,12 +173,12 @@ void interpretert::command()
   }
   else if(ch=='m')
   {
-    ch=tolower(command[1]);
+    ch = static_cast<char>(tolower(command[1]));
     print_memory(ch=='i');
   }
   else if(ch=='o')
   {
-    ch=tolower(command[1]);
+    ch = static_cast<char>(tolower(command[1]));
     if(ch==' ')
     {
       std::ofstream file;
@@ -194,14 +194,14 @@ void interpretert::command()
   }
   else if(ch=='r')
   {
-    ch=tolower(command[1]);
+    ch = static_cast<char>(tolower(command[1]));
     initialize(ch!='0');
   }
   else if((ch=='s') || (ch==0))
   {
     num_steps=1;
     stack_depth=npos;
-    ch=tolower(command[1]);
+    ch = static_cast<char>(tolower(command[1]));
     if(ch=='e')
       num_steps=npos;
     else if(ch=='o')
