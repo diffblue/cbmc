@@ -61,7 +61,7 @@ bvt boolbvt::convert_complex_imag(const complex_imag_exprt &expr)
 
   bvt bv = convert_bv(expr.op(), width * 2);
 
-  bv.erase(bv.begin(), bv.begin()+width);
+  bv.erase(bv.begin(), bv.begin() + static_cast<std::ptrdiff_t>(width));
 
   return bv;
 }

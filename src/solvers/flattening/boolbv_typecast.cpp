@@ -79,8 +79,10 @@ bool boolbvt::type_conversion(
     {
       // recursively do both halfs
       bvt lower, upper, lower_res, upper_res;
-      lower.assign(src.begin(), src.begin()+src.size()/2);
-      upper.assign(src.begin()+src.size()/2, src.end());
+      lower.assign(
+        src.begin(), src.begin() + static_cast<std::ptrdiff_t>(src.size() / 2));
+      upper.assign(
+        src.begin() + static_cast<std::ptrdiff_t>(src.size() / 2), src.end());
       type_conversion(
         src_type.subtype(), lower, dest_type.subtype(), lower_res);
       type_conversion(

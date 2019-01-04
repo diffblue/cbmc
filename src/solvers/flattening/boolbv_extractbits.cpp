@@ -57,7 +57,9 @@ bvt boolbvt::convert_extractbits(const extractbits_exprt &expr)
 
   const std::size_t offset = numeric_cast_v<std::size_t>(lower_as_int);
 
-  bvt result_bv(src_bv.begin() + offset, src_bv.begin() + offset + bv_width);
+  bvt result_bv(
+    src_bv.begin() + static_cast<std::ptrdiff_t>(offset),
+    src_bv.begin() + static_cast<std::ptrdiff_t>(offset + bv_width));
 
   return result_bv;
 }
