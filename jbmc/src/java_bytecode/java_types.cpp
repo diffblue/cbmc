@@ -605,7 +605,8 @@ optionalt<typet> java_type_from_string(
          subtype_letter=='[' || // Array-of-arrays
          subtype_letter=='T')   // Array of generic types
         subtype_letter='A';
-      typet tmp=java_array_type(std::tolower(subtype_letter));
+      typet tmp =
+        java_array_type(narrow_cast<char>(std::tolower(subtype_letter)));
       tmp.subtype().set(ID_element_type, std::move(*subtype));
       return std::move(tmp);
     }

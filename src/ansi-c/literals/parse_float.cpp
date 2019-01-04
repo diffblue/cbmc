@@ -11,6 +11,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "parse_float.h"
 
+#include <util/narrow.h>
+
 #include <algorithm>
 #include <cctype>
 #include <cstring>
@@ -30,8 +32,10 @@ parse_floatt::parse_floatt(const std::string &src)
   // by first converting to lower case.
 
   std::string src_lower=src;
-  std::transform(src_lower.begin(), src_lower.end(),
-                 src_lower.begin(), ::tolower);
+  std::transform(
+    src_lower.begin(), src_lower.end(), src_lower.begin(), [](char c) {
+      return narrow_cast<char>(std::tolower(c));
+    });
 
   const char *p=src_lower.c_str();
 

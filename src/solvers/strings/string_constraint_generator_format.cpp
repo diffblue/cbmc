@@ -382,7 +382,7 @@ add_axioms_for_format_specifier(
   case format_specifiert::HASHCODE_UPPER:
   {
     format_specifiert fs_lower = fs;
-    fs_lower.conversion = tolower(fs.conversion);
+    fs_lower.conversion = narrow_cast<char>(tolower(fs.conversion));
     auto format_specifier_result = add_axioms_for_format_specifier(
       fresh_symbol,
       fs_lower,
