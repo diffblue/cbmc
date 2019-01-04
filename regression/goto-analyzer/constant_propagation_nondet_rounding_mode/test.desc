@@ -8,6 +8,5 @@ main.c
 \[main.assertion.3\] line 22 assertion \(1.0f / 10.0f\) - f <= 0.0f: SUCCESS
 \[main.assertion.4\] line 24 assertion \(1.0f / 10.0f\) - f >= 0.0f: UNKNOWN
 \[main.assertion.5\] line 26 assertion \(1.0f / 10.0f\) - f > 0.0f: FAILURE \(if reachable\)
-
 --
 ^warning: ignoring
