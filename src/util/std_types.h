@@ -948,10 +948,10 @@ public:
   parameter_indicest parameter_indices() const
   {
     parameter_indicest parameter_indices;
-    const parameterst &p = parameters();
-    parameter_indices.reserve(p.size());
+    const parameterst &params = parameters();
+    parameter_indices.reserve(params.size());
     std::size_t index = 0;
-    for(const auto &p : parameters())
+    for(const auto &p : params)
     {
       const irep_idt &id = p.get_identifier();
       if(!id.empty())
