@@ -313,7 +313,9 @@ const char *ms_link_options[] = {
 static std::string to_upper_string(const std::string &s)
 {
   std::string result = s;
-  transform(result.begin(), result.end(), result.begin(), toupper);
+  transform(result.begin(), result.end(), result.begin(), [](char c) {
+    return static_cast<char>(std::toupper(c));
+  });
   return result;
 }
 
