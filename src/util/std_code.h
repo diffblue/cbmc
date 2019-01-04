@@ -296,7 +296,7 @@ public:
 
   static void validate(
     const codet &code,
-    const namespacet &ns,
+    const namespacet &,
     const validation_modet vm = validation_modet::INVARIANT)
   {
     check(code, vm);
