@@ -1,3 +1,8 @@
+#ifndef __GNUC__
+void reduce()
+{
+}
+#else
 # include <stdint.h>
 
 typedef unsigned __int128 uint128_t;
@@ -109,3 +114,4 @@ void reduce(
           out[2] < p[1] || (out[2]==p[1] && (out[1]<p[2] || out[1]==p[2]
           && (out[0]<p[3]))))));
 }
+#endif
