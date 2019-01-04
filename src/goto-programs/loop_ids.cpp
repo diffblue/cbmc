@@ -88,9 +88,9 @@ void show_loop_ids_json(
       std::string id =
         id2string(function_identifier) + "." + std::to_string(loop_id);
 
-      json_objectt &loop=loops.push_back().make_object();
-      loop["name"]=json_stringt(id);
-      loop["sourceLocation"]=json(it->source_location);
+      loops.push_back(
+        json_objectt({{"name", json_stringt(id)},
+                      {"sourceLocation", json(it->source_location)}}));
     }
   }
 }

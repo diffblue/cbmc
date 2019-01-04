@@ -284,21 +284,20 @@ jsont dep_graph_domaint::output_json(
 
   for(const auto &cd : control_deps)
   {
-    json_objectt &link=graph.push_back().make_object();
-    link["locationNumber"]=
-      json_numbert(std::to_string(cd->location_number));
-    link["sourceLocation"]=json(cd->source_location);
-    link["type"]=json_stringt("control");
+    json_objectt link(
+      {{"locationNumber", json_numbert(std::to_string(cd->location_number))},
+       {"sourceLocation", json(cd->source_location)},
+       {"type", json_stringt("control")}});
+    graph.push_back(std::move(link));
   }
 
   for(const auto &dd : data_deps)
   {
-    json_objectt &link=graph.push_back().make_object();
-    link["locationNumber"]=
-      json_numbert(std::to_string(dd->location_number));
-    link["sourceLocation"]=json(dd->source_location);
-      json_stringt(dd->source_location.as_string());
-    link["type"]=json_stringt("data");
+    json_objectt link(
+      {{"locationNumber", json_numbert(std::to_string(dd->location_number))},
+       {"sourceLocation", json(dd->source_location)},
+       {"type", json_stringt("data")}});
+    graph.push_back(std::move(link));
   }
 
   return std::move(graph);

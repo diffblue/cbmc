@@ -197,9 +197,9 @@ json_objectt json(
       to_struct_type(type).components();
     for(const auto &component : components)
     {
-      json_objectt &e=members.push_back().make_object();
-      e["name"] = json_stringt(component.get_name());
-      e["type"]=json(component.type(), ns, mode);
+      json_objectt e({{"name", json_stringt(component.get_name())},
+                      {"type", json(component.type(), ns, mode)}});
+      members.push_back(std::move(e));
     }
   }
   else if(type.id()==ID_union)
@@ -210,9 +210,9 @@ json_objectt json(
       to_union_type(type).components();
     for(const auto &component : components)
     {
-      json_objectt &e=members.push_back().make_object();
-      e["name"] = json_stringt(component.get_name());
-      e["type"]=json(component.type(), ns, mode);
+      json_objectt e({{"name", json_stringt(component.get_name())},
+                      {"type", json(component.type(), ns, mode)}});
+      members.push_back(std::move(e));
     }
   }
   else
@@ -373,9 +373,9 @@ json_objectt json(
 
     forall_operands(it, expr)
     {
-      json_objectt &e=elements.push_back().make_object();
-      e["index"]=json_numbert(std::to_string(index));
-      e["value"]=json(*it, ns, mode);
+      json_objectt e({{"index", json_numbert(std::to_string(index))},
+                      {"value", json(*it, ns, mode)}});
+      elements.push_back(std::move(e));
       index++;
     }
   }
@@ -395,9 +395,9 @@ json_objectt json(
       json_arrayt &members=result["members"].make_array();
       for(std::size_t m=0; m<expr.operands().size(); m++)
       {
-        json_objectt &e=members.push_back().make_object();
-        e["value"]=json(expr.operands()[m], ns, mode);
-        e["name"] = json_stringt(components[m].get_name());
+        json_objectt e({{"value", json(expr.operands()[m], ns, mode)},
+                        {"name", json_stringt(components[m].get_name())}});
+        members.push_back(std::move(e));
       }
     }
   }
@@ -406,9 +406,9 @@ json_objectt json(
     result["name"]=json_stringt("union");
 
     const union_exprt &union_expr=to_union_expr(expr);
-    json_objectt &e=result["member"].make_object();
-    e["value"]=json(union_expr.op(), ns, mode);
-    e["name"] = json_stringt(union_expr.get_component_name());
+    result["member"] =
+      json_objectt({{"value", json(union_expr.op(), ns, mode)},
+                    {"name", json_stringt(union_expr.get_component_name())}});
   }
   else
     result["name"]=json_stringt("unknown");

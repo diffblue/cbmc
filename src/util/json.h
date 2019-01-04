@@ -136,6 +136,15 @@ protected:
   jsont(kindt _kind, std::string _value) : kind(_kind), value(std::move(_value))
   {
   }
+
+  jsont(kindt _kind, arrayt &&entries) : kind(_kind), array(std::move(entries))
+  {
+  }
+
+  jsont(kindt _kind, objectt &&objects)
+    : kind(_kind), object(std::move(objects))
+  {
+  }
 };
 
 inline std::ostream &operator<<(std::ostream &out, const jsont &src)
@@ -148,6 +157,11 @@ class json_arrayt:public jsont
 {
 public:
   json_arrayt():jsont(kindt::J_ARRAY)
+  {
+  }
+
+  explicit json_arrayt(arrayt &&entries)
+    : jsont(kindt::J_ARRAY, std::move(entries))
   {
   }
 
@@ -257,6 +271,11 @@ class json_objectt:public jsont
 {
 public:
   json_objectt():jsont(kindt::J_OBJECT)
+  {
+  }
+
+  explicit json_objectt(objectt &&objects)
+    : jsont(kindt::J_OBJECT, std::move(objects))
   {
   }
 

@@ -38,9 +38,9 @@ void goto_difft::output_functions() const
     }
     case ui_message_handlert::uit::JSON_UI:
     {
-      json_objectt json_result;
-      json_result["totalNumberOfFunctions"]=
-        json_stringt(std::to_string(total_functions_count));
+      json_objectt json_result(
+        {{"totalNumberOfFunctions",
+          json_stringt(std::to_string(total_functions_count))}});
       convert_function_group_json(
         json_result["newFunctions"].make_array(), new_functions, goto_model2);
       convert_function_group_json(
