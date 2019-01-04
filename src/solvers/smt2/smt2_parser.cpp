@@ -925,75 +925,74 @@ exprt smt2_parsert::expression()
   switch(next_token())
   {
   case smt2_tokenizert::SYMBOL:
+  {
+    // hash it
+    const irep_idt identifier = smt2_tokenizer.get_buffer();
+
+    if(identifier == ID_true)
+      return true_exprt();
+    else if(identifier == ID_false)
+      return false_exprt();
+    else if(identifier == "roundNearestTiesToEven")
     {
-      // hash it
-      const irep_idt identifier=smt2_tokenizer.get_buffer();
-
-      if(identifier==ID_true)
-        return true_exprt();
-      else if(identifier==ID_false)
-        return false_exprt();
-      else if(identifier == "roundNearestTiesToEven")
-      {
-        // we encode as 32-bit unsignedbv
-        return from_integer(ieee_floatt::ROUND_TO_EVEN, unsignedbv_typet(32));
-      }
-      else if(identifier == "roundNearestTiesToAway")
-      {
-        throw error("unsupported rounding mode");
-      }
-      else if(identifier == "roundTowardPositive")
-      {
-        // we encode as 32-bit unsignedbv
-        return from_integer(
-          ieee_floatt::ROUND_TO_PLUS_INF, unsignedbv_typet(32));
-      }
-      else if(identifier == "roundTowardNegative")
-      {
-        // we encode as 32-bit unsignedbv
-        return from_integer(
-          ieee_floatt::ROUND_TO_MINUS_INF, unsignedbv_typet(32));
-      }
-      else if(identifier == "roundTowardZero")
-      {
-        // we encode as 32-bit unsignedbv
-        return from_integer(ieee_floatt::ROUND_TO_ZERO, unsignedbv_typet(32));
-      }
-      else
-      {
-        // rummage through id_map
-        const irep_idt final_id=rename_id(identifier);
-        auto id_it=id_map.find(final_id);
-        if(id_it!=id_map.end())
-        {
-          symbol_exprt symbol_expr(final_id, id_it->second.type);
-          if(smt2_tokenizer.token_is_quoted_symbol())
-            symbol_expr.set(ID_C_quoted, true);
-          return std::move(symbol_expr);
-        }
-
-        throw error() << "unknown expression `" << identifier << '\'';
-      }
+      // we encode as 32-bit unsignedbv
+      return from_integer(ieee_floatt::ROUND_TO_EVEN, unsignedbv_typet(32));
     }
+    else if(identifier == "roundNearestTiesToAway")
+    {
+      throw error("unsupported rounding mode");
+    }
+    else if(identifier == "roundTowardPositive")
+    {
+      // we encode as 32-bit unsignedbv
+      return from_integer(ieee_floatt::ROUND_TO_PLUS_INF, unsignedbv_typet(32));
+    }
+    else if(identifier == "roundTowardNegative")
+    {
+      // we encode as 32-bit unsignedbv
+      return from_integer(
+        ieee_floatt::ROUND_TO_MINUS_INF, unsignedbv_typet(32));
+    }
+    else if(identifier == "roundTowardZero")
+    {
+      // we encode as 32-bit unsignedbv
+      return from_integer(ieee_floatt::ROUND_TO_ZERO, unsignedbv_typet(32));
+    }
+    else
+    {
+      // rummage through id_map
+      const irep_idt final_id = rename_id(identifier);
+      auto id_it = id_map.find(final_id);
+      if(id_it != id_map.end())
+      {
+        symbol_exprt symbol_expr(final_id, id_it->second.type);
+        if(smt2_tokenizer.token_is_quoted_symbol())
+          symbol_expr.set(ID_C_quoted, true);
+        return std::move(symbol_expr);
+      }
+
+      throw error() << "unknown expression `" << identifier << '\'';
+    }
+  }
 
   case smt2_tokenizert::NUMERAL:
   {
     const std::string &buffer = smt2_tokenizer.get_buffer();
-    if(buffer.size()>=2 && buffer[0]=='#' && buffer[1]=='x')
+    if(buffer.size() >= 2 && buffer[0] == '#' && buffer[1] == 'x')
     {
-      mp_integer value=
+      mp_integer value =
         string2integer(std::string(buffer, 2, std::string::npos), 16);
-      const std::size_t width = 4*(buffer.size() - 2);
-      CHECK_RETURN(width!=0 && width%4==0);
+      const std::size_t width = 4 * (buffer.size() - 2);
+      CHECK_RETURN(width != 0 && width % 4 == 0);
       unsignedbv_typet type(width);
       return from_integer(value, type);
     }
-    else if(buffer.size()>=2 && buffer[0]=='#' && buffer[1]=='b')
+    else if(buffer.size() >= 2 && buffer[0] == '#' && buffer[1] == 'b')
     {
-      mp_integer value=
+      mp_integer value =
         string2integer(std::string(buffer, 2, std::string::npos), 2);
       const std::size_t width = buffer.size() - 2;
-      CHECK_RETURN(width!=0);
+      CHECK_RETURN(width != 0);
       unsignedbv_typet type(width);
       return from_integer(value, type);
     }
