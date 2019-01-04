@@ -729,7 +729,7 @@ void java_bytecode_parsert::rconstant_pool()
         std::string s;
         s.resize(bytes);
         for(std::string::iterator s_it=s.begin(); s_it!=s.end(); s_it++)
-          *s_it=read_u1();
+          *s_it = narrow_cast<char>(read_u1());
         it->s=s; // hashes
       }
       break;
@@ -987,7 +987,7 @@ void java_bytecode_parsert::rbytecode(
 
     case 'b': // a signed byte
       {
-        s1 c=read_u1();
+        s1 c = narrow_cast<s1>(read_u1());
         instruction.args.push_back(from_integer(c, signedbv_typet(8)));
       }
       address+=1;
@@ -995,7 +995,7 @@ void java_bytecode_parsert::rbytecode(
 
     case 'o': // two byte branch offset, signed
       {
-        s2 offset=read_u2();
+        s2 offset = narrow_cast<s2>(read_u2());
         // By converting the signed offset into an absolute address (by adding
         // the current address) the number represented becomes unsigned.
         instruction.args.push_back(
@@ -1006,7 +1006,7 @@ void java_bytecode_parsert::rbytecode(
 
     case 'O': // four byte branch offset, signed
       {
-        s4 offset=read_u4();
+        s4 offset = narrow_cast<s4>(read_u4());
         // By converting the signed offset into an absolute address (by adding
         // the current address) the number represented becomes unsigned.
         instruction.args.push_back(
@@ -1039,7 +1039,7 @@ void java_bytecode_parsert::rbytecode(
       {
         u2 v=read_u2();
         instruction.args.push_back(from_integer(v, unsignedbv_typet(16)));
-        s2 c=read_u2();
+        s2 c = narrow_cast<s2>(read_u2());
         instruction.args.push_back(from_integer(c, signedbv_typet(16)));
         address+=4;
       }
@@ -1047,7 +1047,7 @@ void java_bytecode_parsert::rbytecode(
       {
         u1 v=read_u1();
         instruction.args.push_back(from_integer(v, unsignedbv_typet(8)));
-        s1 c=read_u1();
+        s1 c = narrow_cast<s1>(read_u1());
         instruction.args.push_back(from_integer(c, signedbv_typet(8)));
         address+=2;
       }
@@ -1073,7 +1073,7 @@ void java_bytecode_parsert::rbytecode(
         while(((address+1)&3)!=0) { read_u1(); address++; }
 
         // now default value
-        s4 default_value=read_u4();
+        s4 default_value = narrow_cast<s4>(read_u4());
         // By converting the signed offset into an absolute address (by adding
         // the current address) the number represented becomes unsigned.
         instruction.args.push_back(
@@ -1086,8 +1086,8 @@ void java_bytecode_parsert::rbytecode(
 
         for(std::size_t i=0; i<npairs; i++)
         {
-          s4 match=read_u4();
-          s4 offset=read_u4();
+          s4 match = narrow_cast<s4>(read_u4());
+          s4 offset = narrow_cast<s4>(read_u4());
           instruction.args.push_back(
             from_integer(match, signedbv_typet(32)));
           // By converting the signed offset into an absolute address (by adding
@@ -1107,23 +1107,23 @@ void java_bytecode_parsert::rbytecode(
         while(((address+1)&3)!=0) { read_u1(); address++; }
 
         // now default value
-        s4 default_value=read_u4();
+        s4 default_value = narrow_cast<s4>(read_u4());
         instruction.args.push_back(
           from_integer(base_offset+default_value, signedbv_typet(32)));
         address+=4;
 
         // now low value
-        s4 low_value=read_u4();
+        s4 low_value = narrow_cast<s4>(read_u4());
         address+=4;
 
         // now high value
-        s4 high_value=read_u4();
+        s4 high_value = narrow_cast<s4>(read_u4());
         address+=4;
 
         // there are high-low+1 offsets, and they are signed
         for(s4 i=low_value; i<=high_value; i++)
         {
-          s4 offset=read_u4();
+          s4 offset = narrow_cast<s4>(read_u4());
           instruction.args.push_back(from_integer(i, signedbv_typet(32)));
           // By converting the signed offset into an absolute address (by adding
           // the current address) the number represented becomes unsigned.
@@ -1167,7 +1167,7 @@ void java_bytecode_parsert::rbytecode(
 
     case 's': // a signed short
       {
-        s2 s=read_u2();
+        s2 s = narrow_cast<s2>(read_u2());
         instruction.args.push_back(from_integer(s, signedbv_typet(16)));
       }
       address+=2;

@@ -77,10 +77,10 @@ static bool read_goto_binary(
   }
 
   char hdr[4];
-  hdr[0]=in.get();
-  hdr[1]=in.get();
-  hdr[2]=in.get();
-  hdr[3]=in.get();
+  hdr[0] = narrow_cast<char>(in.get());
+  hdr[1] = narrow_cast<char>(in.get());
+  hdr[2] = narrow_cast<char>(in.get());
+  hdr[3] = narrow_cast<char>(in.get());
   in.seekg(0);
 
   if(hdr[0]==0x7f && hdr[1]=='G' && hdr[2]=='B' && hdr[3]=='F')
@@ -201,10 +201,10 @@ bool is_goto_binary(
   // 2. ELF binaries, marked with 0x7f ELF
 
   char hdr[4];
-  hdr[0]=in.get();
-  hdr[1]=in.get();
-  hdr[2]=in.get();
-  hdr[3]=in.get();
+  hdr[0] = narrow_cast<char>(in.get());
+  hdr[1] = narrow_cast<char>(in.get());
+  hdr[2] = narrow_cast<char>(in.get());
+  hdr[3] = narrow_cast<char>(in.get());
 
   if(hdr[0]==0x7f && hdr[1]=='G' && hdr[2]=='B' && hdr[3]=='F')
   {
