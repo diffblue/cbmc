@@ -358,10 +358,8 @@ void local_bitvector_analysist::output(
         p_it!=loc_info.end();
         p_it++)
     {
-      out << "  " << pointers[p_it-loc_info.begin()]
-          << ": "
-          << *p_it
-          << "\n";
+      out << "  " << pointers[static_cast<std::size_t>(p_it - loc_info.begin())]
+          << ": " << *p_it << "\n";
     }
 
     out << "\n";
