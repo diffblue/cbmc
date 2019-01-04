@@ -453,9 +453,8 @@ void string_instrumentationt::do_format_string_read(
     format_ass->make_assertion(is_zero_string(arguments[1]));
     format_ass->source_location=target->source_location;
     format_ass->source_location.set_property_class("string");
-    std::string comment("zero-termination of format string of ");
-    comment += function_name;
-    format_ass->source_location.set_comment(comment);
+    format_ass->source_location.set_comment(
+      "zero-termination of format string of " + function_name);
 
     for(std::size_t i=2; i<arguments.size(); i++)
     {
@@ -468,9 +467,8 @@ void string_instrumentationt::do_format_string_read(
         goto_programt::targett assertion=dest.add_instruction();
         assertion->source_location=target->source_location;
         assertion->source_location.set_property_class("string");
-        std::string comment("zero-termination of string argument of ");
-        comment += function_name;
-        assertion->source_location.set_comment(comment);
+        assertion->source_location.set_comment(
+          "zero-termination of string argument of " + function_name);
 
         exprt temp(arg);
 

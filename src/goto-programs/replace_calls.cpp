@@ -103,13 +103,12 @@ void replace_callst::operator()(
       const code_assignt &ca = to_code_assign(next_it->code);
       const exprt &rhs = ca.rhs();
 
-      if(rhs.id() == ID_symbol)
-      {
-        const symbol_exprt &se = to_symbol_expr(rhs);
-        INVARIANT(
-          !has_suffix(id2string(se.get_identifier()), RETURN_VALUE_SUFFIX),
-          "returns must not be removed before replacing calls");
-      }
+      INVARIANT(
+        rhs.id() != ID_symbol ||
+          !has_suffix(
+            id2string(to_symbol_expr(rhs).get_identifier()),
+            RETURN_VALUE_SUFFIX),
+        "returns must not be removed before replacing calls");
     }
 
     // Finally modify the call

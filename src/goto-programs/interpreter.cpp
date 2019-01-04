@@ -611,21 +611,22 @@ exprt interpretert::get_value(
       // We want the symbol pointed to
       mp_integer address = rhs[numeric_cast_v<std::size_t>(offset)];
       irep_idt identifier=address_to_identifier(address);
-      mp_integer offset=address_to_offset(address);
-      const typet type=get_type(identifier);
-      const symbol_exprt symbol_expr(identifier, type);
+      mp_integer offset_from_address = address_to_offset(address);
+      const typet type_from_identifier = get_type(identifier);
+      const symbol_exprt symbol_expr(identifier, type_from_identifier);
 
-      if(offset==0)
+      if(offset_from_address == 0)
         return address_of_exprt(symbol_expr);
 
-      if(ns.follow(type).id()==ID_struct)
+      if(ns.follow(type_from_identifier).id() == ID_struct)
       {
-        const auto c=get_component(identifier, offset);
+        const auto c = get_component(identifier, offset_from_address);
         member_exprt member_expr(symbol_expr, c);
         return address_of_exprt(member_expr);
       }
 
-      return index_exprt(symbol_expr, from_integer(offset, integer_typet()));
+      return index_exprt(
+        symbol_expr, from_integer(offset_from_address, integer_typet()));
     }
 
     error() << "interpreter: invalid pointer "

@@ -78,11 +78,9 @@ replace_symbolt actuals_replace_map(
     if(p.get_identifier()!=irep_idt() &&
        arguments.size()>count)
     {
-      exprt a=arguments[count];
-      if(a.type()!=p.type())
-        a=typecast_exprt(a, p.type());
-      symbol_exprt s(p.get_identifier(), p.type());
-      result.insert(s, a);
+      const exprt a =
+        typecast_exprt::conditional_cast(arguments[count], p.type());
+      result.insert(symbol_exprt(p.get_identifier(), p.type()), a);
     }
     count++;
   }
