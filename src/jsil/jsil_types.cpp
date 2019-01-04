@@ -159,7 +159,7 @@ jsil_union_typet jsil_union_typet::union_with(
     elements1.begin(), elements1.end(),
     elements2.begin(), elements2.end(),
     elements.begin(), compare_components);
-  elements.resize(it-elements.begin());
+  elements.resize(static_cast<std::size_t>(it - elements.begin()));
 
   return result;
 }
@@ -176,7 +176,7 @@ jsil_union_typet jsil_union_typet::intersect_with(
     elements1.begin(), elements1.end(),
     elements2.begin(), elements2.end(),
     elements.begin(), compare_components);
-  elements.resize(it-elements.begin());
+  elements.resize(static_cast<std::size_t>(it - elements.begin()));
 
   return result;
 }

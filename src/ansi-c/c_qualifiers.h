@@ -149,8 +149,9 @@ public:
 
   virtual std::size_t count() const override
   {
-    return is_constant+is_volatile+is_restricted+is_atomic+
-           is_ptr32+is_ptr64+is_noreturn;
+    return static_cast<std::size_t>(
+      is_constant + is_volatile + is_restricted + is_atomic + is_ptr32 +
+      is_ptr64 + is_noreturn);
   }
 };
 

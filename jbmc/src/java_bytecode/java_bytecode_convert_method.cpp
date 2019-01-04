@@ -820,7 +820,7 @@ code_blockt &java_bytecode_convert_methodt::get_or_create_block_for_pcrange(
   {
     // Range wholly contained within a child block
     return get_or_create_block_for_pcrange(
-      tree.branch[child_offset],
+      tree.branch[static_cast<std::size_t>(child_offset)],
       child_block,
       address_start,
       address_limit,
@@ -887,7 +887,7 @@ code_blockt &java_bytecode_convert_methodt::get_or_create_block_for_pcrange(
   for(auto blockidx=child_offset, blocklim=child_offset+nblocks;
       blockidx!=blocklim;
       ++blockidx)
-    newblock.add(this_block_children[blockidx]);
+    newblock.add(this_block_children[static_cast<std::size_t>(blockidx)]);
 
   // Relabel the inner header:
   to_code_label(newblock.statements()[0]).set_label(new_label_irep);
@@ -900,7 +900,7 @@ code_blockt &java_bytecode_convert_methodt::get_or_create_block_for_pcrange(
   auto dellim=delfirst;
   std::advance(dellim, nblocks-1);
   this_block_children.erase(delfirst, dellim);
-  this_block_children[child_offset].swap(newlabel);
+  this_block_children[static_cast<std::size_t>(child_offset)].swap(newlabel);
 
   // Perform the same transformation on the index tree:
   block_tree_nodet newnode;
@@ -927,14 +927,13 @@ code_blockt &java_bytecode_convert_methodt::get_or_create_block_for_pcrange(
   ++branchaddriter;
   tree.branch_addresses.erase(branchaddriter, branchaddrlim);
 
-  tree.branch[child_offset]=std::move(newnode);
+  tree.branch[static_cast<std::size_t>(child_offset)] = std::move(newnode);
 
   assert(tree.branch.size()==tree.branch_addresses.size());
 
-  return
-    to_code_block(
-      to_code_label(
-        this_block_children[child_offset]).code());
+  return to_code_block(
+    to_code_label(this_block_children[static_cast<std::size_t>(child_offset)])
+      .code());
 }
 
 static void gather_symbol_live_ranges(

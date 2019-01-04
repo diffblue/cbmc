@@ -227,7 +227,8 @@ static std::vector<format_elementt> parse_format_string(std::string s)
   {
     if(match.position() != 0)
     {
-      std::string pre_match = s.substr(0, match.position());
+      std::string pre_match =
+        s.substr(0, static_cast<std::size_t>(match.position()));
       al.emplace_back(pre_match);
     }
 
@@ -428,7 +429,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_format(
             "number of format must match specifiers");
 
           // first argument `args[0]` corresponds to index 1
-          arg = to_struct_expr(args[fs.index - 1]);
+          arg = to_struct_expr(args[static_cast<std::size_t>(fs.index - 1)]);
         }
 
         auto result = add_axioms_for_format_specifier(
