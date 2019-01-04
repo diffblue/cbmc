@@ -87,19 +87,19 @@ public:
 
   void set_level_0(unsigned i)
   {
-    set(ID_L0, i);
+    set(ID_L0, narrow_cast<long long>(i));
     update_identifier();
   }
 
   void set_level_1(unsigned i)
   {
-    set(ID_L1, i);
+    set(ID_L1, narrow_cast<long long>(i));
     update_identifier();
   }
 
   void set_level_2(unsigned i)
   {
-    set(ID_L2, i);
+    set(ID_L2, narrow_cast<long long>(i));
     update_identifier();
   }
 
