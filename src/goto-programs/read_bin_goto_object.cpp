@@ -146,7 +146,8 @@ static void read_bin_functions_object(
       std::size_t t_count = irepconverter.read_gb_word(in); // # of targets
       for(std::size_t i=0; i<t_count; i++)
         // just save the target numbers
-        target_map[itarget].push_back(irepconverter.read_gb_word(in));
+        target_map[itarget].push_back(
+          static_cast<unsigned>(irepconverter.read_gb_word(in)));
 
       std::size_t l_count = irepconverter.read_gb_word(in); // # of labels
 

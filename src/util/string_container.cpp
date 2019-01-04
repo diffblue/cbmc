@@ -40,7 +40,7 @@ unsigned string_containert::get(const char *s)
   if(it!=hash_table.end())
     return it->second;
 
-  size_t r=hash_table.size();
+  const unsigned r = static_cast<unsigned>(hash_table.size());
 
   // these are stable
   string_list.push_back(std::string(s));
@@ -63,7 +63,7 @@ unsigned string_containert::get(const std::string &s)
   if(it!=hash_table.end())
     return it->second;
 
-  size_t r=hash_table.size();
+  const unsigned r = static_cast<unsigned>(hash_table.size());
 
   // these are stable
   string_list.push_back(s);

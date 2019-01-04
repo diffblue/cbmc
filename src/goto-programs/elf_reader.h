@@ -143,9 +143,14 @@ public:
 
   std::streampos section_offset(std::size_t index) const
   {
-    return
-      elf_class==ELF32?elf32_section_header_table[index].sh_offset:
-                       elf64_section_header_table[index].sh_offset;
+    // Visual Studio insists on a type cast to std::streamoff, for an unknown
+    // reason
+    if(elf_class == ELF32)
+      return static_cast<std::streamoff>(
+        elf32_section_header_table[index].sh_offset);
+    else
+      return static_cast<std::streamoff>(
+        elf64_section_header_table[index].sh_offset);
   }
 
   bool has_section(const std::string &name) const;

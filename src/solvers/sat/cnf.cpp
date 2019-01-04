@@ -384,7 +384,7 @@ literalt cnft::lselect(literalt a, literalt b, literalt c)
 /// \return New variable as literal
 literalt cnft::new_variable()
 {
-  literalt l(_no_variables, false);
+  literalt l(static_cast<literalt::var_not>(_no_variables), false);
 
   set_no_variables(_no_variables+1);
 
