@@ -50,7 +50,66 @@ different decision procedures, roughly one per directory.
 
 \section flattening-section Flattening
 
-To be documented.
+**Key classes:**
+* \ref propt (in solvers/prop)
+* \ref boolbvt
+* \ref bv_utilst
+
+The main class in this folder is \ref boolbvt which wraps a variety of 
+helper methods and classes (including inherited ones) and acts as an interface 
+for transforming \ref exprt into boolean formula and then solving it.
+
+Many of its methods are focused around transforming a particular \ref exprt 
+into a vector of \ref literalt and then passing them to a \ref propt 
+for formula building / solving.
+
+The primary methods are:
+
+Note: `bvt` mentioned below is an alias to a vector of literalt.
+
+`bvt boolbvt::convert_bitvector(const exprt &expr)`
+
+Which takes an exprt then calls the associated transformation functions to
+generate the \ref literalt vector to then pass to the internal \ref propt instance.
+
+`const bvt & boolbvt::convert_bv(const exprt &expr, optionalt<std::size_t> expected_width)`
+
+Similar to convert_bitvector except it also provides basic caching and
+freezing results for incremental solving. It calls convert_bitvector
+internally.
+
+`literalt boolbvt::convert_rest(const exprt &expr)`
+
+(Note: I'm not sure why this is split from the normal convert_bitvector, 
+but it's probably worth mentioning)
+
+`void post_process()`
+
+Performs any post-processing, which is normally adding constraints that 
+require some global knowledge of the formula, ex. for encoding arrays 
+into uninterpreted functions.
+
+Some key classes:
+
+\ref propt is instance of whichever solver is currently being used. This
+inherits from `decision_proceduret` whose interface has a fuller explanation 
+in the "General Interfaces" subsection.
+
+\ref bv_utilst holds a set of utility functions for bit manipulation that work
+upon [literal](\ref literalt)s (or vectors of them). Holds a reference to the propt 
+that its parent uses.
+
+\ref functionst Helper class that keeps a list of uninterpreted functions
+which then gets used to add function constraints when `post_process` is called.
+
+\ref boolbv_mapt Helper class that maps an \ref irep_idt (and a type) to a 
+vector of [literal](\ref literalt)s. 
+
+\ref arrayst Base class of \ref boolbvt. Adds additional array constraints 
+when `post_process` is called.
+
+\ref equalityt Base class of \ref boolbvt. Adds equality constraints between
+bitvectors when `post_process` is called.
 
 \section solver-apis Solver APIs
 
