@@ -145,11 +145,11 @@ bvt boolbvt::convert_floatbv_op(const exprt &expr)
         bvt lhs_sub_bv, rhs_sub_bv, sub_result_bv;
 
         lhs_sub_bv.assign(
-          lhs_as_bv.begin() + i * sub_width,
-          lhs_as_bv.begin() + (i + 1) * sub_width);
+          lhs_as_bv.begin() + narrow_cast<std::ptrdiff_t>(i * sub_width),
+          lhs_as_bv.begin() + narrow_cast<std::ptrdiff_t>((i + 1) * sub_width));
         rhs_sub_bv.assign(
-          rhs_as_bv.begin() + i * sub_width,
-          rhs_as_bv.begin() + (i + 1) * sub_width);
+          rhs_as_bv.begin() + narrow_cast<std::ptrdiff_t>(i * sub_width),
+          rhs_as_bv.begin() + narrow_cast<std::ptrdiff_t>((i + 1) * sub_width));
 
         if(expr.id()==ID_floatbv_plus)
           sub_result_bv = float_utils.add_sub(lhs_sub_bv, rhs_sub_bv, false);
@@ -171,7 +171,7 @@ bvt boolbvt::convert_floatbv_op(const exprt &expr)
         std::copy(
           sub_result_bv.begin(),
           sub_result_bv.end(),
-          result_bv.begin() + i * sub_width);
+          result_bv.begin() + narrow_cast<std::ptrdiff_t>(i * sub_width));
       }
 
       return result_bv;

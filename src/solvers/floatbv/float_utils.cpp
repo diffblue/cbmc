@@ -389,7 +389,9 @@ bvt float_utilst::limit_distance(
   std::size_t nb_bits = address_bits(limit);
 
   bvt upper_bits=dist;
-  upper_bits.erase(upper_bits.begin(), upper_bits.begin()+nb_bits);
+  upper_bits.erase(
+    upper_bits.begin(),
+    upper_bits.begin() + narrow_cast<std::ptrdiff_t>(nb_bits));
   literalt or_upper_bits=prop.lor(upper_bits);
 
   bvt lower_bits=dist;
@@ -706,7 +708,8 @@ literalt float_utilst::exponent_all_ones(const bvt &src)
   bvt exponent=src;
 
   // removes the fractional part
-  exponent.erase(exponent.begin(), exponent.begin()+spec.f);
+  exponent.erase(
+    exponent.begin(), exponent.begin() + narrow_cast<std::ptrdiff_t>(spec.f));
 
   // removes the sign
   exponent.resize(spec.e);
@@ -719,7 +722,8 @@ literalt float_utilst::exponent_all_zeros(const bvt &src)
   bvt exponent=src;
 
   // removes the fractional part
-  exponent.erase(exponent.begin(), exponent.begin()+spec.f);
+  exponent.erase(
+    exponent.begin(), exponent.begin() + narrow_cast<std::ptrdiff_t>(spec.f));
 
   // removes the sign
   exponent.resize(spec.e);

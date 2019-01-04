@@ -49,7 +49,8 @@ bvt bv_utilst::extract(const bvt &a, std::size_t first, std::size_t last)
   bvt result=a;
   result.resize(last+1);
   if(first!=0)
-    result.erase(result.begin(), result.begin()+first);
+    result.erase(
+      result.begin(), result.begin() + narrow_cast<std::ptrdiff_t>(first));
 
   POSTCONDITION(result.size() == last - first + 1);
   return result;
@@ -61,7 +62,9 @@ bvt bv_utilst::extract_msb(const bvt &a, std::size_t n)
   PRECONDITION(n <= a.size());
 
   bvt result=a;
-  result.erase(result.begin(), result.begin()+(result.size()-n));
+  result.erase(
+    result.begin(),
+    result.begin() + narrow_cast<std::ptrdiff_t>(result.size() - n));
 
   POSTCONDITION(result.size() == n);
   return result;

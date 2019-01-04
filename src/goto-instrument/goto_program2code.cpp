@@ -1556,7 +1556,8 @@ void goto_program2codet::cleanup_code_block(
       operands.size()>1 && i<operands.size();
      ) // no ++i
   {
-    exprt::operandst::iterator it=operands.begin()+i;
+    exprt::operandst::iterator it =
+      operands.begin() + narrow_cast<std::ptrdiff_t>(i);
     // remove skip
     if(to_code(*it).get_statement()==ID_skip &&
        it->source_location().get_comment().empty())
@@ -1574,9 +1575,11 @@ void goto_program2codet::cleanup_code_block(
 
       if(!has_decl)
       {
-        operands.insert(operands.begin()+i+1,
-            it->operands().begin(), it->operands().end());
-        operands.erase(operands.begin()+i);
+        operands.insert(
+          operands.begin() + narrow_cast<std::ptrdiff_t>(i) + 1,
+          it->operands().begin(),
+          it->operands().end());
+        operands.erase(operands.begin() + narrow_cast<std::ptrdiff_t>(i));
         // no ++i
       }
       else
