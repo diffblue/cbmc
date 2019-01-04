@@ -33,7 +33,18 @@ static void irep2name(const irept &irep, std::string &result)
   if(is_reference(static_cast<const typet&>(irep)))
     result+="reference";
 
-  if(irep.id()!="")
+  if(is_rvalue_reference(static_cast<const typet &>(irep)))
+    result += "rvalue_reference";
+
+  if(irep.id() == ID_frontend_pointer)
+  {
+    if(irep.get_bool(ID_C_reference))
+      result += "reference";
+
+    if(irep.get_bool(ID_C_rvalue_reference))
+      result += "rvalue_reference";
+  }
+  else if(!irep.id().empty())
     result+=do_prefix(irep.id_string());
 
   if(irep.get_named_sub().empty() && irep.get_sub().empty())
