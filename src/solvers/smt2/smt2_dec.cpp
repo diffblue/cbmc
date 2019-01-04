@@ -141,7 +141,7 @@ decision_proceduret::resultt smt2_dect::read_result(std::istream &in)
 
   while(in)
   {
-    irept parsed=smt2irep(in);
+    irept parsed = smt2irep(in, get_message_handler());
 
     if(parsed.id()=="sat")
       res=resultt::D_SATISFIABLE;

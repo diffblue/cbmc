@@ -15,18 +15,19 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "smt2_tokenizer.h"
 
-class smt2_parsert:public smt2_tokenizert
+class smt2_parsert
 {
 public:
   explicit smt2_parsert(std::istream &_in)
-    : smt2_tokenizert(_in), exit(false), parenthesis_level(0)
+    : exit(false), smt2_tokenizer(_in), parenthesis_level(0)
   {
   }
 
-  bool parse() override
+  virtual ~smt2_parsert() = default;
+
+  void parse()
   {
     command_sequence();
-    return false;
   }
 
   struct idt
@@ -54,13 +55,24 @@ public:
 
   bool exit;
 
+  smt2_tokenizert::smt2_errort error(const std::string &message)
+  {
+    return smt2_tokenizer.error(message);
+  }
+
+  smt2_tokenizert::smt2_errort error()
+  {
+    return smt2_tokenizer.error();
+  }
+
   /// This skips tokens until all bracketed expressions are closed
   void skip_to_end_of_list();
 
 protected:
-  // we override next_token to track the parenthesis level
+  smt2_tokenizert smt2_tokenizer;
+  // we extend next_token to track the parenthesis level
   std::size_t parenthesis_level;
-  tokent next_token() override;
+  smt2_tokenizert::tokent next_token();
 
   void command_sequence();
 

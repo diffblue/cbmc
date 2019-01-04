@@ -8,6 +8,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "smt2irep.h"
 
+#include <util/message.h>
+
 #include <stack>
 
 #include "smt2_tokenizer.h"
@@ -15,7 +17,8 @@ Author: Daniel Kroening, kroening@kroening.com
 class smt2irept:public smt2_tokenizert
 {
 public:
-  explicit smt2irept(std::istream &_in):smt2_tokenizert(_in)
+  smt2irept(std::istream &_in, message_handlert &message_handler)
+    : smt2_tokenizert(_in), log(message_handler)
   {
   }
 
@@ -25,9 +28,10 @@ public:
     return result;
   }
 
-  bool parse() override;
+  bool parse();
 
 protected:
+  messaget log;
   irept result;
 };
 
@@ -88,13 +92,13 @@ bool smt2irept::parse()
   }
   catch(const smt2_errort &e)
   {
-    messaget::error().source_location.set_line(e.get_line_no());
-    messaget::error() << e.what() << eom;
+    log.error().source_location.set_line(e.get_line_no());
+    log.error() << e.what() << messaget::eom;
     return true;
   }
 }
 
-irept smt2irep(std::istream &in)
+irept smt2irep(std::istream &in, message_handlert &message_handler)
 {
-  return smt2irept(in)();
+  return smt2irept(in, message_handler)();
 }
