@@ -147,7 +147,7 @@ typedef
 #define TEST_FUNCTION_NAME TEST_PREFIX "test:()V"
 #define TEST_LOCAL_PREFIX TEST_FUNCTION_NAME "::"
 
-static std::size_t
+static std::ptrdiff_t
 exprs_with_id(const std::vector<exprt> &exprs, const irep_idt &id)
 {
   return std::count_if(
