@@ -2,10 +2,16 @@
 set -x -e
 
 # set up the additional volume
-sleep 10
-e2fsck -f -y /dev/xvdf
-resize2fs /dev/xvdf
-mount /dev/xvdf /mnt
+if lsblk | grep ^nvme
+then
+  e2fsck -f -y /dev/nvme0n1
+  resize2fs /dev/nvme0n1
+  mount /dev/nvme0n1 /mnt
+else
+  e2fsck -f -y /dev/xvdf
+  resize2fs /dev/xvdf
+  mount /dev/xvdf /mnt
+fi
 
 # install packages
 apt-get install -y git time wget binutils make jq
@@ -164,7 +170,7 @@ do
   if [ $cfg != "profiling" ]
   then
     ../benchexec/bin/benchexec cbmc.xml --no-container \
-      --task $t -T 900s -M 15GB -o logs-$t/ -N $max_par -c 1
+      --task $t -T 900s -M 15GB -o logs-$t/ -N $max_par -c -1
     if [ -d logs-$t/cbmc.*.logfiles ]
     then
       cd logs-$t
@@ -228,7 +234,7 @@ do
   else
     rm -f gmon.sum gmon.out *.gmon.out.*
     ../benchexec/bin/benchexec cbmc.xml --no-container \
-      --task $t -T 600s -M 7GB -o logs-$t/ -N $max_par -c 1
+      --task $t -T 600s -M 7GB -o logs-$t/ -N $max_par -c -1
     if ls *.gmon.out.* >/dev/null 2>&1
     then
       gprof --sum ./cbmc-binary cbmc*.gmon.out.*
