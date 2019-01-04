@@ -76,7 +76,8 @@ std::string mz_zip_archivet::get_filename(const size_t index)
   const auto id=static_cast<mz_uint>(index);
   std::vector<char> buffer;
   buffer.resize(mz_zip_reader_get_filename(m_state.get(), id, nullptr, 0));
-  mz_zip_reader_get_filename(m_state.get(), id, buffer.data(), buffer.size());
+  mz_zip_reader_get_filename(
+    m_state.get(), id, buffer.data(), static_cast<mz_uint>(buffer.size()));
   // Buffer may contain junk returned after \0
   const auto null_char_it=std::find(buffer.cbegin(), buffer.cend(), '\0');
   return { buffer.cbegin(), null_char_it };

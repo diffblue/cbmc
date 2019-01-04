@@ -305,7 +305,8 @@ bool get_bvrep_bit(
     "bvrep is hexadecimal, upper-case");
 
   const unsigned char nibble_value =
-    isdigit(nibble) ? nibble - '0' : nibble - 'A' + 10;
+    isdigit(nibble) ? static_cast<unsigned char>(nibble - '0')
+                    : static_cast<unsigned char>(nibble - 'A' + 10);
 
   return ((nibble_value >> (bit_index % 4)) & 1) != 0;
 }

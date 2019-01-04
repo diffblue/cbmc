@@ -338,7 +338,7 @@ exprt float_bvt::conversion(
 
   int sourceSmallestNormalExponent = -((1 << (src_spec.e - 1)) - 1);
   int sourceSmallestDenormalExponent =
-    sourceSmallestNormalExponent - src_spec.f;
+    sourceSmallestNormalExponent - static_cast<int>(src_spec.f);
 
   // Using the fact that f doesn't include the hidden bit
 

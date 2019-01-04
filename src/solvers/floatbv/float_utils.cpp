@@ -168,7 +168,7 @@ bvt float_utilst::conversion(
 
   int sourceSmallestNormalExponent=-((1 << (spec.e - 1)) - 1);
   int sourceSmallestDenormalExponent =
-    sourceSmallestNormalExponent - spec.f;
+    sourceSmallestNormalExponent - static_cast<int>(spec.f);
 
   // Using the fact that f doesn't include the hidden bit
 

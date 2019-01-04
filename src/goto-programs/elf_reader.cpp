@@ -58,7 +58,8 @@ elf_readert::elf_readert(std::istream &_in):in(_in)
     for(std::size_t i=0; i<elf32_section_header_table.size(); i++)
     {
       // go to right place
-      in.seekg(elf32_header.e_shoff+i*elf32_header.e_shentsize);
+      in.seekg(static_cast<std::streamoff>(
+        elf32_header.e_shoff + i * elf32_header.e_shentsize));
 
       // read section header
       in.read(
@@ -105,7 +106,8 @@ elf_readert::elf_readert(std::istream &_in):in(_in)
     for(std::size_t i=0; i<elf64_section_header_table.size(); i++)
     {
       // go to right place
-      in.seekg(elf64_header.e_shoff+i*elf64_header.e_shentsize);
+      in.seekg(static_cast<std::streamoff>(
+        elf64_header.e_shoff + i * elf64_header.e_shentsize));
 
       // read section header
       in.read(

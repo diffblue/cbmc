@@ -39,7 +39,7 @@ std::basic_string<unsigned int> convert_one_string_literal(
     // pad into wide string
     value.resize(utf8_value.size());
     for(std::size_t i=0; i<utf8_value.size(); i++)
-      value[i]=utf8_value[i];
+      value[i] = static_cast<unsigned int>(utf8_value[i]);
 
     return value;
   }
@@ -62,7 +62,7 @@ std::basic_string<unsigned int> convert_one_string_literal(
     std::basic_string<unsigned int> value;
     value.resize(char_value.size());
     for(std::size_t i=0; i<char_value.size(); i++)
-      value[i]=char_value[i];
+      value[i] = static_cast<unsigned int>(char_value[i]);
 
     return value;
   }
@@ -150,7 +150,7 @@ exprt convert_string_literal(const std::string &src)
     {
       // Loss of data here if value[i]>255.
       // gcc issues a warning in this case.
-      char_value[i]=value[i];
+      char_value[i] = static_cast<char>(value[i]);
     }
 
     return string_constantt(char_value);

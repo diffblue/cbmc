@@ -278,7 +278,7 @@ void satcheck_minisat2_baset<T>::set_assignment(literalt a, bool value)
 
   try
   {
-    unsigned v = a.var_no();
+    unsigned v = static_cast<unsigned>(a.var_no());
     bool sign = a.sign();
 
     // MiniSat2 kills the model in case of UNSAT
@@ -354,7 +354,7 @@ void satcheck_minisat_simplifiert::set_frozen(literalt a)
     if(!a.is_constant())
     {
       add_variables();
-      solver->setFrozen(a.var_no(), true);
+      solver->setFrozen(static_cast<int>(a.var_no()), true);
     }
   }
   catch(const Minisat::OutOfMemoryException &)
@@ -369,5 +369,5 @@ bool satcheck_minisat_simplifiert::is_eliminated(literalt a) const
 {
   PRECONDITION(!a.is_constant());
 
-  return solver->isEliminated(a.var_no());
+  return solver->isEliminated(static_cast<int>(a.var_no()));
 }

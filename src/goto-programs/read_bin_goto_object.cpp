@@ -107,7 +107,8 @@ static bool read_bin_goto_object_v4(
       instruction.guard.make_nil();
       irepconverter.reference_convert(in, instruction.guard);
       irepconverter.read_string_ref(in); // former event
-      instruction.target_number = irepconverter.read_gb_word(in);
+      instruction.target_number =
+        static_cast<unsigned>(irepconverter.read_gb_word(in));
       if(instruction.is_target() &&
          rev_target_map.insert(
            rev_target_map.end(),
@@ -117,7 +118,8 @@ static bool read_bin_goto_object_v4(
       std::size_t t_count = irepconverter.read_gb_word(in); // # of targets
       for(std::size_t i=0; i<t_count; i++)
         // just save the target numbers
-        target_map[itarget].push_back(irepconverter.read_gb_word(in));
+        target_map[itarget].push_back(
+          static_cast<unsigned>(irepconverter.read_gb_word(in)));
 
       std::size_t l_count = irepconverter.read_gb_word(in); // # of labels
 

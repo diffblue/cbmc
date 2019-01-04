@@ -430,7 +430,7 @@ public:
 
   const_value_iterator value_begin() const
   {
-    return const_value_iterator(*this, size() - 1);
+    return const_value_iterator(*this, static_cast<int>(size()) - 1);
   }
 
   const_value_iterator value_end() const
