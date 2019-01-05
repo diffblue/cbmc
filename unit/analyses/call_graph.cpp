@@ -47,24 +47,19 @@ SCENARIO("call_graph",
     code_typet void_function_type({}, empty_typet());
 
     {
-      code_blockt calls;
-      code_function_callt call1(symbol_exprt("A", void_function_type));
-      code_function_callt call2(symbol_exprt("B", void_function_type));
-      code_function_callt call3(symbol_exprt("B", void_function_type));
-      calls.move_to_operands(call1);
-      calls.move_to_operands(call2);
-      calls.move_to_operands(call3);
+      code_blockt calls(
+        {code_function_callt(symbol_exprt("A", void_function_type)),
+         code_function_callt(symbol_exprt("B", void_function_type)),
+         code_function_callt(symbol_exprt("B", void_function_type))});
 
       goto_model.symbol_table.add(
         create_void_function_symbol("A", calls));
     }
 
     {
-      code_blockt calls;
-      code_function_callt call1(symbol_exprt("C", void_function_type));
-      code_function_callt call2(symbol_exprt("D", void_function_type));
-      calls.move_to_operands(call1);
-      calls.move_to_operands(call2);
+      code_blockt calls(
+        {code_function_callt(symbol_exprt("C", void_function_type)),
+         code_function_callt(symbol_exprt("D", void_function_type))});
 
       goto_model.symbol_table.add(
         create_void_function_symbol("B", calls));

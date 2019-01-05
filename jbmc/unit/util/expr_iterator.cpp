@@ -176,8 +176,8 @@ SCENARIO("depth_iterator_mutate_root", "[core][utils][depth_iterator]")
     exprt test_root;
     // This is the expression we might mutate when we find it
     exprt test_operand(ID_1);
-    test_root.move_to_operands(test_operand);
-    test_expr.move_to_operands(test_root);
+    test_root.add_to_operands(std::move(test_operand));
+    test_expr.add_to_operands(std::move(test_root));
     WHEN("Iteration occurs without mutation")
     {
       // Create shared copies

@@ -351,7 +351,7 @@ const exprt qbf_bdd_certificatet::f_get(literalt l)
         if(cube[i]!=2)
         {
           exprt subf=f_get(literalt(quantifiers[i].var_no, (cube[i]==1)));
-          prime.move_to_operands(subf);
+          prime.add_to_operands(std::move(subf));
         }
       }
 
@@ -360,9 +360,9 @@ const exprt qbf_bdd_certificatet::f_get(literalt l)
       if(prime.operands().empty())
         result.copy_to_operands(true_exprt());
       else if(prime.operands().size()==1)
-        result.move_to_operands(prime.op0());
+        result.add_to_operands(std::move(prime.op0()));
       else
-        result.move_to_operands(prime);
+        result.add_to_operands(std::move(prime));
     }
 
     cube=NULL; // cube is free'd by nextCube

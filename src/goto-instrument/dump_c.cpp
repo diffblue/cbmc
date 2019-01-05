@@ -1237,7 +1237,7 @@ void dump_ct::cleanup_expr(exprt &expr)
       if(!old_comp.get_is_padding() && !is_zero_bit_field)
       {
         type.components().push_back(old_comp);
-        expr.move_to_operands(*o_it);
+        expr.add_to_operands(std::move(*o_it));
       }
       ++o_it;
     }

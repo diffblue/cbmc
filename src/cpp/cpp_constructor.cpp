@@ -190,7 +190,7 @@ optionalt<codet> cpp_typecheckt::cpp_constructor(
         val=true_exprt();
 
       side_effect_exprt assign(ID_assign, typet(), source_location);
-      assign.move_to_operands(member, val);
+      assign.add_to_operands(std::move(member), std::move(val));
       typecheck_side_effect_assignment(assign);
       block.add(code_expressiont(std::move(assign)));
     }
@@ -285,7 +285,7 @@ void cpp_typecheckt::new_temporary(
   if(new_code.has_value())
   {
     if(new_code->get_statement() == ID_assign)
-      tmp_object_expr.move_to_operands(new_code->op1());
+      tmp_object_expr.add_to_operands(std::move(new_code->op1()));
     else
       tmp_object_expr.add(ID_initializer) = *new_code;
   }

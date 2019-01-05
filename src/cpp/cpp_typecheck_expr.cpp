@@ -538,7 +538,7 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
     {
       add_implicit_dereference(function_call);
       exprt tmp(ID_already_typechecked);
-      tmp.move_to_operands(function_call);
+      tmp.add_to_operands(std::move(function_call));
       expr.op0().swap(tmp);
       typecheck_expr(expr);
       return true;
@@ -658,7 +658,7 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
           {
             add_implicit_dereference(function_call);
             exprt tmp(ID_already_typechecked);
-            tmp.move_to_operands(function_call);
+            tmp.add_to_operands(std::move(function_call));
             expr.op0()=tmp;
             typecheck_expr(expr);
             return true;
@@ -809,7 +809,7 @@ void cpp_typecheckt::typecheck_expr_new(exprt &expr)
 
   {
     exprt tmp(ID_already_typechecked);
-    tmp.move_to_operands(object_expr);
+    tmp.add_to_operands(std::move(object_expr));
     object_expr.swap(tmp);
   }
 
@@ -931,7 +931,7 @@ void cpp_typecheckt::typecheck_expr_explicit_typecast(exprt &expr)
       // or an expression for a pointer or scalar.
       // We produce a compound_literal expression.
       exprt tmp(ID_compound_literal, expr.type());
-      tmp.move_to_operands(expr.op0());
+      tmp.add_to_operands(std::move(expr.op0()));
       expr=tmp;
       expr.set(ID_C_lvalue, true); // these are l-values
       return;
@@ -1284,7 +1284,7 @@ void cpp_typecheckt::typecheck_expr_ptrmember(
   op.swap(tmp);
 
   op.id(ID_dereference);
-  op.move_to_operands(tmp);
+  op.add_to_operands(std::move(tmp));
   op.add_source_location()=expr.source_location();
   typecheck_expr_dereference(op);
 
@@ -2047,13 +2047,13 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
       if(op0.id()==ID_member || op0.id()==ID_ptrmember)
       {
         vtptr_member.id(op0.id());
-        vtptr_member.move_to_operands(op0.op0());
+        vtptr_member.add_to_operands(std::move(op0.op0()));
       }
       else
       {
         vtptr_member.id(ID_ptrmember);
         exprt this_expr("cpp-this");
-        vtptr_member.move_to_operands(this_expr);
+        vtptr_member.add_to_operands(std::move(this_expr));
       }
 
       // get the virtual table
@@ -2113,7 +2113,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
     exprt member(ID_member);
     member.add(ID_component_cpp_name)=cppname;
 
-    member.move_to_operands(op0);
+    member.add_to_operands(std::move(op0));
 
     expr.function().swap(member);
     typecheck_side_effect_function_call(expr);
@@ -2488,11 +2488,11 @@ void cpp_typecheckt::typecheck_side_effect_assignment(side_effect_exprt &expr)
 
   // expr.op0() is already typechecked
   exprt already_typechecked(ID_already_typechecked);
-  already_typechecked.move_to_operands(expr.op0());
+  already_typechecked.add_to_operands(std::move(expr.op0()));
 
   exprt member(ID_member);
   member.set(ID_component_cpp_name, cpp_name);
-  member.move_to_operands(already_typechecked);
+  member.add_to_operands(std::move(already_typechecked));
 
   side_effect_expr_function_callt new_expr;
   new_expr.function().swap(member);
@@ -2558,11 +2558,11 @@ void cpp_typecheckt::typecheck_side_effect_inc_dec(
   const cpp_namet cpp_name(str_op, expr.source_location());
 
   exprt already_typechecked(ID_already_typechecked);
-  already_typechecked.move_to_operands(expr.op0());
+  already_typechecked.add_to_operands(std::move(expr.op0()));
 
   exprt member(ID_member);
   member.set(ID_component_cpp_name, cpp_name);
-  member.move_to_operands(already_typechecked);
+  member.add_to_operands(std::move(already_typechecked));
 
   side_effect_expr_function_callt new_expr;
   new_expr.function().swap(member);

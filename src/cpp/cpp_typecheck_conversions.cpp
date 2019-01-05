@@ -1398,7 +1398,7 @@ bool cpp_typecheckt::reference_binding(
       tmp.set(ID_statement, ID_temporary_object);
       tmp.add_source_location()=expr.source_location();
       // tmp.set(ID_C_lvalue, true);
-      tmp.move_to_operands(new_expr);
+      tmp.add_to_operands(std::move(new_expr));
       new_expr.swap(tmp);
     }
 

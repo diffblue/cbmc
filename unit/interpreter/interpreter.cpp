@@ -60,10 +60,8 @@ SCENARIO("interpreter evaluation null pointer expressions")
       "0000000000000000000000000000000000000000000000000000000000000000",
       outer_pointer_type);
 
-    pointer_typet inner_pointer_type(empty_typet(), 64);
-    constant_exprt inner_expression(ID_NULL, inner_pointer_type);
-
-    outer_expression.move_to_operands(inner_expression);
+    outer_expression.add_to_operands(
+      null_pointer_exprt(pointer_typet(empty_typet(), 64)));
 
     mp_vectort mp_vector = interpreter_test.evaluate(outer_expression);
 

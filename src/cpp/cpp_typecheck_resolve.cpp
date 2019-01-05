@@ -295,7 +295,7 @@ exprt cpp_typecheck_resolvet::convert_identifier(
       if(object.is_not_nil())
       {
         // we got an object
-        e.move_to_operands(object);
+        e.add_to_operands(std::move(object));
 
         bool old_value=cpp_typecheck.disable_access_control;
         cpp_typecheck.disable_access_control=true;

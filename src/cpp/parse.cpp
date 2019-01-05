@@ -4197,7 +4197,7 @@ bool Parser::rInitializeExpr(exprt &expr)
       return true;           // error recovery
     }
 
-    expr.move_to_operands(tmp);
+    expr.add_to_operands(std::move(tmp));
 
     t=lex.LookAhead(0);
     if(t=='}')
@@ -4246,7 +4246,7 @@ bool Parser::rFunctionArguments(exprt &args)
     if(!rExpression(exp, false))
       return false;
 
-    args.move_to_operands(exp);
+    args.add_to_operands(std::move(exp));
 
     if(lex.LookAhead(0)==TOK_ELLIPSIS &&
        (lex.LookAhead(1)==')' || lex.LookAhead(1)==','))
@@ -4632,8 +4632,8 @@ bool Parser::rClassBody(exprt &body)
               << member.pretty() << '\n';
     #endif
 
-    members.move_to_operands(
-      static_cast<exprt &>(static_cast<irept &>(member)));
+    members.add_to_operands(
+      std::move(static_cast<exprt &>(static_cast<irept &>(member))));
   }
 
   lex.get_token(tk);
@@ -4778,7 +4778,7 @@ bool Parser::rCommaExpression(exprt &exp)
     left.swap(exp);
 
     exp=exprt(ID_comma);
-    exp.move_to_operands(left, right);
+    exp.add_to_operands(std::move(left), std::move(right));
     set_location(exp, tk);
   }
 
@@ -4859,7 +4859,7 @@ bool Parser::rExpression(exprt &exp, bool template_args)
     else if(t==TOK_ORASSIGN)
       exp.set(ID_statement, ID_assign_bitor);
 
-    exp.move_to_operands(left, right);
+    exp.add_to_operands(std::move(left), std::move(right));
     set_location(exp, tk);
   }
 
@@ -4910,8 +4910,8 @@ bool Parser::rConditionalExpr(exprt &exp, bool template_args)
     exprt cond;
     cond.swap(exp);
 
-    exp=exprt(ID_if);
-    exp.move_to_operands(cond, then, otherwise);
+    exp =
+      if_exprt(std::move(cond), std::move(then), std::move(otherwise), typet());
     set_location(exp, tk1);
   }
 
@@ -4950,7 +4950,7 @@ bool Parser::rLogicalOrExpr(exprt &exp, bool template_args)
     left.swap(exp);
 
     exp=exprt(ID_or);
-    exp.move_to_operands(left, right);
+    exp.add_to_operands(std::move(left), std::move(right));
     set_location(exp, tk);
   }
 
@@ -4989,7 +4989,7 @@ bool Parser::rLogicalAndExpr(exprt &exp, bool template_args)
     left.swap(exp);
 
     exp=exprt(ID_and);
-    exp.move_to_operands(left, right);
+    exp.add_to_operands(std::move(left), std::move(right));
     set_location(exp, tk);
   }
 
@@ -5028,7 +5028,7 @@ bool Parser::rInclusiveOrExpr(exprt &exp, bool template_args)
     left.swap(exp);
 
     exp=exprt(ID_bitor);
-    exp.move_to_operands(left, right);
+    exp.add_to_operands(std::move(left), std::move(right));
     set_location(exp, tk);
   }
 
@@ -5067,7 +5067,7 @@ bool Parser::rExclusiveOrExpr(exprt &exp, bool template_args)
     left.swap(exp);
 
     exp=exprt(ID_bitxor);
-    exp.move_to_operands(left, right);
+    exp.add_to_operands(std::move(left), std::move(right));
     set_location(exp, tk);
   }
 
@@ -5106,7 +5106,7 @@ bool Parser::rAndExpr(exprt &exp, bool template_args)
     left.swap(exp);
 
     exp=exprt(ID_bitand);
-    exp.move_to_operands(left, right);
+    exp.add_to_operands(std::move(left), std::move(right));
     set_location(exp, tk);
   }
 
@@ -5146,7 +5146,7 @@ bool Parser::rEqualityExpr(exprt &exp, bool template_args)
     left.swap(exp);
 
     exp=exprt(tk.kind==TOK_EQ?ID_equal:ID_notequal);
-    exp.move_to_operands(left, right);
+    exp.add_to_operands(std::move(left), std::move(right));
     set_location(exp, tk);
   }
 
@@ -5198,7 +5198,7 @@ bool Parser::rRelationalExpr(exprt &exp, bool template_args)
     }
 
     exp=exprt(id);
-    exp.move_to_operands(left, right);
+    exp.add_to_operands(std::move(left), std::move(right));
     set_location(exp, tk);
   }
 
@@ -5238,7 +5238,7 @@ bool Parser::rShiftExpr(exprt &exp, bool template_args)
     left.swap(exp);
 
     exp=exprt((tk.kind==TOK_SHIFTRIGHT)?ID_shr:ID_shl);
-    exp.move_to_operands(left, right);
+    exp.add_to_operands(std::move(left), std::move(right));
     set_location(exp, tk);
   }
 
@@ -5285,7 +5285,7 @@ bool Parser::rAdditiveExpr(exprt &exp)
     }
 
     exp=exprt(id);
-    exp.move_to_operands(left, right);
+    exp.add_to_operands(std::move(left), std::move(right));
     set_location(exp, tk);
   }
 
@@ -5333,7 +5333,7 @@ bool Parser::rMultiplyExpr(exprt &exp)
     }
 
     exp=exprt(id);
-    exp.move_to_operands(left, right);
+    exp.add_to_operands(std::move(left), std::move(right));
     set_location(exp, tk);
   }
 
@@ -5378,7 +5378,7 @@ bool Parser::rPmExpr(exprt &exp)
     left.swap(exp);
 
     exp = exprt(ID_pointer_to_member);
-    exp.move_to_operands(left, right);
+    exp.add_to_operands(std::move(left), std::move(right));
     set_location(exp, tk);
   }
 
@@ -5437,7 +5437,7 @@ bool Parser::rCastExpr(exprt &exp)
 
           exp=exprt("explicit-typecast");
           exp.type().swap(tname);
-          exp.move_to_operands(op);
+          exp.add_to_operands(std::move(op));
           set_location(exp, tk1);
 
           return true;
@@ -5748,7 +5748,7 @@ bool Parser::rUnaryExpr(exprt &exp)
       UNREACHABLE;
     }
 
-    exp.move_to_operands(right);
+    exp.add_to_operands(std::move(right));
     set_location(exp, tk);
 
     return true;
@@ -5773,7 +5773,7 @@ bool Parser::rUnaryExpr(exprt &exp)
       return false;
 
     exp=exprt(t==TOK_REAL?ID_complex_real:ID_complex_imag);
-    exp.move_to_operands(unary);
+    exp.add_to_operands(std::move(unary));
     set_location(exp, tk);
     return true;
   }
@@ -5815,7 +5815,7 @@ bool Parser::rThrowExpr(exprt &exp)
     if(!rExpression(e, false))
       return false;
 
-    exp.move_to_operands(e);
+    exp.add_to_operands(std::move(e));
   }
 
   return true;
@@ -5954,7 +5954,7 @@ bool Parser::rSizeofExpr(exprt &exp)
     return false;
 
   exp=exprt(ID_sizeof);
-  exp.move_to_operands(unary);
+  exp.add_to_operands(std::move(unary));
   set_location(exp, tk);
   return true;
 }
@@ -6017,7 +6017,7 @@ bool Parser::rNoexceptExpr(exprt &exp)
       {
         // TODO
         exp=exprt(ID_noexcept);
-        exp.move_to_operands(subexp);
+        exp.add_to_operands(std::move(subexp));
         set_location(exp, tk);
         return true;
       }
@@ -6094,7 +6094,7 @@ bool Parser::rAllocateExpr(exprt &exp)
     if(!rCastExpr(obj))
        return false;
 
-    exp.move_to_operands(obj);
+    exp.add_to_operands(std::move(obj));
 
     return true;
   }
@@ -6278,7 +6278,7 @@ bool Parser::rAllocateInitializer(exprt &init)
     if(!rInitializeExpr(exp))
       return false;
 
-    init.move_to_operands(exp);
+    init.add_to_operands(std::move(exp));
 
     if(lex.LookAhead(0)==TOK_ELLIPSIS)
     {
@@ -6355,7 +6355,7 @@ bool Parser::rPostfixExpr(exprt &exp)
         left.swap(exp);
 
         exp=exprt(ID_index);
-        exp.move_to_operands(left, e);
+        exp.add_to_operands(std::move(left), std::move(e));
         set_location(exp, op);
       }
       break;
@@ -6394,7 +6394,7 @@ bool Parser::rPostfixExpr(exprt &exp)
 
       {
         side_effect_exprt tmp(ID_postincrement, typet(), source_locationt());
-        tmp.move_to_operands(exp);
+        tmp.add_to_operands(std::move(exp));
         set_location(tmp, op);
         exp.swap(tmp);
       }
@@ -6405,7 +6405,7 @@ bool Parser::rPostfixExpr(exprt &exp)
 
       {
         side_effect_exprt tmp(ID_postdecrement, typet(), source_locationt());
-        tmp.move_to_operands(exp);
+        tmp.add_to_operands(std::move(exp));
         set_location(tmp, op);
         exp.swap(tmp);
       }
@@ -6435,7 +6435,7 @@ bool Parser::rPostfixExpr(exprt &exp)
         else // ARROW
           exp=exprt(ID_ptrmember);
 
-        exp.move_to_operands(left);
+        exp.add_to_operands(std::move(left));
         set_location(exp, op);
       }
 
@@ -6494,7 +6494,7 @@ bool Parser::rMSCuuidof(exprt &expr)
     return false;
 
   expr=exprt(ID_msc_uuidof);
-  expr.move_to_operands(unary);
+  expr.add_to_operands(std::move(unary));
   set_location(expr, tk);
   return true;
 }
@@ -6542,7 +6542,7 @@ bool Parser::rMSC_if_existsExpr(exprt &expr)
     tk1.kind==TOK_MSC_IF_EXISTS?ID_msc_if_exists:
                                 ID_msc_if_not_exists);
 
-  expr.move_to_operands(name, op);
+  expr.add_to_operands(std::move(name), std::move(op));
 
   set_location(expr, tk1);
 
@@ -6584,7 +6584,7 @@ bool Parser::rMSC_if_existsStatement(codet &code)
     if(!rStatement(statement))
       return false;
 
-    block.move_to_operands(statement);
+    block.add_to_operands(std::move(statement));
   }
 
   if(lex.get_token(tk2)!='}')
@@ -6594,7 +6594,7 @@ bool Parser::rMSC_if_existsStatement(codet &code)
     tk1.kind==TOK_MSC_IF_EXISTS?ID_msc_if_exists:
                                 ID_msc_if_not_exists);
 
-  code.move_to_operands(name, block);
+  code.add_to_operands(std::move(name), std::move(block));
 
   set_location(code, tk1);
 
@@ -6755,7 +6755,7 @@ bool Parser::rPrimaryExpr(exprt &exp)
       exp=exprt(ID_side_effect);
       exp.set(ID_statement, ID_statement_expression);
       set_location(exp, tk);
-      exp.move_to_operands(code);
+      exp.add_to_operands(std::move(code));
 
       if(lex.get_token(tk2)!=')')
         return false;
@@ -6849,7 +6849,7 @@ bool Parser::rPrimaryExpr(exprt &exp)
 
           exp=exprt("explicit-constructor-call");
           exp.type().swap(type);
-          exp.move_to_operands(exp2);
+          exp.add_to_operands(std::move(exp2));
           set_location(exp, tk);
         }
         else if(lex.LookAhead(0)=='(')
@@ -7248,7 +7248,7 @@ bool Parser::rCompoundStatement(codet &statement)
       return true;        // error recovery
     }
 
-    statement.move_to_operands(statement2);
+    statement.add_to_operands(std::move(statement2));
   }
 
   if(lex.get_token(cb)!='}')
@@ -7375,7 +7375,7 @@ bool Parser::rStatement(codet &statement)
       if(lex.get_token(tk2)!=';')
         return false;
 
-      statement.move_to_operands(exp);
+      statement.add_to_operands(std::move(exp));
     }
 
     return true;
@@ -7491,7 +7491,7 @@ bool Parser::rStatement(codet &statement)
       if(!rStatement(statement2))
         return false;
 
-      statement.move_to_operands(statement2);
+      statement.add_to_operands(std::move(statement2));
       return true;
     }
 
@@ -7612,7 +7612,7 @@ bool Parser::rSwitchStatement(codet &statement)
   if(!rStatement(body))
     return false;
 
-  statement.move_to_operands(exp, body);
+  statement.add_to_operands(std::move(exp), std::move(body));
 
   return true;
 }
@@ -7645,7 +7645,7 @@ bool Parser::rWhileStatement(codet &statement)
   if(!rStatement(body))
     return false;
 
-  statement.move_to_operands(exp, body);
+  statement.add_to_operands(std::move(exp), std::move(body));
 
   return true;
 }
@@ -7684,7 +7684,7 @@ bool Parser::rDoStatement(codet &statement)
   if(lex.get_token(tk4)!=';')
     return false;
 
-  statement.move_to_operands(exp, body);
+  statement.add_to_operands(std::move(exp), std::move(body));
 
   return true;
 }
@@ -7742,10 +7742,10 @@ bool Parser::rForStatement(codet &statement)
     return false;
 
   statement.reserve_operands(4);
-  statement.move_to_operands(exp1);
-  statement.move_to_operands(exp2);
-  statement.move_to_operands(exp3);
-  statement.move_to_operands(body);
+  statement.add_to_operands(std::move(exp1));
+  statement.add_to_operands(std::move(exp2));
+  statement.add_to_operands(std::move(exp3));
+  statement.add_to_operands(std::move(body));
 
   return true;
 }
@@ -7811,7 +7811,7 @@ bool Parser::rTryStatement(codet &statement)
 
       codet code_decl;
       code_decl.set_statement(ID_decl);
-      code_decl.move_to_operands(declaration);
+      code_decl.add_to_operands(std::move(declaration));
       set_location(code_decl, catch_token);
 
       catch_op=code_decl;
@@ -7829,7 +7829,7 @@ bool Parser::rTryStatement(codet &statement)
 
     body.operands().insert(body.operands().begin(), catch_op);
 
-    statement.move_to_operands(body);
+    statement.add_to_operands(std::move(body));
   }
   while(lex.LookAhead(0)==TOK_CATCH);
 
@@ -7873,7 +7873,8 @@ bool Parser::rMSC_tryStatement(codet &statement)
     if(!rCompoundStatement(body2))
       return false;
 
-    statement.move_to_operands(body1, exp, body2);
+    statement.add_to_operands(
+      std::move(body1), std::move(exp), std::move(body2));
   }
   else if(lex.LookAhead(0)==TOK_MSC_FINALLY)
   {
@@ -7883,7 +7884,7 @@ bool Parser::rMSC_tryStatement(codet &statement)
     if(!rCompoundStatement(body2))
       return false;
 
-    statement.move_to_operands(body1, body2);
+    statement.add_to_operands(std::move(body1), std::move(body2));
   }
   else
     return false;
@@ -8044,7 +8045,7 @@ bool Parser::rMSCAsmStatement(codet &statement)
 
     lex.get_token(tk);
 
-    statement.move_to_operands(tk.data);
+    statement.add_to_operands(std::move(tk.data));
     if(lex.get_token(tk)!='}')
       return false;
 
@@ -8062,7 +8063,7 @@ bool Parser::rMSCAsmStatement(codet &statement)
       return true;
 
     lex.get_token(tk);
-    statement.move_to_operands(tk.data);
+    statement.add_to_operands(std::move(tk.data));
 
     #ifdef DEBUG
     std::cout << std::string(__indent, ' ') << "Parser::rMSCAsmStatement 6\n";
@@ -8151,7 +8152,7 @@ bool Parser::rExprStatement(codet &statement)
 
       statement=codet(ID_expression);
       statement.add_source_location()=exp.source_location();
-      statement.move_to_operands(exp);
+      statement.add_to_operands(std::move(exp));
       return true;
     }
   }
@@ -8168,7 +8169,7 @@ bool Parser::rCondition(exprt &statement)
   if(rSimpleDeclaration(declaration))
   {
     statement=codet(ID_decl);
-    statement.move_to_operands(declaration);
+    statement.add_to_operands(std::move(declaration));
     return true;
   }
   else
@@ -8286,7 +8287,7 @@ bool Parser::rIntegralDeclStatement(
     lex.get_token(tk);
     statement=codet(ID_decl);
     set_location(statement, tk);
-    statement.move_to_operands(declaration);
+    statement.add_to_operands(std::move(declaration));
   }
   else
   {
@@ -8299,7 +8300,7 @@ bool Parser::rIntegralDeclStatement(
     statement=codet(ID_decl);
     set_location(statement, tk);
 
-    statement.move_to_operands(declaration);
+    statement.add_to_operands(std::move(declaration));
   }
 
   return true;
@@ -8354,7 +8355,7 @@ bool Parser::rOtherDeclStatement(
 
   statement=codet(ID_decl);
   set_location(statement, tk);
-  statement.move_to_operands(declaration);
+  statement.add_to_operands(std::move(declaration));
 
   return true;
 }

@@ -57,9 +57,7 @@ void cpp_typecheckt::convert_anonymous_union(
     throw 0;
   }
 
-  code_declt decl_statement(cpp_symbol_expr(symbol));
-
-  new_code.move_to_operands(decl_statement);
+  new_code.add_to_operands(code_declt(cpp_symbol_expr(symbol)));
 
   // do scoping
   symbolt union_symbol=

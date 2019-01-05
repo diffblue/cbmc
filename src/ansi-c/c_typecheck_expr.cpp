@@ -943,7 +943,7 @@ void c_typecheck_baset::typecheck_side_effect_statement_expression(
     {
       side_effect_exprt assign(
         ID_assign, sideeffect.type(), fc.source_location());
-      assign.move_to_operands(fc.lhs(), sideeffect);
+      assign.add_to_operands(fc.lhs(), std::move(sideeffect));
 
       code_expressiont code_expr(assign);
       code_expr.add_source_location() = fc.source_location();
@@ -1302,7 +1302,7 @@ void c_typecheck_baset::typecheck_expr_index(exprt &expr)
     typecheck_arithmetic_pointer(expr.op0());
     exprt addition(ID_plus, array_expr.type());
     addition.operands().swap(expr.operands());
-    expr.move_to_operands(addition);
+    expr.add_to_operands(std::move(addition));
     expr.id(ID_dereference);
     expr.set(ID_C_lvalue, true);
     expr.type() = final_array_type.subtype();

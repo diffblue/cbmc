@@ -285,14 +285,10 @@ void symex_slice_by_tracet::compute_ts_back(
 
             for(const auto &sigma_val : sigma_vals[j])
             {
-              exprt equal_cond=exprt(ID_equal, bool_typet());
-              equal_cond.operands().reserve(2);
-              equal_cond.copy_to_operands(*pvi);
               // Should eventually change to handle non-bv types!
               exprt constant_value = from_integer(
                 unsafe_string2int(id2string(sigma_val)), (*pvi).type());
-              equal_cond.move_to_operands(constant_value);
-              eq_conds.push_back(equal_cond);
+              eq_conds.push_back(equal_exprt(*pvi, std::move(constant_value)));
               pvi++;
             }
 
@@ -305,7 +301,7 @@ void symex_slice_by_tracet::compute_ts_back(
               val_merge.copy_to_operands(eq_cond);
             }
 
-            u_lhs.move_to_operands(val_merge);
+            u_lhs.add_to_operands(std::move(val_merge));
           }
           else
           {

@@ -45,7 +45,7 @@ void cpp_typecheckt::default_dtor(
 
   dtor.add(ID_type).id(ID_destructor);
   dtor.add(ID_storage_spec).id(ID_cpp_storage_spec);
-  dtor.move_to_operands(decl);
+  dtor.add_to_operands(std::move(decl));
 }
 
 /// produces destructor code for a class object

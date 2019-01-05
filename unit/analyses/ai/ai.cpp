@@ -224,7 +224,7 @@ SCENARIO(
 
   loop.body() = loop_body;
 
-  f_body.move_to_operands(loop);
+  f_body.add_to_operands(std::move(loop));
 
   f_body.copy_to_operands(make_void_call(g.symbol_expr()));
 

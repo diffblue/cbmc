@@ -26,7 +26,7 @@ code_blockt &codet::make_block()
   tmp.swap(*this);
 
   *this = codet(ID_block);
-  move_to_operands(tmp);
+  add_to_operands(std::move(tmp));
 
   return static_cast<code_blockt &>(*this);
 }

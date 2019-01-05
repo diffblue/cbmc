@@ -116,13 +116,13 @@ SCENARIO("irept_sharing", "[core][utils][irept]")
 
 SCENARIO("exprt_sharing_trade_offs", "[!mayfail][core][utils][exprt]")
 {
-  GIVEN("An expression created with move_to_operands")
+  GIVEN("An expression created with add_to_operands(std::move(...))")
   {
     exprt test_expr(ID_1);
     exprt test_subexpr(ID_1);
     exprt test_subsubexpr(ID_1);
-    test_subexpr.move_to_operands(test_subsubexpr);
-    test_expr.move_to_operands(test_subexpr);
+    test_subexpr.add_to_operands(std::move(test_subsubexpr));
+    test_expr.add_to_operands(std::move(test_subexpr));
     THEN("Calling read() on a copy should return object with the same address")
     {
       exprt expr = test_expr;
@@ -150,13 +150,13 @@ SCENARIO("exprt_sharing_trade_offs", "[!mayfail][core][utils][exprt]")
 
 SCENARIO("exprt_sharing", "[core][utils][exprt]")
 {
-  GIVEN("An expression created with move_to_operands")
+  GIVEN("An expression created with add_to_operands(std::move(...))")
   {
     exprt test_expr(ID_1);
     exprt test_subexpr(ID_1);
     exprt test_subsubexpr(ID_1);
-    test_subexpr.move_to_operands(test_subsubexpr);
-    test_expr.move_to_operands(test_subexpr);
+    test_subexpr.add_to_operands(std::move(test_subsubexpr));
+    test_expr.add_to_operands(std::move(test_subexpr));
     THEN("Copies of a copy should return object with the same address")
     {
       exprt expr1 = test_expr;
