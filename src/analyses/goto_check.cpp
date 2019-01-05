@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/array_name.h>
 #include <util/base_type.h>
 #include <util/c_types.h>
+#include <util/config.h>
 #include <util/cprover_prefix.h>
 #include <util/expr_util.h>
 #include <util/find_symbols.h>
@@ -662,12 +663,40 @@ void goto_checkt::integer_overflow_check(
 
       const exprt op_ext_shifted = shl_exprt(op_ext, distance);
 
-      // get top bits of the shifted operand
+      // The semantics of signed left shifts are contentious for the case
+      // that a '1' is shifted into the signed bit.
+      // Assuming 32-bit integers, 1<<31 is implementation-defined
+      // in ANSI C and C++98, but is explicitly undefined by C99,
+      // C11 and C++11.
+      bool allow_shift_into_sign_bit = true;
+
+      if(mode == ID_C)
+      {
+        if(
+          config.ansi_c.c_standard == configt::ansi_ct::c_standardt::C99 ||
+          config.ansi_c.c_standard == configt::ansi_ct::c_standardt::C11)
+        {
+          allow_shift_into_sign_bit = false;
+        }
+      }
+      else if(mode == ID_cpp)
+      {
+        if(
+          config.cpp.cpp_standard == configt::cppt::cpp_standardt::CPP11 ||
+          config.cpp.cpp_standard == configt::cppt::cpp_standardt::CPP14)
+        {
+          allow_shift_into_sign_bit = false;
+        }
+      }
+
+      const unsigned number_of_top_bits =
+        allow_shift_into_sign_bit ? op_width : op_width + 1;
+
       const exprt top_bits = extractbits_exprt(
         op_ext_shifted,
         new_type.get_width() - 1,
-        op_width - 1,
-        unsignedbv_typet(op_width + 1));
+        new_type.get_width() - number_of_top_bits,
+        unsignedbv_typet(number_of_top_bits));
 
       const exprt top_bits_zero =
         equal_exprt(top_bits, from_integer(0, top_bits.type()));
