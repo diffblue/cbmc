@@ -1270,9 +1270,9 @@ void c_typecheck_baset::typecheck_expr_index(exprt &expr)
     // p[i] is syntactic sugar for *(p+i)
 
     typecheck_arithmetic_pointer(expr.op0());
-    exprt addition(ID_plus, array_expr.type());
-    addition.operands().swap(expr.operands());
-    expr.add_to_operands(std::move(addition));
+    exprt::operandst summands;
+    std::swap(summands, expr.operands());
+    expr.add_to_operands(plus_exprt(std::move(summands), array_expr.type()));
     expr.id(ID_dereference);
     expr.set(ID_C_lvalue, true);
     expr.type() = final_array_type.subtype();
