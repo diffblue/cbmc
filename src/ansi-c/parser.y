@@ -2323,27 +2323,21 @@ selection_statement:
         {
           $$=$1;
           statement($$, ID_ifthenelse);
-          stack($$).operands().reserve(3);
-          mto($$, $3);
-          mto($$, $5);
-          stack($$).copy_to_operands(nil_exprt());
+          stack($$).add_to_operands(
+            std::move(stack($3)), std::move(stack($5)), nil_exprt());
         }
         | TOK_IF '(' comma_expression ')' statement TOK_ELSE statement
         {
           $$=$1;
           statement($$, ID_ifthenelse);
-          stack($$).operands().reserve(3);
-          mto($$, $3);
-          mto($$, $5);
-          mto($$, $7);
+          stack($$).add_to_operands(
+            std::move(stack($3)), std::move(stack($5)), std::move(stack($7)));
         }
         | TOK_SWITCH '(' comma_expression ')' statement
         {
           $$=$1;
           statement($$, ID_switch);
-          stack($$).operands().reserve(2);
-          mto($$, $3);
-          mto($$, $5);
+          stack($$).add_to_operands(std::move(stack($3)), std::move(stack($5)));
         }
         ;
 
@@ -2358,9 +2352,7 @@ iteration_statement:
         {
           $$=$1;
           statement($$, ID_while);
-          stack($$).operands().reserve(2);
-          mto($$, $3);
-          mto($$, $6);
+          stack($$).add_to_operands(std::move(stack($3)), std::move(stack($6)));
 
           if(stack($5).is_not_nil())
             stack($$).add(ID_C_spec_loop_invariant).swap(stack($5));
@@ -2370,9 +2362,7 @@ iteration_statement:
         {
           $$=$1;
           statement($$, ID_dowhile);
-          stack($$).operands().reserve(2);
-          mto($$, $5);
-          mto($$, $2);
+          stack($$).add_to_operands(std::move(stack($5)), std::move(stack($2)));
 
           if(stack($7).is_not_nil())
             stack($$).add(ID_C_spec_loop_invariant).swap(stack($7));
