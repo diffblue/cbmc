@@ -1394,9 +1394,8 @@ bool cpp_typecheckt::reference_binding(
   {
     {
       // create temporary object
-      exprt tmp=exprt(ID_side_effect, type.subtype());
-      tmp.set(ID_statement, ID_temporary_object);
-      tmp.add_source_location()=expr.source_location();
+      side_effect_exprt tmp(
+        ID_temporary_object, type.subtype(), expr.source_location());
       // tmp.set(ID_C_lvalue, true);
       tmp.add_to_operands(std::move(new_expr));
       new_expr.swap(tmp);
