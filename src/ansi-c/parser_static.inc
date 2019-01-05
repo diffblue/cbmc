@@ -13,7 +13,7 @@
 #define mts(x, y) (to_type_with_subtypes(stack_type(x)).move_to_subtypes(stack_type(y)))
 #define binary(x, y, l, id, z) { init(x, id); \
   stack(x).add_source_location()=stack(l).source_location(); \
-  stack(x).reserve_operands(2); mto(x, y); mto(x, z); }
+  stack(x).add_to_operands(std::move(stack(y)), std::move(stack(z))); }
 
 /*******************************************************************\
 
