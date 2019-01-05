@@ -169,6 +169,7 @@ public:
   bool is_nil() const { return id()==ID_nil; }
   bool is_not_nil() const { return id()!=ID_nil; }
 
+#if !defined(USE_MOVE) || !defined(SHARING)
   explicit irept(const irep_idt &_id)
 #ifdef SHARING
     :data(&empty_d)
@@ -177,7 +178,27 @@ public:
     id(_id);
   }
 
-  #ifdef SHARING
+  irept(const irep_idt &_id, const named_subt &_named_sub, const subt &_sub)
+#ifdef SHARING
+    : data(&empty_d)
+#endif
+  {
+    id(_id);
+    get_named_sub() = _named_sub;
+    get_sub() = _sub;
+  }
+#else
+  explicit irept(irep_idt _id) : data(new dt(std::move(_id)))
+  {
+  }
+
+  irept(irep_idt _id, named_subt _named_sub, subt _sub)
+    : data(new dt(std::move(_id), std::move(_named_sub), std::move(_sub)))
+  {
+  }
+#endif
+
+#ifdef SHARING
   // constructor for blank irep
   irept():data(&empty_d)
   {
@@ -335,9 +356,9 @@ public:
   private:
     friend class irept;
 
-    #ifdef SHARING
-    unsigned ref_count;
-    #endif
+#ifdef SHARING
+    unsigned ref_count = 1;
+#endif
 
     /// This irep_idt is the only place to store data in an irep, other than
     /// the mere nesting structure
@@ -346,9 +367,9 @@ public:
     named_subt named_sub;
     subt sub;
 
-    #ifdef HASH_CODE
-    mutable std::size_t hash_code;
-    #endif
+#ifdef HASH_CODE
+    mutable std::size_t hash_code = 0;
+#endif
 
     void clear()
     {
@@ -370,21 +391,20 @@ public:
       #endif
     }
 
-    #ifdef SHARING
-    dt():ref_count(1)
-      #ifdef HASH_CODE
-         , hash_code(0)
-      #endif
+    dt() = default;
+
+#ifdef USE_MOVE
+    explicit dt(irep_idt _data) : data(std::move(_data))
     {
     }
-    #else
-    dt()
-      #ifdef HASH_CODE
-      :hash_code(0)
-      #endif
+
+    dt(irep_idt _data, named_subt _named_sub, subt _sub)
+      : data(std::move(_data)),
+        named_sub(std::move(_named_sub)),
+        sub(std::move(_sub))
     {
     }
-    #endif
+#endif
   };
 
 protected:

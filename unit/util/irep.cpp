@@ -72,6 +72,19 @@ SCENARIO("irept_memory", "[core][utils][irept]")
     }
   }
 
+  GIVEN("Parts of an irep")
+  {
+    irept irep("some_id", {{"some_member", irept("other")}}, {irept("op")});
+
+    THEN("It is properly initialized")
+    {
+      REQUIRE(irep.id() == "some_id");
+      REQUIRE(irep.find("some_member") == irept("other"));
+      REQUIRE(irep.get_sub().size() == 1);
+      REQUIRE(irep.get_sub().front() == irept("op"));
+    }
+  }
+
   GIVEN("An initialized irep")
   {
     irept irep("some_id");
