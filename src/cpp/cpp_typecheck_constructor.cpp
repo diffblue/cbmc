@@ -235,7 +235,7 @@ void cpp_typecheckt::default_cpctor(
       address_of_exprt address(var);
       assert(address.type() == mem_c.type());
 
-      already_typechecked(address);
+      already_typechecked_exprt::make_already_typechecked(address);
 
       exprt ptrmember(ID_ptrmember);
       ptrmember.set(ID_component_name, mem_c.get_name());
@@ -690,7 +690,7 @@ void cpp_typecheckt::full_member_initialization(
       address_of_exprt address(var);
       assert(address.type() == c.type());
 
-      already_typechecked(address);
+      already_typechecked_exprt::make_already_typechecked(address);
 
       exprt ptrmember(ID_ptrmember);
       ptrmember.set(ID_component_name, c.get_name());

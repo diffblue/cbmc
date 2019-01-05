@@ -116,7 +116,7 @@ void cpp_typecheckt::convert_non_template_declaration(
 
   // mark as 'already typechecked'
   if(!declaration.declarators().empty())
-    make_already_typechecked(declaration_type);
+    already_typechecked_typet::make_already_typechecked(declaration_type);
 
   // Special treatment for anonymous unions
   if(declaration.declarators().empty() &&

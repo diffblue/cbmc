@@ -668,17 +668,16 @@ void cpp_typecheckt::typecheck_compound_declarator(
            code_type.return_type().id()!=ID_destructor)
         {
           expr_call.type()=to_code_type(component.type()).return_type();
-          exprt already_typechecked(ID_already_typechecked);
-          already_typechecked.add_to_operands(std::move(expr_call));
 
-          func_symb.value = code_returnt(already_typechecked).make_block();
+          func_symb.value =
+            code_returnt(already_typechecked_exprt{std::move(expr_call)})
+              .make_block();
         }
         else
         {
-          exprt already_typechecked(ID_already_typechecked);
-          already_typechecked.add_to_operands(std::move(expr_call));
-
-          func_symb.value = code_expressiont(already_typechecked).make_block();
+          func_symb.value =
+            code_expressiont(already_typechecked_exprt{std::move(expr_call)})
+              .make_block();
         }
 
         // add this new function to the list of components

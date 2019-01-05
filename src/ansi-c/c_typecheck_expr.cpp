@@ -38,10 +38,7 @@ void c_typecheck_baset::typecheck_expr(exprt &expr)
 {
   if(expr.id()==ID_already_typechecked)
   {
-    assert(expr.operands().size()==1);
-    exprt tmp;
-    tmp.swap(expr.op0());
-    expr.swap(tmp);
+    expr.swap(to_already_typechecked_expr(expr).get_expr());
     return;
   }
 

@@ -359,7 +359,7 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
       else
       {
         // it's a data member
-        already_typechecked(symbol_expr);
+        already_typechecked_exprt::make_already_typechecked(symbol_expr);
 
         auto call =
           cpp_constructor(code.source_location(), symbol_expr, code.operands());
@@ -423,7 +423,7 @@ void cpp_typecheckt::typecheck_decl(codet &code)
   }
 
   // mark as 'already typechecked'
-  make_already_typechecked(type);
+  already_typechecked_typet::make_already_typechecked(type);
 
   codet new_code(ID_decl_block);
   new_code.reserve_operands(declaration.declarators().size());
@@ -469,7 +469,7 @@ void cpp_typecheckt::typecheck_decl(codet &code)
     {
       exprt object_expr=cpp_symbol_expr(symbol);
 
-      already_typechecked(object_expr);
+      already_typechecked_exprt::make_already_typechecked(object_expr);
 
       auto constructor_call = cpp_constructor(
         symbol.location, object_expr, declarator.init_args().operands());

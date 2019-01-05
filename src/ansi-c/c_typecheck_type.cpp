@@ -40,14 +40,17 @@ void c_typecheck_baset::typecheck_type(typet &type)
 
   if(type.id()==ID_already_typechecked)
   {
+    already_typechecked_typet &already_typechecked =
+      to_already_typechecked_type(type);
+
     // need to preserve any qualifiers
     c_qualifierst c_qualifiers(type);
-    c_qualifiers+=c_qualifierst(type.subtype());
+    c_qualifiers += c_qualifierst(already_typechecked.get_type());
     bool packed=type.get_bool(ID_C_packed);
     exprt alignment=static_cast<const exprt &>(type.find(ID_C_alignment));
     irept _typedef=type.find(ID_C_typedef);
 
-    type=type.subtype();
+    type = already_typechecked.get_type();
 
     c_qualifiers.write(type);
     if(packed)
@@ -896,7 +899,7 @@ void c_typecheck_baset::typecheck_compound_body(
     {
       // do first half of type
       typecheck_type(declaration.type());
-      make_already_typechecked(declaration.type());
+      already_typechecked_typet::make_already_typechecked(declaration.type());
 
       for(const auto &declarator : declaration.declarators())
       {

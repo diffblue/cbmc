@@ -276,7 +276,7 @@ void cpp_typecheckt::new_temporary(
   new_object.set(ID_C_lvalue, true);
   new_object.type()=tmp_object_expr.type();
 
-  already_typechecked(new_object);
+  already_typechecked_exprt::make_already_typechecked(new_object);
 
   auto new_code = cpp_constructor(source_location, new_object, ops);
 

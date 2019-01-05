@@ -225,13 +225,6 @@ protected:
     const mp_integer &min, const mp_integer &max,
     bool is_packed) const;
 
-  void make_already_typechecked(typet &dest)
-  {
-    typet result(ID_already_typechecked);
-    result.subtype().swap(dest);
-    result.swap(dest);
-  }
-
   // this cleans expressions in array types
   std::list<codet> clean_code;
 
@@ -271,5 +264,61 @@ protected:
 
   void apply_asm_label(const irep_idt &asm_label, symbolt &symbol);
 };
+
+class already_typechecked_exprt : public expr_protectedt
+{
+public:
+  explicit already_typechecked_exprt(exprt expr)
+    : expr_protectedt(ID_already_typechecked, typet{}, {std::move(expr)})
+  {
+  }
+
+  static void make_already_typechecked(exprt &expr)
+  {
+    already_typechecked_exprt a{expr};
+    expr.swap(a);
+  }
+
+  exprt &get_expr()
+  {
+    return op0();
+  }
+};
+
+class already_typechecked_typet : public type_with_subtypet
+{
+public:
+  explicit already_typechecked_typet(typet type)
+    : type_with_subtypet(ID_already_typechecked, std::move(type))
+  {
+  }
+
+  static void make_already_typechecked(typet &type)
+  {
+    already_typechecked_typet a{type};
+    type.swap(a);
+  }
+
+  typet &get_type()
+  {
+    return subtype();
+  }
+};
+
+inline already_typechecked_exprt &to_already_typechecked_expr(exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_already_typechecked);
+  PRECONDITION(expr.operands().size() == 1);
+
+  return static_cast<already_typechecked_exprt &>(expr);
+}
+
+inline already_typechecked_typet &to_already_typechecked_type(typet &type)
+{
+  PRECONDITION(type.id() == ID_already_typechecked);
+  PRECONDITION(type.has_subtype());
+
+  return static_cast<already_typechecked_typet &>(type);
+}
 
 #endif // CPROVER_ANSI_C_C_TYPECHECK_BASE_H
