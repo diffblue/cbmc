@@ -19,10 +19,10 @@ SCENARIO("range tests", "[core][util][range]")
     list.emplace_back("abc");
     list.emplace_back("cdef");
     list.emplace_back("acdef");
-    auto range = make_range(list);
-    std::size_t total_length = 0;
     THEN("Use range-for to compute the total length")
     {
+      auto range = make_range(list);
+      std::size_t total_length = 0;
       for(const auto &s : range)
         total_length += s.length();
       REQUIRE(total_length == 12);
