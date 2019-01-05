@@ -305,31 +305,28 @@ bool compilet::add_files_from_archive(
 /// \return true if found, false otherwise
 bool compilet::find_library(const std::string &name)
 {
-  std::string tmp;
+  std::string library_file_name;
 
   for(const auto &library_path : library_paths)
   {
-    #ifdef _WIN32
-    tmp = library_path + "\\lib";
-    #else
-    tmp = library_path + "/lib";
-    #endif
+    library_file_name = concat_dir_file(library_path, "lib" + name + ".a");
 
-    std::ifstream in(tmp+name+".a");
+    std::ifstream in(library_file_name);
 
     if(in.is_open())
-      return !add_input_file(tmp+name+".a");
+      return !add_input_file(library_file_name);
     else
     {
-      std::string libname=tmp+name+".so";
+      library_file_name = concat_dir_file(library_path, "lib" + name + ".so");
 
-      switch(detect_file_type(libname))
+      switch(detect_file_type(library_file_name))
       {
       case file_typet::GOTO_BINARY:
-        return !add_input_file(libname);
+        return !add_input_file(library_file_name);
 
       case file_typet::ELF_OBJECT:
-        warning() << "Warning: Cannot read ELF library " << libname << eom;
+        warning() << "Warning: Cannot read ELF library " << library_file_name
+                  << eom;
         return warning_is_fatal;
 
       default:
