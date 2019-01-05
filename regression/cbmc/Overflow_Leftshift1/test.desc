@@ -3,8 +3,13 @@ main.c
 --signed-overflow-check
 ^EXIT=10$
 ^SIGNAL=0$
-^\[.*\] .* arithmetic overflow on signed shl in .*: FAILURE$
-^\*\* 2 of 4 failed
+^\[.*\] line 6 arithmetic overflow on signed shl in .*: FAILURE$
+^\[.*\] line 9 arithmetic overflow on signed shl in .*: SUCCESS$
+^\[.*\] line 15 arithmetic overflow on signed shl in .*: SUCCESS$
+^\[.*\] line 18 arithmetic overflow on signed shl in .*: FAILURE$
+^\*\* 2 of 5 failed
 ^VERIFICATION FAILED$
 --
 ^warning: ignoring
+^\[.*\] line 12 arithmetic overflow on signed shl in .*: .*
+^\[.*\] line 21 arithmetic overflow on signed shl in .*: .*
