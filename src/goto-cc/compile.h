@@ -71,8 +71,6 @@ public:
 
   bool parse_source(const std::string &);
 
-  bool write_object_file(const std::string &, const goto_modelt &);
-
   bool write_bin_object_file(const std::string &, const goto_modelt &);
 
   /// \brief Has this compiler written any object files?
@@ -98,7 +96,7 @@ protected:
 
   std::size_t function_body_count(const goto_functionst &) const;
 
-  void add_compiler_specific_defines(class configt &config) const;
+  void add_compiler_specific_defines() const;
 
   void convert_symbols(goto_functionst &dest);
 

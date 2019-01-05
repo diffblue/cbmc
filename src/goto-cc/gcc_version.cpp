@@ -95,7 +95,7 @@ void gcc_versiont::get(const std::string &executable)
         out << "default_cxx_standard __cplusplus\n";
       }
 
-      int result = run(
+      result = run(
         executable,
         {executable, "-E", "-x", "c++", "-", "-o", "-"},
         cpp_in(),
@@ -104,10 +104,9 @@ void gcc_versiont::get(const std::string &executable)
 
       if(result >= 0)
       {
-        std::ifstream in(cpp_out());
-        std::string line;
+        std::ifstream in2(cpp_out());
 
-        while(!in.fail() && std::getline(in, line))
+        while(!in2.fail() && std::getline(in2, line))
         {
           if(line.empty() || line[0] == '#')
             continue;

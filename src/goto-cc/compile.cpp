@@ -79,7 +79,7 @@ bool compilet::doit()
 {
   goto_model.goto_functions.clear();
 
-  add_compiler_specific_defines(config);
+  add_compiler_specific_defines();
 
   // Parse command line for source and object file names
   for(const auto &arg : cmdline.args)
@@ -381,7 +381,7 @@ bool compilet::link()
     convert_symbols(goto_model.goto_functions);
   }
 
-  if(write_object_file(output_file_executable, goto_model))
+  if(write_bin_object_file(output_file_executable, goto_model))
     return true;
 
   return add_written_cprover_symbols(goto_model.symbol_table);
@@ -441,7 +441,7 @@ bool compilet::compile()
       else
         cfn = output_file_object;
 
-      if(write_object_file(cfn, goto_model))
+      if(write_bin_object_file(cfn, goto_model))
         return true;
 
       if(add_written_cprover_symbols(goto_model.symbol_table))
@@ -580,31 +580,21 @@ bool compilet::parse_stdin()
   return false;
 }
 
-/// writes the goto functions in the function table to a binary format object
+/// Writes the goto functions of \p src_goto_model to a binary format object
 /// file.
-/// \par parameters: file_name, functions table
-/// \return true on error, false otherwise
-bool compilet::write_object_file(
-  const std::string &file_name,
-  const goto_modelt &goto_model)
-{
-  return write_bin_object_file(file_name, goto_model);
-}
-
-/// writes the goto functions in the function table to a binary format object
-/// file.
-/// \par parameters: file_name, functions table
+/// \param file_name: Target file to serialize \p src_goto_model to
+/// \param src_goto_model: goto model to serialize
 /// \return true on error, false otherwise
 bool compilet::write_bin_object_file(
   const std::string &file_name,
-  const goto_modelt &goto_model)
+  const goto_modelt &src_goto_model)
 {
   statistics() << "Writing binary format object `"
                << file_name << "'" << eom;
 
   // symbols
-  statistics() << "Symbols in table: " << goto_model.symbol_table.symbols.size()
-               << eom;
+  statistics() << "Symbols in table: "
+               << src_goto_model.symbol_table.symbols.size() << eom;
 
   std::ofstream outfile(file_name, std::ios::binary);
 
@@ -614,13 +604,14 @@ bool compilet::write_bin_object_file(
     return true;
   }
 
-  if(write_goto_binary(outfile, goto_model))
+  if(write_goto_binary(outfile, src_goto_model))
     return true;
 
-  const auto cnt = function_body_count(goto_model.goto_functions);
+  const auto cnt = function_body_count(src_goto_model.goto_functions);
 
-  statistics() << "Functions: " << goto_model.goto_functions.function_map.size()
-               << "; " << cnt << " have a body." << eom;
+  statistics() << "Functions: "
+               << src_goto_model.goto_functions.function_map.size() << "; "
+               << cnt << " have a body." << eom;
 
   outfile.close();
   wrote_object=true;
@@ -690,7 +681,7 @@ compilet::function_body_count(const goto_functionst &functions) const
   return count;
 }
 
-void compilet::add_compiler_specific_defines(configt &config) const
+void compilet::add_compiler_specific_defines() const
 {
   config.ansi_c.defines.push_back(
     std::string("__GOTO_CC_VERSION__=") + CBMC_VERSION);
