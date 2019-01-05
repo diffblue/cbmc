@@ -293,11 +293,10 @@ void bmc_all_propertiest::report(const cover_goalst &cover_goals)
   }
 }
 
-safety_checkert::resultt bmct::all_properties(
-  const goto_functionst &goto_functions,
-  prop_convt &solver)
+safety_checkert::resultt
+bmct::all_properties(const goto_functionst &goto_functions)
 {
-  bmc_all_propertiest bmc_all_properties(goto_functions, solver, *this);
+  bmc_all_propertiest bmc_all_properties(goto_functions, prop_conv, *this);
   bmc_all_properties.set_message_handler(get_message_handler());
   return bmc_all_properties();
 }

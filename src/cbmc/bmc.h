@@ -177,12 +177,9 @@ protected:
   // use gui format
   ui_message_handlert &ui_message_handler;
 
-  virtual decision_proceduret::resultt
-    run_decision_procedure(prop_convt &prop_conv);
+  virtual decision_proceduret::resultt run_decision_procedure();
 
-  virtual resultt decide(
-    const goto_functionst &,
-    prop_convt &);
+  virtual resultt decide(const goto_functionst &);
 
   void do_conversion();
 
@@ -193,10 +190,8 @@ protected:
     return trace_optionst(options);
   }
 
-  virtual resultt all_properties(
-    const goto_functionst &goto_functions,
-    prop_convt &solver);
-  virtual resultt stop_on_fail(prop_convt &solver);
+  virtual resultt all_properties(const goto_functionst &goto_functions);
+  virtual resultt stop_on_fail();
   virtual void report_success();
   virtual void report_failure();
 

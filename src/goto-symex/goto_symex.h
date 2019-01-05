@@ -468,7 +468,7 @@ public:
     return _remaining_vccs;
   }
 
-  void validate(const namespacet &ns, const validation_modet vm) const
+  void validate(const validation_modet vm) const
   {
     target.validate(ns, vm);
   }
