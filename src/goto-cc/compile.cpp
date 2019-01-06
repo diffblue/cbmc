@@ -21,9 +21,11 @@ Date: June 2006
 #include <util/config.h>
 #include <util/file_util.h>
 #include <util/get_base_name.h>
+#include <util/run.h>
 #include <util/suffix.h>
 #include <util/symbol_table_builder.h>
 #include <util/tempdir.h>
+#include <util/tempfile.h>
 #include <util/unicode.h>
 #include <util/version.h>
 
@@ -46,21 +48,6 @@ Date: June 2006
                           "compound=true;"\
                           "size=\"30,40\";"\
                           "ratio=compress;"
-
-#ifdef _WIN32
-#include <util/pragma_push.def>
-#ifdef _MSC_VER
-#pragma warning(disable:4668)
-  // using #if/#elif on undefined macro
-#pragma warning(disable : 5039)
-// pointer or reference to potentially throwing function passed to extern C
-#endif
-#include <direct.h>
-#include <windows.h>
-#define popen _popen
-#define pclose _pclose
-#include <util/pragma_pop.def>
-#endif
 
 /// reads and source and object files, compiles and links them into goto program
 /// objects.
@@ -221,9 +208,6 @@ bool compilet::add_files_from_archive(
   const std::string &file_name,
   bool thin_archive)
 {
-  std::stringstream cmd;
-  FILE *stream;
-
   std::string tstr = working_directory;
 
   if(!thin_archive)
@@ -234,44 +218,40 @@ bool compilet::add_files_from_archive(
     set_current_path(tmp_dirs.back());
 
     // unpack now
-    cmd << "ar x " << concat_dir_file(working_directory, file_name);
-
-    stream=popen(cmd.str().c_str(), "r");
-    pclose(stream);
-
-    cmd.clear();
-    cmd.str("");
+    int ret =
+      run("ar", {"ar", "x", concat_dir_file(working_directory, file_name)});
+    if(ret != 0)
+    {
+      error() << "Failed to extract archive " << file_name << eom;
+      return true;
+    }
   }
 
   // add the files from "ar t"
-  cmd << "ar t " << concat_dir_file(working_directory, file_name);
-
-  stream = popen(cmd.str().c_str(), "r");
-
-  if(stream != nullptr)
+  temporary_filet tmp_file_out("", "");
+  int ret = run(
+    "ar",
+    {"ar", "t", concat_dir_file(working_directory, file_name)},
+    "",
+    tmp_file_out(),
+    "");
+  if(ret != 0)
   {
-    std::string line;
-    int ch; // fgetc returns an int, not char
-    while((ch = fgetc(stream)) != EOF)
-    {
-      if(ch != '\n')
-      {
-        line += static_cast<char>(ch);
-      }
-      else
-      {
-        std::string t = concat_dir_file(tstr, line);
+    error() << "Failed to list archive " << file_name << eom;
+    return true;
+  }
 
-        if(is_goto_binary(t))
-          object_files.push_back(t);
-        else
-          debug() << "Object file is not a goto binary: " << line << eom;
+  std::ifstream in(tmp_file_out());
+  std::string line;
 
-        line = "";
-      }
-    }
+  while(!in.fail() && std::getline(in, line))
+  {
+    std::string t = concat_dir_file(tstr, line);
 
-    pclose(stream);
+    if(is_goto_binary(t))
+      object_files.push_back(t);
+    else
+      debug() << "Object file is not a goto binary: " << line << eom;
   }
 
   if(!thin_archive)
