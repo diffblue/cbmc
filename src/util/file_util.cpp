@@ -41,6 +41,7 @@ Date: January 2012
 #include <windows.h>
 #include <direct.h>
 #include <util/unicode.h>
+#define chdir _chdir
 #include <util/pragma_pop.def>
 #endif
 
@@ -66,6 +67,15 @@ std::string get_current_working_directory()
   #endif
 
   return working_directory;
+}
+
+/// Set working directory.
+/// \param path: New working directory to change to
+void set_current_path(const std::string &path)
+{
+  if(chdir(path.c_str()) != 0)
+    throw system_exceptiont(
+      std::string("chdir failed: ") + std::strerror(errno));
 }
 
 /// deletes all files in 'path' and then the directory itself
