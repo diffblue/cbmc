@@ -228,12 +228,6 @@ bool compilet::add_files_from_archive(
   {
     tstr = get_temporary_directory("goto-cc.XXXXXX");
 
-    if(tstr=="")
-    {
-      error() << "Cannot create temporary directory" << eom;
-      return true;
-    }
-
     tmp_dirs.push_back(tstr);
     set_current_path(tmp_dirs.back());
 
