@@ -257,7 +257,51 @@ bool generate_ansi_c_start_function(
     {
       namespacet ns(symbol_table);
 
-      const symbolt &argc_symbol=ns.lookup("argc'");
+      {
+        symbolt argc_symbol;
+
+        argc_symbol.base_name = "argc";
+        argc_symbol.name = "argc'";
+        argc_symbol.type = signed_int_type();
+        argc_symbol.is_static_lifetime = true;
+        argc_symbol.is_lvalue = true;
+        argc_symbol.mode = ID_C;
+
+        if(!symbol_table.insert(std::move(argc_symbol)).second)
+        {
+          messaget message(message_handler);
+          message.error() << "failed to insert argc symbol" << messaget::eom;
+          return true;
+        }
+      }
+
+      const symbolt &argc_symbol = ns.lookup("argc'");
+
+      {
+        // we make the type of this thing an array of pointers
+        // need to add one to the size -- the array is terminated
+        // with NULL
+        const exprt one_expr = from_integer(1, argc_symbol.type);
+        const plus_exprt size_expr(argc_symbol.symbol_expr(), one_expr);
+        const array_typet argv_type(pointer_type(char_type()), size_expr);
+
+        symbolt argv_symbol;
+
+        argv_symbol.base_name = "argv'";
+        argv_symbol.name = "argv'";
+        argv_symbol.type = argv_type;
+        argv_symbol.is_static_lifetime = true;
+        argv_symbol.is_lvalue = true;
+        argv_symbol.mode = ID_C;
+
+        if(!symbol_table.insert(std::move(argv_symbol)).second)
+        {
+          messaget message(message_handler);
+          message.error() << "failed to insert argv symbol" << messaget::eom;
+          return true;
+        }
+      }
+
       const symbolt &argv_symbol=ns.lookup("argv'");
 
       {
@@ -295,7 +339,41 @@ bool generate_ansi_c_start_function(
 
       if(parameters.size()==3)
       {
+        {
+          symbolt envp_size_symbol;
+          envp_size_symbol.base_name = "envp_size'";
+          envp_size_symbol.name = "envp_size'";
+          envp_size_symbol.type = size_type();
+          envp_size_symbol.is_static_lifetime = true;
+          envp_size_symbol.mode = ID_C;
+
+          if(!symbol_table.insert(std::move(envp_size_symbol)).second)
+          {
+            messaget message(message_handler);
+            message.error()
+              << "failed to insert envp_size symbol" << messaget::eom;
+            return true;
+          }
+        }
+
         const symbolt &envp_size_symbol=ns.lookup("envp_size'");
+
+        {
+          symbolt envp_symbol;
+          envp_symbol.base_name = "envp'";
+          envp_symbol.name = "envp'";
+          envp_symbol.type = array_typet(
+            pointer_type(char_type()), envp_size_symbol.symbol_expr());
+          envp_symbol.is_static_lifetime = true;
+          envp_symbol.mode = ID_C;
+
+          if(!symbol_table.insert(std::move(envp_symbol)).second)
+          {
+            messaget message(message_handler);
+            message.error() << "failed to insert envp symbol" << messaget::eom;
+            return true;
+          }
+        }
 
         // assume envp_size is INTMAX-1
         mp_integer max;
@@ -383,40 +461,36 @@ bool generate_ansi_c_start_function(
         exprt &op0=operands[0];
         exprt &op1=operands[1];
 
-        op0=argc_symbol.symbol_expr();
+        op0 = typecast_exprt::conditional_cast(
+          argc_symbol.symbol_expr(), parameters[0].type());
 
         {
-          const exprt &arg1=parameters[1];
-          const pointer_typet &pointer_type=
-            to_pointer_type(arg1.type());
-
           index_exprt index_expr(
-            argv_symbol.symbol_expr(),
-            from_integer(0, index_type()),
-            pointer_type.subtype());
+            argv_symbol.symbol_expr(), from_integer(0, index_type()));
 
           // disable bounds check on that one
           index_expr.set("bounds_check", false);
 
-          op1=address_of_exprt(index_expr, pointer_type);
+          const pointer_typet &pointer_type =
+            to_pointer_type(parameters[1].type());
+
+          op1 = typecast_exprt::conditional_cast(
+            address_of_exprt(index_expr), pointer_type);
         }
 
         // do we need envp?
         if(parameters.size()==3)
         {
           const symbolt &envp_symbol=ns.lookup("envp'");
-          exprt &op2=operands[2];
-
-          const exprt &arg2=parameters[2];
-          const pointer_typet &pointer_type=
-            to_pointer_type(arg2.type());
 
           index_exprt index_expr(
-            envp_symbol.symbol_expr(),
-            from_integer(0, index_type()),
-            pointer_type.subtype());
+            envp_symbol.symbol_expr(), from_integer(0, index_type()));
 
-          op2=address_of_exprt(index_expr, pointer_type);
+          const pointer_typet &pointer_type =
+            to_pointer_type(parameters[2].type());
+
+          operands[2] = typecast_exprt::conditional_cast(
+            address_of_exprt(index_expr), pointer_type);
         }
       }
     }
@@ -446,8 +520,7 @@ bool generate_ansi_c_start_function(
 
   if(!symbol_table.insert(std::move(new_symbol)).second)
   {
-    messaget message;
-    message.set_message_handler(message_handler);
+    messaget message(message_handler);
     message.error() << "failed to insert main symbol" << messaget::eom;
     return true;
   }

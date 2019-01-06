@@ -235,9 +235,6 @@ protected:
   // this cleans expressions in array types
   std::list<codet> clean_code;
 
-  // environment
-  void add_argc_argv(const symbolt &main_symbol);
-
   // symbol table management
   void move_symbol(symbolt &symbol, symbolt *&new_symbol);
   void move_symbol(symbolt &symbol)

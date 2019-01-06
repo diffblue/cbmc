@@ -565,10 +565,6 @@ void c_typecheck_baset::typecheck_function_body(symbolt &symbol)
   // typecheck the body code
   typecheck_code(to_code(symbol.value));
 
-  // special case for main()
-  if(symbol.name==ID_main)
-    add_argc_argv(symbol);
-
   // check the labels
   for(std::map<irep_idt, source_locationt>::const_iterator
       it=labels_used.begin(); it!=labels_used.end(); it++)

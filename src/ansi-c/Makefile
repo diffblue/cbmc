@@ -18,7 +18,6 @@ SRC = anonymous_member.cpp \
       c_qualifiers.cpp \
       c_storage_spec.cpp \
       c_typecast.cpp \
-      c_typecheck_argc_argv.cpp \
       c_typecheck_base.cpp \
       c_typecheck_code.cpp \
       c_typecheck_expr.cpp \
