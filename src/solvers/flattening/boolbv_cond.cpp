@@ -74,8 +74,8 @@ bvt boolbvt::convert_cond(const cond_exprt &expr)
 
       const bvt &op = convert_bv(value, bv.size());
 
-      for(std::size_t i=0; i<bv.size(); i++)
-        bv[i]=prop.lselect(cond_literal, op[i], bv[i]);
+      for(std::size_t j = 0; j < bv.size(); j++)
+        bv[j] = prop.lselect(cond_literal, op[j], bv[j]);
     }
   }
 

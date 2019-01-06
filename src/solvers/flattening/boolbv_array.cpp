@@ -27,7 +27,6 @@ bvt boolbvt::convert_array(const exprt &expr)
       expr.has_operands(),
       "the bit width being nonzero implies that the array has a nonzero size "
       "in which case the array shall have operands");
-    const exprt::operandst &operands=expr.operands();
     const std::size_t op_width = width / operands.size();
 
     bvt bv;

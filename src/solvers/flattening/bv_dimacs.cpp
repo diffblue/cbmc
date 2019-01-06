@@ -16,7 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <solvers/sat/dimacs_cnf.h>
 
-bool bv_dimacst::write_dimacs(const std::string &filename)
+bool bv_dimacst::write_dimacs()
 {
   if(filename.empty() || filename == "-")
     return write_dimacs(std::cout);
