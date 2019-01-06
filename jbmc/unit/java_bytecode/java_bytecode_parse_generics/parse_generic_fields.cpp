@@ -26,9 +26,8 @@ SCENARIO(
       REQUIRE(new_symbol_table.has_symbol(class_prefix));
 
       const symbolt &class_symbol = new_symbol_table.lookup_ref(class_prefix);
-      const java_generic_class_typet &java_generic_class_type =
-        require_type::require_complete_java_generic_class(
-          class_symbol.type, {class_prefix + "::T", class_prefix + "::S"});
+      require_type::require_complete_java_generic_class(
+        class_symbol.type, {class_prefix + "::T", class_prefix + "::S"});
 
       const struct_typet class_struct = to_struct_type(class_symbol.type);
 

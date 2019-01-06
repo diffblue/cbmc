@@ -27,9 +27,8 @@ SCENARIO(
     REQUIRE(new_symbol_table.has_symbol(inner_prefix));
 
     const symbolt &inner_symbol = new_symbol_table.lookup_ref(inner_prefix);
-    const class_typet &inner_class_type =
-      require_type::require_complete_java_implicitly_generic_class(
-        inner_symbol.type);
+    require_type::require_complete_java_implicitly_generic_class(
+      inner_symbol.type);
   }
 
   THEN(
