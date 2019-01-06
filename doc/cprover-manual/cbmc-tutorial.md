@@ -218,6 +218,7 @@ is an example of a program with a user-specified property:
 
 ```C
 _Bool nondet_bool();
+unsigned int nondet_unsigned_int();
 _Bool LOCK = 0;
 
 _Bool lock()
@@ -241,7 +242,7 @@ void unlock()
 int main()
 {
   unsigned got_lock = 0;
-  int times;
+  unsigned times = nondet_unsigned_int();
 
   while(times > 0)
   {
