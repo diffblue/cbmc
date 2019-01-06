@@ -8,6 +8,7 @@ Author: Daniel Kroening
 
 #include <testing-utils/catch.hpp>
 
+#include <util/exception_utils.h>
 #include <util/file_util.h>
 #include <util/tempdir.h>
 #include <util/unicode.h>
@@ -52,4 +53,17 @@ TEST_CASE("is_directory functionality", "[core][util][file_util]")
   REQUIRE(!is_directory(temp_dir("whatnot")));
   REQUIRE(!is_directory(temp_dir("file")));
   REQUIRE(!is_directory(""));
+}
+
+TEST_CASE("get/set working directory", "[core][util][file_util]")
+{
+  temp_dirt temp_dir("testXXXXXX");
+
+  std::string cwd = get_current_working_directory();
+  REQUIRE(cwd != temp_dir.path);
+  set_current_path(temp_dir.path);
+  REQUIRE(get_current_working_directory() == temp_dir.path);
+  REQUIRE_THROWS_AS(set_current_path("no-such-dir"), system_exceptiont);
+
+  set_current_path(cwd);
 }
