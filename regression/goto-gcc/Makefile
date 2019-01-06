@@ -9,14 +9,20 @@ test:
 tests.log: ../test.pl
 
 else
-test:
-	-@ln -s goto-cc ../../src/goto-cc/goto-gcc
+test: ../../src/goto-cc/goto-gcc
 	@../test.pl -e -p -c ../../../src/goto-cc/goto-gcc
 
-tests.log: ../test.pl
-	-@ln -s goto-cc ../../src/goto-cc/goto-gcc
+tests.log: ../test.pl ../../src/goto-cc/goto-gcc
 	@../test.pl -e -p -c ../../../src/goto-cc/goto-gcc
 
+../../src/goto-cc/goto-gcc: ../../src/goto-cc/goto-cc
+	@ln -sf goto-cc ../../src/goto-cc/goto-gcc
+
+test tests.log: archives/libour_archive.a
+archives/libour_archive.a: archives/foo.c ../../src/goto-cc/goto-gcc
+	@cd archives && \
+		../../../src/goto-cc/goto-gcc -c foo.c && \
+		$(AR) rcs libour_archive.a foo.o
 endif
 
 show:
@@ -30,4 +36,4 @@ clean:
 	find -name '*.out' -execdir $(RM) '{}' \;
 	find -name '*.gb' -execdir $(RM) '{}' \;
 	find -name '*.goto-cc-saved' -execdir $(RM) '{}' \;
-	$(RM) tests.log
+	$(RM) tests.log archives/lib_ourarchive.a archives/foo.o
