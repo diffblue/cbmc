@@ -47,17 +47,6 @@ Date: June 2006
                           "size=\"30,40\";"\
                           "ratio=compress;"
 
-// the following are for chdir
-
-#if defined(__linux__) || \
-    defined(__FreeBSD_kernel__) || \
-    defined(__GNU__) || \
-    defined(__unix__) || \
-    defined(__CYGWIN__) || \
-    defined(__MACH__)
-#include <unistd.h>
-#endif
-
 #ifdef _WIN32
 #include <util/pragma_push.def>
 #ifdef _MSC_VER
@@ -66,7 +55,6 @@ Date: June 2006
 #endif
 #include <direct.h>
 #include <windows.h>
-#define chdir _chdir
 #define popen _popen
 #define pclose _pclose
 #include <util/pragma_pop.def>
@@ -247,11 +235,7 @@ bool compilet::add_files_from_archive(
     }
 
     tmp_dirs.push_back(tstr);
-    if(chdir(tmp_dirs.back().c_str())!=0)
-    {
-      error() << "Cannot switch to temporary directory" << eom;
-      return true;
-    }
+    set_current_path(tmp_dirs.back());
 
     // unpack now
     cmd << "ar x " << concat_dir_file(working_directory, file_name);
@@ -294,8 +278,8 @@ bool compilet::add_files_from_archive(
     pclose(stream);
   }
 
-  if(!thin_archive && chdir(working_directory.c_str()) != 0)
-    error() << "Could not change back to working directory" << eom;
+  if(!thin_archive)
+    set_current_path(working_directory);
 
   return false;
 }
