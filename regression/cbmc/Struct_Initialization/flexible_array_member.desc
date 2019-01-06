@@ -1,0 +1,10 @@
+KNOWNBUG
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Based on issue #3653.
