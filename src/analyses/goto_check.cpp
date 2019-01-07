@@ -105,6 +105,7 @@ protected:
   void bounds_check(const index_exprt &, const guardt &);
   void div_by_zero_check(const div_exprt &, const guardt &);
   void mod_by_zero_check(const mod_exprt &, const guardt &);
+  void mod_overflow_check(const mod_exprt &, const guardt &);
   void undefined_shift_check(const shift_exprt &, const guardt &);
   void pointer_rel_check(const exprt &, const guardt &);
   void pointer_overflow_check(const exprt &, const guardt &);
@@ -328,7 +329,7 @@ void goto_checkt::mod_by_zero_check(
   const mod_exprt &expr,
   const guardt &guard)
 {
-  if(!enable_div_by_zero_check)
+  if(!enable_div_by_zero_check || mode == ID_java)
     return;
 
   // add divison by zero subgoal
@@ -347,6 +348,37 @@ void goto_checkt::mod_by_zero_check(
     expr.find_source_location(),
     expr,
     guard);
+}
+
+/// check a mod expression for the case INT_MIN % -1
+void goto_checkt::mod_overflow_check(const mod_exprt &expr, const guardt &guard)
+{
+  if(!enable_signed_overflow_check)
+    return;
+
+  const auto &type = expr.type();
+
+  if(type.id() == ID_signedbv)
+  {
+    // INT_MIN % -1 is, in principle, defined to be zero in
+    // ANSI C, C99, C++98, and C++11. Most compilers, however,
+    // fail to produce 0, and in some cases generate an exception.
+    // C11 explicitly makes this case undefined.
+
+    notequal_exprt int_min_neq(
+      expr.op0(), to_signedbv_type(type).smallest_expr());
+
+    notequal_exprt minus_one_neq(
+      expr.op1(), from_integer(-1, expr.op1().type()));
+
+    add_guarded_claim(
+      or_exprt(int_min_neq, minus_one_neq),
+      "result of signed mod is not representable",
+      "overflow",
+      expr.find_source_location(),
+      expr,
+      guard);
+  }
 }
 
 void goto_checkt::conversion_check(
@@ -562,11 +594,6 @@ void goto_checkt::integer_overflow_check(
         guard);
     }
 
-    return;
-  }
-  else if(expr.id()==ID_mod)
-  {
-    // these can't overflow
     return;
   }
   else if(expr.id()==ID_unary_minus)
@@ -1544,6 +1571,7 @@ void goto_checkt::check_rec(const exprt &expr, guardt &guard, bool address)
   else if(expr.id()==ID_mod)
   {
     mod_by_zero_check(to_mod_expr(expr), guard);
+    mod_overflow_check(to_mod_expr(expr), guard);
   }
   else if(expr.id()==ID_plus || expr.id()==ID_minus ||
           expr.id()==ID_mult ||

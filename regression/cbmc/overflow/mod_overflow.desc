@@ -1,0 +1,10 @@
+CORE
+mod_overflow.c
+--signed-overflow-check
+^EXIT=10$
+^SIGNAL=0$
+^\[.*\] line 9 result of signed mod is not representable in .*: FAILURE$
+^VERIFICATION FAILED$
+--
+^\[.*\] line 12 result of signed mod is not representable in .*: FAILURE$
+^warning: ignoring
