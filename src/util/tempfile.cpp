@@ -13,6 +13,8 @@ Author: Daniel Kroening
 #ifdef _MSC_VER
 #pragma warning(disable:4668)
   // using #if/#elif on undefined macro
+#pragma warning(disable : 5039)
+// pointer or reference to potentially throwing function passed to extern C
 #endif
 #include <process.h>
 #include <sys/stat.h>
