@@ -164,7 +164,7 @@ SCENARIO("instantiate_not_contains",
   register_language(new_java_bytecode_language);
   std::unique_ptr<languaget> java_lang = get_language_from_mode(ID_java);
   symbol_tablet symtbl;
-  const namespacet ns(symtbl);
+  const namespacet empty_ns(symtbl);
 
   // initialize architecture with sensible default values
   config.set_arch("none");
@@ -190,9 +190,7 @@ SCENARIO("instantiate_not_contains",
       t.length_type());
 
     // Generating the corresponding axioms and simplifying, recording info
-    symbol_tablet symtab;
-    const namespacet empty_ns(symtab);
-    string_constraint_generatort generator(ns);
+    string_constraint_generatort generator(empty_ns);
     const auto pair = generator.add_axioms_for_function_application(
       generator.fresh_symbol, func);
     const string_constraintst &constraints = pair.second;
@@ -206,7 +204,7 @@ SCENARIO("instantiate_not_contains",
       constraints.universal.end(),
       axioms,
       [&](const std::string &accu, string_constraintt sc) {
-        simplify(sc.body, ns);
+        simplify(sc.body, empty_ns);
         return accu + to_string(sc) + "\n\n";
       });
 
@@ -215,9 +213,9 @@ SCENARIO("instantiate_not_contains",
       constraints.not_contains.end(),
       axioms,
       [&](const std::string &accu, string_not_contains_constraintt sc) {
-        simplify(sc.premise, ns);
-        simplify(sc.s0, ns);
-        simplify(sc.s1, ns);
+        simplify(sc.premise, empty_ns);
+        simplify(sc.s0, empty_ns);
+        simplify(sc.s1, empty_ns);
         witnesses[sc] = generator.fresh_symbol("w", t.witness_type());
         nc_axioms.push_back(sc);
         return accu + to_string(sc) + "\n\n";
@@ -228,9 +226,9 @@ SCENARIO("instantiate_not_contains",
       constraints.existential.end(),
       axioms,
       [&](const std::string &accu, exprt axiom) {
-        simplify(axiom, ns);
+        simplify(axiom, empty_ns);
         std::string s;
-        java_lang->from_expr(axiom, s, ns);
+        java_lang->from_expr(axiom, s, empty_ns);
         return accu + s + "\n\n";
       });
 
@@ -254,14 +252,14 @@ SCENARIO("instantiate_not_contains",
         lemmas.insert(lemmas.end(), l.begin(), l.end());
       }
 
-      const exprt conj=combine_lemmas(lemmas, ns);
-      const std::string info=create_info(lemmas, ns);
+      const exprt conj = combine_lemmas(lemmas, empty_ns);
+      const std::string info = create_info(lemmas, empty_ns);
       INFO(info);
 
       THEN("the conjunction of instantiations is SAT")
       {
         // Check if SAT
-        decision_proceduret::resultt result=check_sat(conj, ns);
+        decision_proceduret::resultt result = check_sat(conj, empty_ns);
 
         // Require SAT
         if(result==decision_proceduret::resultt::D_ERROR)
@@ -288,9 +286,7 @@ SCENARIO("instantiate_not_contains",
                                                      a_array};
 
     // Create witness for axiom
-    symbol_tablet symtab;
-    const namespacet empty_ns(symtab);
-    string_constraint_generatort generator(ns);
+    string_constraint_generatort generator(empty_ns);
     std::unordered_map<string_not_contains_constraintt, symbol_exprt> witnesses;
     witnesses[vacuous] = generator.fresh_symbol("w", t.witness_type());
 
@@ -306,14 +302,14 @@ SCENARIO("instantiate_not_contains",
       std::vector<exprt> lemmas = instantiate_not_contains(
         vacuous, product(index_set_a, index_set_a), witnesses);
 
-      const exprt conj=combine_lemmas(lemmas, ns);
-      const std::string info=create_info(lemmas, ns);
+      const exprt conj = combine_lemmas(lemmas, empty_ns);
+      const std::string info = create_info(lemmas, empty_ns);
       INFO(info);
 
       THEN("the conjunction of instantiations is SAT")
       {
         // Check if SAT
-        decision_proceduret::resultt result=check_sat(conj, ns);
+        decision_proceduret::resultt result = check_sat(conj, empty_ns);
 
         // Require SAT
         if(result==decision_proceduret::resultt::D_ERROR)
@@ -340,9 +336,7 @@ SCENARIO("instantiate_not_contains",
                                                      b_array};
 
     // Create witness for axiom
-    symbol_tablet symtab;
-    const namespacet ns(symtab);
-    string_constraint_generatort generator(ns);
+    string_constraint_generatort generator(empty_ns);
     std::unordered_map<string_not_contains_constraintt, symbol_exprt> witnesses;
     witnesses[trivial] = generator.fresh_symbol("w", t.witness_type());
 
@@ -359,14 +353,14 @@ SCENARIO("instantiate_not_contains",
       std::vector<exprt> lemmas = instantiate_not_contains(
         trivial, product(index_set_a, index_set_b), witnesses);
 
-      const exprt conj=combine_lemmas(lemmas, ns);
-      const std::string info=create_info(lemmas, ns);
+      const exprt conj = combine_lemmas(lemmas, empty_ns);
+      const std::string info = create_info(lemmas, empty_ns);
       INFO(info);
 
       THEN("the conjunction of instantiations is UNSAT")
       {
         // Check if SAT
-        decision_proceduret::resultt result=check_sat(conj, ns);
+        decision_proceduret::resultt result = check_sat(conj, empty_ns);
 
         // Require UNSAT
         if(result==decision_proceduret::resultt::D_ERROR)
@@ -393,9 +387,7 @@ SCENARIO("instantiate_not_contains",
                                                      empty_array};
 
     // Create witness for axiom
-    symbol_tablet symtab;
-    const namespacet empty_ns(symtab);
-    string_constraint_generatort generator(ns);
+    string_constraint_generatort generator(empty_ns);
     std::unordered_map<string_not_contains_constraintt, symbol_exprt> witnesses;
     witnesses[trivial] = generator.fresh_symbol("w", t.witness_type());
 
@@ -413,14 +405,14 @@ SCENARIO("instantiate_not_contains",
       std::vector<exprt> lemmas = instantiate_not_contains(
         trivial, product(index_set_a, index_set_empty), witnesses);
 
-      const exprt conj=combine_lemmas(lemmas, ns);
-      const std::string info=create_info(lemmas, ns);
+      const exprt conj = combine_lemmas(lemmas, empty_ns);
+      const std::string info = create_info(lemmas, empty_ns);
       INFO(info);
 
       THEN("the conjunction of instantiations is UNSAT")
       {
         // Check if SAT
-        decision_proceduret::resultt result=check_sat(conj, ns);
+        decision_proceduret::resultt result = check_sat(conj, empty_ns);
 
         // Require UNSAT
         if(result==decision_proceduret::resultt::D_ERROR)
@@ -448,10 +440,7 @@ SCENARIO("instantiate_not_contains",
                                                      ab_array};
 
     // Create witness for axiom
-    symbol_tablet symtab;
-    const namespacet empty_ns(symtab);
-
-    string_constraint_generatort generator(ns);
+    string_constraint_generatort generator(empty_ns);
     std::unordered_map<string_not_contains_constraintt, symbol_exprt> witnesses;
     witnesses[trivial] = generator.fresh_symbol("w", t.witness_type());
 
@@ -467,14 +456,14 @@ SCENARIO("instantiate_not_contains",
       std::vector<exprt> lemmas = instantiate_not_contains(
         trivial, product(index_set_ab, index_set_ab), witnesses);
 
-      const exprt conj=combine_lemmas(lemmas, ns);
-      const std::string info=create_info(lemmas, ns);
+      const exprt conj = combine_lemmas(lemmas, empty_ns);
+      const std::string info = create_info(lemmas, empty_ns);
       INFO(info);
 
       THEN("the conjunction of instantiations is UNSAT")
       {
         // Check if SAT
-        decision_proceduret::resultt result=check_sat(conj, ns);
+        decision_proceduret::resultt result = check_sat(conj, empty_ns);
 
         // Require UNSAT
         if(result==decision_proceduret::resultt::D_ERROR)
@@ -502,9 +491,7 @@ SCENARIO("instantiate_not_contains",
                                                      cd_array};
 
     // Create witness for axiom
-    symbol_tablet symtab;
-    const namespacet empty_ns(symtab);
-    string_constraint_generatort generator(ns);
+    string_constraint_generatort generator(empty_ns);
     std::unordered_map<string_not_contains_constraintt, symbol_exprt> witnesses;
     witnesses[trivial] = generator.fresh_symbol("w", t.witness_type());
 
@@ -521,14 +508,14 @@ SCENARIO("instantiate_not_contains",
       std::vector<exprt> lemmas = instantiate_not_contains(
         trivial, product(index_set_ab, index_set_cd), witnesses);
 
-      const exprt conj=combine_lemmas(lemmas, ns);
-      const std::string info=create_info(lemmas, ns);
+      const exprt conj = combine_lemmas(lemmas, empty_ns);
+      const std::string info = create_info(lemmas, empty_ns);
       INFO(info);
 
       THEN("the conjunction of instantiations is SAT")
       {
         // Check if SAT
-        decision_proceduret::resultt result=check_sat(conj, ns);
+        decision_proceduret::resultt result = check_sat(conj, empty_ns);
 
         // Require UNSAT
         if(result==decision_proceduret::resultt::D_ERROR)

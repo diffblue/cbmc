@@ -21,10 +21,6 @@ SCENARIO(
   std::string class_prefix = "java::BoundedGenericInnerClasses";
   REQUIRE(new_symbol_table.has_symbol(class_prefix));
 
-  const symbolt &class_symbol = new_symbol_table.lookup_ref(class_prefix);
-  const java_class_typet &java_class_type =
-    require_type::require_complete_java_non_generic_class(class_symbol.type);
-
   WHEN("Parsing an inner class with type variable")
   {
     std::string inner_name = class_prefix + "$Inner";
@@ -90,6 +86,8 @@ SCENARIO(
 
   WHEN("There is a generic field with a concrete type")
   {
+    const symbolt &class_symbol = new_symbol_table.lookup_ref(class_prefix);
+    require_type::require_complete_java_non_generic_class(class_symbol.type);
     const struct_union_typet::componentt &belem_type =
       require_type::require_component(
         to_struct_type(class_symbol.type), "belem");
