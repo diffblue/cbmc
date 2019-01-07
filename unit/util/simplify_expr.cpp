@@ -155,3 +155,29 @@ TEST_CASE("Simplify extractbits")
   REQUIRE(!unmodified);
   REQUIRE(eb == from_integer(0xbe, unsignedbv_typet(8)));
 }
+
+TEST_CASE("Simplify shift")
+{
+  const symbol_tablet symbol_table;
+  const namespacet ns(symbol_table);
+
+  REQUIRE(
+    simplify_expr(shl_exprt(from_integer(5, signedbv_typet(8)), 1), ns) ==
+    from_integer(10, signedbv_typet(8)));
+
+  REQUIRE(
+    simplify_expr(ashr_exprt(from_integer(5, signedbv_typet(8)), 1), ns) ==
+    from_integer(2, signedbv_typet(8)));
+
+  REQUIRE(
+    simplify_expr(lshr_exprt(from_integer(5, unsignedbv_typet(8)), 1), ns) ==
+    from_integer(2, unsignedbv_typet(8)));
+
+  REQUIRE(
+    simplify_expr(ashr_exprt(from_integer(-4, signedbv_typet(8)), 1), ns) ==
+    from_integer(-2, signedbv_typet(8)));
+
+  REQUIRE(
+    simplify_expr(lshr_exprt(from_integer(-4, signedbv_typet(8)), 1), ns) ==
+    from_integer(126, signedbv_typet(8)));
+}

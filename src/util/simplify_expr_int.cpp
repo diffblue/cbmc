@@ -1008,6 +1008,8 @@ bool simplify_exprt::simplify_shifts(exprt &expr)
       }
       else if(distance>=0)
       {
+        if(value < 0)
+          value += power(2, width);
         value/=power(2, distance);
         expr=from_integer(value, expr.type());
         return false;
