@@ -9,11 +9,11 @@ Author: Peter Schrammel
 /// \file
 /// Expressions in JSON
 
-#ifndef CPROVER_UTIL_JSON_EXPR_H
-#define CPROVER_UTIL_JSON_EXPR_H
+#ifndef CPROVER_GOTO_PROGRAMS_JSON_EXPR_H
+#define CPROVER_GOTO_PROGRAMS_JSON_EXPR_H
 
-#include "json.h"
-#include "irep.h"
+#include <util/json.h>
+#include <util/irep.h>
 
 class typet;
 class exprt;
@@ -29,4 +29,4 @@ json_objectt json(
   const namespacet &,
   const irep_idt &mode);
 
-#endif // CPROVER_UTIL_JSON_EXPR_H
+#endif // CPROVER_GOTO_PROGRAMS_JSON_EXPR_H

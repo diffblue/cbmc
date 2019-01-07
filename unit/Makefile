@@ -25,6 +25,7 @@ SRC += analyses/ai/ai.cpp \
        goto-programs/goto_program_symbol_type_table_consistency.cpp \
        goto-programs/goto_program_table_consistency.cpp \
        goto-programs/goto_trace_output.cpp \
+       goto-programs/xml_expr.cpp \
        goto-symex/ssa_equation.cpp \
        interpreter/interpreter.cpp \
        json/json_parser.cpp \
@@ -68,7 +69,6 @@ SRC += analyses/ai/ai.cpp \
        util/symbol_table.cpp \
        util/symbol.cpp \
        util/unicode.cpp \
-       util/xml_expr.cpp \
        # Empty last line
 
 INCLUDES= -I ../src/ -I.

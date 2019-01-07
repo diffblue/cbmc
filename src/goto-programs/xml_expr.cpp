@@ -13,15 +13,15 @@ Author: Daniel Kroening
 
 #include "xml_expr.h"
 
-#include "arith_tools.h"
-#include "config.h"
-#include "expr.h"
-#include "fixedbv.h"
-#include "ieee_float.h"
-#include "invariant.h"
-#include "namespace.h"
-#include "std_expr.h"
-#include "xml.h"
+#include <util/arith_tools.h>
+#include <util/config.h>
+#include <util/expr.h>
+#include <util/fixedbv.h>
+#include <util/ieee_float.h>
+#include <util/invariant.h>
+#include <util/namespace.h>
+#include <util/std_expr.h>
+#include <util/xml.h>
 
 xmlt xml(
   const typet &type,

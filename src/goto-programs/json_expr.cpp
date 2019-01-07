@@ -11,16 +11,16 @@ Author: Peter Schrammel
 
 #include "json_expr.h"
 
-#include "namespace.h"
-#include "expr.h"
-#include "json.h"
-#include "arith_tools.h"
-#include "ieee_float.h"
-#include "fixedbv.h"
-#include "std_expr.h"
-#include "config.h"
-#include "identifier.h"
-#include "invariant.h"
+#include <util/namespace.h>
+#include <util/expr.h>
+#include <util/json.h>
+#include <util/arith_tools.h>
+#include <util/ieee_float.h>
+#include <util/fixedbv.h>
+#include <util/std_expr.h>
+#include <util/config.h>
+#include <util/identifier.h>
+#include <util/invariant.h>
 
 #include <langapi/mode.h>
 #include <langapi/language.h>

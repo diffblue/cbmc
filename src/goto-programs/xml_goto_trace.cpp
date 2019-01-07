@@ -16,12 +16,12 @@ Author: Daniel Kroening
 #include <cassert>
 
 #include <util/symbol.h>
-#include <util/xml_expr.h>
 #include <util/xml_irep.h>
 
 #include <langapi/language_util.h>
 
 #include "printf_formatter.h"
+#include "xml_expr.h"
 
 void convert(
   const namespacet &ns,

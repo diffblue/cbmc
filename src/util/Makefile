@@ -37,7 +37,6 @@ SRC = allocate_objects.cpp \
       irep_serialization.cpp \
       invariant_utils.cpp \
       json.cpp \
-      json_expr.cpp \
       json_irep.cpp \
       json_stream.cpp \
       lispexpr.cpp \
@@ -103,7 +102,6 @@ SRC = allocate_objects.cpp \
       validate_types.cpp \
       version.cpp \
       xml.cpp \
-      xml_expr.cpp \
       xml_irep.cpp \
       # Empty last line
 

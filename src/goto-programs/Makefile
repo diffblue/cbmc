@@ -25,6 +25,7 @@ SRC = adjust_float_expressions.cpp \
       instrument_preconditions.cpp \
       interpreter.cpp \
       interpreter_evaluate.cpp \
+      json_expr.cpp \
       json_goto_trace.cpp \
       lazy_goto_model.cpp \
       link_goto_model.cpp \
@@ -67,6 +68,7 @@ SRC = adjust_float_expressions.cpp \
       vcd_goto_trace.cpp \
       wp.cpp \
       write_goto_binary.cpp \
+      xml_expr.cpp \
       xml_goto_trace.cpp \
       # Empty last line
 
