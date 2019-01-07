@@ -359,15 +359,15 @@ inline java_method_typet &to_java_method_type(typet &type)
   return static_cast<java_method_typet &>(type);
 }
 
-typet java_int_type();
-typet java_long_type();
-typet java_short_type();
-typet java_byte_type();
-typet java_char_type();
-typet java_float_type();
-typet java_double_type();
-typet java_boolean_type();
-typet java_void_type();
+signedbv_typet java_int_type();
+signedbv_typet java_long_type();
+signedbv_typet java_short_type();
+signedbv_typet java_byte_type();
+unsignedbv_typet java_char_type();
+floatbv_typet java_float_type();
+floatbv_typet java_double_type();
+c_bool_typet java_boolean_type();
+void_typet java_void_type();
 reference_typet java_reference_type(const typet &subtype);
 reference_typet java_lang_object_type();
 struct_tag_typet java_classname(const std::string &);
