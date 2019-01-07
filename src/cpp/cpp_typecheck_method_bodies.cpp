@@ -32,9 +32,6 @@ void cpp_typecheckt::typecheck_method_bodies()
 
     method_bodies.erase(method_bodies.begin());
 
-    if(method_symbol.name==ID_main)
-      add_argc_argv(method_symbol);
-
     exprt &body=method_symbol.value;
     if(body.id() == ID_cpp_not_typechecked)
       continue;
