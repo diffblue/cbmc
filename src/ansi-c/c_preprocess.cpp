@@ -610,7 +610,7 @@ bool c_preprocess_gcc_clang(
     switch(config.ansi_c.c_standard)
     {
     case configt::ansi_ct::c_standardt::C89:
-      argv.push_back("-std=gnu++89");
+      argv.push_back("-std=gnu89");
       break;
 
     case configt::ansi_ct::c_standardt::C99:

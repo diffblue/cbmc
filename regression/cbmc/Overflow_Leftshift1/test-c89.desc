@@ -1,6 +1,6 @@
 CORE
 main.c
---signed-overflow-check
+--signed-overflow-check --c89
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[.*\] line 6 arithmetic overflow on signed shl in .*: FAILURE$
@@ -13,3 +13,4 @@ main.c
 ^warning: ignoring
 ^\[.*\] line 12 arithmetic overflow on signed shl in .*: .*
 ^\[.*\] line 21 arithmetic overflow on signed shl in .*: .*
+^\[.*\] line 24 arithmetic overflow on signed shl in .*: .*
