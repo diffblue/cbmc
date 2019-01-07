@@ -8,7 +8,7 @@ Author: Martin Brain, martin.brain@cs.ox.ac.uk
 
 #include "static_verifier.h"
 
-#include <util/json_expr.h>
+#include <util/json_irep.h>
 #include <util/message.h>
 #include <util/namespace.h>
 #include <util/options.h>

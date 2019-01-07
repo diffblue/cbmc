@@ -137,3 +137,28 @@ irept json_irept::convert_from_json(const jsont &in) const
 
   return out;
 }
+
+json_objectt json(const source_locationt &location)
+{
+  json_objectt result;
+
+  if(!location.get_working_directory().empty())
+    result["workingDirectory"] = json_stringt(location.get_working_directory());
+
+  if(!location.get_file().empty())
+    result["file"] = json_stringt(location.get_file());
+
+  if(!location.get_line().empty())
+    result["line"] = json_stringt(location.get_line());
+
+  if(!location.get_column().empty())
+    result["column"] = json_stringt(location.get_column());
+
+  if(!location.get_function().empty())
+    result["function"] = json_stringt(location.get_function());
+
+  if(!location.get_java_bytecode_index().empty())
+    result["bytecodeIndex"] = json_stringt(location.get_java_bytecode_index());
+
+  return result;
+}

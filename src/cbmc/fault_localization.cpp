@@ -13,12 +13,12 @@ Author: Peter Schrammel
 
 #include <chrono>
 
-#include <util/threeval.h>
 #include <util/arith_tools.h>
-#include <util/symbol.h>
-#include <util/std_expr.h>
 #include <util/message.h>
-#include <util/xml_expr.h>
+#include <util/std_expr.h>
+#include <util/symbol.h>
+#include <util/threeval.h>
+#include <util/xml_irep.h>
 
 #include <solvers/prop/minimize.h>
 #include <solvers/prop/literal_expr.h>

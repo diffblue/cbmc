@@ -11,7 +11,7 @@ Author: Peter Schrammel
 
 #include "goto_diff.h"
 
-#include <util/json_expr.h>
+#include <util/json_irep.h>
 #include <util/options.h>
 
 #include <goto-programs/goto_model.h>

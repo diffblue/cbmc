@@ -14,15 +14,12 @@ Author: Daniel Kroening
 #include "json_goto_trace.h"
 #include "goto_trace.h"
 
-#include <util/json_expr.h>
-#include <util/json.h>
-#include <util/json_stream.h>
+#include <langapi/language_util.h>
 #include <util/arith_tools.h>
 #include <util/config.h>
 #include <util/invariant.h>
+#include <util/json_expr.h>
 #include <util/simplify_expr.h>
-#include <util/json_irep.h>
-#include <langapi/language_util.h>
 
 /// Convert an ASSERT goto_trace step.
 /// \param [out] json_failure: The JSON object that

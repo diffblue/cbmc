@@ -14,7 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/expr_util.h>
 #include <util/simplify_expr.h>
 #include <util/string_constant.h>
-#include <util/xml_expr.h>
+#include <util/xml_irep.h>
 
 #include <langapi/language_util.h>
 

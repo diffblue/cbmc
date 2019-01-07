@@ -23,31 +23,6 @@ Author: Daniel Kroening
 #include "std_expr.h"
 #include "xml.h"
 
-xmlt xml(const source_locationt &location)
-{
-  xmlt result;
-
-  result.name="location";
-
-  if(!location.get_working_directory().empty())
-    result.set_attribute(
-      "working-directory", id2string(location.get_working_directory()));
-
-  if(!location.get_file().empty())
-    result.set_attribute("file", id2string(location.get_file()));
-
-  if(!location.get_line().empty())
-    result.set_attribute("line", id2string(location.get_line()));
-
-  if(!location.get_column().empty())
-    result.set_attribute("column", id2string(location.get_column()));
-
-  if(!location.get_function().empty())
-    result.set_attribute("function", id2string(location.get_function()));
-
-  return result;
-}
-
 xmlt xml(
   const typet &type,
   const namespacet &ns)

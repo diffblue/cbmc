@@ -16,10 +16,10 @@ Date: November 2005
 
 #include "goto_trace.h"
 
-#include <util/json.h>
-#include <util/json_stream.h>
-#include <util/json_expr.h>
 #include <util/invariant.h>
+#include <util/json.h>
+#include <util/json_irep.h>
+#include <util/json_stream.h>
 
 /// This is structure is here to facilitate
 /// passing arguments to the conversion

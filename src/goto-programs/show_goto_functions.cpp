@@ -13,8 +13,6 @@ Author: Peter Schrammel
 
 #include <util/xml.h>
 #include <util/json.h>
-#include <util/json_expr.h>
-#include <util/xml_expr.h>
 #include <util/cprover_prefix.h>
 #include <util/prefix.h>
 

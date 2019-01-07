@@ -84,31 +84,6 @@ static exprt simplify_json_expr(
   return src;
 }
 
-json_objectt json(const source_locationt &location)
-{
-  json_objectt result;
-
-  if(!location.get_working_directory().empty())
-    result["workingDirectory"] = json_stringt(location.get_working_directory());
-
-  if(!location.get_file().empty())
-    result["file"] = json_stringt(location.get_file());
-
-  if(!location.get_line().empty())
-    result["line"] = json_stringt(location.get_line());
-
-  if(!location.get_column().empty())
-    result["column"] = json_stringt(location.get_column());
-
-  if(!location.get_function().empty())
-    result["function"] = json_stringt(location.get_function());
-
-  if(!location.get_java_bytecode_index().empty())
-    result["bytecodeIndex"] = json_stringt(location.get_java_bytecode_index());
-
-  return result;
-}
-
 /// Output a CBMC type in json.
 /// The `mode` argument is used to correctly report types.
 /// \param type: a type

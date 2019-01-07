@@ -13,10 +13,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <iostream>
 
-#include <util/xml.h>
-#include <util/xml_expr.h>
-#include <util/json.h>
-#include <util/json_expr.h>
+#include <util/json_irep.h>
+#include <util/xml_irep.h>
 
 void show_loop_ids(
   ui_message_handlert::uit ui,

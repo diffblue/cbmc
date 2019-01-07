@@ -12,7 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "xml.h"
 
-class source_locationt;
 class typet;
 class exprt;
 class namespacet;
@@ -24,7 +23,5 @@ xmlt xml(
 xmlt xml(
   const typet &,
   const namespacet &);
-
-xmlt xml(const source_locationt &);
 
 #endif // CPROVER_UTIL_XML_EXPR_H

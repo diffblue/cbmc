@@ -20,8 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/exception_utils.h>
 #include <util/format_expr.h>
-#include <util/json.h>
-#include <util/json_expr.h>
+#include <util/json_irep.h>
 #include <util/ui_message.h>
 
 void show_vcc_plain(

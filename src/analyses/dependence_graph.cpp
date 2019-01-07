@@ -17,8 +17,7 @@ Date: August 2013
 #include <cassert>
 
 #include <util/container_utils.h>
-#include <util/json.h>
-#include <util/json_expr.h>
+#include <util/json_irep.h>
 
 #include "goto_rw.h"
 

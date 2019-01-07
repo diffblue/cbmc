@@ -15,7 +15,6 @@ Author: Peter Schrammel
 #include "json.h"
 #include "irep.h"
 
-class source_locationt;
 class typet;
 class exprt;
 class namespacet;
@@ -29,7 +28,5 @@ json_objectt json(
   const typet &,
   const namespacet &,
   const irep_idt &mode);
-
-json_objectt json(const source_locationt &);
 
 #endif // CPROVER_UTIL_JSON_EXPR_H
