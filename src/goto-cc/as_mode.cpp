@@ -30,6 +30,7 @@ Author: Michael Tautschnig
 #include <util/version.h>
 
 #include "compile.h"
+#include "hybrid_binary.h"
 
 static std::string assembler_name(
   const cmdlinet &cmdline,
@@ -287,9 +288,8 @@ int as_modet::as_hybrid_binary()
           << " to generate hybrid binary" << eom;
 
   // save the goto-cc output file
-  int result=rename(
-    output_file.c_str(),
-    (output_file+".goto-cc-saved").c_str());
+  std::string saved = output_file + ".goto-cc-saved";
+  int result = rename(output_file.c_str(), saved.c_str());
   if(result!=0)
   {
     error() << "Rename failed: " << std::strerror(errno) << eom;
@@ -298,76 +298,11 @@ int as_modet::as_hybrid_binary()
 
   result=run_as();
 
-  // merge output from as with goto-binaries
-  // using objcopy, or do cleanup if an earlier call failed
-  debug() << "merging " << output_file << eom;
-  std::string saved=output_file+".goto-cc-saved";
-
-  #if defined(__linux__) || defined(__FreeBSD_kernel__)
-  if(result==0)
+  if(result == 0)
   {
-    // remove any existing goto-cc section
-    std::vector<std::string> objcopy_argv;
-
-    objcopy_argv.push_back("objcopy");
-    objcopy_argv.push_back("--remove-section=goto-cc");
-    objcopy_argv.push_back(output_file);
-
-    result = run(objcopy_argv[0], objcopy_argv);
+    result = hybrid_binary(
+      native_tool_name, saved, output_file, get_message_handler());
   }
-
-  if(result==0)
-  {
-    // now add goto-binary as goto-cc section
-    std::vector<std::string> objcopy_argv;
-
-    objcopy_argv.push_back("objcopy");
-    objcopy_argv.push_back("--add-section");
-    objcopy_argv.push_back("goto-cc="+saved);
-    objcopy_argv.push_back(output_file);
-
-    result = run(objcopy_argv[0], objcopy_argv);
-  }
-
-  int remove_result=remove(saved.c_str());
-  if(remove_result!=0)
-  {
-    error() << "Remove failed: " << std::strerror(errno) << eom;
-    if(result==0)
-      result=remove_result;
-  }
-
-  #elif defined(__APPLE__)
-  // Mac
-  if(result==0)
-  {
-    std::vector<std::string> lipo_argv;
-
-    // now add goto-binary as hppa7100LC section
-    lipo_argv.push_back("lipo");
-    lipo_argv.push_back(output_file);
-    lipo_argv.push_back("-create");
-    lipo_argv.push_back("-arch");
-    lipo_argv.push_back("hppa7100LC");
-    lipo_argv.push_back(saved);
-    lipo_argv.push_back("-output");
-    lipo_argv.push_back(output_file);
-
-    result = run(lipo_argv[0], lipo_argv);
-  }
-
-  int remove_result=remove(saved.c_str());
-  if(remove_result!=0)
-  {
-    error() << "Remove failed: " << std::strerror(errno) << eom;
-    if(result==0)
-      result=remove_result;
-  }
-
-  #else
-  error() << "binary merging not implemented for this platform" << eom;
-  result = 1;
-  #endif
 
   return result;
 }
