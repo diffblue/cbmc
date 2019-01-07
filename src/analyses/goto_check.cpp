@@ -16,12 +16,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/array_name.h>
 #include <util/base_type.h>
-#include <util/cprover_prefix.h>
 #include <util/c_types.h>
+#include <util/cprover_prefix.h>
 #include <util/expr_util.h>
 #include <util/find_symbols.h>
 #include <util/guard.h>
 #include <util/ieee_float.h>
+#include <util/invariant.h>
 #include <util/make_unique.h>
 #include <util/options.h>
 #include <util/pointer_offset_size.h>
@@ -982,23 +983,23 @@ void goto_checkt::pointer_overflow_check(
   if(!enable_pointer_overflow_check)
     return;
 
-  if(expr.id()==ID_plus ||
-     expr.id()==ID_minus)
-  {
-    if(expr.operands().size()==2)
-    {
-      exprt overflow("overflow-"+expr.id_string(), bool_typet());
-      overflow.operands()=expr.operands();
+  if(expr.id() != ID_plus && expr.id() != ID_minus)
+    return;
 
-      add_guarded_claim(
-        not_exprt(overflow),
-        "pointer arithmetic overflow on "+expr.id_string(),
-        "overflow",
-        expr.find_source_location(),
-        expr,
-        guard);
-    }
-  }
+  DATA_INVARIANT(
+    expr.operands().size() == 2,
+    "pointer arithmetic expected to have exactly 2 operands");
+
+  exprt overflow("overflow-" + expr.id_string(), bool_typet());
+  overflow.operands() = expr.operands();
+
+  add_guarded_claim(
+    not_exprt(overflow),
+    "pointer arithmetic overflow on " + expr.id_string(),
+    "overflow",
+    expr.find_source_location(),
+    expr,
+    guard);
 }
 
 void goto_checkt::pointer_validity_check(
@@ -1551,11 +1552,7 @@ void goto_checkt::check_rec(const exprt &expr, guardt &guard, bool address)
     if(expr.type().id()==ID_signedbv ||
        expr.type().id()==ID_unsignedbv)
     {
-      if(expr.operands().size()==2 &&
-         expr.op0().type().id()==ID_pointer)
-        pointer_overflow_check(expr, guard);
-      else
-        integer_overflow_check(expr, guard);
+      integer_overflow_check(expr, guard);
     }
     else if(expr.type().id()==ID_floatbv)
     {
