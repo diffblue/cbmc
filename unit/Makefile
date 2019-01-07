@@ -49,6 +49,7 @@ SRC += analyses/ai/ai.cpp \
        util/graph.cpp \
        util/irep.cpp \
        util/irep_sharing.cpp \
+       util/memory_info.cpp \
        util/message.cpp \
        util/optional.cpp \
        util/optional_utils.cpp \
