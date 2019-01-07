@@ -181,6 +181,7 @@ public:
 
   // constructors, destructor
 
+  DEPRECATED("use messaget(message_handler) instead")
   messaget():
     message_handler(nullptr),
     mstream(M_DEBUG, *this)
