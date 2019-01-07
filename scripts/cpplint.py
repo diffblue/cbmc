@@ -1745,6 +1745,9 @@ def CloseExpression(clean_lines, linenum, pos):
   and have CloseExpression be just a simple lookup, but due to preprocessor
   tricks, this is not so easy.
 
+  Note this operates on the *elided lines* - the position will be wrong if you
+  want strings (or comments) to be included.
+
   Args:
     clean_lines: A CleansedLines instance containing the file.
     linenum: The number of the line to check.
