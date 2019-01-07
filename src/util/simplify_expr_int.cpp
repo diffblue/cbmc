@@ -913,7 +913,7 @@ bool simplify_exprt::simplify_concatenation(exprt &expr)
           });
 
         to_constant_expr(opi).set_value(new_value);
-        opi.type().set(ID_width, new_width);
+        to_bitvector_type(opi.type()).set_width(new_width);
         // erase opn
         expr.operands().erase(expr.operands().begin()+i+1);
         result = false;
@@ -943,7 +943,7 @@ bool simplify_exprt::simplify_concatenation(exprt &expr)
         const std::string new_value=
           opi.get_string(ID_value)+opn.get_string(ID_value);
         opi.set(ID_value, new_value);
-        opi.type().set(ID_width, new_value.size());
+        to_bitvector_type(opi.type()).set_width(new_value.size());
         opi.type().id(ID_verilog_unsignedbv);
         // erase opn
         expr.operands().erase(expr.operands().begin()+i+1);
@@ -995,8 +995,7 @@ bool simplify_exprt::simplify_shifts(exprt &expr)
   if(expr.op0().type().id()==ID_unsignedbv ||
      expr.op0().type().id()==ID_signedbv)
   {
-    mp_integer width=
-      string2integer(id2string(expr.op0().type().get(ID_width)));
+    const std::size_t width = to_bitvector_type(expr.op0().type()).get_width();
 
     if(expr.id()==ID_lshr)
     {

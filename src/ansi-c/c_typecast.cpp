@@ -279,10 +279,10 @@ typet c_typecastt::follow_with_qualifiers(const typet &src_type)
 c_typecastt::c_typet c_typecastt::get_c_type(
   const typet &type) const
 {
-  const std::size_t width = type.get_size_t(ID_width);
-
   if(type.id()==ID_signedbv)
   {
+    const std::size_t width = to_bitvector_type(type).get_width();
+
     if(width<=config.ansi_c.char_width)
       return CHAR;
     else if(width<=config.ansi_c.short_int_width)
@@ -298,6 +298,8 @@ c_typecastt::c_typet c_typecastt::get_c_type(
   }
   else if(type.id()==ID_unsignedbv)
   {
+    const std::size_t width = to_bitvector_type(type).get_width();
+
     if(width<=config.ansi_c.char_width)
       return UCHAR;
     else if(width<=config.ansi_c.short_int_width)
@@ -317,6 +319,8 @@ c_typecastt::c_typet c_typecastt::get_c_type(
     return BOOL;
   else if(type.id()==ID_floatbv)
   {
+    const std::size_t width = to_bitvector_type(type).get_width();
+
     if(width<=config.ansi_c.single_width)
       return SINGLE;
     else if(width<=config.ansi_c.double_width)
@@ -591,8 +595,8 @@ void c_typecastt::implicit_typecast_arithmetic(
   if(max_type==LARGE_SIGNED_INT || max_type==LARGE_UNSIGNED_INT)
   {
     // get the biggest width of both
-    std::size_t width1=type1.get_size_t(ID_width);
-    std::size_t width2=type2.get_size_t(ID_width);
+    std::size_t width1 = to_bitvector_type(type1).get_width();
+    std::size_t width2 = to_bitvector_type(type2).get_width();
 
     // produce type
     typet result_type;

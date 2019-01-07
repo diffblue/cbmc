@@ -90,8 +90,8 @@ exprt convert_integer_literal(const std::string &src)
     else
       c_type=is_unsigned?ID_unsigned_long_long_int:ID_signed_long_long_int;
 
-    typet type=typet(is_unsigned?ID_unsignedbv:ID_signedbv);
-    type.set(ID_width, width_suffix);
+    bitvector_typet type(
+      is_unsigned ? ID_unsignedbv : ID_signedbv, width_suffix);
     type.set(ID_C_c_type, c_type);
 
     exprt result=from_integer(value, type);
@@ -166,9 +166,7 @@ exprt convert_integer_literal(const std::string &src)
       c_type=ID_signed_long_long_int;
   }
 
-  typet type=typet(is_signed?ID_signedbv:ID_unsignedbv);
-
-  type.set(ID_width, width);
+  bitvector_typet type(is_signed ? ID_signedbv : ID_unsignedbv, width);
   type.set(ID_C_c_type, c_type);
 
   exprt result;

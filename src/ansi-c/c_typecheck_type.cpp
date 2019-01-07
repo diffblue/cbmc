@@ -76,7 +76,8 @@ void c_typecheck_baset::typecheck_type(typet &type)
   else if(type.id()==ID_pointer)
   {
     typecheck_type(type.subtype());
-    INVARIANT(!type.get(ID_width).empty(), "pointers must have width");
+    INVARIANT(
+      to_bitvector_type(type).get_width() > 0, "pointers must have width");
   }
   else if(type.id()==ID_struct ||
           type.id()==ID_union)
@@ -1433,7 +1434,7 @@ void c_typecheck_baset::typecheck_c_bit_field_type(c_bit_field_typet &type)
       throw 0;
     }
 
-    sub_width = c_enum_type.subtype().get_size_t(ID_width);
+    sub_width = to_bitvector_type(c_enum_type.subtype()).get_width();
   }
   else
   {

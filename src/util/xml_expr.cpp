@@ -196,7 +196,7 @@ xmlt xml(
       result.name="integer";
       result.set_attribute("binary", expr.get_string(ID_value));
       result.set_attribute(
-        "width", to_c_enum_type(type).subtype().get_string(ID_width));
+        "width", to_bitvector_type(to_c_enum_type(type).subtype()).get_width());
       result.set_attribute("c_type", "enum");
 
       mp_integer i;
@@ -218,14 +218,14 @@ xmlt xml(
     else if(type.id()==ID_fixedbv)
     {
       result.name="fixed";
-      result.set_attribute("width", type.get_string(ID_width));
+      result.set_attribute("width", to_bitvector_type(type).get_width());
       result.set_attribute("binary", expr.get_string(ID_value));
       result.data=fixedbvt(to_constant_expr(expr)).to_ansi_c_string();
     }
     else if(type.id()==ID_floatbv)
     {
       result.name="float";
-      result.set_attribute("width", type.get_string(ID_width));
+      result.set_attribute("width", to_bitvector_type(type).get_width());
       result.set_attribute("binary", expr.get_string(ID_value));
       result.data=ieee_floatt(to_constant_expr(expr)).to_ansi_c_string();
     }

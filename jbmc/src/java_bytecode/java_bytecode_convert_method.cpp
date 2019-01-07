@@ -974,7 +974,7 @@ static std::size_t get_bytecode_type_width(const typet &ty)
 {
   if(ty.id()==ID_pointer)
     return 32;
-  return ty.get_size_t(ID_width);
+  return to_bitvector_type(ty).get_width();
 }
 
 code_blockt java_bytecode_convert_methodt::convert_instructions(
@@ -2646,7 +2646,7 @@ exprt::operandst &java_bytecode_convert_methodt::convert_ushr(
 {
   const typet type = java_type_from_char(statement[0]);
 
-  const std::size_t width = type.get_size_t(ID_width);
+  const std::size_t width = get_bytecode_type_width(type);
   typet target = unsignedbv_typet(width);
 
   exprt lhs = op[0];

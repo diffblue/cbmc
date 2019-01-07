@@ -33,7 +33,7 @@ unsigned java_local_variable_slots(const typet &t)
   if(t.id()==ID_pointer)
     return 1;
 
-  const std::size_t bitwidth = t.get_size_t(ID_width);
+  const std::size_t bitwidth = to_bitvector_type(t).get_width();
   INVARIANT(
     bitwidth==8 ||
     bitwidth==16 ||

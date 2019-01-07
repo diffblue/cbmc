@@ -69,12 +69,13 @@ exprt c_typecheck_baset::do_initializer_rec(
   if(value.id()==ID_initializer_list)
     return do_initializer_list(value, type, force_constant);
 
-  if(value.id()==ID_array &&
-     value.get_bool(ID_C_string_constant) &&
-     full_type.id()==ID_array &&
-     (full_type.subtype().id()==ID_signedbv ||
-      full_type.subtype().id()==ID_unsignedbv) &&
-      full_type.subtype().get(ID_width)==value.type().subtype().get(ID_width))
+  if(
+    value.id() == ID_array && value.get_bool(ID_C_string_constant) &&
+    full_type.id() == ID_array &&
+    (full_type.subtype().id() == ID_signedbv ||
+     full_type.subtype().id() == ID_unsignedbv) &&
+    to_bitvector_type(full_type.subtype()).get_width() ==
+      to_bitvector_type(value.type().subtype()).get_width())
   {
     exprt tmp=value;
 
@@ -130,11 +131,12 @@ exprt c_typecheck_baset::do_initializer_rec(
     return tmp;
   }
 
-  if(value.id()==ID_string_constant &&
-     full_type.id()==ID_array &&
-     (full_type.subtype().id()==ID_signedbv ||
-      full_type.subtype().id()==ID_unsignedbv) &&
-      full_type.subtype().get(ID_width)==char_type().get(ID_width))
+  if(
+    value.id() == ID_string_constant && full_type.id() == ID_array &&
+    (full_type.subtype().id() == ID_signedbv ||
+     full_type.subtype().id() == ID_unsignedbv) &&
+    to_bitvector_type(full_type.subtype()).get_width() ==
+      char_type().get_width())
   {
     // will go away, to be replaced by the above block
 
@@ -876,11 +878,12 @@ exprt c_typecheck_baset::do_initializer_list(
 
     // 6.7.9, 14: An array of character type may be initialized by a character
     // string literal or UTF-8 string literal, optionally enclosed in braces.
-    if(value.operands().size()>=1 &&
-       value.op0().id()==ID_string_constant &&
-       (full_type.subtype().id()==ID_signedbv ||
-        full_type.subtype().id()==ID_unsignedbv) &&
-       full_type.subtype().get(ID_width)==char_type().get(ID_width))
+    if(
+      value.operands().size() >= 1 && value.op0().id() == ID_string_constant &&
+      (full_type.subtype().id() == ID_signedbv ||
+       full_type.subtype().id() == ID_unsignedbv) &&
+      to_bitvector_type(full_type.subtype()).get_width() ==
+        char_type().get_width())
     {
       if(value.operands().size()>1)
       {

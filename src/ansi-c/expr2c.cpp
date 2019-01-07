@@ -244,7 +244,7 @@ std::string expr2ct::convert_rec(
       return q+"long double"+d;
     else
     {
-      std::string swidth=src.get_string(ID_width);
+      std::string swidth = std::to_string(width);
       std::string fwidth=src.get_string(ID_f);
       return q + CPROVER_PREFIX + "floatbv[" + swidth + "][" + fwidth + "]";
     }
@@ -282,7 +282,7 @@ std::string expr2ct::convert_rec(
 
     // There is also wchar_t among the above, but this isn't a C type.
 
-    mp_integer width=string2integer(src.get_string(ID_width));
+    const std::size_t width = to_bitvector_type(src).get_width();
 
     bool is_signed=src.id()==ID_signedbv;
     std::string sign_str=is_signed?"signed ":"unsigned ";
