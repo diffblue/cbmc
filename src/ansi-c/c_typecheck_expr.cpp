@@ -420,7 +420,7 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
     // This is one of the few places where it's detectable
     // that we are using "bool" for boolean operators instead
     // of "int". We convert for this reason.
-    if(follow(expr.op0().type()).id()==ID_bool)
+    if(expr.op0().type().id() == ID_bool)
       expr.op0().make_typecast(signed_int_type());
 
     irept::subt &generic_associations=
@@ -1104,7 +1104,7 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
     // This is one of the few places where it's detectable
     // that we are using "bool" for boolean operators instead
     // of "int". We convert for this reason.
-    if(follow(op.type()).id()==ID_bool)
+    if(op.type().id() == ID_bool)
       op.make_typecast(signed_int_type());
 
     // we need to find a member with the right type
@@ -1273,15 +1273,14 @@ void c_typecheck_baset::typecheck_expr_index(exprt &expr)
   // we might have to swap them
 
   {
-    const typet &array_full_type=follow(array_expr.type());
-    const typet &index_full_type=follow(index_expr.type());
+    const typet &array_type = array_expr.type();
+    const typet &index_type = index_expr.type();
 
-    if(array_full_type.id()!=ID_array &&
-       array_full_type.id()!=ID_pointer &&
-       array_full_type.id()!=ID_vector &&
-       (index_full_type.id()==ID_array ||
-        index_full_type.id()==ID_pointer ||
-        index_full_type.id()==ID_vector))
+    if(
+      array_type.id() != ID_array && array_type.id() != ID_pointer &&
+      array_type.id() != ID_vector &&
+      (index_type.id() == ID_array || index_type.id() == ID_pointer ||
+       index_type.id() == ID_vector))
       std::swap(array_expr, index_expr);
   }
 
@@ -1290,7 +1289,7 @@ void c_typecheck_baset::typecheck_expr_index(exprt &expr)
   // array_expr is a reference to one of expr.operands(), when that vector is
   // swapped below the reference is no longer valid. final_array_type exists
   // beyond that point so can't be a reference
-  const typet final_array_type = follow(array_expr.type());
+  const typet final_array_type = array_expr.type();
 
   if(final_array_type.id()==ID_array ||
      final_array_type.id()==ID_vector)
@@ -1329,7 +1328,7 @@ void c_typecheck_baset::adjust_float_rel(exprt &expr)
   // equality and disequality on float is not mathematical equality!
   assert(expr.operands().size()==2);
 
-  if(follow(expr.op0().type()).id()==ID_floatbv)
+  if(expr.op0().type().id() == ID_floatbv)
   {
     if(expr.id()==ID_equal)
       expr.id(ID_ieee_float_equal);
@@ -1347,8 +1346,7 @@ void c_typecheck_baset::typecheck_expr_rel(
   const typet o_type0=op0.type();
   const typet o_type1=op1.type();
 
-  if(follow(o_type0).id()==ID_vector ||
-     follow(o_type1).id()==ID_vector)
+  if(o_type0.id() == ID_vector || o_type1.id() == ID_vector)
   {
     typecheck_expr_rel_vector(expr);
     return;
@@ -1360,8 +1358,7 @@ void c_typecheck_baset::typecheck_expr_rel(
   {
     if(follow(o_type0)==follow(o_type1))
     {
-      const typet &final_type=follow(o_type0);
-      if(final_type.id() != ID_array)
+      if(o_type0.id() != ID_array)
       {
         adjust_float_rel(expr);
         return; // no promotion necessary
@@ -1449,12 +1446,12 @@ void c_typecheck_baset::typecheck_expr_rel_vector(
   exprt &op0=expr.op0();
   exprt &op1=expr.op1();
 
-  const typet o_type0=follow(op0.type());
-  const typet o_type1=follow(op1.type());
+  const typet o_type0 = op0.type();
+  const typet o_type1 = op1.type();
 
-  if(o_type0.id()!=ID_vector ||
-     o_type1.id()!=ID_vector ||
-     follow(o_type0.subtype())!=follow(o_type1.subtype()))
+  if(
+    o_type0.id() != ID_vector || o_type1.id() != ID_vector ||
+    o_type0.subtype() != o_type1.subtype())
   {
     error().source_location = expr.source_location();
     error() << "vector operator `" << expr.id()
@@ -1478,17 +1475,17 @@ void c_typecheck_baset::typecheck_expr_ptrmember(exprt &expr)
     throw 0;
   }
 
-  const typet &final_op0_type=follow(expr.op0().type());
+  const typet &op0_type = expr.op0().type();
 
-  if(final_op0_type.id()==ID_array)
+  if(op0_type.id() == ID_array)
   {
     // a->f is the same as a[0].f
     exprt zero=from_integer(0, index_type());
-    index_exprt index_expr(expr.op0(), zero, final_op0_type.subtype());
+    index_exprt index_expr(expr.op0(), zero, op0_type.subtype());
     index_expr.set(ID_C_lvalue, true);
     expr.op0().swap(index_expr);
   }
-  else if(final_op0_type.id()==ID_pointer)
+  else if(op0_type.id() == ID_pointer)
   {
     // turn x->y into (*x).y
     dereference_exprt deref_expr(expr.op0());
@@ -1667,7 +1664,7 @@ void c_typecheck_baset::typecheck_expr_trinary(if_exprt &expr)
     return;
   }
 
-  if(follow(operands[1].type())==follow(operands[2].type()))
+  if(operands[1].type() == operands[2].type())
   {
     expr.type()=operands[1].type();
 
@@ -1808,7 +1805,7 @@ void c_typecheck_baset::typecheck_expr_dereference(exprt &expr)
 
   exprt &op=expr.op0();
 
-  const typet op_type=follow(op.type());
+  const typet op_type = op.type();
 
   if(op_type.id()==ID_array)
   {
@@ -1868,7 +1865,6 @@ void c_typecheck_baset::typecheck_expr_side_effect(side_effect_exprt &expr)
 
     const exprt &op0=expr.op0();
     const typet &type0=op0.type();
-    const typet &final_type0=follow(type0);
 
     if(!op0.get_bool(ID_C_lvalue))
     {
@@ -1886,9 +1882,9 @@ void c_typecheck_baset::typecheck_expr_side_effect(side_effect_exprt &expr)
       throw 0;
     }
 
-    if(final_type0.id()==ID_c_enum_tag)
+    if(type0.id() == ID_c_enum_tag)
     {
-      if(follow_tag(to_c_enum_tag_type(final_type0)).is_incomplete())
+      if(follow_tag(to_c_enum_tag_type(type0)).is_incomplete())
       {
         error().source_location = expr.source_location();
         error() << "operator `" << statement
@@ -1899,18 +1895,18 @@ void c_typecheck_baset::typecheck_expr_side_effect(side_effect_exprt &expr)
       else
         expr.type()=type0;
     }
-    else if(final_type0.id()==ID_c_bit_field)
+    else if(type0.id() == ID_c_bit_field)
     {
       // promote to underlying type
-      typet underlying_type=to_c_bit_field_type(final_type0).subtype();
+      typet underlying_type = to_c_bit_field_type(type0).subtype();
       expr.op0().make_typecast(underlying_type);
       expr.type()=underlying_type;
     }
-    else if(is_numeric_type(final_type0))
+    else if(is_numeric_type(type0))
     {
       expr.type()=type0;
     }
-    else if(final_type0.id()==ID_pointer)
+    else if(type0.id() == ID_pointer)
     {
       expr.type()=type0;
       typecheck_arithmetic_pointer(op0);

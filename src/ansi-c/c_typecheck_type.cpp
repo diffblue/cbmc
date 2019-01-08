@@ -475,8 +475,7 @@ void c_typecheck_baset::typecheck_code_type(code_typet &type)
 
     parameter_map.clear();
 
-    if(parameters.size()==1 &&
-       follow(parameters[0].type()).id()==ID_empty)
+    if(parameters.size() == 1 && parameters[0].type().id() == ID_empty)
     {
       // if we just have one parameter of type void, remove it
       parameters.clear();
@@ -489,7 +488,7 @@ void c_typecheck_baset::typecheck_code_type(code_typet &type)
   // "A function declarator shall not specify a return type that
   // is a function type or an array type."
 
-  const typet &decl_return_type = follow(type.return_type());
+  const typet &decl_return_type = type.return_type();
 
   if(decl_return_type.id() == ID_array)
   {
@@ -1403,7 +1402,7 @@ void c_typecheck_baset::typecheck_c_bit_field_type(c_bit_field_typet &type)
     type.remove(ID_size);
   }
 
-  const typet &subtype=follow(type.subtype());
+  const typet &subtype = type.subtype();
 
   std::size_t sub_width=0;
 

@@ -410,24 +410,27 @@ std::string expr2ct::convert_rec(
   {
     c_qualifierst sub_qualifiers;
     sub_qualifiers.read(src.subtype());
-    const typet &subtype_followed=ns.follow(src.subtype());
+    const typet &subtype = src.subtype();
 
     // The star gets attached to the declarator.
     std::string new_declarator="*";
 
-    if(q!="" &&
-       (!declarator.empty() || subtype_followed.id()==ID_pointer))
+    if(q != "" && (!declarator.empty() || subtype.id() == ID_pointer))
+    {
       new_declarator+=" "+q;
+    }
 
     new_declarator+=declarator;
 
     // Depending on precedences, we may add parentheses.
     if(
-      subtype_followed.id() == ID_code ||
-      (sizeof_nesting == 0 && subtype_followed.id() == ID_array))
+      subtype.id() == ID_code ||
+      (sizeof_nesting == 0 && subtype.id() == ID_array))
+    {
       new_declarator="("+new_declarator+")";
+    }
 
-    return convert_rec(src.subtype(), sub_qualifiers, new_declarator);
+    return convert_rec(subtype, sub_qualifiers, new_declarator);
   }
   else if(src.id()==ID_array)
   {
@@ -552,9 +555,9 @@ std::string expr2ct::convert_rec(
     const typet &return_type=code_type.return_type();
 
     // return type may be a function pointer or array
-    const typet *non_ptr_type=&ns.follow(return_type);
+    const typet *non_ptr_type = &return_type;
     while(non_ptr_type->id()==ID_pointer)
-      non_ptr_type=&(ns.follow(non_ptr_type->subtype()));
+      non_ptr_type = &(non_ptr_type->subtype());
 
     if(non_ptr_type->id()==ID_code ||
        non_ptr_type->id()==ID_array)
@@ -753,8 +756,8 @@ std::string expr2ct::convert_typecast(
 
   // some special cases
 
-  const typet &to_type=ns.follow(src.type());
-  const typet &from_type=ns.follow(src.op().type());
+  const typet &to_type = src.type();
+  const typet &from_type = src.op().type();
 
   if(to_type.id()==ID_c_bool &&
      from_type.id()==ID_bool)
@@ -764,7 +767,7 @@ std::string expr2ct::convert_typecast(
      from_type.id()==ID_c_bool)
     return convert_with_precedence(src.op(), precedence);
 
-  std::string dest="("+convert(src.type())+")";
+  std::string dest = "(" + convert(to_type) + ")";
 
   unsigned p;
   std::string tmp=convert_with_precedence(src.op(), p);
@@ -1284,8 +1287,7 @@ std::string expr2ct::convert_complex(
   // float complex CMPLXF(float x, float y);
   // long double complex CMPLXL(long double x, long double y);
 
-  const typet &subtype=
-    ns.follow(ns.follow(src.type()).subtype());
+  const typet &subtype = ns.follow(src.type()).subtype();
 
   std::string name;
 
@@ -2071,9 +2073,9 @@ std::string expr2ct::convert_vector(
   const exprt &src,
   unsigned &precedence)
 {
-  const typet full_type=ns.follow(src.type());
+  const typet &type = src.type();
 
-  if(full_type.id()!=ID_vector)
+  if(type.id() != ID_vector)
     return convert_norep(src, precedence);
 
   std::string dest="{ ";
@@ -2144,7 +2146,7 @@ std::string expr2ct::convert_array(
   // we treat arrays of characters as string constants,
   // and arrays of wchar_t as wide strings
 
-  const typet &subtype=ns.follow(ns.follow(src.type()).subtype());
+  const typet &subtype = src.type().subtype();
 
   bool all_constant=true;
 
@@ -3426,9 +3428,8 @@ std::string expr2ct::convert_with_precedence(
     if(p0<=1)
       dest+=')';
 
-    const typet &to_type=ns.follow(src.type());
     dest+=", ";
-    dest+=convert(to_type);
+    dest += convert(src.type());
     dest+=", ";
 
     unsigned p1;
@@ -3598,9 +3599,9 @@ std::string expr2ct::convert_with_precedence(
       return convert_norep(src, precedence);
     else if(src.type().id()==ID_code)
       return convert_unary(src, "", precedence=15);
-    else if(src.op0().id()==ID_plus &&
-            src.op0().operands().size()==2 &&
-            ns.follow(src.op0().op0().type()).id()==ID_pointer)
+    else if(
+      src.op0().id() == ID_plus && src.op0().operands().size() == 2 &&
+      src.op0().op0().type().id() == ID_pointer)
     {
       // Note that index[pointer] is legal C, but we avoid it nevertheless.
       return convert(index_exprt(src.op0().op0(), src.op0().op1()));

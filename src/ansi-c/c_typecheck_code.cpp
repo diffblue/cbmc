@@ -639,9 +639,9 @@ void c_typecheck_baset::typecheck_return(codet &code)
 {
   if(code.operands().empty())
   {
-    if(follow(return_type).id()!=ID_empty &&
-       return_type.id()!=ID_constructor &&
-       return_type.id()!=ID_destructor)
+    if(
+      return_type.id() != ID_empty && return_type.id() != ID_constructor &&
+      return_type.id() != ID_destructor)
     {
       // gcc doesn't actually complain, it just warns!
       warning().source_location = code.source_location();
@@ -655,16 +655,16 @@ void c_typecheck_baset::typecheck_return(codet &code)
   {
     typecheck_expr(code.op0());
 
-    if(follow(return_type).id()==ID_empty)
+    if(return_type.id() == ID_empty)
     {
       // gcc doesn't actually complain, it just warns!
-      if(follow(code.op0().type()).id()!=ID_empty)
+      if(code.op0().type().id() != ID_empty)
       {
         warning().source_location=code.source_location();
 
         warning() << "function has return void ";
         warning() << "but a return statement returning ";
-        warning() << to_string(follow(code.op0().type()));
+        warning() << to_string(code.op0().type());
         warning() << eom;
 
         code.op0().make_typecast(return_type);
