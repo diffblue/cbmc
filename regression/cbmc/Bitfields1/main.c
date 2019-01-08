@@ -11,7 +11,7 @@ struct bft {
   unsigned int a:3;
   unsigned int b:1;
   signed int c:2;
-  _Bool d:3;
+  _Bool d : 1;
 
   // an anonymous bitfield
   signed int :2;
