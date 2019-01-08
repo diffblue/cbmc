@@ -156,36 +156,36 @@ std::string expr2cppt::convert_rec(
   }
   else if(src.id() == ID_struct_tag)
   {
-    const symbolt &symbol=ns.lookup(to_struct_tag_type(src));
+    const symbolt &symbol = ns.lookup(to_struct_tag_type(src));
 
-    std::string dest=q;
+    std::string dest = q;
 
     if(symbol.type.get_bool(ID_C_class))
-      dest+="class";
+      dest += "class";
     else if(symbol.type.get_bool(ID_C_interface))
-      dest+="__interface"; // MS-specific
+      dest += "__interface"; // MS-specific
     else
-      dest+="struct";
+      dest += "struct";
 
     if(!symbol.pretty_name.empty())
-      dest+=" "+id2string(symbol.pretty_name);
+      dest += " " + id2string(symbol.pretty_name);
 
-    dest+=d;
+    dest += d;
 
     return dest;
   }
   else if(src.id() == ID_c_enum_tag)
   {
-    const symbolt &symbol=ns.lookup(to_c_enum_tag_type(src));
+    const symbolt &symbol = ns.lookup(to_c_enum_tag_type(src));
 
-    std::string dest=q;
+    std::string dest = q;
 
-    dest+="enum";
+    dest += "enum";
 
     if(!symbol.pretty_name.empty())
-      dest+=" "+id2string(symbol.pretty_name);
+      dest += " " + id2string(symbol.pretty_name);
 
-    dest+=d;
+    dest += d;
 
     return dest;
   }

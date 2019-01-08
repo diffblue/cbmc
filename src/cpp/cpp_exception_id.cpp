@@ -21,7 +21,7 @@ void cpp_exception_list_rec(
   const std::string &suffix,
   std::vector<irep_idt> &dest)
 {
-  if(src.id()==ID_pointer)
+  if(src.id() == ID_pointer)
   {
     if(src.get_bool(ID_C_reference))
     {

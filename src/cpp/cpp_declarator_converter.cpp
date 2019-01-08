@@ -143,8 +143,7 @@ symbolt &cpp_declarator_convertert::convert(
           cpp_typecheck_fargst());
 
       if(
-        symbol_expr.id() != ID_type ||
-        symbol_expr.type().id() != ID_struct_tag)
+        symbol_expr.id() != ID_type || symbol_expr.type().id() != ID_struct_tag)
       {
         cpp_typecheck.error().source_location=name.source_location();
         cpp_typecheck.error() << "error: expected type"

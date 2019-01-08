@@ -350,14 +350,14 @@ exprt cpp_typecheck_resolvet::convert_identifier(
       typet followed_type=symbol.type;
       bool constant=followed_type.get_bool(ID_C_constant);
 
-      #if 0
+#if 0
       while(followed_type.id() == ID_symbol_type)
       {
         followed_type =
           cpp_typecheck.follow(to_symbol_type(followed_type));
         constant |= followed_type.get_bool(ID_C_constant);
       }
-      #endif
+#endif
 
       if(constant &&
          symbol.value.is_not_nil() &&

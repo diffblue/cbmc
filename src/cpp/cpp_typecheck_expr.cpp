@@ -584,7 +584,7 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
       // go into scope of first operand
       if(expr.op0().type().id() == ID_struct_tag)
       {
-        const irep_idt &struct_identifier=
+        const irep_idt &struct_identifier =
           to_struct_tag_type(expr.op0().type()).get_identifier();
 
         // get that scope
