@@ -337,14 +337,14 @@ std::pair<exprt, string_constraintst> add_axioms_for_fractional_part(
 /// \todo For now we only consider single precision.
 /// \param fresh_symbol: generator of fresh symbols
 /// \param res: string expression representing the float in scientific notation
-/// \param f: a float expression, which is positive
+/// \param float_expr: a float expression, which is positive
 /// \param array_pool: pool of arrays representing strings
 /// \param ns: namespace
 /// \return a integer expression different from 0 to signal an exception
 std::pair<exprt, string_constraintst> add_axioms_from_float_scientific_notation(
   symbol_generatort &fresh_symbol,
   const array_string_exprt &res,
-  const exprt &f,
+  const exprt &float_expr,
   array_poolt &array_pool,
   const namespacet &ns)
 {
@@ -359,13 +359,13 @@ std::pair<exprt, string_constraintst> add_axioms_from_float_scientific_notation(
   exprt round_to_zero_expr=from_integer(ieee_floatt::ROUND_TO_ZERO, int_type);
 
   // `bin_exponent` is $e$ in the formulas
-  exprt bin_exponent=get_exponent(f, float_spec);
+  exprt bin_exponent = get_exponent(float_expr, float_spec);
 
   // $m$ from the formula is a value between 0.0 and 2.0 represented
   // with values in the range 0x000000 0xFFFFFF so 1 corresponds to 0x800000.
   // `bin_significand_int` represents $m * 0x800000$
-  exprt bin_significand_int=
-    get_significand(f, float_spec, unsignedbv_typet(32));
+  exprt bin_significand_int =
+    get_significand(float_expr, float_spec, unsignedbv_typet(32));
   // `bin_significand` represents $m$ and is obtained
   // by multiplying `binary_significand_as_int` by
   // 1/0x800000 = 2^-23 = 1.1920928955078125 * 10^-7
@@ -375,7 +375,8 @@ std::pair<exprt, string_constraintst> add_axioms_from_float_scientific_notation(
 
   // This is a first approximation of the exponent that will adjust
   // if the fraction we get is greater than 10
-  exprt dec_exponent_estimate=estimate_decimal_exponent(f, float_spec);
+  exprt dec_exponent_estimate =
+    estimate_decimal_exponent(float_expr, float_spec);
 
   // Table for values of $2^x / 10^(floor(log_10(2)*x))$ where x=Range[0,128]
   std::vector<double> two_power_e_over_ten_power_d_table(
@@ -462,7 +463,7 @@ std::pair<exprt, string_constraintst> add_axioms_from_float_scientific_notation(
   minus_exprt fractional_part(
     dec_significand, floatbv_of_int_expr(dec_significand_int, float_spec));
 
-  // shifted_float is floor(f * 1e5)
+  // shifted_float is floor(float_expr * 1e5)
   exprt shifting=constant_float(1e5, float_spec);
   exprt shifted_float=
     round_expr_to_zero(floatbv_mult(fractional_part, shifting));
@@ -471,7 +472,7 @@ std::pair<exprt, string_constraintst> add_axioms_from_float_scientific_notation(
   // the exponent notation.
   exprt max_non_exponent_notation=from_integer(100000, shifted_float.type());
 
-  // fractional_part_shifted is floor(f * 100000) % 100000
+  // fractional_part_shifted is floor(float_expr * 100000) % 100000
   const mod_exprt fractional_part_shifted(
     shifted_float, max_non_exponent_notation);
 
