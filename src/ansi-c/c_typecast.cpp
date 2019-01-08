@@ -354,7 +354,30 @@ c_typecastt::c_typet c_typecastt::get_c_type(
   else if(type.id()==ID_complex)
     return COMPLEX;
   else if(type.id()==ID_c_bit_field)
-    return get_c_type(to_c_bit_field_type(type).subtype());
+  {
+    const auto &bit_field_type = to_c_bit_field_type(type);
+
+    // We take the underlying type, and then apply the number
+    // of bits given
+    typet underlying_type;
+
+    if(bit_field_type.subtype().id() == ID_c_enum_tag)
+    {
+      const auto &followed =
+        ns.follow_tag(to_c_enum_tag_type(bit_field_type.subtype()));
+      if(followed.is_incomplete())
+        return INT;
+      else
+        underlying_type = followed.subtype();
+    }
+    else
+      underlying_type = bit_field_type.subtype();
+
+    const bitvector_typet new_type(
+      underlying_type.id(), bit_field_type.get_width());
+
+    return get_c_type(new_type);
+  }
 
   return OTHER;
 }
