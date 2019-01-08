@@ -1,0 +1,11 @@
+KNOWNBUG
+compound_promition.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+The C frontend needs to apply the usual arithmetic promotion rules in
+compound assignments. Issue #3706.
