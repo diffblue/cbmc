@@ -111,13 +111,16 @@ void set_internal_dynamic_object(
 {
   if(expr.id()==ID_symbol)
   {
-    const irep_idt &id=to_ssa_expr(expr).get_original_name();
-    const symbolt *symbol;
-    if(!ns.lookup(id, symbol))
+    if(expr.type().id() != ID_code)
     {
-      bool result = symbol->type.get_bool(ID_C_dynamic);
-      if(result)
-        goto_trace_step.internal=true;
+      const irep_idt &id = to_ssa_expr(expr).get_original_name();
+      const symbolt *symbol;
+      if(!ns.lookup(id, symbol))
+      {
+        bool result = symbol->type.get_bool(ID_C_dynamic);
+        if(result)
+          goto_trace_step.internal = true;
+      }
     }
   }
   else
