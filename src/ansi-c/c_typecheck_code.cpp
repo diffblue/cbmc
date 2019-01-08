@@ -259,12 +259,9 @@ void c_typecheck_baset::typecheck_decl(codet &code)
 
   // iterate over declarators
 
-  for(ansi_c_declarationt::declaratorst::const_iterator
-      d_it=declaration.declarators().begin();
-      d_it!=declaration.declarators().end();
-      d_it++)
+  for(const auto &d : declaration.declarators())
   {
-    irep_idt identifier=d_it->get_name();
+    irep_idt identifier = d.get_name();
 
     // look it up
     symbol_tablet::symbolst::const_iterator s_it=

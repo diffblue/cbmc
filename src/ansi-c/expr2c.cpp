@@ -92,13 +92,11 @@ static std::string clean_identifier(const irep_idt &id)
     dest.erase(0, c_pos+2);
   else if(c_pos!=std::string::npos)
   {
-    for(std::string::iterator it2=dest.begin();
-        it2!=dest.end();
-        ++it2)
-      if(*it2==':')
-        *it2='$';
-      else if(*it2=='-')
-        *it2='_';
+    for(char &ch : dest)
+      if(ch == ':')
+        ch = '$';
+      else if(ch == '-')
+        ch = '_';
   }
 
   // rewrite . as used in ELF section names
@@ -113,20 +111,17 @@ void expr2ct::get_shorthands(const exprt &expr)
   find_symbols(expr, symbols);
 
   // avoid renaming parameters, if possible
-  for(find_symbols_sett::const_iterator
-      it=symbols.begin();
-      it!=symbols.end();
-      it++)
+  for(const auto &symbol_id : symbols)
   {
     const symbolt *symbol;
-    bool is_param=!ns.lookup(*it, symbol) && symbol->is_parameter;
+    bool is_param = !ns.lookup(symbol_id, symbol) && symbol->is_parameter;
 
     if(!is_param)
       continue;
 
-    irep_idt sh=id_shorthand(*it);
+    irep_idt sh = id_shorthand(symbol_id);
 
-    std::string func = id2string(*it);
+    std::string func = id2string(symbol_id);
     func = func.substr(0, func.rfind("::"));
 
     // if there is a global symbol of the same name as the shorthand (even if
@@ -137,19 +132,16 @@ void expr2ct::get_shorthands(const exprt &expr)
 
     ns_collision[func].insert(sh);
 
-    if(!shorthands.insert(std::make_pair(*it, sh)).second)
+    if(!shorthands.insert(std::make_pair(symbol_id, sh)).second)
       UNREACHABLE;
   }
 
-  for(find_symbols_sett::const_iterator
-      it=symbols.begin();
-      it!=symbols.end();
-      it++)
+  for(const auto &symbol_id : symbols)
   {
-    if(shorthands.find(*it)!=shorthands.end())
+    if(shorthands.find(symbol_id) != shorthands.end())
       continue;
 
-    irep_idt sh=id_shorthand(*it);
+    irep_idt sh = id_shorthand(symbol_id);
 
     bool has_collision=
       ns_collision[irep_idt()].find(sh)!=
@@ -168,16 +160,16 @@ void expr2ct::get_shorthands(const exprt &expr)
       irep_idt func;
 
       const symbolt *symbol;
-      if(!ns.lookup(*it, symbol))
+      if(!ns.lookup(symbol_id, symbol))
         func=symbol->location.get_function();
 
       has_collision=!ns_collision[func].insert(sh).second;
     }
 
     if(has_collision)
-      sh=clean_identifier(*it);
+      sh = clean_identifier(symbol_id);
 
-    shorthands.insert(std::make_pair(*it, sh));
+    shorthands.insert(std::make_pair(symbol_id, sh));
   }
 }
 
@@ -1786,13 +1778,10 @@ std::string expr2ct::convert_constant(
     const c_enum_typet::memberst &members=
       to_c_enum_type(c_enum_type).members();
 
-    for(c_enum_typet::memberst::const_iterator
-        it=members.begin();
-        it!=members.end();
-        it++)
+    for(const auto &member : members)
     {
-      if(it->get_value()==int_value_string)
-        return "/*enum*/"+id2string(it->get_base_name());
+      if(member.get_value() == int_value_string)
+        return "/*enum*/" + id2string(member.get_base_name());
     }
 
     // failed...
