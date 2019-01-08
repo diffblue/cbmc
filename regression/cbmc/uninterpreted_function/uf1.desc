@@ -1,0 +1,10 @@
+CORE
+uf1.c
+
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+Basic test for an uninterpreted function; based on issue #3561.
