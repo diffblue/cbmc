@@ -154,46 +154,40 @@ std::string expr2cppt::convert_rec(
     else
       return expr2ct::convert_rec(src, qualifiers, declarator);
   }
-  else if(src.id() == ID_symbol_type)
+  else if(src.id() == ID_struct_tag)
   {
-    const irep_idt &identifier=
-      to_symbol_type(src).get_identifier();
+    const symbolt &symbol=ns.lookup(to_struct_tag_type(src));
 
-    const symbolt &symbol=ns.lookup(identifier);
+    std::string dest=q;
 
-    if(symbol.type.id() == ID_struct)
-    {
-      std::string dest=q;
-
-      if(symbol.type.get_bool(ID_C_class))
-        dest+="class";
-      else if(symbol.type.get_bool(ID_C_interface))
-        dest+="__interface"; // MS-specific
-      else
-        dest+="struct";
-
-      if(!symbol.pretty_name.empty())
-        dest+=" "+id2string(symbol.pretty_name);
-
-      dest+=d;
-
-      return dest;
-    }
-    else if(symbol.type.id()==ID_c_enum)
-    {
-      std::string dest=q;
-
-      dest+="enum";
-
-      if(!symbol.pretty_name.empty())
-        dest+=" "+id2string(symbol.pretty_name);
-
-      dest+=d;
-
-      return dest;
-    }
+    if(symbol.type.get_bool(ID_C_class))
+      dest+="class";
+    else if(symbol.type.get_bool(ID_C_interface))
+      dest+="__interface"; // MS-specific
     else
-      return expr2ct::convert_rec(src, qualifiers, declarator);
+      dest+="struct";
+
+    if(!symbol.pretty_name.empty())
+      dest+=" "+id2string(symbol.pretty_name);
+
+    dest+=d;
+
+    return dest;
+  }
+  else if(src.id() == ID_c_enum_tag)
+  {
+    const symbolt &symbol=ns.lookup(to_c_enum_tag_type(src));
+
+    std::string dest=q;
+
+    dest+="enum";
+
+    if(!symbol.pretty_name.empty())
+      dest+=" "+id2string(symbol.pretty_name);
+
+    dest+=d;
+
+    return dest;
   }
   else if(src.id() == ID_struct)
   {

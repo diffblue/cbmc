@@ -46,10 +46,7 @@ std::string cpp_typecheckt::template_suffix(
     if(expr.id()==ID_type)
     {
       const typet &type=expr.type();
-      if(type.id() == ID_symbol_type)
-        result += id2string(to_symbol_type(type).get_identifier());
-      else if(type.id() == ID_struct_tag ||
-              type.id() == ID_union_tag)
+      if(type.id() == ID_struct_tag || type.id() == ID_union_tag)
         result += id2string(to_tag_type(type).get_identifier());
       else
         result+=cpp_type2name(type);
@@ -187,7 +184,7 @@ const symbolt &cpp_typecheckt::class_template_symbol(
 void cpp_typecheckt::elaborate_class_template(
   const typet &type)
 {
-  if(type.id() != ID_symbol_type)
+  if(type.id() != ID_struct_tag)
     return;
 
   const symbolt &symbol = lookup(to_symbol_type(type));
