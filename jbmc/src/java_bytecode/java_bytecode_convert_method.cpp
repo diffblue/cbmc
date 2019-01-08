@@ -641,20 +641,39 @@ static irep_idt get_if_cmp_operator(const irep_idt &stmt)
   throw "unhandled java comparison instruction";
 }
 
-static member_exprt to_member(const exprt &pointer, const exprt &fieldref)
+static member_exprt
+to_member(const exprt &pointer, const exprt &fieldref, const namespacet &ns)
 {
   struct_tag_typet class_type(fieldref.get(ID_class));
 
-  const typecast_exprt pointer2(pointer, java_reference_type(class_type));
+  const exprt typed_pointer =
+    typecast_exprt::conditional_cast(pointer, java_reference_type(class_type));
 
-  dereference_exprt obj_deref=checked_dereference(pointer2, class_type);
+  const irep_idt &component_name = fieldref.get(ID_component_name);
 
-  const member_exprt member_expr(
-    obj_deref,
-    fieldref.get(ID_component_name),
-    fieldref.type());
+  exprt accessed_object = checked_dereference(typed_pointer, class_type);
 
-  return member_expr;
+  // The field access is described as being against a particular type, but it
+  // may in fact belong to any ancestor type.
+  while(1)
+  {
+    struct_typet object_type =
+      to_struct_type(ns.follow(accessed_object.type()));
+    auto component = object_type.get_component(component_name);
+
+    if(component.is_not_nil())
+      return member_exprt(accessed_object, component);
+
+    // Component not present: check the immediate parent type.
+
+    const auto &components = object_type.components();
+    INVARIANT(
+      components.size() != 0,
+      "infer_opaque_type_fields should guarantee that a member access has a "
+      "corresponding field");
+
+    accessed_object = member_exprt(accessed_object, components.front());
+  }
 }
 
 /// Find all goto statements in 'repl' that target 'old_label' and redirect them
@@ -1530,7 +1549,7 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
     else if(statement=="getfield")
     {
       PRECONDITION(op.size() == 1 && results.size() == 1);
-      results[0]=java_bytecode_promotion(to_member(op[0], arg0));
+      results[0] = java_bytecode_promotion(to_member(op[0], arg0, ns));
     }
     else if(statement=="getstatic")
     {
@@ -2543,7 +2562,7 @@ code_blockt java_bytecode_convert_methodt::convert_putfield(
     block,
     bytecode_write_typet::FIELD,
     arg0.get(ID_component_name));
-  block.add(code_assignt(to_member(op[0], arg0), op[1]));
+  block.add(code_assignt(to_member(op[0], arg0, ns), op[1]));
   return block;
 }
 
@@ -2918,8 +2937,7 @@ optionalt<exprt> java_bytecode_convert_methodt::convert_invoke_dynamic(
   if(return_type.id() == ID_empty)
     return {};
 
-  const auto value =
-    zero_initializer(return_type, location, namespacet(symbol_table));
+  const auto value = zero_initializer(return_type, location, ns);
   if(!value.has_value())
   {
     error().source_location = location;

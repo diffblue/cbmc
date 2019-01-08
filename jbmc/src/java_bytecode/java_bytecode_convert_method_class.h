@@ -43,6 +43,7 @@ public:
     bool threading_support)
     : messaget(_message_handler),
       symbol_table(symbol_table),
+      ns(symbol_table),
       max_array_length(_max_array_length),
       throw_assertion_error(throw_assertion_error),
       threading_support(threading_support),
@@ -69,6 +70,7 @@ public:
 
 protected:
   symbol_table_baset &symbol_table;
+  namespacet ns;
   const size_t max_array_length;
   const bool throw_assertion_error;
   const bool threading_support;
