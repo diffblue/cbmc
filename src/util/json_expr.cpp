@@ -158,10 +158,7 @@ json_objectt json(
   else if(type.id()==ID_c_enum_tag)
   {
     // we return the base type
-    return json(
-      to_c_enum_type(ns.follow_tag(to_c_enum_tag_type(type))).subtype(),
-      ns,
-      mode);
+    return json(ns.follow_tag(to_c_enum_tag_type(type)).subtype(), ns, mode);
   }
   else if(type.id()==ID_fixedbv)
   {

@@ -200,49 +200,60 @@ static std::string type2name(
   else if(type.id()==ID_struct ||
           type.id()==ID_union)
   {
-    if(type.id()==ID_struct)
-      result+="ST";
-    if(type.id()==ID_union)
-      result+="UN";
-    result+='[';
-    bool first = true;
-    for(const auto &c : to_struct_union_type(type).components())
-    {
-      if(!first)
-        result+='|';
-      else
-        first = false;
+    const auto &struct_union_type = to_struct_union_type(type);
 
-      result += type2name(c.type(), ns, symbol_number);
-      const irep_idt &component_name = c.get_name();
-      CHECK_RETURN(!component_name.empty());
-      result+="'"+id2string(component_name)+"'";
+    if(struct_union_type.is_incomplete())
+    {
+      if(type.id() == ID_struct)
+        result += "ST?";
+      else if(type.id() == ID_union)
+        result += "UN?";
     }
-    result+=']';
+    else
+    {
+      if(type.id() == ID_struct)
+        result += "ST";
+      if(type.id() == ID_union)
+        result += "UN";
+      result += '[';
+      bool first = true;
+      for(const auto &c : struct_union_type.components())
+      {
+        if(!first)
+          result += '|';
+        else
+          first = false;
+
+        result += type2name(c.type(), ns, symbol_number);
+        const irep_idt &component_name = c.get_name();
+        CHECK_RETURN(!component_name.empty());
+        result += "'" + id2string(component_name) + "'";
+      }
+      result += ']';
+    }
   }
-  else if(type.id()==ID_incomplete_struct)
-    result +="ST?";
-  else if(type.id()==ID_incomplete_union)
-    result +="UN?";
   else if(type.id()==ID_c_enum)
   {
-    result +="EN";
     const c_enum_typet &t=to_c_enum_type(type);
-    const c_enum_typet::memberst &members=t.members();
-    result+='[';
-    for(c_enum_typet::memberst::const_iterator
-        it=members.begin();
-        it!=members.end();
-        ++it)
+
+    if(t.is_incomplete())
+      result += "EN?";
+    else
     {
-      if(it!=members.begin())
-        result+='|';
-      result+=id2string(it->get_value());
-      result+="'"+id2string(it->get_identifier())+"'";
+      result += "EN";
+      const c_enum_typet::memberst &members = t.members();
+      result += '[';
+      for(c_enum_typet::memberst::const_iterator it = members.begin();
+          it != members.end();
+          ++it)
+      {
+        if(it != members.begin())
+          result += '|';
+        result += id2string(it->get_value());
+        result += "'" + id2string(it->get_identifier()) + "'";
+      }
     }
   }
-  else if(type.id()==ID_incomplete_c_enum)
-    result +="EN?";
   else if(type.id()==ID_c_bit_field)
     result+="BF"+pointer_offset_bits_as_string(type, ns);
   else if(type.id()==ID_vector)

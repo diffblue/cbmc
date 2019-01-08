@@ -332,17 +332,6 @@ std::string expr2ct::convert_rec(
   {
     return convert_struct_type(src, q, d);
   }
-  else if(src.id()==ID_incomplete_struct)
-  {
-    std::string dest=q+"struct";
-
-    const std::string &tag=src.get_string(ID_tag);
-    if(tag!="")
-      dest+=" "+tag;
-    dest+=d;
-
-    return dest;
-  }
   else if(src.id()==ID_union)
   {
     const union_typet &union_type=to_union_type(src);
@@ -352,28 +341,21 @@ std::string expr2ct::convert_rec(
     const irep_idt &tag=union_type.get_tag();
     if(tag!="")
       dest+=" "+id2string(tag);
-    dest+=" {";
 
-    for(const auto &c : union_type.components())
+    if(!union_type.is_incomplete())
     {
-      dest+=' ';
-      dest += convert_rec(c.type(), c_qualifierst(), id2string(c.get_name()));
-      dest+=';';
+      dest += " {";
+
+      for(const auto &c : union_type.components())
+      {
+        dest += ' ';
+        dest += convert_rec(c.type(), c_qualifierst(), id2string(c.get_name()));
+        dest += ';';
+      }
+
+      dest += " }";
     }
 
-    dest+=" }";
-
-    dest+=d;
-
-    return dest;
-  }
-  else if(src.id()==ID_incomplete_union)
-  {
-    std::string dest=q+"union";
-
-    const std::string &tag=src.get_string(ID_tag);
-    if(tag!="")
-      dest+=" "+tag;
     dest+=d;
 
     return dest;
@@ -397,40 +379,31 @@ std::string expr2ct::convert_rec(
     }
 
     result+=' ';
-    result+='{';
 
-    // add members
-    const c_enum_typet::memberst &members=to_c_enum_type(src).members();
-
-    for(c_enum_typet::memberst::const_iterator
-        it=members.begin();
-        it!=members.end();
-        it++)
+    if(!to_c_enum_type(src).is_incomplete())
     {
-      if(it!=members.begin())
-        result+=',';
-      result+=' ';
-      result+=id2string(it->get_base_name());
-      result+='=';
-      result+=id2string(it->get_value());
+      result += '{';
+
+      // add members
+      const c_enum_typet::memberst &members = to_c_enum_type(src).members();
+
+      for(c_enum_typet::memberst::const_iterator it = members.begin();
+          it != members.end();
+          it++)
+      {
+        if(it != members.begin())
+          result += ',';
+        result += ' ';
+        result += id2string(it->get_base_name());
+        result += '=';
+        result += id2string(it->get_value());
+      }
+
+      result += " }";
     }
 
-    result+=" }";
-
-    result+=d;
+    result += d;
     return result;
-  }
-  else if(src.id()==ID_incomplete_c_enum)
-  {
-    const irept &tag=src.find(ID_tag);
-
-    if(tag.is_not_nil())
-    {
-      std::string result=q+"enum";
-      result+=" "+tag.get_string(ID_C_base_name);
-      result+=d;
-      return result;
-    }
   }
   else if(src.id()==ID_c_enum_tag)
   {
@@ -708,7 +681,7 @@ std::string expr2ct::convert_struct_type(
   if(tag!="")
     dest+=" "+id2string(tag);
 
-  if(inc_struct_body)
+  if(inc_struct_body && !struct_type.is_incomplete())
   {
     dest+=" {";
 

@@ -65,9 +65,9 @@ public:
 
   // These produce union_typet, struct_typet, c_enum_typet or
   // the incomplete version.
-  const typet &follow_tag(const union_tag_typet &) const;
-  const typet &follow_tag(const struct_tag_typet &) const;
-  const typet &follow_tag(const c_enum_tag_typet &) const;
+  const union_typet &follow_tag(const union_tag_typet &) const;
+  const struct_typet &follow_tag(const struct_tag_typet &) const;
+  const c_enum_typet &follow_tag(const c_enum_tag_typet &) const;
 
   /// Returns the minimal integer n such that there is no symbol (in any of the
   /// symbol tables) whose name is of the form "An" where A is \p prefix.

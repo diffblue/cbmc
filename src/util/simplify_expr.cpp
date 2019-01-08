@@ -494,8 +494,8 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
       }
       else if(expr_type_id==ID_c_enum_tag)
       {
-        const typet &c_enum_type=ns.follow_tag(to_c_enum_tag_type(expr_type));
-        if(c_enum_type.id()==ID_c_enum) // possibly incomplete
+        const auto &c_enum_type = ns.follow_tag(to_c_enum_tag_type(expr_type));
+        if(!c_enum_type.is_incomplete()) // possibly incomplete
         {
           unsigned int_value = operand.is_true() ? 1u : 0u;
           exprt tmp=from_integer(int_value, c_enum_type);
@@ -564,8 +564,8 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
 
       if(expr_type_id==ID_c_enum_tag)
       {
-        const typet &c_enum_type=ns.follow_tag(to_c_enum_tag_type(expr_type));
-        if(c_enum_type.id()==ID_c_enum) // possibly incomplete
+        const auto &c_enum_type = ns.follow_tag(to_c_enum_tag_type(expr_type));
+        if(!c_enum_type.is_incomplete()) // possibly incomplete
         {
           exprt tmp=from_integer(int_value, c_enum_type);
           tmp.type()=expr_type; // we maintain the tag type
@@ -678,7 +678,7 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
     else if(op_type_id==ID_c_enum_tag) // enum to int
     {
       const typet &base_type =
-        to_c_enum_type(ns.follow_tag(to_c_enum_tag_type(op_type))).subtype();
+        ns.follow_tag(to_c_enum_tag_type(op_type)).subtype();
       if(base_type.id()==ID_signedbv || base_type.id()==ID_unsignedbv)
       {
         // enum constants use the representation of their base type
@@ -1574,7 +1574,7 @@ optionalt<std::string> simplify_exprt::expr2bits(
     }
     else if(type.id() == ID_c_enum_tag)
     {
-      const typet &c_enum_type = ns.follow_tag(to_c_enum_tag_type(type));
+      const auto &c_enum_type = ns.follow_tag(to_c_enum_tag_type(type));
       return expr2bits(constant_exprt(value, c_enum_type), little_endian);
     }
     else if(type.id() == ID_c_enum)

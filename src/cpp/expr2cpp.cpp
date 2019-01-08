@@ -161,8 +161,7 @@ std::string expr2cppt::convert_rec(
 
     const symbolt &symbol=ns.lookup(identifier);
 
-    if(symbol.type.id()==ID_struct ||
-       symbol.type.id()==ID_incomplete_struct)
+    if(symbol.type.id() == ID_struct)
     {
       std::string dest=q;
 
@@ -196,8 +195,7 @@ std::string expr2cppt::convert_rec(
     else
       return expr2ct::convert_rec(src, qualifiers, declarator);
   }
-  else if(src.id()==ID_struct ||
-          src.id()==ID_incomplete_struct)
+  else if(src.id() == ID_struct)
   {
     std::string dest=q;
 

@@ -87,37 +87,36 @@ const typet &namespace_baset::follow(const typet &src) const
 /// Follow type tag of union type.
 /// \param src: The union tag type to dispatch on.
 /// \return The type of the union tag in the symbol table.
-const typet &namespace_baset::follow_tag(const union_tag_typet &src) const
+const union_typet &namespace_baset::follow_tag(const union_tag_typet &src) const
 {
   const symbolt &symbol=lookup(src.get_identifier());
   CHECK_RETURN(symbol.is_type);
-  CHECK_RETURN(
-    symbol.type.id() == ID_union || symbol.type.id() == ID_incomplete_union);
-  return symbol.type;
+  CHECK_RETURN(symbol.type.id() == ID_union);
+  return to_union_type(symbol.type);
 }
 
 /// Follow type tag of struct type.
 /// \param src: The struct tag type to dispatch on.
 /// \return The type of the struct tag in the symbol table.
-const typet &namespace_baset::follow_tag(const struct_tag_typet &src) const
+const struct_typet &
+namespace_baset::follow_tag(const struct_tag_typet &src) const
 {
   const symbolt &symbol=lookup(src.get_identifier());
   CHECK_RETURN(symbol.is_type);
-  CHECK_RETURN(
-    symbol.type.id() == ID_struct || symbol.type.id() == ID_incomplete_struct);
-  return symbol.type;
+  CHECK_RETURN(symbol.type.id() == ID_struct);
+  return to_struct_type(symbol.type);
 }
 
 /// Follow type tag of enum type.
 /// \param src: The enum tag type to dispatch on.
 /// \return The type of the enum tag in the symbol table.
-const typet &namespace_baset::follow_tag(const c_enum_tag_typet &src) const
+const c_enum_typet &
+namespace_baset::follow_tag(const c_enum_tag_typet &src) const
 {
   const symbolt &symbol=lookup(src.get_identifier());
   CHECK_RETURN(symbol.is_type);
-  CHECK_RETURN(
-    symbol.type.id() == ID_c_enum || symbol.type.id() == ID_incomplete_c_enum);
-  return symbol.type;
+  CHECK_RETURN(symbol.type.id() == ID_c_enum);
+  return to_c_enum_type(symbol.type);
 }
 
 /// Follow macros to their values in a given expression.

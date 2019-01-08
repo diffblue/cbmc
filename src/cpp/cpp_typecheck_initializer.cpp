@@ -199,7 +199,16 @@ void cpp_typecheckt::zero_initializer(
 
   if(final_type.id()==ID_struct)
   {
-    for(const auto &component : to_struct_type(final_type).components())
+    const auto &struct_type = to_struct_type(final_type);
+
+    if(struct_type.is_incomplete())
+    {
+      error().source_location = source_location;
+      error() << "cannot zero-initialize incomplete struct" << eom;
+      throw 0;
+    }
+
+    for(const auto &component : struct_type.components())
     {
       if(component.type().id()==ID_code)
         continue;
@@ -238,12 +247,21 @@ void cpp_typecheckt::zero_initializer(
   }
   else if(final_type.id()==ID_union)
   {
+    const auto &union_type = to_union_type(final_type);
+
+    if(union_type.is_incomplete())
+    {
+      error().source_location = source_location;
+      error() << "cannot zero-initialize incomplete union" << eom;
+      throw 0;
+    }
+
     // Select the largest component for zero-initialization
     mp_integer max_comp_size=0;
 
     union_typet::componentt comp;
 
-    for(const auto &component : to_union_type(final_type).components())
+    for(const auto &component : union_type.components())
     {
       assert(component.type().is_not_nil());
 
@@ -293,13 +311,6 @@ void cpp_typecheckt::zero_initializer(
 
     typecheck_code(assign);
     ops.push_back(assign);
-  }
-  else if(final_type.id()==ID_incomplete_struct ||
-          final_type.id()==ID_incomplete_union)
-  {
-    error().source_location=source_location;
-    error() << "cannot zero-initialize incomplete compound" << eom;
-    throw 0;
   }
   else
   {

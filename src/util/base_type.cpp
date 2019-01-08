@@ -224,14 +224,6 @@ bool base_type_eqt::base_type_eq_rec(
 
     return true;
   }
-  else if(type1.id()==ID_incomplete_struct)
-  {
-    return true;
-  }
-  else if(type1.id()==ID_incomplete_union)
-  {
-    return true;
-  }
   else if(type1.id()==ID_code)
   {
     const code_typet::parameterst &parameters1=

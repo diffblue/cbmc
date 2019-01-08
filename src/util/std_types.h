@@ -238,6 +238,18 @@ public:
   {
     return is_class() ? ID_private : ID_public;
   }
+
+  /// A struct/union may be incomplete
+  bool is_incomplete() const
+  {
+    return get_bool(ID_incomplete);
+  }
+
+  /// A struct/union may be incomplete
+  void make_incomplete()
+  {
+    set(ID_incomplete, true);
+  }
 };
 
 /// Check whether a reference to a typet is a \ref struct_union_typet.
@@ -674,6 +686,18 @@ public:
   const memberst &members() const
   {
     return (const memberst &)(find(ID_body).get_sub());
+  }
+
+  /// enum types may be incomplete
+  bool is_incomplete() const
+  {
+    return get_bool(ID_incomplete);
+  }
+
+  /// enum types may be incomplete
+  void make_incomplete()
+  {
+    set(ID_incomplete, true);
   }
 };
 

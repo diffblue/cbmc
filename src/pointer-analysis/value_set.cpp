@@ -410,11 +410,9 @@ void value_sett::get_value_set_rec(
 
     const typet &type=ns.follow(expr.op0().type());
 
-    DATA_INVARIANT(type.id()==ID_struct ||
-                   type.id()==ID_union ||
-                   type.id()==ID_incomplete_struct ||
-                   type.id()==ID_incomplete_union,
-                   "operand 0 of member expression must be struct or union");
+    DATA_INVARIANT(
+      type.id() == ID_struct || type.id() == ID_union,
+      "operand 0 of member expression must be struct or union");
 
     const std::string &component_name=
       expr.get_string(ID_component_name);
@@ -1358,11 +1356,9 @@ void value_sett::assign_rec(
 
     const typet &type=ns.follow(lhs.op0().type());
 
-    DATA_INVARIANT(type.id()==ID_struct ||
-                   type.id()==ID_union ||
-                   type.id()==ID_incomplete_struct ||
-                   type.id()==ID_incomplete_union,
-                   "operand 0 of member expression must be struct or union");
+    DATA_INVARIANT(
+      type.id() == ID_struct || type.id() == ID_union,
+      "operand 0 of member expression must be struct or union");
 
     assign_rec(
       lhs.op0(), values_rhs, "."+component_name+suffix, ns, add_to_sets);

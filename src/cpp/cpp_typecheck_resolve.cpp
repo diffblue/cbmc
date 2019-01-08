@@ -1184,8 +1184,7 @@ symbol_typet cpp_typecheck_resolvet::disambiguate_template_classes(
       match.specialization_args,
       match.full_args);
 
-  if(instance.type.id()!=ID_struct &&
-     instance.type.id()!=ID_incomplete_struct)
+  if(instance.type.id()!=ID_struct)
   {
     cpp_typecheck.error().source_location=source_location;
     cpp_typecheck.str << "template `"
@@ -2298,9 +2297,7 @@ void cpp_typecheck_resolvet::filter_for_named_scopes(
           if(symbol.type.id() == ID_symbol_type)
             type=to_symbol_type(symbol.type);
           else if(symbol.type.id()==ID_struct ||
-                  symbol.type.id()==ID_incomplete_struct ||
                   symbol.type.id()==ID_union ||
-                  symbol.type.id()==ID_incomplete_union ||
                   symbol.type.id()==ID_c_enum)
           {
             // this is a scope, too!

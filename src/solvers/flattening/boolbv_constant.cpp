@@ -68,16 +68,12 @@ bvt boolbvt::convert_constant(const constant_exprt &expr)
 
     return bv;
   }
-  else if(expr_type.id()==ID_unsignedbv ||
-          expr_type.id()==ID_signedbv ||
-          expr_type.id()==ID_bv ||
-          expr_type.id()==ID_fixedbv ||
-          expr_type.id()==ID_floatbv ||
-          expr_type.id()==ID_c_enum ||
-          expr_type.id()==ID_c_enum_tag ||
-          expr_type.id()==ID_c_bool ||
-          expr_type.id()==ID_c_bit_field ||
-          expr_type.id()==ID_incomplete_c_enum)
+  else if(
+    expr_type.id() == ID_unsignedbv || expr_type.id() == ID_signedbv ||
+    expr_type.id() == ID_bv || expr_type.id() == ID_fixedbv ||
+    expr_type.id() == ID_floatbv || expr_type.id() == ID_c_enum ||
+    expr_type.id() == ID_c_enum_tag || expr_type.id() == ID_c_bool ||
+    expr_type.id() == ID_c_bit_field)
   {
     const auto &value = expr.get_value();
 

@@ -171,9 +171,7 @@ void dump_ct::operator()(std::ostream &os)
     if(symbol.is_type &&
        symbol.location.get_function().empty() &&
        (type_id==ID_struct ||
-        type_id==ID_incomplete_struct ||
         type_id==ID_union ||
-        type_id==ID_incomplete_union ||
         type_id==ID_c_enum))
     {
       if(!system_symbols.is_symbol_internal_symbol(symbol, system_headers))
@@ -235,11 +233,9 @@ void dump_ct::operator()(std::ostream &os)
   {
     const symbolt &symbol=ns.lookup(*it);
 
-    if(symbol.is_type &&
-        (symbol.type.id()==ID_struct ||
-         symbol.type.id()==ID_incomplete_struct ||
-         symbol.type.id()==ID_union ||
-         symbol.type.id()==ID_incomplete_union))
+    if(
+      symbol.is_type &&
+      (symbol.type.id() == ID_struct || symbol.type.id() == ID_union))
       convert_compound_declaration(
           symbol,
           compound_body_stream);
