@@ -127,14 +127,25 @@ void static_lifetime_init(
     symbols.insert(id2string(symbol_pair.first));
   }
 
+  // first do framework variables
   for(const std::string &id : symbols)
-  {
-    auto code = static_lifetime_init(id, symbol_table);
-    if(code.has_value())
-      dest.add(std::move(*code));
-  }
+    if(has_prefix(id, CPROVER_PREFIX))
+    {
+      auto code = static_lifetime_init(id, symbol_table);
+      if(code.has_value())
+        dest.add(std::move(*code));
+    }
 
-  // call designated "initialization" functions
+  // now all other variables
+  for(const std::string &id : symbols)
+    if(!has_prefix(id, CPROVER_PREFIX))
+    {
+      auto code = static_lifetime_init(id, symbol_table);
+      if(code.has_value())
+        dest.add(std::move(*code));
+    }
+
+  // now call designated "initialization" functions
 
   for(const std::string &id : symbols)
   {
