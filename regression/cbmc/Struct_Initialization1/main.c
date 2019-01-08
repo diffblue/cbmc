@@ -3,7 +3,9 @@
 struct tag1 {
   int f;
   int : 32; // unnamed bit-field, ignored during initialization
-  int g;
+  union {
+    int g;
+  }; // anonymous, but not ignored
   int *p;
   int a[2];
 } x;
