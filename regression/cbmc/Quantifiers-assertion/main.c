@@ -11,7 +11,8 @@ int main()
   // clang-format would rewrite the "==>" as "== >"
   __CPROVER_assert(__CPROVER_exists { int i; (i>=0 && i<2) ==> (__CPROVER_exists{int j; (j>=0 && j<2) ==> c[i][j]>=1 && c[i][j]<=10}) }, "Exists-Exists: successful");
 
-  __CPROVER_assert(!__CPROVER_exists { int i; (i>=0 && i<2) ==> (!__CPROVER_exists{int j; (j>=0 && j<2) ==> c[i][j]>=1 && c[i][j]<=10}) }, "NotExists-NotExists: successful");
+  // NOLINTNEXTLINE(whitespace/line_length)
+  __CPROVER_assert(!__CPROVER_exists { int i; (i>=0 && i<2) ==> (!__CPROVER_exists{int j; (j>=0 && j<2) ==> c[i][j]>=1 && c[i][j]<=10}) }, "NotExists-NotExists: failed");
 
   __CPROVER_assert(!__CPROVER_exists { int i; (i>=0 && i<2) ==> (__CPROVER_exists{int j; (j>=0 && j<2) ==> c[i][j]>=1 && c[i][j]<=10}) }, "NotExists-Exists: failed");
 
