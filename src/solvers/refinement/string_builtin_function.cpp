@@ -445,7 +445,7 @@ std::vector<mp_integer> string_insertion_builtin_functiont::eval(
   const std::vector<mp_integer> &input2_value,
   const std::vector<mp_integer> &args_value) const
 {
-  PRECONDITION(args_value.size() >= 1 || args_value.size() <= 3);
+  PRECONDITION(args_value.size() >= 1 && args_value.size() <= 3);
   const auto offset = std::min(
     std::max(args_value[0], mp_integer(0)), mp_integer(input1_value.size()));
   const auto start = args_value.size() > 1
