@@ -52,6 +52,7 @@ import sre_compile
 import string
 import sys
 import unicodedata
+import itertools
 
 
 _USAGE = """
@@ -6121,6 +6122,32 @@ def CheckMakePairUsesDeduction(filename, clean_lines, linenum, error):
           'For C++11-compatibility, omit template arguments from make_pair'
           ' OR use pair directly OR if appropriate, construct a pair directly')
 
+def AssembleString(clean_lines, start_lineno, start_linepos, end_lineno, end_linepos):
+    """
+    Concatenates all the strings between the starting line position and
+    the ending line position.
+
+    Note: this operated on the elided (no strings and comments) view of the
+    code.
+
+    Args:
+        clean_lines: All the lines
+        start_lineno: The starting line number
+        start_linepos: The index of the first character to include
+        end_lineno: The last line
+        end_linepos: The index of the first character not to include
+    """
+    if end_lineno < start_lineno:
+        return ''
+
+    if start_lineno == end_lineno:
+        return clean_lines.elided[start_lineno][start_linepos : end_linepos]
+
+    full_string = clean_lines.elided[start_lineno][start_linepos:]
+    for line in itertools.islice(clean_lines.elided, start_lineno + 1, end_lineno):
+        full_string += line
+    full_string += clean_lines.elided[end_lineno][:end_linepos]
+    return full_string
 
 def CheckRedundantVirtual(filename, clean_lines, linenum, error):
   """Check if line contains a redundant "virtual" function-specifier.
