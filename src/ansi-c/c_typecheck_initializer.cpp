@@ -665,10 +665,16 @@ void c_typecheck_baset::increment_designator(designatort &designator)
       assert(components.size()==entry.size);
 
       // we skip over any padding or code
-      while(entry.index<entry.size &&
+      // we also skip over anonymous members
+      while(entry.index < entry.size &&
             (components[entry.index].get_is_padding() ||
-             components[entry.index].type().id()==ID_code))
+             (components[entry.index].get_anonymous() &&
+              components[entry.index].type().id() != ID_struct_tag &&
+              components[entry.index].type().id() != ID_union_tag) ||
+             components[entry.index].type().id() == ID_code))
+      {
         entry.index++;
+      }
 
       if(entry.index<entry.size)
         entry.subtype=components[entry.index].type();
