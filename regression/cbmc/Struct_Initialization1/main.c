@@ -1,5 +1,8 @@
+#include <assert.h>
+
 struct tag1 {
   int f;
+  int : 32; // unnamed bit-field, ignored during initialization
   int g;
   int *p;
   int a[2];
