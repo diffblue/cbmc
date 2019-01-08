@@ -32,7 +32,7 @@ void c_typecheck_baset::do_initializer(
 
   if(type.id()==ID_array)
   {
-    const typet &result_type=follow(result.type());
+    const typet &result_type = result.type();
     DATA_INVARIANT(result_type.id()==ID_array &&
                    to_array_type(result_type).size().is_not_nil(),
                    "any array must have a size");
@@ -232,8 +232,9 @@ void c_typecheck_baset::do_initializer(symbolt &symbol)
       do_initializer(symbol.value, symbol.type, true);
 
       // need to adjust size?
-      if(follow(symbol.type).id()==ID_array &&
-         to_array_type(follow(symbol.type)).size().is_nil())
+      if(
+        symbol.type.id() == ID_array &&
+        to_array_type(symbol.type).size().is_nil())
         symbol.type=symbol.value.type();
     }
   }
@@ -254,8 +255,9 @@ void c_typecheck_baset::do_initializer(symbolt &symbol)
       do_initializer(symbol.value, symbol.type, true);
 
       // need to adjust size?
-      if(follow(symbol.type).id()==ID_array &&
-         to_array_type(follow(symbol.type)).size().is_nil())
+      if(
+        symbol.type.id() == ID_array &&
+        to_array_type(symbol.type).size().is_nil())
         symbol.type=symbol.value.type();
     }
   }
@@ -564,9 +566,10 @@ exprt::operandst::const_iterator c_typecheck_baset::do_designated_initializer(
       // We stop for initializers that are string-constants,
       // which are like arrays. We only do so if we are to
       // initialize an array of scalars.
-      if(full_type.id()==ID_array &&
-         (follow(full_type.subtype()).id()==ID_signedbv ||
-          follow(full_type.subtype()).id()==ID_unsignedbv))
+      if(
+        full_type.id() == ID_array &&
+        (full_type.subtype().id() == ID_signedbv ||
+         full_type.subtype().id() == ID_unsignedbv))
       {
         *dest=do_initializer_rec(value, type, force_constant);
         return ++init_it; // done
