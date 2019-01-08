@@ -144,3 +144,34 @@ bool symbolt::is_well_formed() const
 
   return true;
 }
+
+bool symbolt::operator==(const symbolt &other) const
+{
+  // clang-format off
+  return
+    type == other.type &&
+    value == other.value &&
+    location == other.location &&
+    name == other.name &&
+    module == other.module &&
+    base_name == other.base_name &&
+    mode == other.mode &&
+    pretty_name == other.pretty_name &&
+    is_type == other.is_type &&
+    is_macro == other.is_macro &&
+    is_exported == other.is_exported &&
+    is_input == other.is_input &&
+    is_output == other.is_output &&
+    is_state_var == other.is_state_var &&
+    is_property == other.is_property &&
+    is_parameter == other.is_parameter &&
+    is_auxiliary == other.is_auxiliary &&
+    is_weak == other.is_weak &&
+    is_lvalue == other.is_lvalue &&
+    is_static_lifetime == other.is_static_lifetime &&
+    is_thread_local == other.is_thread_local &&
+    is_file_local == other.is_file_local &&
+    is_extern == other.is_extern &&
+    is_volatile == other.is_volatile;
+  // clang-format on
+}

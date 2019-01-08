@@ -6,6 +6,8 @@
 #include <util/invariant.h>
 #include <util/validate.h>
 
+#include <set>
+
 /// Move or copy a new symbol to the symbol table.
 /// \remarks This is a nicer interface than move and achieves the same
 ///   result as both move and add.
@@ -218,4 +220,43 @@ void symbol_tablet::validate(const validation_modet vm) const
       module_map_entry.second,
       "'");
   }
+}
+
+bool symbol_tablet::operator==(const symbol_tablet &other) const
+{
+  // we cannot use == for comparing the multimaps as it compares the items
+  // sequentially, but the order of items with equal keys depends on the
+  // insertion order
+
+  {
+    std::vector<std::pair<irep_idt, irep_idt>> v1(
+      internal_symbol_base_map.begin(), internal_symbol_base_map.end());
+
+    std::vector<std::pair<irep_idt, irep_idt>> v2(
+      other.internal_symbol_base_map.begin(),
+      other.internal_symbol_base_map.end());
+
+    std::sort(v1.begin(), v1.end());
+    std::sort(v2.begin(), v2.end());
+
+    if(v1 != v2)
+      return false;
+  }
+
+  {
+    std::vector<std::pair<irep_idt, irep_idt>> v1(
+      internal_symbol_module_map.begin(), internal_symbol_module_map.end());
+
+    std::vector<std::pair<irep_idt, irep_idt>> v2(
+      other.internal_symbol_module_map.begin(),
+      other.internal_symbol_module_map.end());
+
+    std::sort(v1.begin(), v1.end());
+    std::sort(v2.begin(), v2.end());
+
+    if(v1 != v2)
+      return false;
+  }
+
+  return internal_symbols == other.internal_symbols;
 }
