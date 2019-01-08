@@ -3459,7 +3459,7 @@ void c_typecheck_baset::typecheck_side_effect_assignment(
     }
     else
     {
-      implicit_typecast(op1, o_type0);
+      implicit_typecast_arithmetic(op0, op1);
 
       if(is_number(op1.type()) ||
          op1.type().id()==ID_bool ||
