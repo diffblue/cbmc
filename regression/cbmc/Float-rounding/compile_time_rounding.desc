@@ -1,0 +1,11 @@
+KNOWNBUG
+compile_time_rounding.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+the rounding mode of the two '3' literals during
+the conversion to double should match
