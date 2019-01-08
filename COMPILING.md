@@ -31,7 +31,7 @@ We assume that you have a Debian/Ubuntu or Red Hat-like distribution.
 
    On Amazon Linux and similar distributions, do as root:
    ```
-   yum install gcc72-c++ flex bison perl-libwww-perl patch
+   yum install gcc72-c++ flex bison perl-libwww-perl patch tar
    ```
 
    To compile JBMC, you additionally need the JDK and Maven 3.
