@@ -28,7 +28,7 @@ Release/*
 *.obj
 *.a
 *.lib
-util/version.cpp
+src/util/version.cpp
 src/ansi-c/arm_builtin_headers.inc
 src/ansi-c/clang_builtin_headers.inc
 src/ansi-c/cprover_builtin_headers.inc
