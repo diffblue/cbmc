@@ -253,6 +253,7 @@ _ERROR_CATEGORIES = [
     'runtime/string',
     'runtime/threadsafe_fn',
     'runtime/vlog',
+    'runtime/catch_scenario',
     'whitespace/blank_line',
     'whitespace/braces',
     'whitespace/comma',
@@ -6149,6 +6150,25 @@ def AssembleString(clean_lines, start_lineno, start_linepos, end_lineno, end_lin
     full_string += clean_lines.elided[end_lineno][:end_linepos]
     return full_string
 
+def CheckScenarioHasTags(filename, clean_lines, linenum, error):
+    line = clean_lines.elided[linenum]
+    scenario = Match(r'^SCENARIO\(', line)
+    if not scenario: return
+
+    closing_line, closing_linenum, closing_pos = CloseExpression(clean_lines, linenum, line.find('('))
+
+    if closing_pos == -1:
+        error(filename, linenum,
+            'runtime/catch_scenario', 4, "Can't find closing bracket for scenario")
+
+    full_string = AssembleString(
+        clean_lines, linenum, line.find('(') + 1, closing_linenum, closing_pos - 1)
+
+    if(full_string.find(',') == -1):
+        error(filename, linenum,
+            'runtime/catch_scenario', 4, "Can't find `,\' seperating scenario name and the tags: " + str(clean_lines.lines[linenum]))
+
+
 def CheckRedundantVirtual(filename, clean_lines, linenum, error):
   """Check if line contains a redundant "virtual" function-specifier.
 
@@ -6342,6 +6362,7 @@ def ProcessLine(filename, file_extension, clean_lines, line,
   CheckInvalidIncrement(filename, clean_lines, line, error)
   CheckMakePairUsesDeduction(filename, clean_lines, line, error)
   CheckRedundantVirtual(filename, clean_lines, line, error)
+  CheckScenarioHasTags(filename, clean_lines, line, error)
   CheckNamespaceOrUsing(filename, clean_lines, line, error)
   CheckForEndl(filename, clean_lines, line, error)
   for check_fn in extra_check_functions:
