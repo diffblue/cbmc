@@ -41,7 +41,7 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
   " --no-refine-strings          turn off string refinement\n" \
   " --string-printable           restrict to printable strings (experimental)\n" /* NOLINT(*) */ \
   " --string-non-empty           restrict to non-empty strings (experimental)\n" /* NOLINT(*) */ \
-  " --string-printable st        restrict non-null strings to a fixed value st;\n" /* NOLINT(*) */ \
+  " --string-input-value st      restrict non-null strings to a fixed value st;\n" /* NOLINT(*) */ \
   "                              the switch can be used multiple times to give\n" /* NOLINT(*) */ \
   "                              several strings\n" /* NOLINT(*) */ \
   " --max-nondet-string-length n bound the length of nondet (e.g. input) strings\n" /* NOLINT(*) */
