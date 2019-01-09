@@ -120,15 +120,17 @@ exprt boolbvt::bv_get_rec(
     }
     else if(type.id()==ID_struct_tag)
     {
-      return
-        bv_get_rec(
-          bv, unknown, offset, ns.follow_tag(to_struct_tag_type(type)));
+      exprt result = bv_get_rec(
+        bv, unknown, offset, ns.follow_tag(to_struct_tag_type(type)));
+      result.type() = type;
+      return result;
     }
     else if(type.id()==ID_union_tag)
     {
-      return
-        bv_get_rec(
-          bv, unknown, offset, ns.follow_tag(to_union_tag_type(type)));
+      exprt result =
+        bv_get_rec(bv, unknown, offset, ns.follow_tag(to_union_tag_type(type)));
+      result.type() = type;
+      return result;
     }
     else if(type.id()==ID_struct)
     {
