@@ -119,6 +119,8 @@ public:
 
   /// Check that the symbol table is well-formed
   void validate(const validation_modet vm = validation_modet::INVARIANT) const;
+
+  bool operator==(const symbol_tablet &other) const;
 };
 
 #endif // CPROVER_UTIL_SYMBOL_TABLE_H

@@ -196,6 +196,7 @@ static void show_symbol_table_json_ui(
 
     json_objectt symbol_json(
       {{"prettyName", json_stringt(symbol.pretty_name)},
+       {"name", json_stringt(symbol.name)},
        {"baseName", json_stringt(symbol.base_name)},
        {"mode", json_stringt(symbol.mode)},
        {"module", json_stringt(symbol.module)},

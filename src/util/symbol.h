@@ -124,6 +124,8 @@ public:
 
   /// Check that a symbol is well formed.
   bool is_well_formed() const;
+
+  bool operator==(const symbolt &other) const;
 };
 
 std::ostream &operator<<(std::ostream &out, const symbolt &symbol);

@@ -27,14 +27,14 @@ public:
 
   virtual ~ui_message_handlert();
 
-  uit get_ui() const
+  virtual uit get_ui() const
   {
     return _ui;
   }
 
   virtual void flush(unsigned level) override;
 
-  json_stream_arrayt &get_json_stream()
+  virtual json_stream_arrayt &get_json_stream()
   {
     PRECONDITION(json_stream!=nullptr);
     return *json_stream;

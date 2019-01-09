@@ -69,44 +69,50 @@ symbolt symbol_from_json(const jsont &in)
       result.name = try_get_string(kv.second, "name");
     else if(kv.first == "module")
       result.module = try_get_string(kv.second, "module");
-    else if(kv.first == "base_name")
-      result.base_name = try_get_string(kv.second, "base_name");
+    else if(kv.first == "baseName")
+      result.base_name = try_get_string(kv.second, "baseName");
     else if(kv.first == "mode")
       result.mode = try_get_string(kv.second, "mode");
-    else if(kv.first == "pretty_name")
-      result.pretty_name = try_get_string(kv.second, "pretty_name");
-    else if(kv.first == "is_type")
-      result.is_type = try_get_bool(kv.second, "is_type");
-    else if(kv.first == "is_macro")
-      result.is_macro = try_get_bool(kv.second, "is_macro");
-    else if(kv.first == "is_exported")
-      result.is_exported = try_get_bool(kv.second, "is_exported");
-    else if(kv.first == "is_input")
-      result.is_input = try_get_bool(kv.second, "is_input");
-    else if(kv.first == "is_output")
-      result.is_output = try_get_bool(kv.second, "is_output");
-    else if(kv.first == "is_state_var")
-      result.is_state_var = try_get_bool(kv.second, "is_state_var");
-    else if(kv.first == "is_property")
-      result.is_property = try_get_bool(kv.second, "is_property");
-    else if(kv.first == "is_static_lifetime")
-      result.is_static_lifetime = try_get_bool(kv.second, "is_static_lifetime");
-    else if(kv.first == "is_thread_local")
-      result.is_thread_local = try_get_bool(kv.second, "is_thread_local");
-    else if(kv.first == "is_lvalue")
-      result.is_lvalue = try_get_bool(kv.second, "is_lvalue");
-    else if(kv.first == "is_file_local")
-      result.is_file_local = try_get_bool(kv.second, "is_file_local");
-    else if(kv.first == "is_extern")
-      result.is_extern = try_get_bool(kv.second, "is_extern");
-    else if(kv.first == "is_volatile")
-      result.is_volatile = try_get_bool(kv.second, "is_volatile");
-    else if(kv.first == "is_parameter")
-      result.is_parameter = try_get_bool(kv.second, "is_parameter");
-    else if(kv.first == "is_auxiliary")
-      result.is_auxiliary = try_get_bool(kv.second, "is_auxiliary");
-    else if(kv.first == "is_weak")
-      result.is_weak = try_get_bool(kv.second, "is_weak");
+    else if(kv.first == "prettyName")
+      result.pretty_name = try_get_string(kv.second, "prettyName");
+    else if(kv.first == "isType")
+      result.is_type = try_get_bool(kv.second, "isType");
+    else if(kv.first == "isMacro")
+      result.is_macro = try_get_bool(kv.second, "isMacro");
+    else if(kv.first == "isExported")
+      result.is_exported = try_get_bool(kv.second, "isExported");
+    else if(kv.first == "isInput")
+      result.is_input = try_get_bool(kv.second, "isInput");
+    else if(kv.first == "isOutput")
+      result.is_output = try_get_bool(kv.second, "isOutput");
+    else if(kv.first == "isStateVar")
+      result.is_state_var = try_get_bool(kv.second, "isStateVar");
+    else if(kv.first == "isProperty")
+      result.is_property = try_get_bool(kv.second, "isProperty");
+    else if(kv.first == "isStaticLifetime")
+      result.is_static_lifetime = try_get_bool(kv.second, "isStaticLifetime");
+    else if(kv.first == "isThreadLocal")
+      result.is_thread_local = try_get_bool(kv.second, "isThreadLocal");
+    else if(kv.first == "isLvalue")
+      result.is_lvalue = try_get_bool(kv.second, "isLvalue");
+    else if(kv.first == "isFileLocal")
+      result.is_file_local = try_get_bool(kv.second, "isFileLocal");
+    else if(kv.first == "isExtern")
+      result.is_extern = try_get_bool(kv.second, "isExtern");
+    else if(kv.first == "isVolatile")
+      result.is_volatile = try_get_bool(kv.second, "isVolatile");
+    else if(kv.first == "isParameter")
+      result.is_parameter = try_get_bool(kv.second, "isParameter");
+    else if(kv.first == "isAuxiliary")
+      result.is_auxiliary = try_get_bool(kv.second, "isAuxiliary");
+    else if(kv.first == "isWeak")
+      result.is_weak = try_get_bool(kv.second, "isWeak");
+    else if(kv.first == "prettyType")
+    {
+    } // ignore
+    else if(kv.first == "prettyValue")
+    {
+    } // ignore
     else
       throw deserialization_exceptiont(
         "symbol_from_json: unexpected key '" + kv.first + "'");

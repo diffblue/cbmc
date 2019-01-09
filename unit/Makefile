@@ -28,6 +28,7 @@ SRC += analyses/ai/ai.cpp \
        goto-symex/ssa_equation.cpp \
        interpreter/interpreter.cpp \
        json/json_parser.cpp \
+       json_symbol_table.cpp \
        path_strategies.cpp \
        pointer-analysis/value_set.cpp \
        solvers/floatbv/float_utils.cpp \
