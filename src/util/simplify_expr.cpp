@@ -1431,12 +1431,10 @@ bool simplify_exprt::simplify_object(exprt &expr)
 
 exprt simplify_exprt::bits2expr(
   const std::string &bits,
-  const typet &_type,
+  const typet &type,
   bool little_endian)
 {
   // bits start at lowest memory address
-  const typet &type=ns.follow(_type);
-
   auto type_bits = pointer_offset_bits(type, ns);
 
   if(!type_bits.has_value() || *type_bits != bits.size())
@@ -1461,15 +1459,16 @@ exprt simplify_exprt::bits2expr(
   else if(type.id()==ID_c_enum)
   {
     exprt val = bits2expr(bits, to_c_enum_type(type).subtype(), little_endian);
-    val.type()=type;
+    val.type() = type;
     return val;
   }
   else if(type.id()==ID_c_enum_tag)
-    return
-      bits2expr(
-        bits,
-        ns.follow_tag(to_c_enum_tag_type(type)),
-        little_endian);
+  {
+    exprt val =
+      bits2expr(bits, ns.follow_tag(to_c_enum_tag_type(type)), little_endian);
+    val.type() = type;
+    return val;
+  }
   else if(type.id()==ID_union)
   {
     // find a suitable member
@@ -1485,6 +1484,13 @@ exprt simplify_exprt::bits2expr(
 
       return union_exprt(component.get_name(), val, type);
     }
+  }
+  else if(type.id() == ID_union_tag)
+  {
+    exprt val =
+      bits2expr(bits, ns.follow_tag(to_union_tag_type(type)), little_endian);
+    val.type() = type;
+    return val;
   }
   else if(type.id()==ID_struct)
   {
@@ -1515,6 +1521,13 @@ exprt simplify_exprt::bits2expr(
     }
 
     return std::move(result);
+  }
+  else if(type.id() == ID_struct_tag)
+  {
+    exprt val =
+      bits2expr(bits, ns.follow_tag(to_struct_tag_type(type)), little_endian);
+    val.type() = type;
+    return val;
   }
   else if(type.id()==ID_array)
   {
