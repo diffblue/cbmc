@@ -3,8 +3,12 @@ main.c
 --undefined-shift-check
 ^EXIT=10$
 ^SIGNAL=0$
-^\[.*\] line 8 shift operand is negative in .*: FAILURE$
-^\*\* 1 of 2 failed
+^\[.*\] line 4 shift operand is negative in .*: SUCCESS$
+^\[.*\] line 7 shift distance too large in .*: FAILURE$
+^\[.*\] line 15 shift distance is negative in .*: FAILURE$
+^\[.*\] line 15 shift distance too large in .*: SUCCESS$
+^\[.*\] line 20 shift operand is negative in .*: FAILURE$
+^\*\* 3 of 5 failed
 ^VERIFICATION FAILED$
 --
 ^warning: ignoring
