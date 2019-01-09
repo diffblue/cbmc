@@ -413,6 +413,33 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("validate-goto-model", true);
   }
 
+  {
+    const bool memory_snapshot = cmdline.isset("memory-snapshot");
+    const bool initial_location = cmdline.isset("initial-location");
+
+    if(memory_snapshot || initial_location)
+    {
+      if(!memory_snapshot)
+      {
+        throw invalid_command_line_argument_exceptiont(
+          "--initial-location also requires --memory-snapshot",
+          "--initial-location");
+      }
+      else if(!initial_location)
+      {
+        throw invalid_command_line_argument_exceptiont(
+          "--memory-snapshot also requires --initial-location",
+          "--memory-snapshot");
+      }
+
+      options.set_option(
+        "memory-snapshot", cmdline.get_value("memory-snapshot"));
+
+      options.set_option(
+        "initial-location", cmdline.get_value("initial-location"));
+    }
+  }
+
   PARSE_OPTIONS_GOTO_TRACE(cmdline, options);
 }
 

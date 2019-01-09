@@ -23,6 +23,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <analyses/dirty.h>
 
+#include <iostream>
+
 symex_configt::symex_configt(const optionst &options)
   : max_depth(options.get_unsigned_int_option("depth")),
     doing_path_exploration(options.is_set("paths")),
@@ -319,6 +321,47 @@ void goto_symext::symex_from_entry_point_of(
 
   symex_with_state(
     state, get_goto_function, new_symbol_table);
+}
+
+void goto_symext::symex_from_instruction_with_snapshot(
+  const get_goto_functiont &get_goto_function,
+  symbol_tablet &new_symbol_table,
+  const symbol_tablet &snapshot,
+  goto_programt::const_targett pc)
+{
+  statet state;
+
+  // First initialize state from snapshot
+
+  state.symex_target = &target;
+  state.source.pc = pc;
+
+  for(const auto &pair : snapshot)
+  {
+    const symbolt &symbol = pair.second;
+
+    if(!symbol.is_static_lifetime)
+      continue;
+
+    symex_assign(state, code_assignt(symbol.symbol_expr(), symbol.value));
+  }
+
+  // Now do actual program
+
+  const irep_idt id = goto_programt::get_function_id(pc);
+  const goto_functionst::goto_functiont &goto_function = get_goto_function(id);
+
+  INVARIANT(
+    goto_function.body_available(), "starting function should have a body");
+
+  initialize_entry_point(
+    state,
+    get_goto_function,
+    id,
+    pc,
+    prev(goto_function.body.instructions.end()));
+
+  symex_with_state(state, get_goto_function, new_symbol_table);
 }
 
 /// do just one step

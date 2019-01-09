@@ -87,7 +87,9 @@ void slice(
   "(unwind):" \
   "(unwindset):" \
   "(graphml-witness):" \
-  "(unwindset):"
+  "(unwindset):" \
+  "(memory-snapshot):" \
+  "(initial-location):"
 
 #define HELP_BMC \
   " --paths [strategy]           explore paths one at a time\n" \
@@ -106,7 +108,13 @@ void slice(
   " --no-self-loops-to-assumptions\n" \
   "                              do not simplify while(1){} to assume(0)\n" \
   " --no-pretty-names            do not simplify identifiers\n" \
-  " --graphml-witness filename   write the witness in GraphML format to filename\n" // NOLINT(*)
+  " --graphml-witness filename   write the witness in GraphML format to " \
+  "filename\n" \
+  " --memory-snapshot <file>     initialize memory from given JSON memory " \
+  "snapshot\n" \
+  " --initial-location <func[:<n>]\n" \
+  "                              start symex from given function and " \
+  "location\n number (use with --memory-snapshot)\n"
 // clang-format on
 
 #endif // CPROVER_GOTO_CHECKER_BMC_UTIL_H

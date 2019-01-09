@@ -22,10 +22,17 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-symex/show_program.h>
 #include <goto-symex/show_vcc.h>
 
+#include <json/json_parser.h>
+
+#include <json-symtab-language/json_symbol_table.h>
+
 #include <linking/static_lifetime_init.h>
 
 #include <goto-checker/bmc_util.h>
 #include <goto-checker/solver_factory.h>
+
+#include <util/string2int.h>
+#include <util/string_utils.h>
 
 #include "counterexample_beautification.h"
 #include "fault_localization.h"
@@ -404,7 +411,94 @@ int bmct::do_language_agnostic_bmc(
 void bmct::perform_symbolic_execution(
   goto_symext::get_goto_functiont get_goto_function)
 {
-  symex.symex_from_entry_point_of(get_goto_function, symex_symbol_table);
+  if(options.is_set("memory-snapshot"))
+  {
+    // start symex from given program location and memory snapshot
+
+    INVARIANT(
+      options.is_set("initial-location"),
+      "during option parsing it should be checked that --initial-location is "
+      "provided when --memory-snapshot is given");
+
+    jsont json;
+    {
+      const bool r = parse_json(
+        options.get_option("memory-snapshot"), ui_message_handler, json);
+
+      if(r)
+      {
+        throw deserialization_exceptiont("failed to read JSON memory snapshot");
+      }
+    }
+
+    symbol_tablet snapshot;
+
+    // throws a deserialization_exceptiont on failure to read JSON symbol table
+    symbol_table_from_json(json, snapshot);
+
+    std::vector<std::string> start;
+    split_string(options.get_option("initial-location"), ':', start, true);
+
+    CHECK_RETURN(start.size() > 0);
+
+    if(start.front().empty() || start.size() > 2)
+    {
+      throw invalid_command_line_argument_exceptiont(
+        "invalid initial location specification", "--initial-location");
+    }
+
+    INVARIANT(
+      !start.back().empty(),
+      "component of initial location specification should not be empty");
+
+    const irep_idt function_id(start.front());
+
+    const goto_functionst::goto_functiont &goto_function =
+      get_goto_function(function_id);
+
+    if(!goto_function.body_available())
+    {
+      throw invalid_command_line_argument_exceptiont(
+        "starting function must have a body", "--initial-location");
+    }
+
+    const goto_programt::instructionst &instructions =
+      goto_function.body.instructions;
+
+    goto_programt::const_targett it = instructions.begin();
+
+    if(start.size() == 2)
+    {
+      // the initial location specification includes a location number
+
+      const unsigned location_number = safe_string2unsigned(start.back());
+
+      const unsigned start_location_number = it->location_number;
+      const unsigned end_location_number =
+        std::prev(instructions.end())->location_number;
+
+      INVARIANT(
+        start_location_number <= end_location_number,
+        "location numbers should be increasing in goto program");
+
+      if(
+        location_number < start_location_number ||
+        location_number > end_location_number)
+      {
+        throw invalid_command_line_argument_exceptiont(
+          "location number does not exist in function", "--initial-location");
+      }
+
+      std::advance(it, location_number - start_location_number);
+    }
+
+    symex.symex_from_instruction_with_snapshot(
+      get_goto_function, symex_symbol_table, snapshot, it);
+  }
+  else
+  {
+    symex.symex_from_entry_point_of(get_goto_function, symex_symbol_table);
+  }
 
   if(options.get_bool_option("validate-ssa-equation"))
   {

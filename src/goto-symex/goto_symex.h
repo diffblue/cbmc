@@ -118,6 +118,22 @@ public:
     const get_goto_functiont &get_goto_function,
     symbol_tablet &new_symbol_table);
 
+  /// Symex program starting from given instruction and initialize the memory
+  /// with the given snapshot
+  ///
+  /// \param get_goto_function mapping from function ids to goto functions
+  /// \param new_symbol_table symbol table to which to add symbols generated
+  ///   during symex
+  /// \param snapshot memory snapshot represented as a symbol table, the `value`
+  ///   field of each symbol holds the value to initialize the corresponding
+  ///   symbol expression with
+  /// \param it iterator to goto instruction to start symex from
+  virtual void symex_from_instruction_with_snapshot(
+    const get_goto_functiont &get_goto_function,
+    symbol_tablet &new_symbol_table,
+    const symbol_tablet &snapshot,
+    goto_programt::const_targett it);
+
   /// Performs symbolic execution using a state and equation that have
   /// already been used to symex part of the program. The state is not
   /// re-initialized; instead, symbolic execution resumes from the program
