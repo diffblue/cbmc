@@ -113,16 +113,35 @@ static void create_static_function_call(
   const namespacet &ns)
 {
   call.function() = function_symbol;
-  // Cast the `this` pointer to the correct type for the new callee:
-  const auto &callee_type =
-    to_code_type(ns.lookup(function_symbol.get_identifier()).type);
-  const code_typet::parametert *this_param = callee_type.get_this();
+  // Cast the pointers to the correct type for the new callee:
+  // Note the `this` pointer is expected to change type, but other pointers
+  // could also change due to e.g. using a different alias to refer to the same
+  // type (in Java, for example, we see ArrayList.add(ArrayList::E arg)
+  // overriding Collection.add(Collection::E arg))
+  const auto &callee_parameters =
+    to_code_type(ns.lookup(function_symbol.get_identifier()).type).parameters();
+  auto &call_args = call.arguments();
+
   INVARIANT(
-    this_param != nullptr,
-    "Virtual function callees must have a `this` argument");
-  typet need_type = this_param->type();
-  if(!type_eq(call.arguments()[0].type(), need_type, ns))
-    call.arguments()[0].make_typecast(need_type);
+    callee_parameters.size() == call_args.size(),
+    "function overrides must have matching argument counts");
+
+  for(std::size_t i = 0; i < call_args.size(); ++i)
+  {
+    const typet &need_type = callee_parameters[i].type();
+
+    if(!type_eq(call_args[i].type(), need_type, ns))
+    {
+      // If this wasn't language agnostic code we'd also like to check
+      // compatibility-- for example, Java overrides may have differing generic
+      // qualifiers, but not different base types.
+      INVARIANT(
+        call_args[i].type().id() == ID_pointer,
+        "where overriding function argument types differ, "
+        "those arguments must be pointer-typed");
+      call_args[i].make_typecast(need_type);
+    }
+  }
 }
 
 /// Replace virtual function call with a static function call
