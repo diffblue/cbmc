@@ -9,20 +9,20 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Bounded Model Checking for ANSI-C
 
-#ifndef CPROVER_CBMC_SYMEX_BMC_H
-#define CPROVER_CBMC_SYMEX_BMC_H
+#ifndef CPROVER_GOTO_CHECKER_SYMEX_BMC_H
+#define CPROVER_GOTO_CHECKER_SYMEX_BMC_H
 
 #include <util/message.h>
 #include <util/threeval.h>
 
-#include <goto-symex/path_storage.h>
 #include <goto-symex/goto_symex.h>
+#include <goto-symex/path_storage.h>
 
 #include <goto-instrument/unwindset.h>
 
 #include "symex_coverage.h"
 
-class symex_bmct: public goto_symext
+class symex_bmct : public goto_symext
 {
 public:
   symex_bmct(
@@ -41,9 +41,8 @@ public:
   /// information for the user (e.g. "unwinding iteration N, max M"), and is not
   /// enforced. They return true to halt unwinding, false to authorise
   /// unwinding, or Unknown to indicate they have no opinion.
-  typedef
-    std::function<tvt(
-      const goto_symex_statet::call_stackt &, unsigned, unsigned, unsigned &)>
+  typedef std::function<
+    tvt(const goto_symex_statet::call_stackt &, unsigned, unsigned, unsigned &)>
     loop_unwind_handlert;
 
   /// Recursion unwind handlers take the function ID, the unwind count so far,
@@ -115,4 +114,4 @@ protected:
   symex_coveraget symex_coverage;
 };
 
-#endif // CPROVER_CBMC_SYMEX_BMC_H
+#endif // CPROVER_GOTO_CHECKER_SYMEX_BMC_H

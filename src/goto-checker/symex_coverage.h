@@ -28,15 +28,14 @@ class xmlt;
 class symex_coveraget
 {
 public:
-  explicit symex_coveraget(const namespacet &_ns):ns(_ns)
+  explicit symex_coveraget(const namespacet &_ns) : ns(_ns)
   {
   }
 
-  void covered(
-    goto_programt::const_targett from,
-    goto_programt::const_targett to)
+  void
+  covered(goto_programt::const_targett from, goto_programt::const_targett to)
   {
-    std::pair<coverage_innert::iterator, bool> entry=
+    std::pair<coverage_innert::iterator, bool> entry =
       coverage[from].insert({to, coverage_infot(from, to, 1)});
 
     if(!entry.second)
@@ -55,9 +54,8 @@ protected:
     coverage_infot(
       goto_programt::const_targett _from,
       goto_programt::const_targett _to,
-      unsigned _num_executions):
-      location(_from), num_executions(_num_executions),
-      succ(_to)
+      unsigned _num_executions)
+      : location(_from), num_executions(_num_executions), succ(_to)
     {
     }
 
@@ -68,13 +66,11 @@ protected:
 
   typedef std::map<goto_programt::const_targett, coverage_infot>
     coverage_innert;
-  typedef std::map<goto_programt::const_targett, coverage_innert>
-    coveraget;
+  typedef std::map<goto_programt::const_targett, coverage_innert> coveraget;
   coveraget coverage;
 
-  bool output_report(
-    const goto_functionst &goto_functions,
-    std::ostream &os) const;
+  bool
+  output_report(const goto_functionst &goto_functions, std::ostream &os) const;
 
   void build_cobertura(
     const goto_functionst &goto_functions,

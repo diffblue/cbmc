@@ -20,6 +20,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/ui_message.h>
 #include <util/decision_procedure.h>
 
+#include <goto-checker/symex_bmc.h>
+
 #include <goto-programs/goto_trace.h>
 
 #include <goto-symex/symex_target_equation.h>
@@ -29,7 +31,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/safety_checker.h>
 #include <goto-symex/memory_model.h>
 
-#include "symex_bmc.h"
 
 class cbmc_solverst;
 

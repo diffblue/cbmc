@@ -93,8 +93,6 @@ BMC_DEPS =../src/cbmc/all_properties$(OBJEXT) \
           ../src/cbmc/cbmc_parse_options$(OBJEXT) \
           ../src/cbmc/counterexample_beautification$(OBJEXT) \
           ../src/cbmc/fault_localization$(OBJEXT) \
-          ../src/cbmc/symex_bmc$(OBJEXT) \
-          ../src/cbmc/symex_coverage$(OBJEXT) \
           ../src/cbmc/xml_interface$(OBJEXT) \
           ../src/goto-instrument/cover$(OBJEXT) \
           ../src/goto-instrument/cover_basic_blocks$(OBJEXT) \

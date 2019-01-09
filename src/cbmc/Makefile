@@ -6,8 +6,6 @@ SRC = all_properties.cpp \
       cbmc_parse_options.cpp \
       counterexample_beautification.cpp \
       fault_localization.cpp \
-      symex_bmc.cpp \
-      symex_coverage.cpp \
       xml_interface.cpp \
       # Empty last line
 

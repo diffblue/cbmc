@@ -14,8 +14,6 @@ Author: Daniel Kroening, Peter Schrammel
 #include <fstream>
 #include <iostream>
 
-#include <cbmc/symex_bmc.h>
-
 #include <goto-programs/graphml_witness.h>
 #include <goto-programs/json_goto_trace.h>
 #include <goto-programs/xml_goto_trace.h>
@@ -32,6 +30,8 @@ Author: Daniel Kroening, Peter Schrammel
 
 #include <util/make_unique.h>
 #include <util/ui_message.h>
+
+#include "symex_bmc.h"
 
 void build_error_trace(
   goto_tracet &goto_trace,
