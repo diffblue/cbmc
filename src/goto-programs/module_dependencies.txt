@@ -1,5 +1,4 @@
 analyses # dubious - concerns call_graph and does_remove_const
-assembler # should go away
 goto-programs
 goto-symex # dubious - spurious inclusion of symex_target_equation in graphml_witness
 json

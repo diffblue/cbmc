@@ -1,5 +1,6 @@
 SRC = assembler_lex.yy.cpp \
       assembler_parser.cpp \
+      remove_asm.cpp \
       # Empty last line
 INCLUDES= -I ..
 

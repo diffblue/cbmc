@@ -49,8 +49,8 @@ Date:   December 2014
 /// Unrecognised assembly instructions are ignored (i.e., they are simply
 /// removed from the goto program).
 
-#ifndef CPROVER_GOTO_PROGRAMS_REMOVE_ASM_H
-#define CPROVER_GOTO_PROGRAMS_REMOVE_ASM_H
+#ifndef CPROVER_ASSEMBLER_REMOVE_ASM_H
+#define CPROVER_ASSEMBLER_REMOVE_ASM_H
 
 #include <goto-programs/goto_functions.h>
 
@@ -61,4 +61,4 @@ void remove_asm(goto_functionst &, symbol_tablet &);
 
 void remove_asm(goto_modelt &);
 
-#endif // CPROVER_GOTO_PROGRAMS_REMOVE_ASM_H
+#endif // CPROVER_ASSEMBLER_REMOVE_ASM_H

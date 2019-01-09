@@ -32,7 +32,6 @@ Author: Peter Schrammel
 #include <goto-programs/loop_ids.h>
 #include <goto-programs/mm_io.h>
 #include <goto-programs/read_goto_binary.h>
-#include <goto-programs/remove_asm.h>
 #include <goto-programs/remove_complex.h>
 #include <goto-programs/remove_function_pointers.h>
 #include <goto-programs/remove_returns.h>
@@ -53,6 +52,9 @@ Author: Peter Schrammel
 #include <langapi/mode.h>
 
 #include <ansi-c/cprover_library.h>
+
+#include <assembler/remove_asm.h>
+
 #include <cpp/cprover_library.h>
 
 #include "goto_diff.h"

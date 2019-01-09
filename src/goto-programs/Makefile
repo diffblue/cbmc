@@ -39,7 +39,6 @@ SRC = adjust_float_expressions.cpp \
       read_bin_goto_object.cpp \
       read_goto_binary.cpp \
       rebuild_goto_start_function.cpp \
-      remove_asm.cpp \
       remove_calls_no_body.cpp \
       remove_complex.cpp \
       remove_const_function_pointers.cpp \

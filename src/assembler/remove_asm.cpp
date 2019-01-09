@@ -18,10 +18,10 @@ Date:   December 2014
 #include <util/c_types.h>
 #include <util/string_constant.h>
 
-#include <assembler/assembler_parser.h>
+#include <goto-programs/goto_model.h>
+#include <goto-programs/remove_skip.h>
 
-#include "goto_model.h"
-#include "remove_skip.h"
+#include "assembler_parser.h"
 
 class remove_asmt
 {
