@@ -955,7 +955,9 @@ bool simplify_exprt::simplify_concatenation(exprt &expr)
   }
 
   // { x } = x
-  if(expr.operands().size()==1)
+  if(
+    expr.operands().size() == 1 &&
+    base_type_eq(expr.op0().type(), expr.type(), ns))
   {
     exprt tmp;
     tmp.swap(expr.op0());
