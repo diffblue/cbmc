@@ -263,7 +263,7 @@ exprt expr_initializert<nondet>::expr_initializer_rec(
   {
     exprt result = expr_initializer_rec(ns.follow(type), source_location);
     // we might have mangled the type for arrays, so keep that
-    if(ns.follow(type).id()!=ID_array)
+    if(type.id() != ID_array)
       result.type()=type;
 
     return result;
