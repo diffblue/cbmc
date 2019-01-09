@@ -428,11 +428,14 @@ void java_bytecode_convert_methodt::convert(
     id2string(class_symbol.name)+"."+id2string(m.name)+":"+m.descriptor;
   method_id=method_identifier;
 
-  symbolt &method_symbol=*symbol_table.get_writeable(method_identifier);
-
   // Obtain a std::vector of java_method_typet::parametert objects from the
   // (function) type of the symbol
-  java_method_typet method_type = to_java_method_type(method_symbol.type);
+  // Don't try to hang on to this reference into the symbol table, as we're
+  // about to create symbols for the method's parameters, which would invalidate
+  // the reference. Instead, copy the type here, set it up, then assign it back
+  // to the symbol later.
+  java_method_typet method_type =
+    to_java_method_type(symbol_table.lookup_ref(method_identifier).type);
   method_type.set(ID_C_class, class_symbol.name);
   method_type.set_is_final(m.is_final);
   method_return_type = method_type.return_type();
@@ -554,6 +557,8 @@ void java_bytecode_convert_methodt::convert(
     variables[param_index][0].length=std::numeric_limits<size_t>::max();
     param_index+=java_local_variable_slots(param.type());
   }
+
+  symbolt &method_symbol = symbol_table.get_writeable_ref(method_identifier);
 
   // The parameter slots detected in this function should agree with what
   // java_parameter_count() thinks about this method
