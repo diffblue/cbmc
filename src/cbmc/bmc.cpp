@@ -152,7 +152,7 @@ safety_checkert::resultt bmct::execute(
       if(options.is_set("paths"))
         return safety_checkert::resultt::PAUSED;
       report_success(ui_message_handler);
-      output_graphml(resultt::SAFE, error_trace, equation, ns, options);
+      output_graphml(equation, ns, options);
       return safety_checkert::resultt::SAFE;
     }
 
@@ -219,7 +219,7 @@ safety_checkert::resultt bmct::stop_on_fail()
   {
   case decision_proceduret::resultt::D_UNSATISFIABLE:
     report_success(ui_message_handler);
-    output_graphml(resultt::SAFE, error_trace, equation, ns, options);
+    output_graphml(equation, ns, options);
     return resultt::SAFE;
 
   case decision_proceduret::resultt::D_SATISFIABLE:
@@ -232,7 +232,7 @@ safety_checkert::resultt bmct::stop_on_fail()
       build_error_trace(
         error_trace, ns, equation, prop_conv, ui_message_handler);
       output_error_trace(error_trace, ns, trace_options(), ui_message_handler);
-      output_graphml(resultt::UNSAFE, error_trace, equation, ns, options);
+      output_graphml(error_trace, ns, options);
     }
 
     report_failure(ui_message_handler);
