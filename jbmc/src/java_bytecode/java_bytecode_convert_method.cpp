@@ -2094,33 +2094,51 @@ void java_bytecode_convert_methodt::convert_invoke(
   const bool is_virtual(
     statement == "invokevirtual" || statement == "invokeinterface");
 
+  const irep_idt &invoked_method_id = arg0.get(ID_identifier);
+  INVARIANT(
+    !invoked_method_id.empty(),
+    "invoke statement arg0 must have an identifier");
+
+  auto method_symbol = symbol_table.symbols.find(invoked_method_id);
+
+  // Use the most precise type available: the actual symbol has generic info,
+  // whereas the type given by the invoke instruction doesn't and is therefore
+  // less accurate.
+  if(method_symbol != symbol_table.symbols.end())
+    arg0.type() = to_java_method_type(method_symbol->second.type);
+
+  // Note arg0 and arg0.type() are subject to many side-effects in this method,
+  // then finally used to populate the call instruction.
   java_method_typet &method_type = to_java_method_type(arg0.type());
+
   java_method_typet::parameterst &parameters(method_type.parameters());
 
   if(use_this)
   {
+    irep_idt classname = arg0.get(ID_C_class);
+
     if(parameters.empty() || !parameters[0].get_this())
     {
-      irep_idt classname = arg0.get(ID_C_class);
       typet thistype = struct_tag_typet(classname);
-      // Note invokespecial is used for super-method calls as well as
-      // constructors.
-      if(statement == "invokespecial")
-      {
-        if(is_constructor(arg0.get(ID_identifier)))
-        {
-          if(needed_lazy_methods)
-            needed_lazy_methods->add_needed_class(classname);
-          method_type.set_is_constructor();
-        }
-        else
-          method_type.set(ID_java_super_method_call, true);
-      }
       reference_typet object_ref_type = java_reference_type(thistype);
       java_method_typet::parametert this_p(object_ref_type);
       this_p.set_this();
       this_p.set_base_name(ID_this);
       parameters.insert(parameters.begin(), this_p);
+    }
+
+    // Note invokespecial is used for super-method calls as well as
+    // constructors.
+    if(statement == "invokespecial")
+    {
+      if(is_constructor(invoked_method_id))
+      {
+        if(needed_lazy_methods)
+          needed_lazy_methods->add_needed_class(classname);
+        method_type.set_is_constructor();
+      }
+      else
+        method_type.set(ID_java_super_method_call, true);
     }
   }
 
@@ -2184,18 +2202,17 @@ void java_bytecode_convert_methodt::convert_invoke(
   //   accessible from the original caller, but not from the generated test.
   //   Therefore we must assume that the method is not accessible.
   // We set opaque methods as final to avoid assuming they can be overridden.
-  irep_idt id = arg0.get(ID_identifier);
   if(
-    symbol_table.symbols.find(id) == symbol_table.symbols.end() &&
+    method_symbol == symbol_table.symbols.end() &&
     !(is_virtual &&
       is_method_inherited(arg0.get(ID_C_class), arg0.get(ID_component_name))))
   {
     symbolt symbol;
-    symbol.name = id;
+    symbol.name = invoked_method_id;
     symbol.base_name = arg0.get(ID_C_base_name);
     symbol.pretty_name = id2string(arg0.get(ID_C_class)).substr(6) + "." +
                          id2string(symbol.base_name) + "()";
-    symbol.type = arg0.type();
+    symbol.type = method_type;
     symbol.type.set(ID_access, ID_private);
     to_java_method_type(symbol.type).set_is_final(true);
     symbol.value.make_nil();
@@ -2220,10 +2237,10 @@ void java_bytecode_convert_methodt::convert_invoke(
   else
   {
     // static binding
-    call.function() = symbol_exprt(arg0.get(ID_identifier), arg0.type());
+    call.function() = symbol_exprt(invoked_method_id, method_type);
     if(needed_lazy_methods)
     {
-      needed_lazy_methods->add_needed_method(arg0.get(ID_identifier));
+      needed_lazy_methods->add_needed_method(invoked_method_id);
       // Calling a static method causes static initialization:
       needed_lazy_methods->add_needed_class(arg0.get(ID_C_class));
     }
