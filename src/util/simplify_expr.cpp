@@ -67,7 +67,7 @@ bool simplify_exprt::simplify_abs(exprt &expr)
 
   if(expr.op0().is_constant())
   {
-    const typet &type=ns.follow(expr.op0().type());
+    const typet &type = expr.op0().type();
 
     if(type.id()==ID_floatbv)
     {
@@ -107,7 +107,7 @@ bool simplify_exprt::simplify_sign(exprt &expr)
 
   if(expr.op0().is_constant())
   {
-    const typet &type=ns.follow(expr.op0().type());
+    const typet &type = expr.op0().type();
 
     if(type.id()==ID_floatbv)
     {
@@ -163,8 +163,8 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
   if(expr.operands().size()!=1)
     return true;
 
-  const typet &expr_type=ns.follow(expr.type());
-  const typet &op_type=ns.follow(expr.op0().type());
+  const typet &expr_type = expr.type();
+  const typet &op_type = expr.op0().type();
 
   // eliminate casts of infinity
   if(expr.op0().id()==ID_infinity)
@@ -778,11 +778,12 @@ bool simplify_exprt::simplify_dereference(exprt &expr)
     if(address_of.object().id()==ID_index)
     {
       const index_exprt &old=to_index_expr(address_of.object());
-      if(ns.follow(old.array().type()).id()==ID_array)
+      if(old.array().type().id() == ID_array)
       {
-        index_exprt idx(old.array(),
-                        plus_exprt(old.index(), pointer.op1()),
-                        ns.follow(old.array().type()).subtype());
+        index_exprt idx(
+          old.array(),
+          plus_exprt(old.index(), pointer.op1()),
+          old.array().type().subtype());
         simplify_rec(idx);
         expr.swap(idx);
         return false;
@@ -1347,7 +1348,7 @@ bool simplify_exprt::simplify_object(exprt &expr)
     {
       // kill integers from sum
       Forall_operands(it, expr)
-        if(ns.follow(it->type()).id()==ID_pointer)
+        if(it->type().id() == ID_pointer)
         {
           exprt tmp=*it;
           expr.swap(tmp);
@@ -1359,7 +1360,7 @@ bool simplify_exprt::simplify_object(exprt &expr)
   else if(expr.id()==ID_typecast)
   {
     auto const &typecast_expr = to_typecast_expr(expr);
-    const typet &op_type = ns.follow(typecast_expr.op().type());
+    const typet &op_type = typecast_expr.op().type();
 
     if(op_type.id()==ID_pointer)
     {
@@ -1563,7 +1564,7 @@ optionalt<std::string> simplify_exprt::expr2bits(
   bool little_endian)
 {
   // extract bits from lowest to highest memory address
-  const typet &type=ns.follow(expr.type());
+  const typet &type = expr.type();
 
   if(expr.id()==ID_constant)
   {

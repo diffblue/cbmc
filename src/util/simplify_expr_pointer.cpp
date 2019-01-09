@@ -177,7 +177,7 @@ bool simplify_exprt::simplify_address_of(exprt &expr)
   if(expr.operands().size()!=1)
     return true;
 
-  if(ns.follow(expr.type()).id()!=ID_pointer)
+  if(expr.type().id() != ID_pointer)
     return true;
 
   exprt &object=expr.op0();
@@ -249,7 +249,7 @@ bool simplify_exprt::simplify_pointer_offset(exprt &expr)
     if(ptr.operands().size()!=1)
       return true;
 
-    const typet &op_type=ns.follow(ptr.op0().type());
+    const typet &op_type = ptr.op0().type();
 
     if(op_type.id()==ID_pointer)
     {
@@ -281,7 +281,7 @@ bool simplify_exprt::simplify_pointer_offset(exprt &expr)
         // We do a bit of special treatment for (TYPE *)(a+(int)&o),
         // which is re-written to 'a'.
 
-        typet type=ns.follow(expr.type());
+        typet type = expr.type();
         exprt tmp=ptr.op0();
         if(tmp.id()==ID_plus && tmp.operands().size()==2)
         {
@@ -289,9 +289,7 @@ bool simplify_exprt::simplify_pointer_offset(exprt &expr)
              tmp.op0().operands().size()==1 &&
              tmp.op0().op0().id()==ID_address_of)
           {
-            expr=tmp.op1();
-            if(type!=expr.type())
-              expr.make_typecast(type);
+            expr = typecast_exprt::conditional_cast(tmp.op1(), type);
 
             simplify_node(expr);
             return false;
@@ -300,9 +298,7 @@ bool simplify_exprt::simplify_pointer_offset(exprt &expr)
                   tmp.op1().operands().size()==1 &&
                   tmp.op1().op0().id()==ID_address_of)
           {
-            expr=tmp.op0();
-            if(type!=expr.type())
-              expr.make_typecast(type);
+            expr = typecast_exprt::conditional_cast(tmp.op0(), type);
 
             simplify_node(expr);
             return false;
@@ -664,9 +660,7 @@ bool simplify_exprt::simplify_object_size(exprt &expr)
     if(op.op0().id()==ID_symbol)
     {
       // just get the type
-      const typet &type=ns.follow(op.op0().type());
-
-      exprt size=size_of_expr(type, ns);
+      exprt size = size_of_expr(op.op0().type(), ns);
 
       if(size.is_not_nil())
       {
