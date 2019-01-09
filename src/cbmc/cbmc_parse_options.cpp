@@ -30,6 +30,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cpp/cprover_library.h>
 
+#include <goto-checker/bmc_util.h>
+
 #include <goto-programs/adjust_float_expressions.h>
 #include <goto-programs/initialize_goto_model.h>
 #include <goto-programs/instrument_preconditions.h>
