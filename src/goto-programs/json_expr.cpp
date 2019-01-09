@@ -27,13 +27,11 @@ Author: Peter Schrammel
 
 #include <memory>
 
-static exprt simplify_json_expr(const exprt &src, const namespacet &ns)
+static exprt simplify_json_expr(const exprt &src)
 {
   if(src.id() == ID_constant)
   {
-    const typet &type = ns.follow(src.type());
-
-    if(type.id() == ID_pointer)
+    if(src.type().id() == ID_pointer)
     {
       const constant_exprt &c = to_constant_expr(src);
 
@@ -44,7 +42,7 @@ static exprt simplify_json_expr(const exprt &src, const namespacet &ns)
         to_unary_expr(src).op().id() != ID_constant)
       // try to simplify the constant pointer
       {
-        return simplify_json_expr(to_unary_expr(src).op(), ns);
+        return simplify_json_expr(to_unary_expr(src).op());
       }
     }
   }
@@ -56,7 +54,7 @@ static exprt simplify_json_expr(const exprt &src, const namespacet &ns)
         .find("@") != std::string::npos)
   {
     // simplify expressions of the form &member_expr(object, @class_identifier)
-    return simplify_json_expr(to_address_of_expr(src).object(), ns);
+    return simplify_json_expr(to_address_of_expr(src).object());
   }
   else if(
     src.id() == ID_address_of &&
@@ -68,7 +66,7 @@ static exprt simplify_json_expr(const exprt &src, const namespacet &ns)
   {
     // simplify expressions of the form  &array[0]
     return simplify_json_expr(
-      to_index_expr(to_address_of_expr(src).object()).array(), ns);
+      to_index_expr(to_address_of_expr(src).object()).array());
   }
   else if(
     src.id() == ID_member &&
@@ -76,7 +74,7 @@ static exprt simplify_json_expr(const exprt &src, const namespacet &ns)
       std::string::npos)
   {
     // simplify expressions of the form  member_expr(object, @class_identifier)
-    return simplify_json_expr(to_member_expr(src).struct_op(), ns);
+    return simplify_json_expr(to_member_expr(src).struct_op());
   }
 
   return src;
@@ -287,7 +285,7 @@ json_objectt json(const exprt &expr, const namespacet &ns, const irep_idt &mode)
     {
       result["name"] = json_stringt("pointer");
       result["type"] = json_stringt(type_string);
-      exprt simpl_expr = simplify_json_expr(expr, ns);
+      exprt simpl_expr = simplify_json_expr(expr);
       if(
         simpl_expr.get(ID_value) == ID_NULL ||
         // remove typecast on NULL
