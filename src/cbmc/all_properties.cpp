@@ -14,6 +14,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <algorithm>
 #include <chrono>
 
+#include <goto-checker/bmc_util.h>
+
 #include <util/xml.h>
 #include <util/json.h>
 
@@ -55,7 +57,9 @@ safety_checkert::resultt bmc_all_propertiest::operator()()
 
   auto solver_start=std::chrono::steady_clock::now();
 
-  bmc.do_conversion();
+  convert_symex_target_equation(
+    bmc.equation, bmc.prop_conv, get_message_handler());
+  bmc.freeze_program_variables();
 
   // Collect _all_ goals in `goal_map'.
   // This maps property IDs to 'goalt'
@@ -144,9 +148,9 @@ safety_checkert::resultt bmc_all_propertiest::operator()()
   bool safe=(cover_goals.number_covered()==0);
 
   if(safe)
-    bmc.report_success(); // legacy, might go away
+    report_success(bmc.ui_message_handler); // legacy, might go away
   else
-    bmc.report_failure(); // legacy, might go away
+    report_failure(bmc.ui_message_handler); // legacy, might go away
 
   return safe?safety_checkert::resultt::SAFE:safety_checkert::resultt::UNSAFE;
 }

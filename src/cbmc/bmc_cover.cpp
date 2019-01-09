@@ -14,6 +14,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <chrono>
 #include <iomanip>
 
+#include <goto-checker/bmc_util.h>
+
 #include <util/xml.h>
 #include <util/xml_expr.h>
 #include <util/json.h>
@@ -209,7 +211,9 @@ bool bmc_covert::operator()()
 
   // Do conversion to next solver layer
 
-  bmc.do_conversion();
+  convert_symex_target_equation(
+    bmc.equation, bmc.prop_conv, get_message_handler());
+  bmc.freeze_program_variables();
 
   // get the conditions for these goals from formula
   // collect all 'instances' of the goals

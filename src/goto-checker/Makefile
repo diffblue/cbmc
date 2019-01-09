@@ -1,4 +1,5 @@
-SRC = solver_factory.cpp \
+SRC = bmc_util.cpp \
+      solver_factory.cpp \
       # Empty last line
 
 INCLUDES= -I ..
