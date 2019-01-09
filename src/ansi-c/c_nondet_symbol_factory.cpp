@@ -48,6 +48,11 @@ public:
       allocate_objects(ID_C, loc, loc.get_function(), symbol_table)
   {}
 
+  /// Generate a function that behaves like malloc from our stdlib
+  /// implementation
+  /// \param malloc_symbol_name The name of the malloc function
+  const symbolt &gen_malloc_function(const irep_idt &malloc_symbol_name);
+
   void gen_nondet_init(
     code_blockt &assignments,
     const exprt &expr,
@@ -209,6 +214,144 @@ void symbol_factoryt::gen_nondet_array_init(
       depth,
       recursion_set);
   }
+}
+
+const symbolt &
+symbol_factoryt::gen_malloc_function(const irep_idt &malloc_symbol_name)
+{
+  // the name passed in as parameter should not exist in the symbol
+  // table already
+  PRECONDITION(symbol_table.lookup(malloc_symbol_name) == nullptr);
+
+  auto source_location = source_locationt{};
+  source_location.set_file(
+    "<builtin-library-" + id2string(malloc_symbol_name) + ">");
+  symbolt malloc_sym;
+  malloc_sym.base_name = malloc_sym.name = malloc_sym.pretty_name =
+    malloc_symbol_name;
+  malloc_sym.mode = "C";
+
+  auto malloc_body = code_blockt{};
+  malloc_body.add_source_location() = source_location;
+
+  // create a new local variable with this name and type, and return
+  // a symbol_expr that represents this variable
+  auto declare_local_variable = [&](
+                                  const std::string &name, const typet &type) {
+    auto const local_id = irep_idt{id2string(malloc_symbol_name) + "::" + name};
+    auto local_sym = symbolt{};
+    local_sym.type = type;
+    local_sym.pretty_name = name;
+    local_sym.name = id2string(local_id);
+    local_sym.base_name = name;
+    local_sym.is_lvalue = false;
+    local_sym.is_static_lifetime = false;
+    local_sym.is_type = false;
+    local_sym.mode = "C";
+    symbol_table.insert(local_sym);
+    malloc_body.add(code_declt{local_sym.symbol_expr()});
+    return local_sym.symbol_expr();
+  };
+
+  // declare the parameter `size_t malloc_size` for malloc
+  auto malloc_size_param_symbol = symbolt{};
+  malloc_size_param_symbol.type = size_type();
+  malloc_size_param_symbol.name =
+    id2string(malloc_symbol_name) + "::malloc_size";
+  malloc_size_param_symbol.pretty_name = "malloc_size";
+  malloc_size_param_symbol.base_name = "malloc_size";
+  malloc_size_param_symbol.is_static_lifetime = false;
+  malloc_size_param_symbol.is_parameter = true;
+  symbol_table.insert(malloc_size_param_symbol);
+  auto malloc_size_param = code_typet::parametert{size_type()};
+  malloc_size_param.set_base_name("malloc_size");
+  malloc_size_param.set_identifier(malloc_size_param_symbol.name);
+
+  // the signature for our malloc is
+  // void *__CPROVER_malloc(size_t malloc_size);
+  malloc_sym.type = code_typet{code_typet::parameterst{malloc_size_param},
+                               pointer_type(void_type())};
+
+  auto const &local_size_variable = malloc_size_param_symbol.symbol_expr();
+
+  // the variable that holds the allocation result, i.e. a valid void*
+  // that points to a memory region of malloc_size bytes
+  // void *malloc_res = __CPROVER_allocate(malloc_size, 0);
+  auto const malloc_res =
+    declare_local_variable("malloc_res", pointer_type(void_type()));
+
+  // the actual allocation
+  auto malloc_allocate = side_effect_exprt{ID_allocate};
+  malloc_allocate.copy_to_operands(local_size_variable);
+  malloc_allocate.copy_to_operands(false_exprt{});
+  malloc_body.add(code_assignt{malloc_res, malloc_allocate});
+
+  // the following are all setting various CBMC book-keeping variables
+
+  // __CPROVER_deallocated=(malloc_res==__CPROVER_deallocated)?0:__CPROVER_deallocated;
+  auto const &cprover_deallocated =
+    symbol_table.lookup_ref(CPROVER_PREFIX "deallocated");
+  malloc_body.add(code_assignt{
+    cprover_deallocated.symbol_expr(),
+    if_exprt{equal_exprt{malloc_res, cprover_deallocated.symbol_expr()},
+             from_integer(0, cprover_deallocated.type),
+             cprover_deallocated.symbol_expr()}});
+
+  // __CPROVER_bool record_malloc=__VERIFIER_nondet___CPROVER_bool();
+  auto const record_malloc =
+    declare_local_variable("record_malloc", bool_typet{});
+  malloc_body.add(
+    code_assignt{record_malloc, get_nondet_bool(bool_typet{}, loc)});
+
+  // __CPROVER_malloc_object=record_malloc?malloc_res:__CPROVER_malloc_object;
+  auto const &malloc_object =
+    symbol_table.lookup_ref(CPROVER_PREFIX "malloc_object");
+  malloc_body.add(code_assignt{malloc_object.symbol_expr(),
+                               if_exprt{record_malloc,
+                                        malloc_res,
+                                        malloc_object.symbol_expr(),
+                                        malloc_object.type}});
+
+  // __CPROVER_malloc_size=record_malloc?malloc_size:__CPROVER_malloc_size;
+  auto const &malloc_size =
+    symbol_table.lookup_ref(CPROVER_PREFIX "malloc_size");
+  malloc_body.add(code_assignt{malloc_size.symbol_expr(),
+                               if_exprt{record_malloc,
+                                        local_size_variable,
+                                        malloc_size.symbol_expr(),
+                                        malloc_size.type}});
+
+  // __CPROVER_malloc_is_new_array=record_malloc?0:__CPROVER_malloc_is_new_array;
+  auto const &malloc_is_new_array =
+    symbol_table.lookup_ref(CPROVER_PREFIX "malloc_is_new_array");
+  malloc_body.add(code_assignt{
+    malloc_is_new_array.symbol_expr(),
+    if_exprt{record_malloc, false_exprt{}, malloc_is_new_array.symbol_expr()}});
+
+  // __CPROVER_bool record_may_leak=__VERIFIER_nondet___CPROVER_bool();
+  auto const record_may_leak =
+    declare_local_variable("record_may_leak", bool_typet{});
+  malloc_body.add(code_declt{record_may_leak});
+  malloc_body.add(
+    code_assignt{record_may_leak, get_nondet_bool(bool_typet{}, loc)});
+
+  // __CPROVER_memory_leak=record_may_leak?malloc_res:__CPROVER_memory_leak;
+  auto const &memory_leak =
+    symbol_table.lookup_ref(CPROVER_PREFIX "memory_leak");
+  malloc_body.add(code_assignt{
+    memory_leak.symbol_expr(),
+    if_exprt{record_may_leak, malloc_res, memory_leak.symbol_expr()}});
+
+  // return malloc_res;
+  malloc_body.add(code_returnt{malloc_res});
+
+  malloc_sym.value = malloc_body;
+  auto inserted_sym = symbol_table.insert(malloc_sym);
+
+  // since the function is only called when there's no symbol with
+  // malloc_sym.name already in the symbol table, inserting it does succeed
+  CHECK_RETURN(inserted_sym.second);
+  return inserted_sym.first;
 }
 
 /// Creates a symbol and generates code so that it can vary over all possible
