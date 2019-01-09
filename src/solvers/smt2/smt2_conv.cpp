@@ -148,7 +148,7 @@ void smt2_convt::define_object_size(
 
   for(const auto &o : pointer_logic.objects)
   {
-    const typet &type = ns.follow(o.type());
+    const typet &type = o.type();
     exprt size_expr = size_of_expr(type, ns);
     mp_integer object_size;
 
@@ -555,7 +555,7 @@ void smt2_convt::convert_address_of_rec(
     const member_exprt &member_expr=to_member_expr(expr);
 
     const exprt &struct_op=member_expr.struct_op();
-    const typet &struct_op_type=ns.follow(struct_op.type());
+    const typet &struct_op_type = struct_op.type();
 
     DATA_INVARIANT(
       struct_op_type.id() == ID_struct || struct_op_type.id() == ID_struct_tag,
@@ -1915,11 +1915,11 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
 {
   const exprt &src = expr.op();
 
-  typet dest_type=ns.follow(expr.type());
+  typet dest_type = expr.type();
   if(dest_type.id()==ID_c_enum_tag)
     dest_type=ns.follow_tag(to_c_enum_tag_type(dest_type));
 
-  typet src_type=ns.follow(src.type());
+  typet src_type = src.type();
   if(src_type.id()==ID_c_enum_tag)
     src_type=ns.follow_tag(to_c_enum_tag_type(src_type));
 
@@ -2618,7 +2618,7 @@ void smt2_convt::convert_struct(const struct_exprt &expr)
         exprt op=expr.operands()[i-1];
 
         // may need to flatten array-theory arrays in there
-        if(ns.follow(op.type()).id()==ID_array)
+        if(op.type().id() == ID_array)
           flatten_array(op);
         else
           convert_expr(op);
@@ -2637,8 +2637,7 @@ void smt2_convt::convert_struct(const struct_exprt &expr)
 /// produce a flat bit-vector for a given array of fixed size
 void smt2_convt::flatten_array(const exprt &expr)
 {
-  const array_typet &array_type=
-    to_array_type(ns.follow(expr.type()));
+  const array_typet &array_type = to_array_type(expr.type());
 
   mp_integer size = numeric_cast_v<mp_integer>(array_type.size());
   CHECK_RETURN_WITH_DIAGNOSTICS(size != 0, "can't convert zero-sized array");
@@ -3492,7 +3491,7 @@ void smt2_convt::convert_with(const with_exprt &expr)
     "with expression should have been converted to a version with three "
     "operands above");
 
-  const typet &expr_type=ns.follow(expr.type());
+  const typet &expr_type = expr.type();
 
   if(expr_type.id()==ID_array)
   {
@@ -3724,7 +3723,7 @@ void smt2_convt::convert_update(const exprt &expr)
 
 void smt2_convt::convert_index(const index_exprt &expr)
 {
-  const typet &array_op_type=ns.follow(expr.array().type());
+  const typet &array_op_type = expr.array().type();
 
   if(array_op_type.id()==ID_array)
   {
@@ -3732,7 +3731,7 @@ void smt2_convt::convert_index(const index_exprt &expr)
 
     if(use_array_theory(expr.array()))
     {
-      if(ns.follow(expr.type()).id()==ID_bool && !use_array_of_bool)
+      if(expr.type().id() == ID_bool && !use_array_of_bool)
       {
         out << "(= ";
         out << "(select ";
@@ -3824,7 +3823,7 @@ void smt2_convt::convert_member(const member_exprt &expr)
 {
   const member_exprt &member_expr=to_member_expr(expr);
   const exprt &struct_op=member_expr.struct_op();
-  const typet &struct_op_type=ns.follow(struct_op.type());
+  const typet &struct_op_type = struct_op.type();
   const irep_idt &name=member_expr.get_component_name();
 
   if(struct_op_type.id() == ID_struct || struct_op_type.id() == ID_struct_tag)
@@ -3883,7 +3882,7 @@ void smt2_convt::convert_member(const member_exprt &expr)
 
 void smt2_convt::flatten2bv(const exprt &expr)
 {
-  const typet &type=ns.follow(expr.type());
+  const typet &type = expr.type();
 
   if(type.id()==ID_bool)
   {
@@ -4379,9 +4378,8 @@ void smt2_convt::find_symbols(const exprt &expr)
 
 bool smt2_convt::use_array_theory(const exprt &expr)
 {
-  const typet &type=ns.follow(expr.type());
+  const typet &type = expr.type();
   PRECONDITION(type.id()==ID_array);
-  // const array_typet &array_type=to_array_type(ns.follow(expr.type()));
 
   if(use_datatypes)
   {
@@ -4407,7 +4405,7 @@ void smt2_convt::convert_type(const typet &type)
     CHECK_RETURN(array_type.size().is_not_nil());
 
     // we always use array theory for top-level arrays
-    const typet &subtype=ns.follow(array_type.subtype());
+    const typet &subtype = array_type.subtype();
 
     out << "(Array ";
     convert_type(array_type.size().type());
