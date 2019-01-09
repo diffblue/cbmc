@@ -363,12 +363,10 @@ optionalt<exprt> string_constraint_generatort::make_array_pointer_association(
 /// strings contained in this call are converted to objects of type
 /// `string_exprt`, through adding axioms. Axioms are then added to enforce that
 /// the result corresponds to the function application.
-/// \param fresh_symbol: generator of fresh symbols
 /// \param expr: an expression containing a function application
 /// \return expression corresponding to the result of the function application
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_function_application(
-  symbol_generatort &fresh_symbol,
   const function_application_exprt &expr)
 {
   const irep_idt &id = get_function_name(expr);
@@ -396,7 +394,7 @@ string_constraint_generatort::add_axioms_for_function_application(
   else if(id==ID_cprover_string_contains_func)
     return add_axioms_for_contains(fresh_symbol, expr, array_pool);
   else if(id==ID_cprover_string_hash_code_func)
-    return add_axioms_for_hash_code(fresh_symbol, expr, array_pool);
+    return add_axioms_for_hash_code(expr, array_pool);
   else if(id==ID_cprover_string_index_of_func)
     return add_axioms_for_index_of(fresh_symbol, expr, array_pool);
   else if(id==ID_cprover_string_last_index_of_func)
@@ -463,7 +461,7 @@ string_constraint_generatort::add_axioms_for_function_application(
   else if(id==ID_cprover_string_replace_func)
     return add_axioms_for_replace(fresh_symbol, expr, array_pool);
   else if(id==ID_cprover_string_intern_func)
-    return add_axioms_for_intern(fresh_symbol, expr);
+    return add_axioms_for_intern(expr);
   else if(id==ID_cprover_string_format_func)
     return add_axioms_for_format(fresh_symbol, expr, array_pool, message, ns);
   else if(id == ID_cprover_string_constrain_characters_func)

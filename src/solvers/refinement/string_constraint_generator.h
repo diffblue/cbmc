@@ -127,7 +127,6 @@ public:
   explicit string_constraint_generatort(const namespacet &ns);
 
   std::pair<exprt, string_constraintst> add_axioms_for_function_application(
-    symbol_generatort &fresh_symbol,
     const function_application_exprt &expr);
 
   symbol_generatort fresh_symbol;
@@ -150,7 +149,6 @@ private:
   /// string pointers.
   /// \deprecated Not tested.
   std::pair<symbol_exprt, string_constraintst> add_axioms_for_intern(
-    symbol_generatort &fresh_symbol,
     const function_application_exprt &f);
 
   exprt associate_array_to_pointer(const function_application_exprt &f);
@@ -161,7 +159,6 @@ private:
   // The specification is partial: the actual value is not actually computed
   // but we ensure that hash codes of equal strings are equal.
   std::pair<exprt, string_constraintst> add_axioms_for_hash_code(
-    symbol_generatort &fresh_symbol,
     const function_application_exprt &f,
     array_poolt &pool);
 

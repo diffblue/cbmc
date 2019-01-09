@@ -182,18 +182,16 @@ std::pair<exprt, string_constraintst> add_axioms_for_equals_ignore_case(
 /// These axioms are, for each string `s` on which hash was called:
 ///   * \f$ hash(str)=hash(s) \lor |str| \ne |s|
 ///       \lor (|str|=|s| \land \exists i<|s|.\ s[i]\ne str[i]) \f$
-/// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with argument refined_string `str`
 /// \param pool: pool of arrays representing strings
 /// \return integer expression `hash(str)`
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_hash_code(
-  symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
   array_poolt &pool)
 {
   PRECONDITION(f.arguments().size() == 1);
-  string_constraintst constraints;
+  string_constraintst hash_constraints;
   const array_string_exprt str = get_string_expr(pool, f.arguments()[0]);
   const typet &return_type = f.type();
   const typet &index_type = str.length().type();
@@ -212,9 +210,9 @@ string_constraint_generatort::add_axioms_for_hash_code(
       and_exprt(
         notequal_exprt(str[i], it.first[i]),
         and_exprt(length_gt(str, i), is_positive(i))));
-    constraints.existential.push_back(or_exprt(c1, or_exprt(c2, c3)));
+    hash_constraints.existential.push_back(or_exprt(c1, or_exprt(c2, c3)));
   }
-  return {hash, std::move(constraints)};
+  return {hash, std::move(hash_constraints)};
 }
 
 /// Lexicographic comparison of two strings
@@ -302,17 +300,15 @@ std::pair<exprt, string_constraintst> add_axioms_for_compare_to(
 /// Add axioms stating that the return value for two equal string should be the
 /// same
 /// \deprecated never tested
-/// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with one string argument
 /// \return a string expression
 DEPRECATED("never tested")
 std::pair<symbol_exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_intern(
-  symbol_generatort &fresh_symbol,
   const function_application_exprt &f)
 {
   PRECONDITION(f.arguments().size() == 1);
-  string_constraintst constraints;
+  string_constraintst intern_constraints;
   const array_string_exprt str = get_string_expr(array_pool, f.arguments()[0]);
   // For now we only enforce content equality and not pointer equality
   const typet &return_type=f.type();
@@ -330,14 +326,14 @@ string_constraint_generatort::add_axioms_for_intern(
   exprt::operandst disj;
   for(auto it : intern_of_string)
     disj.push_back(equal_exprt(intern, it.second));
-  constraints.existential.push_back(disjunction(disj));
+  intern_constraints.existential.push_back(disjunction(disj));
 
   // WARNING: the specification may be incomplete or incorrect
   for(auto it : intern_of_string)
     if(it.second!=str)
     {
       symbol_exprt i = fresh_symbol("index_intern", index_type);
-      constraints.existential.push_back(or_exprt(
+      intern_constraints.existential.push_back(or_exprt(
         equal_exprt(it.second, intern),
         or_exprt(
           notequal_exprt(str.length(), it.first.length()),
@@ -348,5 +344,5 @@ string_constraint_generatort::add_axioms_for_intern(
               and_exprt(length_gt(str, i), is_positive(i)))))));
     }
 
-  return {intern, std::move(constraints)};
+  return {intern, std::move(intern_constraints)};
 }

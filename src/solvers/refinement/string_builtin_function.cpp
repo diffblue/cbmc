@@ -129,12 +129,12 @@ std::vector<mp_integer> string_concatenation_builtin_functiont::eval(
       ? std::max(std::min(args_value[1], input2_size), start_index)
       : input2_size;
 
-  std::vector<mp_integer> result(input1_value);
-  result.insert(
-    result.end(),
+  std::vector<mp_integer> eval_result(input1_value);
+  eval_result.insert(
+    eval_result.end(),
     input2_value.begin() + numeric_cast_v<std::size_t>(start_index),
     input2_value.begin() + numeric_cast_v<std::size_t>(end_index));
-  return result;
+  return eval_result;
 }
 
 string_constraintst string_concatenation_builtin_functiont::constraints(
@@ -458,12 +458,12 @@ std::vector<mp_integer> string_insertion_builtin_functiont::eval(
       ? std::max(std::min(args_value[2], input2_size), mp_integer(0))
       : input2_size;
 
-  std::vector<mp_integer> result(input1_value);
-  result.insert(
-    result.begin() + numeric_cast_v<std::size_t>(offset),
+  std::vector<mp_integer> eval_result(input1_value);
+  eval_result.insert(
+    eval_result.begin() + numeric_cast_v<std::size_t>(offset),
     input2_value.begin() + numeric_cast_v<std::size_t>(start),
     input2_value.begin() + numeric_cast_v<std::size_t>(end));
-  return result;
+  return eval_result;
 }
 
 optionalt<exprt> string_insertion_builtin_functiont::eval(
@@ -634,8 +634,8 @@ string_builtin_function_with_no_evalt::string_builtin_function_with_no_evalt(
 string_constraintst string_builtin_function_with_no_evalt::constraints(
   string_constraint_generatort &generator) const
 {
-  auto pair = generator.add_axioms_for_function_application(
-    generator.fresh_symbol, function_application);
+  auto pair =
+    generator.add_axioms_for_function_application(function_application);
   pair.second.existential.push_back(equal_exprt(pair.first, return_code));
   return pair.second;
 }
