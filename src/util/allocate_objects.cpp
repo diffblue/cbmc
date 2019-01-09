@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "fresh_symbol.h"
 #include "pointer_offset_size.h"
 #include "string_constant.h"
+#include "type_eq.h"
 
 /// Allocates a new object, either by creating a local variable with automatic
 /// lifetime, a global variable with static lifetime, or by dynamically
@@ -183,7 +184,7 @@ exprt allocate_objectst::allocate_dynamic_object(
   output_code.add(assign);
 
   exprt malloc_symbol_expr =
-    ns.follow(malloc_sym.symbol_expr().type()) != ns.follow(target_expr.type())
+    !type_eq(malloc_sym.symbol_expr().type(), target_expr.type(), ns)
       ? (exprt)typecast_exprt(malloc_sym.symbol_expr(), target_expr.type())
       : malloc_sym.symbol_expr();
 

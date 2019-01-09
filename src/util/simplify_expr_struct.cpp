@@ -200,7 +200,7 @@ bool simplify_exprt::simplify_member(exprt &expr)
   else if(op.id()==ID_union && op_type.id()==ID_union)
   {
     // trivial?
-    if(ns.follow(to_union_expr(op).op().type())==ns.follow(expr.type()))
+    if(type_eq(to_union_expr(op).op().type(), expr.type(), ns))
     {
       exprt tmp=to_union_expr(op).op();
       expr.swap(tmp);
