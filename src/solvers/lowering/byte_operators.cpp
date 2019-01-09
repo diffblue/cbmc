@@ -43,11 +43,9 @@ static exprt unpack_rec(
   // endianness, but we need to work on elements here instead of
   // individual bits
 
-  const typet &type=ns.follow(src.type());
-
-  if(type.id()==ID_array)
+  if(src.type().id()==ID_array)
   {
-    const array_typet &array_type=to_array_type(type);
+    const array_typet &array_type=to_array_type(src.type());
     const typet &subtype=array_type.subtype();
 
     auto element_width = pointer_offset_bits(subtype, ns);
@@ -58,12 +56,12 @@ static exprt unpack_rec(
     INVARIANT(
       element_width > 0,
       "element width of array should be constant",
-      irep_pretty_diagnosticst(type));
+      irep_pretty_diagnosticst(src.type()));
 
     INVARIANT(
       element_width % 8 == 0,
       "elements in array should be byte-aligned",
-      irep_pretty_diagnosticst(type));
+      irep_pretty_diagnosticst(src.type()));
     #endif
 
     if(!unpack_byte_array && *element_width == 8)
@@ -97,9 +95,9 @@ static exprt unpack_rec(
       }
     }
   }
-  else if(type.id()==ID_struct)
+  else if(ns.follow(src.type()).id()==ID_struct)
   {
-    const struct_typet &struct_type=to_struct_type(type);
+    const struct_typet &struct_type=to_struct_type(ns.follow(src.type()));
     const struct_typet::componentst &components=struct_type.components();
 
     for(const auto &comp : components)
@@ -121,11 +119,11 @@ static exprt unpack_rec(
         array.copy_to_operands(op);
     }
   }
-  else if(type.id()!=ID_empty)
+  else if(src.type().id()!=ID_empty)
   {
     // a basic type; we turn that into extractbits while considering
     // endianness
-    auto bits_opt = pointer_offset_bits(type, ns);
+    auto bits_opt = pointer_offset_bits(src.type(), ns);
     mp_integer bits;
 
     if(bits_opt.has_value())
@@ -229,11 +227,9 @@ exprt lower_byte_extract(const byte_extract_exprt &src, const namespacet &ns)
   unpacked.op()=
     unpack_rec(src.op(), little_endian, upper_bound, ns);
 
-  const typet &type=ns.follow(src.type());
-
-  if(type.id()==ID_array)
+  if(src.type().id()==ID_array)
   {
-    const array_typet &array_type=to_array_type(type);
+    const array_typet &array_type=to_array_type(src.type());
     const typet &subtype=array_type.subtype();
 
     auto element_width = pointer_offset_bits(subtype, ns);
@@ -262,13 +258,13 @@ exprt lower_byte_extract(const byte_extract_exprt &src, const namespacet &ns)
       return simplify_expr(array, ns);
     }
   }
-  else if(type.id()==ID_struct)
+  else if(ns.follow(src.type()).id()==ID_struct)
   {
-    const struct_typet &struct_type=to_struct_type(type);
+    const struct_typet &struct_type=to_struct_type(ns.follow(src.type()));
     const struct_typet::componentst &components=struct_type.components();
 
     bool failed=false;
-    struct_exprt s(struct_type);
+    struct_exprt s(src.type());
 
     for(const auto &comp : components)
     {
@@ -327,8 +323,6 @@ exprt lower_byte_extract(const byte_extract_exprt &src, const namespacet &ns)
   mp_integer num_elements =
     (*size_bits) / 8 + (((*size_bits) % 8 == 0) ? 0 : 1);
 
-  const typet &offset_type=ns.follow(offset.type());
-
   // get 'width'-many bytes, and concatenate
   const std::size_t width_bytes = numeric_cast_v<std::size_t>(num_elements);
   exprt::operandst op;
@@ -340,7 +334,7 @@ exprt lower_byte_extract(const byte_extract_exprt &src, const namespacet &ns)
     std::size_t offset_int=
       little_endian?(width_bytes-i-1):i;
 
-    plus_exprt offset_i(from_integer(offset_int, offset_type), offset);
+    plus_exprt offset_i(from_integer(offset_int, offset.type()), offset);
     index_exprt index_expr(root, offset_i);
     op.push_back(index_expr);
   }
@@ -368,11 +362,9 @@ static exprt lower_byte_update(
 
   const mp_integer &element_size = *element_size_opt;
 
-  const typet &t=ns.follow(src.op0().type());
-
-  if(t.id()==ID_array)
+  if(src.op0().type().id()==ID_array)
   {
-    const array_typet &array_type=to_array_type(t);
+    const array_typet &array_type=to_array_type(src.op0().type());
     const typet &subtype=array_type.subtype();
 
     // array of bitvectors?
@@ -398,7 +390,7 @@ static exprt lower_byte_update(
 
         for(mp_integer i=0; i<element_size; ++i)
         {
-          exprt i_expr = from_integer(i, ns.follow(src.offset().type()));
+          exprt i_expr = from_integer(i, src.offset().type());
 
           exprt new_value;
 
@@ -445,7 +437,7 @@ static exprt lower_byte_update(
         mp_integer num_elements=
           element_size/sub_size+((element_size%sub_size==0)?1:2);
 
-        const auto &offset_type = ns.follow(src.offset().type());
+        const auto &offset_type = src.offset().type();
         exprt zero_offset=from_integer(0, offset_type);
 
         exprt sub_size_expr=from_integer(sub_size, offset_type);
@@ -544,14 +536,14 @@ static exprt lower_byte_update(
         subtype.id_string());
     }
   }
-  else if(t.id()==ID_signedbv ||
-          t.id()==ID_unsignedbv ||
-          t.id()==ID_floatbv ||
-          t.id()==ID_c_bool ||
-          t.id()==ID_pointer)
+  else if(src.op0().type().id()==ID_signedbv ||
+          src.op0().type().id()==ID_unsignedbv ||
+          src.op0().type().id()==ID_floatbv ||
+          src.op0().type().id()==ID_c_bool ||
+          src.op0().type().id()==ID_pointer)
   {
     // do a shift, mask and OR
-    const auto type_width = pointer_offset_bits(t, ns);
+    const auto type_width = pointer_offset_bits(src.op0().type(), ns);
     CHECK_RETURN(type_width.has_value() && *type_width > 0);
     const std::size_t width = numeric_cast_v<std::size_t>(*type_width);
 
@@ -573,11 +565,11 @@ static exprt lower_byte_update(
           unsignedbv_typet(
             width - numeric_cast_v<std::size_t>(element_size) * 8)),
         src.value(),
-        t);
+        src.op0().type());
     else
       value_extended = src.value();
 
-    const typet &offset_type = ns.follow(src.offset().type());
+    const typet &offset_type = src.offset().type();
     mult_exprt offset_times_eight(src.offset(), from_integer(8, offset_type));
 
     binary_predicate_exprt offset_ge_zero(
@@ -615,7 +607,7 @@ static exprt lower_byte_update(
     PRECONDITION_WITH_DIAGNOSTICS(
       false,
       "flatten_byte_update can only do arrays and scalars right now",
-      t.id_string());
+      src.op0().type().id_string());
   }
 }
 

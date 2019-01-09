@@ -11,7 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 bvt boolbvt::convert_power(const binary_exprt &expr)
 {
-  const typet &type=ns.follow(expr.type());
+  const typet &type = expr.type();
 
   std::size_t width=boolbv_width(type);
 

@@ -115,7 +115,7 @@ bool bv_pointerst::convert_address_of_rec(
     const index_exprt &index_expr=to_index_expr(expr);
     const exprt &array=index_expr.array();
     const exprt &index=index_expr.index();
-    const typet &array_type=ns.follow(array.type());
+    const typet &array_type = array.type();
 
     // recursive call
     if(array_type.id()==ID_pointer)
@@ -249,7 +249,7 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
     const typecast_exprt &typecast_expr = to_typecast_expr(expr);
 
     const exprt &op = typecast_expr.op();
-    const typet &op_type=ns.follow(op.type());
+    const typet &op_type = op.type();
 
     if(op_type.id()==ID_pointer)
       return convert_bv(op);

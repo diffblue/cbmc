@@ -50,9 +50,6 @@ boolbv_mapt::map_entryt &boolbv_mapt::get_map_entry(
   const irep_idt &identifier,
   const typet &type)
 {
-  if(type.id() == ID_symbol_type)
-    return get_map_entry(identifier, ns.follow(type));
-
   std::pair<mappingt::iterator, bool> result=
     mapping.insert(std::pair<irep_idt, map_entryt>(
       identifier, map_entryt()));

@@ -32,15 +32,13 @@ class member_exprt;
 class boolbvt:public arrayst
 {
 public:
-  boolbvt(
-    const namespacet &_ns,
-    propt &_prop):
-    arrayst(_ns, _prop),
-    unbounded_array(unbounded_arrayt::U_NONE),
-    boolbv_width(_ns),
-    bv_utils(_prop),
-    functions(*this),
-    map(_prop, _ns, boolbv_width)
+  boolbvt(const namespacet &_ns, propt &_prop)
+    : arrayst(_ns, _prop),
+      unbounded_array(unbounded_arrayt::U_NONE),
+      boolbv_width(_ns),
+      bv_utils(_prop),
+      functions(*this),
+      map(_prop, boolbv_width)
   {
   }
 

@@ -19,7 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 bvt boolbvt::convert_unary_minus(const unary_minus_exprt &expr)
 {
-  const typet &type=ns.follow(expr.type());
+  const typet &type = expr.type();
 
   std::size_t width=boolbv_width(type);
 
@@ -36,7 +36,7 @@ bvt boolbvt::convert_unary_minus(const unary_minus_exprt &expr)
   if(bvtype==bvtypet::IS_UNKNOWN &&
      (type.id()==ID_vector || type.id()==ID_complex))
   {
-    const typet &subtype=ns.follow(type.subtype());
+    const typet &subtype = type.subtype();
 
     std::size_t sub_width=boolbv_width(subtype);
 
