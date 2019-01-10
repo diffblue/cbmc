@@ -117,6 +117,18 @@ public:
     return iteratort(internal_symbols.end());
   }
 
+  typedef symbolst::const_iterator const_iteratort;
+
+  virtual const_iteratort begin() const
+  {
+    return internal_symbols.begin();
+  }
+
+  virtual const_iteratort end() const
+  {
+    return internal_symbols.end();
+  }
+
   /// Check that the symbol table is well-formed
   void validate(const validation_modet vm = validation_modet::INVARIANT) const;
 
