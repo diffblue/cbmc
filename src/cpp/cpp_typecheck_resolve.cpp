@@ -2283,9 +2283,9 @@ void cpp_typecheck_resolvet::filter_for_named_scopes(
       if(e.id()!=ID_type)
         continue; // expressions are definitively not a scope
 
-      if(e.type().id() == ID_symbol_type)
+      if(e.type().id() == ID_template_parameter_symbol_type)
       {
-        symbol_typet type=to_symbol_type(e.type());
+        auto type = to_template_parameter_symbol_type(e.type());
 
         while(true)
         {
@@ -2294,8 +2294,8 @@ void cpp_typecheck_resolvet::filter_for_named_scopes(
           const symbolt &symbol=cpp_typecheck.lookup(identifier);
           assert(symbol.is_type);
 
-          if(symbol.type.id() == ID_symbol_type)
-            type=to_symbol_type(symbol.type);
+          if(symbol.type.id() == ID_template_parameter_symbol_type)
+            type = to_template_parameter_symbol_type(symbol.type);
           else if(symbol.type.id()==ID_struct ||
                   symbol.type.id()==ID_union ||
                   symbol.type.id()==ID_c_enum)
