@@ -97,11 +97,8 @@ propt::resultt satcheck_ipasirt::prop_solve()
 {
   INVARIANT(status!=statust::ERROR, "there cannot be an error");
 
-  {
-    messaget::status() <<
-      (no_variables()-1) << " variables, " <<
-      clause_counter << " clauses" << eom;
-  }
+  messaget::statistics() << (no_variables() - 1) << " variables, "
+                         << clause_counter << " clauses" << eom;
 
   // use the internal representation, as ipasir does not support reporting the
   // status

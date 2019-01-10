@@ -72,7 +72,7 @@ propt::resultt satcheck_lingelingt::prop_solve()
     std::string msg=
       std::to_string(no_variables()-1)+" variables, "+
       std::to_string(clause_counter)+" clauses";
-    messaget::status() << msg << messaget::eom;
+    messaget::statistics() << msg << messaget::eom;
   }
 
   std::string msg;

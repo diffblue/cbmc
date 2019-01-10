@@ -167,11 +167,8 @@ propt::resultt satcheck_minisat2_baset<T>::prop_solve()
 {
   PRECONDITION(status != statust::ERROR);
 
-  {
-    messaget::status() <<
-      (no_variables()-1) << " variables, " <<
-      solver->nClauses() << " clauses" << eom;
-  }
+  messaget::statistics() << (no_variables() - 1) << " variables, "
+                         << solver->nClauses() << " clauses" << eom;
 
   try
   {

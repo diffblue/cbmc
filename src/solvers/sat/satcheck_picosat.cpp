@@ -73,7 +73,7 @@ propt::resultt satcheck_picosatt::prop_solve()
     std::string msg=
       std::to_string(_no_variables-1)+" variables, "+
       std::to_string(picosat_added_original_clauses(picosat))+" clauses";
-    messaget::status() << msg << messaget::eom;
+    messaget::statistics() << msg << messaget::eom;
   }
 
   std::string msg;

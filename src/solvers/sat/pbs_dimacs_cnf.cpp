@@ -218,8 +218,8 @@ propt::resultt pbs_dimacs_cnft::prop_solve()
   pbfile.close();
 
   // We start counting at 1, thus there is one variable fewer.
-  messaget::status() << (no_variables() - 1) << " variables, " << clauses.size()
-                     << " clauses" << eom;
+  messaget::statistics() << (no_variables() - 1) << " variables, "
+                         << clauses.size() << " clauses" << eom;
 
   const bool result = pbs_solve();
 
