@@ -116,8 +116,7 @@ public:
     irep_idt class_identifier,
     bool skip_classid,
     lifetimet lifetime,
-    bool override_,
-    const typet &override_type,
+    const optionalt<typet> &override_type,
     size_t depth,
     update_in_placet,
     const source_locationt &location);
@@ -295,8 +294,7 @@ void java_object_factoryt::gen_pointer_target_init(
     "",    // class_identifier
     false, // skip_classid
     lifetime,
-    false,   // override
-    typet(), // override type immaterial
+    {}, // no override type
     depth + 1,
     update_in_place,
     location);
@@ -763,8 +761,7 @@ symbol_exprt java_object_factoryt::gen_nondet_subtype_pointer_init(
     "",    // class_identifier
     false, // skip_classid
     lifetime,
-    false,   // override
-    typet(), // override_type
+    {}, // no override_type
     depth,
     update_in_placet::NO_UPDATE_IN_PLACE,
     location);
@@ -968,8 +965,7 @@ void java_object_factoryt::gen_nondet_struct_init(
         class_identifier,
         false, // skip_classid
         lifetime,
-        false,   // override
-        typet(), // override_type
+        {}, // no override_type
         depth,
         substruct_in_place,
         location);
@@ -1007,15 +1003,14 @@ void java_object_factoryt::gen_nondet_struct_init(
 /// \param lifetime:
 ///   Lifetime of the allocated objects (AUTOMATIC_LOCAL, STATIC_GLOBAL, or
 ///   DYNAMIC)
-/// \param override_:
-///   If true, initialize with `override_type` instead of `expr.type()`. Used at
-///   the moment for reference arrays, which are implemented as void* arrays but
-///   should be init'd as their true type with appropriate casts.
 /// \param depth:
 ///   Number of times that a pointer has been dereferenced from the root of the
 ///   object tree that we are initializing.
 /// \param override_type:
-///   Override type per above.
+///   If not empty, initialize with `override_type` instead of `expr.type()`.
+///   Used at the moment for reference arrays, which are implemented as
+///   void* arrays but should be init'd as their true type with appropriate
+///   casts.
 /// \param update_in_place:
 ///   NO_UPDATE_IN_PLACE: initialize `expr` from scratch
 ///   MAY_UPDATE_IN_PLACE: generate a runtime nondet branch between the NO_
@@ -1030,15 +1025,13 @@ void java_object_factoryt::gen_nondet_init(
   irep_idt class_identifier,
   bool skip_classid,
   lifetimet lifetime,
-  bool override_,
-  const typet &override_type,
+  const optionalt<typet> &override_type,
   size_t depth,
   update_in_placet update_in_place,
   const source_locationt &location)
 {
-  const typet &type=
-    override_ ? ns.follow(override_type) : ns.follow(expr.type());
-
+  const typet &type = override_type.has_value() ? ns.follow(*override_type)
+                                                : ns.follow(expr.type());
 
   if(type.id()==ID_pointer)
   {
@@ -1074,7 +1067,8 @@ void java_object_factoryt::gen_nondet_init(
         generic_parameter_specialization_map);
     if(is_sub)
     {
-      const typet &symbol = override_ ? override_type : expr.type();
+      const typet &symbol =
+        override_type.has_value() ? *override_type : expr.type();
       PRECONDITION(symbol.id() == ID_struct_tag);
       generic_parameter_specialization_map_keys.insert_pairs_for_symbol(
         to_struct_tag_type(symbol), struct_type);
@@ -1146,8 +1140,7 @@ const symbol_exprt java_object_factoryt::gen_nondet_int_init(
     irep_idt(),
     false,                      // skip_classid
     lifetimet::AUTOMATIC_LOCAL, // immaterial, type is primitive
-    false,                      // override
-    typet(),                    // override type is immaterial
+    {},                         // no override type
     0,                          // depth is immaterial, always non-null
     update_in_placet::NO_UPDATE_IN_PLACE,
     location);
@@ -1369,8 +1362,7 @@ void java_object_factoryt::array_loop_init_code(
     false,      // skip_classid
     // These are variable in number, so use dynamic allocator:
     lifetimet::DYNAMIC,
-    true, // override
-    element_type,
+    element_type, // override
     depth,
     child_update_in_place,
     location);
@@ -1555,9 +1547,8 @@ exprt object_factory(
     "",    // class_identifier
     false, // skip_classid
     lifetime,
-    false,   // override
-    typet(), // override_type is immaterial
-    1,       // initial depth
+    {}, // no override_type
+    1,  // initial depth
     update_in_placet::NO_UPDATE_IN_PLACE,
     loc);
 
@@ -1627,9 +1618,8 @@ void gen_nondet_init(
     "",    // class_identifier
     skip_classid,
     lifetime,
-    false,   // override
-    typet(), // override_type is immaterial
-    1,       // initial depth
+    {}, // no override_type
+    1,  // initial depth
     update_in_place,
     loc);
 
