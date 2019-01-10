@@ -3795,6 +3795,21 @@ public:
   {
     return op0();
   }
+
+  static void check(
+    const exprt &expr,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    DATA_CHECK(
+      vm,
+      expr.operands().size() == 1,
+      "member expression must have one operand");
+  }
+
+  static void validate(
+    const exprt &expr,
+    const namespacet &ns,
+    const validation_modet vm = validation_modet::INVARIANT);
 };
 
 template <>
