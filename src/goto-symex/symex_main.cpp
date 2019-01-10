@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <memory>
 
 #include <util/exception_utils.h>
+#include <util/expr_util.h>
 #include <util/make_unique.h>
 #include <util/mathematical_expr.h>
 #include <util/replace_symbol.h>
@@ -86,7 +87,12 @@ void goto_symext::vcc(
   exprt expr=vcc_expr;
 
   // we are willing to re-write some quantified expressions
-  rewrite_quantifiers(expr, state);
+  if(has_subexpr(expr, ID_exists) || has_subexpr(expr, ID_forall))
+  {
+    // have negation pushed inwards as far as possible
+    do_simplify(expr);
+    rewrite_quantifiers(expr, state);
+  }
 
   // now rename, enables propagation
   state.rename(expr, ns);
@@ -143,7 +149,13 @@ void goto_symext::rewrite_quantifiers(exprt &expr, statet &state)
       to_symbol_expr(to_ssa_expr(quant_expr.symbol()).get_original_expr());
     symex_decl(state, tmp0);
     exprt tmp = quant_expr.where();
+    rewrite_quantifiers(tmp, state);
     quant_expr.swap(tmp);
+  }
+  else if(expr.id() == ID_or || expr.id() == ID_and)
+  {
+    for(auto &op : expr.operands())
+      rewrite_quantifiers(op, state);
   }
 }
 
