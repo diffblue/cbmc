@@ -20,7 +20,7 @@ class namespacet;
 class pointer_typet;
 class select_pointer_typet;
 class symbol_table_baset;
-class typet;
+class struct_tag_typet;
 
 class ci_lazy_methods_neededt
 {
@@ -64,7 +64,8 @@ private:
     const pointer_typet &pointer_type,
     const namespacet &ns);
 
-  void gather_field_types(const typet &class_type, const namespacet &ns);
+  void
+  gather_field_types(const struct_tag_typet &class_type, const namespacet &ns);
 };
 
 #endif
