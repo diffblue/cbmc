@@ -3661,6 +3661,64 @@ inline member_exprt &to_member_expr(exprt &expr)
   return ret;
 }
 
+/// \brief Extract member of struct or union, following unnamed members
+class deep_member_exprt:public unary_exprt
+{
+public:
+  deep_member_exprt(
+    const exprt &op,
+    const irep_idt &component_name,
+    const typet &_type):
+    unary_exprt(ID_deep_member, op, _type)
+  {
+    set_component_name(component_name);
+  }
+
+  irep_idt get_component_name() const
+  {
+    return get(ID_component_name);
+  }
+
+  void set_component_name(const irep_idt &component_name)
+  {
+    set(ID_component_name, component_name);
+  }
+
+  const exprt &compound() const
+  {
+    return op0();
+  }
+
+  exprt &compound()
+  {
+    return op0();
+  }
+};
+
+/// \brief Cast an exprt to a \ref member_exprt
+///
+/// \a expr must be known to be \ref member_exprt.
+///
+/// \param expr: Source expression
+/// \return Object of type \ref member_exprt
+inline const deep_member_exprt &to_deep_member_expr(const exprt &expr)
+{
+  PRECONDITION(expr.id()==ID_deep_member);
+  DATA_INVARIANT(
+    expr.operands().size()==1,
+    "deep_member must have one operand");
+  return static_cast<const deep_member_exprt &>(expr);
+}
+
+/// \copydoc to_member_expr(const exprt &)
+inline deep_member_exprt &to_deep_member_expr(exprt &expr)
+{
+  PRECONDITION(expr.id()==ID_deep_member);
+  DATA_INVARIANT(
+    expr.operands().size()==1,
+    "deep_member must have one operand");
+  return static_cast<deep_member_exprt &>(expr);
+}
 
 /// \brief Evaluates to true if the operand is NaN
 class isnan_exprt:public unary_predicate_exprt
