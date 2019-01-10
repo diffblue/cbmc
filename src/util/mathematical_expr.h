@@ -337,6 +337,24 @@ public:
   }
 };
 
+inline const forall_exprt &to_forall_expr(const exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_forall);
+  DATA_INVARIANT(
+    expr.operands().size() == 2,
+    "forall expressions have exactly two operands");
+  return static_cast<const forall_exprt &>(expr);
+}
+
+inline forall_exprt &to_forall_expr(exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_forall);
+  DATA_INVARIANT(
+    expr.operands().size() == 2,
+    "forall expressions have exactly two operands");
+  return static_cast<forall_exprt &>(expr);
+}
+
 /// \brief An exists expression
 class exists_exprt : public quantifier_exprt
 {
