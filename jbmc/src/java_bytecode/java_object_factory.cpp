@@ -417,7 +417,7 @@ void initialize_nondet_string_fields(
   namespacet ns(symbol_table);
 
   const struct_typet &struct_type =
-    to_struct_type(ns.follow(struct_expr.type()));
+    ns.follow_tag(to_struct_tag_type(struct_expr.type()));
 
   // In case the type for String was not added to the symbol table,
   // (typically when string refinement is not activated), `struct_type`
@@ -538,7 +538,8 @@ void java_object_factoryt::gen_nondet_pointer_init(
       generic_parameter_specialization_map_keys(
         generic_parameter_specialization_map);
     generic_parameter_specialization_map_keys.insert_pairs_for_pointer(
-      replacement_pointer_type, ns.follow(replacement_pointer_type.subtype()));
+      replacement_pointer_type,
+      ns.follow(to_struct_tag_type(replacement_pointer_type.subtype())));
 
     const symbol_exprt real_pointer_symbol = gen_nondet_subtype_pointer_init(
       assignments, lifetime, replacement_pointer_type, depth, location);
@@ -568,24 +569,21 @@ void java_object_factoryt::gen_nondet_pointer_init(
   // the pointer to NULL instead of recursively initializing the struct to which
   // it points.
   const typet &subtype = pointer_type.subtype();
-  const typet &followed_subtype = ns.follow(subtype);
-  if(followed_subtype.id() == ID_struct)
-  {
-    const struct_typet &struct_type = to_struct_type(followed_subtype);
-    const irep_idt &struct_tag=struct_type.get_tag();
+  const struct_typet &struct_type = ns.follow_tag(to_struct_tag_type(subtype));
+  const irep_idt &struct_tag = struct_type.get_tag();
 
-    // If this is a recursive type of some kind AND the depth is exceeded, set
-    // the pointer to null.
-    if(!recursion_set_entry.insert_entry(struct_tag) &&
-      depth>=object_factory_parameters.max_nondet_tree_depth)
+  // If this is a recursive type of some kind AND the depth is exceeded, set
+  // the pointer to null.
+  if(
+    !recursion_set_entry.insert_entry(struct_tag) &&
+    depth >= object_factory_parameters.max_nondet_tree_depth)
+  {
+    if(update_in_place == update_in_placet::NO_UPDATE_IN_PLACE)
     {
-      if(update_in_place==update_in_placet::NO_UPDATE_IN_PLACE)
-      {
-        assignments.add(get_null_assignment(expr, pointer_type));
-      }
-      // Otherwise leave it as it is.
-      return;
+      assignments.add(get_null_assignment(expr, pointer_type));
     }
+    // Otherwise leave it as it is.
+    return;
   }
 
   // If this is a void* we *must* initialise with null:
@@ -609,7 +607,7 @@ void java_object_factoryt::gen_nondet_pointer_init(
   // ci_lazy_methodst::initialize_instantiated_classes.
   if(
     const auto class_type =
-      type_try_dynamic_cast<java_class_typet>(followed_subtype))
+      type_try_dynamic_cast<java_class_typet>(struct_type))
   {
     if(class_type->get_base("java::java.lang.Enum") && !must_be_null)
     {
@@ -830,7 +828,7 @@ void java_object_factoryt::gen_nondet_struct_init(
   const update_in_placet &update_in_place,
   const source_locationt &location)
 {
-  PRECONDITION(ns.follow(expr.type()).id()==ID_struct);
+  PRECONDITION(expr.type().id() == ID_struct_tag);
   PRECONDITION(struct_type.id()==ID_struct);
 
   typedef struct_typet::componentst componentst;
@@ -1043,7 +1041,7 @@ void java_object_factoryt::gen_nondet_init(
       generic_parameter_specialization_map_keys(
         generic_parameter_specialization_map);
     generic_parameter_specialization_map_keys.insert_pairs_for_pointer(
-      pointer_type, ns.follow(pointer_type.subtype()));
+      pointer_type, ns.follow_tag(to_struct_tag_type(pointer_type.subtype())));
 
     gen_nondet_pointer_init(
       assignments,
@@ -1056,7 +1054,7 @@ void java_object_factoryt::gen_nondet_init(
   }
   else if(followed_type.id() == ID_struct)
   {
-    const struct_typet struct_type = to_struct_type(followed_type);
+    const struct_typet &struct_type = to_struct_type(followed_type);
 
     // If we are about to initialize a generic class (as a superclass object
     // for a different object), add its concrete types to the map and delete
@@ -1064,13 +1062,11 @@ void java_object_factoryt::gen_nondet_init(
     generic_parameter_specialization_map_keyst
       generic_parameter_specialization_map_keys(
         generic_parameter_specialization_map);
+
     if(is_sub)
     {
-      const typet &symbol =
-        override_type.has_value() ? *override_type : expr.type();
-      PRECONDITION(symbol.id() == ID_struct_tag);
       generic_parameter_specialization_map_keys.insert_pairs_for_symbol(
-        to_struct_tag_type(symbol), struct_type);
+        to_struct_tag_type(type), struct_type);
     }
 
     gen_nondet_struct_init(
@@ -1391,8 +1387,9 @@ void java_object_factoryt::gen_nondet_array_init(
   PRECONDITION(expr.type().subtype().id() == ID_struct_tag);
   PRECONDITION(update_in_place != update_in_placet::MAY_UPDATE_IN_PLACE);
 
-  const typet &type = ns.follow(expr.type().subtype());
-  const struct_typet &struct_type = to_struct_type(type);
+  const struct_tag_typet &struct_tag_type =
+    to_struct_tag_type(expr.type().subtype());
+  const struct_typet &struct_type = ns.follow_tag(struct_tag_type);
   const typet &element_type =
     static_cast<const typet &>(expr.type().subtype().find(ID_element_type));
 
@@ -1475,7 +1472,8 @@ void java_object_factoryt::gen_nondet_enum_init(
 
   // Access members (length and data) of $VALUES array
   dereference_exprt deref_expr(values.symbol_expr());
-  const auto &deref_struct_type = to_struct_type(ns.follow(deref_expr.type()));
+  const auto &deref_struct_type =
+    ns.follow_tag(to_struct_tag_type(deref_expr.type()));
   PRECONDITION(is_valid_java_array(deref_struct_type));
   const auto &comps = deref_struct_type.components();
   const member_exprt length_expr(deref_expr, "length", comps[1].type());
