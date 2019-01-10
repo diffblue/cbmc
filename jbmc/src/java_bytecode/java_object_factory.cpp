@@ -143,7 +143,6 @@ private:
     irep_idt class_identifier,
     bool skip_classid,
     lifetimet lifetime,
-    const struct_typet &struct_type,
     size_t depth,
     const update_in_placet &update_in_place,
     const source_locationt &location);
@@ -829,13 +828,13 @@ void java_object_factoryt::gen_nondet_struct_init(
   irep_idt class_identifier,
   bool skip_classid,
   lifetimet lifetime,
-  const struct_typet &struct_type,
   size_t depth,
   const update_in_placet &update_in_place,
   const source_locationt &location)
 {
-  PRECONDITION(ns.follow(expr.type()).id()==ID_struct);
-  PRECONDITION(struct_type.id()==ID_struct);
+  PRECONDITION(expr.type().id() == ID_struct_tag);
+  const struct_typet &struct_type =
+    ns.follow_tag(to_struct_tag_type(expr.type()));
 
   typedef struct_typet::componentst componentst;
   const irep_idt &struct_tag=struct_type.get_tag();
@@ -1039,7 +1038,6 @@ void java_object_factoryt::gen_nondet_init(
   const typet &type=
     override_ ? ns.follow(override_type) : ns.follow(expr.type());
 
-
   if(type.id()==ID_pointer)
   {
     // dereferenced type
@@ -1064,20 +1062,19 @@ void java_object_factoryt::gen_nondet_init(
   }
   else if(type.id()==ID_struct)
   {
-    const struct_typet struct_type=to_struct_type(type);
-
     // If we are about to initialize a generic class (as a superclass object
     // for a different object), add its concrete types to the map and delete
     // them on leaving this function scope.
     generic_parameter_specialization_map_keyst
       generic_parameter_specialization_map_keys(
         generic_parameter_specialization_map);
+
     if(is_sub)
     {
       const typet &symbol = override_ ? override_type : expr.type();
       PRECONDITION(symbol.id() == ID_struct_tag);
       generic_parameter_specialization_map_keys.insert_pairs_for_symbol(
-        to_struct_tag_type(symbol), struct_type);
+        to_struct_tag_type(symbol), to_struct_type(type));
     }
 
     gen_nondet_struct_init(
@@ -1087,7 +1084,6 @@ void java_object_factoryt::gen_nondet_init(
       class_identifier,
       skip_classid,
       lifetime,
-      struct_type,
       depth,
       update_in_place,
       location);
