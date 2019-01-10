@@ -973,7 +973,7 @@ void symex_target_equationt::SSA_stept::validate(
     validate_full_expr(ssa_rhs, ns, vm);
     DATA_CHECK(
       vm,
-      base_type_eq(ssa_lhs.get_original_expr(), ssa_rhs, ns),
+      base_type_eq(ssa_lhs.get_original_expr().type(), ssa_rhs.type(), ns),
       "Type inequality in SSA assignment\nlhs-type: " +
         ssa_lhs.get_original_expr().type().id_string() +
         "\nrhs-type: " + ssa_rhs.type().id_string());
