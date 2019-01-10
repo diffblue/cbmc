@@ -37,10 +37,10 @@ void template_mapt::apply(typet &type) const
       apply(subtype);
     }
   }
-  else if(type.id() == ID_symbol_type)
+  else if(type.id() == ID_template_parameter_symbol_type)
   {
     type_mapt::const_iterator m_it =
-      type_map.find(to_symbol_type(type).get_identifier());
+      type_map.find(to_template_parameter_symbol_type(type).get_identifier());
 
     if(m_it!=type_map.end())
     {
