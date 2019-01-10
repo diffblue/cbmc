@@ -1,4 +1,4 @@
-CORE
+KNOWNBUG
 main.c
 
 ^\*\* Results:$
@@ -8,3 +8,8 @@ main.c
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$
+--
+^warning: ignoring
+--
+This produces the expected verification result, but actually ignores some
+quantifiers.

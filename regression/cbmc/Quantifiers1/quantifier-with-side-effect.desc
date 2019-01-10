@@ -5,3 +5,4 @@ quantifier-with-side-effect.c
 ^SIGNAL=0$
 ^file .* line 10 function main: quantifier must not contain side effects$
 --
+^warning: ignoring
