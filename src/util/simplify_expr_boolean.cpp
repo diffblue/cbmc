@@ -222,6 +222,15 @@ bool simplify_exprt::simplify_not(exprt &expr)
     expr = rewritten_op;
     return false;
   }
+  else if(op.id() == ID_forall) // !(forall: a) <-> exists: not a
+  {
+    auto const &op_as_forall = to_forall_expr(op);
+    exists_exprt rewritten_op(
+      op_as_forall.symbol(), not_exprt(op_as_forall.where()));
+    simplify_node(rewritten_op.where());
+    expr = rewritten_op;
+    return false;
+  }
 
   return true;
 }
