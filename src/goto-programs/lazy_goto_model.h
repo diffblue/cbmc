@@ -243,6 +243,15 @@ public:
     return goto_functions.at(id);
   }
 
+  /// Check that the goto model is well-formed
+  ///
+  /// The validation mode indicates whether well-formedness check failures are
+  /// reported via DATA_INVARIANT violations or exceptions.
+  void validate(const validation_modet vm) const override
+  {
+    goto_model->validate(vm);
+  }
+
 private:
   std::unique_ptr<goto_modelt> goto_model;
 

@@ -94,7 +94,7 @@ public:
   ///
   /// The validation mode indicates whether well-formedness check failures are
   /// reported via DATA_INVARIANT violations or exceptions.
-  void validate(const validation_modet vm) const
+  void validate(const validation_modet vm) const override
   {
     symbol_table.validate(vm);
 
@@ -136,6 +136,18 @@ public:
   {
     return goto_functions.function_map.find(id) !=
            goto_functions.function_map.end();
+  }
+
+  /// Check that the goto model is well-formed
+  ///
+  /// The validation mode indicates whether well-formedness check failures are
+  /// reported via DATA_INVARIANT violations or exceptions.
+  void validate(const validation_modet vm) const override
+  {
+    symbol_table.validate(vm);
+
+    const namespacet ns(symbol_table);
+    goto_functions.validate(ns, vm);
   }
 
 private:
