@@ -167,11 +167,31 @@ instantiate_quantifier(const quantifier_exprt &expr, const namespacet &ns)
 
   if(expr.id()==ID_forall)
   {
-    return conjunction(expr_insts);
+    // maintain the domain constraint if it isn't guaranteed by the
+    // instantiations (for a disjunction the domain constraint is implied by the
+    // instantiations)
+    if(re.id() == ID_and)
+    {
+      expr_insts.push_back(binary_predicate_exprt(
+        var_expr, ID_gt, from_integer(lb, var_expr.type())));
+      expr_insts.push_back(binary_predicate_exprt(
+        var_expr, ID_le, from_integer(ub, var_expr.type())));
+    }
+    return simplify_expr(conjunction(expr_insts), ns);
   }
   else if(expr.id() == ID_exists)
   {
-    return disjunction(expr_insts);
+    // maintain the domain constraint if it isn't trivially satisfied by the
+    // instantiations (for a conjunction the instantiations are stronger
+    // constraints)
+    if(re.id() == ID_or)
+    {
+      expr_insts.push_back(binary_predicate_exprt(
+        var_expr, ID_gt, from_integer(lb, var_expr.type())));
+      expr_insts.push_back(binary_predicate_exprt(
+        var_expr, ID_le, from_integer(ub, var_expr.type())));
+    }
+    return simplify_expr(disjunction(expr_insts), ns);
   }
 
   UNREACHABLE;
