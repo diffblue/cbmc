@@ -22,13 +22,26 @@ Author: Daniel Kroening, kroening@kroening.com
 // clang-format off
 #define OPT_ANSI_C_LANGUAGE \
   "(max-nondet-tree-depth):" \
-  "(min-null-tree-depth):"
+  "(min-null-tree-depth):" \
+  "(pointers-to-treat-as-arrays):" \
+  "(associated-array-sizes):" \
+  "(max-dynamic-array-size):" \
 
 #define HELP_ANSI_C_LANGUAGE \
   " --max-nondet-tree-depth N    limit size of nondet (e.g. input) object tree;\n" /* NOLINT(*) */\
   "                              at level N pointers are set to null\n" \
   " --min-null-tree-depth N      minimum level at which a pointer can first be\n" /* NOLINT(*) */\
-  "                              NULL in a recursively nondet initialized struct\n" /* NOLINT(*) */
+  "                              NULL in a recursively nondet initialized struct\n" /* NOLINT(*) */\
+  " --pointers-to-treat-as-arrays <identifier,...>  comma separated list of\n" \
+  "                               identifiers that should be initialized as arrays\n" /* NOLINT(*) */ \
+  " --associated-array-sizes <identifier:identifier...>\n" \
+  "                               comma separated list of colon separated pairs\n" /* NOLINT(*) */ \
+  "                               of identifiers; The first element of the pair \n" /* NOLINT(*) */ \
+  "                               should be the name of an array pointer \n" \
+  "                               (see --pointers-to-treat-as-arrays),\n" \
+  "                               the second an integer parameter that\n" \
+  "                               should hold its size\n" \
+  " --max-dynamic-array-size <size>  max size for dynamically allocated arrays\n" /* NOLINT(*) */
 // clang-format on
 
 class ansi_c_languaget:public languaget
