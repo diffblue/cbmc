@@ -14,7 +14,7 @@ Date: April 2016
 #include "unreachable_instructions.h"
 
 #include <util/file_util.h>
-#include <util/json_expr.h>
+#include <util/json_irep.h>
 #include <util/options.h>
 #include <util/xml.h>
 

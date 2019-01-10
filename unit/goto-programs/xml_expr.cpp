@@ -13,7 +13,8 @@ Author: Michael Tautschnig
 #include <util/namespace.h>
 #include <util/std_expr.h>
 #include <util/symbol_table.h>
-#include <util/xml_expr.h>
+
+#include <goto-programs/xml_expr.h>
 
 TEST_CASE("Constant expression to XML")
 {

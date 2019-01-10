@@ -16,7 +16,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "unwindset.h"
 
 #include <util/json.h>
-#include <util/json_expr.h>
 #include <goto-programs/goto_model.h>
 
 class goto_modelt;
