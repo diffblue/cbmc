@@ -108,15 +108,14 @@ exprt goto_symext::address_arithmetic(
     // recursive call
     result=address_arithmetic(be.op(), state, guard, keep_array);
 
-    if(ns.follow(be.op().type()).id()==ID_array &&
-       result.id()==ID_address_of)
+    if(be.op().type().id() == ID_array && result.id() == ID_address_of)
     {
       address_of_exprt &a=to_address_of_expr(result);
 
       // turn &a of type T[i][j] into &(a[0][0])
-      for(const typet *t=&(ns.follow(a.type().subtype()));
-          t->id()==ID_array && !base_type_eq(expr.type(), *t, ns);
-          t=&(ns.follow(*t).subtype()))
+      for(const typet *t = &(a.type().subtype());
+          t->id() == ID_array && !base_type_eq(expr.type(), *t, ns);
+          t = &(t->subtype()))
         a.object()=index_exprt(a.object(), from_integer(0, index_type()));
     }
 
@@ -130,7 +129,7 @@ exprt goto_symext::address_arithmetic(
     result=plus_exprt(result, offset);
 
     // treat &array as &array[0]
-    const typet &expr_type=ns.follow(expr.type());
+    const typet &expr_type = expr.type();
     typet dest_type_subtype;
 
     if(expr_type.id()==ID_array && !keep_array)
@@ -188,7 +187,7 @@ exprt goto_symext::address_arithmetic(
     dereference_rec(result, state, guard, false);
 
     // turn &array into &array[0]
-    if(ns.follow(result.type()).id()==ID_array && !keep_array)
+    if(result.type().id() == ID_array && !keep_array)
       result=index_exprt(result, from_integer(0, index_type()));
 
     // handle field-sensitive SSA symbol
@@ -223,7 +222,7 @@ exprt goto_symext::address_arithmetic(
     result = address_arithmetic(tc_expr.op(), state, guard, keep_array);
 
     // treat &array as &array[0]
-    const typet &expr_type = ns.follow(expr.type());
+    const typet &expr_type = expr.type();
     typet dest_type_subtype;
 
     if(expr_type.id() == ID_array && !keep_array)
@@ -237,7 +236,7 @@ exprt goto_symext::address_arithmetic(
     throw unsupported_operation_exceptiont(
       "goto_symext::address_arithmetic does not handle " + expr.id_string());
 
-  const typet &expr_type=ns.follow(expr.type());
+  const typet &expr_type = expr.type();
   INVARIANT((expr_type.id()==ID_array && !keep_array) ||
             base_type_eq(pointer_type(expr_type), result.type(), ns),
             "either non-persistent array or pointer to result");
@@ -300,10 +299,9 @@ void goto_symext::dereference_rec(
     // this may yield a new auto-object
     trigger_auto_object(expr, state);
   }
-  else if(expr.id()==ID_index &&
-          to_index_expr(expr).array().id()==ID_member &&
-          to_array_type(ns.follow(to_index_expr(expr).array().type())).
-            size().is_zero())
+  else if(
+    expr.id() == ID_index && to_index_expr(expr).array().id() == ID_member &&
+    to_array_type(to_index_expr(expr).array().type()).size().is_zero())
   {
     // This is an expression of the form x.a[i],
     // where a is a zero-sized array. This gets
@@ -336,12 +334,11 @@ void goto_symext::dereference_rec(
 
     exprt &object=address_of_expr.object();
 
-    const typet &expr_type=ns.follow(expr.type());
     expr = address_arithmetic(
       object,
       state,
       guard,
-      to_pointer_type(expr_type).subtype().id() == ID_array);
+      to_pointer_type(expr.type()).subtype().id() == ID_array);
   }
   else if(expr.id()==ID_typecast)
   {
