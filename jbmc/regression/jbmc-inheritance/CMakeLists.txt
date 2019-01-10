@@ -1,3 +1,3 @@
 add_test_pl_tests(
-    "$<TARGET_FILE:jbmc> --validate-goto-model"
+    "$<TARGET_FILE:jbmc> --validate-goto-model --validate-ssa-equation"
 )
