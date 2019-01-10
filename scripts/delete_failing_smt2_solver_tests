@@ -49,6 +49,8 @@ rm Quantifiers-invalid-var-range/test.desc
 rm Quantifiers-type/test.desc
 rm Union_Initialization1/test.desc
 rm address_space_size_limit1/test.desc
+rm address_space_size_limit3/test.desc
+rm argv1/test.desc
 rm array-function-parameters/test.desc
 rm array-tests/test.desc
 rm bounds_check1/test.desc
@@ -68,6 +70,15 @@ rm memory_allocation1/test.desc
 rm pointer-function-parameters-struct-mutual-recursion/test.desc
 rm pointer-function-parameters-struct-simple-recursion/test.desc
 rm pointer-function-parameters-struct-simple-recursion-2/test.desc
+rm pointer-function-parameters-struct-simple-recursion-3/test.desc
+rm pointer-to-array-function-parameters-max-size/test.desc
+rm pointer-to-array-function-parameters-multi-arg-right/test.desc
+rm pointer-to-array-function-parameters-multi-arg-wrong/test.desc
+rm pointer-to-array-function-parameters-with-size/test.desc
+rm pointer-to-array-function-parameters/test.desc
+rm read1/test.desc
+rm realloc1/test.desc
+rm realloc2/test.desc
 rm scanf1/test.desc
 rm stack-trace/test.desc
 rm struct6/test.desc

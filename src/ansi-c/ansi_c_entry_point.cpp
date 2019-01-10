@@ -27,7 +27,7 @@ exprt::operandst build_function_environment(
 {
   exprt::operandst main_arguments;
   main_arguments.resize(parameters.size());
-
+  std::map<irep_idt, irep_idt> deferred_array_sizes;
   for(std::size_t param_number=0;
       param_number<parameters.size();
       param_number++)
@@ -42,7 +42,8 @@ exprt::operandst build_function_environment(
       base_name,
       p.type(),
       p.source_location(),
-      object_factory_parameters);
+      object_factory_parameters,
+      deferred_array_sizes);
   }
 
   return main_arguments;
