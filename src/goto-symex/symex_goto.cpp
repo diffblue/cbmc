@@ -476,15 +476,17 @@ static void merge_names(
   //  1. Either guard is false, so we can't follow that branch.
   //  2. Either identifier is of generation zero, and so hasn't been
   //     initialized and therefore an invalid target.
+
+  // These rules only apply to dynamic objects and locals.
   if(dest_state.guard.is_false())
     rhs = goto_state_rhs;
   else if(goto_state.guard.is_false())
     rhs = dest_state_rhs;
-  else if(goto_count == 0 && symbol.value.is_not_nil())
+  else if(goto_count == 0 && !symbol.is_static_lifetime)
   {
     rhs = dest_state_rhs;
   }
-  else if(dest_count == 0 && symbol.value.is_not_nil())
+  else if(dest_count == 0 && !symbol.is_static_lifetime)
   {
     rhs = goto_state_rhs;
   }
