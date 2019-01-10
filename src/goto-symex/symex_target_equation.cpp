@@ -961,8 +961,12 @@ void symex_target_equationt::SSA_stept::validate(
   case goto_trace_stept::typet::CONSTRAINT:
     validate_full_expr(cond_expr, ns, vm);
     break;
-  case goto_trace_stept::typet::ASSIGNMENT:
   case goto_trace_stept::typet::DECL:
+    validate_full_expr(ssa_lhs, ns, vm);
+    validate_full_expr(ssa_full_lhs, ns, vm);
+    validate_full_expr(original_full_lhs, ns, vm);
+    break;
+  case goto_trace_stept::typet::ASSIGNMENT:
     validate_full_expr(ssa_lhs, ns, vm);
     validate_full_expr(ssa_full_lhs, ns, vm);
     validate_full_expr(original_full_lhs, ns, vm);
