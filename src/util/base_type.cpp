@@ -253,6 +253,34 @@ bool base_type_eqt::base_type_eq_rec(
   }
   else if(type1.id()==ID_pointer)
   {
+    // Types dervied from pointer, such as java_generic_parametert, may have
+    // qualifiers given as named subexpressions:
+    const auto &named_subs1 = type1.get_named_sub();
+    const auto &named_subs2 = type2.get_named_sub();
+
+    for(const auto &name_and_sub : named_subs1)
+    {
+      if(irept::is_comment(name_and_sub.first))
+        continue;
+      auto other_sub = named_subs2.find(name_and_sub.first);
+      if(
+        other_sub == named_subs2.end() ||
+        name_and_sub.second != other_sub->second)
+      {
+        return false;
+      }
+    }
+
+    for(const auto &name_and_sub : named_subs2)
+    {
+      if(irept::is_comment(name_and_sub.first))
+        continue;
+      auto other_sub = named_subs1.find(name_and_sub.first);
+      // Equality already checked above
+      if(other_sub == named_subs1.end())
+        return false;
+    }
+
     return base_type_eq_rec(
       to_pointer_type(type1).subtype(), to_pointer_type(type2).subtype());
   }
