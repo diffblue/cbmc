@@ -222,7 +222,7 @@ protected:
 
   void elaborate_class_template(
     const source_locationt &source_location,
-    const symbol_typet &type);
+    const struct_tag_typet &type);
 
   unsigned template_counter;
   unsigned anon_counter;

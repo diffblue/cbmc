@@ -583,7 +583,7 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
       // TODO: need to resolve an incomplete struct (template) here
       // go into scope of first operand
       if(
-        expr.op0().type().id() == ID_symbol_type &&
+        expr.op0().type().id() == ID_struct_tag &&
         follow(expr.op0().type()).id() == ID_struct)
       {
         const irep_idt &struct_identifier=

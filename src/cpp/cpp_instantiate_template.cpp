@@ -187,10 +187,10 @@ const symbolt &cpp_typecheckt::class_template_symbol(
 void cpp_typecheckt::elaborate_class_template(
   const typet &type)
 {
-  if(type.id() != ID_symbol_type)
+  if(type.id() != ID_struct_tag)
     return;
 
-  const symbolt &symbol = lookup(to_symbol_type(type));
+  const symbolt &symbol = lookup(to_struct_tag_type(type));
 
   // Make a copy, as instantiate will destroy the symbol type!
   const typet t_type=symbol.type;

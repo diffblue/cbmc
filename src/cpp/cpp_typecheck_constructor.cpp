@@ -292,7 +292,7 @@ void cpp_typecheckt::default_assignop(
   std::string arg_name("ref");
 
   cpctor.add(ID_storage_spec).id(ID_cpp_storage_spec);
-  cpctor.type().id(ID_symbol_type);
+  cpctor.type().id(ID_struct_tag);
   cpctor.type().add(ID_identifier).id(symbol.name);
   cpctor.operands().push_back(exprt(ID_cpp_declarator));
   cpctor.add_source_location()=source_location;
@@ -488,7 +488,7 @@ void cpp_typecheckt::check_member_initializers(
       // Maybe it is a parent constructor?
       if(c.get_bool(ID_is_type))
       {
-        if(c.type().id() != ID_symbol_type)
+        if(c.type().id() != ID_struct_tag)
           continue;
 
         const symbolt &symb = lookup(to_symbol_type(c.type()).get_identifier());
@@ -646,7 +646,7 @@ void cpp_typecheckt::full_member_initialization(
 
         typecheck_type(member_type);
 
-        if(member_type.id() != ID_symbol_type)
+        if(member_type.id() != ID_struct_tag)
           break;
 
         if(
