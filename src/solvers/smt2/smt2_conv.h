@@ -20,9 +20,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #  include <util/irep_hash_container.h>
 #endif
 
-#include <solvers/prop/prop_conv.h>
 #include <solvers/flattening/boolbv_width.h>
 #include <solvers/flattening/pointer_logic.h>
+#include <solvers/prop/prop_conv.h>
+#include <solvers/smt2/smt2_ast.h>
 
 #include "letify.h"
 
@@ -96,37 +97,37 @@ protected:
 
   // tweaks for arrays
   bool use_array_theory(const exprt &);
-  void flatten_array(const exprt &);
+  smt2_astt flatten_array(const exprt &);
 
   // specific expressions go here
-  void convert_typecast(const typecast_exprt &expr);
-  void convert_floatbv_typecast(const floatbv_typecast_exprt &expr);
-  void convert_struct(const struct_exprt &expr);
-  void convert_union(const union_exprt &expr);
-  void convert_constant(const constant_exprt &expr);
-  void convert_relation(const exprt &expr);
-  void convert_is_dynamic_object(const exprt &expr);
-  void convert_plus(const plus_exprt &expr);
-  void convert_minus(const minus_exprt &expr);
-  void convert_div(const div_exprt &expr);
-  void convert_mult(const mult_exprt &expr);
+  smt2_astt convert_typecast(const typecast_exprt &expr);
+  smt2_astt convert_floatbv_typecast(const floatbv_typecast_exprt &expr);
+  smt2_astt convert_struct(const struct_exprt &expr);
+  smt2_astt convert_union(const union_exprt &expr);
+  smt2_astt convert_constant(const constant_exprt &expr);
+  smt2_astt convert_relation(const exprt &expr);
+  smt2_astt convert_is_dynamic_object(const exprt &expr);
+  smt2_astt convert_plus(const plus_exprt &expr);
+  smt2_astt convert_minus(const minus_exprt &expr);
+  smt2_astt convert_div(const div_exprt &expr);
+  smt2_astt convert_mult(const mult_exprt &expr);
   void convert_rounding_mode_FPA(const exprt &expr);
-  void convert_floatbv_plus(const ieee_float_op_exprt &expr);
-  void convert_floatbv_minus(const ieee_float_op_exprt &expr);
-  void convert_floatbv_div(const ieee_float_op_exprt &expr);
-  void convert_floatbv_mult(const ieee_float_op_exprt &expr);
-  void convert_mod(const mod_exprt &expr);
-  void convert_index(const index_exprt &expr);
-  void convert_member(const member_exprt &expr);
+  smt2_astt convert_floatbv_plus(const ieee_float_op_exprt &expr);
+  smt2_astt convert_floatbv_minus(const ieee_float_op_exprt &expr);
+  smt2_astt convert_floatbv_div(const ieee_float_op_exprt &expr);
+  smt2_astt convert_floatbv_mult(const ieee_float_op_exprt &expr);
+  smt2_astt convert_mod(const mod_exprt &expr);
+  smt2_astt convert_index(const index_exprt &expr);
+  smt2_astt convert_member(const member_exprt &expr);
 
-  void convert_with(const with_exprt &expr);
-  void convert_update(const exprt &expr);
+  smt2_astt convert_with(const with_exprt &expr);
+  smt2_astt convert_update(const exprt &expr);
 
   std::string convert_identifier(const irep_idt &identifier);
 
-  void convert_expr(const exprt &);
-  void convert_type(const typet &);
-  void convert_literal(const literalt);
+  smt2_astt convert_expr(const exprt &);
+  smt2_sortt convert_type(const typet &);
+  smt2_astt convert_literal(const literalt);
 
   literalt convert(const exprt &expr);
   tvt l_get(literalt l) const;
@@ -149,7 +150,7 @@ protected:
   exprt parse_rec(const irept &s, const typet &type);
 
   // we use this to build a bit-vector encoding of the FPA theory
-  void convert_floatbv(const exprt &expr);
+  smt2_astt convert_floatbv(const exprt &expr);
   std::string type2id(const typet &) const;
   std::string floatbv_suffix(const exprt &) const;
   std::set<irep_idt> bvfp_set; // already converted
@@ -178,13 +179,13 @@ protected:
   // floats when using the FPA theory.
   // unflatten() does the opposite.
   enum class wheret { BEGIN, END };
-  void flatten2bv(const exprt &);
-  void unflatten(wheret, const typet &, unsigned nesting=0);
+  smt2_astt flatten2bv(const exprt &);
+  smt2_astt unflatten(const typet &, smt2_astt ast, unsigned nesting = 0);
 
   // pointers
   pointer_logict pointer_logic;
-  void convert_address_of_rec(
-    const exprt &expr, const pointer_typet &result_type);
+  smt2_astt
+  convert_address_of_rec(const exprt &expr, const pointer_typet &result_type);
 
   void define_object_size(const irep_idt &id, const exprt &expr);
 
