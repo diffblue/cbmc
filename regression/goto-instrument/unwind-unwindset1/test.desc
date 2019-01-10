@@ -1,6 +1,6 @@
 CORE
 main.c
---unwind 9 --unwindset main.0:10 --unwinding-assertions
+--unwind 9 --unwindset main.0:10 --unwinding-assertions --verbosity 8
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
