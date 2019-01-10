@@ -337,9 +337,13 @@ exprt cpp_typecheck_resolvet::convert_identifier(
       {
         e.type()=c_enum_tag_typet(symbol.name);
       }
-      else // will need to do struct, union
+      else if(symbol.type.id() == ID_struct)
       {
-        e.type()=symbol_typet(symbol.name);
+        e.type() = struct_tag_typet(symbol.name);
+      }
+      else if(symbol.type.id() == ID_union)
+      {
+        e.type() = union_tag_typet(symbol.name);
       }
     }
     else if(symbol.is_macro)
@@ -908,7 +912,7 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
         cpp_typecheck.cpp_scopes.current_scope().print(std::cout);
         std::cout << "X: " << id_set.size() << '\n';
 #endif
-        symbol_typet instance=
+        struct_tag_typet instance =
           disambiguate_template_classes(final_base_name, id_set, template_args);
 
         instance.add_source_location()=source_location;
@@ -954,7 +958,7 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
         // the "::" triggers template elaboration
         if(!cpp_typecheck.cpp_scopes.current_scope().class_identifier.empty())
         {
-          symbol_typet instance(
+          struct_tag_typet instance(
             cpp_typecheck.cpp_scopes.current_scope().class_identifier);
           cpp_typecheck.elaborate_class_template(instance);
         }
@@ -996,7 +1000,7 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
 }
 
 /// disambiguate partial specialization
-symbol_typet cpp_typecheck_resolvet::disambiguate_template_classes(
+struct_tag_typet cpp_typecheck_resolvet::disambiguate_template_classes(
   const irep_idt &base_name,
   const cpp_scopest::id_sett &id_set,
   const cpp_template_args_non_tct &full_template_args)
@@ -1192,7 +1196,7 @@ symbol_typet cpp_typecheck_resolvet::disambiguate_template_classes(
     throw 0;
   }
 
-  symbol_typet result(instance.name);
+  struct_tag_typet result(instance.name);
   result.add_source_location()=source_location;
 
   return result;
@@ -1206,7 +1210,7 @@ symbol_typet cpp_typecheck_resolvet::disambiguate_template_classes(
       match.specialization_args,
       match.full_args);
 
-  symbol_typet result(instance.name);
+  struct_tag_typet result(instance.name);
   result.add_source_location()=source_location;
 
   return result;
@@ -2072,7 +2076,7 @@ void cpp_typecheck_resolvet::apply_template_args(
         template_args_tc,
         template_args_tc);
 
-    expr=exprt(ID_type, symbol_typet(new_symbol.name));
+    expr = type_exprt(struct_tag_typet(new_symbol.name));
     expr.add_source_location()=source_location;
   }
   else
@@ -2208,21 +2212,7 @@ void cpp_typecheck_resolvet::filter_for_named_scopes(
       irep_idt identifier=id.identifier;
 
       if(id.is_member)
-      {
-        struct_typet struct_type=
-          static_cast<const struct_typet &>(
-            cpp_typecheck.lookup(id.class_identifier).type);
-        const exprt pcomp=struct_type.get_component(identifier);
-        assert(pcomp.is_not_nil());
-        assert(pcomp.get_bool(ID_is_type));
-        const typet &type=pcomp.type();
-        assert(type.id()!=ID_struct);
-
-        if(type.id() == ID_symbol_type)
-          identifier = to_symbol_type(type).get_identifier();
-        else
-          continue;
-      }
+        continue;
 
       while(true)
       {
@@ -2240,8 +2230,6 @@ void cpp_typecheck_resolvet::filter_for_named_scopes(
           new_set.insert(&class_id);
           break;
         }
-        else if(symbol.type.id() == ID_symbol_type)
-          identifier = to_symbol_type(symbol.type).get_identifier();
         else
           break;
       }
