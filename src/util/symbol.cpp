@@ -137,10 +137,11 @@ bool symbolt::is_well_formed() const
   // Well-formedness criterion number 2 is for a symbol
   // to have it's base name as a suffix to it's more
   // general name.
-  if(!has_suffix(id2string(name), id2string(base_name)))
-  {
+  // Exception: Java symbols' base names do not have type signatures
+  // (for example, they can have name "someclass.method:(II)V" and base name
+  // "method")
+  if(!has_suffix(id2string(name), id2string(base_name)) && mode != ID_java)
     return false;
-  }
 
   return true;
 }
