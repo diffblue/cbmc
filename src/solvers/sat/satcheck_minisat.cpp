@@ -154,11 +154,8 @@ propt::resultt satcheck_minisat1_baset::prop_solve()
 {
   PRECONDITION(status != ERROR);
 
-  {
-    messaget::status() <<
-      (_no_variables-1) << " variables, " <<
-      solver->nClauses() << " clauses" << messaget::eom;
-  }
+  messaget::statistics() << (_no_variables - 1) << " variables, "
+                         << solver->nClauses() << " clauses" << messaget::eom;
 
   add_variables();
 

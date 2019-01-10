@@ -69,8 +69,8 @@ propt::resultt satcheck_cadicalt::prop_solve()
 {
   INVARIANT(status != statust::ERROR, "there cannot be an error");
 
-  messaget::status() << (no_variables() - 1) << " variables, " << clause_counter
-                     << " clauses" << eom;
+  messaget::statistics() << (no_variables() - 1) << " variables, "
+                         << clause_counter << " clauses" << eom;
 
   if(status == statust::UNSAT)
   {
