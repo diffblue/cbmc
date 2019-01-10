@@ -96,18 +96,17 @@ void symbol_factoryt::gen_nondet_init(
   const std::size_t depth,
   recursion_sett recursion_set)
 {
-  const typet &type=ns.follow(expr.type());
+  const typet &type = expr.type();
 
   if(type.id()==ID_pointer)
   {
     // dereferenced type
     const pointer_typet &pointer_type=to_pointer_type(type);
-    const typet &subtype=ns.follow(pointer_type.subtype());
+    const typet &subtype = pointer_type.subtype();
 
-    if(subtype.id() == ID_struct)
+    if(subtype.id() == ID_struct_tag)
     {
-      const struct_typet &struct_type = to_struct_type(subtype);
-      const irep_idt struct_tag = struct_type.get_tag();
+      const irep_idt struct_tag = to_struct_tag_type(subtype).get_identifier();
 
       if(
         recursion_set.find(struct_tag) != recursion_set.end() &&
@@ -153,13 +152,15 @@ void symbol_factoryt::gen_nondet_init(
       assignments.add(std::move(null_check));
     }
   }
-  else if(type.id() == ID_struct)
+  else if(type.id() == ID_struct_tag)
   {
-    const struct_typet &struct_type = to_struct_type(type);
+    const auto &struct_tag_type = to_struct_tag_type(type);
 
-    const irep_idt struct_tag = struct_type.get_tag();
+    const irep_idt struct_tag = struct_tag_type.get_identifier();
 
     recursion_set.insert(struct_tag);
+
+    const auto &struct_type = to_struct_type(ns.follow_tag(struct_tag_type));
 
     for(const auto &component : struct_type.components())
     {
