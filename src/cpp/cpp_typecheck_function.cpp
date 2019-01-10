@@ -18,7 +18,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_util.h"
 
 void cpp_typecheckt::convert_parameter(
-  const irep_idt &mode,
+  const irep_idt &current_mode,
   code_typet::parametert &parameter)
 {
   irep_idt base_name=id2string(parameter.get_base_name());
@@ -44,7 +44,7 @@ void cpp_typecheckt::convert_parameter(
   symbol.name=identifier;
   symbol.base_name=parameter.get_base_name();
   symbol.location=parameter.source_location();
-  symbol.mode=mode;
+  symbol.mode = current_mode;
   symbol.module=module;
   symbol.type=parameter.type();
   symbol.is_state_var=true;
@@ -68,7 +68,7 @@ void cpp_typecheckt::convert_parameter(
 }
 
 void cpp_typecheckt::convert_parameters(
-  const irep_idt &mode,
+  const irep_idt &current_mode,
   code_typet &function_type)
 {
   code_typet::parameterst &parameters=
@@ -78,7 +78,7 @@ void cpp_typecheckt::convert_parameters(
       it=parameters.begin();
       it!=parameters.end();
       it++)
-    convert_parameter(mode, *it);
+    convert_parameter(current_mode, *it);
 }
 
 void cpp_typecheckt::convert_function(symbolt &symbol)

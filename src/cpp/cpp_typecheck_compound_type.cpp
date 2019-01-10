@@ -610,7 +610,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
           id2string(component.get_name())+"::"+id2string(virtual_base);
         func_symb.base_name = component.get_base_name();
         func_symb.pretty_name = component.get_base_name();
-        func_symb.mode=ID_cpp;
+        func_symb.mode = symbol.mode;
         func_symb.module=module;
         func_symb.location=component.source_location();
         func_symb.type=component.type();
@@ -635,7 +635,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
             id2string(func_symb.name) + "::" + id2string(param_base_name);
           arg_symb.base_name = param_base_name;
           arg_symb.pretty_name = param_base_name;
-          arg_symb.mode=ID_cpp;
+          arg_symb.mode = symbol.mode;
           arg_symb.location=func_symb.location;
           arg_symb.type=arg.type();
 
@@ -1313,7 +1313,7 @@ void cpp_typecheckt::typecheck_member_function(
   symbol.name=identifier;
   symbol.base_name=component.get_base_name();
   symbol.value.swap(value);
-  symbol.mode=ID_cpp;
+  symbol.mode = compound_symbol.mode;
   symbol.module=module;
   symbol.type=type;
   symbol.is_type=false;
