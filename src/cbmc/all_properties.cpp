@@ -134,9 +134,10 @@ safety_checkert::resultt bmc_all_propertiest::operator()()
   {
     auto solver_stop = std::chrono::steady_clock::now();
 
-    status() << "Runtime decision procedure: "
-             << std::chrono::duration<double>(solver_stop-solver_start).count()
-             << "s" << eom;
+    statistics()
+      << "Runtime decision procedure: "
+      << std::chrono::duration<double>(solver_stop - solver_start).count()
+      << "s" << eom;
   }
 
   // report

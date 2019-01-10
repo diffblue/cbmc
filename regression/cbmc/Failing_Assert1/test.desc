@@ -1,6 +1,6 @@
 CORE
 main.c
-
+--verbosity 8
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
