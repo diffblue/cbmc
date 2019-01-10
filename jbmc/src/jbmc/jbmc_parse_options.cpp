@@ -369,6 +369,16 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
       "symex-coverage-report",
       cmdline.get_value("symex-coverage-report"));
 
+  if(cmdline.isset("validate-ssa-equation"))
+  {
+    options.set_option("validate-ssa-equation", true);
+  }
+
+  if(cmdline.isset("validate-goto-model"))
+  {
+    options.set_option("validate-goto-model", true);
+  }
+
   PARSE_OPTIONS_GOTO_TRACE(cmdline, options);
 
   if(cmdline.isset("no-lazy-methods"))
@@ -553,6 +563,11 @@ int jbmc_parse_optionst::doit()
     if(set_properties(goto_model))
       return 7; // should contemplate EX_USAGE from sysexits.h
 
+    if(cmdline.isset("validate-goto-model"))
+    {
+      goto_model.validate(validation_modet::INVARIANT);
+    }
+
     // The `configure_bmc` callback passed will enable enum-unwind-static if
     // applicable.
     return bmct::do_language_agnostic_bmc(
@@ -584,6 +599,11 @@ int jbmc_parse_optionst::doit()
     // Add failed symbols for any symbol created prior to loading any
     // particular function:
     add_failed_symbols(lazy_goto_model.symbol_table);
+
+    if(cmdline.isset("validate-goto-model"))
+    {
+      lazy_goto_model.validate(validation_modet::INVARIANT);
+    }
 
     // Provide show-goto-functions and similar dump functions after symex
     // executes. If --paths is active, these dump routines run after every
@@ -1141,6 +1161,7 @@ void jbmc_parse_optionst::help()
     " --version                    show version and exit\n"
     " --xml-ui                     use XML-formatted output\n"
     " --json-ui                    use JSON-formatted output\n"
+    HELP_VALIDATE
     HELP_GOTO_TRACE
     HELP_FLUSH
     " --verbosity #                verbosity level\n"
