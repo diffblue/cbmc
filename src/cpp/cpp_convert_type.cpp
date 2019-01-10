@@ -589,8 +589,7 @@ void cpp_convert_plain_type(typet &type)
     type.id() == ID_union || type.id() == ID_array || type.id() == ID_code ||
     type.id() == ID_unsignedbv || type.id() == ID_signedbv ||
     type.id() == ID_bool || type.id() == ID_floatbv || type.id() == ID_empty ||
-    type.id() == ID_symbol_type || type.id() == ID_constructor ||
-    type.id() == ID_destructor)
+    type.id() == ID_constructor || type.id() == ID_destructor)
   {
   }
   else if(type.id()==ID_c_enum)

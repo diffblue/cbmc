@@ -160,8 +160,6 @@ void cpp_typecheck_resolvet::remove_duplicates(
 
     if(old_id.id() == ID_symbol)
       id = to_symbol_expr(old_id).get_identifier();
-    else if(old_id.id() == ID_type && old_id.type().id() == ID_symbol_type)
-      id = to_symbol_type(old_id.type()).get_identifier();
     else if(old_id.id() == ID_type && old_id.type().id() == ID_struct_tag)
       id = to_struct_tag_type(old_id.type()).get_identifier();
     else if(old_id.id() == ID_type && old_id.type().id() == ID_union_tag)
@@ -353,20 +351,11 @@ exprt cpp_typecheck_resolvet::convert_identifier(
     }
     else
     {
-      typet followed_type=symbol.type;
-      bool constant=followed_type.get_bool(ID_C_constant);
+      bool constant = symbol.type.get_bool(ID_C_constant);
 
-      while(followed_type.id() == ID_symbol_type)
-      {
-        followed_type =
-          cpp_typecheck.follow(to_symbol_type(followed_type));
-        constant |= followed_type.get_bool(ID_C_constant);
-      }
-
-      if(constant &&
-         symbol.value.is_not_nil() &&
-         is_number(followed_type) &&
-         symbol.value.id() == ID_constant)
+      if(
+        constant && symbol.value.is_not_nil() && is_number(symbol.type) &&
+        symbol.value.id() == ID_constant)
       {
         e=symbol.value;
       }
