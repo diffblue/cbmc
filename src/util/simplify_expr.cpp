@@ -19,12 +19,15 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "expr_util.h"
 #include "fixedbv.h"
 #include "invariant.h"
+#include "mathematical_expr.h"
 #include "namespace.h"
 #include "pointer_offset_size.h"
 #include "rational.h"
 #include "rational_tools.h"
 #include "simplify_utils.h"
 #include "std_expr.h"
+#include "string_expr.h"
+#include "symbol.h"
 #include "type_eq.h"
 
 // #define DEBUGX
@@ -151,6 +154,77 @@ bool simplify_exprt::simplify_popcount(popcount_exprt &expr)
       auto result_expr = from_integer(result, expr.type());
       expr.swap(result_expr);
 
+      return false;
+    }
+  }
+
+  return true;
+}
+
+bool simplify_exprt::simplify_function_application(exprt &expr)
+{
+  const function_application_exprt &function_app =
+    to_function_application_expr(expr);
+  irep_idt func_id =
+    function_app.function().find(ID_expression).get(ID_identifier);
+
+  // Starts-with is used for .equals.
+  if(func_id == ID_cprover_string_startswith_func)
+  {
+    // We want to get both arguments of any starts-with comparison, and
+    // trace them back to the actual string instance. All variables on the
+    // way must be constant for us to be sure this will work.
+    auto &first_argument = to_string_expr(function_app.arguments().at(0));
+    auto &second_argument = to_string_expr(function_app.arguments().at(1));
+
+    if(
+      first_argument.content().id() != ID_address_of ||
+      second_argument.content().id() != ID_address_of)
+    {
+      return true;
+    }
+
+    const address_of_exprt &first_address_of =
+      to_address_of_expr(first_argument.content());
+    const address_of_exprt &second_address_of =
+      to_address_of_expr(second_argument.content());
+
+    // Constants are got via address_of expressions, so this helps filter out
+    // things that are non-constant.
+    if(
+      first_address_of.object().id() != ID_index ||
+      first_address_of.object().id() != ID_index)
+    {
+      return true;
+    }
+
+    const index_exprt &first_index_expression =
+      to_index_expr(first_address_of.object());
+    const index_exprt &second_index_expression =
+      to_index_expr(second_address_of.object());
+
+    const exprt &first_string_array = first_index_expression.array();
+    const exprt &second_string_array = second_index_expression.array();
+
+    // Check if our symbols type is an array.
+    if(
+      first_string_array.type().id() != ID_array ||
+      second_string_array.type().id() != ID_array)
+    {
+      return true;
+    }
+
+    // If so, it'll be a string array that we can use.
+    const array_string_exprt &first_string = to_array_string_expr(
+      ns.lookup(first_string_array.get(ID_identifier)).value);
+
+    const array_string_exprt &second_string = to_array_string_expr(
+      ns.lookup(second_string_array.get(ID_identifier)).value);
+
+    // If the lengths are the same we can do the .equals substitute.
+    if(first_string.length() == second_string.length())
+    {
+      expr = from_integer(first_string == second_string ? 1 : 0, expr.type());
       return false;
     }
   }
@@ -2265,6 +2339,8 @@ bool simplify_exprt::simplify_node(exprt &expr)
     result=simplify_sign(expr) && result;
   else if(expr.id() == ID_popcount)
     result = simplify_popcount(to_popcount_expr(expr)) && result;
+  else if(expr.id() == ID_function_application)
+    result = simplify_function_application(expr) && result;
 
   #ifdef DEBUGX
   if(!result

@@ -114,6 +114,10 @@ public:
   bool simplify_sign(exprt &expr);
   bool simplify_popcount(popcount_exprt &expr);
 
+  /// Attempt to simplify mathematical function applications if we have
+  /// enough information to do so. Currently focused on constant comparisons.
+  bool simplify_function_application(exprt &expr);
+
   // auxiliary
   bool simplify_if_implies(
     exprt &expr, const exprt &cond, bool truth, bool &new_truth);
