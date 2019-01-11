@@ -50,7 +50,7 @@ void goto_inlinet::parameter_assignments(
   for(const auto &parameter : parameter_types)
   {
     // this is the type the n-th argument should be
-    const typet &par_type=ns.follow(parameter.type());
+    const typet &par_type = parameter.type();
 
     const irep_idt &identifier=parameter.get_identifier();
 
@@ -95,8 +95,8 @@ void goto_inlinet::parameter_assignments(
       // subject to some exceptions
       if(!base_type_eq(par_type, actual.type(), ns))
       {
-        const typet &f_partype=ns.follow(par_type);
-        const typet &f_acttype=ns.follow(actual.type());
+        const typet &f_partype = par_type;
+        const typet &f_acttype = actual.type();
 
         // we are willing to do some conversion
         if((f_partype.id()==ID_pointer &&

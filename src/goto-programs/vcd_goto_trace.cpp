@@ -23,7 +23,7 @@ std::string as_vcd_binary(
   const exprt &expr,
   const namespacet &ns)
 {
-  const typet &type=ns.follow(expr.type());
+  const typet &type = expr.type();
 
   if(expr.id()==ID_constant)
   {

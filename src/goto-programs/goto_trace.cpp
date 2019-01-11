@@ -183,7 +183,7 @@ std::string trace_numeric_value(
   const namespacet &ns,
   const trace_optionst &options)
 {
-  const typet &type=ns.follow(expr.type());
+  const typet &type = expr.type();
 
   if(expr.id()==ID_constant)
   {

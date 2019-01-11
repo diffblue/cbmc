@@ -523,7 +523,7 @@ goto_programt::targett string_abstractiont::abstract_assign(
   if(has_string_macros(rhs))
     replace_string_macros(rhs, false, target->source_location);
 
-  const typet &type=ns.follow(lhs.type());
+  const typet &type = lhs.type();
   if(type.id()==ID_pointer || type.id()==ID_array)
     return abstract_pointer_assign(dest, target);
   else if(is_char_type(type))

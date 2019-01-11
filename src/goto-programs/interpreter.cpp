@@ -618,7 +618,9 @@ exprt interpretert::get_value(
       if(offset_from_address == 0)
         return address_of_exprt(symbol_expr);
 
-      if(ns.follow(type_from_identifier).id() == ID_struct)
+      if(
+        type_from_identifier.id() == ID_struct ||
+        type_from_identifier.id() == ID_struct_tag)
       {
         const auto c = get_component(identifier, offset_from_address);
         member_exprt member_expr(symbol_expr, c);

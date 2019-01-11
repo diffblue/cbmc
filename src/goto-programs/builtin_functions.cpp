@@ -576,7 +576,7 @@ exprt goto_convertt::get_array_argument(const exprt &src)
 
   assert(src.op0().operands().size()==2);
 
-  if(ns.follow(src.op0().op0().type()).id()!=ID_array)
+  if(src.op0().op0().type().id() != ID_array)
   {
     error().source_location=src.find_source_location();
     error() << "expected array as argument" << eom;
@@ -1188,7 +1188,7 @@ void goto_convertt::do_function_call_symbol(
     }
 
     // our __builtin_va_list is a pointer
-    if(ns.follow(dest_expr.type()).id()==ID_pointer)
+    if(dest_expr.type().id() == ID_pointer)
     {
       goto_programt::targett t=dest.add_instruction(ASSIGN);
       t->source_location=function.source_location();
