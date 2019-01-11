@@ -486,12 +486,11 @@ void invariant_sett::strengthen_rec(const exprt &expr)
   {
     const auto &equal_expr = to_equal_expr(expr);
 
-    const typet &op_type = ns->follow(equal_expr.op0().type());
+    const typet &op_type = equal_expr.op0().type();
 
-    if(op_type.id()==ID_struct)
+    if(op_type.id() == ID_struct || op_type.id() == ID_struct_tag)
     {
-      const struct_typet &struct_type=to_struct_type(op_type);
-
+      const struct_typet &struct_type = to_struct_type(ns->follow(op_type));
 
       for(const auto &comp : struct_type.components())
       {

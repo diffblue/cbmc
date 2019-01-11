@@ -264,8 +264,7 @@ void goto_checkt::undefined_shift_check(
   // Undefined for all types and shifts if distance exceeds width,
   // and also undefined for negative distances.
 
-  const typet &distance_type=
-    ns.follow(expr.distance().type());
+  const typet &distance_type = expr.distance().type();
 
   if(distance_type.id()==ID_signedbv)
   {
@@ -281,8 +280,7 @@ void goto_checkt::undefined_shift_check(
       guard);
   }
 
-  const typet &op_type=
-    ns.follow(expr.op().type());
+  const typet &op_type = expr.op().type();
 
   if(op_type.id()==ID_unsignedbv || op_type.id()==ID_signedbv)
   {
@@ -390,7 +388,7 @@ void goto_checkt::conversion_check(
     return;
 
   // First, check type.
-  const typet &type=ns.follow(expr.type());
+  const typet &type = expr.type();
 
   if(type.id()!=ID_signedbv &&
      type.id()!=ID_unsignedbv)
@@ -403,7 +401,7 @@ void goto_checkt::conversion_check(
     if(expr.operands().size()!=1)
       throw "typecast takes one operand";
 
-    const typet &old_type=ns.follow(expr.op0().type());
+    const typet &old_type = expr.op0().type();
 
     if(type.id()==ID_signedbv)
     {
@@ -563,7 +561,7 @@ void goto_checkt::integer_overflow_check(
     return;
 
   // First, check type.
-  const typet &type=ns.follow(expr.type());
+  const typet &type = expr.type();
 
   if(type.id()==ID_signedbv && !enable_signed_overflow_check)
     return;
@@ -781,7 +779,7 @@ void goto_checkt::float_overflow_check(
     return;
 
   // First, check type.
-  const typet &type=ns.follow(expr.type());
+  const typet &type = expr.type();
 
   if(type.id()!=ID_floatbv)
     return;
@@ -794,7 +792,7 @@ void goto_checkt::float_overflow_check(
     // to smaller type.
     assert(expr.operands().size()==1);
 
-    if(ns.follow(expr.op0().type()).id()==ID_floatbv)
+    if(expr.op0().type().id() == ID_floatbv)
     {
       // float-to-float
       const isinf_exprt op0_inf(expr.op0());
@@ -1229,7 +1227,7 @@ void goto_checkt::bounds_check(
      !expr.get_bool("bounds_check"))
     return;
 
-  typet array_type=ns.follow(expr.array().type());
+  typet array_type = expr.array().type();
 
   if(array_type.id()==ID_pointer)
     throw "index got pointer as array type";
