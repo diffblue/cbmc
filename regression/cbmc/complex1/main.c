@@ -2,7 +2,7 @@
 
 int main()
 {
-  #ifdef __GNUC__
+#ifdef __GNUC__
   _Complex c; // this is usually '_Complex double'
   c=1.0i+2;
 
@@ -21,10 +21,10 @@ int main()
 
   // The real part is stored first in memory on i386.
   // Need to find out about other architectures.
-  #if defined(__i386__) || defined(__amd64__)
+#if defined(__i386__) || defined(__amd64__)
   assert(((signed char *)&char_complex)[0]==-2);
   assert(((signed char *)&char_complex)[1]==3);
-  #endif
+#endif
 
   assert(__real__ char_complex == -2);
   assert(__imag__ char_complex == 3);
@@ -44,18 +44,35 @@ int main()
   char_complex++;
   assert(__real__ char_complex == 101);
   assert(__imag__ char_complex == 3);
+  ++char_complex;
+  assert(__real__ char_complex == 102);
+  assert(__imag__ char_complex == 3);
+  char_complex += 1;
+  assert(__real__ char_complex == 103);
+  assert(__imag__ char_complex == 3);
 
   // also separately
   (__real__ char_complex)++;
-  assert(__real__ char_complex == 102);
+  assert(__real__ char_complex == 104);
   assert(__imag__ char_complex == 3);
 
   // casts to reals produce the real part
-  assert((int) char_complex == 102);
+  assert((int)char_complex == 104);
 
-  #else
+  // can be decremented
+  char_complex--;
+  assert(__real__ char_complex == 103);
+  assert(__imag__ char_complex == 3);
+  --char_complex;
+  assert(__real__ char_complex == 102);
+  assert(__imag__ char_complex == 3);
+  char_complex -= 1;
+  assert(__real__ char_complex == 101);
+  assert(__imag__ char_complex == 3);
+
+#else
 
   // Visual studio doesn't have it
 
-  #endif
+#endif
 }

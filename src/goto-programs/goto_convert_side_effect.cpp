@@ -99,31 +99,13 @@ void goto_convertt::remove_assignment(
 
     const typet &op0_type = expr.op0().type();
 
-    if(op0_type.id()==ID_c_bool)
-    {
-      // C/C++ Booleans get very special treatment.
-      binary_exprt tmp(expr.op0(), new_id, expr.op1(), expr.op1().type());
-      tmp.op0().make_typecast(expr.op1().type());
-      rhs=typecast_exprt(is_not_zero(tmp, ns), expr.op0().type());
-    }
-    else if(op0_type.id() == ID_c_enum_tag)
-    {
-      // We convert c_enums to their underlying type, do the
-      // operation, and then convert back
-      const auto &enum_type = ns.follow_tag(to_c_enum_tag_type(op0_type));
-      auto underlying_type = enum_type.subtype();
-      auto op0 = typecast_exprt(expr.op0(), underlying_type);
-      auto op1 = typecast_exprt(expr.op1(), underlying_type);
-      binary_exprt tmp(op0, new_id, op1, underlying_type);
-      rhs = typecast_exprt(tmp, expr.op0().type());
-    }
-    else
-    {
-      rhs.id(new_id);
-      rhs.copy_to_operands(expr.op0(), expr.op1());
-      rhs.type()=expr.op0().type();
-      rhs.add_source_location()=expr.source_location();
-    }
+    PRECONDITION(
+      op0_type.id() != ID_c_enum_tag && op0_type.id() != ID_c_enum &&
+      op0_type.id() != ID_c_bool && op0_type.id() != ID_bool);
+    rhs.id(new_id);
+    rhs.copy_to_operands(expr.op0(), expr.op1());
+    rhs.type() = expr.op0().type();
+    rhs.add_source_location() = expr.source_location();
 
     code_assignt assignment(expr.op0(), rhs);
     assignment.add_source_location()=expr.source_location();
@@ -171,45 +153,34 @@ void goto_convertt::remove_pre(
 
   const typet &op_type = expr.op0().type();
 
-  if(op_type.id()==ID_bool)
-  {
-    rhs.copy_to_operands(expr.op0(), from_integer(1, signed_int_type()));
-    rhs.op0().make_typecast(signed_int_type());
-    rhs.type()=signed_int_type();
-    rhs=is_not_zero(rhs, ns);
-  }
-  else if(op_type.id()==ID_c_bool)
-  {
-    rhs.copy_to_operands(expr.op0(), from_integer(1, signed_int_type()));
-    rhs.op0().make_typecast(signed_int_type());
-    rhs.type()=signed_int_type();
-    rhs=is_not_zero(rhs, ns);
-    rhs.make_typecast(op_type);
-  }
-  else if(op_type.id()==ID_c_enum ||
-          op_type.id()==ID_c_enum_tag)
-  {
-    rhs.copy_to_operands(expr.op0(), from_integer(1, signed_int_type()));
-    rhs.op0().make_typecast(signed_int_type());
-    rhs.type()=signed_int_type();
-    rhs.make_typecast(op_type);
-  }
+  PRECONDITION(
+    op_type.id() != ID_c_enum_tag && op_type.id() != ID_c_enum &&
+    op_type.id() != ID_c_bool && op_type.id() != ID_bool);
+
+  typet constant_type;
+
+  if(op_type.id() == ID_pointer)
+    constant_type = index_type();
+  else if(is_number(op_type))
+    constant_type = op_type;
   else
   {
-    typet constant_type;
-
-    if(op_type.id()==ID_pointer)
-      constant_type=index_type();
-    else if(is_number(op_type) || op_type.id()==ID_c_bool)
-      constant_type=op_type;
-    else
-    {
-      UNREACHABLE;
-    }
-
-    rhs.add_to_operands(expr.op0(), from_integer(1, constant_type));
-    rhs.type()=expr.op0().type();
+    UNREACHABLE;
   }
+
+  exprt constant;
+
+  if(constant_type.id() == ID_complex)
+  {
+    exprt real = from_integer(1, constant_type.subtype());
+    exprt imag = from_integer(0, constant_type.subtype());
+    constant = complex_exprt(real, imag, to_complex_type(constant_type));
+  }
+  else
+    constant = from_integer(1, constant_type);
+
+  rhs.add_to_operands(expr.op0(), std::move(constant));
+  rhs.type() = expr.op0().type();
 
   code_assignt assignment(expr.op0(), rhs);
   assignment.add_source_location()=expr.find_source_location();
@@ -257,56 +228,34 @@ void goto_convertt::remove_post(
 
   const typet &op_type = expr.op0().type();
 
-  if(op_type.id()==ID_bool)
-  {
-    rhs.copy_to_operands(expr.op0(), from_integer(1, signed_int_type()));
-    rhs.op0().make_typecast(signed_int_type());
-    rhs.type()=signed_int_type();
-    rhs=is_not_zero(rhs, ns);
-  }
-  else if(op_type.id()==ID_c_bool)
-  {
-    rhs.copy_to_operands(expr.op0(), from_integer(1, signed_int_type()));
-    rhs.op0().make_typecast(signed_int_type());
-    rhs.type()=signed_int_type();
-    rhs=is_not_zero(rhs, ns);
-    rhs.make_typecast(op_type);
-  }
-  else if(op_type.id()==ID_c_enum ||
-          op_type.id()==ID_c_enum_tag)
-  {
-    rhs.copy_to_operands(expr.op0(), from_integer(1, signed_int_type()));
-    rhs.op0().make_typecast(signed_int_type());
-    rhs.type()=signed_int_type();
-    rhs.make_typecast(op_type);
-  }
+  PRECONDITION(
+    op_type.id() != ID_c_enum_tag && op_type.id() != ID_c_enum &&
+    op_type.id() != ID_c_bool && op_type.id() != ID_bool);
+
+  typet constant_type;
+
+  if(op_type.id() == ID_pointer)
+    constant_type = index_type();
+  else if(is_number(op_type))
+    constant_type = op_type;
   else
   {
-    typet constant_type;
-
-    if(op_type.id()==ID_pointer)
-      constant_type=index_type();
-    else if(is_number(op_type) || op_type.id()==ID_c_bool)
-      constant_type=op_type;
-    else
-    {
-      UNREACHABLE;
-    }
-
-    exprt constant;
-
-    if(constant_type.id()==ID_complex)
-    {
-      exprt real=from_integer(1, constant_type.subtype());
-      exprt imag=from_integer(0, constant_type.subtype());
-      constant=complex_exprt(real, imag, to_complex_type(constant_type));
-    }
-    else
-      constant=from_integer(1, constant_type);
-
-    rhs.add_to_operands(expr.op0(), std::move(constant));
-    rhs.type()=expr.op0().type();
+    UNREACHABLE;
   }
+
+  exprt constant;
+
+  if(constant_type.id() == ID_complex)
+  {
+    exprt real = from_integer(1, constant_type.subtype());
+    exprt imag = from_integer(0, constant_type.subtype());
+    constant = complex_exprt(real, imag, to_complex_type(constant_type));
+  }
+  else
+    constant = from_integer(1, constant_type);
+
+  rhs.add_to_operands(expr.op0(), std::move(constant));
+  rhs.type() = expr.op0().type();
 
   code_assignt assignment(expr.op0(), rhs);
   assignment.add_source_location()=expr.find_source_location();
