@@ -42,10 +42,6 @@ void boolbvt::convert_update_rec(
   const exprt &new_value,
   bvt &bv)
 {
-  if(type.id() == ID_symbol_type)
-    convert_update_rec(
-      designators, d, ns.follow(type), offset, new_value, bv);
-
   if(d>=designators.size())
   {
     // done
@@ -79,7 +75,7 @@ void boolbvt::convert_update_rec(
 
     const array_typet &array_type=to_array_type(type);
 
-    const typet &subtype=ns.follow(array_type.subtype());
+    const typet &subtype = array_type.subtype();
 
     std::size_t element_size=boolbv_width(subtype);
 
@@ -110,10 +106,9 @@ void boolbvt::convert_update_rec(
   {
     const irep_idt &component_name=designator.get(ID_component_name);
 
-    if(type.id()==ID_struct)
+    if(ns.follow(type).id() == ID_struct)
     {
-      const struct_typet &struct_type=
-        to_struct_type(type);
+      const struct_typet &struct_type = to_struct_type(ns.follow(type));
 
       std::size_t struct_offset=0;
 
@@ -140,7 +135,7 @@ void boolbvt::convert_update_rec(
       if(component.is_nil())
         throw "update: failed to find struct component";
 
-      const typet &new_type=ns.follow(component.type());
+      const typet &new_type = component.type();
 
       std::size_t new_offset=offset+struct_offset;
 
@@ -148,10 +143,9 @@ void boolbvt::convert_update_rec(
       convert_update_rec(
         designators, d+1, new_type, new_offset, new_value, bv);
     }
-    else if(type.id()==ID_union)
+    else if(ns.follow(type).id() == ID_union)
     {
-      const union_typet &union_type=
-        to_union_type(type);
+      const union_typet &union_type = to_union_type(ns.follow(type));
 
       const union_typet::componentt &component=
         union_type.get_component(component_name);
@@ -161,7 +155,7 @@ void boolbvt::convert_update_rec(
 
       // this only adjusts the type, the offset stays as-is
 
-      const typet &new_type=ns.follow(component.type());
+      const typet &new_type = component.type();
 
       // recursive call
       convert_update_rec(

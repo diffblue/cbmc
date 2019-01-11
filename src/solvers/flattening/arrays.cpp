@@ -55,7 +55,7 @@ literalt arrayst::record_array_equality(
   }
 
   DATA_INVARIANT(
-    ns.follow(op0.type()).id()==ID_array,
+    op0.type().id() == ID_array,
     "record_array_equality parameter should be array-typed");
 
   array_equalities.push_back(array_equalityt());
@@ -90,7 +90,7 @@ void arrayst::collect_indices(const exprt &expr)
     const index_exprt &e = to_index_expr(expr);
     collect_indices(e.index()); // necessary?
 
-    const typet &array_op_type=ns.follow(e.array().type());
+    const typet &array_op_type = e.array().type();
 
     if(array_op_type.id()==ID_array)
     {
@@ -107,8 +107,7 @@ void arrayst::collect_indices(const exprt &expr)
 
 void arrayst::collect_arrays(const exprt &a)
 {
-  const array_typet &array_type=
-    to_array_type(ns.follow(a.type()));
+  const array_typet &array_type = to_array_type(a.type());
 
   if(a.id()==ID_with)
   {
@@ -337,7 +336,7 @@ void arrayst::add_array_Ackermann_constraints()
 
           if(indices_equal_lit!=const_literal(false))
           {
-            const typet &subtype=ns.follow(arrays[i].type()).subtype();
+            const typet &subtype = arrays[i].type().subtype();
             index_exprt index_expr1(arrays[i], *i1, subtype);
 
             index_exprt index_expr2=index_expr1;
@@ -415,10 +414,10 @@ void arrayst::add_array_constraints_equality(
 
   for(const auto &index : index_set)
   {
-    const typet &subtype1=ns.follow(array_equality.f1.type()).subtype();
+    const typet &subtype1 = array_equality.f1.type().subtype();
     index_exprt index_expr1(array_equality.f1, index, subtype1);
 
-    const typet &subtype2=ns.follow(array_equality.f2.type()).subtype();
+    const typet &subtype2 = array_equality.f2.type().subtype();
     index_exprt index_expr2(array_equality.f2, index, subtype2);
 
     DATA_INVARIANT(
@@ -477,7 +476,7 @@ void arrayst::add_array_constraints(
     // add a[i]=b[i]
     for(const auto &index : index_set)
     {
-      const typet &subtype=ns.follow(expr.type()).subtype();
+      const typet &subtype = expr.type().subtype();
       index_exprt index_expr1(expr, index, subtype);
       index_exprt index_expr2(expr.op0(), index, subtype);
 
@@ -514,7 +513,7 @@ void arrayst::add_array_constraints_with(
   const exprt &value=expr.new_value();
 
   {
-    index_exprt index_expr(expr, index, ns.follow(expr.type()).subtype());
+    index_exprt index_expr(expr, index, expr.type().subtype());
 
     if(index_expr.type()!=value.type())
     {
@@ -545,7 +544,7 @@ void arrayst::add_array_constraints_with(
 
       if(guard_lit!=const_literal(true))
       {
-        const typet &subtype=ns.follow(expr.type()).subtype();
+        const typet &subtype = expr.type().subtype();
         index_exprt index_expr1(expr, other_index, subtype);
         index_exprt index_expr2(expr.op0(), other_index, subtype);
 
@@ -584,7 +583,7 @@ void arrayst::add_array_constraints_update(
   const exprt &value=expr.new_value();
 
   {
-    index_exprt index_expr(expr, index, ns.follow(expr.type()).subtype());
+    index_exprt index_expr(expr, index, expr.type().subtype());
 
     if(index_expr.type()!=value.type())
     {
@@ -613,7 +612,7 @@ void arrayst::add_array_constraints_update(
 
       if(guard_lit!=const_literal(true))
       {
-        const typet &subtype=ns.follow(expr.type()).subtype();
+        const typet &subtype=expr.type().subtype();
         index_exprt index_expr1(expr, other_index, subtype);
         index_exprt index_expr2(expr.op0(), other_index, subtype);
 
@@ -643,7 +642,7 @@ void arrayst::add_array_constraints_array_of(
 
   for(const auto &index : index_set)
   {
-    const typet &subtype=ns.follow(expr.type()).subtype();
+    const typet &subtype = expr.type().subtype();
     index_exprt index_expr(expr, index, subtype);
 
     DATA_INVARIANT(
@@ -672,7 +671,7 @@ void arrayst::add_array_constraints_if(
 
   for(const auto &index : index_set)
   {
-    const typet subtype=ns.follow(expr.type()).subtype();
+    const typet subtype = expr.type().subtype();
     index_exprt index_expr1(expr, index, subtype);
     index_exprt index_expr2(expr.true_case(), index, subtype);
 
@@ -690,7 +689,7 @@ void arrayst::add_array_constraints_if(
   // now the false case
   for(const auto &index : index_set)
   {
-    const typet subtype=ns.follow(expr.type()).subtype();
+    const typet subtype = expr.type().subtype();
     index_exprt index_expr1(expr, index, subtype);
     index_exprt index_expr2(expr.false_case(), index, subtype);
 

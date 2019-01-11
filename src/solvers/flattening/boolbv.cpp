@@ -628,9 +628,6 @@ exprt boolbvt::make_free_bv_expr(const typet &type)
 
 bool boolbvt::is_unbounded_array(const typet &type) const
 {
-  if(type.id() == ID_symbol_type)
-    return is_unbounded_array(ns.follow(type));
-
   if(type.id()!=ID_array)
     return false;
 

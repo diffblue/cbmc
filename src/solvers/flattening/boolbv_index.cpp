@@ -21,7 +21,7 @@ bvt boolbvt::convert_index(const index_exprt &expr)
   const exprt &array=expr.array();
   const exprt &index=expr.index();
 
-  const typet &array_op_type=ns.follow(array.type());
+  const typet &array_op_type = array.type();
 
   bvt bv;
 
@@ -276,8 +276,7 @@ bvt boolbvt::convert_index(
   const exprt &array,
   const mp_integer &index)
 {
-  const array_typet &array_type=
-    to_array_type(ns.follow(array.type()));
+  const array_typet &array_type = to_array_type(array.type());
 
   std::size_t width=boolbv_width(array_type.subtype());
 

@@ -41,8 +41,7 @@ bvt bv_refinementt::convert_floatbv_op(const exprt &expr)
   if(!config_.refine_arithmetic)
     return SUB::convert_floatbv_op(expr);
 
-  if(ns.follow(expr.type()).id()!=ID_floatbv ||
-     expr.operands().size()!=3)
+  if(expr.type().id() != ID_floatbv || expr.operands().size() != 3)
     return SUB::convert_floatbv_op(expr);
 
   bvt bv;
@@ -60,7 +59,7 @@ bvt bv_refinementt::convert_mult(const mult_exprt &expr)
 
   const exprt::operandst &operands=expr.operands();
 
-  const typet &type=ns.follow(expr.type());
+  const typet &type = expr.type();
 
   PRECONDITION(operands.size()>=2);
 
@@ -166,7 +165,7 @@ void bv_refinementt::check_SAT(approximationt &a)
 
   // see if the satisfying assignment is spurious in any way
 
-  const typet &type=ns.follow(a.expr.type());
+  const typet &type = a.expr.type();
 
   if(type.id()==ID_floatbv)
   {

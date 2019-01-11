@@ -19,14 +19,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 bvt boolbvt::convert_bv_typecast(const typecast_exprt &expr)
 {
-  const typet &expr_type=ns.follow(expr.type());
   const exprt &op=expr.op();
-  const typet &op_type=ns.follow(op.type());
   const bvt &op_bv=convert_bv(op);
 
   bvt bv;
 
-  if(type_conversion(op_type, op_bv, expr_type, bv))
+  if(type_conversion(op.type(), op_bv, expr.type(), bv))
     return conversion_failed(expr);
 
   return bv;
@@ -84,15 +82,9 @@ bool boolbvt::type_conversion(
       lower.assign(src.begin(), src.begin()+src.size()/2);
       upper.assign(src.begin()+src.size()/2, src.end());
       type_conversion(
-        ns.follow(src_type.subtype()),
-        lower,
-        ns.follow(dest_type.subtype()),
-        lower_res);
+        src_type.subtype(), lower, dest_type.subtype(), lower_res);
       type_conversion(
-        ns.follow(src_type.subtype()),
-        upper,
-        ns.follow(dest_type.subtype()),
-        upper_res);
+        src_type.subtype(), upper, dest_type.subtype(), upper_res);
       INVARIANT(
         lower_res.size() + upper_res.size() == dest_width,
         "lower result bitvector size plus upper result bitvector size shall "
@@ -526,17 +518,17 @@ bool boolbvt::type_conversion(
         return false;
       }
     }
-    else if(dest_type.id()==ID_struct)
+    else if(ns.follow(dest_type).id() == ID_struct)
     {
-      const struct_typet &dest_struct=to_struct_type(dest_type);
+      const struct_typet &dest_struct = to_struct_type(ns.follow(dest_type));
 
-      if(src_type.id()==ID_struct)
+      if(ns.follow(src_type).id() == ID_struct)
       {
         // we do subsets
 
         dest.resize(dest_width, const_literal(false));
 
-        const struct_typet &op_struct=to_struct_type(src_type);
+        const struct_typet &op_struct = to_struct_type(ns.follow(src_type));
 
         const struct_typet::componentst &dest_comp=
           dest_struct.components();

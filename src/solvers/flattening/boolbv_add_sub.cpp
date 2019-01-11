@@ -19,7 +19,7 @@ bvt boolbvt::convert_add_sub(const exprt &expr)
     expr.id() == ID_plus || expr.id() == ID_minus ||
     expr.id() == "no-overflow-plus" || expr.id() == "no-overflow-minus");
 
-  const typet &type=ns.follow(expr.type());
+  const typet &type = expr.type();
 
   if(type.id()!=ID_unsignedbv &&
      type.id()!=ID_signedbv &&
@@ -53,9 +53,8 @@ bvt boolbvt::convert_add_sub(const exprt &expr)
   bool no_overflow=(expr.id()=="no-overflow-plus" ||
                     expr.id()=="no-overflow-minus");
 
-  typet arithmetic_type=
-    (type.id()==ID_vector || type.id()==ID_complex)?
-      ns.follow(type.subtype()):type;
+  typet arithmetic_type =
+    (type.id() == ID_vector || type.id() == ID_complex) ? type.subtype() : type;
 
   bv_utilst::representationt rep=
     (arithmetic_type.id()==ID_signedbv ||

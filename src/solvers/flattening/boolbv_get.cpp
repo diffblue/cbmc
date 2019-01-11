@@ -71,9 +71,6 @@ exprt boolbvt::bv_get_rec(
   std::size_t offset,
   const typet &type) const
 {
-  if(type.id() == ID_symbol_type)
-    return bv_get_rec(bv, unknown, offset, ns.follow(type));
-
   std::size_t width=boolbv_width(type);
 
   assert(bv.size()==unknown.size());
@@ -143,7 +140,7 @@ exprt boolbvt::bv_get_rec(
 
       for(const auto &c : components)
       {
-        const typet &subtype = ns.follow(c.type());
+        const typet &subtype = c.type();
         op.push_back(nil_exprt());
 
         std::size_t sub_width=boolbv_width(subtype);
@@ -178,7 +175,7 @@ exprt boolbvt::bv_get_rec(
     }
     else if(type.id()==ID_vector)
     {
-      const typet &subtype=ns.follow(type.subtype());
+      const typet &subtype = type.subtype();
       std::size_t sub_width=boolbv_width(subtype);
 
       if(sub_width!=0 && width%sub_width==0)
@@ -196,7 +193,7 @@ exprt boolbvt::bv_get_rec(
     }
     else if(type.id()==ID_complex)
     {
-      const typet &subtype=ns.follow(type.subtype());
+      const typet &subtype = type.subtype();
       std::size_t sub_width=boolbv_width(subtype);
 
       if(sub_width!=0 && width==sub_width*2)
