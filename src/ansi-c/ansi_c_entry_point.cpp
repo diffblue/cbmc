@@ -238,7 +238,7 @@ bool generate_ansi_c_start_function(
     return_symbol.mode=ID_C;
     return_symbol.is_static_lifetime=false;
     return_symbol.name="return'";
-    return_symbol.base_name="return";
+    return_symbol.base_name = "return'";
     return_symbol.type=to_code_type(symbol.type).return_type();
 
     symbol_table.add(return_symbol);
