@@ -1287,7 +1287,7 @@ std::string expr2ct::convert_complex(
   // float complex CMPLXF(float x, float y);
   // long double complex CMPLXL(long double x, long double y);
 
-  const typet &subtype = ns.follow(src.type()).subtype();
+  const typet &subtype = src.type().subtype();
 
   std::string name;
 
@@ -1749,7 +1749,7 @@ std::string expr2ct::convert_constant(
   unsigned &precedence)
 {
   const irep_idt &base=src.get(ID_C_base);
-  const typet &type=ns.follow(src.type());
+  const typet &type = src.type();
   const irep_idt value=src.get_value();
   std::string dest;
 

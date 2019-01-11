@@ -51,14 +51,15 @@ exprt get_component_rec(
 
   for(const auto &comp : components)
   {
-    const typet &type=ns.follow(comp.type());
+    const typet &type = comp.type();
 
     if(comp.get_name()==component_name)
     {
       return std::move(make_member_expr(struct_union, comp, ns));
     }
-    else if(comp.get_anonymous() &&
-            (type.id()==ID_struct || type.id()==ID_union))
+    else if(
+      comp.get_anonymous() &&
+      (type.id() == ID_struct_tag || type.id() == ID_union_tag))
     {
       const member_exprt tmp = make_member_expr(struct_union, comp, ns);
       exprt result=get_component_rec(tmp, component_name, ns);

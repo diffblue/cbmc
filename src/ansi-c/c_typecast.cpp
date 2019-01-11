@@ -388,14 +388,12 @@ void c_typecastt::implicit_typecast_arithmetic(
 {
   typet new_type;
 
-  const typet &expr_type=ns.follow(expr.type());
-
   switch(c_type)
   {
   case PTR:
-    if(expr_type.id()==ID_array)
+    if(expr.type().id() == ID_array)
     {
-      new_type=pointer_type(expr_type.subtype());
+      new_type = pointer_type(expr.type().subtype());
       break;
     }
     return;
@@ -423,7 +421,7 @@ void c_typecastt::implicit_typecast_arithmetic(
   default: return;
   }
 
-  if(new_type!=expr_type)
+  if(new_type != expr.type())
     do_typecast(expr, new_type);
 }
 
@@ -538,8 +536,8 @@ void c_typecastt::implicit_typecast_followed(
     {
       // we are quite generous about pointers
 
-      const typet &src_sub=ns.follow(src_type.subtype());
-      const typet &dest_sub=ns.follow(dest_type.subtype());
+      const typet &src_sub = src_type.subtype();
+      const typet &dest_sub = dest_type.subtype();
 
       if(is_void_pointer(src_type) ||
          is_void_pointer(dest_type))
@@ -603,8 +601,8 @@ void c_typecastt::implicit_typecast_arithmetic(
   exprt &expr1,
   exprt &expr2)
 {
-  const typet &type1=ns.follow(expr1.type());
-  const typet &type2=ns.follow(expr2.type());
+  const typet &type1 = expr1.type();
+  const typet &type2 = expr2.type();
 
   c_typet c_type1=minimum_promotion(type1),
           c_type2=minimum_promotion(type2);
@@ -718,7 +716,7 @@ void c_typecastt::do_typecast(exprt &expr, const typet &dest_type)
   // special case: array -> pointer is actually
   // something like address_of
 
-  const typet &src_type=ns.follow(expr.type());
+  const typet &src_type = expr.type();
 
   if(src_type.id()==ID_array)
   {
@@ -726,9 +724,7 @@ void c_typecastt::do_typecast(exprt &expr, const typet &dest_type)
     index.array()=expr;
     index.index()=from_integer(0, index_type());
     index.type()=src_type.subtype();
-    expr=address_of_exprt(index);
-    if(ns.follow(expr.type())!=ns.follow(dest_type))
-      expr.make_typecast(dest_type);
+    expr = typecast_exprt::conditional_cast(address_of_exprt(index), dest_type);
     return;
   }
 
