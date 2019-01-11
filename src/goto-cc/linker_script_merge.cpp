@@ -114,72 +114,76 @@ int linker_script_merget::add_linker_script_definitions()
 }
 
 linker_script_merget::linker_script_merget(
-      compilet &compiler,
-      const std::string &elf_binary,
-      const std::string &goto_binary,
-      const cmdlinet &cmdline,
-      message_handlert &message_handler) :
-    messaget(message_handler), compiler(compiler),
-    elf_binary(elf_binary), goto_binary(goto_binary),
+  compilet &compiler,
+  const std::string &elf_binary,
+  const std::string &goto_binary,
+  const cmdlinet &cmdline,
+  message_handlert &message_handler)
+  : messaget(message_handler),
+    compiler(compiler),
+    elf_binary(elf_binary),
+    goto_binary(goto_binary),
     cmdline(cmdline),
     replacement_predicates(
-    {
-      replacement_predicatet("address of array's first member",
-        [](const exprt &expr) -> const symbol_exprt&
-        { return to_symbol_expr(expr.op0().op0()); },
-        [](const exprt &expr, const namespacet &)
-        {
-          return expr.id()==ID_address_of &&
-                 expr.type().id()==ID_pointer &&
+      {replacement_predicatet(
+         "address of array's first member",
+         [](const exprt &expr) -> const symbol_exprt & {
+           return to_symbol_expr(expr.op0().op0());
+         },
+         [](const exprt &expr) {
+           return expr.id() == ID_address_of &&
+                  expr.type().id() == ID_pointer &&
 
-                 expr.op0().id()==ID_index &&
-                 expr.op0().type().id()==ID_unsignedbv &&
+                  expr.op0().id() == ID_index &&
+                  expr.op0().type().id() == ID_unsignedbv &&
 
-                 expr.op0().op0().id()==ID_symbol &&
-                 expr.op0().op0().type().id()==ID_array &&
+                  expr.op0().op0().id() == ID_symbol &&
+                  expr.op0().op0().type().id() == ID_array &&
 
-                 expr.op0().op1().id()==ID_constant &&
-                 expr.op0().op1().type().id()==ID_signedbv;
-        }),
-      replacement_predicatet("address of array",
-        [](const exprt &expr) -> const symbol_exprt&
-        { return to_symbol_expr(expr.op0()); },
-        [](const exprt &expr, const namespacet &)
-        {
-          return expr.id()==ID_address_of &&
-                 expr.type().id()==ID_pointer &&
+                  expr.op0().op1().id() == ID_constant &&
+                  expr.op0().op1().type().id() == ID_signedbv;
+         }),
+       replacement_predicatet(
+         "address of array",
+         [](const exprt &expr) -> const symbol_exprt & {
+           return to_symbol_expr(expr.op0());
+         },
+         [](const exprt &expr) {
+           return expr.id() == ID_address_of &&
+                  expr.type().id() == ID_pointer &&
 
-                 expr.op0().id()==ID_symbol &&
-                 expr.op0().type().id()==ID_array;
-        }),
-      replacement_predicatet("address of struct",
-        [](const exprt &expr) -> const symbol_exprt&
-        { return to_symbol_expr(expr.op0()); },
-        [](const exprt &expr, const namespacet &ns)
-        {
-          return expr.id()==ID_address_of &&
-                 expr.type().id()==ID_pointer &&
+                  expr.op0().id() == ID_symbol &&
+                  expr.op0().type().id() == ID_array;
+         }),
+       replacement_predicatet(
+         "address of struct",
+         [](const exprt &expr) -> const symbol_exprt & {
+           return to_symbol_expr(expr.op0());
+         },
+         [](const exprt &expr) {
+           return expr.id() == ID_address_of &&
+                  expr.type().id() == ID_pointer &&
 
-                 expr.op0().id()==ID_symbol &&
-                 ns.follow(expr.op0().type()).id()==ID_struct;
-        }),
-      replacement_predicatet("array variable",
-        [](const exprt &expr) -> const symbol_exprt&
-        { return to_symbol_expr(expr); },
-        [](const exprt &expr, const namespacet &)
-        {
-          return expr.id()==ID_symbol &&
-                 expr.type().id()==ID_array;
-        }),
-      replacement_predicatet("pointer (does not need pointerizing)",
-        [](const exprt &expr) -> const symbol_exprt&
-        { return to_symbol_expr(expr); },
-        [](const exprt &expr, const namespacet &)
-        {
-          return expr.id()==ID_symbol &&
-                 expr.type().id()==ID_pointer;
-        })
-    })
+                  expr.op0().id() == ID_symbol &&
+                  (expr.op0().type().id() == ID_struct ||
+                   expr.op0().type().id() == ID_struct_tag);
+         }),
+       replacement_predicatet(
+         "array variable",
+         [](const exprt &expr) -> const symbol_exprt & {
+           return to_symbol_expr(expr);
+         },
+         [](const exprt &expr) {
+           return expr.id() == ID_symbol && expr.type().id() == ID_array;
+         }),
+       replacement_predicatet(
+         "pointer (does not need pointerizing)",
+         [](const exprt &expr) -> const symbol_exprt & {
+           return to_symbol_expr(expr);
+         },
+         [](const exprt &expr) {
+           return expr.id() == ID_symbol && expr.type().id() == ID_pointer;
+         })})
 {}
 
 int linker_script_merget::pointerize_linker_defined_symbols(
@@ -215,8 +219,7 @@ int linker_script_merget::pointerize_linker_defined_symbols(
     int fail = pointerize_subexprs_of(
       goto_model.symbol_table.get_writeable_ref(pair.first).value,
       to_pointerize,
-      linker_values,
-      ns);
+      linker_values);
     if(to_pointerize.empty() && fail==0)
       continue;
     ret=1;
@@ -241,8 +244,7 @@ int linker_script_merget::pointerize_linker_defined_symbols(
         if(to_pointerize.empty())
           continue;
         debug() << "Pointerizing a program expression..." << eom;
-        int fail = pointerize_subexprs_of(
-          *insts, to_pointerize, linker_values, ns);
+        int fail = pointerize_subexprs_of(*insts, to_pointerize, linker_values);
         if(to_pointerize.empty() && fail==0)
           continue;
         ret=1;
@@ -283,16 +285,15 @@ int linker_script_merget::replace_expr(
 }
 
 int linker_script_merget::pointerize_subexprs_of(
-    exprt &expr,
-    std::list<symbol_exprt> &to_pointerize,
-    const linker_valuest &linker_values,
-    const namespacet &ns)
+  exprt &expr,
+  std::list<symbol_exprt> &to_pointerize,
+  const linker_valuest &linker_values)
 {
   int fail=0, tmp=0;
   for(auto const &pair : linker_values)
     for(auto const &pattern : replacement_predicates)
     {
-      if(!pattern.match(expr, ns))
+      if(!pattern.match(expr))
         continue;
       // take a copy, expr will be changed below
       const symbol_exprt inner_symbol=pattern.inner_symbol(expr);
@@ -320,7 +321,7 @@ int linker_script_merget::pointerize_subexprs_of(
 
   for(auto &op : expr.operands())
   {
-    tmp=pointerize_subexprs_of(op, to_pointerize, linker_values, ns);
+    tmp = pointerize_subexprs_of(op, to_pointerize, linker_values);
     fail=tmp?tmp:fail;
   }
   return fail;
