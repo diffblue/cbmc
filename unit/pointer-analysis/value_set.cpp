@@ -62,12 +62,12 @@ SCENARIO(
     A_x.set_name("x");
     A_x.set_base_name("x");
     A_x.set_pretty_name("x");
-    A_x.type() = pointer_typet(symbol_typet(A_symbol.name), 64);
+    A_x.type() = pointer_typet(struct_tag_typet(A_symbol.name), 64);
 
     A_y.set_name("y");
     A_y.set_base_name("y");
     A_y.set_pretty_name("y");
-    A_y.type() = pointer_typet(symbol_typet(A_symbol.name), 64);
+    A_y.type() = pointer_typet(struct_tag_typet(A_symbol.name), 64);
 
     A_symbol.type = struct_A;
     symbol_table.add(A_symbol);
@@ -78,7 +78,7 @@ SCENARIO(
     a1_symbol.name = "a1";
     a1_symbol.base_name = "a1";
     a1_symbol.pretty_name = "a1";
-    a1_symbol.type = symbol_typet(A_symbol.name);
+    a1_symbol.type = struct_tag_typet(A_symbol.name);
     a1_symbol.is_static_lifetime = true;
     symbol_table.add(a1_symbol);
 
@@ -86,7 +86,7 @@ SCENARIO(
     a2_symbol.name = "a2";
     a2_symbol.base_name = "a2";
     a2_symbol.pretty_name = "a2";
-    a2_symbol.type = symbol_typet(A_symbol.name);
+    a2_symbol.type = struct_tag_typet(A_symbol.name);
     a2_symbol.is_static_lifetime = true;
     symbol_table.add(a2_symbol);
 
@@ -94,7 +94,7 @@ SCENARIO(
     a3_symbol.name = "a3";
     a3_symbol.base_name = "a3";
     a3_symbol.pretty_name = "a3";
-    a3_symbol.type = symbol_typet(A_symbol.name);
+    a3_symbol.type = struct_tag_typet(A_symbol.name);
     a3_symbol.is_static_lifetime = true;
     symbol_table.add(a3_symbol);
 
@@ -211,7 +211,7 @@ SCENARIO(
 
     WHEN("We query what '{ .x = &a2, .y = &a3 }.x' points to")
     {
-      struct_exprt struct_constant(symbol_typet(A_symbol.name));
+      struct_exprt struct_constant(struct_tag_typet(A_symbol.name));
       struct_constant.copy_to_operands(
         address_of_exprt(a2_symbol.symbol_expr()));
       struct_constant.copy_to_operands(
