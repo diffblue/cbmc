@@ -334,8 +334,7 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
       expr.operands().size() == 1,
       "real part retrieval operation should have one operand");
 
-    exprt op = expr.op0();
-    op.type() = follow(op.type());
+    const exprt &op = expr.op0();
 
     if(op.type().id() != ID_complex)
     {
@@ -372,8 +371,7 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
       expr.operands().size() == 1,
       "imaginary part retrieval operation should have one operand");
 
-    exprt op = expr.op0();
-    op.type() = follow(op.type());
+    const exprt &op = expr.op0();
 
     if(op.type().id() != ID_complex)
     {
@@ -636,8 +634,8 @@ void c_typecheck_baset::typecheck_expr_builtin_offsetof(exprt &expr)
           for(const auto &c : struct_union_type.components())
           {
             if(
-              c.get_anonymous() && (follow(c.type()).id() == ID_struct ||
-                                    follow(c.type()).id() == ID_union))
+              c.get_anonymous() &&
+              (c.type().id() == ID_struct_tag || c.type().id() == ID_union_tag))
             {
               if(has_component_rec(c.type(), component_name, *this))
               {
@@ -1160,7 +1158,7 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
   if(expr_type.id()==ID_empty)
     return;
 
-  const typet op_type=follow(op.type());
+  const typet op_type = op.type();
 
   // cast to same type?
   if(base_type_eq(expr_type, op_type, *this))
@@ -2009,7 +2007,7 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
   // typecheck it now
   typecheck_expr(f_op);
 
-  const typet f_op_type=follow(f_op.type());
+  const typet f_op_type = f_op.type();
 
   if(f_op_type.id()!=ID_pointer)
   {
@@ -2853,8 +2851,7 @@ void c_typecheck_baset::typecheck_function_call_arguments(
     {
       // don't know type, just do standard conversion
 
-      const typet &type=follow(op.type());
-      if(type.id()==ID_array)
+      if(op.type().id() == ID_array)
       {
         typet dest_type=pointer_type(void_type());
         dest_type.subtype().set(ID_C_constant, true);
@@ -2881,7 +2878,7 @@ void c_typecheck_baset::typecheck_expr_unary_arithmetic(exprt &expr)
 
   exprt &operand=expr.op0();
 
-  const typet &o_type=follow(operand.type());
+  const typet &o_type = operand.type();
 
   if(o_type.id()==ID_vector)
   {
@@ -2970,15 +2967,16 @@ void c_typecheck_baset::typecheck_expr_binary_arithmetic(exprt &expr)
   exprt &op0=expr.op0();
   exprt &op1=expr.op1();
 
-  const typet o_type0=follow(op0.type());
-  const typet o_type1=follow(op1.type());
+  const typet o_type0 = op0.type();
+  const typet o_type1 = op1.type();
 
   if(o_type0.id()==ID_vector &&
      o_type1.id()==ID_vector)
   {
-    if(gcc_vector_types_compatible(
+    if(
+      gcc_vector_types_compatible(
         to_vector_type(o_type0), to_vector_type(o_type1)) &&
-       is_number(follow(o_type0.subtype())))
+      is_number(o_type0.subtype()))
     {
       // Vector arithmetic has fairly strict typing rules, no promotion
       if(o_type0!=o_type1)
@@ -3010,8 +3008,8 @@ void c_typecheck_baset::typecheck_expr_binary_arithmetic(exprt &expr)
 
   implicit_typecast_arithmetic(op0, op1);
 
-  const typet &type0=follow(op0.type());
-  const typet &type1=follow(op1.type());
+  const typet &type0 = op0.type();
+  const typet &type1 = op1.type();
 
   if(expr.id()==ID_plus || expr.id()==ID_minus ||
      expr.id()==ID_mult || expr.id()==ID_div)
@@ -3083,14 +3081,13 @@ void c_typecheck_baset::typecheck_expr_shifts(shift_exprt &expr)
   exprt &op0=expr.op0();
   exprt &op1=expr.op1();
 
-  const typet o_type0=follow(op0.type());
-  const typet o_type1=follow(op1.type());
+  const typet o_type0 = op0.type();
+  const typet o_type1 = op1.type();
 
   if(o_type0.id()==ID_vector &&
      o_type1.id()==ID_vector)
   {
-    if(follow(o_type0.subtype())==follow(o_type1.subtype()) &&
-       is_number(follow(o_type0.subtype())))
+    if(o_type0.subtype() == o_type1.subtype() && is_number(o_type0.subtype()))
     {
       // {a0, a1, ..., an} >> {b0, b1, ..., bn} ==
       // {a0 >> b0, a1 >> b1, ..., an >> bn}
@@ -3100,9 +3097,9 @@ void c_typecheck_baset::typecheck_expr_shifts(shift_exprt &expr)
     }
   }
 
-  if(o_type0.id()==ID_vector &&
-     is_number(follow(o_type0.subtype())) &&
-     is_number(o_type1))
+  if(
+    o_type0.id() == ID_vector && is_number(o_type0.subtype()) &&
+    is_number(o_type1))
   {
     // {a0, a1, ..., an} >> b == {a0 >> b, a1 >> b, ..., an >> b}
     expr.type()=op0.type();
@@ -3120,7 +3117,7 @@ void c_typecheck_baset::typecheck_expr_shifts(shift_exprt &expr)
 
     if(expr.id()==ID_shr) // shifting operation depends on types
     {
-      const typet &op0_type=follow(op0.type());
+      const typet &op0_type = op0.type();
 
       if(op0_type.id()==ID_unsignedbv)
       {
@@ -3177,8 +3174,8 @@ void c_typecheck_baset::typecheck_expr_pointer_arithmetic(exprt &expr)
   exprt &op0=expr.op0();
   exprt &op1=expr.op1();
 
-  const typet &type0=follow(op0.type());
-  const typet &type1=follow(op1.type());
+  const typet &type0 = op0.type();
+  const typet &type1 = op1.type();
 
   if(expr.id()==ID_minus ||
      (expr.id()==ID_side_effect && expr.get(ID_statement)==ID_assign_minus))
@@ -3229,7 +3226,7 @@ void c_typecheck_baset::typecheck_expr_pointer_arithmetic(exprt &expr)
       UNREACHABLE;
     }
 
-    const typet &int_op_type=follow(int_op->type());
+    const typet &int_op_type = int_op->type();
 
     if(int_op_type.id()==ID_bool ||
        int_op_type.id()==ID_c_bool ||

@@ -794,8 +794,9 @@ designatort c_typecheck_baset::make_designator(
               entry.type=tmp_type;
             }
             else if(
-              c.get_anonymous() && (follow(c.type()).id() == ID_struct ||
-                                    follow(c.type()).id() == ID_union) &&
+              c.get_anonymous() &&
+              (c.type().id() == ID_struct_tag ||
+               c.type().id() == ID_union_tag) &&
               has_component_rec(c.type(), component_name, *this))
             {
               entry.index=number;

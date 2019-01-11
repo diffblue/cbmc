@@ -284,8 +284,7 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
   }
 
   // do initializer, this may change the type
-  if(follow(new_symbol.type).id()!=ID_code &&
-     !new_symbol.is_macro)
+  if(new_symbol.type.id() != ID_code && !new_symbol.is_macro)
     do_initializer(new_symbol);
 
   const typet &final_new=follow(new_symbol.type);
@@ -419,22 +418,20 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
       PRECONDITION(old_symbol.type.id() != ID_symbol_type);
       old_symbol.type=new_symbol.type;
     }
-    else if(final_old.id()==ID_pointer &&
-            follow(final_old).subtype().id()==ID_code &&
-            to_code_type(follow(final_old).subtype()).has_ellipsis() &&
-            final_new.id()==ID_pointer &&
-            follow(final_new).subtype().id()==ID_code)
+    else if(
+      final_old.id() == ID_pointer && final_old.subtype().id() == ID_code &&
+      to_code_type(final_old.subtype()).has_ellipsis() &&
+      final_new.id() == ID_pointer && final_new.subtype().id() == ID_code)
     {
       // to allow
       // int (*f) ();
       // int (*f) (int)=0;
       old_symbol.type=new_symbol.type;
     }
-    else if(final_old.id()==ID_pointer &&
-            follow(final_old).subtype().id()==ID_code &&
-            final_new.id()==ID_pointer &&
-            follow(final_new).subtype().id()==ID_code &&
-            to_code_type(follow(final_new).subtype()).has_ellipsis())
+    else if(
+      final_old.id() == ID_pointer && final_old.subtype().id() == ID_code &&
+      final_new.id() == ID_pointer && final_new.subtype().id() == ID_code &&
+      to_code_type(final_new.subtype()).has_ellipsis())
     {
       // to allow
       // int (*f) (int)=0;
