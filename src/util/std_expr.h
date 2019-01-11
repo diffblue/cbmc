@@ -1500,16 +1500,6 @@ inline void validate_expr(const notequal_exprt &value)
 class index_exprt:public binary_exprt
 {
 public:
-  DEPRECATED("use index_exprt(array, index) instead")
-  index_exprt():binary_exprt(ID_index)
-  {
-  }
-
-  DEPRECATED("use index_exprt(array, index) instead")
-  explicit index_exprt(const typet &_type):binary_exprt(ID_index, _type)
-  {
-  }
-
   index_exprt(const exprt &_array, const exprt &_index):
     binary_exprt(_array, ID_index, _index, _array.type().subtype())
   {
