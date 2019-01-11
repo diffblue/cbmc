@@ -1501,16 +1501,6 @@ inline notequal_exprt &to_notequal_expr(exprt &expr)
 class index_exprt:public binary_exprt
 {
 public:
-  DEPRECATED(SINCE(2018, 9, 21, "use index_exprt(array, index) instead"))
-  index_exprt():binary_exprt(ID_index)
-  {
-  }
-
-  DEPRECATED(SINCE(2018, 9, 21, "use index_exprt(array, index) instead"))
-  explicit index_exprt(const typet &_type):binary_exprt(ID_index, _type)
-  {
-  }
-
   index_exprt(const exprt &_array, exprt _index)
     : binary_exprt(_array, ID_index, std::move(_index), _array.type().subtype())
   {
