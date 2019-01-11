@@ -155,11 +155,10 @@ void cpp_typecheckt::typecheck_enum_type(typet &type)
     else
     {
       typecheck_type(type.subtype());
-      if(type.subtype().id()==ID_signedbv ||
-         type.subtype().id()==ID_unsignedbv)
-      {
-      }
-      else
+      if(
+        type.subtype().id() != ID_signedbv &&
+        type.subtype().id() != ID_unsignedbv &&
+        type.subtype().id() != ID_c_bool)
       {
         error().source_location=type.source_location();
         error() << "underlying type must be integral" << eom;
