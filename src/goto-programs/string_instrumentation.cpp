@@ -425,10 +425,7 @@ void string_instrumentationt::do_format_string_read(
 
           if(arg_type.id()!=ID_pointer)
           {
-            index_exprt index;
-            index.array()=temp;
-            index.index()=from_integer(0, index_type());
-            index.type()=arg_type.subtype();
+            index_exprt index(temp, from_integer(0, index_type()));
             temp=address_of_exprt(index);
           }
 
@@ -474,10 +471,7 @@ void string_instrumentationt::do_format_string_read(
 
         if(arg_type.id()!=ID_pointer)
         {
-          index_exprt index;
-          index.array()=temp;
-          index.index()=from_integer(0, index_type());
-          index.type()=arg_type.subtype();
+          index_exprt index(temp, from_integer(0, index_type()));
           temp=address_of_exprt(index);
         }
 
@@ -911,10 +905,8 @@ void string_instrumentationt::invalidate_buffer(
     bufp=buffer;
   else
   {
-    index_exprt index;
-    index.array()=buffer;
-    index.index()=from_integer(0, index_type());
-    index.type()=buf_type.subtype();
+    index_exprt index(
+      buffer, from_integer(0, index_type()), buf_type.subtype());
     bufp=address_of_exprt(index);
   }
 

@@ -188,9 +188,8 @@ void goto_symext::symex_allocate(
   if(object_type.id()==ID_array)
   {
     const auto &array_type = to_array_type(object_type);
-    index_exprt index_expr(array_type.subtype());
-    index_expr.array()=value_symbol.symbol_expr();
-    index_expr.index()=from_integer(0, index_type());
+    index_exprt index_expr(
+      value_symbol.symbol_expr(), from_integer(0, index_type()));
     rhs = address_of_exprt(index_expr, pointer_type(array_type.subtype()));
   }
   else
