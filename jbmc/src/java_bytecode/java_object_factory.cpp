@@ -100,7 +100,6 @@ public:
     code_blockt &assignments,
     const exprt &expr,
     size_t depth,
-    update_in_placet,
     const source_locationt &location);
 
   void gen_nondet_enum_init(
@@ -180,7 +179,6 @@ private:
     const typet &element_type,
     const exprt &max_length_expr,
     size_t depth,
-    update_in_placet update_in_place,
     const source_locationt &location);
 };
 
@@ -247,15 +245,14 @@ void java_object_factoryt::gen_pointer_target_init(
   const source_locationt &location)
 {
   PRECONDITION(expr.type().id() == ID_pointer);
-  PRECONDITION(update_in_place != update_in_placet::MAY_UPDATE_IN_PLACE);
+  PRECONDITION(update_in_place == update_in_placet::NO_UPDATE_IN_PLACE);
 
   if(target_type.id() == ID_struct)
   {
     const auto &target_class_type = to_java_class_type(target_type);
     if(has_prefix(id2string(target_class_type.get_tag()), "java::array["))
     {
-      gen_nondet_array_init(
-        assignments, expr, depth + 1, update_in_place, location);
+      gen_nondet_array_init(assignments, expr, depth + 1, location);
       return;
     }
     if(target_class_type.get_base("java::java.lang.Enum"))
@@ -1285,11 +1282,6 @@ void java_object_factoryt::array_primitive_init_code(
 /// \param max_length_expr : max length, as specified by max-nondet-array-length
 /// \param depth: Number of times that a pointer has been dereferenced from the
 ///   root of the object tree that we are initializing.
-/// \param update_in_place:
-///   NO_UPDATE_IN_PLACE: initialize `expr` from scratch
-///   MAY_UPDATE_IN_PLACE: generate a runtime nondet branch between the NO_
-///   and MUST_ cases.
-///   MUST_UPDATE_IN_PLACE: reinitialize an existing object
 /// \param location: Source location associated with nondet-initialization.
 void java_object_factoryt::array_loop_init_code(
   code_blockt &assignments,
@@ -1298,7 +1290,6 @@ void java_object_factoryt::array_loop_init_code(
   const typet &element_type,
   const exprt &max_length_expr,
   size_t depth,
-  update_in_placet update_in_place,
   const source_locationt &location)
 {
   const symbol_exprt &array_init_symexpr =
@@ -1333,27 +1324,17 @@ void java_object_factoryt::array_loop_init_code(
 
   assignments.add(std::move(done_test));
 
-  if(update_in_place!=update_in_placet::MUST_UPDATE_IN_PLACE)
-  {
-    // Add a redundant if(counter == max_length) break
-    // that is easier for the unwinder to understand.
-    code_ifthenelset max_test(
-      equal_exprt(counter_expr, max_length_expr), std::move(goto_done));
+  // Add a redundant if(counter == max_length) break
+  // that is easier for the unwinder to understand.
+  code_ifthenelset max_test(
+    equal_exprt(counter_expr, max_length_expr), std::move(goto_done));
 
-    assignments.add(std::move(max_test));
-  }
+  assignments.add(std::move(max_test));
 
   const dereference_exprt arraycellref(
     plus_exprt(array_init_symexpr, counter_expr, array_init_symexpr.type()),
     array_init_symexpr.type().subtype());
 
-  // MUST_UPDATE_IN_PLACE only applies to this object.
-  // If this is a pointer to another object, offer the chance
-  // to leave it alone by setting MAY_UPDATE_IN_PLACE instead.
-  update_in_placet child_update_in_place=
-    update_in_place==update_in_placet::MUST_UPDATE_IN_PLACE ?
-    update_in_placet::MAY_UPDATE_IN_PLACE :
-    update_in_place;
   gen_nondet_init(
     assignments,
     arraycellref,
@@ -1364,7 +1345,7 @@ void java_object_factoryt::array_loop_init_code(
     lifetimet::DYNAMIC,
     element_type, // override
     depth,
-    child_update_in_place,
+    update_in_placet::NO_UPDATE_IN_PLACE,
     location);
 
   exprt java_one=from_integer(1, java_int_type());
@@ -1385,12 +1366,10 @@ void java_object_factoryt::gen_nondet_array_init(
   code_blockt &assignments,
   const exprt &expr,
   size_t depth,
-  update_in_placet update_in_place,
   const source_locationt &location)
 {
   PRECONDITION(expr.type().id() == ID_pointer);
   PRECONDITION(expr.type().subtype().id() == ID_struct_tag);
-  PRECONDITION(update_in_place != update_in_placet::MAY_UPDATE_IN_PLACE);
 
   const typet &type = ns.follow(expr.type().subtype());
   const struct_typet &struct_type = to_struct_type(type);
@@ -1400,16 +1379,8 @@ void java_object_factoryt::gen_nondet_array_init(
   auto max_length_expr = from_integer(
     object_factory_parameters.max_nondet_array_length, java_int_type());
 
-  // In NO_UPDATE_IN_PLACE mode we allocate a new array and recursively
-  // initialize its elements
-  if(update_in_place == update_in_placet::NO_UPDATE_IN_PLACE)
-  {
-    allocate_nondet_length_array(
-      assignments, expr, max_length_expr, element_type, location);
-  }
-
-  // Otherwise we're updating the array in place, and use the
-  // existing array allocation and length.
+  allocate_nondet_length_array(
+    assignments, expr, max_length_expr, element_type, location);
 
   INVARIANT(
     is_valid_java_array(struct_type),
@@ -1435,7 +1406,6 @@ void java_object_factoryt::gen_nondet_array_init(
       element_type,
       max_length_expr,
       depth,
-      update_in_place,
       location);
   }
   else
