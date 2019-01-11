@@ -102,18 +102,6 @@ public:
 class symbol_exprt : public nullary_exprt
 {
 public:
-  DEPRECATED(SINCE(2018, 9, 21, "use symbol_exprt(identifier, type) instead"))
-  symbol_exprt() : nullary_exprt(ID_symbol)
-  {
-  }
-
-  /// \param identifier: Name of symbol
-  DEPRECATED(SINCE(2018, 9, 21, "use symbol_exprt(identifier, type) instead"))
-  explicit symbol_exprt(const irep_idt &identifier) : nullary_exprt(ID_symbol)
-  {
-    set_identifier(identifier);
-  }
-
   /// \param type: Type of symbol
   explicit symbol_exprt(typet type) : nullary_exprt(ID_symbol, std::move(type))
   {
@@ -152,28 +140,6 @@ public:
 class decorated_symbol_exprt:public symbol_exprt
 {
 public:
-  DEPRECATED(
-    SINCE(2018, 9, 21, "use decorated_symbol_exprt(identifier, type) instead"))
-  decorated_symbol_exprt()
-  {
-  }
-
-  /// \param identifier: Name of symbol
-  DEPRECATED(
-    SINCE(2018, 9, 21, "use decorated_symbol_exprt(identifier, type) instead"))
-  explicit decorated_symbol_exprt(const irep_idt &identifier):
-    symbol_exprt(identifier)
-  {
-  }
-
-  /// \param type: Type of symbol
-  DEPRECATED(
-    SINCE(2018, 9, 21, "use decorated_symbol_exprt(identifier, type) instead"))
-  explicit decorated_symbol_exprt(const typet &type):
-    symbol_exprt(type)
-  {
-  }
-
   /// \param identifier: Name of symbol
   /// \param type: Type of symbol
   decorated_symbol_exprt(const irep_idt &identifier, typet type)
