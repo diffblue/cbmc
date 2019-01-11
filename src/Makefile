@@ -45,7 +45,7 @@ languages: util.dir langapi.dir \
            cpp.dir ansi-c.dir xmllang.dir assembler.dir \
            jsil.dir json.dir json-symtab-language.dir
 
-solvers.dir: util.dir langapi.dir
+solvers.dir: util.dir
 
 goto-instrument.dir: languages goto-programs.dir pointer-analysis.dir \
                      goto-symex.dir linking.dir analyses.dir solvers.dir

@@ -13,8 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/expr_util.h>
 #include <util/arith_tools.h>
 
-#include <langapi/language_util.h>
-
 #include <solvers/refinement/string_refinement_invariant.h>
 #include <solvers/floatbv/float_utils.h>
 
@@ -527,9 +525,5 @@ bv_refinementt::add_approximation(
 
 std::string bv_refinementt::approximationt::as_string() const
 {
-  #if 0
-  return from_expr(expr);
-  #else
   return std::to_string(id_nr)+"/"+id2string(expr.id());
-  #endif
 }
