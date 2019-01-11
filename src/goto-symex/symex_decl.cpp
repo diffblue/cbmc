@@ -46,7 +46,7 @@ void goto_symext::symex_decl(statet &state, const symbol_exprt &expr)
   ssa.update_type();
 
   // in case of pointers, put something into the value set
-  if(ns.follow(expr.type()).id()==ID_pointer)
+  if(expr.type().id() == ID_pointer)
   {
     exprt failed=
       get_failed_symbol(expr, ns);

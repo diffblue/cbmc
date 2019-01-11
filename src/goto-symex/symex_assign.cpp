@@ -307,7 +307,7 @@ void goto_symext::symex_assign_array(
 {
   const exprt &lhs_array=lhs.array();
   const exprt &lhs_index=lhs.index();
-  const typet &lhs_index_type = ns.follow(lhs_array.type());
+  const typet &lhs_index_type = lhs_array.type();
 
   PRECONDITION(lhs_index_type.id() == ID_array);
 
@@ -371,9 +371,8 @@ void goto_symext::symex_assign_struct_member(
     {
       // remove the type cast, we assume that the member is there
       exprt tmp = to_typecast_expr(lhs_struct).op();
-      const typet &op0_type=ns.follow(tmp.type());
 
-      if(op0_type.id()==ID_struct)
+      if(tmp.type().id() == ID_struct || tmp.type().id() == ID_struct_tag)
         lhs_struct=tmp;
       else
         return; // ignore and give up
