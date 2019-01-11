@@ -272,8 +272,7 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
   const exprt &what,
   const exprt &pointer_expr)
 {
-  const typet &dereference_type=
-    ns.follow(pointer_expr.type()).subtype();
+  const typet &dereference_type = pointer_expr.type().subtype();
 
   if(what.id()==ID_unknown ||
      what.id()==ID_invalid)
@@ -334,9 +333,7 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
     const symbolt &memory_symbol=ns.lookup(CPROVER_PREFIX "memory");
     const symbol_exprt symbol_expr(memory_symbol.name, memory_symbol.type);
 
-    if(base_type_eq(
-         ns.follow(memory_symbol.type).subtype(),
-         dereference_type, ns))
+    if(base_type_eq(memory_symbol.type.subtype(), dereference_type, ns))
     {
       // Types match already, what a coincidence!
       // We can use an index expression.
@@ -344,18 +341,17 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
       const index_exprt index_expr(
         symbol_expr,
         pointer_offset(pointer_expr),
-        ns.follow(memory_symbol.type).subtype());
+        memory_symbol.type.subtype());
 
       result.value=index_expr;
     }
     else if(dereference_type_compare(
-              ns.follow(memory_symbol.type).subtype(),
-              dereference_type))
+              memory_symbol.type.subtype(), dereference_type))
     {
       const index_exprt index_expr(
         symbol_expr,
         pointer_offset(pointer_expr),
-        ns.follow(memory_symbol.type).subtype());
+        memory_symbol.type.subtype());
       result.value=typecast_exprt(index_expr, dereference_type);
     }
     else
@@ -592,10 +588,10 @@ bool value_set_dereferencet::memory_model_bytes(
   auto to_type_size = pointer_offset_size(to_type, ns);
 
   if(
-    ns.follow(from_type).id() == ID_array &&
-    from_type_subtype_size.has_value() && *from_type_subtype_size == 1 &&
-    to_type_size.has_value() && *to_type_size == 1 &&
-    is_a_bv_type(ns.follow(from_type).subtype()) && is_a_bv_type(to_type))
+    from_type.id() == ID_array && from_type_subtype_size.has_value() &&
+    *from_type_subtype_size == 1 && to_type_size.has_value() &&
+    *to_type_size == 1 && is_a_bv_type(ns.follow(from_type).subtype()) &&
+    is_a_bv_type(to_type))
   {
     // yes, can use 'index'
     result=index_exprt(value, offset, ns.follow(from_type).subtype());

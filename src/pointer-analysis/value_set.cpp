@@ -48,7 +48,7 @@ bool value_sett::field_sensitive(
     return true;
 
   // otherwise it has to be a struct
-  return ns.follow(type).id()==ID_struct;
+  return type.id() == ID_struct || type.id() == ID_struct_tag;
 }
 
 const value_sett::entryt *value_sett::find_entry(const value_sett::idt &id)
@@ -397,7 +397,7 @@ void value_sett::get_value_set_rec(
   {
     assert(expr.operands().size()==2);
 
-    const typet &type=ns.follow(expr.op0().type());
+    const typet &type = expr.op0().type();
 
     DATA_INVARIANT(
       type.id() == ID_array, "operand 0 of index expression must be an array");
@@ -548,7 +548,7 @@ void value_sett::get_value_set_rec(
 
     // let's see what gets converted to what
 
-    const typet &op_type=ns.follow(expr.op0().type());
+    const typet &op_type = expr.op0().type();
 
     if(op_type.id()==ID_pointer)
     {
@@ -1033,7 +1033,7 @@ void value_sett::get_reference_set_rec(
     const index_exprt &index_expr=to_index_expr(expr);
     const exprt &array=index_expr.array();
     const exprt &offset=index_expr.index();
-    const typet &array_type=ns.follow(array.type());
+    const typet &array_type = array.type();
 
     DATA_INVARIANT(
       array_type.id() == ID_array, "index takes array-typed operand");
@@ -1340,7 +1340,7 @@ void value_sett::assign_rec(
     if(lhs.operands().size()!=2)
       throw "index expected to have two operands";
 
-    const typet &type=ns.follow(lhs.op0().type());
+    const typet &type = lhs.op0().type();
 
     DATA_INVARIANT(
       type.id() == ID_array, "operand 0 of index expression must be an array");
@@ -1493,11 +1493,11 @@ void value_sett::apply_code_rec(
     if(lhs.id()!=ID_symbol)
       throw "decl expected to have symbol on lhs";
 
-    const typet &lhs_type=ns.follow(lhs.type());
+    const typet &lhs_type = lhs.type();
 
-    if(lhs_type.id()==ID_pointer ||
-       (lhs_type.id()==ID_array &&
-        ns.follow(lhs_type.subtype()).id()==ID_pointer))
+    if(
+      lhs_type.id() == ID_pointer ||
+      (lhs_type.id() == ID_array && lhs_type.subtype().id() == ID_pointer))
     {
       // assign the address of the failed object
       exprt failed=get_failed_symbol(to_symbol_expr(lhs), ns);

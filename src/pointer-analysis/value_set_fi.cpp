@@ -407,7 +407,7 @@ void value_set_fit::get_value_set_rec(
   {
     assert(expr.operands().size()==2);
 
-    const typet &type=ns.follow(expr.op0().type());
+    const typet &type = expr.op0().type();
 
     DATA_INVARIANT(type.id()==ID_array ||
                    type.id()=="#REF#",
@@ -852,7 +852,7 @@ void value_set_fit::get_reference_set_sharing_rec(
 
     const exprt &array=expr.op0();
     const exprt &offset=expr.op1();
-    const typet &array_type=ns.follow(array.type());
+    const typet &array_type = array.type();
 
     DATA_INVARIANT(
       array_type.id() == ID_array, "index takes array-typed operand");
@@ -874,8 +874,7 @@ void value_set_fit::get_reference_set_sharing_rec(
           object, from_integer(0, index_type()), expr.type());
 
         // adjust type?
-        if(object.type().id()!="#REF#" &&
-           ns.follow(object.type())!=array_type)
+        if(object.type().id() != "#REF#" && object.type() != array_type)
           index_expr.make_typecast(array.type());
 
         offsett o = a_it->second;
@@ -1197,7 +1196,7 @@ void value_set_fit::assign_rec(
     if(lhs.operands().size()!=2)
       throw "index expected to have two operands";
 
-    const typet &type=ns.follow(lhs.op0().type());
+    const typet &type = lhs.op0().type();
 
     DATA_INVARIANT(type.id()==ID_array ||
                    type.id()=="#REF#",
