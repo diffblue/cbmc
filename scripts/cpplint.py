@@ -52,6 +52,7 @@ import sre_compile
 import string
 import sys
 import unicodedata
+import itertools
 
 
 _USAGE = """
@@ -252,6 +253,7 @@ _ERROR_CATEGORIES = [
     'runtime/string',
     'runtime/threadsafe_fn',
     'runtime/vlog',
+    'runtime/catch_test_tags',
     'whitespace/blank_line',
     'whitespace/braces',
     'whitespace/comma',
@@ -1744,6 +1746,9 @@ def CloseExpression(clean_lines, linenum, pos):
   Ideally we would want to index all opening and closing parentheses once
   and have CloseExpression be just a simple lookup, but due to preprocessor
   tricks, this is not so easy.
+
+  Note this operates on the *elided lines* - the position will be wrong if you
+  want strings (or comments) to be included.
 
   Args:
     clean_lines: A CleansedLines instance containing the file.
@@ -6118,6 +6123,50 @@ def CheckMakePairUsesDeduction(filename, clean_lines, linenum, error):
           'For C++11-compatibility, omit template arguments from make_pair'
           ' OR use pair directly OR if appropriate, construct a pair directly')
 
+def AssembleString(clean_lines, start_lineno, start_linepos, end_lineno, end_linepos):
+    """
+    Concatenates all the strings between the starting line position and
+    the ending line position.
+
+    Note: this operated on the elided (no strings and comments) view of the
+    code.
+
+    Args:
+        clean_lines: All the lines
+        start_lineno: The starting line number
+        start_linepos: The index of the first character to include
+        end_lineno: The last line
+        end_linepos: The index of the first character not to include
+    """
+    if end_lineno < start_lineno:
+        return ''
+
+    if start_lineno == end_lineno:
+        return clean_lines.elided[start_lineno][start_linepos : end_linepos]
+
+    full_string = clean_lines.elided[start_lineno][start_linepos:]
+    for line in itertools.islice(clean_lines.elided, start_lineno + 1, end_lineno):
+        full_string += line
+    full_string += clean_lines.elided[end_lineno][:end_linepos]
+    return full_string
+
+def CheckCatchTestHasTags(filename, clean_lines, linenum, error):
+    line = clean_lines.elided[linenum]
+    test = Match(r'^(SCENARIO|TEST_CASE)\(', line)
+    if not test: return
+
+    closing_line, closing_linenum, closing_pos = CloseExpression(clean_lines, linenum, line.find('('))
+
+    if closing_pos == -1:
+        error(filename, linenum,
+            'runtime/catch_test_tags', 4, "Can't find closing bracket for catch test")
+
+    full_string = AssembleString(
+        clean_lines, linenum, line.find('(') + 1, closing_linenum, closing_pos - 1)
+
+    if(full_string.find(',') == -1):
+        error(filename, linenum,
+            'runtime/catch_test_tags', 4, "Can't find `,\' seperating test name and the tags: " + str(clean_lines.lines[linenum]))
 
 def CheckRedundantVirtual(filename, clean_lines, linenum, error):
   """Check if line contains a redundant "virtual" function-specifier.
@@ -6312,6 +6361,7 @@ def ProcessLine(filename, file_extension, clean_lines, line,
   CheckInvalidIncrement(filename, clean_lines, line, error)
   CheckMakePairUsesDeduction(filename, clean_lines, line, error)
   CheckRedundantVirtual(filename, clean_lines, line, error)
+  CheckCatchTestHasTags(filename, clean_lines, line, error)
   CheckNamespaceOrUsing(filename, clean_lines, line, error)
   CheckForEndl(filename, clean_lines, line, error)
   for check_fn in extra_check_functions:
