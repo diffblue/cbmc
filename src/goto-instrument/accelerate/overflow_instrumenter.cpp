@@ -100,7 +100,7 @@ void overflow_instrumentert::overflow_expr(
     overflow_expr(*it, cases);
   }
 
-  const typet &type=ns.follow(expr.type());
+  const typet &type = expr.type();
 
   if(expr.id()==ID_typecast)
   {
@@ -109,7 +109,7 @@ void overflow_instrumentert::overflow_expr(
       return;
     }
 
-    const typet &old_type=ns.follow(expr.op0().type());
+    const typet &old_type = expr.op0().type();
     const std::size_t new_width = to_bitvector_type(expr.type()).get_width();
     const std::size_t old_width = to_bitvector_type(old_type).get_width();
 
