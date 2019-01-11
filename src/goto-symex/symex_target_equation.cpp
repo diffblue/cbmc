@@ -659,6 +659,9 @@ void symex_target_equationt::convert_io(
     }
 }
 
+/// Merging causes identical ireps to be shared.
+/// This is only enabled if the definition SHARING is defined.
+/// \param SSA_step The step you want to have shared values.
 void symex_target_equationt::merge_ireps(SSA_stept &SSA_step)
 {
   merge_irep(SSA_step.guard);

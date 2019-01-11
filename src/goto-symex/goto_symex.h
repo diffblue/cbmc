@@ -473,6 +473,11 @@ public:
   }
 };
 
+/// Transition to the next instruction, which increments the internal program
+/// counter and initializes the loop counter when it detects a loop (or
+/// recursion) being entered. 'Next instruction' in this situation refers
+/// to the next one in program order, so it ignores things like unconditional
+/// GOTOs, and only goes until the end of the current function.
 void symex_transition(goto_symext::statet &state);
 
 void symex_transition(

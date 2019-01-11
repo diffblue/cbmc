@@ -30,7 +30,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "renaming_level.h"
 #include "symex_target_equation.h"
 
-// central data structure: state
+/// Central data structure: state.
+
+/// The state is a persistent data structure that symex maintains as it
+/// executes. As we walk over each instruction, state will be updated reflecting
+/// their effects until a branch occurs (such as an if), where parts of the
+/// state will be copied into a \ref goto_statet, stored in a map for later
+/// reference and then merged again (via merge_goto) once it reaches a
+/// control-flow graph convergence.
 class goto_symex_statet final
 {
 public:
@@ -54,6 +61,11 @@ public:
   /// distance from entry
   unsigned depth;
 
+  // A guard is a particular condition that has to pass for an instruction
+  // to be executed. The easiest example is an if/else: each instruction along
+  // the if branch will be guarded by the condition of the if (and if there
+  // is an else branch then instructions on it will be guarded by the negation
+  // of the condition of the if).
   guardt guard{true_exprt{}};
   symex_targett::sourcet source;
   symex_target_equationt *symex_target;
@@ -65,13 +77,43 @@ public:
   symex_level1t level1;
   symex_level2t level2;
 
-  // Map L1 names to (L2) constants
+  // Map L1 names to (L2) constants. Values will be evicted from this map
+  // when they become non-constant. This is used to propagate values that have
+  // been worked out to only have one possible value.
+  //
+  // "constants" can include symbols, but only in the context of an address-of
+  // op (i.e. &x can be propagated), and an address-taken thing should only be
+  // L1.
   std::map<irep_idt, exprt> propagation;
   void output_propagation_map(std::ostream &);
 
+  // Symex renaming levels.
   enum levelt { L0=0, L1=1, L2=2 };
 
-  // performs renaming _up to_ the given level
+  /// Rewrites symbol expressions in \ref exprt, applying a suffix to each
+  /// symbol reflecting its most recent version, which differs depending on
+  /// which level you requested. Each level also updates its predecessors, so
+  /// a L1 rename will update L1 and L0. A L2 will update L2, L1 and L0.
+  ///
+  /// What happens at each level:
+  ///     L0. Applies a suffix giving the current thread number. (Excludes
+  ///         guards, dynamic objects and anything not considered thread-local)
+  ///     L1. Applies a suffix giving the current loop iteration or recursive
+  ///         function invocation.
+  ///     L2. Applies a suffix giving the generation of this variable.
+  ///
+  /// Renaming will not increment any of these values, just update the
+  /// expression with them. Levels matter when reading a variable, for
+  /// example: reading the value of x really means reading the particular x
+  /// symbol for this thread (L0 renaming, if applicable), the most recent
+  /// instance of x (L1 renaming), and the most recent write to x (L2 renaming).
+  ///
+  /// The above example after being renamed could look like this: 'x!0@0#42'.
+  /// That states it's the 42nd generation of this variable, on the first
+  /// thread, in the first frame.
+  ///
+  /// A full explanation of SSA (which is why we do this renaming) is in
+  /// the SSA section of background-concepts.md.
   void rename(exprt &expr, const namespacet &ns, levelt level=L2);
   void rename(
     typet &type,
@@ -93,8 +135,13 @@ public:
 protected:
   void rename_address(exprt &expr, const namespacet &ns, levelt level);
 
+  /// Update level 0 values.
   void set_l0_indices(ssa_exprt &expr, const namespacet &ns);
+
+  /// Update level 0 and 1 values.
   void set_l1_indices(ssa_exprt &expr, const namespacet &ns);
+
+  /// Update level 0, 1 and 2 values.
   void set_l2_indices(ssa_exprt &expr, const namespacet &ns);
 
   // this maps L1 names to (L2) types
@@ -108,6 +155,10 @@ public:
   // do dereferencing
   value_sett value_set;
 
+  /// Container for data that varies per program point, e.g. the constant
+  /// propagator state, when state needs to branch. This is copied out of
+  /// goto_symex_statet at a control-flow fork and then back into it at a
+  /// control-flow merge.
   class goto_statet
   {
   public:
@@ -266,6 +317,9 @@ public:
   bool l2_thread_write_encoding(const ssa_exprt &expr, const namespacet &ns);
 
   bool record_events;
+
+  // Local variables are considered 'dirty' if they've had an address taken and
+  // therefore may be referred to by a pointer.
   incremental_dirtyt dirty;
 
   goto_programt::const_targett saved_target;
