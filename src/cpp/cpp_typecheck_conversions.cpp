@@ -931,12 +931,6 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
     }
     else
     {
-      struct_typet from_struct;
-      from_struct.make_nil();
-
-      if(from.id()==ID_struct)
-        from_struct=to_struct_type(from);
-
       bool found=false;
 
       for(const auto &component : to_struct_type(to).components())
@@ -971,16 +965,8 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
           arg1_type.swap(tmp);
         }
 
-        struct_typet arg1_struct;
-        arg1_struct.make_nil();
-        {
-          typet tmp=follow(arg1_type);
-          if(tmp.id()==ID_struct)
-            arg1_struct=to_struct_type(tmp);
-        }
-
         unsigned tmp_rank=0;
-        if(arg1_struct.is_nil())
+        if(arg1_type.id() != ID_struct_tag)
         {
             exprt tmp_expr;
             if(standard_conversion_sequence(
@@ -1020,7 +1006,7 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
               rank += tmp_rank;
             }
           }
-          else if(from_struct.is_not_nil() && arg1_struct.is_not_nil())
+          else if(from.id() == ID_struct && arg1_type.id() == ID_struct_tag)
           {
             // try derived-to-base conversion
             address_of_exprt expr_pfrom(expr, pointer_type(expr.type()));
@@ -1389,7 +1375,7 @@ bool cpp_typecheckt::reference_binding(
 
   exprt arg_expr=expr;
 
-  if(follow(arg_expr.type()).id()==ID_struct)
+  if(arg_expr.type().id() == ID_struct_tag)
   {
     // required to initialize the temporary
     arg_expr.set(ID_C_lvalue, true);
@@ -1730,7 +1716,7 @@ bool cpp_typecheckt::dynamic_typecast(
 
   if(is_reference(type))
   {
-    if(follow(type.subtype()).id() != ID_struct)
+    if(type.subtype().id() != ID_struct_tag)
       return false;
   }
   else if(type.id()==ID_pointer)
@@ -1744,7 +1730,7 @@ bool cpp_typecheckt::dynamic_typecast(
         return false;
       UNREACHABLE; // currently not supported
     }
-    else if(follow(type.subtype()).id()==ID_struct)
+    else if(type.subtype().id() == ID_struct_tag)
     {
       if(e.get_bool(ID_C_lvalue))
       {

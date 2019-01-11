@@ -1841,29 +1841,20 @@ void cpp_typecheck_resolvet::guess_template_args(
   }
   else if(template_type.id()==ID_pointer)
   {
-    const typet &desired_type_followed=
-      cpp_typecheck.follow(desired_type);
-
-    if(desired_type_followed.id()==ID_pointer)
-      guess_template_args(
-        template_type.subtype(), desired_type_followed.subtype());
+    if(desired_type.id() == ID_pointer)
+      guess_template_args(template_type.subtype(), desired_type.subtype());
   }
   else if(template_type.id()==ID_array)
   {
-    const typet &desired_type_followed=
-      cpp_typecheck.follow(desired_type);
-
-    if(desired_type_followed.id()==ID_array)
+    if(desired_type.id() == ID_array)
     {
       // look at subtype first
-      guess_template_args(
-        template_type.subtype(),
-        desired_type_followed.subtype());
+      guess_template_args(template_type.subtype(), desired_type.subtype());
 
       // size (e.g., buffer size guessing)
       guess_template_args(
         to_array_type(template_type).size(),
-        to_array_type(desired_type_followed).size());
+        to_array_type(desired_type).size());
     }
   }
 }

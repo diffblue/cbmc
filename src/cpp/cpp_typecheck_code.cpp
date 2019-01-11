@@ -374,7 +374,7 @@ void cpp_typecheckt::typecheck_decl(codet &code)
   if(declaration.declarators().empty() &&
      follow(type).get_bool(ID_C_is_anonymous))
   {
-    if(follow(type).id()!=ID_union)
+    if(type.id() != ID_union_tag)
     {
       error().source_location=code.find_source_location();
       error() << "declaration statement does not declare anything"
