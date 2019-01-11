@@ -261,7 +261,7 @@ bool generate_ansi_c_start_function(
       {
         symbolt argc_symbol;
 
-        argc_symbol.base_name = "argc";
+        argc_symbol.base_name = "argc'";
         argc_symbol.name = "argc'";
         argc_symbol.type = signed_int_type();
         argc_symbol.is_static_lifetime = true;
