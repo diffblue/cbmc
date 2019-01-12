@@ -57,7 +57,7 @@ void goto_symext::initialize_auto_object(
   else if(type.id()==ID_pointer)
   {
     const pointer_typet &pointer_type=to_pointer_type(type);
-    const typet &subtype = ns.follow(pointer_type.subtype());
+    const typet &subtype = pointer_type.subtype();
 
     // we don't like function pointers and
     // we don't like void *

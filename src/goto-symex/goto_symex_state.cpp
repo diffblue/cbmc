@@ -321,7 +321,7 @@ void goto_symex_statet::rename(
   else if(expr.id()==ID_symbol)
   {
     // we never rename function symbols
-    if(ns.follow(expr.type()).id()==ID_code)
+    if(expr.type().id() == ID_code)
     {
       rename(
         expr.type(),

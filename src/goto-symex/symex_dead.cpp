@@ -30,7 +30,7 @@ void goto_symext::symex_dead(statet &state)
   state.rename(ssa, ns, goto_symex_statet::L1);
 
   // in case of pointers, put something into the value set
-  if(ns.follow(code.symbol().type()).id() == ID_pointer)
+  if(code.symbol().type().id() == ID_pointer)
   {
     exprt failed = get_failed_symbol(to_symbol_expr(code.symbol()), ns);
 
