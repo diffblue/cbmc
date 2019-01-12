@@ -46,10 +46,7 @@ void goto_symext::initialize_auto_object(
 
     for(const auto &comp : struct_type.components())
     {
-      member_exprt member_expr;
-      member_expr.struct_op()=expr;
-      member_expr.set_component_name(comp.get_name());
-      member_expr.type()=comp.type();
+      member_exprt member_expr(expr, comp.get_name(), comp.type());
 
       initialize_auto_object(member_expr, state);
     }
