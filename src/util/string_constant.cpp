@@ -13,7 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "std_expr.h"
 
 string_constantt::string_constantt(const irep_idt &_value)
-  : nullary_exprt(ID_string_constant)
+  : nullary_exprt(ID_string_constant, typet())
 {
   set_value(_value);
 }

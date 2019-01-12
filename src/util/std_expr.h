@@ -2135,10 +2135,9 @@ class namespacet;
 class object_descriptor_exprt:public binary_exprt
 {
 public:
-  object_descriptor_exprt():binary_exprt(ID_object_descriptor)
+  object_descriptor_exprt()
+    : binary_exprt(exprt(ID_unknown), ID_object_descriptor, exprt(ID_unknown))
   {
-    op0().id(ID_unknown);
-    op1().id(ID_unknown);
   }
 
   void build(const exprt &expr, const namespacet &ns);
@@ -2207,17 +2206,18 @@ inline void validate_expr(const object_descriptor_exprt &value)
 class dynamic_object_exprt:public binary_exprt
 {
 public:
-  dynamic_object_exprt():binary_exprt(ID_dynamic_object)
+  dynamic_object_exprt()
+    : binary_exprt(exprt(ID_unknown), ID_dynamic_object, exprt(ID_unknown))
   {
-    op0().id(ID_unknown);
-    op1().id(ID_unknown);
   }
 
-  explicit dynamic_object_exprt(const typet &type):
-    binary_exprt(ID_dynamic_object, type)
+  explicit dynamic_object_exprt(const typet &type)
+    : binary_exprt(
+        exprt(ID_unknown),
+        ID_dynamic_object,
+        exprt(ID_unknown),
+        type)
   {
-    op0().id(ID_unknown);
-    op1().id(ID_unknown);
   }
 
   void set_instance(unsigned int instance);
@@ -2417,25 +2417,18 @@ public:
   {
   }
 
-  and_exprt(const exprt &op0, const exprt &op1, const exprt &op2):
-    multi_ary_exprt(ID_and, bool_typet())
+  and_exprt(const exprt &op0, const exprt &op1, const exprt &op2)
+    : multi_ary_exprt(ID_and, {op0, op1, op2}, bool_typet())
   {
-    add_to_operands(op0, op1, op2);
   }
 
   and_exprt(
     const exprt &op0,
     const exprt &op1,
     const exprt &op2,
-    const exprt &op3):
-    multi_ary_exprt(ID_and, bool_typet())
+    const exprt &op3)
+    : multi_ary_exprt(ID_and, {op0, op1, op2, op3}, bool_typet())
   {
-    exprt::operandst &op=operands();
-    op.resize(4);
-    op[0]=op0;
-    op[1]=op1;
-    op[2]=op2;
-    op[3]=op3;
   }
 };
 
@@ -2539,25 +2532,18 @@ public:
   {
   }
 
-  or_exprt(const exprt &op0, const exprt &op1, const exprt &op2):
-    multi_ary_exprt(ID_or, bool_typet())
+  or_exprt(const exprt &op0, const exprt &op1, const exprt &op2)
+    : multi_ary_exprt(ID_or, {op0, op1, op2}, bool_typet())
   {
-    add_to_operands(op0, op1, op2);
   }
 
   or_exprt(
     const exprt &op0,
     const exprt &op1,
     const exprt &op2,
-    const exprt &op3):
-    multi_ary_exprt(ID_or, bool_typet())
+    const exprt &op3)
+    : multi_ary_exprt(ID_or, {op0, op1, op2, op3}, bool_typet())
   {
-    exprt::operandst &op=operands();
-    op.resize(4);
-    op[0]=op0;
-    op[1]=op1;
-    op[2]=op2;
-    op[3]=op3;
   }
 };
 
@@ -2706,10 +2692,9 @@ public:
   {
   }
 
-  bitor_exprt(const exprt &_op0, const exprt &_op1):
-    multi_ary_exprt(ID_bitor, _op0.type())
+  bitor_exprt(const exprt &_op0, const exprt &_op1)
+    : multi_ary_exprt(_op0, ID_bitor, _op1, _op0.type())
   {
-    add_to_operands(_op0, _op1);
   }
 };
 
@@ -2815,10 +2800,9 @@ public:
   {
   }
 
-  bitand_exprt(const exprt &_op0, const exprt &_op1):
-    multi_ary_exprt(ID_bitand, _op0.type())
+  bitand_exprt(const exprt &_op0, const exprt &_op1)
+    : multi_ary_exprt(_op0, ID_bitand, _op1, _op0.type())
   {
-    add_to_operands(_op0, _op1);
   }
 };
 
@@ -4508,9 +4492,8 @@ public:
     const symbol_exprt &_function,
     const argumentst &_arguments,
     const typet &_type)
-    : binary_exprt(ID_function_application, _type)
+    : binary_exprt(_function, ID_function_application, exprt(), _type)
   {
-    function()=_function;
     arguments() = _arguments;
   }
 
