@@ -49,7 +49,7 @@ static array_exprt utf16_to_array(const std::wstring &in)
 {
   const auto jchar=java_char_type();
   array_exprt ret(
-    array_typet(jchar, from_integer(in.length(), java_int_type())));
+    {}, array_typet(jchar, from_integer(in.length(), java_int_type())));
   for(const auto c : in)
     ret.copy_to_operands(from_integer(c, jchar));
   return ret;

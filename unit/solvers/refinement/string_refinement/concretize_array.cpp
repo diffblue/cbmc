@@ -48,9 +48,9 @@ SCENARIO("concretize_array_expression",
   const exprt concrete = sparse_array.concretize(7, int_type);
 
   // Assert
-  array_exprt expected(array_type);
   // The expected result is `{ 'x', 'x', 'y', 'y', 'y', 'z', 'z' }`
-  expected.operands() = {charx, charx, chary, chary, chary, charz, charz};
+  array_exprt expected(
+    {charx, charx, chary, chary, chary, charz, charz}, array_type);
   to_array_type(expected.type()).size() = from_integer(7, int_type);
   REQUIRE(concrete==expected);
 }

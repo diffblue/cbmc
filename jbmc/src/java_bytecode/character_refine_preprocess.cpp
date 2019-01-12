@@ -1187,13 +1187,13 @@ exprt character_refine_preprocesst::expr_of_to_chars(
 {
   array_typet array_type=to_array_type(type);
   const typet &char_type=array_type.subtype();
-  array_exprt case1(array_type);
-  array_exprt case2(array_type);
   exprt low_surrogate=expr_of_low_surrogate(chr, char_type);
-  case1.copy_to_operands(low_surrogate);
-  case2.add_to_operands(
-    std::move(low_surrogate), expr_of_high_surrogate(chr, char_type));
-  return if_exprt(expr_of_is_bmp_code_point(chr, type), case1, case2);
+  array_exprt case1({low_surrogate}, array_type);
+  exprt high_surrogate = expr_of_high_surrogate(chr, char_type);
+  array_exprt case2(
+    {std::move(low_surrogate), std::move(high_surrogate)}, array_type);
+  return if_exprt(
+    expr_of_is_bmp_code_point(chr, type), std::move(case1), std::move(case2));
 }
 
 /// Converts function call to an assignment of an expression corresponding to

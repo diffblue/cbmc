@@ -1540,7 +1540,7 @@ exprt simplify_exprt::bits2expr(
 
     const std::size_t el_size = numeric_cast_v<std::size_t>(*el_size_opt);
 
-    array_exprt result(array_type);
+    array_exprt result({}, array_type);
     result.reserve_operands(n_el);
 
     for(std::size_t i=0; i<n_el; ++i)

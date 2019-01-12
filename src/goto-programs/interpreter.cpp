@@ -487,7 +487,7 @@ exprt interpretert::get_value(
   else if(real_type.id()==ID_array)
   {
     // Get size of array
-    array_exprt result(to_array_type(real_type));
+    array_exprt result({}, to_array_type(real_type));
     const exprt &size_expr=static_cast<const exprt &>(type.find(ID_size));
     mp_integer subtype_size=get_size(type.subtype());
     mp_integer count;
@@ -551,7 +551,7 @@ exprt interpretert::get_value(
   }
   else if(real_type.id()==ID_array)
   {
-    array_exprt result(to_array_type(real_type));
+    array_exprt result({}, to_array_type(real_type));
     const exprt &size_expr=static_cast<const exprt &>(type.find(ID_size));
 
     // Get size of array

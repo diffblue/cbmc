@@ -1614,13 +1614,14 @@ exprt java_bytecode_parsert::get_relement_value()
 
   case '[':
     {
-      array_exprt values;
       u2 num_values=read_u2();
+      exprt::operandst values;
+      values.reserve(num_values);
       for(std::size_t i=0; i<num_values; i++)
       {
-        values.operands().push_back(get_relement_value());
+        values.push_back(get_relement_value());
       }
-      return std::move(values);
+      return array_exprt(std::move(values), array_typet(typet(), exprt()));
     }
 
   case 's':

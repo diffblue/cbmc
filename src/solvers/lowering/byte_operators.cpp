@@ -36,7 +36,7 @@ static exprt unpack_rec(
   const namespacet &ns,
   bool unpack_byte_array=false)
 {
-  array_exprt array(
+  array_exprt array({},
     array_typet(unsignedbv_typet(8), from_integer(0, size_type())));
 
   // endianness_mapt should be the point of reference for mapping out
@@ -240,7 +240,7 @@ exprt lower_byte_extract(const byte_extract_exprt &src, const namespacet &ns)
       element_width.has_value() && *element_width >= 1 &&
       *element_width % 8 == 0 && to_integer(array_type.size(), num_elements))
     {
-      array_exprt array(array_type);
+      array_exprt array({}, array_type);
 
       for(mp_integer i=0; i<num_elements; ++i)
       {
