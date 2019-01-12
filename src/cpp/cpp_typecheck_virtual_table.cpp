@@ -81,7 +81,7 @@ void cpp_typecheckt::do_virtual_table(const symbolt &symbol)
     // do the values
     const struct_typet &vt_type=to_struct_type(vt_symb_type.type);
 
-    struct_exprt values(struct_tag_typet(vt_symb_type.name));
+    struct_exprt values({}, struct_tag_typet(vt_symb_type.name));
 
     for(const auto &compo : vt_type.components())
     {

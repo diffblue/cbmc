@@ -1492,7 +1492,7 @@ exprt simplify_exprt::bits2expr(
     const struct_typet::componentst &components=
       struct_type.components();
 
-    struct_exprt result(type);
+    struct_exprt result({}, type);
     result.reserve_operands(components.size());
 
     mp_integer m_offset_bits=0;

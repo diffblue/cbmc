@@ -37,10 +37,7 @@ struct_exprt make_string_argument(std::string name)
 
   const symbol_exprt length(name + "_length", length_type());
   const symbol_exprt content(name + "_content", pointer_type(java_char_type()));
-  struct_exprt expr(type);
-  expr.operands().push_back(length);
-  expr.operands().push_back(content);
-  return expr;
+  return struct_exprt({length, content}, type);
 }
 
 SCENARIO("dependency_graph", "[core][solvers][refinement][string_refinement]")

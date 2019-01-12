@@ -836,14 +836,11 @@ codet java_string_library_preprocesst::code_assign_components_to_java_string(
     // A String has a field Object with @clsid = String
     const symbolt &jlo_symbol = *symbol_table.lookup("java::java.lang.Object");
     const struct_typet &jlo_struct = to_struct_type(jlo_symbol.type);
-    struct_exprt jlo_init(jlo_struct);
+    struct_exprt jlo_init({}, jlo_struct);
     irep_idt clsid = get_tag(lhs.type().subtype());
     java_root_class_init(jlo_init, jlo_struct, clsid);
 
-    struct_exprt struct_rhs(deref.type());
-    struct_rhs.copy_to_operands(jlo_init);
-    struct_rhs.copy_to_operands(rhs_length);
-    struct_rhs.copy_to_operands(rhs_array);
+    struct_exprt struct_rhs({jlo_init, rhs_length, rhs_array}, deref.type());
     return code_assignt(
       checked_dereference(lhs, lhs.type().subtype()), struct_rhs);
   }
@@ -1342,7 +1339,7 @@ struct_exprt java_string_library_preprocesst::make_argument_for_format(
 {
   // Declarations of the fields of arg_i_struct
   // arg_i_struct is { arg_i_string_expr, tmp_int, tmp_char, ... }
-  struct_exprt arg_i_struct(structured_type);
+  struct_exprt arg_i_struct({}, structured_type);
   std::list<exprt> field_exprs;
   for(const auto & comp : structured_type.components())
   {

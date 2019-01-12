@@ -188,7 +188,7 @@ exprt expr_initializert<nondet>::expr_initializer_rec(
     const struct_typet::componentst &components=
       to_struct_type(type).components();
 
-    struct_exprt value(type);
+    struct_exprt value({}, type);
 
     value.operands().reserve(components.size());
 

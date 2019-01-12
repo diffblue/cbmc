@@ -98,7 +98,7 @@ symbol_exprt get_or_create_string_literal_symbol(
   // the literal with @clsid = String
   struct_tag_typet jlo_symbol("java::java.lang.Object");
   const auto &jlo_struct = to_struct_type(ns.follow(jlo_symbol));
-  struct_exprt jlo_init(jlo_symbol);
+  struct_exprt jlo_init({}, jlo_symbol);
   const auto &jls_struct = to_struct_type(ns.follow(string_type));
   java_root_class_init(jlo_init, jlo_struct, "java::java.lang.String");
 
@@ -109,7 +109,7 @@ symbol_exprt get_or_create_string_literal_symbol(
     const array_exprt data =
       utf16_to_array(utf8_to_utf16_native_endian(id2string(value)));
 
-    struct_exprt literal_init(new_symbol.type);
+    struct_exprt literal_init({}, new_symbol.type);
     literal_init.operands().resize(jls_struct.components().size());
     const std::size_t jlo_nb = jls_struct.component_number("@java.lang.Object");
     literal_init.operands()[jlo_nb] = jlo_init;
@@ -183,8 +183,7 @@ symbol_exprt get_or_create_string_literal_symbol(
     // Case where something defined java.lang.String, so it has
     // a proper base class (always java.lang.Object in practical
     // JDKs seen so far)
-    struct_exprt literal_init(new_symbol.type);
-    literal_init.move_to_operands(jlo_init);
+    struct_exprt literal_init({std::move(jlo_init)}, new_symbol.type);
     for(const auto &comp : jls_struct.components())
     {
       if(comp.get_name()=="@java.lang.Object")
