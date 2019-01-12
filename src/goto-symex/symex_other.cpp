@@ -151,22 +151,24 @@ void goto_symext::symex_other(
     // check for size (or type) mismatch and adjust
     if(!base_type_eq(dest_array.type(), src_array.type(), ns))
     {
-      byte_extract_exprt be(byte_extract_id());
-
       if(statement==ID_array_copy)
       {
-        be.op()=src_array;
-        be.offset()=from_integer(0, index_type());
-        be.type()=dest_array.type();
+        byte_extract_exprt be(
+          byte_extract_id(),
+          src_array,
+          from_integer(0, index_type()),
+          dest_array.type());
         src_array.swap(be);
         do_simplify(src_array);
       }
       else
       {
         // ID_array_replace
-        be.op()=dest_array;
-        be.offset()=from_integer(0, index_type());
-        be.type()=src_array.type();
+        byte_extract_exprt be(
+          byte_extract_id(),
+          dest_array,
+          from_integer(0, index_type()),
+          src_array.type());
         dest_array.swap(be);
         do_simplify(dest_array);
       }

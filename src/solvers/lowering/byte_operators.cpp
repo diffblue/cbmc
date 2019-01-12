@@ -411,10 +411,9 @@ static exprt lower_byte_update(
               src.id() == ID_byte_update_little_endian
                 ? ID_byte_extract_little_endian
                 : ID_byte_extract_big_endian,
+              src.value(),
+              i_expr,
               subtype);
-
-            byte_extract_expr.op() = src.value();
-            byte_extract_expr.offset()=i_expr;
 
             new_value=lower_byte_extract(byte_extract_expr, ns);
           }
@@ -483,10 +482,8 @@ static exprt lower_byte_update(
               src.id() == ID_byte_update_little_endian
                 ? ID_byte_extract_little_endian
                 : ID_byte_extract_big_endian,
+                src.value(), stored_value_offset,
               element_size < sub_size ? src.value().type() : subtype);
-
-            byte_extract_expr.op() = src.value();
-            byte_extract_expr.offset()=stored_value_offset;
 
             new_value=lower_byte_extract(byte_extract_expr, ns);
           }
