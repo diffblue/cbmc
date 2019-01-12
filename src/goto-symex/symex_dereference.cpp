@@ -312,9 +312,8 @@ void goto_symext::dereference_rec(
     address_of_exprt address_of_expr(index_expr.array());
     address_of_expr.type()=pointer_type(expr.type());
 
-    dereference_exprt tmp;
-    tmp.pointer()=plus_exprt(address_of_expr, index_expr.index());
-    tmp.type()=expr.type();
+    dereference_exprt tmp(
+      plus_exprt(address_of_expr, index_expr.index()), expr.type());
     tmp.add_source_location()=expr.source_location();
 
     // recursive call

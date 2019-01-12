@@ -1108,8 +1108,7 @@ void goto_convertt::do_function_call_symbol(
     if(lhs.is_not_nil())
     {
       typet t=pointer_type(lhs.type());
-      dereference_exprt rhs(lhs.type());
-      rhs.op0()=typecast_exprt(list_arg, t);
+      dereference_exprt rhs(typecast_exprt(list_arg, t), lhs.type());
       rhs.add_source_location()=function.source_location();
       goto_programt::targett t2=dest.add_instruction(ASSIGN);
       t2->source_location=function.source_location();
