@@ -1046,6 +1046,7 @@ public:
   {
   }
 
+  DEPRECATED("use plus_exprt(lhs, rhs, type) instead")
   plus_exprt(const typet &type) : multi_ary_exprt(ID_plus, type)
   {
   }
@@ -1743,6 +1744,7 @@ public:
   {
   }
 
+  DEPRECATED("use array_exprt(operands, type) instead")
   explicit array_exprt(const array_typet &_type)
     : multi_ary_exprt(ID_array, _type)
   {
@@ -1778,6 +1780,7 @@ template<> inline bool can_cast_expr<array_exprt>(const exprt &base)
 class array_list_exprt : public multi_ary_exprt
 {
 public:
+  DEPRECATED("use array_list_exprt(operands, type) instead")
   explicit array_list_exprt(const array_typet &_type)
     : multi_ary_exprt(ID_array_list, _type)
   {
@@ -1804,6 +1807,7 @@ public:
   {
   }
 
+  DEPRECATED("use vector_exprt(operands, type) instead")
   explicit vector_exprt(const vector_typet &_type)
     : multi_ary_exprt(ID_vector, _type)
   {
@@ -1924,6 +1928,7 @@ public:
   {
   }
 
+  DEPRECATED("use struct_exprt(component_name, value, type) instead")
   explicit struct_exprt(const typet &_type) : multi_ary_exprt(ID_struct, _type)
   {
   }
@@ -2408,6 +2413,7 @@ inline void validate_expr(const floatbv_typecast_exprt &value)
 class and_exprt:public multi_ary_exprt
 {
 public:
+  DEPRECATED("use and_exprt(op, op) instead")
   and_exprt():multi_ary_exprt(ID_and, bool_typet())
   {
   }
@@ -2530,6 +2536,7 @@ inline void validate_expr(const implies_exprt &value)
 class or_exprt:public multi_ary_exprt
 {
 public:
+  DEPRECATED("use or_exprt(op, op) instead")
   or_exprt():multi_ary_exprt(ID_or, bool_typet())
   {
   }
@@ -2606,6 +2613,7 @@ template<> inline bool can_cast_expr<or_exprt>(const exprt &base)
 class xor_exprt:public multi_ary_exprt
 {
 public:
+  DEPRECATED("use xor_exprt(op, op) instead")
   xor_exprt():multi_ary_exprt(ID_bitxor, bool_typet())
   {
   }
@@ -3336,6 +3344,7 @@ public:
     PRECONDITION(op.type().id()==ID_bool);
   }
 
+  DEPRECATED("use not_exprt(op) instead")
   not_exprt():unary_exprt(ID_not, bool_typet())
   {
   }
@@ -4889,6 +4898,7 @@ inline void validate_expr(const popcount_exprt &value)
 class cond_exprt : public multi_ary_exprt
 {
 public:
+  DEPRECATED("use cond_exprt(operands, type) instead")
   explicit cond_exprt(const typet &_type) : multi_ary_exprt(ID_cond, _type)
   {
   }
