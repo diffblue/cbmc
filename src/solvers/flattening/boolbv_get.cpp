@@ -337,10 +337,7 @@ exprt boolbvt::bv_get_unbounded_array(const exprt &expr) const
         it1!=index_set.end();
         it1++)
     {
-      index_exprt index;
-      index.type()=type.subtype();
-      index.array()=expr;
-      index.index()=*it1;
+      index_exprt index(expr, *it1);
 
       exprt value=bv_get_cache(index);
       exprt index_value=bv_get_cache(*it1);

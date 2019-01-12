@@ -720,10 +720,7 @@ void c_typecastt::do_typecast(exprt &expr, const typet &dest_type)
 
   if(src_type.id()==ID_array)
   {
-    index_exprt index;
-    index.array()=expr;
-    index.index()=from_integer(0, index_type());
-    index.type()=src_type.subtype();
+    index_exprt index(expr, from_integer(0, index_type()));
     expr = typecast_exprt::conditional_cast(address_of_exprt(index), dest_type);
     return;
   }

@@ -88,10 +88,7 @@ bool simplify_exprt::simplify_index(exprt &expr)
 
       simplify_inequality(equality_expr);
 
-      index_exprt new_index_expr;
-      new_index_expr.type()=expr.type();
-      new_index_expr.array()=with_expr.op0();
-      new_index_expr.index()=expr.op1();
+      index_exprt new_index_expr(with_expr.op0(), expr.op1(), expr.type());
 
       simplify_index(new_index_expr); // recursive call
 

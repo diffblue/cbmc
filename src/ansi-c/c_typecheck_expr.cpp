@@ -1189,10 +1189,7 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
   }
   else if(op_type.id()==ID_array)
   {
-    index_exprt index;
-    index.array()=op;
-    index.index()=from_integer(0, index_type());
-    index.type()=op_type.subtype();
+    index_exprt index(op, from_integer(0, index_type()));
     op=address_of_exprt(index);
   }
   else if(op_type.id()==ID_empty)
