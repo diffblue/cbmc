@@ -1823,6 +1823,11 @@ public:
     : multi_ary_exprt(ID_vector, _type)
   {
   }
+
+  vector_exprt(operandst &&_operands, const vector_typet &_type)
+    : multi_ary_exprt(ID_vector, std::move(_operands), _type)
+  {
+  }
 };
 
 /// \brief Cast an exprt to an \ref vector_exprt
