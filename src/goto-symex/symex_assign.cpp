@@ -223,11 +223,7 @@ void goto_symext::symex_assign_symbol(
   // put assignment guard into the rhs
   if(!guard.is_true())
   {
-    if_exprt tmp_ssa_rhs;
-    tmp_ssa_rhs.type()=ssa_rhs.type();
-    tmp_ssa_rhs.cond()=guard.as_expr();
-    tmp_ssa_rhs.true_case()=ssa_rhs;
-    tmp_ssa_rhs.false_case()=lhs;
+    if_exprt tmp_ssa_rhs(guard.as_expr(), ssa_rhs, lhs, ssa_rhs.type());
     tmp_ssa_rhs.swap(ssa_rhs);
   }
 

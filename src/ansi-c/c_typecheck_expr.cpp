@@ -1696,10 +1696,7 @@ void c_typecheck_baset::typecheck_side_effect_gcc_conditional_expression(
 
   // use typechecking code for "if"
 
-  if_exprt if_expr;
-  if_expr.cond()=operands[0];
-  if_expr.true_case()=operands[0];
-  if_expr.false_case()=operands[1];
+  if_exprt if_expr(operands[0], operands[0], operands[1]);
   if_expr.add_source_location()=expr.source_location();
 
   typecheck_expr_trinary(if_expr);
