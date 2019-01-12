@@ -144,12 +144,6 @@ bvt boolbvt::convert_index(const index_exprt &expr)
 
       // add implications
 
-      equal_exprt index_equality;
-      index_equality.lhs()=index; // index operand
-
-      equal_exprt value_equality;
-      value_equality.lhs()=result;
-
 #ifdef COMPACT_EQUAL_CONST
       bv_utils.equal_const_register(convert_bv(index));  // Definitely
       bv_utils.equal_const_register(convert_bv(result)); // Maybe
@@ -159,19 +153,15 @@ bvt boolbvt::convert_index(const index_exprt &expr)
 
       for(mp_integer i=0; i<array_size; i=i+1)
       {
-        index_equality.rhs()=from_integer(i, index_equality.lhs().type());
-        CHECK_RETURN(index_equality.rhs().is_not_nil());
-
         INVARIANT(
           it != array.operands().end(),
           "this loop iterates over the array, so `it` shouldn't be increased "
           "past the array's end");
 
-        value_equality.rhs()=*it++;
-
         // Cache comparisons and equalities
-        prop.l_set_to_true(convert(implies_exprt(index_equality,
-                                                 value_equality)));
+        prop.l_set_to_true(convert(implies_exprt(
+          equal_exprt(index, from_integer(i, index.type())),
+          equal_exprt(result, *it++))));
       }
 
       return bv;
@@ -203,9 +193,6 @@ bvt boolbvt::convert_index(const index_exprt &expr)
 
       // add implications
 
-      equal_exprt index_equality;
-      index_equality.lhs()=index; // index operand
-
 #ifdef COMPACT_EQUAL_CONST
       bv_utils.equal_const_register(convert_bv(index));  // Definitely
 #endif
@@ -215,25 +202,20 @@ bvt boolbvt::convert_index(const index_exprt &expr)
 
       for(mp_integer i=0; i<array_size; i=i+1)
       {
-        index_equality.rhs()=from_integer(i, index_equality.lhs().type());
-        CHECK_RETURN(index_equality.rhs().is_not_nil());
-
         mp_integer offset=i*width;
 
         for(std::size_t j=0; j<width; j++)
           equal_bv[j] = prop.lequal(
             bv[j], array_bv[numeric_cast_v<std::size_t>(offset + j)]);
 
-        prop.l_set_to_true(
-          prop.limplies(convert(index_equality), prop.land(equal_bv)));
+        prop.l_set_to_true(prop.limplies(
+          convert(equal_exprt(index, from_integer(i, index.type()))),
+          prop.land(equal_bv)));
       }
     }
     else
     {
       bv.resize(width);
-
-      equal_exprt equality;
-      equality.lhs()=index; // index operand
 
 #ifdef COMPACT_EQUAL_CONST
       bv_utils.equal_const_register(convert_bv(index));  // Definitely
@@ -247,9 +229,8 @@ bvt boolbvt::convert_index(const index_exprt &expr)
 
       for(mp_integer i=0; i<array_size; i=i+1)
       {
-        equality.op1()=from_integer(i, constant_type);
-
-        literalt e=convert(equality);
+        literalt e =
+          convert(equal_exprt(index, from_integer(i, constant_type)));
 
         mp_integer offset=i*width;
 

@@ -2540,8 +2540,8 @@ exprt c_typecheck_baset::do_special_functions(
       throw 0;
     }
 
-    equal_exprt equality_expr;
-    equality_expr.operands()=expr.arguments();
+    equal_exprt equality_expr(
+      expr.arguments().front(), expr.arguments().back());
     equality_expr.add_source_location()=source_location;
 
     if(!base_type_eq(equality_expr.lhs().type(),
