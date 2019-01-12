@@ -69,12 +69,12 @@ with_exprt make_with_expr(const update_exprt &src)
   const exprt::operandst &designator=src.designator();
   PRECONDITION(!designator.empty());
 
-  with_exprt result;
+  with_exprt result{exprt{}, exprt{}, exprt{}};
   exprt *dest=&result;
 
   forall_expr(it, designator)
   {
-    with_exprt tmp;
+    with_exprt tmp{exprt{}, exprt{}, exprt{}};
 
     if(it->id()==ID_index_designator)
     {
