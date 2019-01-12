@@ -56,8 +56,7 @@ std::string graphml_witnesst::convert_assign_rec(
 
   if(assign.rhs().id()==ID_array)
   {
-    const array_typet &type=
-      to_array_type(ns.follow(assign.rhs().type()));
+    const array_typet &type = to_array_type(assign.rhs().type());
 
     unsigned i=0;
     forall_operands(it, assign.rhs())

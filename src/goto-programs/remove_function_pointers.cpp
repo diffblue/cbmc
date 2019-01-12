@@ -202,8 +202,7 @@ bool remove_function_pointerst::is_type_compatible(
 void remove_function_pointerst::fix_argument_types(
   code_function_callt &function_call)
 {
-  const code_typet &code_type=
-    to_code_type(ns.follow(function_call.function().type()));
+  const code_typet &code_type = to_code_type(function_call.function().type());
 
   const code_typet::parameterst &function_parameters=
     code_type.parameters();
@@ -232,8 +231,7 @@ void remove_function_pointerst::fix_return_type(
   if(function_call.lhs().is_nil())
     return;
 
-  const code_typet &code_type=
-    to_code_type(ns.follow(function_call.function().type()));
+  const code_typet &code_type = to_code_type(function_call.function().type());
 
   // type already ok?
   if(type_eq(

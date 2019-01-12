@@ -96,7 +96,7 @@ void goto_convertt::remove_assignment(
 
     exprt rhs;
 
-    const typet &op0_type=ns.follow(expr.op0().type());
+    const typet &op0_type = expr.op0().type();
 
     if(op0_type.id()==ID_c_bool)
     {
@@ -168,7 +168,7 @@ void goto_convertt::remove_pre(
   else
     rhs.id(ID_minus);
 
-  const typet &op_type=ns.follow(expr.op0().type());
+  const typet &op_type = expr.op0().type();
 
   if(op_type.id()==ID_bool)
   {
@@ -257,7 +257,7 @@ void goto_convertt::remove_post(
   else
     rhs.id(ID_minus);
 
-  const typet &op_type=ns.follow(expr.op0().type());
+  const typet &op_type = expr.op0().type();
 
   if(op_type.id()==ID_bool)
   {
