@@ -401,10 +401,11 @@ std::pair<exprt, string_constraintst> add_axioms_for_format(
     if(fe.is_format_specifier())
     {
       const format_specifiert &fs=fe.get_format_specifier();
-      struct_exprt arg;
       if(fs.conversion!=format_specifiert::PERCENT_SIGN &&
          fs.conversion!=format_specifiert::LINE_SEPARATOR)
       {
+        exprt arg;
+
         if(fs.index==-1)
         {
           INVARIANT(
@@ -421,11 +422,19 @@ std::pair<exprt, string_constraintst> add_axioms_for_format(
           // first argument `args[0]` corresponds to index 1
           arg=to_struct_expr(args[fs.index-1]);
         }
+
+        auto result = add_axioms_for_format_specifier(
+          fresh_symbol,
+          fs,
+          to_struct_expr(arg),
+          index_type,
+          char_type,
+          array_pool,
+          message,
+          ns);
+        merge(constraints, std::move(result.second));
+        intermediary_strings.push_back(result.first);
       }
-      auto result = add_axioms_for_format_specifier(
-        fresh_symbol, fs, arg, index_type, char_type, array_pool, message, ns);
-      merge(constraints, std::move(result.second));
-      intermediary_strings.push_back(result.first);
     }
     else
     {
