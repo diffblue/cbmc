@@ -93,7 +93,18 @@ public:
 class transt : public ternary_exprt
 {
 public:
+  DEPRECATED("use transt(op0, op1, op2) instead")
   transt() : ternary_exprt(ID_trans)
+  {
+  }
+
+  transt(
+    const irep_idt &_id,
+    const exprt &_op0,
+    const exprt &_op1,
+    const exprt &_op2,
+    const typet &_type)
+    : ternary_exprt(_id, _op0, _op1, _op2, _type)
   {
   }
 
