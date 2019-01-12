@@ -32,9 +32,7 @@ void guardt::guard_expr(exprt &dest) const
     }
     else
     {
-      implies_exprt tmp;
-      tmp.op0()=as_expr();
-      tmp.op1().swap(dest);
+      implies_exprt tmp(as_expr(), dest);
       dest.swap(tmp);
     }
   }
