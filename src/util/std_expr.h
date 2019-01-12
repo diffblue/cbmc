@@ -2467,6 +2467,11 @@ public:
     : multi_ary_exprt(ID_and, {op0, op1, op2, op3}, bool_typet())
   {
   }
+
+  explicit and_exprt(exprt::operandst &&_operands)
+    : multi_ary_exprt(ID_and, std::move(_operands), bool_typet())
+  {
+  }
 };
 
 /// 1) generates a conjunction for two or more operands
