@@ -1076,6 +1076,11 @@ public:
     multi_ary_exprt(_lhs, ID_plus, _rhs, _type)
   {
   }
+
+  plus_exprt(operandst &&_operands, const typet &_type)
+    : multi_ary_exprt(ID_plus, std::move(_operands), _type)
+  {
+  }
 };
 
 /// \brief Cast an exprt to a \ref plus_exprt
