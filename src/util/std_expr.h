@@ -4922,6 +4922,11 @@ public:
   {
   }
 
+  cond_exprt(operandst &&_operands, const typet &_type)
+    : multi_ary_exprt(ID_cond, std::move(_operands), _type)
+  {
+  }
+
   /// adds a case to a cond expression
   /// \param condition: the condition for the case
   /// \param value: the value for the case
