@@ -21,7 +21,6 @@ SCENARIO("substitute_array_list",
   const typet char_type=unsignedbv_typet(16);
   const typet int_type=signedbv_typet(32);
   const array_typet array_type(char_type, infinity_exprt(int_type));
-  array_list_exprt arr(array_type);
   const exprt index0=from_integer(0, int_type);
   const exprt charx=from_integer('x', char_type);
   const exprt index1=from_integer(1, int_type);
@@ -29,8 +28,9 @@ SCENARIO("substitute_array_list",
   const exprt index100=from_integer(100, int_type);
 
   // arr is `array-list [ 0 , 'x' , 1 , 'y' , 2 , 'z']`
-  arr.operands()=
-    { index0, charx, index1, chary, index100, from_integer('z', char_type) };
+  array_list_exprt arr(
+    {index0, charx, index1, chary, index100, from_integer('z', char_type)},
+    array_type);
 
   // Max length is 2, so index 2 should get ignored.
   const exprt subst=substitute_array_lists(arr, 2);
