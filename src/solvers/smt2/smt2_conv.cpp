@@ -3076,13 +3076,13 @@ void smt2_convt::convert_plus(const plus_exprt &expr)
     // add component-by-component
     for(mp_integer i = 0; i != size; ++i)
     {
-      plus_exprt tmp(vector_type.subtype());
-      forall_operands(it, expr)
-        tmp.copy_to_operands(
-          index_exprt(
-            *it,
-            from_integer(size - i - 1, index_type),
-            vector_type.subtype()));
+      exprt::operandst summands;
+      summands.reserve(expr.operands().size());
+      for(const auto &op : expr.operands())
+        summands.push_back(index_exprt(
+          op, from_integer(size - i - 1, index_type), vector_type.subtype()));
+
+      plus_exprt tmp(std::move(summands), vector_type.subtype());
 
       out << " ";
       convert_expr(tmp);
