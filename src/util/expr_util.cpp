@@ -205,12 +205,8 @@ if_exprt lift_if(const exprt &src, std::size_t operand_number)
   const exprt true_case=if_expr.true_case();
   const exprt false_case=if_expr.false_case();
 
-  if_exprt result;
-  result.cond()=if_expr.cond();
-  result.type()=src.type();
-  result.true_case()=src;
+  if_exprt result(if_expr.cond(), src, src);
   result.true_case().operands()[operand_number]=true_case;
-  result.false_case()=src;
   result.false_case().operands()[operand_number]=false_case;
 
   return result;

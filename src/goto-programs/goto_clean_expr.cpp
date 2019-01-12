@@ -504,12 +504,7 @@ void goto_convertt::remove_gcc_conditional_expression(
   clean_expr(expr.op0(), dest, mode);
 
   // now we can copy op0 safely
-  if_exprt if_expr;
-
-  if_expr.cond()=expr.op0();
-  if_expr.true_case()=expr.op0();
-  if_expr.false_case()=expr.op1();
-  if_expr.type()=expr.type();
+  if_exprt if_expr(expr.op0(), expr.op0(), expr.op1(), expr.type());
   if_expr.add_source_location()=expr.source_location();
 
   if(if_expr.cond().type()!=bool_typet())
