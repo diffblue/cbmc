@@ -219,8 +219,6 @@ exprt expr_initializert<nondet>::expr_initializer_rec(
     const union_typet::componentst &components=
       to_union_type(type).components();
 
-    union_exprt value(type);
-
     union_typet::componentt component;
     bool found=false;
     mp_integer component_size=0;
@@ -243,12 +241,12 @@ exprt expr_initializert<nondet>::expr_initializer_rec(
       }
     }
 
+    union_exprt value("", nil_exprt(), type);
     value.add_source_location()=source_location;
 
     if(!found)
     {
       // stupid empty union
-      value.op()=nil_exprt();
     }
     else
     {

@@ -1111,10 +1111,8 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
       if(base_type_eq(c.type(), op.type(), *this))
       {
         // found! build union constructor
-        union_exprt union_expr(expr.type());
+        union_exprt union_expr(c.get_name(), op, expr.type());
         union_expr.add_source_location()=expr.source_location();
-        union_expr.op()=op;
-        union_expr.set_component_name(c.get_name());
         expr=union_expr;
         expr.set(ID_C_lvalue, true);
         return;
