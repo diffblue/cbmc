@@ -2563,6 +2563,11 @@ public:
     : multi_ary_exprt(ID_or, {op0, op1, op2, op3}, bool_typet())
   {
   }
+
+  explicit or_exprt(exprt::operandst &&_operands)
+    : multi_ary_exprt(ID_or, std::move(_operands), bool_typet())
+  {
+  }
 };
 
 /// 1) generates a disjunction for two or more operands

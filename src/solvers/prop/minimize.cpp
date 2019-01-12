@@ -81,11 +81,12 @@ literalt prop_minimizet::constraint()
     return or_clause.front();
   else
   {
-    or_exprt or_expr;
+    exprt::operandst disjuncts;
+    disjuncts.reserve(or_clause.size());
     forall_literals(it, or_clause)
-      or_expr.copy_to_operands(literal_exprt(*it));
+      disjuncts.push_back(literal_exprt(*it));
 
-    return prop_conv.convert(or_expr);
+    return prop_conv.convert(disjunction(disjuncts));
   }
 }
 

@@ -789,11 +789,7 @@ exprt float_bvt::relation(
     }
     else if(rel==relt::LE)
     {
-      or_exprt or_bv;
-      or_bv.reserve_operands(3);
-      or_bv.copy_to_operands(less_than3);
-      or_bv.copy_to_operands(both_zero);
-      or_bv.copy_to_operands(bitwise_equal);
+      or_exprt or_bv{{less_than3, both_zero, bitwise_equal}};
 
       return and_exprt(or_bv, not_exprt(nan));
     }
