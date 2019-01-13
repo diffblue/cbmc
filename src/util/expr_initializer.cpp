@@ -177,7 +177,7 @@ exprt expr_initializert<nondet>::expr_initializer_rec(
     if(vector_size < 0)
       return nil_exprt();
 
-    vector_exprt value(vector_type);
+    vector_exprt value({}, vector_type);
     value.operands().resize(numeric_cast_v<std::size_t>(vector_size), tmpval);
     value.add_source_location()=source_location;
 
