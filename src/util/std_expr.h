@@ -1796,6 +1796,11 @@ public:
     : multi_ary_exprt(ID_array_list, _type)
   {
   }
+
+  array_list_exprt(operandst &&_operands, const array_typet &_type)
+    : multi_ary_exprt(ID_array_list, std::move(_operands), _type)
+  {
+  }
 };
 
 template <>
