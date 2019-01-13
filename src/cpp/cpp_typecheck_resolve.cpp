@@ -324,24 +324,24 @@ exprt cpp_typecheck_resolvet::convert_identifier(
 
     if(symbol.is_type)
     {
-      e=type_exprt();
+      e.make_nil();
 
       if(symbol.is_macro) // includes typedefs
       {
-        e.type()=symbol.type;
+        e = type_exprt(symbol.type);
         assert(symbol.type.is_not_nil());
       }
       else if(symbol.type.id()==ID_c_enum)
       {
-        e.type()=c_enum_tag_typet(symbol.name);
+        e = type_exprt(c_enum_tag_typet(symbol.name));
       }
       else if(symbol.type.id() == ID_struct)
       {
-        e.type() = struct_tag_typet(symbol.name);
+        e = type_exprt(struct_tag_typet(symbol.name));
       }
       else if(symbol.type.id() == ID_union)
       {
-        e.type() = union_tag_typet(symbol.name);
+        e = type_exprt(union_tag_typet(symbol.name));
       }
     }
     else if(symbol.is_macro)
