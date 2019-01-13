@@ -27,6 +27,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <ansi-c/ansi_c_language.h>
 
+#include <goto-checker/all_properties_verifier.h>
+
 #include <goto-programs/adjust_float_expressions.h>
 #include <goto-programs/lazy_goto_model.h>
 #include <goto-programs/instrument_preconditions.h>
@@ -60,6 +62,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <java_bytecode/convert_java_nondet.h>
 #include <java_bytecode/java_bytecode_language.h>
 #include <java_bytecode/java_enum_static_init_unwind_handler.h>
+#include <java_bytecode/java_multi_path_symex_only_checker.h>
 #include <java_bytecode/remove_exceptions.h>
 #include <java_bytecode/remove_instanceof.h>
 #include <java_bytecode/remove_java_new.h>
@@ -561,6 +564,19 @@ int jbmc_parse_optionst::doit()
     if(cmdline.isset("validate-goto-model"))
     {
       goto_model.validate(validation_modet::INVARIANT);
+    }
+
+    if(
+      options.get_bool_option("program-only") ||
+      options.get_bool_option("show-vcc"))
+    {
+      if(!options.get_bool_option("paths"))
+      {
+        all_properties_verifiert<java_multi_path_symex_only_checkert> verifier(
+          options, ui_message_handler, goto_model);
+        (void)verifier();
+        return CPROVER_EXIT_SUCCESS;
+      }
     }
 
     // The `configure_bmc` callback passed will enable enum-unwind-static if
