@@ -218,11 +218,11 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
   if(expr_type.id()==ID_bool)
   {
     // rewrite (bool)x to x!=0
-    binary_relation_exprt inequality;
-    inequality.id(op_type.id()==ID_floatbv?ID_ieee_float_notequal:ID_notequal);
+    binary_relation_exprt inequality(
+      expr.op0(),
+      op_type.id() == ID_floatbv ? ID_ieee_float_notequal : ID_notequal,
+      from_integer(0, op_type));
     inequality.add_source_location()=expr.source_location();
-    inequality.lhs()=expr.op0();
-    inequality.rhs()=from_integer(0, op_type);
     CHECK_RETURN(inequality.rhs().is_not_nil());
     simplify_node(inequality);
     expr.swap(inequality);
