@@ -47,6 +47,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-instrument/reachability_slicer.h>
 #include <goto-instrument/nondet_static.h>
 
+#include <goto-symex/path_storage.h>
+
 #include <linking/static_lifetime_init.h>
 
 #include <pointer-analysis/add_failed_symbols.h>
@@ -67,8 +69,7 @@ Author: Daniel Kroening, kroening@kroening.com
 jbmc_parse_optionst::jbmc_parse_optionst(int argc, const char **argv)
   : parse_options_baset(JBMC_OPTIONS, argc, argv),
     messaget(ui_message_handler),
-    ui_message_handler(cmdline, std::string("JBMC ") + CBMC_VERSION),
-    path_strategy_chooser()
+    ui_message_handler(cmdline, std::string("JBMC ") + CBMC_VERSION)
 {
 }
 
@@ -78,8 +79,7 @@ jbmc_parse_optionst::jbmc_parse_optionst(int argc, const char **argv)
   const std::string &extra_options)
   : parse_options_baset(JBMC_OPTIONS + extra_options, argc, argv),
     messaget(ui_message_handler),
-    ui_message_handler(cmdline, std::string("JBMC ") + CBMC_VERSION),
-    path_strategy_chooser()
+    ui_message_handler(cmdline, std::string("JBMC ") + CBMC_VERSION)
 {
 }
 
@@ -119,11 +119,11 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
 
   if(cmdline.isset("show-symex-strategies"))
   {
-    std::cout << path_strategy_chooser.show_strategies();
+    status() << path_strategy_choosert().show_strategies() << eom;
     exit(CPROVER_EXIT_SUCCESS);
   }
 
-  path_strategy_chooser.set_path_strategy_options(cmdline, options, *this);
+  parse_path_strategy_options(cmdline, options, ui_message_handler);
 
   if(cmdline.isset("program-only"))
     options.set_option("program-only", true);
@@ -573,7 +573,7 @@ int jbmc_parse_optionst::doit()
     // The `configure_bmc` callback passed will enable enum-unwind-static if
     // applicable.
     return bmct::do_language_agnostic_bmc(
-      path_strategy_chooser,
+      path_strategy_choosert(),
       options,
       goto_model,
       ui_message_handler,
@@ -618,7 +618,7 @@ int jbmc_parse_optionst::doit()
     // The `configure_bmc` callback passed will enable enum-unwind-static if
     // applicable.
     return bmct::do_language_agnostic_bmc(
-      path_strategy_chooser,
+      path_strategy_choosert(),
       options,
       lazy_goto_model,
       ui_message_handler,

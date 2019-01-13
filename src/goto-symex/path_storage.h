@@ -152,17 +152,12 @@ public:
     return found->second.second();
   }
 
-  /// \brief add `paths` and `exploration-strategy` option, suitable to be
-  /// invoked from front-ends.
-  void
-  set_path_strategy_options(const cmdlinet &, optionst &, messaget &) const;
-
-protected:
   std::string default_strategy() const
   {
     return "lifo";
   }
 
+protected:
   /// Map from the name of a strategy (to be supplied on the command line), to
   /// the help text for that strategy and a factory thunk returning a pointer to
   /// a derived class of path_storaget that implements that strategy.
@@ -171,5 +166,12 @@ protected:
                      const std::function<std::unique_ptr<path_storaget>()>>>
     strategies;
 };
+
+/// \brief add `paths` and `exploration-strategy` option, suitable to be
+/// invoked from front-ends.
+void parse_path_strategy_options(
+  const cmdlinet &,
+  optionst &,
+  message_handlert &);
 
 #endif /* CPROVER_GOTO_SYMEX_PATH_STORAGE_H */

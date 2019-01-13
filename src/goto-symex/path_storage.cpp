@@ -90,27 +90,32 @@ std::string path_strategy_choosert::show_strategies() const
   return ss.str();
 }
 
-void path_strategy_choosert::set_path_strategy_options(
+void parse_path_strategy_options(
   const cmdlinet &cmdline,
   optionst &options,
-  messaget &message) const
+  message_handlert &message_handler)
 {
+  messaget log(message_handler);
+  path_strategy_choosert path_strategy_chooser;
   if(cmdline.isset("paths"))
   {
     options.set_option("paths", true);
     std::string strategy = cmdline.get_value("paths");
-    if(!is_valid_strategy(strategy))
+    if(!path_strategy_chooser.is_valid_strategy(strategy))
     {
-      message.error() << "Unknown strategy '" << strategy
-                      << "'. Pass the --show-symex-strategies flag to list "
-                         "available strategies."
-                      << message.eom;
+      log.error() << "Unknown strategy '" << strategy
+                  << "'. Pass the --show-symex-strategies flag to list "
+                     "available strategies."
+                  << messaget::eom;
       exit(CPROVER_EXIT_USAGE_ERROR);
     }
     options.set_option("exploration-strategy", strategy);
   }
   else
-    options.set_option("exploration-strategy", default_strategy());
+  {
+    options.set_option(
+      "exploration-strategy", path_strategy_chooser.default_strategy());
+  }
 }
 
 path_strategy_choosert::path_strategy_choosert()

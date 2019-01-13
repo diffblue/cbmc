@@ -59,6 +59,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-instrument/nondet_static.h>
 #include <goto-instrument/cover.h>
 
+#include <goto-symex/path_storage.h>
+
 #include <pointer-analysis/add_failed_symbols.h>
 
 #include <langapi/mode.h>
@@ -69,8 +71,7 @@ cbmc_parse_optionst::cbmc_parse_optionst(int argc, const char **argv)
   : parse_options_baset(CBMC_OPTIONS, argc, argv),
     xml_interfacet(cmdline),
     messaget(ui_message_handler),
-    ui_message_handler(cmdline, std::string("CBMC ") + CBMC_VERSION),
-    path_strategy_chooser()
+    ui_message_handler(cmdline, std::string("CBMC ") + CBMC_VERSION)
 {
 }
 
@@ -81,8 +82,7 @@ cbmc_parse_optionst::cbmc_parse_optionst(int argc, const char **argv)
   : parse_options_baset(CBMC_OPTIONS + extra_options, argc, argv),
     xml_interfacet(cmdline),
     messaget(ui_message_handler),
-    ui_message_handler(cmdline, std::string("CBMC ") + CBMC_VERSION),
-    path_strategy_chooser()
+    ui_message_handler(cmdline, std::string("CBMC ") + CBMC_VERSION)
 {
 }
 
@@ -143,11 +143,11 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
 
   if(cmdline.isset("show-symex-strategies"))
   {
-    std::cout << path_strategy_chooser.show_strategies();
+    status() << path_strategy_choosert().show_strategies() << eom;
     exit(CPROVER_EXIT_SUCCESS);
   }
 
-  path_strategy_chooser.set_path_strategy_options(cmdline, options, *this);
+  parse_path_strategy_options(cmdline, options, ui_message_handler);
 
   if(cmdline.isset("program-only"))
     options.set_option("program-only", true);
@@ -554,7 +554,7 @@ int cbmc_parse_optionst::doit()
   }
 
   return bmct::do_language_agnostic_bmc(
-    path_strategy_chooser, options, goto_model, ui_message_handler);
+    path_strategy_choosert(), options, goto_model, ui_message_handler);
 }
 
 bool cbmc_parse_optionst::set_properties()

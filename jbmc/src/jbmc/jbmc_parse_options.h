@@ -28,8 +28,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/lazy_goto_model.h>
 #include <goto-programs/show_properties.h>
 
-#include <goto-symex/path_storage.h>
-
 #include <solvers/refinement/string_refinement.h>
 
 #include <java_bytecode/java_bytecode_language.h>
@@ -120,7 +118,6 @@ public:
 
 protected:
   ui_message_handlert ui_message_handler;
-  path_strategy_choosert path_strategy_chooser;
   java_object_factory_parameterst object_factory_params;
   bool stub_objects_are_not_null;
 
