@@ -20,7 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class ansi_c_declaratort : public nullary_exprt
 {
 public:
-  ansi_c_declaratort() : nullary_exprt(ID_declarator)
+  ansi_c_declaratort() : nullary_exprt(ID_declarator, typet())
   {
   }
 

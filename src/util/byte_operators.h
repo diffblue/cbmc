@@ -38,11 +38,11 @@ public:
 
   byte_extract_exprt(
     irep_idt _id,
-    const exprt &_op, const exprt &_offset, const typet &_type):
-    binary_exprt(_id, _type)
+    const exprt &_op,
+    const exprt &_offset,
+    const typet &_type)
+    : binary_exprt(_op, _id, _offset, _type)
   {
-    op()=_op;
-    offset()=_offset;
   }
 
   exprt &op() { return op0(); }
