@@ -89,4 +89,8 @@ int result_to_exit_code(resultt result);
 /// Return the number of properties with given \p status
 std::size_t count_properties(const propertiest &, property_statust);
 
+property_statust &operator|=(property_statust &, property_statust const &);
+property_statust &operator&=(property_statust &, property_statust const &);
+resultt determine_result(const propertiest &properties);
+
 #endif // CPROVER_GOTO_CHECKER_PROPERTIES_H

@@ -144,3 +144,100 @@ count_properties(const propertiest &properties, property_statust status)
   }
   return count;
 }
+
+/// Update with the preference order
+/// 1. old non-UNKNOWN/non-NOT_CHECKED status
+/// 2. new non-UNKNOWN/non-NOT_CHECKED status
+/// 3. UNKNOWN
+/// 4. NOT_CHECKED
+/// Suitable for updating property status
+property_statust &operator|=(property_statust &a, property_statust const &b)
+{
+  // non-monotonic use is likely a bug
+  PRECONDITION(
+    a == property_statust::NOT_CHECKED ||
+    (a == property_statust::UNKNOWN && b != property_statust::NOT_CHECKED) ||
+    a == b);
+  switch(a)
+  {
+  case property_statust::NOT_CHECKED:
+  case property_statust::UNKNOWN:
+    a = b;
+    return a;
+  case property_statust::ERROR:
+  case property_statust::PASS:
+  case property_statust::NOT_REACHABLE:
+  case property_statust::FAIL:
+    return a;
+  }
+  UNREACHABLE;
+}
+
+/// Update with the preference order
+/// 1. ERROR
+/// 2. FAIL
+/// 3. UNKNOWN
+/// 4. NOT_CHECKED
+/// 5. NOT_REACHABLE
+/// 6. PASS
+/// Suitable for computing overall results
+property_statust &operator&=(property_statust &a, property_statust const &b)
+{
+  switch(a)
+  {
+  case property_statust::ERROR:
+    a = b;
+    return a;
+  case property_statust::FAIL:
+    a = (b == property_statust::ERROR ? b : a);
+    return a;
+  case property_statust::UNKNOWN:
+    a = (b == property_statust::ERROR || b == property_statust::FAIL ? b : a);
+    return a;
+  case property_statust::NOT_CHECKED:
+    a =
+      (b != property_statust::PASS && b != property_statust::NOT_REACHABLE ? b
+                                                                           : a);
+    return a;
+  case property_statust::NOT_REACHABLE:
+    a = (b != property_statust::PASS ? b : a);
+    return a;
+  case property_statust::PASS:
+    a = (b == property_statust::PASS ? a : b);
+    return a;
+  }
+  UNREACHABLE;
+}
+
+/// Determines the overall result corresponding from the given properties
+/// That is PASS if all properties are PASS or NOT_CHECKED,
+///         FAIL if at least one property is FAIL and no property is ERROR,
+///         UNKNOWN if no property is FAIL or ERROR and
+///           at least one property is UNKNOWN,
+///         ERROR if at least one property is error.
+resultt determine_result(const propertiest &properties)
+{
+  property_statust status = property_statust::PASS;
+  for(const auto &property_pair : properties)
+  {
+    status &= property_pair.second.status;
+  }
+  switch(status)
+  {
+  case property_statust::NOT_CHECKED:
+    // If we have unchecked properties then we don't know.
+    return resultt::UNKNOWN;
+  case property_statust::UNKNOWN:
+    return resultt::UNKNOWN;
+  case property_statust::NOT_REACHABLE:
+    // If a property is not reachable then overall it's still a PASS.
+    return resultt::PASS;
+  case property_statust::PASS:
+    return resultt::PASS;
+  case property_statust::FAIL:
+    return resultt::FAIL;
+  case property_statust::ERROR:
+    return resultt::ERROR;
+  }
+  UNREACHABLE;
+}
