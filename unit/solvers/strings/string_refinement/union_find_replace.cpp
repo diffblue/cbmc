@@ -13,8 +13,8 @@ Author: Diffblue Ltd.
 
 #include <util/arith_tools.h>
 #include <util/c_types.h>
-#include <util/std_types.h>
 #include <util/std_expr.h>
+#include <util/std_types.h>
 
 SCENARIO("union_find_replace", "[core][solvers][strings][string_refinement]")
 {

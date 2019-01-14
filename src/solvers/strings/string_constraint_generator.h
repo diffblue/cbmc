@@ -21,12 +21,12 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #define CPROVER_SOLVERS_REFINEMENT_STRING_CONSTRAINT_GENERATOR_H
 
 #include <limits>
-#include <util/string_expr.h>
-#include <util/replace_expr.h>
-#include <util/refined_string_type.h>
+#include <solvers/strings/string_constraint.h>
 #include <util/constexpr.def>
 #include <util/deprecate.h>
-#include <solvers/strings/string_constraint.h>
+#include <util/refined_string_type.h>
+#include <util/replace_expr.h>
+#include <util/string_expr.h>
 
 /// Generation of fresh symbols of a given type
 class symbol_generatort final
@@ -126,8 +126,8 @@ public:
 
   explicit string_constraint_generatort(const namespacet &ns);
 
-  std::pair<exprt, string_constraintst> add_axioms_for_function_application(
-    const function_application_exprt &expr);
+  std::pair<exprt, string_constraintst>
+  add_axioms_for_function_application(const function_application_exprt &expr);
 
   symbol_generatort fresh_symbol;
 
@@ -148,8 +148,8 @@ private:
   /// \todo This does not work at the moment because of the way we treat
   /// string pointers.
   /// \deprecated Not tested.
-  std::pair<symbol_exprt, string_constraintst> add_axioms_for_intern(
-    const function_application_exprt &f);
+  std::pair<symbol_exprt, string_constraintst>
+  add_axioms_for_intern(const function_application_exprt &f);
 
   exprt associate_array_to_pointer(const function_application_exprt &f);
 
@@ -265,8 +265,8 @@ std::pair<exprt, string_constraintst> add_axioms_for_is_suffix(
 std::pair<exprt, string_constraintst> add_axioms_for_length(
   const function_application_exprt &f,
   array_poolt &array_pool);
-std::pair<exprt, string_constraintst> add_axioms_for_empty_string(
-  const function_application_exprt &f);
+std::pair<exprt, string_constraintst>
+add_axioms_for_empty_string(const function_application_exprt &f);
 
 std::pair<exprt, string_constraintst> add_axioms_for_copy(
   symbol_generatort &fresh_symbol,
@@ -355,9 +355,8 @@ std::pair<exprt, string_constraintst> add_axioms_for_string_of_int(
   const exprt &input_int,
   size_t max_size,
   const namespacet &ns);
-std::pair<exprt, string_constraintst> add_axioms_from_int_hex(
-  const array_string_exprt &res,
-  const exprt &i);
+std::pair<exprt, string_constraintst>
+add_axioms_from_int_hex(const array_string_exprt &res, const exprt &i);
 std::pair<exprt, string_constraintst> add_axioms_from_int_hex(
   const function_application_exprt &f,
   array_poolt &array_pool);
@@ -368,15 +367,13 @@ std::pair<exprt, string_constraintst> add_axioms_from_long(
 std::pair<exprt, string_constraintst> add_axioms_from_bool(
   const function_application_exprt &f,
   array_poolt &array_pool);
-std::pair<exprt, string_constraintst> add_axioms_from_bool(
-  const array_string_exprt &res,
-  const exprt &i);
+std::pair<exprt, string_constraintst>
+add_axioms_from_bool(const array_string_exprt &res, const exprt &i);
 std::pair<exprt, string_constraintst> add_axioms_from_char(
   const function_application_exprt &f,
   array_poolt &array_pool);
-std::pair<exprt, string_constraintst> add_axioms_from_char(
-  const array_string_exprt &res,
-  const exprt &i);
+std::pair<exprt, string_constraintst>
+add_axioms_from_char(const array_string_exprt &res, const exprt &i);
 std::pair<exprt, string_constraintst> add_axioms_for_index_of(
   symbol_generatort &fresh_symbol,
   const array_string_exprt &str,
@@ -478,8 +475,8 @@ std::pair<exprt, string_constraintst> add_axioms_for_trim(
 std::pair<exprt, string_constraintst> add_axioms_for_code_point(
   const array_string_exprt &res,
   const exprt &code_point);
-std::pair<exprt, string_constraintst> add_axioms_for_char_literal(
-  const function_application_exprt &f);
+std::pair<exprt, string_constraintst>
+add_axioms_for_char_literal(const function_application_exprt &f);
 
 /// Add axioms corresponding the String.codePointCount java function
 /// \todo This function is underspecified, we do not compute the exact value

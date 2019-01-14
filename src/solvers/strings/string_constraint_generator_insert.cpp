@@ -9,8 +9,8 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 /// \file
 /// Generates string constraints for the family of insert Java functions
 
-#include "string_refinement_invariant.h"
 #include "string_constraint_generator.h"
+#include "string_refinement_invariant.h"
 
 #include <util/deprecate.h>
 
@@ -38,7 +38,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_insert(
   const array_string_exprt &s2,
   const exprt &offset)
 {
-  PRECONDITION(offset.type()==s1.length().type());
+  PRECONDITION(offset.type() == s1.length().type());
 
   string_constraintst constraints;
   const typet &index_type = s1.length().type();

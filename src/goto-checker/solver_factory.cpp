@@ -28,9 +28,9 @@ Author: Daniel Kroening, Peter Schrammel
 #include <solvers/prop/prop.h>
 #include <solvers/prop/prop_conv.h>
 #include <solvers/refinement/bv_refinement.h>
-#include <solvers/strings/string_refinement.h>
 #include <solvers/sat/dimacs_cnf.h>
 #include <solvers/sat/satcheck.h>
+#include <solvers/strings/string_refinement.h>
 
 solver_factoryt::solver_factoryt(
   const optionst &_options,

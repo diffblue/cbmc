@@ -12,8 +12,8 @@ Date:   May 2017
 /// Generates string constraints for the Java format function
 
 #include <iomanip>
-#include <string>
 #include <regex>
+#include <string>
 #include <vector>
 
 #include <util/std_expr.h>
@@ -27,35 +27,35 @@ class format_specifiert
 {
 public:
   // Constants describing the meaning of characters in format specifiers.
-  static const char DECIMAL_INTEGER          ='d';
-  static const char OCTAL_INTEGER            ='o';
-  static const char HEXADECIMAL_INTEGER      ='x';
-  static const char HEXADECIMAL_INTEGER_UPPER='X';
-  static const char SCIENTIFIC               ='e';
-  static const char SCIENTIFIC_UPPER         ='E';
-  static const char GENERAL                  ='g';
-  static const char GENERAL_UPPER            ='G';
-  static const char DECIMAL_FLOAT            ='f';
-  static const char HEXADECIMAL_FLOAT        ='a';
-  static const char HEXADECIMAL_FLOAT_UPPER  ='A';
-  static const char CHARACTER                ='c';
-  static const char CHARACTER_UPPER          ='C';
-  static const char DATE_TIME                ='t';
-  static const char DATE_TIME_UPPER          ='T';
-  static const char BOOLEAN                  ='b';
-  static const char BOOLEAN_UPPER            ='B';
-  static const char STRING                   ='s';
-  static const char STRING_UPPER             ='S';
-  static const char HASHCODE                 ='h';
-  static const char HASHCODE_UPPER           ='H';
-  static const char LINE_SEPARATOR           ='n';
-  static const char PERCENT_SIGN             ='%';
+  static const char DECIMAL_INTEGER = 'd';
+  static const char OCTAL_INTEGER = 'o';
+  static const char HEXADECIMAL_INTEGER = 'x';
+  static const char HEXADECIMAL_INTEGER_UPPER = 'X';
+  static const char SCIENTIFIC = 'e';
+  static const char SCIENTIFIC_UPPER = 'E';
+  static const char GENERAL = 'g';
+  static const char GENERAL_UPPER = 'G';
+  static const char DECIMAL_FLOAT = 'f';
+  static const char HEXADECIMAL_FLOAT = 'a';
+  static const char HEXADECIMAL_FLOAT_UPPER = 'A';
+  static const char CHARACTER = 'c';
+  static const char CHARACTER_UPPER = 'C';
+  static const char DATE_TIME = 't';
+  static const char DATE_TIME_UPPER = 'T';
+  static const char BOOLEAN = 'b';
+  static const char BOOLEAN_UPPER = 'B';
+  static const char STRING = 's';
+  static const char STRING_UPPER = 'S';
+  static const char HASHCODE = 'h';
+  static const char HASHCODE_UPPER = 'H';
+  static const char LINE_SEPARATOR = 'n';
+  static const char PERCENT_SIGN = '%';
 
-  int index=-1;
+  int index = -1;
   std::string flag;
   int width;
   int precision;
-  bool dt=false;
+  bool dt = false;
   char conversion;
 
   format_specifiert(
@@ -64,23 +64,28 @@ public:
     int _width,
     int _precision,
     bool _dt,
-    char c):
-      index(_index),
+    char c)
+    : index(_index),
       flag(_flag),
       width(_width),
       precision(_precision),
       dt(_dt),
       conversion(c)
-  { }
+  {
+  }
 };
 
 // Format text represent a constant part of a format string.
 class format_textt
 {
 public:
-  explicit format_textt(std::string _content): content(_content) { }
+  explicit format_textt(std::string _content) : content(_content)
+  {
+  }
 
-  format_textt(const format_textt &fs): content(fs.content) { }
+  format_textt(const format_textt &fs) : content(fs.content)
+  {
+  }
 
   std::string get_content() const
   {
@@ -95,13 +100,17 @@ private:
 class format_elementt
 {
 public:
-  typedef enum {SPECIFIER, TEXT} format_typet;
+  typedef enum
+  {
+    SPECIFIER,
+    TEXT
+  } format_typet;
 
-  explicit format_elementt(format_typet _type): type(_type), fstring("")
+  explicit format_elementt(format_typet _type) : type(_type), fstring("")
   {
   }
 
-  explicit format_elementt(std::string s): type(TEXT), fstring(s)
+  explicit format_elementt(std::string s) : type(TEXT), fstring(s)
   {
   }
 
@@ -112,12 +121,12 @@ public:
 
   bool is_format_specifier() const
   {
-    return type==SPECIFIER;
+    return type == SPECIFIER;
   }
 
   bool is_format_text() const
   {
-    return type==TEXT;
+    return type == TEXT;
   }
 
   format_specifiert get_format_specifier() const
@@ -184,19 +193,19 @@ static bool check_format_string(std::string s)
 ///   conversion type.
 static format_specifiert format_specifier_of_match(std::smatch &m)
 {
-  int index=m[1].str().empty()?-1:std::stoi(m[1].str());
-  std::string flag=m[2].str().empty()?"":m[2].str();
-  int width=m[3].str().empty()?-1:std::stoi(m[3].str());
-  int precision=m[4].str().empty()?-1:std::stoi(m[4].str());
-  std::string tT=m[5].str();
+  int index = m[1].str().empty() ? -1 : std::stoi(m[1].str());
+  std::string flag = m[2].str().empty() ? "" : m[2].str();
+  int width = m[3].str().empty() ? -1 : std::stoi(m[3].str());
+  int precision = m[4].str().empty() ? -1 : std::stoi(m[4].str());
+  std::string tT = m[5].str();
 
-  bool dt=(tT!="");
-  if(tT=="T")
+  bool dt = (tT != "");
+  if(tT == "T")
     flag.push_back(format_specifiert::DATE_TIME_UPPER);
 
   INVARIANT(
-    m[6].str().length()==1, "format conversion should be one character");
-  char conversion=m[6].str()[0];
+    m[6].str().length() == 1, "format conversion should be one character");
+  char conversion = m[6].str()[0];
 
   return format_specifiert(index, flag, width, precision, dt, conversion);
 }
@@ -208,7 +217,7 @@ static format_specifiert format_specifier_of_match(std::smatch &m)
 /// \return A vector of format_elementt.
 static std::vector<format_elementt> parse_format_string(std::string s)
 {
-  std::string format_specifier=
+  std::string format_specifier =
     "%(\\d+\\$)?([-#+ 0,(\\<]*)?(\\d+)?(\\.\\d+)?([tT])?([a-zA-Z%])";
   std::regex regex(format_specifier);
   std::vector<format_elementt> al;
@@ -216,14 +225,14 @@ static std::vector<format_elementt> parse_format_string(std::string s)
 
   while(std::regex_search(s, match, regex))
   {
-    if(match.position()!=0)
+    if(match.position() != 0)
     {
-      std::string pre_match=s.substr(0, match.position());
+      std::string pre_match = s.substr(0, match.position());
       al.emplace_back(pre_match);
     }
 
     al.emplace_back(format_specifier_of_match(match));
-    s=match.suffix();
+    s = match.suffix();
   }
 
   al.emplace_back(s);
@@ -234,11 +243,11 @@ static std::vector<format_elementt> parse_format_string(std::string s)
 /// \param expr: a structured expression
 /// \param component_name: name of the desired component
 /// \return Expression in the component of `expr` named `component_name`.
-static exprt get_component_in_struct(
-  const struct_exprt &expr, irep_idt component_name)
+static exprt
+get_component_in_struct(const struct_exprt &expr, irep_idt component_name)
 {
-  const struct_typet &type=to_struct_type(expr.type());
-  std::size_t number=type.component_number(component_name);
+  const struct_typet &type = to_struct_type(expr.type());
+  std::size_t number = type.component_number(component_name);
   return expr.operands()[number];
 }
 
@@ -331,7 +340,7 @@ add_axioms_for_format_specifier(
   case format_specifiert::HASHCODE_UPPER:
   {
     format_specifiert fs_lower = fs;
-    fs_lower.conversion=tolower(fs.conversion);
+    fs_lower.conversion = tolower(fs.conversion);
     auto format_specifier_result = add_axioms_for_format_specifier(
       fresh_symbol,
       fs_lower,
@@ -390,9 +399,9 @@ std::pair<exprt, string_constraintst> add_axioms_for_format(
   const namespacet &ns)
 {
   string_constraintst constraints;
-  const std::vector<format_elementt> format_strings=parse_format_string(s);
+  const std::vector<format_elementt> format_strings = parse_format_string(s);
   std::vector<array_string_exprt> intermediary_strings;
-  std::size_t arg_count=0;
+  std::size_t arg_count = 0;
   const typet &char_type = res.content().type().subtype();
   const typet &index_type = res.length().type();
 
@@ -400,27 +409,28 @@ std::pair<exprt, string_constraintst> add_axioms_for_format(
   {
     if(fe.is_format_specifier())
     {
-      const format_specifiert &fs=fe.get_format_specifier();
-      if(fs.conversion!=format_specifiert::PERCENT_SIGN &&
-         fs.conversion!=format_specifiert::LINE_SEPARATOR)
+      const format_specifiert &fs = fe.get_format_specifier();
+      if(
+        fs.conversion != format_specifiert::PERCENT_SIGN &&
+        fs.conversion != format_specifiert::LINE_SEPARATOR)
       {
         exprt arg;
 
-        if(fs.index==-1)
+        if(fs.index == -1)
         {
           INVARIANT(
-            arg_count<args.size(), "number of format must match specifiers");
-          arg=to_struct_expr(args[arg_count++]);
+            arg_count < args.size(), "number of format must match specifiers");
+          arg = to_struct_expr(args[arg_count++]);
         }
         else
         {
           INVARIANT(fs.index > 0, "index in format should be positive");
           INVARIANT(
-            static_cast<std::size_t>(fs.index)<=args.size(),
+            static_cast<std::size_t>(fs.index) <= args.size(),
             "number of format must match specifiers");
 
           // first argument `args[0]` corresponds to index 1
-          arg=to_struct_expr(args[fs.index-1]);
+          arg = to_struct_expr(args[fs.index - 1]);
         }
 
         auto result = add_axioms_for_format_specifier(
@@ -498,7 +508,7 @@ utf16_constant_array_to_java(const array_exprt &arr, std::size_t length)
 
   std::wstring out(length, '?');
 
-  for(std::size_t i=0; i<arr.operands().size() && i<length; i++)
+  for(std::size_t i = 0; i < arr.operands().size() && i < length; i++)
     out[i] = numeric_cast_v<unsigned>(to_constant_expr(arr.operands()[i]));
 
   return utf16_native_endian_to_java(out);
@@ -534,8 +544,8 @@ std::pair<exprt, string_constraintst> add_axioms_for_format(
   {
     const auto length =
       numeric_cast_v<std::size_t>(to_constant_expr(s1.length()));
-    std::string s=utf16_constant_array_to_java(
-      to_array_expr(s1.content()), length);
+    std::string s =
+      utf16_constant_array_to_java(to_array_expr(s1.content()), length);
     // List of arguments after s
     std::vector<exprt> args(f.arguments().begin() + 3, f.arguments().end());
     return add_axioms_for_format(

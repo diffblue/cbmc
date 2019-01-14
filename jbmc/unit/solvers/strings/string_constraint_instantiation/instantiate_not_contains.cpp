@@ -8,18 +8,18 @@ Author: Jesse Sigal, jesse.sigal@diffblue.com
 
 #include <testing-utils/catch.hpp>
 
-#include <numeric>
 #include <java_bytecode/java_bytecode_language.h>
 #include <java_bytecode/java_types.h>
+#include <numeric>
 
-#include <langapi/mode.h>
 #include <langapi/language_util.h>
+#include <langapi/mode.h>
 
-#include <solvers/strings/string_constraint_instantiation.h>
 #include <solvers/sat/satcheck.h>
+#include <solvers/strings/string_constraint_instantiation.h>
 
-#include <util/simplify_expr.h>
 #include <util/config.h>
+#include <util/simplify_expr.h>
 
 /// \class Types used throughout the test. Currently it is impossible to
 /// statically initialize this value, there is a PR to allow this
@@ -27,9 +27,17 @@ Author: Jesse Sigal, jesse.sigal@diffblue.com
 class tt
 {
 public:
-  tt() {}
-  typet char_type() const {return java_char_type();}
-  typet length_type() const {return java_int_type();}
+  tt()
+  {
+  }
+  typet char_type() const
+  {
+    return java_char_type();
+  }
+  typet length_type() const
+  {
+    return java_int_type();
+  }
   array_typet array_type() const
   {
     return array_typet(char_type(), infinity_exprt(length_type()));
@@ -60,7 +68,7 @@ constant_exprt from_integer(const mp_integer &i)
 /// \return corresponding `string_exprt`
 array_string_exprt make_string_exprt(const std::string &str)
 {
-  const constant_exprt length=from_integer(str.length(), t.length_type());
+  const constant_exprt length = from_integer(str.length(), t.length_type());
   array_exprt content({}, array_typet(t.char_type(), length));
 
   for(const char c : str)
@@ -92,7 +100,7 @@ std::set<exprt> full_index_set(const array_string_exprt &s)
 {
   const mp_integer n = numeric_cast_v<mp_integer>(s.length());
   std::set<exprt> ret;
-  for(mp_integer i=0; i<n; ++i)
+  for(mp_integer i = 0; i < n; ++i)
     ret.insert(from_integer(i));
   return ret;
 }
@@ -115,7 +123,7 @@ std::set<std::pair<X, Y>> product(const std::set<X> xs, const std::set<Y> ys)
 exprt combine_lemmas(const std::vector<exprt> &lemmas, const namespacet &ns)
 {
   // Conjunction of new lemmas
-  exprt conj=conjunction(lemmas);
+  exprt conj = conjunction(lemmas);
   // Simplify
   simplify(conj, ns);
 
@@ -137,7 +145,7 @@ std::string create_info(std::vector<exprt> &lemmas, const namespacet &ns)
     get_language_from_mode(ID_java)->from_expr(lemma, lemma_string, ns);
     new_lemmas += lemma_string + "\n\n";
   }
-  return "Instantiated lemmas:\n"+new_lemmas;
+  return "Instantiated lemmas:\n" + new_lemmas;
 }
 
 /// Checks the satisfiability of the given expression.
@@ -148,8 +156,8 @@ decision_proceduret::resultt check_sat(const exprt &expr, const namespacet &ns)
 {
   satcheck_no_simplifiert sat_check;
   bv_refinementt::infot info;
-  info.ns=&ns;
-  info.prop=&sat_check;
+  info.ns = &ns;
+  info.prop = &sat_check;
   info.output_xml = false;
   bv_refinementt solver(info);
   solver << expr;
@@ -157,7 +165,8 @@ decision_proceduret::resultt check_sat(const exprt &expr, const namespacet &ns)
 }
 
 // The [!mayfail] tag allows tests to fail while reporting the failure
-SCENARIO("instantiate_not_contains",
+SCENARIO(
+  "instantiate_not_contains",
   "[!mayfail][core][solvers][refinement][string_constraint_instantiation]")
 {
   // For printing expression
@@ -261,10 +270,10 @@ SCENARIO("instantiate_not_contains",
         decision_proceduret::resultt result = check_sat(conj, empty_ns);
 
         // Require SAT
-        if(result==decision_proceduret::resultt::D_ERROR)
+        if(result == decision_proceduret::resultt::D_ERROR)
           INFO("Got an error");
 
-        REQUIRE(result==decision_proceduret::resultt::D_SATISFIABLE);
+        REQUIRE(result == decision_proceduret::resultt::D_SATISFIABLE);
       }
     }
   }
@@ -311,10 +320,10 @@ SCENARIO("instantiate_not_contains",
         decision_proceduret::resultt result = check_sat(conj, empty_ns);
 
         // Require SAT
-        if(result==decision_proceduret::resultt::D_ERROR)
+        if(result == decision_proceduret::resultt::D_ERROR)
           INFO("Got an error");
 
-        REQUIRE(result==decision_proceduret::resultt::D_SATISFIABLE);
+        REQUIRE(result == decision_proceduret::resultt::D_SATISFIABLE);
       }
     }
   }
@@ -362,10 +371,10 @@ SCENARIO("instantiate_not_contains",
         decision_proceduret::resultt result = check_sat(conj, empty_ns);
 
         // Require UNSAT
-        if(result==decision_proceduret::resultt::D_ERROR)
+        if(result == decision_proceduret::resultt::D_ERROR)
           INFO("Got an error");
 
-        REQUIRE(result==decision_proceduret::resultt::D_UNSATISFIABLE);
+        REQUIRE(result == decision_proceduret::resultt::D_UNSATISFIABLE);
       }
     }
   }
@@ -414,10 +423,10 @@ SCENARIO("instantiate_not_contains",
         decision_proceduret::resultt result = check_sat(conj, empty_ns);
 
         // Require UNSAT
-        if(result==decision_proceduret::resultt::D_ERROR)
+        if(result == decision_proceduret::resultt::D_ERROR)
           INFO("Got an error");
 
-        REQUIRE(result==decision_proceduret::resultt::D_UNSATISFIABLE);
+        REQUIRE(result == decision_proceduret::resultt::D_UNSATISFIABLE);
       }
     }
   }
@@ -465,10 +474,10 @@ SCENARIO("instantiate_not_contains",
         decision_proceduret::resultt result = check_sat(conj, empty_ns);
 
         // Require UNSAT
-        if(result==decision_proceduret::resultt::D_ERROR)
+        if(result == decision_proceduret::resultt::D_ERROR)
           INFO("Got an error");
 
-        REQUIRE(result==decision_proceduret::resultt::D_UNSATISFIABLE);
+        REQUIRE(result == decision_proceduret::resultt::D_UNSATISFIABLE);
       }
     }
   }
@@ -517,10 +526,10 @@ SCENARIO("instantiate_not_contains",
         decision_proceduret::resultt result = check_sat(conj, empty_ns);
 
         // Require UNSAT
-        if(result==decision_proceduret::resultt::D_ERROR)
+        if(result == decision_proceduret::resultt::D_ERROR)
           INFO("Got an error");
 
-        REQUIRE(result==decision_proceduret::resultt::D_SATISFIABLE);
+        REQUIRE(result == decision_proceduret::resultt::D_SATISFIABLE);
       }
     }
   }

@@ -10,25 +10,26 @@ Author: Diffblue Ltd.
 #include <testing-utils/catch.hpp>
 
 #include <util/arith_tools.h>
-#include <util/std_types.h>
 #include <util/std_expr.h>
+#include <util/std_types.h>
 #include <util/symbol_table.h>
 
 #include <solvers/strings/string_refinement.h>
 
-SCENARIO("concretize_array_expression",
+SCENARIO(
+  "concretize_array_expression",
   "[core][solvers][strings][string_refinement]")
 {
   // Arrange
-  const typet char_type=unsignedbv_typet(16);
-  const typet int_type=signedbv_typet(32);
-  const exprt index1=from_integer(1, int_type);
-  const exprt charx=from_integer('x', char_type);
-  const exprt index4=from_integer(4, int_type);
-  const exprt chary=from_integer('y', char_type);
-  const exprt index100=from_integer(100, int_type);
-  const exprt char0=from_integer('0', char_type);
-  const exprt index2=from_integer(2, int_type);
+  const typet char_type = unsignedbv_typet(16);
+  const typet int_type = signedbv_typet(32);
+  const exprt index1 = from_integer(1, int_type);
+  const exprt charx = from_integer('x', char_type);
+  const exprt index4 = from_integer(4, int_type);
+  const exprt chary = from_integer('y', char_type);
+  const exprt index100 = from_integer(100, int_type);
+  const exprt char0 = from_integer('0', char_type);
+  const exprt index2 = from_integer(2, int_type);
   const exprt charz = from_integer('z', char_type);
   array_typet array_type(char_type, infinity_exprt(int_type));
 
@@ -53,5 +54,5 @@ SCENARIO("concretize_array_expression",
   array_exprt expected(
     {charx, charx, chary, chary, chary, charz, charz}, array_type);
   to_array_type(expected.type()).size() = from_integer(7, int_type);
-  REQUIRE(concrete==expected);
+  REQUIRE(concrete == expected);
 }

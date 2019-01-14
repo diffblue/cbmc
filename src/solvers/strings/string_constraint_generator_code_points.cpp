@@ -23,8 +23,8 @@ std::pair<exprt, string_constraintst> add_axioms_for_code_point(
 {
   string_constraintst constraints;
   const typet &char_type = res.content().type().subtype();
-  const typet &type=code_point.type();
-  PRECONDITION(type.id()==ID_signedbv);
+  const typet &type = code_point.type();
+  PRECONDITION(type.id() == ID_signedbv);
 
   // We add axioms:
   // a1 : code_point<0x010000 => |res|=1
@@ -35,10 +35,10 @@ std::pair<exprt, string_constraintst> add_axioms_for_code_point(
   // For more explenations about this conversion, see:
   //   https://en.wikipedia.org/wiki/UTF-16
 
-  exprt hex010000=from_integer(0x010000, type);
-  exprt hexD800=from_integer(0xD800, type);
-  exprt hexDC00=from_integer(0xDC00, type);
-  exprt hex0400=from_integer(0x0400, type);
+  exprt hex010000 = from_integer(0x010000, type);
+  exprt hexD800 = from_integer(0xD800, type);
+  exprt hexDC00 = from_integer(0xDC00, type);
+  exprt hex0400 = from_integer(0x0400, type);
 
   binary_relation_exprt small(code_point, ID_lt, hex010000);
   implies_exprt a1(small, length_eq(res, 1));
@@ -104,9 +104,9 @@ static exprt is_low_surrogate(const exprt &chr)
 /// \return an integer expression of type return_type
 exprt pair_value(exprt char1, exprt char2, typet return_type)
 {
-  exprt hex010000=from_integer(0x010000, return_type);
-  exprt hex0800=from_integer(0x0800, return_type);
-  exprt hex0400=from_integer(0x0400, return_type);
+  exprt hex010000 = from_integer(0x010000, return_type);
+  exprt hex0800 = from_integer(0x0800, return_type);
+  exprt hex0400 = from_integer(0x0400, return_type);
   mult_exprt m1(mod_exprt(char1, hex0800), hex0400);
   mod_exprt m2(char2, hex0400);
   return plus_exprt(hex010000, plus_exprt(m1, m2));
@@ -125,14 +125,14 @@ std::pair<exprt, string_constraintst> add_axioms_for_code_point_at(
 {
   string_constraintst constraints;
   const typet &return_type = f.type();
-  PRECONDITION(return_type.id()==ID_signedbv);
+  PRECONDITION(return_type.id() == ID_signedbv);
   PRECONDITION(f.arguments().size() == 2);
   const array_string_exprt str = get_string_expr(array_pool, f.arguments()[0]);
   const exprt &pos = f.arguments()[1];
 
   const symbol_exprt result = fresh_symbol("char", return_type);
   const exprt index1 = from_integer(1, str.length().type());
-  const exprt &char1=str[pos];
+  const exprt &char1 = str[pos];
   const exprt &char2 = str[plus_exprt(pos, index1)];
   const typecast_exprt char1_as_int(char1, return_type);
   const typecast_exprt char2_as_int(char2, return_type);
@@ -156,17 +156,17 @@ std::pair<exprt, string_constraintst> add_axioms_for_code_point_before(
   const function_application_exprt &f,
   array_poolt &array_pool)
 {
-  const function_application_exprt::argumentst &args=f.arguments();
-  PRECONDITION(args.size()==2);
-  typet return_type=f.type();
-  PRECONDITION(return_type.id()==ID_signedbv);
-  symbol_exprt result=fresh_symbol("char", return_type);
+  const function_application_exprt::argumentst &args = f.arguments();
+  PRECONDITION(args.size() == 2);
+  typet return_type = f.type();
+  PRECONDITION(return_type.id() == ID_signedbv);
+  symbol_exprt result = fresh_symbol("char", return_type);
   array_string_exprt str = get_string_expr(array_pool, args[0]);
   string_constraintst constraints;
 
-  const exprt &char1=
+  const exprt &char1 =
     str[minus_exprt(args[1], from_integer(2, str.length().type()))];
-  const exprt &char2=
+  const exprt &char2 =
     str[minus_exprt(args[1], from_integer(1, str.length().type()))];
   const typecast_exprt char1_as_int(char1, return_type);
   const typecast_exprt char2_as_int(char2, return_type);
@@ -199,7 +199,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_code_point_count(
   const array_string_exprt str = get_string_expr(array_pool, f.arguments()[0]);
   const exprt &begin = f.arguments()[1];
   const exprt &end = f.arguments()[2];
-  const typet &return_type=f.type();
+  const typet &return_type = f.type();
   const symbol_exprt result = fresh_symbol("code_point_count", return_type);
   const minus_exprt length(end, begin);
   const div_exprt minimum(length, from_integer(2, length.type()));
@@ -226,7 +226,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_offset_by_code_point(
   string_constraintst constraints;
   const exprt &index = f.arguments()[1];
   const exprt &offset = f.arguments()[2];
-  const typet &return_type=f.type();
+  const typet &return_type = f.type();
   const symbol_exprt result = fresh_symbol("offset_by_code_point", return_type);
 
   const exprt minimum = plus_exprt(index, offset);
@@ -238,4 +238,3 @@ std::pair<exprt, string_constraintst> add_axioms_for_offset_by_code_point(
 
   return {result, constraints};
 }
-

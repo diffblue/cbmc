@@ -161,6 +161,6 @@ struct hash<string_not_contains_constraintt>
            irep_hash()(constraint.s1);
   }
 };
-}
+} // namespace std
 
 #endif

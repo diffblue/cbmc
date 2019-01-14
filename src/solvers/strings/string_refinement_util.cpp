@@ -6,20 +6,20 @@ Author: Diffblue Ltd.
 
 \*******************************************************************/
 
+#include "string_refinement_util.h"
 #include <algorithm>
-#include <numeric>
 #include <functional>
 #include <iostream>
+#include <numeric>
+#include <unordered_set>
 #include <util/arith_tools.h>
-#include <util/expr_util.h>
-#include <util/ssa_expr.h>
-#include <util/std_expr.h>
 #include <util/expr_iterator.h>
+#include <util/expr_util.h>
 #include <util/graph.h>
 #include <util/magic.h>
 #include <util/make_unique.h>
-#include <unordered_set>
-#include "string_refinement_util.h"
+#include <util/ssa_expr.h>
+#include <util/std_expr.h>
 
 /// Applies `f` on all strings contained in `e` that are not if-expressions.
 /// For instance on input `cond1?s1:cond2?s2:s3` we apply `f` on s1, s2 and s3.
@@ -29,9 +29,8 @@ static void for_each_atomic_string(
 
 bool is_char_type(const typet &type)
 {
-  return type.id() == ID_unsignedbv &&
-         to_unsignedbv_type(type).get_width() <=
-           STRING_REFINEMENT_MAX_CHAR_WIDTH;
+  return type.id() == ID_unsignedbv && to_unsignedbv_type(type).get_width() <=
+                                         STRING_REFINEMENT_MAX_CHAR_WIDTH;
 }
 
 bool is_char_array_type(const typet &type, const namespacet &ns)
@@ -432,8 +431,9 @@ void string_dependenciest::for_each_dependency(
         const auto string_node = node_at(to_array_string_expr(current));
         INVARIANT(
           string_node,
-          "dependencies of the node should have been added to the graph at node creation "
-          + current.get().pretty());
+          "dependencies of the node should have been added to the graph at "
+          "node creation " +
+            current.get().pretty());
         f(*string_node);
       }
     }

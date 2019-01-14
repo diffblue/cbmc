@@ -33,8 +33,8 @@ std::vector<exprt> instantiate_not_contains(
   {
     // We have s0[x+f(x)] and s1[f(x)], so to have i0 indexing s0 and i1
     // indexing s1, we need x = i0 - i1 and f(i0 - i1) = f(x) = i1.
-    const exprt &i0=pair.first;
-    const exprt &i1=pair.second;
+    const exprt &i0 = pair.first;
+    const exprt &i1 = pair.second;
     const minus_exprt val(i0, i1);
     const and_exprt universal_bound(
       binary_relation_exprt(axiom.univ_lower_bound, ID_le, val),

@@ -129,7 +129,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_concat(
   const array_string_exprt &s1,
   const array_string_exprt &s2)
 {
-  exprt index_zero=from_integer(0, s2.length().type());
+  exprt index_zero = from_integer(0, s2.length().type());
   return add_axioms_for_concat_substr(
     fresh_symbol, res, s1, s2, index_zero, s2.length());
 }

@@ -24,10 +24,10 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <limits>
 
 #include <util/arith_tools.h>
+#include <util/deprecate.h>
 #include <util/pointer_predicates.h>
 #include <util/ssa_expr.h>
 #include <util/string_constant.h>
-#include <util/deprecate.h>
 
 string_constraint_generatort::string_constraint_generatort(const namespacet &ns)
   : array_pool(fresh_symbol), ns(ns)
@@ -135,7 +135,7 @@ array_string_exprt array_poolt::make_char_array_for_char_pointer(
     to_array_string_expr(fresh_symbol(symbol_name, char_array_type));
   const auto insert_result =
     arrays_of_pointers.insert({char_pointer, array_sym});
-  return  to_array_string_expr(insert_result.first->second);
+  return to_array_string_expr(insert_result.first->second);
 }
 
 void array_poolt::insert(
@@ -371,98 +371,98 @@ string_constraint_generatort::add_axioms_for_function_application(
 {
   const irep_idt &id = get_function_name(expr);
 
-  if(id==ID_cprover_char_literal_func)
+  if(id == ID_cprover_char_literal_func)
     return add_axioms_for_char_literal(expr);
-  else if(id==ID_cprover_string_length_func)
+  else if(id == ID_cprover_string_length_func)
     return add_axioms_for_length(expr, array_pool);
-  else if(id==ID_cprover_string_equal_func)
+  else if(id == ID_cprover_string_equal_func)
     return add_axioms_for_equals(fresh_symbol, expr, array_pool);
-  else if(id==ID_cprover_string_equals_ignore_case_func)
+  else if(id == ID_cprover_string_equals_ignore_case_func)
     return add_axioms_for_equals_ignore_case(fresh_symbol, expr, array_pool);
-  else if(id==ID_cprover_string_is_empty_func)
+  else if(id == ID_cprover_string_is_empty_func)
     return add_axioms_for_is_empty(fresh_symbol, expr, array_pool);
-  else if(id==ID_cprover_string_char_at_func)
+  else if(id == ID_cprover_string_char_at_func)
     return add_axioms_for_char_at(fresh_symbol, expr, array_pool);
-  else if(id==ID_cprover_string_is_prefix_func)
+  else if(id == ID_cprover_string_is_prefix_func)
     return add_axioms_for_is_prefix(fresh_symbol, expr, false, array_pool);
-  else if(id==ID_cprover_string_is_suffix_func)
+  else if(id == ID_cprover_string_is_suffix_func)
     return add_axioms_for_is_suffix(fresh_symbol, expr, false, array_pool);
-  else if(id==ID_cprover_string_startswith_func)
+  else if(id == ID_cprover_string_startswith_func)
     return add_axioms_for_is_prefix(fresh_symbol, expr, true, array_pool);
-  else if(id==ID_cprover_string_endswith_func)
+  else if(id == ID_cprover_string_endswith_func)
     return add_axioms_for_is_suffix(fresh_symbol, expr, true, array_pool);
-  else if(id==ID_cprover_string_contains_func)
+  else if(id == ID_cprover_string_contains_func)
     return add_axioms_for_contains(fresh_symbol, expr, array_pool);
-  else if(id==ID_cprover_string_hash_code_func)
+  else if(id == ID_cprover_string_hash_code_func)
     return add_axioms_for_hash_code(expr, array_pool);
-  else if(id==ID_cprover_string_index_of_func)
+  else if(id == ID_cprover_string_index_of_func)
     return add_axioms_for_index_of(fresh_symbol, expr, array_pool);
-  else if(id==ID_cprover_string_last_index_of_func)
+  else if(id == ID_cprover_string_last_index_of_func)
     return add_axioms_for_last_index_of(fresh_symbol, expr, array_pool);
-  else if(id==ID_cprover_string_parse_int_func)
+  else if(id == ID_cprover_string_parse_int_func)
     return add_axioms_for_parse_int(fresh_symbol, expr, array_pool, ns);
-  else if(id==ID_cprover_string_code_point_at_func)
+  else if(id == ID_cprover_string_code_point_at_func)
     return add_axioms_for_code_point_at(fresh_symbol, expr, array_pool);
-  else if(id==ID_cprover_string_code_point_before_func)
+  else if(id == ID_cprover_string_code_point_before_func)
     return add_axioms_for_code_point_before(fresh_symbol, expr, array_pool);
-  else if(id==ID_cprover_string_code_point_count_func)
+  else if(id == ID_cprover_string_code_point_count_func)
     return add_axioms_for_code_point_count(fresh_symbol, expr, array_pool);
-  else if(id==ID_cprover_string_offset_by_code_point_func)
+  else if(id == ID_cprover_string_offset_by_code_point_func)
     return add_axioms_for_offset_by_code_point(fresh_symbol, expr);
-  else if(id==ID_cprover_string_compare_to_func)
+  else if(id == ID_cprover_string_compare_to_func)
     return add_axioms_for_compare_to(fresh_symbol, expr, array_pool);
-  else if(id==ID_cprover_string_literal_func)
+  else if(id == ID_cprover_string_literal_func)
     return add_axioms_from_literal(fresh_symbol, expr, array_pool);
-  else if(id==ID_cprover_string_concat_code_point_func)
+  else if(id == ID_cprover_string_concat_code_point_func)
     return add_axioms_for_concat_code_point(fresh_symbol, expr, array_pool);
-  else if(id==ID_cprover_string_insert_func)
+  else if(id == ID_cprover_string_insert_func)
     return add_axioms_for_insert(fresh_symbol, expr, array_pool);
-  else if(id==ID_cprover_string_insert_int_func)
+  else if(id == ID_cprover_string_insert_int_func)
     return add_axioms_for_insert_int(fresh_symbol, expr, array_pool, ns);
-  else if(id==ID_cprover_string_insert_long_func)
+  else if(id == ID_cprover_string_insert_long_func)
     return add_axioms_for_insert_int(fresh_symbol, expr, array_pool, ns);
-  else if(id==ID_cprover_string_insert_bool_func)
+  else if(id == ID_cprover_string_insert_bool_func)
     return add_axioms_for_insert_bool(fresh_symbol, expr, array_pool);
-  else if(id==ID_cprover_string_insert_char_func)
+  else if(id == ID_cprover_string_insert_char_func)
     return add_axioms_for_insert_char(fresh_symbol, expr, array_pool);
-  else if(id==ID_cprover_string_insert_double_func)
+  else if(id == ID_cprover_string_insert_double_func)
     return add_axioms_for_insert_double(fresh_symbol, expr, array_pool, ns);
-  else if(id==ID_cprover_string_insert_float_func)
+  else if(id == ID_cprover_string_insert_float_func)
     return add_axioms_for_insert_float(fresh_symbol, expr, array_pool, ns);
-  else if(id==ID_cprover_string_substring_func)
+  else if(id == ID_cprover_string_substring_func)
     return add_axioms_for_substring(fresh_symbol, expr, array_pool);
-  else if(id==ID_cprover_string_trim_func)
+  else if(id == ID_cprover_string_trim_func)
     return add_axioms_for_trim(fresh_symbol, expr, array_pool);
-  else if(id==ID_cprover_string_empty_string_func)
+  else if(id == ID_cprover_string_empty_string_func)
     return add_axioms_for_empty_string(expr);
-  else if(id==ID_cprover_string_copy_func)
+  else if(id == ID_cprover_string_copy_func)
     return add_axioms_for_copy(fresh_symbol, expr, array_pool);
-  else if(id==ID_cprover_string_of_int_hex_func)
+  else if(id == ID_cprover_string_of_int_hex_func)
     return add_axioms_from_int_hex(expr, array_pool);
-  else if(id==ID_cprover_string_of_float_func)
+  else if(id == ID_cprover_string_of_float_func)
     return add_axioms_for_string_of_float(fresh_symbol, expr, array_pool, ns);
-  else if(id==ID_cprover_string_of_float_scientific_notation_func)
+  else if(id == ID_cprover_string_of_float_scientific_notation_func)
     return add_axioms_from_float_scientific_notation(
       fresh_symbol, expr, array_pool, ns);
-  else if(id==ID_cprover_string_of_double_func)
+  else if(id == ID_cprover_string_of_double_func)
     return add_axioms_from_double(fresh_symbol, expr, array_pool, ns);
-  else if(id==ID_cprover_string_of_long_func)
+  else if(id == ID_cprover_string_of_long_func)
     return add_axioms_from_long(expr, array_pool, ns);
-  else if(id==ID_cprover_string_of_bool_func)
+  else if(id == ID_cprover_string_of_bool_func)
     return add_axioms_from_bool(expr, array_pool);
-  else if(id==ID_cprover_string_of_char_func)
+  else if(id == ID_cprover_string_of_char_func)
     return add_axioms_from_char(expr, array_pool);
-  else if(id==ID_cprover_string_set_length_func)
+  else if(id == ID_cprover_string_set_length_func)
     return add_axioms_for_set_length(fresh_symbol, expr, array_pool);
-  else if(id==ID_cprover_string_delete_func)
+  else if(id == ID_cprover_string_delete_func)
     return add_axioms_for_delete(fresh_symbol, expr, array_pool);
-  else if(id==ID_cprover_string_delete_char_at_func)
+  else if(id == ID_cprover_string_delete_char_at_func)
     return add_axioms_for_delete_char_at(fresh_symbol, expr, array_pool);
-  else if(id==ID_cprover_string_replace_func)
+  else if(id == ID_cprover_string_replace_func)
     return add_axioms_for_replace(fresh_symbol, expr, array_pool);
-  else if(id==ID_cprover_string_intern_func)
+  else if(id == ID_cprover_string_intern_func)
     return add_axioms_for_intern(expr);
-  else if(id==ID_cprover_string_format_func)
+  else if(id == ID_cprover_string_format_func)
     return add_axioms_for_format(fresh_symbol, expr, array_pool, message, ns);
   else if(id == ID_cprover_string_constrain_characters_func)
     return add_axioms_for_constrain_characters(fresh_symbol, expr, array_pool);
@@ -470,7 +470,7 @@ string_constraint_generatort::add_axioms_for_function_application(
   {
     std::string msg(
       "string_constraint_generator::function_application: unknown symbol :");
-    msg+=id2string(id);
+    msg += id2string(id);
     DATA_INVARIANT(false, string_refinement_invariantt(msg));
   }
   UNREACHABLE;
@@ -490,7 +490,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_copy(
   const function_application_exprt &f,
   array_poolt &array_pool)
 {
-  const auto &args=f.arguments();
+  const auto &args = f.arguments();
   PRECONDITION(args.size() == 3 || args.size() == 5);
   const array_string_exprt res =
     char_array_of_pointer(array_pool, args[1], args[0]);
@@ -527,23 +527,24 @@ exprt is_positive(const exprt &x)
 /// add axioms stating that the returned value is equal to the argument
 /// \param f: function application with one character argument
 /// \return a new character expression
-std::pair<exprt, string_constraintst> add_axioms_for_char_literal(
-  const function_application_exprt &f)
+std::pair<exprt, string_constraintst>
+add_axioms_for_char_literal(const function_application_exprt &f)
 {
-  const function_application_exprt::argumentst &args=f.arguments();
-  PRECONDITION(args.size()==1); // there should be exactly 1 arg to char literal
+  const function_application_exprt::argumentst &args = f.arguments();
+  PRECONDITION(
+    args.size() == 1); // there should be exactly 1 arg to char literal
 
-  const exprt &arg=args[0];
+  const exprt &arg = args[0];
   // for C programs argument to char literal should be one string constant
   // of size 1.
-  if(arg.operands().size()==1 &&
-     arg.op0().operands().size()==1 &&
-     arg.op0().op0().operands().size()==2 &&
-     arg.op0().op0().op0().id()==ID_string_constant)
+  if(
+    arg.operands().size() == 1 && arg.op0().operands().size() == 1 &&
+    arg.op0().op0().operands().size() == 2 &&
+    arg.op0().op0().op0().id() == ID_string_constant)
   {
     const string_constantt &s = to_string_constant(arg.op0().op0().op0());
     const std::string &sval = id2string(s.get_value());
-    CHECK_RETURN(sval.size()==1);
+    CHECK_RETURN(sval.size() == 1);
     return {from_integer(unsigned(sval[0]), arg.type()), {}};
   }
   else

@@ -10,8 +10,8 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 /// \file
 /// Generates string constraints for string functions that return Boolean values
 
-#include "string_refinement_invariant.h"
 #include "string_constraint_generator.h"
+#include "string_refinement_invariant.h"
 
 #include <util/deprecate.h>
 
@@ -103,8 +103,8 @@ std::pair<exprt, string_constraintst> add_axioms_for_is_prefix(
   bool swap_arguments,
   array_poolt &array_pool)
 {
-  const function_application_exprt::argumentst &args=f.arguments();
-  PRECONDITION(f.type()==bool_typet() || f.type().id()==ID_c_bool);
+  const function_application_exprt::argumentst &args = f.arguments();
+  PRECONDITION(f.type() == bool_typet() || f.type().id() == ID_c_bool);
   PRECONDITION(args.size() == 2 || args.size() == 3);
   const array_string_exprt &s0 =
     get_string_expr(array_pool, args[swap_arguments ? 1u : 0u]);
@@ -129,7 +129,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_is_empty(
   const function_application_exprt &f,
   array_poolt &array_pool)
 {
-  PRECONDITION(f.type()==bool_typet() || f.type().id()==ID_c_bool);
+  PRECONDITION(f.type() == bool_typet() || f.type().id() == ID_c_bool);
   PRECONDITION(f.arguments().size() == 1);
   // We add axioms:
   // a1 : is_empty => |s0| = 0
@@ -172,9 +172,9 @@ std::pair<exprt, string_constraintst> add_axioms_for_is_suffix(
   bool swap_arguments,
   array_poolt &array_pool)
 {
-  const function_application_exprt::argumentst &args=f.arguments();
-  PRECONDITION(args.size()==2); // bad args to string issuffix?
-  PRECONDITION(f.type()==bool_typet() || f.type().id()==ID_c_bool);
+  const function_application_exprt::argumentst &args = f.arguments();
+  PRECONDITION(args.size() == 2); // bad args to string issuffix?
+  PRECONDITION(f.type() == bool_typet() || f.type().id() == ID_c_bool);
 
   string_constraintst constraints;
   symbol_exprt issuffix = fresh_symbol("issuffix");
@@ -183,7 +183,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_is_suffix(
     get_string_expr(array_pool, args[swap_arguments ? 1u : 0u]);
   const array_string_exprt &s1 =
     get_string_expr(array_pool, args[swap_arguments ? 0u : 1u]);
-  const typet &index_type=s0.length().type();
+  const typet &index_type = s0.length().type();
 
   implies_exprt a1(issuffix, length_ge(s1, s0.length()));
   constraints.existential.push_back(a1);
@@ -237,7 +237,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_contains(
   array_poolt &array_pool)
 {
   PRECONDITION(f.arguments().size() == 2);
-  PRECONDITION(f.type()==bool_typet() || f.type().id()==ID_c_bool);
+  PRECONDITION(f.type() == bool_typet() || f.type().id() == ID_c_bool);
   string_constraintst constraints;
   const array_string_exprt s0 = get_string_expr(array_pool, f.arguments()[0]);
   const array_string_exprt s1 = get_string_expr(array_pool, f.arguments()[1]);
@@ -255,8 +255,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_contains(
   constraints.existential.push_back(a2);
 
   implies_exprt a3(
-    not_exprt(contains),
-    equal_exprt(startpos, from_integer(-1, index_type)));
+    not_exprt(contains), equal_exprt(startpos, from_integer(-1, index_type)));
   constraints.existential.push_back(a3);
 
   symbol_exprt qvar = fresh_symbol("QA_contains", index_type);

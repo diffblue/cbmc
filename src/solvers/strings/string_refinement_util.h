@@ -158,7 +158,6 @@ private:
   std::unordered_map<std::size_t, std::vector<exprt>> strings_in_equation;
 };
 
-
 /// Keep track of dependencies between strings.
 /// Each string points to the builtin_function calls on which it depends.
 /// Each builtin_function points to the strings on which the result depends.

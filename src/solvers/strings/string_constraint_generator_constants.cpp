@@ -28,7 +28,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_constant(
   string_constraintst constraints;
   const typet &index_type = res.length().type();
   const typet &char_type = res.content().type().subtype();
-  std::string c_str=id2string(sval);
+  std::string c_str = id2string(sval);
   std::wstring str;
 
 /// \todo We should have a special treatment for java strings when the
@@ -38,9 +38,9 @@ std::pair<exprt, string_constraintst> add_axioms_for_constant(
     str=utf8_to_utf16_little_endian(c_str);
   else
 #endif
-    str=widen(c_str);
+  str = widen(c_str);
 
-  for(std::size_t i=0; i<str.size(); i++)
+  for(std::size_t i = 0; i < str.size(); i++)
   {
     const exprt idx = from_integer(i, index_type);
     const exprt c = from_integer(str[i], char_type);
@@ -59,8 +59,8 @@ std::pair<exprt, string_constraintst> add_axioms_for_constant(
 /// \param f: function application with arguments integer `length` and character
 ///   pointer `ptr`.
 /// \return integer expression equal to zero
-std::pair<exprt, string_constraintst> add_axioms_for_empty_string(
-  const function_application_exprt &f)
+std::pair<exprt, string_constraintst>
+add_axioms_for_empty_string(const function_application_exprt &f)
 {
   PRECONDITION(f.arguments().size() == 2);
   string_constraintst constraints;
@@ -115,7 +115,7 @@ std::pair<exprt, string_constraintst> add_axioms_from_literal(
   const function_application_exprt &f,
   array_poolt &array_pool)
 {
-  const function_application_exprt::argumentst &args=f.arguments();
+  const function_application_exprt::argumentst &args = f.arguments();
   PRECONDITION(args.size() == 3); // Bad args to string literal?
   const array_string_exprt res =
     char_array_of_pointer(array_pool, args[1], args[0]);

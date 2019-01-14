@@ -9,11 +9,11 @@ Author: Diffblue Ltd.
 
 #include <testing-utils/catch.hpp>
 
-#include <util/arith_tools.h>
-#include <util/std_types.h>
-#include <util/std_expr.h>
 #include <java_bytecode/java_types.h>
 #include <solvers/strings/string_refinement_util.h>
+#include <util/arith_tools.h>
+#include <util/std_expr.h>
+#include <util/std_types.h>
 
 #ifdef DEBUG
 #include <iostream>

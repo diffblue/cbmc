@@ -34,7 +34,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_equals(
   const function_application_exprt &f,
   array_poolt &pool)
 {
-  PRECONDITION(f.type()==bool_typet() || f.type().id()==ID_c_bool);
+  PRECONDITION(f.type() == bool_typet() || f.type().id() == ID_c_bool);
   PRECONDITION(f.arguments().size() == 2);
 
   string_constraintst constraints;
@@ -43,7 +43,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_equals(
   symbol_exprt eq = fresh_symbol("equal");
   typecast_exprt tc_eq(eq, f.type());
 
-  typet index_type=s1.length().type();
+  typet index_type = s1.length().type();
 
   // Axiom 1.
   constraints.existential.push_back(
@@ -135,7 +135,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_equals_ignore_case(
   const function_application_exprt &f,
   array_poolt &pool)
 {
-  PRECONDITION(f.type()==bool_typet() || f.type().id()==ID_c_bool);
+  PRECONDITION(f.type() == bool_typet() || f.type().id() == ID_c_bool);
   PRECONDITION(f.arguments().size() == 2);
   string_constraintst constraints;
   const symbol_exprt eq = fresh_symbol("equal_ignore_case");
@@ -197,7 +197,7 @@ string_constraint_generatort::add_axioms_for_hash_code(
   const typet &return_type = f.type();
   const typet &index_type = str.length().type();
 
-  auto pair=hash_code_of_string.insert(
+  auto pair = hash_code_of_string.insert(
     std::make_pair(str, fresh_symbol("hash", return_type)));
   const exprt hash = pair.first->second;
 
@@ -243,7 +243,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_compare_to(
   array_poolt &pool)
 {
   PRECONDITION(f.arguments().size() == 2);
-  const typet &return_type=f.type();
+  const typet &return_type = f.type();
   PRECONDITION(return_type.id() == ID_signedbv);
   string_constraintst constraints;
   const array_string_exprt &s1 = get_string_expr(pool, f.arguments()[0]);
@@ -312,10 +312,10 @@ string_constraint_generatort::add_axioms_for_intern(
   string_constraintst intern_constraints;
   const array_string_exprt str = get_string_expr(array_pool, f.arguments()[0]);
   // For now we only enforce content equality and not pointer equality
-  const typet &return_type=f.type();
+  const typet &return_type = f.type();
   const typet index_type = str.length().type();
 
-  auto pair=intern_of_string.insert(
+  auto pair = intern_of_string.insert(
     std::make_pair(str, fresh_symbol("pool", return_type)));
   const symbol_exprt intern = pair.first->second;
 
@@ -331,7 +331,7 @@ string_constraint_generatort::add_axioms_for_intern(
 
   // WARNING: the specification may be incomplete or incorrect
   for(auto it : intern_of_string)
-    if(it.second!=str)
+    if(it.second != str)
     {
       symbol_exprt i = fresh_symbol("index_intern", index_type);
       intern_constraints.existential.push_back(or_exprt(

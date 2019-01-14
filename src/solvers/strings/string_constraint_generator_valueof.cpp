@@ -11,11 +11,11 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 /// Generates string constraints for functions generating strings from other
 ///   types, in particular int, long, float, double, char, bool
 
-#include "string_refinement_invariant.h"
 #include "string_constraint_generator.h"
+#include "string_refinement_invariant.h"
 
-#include <util/simplify_expr.h>
 #include <util/deprecate.h>
+#include <util/simplify_expr.h>
 
 #include <cmath>
 #include <solvers/floatbv/float_bv.h>
@@ -81,12 +81,11 @@ std::pair<exprt, string_constraintst> add_axioms_from_bool(
 /// \param b: Boolean expression
 /// \return code 0 on success
 DEPRECATED("This is Java specific and should be implemented in Java instead")
-std::pair<exprt, string_constraintst> add_axioms_from_bool(
-  const array_string_exprt &res,
-  const exprt &b)
+std::pair<exprt, string_constraintst>
+add_axioms_from_bool(const array_string_exprt &res, const exprt &b)
 {
   const typet &char_type = res.content().type().subtype();
-  PRECONDITION(b.type()==bool_typet() || b.type().id()==ID_c_bool);
+  PRECONDITION(b.type() == bool_typet() || b.type().id() == ID_c_bool);
   string_constraintst constraints;
   typecast_exprt eq(b, bool_typet());
 
@@ -96,24 +95,24 @@ std::pair<exprt, string_constraintst> add_axioms_from_bool(
   // a3 : !eq => res = |"false"|
   // a4 : forall i < |"false"|. !eq => res[i]="false"[i]
 
-  std::string str_true="true";
+  std::string str_true = "true";
   const implies_exprt a1(eq, length_eq(res, str_true.length()));
   constraints.existential.push_back(a1);
 
-  for(std::size_t i=0; i<str_true.length(); i++)
+  for(std::size_t i = 0; i < str_true.length(); i++)
   {
-    exprt chr=from_integer(str_true[i], char_type);
+    exprt chr = from_integer(str_true[i], char_type);
     implies_exprt a2(eq, equal_exprt(res[i], chr));
     constraints.existential.push_back(a2);
   }
 
-  std::string str_false="false";
+  std::string str_false = "false";
   const implies_exprt a3(not_exprt(eq), length_eq(res, str_false.length()));
   constraints.existential.push_back(a3);
 
-  for(std::size_t i=0; i<str_false.length(); i++)
+  for(std::size_t i = 0; i < str_false.length(); i++)
   {
-    exprt chr=from_integer(str_false[i], char_type);
+    exprt chr = from_integer(str_false[i], char_type);
     implies_exprt a4(not_exprt(eq), equal_exprt(res[i], chr));
     constraints.existential.push_back(a4);
   }
@@ -136,7 +135,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_string_of_int(
   size_t max_size,
   const namespacet &ns)
 {
-  const constant_exprt radix=from_integer(10, input_int.type());
+  const constant_exprt radix = from_integer(10, input_int.type());
   return add_axioms_for_string_of_int_with_radix(
     res, input_int, radix, max_size, ns);
 }
@@ -159,24 +158,24 @@ std::pair<exprt, string_constraintst> add_axioms_for_string_of_int_with_radix(
   const namespacet &ns)
 {
   PRECONDITION(max_size < std::numeric_limits<size_t>::max());
-  const typet &type=input_int.type();
-  PRECONDITION(type.id()==ID_signedbv);
+  const typet &type = input_int.type();
+  PRECONDITION(type.id() == ID_signedbv);
 
   /// Most of the time we can evaluate radix as an integer. The value 0 is used
   /// to indicate when we can't tell what the radix is.
   const unsigned long radix_ul = to_integer_or_default(radix, 0, ns);
-  CHECK_RETURN((radix_ul>=2 && radix_ul<=36) || radix_ul==0);
+  CHECK_RETURN((radix_ul >= 2 && radix_ul <= 36) || radix_ul == 0);
 
-  if(max_size==0)
+  if(max_size == 0)
   {
-    max_size=max_printed_string_length(type, radix_ul);
-    CHECK_RETURN(max_size<std::numeric_limits<size_t>::max());
+    max_size = max_printed_string_length(type, radix_ul);
+    CHECK_RETURN(max_size < std::numeric_limits<size_t>::max());
   }
 
   const typet &char_type = res.content().type().subtype();
   const typecast_exprt radix_as_char(radix, char_type);
   const typecast_exprt radix_input_type(radix, type);
-  const bool strict_formatting=true;
+  const bool strict_formatting = true;
 
   auto result1 = add_axioms_for_correct_number_format(
     res, radix_as_char, radix_ul, max_size, strict_formatting);
@@ -214,35 +213,34 @@ static exprt int_of_hex_char(const exprt &chr)
 /// \param i: an integer argument
 /// \return code 0 on success
 DEPRECATED("use add_axioms_for_string_of_int_with_radix instead")
-std::pair<exprt, string_constraintst> add_axioms_from_int_hex(
-  const array_string_exprt &res,
-  const exprt &i)
+std::pair<exprt, string_constraintst>
+add_axioms_from_int_hex(const array_string_exprt &res, const exprt &i)
 {
-  const typet &type=i.type();
-  PRECONDITION(type.id()==ID_signedbv);
+  const typet &type = i.type();
+  PRECONDITION(type.id() == ID_signedbv);
   string_constraintst constraints;
   const typet &index_type = res.length().type();
   const typet &char_type = res.content().type().subtype();
-  exprt sixteen=from_integer(16, index_type);
+  exprt sixteen = from_integer(16, index_type);
   exprt minus_char = from_integer('-', char_type);
   exprt zero_char = from_integer('0', char_type);
   exprt nine_char = from_integer('9', char_type);
   exprt a_char = from_integer('a', char_type);
   exprt f_char = from_integer('f', char_type);
 
-  size_t max_size=8;
+  size_t max_size = 8;
   constraints.existential.push_back(
     and_exprt(length_gt(res, 0), length_le(res, max_size)));
 
-  for(size_t size=1; size<=max_size; size++)
+  for(size_t size = 1; size <= max_size; size++)
   {
-    exprt sum=from_integer(0, type);
-    exprt all_numbers=true_exprt();
-    exprt chr=res[0];
+    exprt sum = from_integer(0, type);
+    exprt all_numbers = true_exprt();
+    exprt chr = res[0];
 
-    for(size_t j=0; j<size; j++)
+    for(size_t j = 0; j < size; j++)
     {
-      chr=res[j];
+      chr = res[j];
       exprt chr_int = int_of_hex_char(chr);
       sum = plus_exprt(mult_exprt(sum, sixteen), typecast_exprt(chr_int, type));
       or_exprt is_number(
@@ -252,7 +250,7 @@ std::pair<exprt, string_constraintst> add_axioms_from_int_hex(
         and_exprt(
           binary_relation_exprt(chr, ID_ge, a_char),
           binary_relation_exprt(chr, ID_le, f_char)));
-      all_numbers=and_exprt(all_numbers, is_number);
+      all_numbers = and_exprt(all_numbers, is_number);
     }
 
     const equal_exprt premise = length_eq(res, size);
@@ -260,7 +258,7 @@ std::pair<exprt, string_constraintst> add_axioms_from_int_hex(
       implies_exprt(premise, and_exprt(equal_exprt(i, sum), all_numbers)));
 
     // disallow 0s at the beginning
-    if(size>1)
+    if(size > 1)
       constraints.existential.push_back(
         implies_exprt(premise, not_exprt(equal_exprt(res[0], zero_char))));
   }
@@ -309,9 +307,8 @@ std::pair<exprt, string_constraintst> add_axioms_from_char(
 /// \param res: array of characters expression
 /// \param c: character expression
 /// \return code 0 on success
-std::pair<exprt, string_constraintst> add_axioms_from_char(
-  const array_string_exprt &res,
-  const exprt &c)
+std::pair<exprt, string_constraintst>
+add_axioms_from_char(const array_string_exprt &res, const exprt &c)
 {
   string_constraintst constraints;
   constraints.existential = {
@@ -340,10 +337,10 @@ string_constraintst add_axioms_for_correct_number_format(
   const typet &char_type = str.content().type().subtype();
   const typet &index_type = str.length().type();
 
-  const exprt &chr=str[0];
+  const exprt &chr = str[0];
   const equal_exprt starts_with_minus(chr, from_integer('-', char_type));
   const equal_exprt starts_with_plus(chr, from_integer('+', char_type));
-  const exprt starts_with_digit=
+  const exprt starts_with_digit =
     is_digit_with_radix(chr, strict_formatting, radix_as_char, radix_ul);
 
   // |str| > 0
@@ -376,7 +373,7 @@ string_constraintst add_axioms_for_correct_number_format(
   // forall 1 <= i < |str| . is_digit_with_radix(str[i], radix)
   // We unfold the above because we know that it will be used for all i up to
   // str.length(), and str.length() <= max_size
-  for(std::size_t index=1; index<max_size; ++index)
+  for(std::size_t index = 1; index < max_size; ++index)
   {
     /// index < length => is_digit_with_radix(str[index], radix)
     const implies_exprt character_at_index_is_digit(
@@ -428,10 +425,10 @@ string_constraintst add_axioms_for_characters_in_integer_string(
   const typet &char_type = str.content().type().subtype();
 
   const equal_exprt starts_with_minus(str[0], from_integer('-', char_type));
-  const constant_exprt zero_expr=from_integer(0, type);
+  const constant_exprt zero_expr = from_integer(0, type);
   exprt::operandst digit_constraints;
 
-  exprt sum=get_numeric_value_from_character(
+  exprt sum = get_numeric_value_from_character(
     str[0], char_type, type, strict_formatting, radix_ul);
 
   /// Deal with size==1 case separately. There are axioms from
@@ -440,7 +437,7 @@ string_constraintst add_axioms_for_characters_in_integer_string(
   constraints.existential.push_back(
     implies_exprt(length_eq(str, 1), equal_exprt(input_int, sum)));
 
-  for(size_t size=2; size<=max_string_length; size++)
+  for(size_t size = 2; size <= max_string_length; size++)
   {
     // sum_0 := numeric value of res[0] (which is 0 if res[0] is '-')
     // For each 1<=j<max_string_length, we have:
@@ -458,23 +455,23 @@ string_constraintst add_axioms_for_characters_in_integer_string(
 
     const mult_exprt radix_sum(sum, radix);
     // new_sum = radix * sum + (numeric value of res[j])
-    const exprt new_sum=plus_exprt(
+    const exprt new_sum = plus_exprt(
       radix_sum,
       get_numeric_value_from_character(
-        str[size-1], char_type, type, strict_formatting, radix_ul));
+        str[size - 1], char_type, type, strict_formatting, radix_ul));
 
     // An overflow can happen when reaching the last index which can contain
     // a digit, which is `max_string_length - 2` because of the space left for
     // a minus sign. That assumes that we were able to identify the radix. If we
     // weren't then we check for overflow on every index.
-    if(size-1>=max_string_length-2 || radix_ul==0)
+    if(size - 1 >= max_string_length - 2 || radix_ul == 0)
     {
       const and_exprt no_overflow(
         equal_exprt(sum, div_exprt(radix_sum, radix)),
         binary_relation_exprt(new_sum, ID_ge, radix_sum));
       digit_constraints.push_back(no_overflow);
     }
-    sum=new_sum;
+    sum = new_sum;
 
     const equal_exprt premise = length_eq(str, size);
 
@@ -513,24 +510,26 @@ std::pair<exprt, string_constraintst> add_axioms_for_parse_int(
   array_poolt &array_pool,
   const namespacet &ns)
 {
-  PRECONDITION(f.arguments().size()==1 || f.arguments().size()==2);
+  PRECONDITION(f.arguments().size() == 1 || f.arguments().size() == 2);
   const array_string_exprt str = get_string_expr(array_pool, f.arguments()[0]);
-  const typet &type=f.type();
-  PRECONDITION(type.id()==ID_signedbv);
-  const exprt radix=f.arguments().size()==1?
-    static_cast<exprt>(from_integer(10, type)):
-    static_cast<exprt>(typecast_exprt(f.arguments()[1], type));
+  const typet &type = f.type();
+  PRECONDITION(type.id() == ID_signedbv);
+  const exprt radix =
+    f.arguments().size() == 1
+      ? static_cast<exprt>(from_integer(10, type))
+      : static_cast<exprt>(typecast_exprt(f.arguments()[1], type));
   // Most of the time we can evaluate radix as an integer. The value 0 is used
   // to indicate when we can't tell what the radix is.
   const unsigned long radix_ul = to_integer_or_default(radix, 0, ns);
-  PRECONDITION((radix_ul>=2 && radix_ul<=36) || radix_ul==0);
+  PRECONDITION((radix_ul >= 2 && radix_ul <= 36) || radix_ul == 0);
 
-  const symbol_exprt input_int=fresh_symbol("parsed_int", type);
+  const symbol_exprt input_int = fresh_symbol("parsed_int", type);
   const typet &char_type = str.content().type().subtype();
   const typecast_exprt radix_as_char(radix, char_type);
-  const bool strict_formatting=false;
+  const bool strict_formatting = false;
 
-  const std::size_t max_string_length=max_printed_string_length(type, radix_ul);
+  const std::size_t max_string_length =
+    max_printed_string_length(type, radix_ul);
 
   /// \todo We should throw an exception when constraints added in
   /// add_axioms_for_correct_number_format do not hold.
@@ -566,24 +565,23 @@ exprt is_digit_with_radix(
   const exprt &radix_as_char,
   const unsigned long radix_ul)
 {
-  PRECONDITION((radix_ul>=2 && radix_ul<=36) || radix_ul==0);
-  const typet &char_type=chr.type();
-  const exprt zero_char=from_integer('0', char_type);
+  PRECONDITION((radix_ul >= 2 && radix_ul <= 36) || radix_ul == 0);
+  const typet &char_type = chr.type();
+  const exprt zero_char = from_integer('0', char_type);
 
   const and_exprt is_digit_when_radix_le_10(
     binary_relation_exprt(chr, ID_ge, zero_char),
-    binary_relation_exprt(
-      chr, ID_lt, plus_exprt(zero_char, radix_as_char)));
+    binary_relation_exprt(chr, ID_lt, plus_exprt(zero_char, radix_as_char)));
 
-  if(radix_ul<=10 && radix_ul!=0)
+  if(radix_ul <= 10 && radix_ul != 0)
   {
     return is_digit_when_radix_le_10;
   }
   else
   {
-    const exprt nine_char=from_integer('9', char_type);
-    const exprt a_char=from_integer('a', char_type);
-    const constant_exprt ten_char_type=from_integer(10, char_type);
+    const exprt nine_char = from_integer('9', char_type);
+    const exprt a_char = from_integer('a', char_type);
+    const constant_exprt ten_char_type = from_integer(10, char_type);
 
     const minus_exprt radix_minus_ten(radix_as_char, ten_char_type);
 
@@ -598,15 +596,14 @@ exprt is_digit_with_radix(
 
     if(!strict_formatting)
     {
-      exprt A_char=from_integer('A', char_type);
-      is_digit_when_radix_gt_10.copy_to_operands(
-        and_exprt(
-          binary_relation_exprt(chr, ID_ge, A_char),
-          binary_relation_exprt(
-            chr, ID_lt, plus_exprt(A_char, radix_minus_ten))));
+      exprt A_char = from_integer('A', char_type);
+      is_digit_when_radix_gt_10.copy_to_operands(and_exprt(
+        binary_relation_exprt(chr, ID_ge, A_char),
+        binary_relation_exprt(
+          chr, ID_lt, plus_exprt(A_char, radix_minus_ten))));
     }
 
-    if(radix_ul==0)
+    if(radix_ul == 0)
     {
       return if_exprt(
         binary_relation_exprt(radix_as_char, ID_le, ten_char_type),
@@ -637,14 +634,14 @@ exprt get_numeric_value_from_character(
   const bool strict_formatting,
   const unsigned long radix_ul)
 {
-  const constant_exprt zero_char=from_integer('0', char_type);
+  const constant_exprt zero_char = from_integer('0', char_type);
 
   /// There are four cases, which occur in ASCII in the following order:
   /// '+' and '-', digits, upper case letters, lower case letters
   const binary_relation_exprt upper_case_lower_case_or_digit(
     chr, ID_ge, zero_char);
 
-  if(radix_ul<=10 && radix_ul!=0)
+  if(radix_ul <= 10 && radix_ul != 0)
   {
     /// return char >= '0' ? (char - '0') : 0
     return typecast_exprt(
@@ -656,11 +653,11 @@ exprt get_numeric_value_from_character(
   }
   else
   {
-    const constant_exprt a_char=from_integer('a', char_type);
+    const constant_exprt a_char = from_integer('a', char_type);
     const binary_relation_exprt lower_case(chr, ID_ge, a_char);
-    const constant_exprt A_char=from_integer('A', char_type);
+    const constant_exprt A_char = from_integer('A', char_type);
     const binary_relation_exprt upper_case_or_lower_case(chr, ID_ge, A_char);
-    const constant_exprt ten_int=from_integer(10, char_type);
+    const constant_exprt ten_int = from_integer(10, char_type);
 
     if(strict_formatting)
     {
@@ -706,13 +703,13 @@ exprt get_numeric_value_from_character(
 /// \return the maximum string length
 size_t max_printed_string_length(const typet &type, unsigned long radix_ul)
 {
-  if(radix_ul==0)
+  if(radix_ul == 0)
   {
-    radix_ul=2;
+    radix_ul = 2;
   }
-  double n_bits=static_cast<double>(to_bitvector_type(type).get_width());
-  double radix=static_cast<double>(radix_ul);
-  bool signed_type=type.id()==ID_signedbv;
+  double n_bits = static_cast<double>(to_bitvector_type(type).get_width());
+  double radix = static_cast<double>(radix_ul);
+  bool signed_type = type.id() == ID_signedbv;
   /// We want to calculate max, the maximum number of characters needed to
   /// represent any value of the given type.
   ///
@@ -731,8 +728,8 @@ size_t max_printed_string_length(const typet &type, unsigned long radix_ul)
   ///     = min{k: k >= n_bits / log_2(radix)}
   ///     = min{k: k >= ceil(n_bits / log_2(radix))}
   ///     = ceil(n_bits / log_2(radix))
-  double max=signed_type?
-    floor(static_cast<double>(n_bits-1)/log2(radix))+2.0:
-    ceil(static_cast<double>(n_bits)/log2(radix));
+  double max = signed_type
+                 ? floor(static_cast<double>(n_bits - 1) / log2(radix)) + 2.0
+                 : ceil(static_cast<double>(n_bits) / log2(radix));
   return static_cast<size_t>(max);
 }

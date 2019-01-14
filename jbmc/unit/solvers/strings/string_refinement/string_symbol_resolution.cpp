@@ -11,16 +11,17 @@ Author: Diffblue Ltd.
 
 #include <solvers/strings/string_refinement.h>
 
+#include <iostream>
+#include <java_bytecode/java_bytecode_language.h>
+#include <langapi/mode.h>
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/std_expr.h>
 #include <util/symbol_table.h>
-#include <langapi/mode.h>
-#include <java_bytecode/java_bytecode_language.h>
-#include <iostream>
 
-SCENARIO("string_identifiers_resolution_from_equations",
-"[core][solvers][refinement][string_refinement]")
+SCENARIO(
+  "string_identifiers_resolution_from_equations",
+  "[core][solvers][refinement][string_refinement]")
 {
   // For printing expression
   register_language(new_java_bytecode_language);
@@ -51,8 +52,7 @@ SCENARIO("string_identifiers_resolution_from_equations",
     WHEN("There is no function call")
     {
       union_find_replacet symbol_resolve =
-        string_identifiers_resolution_from_equations(
-          equations, ns, stream);
+        string_identifiers_resolution_from_equations(equations, ns, stream);
 
       THEN("The symbol resolution structure is empty")
       {
@@ -70,8 +70,7 @@ SCENARIO("string_identifiers_resolution_from_equations",
       symbol_exprt bool_sym("bool_b", bool_typet());
       equations.emplace_back(bool_sym, fun);
       union_find_replacet symbol_resolve =
-        string_identifiers_resolution_from_equations(
-          equations, ns, stream);
+        string_identifiers_resolution_from_equations(equations, ns, stream);
 
       THEN("Equations that depend on it should be added")
       {

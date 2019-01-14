@@ -11,8 +11,8 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 /// Generates string constraints for string transformations, that is, functions
 ///   taking one string and returning another
 
-#include "string_refinement_invariant.h"
 #include "string_constraint_generator.h"
+#include "string_refinement_invariant.h"
 
 #include <util/arith_tools.h>
 
@@ -97,7 +97,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_substring(
   const function_application_exprt &f,
   array_poolt &array_pool)
 {
-  const function_application_exprt::argumentst &args=f.arguments();
+  const function_application_exprt::argumentst &args = f.arguments();
   PRECONDITION(args.size() == 4 || args.size() == 5);
   const array_string_exprt str = get_string_expr(array_pool, args[2]);
   const array_string_exprt res =
@@ -130,8 +130,8 @@ std::pair<exprt, string_constraintst> add_axioms_for_substring(
   const exprt &end)
 {
   const typet &index_type = str.length().type();
-  PRECONDITION(start.type()==index_type);
-  PRECONDITION(end.type()==index_type);
+  PRECONDITION(start.type() == index_type);
+  PRECONDITION(end.type() == index_type);
 
   string_constraintst constraints;
   const exprt start1 = maximum(start, from_integer(0, start.type()));
@@ -260,18 +260,17 @@ static optionalt<std::pair<exprt, exprt>> to_char_pair(
   exprt expr2,
   std::function<array_string_exprt(const exprt &)> get_string_expr)
 {
-  if((expr1.type().id()==ID_unsignedbv
-      || expr1.type().id()==ID_char)
-     && (expr2.type().id()==ID_char
-         || expr2.type().id()==ID_unsignedbv))
+  if(
+    (expr1.type().id() == ID_unsignedbv || expr1.type().id() == ID_char) &&
+    (expr2.type().id() == ID_char || expr2.type().id() == ID_unsignedbv))
     return std::make_pair(expr1, expr2);
   const auto expr1_str = get_string_expr(expr1);
   const auto expr2_str = get_string_expr(expr2);
   const auto expr1_length = numeric_cast<std::size_t>(expr1_str.length());
   const auto expr2_length = numeric_cast<std::size_t>(expr2_str.length());
-  if(expr1_length && expr2_length && *expr1_length==1 && *expr2_length==1)
+  if(expr1_length && expr2_length && *expr1_length == 1 && *expr2_length == 1)
     return std::make_pair(exprt(expr1_str[0]), exprt(expr2_str[0]));
-  return { };
+  return {};
 }
 
 /// Replace a character by another in a string
@@ -311,15 +310,14 @@ std::pair<exprt, string_constraintst> add_axioms_for_replace(
         return get_string_expr(array_pool, e);
       }))
   {
-    const auto old_char=maybe_chars->first;
-    const auto new_char=maybe_chars->second;
+    const auto old_char = maybe_chars->first;
+    const auto new_char = maybe_chars->second;
 
     constraints.existential.push_back(equal_exprt(res.length(), str.length()));
 
     symbol_exprt qvar = fresh_symbol("QA_replace", str.length().type());
     implies_exprt case1(
-      equal_exprt(str[qvar], old_char),
-      equal_exprt(res[qvar], new_char));
+      equal_exprt(str[qvar], old_char), equal_exprt(res[qvar], new_char));
     implies_exprt case2(
       not_exprt(equal_exprt(str[qvar], old_char)),
       equal_exprt(res[qvar], str[qvar]));
@@ -346,7 +344,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_delete_char_at(
   const array_string_exprt res =
     char_array_of_pointer(array_pool, f.arguments()[1], f.arguments()[0]);
   const array_string_exprt str = get_string_expr(array_pool, f.arguments()[2]);
-  exprt index_one=from_integer(1, str.length().type());
+  exprt index_one = from_integer(1, str.length().type());
   return add_axioms_for_delete(
     fresh_symbol,
     res,
@@ -380,8 +378,8 @@ std::pair<exprt, string_constraintst> add_axioms_for_delete(
   const exprt &end,
   array_poolt &array_pool)
 {
-  PRECONDITION(start.type()==str.length().type());
-  PRECONDITION(end.type()==str.length().type());
+  PRECONDITION(start.type() == str.length().type());
+  PRECONDITION(end.type() == str.length().type());
   const typet &index_type = str.length().type();
   const typet &char_type = str.content().type().subtype();
   const array_string_exprt sub1 =

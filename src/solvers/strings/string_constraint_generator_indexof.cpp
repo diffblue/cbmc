@@ -11,8 +11,8 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 /// Generates string constraints for the family of indexOf and lastIndexOf java
 ///   functions
 
-#include "string_refinement_invariant.h"
 #include "string_constraint_generator.h"
+#include "string_refinement_invariant.h"
 
 /// Add axioms stating that the returned value is the index within `haystack`
 /// (`str`) of the first occurrence of `needle` (`c`) starting the search at
@@ -42,11 +42,11 @@ std::pair<exprt, string_constraintst> add_axioms_for_index_of(
   const exprt &from_index)
 {
   string_constraintst constraints;
-  const typet &index_type=str.length().type();
+  const typet &index_type = str.length().type();
   symbol_exprt index = fresh_symbol("index_of", index_type);
   symbol_exprt contains = fresh_symbol("contains_in_index_of");
 
-  exprt minus1=from_integer(-1, index_type);
+  exprt minus1 = from_integer(-1, index_type);
   and_exprt a1(
     binary_relation_exprt(index, ID_ge, minus1),
     binary_relation_exprt(index, ID_lt, str.length()));
@@ -115,7 +115,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_index_of_string(
   const exprt &from_index)
 {
   string_constraintst constraints;
-  const typet &index_type=haystack.length().type();
+  const typet &index_type = haystack.length().type();
   symbol_exprt offset = fresh_symbol("index_of", index_type);
   symbol_exprt contains = fresh_symbol("contains_substring");
 
@@ -128,8 +128,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_index_of_string(
   constraints.existential.push_back(a1);
 
   equal_exprt a2(
-    not_exprt(contains),
-    equal_exprt(offset, from_integer(-1, index_type)));
+    not_exprt(contains), equal_exprt(offset, from_integer(-1, index_type)));
   constraints.existential.push_back(a2);
 
   symbol_exprt qvar = fresh_symbol("QA_index_of_string", index_type);
@@ -209,7 +208,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_last_index_of_string(
   const exprt &from_index)
 {
   string_constraintst constraints;
-  const typet &index_type=haystack.length().type();
+  const typet &index_type = haystack.length().type();
   symbol_exprt offset = fresh_symbol("index_of", index_type);
   symbol_exprt contains = fresh_symbol("contains_substring");
 
@@ -223,8 +222,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_last_index_of_string(
   constraints.existential.push_back(a1);
 
   equal_exprt a2(
-    not_exprt(contains),
-    equal_exprt(offset, from_integer(-1, index_type)));
+    not_exprt(contains), equal_exprt(offset, from_integer(-1, index_type)));
   constraints.existential.push_back(a2);
 
   symbol_exprt qvar = fresh_symbol("QA_index_of_string", index_type);
@@ -293,17 +291,17 @@ std::pair<exprt, string_constraintst> add_axioms_for_index_of(
   const function_application_exprt &f,
   array_poolt &array_pool)
 {
-  const function_application_exprt::argumentst &args=f.arguments();
+  const function_application_exprt::argumentst &args = f.arguments();
   PRECONDITION(args.size() == 2 || args.size() == 3);
   const array_string_exprt str = get_string_expr(array_pool, args[0]);
-  const exprt &c=args[1];
+  const exprt &c = args[1];
   const typet &index_type = str.length().type();
   const typet &char_type = str.content().type().subtype();
   PRECONDITION(f.type() == index_type);
   const exprt from_index =
     args.size() == 2 ? from_integer(0, index_type) : args[2];
 
-  if(c.type().id()==ID_unsignedbv || c.type().id()==ID_signedbv)
+  if(c.type().id() == ID_unsignedbv || c.type().id() == ID_signedbv)
   {
     return add_axioms_for_index_of(
       fresh_symbol, str, typecast_exprt(c, char_type), from_index);
@@ -312,7 +310,8 @@ std::pair<exprt, string_constraintst> add_axioms_for_index_of(
   {
     INVARIANT(
       is_refined_string_type(c.type()),
-      string_refinement_invariantt("c can only be a (un)signedbv or a refined "
+      string_refinement_invariantt(
+        "c can only be a (un)signedbv or a refined "
         "string and the (un)signedbv case is already handled"));
     array_string_exprt sub = get_string_expr(array_pool, c);
     return add_axioms_for_index_of_string(fresh_symbol, str, sub, from_index);
@@ -417,7 +416,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_last_index_of(
   const function_application_exprt &f,
   array_poolt &array_pool)
 {
-  const function_application_exprt::argumentst &args=f.arguments();
+  const function_application_exprt::argumentst &args = f.arguments();
   PRECONDITION(args.size() == 2 || args.size() == 3);
   const array_string_exprt str = get_string_expr(array_pool, args[0]);
   const exprt c = args[1];
@@ -427,7 +426,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_last_index_of(
 
   const exprt from_index = args.size() == 2 ? str.length() : args[2];
 
-  if(c.type().id()==ID_unsignedbv || c.type().id()==ID_signedbv)
+  if(c.type().id() == ID_unsignedbv || c.type().id() == ID_signedbv)
   {
     return add_axioms_for_last_index_of(
       fresh_symbol, str, typecast_exprt(c, char_type), from_index);

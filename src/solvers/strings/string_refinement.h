@@ -21,8 +21,8 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 #define CPROVER_SOLVERS_REFINEMENT_STRING_REFINEMENT_H
 
 #include <limits>
-#include <util/string_expr.h>
 #include <util/replace_expr.h>
+#include <util/string_expr.h>
 #include <util/union_find_replace.h>
 
 #include "string_constraint.h"
@@ -60,25 +60,27 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 
 #define DEFAULT_MAX_NB_REFINEMENT std::numeric_limits<size_t>::max()
 
-class string_refinementt final: public bv_refinementt
+class string_refinementt final : public bv_refinementt
 {
 private:
   struct configt
   {
-    std::size_t refinement_bound=0;
-    bool use_counter_example=true;
+    std::size_t refinement_bound = 0;
+    bool use_counter_example = true;
   };
+
 public:
   /// string_refinementt constructor arguments
-  struct infot : public bv_refinementt::infot,
-                 public configt
+  struct infot : public bv_refinementt::infot, public configt
   {
   };
 
   explicit string_refinementt(const infot &);
 
   std::string decision_procedure_text() const override
-  { return "string refinement loop with "+prop.solver_text(); }
+  {
+    return "string refinement loop with " + prop.solver_text();
+  }
 
   exprt get(const exprt &expr) const override;
   void set_to(const exprt &expr, bool value) override;

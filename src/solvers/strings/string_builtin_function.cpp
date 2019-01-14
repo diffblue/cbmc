@@ -247,13 +247,11 @@ string_constraintst string_set_char_builtin_functiont::constraints(
 {
   string_constraintst constraints;
   constraints.existential.push_back(length_constraint());
-  constraints.existential.push_back(
-    implies_exprt(
-      and_exprt(
-        binary_relation_exprt(
-          from_integer(0, position.type()), ID_le, position),
-        binary_relation_exprt(position, ID_lt, result.length())),
-      equal_exprt(result[position], character)));
+  constraints.existential.push_back(implies_exprt(
+    and_exprt(
+      binary_relation_exprt(from_integer(0, position.type()), ID_le, position),
+      binary_relation_exprt(position, ID_lt, result.length())),
+    equal_exprt(result[position], character)));
   constraints.universal.push_back([&] {
     const symbol_exprt q =
       generator.fresh_symbol("QA_char_set", position.type());
@@ -323,28 +321,25 @@ static exprt is_upper_case(const exprt &character)
   const exprt char_Z = from_integer('Z', character.type());
   exprt::operandst upper_case;
   // Characters between 'A' and 'Z' are upper-case
-  upper_case.push_back(
-    and_exprt(
-      binary_relation_exprt(char_A, ID_le, character),
-      binary_relation_exprt(character, ID_le, char_Z)));
+  upper_case.push_back(and_exprt(
+    binary_relation_exprt(char_A, ID_le, character),
+    binary_relation_exprt(character, ID_le, char_Z)));
 
   // Characters between 0xc0 (latin capital A with grave)
   // and 0xd6 (latin capital O with diaeresis) are upper-case
-  upper_case.push_back(
-    and_exprt(
-      binary_relation_exprt(
-        from_integer(0xc0, character.type()), ID_le, character),
-      binary_relation_exprt(
-        character, ID_le, from_integer(0xd6, character.type()))));
+  upper_case.push_back(and_exprt(
+    binary_relation_exprt(
+      from_integer(0xc0, character.type()), ID_le, character),
+    binary_relation_exprt(
+      character, ID_le, from_integer(0xd6, character.type()))));
 
   // Characters between 0xd8 (latin capital O with stroke)
   // and 0xde (latin capital thorn) are upper-case
-  upper_case.push_back(
-    and_exprt(
-      binary_relation_exprt(
-        from_integer(0xd8, character.type()), ID_le, character),
-      binary_relation_exprt(
-        character, ID_le, from_integer(0xde, character.type()))));
+  upper_case.push_back(and_exprt(
+    binary_relation_exprt(
+      from_integer(0xd8, character.type()), ID_le, character),
+    binary_relation_exprt(
+      character, ID_le, from_integer(0xde, character.type()))));
   return disjunction(upper_case);
 }
 

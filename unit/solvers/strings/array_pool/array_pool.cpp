@@ -11,8 +11,7 @@ Author: Diffblue Ltd.
 
 #include <solvers/strings/string_constraint_generator.h>
 
-SCENARIO(
-  "array_pool", "[core][solvers][strings][string_constraint_generator]")
+SCENARIO("array_pool", "[core][solvers][strings][string_constraint_generator]")
 {
   const std::size_t pointer_width = 16;
   const auto char_type = unsignedbv_typet(8);
@@ -88,8 +87,9 @@ SCENARIO(
       const array_string_exprt associated_array =
         pool.find(if_expr, pointer_length);
 
-      THEN("Arrays associated to the subexpressions are the subexpressions of "
-           "the associated array")
+      THEN(
+        "Arrays associated to the subexpressions are the subexpressions of "
+        "the associated array")
       {
         const symbol_exprt pointer_length1("pointer_length1", length_type);
         const array_string_exprt associated_to_true =

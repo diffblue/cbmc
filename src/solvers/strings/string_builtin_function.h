@@ -4,10 +4,10 @@
 #ifndef CPROVER_SOLVERS_REFINEMENT_STRING_BUILTIN_FUNCTION_H
 #define CPROVER_SOLVERS_REFINEMENT_STRING_BUILTIN_FUNCTION_H
 
-#include <vector>
+#include "string_constraint_generator.h"
 #include <util/optional.h>
 #include <util/string_expr.h>
-#include "string_constraint_generator.h"
+#include <vector>
 
 class array_poolt;
 struct string_constraintst;
