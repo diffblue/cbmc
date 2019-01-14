@@ -2875,7 +2875,7 @@ void c_typecheck_baset::typecheck_expr_unary_arithmetic(exprt &expr)
 
   if(o_type.id()==ID_vector)
   {
-    if(is_number(follow(o_type.subtype())))
+    if(is_number(o_type.subtype()))
     {
       // Vector arithmetic.
       expr.type()=operand.type();

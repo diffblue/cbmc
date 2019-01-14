@@ -121,7 +121,6 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
     // these appear to have type "struct _GUID"
     // and they are lvalues!
     expr.type() = struct_tag_typet("tag-_GUID");
-    follow(expr.type());
     expr.set(ID_C_lvalue, true);
   }
   else if(expr.id()==ID_noexcept)
@@ -415,15 +414,18 @@ bool cpp_typecheckt::overloadable(const exprt &expr)
 
   forall_operands(it, expr)
   {
-    typet t=follow(it->type());
+    typet t = it->type();
 
     if(is_reference(t))
       t=t.subtype();
 
-    if(t.id()==ID_struct ||
-       t.id()==ID_union ||
-       t.id()==ID_c_enum || t.id() == ID_c_enum_tag)
+    if(
+      t.id() == ID_struct || t.id() == ID_union || t.id() == ID_c_enum ||
+      t.id() == ID_c_enum_tag || t.id() == ID_struct_tag ||
+      t.id() == ID_union_tag)
+    {
       return true;
+    }
   }
 
   return false;

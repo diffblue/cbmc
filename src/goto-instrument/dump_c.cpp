@@ -414,7 +414,7 @@ void dump_ct::convert_compound(
 
   for(const auto &comp : type.components())
   {
-    const typet &comp_type=ns.follow(comp.type());
+    const typet &comp_type = comp.type();
 
     if(comp_type.id()==ID_code ||
        comp.get_bool(ID_from_base) ||

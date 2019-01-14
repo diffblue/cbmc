@@ -145,11 +145,11 @@ void goto_symext::symex_assign_rec(
       state, to_index_expr(lhs), full_lhs, rhs, guard, assignment_type);
   else if(lhs.id()==ID_member)
   {
-    const typet &type=ns.follow(to_member_expr(lhs).struct_op().type());
-    if(type.id()==ID_struct)
+    const typet &type = to_member_expr(lhs).struct_op().type();
+    if(type.id() == ID_struct || type.id() == ID_struct_tag)
       symex_assign_struct_member(
         state, to_member_expr(lhs), full_lhs, rhs, guard, assignment_type);
-    else if(type.id()==ID_union)
+    else if(type.id() == ID_union || type.id() == ID_union_tag)
     {
       // should have been replaced by byte_extract
       throw unsupported_operation_exceptiont(

@@ -86,24 +86,27 @@ void goto_symext::parameter_assignments(
       // It should be the same exact type.
       if(!base_type_eq(parameter_type, rhs.type(), ns))
       {
-        const typet &f_parameter_type=ns.follow(parameter_type);
-        const typet &f_rhs_type=ns.follow(rhs.type());
+        const typet &rhs_type = rhs.type();
 
         // But we are willing to do some limited conversion.
         // This is highly dubious, obviously.
-        if((f_parameter_type.id()==ID_signedbv ||
-            f_parameter_type.id()==ID_unsignedbv ||
-            f_parameter_type.id()==ID_c_enum_tag ||
-            f_parameter_type.id()==ID_bool ||
-            f_parameter_type.id()==ID_pointer ||
-            f_parameter_type.id()==ID_union) &&
-           (f_rhs_type.id()==ID_signedbv ||
-            f_rhs_type.id()==ID_unsignedbv ||
-            f_rhs_type.id()==ID_c_bit_field ||
-            f_rhs_type.id()==ID_c_enum_tag ||
-            f_rhs_type.id()==ID_bool ||
-            f_rhs_type.id()==ID_pointer ||
-            f_rhs_type.id()==ID_union))
+        // clang-format off
+        if(
+          (parameter_type.id() == ID_signedbv ||
+           parameter_type.id() == ID_unsignedbv ||
+           parameter_type.id() == ID_c_enum_tag ||
+           parameter_type.id() == ID_bool ||
+           parameter_type.id() == ID_pointer ||
+           parameter_type.id() == ID_union ||
+           parameter_type.id() == ID_union_tag) &&
+          (rhs_type.id() == ID_signedbv ||
+           rhs_type.id() == ID_unsignedbv ||
+           rhs_type.id() == ID_c_bit_field ||
+           rhs_type.id() == ID_c_enum_tag ||
+           rhs_type.id() == ID_bool ||
+           rhs_type.id() == ID_pointer ||
+           rhs_type.id() == ID_union ||
+           rhs_type.id() == ID_union_tag))
         {
           rhs=
             byte_extract_exprt(
@@ -120,6 +123,7 @@ void goto_symext::parameter_assignments(
                 << ", expected " << parameter_type.pretty();
           throw unsupported_operation_exceptiont(error.str());
         }
+        // clang-format on
       }
 
       assignment_typet assignment_type;

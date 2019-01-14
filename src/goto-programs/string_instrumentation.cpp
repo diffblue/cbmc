@@ -410,7 +410,6 @@ void string_instrumentationt::do_format_string_read(
       if(token.type==format_tokent::token_typet::STRING)
       {
         const exprt &arg=arguments[argument_start_inx+args];
-        const typet &arg_type=ns.follow(arg.type());
 
         if(arg.id()!=ID_string_constant) // we don't need to check constants
         {
@@ -423,7 +422,7 @@ void string_instrumentationt::do_format_string_read(
 
           exprt temp(arg);
 
-          if(arg_type.id()!=ID_pointer)
+          if(arg.type().id() != ID_pointer)
           {
             index_exprt index(temp, from_integer(0, index_type()));
             temp=address_of_exprt(index);
@@ -456,10 +455,8 @@ void string_instrumentationt::do_format_string_read(
     for(std::size_t i=2; i<arguments.size(); i++)
     {
       const exprt &arg=arguments[i];
-      const typet &arg_type=ns.follow(arguments[i].type());
 
-      if(arguments[i].id()!=ID_string_constant &&
-         is_string_type(arg_type))
+      if(arguments[i].id() != ID_string_constant && is_string_type(arg.type()))
       {
         goto_programt::targett assertion=dest.add_instruction();
         assertion->source_location=target->source_location;
@@ -469,7 +466,7 @@ void string_instrumentationt::do_format_string_read(
 
         exprt temp(arg);
 
-        if(arg_type.id()!=ID_pointer)
+        if(arg.type().id() != ID_pointer)
         {
           index_exprt index(temp, from_integer(0, index_type()));
           temp=address_of_exprt(index);
@@ -514,7 +511,7 @@ void string_instrumentationt::do_format_string_write(
         case format_tokent::token_typet::STRING:
         {
           const exprt &argument=arguments[argument_start_inx+args];
-          const typet &arg_type=ns.follow(argument.type());
+          const typet &arg_type = argument.type();
 
           goto_programt::targett assertion=dest.add_instruction();
           assertion->source_location=target->source_location;
@@ -566,7 +563,7 @@ void string_instrumentationt::do_format_string_write(
         default: // everything else
         {
           const exprt &argument=arguments[argument_start_inx+args];
-          const typet &arg_type=ns.follow(argument.type());
+          const typet &arg_type = argument.type();
 
           goto_programt::targett assignment=dest.add_instruction(ASSIGN);
           assignment->source_location=target->source_location;
@@ -587,7 +584,7 @@ void string_instrumentationt::do_format_string_write(
   {
     for(std::size_t i=argument_start_inx; i<arguments.size(); i++)
     {
-      const typet &arg_type=ns.follow(arguments[i].type());
+      const typet &arg_type = arguments[i].type();
 
       // Note: is_string_type() is a `good guess' here. Actually
       // any of the pointers could point into an array. But it
