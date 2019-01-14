@@ -129,12 +129,17 @@ void convert_properties_json(
 
     irep_idt property_id=source_location.get_property_id();
 
+    json_stringt name_json(property_id);
+    json_stringt class_json(property_class);
+    jsont source_location_json(json(source_location));
+    json_stringt description_json(description);
+    json_stringt expression_json(from_expr(ns, identifier, ins.guard));
     json_objectt json_property(
-      {{"name", json_stringt(property_id)},
-       {"class", json_stringt(property_class)},
-       {"sourceLocation", json(source_location)},
-       {"description", json_stringt(description)},
-       {"expression", json_stringt(from_expr(ns, identifier, ins.guard))}});
+      {{"name", std::move(name_json)},
+       {"class", std::move(class_json)},
+       {"sourceLocation", std::move(source_location_json)},
+       {"description", std::move(description_json)},
+       {"expression", std::move(expression_json)}});
 
     if(!source_location.get_basic_block_covered_lines().empty())
       json_property["coveredLines"] =

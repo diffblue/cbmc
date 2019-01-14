@@ -194,36 +194,59 @@ static void show_symbol_table_json_ui(
     if(symbol.value.is_not_nil())
       ptr->from_expr(symbol.value, value_str, ns);
 
+    json_stringt pretty_name_json(symbol.pretty_name);
+    json_stringt name_json(symbol.name);
+    json_stringt base_name_json(symbol.base_name);
+    json_stringt mode_json(symbol.mode);
+    json_stringt module_json(symbol.module);
+    json_stringt pretty_type_json(type_str);
+    json_stringt pretty_value_json(value_str);
+    jsont type_json(irep_converter.convert_from_irep(symbol.type));
+    jsont value_json(irep_converter.convert_from_irep(symbol.value));
+    jsont location_json(irep_converter.convert_from_irep(symbol.location));
+    jsont is_type_json(jsont::json_boolean(symbol.is_type));
+    jsont is_macro_json(jsont::json_boolean(symbol.is_macro));
+    jsont is_exported_json(jsont::json_boolean(symbol.is_exported));
+    jsont is_input_json(jsont::json_boolean(symbol.is_input));
+    jsont is_output_json(jsont::json_boolean(symbol.is_output));
+    jsont is_state_var_json(jsont::json_boolean(symbol.is_state_var));
+    jsont is_property_json(jsont::json_boolean(symbol.is_property));
+    jsont is_static_lifetime_json(jsont::json_boolean(symbol.is_static_lifetime));
+    jsont is_thread_local_json(jsont::json_boolean(symbol.is_thread_local));
+    jsont is_lvalue_json(jsont::json_boolean(symbol.is_lvalue));
+    jsont is_file_local_json(jsont::json_boolean(symbol.is_file_local));
+    jsont is_extern_json(jsont::json_boolean(symbol.is_extern));
+    jsont is_volatile_json(jsont::json_boolean(symbol.is_volatile));
+    jsont is_parameter_json(jsont::json_boolean(symbol.is_parameter));
+    jsont is_auxiliary_json(jsont::json_boolean(symbol.is_auxiliary));
+    jsont is_weak_json(jsont::json_boolean(symbol.is_weak));
     json_objectt symbol_json(
-      {{"prettyName", json_stringt(symbol.pretty_name)},
-       {"name", json_stringt(symbol.name)},
-       {"baseName", json_stringt(symbol.base_name)},
-       {"mode", json_stringt(symbol.mode)},
-       {"module", json_stringt(symbol.module)},
-
-       {"prettyType", json_stringt(type_str)},
-       {"prettyValue", json_stringt(value_str)},
-
-       {"type", irep_converter.convert_from_irep(symbol.type)},
-       {"value", irep_converter.convert_from_irep(symbol.value)},
-       {"location", irep_converter.convert_from_irep(symbol.location)},
-
-       {"isType", jsont::json_boolean(symbol.is_type)},
-       {"isMacro", jsont::json_boolean(symbol.is_macro)},
-       {"isExported", jsont::json_boolean(symbol.is_exported)},
-       {"isInput", jsont::json_boolean(symbol.is_input)},
-       {"isOutput", jsont::json_boolean(symbol.is_output)},
-       {"isStateVar", jsont::json_boolean(symbol.is_state_var)},
-       {"isProperty", jsont::json_boolean(symbol.is_property)},
-       {"isStaticLifetime", jsont::json_boolean(symbol.is_static_lifetime)},
-       {"isThreadLocal", jsont::json_boolean(symbol.is_thread_local)},
-       {"isLvalue", jsont::json_boolean(symbol.is_lvalue)},
-       {"isFileLocal", jsont::json_boolean(symbol.is_file_local)},
-       {"isExtern", jsont::json_boolean(symbol.is_extern)},
-       {"isVolatile", jsont::json_boolean(symbol.is_volatile)},
-       {"isParameter", jsont::json_boolean(symbol.is_parameter)},
-       {"isAuxiliary", jsont::json_boolean(symbol.is_auxiliary)},
-       {"isWeak", jsont::json_boolean(symbol.is_weak)}});
+      {{"prettyName", std::move(pretty_name_json)},
+       {"name", std::move(name_json)},
+       {"baseName", std::move(base_name_json)},
+       {"mode", std::move(mode_json)},
+       {"module", std::move(module_json)},
+       {"prettyType", std::move(pretty_type_json)},
+       {"prettyValue", std::move(pretty_value_json)},
+       {"type", std::move(type_json)},
+       {"value", std::move(value_json)},
+       {"location", std::move(location_json)},
+       {"isType", std::move(is_type_json)},
+       {"isMacro", std::move(is_macro_json)},
+       {"isExported", std::move(is_exported_json)},
+       {"isInput", std::move(is_input_json)},
+       {"isOutput", std::move(is_output_json)},
+       {"isStateVar", std::move(is_state_var_json)},
+       {"isProperty", std::move(is_property_json)},
+       {"isStaticLifetime", std::move(is_static_lifetime_json)},
+       {"isThreadLocal", std::move(is_thread_local_json)},
+       {"isLvalue", std::move(is_lvalue_json)},
+       {"isFileLocal", std::move(is_file_local_json)},
+       {"isExtern", std::move(is_extern_json)},
+       {"isVolatile", std::move(is_volatile_json)},
+       {"isParameter", std::move(is_parameter_json)},
+       {"isAuxiliary", std::move(is_auxiliary_json)},
+       {"isWeak", std::move(is_weak_json)}});
 
     result.push_back(id2string(symbol.name), std::move(symbol_json));
   }
@@ -265,15 +288,19 @@ static void show_symbol_table_brief_json_ui(
     if(symbol.type.is_not_nil())
       ptr->from_type(symbol.type, type_str, ns);
 
+    json_stringt pretty_name_json(symbol.pretty_name);
+    json_stringt base_name_json(symbol.base_name);
+    json_stringt mode_json(symbol.mode);
+    json_stringt module_json(symbol.module);
+    json_stringt pretty_type_json(type_str);
+    jsont type_json(irep_converter.convert_from_irep(symbol.type));
     json_objectt symbol_json(
-      {{"prettyName", json_stringt(symbol.pretty_name)},
-       {"baseName", json_stringt(symbol.base_name)},
-       {"mode", json_stringt(symbol.mode)},
-       {"module", json_stringt(symbol.module)},
-
-       {"prettyType", json_stringt(type_str)},
-
-       {"type", irep_converter.convert_from_irep(symbol.type)}});
+      {{"prettyName", std::move(pretty_name_json)},
+       {"baseName", std::move(base_name_json)},
+       {"mode", std::move(mode_json)},
+       {"module", std::move(module_json)},
+       {"prettyType", std::move(pretty_type_json)},
+       {"type", std::move(type_json)}});
 
     result.push_back(id2string(symbol.name), std::move(symbol_json));
   }

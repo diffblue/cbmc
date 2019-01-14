@@ -56,9 +56,9 @@ std::string as_string(property_statust status)
 
 property_infot::property_infot(
   goto_programt::const_targett pc,
-  std::string description,
+  const std::string &description,
   property_statust status)
-  : pc(pc), description(std::move(description)), status(status)
+  : pc(pc), description(description), status(status)
 {
 }
 
@@ -80,9 +80,8 @@ propertiest initialize_properties(const abstract_goto_modelt &goto_model)
       std::string description = id2string(i_it->source_location.get_comment());
       if(description.empty())
         description = "assertion";
-      properties.emplace(
-        i_it->source_location.get_property_id(),
-        property_infot{i_it, description, property_statust::NOT_CHECKED});
+      property_infot info{i_it, description, property_statust::NOT_CHECKED};
+      properties.emplace(i_it->source_location.get_property_id(), std::move(info));
     }
   }
   return properties;
