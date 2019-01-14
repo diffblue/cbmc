@@ -175,9 +175,10 @@ void taint_analysist::instrument(
               case taint_parse_treet::rulet::SINK:
                 {
                   goto_programt::targett t=insert_before.add_instruction();
-                  binary_predicate_exprt get_may("get_may");
-                  get_may.op0()=where;
-                  get_may.op1()=address_of_exprt(string_constantt(rule.taint));
+                  binary_predicate_exprt get_may(
+                    where,
+                    "get_may",
+                    address_of_exprt(string_constantt(rule.taint)));
                   t->make_assertion(not_exprt(get_may));
                   t->source_location=instruction.source_location;
                   t->source_location.set_property_class(

@@ -2420,7 +2420,8 @@ exprt c_typecheck_baset::do_special_functions(
 
     irep_idt id = identifier == CPROVER_PREFIX "r_ok" ? ID_r_ok : ID_w_ok;
 
-    predicate_exprt ok_expr(id, expr.arguments()[0], expr.arguments()[1]);
+    binary_predicate_exprt ok_expr(
+      expr.arguments()[0], id, expr.arguments()[1]);
     ok_expr.add_source_location() = source_location;
 
     return std::move(ok_expr);

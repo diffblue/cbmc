@@ -264,9 +264,7 @@ exprt smt2_parsert::quantifier_expression(irep_idt id)
   // go backwards, build quantified expression
   for(auto r_it=bindings.rbegin(); r_it!=bindings.rend(); r_it++)
   {
-    binary_predicate_exprt quantifier(id);
-    quantifier.op0()=*r_it;
-    quantifier.op1().swap(result);
+    binary_predicate_exprt quantifier(*r_it, id, result);
     result=quantifier;
   }
 
