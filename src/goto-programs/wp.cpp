@@ -166,12 +166,8 @@ void rewrite_assignment(exprt &lhs, exprt &rhs)
     irep_idt component_name=member_expr.get_component_name();
     exprt new_lhs=member_expr.struct_op();
 
-    with_exprt new_rhs;
-    new_rhs.type()=new_lhs.type();
-    new_rhs.old()=new_lhs;
-    new_rhs.where().id(ID_member_name);
+    with_exprt new_rhs(new_lhs, exprt(ID_member_name), rhs);
     new_rhs.where().set(ID_component_name, component_name);
-    new_rhs.new_value()=rhs;
 
     lhs=new_lhs;
     rhs=new_rhs;
@@ -183,11 +179,7 @@ void rewrite_assignment(exprt &lhs, exprt &rhs)
     const index_exprt index_expr=to_index_expr(lhs);
     exprt new_lhs=index_expr.array();
 
-    with_exprt new_rhs;
-    new_rhs.type()=new_lhs.type();
-    new_rhs.old()=new_lhs;
-    new_rhs.where()=index_expr.index();
-    new_rhs.new_value()=rhs;
+    with_exprt new_rhs(new_lhs, index_expr.index(), rhs);
 
     lhs=new_lhs;
     rhs=new_rhs;
