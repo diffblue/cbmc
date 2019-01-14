@@ -1831,7 +1831,7 @@ std::string expr2ct::convert_constant(
       else if(int_value>=' ' && int_value<126)
       {
         dest+='\'';
-        dest+=static_cast<char>(integer2ulong(int_value));
+        dest += numeric_cast_v<char>(int_value);
         dest+='\'';
       }
       else
