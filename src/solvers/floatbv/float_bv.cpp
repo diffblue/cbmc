@@ -777,13 +777,11 @@ exprt float_bvt::relation(
 
     if(rel==relt::LT)
     {
-      and_exprt and_bv;
-      and_bv.reserve_operands(4);
-      and_bv.copy_to_operands(less_than3);
-      // for the case of two negative numbers
-      and_bv.copy_to_operands(not_exprt(bitwise_equal));
-      and_bv.copy_to_operands(not_exprt(both_zero));
-      and_bv.copy_to_operands(not_exprt(nan));
+      and_exprt and_bv{{less_than3,
+                        // for the case of two negative numbers
+                        not_exprt(bitwise_equal),
+                        not_exprt(both_zero),
+                        not_exprt(nan)}};
 
       return std::move(and_bv);
     }

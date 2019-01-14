@@ -32,21 +32,17 @@ exprt functionst::arguments_equal(const exprt::operandst &o1,
 {
   PRECONDITION(o1.size() == o2.size());
 
-  if(o1.empty())
-    return true_exprt();
-
-  and_exprt and_expr;
-  and_exprt::operandst &conjuncts=and_expr.operands();
-  conjuncts.resize(o1.size());
+  exprt::operandst conjuncts;
+  conjuncts.reserve(o1.size());
 
   for(std::size_t i=0; i<o1.size(); i++)
   {
     exprt lhs=o1[i];
     exprt rhs = typecast_exprt::conditional_cast(o2[i], o1[i].type());
-    conjuncts[i]=equal_exprt(lhs, rhs);
+    conjuncts.push_back(equal_exprt(lhs, rhs));
   }
 
-  return std::move(and_expr);
+  return conjunction(conjuncts);
 }
 
 void functionst::add_function_constraints(const function_infot &info)

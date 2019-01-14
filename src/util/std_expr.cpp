@@ -53,9 +53,7 @@ exprt conjunction(const exprt::operandst &op)
     return op.front();
   else
   {
-    and_exprt result;
-    result.operands()=op;
-    return std::move(result);
+    return and_exprt(exprt::operandst(op));
   }
 }
 
