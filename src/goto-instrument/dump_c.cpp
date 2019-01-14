@@ -421,9 +421,9 @@ void dump_ct::convert_compound(
        comp.get_is_padding())
       continue;
 
-    const typet *non_array_type=&ns.follow(comp_type);
+    const typet *non_array_type = &comp_type;
     while(non_array_type->id()==ID_array)
-      non_array_type=&(ns.follow(non_array_type->subtype()));
+      non_array_type = &(non_array_type->subtype());
 
     if(recursive)
     {

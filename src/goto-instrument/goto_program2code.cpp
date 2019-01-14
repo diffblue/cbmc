@@ -405,8 +405,7 @@ void goto_program2codet::convert_assign_rec(
 {
   if(assign.rhs().id()==ID_array)
   {
-    const array_typet &type=
-      to_array_type(ns.follow(assign.rhs().type()));
+    const array_typet &type = to_array_type(assign.rhs().type());
 
     unsigned i=0;
     forall_operands(it, assign.rhs())
@@ -1575,7 +1574,7 @@ void goto_program2codet::cleanup_function_call(
       code_typet::parameterst::const_iterator it=parameters.begin();
       Forall_expr(it2, arguments)
       {
-        if(ns.follow(it2->type()).id()==ID_union)
+        if(it2->type().id() == ID_union || it2->type().id() == ID_union_tag)
           it2->type()=it->type();
         ++it;
       }
@@ -1825,8 +1824,9 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
   }
 
   // work around transparent union argument
-  if(expr.id()==ID_union &&
-     ns.follow(expr.type()).id()!=ID_union)
+  if(
+    expr.id() == ID_union && expr.type().id() != ID_union &&
+    expr.type().id() != ID_union_tag)
   {
     expr=to_union_expr(expr).op();
   }
@@ -1977,7 +1977,7 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
   }
   else if(expr.id()==ID_typecast)
   {
-    if(ns.follow(expr.type()).id()==ID_c_bit_field)
+    if(expr.type().id() == ID_c_bit_field)
       expr=to_typecast_expr(expr).op();
     else
     {
