@@ -511,12 +511,14 @@ exprt interpretert::get_value(
     }
     return std::move(result);
   }
-  if(use_non_det &&
-     memory[integer2ulong(offset)].initialized!=
-     memory_cellt::initializedt::WRITTEN_BEFORE_READ)
+  if(
+    use_non_det && memory[numeric_cast_v<std::size_t>(offset)].initialized !=
+                     memory_cellt::initializedt::WRITTEN_BEFORE_READ)
+  {
     return side_effect_expr_nondett(type, source_locationt());
+  }
   mp_vectort rhs;
-  rhs.push_back(memory[integer2ulong(offset)].value);
+  rhs.push_back(memory[numeric_cast_v<std::size_t>(offset)].value);
   return get_value(type, rhs);
 }
 
@@ -647,7 +649,7 @@ exprt interpretert::get_value(
   }
 
   // Retrieve value of basic data type
-  return from_integer(rhs[integer2ulong(offset)], type);
+  return from_integer(rhs[numeric_cast_v<std::size_t>(offset)], type);
 }
 
 /// executes the assign statement at the current pc value
@@ -690,7 +692,7 @@ void interpretert::execute_assign()
 
       for(mp_integer i=0; i<size; ++i)
       {
-        memory[integer2ulong(address+i)].initialized=
+        memory[numeric_cast_v<std::size_t>(address + i)].initialized =
           memory_cellt::initializedt::READ_BEFORE_WRITTEN;
       }
     }
@@ -707,7 +709,7 @@ void interpretert::assign(
     if((address+i)<memory.size())
     {
       mp_integer address_val=address+i;
-      memory_cellt &cell=memory[integer2ulong(address_val)];
+      memory_cellt &cell = memory[numeric_cast_v<std::size_t>(address_val)];
       if(show)
       {
         status() << total_steps << " ** assigning "
@@ -884,7 +886,7 @@ void interpretert::build_memory_map(const symbolt &symbol)
   if(size!=0)
   {
     mp_integer address=memory.size();
-    memory.resize(integer2ulong(address+size));
+    memory.resize(numeric_cast_v<std::size_t>(address + size));
     memory_map[symbol.name]=address;
     inverse_memory_map[address]=symbol.name;
   }
@@ -942,7 +944,7 @@ mp_integer interpretert::build_memory_map(
     size=1; // This is a hack to create existence
 
   mp_integer address=memory.size();
-  memory.resize(integer2ulong(address+size));
+  memory.resize(numeric_cast_v<std::size_t>(address + size));
   memory_map[id]=address;
   inverse_memory_map[address]=id;
   dynamic_types.insert(std::pair<const irep_idt, typet>(id, alloc_type));

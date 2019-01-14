@@ -145,7 +145,7 @@ protected:
 
   mp_integer base_address_to_actual_size(const mp_integer &address) const
   {
-    auto memory_iter=memory.find(integer2ulong(address));
+    auto memory_iter = memory.find(numeric_cast_v<std::size_t>(address));
     if(memory_iter==memory.end())
       return 0;
     mp_integer ret=0;

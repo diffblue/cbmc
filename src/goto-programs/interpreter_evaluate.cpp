@@ -33,7 +33,8 @@ void interpretert::read(
 
     if((address+i)<memory.size())
     {
-      const memory_cellt &cell=memory[integer2ulong(address+i)];
+      const memory_cellt &cell =
+        memory[numeric_cast_v<std::size_t>(address + i)];
       value=cell.value;
       if(cell.initialized==memory_cellt::initializedt::UNKNOWN)
         cell.initialized=memory_cellt::initializedt::READ_BEFORE_WRITTEN;
@@ -84,7 +85,7 @@ void interpretert::allocate(
   {
     if((address+i)<memory.size())
     {
-      memory_cellt &cell=memory[integer2ulong(address+i)];
+      memory_cellt &cell = memory[numeric_cast_v<std::size_t>(address + i)];
       cell.value=0;
       cell.initialized=memory_cellt::initializedt::UNKNOWN;
     }
