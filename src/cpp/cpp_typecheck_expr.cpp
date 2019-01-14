@@ -750,7 +750,7 @@ void cpp_typecheckt::typecheck_expr_throw(exprt &expr)
     // nothing really to do; one can throw _almost_ anything
     const typet &exception_type=expr.op0().type();
 
-    if(follow(exception_type).id()==ID_empty)
+    if(exception_type.id() == ID_empty)
     {
       error().source_location=expr.op0().find_source_location();
       error() << "cannot throw void" << eom;
@@ -1023,7 +1023,7 @@ void cpp_typecheckt::typecheck_expr_delete(exprt &expr)
   else
     UNREACHABLE;
 
-  typet pointer_type=follow(expr.op0().type());
+  typet pointer_type = expr.op0().type();
 
   if(pointer_type.id()!=ID_pointer)
   {
@@ -1088,9 +1088,10 @@ void cpp_typecheckt::typecheck_expr_member(
   // explicit calls without knowing if a destructor is defined for the type.
   // An explicit call to a destructor where none is defined has no effect.
 
-  if(expr.find(ID_component_cpp_name).is_not_nil() &&
-     to_cpp_name(expr.find(ID_component_cpp_name)).is_destructor() &&
-     follow(op0.type()).id()!=ID_struct)
+  if(
+    expr.find(ID_component_cpp_name).is_not_nil() &&
+    to_cpp_name(expr.find(ID_component_cpp_name)).is_destructor() &&
+    op0.type().id() != ID_struct && op0.type().id() != ID_struct_tag)
   {
     exprt tmp(ID_cpp_dummy_destructor);
     tmp.add_source_location()=expr.source_location();
@@ -1211,8 +1212,10 @@ void cpp_typecheckt::typecheck_expr_member(
   exprt component;
   component.make_nil();
 
-  assert(follow(expr.op0().type()).id()==ID_struct ||
-         follow(expr.op0().type()).id()==ID_union);
+  PRECONDITION(
+    expr.op0().type().id() == ID_struct || expr.op0().type().id() == ID_union ||
+    expr.op0().type().id() == ID_struct_tag ||
+    expr.op0().type().id() == ID_union_tag);
 
   exprt member;
 
@@ -2152,7 +2155,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
     exprt new_object(ID_new_object, tmp_object_expr.type());
     new_object.set(ID_C_lvalue, true);
 
-    assert(follow(tmp_object_expr.type()).id()==ID_struct);
+    PRECONDITION(tmp_object_expr.type().id() == ID_struct_tag);
 
     get_component(expr.source_location(),
                   new_object,
@@ -2434,7 +2437,7 @@ void cpp_typecheckt::typecheck_side_effect_assignment(side_effect_exprt &expr)
   {
     // for structs we use the 'implicit assignment operator',
     // and therefore, it is allowed to assign to a rvalue struct.
-    if(follow(type0).id()==ID_struct)
+    if(type0.id() == ID_struct_tag)
       expr.op0().set(ID_C_lvalue, true);
 
     c_typecheck_baset::typecheck_side_effect_assignment(expr);
@@ -2512,7 +2515,7 @@ void cpp_typecheckt::typecheck_side_effect_inc_dec(
 
   add_implicit_dereference(expr.op0());
 
-  typet tmp_type=follow(expr.op0().type());
+  const typet &tmp_type = expr.op0().type();
 
   if(is_number(tmp_type) ||
      tmp_type.id()==ID_pointer)
@@ -2582,7 +2585,7 @@ void cpp_typecheckt::typecheck_expr_dereference(exprt &expr)
   }
 
   exprt &op=expr.op0();
-  const typet op_type=follow(op.type());
+  const typet &op_type = op.type();
 
   if(op_type.id() == ID_pointer && op_type.find(ID_to_member).is_not_nil())
   {
@@ -2779,7 +2782,9 @@ void cpp_typecheckt::typecheck_expr_comma(exprt &expr)
     throw 0;
   }
 
-  if(follow(expr.op0().type()).id()==ID_struct)
+  if(
+    expr.op0().type().id() == ID_struct ||
+    expr.op0().type().id() == ID_struct_tag)
   {
     // TODO: check if the comma operator has been overloaded!
   }
