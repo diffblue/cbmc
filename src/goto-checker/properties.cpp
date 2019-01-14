@@ -44,9 +44,9 @@ std::string as_string(property_statust status)
   case property_statust::NOT_REACHABLE:
     return "UNREACHABLE";
   case property_statust::PASS:
-    return "PASS";
+    return "SUCCESS";
   case property_statust::FAIL:
-    return "FAIL";
+    return "FAILURE";
   case property_statust::ERROR:
     return "ERROR";
   }
