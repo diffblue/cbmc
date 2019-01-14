@@ -143,9 +143,6 @@ bvt boolbvt::convert_byte_extract(const byte_extract_exprt &expr)
 
       // add implications
 
-      equal_exprt equality;
-      equality.lhs() = expr.offset(); // index operand
-
       // type of index operand
       const typet &constant_type = expr.offset().type();
 
@@ -154,8 +151,6 @@ bvt boolbvt::convert_byte_extract(const byte_extract_exprt &expr)
 
       for(std::size_t i=0; i<bytes; i++)
       {
-        equality.rhs()=from_integer(i, constant_type);
-
         std::size_t offset=i*byte_width;
 
         for(std::size_t j=0; j<width; j++)
@@ -164,23 +159,20 @@ bvt boolbvt::convert_byte_extract(const byte_extract_exprt &expr)
           else
             equal_bv[j]=const_literal(true);
 
-        prop.l_set_to_true(
-          prop.limplies(convert(equality), prop.land(equal_bv)));
+        prop.l_set_to_true(prop.limplies(
+          convert(equal_exprt(expr.offset(), from_integer(i, constant_type))),
+          prop.land(equal_bv)));
       }
     }
     else
     {
-      equal_exprt equality;
-      equality.lhs() = expr.offset(); // index operand
-
       // type of index operand
       const typet &constant_type = expr.offset().type();
 
       for(std::size_t i=0; i<bytes; i++)
       {
-        equality.rhs()=from_integer(i, constant_type);
-
-        literalt e=convert(equality);
+        literalt e =
+          convert(equal_exprt(expr.offset(), from_integer(i, constant_type)));
 
         std::size_t offset=i*byte_width;
 

@@ -85,9 +85,8 @@ bvt boolbvt::convert_byte_update(const byte_update_exprt &expr)
   for(std::size_t offset=0; offset<bv.size(); offset+=byte_width)
   {
     // index condition
-    equal_exprt equality;
-    equality.lhs()=offset_expr;
-    equality.rhs()=from_integer(offset/byte_width, offset_expr.type());
+    equal_exprt equality(
+      offset_expr, from_integer(offset / byte_width, offset_expr.type()));
     literalt equal=convert(equality);
 
     bv_endianness_mapt map_op(op.type(), little_endian, ns, boolbv_width);

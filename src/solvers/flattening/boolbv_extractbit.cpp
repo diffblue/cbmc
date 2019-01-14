@@ -51,11 +51,8 @@ literalt boolbvt::convert_extractbit(const extractbit_exprt &expr)
       std::max(address_bits(src_bv_width), index_bv_width);
     unsignedbv_typet index_type(index_width);
 
-    equal_exprt equality;
-    equality.lhs() = expr.index();
-
-    if(index_type!=equality.lhs().type())
-      equality.lhs().make_typecast(index_type);
+    equal_exprt equality(
+      typecast_exprt::conditional_cast(expr.index(), index_type), exprt());
 
     if(prop.has_set_to())
     {

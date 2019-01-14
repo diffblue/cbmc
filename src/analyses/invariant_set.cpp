@@ -752,9 +752,8 @@ void invariant_sett::nnf(exprt &expr, bool negate)
       typecast_expr.op().type().id() == ID_unsignedbv ||
       typecast_expr.op().type().id() == ID_signedbv)
     {
-      equal_exprt tmp;
-      tmp.lhs() = typecast_expr.op();
-      tmp.rhs() = from_integer(0, typecast_expr.op().type());
+      equal_exprt tmp(
+        typecast_expr.op(), from_integer(0, typecast_expr.op().type()));
       nnf(tmp, !negate);
       expr.swap(tmp);
     }
@@ -1053,9 +1052,7 @@ void invariant_sett::assignment(
   const exprt &lhs,
   const exprt &rhs)
 {
-  equal_exprt equality;
-  equality.lhs()=lhs;
-  equality.rhs()=rhs;
+  equal_exprt equality(lhs, rhs);
 
   // first evaluate RHS
   simplify(equality.rhs());

@@ -1156,9 +1156,7 @@ exprt goto_convertt::case_guard(
 
     forall_expr(it, case_op)
     {
-      equal_exprt eq_expr;
-      eq_expr.lhs() = value;
-      eq_expr.rhs() = *it;
+      equal_exprt eq_expr(value, *it);
       dest.move_to_operands(eq_expr);
     }
     INVARIANT(
