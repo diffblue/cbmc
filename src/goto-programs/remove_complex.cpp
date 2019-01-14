@@ -136,19 +136,18 @@ static void remove_complex(exprt &expr)
       PRECONDITION(expr.operands().size() == 2);
       // do component-wise:
       // x+y -> complex(x.r+y.r,x.i+y.i)
-      struct_exprt struct_expr(expr.type());
-      struct_expr.operands().resize(2);
+      struct_exprt struct_expr(
+        {binary_exprt(
+           complex_member(expr.op0(), ID_real),
+           expr.id(),
+           complex_member(expr.op1(), ID_real)),
+         binary_exprt(
+           complex_member(expr.op0(), ID_imag),
+           expr.id(),
+           complex_member(expr.op1(), ID_imag))},
+        expr.type());
 
-      struct_expr.op0()=
-        binary_exprt(complex_member(expr.op0(), ID_real), expr.id(),
-                     complex_member(expr.op1(), ID_real));
-
-      struct_expr.op0().add_source_location()=expr.source_location();
-
-      struct_expr.op1()=
-        binary_exprt(complex_member(expr.op0(), ID_imag), expr.id(),
-                     complex_member(expr.op1(), ID_imag));
-
+      struct_expr.op0().add_source_location() = expr.source_location();
       struct_expr.op1().add_source_location()=expr.source_location();
 
       expr=struct_expr;
@@ -158,17 +157,13 @@ static void remove_complex(exprt &expr)
       auto const &unary_minus_expr = to_unary_minus_expr(expr);
       // do component-wise:
       // -x -> complex(-x.r,-x.i)
-      struct_exprt struct_expr(unary_minus_expr.type());
-      struct_expr.operands().resize(2);
-
-      struct_expr.op0() =
-        unary_minus_exprt(complex_member(unary_minus_expr.op(), ID_real));
+      struct_exprt struct_expr(
+        {unary_minus_exprt(complex_member(unary_minus_expr.op(), ID_real)),
+         unary_minus_exprt(complex_member(unary_minus_expr.op(), ID_imag))},
+        unary_minus_expr.type());
 
       struct_expr.op0().add_source_location() =
         unary_minus_expr.source_location();
-
-      struct_expr.op1() =
-        unary_minus_exprt(complex_member(unary_minus_expr.op(), ID_imag));
 
       struct_expr.op1().add_source_location() =
         unary_minus_expr.source_location();
@@ -178,9 +173,9 @@ static void remove_complex(exprt &expr)
     else if(expr.id()==ID_complex)
     {
       auto const &complex_expr = to_complex_expr(expr);
-      auto struct_expr = struct_exprt(complex_expr.type());
+      auto struct_expr = struct_exprt(
+        {complex_expr.real(), complex_expr.imag()}, complex_expr.type());
       struct_expr.add_source_location() = complex_expr.source_location();
-      struct_expr.copy_to_operands(complex_expr.real(), complex_expr.imag());
       expr.swap(struct_expr);
     }
     else if(expr.id()==ID_typecast)
@@ -192,17 +187,14 @@ static void remove_complex(exprt &expr)
       {
         // complex to complex -- do typecast per component
 
-        struct_exprt struct_expr(typecast_expr.type());
-        struct_expr.operands().resize(2);
-
-        struct_expr.op0() =
-          typecast_exprt(complex_member(typecast_expr.op(), ID_real), subtype);
+        struct_exprt struct_expr(
+          {typecast_exprt(complex_member(typecast_expr.op(), ID_real), subtype),
+           typecast_exprt(
+             complex_member(typecast_expr.op(), ID_imag), subtype)},
+          typecast_expr.type());
 
         struct_expr.op0().add_source_location() =
           typecast_expr.source_location();
-
-        struct_expr.op1() =
-          typecast_exprt(complex_member(typecast_expr.op(), ID_imag), subtype);
 
         struct_expr.op1().add_source_location() =
           typecast_expr.source_location();
@@ -212,11 +204,10 @@ static void remove_complex(exprt &expr)
       else
       {
         // non-complex to complex
-        struct_exprt struct_expr(typecast_expr.type());
-        struct_expr.operands().resize(2);
-
-        struct_expr.op0() = typecast_exprt(typecast_expr.op(), subtype);
-        struct_expr.op1()=from_integer(0, subtype);
+        struct_exprt struct_expr(
+          {typecast_exprt(typecast_expr.op(), subtype),
+           from_integer(0, subtype)},
+          typecast_expr.type());
         struct_expr.add_source_location() = typecast_expr.source_location();
 
         expr=struct_expr;

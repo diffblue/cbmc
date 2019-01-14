@@ -211,11 +211,10 @@ SCENARIO(
 
     WHEN("We query what '{ .x = &a2, .y = &a3 }.x' points to")
     {
-      struct_exprt struct_constant(struct_tag_typet(A_symbol.name));
-      struct_constant.copy_to_operands(
-        address_of_exprt(a2_symbol.symbol_expr()));
-      struct_constant.copy_to_operands(
-        address_of_exprt(a3_symbol.symbol_expr()));
+      struct_exprt struct_constant(
+        {address_of_exprt(a2_symbol.symbol_expr()),
+         address_of_exprt(a3_symbol.symbol_expr())},
+        struct_tag_typet(A_symbol.name));
 
       member_exprt member_of_constant(struct_constant, A_x);
 

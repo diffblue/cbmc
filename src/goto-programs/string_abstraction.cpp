@@ -429,12 +429,13 @@ symbol_exprt string_abstractiont::add_dummy_symbol_and_value(
   if(source_type.id()==ID_array && is_char_type(source_type.subtype()) &&
       type_eq(type, string_struct, ns))
   {
-    new_symbol.value=struct_exprt(string_struct);
-    new_symbol.value.operands().resize(3);
-    new_symbol.value.op0()=build_unknown(whatt::IS_ZERO, false);
-    new_symbol.value.op1()=build_unknown(whatt::LENGTH, false);
-    new_symbol.value.op2()=to_array_type(source_type).size().id()==ID_infinity?
-      build_unknown(whatt::SIZE, false):to_array_type(source_type).size();
+    new_symbol.value = struct_exprt(
+      {build_unknown(whatt::IS_ZERO, false),
+       build_unknown(whatt::LENGTH, false),
+       to_array_type(source_type).size().id() == ID_infinity
+         ? build_unknown(whatt::SIZE, false)
+         : to_array_type(source_type).size()},
+      string_struct);
     make_type(new_symbol.value.op2(), build_type(whatt::SIZE));
   }
   else
@@ -1032,12 +1033,11 @@ bool string_abstractiont::build_symbol_constant(
     new_symbol.is_file_local=false;
 
     {
-      struct_exprt value(string_struct);
-      value.operands().resize(3);
-
-      value.op0()=true_exprt();
-      value.op1()=from_integer(zero_length, build_type(whatt::LENGTH));
-      value.op2()=from_integer(buf_size, build_type(whatt::SIZE));
+      struct_exprt value(
+        {true_exprt(),
+         from_integer(zero_length, build_type(whatt::LENGTH)),
+         from_integer(buf_size, build_type(whatt::SIZE))},
+        string_struct);
 
       // initialization
       goto_programt::targett assignment1=initialization.add_instruction();

@@ -264,7 +264,7 @@ exprt lower_byte_extract(const byte_extract_exprt &src, const namespacet &ns)
     const struct_typet::componentst &components=struct_type.components();
 
     bool failed=false;
-    struct_exprt s(src.type());
+    struct_exprt s({}, src.type());
 
     for(const auto &comp : components)
     {

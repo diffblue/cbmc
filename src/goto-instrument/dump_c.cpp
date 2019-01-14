@@ -1253,7 +1253,7 @@ void dump_ct::cleanup_expr(exprt &expr)
     {
       if(u_type_f.get_component(u.get_component_name()).get_is_padding())
         // we just use an empty struct to fake an empty union
-        expr=struct_exprt(struct_typet());
+        expr = struct_exprt({}, struct_typet());
     }
     // add a typecast for NULL
     else if(u.op().id()==ID_constant &&

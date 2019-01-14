@@ -393,9 +393,7 @@ exprt smt2_convt::parse_struct(
   const struct_typet::componentst &components =
     type.components();
 
-  struct_exprt result(type);
-
-  result.operands().resize(components.size(), nil_exprt());
+  struct_exprt result(exprt::operandst(components.size(), nil_exprt()), type);
 
   if(components.empty())
     return std::move(result);

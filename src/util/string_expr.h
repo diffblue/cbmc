@@ -123,9 +123,8 @@ public:
     const exprt &_length,
     const exprt &_content,
     const typet &type)
-    : struct_exprt(type)
+    : struct_exprt({_length, _content}, type)
   {
-    add_to_operands(_length, _content);
   }
 
   refined_string_exprt(const exprt &_length, const exprt &_content)

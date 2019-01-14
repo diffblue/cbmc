@@ -39,9 +39,7 @@ SCENARIO("string_identifiers_resolution_from_equations",
     struct_typet struct_type;
     struct_type.components().emplace_back("str1", string_typet());
     struct_type.components().emplace_back("str2", string_typet());
-    struct_exprt struct_expr(struct_type);
-    struct_expr.operands().push_back(a);
-    struct_expr.operands().push_back(f);
+    struct_exprt struct_expr({a, f}, struct_type);
     symbol_exprt symbol_struct("sym_struct", struct_type);
 
     std::vector<equal_exprt> equations;

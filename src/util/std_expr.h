@@ -1959,6 +1959,11 @@ public:
   {
   }
 
+  struct_exprt(operandst &&_operands, const typet &_type)
+    : multi_ary_exprt(ID_struct, std::move(_operands), _type)
+  {
+  }
+
   exprt &component(const irep_idt &name, const namespacet &ns);
   const exprt &component(const irep_idt &name, const namespacet &ns) const;
 };

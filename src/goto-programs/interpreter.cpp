@@ -465,7 +465,7 @@ exprt interpretert::get_value(
   const typet real_type=ns.follow(type);
   if(real_type.id()==ID_struct)
   {
-    struct_exprt result(real_type);
+    struct_exprt result({}, real_type);
     const struct_typet &struct_type=to_struct_type(real_type);
     const struct_typet::componentst &components=struct_type.components();
 
@@ -532,7 +532,7 @@ exprt interpretert::get_value(
 
   if(real_type.id()==ID_struct)
   {
-    struct_exprt result(real_type);
+    struct_exprt result({}, real_type);
     const struct_typet &struct_type=to_struct_type(real_type);
     const struct_typet::componentst &components=struct_type.components();
 

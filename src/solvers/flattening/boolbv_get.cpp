@@ -152,9 +152,7 @@ exprt boolbvt::bv_get_rec(
         }
       }
 
-      struct_exprt dest(type);
-      dest.operands().swap(op);
-      return std::move(dest);
+      return struct_exprt(std::move(op), type);
     }
     else if(type.id()==ID_union)
     {
