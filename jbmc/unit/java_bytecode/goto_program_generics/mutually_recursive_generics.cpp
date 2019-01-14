@@ -100,7 +100,7 @@ SCENARIO(
 
     const irep_idt &tmp_object_name =
       require_goto_statements::require_entry_point_argument_assignment(
-        "this", entry_point_code);
+        ID_this, entry_point_code);
 
     THEN(
       "The Object has a field `example1` of type `KeyValue<String, Integer>`")

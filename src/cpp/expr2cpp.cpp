@@ -316,7 +316,7 @@ std::string expr2cppt::convert_cpp_this(
   const exprt &src,
   unsigned precedence)
 {
-  return "this";
+  return id2string(ID_this);
 }
 
 std::string expr2cppt::convert_cpp_new(

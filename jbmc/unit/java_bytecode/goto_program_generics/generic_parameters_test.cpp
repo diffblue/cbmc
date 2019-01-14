@@ -39,7 +39,7 @@ SCENARIO(
       //   this = &tmp_object_factory$1;
       const irep_idt &tmp_object_name =
         require_goto_statements::require_entry_point_argument_assignment(
-          "this", entry_point_code);
+          ID_this, entry_point_code);
 
       THEN("Object 'this' has field 'field_input' of type Wrapper")
       {
@@ -102,7 +102,7 @@ SCENARIO(
       // for, so we need to extract its identifier, and start looking for that.
       const auto &tmp_object_name =
         require_goto_statements::require_entry_point_argument_assignment(
-          "this", entry_point_code);
+          ID_this, entry_point_code);
 
       THEN("Type of multiple generic fields should be right")
       {
@@ -188,7 +188,7 @@ SCENARIO(
 
       const auto &tmp_object_name =
         require_goto_statements::require_entry_point_argument_assignment(
-          "this", entry_point_code);
+          ID_this, entry_point_code);
 
       THEN("Object 'this' has field 'field_input1' of type Wrapper")
       {
@@ -246,7 +246,7 @@ SCENARIO(
 
       const auto &tmp_object_name =
         require_goto_statements::require_entry_point_argument_assignment(
-          "this", entry_point_code);
+          ID_this, entry_point_code);
 
       THEN("Object 'this' has field 'field_input' of type PairWrapper")
       {
@@ -563,7 +563,7 @@ SCENARIO(
 
       const irep_idt &tmp_object_name =
         require_goto_statements::require_entry_point_argument_assignment(
-          "this", entry_point_code);
+          ID_this, entry_point_code);
 
       THEN("Object 'this' has field 'f' of type UnsupportedWrapper2")
       {
@@ -627,7 +627,7 @@ SCENARIO(
 
       const irep_idt &tmp_object_name =
         require_goto_statements::require_entry_point_argument_assignment(
-          "this", entry_point_code);
+          ID_this, entry_point_code);
 
       THEN("Object 'this' has field 'f' of type OpaqueWrapper")
       {

@@ -177,7 +177,7 @@ require_goto_statements::find_this_component_assignment(
           member_expr.op().op0().id() == ID_symbol &&
           has_suffix(
             id2string(to_symbol_expr(member_expr.op().op0()).get_identifier()),
-            "this"))
+            id2string(ID_this)))
         {
           if(
             code_assign.rhs() ==

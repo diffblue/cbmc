@@ -314,7 +314,7 @@ std::string expr2javat::convert_java_this(
   const exprt &src,
   unsigned precedence)
 {
-  return "this";
+  return id2string(ID_this);
 }
 
 std::string expr2javat::convert_java_instanceof(

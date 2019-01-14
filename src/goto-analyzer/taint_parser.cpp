@@ -88,7 +88,7 @@ bool taint_parser(
     {
       rule.where=taint_parse_treet::rulet::RETURN_VALUE;
     }
-    else if(where=="this")
+    else if(where == id2string(ID_this))
     {
       rule.where=taint_parse_treet::rulet::THIS;
     }

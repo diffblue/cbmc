@@ -99,7 +99,7 @@ static void assign_parameter_names(
     irep_idt base_name, identifier;
 
     if(i==0 && parameters[i].get_this())
-      base_name="this";
+      base_name = ID_this;
     else
       base_name="stub_ignored_arg"+std::to_string(i);
 
@@ -516,7 +516,7 @@ void java_bytecode_convert_methodt::convert(
     if(param_index==0 && param.get_this())
     {
       // my.package.ClassName.myMethodName:(II)I::this
-      base_name="this";
+      base_name = ID_this;
       identifier=id2string(method_identifier)+"::"+id2string(base_name);
     }
     else
@@ -2096,7 +2096,7 @@ void java_bytecode_convert_methodt::convert_invoke(
       reference_typet object_ref_type = java_reference_type(thistype);
       java_method_typet::parametert this_p(object_ref_type);
       this_p.set_this();
-      this_p.set_base_name("this");
+      this_p.set_base_name(ID_this);
       parameters.insert(parameters.begin(), this_p);
     }
   }
@@ -3013,7 +3013,7 @@ void java_bytecode_initialize_parameter_names(
     if(param_index == 0 && param.get_this())
     {
       // my.package.ClassName.myMethodName:(II)I::this
-      base_name = "this";
+      base_name = ID_this;
       identifier = id2string(method_symbol.name) + "::" + id2string(base_name);
     }
     else

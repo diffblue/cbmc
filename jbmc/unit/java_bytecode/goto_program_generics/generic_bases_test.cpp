@@ -41,7 +41,7 @@ SCENARIO(
       //   this = &tmp_object_factory$1;
       const irep_idt &this_tmp_name =
         require_goto_statements::require_entry_point_argument_assignment(
-          "this", entry_point_code);
+          ID_this, entry_point_code);
 
       THEN("Object 'this' created has correctly specialized inherited field")
       {
@@ -81,7 +81,7 @@ SCENARIO(
       // parts of the previous tests.
       const auto &this_tmp_name =
         require_goto_statements::require_entry_point_argument_assignment(
-          "this", entry_point_code);
+          ID_this, entry_point_code);
 
       THEN("Object 'this' has correctly specialized inherited field")
       {
@@ -113,7 +113,7 @@ SCENARIO(
       // parts of the previous tests.
       const auto &this_tmp_name =
         require_goto_statements::require_entry_point_argument_assignment(
-          "this", entry_point_code);
+          ID_this, entry_point_code);
 
       THEN("Object 'this' has correctly specialized inherited field")
       {
@@ -158,7 +158,7 @@ SCENARIO(
       // parts of the previous tests.
       const auto &this_tmp_name =
         require_goto_statements::require_entry_point_argument_assignment(
-          "this", entry_point_code);
+          ID_this, entry_point_code);
 
       THEN(
         "The object 'this' has field 'f' of type "
@@ -205,7 +205,7 @@ SCENARIO(
       // parts of the previous tests.
       const auto &this_tmp_name =
         require_goto_statements::require_entry_point_argument_assignment(
-          "this", entry_point_code);
+          ID_this, entry_point_code);
 
       THEN("The object 'this' has field 'f' of type java::SuperclassMixed")
       {
@@ -261,7 +261,7 @@ SCENARIO(
       // parts of the previous tests.
       const auto &this_tmp_name =
         require_goto_statements::require_entry_point_argument_assignment(
-          "this", entry_point_code);
+          ID_this, entry_point_code);
 
       THEN(
         "The object 'this' has fields 'inner' and 'inner_gen' "
@@ -334,7 +334,7 @@ SCENARIO(
       // parts of the previous tests.
       const auto &this_tmp_name =
         require_goto_statements::require_entry_point_argument_assignment(
-          "this", entry_point_code);
+          ID_this, entry_point_code);
 
       THEN(
         "The object 'this' has field 'f' of type "
@@ -470,7 +470,7 @@ SCENARIO(
       //   this = &tmp_object_factory$1;
       const irep_idt &this_tmp_name =
         require_goto_statements::require_entry_point_argument_assignment(
-          "this", entry_point_code);
+          ID_this, entry_point_code);
 
       THEN("Object 'this' created has unspecialized inherited field")
       {
@@ -518,7 +518,7 @@ SCENARIO(
       // parts of the previous tests.
       const irep_idt &this_tmp_name =
         require_goto_statements::require_entry_point_argument_assignment(
-          "this", entry_point_code);
+          ID_this, entry_point_code);
 
       THEN("Object 'this' created has unspecialized inherited field")
       {
