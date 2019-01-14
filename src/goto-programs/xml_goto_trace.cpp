@@ -81,8 +81,6 @@ void convert(
           xml_assignment.new_element().swap(xml_location);
 
         {
-          auto lhs_object=step.get_lhs_object();
-
           const symbolt *symbol;
 
           if(lhs_object.has_value() &&
