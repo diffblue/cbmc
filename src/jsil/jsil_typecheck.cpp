@@ -348,7 +348,7 @@ void jsil_typecheckt::typecheck_expr_index(exprt &expr)
 
   // special case for function identifiers
   if(expr.op1().id()=="fid" || expr.op1().id()=="constructid")
-    expr.type()=code_typet();
+    expr.type() = code_typet({}, typet());
   else
     expr.type()=jsil_value_type();
 }
@@ -802,7 +802,7 @@ void jsil_typecheckt::typecheck_function_call(
       // Should be function, declaration not found yet
       symbolt new_symbol;
       new_symbol.name=id;
-      new_symbol.type=code_typet();
+      new_symbol.type = code_typet({}, typet());
       new_symbol.mode="jsil";
       new_symbol.is_type=false;
       new_symbol.value=exprt("no-body-just-yet");
