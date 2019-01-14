@@ -303,7 +303,7 @@ public:
 
     DATA_CHECK(
       vm,
-      code.op0().type() == code.op1().type(),
+      base_type_eq(code.op0().type(), code.op1().type(), ns),
       "lhs and rhs of assignment must have same type");
   }
 
