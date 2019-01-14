@@ -221,7 +221,9 @@ void goto_convertt::do_printf(
     else
     {
       printf_code.id(ID_code);
-      printf_code.type()=typet(ID_code);
+      printf_code.type() = code_typet(
+        code_typet::parameterst(to_code_type(function.type()).parameters()),
+        empty_typet());
       copy(to_code(printf_code), OTHER, dest);
     }
   }
