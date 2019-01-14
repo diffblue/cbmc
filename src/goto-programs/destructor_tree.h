@@ -40,6 +40,20 @@ public:
   std::size_t right_depth_below_common_ancestor;
 };
 
+/// Result of a tree query holding both destructor codet and the ID of the node
+/// that held it.
+class destructor_and_idt
+{
+public:
+  destructor_and_idt(const codet &code, node_indext id)
+    : destructor(code), node_id(id)
+  {
+  }
+
+  const codet destructor;
+  node_indext node_id;
+};
+
 /// Tree to keep track of the destructors generated along each branch of a
 /// function. Used to compare and find out what dead
 /// instructions are needed when moving from one branch to another.
@@ -95,7 +109,7 @@ public:
   ///     top of the current stack.
   /// \return collection of destructors that should be called for the
   ///     range supplied.
-  const std::vector<codet> get_destructors(
+  const std::vector<destructor_and_idt> get_destructors(
     optionalt<node_indext> end_index = {},
     optionalt<node_indext> starting_index = {});
 
@@ -117,6 +131,9 @@ public:
 
   /// Gets the node that the next addition will be added to as a child.
   node_indext get_current_node() const;
+
+  /// Walks the current node down to its child.
+  void descend_tree();
 
 private:
   class destructor_nodet : public graph_nodet<empty_edget>

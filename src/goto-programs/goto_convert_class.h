@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <list>
 #include <vector>
+#include <unordered_set>
 
 #include <util/namespace.h>
 #include <util/replace_expr.h>
@@ -336,16 +337,9 @@ protected:
 
   symbol_exprt exception_flag(const irep_idt &mode);
 
-  bool unwind_destructor_stack(
+  void unwind_destructor_stack(
     const source_locationt &source_location,
     goto_programt &dest,
-    const irep_idt &mode,
-    optionalt<node_indext> destructor_start_point = {},
-    optionalt<node_indext> destructor_end_point = {});
-  bool unwind_destructor_stack(
-    const source_locationt &source_location,
-    goto_programt &dest,
-    destructor_treet &destructor_stack,
     const irep_idt &mode,
     optionalt<node_indext> destructor_start_point = {},
     optionalt<node_indext> destructor_end_point = {});

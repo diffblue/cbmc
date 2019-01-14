@@ -53,21 +53,22 @@ const ancestry_resultt destructor_treet::get_nearest_common_ancestor_info(
   return {right_index, left_unique_count, right_unique_count};
 }
 
-const std::vector<codet> destructor_treet::get_destructors(
+const std::vector<destructor_and_idt> destructor_treet::get_destructors(
   optionalt<node_indext> end_index,
   optionalt<node_indext> starting_index)
 {
   node_indext next_id = starting_index.value_or(get_current_node());
   node_indext end_id = end_index.value_or(0);
 
-  std::vector<codet> codes;
+  std::vector<destructor_and_idt> codes;
   while(next_id > end_id)
   {
     auto node = destruction_graph[next_id];
-    next_id = node.in.begin()->first;
     auto &destructor = node.destructor_value;
     if(destructor)
-      codes.emplace_back(*destructor);
+      codes.emplace_back(destructor_and_idt(*destructor, next_id));
+
+    next_id = node.in.begin()->first;
   }
 
   return codes;
@@ -82,6 +83,15 @@ void destructor_treet::set_current_node(optionalt<node_indext> val)
 void destructor_treet::set_current_node(node_indext val)
 {
   current_node = val;
+}
+
+void destructor_treet::descend_tree()
+{
+  node_indext current_node = get_current_node();
+  if(current_node != 0)
+  {
+    set_current_node(destruction_graph[current_node].in.begin()->first);
+  }
 }
 
 node_indext destructor_treet::get_current_node() const

@@ -265,43 +265,70 @@ symbol_exprt goto_convertt::exception_flag(const irep_idt &mode)
 /// destructor_start_point and destructor_end_point (including the start,
 /// excluding the end).
 ///
-/// If destructor_end_point isn't passed, it will unwind the whole stack.
-/// If destructor_start_point isn't passed, it will unwind from the current
-/// node.
-bool goto_convertt::unwind_destructor_stack(
+/// If \p end_index isn't passed, it will unwind the whole stack.
+/// If \p start_index isn't passed, it will unwind from the current node.
+///
+/// When destructors are non-trivial (i.e. if they contain DECL or GOTO
+/// statements) then unwinding becomes more complicated because when we call
+/// convert on the destructor code it may recursively invoke this function.
+///
+/// Say we have a tree of [3, 2, 1, 0] and we start unwinding from top to
+/// bottom. If node 1 has such a non-trivial destructor during the convert it
+/// will add nodes to the tree so it ends up looking like this:
+///
+///     3, 2, 1, 0
+///        5, 4,/
+///
+/// If for example the destructor contained a THROW statement then it would
+/// unwind destroying variables 5, 4 and finally 0. Note that we don't have 1
+/// here even if that was the instruction that triggered the recursive unwind
+/// because it's already been popped off before convert is called.
+///
+/// After our unwind has finished, we return to our [3, 2, 1, 0] branch and
+/// continue processing the branch for destructor 0.
+void goto_convertt::unwind_destructor_stack(
   const source_locationt &source_location,
   goto_programt &dest,
   const irep_idt &mode,
-  optionalt<node_indext> destructor_end_point,
-  optionalt<node_indext> destructor_start_point)
+  optionalt<node_indext> end_index,
+  optionalt<node_indext> starting_index)
 {
-  return unwind_destructor_stack(
-    source_location,
-    dest,
-    targets.destructor_stack,
-    mode,
-    destructor_end_point,
-    destructor_start_point);
-}
+  // As we go we'll keep targets.destructor_stack.current_node pointing at the
+  // next node we intend to destroy, so that if our convert(...) call for each
+  // destructor returns, throws or otherwise unwinds then it will carry on from
+  // the correct point in the stack of variables we intend to destroy, and if it
+  // contains any DECL statements they will be added as a new child branch,
+  // again at the right point.
 
-bool goto_convertt::unwind_destructor_stack(
-  const source_locationt &source_location,
-  goto_programt &dest,
-  destructor_treet &destructor_stack,
-  const irep_idt &mode,
-  optionalt<node_indext> destructor_end_point,
-  optionalt<node_indext> destructor_start_point)
-{
-  std::vector<codet> stack = destructor_stack.get_destructors(
-    destructor_end_point, destructor_start_point);
+  // We back up the current node as of entering this function so this
+  // side-effect is only noticed by that convert(...) call.
 
-  for(const codet &destructor : stack)
+  node_indext start_id =
+    starting_index.value_or(targets.destructor_stack.get_current_node());
+
+  targets.destructor_stack.set_current_node(start_id);
+
+  node_indext end_id = end_index.value_or(0);
+
+  while(targets.destructor_stack.get_current_node() > end_id)
   {
-    // Copy, assign source location then convert.
-    codet d_code = destructor;
-    d_code.add_source_location() = source_location;
-    convert(d_code, dest, mode);
+    node_indext current_node = targets.destructor_stack.get_current_node();
+
+    optionalt<codet> &destructor =
+      targets.destructor_stack.get_destructor(current_node);
+
+    // Descend the tree before unwinding so we don't re-do the current node
+    // in event that convert(...) recurses into this function:
+    targets.destructor_stack.descend_tree();
+    if(destructor)
+    {
+      // Copy, assign source location then convert.
+      codet copied_instruction = *destructor;
+      copied_instruction.add_source_location() = source_location;
+      convert(copied_instruction, dest, mode);
+    }
   }
 
-  return !stack.empty();
+  // Restore the working destructor stack to how it was before we began:
+  targets.destructor_stack.set_current_node(start_id);
 }
