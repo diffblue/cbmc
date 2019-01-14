@@ -181,7 +181,7 @@ irep_idt cpp_typecheckt::function_identifier(const typet &type)
       result += "$const";
     if(symbol.get_bool(ID_C_volatile))
       result += "$volatile";
-    result+="this";
+    result += id2string(ID_this);
     first=false;
     it++;
   }

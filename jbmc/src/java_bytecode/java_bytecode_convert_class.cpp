@@ -833,7 +833,7 @@ void java_bytecode_convert_classt::add_array_types(symbol_tablet &symbol_table)
       id2string(struct_tag_type_identifier) + ".clone:()Ljava/lang/Object;";
     java_method_typet::parametert this_param;
     this_param.set_identifier(id2string(clone_name)+"::this");
-    this_param.set_base_name("this");
+    this_param.set_base_name(ID_this);
     this_param.set_this();
     this_param.type() = java_reference_type(struct_tag_type);
     const java_method_typet clone_type({this_param}, java_lang_object_type());
