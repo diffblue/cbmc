@@ -5,8 +5,8 @@ activate-multi-line-match
 ^EXIT=0$
 ^SIGNAL=0$
 --
-^.*:\s+global(@[0-9]+)?#0\)
-^.*\?\s+global(@[0-9]+)?#0\s+:
+\([^\s]+guard[^\s]+ \? [^\s]+#0 : [^\s]+\)
+\([^\s]+guard[^\s]+ \? [^\s]+ : [^\s]+#0\)
 --
 These regexes are making sure that a variable of generation 0 dosen't appear in a phi merge, so the below
 statement:
