@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <chrono>
 
 #include <goto-checker/bmc_util.h>
+#include <goto-checker/report_util.h>
 
 #include <util/xml.h>
 #include <util/json.h>

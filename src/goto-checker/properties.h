@@ -84,6 +84,8 @@ xmlt xml(const irep_idt &property_id, const property_infot &property_info);
 json_objectt
 json(const irep_idt &property_id, const property_infot &property_info);
 
+int result_to_exit_code(resultt result);
+
 /// Return the number of properties with given \p status
 std::size_t count_properties(const propertiest &, property_statust);
 
