@@ -14,6 +14,7 @@ Author: Daniel Kroening, Peter Schrammel
 #include <util/exit_codes.h>
 #include <util/invariant.h>
 #include <util/json.h>
+#include <util/json_stream.h>
 #include <util/xml.h>
 
 std::string as_string(resultt result)
@@ -103,14 +104,31 @@ xmlt xml(const irep_idt &property_id, const property_infot &property_info)
   return xml_result;
 }
 
+template <class json_objectT>
+static void json(
+  json_objectT &result,
+  const irep_idt &property_id,
+  const property_infot &property_info)
+{
+  result["property"] = json_stringt(property_id);
+  result["description"] = json_stringt(property_info.description);
+  result["status"] = json_stringt(as_string(property_info.status));
+}
+
 json_objectt
 json(const irep_idt &property_id, const property_infot &property_info)
 {
   json_objectt result;
-  result["property"] = json_stringt(property_id);
-  result["description"] = json_stringt(property_info.description);
-  result["status"] = json_stringt(as_string(property_info.status));
+  json<json_objectt>(result, property_id, property_info);
   return result;
+}
+
+void json(
+  json_stream_objectt &result,
+  const irep_idt &property_id,
+  const property_infot &property_info)
+{
+  json<json_stream_objectt>(result, property_id, property_info);
 }
 
 int result_to_exit_code(resultt result)
