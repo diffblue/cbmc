@@ -57,22 +57,20 @@ int linker_script_merget::add_linker_script_definitions()
     return fail;
   }
 
-  goto_modelt original_goto_model;
+  auto original_goto_model =
+    read_goto_binary(goto_binary, get_message_handler());
 
-  fail =
-    read_goto_binary(goto_binary, original_goto_model, get_message_handler());
-
-  if(fail!=0)
+  if(!original_goto_model.has_value())
   {
     error() << "Unable to read goto binary for linker script merging" << eom;
-    return fail;
+    return 1;
   }
 
   fail=1;
   linker_valuest linker_values;
   const auto &pair =
-    original_goto_model.goto_functions.function_map.find(INITIALIZE_FUNCTION);
-  if(pair == original_goto_model.goto_functions.function_map.end())
+    original_goto_model->goto_functions.function_map.find(INITIALIZE_FUNCTION);
+  if(pair == original_goto_model->goto_functions.function_map.end())
   {
     error() << "No " << INITIALIZE_FUNCTION << " found in goto_functions"
             << eom;
@@ -82,7 +80,7 @@ int linker_script_merget::add_linker_script_definitions()
     data,
     cmdline.get_value('T'),
     pair->second.body,
-    original_goto_model.symbol_table,
+    original_goto_model->symbol_table,
     linker_values);
   if(fail!=0)
   {
@@ -97,7 +95,7 @@ int linker_script_merget::add_linker_script_definitions()
   // The keys of linker_values are exactly the elements of
   // linker_defined_symbols, so iterate over linker_values from now on.
 
-  fail = pointerize_linker_defined_symbols(original_goto_model, linker_values);
+  fail = pointerize_linker_defined_symbols(*original_goto_model, linker_values);
 
   if(fail!=0)
   {
@@ -105,7 +103,7 @@ int linker_script_merget::add_linker_script_definitions()
     return fail;
   }
 
-  fail = compiler.write_bin_object_file(goto_binary, original_goto_model);
+  fail = compiler.write_bin_object_file(goto_binary, *original_goto_model);
 
   if(fail!=0)
     error() << "Could not write linkerscript-augmented binary" << eom;
