@@ -31,9 +31,7 @@ exprt disjunction(const exprt::operandst &op)
     return op.front();
   else
   {
-    or_exprt result;
-    result.operands()=op;
-    return std::move(result);
+    return or_exprt(exprt::operandst(op));
   }
 }
 

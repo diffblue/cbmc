@@ -120,8 +120,7 @@ void memory_model_baset::read_from(symex_target_equationt &equation)
         rf_some=rf_some_operands.front();
       else
       {
-        rf_some=or_exprt();
-        rf_some.operands().swap(rf_some_operands);
+        rf_some = or_exprt(std::move(rf_some_operands));
       }
 
       // Add the read's guard, each of the writes' guards is implied
