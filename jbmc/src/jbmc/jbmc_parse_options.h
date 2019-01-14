@@ -12,9 +12,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_JBMC_JBMC_PARSE_OPTIONS_H
 #define CPROVER_JBMC_JBMC_PARSE_OPTIONS_H
 
-#include <util/ui_message.h>
 #include <util/parse_options.h>
 #include <util/timestamper.h>
+#include <util/ui_message.h>
+#include <util/validation_interface.h>
 
 #include <langapi/language.h>
 
@@ -79,6 +80,7 @@ class optionst;
   "(localize-faults)(localize-faults-method):" \
   "(java-threading)" \
   OPT_GOTO_TRACE \
+  OPT_VALIDATE \
   "(symex-driven-lazy-loading)"
 // clang-format on
 

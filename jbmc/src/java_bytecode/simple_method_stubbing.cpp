@@ -170,7 +170,8 @@ void java_simple_method_stubst::create_method_stub(symbolt &symbol)
       symbol_table);
     const symbol_exprt &init_symbol_expression = init_symbol.symbol_expr();
     code_assignt get_argument(
-      init_symbol_expression, symbol_exprt(this_argument.get_identifier()));
+      init_symbol_expression,
+      symbol_exprt(this_argument.get_identifier(), this_type));
     get_argument.add_source_location() = synthesized_source_location;
     new_instructions.add(get_argument);
     create_method_stub_at(

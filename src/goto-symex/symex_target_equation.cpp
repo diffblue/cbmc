@@ -961,15 +961,19 @@ void symex_target_equationt::SSA_stept::validate(
   case goto_trace_stept::typet::CONSTRAINT:
     validate_full_expr(cond_expr, ns, vm);
     break;
-  case goto_trace_stept::typet::ASSIGNMENT:
   case goto_trace_stept::typet::DECL:
+    validate_full_expr(ssa_lhs, ns, vm);
+    validate_full_expr(ssa_full_lhs, ns, vm);
+    validate_full_expr(original_full_lhs, ns, vm);
+    break;
+  case goto_trace_stept::typet::ASSIGNMENT:
     validate_full_expr(ssa_lhs, ns, vm);
     validate_full_expr(ssa_full_lhs, ns, vm);
     validate_full_expr(original_full_lhs, ns, vm);
     validate_full_expr(ssa_rhs, ns, vm);
     DATA_CHECK(
       vm,
-      base_type_eq(ssa_lhs.get_original_expr(), ssa_rhs, ns),
+      base_type_eq(ssa_lhs.get_original_expr().type(), ssa_rhs.type(), ns),
       "Type inequality in SSA assignment\nlhs-type: " +
         ssa_lhs.get_original_expr().type().id_string() +
         "\nrhs-type: " + ssa_rhs.type().id_string());

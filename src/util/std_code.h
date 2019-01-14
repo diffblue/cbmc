@@ -296,14 +296,14 @@ public:
 
   static void validate(
     const codet &code,
-    const namespacet &,
+    const namespacet &ns,
     const validation_modet vm = validation_modet::INVARIANT)
   {
     check(code, vm);
 
     DATA_CHECK(
       vm,
-      code.op0().type() == code.op1().type(),
+      base_type_eq(code.op0().type(), code.op1().type(), ns),
       "lhs and rhs of assignment must have same type");
   }
 

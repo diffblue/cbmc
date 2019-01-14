@@ -3,10 +3,10 @@ default: tests.log
 include ../../src/config.inc
 
 test:
-	@../$(CPROVER_DIR)/regression/test.pl -p -c ../../../src/jbmc/jbmc
+	@../$(CPROVER_DIR)/regression/test.pl -p -c "../../../src/jbmc/jbmc --validate-goto-model --validate-ssa-equation"
 
 tests.log: ../$(CPROVER_DIR)/regression/test.pl
-	@../$(CPROVER_DIR)/regression/test.pl -p -c ../../../src/jbmc/jbmc
+	@../$(CPROVER_DIR)/regression/test.pl -p -c "../../../src/jbmc/jbmc --validate-goto-model --validate-ssa-equation"
 
 show:
 	@for dir in *; do \
