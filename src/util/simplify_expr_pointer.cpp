@@ -28,21 +28,22 @@ static bool is_dereference_integer_object(
   if(expr.id()==ID_dereference &&
      expr.operands().size()==1)
   {
-    if(expr.op0().id()==ID_typecast &&
-       expr.op0().operands().size()==1 &&
-       expr.op0().op0().is_constant() &&
-       !to_integer(expr.op0().op0(), address))
+    if(
+      expr.op0().id() == ID_typecast && expr.op0().operands().size() == 1 &&
+      expr.op0().op0().is_constant() &&
+      !to_integer(to_constant_expr(expr.op0().op0()), address))
       return true;
 
     if(expr.op0().is_constant())
     {
-      if(to_constant_expr(expr.op0()).get_value()==ID_NULL &&
-         config.ansi_c.NULL_is_zero) // NULL
+      const constant_exprt &op0 = to_constant_expr(expr.op0());
+
+      if(op0.get_value() == ID_NULL && config.ansi_c.NULL_is_zero) // NULL
       {
         address=0;
         return true;
       }
-      else if(!to_integer(expr.op0(), address))
+      else if(!to_integer(op0, address))
         return true;
     }
   }

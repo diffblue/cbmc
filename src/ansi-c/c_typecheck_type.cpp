@@ -316,7 +316,7 @@ void c_typecheck_baset::typecheck_custom_type(typet &type)
   make_constant_index(size_expr);
 
   mp_integer size_int;
-  if(to_integer(size_expr, size_int))
+  if(to_integer(to_constant_expr(size_expr), size_int))
   {
     error().source_location=source_location;
     error() << "failed to convert bit vector width to constant" << eom;
@@ -354,7 +354,7 @@ void c_typecheck_baset::typecheck_custom_type(typet &type)
     make_constant_index(f_expr);
 
     mp_integer f_int;
-    if(to_integer(f_expr, f_int))
+    if(to_integer(to_constant_expr(f_expr), f_int))
     {
       error().source_location = fraction_source_location;
       error() << "failed to convert number of fraction bits to constant" << eom;
@@ -386,7 +386,7 @@ void c_typecheck_baset::typecheck_custom_type(typet &type)
     make_constant_index(f_expr);
 
     mp_integer f_int;
-    if(to_integer(f_expr, f_int))
+    if(to_integer(to_constant_expr(f_expr), f_int))
     {
       error().source_location = fraction_source_location;
       error() << "failed to convert number of fraction bits to constant" << eom;
@@ -560,7 +560,7 @@ void c_typecheck_baset::typecheck_array_type(array_typet &type)
     if(tmp_size.is_constant())
     {
       mp_integer s;
-      if(to_integer(tmp_size, s))
+      if(to_integer(to_constant_expr(tmp_size), s))
       {
         error().source_location = size_source_location;
         error() << "failed to convert constant: "
@@ -684,7 +684,7 @@ void c_typecheck_baset::typecheck_vector_type(vector_typet &type)
   make_constant_index(size);
 
   mp_integer s;
-  if(to_integer(size, s))
+  if(to_integer(to_constant_expr(size), s))
   {
     error().source_location=source_location;
     error() << "failed to convert constant: "
@@ -1174,7 +1174,9 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
         value=1;
       else if(tmp_v.is_false())
         value=0;
-      else if(!to_integer(tmp_v, value))
+      else if(
+        tmp_v.id() == ID_constant &&
+        !to_integer(to_constant_expr(tmp_v), value))
       {
       }
       else
@@ -1384,7 +1386,7 @@ void c_typecheck_baset::typecheck_c_bit_field_type(c_bit_field_typet &type)
     typecheck_expr(width_expr);
     make_constant_index(width_expr);
 
-    if(to_integer(width_expr, i))
+    if(to_integer(to_constant_expr(width_expr), i))
     {
       error().source_location=type.source_location();
       error() << "failed to convert bit field width" << eom;

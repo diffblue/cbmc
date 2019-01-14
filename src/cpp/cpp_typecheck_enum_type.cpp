@@ -40,7 +40,7 @@ void cpp_typecheckt::typecheck_enum_body(symbolt &enum_symbol)
       typecheck_expr(value);
       implicit_typecast(value, c_enum_type.subtype());
       make_constant(value);
-      if(to_integer(value, i))
+      if(to_integer(to_constant_expr(value), i))
       {
         error().source_location=value.find_source_location();
         error() << "failed to produce integer for enum constant" << eom;

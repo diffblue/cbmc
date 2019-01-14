@@ -726,7 +726,7 @@ designatort c_typecheck_baset::make_designator(
 
       mp_integer index, size;
 
-      if(to_integer(tmp_index, index))
+      if(to_integer(to_constant_expr(tmp_index), index))
       {
         error().source_location = d_op.op0().source_location();
         error() << "expected constant array index designator" << eom;

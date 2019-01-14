@@ -532,7 +532,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
       if(value.is_not_nil() && value.id() == ID_constant)
       {
         mp_integer i;
-        to_integer(value, i);
+        to_integer(to_constant_expr(value), i);
         if(i!=0)
         {
           error().source_location = declarator.name().source_location();

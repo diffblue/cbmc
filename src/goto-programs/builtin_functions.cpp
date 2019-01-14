@@ -82,8 +82,9 @@ void goto_convertt::do_prob_uniform(
 
   mp_integer lb, ub;
 
-  if(to_integer(arguments[0], lb) ||
-     to_integer(arguments[1], ub))
+  if(
+    to_integer(to_constant_expr(arguments[0]), lb) ||
+    to_integer(to_constant_expr(arguments[1]), ub))
   {
     error().source_location=function.find_source_location();
     error() << "error converting operands" << eom;
@@ -147,10 +148,21 @@ void goto_convertt::do_prob_coin(
     throw 0;
   }
 
+  if(
+    arguments[1].type().id() != ID_unsignedbv ||
+    arguments[1].id() != ID_constant)
+  {
+    error().source_location = function.find_source_location();
+    error() << "`" << identifier << "' expected second operand to be "
+            << "a constant literal of type unsigned long" << eom;
+    throw 0;
+  }
+
   mp_integer num, den;
 
-  if(to_integer(arguments[0], num) ||
-     to_integer(arguments[1], den))
+  if(
+    to_integer(to_constant_expr(arguments[0]), num) ||
+    to_integer(to_constant_expr(arguments[1]), den))
   {
     error().source_location=function.find_source_location();
     error() << "error converting operands" << eom;
