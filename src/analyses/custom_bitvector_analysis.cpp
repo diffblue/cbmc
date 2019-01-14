@@ -230,7 +230,7 @@ void custom_bitvector_domaint::assign_struct_rec(
   custom_bitvector_analysist &cba,
   const namespacet &ns)
 {
-  if(ns.follow(lhs.type()).id()==ID_struct)
+  if(lhs.type().id() == ID_struct || lhs.type().id() == ID_struct_tag)
   {
     const struct_typet &struct_type=
       to_struct_type(ns.follow(lhs.type()));

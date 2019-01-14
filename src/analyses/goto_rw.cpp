@@ -222,16 +222,15 @@ void rw_range_sett::get_objects_member(
   const range_spect &range_start,
   const range_spect &size)
 {
-  const typet &type=ns.follow(expr.struct_op().type());
+  const typet &type = expr.struct_op().type();
 
-  if(type.id()==ID_union ||
-     range_start==-1)
+  if(type.id() == ID_union || type.id() == ID_union_tag || range_start == -1)
   {
     get_objects_rec(mode, expr.struct_op(), range_start, size);
     return;
   }
 
-  const struct_typet &struct_type=to_struct_type(type);
+  const struct_typet &struct_type = to_struct_type(ns.follow(type));
 
   auto offset_bits =
     member_offset_bits(struct_type, expr.get_component_name(), ns);
@@ -259,7 +258,7 @@ void rw_range_sett::get_objects_index(
     return;
 
   range_spect sub_size=0;
-  const typet &type=ns.follow(expr.array().type());
+  const typet &type = expr.array().type();
 
   if(type.id()==ID_vector)
   {
@@ -302,8 +301,7 @@ void rw_range_sett::get_objects_array(
   const range_spect &range_start,
   const range_spect &size)
 {
-  const array_typet &array_type=
-    to_array_type(ns.follow(expr.type()));
+  const array_typet &array_type = to_array_type(expr.type());
 
   auto subtype_bits = pointer_offset_bits(array_type.subtype(), ns);
 
