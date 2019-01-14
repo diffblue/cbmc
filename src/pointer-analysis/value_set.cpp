@@ -566,8 +566,7 @@ void value_sett::get_value_set_rec(
       throw expr.id_string()+" expected to have at least two operands";
 
     object_mapt pointer_expr_set;
-    mp_integer i;
-    bool i_is_set=false;
+    optionalt<mp_integer> i;
 
     // special case for pointer+integer
 
@@ -579,16 +578,16 @@ void value_sett::get_value_set_rec(
       if(expr.op0().type().id()!=ID_pointer &&
          expr.op0().is_constant())
       {
-        i_is_set=!to_integer(expr.op0(), i);
+        i = numeric_cast<mp_integer>(expr.op0());
         ptr_operand=expr.op1();
       }
       else
       {
-        i_is_set=!to_integer(expr.op1(), i);
+        i = numeric_cast<mp_integer>(expr.op1());
         ptr_operand=expr.op0();
       }
 
-      if(i_is_set)
+      if(i.has_value())
       {
         typet pointer_sub_type=ptr_operand.type().subtype();
         if(pointer_sub_type.id()==ID_empty)
@@ -598,14 +597,14 @@ void value_sett::get_value_set_rec(
 
         if(!size.has_value() || (*size) == 0)
         {
-          i_is_set=false;
+          i.reset();
         }
         else
         {
-          i *= *size;
+          *i *= *size;
 
           if(expr.id()==ID_minus)
-            i.negate();
+            i->negate();
         }
       }
 
@@ -630,8 +629,8 @@ void value_sett::get_value_set_rec(
       offsett offset = it->second;
 
       // adjust by offset
-      if(offset && i_is_set)
-        *offset += i;
+      if(offset && i.has_value())
+        *offset += *i;
       else
         offset.reset();
 
@@ -851,9 +850,9 @@ void value_sett::get_value_set_rec(
     if(eval_pointer_offset(op1, ns))
       simplify(op1, ns);
 
-    mp_integer op1_offset;
+    const auto op1_offset = numeric_cast<mp_integer>(op1);
     const typet &op0_type=ns.follow(expr.op0().type());
-    if(!to_integer(op1, op1_offset) && op0_type.id()==ID_struct)
+    if(op1_offset.has_value() && op0_type.id() == ID_struct)
     {
       const struct_typet &struct_type=to_struct_type(op0_type);
 
@@ -865,9 +864,9 @@ void value_sett::get_value_set_rec(
 
         if(!comp_offset.has_value())
           continue;
-        else if(*comp_offset > op1_offset)
+        else if(*comp_offset > *op1_offset)
           break;
-        else if(*comp_offset != op1_offset)
+        else if(*comp_offset != *op1_offset)
           continue;
 
         found=true;
@@ -1028,19 +1027,19 @@ void value_sett::get_reference_set_rec(
           from_integer(0, index_type()));
 
         offsett o = a_it->second;
-        mp_integer i;
+        const auto i = numeric_cast<mp_integer>(offset);
 
         if(offset.is_zero())
         {
         }
-        else if(!to_integer(offset, i) && o)
+        else if(i.has_value() && o)
         {
           auto size = pointer_offset_size(array_type.subtype(), ns);
 
           if(!size.has_value() || *size == 0)
             o.reset();
           else
-            *o = i * (*size);
+            *o = *i * (*size);
         }
         else
           o.reset();

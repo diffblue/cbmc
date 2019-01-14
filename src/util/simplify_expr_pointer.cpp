@@ -74,16 +74,16 @@ bool simplify_exprt::simplify_address_of_arg(exprt &expr)
 
         if(step_size.has_value())
         {
-          mp_integer index;
+          const auto index = numeric_cast<mp_integer>(expr.op1());
 
-          if(!to_integer(expr.op1(), index))
+          if(index.has_value())
           {
             pointer_typet pointer_type =
               to_pointer_type(to_dereference_expr(expr.op0()).pointer().type());
             pointer_type.subtype() = expr.type();
 
             typecast_exprt typecast_expr(
-              from_integer((*step_size) * index + address, index_type()),
+              from_integer((*step_size) * (*index) + address, index_type()),
               pointer_type);
 
             expr = dereference_exprt(typecast_expr, expr.type());

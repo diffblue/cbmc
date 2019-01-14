@@ -703,9 +703,9 @@ void c_typecheck_baset::typecheck_vector_type(vector_typet &type)
 
   simplify(size_expr, *this);
 
-  mp_integer sub_size;
+  const auto sub_size = numeric_cast<mp_integer>(size_expr);
 
-  if(to_integer(size_expr, sub_size))
+  if(!sub_size.has_value())
   {
     error().source_location=source_location;
     error() << "failed to determine size of vector base type `"
@@ -713,7 +713,7 @@ void c_typecheck_baset::typecheck_vector_type(vector_typet &type)
     throw 0;
   }
 
-  if(sub_size==0)
+  if(*sub_size == 0)
   {
     error().source_location=source_location;
     error() << "type had size 0: `"
@@ -722,16 +722,16 @@ void c_typecheck_baset::typecheck_vector_type(vector_typet &type)
   }
 
   // adjust by width of base type
-  if(s%sub_size!=0)
+  if(s % *sub_size != 0)
   {
     error().source_location=source_location;
     error() << "vector size (" << s
-            << ") expected to be multiple of base type size (" << sub_size
+            << ") expected to be multiple of base type size (" << *sub_size
             << ")" << eom;
     throw 0;
   }
 
-  s/=sub_size;
+  s /= *sub_size;
 
   type.size()=from_integer(s, signed_size_type());
 }

@@ -288,18 +288,15 @@ bool simplify_exprt::simplify_div(exprt &expr)
      expr_type.id()==ID_natural ||
      expr_type.id()==ID_integer)
   {
-    mp_integer int_value0, int_value1;
-    bool ok0, ok1;
-
-    ok0=!to_integer(expr.op0(), int_value0);
-    ok1=!to_integer(expr.op1(), int_value1);
+    const auto int_value0 = numeric_cast<mp_integer>(expr.op0());
+    const auto int_value1 = numeric_cast<mp_integer>(expr.op1());
 
     // division by zero?
-    if(ok1 && int_value1==0)
+    if(int_value1.has_value() && *int_value1 == 0)
       return true;
 
     // x/1?
-    if(ok1 && int_value1==1)
+    if(int_value1.has_value() && *int_value1 == 1)
     {
       exprt tmp;
       tmp.swap(expr.op0());
@@ -308,7 +305,7 @@ bool simplify_exprt::simplify_div(exprt &expr)
     }
 
     // 0/x?
-    if(ok0 && int_value0==0)
+    if(int_value0.has_value() && *int_value0 == 0)
     {
       exprt tmp;
       tmp.swap(expr.op0());
@@ -316,9 +313,9 @@ bool simplify_exprt::simplify_div(exprt &expr)
       return false;
     }
 
-    if(ok0 && ok1)
+    if(int_value0.has_value() && int_value1.has_value())
     {
-      mp_integer result=int_value0/int_value1;
+      mp_integer result = *int_value0 / *int_value1;
       exprt tmp=from_integer(result, expr_type);
 
       if(tmp.is_not_nil())
@@ -405,25 +402,23 @@ bool simplify_exprt::simplify_mod(exprt &expr)
     if(expr.type()==expr.op0().type() &&
        expr.type()==expr.op1().type())
     {
-      mp_integer int_value0, int_value1;
-      bool ok0, ok1;
+      const auto int_value0 = numeric_cast<mp_integer>(expr.op0());
+      const auto int_value1 = numeric_cast<mp_integer>(expr.op1());
 
-      ok0=!to_integer(expr.op0(), int_value0);
-      ok1=!to_integer(expr.op1(), int_value1);
-
-      if(ok1 && int_value1==0)
+      if(int_value1.has_value() && *int_value1 == 0)
         return true; // division by zero
 
-      if((ok1 && int_value1==1) ||
-         (ok0 && int_value0==0))
+      if(
+        (int_value1.has_value() && *int_value1 == 1) ||
+        (int_value0.has_value() && *int_value0 == 0))
       {
         expr=from_integer(0, expr.type());
         return false;
       }
 
-      if(ok0 && ok1)
+      if(int_value0.has_value() && int_value1.has_value())
       {
-        mp_integer result=int_value0%int_value1;
+        mp_integer result = *int_value0 % *int_value1;
         exprt tmp=from_integer(result, expr.type());
 
         if(tmp.is_not_nil())
@@ -980,12 +975,12 @@ bool simplify_exprt::simplify_shifts(exprt &expr)
   if(expr.operands().size()!=2)
     return true;
 
-  mp_integer distance;
+  const auto distance = numeric_cast<mp_integer>(expr.op1());
 
-  if(to_integer(expr.op1(), distance))
+  if(!distance.has_value())
     return true;
 
-  if(distance==0)
+  if(*distance == 0)
   {
     exprt tmp;
     tmp.swap(expr.op0());
@@ -993,9 +988,9 @@ bool simplify_exprt::simplify_shifts(exprt &expr)
     return false;
   }
 
-  mp_integer value;
+  auto value = numeric_cast<mp_integer>(expr.op0());
 
-  if(to_integer(expr.op0(), value))
+  if(!value.has_value())
     return true;
 
   if(expr.op0().type().id()==ID_unsignedbv ||
@@ -1006,26 +1001,26 @@ bool simplify_exprt::simplify_shifts(exprt &expr)
     if(expr.id()==ID_lshr)
     {
       // this is to guard against large values of distance
-      if(distance>=width)
+      if(*distance >= width)
       {
         expr=from_integer(0, expr.type());
         return false;
       }
-      else if(distance>=0)
+      else if(*distance >= 0)
       {
-        if(value < 0)
-          value += power(2, width);
-        value/=power(2, distance);
-        expr=from_integer(value, expr.type());
+        if(*value < 0)
+          *value += power(2, width);
+        *value /= power(2, *distance);
+        expr = from_integer(*value, expr.type());
         return false;
       }
     }
     else if(expr.id()==ID_ashr)
     {
-      if(distance>=0)
+      if(*distance >= 0)
       {
         // this is to simulate an arithmetic right shift
-        mp_integer new_value=value>>distance; // NOLINT(whitespace/operators)
+        mp_integer new_value = *value >> *distance;
         expr=from_integer(new_value, expr.type());
         return false;
       }
@@ -1033,15 +1028,15 @@ bool simplify_exprt::simplify_shifts(exprt &expr)
     else if(expr.id()==ID_shl)
     {
       // this is to guard against large values of distance
-      if(distance>=width)
+      if(*distance >= width)
       {
         expr=from_integer(0, expr.type());
         return false;
       }
-      else if(distance>=0)
+      else if(*distance >= 0)
       {
-        value*=power(2, distance);
-        expr=from_integer(value, expr.type());
+        *value *= power(2, *distance);
+        expr = from_integer(*value, expr.type());
         return false;
       }
     }
@@ -1051,20 +1046,20 @@ bool simplify_exprt::simplify_shifts(exprt &expr)
   {
     if(expr.id()==ID_lshr)
     {
-      if(distance>=0)
+      if(*distance >= 0)
       {
-        value/=power(2, distance);
-        expr=from_integer(value, expr.type());
+        *value /= power(2, *distance);
+        expr = from_integer(*value, expr.type());
         return false;
       }
     }
     else if(expr.id()==ID_ashr)
     {
       // this is to simulate an arithmetic right shift
-      if(distance>=0)
+      if(*distance >= 0)
       {
-        mp_integer new_value=value/power(2, distance);
-        if(value<0 && new_value==0)
+        mp_integer new_value = *value / power(2, *distance);
+        if(*value < 0 && new_value == 0)
           new_value=-1;
 
         expr=from_integer(new_value, expr.type());
@@ -1073,10 +1068,10 @@ bool simplify_exprt::simplify_shifts(exprt &expr)
     }
     else if(expr.id()==ID_shl)
     {
-      if(distance>=0)
+      if(*distance >= 0)
       {
-        value*=power(2, distance);
-        expr=from_integer(value, expr.type());
+        *value *= power(2, *distance);
+        expr = from_integer(*value, expr.type());
         return false;
       }
     }
@@ -1093,15 +1088,16 @@ bool simplify_exprt::simplify_power(exprt &expr)
   if(expr.operands().size()!=2)
     return true;
 
-  mp_integer base, exponent;
+  const auto base = numeric_cast<mp_integer>(expr.op0());
+  const auto exponent = numeric_cast<mp_integer>(expr.op1());
 
-  if(to_integer(expr.op0(), base))
+  if(!base.has_value())
     return true;
 
-  if(to_integer(expr.op1(), exponent))
+  if(!exponent.has_value())
     return true;
 
-  mp_integer result=power(base, exponent);
+  mp_integer result = power(*base, *exponent);
 
   expr=from_integer(result, expr.type());
   return false;
@@ -1116,12 +1112,13 @@ bool simplify_exprt::simplify_extractbits(extractbits_exprt &expr)
      !is_bitvector_type(expr.type()))
     return true;
 
-  mp_integer start, end;
+  const auto start = numeric_cast<mp_integer>(expr.upper());
+  const auto end = numeric_cast<mp_integer>(expr.lower());
 
-  if(to_integer(expr.upper(), start))
+  if(!start.has_value())
     return true;
 
-  if(to_integer(expr.lower(), end))
+  if(!end.has_value())
     return true;
 
   const auto width = pointer_offset_bits(op0_type, ns);
@@ -1129,12 +1126,10 @@ bool simplify_exprt::simplify_extractbits(extractbits_exprt &expr)
   if(!width.has_value())
     return true;
 
-  if(start < 0 || start >= (*width) || end < 0 || end >= (*width))
+  if(*start < 0 || *start >= (*width) || *end < 0 || *end >= (*width))
     return true;
 
-  DATA_INVARIANT(
-    start >= end,
-    "extractbits must have upper() >= lower()");
+  DATA_INVARIANT(*start >= *end, "extractbits must have upper() >= lower()");
 
   if(expr.src().is_constant())
   {
@@ -1144,8 +1139,8 @@ bool simplify_exprt::simplify_extractbits(extractbits_exprt &expr)
       return true;
 
     std::string extracted_value = svalue->substr(
-      numeric_cast_v<std::size_t>(end),
-      numeric_cast_v<std::size_t>(start - end + 1));
+      numeric_cast_v<std::size_t>(*end),
+      numeric_cast_v<std::size_t>(*start - *end + 1));
 
     exprt result = bits2expr(extracted_value, expr.type(), true);
     if(result.is_nil())
@@ -1168,7 +1163,7 @@ bool simplify_exprt::simplify_extractbits(extractbits_exprt &expr)
       if(!op_width.has_value() || *op_width <= 0)
         return true;
 
-      if(start + 1 == offset && end + *op_width == offset)
+      if(*start + 1 == offset && *end + *op_width == offset)
       {
         exprt tmp = *it;
         if(tmp.type() != expr.type())
@@ -1230,12 +1225,12 @@ bool simplify_exprt::simplify_unary_minus(exprt &expr)
        type_id==ID_signedbv ||
        type_id==ID_unsignedbv)
     {
-      mp_integer int_value;
+      const auto int_value = numeric_cast<mp_integer>(expr.op0());
 
-      if(to_integer(expr.op0(), int_value))
+      if(!int_value.has_value())
         return true;
 
-      exprt tmp=from_integer(-int_value, expr.type());
+      exprt tmp = from_integer(-*int_value, expr.type());
 
       if(tmp.is_nil())
         return true;
@@ -1442,22 +1437,24 @@ bool simplify_exprt::simplify_inequality(exprt &expr)
     }
     else
     {
-      mp_integer v0, v1;
+      const auto v0 = numeric_cast<mp_integer>(tmp0);
 
-      if(to_integer(tmp0, v0))
+      if(!v0.has_value())
         return true;
 
-      if(to_integer(tmp1, v1))
+      const auto v1 = numeric_cast<mp_integer>(tmp1);
+
+      if(!v1.has_value())
         return true;
 
       if(expr.id() == ID_ge)
-        expr.make_bool(v0>=v1);
+        expr.make_bool(*v0 >= *v1);
       else if(expr.id()==ID_le)
-        expr.make_bool(v0<=v1);
+        expr.make_bool(*v0 <= *v1);
       else if(expr.id()==ID_gt)
-        expr.make_bool(v0>v1);
+        expr.make_bool(*v0 > *v1);
       else if(expr.id()==ID_lt)
-        expr.make_bool(v0<v1);
+        expr.make_bool(*v0 < *v1);
       else
         UNREACHABLE;
 

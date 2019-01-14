@@ -2899,12 +2899,13 @@ bool c_typecheck_baset::gcc_vector_types_compatible(
   // This is relatively restrictive!
 
   // compare dimension
-  mp_integer s0, s1;
-  if(to_integer(type0.size(), s0))
+  const auto s0 = numeric_cast<mp_integer>(type0.size());
+  const auto s1 = numeric_cast<mp_integer>(type1.size());
+  if(!s0.has_value())
     return false;
-  if(to_integer(type1.size(), s1))
+  if(!s1.has_value())
     return false;
-  if(s0!=s1)
+  if(*s0 != *s1)
     return false;
 
   // compare subtype

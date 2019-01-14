@@ -696,8 +696,8 @@ exprt cpp_typecheck_resolvet::do_builtin(
 
     resolve_argument(argument, fargs);
 
-    mp_integer i;
-    if(to_integer(argument, i))
+    const auto i = numeric_cast<mp_integer>(argument);
+    if(!i.has_value())
     {
       cpp_typecheck.error().source_location=source_location;
       cpp_typecheck.error() << "template argument must be constant"
@@ -705,7 +705,7 @@ exprt cpp_typecheck_resolvet::do_builtin(
       throw 0;
     }
 
-    if(i<1)
+    if(*i < 1)
     {
       cpp_typecheck.error().source_location=source_location;
       cpp_typecheck.error()
@@ -715,7 +715,7 @@ exprt cpp_typecheck_resolvet::do_builtin(
     }
 
     dest=type_exprt(typet(base_name));
-    dest.type().set(ID_width, integer2string(i));
+    dest.type().set(ID_width, integer2string(*i));
   }
   else if(base_name==ID_fixedbv)
   {
@@ -751,9 +751,9 @@ exprt cpp_typecheck_resolvet::do_builtin(
       throw 0;
     }
 
-    mp_integer width, integer_bits;
+    const auto width = numeric_cast<mp_integer>(argument0);
 
-    if(to_integer(argument0, width))
+    if(!width.has_value())
     {
       cpp_typecheck.error().source_location=argument0.find_source_location();
       cpp_typecheck.error() << "template argument must be constant"
@@ -761,7 +761,9 @@ exprt cpp_typecheck_resolvet::do_builtin(
       throw 0;
     }
 
-    if(to_integer(argument1, integer_bits))
+    const auto integer_bits = numeric_cast<mp_integer>(argument1);
+
+    if(!integer_bits.has_value())
     {
       cpp_typecheck.error().source_location=argument1.find_source_location();
       cpp_typecheck.error() << "template argument must be constant"
@@ -769,7 +771,7 @@ exprt cpp_typecheck_resolvet::do_builtin(
       throw 0;
     }
 
-    if(width<1)
+    if(*width < 1)
     {
       cpp_typecheck.error().source_location=argument0.find_source_location();
       cpp_typecheck.error()
@@ -778,7 +780,7 @@ exprt cpp_typecheck_resolvet::do_builtin(
       throw 0;
     }
 
-    if(integer_bits<0)
+    if(*integer_bits < 0)
     {
       cpp_typecheck.error().source_location=argument1.find_source_location();
       cpp_typecheck.error()
@@ -787,7 +789,7 @@ exprt cpp_typecheck_resolvet::do_builtin(
       throw 0;
     }
 
-    if(integer_bits>width)
+    if(*integer_bits > *width)
     {
       cpp_typecheck.error().source_location=argument1.find_source_location();
       cpp_typecheck.error()
@@ -797,8 +799,8 @@ exprt cpp_typecheck_resolvet::do_builtin(
     }
 
     dest=type_exprt(typet(base_name));
-    dest.type().set(ID_width, integer2string(width));
-    dest.type().set(ID_integer_bits, integer2string(integer_bits));
+    dest.type().set(ID_width, integer2string(*width));
+    dest.type().set(ID_integer_bits, integer2string(*integer_bits));
   }
   else if(base_name==ID_integer)
   {
