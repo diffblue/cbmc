@@ -63,7 +63,7 @@ std::string cpp_typecheckt::template_suffix(
         i=1;
       else if(e.is_false())
         i=0;
-      else if(to_integer(e, i))
+      else if(to_integer(to_constant_expr(e), i))
       {
         error().source_location = expr.find_source_location();
         error() << "template argument expression expected to be "

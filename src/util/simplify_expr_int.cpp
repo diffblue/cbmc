@@ -1772,7 +1772,7 @@ bool simplify_exprt::simplify_inequality_constant(exprt &expr)
         if(it->is_constant())
         {
           mp_integer i;
-          if(!to_integer(*it, i))
+          if(!to_integer(to_constant_expr(*it), i))
           {
             constant+=i;
             *it=from_integer(0, it->type());

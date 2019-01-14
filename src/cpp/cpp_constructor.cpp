@@ -68,7 +68,7 @@ optionalt<codet> cpp_typecheckt::cpp_constructor(
     make_constant_index(tmp_size);
 
     mp_integer s;
-    if(to_integer(tmp_size, s))
+    if(to_integer(to_constant_expr(tmp_size), s))
     {
       error().source_location=source_location;
       error() << "array size `" << to_string(size_expr)

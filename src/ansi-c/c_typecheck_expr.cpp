@@ -2592,7 +2592,7 @@ exprt c_typecheck_baset::do_special_functions(
       arg1=1;
     else if(expr.arguments()[1].is_false())
       arg1=0;
-    else if(to_integer(expr.arguments()[1], arg1))
+    else if(to_integer(to_constant_expr(expr.arguments()[1]), arg1))
     {
       error().source_location = f_op.source_location();
       error() << "__builtin_object_size expects constant as second argument, "
