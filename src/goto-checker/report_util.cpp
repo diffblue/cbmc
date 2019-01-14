@@ -129,6 +129,99 @@ void report_error(ui_message_handlert &ui_message_handler)
   }
 }
 
+static void output_single_property_plain(
+  const irep_idt &property_id,
+  const property_infot &property_info,
+  messaget &log,
+  irep_idt current_file = irep_idt())
+{
+  const auto &l = property_info.pc->source_location;
+  log.result() << messaget::faint << '[' << property_id << "] "
+               << messaget::reset;
+  if(l.get_file() != current_file)
+    log.result() << "file " << l.get_file() << ' ';
+  if(!l.get_line().empty())
+    log.result() << "line " << l.get_line() << ' ';
+  log.result() << property_info.description << ": ";
+  switch(property_info.status)
+  {
+  case property_statust::NOT_CHECKED:
+    log.result() << messaget::magenta;
+    break;
+  case property_statust::UNKNOWN:
+    log.result() << messaget::yellow;
+    break;
+  case property_statust::NOT_REACHABLE:
+    log.result() << messaget::bright_green;
+    break;
+  case property_statust::PASS:
+    log.result() << messaget::green;
+    break;
+  case property_statust::FAIL:
+    log.result() << messaget::red;
+    break;
+  case property_statust::ERROR:
+    log.result() << messaget::bright_red;
+    break;
+  }
+  log.result() << as_string(property_info.status) << messaget::reset
+               << messaget::eom;
+}
+
+static void
+output_properties_plain(const propertiest &properties, messaget &log)
+{
+  log.result() << "\n** Results:" << messaget::eom;
+  // collect properties in a vector
+  std::vector<propertiest::const_iterator> sorted_properties;
+  for(auto p_it = properties.begin(); p_it != properties.end(); p_it++)
+    sorted_properties.push_back(p_it);
+  // now determine an ordering for those goals:
+  // 1. alphabetical ordering of file name
+  // 2. numerical ordering of line number
+  // 3. alphabetical ordering of goal ID
+  std::sort(
+    sorted_properties.begin(),
+    sorted_properties.end(),
+    [](propertiest::const_iterator pit1, propertiest::const_iterator pit2) {
+      const auto &p1 = pit1->second.pc->source_location;
+      const auto &p2 = pit2->second.pc->source_location;
+      if(p1.get_file() != p2.get_file())
+        return id2string(p1.get_file()) < id2string(p2.get_file());
+      else if(!p1.get_line().empty() && !p2.get_line().empty())
+        return std::stoul(id2string(p1.get_line())) <
+               std::stoul(id2string(p2.get_line()));
+      else
+        return id2string(pit1->first) < id2string(pit2->first);
+    });
+  // now show in the order we have determined
+  irep_idt previous_function;
+  irep_idt current_file;
+  for(const auto &p : sorted_properties)
+  {
+    const auto &l = p->second.pc->source_location;
+    if(l.get_function() != previous_function)
+    {
+      if(!previous_function.empty())
+        log.result() << '\n';
+      previous_function = l.get_function();
+      if(!previous_function.empty())
+      {
+        current_file = l.get_file();
+        if(!current_file.empty())
+          log.result() << current_file << ' ';
+        if(!l.get_function().empty())
+          log.result() << "function " << l.get_function();
+        log.result() << messaget::eom;
+      }
+    }
+    output_single_property_plain(p->first, p->second, log, current_file);
+  }
+  log.status() << "\n** "
+               << count_properties(properties, property_statust::FAIL) << " of "
+               << properties.size() << " failed" << messaget::eom;
+}
+
 void output_properties(
   const propertiest &properties,
   ui_message_handlert &ui_message_handler)
@@ -138,84 +231,7 @@ void output_properties(
   {
   case ui_message_handlert::uit::PLAIN:
   {
-    log.result() << "\n** Results:" << messaget::eom;
-    // collect properties in a vector
-    std::vector<propertiest::const_iterator> sorted_properties;
-    for(auto p_it = properties.begin(); p_it != properties.end(); p_it++)
-      sorted_properties.push_back(p_it);
-    // now determine an ordering for those goals:
-    // 1. alphabetical ordering of file name
-    // 2. numerical ordering of line number
-    // 3. alphabetical ordering of goal ID
-    std::sort(
-      sorted_properties.begin(),
-      sorted_properties.end(),
-      [](propertiest::const_iterator pit1, propertiest::const_iterator pit2) {
-        const auto &p1 = pit1->second.pc->source_location;
-        const auto &p2 = pit2->second.pc->source_location;
-        if(p1.get_file() != p2.get_file())
-          return id2string(p1.get_file()) < id2string(p2.get_file());
-        else if(!p1.get_line().empty() && !p2.get_line().empty())
-          return std::stoul(id2string(p1.get_line())) <
-                 std::stoul(id2string(p2.get_line()));
-        else
-          return id2string(pit1->first) < id2string(pit2->first);
-      });
-    // now show in the order we have determined
-    irep_idt previous_function;
-    irep_idt current_file;
-    for(const auto &p : sorted_properties)
-    {
-      const auto &l = p->second.pc->source_location;
-      if(l.get_function() != previous_function)
-      {
-        if(!previous_function.empty())
-          log.result() << '\n';
-        previous_function = l.get_function();
-        if(!previous_function.empty())
-        {
-          current_file = l.get_file();
-          if(!current_file.empty())
-            log.result() << current_file << ' ';
-          if(!l.get_function().empty())
-            log.result() << "function " << l.get_function();
-          log.result() << messaget::eom;
-        }
-      }
-      log.result() << messaget::faint << '[' << p->first << "] "
-                   << messaget::reset;
-      if(l.get_file() != current_file)
-        log.result() << "file " << l.get_file() << ' ';
-      if(!l.get_line().empty())
-        log.result() << "line " << l.get_line() << ' ';
-      log.result() << p->second.description << ": ";
-      switch(p->second.status)
-      {
-      case property_statust::NOT_CHECKED:
-        log.result() << messaget::magenta;
-        break;
-      case property_statust::UNKNOWN:
-        log.result() << messaget::yellow;
-        break;
-      case property_statust::NOT_REACHABLE:
-        log.result() << messaget::bright_green;
-        break;
-      case property_statust::PASS:
-        log.result() << messaget::green;
-        break;
-      case property_statust::FAIL:
-        log.result() << messaget::red;
-        break;
-      case property_statust::ERROR:
-        log.result() << messaget::bright_red;
-        break;
-      }
-      log.result() << as_string(p->second.status) << messaget::reset
-                   << messaget::eom;
-    }
-    log.status() << "\n** "
-                 << count_properties(properties, property_statust::FAIL)
-                 << " of " << properties.size() << " failed" << messaget::eom;
+    output_properties_plain(properties, log);
     break;
   }
   case ui_message_handlert::uit::XML_UI:
