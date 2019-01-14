@@ -118,15 +118,15 @@ procedure_decl: TOK_PROCEDURE proc_ident '(' parameters_opt ')'
                   '{' statements_opt '}'
               {
                 symbol_exprt proc(to_symbol_expr(stack($2)));
-                code_typet ct;
+                code_typet::parameterst parameters;
                 forall_operands(it, stack($4))
                 {
                   symbol_exprt s(to_symbol_expr(*it));
-                  code_typet::parametert p;
+                  code_typet::parametert p(typet{});
                   p.set_identifier(s.get_identifier());
-                  ct.parameters().push_back(p);
+                  parameters.push_back(p);
                 }
-                proc.type().swap(ct);
+                proc.type() = code_typet(std::move(parameters), typet());
 
                 symbol_exprt rv(to_symbol_expr(stack($7)));
                 symbol_exprt rl(to_symbol_expr(stack($9)));

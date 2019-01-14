@@ -5615,7 +5615,7 @@ bool Parser::rTypeNameOrFunctionType(typet &tname)
       if(!rArgDeclaration(parameter_declaration))
         return false;
 
-      code_typet::parametert parameter;
+      code_typet::parametert parameter(typet{});
       parameter.swap(parameter_declaration);
       type.parameters().push_back(parameter);
 
