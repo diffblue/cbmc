@@ -47,10 +47,7 @@ public:
 
   virtual ~value_sett() = default;
 
-  static bool field_sensitive(
-    const irep_idt &id,
-    const typet &type,
-    const namespacet &);
+  static bool field_sensitive(const irep_idt &id, const typet &type);
 
   /// Matches the location_number field of the instruction that corresponds
   /// to this value_sett instance in value_set_domaint's state map
@@ -329,10 +326,7 @@ public:
   /// \param type: type of `e.identifier`, used to determine whether `e`'s
   ///   suffix should be used to find a field-sensitive value-set or whether
   ///   a single entry should be shared by all of symbol `e.identifier`.
-  /// \param ns: global namespace
-  entryt &get_entry(
-    const entryt &e, const typet &type,
-    const namespacet &ns);
+  entryt &get_entry(const entryt &e, const typet &type);
 
   /// Pretty-print this value-set
   /// \param ns: global namespace

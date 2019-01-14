@@ -36,10 +36,7 @@ Author: Daniel Kroening, kroening@kroening.com
 const value_sett::object_map_dt value_sett::object_map_dt::blank{};
 object_numberingt value_sett::object_numbering;
 
-bool value_sett::field_sensitive(
-  const irep_idt &id,
-  const typet &type,
-  const namespacet &ns)
+bool value_sett::field_sensitive(const irep_idt &id, const typet &type)
 {
   // we always track fields on these
   if(has_prefix(id2string(id), "value_set::dynamic_object") ||
@@ -58,14 +55,11 @@ const value_sett::entryt *value_sett::find_entry(const value_sett::idt &id)
   return found == values.end() ? nullptr : &found->second;
 }
 
-value_sett::entryt &value_sett::get_entry(
-  const entryt &e,
-  const typet &type,
-  const namespacet &ns)
+value_sett::entryt &value_sett::get_entry(const entryt &e, const typet &type)
 {
   irep_idt index;
 
-  if(field_sensitive(e.identifier, type, ns))
+  if(field_sensitive(e.identifier, type))
     index=id2string(e.identifier)+e.suffix;
   else
     index=e.identifier;
@@ -1291,7 +1285,7 @@ void value_sett::assign_rec(
   {
     const irep_idt &identifier=to_symbol_expr(lhs).get_identifier();
 
-    entryt &e=get_entry(entryt(identifier, suffix), lhs.type(), ns);
+    entryt &e = get_entry(entryt(identifier, suffix), lhs.type());
 
     if(add_to_sets)
       make_union(e.object_map, values_rhs);
@@ -1307,7 +1301,7 @@ void value_sett::assign_rec(
       "value_set::dynamic_object"+
       std::to_string(dynamic_object.get_instance());
 
-    entryt &e=get_entry(entryt(name, suffix), lhs.type(), ns);
+    entryt &e = get_entry(entryt(name, suffix), lhs.type());
 
     make_union(e.object_map, values_rhs);
   }
