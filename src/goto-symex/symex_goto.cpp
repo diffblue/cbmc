@@ -490,6 +490,18 @@ static void merge_names(
   {
     rhs = goto_state_rhs;
   }
+  else if(diff_guard.is_false())
+  {
+    if(do_simplify)
+      simplify(dest_state_rhs, ns);
+    rhs = dest_state_rhs;
+  }
+  else if(diff_guard.is_true())
+  {
+    if(do_simplify)
+      simplify(goto_state_rhs, ns);
+    rhs = goto_state_rhs;
+  }
   else
   {
     rhs = if_exprt(diff_guard.as_expr(), goto_state_rhs, dest_state_rhs);
