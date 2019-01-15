@@ -143,7 +143,7 @@ CLEANFILES = $(CATCH_TEST) testing-utils/testing-utils$(LIBEXT)
 
 # only add a dependency for libraries to avoid triggering implicit rules, which
 # would cause unnecessary rebuilds
-$(filter %$(LIBEXT), CPROVER_LIBS): cprover.dir
+$(filter %$(LIBEXT), $(CPROVER_LIBS)): cprover.dir
 
 all: $(CATCH_TEST)
 
