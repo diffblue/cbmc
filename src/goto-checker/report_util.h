@@ -26,12 +26,14 @@ void report_error(ui_message_handlert &);
 
 void output_properties(
   const propertiest &properties,
+  std::size_t iterations,
   ui_message_handlert &ui_message_handler);
 
 void output_properties_with_traces(
   const propertiest &properties,
   const goto_trace_storaget &traces,
   const trace_optionst &trace_options,
+  std::size_t iterations,
   ui_message_handlert &ui_message_handler);
 
 void output_overall_result(

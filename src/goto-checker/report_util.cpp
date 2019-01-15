@@ -224,13 +224,25 @@ output_properties_plain(const propertiest &properties, messaget &log)
     }
     output_single_property_plain(p->first, p->second, log, current_file);
   }
+}
+
+static void output_iterations(
+  const propertiest &properties,
+  std::size_t iterations,
+  messaget &log)
+{
+  if(properties.empty())
+    return;
+
   log.status() << "\n** "
                << count_properties(properties, property_statust::FAIL) << " of "
-               << properties.size() << " failed" << messaget::eom;
+               << properties.size() << " failed (" << iterations
+               << " iterations)" << messaget::eom;
 }
 
 void output_properties(
   const propertiest &properties,
+  std::size_t iterations,
   ui_message_handlert &ui_message_handler)
 {
   messaget log(ui_message_handler);
@@ -239,6 +251,7 @@ void output_properties(
   case ui_message_handlert::uit::PLAIN:
   {
     output_properties_plain(properties, log);
+    output_iterations(properties, iterations, log);
     break;
   }
   case ui_message_handlert::uit::XML_UI:
@@ -268,6 +281,7 @@ void output_properties_with_traces(
   const propertiest &properties,
   const goto_trace_storaget &traces,
   const trace_optionst &trace_options,
+  std::size_t iterations,
   ui_message_handlert &ui_message_handler)
 {
   messaget log(ui_message_handler);
@@ -291,6 +305,7 @@ void output_properties_with_traces(
         log.result() << messaget::eom;
       }
     }
+    output_iterations(properties, iterations, log);
     break;
   }
   case ui_message_handlert::uit::XML_UI:
