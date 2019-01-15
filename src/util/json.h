@@ -270,6 +270,10 @@ public:
 class json_objectt:public jsont
 {
 public:
+  using value_type = objectt::value_type;
+  using iterator = objectt::iterator;
+  using const_iterator = objectt::const_iterator;
+
   json_objectt():jsont(kindt::J_OBJECT)
   {
   }
@@ -286,54 +290,57 @@ public:
 
   const jsont &operator[](const std::string &key) const
   {
-    objectt::const_iterator it=object.find(key);
+    const_iterator it = object.find(key);
     if(it==object.end())
       return null_json_object;
     else
       return it->second;
   }
 
-  objectt::iterator find(const std::string &key)
+  iterator insert(const_iterator it, value_type value)
+  {
+    return object.insert(it, std::move(value));
+  }
+
+  iterator find(const std::string &key)
   {
     return object.find(key);
   }
 
-  objectt::const_iterator find(const std::string &key) const
+  const_iterator find(const std::string &key) const
   {
     return object.find(key);
   }
 
-  objectt::iterator begin()
+  iterator begin()
   {
     return object.begin();
   }
 
-  objectt::const_iterator begin() const
+  const_iterator begin() const
   {
     return object.begin();
   }
 
-  objectt::const_iterator cbegin() const
+  const_iterator cbegin() const
   {
     return object.cbegin();
   }
 
-  objectt::iterator end()
+  iterator end()
   {
     return object.end();
   }
 
-  objectt::const_iterator end() const
+  const_iterator end() const
   {
     return object.end();
   }
 
-  objectt::const_iterator cend() const
+  const_iterator cend() const
   {
     return object.cend();
   }
-
-  typedef jsont value_type; // NOLINT(readability/identifiers)
 };
 
 class json_truet:public jsont
