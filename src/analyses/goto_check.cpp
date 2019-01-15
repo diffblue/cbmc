@@ -1491,8 +1491,7 @@ void goto_checkt::check_rec(const exprt &expr, guardt &guard, bool address)
         guard.add(op);
     }
 
-    guard.swap(old_guard);
-
+    guard = std::move(old_guard);
     return;
   }
   else if(expr.id()==ID_if)
@@ -1514,14 +1513,14 @@ void goto_checkt::check_rec(const exprt &expr, guardt &guard, bool address)
       guardt old_guard=guard;
       guard.add(expr.op0());
       check_rec(expr.op1(), guard, false);
-      guard.swap(old_guard);
+      guard = std::move(old_guard);
     }
 
     {
       guardt old_guard=guard;
       guard.add(not_exprt(expr.op0()));
       check_rec(expr.op2(), guard, false);
-      guard.swap(old_guard);
+      guard = std::move(old_guard);
     }
 
     return;

@@ -431,7 +431,7 @@ void goto_symext::symex_assign_if(
     guard.add(renamed_guard);
     symex_assign_rec(
       state, lhs.true_case(), full_lhs, rhs, guard, assignment_type);
-    guard.swap(old_guard);
+    guard = std::move(old_guard);
   }
 
   if(!renamed_guard.is_true())
@@ -439,7 +439,7 @@ void goto_symext::symex_assign_if(
     guard.add(not_exprt(renamed_guard));
     symex_assign_rec(
       state, lhs.false_case(), full_lhs, rhs, guard, assignment_type);
-    guard.swap(old_guard);
+    guard = std::move(old_guard);
   }
 }
 
