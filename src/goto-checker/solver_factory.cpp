@@ -18,7 +18,6 @@ Author: Daniel Kroening, Peter Schrammel
 #include <util/message.h>
 #include <util/namespace.h>
 #include <util/options.h>
-#include <util/symbol_table.h>
 #include <util/version.h>
 
 #ifdef _MSC_VER
@@ -35,12 +34,11 @@ Author: Daniel Kroening, Peter Schrammel
 
 solver_factoryt::solver_factoryt(
   const optionst &_options,
-  const symbol_tablet &_symbol_table,
+  const namespacet &_ns,
   message_handlert &_message_handler,
   bool _output_xml_in_refinement)
   : options(_options),
-    symbol_table(_symbol_table),
-    ns(_symbol_table),
+    ns(_ns),
     message_handler(_message_handler),
     output_xml_in_refinement(_output_xml_in_refinement)
 {
