@@ -178,6 +178,9 @@ static void output_single_property_plain(
 static void
 output_properties_plain(const propertiest &properties, messaget &log)
 {
+  if(properties.empty())
+    return;
+
   log.result() << "\n** Results:" << messaget::eom;
   // collect properties in a vector
   std::vector<propertiest::const_iterator> sorted_properties;
