@@ -50,15 +50,14 @@ public:
         goto_functions,
         guard_manager),
       path_limit(_path_limit),
-      path_enumerator(
-        util_make_unique<sat_path_enumeratort>(
-          message_handler,
-          symbol_table,
-          goto_functions,
-          goto_program,
-          loop,
-          loop_header,
-          guard_manager))
+      path_enumerator(util_make_unique<sat_path_enumeratort>(
+        message_handler,
+        symbol_table,
+        goto_functions,
+        goto_program,
+        loop,
+        loop_header,
+        guard_manager))
   {
   }
 
