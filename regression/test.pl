@@ -319,7 +319,7 @@ $main::VERSION = 0.1;
 $Getopt::Std::STANDARD_HELP_VERSION = 1;
 our ($opt_c, $opt_f, $opt_i, $opt_j, $opt_n, $opt_p, $opt_h, $opt_C, $opt_T, $opt_F, $opt_K, $opt_s, %defines, @include_tags, @exclude_tags); # the variables for getopt
 GetOptions("D=s" => \%defines, "X=s" => \@exclude_tags, "I=s" => \@include_tags);
-getopts('c:f:i:j:nphCTFKs') or &main::HELP_MESSAGE(\*STDOUT, "", $main::VERSION, "");
+getopts('c:fi:j:nphCTFKs:') or &main::HELP_MESSAGE(\*STDOUT, "", $main::VERSION, "");
 $opt_c or &main::HELP_MESSAGE(\*STDOUT, "", $main::VERSION, "");
 $opt_j = $opt_j || $ENV{'TESTPL_JOBS'} || 0;
 if($opt_j && $opt_j != 1 && !$has_thread_pool) {
