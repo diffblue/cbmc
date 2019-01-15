@@ -270,6 +270,10 @@ public:
 class json_objectt:public jsont
 {
 public:
+  using value_type = objectt::value_type;
+  using iterator = objectt::iterator;
+  using const_iterator = objectt::const_iterator;
+
   json_objectt():jsont(kindt::J_OBJECT)
   {
   }
@@ -291,6 +295,11 @@ public:
       return null_json_object;
     else
       return it->second;
+  }
+
+  iterator insert(const_iterator it, value_type value)
+  {
+    return object.insert(it, std::move(value));
   }
 
   objectt::iterator find(const std::string &key)
@@ -332,8 +341,6 @@ public:
   {
     return object.cend();
   }
-
-  typedef jsont value_type; // NOLINT(readability/identifiers)
 };
 
 class json_truet:public jsont
