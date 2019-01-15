@@ -16,7 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "std_expr.h"
 
-class guardt:public exprt
+class guardt : private exprt
 {
 public:
   guardt()
@@ -44,6 +44,16 @@ public:
   }
 
   void guard_expr(exprt &dest) const;
+
+  bool is_true() const
+  {
+    return exprt::is_true();
+  }
+
+  bool is_false() const
+  {
+    return exprt::is_false();
+  }
 
   friend guardt &operator -= (guardt &g1, const guardt &g2);
   friend guardt &operator |= (guardt &g1, const guardt &g2);
