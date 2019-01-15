@@ -221,6 +221,10 @@ public:
 
   // Eliminate need for explicit casts when comparing.
 
+  int compare(long n) const
+  {
+    return compare(static_cast<llong_t>(n));
+  }
   int compare (unsigned long n) const { return compare (static_cast<ullong_t>(n)); }
   int compare (int n) const           { return compare (static_cast<llong_t> (n)); }
   int compare (unsigned n) const      { return compare (static_cast<ullong_t>(n)); }
@@ -257,6 +261,7 @@ public:
   BigInt &operator/=(FROM x) { return operator/=(static_cast<TO>(x)); } \
   BigInt &operator%=(FROM x) { return operator%=(static_cast<TO>(x)); }
 
+  OVERLOAD_IN_PLACE_OPERATOR(long, llong_t)
   OVERLOAD_IN_PLACE_OPERATOR(unsigned long, ullong_t)
   OVERLOAD_IN_PLACE_OPERATOR(int, llong_t)
   OVERLOAD_IN_PLACE_OPERATOR(unsigned, ullong_t)
@@ -317,6 +322,7 @@ inline BigInt operator% (const BigInt &lhs, const BigInt &rhs) { return BigInt(l
 
 BINARY_ARITHMETIC_OPERATORS(BigInt::llong_t)
 BINARY_ARITHMETIC_OPERATORS(BigInt::ullong_t)
+BINARY_ARITHMETIC_OPERATORS(long)
 BINARY_ARITHMETIC_OPERATORS(unsigned long)
 BINARY_ARITHMETIC_OPERATORS(int)
 BINARY_ARITHMETIC_OPERATORS(unsigned)
@@ -350,6 +356,7 @@ inline bool operator!= (const BigInt &lhs, const BigInt &rhs) { return lhs.compa
 
 COMPARISON_OPERATORS(BigInt::llong_t)
 COMPARISON_OPERATORS(BigInt::ullong_t)
+COMPARISON_OPERATORS(long)
 COMPARISON_OPERATORS(unsigned long)
 COMPARISON_OPERATORS(int)
 COMPARISON_OPERATORS(unsigned)
