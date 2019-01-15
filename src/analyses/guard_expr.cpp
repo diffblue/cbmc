@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Symbolic Execution
 
-#include "guard.h"
+#include "guard_expr.h"
 
 #include <ostream>
 

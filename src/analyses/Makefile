@@ -12,8 +12,8 @@ SRC = ai.cpp \
       global_may_alias.cpp \
       goto_check.cpp \
       goto_rw.cpp \
-      guard.cpp \
       guard_bdd.cpp \
+      guard_expr.cpp \
       interval_analysis.cpp \
       interval_domain.cpp \
       invariant_propagation.cpp \
