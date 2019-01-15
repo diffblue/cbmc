@@ -41,20 +41,15 @@ void irep_serializationt::write_irep(
   out.put(0); // terminator
 }
 
-void irep_serializationt::reference_convert(
-  std::istream &in,
-  irept &irep)
+const irept &irep_serializationt::reference_convert(std::istream &in)
 {
   std::size_t id=read_gb_word(in);
 
-  if(id<ireps_container.ireps_on_read.size() &&
-     ireps_container.ireps_on_read[id].first)
+  if(
+    id >= ireps_container.ireps_on_read.size() ||
+    !ireps_container.ireps_on_read[id].first)
   {
-    irep=ireps_container.ireps_on_read[id].second;
-  }
-  else
-  {
-    read_irep(in, irep);
+    irept irep = read_irep(in);
 
     if(id >= ireps_container.ireps_on_read.size())
       ireps_container.ireps_on_read.resize(1 + id * 2, {false, get_nil_irep()});
@@ -63,42 +58,57 @@ void irep_serializationt::reference_convert(
     if(ireps_container.ireps_on_read[id].first)
       throw deserialization_exceptiont("irep id read twice.");
 
-    ireps_container.ireps_on_read[id] = {true, irep};
+    ireps_container.ireps_on_read[id] = {true, std::move(irep)};
   }
+
+  return ireps_container.ireps_on_read[id].second;
 }
 
-void irep_serializationt::read_irep(
-  std::istream &in,
-  irept &irep)
+irept irep_serializationt::read_irep(std::istream &in)
 {
-  irep.clear();
-  irep.id(read_string_ref(in));
+  irep_idt id = read_string_ref(in);
+  irept::subt sub;
+  irept::named_subt named_sub;
 
   while(in.peek()=='S')
   {
     in.get();
-    irep.get_sub().push_back(irept());
-    reference_convert(in, irep.get_sub().back());
+    sub.push_back(reference_convert(in));
   }
 
+#ifdef NAMED_SUB_IS_FORWARD_LIST
+  irept::named_subt::iterator before = named_sub.before_begin();
+#endif
   while(in.peek()=='N')
   {
     in.get();
-    irept &r=irep.add(read_string_ref(in));
-    reference_convert(in, r);
+    irep_idt id = read_string_ref(in);
+#ifdef NAMED_SUB_IS_FORWARD_LIST
+    named_sub.emplace_after(before, id, reference_convert(in));
+    ++before;
+#else
+    named_sub.emplace(id, reference_convert(in));
+#endif
   }
 
   while(in.peek()=='C')
   {
     in.get();
-    irept &r=irep.add(read_string_ref(in));
-    reference_convert(in, r);
+    irep_idt id = read_string_ref(in);
+#ifdef NAMED_SUB_IS_FORWARD_LIST
+    named_sub.emplace_after(before, id, reference_convert(in));
+    ++before;
+#else
+    named_sub.emplace(id, reference_convert(in));
+#endif
   }
 
   if(in.get()!=0)
   {
     throw deserialization_exceptiont("irep not terminated");
   }
+
+  return irept(std::move(id), std::move(named_sub), std::move(sub));
 }
 
 /// Serialize an irept

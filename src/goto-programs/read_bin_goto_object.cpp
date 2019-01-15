@@ -35,9 +35,10 @@ static bool read_bin_goto_object_v5(
   {
     symbolt sym;
 
-    irepconverter.reference_convert(in, sym.type);
-    irepconverter.reference_convert(in, sym.value);
-    irepconverter.reference_convert(in, sym.location);
+    sym.type = static_cast<const typet &>(irepconverter.reference_convert(in));
+    sym.value = static_cast<const exprt &>(irepconverter.reference_convert(in));
+    sym.location = static_cast<const source_locationt &>(
+      irepconverter.reference_convert(in));
 
     sym.name = irepconverter.read_string_ref(in);
     sym.module = irepconverter.read_string_ref(in);
@@ -99,12 +100,14 @@ static bool read_bin_goto_object_v5(
       goto_programt::targett itarget = f.body.add_instruction();
       goto_programt::instructiont &instruction=*itarget;
 
-      irepconverter.reference_convert(in, instruction.code);
-      irepconverter.reference_convert(in, instruction.source_location);
+      instruction.code =
+        static_cast<const codet &>(irepconverter.reference_convert(in));
+      instruction.source_location = static_cast<const source_locationt &>(
+        irepconverter.reference_convert(in));
       instruction.type = (goto_program_instruction_typet)
                               irepconverter.read_gb_word(in);
-      instruction.guard.make_nil();
-      irepconverter.reference_convert(in, instruction.guard);
+      instruction.guard =
+        static_cast<const exprt &>(irepconverter.reference_convert(in));
       instruction.target_number = irepconverter.read_gb_word(in);
       if(instruction.is_target() &&
          rev_target_map.insert(

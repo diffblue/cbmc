@@ -61,7 +61,7 @@ public:
     clear();
   };
 
-  void reference_convert(std::istream &, irept &irep);
+  const irept &reference_convert(std::istream &);
   void reference_convert(const irept &irep, std::ostream &);
 
   irep_idt read_string_ref(std::istream &);
@@ -77,7 +77,7 @@ private:
   std::vector<char> read_buffer;
 
   void write_irep(std::ostream &, const irept &irep);
-  void read_irep(std::istream &, irept &irep);
+  irept read_irep(std::istream &);
 };
 
 #endif // CPROVER_UTIL_IREP_SERIALIZATION_H
