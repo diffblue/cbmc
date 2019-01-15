@@ -1407,16 +1407,15 @@ void goto_checkt::add_guarded_claim(
     return;
 
   // add the guard
-  exprt guard_expr=guard.as_expr();
 
   exprt new_expr;
 
-  if(guard_expr.is_true())
+  if(guard.is_true())
     new_expr.swap(expr);
   else
   {
     new_expr=exprt(ID_implies, bool_typet());
-    new_expr.move_to_operands(guard_expr, expr);
+    new_expr.add_to_operands(guard.as_expr(), std::move(expr));
   }
 
   if(assertions.insert(new_expr).second)
