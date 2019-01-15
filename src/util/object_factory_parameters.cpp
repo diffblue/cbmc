@@ -82,4 +82,9 @@ void parse_object_factory_options(const cmdlinet &cmdline, optionst &options)
   {
     options.set_option("min-nondet-string-length", 1);
   }
+  if(cmdline.isset("string-input-value"))
+  {
+    options.set_option(
+      "string-input-value", cmdline.get_values("string-input-value"));
+  }
 }

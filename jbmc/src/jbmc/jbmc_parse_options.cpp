@@ -251,28 +251,18 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
   if(cmdline.isset("no-refine-strings"))
     options.set_option("refine-strings", false);
 
-  if(cmdline.isset("string-printable"))
+  if(cmdline.isset("string-printable") && cmdline.isset("no-refine-strings"))
   {
-    if(cmdline.isset("no-refine-strings"))
-    {
-      throw invalid_command_line_argument_exceptiont(
-        "cannot use --string-printable with --no-refine-strings",
-        "--string-printable");
-    }
-    options.set_option("string-printable", true);
+    throw invalid_command_line_argument_exceptiont(
+      "cannot use --string-printable with --no-refine-strings",
+      "--string-printable");
   }
 
-  if(cmdline.isset("string-input-value"))
+  if(cmdline.isset("string-input-value") && cmdline.isset("no-refine-strings"))
   {
-    if(cmdline.isset("no-refine-strings"))
-    {
-      throw invalid_command_line_argument_exceptiont(
-        "cannot use --string-input-value with --no-refine-strings",
-        "--string-input-value");
-    }
-    options.set_option(
-      "string-input-value",
-      cmdline.get_values("string-input-value"));
+    throw invalid_command_line_argument_exceptiont(
+      "cannot use --string-input-value with --no-refine-strings",
+      "--string-input-value");
   }
 
   if(
