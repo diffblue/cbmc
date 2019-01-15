@@ -87,7 +87,6 @@ protected:
 
   void compute_coverage_lines(
     const goto_programt &goto_program,
-    const irep_idt &file_name,
     const symex_coveraget::coveraget &coverage,
     coverage_lines_mapt &dest);
 };
@@ -145,8 +144,7 @@ goto_program_coverage_recordt::goto_program_coverage_recordt(
 
   // compute the maximum coverage of individual source-code lines
   coverage_lines_mapt coverage_lines_map;
-  compute_coverage_lines(
-    gf_it->second.body, file_name, coverage, coverage_lines_map);
+  compute_coverage_lines(gf_it->second.body, coverage, coverage_lines_map);
 
   // <method name="foo" signature="int(int)" line-rate="1.0" branch-rate="1.0">
   //   <lines>
@@ -205,7 +203,6 @@ goto_program_coverage_recordt::goto_program_coverage_recordt(
 
 void goto_program_coverage_recordt::compute_coverage_lines(
   const goto_programt &goto_program,
-  const irep_idt &file_name,
   const symex_coveraget::coveraget &coverage,
   coverage_lines_mapt &dest)
 {
