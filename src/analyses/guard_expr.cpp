@@ -18,7 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/simplify_utils.h>
 #include <util/std_expr.h>
 
-void guardt::guard_expr(exprt &dest) const
+void guard_exprt::guard_expr(exprt &dest) const
 {
   if(is_true())
   {
@@ -38,7 +38,7 @@ void guardt::guard_expr(exprt &dest) const
   }
 }
 
-void guardt::add(const exprt &expr)
+void guard_exprt::add(const exprt &expr)
 {
   PRECONDITION(expr.type().id() == ID_bool);
 
@@ -64,7 +64,7 @@ void guardt::add(const exprt &expr)
     op.push_back(expr);
 }
 
-guardt &operator-=(guardt &g1, const guardt &g2)
+guard_exprt &operator-=(guard_exprt &g1, const guard_exprt &g2)
 {
   if(g1.expr.id() != ID_and || g2.expr.id() != ID_and)
     return g1;
@@ -91,7 +91,7 @@ guardt &operator-=(guardt &g1, const guardt &g2)
   return g1;
 }
 
-guardt &operator|=(guardt &g1, const guardt &g2)
+guard_exprt &operator|=(guard_exprt &g1, const guard_exprt &g2)
 {
   if(g2.is_false() || g1.is_true())
     return g1;

@@ -27,7 +27,6 @@ class code_assignt;
 class code_function_callt;
 class exprt;
 class goto_symex_statet;
-class guardt;
 class if_exprt;
 class index_exprt;
 class symbol_exprt;

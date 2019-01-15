@@ -18,21 +18,21 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /// This is unused by this implementation of guards, but can be used by other
 /// implementations of the same interface.
-struct guard_managert
+struct guard_expr_managert
 {
 };
 
-class guardt
+class guard_exprt
 {
 public:
   /// Construct a BDD from an expression
   /// The \c guard_managert parameter is not used, but we keep it for uniformity
   /// with other implementations of guards which may use it.
-  explicit guardt(const exprt &e, guard_managert &) : expr(e)
+  explicit guard_exprt(const exprt &e, guard_expr_managert &) : expr(e)
   {
   }
 
-  guardt &operator=(const guardt &other)
+  guard_exprt &operator=(const guard_exprt &other)
   {
     expr = other.expr;
     return *this;
@@ -40,7 +40,7 @@ public:
 
   void add(const exprt &expr);
 
-  void append(const guardt &guard)
+  void append(const guard_exprt &guard)
   {
     add(guard.as_expr());
   }
@@ -62,8 +62,8 @@ public:
     return expr.is_false();
   }
 
-  friend guardt &operator-=(guardt &g1, const guardt &g2);
-  friend guardt &operator|=(guardt &g1, const guardt &g2);
+  friend guard_exprt &operator-=(guard_exprt &g1, const guard_exprt &g2);
+  friend guard_exprt &operator|=(guard_exprt &g1, const guard_exprt &g2);
 
 private:
   exprt expr;
