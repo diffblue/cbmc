@@ -76,7 +76,7 @@ void parse_object_factory_options(const cmdlinet &cmdline, optionst &options)
   }
   if(cmdline.isset("string-printable"))
   {
-    options.set_option("string-printable", cmdline.isset("string-printable"));
+    options.set_option("string-printable", true);
   }
   if(cmdline.isset("string-non-empty"))
   {
