@@ -370,7 +370,7 @@ public:
     get_modet mode,
     const exprt &expr) override
   {
-    guard = true_exprt();
+    guard = guardt();
 
     rw_range_set_value_sett::get_objects_rec(_function, _target, mode, expr);
   }
