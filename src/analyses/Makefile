@@ -13,6 +13,7 @@ SRC = ai.cpp \
       goto_check.cpp \
       goto_rw.cpp \
       guard.cpp \
+      guard_bdd.cpp \
       interval_analysis.cpp \
       interval_domain.cpp \
       invariant_propagation.cpp \

@@ -3,4 +3,8 @@ add_library(analyses ${sources})
 
 generic_includes(analyses)
 
-target_link_libraries(analyses util pointer-analysis)
+if(CMAKE_USE_CUDD)
+    target_include_directories(analyses PUBLIC ${CUDD_INCLUDE}/cudd/)
+endif()
+
+target_link_libraries(analyses util pointer-analysis solvers)

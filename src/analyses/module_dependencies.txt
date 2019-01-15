@@ -2,4 +2,6 @@ analyses
 goto-programs
 langapi # should go away
 pointer-analysis
+solvers/bdd
+solvers/prop
 util
