@@ -255,8 +255,9 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
   {
     if(cmdline.isset("no-refine-strings"))
     {
-      warning() << "--string-printable ignored due to --no-refine-strings"
-                << eom;
+      throw invalid_command_line_argument_exceptiont(
+        "cannot use --string-printable with --no-refine-strings",
+        "--string-printable");
     }
     options.set_option("string-printable", true);
   }
@@ -265,8 +266,9 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
   {
     if(cmdline.isset("no-refine-strings"))
     {
-      warning() << "--string-input-value ignored due to --no-refine-strings"
-                << eom;
+      throw invalid_command_line_argument_exceptiont(
+        "cannot use --string-input-value with --no-refine-strings",
+        "--string-input-value");
     }
     options.set_option(
       "string-input-value",
@@ -277,8 +279,9 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
     cmdline.isset("no-refine-strings") &&
     cmdline.isset("max-nondet-string-length"))
   {
-    warning() << "--max-nondet-string-length ignored due to "
-              << "--no-refine-strings" << eom;
+    throw invalid_command_line_argument_exceptiont(
+      "cannot use --max-nondet-string-length with --no-refine-strings",
+      "--max-nondet-string-length");
   }
 
   if(cmdline.isset("max-node-refinement"))
