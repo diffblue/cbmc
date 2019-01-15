@@ -69,10 +69,6 @@ propertiest initialize_properties(const abstract_goto_modelt &goto_model)
   const auto &goto_functions = goto_model.get_goto_functions();
   for(const auto &function_pair : goto_functions.function_map)
   {
-    // don't collect properties from inlined functions
-    if(function_pair.second.is_inlined())
-      continue;
-
     const goto_programt &goto_program = function_pair.second.body;
 
     // need pointer to goto instruction
