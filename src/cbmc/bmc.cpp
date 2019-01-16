@@ -276,6 +276,7 @@ int bmct::do_language_agnostic_bmc(
   safety_checkert::resultt final_result = safety_checkert::resultt::SAFE;
   safety_checkert::resultt tmp_result = safety_checkert::resultt::SAFE;
   const symbol_tablet &symbol_table = model.get_symbol_table();
+  namespacet ns(symbol_table);
   messaget message(ui);
   std::unique_ptr<path_storaget> worklist;
   std::string strategy = opts.get_option("exploration-strategy");
@@ -285,12 +286,10 @@ int bmct::do_language_agnostic_bmc(
   worklist = path_strategy_chooser.get(strategy);
   try
   {
+    solver_factoryt solvers(
+      opts, ns, ui, ui.get_ui() == ui_message_handlert::uit::XML_UI);
+
     {
-      solver_factoryt solvers(
-        opts,
-        symbol_table,
-        ui,
-        ui.get_ui() == ui_message_handlert::uit::XML_UI);
       std::unique_ptr<solver_factoryt::solvert> cbmc_solver =
         solvers.get_solver();
       prop_convt &pc = cbmc_solver->prop_conv();
@@ -333,11 +332,6 @@ int bmct::do_language_agnostic_bmc(
 
     while(!worklist->empty())
     {
-      solver_factoryt solvers(
-        opts,
-        symbol_table,
-        ui,
-        ui.get_ui() == ui_message_handlert::uit::XML_UI);
       std::unique_ptr<solver_factoryt::solvert> cbmc_solver =
         solvers.get_solver();
       prop_convt &pc = cbmc_solver->prop_conv();
