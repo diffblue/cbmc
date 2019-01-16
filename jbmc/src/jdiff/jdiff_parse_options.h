@@ -23,8 +23,6 @@ Author: Peter Schrammel
 #include <goto-programs/show_goto_functions.h>
 #include <goto-programs/show_properties.h>
 
-#include "jdiff_languages.h"
-
 class goto_modelt;
 
 // clang-format off
@@ -42,29 +40,19 @@ class goto_modelt;
   "(compact-output)"
 // clang-format on
 
-class jdiff_parse_optionst : public parse_options_baset, public jdiff_languagest
+class jdiff_parse_optionst : public parse_options_baset, public messaget
 {
 public:
   virtual int doit();
   virtual void help();
 
   jdiff_parse_optionst(int argc, const char **argv);
-  jdiff_parse_optionst(
-    int argc,
-    const char **argv,
-    const std::string &extra_options);
 
 protected:
-  optionst options;
   ui_message_handlert ui_message_handler;
-  jdiff_languagest languages2;
+  void register_languages();
 
   void get_command_line_options(optionst &options);
-
-  virtual int get_goto_program(
-    const optionst &options,
-    jdiff_languagest &languages,
-    goto_modelt &goto_model);
 
   bool process_goto_program(const optionst &options, goto_modelt &goto_model);
 };

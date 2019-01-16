@@ -27,6 +27,7 @@ Author: Peter Schrammel
 #include <goto-programs/adjust_float_expressions.h>
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/goto_inline.h>
+#include <goto-programs/initialize_goto_model.h>
 #include <goto-programs/instrument_preconditions.h>
 #include <goto-programs/link_to_library.h>
 #include <goto-programs/loop_ids.h>
@@ -60,28 +61,10 @@ Author: Peter Schrammel
 #include <goto-diff/goto_diff.h>
 #include <goto-diff/unified_diff.h>
 
-// TODO: do not use language_uit for this; requires a refactoring of
-//   initialize_goto_model to support parsing specific command line files
 jdiff_parse_optionst::jdiff_parse_optionst(int argc, const char **argv)
   : parse_options_baset(JDIFF_OPTIONS, argc, argv, ui_message_handler),
-    jdiff_languagest(cmdline, ui_message_handler, &options),
-    ui_message_handler(cmdline, std::string("JDIFF ") + CBMC_VERSION),
-    languages2(cmdline, ui_message_handler, &options)
-{
-}
-
-::jdiff_parse_optionst::jdiff_parse_optionst(
-  int argc,
-  const char **argv,
-  const std::string &extra_options)
-  : parse_options_baset(
-      JDIFF_OPTIONS + extra_options,
-      argc,
-      argv,
-      ui_message_handler),
-    jdiff_languagest(cmdline, ui_message_handler, &options),
-    ui_message_handler(cmdline, std::string("JDIFF ") + CBMC_VERSION),
-    languages2(cmdline, ui_message_handler, &options)
+    messaget(ui_message_handler),
+    ui_message_handler(cmdline, std::string("JDIFF ") + CBMC_VERSION)
 {
 }
 
@@ -219,19 +202,21 @@ int jdiff_parse_optionst::doit()
     return CPROVER_EXIT_INCORRECT_TASK;
   }
 
-  goto_modelt goto_model1, goto_model2;
+  register_languages();
 
-  int get_goto_program_ret = get_goto_program(options, *this, goto_model1);
-  if(get_goto_program_ret != -1)
-    return get_goto_program_ret;
-  get_goto_program_ret = get_goto_program(options, languages2, goto_model2);
-  if(get_goto_program_ret != -1)
-    return get_goto_program_ret;
+  goto_modelt goto_model1 =
+    initialize_goto_model({cmdline.args[0]}, ui_message_handler, options);
+  if(process_goto_program(options, goto_model1))
+    return CPROVER_EXIT_INTERNAL_ERROR;
+  goto_modelt goto_model2 =
+    initialize_goto_model({cmdline.args[1]}, ui_message_handler, options);
+  if(process_goto_program(options, goto_model2))
+    return CPROVER_EXIT_INTERNAL_ERROR;
 
   if(cmdline.isset("show-loops"))
   {
-    show_loop_ids(get_ui(), goto_model1);
-    show_loop_ids(get_ui(), goto_model2);
+    show_loop_ids(ui_message_handler.get_ui(), goto_model1);
+    show_loop_ids(ui_message_handler.get_ui(), goto_model2);
     return CPROVER_EXIT_SUCCESS;
   }
 
@@ -282,61 +267,6 @@ int jdiff_parse_optionst::doit()
   sd.output_functions();
 
   return CPROVER_EXIT_SUCCESS;
-}
-
-int jdiff_parse_optionst::get_goto_program(
-  const optionst &options,
-  jdiff_languagest &languages,
-  goto_modelt &goto_model)
-{
-  status() << "Reading program from `" << cmdline.args[0] << "'" << eom;
-
-  if(is_goto_binary(cmdline.args[0]))
-  {
-    auto tmp_goto_model =
-      read_goto_binary(cmdline.args[0], languages.get_message_handler());
-    if(!tmp_goto_model.has_value())
-      return CPROVER_EXIT_INCORRECT_TASK;
-
-    goto_model = std::move(*tmp_goto_model);
-
-    config.set(cmdline);
-
-    // This one is done.
-    cmdline.args.erase(cmdline.args.begin());
-  }
-  else
-  {
-    // This is a a workaround to make parse() think that there is only
-    // one source file.
-    std::string arg2("");
-    if(cmdline.args.size() == 2)
-    {
-      arg2 = cmdline.args[1];
-      cmdline.args.erase(--cmdline.args.end());
-    }
-
-    if(languages.parse() || languages.typecheck() || languages.final())
-      return CPROVER_EXIT_INCORRECT_TASK;
-
-    // we no longer need any parse trees or language files
-    languages.clear_parse();
-
-    status() << "Generating GOTO Program" << eom;
-
-    goto_model.symbol_table = languages.symbol_table;
-    goto_convert(
-      goto_model.symbol_table, goto_model.goto_functions, ui_message_handler);
-
-    if(process_goto_program(options, goto_model))
-      return CPROVER_EXIT_INTERNAL_ERROR;
-
-    // if we had a second argument then we will handle it next
-    if(arg2 != "")
-      cmdline.args[0] = arg2;
-  }
-
-  return -1; // no error, continue
 }
 
 bool jdiff_parse_optionst::process_goto_program(
