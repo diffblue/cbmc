@@ -279,6 +279,9 @@ public:
     // NOLINTNEXTLINE(whitespace/line_length)
     bool is_atomic_end() const      { return type==goto_trace_stept::typet::ATOMIC_END; }
 
+    // return the property ID if this is an assertion step
+    irep_idt get_property_id() const;
+
     // we may choose to hide
     bool hidden=false;
 

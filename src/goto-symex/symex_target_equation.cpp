@@ -1007,3 +1007,27 @@ void symex_target_equationt::SSA_stept::validate(
     break;
   }
 }
+
+irep_idt symex_target_equationt::SSA_stept::get_property_id() const
+{
+  PRECONDITION(is_assert());
+
+  irep_idt property_id;
+
+  if(source.pc->is_assert())
+  {
+    property_id = source.pc->source_location.get_property_id();
+  }
+  else if(source.pc->is_goto())
+  {
+    // this is likely an unwinding assertion
+    property_id = id2string(source.pc->source_location.get_function()) +
+                  ".unwind." + std::to_string(source.pc->loop_number);
+  }
+  else
+  {
+    // return empty
+  }
+
+  return property_id;
+}
