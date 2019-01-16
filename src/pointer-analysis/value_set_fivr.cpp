@@ -1022,13 +1022,14 @@ void value_set_fivrt::get_reference_set_sharing_rec(
     forall_objects(it, object_map)
     {
       const exprt &object=object_numbering[it->first];
-      const typet &obj_type=ns.follow(object.type());
+      const typet &obj_type = object.type();
 
       if(object.id()==ID_unknown)
         insert_from(dest, exprt(ID_unknown, expr.type()));
-      else if(object.id()==ID_dynamic_object &&
-              obj_type.id()!=ID_struct &&
-              obj_type.id()!=ID_union)
+      else if(
+        object.id() == ID_dynamic_object && obj_type.id() != ID_struct &&
+        obj_type.id() != ID_union && obj_type.id() != ID_struct_tag &&
+        obj_type.id() != ID_union_tag)
       {
         // we catch dynamic objects of the wrong type,
         // to avoid non-integral typecasts.

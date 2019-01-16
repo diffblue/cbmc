@@ -391,8 +391,8 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
       result.pointer_guard=same_object(pointer_expr, object_pointer);
     }
 
-    const typet &object_type=ns.follow(object.type());
-    const typet &root_object_type=ns.follow(root_object.type());
+    const typet &object_type = object.type();
+    const typet &root_object_type = root_object.type();
 
     exprt root_object_subexpression=root_object;
 
@@ -402,10 +402,7 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
       // The simplest case: types match, and offset is zero!
       // This is great, we are almost done.
 
-      result.value=object;
-
-      if(object_type!=ns.follow(dereference_type))
-        result.value.make_typecast(dereference_type);
+      result.value = typecast_exprt::conditional_cast(object, dereference_type);
     }
     else if(root_object_type.id()==ID_array &&
             dereference_type_compare(
@@ -582,19 +579,18 @@ bool value_set_dereferencet::memory_model_bytes(
 
   // See if we have an array of bytes already,
   // and we want something byte-sized.
-  auto from_type_subtype_size =
-    pointer_offset_size(ns.follow(from_type).subtype(), ns);
+  auto from_type_subtype_size = pointer_offset_size(from_type.subtype(), ns);
 
   auto to_type_size = pointer_offset_size(to_type, ns);
 
   if(
     from_type.id() == ID_array && from_type_subtype_size.has_value() &&
     *from_type_subtype_size == 1 && to_type_size.has_value() &&
-    *to_type_size == 1 && is_a_bv_type(ns.follow(from_type).subtype()) &&
+    *to_type_size == 1 && is_a_bv_type(from_type.subtype()) &&
     is_a_bv_type(to_type))
   {
     // yes, can use 'index'
-    result=index_exprt(value, offset, ns.follow(from_type).subtype());
+    result = index_exprt(value, offset, from_type.subtype());
 
     // possibly need to convert
     if(!base_type_eq(result.type(), to_type, ns))
