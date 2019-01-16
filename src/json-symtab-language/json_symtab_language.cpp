@@ -32,6 +32,8 @@ bool json_symtab_languaget::typecheck(
   symbol_tablet &symbol_table,
   const std::string &module)
 {
+  (void)module; // unused parameter
+
   try
   {
     symbol_table_from_json(parsed_json_file, symbol_table);
