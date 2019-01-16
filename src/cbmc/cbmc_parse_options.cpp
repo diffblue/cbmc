@@ -143,7 +143,7 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
 
   if(cmdline.isset("show-symex-strategies"))
   {
-    status() << path_strategy_choosert().show_strategies() << eom;
+    status() << show_path_strategies() << eom;
     exit(CPROVER_EXIT_SUCCESS);
   }
 
@@ -554,7 +554,7 @@ int cbmc_parse_optionst::doit()
   }
 
   return bmct::do_language_agnostic_bmc(
-    path_strategy_choosert(), options, goto_model, ui_message_handler);
+    options, goto_model, ui_message_handler);
 }
 
 bool cbmc_parse_optionst::set_properties()

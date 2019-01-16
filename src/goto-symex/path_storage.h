@@ -125,47 +125,15 @@ private:
   void private_pop() override;
 };
 
-/// \brief Factory and information for path_storaget
-class path_strategy_choosert
-{
-public:
-  path_strategy_choosert();
+/// \brief suitable for displaying as a front-end help message
+std::string show_path_strategies();
 
-  /// \brief suitable for displaying as a front-end help message
-  std::string show_strategies() const;
+/// \brief is there a factory constructor for the named strategy?
+bool is_valid_path_strategy(const std::string strategy);
 
-  /// \brief is there a factory constructor for the named strategy?
-  bool is_valid_strategy(const std::string strategy) const
-  {
-    return strategies.find(strategy) != strategies.end();
-  }
-
-  /// \brief Factory for a path_storaget
-  ///
-  /// Ensure that path_strategy_choosert::is_valid_strategy() returns true for a
-  /// particular string before calling this function on that string.
-  std::unique_ptr<path_storaget> get(const std::string strategy) const
-  {
-    auto found = strategies.find(strategy);
-    INVARIANT(
-      found != strategies.end(), "Unknown strategy '" + strategy + "'.");
-    return found->second.second();
-  }
-
-  std::string default_strategy() const
-  {
-    return "lifo";
-  }
-
-protected:
-  /// Map from the name of a strategy (to be supplied on the command line), to
-  /// the help text for that strategy and a factory thunk returning a pointer to
-  /// a derived class of path_storaget that implements that strategy.
-  std::map<const std::string,
-           std::pair<const std::string,
-                     const std::function<std::unique_ptr<path_storaget>()>>>
-    strategies;
-};
+/// Ensure that is_valid_strategy() returns true for a
+/// particular string before calling this function on that string.
+std::unique_ptr<path_storaget> get_path_strategy(const std::string strategy);
 
 /// \brief add `paths` and `exploration-strategy` option, suitable to be
 /// invoked from front-ends.

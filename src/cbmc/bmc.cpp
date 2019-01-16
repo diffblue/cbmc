@@ -255,8 +255,6 @@ safety_checkert::resultt bmct::stop_on_fail()
 
 /// Perform core BMC, using an abstract model to supply GOTO function bodies
 /// (perhaps created on demand).
-/// \param path_strategy_chooser: controls whether symex generates a single
-///   large equation for the whole program or an equation per path
 /// \param opts: command-line options affecting BMC
 /// \param model: provides goto function bodies and the symbol table, perhaps
 ///   creating those function bodies on demand.
@@ -266,7 +264,6 @@ safety_checkert::resultt bmct::stop_on_fail()
 /// \param callback_after_symex: optional callback to be run after symex.
 ///   See class member `bmct::driver_callback_after_symex` for details.
 int bmct::do_language_agnostic_bmc(
-  const path_strategy_choosert &path_strategy_chooser,
   const optionst &opts,
   abstract_goto_modelt &model,
   ui_message_handlert &ui,
@@ -279,10 +276,7 @@ int bmct::do_language_agnostic_bmc(
   messaget message(ui);
   std::unique_ptr<path_storaget> worklist;
   std::string strategy = opts.get_option("exploration-strategy");
-  INVARIANT(
-    path_strategy_chooser.is_valid_strategy(strategy),
-    "Front-end passed us invalid path strategy '" + strategy + "'");
-  worklist = path_strategy_chooser.get(strategy);
+  worklist = get_path_strategy(strategy);
   try
   {
     {

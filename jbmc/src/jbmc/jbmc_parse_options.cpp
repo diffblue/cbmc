@@ -119,7 +119,7 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
 
   if(cmdline.isset("show-symex-strategies"))
   {
-    status() << path_strategy_choosert().show_strategies() << eom;
+    status() << show_path_strategies() << eom;
     exit(CPROVER_EXIT_SUCCESS);
   }
 
@@ -573,7 +573,6 @@ int jbmc_parse_optionst::doit()
     // The `configure_bmc` callback passed will enable enum-unwind-static if
     // applicable.
     return bmct::do_language_agnostic_bmc(
-      path_strategy_choosert(),
       options,
       goto_model,
       ui_message_handler,
@@ -618,7 +617,6 @@ int jbmc_parse_optionst::doit()
     // The `configure_bmc` callback passed will enable enum-unwind-static if
     // applicable.
     return bmct::do_language_agnostic_bmc(
-      path_strategy_choosert(),
       options,
       lazy_goto_model,
       ui_message_handler,
