@@ -8,7 +8,7 @@ int fun(int **a)
   {
     return 1;
   }
-  if(**a==4)
+  if(**a == 4)
   {
     return 2;
   }

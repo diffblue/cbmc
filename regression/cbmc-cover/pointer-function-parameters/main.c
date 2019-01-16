@@ -4,7 +4,7 @@ int fun(int *a)
   {
     return 0;
   }
-  if(*a==4)
+  if(*a == 4)
   {
     return 1;
   }
