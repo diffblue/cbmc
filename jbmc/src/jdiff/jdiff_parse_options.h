@@ -67,8 +67,6 @@ protected:
     goto_modelt &goto_model);
 
   bool process_goto_program(const optionst &options, goto_modelt &goto_model);
-
-  void preprocessing();
 };
 
 #endif // CPROVER_JDIFF_JDIFF_PARSE_OPTIONS_H
