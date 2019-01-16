@@ -94,7 +94,7 @@ protected:
   void symex_step(const get_goto_functiont &get_goto_function, statet &state)
     override;
 
-  void merge_goto(const goto_statet &goto_state, statet &state) override;
+  void merge_goto(goto_statet &&goto_state, statet &state) override;
 
   bool should_stop_unwind(
     const symex_targett::sourcet &source,

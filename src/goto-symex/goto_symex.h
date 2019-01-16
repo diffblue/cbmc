@@ -232,12 +232,15 @@ protected:
 
   virtual void symex_assume(statet &, const exprt &cond);
 
-  // gotos
+  /// Merge all branches joining at the current program point. Applies
+  /// \ref merge_goto for each goto state (each of which corresponds to previous
+  /// branch).
   void merge_gotos(statet &);
 
-  virtual void merge_goto(const goto_statet &goto_state, statet &);
-
-  void merge_value_sets(const goto_statet &goto_state, statet &dest);
+  /// Merge a single branch, the symbolic state of which is held in \p
+  /// goto_state, into the current overall symbolic state. \p goto_state is no
+  /// longer expected to be valid afterwards.
+  virtual void merge_goto(goto_statet &&goto_state, statet &);
 
   void phi_function(const goto_statet &goto_state, statet &);
 

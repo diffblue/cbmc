@@ -312,13 +312,13 @@ void goto_symext::merge_gotos(statet &state)
 
   for(auto list_it = state_list.rbegin(); list_it != state_list.rend();
       ++list_it)
-    merge_goto(*list_it, state);
+    merge_goto(std::move(*list_it), state);
 
   // clean up to save some memory
   frame.goto_state_map.erase(state_map_it);
 }
 
-void goto_symext::merge_goto(const goto_statet &goto_state, statet &state)
+void goto_symext::merge_goto(goto_statet &&goto_state, statet &state)
 {
   // check atomic section
   if(state.atomic_section_id != goto_state.atomic_section_id)
@@ -329,24 +329,17 @@ void goto_symext::merge_goto(const goto_statet &goto_state, statet &state)
   // do SSA phi functions
   phi_function(goto_state, state);
 
-  merge_value_sets(goto_state, state);
+  // merge value sets
+  if(state.guard.is_false() && !goto_state.guard.is_false())
+    state.value_set = std::move(goto_state.value_set);
+  else if(!goto_state.guard.is_false())
+    state.value_set.make_union(goto_state.value_set);
 
   // adjust guard
   state.guard|=goto_state.guard;
 
   // adjust depth
   state.depth=std::min(state.depth, goto_state.depth);
-}
-
-void goto_symext::merge_value_sets(const goto_statet &src, statet &dest)
-{
-  if(dest.guard.is_false())
-  {
-    dest.value_set=src.value_set;
-    return;
-  }
-
-  dest.value_set.make_union(src.value_set);
 }
 
 /// Applies f to `(k, ssa, i, j)` if the first map maps k to (ssa, i) and
