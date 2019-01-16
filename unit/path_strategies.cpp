@@ -368,9 +368,8 @@ void _check_with_strategy(
   mh.set_verbosity(0);
   messaget log(mh);
 
-  path_strategy_choosert chooser;
-  REQUIRE(chooser.is_valid_strategy(strategy));
-  std::unique_ptr<path_storaget> worklist = chooser.get(strategy);
+  REQUIRE(is_valid_path_strategy(strategy));
+  std::unique_ptr<path_storaget> worklist = get_path_strategy(strategy);
 
   goto_modelt gm;
   int ret;

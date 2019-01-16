@@ -116,7 +116,6 @@ public:
 protected:
   goto_modelt goto_model;
   ui_message_handlert ui_message_handler;
-  const path_strategy_choosert path_strategy_chooser;
 
   void register_languages();
   void get_command_line_options(optionst &);
