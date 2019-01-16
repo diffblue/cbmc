@@ -35,6 +35,11 @@ public:
   guard_bddt &append(const guard_bddt &guard);
   exprt as_expr() const;
 
+  /// BDDs are always in a simplified form and thus no further simplification
+  /// is required after calls to \ref as_expr().
+  /// This can vary according to the guard implementation.
+  static constexpr bool is_always_simplified = true;
+
   /// Assign dest to `guard => dest` unless guard or dest are trivial.
   void guard_expr(exprt &dest) const;
 

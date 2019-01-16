@@ -50,6 +50,11 @@ public:
     return expr;
   }
 
+  /// The result of \ref as_expr is not always in a simplified form
+  /// and may requires some simplification.
+  /// This can vary according to the guard implementation.
+  static constexpr bool is_always_simplified = false;
+
   void guard_expr(exprt &dest) const;
 
   bool is_true() const
