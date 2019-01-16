@@ -14,7 +14,7 @@ See \ref goto-programs, \ref goto_programt and [instructiont](\ref goto_programt
 
 \section front-end-languages-generating-codet-from-multiple-languages-section Front-end languages: generating codet from multiple languages
 
-\subsection language-uit-section language_uit, language_filest, languaget classes:
+\subsection language-uit-section language_filest, languaget classes:
 
 See \ref langapi.
 

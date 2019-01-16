@@ -19,10 +19,6 @@ To be documented.
 
 To be documented.
 
-\section langapi-manipulation-framework The top-level language-file manipulation framework (language_uit, obsolete, replaced by initialize_goto_model)
-
-To be documented.
-
 \section langapi-mode-related-utils Symbol mode-related utilities (everything in mode.h)
 
 To be documented.

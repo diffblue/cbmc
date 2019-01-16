@@ -1,5 +1,4 @@
-SRC = language_ui.cpp \
-      language_util.cpp \
+SRC = language_util.cpp \
       language_file.cpp \
       language.cpp \
       mode.cpp \
