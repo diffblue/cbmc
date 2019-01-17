@@ -1424,7 +1424,7 @@ void java_object_factoryt::gen_nondet_array_init(
     init_array_expr =
       typecast_exprt(init_array_expr, pointer_type(element_type));
 
-  if(element_type.id() == ID_pointer)
+  if(element_type.id() == ID_pointer || element_type.id() == ID_c_bool)
   {
     // For arrays of non-primitive types, nondeterministically initialize each
     // element of the array
@@ -1441,6 +1441,9 @@ void java_object_factoryt::gen_nondet_array_init(
   else
   {
     // Arrays of primitive types can be initialized with a single instruction
+    // We don't do this for arrays of Booleans, because Bools are represented
+    // as bytes, so each cell must be initialized in a particular way (see
+    // gen_nondet_init).
     array_primitive_init_code(
       assignments,
       init_array_expr,
