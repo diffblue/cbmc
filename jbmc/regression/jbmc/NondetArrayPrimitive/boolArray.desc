@@ -1,4 +1,4 @@
-CORE
+KNOWNBUG
 NondetArrayPrimitive.class
 --function NondetArrayPrimitive.boolArray --max-nondet-array-length 2000 --unwind 1
 ^VERIFICATION FAILED$
@@ -10,3 +10,4 @@ Unwinding loop __CPROVER__start.0 iteration 2
 ^warning: ignoring
 --
 Check no unwind needed to reach non-primitive array cell
+Skipped: Loop-less initialisation is disabled

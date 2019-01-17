@@ -1424,30 +1424,18 @@ void java_object_factoryt::gen_nondet_array_init(
     init_array_expr =
       typecast_exprt(init_array_expr, pointer_type(element_type));
 
-  if(element_type.id() == ID_pointer)
-  {
-    // For arrays of non-primitive types, nondeterministically initialize each
-    // element of the array
-    array_loop_init_code(
-      assignments,
-      init_array_expr,
-      length_expr,
-      element_type,
-      max_length_expr,
-      depth,
-      update_in_place,
-      location);
-  }
-  else
-  {
-    // Arrays of primitive types can be initialized with a single instruction
-    array_primitive_init_code(
-      assignments,
-      init_array_expr,
-      element_type,
-      max_length_expr,
-      location);
-  }
+  array_loop_init_code(
+    assignments,
+    init_array_expr,
+    length_expr,
+    element_type,
+    max_length_expr,
+    depth,
+    update_in_place,
+    location);
+
+  // TODO: Enable loop-less initialization of primitive arrays using
+  // array_primitive_init_code
 }
 
 /// We nondet-initialize enums to be equal to one of the constants defined

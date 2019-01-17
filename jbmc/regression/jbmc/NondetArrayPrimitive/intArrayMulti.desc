@@ -1,4 +1,4 @@
-CORE
+KNOWNBUG
 NondetArrayPrimitive.class
 --function NondetArrayPrimitive.intArrayMulti --max-nondet-array-length 51 --unwind 4
 ^VERIFICATION FAILED$
@@ -10,3 +10,4 @@ line 65 assertion.*: FAILURE
 --
 Check inner most array of multi-dimensional array is reachable independently of
 --unwind value.
+Skipped: Loop-less initialisation is disabled
