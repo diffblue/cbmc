@@ -6,6 +6,7 @@ DIRS = janalyzer \
        jbmc \
        jbmc-concurrency \
        jbmc-inheritance \
+       jbmc-json-ui \
        jbmc-strings \
        jdiff \
        strings-smoke-tests \
