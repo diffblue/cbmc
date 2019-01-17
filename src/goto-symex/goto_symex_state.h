@@ -54,7 +54,7 @@ public:
   /// distance from entry
   unsigned depth;
 
-  guardt guard;
+  guardt guard{true_exprt{}};
   symex_targett::sourcet source;
   symex_target_equationt *symex_target;
 
@@ -254,7 +254,7 @@ public:
   struct threadt
   {
     goto_programt::const_targett pc;
-    guardt guard;
+    guardt guard{true_exprt{}};
     call_stackt call_stack;
     std::map<irep_idt, unsigned> function_frame;
     unsigned atomic_section_id = 0;

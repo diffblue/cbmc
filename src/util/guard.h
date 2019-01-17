@@ -19,10 +19,6 @@ Author: Daniel Kroening, kroening@kroening.com
 class guardt
 {
 public:
-  guardt() : expr(true_exprt())
-  {
-  }
-
   explicit guardt(const exprt &e) : expr(e)
   {
   }

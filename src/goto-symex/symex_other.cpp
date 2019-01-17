@@ -275,7 +275,7 @@ void goto_symext::symex_other(
     dereference_exprt object(code.op0(), empty_typet());
     clean_expr(object, state, true);
 
-    havoc_rec(state, guardt(), object);
+    havoc_rec(state, guardt(true_exprt()), object);
   }
   else
     UNREACHABLE;

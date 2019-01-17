@@ -1632,7 +1632,7 @@ void goto_checkt::check_rec(const exprt &expr, guardt &guard, bool address)
 
 void goto_checkt::check(const exprt &expr)
 {
-  guardt guard;
+  guardt guard{true_exprt{}};
   check_rec(expr, guard, false);
 }
 
@@ -1762,7 +1762,7 @@ void goto_checkt::goto_check(
             "pointer dereference",
             i.source_location,
             pointer,
-            guardt());
+            guardt(true_exprt()));
         }
       }
 
@@ -1800,7 +1800,7 @@ void goto_checkt::goto_check(
           "pointer dereference",
           i.source_location,
           pointer,
-          guardt());
+          guardt(true_exprt()));
       }
 
       // this has no successor
@@ -1881,7 +1881,7 @@ void goto_checkt::goto_check(
           "memory-leak",
           source_location,
           eq,
-          guardt());
+          guardt(true_exprt()));
       }
     }
 

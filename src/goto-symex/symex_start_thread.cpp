@@ -81,7 +81,7 @@ void goto_symext::symex_start_thread(statet &state)
     // make copy
     ssa_exprt rhs=c_it->second.first;
 
-    guardt guard;
+    guardt guard{true_exprt{}};
     const bool record_events=state.record_events;
     state.record_events=false;
     symex_assign_symbol(
@@ -120,7 +120,7 @@ void goto_symext::symex_start_thread(statet &state)
       rhs = *zero;
     }
 
-    guardt guard;
+    guardt guard{true_exprt{}};
     symex_assign_symbol(
       state,
       lhs,

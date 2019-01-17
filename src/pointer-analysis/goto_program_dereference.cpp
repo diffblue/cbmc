@@ -251,7 +251,7 @@ void goto_program_dereferencet::dereference_expr(
   const bool checks_only,
   const value_set_dereferencet::modet mode)
 {
-  guardt guard;
+  guardt guard{true_exprt{}};
 
   if(checks_only)
   {

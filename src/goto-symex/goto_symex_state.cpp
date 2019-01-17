@@ -389,8 +389,7 @@ bool goto_symex_statet::l2_thread_read_encoding(
   // see whether we are within an atomic section
   if(atomic_section_id!=0)
   {
-    guardt write_guard;
-    write_guard.add(false_exprt());
+    guardt write_guard{false_exprt{}};
 
     const auto a_s_writes = written_in_atomic_section.find(ssa_l1);
     if(a_s_writes!=written_in_atomic_section.end())
@@ -414,8 +413,7 @@ bool goto_symex_statet::l2_thread_read_encoding(
     // we cannot determine for sure that there has been a write already
     // so generate a read even if l1_identifier has been written on
     // all branches flowing into this read
-    guardt read_guard;
-    read_guard.add(false_exprt());
+    guardt read_guard{false_exprt{}};
 
     a_s_r_entryt &a_s_read=read_in_atomic_section[ssa_l1];
     for(const auto &a_s_read_guard : a_s_read.second)
@@ -433,11 +431,7 @@ bool goto_symex_statet::l2_thread_read_encoding(
 
     guardt cond = read_guard;
     if(!no_write.op().is_false())
-    {
-      guardt no_write_guard;
-      no_write_guard.add(no_write.op());
-      cond |= no_write_guard;
-    }
+      cond |= guardt{no_write.op()};
 
     if_exprt tmp(cond.as_expr(), ssa_l1, ssa_l1);
     set_l2_indices(to_ssa_expr(tmp.true_case()), ns);

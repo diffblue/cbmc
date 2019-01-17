@@ -384,7 +384,7 @@ void goto_symext::dereference(
   state.rename(expr, ns, goto_symex_statet::L1);
 
   // start the recursion!
-  guardt guard;
+  guardt guard{true_exprt{}};
   dereference_rec(expr, state, guard, write);
   // dereferencing may introduce new symbol_exprt
   // (like __CPROVER_memory)

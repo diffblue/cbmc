@@ -89,7 +89,7 @@ void goto_symext::symex_assign(
     if(state.source.pc->source_location.get_hide())
       assignment_type=symex_targett::assignment_typet::HIDDEN;
 
-    guardt guard; // NOT the state guard!
+    guardt guard{true_exprt{}}; // NOT the state guard!
     symex_assign_rec(state, lhs, nil_exprt(), rhs, guard, assignment_type);
   }
 }
