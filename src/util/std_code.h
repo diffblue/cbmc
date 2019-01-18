@@ -1135,12 +1135,7 @@ public:
   {
     check(code, vm);
 
-    if(code.op0().id() == ID_nil)
-      DATA_CHECK(
-        vm,
-        to_code_type(code.op1().type()).return_type().id() == ID_empty,
-        "void function should not return value");
-    else
+    if(code.op0().id() != ID_nil)
       DATA_CHECK(
         vm,
         base_type_eq(
