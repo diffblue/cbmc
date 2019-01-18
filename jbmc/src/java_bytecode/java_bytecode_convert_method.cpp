@@ -36,16 +36,17 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/cfg.h>
 #include <goto-programs/class_hierarchy.h>
+#include <goto-programs/remove_returns.h>
 #include <goto-programs/resolve_inherited_component.h>
 
 #include <analyses/cfg_dominators.h>
 #include <analyses/uncaught_exceptions_analysis.h>
 
-#include <limits>
 #include <algorithm>
 #include <functional>
-#include <unordered_set>
+#include <limits>
 #include <regex>
+#include <unordered_set>
 
 /// Given a string of the format '?blah?', will return true when compared
 /// against a string that matches appart from any characters that are '?'
@@ -2105,7 +2106,18 @@ void java_bytecode_convert_methodt::convert_invoke(
   // whereas the type given by the invoke instruction doesn't and is therefore
   // less accurate.
   if(method_symbol != symbol_table.symbols.end())
-    arg0.type() = to_java_method_type(method_symbol->second.type);
+  {
+    const auto &restored_type =
+      original_return_type(symbol_table, invoked_method_id);
+    // Note the number of parameters might change here due to constructors using
+    // invokespecial will have zero arguments (the `this` is added below)
+    // but the symbol for the <init> will have the this parameter.
+    INVARIANT(
+      to_java_method_type(arg0.type()).return_type().id() ==
+        restored_type.return_type().id(),
+      "Function return type must not change in kind");
+    arg0.type() = restored_type;
+  }
 
   // Note arg0 and arg0.type() are subject to many side-effects in this method,
   // then finally used to populate the call instruction.
