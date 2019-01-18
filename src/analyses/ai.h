@@ -145,7 +145,7 @@ public:
     const goto_programt &goto_program,
     std::ostream &out) const
   {
-    output(ns, goto_program, "", out);
+    output(ns, "", goto_program, out);
   }
 
   /// Output the abstract states for a function
@@ -154,7 +154,7 @@ public:
     const goto_functionst::goto_functiont &goto_function,
     std::ostream &out) const
   {
-    output(ns, goto_function.body, "", out);
+    output(ns, "", goto_function.body, out);
   }
 
   /// Output the abstract states for the whole program as JSON
@@ -175,7 +175,7 @@ public:
     const namespacet &ns,
     const goto_programt &goto_program) const
   {
-    return output_json(ns, goto_program, "");
+    return output_json(ns, "", goto_program);
   }
 
   /// Output the abstract states for a single function as JSON
@@ -183,7 +183,7 @@ public:
     const namespacet &ns,
     const goto_functionst::goto_functiont &goto_function) const
   {
-    return output_json(ns, goto_function.body, "");
+    return output_json(ns, "", goto_function.body);
   }
 
   /// Output the abstract states for the whole program as XML
@@ -204,7 +204,7 @@ public:
     const namespacet &ns,
     const goto_programt &goto_program) const
   {
-    return output_xml(ns, goto_program, "");
+    return output_xml(ns, "", goto_program);
   }
 
   /// Output the abstract states for a single function as XML
@@ -259,8 +259,8 @@ protected:
   /// \return The JSON object
   virtual jsont output_json(
     const namespacet &ns,
-    const goto_programt &goto_program,
-    const irep_idt &identifier) const;
+    const irep_idt &identifier,
+    const goto_programt &goto_program) const;
 
   /// Output the abstract states for a single function as XML
   /// \param ns: The namespace
@@ -270,8 +270,8 @@ protected:
   /// \return The XML object
   virtual xmlt output_xml(
     const namespacet &ns,
-    const goto_programt &goto_program,
-    const irep_idt &identifier) const;
+    const irep_idt &identifier,
+    const goto_programt &goto_program) const;
 
   /// The work queue, sorted by location number
   typedef std::map<unsigned, locationt> working_sett;
