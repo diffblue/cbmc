@@ -95,6 +95,15 @@ SCENARIO("range tests", "[core][util][range]")
     {
       REQUIRE(front(make_range(input)) == 1);
     }
+    THEN("Map over the vector using range.")
+    {
+      const auto plus_one_range =
+        make_range(input).map([](const int number) { return number + 1; });
+      const std::vector<int> plus_one_collection{plus_one_range.begin(),
+                                                 plus_one_range.end()};
+      const std::vector<int> expected_output{2, 3, 4, 5};
+      REQUIRE(plus_one_collection == expected_output);
+    };
   }
   GIVEN("Two const vectors of ints")
   {
