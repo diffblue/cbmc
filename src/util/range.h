@@ -113,8 +113,8 @@ class filter_iteratort
 public:
   using difference_type = typename iteratort::difference_type;
   using value_type = typename iteratort::value_type;
-  using pointer = const value_type *;
-  using reference = const value_type &;
+  using pointer = typename iteratort::pointer;
+  using reference = typename iteratort::reference;
   using iterator_category = std::forward_iterator_tag;
 
   bool operator==(const filter_iteratort &other) const
@@ -143,12 +143,12 @@ public:
     return tmp;
   }
 
-  value_type &operator*()
+  reference operator*()
   {
     return *underlying;
   }
 
-  value_type *operator->()
+  pointer operator->()
   {
     return &(*underlying);
   }

@@ -64,6 +64,18 @@ SCENARIO("range tests", "[core][util][range]")
       REQUIRE(total == 8);
     }
   }
+  GIVEN("A const vector of ints")
+  {
+    const std::vector<int> input{1, 2, 3, 4};
+    THEN("Filter the vector using range.")
+    {
+      auto odds_range =
+        make_range(input).filter([](const int number) { return number % 2; });
+      const std::vector<int> odds{odds_range.begin(), odds_range.end()};
+      const std::vector<int> expected_odds{1, 3};
+      REQUIRE(odds == expected_odds);
+    }
+  }
 }
 
 class move_onlyt
