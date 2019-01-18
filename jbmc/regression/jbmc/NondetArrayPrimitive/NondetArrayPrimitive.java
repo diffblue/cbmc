@@ -49,13 +49,6 @@ class NondetArrayPrimitive
     }
   }
 
-  void boolArray(boolean[] array)
-  {
-    if (array != null && array.length > 1500 && array[1500] == true) {
-      assert false;
-    }
-  }
-
   void intArrayMulti(int[][] array)
   {
     if (array != null &&
