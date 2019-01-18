@@ -146,6 +146,34 @@ static bool read_goto_binary(
     message.error() << "failed to find goto binary in Mach-O file"
                     << messaget::eom;
   }
+  else if(is_osx_mach_object(hdr))
+  {
+    messaget message(message_handler);
+
+    // Mach-O object file, may contain a goto-cc section
+    try
+    {
+      osx_mach_o_readert mach_o_reader(in);
+
+      osx_mach_o_readert::sectionst::const_iterator entry =
+        mach_o_reader.sections.find("goto-cc");
+      if(entry != mach_o_reader.sections.end())
+      {
+        in.seekg(entry->second.offset);
+        return read_bin_goto_object(
+          in, filename, symbol_table, goto_functions, message_handler);
+      }
+
+      // section not found
+      messaget(message_handler).error()
+        << "failed to find goto-cc section in Mach-O binary" << messaget::eom;
+    }
+
+    catch(const deserialization_exceptiont &e)
+    {
+      messaget(message_handler).error() << e.what() << messaget::eom;
+    }
+  }
   else
   {
     messaget(message_handler).error() <<
@@ -204,6 +232,22 @@ bool is_goto_binary(const std::string &filename, message_handlert &)
       in.seekg(0);
       osx_fat_readert osx_fat_reader(in);
       if(osx_fat_reader.has_gb())
+        return true;
+    }
+
+    catch(...)
+    {
+      // ignore any errors
+    }
+  }
+  else if(is_osx_mach_object(hdr))
+  {
+    // this _may_ have a goto-cc section
+    try
+    {
+      in.seekg(0);
+      osx_mach_o_readert mach_o_reader(in);
+      if(mach_o_reader.has_section("goto-cc"))
         return true;
     }
 
