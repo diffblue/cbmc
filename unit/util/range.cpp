@@ -11,6 +11,14 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <testing-utils/catch.hpp>
 #include <util/range.h>
 
+/// Trivial example template function requiring a container to have a
+/// `value_type`.
+template <typename containert>
+typename containert::value_type front(containert container)
+{
+  return *container.begin();
+}
+
 SCENARIO("range tests", "[core][util][range]")
 {
   GIVEN("A vector with three strings")
@@ -74,6 +82,18 @@ SCENARIO("range tests", "[core][util][range]")
       const std::vector<int> odds{odds_range.begin(), odds_range.end()};
       const std::vector<int> expected_odds{1, 3};
       REQUIRE(odds == expected_odds);
+    }
+    THEN(
+      "The unit testing template function requiring `value_type` works with "
+      "`std::vector`.")
+    {
+      REQUIRE(front(input) == 1);
+    }
+    THEN(
+      "A range can be used with a template function expecting a container "
+      "which has a `value_type`.")
+    {
+      REQUIRE(front(make_range(input)) == 1);
     }
   }
   GIVEN("Two const vectors of ints")

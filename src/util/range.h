@@ -311,14 +311,14 @@ template <typename iteratort>
 struct ranget final
 {
 public:
-  using value_typet = typename iteratort::value_type;
+  using value_type = typename iteratort::value_type;
 
   ranget(iteratort begin, iteratort end) : begin_value(begin), end_value(end)
   {
   }
 
   ranget<filter_iteratort<iteratort>>
-  filter(std::function<bool(const value_typet &)> f)
+  filter(std::function<bool(const value_type &)> f)
   {
     auto shared_f = std::make_shared<decltype(f)>(std::move(f));
     filter_iteratort<iteratort> filter_begin(shared_f, begin(), end());
@@ -335,9 +335,9 @@ public:
   template <typename functiont>
   auto map(functiont &&f) -> ranget<map_iteratort<
     iteratort,
-    typename std::result_of<functiont(value_typet)>::type>>
+    typename std::result_of<functiont(value_type)>::type>>
   {
-    using outputt = typename std::result_of<functiont(value_typet)>::type;
+    using outputt = typename std::result_of<functiont(value_type)>::type;
     auto shared_f = std::make_shared<
       std::function<outputt(const typename iteratort::value_type &)>>(
       std::forward<functiont>(f));
