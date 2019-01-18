@@ -91,13 +91,13 @@ void rd_range_domaint::transform(
     transform_function_call(ns, function_from, from, function_to, *rd);
   // cleanup parameters
   else if(from->is_end_function())
-    transform_end_function(ns, function_from, from, to, *rd);
+    transform_end_function(ns, function_from, from, function_to, to, *rd);
   // lhs assignments
   else if(from->is_assign())
-    transform_assign(ns, from, from, *rd);
+    transform_assign(ns, from, function_from, from, *rd);
   // initial (non-deterministic) value
   else if(from->is_decl())
-    transform_assign(ns, from, from, *rd);
+    transform_assign(ns, from, function_from, from, *rd);
 
 #if 0
   // handle return values
@@ -233,7 +233,7 @@ void rd_range_domaint::transform_function_call(
   {
     // handle return values of undefined functions
     if(to_code_function_call(from->code).lhs().is_not_nil())
-      transform_assign(ns, from, from, rd);
+      transform_assign(ns, from, function_from, from, rd);
   }
 }
 
@@ -241,6 +241,7 @@ void rd_range_domaint::transform_end_function(
   const namespacet &ns,
   const irep_idt &function_from,
   locationt from,
+  const irep_idt &function_to,
   locationt to,
   reaching_definitions_analysist &rd)
 {
@@ -301,18 +302,19 @@ void rd_range_domaint::transform_end_function(
     assert(rd_state!=0);
     rd_state->
 #endif
-      transform_assign(ns, from, call, rd);
+    transform_assign(ns, from, function_to, call, rd);
   }
 }
 
 void rd_range_domaint::transform_assign(
   const namespacet &ns,
   locationt from,
+  const irep_idt &function_to,
   locationt to,
   reaching_definitions_analysist &rd)
 {
   rw_range_set_value_sett rw_set(ns, rd.get_value_sets());
-  goto_rw(to, rw_set);
+  goto_rw(function_to, to, rw_set);
   const bool is_must_alias=rw_set.get_w_set().size()==1;
 
   forall_rw_range_set_w_objects(it, rw_set)

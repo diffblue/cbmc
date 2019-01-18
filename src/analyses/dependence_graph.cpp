@@ -162,7 +162,7 @@ void dep_graph_domaint::data_dependencies(
   value_setst &value_sets=
     dep_graph.reaching_definitions().get_value_sets();
   rw_range_set_value_sett rw_set(ns, value_sets);
-  goto_rw(to, rw_set);
+  goto_rw(to->function, to, rw_set);
 
   forall_rw_range_set_r_objects(it, rw_set)
   {
