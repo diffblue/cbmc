@@ -1,0 +1,12 @@
+CORE
+test.class
+'.[] | select(has("result")) | .result | .[] | select(has("trace")) | .trace | .[] | select(has("value")) | .value | select(.name == "pointer") | {has_data: has("data")}' --json-ui --trace
+^EXIT=0$
+^SIGNAL=0$
+\{"has_data":true\}
+--
+\{"has_data":false\}
+--
+This checks that all pointer assignments in the test program have a "data" entry,
+which is given when json_expr can determine what object is referenced on the RHS
+(e.g. x = &dynamic_object1.@some_subclass yields "data": "dynamic_object1" in the trace)

@@ -8,7 +8,7 @@ phases:
       - apt-key adv --keyserver keyserver.ubuntu.com --recv-keys BA9EF27F
       - add-apt-repository ppa:openjdk-r/ppa -y
       - apt-get update -y
-      - apt-get install -y g++-5 flex bison make git libwww-perl patch ccache libc6-dev-i386
+      - apt-get install -y g++-5 flex bison make git libwww-perl patch ccache libc6-dev-i386 jq
       - apt-get install -y openjdk-8-jdk
       - update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 1
       - update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-5 1

@@ -14,6 +14,7 @@ Author: Peter Schrammel
 #include <util/arith_tools.h>
 #include <util/config.h>
 #include <util/expr.h>
+#include <util/expr_util.h>
 #include <util/fixedbv.h>
 #include <util/identifier.h>
 #include <util/ieee_float.h>
@@ -46,27 +47,35 @@ static exprt simplify_json_expr(const exprt &src)
       }
     }
   }
-  else if(
-    src.id() == ID_address_of &&
-    to_address_of_expr(src).object().id() == ID_member &&
-    id2string(
-      to_member_expr(to_address_of_expr(src).object()).get_component_name())
-        .find("@") != std::string::npos)
+  else if(src.id() == ID_typecast)
   {
-    // simplify expressions of the form &member_expr(object, @class_identifier)
-    return simplify_json_expr(to_address_of_expr(src).object());
+    return simplify_json_expr(to_typecast_expr(src).op());
   }
-  else if(
-    src.id() == ID_address_of &&
-    to_address_of_expr(src).object().id() == ID_index &&
-    to_index_expr(to_address_of_expr(src).object()).index().id() ==
-      ID_constant &&
-    to_constant_expr(to_index_expr(to_address_of_expr(src).object()).index())
-      .value_is_zero_string())
+  else if(src.id() == ID_address_of)
   {
-    // simplify expressions of the form  &array[0]
-    return simplify_json_expr(
-      to_index_expr(to_address_of_expr(src).object()).array());
+    const exprt &object = skip_typecast(to_address_of_expr(src).object());
+
+    if(object.id() == ID_symbol)
+    {
+      // simplify expressions of the form &symbol
+      return simplify_json_expr(object);
+    }
+    else if(
+      object.id() == ID_member &&
+      id2string(to_member_expr(object).get_component_name()).find("@") !=
+      std::string::npos)
+    {
+      // simplify expressions of the form &member(object, @class_identifier)
+      return simplify_json_expr(object);
+    }
+    else if(
+      object.id() == ID_index &&
+      to_index_expr(object).index().id() == ID_constant &&
+      to_constant_expr(to_index_expr(object).index()).value_is_zero_string())
+    {
+      // simplify expressions of the form  &array[0]
+      return simplify_json_expr(to_index_expr(object).array());
+    }
   }
   else if(
     src.id() == ID_member &&

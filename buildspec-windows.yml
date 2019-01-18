@@ -4,7 +4,7 @@ phases:
   install:
     commands:
       - choco install cyg-get -y --no-progress
-      - cyg-get bash patch bison flex make wget perl
+      - cyg-get bash patch bison flex make wget perl jq
       - nuget install clcache -OutputDirectory "c:\tools" -ExcludeVersion -Version 4.1.0
 
   build:
