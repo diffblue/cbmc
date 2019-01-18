@@ -19,7 +19,7 @@ Date: September 2011
 #include <analyses/local_may_alias.h>
 #endif
 
-bool potential_race_on_read(
+static bool potential_race_on_read(
   const rw_set_baset &code_rw_set,
   const rw_set_baset &isr_rw_set)
 {
@@ -33,7 +33,7 @@ bool potential_race_on_read(
   return false;
 }
 
-bool potential_race_on_write(
+static bool potential_race_on_write(
   const rw_set_baset &code_rw_set,
   const rw_set_baset &isr_rw_set)
 {
@@ -50,9 +50,10 @@ bool potential_race_on_write(
   return false;
 }
 
-void interrupt(
+static void interrupt(
   value_setst &value_sets,
   const symbol_tablet &symbol_table,
+  const irep_idt &function_id,
 #ifdef LOCAL_MAY
   const goto_functionst::goto_functiont &goto_function,
 #endif
@@ -69,11 +70,16 @@ void interrupt(
 #ifdef LOCAL_MAY
   local_may_aliast local_may(goto_function);
 #endif
-    rw_set_loct rw_set(ns, value_sets, i_it
+  rw_set_loct rw_set(
+    ns,
+    value_sets,
+    function_id,
+    i_it
 #ifdef LOCAL_MAY
-      , local_may
+    ,
+    local_may
 #endif
-    ); // NOLINT(whitespace/parens)
+  ); // NOLINT(whitespace/parens)
 
     // potential race?
     bool race_on_read=potential_race_on_read(rw_set, isr_rw_set);
@@ -143,9 +149,8 @@ void interrupt(
   }
 }
 
-symbol_exprt get_isr(
-  const symbol_tablet &symbol_table,
-  const irep_idt &interrupt_handler)
+static symbol_exprt
+get_isr(const symbol_tablet &symbol_table, const irep_idt &interrupt_handler)
 {
   std::list<symbol_exprt> matches;
 
@@ -197,11 +202,15 @@ void interrupt(
        f_it->first!=goto_functionst::entry_point() &&
        f_it->first!=isr.get_identifier())
       interrupt(
-        value_sets, goto_model.symbol_table,
+        value_sets,
+        goto_model.symbol_table,
+        f_it->first,
 #ifdef LOCAL_MAY
         f_it->second,
 #endif
-        f_it->second.body, isr, isr_rw_set);
+        f_it->second.body,
+        isr,
+        isr_rw_set);
 
   goto_model.goto_functions.update();
 }

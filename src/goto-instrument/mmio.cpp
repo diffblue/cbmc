@@ -21,9 +21,10 @@ Date: September 2011
 #include <analyses/local_may_alias.h>
 #endif
 
-void mmio(
+static void mmio(
   value_setst &value_sets,
   const symbol_tablet &symbol_table,
+  const irep_idt &function_id,
 #ifdef LOCAL_MAY
   const goto_functionst::goto_functiont &goto_function,
 #endif
@@ -41,9 +42,14 @@ void mmio(
 
     if(instruction.is_assign())
     {
-      rw_set_loct rw_set(ns, value_sets, i_it
+      rw_set_loct rw_set(
+        ns,
+        value_sets,
+        function_id,
+        i_it
 #ifdef LOCAL_MAY
-        , local_may
+        ,
+        local_may
 #endif
       ); // NOLINT(whitespace/parens)
 
@@ -159,7 +165,10 @@ void mmio(
   Forall_goto_functions(f_it, goto_model.goto_functions)
     if(f_it->first != INITIALIZE_FUNCTION &&
        f_it->first!=goto_functionst::entry_point())
-      mmio(value_sets, goto_model.symbol_table,
+      mmio(
+        value_sets,
+        goto_model.symbol_table,
+        f_it->first,
 #ifdef LOCAL_MAY
         f_it->second,
 #endif

@@ -210,6 +210,7 @@ void instrumentert::cfg_visitort::visit_cfg_function(
     {
       visit_cfg_assign(
         value_sets,
+        function_id,
         i_it,
         no_dependencies
 #ifdef LOCAL_MAY
@@ -245,6 +246,7 @@ void instrumentert::cfg_visitort::visit_cfg_function(
     else if(instruction.is_goto())
     {
       visit_cfg_goto(
+        function_id,
         goto_program,
         i_it,
         replicate_body,
@@ -403,13 +405,15 @@ event_idt alt_copy_segment(wmm_grapht &alt_egraph,
 }
 
 bool instrumentert::cfg_visitort::contains_shared_array(
+  const irep_idt &function_id,
   goto_programt::const_targett targ,
   goto_programt::const_targett i_it,
   value_setst &value_sets
-  #ifdef LOCAL_MAY
-  , local_may_aliast local_may
-  #endif
-) const
+#ifdef LOCAL_MAY
+  ,
+  local_may_aliast local_may
+#endif
+  ) const // NOLINT(whitespace/parens)
 {
   instrumenter.message.debug() << "contains_shared_array called for "
     << targ->source_location.get_line() << " and "
@@ -418,10 +422,15 @@ bool instrumentert::cfg_visitort::contains_shared_array(
   {
     instrumenter.message.debug() << "Do we have an array at line "
       <<cur->source_location.get_line()<<"?" << messaget::eom;
-    rw_set_loct rw_set(ns, value_sets, cur
-      #ifdef LOCAL_MAY
-      , local_may
-      #endif
+    rw_set_loct rw_set(
+      ns,
+      value_sets,
+      function_id,
+      cur
+#ifdef LOCAL_MAY
+      ,
+      local_may
+#endif
     ); // NOLINT(whitespace/parens)
     instrumenter.message.debug() << "Writes: "<<rw_set.w_entries.size()
       <<"; Reads:"<<rw_set.r_entries.size() << messaget::eom;
@@ -452,6 +461,7 @@ bool instrumentert::cfg_visitort::contains_shared_array(
 
 /// strategy: fwd/bwd alternation
 void inline instrumentert::cfg_visitort::visit_cfg_body(
+  const irep_idt &function_id,
   const goto_programt &goto_program,
   goto_programt::const_targett i_it,
   loop_strategyt replicate_body,
@@ -476,10 +486,15 @@ void inline instrumentert::cfg_visitort::visit_cfg_body(
       switch(replicate_body)
       {
         case arrays_only:
-          duplicate_this=contains_shared_array(target, i_it, value_sets
-            #ifdef LOCAL_MAY
-            , local_may
-            #endif
+          duplicate_this = contains_shared_array(
+            function_id,
+            target,
+            i_it,
+            value_sets
+#ifdef LOCAL_MAY
+            ,
+            local_may
+#endif
           ); // NOLINT(whitespace/parens)
           break;
         case all_loops:
@@ -627,6 +642,7 @@ void inline instrumentert::cfg_visitort::visit_cfg_backedge(
 }
 
 void instrumentert::cfg_visitort::visit_cfg_goto(
+  const irep_idt &function_id,
   const goto_programt &goto_program,
   goto_programt::instructionst::iterator i_it,
   loop_strategyt replicate_body,
@@ -650,6 +666,7 @@ void instrumentert::cfg_visitort::visit_cfg_goto(
   {
     instrumenter.message.debug() << "backward goto" << messaget::eom;
     visit_cfg_body(
+      function_id,
       goto_program,
       i_it,
       replicate_body,
@@ -798,19 +815,26 @@ void instrumentert::cfg_visitort::visit_cfg_asm_fence(
 
 void instrumentert::cfg_visitort::visit_cfg_assign(
   value_setst &value_sets,
+  const irep_idt &function_id,
   goto_programt::instructionst::iterator &i_it,
   bool no_dependencies
 #ifdef LOCAL_MAY
-  , local_may_aliast &local_may
+  ,
+  local_may_aliast &local_may
 #endif
-  )
+)
 {
   goto_programt::instructiont &instruction=*i_it;
 
   /* Read (Rb) */
-  rw_set_loct rw_set(ns, value_sets, i_it
+  rw_set_loct rw_set(
+    ns,
+    value_sets,
+    function_id,
+    i_it
 #ifdef LOCAL_MAY
-    , local_may
+    ,
+    local_may
 #endif
   ); // NOLINT(whitespace/parens)
 

@@ -36,7 +36,7 @@ Date: September 2011
 void introduce_temporaries(
   value_setst &value_sets,
   symbol_tablet &symbol_table,
-  const irep_idt &function,
+  const irep_idt &function_id,
   goto_programt &goto_program,
 #ifdef LOCAL_MAY
   const goto_functionst::goto_functiont &goto_function,
@@ -60,9 +60,14 @@ void introduce_temporaries(
        instruction.is_assert() ||
        instruction.is_assume())
     {
-      rw_set_loct rw_set(ns, value_sets, i_it
+      rw_set_loct rw_set(
+        ns,
+        value_sets,
+        function_id,
+        i_it
 #ifdef LOCAL_MAY
-      , local_may
+        ,
+        local_may
 #endif
       ); // NOLINT(whitespace/parens)
       if(rw_set.empty())
@@ -70,8 +75,8 @@ void introduce_temporaries(
 
       symbolt new_symbol;
       new_symbol.base_name="$tmp_guard";
-      new_symbol.name=
-        id2string(function)+"$tmp_guard"+std::to_string(tmp_counter++);
+      new_symbol.name =
+        id2string(function_id) + "$tmp_guard" + std::to_string(tmp_counter++);
       new_symbol.type=bool_typet();
       new_symbol.is_static_lifetime=true;
       new_symbol.is_thread_local=true;

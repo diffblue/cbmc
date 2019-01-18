@@ -20,11 +20,11 @@ Date: February 2006
 void race_check(
   value_setst &,
   class symbol_tablet &,
+  const irep_idt &function_id,
 #ifdef LOCAL_MAY
   const goto_functionst::goto_functiont &goto_function,
 #endif
-  goto_programt &goto_program
-);
+  goto_programt &goto_program);
 
 void race_check(value_setst &, goto_modelt &);
 
