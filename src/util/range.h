@@ -143,22 +143,12 @@ public:
     return tmp;
   }
 
-  reference operator*()
+  reference operator*() const
   {
     return *underlying;
   }
 
-  pointer operator->()
-  {
-    return &(*underlying);
-  }
-
-  const value_type &operator*() const
-  {
-    return *underlying;
-  }
-
-  const value_type *operator->() const
+  pointer operator->() const
   {
     return &(*underlying);
   }
@@ -245,28 +235,14 @@ public:
     return tmp;
   }
 
-  reference operator*()
+  reference operator*() const
   {
     if(first_begin == first_end)
       return *second_begin;
     return *first_begin;
   }
 
-  pointer operator->()
-  {
-    if(first_begin == first_end)
-      return &(*second_begin);
-    return &(*first_begin);
-  }
-
-  const value_type &operator*() const
-  {
-    if(first_begin == first_end)
-      return *second_begin;
-    return *first_begin;
-  }
-
-  const value_type *operator->() const
+  pointer operator->() const
   {
     if(first_begin == first_end)
       return &(*second_begin);

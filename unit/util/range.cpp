@@ -57,6 +57,17 @@ SCENARIO("range tests", "[core][util][range]")
       ++it;
       REQUIRE(it == filtered_range.end());
     }
+    THEN(
+      "A const instance of a `filter_iteratort` can mutate the input "
+      "collection.")
+    {
+      const auto it =
+        make_range(list)
+          .filter([&](const std::string &s) { return s.length() == 3; })
+          .begin();
+      *it += "x";
+      REQUIRE(*list.begin() == "abcx");
+    }
     THEN("Filter, map and use range-for on the same list")
     {
       const auto range =
@@ -116,6 +127,27 @@ SCENARIO("range tests", "[core][util][range]")
       const std::vector<int> expected{1, 2, 3, 4};
       REQUIRE(output == expected);
     };
+  }
+  GIVEN("Two non-const vectors of ints.")
+  {
+    std::vector<int> input1{1, 2};
+    std::vector<int> input2{3, 4};
+    THEN(
+      "Const instances of `concat_iteratort` should enable the input "
+      "collections to be mutated.")
+    {
+      const auto concat_range = make_range(input1).concat(make_range(input2));
+      int x = 5;
+      for(auto it = concat_range.begin(); it != concat_range.end(); ++it, ++x)
+      {
+        const auto const_it = it;
+        *const_it = x;
+      }
+      std::vector<int> expected_result1{5, 6};
+      std::vector<int> expected_result2{7, 8};
+      REQUIRE(input1 == expected_result1);
+      REQUIRE(input2 == expected_result2);
+    }
   }
 }
 
