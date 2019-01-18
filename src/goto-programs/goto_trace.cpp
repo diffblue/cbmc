@@ -333,7 +333,7 @@ void show_state_header(
 
   if(options.show_code)
   {
-    out << as_string(ns, *state.pc) << '\n';
+    out << as_string(ns, state.function, *state.pc) << '\n';
     out << "----------------------------------------------------" << '\n';
   }
 }

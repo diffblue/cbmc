@@ -403,6 +403,7 @@ std::list<exprt> objects_written(
 
 std::string as_string(
   const class namespacet &ns,
+  const irep_idt &function,
   const goto_programt::instructiont &i)
 {
   std::string result;
@@ -415,9 +416,7 @@ std::string as_string(
   case GOTO:
     if(!i.guard.is_true())
     {
-      result+="IF "
-            +from_expr(ns, i.function, i.guard)
-            +" THEN ";
+      result += "IF " + from_expr(ns, function, i.guard) + " THEN ";
     }
 
     result+="GOTO ";
@@ -439,7 +438,7 @@ std::string as_string(
   case DEAD:
   case FUNCTION_CALL:
   case ASSIGN:
-    return from_expr(ns, i.function, i.code);
+    return from_expr(ns, function, i.code);
 
   case ASSUME:
   case ASSERT:
@@ -448,7 +447,7 @@ std::string as_string(
     else
       result+="ASSERT ";
 
-    result+=from_expr(ns, i.function, i.guard);
+    result += from_expr(ns, function, i.guard);
 
     {
       const irep_idt &comment=i.source_location.get_comment();
