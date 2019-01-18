@@ -236,14 +236,13 @@ public:
     rd(goto_functions, ns);
   }
 
-  void initialize(const goto_programt &goto_program)
+  void initialize(const irep_idt &function, const goto_programt &goto_program)
   {
-    ait<dep_graph_domaint>::initialize(goto_program);
+    ait<dep_graph_domaint>::initialize(function, goto_program);
 
     if(!goto_program.empty())
     {
-      const irep_idt id=goto_programt::get_function_id(goto_program);
-      cfg_post_dominatorst &pd=post_dominators[id];
+      cfg_post_dominatorst &pd = post_dominators[function];
       pd(goto_program);
     }
   }

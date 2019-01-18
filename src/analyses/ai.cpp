@@ -187,12 +187,14 @@ void ai_baset::entry_state(const goto_programt &goto_program)
   get_state(goto_program.instructions.begin()).make_entry();
 }
 
-void ai_baset::initialize(const goto_functionst::goto_functiont &goto_function)
+void ai_baset::initialize(
+  const irep_idt &function_identifier,
+  const goto_functionst::goto_functiont &goto_function)
 {
-  initialize(goto_function.body);
+  initialize(function, goto_function.body);
 }
 
-void ai_baset::initialize(const goto_programt &goto_program)
+void ai_baset::initialize(const irep_idt &, const goto_programt &goto_program)
 {
   // we mark everything as unreachable as starting point
 
@@ -203,7 +205,7 @@ void ai_baset::initialize(const goto_programt &goto_program)
 void ai_baset::initialize(const goto_functionst &goto_functions)
 {
   forall_goto_functions(it, goto_functions)
-    initialize(it->second);
+    initialize(it->first, it->second);
 }
 
 void ai_baset::finalize()
