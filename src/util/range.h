@@ -208,8 +208,8 @@ struct concat_iteratort
 public:
   using difference_type = typename first_iteratort::difference_type;
   using value_type = typename first_iteratort::value_type;
-  using pointer = const value_type *;
-  using reference = const value_type &;
+  using pointer = typename first_iteratort::pointer;
+  using reference = typename first_iteratort::reference;
   using iterator_category = std::forward_iterator_tag;
 
   static_assert(
@@ -245,14 +245,14 @@ public:
     return tmp;
   }
 
-  value_type &operator*()
+  reference operator*()
   {
     if(first_begin == first_end)
       return *second_begin;
     return *first_begin;
   }
 
-  value_type *operator->()
+  pointer operator->()
   {
     if(first_begin == first_end)
       return &(*second_begin);

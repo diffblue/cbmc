@@ -76,6 +76,18 @@ SCENARIO("range tests", "[core][util][range]")
       REQUIRE(odds == expected_odds);
     }
   }
+  GIVEN("Two const vectors of ints")
+  {
+    const std::vector<int> input1{1, 2};
+    const std::vector<int> input2{3, 4};
+    THEN("Concat the vectors using range.")
+    {
+      auto range = make_range(input1).concat(make_range(input2));
+      const std::vector<int> output{range.begin(), range.end()};
+      const std::vector<int> expected{1, 2, 3, 4};
+      REQUIRE(output == expected);
+    };
+  }
 }
 
 class move_onlyt
