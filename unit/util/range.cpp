@@ -21,7 +21,7 @@ SCENARIO("range tests", "[core][util][range]")
     list.emplace_back("acdef");
     THEN("Use range-for to compute the total length")
     {
-      auto range = make_range(list);
+      const auto range = make_range(list);
       std::size_t total_length = 0;
       for(const auto &s : range)
         total_length += s.length();
@@ -29,7 +29,7 @@ SCENARIO("range tests", "[core][util][range]")
     }
     THEN("Use map to compute individual lengths")
     {
-      auto length_range =
+      const auto length_range =
         make_range(list).map([](const std::string &s) { return s.length(); });
       auto it = length_range.begin();
       REQUIRE(*it == 3);
@@ -42,7 +42,7 @@ SCENARIO("range tests", "[core][util][range]")
     }
     THEN("Filter using lengths")
     {
-      auto filtered_range = make_range(list).filter(
+      const auto filtered_range = make_range(list).filter(
         [&](const std::string &s) { return s.length() == 4; });
       auto it = filtered_range.begin();
       REQUIRE(*it == "cdef");
@@ -51,7 +51,7 @@ SCENARIO("range tests", "[core][util][range]")
     }
     THEN("Filter, map and use range-for on the same list")
     {
-      auto range =
+      const auto range =
         make_range(list)
           .filter([&](const std::string &s) -> bool { return s[0] == 'a'; })
           .map([&](const std::string &s) { return s.length(); });
@@ -69,7 +69,7 @@ SCENARIO("range tests", "[core][util][range]")
     const std::vector<int> input{1, 2, 3, 4};
     THEN("Filter the vector using range.")
     {
-      auto odds_range =
+      const auto odds_range =
         make_range(input).filter([](const int number) { return number % 2; });
       const std::vector<int> odds{odds_range.begin(), odds_range.end()};
       const std::vector<int> expected_odds{1, 3};
@@ -82,7 +82,7 @@ SCENARIO("range tests", "[core][util][range]")
     const std::vector<int> input2{3, 4};
     THEN("Concat the vectors using range.")
     {
-      auto range = make_range(input1).concat(make_range(input2));
+      const auto range = make_range(input1).concat(make_range(input2));
       const std::vector<int> output{range.begin(), range.end()};
       const std::vector<int> expected{1, 2, 3, 4};
       REQUIRE(output == expected);
@@ -122,13 +122,13 @@ SCENARIO(
       input.emplace_back(i);
     THEN("Values from a range of made from the vector can be moved.")
     {
-      auto input_range = make_range(input);
+      const auto input_range = make_range(input);
       move_onlyt destination{std::move(*input_range.begin())};
       REQUIRE(destination.value == 1);
     }
     THEN("A range of made from the vector can be filtered.")
     {
-      auto odds_filter = make_range(input).filter(is_odd);
+      const auto odds_filter = make_range(input).filter(is_odd);
       const std::size_t total =
         std::distance(odds_filter.begin(), odds_filter.end());
       REQUIRE(total == 5);

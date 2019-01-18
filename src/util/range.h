@@ -365,7 +365,7 @@ public:
     return begin_value == end_value;
   }
 
-  iteratort begin()
+  iteratort begin() const
   {
     return begin_value;
   }
