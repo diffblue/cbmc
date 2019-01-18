@@ -143,7 +143,11 @@ void load_and_test_method(
   // is called.
   class_hierarchyt class_hierarchy(symbol_table);
   remove_instanceof(
-    goto_function, symbol_table, class_hierarchy, null_message_handler);
+    function_name,
+    goto_function,
+    symbol_table,
+    class_hierarchy,
+    null_message_handler);
 
   remove_virtual_functions(model_function);
 
