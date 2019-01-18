@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_SOLVERS_SMT2_SMT2_PARSER_H
 #define CPROVER_SOLVERS_SMT2_SMT2_PARSER_H
 
-#include <stack>
+#include <map>
 
 #include <util/std_expr.h>
 
