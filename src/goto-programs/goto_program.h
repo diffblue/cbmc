@@ -694,9 +694,10 @@ public:
   void update();
 
   /// Human-readable loop name
-  static irep_idt loop_id(const instructiont &instruction)
+  static irep_idt
+  loop_id(const irep_idt &function_id, const instructiont &instruction)
   {
-    return id2string(instruction.function)+"."+
+    return id2string(function_id) + "." +
            std::to_string(instruction.loop_number);
   }
 

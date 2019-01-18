@@ -58,7 +58,11 @@ void symex_transition(
       if(i_e->is_goto() && i_e->is_backwards_goto() &&
          (!is_backwards_goto ||
           state.source.pc->location_number>i_e->location_number))
-        frame.loop_iterations[goto_programt::loop_id(*i_e)].count=0;
+      {
+        const auto loop_id =
+          goto_programt::loop_id(state.source.function, *i_e);
+        frame.loop_iterations[loop_id].count = 0;
+      }
   }
 
   state.source.pc=to;
@@ -157,19 +161,18 @@ void goto_symext::initialize_entry_point(
   state.top().calling_location.pc=state.top().end_of_function;
   state.symex_target=&target;
 
-  INVARIANT(
-    !pc->function.empty(), "all symexed instructions should have a function");
-
-  const goto_functiont &entry_point_function = get_goto_function(pc->function);
+  const goto_functiont &entry_point_function =
+    get_goto_function(function_identifier);
 
   state.top().hidden_function = entry_point_function.is_hidden();
 
   auto emplace_safe_pointers_result =
-    state.safe_pointers.emplace(pc->function, local_safe_pointerst{ns});
+    state.safe_pointers.emplace(function_identifier, local_safe_pointerst{ns});
   if(emplace_safe_pointers_result.second)
     emplace_safe_pointers_result.first->second(entry_point_function.body);
 
-  state.dirty.populate_dirty_for_function(pc->function, entry_point_function);
+  state.dirty.populate_dirty_for_function(
+    function_identifier, entry_point_function);
 
   symex_transition(state, state.source.pc, false);
 }

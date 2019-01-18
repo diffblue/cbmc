@@ -110,7 +110,7 @@ bool symex_bmct::should_stop_unwind(
   const goto_symex_statet::call_stackt &context,
   unsigned unwind)
 {
-  const irep_idt id = goto_programt::loop_id(*source.pc);
+  const irep_idt id = goto_programt::loop_id(source.function, *source.pc);
 
   tvt abort_unwind_decision;
   unsigned this_loop_limit = std::numeric_limits<unsigned>::max();
