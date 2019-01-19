@@ -181,7 +181,7 @@ public:
 
   // retrieves the final step in the trace for manipulation
   // (used to fill a trace from code, hence non-const)
-  inline goto_trace_stept &get_last_step()
+  goto_trace_stept &get_last_step()
   {
     return steps.back();
   }
