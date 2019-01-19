@@ -68,6 +68,7 @@ static goto_programt get_gen_nondet_init_instructions(
 /// Checks an instruction to see whether it contains an assignment from
 /// side_effect_expr_nondet.  If so, replaces the instruction with a range of
 /// instructions to properly nondet-initialize the lhs.
+/// \param function_identifier: Name of the function containing \p target.
 /// \param goto_program: The goto program to modify.
 /// \param target: One of the steps in that goto program.
 /// \param symbol_table: The global symbol table.
@@ -78,6 +79,7 @@ static goto_programt get_gen_nondet_init_instructions(
 /// \return The next instruction to process with this function and a boolean
 ///   indicating whether any changes were made to the goto program.
 static std::pair<goto_programt::targett, bool> insert_nondet_init_code(
+  const irep_idt &function_identifier,
   goto_programt &goto_program,
   const goto_programt::targett &target,
   symbol_table_baset &symbol_table,
@@ -116,7 +118,7 @@ static std::pair<goto_programt::targett, bool> insert_nondet_init_code(
 
     symbolt &aux_symbol = get_fresh_aux_symbol(
       op.type(),
-      id2string(goto_programt::get_function_id(goto_program)),
+      id2string(function_identifier),
       "nondet_tmp",
       source_loc,
       ID_java,
@@ -162,6 +164,7 @@ static std::pair<goto_programt::targett, bool> insert_nondet_init_code(
 /// For each instruction in the goto program, checks if it is an assignment from
 /// nondet and replaces it with the appropriate composite initialization code if
 /// so.
+/// \param function_identifier: Name of the function \p goto_program.
 /// \param goto_program: The goto program to modify.
 /// \param symbol_table: The global symbol table.
 /// \param message_handler: Handles logging.
@@ -169,6 +172,7 @@ static std::pair<goto_programt::targett, bool> insert_nondet_init_code(
 ///   objects.
 /// \param mode: Language mode
 void convert_nondet(
+  const irep_idt &function_identifier,
   goto_programt &goto_program,
   symbol_table_baset &symbol_table,
   message_handlert &message_handler,
@@ -181,6 +185,7 @@ void convert_nondet(
   while(instruction_iterator != goto_program.instructions.end())
   {
     auto ret = insert_nondet_init_code(
+      function_identifier,
       goto_program,
       instruction_iterator,
       symbol_table,
@@ -206,6 +211,7 @@ void convert_nondet(
   java_object_factory_parameterst parameters = object_factory_parameters;
   parameters.function_id = function.get_function_id();
   convert_nondet(
+    function.get_function_id(),
     function.get_goto_function().body,
     function.get_symbol_table(),
     message_handler,
@@ -232,6 +238,7 @@ void convert_nondet(
       java_object_factory_parameterst parameters = object_factory_parameters;
       parameters.function_id = f_it.first;
       convert_nondet(
+        f_it.first,
         f_it.second.body,
         symbol_table,
         message_handler,
