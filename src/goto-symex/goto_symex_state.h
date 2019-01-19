@@ -196,6 +196,11 @@ public:
       bool is_recursion = false;
     };
     std::unordered_map<irep_idt, loop_infot> loop_iterations;
+
+    explicit framet(const symex_targett::sourcet &_calling_location)
+      : calling_location(_calling_location)
+    {
+    }
   };
 
   typedef std::vector<framet> call_stackt;
@@ -224,8 +229,14 @@ public:
     return call_stack().back();
   }
 
-  framet &new_frame() { call_stack().push_back(framet()); return top(); }
+  framet &new_frame()
+  {
+    call_stack().emplace_back(source);
+    return top();
+  }
+
   void pop_frame() { call_stack().pop_back(); }
+
   const framet &previous_frame() { return *(--(--call_stack().end())); }
 
   void print_backtrace(std::ostream &) const;
