@@ -11,6 +11,14 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <testing-utils/catch.hpp>
 #include <util/range.h>
 
+/// Trivial example template function requiring a container to have a
+/// `value_type`.
+template <typename containert>
+typename containert::value_type front(containert container)
+{
+  return *container.begin();
+}
+
 SCENARIO("range tests", "[core][util][range]")
 {
   GIVEN("A vector with three strings")
@@ -21,7 +29,7 @@ SCENARIO("range tests", "[core][util][range]")
     list.emplace_back("acdef");
     THEN("Use range-for to compute the total length")
     {
-      auto range = make_range(list);
+      const auto range = make_range(list);
       std::size_t total_length = 0;
       for(const auto &s : range)
         total_length += s.length();
@@ -29,7 +37,7 @@ SCENARIO("range tests", "[core][util][range]")
     }
     THEN("Use map to compute individual lengths")
     {
-      auto length_range =
+      const auto length_range =
         make_range(list).map([](const std::string &s) { return s.length(); });
       auto it = length_range.begin();
       REQUIRE(*it == 3);
@@ -42,16 +50,27 @@ SCENARIO("range tests", "[core][util][range]")
     }
     THEN("Filter using lengths")
     {
-      auto filtered_range = make_range(list).filter(
+      const auto filtered_range = make_range(list).filter(
         [&](const std::string &s) { return s.length() == 4; });
       auto it = filtered_range.begin();
       REQUIRE(*it == "cdef");
       ++it;
       REQUIRE(it == filtered_range.end());
     }
+    THEN(
+      "A const instance of a `filter_iteratort` can mutate the input "
+      "collection.")
+    {
+      const auto it =
+        make_range(list)
+          .filter([&](const std::string &s) { return s.length() == 3; })
+          .begin();
+      *it += "x";
+      REQUIRE(*list.begin() == "abcx");
+    }
     THEN("Filter, map and use range-for on the same list")
     {
-      auto range =
+      const auto range =
         make_range(list)
           .filter([&](const std::string &s) -> bool { return s[0] == 'a'; })
           .map([&](const std::string &s) { return s.length(); });
@@ -62,6 +81,72 @@ SCENARIO("range tests", "[core][util][range]")
       for(const auto &l : range)
         total += l;
       REQUIRE(total == 8);
+    }
+  }
+  GIVEN("A const vector of ints")
+  {
+    const std::vector<int> input{1, 2, 3, 4};
+    THEN("Filter the vector using range.")
+    {
+      const auto odds_range =
+        make_range(input).filter([](const int number) { return number % 2; });
+      const std::vector<int> odds{odds_range.begin(), odds_range.end()};
+      const std::vector<int> expected_odds{1, 3};
+      REQUIRE(odds == expected_odds);
+    }
+    THEN(
+      "The unit testing template function requiring `value_type` works with "
+      "`std::vector`.")
+    {
+      REQUIRE(front(input) == 1);
+    }
+    THEN(
+      "A range can be used with a template function expecting a container "
+      "which has a `value_type`.")
+    {
+      REQUIRE(front(make_range(input)) == 1);
+    }
+    THEN("Map over the vector using range.")
+    {
+      const auto plus_one_range =
+        make_range(input).map([](const int number) { return number + 1; });
+      const std::vector<int> plus_one_collection{plus_one_range.begin(),
+                                                 plus_one_range.end()};
+      const std::vector<int> expected_output{2, 3, 4, 5};
+      REQUIRE(plus_one_collection == expected_output);
+    };
+  }
+  GIVEN("Two const vectors of ints")
+  {
+    const std::vector<int> input1{1, 2};
+    const std::vector<int> input2{3, 4};
+    THEN("Concat the vectors using range.")
+    {
+      const auto range = make_range(input1).concat(make_range(input2));
+      const std::vector<int> output{range.begin(), range.end()};
+      const std::vector<int> expected{1, 2, 3, 4};
+      REQUIRE(output == expected);
+    };
+  }
+  GIVEN("Two non-const vectors of ints.")
+  {
+    std::vector<int> input1{1, 2};
+    std::vector<int> input2{3, 4};
+    THEN(
+      "Const instances of `concat_iteratort` should enable the input "
+      "collections to be mutated.")
+    {
+      const auto concat_range = make_range(input1).concat(make_range(input2));
+      int x = 5;
+      for(auto it = concat_range.begin(); it != concat_range.end(); ++it, ++x)
+      {
+        const auto const_it = it;
+        *const_it = x;
+      }
+      std::vector<int> expected_result1{5, 6};
+      std::vector<int> expected_result2{7, 8};
+      REQUIRE(input1 == expected_result1);
+      REQUIRE(input2 == expected_result2);
     }
   }
 }
@@ -98,13 +183,13 @@ SCENARIO(
       input.emplace_back(i);
     THEN("Values from a range of made from the vector can be moved.")
     {
-      auto input_range = make_range(input);
+      const auto input_range = make_range(input);
       move_onlyt destination{std::move(*input_range.begin())};
       REQUIRE(destination.value == 1);
     }
     THEN("A range of made from the vector can be filtered.")
     {
-      auto odds_filter = make_range(input).filter(is_odd);
+      const auto odds_filter = make_range(input).filter(is_odd);
       const std::size_t total =
         std::distance(odds_filter.begin(), odds_filter.end());
       REQUIRE(total == 5);

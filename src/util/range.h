@@ -113,8 +113,8 @@ class filter_iteratort
 public:
   using difference_type = typename iteratort::difference_type;
   using value_type = typename iteratort::value_type;
-  using pointer = const value_type *;
-  using reference = const value_type &;
+  using pointer = typename iteratort::pointer;
+  using reference = typename iteratort::reference;
   using iterator_category = std::forward_iterator_tag;
 
   bool operator==(const filter_iteratort &other) const
@@ -143,22 +143,12 @@ public:
     return tmp;
   }
 
-  value_type &operator*()
+  reference operator*() const
   {
     return *underlying;
   }
 
-  value_type *operator->()
-  {
-    return &(*underlying);
-  }
-
-  const value_type &operator*() const
-  {
-    return *underlying;
-  }
-
-  const value_type *operator->() const
+  pointer operator->() const
   {
     return &(*underlying);
   }
@@ -208,8 +198,8 @@ struct concat_iteratort
 public:
   using difference_type = typename first_iteratort::difference_type;
   using value_type = typename first_iteratort::value_type;
-  using pointer = const value_type *;
-  using reference = const value_type &;
+  using pointer = typename first_iteratort::pointer;
+  using reference = typename first_iteratort::reference;
   using iterator_category = std::forward_iterator_tag;
 
   static_assert(
@@ -245,28 +235,14 @@ public:
     return tmp;
   }
 
-  value_type &operator*()
+  reference operator*() const
   {
     if(first_begin == first_end)
       return *second_begin;
     return *first_begin;
   }
 
-  value_type *operator->()
-  {
-    if(first_begin == first_end)
-      return &(*second_begin);
-    return &(*first_begin);
-  }
-
-  const value_type &operator*() const
-  {
-    if(first_begin == first_end)
-      return *second_begin;
-    return *first_begin;
-  }
-
-  const value_type *operator->() const
+  pointer operator->() const
   {
     if(first_begin == first_end)
       return &(*second_begin);
@@ -311,14 +287,14 @@ template <typename iteratort>
 struct ranget final
 {
 public:
-  using value_typet = typename iteratort::value_type;
+  using value_type = typename iteratort::value_type;
 
   ranget(iteratort begin, iteratort end) : begin_value(begin), end_value(end)
   {
   }
 
   ranget<filter_iteratort<iteratort>>
-  filter(std::function<bool(const value_typet &)> f)
+  filter(std::function<bool(const value_type &)> f)
   {
     auto shared_f = std::make_shared<decltype(f)>(std::move(f));
     filter_iteratort<iteratort> filter_begin(shared_f, begin(), end());
@@ -335,9 +311,9 @@ public:
   template <typename functiont>
   auto map(functiont &&f) -> ranget<map_iteratort<
     iteratort,
-    typename std::result_of<functiont(value_typet)>::type>>
+    typename std::result_of<functiont(value_type)>::type>>
   {
-    using outputt = typename std::result_of<functiont(value_typet)>::type;
+    using outputt = typename std::result_of<functiont(value_type)>::type;
     auto shared_f = std::make_shared<
       std::function<outputt(const typename iteratort::value_type &)>>(
       std::forward<functiont>(f));
@@ -365,7 +341,7 @@ public:
     return begin_value == end_value;
   }
 
-  iteratort begin()
+  iteratort begin() const
   {
     return begin_value;
   }
