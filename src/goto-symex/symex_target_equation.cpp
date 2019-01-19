@@ -988,6 +988,12 @@ irep_idt symex_target_equationt::SSA_stept::get_property_id() const
     property_id = id2string(source.pc->source_location.get_function()) +
                   ".unwind." + std::to_string(source.pc->loop_number);
   }
+  else if(source.pc->is_function_call())
+  {
+    // this is likely a recursion unwinding assertion
+    property_id =
+      id2string(source.pc->source_location.get_function()) + ".recursion";
+  }
   else
   {
     // return empty
