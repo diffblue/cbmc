@@ -39,8 +39,8 @@ public:
     if(!has_properties_to_check(properties))
       return resultt::PASS;
 
-    while(incremental_goto_checker(properties) !=
-          incremental_goto_checkert::resultt::DONE)
+    while(incremental_goto_checker(properties).progress !=
+          incremental_goto_checkert::resultt::progresst::DONE)
     {
       // loop until we are done
     }

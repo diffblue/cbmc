@@ -37,14 +37,28 @@ public:
   incremental_goto_checkert(const incremental_goto_checkert &) = delete;
   virtual ~incremental_goto_checkert() = default;
 
-  enum class resultt
+  struct resultt
   {
-    /// The goto checker may be able to find another FAILed property
-    /// if operator() is called again.
-    FOUND_FAIL,
-    /// The goto checker has returned all results for the given set
-    /// of properties.
-    DONE
+    enum class progresst
+    {
+      /// The goto checker may be able to find another FAILed property
+      /// if operator() is called again.
+      FOUND_FAIL,
+      /// The goto checker has returned all results for the given set
+      /// of properties.
+      DONE
+    };
+
+    progresst progress = progresst::DONE;
+
+    /// Changed properties since the last call to
+    /// `incremental_goto_checkert::operator()`
+    std::vector<irep_idt> updated_properties;
+
+    resultt() = default;
+    resultt(
+      progresst progress,
+      const std::vector<irep_idt> &updated_properties);
   };
 
   /// Check whether the given properties with status NOT_CHECKED, UNKNOWN or
@@ -52,7 +66,8 @@ public:
   /// \param [out] properties: Properties updated to whether their status
   ///   have been determined. Newly discovered properties are added.
   /// \return whether the goto checker found a violated property (FOUND_FAIL) or
-  ///   whether it is DONE with the given properties.
+  ///   whether it is DONE with the given properties, together with
+  ///   the properties whose status changed since the last call to operator().
   /// After returning DONE, another call to operator() with the same
   /// properties will return DONE and leave the properties' status unchanged.
   /// If there is a property with status FAIL then its counterexample
