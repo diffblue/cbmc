@@ -169,7 +169,6 @@ void convert_output(
   const goto_trace_stept &step = conversion_dependencies.step;
   const jsont &location = conversion_dependencies.location;
   const namespacet &ns = conversion_dependencies.ns;
-  const source_locationt &source_location = step.pc->source_location;
 
   json_output["stepType"] = json_stringt("output");
   json_output["hidden"] = jsont::json_boolean(step.hidden);
@@ -180,7 +179,7 @@ void convert_output(
   // Recovering the mode from the function
   irep_idt mode;
   const symbolt *function_name;
-  if(ns.lookup(source_location.get_function(), function_name))
+  if(ns.lookup(step.function, function_name))
     // Failed to find symbol
     mode = ID_unknown;
   else
@@ -212,7 +211,6 @@ void convert_input(
   const goto_trace_stept &step = conversion_dependencies.step;
   const jsont &location = conversion_dependencies.location;
   const namespacet &ns = conversion_dependencies.ns;
-  const source_locationt &source_location = step.pc->source_location;
 
   json_input["stepType"] = json_stringt("input");
   json_input["hidden"] = jsont::json_boolean(step.hidden);
@@ -223,7 +221,7 @@ void convert_input(
   // Recovering the mode from the function
   irep_idt mode;
   const symbolt *function_name;
-  if(ns.lookup(source_location.get_function(), function_name))
+  if(ns.lookup(step.function, function_name))
     // Failed to find symbol
     mode = ID_unknown;
   else
