@@ -318,21 +318,22 @@ public:
     // for slicing
     bool ignore=false;
 
-    SSA_stept():
-      type(goto_trace_stept::typet::NONE),
-      hidden(false),
-      guard(static_cast<const exprt &>(get_nil_irep())),
-      guard_literal(const_literal(false)),
-      ssa_lhs(static_cast<const ssa_exprt &>(get_nil_irep())),
-      ssa_full_lhs(static_cast<const exprt &>(get_nil_irep())),
-      original_full_lhs(static_cast<const exprt &>(get_nil_irep())),
-      ssa_rhs(static_cast<const exprt &>(get_nil_irep())),
-      assignment_type(assignment_typet::STATE),
-      cond_expr(static_cast<const exprt &>(get_nil_irep())),
-      cond_literal(const_literal(false)),
-      formatted(false),
-      atomic_section_id(0),
-      ignore(false)
+    SSA_stept(const sourcet &_source, goto_trace_stept::typet _type)
+      : source(_source),
+        type(_type),
+        hidden(false),
+        guard(static_cast<const exprt &>(get_nil_irep())),
+        guard_literal(const_literal(false)),
+        ssa_lhs(static_cast<const ssa_exprt &>(get_nil_irep())),
+        ssa_full_lhs(static_cast<const exprt &>(get_nil_irep())),
+        original_full_lhs(static_cast<const exprt &>(get_nil_irep())),
+        ssa_rhs(static_cast<const exprt &>(get_nil_irep())),
+        assignment_type(assignment_typet::STATE),
+        cond_expr(static_cast<const exprt &>(get_nil_irep())),
+        cond_literal(const_literal(false)),
+        formatted(false),
+        atomic_section_id(0),
+        ignore(false)
     {
     }
 
