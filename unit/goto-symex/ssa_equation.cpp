@@ -24,9 +24,10 @@ SCENARIO("Validation of well-formed SSA steps", "[core][goto-symex][validate]")
     symbol_exprt fun_foo(fun_name, code_type);
 
     symex_target_equationt equation;
-    equation.SSA_steps.push_back(symex_target_equationt::SSA_stept());
+    symex_targett::sourcet empty_source;
+    equation.SSA_steps.emplace_back(
+      empty_source, goto_trace_stept::typet::FUNCTION_RETURN);
     auto &step = equation.SSA_steps.back();
-    step.type = goto_trace_stept::typet::FUNCTION_RETURN;
     step.called_function = fun_name;
 
     WHEN("Called function is in symbol table")

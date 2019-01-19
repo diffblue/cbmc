@@ -56,16 +56,15 @@ void partial_order_concurrencyt::add_init_writes(
        e_it->is_shared_read() ||
        !e_it->guard.is_true())
     {
-      init_steps.push_back(symex_target_equationt::SSA_stept());
+      init_steps.emplace_back(
+        e_it->source, goto_trace_stept::typet::SHARED_WRITE);
       symex_target_equationt::SSA_stept &SSA_step=init_steps.back();
 
       SSA_step.guard=true_exprt();
       // no SSA L2 index, thus nondet value
       SSA_step.ssa_lhs=e_it->ssa_lhs;
       SSA_step.ssa_lhs.remove_level_2();
-      SSA_step.type=goto_trace_stept::typet::SHARED_WRITE;
       SSA_step.atomic_section_id=0;
-      SSA_step.source=e_it->source;
     }
 
     init_done.insert(a);

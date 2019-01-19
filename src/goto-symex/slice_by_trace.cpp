@@ -103,14 +103,13 @@ void symex_slice_by_tracet::slice_by_trace(
 
   guardt t_guard;
   symex_targett::sourcet empty_source;
-  equation.SSA_steps.push_front(symex_target_equationt::SSA_stept());
+  equation.SSA_steps.emplace_front(
+    empty_source, goto_trace_stept::typet::ASSUME);
   symex_target_equationt::SSA_stept &SSA_step=equation.SSA_steps.front();
 
   SSA_step.guard=t_guard.as_expr();
   SSA_step.ssa_lhs.make_nil();
   SSA_step.cond_expr.swap(trace_condition);
-  SSA_step.type=goto_trace_stept::typet::ASSUME;
-  SSA_step.source=empty_source;
 
   assign_merges(equation); // Now add the merge variable assignments to eqn
 
@@ -508,7 +507,8 @@ void symex_slice_by_tracet::assign_merges(
 
     exprt merge_copy(*i);
 
-    equation.SSA_steps.push_front(symex_target_equationt::SSA_stept());
+    equation.SSA_steps.emplace_front(
+      empty_source, goto_trace_stept::typet::ASSIGNMENT);
     symex_target_equationt::SSA_stept &SSA_step=equation.SSA_steps.front();
 
     SSA_step.guard=t_guard.as_expr();
@@ -517,8 +517,6 @@ void symex_slice_by_tracet::assign_merges(
     SSA_step.assignment_type=symex_targett::assignment_typet::HIDDEN;
 
     SSA_step.cond_expr=equal_exprt(SSA_step.ssa_lhs, SSA_step.ssa_rhs);
-    SSA_step.type=goto_trace_stept::typet::ASSIGNMENT;
-    SSA_step.source=empty_source;
   }
 }
 
