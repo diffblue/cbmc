@@ -717,35 +717,40 @@ void rw_guarded_range_set_value_sett::add(
     {range_start, {range_end, guard.as_expr()}});
 }
 
-void goto_rw(goto_programt::const_targett target,
-             const code_assignt &assign,
-             rw_range_sett &rw_set)
+static void goto_rw(
+  const irep_idt &function,
+  goto_programt::const_targett target,
+  const code_assignt &assign,
+  rw_range_sett &rw_set)
 {
-  rw_set.get_objects_rec(target, rw_range_sett::get_modet::LHS_W, assign.lhs());
-  rw_set.get_objects_rec(target, rw_range_sett::get_modet::READ, assign.rhs());
+  rw_set.get_objects_rec(
+    function, target, rw_range_sett::get_modet::LHS_W, assign.lhs());
+  rw_set.get_objects_rec(
+    function, target, rw_range_sett::get_modet::READ, assign.rhs());
 }
 
-void goto_rw(goto_programt::const_targett target,
-             const code_function_callt &function_call,
-             rw_range_sett &rw_set)
+static void goto_rw(
+  const irep_idt &function,
+  goto_programt::const_targett target,
+  const code_function_callt &function_call,
+  rw_range_sett &rw_set)
 {
   if(function_call.lhs().is_not_nil())
     rw_set.get_objects_rec(
-      target,
-      rw_range_sett::get_modet::LHS_W,
-      function_call.lhs());
+      function, target, rw_range_sett::get_modet::LHS_W, function_call.lhs());
 
   rw_set.get_objects_rec(
-    target,
-    rw_range_sett::get_modet::READ,
-    function_call.function());
+    function, target, rw_range_sett::get_modet::READ, function_call.function());
 
   forall_expr(it, function_call.arguments())
-    rw_set.get_objects_rec(target, rw_range_sett::get_modet::READ, *it);
+    rw_set.get_objects_rec(
+      function, target, rw_range_sett::get_modet::READ, *it);
 }
 
-void goto_rw(goto_programt::const_targett target,
-             rw_range_sett &rw_set)
+void goto_rw(
+  const irep_idt &function,
+  goto_programt::const_targett target,
+  rw_range_sett &rw_set)
 {
   switch(target->type)
   {
@@ -758,9 +763,7 @@ void goto_rw(goto_programt::const_targett target,
   case ASSUME:
   case ASSERT:
     rw_set.get_objects_rec(
-      target,
-      rw_range_sett::get_modet::READ,
-      target->guard);
+      function, target, rw_range_sett::get_modet::READ, target->guard);
     break;
 
   case RETURN:
@@ -769,6 +772,7 @@ void goto_rw(goto_programt::const_targett target,
         to_code_return(target->code);
       if(code_return.has_return_value())
         rw_set.get_objects_rec(
+          function,
           target,
           rw_range_sett::get_modet::READ,
           code_return.return_value());
@@ -780,7 +784,8 @@ void goto_rw(goto_programt::const_targett target,
     if(target->code.get(ID_statement)==ID_printf)
     {
       forall_expr(it, target->code.operands())
-        rw_set.get_objects_rec(target, rw_range_sett::get_modet::READ, *it);
+        rw_set.get_objects_rec(
+          function, target, rw_range_sett::get_modet::READ, *it);
     }
     break;
 
@@ -797,11 +802,12 @@ void goto_rw(goto_programt::const_targett target,
     break;
 
   case ASSIGN:
-    goto_rw(target, to_code_assign(target->code), rw_set);
+    goto_rw(function, target, to_code_assign(target->code), rw_set);
     break;
 
   case DEAD:
     rw_set.get_objects_rec(
+      function,
       target,
       rw_range_sett::get_modet::LHS_W,
       to_code_dead(target->code).symbol());
@@ -809,23 +815,27 @@ void goto_rw(goto_programt::const_targett target,
 
   case DECL:
     rw_set.get_objects_rec(
-      to_code_decl(target->code).symbol().type());
+      function, target, to_code_decl(target->code).symbol().type());
     rw_set.get_objects_rec(
+      function,
       target,
       rw_range_sett::get_modet::LHS_W,
       to_code_decl(target->code).symbol());
     break;
 
   case FUNCTION_CALL:
-    goto_rw(target, to_code_function_call(target->code), rw_set);
+    goto_rw(function, target, to_code_function_call(target->code), rw_set);
     break;
   }
 }
 
-void goto_rw(const goto_programt &goto_program, rw_range_sett &rw_set)
+void goto_rw(
+  const irep_idt &function,
+  const goto_programt &goto_program,
+  rw_range_sett &rw_set)
 {
   forall_goto_program_instructions(i_it, goto_program)
-    goto_rw(i_it, rw_set);
+    goto_rw(function, i_it, rw_set);
 }
 
 void goto_rw(const goto_functionst &goto_functions,
@@ -839,6 +849,6 @@ void goto_rw(const goto_functionst &goto_functions,
   {
     const goto_programt &body=f_it->second.body;
 
-    goto_rw(body, rw_set);
+    goto_rw(f_it->first, body, rw_set);
   }
 }

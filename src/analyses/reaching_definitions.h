@@ -309,11 +309,13 @@ private:
     const namespacet &ns,
     const irep_idt &function_from,
     locationt from,
+    const irep_idt &function_to,
     locationt to,
     reaching_definitions_analysist &rd);
   void transform_assign(
     const namespacet &ns,
     locationt from,
+    const irep_idt &function_to,
     locationt to,
     reaching_definitions_analysist &rd);
 
