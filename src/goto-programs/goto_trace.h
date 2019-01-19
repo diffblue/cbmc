@@ -186,6 +186,9 @@ public:
     return steps.back();
   }
 
+  /// Returns the property IDs of all assertions in the trace
+  std::vector<irep_idt> get_all_property_ids() const;
+
   // delete all steps after (not including) s
   void trim_after(stepst::iterator s)
   {
