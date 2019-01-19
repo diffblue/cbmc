@@ -132,7 +132,7 @@ static void remove_vector(exprt &expr)
         exprt index=from_integer(i, array_type.size().type());
 
         array_expr.operands()[i] = unary_exprt(
-          unary_expr.id(), index_exprt(unary_expr.op0(), index, subtype));
+          unary_expr.id(), index_exprt(unary_expr.op(), index, subtype));
       }
 
       expr=array_expr;
