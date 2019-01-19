@@ -288,8 +288,7 @@ void goto_unwindt::unwind(
     }
 
     PRECONDITION(!function_id.empty());
-    const irep_idt loop_id =
-      id2string(function_id) + "." + std::to_string(i_it->loop_number);
+    const irep_idt loop_id = goto_programt::loop_id(function_id, *i_it);
 
     auto limit=unwindset.get_limit(loop_id, 0);
 
