@@ -311,7 +311,6 @@ void goto_symext::symex_function_call_code(
 
   frame.end_of_function=--goto_function.body.instructions.end();
   frame.return_value=call.lhs();
-  frame.calling_location=state.source;
   frame.function_identifier=identifier;
   frame.hidden_function=goto_function.is_hidden();
 
