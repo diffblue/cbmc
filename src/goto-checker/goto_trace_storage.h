@@ -23,6 +23,9 @@ public:
   /// Store trace that ends in a violated assertion
   const goto_tracet &insert(goto_tracet &&);
 
+  /// Store trace that contains multiple violated assertions
+  const goto_tracet &insert_all(goto_tracet &&);
+
   const std::vector<goto_tracet> &all() const;
   const goto_tracet &operator[](const irep_idt &property_id) const;
 
