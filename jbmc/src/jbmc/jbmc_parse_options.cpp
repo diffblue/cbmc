@@ -811,7 +811,11 @@ void jbmc_parse_optionst::process_goto_function(
       function.get_function_id(), function.get_goto_function(), ns, options);
 
     // Replace Java new side effects
-    remove_java_new(goto_function, symbol_table, get_message_handler());
+    remove_java_new(
+      function.get_function_id(),
+      goto_function,
+      symbol_table,
+      get_message_handler());
 
     // checks don't know about adjusted float expressions
     adjust_float_expressions(goto_function, ns);
