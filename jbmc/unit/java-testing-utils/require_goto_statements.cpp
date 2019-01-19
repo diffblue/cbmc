@@ -95,7 +95,7 @@ require_goto_statements::find_struct_component_assignments(
             member_expr.compound().id() == ID_member)
           {
             const member_exprt &superclass_expr =
-              to_member_expr(member_expr.op0());
+              to_member_expr(member_expr.compound());
             const irep_idt supercomponent_name =
               "@" + id2string(superclass_name.value());
 
