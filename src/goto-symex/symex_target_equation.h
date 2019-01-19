@@ -12,8 +12,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_SYMEX_SYMEX_TARGET_EQUATION_H
 #define CPROVER_GOTO_SYMEX_SYMEX_TARGET_EQUATION_H
 
-#include <list>
+#include <algorithm>
 #include <iosfwd>
+#include <list>
 
 #include <util/invariant.h>
 #include <util/merge_irep.h>
@@ -349,24 +350,18 @@ public:
 
   std::size_t count_assertions() const
   {
-    std::size_t i=0;
-    for(SSA_stepst::const_iterator
-        it=SSA_steps.begin();
-        it!=SSA_steps.end(); it++)
-      if(it->is_assert())
-        i++;
-    return i;
+    return std::count_if(
+      SSA_steps.begin(), SSA_steps.end(), [](const SSA_stept &step) {
+        return step.is_assert();
+      });
   }
 
   std::size_t count_ignored_SSA_steps() const
   {
-    std::size_t i=0;
-    for(SSA_stepst::const_iterator
-        it=SSA_steps.begin();
-        it!=SSA_steps.end(); it++)
-      if(it->ignore)
-        i++;
-    return i;
+    return std::count_if(
+      SSA_steps.begin(), SSA_steps.end(), [](const SSA_stept &step) {
+        return step.ignore;
+      });
   }
 
   typedef std::list<SSA_stept> SSA_stepst;
@@ -392,13 +387,10 @@ public:
 
   bool has_threads() const
   {
-    for(SSA_stepst::const_iterator it=SSA_steps.begin();
-        it!=SSA_steps.end();
-        it++)
-      if(it->source.thread_nr!=0)
-        return true;
-
-    return false;
+    return std::any_of(
+      SSA_steps.begin(), SSA_steps.end(), [](const SSA_stept &step) {
+        return step.source.thread_nr != 0;
+      });
   }
 
   void validate(const namespacet &ns, const validation_modet vm) const
