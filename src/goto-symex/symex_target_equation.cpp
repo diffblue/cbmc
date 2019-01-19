@@ -996,7 +996,7 @@ irep_idt symex_target_equationt::SSA_stept::get_property_id() const
   }
   else
   {
-    // return empty
+    UNREACHABLE;
   }
 
   return property_id;
