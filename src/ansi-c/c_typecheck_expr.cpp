@@ -420,7 +420,7 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
     // that we are using "bool" for boolean operators instead
     // of "int". We convert for this reason.
     if(expr.op0().type().id() == ID_bool)
-      expr.op0().make_typecast(signed_int_type());
+      expr.op0() = typecast_exprt(expr.op0(), signed_int_type());
 
     irept::subt &generic_associations=
       expr.add(ID_generic_associations).get_sub();
@@ -1104,7 +1104,7 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
     // that we are using "bool" for boolean operators instead
     // of "int". We convert for this reason.
     if(op.type().id() == ID_bool)
-      op.make_typecast(signed_int_type());
+      op = typecast_exprt(op, signed_int_type());
 
     // we need to find a member with the right type
     for(const auto &c : to_union_type(expr_type).components())
@@ -1409,19 +1409,19 @@ void c_typecheck_baset::typecheck_expr_rel(
     // pointer and integer
     if(type0.id()==ID_pointer && is_number(type1))
     {
-      op1.make_typecast(type0);
+      op1 = typecast_exprt(op1, type0);
       return;
     }
 
     if(type1.id()==ID_pointer && is_number(type0))
     {
-      op0.make_typecast(type1);
+      op0 = typecast_exprt(op0, type1);
       return;
     }
 
     if(type0.id()==ID_pointer && type1.id()==ID_pointer)
     {
-      op1.make_typecast(type0);
+      op1 = typecast_exprt(op1, type0);
       return;
     }
   }
@@ -1890,7 +1890,7 @@ void c_typecheck_baset::typecheck_expr_side_effect(side_effect_exprt &expr)
     {
       // promote to underlying type
       typet underlying_type = to_c_bit_field_type(type0).subtype();
-      expr.op0().make_typecast(underlying_type);
+      expr.op0() = typecast_exprt(expr.op0(), underlying_type);
       expr.type()=underlying_type;
     }
     else if(is_numeric_type(type0))
@@ -3326,7 +3326,7 @@ void c_typecheck_baset::typecheck_side_effect_assignment(
   // Add a cast to the underlying type for bit fields.
   // In particular, sizeof(s.f=1) works for bit fields.
   if(op0.type().id()==ID_c_bit_field)
-    op0.make_typecast(op0.type().subtype());
+    op0 = typecast_exprt(op0, op0.type().subtype());
 
   const typet o_type0=op0.type();
   const typet o_type1=op1.type();

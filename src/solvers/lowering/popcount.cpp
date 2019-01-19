@@ -30,10 +30,12 @@ exprt lower_popcount(const popcount_exprt &expr, const namespacet &ns)
   CHECK_RETURN(x_width.has_value() && *x_width >= 1);
   const std::size_t bits = address_bits(*x_width);
   const std::size_t new_width = numeric_cast_v<std::size_t>(power(2, bits));
+
   const bool need_typecast =
     new_width > *x_width || x.type().id() != ID_unsignedbv;
+
   if(need_typecast)
-    x.make_typecast(unsignedbv_typet(new_width));
+    x = typecast_exprt(x, unsignedbv_typet(new_width));
 
   // repeatedly compute x = (x & bitmask) + ((x >> shift) & bitmask)
   for(std::size_t shift = 1; shift < new_width; shift <<= 1)
@@ -54,7 +56,5 @@ exprt lower_popcount(const popcount_exprt &expr, const namespacet &ns)
   }
 
   // the result is restricted to the result type
-  x.make_typecast(expr.type());
-
-  return x;
+  return typecast_exprt(x, expr.type());
 }

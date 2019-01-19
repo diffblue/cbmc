@@ -735,8 +735,7 @@ void c_typecastt::do_typecast(exprt &expr, const typet &dest_type)
 
     if(dest_type.get(ID_C_c_type)==ID_bool)
     {
-      expr=is_not_zero(expr, ns);
-      expr.make_typecast(dest_type);
+      expr = typecast_exprt(is_not_zero(expr, ns), dest_type);
     }
     else if(dest_type.id()==ID_bool)
     {
@@ -744,7 +743,7 @@ void c_typecastt::do_typecast(exprt &expr, const typet &dest_type)
     }
     else
     {
-      expr.make_typecast(dest_type);
+      expr = typecast_exprt(expr, dest_type);
     }
   }
 }

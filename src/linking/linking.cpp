@@ -1072,7 +1072,7 @@ void linkingt::duplicate_object_symbol(
   {
     // the type has been updated, now make sure that the initialising assignment
     // will have matching types
-    old_symbol.value.make_typecast(old_symbol.type);
+    old_symbol.value = typecast_exprt(old_symbol.value, old_symbol.type);
   }
 }
 

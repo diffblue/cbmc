@@ -1020,7 +1020,7 @@ void c_typecheck_baset::typecheck_compound_body(
       exprt &assertion=it->op0();
       typecheck_expr(assertion);
       typecheck_expr(it->op1());
-      assertion.make_typecast(bool_typet());
+      assertion = typecast_exprt(assertion, bool_typet());
       make_constant(assertion);
 
       if(assertion.is_false())

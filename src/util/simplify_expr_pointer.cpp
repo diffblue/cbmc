@@ -270,8 +270,7 @@ bool simplify_exprt::simplify_pointer_offset(exprt &expr)
       if(ptr.op0().is_constant())
       {
         // (T *)0x1234 -> 0x1234
-        exprt tmp=ptr.op0();
-        tmp.make_typecast(expr.type());
+        exprt tmp = typecast_exprt(ptr.op0(), expr.type());
         simplify_node(tmp);
         expr.swap(tmp);
         return false;
@@ -321,7 +320,7 @@ bool simplify_exprt::simplify_pointer_offset(exprt &expr)
         exprt tmp=op;
         if(tmp.type()!=expr.type())
         {
-          tmp.make_typecast(expr.type());
+          tmp = typecast_exprt(tmp, expr.type());
           simplify_node(tmp);
         }
 
@@ -668,7 +667,7 @@ bool simplify_exprt::simplify_object_size(exprt &expr)
 
         if(size.type() != expr_type)
         {
-          size.make_typecast(expr_type);
+          size = typecast_exprt(size, expr_type);
           simplify_node(size);
         }
 

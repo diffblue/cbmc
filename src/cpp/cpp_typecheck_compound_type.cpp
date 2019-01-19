@@ -1703,5 +1703,5 @@ void cpp_typecheckt::make_ptr_typecast(
     subtype_typecast(src_struct, dest_struct) ||
     subtype_typecast(dest_struct, src_struct));
 
-  expr.make_typecast(dest_type);
+  expr = typecast_exprt(expr, dest_type);
 }

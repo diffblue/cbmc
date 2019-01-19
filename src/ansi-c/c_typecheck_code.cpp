@@ -667,7 +667,7 @@ void c_typecheck_baset::typecheck_return(codet &code)
         warning() << to_string(code.op0().type());
         warning() << eom;
 
-        code.op0().make_typecast(return_type);
+        code.op0() = typecast_exprt(code.op0(), return_type);
       }
     }
     else

@@ -703,7 +703,7 @@ bool simplify_exprt::simplify_bitwise(exprt &expr)
       new_expr.type()=bool_typet();
       simplify_node(new_expr);
 
-      new_expr.make_typecast(expr.type());
+      new_expr = typecast_exprt(new_expr, expr.type());
       simplify_node(new_expr);
 
       expr.swap(new_expr);

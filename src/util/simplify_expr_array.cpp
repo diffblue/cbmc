@@ -168,8 +168,7 @@ bool simplify_exprt::simplify_index(exprt &expr)
     // These are index/value pairs, alternating.
     for(size_t i=0; i<array.operands().size()/2; i++)
     {
-      exprt tmp_index=array.operands()[i*2];
-      tmp_index.make_typecast(index.type());
+      exprt tmp_index = typecast_exprt(array.operands()[i * 2], index.type());
       simplify(tmp_index);
       if(tmp_index==index)
       {
