@@ -160,7 +160,7 @@ bool bv_pointerst::convert_address_of_rec(
   else if(expr.id()==ID_member)
   {
     const member_exprt &member_expr=to_member_expr(expr);
-    const exprt &struct_op=member_expr.op0();
+    const exprt &struct_op = member_expr.compound();
     const typet &struct_op_type=ns.follow(struct_op.type());
 
     // recursive call

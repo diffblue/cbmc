@@ -1528,39 +1528,37 @@ std::string expr2ct::convert_member(
   const member_exprt &src,
   unsigned precedence)
 {
-  if(src.operands().size()!=1)
-    return convert_norep(src, precedence);
+  const auto &compound = src.compound();
 
   unsigned p;
   std::string dest;
 
-  if(src.op0().id()==ID_dereference &&
-     src.operands().size()==1)
+  if(compound.id() == ID_dereference && src.operands().size() == 1)
   {
-    std::string op=convert_with_precedence(src.op0().op0(), p);
+    std::string op = convert_with_precedence(compound.op0(), p);
 
-    if(precedence>p || src.op0().op0().id()==ID_typecast)
+    if(precedence > p || compound.op0().id() == ID_typecast)
       dest+='(';
     dest+=op;
-    if(precedence>p || src.op0().op0().id()==ID_typecast)
+    if(precedence > p || compound.op0().id() == ID_typecast)
       dest+=')';
 
     dest+="->";
   }
   else
   {
-    std::string op=convert_with_precedence(src.op0(), p);
+    std::string op = convert_with_precedence(compound, p);
 
-    if(precedence>p || src.op0().id()==ID_typecast)
+    if(precedence > p || compound.id() == ID_typecast)
       dest+='(';
     dest+=op;
-    if(precedence>p || src.op0().id()==ID_typecast)
+    if(precedence > p || compound.id() == ID_typecast)
       dest+=')';
 
     dest+='.';
   }
 
-  const typet &full_type=ns.follow(src.op0().type());
+  const typet &full_type = ns.follow(compound.type());
 
   if(full_type.id()!=ID_struct &&
      full_type.id()!=ID_union)

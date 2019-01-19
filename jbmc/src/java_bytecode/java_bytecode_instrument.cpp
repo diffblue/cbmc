@@ -484,10 +484,10 @@ optionalt<codet> java_bytecode_instrumentt::instrument_expr(const exprt &expr)
     if(plus_expr.op0().id()==ID_member)
     {
       const member_exprt &member_expr=to_member_expr(plus_expr.op0());
-      if(member_expr.op0().id()==ID_dereference)
+      if(member_expr.compound().id() == ID_dereference)
       {
-        const dereference_exprt &dereference_expr=
-          to_dereference_expr(member_expr.op0());
+        const dereference_exprt &dereference_expr =
+          to_dereference_expr(member_expr.compound());
         codet bounds_check=
           check_array_access(
             dereference_expr,

@@ -1115,7 +1115,7 @@ void value_sett::get_reference_set_rec(
         {
           // adjust type?
           if(ns.follow(struct_op.type())!=final_object_type)
-            member_expr.op0().make_typecast(struct_op.type());
+            member_expr.compound().make_typecast(struct_op.type());
 
           insert(dest, member_expr, o);
         }
