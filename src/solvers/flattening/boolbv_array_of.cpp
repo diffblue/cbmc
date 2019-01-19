@@ -42,7 +42,7 @@ bvt boolbvt::convert_array_of(const array_of_exprt &expr)
   if(to_integer(array_size, size))
     return conversion_failed(expr);
 
-  const bvt &tmp=convert_bv(expr.op0());
+  const bvt &tmp = convert_bv(expr.what());
 
   INVARIANT(
     size * tmp.size() == width,

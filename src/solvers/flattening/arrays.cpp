@@ -546,7 +546,7 @@ void arrayst::add_array_constraints_with(
       {
         const typet &subtype = expr.type().subtype();
         index_exprt index_expr1(expr, other_index, subtype);
-        index_exprt index_expr2(expr.op0(), other_index, subtype);
+        index_exprt index_expr2(expr.old(), other_index, subtype);
 
         equal_exprt equality_expr(index_expr1, index_expr2);
 
@@ -646,12 +646,12 @@ void arrayst::add_array_constraints_array_of(
     index_exprt index_expr(expr, index, subtype);
 
     DATA_INVARIANT(
-      base_type_eq(index_expr.type(), expr.op0().type(), ns),
+      base_type_eq(index_expr.type(), expr.what().type(), ns),
       "array_of operand type should match array element type");
 
     // add constraint
     lazy_constraintt lazy(
-      lazy_typet::ARRAY_OF, equal_exprt(index_expr, expr.op0()));
+      lazy_typet::ARRAY_OF, equal_exprt(index_expr, expr.what()));
     add_array_constraint(lazy, false); // added immediately
   }
 }

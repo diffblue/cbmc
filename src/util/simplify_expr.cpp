@@ -1889,7 +1889,7 @@ bool simplify_exprt::simplify_byte_update(byte_update_exprt &expr)
             exprt compo_offset = from_integer(*i, offset.type());
             plus_exprt new_offset(offset, compo_offset);
             simplify_node(new_offset);
-            exprt new_value(with.op2());
+            exprt new_value(with.new_value());
             expr.op1().swap(new_offset);
             expr.op2().swap(new_value);
             simplify_byte_update(expr); // do this recursively
@@ -1916,7 +1916,7 @@ bool simplify_exprt::simplify_byte_update(byte_update_exprt &expr)
 
           plus_exprt new_offset(offset, index_offset);
           simplify_node(new_offset);
-          exprt new_value(with.op2());
+          exprt new_value(with.new_value());
           expr.op1().swap(new_offset);
           expr.op2().swap(new_value);
           simplify_byte_update(expr); // do this recursively
