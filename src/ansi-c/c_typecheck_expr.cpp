@@ -619,8 +619,7 @@ void c_typecheck_baset::typecheck_expr_builtin_offsetof(exprt &expr)
               throw 0;
             }
 
-            if(o.type()!=size_type())
-              o.make_typecast(size_type());
+            o = typecast_exprt::conditional_cast(o, size_type());
 
             result=plus_exprt(result, o);
           }
@@ -653,8 +652,7 @@ void c_typecheck_baset::typecheck_expr_builtin_offsetof(exprt &expr)
                     throw 0;
                   }
 
-                  if(o.type()!=size_type())
-                    o.make_typecast(size_type());
+                  o = typecast_exprt::conditional_cast(o, size_type());
 
                   result=plus_exprt(result, o);
                 }
@@ -696,8 +694,9 @@ void c_typecheck_baset::typecheck_expr_builtin_offsetof(exprt &expr)
       typecheck_expr(index);
 
       exprt sub_size=size_of_expr(type.subtype(), *this);
-      if(index.type()!=size_type())
-        index.make_typecast(size_type());
+
+      index = typecast_exprt::conditional_cast(index, size_type());
+
       result=plus_exprt(result, mult_exprt(sub_size, index));
 
       typet tmp=type.subtype();
@@ -2973,8 +2972,7 @@ void c_typecheck_baset::typecheck_expr_binary_arithmetic(exprt &expr)
       is_number(o_type0.subtype()))
     {
       // Vector arithmetic has fairly strict typing rules, no promotion
-      if(o_type0!=o_type1)
-        op1.make_typecast(op0.type());
+      op1 = typecast_exprt::conditional_cast(op1, op0.type());
       expr.type()=op0.type();
       return;
     }
@@ -3406,8 +3404,7 @@ void c_typecheck_baset::typecheck_side_effect_assignment(
       if(gcc_vector_types_compatible(
            to_vector_type(o_type0), to_vector_type(o_type1)))
       {
-        if(o_type0!=o_type1)
-          op1.make_typecast(o_type0);
+        op1 = typecast_exprt::conditional_cast(op1, o_type0);
         return;
       }
     }
@@ -3427,8 +3424,7 @@ void c_typecheck_baset::typecheck_side_effect_assignment(
       if(gcc_vector_types_compatible(
            to_vector_type(o_type0), to_vector_type(o_type1)))
       {
-        if(o_type0!=o_type1)
-          op1.make_typecast(o_type0);
+        op1 = typecast_exprt::conditional_cast(op1, o_type0);
         return;
       }
     }

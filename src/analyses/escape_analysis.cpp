@@ -421,8 +421,9 @@ void escape_analysist::insert_cleanup(
       exprt arg=lhs;
       if(is_object)
         arg=address_of_exprt(arg);
-      if(arg.type()!=param_type)
-        arg.make_typecast(param_type);
+
+      arg = typecast_exprt::conditional_cast(arg, param_type);
+
       code.arguments().push_back(arg);
     }
 

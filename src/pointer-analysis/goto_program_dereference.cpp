@@ -180,17 +180,8 @@ void goto_program_dereferencet::dereference_rec(
     assert(expr.operands().size()==1);
 
     if(expr.op0().id()==ID_dereference)
-    {
-      assert(expr.op0().operands().size()==1);
-
-      exprt tmp;
-      tmp.swap(expr.op0().op0());
-
-      if(tmp.type()!=expr.type())
-        tmp.make_typecast(expr.type());
-
-      expr.swap(tmp);
-    }
+      expr = typecast_exprt::conditional_cast(
+        to_dereference_expr(expr.op0()).pointer(), expr.type());
   }
 
   Forall_operands(it, expr)

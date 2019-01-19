@@ -311,15 +311,14 @@ exprt size_of_expr(
       return nil_exprt();
 
     // get size
-    exprt size = array_type.size();
+    const auto size = array_type.size();
 
     if(size.is_nil())
       return nil_exprt();
 
-    if(size.type()!=sub.type())
-      size.make_typecast(sub.type());
+    const auto size_casted = typecast_exprt::conditional_cast(size, sub.type());
 
-    mult_exprt result(size, sub);
+    mult_exprt result(size_casted, sub);
     simplify(result, ns);
 
     return std::move(result);
@@ -342,15 +341,14 @@ exprt size_of_expr(
       return nil_exprt();
 
     // get size
-    exprt size=to_vector_type(type).size();
+    const auto size = to_vector_type(type).size();
 
     if(size.is_nil())
       return nil_exprt();
 
-    if(size.type()!=sub.type())
-      size.make_typecast(sub.type());
+    const auto size_casted = typecast_exprt::conditional_cast(size, sub.type());
 
-    mult_exprt result(size, sub);
+    mult_exprt result(size_casted, sub);
     simplify(result, ns);
 
     return std::move(result);
@@ -633,10 +631,7 @@ exprt build_sizeof_expr(
   if(remainder>0)
     result=plus_exprt(result, from_integer(remainder, t));
 
-  if(result.type()!=expr.type())
-    result.make_typecast(expr.type());
-
-  return result;
+  return typecast_exprt::conditional_cast(result, expr.type());
 }
 
 exprt get_subexpression_at_offset(

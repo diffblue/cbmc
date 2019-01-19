@@ -1293,18 +1293,19 @@ void goto_checkt::bounds_check(
     const exprt &pointer=
       to_dereference_expr(ode.root_object()).pointer();
 
-    if_exprt size(
+    const if_exprt size(
       dynamic_object(pointer),
       typecast_exprt(dynamic_size(ns), object_size(pointer).type()),
       object_size(pointer));
 
-    plus_exprt effective_offset(ode.offset(), pointer_offset(pointer));
+    const plus_exprt effective_offset(ode.offset(), pointer_offset(pointer));
 
     assert(effective_offset.op0().type()==effective_offset.op1().type());
-    if(effective_offset.type()!=size.type())
-      size.make_typecast(effective_offset.type());
 
-    binary_relation_exprt inequality(effective_offset, ID_lt, size);
+    const auto size_casted =
+      typecast_exprt::conditional_cast(size, effective_offset.type());
+
+    binary_relation_exprt inequality(effective_offset, ID_lt, size_casted);
 
     or_exprt precond(
       and_exprt(
@@ -1371,12 +1372,8 @@ void goto_checkt::bounds_check(
     binary_relation_exprt inequality(index, ID_lt, size);
 
     // typecast size
-    if(inequality.op1().type()!=inequality.op0().type())
-      inequality.op1().make_typecast(inequality.op0().type());
-
-    // typecast size
-    if(inequality.op1().type()!=inequality.op0().type())
-      inequality.op1().make_typecast(inequality.op0().type());
+    inequality.op1() = typecast_exprt::conditional_cast(
+      inequality.op1(), inequality.op0().type());
 
     add_guarded_claim(
       implies_exprt(type_matches_size, inequality),
@@ -1839,8 +1836,8 @@ void goto_checkt::goto_check(
           goto_programt::targett t=new_code.add_instruction(ASSIGN);
           exprt address_of_expr=address_of_exprt(variable);
           exprt lhs=ns.lookup(CPROVER_PREFIX "dead_object").symbol_expr();
-          if(!base_type_eq(lhs.type(), address_of_expr.type(), ns))
-            address_of_expr.make_typecast(lhs.type());
+          address_of_expr =
+            typecast_exprt::conditional_cast(address_of_expr, lhs.type());
           const if_exprt rhs(
             side_effect_expr_nondett(bool_typet(), i.source_location),
             address_of_expr,

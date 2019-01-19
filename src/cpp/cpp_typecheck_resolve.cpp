@@ -1725,9 +1725,7 @@ void cpp_typecheck_resolvet::guess_template_args(
           if(e.id()==ID_unassigned)
           {
             typet old_type=e.type();
-            e=desired_expr;
-            if(e.type()!=old_type)
-              e.make_typecast(old_type);
+            e = typecast_exprt::conditional_cast(desired_expr, old_type);
           }
         }
       }

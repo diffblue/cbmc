@@ -1386,9 +1386,7 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
       DATA_INVARIANT(
         arg0.id()==ID_constant,
         "ipush argument expected to be constant");
-      results[0]=arg0;
-      if(arg0.type()!=java_int_type())
-        results[0].make_typecast(java_int_type());
+      results[0] = typecast_exprt::conditional_cast(arg0, java_int_type());
     }
     else if(statement==patternt("if_?cmp??"))
     {
@@ -1598,9 +1596,7 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
     {
       PRECONDITION(op.size() == 1 && results.size() == 1);
       typet type=java_type_from_char(statement[2]);
-      results[0]=op[0];
-      if(results[0].type()!=type)
-        results[0].make_typecast(type);
+      results[0] = typecast_exprt::conditional_cast(op[0], type);
     }
     else if(statement=="new")
     {
@@ -2277,9 +2273,9 @@ codet &java_bytecode_convert_methodt::replace_call_to_cprover_assume(
   codet &c)
 {
   exprt operand = pop(1)[0];
+
   // we may need to adjust the type of the argument
-  if(operand.type() != bool_typet())
-    operand.make_typecast(bool_typet());
+  operand = typecast_exprt::conditional_cast(operand, bool_typet());
 
   c = code_assumet(operand);
   location.set_function(method_id);
@@ -2701,16 +2697,12 @@ exprt::operandst &java_bytecode_convert_methodt::convert_ushr(
   const std::size_t width = get_bytecode_type_width(type);
   typet target = unsignedbv_typet(width);
 
-  exprt lhs = op[0];
-  if(lhs.type() != target)
-    lhs.make_typecast(target);
-  exprt rhs = op[1];
-  if(rhs.type() != target)
-    rhs.make_typecast(target);
+  exprt lhs = typecast_exprt::conditional_cast(op[0], target);
+  exprt rhs = typecast_exprt::conditional_cast(op[1], target);
 
-  results[0] = lshr_exprt(lhs, rhs);
-  if(results[0].type() != op[0].type())
-    results[0].make_typecast(op[0].type());
+  results[0] =
+    typecast_exprt::conditional_cast(lshr_exprt(lhs, rhs), op[0].type());
+
   return results;
 }
 

@@ -91,8 +91,10 @@ bvt boolbvt::convert_byte_extract(const byte_extract_exprt &expr)
     object_descriptor_exprt o;
     o.build(expr.op(), ns);
     CHECK_RETURN(o.offset().id() != ID_unknown);
-    if(o.offset().type() != expr.offset().type())
-      o.offset().make_typecast(expr.offset().type());
+
+    o.offset() =
+      typecast_exprt::conditional_cast(o.offset(), expr.offset().type());
+
     byte_extract_exprt be(
       expr.id(),
       o.root_object(),
