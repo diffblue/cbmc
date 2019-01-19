@@ -525,10 +525,8 @@ optionalt<codet> java_bytecode_instrumentt::instrument_expr(const exprt &expr)
   {
     // Check pointer non-null before access:
     const dereference_exprt &dereference_expr = to_dereference_expr(expr);
-    codet null_dereference_check=
-      check_null_dereference(
-        dereference_expr.op0(),
-        dereference_expr.source_location());
+    codet null_dereference_check = check_null_dereference(
+      dereference_expr.pointer(), dereference_expr.source_location());
     result.add(std::move(null_dereference_check));
   }
 

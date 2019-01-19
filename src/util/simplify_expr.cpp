@@ -242,7 +242,7 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
       const auto &typecast=expr_checked_cast<typecast_exprt>(expr.op0());
       if(typecast.op().type()==expr_type)
       {
-        expr=typecast.op0();
+        expr = typecast.op();
         return false;
       }
     }

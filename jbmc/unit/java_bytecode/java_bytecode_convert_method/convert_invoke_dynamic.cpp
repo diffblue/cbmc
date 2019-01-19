@@ -53,8 +53,7 @@ void validate_lambda_assignment(
   const typecast_exprt &rhs_value =
     require_expr::require_typecast(lambda_assignment.rhs());
 
-  const symbol_exprt &rhs_symbol =
-    require_expr::require_symbol(rhs_value.op0());
+  const symbol_exprt &rhs_symbol = require_expr::require_symbol(rhs_value.op());
 
   const irep_idt &tmp_object_symbol = rhs_symbol.get_identifier();
 

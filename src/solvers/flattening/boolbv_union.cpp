@@ -46,7 +46,7 @@ bvt boolbvt::convert_union(const union_exprt &expr)
       "endianness should be set to either little endian or big endian");
 
     bv_endianness_mapt map_u(expr.type(), false, ns, boolbv_width);
-    bv_endianness_mapt map_op(expr.op0().type(), false, ns, boolbv_width);
+    bv_endianness_mapt map_op(expr.op().type(), false, ns, boolbv_width);
 
     for(std::size_t i=0; i<op_bv.size(); i++)
       bv[map_u.map_bit(i)]=op_bv[map_op.map_bit(i)];
