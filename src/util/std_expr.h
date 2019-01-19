@@ -4334,23 +4334,16 @@ inline void validate_expr(const ieee_float_notequal_exprt &value)
 /// \brief IEEE floating-point operations
 /// These have two data operands (op0 and op1) and one rounding mode (op2).
 /// The type of the result is that of the data operands.
-class ieee_float_op_exprt:public exprt
+class ieee_float_op_exprt : public ternary_exprt
 {
 public:
-  DEPRECATED("use ieee_float_op_exprt(lhs, id, rhs, rm) instead")
-  ieee_float_op_exprt()
-  {
-    operands().resize(3);
-  }
-
   ieee_float_op_exprt(
     const exprt &_lhs,
     const irep_idt &_id,
     const exprt &_rhs,
     const exprt &_rm)
-    : exprt(_id, _lhs.type())
+    : ternary_exprt(_id, _lhs, _rhs, _rm, _lhs.type())
   {
-    add_to_operands(_lhs, _rhs, _rm);
   }
 
   exprt &lhs()
