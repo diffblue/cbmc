@@ -99,6 +99,7 @@ public:
   exprt cond_expr;
 
   // for assert
+  irep_idt property_id;
   std::string comment;
 
   // the full, original lhs expression, after dereferencing

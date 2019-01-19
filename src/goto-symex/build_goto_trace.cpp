@@ -303,7 +303,11 @@ void build_goto_trace(
       goto_trace_step.thread_nr = SSA_step.source.thread_nr;
       goto_trace_step.pc = SSA_step.source.pc;
       goto_trace_step.function = SSA_step.source.function;
-      goto_trace_step.comment = SSA_step.comment;
+      if(SSA_step.is_assert())
+      {
+        goto_trace_step.comment = SSA_step.comment;
+        goto_trace_step.property_id = SSA_step.get_property_id();
+      }
       goto_trace_step.type = SSA_step.type;
       goto_trace_step.hidden = SSA_step.hidden;
       goto_trace_step.format_string = SSA_step.format_string;

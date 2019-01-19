@@ -45,24 +45,13 @@ void convert(
     case goto_trace_stept::typet::ASSERT:
       if(!step.cond_value)
       {
-        irep_idt property_id;
-
-        if(step.pc->is_assert())
-          property_id=source_location.get_property_id();
-        else if(step.pc->is_goto()) // unwinding, we suspect
-        {
-          property_id=
-            id2string(step.pc->source_location.get_function())+
-            ".unwind."+std::to_string(step.pc->loop_number);
-        }
-
         xmlt &xml_failure=dest.new_element("failure");
 
         xml_failure.set_attribute_bool("hidden", step.hidden);
         xml_failure.set_attribute("thread", std::to_string(step.thread_nr));
         xml_failure.set_attribute("step_nr", std::to_string(step.step_nr));
         xml_failure.set_attribute("reason", id2string(step.comment));
-        xml_failure.set_attribute("property", id2string(property_id));
+        xml_failure.set_attribute("property", id2string(step.property_id));
 
         if(xml_location.name!="")
           xml_failure.new_element().swap(xml_location);
