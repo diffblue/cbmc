@@ -55,31 +55,15 @@ void symex_slice_by_tracet::slice_by_trace(
     idx=next;
   }
 
-  exprt trace_condition;
-
-  if(trace_conditions.size()==1)
-  {
-    trace_condition=trace_conditions[0];
-  }
-  else
-  {
-    trace_condition=exprt(ID_and, typet(ID_bool));
-    trace_condition.operands().reserve(trace_conditions.size());
-    for(std::vector<exprt>::iterator i=trace_conditions.begin();
-        i!=trace_conditions.end(); i++)
-    {
-      trace_condition.move_to_operands(*i);
-    }
-  }
+  exprt trace_condition = conjunction(trace_conditions);
 
   simplify(trace_condition, ns);
 
   std::set<exprt> implications=implied_guards(trace_condition);
 
-  for(std::set<exprt>::iterator i=sliced_guards.begin(); i !=
-        sliced_guards.end(); i++)
+  for(const auto &guard : sliced_guards)
   {
-    exprt g_copy(*i);
+    exprt g_copy(guard);
 
     DATA_INVARIANT(
       g_copy.id() == ID_symbol || g_copy.id() == ID_not ||
@@ -300,27 +284,29 @@ void symex_slice_by_tracet::compute_ts_back(
           {
             std::list<exprt> eq_conds;
             std::list<exprt>::iterator pvi=i->io_args.begin();
-            for(std::vector<irep_idt>::iterator k=sigma_vals[j].begin();
-                 k!=sigma_vals[j].end(); k++)
+
+            for(const auto &sigma_val : sigma_vals[j])
             {
               exprt equal_cond=exprt(ID_equal, bool_typet());
               equal_cond.operands().reserve(2);
               equal_cond.copy_to_operands(*pvi);
               // Should eventually change to handle non-bv types!
-              exprt constant_value=
-                from_integer(unsafe_string2int(id2string(*k)), (*pvi).type());
+              exprt constant_value = from_integer(
+                unsafe_string2int(id2string(sigma_val)), (*pvi).type());
               equal_cond.move_to_operands(constant_value);
               eq_conds.push_back(equal_cond);
               pvi++;
             }
+
             exprt val_merge=exprt(ID_and, typet(ID_bool));
             val_merge.operands().reserve(eq_conds.size()+1);
             val_merge.copy_to_operands(merge[j+1]);
-            for(std::list<exprt>::iterator k=eq_conds.begin();
-                 k!= eq_conds.end(); k++)
+
+            for(const auto &eq_cond : eq_conds)
             {
-              val_merge.copy_to_operands(*k);
+              val_merge.copy_to_operands(eq_cond);
             }
+
             u_lhs.move_to_operands(val_merge);
           }
           else
@@ -384,23 +370,20 @@ void symex_slice_by_tracet::slice_SSA_steps(
   size_t location_SSA_steps=0;
   size_t trace_loc_sliced=0;
 
-  for(symex_target_equationt::SSA_stepst::iterator
-      it=equation.SSA_steps.begin();
-      it!=equation.SSA_steps.end();
-      it++)
+  for(auto &SSA_step : equation.SSA_steps)
   {
-    if(it->is_output())
+    if(SSA_step.is_output())
       trace_SSA_steps++;
-    if(it->is_location())
+    if(SSA_step.is_location())
       location_SSA_steps++;
     bool sliced_SSA_step=false;
-    exprt guard=it->guard;
+    exprt guard = SSA_step.guard;
 
     simplify(guard, ns);
 
     if(!guard.is_true())
       potential_SSA_steps++;
-    // it->output(ns,std::cout);
+    // SSA_step.output(ns,std::cout);
     // std::cout << "-----------------\n";
 
     if((guard.id()==ID_symbol) || (guard.id() == ID_not))
@@ -409,11 +392,11 @@ void symex_slice_by_tracet::slice_SSA_steps(
 
       if(implications.count(guard)!=0)
       {
-        it->cond_expr=true_exprt();
-        it->ssa_rhs=true_exprt();
-        it->guard=false_exprt();
+        SSA_step.cond_expr = true_exprt();
+        SSA_step.ssa_rhs = true_exprt();
+        SSA_step.guard = false_exprt();
         sliced_SSA_steps++;
-        if(it->is_output() || it->is_location())
+        if(SSA_step.is_output() || SSA_step.is_location())
           trace_loc_sliced++;
         sliced_SSA_step=true;
       }
@@ -427,11 +410,11 @@ void symex_slice_by_tracet::slice_SSA_steps(
 
         if(implications.count(neg_expr)!=0)
         {
-          it->cond_expr=true_exprt();
-          it->ssa_rhs=true_exprt();
-          it->guard=false_exprt();
+          SSA_step.cond_expr = true_exprt();
+          SSA_step.ssa_rhs = true_exprt();
+          SSA_step.guard = false_exprt();
           sliced_SSA_steps++;
-          if(it->is_output() || it->is_location())
+          if(SSA_step.is_output() || SSA_step.is_location())
             trace_loc_sliced++;
           sliced_SSA_step=true;
           break; // Sliced, so no need to consider the rest
@@ -443,21 +426,21 @@ void symex_slice_by_tracet::slice_SSA_steps(
       }
     }
 
-    if(!sliced_SSA_step && it->is_assignment())
+    if(!sliced_SSA_step && SSA_step.is_assignment())
     {
-      if(it->ssa_rhs.id()==ID_if)
+      if(SSA_step.ssa_rhs.id() == ID_if)
       {
         conds_seen++;
-        exprt cond_copy(to_if_expr(it->ssa_rhs).cond());
+        exprt cond_copy(to_if_expr(SSA_step.ssa_rhs).cond());
         simplify(cond_copy, ns);
 
         if(implications.count(cond_copy)!=0)
         {
           sliced_conds++;
-          exprt t_copy1(to_if_expr(it->ssa_rhs).true_case());
-          exprt t_copy2(to_if_expr(it->ssa_rhs).true_case());
-          it->ssa_rhs=t_copy1;
-          it->cond_expr.op1().swap(t_copy2);
+          exprt t_copy1(to_if_expr(SSA_step.ssa_rhs).true_case());
+          exprt t_copy2(to_if_expr(SSA_step.ssa_rhs).true_case());
+          SSA_step.ssa_rhs = t_copy1;
+          SSA_step.cond_expr.op1().swap(t_copy2);
         }
         else
         {
@@ -465,10 +448,10 @@ void symex_slice_by_tracet::slice_SSA_steps(
           if(implications.count(cond_copy)!=0)
           {
             sliced_conds++;
-            exprt f_copy1(to_if_expr(it->ssa_rhs).false_case());
-            exprt f_copy2(to_if_expr(it->ssa_rhs).false_case());
-            it->ssa_rhs=f_copy1;
-            it->cond_expr.op1().swap(f_copy2);
+            exprt f_copy1(to_if_expr(SSA_step.ssa_rhs).false_case());
+            exprt f_copy2(to_if_expr(SSA_step.ssa_rhs).false_case());
+            SSA_step.ssa_rhs = f_copy1;
+            SSA_step.cond_expr.op1().swap(f_copy2);
           }
         }
       }
@@ -565,15 +548,13 @@ std::set<exprt> symex_slice_by_tracet::implied_guards(exprt e)
   }
   else if(e.id()==ID_and)
   { // Descend into and
-    Forall_operands(it, e)
+    for(const auto &conjunct : e.operands())
     {
-      std::set<exprt> r=implied_guards(*it);
-      for(std::set<exprt>::iterator i=r.begin();
-          i!=r.end(); i++)
-      {
-        s.insert(*i);
-      }
+      const auto imps = implied_guards(conjunct);
+      for(const auto &guard : imps)
+        s.insert(guard);
     }
+
     return s;
   }
   else if(e.id()==ID_or)
@@ -611,11 +592,9 @@ bool symex_slice_by_tracet::implies_false(const exprt e)
 {
   std::set<exprt> imps=implied_guards(e);
 
-  for(std::set<exprt>::iterator
-      i=imps.begin();
-      i!=imps.end(); i++)
+  for(const auto &implied_guard : imps)
   {
-    exprt i_copy = boolean_negate(*i);
+    exprt i_copy = boolean_negate(implied_guard);
     simplify(i_copy, ns);
     if(imps.count(i_copy)!=0)
       return true;
