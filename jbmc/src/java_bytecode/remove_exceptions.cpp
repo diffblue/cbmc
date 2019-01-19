@@ -364,6 +364,7 @@ void remove_exceptionst::add_exception_dispatch_sequence(
         if(remove_added_instanceof)
         {
           remove_instanceof(
+            function_identifier,
             t_exc,
             goto_program,
             symbol_table,
