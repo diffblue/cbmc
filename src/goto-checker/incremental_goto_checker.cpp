@@ -19,3 +19,10 @@ incremental_goto_checkert::incremental_goto_checkert(
     log(ui_message_handler)
 {
 }
+
+incremental_goto_checkert::resultt::resultt(
+  progresst progress,
+  const std::vector<irep_idt> &updated_properties)
+  : progress(progress), updated_properties(updated_properties)
+{
+}
