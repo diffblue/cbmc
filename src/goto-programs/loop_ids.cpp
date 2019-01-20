@@ -25,7 +25,7 @@ void show_loop_ids(
 
 void show_loop_ids(
   ui_message_handlert::uit ui,
-  const irep_idt &function_identifier,
+  const irep_idt &function_id,
   const goto_programt &goto_program)
 {
   switch(ui)
@@ -36,8 +36,8 @@ void show_loop_ids(
       {
         if(it->is_backwards_goto())
         {
-          std::cout << "Loop "
-                    << goto_programt::loop_id(function_identifier, *it) << ":"
+          std::cout << "Loop " << goto_programt::loop_id(function_id, *it)
+                    << ":"
                     << "\n";
 
           std::cout << "  " << it->source_location << "\n";
@@ -52,8 +52,7 @@ void show_loop_ids(
       {
         if(it->is_backwards_goto())
         {
-          std::string id =
-            id2string(goto_programt::loop_id(function_identifier, *it));
+          std::string id = id2string(goto_programt::loop_id(function_id, *it));
 
           xmlt xml_loop("loop", {{"name", id}}, {});
           xml_loop.new_element("loop-id").data=id;
@@ -70,7 +69,7 @@ void show_loop_ids(
 
 void show_loop_ids_json(
   ui_message_handlert::uit ui,
-  const irep_idt &function_identifier,
+  const irep_idt &function_id,
   const goto_programt &goto_program,
   json_arrayt &loops)
 {
@@ -80,8 +79,7 @@ void show_loop_ids_json(
   {
     if(it->is_backwards_goto())
     {
-      std::string id =
-        id2string(goto_programt::loop_id(function_identifier, *it));
+      std::string id = id2string(goto_programt::loop_id(function_id, *it));
 
       loops.push_back(
         json_objectt({{"name", json_stringt(id)},

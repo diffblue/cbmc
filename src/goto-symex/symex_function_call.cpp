@@ -322,7 +322,7 @@ void goto_symext::symex_function_call_code(
   frame.loop_iterations[identifier].count++;
 
   state.source.is_set=true;
-  state.source.function = identifier;
+  state.source.function_id = identifier;
   symex_transition(state, goto_function.body.instructions.begin(), false);
 }
 
@@ -336,7 +336,7 @@ void goto_symext::pop_frame(statet &state)
 
     // restore program counter
     symex_transition(state, frame.calling_location.pc, false);
-    state.source.function = frame.calling_location.function;
+    state.source.function_id = frame.calling_location.function_id;
 
     // restore L1 renaming
     state.level1.restore_from(frame.old_level1);

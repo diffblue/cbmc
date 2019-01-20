@@ -292,9 +292,9 @@ state_location(const goto_trace_stept &state, const namespacet &ns)
   if(!source_location.get_file().empty())
     result += "file " + id2string(source_location.get_file());
 
-  if(!state.function.empty())
+  if(!state.function_id.empty())
   {
-    const symbolt &symbol = ns.lookup(state.function);
+    const symbolt &symbol = ns.lookup(state.function_id);
     if(!result.empty())
       result += ' ';
     result += "function " + id2string(symbol.display_name());
@@ -333,7 +333,7 @@ void show_state_header(
 
   if(options.show_code)
   {
-    out << as_string(ns, state.function, *state.pc) << '\n';
+    out << as_string(ns, state.function_id, *state.pc) << '\n';
     out << "----------------------------------------------------" << '\n';
   }
 }
@@ -387,7 +387,10 @@ void show_compact_goto_trace(
         out << "  " << messaget::red << step.comment << messaget::reset << '\n';
 
         if(step.pc->is_assert())
-          out << "  " << from_expr(ns, step.function, step.pc->guard) << '\n';
+        {
+          out << "  " << from_expr(ns, step.function_id, step.pc->guard)
+              << '\n';
+        }
 
         out << '\n';
       }
@@ -442,7 +445,7 @@ void show_compact_goto_trace(
       {
         auto arg_strings = make_range(step.function_arguments)
                              .map([&ns, &step](const exprt &arg) {
-                               return from_expr(ns, step.function, arg);
+                               return from_expr(ns, step.function_id, arg);
                              });
 
         out << '(';
@@ -507,7 +510,10 @@ void show_full_goto_trace(
         out << "  " << messaget::red << step.comment << messaget::reset << '\n';
 
         if(step.pc->is_assert())
-          out << "  " << from_expr(ns, step.function, step.pc->guard) << '\n';
+        {
+          out << "  " << from_expr(ns, step.function_id, step.pc->guard)
+              << '\n';
+        }
 
         out << '\n';
       }
@@ -522,7 +528,10 @@ void show_full_goto_trace(
           out << "  " << step.pc->source_location << '\n';
 
         if(step.pc->is_assume())
-          out << "  " << from_expr(ns, step.function, step.pc->guard) << '\n';
+        {
+          out << "  " << from_expr(ns, step.function_id, step.pc->guard)
+              << '\n';
+        }
 
         out << '\n';
       }
@@ -592,7 +601,7 @@ void show_full_goto_trace(
           if(l_it!=step.io_args.begin())
             out << ';';
 
-          out << ' ' << from_expr(ns, step.function, *l_it);
+          out << ' ' << from_expr(ns, step.function_id, *l_it);
 
           // the binary representation
           out << " (" << trace_numeric_value(*l_it, ns, options) << ')';
@@ -614,7 +623,7 @@ void show_full_goto_trace(
         if(l_it!=step.io_args.begin())
           out << ';';
 
-        out << ' ' << from_expr(ns, step.function, *l_it);
+        out << ' ' << from_expr(ns, step.function_id, *l_it);
 
         // the binary representation
         out << " (" << trace_numeric_value(*l_it, ns, options) << ')';
@@ -638,7 +647,7 @@ void show_full_goto_trace(
           else
             out << ", ";
 
-          out << from_expr(ns, step.function, arg);
+          out << from_expr(ns, step.function_id, arg);
         }
 
         out << ") (depth " << function_depth << ") ####\n";
@@ -649,7 +658,7 @@ void show_full_goto_trace(
       function_depth--;
       if(options.show_function_calls)
       {
-        out << "\n#### Function return from " << step.function << " (depth "
+        out << "\n#### Function return from " << step.function_id << " (depth "
             << function_depth << ") ####\n";
       }
       break;
@@ -732,7 +741,7 @@ static void show_goto_stack_trace(
         else
           out << ", ";
 
-        out << from_expr(ns, step.function, arg);
+        out << from_expr(ns, step.function_id, arg);
       }
 
       out << ')';

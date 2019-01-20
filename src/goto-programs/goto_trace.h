@@ -88,7 +88,7 @@ public:
 
   // The instruction that created this step
   // (function calls are in the caller, function returns are in the callee)
-  irep_idt function;
+  irep_idt function_id;
   goto_programt::const_targett pc;
 
   // this transition done by given thread number

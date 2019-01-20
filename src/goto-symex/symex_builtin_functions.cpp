@@ -56,7 +56,7 @@ void goto_symext::symex_allocate(
 
   exprt size=code.op0();
   typet object_type=nil_typet();
-  auto function_symbol = outer_symbol_table.lookup(state.source.function);
+  auto function_symbol = outer_symbol_table.lookup(state.source.function_id);
   INVARIANT(function_symbol, "function associated with allocation not found");
   const irep_idt &mode = function_symbol->mode;
 

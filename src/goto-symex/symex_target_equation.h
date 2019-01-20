@@ -78,7 +78,7 @@ public:
   /// \copydoc symex_targett::function_call()
   virtual void function_call(
     const exprt &guard,
-    const irep_idt &function_identifier,
+    const irep_idt &function_id,
     const std::vector<exprt> &ssa_function_arguments,
     const sourcet &source,
     bool hidden);

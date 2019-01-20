@@ -35,26 +35,26 @@ public:
   struct sourcet
   {
     unsigned thread_nr;
-    irep_idt function;
+    irep_idt function_id;
     // The program counter is an iterator which indicates where the execution
     // is in its program sequence
     goto_programt::const_targett pc;
     bool is_set;
 
-    sourcet() : thread_nr(0), function(irep_idt()), is_set(false)
+    sourcet() : thread_nr(0), function_id(irep_idt()), is_set(false)
     {
     }
 
-    sourcet(const irep_idt &_function, goto_programt::const_targett _pc)
-      : thread_nr(0), function(_function), pc(_pc), is_set(true)
+    sourcet(const irep_idt &_function_id, goto_programt::const_targett _pc)
+      : thread_nr(0), function_id(_function_id), pc(_pc), is_set(true)
     {
     }
 
     explicit sourcet(
-      const irep_idt &_function,
+      const irep_idt &_function_id,
       const goto_programt &_goto_program)
       : thread_nr(0),
-        function(_function),
+        function_id(_function_id),
         pc(_goto_program.instructions.begin()),
         is_set(true)
     {
@@ -144,14 +144,14 @@ public:
 
   /// Record a function call.
   /// \param guard: Precondition for calling a function
-  /// \param function_identifier: Name of the function
+  /// \param function_id: Name of the function
   /// \param ssa_function_arguments: Vector of arguments in SSA form
   /// \param source: To location in the input GOTO program of this
   /// \param hidden: Should this step be recorded as hidden?
   ///  function call
   virtual void function_call(
     const exprt &guard,
-    const irep_idt &function_identifier,
+    const irep_idt &function_id,
     const std::vector<exprt> &ssa_function_arguments,
     const sourcet &source,
     bool hidden) = 0;

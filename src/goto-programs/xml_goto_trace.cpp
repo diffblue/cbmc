@@ -127,7 +127,7 @@ void convert(
         for(const auto &arg : step.io_args)
         {
           xml_output.new_element("value").data =
-            from_expr(ns, step.function, arg);
+            from_expr(ns, step.function_id, arg);
           xml_output.new_element("value_expression").
             new_element(xml(arg, ns));
         }
@@ -146,7 +146,7 @@ void convert(
         for(const auto &arg : step.io_args)
         {
           xml_input.new_element("value").data =
-            from_expr(ns, step.function, arg);
+            from_expr(ns, step.function_id, arg);
           xml_input.new_element("value_expression").
             new_element(xml(arg, ns));
         }
@@ -186,11 +186,11 @@ void convert(
         xml_call_return.set_attribute("thread", std::to_string(step.thread_nr));
         xml_call_return.set_attribute("step_nr", std::to_string(step.step_nr));
 
-        const symbolt &symbol = ns.lookup(step.function);
+        const symbolt &symbol = ns.lookup(step.function_id);
         xmlt &xml_function=xml_call_return.new_element("function");
         xml_function.set_attribute(
           "display_name", id2string(symbol.display_name()));
-        xml_function.set_attribute("identifier", id2string(step.function));
+        xml_function.set_attribute("identifier", id2string(step.function_id));
         xml_function.new_element()=xml(symbol.location);
 
         if(xml_location.name!="")
