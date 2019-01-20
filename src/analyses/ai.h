@@ -45,14 +45,14 @@ public:
 
   /// Run abstract interpretation on a single function
   void operator()(
-    const irep_idt &function_identifier,
+    const irep_idt &function_id,
     const goto_programt &goto_program,
     const namespacet &ns)
   {
     goto_functionst goto_functions;
-    initialize(function_identifier, goto_program);
+    initialize(function_id, goto_program);
     entry_state(goto_program);
-    fixedpoint(function_identifier, goto_program, goto_functions, ns);
+    fixedpoint(function_id, goto_program, goto_functions, ns);
     finalize();
   }
 
@@ -79,14 +79,14 @@ public:
 
   /// Run abstract interpretation on a single function
   void operator()(
-    const irep_idt &function_identifier,
+    const irep_idt &function_id,
     const goto_functionst::goto_functiont &goto_function,
     const namespacet &ns)
   {
     goto_functionst goto_functions;
-    initialize(function_identifier, goto_function);
+    initialize(function_id, goto_function);
     entry_state(goto_function.body);
-    fixedpoint(function_identifier, goto_function.body, goto_functions, ns);
+    fixedpoint(function_id, goto_function.body, goto_functions, ns);
     finalize();
   }
 
@@ -126,13 +126,13 @@ public:
 
   /// Output the abstract states for a single function
   /// \param ns: The namespace
-  /// \param function_identifier: The identifier used to find a symbol to
+  /// \param function_id: The identifier used to find a symbol to
   ///   identify the \p goto_program's source language
   /// \param goto_program: The goto program
   /// \param out: The ostream to direct output to
   virtual void output(
     const namespacet &ns,
-    const irep_idt &function_identifier,
+    const irep_idt &function_id,
     const goto_programt &goto_program,
     std::ostream &out) const;
 
@@ -221,13 +221,12 @@ public:
 protected:
   /// Initialize all the abstract states for a single function. Override this to
   /// do custom per-domain initialization.
-  virtual void initialize(
-    const irep_idt &function_identifier,
-    const goto_programt &goto_program);
+  virtual void
+  initialize(const irep_idt &function_id, const goto_programt &goto_program);
 
   /// Initialize all the abstract states for a single function.
   virtual void initialize(
-    const irep_idt &function_identifier,
+    const irep_idt &function_id,
     const goto_functionst::goto_functiont &goto_function);
 
   /// Initialize all the abstract states for a whole program. Override this to
@@ -249,23 +248,23 @@ protected:
   /// Output the abstract states for a single function as JSON
   /// \param ns: The namespace
   /// \param goto_program: The goto program
-  /// \param function_identifier: The identifier used to find a symbol to
+  /// \param function_id: The identifier used to find a symbol to
   ///   identify the source language
   /// \return The JSON object
   virtual jsont output_json(
     const namespacet &ns,
-    const irep_idt &function_identifier,
+    const irep_idt &function_id,
     const goto_programt &goto_program) const;
 
   /// Output the abstract states for a single function as XML
   /// \param ns: The namespace
   /// \param goto_program: The goto program
-  /// \param function_identifier: The identifier used to find a symbol to
+  /// \param function_id: The identifier used to find a symbol to
   ///   identify the source language
   /// \return The XML object
   virtual xmlt output_xml(
     const namespacet &ns,
-    const irep_idt &function_identifier,
+    const irep_idt &function_id,
     const goto_programt &goto_program) const;
 
   /// The work queue, sorted by location number
@@ -285,7 +284,7 @@ protected:
   /// Run the fixedpoint algorithm until it reaches a fixed point
   /// \return True if we found something new
   bool fixedpoint(
-    const irep_idt &function_identifier,
+    const irep_idt &function_id,
     const goto_programt &goto_program,
     const goto_functionst &goto_functions,
     const namespacet &ns);
@@ -307,7 +306,7 @@ protected:
   /// or applications of the abstract transformer
   /// \return True if the state was changed
   bool visit(
-    const irep_idt &function_identifier,
+    const irep_idt &function_id,
     locationt l,
     working_sett &working_set,
     const goto_programt &goto_program,
@@ -316,7 +315,7 @@ protected:
 
   // function calls
   bool do_function_call_rec(
-    const irep_idt &calling_function_identifier,
+    const irep_idt &calling_function_id,
     locationt l_call,
     locationt l_return,
     const exprt &function,
@@ -325,7 +324,7 @@ protected:
     const namespacet &ns);
 
   bool do_function_call(
-    const irep_idt &calling_function_identifier,
+    const irep_idt &calling_function_id,
     locationt l_call,
     locationt l_return,
     const goto_functionst &goto_functions,
