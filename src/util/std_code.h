@@ -1557,7 +1557,7 @@ inline const code_expressiont &to_code_expression(const codet &code)
 /// subtypes are not subtypes of \ref codet, but they inherit directly from
 /// \ref exprt. They do have a `statement` like [codets](\ref codet), but their
 /// [id()](\ref irept::id) is `ID_side_effect`, not `ID_code`.
-class side_effect_exprt:public exprt
+class side_effect_exprt : public exprt
 {
 public:
   DEPRECATED("use side_effect_exprt(statement, type, loc) instead")
@@ -1567,8 +1567,8 @@ public:
   }
 
   DEPRECATED("use side_effect_exprt(statement, type, loc) instead")
-  side_effect_exprt(const irep_idt &statement, const typet &_type):
-    exprt(ID_side_effect, _type)
+  side_effect_exprt(const irep_idt &statement, const typet &_type)
+    : exprt(ID_side_effect, _type)
   {
     set_statement(statement);
   }
@@ -1580,6 +1580,19 @@ public:
     : exprt(ID_side_effect, _type)
   {
     set_statement(statement);
+    add_source_location() = loc;
+  }
+
+  /// constructor with operands
+  side_effect_exprt(
+    const irep_idt &statement,
+    operandst &&_operands,
+    const typet &_type,
+    const source_locationt &loc)
+    : exprt(ID_side_effect, _type)
+  {
+    set_statement(statement);
+    operands() = std::move(_operands);
     add_source_location() = loc;
   }
 
@@ -1735,9 +1748,12 @@ public:
     const exprt::operandst &_arguments,
     const typet &_type,
     const source_locationt &loc)
-    : side_effect_exprt(ID_function_call, _type, loc)
+    : side_effect_exprt(
+        ID_function_call,
+        {_function, exprt(ID_arguments)},
+        _type,
+        loc)
   {
-    add_to_operands(_function, exprt(ID_arguments));
     arguments() = _arguments;
   }
 

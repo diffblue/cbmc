@@ -6403,8 +6403,8 @@ bool Parser::rPostfixExpr(exprt &exp)
       lex.get_token(op);
 
       {
-        side_effect_exprt tmp(ID_postdecrement, typet(), source_locationt());
-        tmp.add_to_operands(std::move(exp));
+        side_effect_exprt tmp(
+          ID_postdecrement, {std::move(exp)}, typet(), source_locationt());
         set_location(tmp, op);
         exp.swap(tmp);
       }
