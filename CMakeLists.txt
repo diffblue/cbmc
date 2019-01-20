@@ -39,6 +39,44 @@ if(${enable_cbmc_tests})
     enable_testing()
 endif()
 
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR
+   "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang" OR
+   "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU"
+)
+    set(enable_coverage off CACHE BOOL "Build with coverage recording")
+    set(parallel_tests "1" CACHE STRING "Number of tests to run in parallel")
+    if(${enable_coverage})
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage -g")
+        set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --coverage -g")
+        if (NOT DEFINED CODE_COVERAGE_OUTPUT_DIR)
+            set(CODE_COVERAGE_OUTPUT_DIR ${CMAKE_BINARY_DIR}/html)
+            set(CODE_COVERAGE_INFO_FILE ${CODE_COVERAGE_OUTPUT_DIR}/coverage.info)
+        endif()
+        find_program(CODE_COVERAGE_LCOV lcov)
+        find_program(CODE_COVERAGE_GENHTML genhtml)
+        add_custom_target(coverage
+            COMMAND ${CMAKE_COMMAND} -E make_directory ${CODE_COVERAGE_OUTPUT_DIR}
+            COMMAND ctest -V -L CORE -j${parallel_tests}
+            COMMAND ${CODE_COVERAGE_LCOV} ${LCOV_FLAGS} --capture --directory ${CMAKE_BINARY_DIR} --output-file ${CODE_COVERAGE_INFO_FILE}
+            COMMAND ${CODE_COVERAGE_LCOV} ${LCOV_FLAGS} --remove ${CODE_COVERAGE_INFO_FILE} '/usr/*' --output-file ${CODE_COVERAGE_INFO_FILE}
+            COMMAND ${CODE_COVERAGE_GENHTML} ${CODE_COVERAGE_INFO_FILE} --output-directory ${CODE_COVERAGE_OUTPUT_DIR}
+            DEPENDS
+              java-models-library java-unit unit
+              "$<TARGET_FILE:cbmc>"
+              "$<TARGET_FILE:driver>"
+              "$<TARGET_FILE:goto-analyzer>"
+              "$<TARGET_FILE:goto-cc>"
+              "$<TARGET_FILE:goto-diff>"
+              "$<TARGET_FILE:goto-instrument>"
+              "$<TARGET_FILE:janalyzer>"
+              "$<TARGET_FILE:jbmc>"
+              "$<TARGET_FILE:jdiff>"
+              "$<TARGET_FILE:smt2_solver>"
+            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        )
+    endif()
+endif()
+
 add_subdirectory(src)
 add_subdirectory(regression)
 add_subdirectory(unit)

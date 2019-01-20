@@ -179,6 +179,23 @@ For more information on the structure of `unit/` and how to tag tests, see
 repository](https://github.com/diffblue/cbmc/blob/develop/CODING_STANDARD.md#unit-tests)
 
 
+\subsection compilation-and-development-subsection-coverage Test coverage
+
+On Unix-style systems you can automatically generate a code coverage report. To
+obtain an HTML report for the test and unit tests, first build the dedicated
+coverage configuration using CMake (setting `enable_coverage` and building the
+`coverage` target):
+
+    cmake -H. -Bcov-build -Denable_coverage=1 -Dparallel_tests=2
+    make -C cov-build coverage
+
+This configures a build environment in the `cov-build/` folder with coverage
+recording at runtime enabled. The actual build (using `make` in the above case)
+will run the test suite, running `parallel_tests`-many tests concurrently (in
+the above case: 2). The HTML report is generated using `lcov` and stored in
+`cov-build/html/`.
+
+
 \subsection compilation-and-development-subsection-sat-solver Using a different SAT solver
 
 By default, CBMC will assume MiniSat 2 as the SAT back-end. Several other
