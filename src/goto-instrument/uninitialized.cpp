@@ -223,7 +223,7 @@ void show_uninitialized(
       out << "////\n\n";
       uninitialized_analysist uninitialized_analysis;
       uninitialized_analysis(f_it->first, f_it->second.body, ns);
-      uninitialized_analysis.output(ns, f_it->second.body, out);
+      uninitialized_analysis.output(ns, f_it->first, f_it->second.body, out);
     }
   }
 }

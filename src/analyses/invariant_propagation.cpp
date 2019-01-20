@@ -202,9 +202,11 @@ bool invariant_propagationt::check_type(const typet &type) const
   return false;
 }
 
-void invariant_propagationt::initialize(const goto_programt &goto_program)
+void invariant_propagationt::initialize(
+  const irep_idt &function,
+  const goto_programt &goto_program)
 {
-  baset::initialize(goto_program);
+  baset::initialize(function, goto_program);
 
   forall_goto_program_instructions(it, goto_program)
   {
@@ -228,7 +230,7 @@ void invariant_propagationt::initialize(const goto_functionst &goto_functions)
   baset::initialize(goto_functions);
 
   forall_goto_functions(f_it, goto_functions)
-    initialize(f_it->second.body);
+    initialize(f_it->first, f_it->second.body);
 }
 
 void invariant_propagationt::simplify(goto_functionst &goto_functions)

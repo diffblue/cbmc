@@ -35,15 +35,15 @@ void ai_baset::output(
       out << "////\n";
       out << "\n";
 
-      output(ns, f_it->second.body, f_it->first, out);
+      output(ns, f_it->first, f_it->second.body, out);
     }
   }
 }
 
 void ai_baset::output(
   const namespacet &ns,
+  const irep_idt &function_id,
   const goto_programt &goto_program,
-  const irep_idt &identifier,
   std::ostream &out) const
 {
   forall_goto_program_instructions(i_it, goto_program)
@@ -54,7 +54,7 @@ void ai_baset::output(
     abstract_state_before(i_it)->output(out, *this, ns);
     out << "\n";
     #if 1
-    goto_program.output_instruction(ns, identifier, out, *i_it);
+    goto_program.output_instruction(ns, function_id, out, *i_it);
     out << "\n";
     #endif
   }
@@ -70,8 +70,8 @@ jsont ai_baset::output_json(
   {
     if(f_it->second.body_available())
     {
-      result[id2string(f_it->first)]=
-        output_json(ns, f_it->second.body, f_it->first);
+      result[id2string(f_it->first)] =
+        output_json(ns, f_it->first, f_it->second.body);
     }
     else
     {
@@ -82,16 +82,10 @@ jsont ai_baset::output_json(
   return std::move(result);
 }
 
-/// Output the domains for a single function as JSON
-/// \param ns: The namespace
-/// \param goto_program: The goto program
-/// \param identifier: The identifier used to find a symbol to identify the
-///   source language
-/// \return The JSON object
 jsont ai_baset::output_json(
   const namespacet &ns,
-  const goto_programt &goto_program,
-  const irep_idt &identifier) const
+  const irep_idt &function_id,
+  const goto_programt &goto_program) const
 {
   json_arrayt contents;
 
@@ -99,7 +93,7 @@ jsont ai_baset::output_json(
   {
     // Ideally we need output_instruction_json
     std::ostringstream out;
-    goto_program.output_instruction(ns, identifier, out, *i_it);
+    goto_program.output_instruction(ns, function_id, out, *i_it);
 
     json_objectt location(
       {{"locationNumber", json_numbert(std::to_string(i_it->location_number))},
@@ -129,7 +123,7 @@ xmlt ai_baset::output_xml(
 
     if(f_it->second.body_available())
     {
-      function.new_element(output_xml(ns, f_it->second.body, f_it->first));
+      function.new_element(output_xml(ns, f_it->first, f_it->second.body));
     }
 
     program.new_element(function);
@@ -138,16 +132,10 @@ xmlt ai_baset::output_xml(
   return program;
 }
 
-/// Output the domains for a single function as XML
-/// \param ns: The namespace
-/// \param goto_program: The goto program
-/// \param identifier: The identifier used to find a symbol to identify the
-///   source language
-/// \return The XML object
 xmlt ai_baset::output_xml(
   const namespacet &ns,
-  const goto_programt &goto_program,
-  const irep_idt &identifier) const
+  const irep_idt &function_id,
+  const goto_programt &goto_program) const
 {
   xmlt function_body;
 
@@ -161,7 +149,7 @@ xmlt ai_baset::output_xml(
 
     // Ideally we need output_instruction_xml
     std::ostringstream out;
-    goto_program.output_instruction(ns, identifier, out, *i_it);
+    goto_program.output_instruction(ns, function_id, out, *i_it);
     location.set_attribute("instruction", out.str());
 
     function_body.new_element(location);
@@ -187,12 +175,14 @@ void ai_baset::entry_state(const goto_programt &goto_program)
   get_state(goto_program.instructions.begin()).make_entry();
 }
 
-void ai_baset::initialize(const goto_functionst::goto_functiont &goto_function)
+void ai_baset::initialize(
+  const irep_idt &function_id,
+  const goto_functionst::goto_functiont &goto_function)
 {
-  initialize(goto_function.body);
+  initialize(function_id, goto_function.body);
 }
 
-void ai_baset::initialize(const goto_programt &goto_program)
+void ai_baset::initialize(const irep_idt &, const goto_programt &goto_program)
 {
   // we mark everything as unreachable as starting point
 
@@ -203,7 +193,7 @@ void ai_baset::initialize(const goto_programt &goto_program)
 void ai_baset::initialize(const goto_functionst &goto_functions)
 {
   forall_goto_functions(it, goto_functions)
-    initialize(it->second);
+    initialize(it->first, it->second);
 }
 
 void ai_baset::finalize()
@@ -224,7 +214,7 @@ ai_baset::locationt ai_baset::get_next(
 }
 
 bool ai_baset::fixedpoint(
-  const irep_idt &function_identifier,
+  const irep_idt &function_id,
   const goto_programt &goto_program,
   const goto_functionst &goto_functions,
   const namespacet &ns)
@@ -244,8 +234,7 @@ bool ai_baset::fixedpoint(
     locationt l=get_next(working_set);
 
     // goto_program is really only needed for iterator manipulation
-    if(visit(
-         function_identifier, l, working_set, goto_program, goto_functions, ns))
+    if(visit(function_id, l, working_set, goto_program, goto_functions, ns))
       new_data=true;
   }
 
@@ -253,7 +242,7 @@ bool ai_baset::fixedpoint(
 }
 
 bool ai_baset::visit(
-  const irep_idt &function_identifier,
+  const irep_idt &function_id,
   locationt l,
   working_sett &working_set,
   const goto_programt &goto_program,
@@ -284,7 +273,7 @@ bool ai_baset::visit(
         to_code_function_call(l->code);
 
       if(do_function_call_rec(
-           function_identifier,
+           function_id,
            l,
            to_l,
            code.function(),
@@ -298,8 +287,7 @@ bool ai_baset::visit(
       // initialize state, if necessary
       get_state(to_l);
 
-      new_values.transform(
-        function_identifier, l, function_identifier, to_l, *this, ns);
+      new_values.transform(function_id, l, function_id, to_l, *this, ns);
 
       if(merge(new_values, l, to_l))
         have_new_values=true;
@@ -316,7 +304,7 @@ bool ai_baset::visit(
 }
 
 bool ai_baset::do_function_call(
-  const irep_idt &calling_function_identifier,
+  const irep_idt &calling_function_id,
   locationt l_call,
   locationt l_return,
   const goto_functionst &goto_functions,
@@ -337,12 +325,7 @@ bool ai_baset::do_function_call(
     // If we don't have a body, we just do an edge call -> return
     std::unique_ptr<statet> tmp_state(make_temporary_state(get_state(l_call)));
     tmp_state->transform(
-      calling_function_identifier,
-      l_call,
-      calling_function_identifier,
-      l_return,
-      *this,
-      ns);
+      calling_function_id, l_call, calling_function_id, l_return, *this, ns);
 
     return merge(*tmp_state, l_call, l_return);
   }
@@ -360,7 +343,7 @@ bool ai_baset::do_function_call(
     // do the edge from the call site to the beginning of the function
     std::unique_ptr<statet> tmp_state(make_temporary_state(get_state(l_call)));
     tmp_state->transform(
-      calling_function_identifier, l_call, f_it->first, l_begin, *this, ns);
+      calling_function_id, l_call, f_it->first, l_begin, *this, ns);
 
     bool new_data=false;
 
@@ -388,7 +371,7 @@ bool ai_baset::do_function_call(
 
     std::unique_ptr<statet> tmp_state(make_temporary_state(end_state));
     tmp_state->transform(
-      f_it->first, l_end, calling_function_identifier, l_return, *this, ns);
+      f_it->first, l_end, calling_function_id, l_return, *this, ns);
 
     // Propagate those
     return merge(*tmp_state, l_end, l_return);
@@ -396,7 +379,7 @@ bool ai_baset::do_function_call(
 }
 
 bool ai_baset::do_function_call_rec(
-  const irep_idt &calling_function_identifier,
+  const irep_idt &calling_function_id,
   locationt l_call,
   locationt l_return,
   const exprt &function,
@@ -424,13 +407,7 @@ bool ai_baset::do_function_call_rec(
     "Function " + id2string(identifier) + "not in function map");
 
   new_data = do_function_call(
-    calling_function_identifier,
-    l_call,
-    l_return,
-    goto_functions,
-    it,
-    arguments,
-    ns);
+    calling_function_id, l_call, l_return, goto_functions, it, arguments, ns);
 
   return new_data;
 }
@@ -464,16 +441,16 @@ void ai_baset::concurrent_fixedpoint(
   struct wl_entryt
   {
     wl_entryt(
-      const irep_idt &_function_identifier,
+      const irep_idt &_function_id,
       const goto_programt &_goto_program,
       locationt _location)
-      : function_identifier(_function_identifier),
+      : function_id(_function_id),
         goto_program(&_goto_program),
         location(_location)
     {
     }
 
-    irep_idt function_identifier;
+    irep_idt function_id;
     const goto_programt *goto_program;
     locationt location;
   };
@@ -516,7 +493,7 @@ void ai_baset::concurrent_fixedpoint(
         goto_programt::const_targett l=get_next(working_set);
 
         visit(
-          wl_entry.function_identifier,
+          wl_entry.function_id,
           l,
           working_set,
           *(wl_entry.goto_program),
