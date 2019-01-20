@@ -165,6 +165,11 @@ public:
   {
   }
 
+  explicit json_arrayt(std::initializer_list<jsont> &&initializer_list)
+    : jsont(kindt::J_ARRAY, arrayt{initializer_list})
+  {
+  }
+
   void resize(std::size_t size)
   {
     array.resize(size);
