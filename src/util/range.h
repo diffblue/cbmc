@@ -351,6 +351,14 @@ public:
     return end_value;
   }
 
+  /// Constructs a collection containing the values, which this range iterates
+  /// over.
+  template <typename containert>
+  containert collect() const
+  {
+    return containert(begin(), end());
+  }
+
 private:
   iteratort begin_value;
   iteratort end_value;

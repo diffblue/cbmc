@@ -170,6 +170,21 @@ public:
   {
   }
 
+  template <typename begin_iteratort, typename end_iteratort>
+  json_arrayt(begin_iteratort &&begin_iterator, end_iteratort &&end_iterator)
+    : jsont(
+        kindt::J_ARRAY,
+        arrayt(
+          std::forward<begin_iteratort>(begin_iterator),
+          std::forward<end_iteratort>(end_iterator)))
+  {
+    static_assert(
+      std::is_same<
+        typename std::decay<begin_iteratort>::type,
+        typename std::decay<end_iteratort>::type>::value,
+      "The iterators must be of the same type.");
+  }
+
   void resize(std::size_t size)
   {
     array.resize(size);
@@ -292,6 +307,21 @@ public:
     std::initializer_list<typename objectt::value_type> &&initializer_list)
     : jsont(kindt::J_OBJECT, objectt{initializer_list})
   {
+  }
+
+  template <typename begin_iteratort, typename end_iteratort>
+  json_objectt(begin_iteratort &&begin_iterator, end_iteratort &&end_iterator)
+    : jsont(
+        kindt::J_OBJECT,
+        objectt(
+          std::forward<begin_iteratort>(begin_iterator),
+          std::forward<end_iteratort>(end_iterator)))
+  {
+    static_assert(
+      std::is_same<
+        typename std::decay<begin_iteratort>::type,
+        typename std::decay<end_iteratort>::type>::value,
+      "The iterators must be of the same type.");
   }
 
   jsont &operator[](const std::string &key)
