@@ -40,20 +40,27 @@ reachability_slicert::get_sources(
   std::vector<cfgt::node_indext> sources;
   for(const auto &e_it : cfg.entry_map)
   {
-    if(criterion(e_it.first) || is_threaded(e_it.first))
+    if(
+      criterion(cfg[e_it.second].function_id, e_it.first) ||
+      is_threaded(e_it.first))
       sources.push_back(e_it.second);
   }
 
   return sources;
 }
 
-static bool is_same_target(
+bool reachability_slicert::is_same_target(
   goto_programt::const_targett it1,
-  goto_programt::const_targett it2)
+  goto_programt::const_targett it2) const
 {
   // Avoid comparing iterators belonging to different functions, and therefore
   // different std::lists.
-  return it1->function == it2->function && it1 == it2;
+  cfgt::entry_mapt::const_iterator it1_entry = cfg.entry_map.find(it1);
+  cfgt::entry_mapt::const_iterator it2_entry = cfg.entry_map.find(it2);
+  return it1_entry != cfg.entry_map.end() && it2_entry != cfg.entry_map.end() &&
+         cfg[it1_entry->second].function_id ==
+           cfg[it2_entry->second].function_id &&
+         it1 == it2;
 }
 
 /// Perform backward depth-first search of the control-flow graph of the

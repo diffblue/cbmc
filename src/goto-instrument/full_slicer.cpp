@@ -38,8 +38,8 @@ void full_slicert::add_function_calls(
   queuet &queue,
   const goto_functionst &goto_functions)
 {
-  goto_functionst::function_mapt::const_iterator f_it=
-    goto_functions.function_map.find(node.PC->function);
+  goto_functionst::function_mapt::const_iterator f_it =
+    goto_functions.function_map.find(node.function_id);
   assert(f_it!=goto_functions.function_map.end());
 
   assert(!f_it->second.body.instructions.empty());
@@ -148,7 +148,7 @@ void full_slicert::add_jumps(
       continue;
     }
 
-    const irep_idt id=j.PC->function;
+    const irep_idt &id = j.function_id;
     const cfg_post_dominatorst &pd=post_dominators.at(id);
 
     cfg_post_dominatorst::cfgt::entry_mapt::const_iterator e=
@@ -182,7 +182,7 @@ void full_slicert::add_jumps(
 
         if(cfg[entry->second].node_required)
         {
-          const irep_idt id2=(*d_it)->function;
+          const irep_idt &id2 = cfg[entry->second].function_id;
           INVARIANT(id==id2,
                     "goto/jump expected to be within a single function");
 
@@ -288,6 +288,11 @@ void full_slicert::operator()(
 {
   // build the CFG data structure
   cfg(goto_functions);
+  forall_goto_functions(f_it, goto_functions)
+  {
+    forall_goto_program_instructions(i_it, f_it->second.body)
+      cfg[cfg.entry_map[i_it]].function_id = f_it->first;
+  }
 
   // fill queue with according to slicing criterion
   queuet queue;
@@ -301,7 +306,7 @@ void full_slicert::operator()(
       e_it!=cfg.entry_map.end();
       e_it++)
   {
-    if(criterion(e_it->first))
+    if(criterion(cfg[e_it->second].function_id, e_it->first))
       add_to_queue(queue, e_it->second, e_it->first);
     else if(implicit(e_it->first))
       add_to_queue(queue, e_it->second, e_it->first);

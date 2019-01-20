@@ -46,8 +46,8 @@ void aggressive_slicert::get_all_functions_containing_properties()
       for(const auto &ins : fct.second.body.instructions)
         if(ins.is_assert())
         {
-          if(functions_to_keep.insert(ins.function).second)
-            note_functions_to_keep(ins.function);
+          if(functions_to_keep.insert(fct.first).second)
+            note_functions_to_keep(fct.first);
         }
     }
   }
