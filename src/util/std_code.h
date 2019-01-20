@@ -1700,6 +1700,86 @@ inline const side_effect_expr_nondett &to_side_effect_expr_nondet(
   return static_cast<const side_effect_expr_nondett &>(side_effect_expr_nondet);
 }
 
+/// A \ref side_effect_exprt that performs an assignment
+class side_effect_expr_assignt : public side_effect_exprt
+{
+public:
+  /// construct an assignment side-effect, given lhs and rhs
+  /// The type is copied from lhs
+  side_effect_expr_assignt(
+    const exprt &_lhs,
+    const exprt &_rhs,
+    const source_locationt &loc)
+    : side_effect_exprt(ID_assign, {_lhs, _rhs}, _lhs.type(), loc)
+  {
+  }
+
+  /// construct an assignment side-effect, given lhs, rhs and the type
+  side_effect_expr_assignt(
+    const exprt &_lhs,
+    const exprt &_rhs,
+    const typet &_type,
+    const source_locationt &loc)
+    : side_effect_exprt(ID_assign, {_lhs, _rhs}, _type, loc)
+  {
+  }
+
+  /// construct an assignment side-effect, given lhs, rhs and the type
+  side_effect_expr_assignt(
+    exprt &&_lhs,
+    exprt &&_rhs,
+    typet &&_type,
+    const source_locationt &loc)
+    : side_effect_exprt(
+        ID_assign,
+        {std::move(_lhs), std::move(_rhs)},
+        std::move(_type),
+        loc)
+  {
+  }
+
+  exprt &lhs()
+  {
+    return op0();
+  }
+
+  const exprt &lhs() const
+  {
+    return op0();
+  }
+
+  exprt &rhs()
+  {
+    return op1();
+  }
+
+  const exprt &rhs() const
+  {
+    return op1();
+  }
+};
+
+template <>
+inline bool can_cast_expr<side_effect_expr_assignt>(const exprt &base)
+{
+  return detail::can_cast_side_effect_expr_impl(base, ID_assign);
+}
+
+inline side_effect_expr_assignt &to_side_effect_expr_assign(exprt &expr)
+{
+  auto &side_effect_expr_assign = to_side_effect_expr(expr);
+  PRECONDITION(side_effect_expr_assign.get_statement() == ID_assign);
+  return static_cast<side_effect_expr_assignt &>(side_effect_expr_assign);
+}
+
+inline const side_effect_expr_assignt &
+to_side_effect_expr_assign(const exprt &expr)
+{
+  const auto &side_effect_expr_assign = to_side_effect_expr(expr);
+  PRECONDITION(side_effect_expr_assign.get_statement() == ID_assign);
+  return static_cast<const side_effect_expr_assignt &>(side_effect_expr_assign);
+}
+
 /// A \ref side_effect_exprt representation of a function call side effect.
 class side_effect_expr_function_callt:public side_effect_exprt
 {
