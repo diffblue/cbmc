@@ -20,6 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/exception_utils.h>
 #include <util/exit_codes.h>
 #include <util/invariant.h>
+#include <util/make_unique.h>
 #include <util/unicode.h>
 #include <util/version.h>
 
@@ -38,6 +39,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-checker/multi_path_symex_checker.h>
 #include <goto-checker/multi_path_symex_only_checker.h>
 #include <goto-checker/properties.h>
+#include <goto-checker/stop_on_fail_verifier.h>
 
 #include <goto-programs/adjust_float_expressions.h>
 #include <goto-programs/initialize_goto_model.h>
@@ -568,7 +570,13 @@ int cbmc_parse_optionst::doit()
 
   if(!options.get_bool_option("paths") && !options.is_set("cover"))
   {
-    if(!options.get_bool_option("stop-on-fail"))
+    if(options.get_bool_option("stop-on-fail"))
+    {
+      verifier =
+        util_make_unique<stop_on_fail_verifiert<multi_path_symex_checkert>>(
+          options, ui_message_handler, goto_model);
+    }
+    else
     {
       verifier = util_make_unique<
         all_properties_verifier_with_trace_storaget<multi_path_symex_checkert>>(
