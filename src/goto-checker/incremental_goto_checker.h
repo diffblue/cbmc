@@ -64,9 +64,6 @@ public:
   /// failing properties any more.
   virtual resultt operator()(propertiest &properties) = 0;
 
-  /// Builds and returns the counterexample
-  virtual goto_tracet build_error_trace() const = 0;
-
 protected:
   incremental_goto_checkert(const optionst &, ui_message_handlert &);
 
