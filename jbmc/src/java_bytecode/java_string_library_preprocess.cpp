@@ -954,6 +954,7 @@ code_blockt java_string_library_preprocesst::make_float_to_string_code(
   // Getting the argument
   java_method_typet::parameterst params = type.parameters();
   PRECONDITION(params.size()==1);
+  PRECONDITION(!params[0].get_identifier().empty());
   const symbol_exprt arg(params[0].get_identifier(), params[0].type());
 
   // Holder for output code
@@ -1097,6 +1098,7 @@ code_blockt java_string_library_preprocesst::make_init_function_from_call(
 
   // The first parameter is the object to be initialized
   PRECONDITION(!params.empty());
+  PRECONDITION(!params[0].get_identifier().empty());
   const symbol_exprt arg_this(params[0].get_identifier(), params[0].type());
   if(is_constructor)
     params.erase(params.begin());
@@ -1137,6 +1139,7 @@ java_string_library_preprocesst::make_assign_and_return_function_from_call(
   // This is similar to assign functions except we return a pointer to `this`
   java_method_typet::parameterst params = type.parameters();
   PRECONDITION(!params.empty());
+  PRECONDITION(!params[0].get_identifier().empty());
   code_blockt code;
   code.add(
     make_assign_function_from_call(function_name, type, loc, symbol_table),
@@ -1507,6 +1510,8 @@ code_blockt java_string_library_preprocesst::make_object_get_class_code(
   symbol_table_baset &symbol_table)
 {
   java_method_typet::parameterst params = type.parameters();
+  PRECONDITION(!params.empty());
+  PRECONDITION(!params[0].get_identifier().empty());
   const symbol_exprt this_obj(params[0].get_identifier(), params[0].type());
 
   // Code to be returned
@@ -1668,6 +1673,7 @@ code_blockt java_string_library_preprocesst::make_copy_string_code(
 
   // Assign the argument to string_expr
   java_method_typet::parametert op = type.parameters()[0];
+  PRECONDITION(!op.get_identifier().empty());
   symbol_exprt arg0(op.get_identifier(), op.type());
   code_assign_java_string_to_string_expr(
     string_expr, arg0, loc, symbol_table, code);
@@ -1713,6 +1719,8 @@ code_blockt java_string_library_preprocesst::make_copy_constructor_code(
 
   // Assign argument to a string_expr
   java_method_typet::parameterst params = type.parameters();
+  PRECONDITION(!params[0].get_identifier().empty());
+  PRECONDITION(!params[1].get_identifier().empty());
   symbol_exprt arg1(params[1].get_identifier(), params[1].type());
   code_assign_java_string_to_string_expr(
     string_expr, arg1, loc, symbol_table, code);
@@ -1747,6 +1755,7 @@ code_returnt java_string_library_preprocesst::make_string_length_code(
   (void)function_id;
 
   java_method_typet::parameterst params = type.parameters();
+  PRECONDITION(!params[0].get_identifier().empty());
   symbol_exprt arg_this(params[0].get_identifier(), params[0].type());
   dereference_exprt deref =
     checked_dereference(arg_this, arg_this.type().subtype());
