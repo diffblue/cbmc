@@ -461,7 +461,7 @@ int jbmc_parse_optionst::doit()
       break;
     case ui_message_handlert::uit::JSON_UI:
     {
-      json_objectt json_options({{"options", options.to_json()}});
+      json_objectt json_options{{"options", options.to_json()}};
       debug() << json_options;
       break;
     }

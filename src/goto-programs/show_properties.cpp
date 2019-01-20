@@ -129,12 +129,12 @@ void convert_properties_json(
 
     irep_idt property_id=source_location.get_property_id();
 
-    json_objectt json_property(
-      {{"name", json_stringt(property_id)},
-       {"class", json_stringt(property_class)},
-       {"sourceLocation", json(source_location)},
-       {"description", json_stringt(description)},
-       {"expression", json_stringt(from_expr(ns, identifier, ins.guard))}});
+    json_objectt json_property{
+      {"name", json_stringt(property_id)},
+      {"class", json_stringt(property_class)},
+      {"sourceLocation", json(source_location)},
+      {"description", json_stringt(description)},
+      {"expression", json_stringt(from_expr(ns, identifier, ins.guard))}};
 
     if(!source_location.get_basic_block_covered_lines().empty())
       json_property["coveredLines"] =
@@ -155,7 +155,7 @@ void show_properties_json(
   for(const auto &fct : goto_functions.function_map)
     convert_properties_json(json_properties, ns, fct.first, fct.second.body);
 
-  json_objectt json_result({{"properties", json_properties}});
+  json_objectt json_result{{"properties", json_properties}};
   msg.result() << json_result;
 }
 
