@@ -29,7 +29,6 @@ typedef struct
   const jsont &location;
   const goto_trace_stept &step;
   const namespacet &ns;
-  const source_locationt &source_location;
 } conversion_dependenciest;
 
 /// Convert an ASSERT goto_trace step.
@@ -133,7 +132,7 @@ void convert(
 
     // NOLINTNEXTLINE(whitespace/braces)
     conversion_dependenciest conversion_dependencies = {
-      json_location, step, ns, source_location};
+      json_location, step, ns};
 
     switch(step.type)
     {

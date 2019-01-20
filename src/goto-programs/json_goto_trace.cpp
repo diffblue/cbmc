@@ -35,23 +35,13 @@ void convert_assert(
 {
   const goto_trace_stept &step = conversion_dependencies.step;
   const jsont &location = conversion_dependencies.location;
-  const source_locationt &source_location =
-    conversion_dependencies.source_location;
-
-  irep_idt property_id =
-    step.pc->is_assert()
-      ? source_location.get_property_id()
-      : step.pc->is_goto()
-          ? id2string(step.pc->source_location.get_function()) + ".unwind." +
-              std::to_string(step.pc->loop_number)
-          : "";
 
   json_failure["stepType"] = json_stringt("failure");
   json_failure["hidden"] = jsont::json_boolean(step.hidden);
   json_failure["internal"] = jsont::json_boolean(step.internal);
   json_failure["thread"] = json_numbert(std::to_string(step.thread_nr));
   json_failure["reason"] = json_stringt(step.comment);
-  json_failure["property"] = json_stringt(property_id);
+  json_failure["property"] = json_stringt(step.property_id);
 
   if(!location.is_null())
     json_failure["sourceLocation"] = location;
@@ -179,7 +169,6 @@ void convert_output(
   const goto_trace_stept &step = conversion_dependencies.step;
   const jsont &location = conversion_dependencies.location;
   const namespacet &ns = conversion_dependencies.ns;
-  const source_locationt &source_location = step.pc->source_location;
 
   json_output["stepType"] = json_stringt("output");
   json_output["hidden"] = jsont::json_boolean(step.hidden);
@@ -190,7 +179,7 @@ void convert_output(
   // Recovering the mode from the function
   irep_idt mode;
   const symbolt *function_name;
-  if(ns.lookup(source_location.get_function(), function_name))
+  if(ns.lookup(step.function, function_name))
     // Failed to find symbol
     mode = ID_unknown;
   else
@@ -222,7 +211,6 @@ void convert_input(
   const goto_trace_stept &step = conversion_dependencies.step;
   const jsont &location = conversion_dependencies.location;
   const namespacet &ns = conversion_dependencies.ns;
-  const source_locationt &source_location = step.pc->source_location;
 
   json_input["stepType"] = json_stringt("input");
   json_input["hidden"] = jsont::json_boolean(step.hidden);
@@ -233,7 +221,7 @@ void convert_input(
   // Recovering the mode from the function
   irep_idt mode;
   const symbolt *function_name;
-  if(ns.lookup(source_location.get_function(), function_name))
+  if(ns.lookup(step.function, function_name))
     // Failed to find symbol
     mode = ID_unknown;
   else

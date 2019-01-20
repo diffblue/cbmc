@@ -280,7 +280,8 @@ public:
     // NOLINTNEXTLINE(whitespace/line_length)
     bool is_atomic_end() const      { return type==goto_trace_stept::typet::ATOMIC_END; }
 
-    // return the property ID if this is an assertion step
+    /// Returns the property ID if this is a step resulting from an ASSERT, or
+    /// builds a unique name for an unwinding assertion.
     irep_idt get_property_id() const;
 
     // we may choose to hide
