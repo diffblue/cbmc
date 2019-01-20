@@ -447,6 +447,7 @@ void shared_bufferst::det_flush(
 
 /// instruments read
 void shared_bufferst::nondet_flush(
+  const irep_idt &function_id,
   goto_programt &goto_program,
   goto_programt::targett &target,
   const source_locationt &source_location,
@@ -463,8 +464,8 @@ void shared_bufferst::nondet_flush(
   const varst &vars=(*this)(object);
 
   // Non deterministic choice
-  irep_idt choice0=choice(target->function, "0");
-  irep_idt choice2=choice(target->function, "2"); // delays the write flush
+  irep_idt choice0 = choice(function_id, "0");
+  irep_idt choice2 = choice(function_id, "2"); // delays the write flush
 
   const symbol_exprt choice0_expr=symbol_exprt(choice0, bool_typet());
   const symbol_exprt delay_expr=symbol_exprt(choice2, bool_typet());
@@ -690,7 +691,7 @@ void shared_bufferst::nondet_flush(
     // a thread can read the other threads' buffers
 
     // One extra non-deterministic choice needed
-    irep_idt choice1=choice(target->function, "1");
+    irep_idt choice1 = choice(function_id, "1");
     const symbol_exprt choice1_expr=symbol_exprt(choice1, bool_typet());
 
     // throw Boolean dice
@@ -1056,19 +1057,19 @@ void shared_bufferst::affected_by_delay(
 /// instruments the program for the pairs detected through the CFG
 void shared_bufferst::cfg_visitort::weak_memory(
   value_setst &value_sets,
-  const irep_idt &function,
+  const irep_idt &function_id,
   memory_modelt model)
 {
-  shared_buffers.message.debug() << "visit function "<< function
-                                 << messaget::eom;
-  if(function == INITIALIZE_FUNCTION)
+  shared_buffers.message.debug()
+    << "visit function " << function_id << messaget::eom;
+  if(function_id == INITIALIZE_FUNCTION)
     return;
 
   namespacet ns(symbol_table);
-  goto_programt &goto_program=goto_functions.function_map[function].body;
+  goto_programt &goto_program = goto_functions.function_map[function_id].body;
 
 #ifdef LOCAL_MAY
-  local_may_aliast local_may(goto_functions.function_map[function]);
+  local_may_aliast local_may(goto_functions.function_map[function_id]);
 #endif
 
   Forall_goto_program_instructions(i_it, goto_program)
@@ -1127,9 +1128,13 @@ void shared_bufferst::cfg_visitort::weak_memory(
 
           if(shared_buffers.is_buffered(ns, e_it->second.symbol_expr, false))
             shared_buffers.nondet_flush(
-              goto_program, i_it, source_location, e_it->second.object,
+              function_id,
+              goto_program,
+              i_it,
+              source_location,
+              e_it->second.object,
               current_thread,
-              (model==TSO || model==PSO || model==RMO));
+              (model == TSO || model == PSO || model == RMO));
         }
 
         // Now perform the write(s).
@@ -1184,8 +1189,7 @@ void shared_bufferst::cfg_visitort::weak_memory(
                     vars.read_delayed, bool_typet());
 
                   // One extra non-deterministic choice needed
-                  irep_idt choice1=shared_buffers.choice(
-                    instruction.function, "1");
+                  irep_idt choice1 = shared_buffers.choice(function_id, "1");
                   const symbol_exprt choice1_expr=symbol_exprt(choice1,
                     bool_typet());
                   const exprt nondet_bool_expr =

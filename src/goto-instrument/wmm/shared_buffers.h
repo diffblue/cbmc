@@ -117,6 +117,7 @@ public:
     const unsigned current_thread);
 
   void nondet_flush(
+    const irep_idt &function_id,
     goto_programt &goto_program,
     goto_programt::targett &t,
     const source_locationt &source_location,
@@ -156,9 +157,9 @@ public:
     return true;
   }
 
-  irep_idt choice(const irep_idt &function, const std::string &suffix)
+  irep_idt choice(const irep_idt &function_id, const std::string &suffix)
   {
-    const auto maybe_symbol=symbol_table.lookup(function);
+    const auto maybe_symbol = symbol_table.lookup(function_id);
     const std::string function_base_name =
       maybe_symbol
         ? id2string(maybe_symbol->base_name)
@@ -213,10 +214,10 @@ public:
       max_thread = 0;
     }
 
-  void weak_memory(
-    value_setst &value_sets,
-    const irep_idt &function,
-    memory_modelt model);
+    void weak_memory(
+      value_setst &value_sets,
+      const irep_idt &function_id,
+      memory_modelt model);
   };
 
 protected:
