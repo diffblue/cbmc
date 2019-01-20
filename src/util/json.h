@@ -283,6 +283,12 @@ public:
   {
   }
 
+  explicit json_objectt(
+    std::initializer_list<typename objectt::value_type> &&initializer_list)
+    : jsont(kindt::J_OBJECT, objectt{initializer_list})
+  {
+  }
+
   jsont &operator[](const std::string &key)
   {
     return object[key];

@@ -47,3 +47,30 @@ SCENARIO(
     }
   }
 }
+
+SCENARIO(
+  "Test that json_objectt can be constructed from an initializer list.",
+  "[core][util][json]")
+{
+  GIVEN("A json_objectt constructed from an initializer list.")
+  {
+    const json_objectt object{
+      {"number", json_numbert{"6"}},
+      {"string", json_stringt{"eggs"}},
+      {"mice",
+       json_objectt{{"number", json_numbert{"3"}},
+                    {"string", json_stringt{"blind"}}}}};
+    THEN("The fields of the json_objectt match the initialiser list.")
+    {
+      REQUIRE(object["number"].kind == jsont::kindt::J_NUMBER);
+      REQUIRE(object["number"].value == "6");
+      REQUIRE(object["string"].kind == jsont::kindt::J_STRING);
+      REQUIRE(object["string"].value == "eggs");
+      const json_objectt mice = to_json_object(object["mice"]);
+      REQUIRE(mice["number"].kind == jsont::kindt::J_NUMBER);
+      REQUIRE(mice["number"].value == "3");
+      REQUIRE(mice["string"].kind == jsont::kindt::J_STRING);
+      REQUIRE(mice["string"].value == "blind");
+    }
+  }
+}
