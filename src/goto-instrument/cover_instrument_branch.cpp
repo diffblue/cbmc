@@ -13,6 +13,7 @@ Author: Daniel Kroening
 #include "cover_basic_blocks.h"
 
 void cover_branch_instrumentert::instrument(
+  const irep_idt &function_id,
   goto_programt &goto_program,
   goto_programt::targett &i_it,
   const cover_blocks_baset &basic_blocks) const
@@ -31,7 +32,7 @@ void cover_branch_instrumentert::instrument(
     goto_programt::targett t = goto_program.insert_before(i_it);
     t->make_assertion(false_exprt());
     t->source_location = source_location;
-    initialize_source_location(t, comment, i_it->function);
+    initialize_source_location(t, comment, function_id);
   }
 
   if(
@@ -44,18 +45,17 @@ void cover_branch_instrumentert::instrument(
     std::string false_comment = "block " + b + " branch false";
 
     exprt guard = i_it->guard;
-    const irep_idt function = i_it->function;
     source_locationt source_location = i_it->source_location;
 
     goto_program.insert_before_swap(i_it);
     i_it->make_assertion(not_exprt(guard));
     i_it->source_location = source_location;
-    initialize_source_location(i_it, true_comment, function);
+    initialize_source_location(i_it, true_comment, function_id);
 
     goto_program.insert_before_swap(i_it);
     i_it->make_assertion(guard);
     i_it->source_location = source_location;
-    initialize_source_location(i_it, false_comment, function);
+    initialize_source_location(i_it, false_comment, function_id);
 
     std::advance(i_it, 2);
   }

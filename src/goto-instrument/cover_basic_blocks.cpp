@@ -109,6 +109,7 @@ cover_basic_blockst::source_location_of(const std::size_t block_nr) const
 }
 
 void cover_basic_blockst::report_block_anomalies(
+  const irep_idt &function_id,
   const goto_programt &goto_program,
   message_handlert &message_handler)
 {
@@ -133,7 +134,7 @@ void cover_basic_blockst::report_block_anomalies(
       block_info.source_location.is_nil())
     {
       msg.warning() << "Ignoring block " << (block_nr + 1) << " location "
-                    << it->location_number << " " << it->function
+                    << it->location_number << " " << function_id
                     << " (missing source location)" << messaget::eom;
     }
     // The location numbers printed here are those

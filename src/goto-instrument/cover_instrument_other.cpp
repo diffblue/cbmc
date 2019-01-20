@@ -16,6 +16,7 @@ Author: Daniel Kroening
 #include "cover_util.h"
 
 void cover_path_instrumentert::instrument(
+  const irep_idt &,
   goto_programt &,
   goto_programt::targett &i_it,
   const cover_blocks_baset &) const
@@ -27,6 +28,7 @@ void cover_path_instrumentert::instrument(
 }
 
 void cover_assertion_instrumentert::instrument(
+  const irep_idt &function_id,
   goto_programt &,
   goto_programt::targett &i_it,
   const cover_blocks_baset &) const
@@ -36,11 +38,12 @@ void cover_assertion_instrumentert::instrument(
   {
     i_it->guard = false_exprt();
     initialize_source_location(
-      i_it, id2string(i_it->source_location.get_comment()), i_it->function);
+      i_it, id2string(i_it->source_location.get_comment()), function_id);
   }
 }
 
 void cover_cover_instrumentert::instrument(
+  const irep_idt &function_id,
   goto_programt &,
   goto_programt::targett &i_it,
   const cover_blocks_baset &) const
@@ -57,12 +60,11 @@ void cover_cover_instrumentert::instrument(
       code_function_call.arguments().size() == 1)
     {
       const exprt c = code_function_call.arguments()[0];
-      std::string comment =
-        "condition `" + from_expr(ns, i_it->function, c) + "'";
+      std::string comment = "condition `" + from_expr(ns, function_id, c) + "'";
       i_it->guard = not_exprt(c);
       i_it->type = ASSERT;
       i_it->code.clear();
-      initialize_source_location(i_it, comment, i_it->function);
+      initialize_source_location(i_it, comment, function_id);
     }
   }
   else if(is_non_cover_assertion(i_it))
@@ -70,7 +72,7 @@ void cover_cover_instrumentert::instrument(
 }
 
 void cover_instrument_end_of_function(
-  const irep_idt &function,
+  const irep_idt &function_id,
   goto_programt &goto_program)
 {
   auto if_it = goto_program.instructions.end();
@@ -83,6 +85,6 @@ void cover_instrument_end_of_function(
   if_it->make_assertion(false_exprt());
   if_it->source_location.set_comment(comment);
   if_it->source_location.set_property_class("reachability_constraint");
-  if_it->source_location.set_function(function);
-  if_it->function = function;
+  if_it->source_location.set_function(function_id);
+  if_it->function = function_id;
 }

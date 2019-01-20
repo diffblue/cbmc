@@ -15,6 +15,7 @@ Author: Daniel Kroening
 #include "cover_filter.h"
 
 void cover_location_instrumentert::instrument(
+  const irep_idt &function_id,
   goto_programt &goto_program,
   goto_programt::targett &i_it,
   const cover_blocks_baset &basic_blocks) const
@@ -28,18 +29,17 @@ void cover_location_instrumentert::instrument(
   if(representative_instruction && *representative_instruction == i_it)
   {
     const std::string b = std::to_string(block_nr + 1); // start with 1
-    const std::string id = id2string(i_it->function) + "#" + b;
+    const std::string id = id2string(function_id) + "#" + b;
     const auto source_location = basic_blocks.source_location_of(block_nr);
 
     // filter goals
     if(goal_filters(source_location))
     {
       const std::string comment = "block " + b;
-      const irep_idt function = i_it->function;
       goto_program.insert_before_swap(i_it);
       i_it->make_assertion(false_exprt());
       i_it->source_location = source_location;
-      initialize_source_location(i_it, comment, function);
+      initialize_source_location(i_it, comment, function_id);
       i_it++;
     }
   }
