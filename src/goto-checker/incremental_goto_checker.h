@@ -67,12 +67,6 @@ public:
   /// Builds and returns the counterexample
   virtual goto_tracet build_error_trace() const = 0;
 
-  // Outputs an error witness in GraphML format (see `graphml_witnesst`)
-  virtual void output_error_witness(const goto_tracet &) = 0;
-
-  // Outputs a proof in GraphML format (see `graphml_witnesst`)
-  virtual void output_proof() = 0;
-
 protected:
   incremental_goto_checkert(const optionst &, ui_message_handlert &);
 
