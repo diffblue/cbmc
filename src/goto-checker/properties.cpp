@@ -166,10 +166,14 @@ bool has_properties_to_check(const propertiest &properties)
 property_statust &operator|=(property_statust &a, property_statust const &b)
 {
   // non-monotonic use is likely a bug
+  // UNKNOWN is neutral element w.r.t. ERROR/PASS/NOT_REACHABLE/FAIL
+  // clang-format off
   PRECONDITION(
     a == property_statust::NOT_CHECKED ||
     (a == property_statust::UNKNOWN && b != property_statust::NOT_CHECKED) ||
+    b == property_statust::UNKNOWN ||
     a == b);
+  // clang-format on
   switch(a)
   {
   case property_statust::NOT_CHECKED:
