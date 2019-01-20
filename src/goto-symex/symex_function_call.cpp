@@ -139,7 +139,7 @@ void goto_symext::parameter_assignments(
       clean_expr(lhs, state, true);
       clean_expr(rhs, state, false);
 
-      guardt guard;
+      guardt guard{true_exprt{}};
       symex_assign_rec(state, lhs, nil_exprt(), rhs, guard, assignment_type);
     }
 

@@ -89,7 +89,7 @@ void goto_symext::symex_assign(
     if(state.source.pc->source_location.get_hide())
       assignment_type=symex_targett::assignment_typet::HIDDEN;
 
-    guardt guard; // NOT the state guard!
+    guardt guard{true_exprt{}}; // NOT the state guard!
     symex_assign_rec(state, lhs, nil_exprt(), rhs, guard, assignment_type);
   }
 }
@@ -431,7 +431,7 @@ void goto_symext::symex_assign_if(
     guard.add(renamed_guard);
     symex_assign_rec(
       state, lhs.true_case(), full_lhs, rhs, guard, assignment_type);
-    guard.swap(old_guard);
+    guard = std::move(old_guard);
   }
 
   if(!renamed_guard.is_true())
@@ -439,7 +439,7 @@ void goto_symext::symex_assign_if(
     guard.add(not_exprt(renamed_guard));
     symex_assign_rec(
       state, lhs.false_case(), full_lhs, rhs, guard, assignment_type);
-    guard.swap(old_guard);
+    guard = std::move(old_guard);
   }
 }
 

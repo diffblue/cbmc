@@ -79,7 +79,7 @@ void _rw_set_loct::compute()
 void _rw_set_loct::assign(const exprt &lhs, const exprt &rhs)
 {
   read(rhs);
-  read_write_rec(lhs, false, true, "", guardt());
+  read_write_rec(lhs, false, true, "", guardt(true_exprt()));
 }
 
 void _rw_set_loct::read_write_rec(

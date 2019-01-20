@@ -149,7 +149,7 @@ protected:
 
   void read(const exprt &expr)
   {
-    read_write_rec(expr, true, false, "", guardt());
+    read_write_rec(expr, true, false, "", guardt(true_exprt()));
   }
 
   void read(const exprt &expr, const guardt &guard)
@@ -159,7 +159,7 @@ protected:
 
   void write(const exprt &expr)
   {
-    read_write_rec(expr, false, true, "", guardt());
+    read_write_rec(expr, false, true, "", guardt(true_exprt()));
   }
 
   void compute();

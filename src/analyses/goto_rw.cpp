@@ -685,15 +685,15 @@ void rw_guarded_range_set_value_sett::get_objects_if(
   {
     get_objects_rec(get_modet::READ, if_expr.cond());
 
-    guardt guard_bak1(guard), guard_bak2(guard);
+    guardt copy = guard;
 
     guard.add(not_exprt(if_expr.cond()));
     get_objects_rec(mode, if_expr.false_case(), range_start, size);
-    guard.swap(guard_bak1);
+    guard = copy;
 
     guard.add(if_expr.cond());
     get_objects_rec(mode, if_expr.true_case(), range_start, size);
-    guard.swap(guard_bak2);
+    guard = std::move(copy);
   }
 }
 

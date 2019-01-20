@@ -1407,16 +1407,15 @@ void goto_checkt::add_guarded_claim(
     return;
 
   // add the guard
-  exprt guard_expr=guard.as_expr();
 
   exprt new_expr;
 
-  if(guard_expr.is_true())
+  if(guard.is_true())
     new_expr.swap(expr);
   else
   {
     new_expr=exprt(ID_implies, bool_typet());
-    new_expr.move_to_operands(guard_expr, expr);
+    new_expr.add_to_operands(guard.as_expr(), std::move(expr));
   }
 
   if(assertions.insert(new_expr).second)
@@ -1491,8 +1490,7 @@ void goto_checkt::check_rec(const exprt &expr, guardt &guard, bool address)
         guard.add(op);
     }
 
-    guard.swap(old_guard);
-
+    guard = std::move(old_guard);
     return;
   }
   else if(expr.id()==ID_if)
@@ -1514,14 +1512,14 @@ void goto_checkt::check_rec(const exprt &expr, guardt &guard, bool address)
       guardt old_guard=guard;
       guard.add(expr.op0());
       check_rec(expr.op1(), guard, false);
-      guard.swap(old_guard);
+      guard = std::move(old_guard);
     }
 
     {
       guardt old_guard=guard;
       guard.add(not_exprt(expr.op0()));
       check_rec(expr.op2(), guard, false);
-      guard.swap(old_guard);
+      guard = std::move(old_guard);
     }
 
     return;
@@ -1634,7 +1632,7 @@ void goto_checkt::check_rec(const exprt &expr, guardt &guard, bool address)
 
 void goto_checkt::check(const exprt &expr)
 {
-  guardt guard;
+  guardt guard{true_exprt{}};
   check_rec(expr, guard, false);
 }
 
@@ -1764,7 +1762,7 @@ void goto_checkt::goto_check(
             "pointer dereference",
             i.source_location,
             pointer,
-            guardt());
+            guardt(true_exprt()));
         }
       }
 
@@ -1802,7 +1800,7 @@ void goto_checkt::goto_check(
           "pointer dereference",
           i.source_location,
           pointer,
-          guardt());
+          guardt(true_exprt()));
       }
 
       // this has no successor
@@ -1883,7 +1881,7 @@ void goto_checkt::goto_check(
           "memory-leak",
           source_location,
           eq,
-          guardt());
+          guardt(true_exprt()));
       }
     }
 

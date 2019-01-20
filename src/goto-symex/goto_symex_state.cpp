@@ -384,12 +384,12 @@ bool goto_symex_statet::l2_thread_read_encoding(
   ssa_exprt ssa_l1=expr;
   ssa_l1.remove_level_2();
   const irep_idt &l1_identifier=ssa_l1.get_identifier();
+  const exprt guard_as_expr = guard.as_expr();
 
   // see whether we are within an atomic section
   if(atomic_section_id!=0)
   {
-    guardt write_guard;
-    write_guard.add(false_exprt());
+    guardt write_guard{false_exprt{}};
 
     const auto a_s_writes = written_in_atomic_section.find(ssa_l1);
     if(a_s_writes!=written_in_atomic_section.end())
@@ -413,8 +413,7 @@ bool goto_symex_statet::l2_thread_read_encoding(
     // we cannot determine for sure that there has been a write already
     // so generate a read even if l1_identifier has been written on
     // all branches flowing into this read
-    guardt read_guard;
-    read_guard.add(false_exprt());
+    guardt read_guard{false_exprt{}};
 
     a_s_r_entryt &a_s_read=read_in_atomic_section[ssa_l1];
     for(const auto &a_s_read_guard : a_s_read.second)
@@ -430,11 +429,11 @@ bool goto_symex_statet::l2_thread_read_encoding(
       read_guard |= a_s_read_guard;
     }
 
-    exprt cond=read_guard.as_expr();
+    guardt cond = read_guard;
     if(!no_write.op().is_false())
-      cond=or_exprt(no_write.op(), cond);
+      cond |= guardt{no_write.op()};
 
-    if_exprt tmp(cond, ssa_l1, ssa_l1);
+    if_exprt tmp(cond.as_expr(), ssa_l1, ssa_l1);
     set_l2_indices(to_ssa_expr(tmp.true_case()), ns);
 
     if(a_s_read.second.empty())
@@ -460,7 +459,7 @@ bool goto_symex_statet::l2_thread_read_encoding(
     record_events=record_events_bak;
 
     symex_target->assignment(
-      guard.as_expr(),
+      guard_as_expr,
       ssa_l1,
       ssa_l1,
       ssa_l1.get_original_expr(),
@@ -498,11 +497,7 @@ bool goto_symex_statet::l2_thread_read_encoding(
   // and record that
   INVARIANT_STRUCTURED(
     symex_target!=nullptr, nullptr_exceptiont, "symex_target is null");
-  symex_target->shared_read(
-    guard.as_expr(),
-    expr,
-    atomic_section_id,
-    source);
+  symex_target->shared_read(guard_as_expr, expr, atomic_section_id, source);
 
   return true;
 }
