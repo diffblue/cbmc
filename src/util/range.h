@@ -359,6 +359,12 @@ public:
     return containert(begin(), end());
   }
 
+  template <typename containert>
+  operator containert() const
+  {
+    return collect<containert>();
+  }
+
 private:
   iteratort begin_value;
   iteratort end_value;

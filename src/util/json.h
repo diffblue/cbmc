@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <string>
 
 #include "irep.h"
+#include "range.h"
 
 class json_objectt;
 class json_arrayt;
@@ -185,6 +186,12 @@ public:
       "The iterators must be of the same type.");
   }
 
+  template <typename iteratort>
+  explicit json_arrayt(ranget<iteratort> &&range)
+    : jsont(kindt::J_ARRAY, arrayt{range.begin(), range.end()})
+  {
+  }
+
   void resize(std::size_t size)
   {
     array.resize(size);
@@ -322,6 +329,12 @@ public:
         typename std::decay<begin_iteratort>::type,
         typename std::decay<end_iteratort>::type>::value,
       "The iterators must be of the same type.");
+  }
+
+  template <typename iteratort>
+  explicit json_objectt(ranget<iteratort> &&range)
+    : jsont(kindt::J_OBJECT, objectt{range.begin(), range.end()})
+  {
   }
 
   jsont &operator[](const std::string &key)
