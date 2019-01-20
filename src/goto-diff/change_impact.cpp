@@ -245,9 +245,10 @@ protected:
 
   goto_functions_change_impactt old_change_impact, new_change_impact;
 
-  void change_impact(const irep_idt &function);
+  void change_impact(const irep_idt &function_id);
 
   void change_impact(
+    const irep_idt &function_id,
     const goto_programt &old_goto_program,
     const goto_programt &new_goto_program,
     const unified_difft::goto_program_difft &diff,
@@ -255,23 +256,25 @@ protected:
     goto_program_change_impactt &new_impact);
 
   void propogate_dep_back(
+    const irep_idt &function_id,
     const dependence_grapht::nodet &d_node,
     const dependence_grapht &dep_graph,
     goto_functions_change_impactt &change_impact,
     bool del);
   void propogate_dep_forward(
+    const irep_idt &function_id,
     const dependence_grapht::nodet &d_node,
     const dependence_grapht &dep_graph,
     goto_functions_change_impactt &change_impact,
     bool del);
 
   void output_change_impact(
-    const irep_idt &function,
+    const irep_idt &function_id,
     const goto_program_change_impactt &c_i,
     const goto_functionst &goto_functions,
     const namespacet &ns) const;
   void output_change_impact(
-    const irep_idt &function,
+    const irep_idt &function_id,
     const goto_program_change_impactt &o_c_i,
     const goto_functionst &o_goto_functions,
     const namespacet &o_ns,
@@ -279,11 +282,12 @@ protected:
     const goto_functionst &n_goto_functions,
     const namespacet &n_ns) const;
 
-  void output_instruction(char prefix,
-      const goto_programt &goto_program,
-      const namespacet &ns,
-      const irep_idt &function,
-      goto_programt::const_targett &target) const;
+  void output_instruction(
+    char prefix,
+    const goto_programt &goto_program,
+    const namespacet &ns,
+    const irep_idt &function_id,
+    goto_programt::const_targett &target) const;
 };
 
 change_impactt::change_impactt(
@@ -312,17 +316,17 @@ change_impactt::change_impactt(
   new_dep_graph(new_goto_functions, ns_new);
 }
 
-void change_impactt::change_impact(const irep_idt &function)
+void change_impactt::change_impact(const irep_idt &function_id)
 {
-  unified_difft::goto_program_difft diff = unified_diff.get_diff(function);
+  unified_difft::goto_program_difft diff = unified_diff.get_diff(function_id);
 
   if(diff.empty())
     return;
 
-  goto_functionst::function_mapt::const_iterator old_fit=
-    old_goto_functions.function_map.find(function);
-  goto_functionst::function_mapt::const_iterator new_fit=
-    new_goto_functions.function_map.find(function);
+  goto_functionst::function_mapt::const_iterator old_fit =
+    old_goto_functions.function_map.find(function_id);
+  goto_functionst::function_mapt::const_iterator new_fit =
+    new_goto_functions.function_map.find(function_id);
 
   goto_programt empty;
 
@@ -336,14 +340,16 @@ void change_impactt::change_impact(const irep_idt &function)
     new_fit->second.body;
 
   change_impact(
+    function_id,
     old_goto_program,
     new_goto_program,
     diff,
-    old_change_impact[function],
-    new_change_impact[function]);
+    old_change_impact[function_id],
+    new_change_impact[function_id]);
 }
 
 void change_impactt::change_impact(
+  const irep_idt &function_id,
   const goto_programt &old_goto_program,
   const goto_programt &new_goto_program,
   const unified_difft::goto_program_difft &diff,
@@ -378,17 +384,11 @@ void change_impactt::change_impact(
           if(impact_mode==impact_modet::BACKWARD ||
              impact_mode==impact_modet::BOTH)
             propogate_dep_back(
-              d_node,
-              old_dep_graph,
-              old_change_impact,
-              true);
+              function_id, d_node, old_dep_graph, old_change_impact, true);
           if(impact_mode==impact_modet::FORWARD ||
              impact_mode==impact_modet::BOTH)
             propogate_dep_forward(
-              d_node,
-              old_dep_graph,
-              old_change_impact,
-              true);
+              function_id, d_node, old_dep_graph, old_change_impact, true);
         }
         old_impact[o_it]|=DELETED;
         ++o_it;
@@ -402,18 +402,16 @@ void change_impactt::change_impact(
 
           if(impact_mode==impact_modet::BACKWARD ||
              impact_mode==impact_modet::BOTH)
+          {
             propogate_dep_back(
-              d_node,
-              new_dep_graph,
-              new_change_impact,
-              false);
+              function_id, d_node, new_dep_graph, new_change_impact, false);
+          }
           if(impact_mode==impact_modet::FORWARD ||
              impact_mode==impact_modet::BOTH)
+          {
             propogate_dep_forward(
-              d_node,
-              new_dep_graph,
-              new_change_impact,
-              false);
+              function_id, d_node, new_dep_graph, new_change_impact, false);
+          }
         }
         new_impact[n_it]|=NEW;
         ++n_it;
@@ -422,8 +420,8 @@ void change_impactt::change_impact(
   }
 }
 
-
 void change_impactt::propogate_dep_forward(
+  const irep_idt &function_id,
   const dependence_grapht::nodet &d_node,
   const dependence_grapht &dep_graph,
   goto_functions_change_impactt &change_impact,
@@ -437,20 +435,26 @@ void change_impactt::propogate_dep_forward(
     mod_flagt data_flag = del ? DEL_DATA_DEP : NEW_DATA_DEP;
     mod_flagt ctrl_flag = del ? DEL_CTRL_DEP : NEW_CTRL_DEP;
 
-    if((change_impact[src->function][src] &data_flag)
-        || (change_impact[src->function][src] &ctrl_flag))
+    if(
+      (change_impact[function_id][src] & data_flag) ||
+      (change_impact[function_id][src] & ctrl_flag))
       continue;
     if(it->second.get() == dep_edget::kindt::DATA
         || it->second.get() == dep_edget::kindt::BOTH)
-      change_impact[src->function][src] |= data_flag;
+      change_impact[function_id][src] |= data_flag;
     else
-      change_impact[src->function][src] |= ctrl_flag;
-    propogate_dep_forward(dep_graph[dep_graph[src].get_node_id()], dep_graph,
-        change_impact, del);
+      change_impact[function_id][src] |= ctrl_flag;
+    propogate_dep_forward(
+      function_id,
+      dep_graph[dep_graph[src].get_node_id()],
+      dep_graph,
+      change_impact,
+      del);
   }
 }
 
 void change_impactt::propogate_dep_back(
+  const irep_idt &function_id,
   const dependence_grapht::nodet &d_node,
   const dependence_grapht &dep_graph,
   goto_functions_change_impactt &change_impact,
@@ -464,19 +468,24 @@ void change_impactt::propogate_dep_back(
     mod_flagt data_flag = del ? DEL_DATA_DEP : NEW_DATA_DEP;
     mod_flagt ctrl_flag = del ? DEL_CTRL_DEP : NEW_CTRL_DEP;
 
-    if((change_impact[src->function][src] &data_flag)
-        || (change_impact[src->function][src] &ctrl_flag))
+    if(
+      (change_impact[function_id][src] & data_flag) ||
+      (change_impact[function_id][src] & ctrl_flag))
     {
       continue;
     }
     if(it->second.get() == dep_edget::kindt::DATA
         || it->second.get() == dep_edget::kindt::BOTH)
-      change_impact[src->function][src] |= data_flag;
+      change_impact[function_id][src] |= data_flag;
     else
-      change_impact[src->function][src] |= ctrl_flag;
+      change_impact[function_id][src] |= ctrl_flag;
 
-    propogate_dep_back(dep_graph[dep_graph[src].get_node_id()], dep_graph,
-        change_impact, del);
+    propogate_dep_back(
+      function_id,
+      dep_graph[dep_graph[src].get_node_id()],
+      dep_graph,
+      change_impact,
+      del);
   }
 }
 
@@ -551,18 +560,18 @@ void change_impactt::operator()()
 }
 
 void change_impactt::output_change_impact(
-  const irep_idt &function,
+  const irep_idt &function_id,
   const goto_program_change_impactt &c_i,
   const goto_functionst &goto_functions,
   const namespacet &ns) const
 {
-  goto_functionst::function_mapt::const_iterator f_it=
-    goto_functions.function_map.find(function);
+  goto_functionst::function_mapt::const_iterator f_it =
+    goto_functions.function_map.find(function_id);
   assert(f_it!=goto_functions.function_map.end());
   const goto_programt &goto_program=f_it->second.body;
 
   if(!compact_output)
-    std::cout << "/** " << function << " **/\n";
+    std::cout << "/** " << function_id << " **/\n";
 
   forall_goto_program_instructions(target, goto_program)
   {
@@ -591,12 +600,12 @@ void change_impactt::output_change_impact(
     else
       UNREACHABLE;
 
-    output_instruction(prefix, goto_program, ns, function, target);
+    output_instruction(prefix, goto_program, ns, function_id, target);
   }
 }
 
 void change_impactt::output_change_impact(
-  const irep_idt &function,
+  const irep_idt &function_id,
   const goto_program_change_impactt &o_c_i,
   const goto_functionst &o_goto_functions,
   const namespacet &o_ns,
@@ -604,18 +613,18 @@ void change_impactt::output_change_impact(
   const goto_functionst &n_goto_functions,
   const namespacet &n_ns) const
 {
-  goto_functionst::function_mapt::const_iterator o_f_it=
-    o_goto_functions.function_map.find(function);
+  goto_functionst::function_mapt::const_iterator o_f_it =
+    o_goto_functions.function_map.find(function_id);
   assert(o_f_it!=o_goto_functions.function_map.end());
   const goto_programt &old_goto_program=o_f_it->second.body;
 
-  goto_functionst::function_mapt::const_iterator f_it=
-    n_goto_functions.function_map.find(function);
+  goto_functionst::function_mapt::const_iterator f_it =
+    n_goto_functions.function_map.find(function_id);
   assert(f_it!=n_goto_functions.function_map.end());
   const goto_programt &goto_program=f_it->second.body;
 
   if(!compact_output)
-    std::cout << "/** " << function << " **/\n";
+    std::cout << "/** " << function_id << " **/\n";
 
   goto_programt::const_targett o_target=
     old_goto_program.instructions.begin();
@@ -629,7 +638,7 @@ void change_impactt::output_change_impact(
 
     if(old_mod_flags&DELETED)
     {
-      output_instruction('-', goto_program, o_ns, function, o_target);
+      output_instruction('-', goto_program, o_ns, function_id, o_target);
       ++o_target;
       --target;
       continue;
@@ -681,7 +690,7 @@ void change_impactt::output_change_impact(
     else
       UNREACHABLE;
 
-    output_instruction(prefix, goto_program, n_ns, function, target);
+    output_instruction(prefix, goto_program, n_ns, function_id, target);
   }
   for( ;
       o_target!=old_goto_program.instructions.end();
@@ -709,15 +718,16 @@ void change_impactt::output_change_impact(
     else
       UNREACHABLE;
 
-    output_instruction(prefix, goto_program, o_ns, function, o_target);
+    output_instruction(prefix, goto_program, o_ns, function_id, o_target);
   }
 }
 
-void change_impactt::output_instruction(char prefix,
-    const goto_programt &goto_program,
-    const namespacet &ns,
-    const irep_idt &function,
-    goto_programt::const_targett &target) const
+void change_impactt::output_instruction(
+  char prefix,
+  const goto_programt &goto_program,
+  const namespacet &ns,
+  const irep_idt &function_id,
+  goto_programt::const_targett &target) const
 {
   if(compact_output)
   {
@@ -732,7 +742,7 @@ void change_impactt::output_instruction(char prefix,
   else
   {
     std::cout << prefix;
-    goto_program.output_instruction(ns, function, std::cout, *target);
+    goto_program.output_instruction(ns, function_id, std::cout, *target);
   }
 }
 
