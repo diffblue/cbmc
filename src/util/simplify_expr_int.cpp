@@ -440,16 +440,19 @@ simplify_exprt::resultt<> simplify_exprt::simplify_plus(const plus_exprt &expr)
     {
       plus_exprt op0 = to_plus_expr(expr.op0());
 
-      if(op0.op1().id() == ID_plus)
-        to_plus_expr(op0.op1()).add_to_operands(expr.op1());
-      else
-        op0.op1()=plus_exprt(op0.op1(), expr.op1());
+      if(op0.op1().type() == expr.op1().type())
+      {
+        if(expr.op0().op1().id() == ID_plus)
+          op0.op1().add_to_operands(expr.op1());
+        else
+          op0.op1() = plus_exprt(op0.op1(), expr.op1());
 
-      auto result = op0;
+        auto result = to_plus_expr(op0);
 
-      result.op1() = simplify_plus(to_plus_expr(result.op1()));
+        result.op1() = simplify_plus(to_plus_expr(result.op1()));
 
-      return changed(simplify_plus(result));
+        return changed(simplify_plus(result));
+      }
     }
 
     // count the constants
