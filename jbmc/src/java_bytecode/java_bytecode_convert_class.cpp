@@ -879,9 +879,8 @@ void java_bytecode_convert_classt::add_array_types(symbol_tablet &symbol_table)
       // TODO use this instead of a loop.
     codet array_copy;
     array_copy.set_statement(ID_array_copy);
-    array_copy.move_to_operands(new_data);
-    array_copy.move_to_operands(old_data);
-    clone_body.move_to_operands(array_copy);
+    array_copy.add_to_operands(std::move(new_data), std::move(old_data));
+    clone_body.add_to_operands(std::move(array_copy));
     */
 
     // Begin for-loop to replace:

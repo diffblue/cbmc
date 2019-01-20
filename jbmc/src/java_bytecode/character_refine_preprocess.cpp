@@ -1191,9 +1191,8 @@ exprt character_refine_preprocesst::expr_of_to_chars(
   array_exprt case2(array_type);
   exprt low_surrogate=expr_of_low_surrogate(chr, char_type);
   case1.copy_to_operands(low_surrogate);
-  case2.move_to_operands(low_surrogate);
-  exprt high_surrogate=expr_of_high_surrogate(chr, char_type);
-  case2.move_to_operands(high_surrogate);
+  case2.add_to_operands(
+    std::move(low_surrogate), expr_of_high_surrogate(chr, char_type));
   return if_exprt(expr_of_is_bmp_code_point(chr, type), case1, case2);
 }
 

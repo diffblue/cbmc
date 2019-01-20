@@ -64,9 +64,7 @@ SCENARIO("dependence_graph", "[core][analyses][dependence_graph]")
 
     const code_typet void_function_type({}, empty_typet());
 
-    code_blockt a_body;
-    code_declt declare_x(x_symbol.symbol_expr());
-    a_body.move_to_operands(declare_x);
+    code_blockt a_body({code_declt(x_symbol.symbol_expr())});
 
     code_function_callt call(symbol_exprt("b", void_function_type));
     code_assignt assign_x(

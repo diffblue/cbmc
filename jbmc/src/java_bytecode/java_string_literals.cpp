@@ -173,8 +173,8 @@ symbol_exprt get_or_create_string_literal_symbol(
     // _return_value global for its side-effects.
     exprt init_comma_expr(ID_comma);
     init_comma_expr.type() = literal_init.type();
-    init_comma_expr.copy_to_operands(return_symbol.symbol_expr());
-    init_comma_expr.move_to_operands(literal_init);
+    init_comma_expr.add_to_operands(
+      return_symbol.symbol_expr(), std::move(literal_init));
     new_symbol.value = init_comma_expr;
   }
   else if(jls_struct.components().size()>=1 &&

@@ -289,7 +289,7 @@ exprt lower_byte_extract(const byte_extract_exprt &src, const namespacet &ns)
       tmp.type()=comp.type();
       tmp.offset()=new_offset;
 
-      s.move_to_operands(tmp);
+      s.add_to_operands(std::move(tmp));
     }
 
     if(!failed)

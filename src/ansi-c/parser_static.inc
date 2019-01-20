@@ -9,7 +9,7 @@
 #define YYSTYPE unsigned
 #define YYSTYPE_IS_TRIVIAL 1
 
-#define mto(x, y) stack(x).move_to_operands(stack(y))
+#define mto(x, y) stack(x).add_to_operands(std::move(stack(y)))
 #define mts(x, y) (to_type_with_subtypes(stack_type(x)).move_to_subtypes(stack_type(y)))
 #define binary(x, y, l, id, z) { init(x, id); \
   stack(x).add_source_location()=stack(l).source_location(); \

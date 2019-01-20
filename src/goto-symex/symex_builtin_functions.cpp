@@ -434,8 +434,8 @@ void goto_symext::symex_cpp_new(
 
   if(do_array)
   {
-    index_exprt index_expr(symbol.symbol_expr(), from_integer(0, index_type()));
-    rhs.move_to_operands(index_expr);
+    rhs.add_to_operands(
+      index_exprt(symbol.symbol_expr(), from_integer(0, index_type())));
   }
   else
     rhs.copy_to_operands(symbol.symbol_expr());
@@ -506,7 +506,7 @@ void goto_symext::symex_fkt(
     if(first)
       first=false;
     else
-      new_fc.move_to_operands(*it);
+      new_fc.add_to_operands(std::move(*it));
 
   new_fc.set(ID_identifier, fc.op0().get(ID_identifier));
 

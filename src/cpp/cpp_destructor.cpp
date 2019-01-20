@@ -68,7 +68,7 @@ optionalt<codet> cpp_typecheckt::cpp_destructor(
 
       auto i_code = cpp_destructor(source_location, index);
       if(i_code.has_value())
-        new_code.move_to_operands(i_code.value());
+        new_code.add_to_operands(std::move(i_code.value()));
     }
   }
   else

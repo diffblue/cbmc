@@ -196,8 +196,6 @@ void cpp_typecheckt::static_and_dynamic_initialization()
 
   dynamic_initializations.clear();
 
-  // block_sini.move_to_operands(block_dini);
-
   // Create the dynamic initialization procedure
   symbolt init_symbol;
 

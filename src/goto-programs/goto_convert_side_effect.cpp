@@ -206,10 +206,7 @@ void goto_convertt::remove_pre(
       UNREACHABLE;
     }
 
-    exprt constant=from_integer(1, constant_type);
-
-    rhs.copy_to_operands(expr.op0());
-    rhs.move_to_operands(constant);
+    rhs.add_to_operands(expr.op0(), from_integer(1, constant_type));
     rhs.type()=expr.op0().type();
   }
 
@@ -306,8 +303,7 @@ void goto_convertt::remove_post(
     else
       constant=from_integer(1, constant_type);
 
-    rhs.copy_to_operands(expr.op0());
-    rhs.move_to_operands(constant);
+    rhs.add_to_operands(expr.op0(), std::move(constant));
     rhs.type()=expr.op0().type();
   }
 
@@ -479,8 +475,7 @@ void goto_convertt::remove_malloc(
   }
   else
   {
-    call=codet(ID_expression);
-    call.move_to_operands(expr);
+    call = code_expressiont(std::move(expr));
   }
 
   convert(call, dest, mode);

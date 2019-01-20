@@ -179,12 +179,12 @@ parameters_opt: /* empty */
 parameters: TOK_IDENTIFIER
           {
             newstack($$).id(ID_parameters);
-            stack($$).move_to_operands(stack($1));
+            stack($$).add_to_operands(std::move(stack($1)));
           }
           | parameters ',' TOK_IDENTIFIER
           {
             $$=$1;
-            stack($$).move_to_operands(stack($3));
+            stack($$).add_to_operands(std::move(stack($3)));
           }
           ;
 
@@ -199,12 +199,12 @@ statements: statement
           {
             newstack($$).id(ID_code);
             to_code(stack($$)).set_statement(ID_block);
-            stack($$).move_to_operands(stack($1));
+            stack($$).add_to_operands(std::move(stack($1)));
           }
           | statements statement
           {
             $$=$1;
-            stack($$).move_to_operands(stack($2));
+            stack($$).add_to_operands(std::move(stack($2)));
           }
           ;
 
@@ -280,8 +280,7 @@ rhs: expression
    | TOK_HAS_FIELD '(' expression ',' expression ')'
    {
      exprt has_field("hasField");
-     has_field.move_to_operands(stack($3));
-     has_field.move_to_operands(stack($5));
+     has_field.add_to_operands(std::move(stack($3)), std::move(stack($5)));
 
      newstack($$).swap(has_field);
    }
@@ -293,24 +292,21 @@ rhs: expression
    | TOK_DELETE '(' expression ',' expression ')'
    {
      exprt d("delete");
-     d.move_to_operands(stack($3));
-     d.move_to_operands(stack($5));
+     d.add_to_operands(std::move(stack($3)), std::move(stack($5)));
 
      newstack($$).swap(d);
    }
    | TOK_PROTO_FIELD '(' expression ',' expression ')'
    {
      exprt proto_field("protoField");
-     proto_field.move_to_operands(stack($3));
-     proto_field.move_to_operands(stack($5));
+     proto_field.add_to_operands(std::move(stack($3)), std::move(stack($5)));
 
      newstack($$).swap(proto_field);
    }
    | TOK_PROTO_OBJ '(' expression ',' expression ')'
    {
      exprt proto_obj("protoObj");
-     proto_obj.move_to_operands(stack($3));
-     proto_obj.move_to_operands(stack($5));
+     proto_obj.add_to_operands(std::move(stack($3)), std::move(stack($5)));
 
      newstack($$).swap(proto_obj);
    }
@@ -336,12 +332,12 @@ expressions_opt: /* empty */
 expressions: expression
            {
              newstack($$).id(ID_expression_list);
-             stack($$).move_to_operands(stack($1));
+             stack($$).add_to_operands(std::move(stack($1)));
            }
            | expressions ',' expression
            {
              $$=$1;
-             stack($$).move_to_operands(stack($3));
+             stack($$).add_to_operands(std::move(stack($3)));
            }
            ;
 
@@ -349,8 +345,7 @@ expression: atom_expression
           | expression binary_op atom_expression
           {
             $$=$2;
-            stack($$).move_to_operands(stack($1));
-            stack($$).move_to_operands(stack($3));
+            stack($$).add_to_operands(std::move(stack($1)), std::move(stack($3)));
           }
           ;
 
@@ -358,7 +353,7 @@ atom_expression: literal
                | unary_op atom_expression
                {
                  $$=$1;
-                 stack($$).move_to_operands(stack($2));
+                 stack($$).add_to_operands(std::move(stack($2)));
                }
                | '(' expression ')'
                {
@@ -367,30 +362,31 @@ atom_expression: literal
                | TOK_REF '(' expression ',' expression ',' ref_type ')'
                {
                  exprt ref("ref");
-                 ref.move_to_operands(stack($3));
-                 ref.move_to_operands(stack($5));
-                 ref.move_to_operands(stack($7));
+                 ref.add_to_operands(
+                   std::move(stack($3)),
+                   std::move(stack($5)),
+                   std::move(stack($7)));
 
                  newstack($$).swap(ref);
                }
                | TOK_FIELD '(' expression ')'
                {
                  exprt field("field");
-                 field.move_to_operands(stack($3));
+                 field.add_to_operands(std::move(stack($3)));
 
                  newstack($$).swap(field);
                }
                | TOK_BASE '(' expression ')'
                {
                  exprt base(ID_base);
-                 base.move_to_operands(stack($3));
+                 base.add_to_operands(std::move(stack($3)));
 
                  newstack($$).swap(base);
                }
                | TOK_TYPEOF '(' expression ')'
                {
                  exprt typeof_expr(ID_typeof);
-                 typeof_expr.move_to_operands(stack($3));
+                 typeof_expr.add_to_operands(std::move(stack($3)));
 
                  newstack($$).swap(typeof_expr);
                }

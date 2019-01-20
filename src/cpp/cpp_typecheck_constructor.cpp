@@ -136,7 +136,7 @@ void cpp_typecheckt::default_ctor(
 
   ctor.type().id(ID_constructor);
   ctor.add(ID_storage_spec).id(ID_cpp_storage_spec);
-  ctor.move_to_operands(decl);
+  ctor.add_to_operands(std::move(decl));
   ctor.add_source_location()=source_location;
 }
 
@@ -178,7 +178,7 @@ void cpp_typecheckt::default_cpctor(
   sub.push_back(cppcomp.as_type());
   irept constnd(ID_const);
   sub.push_back(static_cast<const typet &>(constnd));
-  parameter_decl.move_to_operands(parameter_tor);
+  parameter_decl.add_to_operands(std::move(parameter_tor));
   parameter_decl.add_source_location()=source_location;
 
   // Add parameter to function type
@@ -271,7 +271,7 @@ void cpp_typecheckt::default_cpctor(
     if(mem_c.type().id() == ID_array)
       memberexpr.set(ID_C_array_ini, true);
 
-    mem_init.move_to_operands(memberexpr);
+    mem_init.add_to_operands(std::move(memberexpr));
     initializers.move_to_sub(mem_init);
   }
 }
@@ -568,12 +568,6 @@ void cpp_typecheckt::full_member_initialization(
 
     if(!vbases.empty())
     {
-      // TODO(tautschnig): this code doesn't seem to make much sense as the
-      // ifthenelse only gets to have two operands (instead of three)
-      codet cond(ID_ifthenelse);
-
-      cond.copy_to_operands(cpp_namet("@most_derived").as_expr());
-
       code_blockt block;
 
       while(!vbases.empty())
@@ -590,7 +584,9 @@ void cpp_typecheckt::full_member_initialization(
         }
         vbases.pop_front();
       }
-      cond.move_to_operands(block);
+
+      code_ifthenelset cond(
+        cpp_namet("@most_derived").as_expr(), std::move(block));
       final_initializers.move_to_sub(cond);
     }
 
@@ -671,18 +667,13 @@ void cpp_typecheckt::full_member_initialization(
 
       if(b.get_bool(ID_virtual))
       {
-        // TODO(tautschnig): this code doesn't seem to make much sense as the
-        // ifthenelse only gets to have two operands (instead of three)
-        codet cond(ID_ifthenelse);
+        codet tmp(ID_member_initializer);
+        tmp.swap(final_initializers.get_sub().back());
 
-        cond.copy_to_operands(cpp_namet("@most_derived").as_expr());
+        code_ifthenelset cond(
+          cpp_namet("@most_derived").as_expr(), std::move(tmp));
 
-        {
-          codet tmp(ID_member_initializer);
-          tmp.swap(final_initializers.get_sub().back());
-          cond.move_to_operands(tmp);
-          final_initializers.get_sub().back().swap(cond);
-        }
+        final_initializers.get_sub().back().swap(cond);
       }
     }
   }

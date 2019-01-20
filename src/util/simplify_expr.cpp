@@ -1515,7 +1515,7 @@ exprt simplify_exprt::bits2expr(
       exprt comp=bits2expr(comp_bits, component.type(), little_endian);
       if(comp.is_nil())
         return nil_exprt();
-      result.move_to_operands(comp);
+      result.add_to_operands(std::move(comp));
 
       m_offset_bits += *m_size;
     }
@@ -1549,7 +1549,7 @@ exprt simplify_exprt::bits2expr(
       exprt el = bits2expr(el_bits, array_type.subtype(), little_endian);
       if(el.is_nil())
         return nil_exprt();
-      result.move_to_operands(el);
+      result.add_to_operands(std::move(el));
     }
 
     return std::move(result);

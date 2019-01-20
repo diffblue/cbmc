@@ -668,14 +668,14 @@ void cpp_typecheckt::typecheck_compound_declarator(
         {
           expr_call.type()=to_code_type(component.type()).return_type();
           exprt already_typechecked(ID_already_typechecked);
-          already_typechecked.move_to_operands(expr_call);
+          already_typechecked.add_to_operands(std::move(expr_call));
 
           func_symb.value = code_returnt(already_typechecked).make_block();
         }
         else
         {
           exprt already_typechecked(ID_already_typechecked);
-          already_typechecked.move_to_operands(expr_call);
+          already_typechecked.add_to_operands(std::move(expr_call));
 
           func_symb.value = code_expressiont(already_typechecked).make_block();
         }
@@ -1103,12 +1103,12 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
   {
     // it's public!
     exprt cpp_public("cpp-public");
-    body.move_to_operands(cpp_public);
+    body.add_to_operands(std::move(cpp_public));
 
     // build declaration
     cpp_declarationt ctor;
     default_ctor(symbol.type.source_location(), symbol.base_name, ctor);
-    body.move_to_operands(ctor);
+    body.add_to_operands(std::move(ctor));
   }
 
   // Reset the access type

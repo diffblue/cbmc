@@ -418,7 +418,7 @@ void cpp_typecheckt::typecheck_decl(codet &code)
         "declarator type should match symbol type");
     }
 
-    new_code.move_to_operands(decl_statement);
+    new_code.add_to_operands(std::move(decl_statement));
 
     // is there a constructor to be called?
     if(symbol.value.is_not_nil())
@@ -439,7 +439,7 @@ void cpp_typecheckt::typecheck_decl(codet &code)
         symbol.location, object_expr, declarator.init_args().operands());
 
       if(constructor_call.has_value())
-        new_code.move_to_operands(constructor_call.value());
+        new_code.add_to_operands(std::move(constructor_call.value()));
     }
   }
 

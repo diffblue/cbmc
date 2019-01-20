@@ -225,7 +225,7 @@ goto_programt::const_targett goto_program2codet::convert_instruction(
           target->is_atomic_begin() ? CPROVER_PREFIX "atomic_begin"
                                     : CPROVER_PREFIX "atomic_end",
           void_t));
-        dest.move_to_operands(f);
+        dest.add_to_operands(std::move(f));
         return target;
       }
 
@@ -259,7 +259,7 @@ void goto_program2codet::convert_labels(
     code_labelt l(label.str(), code_blockt());
     l.add_source_location()=target->source_location;
     target_label=l.get_label();
-    latest_block->move_to_operands(l);
+    latest_block->add_to_operands(std::move(l));
     latest_block=&to_code_label(
         to_code(latest_block->operands().back())).code();
   }
@@ -281,7 +281,7 @@ void goto_program2codet::convert_labels(
 
     code_labelt l(*it, code_blockt());
     l.add_source_location()=target->source_location;
-    latest_block->move_to_operands(l);
+    latest_block->add_to_operands(std::move(l));
     latest_block=&to_code_label(
         to_code(latest_block->operands().back())).code();
   }
@@ -326,7 +326,7 @@ goto_programt::const_targett goto_program2codet::convert_assign_varargs(
     f.arguments().push_back(this_va_list_expr);
     f.arguments().back().type().id(ID_gcc_builtin_va_list);
 
-    dest.move_to_operands(f);
+    dest.add_to_operands(std::move(f));
   }
   else if(r.id()==ID_address_of)
   {
@@ -335,7 +335,7 @@ goto_programt::const_targett goto_program2codet::convert_assign_varargs(
     f.arguments().back().type().id(ID_gcc_builtin_va_list);
     f.arguments().push_back(to_address_of_expr(r).object());
 
-    dest.move_to_operands(f);
+    dest.add_to_operands(std::move(f));
   }
   else if(r.id()==ID_side_effect &&
           to_side_effect_expr(r).get_statement()==ID_gcc_builtin_va_arg_next)
@@ -365,7 +365,7 @@ goto_programt::const_targett goto_program2codet::convert_assign_varargs(
          type_of.arguments().push_back(f.lhs());
          f.arguments().push_back(type_of);
 
-         dest.move_to_operands(f);
+         dest.add_to_operands(std::move(f));
          return next;
        }
     }
@@ -384,7 +384,7 @@ goto_programt::const_targett goto_program2codet::convert_assign_varargs(
 
     code_expressiont void_f(typecast_exprt(f, empty_typet()));
 
-    dest.move_to_operands(void_f);
+    dest.add_to_operands(std::move(void_f));
   }
   else
   {
@@ -393,7 +393,7 @@ goto_programt::const_targett goto_program2codet::convert_assign_varargs(
     f.arguments().back().type().id(ID_gcc_builtin_va_list);
     f.arguments().push_back(r);
 
-    dest.move_to_operands(f);
+    dest.add_to_operands(std::move(f));
   }
 
   return target;
@@ -506,7 +506,7 @@ goto_programt::const_targett goto_program2codet::convert_decl(
     remove_const(symbol.type());
 
   if(move_to_dest)
-    dest.move_to_operands(d);
+    dest.add_to_operands(std::move(d));
   else
     toplevel_block.add(d);
 
@@ -536,7 +536,7 @@ goto_programt::const_targett goto_program2codet::convert_do_while(
 
   convert_labels(loop_end, d.body());
 
-  dest.move_to_operands(d);
+  dest.add_to_operands(std::move(d));
   return target;
 }
 
@@ -607,9 +607,7 @@ goto_programt::const_targett goto_program2codet::convert_goto_while(
   convert_labels(loop_end, w.body());
   if(loop_end->guard.is_false())
   {
-    code_breakt brk;
-
-    w.body().move_to_operands(brk);
+    w.body().add_to_operands(code_breakt());
   }
   else if(!loop_end->guard.is_true())
   {
@@ -618,7 +616,7 @@ goto_programt::const_targett goto_program2codet::convert_goto_while(
 
     copy_source_location(target, i);
 
-    w.body().move_to_operands(i);
+    w.body().add_to_operands(std::move(i));
   }
 
   if(w.body().has_operands() &&
@@ -658,7 +656,7 @@ goto_programt::const_targett goto_program2codet::convert_goto_while(
     }
   }
 
-  dest.move_to_operands(w);
+  dest.add_to_operands(std::move(w));
 
   return target;
 }
@@ -1034,7 +1032,7 @@ goto_programt::const_targett goto_program2codet::convert_goto_switch(
 
     csc.code().swap(c);
     targets_done[it->case_start]=s.body().operands().size();
-    s.body().move_to_operands(csc);
+    s.body().add_to_operands(std::move(csc));
   }
 
   loop_last_stack.pop_back();
@@ -1059,7 +1057,7 @@ goto_programt::const_targett goto_program2codet::convert_goto_switch(
       }
     }
 
-  dest.move_to_operands(s);
+  dest.add_to_operands(std::move(s));
   return max_target;
 }
 
@@ -1133,7 +1131,7 @@ goto_programt::const_targett goto_program2codet::convert_goto_if(
       target = convert_instruction(target, end_if, i.then_case());
   }
 
-  dest.move_to_operands(i);
+  dest.add_to_operands(std::move(i));
   return --target;
 }
 
@@ -1180,9 +1178,9 @@ goto_programt::const_targett goto_program2codet::convert_goto_break_continue(
     copy_source_location(target, i);
 
     if(i.cond().is_true())
-      dest.move_to_operands(i.then_case());
+      dest.add_to_operands(std::move(i.then_case()));
     else
-      dest.move_to_operands(i);
+      dest.add_to_operands(std::move(i));
 
     return target;
   }
@@ -1210,9 +1208,9 @@ goto_programt::const_targett goto_program2codet::convert_goto_break_continue(
     copy_source_location(target, i);
 
     if(i.cond().is_true())
-      dest.move_to_operands(i.then_case());
+      dest.add_to_operands(std::move(i.then_case()));
     else
-      dest.move_to_operands(i);
+      dest.add_to_operands(std::move(i));
 
     return target;
   }
@@ -1273,9 +1271,9 @@ goto_programt::const_targett goto_program2codet::convert_goto_goto(
   copy_source_location(target, i);
 
   if(i.cond().is_true())
-    dest.move_to_operands(i.then_case());
+    dest.add_to_operands(std::move(i.then_case()));
   else
-    dest.move_to_operands(i);
+    dest.add_to_operands(std::move(i));
 
   return target;
 }
@@ -1324,7 +1322,7 @@ goto_programt::const_targett goto_program2codet::convert_start_thread(
       }
 
     assert(b.get_statement()==ID_label);
-    dest.move_to_operands(b);
+    dest.add_to_operands(std::move(b));
     return this_end;
   }
 
@@ -1362,12 +1360,11 @@ goto_programt::const_targett goto_program2codet::convert_start_thread(
     system_headers.insert("pthread.h");
 
     const null_pointer_exprt n(pointer_type(empty_typet()));
-    code_function_callt f(
+    dest.add_to_operands(code_function_callt(
       cf.lhs(),
       symbol_exprt("pthread_create", code_typet({}, empty_typet())),
-      {n, n, cf.function(), cf.arguments().front()});
+      {n, n, cf.function(), cf.arguments().front()}));
 
-    dest.move_to_operands(f);
     return thread_end;
   }
 
@@ -1390,7 +1387,7 @@ goto_programt::const_targett goto_program2codet::convert_start_thread(
     }
 
   assert(b.get_statement()==ID_label);
-  dest.move_to_operands(b);
+  dest.add_to_operands(std::move(b));
   return thread_end;
 }
 

@@ -442,8 +442,7 @@ offsetof_member_designator:
         {
           $$=$1;
           set($2, ID_index);
-          exprt tmp=convert_integer_literal("0");
-          stack($2).move_to_operands(tmp);
+          stack($2).add_to_operands(convert_integer_literal("0"));
           mto($$, $2);
           set($2, ID_member);
           stack($2).set(ID_component_name, stack($3).get(ID_C_base_name));
@@ -574,7 +573,7 @@ postfix_expression:
           tmp.operands().swap(stack($5).operands());
           $$=$1;
           set($$, ID_typecast);
-          stack($$).move_to_operands(tmp);
+          stack($$).add_to_operands(std::move(tmp));
           stack($$).type().swap(stack($2));
         }
         | '(' type_name ')' '{' initializer_list ',' '}'
@@ -585,7 +584,7 @@ postfix_expression:
           tmp.operands().swap(stack($5).operands());
           $$=$1;
           set($$, ID_typecast);
-          stack($$).move_to_operands(tmp);
+          stack($$).add_to_operands(std::move(tmp));
           stack($$).type().swap(stack($2));
         }
         ;
@@ -2080,7 +2079,7 @@ initializer_list:
           exprt tmp;
           tmp.swap(stack($$));
           stack($$).clear();
-          stack($$).move_to_operands(tmp);
+          stack($$).add_to_operands(std::move(tmp));
         }
         | initializer_list ',' designated_initializer
         {
@@ -2123,7 +2122,7 @@ designated_initializer:
           exprt designator;
           exprt member(ID_member);
           member.set(ID_component_name, stack($1).get(ID_C_base_name));
-          designator.move_to_operands(member);
+          designator.add_to_operands(std::move(member));
           stack($$).add(ID_designator).swap(designator);
           mto($$, $3);
         }
@@ -2638,14 +2637,14 @@ gcc_asm_output:
         {
           $$=$2;
           stack($$).id(ID_gcc_asm_output);
-          stack($$).move_to_operands(stack($1), stack($3)); 
+          stack($$).add_to_operands(std::move(stack($1)), std::move(stack($3)));
         }
         | '[' identifier_or_typedef_name ']'
           string '(' comma_expression ')'
         {
           $$=$5;
           stack($$).id(ID_gcc_asm_output);
-          stack($$).move_to_operands(stack($4), stack($6)); 
+          stack($$).add_to_operands(std::move(stack($4)), std::move(stack($6)));
         }
         ;
 
@@ -2675,14 +2674,14 @@ gcc_asm_input:
         {
           $$=$2;
           stack($$).id(ID_gcc_asm_input);
-          stack($$).move_to_operands(stack($1), stack($3)); 
+          stack($$).add_to_operands(std::move(stack($1)), std::move(stack($3)));
         }
         | '[' identifier_or_typedef_name ']'
           string '(' comma_expression ')'
         {
           $$=$5;
           stack($$).id(ID_gcc_asm_input);
-          stack($$).move_to_operands(stack($4), stack($6)); 
+          stack($$).add_to_operands(std::move(stack($4)), std::move(stack($6)));
         }
         ;
 
