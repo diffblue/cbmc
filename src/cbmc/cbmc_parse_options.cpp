@@ -566,9 +566,23 @@ int cbmc_parse_optionst::doit()
     }
   }
 
+  if(
+    options.get_bool_option("dimacs") || !options.get_option("outfile").empty())
+  {
+    if(!options.get_bool_option("paths"))
+    {
+      stop_on_fail_verifiert<multi_path_symex_checkert> verifier(
+        options, ui_message_handler, goto_model);
+      (void)verifier();
+      return CPROVER_EXIT_SUCCESS;
+    }
+  }
+
   std::unique_ptr<goto_verifiert> verifier = nullptr;
 
-  if(!options.get_bool_option("paths") && !options.is_set("cover"))
+  if(
+    !options.get_bool_option("paths") && !options.is_set("cover") &&
+    !options.get_bool_option("dimacs") && options.get_option("outfile").empty())
   {
     if(options.get_bool_option("stop-on-fail"))
     {
