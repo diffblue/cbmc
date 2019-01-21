@@ -125,6 +125,8 @@ public:
 
     bool is_constant(const exprt &expr) const;
 
+    bool is_constant(const irep_idt &id) const;
+
     bool is_empty() const
     {
       return replace_const.empty();

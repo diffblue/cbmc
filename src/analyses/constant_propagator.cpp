@@ -415,34 +415,40 @@ bool constant_propagator_domaint::ai_simplify(
   return partial_evaluate(values, condition, ns);
 }
 
+class constant_propagator_is_constantt : public is_constantt
+{
+public:
+  explicit constant_propagator_is_constantt(
+    const replace_symbolt &replace_const)
+    : replace_const(replace_const)
+  {
+  }
+
+  bool is_constant(const irep_idt &id) const
+  {
+    return replace_const.replaces_symbol(id);
+  }
+
+protected:
+  bool is_constant(const exprt &expr) const override
+  {
+    if(expr.id() == ID_symbol)
+      return is_constant(to_symbol_expr(expr).get_identifier());
+
+    return is_constantt::is_constant(expr);
+  }
+
+  const replace_symbolt &replace_const;
+};
 
 bool constant_propagator_domaint::valuest::is_constant(const exprt &expr) const
 {
-  class constant_propagator_is_constantt : public is_constantt
-  {
-  public:
-    explicit constant_propagator_is_constantt(
-      const replace_symbolt &replace_const)
-      : replace_const(replace_const)
-    {
-    }
-
-  protected:
-    bool is_constant(const exprt &expr) const override
-    {
-      if(expr.id() == ID_symbol)
-      {
-        return replace_const.replaces_symbol(
-          to_symbol_expr(expr).get_identifier());
-      }
-
-      return is_constantt::is_constant(expr);
-    }
-
-    const replace_symbolt &replace_const;
-  };
-
   return constant_propagator_is_constantt(replace_const)(expr);
+}
+
+bool constant_propagator_domaint::valuest::is_constant(const irep_idt &id) const
+{
+  return constant_propagator_is_constantt(replace_const).is_constant(id);
 }
 
 /// Do not call this when iterating over replace_const.expr_map!
@@ -649,10 +655,9 @@ bool constant_propagator_domaint::partial_evaluate(
   // if the current rounding mode is top we can
   // still get a non-top result by trying all rounding
   // modes and checking if the results are all the same
-  if(!known_values.is_constant(symbol_exprt(ID_cprover_rounding_mode_str)))
-  {
+  if(!known_values.is_constant(ID_cprover_rounding_mode_str))
     return partial_evaluate_with_all_rounding_modes(known_values, expr, ns);
-  }
+
   return replace_constants_and_simplify(known_values, expr, ns);
 }
 
