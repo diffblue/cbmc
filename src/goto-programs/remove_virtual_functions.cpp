@@ -399,7 +399,7 @@ void remove_virtual_functionst::get_child_functions_rec(
       }
     }
     functions.push_back(function);
-    entry_map.insert({child, function});
+    entry_map.emplace(child, function);
 
     get_child_functions_rec(
       child,

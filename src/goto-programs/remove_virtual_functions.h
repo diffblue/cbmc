@@ -53,11 +53,33 @@ enum class virtual_dispatch_fallback_actiont
 
 class dispatch_table_entryt
 {
- public:
-  dispatch_table_entryt() = default;
+public:
   explicit dispatch_table_entryt(const irep_idt &_class_id)
-    : class_id(_class_id)
-  {}
+    : symbol_expr(), class_id(_class_id)
+  {
+  }
+
+#if defined(__GNUC__) && __GNUC__ < 7
+  // GCC up to version 6.5 warns about irept::data being used uninitialized upon
+  // the move triggered by std::sort; using operator= works around this
+  dispatch_table_entryt(dispatch_table_entryt &&other)
+  {
+    symbol_expr = other.symbol_expr;
+    class_id = other.class_id;
+  }
+
+  dispatch_table_entryt &operator=(const dispatch_table_entryt &other)
+  {
+    symbol_expr = other.symbol_expr;
+    class_id = other.class_id;
+    return *this;
+  }
+
+  dispatch_table_entryt(const dispatch_table_entryt &other)
+    : symbol_expr(other.symbol_expr), class_id(other.class_id)
+  {
+  }
+#endif
 
   optionalt<symbol_exprt> symbol_expr;
   irep_idt class_id;
