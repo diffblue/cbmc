@@ -49,7 +49,13 @@ operator()(propertiest &properties)
   if(!equation_generated)
   {
     perform_symex();
-    output_coverage_report();
+
+    output_coverage_report(
+      options.get_option("symex-coverage-report"),
+      goto_model,
+      symex,
+      ui_message_handler);
+
     // This might add new properties such as unwinding assertions, for instance.
     update_properties_status_from_symex_target_equation(
       properties, result.updated_properties, equation);

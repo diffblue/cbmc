@@ -35,7 +35,6 @@ protected:
   symex_bmct symex;
 
   void perform_symex();
-  void output_coverage_report();
 };
 
 #endif // CPROVER_GOTO_CHECKER_MULTI_PATH_SYMEX_ONLY_CHECKER_H

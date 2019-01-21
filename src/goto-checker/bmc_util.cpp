@@ -269,3 +269,19 @@ void update_status_of_not_checked_properties(
     }
   }
 }
+
+void output_coverage_report(
+  const std::string &cov_out,
+  const abstract_goto_modelt &goto_model,
+  const symex_bmct &symex,
+  ui_message_handlert &ui_message_handler)
+{
+  if(
+    !cov_out.empty() &&
+    symex.output_coverage_report(goto_model.get_goto_functions(), cov_out))
+  {
+    messaget log(ui_message_handler);
+    log.error() << "Failed to write symex coverage report to '" << cov_out
+                << "'" << messaget::eom;
+  }
+}

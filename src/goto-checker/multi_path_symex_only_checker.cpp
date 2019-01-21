@@ -41,7 +41,11 @@ operator()(propertiest &properties)
 {
   perform_symex();
 
-  output_coverage_report();
+  output_coverage_report(
+    options.get_option("symex-coverage-report"),
+    goto_model,
+    symex,
+    ui_message_handler);
 
   if(options.get_bool_option("show-vcc"))
   {
@@ -93,17 +97,5 @@ void multi_path_symex_only_checkert::perform_symex()
   if(options.get_bool_option("validate-ssa-equation"))
   {
     symex.validate(validation_modet::INVARIANT);
-  }
-}
-
-void multi_path_symex_only_checkert::output_coverage_report()
-{
-  std::string cov_out = options.get_option("symex-coverage-report");
-  if(
-    !cov_out.empty() &&
-    symex.output_coverage_report(goto_model.get_goto_functions(), cov_out))
-  {
-    log.error() << "Failed to write symex coverage report to '" << cov_out
-                << "'" << messaget::eom;
   }
 }
