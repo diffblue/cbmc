@@ -202,6 +202,12 @@ public:
 
   typedef std::vector<componentt> componentst;
 
+  struct_union_typet(const irep_idt &_id, componentst &&_components)
+    : typet(_id)
+  {
+    components() = std::move(_components);
+  }
+
   const componentst &components() const
   {
     return (const componentst &)(find(ID_components).get_sub());
@@ -289,6 +295,11 @@ class struct_typet:public struct_union_typet
 {
 public:
   struct_typet():struct_union_typet(ID_struct)
+  {
+  }
+
+  explicit struct_typet(componentst &&_components)
+    : struct_union_typet(ID_struct, std::move(_components))
   {
   }
 
@@ -438,6 +449,11 @@ class union_typet:public struct_union_typet
 {
 public:
   union_typet():struct_union_typet(ID_union)
+  {
+  }
+
+  explicit union_typet(componentst &&_components)
+    : struct_union_typet(ID_union, std::move(_components))
   {
   }
 };

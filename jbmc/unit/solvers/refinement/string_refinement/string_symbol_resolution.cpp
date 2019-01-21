@@ -36,9 +36,8 @@ SCENARIO("string_identifiers_resolution_from_equations",
     constant_exprt e("e", string_typet());
     constant_exprt f("f", string_typet());
 
-    struct_typet struct_type;
-    struct_type.components().emplace_back("str1", string_typet());
-    struct_type.components().emplace_back("str2", string_typet());
+    struct_typet struct_type(
+      {{"str1", string_typet()}, {"str2", string_typet()}});
     struct_exprt struct_expr({a, f}, struct_type);
     symbol_exprt symbol_struct("sym_struct", struct_type);
 

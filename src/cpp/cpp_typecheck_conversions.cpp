@@ -619,10 +619,10 @@ bool cpp_typecheckt::standard_conversion_pointer_to_member(
     return true;
   }
 
-  struct_typet from_struct = to_struct_type(
+  const struct_typet &from_struct = to_struct_type(
     follow(static_cast<const typet &>(expr.type().find(ID_to_member))));
 
-  struct_typet to_struct =
+  const struct_typet &to_struct =
     to_struct_type(follow(static_cast<const typet &>(type.find(ID_to_member))));
 
   if(subtype_typecast(to_struct, from_struct))
@@ -1891,8 +1891,8 @@ bool cpp_typecheckt::static_typecast(
       if(!qual_to.is_subset_of(qual_from))
         return false;
 
-      struct_typet from_struct=to_struct_type(from);
-      struct_typet subto_struct=to_struct_type(subto);
+      const struct_typet &from_struct = to_struct_type(from);
+      const struct_typet &subto_struct = to_struct_type(subto);
 
       if(subtype_typecast(subto_struct, from_struct))
       {
@@ -1975,8 +1975,8 @@ bool cpp_typecheckt::static_typecast(
             return false;
         }
 
-        struct_typet from_struct=to_struct_type(from);
-        struct_typet to_struct=to_struct_type(to);
+        const struct_typet &from_struct = to_struct_type(from);
+        const struct_typet &to_struct = to_struct_type(to);
         if(subtype_typecast(to_struct, from_struct))
         {
           make_ptr_typecast(e, type);
@@ -1994,10 +1994,10 @@ bool cpp_typecheckt::static_typecast(
       if(type.subtype()!=e.type().subtype())
         return false;
 
-      struct_typet from_struct = to_struct_type(
+      const struct_typet &from_struct = to_struct_type(
         follow(static_cast<const typet &>(e.type().find(ID_to_member))));
 
-      struct_typet to_struct = to_struct_type(
+      const struct_typet &to_struct = to_struct_type(
         follow(static_cast<const typet &>(type.find(ID_to_member))));
 
       if(subtype_typecast(from_struct, to_struct))
@@ -2014,7 +2014,7 @@ bool cpp_typecheckt::static_typecast(
       if(type.subtype() != e.type().subtype())
         return false;
 
-      struct_typet from_struct = to_struct_type(
+      const struct_typet &from_struct = to_struct_type(
         follow(static_cast<const typet &>(e.type().find(ID_to_member))));
 
       new_expr = e;

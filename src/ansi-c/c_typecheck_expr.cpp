@@ -1538,7 +1538,7 @@ void c_typecheck_baset::typecheck_expr_member(exprt &expr)
     expr.get(ID_component_name);
 
   // first try to find directly
-  struct_union_typet::componentt component=
+  const struct_union_typet::componentt &component =
     struct_union_type.get_component(component_name);
 
   // if that fails, search the anonymous members

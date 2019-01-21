@@ -79,9 +79,7 @@ TEST_CASE("Build subexpression to access element at offset into struct")
 
   const signedbv_typet t(32);
 
-  struct_typet st;
-  st.components().emplace_back("foo", t);
-  st.components().emplace_back("bar", t);
+  struct_typet st({{"foo", t}, {"bar", t}});
 
   symbol_exprt s("struct", st);
 

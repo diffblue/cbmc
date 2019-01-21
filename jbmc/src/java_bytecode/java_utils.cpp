@@ -239,11 +239,8 @@ void java_add_components_to_class(
   PRECONDITION(class_symbol.type.id()==ID_struct);
   struct_typet &struct_type=to_struct_type(class_symbol.type);
   struct_typet::componentst &components=struct_type.components();
-
-  for(const struct_union_typet::componentt &component : components_to_add)
-  {
-    components.push_back(component);
-  }
+  components.insert(
+    components.end(), components_to_add.begin(), components_to_add.end());
 }
 
 /// Declare a function with the given name and type.

@@ -1571,8 +1571,7 @@ std::string expr2ct::convert_member(
 
   if(component_name!="")
   {
-    const exprt comp_expr=
-      struct_union_type.get_component(component_name);
+    const exprt &comp_expr = struct_union_type.get_component(component_name);
 
     if(comp_expr.is_nil())
       return convert_norep(src, precedence);
@@ -1590,8 +1589,7 @@ std::string expr2ct::convert_member(
   if(n>=struct_union_type.components().size())
     return convert_norep(src, precedence);
 
-  const exprt comp_expr=
-    struct_union_type.components()[n];
+  const exprt &comp_expr = struct_union_type.components()[n];
 
   dest+=comp_expr.get_string(ID_pretty_name);
 

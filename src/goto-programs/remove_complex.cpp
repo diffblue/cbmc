@@ -257,15 +257,11 @@ static void remove_complex(typet &type)
 
     // Replace by a struct with two members.
     // The real part goes first.
-    struct_typet struct_type;
+    struct_typet struct_type(
+      {{ID_real, type.subtype()}, {ID_imag, type.subtype()}});
     struct_type.add_source_location()=type.source_location();
-    struct_type.components().resize(2);
-    struct_type.components()[0].type()=type.subtype();
-    struct_type.components()[0].set_name(ID_real);
-    struct_type.components()[1].type()=type.subtype();
-    struct_type.components()[1].set_name(ID_imag);
 
-    type=struct_type;
+    type = std::move(struct_type);
   }
 }
 
