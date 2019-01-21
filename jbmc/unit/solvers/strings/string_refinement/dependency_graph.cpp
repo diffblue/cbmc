@@ -64,19 +64,19 @@ SCENARIO("dependency_graph", "[core][solvers][refinement][string_refinement]")
 
     // fun1 is s3 = s1.concat(s2)
     const function_application_exprt fun1(
-      symbol_exprt(ID_cprover_string_concat_func),
+      symbol_exprt(ID_cprover_string_concat_func, fun_type),
       {string3.op0(), string3.op1(), string1, string2},
       fun_type);
 
     // fun2 is s5 = s3.concat(s4)
     const function_application_exprt fun2(
-      symbol_exprt(ID_cprover_string_concat_func),
+      symbol_exprt(ID_cprover_string_concat_func, fun_type),
       {string5.op0(), string5.op1(), string3, string4},
       fun_type);
 
     // fun3 is s6 = s5.concat(s2)
     const function_application_exprt fun3(
-      symbol_exprt(ID_cprover_string_concat_func),
+      symbol_exprt(ID_cprover_string_concat_func, fun_type),
       {string6.op0(), string6.op1(), string5, string2},
       fun_type);
 
