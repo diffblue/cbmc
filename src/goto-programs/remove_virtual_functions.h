@@ -15,6 +15,7 @@ Date: April 2016
 #ifndef CPROVER_GOTO_PROGRAMS_REMOVE_VIRTUAL_FUNCTIONS_H
 #define CPROVER_GOTO_PROGRAMS_REMOVE_VIRTUAL_FUNCTIONS_H
 
+#include <util/optional.h>
 #include <util/std_expr.h>
 
 #include "class_hierarchy.h"
@@ -54,11 +55,11 @@ class dispatch_table_entryt
 {
  public:
   dispatch_table_entryt() = default;
-  explicit dispatch_table_entryt(const irep_idt &_class_id) :
-    class_id(_class_id)
+  explicit dispatch_table_entryt(const irep_idt &_class_id)
+    : class_id(_class_id)
   {}
 
-  symbol_exprt symbol_expr;
+  optionalt<symbol_exprt> symbol_expr;
   irep_idt class_id;
 };
 
