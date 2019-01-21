@@ -19,7 +19,7 @@ Author: Nathan Phillips <Nathan.Phillips@diffblue.com>
 SCENARIO("expr_dynamic_cast",
   "[core][utils][expr_cast][expr_dynamic_cast]")
 {
-  symbol_exprt symbol_expr;
+  symbol_exprt symbol_expr("dummy", empty_typet());
 
   GIVEN("A const exprt reference to a symbolt")
   {

@@ -121,9 +121,7 @@ void uninitializedt::add_assertions(
         const irep_idt new_identifier=
           id2string(identifier)+"#initialized";
 
-        symbol_exprt symbol_expr;
-        symbol_expr.set_identifier(new_identifier);
-        symbol_expr.type()=bool_typet();
+        symbol_exprt symbol_expr(new_identifier, bool_typet());
         i1->type=DECL;
         i1->source_location=instruction.source_location;
         i1->code=code_declt(symbol_expr);

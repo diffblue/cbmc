@@ -500,9 +500,8 @@ exprt smt2_parsert::function_application()
           {
             const symbol_exprt symbol_expr(
               smt2_tokenizer.get_buffer(), bool_typet());
-            auto &named_term = named_terms[symbol_expr.get_identifier()];
-            named_term.term = term;
-            named_term.name = symbol_expr;
+            named_terms.emplace(
+              symbol_expr.get_identifier(), named_termt(term, symbol_expr));
           }
           else
             throw error("invalid name attribute, expected symbol");

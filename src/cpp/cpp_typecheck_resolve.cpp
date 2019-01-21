@@ -2132,7 +2132,7 @@ bool cpp_typecheck_resolvet::disambiguate_functions(
       {
         // it's a constructor
         const typet &object_type=parameter.type().subtype();
-        symbol_exprt object(object_type);
+        symbol_exprt object(irep_idt(), object_type);
         object.set(ID_C_lvalue, true);
 
         cpp_typecheck_fargst new_fargs(fargs);

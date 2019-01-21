@@ -1451,13 +1451,11 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
         throw 0;
       }
 
-      symbol_exprt result;
-      result.add_source_location()=source_location;
-      result.set_identifier(identifier);
       code_typet t(
         {code_typet::parametert(ptr_arg.type())}, ptr_arg.type().subtype());
       t.make_ellipsis();
-      result.type()=t;
+      symbol_exprt result(identifier, t);
+      result.add_source_location() = source_location;
       expr.swap(result);
       return;
     }
@@ -1484,14 +1482,12 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
         throw 0;
       }
 
-      symbol_exprt result;
-      result.add_source_location()=source_location;
-      result.set_identifier(identifier);
       const code_typet t(
         {code_typet::parametert(ptr_arg.type()),
          code_typet::parametert(signed_int_type())},
         ptr_arg.type().subtype());
-      result.type()=t;
+      symbol_exprt result(identifier, t);
+      result.add_source_location() = source_location;
       expr.swap(result);
       return;
     }
@@ -1518,15 +1514,13 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
         throw 0;
       }
 
-      symbol_exprt result;
-      result.add_source_location()=source_location;
-      result.set_identifier(identifier);
       const code_typet t(
         {code_typet::parametert(ptr_arg.type()),
          code_typet::parametert(ptr_arg.type().subtype()),
          code_typet::parametert(signed_int_type())},
         empty_typet());
-      result.type()=t;
+      symbol_exprt result(identifier, t);
+      result.add_source_location() = source_location;
       expr.swap(result);
       return;
     }
@@ -1553,15 +1547,13 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
         throw 0;
       }
 
-      symbol_exprt result;
-      result.add_source_location()=source_location;
-      result.set_identifier(identifier);
       const code_typet t(
         {code_typet::parametert(ptr_arg.type()),
          code_typet::parametert(ptr_arg.type().subtype()),
          code_typet::parametert(signed_int_type())},
         ptr_arg.type().subtype());
-      result.type()=t;
+      symbol_exprt result(identifier, t);
+      result.add_source_location() = source_location;
       expr.swap(result);
       return;
     }
@@ -1596,15 +1588,13 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
 
       const exprt &ptr_arg=fargs.operands.front();
 
-      symbol_exprt result;
-      result.add_source_location()=source_location;
-      result.set_identifier(identifier);
       const code_typet t(
         {code_typet::parametert(ptr_arg.type()),
          code_typet::parametert(ptr_arg.type()),
          code_typet::parametert(signed_int_type())},
         empty_typet());
-      result.type()=t;
+      symbol_exprt result(identifier, t);
+      result.add_source_location() = source_location;
       expr.swap(result);
       return;
     }
@@ -1645,16 +1635,14 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
 
       const exprt &ptr_arg=fargs.operands.front();
 
-      symbol_exprt result;
-      result.add_source_location()=source_location;
-      result.set_identifier(identifier);
       const code_typet t(
         {code_typet::parametert(ptr_arg.type()),
          code_typet::parametert(ptr_arg.type()),
          code_typet::parametert(ptr_arg.type()),
          code_typet::parametert(signed_int_type())},
         empty_typet());
-      result.type()=t;
+      symbol_exprt result(identifier, t);
+      result.add_source_location() = source_location;
       expr.swap(result);
       return;
     }
@@ -1700,9 +1688,6 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
 
       const exprt &ptr_arg=fargs.operands.front();
 
-      symbol_exprt result;
-      result.add_source_location()=source_location;
-      result.set_identifier(identifier);
       code_typet::parameterst parameters;
       parameters.push_back(code_typet::parametert(ptr_arg.type()));
       parameters.push_back(code_typet::parametert(ptr_arg.type()));
@@ -1716,7 +1701,8 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
       parameters.push_back(code_typet::parametert(signed_int_type()));
       parameters.push_back(code_typet::parametert(signed_int_type()));
       code_typet t(std::move(parameters), c_bool_type());
-      result.type()=t;
+      symbol_exprt result(identifier, t);
+      result.add_source_location() = source_location;
       expr.swap(result);
       return;
     }
@@ -1745,13 +1731,11 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
         throw 0;
       }
 
-      symbol_exprt result;
-      result.add_source_location()=source_location;
-      result.set_identifier(identifier);
       code_typet t(
         {code_typet::parametert(ptr_arg.type())}, ptr_arg.type().subtype());
       t.make_ellipsis();
-      result.type()=t;
+      symbol_exprt result(identifier, t);
+      result.add_source_location() = source_location;
       expr.swap(result);
       return;
     }
@@ -1780,13 +1764,11 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
         throw 0;
       }
 
-      symbol_exprt result;
-      result.add_source_location()=source_location;
-      result.set_identifier(identifier);
       code_typet t(
         {code_typet::parametert(ptr_arg.type())}, ptr_arg.type().subtype());
       t.make_ellipsis();
-      result.type()=t;
+      symbol_exprt result(identifier, t);
+      result.add_source_location() = source_location;
       expr.swap(result);
       return;
     }

@@ -224,7 +224,7 @@ SCENARIO(
         simplify(sc.premise, empty_ns);
         simplify(sc.s0, empty_ns);
         simplify(sc.s1, empty_ns);
-        witnesses[sc] = generator.fresh_symbol("w", t.witness_type());
+        witnesses.emplace(sc, generator.fresh_symbol("w", t.witness_type()));
         nc_axioms.push_back(sc);
         return accu + to_string(sc) + "\n\n";
       });
@@ -296,7 +296,7 @@ SCENARIO(
     // Create witness for axiom
     string_constraint_generatort generator(empty_ns);
     std::unordered_map<string_not_contains_constraintt, symbol_exprt> witnesses;
-    witnesses[vacuous] = generator.fresh_symbol("w", t.witness_type());
+    witnesses.emplace(vacuous, generator.fresh_symbol("w", t.witness_type()));
 
     INFO("Original axiom:\n");
     INFO(to_string(vacuous) + "\n\n");
@@ -346,7 +346,7 @@ SCENARIO(
     // Create witness for axiom
     string_constraint_generatort generator(empty_ns);
     std::unordered_map<string_not_contains_constraintt, symbol_exprt> witnesses;
-    witnesses[trivial] = generator.fresh_symbol("w", t.witness_type());
+    witnesses.emplace(trivial, generator.fresh_symbol("w", t.witness_type()));
 
     INFO("Original axiom:\n");
     INFO(to_string(trivial) + "\n\n");
@@ -397,7 +397,7 @@ SCENARIO(
     // Create witness for axiom
     string_constraint_generatort generator(empty_ns);
     std::unordered_map<string_not_contains_constraintt, symbol_exprt> witnesses;
-    witnesses[trivial] = generator.fresh_symbol("w", t.witness_type());
+    witnesses.emplace(trivial, generator.fresh_symbol("w", t.witness_type()));
 
     INFO("Original axiom:\n");
     INFO(to_string(trivial) + "\n\n");
@@ -450,7 +450,7 @@ SCENARIO(
     // Create witness for axiom
     string_constraint_generatort generator(empty_ns);
     std::unordered_map<string_not_contains_constraintt, symbol_exprt> witnesses;
-    witnesses[trivial] = generator.fresh_symbol("w", t.witness_type());
+    witnesses.emplace(trivial, generator.fresh_symbol("w", t.witness_type()));
 
     INFO("Original axiom:\n");
     INFO(to_string(trivial) + "\n\n");
@@ -501,7 +501,7 @@ SCENARIO(
     // Create witness for axiom
     string_constraint_generatort generator(empty_ns);
     std::unordered_map<string_not_contains_constraintt, symbol_exprt> witnesses;
-    witnesses[trivial] = generator.fresh_symbol("w", t.witness_type());
+    witnesses.emplace(trivial, generator.fresh_symbol("w", t.witness_type()));
 
     INFO("Original axiom:\n");
     INFO(to_string(trivial) + "\n\n");

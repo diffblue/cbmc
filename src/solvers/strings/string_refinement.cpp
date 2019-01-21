@@ -735,8 +735,8 @@ decision_proceduret::resultt string_refinementt::dec_solve()
       const typet &index_type = rtype.size().type();
       return array_typet(index_type, infinity_exprt(index_type));
     }();
-    not_contain_witnesses[nc_axiom] =
-      generator.fresh_symbol("not_contains_witness", witness_type);
+    not_contain_witnesses.emplace(
+      nc_axiom, generator.fresh_symbol("not_contains_witness", witness_type));
   }
 
   for(const exprt &lemma : generator.constraints.existential)

@@ -1559,14 +1559,14 @@ code_blockt java_string_library_preprocesst::make_object_get_class_code(
     loc);
 
   // > class1 = Class.forName(string1)
+  java_method_typet fun_type(
+    {java_method_typet::parametert(string_ptr_type)}, class_type);
   code_function_callt fun_call(
     class1,
     symbol_exprt(
-      "java::java.lang.Class.forName:(Ljava/lang/String;)Ljava/lang/Class;"),
+      "java::java.lang.Class.forName:(Ljava/lang/String;)Ljava/lang/Class;",
+      std::move(fun_type)),
     {string1});
-  const java_method_typet fun_type(
-    {java_method_typet::parametert(string_ptr_type)}, class_type);
-  fun_call.function().type()=fun_type;
   code.add(fun_call, loc);
 
   // > return class1;

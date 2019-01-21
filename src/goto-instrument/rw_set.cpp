@@ -96,22 +96,18 @@ void _rw_set_loct::read_write_rec(
 
     if(r)
     {
-      entryt &entry=r_entries[object];
-      entry.object=object;
-      entry.symbol_expr=symbol_expr;
-      entry.guard=guard.as_expr(); // should 'OR'
+      const auto &entry =
+        r_entries.emplace(object, entryt(symbol_expr, object, guard.as_expr()));
 
-      track_deref(entry, true);
+      track_deref(entry.first->second, true);
     }
 
     if(w)
     {
-      entryt &entry=w_entries[object];
-      entry.object=object;
-      entry.symbol_expr=symbol_expr;
-      entry.guard=guard.as_expr(); // should 'OR'
+      const auto &entry =
+        w_entries.emplace(object, entryt(symbol_expr, object, guard.as_expr()));
 
-      track_deref(entry, false);
+      track_deref(entry.first->second, false);
     }
   }
   else if(expr.id()==ID_member)

@@ -635,9 +635,7 @@ void c_typecheck_baset::typecheck_array_type(array_typet &type)
       symbol_table.add(new_symbol);
 
       // produce the code that declares and initializes the symbol
-      symbol_exprt symbol_expr;
-      symbol_expr.set_identifier(temp_identifier);
-      symbol_expr.type() = new_symbol.type;
+      symbol_exprt symbol_expr(temp_identifier, new_symbol.type);
 
       code_declt declaration(symbol_expr);
       declaration.add_source_location() = size_source_location;

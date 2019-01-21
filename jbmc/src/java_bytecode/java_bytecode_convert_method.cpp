@@ -484,21 +484,19 @@ void java_bytecode_convert_methodt::convert(
     // be rewritten below in the loop that iterates through the method
     // parameters; the only field that seem to be useful to write here is the
     // symbol_expr, others will be rewritten
-    variables[v.index].push_back(variablet());
-    auto &newv=variables[v.index].back();
-    newv.symbol_expr=result;
-    newv.start_pc=v.start_pc;
-    newv.length=v.length;
+    variables[v.index].emplace_back(result, v.start_pc, v.length);
   }
 
   // The variables is a expanding_vectort, and the loop above may have expanded
   // the vector introducing gaps where the entries are empty vectors. We now
   // make sure that the vector of each LV slot contains exactly one variablet,
-  // possibly default-initialized
+  // which we will add below
   std::size_t param_index=0;
   for(const auto &param : parameters)
   {
-    variables[param_index].resize(1);
+    INVARIANT(
+      variables[param_index].size() <= 1,
+      "should have at most one entry per index");
     param_index+=java_local_variable_slots(param.type());
   }
   INVARIANT(
@@ -522,23 +520,20 @@ void java_bytecode_convert_methodt::convert(
       base_name = ID_this;
       identifier=id2string(method_identifier)+"::"+id2string(base_name);
     }
-    else
+    else if(!variables[param_index].empty())
     {
       // if already present in the LVT ...
       base_name=variables[param_index][0].symbol_expr.get(ID_C_base_name);
       identifier=variables[param_index][0].symbol_expr.get(ID_identifier);
-
-      // ... then base_name will not be empty
-      if(base_name.empty())
-      {
-        // my.package.ClassName.myMethodName:(II)I::argNT, where N is the local
-        // variable slot where the parameter is stored and T is a character
-        // indicating the type
-        const typet &type=param.type();
-        char suffix=java_char_from_type(type);
-        base_name="arg"+std::to_string(param_index)+suffix;
-        identifier=id2string(method_identifier)+"::"+id2string(base_name);
-      }
+    }
+    else
+    {
+      // my.package.ClassName.myMethodName:(II)I::argNT, where N is the local
+      // variable slot where the parameter is stored and T is a character
+      // indicating the type
+      char suffix = java_char_from_type(param.type());
+      base_name = "arg" + std::to_string(param_index) + suffix;
+      identifier = id2string(method_identifier) + "::" + id2string(base_name);
     }
     param.set_base_name(base_name);
     param.set_identifier(identifier);
@@ -552,10 +547,12 @@ void java_bytecode_convert_methodt::convert(
     symbol_table.add(parameter_symbol);
 
     // Add as a JVM local variable
-    variables[param_index][0].symbol_expr=parameter_symbol.symbol_expr();
-    variables[param_index][0].is_parameter=true;
-    variables[param_index][0].start_pc=0;
-    variables[param_index][0].length=std::numeric_limits<size_t>::max();
+    variables[param_index].clear();
+    variables[param_index].emplace_back(
+      parameter_symbol.symbol_expr(),
+      0,
+      std::numeric_limits<size_t>::max(),
+      true);
     param_index+=java_local_variable_slots(param.type());
   }
 
@@ -952,17 +949,14 @@ static void gather_symbol_live_ranges(
   if(e.id()==ID_symbol)
   {
     const auto &symexpr=to_symbol_expr(e);
-    auto findit = result.insert(
-      {symexpr.get_identifier(), java_bytecode_convert_methodt::variablet()});
-    auto &var=findit.first->second;
-    if(findit.second)
+    auto findit = result.emplace(
+      std::piecewise_construct,
+      std::forward_as_tuple(symexpr.get_identifier()),
+      std::forward_as_tuple(symexpr, pc, 1));
+    if(!findit.second)
     {
-      var.symbol_expr=symexpr;
-      var.start_pc=pc;
-      var.length=1;
-    }
-    else
-    {
+      auto &var = findit.first->second;
+
       if(pc<var.start_pc)
       {
         var.length+=(var.start_pc-pc);
@@ -1564,13 +1558,12 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
     else if(statement=="getstatic")
     {
       PRECONDITION(op.empty() && results.size() == 1);
-      symbol_exprt symbol_expr(arg0.type());
       const auto &field_name=arg0.get_string(ID_component_name);
       const bool is_assertions_disabled_field=
         field_name.find("$assertionsDisabled")!=std::string::npos;
 
-      symbol_expr.set_identifier(
-        get_static_field(arg0.get_string(ID_class), field_name));
+      const symbol_exprt symbol_expr(
+        get_static_field(arg0.get_string(ID_class), field_name), arg0.type());
 
       INVARIANT(
         symbol_table.has_symbol(symbol_expr.get_identifier()),
@@ -1587,10 +1580,10 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
     else if(statement=="putstatic")
     {
       PRECONDITION(op.size() == 1 && results.empty());
-      symbol_exprt symbol_expr(arg0.type());
       const auto &field_name=arg0.get_string(ID_component_name);
-      symbol_expr.set_identifier(
-        get_static_field(arg0.get_string(ID_class), field_name));
+
+      const symbol_exprt symbol_expr(
+        get_static_field(arg0.get_string(ID_class), field_name), arg0.type());
 
       INVARIANT(
         symbol_table.has_symbol(symbol_expr.get_identifier()),

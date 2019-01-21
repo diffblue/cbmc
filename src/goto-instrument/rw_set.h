@@ -48,7 +48,11 @@ public:
     irep_idt object;
     exprt guard;
 
-    entryt():guard(true_exprt())
+    entryt(
+      const symbol_exprt &_symbol_expr,
+      const irep_idt &_object,
+      const exprt &_guard)
+      : symbol_expr(_symbol_expr), object(_object), guard(_guard)
     {
     }
   };
