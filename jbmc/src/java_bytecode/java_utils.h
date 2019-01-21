@@ -87,11 +87,6 @@ size_t find_closing_delimiter(
   char open_char,
   char close_char);
 
-void declare_function(
-  irep_idt function_name,
-  const typet &type,
-  symbol_table_baset &symbol_table);
-
 exprt make_function_application(
   const irep_idt &function_name,
   const exprt::operandst &arguments,

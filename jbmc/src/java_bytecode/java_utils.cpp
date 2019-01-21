@@ -247,8 +247,9 @@ void java_add_components_to_class(
 /// \param function_name: a name
 /// \param type: a type
 /// \param symbol_table: symbol table
-void declare_function(
-  irep_idt function_name,
+/// \return newly created symbol
+static auxiliary_symbolt declare_function(
+  const irep_idt &function_name,
   const typet &type,
   symbol_table_baset &symbol_table)
 {
@@ -260,6 +261,8 @@ void declare_function(
   func_symbol.name=function_name;
   func_symbol.type=type;
   symbol_table.add(func_symbol);
+
+  return func_symbol;
 }
 
 /// Create a function application expression.
@@ -275,14 +278,11 @@ exprt make_function_application(
   const typet &type,
   symbol_table_baset &symbol_table)
 {
-  // Names of function to call
-  std::string fun_name=id2string(function_name);
-
   // Declaring the function
-  declare_function(fun_name, type, symbol_table);
+  const auto symbol = declare_function(function_name, type, symbol_table);
 
   // Function application
-  return function_application_exprt(symbol_exprt(fun_name), arguments, type);
+  return function_application_exprt(symbol.symbol_expr(), arguments, type);
 }
 
 /// Strip java:: prefix from given identifier
