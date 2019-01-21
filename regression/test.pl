@@ -74,6 +74,7 @@ sub test($$$$$$$$$$) {
   foreach my $key (@keys) {
     my $value = $defines->{$key};
     $options =~ s/(\$$key$|\$$key )/$value /g;
+    $options =~ s/\$$key([:;])/$value\1/g; # Variables in --classpath are separated by (semi)colons
   }
   if (scalar @keys) {
     foreach my $word (split(/\s/, $options)) {
