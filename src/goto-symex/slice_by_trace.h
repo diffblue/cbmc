@@ -17,9 +17,11 @@ Author: Alex Groce (agroce@gmail.com)
 class symex_slice_by_tracet
 {
 public:
-  explicit symex_slice_by_tracet(const namespacet &_ns):
-    ns(_ns),
-    alphabet_parity(false)
+  explicit symex_slice_by_tracet(const namespacet &_ns)
+    : ns(_ns),
+      alphabet_parity(false),
+      merge_symbol("goto_symex::\\merge", bool_typet())
+
   {
   }
 
