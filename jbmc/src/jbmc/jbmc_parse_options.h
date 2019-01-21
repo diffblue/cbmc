@@ -28,7 +28,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/lazy_goto_model.h>
 #include <goto-programs/show_properties.h>
 
-#include <solvers/refinement/string_refinement.h>
+#include <goto-symex/path_storage.h>
+
+#include <solvers/strings/string_refinement.h>
 
 #include <java_bytecode/java_bytecode_language.h>
 

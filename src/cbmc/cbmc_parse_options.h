@@ -29,7 +29,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/goto_trace.h>
 
-#include <solvers/refinement/string_refinement.h>
+#include <solvers/strings/string_refinement.h>
 
 #include "bmc.h"
 #include "xml_interface.h"

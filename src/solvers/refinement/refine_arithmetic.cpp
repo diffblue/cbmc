@@ -13,7 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/expr_util.h>
 #include <util/arith_tools.h>
 
-#include <solvers/refinement/string_refinement_invariant.h>
 #include <solvers/floatbv/float_utils.h>
 
 // Parameters
@@ -167,10 +166,7 @@ void bv_refinementt::check_SAT(approximationt &a)
 
   if(type.id()==ID_floatbv)
   {
-    // these are all ternary
-    INVARIANT(
-      a.expr.operands().size()==3,
-      string_refinement_invariantt("all floatbv typed exprs are ternary"));
+    const auto &float_op = to_ieee_float_op_expr(a.expr);
 
     if(a.over_state==MAX_STATE)
       return;
@@ -182,7 +178,7 @@ void bv_refinementt::check_SAT(approximationt &a)
     o1.unpack(a.op1_value);
 
     // get actual rounding mode
-    exprt rounding_mode_expr = get(a.expr.op2());
+    exprt rounding_mode_expr = get(float_op.rounding_mode());
     const std::size_t rounding_mode_int =
       numeric_cast_v<std::size_t>(rounding_mode_expr);
     ieee_floatt::rounding_modet rounding_mode =
@@ -279,8 +275,7 @@ void bv_refinementt::check_SAT(approximationt &a)
   {
     // these are all binary
     INVARIANT(
-      a.expr.operands().size()==2,
-      string_refinement_invariantt("all (un)signedbv typed exprs are binary"));
+      a.expr.operands().size() == 2, "all (un)signedbv typed exprs are binary");
 
     // already full interpretation?
     if(a.over_state>0)

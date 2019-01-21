@@ -161,23 +161,23 @@ SRC = $(BOOLEFORCE_SRC) \
       refinement/bv_refinement_loop.cpp \
       refinement/refine_arithmetic.cpp \
       refinement/refine_arrays.cpp \
-      refinement/string_builtin_function.cpp \
-      refinement/string_refinement.cpp \
-      refinement/string_refinement_util.cpp \
-      refinement/string_constraint.cpp \
-      refinement/string_constraint_generator_code_points.cpp \
-      refinement/string_constraint_generator_comparison.cpp \
-      refinement/string_constraint_generator_concat.cpp \
-      refinement/string_constraint_generator_constants.cpp \
-      refinement/string_constraint_generator_indexof.cpp \
-      refinement/string_constraint_generator_insert.cpp \
-      refinement/string_constraint_generator_float.cpp \
-      refinement/string_constraint_generator_format.cpp \
-      refinement/string_constraint_generator_main.cpp \
-      refinement/string_constraint_generator_testing.cpp \
-      refinement/string_constraint_generator_transformation.cpp \
-      refinement/string_constraint_generator_valueof.cpp \
-      refinement/string_constraint_instantiation.cpp \
+      strings/string_builtin_function.cpp \
+      strings/string_refinement.cpp \
+      strings/string_refinement_util.cpp \
+      strings/string_constraint.cpp \
+      strings/string_constraint_generator_code_points.cpp \
+      strings/string_constraint_generator_comparison.cpp \
+      strings/string_constraint_generator_concat.cpp \
+      strings/string_constraint_generator_constants.cpp \
+      strings/string_constraint_generator_indexof.cpp \
+      strings/string_constraint_generator_insert.cpp \
+      strings/string_constraint_generator_float.cpp \
+      strings/string_constraint_generator_format.cpp \
+      strings/string_constraint_generator_main.cpp \
+      strings/string_constraint_generator_testing.cpp \
+      strings/string_constraint_generator_transformation.cpp \
+      strings/string_constraint_generator_valueof.cpp \
+      strings/string_constraint_instantiation.cpp \
       sat/cnf.cpp \
       sat/cnf_clause_list.cpp \
       sat/dimacs_cnf.cpp \

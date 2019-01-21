@@ -34,14 +34,14 @@ SRC += analyses/ai/ai.cpp \
        pointer-analysis/value_set.cpp \
        solvers/floatbv/float_utils.cpp \
        solvers/miniBDD/miniBDD.cpp \
-       solvers/refinement/array_pool/array_pool.cpp \
-       solvers/refinement/string_constraint_generator_valueof/calculate_max_string_length.cpp \
-       solvers/refinement/string_constraint_generator_valueof/get_numeric_value_from_character.cpp \
-       solvers/refinement/string_constraint_generator_valueof/is_digit_with_radix.cpp \
-       solvers/refinement/string_refinement/concretize_array.cpp \
-       solvers/refinement/string_refinement/sparse_array.cpp \
-       solvers/refinement/string_refinement/substitute_array_list.cpp \
-       solvers/refinement/string_refinement/union_find_replace.cpp \
+       solvers/strings/array_pool/array_pool.cpp \
+       solvers/strings/string_constraint_generator_valueof/calculate_max_string_length.cpp \
+       solvers/strings/string_constraint_generator_valueof/get_numeric_value_from_character.cpp \
+       solvers/strings/string_constraint_generator_valueof/is_digit_with_radix.cpp \
+       solvers/strings/string_refinement/concretize_array.cpp \
+       solvers/strings/string_refinement/sparse_array.cpp \
+       solvers/strings/string_refinement/substitute_array_list.cpp \
+       solvers/strings/string_refinement/union_find_replace.cpp \
        util/cmdline.cpp \
        util/expr_cast/expr_cast.cpp \
        util/expr.cpp \

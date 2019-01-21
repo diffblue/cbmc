@@ -54,9 +54,9 @@ SRC += java_bytecode/ci_lazy_methods/lazy_load_lambdas.cpp \
        java_bytecode/java_virtual_functions/virtual_functions.cpp \
        java_bytecode/load_method_by_regex.cpp \
        pointer-analysis/custom_value_set_analysis.cpp \
-       solvers/refinement/string_constraint_instantiation/instantiate_not_contains.cpp \
-       solvers/refinement/string_refinement/dependency_graph.cpp \
-       solvers/refinement/string_refinement/string_symbol_resolution.cpp \
+       solvers/strings/string_constraint_instantiation/instantiate_not_contains.cpp \
+       solvers/strings/string_refinement/dependency_graph.cpp \
+       solvers/strings/string_refinement/string_symbol_resolution.cpp \
        util/expr_iterator.cpp \
        util/has_subtype.cpp \
        util/parameter_indices.cpp \
