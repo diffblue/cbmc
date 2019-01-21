@@ -15,12 +15,12 @@ codet allocate_array(
   const exprt &array_length_expr,
   const source_locationt &loc)
 {
-  const pointer_typet &pointer_type = to_pointer_type(expr.type());
+  pointer_typet pointer_type = to_pointer_type(expr.type());
   const auto &element_type =
     java_array_element_type(to_struct_tag_type(pointer_type.subtype()));
-  side_effect_exprt java_new_array{ID_java_new_array, pointer_type};
-  java_new_array.copy_to_operands(array_length_expr);
-  java_new_array.type().subtype().set(ID_element_type, element_type);
+  pointer_type.subtype().set(ID_element_type, element_type);
+  side_effect_exprt java_new_array{
+    ID_java_new_array, {array_length_expr}, pointer_type, loc};
   return code_assignt{expr, java_new_array, loc};
 }
 
