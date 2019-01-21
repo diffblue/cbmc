@@ -224,9 +224,11 @@ void build_goto_trace(
 
       if(it->is_shared_read() || it->is_shared_write())
       {
-        // these are just used to get the time stamp
-        exprt clock_value=prop_conv.get(
-          symbol_exprt(partial_order_concurrencyt::rw_clock_id(it)));
+        // these are just used to get the time stamp -- the clock type is
+        // computed to be of the minimal necessary size, but we don't need to
+        // know it to get the value so just use typeless
+        exprt clock_value = prop_conv.get(
+          symbol_exprt::typeless(partial_order_concurrencyt::rw_clock_id(it)));
 
         const auto cv = numeric_cast<mp_integer>(clock_value);
         if(cv.has_value())

@@ -148,7 +148,7 @@ procedure_decl: TOK_PROCEDURE proc_ident '(' parameters_opt ')'
 proc_ident: TOK_IDENTIFIER
           | TOK_EVAL
           {
-            symbol_exprt e("eval");
+            symbol_exprt e = symbol_exprt::typeless("eval");
             newstack($$).swap(e);
           }
           | TOK_BUILTIN_IDENTIFIER
@@ -164,7 +164,8 @@ proc_ident: TOK_IDENTIFIER
 proc_ident_expr: proc_ident
                | TOK_STRING
                {
-                 symbol_exprt s(to_string_constant(stack($$)).get_value());
+                 symbol_exprt s = symbol_exprt::typeless(
+                   to_string_constant(stack($$)).get_value());
                  stack($$).swap(s);
                }
                ;

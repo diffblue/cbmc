@@ -227,7 +227,7 @@ void linkingt::detailed_conflict_report_rec(
             {
               std::string msg_bak;
               msg_bak.swap(msg);
-              symbol_exprt c(ID_C_this);
+              symbol_exprt c = symbol_exprt::typeless(ID_C_this);
               detailed_conflict_report_rec(
                 old_symbol,
                 new_symbol,

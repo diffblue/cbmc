@@ -1600,7 +1600,7 @@ exprt java_bytecode_parsert::get_relement_value()
   case 'c':
     {
       u2 class_info_index = read_u2();
-      return symbol_exprt(pool_entry(class_info_index).s);
+      return symbol_exprt::typeless(pool_entry(class_info_index).s);
     }
 
   case '@':

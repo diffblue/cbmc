@@ -143,7 +143,7 @@ protected:
     const typet &type1,
     const typet &type2)
   {
-    symbol_exprt conflict_path(ID_C_this);
+    symbol_exprt conflict_path = symbol_exprt::typeless(ID_C_this);
     detailed_conflict_report_rec(
       old_symbol,
       new_symbol,
