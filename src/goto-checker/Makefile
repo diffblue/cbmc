@@ -1,5 +1,6 @@
 SRC = bmc_util.cpp \
       counterexample_beautification.cpp \
+      cover_goals_report_util.cpp \
       incremental_goto_checker.cpp \
       goto_trace_storage.cpp \
       goto_verifier.cpp \
