@@ -31,10 +31,6 @@ void symex_slice_by_tracet::slice_by_trace(
 {
   std::cout << "Slicing by trace...\n";
 
-  merge_identifier="goto_symex::\\merge";
-  merge_symbol=symbol_exprt(typet(ID_bool));
-  merge_symbol.set_identifier(merge_identifier);
-
   std::vector<exprt> trace_conditions;
 
   size_t length=trace_files.length();
