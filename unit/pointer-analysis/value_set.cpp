@@ -263,9 +263,10 @@ SCENARIO(
 
     WHEN("We query { &i1, &i2 }[i3]")
     {
-      array_exprt arr(array_typet(int32_ptr, from_integer(2, int32_type)));
-      arr.copy_to_operands(address_of_exprt(i1.symbol_expr()));
-      arr.copy_to_operands(address_of_exprt(i2.symbol_expr()));
+      array_exprt arr(
+        {address_of_exprt(i1.symbol_expr()),
+         address_of_exprt(i2.symbol_expr())},
+        array_typet(int32_ptr, from_integer(2, int32_type)));
 
       index_exprt index_of_arr(arr, i3.symbol_expr());
 

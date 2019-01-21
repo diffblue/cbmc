@@ -97,7 +97,7 @@ static void remove_vector(exprt &expr)
       const typet subtype=array_type.subtype();
       // do component-wise:
       // x+y -> vector(x[0]+y[0],x[1]+y[1],...)
-      array_exprt array_expr(array_type);
+      array_exprt array_expr({}, array_type);
       array_expr.operands().resize(numeric_cast_v<std::size_t>(dimension));
 
       for(std::size_t i=0; i<array_expr.operands().size(); i++)
@@ -124,7 +124,7 @@ static void remove_vector(exprt &expr)
       const typet subtype=array_type.subtype();
       // do component-wise:
       // -x -> vector(-x[0],-x[1],...)
-      array_exprt array_expr(array_type);
+      array_exprt array_expr({}, array_type);
       array_expr.operands().resize(numeric_cast_v<std::size_t>(dimension));
 
       for(std::size_t i=0; i<array_expr.operands().size(); i++)
@@ -153,9 +153,7 @@ static void remove_vector(exprt &expr)
         const auto dimension = numeric_cast_v<std::size_t>(array_type.size());
         exprt casted_op =
           typecast_exprt::conditional_cast(op, array_type.subtype());
-        array_exprt array_expr(array_type);
-        array_expr.operands().resize(dimension, op);
-        expr = array_expr;
+        expr = array_exprt(exprt::operandst(dimension, casted_op), array_type);
       }
     }
   }

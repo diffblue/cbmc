@@ -1765,6 +1765,11 @@ public:
     : multi_ary_exprt(ID_array, _type)
   {
   }
+
+  array_exprt(operandst &&_operands, const array_typet &_type)
+    : multi_ary_exprt(ID_array, std::move(_operands), _type)
+  {
+  }
 };
 
 /// \brief Cast an exprt to an \ref array_exprt

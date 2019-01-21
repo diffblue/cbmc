@@ -35,8 +35,7 @@ array_exprt string_constantt::to_array_expr() const
 
   exprt size=from_integer(string_size, index_type());
 
-  array_exprt dest;
-  dest.type()=array_typet(char_type, size);
+  array_exprt dest({}, array_typet(char_type, size));
 
   dest.operands().resize(string_size);
 

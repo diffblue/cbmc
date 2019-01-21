@@ -422,7 +422,7 @@ std::pair<exprt, string_constraintst> add_axioms_from_float_scientific_notation(
       two_power_e_over_ten_power_d_table.size(),
     int_type);
   array_exprt conversion_factor_table(
-    array_typet(float_type, conversion_factor_table_size));
+    {}, array_typet(float_type, conversion_factor_table_size));
   for(const auto &negative : two_power_e_over_ten_power_d_table_negatives)
     conversion_factor_table.copy_to_operands(
       constant_float(negative, float_spec));

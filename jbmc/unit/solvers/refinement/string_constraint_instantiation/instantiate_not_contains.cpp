@@ -61,7 +61,7 @@ constant_exprt from_integer(const mp_integer &i)
 array_string_exprt make_string_exprt(const std::string &str)
 {
   const constant_exprt length=from_integer(str.length(), t.length_type());
-  array_exprt content(array_typet(t.char_type(), length));
+  array_exprt content({}, array_typet(t.char_type(), length));
 
   for(const char c : str)
     content.copy_to_operands(from_integer(c, t.char_type()));
