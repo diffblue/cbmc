@@ -247,3 +247,82 @@ bool cmdlinet::parse(int argc, const char **argv, const char *optstring)
 
   return false;
 }
+
+cmdlinet::option_namest cmdlinet::option_names() const
+{
+  return option_namest{*this};
+}
+
+cmdlinet::option_namest::option_names_iteratort::option_names_iteratort(
+  const cmdlinet *command_line,
+  std::size_t index)
+  : command_line(command_line), index(index)
+{
+  goto_next_valid_index();
+}
+
+cmdlinet::option_namest::option_names_iteratort &
+cmdlinet::option_namest::option_names_iteratort::operator++()
+{
+  PRECONDITION(command_line != nullptr);
+  ++index;
+  goto_next_valid_index();
+  return *this;
+}
+bool cmdlinet::option_namest::option_names_iteratort::is_valid_index() const
+{
+  PRECONDITION(command_line != nullptr);
+  auto const &options = command_line->options;
+  return index < options.size() && options[index].isset &&
+         options[index].islong;
+}
+
+void cmdlinet::option_namest::option_names_iteratort::goto_next_valid_index()
+{
+  PRECONDITION(command_line != nullptr);
+  while(index < command_line->options.size() && !is_valid_index())
+  {
+    ++index;
+  }
+}
+
+const cmdlinet::option_namest::option_names_iteratort
+cmdlinet::option_namest::option_names_iteratort::operator++(int dummy)
+{
+  return ++option_names_iteratort(*this);
+}
+
+const std::string &cmdlinet::option_namest::option_names_iteratort::operator*()
+{
+  PRECONDITION(command_line != nullptr);
+  return command_line->options.at(index).optstring;
+}
+
+bool cmdlinet::option_namest::option_names_iteratort::
+operator==(const cmdlinet::option_namest::option_names_iteratort &other)
+{
+  PRECONDITION(command_line != nullptr && command_line == other.command_line);
+  return index == other.index;
+}
+
+bool cmdlinet::option_namest::option_names_iteratort::
+operator!=(const cmdlinet::option_namest::option_names_iteratort &other)
+{
+  PRECONDITION(command_line != nullptr && command_line == other.command_line);
+  return index != other.index;
+}
+
+cmdlinet::option_namest::option_namest(const cmdlinet &command_line)
+  : command_line(command_line)
+{
+}
+
+cmdlinet::option_namest::option_names_iteratort cmdlinet::option_namest::begin()
+{
+  return option_names_iteratort(&command_line, 0);
+}
+
+cmdlinet::option_namest::option_names_iteratort cmdlinet::option_namest::end()
+{
+  return option_names_iteratort(&command_line, command_line.options.size());
+}
