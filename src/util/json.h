@@ -161,11 +161,6 @@ public:
   {
   }
 
-  explicit json_arrayt(arrayt &&entries)
-    : jsont(kindt::J_ARRAY, std::move(entries))
-  {
-  }
-
   explicit json_arrayt(std::initializer_list<jsont> &&initializer_list)
     : jsont(kindt::J_ARRAY, arrayt{initializer_list})
   {
@@ -302,11 +297,6 @@ public:
   using const_iterator = objectt::const_iterator;
 
   json_objectt():jsont(kindt::J_OBJECT)
-  {
-  }
-
-  explicit json_objectt(objectt &&objects)
-    : jsont(kindt::J_OBJECT, std::move(objects))
   {
   }
 
