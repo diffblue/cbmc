@@ -251,34 +251,27 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
   if(cmdline.isset("no-refine-strings"))
     options.set_option("refine-strings", false);
 
-  if(cmdline.isset("string-printable"))
+  if(cmdline.isset("string-printable") && cmdline.isset("no-refine-strings"))
   {
-    if(cmdline.isset("no-refine-strings"))
-    {
-      warning() << "--string-printable ignored due to --no-refine-strings"
-                << eom;
-    }
-    options.set_option("string-printable", true);
+    throw invalid_command_line_argument_exceptiont(
+      "cannot use --string-printable with --no-refine-strings",
+      "--string-printable");
   }
 
-  if(cmdline.isset("string-input-value"))
+  if(cmdline.isset("string-input-value") && cmdline.isset("no-refine-strings"))
   {
-    if(cmdline.isset("no-refine-strings"))
-    {
-      warning() << "--string-input-value ignored due to --no-refine-strings"
-                << eom;
-    }
-    options.set_option(
-      "string-input-value",
-      cmdline.get_values("string-input-value"));
+    throw invalid_command_line_argument_exceptiont(
+      "cannot use --string-input-value with --no-refine-strings",
+      "--string-input-value");
   }
 
   if(
     cmdline.isset("no-refine-strings") &&
     cmdline.isset("max-nondet-string-length"))
   {
-    warning() << "--max-nondet-string-length ignored due to "
-              << "--no-refine-strings" << eom;
+    throw invalid_command_line_argument_exceptiont(
+      "cannot use --max-nondet-string-length with --no-refine-strings",
+      "--max-nondet-string-length");
   }
 
   if(cmdline.isset("max-node-refinement"))
