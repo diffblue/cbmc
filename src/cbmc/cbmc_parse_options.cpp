@@ -40,6 +40,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-checker/multi_path_symex_checker.h>
 #include <goto-checker/multi_path_symex_only_checker.h>
 #include <goto-checker/properties.h>
+#include <goto-checker/single_path_symex_only_checker.h>
 #include <goto-checker/stop_on_fail_verifier.h>
 
 #include <goto-programs/adjust_float_expressions.h>
@@ -559,13 +560,20 @@ int cbmc_parse_optionst::doit()
     options.get_bool_option("program-only") ||
     options.get_bool_option("show-vcc"))
   {
-    if(!options.get_bool_option("paths"))
+    if(options.get_bool_option("paths"))
+    {
+      all_properties_verifiert<single_path_symex_only_checkert> verifier(
+        options, ui_message_handler, goto_model);
+      (void)verifier();
+    }
+    else
     {
       all_properties_verifiert<multi_path_symex_only_checkert> verifier(
         options, ui_message_handler, goto_model);
       (void)verifier();
-      return CPROVER_EXIT_SUCCESS;
     }
+
+    return CPROVER_EXIT_SUCCESS;
   }
 
   if(
