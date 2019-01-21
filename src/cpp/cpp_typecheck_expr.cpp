@@ -381,17 +381,16 @@ void cpp_typecheckt::typecheck_function_expr(
       std::string op_name="operator->";
 
       // turn this into a function call
-      side_effect_expr_function_callt function_call;
-      function_call.arguments().reserve(expr.operands().size());
-      function_call.add_source_location()=expr.source_location();
-
       // first do function/operator
       const cpp_namet cpp_name(op_name, expr.source_location());
 
-      function_call.function() = cpp_name.as_expr();
+      side_effect_expr_function_callt function_call(
+        cpp_name.as_expr(),
+        {expr.op0()},
+        uninitialized_typet{},
+        expr.source_location());
+      function_call.arguments().reserve(expr.operands().size());
 
-      // now do the argument
-      function_call.arguments().push_back(expr.op0());
       typecheck_side_effect_function_call(function_call);
 
       exprt tmp(ID_already_typechecked);
@@ -487,10 +486,6 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
     std::string op_name=std::string("operator")+"("+cpp_type2name(t)+")";
 
     // turn this into a function call
-    side_effect_expr_function_callt function_call;
-    function_call.arguments().reserve(expr.operands().size());
-    function_call.add_source_location()=expr.source_location();
-
     const cpp_namet cpp_name(op_name, expr.source_location());
 
     // See if the struct declares the cast operator as a member
@@ -513,16 +508,16 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
     if(!found_in_struct)
       return false;
 
-    {
-      exprt member(ID_member);
-      member.add(ID_component_cpp_name)= cpp_name;
+    exprt member(ID_member);
+    member.add(ID_component_cpp_name) = cpp_name;
 
-      exprt tmp(ID_already_typechecked);
-      tmp.copy_to_operands(expr.op0());
-      member.copy_to_operands(tmp);
+    exprt tmp(ID_already_typechecked);
+    tmp.copy_to_operands(expr.op0());
+    member.copy_to_operands(tmp);
 
-      function_call.function()=member;
-    }
+    side_effect_expr_function_callt function_call(
+      std::move(member), {}, uninitialized_typet{}, expr.source_location());
+    function_call.arguments().reserve(expr.operands().size());
 
     if(expr.operands().size()>1)
     {
@@ -563,10 +558,6 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
       const cpp_namet cpp_name(op_name, expr.source_location());
 
       // turn this into a function call
-      side_effect_expr_function_callt function_call;
-      function_call.arguments().reserve(expr.operands().size());
-      function_call.add_source_location()=expr.source_location();
-
       // There are two options to overload an operator:
       //
       // 1. In the scope of a as a.operator(b, ...)
@@ -603,16 +594,19 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
         if(resolve_result.is_not_nil())
         {
           // Found! We turn op(a, b, ...) into a.op(b, ...)
-          {
-            exprt member(ID_member);
-            member.add(ID_component_cpp_name)=cpp_name;
+          exprt member(ID_member);
+          member.add(ID_component_cpp_name) = cpp_name;
 
-            exprt tmp(ID_already_typechecked);
-            tmp.copy_to_operands(expr.op0());
-            member.copy_to_operands(tmp);
+          exprt tmp(ID_already_typechecked);
+          tmp.copy_to_operands(expr.op0());
+          member.copy_to_operands(tmp);
 
-            function_call.function()=member;
-          }
+          side_effect_expr_function_callt function_call(
+            std::move(member),
+            {},
+            uninitialized_typet{},
+            expr.source_location());
+          function_call.arguments().reserve(expr.operands().size());
 
           if(expr.operands().size()>1)
           {
@@ -645,9 +639,12 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
         if(resolve_result.is_not_nil())
         {
           // found!
-          function_call.function()=
-            static_cast<const exprt &>(
-              static_cast<const irept &>(cpp_name));
+          side_effect_expr_function_callt function_call(
+            cpp_name.as_expr(),
+            {},
+            uninitialized_typet{},
+            expr.source_location());
+          function_call.arguments().reserve(expr.operands().size());
 
           // now do arguments
           forall_operands(it, expr)
@@ -904,11 +901,11 @@ void cpp_typecheckt::typecheck_expr_explicit_typecast(exprt &expr)
       {
         // It's really a function call. Note that multiple arguments
         // become a comma expression, and that these are already typechecked.
-        side_effect_expr_function_callt f_call;
-
-        f_call.add_source_location()=expr.source_location();
-        f_call.function().swap(expr.type());
-        f_call.arguments()=collect_comma_expression(expr.op0()).operands();
+        side_effect_expr_function_callt f_call(
+          static_cast<const exprt &>(static_cast<const irept &>(expr.type())),
+          collect_comma_expression(expr.op0()).operands(),
+          uninitialized_typet{},
+          expr.source_location());
 
         typecheck_side_effect_function_call(f_call);
 
@@ -2495,10 +2492,11 @@ void cpp_typecheckt::typecheck_side_effect_assignment(side_effect_exprt &expr)
   member.set(ID_component_cpp_name, cpp_name);
   member.add_to_operands(std::move(already_typechecked));
 
-  side_effect_expr_function_callt new_expr;
-  new_expr.function().swap(member);
-  new_expr.arguments().push_back(expr.op1());
-  new_expr.add_source_location()=expr.source_location();
+  side_effect_expr_function_callt new_expr(
+    std::move(member),
+    {expr.op1()},
+    uninitialized_typet{},
+    expr.source_location());
 
   typecheck_side_effect_function_call(new_expr);
 
@@ -2565,9 +2563,8 @@ void cpp_typecheckt::typecheck_side_effect_inc_dec(
   member.set(ID_component_cpp_name, cpp_name);
   member.add_to_operands(std::move(already_typechecked));
 
-  side_effect_expr_function_callt new_expr;
-  new_expr.function().swap(member);
-  new_expr.add_source_location()=expr.source_location();
+  side_effect_expr_function_callt new_expr(
+    std::move(member), {}, uninitialized_typet{}, expr.source_location());
 
   // the odd C++ way to denote the post-inc/dec operator
   if(post)

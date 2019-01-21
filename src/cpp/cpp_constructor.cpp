@@ -223,9 +223,9 @@ optionalt<codet> cpp_typecheckt::cpp_constructor(
 
     side_effect_expr_function_callt function_call(
       cpp_namet(constructor_name, source_location).as_expr(),
-      operands_tc);
-
-    function_call.add_source_location()=source_location;
+      operands_tc,
+      uninitialized_typet(),
+      source_location);
 
     typecheck_side_effect_function_call(function_call);
     assert(function_call.get(ID_statement)==ID_temporary_object);

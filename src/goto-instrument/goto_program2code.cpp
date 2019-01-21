@@ -342,9 +342,13 @@ goto_programt::const_targett goto_program2codet::convert_assign_varargs(
       {this_va_list_expr});
     f.arguments().back().type().id(ID_gcc_builtin_va_list);
 
-    side_effect_expr_function_callt type_of;
-    type_of.function() =
-      symbol_exprt("__typeof__", code_typet({}, empty_typet()));
+    // we do not bother to set the correct types here, they are not relevant for
+    // generating the correct dumped output
+    side_effect_expr_function_callt type_of(
+      symbol_exprt("__typeof__", code_typet({}, empty_typet())),
+      {},
+      typet{},
+      source_locationt{});
 
     // if the return value is used, the next instruction will be assign
     goto_programt::const_targett next=target;
@@ -486,9 +490,8 @@ goto_programt::const_targett goto_program2codet::convert_decl(
       {
         // could hack this by just erasing the first operand
         const code_function_callt &f=to_code_function_call(next->code);
-        side_effect_expr_function_callt call;
-        call.function()=f.function();
-        call.arguments()=f.arguments();
+        side_effect_expr_function_callt call(
+          f.function(), f.arguments(), typet{}, source_locationt{});
         d.copy_to_operands(call);
       }
 
@@ -1919,10 +1922,8 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
       symbol_exprt symbol_expr(symbol.name, symbol.type);
       symbol_expr.add_source_location()=expr.source_location();
 
-      side_effect_expr_function_callt call;
-      call.add_source_location()=expr.source_location();
-      call.function()=symbol_expr;
-      call.type()=expr.type();
+      side_effect_expr_function_callt call(
+        symbol_expr, {}, expr.type(), expr.source_location());
 
       expr.swap(call);
     }

@@ -203,10 +203,8 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
     assert(code_type.parameters().size()>=1);
 
     // It's a parent. Call the constructor that we got.
-    side_effect_expr_function_callt function_call;
-
-    function_call.function()=symbol_expr;
-    function_call.add_source_location()=code.source_location();
+    side_effect_expr_function_callt function_call(
+      symbol_expr, {}, uninitialized_typet{}, code.source_location());
     function_call.arguments().reserve(code.operands().size()+1);
 
     // we have to add 'this'

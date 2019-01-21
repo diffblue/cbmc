@@ -651,11 +651,12 @@ void cpp_typecheckt::typecheck_compound_declarator(
           lookup(args[0].get(ID_C_identifier)).symbol_expr(),
           to_code_type(component.type()).parameters()[0].type());
 
-        side_effect_expr_function_callt expr_call;
-        expr_call.function() =
-          symbol_exprt(component.get_name(), component.type());
+        side_effect_expr_function_callt expr_call(
+          symbol_exprt(component.get_name(), component.type()),
+          {late_cast},
+          uninitialized_typet{},
+          source_locationt{});
         expr_call.arguments().reserve(args.size());
-        expr_call.arguments().push_back(late_cast);
 
         for(const auto &arg : args)
         {
