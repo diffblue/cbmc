@@ -315,33 +315,31 @@ goto_programt::const_targett goto_program2codet::convert_assign_varargs(
   const exprt this_va_list_expr=assign.lhs();
   const exprt &r=skip_typecast(assign.rhs());
 
-  // we don't bother setting the type
-  code_function_callt f;
-  f.lhs().make_nil();
-
   if(r.id()==ID_constant &&
      (r.is_zero() || to_constant_expr(r).get_value()==ID_NULL))
   {
-    f.function() = symbol_exprt("va_end", code_typet({}, empty_typet()));
-    f.arguments().push_back(this_va_list_expr);
+    code_function_callt f(
+      symbol_exprt("va_end", code_typet({}, empty_typet())),
+      {this_va_list_expr});
     f.arguments().back().type().id(ID_gcc_builtin_va_list);
 
     dest.add_to_operands(std::move(f));
   }
   else if(r.id()==ID_address_of)
   {
-    f.function() = symbol_exprt("va_start", code_typet({}, empty_typet()));
-    f.arguments().push_back(this_va_list_expr);
-    f.arguments().back().type().id(ID_gcc_builtin_va_list);
-    f.arguments().push_back(to_address_of_expr(r).object());
+    code_function_callt f(
+      symbol_exprt("va_start", code_typet({}, empty_typet())),
+      {this_va_list_expr, to_address_of_expr(r).object()});
+    f.arguments().front().type().id(ID_gcc_builtin_va_list);
 
     dest.add_to_operands(std::move(f));
   }
   else if(r.id()==ID_side_effect &&
           to_side_effect_expr(r).get_statement()==ID_gcc_builtin_va_arg_next)
   {
-    f.function() = symbol_exprt("va_arg", code_typet({}, empty_typet()));
-    f.arguments().push_back(this_va_list_expr);
+    code_function_callt f(
+      symbol_exprt("va_arg", code_typet({}, empty_typet())),
+      {this_va_list_expr});
     f.arguments().back().type().id(ID_gcc_builtin_va_list);
 
     side_effect_expr_function_callt type_of;
@@ -388,10 +386,10 @@ goto_programt::const_targett goto_program2codet::convert_assign_varargs(
   }
   else
   {
-    f.function() = symbol_exprt("va_copy", code_typet({}, empty_typet()));
-    f.arguments().push_back(this_va_list_expr);
-    f.arguments().back().type().id(ID_gcc_builtin_va_list);
-    f.arguments().push_back(r);
+    code_function_callt f(
+      symbol_exprt("va_copy", code_typet({}, empty_typet())),
+      {this_va_list_expr, r});
+    f.arguments().front().type().id(ID_gcc_builtin_va_list);
 
     dest.add_to_operands(std::move(f));
   }
