@@ -743,8 +743,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
       }
       else
       {
-        symbol_exprt symexpr;
-        symexpr.set_identifier(new_symbol->name);
+        symbol_exprt symexpr = symbol_exprt::typeless(new_symbol->name);
 
         exprt::operandst ops;
         ops.push_back(value);

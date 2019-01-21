@@ -179,6 +179,15 @@ public:
     set_identifier(identifier);
   }
 
+  /// Generate a symbol_exprt without a proper type. Use if, and only if, the
+  /// type either cannot be determined just yet (such as during type checking)
+  /// or when the type truly is immaterial. The latter case may better be dealt
+  /// with by using just an irep_idt, and not a symbol_exprt.
+  static symbol_exprt typeless(const irep_idt &id)
+  {
+    return symbol_exprt(id, typet());
+  }
+
   void set_identifier(const irep_idt &identifier)
   {
     set(ID_identifier, identifier);

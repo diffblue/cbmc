@@ -91,7 +91,7 @@ bool jsil_convertt::convert_code(const symbolt &symbol, codet &code)
 
       code_try_catcht t_c(std::move(t));
       // Adding empty symbol to catch decl
-      code_declt d(symbol_exprt("decl_symbol"));
+      code_declt d(symbol_exprt::typeless("decl_symbol"));
       t_c.add_catch(d, g);
       t_c.add_source_location()=code.source_location();
 
