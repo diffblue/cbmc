@@ -15,6 +15,7 @@ Date: October 2012
 
 #include <util/find_symbols.h>
 #include <util/invariant.h>
+#include <util/optional.h>
 #include <util/replace_symbol.h>
 #include <util/std_expr.h>
 
@@ -58,14 +59,14 @@ protected:
   {
   public:
     typet type;
-    symbol_exprt array_symbol, w_index_symbol;
+    optionalt<symbol_exprt> array_symbol, w_index_symbol;
   };
 
   class thread_local_vart
   {
   public:
     typet type;
-    symbol_exprt array_symbol;
+    optionalt<symbol_exprt> array_symbol;
   };
 
   typedef std::map<irep_idt, shared_vart> shared_varst;
@@ -101,7 +102,7 @@ void concurrency_instrumentationt::instrument(exprt &expr)
         // initialized anywhere
         const shared_vart &shared_var = v_it->second;
         const index_exprt new_expr(
-          shared_var.array_symbol, shared_var.w_index_symbol);
+          *shared_var.array_symbol, *shared_var.w_index_symbol);
 
         replace_symbol.insert(s, new_expr);
       }
