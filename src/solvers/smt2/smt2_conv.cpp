@@ -3361,11 +3361,11 @@ void smt2_convt::convert_floatbv_div(const ieee_float_op_exprt &expr)
   if(use_FPA_theory)
   {
     out << "(fp.div ";
-    convert_rounding_mode_FPA(expr.op2());
+    convert_rounding_mode_FPA(expr.rounding_mode());
     out << " ";
-    convert_expr(expr.op0());
+    convert_expr(expr.lhs());
     out << " ";
-    convert_expr(expr.op1());
+    convert_expr(expr.rhs());
     out << ")";
   }
   else
@@ -3555,8 +3555,8 @@ void smt2_convt::convert_with(const with_exprt &expr)
   {
     const struct_typet &struct_type = to_struct_type(ns.follow(expr_type));
 
-    const exprt &index=expr.op1();
-    const exprt &value=expr.op2();
+    const exprt &index = expr.where();
+    const exprt &value = expr.new_value();
 
     const irep_idt &component_name=index.get(ID_component_name);
 
@@ -3569,7 +3569,7 @@ void smt2_convt::convert_with(const with_exprt &expr)
       const std::string &smt_typename = datatype_map.at(expr_type);
 
       out << "(update-" << smt_typename << "." << component_name << " ";
-      convert_expr(expr.op0());
+      convert_expr(expr.old());
       out << " ";
       convert_expr(value);
       out << ")";
@@ -3583,7 +3583,7 @@ void smt2_convt::convert_with(const with_exprt &expr)
         boolbv_width.get_member(struct_type, component_name);
 
       out << "(let ((?withop ";
-      convert_expr(expr.op0());
+      convert_expr(expr.old());
       out << ")) ";
 
       if(m.width==struct_width)
@@ -3626,7 +3626,7 @@ void smt2_convt::convert_with(const with_exprt &expr)
   {
     const union_typet &union_type = to_union_type(ns.follow(expr_type));
 
-    const exprt &value=expr.op2();
+    const exprt &value = expr.new_value();
 
     std::size_t total_width=boolbv_width(union_type);
     CHECK_RETURN_WITH_DIAGNOSTICS(
@@ -3651,7 +3651,7 @@ void smt2_convt::convert_with(const with_exprt &expr)
       out << "((_ extract "
           << (total_width-1)
           << " " << member_width << ") ";
-      convert_expr(expr.op0());
+      convert_expr(expr.old());
       out << ") ";
       flatten2bv(value);
       out << ")";
