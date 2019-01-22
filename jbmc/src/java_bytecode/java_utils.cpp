@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_root_class.h"
 
 #include <util/invariant.h>
+#include <util/mathematical_expr.h>
 #include <util/message.h>
 #include <util/prefix.h>
 #include <util/std_types.h>

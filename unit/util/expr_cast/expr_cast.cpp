@@ -10,6 +10,8 @@ Author: Nathan Phillips <Nathan.Phillips@diffblue.com>
 /// expr_dynamic_cast Unit Tests
 
 #include <testing-utils/use_catch.h>
+
+#include <util/mathematical_expr.h>
 #include <util/std_code.h>
 #include <util/std_expr.h>
 #include <util/std_types.h>

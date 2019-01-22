@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/exception_utils.h>
 #include <util/make_unique.h>
+#include <util/mathematical_expr.h>
 #include <util/replace_symbol.h>
 #include <util/std_expr.h>
 #include <util/string2int.h>

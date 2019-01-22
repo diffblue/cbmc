@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <unordered_map>
 #include <unordered_set>
 
+#include <util/mathematical_expr.h>
 #include <util/std_code.h>
 #include <util/std_expr.h>
 
