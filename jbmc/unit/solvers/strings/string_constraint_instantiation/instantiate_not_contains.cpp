@@ -194,7 +194,7 @@ SCENARIO(
   {
     // Creating "ab".lastIndexOf("b", 0)
     const function_application_exprt func(
-      symbol_exprt(ID_cprover_string_last_index_of_func),
+      symbol_exprt(ID_cprover_string_last_index_of_func, t.length_type()),
       {ab, b, from_integer(2)},
       t.length_type());
 
