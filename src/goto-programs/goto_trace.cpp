@@ -282,8 +282,7 @@ void trace_value(
   out << '\n';
 }
 
-static std::string
-state_location(const goto_trace_stept &state, const namespacet &ns)
+static std::string state_location(const goto_trace_stept &state)
 {
   std::string result;
 
@@ -292,12 +291,11 @@ state_location(const goto_trace_stept &state, const namespacet &ns)
   if(!source_location.get_file().empty())
     result += "file " + id2string(source_location.get_file());
 
-  if(!state.function.empty())
+  if(!source_location.get_function().empty())
   {
-    const symbolt &symbol = ns.lookup(state.function);
     if(!result.empty())
       result += ' ';
-    result += "function " + id2string(symbol.display_name());
+    result += "function " + id2string(source_location.get_function());
   }
 
   if(!source_location.get_line().empty())
@@ -328,7 +326,7 @@ void show_state_header(
   else
     out << "State " << step_nr;
 
-  out << ' ' << state_location(state, ns) << '\n';
+  out << ' ' << state_location(state) << '\n';
   out << "----------------------------------------------------" << '\n';
 
   if(options.show_code)
@@ -382,7 +380,7 @@ void show_compact_goto_trace(
         out << '\n';
         out << messaget::red << "Violated property:" << messaget::reset << '\n';
         if(!step.pc->source_location.is_nil())
-          out << "  " << state_location(step, ns) << '\n';
+          out << "  " << state_location(step) << '\n';
 
         out << "  " << messaget::red << step.comment << messaget::reset << '\n';
 
@@ -501,7 +499,7 @@ void show_full_goto_trace(
         out << messaget::red << "Violated property:" << messaget::reset << '\n';
         if(!step.pc->source_location.is_nil())
         {
-          out << "  " << state_location(step, ns) << '\n';
+          out << "  " << state_location(step) << '\n';
         }
 
         out << "  " << messaget::red << step.comment << messaget::reset << '\n';
