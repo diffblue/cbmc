@@ -15,7 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class merged_typet : public type_with_subtypest
 {
 public:
-  merged_typet() : type_with_subtypest(ID_merged_type)
+  merged_typet() : type_with_subtypest(ID_merged_type, {})
   {
   }
 
