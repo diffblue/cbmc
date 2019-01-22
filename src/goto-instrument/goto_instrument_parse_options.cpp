@@ -64,6 +64,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <analyses/is_threaded.h>
 #include <analyses/local_safe_pointers.h>
 
+#include <ansi-c/ansi_c_language.h>
+#include <ansi-c/c_object_factory_parameters.h>
 #include <ansi-c/cprover_library.h>
 #include <cpp/cprover_library.h>
 
@@ -1185,6 +1187,25 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     remove_skip(goto_model);
   }
 
+  if(cmdline.isset("generate-function-body"))
+  {
+    optionst c_object_factory_options;
+    parse_c_object_factory_options(cmdline, c_object_factory_options);
+    c_object_factory_parameterst object_factory_parameters(
+      c_object_factory_options);
+
+    auto generate_implementation = generate_function_bodies_factory(
+      cmdline.get_value("generate-function-body-options"),
+      object_factory_parameters,
+      goto_model.symbol_table,
+      *message_handler);
+    generate_function_bodies(
+      std::regex(cmdline.get_value("generate-function-body")),
+      *generate_implementation,
+      goto_model,
+      *message_handler);
+  }
+
   // add generic checks, if needed
   goto_check(options, goto_model);
 
@@ -1487,19 +1508,6 @@ void goto_instrument_parse_optionst::instrument_goto_program()
       throw 0;
   }
 
-  if(cmdline.isset("generate-function-body"))
-  {
-    auto generate_implementation = generate_function_bodies_factory(
-      cmdline.get_value("generate-function-body-options"),
-      goto_model.symbol_table,
-      *message_handler);
-    generate_function_bodies(
-      std::regex(cmdline.get_value("generate-function-body")),
-      *generate_implementation,
-      goto_model,
-      *message_handler);
-  }
-
   // aggressive slicer
   if(cmdline.isset("aggressive-slice"))
   {
@@ -1622,6 +1630,7 @@ void goto_instrument_parse_optionst::help()
     // NOLINTNEXTLINE(whitespace/line_length)
     "                              convert each call to an undefined function to assume(false)\n"
     HELP_REPLACE_FUNCTION_BODY
+    HELP_ANSI_C_LANGUAGE
     "\n"
     "Loop transformations:\n"
     " --k-induction <k>            check loops with k-induction\n"

@@ -8,12 +8,16 @@ Author: Diffblue Ltd.
 
 #include "generate_function_bodies.h"
 
+#include <ansi-c/c_nondet_symbol_factory.h>
+#include <ansi-c/c_object_factory_parameters.h>
+
+#include <goto-programs/goto_convert.h>
+#include <goto-programs/remove_skip.h>
+
 #include <util/arith_tools.h>
 #include <util/format_expr.h>
 #include <util/make_unique.h>
 #include <util/string_utils.h>
-
-#include "remove_skip.h"
 
 void generate_function_bodiest::generate_function_body(
   goto_functiont &function,
@@ -64,7 +68,7 @@ class assume_false_generate_function_bodiest : public generate_function_bodiest
 protected:
   void generate_function_body_impl(
     goto_functiont &function,
-    const symbol_tablet &symbol_table,
+    symbol_tablet &symbol_table,
     const irep_idt &function_name) const override
   {
     auto const &function_symbol = symbol_table.lookup_ref(function_name);
@@ -87,7 +91,7 @@ class assert_false_generate_function_bodiest : public generate_function_bodiest
 protected:
   void generate_function_body_impl(
     goto_functiont &function,
-    const symbol_tablet &symbol_table,
+    symbol_tablet &symbol_table,
     const irep_idt &function_name) const override
   {
     auto const &function_symbol = symbol_table.lookup_ref(function_name);
@@ -118,7 +122,7 @@ class assert_false_then_assume_false_generate_function_bodiest
 protected:
   void generate_function_body_impl(
     goto_functiont &function,
-    const symbol_tablet &symbol_table,
+    symbol_tablet &symbol_table,
     const irep_idt &function_name) const override
   {
     auto const &function_symbol = symbol_table.lookup_ref(function_name);
@@ -146,115 +150,61 @@ protected:
   }
 };
 
-class havoc_generate_function_bodiest : public generate_function_bodiest,
-                                        private messaget
+class havoc_generate_function_bodiest : public generate_function_bodiest
 {
 public:
   havoc_generate_function_bodiest(
     std::vector<irep_idt> globals_to_havoc,
     std::regex parameters_to_havoc,
+    const c_object_factory_parameterst &object_factory_parameters,
     message_handlert &message_handler)
     : generate_function_bodiest(),
-      messaget(message_handler),
       globals_to_havoc(std::move(globals_to_havoc)),
-      parameters_to_havoc(std::move(parameters_to_havoc))
+      parameters_to_havoc(std::move(parameters_to_havoc)),
+      object_factory_parameters(object_factory_parameters),
+      message(message_handler)
   {
   }
 
 private:
   void havoc_expr_rec(
     const exprt &lhs,
-    const namespacet &ns,
-    const std::function<goto_programt::targett(void)> &add_instruction,
-    const irep_idt &function_name) const
+    const std::size_t initial_depth,
+    const source_locationt &source_location,
+    symbol_tablet &symbol_table,
+    goto_programt &dest) const
   {
-    // resolve type symbols
-    auto const lhs_type = ns.follow(lhs.type());
-    // skip constants
-    if(!lhs_type.get_bool(ID_C_constant))
-    {
-      // expand arrays, structs and union, everything else gets
-      // assigned nondet
-      if(lhs_type.id() == ID_struct || lhs_type.id() == ID_union)
-      {
-        // Note: In the case of unions it's often enough to assign
-        // just one member; However consider a case like
-        // union { struct { const int x; int y; } a;
-        //         struct {  int x; const int y; } b;};
-        // in this case both a.y and b.x must be assigned
-        // otherwise these parts stay constant even though
-        // they could've changed (note that type punning through
-        // unions is allowed in the C standard but forbidden in C++)
-        // so we're assigning all members even in the case of
-        // unions just to be safe
-        auto const lhs_struct_type = to_struct_union_type(lhs_type);
-        for(auto const &component : lhs_struct_type.components())
-        {
-          havoc_expr_rec(
-            member_exprt(lhs, component.get_name(), component.type()),
-            ns,
-            add_instruction,
-            function_name);
-        }
-      }
-      else if(lhs_type.id() == ID_array)
-      {
-        auto const lhs_array_type = to_array_type(lhs_type);
-        if(!lhs_array_type.subtype().get_bool(ID_C_constant))
-        {
-          bool constant_known_array_size = lhs_array_type.size().is_constant();
-          if(!constant_known_array_size)
-          {
-            warning() << "Cannot havoc non-const array " << format(lhs)
-                      << " in function " << function_name
-                      << ": Unknown array size" << eom;
-          }
-          else
-          {
-            auto const array_size =
-              numeric_cast<mp_integer>(lhs_array_type.size());
-            INVARIANT(
-              array_size.has_value(),
-              "Array size should be known constant integer");
-            if(array_size.value() == 0)
-            {
-              // Pretty much the same thing as a unknown size array
-              // Technically not allowed by the C standard, but we model
-              // unknown size arrays in structs this way
-              warning() << "Cannot havoc non-const array " << format(lhs)
-                        << " in function " << function_name << ": Array size 0"
-                        << eom;
-            }
-            else
-            {
-              for(mp_integer i = 0; i < array_size.value(); ++i)
-              {
-                auto const index =
-                  from_integer(i, lhs_array_type.size().type());
-                havoc_expr_rec(
-                  index_exprt(lhs, index, lhs_array_type.subtype()),
-                  ns,
-                  add_instruction,
-                  function_name);
-              }
-            }
-          }
-        }
-      }
-      else
-      {
-        auto assign_instruction = add_instruction();
-        assign_instruction->make_assignment(
-          code_assignt(
-            lhs, side_effect_expr_nondett(lhs_type, lhs.source_location())));
-      }
-    }
+    symbol_factoryt symbol_factory(
+      symbol_table,
+      source_location,
+      object_factory_parameters,
+      lifetimet::DYNAMIC);
+
+    code_blockt assignments;
+
+    symbol_factory.gen_nondet_init(
+      assignments,
+      lhs,
+      initial_depth,
+      symbol_factoryt::recursion_sett(),
+      false); // do not initialize const objects at the top level
+
+    code_blockt init_code;
+
+    symbol_factory.declare_created_symbols(init_code);
+    init_code.append(assignments);
+
+    goto_programt tmp_dest;
+    goto_convert(
+      init_code, symbol_table, tmp_dest, message.get_message_handler(), ID_C);
+
+    dest.destructive_append(tmp_dest);
   }
 
 protected:
   void generate_function_body_impl(
     goto_functiont &function,
-    const symbol_tablet &symbol_table,
+    symbol_tablet &symbol_table,
     const irep_idt &function_name) const override
   {
     auto const &function_symbol = symbol_table.lookup_ref(function_name);
@@ -270,18 +220,29 @@ protected:
     {
       if(
         parameter.type().id() == ID_pointer &&
+        !parameter.type().subtype().get_bool(ID_C_constant) &&
         std::regex_match(
           id2string(parameter.get_base_name()), parameters_to_havoc))
       {
-        // if (param != nullptr) { *param = nondet(); }
         auto goto_instruction = add_instruction();
+
+        const irep_idt base_name = parameter.get_base_name();
+        CHECK_RETURN(!base_name.empty());
+
+        dereference_exprt dereference_expr(
+          symbol_exprt(parameter.get_identifier(), parameter.type()),
+          parameter.type().subtype());
+
+        goto_programt dest;
         havoc_expr_rec(
-          dereference_exprt(
-            symbol_exprt(parameter.get_identifier(), parameter.type()),
-            parameter.type().subtype()),
-          ns,
-          add_instruction,
-          function_name);
+          dereference_expr,
+          1, // depth 1 since we pass the dereferenced pointer
+          function_symbol.location,
+          symbol_table,
+          dest);
+
+        function.body.destructive_append(dest);
+
         auto label_instruction = add_instruction();
         goto_instruction->make_goto(
           label_instruction,
@@ -295,19 +256,25 @@ protected:
     for(auto const &global_id : globals_to_havoc)
     {
       auto const &global_sym = symbol_table.lookup_ref(global_id);
+
+      goto_programt dest;
+
       havoc_expr_rec(
         symbol_exprt(global_sym.name, global_sym.type),
-        ns,
-        add_instruction,
-        function_name);
+        0,
+        function_symbol.location,
+        symbol_table,
+        dest);
+
+      function.body.destructive_append(dest);
     }
+
     if(function.type.return_type() != void_typet())
     {
       auto return_instruction = add_instruction();
       return_instruction->make_return();
-      return_instruction->code = code_returnt(
-        side_effect_expr_nondett(
-          function.type.return_type(), function_symbol.location));
+      return_instruction->code = code_returnt(side_effect_expr_nondett(
+        function.type.return_type(), function_symbol.location));
     }
     auto end_function_instruction = add_instruction();
     end_function_instruction->make_end_function();
@@ -318,6 +285,8 @@ protected:
 private:
   const std::vector<irep_idt> globals_to_havoc;
   std::regex parameters_to_havoc;
+  const c_object_factory_parameterst &object_factory_parameters;
+  mutable messaget message;
 };
 
 class generate_function_bodies_errort : public std::runtime_error
@@ -333,13 +302,17 @@ public:
 /// \see generate_function_bodies for the syntax of the options parameter
 std::unique_ptr<generate_function_bodiest> generate_function_bodies_factory(
   const std::string &options,
+  const c_object_factory_parameterst &object_factory_parameters,
   const symbol_tablet &symbol_table,
   message_handlert &message_handler)
 {
   if(options.empty() || options == "nondet-return")
   {
     return util_make_unique<havoc_generate_function_bodiest>(
-      std::vector<irep_idt>{}, std::regex{}, message_handler);
+      std::vector<irep_idt>{},
+      std::regex{},
+      object_factory_parameters,
+      message_handler);
   }
 
   if(options == "assume-false")
@@ -408,7 +381,10 @@ std::unique_ptr<generate_function_bodiest> generate_function_bodies_factory(
       }
     }
     return util_make_unique<havoc_generate_function_bodiest>(
-      std::move(globals_to_havoc), std::move(params_regex), message_handler);
+      std::move(globals_to_havoc),
+      std::move(params_regex),
+      object_factory_parameters,
+      message_handler);
   }
   throw generate_function_bodies_errort("Can't parse \"" + options + "\"");
 }

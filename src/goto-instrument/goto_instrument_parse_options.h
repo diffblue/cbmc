@@ -12,6 +12,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_INSTRUMENT_GOTO_INSTRUMENT_PARSE_OPTIONS_H
 #define CPROVER_GOTO_INSTRUMENT_GOTO_INSTRUMENT_PARSE_OPTIONS_H
 
+#include <ansi-c/ansi_c_language.h>
+
 #include <util/parse_options.h>
 #include <util/timestamper.h>
 #include <util/ui_message.h>
@@ -27,8 +29,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <analyses/goto_check.h>
 
-#include <goto-programs/generate_function_bodies.h>
 #include "aggressive_slicer.h"
+#include "generate_function_bodies.h"
 
 #include "count_eloc.h"
 
@@ -104,6 +106,7 @@ Author: Daniel Kroening, kroening@kroening.com
   OPT_REPLACE_CALLS \
   "(validate-goto-binary)" \
   OPT_VALIDATE \
+  OPT_ANSI_C_LANGUAGE \
   // empty last line
 
 // clang-format on

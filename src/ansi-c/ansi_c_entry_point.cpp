@@ -42,7 +42,8 @@ exprt::operandst build_function_environment(
       base_name,
       p.type(),
       p.source_location(),
-      object_factory_parameters);
+      object_factory_parameters,
+      lifetimet::AUTOMATIC_LOCAL);
   }
 
   return main_arguments;
