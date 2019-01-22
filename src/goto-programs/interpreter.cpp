@@ -21,6 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/fixedbv.h>
 #include <util/ieee_float.h>
 #include <util/invariant.h>
+#include <util/mathematical_types.h>
 #include <util/message.h>
 #include <util/std_expr.h>
 #include <util/std_types.h>

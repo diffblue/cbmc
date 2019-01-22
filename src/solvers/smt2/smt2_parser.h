@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <map>
 
+#include <util/mathematical_types.h>
 #include <util/std_expr.h>
 
 #include "smt2_tokenizer.h"

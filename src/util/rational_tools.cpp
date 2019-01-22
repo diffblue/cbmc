@@ -11,8 +11,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "rational_tools.h"
 
+#include "mathematical_types.h"
 #include "rational.h"
-#include "std_types.h"
 
 static mp_integer power10(size_t i)
 {

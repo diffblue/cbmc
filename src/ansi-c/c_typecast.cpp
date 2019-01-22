@@ -13,13 +13,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 
 #include <util/arith_tools.h>
+#include <util/base_type.h>
 #include <util/c_types.h>
 #include <util/config.h>
 #include <util/expr_util.h>
-#include <util/std_expr.h>
-#include <util/base_type.h>
-#include <util/symbol.h>
+#include <util/mathematical_types.h>
 #include <util/simplify_expr.h>
+#include <util/std_expr.h>
+#include <util/symbol.h>
 
 #include "c_qualifiers.h"
 
