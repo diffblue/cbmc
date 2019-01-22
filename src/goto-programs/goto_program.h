@@ -180,6 +180,76 @@ public:
   public:
     codet code;
 
+    /// Get the assignment for ASSIGN
+    const code_assignt &get_assign() const
+    {
+      PRECONDITION(is_assign());
+      return to_code_assign(code);
+    }
+
+    /// Get the assignment for ASSIGN
+    code_assignt &get_assign()
+    {
+      PRECONDITION(is_assign());
+      return to_code_assign(code);
+    }
+
+    /// Get the declaration for DECL
+    const code_declt &get_decl() const
+    {
+      PRECONDITION(is_decl());
+      return to_code_decl(code);
+    }
+
+    /// Get the declaration for DECL
+    code_declt &get_decl()
+    {
+      PRECONDITION(is_decl());
+      return to_code_decl(code);
+    }
+
+    /// Get the dead statement for DEAD
+    const code_deadt &get_dead() const
+    {
+      PRECONDITION(is_dead());
+      return to_code_dead(code);
+    }
+
+    /// Get the dead statement for DEAD
+    code_deadt &get_dead()
+    {
+      PRECONDITION(is_dead());
+      return to_code_dead(code);
+    }
+
+    /// Get the return statement for READ
+    const code_returnt &get_return() const
+    {
+      PRECONDITION(is_return());
+      return to_code_return(code);
+    }
+
+    /// Get the return statement for READ
+    code_returnt &get_return()
+    {
+      PRECONDITION(is_return());
+      return to_code_return(code);
+    }
+
+    /// Get the function call for FUNCTION_CALL
+    const code_function_callt &get_function_call() const
+    {
+      PRECONDITION(is_function_call());
+      return to_code_function_call(code);
+    }
+
+    /// Get the function call for FUNCTION_CALL
+    code_function_callt &get_function_call()
+    {
+      PRECONDITION(is_function_call());
+      return to_code_function_call(code);
+    }
+
     /// The function this instruction belongs to
     irep_idt function;
 
@@ -190,7 +260,15 @@ public:
     goto_program_instruction_typet type;
 
     /// Guard for gotos, assume, assert
+    /// Use get_condition() to read
     exprt guard;
+
+    /// Get the condition of gotos, assume, assert
+    const exprt &get_condition() const
+    {
+      PRECONDITION(is_goto() || is_assume() || is_assert());
+      return guard;
+    }
 
     // The below will eventually become a single target only.
     /// The target for gotos and for start_thread nodes
