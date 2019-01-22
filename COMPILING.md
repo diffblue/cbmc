@@ -144,7 +144,7 @@ Follow these instructions:
 
 # COMPILATION ON WINDOWS
 
-There are two options: the Visual Studio compiler with version 12 (2013) or
+There are two options: the Visual Studio compiler with version 14 (2015) or
 later, or the MinGW cross compiler with version 5.4 or later.
 We recommend Visual Studio.
 
@@ -218,7 +218,7 @@ require manual modification of build files.
      ```
      You shoud also install [Homebrew](https://brew.sh), after which you can
      run `brew install cmake` to install CMake.
-   - On Windows, ensure you have Visual Studio 2013 or later installed.
+   - On Windows, ensure you have Visual Studio 2015 or later installed.
      Then, download CMake from the [official download
      page](https://cmake.org/download).
      You'll also need `git` and `patch`, which are both provided by the
