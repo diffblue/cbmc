@@ -560,32 +560,11 @@ int cbmc_parse_optionst::doit()
 
 bool cbmc_parse_optionst::set_properties()
 {
-  try
-  {
-    if(cmdline.isset("claim")) // will go away
-      ::set_properties(goto_model, cmdline.get_values("claim"));
+  if(cmdline.isset("claim")) // will go away
+    ::set_properties(goto_model, cmdline.get_values("claim"));
 
-    if(cmdline.isset("property")) // use this one
-      ::set_properties(goto_model, cmdline.get_values("property"));
-  }
-
-  catch(const char *e)
-  {
-    error() << e << eom;
-    return true;
-  }
-
-  catch(const std::string &e)
-  {
-    error() << e << eom;
-    return true;
-  }
-
-  catch(int e)
-  {
-    error() << "Numeric exception : " << e << eom;
-    return true;
-  }
+  if(cmdline.isset("property")) // use this one
+    ::set_properties(goto_model, cmdline.get_values("property"));
 
   return false;
 }
@@ -644,7 +623,6 @@ int cbmc_parse_optionst::get_goto_program(
 
 void cbmc_parse_optionst::preprocessing(const optionst &options)
 {
-  try
   {
     if(cmdline.args.size()!=1)
     {
@@ -676,27 +654,6 @@ void cbmc_parse_optionst::preprocessing(const optionst &options)
     if(language->preprocess(infile, filename, std::cout))
       error() << "PREPROCESSING ERROR" << eom;
   }
-
-  catch(const char *e)
-  {
-    error() << e << eom;
-  }
-
-  catch(const std::string &e)
-  {
-    error() << e << eom;
-  }
-
-  catch(int e)
-  {
-    error() << "Numeric exception : " << e << eom;
-  }
-
-  catch(const std::bad_alloc &)
-  {
-    error() << "Out of memory" << eom;
-    exit(CPROVER_EXIT_INTERNAL_OUT_OF_MEMORY);
-  }
 }
 
 bool cbmc_parse_optionst::process_goto_program(
@@ -704,7 +661,6 @@ bool cbmc_parse_optionst::process_goto_program(
   const optionst &options,
   messaget &log)
 {
-  try
   {
     // Remove inline assembler; this needs to happen before
     // adding the library.
@@ -830,31 +786,6 @@ bool cbmc_parse_optionst::process_goto_program(
 
     // remove any skips introduced since coverage instrumentation
     remove_skip(goto_model);
-  }
-
-  catch(const char *e)
-  {
-    log.error() << e << eom;
-    return true;
-  }
-
-  catch(const std::string &e)
-  {
-    log.error() << e << eom;
-    return true;
-  }
-
-  catch(int e)
-  {
-    log.error() << "Numeric exception : " << e << eom;
-    return true;
-  }
-
-  catch(const std::bad_alloc &)
-  {
-    log.error() << "Out of memory" << eom;
-    exit(CPROVER_EXIT_INTERNAL_OUT_OF_MEMORY);
-    return true;
   }
 
   return false;
