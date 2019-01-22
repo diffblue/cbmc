@@ -54,10 +54,11 @@ protected:
   void undo_function_calls(
     goto_programt &goto_program);
 
-  symbol_exprt get_or_create_return_value_symbol(const irep_idt &function_id);
+  optionalt<symbol_exprt>
+  get_or_create_return_value_symbol(const irep_idt &function_id);
 };
 
-symbol_exprt
+optionalt<symbol_exprt>
 remove_returnst::get_or_create_return_value_symbol(const irep_idt &function_id)
 {
   const irep_idt symbol_name = id2string(function_id) + RETURN_VALUE_SUFFIX;
@@ -69,7 +70,7 @@ remove_returnst::get_or_create_return_value_symbol(const irep_idt &function_id)
   const typet &return_type = to_code_type(function_symbol.type).return_type();
 
   if(return_type == empty_typet())
-    return symbol_exprt();
+    return {};
 
   auxiliary_symbolt new_symbol;
   new_symbol.is_static_lifetime = true;
@@ -103,7 +104,7 @@ void remove_returnst::replace_returns(
     return;
 
   // add return_value symbol to symbol_table, if not already created:
-  symbol_exprt return_symbol = get_or_create_return_value_symbol(function_id);
+  const auto return_symbol = get_or_create_return_value_symbol(function_id);
 
   // look up the function symbol
   symbolt &function_symbol = *symbol_table.get_writeable(function_id);
@@ -122,11 +123,16 @@ void remove_returnst::replace_returns(
         i_it->code.operands().size() == 1,
         "return instructions should have one operand");
 
-      // replace "return x;" by "fkt#return_value=x;"
-      code_assignt assignment(return_symbol, i_it->code.op0());
+      if(return_symbol.has_value())
+      {
+        // replace "return x;" by "fkt#return_value=x;"
+        code_assignt assignment(*return_symbol, i_it->code.op0());
 
-      // now turn the `return' into `assignment'
-      i_it->make_assignment(assignment);
+        // now turn the `return' into `assignment'
+        i_it->make_assignment(assignment);
+      }
+      else
+        i_it->make_skip();
     }
   }
 }
@@ -153,7 +159,7 @@ void remove_returnst::do_function_calls(
       const irep_idt function_id =
         to_symbol_expr(function_call.function()).get_identifier();
 
-      symbol_exprt return_value;
+      optionalt<symbol_exprt> return_value;
       typet old_return_type;
       bool is_stub = function_is_stub(function_id);
 
@@ -169,9 +175,9 @@ void remove_returnst::do_function_calls(
         // To simplify matters, create its return-value global now (if not
         // already done), and use that to determine its true return type.
         return_value = get_or_create_return_value_symbol(function_id);
-        if(return_value == symbol_exprt()) // really void-typed?
+        if(!return_value.has_value()) // really void-typed?
           continue;
-        old_return_type = return_value.type();
+        old_return_type = return_value->type();
       }
 
       // Do we return anything?
@@ -194,7 +200,7 @@ void remove_returnst::do_function_calls(
             // from the return type in the declaration.  We therefore do a
             // cast.
             rhs = typecast_exprt::conditional_cast(
-              return_value, function_call.lhs().type());
+              *return_value, function_call.lhs().type());
           }
           else
             rhs = side_effect_expr_nondett(
@@ -214,7 +220,7 @@ void remove_returnst::do_function_calls(
             goto_programt::targett t_d=goto_program.insert_after(t_a);
             t_d->make_dead();
             t_d->source_location=i_it->source_location;
-            t_d->code = code_deadt(return_value);
+            t_d->code = code_deadt(*return_value);
             t_d->function=i_it->function;
           }
         }

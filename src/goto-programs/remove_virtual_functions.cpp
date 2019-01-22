@@ -54,7 +54,7 @@ protected:
     function_call_resolvert;
   void get_child_functions_rec(
     const irep_idt &,
-    const symbol_exprt &,
+    const optionalt<symbol_exprt> &,
     const irep_idt &,
     dispatch_table_entriest &,
     dispatch_table_entries_mapt &,
@@ -166,7 +166,7 @@ goto_programt::targett remove_virtual_functionst::remove_virtual_function(
   if(functions.size()==1 &&
      fallback_action==virtual_dispatch_fallback_actiont::CALL_LAST_FUNCTION)
   {
-    if(functions.begin()->symbol_expr==symbol_exprt())
+    if(!functions.front().symbol_expr.has_value())
     {
       target->make_skip();
       remove_skip(goto_program, target, next_target);
@@ -174,7 +174,9 @@ goto_programt::targett remove_virtual_functionst::remove_virtual_function(
     else
     {
       create_static_function_call(
-        to_code_function_call(target->code), functions.front().symbol_expr, ns);
+        to_code_function_call(target->code),
+        *functions.front().symbol_expr,
+        ns);
     }
     return next_target;
   }
@@ -195,7 +197,6 @@ goto_programt::targett remove_virtual_functionst::remove_virtual_function(
   goto_programt new_code_gotos;
 
   exprt this_expr=code.arguments()[0];
-  const auto &last_function_symbol=functions.back().symbol_expr;
 
   const typet &this_type=this_expr.type();
   INVARIANT(this_type.id() == ID_pointer, "this parameter must be a pointer");
@@ -219,26 +220,29 @@ goto_programt::targett remove_virtual_functionst::remove_virtual_function(
 
   // get initial identifier for grouping
   INVARIANT(!functions.empty(), "Function dispatch table cannot be empty.");
+  const auto &last_function_symbol = functions.back().symbol_expr;
 
   std::map<irep_idt, goto_programt::targett> calls;
   // Note backwards iteration, to get the fallback candidate first.
   for(auto it=functions.crbegin(), itend=functions.crend(); it!=itend; ++it)
   {
     const auto &fun=*it;
-    auto insertit=calls.insert(
-      {fun.symbol_expr.get_identifier(), goto_programt::targett()});
+    irep_idt id_or_empty = fun.symbol_expr.has_value()
+                             ? fun.symbol_expr->get_identifier()
+                             : irep_idt();
+    auto insertit = calls.insert({id_or_empty, goto_programt::targett()});
 
     // Only create one call sequence per possible target:
     if(insertit.second)
     {
       goto_programt::targett t1=new_code_calls.add_instruction();
       t1->source_location=vcall_source_loc;
-      if(!fun.symbol_expr.get_identifier().empty())
+      if(fun.symbol_expr.has_value())
       {
       // call function
         t1->make_function_call(code);
         create_static_function_call(
-          to_code_function_call(t1->code), fun.symbol_expr, ns);
+          to_code_function_call(t1->code), *fun.symbol_expr, ns);
       }
       else
       {
@@ -257,9 +261,12 @@ goto_programt::targett remove_virtual_functionst::remove_virtual_function(
     }
 
     // Fall through to the default callee if possible:
-    if(fallback_action ==
-       virtual_dispatch_fallback_actiont::CALL_LAST_FUNCTION &&
-       fun.symbol_expr == last_function_symbol)
+    if(
+      fallback_action ==
+        virtual_dispatch_fallback_actiont::CALL_LAST_FUNCTION &&
+      fun.symbol_expr.has_value() == last_function_symbol.has_value() &&
+      (!fun.symbol_expr.has_value() ||
+       *fun.symbol_expr == *last_function_symbol))
     {
       // Nothing to do
     }
@@ -271,8 +278,11 @@ goto_programt::targett remove_virtual_functionst::remove_virtual_function(
 
       // If the previous GOTO goes to the same callee, join it
       // (e.g. turning IF x GOTO y into IF x || z GOTO y)
-      if(it != functions.crbegin() &&
-         std::prev(it)->symbol_expr == fun.symbol_expr)
+      if(
+        it != functions.crbegin() &&
+        std::prev(it)->symbol_expr.has_value() == fun.symbol_expr.has_value() &&
+        (!fun.symbol_expr.has_value() ||
+         *(std::prev(it)->symbol_expr) == *fun.symbol_expr))
       {
         INVARIANT(
           !new_code_gotos.empty(),
@@ -337,7 +347,7 @@ goto_programt::targett remove_virtual_functionst::remove_virtual_function(
 /// \param resolve_function_call`: function to resolve abstract method call
 void remove_virtual_functionst::get_child_functions_rec(
   const irep_idt &this_id,
-  const symbol_exprt &last_method_defn,
+  const optionalt<symbol_exprt> &last_method_defn,
   const irep_idt &component_name,
   dispatch_table_entriest &functions,
   dispatch_table_entries_mapt &entry_map,
@@ -354,9 +364,10 @@ void remove_virtual_functionst::get_child_functions_rec(
     auto it = entry_map.find(child);
     if(
       it != entry_map.end() &&
-      !has_prefix(
-        id2string(it->second.symbol_expr.get_identifier()),
-        "java::java.lang.Object"))
+      (!it->second.symbol_expr.has_value() ||
+       !has_prefix(
+         id2string(it->second.symbol_expr->get_identifier()),
+         "java::java.lang.Object")))
     {
       continue;
     }
@@ -365,13 +376,13 @@ void remove_virtual_functionst::get_child_functions_rec(
     if(method.is_not_nil())
     {
       function.symbol_expr=to_symbol_expr(method);
-      function.symbol_expr.set(ID_C_class, child);
+      function.symbol_expr->set(ID_C_class, child);
     }
     else
     {
       function.symbol_expr=last_method_defn;
     }
-    if(function.symbol_expr == symbol_exprt())
+    if(!function.symbol_expr.has_value())
     {
       const resolve_inherited_componentt::inherited_componentt
         &resolved_call = resolve_function_call(child, component_name);
@@ -383,12 +394,12 @@ void remove_virtual_functionst::get_child_functions_rec(
             resolved_call.get_full_component_identifier());
 
         function.symbol_expr = called_symbol.symbol_expr();
-        function.symbol_expr.set(
+        function.symbol_expr->set(
           ID_C_class, resolved_call.get_class_identifier());
       }
     }
     functions.push_back(function);
-    entry_map.insert({child, function});
+    entry_map.emplace(child, function);
 
     get_child_functions_rec(
       child,
@@ -426,7 +437,8 @@ void remove_virtual_functionst::get_functions(
   const resolve_inherited_componentt::inherited_componentt
     &resolved_call = get_virtual_call_target(class_id, function_name, false);
 
-  dispatch_table_entryt root_function;
+  // might be an abstract function
+  dispatch_table_entryt root_function(class_id);
 
   if(resolved_call.is_valid())
   {
@@ -436,13 +448,8 @@ void remove_virtual_functionst::get_functions(
       symbol_table.lookup_ref(resolved_call.get_full_component_identifier());
 
     root_function.symbol_expr=called_symbol.symbol_expr();
-    root_function.symbol_expr.set(
+    root_function.symbol_expr->set(
       ID_C_class, resolved_call.get_class_identifier());
-  }
-  else
-  {
-    // No definition here; this is an abstract function.
-    root_function.class_id=class_id;
   }
 
   // iterate over all children, transitively
@@ -455,7 +462,7 @@ void remove_virtual_functionst::get_functions(
     entry_map,
     resolve_function_call);
 
-  if(root_function.symbol_expr!=symbol_exprt())
+  if(root_function.symbol_expr.has_value())
     functions.push_back(root_function);
 
   // Sort for the identifier of the function call symbol expression, grouping
@@ -465,20 +472,21 @@ void remove_virtual_functionst::get_functions(
   std::sort(
     functions.begin(),
     functions.end(),
-    [](const dispatch_table_entryt &a, dispatch_table_entryt &b)
-    {
-      if(
-        has_prefix(
-          id2string(a.symbol_expr.get_identifier()), "java::java.lang.Object"))
+    [](const dispatch_table_entryt &a, const dispatch_table_entryt &b) {
+      irep_idt a_id = a.symbol_expr.has_value()
+                        ? a.symbol_expr->get_identifier()
+                        : irep_idt();
+      irep_idt b_id = b.symbol_expr.has_value()
+                        ? b.symbol_expr->get_identifier()
+                        : irep_idt();
+
+      if(has_prefix(id2string(a_id), "java::java.lang.Object"))
         return false;
-      else if(
-        has_prefix(
-          id2string(b.symbol_expr.get_identifier()), "java::java.lang.Object"))
+      else if(has_prefix(id2string(b_id), "java::java.lang.Object"))
         return true;
       else
       {
-        int cmp = a.symbol_expr.get_identifier().compare(
-          b.symbol_expr.get_identifier());
+        int cmp = a_id.compare(b_id);
         if(cmp == 0)
           return a.class_id < b.class_id;
         else
