@@ -433,22 +433,7 @@ int cbmc_parse_optionst::doit()
   //
 
   optionst options;
-  try
-  {
-    get_command_line_options(options);
-  }
-
-  catch(const char *error_msg)
-  {
-    error() << error_msg << eom;
-    return CPROVER_EXIT_EXCEPTION;
-  }
-
-  catch(const std::string &error_msg)
-  {
-    error() << error_msg << eom;
-    return CPROVER_EXIT_EXCEPTION;
-  }
+  get_command_line_options(options);
 
   eval_verbosity(
     cmdline.get_value("verbosity"), messaget::M_STATISTICS, ui_message_handler);
@@ -618,7 +603,6 @@ int cbmc_parse_optionst::get_goto_program(
     return CPROVER_EXIT_INCORRECT_TASK;
   }
 
-  try
   {
     goto_model =
       initialize_goto_model(cmdline.args, ui_message_handler, options);
@@ -653,36 +637,6 @@ int cbmc_parse_optionst::get_goto_program(
     }
 
     log.status() << config.object_bits_info() << log.eom;
-  }
-
-  catch(incorrect_goto_program_exceptiont &e)
-  {
-    log.error() << e.what() << log.eom;
-    return CPROVER_EXIT_EXCEPTION;
-  }
-
-  catch(const char *e)
-  {
-    log.error() << e << log.eom;
-    return CPROVER_EXIT_EXCEPTION;
-  }
-
-  catch(const std::string &e)
-  {
-    log.error() << e << log.eom;
-    return CPROVER_EXIT_EXCEPTION;
-  }
-
-  catch(int e)
-  {
-    log.error() << "Numeric exception : " << e << log.eom;
-    return CPROVER_EXIT_EXCEPTION;
-  }
-
-  catch(const std::bad_alloc &)
-  {
-    log.error() << "Out of memory" << log.eom;
-    return CPROVER_EXIT_INTERNAL_OUT_OF_MEMORY;
   }
 
   return -1; // no error, continue
