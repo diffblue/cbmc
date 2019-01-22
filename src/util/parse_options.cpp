@@ -71,14 +71,52 @@ int parse_options_baset::main()
 
     return doit();
   }
+
+  // CPROVER style exceptions in order of decreasing happiness
   catch(const invalid_command_line_argument_exceptiont &e)
   {
-    std::cerr << e.what() << "\n";
+    std::cerr << e.what() << '\n';
     return CPROVER_EXIT_USAGE_ERROR;
+  }
+  catch(incorrect_goto_program_exceptiont &e)
+  {
+    std::cerr << e.what() << '\n';
+    return CPROVER_EXIT_EXCEPTION;
   }
   catch(const cprover_exception_baset &e)
   {
     std::cerr << e.what() << '\n';
+    return CPROVER_EXIT_EXCEPTION;
+  }
+  catch(const std::string &e)
+  {
+    std::cerr << "C++ string exception : " << e << '\n';
+    return CPROVER_EXIT_EXCEPTION;
+  }
+  catch(const char *e)
+  {
+    std::cerr << "C string exception : " << e << '\n';
+    return CPROVER_EXIT_EXCEPTION;
+  }
+  catch(int e)
+  {
+    std::cerr << "Numeric exception : " << e << '\n';
+    return CPROVER_EXIT_EXCEPTION;
+  }
+  // C++ style exceptions
+  catch(const std::bad_alloc &)
+  {
+    std::cerr << "Out of memory" << '\n';
+    return CPROVER_EXIT_INTERNAL_OUT_OF_MEMORY;
+  }
+  catch(const std::exception &e)
+  {
+    std::cerr << e.what() << '\n';
+    return CPROVER_EXIT_EXCEPTION;
+  }
+  catch(...)
+  {
+    std::cerr << "Unknown exception type!" << '\n';
     return CPROVER_EXIT_EXCEPTION;
   }
 }
