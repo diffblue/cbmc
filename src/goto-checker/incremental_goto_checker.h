@@ -60,7 +60,7 @@ public:
   };
 
   /// Check whether the given properties with status NOT_CHECKED, UNKNOWN or
-  /// properties newly discovered by `goto_checkert` hold.
+  /// properties newly discovered by `incremental_goto_checkert` hold.
   /// \param [out] properties: Properties updated to whether their status
   ///   have been determined. Newly discovered properties are added.
   /// \return whether the goto checker found a violated property (FOUND_FAIL) or
@@ -71,7 +71,7 @@ public:
   /// If there is a property with status FAIL then its counterexample
   /// can be retrieved by calling `build_error_trace` before any
   /// subsequent call to operator().
-  /// `goto_checkert` derivatives shall be implemented in a way such
+  /// `incremental_goto_checkert` derivatives shall be implemented in a way such
   /// that repeated calls to operator() shall return when the next FAILed
   /// property has been found until eventually it does not find any
   /// failing properties any more.
