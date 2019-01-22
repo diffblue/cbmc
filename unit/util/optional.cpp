@@ -6,7 +6,7 @@ Author: Diffblue Ltd.
 
 \*******************************************************************/
 
-#include <testing-utils/catch.hpp>
+#include <testing-utils/use_catch.h>
 #include <util/optional.h>
 
 TEST_CASE("Optional without a value", "[core][util][optional]")

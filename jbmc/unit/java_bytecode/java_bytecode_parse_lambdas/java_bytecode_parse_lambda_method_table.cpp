@@ -13,8 +13,8 @@ Author: Diffblue Ltd.
 #include <java-testing-utils/require_parse_tree.h>
 
 #include <java_bytecode/java_bytecode_parser.h>
-#include <testing-utils/catch.hpp>
 #include <testing-utils/message.h>
+#include <testing-utils/use_catch.h>
 
 #include <java_bytecode/java_bytecode_parse_tree.h>
 #include <java_bytecode/java_types.h>

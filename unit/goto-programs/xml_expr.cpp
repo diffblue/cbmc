@@ -6,7 +6,7 @@ Author: Michael Tautschnig
 
 \*******************************************************************/
 
-#include <testing-utils/catch.hpp>
+#include <testing-utils/use_catch.h>
 
 #include <util/arith_tools.h>
 #include <util/config.h>

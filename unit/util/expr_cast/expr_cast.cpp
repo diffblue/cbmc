@@ -9,11 +9,10 @@ Author: Nathan Phillips <Nathan.Phillips@diffblue.com>
 /// \file
 /// expr_dynamic_cast Unit Tests
 
-#include <testing-utils/catch.hpp>
-#include <util/std_expr.h>
+#include <testing-utils/use_catch.h>
 #include <util/std_code.h>
+#include <util/std_expr.h>
 #include <util/std_types.h>
-
 
 SCENARIO("expr_dynamic_cast",
   "[core][utils][expr_cast][expr_dynamic_cast]")

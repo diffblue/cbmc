@@ -2,8 +2,8 @@
 
 /// \file Tests for small shared two-way pointer
 
+#include <testing-utils/use_catch.h>
 #include <util/small_shared_two_way_ptr.h>
-#include <testing-utils/catch.hpp>
 
 class d1t : public small_shared_two_way_pointeet<unsigned>
 {

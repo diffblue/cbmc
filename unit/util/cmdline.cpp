@@ -6,7 +6,7 @@ Author: Diffblue Ltd.
 
 \*******************************************************************/
 
-#include <testing-utils/catch.hpp>
+#include <testing-utils/use_catch.h>
 #include <util/cmdline.h>
 
 TEST_CASE("cmdlinet::has_option", "[core][util][cmdline]")

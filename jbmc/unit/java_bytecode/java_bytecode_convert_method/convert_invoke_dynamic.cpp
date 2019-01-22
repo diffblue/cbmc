@@ -6,15 +6,15 @@ Author: Diffblue Ltd.
 
 \*******************************************************************/
 
-#include <testing-utils/catch.hpp>
+#include <goto-programs/class_hierarchy.h>
 #include <java-testing-utils/load_java_class.h>
 #include <java-testing-utils/require_goto_statements.h>
-#include <testing-utils/require_expr.h>
 #include <java-testing-utils/require_type.h>
-#include <testing-utils/run_test_with_compilers.h>
+#include <testing-utils/require_expr.h>
 #include <testing-utils/require_symbol.h>
+#include <testing-utils/run_test_with_compilers.h>
+#include <testing-utils/use_catch.h>
 #include <util/expr_iterator.h>
-#include <goto-programs/class_hierarchy.h>
 
 struct lambda_assignment_test_datat
 {

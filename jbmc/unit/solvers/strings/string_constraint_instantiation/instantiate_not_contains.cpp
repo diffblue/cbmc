@@ -6,7 +6,7 @@ Author: Jesse Sigal, jesse.sigal@diffblue.com
 
 \*******************************************************************/
 
-#include <testing-utils/catch.hpp>
+#include <testing-utils/use_catch.h>
 
 #include <java_bytecode/java_bytecode_language.h>
 #include <java_bytecode/java_types.h>

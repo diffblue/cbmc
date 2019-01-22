@@ -9,8 +9,8 @@ Author: Diffblue Ltd.
 /// \file
 /// Unit tests for ait
 
-#include <testing-utils/catch.hpp>
 #include <testing-utils/message.h>
+#include <testing-utils/use_catch.h>
 
 #include <analyses/ai.h>
 

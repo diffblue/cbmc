@@ -9,8 +9,8 @@ Author: Diffblue Ltd.
 /// \file
 /// Unit tests for ai_domain_baset::ai_simplify_lhs
 
-#include <testing-utils/catch.hpp>
 #include <testing-utils/message.h>
+#include <testing-utils/use_catch.h>
 
 #include <analyses/ai.h>
 

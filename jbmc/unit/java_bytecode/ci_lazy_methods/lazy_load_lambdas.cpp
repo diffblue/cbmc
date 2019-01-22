@@ -6,9 +6,9 @@ Author: Diffblue Limited.
 
 \*******************************************************************/
 
-#include <testing-utils/catch.hpp>
 #include <java-testing-utils/load_java_class.h>
 #include <testing-utils/require_symbol.h>
+#include <testing-utils/use_catch.h>
 
 SCENARIO(
   "Lazy load lambda methods",

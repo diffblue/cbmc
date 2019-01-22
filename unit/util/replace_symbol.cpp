@@ -6,7 +6,7 @@ Author: Michael Tautschnig
 
 \*******************************************************************/
 
-#include <testing-utils/catch.hpp>
+#include <testing-utils/use_catch.h>
 
 #include <util/replace_symbol.h>
 #include <util/std_expr.h>

@@ -13,7 +13,7 @@ Author: Daniel Poetzl
 #include <random>
 #include <set>
 
-#include <testing-utils/catch.hpp>
+#include <testing-utils/use_catch.h>
 #include <util/sharing_map.h>
 
 class smt : public sharing_mapt<irep_idt, std::string, irep_id_hash>

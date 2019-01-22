@@ -13,7 +13,7 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 #include <goto-programs/goto_convert_functions.h>
 #include <langapi/mode.h>
 #include <testing-utils/call_graph_test_utils.h>
-#include <testing-utils/catch.hpp>
+#include <testing-utils/use_catch.h>
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/std_code.h>

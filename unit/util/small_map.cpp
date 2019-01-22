@@ -2,7 +2,7 @@
 
 /// \file Tests for small map
 
-#include <testing-utils/catch.hpp>
+#include <testing-utils/use_catch.h>
 #include <util/small_map.h>
 
 // This method is a friend of small_map

@@ -6,8 +6,8 @@ Author: Diffblue Ltd.
 
 \*******************************************************************/
 
-#include <testing-utils/catch.hpp>
 #include <java_bytecode/java_types.h>
+#include <testing-utils/use_catch.h>
 
 SCENARIO("java_generic_struct_tag_type", "[core][java_types]")
 {

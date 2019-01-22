@@ -6,9 +6,11 @@ Author: Diffblue Ltd.
 
 \*******************************************************************/
 
-#include <goto-programs/goto_function.h>
-#include <testing-utils/catch.hpp>
+#include <testing-utils/use_catch.h>
+
 #include <util/arith_tools.h>
+
+#include <goto-programs/goto_function.h>
 
 SCENARIO(
   "Validation of well-formed goto codes",

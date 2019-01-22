@@ -6,7 +6,7 @@ Author: Diffblue Ltd.
 
 \*******************************************************************/
 
-#include <testing-utils/catch.hpp>
+#include <testing-utils/use_catch.h>
 
 #include <goto-programs/goto_functions.h>
 #include <goto-programs/interpreter_class.h>

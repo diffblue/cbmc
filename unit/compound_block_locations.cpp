@@ -8,7 +8,7 @@ Author: Kareem Khazem <karkhaz@karkhaz.com>, 2018
 
 #include "compound_block_locations.h"
 
-#include <testing-utils/catch.hpp>
+#include <testing-utils/use_catch.h>
 
 #include <fstream>
 #include <utility>

@@ -5,12 +5,12 @@ Module: Unit tests for instantiating generic superclasses and interfaces.
 Author: Diffblue Ltd.
 
 \*******************************************************************/
-#include <testing-utils/catch.hpp>
 #include <java-testing-utils/load_java_class.h>
 #include <java-testing-utils/require_goto_statements.h>
-#include <util/config.h>
 #include <java-testing-utils/require_type.h>
 #include <testing-utils/require_symbol.h>
+#include <testing-utils/use_catch.h>
+#include <util/config.h>
 
 // NOTE: To inspect these tests at any point, use expr2java.
 // A good way to verify the validity of a test is to iterate

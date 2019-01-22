@@ -9,7 +9,7 @@ Author: Diffblue Ltd.
 /// \file
 /// Unit tests for value_sett
 
-#include <testing-utils/catch.hpp>
+#include <testing-utils/use_catch.h>
 
 #include <pointer-analysis/value_set.h>
 #include <util/arith_tools.h>

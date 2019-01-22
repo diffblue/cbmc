@@ -9,7 +9,7 @@ Author: Diffblue Limited.
 #ifndef CPROVER_TESTING_UTILS_REQUIRE_VECTORS_EQUAL_UNORDERED_H
 #define CPROVER_TESTING_UTILS_REQUIRE_VECTORS_EQUAL_UNORDERED_H
 
-#include <testing-utils/catch.hpp>
+#include <testing-utils/use_catch.h>
 #include <vector>
 
 /// Checks whether two vectors are equal, ignoring ordering

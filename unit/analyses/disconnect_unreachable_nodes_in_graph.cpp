@@ -9,7 +9,7 @@ Author:
 #include <iostream>
 
 #include <testing-utils/call_graph_test_utils.h>
-#include <testing-utils/catch.hpp>
+#include <testing-utils/use_catch.h>
 
 #include <analyses/call_graph_helpers.h>
 

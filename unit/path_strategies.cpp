@@ -6,7 +6,7 @@ Author: Kareem Khazem <karkhaz@karkhaz.com>, 2018
 
 \*******************************************************************/
 
-#include <testing-utils/catch.hpp>
+#include <testing-utils/use_catch.h>
 
 #include <path_strategies.h>
 

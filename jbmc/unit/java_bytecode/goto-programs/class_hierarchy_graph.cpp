@@ -6,8 +6,8 @@ Author: Diffblue Ltd.
 
 \*******************************************************************/
 
-#include <testing-utils/catch.hpp>
 #include <java-testing-utils/load_java_class.h>
+#include <testing-utils/use_catch.h>
 
 #include <goto-programs/class_hierarchy.h>
 

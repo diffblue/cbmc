@@ -7,7 +7,7 @@ Author: Diffblue Ltd.
 
 \*******************************************************************/
 
-#include <testing-utils/catch.hpp>
+#include <testing-utils/use_catch.h>
 
 #include <util/arith_tools.h>
 #include <util/std_expr.h>

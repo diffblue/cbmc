@@ -7,8 +7,8 @@ Author: Diffblue Limited
 \*******************************************************************/
 
 #include <java_bytecode/load_method_by_regex.h>
-#include <testing-utils/catch.hpp>
 #include <testing-utils/require_vectors_equal_unordered.h>
+#include <testing-utils/use_catch.h>
 
 SCENARIO(
   "load_method_by_regex::does_pattern_miss_descriptor",

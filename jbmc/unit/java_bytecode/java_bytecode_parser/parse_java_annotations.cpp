@@ -11,9 +11,9 @@ Author: Diffblue Ltd.
 #include <java_bytecode/java_bytecode_convert_class.h>
 #include <java_bytecode/java_bytecode_parse_tree.h>
 #include <java_bytecode/java_types.h>
-#include <testing-utils/catch.hpp>
 #include <testing-utils/free_form_cmdline.h>
 #include <testing-utils/message.h>
+#include <testing-utils/use_catch.h>
 #include <util/options.h>
 
 class test_java_bytecode_languaget : public java_bytecode_languaget

@@ -6,10 +6,10 @@ Author: Diffblue Ltd.
 
 \*******************************************************************/
 
-#include <testing-utils/catch.hpp>
 #include <goto-programs/goto_program.h>
 #include <goto-programs/goto_trace.h>
 #include <sstream>
+#include <testing-utils/use_catch.h>
 
 SCENARIO(
   "Output trace with nil lhs object",

@@ -6,9 +6,9 @@ Author: Diffblue Ltd.
 
 \*******************************************************************/
 
-#include <testing-utils/catch.hpp>
 #include <java-testing-utils/load_java_class.h>
 #include <java-testing-utils/require_type.h>
+#include <testing-utils/use_catch.h>
 
 SCENARIO(
   "parse_signature_descriptor_mismatch",

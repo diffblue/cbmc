@@ -4,7 +4,7 @@
 
 #define SN_INTERNAL_CHECKS
 
-#include <testing-utils/catch.hpp>
+#include <testing-utils/use_catch.h>
 #include <util/sharing_node.h>
 
 void sharing_node_test()

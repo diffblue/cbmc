@@ -2,7 +2,7 @@
 
 /// \file Tests that irept memory consumption is fixed
 
-#include <testing-utils/catch.hpp>
+#include <testing-utils/use_catch.h>
 #include <util/irep.h>
 
 SCENARIO("irept_memory", "[core][utils][irept]")

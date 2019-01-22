@@ -8,7 +8,7 @@ Author: Diffblue Ltd.
 
 #include "require_goto_statements.h"
 
-#include <testing-utils/catch.hpp>
+#include <testing-utils/use_catch.h>
 
 #include <algorithm>
 #include <util/expr_iterator.h>

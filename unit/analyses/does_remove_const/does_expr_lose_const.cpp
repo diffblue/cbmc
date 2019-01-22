@@ -9,7 +9,7 @@ Author: Diffblue Ltd.
 /// \file
 /// Does Remove Const Unit Tests
 
-#include <testing-utils/catch.hpp>
+#include <testing-utils/use_catch.h>
 
 #include <util/std_expr.h>
 #include <util/std_code.h>

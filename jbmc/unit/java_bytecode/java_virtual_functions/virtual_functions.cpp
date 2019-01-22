@@ -7,8 +7,8 @@ Author: Diffblue Ltd.
 \*******************************************************************/
 
 #include <java-testing-utils/load_java_class.h>
-#include <testing-utils/catch.hpp>
 #include <testing-utils/message.h>
+#include <testing-utils/use_catch.h>
 
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/remove_virtual_functions.h>

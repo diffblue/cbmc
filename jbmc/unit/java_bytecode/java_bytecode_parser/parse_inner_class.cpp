@@ -6,9 +6,10 @@ Author: Diffblue Ltd.
 
 \*******************************************************************/
 
+#include <testing-utils/use_catch.h>
+
 #include <java-testing-utils/load_java_class.h>
 #include <java_bytecode/java_types.h>
-#include <testing-utils/catch.hpp>
 
 #include <string>
 #include <vector>

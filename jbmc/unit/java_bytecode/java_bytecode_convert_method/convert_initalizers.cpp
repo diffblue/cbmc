@@ -6,7 +6,7 @@ Author: Diffblue Limited.
 
 \*******************************************************************/
 
-#include <testing-utils/catch.hpp>
+#include <testing-utils/use_catch.h>
 
 #include <memory>
 

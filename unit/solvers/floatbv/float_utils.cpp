@@ -6,7 +6,7 @@ Author: Daniel Kroening
 
 \*******************************************************************/
 
-#include <testing-utils/catch.hpp>
+#include <testing-utils/use_catch.h>
 
 // for debug output in case of failure
 #include <iostream>

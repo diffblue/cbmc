@@ -7,16 +7,16 @@ Author: Diffblue Ltd.
 
 \*******************************************************************/
 
-#include <testing-utils/catch.hpp>
-#include <util/expr.h>
-#include <util/std_code.h>
-#include <util/namespace.h>
-#include <java_bytecode/java_object_factory.h>
+#include <iostream>
 #include <java_bytecode/java_bytecode_language.h>
+#include <java_bytecode/java_object_factory.h>
 #include <java_bytecode/java_root_class.h>
 #include <langapi/language_util.h>
 #include <langapi/mode.h>
-#include <iostream>
+#include <testing-utils/use_catch.h>
+#include <util/expr.h>
+#include <util/namespace.h>
+#include <util/std_code.h>
 
 SCENARIO(
   "Generate string object",
