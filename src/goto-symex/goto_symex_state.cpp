@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/base_exceptions.h>
 #include <util/exception_utils.h>
+#include <util/expr_iterator.h>
 #include <util/expr_util.h>
 #include <util/format.h>
 #include <util/format_expr.h>
@@ -261,34 +262,33 @@ void goto_symex_statet::set_l2_indices(
   ssa_expr.set_level_2(level2.current_count(ssa_expr.get_identifier()));
 }
 
+/// Rename all symbols contained in \p expr with their last known value at
+/// given \p level.
 void goto_symex_statet::rename(exprt &expr, const namespacet &ns, levelt level)
 {
-  // This condition is just here to increase indentation, to make the following
-  // commit diffs nicer.
-  if(true)
+  auto expr_it = expr.depth_begin();
+  while(expr_it != expr.depth_end())
   {
-    // rename all the symbols with their last known value
-
-    if(expr.id() == ID_symbol && expr.get_bool(ID_C_SSA_symbol))
+    if(expr_it->id() == ID_symbol && expr_it->get_bool(ID_C_SSA_symbol))
     {
-      ssa_exprt &ssa = to_ssa_expr(expr);
+      ssa_exprt &ssa = to_ssa_expr(expr_it.mutate());
 
       if(level == L0)
       {
         set_l0_indices(ssa, ns);
-        rename(expr.type(), ssa.get_identifier(), ns, level);
+        rename(ssa.type(), ssa.get_identifier(), ns, level);
         ssa.update_type();
       }
       else if(level == L1)
       {
         set_l1_indices(ssa, ns);
-        rename(expr.type(), ssa.get_identifier(), ns, level);
+        rename(ssa.type(), ssa.get_identifier(), ns, level);
         ssa.update_type();
       }
       else if(level == L2)
       {
         set_l1_indices(ssa, ns);
-        rename(expr.type(), ssa.get_identifier(), ns, level);
+        rename(ssa.type(), ssa.get_identifier(), ns, level);
         ssa.update_type();
 
         if(l2_thread_read_encoding(ssa, ns))
@@ -306,48 +306,44 @@ void goto_symex_statet::rename(exprt &expr, const namespacet &ns, levelt level)
           auto p_it = propagation.find(ssa.get_identifier());
 
           if(p_it != propagation.end())
-            expr = p_it->second; // already L2
+            expr_it.mutate() = p_it->second; // already L2
           else
             set_l2_indices(ssa, ns);
         }
       }
+      expr_it.next_sibling_or_parent();
     }
-    else if(expr.id() == ID_symbol)
+    else if(expr_it->id() == ID_symbol)
     {
       // we never rename function symbols
-      if(expr.type().id() == ID_code)
+      if(expr_it->type().id() == ID_code)
       {
-        rename(expr.type(), to_symbol_expr(expr).get_identifier(), ns, level);
-
-        return;
+        rename(
+          expr_it.mutate().type(),
+          to_symbol_expr(*expr_it).get_identifier(),
+          ns,
+          level);
+        expr_it.next_sibling_or_parent();
       }
-
-      expr = ssa_exprt(expr);
-      rename(expr, ns, level);
+      else
+      {
+        expr_it.mutate() = ssa_exprt(*expr_it);
+        // Do not advance iterator and do another pass on the same position
+        // now that it is an ssa_exprt
+      }
     }
-    else if(expr.id() == ID_address_of)
+    else if(expr_it->id() == ID_address_of)
     {
-      auto &address_of_expr = to_address_of_expr(expr);
+      auto &address_of_expr = to_address_of_expr(expr_it.mutate());
       rename_address(address_of_expr.object(), ns, level);
-      to_pointer_type(expr.type()).subtype() = address_of_expr.object().type();
+      to_pointer_type(address_of_expr.type()).subtype() =
+        address_of_expr.object().type();
+      expr_it.next_sibling_or_parent();
     }
     else
     {
-      rename(expr.type(), irep_idt(), ns, level);
-
-      // do this recursively
-      Forall_operands(it, expr)
-        rename(*it, ns, level);
-
-      INVARIANT(
-        (expr.id() != ID_with ||
-         expr.type() == to_with_expr(expr).old().type()) &&
-          (expr.id() != ID_if ||
-           (expr.type() == to_if_expr(expr).true_case().type() &&
-            expr.type() == to_if_expr(expr).false_case().type())),
-        "Type of renamed expr should be the same as operands for with_exprt "
-        "and "
-        "if_exprt");
+      rename(expr_it.mutate().type(), irep_idt(), ns, level);
+      ++expr_it;
     }
   }
 }
