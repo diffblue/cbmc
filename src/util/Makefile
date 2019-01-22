@@ -41,6 +41,7 @@ SRC = allocate_objects.cpp \
       json_stream.cpp \
       lispexpr.cpp \
       lispirep.cpp \
+      mathematical_expr.cpp \
       mathematical_types.cpp \
       memory_info.cpp \
       merge_irep.cpp \
