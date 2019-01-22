@@ -396,29 +396,8 @@ int goto_analyzer_parse_optionst::doit()
 
   register_languages();
 
-  try
-  {
-    goto_model =
-      initialize_goto_model(cmdline.args, get_message_handler(), options);
-  }
-
-  catch(const char *e)
-  {
-    error() << e << eom;
-    return CPROVER_EXIT_EXCEPTION;
-  }
-
-  catch(const std::string &e)
-  {
-    error() << e << eom;
-    return CPROVER_EXIT_EXCEPTION;
-  }
-
-  catch(int e)
-  {
-    error() << "Numeric exception: " << e << eom;
-    return CPROVER_EXIT_EXCEPTION;
-  }
+  goto_model =
+    initialize_goto_model(cmdline.args, get_message_handler(), options);
 
   if(process_goto_program(options))
     return CPROVER_EXIT_INTERNAL_ERROR;
@@ -448,34 +427,7 @@ int goto_analyzer_parse_optionst::doit()
     return CPROVER_EXIT_SUCCESS;
   }
 
-  try
-  {
-    return perform_analysis(options);
-  }
-
-  catch(const char *e)
-  {
-    error() << e << eom;
-    return CPROVER_EXIT_EXCEPTION;
-  }
-
-  catch(const std::string &e)
-  {
-    error() << e << eom;
-    return CPROVER_EXIT_EXCEPTION;
-  }
-
-  catch(int e)
-  {
-    error() << "Numeric exception: " << e << eom;
-    return CPROVER_EXIT_EXCEPTION;
-  }
-
-  catch(const std::bad_alloc &)
-  {
-    error() << "Out of memory" << eom;
-    return CPROVER_EXIT_INTERNAL_OUT_OF_MEMORY;
-  }
+  return perform_analysis(options);
 }
 
 
