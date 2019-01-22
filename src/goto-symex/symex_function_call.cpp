@@ -418,7 +418,7 @@ static void locality(
     // identifiers may be shared among functions
     // (e.g., due to inlining or other code restructuring)
 
-    state.rename(ssa, ns, goto_symex_statet::L1);
+    state.rename<goto_symex_statet::L1>(ssa, ns);
 
     irep_idt l1_name=ssa.get_identifier();
     unsigned offset=0;

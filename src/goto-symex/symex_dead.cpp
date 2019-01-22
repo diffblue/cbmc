@@ -27,7 +27,7 @@ void goto_symext::symex_dead(statet &state)
   // We also prevent propagation of old values.
 
   ssa_exprt ssa(code.symbol());
-  state.rename(ssa, ns, goto_symex_statet::L1);
+  state.rename<goto_symex_statet::L1>(ssa, ns);
 
   // in case of pointers, put something into the value set
   if(code.symbol().type().id() == ID_pointer)
@@ -38,7 +38,7 @@ void goto_symext::symex_dead(statet &state)
     else
       rhs=exprt(ID_invalid);
 
-    state.rename(rhs, ns, goto_symex_statet::L1);
+    state.rename<goto_symex_statet::L1>(rhs, ns);
     state.value_set.assign(ssa, rhs, ns, true, false);
   }
 

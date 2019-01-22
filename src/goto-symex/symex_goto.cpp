@@ -249,7 +249,7 @@ void goto_symext::symex_goto(statet &state)
       exprt new_rhs = boolean_negate(new_guard);
 
       ssa_exprt new_lhs(guard_symbol_expr);
-      state.rename(new_lhs, ns, goto_symex_statet::L1);
+      state.rename<goto_symex_statet::L1>(new_lhs, ns);
       state.assignment(new_lhs, new_rhs, ns, true, false);
 
       guardt guard{true_exprt{}};

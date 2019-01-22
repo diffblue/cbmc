@@ -71,7 +71,7 @@ exprt scratch_programt::eval(const exprt &e)
 {
   exprt ssa=e;
 
-  symex_state->rename(ssa, ns);
+  symex_state->rename<goto_symex_statet::L2>(ssa, ns);
 
   return checker->get(ssa);
 }
