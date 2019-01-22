@@ -89,6 +89,11 @@ void multi_path_symex_only_checkert::perform_symex()
                    << equation.SSA_steps.size() << " steps" << messaget::eom;
 
   slice(symex, equation, ns, options, ui_message_handler);
+
+  if(options.get_bool_option("validate-ssa-equation"))
+  {
+    symex.validate(validation_modet::INVARIANT);
+  }
 }
 
 void multi_path_symex_only_checkert::output_coverage_report()
