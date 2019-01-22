@@ -154,7 +154,7 @@ void symbol_tablet::validate(const validation_modet vm) const
         std::find_if(
           base_map_search.first,
           base_map_search.second,
-          [&symbol_key](const typename symbol_base_mapt::value_type &match) {
+          [&symbol_key](const symbol_base_mapt::value_type &match) {
             return match.second == symbol_key;
           }) != symbol_base_map.end();
 
@@ -177,7 +177,7 @@ void symbol_tablet::validate(const validation_modet vm) const
         std::find_if(
           module_map_search.first,
           module_map_search.second,
-          [&symbol_key](const typename symbol_module_mapt::value_type &match) {
+          [&symbol_key](const symbol_module_mapt::value_type &match) {
             return match.second == symbol_key;
           }) != symbol_module_map.end();
 
