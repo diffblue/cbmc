@@ -13,7 +13,7 @@ Author: Daniel Kroening, Peter Schrammel
 
 #include <util/invariant.h>
 
-#include <goto-symex/memory_model_pso.h>
+#include <goto-symex/memory_model.h>
 #include <goto-symex/show_program.h>
 #include <goto-symex/show_vcc.h>
 
