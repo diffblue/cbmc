@@ -386,7 +386,6 @@ bool goto_diff_parse_optionst::process_goto_program(
   const optionst &options,
   goto_modelt &goto_model)
 {
-  try
   {
     // Remove inline assembler; this needs to happen before
     // adding the library.
@@ -448,31 +447,6 @@ bool goto_diff_parse_optionst::process_goto_program(
 
     // remove any skips introduced since coverage instrumentation
     remove_skip(goto_model);
-  }
-
-  catch(const char *e)
-  {
-    error() << e << eom;
-    return true;
-  }
-
-  catch(const std::string &e)
-  {
-    error() << e << eom;
-    return true;
-  }
-
-  catch(int e)
-  {
-    error() << "Numeric exception: " << e << eom;
-    return true;
-  }
-
-  catch(const std::bad_alloc &)
-  {
-    error() << "Out of memory" << eom;
-    exit(CPROVER_EXIT_INTERNAL_OUT_OF_MEMORY);
-    return true;
   }
 
   return false;
