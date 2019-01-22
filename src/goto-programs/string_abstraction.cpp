@@ -249,8 +249,8 @@ void string_abstractiont::declare_define_locals(goto_programt &dest)
     if(it->is_decl())
       // same name may exist several times due to inlining, make sure the first
       // declaration is used
-      available_decls.insert(std::make_pair(
-            to_code_decl(it->code).get_identifier(), it));
+      available_decls.insert(
+        std::make_pair(it->get_decl().get_identifier(), it));
 
   // declare (and, if necessary, define) locals
   for(const auto &l : locals)
@@ -501,7 +501,7 @@ goto_programt::targett string_abstractiont::abstract_assign(
   goto_programt &dest,
   goto_programt::targett target)
 {
-  code_assignt &assign=to_code_assign(target->code);
+  code_assignt &assign = target->get_assign();
 
   exprt &lhs=assign.lhs();
   exprt &rhs=assign.rhs();
@@ -527,7 +527,7 @@ goto_programt::targett string_abstractiont::abstract_assign(
 void string_abstractiont::abstract_function_call(
   goto_programt::targett target)
 {
-  code_function_callt &call=to_code_function_call(target->code);
+  code_function_callt &call = target->get_function_call();
   code_function_callt::argumentst &arguments=call.arguments();
   code_function_callt::argumentst str_args;
 
@@ -1060,7 +1060,7 @@ goto_programt::targett string_abstractiont::abstract_pointer_assign(
   goto_programt &dest,
   goto_programt::targett target)
 {
-  code_assignt &assign=to_code_assign(target->code);
+  code_assignt &assign = target->get_assign();
 
   exprt &lhs=assign.lhs();
   exprt rhs=assign.rhs();
@@ -1105,7 +1105,7 @@ goto_programt::targett string_abstractiont::abstract_char_assign(
   goto_programt &dest,
   goto_programt::targett target)
 {
-  code_assignt &assign=to_code_assign(target->code);
+  code_assignt &assign = target->get_assign();
 
   exprt &lhs=assign.lhs();
   exprt *rhsp=&(assign.rhs());

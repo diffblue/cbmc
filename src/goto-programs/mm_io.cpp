@@ -45,7 +45,7 @@ void mm_io(
 
     if(it->is_assign())
     {
-      auto &a=to_code_assign(it->code);
+      auto &a = it->get_assign();
       collect_deref_expr(a.rhs(), deref_expr_r);
 
       if(mm_io_r.is_not_nil())

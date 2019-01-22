@@ -278,14 +278,14 @@ std::list<exprt> expressions_read(
     break;
 
   case RETURN:
-    if(to_code_return(instruction.code).return_value().is_not_nil())
-      dest.push_back(to_code_return(instruction.code).return_value());
+    if(instruction.get_return().return_value().is_not_nil())
+      dest.push_back(instruction.get_return().return_value());
     break;
 
   case FUNCTION_CALL:
     {
-      const code_function_callt &function_call=
-        to_code_function_call(instruction.code);
+      const code_function_callt &function_call =
+        instruction.get_function_call();
       forall_expr(it, function_call.arguments())
         dest.push_back(*it);
       if(function_call.lhs().is_not_nil())
@@ -295,7 +295,7 @@ std::list<exprt> expressions_read(
 
   case ASSIGN:
     {
-      const code_assignt &assignment=to_code_assign(instruction.code);
+      const code_assignt &assignment = instruction.get_assign();
       dest.push_back(assignment.rhs());
       parse_lhs_read(assignment.lhs(), dest);
     }
@@ -318,15 +318,15 @@ std::list<exprt> expressions_written(
   {
   case FUNCTION_CALL:
     {
-      const code_function_callt &function_call=
-        to_code_function_call(instruction.code);
+      const code_function_callt &function_call =
+        instruction.get_function_call();
       if(function_call.lhs().is_not_nil())
         dest.push_back(function_call.lhs());
     }
     break;
 
   case ASSIGN:
-    dest.push_back(to_code_assign(instruction.code).lhs());
+    dest.push_back(instruction.get_assign().lhs());
     break;
 
   default:
@@ -792,9 +792,9 @@ void goto_programt::instructiont::validate(
       source_location);
     DATA_CHECK_WITH_DIAGNOSTICS(
       vm,
-      !ns.lookup(to_code_decl(code).get_identifier(), table_symbol),
+      !ns.lookup(get_decl().get_identifier(), table_symbol),
       "declared symbols should be known",
-      id2string(to_code_decl(code).get_identifier()),
+      id2string(get_decl().get_identifier()),
       source_location);
     break;
   case DEAD:
@@ -805,9 +805,9 @@ void goto_programt::instructiont::validate(
       source_location);
     DATA_CHECK_WITH_DIAGNOSTICS(
       vm,
-      !ns.lookup(to_code_dead(code).get_identifier(), table_symbol),
+      !ns.lookup(get_dead().get_identifier(), table_symbol),
       "removed symbols should be known",
-      id2string(to_code_dead(code).get_identifier()),
+      id2string(get_dead().get_identifier()),
       source_location);
     break;
   case FUNCTION_CALL:

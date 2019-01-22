@@ -74,7 +74,7 @@ bool remove_calls_no_bodyt::is_opaque_function_call(
   if(!target->is_function_call())
     return false;
 
-  const code_function_callt &cfc = to_code_function_call(target->code);
+  const code_function_callt &cfc = target->get_function_call();
   const exprt &f = cfc.function();
 
   if(f.id() != ID_symbol)
@@ -108,7 +108,7 @@ operator()(goto_programt &goto_program, const goto_functionst &goto_functions)
   {
     if(is_opaque_function_call(it, goto_functions))
     {
-      const code_function_callt &cfc = to_code_function_call(it->code);
+      const code_function_callt &cfc = it->get_function_call();
       remove_call_no_body(goto_program, it, cfc.lhs(), cfc.arguments());
     }
     else

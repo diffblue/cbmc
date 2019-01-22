@@ -42,7 +42,7 @@ void parameter_assignmentst::do_function_calls(
   {
     if(i_it->is_function_call())
     {
-      code_function_callt &function_call=to_code_function_call(i_it->code);
+      code_function_callt &function_call = i_it->get_function_call();
 
       // add x=y for f(y) where x is the parameter
 

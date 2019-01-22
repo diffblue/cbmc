@@ -746,8 +746,7 @@ void interpretert::execute_assert()
 
 void interpretert::execute_function_call()
 {
-  const code_function_callt &function_call=
-    to_code_function_call(pc->code);
+  const code_function_callt &function_call = pc->get_function_call();
 
   // function to be called
   mp_integer address=evaluate_address(function_call.function());

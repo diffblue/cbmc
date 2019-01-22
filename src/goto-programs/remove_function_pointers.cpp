@@ -265,8 +265,7 @@ void remove_function_pointerst::remove_function_pointer(
   goto_programt &goto_program,
   goto_programt::targett target)
 {
-  const code_function_callt &code=
-    to_code_function_call(target->code);
+  const code_function_callt &code = target->get_function_call();
 
   const auto &function = to_dereference_expr(code.function());
 
@@ -312,7 +311,7 @@ void remove_function_pointerst::remove_function_pointer(
 
     if(functions.size()==1)
     {
-      to_code_function_call(target->code).function()=*functions.cbegin();
+      target->get_function_call().function() = *functions.cbegin();
       return;
     }
   }
@@ -360,7 +359,7 @@ void remove_function_pointerst::remove_function_pointer(
   goto_programt::targett target,
   const functionst &functions)
 {
-  const code_function_callt &code = to_code_function_call(target->code);
+  const code_function_callt &code = target->get_function_call();
 
   const exprt &function = code.function();
   const exprt &pointer = to_dereference_expr(function).pointer();
@@ -381,12 +380,12 @@ void remove_function_pointerst::remove_function_pointer(
     // call function
     goto_programt::targett t1=new_code_calls.add_instruction();
     t1->make_function_call(code);
-    to_code_function_call(t1->code).function()=fun;
+    t1->get_function_call().function() = fun;
 
     // the signature of the function might not match precisely
-    fix_argument_types(to_code_function_call(t1->code));
+    fix_argument_types(t1->get_function_call());
 
-    fix_return_type(to_code_function_call(t1->code), new_code_calls);
+    fix_return_type(t1->get_function_call(), new_code_calls);
     // goto final
     goto_programt::targett t3=new_code_calls.add_instruction();
     t3->make_goto(t_final, true_exprt());
@@ -474,8 +473,7 @@ bool remove_function_pointerst::remove_function_pointers(
   Forall_goto_program_instructions(target, goto_program)
     if(target->is_function_call())
     {
-      const code_function_callt &code=
-        to_code_function_call(target->code);
+      const code_function_callt &code = target->get_function_call();
 
       if(code.function().id()==ID_dereference)
       {

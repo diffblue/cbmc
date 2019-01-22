@@ -70,7 +70,7 @@ void replace_callst::operator()(
     if(!ins.is_function_call())
       continue;
 
-    code_function_callt &cfc = to_code_function_call(ins.code);
+    code_function_callt &cfc = ins.get_function_call();
     exprt &function = cfc.function();
 
     PRECONDITION(function.id() == ID_symbol);
@@ -100,7 +100,7 @@ void replace_callst::operator()(
     goto_programt::const_targett next_it = std::next(it);
     if(next_it != goto_program.instructions.end() && next_it->is_assign())
     {
-      const code_assignt &ca = to_code_assign(next_it->code);
+      const code_assignt &ca = next_it->get_assign();
       const exprt &rhs = ca.rhs();
 
       INVARIANT(
