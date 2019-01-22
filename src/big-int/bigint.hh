@@ -168,7 +168,7 @@ public:
   BigInt (llong_t) _fast;
   BigInt (ullong_t) _fast;
   BigInt (BigInt const &) _fast;
-  BigInt (BigInt &&) _fast;
+  BigInt (BigInt &&) noexcept _fast;
   BigInt (char const *, onedig_t = 10) _fast;
 
   BigInt &operator= (BigInt const &) _fast;

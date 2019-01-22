@@ -57,7 +57,9 @@ public:
   typedef std::vector<exprt> operandst;
 
   // constructors
-  exprt() { }
+  exprt() noexcept
+  {
+  }
   explicit exprt(const irep_idt &_id):irept(_id) { }
   exprt(const irep_idt &_id, const typet &_type):irept(_id)
   {
