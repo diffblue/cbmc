@@ -285,3 +285,51 @@ void output_coverage_report(
                 << "'" << messaget::eom;
   }
 }
+
+static void postprocess_equation(
+  symex_bmct &symex,
+  symex_target_equationt &equation,
+  const optionst &options,
+  const namespacet &ns,
+  ui_message_handlert &ui_message_handler)
+{
+  // add a partial ordering, if required
+  if(equation.has_threads())
+  {
+    std::unique_ptr<memory_model_baset> memory_model =
+      get_memory_model(options, ns);
+    memory_model->set_message_handler(ui_message_handler);
+    (*memory_model)(equation);
+  }
+
+  messaget log(ui_message_handler);
+  log.statistics() << "size of program expression: "
+                   << equation.SSA_steps.size() << " steps" << messaget::eom;
+
+  slice(symex, equation, ns, options, ui_message_handler);
+
+  if(options.get_bool_option("validate-ssa-equation"))
+  {
+    symex.validate(validation_modet::INVARIANT);
+  }
+}
+
+void perform_symex(
+  abstract_goto_modelt &goto_model,
+  symex_bmct &symex,
+  symbol_tablet &symex_symbol_table,
+  symex_target_equationt &equation,
+  const optionst &options,
+  const namespacet &ns,
+  ui_message_handlert &ui_message_handler)
+{
+  auto get_goto_function =
+    [&goto_model](
+      const irep_idt &id) -> const goto_functionst::goto_functiont & {
+    return goto_model.get_goto_function(id);
+  };
+
+  symex.symex_from_entry_point_of(get_goto_function, symex_symbol_table);
+
+  postprocess_equation(symex, equation, options, ns, ui_message_handler);
+}

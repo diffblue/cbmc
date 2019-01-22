@@ -48,7 +48,14 @@ operator()(propertiest &properties)
   // we haven't got an equation yet
   if(!equation_generated)
   {
-    perform_symex();
+    perform_symex(
+      goto_model,
+      symex,
+      symex_symbol_table,
+      equation,
+      options,
+      ns,
+      ui_message_handler);
 
     output_coverage_report(
       options.get_option("symex-coverage-report"),
