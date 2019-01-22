@@ -405,26 +405,6 @@ void value_set_fivrnst::get_value_set_rec(
       return;
     }
   }
-  else if(expr.id()=="reference_to")
-  {
-    object_mapt reference_set;
-
-    get_reference_set(expr, reference_set, ns);
-
-    const object_map_dt &object_map=reference_set.read();
-
-    if(object_map.begin()!=object_map.end())
-    {
-      forall_objects(it, object_map)
-      {
-        const exprt &object=object_numbering[it->first];
-        get_value_set_rec(object, dest, suffix,
-                          original_type, ns);
-      }
-
-      return;
-    }
-  }
   else if(expr.is_constant())
   {
     // check if NULL

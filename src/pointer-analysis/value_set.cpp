@@ -493,31 +493,6 @@ void value_sett::get_value_set_rec(
       }
     }
   }
-  else if(expr.id()=="reference_to")
-  {
-    // old stuff, will go away
-    object_mapt reference_set;
-
-    get_reference_set(expr, reference_set, ns);
-
-    const object_map_dt &object_map=reference_set.read();
-
-    if(object_map.begin()==object_map.end())
-      insert(dest, exprt(ID_unknown, original_type));
-    else
-    {
-      for(object_map_dt::const_iterator
-          it=object_map.begin();
-          it!=object_map.end();
-          it++)
-      {
-        /// Do not take a reference to object_numbering's storage as we may call
-        /// object_numbering.number(), which may reallocate it.
-        const exprt object=object_numbering[it->first];
-        get_value_set_rec(object, dest, suffix, original_type, ns);
-      }
-    }
-  }
   else if(expr.is_constant())
   {
     // check if NULL

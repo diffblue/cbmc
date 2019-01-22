@@ -134,8 +134,7 @@ std::string inv_object_storet::build_string(const exprt &expr) const
       return integer2string(*i);
   }
 
-  // we also like "address_of" and "reference_to"
-  // if the object is constant
+  // we also like "address_of" if the object is constant
   // we don't know what mode (language) we are in, so we rely on the default
   // language to be reasonable for from_expr
   if(is_constant_address(expr))
