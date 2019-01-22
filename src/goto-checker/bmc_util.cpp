@@ -231,7 +231,8 @@ void update_properties_status_from_symex_target_equation(
     irep_idt property_id = step.get_property_id();
     CHECK_RETURN(!property_id.empty());
 
-    // Don't set false properties; we wouldn't have traces for them.
+    // Don't update status of properties that are constant 'false';
+    // we wouldn't have traces for them.
     const auto status = step.cond_expr.is_true() ? property_statust::PASS
                                                  : property_statust::UNKNOWN;
     auto emplace_result = properties.emplace(
