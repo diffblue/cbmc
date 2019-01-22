@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/cprover_prefix.h>
 #include <util/expr_util.h>
 #include <util/fresh_symbol.h>
+#include <util/mathematical_types.h>
 #include <util/std_expr.h>
 #include <util/symbol.h>
 

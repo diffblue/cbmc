@@ -16,7 +16,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "base_type.h"
 #include "expr_cast.h"
 #include "invariant.h"
-#include "mathematical_types.h"
 #include "std_types.h"
 
 /// An expression without operands
