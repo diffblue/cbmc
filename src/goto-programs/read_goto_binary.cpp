@@ -155,7 +155,7 @@ static bool read_goto_binary(
   return true;
 }
 
-bool is_goto_binary(const std::string &filename)
+bool is_goto_binary(const std::string &filename, message_handlert &)
 {
   #ifdef _MSC_VER
   std::ifstream in(widen(filename), std::ios::binary);

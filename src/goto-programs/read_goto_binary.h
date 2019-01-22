@@ -25,7 +25,7 @@ class symbol_tablet;
 optionalt<goto_modelt>
 read_goto_binary(const std::string &filename, message_handlert &);
 
-bool is_goto_binary(const std::string &filename);
+bool is_goto_binary(const std::string &filename, message_handlert &);
 
 bool read_object_and_link(
   const std::string &file_name,

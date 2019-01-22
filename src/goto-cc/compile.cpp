@@ -126,7 +126,9 @@ enum class file_typet
   ELF_OBJECT
 };
 
-static file_typet detect_file_type(const std::string &file_name)
+static file_typet detect_file_type(
+  const std::string &file_name,
+  message_handlert &message_handler)
 {
   // first of all, try to open the file
   std::ifstream in(file_name);
@@ -154,7 +156,7 @@ static file_typet detect_file_type(const std::string &file_name)
   if(ext == "a")
     return file_typet::NORMAL_ARCHIVE;
 
-  if(is_goto_binary(file_name))
+  if(is_goto_binary(file_name, message_handler))
     return file_typet::GOTO_BINARY;
 
   if(hdr[0] == 0x7f && memcmp(hdr + 1, "ELF", 3) == 0)
@@ -167,7 +169,7 @@ static file_typet detect_file_type(const std::string &file_name)
 /// \return false on success, true on error.
 bool compilet::add_input_file(const std::string &file_name)
 {
-  switch(detect_file_type(file_name))
+  switch(detect_file_type(file_name, get_message_handler()))
   {
   case file_typet::FAILED_TO_OPEN_FILE:
     warning() << "failed to open file `" << file_name
@@ -249,7 +251,7 @@ bool compilet::add_files_from_archive(
   {
     std::string t = concat_dir_file(tstr, line);
 
-    if(is_goto_binary(t))
+    if(is_goto_binary(t, get_message_handler()))
       object_files.push_back(t);
     else
       debug() << "Object file is not a goto binary: " << line << eom;
@@ -280,7 +282,7 @@ bool compilet::find_library(const std::string &name)
     {
       library_file_name = concat_dir_file(library_path, "lib" + name + ".so");
 
-      switch(detect_file_type(library_file_name))
+      switch(detect_file_type(library_file_name, get_message_handler()))
       {
       case file_typet::GOTO_BINARY:
         return !add_input_file(library_file_name);
