@@ -96,7 +96,7 @@ void goto_program_dereferencet::dereference_failure(
   }
 }
 
-/// Turn subexpression of `expr` of the form `&*p` or `reference_to(*p)` to p
+/// Turn subexpression of `expr` of the form `&*p` into p
 /// and use `dereference` on subexpressions of the form `*p`
 /// \param expr: expression in which to remove dereferences
 /// \param guard: boolean expression assumed to hold when dereferencing
@@ -172,8 +172,7 @@ void goto_program_dereferencet::dereference_rec(
     return;
   }
 
-  if(expr.id()==ID_address_of ||
-     expr.id()=="reference_to")
+  if(expr.id() == ID_address_of)
   {
     // turn &*p to p
     // this has *no* side effect!
