@@ -222,8 +222,7 @@ void string_instrumentationt::do_function_call(
   goto_programt &dest,
   goto_programt::targett target)
 {
-  code_function_callt &call=
-    to_code_function_call(target->code);
+  code_function_callt &call = target->get_function_call();
   exprt &function=call.function();
   // const exprt &lhs=call.lhs();
 

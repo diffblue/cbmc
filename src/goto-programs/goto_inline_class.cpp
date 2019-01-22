@@ -343,7 +343,7 @@ void goto_inlinet::insert_function_body(
         if(it->function==identifier)
         {
           // don't hide assignment to lhs
-          if(it->is_assign() && to_code_assign(it->code).lhs()==lhs)
+          if(it->is_assign() && it->get_assign().lhs()==lhs)
           {
           }
           else
@@ -502,7 +502,7 @@ void goto_inlinet::get_call(
 {
   PRECONDITION(it->is_function_call());
 
-  const code_function_callt &call=to_code_function_call(it->code);
+  const code_function_callt &call = it->get_function_call();
 
   lhs=call.lhs();
   function=call.function();

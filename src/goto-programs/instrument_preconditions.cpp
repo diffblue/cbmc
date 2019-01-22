@@ -101,7 +101,7 @@ void instrument_preconditions(
     if(it->is_function_call())
     {
       // does the function we call have preconditions?
-      const auto &call=to_code_function_call(it->code);
+      const auto &call = it->get_function_call();
 
       if(call.function().id()==ID_symbol)
       {

@@ -85,7 +85,7 @@ void slice_global_inits(goto_modelt &goto_model)
   {
     if(i_it->is_assign())
     {
-      const code_assignt &code_assign=to_code_assign(i_it->code);
+      const code_assignt &code_assign = i_it->get_assign();
       const symbol_exprt &symbol_expr=to_symbol_expr(code_assign.lhs());
       const irep_idt id=symbol_expr.get_identifier();
 

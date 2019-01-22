@@ -83,8 +83,7 @@ goto_programt::targett remove_virtual_functionst::remove_virtual_function(
   goto_programt &goto_program,
   goto_programt::targett target)
 {
-  const code_function_callt &code=
-    to_code_function_call(target->code);
+  const code_function_callt &code = target->get_function_call();
 
   const exprt &function=code.function();
   INVARIANT(
@@ -150,8 +149,7 @@ goto_programt::targett remove_virtual_functionst::remove_virtual_function(
   INVARIANT(
     target->is_function_call(),
     "remove_virtual_function must target a FUNCTION_CALL instruction");
-  const code_function_callt &code=
-    to_code_function_call(target->code);
+  const code_function_callt &code = target->get_function_call();
 
   goto_programt::targett next_target = std::next(target);
 
@@ -174,9 +172,7 @@ goto_programt::targett remove_virtual_functionst::remove_virtual_function(
     else
     {
       create_static_function_call(
-        to_code_function_call(target->code),
-        *functions.front().symbol_expr,
-        ns);
+        target->get_function_call(), *functions.front().symbol_expr, ns);
     }
     return next_target;
   }
@@ -242,7 +238,7 @@ goto_programt::targett remove_virtual_functionst::remove_virtual_function(
       // call function
         t1->make_function_call(code);
         create_static_function_call(
-          to_code_function_call(t1->code), *fun.symbol_expr, ns);
+          t1->get_function_call(), *fun.symbol_expr, ns);
       }
       else
       {
@@ -530,8 +526,7 @@ bool remove_virtual_functionst::remove_virtual_functions(
   {
     if(target->is_function_call())
     {
-      const code_function_callt &code=
-        to_code_function_call(target->code);
+      const code_function_callt &code = target->get_function_call();
 
       if(code.function().id()==ID_virtual_function)
       {

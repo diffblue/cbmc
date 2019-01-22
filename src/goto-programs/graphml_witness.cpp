@@ -144,10 +144,10 @@ static bool filter_out(
   const goto_tracet::stepst::const_iterator &prev_it,
   goto_tracet::stepst::const_iterator &it)
 {
-  if(it->hidden &&
-     (!it->pc->is_assign() ||
-      to_code_assign(it->pc->code).rhs().id()!=ID_side_effect ||
-      to_code_assign(it->pc->code).rhs().get(ID_statement)!=ID_nondet))
+  if(
+    it->hidden && (!it->pc->is_assign() ||
+                   it->pc->get_assign().rhs().id() != ID_side_effect ||
+                   it->pc->get_assign().rhs().get(ID_statement) != ID_nondet))
     return true;
 
   if(!it->is_assignment() && !it->is_goto() && !it->is_assert())

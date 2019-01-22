@@ -149,7 +149,7 @@ void remove_returnst::do_function_calls(
   {
     if(i_it->is_function_call())
     {
-      code_function_callt &function_call=to_code_function_call(i_it->code);
+      code_function_callt &function_call = i_it->get_function_call();
 
       INVARIANT(
         function_call.function().id() == ID_symbol,
@@ -357,7 +357,7 @@ bool remove_returnst::restore_returns(
   {
     if(i_it->is_assign())
     {
-      code_assignt &assign=to_code_assign(i_it->code);
+      code_assignt &assign = i_it->get_assign();
       if(assign.lhs().id()!=ID_symbol ||
          to_symbol_expr(assign.lhs()).get_identifier()!=rv_name_id)
         continue;
@@ -386,7 +386,7 @@ void remove_returnst::undo_function_calls(
   {
     if(i_it->is_function_call())
     {
-      code_function_callt &function_call=to_code_function_call(i_it->code);
+      code_function_callt &function_call = i_it->get_function_call();
 
       // ignore function pointers
       if(function_call.function().id()!=ID_symbol)
@@ -412,7 +412,7 @@ void remove_returnst::undo_function_calls(
       if(!next->is_assign())
         continue;
 
-      const code_assignt &assign=to_code_assign(next->code);
+      const code_assignt &assign = next->get_assign();
 
       if(assign.rhs().id()!=ID_symbol)
         continue;
