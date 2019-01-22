@@ -1349,17 +1349,6 @@ void cpp_typecheckt::add_this_to_method_type(
   code_typet &type,
   const typet &method_qualifier)
 {
-  code_typet::parameterst &parameters = type.parameters();
-
-  parameters.insert(
-    parameters.begin(), code_typet::parametert());
-
-  code_typet::parametert &parameter=parameters.front();
-
-  parameter.set_identifier(ID_this); // check? Not qualified
-  parameter.set_base_name(ID_this);
-  parameter.set_this();
-
   typet subtype;
 
   if(compound_symbol.type.id() == ID_union)
@@ -1373,7 +1362,13 @@ void cpp_typecheckt::add_this_to_method_type(
   if(has_volatile(method_qualifier))
     subtype.set(ID_C_volatile, true);
 
-  parameter.type()=pointer_type(subtype);
+  code_typet::parametert parameter(pointer_type(subtype));
+  parameter.set_identifier(ID_this); // check? Not qualified
+  parameter.set_base_name(ID_this);
+  parameter.set_this();
+
+  code_typet::parameterst &parameters = type.parameters();
+  parameters.insert(parameters.begin(), parameter);
 }
 
 void cpp_typecheckt::add_anonymous_members_to_scope(

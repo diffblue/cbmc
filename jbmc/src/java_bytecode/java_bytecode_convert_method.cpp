@@ -368,10 +368,9 @@ void java_bytecode_convert_method_lazy(
   if(!m.is_static)
   {
     java_method_typet::parameterst &parameters = member_type.parameters();
-    java_method_typet::parametert this_p;
     const reference_typet object_ref_type =
       java_reference_type(struct_tag_typet(class_symbol.name));
-    this_p.type()=object_ref_type;
+    java_method_typet::parametert this_p(object_ref_type);
     this_p.set_this();
     parameters.insert(parameters.begin(), this_p);
   }

@@ -56,9 +56,7 @@ void jsil_internal_additions(symbol_tablet &dest)
   // add eval
 
   {
-    code_typet eval_type;
-    code_typet::parametert p;
-    eval_type.parameters().push_back(p);
+    code_typet eval_type({code_typet::parametert(typet())}, empty_typet());
 
     symbolt symbol;
     symbol.base_name="eval";

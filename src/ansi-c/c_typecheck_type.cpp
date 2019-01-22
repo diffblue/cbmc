@@ -439,11 +439,11 @@ void c_typecheck_baset::typecheck_code_type(code_typet &type)
         ansi_c_declarationt &declaration=
           to_ansi_c_declaration(param);
 
-        code_typet::parametert parameter;
 
         // first fix type
+        code_typet::parametert parameter(
+          declaration.full_type(declaration.declarator()));
         typet &param_type = parameter.type();
-        param_type = declaration.full_type(declaration.declarator());
         std::list<codet> tmp_clean_code;
         tmp_clean_code.swap(clean_code); // ignore side-effects
         typecheck_type(param_type);
