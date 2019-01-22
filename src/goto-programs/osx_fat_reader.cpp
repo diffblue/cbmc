@@ -15,35 +15,49 @@ Author:
 #include <util/exception_utils.h>
 #include <util/invariant.h>
 
+// we define file-type magic values for all platforms to detect when we find a
+// file that we might not be able to process
+#define CPROVER_FAT_MAGIC 0xcafebabe
+#define CPROVER_FAT_CIGAM 0xbebafeca
+#define CPROVER_MH_MAGIC 0xfeedface
+#define CPROVER_MH_CIGAM 0xcefaedfe
+#define CPROVER_MH_MAGIC_64 0xfeedfacf
+#define CPROVER_MH_CIGAM_64 0xcffaedfe
+
 #ifdef __APPLE__
 #  include <architecture/byte_order.h>
 #  include <mach-o/fat.h>
 #  include <mach-o/loader.h>
 #  include <mach-o/swap.h>
+
+#  if(CPROVER_FAT_MAGIC != FAT_MAGIC) || (CPROVER_FAT_CIGAM != FAT_CIGAM) ||   \
+    (CPROVER_MH_MAGIC != MH_MAGIC) || (CPROVER_MH_CIGAM != MH_CIGAM) ||        \
+    (CPROVER_MH_MAGIC_64 != MH_MAGIC_64) ||                                    \
+    (CPROVER_MH_CIGAM_64 != MH_CIGAM_64)
+#    error "Mach-O magic has inconsistent value"
+#  endif
 #endif
 
 #include <util/run.h>
 
 bool is_osx_fat_magic(char hdr[4])
 {
-#ifdef __APPLE__
   uint32_t *magic=reinterpret_cast<uint32_t*>(hdr);
 
   switch(*magic)
   {
-    case FAT_MAGIC:
-    case FAT_CIGAM:
-      return true;
+  case CPROVER_FAT_MAGIC:
+  case CPROVER_FAT_CIGAM:
+    return true;
   }
-#else
-  (void)hdr; // unused parameter
-#endif
 
   return false;
 }
 
-osx_fat_readert::osx_fat_readert(std::ifstream &in) :
-  has_gb_arch(false)
+osx_fat_readert::osx_fat_readert(
+  std::ifstream &in,
+  message_handlert &message_handler)
+  : log(message_handler), has_gb_arch(false)
 {
 #ifdef __APPLE__
   // NOLINTNEXTLINE(readability/identifiers)
@@ -82,6 +96,9 @@ osx_fat_readert::osx_fat_readert(std::ifstream &in) :
   }
 #else
   (void)in;  // unused parameter
+
+  log.warning() << "Cannot read OSX fat archive on this platform"
+                << messaget::eom;
 #endif
 }
 
@@ -99,20 +116,16 @@ bool osx_fat_readert::extract_gb(
 // guided by https://lowlevelbits.org/parsing-mach-o-files/
 bool is_osx_mach_object(char hdr[4])
 {
-#ifdef __APPLE__
   uint32_t *magic = reinterpret_cast<uint32_t *>(hdr);
 
   switch(*magic)
   {
-  case MH_MAGIC:
-  case MH_CIGAM:
-  case MH_MAGIC_64:
-  case MH_CIGAM_64:
+  case CPROVER_MH_MAGIC:
+  case CPROVER_MH_CIGAM:
+  case CPROVER_MH_MAGIC_64:
+  case CPROVER_MH_CIGAM_64:
     return true;
   }
-#else
-  (void)hdr; // unused parameter
-#endif
 
   return false;
 }
@@ -236,7 +249,10 @@ void osx_mach_o_readert::process_commands(
 #endif
 }
 
-osx_mach_o_readert::osx_mach_o_readert(std::istream &_in) : in(_in)
+osx_mach_o_readert::osx_mach_o_readert(
+  std::istream &_in,
+  message_handlert &message_handler)
+  : log(message_handler), in(_in)
 {
   // read magic
   uint32_t magic;
@@ -249,16 +265,16 @@ osx_mach_o_readert::osx_mach_o_readert(std::istream &_in) : in(_in)
   bool is_64 = false, need_swap = false;
   switch(magic)
   {
-  case MH_CIGAM:
+  case CPROVER_MH_CIGAM:
     need_swap = true;
     break;
-  case MH_MAGIC:
+  case CPROVER_MH_MAGIC:
     break;
-  case MH_CIGAM_64:
+  case CPROVER_MH_CIGAM_64:
     need_swap = true;
     is_64 = true;
     break;
-  case MH_MAGIC_64:
+  case CPROVER_MH_MAGIC_64:
     is_64 = true;
     break;
   default:
@@ -303,5 +319,7 @@ osx_mach_o_readert::osx_mach_o_readert(std::istream &_in) : in(_in)
   }
 
   process_commands(ncmds, offset, need_swap);
+#else
+  log.warning() << "Cannot read OSX Mach-O on this platform" << messaget::eom;
 #endif
 }

@@ -12,6 +12,8 @@ Author:
 #ifndef CPROVER_GOTO_PROGRAMS_OSX_FAT_READER_H
 #define CPROVER_GOTO_PROGRAMS_OSX_FAT_READER_H
 
+#include <util/message.h>
+
 #include <fstream>
 #include <map>
 #include <string>
@@ -22,7 +24,7 @@ Author:
 class osx_fat_readert
 {
 public:
-  explicit osx_fat_readert(std::ifstream &in);
+  osx_fat_readert(std::ifstream &, message_handlert &);
 
   bool has_gb() const { return has_gb_arch; }
 
@@ -31,6 +33,7 @@ public:
     const std::string &dest) const;
 
 private:
+  messaget log;
   bool has_gb_arch;
 };
 
@@ -39,7 +42,7 @@ bool is_osx_fat_magic(char hdr[4]);
 class osx_mach_o_readert
 {
 public:
-  explicit osx_mach_o_readert(std::istream &_in);
+  osx_mach_o_readert(std::istream &, message_handlert &);
 
   struct sectiont
   {
@@ -62,6 +65,7 @@ public:
   }
 
 private:
+  messaget log;
   std::istream &in;
 
   void process_commands(uint32_t ncmds, std::size_t offset, bool need_swap);
