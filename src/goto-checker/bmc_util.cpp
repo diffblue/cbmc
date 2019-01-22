@@ -229,9 +229,7 @@ void update_properties_status_from_symex_target_equation(
       continue;
 
     irep_idt property_id = step.get_property_id();
-
-    if(property_id.empty())
-      continue;
+    CHECK_RETURN(!property_id.empty());
 
     // Don't set false properties; we wouldn't have traces for them.
     const auto status = step.cond_expr.is_true() ? property_statust::PASS
