@@ -15,6 +15,7 @@ Author: Daniel Kroening, Peter Schrammel
 #include <memory>
 
 #include <goto-programs/safety_checker.h>
+#include <goto-symex/path_storage.h>
 
 #include "properties.h"
 
@@ -75,6 +76,16 @@ void perform_symex(
   symex_bmct &,
   symbol_tablet &,
   symex_target_equationt &,
+  const optionst &,
+  const namespacet &,
+  ui_message_handlert &);
+
+/// Perform symbolic execution starting from \p resume.
+void perform_symex(
+  abstract_goto_modelt &,
+  symex_bmct &,
+  path_storaget::patht &resume,
+  symbol_tablet &,
   const optionst &,
   const namespacet &,
   ui_message_handlert &);
