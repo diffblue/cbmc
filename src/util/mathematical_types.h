@@ -63,11 +63,10 @@ public:
   using domaint = std::vector<typet>;
 
   mathematical_function_typet(const domaint &_domain, const typet &_codomain)
-    : type_with_subtypest(ID_mathematical_function)
+    : type_with_subtypest(
+        ID_mathematical_function,
+        {type_with_subtypest(irep_idt(), _domain), _codomain})
   {
-    subtypes().resize(2);
-    domain() = _domain;
-    codomain() = _codomain;
   }
 
   domaint &domain()
