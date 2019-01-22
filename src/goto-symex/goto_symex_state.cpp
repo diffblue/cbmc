@@ -27,8 +27,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 static void get_l1_name(exprt &expr);
 
-goto_symex_statet::goto_symex_statet()
-  : symex_target(nullptr), record_events(true), dirty()
+goto_symex_statet::goto_symex_statet(const symex_targett::sourcet &_source)
+  : goto_statet(_source), symex_target(nullptr), record_events(true), dirty()
 {
   threads.resize(1);
   new_frame();
@@ -782,11 +782,8 @@ void goto_symex_statet::print_backtrace(std::ostream &out) const
       ++stackit)
   {
     const auto &frame = *stackit;
-    if(frame.calling_location.is_set)
-    {
-      out << frame.calling_location.function_id << " "
-          << frame.calling_location.pc->location_number << "\n";
-    }
+    out << frame.calling_location.function_id << " "
+        << frame.calling_location.pc->location_number << "\n";
   }
 }
 

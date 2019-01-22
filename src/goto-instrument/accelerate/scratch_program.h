@@ -74,7 +74,7 @@ public:
   bool constant_propagation;
 
 protected:
-  goto_symex_statet symex_state;
+  std::unique_ptr<goto_symex_statet> symex_state;
   goto_functionst functions;
   symbol_tablet &symbol_table;
   symbol_tablet symex_symbol_table;

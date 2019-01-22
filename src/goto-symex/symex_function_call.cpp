@@ -326,7 +326,6 @@ void goto_symext::symex_function_call_code(
   frame.loop_iterations[identifier].is_recursion=true;
   frame.loop_iterations[identifier].count++;
 
-  state.source.is_set=true;
   state.source.function_id = identifier;
   symex_transition(state, goto_function.body.instructions.begin(), false);
 }

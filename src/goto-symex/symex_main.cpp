@@ -333,7 +333,19 @@ void goto_symext::symex_from_entry_point_of(
   const get_goto_functiont &get_goto_function,
   symbol_tablet &new_symbol_table)
 {
-  statet state;
+  const goto_functionst::goto_functiont *start_function;
+  try
+  {
+    start_function = &get_goto_function(goto_functionst::entry_point());
+  }
+  catch(const std::out_of_range &)
+  {
+    throw unsupported_operation_exceptiont("the program has no entry point");
+  }
+
+  statet state(symex_targett::sourcet(
+    goto_functionst::entry_point(), start_function->body));
+
   initialize_entry_point_state(get_goto_function, state);
 
   symex_with_state(
@@ -344,7 +356,19 @@ void goto_symext::initialize_path_storage_from_entry_point_of(
   const get_goto_functiont &get_goto_function,
   symbol_tablet &new_symbol_table)
 {
-  statet state;
+  const goto_functionst::goto_functiont *start_function;
+  try
+  {
+    start_function = &get_goto_function(goto_functionst::entry_point());
+  }
+  catch(const std::out_of_range &)
+  {
+    throw unsupported_operation_exceptiont("the program has no entry point");
+  }
+
+  statet state(symex_targett::sourcet(
+    goto_functionst::entry_point(), start_function->body));
+
   initialize_entry_point_state(get_goto_function, state);
 
   path_storaget::patht entry_point_start(target, state);
