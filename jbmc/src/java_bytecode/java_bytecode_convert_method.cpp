@@ -650,20 +650,22 @@ static irep_idt get_if_cmp_operator(const irep_idt &stmt)
 /// Build a member exprt for accessing a specific field that may come from a
 /// base class.
 /// \param pointer: The expression to access the field on.
-/// \param fieldref: A getfield/setfield instruction produced by the bytecode
-///   parser.
+/// \param field_reference: A getfield/setfield instruction produced by the
+///   bytecode parser.
 /// \param ns: Global namespace
 /// \return A member expression accessing the field, through base class
 ///   components if necessary.
-static member_exprt
-to_member(const exprt &pointer, const exprt &fieldref, const namespacet &ns)
+static member_exprt to_member(
+  const exprt &pointer,
+  const exprt &field_reference,
+  const namespacet &ns)
 {
-  struct_tag_typet class_type(fieldref.get(ID_class));
+  struct_tag_typet class_type(field_reference.get(ID_class));
 
   const exprt typed_pointer =
     typecast_exprt::conditional_cast(pointer, java_reference_type(class_type));
 
-  const irep_idt &component_name = fieldref.get(ID_component_name);
+  const irep_idt &component_name = field_reference.get(ID_component_name);
 
   exprt accessed_object = checked_dereference(typed_pointer, class_type);
 
