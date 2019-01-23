@@ -40,7 +40,6 @@ Author: Martin Brain, martin.brain@diffblue.com
 /// An (unanticipated) exception was thrown during computation.
 #define CPROVER_EXIT_EXCEPTION 6
 // should contemplate EX_SOFTWARE from sysexits.h
-#define CPROVER_EXIT_EXCEPTION_GOTO_INSTRUMENT 11
 
 /// An error has been encountered during processing the requested analysis.
 #define CPROVER_EXIT_INTERNAL_ERROR 6

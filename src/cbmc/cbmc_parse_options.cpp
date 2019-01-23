@@ -433,22 +433,7 @@ int cbmc_parse_optionst::doit()
   //
 
   optionst options;
-  try
-  {
-    get_command_line_options(options);
-  }
-
-  catch(const char *error_msg)
-  {
-    error() << error_msg << eom;
-    return CPROVER_EXIT_EXCEPTION;
-  }
-
-  catch(const std::string &error_msg)
-  {
-    error() << error_msg << eom;
-    return CPROVER_EXIT_EXCEPTION;
-  }
+  get_command_line_options(options);
 
   eval_verbosity(
     cmdline.get_value("verbosity"), messaget::M_STATISTICS, ui_message_handler);
@@ -575,32 +560,11 @@ int cbmc_parse_optionst::doit()
 
 bool cbmc_parse_optionst::set_properties()
 {
-  try
-  {
-    if(cmdline.isset("claim")) // will go away
-      ::set_properties(goto_model, cmdline.get_values("claim"));
+  if(cmdline.isset("claim")) // will go away
+    ::set_properties(goto_model, cmdline.get_values("claim"));
 
-    if(cmdline.isset("property")) // use this one
-      ::set_properties(goto_model, cmdline.get_values("property"));
-  }
-
-  catch(const char *e)
-  {
-    error() << e << eom;
-    return true;
-  }
-
-  catch(const std::string &e)
-  {
-    error() << e << eom;
-    return true;
-  }
-
-  catch(int e)
-  {
-    error() << "Numeric exception : " << e << eom;
-    return true;
-  }
+  if(cmdline.isset("property")) // use this one
+    ::set_properties(goto_model, cmdline.get_values("property"));
 
   return false;
 }
@@ -618,7 +582,6 @@ int cbmc_parse_optionst::get_goto_program(
     return CPROVER_EXIT_INCORRECT_TASK;
   }
 
-  try
   {
     goto_model =
       initialize_goto_model(cmdline.args, ui_message_handler, options);
@@ -655,42 +618,11 @@ int cbmc_parse_optionst::get_goto_program(
     log.status() << config.object_bits_info() << log.eom;
   }
 
-  catch(incorrect_goto_program_exceptiont &e)
-  {
-    log.error() << e.what() << log.eom;
-    return CPROVER_EXIT_EXCEPTION;
-  }
-
-  catch(const char *e)
-  {
-    log.error() << e << log.eom;
-    return CPROVER_EXIT_EXCEPTION;
-  }
-
-  catch(const std::string &e)
-  {
-    log.error() << e << log.eom;
-    return CPROVER_EXIT_EXCEPTION;
-  }
-
-  catch(int e)
-  {
-    log.error() << "Numeric exception : " << e << log.eom;
-    return CPROVER_EXIT_EXCEPTION;
-  }
-
-  catch(const std::bad_alloc &)
-  {
-    log.error() << "Out of memory" << log.eom;
-    return CPROVER_EXIT_INTERNAL_OUT_OF_MEMORY;
-  }
-
   return -1; // no error, continue
 }
 
 void cbmc_parse_optionst::preprocessing(const optionst &options)
 {
-  try
   {
     if(cmdline.args.size()!=1)
     {
@@ -722,27 +654,6 @@ void cbmc_parse_optionst::preprocessing(const optionst &options)
     if(language->preprocess(infile, filename, std::cout))
       error() << "PREPROCESSING ERROR" << eom;
   }
-
-  catch(const char *e)
-  {
-    error() << e << eom;
-  }
-
-  catch(const std::string &e)
-  {
-    error() << e << eom;
-  }
-
-  catch(int e)
-  {
-    error() << "Numeric exception : " << e << eom;
-  }
-
-  catch(const std::bad_alloc &)
-  {
-    error() << "Out of memory" << eom;
-    exit(CPROVER_EXIT_INTERNAL_OUT_OF_MEMORY);
-  }
 }
 
 bool cbmc_parse_optionst::process_goto_program(
@@ -750,7 +661,6 @@ bool cbmc_parse_optionst::process_goto_program(
   const optionst &options,
   messaget &log)
 {
-  try
   {
     // Remove inline assembler; this needs to happen before
     // adding the library.
@@ -876,31 +786,6 @@ bool cbmc_parse_optionst::process_goto_program(
 
     // remove any skips introduced since coverage instrumentation
     remove_skip(goto_model);
-  }
-
-  catch(const char *e)
-  {
-    log.error() << e << eom;
-    return true;
-  }
-
-  catch(const std::string &e)
-  {
-    log.error() << e << eom;
-    return true;
-  }
-
-  catch(int e)
-  {
-    log.error() << "Numeric exception : " << e << eom;
-    return true;
-  }
-
-  catch(const std::bad_alloc &)
-  {
-    log.error() << "Out of memory" << eom;
-    exit(CPROVER_EXIT_INTERNAL_OUT_OF_MEMORY);
-    return true;
   }
 
   return false;

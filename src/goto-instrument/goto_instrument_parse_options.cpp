@@ -121,7 +121,6 @@ int goto_instrument_parse_optionst::doit()
   eval_verbosity(
     cmdline.get_value("verbosity"), messaget::M_STATISTICS, ui_message_handler);
 
-  try
   {
     register_languages();
 
@@ -822,30 +821,6 @@ int goto_instrument_parse_optionst::doit()
 
     help();
     return CPROVER_EXIT_USAGE_ERROR;
-  }
-
-  catch(const char *e)
-  {
-    error() << e << eom;
-    return CPROVER_EXIT_EXCEPTION_GOTO_INSTRUMENT;
-  }
-
-  catch(const std::string &e)
-  {
-    error() << e << eom;
-    return CPROVER_EXIT_EXCEPTION_GOTO_INSTRUMENT;
-  }
-
-  catch(int e)
-  {
-    error() << "Numeric exception : " << e << eom;
-    return CPROVER_EXIT_EXCEPTION_GOTO_INSTRUMENT;
-  }
-
-  catch(const std::bad_alloc &)
-  {
-    error() << "Out of memory" << eom;
-    return CPROVER_EXIT_EXCEPTION_GOTO_INSTRUMENT;
   }
 // NOLINTNEXTLINE(readability/fn_size)
 }

@@ -396,29 +396,8 @@ int goto_analyzer_parse_optionst::doit()
 
   register_languages();
 
-  try
-  {
-    goto_model =
-      initialize_goto_model(cmdline.args, get_message_handler(), options);
-  }
-
-  catch(const char *e)
-  {
-    error() << e << eom;
-    return CPROVER_EXIT_EXCEPTION;
-  }
-
-  catch(const std::string &e)
-  {
-    error() << e << eom;
-    return CPROVER_EXIT_EXCEPTION;
-  }
-
-  catch(int e)
-  {
-    error() << "Numeric exception: " << e << eom;
-    return CPROVER_EXIT_EXCEPTION;
-  }
+  goto_model =
+    initialize_goto_model(cmdline.args, get_message_handler(), options);
 
   if(process_goto_program(options))
     return CPROVER_EXIT_INTERNAL_ERROR;
@@ -448,34 +427,7 @@ int goto_analyzer_parse_optionst::doit()
     return CPROVER_EXIT_SUCCESS;
   }
 
-  try
-  {
-    return perform_analysis(options);
-  }
-
-  catch(const char *e)
-  {
-    error() << e << eom;
-    return CPROVER_EXIT_EXCEPTION;
-  }
-
-  catch(const std::string &e)
-  {
-    error() << e << eom;
-    return CPROVER_EXIT_EXCEPTION;
-  }
-
-  catch(int e)
-  {
-    error() << "Numeric exception: " << e << eom;
-    return CPROVER_EXIT_EXCEPTION;
-  }
-
-  catch(const std::bad_alloc &)
-  {
-    error() << "Out of memory" << eom;
-    return CPROVER_EXIT_INTERNAL_OUT_OF_MEMORY;
-  }
+  return perform_analysis(options);
 }
 
 
@@ -603,8 +555,8 @@ int goto_analyzer_parse_optionst::perform_analysis(const optionst &options)
     return CPROVER_EXIT_SUCCESS;
   }
 
-  if(set_properties())
-    return CPROVER_EXIT_SET_PROPERTIES_FAILED;
+  if(cmdline.isset("property"))
+    ::set_properties(goto_model, cmdline.get_values("property"));
 
   if(options.get_bool_option("general-analysis"))
   {
@@ -713,38 +665,9 @@ int goto_analyzer_parse_optionst::perform_analysis(const optionst &options)
   return CPROVER_EXIT_USAGE_ERROR;
 }
 
-bool goto_analyzer_parse_optionst::set_properties()
-{
-  try
-  {
-    if(cmdline.isset("property"))
-      ::set_properties(goto_model, cmdline.get_values("property"));
-  }
-
-  catch(const char *e)
-  {
-    error() << e << eom;
-    return true;
-  }
-
-  catch(const std::string &e)
-  {
-    error() << e << eom;
-    return true;
-  }
-
-  catch(int)
-  {
-    return true;
-  }
-
-  return false;
-}
-
 bool goto_analyzer_parse_optionst::process_goto_program(
   const optionst &options)
 {
-  try
   {
     #if 0
     // Remove inline assembler; this needs to happen before
@@ -786,30 +709,6 @@ bool goto_analyzer_parse_optionst::process_goto_program(
     // add loop ids
     goto_model.goto_functions.compute_loop_numbers();
   }
-
-  catch(const char *e)
-  {
-    error() << e << eom;
-    return true;
-  }
-
-  catch(const std::string &e)
-  {
-    error() << e << eom;
-    return true;
-  }
-
-  catch(int)
-  {
-    return true;
-  }
-
-  catch(const std::bad_alloc &)
-  {
-    error() << "Out of memory" << eom;
-    return true;
-  }
-
   return false;
 }
 
