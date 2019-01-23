@@ -323,14 +323,8 @@ void arrayst::add_array_Ackermann_constraints()
             continue;
 
           // index equality
-          equal_exprt indices_equal(*i1, *i2);
-
-          if(indices_equal.op0().type()!=
-             indices_equal.op1().type())
-          {
-            indices_equal.op1().
-              make_typecast(indices_equal.op0().type());
-          }
+          const equal_exprt indices_equal(
+            *i1, typecast_exprt::conditional_cast(*i2, i1->type()));
 
           literalt indices_equal_lit=convert(indices_equal);
 
@@ -537,8 +531,7 @@ void arrayst::add_array_constraints_with(
     {
       // we first build the guard
 
-      if(other_index.type()!=index.type())
-        other_index.make_typecast(index.type());
+      other_index = typecast_exprt::conditional_cast(other_index, index.type());
 
       literalt guard_lit=convert(equal_exprt(index, other_index));
 

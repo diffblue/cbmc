@@ -364,7 +364,7 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
 
           Forall_operands(it, result)
           {
-            it->make_typecast(expr.type());
+            *it = typecast_exprt(*it, expr.type());
             simplify_typecast(*it); // recursive call
           }
 
@@ -397,11 +397,11 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
       {
         if(op.type().id()==ID_pointer)
         {
-          op.make_typecast(size_t_type);
+          op = typecast_exprt(op, size_t_type);
         }
         else
         {
-          op.make_typecast(size_t_type);
+          op = typecast_exprt(op, size_t_type);
           if(*step > 1)
             op = mult_exprt(from_integer(*step, size_t_type), op);
         }

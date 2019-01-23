@@ -81,10 +81,10 @@ bool simplify_exprt::simplify_index(exprt &expr)
     {
       // Turn (a with i:=x)[j] into (i==j)?x:a[j].
       // watch out that the type of i and j might be different.
-      equal_exprt equality_expr(expr.op1(), with_expr.op1());
+      const exprt rhs_casted =
+        typecast_exprt::conditional_cast(with_expr.op1(), expr.op1().type());
 
-      if(equality_expr.lhs().type()!=equality_expr.rhs().type())
-        equality_expr.rhs().make_typecast(equality_expr.lhs().type());
+      equal_exprt equality_expr(expr.op1(), rhs_casted);
 
       simplify_inequality(equality_expr);
 
@@ -168,8 +168,7 @@ bool simplify_exprt::simplify_index(exprt &expr)
     // These are index/value pairs, alternating.
     for(size_t i=0; i<array.operands().size()/2; i++)
     {
-      exprt tmp_index=array.operands()[i*2];
-      tmp_index.make_typecast(index.type());
+      exprt tmp_index = typecast_exprt(array.operands()[i * 2], index.type());
       simplify(tmp_index);
       if(tmp_index==index)
       {

@@ -396,9 +396,7 @@ static exprt lower_byte_update(
 
           if(i==0 && element_size==1) // bytes?
           {
-            new_value = src.value();
-            if(new_value.type()!=subtype)
-              new_value.make_typecast(subtype);
+            new_value = typecast_exprt::conditional_cast(src.value(), subtype);
           }
           else
           {

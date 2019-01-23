@@ -21,8 +21,8 @@ void java_bytecode_typecheckt::typecheck_code(codet &code)
     typecheck_expr(code_assign.lhs());
     typecheck_expr(code_assign.rhs());
 
-    if(code_assign.lhs().type()!=code_assign.rhs().type())
-      code_assign.rhs().make_typecast(code_assign.lhs().type());
+    code_assign.rhs() = typecast_exprt::conditional_cast(
+      code_assign.rhs(), code_assign.lhs().type());
   }
   else if(statement==ID_block)
   {

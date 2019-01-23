@@ -212,6 +212,7 @@ public:
     op.push_back(std::move(e3));
   }
 
+  DEPRECATED("use typecast_exprt() instead")
   void make_typecast(const typet &_type);
 
   void make_bool(bool value);
