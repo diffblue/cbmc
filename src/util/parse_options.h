@@ -38,4 +38,12 @@ private:
 std::string
 banner_string(const std::string &front_end, const std::string &version);
 
+/// Utility for displaying help centered messages borderered by "* *"
+/// - we use this for displaying banner information and the like
+/// in help messages
+/// \example
+///   align_center_with_border("test-text")
+///   == "* *                        test-text                        * *"
+std::string align_center_with_border(const std::string &text);
+
 #endif // CPROVER_UTIL_PARSE_OPTIONS_H
