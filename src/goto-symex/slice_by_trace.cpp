@@ -288,16 +288,10 @@ void symex_slice_by_tracet::compute_ts_back(
               pvi++;
             }
 
-            exprt val_merge=exprt(ID_and, typet(ID_bool));
-            val_merge.operands().reserve(eq_conds.size()+1);
-            val_merge.copy_to_operands(merge[j+1]);
-
-            for(const auto &eq_cond : eq_conds)
-            {
-              val_merge.copy_to_operands(eq_cond);
-            }
-
-            u_lhs.add_to_operands(std::move(val_merge));
+            exprt::operandst conjuncts(1, merge[j + 1]);
+            conjuncts.reserve(eq_conds.size() + 1);
+            conjuncts.insert(conjuncts.end(), eq_conds.begin(), eq_conds.end());
+            u_lhs.add_to_operands(conjunction(conjuncts));
           }
           else
           {
