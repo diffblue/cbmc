@@ -48,10 +48,10 @@ void goto_cc_modet::help()
 {
   // clang-format off
   std::cout << '\n' << banner_string("goto-cc", CBMC_VERSION) << '\n'
+            << align_center_with_border("Copyright (C) 2006-2018") << '\n'
+            << align_center_with_border("Daniel Kroening, Michael Tautschnig,") << '\n' // NOLINT(*)
+            << align_center_with_border("Christoph Wintersteiger") << '\n'
             <<
-  "* *               Copyright (C) 2006-2018                   * *\n"
-  "* *          Daniel Kroening, Michael Tautschnig,           * *\n"
-  "* *               Christoph Wintersteiger                   * *\n"
   "\n";
 
   help_mode();
