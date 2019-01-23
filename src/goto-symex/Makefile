@@ -14,7 +14,6 @@ SRC = auto_objects.cpp \
       show_program.cpp \
       show_vcc.cpp \
       slice.cpp \
-      slice_by_trace.cpp \
       symex_assign.cpp \
       symex_atomic_section.cpp \
       symex_builtin_functions.cpp \

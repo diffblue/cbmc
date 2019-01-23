@@ -21,7 +21,6 @@ Author: Daniel Kroening, Peter Schrammel
 #include <goto-symex/build_goto_trace.h>
 #include <goto-symex/memory_model_pso.h>
 #include <goto-symex/slice.h>
-#include <goto-symex/slice_by_trace.h>
 #include <goto-symex/symex_target_equation.h>
 
 #include <linking/static_lifetime_init.h>
@@ -187,13 +186,7 @@ void slice(
   ui_message_handlert &ui_message_handler)
 {
   messaget msg(ui_message_handler);
-  if(options.get_option("slice-by-trace") != "")
-  {
-    symex_slice_by_tracet symex_slice_by_trace(ns);
 
-    symex_slice_by_trace.slice_by_trace(
-      options.get_option("slice-by-trace"), symex_target_equation);
-  }
   // any properties to check at all?
   if(symex_target_equation.has_threads())
   {

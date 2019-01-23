@@ -108,9 +108,6 @@ void jdiff_parse_optionst::get_command_line_options(optionst &options)
   if(cmdline.isset("debug-level"))
     options.set_option("debug-level", cmdline.get_value("debug-level"));
 
-  if(cmdline.isset("slice-by-trace"))
-    options.set_option("slice-by-trace", cmdline.get_value("slice-by-trace"));
-
   if(cmdline.isset("unwindset"))
     options.set_option("unwindset", cmdline.get_value("unwindset"));
 
