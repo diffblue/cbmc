@@ -199,10 +199,10 @@ void rw_set_functiont::compute_rec(const exprt &function)
 {
   if(function.id()==ID_symbol)
   {
-    const irep_idt &id=to_symbol_expr(function).get_identifier();
+    const irep_idt &function_id = to_symbol_expr(function).get_identifier();
 
-    goto_functionst::function_mapt::const_iterator f_it=
-      goto_functions.function_map.find(id);
+    goto_functionst::function_mapt::const_iterator f_it =
+      goto_functions.function_map.find(function_id);
 
     if(f_it!=goto_functions.function_map.end())
     {
@@ -220,9 +220,14 @@ void rw_set_functiont::compute_rec(const exprt &function)
 
       forall_goto_program_instructions(i_it, body)
       {
-        *this+=rw_set_loct(ns, value_sets, i_it
+        *this += rw_set_loct(
+          ns,
+          value_sets,
+          function_id,
+          i_it
 #ifdef LOCAL_MAY
-        , local_may
+          ,
+          local_may
 #endif
         ); // NOLINT(whitespace/parens)
       }

@@ -102,18 +102,21 @@ protected:
     unsigned coming_from;
 
     bool contains_shared_array(
+      const irep_idt &function_id,
       goto_programt::const_targett targ,
       goto_programt::const_targett i_it,
       value_setst &value_sets
-      #ifdef LOCAL_MAY
-      , local_may_aliast local_may
-      #endif
-    ) const; // NOLINT(whitespace/parens)
+#ifdef LOCAL_MAY
+      ,
+      local_may_aliast local_may
+#endif
+      ) const; // NOLINT(whitespace/parens)
 
     /* transformers */
     void visit_cfg_thread() const;
     void visit_cfg_propagate(goto_programt::instructionst::iterator i_it);
     void visit_cfg_body(
+      const irep_idt &function_id,
       const goto_programt &goto_program,
       goto_programt::const_targett i_it,
       loop_strategyt replicate_body,
@@ -131,6 +134,7 @@ protected:
       goto_programt::const_targett i_it);
     void visit_cfg_assign(
       value_setst &value_sets,
+      const irep_idt &function_id,
       goto_programt::instructionst::iterator &i_it,
       bool no_dependencies
 #ifdef LOCAL_MAY
@@ -148,6 +152,7 @@ protected:
       bool no_dependenciess,
       loop_strategyt duplicate_body);
     void visit_cfg_goto(
+      const irep_idt &function_id,
       const goto_programt &goto_program,
       goto_programt::instructionst::iterator i_it,
       /* forces the duplication of all the loops, with array or not
