@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "expr_cast.h"
 #include "invariant.h"
 #include "std_types.h"
+#include <util/narrow.h>
 
 /// An expression without operands
 class nullary_exprt : public exprt
@@ -544,7 +545,7 @@ public:
 
   void set_bits_per_byte(std::size_t bits_per_byte)
   {
-    set(ID_bits_per_byte, bits_per_byte);
+    set(ID_bits_per_byte, narrow_cast<long long>(bits_per_byte));
   }
 };
 
@@ -1756,7 +1757,7 @@ public:
 
   void set_component_number(std::size_t component_number)
   {
-    set(ID_component_number, component_number);
+    set(ID_component_number, narrow_cast<long long>(component_number));
   }
 };
 

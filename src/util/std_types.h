@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "invariant.h"
 #include "mp_arith.h"
 #include "validate.h"
+#include <util/narrow.h>
 
 #include <unordered_map>
 
@@ -1122,7 +1123,7 @@ public:
 
   void set_width(std::size_t width)
   {
-    set(ID_width, width);
+    set(ID_width, narrow_cast<long long>(width));
   }
 
   static void check(
@@ -1351,7 +1352,7 @@ public:
 
   void set_integer_bits(std::size_t b)
   {
-    set(ID_integer_bits, b);
+    set(ID_integer_bits, narrow_cast<long long>(b));
   }
 };
 
@@ -1413,7 +1414,7 @@ public:
 
   void set_f(std::size_t b)
   {
-    set(ID_f, b);
+    set(ID_f, narrow_cast<long long>(b));
   }
 };
 

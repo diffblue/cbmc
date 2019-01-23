@@ -13,11 +13,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <algorithm>
 #include <set>
 
-#include <util/type.h>
-#include <util/std_types.h>
 #include <util/c_types.h>
+#include <util/narrow.h>
 #include <util/optional.h>
 #include <util/std_expr.h>
+#include <util/std_types.h>
+#include <util/type.h>
 
 class java_annotationt : public irept
 {
@@ -750,7 +751,7 @@ inline const optionalt<size_t> java_generics_get_index_for_subtype(
     return {};
   }
 
-  return std::distance(gen_types.cbegin(), iter);
+  return narrow_cast<size_t>(std::distance(gen_types.cbegin(), iter));
 }
 
 void get_dependencies_from_generic_parameters(
