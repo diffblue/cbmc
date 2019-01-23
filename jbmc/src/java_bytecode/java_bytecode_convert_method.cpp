@@ -647,6 +647,14 @@ static irep_idt get_if_cmp_operator(const irep_idt &stmt)
   throw "unhandled java comparison instruction";
 }
 
+/// Build a member exprt for accessing a specific field that may come from a
+/// base class.
+/// \param pointer: The expression to access the field on.
+/// \param fieldref: A getfield/setfield instruction produced by the bytecode
+///   parser.
+/// \param ns: Global namespace
+/// \return A member expression accessing the field, through base class
+///   components if necessary.
 static member_exprt
 to_member(const exprt &pointer, const exprt &fieldref, const namespacet &ns)
 {
