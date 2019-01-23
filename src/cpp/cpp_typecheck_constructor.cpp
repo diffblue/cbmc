@@ -128,9 +128,7 @@ void cpp_typecheckt::default_ctor(
   decl.type().subtype().make_nil();
   decl.add_source_location()=source_location;
 
-  decl.value().id(ID_code);
-  decl.value().type()=typet(ID_code);
-  decl.value().set(ID_statement, ID_block);
+  decl.value() = code_blockt();
   decl.add(ID_cv).make_nil();
   decl.add(ID_throw_decl).make_nil();
 

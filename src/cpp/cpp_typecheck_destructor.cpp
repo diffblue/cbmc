@@ -37,9 +37,7 @@ void cpp_typecheckt::default_dtor(
   decl.type().id(ID_function_type);
   decl.type().subtype().make_nil();
 
-  decl.value().id(ID_code);
-  decl.value().add(ID_type).id(ID_code);
-  decl.value().set(ID_statement, ID_block);
+  decl.value() = code_blockt();
   decl.add(ID_cv).make_nil();
   decl.add(ID_throw_decl).make_nil();
 
