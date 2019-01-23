@@ -668,28 +668,25 @@ static member_exprt to_member(
   const irep_idt &component_name = field_reference.get(ID_component_name);
 
   exprt accessed_object = checked_dereference(typed_pointer, class_type);
+  const auto type_of = [&ns](const exprt &object) {
+    return to_struct_type(ns.follow(object.type()));
+  };
 
   // The field access is described as being against a particular type, but it
   // may in fact belong to any ancestor type.
-  while(1)
+  while(type_of(accessed_object).get_component(component_name).is_nil())
   {
-    struct_typet object_type =
-      to_struct_type(ns.follow(accessed_object.type()));
-    auto component = object_type.get_component(component_name);
-
-    if(component.is_not_nil())
-      return member_exprt(accessed_object, component);
-
-    // Component not present: check the immediate parent type.
-
-    const auto &components = object_type.components();
+    const auto components = type_of(accessed_object).components();
     INVARIANT(
       components.size() != 0,
       "infer_opaque_type_fields should guarantee that a member access has a "
       "corresponding field");
 
+    // Base class access is always done through the first component
     accessed_object = member_exprt(accessed_object, components.front());
   }
+  return member_exprt(
+    accessed_object, type_of(accessed_object).get_component(component_name));
 }
 
 /// Find all goto statements in 'repl' that target 'old_label' and redirect them
