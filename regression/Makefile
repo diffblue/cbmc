@@ -10,6 +10,7 @@ DIRS = cbmc \
        cbmc-cover \
        goto-instrument-typedef \
        smt2_solver \
+       smt2_strings \
        strings \
        invariants \
        goto-diff \
