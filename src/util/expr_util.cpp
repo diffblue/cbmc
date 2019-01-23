@@ -174,6 +174,10 @@ bool has_subtype(
       push_if_not_visited(ns.follow(top));
     else if(top.id() == ID_c_enum_tag)
       push_if_not_visited(ns.follow_tag(to_c_enum_tag_type(top)));
+    else if(top.id() == ID_struct_tag)
+      push_if_not_visited(ns.follow_tag(to_struct_tag_type(top)));
+    else if(top.id() == ID_union_tag)
+      push_if_not_visited(ns.follow_tag(to_union_tag_type(top)));
     else if(top.id() == ID_struct || top.id() == ID_union)
     {
       for(const auto &comp : to_struct_union_type(top).components())
