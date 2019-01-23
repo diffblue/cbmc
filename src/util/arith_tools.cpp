@@ -231,7 +231,7 @@ mp_integer power(const mp_integer &base,
     case 2:
       {
         mp_integer result;
-        result.setPower2(exponent.to_ulong());
+        result.setPower2(numeric_cast_v<unsigned>(exponent));
         return result;
       }
     case 1: return 1;
