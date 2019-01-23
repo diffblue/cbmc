@@ -21,7 +21,7 @@ bool simplify_exprt::simplify_isinf(exprt &expr)
   if(expr.operands().size()!=1)
     return true;
 
-  if(ns.follow(expr.op0().type()).id()!=ID_floatbv)
+  if(expr.op0().type().id() != ID_floatbv)
     return true;
 
   if(expr.op0().is_constant())
@@ -72,7 +72,7 @@ bool simplify_exprt::simplify_abs(exprt &expr)
 
   if(expr.op0().is_constant())
   {
-    const typet &type=ns.follow(expr.op0().type());
+    const typet &type = expr.op0().type();
 
     if(type.id()==ID_floatbv)
     {
@@ -114,7 +114,7 @@ bool simplify_exprt::simplify_sign(exprt &expr)
 
   if(expr.op0().is_constant())
   {
-    const typet &type=ns.follow(expr.op0().type());
+    const typet &type = expr.op0().type();
 
     if(type.id()==ID_floatbv)
     {
@@ -144,8 +144,8 @@ bool simplify_exprt::simplify_floatbv_typecast(exprt &expr)
 
   auto const &floatbv_typecast_expr = to_floatbv_typecast_expr(expr);
 
-  const typet &dest_type = ns.follow(floatbv_typecast_expr.type());
-  const typet &src_type = ns.follow(floatbv_typecast_expr.op().type());
+  const typet &dest_type = floatbv_typecast_expr.type();
+  const typet &src_type = floatbv_typecast_expr.op().type();
 
   // eliminate redundant casts
   if(dest_type==src_type)
@@ -171,8 +171,8 @@ bool simplify_exprt::simplify_floatbv_typecast(exprt &expr)
        casted_expr.op1().id()==ID_typecast &&
        casted_expr.op0().operands().size()==1 &&
        casted_expr.op1().operands().size()==1 &&
-       ns.follow(casted_expr.op0().type())==dest_type &&
-       ns.follow(casted_expr.op1().type())==dest_type)
+       casted_expr.op0().type()==dest_type &&
+       casted_expr.op1().type()==dest_type)
     {
       exprt result(casted_expr.id(), floatbv_typecast_expr.type());
       result.operands().resize(3);
@@ -282,7 +282,7 @@ bool simplify_exprt::simplify_floatbv_typecast(exprt &expr)
 
 bool simplify_exprt::simplify_floatbv_op(exprt &expr)
 {
-  const typet &type=ns.follow(expr.type());
+  const typet &type = expr.type();
 
   PRECONDITION(type.id() == ID_floatbv);
   PRECONDITION(
@@ -298,10 +298,10 @@ bool simplify_exprt::simplify_floatbv_op(exprt &expr)
   exprt op2=expr.op2(); // rounding mode
 
   INVARIANT(
-    ns.follow(op0.type()) == type,
+    op0.type() == type,
     "expression type of operand must match type of expression");
   INVARIANT(
-    ns.follow(op1.type()) == type,
+    op1.type() == type,
     "expression type of operand must match type of expression");
 
   // Remember that floating-point addition is _NOT_ associative.

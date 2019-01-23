@@ -104,10 +104,9 @@ exprt is_not_zero(
   // Note that this returns a proper bool_typet(), not a C/C++ boolean.
   // To get a C/C++ boolean, add a further typecast.
 
-  const typet &src_type=
-    src.type().id()==ID_c_enum_tag?
-    ns.follow_tag(to_c_enum_tag_type(src.type())):
-    ns.follow(src.type());
+  const typet &src_type = src.type().id() == ID_c_enum_tag
+                            ? ns.follow_tag(to_c_enum_tag_type(src.type()))
+                            : src.type();
 
   if(src_type.id()==ID_bool) // already there
     return src; // do nothing

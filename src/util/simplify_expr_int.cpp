@@ -447,7 +447,7 @@ bool simplify_exprt::simplify_plus(exprt &expr)
   // floating-point addition is _NOT_ associative; thus,
   // there is special case for float
 
-  if(ns.follow(plus_expr.type()).id() == ID_floatbv)
+  if(plus_expr.type().id() == ID_floatbv)
   {
     // we only merge neighboring constants!
     Forall_expr(it, operands)
@@ -660,9 +660,9 @@ bool simplify_exprt::simplify_bitwise(exprt &expr)
 
     forall_operands(it, expr)
     {
-      if(it->id()==ID_typecast &&
-         it->operands().size()==1 &&
-         ns.follow(it->op0().type()).id()==ID_bool)
+      if(
+        it->id() == ID_typecast && it->operands().size() == 1 &&
+        it->op0().type().id() == ID_bool)
       {
       }
       else if(it->is_zero() || it->is_one())
@@ -1355,9 +1355,6 @@ bool simplify_exprt::simplify_inequality(exprt &expr)
      (expr.id()==ID_equal || expr.id()==ID_notequal))
     return simplify_inequality_pointer_object(expr);
 
-  tmp0.type() = ns.follow(tmp0.type());
-  tmp1.type() = ns.follow(tmp1.type());
-
   if(tmp0.type().id()==ID_c_enum_tag)
     tmp0.type()=ns.follow_tag(to_c_enum_tag_type(tmp0.type()));
 
@@ -1547,7 +1544,7 @@ bool simplify_exprt::simplify_inequality_not_constant(exprt &expr)
   // pretty much all of the simplifications below are unsound
   // for IEEE float because of NaN!
 
-  if(ns.follow(expr.op0().type()).id()==ID_floatbv)
+  if(expr.op0().type().id() == ID_floatbv)
     return true;
 
   // eliminate strict inequalities
@@ -1800,18 +1797,18 @@ bool simplify_exprt::simplify_inequality_constant(exprt &expr)
   // (double)value REL const ---> value rel const
   // if 'const' can be represented exactly.
 
-  if(expr.op0().id()==ID_typecast &&
-     expr.op0().operands().size()==1 &&
-     ns.follow(expr.op0().type()).id()==ID_floatbv &&
-     ns.follow(expr.op0().op0().type()).id()==ID_floatbv)
+  if(
+    expr.op0().id() == ID_typecast && expr.op0().operands().size() == 1 &&
+    expr.op0().type().id() == ID_floatbv &&
+    expr.op0().op0().type().id() == ID_floatbv)
   {
     ieee_floatt const_val(to_constant_expr(expr.op1()));
     ieee_floatt const_val_converted=const_val;
     const_val_converted.change_spec(
-      ieee_float_spect(to_floatbv_type(ns.follow(expr.op0().op0().type()))));
+      ieee_float_spect(to_floatbv_type(expr.op0().op0().type())));
     ieee_floatt const_val_converted_back=const_val_converted;
     const_val_converted_back.change_spec(
-      ieee_float_spect(to_floatbv_type(ns.follow(expr.op0().type()))));
+      ieee_float_spect(to_floatbv_type(expr.op0().type())));
     if(const_val_converted_back==const_val)
     {
       exprt result=expr;

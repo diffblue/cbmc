@@ -33,7 +33,6 @@ exprt integer_address(const exprt &pointer);
 exprt invalid_pointer(const exprt &pointer);
 exprt dynamic_object_lower_bound(
   const exprt &pointer,
-  const namespacet &,
   const exprt &offset);
 exprt dynamic_object_upper_bound(
   const exprt &pointer,
@@ -41,11 +40,9 @@ exprt dynamic_object_upper_bound(
   const exprt &access_size);
 exprt object_lower_bound(
   const exprt &pointer,
-  const namespacet &,
   const exprt &offset);
 exprt object_upper_bound(
   const exprt &pointer,
-  const namespacet &,
   const exprt &access_size);
 
 #endif // CPROVER_UTIL_POINTER_PREDICATES_H
