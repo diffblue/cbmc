@@ -22,6 +22,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <langapi/language_util.h>
 
+#include "remove_returns.h"
+
 /// Writes to \p out a two/three line string representation of a given
 /// \p instruction. The output is of the format:
 /// ```
@@ -709,13 +711,31 @@ void goto_programt::instructiont::validate(
         const auto &goto_id = goto_symbol_expr.get_identifier();
 
         if(!ns.lookup(goto_id, table_symbol))
+        {
+          bool symbol_expr_type_matches_symbol_table =
+            base_type_eq(goto_symbol_expr.type(), table_symbol->type, ns);
+
+          if(
+            !symbol_expr_type_matches_symbol_table &&
+            table_symbol->type.id() == ID_code)
+          {
+            // Return removal sets the return type of a function symbol table
+            // entry to 'void', but some callsites still expect the original
+            // type (e.g. if a function is passed as a parameter)
+            symbol_expr_type_matches_symbol_table = base_type_eq(
+              goto_symbol_expr.type(),
+              original_return_type(ns.get_symbol_table(), goto_id),
+              ns);
+          }
+
           DATA_CHECK_WITH_DIAGNOSTICS(
             vm,
-            base_type_eq(goto_symbol_expr.type(), table_symbol->type, ns),
+            symbol_expr_type_matches_symbol_table,
             id2string(goto_id) + " type inconsistency\n" +
               "goto program type: " + goto_symbol_expr.type().id_string() +
               "\n" + "symbol table type: " + table_symbol->type.id_string(),
             current_source_location);
+        }
       }
     };
 
