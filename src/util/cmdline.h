@@ -10,9 +10,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_UTIL_CMDLINE_H
 #define CPROVER_UTIL_CMDLINE_H
 
-#include <vector>
+#include <limits>
 #include <list>
 #include <string>
+#include <vector>
 
 #include "optional.h"
 
@@ -39,6 +40,46 @@ public:
   {
     return getoptnr(option).has_value();
   }
+
+  struct option_namest
+  {
+    explicit option_namest(const cmdlinet &command_line);
+    struct option_names_iteratort
+      : public std::iterator<std::forward_iterator_tag, std::string>
+    {
+      option_names_iteratort() = default;
+      explicit option_names_iteratort(
+        const cmdlinet *command_line,
+        std::size_t index);
+      option_names_iteratort(const option_names_iteratort &other) = default;
+      option_names_iteratort(option_names_iteratort &&other) = default;
+      option_names_iteratort &
+      operator=(const option_names_iteratort &) = default;
+      option_names_iteratort &operator=(option_names_iteratort &&) = default;
+
+      option_names_iteratort &operator++();
+      const option_names_iteratort operator++(int);
+      const std::string &operator*();
+
+      bool operator==(const option_names_iteratort &other);
+      bool operator!=(const option_names_iteratort &other);
+
+    private:
+      const cmdlinet *command_line = nullptr;
+      std::size_t index = std::numeric_limits<std::size_t>::max();
+      bool is_valid_index() const;
+      void goto_next_valid_index();
+    };
+    option_names_iteratort begin();
+    option_names_iteratort end();
+
+  private:
+    const cmdlinet &command_line;
+  };
+
+  /// Pseudo-object that can be used to iterate over
+  /// options in this cmdlinet (should not outlive this)
+  option_namest option_names() const;
 
   typedef std::vector<std::string> argst;
   argst args;
