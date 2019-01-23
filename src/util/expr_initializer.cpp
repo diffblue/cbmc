@@ -270,10 +270,13 @@ exprt expr_initializert<nondet>::expr_initializer_rec(
   }
   else if(type_id==ID_c_enum_tag)
   {
-    return
-      expr_initializer_rec(
-        ns.follow_tag(to_c_enum_tag_type(type)),
-        source_location);
+    exprt result = expr_initializer_rec(
+      ns.follow_tag(to_c_enum_tag_type(type)), source_location);
+
+    // use the tag type
+    result.type() = type;
+
+    return result;
   }
   else if(type_id==ID_struct_tag)
   {

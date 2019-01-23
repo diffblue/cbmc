@@ -11,10 +11,45 @@ Author: Diffblue Ltd.
 #include <testing-utils/use_catch.h>
 
 #include <algorithm>
-#include <util/expr_iterator.h>
 #include <goto-programs/goto_functions.h>
+#include <goto-programs/show_goto_functions.h>
 #include <java_bytecode/java_types.h>
+#include <util/expr_iterator.h>
+#include <util/expr_util.h>
 #include <util/suffix.h>
+
+/// Given an expression, attempt to find the underlying symbol it represents
+/// by skipping over type casts and removing balanced dereference/address_of
+/// operations
+optionalt<symbol_exprt>
+root_object(const exprt &lhs_expr, const symbol_tablet &symbol_table)
+{
+  auto expr = skip_typecast(lhs_expr);
+  int dereference_balance = 0;
+  while(!can_cast_expr<symbol_exprt>(expr))
+  {
+    if(const auto deref = expr_try_dynamic_cast<dereference_exprt>(expr))
+    {
+      ++dereference_balance;
+      expr = skip_typecast(deref->pointer());
+    }
+    else if(
+      const auto address_of = expr_try_dynamic_cast<address_of_exprt>(expr))
+    {
+      --dereference_balance;
+      expr = skip_typecast(address_of->object());
+    }
+    else
+    {
+      return {};
+    }
+  }
+  if(dereference_balance != 0)
+  {
+    return {};
+  }
+  return to_symbol_expr(expr);
+}
 
 /// Expand value of a function to include all child codets
 /// \param function_value: The value of the function (e.g. got by looking up
@@ -104,8 +139,8 @@ require_goto_statements::find_struct_component_assignments(
             ode.build(superclass_expr, ns);
             if(
               superclass_expr.get_component_name() == supercomponent_name &&
-              to_symbol_expr(ode.root_object()).get_identifier() ==
-              structure_name)
+              root_object(ode.root_object(), symbol_table)->get_identifier() ==
+                structure_name)
             {
               if(
                 code_assign.rhs() ==
@@ -126,9 +161,11 @@ require_goto_statements::find_struct_component_assignments(
           // member_exprt member_expr:
           // - component name: \p component_name
           // - operand (component of): symbol for \p structure_name
+
+          const auto &root_object =
+            ::root_object(member_expr.struct_op(), symbol_table);
           if(
-            member_expr.op().id() == ID_symbol &&
-            to_symbol_expr(member_expr.op()).get_identifier() == structure_name &&
+            root_object && root_object->get_identifier() == structure_name &&
             member_expr.get_component_name() == component_name)
           {
             if(
@@ -317,42 +354,32 @@ const irep_idt &require_goto_statements::require_struct_component_assignment(
       superclass_name,
       component_name,
       symbol_table);
+  INFO(
+    "looking for component assignment " << component_name << " in "
+                                        << structure_name);
   REQUIRE(component_assignments.non_null_assignments.size() == 1);
 
-  // We are expecting that the resulting statement can be of two forms:
+  // We are expecting that the resulting statement can be of the form:
   // 1. structure_name.(@superclass_name if given).component =
-  //     (struct cast_type_name *) tmp_object_factory$1;
+  //     (optional type cast *) tmp_object_factory$1;
   //   followed by a direct assignment like this:
   //     tmp_object_factory$1 = &tmp_object_factory$2;
-  // 2. structure_name.component = &tmp_object_factory$1;
+  // 2. structure_name.component = (optional cast *)&tmp_object_factory$1
   exprt component_assignment_rhs_expr =
-    component_assignments.non_null_assignments[0].rhs();
+    skip_typecast(component_assignments.non_null_assignments[0].rhs());
 
-  // If the rhs is a typecast (case 1 above), deconstruct it to get the name of
-  // the variable and find the assignment to it
-  if(component_assignment_rhs_expr.id() == ID_typecast)
+  // If the rhs is not an address of must be in case 1
+  if(!can_cast_expr<address_of_exprt>(component_assignment_rhs_expr))
   {
-    const auto &component_assignment_rhs =
-      to_typecast_expr(component_assignment_rhs_expr);
-
-    // Check the type we are casting to
-    if(typecast_name.has_value())
-    {
-      REQUIRE(component_assignment_rhs.type().id() == ID_pointer);
-      REQUIRE(
-        to_struct_tag_type(
-          to_pointer_type(component_assignment_rhs.type()).subtype())
-          .get(ID_identifier) == typecast_name.value());
-    }
-
     const auto &component_reference_tmp_name =
-      to_symbol_expr(component_assignment_rhs.op()).get_identifier();
+      to_symbol_expr(component_assignment_rhs_expr).get_identifier();
     const auto &component_reference_assignments =
       require_goto_statements::find_pointer_assignments(
         component_reference_tmp_name, entry_point_instructions)
         .non_null_assignments;
     REQUIRE(component_reference_assignments.size() == 1);
-    component_assignment_rhs_expr = component_reference_assignments[0].rhs();
+    component_assignment_rhs_expr =
+      skip_typecast(component_reference_assignments[0].rhs());
   }
 
   // The rhs assigns an address of a variable, get its name
@@ -480,7 +507,8 @@ require_goto_statements::require_entry_point_argument_assignment(
   const auto &argument_assignment =
     argument_assignments.non_null_assignments[0];
   const auto &argument_tmp_name =
-    to_symbol_expr(to_address_of_expr(argument_assignment.rhs()).object())
+    to_symbol_expr(
+      to_address_of_expr(skip_typecast(argument_assignment.rhs())).object())
       .get_identifier();
   return argument_tmp_name;
 }

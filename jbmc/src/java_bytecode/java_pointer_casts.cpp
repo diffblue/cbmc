@@ -118,8 +118,12 @@ exprt make_clean_pointer_cast(
     return bare_ptr;
 
   exprt superclass_ptr=bare_ptr;
+  // Looking at base types discards generic qualifiers (because those are
+  // recorded on the pointer, not the pointee), so it may still be necessary
+  // to use a cast to reintroduce the qualifier (for example, the base might
+  // be recorded as a List, when we're looking for a List<E>)
   if(find_superclass_with_type(superclass_ptr, target_base, ns))
-    return superclass_ptr;
+    return typecast_exprt::conditional_cast(superclass_ptr, target_type);
 
   return typecast_exprt(bare_ptr, target_type);
 }

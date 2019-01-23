@@ -10,3 +10,5 @@ VirtualFunctions.class
 --
 --
 This doesn't work under symex-driven lazy loading because it is incompatible with lazy-methods (default)
+Note the space before the checks for virtual function call on a and b, this
+verifies there is no cast.

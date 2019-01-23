@@ -36,16 +36,17 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/cfg.h>
 #include <goto-programs/class_hierarchy.h>
+#include <goto-programs/remove_returns.h>
 #include <goto-programs/resolve_inherited_component.h>
 
 #include <analyses/cfg_dominators.h>
 #include <analyses/uncaught_exceptions_analysis.h>
 
-#include <limits>
 #include <algorithm>
 #include <functional>
-#include <unordered_set>
+#include <limits>
 #include <regex>
+#include <unordered_set>
 
 /// Given a string of the format '?blah?', will return true when compared
 /// against a string that matches appart from any characters that are '?'
@@ -428,11 +429,14 @@ void java_bytecode_convert_methodt::convert(
     id2string(class_symbol.name)+"."+id2string(m.name)+":"+m.descriptor;
   method_id=method_identifier;
 
-  symbolt &method_symbol=*symbol_table.get_writeable(method_identifier);
-
   // Obtain a std::vector of java_method_typet::parametert objects from the
   // (function) type of the symbol
-  java_method_typet method_type = to_java_method_type(method_symbol.type);
+  // Don't try to hang on to this reference into the symbol table, as we're
+  // about to create symbols for the method's parameters, which would invalidate
+  // the reference. Instead, copy the type here, set it up, then assign it back
+  // to the symbol later.
+  java_method_typet method_type =
+    to_java_method_type(symbol_table.lookup_ref(method_identifier).type);
   method_type.set(ID_C_class, class_symbol.name);
   method_type.set_is_final(m.is_final);
   method_return_type = method_type.return_type();
@@ -555,6 +559,8 @@ void java_bytecode_convert_methodt::convert(
     param_index+=java_local_variable_slots(param.type());
   }
 
+  symbolt &method_symbol = symbol_table.get_writeable_ref(method_identifier);
+
   // The parameter slots detected in this function should agree with what
   // java_parameter_count() thinks about this method
   INVARIANT(
@@ -641,20 +647,39 @@ static irep_idt get_if_cmp_operator(const irep_idt &stmt)
   throw "unhandled java comparison instruction";
 }
 
-static member_exprt to_member(const exprt &pointer, const exprt &fieldref)
+static member_exprt
+to_member(const exprt &pointer, const exprt &fieldref, const namespacet &ns)
 {
   struct_tag_typet class_type(fieldref.get(ID_class));
 
-  const typecast_exprt pointer2(pointer, java_reference_type(class_type));
+  const exprt typed_pointer =
+    typecast_exprt::conditional_cast(pointer, java_reference_type(class_type));
 
-  dereference_exprt obj_deref=checked_dereference(pointer2, class_type);
+  const irep_idt &component_name = fieldref.get(ID_component_name);
 
-  const member_exprt member_expr(
-    obj_deref,
-    fieldref.get(ID_component_name),
-    fieldref.type());
+  exprt accessed_object = checked_dereference(typed_pointer, class_type);
 
-  return member_expr;
+  // The field access is described as being against a particular type, but it
+  // may in fact belong to any ancestor type.
+  while(1)
+  {
+    struct_typet object_type =
+      to_struct_type(ns.follow(accessed_object.type()));
+    auto component = object_type.get_component(component_name);
+
+    if(component.is_not_nil())
+      return member_exprt(accessed_object, component);
+
+    // Component not present: check the immediate parent type.
+
+    const auto &components = object_type.components();
+    INVARIANT(
+      components.size() != 0,
+      "infer_opaque_type_fields should guarantee that a member access has a "
+      "corresponding field");
+
+    accessed_object = member_exprt(accessed_object, components.front());
+  }
 }
 
 /// Find all goto statements in 'repl' that target 'old_label' and redirect them
@@ -1530,7 +1555,7 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
     else if(statement=="getfield")
     {
       PRECONDITION(op.size() == 1 && results.size() == 1);
-      results[0]=java_bytecode_promotion(to_member(op[0], arg0));
+      results[0] = java_bytecode_promotion(to_member(op[0], arg0, ns));
     }
     else if(statement=="getstatic")
     {
@@ -2070,33 +2095,62 @@ void java_bytecode_convert_methodt::convert_invoke(
   const bool is_virtual(
     statement == "invokevirtual" || statement == "invokeinterface");
 
+  const irep_idt &invoked_method_id = arg0.get(ID_identifier);
+  INVARIANT(
+    !invoked_method_id.empty(),
+    "invoke statement arg0 must have an identifier");
+
+  auto method_symbol = symbol_table.symbols.find(invoked_method_id);
+
+  // Use the most precise type available: the actual symbol has generic info,
+  // whereas the type given by the invoke instruction doesn't and is therefore
+  // less accurate.
+  if(method_symbol != symbol_table.symbols.end())
+  {
+    const auto &restored_type =
+      original_return_type(symbol_table, invoked_method_id);
+    // Note the number of parameters might change here due to constructors using
+    // invokespecial will have zero arguments (the `this` is added below)
+    // but the symbol for the <init> will have the this parameter.
+    INVARIANT(
+      to_java_method_type(arg0.type()).return_type().id() ==
+        restored_type.return_type().id(),
+      "Function return type must not change in kind");
+    arg0.type() = restored_type;
+  }
+
+  // Note arg0 and arg0.type() are subject to many side-effects in this method,
+  // then finally used to populate the call instruction.
   java_method_typet &method_type = to_java_method_type(arg0.type());
+
   java_method_typet::parameterst &parameters(method_type.parameters());
 
   if(use_this)
   {
+    irep_idt classname = arg0.get(ID_C_class);
+
     if(parameters.empty() || !parameters[0].get_this())
     {
-      irep_idt classname = arg0.get(ID_C_class);
       typet thistype = struct_tag_typet(classname);
-      // Note invokespecial is used for super-method calls as well as
-      // constructors.
-      if(statement == "invokespecial")
-      {
-        if(is_constructor(arg0.get(ID_identifier)))
-        {
-          if(needed_lazy_methods)
-            needed_lazy_methods->add_needed_class(classname);
-          method_type.set_is_constructor();
-        }
-        else
-          method_type.set(ID_java_super_method_call, true);
-      }
       reference_typet object_ref_type = java_reference_type(thistype);
       java_method_typet::parametert this_p(object_ref_type);
       this_p.set_this();
       this_p.set_base_name(ID_this);
       parameters.insert(parameters.begin(), this_p);
+    }
+
+    // Note invokespecial is used for super-method calls as well as
+    // constructors.
+    if(statement == "invokespecial")
+    {
+      if(is_constructor(invoked_method_id))
+      {
+        if(needed_lazy_methods)
+          needed_lazy_methods->add_needed_class(classname);
+        method_type.set_is_constructor();
+      }
+      else
+        method_type.set(ID_java_super_method_call, true);
     }
   }
 
@@ -2160,18 +2214,17 @@ void java_bytecode_convert_methodt::convert_invoke(
   //   accessible from the original caller, but not from the generated test.
   //   Therefore we must assume that the method is not accessible.
   // We set opaque methods as final to avoid assuming they can be overridden.
-  irep_idt id = arg0.get(ID_identifier);
   if(
-    symbol_table.symbols.find(id) == symbol_table.symbols.end() &&
+    method_symbol == symbol_table.symbols.end() &&
     !(is_virtual &&
       is_method_inherited(arg0.get(ID_C_class), arg0.get(ID_component_name))))
   {
     symbolt symbol;
-    symbol.name = id;
+    symbol.name = invoked_method_id;
     symbol.base_name = arg0.get(ID_C_base_name);
     symbol.pretty_name = id2string(arg0.get(ID_C_class)).substr(6) + "." +
                          id2string(symbol.base_name) + "()";
-    symbol.type = arg0.type();
+    symbol.type = method_type;
     symbol.type.set(ID_access, ID_private);
     to_java_method_type(symbol.type).set_is_final(true);
     symbol.value.make_nil();
@@ -2196,10 +2249,10 @@ void java_bytecode_convert_methodt::convert_invoke(
   else
   {
     // static binding
-    call.function() = symbol_exprt(arg0.get(ID_identifier), arg0.type());
+    call.function() = symbol_exprt(invoked_method_id, method_type);
     if(needed_lazy_methods)
     {
-      needed_lazy_methods->add_needed_method(arg0.get(ID_identifier));
+      needed_lazy_methods->add_needed_method(invoked_method_id);
       // Calling a static method causes static initialization:
       needed_lazy_methods->add_needed_class(arg0.get(ID_C_class));
     }
@@ -2543,7 +2596,7 @@ code_blockt java_bytecode_convert_methodt::convert_putfield(
     block,
     bytecode_write_typet::FIELD,
     arg0.get(ID_component_name));
-  block.add(code_assignt(to_member(op[0], arg0), op[1]));
+  block.add(code_assignt(to_member(op[0], arg0, ns), op[1]));
   return block;
 }
 
@@ -2918,8 +2971,7 @@ optionalt<exprt> java_bytecode_convert_methodt::convert_invoke_dynamic(
   if(return_type.id() == ID_empty)
     return {};
 
-  const auto value =
-    zero_initializer(return_type, location, namespacet(symbol_table));
+  const auto value = zero_initializer(return_type, location, ns);
   if(!value.has_value())
   {
     error().source_location = location;
