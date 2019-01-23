@@ -10,11 +10,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/namespace.h>
 
-#include <cassert>
-
 #include "arith_tools.h"
 #include "byte_operators.h"
 #include "c_types.h"
+#include "expr_util.h"
 #include "mathematical_types.h"
 #include "pointer_offset_size.h"
 
@@ -113,6 +112,24 @@ static void build_object_descriptor_rec(
     dest.object()=tc.op();
 
     build_object_descriptor_rec(ns, tc.op(), dest);
+  }
+  else if(const auto deref = expr_try_dynamic_cast<dereference_exprt>(expr))
+  {
+    const exprt &pointer = skip_typecast(deref->pointer());
+    if(const auto address_of = expr_try_dynamic_cast<address_of_exprt>(pointer))
+    {
+      dest.object() = address_of->object();
+      build_object_descriptor_rec(ns, address_of->object(), dest);
+    }
+  }
+  else if(const auto address_of = expr_try_dynamic_cast<address_of_exprt>(expr))
+  {
+    const exprt &object = skip_typecast(address_of->object());
+    if(const auto deref = expr_try_dynamic_cast<dereference_exprt>(object))
+    {
+      dest.object() = deref->pointer();
+      build_object_descriptor_rec(ns, deref->pointer(), dest);
+    }
   }
 }
 
