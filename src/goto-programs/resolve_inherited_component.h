@@ -43,11 +43,6 @@ public:
       return class_identifier;
     }
 
-    irep_idt get_component_basename() const
-    {
-      return component_identifier;
-    }
-
     bool is_valid() const;
 
   private:
@@ -64,11 +59,6 @@ public:
     const irep_idt &class_name, const irep_idt &component_name);
 
 private:
-  bool does_implementation_exist(
-    const irep_idt &class_name,
-    const irep_idt &component_name,
-    const irep_idt &user_class_name);
-
   const class_hierarchyt &class_hierarchy;
   const symbol_tablet &symbol_table;
 };
