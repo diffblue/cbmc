@@ -1,0 +1,8 @@
+CORE
+main.c
+--generate-function-body func --generate-function-body-options nondet-return --min-null-tree-depth 10 --max-nondet-tree-depth 3
+^EXIT=0$
+^SIGNAL=0$
+VERIFICATION SUCCESSFUL
+--
+^warning: ignoring
