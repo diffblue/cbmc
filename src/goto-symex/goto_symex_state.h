@@ -180,6 +180,9 @@ public:
   /// A full explanation of SSA (which is why we do this renaming) is in
   /// the SSA section of background-concepts.md.
   void rename(exprt &expr, const namespacet &ns, levelt level=L2);
+
+  ssa_exprt rename_level0_ssa(ssa_exprt ssa, const namespacet &ns);
+
   void rename(
     typet &type,
     const irep_idt &l1_identifier,

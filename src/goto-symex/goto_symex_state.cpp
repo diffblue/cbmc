@@ -263,6 +263,15 @@ void goto_symex_statet::set_l2_indices(
   ssa_expr.set_level_2(level2.current_count(ssa_expr.get_identifier()));
 }
 
+ssa_exprt
+goto_symex_statet::rename_level0_ssa(ssa_exprt ssa, const namespacet &ns)
+{
+  set_l0_indices(ssa, ns);
+  rename(ssa.type(), ssa.get_identifier(), ns, L0);
+  ssa.update_type();
+  return ssa;
+}
+
 void goto_symex_statet::rename(
   exprt &expr,
   const namespacet &ns,
@@ -277,9 +286,7 @@ void goto_symex_statet::rename(
 
     if(level == L0)
     {
-      set_l0_indices(ssa, ns);
-      rename(expr.type(), ssa.get_identifier(), ns, level);
-      ssa.update_type();
+      ssa = rename_level0_ssa(std::move(ssa), ns);
     }
     else if(level == L1)
     {
