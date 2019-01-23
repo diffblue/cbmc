@@ -46,6 +46,9 @@ private:
 
   static std::string extract_value(const std::string &line);
   static std::string extract_memory(const std::string &line);
+
+  typedef std::map<std::string, std::string> gdb_output_recordt;
+  static gdb_output_recordt parse_gdb_output_record(const std::string &s);
 };
 
 class gdb_interaction_exceptiont : public std::exception

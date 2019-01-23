@@ -9,8 +9,9 @@
 #include "gdb_api.h"
 #include <goto-programs/goto_model.h>
 
-gdb_apit::gdb_apit(const char *arg)
-  : binary_name(arg), buffer_position(0), last_read_size(0)
+#include <util/string_utils.h>
+
+gdb_apit::gdb_apit(const char *arg) : binary_name(arg)
 {
   memset(buffer, 0, MAX_READ_SIZE_GDB_BUFFER);
 }
@@ -261,6 +262,69 @@ std::string gdb_apit::extract_value(const std::string &line)
     throw gdb_inaccessible_memoryt("ERROR: " + line);
   }
   throw gdb_interaction_exceptiont("Cannot extract value from this: " + line);
+}
+
+gdb_apit::gdb_output_recordt
+gdb_apit::parse_gdb_output_record(const std::string &s)
+{
+  PRECONDITION(s.back() != '\n');
+
+  gdb_output_recordt result;
+
+  unsigned depth = 0;
+  std::string::size_type start = 0;
+
+  const std::string::size_type n = s.length();
+
+  for(std::string::size_type i = 0; i < n; i++)
+  {
+    const char c = s[i];
+
+    if(c == '{' || c == '[')
+    {
+      depth++;
+    }
+    else if(c == '}' || c == ']')
+    {
+      depth--;
+    }
+
+    if(depth == 0 && (c == ',' || i == n - 1))
+    {
+      const std::string item =
+        i == n - 1 ? s.substr(start) : s.substr(start, i - start);
+
+      // Split on first `=`
+      std::string::size_type j = item.find('=');
+      CHECK_RETURN(j != std::string::npos);
+      CHECK_RETURN(j > 0);
+      CHECK_RETURN(j < s.length());
+
+      const std::string key = strip_string(item.substr(0, j));
+      std::string value = strip_string(item.substr(j + 1));
+
+      const char first = value.front();
+      const char last = value.back();
+
+      INVARIANT(first == '"' || first == '{' || first == '[', "");
+      INVARIANT(first != '"' || last == '"', "");
+      INVARIANT(first != '{' || last == '}', "");
+      INVARIANT(first != '[' || last == ']', "");
+
+      // Remove enclosing `"` for primitive values
+      if(first == '"')
+      {
+        value = value.substr(1, value.length() - 2);
+      }
+
+      auto r = result.insert(std::make_pair(key, value));
+      CHECK_RETURN(r.second);
+
+      start = i + 1;
+    }
+  }
+
+  return result;
 }
 
 #endif
