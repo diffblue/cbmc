@@ -1151,18 +1151,13 @@ exprt goto_convertt::case_guard(
     return equal_exprt(value, case_op.at(0));
   else
   {
-    exprt dest = exprt(ID_or, bool_typet());
-    dest.reserve_operands(case_op.size());
+    exprt::operandst disjuncts;
+    disjuncts.reserve(case_op.size());
 
-    forall_expr(it, case_op)
-    {
-      dest.add_to_operands(equal_exprt(value, *it));
-    }
-    INVARIANT(
-      case_op.size() == dest.operands().size(),
-      "case guard conversion should preserve the number of cases");
+    for(const auto &op : case_op)
+      disjuncts.push_back(equal_exprt(value, op));
 
-    return dest;
+    return disjunction(disjuncts);
   }
 }
 
