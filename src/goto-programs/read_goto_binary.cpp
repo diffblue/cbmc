@@ -27,20 +27,11 @@ Author:
 #include "elf_reader.h"
 #include "osx_fat_reader.h"
 
-/// \brief Read a goto binary from a file, but do not update \ref config
-/// \param filename: the file name of the goto binary
-/// \param dest: the goto model returned
-/// \param message_handler: for diagnostics
-/// \deprecated Use read_goto_binary(file, message_handler) instead
-/// \return true on failure, false on success
-bool read_goto_binary(
+static bool read_goto_binary(
   const std::string &filename,
-  goto_modelt &dest,
-  message_handlert &message_handler)
-{
-  return read_goto_binary(
-    filename, dest.symbol_table, dest.goto_functions, message_handler);
-}
+  symbol_tablet &,
+  goto_functionst &,
+  message_handlert &);
 
 /// \brief Read a goto binary from a file, but do not update \ref config
 /// \param filename: the file name of the goto binary
@@ -66,7 +57,7 @@ read_goto_binary(const std::string &filename, message_handlert &message_handler)
 /// \param goto_functions: the goto functions from the goto binary
 /// \param message_handler: for diagnostics
 /// \return true on failure, false on success
-bool read_goto_binary(
+static bool read_goto_binary(
   const std::string &filename,
   symbol_tablet &symbol_table,
   goto_functionst &goto_functions,
@@ -240,17 +231,13 @@ bool read_object_and_link(
                                          << file_name << messaget::eom;
 
   // we read into a temporary model
-  goto_modelt temp_model;
-
-  if(read_goto_binary(
-      file_name,
-      temp_model,
-      message_handler))
+  auto temp_model = read_goto_binary(file_name, message_handler);
+  if(!temp_model.has_value())
     return true;
 
   try
   {
-    link_goto_model(dest, temp_model, message_handler);
+    link_goto_model(dest, *temp_model, message_handler);
   }
   catch(...)
   {

@@ -332,12 +332,12 @@ int goto_diff_parse_optionst::get_goto_program(
 
   if(is_goto_binary(cmdline.args[0]))
   {
-    if(read_goto_binary(
-        cmdline.args[0],
-        goto_model.symbol_table,
-        goto_model.goto_functions,
-        languages.get_message_handler()))
+    auto tmp_goto_model =
+      read_goto_binary(cmdline.args[0], languages.get_message_handler());
+    if(!tmp_goto_model.has_value())
       return CPROVER_EXIT_INCORRECT_TASK;
+
+    goto_model = std::move(*tmp_goto_model);
 
     config.set(cmdline);
 
