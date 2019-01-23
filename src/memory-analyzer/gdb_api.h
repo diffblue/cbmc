@@ -6,10 +6,6 @@
 
 #include <exception>
 
-class namespacet;
-class symbolt;
-class irept;
-
 class gdb_apit
 {
 public:
