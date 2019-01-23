@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "arith_tools.h"
 #include "base_type.h"
 #include "byte_operators.h"
+#include "invariant.h"
 #include "namespace.h"
 #include "pointer_offset_size.h"
 #include "std_expr.h"
@@ -45,6 +46,9 @@ bool simplify_exprt::simplify_member(exprt &expr)
         if(op1.get(ID_component_name)==component_name)
         {
           // found it!
+          DATA_INVARIANT(
+            base_type_eq(op2.type(), expr.type(), ns),
+            "member expression type must match component type");
           exprt tmp;
           tmp.swap(op2);
           expr.swap(tmp);
@@ -134,6 +138,9 @@ bool simplify_exprt::simplify_member(exprt &expr)
       if(struct_type.has_component(component_name))
       {
         std::size_t number=struct_type.component_number(component_name);
+        DATA_INVARIANT(
+          base_type_eq(op.operands()[number].type(), expr.type(), ns),
+          "member expression type must match component type");
         exprt tmp;
         tmp.swap(op.operands()[number]);
         expr.swap(tmp);
