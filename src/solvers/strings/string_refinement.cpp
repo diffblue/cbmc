@@ -348,9 +348,9 @@ static void add_equations_for_symbol_resolution(
     else if(
       lhs.type().id() != ID_pointer && has_char_pointer_subtype(lhs.type(), ns))
     {
-      if(rhs.type().id() == ID_struct)
+      if(rhs.type().id() == ID_struct || rhs.type().id() == ID_struct_tag)
       {
-        const struct_typet &struct_type = to_struct_type(rhs.type());
+        const struct_typet &struct_type = to_struct_type(ns.follow(rhs.type()));
         for(const auto &comp : struct_type.components())
         {
           if(is_char_pointer_type(comp.type()))
@@ -374,20 +374,22 @@ static void add_equations_for_symbol_resolution(
 /// This is meant to be used on the lhs of an equation with string subtype.
 /// \param lhs: expression which is either of string type, or a symbol
 ///   representing a struct with some string members
+/// \param ns: namespace to resolve type tags
 /// \return if lhs is a string return this string, if it is a struct return the
 ///   members of the expression that have string type.
-static std::vector<exprt> extract_strings_from_lhs(const exprt &lhs)
+static std::vector<exprt>
+extract_strings_from_lhs(const exprt &lhs, const namespacet &ns)
 {
   std::vector<exprt> result;
   if(lhs.type() == string_typet())
     result.push_back(lhs);
-  else if(lhs.type().id() == ID_struct)
+  else if(lhs.type().id() == ID_struct || lhs.type().id() == ID_struct_tag)
   {
-    const struct_typet &struct_type = to_struct_type(lhs.type());
+    const struct_typet &struct_type = to_struct_type(ns.follow(lhs.type()));
     for(const auto &comp : struct_type.components())
     {
       const std::vector<exprt> strings_in_comp = extract_strings_from_lhs(
-        member_exprt(lhs, comp.get_name(), comp.type()));
+        member_exprt(lhs, comp.get_name(), comp.type()), ns);
       result.insert(
         result.end(), strings_in_comp.begin(), strings_in_comp.end());
     }
@@ -396,10 +398,12 @@ static std::vector<exprt> extract_strings_from_lhs(const exprt &lhs)
 }
 
 /// \param expr: an expression
+/// \param ns: namespace to resolve type tags
 /// \return all subexpressions of type string which are not if_exprt expressions
 ///   this includes expressions of the form `e.x` if e is a symbol subexpression
 ///   with a field `x` of type string
-static std::vector<exprt> extract_strings(const exprt &expr)
+static std::vector<exprt>
+extract_strings(const exprt &expr, const namespacet &ns)
 {
   std::vector<exprt> result;
   for(auto it = expr.depth_begin(); it != expr.depth_end();)
@@ -411,7 +415,7 @@ static std::vector<exprt> extract_strings(const exprt &expr)
     }
     else if(it->id() == ID_symbol)
     {
-      for(const exprt &e : extract_strings_from_lhs(*it))
+      for(const exprt &e : extract_strings_from_lhs(*it, ns))
         result.push_back(e);
       it.next_sibling_or_parent();
     }
@@ -438,9 +442,12 @@ static void add_string_equation_to_symbol_resolution(
   }
   else if(has_subtype(eq.lhs().type(), ID_string, ns))
   {
-    if(eq.rhs().type().id() == ID_struct)
+    if(
+      eq.rhs().type().id() == ID_struct ||
+      eq.rhs().type().id() == ID_struct_tag)
     {
-      const struct_typet &struct_type = to_struct_type(eq.rhs().type());
+      const struct_typet &struct_type =
+        to_struct_type(ns.follow(eq.rhs().type()));
       for(const auto &comp : struct_type.components())
       {
         const member_exprt lhs_data(eq.lhs(), comp.get_name(), comp.type());
@@ -484,7 +491,7 @@ union_find_replacet string_identifiers_resolution_from_equations(
       if(required_equations.insert(i).second)
         equations_to_treat.push(i);
 
-      std::vector<exprt> rhs_strings = extract_strings(eq.rhs());
+      std::vector<exprt> rhs_strings = extract_strings(eq.rhs(), ns);
       for(const auto &expr : rhs_strings)
         equation_map.add(i, expr);
     }
@@ -492,7 +499,7 @@ union_find_replacet string_identifiers_resolution_from_equations(
       eq.lhs().type().id() != ID_pointer &&
       has_subtype(eq.lhs().type(), ID_string, ns))
     {
-      std::vector<exprt> lhs_strings = extract_strings_from_lhs(eq.lhs());
+      std::vector<exprt> lhs_strings = extract_strings_from_lhs(eq.lhs(), ns);
 
       for(const auto &expr : lhs_strings)
         equation_map.add(i, expr);
@@ -504,7 +511,7 @@ union_find_replacet string_identifiers_resolution_from_equations(
                << format(eq.lhs().type()) << eom;
       }
 
-      for(const exprt &expr : extract_strings(eq.rhs()))
+      for(const exprt &expr : extract_strings(eq.rhs(), ns))
         equation_map.add(i, expr);
     }
   }
