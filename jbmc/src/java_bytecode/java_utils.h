@@ -97,7 +97,8 @@ irep_idt strip_java_namespace_prefix(const irep_idt &to_strip);
 
 std::string pretty_print_java_type(const std::string &fqn_java_type);
 
-resolve_inherited_componentt::inherited_componentt get_inherited_component(
+optionalt<resolve_inherited_componentt::inherited_componentt>
+get_inherited_component(
   const irep_idt &component_class_id,
   const irep_idt &component_name,
   const symbol_tablet &symbol_table,

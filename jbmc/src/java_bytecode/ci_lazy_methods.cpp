@@ -548,11 +548,10 @@ irep_idt ci_lazy_methodst::get_virtual_method_target(
     return irep_idt();
 
   resolve_inherited_componentt call_resolver(symbol_table, class_hierarchy);
-  const resolve_inherited_componentt::inherited_componentt resolved_call =
-    call_resolver(classname, call_basename, false);
+  const auto resolved_call = call_resolver(classname, call_basename, false);
 
-  if(resolved_call.is_valid())
-    return resolved_call.get_full_component_identifier();
+  if(resolved_call)
+    return resolved_call->get_full_component_identifier();
   else
     return irep_idt();
 }

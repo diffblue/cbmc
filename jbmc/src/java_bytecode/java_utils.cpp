@@ -330,7 +330,8 @@ std::string pretty_print_java_type(const std::string &fqn_java_type)
 ///   ancestors including interfaces, rather than just parents.
 /// \return the concrete component referred to if any is found, or an invalid
 ///   resolve_inherited_componentt::inherited_componentt otherwise.
-resolve_inherited_componentt::inherited_componentt get_inherited_component(
+optionalt<resolve_inherited_componentt::inherited_componentt>
+get_inherited_component(
   const irep_idt &component_class_id,
   const irep_idt &component_name,
   const symbol_tablet &symbol_table,
@@ -339,22 +340,22 @@ resolve_inherited_componentt::inherited_componentt get_inherited_component(
 {
   resolve_inherited_componentt component_resolver(
     symbol_table, class_hierarchy);
-  const resolve_inherited_componentt::inherited_componentt resolved_component =
+  const auto resolved_component =
     component_resolver(component_class_id, component_name, include_interfaces);
 
   // resolved_component is a pair (class-name, component-name) found by walking
   // the chain of class inheritance (not interfaces!) and stopping on the first
   // class that contains a component of equal name and type to `component_name`
 
-  if(resolved_component.is_valid())
+  if(resolved_component)
   {
     // Directly defined on the class referred to?
-    if(component_class_id == resolved_component.get_class_identifier())
-      return resolved_component;
+    if(component_class_id == resolved_component->get_class_identifier())
+      return *resolved_component;
 
     // No, may be inherited from some parent class; check it is visible:
-    const symbolt &component_symbol=
-      *symbol_table.lookup(resolved_component.get_full_component_identifier());
+    const symbolt &component_symbol =
+      *symbol_table.lookup(resolved_component->get_full_component_identifier());
 
     irep_idt access = component_symbol.type.get(ID_access);
     if(access.empty())
@@ -363,7 +364,7 @@ resolve_inherited_componentt::inherited_componentt get_inherited_component(
     if(access==ID_public || access==ID_protected)
     {
       // since the component is public, it is inherited
-      return resolved_component;
+      return *resolved_component;
     }
 
     // components with the default access modifier are only
@@ -372,14 +373,12 @@ resolve_inherited_componentt::inherited_componentt get_inherited_component(
     {
       const std::string &class_package=
         java_class_to_package(id2string(component_class_id));
-      const std::string &component_package=
-        java_class_to_package(
-          id2string(
-            resolved_component.get_class_identifier()));
+      const std::string &component_package = java_class_to_package(
+        id2string(resolved_component->get_class_identifier()));
       if(component_package == class_package)
-        return resolved_component;
+        return *resolved_component;
       else
-        return resolve_inherited_componentt::inherited_componentt();
+        return {};
     }
 
     if(access==ID_private)
@@ -391,14 +390,14 @@ resolve_inherited_componentt::inherited_componentt get_inherited_component(
       // to `classname`, a component can only become "more accessible". So, if
       // the last occurrence is private, all others before must be private as
       // well, and none is inherited in `classname`.
-      return resolve_inherited_componentt::inherited_componentt();
+      return {};
     }
 
     UNREACHABLE; // Unexpected access modifier
   }
   else
   {
-    return resolve_inherited_componentt::inherited_componentt();
+    return {};
   }
 }
 
