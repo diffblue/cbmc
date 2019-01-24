@@ -71,6 +71,12 @@ protected:
     goto_modelt &goto_model);
 
   void preprocessing();
+
+  virtual void error_message(const std::string &err) override
+  {
+    error() << err << eom;
+    return;
+  }
 };
 
 #endif // CPROVER_GOTO_DIFF_GOTO_DIFF_PARSE_OPTIONS_H

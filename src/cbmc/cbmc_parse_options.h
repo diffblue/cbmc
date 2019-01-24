@@ -121,6 +121,12 @@ protected:
   void get_command_line_options(optionst &);
   void preprocessing(const optionst &);
   bool set_properties();
+
+  virtual void error_message(const std::string &err) override
+  {
+    error() << err << eom;
+    return;
+  }
 };
 
 #endif // CPROVER_CBMC_CBMC_PARSE_OPTIONS_H

@@ -181,6 +181,12 @@ protected:
   {
     return ui_message_handler.get_ui();
   }
+
+  virtual void error_message(const std::string &err) override
+  {
+    error() << err << eom;
+    return;
+  }
 };
 
 #endif // CPROVER_GOTO_ANALYZER_GOTO_ANALYZER_PARSE_OPTIONS_H
