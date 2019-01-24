@@ -73,5 +73,5 @@ public:
 private:
   std::string reason;
 };
-#endif
-#endif
+#endif // CPROVER_MEMORY_ANALYZER_GDB_API_H
+#endif // __linux__
