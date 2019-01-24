@@ -1936,9 +1936,11 @@ std::string expr2ct::convert_constant(
       if(src.operands().size()!=1)
         return convert_norep(src, precedence);
 
-      if(src.op0().id()==ID_constant)
+      const auto &annotation = to_unary_expr(src).op();
+
+      if(annotation.id() == ID_constant)
       {
-        const irep_idt &op_value=src.op0().get(ID_value);
+        const irep_idt &op_value = to_constant_expr(annotation).get_value();
 
         if(op_value=="INVALID" ||
            has_prefix(id2string(op_value), "INVALID-") ||
@@ -1948,7 +1950,7 @@ std::string expr2ct::convert_constant(
           return convert_norep(src, precedence);
       }
       else
-        return convert_with_precedence(src.op0(), precedence);
+        return convert_with_precedence(annotation, precedence);
     }
   }
   else if(type.id()==ID_string)
