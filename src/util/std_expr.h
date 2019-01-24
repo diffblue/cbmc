@@ -20,16 +20,17 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/narrow.h>
 
 /// An expression without operands
-class nullary_exprt : public exprt
+class nullary_exprt : public expr_protectedt
 {
 public:
   // constructors
   DEPRECATED("use nullary_exprt(id, type) instead")
-  explicit nullary_exprt(const irep_idt &_id) : exprt(_id)
+  explicit nullary_exprt(const irep_idt &_id) : expr_protectedt(_id, typet())
   {
   }
 
-  nullary_exprt(const irep_idt &_id, const typet &_type) : exprt(_id, _type)
+  nullary_exprt(const irep_idt &_id, const typet &_type)
+    : expr_protectedt(_id, _type)
   {
   }
 
@@ -56,19 +57,19 @@ public:
 };
 
 /// An expression with three operands
-class ternary_exprt : public exprt
+class ternary_exprt : public expr_protectedt
 {
 public:
   // constructors
   DEPRECATED("use ternary_exprt(id, op0, op1, op2, type) instead")
-  explicit ternary_exprt(const irep_idt &_id) : exprt(_id)
+  explicit ternary_exprt(const irep_idt &_id) : expr_protectedt(_id, type())
   {
     operands().resize(3);
   }
 
   DEPRECATED("use ternary_exprt(id, op0, op1, op2, type) instead")
   explicit ternary_exprt(const irep_idt &_id, const typet &_type)
-    : exprt(_id, _type)
+    : expr_protectedt(_id, _type)
   {
     operands().resize(3);
   }
@@ -79,10 +80,15 @@ public:
     const exprt &_op1,
     const exprt &_op2,
     const typet &_type)
-    : exprt(_id, _type)
+    : expr_protectedt(_id, _type)
   {
     add_to_operands(_op0, _op1, _op2);
   }
+
+  // make op0 to op2 public
+  using exprt::op0;
+  using exprt::op1;
+  using exprt::op2;
 
   const exprt &op3() const = delete;
   exprt &op3() = delete;
@@ -286,42 +292,36 @@ inline void validate_expr(const nondet_symbol_exprt &value)
 
 
 /// \brief Generic base class for unary expressions
-class unary_exprt:public exprt
+class unary_exprt : public expr_protectedt
 {
 public:
   DEPRECATED("use unary_exprt(id, op) instead")
-  unary_exprt()
+  unary_exprt() : expr_protectedt(irep_idt(), typet())
   {
     operands().resize(1);
   }
 
   DEPRECATED("use unary_exprt(id, op) instead")
-  explicit unary_exprt(const irep_idt &_id):exprt(_id)
+  explicit unary_exprt(const irep_idt &_id) : expr_protectedt(_id, typet())
   {
     operands().resize(1);
   }
 
-  unary_exprt(
-    const irep_idt &_id,
-    const exprt &_op):
-    exprt(_id, _op.type())
+  unary_exprt(const irep_idt &_id, const exprt &_op)
+    : expr_protectedt(_id, _op.type())
   {
     add_to_operands(_op);
   }
 
   DEPRECATED("use unary_exprt(id, op, type) instead")
-  unary_exprt(
-    const irep_idt &_id,
-    const typet &_type):exprt(_id, _type)
+  unary_exprt(const irep_idt &_id, const typet &_type)
+    : expr_protectedt(_id, _type)
   {
     operands().resize(1);
   }
 
-  unary_exprt(
-    const irep_idt &_id,
-    const exprt &_op,
-    const typet &_type):
-    exprt(_id, _type)
+  unary_exprt(const irep_idt &_id, const exprt &_op, const typet &_type)
+    : expr_protectedt(_id, _type)
   {
     add_to_operands(_op);
   }
@@ -588,32 +588,29 @@ inline void validate_expr(const bswap_exprt &value)
 
 /// \brief A base class for expressions that are predicates,
 ///   i.e., Boolean-typed.
-class predicate_exprt:public exprt
+class predicate_exprt : public expr_protectedt
 {
 public:
   DEPRECATED("use predicate_exprt(id) instead")
-  predicate_exprt():exprt(irep_idt(), bool_typet())
+  predicate_exprt() : expr_protectedt(irep_idt(), bool_typet())
   {
   }
 
-  explicit predicate_exprt(const irep_idt &_id):
-    exprt(_id, bool_typet())
+  explicit predicate_exprt(const irep_idt &_id)
+    : expr_protectedt(_id, bool_typet())
   {
   }
 
   DEPRECATED("use unary_predicate_exprt(id, op) instead")
-  predicate_exprt(
-    const irep_idt &_id,
-    const exprt &_op):exprt(_id, bool_typet())
+  predicate_exprt(const irep_idt &_id, const exprt &_op)
+    : expr_protectedt(_id, bool_typet())
   {
     add_to_operands(_op);
   }
 
   DEPRECATED("use binary_predicate_exprt(op1, id, op2) instead")
-  predicate_exprt(
-    const irep_idt &_id,
-    const exprt &_op0,
-    const exprt &_op1):exprt(_id, bool_typet())
+  predicate_exprt(const irep_idt &_id, const exprt &_op0, const exprt &_op1)
+    : expr_protectedt(_id, bool_typet())
   {
     add_to_operands(_op0, _op1);
   }
@@ -693,34 +690,30 @@ inline void validate_expr(const sign_exprt &expr)
 }
 
 /// \brief A base class for binary expressions
-class binary_exprt:public exprt
+class binary_exprt : public expr_protectedt
 {
 public:
   DEPRECATED("use binary_exprt(lhs, id, rhs) instead")
-  binary_exprt()
+  binary_exprt() : expr_protectedt(irep_idt(), typet())
   {
     operands().resize(2);
   }
 
   DEPRECATED("use binary_exprt(lhs, id, rhs) instead")
-  explicit binary_exprt(const irep_idt &_id):exprt(_id)
+  explicit binary_exprt(const irep_idt &_id) : expr_protectedt(_id, typet())
   {
     operands().resize(2);
   }
 
   DEPRECATED("use binary_exprt(lhs, id, rhs, type) instead")
-  binary_exprt(
-    const irep_idt &_id,
-    const typet &_type):exprt(_id, _type)
+  binary_exprt(const irep_idt &_id, const typet &_type)
+    : expr_protectedt(_id, _type)
   {
     operands().resize(2);
   }
 
-  binary_exprt(
-    const exprt &_lhs,
-    const irep_idt &_id,
-    const exprt &_rhs):
-    exprt(_id, _lhs.type())
+  binary_exprt(const exprt &_lhs, const irep_idt &_id, const exprt &_rhs)
+    : expr_protectedt(_id, _lhs.type())
   {
     add_to_operands(_lhs, _rhs);
   }
@@ -729,8 +722,8 @@ public:
     const exprt &_lhs,
     const irep_idt &_id,
     const exprt &_rhs,
-    const typet &_type):
-    exprt(_id, _type)
+    const typet &_type)
+    : expr_protectedt(_id, _type)
   {
     add_to_operands(_lhs, _rhs);
   }
@@ -752,6 +745,10 @@ public:
   {
     check(expr, vm);
   }
+
+  // make op0 and op1 public
+  using exprt::op0;
+  using exprt::op1;
 
   const exprt &op2() const = delete;
   exprt &op2() = delete;
@@ -927,23 +924,22 @@ template<> inline bool can_cast_expr<binary_relation_exprt>(const exprt &base)
 
 /// \brief A base class for multi-ary expressions
 /// Associativity is not specified.
-class multi_ary_exprt:public exprt
+class multi_ary_exprt : public expr_protectedt
 {
 public:
   DEPRECATED("use multi_ary_exprt(id, op, type) instead")
-  multi_ary_exprt()
+  multi_ary_exprt() : expr_protectedt(irep_idt(), typet())
   {
   }
 
   DEPRECATED("use multi_ary_exprt(id, op, type) instead")
-  explicit multi_ary_exprt(const irep_idt &_id):exprt(_id)
+  explicit multi_ary_exprt(const irep_idt &_id) : expr_protectedt(_id, typet())
   {
   }
 
   DEPRECATED("use multi_ary_exprt(id, op, type) instead")
-  multi_ary_exprt(
-    const irep_idt &_id,
-    const typet &_type):exprt(_id, _type)
+  multi_ary_exprt(const irep_idt &_id, const typet &_type)
+    : expr_protectedt(_id, _type)
   {
   }
 
@@ -951,16 +947,13 @@ public:
     const irep_idt &_id,
     operandst &&_operands,
     const typet &_type)
-    : exprt(_id, _type)
+    : expr_protectedt(_id, _type)
   {
     operands() = std::move(_operands);
   }
 
-  multi_ary_exprt(
-    const exprt &_lhs,
-    const irep_idt &_id,
-    const exprt &_rhs):
-    exprt(_id, _lhs.type())
+  multi_ary_exprt(const exprt &_lhs, const irep_idt &_id, const exprt &_rhs)
+    : expr_protectedt(_id, _lhs.type())
   {
     add_to_operands(_lhs, _rhs);
   }
@@ -969,8 +962,8 @@ public:
     const exprt &_lhs,
     const irep_idt &_id,
     const exprt &_rhs,
-    const typet &_type):
-    exprt(_id, _type)
+    const typet &_type)
+    : expr_protectedt(_id, _type)
   {
     add_to_operands(_lhs, _rhs);
   }
@@ -3114,11 +3107,11 @@ inline void validate_expr(const extractbit_exprt &value)
 
 
 /// \brief Extracts a sub-range of a bit-vector operand
-class extractbits_exprt:public exprt
+class extractbits_exprt : public expr_protectedt
 {
 public:
   DEPRECATED("use extractbits_exprt(value, upper, lower) instead")
-  extractbits_exprt():exprt(ID_extractbits)
+  extractbits_exprt() : expr_protectedt(ID_extractbits, typet())
   {
     operands().resize(3);
   }
@@ -3132,7 +3125,8 @@ public:
     const exprt &_src,
     const exprt &_upper,
     const exprt &_lower,
-    const typet &_type):exprt(ID_extractbits, _type)
+    const typet &_type)
+    : expr_protectedt(ID_extractbits, _type)
   {
     add_to_operands(_src, _upper, _lower);
   }
@@ -3471,20 +3465,17 @@ inline void validate_expr(const if_exprt &value)
 /// \brief Operator to update elements in structs and arrays
 /// \remark This expression will eventually be replaced by separate
 ///   array and struct update operators.
-class with_exprt:public exprt
+class with_exprt : public expr_protectedt
 {
 public:
-  with_exprt(
-    const exprt &_old,
-    const exprt &_where,
-    const exprt &_new_value):
-    exprt(ID_with, _old.type())
+  with_exprt(const exprt &_old, const exprt &_where, const exprt &_new_value)
+    : expr_protectedt(ID_with, _old.type())
   {
     add_to_operands(_old, _where, _new_value);
   }
 
   DEPRECATED("use with_exprt(old, where, new_value) instead")
-  with_exprt():exprt(ID_with)
+  with_exprt() : expr_protectedt(ID_with, typet())
   {
     operands().resize(3);
   }
@@ -3557,12 +3548,11 @@ inline void validate_expr(const with_exprt &value)
     "Array/structure update must have three operands");
 }
 
-
-class index_designatort:public exprt
+class index_designatort : public expr_protectedt
 {
 public:
-  explicit index_designatort(const exprt &_index):
-    exprt(ID_index_designator)
+  explicit index_designatort(const exprt &_index)
+    : expr_protectedt(ID_index_designator, typet())
   {
     add_to_operands(_index);
   }
@@ -3612,12 +3602,11 @@ inline void validate_expr(const index_designatort &value)
   validate_operands(value, 1, "Index designator must have one operand");
 }
 
-
-class member_designatort:public exprt
+class member_designatort : public expr_protectedt
 {
 public:
-  explicit member_designatort(const irep_idt &_component_name):
-    exprt(ID_member_designator)
+  explicit member_designatort(const irep_idt &_component_name)
+    : expr_protectedt(ID_member_designator, typet())
   {
     set(ID_component_name, _component_name);
   }
@@ -3761,7 +3750,7 @@ inline void validate_expr(const update_exprt &value)
 
 #if 0
 /// \brief Update of one element of an array
-class array_update_exprt:public exprt
+class array_update_exprt:public expr_protectedt
 {
 public:
   array_update_exprt(
@@ -3773,7 +3762,7 @@ public:
     add_to_operands(_array, _index, _new_value);
   }
 
-  array_update_exprt():exprt(ID_array_update)
+  array_update_exprt():expr_protectedt(ID_array_update)
   {
     operands().resize(3);
   }
@@ -4334,21 +4323,22 @@ public:
 };
 
 /// \brief A constant literal expression
-class constant_exprt:public exprt
+class constant_exprt : public expr_protectedt
 {
 public:
   DEPRECATED("use constant_exprt(value, type) instead")
-  constant_exprt():exprt(ID_constant)
+  constant_exprt() : expr_protectedt(ID_constant, typet())
   {
   }
 
   DEPRECATED("use constant_exprt(value, type) instead")
-  explicit constant_exprt(const typet &type):exprt(ID_constant, type)
+  explicit constant_exprt(const typet &type)
+    : expr_protectedt(ID_constant, type)
   {
   }
 
-  constant_exprt(const irep_idt &_value, const typet &_type):
-    exprt(ID_constant, _type)
+  constant_exprt(const irep_idt &_value, const typet &_type)
+    : expr_protectedt(ID_constant, _type)
   {
     set_value(_value);
   }

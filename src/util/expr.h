@@ -319,6 +319,28 @@ public:
   const_unique_depth_iteratort unique_depth_cend() const;
 };
 
+/// Base class for all expressions. This protects low-level methods in
+/// exprt that are not type safe. Depcrecated constructors are removed.
+/// This API will eventually replace exprt.
+class expr_protectedt : public exprt
+{
+protected:
+  // constructors
+  expr_protectedt(const irep_idt &_id, const typet &_type) : exprt(_id, _type)
+  {
+  }
+
+  // protect these low-level methods
+  using exprt::add;
+  using exprt::make_bool;
+  using exprt::make_typecast;
+  using exprt::op0;
+  using exprt::op1;
+  using exprt::op2;
+  using exprt::op3;
+  using exprt::remove;
+};
+
 class expr_visitort
 {
 public:
