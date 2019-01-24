@@ -2027,6 +2027,10 @@ public:
   {
   }
 
+  /// Given an expression \p expr, attempt to find the underlying object it
+  /// represents by skipping over type casts and removing balanced
+  /// dereference/address_of operations; that object will then be available
+  /// as root_object().
   void build(const exprt &expr, const namespacet &ns);
 
   exprt &object()
