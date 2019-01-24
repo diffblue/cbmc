@@ -27,9 +27,6 @@ public:
   class inherited_componentt
   {
   public:
-    inherited_componentt()
-    {}
-
     inherited_componentt(
       const irep_idt &class_id, const irep_idt &component_id):
         class_identifier(class_id),
@@ -43,19 +40,12 @@ public:
       return class_identifier;
     }
 
-    irep_idt get_component_basename() const
-    {
-      return component_identifier;
-    }
-
-    bool is_valid() const;
-
   private:
     irep_idt class_identifier;
     irep_idt component_identifier;
   };
 
-  inherited_componentt operator()(
+  optionalt<inherited_componentt> operator()(
     const irep_idt &class_id,
     const irep_idt &component_name,
     bool include_interfaces);
@@ -64,11 +54,6 @@ public:
     const irep_idt &class_name, const irep_idt &component_name);
 
 private:
-  bool does_implementation_exist(
-    const irep_idt &class_name,
-    const irep_idt &component_name,
-    const irep_idt &user_class_name);
-
   const class_hierarchyt &class_hierarchy;
   const symbol_tablet &symbol_table;
 };

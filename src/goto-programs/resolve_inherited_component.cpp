@@ -34,11 +34,11 @@ resolve_inherited_componentt::resolve_inherited_componentt(
 /// \param include_interfaces: If true, consider inheritance from interfaces
 ///   (parent types other than the first listed)
 /// \return The concrete component that has been resolved
-resolve_inherited_componentt::inherited_componentt
-  resolve_inherited_componentt::operator()(
-    const irep_idt &class_id,
-    const irep_idt &component_name,
-    bool include_interfaces)
+optionalt<resolve_inherited_componentt::inherited_componentt>
+resolve_inherited_componentt::operator()(
+  const irep_idt &class_id,
+  const irep_idt &component_name,
+  bool include_interfaces)
 {
   PRECONDITION(!class_id.empty());
   PRECONDITION(!component_name.empty());
@@ -76,7 +76,7 @@ resolve_inherited_componentt::inherited_componentt
     }
   }
 
-  return inherited_componentt();
+  return {};
 }
 
 /// Build a component name as found in a GOTO symbol table equivalent to the
@@ -101,11 +101,4 @@ irep_idt resolve_inherited_componentt::inherited_componentt::
 {
   return resolve_inherited_componentt::build_full_component_identifier(
     class_identifier, component_identifier);
-}
-
-/// Use to check if this inherited_componentt has been fully constructed.
-/// \return True if this represents a real concrete component
-bool resolve_inherited_componentt::inherited_componentt::is_valid() const
-{
-  return !class_identifier.empty();
 }

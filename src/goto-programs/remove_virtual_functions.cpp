@@ -48,7 +48,7 @@ protected:
     goto_programt &goto_program,
     goto_programt::targett target);
   typedef std::function<
-    resolve_inherited_componentt::inherited_componentt(
+    optionalt<resolve_inherited_componentt::inherited_componentt>(
       const irep_idt &,
       const irep_idt &)>
     function_call_resolvert;
@@ -399,18 +399,16 @@ void remove_virtual_functionst::get_child_functions_rec(
     }
     if(!function.symbol_expr.has_value())
     {
-      const resolve_inherited_componentt::inherited_componentt
-        &resolved_call = resolve_function_call(child, component_name);
-      if(resolved_call.is_valid())
+      const auto resolved_call = resolve_function_call(child, component_name);
+      if(resolved_call)
       {
-        function.class_id = resolved_call.get_class_identifier();
-        const symbolt &called_symbol =
-          symbol_table.lookup_ref(
-            resolved_call.get_full_component_identifier());
+        function.class_id = resolved_call->get_class_identifier();
+        const symbolt &called_symbol = symbol_table.lookup_ref(
+          resolved_call->get_full_component_identifier());
 
         function.symbol_expr = called_symbol.symbol_expr();
         function.symbol_expr->set(
-          ID_C_class, resolved_call.get_class_identifier());
+          ID_C_class, resolved_call->get_class_identifier());
       }
     }
     functions.push_back(function);
@@ -449,22 +447,22 @@ void remove_virtual_functionst::get_functions(
     return get_virtual_call_target(class_id, function_name, false);
     };
 
-  const resolve_inherited_componentt::inherited_componentt
-    &resolved_call = get_virtual_call_target(class_id, function_name, false);
+  const auto resolved_call =
+    get_virtual_call_target(class_id, function_name, false);
 
   // might be an abstract function
   dispatch_table_entryt root_function(class_id);
 
-  if(resolved_call.is_valid())
+  if(resolved_call)
   {
-    root_function.class_id=resolved_call.get_class_identifier();
+    root_function.class_id = resolved_call->get_class_identifier();
 
     const symbolt &called_symbol =
-      symbol_table.lookup_ref(resolved_call.get_full_component_identifier());
+      symbol_table.lookup_ref(resolved_call->get_full_component_identifier());
 
     root_function.symbol_expr=called_symbol.symbol_expr();
     root_function.symbol_expr->set(
-      ID_C_class, resolved_call.get_class_identifier());
+      ID_C_class, resolved_call->get_class_identifier());
   }
 
   // iterate over all children, transitively

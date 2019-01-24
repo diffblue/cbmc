@@ -3139,14 +3139,9 @@ bool java_bytecode_convert_methodt::is_method_inherited(
   const irep_idt &classname,
   const irep_idt &methodid) const
 {
-  resolve_inherited_componentt::inherited_componentt inherited_method =
-    get_inherited_component(
-      classname,
-      methodid,
-      symbol_table,
-      class_hierarchy,
-      false);
-  return inherited_method.is_valid();
+  const auto inherited_method = get_inherited_component(
+    classname, methodid, symbol_table, class_hierarchy, false);
+  return inherited_method.has_value();
 }
 
 /// Get static field identifier referred to by `class_identifier.component_name`
@@ -3158,18 +3153,13 @@ irep_idt java_bytecode_convert_methodt::get_static_field(
   const irep_idt &class_identifier,
   const irep_idt &component_name) const
 {
-  resolve_inherited_componentt::inherited_componentt inherited_method =
-    get_inherited_component(
-      class_identifier,
-      component_name,
-      symbol_table,
-      class_hierarchy,
-      true);
+  const auto inherited_method = get_inherited_component(
+    class_identifier, component_name, symbol_table, class_hierarchy, true);
 
   INVARIANT(
-    inherited_method.is_valid(), "static field should be in symbol table");
+    inherited_method.has_value(), "static field should be in symbol table");
 
-  return inherited_method.get_full_component_identifier();
+  return inherited_method->get_full_component_identifier();
 }
 
 /// Create temporary variables if a write instruction can have undesired side-
