@@ -16,7 +16,11 @@ Author: Malte Mues <mail.mues@gmail.com>
     defined(__unix__) || \
     defined(__CYGWIN__) || \
     defined(__MACH__)
+#define RUN_GDB_API_TESTS
+#endif
 // clang-format on
+
+#ifdef RUN_GDB_API_TESTS
 
 #include <cstdio>
 #include <cstdlib>
@@ -27,232 +31,178 @@ Author: Malte Mues <mail.mues@gmail.com>
 #include <iostream>
 
 #include <memory-analyzer/gdb_api.cpp>
-#include <string>
 
-SCENARIO(
-  "gdb_apit uses regex as expected for memory",
-  "[core][memory-analyzer]")
+void compile_test_file()
 {
-  gdb_apit gdb_api("");
-  GIVEN("The result of a struct pointer")
+  std::string test_file("memory-analyzer/test.c");
+
+  std::string cmd("gcc -g -o test ");
+  cmd += test_file;
+
+  const int r = system(cmd.c_str());
+  REQUIRE(!r);
+}
+
+class gdb_api_testt : public gdb_apit
+{
+  explicit gdb_api_testt(const char *binary) : gdb_apit(binary)
   {
-    const std::string line = "$2 = (struct cycle_buffer *) 0x601050 <buffer>";
-    THEN("the result matches the memory address in the output")
-    {
-      REQUIRE(gdb_api.extract_memory(line) == "0x601050");
-    }
-    THEN("adding '(gdb) ' to the line doesn't have an influence")
-    {
-      REQUIRE(gdb_api.extract_memory("(gdb) " + line) == "0x601050");
-    }
   }
 
-  GIVEN("The result of a typedef pointer")
+  friend void gdb_api_internals_test();
+};
+
+void gdb_api_internals_test()
+{
+  compile_test_file();
+
+  SECTION("parse gdb output record")
   {
-    const std::string line = "$4 = (cycle_buffer_entry_t *) 0x602010";
-    THEN("the result matches the memory address in the output")
-    {
-      REQUIRE(gdb_api.extract_memory(line) == "0x602010");
-    }
-    THEN("adding '(gdb) ' to the line doesn't have an influence")
-    {
-      REQUIRE(gdb_api.extract_memory("(gdb) " + line) == "0x602010");
-    }
+    gdb_api_testt gdb_api("test");
+
+    gdb_api_testt::gdb_output_recordt gor;
+
+    gor = gdb_api.parse_gdb_output_record(
+      "a = \"1\", b = \"2\", c = {1, 2}, d = [3, 4], e=\"0x0\"");
+
+    REQUIRE(gor["a"] == "1");
+    REQUIRE(gor["b"] == "2");
+    REQUIRE(gor["c"] == "{1, 2}");
+    REQUIRE(gor["d"] == "[3, 4]");
+    REQUIRE(gor["e"] == "0x0");
   }
 
-  GIVEN("The result of a char pointer")
+  SECTION("read a line from an input stream")
   {
-    const std::string line = "$5 = 0x400734 \"snow\"";
-    THEN("the result matches the memory address in the output")
-    {
-      REQUIRE(gdb_api.extract_memory(line) == "0x400734");
-    }
-    THEN("adding '(gdb) ' to the line doesn't have an influence")
-    {
-      REQUIRE(gdb_api.extract_memory("(gdb) " + line) == "0x400734");
-    }
+    gdb_api_testt gdb_api("test");
+
+    FILE *f = fopen("memory-analyzer/input.txt", "r");
+    gdb_api.input_stream = f;
+
+    std::string line;
+
+    line = gdb_api.read_next_line();
+    REQUIRE(line == "abc\n");
+
+    line = gdb_api.read_next_line();
+    REQUIRE(line == std::string(1120, 'a') + "\n");
+
+    line = gdb_api.read_next_line();
+    REQUIRE(line == "xyz");
   }
 
-  GIVEN("The result of a null pointer")
+  SECTION("start and exit gdb")
   {
-    const std::string line = "$2 = 0x0";
-    THEN("the result matches the memory address in the output")
-    {
-      REQUIRE(gdb_api.extract_memory(line) == "0x0");
-    }
-    THEN("adding '(gdb) ' to the line doesn't have an influence")
-    {
-      REQUIRE(gdb_api.extract_memory("(gdb) " + line) == "0x0");
-    }
-  }
+    gdb_api_testt gdb_api("test");
 
-  GIVEN("The result of a char pointer at very low address")
-  {
-    const std::string line = "$34 = 0x007456 \"snow\"";
-    THEN("the result matches the memory address and not nullpointer")
-    {
-      REQUIRE(gdb_api.extract_memory(line) == "0x007456");
-    }
-    THEN("adding '(gdb) ' to the line doesn't have an influence")
-    {
-      REQUIRE(gdb_api.extract_memory("(gdb) " + line) == "0x007456");
-    }
-  }
+    gdb_api.create_gdb_process();
 
-  GIVEN("The result of a char pointer with some more whitespaces")
-  {
-    const std::string line = "$12 = 0x400752 \"thunder storm\"\n";
-    THEN("the result matches the memory address in the output")
-    {
-      REQUIRE(gdb_api.extract_memory(line) == "0x400752");
-    }
-    THEN("adding '(gdb) ' to the line doesn't have an influence")
-    {
-      REQUIRE(gdb_api.extract_memory("(gdb) " + line) == "0x400752");
-    }
-  }
+    // check input and output streams
+    REQUIRE(!ferror(gdb_api.input_stream));
+    REQUIRE(!ferror(gdb_api.output_stream));
 
-  GIVEN("The result of an array pointer")
-  {
-    const std::string line = "$5 = (struct a_sub_type_t (*)[4]) 0x602080";
-    THEN("the result matches the memory address in the output")
-    {
-      REQUIRE(gdb_api.extract_memory(line) == "0x602080");
-    }
-    THEN("adding '(gdb) ' to the line doesn't have an influence")
-    {
-      REQUIRE(gdb_api.extract_memory("(gdb) " + line) == "0x602080");
-    }
-  }
-
-  GIVEN("A constant struct pointer pointing to 0x0")
-  {
-    const std::string line = "$3 = (const struct name *) 0x0";
-    THEN("the returned memory address should be 0x0")
-    {
-      REQUIRE(gdb_api.extract_memory(line) == "0x0");
-    }
-  }
-
-  GIVEN("An enum address")
-  {
-    const std::string line = "$2 = (char *(*)[5]) 0x7e5500 <abc>";
-    THEN("the returned address is the address of the enum")
-    {
-      REQUIRE(gdb_api.extract_memory(line) == "0x7e5500");
-    }
-  }
-
-  GIVEN("The result of an int pointer")
-  {
-    const std::string line = "$1 = (int *) 0x601088 <e>\n";
-    THEN("the result is the value of memory address of the int pointer")
-    {
-      REQUIRE(gdb_api.extract_memory(line) == "0x601088");
-    }
-    THEN("adding '(gdb) ' to the line doesn't have an influence")
-    {
-      REQUIRE(gdb_api.extract_memory("(gdb) " + line) == "0x601088");
-    }
-  }
-
-  GIVEN("Non matching result")
-  {
-    const std::string line = "Something that must not match 0x605940";
-    THEN("an exception is thrown")
-    {
-      REQUIRE_THROWS_AS(
-        gdb_api.extract_memory(line), gdb_interaction_exceptiont);
-    }
+    gdb_api.terminate_gdb_process();
   }
 }
 
-SCENARIO(
-  "gdb_apit uses regex as expected for value extraction",
-  "[core][memory-analyzer]")
-{
-  gdb_apit gdb_api("");
-  GIVEN("An integer value")
-  {
-    const std::string line = "$90 = 100";
-    THEN("the result schould be '100'")
-    {
-      REQUIRE(gdb_api.extract_value(line) == "100");
-    }
-  }
-
-  GIVEN("A string value")
-  {
-    const std::string line = "$5 = 0x602010 \"snow\"";
-    THEN("the result should be 'snow'")
-    {
-      REQUIRE(gdb_api.extract_value(line) == "snow");
-    }
-  }
-
-  GIVEN("A string with withe spaces")
-  {
-    const std::string line = "$1323 = 0x1243253 \"thunder storm\"\n";
-    THEN("the result should be 'thunder storm'")
-    {
-      REQUIRE(gdb_api.extract_value(line) == "thunder storm");
-    }
-  }
-
-  GIVEN("A byte value")
-  {
-    const std::string line = "$2 = 243 '\363'";
-    THEN("the result should be 243")
-    {
-      REQUIRE(gdb_api.extract_value(line) == "243");
-    }
-  }
-
-  GIVEN("A negative int value")
-  {
-    const std::string line = "$8 = -32";
-    THEN("the result should be -32")
-    {
-      REQUIRE(gdb_api.extract_value(line) == "-32");
-    }
-  }
-
-  GIVEN("An enum value")
-  {
-    const std::string line = "$1 = INFO";
-    THEN("the result should be INFO")
-    {
-      REQUIRE(gdb_api.extract_value(line) == "INFO");
-    }
-  }
-
-  GIVEN("A void pointer value")
-  {
-    const std::string line = "$6 = (const void *) 0x71";
-    THEN("the requried result should be 0x71")
-    {
-      REQUIRE(gdb_api.extract_value(line) == "0x71");
-    }
-  }
-
-  GIVEN("A gdb response that contains 'cannot access memory'")
-  {
-    const std::string line = "Cannot access memory at address 0x71";
-    THEN("a gdb_inaccesible_memoryt excepition must be raised")
-    {
-      REQUIRE_THROWS_AS(
-        gdb_api.extract_value(line), gdb_inaccessible_memory_exceptiont);
-    }
-  }
-
-  GIVEN("A value that must not match")
-  {
-    const std::string line = "$90 = must not match 20";
-    THEN("an exception is raised")
-    {
-      REQUIRE_THROWS_AS(
-        gdb_api.extract_value(line), gdb_interaction_exceptiont);
-    }
-  }
-}
 #endif
+
+TEST_CASE("gdb api internals test", "[core][memory-analyzer]")
+{
+#ifdef RUN_GDB_API_TESTS
+  gdb_api_internals_test();
+#endif
+}
+
+TEST_CASE("gdb api test", "[core][memory-analyzer]")
+{
+#ifdef RUN_GDB_API_TESTS
+  compile_test_file();
+
+  {
+    gdb_apit gdb_api("test", true);
+    gdb_api.create_gdb_process();
+
+    try
+    {
+      const bool r = gdb_api.run_gdb_to_breakpoint("checkpoint");
+      REQUIRE(r);
+
+      gdb_api.terminate_gdb_process();
+    }
+    catch(const gdb_interaction_exceptiont &e)
+    {
+      std::cerr << "warning: cannot fully unit test GDB API as program cannot "
+                << "be run with gdb\n";
+      std::cerr << "warning: this may be due to not having the required "
+                << "permissions (e.g., to invoke ptrace() or to disable ASLR)"
+                << "\n";
+      std::cerr << "gdb_interaction_exceptiont:" << '\n';
+      std::cerr << e.what() << '\n';
+
+      std::ifstream file("gdb.txt");
+      CHECK_RETURN(file.is_open());
+      std::string line;
+
+      std::cerr << "=== gdb log begin ===\n";
+
+      while(getline(file, line))
+      {
+        std::cerr << line << '\n';
+      }
+
+      file.close();
+
+      std::cerr << "=== gdb log end ===\n";
+
+      gdb_api.terminate_gdb_process();
+
+      return;
+    }
+  }
+
+  gdb_apit gdb_api("test");
+  gdb_api.create_gdb_process();
+
+  SECTION("breakpoint is hit")
+  {
+    const bool r = gdb_api.run_gdb_to_breakpoint("checkpoint");
+    REQUIRE(r);
+  }
+
+  SECTION("breakpoint is not hit")
+  {
+    const bool r = gdb_api.run_gdb_to_breakpoint("checkpoint2");
+    REQUIRE(!r);
+  }
+
+  SECTION("breakpoint does not exist")
+  {
+    REQUIRE_THROWS_AS(
+      gdb_api.run_gdb_to_breakpoint("checkpoint3"), gdb_interaction_exceptiont);
+  }
+
+  SECTION("query memory")
+  {
+    const bool r = gdb_api.run_gdb_to_breakpoint("checkpoint");
+    REQUIRE(r);
+
+    REQUIRE(gdb_api.get_value("x") == "8");
+    REQUIRE(gdb_api.get_value("s") == "abc");
+
+    const std::regex regex(R"(0x[1-9a-f][0-9a-f]*)");
+
+    {
+      std::string address = gdb_api.get_memory("p");
+      REQUIRE(std::regex_match(address, regex));
+    }
+
+    {
+      std::string address = gdb_api.get_memory("vp");
+      REQUIRE(std::regex_match(address, regex));
+    }
+  }
+
+  gdb_api.terminate_gdb_process();
+#endif
+}
