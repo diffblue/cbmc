@@ -4,7 +4,7 @@ syntax_error.c
 activate-multi-line-match
 ^EXIT=6$
 ^SIGNAL=0$
-"messageText": "syntax error before .*",[\n ]*"messageType": "ERROR",[\n ]*"sourceLocation": {[\n ]*"file": "syntax_error.c",[\n ]*"function": "main",[\n ]*"line": "4",
+"messageText": "syntax error before .*",[\n ]*"messageType": "ERROR",[\n ]*"sourceLocation": \{[\n ]*"file": "syntax_error.c",[\n ]*"function": "main",[\n ]*"line": "4",
 --
 ^warning: ignoring
 ^VERIFICATION SUCCESSFUL$
