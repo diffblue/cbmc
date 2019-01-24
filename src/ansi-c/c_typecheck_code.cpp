@@ -30,7 +30,7 @@ void c_typecheck_baset::typecheck_code(codet &code)
     throw 0;
   }
 
-  code.type()=code_typet();
+  code.type() = empty_typet();
 
   const irep_idt &statement=code.get_statement();
 

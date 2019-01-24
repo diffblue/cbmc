@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "expr_cast.h"
 #include "invariant.h"
 #include "std_expr.h"
+#include "std_types.h"
 #include "validate.h"
 #include "validate_code.h"
 
@@ -35,15 +36,14 @@ class codet:public exprt
 {
 public:
   DEPRECATED("use codet(statement) instead")
-  codet():exprt(ID_code, typet(ID_code))
+  codet() : exprt(ID_code, empty_typet())
   {
   }
 
   /// \param statement: Specifies the type of the `codet` to be constructed,
   ///   e.g. `ID_block` for a \ref code_blockt or `ID_assign` for a
   ///   \ref code_assignt.
-  explicit codet(const irep_idt &statement):
-    exprt(ID_code, typet(ID_code))
+  explicit codet(const irep_idt &statement) : exprt(ID_code, empty_typet())
   {
     set_statement(statement);
   }
