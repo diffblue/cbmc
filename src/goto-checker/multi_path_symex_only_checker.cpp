@@ -53,9 +53,10 @@ operator()(propertiest &properties)
     show_program(ns, equation);
   }
 
-  return resultt(
-    resultt::progresst::DONE,
-    update_properties_status_from_symex_target_equation(properties, equation));
+  resultt result;
+  update_properties_status_from_symex_target_equation(
+    properties, result.updated_properties, equation);
+  return result;
 }
 
 void multi_path_symex_only_checkert::perform_symex()

@@ -218,12 +218,11 @@ void slice(
                    << " remaining after simplification" << messaget::eom;
 }
 
-std::vector<irep_idt> update_properties_status_from_symex_target_equation(
+void update_properties_status_from_symex_target_equation(
   propertiest &properties,
+  std::unordered_set<irep_idt> &updated_properties,
   const symex_target_equationt &equation)
 {
-  std::vector<irep_idt> updated_properties;
-
   for(const auto &step : equation.SSA_steps)
   {
     if(!step.is_assert())
@@ -242,7 +241,7 @@ std::vector<irep_idt> update_properties_status_from_symex_target_equation(
 
     if(emplace_result.second)
     {
-      updated_properties.push_back(property_id);
+      updated_properties.insert(property_id);
     }
     else
     {
@@ -251,7 +250,7 @@ std::vector<irep_idt> update_properties_status_from_symex_target_equation(
       property_info.status |= status;
 
       if(property_info.status != old_status)
-        updated_properties.push_back(property_id);
+        updated_properties.insert(property_id);
     }
   }
 
@@ -262,9 +261,7 @@ std::vector<irep_idt> update_properties_status_from_symex_target_equation(
       // This could be a NOT_CHECKED, NOT_REACHABLE or PASS,
       // but the equation doesn't give us precise information.
       property_pair.second.status = property_statust::PASS;
-      updated_properties.push_back(property_pair.first);
+      updated_properties.insert(property_pair.first);
     }
   }
-
-  return updated_properties;
 }

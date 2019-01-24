@@ -53,12 +53,7 @@ public:
 
     /// Changed properties since the last call to
     /// `incremental_goto_checkert::operator()`
-    std::vector<irep_idt> updated_properties;
-
-    resultt() = default;
-    resultt(
-      progresst progress,
-      const std::vector<irep_idt> &updated_properties);
+    std::unordered_set<irep_idt> updated_properties;
   };
 
   /// Check whether the given properties with status NOT_CHECKED, UNKNOWN or
