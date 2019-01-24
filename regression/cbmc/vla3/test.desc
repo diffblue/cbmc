@@ -1,0 +1,11 @@
+KNOWNBUG
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Renaming is inconsistent across loop iterations as we map L1 names to types, but
+do not actually introduce new L1 ids each time we declare an object.
