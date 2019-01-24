@@ -40,26 +40,7 @@ void goto_symext::symex_assign(
     const side_effect_exprt &side_effect_expr=to_side_effect_expr(rhs);
     const irep_idt &statement=side_effect_expr.get_statement();
 
-    if(statement==ID_function_call)
-    {
-      const auto &function_call =
-        to_side_effect_expr_function_call(side_effect_expr);
-
-      DATA_INVARIANT(
-        !side_effect_expr.operands().empty(),
-        "function call statement expects non-empty list of side effects");
-
-      DATA_INVARIANT(
-        function_call.function().id() == ID_symbol,
-        "expected symbol as function");
-
-      const irep_idt &identifier =
-        to_symbol_expr(function_call.function()).get_identifier();
-
-      throw unsupported_operation_exceptiont(
-        "symex_assign: unexpected function call: " + id2string(identifier));
-    }
-    else if(
+    if(
       statement == ID_cpp_new || statement == ID_cpp_new_array ||
       statement == ID_java_new_array_data)
       symex_cpp_new(state, lhs, side_effect_expr);
