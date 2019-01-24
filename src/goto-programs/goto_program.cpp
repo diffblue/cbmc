@@ -728,6 +728,24 @@ void goto_programt::instructiont::validate(
               ns);
           }
 
+          if(
+            !symbol_expr_type_matches_symbol_table &&
+            goto_symbol_expr.type().id() == ID_array &&
+            to_array_type(goto_symbol_expr.type()).is_incomplete())
+          {
+            // If the symbol expr has an incomplete array type, it may not have
+            // a constant size value, whereas the symbol table entry may have
+            // an (assumed) constant size of 1 (which mimics gcc behaviour)
+            if(table_symbol->type.id() == ID_array)
+            {
+              auto symbol_table_array_type = to_array_type(table_symbol->type);
+              symbol_table_array_type.size() = nil_exprt();
+
+              symbol_expr_type_matches_symbol_table = base_type_eq(
+                goto_symbol_expr.type(), symbol_table_array_type, ns);
+            }
+          }
+
           DATA_CHECK_WITH_DIAGNOSTICS(
             vm,
             symbol_expr_type_matches_symbol_table,
