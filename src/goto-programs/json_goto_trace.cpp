@@ -179,7 +179,7 @@ void convert_output(
   // Recovering the mode from the function
   irep_idt mode;
   const symbolt *function_name;
-  if(ns.lookup(step.function, function_name))
+  if(ns.lookup(step.function_id, function_name))
     // Failed to find symbol
     mode = ID_unknown;
   else
@@ -221,7 +221,7 @@ void convert_input(
   // Recovering the mode from the function
   irep_idt mode;
   const symbolt *function_name;
-  if(ns.lookup(step.function, function_name))
+  if(ns.lookup(step.function_id, function_name))
     // Failed to find symbol
     mode = ID_unknown;
   else
@@ -265,7 +265,7 @@ void convert_return(
 
   const irep_idt &function_identifier =
     (step.type == goto_trace_stept::typet::FUNCTION_CALL) ? step.called_function
-                                                          : step.function;
+                                                          : step.function_id;
 
   const symbolt &symbol = ns.lookup(function_identifier);
   json_call_return["function"] =

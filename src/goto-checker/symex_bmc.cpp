@@ -69,7 +69,7 @@ void symex_bmct::symex_step(
     record_coverage &&
     // avoid an invalid iterator in state.source.pc
     (!cur_pc->is_end_function() ||
-     state.source.function != goto_functionst::entry_point()))
+     state.source.function_id != goto_functionst::entry_point()))
   {
     // forward goto will effectively be covered via phi function,
     // which does not invoke symex_step; as symex_step is called
@@ -110,7 +110,7 @@ bool symex_bmct::should_stop_unwind(
   const goto_symex_statet::call_stackt &context,
   unsigned unwind)
 {
-  const irep_idt id = goto_programt::loop_id(*source.pc);
+  const irep_idt id = goto_programt::loop_id(source.function_id, *source.pc);
 
   tvt abort_unwind_decision;
   unsigned this_loop_limit = std::numeric_limits<unsigned>::max();

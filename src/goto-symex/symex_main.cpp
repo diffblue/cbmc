@@ -58,7 +58,11 @@ void symex_transition(
       if(i_e->is_goto() && i_e->is_backwards_goto() &&
          (!is_backwards_goto ||
           state.source.pc->location_number>i_e->location_number))
-        frame.loop_iterations[goto_programt::loop_id(*i_e)].count=0;
+      {
+        const auto loop_id =
+          goto_programt::loop_id(state.source.function_id, *i_e);
+        frame.loop_iterations[loop_id].count = 0;
+      }
   }
 
   state.source.pc=to;
@@ -146,30 +150,27 @@ void goto_symext::rewrite_quantifiers(exprt &expr, statet &state)
 void goto_symext::initialize_entry_point(
   statet &state,
   const get_goto_functiont &get_goto_function,
-  const irep_idt &function_identifier,
+  const irep_idt &function_id,
   const goto_programt::const_targett pc,
   const goto_programt::const_targett limit)
 {
   PRECONDITION(!state.threads.empty());
   PRECONDITION(!state.call_stack().empty());
-  state.source = symex_targett::sourcet(function_identifier, pc);
+  state.source = symex_targett::sourcet(function_id, pc);
   state.top().end_of_function=limit;
   state.top().calling_location.pc=state.top().end_of_function;
   state.symex_target=&target;
 
-  INVARIANT(
-    !pc->function.empty(), "all symexed instructions should have a function");
-
-  const goto_functiont &entry_point_function = get_goto_function(pc->function);
+  const goto_functiont &entry_point_function = get_goto_function(function_id);
 
   state.top().hidden_function = entry_point_function.is_hidden();
 
   auto emplace_safe_pointers_result =
-    state.safe_pointers.emplace(pc->function, local_safe_pointerst{ns});
+    state.safe_pointers.emplace(function_id, local_safe_pointerst{ns});
   if(emplace_safe_pointers_result.second)
     emplace_safe_pointers_result.first->second(entry_point_function.body);
 
-  state.dirty.populate_dirty_for_function(pc->function, entry_point_function);
+  state.dirty.populate_dirty_for_function(function_id, entry_point_function);
 
   symex_transition(state, state.source.pc, false);
 }

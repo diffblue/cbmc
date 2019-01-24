@@ -186,7 +186,7 @@ void symex_target_equationt::location(
 
 void symex_target_equationt::function_call(
   const exprt &guard,
-  const irep_idt &function_identifier,
+  const irep_idt &function_id,
   const std::vector<exprt> &ssa_function_arguments,
   const sourcet &source,
   const bool hidden)
@@ -195,7 +195,7 @@ void symex_target_equationt::function_call(
   SSA_stept &SSA_step=SSA_steps.back();
 
   SSA_step.guard = guard;
-  SSA_step.called_function = function_identifier;
+  SSA_step.called_function = function_id;
   SSA_step.ssa_function_arguments = ssa_function_arguments;
   SSA_step.hidden = hidden;
 
@@ -707,10 +707,10 @@ void symex_target_equationt::SSA_stept::output(
   switch(type)
   {
   case goto_trace_stept::typet::ASSERT:
-    out << "ASSERT " << from_expr(ns, source.function, cond_expr) << '\n';
+    out << "ASSERT " << from_expr(ns, source.function_id, cond_expr) << '\n';
     break;
   case goto_trace_stept::typet::ASSUME:
-    out << "ASSUME " << from_expr(ns, source.function, cond_expr) << '\n';
+    out << "ASSUME " << from_expr(ns, source.function_id, cond_expr) << '\n';
     break;
   case goto_trace_stept::typet::LOCATION:
     out << "LOCATION" << '\n'; break;
@@ -721,7 +721,7 @@ void symex_target_equationt::SSA_stept::output(
 
   case goto_trace_stept::typet::DECL:
     out << "DECL" << '\n';
-    out << from_expr(ns, source.function, ssa_lhs) << '\n';
+    out << from_expr(ns, source.function_id, ssa_lhs) << '\n';
     break;
 
   case goto_trace_stept::typet::ASSIGNMENT:
@@ -775,22 +775,22 @@ void symex_target_equationt::SSA_stept::output(
   case goto_trace_stept::typet::MEMORY_BARRIER:
     out << "MEMORY_BARRIER\n"; break;
   case goto_trace_stept::typet::GOTO:
-    out << "IF " << from_expr(ns, source.function, cond_expr) << " GOTO\n";
+    out << "IF " << from_expr(ns, source.function_id, cond_expr) << " GOTO\n";
     break;
 
   default: UNREACHABLE;
   }
 
   if(is_assert() || is_assume() || is_assignment() || is_constraint())
-    out << from_expr(ns, source.function, cond_expr) << '\n';
+    out << from_expr(ns, source.function_id, cond_expr) << '\n';
 
   if(is_assert() || is_constraint())
     out << comment << '\n';
 
   if(is_shared_read() || is_shared_write())
-    out << from_expr(ns, source.function, ssa_lhs) << '\n';
+    out << from_expr(ns, source.function_id, ssa_lhs) << '\n';
 
-  out << "Guard: " << from_expr(ns, source.function, guard) << '\n';
+  out << "Guard: " << from_expr(ns, source.function_id, guard) << '\n';
 }
 
 void symex_target_equationt::SSA_stept::output(std::ostream &out) const

@@ -28,11 +28,11 @@ static void show_step(
   const std::string &annotation,
   std::size_t &count)
 {
-  const irep_idt &function = step.source.function;
+  const irep_idt &function_id = step.source.function_id;
 
   std::string string_value = (step.is_shared_read() || step.is_shared_write())
-                               ? from_expr(ns, function, step.ssa_lhs)
-                               : from_expr(ns, function, step.cond_expr);
+                               ? from_expr(ns, function_id, step.ssa_lhs)
+                               : from_expr(ns, function_id, step.cond_expr);
   std::cout << '(' << count << ") ";
   if(annotation.empty())
     std::cout << string_value;
@@ -42,7 +42,7 @@ static void show_step(
 
   if(!step.guard.is_true())
   {
-    const std::string guard_string = from_expr(ns, function, step.guard);
+    const std::string guard_string = from_expr(ns, function_id, step.guard);
     std::cout << std::string(std::to_string(count).size() + 3, ' ');
     std::cout << "guard: " << guard_string << '\n';
   }
