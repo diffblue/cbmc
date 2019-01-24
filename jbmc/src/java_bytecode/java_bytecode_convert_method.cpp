@@ -657,15 +657,15 @@ static irep_idt get_if_cmp_operator(const irep_idt &stmt)
 ///   components if necessary.
 static member_exprt to_member(
   const exprt &pointer,
-  const exprt &field_reference,
+  const fieldref_exprt &field_reference,
   const namespacet &ns)
 {
-  struct_tag_typet class_type(field_reference.get(ID_class));
+  struct_tag_typet class_type(field_reference.class_name());
 
   const exprt typed_pointer =
     typecast_exprt::conditional_cast(pointer, java_reference_type(class_type));
 
-  const irep_idt &component_name = field_reference.get(ID_component_name);
+  const irep_idt &component_name = field_reference.component_name();
 
   exprt accessed_object = checked_dereference(typed_pointer, class_type);
   const auto type_of = [&ns](const exprt &object) {
@@ -1559,7 +1559,8 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
     else if(statement=="getfield")
     {
       PRECONDITION(op.size() == 1 && results.size() == 1);
-      results[0] = java_bytecode_promotion(to_member(op[0], arg0, ns));
+      results[0] = java_bytecode_promotion(
+        to_member(op[0], expr_dynamic_cast<fieldref_exprt>(arg0), ns));
     }
     else if(statement=="getstatic")
     {
@@ -1582,7 +1583,7 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
     else if(statement=="putfield")
     {
       PRECONDITION(op.size() == 2 && results.empty());
-      c = convert_putfield(arg0, op);
+      c = convert_putfield(expr_dynamic_cast<fieldref_exprt>(arg0), op);
     }
     else if(statement=="putstatic")
     {
@@ -2588,15 +2589,12 @@ code_blockt java_bytecode_convert_methodt::convert_putstatic(
 }
 
 code_blockt java_bytecode_convert_methodt::convert_putfield(
-  const exprt &arg0,
+  const fieldref_exprt &arg0,
   const exprt::operandst &op)
 {
   code_blockt block;
   save_stack_entries(
-    "stack_field",
-    block,
-    bytecode_write_typet::FIELD,
-    arg0.get(ID_component_name));
+    "stack_field", block, bytecode_write_typet::FIELD, arg0.component_name());
   block.add(code_assignt(to_member(op[0], arg0, ns), op[1]));
   return block;
 }

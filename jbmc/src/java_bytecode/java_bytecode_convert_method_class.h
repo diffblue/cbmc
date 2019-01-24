@@ -395,7 +395,8 @@ protected:
     codet &c,
     exprt::operandst &results);
 
-  code_blockt convert_putfield(const exprt &arg0, const exprt::operandst &op);
+  code_blockt
+  convert_putfield(const fieldref_exprt &arg0, const exprt::operandst &op);
 
   code_blockt convert_putstatic(
     const source_locationt &location,

@@ -337,6 +337,22 @@ public:
     set(ID_class, class_name);
     set(ID_component_name, component_name);
   }
+
+  irep_idt class_name() const
+  {
+    return get(ID_class);
+  }
+
+  irep_idt component_name() const
+  {
+    return get(ID_component_name);
+  }
 };
+
+template <>
+inline bool can_cast_expr<fieldref_exprt>(const exprt &base)
+{
+  return base.get(ID_class) != ID_nil && base.get(ID_component_name) != ID_nil;
+}
 
 #endif // CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_PARSE_TREE_H
