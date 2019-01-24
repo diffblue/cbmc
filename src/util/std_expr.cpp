@@ -167,8 +167,8 @@ extractbits_exprt::extractbits_exprt(
   const exprt &_src,
   const std::size_t _upper,
   const std::size_t _lower,
-  const typet &_type):
-  exprt(ID_extractbits, _type)
+  const typet &_type)
+  : expr_protectedt(ID_extractbits, _type)
 {
   PRECONDITION(_upper >= _lower);
   operands().resize(3);
