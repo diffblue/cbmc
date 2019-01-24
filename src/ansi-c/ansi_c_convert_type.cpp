@@ -599,9 +599,8 @@ void ansi_c_convert_typet::write(typet &type)
   if(complex_cnt)
   {
     // These take more or less arbitrary subtypes.
-    complex_typet new_type;
+    complex_typet new_type(type);
     new_type.add_source_location()=source_location;
-    new_type.subtype()=type;
     type.swap(new_type);
   }
 
