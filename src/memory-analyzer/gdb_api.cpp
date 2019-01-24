@@ -13,11 +13,15 @@
 
 gdb_apit::gdb_apit(const char *arg) : binary_name(arg)
 {
-  memset(buffer, 0, MAX_READ_SIZE_GDB_BUFFER);
 }
 
 int gdb_apit::create_gdb_process()
 {
+  pid_t gdb_process;
+
+  int pipe_input[2];
+  int pipe_output[2];
+
   if(pipe(pipe_input) == -1)
   {
     throw gdb_interaction_exceptiont("could not create pipe for stdin!");
@@ -56,6 +60,13 @@ int gdb_apit::create_gdb_process()
     // parent process
     close(pipe_input[0]);
     close(pipe_output[1]);
+
+    // get stream for reading the gdb output
+    input_stream = fdopen(pipe_output[0], "r");
+
+    // get stream for writing to gdb
+    output_stream = fdopen(pipe_input[1], "w");
+
     write_to_gdb("set max-value-size unlimited\n");
   }
   return 0;
@@ -63,15 +74,13 @@ int gdb_apit::create_gdb_process()
 
 void gdb_apit::terminate_gdb_process()
 {
-  close(pipe_input[0]);
-  close(pipe_input[1]);
+  fclose(input_stream);
+  fclose(output_stream);
 }
 
 void gdb_apit::write_to_gdb(const std::string &command)
 {
-  if(
-    write(pipe_input[1], command.c_str(), command.length()) !=
-    (ssize_t)command.length())
+  if(fputs(command.c_str(), output_stream) == EOF)
   {
     throw gdb_interaction_exceptiont("Could not write a command to gdb");
   }
@@ -79,32 +88,32 @@ void gdb_apit::write_to_gdb(const std::string &command)
 
 std::string gdb_apit::read_next_line()
 {
-  char token;
-  std::string line;
+  std::string result;
+
   do
   {
-    while(buffer_position >= last_read_size)
-    {
-      read_next_buffer_chunc();
-    }
-    token = buffer[buffer_position];
-    line += token;
-    ++buffer_position;
-  } while(token != '\n');
-  return line;
-}
+    const size_t buf_size = 1024;
+    char buf[buf_size];
 
-void gdb_apit::read_next_buffer_chunc()
-{
-  memset(buffer, 0, last_read_size);
-  const auto read_size =
-    read(pipe_output[0], &buffer, MAX_READ_SIZE_GDB_BUFFER);
-  if(read_size < 0)
-  {
-    throw gdb_interaction_exceptiont("Error reading from gdb_process");
-  }
-  last_read_size = read_size;
-  buffer_position = 0;
+    const char *c = fgets(buf, buf_size, input_stream);
+
+    if(c == NULL)
+    {
+      if(ferror(input_stream))
+      {
+        throw gdb_interaction_exceptiont("error reading from gdb");
+      }
+
+      INVARIANT(feof(input_stream), "");
+      INVARIANT(result.back() != '\n', "");
+
+      return result;
+    }
+
+    result += std::string(buf);
+  } while(result.back() != '\n');
+
+  return result;
 }
 
 void gdb_apit::run_gdb_from_core(const std::string &corefile)

@@ -6,6 +6,8 @@
 
 #include <exception>
 
+#include <util/exception_utils.h>
+
 class gdb_apit
 {
 public:
@@ -21,21 +23,14 @@ public:
   std::string get_memory(const std::string &variable);
 
 private:
-  static const int MAX_READ_SIZE_GDB_BUFFER = 600;
-
   const char *binary_name;
-  char buffer[MAX_READ_SIZE_GDB_BUFFER];
-  int buffer_position;
-  pid_t gdb_process;
-  int last_read_size;
-  int pipe_input[2];
-  int pipe_output[2];
+  FILE *input_stream;
+  FILE *output_stream;
 
   static std::string create_command(const std::string &variable);
   void write_to_gdb(const std::string &command);
 
   std::string read_next_line();
-  void read_next_buffer_chunc();
 
   static bool check_for_gdb_breakpoint_error(const std::string &line);
   static bool check_for_gdb_core_error(const std::string &line);
