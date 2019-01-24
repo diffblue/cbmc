@@ -79,6 +79,7 @@ const char *gcc_options_with_argument[]=
 const char *gcc_options_with_separated_argument[]=
 {
   "-aux-info",
+  "-arch", // Apple only
   "--param", // Apple only
   "-imacros",
   "-iprefix",
