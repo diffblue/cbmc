@@ -10,13 +10,20 @@ int main()
   // clang-format would rewrite the "==>" as "== >"
   __CPROVER_assume(!__CPROVER_exists { int i; (i>=0 && i<2) ==> (__CPROVER_exists{int j; (j>=0 && j<2) ==> a[i][j]<=10}) });
 
+  assert(0);
+
   __CPROVER_assume(__CPROVER_forall { int i; (i>=0 && i<2) ==> (!__CPROVER_exists{int j; (j>=0 && j<2) ==> b[i][j]>=1 && b[i][j]<=10}) });
 
+  assert(0);
+
   __CPROVER_assume(!__CPROVER_exists { int i; (i>=0 && i<2) ==> (!__CPROVER_exists{int j; (j>=0 && j<2) ==> c[i][j]>=1 && c[i][j]<=10}) });
+
+  assert(0);
 
   __CPROVER_assume(!__CPROVER_exists { int i; (i>=0 && i<2) ==> (__CPROVER_forall{int j; (j>=0 && j<2) ==> d[i][j]>=1 && d[i][j]<=10}) });
   // clang-format on
 
+  assert(0);
 
   assert(a[0][0]>10);
 
