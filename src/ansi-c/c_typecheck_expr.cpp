@@ -916,43 +916,13 @@ void c_typecheck_baset::typecheck_side_effect_statement_expression(
 
     expr.type()=op.type();
   }
-  else if(last_statement==ID_function_call)
-  {
-    // this is suspected to be dead
-    UNREACHABLE;
-
-    // make the last statement an expression
-
-    code_function_callt &fc=to_code_function_call(last);
-
-    side_effect_expr_function_callt sideeffect(
-      fc.function(),
-      fc.arguments(),
-      to_code_type(fc.function().type()).return_type(),
-      fc.source_location());
-
-    expr.type()=sideeffect.type();
-
-    if(fc.lhs().is_nil())
-    {
-      code_expressiont code_expr(sideeffect);
-      code_expr.add_source_location() = fc.source_location();
-      last.swap(code_expr);
-    }
-    else
-    {
-      side_effect_exprt assign(
-        ID_assign, sideeffect.type(), fc.source_location());
-      assign.add_to_operands(fc.lhs(), std::move(sideeffect));
-
-      code_expressiont code_expr(assign);
-      code_expr.add_source_location() = fc.source_location();
-
-      last.swap(code_expr);
-    }
-  }
   else
+  {
+    // we used to do this, but don't expect it any longer
+    PRECONDITION(last_statement != ID_function_call);
+
     expr.type()=typet(ID_empty);
+  }
 }
 
 void c_typecheck_baset::typecheck_expr_sizeof(exprt &expr)
