@@ -14,6 +14,10 @@ set_target_properties(
     XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "Developer ID Application: Daniel Kroening"
 )
 
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+    target_compile_options(glucose-condensed PUBLIC /w)
+endif()
+
 target_include_directories(glucose-condensed
     PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
