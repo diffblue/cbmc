@@ -188,8 +188,7 @@ protected:
       auto &operands = expr->operands();
       // Get iterators into the operands of the new expr corresponding to the
       // ones into the operands of the old expr
-      const auto i=operands.size()-(state.end-state.it);
-      const auto it=operands.begin()+i;
+      const auto it = operands.end() - (state.end - state.it);
       state.expr = *expr;
       state.it=it;
       state.end=operands.end();

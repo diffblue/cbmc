@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/invariant.h>
 #include <util/merge_irep.h>
+#include <util/narrow.h>
 
 #include <goto-programs/goto_program.h>
 #include <goto-programs/goto_trace.h>
@@ -351,18 +352,18 @@ public:
 
   std::size_t count_assertions() const
   {
-    return std::count_if(
+    return narrow_cast<std::size_t>(std::count_if(
       SSA_steps.begin(), SSA_steps.end(), [](const SSA_stept &step) {
         return step.is_assert();
-      });
+      }));
   }
 
   std::size_t count_ignored_SSA_steps() const
   {
-    return std::count_if(
+    return narrow_cast<std::size_t>(std::count_if(
       SSA_steps.begin(), SSA_steps.end(), [](const SSA_stept &step) {
         return step.ignore;
-      });
+      }));
   }
 
   typedef std::list<SSA_stept> SSA_stepst;
