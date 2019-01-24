@@ -23,6 +23,8 @@ Date: September 2011
 
 #include <set>
 
+#include <util/fresh_symbol.h>
+
 #include <goto-programs/remove_skip.h>
 
 #include <linking/static_lifetime_init.h>
@@ -44,7 +46,6 @@ void introduce_temporaries(
   messaget &message)
 {
   namespacet ns(symbol_table);
-  unsigned tmp_counter=0;
 
 #ifdef LOCAL_MAY
   local_may_aliast local_may(goto_function);
@@ -73,19 +74,18 @@ void introduce_temporaries(
       if(rw_set.empty())
         continue;
 
-      symbolt new_symbol;
-      new_symbol.base_name="$tmp_guard";
-      new_symbol.name =
-        id2string(function_id) + "$tmp_guard" + std::to_string(tmp_counter++);
-      new_symbol.type=bool_typet();
+      symbolt &new_symbol = get_fresh_aux_symbol(
+        bool_typet(),
+        id2string(function_id),
+        "$tmp_guard",
+        instruction.source_location,
+        ns.lookup(function_id).mode,
+        symbol_table);
       new_symbol.is_static_lifetime=true;
       new_symbol.is_thread_local=true;
       new_symbol.value.make_nil();
 
       symbol_exprt symbol_expr=new_symbol.symbol_expr();
-
-      symbolt *symbol_ptr;
-      symbol_table.move(new_symbol, symbol_ptr);
 
       goto_programt::instructiont new_i;
       new_i.make_assignment();

@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "shared_buffers.h"
 
 #include <util/c_types.h>
+#include <util/fresh_symbol.h>
 
 #include <linking/static_lifetime_init.h>
 
@@ -88,21 +89,22 @@ irep_idt shared_bufferst::add(
   const typet &type,
   bool instrument)
 {
-  const irep_idt identifier=id2string(object)+suffix;
+  const namespacet ns(symbol_table);
 
-  symbolt new_symbol;
-  new_symbol.name=identifier;
-  new_symbol.base_name=id2string(base_name)+suffix;
-  new_symbol.type=type;
+  symbolt &new_symbol = get_fresh_aux_symbol(
+    type,
+    id2string(object) + suffix,
+    id2string(base_name) + suffix,
+    ns.lookup(object).location,
+    ns.lookup(object).mode,
+    symbol_table);
   new_symbol.is_static_lifetime=true;
   new_symbol.value.make_nil();
 
   if(instrument)
-    instrumentations.insert(identifier);
+    instrumentations.insert(new_symbol.name);
 
-  symbolt *symbol_ptr;
-  symbol_table.move(new_symbol, symbol_ptr);
-  return identifier;
+  return new_symbol.name;
 }
 
 void shared_bufferst::add_initialization(goto_programt &goto_program)
