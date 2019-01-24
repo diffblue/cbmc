@@ -218,7 +218,8 @@ SCENARIO(
     const std::string line = "Cannot access memory at address 0x71";
     THEN("a gdb_inaccesible_memoryt excepition must be raised")
     {
-      REQUIRE_THROWS_AS(gdb_api.extract_value(line), gdb_inaccessible_memoryt);
+      REQUIRE_THROWS_AS(
+        gdb_api.extract_value(line), gdb_inaccessible_memory_exceptiont);
     }
   }
 

@@ -42,29 +42,36 @@ private:
   static gdb_output_recordt parse_gdb_output_record(const std::string &s);
 };
 
-class gdb_interaction_exceptiont : public std::exception
+class gdb_interaction_exceptiont : public cprover_exception_baset
 {
 public:
-  explicit gdb_interaction_exceptiont(std::string reason) : std::exception()
+  explicit gdb_interaction_exceptiont(std::string reason) : reason(reason)
   {
-    error = reason;
   }
-  const char *what() const throw()
+  std::string what() const override
   {
-    return error.c_str();
+    return reason;
   }
 
 private:
-  std::string error;
+  std::string reason;
 };
 
-class gdb_inaccessible_memoryt : public gdb_interaction_exceptiont
+class gdb_inaccessible_memory_exceptiont : public cprover_exception_baset
 {
 public:
-  explicit gdb_inaccessible_memoryt(std::string reason)
-    : gdb_interaction_exceptiont(reason)
+  explicit gdb_inaccessible_memory_exceptiont(std::string reason)
+    : reason(reason)
   {
   }
+
+  std::string what() const override
+  {
+    return reason;
+  }
+
+private:
+  std::string reason;
 };
 #endif
 #endif

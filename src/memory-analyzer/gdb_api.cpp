@@ -268,7 +268,7 @@ std::string gdb_apit::extract_value(const std::string &line)
   std::regex memmory_access_error("Cannot access memory");
   if(regex_search(line, memmory_access_error))
   {
-    throw gdb_inaccessible_memoryt("ERROR: " + line);
+    throw gdb_inaccessible_memory_exceptiont("ERROR: " + line);
   }
   throw gdb_interaction_exceptiont("Cannot extract value from this: " + line);
 }
