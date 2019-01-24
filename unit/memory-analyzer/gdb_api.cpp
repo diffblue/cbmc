@@ -1,5 +1,13 @@
-// Copyright 2018 Malte Mues
-#include <testing-utils/catch.hpp>
+/*******************************************************************\
+
+Module: GDB Machine Interface API unit tests
+
+Author: Malte Mues <mail.mues@gmail.com>
+        Daniel Poetzl
+
+\*******************************************************************/
+
+#include <testing-utils/use_catch.h>
 
 #ifdef __linux__
 //  \file Test that the regex expression used work as expected.

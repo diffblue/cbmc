@@ -1,4 +1,12 @@
-// Copyright 2018 Author: Malte Mues
+/*******************************************************************\
+
+Module: GDB Machine Interface API
+
+Author: Malte Mues <mail.mues@gmail.com>
+        Daniel Poetzl
+
+\*******************************************************************/
+
 #ifdef __linux__
 #ifndef CPROVER_MEMORY_ANALYZER_GDB_API_H
 #define CPROVER_MEMORY_ANALYZER_GDB_API_H

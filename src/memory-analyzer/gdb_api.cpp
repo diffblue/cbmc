@@ -1,4 +1,12 @@
-// Copyright 2018 Author: Malte Mues <mail.mues@gmail.com>
+/*******************************************************************\
+
+Module: GDB Machine Interface API
+
+Author: Malte Mues <mail.mues@gmail.com>
+        Daniel Poetzl
+
+\*******************************************************************/
+
 #ifdef __linux__
 #include <cctype>
 #include <cerrno>
