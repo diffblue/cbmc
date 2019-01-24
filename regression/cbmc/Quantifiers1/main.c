@@ -2,6 +2,8 @@ int zero_array[10];
 
 int main()
 {
+  // clang-format off
+  // clang-format would rewrite the "==>" as "== >"
   // C# style
   assert(__CPROVER_forall { int i; (i>=0 && i<10) ==> zero_array[i]==0 });
 
@@ -20,4 +22,5 @@ int main()
 
   assert(__CPROVER_forall {unsigned i; i>9 || c[i]==i});
   return 0;
+  // clang-format on
 }
