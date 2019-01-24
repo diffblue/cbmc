@@ -391,13 +391,13 @@ void remove_function_pointerst::remove_function_pointer(
     t3->make_goto(t_final, true_exprt());
 
     // goto to call
-    address_of_exprt address_of(fun, pointer_type(fun.type()));
+    const address_of_exprt address_of(fun, pointer_type(fun.type()));
 
-    if(address_of.type()!=pointer.type())
-      address_of.make_typecast(pointer.type());
+    const auto casted_address =
+      typecast_exprt::conditional_cast(address_of, pointer.type());
 
     goto_programt::targett t4=new_code_gotos.add_instruction();
-    t4->make_goto(t1, equal_exprt(pointer, address_of));
+    t4->make_goto(t1, equal_exprt(pointer, casted_address));
   }
 
   // fall-through
