@@ -27,9 +27,10 @@ size_t irep_hash_container_baset::number(const irept &irep)
   pack(irep, packed);
   size_t id=numbering.number(packed);
 
-  auto &irep_entry = ptr_hash[&irep.read()];
-  irep_entry.number = id;
-  irep_entry.irep = irep;
+  ptr_hash.emplace(
+    std::piecewise_construct,
+    std::forward_as_tuple(&irep.read()),
+    std::forward_as_tuple(id, irep));
 
   return id;
 }

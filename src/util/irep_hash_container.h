@@ -49,6 +49,11 @@ protected:
   {
     std::size_t number;
     irept irep; // copy to keep addresses stable
+
+    irep_entryt(std::size_t _number, const irept &_irep)
+      : number(_number), irep(_irep)
+    {
+    }
   };
 
   typedef std::unordered_map<const void *, irep_entryt, pointer_hasht>
