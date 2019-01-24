@@ -1,0 +1,10 @@
+KNOWNBUG
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+The array decision procedure does not yet handle member expressions.
