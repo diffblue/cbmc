@@ -35,8 +35,15 @@ void parse_options_baset::help()
 
 void parse_options_baset::usage_error()
 {
-  std::cerr << "Usage error!\n\n";
+  error_message("Usage error!\n");
   help();
+}
+
+/// This can be overloaded so that error messages are valid XML / JSON.
+void parse_options_baset::error_message(const std::string &err)
+{
+  std::cerr << err << '\n';
+  return;
 }
 
 /// Print an error message mentioning the option that was not recognized when
@@ -44,7 +51,7 @@ void parse_options_baset::usage_error()
 void parse_options_baset::unknown_option_msg()
 {
   if(!cmdline.unknown_arg.empty())
-    std::cerr << "Unknown option: " << cmdline.unknown_arg << "\n";
+    error_message("Unknown option: " + cmdline.unknown_arg + "\n");
 }
 
 int parse_options_baset::main()
@@ -75,43 +82,43 @@ int parse_options_baset::main()
   // CPROVER style exceptions in order of decreasing happiness
   catch(const invalid_command_line_argument_exceptiont &e)
   {
-    std::cerr << e.what() << '\n';
+    error_message(e.what());
     return CPROVER_EXIT_USAGE_ERROR;
   }
   catch(const cprover_exception_baset &e)
   {
-    std::cerr << e.what() << '\n';
+    error_message(e.what());
     return CPROVER_EXIT_EXCEPTION;
   }
   catch(const std::string &e)
   {
-    std::cerr << "C++ string exception : " << e << '\n';
+    error_message("C++ string exception : " + e);
     return CPROVER_EXIT_EXCEPTION;
   }
   catch(const char *e)
   {
-    std::cerr << "C string exception : " << e << '\n';
+    error_message(std::string("C string exception : ") + e);
     return CPROVER_EXIT_EXCEPTION;
   }
   catch(int e)
   {
-    std::cerr << "Numeric exception : " << e << '\n';
+    error_message("Numeric exception : " + std::to_string(e));
     return CPROVER_EXIT_EXCEPTION;
   }
   // C++ style exceptions
   catch(const std::bad_alloc &)
   {
-    std::cerr << "Out of memory" << '\n';
+    error_message("Out of memory");
     return CPROVER_EXIT_INTERNAL_OUT_OF_MEMORY;
   }
   catch(const std::exception &e)
   {
-    std::cerr << e.what() << '\n';
+    error_message(e.what());
     return CPROVER_EXIT_EXCEPTION;
   }
   catch(...)
   {
-    std::cerr << "Unknown exception type!" << '\n';
+    error_message("Unknown exception type!");
     return CPROVER_EXIT_EXCEPTION;
   }
 }

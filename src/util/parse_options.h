@@ -30,6 +30,9 @@ public:
   virtual int main();
   virtual ~parse_options_baset() { }
 
+protected:
+  virtual void error_message(const std::string &err);
+
 private:
   void unknown_option_msg();
   bool parse_result;
