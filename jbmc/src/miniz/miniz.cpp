@@ -28,10 +28,21 @@
 // clang-format off
 
 #ifdef _MSC_VER
+// conversion warnings
+#pragma warning(disable:4242)
+// possible loss of data
+#pragma warning(disable:4244)
+// possible loss of data
+#pragma warning(disable:4365)
+// signed/unsigned mismatch
 #pragma warning(disable:4548)
-  // expression before comma has no effect
+// expression before comma has no effect
 #pragma warning(disable:4061)
-  // enum case is not handled in switch
+// enum case is not handled in switch
+#pragma warning(disable:4334)
+// result of 32-bit shift implicitly converted to 64 bits
+#pragma warning(disable:5039)
+// pointer or reference to potentially throwing function passed to extern C
 #endif
 
 #include  "miniz.h"
