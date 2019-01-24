@@ -252,7 +252,12 @@ void update_properties_status_from_symex_target_equation(
         updated_properties.insert(property_id);
     }
   }
+}
 
+void update_status_of_not_checked_properties(
+  propertiest &properties,
+  std::unordered_set<irep_idt> &updated_properties)
+{
   for(auto &property_pair : properties)
   {
     if(property_pair.second.status == property_statust::NOT_CHECKED)

@@ -80,6 +80,16 @@ void update_properties_status_from_symex_target_equation(
   std::unordered_set<irep_idt> &updated_properties,
   const symex_target_equationt &equation);
 
+/// Sets the property status of NOT_CHECKED properties to PASS.
+/// \param [inout] properties: The status is updated in this data structure
+/// \param [inout] updated_properties: The IDs of updated properties are
+///   added here
+/// Note: this should inspect the equation, but the equation doesn't have
+///   any useful information at the moment.
+void update_status_of_not_checked_properties(
+  propertiest &properties,
+  std::unordered_set<irep_idt> &updated_properties);
+
 // clang-format off
 #define OPT_BMC \
   "(program-only)" \
