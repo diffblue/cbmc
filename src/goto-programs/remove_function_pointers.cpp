@@ -120,7 +120,7 @@ remove_function_pointerst::remove_function_pointerst(
 
   // build type map
   forall_goto_functions(f_it, goto_functions)
-    type_map[f_it->first]=f_it->second.type;
+    type_map.emplace(f_it->first, f_it->second.type);
 }
 
 bool remove_function_pointerst::arg_is_type_compatible(
