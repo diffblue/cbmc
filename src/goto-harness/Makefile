@@ -1,10 +1,17 @@
 SRC = \
+  function_call_harness_generator.cpp \
+  goto_harness_generator.cpp \
+  goto_harness_generator_factory.cpp \
   goto_harness_main.cpp \
   goto_harness_parse_options.cpp \
   # Empty last line
 
 OBJ += \
   ../util/util$(LIBEXT) \
+  ../goto-programs/goto-programs$(LIBEXT) \
+  ../big-int/big-int$(LIBEXT) \
+  ../langapi/langapi$(LIBEXT) \
+  ../linking/linking$(LIBEXT) \
   # Empty last line
 
 INCLUDES= -I ..

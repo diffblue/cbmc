@@ -3,5 +3,6 @@ add_executable(goto-harness ${sources})
 generic_includes(goto-harness)
 
 target_link_libraries(goto-harness
-    util
+  util
+  goto-programs
 )

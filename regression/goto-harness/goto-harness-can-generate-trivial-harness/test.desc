@@ -1,0 +1,7 @@
+CORE
+main.c
+--harness-type call-function --function function_to_test
+^\[function_to_test.assertion.1\] line \d+ assertion some_argument == 0: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$

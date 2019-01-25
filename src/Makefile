@@ -49,7 +49,7 @@ languages: util.dir langapi.dir \
 
 solvers.dir: util.dir
 
-goto-harness.dir: util.dir
+goto-harness.dir: util.dir goto-programs.dir
 
 goto-instrument.dir: languages goto-programs.dir pointer-analysis.dir \
                      goto-symex.dir linking.dir analyses.dir solvers.dir
