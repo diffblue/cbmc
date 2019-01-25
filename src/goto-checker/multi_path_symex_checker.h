@@ -12,9 +12,9 @@ Author: Daniel Kroening, Peter Schrammel
 #ifndef CPROVER_GOTO_CHECKER_MULTI_PATH_SYMEX_CHECKER_H
 #define CPROVER_GOTO_CHECKER_MULTI_PATH_SYMEX_CHECKER_H
 
+#include "goto_symex_property_decider.h"
 #include "goto_trace_provider.h"
 #include "multi_path_symex_only_checker.h"
-#include "solver_factory.h"
 #include "witness_provider.h"
 
 /// Performs a multi-path symbolic execution using goto-symex
@@ -46,50 +46,8 @@ public:
   void output_proof() override;
 
 protected:
-  std::unique_ptr<solver_factoryt::solvert> solver;
-
-  struct goalt
-  {
-    /// A property holds if all instances of it are true
-    std::vector<symex_target_equationt::SSA_stepst::iterator> instances;
-
-    /// The goal variable
-    literalt condition;
-
-    exprt as_expr() const;
-  };
-
-  /// Maintains the relation between a property ID and
-  /// the corresponding goal variable that encodes
-  /// the negation of the conjunction of the instances of the property
-  std::map<irep_idt, goalt> goal_map;
-
   bool equation_generated;
-
-  /// Get the conditions for the properties from the equation
-  /// and collect all 'instances' of the properties in the `goal_map`
-  void
-  update_properties_goals_from_symex_target_equation(propertiest &properties);
-
-  /// Convert the instances of a property into a goal variable
-  void convert_goals();
-
-  /// Prevent the solver to optimize-away the goal variables
-  /// (necessary for incremental solving)
-  void freeze_goal_variables();
-
-  /// Add disjunction of negated properties to the equation
-  void add_constraint_from_goals(const propertiest &properties);
-
-  /// Update the property status from the truth value of the goal variable
-  /// \param [inout] properties: The status is updated in this data structure
-  /// \param [inout] updated_properties: The set of property IDs of
-  ///   updated properties
-  /// \param dec_result: The result returned by the solver
-  void update_properties_status_from_goals(
-    propertiest &properties,
-    std::unordered_set<irep_idt> &updated_properties,
-    decision_proceduret::resultt dec_result);
+  goto_symex_property_decidert property_decider;
 };
 
 #endif // CPROVER_GOTO_CHECKER_MULTI_PATH_SYMEX_CHECKER_H
