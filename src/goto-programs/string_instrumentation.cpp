@@ -74,7 +74,7 @@ protected:
   void make_type(exprt &dest, const typet &type)
   {
     if(ns.follow(dest.type())!=ns.follow(type))
-      dest.make_typecast(type);
+      dest = typecast_exprt(dest, type);
   }
 
   void instrument(goto_programt &dest, goto_programt::targett it);

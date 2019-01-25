@@ -198,10 +198,9 @@ void goto_symext::symex_allocate(
       value_symbol.symbol_expr(), pointer_type(value_symbol.type));
   }
 
-  if(rhs.type()!=lhs.type())
-    rhs.make_typecast(lhs.type());
-
-  symex_assign(state, code_assignt(lhs, rhs));
+  symex_assign(
+    state,
+    code_assignt(lhs, typecast_exprt::conditional_cast(rhs, lhs.type())));
 }
 
 irep_idt get_symbol(const exprt &src)
@@ -260,8 +259,8 @@ void goto_symext::symex_gcc_builtin_va_arg_next(
       if(!ns.lookup(id, symbol))
       {
         const symbol_exprt symbol_expr(symbol->name, symbol->type);
-        rhs=address_of_exprt(symbol_expr);
-        rhs.make_typecast(lhs.type());
+        rhs = typecast_exprt::conditional_cast(
+          address_of_exprt(symbol_expr), lhs.type());
       }
     }
   }

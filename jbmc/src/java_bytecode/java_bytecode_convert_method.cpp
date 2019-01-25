@@ -2166,8 +2166,7 @@ void java_bytecode_convert_methodt::convert_invoke(
       type == java_byte_type() || type == java_short_type() ||
       type.id() == ID_pointer)
     {
-      if(type != arguments[i].type())
-        arguments[i].make_typecast(type);
+      arguments[i] = typecast_exprt::conditional_cast(arguments[i], type);
     }
   }
 

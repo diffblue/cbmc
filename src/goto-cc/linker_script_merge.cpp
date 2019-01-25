@@ -576,8 +576,8 @@ int linker_script_merget::ls_data2instructions(
         unsigned_int_type().get_width()),
       unsigned_int_type());
 
-    exprt rhs_tc(rhs);
-    rhs_tc.make_typecast(pointer_type(char_type()));
+    exprt rhs_tc =
+      typecast_exprt::conditional_cast(rhs, pointer_type(char_type()));
 
     linker_values.emplace(
       irep_idt(d["sym"].value), std::make_pair(lhs, rhs_tc));
@@ -640,8 +640,8 @@ int linker_script_merget::ls_data2instructions(
       string2integer(d["val"].value), unsigned_int_type().get_width()));
     rhs.type()=unsigned_int_type();
 
-    exprt rhs_tc(rhs);
-    rhs_tc.make_typecast(pointer_type(char_type()));
+    exprt rhs_tc =
+      typecast_exprt::conditional_cast(rhs, pointer_type(char_type()));
 
     linker_values.emplace(
       irep_idt(d["sym"].value), std::make_pair(lhs, rhs_tc));

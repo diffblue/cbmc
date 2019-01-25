@@ -65,7 +65,7 @@ protected:
   {
     if(dest.is_not_nil() &&
        ns.follow(dest.type())!=ns.follow(type))
-      dest.make_typecast(type);
+      dest = typecast_exprt(dest, type);
   }
 
   goto_programt::targett abstract(
