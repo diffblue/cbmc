@@ -618,9 +618,6 @@ void goto_symex_statet::rename_address(
   }
 }
 
-/// Return true if, and only if, the \p type or one of its subtypes requires SSA
-/// renaming. Renaming is necessary when symbol expressions occur within the
-/// type, which is the case for arrays of non-constant size.
 static bool requires_renaming(const typet &type, const namespacet &ns)
 {
   if(type.id() == ID_array)
@@ -638,12 +635,8 @@ static bool requires_renaming(const typet &type, const namespacet &ns)
     for(auto &component : components)
     {
       // be careful, or it might get cyclic
-      if(
-        component.type().id() != ID_pointer &&
-        requires_renaming(component.type(), ns))
-      {
-        return true;
-      }
+      if(component.type().id() != ID_pointer)
+        return requires_renaming(component.type(), ns);
     }
 
     return false;
