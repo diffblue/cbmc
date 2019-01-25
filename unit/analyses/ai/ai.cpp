@@ -206,11 +206,6 @@ SCENARIO(
 
   f_body.copy_to_operands(make_void_call(h.symbol_expr()));
 
-  code_whilet loop;
-
-  loop.cond() =
-    notequal_exprt(x.symbol_expr(), from_integer(0, signed_int_type()));
-
   code_blockt loop_body;
   loop_body.copy_to_operands(
     code_assignt(
@@ -222,7 +217,9 @@ SCENARIO(
       minus_exprt(y.symbol_expr(), from_integer(1, signed_int_type()))));
   loop_body.copy_to_operands(make_void_call(g.symbol_expr()));
 
-  loop.body() = loop_body;
+  code_whilet loop(
+    notequal_exprt(x.symbol_expr(), from_integer(0, signed_int_type())),
+    loop_body);
 
   f_body.add_to_operands(std::move(loop));
 

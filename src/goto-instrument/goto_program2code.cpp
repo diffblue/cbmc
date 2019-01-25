@@ -518,10 +518,8 @@ goto_programt::const_targett goto_program2codet::convert_do_while(
 {
   assert(loop_end->is_goto() && loop_end->is_backwards_goto());
 
-  code_dowhilet d;
-  d.cond()=loop_end->guard;
+  code_dowhilet d(loop_end->guard, code_blockt());
   simplify(d.cond(), ns);
-  d.body()=code_blockt();
 
   copy_source_location(loop_end->targets.front(), d);
 
@@ -571,8 +569,7 @@ goto_programt::const_targett goto_program2codet::convert_goto_while(
   if(target==loop_end) // 1: GOTO 1
     return convert_goto_goto(target, dest);
 
-  code_whilet w;
-  w.body()=code_blockt();
+  code_whilet w(true_exprt{}, code_blockt{});
   goto_programt::const_targett after_loop=loop_end;
   ++after_loop;
   assert(after_loop!=goto_program.instructions.end());
@@ -586,12 +583,10 @@ goto_programt::const_targett goto_program2codet::convert_goto_while(
   }
   else if(target->guard.is_true())
   {
-    w.cond()=true_exprt();
     target=convert_goto_goto(target, w.body());
   }
   else
   {
-    w.cond()=true_exprt();
     target=convert_goto_switch(target, loop_end, w.body());
   }
 
@@ -641,12 +636,8 @@ goto_programt::const_targett goto_program2codet::convert_goto_while(
         to_code_ifthenelse(back).cond().is_true() &&
         to_code_ifthenelse(back).then_case().get_statement()==ID_break))
     {
-      code_dowhilet d;
-
-      d.cond()=false_exprt();
-
       w.body().operands().pop_back();
-      d.body().swap(w.body());
+      code_dowhilet d(false_exprt(), w.body());
 
       copy_source_location(target, d);
 
