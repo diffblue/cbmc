@@ -2596,10 +2596,11 @@ exprt c_typecheck_baset::do_special_functions(
       throw 0;
     }
 
-    expr.arguments()[0].make_typecast(bool_typet());
-    make_constant(expr.arguments()[0]);
+    exprt arg0 =
+      typecast_exprt::conditional_cast(expr.arguments()[0], bool_typet());
+    make_constant(arg0);
 
-    if(expr.arguments()[0].is_true())
+    if(arg0.is_true())
       return expr.arguments()[1];
     else
       return expr.arguments()[2];
@@ -2953,7 +2954,7 @@ void c_typecheck_baset::typecheck_expr_binary_arithmetic(exprt &expr)
     is_number(o_type1))
   {
     // convert op1 to the vector type
-    op1.make_typecast(o_type0);
+    op1 = typecast_exprt(op1, o_type0);
     expr.type() = o_type0;
     return;
   }
@@ -2962,7 +2963,7 @@ void c_typecheck_baset::typecheck_expr_binary_arithmetic(exprt &expr)
     is_number(o_type0))
   {
     // convert op0 to the vector type
-    op0.make_typecast(o_type1);
+    op0 = typecast_exprt(op0, o_type1);
     expr.type() = o_type1;
     return;
   }

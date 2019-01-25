@@ -218,7 +218,7 @@ void goto_symext::symex_other(
     const array_typet &array_type = to_array_type(array_expr.type());
 
     if(!base_type_eq(array_type.subtype(), value.type(), ns))
-      value.make_typecast(array_type.subtype());
+      value = typecast_exprt(value, array_type.subtype());
 
     code_assignt assignment(array_expr, array_of_exprt(value, array_type));
     symex_assign(state, assignment);

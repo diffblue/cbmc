@@ -506,8 +506,8 @@ void goto_convertt::convert(
   else if(statement==ID_static_assert)
   {
     PRECONDITION(code.operands().size() == 2);
-    exprt assertion=code.op0();
-    assertion.make_typecast(bool_typet());
+    exprt assertion =
+      typecast_exprt::conditional_cast(code.op0(), bool_typet());
     simplify(assertion, ns);
     INVARIANT_WITH_DIAGNOSTICS(
       !assertion.is_false(),

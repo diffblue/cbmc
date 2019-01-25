@@ -441,10 +441,8 @@ void goto_convertt::do_cpp_new(
 
   if(new_array)
   {
-    count=static_cast<const exprt &>(rhs.find(ID_size));
-
-    if(count.type()!=object_size.type())
-      count.make_typecast(object_size.type());
+    count = typecast_exprt::conditional_cast(
+      static_cast<const exprt &>(rhs.find(ID_size)), object_size.type());
 
     // might have side-effect
     clean_expr(count, dest, ID_cpp);
@@ -513,8 +511,10 @@ void goto_convertt::do_cpp_new(
     new_call.add_source_location()=rhs.source_location();
 
     for(std::size_t i=0; i<code_type.parameters().size(); i++)
-      if(new_call.arguments()[i].type()!=code_type.parameters()[i].type())
-        new_call.arguments()[i].make_typecast(code_type.parameters()[i].type());
+    {
+      new_call.arguments()[i] = typecast_exprt::conditional_cast(
+        new_call.arguments()[i], code_type.parameters()[i].type());
+    }
 
     convert(new_call, dest, ID_cpp);
   }
@@ -689,8 +689,7 @@ void goto_convertt::do_function_call_symbol(
     t->source_location.set("user-provided", true);
 
     // let's double-check the type of the argument
-    if(t->guard.type().id()!=ID_bool)
-      t->guard.make_typecast(bool_typet());
+    t->guard = typecast_exprt::conditional_cast(t->guard, bool_typet());
 
     if(lhs.is_not_nil())
     {
@@ -749,8 +748,7 @@ void goto_convertt::do_function_call_symbol(
       "assertion " + id2string(from_expr(ns, identifier, t->guard)));
 
     // let's double-check the type of the argument
-    if(t->guard.type().id()!=ID_bool)
-      t->guard.make_typecast(bool_typet());
+    t->guard = typecast_exprt::conditional_cast(t->guard, bool_typet());
 
     if(lhs.is_not_nil())
     {
@@ -795,8 +793,7 @@ void goto_convertt::do_function_call_symbol(
     t->source_location.set_comment(description);
 
     // let's double-check the type of the argument
-    if(t->guard.type().id()!=ID_bool)
-      t->guard.make_typecast(bool_typet());
+    t->guard = typecast_exprt::conditional_cast(t->guard, bool_typet());
 
     if(lhs.is_not_nil())
     {
@@ -1250,8 +1247,8 @@ void goto_convertt::do_function_call_symbol(
       goto_programt::targett t2=dest.add_instruction(ASSIGN);
       t2->source_location=function.source_location();
       t2->code=code_assignt(lhs, deref_ptr);
-      if(t2->code.op0().type()!=t2->code.op1().type())
-        t2->code.op1().make_typecast(t2->code.op0().type());
+      t2->code.op1() =
+        typecast_exprt::conditional_cast(t2->code.op1(), t2->code.op0().type());
     }
 
     irep_idt op_id=
@@ -1264,9 +1261,11 @@ void goto_convertt::do_function_call_symbol(
       ID_nil;
 
     // build *ptr=*ptr OP arguments[1];
-    binary_exprt op_expr(deref_ptr, op_id, arguments[1], deref_ptr.type());
-    if(op_expr.op1().type()!=op_expr.type())
-      op_expr.op1().make_typecast(op_expr.type());
+    binary_exprt op_expr(
+      deref_ptr,
+      op_id,
+      typecast_exprt::conditional_cast(arguments[1], deref_ptr.type()),
+      deref_ptr.type());
 
     goto_programt::targett t3=dest.add_instruction(ASSIGN);
     t3->source_location=function.source_location();
@@ -1323,9 +1322,11 @@ void goto_convertt::do_function_call_symbol(
       ID_nil;
 
     // build *ptr=*ptr OP arguments[1];
-    binary_exprt op_expr(deref_ptr, op_id, arguments[1], deref_ptr.type());
-    if(op_expr.op1().type()!=op_expr.type())
-      op_expr.op1().make_typecast(op_expr.type());
+    binary_exprt op_expr(
+      deref_ptr,
+      op_id,
+      typecast_exprt::conditional_cast(arguments[1], deref_ptr.type()),
+      deref_ptr.type());
 
     goto_programt::targett t3=dest.add_instruction(ASSIGN);
     t3->source_location=function.source_location();
@@ -1337,8 +1338,8 @@ void goto_convertt::do_function_call_symbol(
       goto_programt::targett t2=dest.add_instruction(ASSIGN);
       t2->source_location=function.source_location();
       t2->code=code_assignt(lhs, deref_ptr);
-      if(t2->code.op0().type()!=t2->code.op1().type())
-        t2->code.op1().make_typecast(t2->code.op0().type());
+      t2->code.op1() =
+        typecast_exprt::conditional_cast(t2->code.op1(), t2->code.op0().type());
     }
 
     // this instruction implies an mfence, i.e., WRfence
@@ -1387,9 +1388,9 @@ void goto_convertt::do_function_call_symbol(
     t1->source_location=function.source_location();
 
     // build *ptr==oldval
-    equal_exprt equal(deref_ptr, arguments[1]);
-    if(equal.op1().type()!=equal.op0().type())
-      equal.op1().make_typecast(equal.op0().type());
+    equal_exprt equal(
+      deref_ptr,
+      typecast_exprt::conditional_cast(arguments[1], deref_ptr.type()));
 
     if(lhs.is_not_nil())
     {
@@ -1397,8 +1398,8 @@ void goto_convertt::do_function_call_symbol(
       goto_programt::targett t2=dest.add_instruction(ASSIGN);
       t2->source_location=function.source_location();
       t2->code=code_assignt(lhs, equal);
-      if(t2->code.op0().type()!=t2->code.op1().type())
-        t2->code.op1().make_typecast(t2->code.op0().type());
+      t2->code.op1() =
+        typecast_exprt::conditional_cast(t2->code.op1(), t2->code.op0().type());
     }
 
     // build (*ptr==oldval)?newval:*ptr
@@ -1453,14 +1454,14 @@ void goto_convertt::do_function_call_symbol(
       goto_programt::targett t2=dest.add_instruction(ASSIGN);
       t2->source_location=function.source_location();
       t2->code=code_assignt(lhs, deref_ptr);
-      if(t2->code.op0().type()!=t2->code.op1().type())
-        t2->code.op1().make_typecast(t2->code.op0().type());
+      t2->code.op1() =
+        typecast_exprt::conditional_cast(t2->code.op1(), t2->code.op0().type());
     }
 
     // build *ptr==oldval
-    equal_exprt equal(deref_ptr, arguments[1]);
-    if(equal.op1().type()!=equal.op0().type())
-      equal.op1().make_typecast(equal.op0().type());
+    equal_exprt equal(
+      deref_ptr,
+      typecast_exprt::conditional_cast(arguments[1], deref_ptr.type()));
 
     // build (*ptr==oldval)?newval:*ptr
     if_exprt if_expr(
@@ -1534,10 +1535,14 @@ void goto_convertt::do_function_call_symbol(
     if(arguments[0].type()!=arguments[1].type())
     {
       if(use_double)
-        new_arguments[1].make_typecast(arguments[0].type());
+      {
+        new_arguments[1] =
+          typecast_exprt(new_arguments[1], arguments[0].type());
+      }
       else
       {
-        new_arguments[0].make_typecast(arguments[1].type());
+        new_arguments[0] =
+          typecast_exprt(new_arguments[0], arguments[1].type());
         use_double=true;
       }
     }

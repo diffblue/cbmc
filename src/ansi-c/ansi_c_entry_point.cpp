@@ -406,10 +406,10 @@ bool generate_ansi_c_start_function(
         zero_string.type().subtype()=char_type();
         zero_string.type().set(ID_size, "infinity");
         const index_exprt index(zero_string, from_integer(0, uint_type()));
-        exprt address_of=address_of_exprt(index, pointer_type(char_type()));
-
-        if(argv_symbol.type.subtype()!=address_of.type())
-          address_of.make_typecast(argv_symbol.type.subtype());
+        exprt address_of =
+          typecast_exprt::conditional_cast(
+            address_of_exprt(index, pointer_type(char_type())),
+            argv_symbol.type.subtype());
 
         // assign argv[*] to the address of a string-object
         array_of_exprt array_of(address_of, argv_symbol.type);

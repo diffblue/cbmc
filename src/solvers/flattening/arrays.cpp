@@ -600,8 +600,7 @@ void arrayst::add_array_constraints_update(
     {
       // we first build the guard
 
-      if(other_index.type()!=index.type())
-        other_index.make_typecast(index.type());
+      other_index = typecast_exprt::conditional_cast(other_index, index.type());
 
       literalt guard_lit=convert(equal_exprt(index, other_index));
 

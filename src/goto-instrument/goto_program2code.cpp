@@ -1846,7 +1846,7 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
 
     const typet &t=expr.type();
 
-    expr.make_typecast(t);
+    expr = typecast_exprt(expr, t);
     add_local_types(t);
 
     const irep_idt &typedef_str=expr.type().get(ID_C_typedef);
@@ -1944,10 +1944,10 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
     else if(expr.type().id()==ID_bool ||
             expr.type().id()==ID_c_bool)
     {
-      expr=from_integer(
-        expr.is_true()?1:0,
-        signedbv_typet(config.ansi_c.int_width));
-      expr.make_typecast(bool_typet());
+      expr = typecast_exprt(
+        from_integer(
+          expr.is_true() ? 1 : 0, signedbv_typet(config.ansi_c.int_width)),
+        bool_typet());
     }
 
     const irept &c_sizeof_type=expr.find(ID_C_c_sizeof_type);

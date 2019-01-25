@@ -641,8 +641,9 @@ exprt string_abstractiont::build(
   if(what==whatt::LENGTH || what==whatt::SIZE)
   {
     // adjust for offset
-    result=minus_exprt(result, pointer_offset(pointer));
-    result.op0().make_typecast(result.op1().type());
+    exprt offset = pointer_offset(pointer);
+    result = minus_exprt(
+      typecast_exprt::conditional_cast(result, offset.type()), offset);
   }
 
   return result;

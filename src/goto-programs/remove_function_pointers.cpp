@@ -217,7 +217,8 @@ void remove_function_pointerst::fix_argument_types(
       if(!type_eq(call_arguments[i].type(),
                   function_parameters[i].type(), ns))
       {
-        call_arguments[i].make_typecast(function_parameters[i].type());
+        call_arguments[i] =
+          typecast_exprt(call_arguments[i], function_parameters[i].type());
       }
     }
   }
