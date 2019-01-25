@@ -23,7 +23,7 @@ Author: Matt Lewis
 exprt polynomialt::to_expr()
 {
   exprt ret=nil_exprt();
-  typet itype=nil_typet();
+  optionalt<typet> itype;
 
   // Figure out the appropriate type to do all the intermediate calculations
   // in.
@@ -35,13 +35,13 @@ exprt polynomialt::to_expr()
         t_it!=m_it->terms.end();
         ++t_it)
     {
-      if(itype==nil_typet())
+      if(itype.has_value())
       {
         itype=t_it->var.type();
       }
       else
       {
-        itype=join_types(itype, t_it->var.type());
+        itype = join_types(*itype, t_it->var.type());
       }
     }
   }
@@ -59,7 +59,7 @@ exprt polynomialt::to_expr()
       coeff=-coeff;
     }
 
-    exprt mon_expr=from_integer(coeff, itype);
+    exprt mon_expr = from_integer(coeff, *itype);
 
     for(std::vector<monomialt::termt>::iterator t_it=m_it->terms.begin();
         t_it!=m_it->terms.end();
@@ -67,7 +67,7 @@ exprt polynomialt::to_expr()
     {
       for(unsigned int i=0; i < t_it->exp; i++)
       {
-        mon_expr=mult_exprt(mon_expr, typecast_exprt(t_it->var, itype));
+        mon_expr = mult_exprt(mon_expr, typecast_exprt(t_it->var, *itype));
       }
     }
 
@@ -75,7 +75,7 @@ exprt polynomialt::to_expr()
     {
       if(neg)
       {
-        ret=unary_minus_exprt(mon_expr, itype);
+        ret = unary_minus_exprt(mon_expr, *itype);
       }
       else
       {
