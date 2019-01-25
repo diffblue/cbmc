@@ -154,8 +154,8 @@ class optionst;
 // clang-format on
 
 class goto_analyzer_parse_optionst:
-  public parse_options_baset,
-  public messaget
+  public messaget,
+  public parse_options_baset
 {
 public:
   virtual int doit() override;

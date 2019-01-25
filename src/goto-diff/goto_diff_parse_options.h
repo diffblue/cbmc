@@ -42,8 +42,8 @@ class optionst;
 // clang-format on
 
 class goto_diff_parse_optionst:
-  public parse_options_baset,
-  public goto_diff_languagest
+  public goto_diff_languagest,
+  public parse_options_baset
 {
 public:
   virtual int doit();

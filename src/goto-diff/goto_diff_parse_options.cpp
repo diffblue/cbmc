@@ -61,8 +61,8 @@ Author: Peter Schrammel
 #include "change_impact.h"
 
 goto_diff_parse_optionst::goto_diff_parse_optionst(int argc, const char **argv)
-  : parse_options_baset(GOTO_DIFF_OPTIONS, argc, argv),
-    goto_diff_languagest(cmdline, ui_message_handler),
+  : goto_diff_languagest(cmdline, ui_message_handler),
+    parse_options_baset(GOTO_DIFF_OPTIONS, argc, argv, *this),
     ui_message_handler(cmdline, std::string("GOTO-DIFF ") + CBMC_VERSION),
     languages2(cmdline, ui_message_handler)
 {
@@ -72,8 +72,8 @@ goto_diff_parse_optionst::goto_diff_parse_optionst(int argc, const char **argv)
   int argc,
   const char **argv,
   const std::string &extra_options)
-  : parse_options_baset(GOTO_DIFF_OPTIONS + extra_options, argc, argv),
-    goto_diff_languagest(cmdline, ui_message_handler),
+  : goto_diff_languagest(cmdline, ui_message_handler),
+    parse_options_baset(GOTO_DIFF_OPTIONS + extra_options, argc, argv, *this),
     ui_message_handler(cmdline, std::string("GOTO-DIFF ") + CBMC_VERSION),
     languages2(cmdline, ui_message_handler)
 {

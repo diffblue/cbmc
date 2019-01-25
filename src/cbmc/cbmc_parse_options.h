@@ -84,9 +84,9 @@ class optionst;
 // clang-format on
 
 class cbmc_parse_optionst:
+  public messaget,
   public parse_options_baset,
-  public xml_interfacet,
-  public messaget
+  public xml_interfacet
 {
 public:
   virtual int doit() override;

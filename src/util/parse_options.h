@@ -14,11 +14,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "cmdline.h"
 
+// Forwards declare messaget so we can use references to it
+class messaget;
+
 class parse_options_baset
 {
 public:
   parse_options_baset(
-    const std::string &optstring, int argc, const char **argv);
+    const std::string &optstring, int argc, const char **argv, messaget &l);
 
   cmdlinet cmdline;
 
@@ -29,6 +32,9 @@ public:
 
   virtual int main();
   virtual ~parse_options_baset() { }
+
+protected:
+  messaget &log;
 
 private:
   void unknown_option_msg();

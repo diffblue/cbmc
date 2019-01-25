@@ -58,8 +58,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-analyzer/unreachable_instructions.h>
 
 janalyzer_parse_optionst::janalyzer_parse_optionst(int argc, const char **argv)
-  : parse_options_baset(JANALYZER_OPTIONS, argc, argv),
-    messaget(ui_message_handler),
+  : messaget(ui_message_handler),
+    parse_options_baset(JANALYZER_OPTIONS, argc, argv, *this),
     ui_message_handler(cmdline, std::string("JANALYZER ") + CBMC_VERSION)
 {
 }
