@@ -260,26 +260,26 @@ void goto_convertt::do_scanf(
 
       for(const auto &t : token_list)
       {
-        typet type=get_type(t);
+        const auto type = get_type(t);
 
-        if(type.is_not_nil())
+        if(type.has_value())
         {
           if(argument_number<arguments.size())
           {
             const typecast_exprt ptr(
-              arguments[argument_number], pointer_type(type));
+              arguments[argument_number], pointer_type(*type));
             argument_number++;
 
-            if(type.id()==ID_array)
+            if(type->id() == ID_array)
             {
               #if 0
               // A string. We first need a nondeterministic size.
               exprt size=side_effect_expr_nondett(size_type());
-              to_array_type(type).size()=size;
+              to_array_type(*type).size()=size;
 
               const symbolt &tmp_symbol=
                 new_tmp_symbol(
-                  type, "scanf_string", dest, function.source_location());
+                  *type, "scanf_string", dest, function.source_location());
 
               const address_of_exprt rhs(
                 index_exprt(
@@ -298,9 +298,9 @@ void goto_convertt::do_scanf(
               copy(array_copy_statement, OTHER, dest);
               #else
               const index_exprt new_lhs(
-                dereference_exprt(ptr, type), from_integer(0, index_type()));
+                dereference_exprt(ptr, *type), from_integer(0, index_type()));
               const side_effect_expr_nondett rhs(
-                type.subtype(), function.source_location());
+                type->subtype(), function.source_location());
               code_assignt assign(new_lhs, rhs);
               assign.add_source_location()=function.source_location();
               copy(assign, ASSIGN, dest);
@@ -309,9 +309,9 @@ void goto_convertt::do_scanf(
             else
             {
               // make it nondet for now
-              const dereference_exprt new_lhs(ptr, type);
+              const dereference_exprt new_lhs(ptr, *type);
               const side_effect_expr_nondett rhs(
-                type, function.source_location());
+                *type, function.source_location());
               code_assignt assign(new_lhs, rhs);
               assign.add_source_location()=function.source_location();
               copy(assign, ASSIGN, dest);
