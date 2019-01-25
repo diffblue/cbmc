@@ -620,14 +620,13 @@ goto_programt::const_targett goto_program2codet::convert_goto_while(
   if(w.body().has_operands() &&
      to_code(w.body().operands().back()).get_statement()==ID_assign)
   {
-    code_fort f(nil_exprt(), w.cond(), w.body().operands().back(), codet());
-
+    exprt increment = w.body().operands().back();
     w.body().operands().pop_back();
-    f.iter().id(ID_side_effect);
+    increment.id(ID_side_effect);
+
+    code_fort f(nil_exprt(), w.cond(), increment, w.body());
 
     copy_source_location(target, f);
-
-    f.body().swap(w.body());
 
     f.swap(w);
   }
@@ -1523,8 +1522,7 @@ void goto_program2codet::cleanup_code(
 
     if(labels_in_use.find(label)==labels_in_use.end())
     {
-      codet tmp;
-      tmp.swap(cl.code());
+      codet tmp = cl.code();
       code.swap(tmp);
     }
   }
@@ -1624,8 +1622,7 @@ void goto_program2codet::cleanup_code_block(
           parent_stmt!=ID_nil &&
           to_code(code.op0()).get_statement()!=ID_decl)
   {
-    codet tmp;
-    tmp.swap(code.op0());
+    codet tmp = to_code(code.op0());
     code.swap(tmp);
   }
 }
@@ -1717,8 +1714,7 @@ void goto_program2codet::cleanup_code_ifthenelse(
     cond.is_true() &&
     (i_t_e.else_case().is_nil() || !has_labels(i_t_e.else_case())))
   {
-    codet tmp;
-    tmp.swap(i_t_e.then_case());
+    codet tmp = i_t_e.then_case();
     code.swap(tmp);
   }
   else if(cond.is_false() && !has_labels(i_t_e.then_case()))
@@ -1727,8 +1723,7 @@ void goto_program2codet::cleanup_code_ifthenelse(
       code=code_skipt();
     else
     {
-      codet tmp;
-      tmp.swap(i_t_e.else_case());
+      codet tmp = i_t_e.else_case();
       code.swap(tmp);
     }
   }

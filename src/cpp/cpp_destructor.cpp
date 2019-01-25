@@ -20,9 +20,6 @@ optionalt<codet> cpp_typecheckt::cpp_destructor(
   const source_locationt &source_location,
   const exprt &object)
 {
-  codet new_code;
-  new_code.add_source_location()=source_location;
-
   elaborate_class_template(object.type());
 
   typet tmp_type(follow(object.type()));
@@ -53,9 +50,8 @@ optionalt<codet> cpp_typecheckt::cpp_destructor(
       throw 0;
     }
 
-    new_code.type().id(ID_code);
+    code_blockt new_code;
     new_code.add_source_location()=source_location;
-    new_code.set_statement(ID_block);
 
     // for each element of the array, call the destructor
     for(mp_integer i=0; i < s; ++i)
@@ -70,6 +66,8 @@ optionalt<codet> cpp_typecheckt::cpp_destructor(
       if(i_code.has_value())
         new_code.add_to_operands(std::move(i_code.value()));
     }
+
+    return std::move(new_code);
   }
   else
   {
@@ -115,9 +113,9 @@ optionalt<codet> cpp_typecheckt::cpp_destructor(
     typecheck_side_effect_function_call(function_call);
     already_typechecked(function_call);
 
-    new_code = code_expressiont(function_call);
+    code_expressiont new_code(function_call);
     new_code.add_source_location() = source_location;
-  }
 
-  return new_code;
+    return std::move(new_code);
+  }
 }

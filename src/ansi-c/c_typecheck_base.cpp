@@ -648,7 +648,7 @@ void c_typecheck_baset::typecheck_declaration(
     // mark as 'already typechecked'
     make_already_typechecked(declaration.type());
 
-    codet contract;
+    irept contract;
 
     {
       exprt spec_requires=
@@ -738,7 +738,7 @@ void c_typecheck_baset::typecheck_declaration(
       // available
       symbolt &new_symbol=*symbol_table.get_writeable(identifier);
 
-      typecheck_spec_expr(contract, ID_C_spec_requires);
+      typecheck_spec_expr(static_cast<codet &>(contract), ID_C_spec_requires);
 
       typet ret_type=empty_typet();
       if(new_symbol.type.id()==ID_code)
@@ -746,7 +746,7 @@ void c_typecheck_baset::typecheck_declaration(
       assert(parameter_map.empty());
       if(ret_type.id()!=ID_empty)
         parameter_map[CPROVER_PREFIX "return_value"] = ret_type;
-      typecheck_spec_expr(contract, ID_C_spec_ensures);
+      typecheck_spec_expr(static_cast<codet &>(contract), ID_C_spec_ensures);
       parameter_map.clear();
 
       if(contract.find(ID_C_spec_requires).is_not_nil())

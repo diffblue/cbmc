@@ -563,7 +563,10 @@ void goto_convertt::convert_block(
     unwind_destructor_stack(end_location, old_stack_size, dest, mode);
 
   // remove those destructors
-  targets.destructor_stack.resize(old_stack_size);
+  PRECONDITION(old_stack_size <= targets.destructor_stack.size());
+  targets.destructor_stack.erase(
+    targets.destructor_stack.begin() + old_stack_size,
+    targets.destructor_stack.end());
 }
 
 void goto_convertt::convert_expression(

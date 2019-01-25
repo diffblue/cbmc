@@ -453,8 +453,6 @@ void goto_convertt::remove_malloc(
   const irep_idt &mode,
   bool result_is_used)
 {
-  codet call;
-
   if(result_is_used)
   {
     const symbolt &new_symbol = get_fresh_aux_symbol(
@@ -469,17 +467,17 @@ void goto_convertt::remove_malloc(
     decl.add_source_location()=new_symbol.location;
     convert_decl(decl, dest, mode);
 
-    call=code_assignt(new_symbol.symbol_expr(), expr);
+    code_assignt call(new_symbol.symbol_expr(), expr);
     call.add_source_location()=expr.source_location();
 
     static_cast<exprt &>(expr)=new_symbol.symbol_expr();
+
+    convert(call, dest, mode);
   }
   else
   {
-    call = code_expressiont(std::move(expr));
+    convert(code_expressiont(std::move(expr)), dest, mode);
   }
-
-  convert(call, dest, mode);
 }
 
 void goto_convertt::remove_temporary_object(
