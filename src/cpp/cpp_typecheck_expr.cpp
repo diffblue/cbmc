@@ -65,14 +65,6 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
     typecheck_expr_explicit_typecast(expr);
   else if(expr.id()=="explicit-constructor-call")
     typecheck_expr_explicit_constructor_call(expr);
-  else if(expr.is_nil())
-  {
-#ifdef DEBUG
-    std::cerr << "E: " << expr.pretty() << '\n';
-    std::cerr << "cpp_typecheckt::typecheck_expr_main got nil\n";
-#endif
-    UNREACHABLE;
-  }
   else if(expr.id()==ID_code)
   {
 #ifdef DEBUG
