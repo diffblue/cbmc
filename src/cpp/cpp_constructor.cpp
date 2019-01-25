@@ -144,9 +144,7 @@ optionalt<codet> cpp_typecheckt::cpp_constructor(
       side_effect_expr_assignt assign(
         object_tc, operands_tc.front(), typet(), source_location);
       typecheck_side_effect_assignment(assign);
-      code_expressiont new_code;
-      new_code.expression()=assign;
-      return std::move(new_code);
+      return code_expressiont(std::move(assign));
     }
     else
     {
