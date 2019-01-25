@@ -244,8 +244,7 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
       }
     }
 
-    code_expressiont code_expression;
-    code_expression.expression()=function_call;
+    code_expressiont code_expression(function_call);
 
     code.swap(code_expression);
   }
