@@ -92,7 +92,7 @@ static symbolt create_method_symbol(const std::string &method_name)
 {
   symbolt new_symbol;
   new_symbol.name = method_name;
-  new_symbol.type = java_method_typet{{}, nil_typet{}};
+  new_symbol.type = java_method_typet{{}, typet{}};
   return new_symbol;
 }
 
