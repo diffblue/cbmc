@@ -118,10 +118,17 @@ exprt::operandst smt2_parsert::operands()
   return result;
 }
 
-irep_idt smt2_parsert::get_fresh_id(const irep_idt &id)
+irep_idt smt2_parsert::add_fresh_id(const irep_idt &id, const exprt &expr)
 {
-  if(id_map[id].type.is_nil())
+  if(id_map
+       .emplace(
+         std::piecewise_construct,
+         std::forward_as_tuple(id),
+         std::forward_as_tuple(expr))
+       .second)
+  {
     return id; // id not yet used
+  }
 
   auto &count=renaming_counters[id];
   irep_idt new_id;
@@ -129,11 +136,15 @@ irep_idt smt2_parsert::get_fresh_id(const irep_idt &id)
   {
     new_id=id2string(id)+'#'+std::to_string(count);
     count++;
-  }
-  while(id_map.find(new_id)!=id_map.end());
+  } while(!id_map
+             .emplace(
+               std::piecewise_construct,
+               std::forward_as_tuple(new_id),
+               std::forward_as_tuple(expr))
+             .second);
 
   // record renaming
-  renaming_map[id]=new_id;
+  renaming_map[id] = new_id;
 
   return new_id;
 }
@@ -184,10 +195,7 @@ exprt smt2_parsert::let_expression()
   for(auto &b : bindings)
   {
     // get a fresh id for it
-    b.first=get_fresh_id(b.first);
-    auto &entry=id_map[b.first];
-    entry.type=b.second.type();
-    entry.definition=b.second;
+    b.first = add_fresh_id(b.first, b.second);
   }
 
   exprt expr=expression();
@@ -246,9 +254,9 @@ exprt smt2_parsert::quantifier_expression(irep_idt id)
   // go forwards, add to id_map
   for(const auto &b : bindings)
   {
-    auto &entry=id_map[b.get_identifier()];
-    entry.type=b.type();
-    entry.definition=nil_exprt();
+    const irep_idt id =
+      add_fresh_id(b.get_identifier(), exprt(ID_nil, b.type()));
+    CHECK_RETURN(id == b.get_identifier());
   }
 
   exprt expr=expression();
@@ -1131,12 +1139,9 @@ smt2_parsert::function_signature_definition()
       throw error("expected symbol in parameter");
 
     irep_idt id = smt2_tokenizer.get_buffer();
-    parameters.push_back(id);
     domain.push_back(sort());
 
-    auto &entry=id_map[id];
-    entry.type = domain.back();
-    entry.definition=nil_exprt();
+    parameters.push_back(add_fresh_id(id, exprt(ID_nil, domain.back())));
 
     if(next_token() != smt2_tokenizert::CLOSE)
       throw error("expected ')' at end of parameter");
@@ -1196,12 +1201,8 @@ void smt2_parsert::command(const std::string &c)
     irep_idt id = smt2_tokenizer.get_buffer();
     auto type = sort();
 
-    if(id_map.find(id)!=id_map.end())
+    if(add_fresh_id(id, exprt(ID_nil, type)) != id)
       throw error() << "identifier `" << id << "' defined twice";
-
-    auto &entry = id_map[id];
-    entry.type = type;
-    entry.definition = nil_exprt();
   }
   else if(c=="declare-fun")
   {
@@ -1211,12 +1212,8 @@ void smt2_parsert::command(const std::string &c)
     irep_idt id = smt2_tokenizer.get_buffer();
     auto type = function_signature_declaration();
 
-    if(id_map.find(id)!=id_map.end())
+    if(add_fresh_id(id, exprt(ID_nil, type)) != id)
       throw error() << "identifier `" << id << "' defined twice";
-
-    auto &entry = id_map[id];
-    entry.type = type;
-    entry.definition = nil_exprt();
   }
   else if(c == "define-const")
   {
@@ -1224,9 +1221,6 @@ void smt2_parsert::command(const std::string &c)
       throw error("expected a symbol after define-const");
 
     const irep_idt id = smt2_tokenizer.get_buffer();
-
-    if(id_map.find(id) != id_map.end())
-      throw error() << "identifier `" << id << "' defined twice";
 
     const auto type = sort();
     const auto value = expression();
@@ -1240,22 +1234,24 @@ void smt2_parsert::command(const std::string &c)
     }
 
     // create the entry
-    auto &entry = id_map[id];
-    entry.type = type;
-    entry.definition = value;
+    if(add_fresh_id(id, value) != id)
+      throw error() << "identifier `" << id << "' defined twice";
   }
   else if(c=="define-fun")
   {
     if(next_token() != smt2_tokenizert::SYMBOL)
       throw error("expected a symbol after define-fun");
 
-    const irep_idt id = smt2_tokenizer.get_buffer();
+    // save the renaming map
+    renaming_mapt old_renaming_map = renaming_map;
 
-    if(id_map.find(id)!=id_map.end())
-      throw error() << "identifier `" << id << "' defined twice";
+    const irep_idt id = smt2_tokenizer.get_buffer();
 
     const auto signature = function_signature_definition();
     const auto body = expression();
+
+    // restore renamings
+    std::swap(renaming_map, old_renaming_map);
 
     // check type of body
     if(signature.type.id() == ID_mathematical_function)
@@ -1276,10 +1272,11 @@ void smt2_parsert::command(const std::string &c)
     }
 
     // create the entry
-    auto &entry = id_map[id];
-    entry.type = signature.type;
-    entry.parameters = signature.parameters;
-    entry.definition = body;
+    if(add_fresh_id(id, body) != id)
+      throw error() << "identifier `" << id << "' defined twice";
+
+    id_map.at(id).type = signature.type;
+    id_map.at(id).parameters = signature.parameters;
   }
   else if(c=="exit")
   {

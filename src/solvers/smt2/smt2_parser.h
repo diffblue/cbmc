@@ -33,7 +33,7 @@ public:
 
   struct idt
   {
-    idt():type(nil_typet())
+    explicit idt(const exprt &expr) : type(expr.type()), definition(expr)
     {
     }
 
@@ -84,7 +84,7 @@ protected:
   renaming_mapt renaming_map;
   using renaming_counterst=std::map<irep_idt, unsigned>;
   renaming_counterst renaming_counters;
-  irep_idt get_fresh_id(const irep_idt &);
+  irep_idt add_fresh_id(const irep_idt &, const exprt &);
   irep_idt rename_id(const irep_idt &) const;
 
   struct signature_with_parameter_idst
