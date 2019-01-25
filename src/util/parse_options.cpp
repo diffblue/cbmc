@@ -26,7 +26,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "signal_catcher.h"
 
 parse_options_baset::parse_options_baset(
-  const std::string &_optstring, int argc, const char **argv, messaget &l)
+  const std::string &_optstring,
+  int argc,
+  const char **argv,
+  messaget &l)
   : log(l)
 {
   std::string optstring=std::string("?h(help)")+_optstring;

@@ -111,21 +111,20 @@ Author: Daniel Kroening, kroening@kroening.com
 
 // clang-format on
 
-class goto_instrument_parse_optionst:
-  public messaget,
-  public parse_options_baset
+class goto_instrument_parse_optionst : public messaget,
+                                       public parse_options_baset
 {
 public:
   virtual int doit();
   virtual void help();
 
-  goto_instrument_parse_optionst(int argc, const char **argv):
-    messaget(ui_message_handler),
-    parse_options_baset(GOTO_INSTRUMENT_OPTIONS, argc, argv, *this),
-    ui_message_handler(cmdline, "goto-instrument"),
-    function_pointer_removal_done(false),
-    partial_inlining_done(false),
-    remove_returns_done(false)
+  goto_instrument_parse_optionst(int argc, const char **argv)
+    : messaget(ui_message_handler),
+      parse_options_baset(GOTO_INSTRUMENT_OPTIONS, argc, argv, *this),
+      ui_message_handler(cmdline, "goto-instrument"),
+      function_pointer_removal_done(false),
+      partial_inlining_done(false),
+      remove_returns_done(false)
   {
   }
 
