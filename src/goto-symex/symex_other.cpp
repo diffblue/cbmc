@@ -128,7 +128,7 @@ void goto_symext::symex_other(
           statement==ID_array_replace)
   {
     // array_copy and array_replace take two pointers (to arrays); we need to:
-    // 1. dereference the pointers (via clean_expr)
+    // 1. remove any dereference expressions (via clean_expr)
     // 2. find the actual array objects/candidates for objects (via
     // process_array_expr)
     // 3. build an assignment where the type on lhs and rhs is:
@@ -139,14 +139,14 @@ void goto_symext::symex_other(
       "expected array_copy/array_replace statement to have two operands");
 
     // we need to add dereferencing for both operands
-    dereference_exprt dest_array(code.op0());
-    clean_expr(dest_array, state, true);
-    dereference_exprt src_array(code.op1());
+    exprt dest_array(code.op0());
+    clean_expr(dest_array, state, false);
+    exprt src_array(code.op1());
     clean_expr(src_array, state, false);
 
     // obtain the actual arrays
-    process_array_expr(dest_array);
-    process_array_expr(src_array);
+    process_array_expr(state, dest_array, true);
+    process_array_expr(state, src_array, false);
 
     // check for size (or type) mismatch and adjust
     if(!base_type_eq(dest_array.type(), src_array.type(), ns))
@@ -181,7 +181,7 @@ void goto_symext::symex_other(
   {
     // array_set takes a pointer (to an array) and a value that each element
     // should be set to; we need to:
-    // 1. dereference the pointer (via clean_expr)
+    // 1. remove any dereference expressions (via clean_expr)
     // 2. find the actual array object/candidates for objects (via
     // process_array_expr)
     // 3. use the type of the resulting array to construct an array_of
@@ -191,11 +191,11 @@ void goto_symext::symex_other(
       "expected array_set statement to have two operands");
 
     // we need to add dereferencing for the first operand
-    exprt array_expr = dereference_exprt(code.op0());
-    clean_expr(array_expr, state, true);
+    exprt array_expr(code.op0());
+    clean_expr(array_expr, state, false);
 
     // obtain the actual array(s)
-    process_array_expr(array_expr);
+    process_array_expr(state, array_expr, true);
 
     // prepare to build the array_of
     exprt value = code.op1();
@@ -227,7 +227,7 @@ void goto_symext::symex_other(
   {
     // array_equal takes two pointers (to arrays) and the symbol that the result
     // should get assigned to; we need to:
-    // 1. dereference the pointers (via clean_expr)
+    // 1. remove any dereference expressions (via clean_expr)
     // 2. find the actual array objects/candidates for objects (via
     // process_array_expr)
     // 3. build an assignment where the lhs is the previous third argument, and
@@ -238,14 +238,14 @@ void goto_symext::symex_other(
       "expected array_equal statement to have three operands");
 
     // we need to add dereferencing for the first two
-    dereference_exprt array1(code.op0());
+    exprt array1(code.op0());
     clean_expr(array1, state, false);
-    dereference_exprt array2(code.op1());
+    exprt array2(code.op1());
     clean_expr(array2, state, false);
 
     // obtain the actual arrays
-    process_array_expr(array1);
-    process_array_expr(array2);
+    process_array_expr(state, array1, false);
+    process_array_expr(state, array2, false);
 
     code_assignt assignment(code.op2(), equal_exprt(array1, array2));
 
@@ -271,10 +271,10 @@ void goto_symext::symex_other(
       code.operands().size() == 1,
       "expected havoc_object statement to have one operand");
 
-    // we need to add dereferencing for the first operand
-    dereference_exprt object(code.op0(), empty_typet());
-    clean_expr(object, state, true);
+    exprt object(code.op0());
+    clean_expr(object, state, false);
 
+    process_array_expr(state, object, true);
     havoc_rec(state, guardt(true_exprt()), object);
   }
   else

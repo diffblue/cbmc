@@ -16,20 +16,26 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/byte_operators.h>
 #include <util/c_types.h>
 #include <util/pointer_offset_size.h>
+#include <util/simplify_expr.h>
+
+#include "symex_dereference_state.h"
+
+#include <pointer-analysis/value_set_dereference.h>
 
 /// Given an expression, find the root object and the offset into it.
 ///
 /// The extra complication to be considered here is that the expression may
 /// have any number of ternary expressions mixed with type casts.
-void goto_symext::process_array_expr(exprt &expr)
+static void
+process_array_expr(exprt &expr, bool do_simplify, const namespacet &ns)
 {
   // This may change the type of the expression!
 
   if(expr.id()==ID_if)
   {
     if_exprt &if_expr=to_if_expr(expr);
-    process_array_expr(if_expr.true_case());
-    process_array_expr(if_expr.false_case());
+    process_array_expr(if_expr.true_case(), do_simplify, ns);
+    process_array_expr(if_expr.false_case(), do_simplify, ns);
 
     if(!base_type_eq(if_expr.true_case(), if_expr.false_case(), ns))
     {
@@ -49,7 +55,7 @@ void goto_symext::process_array_expr(exprt &expr)
     // strip
     exprt tmp = to_address_of_expr(expr).object();
     expr.swap(tmp);
-    process_array_expr(expr);
+    process_array_expr(expr, do_simplify, ns);
   }
   else if(expr.id()==ID_symbol &&
           expr.get_bool(ID_C_SSA_symbol) &&
@@ -60,13 +66,14 @@ void goto_symext::process_array_expr(exprt &expr)
     exprt tmp=index_expr.array();
     expr.swap(tmp);
 
-    process_array_expr(expr);
+    process_array_expr(expr, do_simplify, ns);
   }
   else if(expr.id() != ID_symbol)
   {
     object_descriptor_exprt ode;
     ode.build(expr, ns);
-    do_simplify(ode.offset());
+    if(do_simplify)
+      simplify(ode.offset(), ns);
 
     expr = ode.root_object();
 
@@ -75,7 +82,8 @@ void goto_symext::process_array_expr(exprt &expr)
       if(expr.type().id() != ID_array)
       {
         exprt array_size = size_of_expr(expr.type(), ns);
-        do_simplify(array_size);
+        if(do_simplify)
+          simplify(array_size, ns);
         expr =
           byte_extract_exprt(
             byte_extract_id(),
@@ -99,7 +107,8 @@ void goto_symext::process_array_expr(exprt &expr)
         subtype_size.make_typecast(array_size_type);
       new_offset = div_exprt(new_offset, subtype_size);
       minus_exprt new_size(prev_array_type.size(), new_offset);
-      do_simplify(new_size);
+      if(do_simplify)
+        simplify(new_size, ns);
 
       array_typet new_array_type(subtype, new_size);
 
@@ -111,6 +120,22 @@ void goto_symext::process_array_expr(exprt &expr)
           new_array_type);
     }
   }
+}
+
+void goto_symext::process_array_expr(statet &state, exprt &expr, bool is_lhs)
+{
+  symex_dereference_statet symex_dereference_state(*this, state);
+
+  value_set_dereferencet dereference(
+    ns, state.symbol_table, symex_dereference_state, language_mode, false);
+
+  expr = dereference.dereference(
+    expr,
+    guardt{true_exprt()},
+    is_lhs ? value_set_dereferencet::modet::WRITE
+           : value_set_dereferencet::modet::READ);
+
+  ::process_array_expr(expr, symex_config.simplify_opt, ns);
 }
 
 /// Rewrite index/member expressions in byte_extract to offset
