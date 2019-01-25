@@ -19,7 +19,10 @@ class parse_options_baset
 {
 public:
   parse_options_baset(
-    const std::string &optstring, int argc, const char **argv, message_handlert &mh);
+    const std::string &optstring,
+    int argc,
+    const char **argv,
+    message_handlert &mh);
 
   cmdlinet cmdline;
 

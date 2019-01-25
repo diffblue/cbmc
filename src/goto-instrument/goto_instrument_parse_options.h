@@ -119,13 +119,17 @@ public:
   virtual int doit();
   virtual void help();
 
-  goto_instrument_parse_optionst(int argc, const char **argv):
-    parse_options_baset(GOTO_INSTRUMENT_OPTIONS, argc, argv, ui_message_handler),
-    messaget(ui_message_handler),
-    ui_message_handler(cmdline, "goto-instrument"),
-    function_pointer_removal_done(false),
-    partial_inlining_done(false),
-    remove_returns_done(false)
+  goto_instrument_parse_optionst(int argc, const char **argv)
+    : parse_options_baset(
+        GOTO_INSTRUMENT_OPTIONS,
+        argc,
+        argv,
+        ui_message_handler),
+      messaget(ui_message_handler),
+      ui_message_handler(cmdline, "goto-instrument"),
+      function_pointer_removal_done(false),
+      partial_inlining_done(false),
+      remove_returns_done(false)
   {
   }
 

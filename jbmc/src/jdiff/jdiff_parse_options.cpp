@@ -74,7 +74,11 @@ jdiff_parse_optionst::jdiff_parse_optionst(int argc, const char **argv)
   int argc,
   const char **argv,
   const std::string &extra_options)
-  : parse_options_baset(JDIFF_OPTIONS + extra_options, argc, argv, ui_message_handler),
+  : parse_options_baset(
+      JDIFF_OPTIONS + extra_options,
+      argc,
+      argv,
+      ui_message_handler),
     jdiff_languagest(cmdline, ui_message_handler, &options),
     ui_message_handler(cmdline, std::string("JDIFF ") + CBMC_VERSION),
     languages2(cmdline, ui_message_handler, &options)

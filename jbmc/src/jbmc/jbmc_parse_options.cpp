@@ -80,7 +80,11 @@ jbmc_parse_optionst::jbmc_parse_optionst(int argc, const char **argv)
   int argc,
   const char **argv,
   const std::string &extra_options)
-  : parse_options_baset(JBMC_OPTIONS + extra_options, argc, argv, ui_message_handler),
+  : parse_options_baset(
+      JBMC_OPTIONS + extra_options,
+      argc,
+      argv,
+      ui_message_handler),
     messaget(ui_message_handler),
     ui_message_handler(cmdline, std::string("JBMC ") + CBMC_VERSION)
 {
