@@ -16,7 +16,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/config.h>
-#include <util/fresh_symbol.h>
 #include <util/mathematical_types.h>
 #include <util/pointer_offset_size.h>
 #include <util/simplify_expr.h>
@@ -609,25 +608,43 @@ void c_typecheck_baset::typecheck_array_type(array_typet &type)
         throw 0;
       }
 
-      symbolt &new_symbol = get_fresh_aux_symbol(
-        size_type(),
-        id2string(current_symbol.name) + "$array_size",
-        id2string(current_symbol.base_name) + "$array_size",
-        size_source_location,
-        mode,
-        symbol_table);
+      // Need to pull out! We insert new symbol.
+      unsigned count = 0;
+      irep_idt temp_identifier;
+      std::string suffix;
+
+      do
+      {
+        suffix = "$array_size" + std::to_string(count);
+        temp_identifier = id2string(current_symbol.name) + suffix;
+        count++;
+      } while(symbol_table.symbols.find(temp_identifier) !=
+              symbol_table.symbols.end());
+
+      // add the symbol to symbol table
+      auxiliary_symbolt new_symbol;
+      new_symbol.name = temp_identifier;
+      new_symbol.pretty_name = id2string(current_symbol.pretty_name) + suffix;
+      new_symbol.base_name = id2string(current_symbol.base_name) + suffix;
+      new_symbol.type = size.type();
       new_symbol.type.set(ID_C_constant, true);
-      new_symbol.value = typecast_exprt::conditional_cast(size, size_type());
+      new_symbol.value = size;
+      new_symbol.location = size_source_location;
+      new_symbol.mode = mode;
+
+      symbol_table.add(new_symbol);
 
       // produce the code that declares and initializes the symbol
-      symbol_exprt symbol_expr = new_symbol.symbol_expr();
+      symbol_exprt symbol_expr;
+      symbol_expr.set_identifier(temp_identifier);
+      symbol_expr.type() = new_symbol.type;
 
       code_declt declaration(symbol_expr);
       declaration.add_source_location() = size_source_location;
 
       code_assignt assignment;
       assignment.lhs()=symbol_expr;
-      assignment.rhs() = new_symbol.value;
+      assignment.rhs() = size;
       assignment.add_source_location() = size_source_location;
 
       // store the code
