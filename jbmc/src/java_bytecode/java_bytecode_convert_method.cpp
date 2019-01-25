@@ -1930,9 +1930,6 @@ code_switcht java_bytecode_convert_methodt::convert_switch(
   const source_locationt &location)
 {
   // we turn into switch-case
-  code_switcht code_switch;
-  code_switch.add_source_location() = location;
-  code_switch.value() = op[0];
   code_blockt code_block;
   code_block.add_source_location() = location;
 
@@ -1942,9 +1939,6 @@ code_switcht java_bytecode_convert_methodt::convert_switch(
   {
     if(is_label)
     {
-      code_switch_caset code_case;
-      code_case.add_source_location() = location;
-
       const mp_integer number = numeric_cast_v<mp_integer>(*a_it);
       // The switch case does not contain any code, it just branches via a GOTO
       // to the jump target of the tableswitch/lookupswitch case at
@@ -1952,26 +1946,33 @@ code_switcht java_bytecode_convert_methodt::convert_switch(
       // instruction and not the target instruction.
       const method_offsett label_number =
         numeric_cast_v<method_offsett>(number);
-      code_case.code() = code_gotot(label(std::to_string(label_number)));
-      code_case.code().add_source_location() = location;
+      code_gotot code(label(std::to_string(label_number)));
+      code.add_source_location() = location;
 
       if(a_it == args.begin())
+      {
+        code_switch_caset code_case(nil_exprt(), std::move(code));
+        code_case.add_source_location() = location;
         code_case.set_default();
+
+        code_block.add(std::move(code_case));
+      }
       else
       {
-        auto prev = a_it;
-        prev--;
-        code_case.case_op() = *prev;
-        if(code_case.case_op().type() != op[0].type())
-          code_case.case_op().make_typecast(op[0].type());
-        code_case.case_op().add_source_location() = location;
-      }
+        exprt case_op =
+          typecast_exprt::conditional_cast(*std::prev(a_it), op[0].type());
+        case_op.add_source_location() = location;
 
-      code_block.add(code_case);
+        code_switch_caset code_case(std::move(case_op), std::move(code));
+        code_case.add_source_location() = location;
+
+        code_block.add(std::move(code_case));
+      }
     }
   }
 
-  code_switch.body() = code_block;
+  code_switcht code_switch(op[0], std::move(code_block));
+  code_switch.add_source_location() = location;
   return code_switch;
 }
 

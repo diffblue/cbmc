@@ -904,9 +904,7 @@ goto_programt::const_targett goto_program2codet::convert_goto_switch(
     return convert_goto_if(target, upper_bound, dest);
 
   // maybe, let's try some more
-  code_switcht s;
-  s.value()=to_equal_expr(eq_cand).lhs();
-  s.body()=code_blockt();
+  code_switcht s(to_equal_expr(eq_cand).lhs(), code_blockt());
 
   copy_source_location(target, s);
 
@@ -972,7 +970,7 @@ goto_programt::const_targett goto_program2codet::convert_goto_switch(
       it!=cases.end();
       ++it)
   {
-    code_switch_caset csc;
+    code_switch_caset csc(nil_exprt{}, code_blockt{});
     // branch condition is nil_exprt for default case;
     if(it->value.is_nil())
       csc.set_default();
