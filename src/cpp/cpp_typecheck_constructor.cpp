@@ -166,7 +166,7 @@ void cpp_typecheckt::default_cpctor(
   cpp_declaratort parameter_tor;
   parameter_tor.add(ID_value).make_nil();
   parameter_tor.set(ID_name, cpp_parameter);
-  parameter_tor.type()=reference_type(nil_typet());
+  parameter_tor.type() = reference_type(uninitialized_typet{});
   parameter_tor.add_source_location()=source_location;
 
   // Parameter declaration
@@ -308,7 +308,7 @@ void cpp_typecheckt::default_assignop(
   declarator_name.get_sub().push_back(irept("="));
 
   declarator_type.id(ID_function_type);
-  declarator_type.subtype()=reference_type(nil_typet());
+  declarator_type.subtype() = reference_type(uninitialized_typet{});
   declarator_type.subtype().add(ID_C_qualifier).make_nil();
 
   exprt &args=static_cast<exprt&>(declarator.type().add(ID_parameters));
@@ -335,7 +335,7 @@ void cpp_typecheckt::default_assignop(
   args_decl_declor.name() = cpp_namet(arg_name, source_location);
   args_decl_declor.add_source_location()=source_location;
 
-  args_decl_declor.type()=pointer_type(typet(ID_nil));
+  args_decl_declor.type() = pointer_type(uninitialized_typet{});
   args_decl_declor.type().set(ID_C_reference, true);
   args_decl_declor.value().make_nil();
 }
