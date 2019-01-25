@@ -76,8 +76,7 @@ void remove_asmt::gcc_asm_function_call(
 {
   irep_idt function_identifier=function_base_name;
 
-  code_function_callt function_call;
-  function_call.lhs().make_nil();
+  code_function_callt::argumentst arguments;
 
   const typet void_pointer=
     pointer_type(void_typet());
@@ -87,7 +86,7 @@ void remove_asmt::gcc_asm_function_call(
   {
     if(it->operands().size()==2)
     {
-      function_call.arguments().push_back(
+      arguments.push_back(
         typecast_exprt(address_of_exprt(it->op1()), void_pointer));
     }
   }
@@ -97,7 +96,7 @@ void remove_asmt::gcc_asm_function_call(
   {
     if(it->operands().size()==2)
     {
-      function_call.arguments().push_back(
+      arguments.push_back(
         typecast_exprt(address_of_exprt(it->op1()), void_pointer));
     }
   }
@@ -107,7 +106,7 @@ void remove_asmt::gcc_asm_function_call(
 
   symbol_exprt fkt(function_identifier, fkt_type);
 
-  function_call.function()=fkt;
+  code_function_callt function_call(std::move(fkt), std::move(arguments));
 
   goto_programt::targett call=dest.add_instruction(FUNCTION_CALL);
   call->code=function_call;

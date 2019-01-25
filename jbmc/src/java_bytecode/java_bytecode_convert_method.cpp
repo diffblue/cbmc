@@ -2150,25 +2150,22 @@ void java_bytecode_convert_methodt::convert_invoke(
     }
   }
 
-  code_function_callt call;
   location.set_function(method_id);
 
-  call.add_source_location() = location;
-  call.arguments() = pop(parameters.size());
+  code_function_callt::argumentst arguments = pop(parameters.size());
 
   // double-check a bit
-  if(use_this)
-  {
-    const exprt &this_arg = call.arguments().front();
-    INVARIANT(
-      this_arg.type().id() == ID_pointer, "first argument must be a pointer");
-  }
+  INVARIANT(
+    !use_this || arguments.front().type().id() == ID_pointer,
+    "first argument must be a pointer");
 
   // do some type adjustment for the arguments,
   // as Java promotes arguments
   // Also cast pointers since intermediate locals
   // can be void*.
-
+  INVARIANT(
+    parameters.size() == arguments.size(),
+    "for each parameter there must be exactly one argument");
   for(std::size_t i = 0; i < parameters.size(); i++)
   {
     const typet &type = parameters[i].type();
@@ -2177,21 +2174,20 @@ void java_bytecode_convert_methodt::convert_invoke(
       type == java_byte_type() || type == java_short_type() ||
       type.id() == ID_pointer)
     {
-      assert(i < call.arguments().size());
-      if(type != call.arguments()[i].type())
-        call.arguments()[i].make_typecast(type);
+      if(type != arguments[i].type())
+        arguments[i].make_typecast(type);
     }
   }
 
   // do some type adjustment for return values
-
+  exprt lhs = nil_exprt();
   const typet &return_type = method_type.return_type();
 
   if(return_type.id() != ID_empty)
   {
     // return types are promoted in Java
-    call.lhs() = tmp_variable("return", return_type);
-    exprt promoted = java_bytecode_promotion(call.lhs());
+    lhs = tmp_variable("return", return_type);
+    exprt promoted = java_bytecode_promotion(lhs);
     results.resize(1);
     results[0] = promoted;
   }
@@ -2233,19 +2229,20 @@ void java_bytecode_convert_methodt::convert_invoke(
     symbol_table.add(symbol);
   }
 
+  exprt function;
   if(is_virtual)
   {
     // dynamic binding
-    assert(use_this);
-    assert(!call.arguments().empty());
-    call.function() = arg0;
+    PRECONDITION(use_this);
+    PRECONDITION(!arguments.empty());
+    function = arg0;
     // Populate needed methods later,
     // once we know what object types can exist.
   }
   else
   {
     // static binding
-    call.function() = symbol_exprt(invoked_method_id, method_type);
+    function = symbol_exprt(invoked_method_id, method_type);
     if(needed_lazy_methods)
     {
       needed_lazy_methods->add_needed_method(invoked_method_id);
@@ -2254,6 +2251,9 @@ void java_bytecode_convert_methodt::convert_invoke(
     }
   }
 
+  code_function_callt call(
+    std::move(lhs), std::move(function), std::move(arguments));
+  call.add_source_location() = location;
   call.function().add_source_location() = location;
 
   // Replacing call if it is a function of the Character library,
