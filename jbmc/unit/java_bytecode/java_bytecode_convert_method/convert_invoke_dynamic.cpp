@@ -240,11 +240,11 @@ SCENARIO(
 
           symbol_exprt integer_param{"primitive", java_int_type()};
           symbol_exprt ref_param{"reference",
-                                 java_type_from_string("Ljava/lang/Object;")};
+                                 *java_type_from_string("Ljava/lang/Object;")};
           // NOLINTNEXTLINE(whitespace/braces)
           symbol_exprt generic_param{
             "specalisedGeneric",
-            java_type_from_string("LDummyGeneric<Ljava/lang/Interger;>;")};
+            *java_type_from_string("LDummyGeneric<Ljava/lang/Interger;>;")};
           test_data.expected_params = {integer_param, ref_param, generic_param};
           test_data.should_return_value = false;
 
@@ -266,14 +266,14 @@ SCENARIO(
             "java::LocalLambdas.lambda$test$2:"
             "[I[Ljava/lang/Object;[LDummyGeneric;)V";
 
-          symbol_exprt integer_param{"primitive", java_type_from_string("[I")};
+          symbol_exprt integer_param{"primitive", *java_type_from_string("[I")};
           symbol_exprt ref_param{"reference",
-                                 java_type_from_string("[Ljava/lang/Object;")};
+                                 *java_type_from_string("[Ljava/lang/Object;")};
 
           // NOLINTNEXTLINE(whitespace/braces)
           symbol_exprt generic_param{
             "specalisedGeneric",
-            java_type_from_string("[LDummyGeneric<Ljava/lang/Interger;>;")};
+            *java_type_from_string("[LDummyGeneric<Ljava/lang/Interger;>;")};
           test_data.expected_params = {integer_param, ref_param, generic_param};
           test_data.should_return_value = false;
 
@@ -428,11 +428,11 @@ SCENARIO(
 
           symbol_exprt integer_param{"primitive", java_int_type()};
           symbol_exprt ref_param{"reference", // NOLINT(whitespace/braces)
-                                 java_type_from_string("Ljava/lang/Object;")};
+                                 *java_type_from_string("Ljava/lang/Object;")};
           // NOLINTNEXTLINE(whitespace/braces)
           symbol_exprt generic_param{
             "specalisedGeneric",
-            java_type_from_string("LDummyGeneric<Ljava/lang/Interger;>;")};
+            *java_type_from_string("LDummyGeneric<Ljava/lang/Interger;>;")};
           test_data.expected_params = {integer_param, ref_param, generic_param};
 
           test_data.should_return_value = false;
@@ -451,13 +451,13 @@ SCENARIO(
             "java::MemberLambdas.lambda$new$2:"
             "([I[Ljava/lang/Object;[LDummyGeneric;)V";
 
-          symbol_exprt integer_param{"primitive", java_type_from_string("[I")};
+          symbol_exprt integer_param{"primitive", *java_type_from_string("[I")};
           symbol_exprt ref_param{"reference", // NOLINT(whitespace/braces)
-                                 java_type_from_string("[Ljava/lang/Object;")};
+                                 *java_type_from_string("[Ljava/lang/Object;")};
           // NOLINTNEXTLINE(whitespace/braces)
           symbol_exprt generic_param{
             "specalisedGeneric",
-            java_type_from_string("[LDummyGeneric<Ljava/lang/Interger;>;")};
+            *java_type_from_string("[LDummyGeneric<Ljava/lang/Interger;>;")};
           test_data.expected_params = {integer_param, ref_param, generic_param};
           test_data.should_return_value = false;
 
@@ -600,11 +600,11 @@ SCENARIO(
 
           symbol_exprt integer_param{"primitive", java_int_type()};
           symbol_exprt ref_param{"reference",
-                                 java_type_from_string("Ljava/lang/Object;")};
+                                 *java_type_from_string("Ljava/lang/Object;")};
           // NOLINTNEXTLINE(whitespace/braces)
           symbol_exprt generic_param{
             "specalisedGeneric",
-            java_type_from_string("LDummyGeneric<Ljava/lang/Interger;>;")};
+            *java_type_from_string("LDummyGeneric<Ljava/lang/Interger;>;")};
           test_data.expected_params = {integer_param, ref_param, generic_param};
 
           test_data.should_return_value = false;
@@ -623,13 +623,13 @@ SCENARIO(
             "java::StaticLambdas.lambda$static$2:"
             "([I[Ljava/lang/Object;[LDummyGeneric;)V";
 
-          symbol_exprt integer_param{"primitive", java_type_from_string("[I")};
+          symbol_exprt integer_param{"primitive", *java_type_from_string("[I")};
           symbol_exprt ref_param{"reference",
-                                 java_type_from_string("[Ljava/lang/Object;")};
+                                 *java_type_from_string("[Ljava/lang/Object;")};
           // NOLINTNEXTLINE(whitespace/braces)
           symbol_exprt generic_param{
             "specalisedGeneric",
-            java_type_from_string("[LDummyGeneric<Ljava/lang/Interger;>;")};
+            *java_type_from_string("[LDummyGeneric<Ljava/lang/Interger;>;")};
           test_data.expected_params = {integer_param, ref_param, generic_param};
           test_data.should_return_value = false;
 

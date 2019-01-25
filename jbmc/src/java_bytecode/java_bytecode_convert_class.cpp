@@ -637,10 +637,8 @@ void java_bytecode_convert_classt::convert(
   typet field_type;
   if(f.signature.has_value())
   {
-    field_type=java_type_from_string_with_exception(
-      f.descriptor,
-      f.signature,
-      id2string(class_symbol.name));
+    field_type = *java_type_from_string_with_exception(
+      f.descriptor, f.signature, id2string(class_symbol.name));
 
     /// this is for a free type variable, e.g., a field of the form `T f;`
     if(is_java_generic_parameter(field_type))
@@ -670,7 +668,7 @@ void java_bytecode_convert_classt::convert(
     }
   }
   else
-    field_type=java_type_from_string(f.descriptor);
+    field_type = *java_type_from_string(f.descriptor);
 
   // is this a static field?
   if(f.is_static)

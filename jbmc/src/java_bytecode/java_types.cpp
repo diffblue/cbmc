@@ -351,9 +351,9 @@ std::vector<typet> parse_list_types(
   for(const std::string &raw_type :
       parse_raw_list_types(src, opening_bracket, closing_bracket))
   {
-    const typet new_type = java_type_from_string(raw_type, class_name_prefix);
-    INVARIANT(new_type != nil_typet(), "Failed to parse type");
-    type_list.push_back(new_type);
+    auto new_type = java_type_from_string(raw_type, class_name_prefix);
+    INVARIANT(new_type.has_value(), "Failed to parse type");
+    type_list.push_back(std::move(*new_type));
   }
   return type_list;
 }
@@ -501,12 +501,12 @@ size_t find_closing_semi_colon_for_reference_type(
 /// \param class_name_prefix: name of class to append to generic type
 ///   variables/parameters
 /// \return internal type representation for GOTO programs
-typet java_type_from_string(
+optionalt<typet> java_type_from_string(
   const std::string &src,
   const std::string &class_name_prefix)
 {
   if(src.empty())
-    return nil_typet();
+    return {};
 
   // a java type is encoded in different ways
   //  - a method type is encoded as '(...)R' where the parenthesis include the
@@ -550,15 +550,15 @@ typet java_type_from_string(
           "Cannot currently parse bounds on generic types");
       }
 
-      const typet &method_type=java_type_from_string(
-        src.substr(closing_generic+1, std::string::npos), class_name_prefix);
+      auto method_type = java_type_from_string(
+        src.substr(closing_generic + 1, std::string::npos), class_name_prefix);
 
       // This invariant being violated means that tkiley has not understood
       // part of the signature spec.
       // Only class and method signatures can start with a '<' and classes are
       // handled separately.
       INVARIANT(
-        method_type.id()==ID_code,
+        method_type.has_value() && method_type->id() == ID_code,
         "This should correspond to method signatures only");
 
       return method_type;
@@ -567,9 +567,9 @@ typet java_type_from_string(
     {
       std::size_t e_pos=src.rfind(')');
       if(e_pos==std::string::npos)
-        return nil_typet();
+        return {};
 
-      typet return_type = java_type_from_string(
+      auto return_type = java_type_from_string(
         std::string(src, e_pos + 1, std::string::npos), class_name_prefix);
 
       std::vector<typet> param_types =
@@ -583,7 +583,7 @@ typet java_type_from_string(
         std::back_inserter(parameters),
         [](const typet &type) { return java_method_typet::parametert(type); });
 
-      return java_method_typet(std::move(parameters), std::move(return_type));
+      return java_method_typet(std::move(parameters), std::move(*return_type));
     }
 
   case '[': // array type
@@ -591,18 +591,17 @@ typet java_type_from_string(
       // If this is a reference array, we generate a plain array[reference]
       // with void* members, but note the real type in ID_element_type.
       if(src.size()<=1)
-        return nil_typet();
+        return {};
       char subtype_letter=src[1];
-      const typet subtype=
-        java_type_from_string(src.substr(1, std::string::npos),
-                              class_name_prefix);
+      auto subtype = java_type_from_string(
+        src.substr(1, std::string::npos), class_name_prefix);
       if(subtype_letter=='L' || // [L denotes a reference array of some sort.
          subtype_letter=='[' || // Array-of-arrays
          subtype_letter=='T')   // Array of generic types
         subtype_letter='A';
       typet tmp=java_array_type(std::tolower(subtype_letter));
-      tmp.subtype().set(ID_element_type, subtype);
-      return tmp;
+      tmp.subtype().set(ID_element_type, std::move(*subtype));
+      return std::move(tmp);
     }
 
   case 'B': return java_byte_type();
@@ -623,7 +622,7 @@ typet java_type_from_string(
     return java_generic_parametert(
       type_var_name,
       to_struct_tag_type(
-        java_type_from_string("Ljava/lang/Object;").subtype()));
+        java_type_from_string("Ljava/lang/Object;")->subtype()));
   }
   case 'L':
     {
@@ -639,7 +638,7 @@ typet java_type_from_string(
     throw unsupported_java_class_signature_exceptiont("wild card generic");
   }
   default:
-    return nil_typet();
+    return {};
   }
 }
 
@@ -724,7 +723,7 @@ std::vector<typet> java_generic_type_from_string(
     java_generic_parametert type_var_type(
       type_var_name,
       to_struct_tag_type(
-        java_type_from_string(bound_type, class_name).subtype()));
+        java_type_from_string(bound_type, class_name)->subtype()));
 
     types.push_back(type_var_type);
     signature=signature.substr(var_sep+1, std::string::npos);
@@ -746,7 +745,7 @@ static std::string slash_to_dot(const std::string &src)
 struct_tag_typet java_classname(const std::string &id)
 {
   if(!id.empty() && id[0]=='[')
-    return to_struct_tag_type(java_type_from_string(id).subtype());
+    return to_struct_tag_type(java_type_from_string(id)->subtype());
 
   std::string class_name=id;
 
@@ -900,9 +899,9 @@ void get_dependencies_from_generic_parameters(
     // class signature without bounds and without wildcards
     else if(signature.find('*') == std::string::npos)
     {
-      get_dependencies_from_generic_parameters_rec(
-        java_type_from_string(signature, erase_type_arguments(signature)),
-        refs);
+      auto type_from_string =
+        java_type_from_string(signature, erase_type_arguments(signature));
+      get_dependencies_from_generic_parameters_rec(*type_from_string, refs);
     }
   }
   catch(unsupported_java_class_signature_exceptiont &)
@@ -940,9 +939,9 @@ java_generic_struct_tag_typet::java_generic_struct_tag_typet(
   : struct_tag_typet(type)
 {
   set(ID_C_java_generic_symbol, true);
-  const typet &base_type = java_type_from_string(base_ref, class_name_prefix);
-  PRECONDITION(is_java_generic_type(base_type));
-  const java_generic_typet &gen_base_type = to_java_generic_type(base_type);
+  const auto base_type = java_type_from_string(base_ref, class_name_prefix);
+  PRECONDITION(is_java_generic_type(*base_type));
+  const java_generic_typet &gen_base_type = to_java_generic_type(*base_type);
   INVARIANT(
     type.get_identifier() ==
       to_struct_tag_type(gen_base_type.subtype()).get_identifier(),

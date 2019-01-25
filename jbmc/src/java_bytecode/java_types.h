@@ -380,9 +380,9 @@ bool is_java_array_type(const typet &type);
 bool is_multidim_java_array_type(const typet &type);
 
 typet java_type_from_char(char t);
-typet java_type_from_string(
+optionalt<typet> java_type_from_string(
   const std::string &,
-  const std::string &class_name_prefix="");
+  const std::string &class_name_prefix = "");
 char java_char_from_type(const typet &type);
 std::vector<typet> java_generic_type_from_string(
   const std::string &,
@@ -715,7 +715,7 @@ public:
   }
 };
 
-inline typet java_type_from_string_with_exception(
+inline optionalt<typet> java_type_from_string_with_exception(
   const std::string &descriptor,
   const optionalt<std::string> &signature,
   const std::string &class_name)
