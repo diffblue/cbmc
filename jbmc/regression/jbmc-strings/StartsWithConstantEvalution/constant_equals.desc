@@ -1,0 +1,8 @@
+CORE
+RefineStrings.class
+--function string_refinement.RefineStrings.constantComparison --show-vcc --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
+^Generated [0-9]+ VCC\(s\), 0 remaining after simplification$
+--
+.*cprover_string_startswith_func*.
+--
+All instances of cprover_string_startswith_func can be calculated as false or true, so there should be no instances of this call.
