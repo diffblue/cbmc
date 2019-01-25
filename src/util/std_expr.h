@@ -974,6 +974,56 @@ public:
   {
     add_to_operands(_lhs, _rhs);
   }
+
+  // In contrast to exprt::opX, the methods
+  // below check the size.
+  exprt &op0()
+  {
+    PRECONDITION(operands().size() >= 1);
+    return operands().front();
+  }
+
+  exprt &op1()
+  {
+    PRECONDITION(operands().size() >= 2);
+    return operands()[1];
+  }
+
+  exprt &op2()
+  {
+    PRECONDITION(operands().size() >= 3);
+    return operands()[2];
+  }
+
+  exprt &op3()
+  {
+    PRECONDITION(operands().size() >= 4);
+    return operands()[3];
+  }
+
+  const exprt &op0() const
+  {
+    PRECONDITION(operands().size() >= 1);
+    return operands().front();
+  }
+
+  const exprt &op1() const
+  {
+    PRECONDITION(operands().size() >= 2);
+    return operands()[1];
+  }
+
+  const exprt &op2() const
+  {
+    PRECONDITION(operands().size() >= 3);
+    return operands()[2];
+  }
+
+  const exprt &op3() const
+  {
+    PRECONDITION(operands().size() >= 4);
+    return operands()[3];
+  }
 };
 
 /// \brief Cast an exprt to a \ref multi_ary_exprt
