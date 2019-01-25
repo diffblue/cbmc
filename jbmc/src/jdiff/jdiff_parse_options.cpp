@@ -346,7 +346,6 @@ bool jdiff_parse_optionst::process_goto_program(
   const optionst &options,
   goto_modelt &goto_model)
 {
-  try
   {
     // remove function pointers
     status() << "Removing function pointers and virtual functions" << eom;
@@ -409,31 +408,6 @@ bool jdiff_parse_optionst::process_goto_program(
     // remove any skips introduced since coverage instrumentation
     remove_skip(goto_model);
     goto_model.goto_functions.update();
-  }
-
-  catch(const char *e)
-  {
-    error() << e << eom;
-    return true;
-  }
-
-  catch(const std::string &e)
-  {
-    error() << e << eom;
-    return true;
-  }
-
-  catch(int e)
-  {
-    error() << "Numeric exception: " << e << eom;
-    return true;
-  }
-
-  catch(const std::bad_alloc &)
-  {
-    error() << "Out of memory" << eom;
-    exit(CPROVER_EXIT_INTERNAL_OUT_OF_MEMORY);
-    return true;
   }
 
   return false;
