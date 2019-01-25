@@ -175,7 +175,7 @@ bool simplify_exprt::simplify_mult(exprt &expr)
   // true if we have found a constant
   bool constant_found = false;
 
-  typet c_sizeof_type=nil_typet();
+  optionalt<typet> c_sizeof_type;
 
   // scan all the operands
   for(exprt::operandst::iterator it=operands.begin();
@@ -201,9 +201,13 @@ bool simplify_exprt::simplify_mult(exprt &expr)
     if(it->is_constant() && it->type()==expr.type())
     {
       // preserve the sizeof type annotation
-      if(c_sizeof_type.is_nil())
-        c_sizeof_type=
+      if(!c_sizeof_type.has_value())
+      {
+        const typet &sizeof_type =
           static_cast<const typet &>(it->find(ID_C_c_sizeof_type));
+        if(sizeof_type.is_not_nil())
+          c_sizeof_type = sizeof_type;
+      }
 
       if(constant_found)
       {
@@ -229,13 +233,13 @@ bool simplify_exprt::simplify_mult(exprt &expr)
       it++; // move to the next operand
   }
 
-  if(c_sizeof_type.is_not_nil())
+  if(c_sizeof_type.has_value())
   {
     INVARIANT(
       constant_found,
       "c_sizeof_type is only set to a non-nil value "
       "if a constant has been found");
-    constant->set(ID_C_c_sizeof_type, c_sizeof_type);
+    constant->set(ID_C_c_sizeof_type, *c_sizeof_type);
   }
 
   if(operands.size()==1)
