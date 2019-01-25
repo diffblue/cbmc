@@ -13,12 +13,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <string>
 
 #include "cmdline.h"
+#include "message.h"
 
 class parse_options_baset
 {
 public:
   parse_options_baset(
-    const std::string &optstring, int argc, const char **argv);
+    const std::string &optstring, int argc, const char **argv, message_handlert &mh);
 
   cmdlinet cmdline;
 
@@ -29,6 +30,9 @@ public:
 
   virtual int main();
   virtual ~parse_options_baset() { }
+
+protected:
+  messaget log;
 
 private:
   void unknown_option_msg();

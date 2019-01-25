@@ -63,7 +63,7 @@ Author: Peter Schrammel
 // TODO: do not use language_uit for this; requires a refactoring of
 //   initialize_goto_model to support parsing specific command line files
 jdiff_parse_optionst::jdiff_parse_optionst(int argc, const char **argv)
-  : parse_options_baset(JDIFF_OPTIONS, argc, argv),
+  : parse_options_baset(JDIFF_OPTIONS, argc, argv, ui_message_handler),
     jdiff_languagest(cmdline, ui_message_handler, &options),
     ui_message_handler(cmdline, std::string("JDIFF ") + CBMC_VERSION),
     languages2(cmdline, ui_message_handler, &options)
@@ -74,7 +74,7 @@ jdiff_parse_optionst::jdiff_parse_optionst(int argc, const char **argv)
   int argc,
   const char **argv,
   const std::string &extra_options)
-  : parse_options_baset(JDIFF_OPTIONS + extra_options, argc, argv),
+  : parse_options_baset(JDIFF_OPTIONS + extra_options, argc, argv, ui_message_handler),
     jdiff_languagest(cmdline, ui_message_handler, &options),
     ui_message_handler(cmdline, std::string("JDIFF ") + CBMC_VERSION),
     languages2(cmdline, ui_message_handler, &options)
