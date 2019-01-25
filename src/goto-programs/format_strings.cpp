@@ -226,7 +226,7 @@ format_token_listt parse_format_string(const std::string &arg_string)
   return token_list;
 }
 
-typet get_type(const format_tokent &token)
+optionalt<typet> get_type(const format_tokent &token)
 {
   switch(token.type)
   {
@@ -291,7 +291,7 @@ typet get_type(const format_tokent &token)
     }
 
   default:
-    return nil_typet();
+    return {};
   }
 
   UNREACHABLE;
