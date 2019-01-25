@@ -457,10 +457,10 @@ void goto_diff_parse_optionst::help()
 {
   // clang-format off
   std::cout << '\n' << banner_string("GOTO_DIFF", CBMC_VERSION) << '\n'
+            << align_center_with_border("Copyright (C) 2016") << '\n'
+            << align_center_with_border("Daniel Kroening, Peter Schrammel") << '\n' // NOLINT (*)
+            << align_center_with_border("kroening@kroening.com") << '\n'
             <<
-    "* *                  Copyright (C) 2016                     * *\n"
-    "* *            Daniel Kroening, Peter Schrammel             * *\n"
-    "* *                 kroening@kroening.com                   * *\n"
     "\n"
     "Usage:                       Purpose:\n"
     "\n"

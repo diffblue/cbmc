@@ -8,6 +8,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "parse_options.h"
 
+#include <algorithm>
+#include <climits>
 #include <iostream>
 
 #if defined (_WIN32)
@@ -116,19 +118,24 @@ int parse_options_baset::main()
   }
 }
 
+std::string align_center_with_border(const std::string &text)
+{
+  auto const total_length = std::size_t{63};
+  auto const border = std::string{"* *"};
+  auto const fill =
+    total_length - std::min(total_length, 2 * border.size() + text.size());
+  auto const fill_right = fill / 2;
+  auto const fill_left = fill - fill_right;
+  return border + std::string(fill_left, ' ') + text +
+         std::string(fill_right, ' ') + border;
+}
+
 std::string
 banner_string(const std::string &front_end, const std::string &version)
 {
   const std::string version_str = front_end + " " + version + " " +
-                                  std::to_string(sizeof(void *) * 8) + "-bit";
+                                  std::to_string(sizeof(void *) * CHAR_BIT) +
+                                  "-bit";
 
-  std::string::size_type left_padding = 0, right_padding = 0;
-  if(version_str.size() < 57)
-  {
-    left_padding = (57 - version_str.size() + 1) / 2;
-    right_padding = (57 - version_str.size()) / 2;
-  }
-
-  return "* *" + std::string(left_padding, ' ') + version_str +
-         std::string(right_padding, ' ') + "* *";
+  return align_center_with_border(version_str);
 }

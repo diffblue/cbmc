@@ -1094,12 +1094,11 @@ void jbmc_parse_optionst::help()
 {
   // clang-format off
   std::cout << '\n' << banner_string("JBMC", CBMC_VERSION) << '\n'
-            <<
-    "* *                 Copyright (C) 2001-2018                 * *\n"
-    "* *              Daniel Kroening, Edmund Clarke             * *\n"
-    "* * Carnegie Mellon University, Computer Science Department * *\n"
-    "* *                 kroening@kroening.com                   * *\n"
-    "\n"
+            << align_center_with_border("Copyright (C) 2001-2018") << '\n'
+            << align_center_with_border("Daniel Kroening, Edmund Clarke") << '\n' // NOLINT(*)
+            << align_center_with_border("Carnegie Mellon University, Computer Science Department") << '\n' // NOLINT(*)
+            << align_center_with_border("kroening@kroening.com") << '\n'
+            << "\n"
     "Usage:                       Purpose:\n"
     "\n"
     " jbmc [-?] [-h] [--help]      show help\n"

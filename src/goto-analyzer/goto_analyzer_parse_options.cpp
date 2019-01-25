@@ -717,10 +717,10 @@ void goto_analyzer_parse_optionst::help()
 {
   // clang-format off
   std::cout << '\n' << banner_string("GOTO-ANALYZER", CBMC_VERSION) << '\n'
+            << align_center_with_border("Copyright (C) 2017-2018") << '\n'
+            << align_center_with_border("Daniel Kroening, Diffblue") << '\n'
+            << align_center_with_border("kroening@kroening.com") << '\n'
             <<
-    "* *                   Copyright (C) 2017-2018                    * *\n"
-    "* *                  Daniel Kroening, Diffblue                   * *\n"
-    "* *                   kroening@kroening.com                      * *\n"
     "\n"
     "Usage:                       Purpose:\n"
     "\n"

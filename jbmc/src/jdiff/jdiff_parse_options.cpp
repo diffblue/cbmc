@@ -440,10 +440,10 @@ void jdiff_parse_optionst::help()
 {
   // clang-format off
   std::cout << '\n' << banner_string("JDIFF", CBMC_VERSION) << '\n'
+            << align_center_with_border("Copyright (C) 2016-2018") << '\n'
+            << align_center_with_border("Daniel Kroening, Peter Schrammel") << '\n' // NOLINT(*)
+            << align_center_with_border("kroening@kroening.com") << '\n'
             <<
-    "* *                Copyright (C) 2016-2018                  * *\n"
-    "* *            Daniel Kroening, Peter Schrammel             * *\n"
-    "* *                 kroening@kroening.com                   * *\n"
     "\n"
     "Usage:                       Purpose:\n"
     "\n"

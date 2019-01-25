@@ -1532,10 +1532,10 @@ void goto_instrument_parse_optionst::help()
 {
   // clang-format off
   std::cout << '\n' << banner_string("Goto-Instrument", CBMC_VERSION) << '\n'
+            << align_center_with_border("Copyright (C) 2008-2013") << '\n'
+            << align_center_with_border("Daniel Kroening") << '\n'
+            << align_center_with_border("kroening@kroening.com") << '\n'
             <<
-    "* *                Copyright (C) 2008-2013                  * *\n"
-    "* *                    Daniel Kroening                      * *\n"
-    "* *                 kroening@kroening.com                   * *\n"
     "\n"
     "Usage:                       Purpose:\n"
     "\n"
