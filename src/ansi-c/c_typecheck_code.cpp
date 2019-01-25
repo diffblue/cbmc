@@ -653,6 +653,9 @@ void c_typecheck_baset::typecheck_return(codet &code)
   }
   else if(code.operands().size()==1)
   {
+    if(code.op0().is_nil())
+      return;
+
     typecheck_expr(code.op0());
 
     if(return_type.id() == ID_empty)
