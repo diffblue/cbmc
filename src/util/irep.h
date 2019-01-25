@@ -19,7 +19,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #define SHARING
 // #define HASH_CODE
-#define USE_MOVE
 // #define NAMED_SUB_IS_FORWARD_LIST
 
 #ifdef NAMED_SUB_IS_FORWARD_LIST
@@ -169,19 +168,13 @@ public:
   bool is_nil() const { return id()==ID_nil; }
   bool is_not_nil() const { return id()!=ID_nil; }
 
-#if !defined(USE_MOVE) || !defined(SHARING)
+#if !defined(SHARING)
   explicit irept(const irep_idt &_id)
-#ifdef SHARING
-    :data(&empty_d)
-#endif
   {
     id(_id);
   }
 
   irept(const irep_idt &_id, const named_subt &_named_sub, const subt &_sub)
-#ifdef SHARING
-    : data(&empty_d)
-#endif
   {
     id(_id);
     get_named_sub() = _named_sub;
@@ -218,7 +211,6 @@ public:
     }
   }
 
-  #ifdef USE_MOVE
   // Copy from rvalue reference.
   // Note that this does avoid a branch compared to the
   // standard copy constructor above.
@@ -229,7 +221,6 @@ public:
     #endif
     irep.data=&empty_d;
   }
-  #endif
 
   irept &operator=(const irept &irep)
   {
@@ -249,7 +240,6 @@ public:
     return *this;
   }
 
-  #ifdef USE_MOVE
   // Note that the move assignment operator does avoid
   // three branches compared to standard operator above.
   irept &operator=(irept &&irep)
@@ -261,7 +251,6 @@ public:
     std::swap(data, irep.data);
     return *this;
   }
-  #endif
 
   ~irept()
   {
@@ -393,7 +382,6 @@ public:
 
     dt() = default;
 
-#ifdef USE_MOVE
     explicit dt(irep_idt _data) : data(std::move(_data))
     {
     }
@@ -404,7 +392,6 @@ public:
         sub(std::move(_sub))
     {
     }
-#endif
   };
 
 protected:
