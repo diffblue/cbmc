@@ -290,7 +290,8 @@ bool taint_analysist::operator()(
           t->make_function_call(call);
           calls.add_instruction()->make_goto(end.instructions.begin());
           goto_programt::targett g=gotos.add_instruction();
-          g->make_goto(t, side_effect_expr_nondett(bool_typet()));
+          g->make_goto(
+            t, side_effect_expr_nondett(bool_typet(), symbol.location));
         }
 
       goto_functionst::goto_functiont &entry=
