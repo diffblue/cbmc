@@ -21,7 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/string2int.h>
 #include <util/string_constant.h>
 
-inline static typet c_sizeof_type_rec(const exprt &expr)
+inline static optionalt<typet> c_sizeof_type_rec(const exprt &expr)
 {
   const irept &sizeof_type=expr.find(ID_C_c_sizeof_type);
 
@@ -33,13 +33,13 @@ inline static typet c_sizeof_type_rec(const exprt &expr)
   {
     forall_operands(it, expr)
     {
-      typet t=c_sizeof_type_rec(*it);
-      if(t.is_not_nil())
+      const auto t = c_sizeof_type_rec(*it);
+      if(t.has_value())
         return t;
     }
   }
 
-  return nil_typet();
+  return {};
 }
 
 void goto_symext::symex_allocate(
@@ -55,7 +55,7 @@ void goto_symext::symex_allocate(
   dynamic_counter++;
 
   exprt size=code.op0();
-  typet object_type=nil_typet();
+  optionalt<typet> object_type;
   auto function_symbol = outer_symbol_table.lookup(state.source.function_id);
   INVARIANT(function_symbol, "function associated with allocation not found");
   const irep_idt &mode = function_symbol->mode;
@@ -75,60 +75,60 @@ void goto_symext::symex_allocate(
 
     // special treatment for sizeof(T)*x
     {
-      typet tmp_type=c_sizeof_type_rec(tmp_size);
+      const auto tmp_type = c_sizeof_type_rec(tmp_size);
 
-      if(tmp_type.is_not_nil())
+      if(tmp_type.has_value())
       {
         // Did the size get multiplied?
-        auto elem_size = pointer_offset_size(tmp_type, ns);
-        mp_integer alloc_size;
+        auto elem_size = pointer_offset_size(*tmp_type, ns);
+        const auto alloc_size = numeric_cast<mp_integer>(tmp_size);
 
         if(!elem_size.has_value() || *elem_size==0)
         {
         }
-        else if(to_integer(tmp_size, alloc_size) &&
-                tmp_size.id()==ID_mult &&
-                tmp_size.operands().size()==2 &&
-                (tmp_size.op0().is_constant() ||
-                 tmp_size.op1().is_constant()))
+        else if(
+          !alloc_size.has_value() && tmp_size.id() == ID_mult &&
+          tmp_size.operands().size() == 2 &&
+          (tmp_size.op0().is_constant() || tmp_size.op1().is_constant()))
         {
           exprt s=tmp_size.op0();
           if(s.is_constant())
           {
             s=tmp_size.op1();
-            PRECONDITION(c_sizeof_type_rec(tmp_size.op0()) == tmp_type);
+            PRECONDITION(*c_sizeof_type_rec(tmp_size.op0()) == *tmp_type);
           }
           else
-            PRECONDITION(c_sizeof_type_rec(tmp_size.op1()) == tmp_type);
+            PRECONDITION(*c_sizeof_type_rec(tmp_size.op1()) == *tmp_type);
 
-          object_type=array_typet(tmp_type, s);
+          object_type = array_typet(*tmp_type, s);
         }
         else
         {
-          if(alloc_size == *elem_size)
-            object_type=tmp_type;
+          if(*alloc_size == *elem_size)
+            object_type = *tmp_type;
           else
           {
-            mp_integer elements = alloc_size / (*elem_size);
+            mp_integer elements = *alloc_size / (*elem_size);
 
-            if(elements * (*elem_size) == alloc_size)
-              object_type=array_typet(
-                tmp_type, from_integer(elements, tmp_size.type()));
+            if(elements * (*elem_size) == *alloc_size)
+              object_type =
+                array_typet(*tmp_type, from_integer(elements, tmp_size.type()));
           }
         }
       }
     }
 
-    if(object_type.is_nil())
+    if(!object_type.has_value())
       object_type=array_typet(unsigned_char_type(), tmp_size);
 
     // we introduce a fresh symbol for the size
     // to prevent any issues of the size getting ever changed
 
-    if(object_type.id()==ID_array &&
-       !to_array_type(object_type).size().is_constant())
+    if(
+      object_type->id() == ID_array &&
+      !to_array_type(*object_type).size().is_constant())
     {
-      exprt &array_size = to_array_type(object_type).size();
+      exprt &array_size = to_array_type(*object_type).size();
 
       auxiliary_symbolt size_symbol;
 
@@ -155,7 +155,7 @@ void goto_symext::symex_allocate(
   value_symbol.base_name="dynamic_object"+std::to_string(dynamic_counter);
   value_symbol.name="symex_dynamic::"+id2string(value_symbol.base_name);
   value_symbol.is_lvalue=true;
-  value_symbol.type=object_type;
+  value_symbol.type = *object_type;
   value_symbol.type.set(ID_C_dynamic, true);
   value_symbol.mode = mode;
 
@@ -171,23 +171,23 @@ void goto_symext::symex_allocate(
   if(!zero_init.is_zero() && !zero_init.is_false())
   {
     const auto zero_value =
-      zero_initializer(object_type, code.source_location(), ns);
+      zero_initializer(*object_type, code.source_location(), ns);
     CHECK_RETURN(zero_value.has_value());
     code_assignt assignment(value_symbol.symbol_expr(), *zero_value);
     symex_assign(state, assignment);
   }
   else
   {
-    const exprt nondet = build_symex_nondet(object_type);
+    const exprt nondet = build_symex_nondet(*object_type);
     const code_assignt assignment(value_symbol.symbol_expr(), nondet);
     symex_assign(state, assignment);
   }
 
   exprt rhs;
 
-  if(object_type.id()==ID_array)
+  if(object_type->id() == ID_array)
   {
-    const auto &array_type = to_array_type(object_type);
+    const auto &array_type = to_array_type(*object_type);
     index_exprt index_expr(
       value_symbol.symbol_expr(), from_integer(0, index_type()));
     rhs = address_of_exprt(index_expr, pointer_type(array_type.subtype()));
