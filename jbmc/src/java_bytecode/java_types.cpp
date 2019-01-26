@@ -31,42 +31,50 @@ std::vector<typet> parse_list_types(
 
 signedbv_typet java_int_type()
 {
-  return signedbv_typet(32);
+  static const auto result = signedbv_typet(32);
+  return result;
 }
 
 void_typet java_void_type()
 {
-  return void_typet();
+  static const auto result = void_typet();
+  return result;
 }
 
 signedbv_typet java_long_type()
 {
-  return signedbv_typet(64);
+  static const auto result = signedbv_typet(64);
+  return result;
 }
 
 signedbv_typet java_short_type()
 {
-  return signedbv_typet(16);
+  static const auto result = signedbv_typet(16);
+  return result;
 }
 
 signedbv_typet java_byte_type()
 {
-  return signedbv_typet(8);
+  static const auto result = signedbv_typet(8);
+  return result;
 }
 
 unsignedbv_typet java_char_type()
 {
-  return unsignedbv_typet(16);
+  static const auto result = unsignedbv_typet(16);
+  return result;
 }
 
 floatbv_typet java_float_type()
 {
-  return ieee_float_spect::single_precision().to_type();
+  static const auto result = ieee_float_spect::single_precision().to_type();
+  return result;
 }
 
 floatbv_typet java_double_type()
 {
-  return ieee_float_spect::double_precision().to_type();
+  static const auto result = ieee_float_spect::double_precision().to_type();
+  return result;
 }
 
 c_bool_typet java_boolean_type()
@@ -74,7 +82,8 @@ c_bool_typet java_boolean_type()
   // The Java standard doesn't really prescribe the width
   // of a boolean. However, JNI suggests that it's 8 bits.
   // http://docs.oracle.com/javase/7/docs/technotes/guides/jni/spec/types.html
-  return c_bool_typet(8);
+  static const auto result = c_bool_typet(8);
+  return result;
 }
 
 reference_typet java_reference_type(const typet &subtype)
@@ -84,7 +93,9 @@ reference_typet java_reference_type(const typet &subtype)
 
 reference_typet java_lang_object_type()
 {
-  return java_reference_type(struct_tag_typet("java::java.lang.Object"));
+  static const auto result =
+    java_reference_type(struct_tag_typet("java::java.lang.Object"));
+  return result;
 }
 
 /// Construct an array pointer type. It is a pointer to a symbol with identifier
