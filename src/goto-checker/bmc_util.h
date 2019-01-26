@@ -124,6 +124,16 @@ void update_status_of_not_checked_properties(
   propertiest &properties,
   std::unordered_set<irep_idt> &updated_properties);
 
+/// Sets the property status of UNKNOWN properties to PASS.
+/// \param [in,out] properties: The status is updated in this data structure
+/// \param [in,out] updated_properties: The set of property IDs of
+///   updated properties
+/// Note: we currently declare everything PASS that is UNKNOWN at the
+///   end of the model checking algorithm.
+void update_status_of_unknown_properties(
+  propertiest &properties,
+  std::unordered_set<irep_idt> &updated_properties);
+
 // clang-format off
 #define OPT_BMC \
   "(program-only)" \

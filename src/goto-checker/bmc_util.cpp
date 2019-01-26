@@ -270,6 +270,22 @@ void update_status_of_not_checked_properties(
   }
 }
 
+void update_status_of_unknown_properties(
+  propertiest &properties,
+  std::unordered_set<irep_idt> &updated_properties)
+{
+  for(auto &property_pair : properties)
+  {
+    if(property_pair.second.status == property_statust::UNKNOWN)
+    {
+      // This could have any status except NOT_CHECKED.
+      // We consider them PASS because we do verification modulo bounds.
+      property_pair.second.status = property_statust::PASS;
+      updated_properties.insert(property_pair.first);
+    }
+  }
+}
+
 void output_coverage_report(
   const std::string &cov_out,
   const abstract_goto_modelt &goto_model,
