@@ -20,10 +20,3 @@ void goto_symext::do_simplify(exprt &expr)
   if(symex_config.simplify_opt)
     simplify(expr, ns);
 }
-
-nondet_symbol_exprt symex_nondet_generatort::operator()(typet &type)
-{
-  irep_idt identifier = "symex::nondet" + std::to_string(nondet_count++);
-  nondet_symbol_exprt new_expr(identifier, type);
-  return new_expr;
-}

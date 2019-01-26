@@ -13,6 +13,12 @@ Author: Kareem Khazem <karkhaz@karkhaz.com>
 #include <util/exit_codes.h>
 #include <util/make_unique.h>
 
+nondet_symbol_exprt symex_nondet_generatort::operator()(const typet &type)
+{
+  irep_idt identifier = "symex::nondet" + std::to_string(nondet_count++);
+  return nondet_symbol_exprt(identifier, type);
+}
+
 // _____________________________________________________________________________
 // path_lifot
 
