@@ -1704,15 +1704,16 @@ void goto_checkt::goto_check(
 
     if(i.is_other())
     {
-      const irep_idt &statement=i.code.get(ID_statement);
+      const auto &code = i.get_other();
+      const irep_idt &statement = code.get_statement();
 
       if(statement==ID_expression)
       {
-        check(i.code);
+        check(code);
       }
       else if(statement==ID_printf)
       {
-        for(const auto &op : i.code.operands())
+        for(const auto &op : code.operands())
           check(op);
       }
     }

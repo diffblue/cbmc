@@ -785,9 +785,10 @@ void constant_propagator_ait::replace(
     }
     else if(it->is_other())
     {
-      if(it->code.get_statement()==ID_expression)
+      if(it->get_other().get_statement() == ID_expression)
       {
-        constant_propagator_domaint::partial_evaluate(d.values, it->code, ns);
+        constant_propagator_domaint::partial_evaluate(
+          d.values, it->get_other(), ns);
       }
     }
   }

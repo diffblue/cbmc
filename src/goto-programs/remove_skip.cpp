@@ -52,10 +52,10 @@ bool is_skip(
 
   if(it->is_other())
   {
-    if(it->code.is_nil())
+    if(it->get_other().is_nil())
       return true;
 
-    const irep_idt &statement=it->code.get_statement();
+    const irep_idt &statement = it->get_other().get_statement();
 
     if(statement==ID_skip)
       return true;

@@ -383,7 +383,7 @@ void interpretert::execute_goto()
 /// executes side effects of 'other' instructions
 void interpretert::execute_other()
 {
-  const irep_idt &statement=pc->code.get_statement();
+  const irep_idt &statement = pc->get_other().get_statement();
   if(statement==ID_expression)
   {
     DATA_INVARIANT(

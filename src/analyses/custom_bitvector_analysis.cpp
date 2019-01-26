@@ -447,17 +447,18 @@ void custom_bitvector_domaint::transform(
 
   case OTHER:
     {
-      const irep_idt &statement=instruction.code.get_statement();
+      const auto &code = instruction.get_other();
+      const irep_idt &statement = code.get_statement();
 
       if(statement=="set_may" ||
          statement=="set_must" ||
          statement=="clear_may" ||
          statement=="clear_must")
       {
-        assert(instruction.code.operands().size()==2);
+        DATA_INVARIANT(
+          code.operands().size() == 2, "set/clear_may/must has two operands");
 
-        unsigned bit_nr=
-          cba.get_bit_nr(instruction.code.op1());
+        unsigned bit_nr = cba.get_bit_nr(code.op1());
 
         // initialize to make Visual Studio happy
         modet mode = modet::SET_MUST;
@@ -473,7 +474,7 @@ void custom_bitvector_domaint::transform(
         else
           UNREACHABLE;
 
-        exprt lhs=instruction.code.op0();
+        exprt lhs = code.op0();
 
         if(lhs.type().id()==ID_pointer)
         {

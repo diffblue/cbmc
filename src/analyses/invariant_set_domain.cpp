@@ -61,7 +61,7 @@ void invariant_set_domaint::transform(
     break;
 
   case OTHER:
-    if(from_l->code.is_not_nil())
+    if(from_l->get_other().is_not_nil())
       invariant_set.apply_code(from_l->code);
     break;
 
