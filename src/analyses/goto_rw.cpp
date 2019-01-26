@@ -781,11 +781,11 @@ void goto_rw(
 
   case OTHER:
     // if it's printf, mark the operands as read here
-    if(target->code.get(ID_statement)==ID_printf)
+    if(target->get_other().get_statement() == ID_printf)
     {
-      forall_expr(it, target->code.operands())
+      for(const auto &op : target->get_other().operands())
         rw_set.get_objects_rec(
-          function, target, rw_range_sett::get_modet::READ, *it);
+          function, target, rw_range_sett::get_modet::READ, op);
     }
     break;
 

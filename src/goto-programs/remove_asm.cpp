@@ -488,7 +488,7 @@ void remove_asmt::process_function(
 
   Forall_goto_program_instructions(it, goto_function.body)
   {
-    if(it->is_other() && it->code.get_statement()==ID_asm)
+    if(it->is_other() && it->get_other().get_statement() == ID_asm)
     {
       goto_programt tmp_dest;
       process_instruction(*it, tmp_dest);

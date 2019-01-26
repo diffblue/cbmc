@@ -337,7 +337,7 @@ void goto_program_dereferencet::dereference_instruction(
   }
   else if(i.is_other())
   {
-    const irep_idt &statement=i.code.get(ID_statement);
+    const irep_idt &statement = i.get_other().get_statement();
 
     if(statement==ID_expression)
     {
@@ -349,9 +349,8 @@ void goto_program_dereferencet::dereference_instruction(
     }
     else if(statement==ID_printf)
     {
-      Forall_operands(it, i.code)
-        dereference_expr(
-          *it, checks_only, value_set_dereferencet::modet::READ);
+      for(auto &op : i.get_other().operands())
+        dereference_expr(op, checks_only, value_set_dereferencet::modet::READ);
     }
   }
 }

@@ -250,6 +250,20 @@ public:
       return to_code_function_call(code);
     }
 
+    /// Get the statement for OTHER
+    const codet &get_other() const
+    {
+      PRECONDITION(is_other());
+      return code;
+    }
+
+    /// Get the statement for OTHER
+    codet &get_other()
+    {
+      PRECONDITION(is_other());
+      return code;
+    }
+
     /// The function this instruction belongs to
     irep_idt function;
 
