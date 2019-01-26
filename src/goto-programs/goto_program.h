@@ -376,19 +376,19 @@ public:
       type = GOTO;
     }
 
-    void make_assignment(const codet &_code)
+    void make_assignment(const code_assignt &_code)
     {
       clear(ASSIGN);
       code=_code;
     }
 
-    void make_decl(const codet &_code)
+    void make_decl(const code_declt &_code)
     {
       clear(DECL);
       code=_code;
     }
 
-    void make_function_call(const codet &_code)
+    void make_function_call(const code_function_callt &_code)
     {
       clear(FUNCTION_CALL);
       code=_code;
