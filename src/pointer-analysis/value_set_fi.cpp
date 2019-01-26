@@ -853,9 +853,13 @@ void value_set_fit::get_reference_set_sharing_rec(
         index_exprt index_expr(
           object, from_integer(0, index_type()), expr.type());
 
+        exprt casted_index;
+
         // adjust type?
         if(object.type().id() != "#REF#" && object.type() != array_type)
-          index_expr.make_typecast(array.type());
+          casted_index = typecast_exprt(index_expr, array.type());
+        else
+          casted_index = index_expr;
 
         offsett o = a_it->second;
         mp_integer i;
@@ -868,7 +872,7 @@ void value_set_fit::get_reference_set_sharing_rec(
         else
           o.reset();
 
-        insert(dest, index_expr, o);
+        insert(dest, casted_index, o);
       }
     }
 
