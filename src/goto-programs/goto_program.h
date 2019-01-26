@@ -645,20 +645,26 @@ public:
     instructions.splice(target, p.instructions);
   }
 
+  /// Adds a given instruction at the end.
+  /// \return The newly added instruction.
+  targett add(instructiont &&instruction)
+  {
+    instructions.push_back(std::move(instruction));
+    return --instructions.end();
+  }
+
   /// Adds an instruction at the end.
   /// \return The newly added instruction.
   targett add_instruction()
   {
-    instructions.push_back(instructiont());
-    return --instructions.end();
+    return add(instructiont());
   }
 
   /// Adds an instruction of given type at the end.
   /// \return The newly added instruction.
   targett add_instruction(goto_program_instruction_typet type)
   {
-    instructions.push_back(instructiont(type));
-    return --instructions.end();
+    return add(instructiont(type));
   }
 
   /// Output goto program to given stream
