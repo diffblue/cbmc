@@ -4,6 +4,9 @@ main.c
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
-^\*\* 4 of 4 failed
+^\[main.assertion.1\] line 12 0 works: FAILURE$
+^\[main.assertion.2\] line 19 \.\.\. works: FAILURE$
+^\[main.assertion.3\] line 22 13 works: FAILURE$
+^\[main.assertion.4\] line 25 default works: FAILURE$
 --
 ^warning: ignoring

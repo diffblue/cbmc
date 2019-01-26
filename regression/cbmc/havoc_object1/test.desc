@@ -4,5 +4,12 @@ main.c
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
-^\*\* 6 of 8 failed.*$
+^\[main.assertion.1\] line 5 i==0: FAILURE$
+^\[main.assertion.2\] line 11 array\[3\]: FAILURE$
+^\[main.assertion.3\] line 15 struct i: FAILURE$
+^\[main.assertion.4\] line 16 struct j: FAILURE$
+^\[main.assertion.5\] line 26 i==20 \(A\): FAILURE$
+^\[main.assertion.6\] line 27 some_struct.i==30 \(A\): SUCCESS$
+^\[main.assertion.7\] line 31 i==20 \(B\): SUCCESS$
+^\[main.assertion.8\] line 32 some_struct\.i==30 \(B\): FAILURE$
 --
