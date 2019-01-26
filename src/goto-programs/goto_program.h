@@ -433,18 +433,18 @@ public:
     {
     }
 
-    /// Constructor that can set all members
+    /// Constructor that can set all members, passed by value
     instructiont(
-      codet &&_code,
-      const irep_idt &_function,
-      source_locationt &&_source_location,
+      codet _code,
+      irep_idt _function,
+      source_locationt _source_location,
       goto_program_instruction_typet _type,
-      exprt &&_guard,
-      targetst &&_targets)
+      exprt _guard,
+      targetst _targets)
       : code(std::move(_code)),
         function(_function),
         source_location(std::move(_source_location)),
-        type(std::move(_type)),
+        type(_type),
         guard(std::move(_guard)),
         targets(std::move(_targets))
     {
@@ -806,6 +806,193 @@ public:
     {
       ins.validate(ns, vm);
     }
+  }
+
+  static instructiont
+  make_return(const source_locationt &l = source_locationt::nil())
+  {
+    return instructiont(code_returnt(), irep_idt(), l, RETURN, nil_exprt(), {});
+  }
+
+  static instructiont
+  make_skip(const source_locationt &l = source_locationt::nil())
+  {
+    return instructiont(
+      static_cast<const codet &>(get_nil_irep()),
+      irep_idt(),
+      l,
+      SKIP,
+      nil_exprt(),
+      {});
+  }
+
+  static instructiont make_location(const source_locationt &l)
+  {
+    return instructiont(
+      static_cast<const codet &>(get_nil_irep()),
+      irep_idt(),
+      l,
+      LOCATION,
+      nil_exprt(),
+      {});
+  }
+
+  static instructiont
+  make_throw(const source_locationt &l = source_locationt::nil())
+  {
+    return instructiont(
+      static_cast<const codet &>(get_nil_irep()),
+      irep_idt(),
+      l,
+      THROW,
+      nil_exprt(),
+      {});
+  }
+
+  static instructiont
+  make_catch(const source_locationt &l = source_locationt::nil())
+  {
+    return instructiont(
+      static_cast<const codet &>(get_nil_irep()),
+      irep_idt(),
+      l,
+      CATCH,
+      nil_exprt(),
+      {});
+  }
+
+  static instructiont make_assertion(
+    const exprt &g,
+    const source_locationt &l = source_locationt::nil())
+  {
+    return instructiont(
+      static_cast<const codet &>(get_nil_irep()),
+      irep_idt(),
+      l,
+      ASSERT,
+      exprt(g),
+      {});
+  }
+
+  static instructiont make_assumption(
+    const exprt &g,
+    const source_locationt &l = source_locationt::nil())
+  {
+    return instructiont(
+      static_cast<const codet &>(get_nil_irep()), irep_idt(), l, ASSUME, g, {});
+  }
+
+  static instructiont make_other(const codet &_code)
+  {
+    return instructiont(
+      _code, irep_idt(), source_locationt::nil(), OTHER, nil_exprt(), {});
+  }
+
+  static instructiont make_decl(
+    const symbol_exprt &symbol,
+    const source_locationt &l = source_locationt::nil())
+  {
+    return instructiont(
+      code_declt(symbol), irep_idt(), l, DECL, nil_exprt(), {});
+  }
+
+  static instructiont make_dead(
+    const symbol_exprt &symbol,
+    const source_locationt &l = source_locationt::nil())
+  {
+    return instructiont(
+      code_deadt(symbol), irep_idt(), l, DEAD, nil_exprt(), {});
+  }
+
+  static instructiont
+  make_atomic_begin(const source_locationt &l = source_locationt::nil())
+  {
+    return instructiont(
+      static_cast<const codet &>(get_nil_irep()),
+      irep_idt(),
+      l,
+      ATOMIC_BEGIN,
+      nil_exprt(),
+      {});
+  }
+
+  static instructiont
+  make_atomic_end(const source_locationt &l = source_locationt::nil())
+  {
+    return instructiont(
+      static_cast<const codet &>(get_nil_irep()),
+      irep_idt(),
+      l,
+      ATOMIC_END,
+      nil_exprt(),
+      {});
+  }
+
+  static instructiont
+  make_end_function(const source_locationt &l = source_locationt::nil())
+  {
+    return instructiont(
+      static_cast<const codet &>(get_nil_irep()),
+      irep_idt(),
+      l,
+      END_FUNCTION,
+      nil_exprt(),
+      {});
+  }
+
+  static instructiont make_incomplete_goto(
+    const code_gotot &_code,
+    const source_locationt &l = source_locationt::nil())
+  {
+    return instructiont(_code, irep_idt(), l, INCOMPLETE_GOTO, nil_exprt(), {});
+  }
+
+  static instructiont make_goto(
+    targett _target,
+    const source_locationt &l = source_locationt::nil())
+  {
+    return instructiont(
+      static_cast<const codet &>(get_nil_irep()),
+      irep_idt(),
+      l,
+      GOTO,
+      true_exprt(),
+      {_target});
+  }
+
+  static instructiont make_goto(
+    targett _target,
+    const exprt &g,
+    const source_locationt &l = source_locationt::nil())
+  {
+    return instructiont(
+      static_cast<const codet &>(get_nil_irep()),
+      irep_idt(),
+      l,
+      GOTO,
+      g,
+      {_target});
+  }
+
+  static instructiont make_assignment(
+    const code_assignt &_code,
+    const source_locationt &l = source_locationt::nil())
+  {
+    return instructiont(_code, irep_idt(), l, ASSIGN, nil_exprt(), {});
+  }
+
+  static instructiont make_decl(
+    const code_declt &_code,
+    const source_locationt &l = source_locationt::nil())
+  {
+    return instructiont(_code, irep_idt(), l, DECL, nil_exprt(), {});
+  }
+
+  static instructiont make_function_call(
+    const code_function_callt &_code,
+    const source_locationt &l = source_locationt::nil())
+  {
+    return instructiont(_code, irep_idt(), l, FUNCTION_CALL, nil_exprt(), {});
   }
 };
 

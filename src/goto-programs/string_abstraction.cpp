@@ -283,11 +283,9 @@ void string_abstractiont::make_decl_and_def(goto_programt &dest,
   const symbolt &symbol=ns.lookup(identifier);
   symbol_exprt sym_expr=symbol.symbol_expr();
 
-  goto_programt::targett decl1=dest.add_instruction();
-  decl1->make_decl();
-  decl1->source_location=ref_instr->source_location;
+  goto_programt::targett decl1 =
+    dest.add(goto_programt::make_decl(sym_expr, ref_instr->source_location));
   decl1->function=ref_instr->function;
-  decl1->code=code_declt(sym_expr);
   decl1->code.add_source_location()=ref_instr->source_location;
 
   exprt val=symbol.value;
