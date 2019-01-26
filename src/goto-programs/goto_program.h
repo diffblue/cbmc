@@ -432,6 +432,23 @@ public:
     {
     }
 
+    /// Constructor that can set all members
+    instructiont(
+      codet &&_code,
+      const irep_idt &_function,
+      source_locationt &&_source_location,
+      goto_program_instruction_typet _type,
+      exprt &&_guard,
+      targetst &&_targets)
+      : code(std::move(_code)),
+        function(_function),
+        source_location(std::move(_source_location)),
+        type(std::move(_type)),
+        guard(std::move(_guard)),
+        targets(std::move(_targets))
+    {
+    }
+
     /// Swap two instructions
     void swap(instructiont &instruction)
     {
