@@ -99,6 +99,7 @@ set_target_properties(
     goto-checker
     goto-diff
     goto-diff-lib
+    goto-harness
     goto-instrument
     goto-instrument-lib
     goto-programs

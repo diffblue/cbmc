@@ -8,6 +8,7 @@ DIRS = analyses \
        goto-cc \
        goto-checker \
        goto-diff \
+       goto-harness \
        goto-instrument \
        goto-programs \
        goto-symex \
@@ -27,6 +28,7 @@ all: cbmc.dir \
      goto-cc.dir \
      goto-diff.dir \
      goto-instrument.dir \
+     goto-harness.dir \
      # Empty last line
 
 ###############################################################################
@@ -46,6 +48,8 @@ languages: util.dir langapi.dir \
            jsil.dir json.dir json-symtab-language.dir
 
 solvers.dir: util.dir
+
+goto-harness.dir: util.dir
 
 goto-instrument.dir: languages goto-programs.dir pointer-analysis.dir \
                      goto-symex.dir linking.dir analyses.dir solvers.dir
