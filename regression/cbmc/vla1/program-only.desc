@@ -1,0 +1,12 @@
+CORE
+main.c
+--program-only
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+\(__CPROVER_size_t\)x\$array_size
+--
+There should not be any type cast of x$array_size to __CPROVER_size_t, because
+it already is of that type.
