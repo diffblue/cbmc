@@ -23,13 +23,11 @@ struct java_bytecode_parse_treet
 {
   // Disallow copy construction and copy assignment, but allow move construction
   // and move assignment.
-  #ifndef _MSC_VER // Ommit this on MS VC2013 as move is not supported.
   java_bytecode_parse_treet(const java_bytecode_parse_treet &) = delete;
   java_bytecode_parse_treet &
   operator=(const java_bytecode_parse_treet &) = delete;
   java_bytecode_parse_treet(java_bytecode_parse_treet &&) = default;
   java_bytecode_parse_treet &operator=(java_bytecode_parse_treet &&) = default;
-  #endif
 
   struct annotationt
   {
@@ -206,12 +204,10 @@ struct java_bytecode_parse_treet
 
     // Disallow copy construction and copy assignment, but allow move
     // construction and move assignment.
-    #ifndef _MSC_VER // Ommit this on MS VC2013 as move is not supported.
     classt(const classt &) = delete;
     classt &operator=(const classt &) = delete;
     classt(classt &&) = default;
     classt &operator=(classt &&) = default;
-    #endif
 
     irep_idt name, super_class, inner_name;
     bool is_abstract=false;

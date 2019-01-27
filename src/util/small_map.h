@@ -25,45 +25,6 @@ Author: Daniel Poetzl
 
 //#define _SMALL_MAP_REALLOC_STATS
 
-// The following templates are used by the class below to compute parameters at
-// compilation time. When having a compiler that supports constexpr, the
-// parameters are computed via static methods defined within the class.
-#if !defined(__GNUC__) && _MSC_VER < 1900
-
-template <std::size_t N>
-struct num_bitst
-{
-  static const std::size_t value = 1 + num_bitst<(N >> 1)>::value;
-};
-
-template <>
-struct num_bitst<1>
-{
-  static const std::size_t value = 1;
-};
-
-template <>
-struct num_bitst<0>
-{
-  static const std::size_t value = 1;
-};
-
-template <typename T, std::size_t B, typename U = std::integral_constant<T, 1>>
-struct indicator_maskt
-{
-  static const T value =
-    U::value |
-    indicator_maskt<T, B, std::integral_constant<T, (U::value << B)>>::value;
-};
-
-template <typename T, std::size_t B>
-struct indicator_maskt<T, B, std::integral_constant<T, 0>>
-{
-  static const T value = 0;
-};
-
-#endif
-
 /// Map from small integers to values
 ///
 /// A data structure that maps small integers (in {0, ..., Num-1}) to values.
@@ -208,17 +169,6 @@ private:
 
   static_assert(NUM >= 2, "");
 
-// When we don't have constexpr
-#if !defined(__GNUC__) && _MSC_VER < 1900
-
-  static const std::size_t S_BITS = NUM * num_bitst<NUM - 1>::value + NUM;
-
-  static const std::size_t BITS = num_bitst<NUM - 1>::value + 1;
-
-  static const index_fieldt IND = indicator_maskt<index_fieldt, BITS>::value;
-
-#else
-
   static constexpr std::size_t num_bits(const std::size_t n)
   {
     return n < 2 ? 1 : 1 + num_bits(n >> 1);
@@ -234,8 +184,6 @@ private:
   }
 
   static const index_fieldt IND = indicator_mask();
-
-#endif
 
   static const index_fieldt MASK = ((index_fieldt)1 << BITS) - 1;
 

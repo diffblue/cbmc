@@ -79,22 +79,13 @@ public:
   // Conversion from mp_integer to integral type T
   optionalt<T> operator()(const mp_integer &mpi) const
   {
-#if !defined(_MSC_VER) || _MSC_VER >= 1900
     static_assert(
       std::numeric_limits<T>::max() <=
           std::numeric_limits<decltype(get_val(mpi))>::max() &&
         std::numeric_limits<T>::min() >=
           std::numeric_limits<decltype(get_val(mpi))>::min(),
       "Numeric cast only works for types smaller than long long");
-#else
-    // std::numeric_limits<> methods are not declared constexpr in old versions
-    // of VS
-    PRECONDITION(
-      std::numeric_limits<T>::max() <=
-        std::numeric_limits<decltype(get_val(mpi))>::max() &&
-      std::numeric_limits<T>::min() >=
-        std::numeric_limits<decltype(get_val(mpi))>::min());
-#endif
+
     if(
       mpi <= std::numeric_limits<T>::max() &&
       mpi >= std::numeric_limits<T>::min())
