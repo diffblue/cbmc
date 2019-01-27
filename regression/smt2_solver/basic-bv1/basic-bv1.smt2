@@ -46,6 +46,9 @@
              (= a #x4) 
              (= a #x8))))
 
+; make sure this still type checks as we have used x with a different type above
+(define-fun d02 () Bool (= (bvand (bvnot x) (bvnot y)) (bvnot (bvor x y))))
+
 ; Predicates over Bitvectors
 
 (define-fun p1 () Bool (= (bvule #x0a #xf0) true))  ; unsigned less or equal
