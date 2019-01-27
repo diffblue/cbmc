@@ -24,9 +24,6 @@
  *
  **************************************************************************/
 
-// this is imported code, don't impose formatting rules
-// clang-format off
-
 #ifdef _MSC_VER
 // conversion warnings
 #pragma warning(disable:4242)
@@ -7208,4 +7205,3 @@ mz_bool mz_zip_end(mz_zip_archive *pZip)
 #ifdef __cplusplus
 }
 #endif
-// clang-format on
