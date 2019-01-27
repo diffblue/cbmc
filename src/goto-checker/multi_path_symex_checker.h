@@ -12,6 +12,7 @@ Author: Daniel Kroening, Peter Schrammel
 #ifndef CPROVER_GOTO_CHECKER_MULTI_PATH_SYMEX_CHECKER_H
 #define CPROVER_GOTO_CHECKER_MULTI_PATH_SYMEX_CHECKER_H
 
+#include "fault_localization_provider.h"
 #include "goto_symex_property_decider.h"
 #include "goto_trace_provider.h"
 #include "multi_path_symex_only_checker.h"
@@ -21,7 +22,8 @@ Author: Daniel Kroening, Peter Schrammel
 /// and calls a SAT/SMT solver to check the status of the properties.
 class multi_path_symex_checkert : public multi_path_symex_only_checkert,
                                   public goto_trace_providert,
-                                  public witness_providert
+                                  public witness_providert,
+                                  public fault_localization_providert
 {
 public:
   multi_path_symex_checkert(
@@ -46,6 +48,9 @@ public:
 
   void output_error_witness(const goto_tracet &) override;
   void output_proof() override;
+
+  fault_location_infot
+  localize_fault(const irep_idt &property_id) const override;
 
 protected:
   bool equation_generated;
