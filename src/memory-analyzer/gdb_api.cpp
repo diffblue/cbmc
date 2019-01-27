@@ -7,6 +7,9 @@ Author: Malte Mues <mail.mues@gmail.com>
 
 \*******************************************************************/
 
+/// \file
+/// Low-level interface to gdb
+
 #ifdef __linux__
 #include <cctype>
 #include <cerrno>
@@ -19,12 +22,23 @@ Author: Malte Mues <mail.mues@gmail.com>
 
 #include <util/string_utils.h>
 
-gdb_apit::gdb_apit(const char *arg) : binary_name(arg)
+/// Create a gdb_apit object
+///
+/// \param binary the binary to run with gdb
+/// \param log boolean indicating whether gdb input and output should be logged
+gdb_apit::gdb_apit(const char *binary, const bool log)
+  : binary(binary), log(log), gdb_state(gdb_statet::NOT_CREATED)
 {
 }
 
-int gdb_apit::create_gdb_process()
+/// Create a new gdb process for analysing the binary indicated by the member
+/// variable `binary`
+void gdb_apit::create_gdb_process()
 {
+  PRECONDITION(gdb_state == gdb_statet::NOT_CREATED);
+
+  command_log.clear();
+
   pid_t gdb_process;
 
   int pipe_input[2];
@@ -32,17 +46,17 @@ int gdb_apit::create_gdb_process()
 
   if(pipe(pipe_input) == -1)
   {
-    throw gdb_interaction_exceptiont("could not create pipe for stdin!");
+    throw gdb_interaction_exceptiont("could not create pipe for stdin");
   }
   if(pipe(pipe_output) == -1)
   {
-    throw gdb_interaction_exceptiont("could not create pipe for stdout!");
+    throw gdb_interaction_exceptiont("could not create pipe for stdout");
   }
 
   gdb_process = fork();
   if(gdb_process == -1)
   {
-    throw gdb_interaction_exceptiont("could not create gdb process.");
+    throw gdb_interaction_exceptiont("could not create gdb process");
   }
   if(gdb_process == 0)
   {
@@ -52,9 +66,11 @@ int gdb_apit::create_gdb_process()
     dup2(pipe_input[0], STDIN_FILENO);
     dup2(pipe_output[1], STDOUT_FILENO);
     dup2(pipe_output[1], STDERR_FILENO);
-    dprintf(pipe_output[1], "binary name: %s\n", binary_name);
-    char *arg[] = {
-      const_cast<char *>("gdb"), const_cast<char *>(binary_name), NULL};
+    dprintf(pipe_output[1], "binary name: %s\n", binary);
+    char *arg[] = {const_cast<char *>("gdb"),
+                   const_cast<char *>("--interpreter=mi"),
+                   const_cast<char *>(binary),
+                   NULL};
 
     dprintf(pipe_output[1], "Loading gdb...\n");
     execvp("gdb", arg);
@@ -66,6 +82,8 @@ int gdb_apit::create_gdb_process()
   else
   {
     // parent process
+    gdb_state = gdb_statet::CREATED;
+
     close(pipe_input[0]);
     close(pipe_output[1]);
 
@@ -75,23 +93,66 @@ int gdb_apit::create_gdb_process()
     // get stream for writing to gdb
     output_stream = fdopen(pipe_input[1], "w");
 
-    write_to_gdb("set max-value-size unlimited\n");
+    CHECK_RETURN(most_recent_line_has_tag(R"(~"done)"));
+
+    if(log)
+    {
+      // logs output to `gdb.txt` in the current directory, input is not logged
+      // hence we log it to `command_log`
+      write_to_gdb("-gdb-set logging on");
+      CHECK_RETURN(most_recent_line_has_tag("^done"));
+    }
+
+    write_to_gdb("-gdb-set max-value-size unlimited");
+    CHECK_RETURN(most_recent_line_has_tag("^done"));
   }
-  return 0;
 }
 
+/// Terminate the gdb process and close open streams (for reading from and
+/// writing to gdb)
 void gdb_apit::terminate_gdb_process()
 {
-  fclose(input_stream);
+  PRECONDITION(
+    gdb_state == gdb_statet::CREATED || gdb_state == gdb_statet::STOPPED);
+
+  write_to_gdb("-gdb-exit");
+  // we cannot use most_recent_line_has_tag() here as it checks the last line
+  // before the next `(gdb) \n` prompt in the output; however when gdb exits no
+  // next prompt is printed
+  CHECK_RETURN(has_tag("^exit", read_next_line()));
+
+  gdb_state = gdb_statet::NOT_CREATED;
+
   fclose(output_stream);
+  fclose(input_stream);
 }
 
 void gdb_apit::write_to_gdb(const std::string &command)
 {
-  if(fputs(command.c_str(), output_stream) == EOF)
+  PRECONDITION(!command.empty());
+  PRECONDITION(command.back() != '\n');
+
+  std::string line(command);
+  line += '\n';
+
+  if(log)
   {
-    throw gdb_interaction_exceptiont("Could not write a command to gdb");
+    command_log.push_back(command);
   }
+
+  if(fputs(line.c_str(), output_stream) == EOF)
+  {
+    throw gdb_interaction_exceptiont("could not write a command to gdb");
+  }
+
+  fflush(output_stream);
+}
+
+/// Return the vector of commands that have been written to gdb so far
+const std::vector<std::string> &gdb_apit::get_command_log()
+{
+  PRECONDITION(log);
+  return command_log;
 }
 
 std::string gdb_apit::read_next_line()
@@ -101,7 +162,7 @@ std::string gdb_apit::read_next_line()
   do
   {
     const size_t buf_size = 1024;
-    char buf[buf_size];
+    char buf[buf_size]; // NOLINT(runtime/arrays)
 
     const char *c = fgets(buf, buf_size, input_stream);
 
@@ -112,173 +173,241 @@ std::string gdb_apit::read_next_line()
         throw gdb_interaction_exceptiont("error reading from gdb");
       }
 
-      INVARIANT(feof(input_stream), "");
-      INVARIANT(result.back() != '\n', "");
+      INVARIANT(
+        feof(input_stream),
+        "EOF must have been reached when the error indicator on the stream "
+        "is not set and fgets returned NULL");
+      INVARIANT(
+        result.empty() || result.back() != '\n',
+        "when EOF is reached then either no characters were read or the string"
+        " read does not end in a newline");
 
       return result;
     }
 
-    result += std::string(buf);
+    std::string chunk(buf);
+    INVARIANT(!chunk.empty(), "chunk cannot be empty when EOF was not reached");
+
+    result += chunk;
   } while(result.back() != '\n');
 
   return result;
 }
 
+std::string gdb_apit::read_most_recent_line()
+{
+  std::string line;
+  std::string output;
+
+  do
+  {
+    output = line;
+    line = read_next_line();
+  } while(line != "(gdb) \n");
+
+  return output;
+}
+
+gdb_apit::gdb_output_recordt
+gdb_apit::get_most_recent_record(const std::string &tag, const bool must_exist)
+{
+  std::string line = read_most_recent_line();
+  const bool b = has_tag(tag, line);
+
+  if(must_exist)
+  {
+    CHECK_RETURN(b);
+  }
+  else if(!b)
+  {
+    throw gdb_interaction_exceptiont("record does not exist");
+  }
+
+  std::string record = strip_string(line.substr(line.find(',') + 1));
+
+  return parse_gdb_output_record(record);
+}
+
+bool gdb_apit::has_tag(const std::string &tag, const std::string &line)
+{
+  return line.compare(0, tag.length(), tag) == 0;
+}
+
+bool gdb_apit::most_recent_line_has_tag(const std::string &tag)
+{
+  const std::string line = read_most_recent_line();
+  return has_tag(tag, line);
+}
+
+/// Run gdb with the given core file
+///
+/// \param corefile core dump
 void gdb_apit::run_gdb_from_core(const std::string &corefile)
 {
-  const std::string command = "core " + corefile + "\n";
+  PRECONDITION(gdb_state == gdb_statet::CREATED);
+
+  // there does not seem to be a gdb mi command to run from a core file
+  const std::string command = "core " + corefile;
+
   write_to_gdb(command);
-  std::string line;
-  while(!isdigit(line[0]))
+  CHECK_RETURN(most_recent_line_has_tag("^done"));
+
+  gdb_state = gdb_statet::STOPPED;
+}
+
+/// Run gdb to the given breakpoint
+///
+/// \param breakpoint the breakpoint to set (can be e.g. a line number or a
+///   function name)
+bool gdb_apit::run_gdb_to_breakpoint(const std::string &breakpoint)
+{
+  PRECONDITION(gdb_state == gdb_statet::CREATED);
+
+  std::string command("-break-insert");
+  command += " " + breakpoint;
+
+  write_to_gdb(command);
+  if(!most_recent_line_has_tag("^done"))
   {
-    line = read_next_line();
-    if(check_for_gdb_core_error(line))
-    {
-      terminate_gdb_process();
-      throw gdb_interaction_exceptiont(
-        "This core file doesn't work with the binary.");
-    }
+    throw gdb_interaction_exceptiont("could not set breakpoint");
   }
-}
 
-bool gdb_apit::check_for_gdb_core_error(const std::string &line)
-{
-  const std::regex core_init_error_r("exec file is newer than core");
-  return regex_search(line, core_init_error_r);
-}
+  write_to_gdb("-exec-run");
 
-void gdb_apit::run_gdb_to_breakpoint(const std::string &breakpoint)
-{
-  std::string command = "break " + breakpoint + "\n";
-  write_to_gdb(command);
-  command = "run\n";
-  write_to_gdb(command);
-  std::string line;
-  while(!isdigit(line[0]))
+  if(!most_recent_line_has_tag("*running"))
   {
-    line = read_next_line();
-    if(check_for_gdb_breakpoint_error(line))
-    {
-      terminate_gdb_process();
-      throw gdb_interaction_exceptiont("This is not a valid breakpoint\n");
-    }
+    throw gdb_interaction_exceptiont("could not run program");
   }
+
+  gdb_output_recordt record = get_most_recent_record("*stopped");
+  const auto it = record.find("reason");
+  CHECK_RETURN(it != record.end());
+
+  const std::string &reason = it->second;
+
+  if(reason == "breakpoint-hit")
+  {
+    gdb_state = gdb_statet::STOPPED;
+    return true;
+  }
+  else if(reason == "exited-normally")
+  {
+    return false;
+  }
+  else
+  {
+    throw gdb_interaction_exceptiont(
+      "gdb stopped for unhandled reason `" + reason + "`");
+  }
+
+  // not reached
+  return true;
 }
 
-bool gdb_apit::check_for_gdb_breakpoint_error(const std::string &line)
+std::string gdb_apit::eval_expr(const std::string &expr)
 {
-  const std::regex breakpoint_init_error_r("Make breakpoint pending on future");
-  return regex_search(line, breakpoint_init_error_r);
+  write_to_gdb("-var-create tmp * " + expr);
+
+  if(!most_recent_line_has_tag("^done"))
+  {
+    throw gdb_interaction_exceptiont(
+      "could not create variable for "
+      "expression `" +
+      expr + "`");
+  }
+
+  write_to_gdb("-var-evaluate-expression tmp");
+  gdb_output_recordt record = get_most_recent_record("^done", true);
+
+  write_to_gdb("-var-delete tmp");
+  CHECK_RETURN(most_recent_line_has_tag("^done"));
+
+  const auto it = record.find("value");
+  CHECK_RETURN(it != record.end());
+
+  const std::string value = it->second;
+
+  INVARIANT(
+    value.back() != '"' ||
+      (value.length() >= 2 && value[value.length() - 2] == '\\'),
+    "quotes should have been stripped off from value");
+  INVARIANT(value.back() != '\n', "value should not end in a newline");
+
+  return value;
 }
 
-std::string gdb_apit::create_command(const std::string &variable)
+/// Get the memory address pointed to by the given pointer expression
+///
+/// \param expr an expression of pointer type (e.g., `&x` with `x` being of type
+///   `int` or `p` with `p` being of type `int *`)
+/// \return memory address in hex format
+std::string gdb_apit::get_memory(const std::string &expr)
 {
-  return "p " + variable + "\n";
-}
+  PRECONDITION(gdb_state == gdb_statet::STOPPED);
 
-std::string gdb_apit::get_memory(const std::string &variable)
-{
-  write_to_gdb(create_command(variable));
-  const std::string &response = read_next_line();
-  return extract_memory(response);
-}
+  std::string mem;
 
-// All lines in the output start with something like
-// '$XX = ' where XX is a digit. => shared_prefix.
-const char shared_prefix[] = R"(\$[0-9]+\s=\s)";
+  // regex matching a hex memory address followed by an optional identifier in
+  // angle brackets (e.g., `0x601060 <x>`)
+  std::regex regex(R"(^(0x[1-9a-f][0-9a-f]*)( <.*>)?)");
 
-// Matching a hex encoded address.
-const char memory_address[] = R"(0x[[:xdigit:]]+)";
-
-std::string gdb_apit::extract_memory(const std::string &line)
-{
-  // The next patterns matches the type information,
-  // which be "(classifier struct name (*)[XX])"
-  // for pointer to struct arrayes. classsifier and struct is optional => {1,3}
-  // If it isn't an array, than the ending is " *)"
-  // => or expression in pointer_star_or_array_suffix.
-  const std::string struct_name = R"((?:\S+\s){1,3})";
-  const std::string pointer_star_or_arary_suffix =
-    R"((?:\*|(?:\*)?\(\*\)\[[0-9]+\])?)";
-  const std::string pointer_type_info =
-    R"(\()" + struct_name + pointer_star_or_arary_suffix + R"(\))";
-
-  // The pointer type info is followed by the memory value and eventually
-  // extended by the name of the pointer content, if gdb has an explicit symbol.
-  // See unit test cases for more examples of expected input.
-  const std::regex pointer_pattern(
-    std::string(shared_prefix) + pointer_type_info + R"(\s()" + memory_address +
-    R"()(\s\S+)?)");
-  const std::regex null_pointer_pattern(
-    std::string(shared_prefix) + R"((0x0))");
-  // Char pointer output the memory adress followed by the string in there.
-  const std::regex char_pointer_pattern(
-    std::string(shared_prefix) + R"(()" + memory_address +
-    R"()\s"[\S[:s:]]*")");
+  const std::string value = eval_expr(expr);
 
   std::smatch result;
-  if(regex_search(line, result, char_pointer_pattern))
+  if(regex_match(value, result, regex))
   {
+    // return hex address only
     return result[1];
   }
-  if(regex_search(line, result, pointer_pattern))
+  else
   {
-    return result[1];
+    throw gdb_interaction_exceptiont(
+      "value `" + value +
+      "` is not a memory address or has unrecognised format");
   }
-  if(regex_search(line, result, null_pointer_pattern))
-  {
-    return result[1];
-  }
-  throw gdb_interaction_exceptiont("Cannot resolve memory_address: " + line);
+
+  // not reached
+  return "";
 }
 
-std::string gdb_apit::get_value(const std::string &variable)
+/// Get value of the given value expression
+///
+/// \param expr an expression of non-pointer type or pointer to char
+/// \return value of the expression; if the expression is of type pointer to
+///   char and represents a string, the string value is returned; otherwise the
+///   value is returned just as it is printed by gdb
+std::string gdb_apit::get_value(const std::string &expr)
 {
-  write_to_gdb(create_command(variable));
-  const std::string &response = read_next_line();
-  return extract_value(response);
-}
+  PRECONDITION(gdb_state == gdb_statet::STOPPED);
 
-std::string gdb_apit::extract_value(const std::string &line)
-{
-  // This pattern matches primitive int values and bools.
-  const std::regex value_pattern(
-    std::string(shared_prefix) + R"(((?:-)?\d+|true|false))");
-  // This pattern matches the char pointer content.
-  // It is printed behind the address.
-  const std::regex char_value_pattern(
-    std::string(shared_prefix) + memory_address + "\\s\"([\\S ]*)\"");
-  // An enum entry just prints the name of the value on the commandline.
-  const std::regex enum_value_pattern(
-    std::string(shared_prefix) + R"(([\S]+)(?:\n|$))");
-  // A void pointer outputs it type first, followed by the memory address it
-  // is pointing to. This pattern should extract the address.
-  const std::regex void_pointer_pattern(
-    std::string(shared_prefix) + R"((?:[\S\s]+)\s()" + memory_address + ")");
+  const std::string value = eval_expr(expr);
 
-  std::smatch result;
-  if(regex_search(line, result, char_value_pattern))
   {
-    return result[1];
+    // get string from char pointer
+    const std::regex regex(R"(0x[1-9a-f][0-9a-f]* \\"(.*)\\")");
+
+    std::smatch result;
+    if(regex_match(value, result, regex))
+    {
+      return result[1];
+    }
   }
-  if(regex_search(line, result, value_pattern))
+
+  // this case will go away eventually, once client code has been refactored to
+  // use get_memory() instead
   {
-    return result[1];
+    // get void pointer address
+    const std::regex regex(R"(0x[1-9a-f][0-9a-f]*)");
+
+    std::smatch result;
+    if(regex_match(value, result, regex))
+    {
+      return result[1];
+    }
   }
-  if(regex_search(line, result, enum_value_pattern))
-  {
-    return result[1];
-  }
-  if(regex_search(line, result, void_pointer_pattern))
-  {
-    return result[1];
-  }
-  std::regex memmory_access_error("Cannot access memory");
-  if(regex_search(line, memmory_access_error))
-  {
-    throw gdb_inaccessible_memory_exceptiont("ERROR: " + line);
-  }
-  throw gdb_interaction_exceptiont("Cannot extract value from this: " + line);
+
+  // return raw value
+  return value;
 }
 
 gdb_apit::gdb_output_recordt
