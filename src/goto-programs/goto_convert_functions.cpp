@@ -167,7 +167,6 @@ void goto_convert_functionst::convert_function(
   goto_programt::targett end_function=tmp_end_function.add_instruction();
   end_function->type=END_FUNCTION;
   end_function->source_location=end_location;
-  end_function->code.set(ID_identifier, identifier);
 
   targets=targetst();
   targets.set_return(end_function);
