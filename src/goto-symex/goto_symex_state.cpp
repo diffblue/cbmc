@@ -766,3 +766,29 @@ void goto_symex_statet::print_backtrace(std::ostream &out) const
         << frame.calling_location.pc->location_number << "\n";
   }
 }
+
+void goto_symex_statet::add_object(
+  ssa_exprt &ssa,
+  std::size_t l1_index,
+  const namespacet &ns)
+{
+  framet &frame = call_stack().top();
+
+  const irep_idt l0_name = ssa.get_identifier();
+
+  // save old L1 name, if any
+  auto existing_or_new_entry = level1.current_names.emplace(
+    std::piecewise_construct,
+    std::forward_as_tuple(l0_name),
+    std::forward_as_tuple(ssa, l1_index));
+
+  if(!existing_or_new_entry.second)
+  {
+    frame.old_level1.emplace(l0_name, existing_or_new_entry.first->second);
+    existing_or_new_entry.first->second = std::make_pair(ssa, l1_index);
+  }
+
+  ssa = rename_ssa<L1>(std::move(ssa), ns);
+  const bool inserted = frame.local_objects.insert(ssa.get_identifier()).second;
+  INVARIANT(inserted, "l1_name expected to be unique by construction");
+}

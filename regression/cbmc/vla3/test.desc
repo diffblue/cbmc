@@ -7,5 +7,4 @@ main.c
 --
 ^warning: ignoring
 --
-Renaming is inconsistent across loop iterations as we map L1 names to types, but
-do not actually introduce new L1 ids each time we declare an object.
+The array decision procedure does not yet handle member expressions.

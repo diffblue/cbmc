@@ -22,6 +22,7 @@ Author: Daniel Kroening, kroening@kroening.com
 static void locality(
   const irep_idt &function_identifier,
   goto_symext::statet &state,
+  path_storaget &path_storage,
   const goto_functionst::goto_functiont &goto_function,
   const namespacet &ns);
 
@@ -307,7 +308,7 @@ void goto_symext::symex_function_call_code(
   framet &frame = state.call_stack().new_frame(state.source);
 
   // preserve locality of local variables
-  locality(identifier, state, goto_function, ns);
+  locality(identifier, state, path_storage, goto_function, ns);
 
   // assign actuals to formal parameters
   parameter_assignments(identifier, goto_function, state, arguments);
@@ -383,11 +384,12 @@ void goto_symext::symex_end_of_function(statet &state)
   pop_frame(state);
 }
 
-/// preserves locality of local variables of a given function by applying L1
-/// renaming to the local identifiers
+/// Preserves locality of parameters of a given function by applying L1
+/// renaming to them.
 static void locality(
   const irep_idt &function_identifier,
   goto_symext::statet &state,
+  path_storaget &path_storage,
   const goto_functionst::goto_functiont &goto_function,
   const namespacet &ns)
 {
@@ -395,56 +397,14 @@ static void locality(
     state.threads[state.source.thread_nr].function_frame[function_identifier];
   frame_nr++;
 
-  std::set<irep_idt> local_identifiers;
-
-  get_local_identifiers(goto_function, local_identifiers);
-
-  framet &frame = state.call_stack().top();
-
-  for(std::set<irep_idt>::const_iterator
-      it=local_identifiers.begin();
-      it!=local_identifiers.end();
-      it++)
+  for(const auto &param : goto_function.parameter_identifiers)
   {
     // get L0 name
     ssa_exprt ssa =
-      state.rename_ssa<L0>(ssa_exprt{ns.lookup(*it).symbol_expr()}, ns);
-    const irep_idt l0_name=ssa.get_identifier();
+      state.rename_ssa<L0>(ssa_exprt{ns.lookup(param).symbol_expr()}, ns);
 
-    // save old L1 name for popping the frame
-    auto c_it = state.level1.current_names.find(l0_name);
-
-    if(c_it != state.level1.current_names.end())
-    {
-      frame.old_level1.emplace(l0_name, c_it->second);
-      c_it->second = std::make_pair(ssa, frame_nr);
-    }
-    else
-    {
-      c_it = state.level1.current_names
-               .emplace(l0_name, std::make_pair(ssa, frame_nr))
-               .first;
-    }
-
-    // do L1 renaming -- these need not be unique, as
-    // identifiers may be shared among functions
-    // (e.g., due to inlining or other code restructuring)
-
-    ssa_exprt ssa_l1 = state.rename_ssa<L1>(std::move(ssa), ns);
-
-    irep_idt l1_name = ssa_l1.get_identifier();
-    unsigned offset=0;
-
-    while(state.l1_history.find(l1_name)!=state.l1_history.end())
-    {
-      symex_renaming_levelt::increase_counter(c_it);
-      ++offset;
-      ssa_l1.set_level_1(frame_nr + offset);
-      l1_name = ssa_l1.get_identifier();
-    }
-
-    // now unique -- store
-    frame.local_objects.insert(l1_name);
-    state.l1_history.insert(l1_name);
+    const std::size_t fresh_l1_index =
+      path_storage.get_unique_index(ssa.get_identifier(), frame_nr);
+    state.add_object(ssa, fresh_l1_index, ns);
   }
 }

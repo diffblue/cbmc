@@ -98,11 +98,25 @@ public:
   /// error-handling paths.
   std::unordered_map<irep_idt, local_safe_pointerst> safe_pointers;
 
+  /// Provide a unique index for a given \p id, starting from \p minimum_index.
+  std::size_t get_unique_index(const irep_idt &id, std::size_t minimum_index)
+  {
+    auto entry = unique_index_map.emplace(id, minimum_index);
+
+    if(!entry.second)
+      entry.first->second = std::max(entry.first->second + 1, minimum_index);
+
+    return entry.first->second;
+  }
+
 private:
   // Derived classes should override these methods, allowing the base class to
   // enforce preconditions.
   virtual patht &private_peek() = 0;
   virtual void private_pop() = 0;
+
+  /// Storage used by \ref get_unique_index.
+  std::unordered_map<irep_idt, std::size_t> unique_index_map;
 };
 
 /// \brief LIFO save queue: depth-first search, try to finish paths

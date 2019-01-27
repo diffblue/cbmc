@@ -60,9 +60,6 @@ public:
 
   symex_target_equationt *symex_target;
 
-  // we remember all L1 renamings
-  std::set<irep_idt> l1_history;
-
   symex_level0t level0;
   symex_level1t level1;
 
@@ -140,6 +137,11 @@ public:
     PRECONDITION(source.thread_nr < threads.size());
     return threads[source.thread_nr].call_stack;
   }
+
+  /// Create a new instance of the L0-renamed object \p ssa. As part of this,
+  /// turn \p ssa into an L1-renamed SSA expression. When doing so, use
+  /// \p l1_index as the L1 index, which must not previously have been used.
+  void add_object(ssa_exprt &ssa, std::size_t l1_index, const namespacet &ns);
 
   void print_backtrace(std::ostream &) const;
 
