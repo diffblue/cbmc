@@ -85,9 +85,7 @@ java-testing-utils-clean:
 BMC_DEPS =$(CPROVER_DIR)/src/cbmc/all_properties$(OBJEXT) \
           $(CPROVER_DIR)/src/cbmc/bmc$(OBJEXT) \
           $(CPROVER_DIR)/src/cbmc/bmc_cover$(OBJEXT) \
-          $(CPROVER_DIR)/src/cbmc/cbmc_languages$(OBJEXT) \
           $(CPROVER_DIR)/src/cbmc/fault_localization$(OBJEXT) \
-          $(CPROVER_DIR)/src/cbmc/xml_interface$(OBJEXT) \
           $(CPROVER_DIR)/src/jsil/expr2jsil$(OBJEXT) \
           $(CPROVER_DIR)/src/jsil/jsil_convert$(OBJEXT) \
           $(CPROVER_DIR)/src/jsil/jsil_entry_point$(OBJEXT) \
