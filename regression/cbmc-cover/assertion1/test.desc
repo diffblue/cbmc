@@ -3,7 +3,7 @@ main.c
 --cover assertion
 ^EXIT=0$
 ^SIGNAL=0$
-^\[main.coverage.1\] file main.c line 9 function main: SATISFIED$
-^\[main.coverage.2\] file main.c line 13 function main: SATISFIED$
+^\[main.coverage.1\] file main.c line 9 function main assertion: SATISFIED$
+^\[main.coverage.2\] file main.c line 13 function main assertion: SATISFIED$
 --
 ^warning: ignoring
