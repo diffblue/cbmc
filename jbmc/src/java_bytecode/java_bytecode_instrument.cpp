@@ -229,7 +229,7 @@ code_ifthenelset java_bytecode_instrumentt::check_class_cast(
   if(null_check_op.type()!=voidptr)
     null_check_op.make_typecast(voidptr);
 
-  codet check_code;
+  optionalt<codet> check_code;
   if(throw_runtime_exceptions)
   {
     check_code=
@@ -251,7 +251,7 @@ code_ifthenelset java_bytecode_instrumentt::check_class_cast(
 
   return code_ifthenelset(
     notequal_exprt(std::move(null_check_op), null_pointer_exprt(voidptr)),
-    std::move(check_code));
+    std::move(*check_code));
 }
 
 /// Checks whether \p expr is null and throws NullPointerException/
