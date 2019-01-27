@@ -111,9 +111,7 @@ public:
 
 static code_function_callt make_void_call(const symbol_exprt &function)
 {
-  code_function_callt ret;
-  ret.function() = function;
-  return ret;
+  return code_function_callt(function, {});
 }
 
 SCENARIO(
