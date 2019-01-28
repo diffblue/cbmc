@@ -358,7 +358,6 @@ exprt::operandst java_build_arguments(
       INVARIANT(!is_this, "We cannot have different types for `this` here");
       // create a non-deterministic switch between all possible values for the
       // type of the parameter.
-      code_switcht code_switch;
 
       // the idea is to get a new symbol for the parameter value `tmp`
 
@@ -385,8 +384,10 @@ exprt::operandst java_build_arguments(
         symbol_table);
       main_arguments[param_number] = result_symbol.symbol_expr();
 
-      std::vector<codet> cases(alternatives.size());
-      const auto initialize_parameter = [&](const struct_tag_typet &type) {
+      std::vector<codet> cases;
+      cases.reserve(alternatives.size());
+      for(const auto &type : alternatives)
+      {
         code_blockt init_code_for_type;
         exprt init_expr_for_parameter = object_factory(
           java_reference_type(type),
@@ -402,14 +403,8 @@ exprt::operandst java_build_arguments(
           code_assignt(
             result_symbol.symbol_expr(),
             typecast_exprt(init_expr_for_parameter, p.type())));
-        return init_code_for_type;
-      };
-
-      std::transform(
-        alternatives.begin(),
-        alternatives.end(),
-        cases.begin(),
-        initialize_parameter);
+        cases.push_back(init_code_for_type);
+      }
 
       init_code.add(
         generate_nondet_switch(
