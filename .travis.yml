@@ -16,7 +16,9 @@ jobs:
       install:
       script: |
         clang-format-7 --version
-        git-clang-format-7 --binary clang-format-7 "${TRAVIS_BRANCH}"
+        # build a pathspec that excludes the files in .clang-format-ignore
+        while read file ; do echo EXCLUDES+="':(top,exclude)$file' " ; done < .clang-format-ignore
+        git-clang-format-7 --binary clang-format-7 "${TRAVIS_BRANCH}" -- $EXCLUDES
         git diff > formatted.diff
         if [[ -s formatted.diff ]] ; then
           echo 'Formatting error! The following diff shows the required changes'
