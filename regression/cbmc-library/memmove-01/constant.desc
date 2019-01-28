@@ -1,0 +1,9 @@
+CORE
+constant.c
+--unwind 17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+^Generated \d+ VCC\(s\), 0 remaining after simplification$
+--
+^warning: ignoring

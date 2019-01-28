@@ -1779,9 +1779,26 @@ bool simplify_exprt::simplify_byte_extract(byte_extract_exprt &expr)
   const auto bits=
     expr2bits(expr.op(), expr.id()==ID_byte_extract_little_endian);
 
-  // exact match of length only - otherwise we might lose bits of
-  // flexible array members at the end of a struct
-  if(bits.has_value() && mp_integer(bits->size()) == *el_size + *offset * 8)
+  // make sure we don't lose bits with structs containing flexible array members
+  const bool struct_has_flexible_array_member = has_subtype(
+    expr.type(),
+    [&](const typet &type) {
+      if(type.id() != ID_struct && type.id() != ID_struct_tag)
+        return false;
+
+      const struct_typet &st = to_struct_type(ns.follow(type));
+      const auto &comps = st.components();
+      if(comps.empty() || comps.back().type().id() != ID_array)
+        return false;
+
+      const auto size =
+        numeric_cast<mp_integer>(to_array_type(comps.back().type()).size());
+      return !size.has_value() || *size <= 1;
+    },
+    ns);
+  if(
+    bits.has_value() && mp_integer(bits->size()) >= *el_size + *offset * 8 &&
+    !struct_has_flexible_array_member)
   {
     std::string bits_cut = std::string(
       bits.value(),
