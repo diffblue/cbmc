@@ -653,19 +653,19 @@ void disjunctive_polynomial_accelerationt::assert_for_values(
   exprt &target)
 {
   // First figure out what the appropriate type for this expression is.
-  typet expr_type=nil_typet();
+  optionalt<typet> expr_type;
 
   for(std::map<exprt, exprt>::iterator it=values.begin();
       it!=values.end();
       ++it)
   {
-    if(expr_type==nil_typet())
+    if(!expr_type.has_value())
     {
       expr_type=it->first.type();
     }
     else
     {
-      expr_type=join_types(expr_type, it->first.type());
+      expr_type = join_types(*expr_type, it->first.type());
     }
   }
 
@@ -690,7 +690,7 @@ void disjunctive_polynomial_accelerationt::assert_for_values(
       it!=coefficients.end();
       ++it)
   {
-    exprt concrete_value=from_integer(1, expr_type);
+    exprt concrete_value = from_integer(1, *expr_type);
 
     for(expr_listt::const_iterator e_it=it->first.begin();
         e_it!=it->first.end();
@@ -701,7 +701,7 @@ void disjunctive_polynomial_accelerationt::assert_for_values(
       if(e==loop_counter)
       {
         mult_exprt mult(
-          from_integer(num_unwindings, expr_type), concrete_value);
+          from_integer(num_unwindings, *expr_type), concrete_value);
         mult.swap(concrete_value);
       }
       else
@@ -718,7 +718,7 @@ void disjunctive_polynomial_accelerationt::assert_for_values(
     // OK, concrete_value now contains the value of all the relevant variables
     // multiplied together.  Create the term concrete_value*coefficient and add
     // it into the polynomial.
-    typecast_exprt cast(it->second, expr_type);
+    typecast_exprt cast(it->second, *expr_type);
     const mult_exprt term(concrete_value, cast);
 
     if(rhs.is_nil())

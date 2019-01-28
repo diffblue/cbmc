@@ -508,7 +508,7 @@ void polynomial_acceleratort::assert_for_values(
   overflow_instrumentert &overflow)
 {
   // First figure out what the appropriate type for this expression is.
-  typet expr_type=nil_typet();
+  optionalt<typet> expr_type;
 
   for(std::map<exprt, int>::iterator it=values.begin();
       it!=values.end();
@@ -523,25 +523,26 @@ void polynomial_acceleratort::assert_for_values(
       this_type=size_type();
     }
 
-    if(expr_type==nil_typet())
+    if(!expr_type.has_value())
     {
       expr_type=this_type;
     }
     else
     {
-      expr_type=join_types(expr_type, this_type);
+      expr_type = join_types(*expr_type, this_type);
     }
   }
 
-  assert(to_bitvector_type(expr_type).get_width()>0);
-
+  INVARIANT(
+    to_bitvector_type(*expr_type).get_width() > 0,
+    "joined types must be non-empty bitvector types");
 
   // Now set the initial values of the all the variables...
   for(std::map<exprt, int>::iterator it=values.begin();
       it!=values.end();
       ++it)
   {
-    program.assign(it->first, from_integer(it->second, expr_type));
+    program.assign(it->first, from_integer(it->second, *expr_type));
   }
 
   // Now unwind the loop as many times as we need to.
@@ -583,8 +584,8 @@ void polynomial_acceleratort::assert_for_values(
     // OK, concrete_value now contains the value of all the relevant variables
     // multiplied together.  Create the term concrete_value*coefficient and add
     // it into the polynomial.
-    typecast_exprt cast(it->second, expr_type);
-    const mult_exprt term(from_integer(concrete_value, expr_type), cast);
+    typecast_exprt cast(it->second, *expr_type);
+    const mult_exprt term(from_integer(concrete_value, *expr_type), cast);
 
     if(rhs.is_nil())
     {
