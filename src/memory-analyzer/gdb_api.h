@@ -91,21 +91,5 @@ private:
   std::string reason;
 };
 
-class gdb_inaccessible_memory_exceptiont : public cprover_exception_baset
-{
-public:
-  explicit gdb_inaccessible_memory_exceptiont(std::string reason)
-    : reason(reason)
-  {
-  }
-
-  std::string what() const override
-  {
-    return reason;
-  }
-
-private:
-  std::string reason;
-};
 #endif // CPROVER_MEMORY_ANALYZER_GDB_API_H
 #endif // __linux__
