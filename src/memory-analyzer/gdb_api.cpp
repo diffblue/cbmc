@@ -18,6 +18,7 @@ Author: Malte Mues <mail.mues@gmail.com>
 #include <regex>
 
 #include "gdb_api.h"
+
 #include <goto-programs/goto_model.h>
 
 #include <util/string_utils.h>
@@ -48,25 +49,31 @@ void gdb_apit::create_gdb_process()
   {
     throw gdb_interaction_exceptiont("could not create pipe for stdin");
   }
+
   if(pipe(pipe_output) == -1)
   {
     throw gdb_interaction_exceptiont("could not create pipe for stdout");
   }
 
   gdb_process = fork();
+
   if(gdb_process == -1)
   {
     throw gdb_interaction_exceptiont("could not create gdb process");
   }
+
   if(gdb_process == 0)
   {
     // child process
     close(pipe_input[1]);
     close(pipe_output[0]);
+
     dup2(pipe_input[0], STDIN_FILENO);
     dup2(pipe_output[1], STDOUT_FILENO);
     dup2(pipe_output[1], STDERR_FILENO);
+
     dprintf(pipe_output[1], "binary name: %s\n", binary);
+
     char *arg[] = {const_cast<char *>("gdb"),
                    const_cast<char *>("--interpreter=mi"),
                    const_cast<char *>(binary),
