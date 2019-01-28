@@ -116,23 +116,7 @@ public:
   ///
   /// The validation mode indicates whether well-formedness check failures are
   /// reported via DATA_INVARIANT violations or exceptions.
-  void validate(const namespacet &ns, const validation_modet vm) const
-  {
-    body.validate(ns, vm);
-
-    find_symbols_sett typetags;
-    find_type_symbols(type, typetags);
-    const symbolt *symbol;
-    for(const auto &identifier : typetags)
-    {
-      DATA_CHECK(
-        vm,
-        !ns.lookup(identifier, symbol),
-        id2string(identifier) + " not found");
-    }
-
-    validate_full_type(type, ns, vm);
-  }
+  void validate(const namespacet &ns, const validation_modet vm) const;
 };
 
 void get_local_identifiers(const goto_functiont &, std::set<irep_idt> &dest);

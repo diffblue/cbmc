@@ -22,6 +22,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <langapi/language_util.h>
 
+#include "remove_returns.h"
+
 /// Writes to \p out a two/three line string representation of a given
 /// \p instruction. The output is of the format:
 /// ```
@@ -709,13 +711,75 @@ void goto_programt::instructiont::validate(
         const auto &goto_id = goto_symbol_expr.get_identifier();
 
         if(!ns.lookup(goto_id, table_symbol))
+        {
+          bool symbol_expr_type_matches_symbol_table =
+            base_type_eq(goto_symbol_expr.type(), table_symbol->type, ns);
+
+          if(
+            !symbol_expr_type_matches_symbol_table &&
+            table_symbol->type.id() == ID_code)
+          {
+            // Return removal sets the return type of a function symbol table
+            // entry to 'void', but some callsites still expect the original
+            // type (e.g. if a function is passed as a parameter)
+            symbol_expr_type_matches_symbol_table = base_type_eq(
+              goto_symbol_expr.type(),
+              original_return_type(ns.get_symbol_table(), goto_id),
+              ns);
+
+            if(
+              !symbol_expr_type_matches_symbol_table &&
+              goto_symbol_expr.type().id() == ID_code)
+            {
+              // If a function declaration and its definition are in different
+              // translation units they may have different return types,
+              // which remove_returns patches up with a typecast. If thats
+              // the case, then the return type in the symbol table may differ
+              // from the return type in the symbol expr
+              if(
+                goto_symbol_expr.type().source_location().get_file() !=
+                table_symbol->type.source_location().get_file())
+              {
+                // temporarily fixup the return types
+                auto goto_symbol_expr_type =
+                  to_code_type(goto_symbol_expr.type());
+                auto table_symbol_type = to_code_type(table_symbol->type);
+
+                goto_symbol_expr_type.return_type() =
+                  table_symbol_type.return_type();
+
+                symbol_expr_type_matches_symbol_table =
+                  base_type_eq(goto_symbol_expr_type, table_symbol_type, ns);
+              }
+            }
+          }
+
+          if(
+            !symbol_expr_type_matches_symbol_table &&
+            goto_symbol_expr.type().id() == ID_array &&
+            to_array_type(goto_symbol_expr.type()).is_incomplete())
+          {
+            // If the symbol expr has an incomplete array type, it may not have
+            // a constant size value, whereas the symbol table entry may have
+            // an (assumed) constant size of 1 (which mimics gcc behaviour)
+            if(table_symbol->type.id() == ID_array)
+            {
+              auto symbol_table_array_type = to_array_type(table_symbol->type);
+              symbol_table_array_type.size() = nil_exprt();
+
+              symbol_expr_type_matches_symbol_table = base_type_eq(
+                goto_symbol_expr.type(), symbol_table_array_type, ns);
+            }
+          }
+
           DATA_CHECK_WITH_DIAGNOSTICS(
             vm,
-            base_type_eq(goto_symbol_expr.type(), table_symbol->type, ns),
+            symbol_expr_type_matches_symbol_table,
             id2string(goto_id) + " type inconsistency\n" +
               "goto program type: " + goto_symbol_expr.type().id_string() +
               "\n" + "symbol table type: " + table_symbol->type.id_string(),
             current_source_location);
+        }
       }
     };
 

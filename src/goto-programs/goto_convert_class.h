@@ -335,7 +335,7 @@ protected:
 
   typedef std::vector<codet> destructor_stackt;
 
-  symbol_exprt exception_flag();
+  symbol_exprt exception_flag(const irep_idt &mode);
   void unwind_destructor_stack(
     const source_locationt &,
     std::size_t stack_size,

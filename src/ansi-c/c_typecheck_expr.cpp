@@ -538,6 +538,7 @@ void c_typecheck_baset::typecheck_expr_builtin_va_arg(exprt &expr)
   symbol.base_name=ID_gcc_builtin_va_arg;
   symbol.name=ID_gcc_builtin_va_arg;
   symbol.type=symbol_type;
+  symbol.mode = ID_C;
 
   symbol_table.insert(std::move(symbol));
 }

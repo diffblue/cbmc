@@ -168,7 +168,7 @@ void goto_convertt::convert_CPROVER_try_catch(
   targets.set_throw(tmp.instructions.begin());
 
   // now put 'catch' code onto destructor stack
-  code_ifthenelset catch_code(exception_flag(), to_code(code.op1()));
+  code_ifthenelset catch_code(exception_flag(mode), to_code(code.op1()));
   catch_code.add_source_location()=code.source_location();
 
   targets.destructor_stack.push_back(std::move(catch_code));
@@ -194,7 +194,7 @@ void goto_convertt::convert_CPROVER_throw(
       dest.add_instruction(ASSIGN);
 
     t_set_exception->source_location=code.source_location();
-    t_set_exception->code=code_assignt(exception_flag(), true_exprt());
+    t_set_exception->code = code_assignt(exception_flag(mode), true_exprt());
   }
 
   // do we catch locally?
@@ -244,7 +244,7 @@ void goto_convertt::convert_CPROVER_try_finally(
   convert(to_code(code.op1()), dest, mode);
 }
 
-symbol_exprt goto_convertt::exception_flag()
+symbol_exprt goto_convertt::exception_flag(const irep_idt &mode)
 {
   irep_idt id="$exception_flag";
 
@@ -260,6 +260,7 @@ symbol_exprt goto_convertt::exception_flag()
     new_symbol.is_thread_local=true;
     new_symbol.is_file_local=false;
     new_symbol.type=bool_typet();
+    new_symbol.mode = mode;
     symbol_table.insert(std::move(new_symbol));
   }
 

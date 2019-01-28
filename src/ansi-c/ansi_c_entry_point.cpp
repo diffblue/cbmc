@@ -238,7 +238,7 @@ bool generate_ansi_c_start_function(
     return_symbol.mode=ID_C;
     return_symbol.is_static_lifetime=false;
     return_symbol.name="return'";
-    return_symbol.base_name="return";
+    return_symbol.base_name = "return'";
     return_symbol.type=to_code_type(symbol.type).return_type();
 
     symbol_table.add(return_symbol);
@@ -261,7 +261,7 @@ bool generate_ansi_c_start_function(
       {
         symbolt argc_symbol;
 
-        argc_symbol.base_name = "argc";
+        argc_symbol.base_name = "argc'";
         argc_symbol.name = "argc'";
         argc_symbol.type = signed_int_type();
         argc_symbol.is_static_lifetime = true;
