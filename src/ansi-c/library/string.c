@@ -571,7 +571,7 @@ inline char *strdup(const char *str)
   __CPROVER_HIDE:;
   __CPROVER_size_t bufsz;
   bufsz=(strlen(str)+1);
-  char *cpy=(char *)malloc(bufsz*sizeof(char));
+  char *cpy = (char *)calloc(bufsz * sizeof(char), sizeof(char));
   if(cpy==((void *)0)) return 0;
   #ifdef __CPROVER_STRING_ABSTRACTION
   __CPROVER_assume(__CPROVER_buffer_size(cpy)==bufsz);
