@@ -81,7 +81,8 @@ void c_typecheck_baset::add_rounding_mode(exprt &expr)
       else
         UNREACHABLE;
 
-      expr.op2()=from_integer(0, unsigned_int_type());
+      to_ieee_float_op_expr(expr).rounding_mode() =
+        from_integer(0, unsigned_int_type());
     }
   }
 }

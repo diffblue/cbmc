@@ -118,8 +118,10 @@ protected:
   std::string convert_array_of(const exprt &src, unsigned precedence);
 
   std::string convert_trinary(
-    const exprt &src, const std::string &symbol1,
-    const std::string &symbol2, unsigned precedence);
+    const ternary_exprt &src,
+    const std::string &symbol1,
+    const std::string &symbol2,
+    unsigned precedence);
 
   std::string convert_overflow(
     const exprt &src, unsigned &precedence);
@@ -155,9 +157,8 @@ protected:
     const exprt &src,
     unsigned precedence);
 
-  std::string convert_extractbits(
-    const exprt &src,
-    unsigned precedence);
+  std::string
+  convert_extractbits(const extractbits_exprt &src, unsigned precedence);
 
   std::string convert_unary(
     const exprt &src, const std::string &symbol,

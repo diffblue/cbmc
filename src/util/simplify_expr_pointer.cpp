@@ -142,26 +142,28 @@ bool simplify_exprt::simplify_address_of_arg(exprt &expr)
     if(expr.operands().size()==3)
     {
       bool result=true;
-      if(!simplify_rec(expr.op0()))
+      auto &if_expr = to_if_expr(expr);
+
+      if(!simplify_rec(if_expr.cond()))
         result=false;
-      if(!simplify_address_of_arg(expr.op1()))
+      if(!simplify_address_of_arg(if_expr.true_case()))
         result=false;
-      if(!simplify_address_of_arg(expr.op2()))
+      if(!simplify_address_of_arg(if_expr.false_case()))
         result=false;
 
-      // op0 is a constant?
-      if(expr.op0().is_true())
+      // condition is a constant?
+      if(if_expr.cond().is_true())
       {
         result=false;
         exprt tmp;
-        tmp.swap(expr.op1());
+        tmp.swap(if_expr.true_case());
         expr.swap(tmp);
       }
-      else if(expr.op0().is_false())
+      else if(if_expr.cond().is_false())
       {
         result=false;
         exprt tmp;
-        tmp.swap(expr.op2());
+        tmp.swap(if_expr.false_case());
         expr.swap(tmp);
       }
 
