@@ -65,15 +65,15 @@ bool simplify_exprt::simplify_index(exprt &expr)
   {
     // we have (a WITH [i:=e])[j]
 
-    const exprt &with_expr=array;
-
-    if(with_expr.operands().size()!=3)
+    if(array.operands().size() != 3)
       return true;
 
-    if(with_expr.op1()==expr.op1())
+    const auto &with_expr = to_with_expr(array);
+
+    if(with_expr.where() == expr.op1())
     {
       // simplify (e with [i:=v])[i] to v
-      exprt tmp=with_expr.op2();
+      exprt tmp = with_expr.new_value();
       expr.swap(tmp);
       return false;
     }
@@ -82,19 +82,19 @@ bool simplify_exprt::simplify_index(exprt &expr)
       // Turn (a with i:=x)[j] into (i==j)?x:a[j].
       // watch out that the type of i and j might be different.
       const exprt rhs_casted =
-        typecast_exprt::conditional_cast(with_expr.op1(), expr.op1().type());
+        typecast_exprt::conditional_cast(with_expr.where(), expr.op1().type());
 
       equal_exprt equality_expr(expr.op1(), rhs_casted);
 
       simplify_inequality(equality_expr);
 
-      index_exprt new_index_expr(with_expr.op0(), expr.op1(), expr.type());
+      index_exprt new_index_expr(with_expr.old(), expr.op1(), expr.type());
 
       simplify_index(new_index_expr); // recursive call
 
       if(equality_expr.is_true())
       {
-        expr=with_expr.op2();
+        expr = with_expr.new_value();
         return false;
       }
       else if(equality_expr.is_false())
@@ -103,7 +103,7 @@ bool simplify_exprt::simplify_index(exprt &expr)
         return false;
       }
 
-      if_exprt if_expr(equality_expr, with_expr.op2(), new_index_expr);
+      if_exprt if_expr(equality_expr, with_expr.new_value(), new_index_expr);
       simplify_if(if_expr);
 
       expr.swap(if_expr);

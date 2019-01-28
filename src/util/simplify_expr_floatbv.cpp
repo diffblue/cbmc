@@ -293,9 +293,9 @@ bool simplify_exprt::simplify_floatbv_op(exprt &expr)
     "binary operations have two operands, here an addtional parameter "
     "is for the rounding mode");
 
-  exprt op0=expr.op0();
-  exprt op1=expr.op1();
-  exprt op2=expr.op2(); // rounding mode
+  exprt op0 = to_ieee_float_op_expr(expr).lhs();
+  exprt op1 = to_ieee_float_op_expr(expr).rhs();
+  exprt op2 = to_ieee_float_op_expr(expr).rounding_mode(); // rounding mode
 
   INVARIANT(
     op0.type() == type,

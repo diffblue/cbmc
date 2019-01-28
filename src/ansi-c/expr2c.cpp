@@ -782,14 +782,11 @@ std::string expr2ct::convert_typecast(
 }
 
 std::string expr2ct::convert_trinary(
-  const exprt &src,
+  const ternary_exprt &src,
   const std::string &symbol1,
   const std::string &symbol2,
   unsigned precedence)
 {
-  if(src.operands().size()!=3)
-    return convert_norep(src, precedence);
-
   const exprt &op0=src.op0();
   const exprt &op1=src.op1();
   const exprt &op2=src.op2();
@@ -3346,18 +3343,14 @@ std::string expr2ct::convert_extractbit(
   return dest;
 }
 
-std::string expr2ct::convert_extractbits(
-  const exprt &src,
-  unsigned precedence)
+std::string
+expr2ct::convert_extractbits(const extractbits_exprt &src, unsigned precedence)
 {
-  if(src.operands().size()!=3)
-    return convert_norep(src, precedence);
-
-  std::string dest=convert_with_precedence(src.op0(), precedence);
+  std::string dest = convert_with_precedence(src.src(), precedence);
   dest+='[';
-  dest+=convert_with_precedence(src.op1(), precedence);
+  dest += convert_with_precedence(src.upper(), precedence);
   dest+=", ";
-  dest+=convert_with_precedence(src.op2(), precedence);
+  dest += convert_with_precedence(src.lower(), precedence);
   dest+=']';
 
   return dest;
@@ -3758,7 +3751,7 @@ std::string expr2ct::convert_with_precedence(
     return convert_binary(src, "==>", precedence=3, true);
 
   else if(src.id()==ID_if)
-    return convert_trinary(src, "?", ":", precedence=3);
+    return convert_trinary(to_if_expr(src), "?", ":", precedence = 3);
 
   else if(src.id()==ID_forall)
     return convert_quantifier(src, "forall", precedence=2);
@@ -3864,7 +3857,7 @@ std::string expr2ct::convert_with_precedence(
     return convert_extractbit(src, precedence);
 
   else if(src.id()==ID_extractbits)
-    return convert_extractbits(src, precedence);
+    return convert_extractbits(to_extractbits_expr(src), precedence);
 
   else if(src.id()==ID_initializer_list ||
           src.id()==ID_compound_literal)

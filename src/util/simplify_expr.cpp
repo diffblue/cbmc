@@ -65,13 +65,13 @@ bool simplify_exprt::simplify_abs(exprt &expr)
   if(expr.operands().size()!=1)
     return true;
 
-  if(expr.op0().is_constant())
+  if(to_unary_expr(expr).op().is_constant())
   {
-    const typet &type = expr.op0().type();
+    const typet &type = to_unary_expr(expr).op().type();
 
     if(type.id()==ID_floatbv)
     {
-      ieee_floatt value(to_constant_expr(expr.op0()));
+      ieee_floatt value(to_constant_expr(to_unary_expr(expr).op()));
       value.set_sign(false);
       expr=value.to_expr();
       return false;
@@ -79,12 +79,12 @@ bool simplify_exprt::simplify_abs(exprt &expr)
     else if(type.id()==ID_signedbv ||
             type.id()==ID_unsignedbv)
     {
-      auto value = numeric_cast<mp_integer>(expr.op0());
+      auto value = numeric_cast<mp_integer>(to_unary_expr(expr).op());
       if(value.has_value())
       {
         if(*value >= 0)
         {
-          expr=expr.op0();
+          expr = to_unary_expr(expr).op();
           return false;
         }
         else
@@ -1221,55 +1221,56 @@ bool simplify_exprt::simplify_with(exprt &expr)
   if((expr.operands().size()%2)!=1)
     return true;
 
-  const typet op0_type=ns.follow(expr.op0().type());
+  auto &with_expr = to_with_expr(expr);
+
+  const typet old_type_followed = ns.follow(with_expr.old().type());
 
   // now look at first operand
 
-  if(op0_type.id()==ID_struct)
+  if(old_type_followed.id() == ID_struct)
   {
-    if(expr.op0().id()==ID_struct ||
-       expr.op0().id()==ID_constant)
+    if(with_expr.old().id() == ID_struct || with_expr.old().id() == ID_constant)
     {
-      while(expr.operands().size()>1)
+      while(with_expr.operands().size() > 1)
       {
-        const irep_idt &component_name=
-          expr.op1().get(ID_component_name);
+        const irep_idt &component_name =
+          with_expr.where().get(ID_component_name);
 
-        if(!to_struct_type(op0_type).
-           has_component(component_name))
+        if(!to_struct_type(old_type_followed).has_component(component_name))
           return result;
 
-        std::size_t number=to_struct_type(op0_type).
-           component_number(component_name);
+        std::size_t number =
+          to_struct_type(old_type_followed).component_number(component_name);
 
-        expr.op0().operands()[number].swap(expr.op2());
+        with_expr.old().operands()[number].swap(with_expr.new_value());
 
-        expr.operands().erase(++expr.operands().begin());
-        expr.operands().erase(++expr.operands().begin());
+        with_expr.operands().erase(++with_expr.operands().begin());
+        with_expr.operands().erase(++with_expr.operands().begin());
 
         result=false;
       }
     }
   }
-  else if(expr.op0().type().id()==ID_array)
+  else if(with_expr.old().type().id() == ID_array)
   {
     if(expr.op0().id()==ID_array ||
        expr.op0().id()==ID_constant)
     {
       while(expr.operands().size()>1)
       {
-        const auto i = numeric_cast<mp_integer>(expr.op1());
+        const auto i = numeric_cast<mp_integer>(with_expr.where());
 
         if(!i.has_value())
           break;
 
-        if(*i < 0 || *i >= expr.op0().operands().size())
+        if(*i < 0 || *i >= with_expr.old().operands().size())
           break;
 
-        expr.op0().operands()[numeric_cast_v<std::size_t>(*i)].swap(expr.op2());
+        with_expr.old().operands()[numeric_cast_v<std::size_t>(*i)].swap(
+          with_expr.new_value());
 
-        expr.operands().erase(++expr.operands().begin());
-        expr.operands().erase(++expr.operands().begin());
+        with_expr.operands().erase(++with_expr.operands().begin());
+        with_expr.operands().erase(++with_expr.operands().begin());
 
         result=false;
       }
@@ -1663,24 +1664,27 @@ bool simplify_exprt::simplify_byte_extract(byte_extract_exprt &expr)
 
   // byte_extract(byte_update(root, offset, value), offset) =>
   // value
-  if(((expr.id()==ID_byte_extract_big_endian &&
-       expr.op().id()==ID_byte_update_big_endian) ||
-      (expr.id()==ID_byte_extract_little_endian &&
-       expr.op().id()==ID_byte_update_little_endian)) &&
-     expr.offset()==expr.op().op1())
+  if(
+    ((expr.id() == ID_byte_extract_big_endian &&
+      expr.op().id() == ID_byte_update_big_endian) ||
+     (expr.id() == ID_byte_extract_little_endian &&
+      expr.op().id() == ID_byte_update_little_endian)) &&
+    expr.offset() == to_byte_update_expr(expr.op()).offset())
   {
-    if(base_type_eq(expr.type(), expr.op().op2().type(), ns))
+    const auto &op_byte_update = to_byte_update_expr(expr.op());
+
+    if(base_type_eq(expr.type(), op_byte_update.value().type(), ns))
     {
-      exprt tmp=expr.op().op2();
+      exprt tmp = op_byte_update.value();
       expr.swap(tmp);
 
       return false;
     }
     else if(
       el_size.has_value() &&
-      *el_size <= pointer_offset_bits(expr.op().op2().type(), ns))
+      *el_size <= pointer_offset_bits(op_byte_update.value().type(), ns))
     {
-      expr.op()=expr.op().op2();
+      expr.op() = op_byte_update.value();
       expr.offset()=from_integer(0, expr.offset().type());
 
       simplify_byte_extract(expr);
@@ -1811,9 +1815,11 @@ bool simplify_exprt::simplify_byte_update(byte_update_exprt &expr)
 {
   // byte_update(byte_update(root, offset, value), offset, value2) =>
   // byte_update(root, offset, value2)
-  if(expr.id()==expr.op().id() &&
-     expr.offset()==expr.op().op1() &&
-     base_type_eq(expr.value().type(), expr.op().op2().type(), ns))
+  if(
+    expr.id() == expr.op().id() &&
+    expr.offset() == to_byte_update_expr(expr.op()).offset() &&
+    base_type_eq(
+      expr.value().type(), to_byte_update_expr(expr.op()).value().type(), ns))
   {
     expr.op()=expr.op().op0();
     return false;
