@@ -74,6 +74,11 @@ protected:
 
   smt2_dect::solvert get_smt2_solver_type() const;
 
+  /// Sets the timeout of \p prop_conv if the `solver-time-limit` option
+  /// has a positive value (in seconds).
+  /// \note Most solvers silently ignore the time limit at the moment.
+  void set_prop_conv_time_limit(prop_convt &prop_conv);
+
   // consistency checks during solver creation
   void no_beautification();
   void no_incremental_check();

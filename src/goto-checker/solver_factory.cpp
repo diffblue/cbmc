@@ -75,6 +75,14 @@ propt &solver_factoryt::solvert::prop() const
   return *prop_ptr;
 }
 
+void solver_factoryt::set_prop_conv_time_limit(prop_convt &prop_conv)
+{
+  const int timeout_seconds =
+    options.get_signed_int_option("solver-time-limit");
+  if(timeout_seconds > 0)
+    prop_conv.set_time_limit_seconds(timeout_seconds);
+}
+
 void solver_factoryt::solvert::set_prop_conv(std::unique_ptr<prop_convt> p)
 {
   prop_conv_ptr = std::move(p);
@@ -157,6 +165,7 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_default()
   else if(options.get_option("arrays-uf") == "always")
     bv_pointers->unbounded_array = bv_pointerst::unbounded_arrayt::U_ALL;
 
+  set_prop_conv_time_limit(*bv_pointers);
   solver->set_prop_conv(std::move(bv_pointers));
 
   return solver;
@@ -203,8 +212,9 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_bv_refinement()
   info.refine_arrays = options.get_bool_option("refine-arrays");
   info.refine_arithmetic = options.get_bool_option("refine-arithmetic");
 
-  return util_make_unique<solvert>(
-    util_make_unique<bv_refinementt>(info), std::move(prop));
+  auto prop_conv = util_make_unique<bv_refinementt>(info);
+  set_prop_conv_time_limit(*prop_conv);
+  return util_make_unique<solvert>(std::move(prop_conv), std::move(prop));
 }
 
 /// the string refinement adds to the bit vector refinement specifications for
@@ -226,8 +236,9 @@ solver_factoryt::get_string_refinement()
   info.refine_arrays = options.get_bool_option("refine-arrays");
   info.refine_arithmetic = options.get_bool_option("refine-arithmetic");
 
-  return util_make_unique<solvert>(
-    util_make_unique<string_refinementt>(info), std::move(prop));
+  auto prop_conv = util_make_unique<string_refinementt>(info);
+  set_prop_conv_time_limit(*prop_conv);
+  return util_make_unique<solvert>(std::move(prop_conv), std::move(prop));
 }
 
 std::unique_ptr<solver_factoryt::solvert>
@@ -257,6 +268,7 @@ solver_factoryt::get_smt2(smt2_dect::solvert solver)
     if(options.get_bool_option("fpa"))
       smt2_dec->use_FPA_theory = true;
 
+    set_prop_conv_time_limit(*smt2_dec);
     return util_make_unique<solvert>(std::move(smt2_dec));
   }
   else if(filename == "-")
@@ -274,6 +286,7 @@ solver_factoryt::get_smt2(smt2_dect::solvert solver)
 
     smt2_conv->set_message_handler(message_handler);
 
+    set_prop_conv_time_limit(*smt2_conv);
     return util_make_unique<solvert>(std::move(smt2_conv));
   }
   else
@@ -303,6 +316,7 @@ solver_factoryt::get_smt2(smt2_dect::solvert solver)
 
     smt2_conv->set_message_handler(message_handler);
 
+    set_prop_conv_time_limit(*smt2_conv);
     return util_make_unique<solvert>(std::move(smt2_conv), std::move(out));
   }
 }
