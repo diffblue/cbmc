@@ -54,8 +54,8 @@ symbol_exprt generate_nondet_int(
 
   // Assign the symbol any non deterministic integer value.
   //   int_type name_prefix::nondet_int = NONDET(int_type)
-  instructions.add(
-    code_assignt(nondet_symbol, side_effect_expr_nondett(int_type)));
+  instructions.add(code_assignt(
+    nondet_symbol, side_effect_expr_nondett(int_type, source_location)));
 
   // Constrain the non deterministic integer with a lower bound of `min_value`.
   //   ASSUME(name_prefix::nondet_int >= min_value)

@@ -72,7 +72,8 @@ SCENARIO("dependence_graph", "[core][analyses][dependence_graph]")
 
     code_ifthenelset if_block(
       equal_exprt(
-        side_effect_expr_nondett(int_type), from_integer(0, int_type)),
+        side_effect_expr_nondett(int_type, source_locationt{}),
+        from_integer(0, int_type)),
       code_blockt({call, assign_x}));
 
     a_body.add(std::move(if_block));
