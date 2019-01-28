@@ -1,0 +1,16 @@
+CORE
+fixed.c
+
+^\*\* Results:$
+^\[main.assertion.5\] line 31 assertion a\[.*\]\[.*\] > 10: SUCCESS$
+^\[main.assertion.6\] line 33 assertion tmp_if_expr\$\d+: SUCCESS$
+^\[main.assertion.7\] line 34 assertion tmp_if_expr\$\d+: SUCCESS$
+^\[main.assertion.8\] line 36 assertion tmp_if_expr\$\d+: SUCCESS$
+^\[main.assertion.9\] line 38 assertion tmp_if_expr\$\d+: SUCCESS$
+^\[main.assertion.10\] line 39 assertion tmp_if_expr\$\d+: SUCCESS$
+^\*\* 4 of 10 failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring

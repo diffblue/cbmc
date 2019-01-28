@@ -1,13 +1,18 @@
-CORE
+KNOWNBUG
 main.c
 
 ^\*\* Results:$
-^\[main.assertion.1\] line 9 assertion a\[.*\]\[.*\] == 0: SUCCESS$
-^\[main.assertion.2\] line 10 assertion a\[.*\]\[.*\] == 1: SUCCESS$
-^\[main.assertion.3\] line 11 assertion a\[.*\]\[.*\] == 1: SUCCESS$
-^\[main.assertion.4\] line 12 assertion a\[.*\]\[.*\] == 2: SUCCESS$
-^\[main.assertion.5\] line 13 assertion tmp_if_expr\$\d+: SUCCESS$
-^\*\* 0 of 5 failed
-^VERIFICATION SUCCESSFUL$
-^EXIT=0$
+^\[main.assertion.1\] line 12 assertion a\[.*\]\[.*\] == 0: SUCCESS$
+^\[main.assertion.2\] line 13 assertion a\[.*\]\[.*\] == 1: SUCCESS$
+^\[main.assertion.3\] line 14 assertion a\[.*\]\[.*\] == 1: SUCCESS$
+^\[main.assertion.4\] line 15 assertion a\[.*\]\[.*\] == 2: SUCCESS$
+^\[main.assertion.5\] line 16 assertion tmp_if_expr\$\d+: FAILURE$
+^\*\* 1 of 5 failed
+^VERIFICATION FAILED$
+^EXIT=10$
 ^SIGNAL=0$
+--
+^warning: ignoring
+--
+The assertion on line 13 need not hold as the assume can be satisfied by picking
+a value for i that does not fulfil the left-hand side of the implication.
