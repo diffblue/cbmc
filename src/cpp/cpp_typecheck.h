@@ -216,7 +216,7 @@ protected:
     const symbolt &symbol,
     const cpp_template_args_tct &specialization_template_args,
     const cpp_template_args_tct &full_template_args,
-    const typet &specialization=typet(ID_nil));
+    const typet &specialization = uninitialized_typet{});
 
   void elaborate_class_template(
     const source_locationt &source_location,

@@ -682,9 +682,8 @@ const typet &string_abstractiont::build_abstraction_type_rec(const typet &type,
   if(known_entry!=known.end())
     return known_entry->second;
 
-  ::std::pair< abstraction_types_mapt::iterator, bool > map_entry(
-      abstraction_types_map.insert(::std::make_pair(
-          eff_type, nil_typet())));
+  ::std::pair<abstraction_types_mapt::iterator, bool> map_entry(
+    abstraction_types_map.insert(::std::make_pair(eff_type, typet())));
   if(!map_entry.second)
     return map_entry.first->second;
 

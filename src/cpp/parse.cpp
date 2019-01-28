@@ -2206,7 +2206,7 @@ bool Parser::rAttribute(typet &t)
       if(lex.get_token(tk3)!=')')
         return false;
 
-      vector_typet attr(nil_typet(), exp);
+      vector_typet attr(uninitialized_typet{}, exp);
       attr.add_source_location()=exp.source_location();
       merge_types(attr, t);
       break;
