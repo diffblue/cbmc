@@ -226,12 +226,18 @@ std::ostream &format_rec(std::ostream &os, const exprt &expr)
 {
   const auto &id = expr.id();
 
-  if(id == ID_plus || id == ID_mult || id == ID_and || id == ID_or)
+  if(
+    id == ID_plus || id == ID_mult || id == ID_and || id == ID_or ||
+    id == ID_xor)
+  {
     return format_rec(os, to_multi_ary_expr(expr));
+  }
   else if(
-    id == ID_lt || id == ID_gt || id == ID_ge || id == ID_le ||
+    id == ID_lt || id == ID_gt || id == ID_ge || id == ID_le || id == ID_div ||
     id == ID_minus || id == ID_implies || id == ID_equal || id == ID_notequal)
+  {
     return format_rec(os, to_binary_expr(expr));
+  }
   else if(id == ID_not || id == ID_unary_minus)
     return format_rec(os, to_unary_expr(expr));
   else if(id == ID_constant)
