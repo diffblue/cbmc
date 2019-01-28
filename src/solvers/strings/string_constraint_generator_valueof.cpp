@@ -21,17 +21,17 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <solvers/floatbv/float_bv.h>
 
 /// If the expression is a constant expression then we get the value of it as
-/// an unsigned long. If not we return a default value.
+/// a std::size_t. If not we return a default value.
 /// \param expr: input expression
 /// \param def: default value to return if we cannot evaluate expr
 /// \param ns: namespace used to simplify the expression
-/// \return the output as an unsigned long
-static unsigned long to_integer_or_default(
+/// \return the output as a std::size_t
+static std::size_t to_integer_or_default(
   const exprt &expr,
-  unsigned long def,
+  std::size_t def,
   const namespacet &ns)
 {
-  if(const auto i = numeric_cast<unsigned long>(simplify_expr(expr, ns)))
+  if(const auto i = numeric_cast<std::size_t>(simplify_expr(expr, ns)))
     return *i;
   return def;
 }
@@ -163,7 +163,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_string_of_int_with_radix(
 
   /// Most of the time we can evaluate radix as an integer. The value 0 is used
   /// to indicate when we can't tell what the radix is.
-  const unsigned long radix_ul = to_integer_or_default(radix, 0, ns);
+  const auto radix_ul = to_integer_or_default(radix, 0, ns);
   CHECK_RETURN((radix_ul >= 2 && radix_ul <= 36) || radix_ul == 0);
 
   if(max_size == 0)
@@ -329,7 +329,7 @@ add_axioms_from_char(const array_string_exprt &res, const exprt &c)
 string_constraintst add_axioms_for_correct_number_format(
   const array_string_exprt &str,
   const exprt &radix_as_char,
-  const unsigned long radix_ul,
+  const std::size_t radix_ul,
   const std::size_t max_size,
   const bool strict_formatting)
 {
@@ -410,7 +410,7 @@ string_constraintst add_axioms_for_correct_number_format(
 /// \param str: input string
 /// \param max_string_length: the maximum length str can have
 /// \param radix: the radix, with the same type as input_int
-/// \param radix_ul: the radix as an unsigned long, or 0 if that can't be
+/// \param radix_ul: the radix as a size_t, or 0 if that can't be
 ///   determined
 string_constraintst add_axioms_for_characters_in_integer_string(
   const exprt &input_int,
@@ -419,7 +419,7 @@ string_constraintst add_axioms_for_characters_in_integer_string(
   const array_string_exprt &str,
   const std::size_t max_string_length,
   const exprt &radix,
-  const unsigned long radix_ul)
+  const std::size_t radix_ul)
 {
   string_constraintst constraints;
   const typet &char_type = str.content().type().subtype();
@@ -520,7 +520,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_parse_int(
       : static_cast<exprt>(typecast_exprt(f.arguments()[1], type));
   // Most of the time we can evaluate radix as an integer. The value 0 is used
   // to indicate when we can't tell what the radix is.
-  const unsigned long radix_ul = to_integer_or_default(radix, 0, ns);
+  const auto radix_ul = to_integer_or_default(radix, 0, ns);
   PRECONDITION((radix_ul >= 2 && radix_ul <= 36) || radix_ul == 0);
 
   const symbol_exprt input_int = fresh_symbol("parsed_int", type);
@@ -563,7 +563,7 @@ exprt is_digit_with_radix(
   const exprt &chr,
   const bool strict_formatting,
   const exprt &radix_as_char,
-  const unsigned long radix_ul)
+  const std::size_t radix_ul)
 {
   PRECONDITION((radix_ul >= 2 && radix_ul <= 36) || radix_ul == 0);
   const typet &char_type = chr.type();
@@ -632,7 +632,7 @@ exprt get_numeric_value_from_character(
   const typet &char_type,
   const typet &type,
   const bool strict_formatting,
-  const unsigned long radix_ul)
+  const std::size_t radix_ul)
 {
   const constant_exprt zero_char = from_integer('0', char_type);
 
@@ -701,7 +701,7 @@ exprt get_numeric_value_from_character(
 /// \param radix_ul: the radix we are using, or 0, in which case the return
 ///   value will work for any radix
 /// \return the maximum string length
-size_t max_printed_string_length(const typet &type, unsigned long radix_ul)
+size_t max_printed_string_length(const typet &type, std::size_t radix_ul)
 {
   if(radix_ul == 0)
   {

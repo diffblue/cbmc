@@ -531,9 +531,9 @@ void acceleratet::build_state_machine(
   symbol_exprt next_state,
   scratch_programt &state_machine)
 {
-  std::map<unsigned int, unsigned int> successor_counts;
-  unsigned int max_count=0;
-  unsigned int likely_next=0;
+  std::map<std::size_t, std::size_t> successor_counts;
+  std::size_t max_count = 0;
+  std::size_t likely_next = 0;
 
   // Optimisation: find the most common successor state and initialise
   // next_state to that value.  This reduces the size of the state machine
@@ -541,8 +541,8 @@ void acceleratet::build_state_machine(
   for(trace_automatont::sym_mapt::iterator p=begin; p!=end; ++p)
   {
     trace_automatont::state_pairt state_pair=p->second;
-    unsigned int to=state_pair.second;
-    unsigned int count=0;
+    const auto to = state_pair.second;
+    std::size_t count = 0;
 
     if(successor_counts.find(to)==successor_counts.end())
     {
@@ -586,8 +586,8 @@ void acceleratet::build_state_machine(
   for(trace_automatont::sym_mapt::iterator p=begin; p!=end; ++p)
   {
     trace_automatont::state_pairt state_pair=p->second;
-    unsigned int from=state_pair.first;
-    unsigned int to=state_pair.second;
+    const auto from = state_pair.first;
+    const auto to = state_pair.second;
 
     if(to==likely_next)
     {

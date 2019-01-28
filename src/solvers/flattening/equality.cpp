@@ -45,11 +45,11 @@ literalt equalityt::equality2(const exprt &e1, const exprt &e2)
   elements_revt &elements_rev=typestruct.elements_rev;
   equalitiest &equalities=typestruct.equalities;
 
-  std::pair<unsigned, unsigned> u;
+  std::pair<std::size_t, std::size_t> u;
 
   {
     std::pair<elementst::iterator, bool> result=
-      elements.insert(std::pair<exprt, unsigned>(e1, elements.size()));
+      elements.insert({e1, elements.size()});
 
     u.first=result.first->second;
 

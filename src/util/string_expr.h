@@ -92,7 +92,7 @@ public:
     return index_exprt(content(), i);
   }
 
-  index_exprt operator[](int i) const
+  index_exprt operator[](std::size_t i) const
   {
     return index_exprt(content(), from_integer(i, length().type()));
   }

@@ -44,7 +44,7 @@ protected:
 
   typedef std::unordered_map<exprt, mini_bddt, irep_hash> expr_mapt;
   expr_mapt expr_map;
-  typedef std::map<unsigned, exprt> node_mapt;
+  typedef std::map<std::size_t, exprt> node_mapt;
   node_mapt node_map;
 
   mini_bddt from_expr_rec(const exprt &expr);

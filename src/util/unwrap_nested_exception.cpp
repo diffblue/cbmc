@@ -21,7 +21,7 @@ Author: Diffblue Ltd.
 /// \param e: The outer exeception
 /// \param level: How many exceptions have already been unrolled
 /// \return A string with all nested exceptions printed and indented
-std::string unwrap_exception(const std::exception &e, int level)
+std::string unwrap_exception(const std::exception &e, std::size_t level)
 {
   const std::string msg = e.what();
   std::vector<std::string> lines =

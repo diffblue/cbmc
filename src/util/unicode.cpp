@@ -33,7 +33,7 @@ std::string narrow(const wchar_t *s)
   int slength=static_cast<int>(wcslen(s));
   int rlength=
     WideCharToMultiByte(CP_UTF8, 0, s, slength, NULL, 0, NULL, NULL);
-  std::string r(rlength, 0);
+  std::string r(static_cast<std::size_t>(rlength), 0);
   WideCharToMultiByte(CP_UTF8, 0, s, slength, &r[0], rlength, NULL, NULL);
   return r;
 
@@ -58,7 +58,7 @@ std::wstring widen(const char *s)
   int slength=static_cast<int>(strlen(s));
   int rlength=
     MultiByteToWideChar(CP_UTF8, 0, s, slength, NULL, 0);
-  std::wstring r(rlength, 0);
+  std::wstring r(static_cast<std::size_t>(rlength), 0);
   MultiByteToWideChar(CP_UTF8, 0, s, slength, &r[0], rlength);
   return r;
 
@@ -83,7 +83,7 @@ std::string narrow(const std::wstring &s)
   int slength=static_cast<int>(s.size());
   int rlength=
     WideCharToMultiByte(CP_UTF8, 0, &s[0], slength, NULL, 0, NULL, NULL);
-  std::string r(rlength, 0);
+  std::string r(static_cast<std::size_t>(rlength), 0);
   WideCharToMultiByte(CP_UTF8, 0, &s[0], slength, &r[0], rlength, NULL, NULL);
   return r;
 
@@ -100,7 +100,7 @@ std::wstring widen(const std::string &s)
   int slength=static_cast<int>(s.size());
   int rlength=
     MultiByteToWideChar(CP_UTF8, 0, &s[0], slength, NULL, 0);
-  std::wstring r(rlength, 0);
+  std::wstring r(static_cast<std::size_t>(rlength), 0);
   MultiByteToWideChar(CP_UTF8, 0, &s[0], slength, &r[0], rlength);
   return r;
 
@@ -157,7 +157,7 @@ std::vector<std::string> narrow_argv(int argc, const wchar_t **argv_wide)
     return std::vector<std::string>();
 
   std::vector<std::string> argv_narrow;
-  argv_narrow.reserve(argc);
+  argv_narrow.reserve(static_cast<std::size_t>(argc));
 
   for(int i=0; i!=argc; ++i)
     argv_narrow.push_back(narrow(argv_wide[i]));
@@ -202,7 +202,7 @@ std::wstring utf8_to_utf16_native_endian(const std::string &in)
     std::string::size_type i=0;
     while(i<in.size())
     {
-      unsigned char c=in[i++];
+      unsigned char c = static_cast<unsigned char>(in[i++]);
       unsigned int code=0;
       // the ifs that follow find out how many UTF8 characters (1-4) store the
       // next unicode character. This is determined by the few most
@@ -218,25 +218,25 @@ std::wstring utf8_to_utf16_native_endian(const std::string &in)
         // we should check that whatever follows first character starts with
         // bits 10.
         code = (c & 0x1Fu) << 6;
-        c=in[i++];
+        c = static_cast<unsigned char>(in[i++]);
         code += c & 0x3Fu;
       }
       else if(c<=0xEF && i+1<in.size())
       {
         code = (c & 0xFu) << 12;
-        c=in[i++];
+        c = static_cast<unsigned char>(in[i++]);
         code += (c & 0x3Fu) << 6;
-        c=in[i++];
+        c = static_cast<unsigned char>(in[i++]);
         code += c & 0x3Fu;
       }
       else if(c<=0xF7 && i+2<in.size())
       {
         code = (c & 0x7u) << 18;
-        c=in[i++];
+        c = static_cast<unsigned char>(in[i++]);
         code += (c & 0x3Fu) << 12;
-        c=in[i++];
+        c = static_cast<unsigned char>(in[i++]);
         code += (c & 0x3Fu) << 6;
-        c=in[i++];
+        c = static_cast<unsigned char>(in[i++]);
         code += c & 0x3Fu;
       }
       else

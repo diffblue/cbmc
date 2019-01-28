@@ -78,10 +78,10 @@ static bool read_goto_binary(
   }
 
   char hdr[4];
-  hdr[0]=in.get();
-  hdr[1]=in.get();
-  hdr[2]=in.get();
-  hdr[3]=in.get();
+  hdr[0] = static_cast<char>(in.get());
+  hdr[1] = static_cast<char>(in.get());
+  hdr[2] = static_cast<char>(in.get());
+  hdr[3] = static_cast<char>(in.get());
   in.seekg(0);
 
   if(hdr[0]==0x7f && hdr[1]=='G' && hdr[2]=='B' && hdr[3]=='F')
@@ -100,7 +100,7 @@ static bool read_goto_binary(
       for(unsigned i=0; i<elf_reader.number_of_sections; i++)
         if(elf_reader.section_name(i)=="goto-cc")
         {
-          in.seekg(elf_reader.section_offset(i));
+          in.seekg(static_cast<std::streamoff>(elf_reader.section_offset(i)));
           return read_bin_goto_object(
             in, filename, symbol_table, goto_functions, message_handler);
         }
@@ -172,10 +172,10 @@ bool is_goto_binary(const std::string &filename)
   // 2. ELF binaries, marked with 0x7f ELF
 
   char hdr[4];
-  hdr[0]=in.get();
-  hdr[1]=in.get();
-  hdr[2]=in.get();
-  hdr[3]=in.get();
+  hdr[0] = static_cast<char>(in.get());
+  hdr[1] = static_cast<char>(in.get());
+  hdr[2] = static_cast<char>(in.get());
+  hdr[3] = static_cast<char>(in.get());
 
   if(hdr[0]==0x7f && hdr[1]=='G' && hdr[2]=='B' && hdr[3]=='F')
   {

@@ -111,7 +111,7 @@ decision_proceduret::resultt smt2_dect::dec_solve()
     argv = {"z3", "-smt2", temp_file_problem()};
     break;
 
-  default:
+  case solvert::GENERIC:
     UNREACHABLE;
   }
 

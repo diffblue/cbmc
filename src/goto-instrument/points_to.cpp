@@ -75,9 +75,24 @@ bool points_tot::transform(const cfgt::nodet &e)
     // these are like assignments for the arguments
     break;
 
-  default:
-    {
-    }
+  case CATCH:
+  case THROW:
+  case GOTO:
+  case DEAD:
+  case DECL:
+  case ATOMIC_BEGIN:
+  case ATOMIC_END:
+  case START_THREAD:
+  case END_THREAD:
+  case END_FUNCTION:
+  case LOCATION:
+  case OTHER:
+  case SKIP:
+  case ASSERT:
+  case ASSUME:
+  case INCOMPLETE_GOTO:
+  case NO_INSTRUCTION_TYPE:
+    break;
   }
 
   return result;

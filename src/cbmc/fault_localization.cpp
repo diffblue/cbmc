@@ -323,7 +323,7 @@ safety_checkert::resultt fault_localizationt::stop_on_fail()
     report_failure(bmc.ui_message_handler);
     return safety_checkert::resultt::UNSAFE;
 
-  default:
+  case decision_proceduret::resultt::D_ERROR:
     error() << "decision procedure failed" << eom;
 
     return safety_checkert::resultt::ERROR;

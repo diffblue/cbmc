@@ -132,7 +132,7 @@ void write_gb_word(std::ostream &out, std::size_t u)
 
     if(u==0)
     {
-      out.put(value);
+      out.put(static_cast<char>(value));
       break;
     }
 

@@ -689,7 +689,7 @@ void goto_checkt::integer_overflow_check(
         }
       }
 
-      const unsigned number_of_top_bits =
+      const auto number_of_top_bits =
         allow_shift_into_sign_bit ? op_width : op_width + 1;
 
       const exprt top_bits = extractbits_exprt(

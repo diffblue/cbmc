@@ -105,7 +105,7 @@ const std::string integer2binary(const mp_integer &n, std::size_t width)
 
 const std::string integer2string(const mp_integer &n, unsigned base)
 {
-  unsigned len = n.digits(base) + 2;
+  std::size_t len = n.digits(base) + 2;
   std::vector<char> buffer(len);
   char *s = n.as_string(buffer.data(), len, base);
 

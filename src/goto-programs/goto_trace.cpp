@@ -58,6 +58,7 @@ void goto_trace_stept::output(
 {
   out << "*** ";
 
+  // clang-format off
   switch(type)
   {
   case goto_trace_stept::typet::ASSERT: out << "ASSERT"; break;
@@ -78,10 +79,12 @@ void goto_trace_stept::output(
   case goto_trace_stept::typet::FUNCTION_CALL: out << "FUNCTION CALL"; break;
   case goto_trace_stept::typet::FUNCTION_RETURN:
     out << "FUNCTION RETURN"; break;
-  default:
-    out << "unknown type: " << static_cast<int>(type) << std::endl;
-    UNREACHABLE;
+  case goto_trace_stept::typet::MEMORY_BARRIER: out << "MEMORY_BARRIER"; break;
+  case goto_trace_stept::typet::SPAWN: out << "SPAWN"; break;
+  case goto_trace_stept::typet::CONSTRAINT: out << "CONSTRAINT"; break;
+  case goto_trace_stept::typet::NONE: out << "NONE"; break;
   }
+  // clang-format on
 
   if(is_assert() || is_assume() || is_goto())
     out << " (" << cond_value << ')';
@@ -318,7 +321,7 @@ void show_state_header(
   messaget::mstreamt &out,
   const namespacet &ns,
   const goto_trace_stept &state,
-  unsigned step_nr,
+  std::size_t step_nr,
   const trace_optionst &options)
 {
   out << '\n';
@@ -471,9 +474,12 @@ void show_compact_goto_trace(
     case goto_trace_stept::typet::ATOMIC_BEGIN:
     case goto_trace_stept::typet::ATOMIC_END:
     case goto_trace_stept::typet::DEAD:
+    case goto_trace_stept::typet::CONSTRAINT:
+    case goto_trace_stept::typet::SHARED_READ:
+    case goto_trace_stept::typet::SHARED_WRITE:
       break;
 
-    default:
+    case goto_trace_stept::typet::NONE:
       UNREACHABLE;
     }
   }
@@ -485,7 +491,7 @@ void show_full_goto_trace(
   const goto_tracet &goto_trace,
   const trace_optionst &options)
 {
-  unsigned prev_step_nr=0;
+  std::size_t prev_step_nr = 0;
   bool first_step=true;
   std::size_t function_depth=0;
 
@@ -673,7 +679,7 @@ void show_full_goto_trace(
     case goto_trace_stept::typet::CONSTRAINT:
     case goto_trace_stept::typet::SHARED_READ:
     case goto_trace_stept::typet::SHARED_WRITE:
-    default:
+    case goto_trace_stept::typet::NONE:
       UNREACHABLE;
     }
   }

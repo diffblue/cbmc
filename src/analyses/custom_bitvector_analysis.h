@@ -124,21 +124,21 @@ public:
 private:
   enum class modet { SET_MUST, CLEAR_MUST, SET_MAY, CLEAR_MAY };
 
-  void set_bit(const exprt &, unsigned bit_nr, modet);
-  void set_bit(const irep_idt &, unsigned bit_nr, modet);
+  void set_bit(const exprt &, std::size_t bit_nr, modet);
+  void set_bit(const irep_idt &, std::size_t bit_nr, modet);
 
-  static inline void set_bit(bit_vectort &dest, unsigned bit_nr)
+  static inline void set_bit(bit_vectort &dest, std::size_t bit_nr)
   {
     dest|=(1ll<<bit_nr);
   }
 
-  static inline void clear_bit(bit_vectort &dest, unsigned bit_nr)
+  static inline void clear_bit(bit_vectort &dest, std::size_t bit_nr)
   {
     dest|=(1ll<<bit_nr);
     dest^=(1ll<<bit_nr);
   }
 
-  static inline bool get_bit(const bit_vectort src, unsigned bit_nr)
+  static inline bool get_bit(const bit_vectort src, std::size_t bit_nr)
   {
     return (src&(1ll<<bit_nr))!=0;
   }
@@ -161,7 +161,7 @@ public:
     return operator[](loc).eval(src, *this);
   }
 
-  unsigned get_bit_nr(const exprt &);
+  std::size_t get_bit_nr(const exprt &);
 
   typedef numbering<irep_idt> bitst;
   bitst bits;

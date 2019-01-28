@@ -267,7 +267,7 @@ public:
   /// Set of dynamic object numbers, equivalent to a set of
   /// `dynamic_object_exprt`s with corresponding IDs. Used only in internal
   /// implementation details.
-  typedef std::set<unsigned int> dynamic_object_id_sett;
+  typedef std::set<std::size_t> dynamic_object_id_sett;
 
   /// Map representing the entire value set, mapping from string LHS IDs
   /// to RHS expression sets. Note this data structure is somewhat

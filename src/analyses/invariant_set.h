@@ -29,21 +29,21 @@ public:
   {
   }
 
-  bool get(const exprt &expr, unsigned &n);
+  bool get(const exprt &expr, std::size_t &n);
 
-  unsigned add(const exprt &expr);
+  std::size_t add(const exprt &expr);
 
-  bool is_constant(unsigned n) const;
+  bool is_constant(std::size_t n) const;
   bool is_constant(const exprt &expr) const;
 
   static bool is_constant_address(const exprt &expr);
 
-  const irep_idt &operator[](unsigned n) const
+  const irep_idt &operator[](std::size_t n) const
   {
     return map[n];
   }
 
-  const exprt &get_expr(unsigned n) const
+  const exprt &get_expr(std::size_t n) const
   {
     assert(n<entries.size());
     return entries[n].expr;
@@ -52,7 +52,7 @@ public:
   void output(std::ostream &out) const;
 
   std::string to_string(
-    unsigned n,
+    std::size_t n,
     const irep_idt &identifier) const;
 
 protected:
@@ -81,7 +81,7 @@ public:
   unsigned_union_find eq_set;
 
   // <=
-  typedef std::set<std::pair<unsigned, unsigned> > ineq_sett;
+  typedef std::set<std::pair<std::size_t, std::size_t> > ineq_sett;
   ineq_sett le_set;
 
   // !=
@@ -89,7 +89,7 @@ public:
 
   // bounds
   typedef interval_templatet<mp_integer> boundst;
-  typedef std::map<unsigned, boundst> bounds_mapt;
+  typedef std::map<std::size_t, boundst> bounds_mapt;
   bounds_mapt bounds_map;
 
   bool threaded;
@@ -176,7 +176,7 @@ public:
     }
   }
 
-  static void remove(ineq_sett &dest, unsigned a)
+  static void remove(ineq_sett &dest, std::size_t a)
   {
     for(ineq_sett::iterator it=dest.begin();
         it!=dest.end();
@@ -207,86 +207,86 @@ protected:
 
   void add_type_bounds(const exprt &expr, const typet &type);
 
-  void add_bounds(unsigned a, const boundst &bound)
+  void add_bounds(std::size_t a, const boundst &bound)
   {
     bounds_map[a].intersect_with(bound);
   }
 
-  void get_bounds(unsigned a, boundst &dest) const;
+  void get_bounds(std::size_t a, boundst &dest) const;
 
   // true = added something
   bool make_union_bounds_map(const bounds_mapt &other);
 
-  void modifies(unsigned a);
+  void modifies(std::size_t a);
 
   std::string to_string(
-    unsigned a,
+    std::size_t a,
     const irep_idt &identifier) const;
 
   bool get_object(
     const exprt &expr,
-    unsigned &n) const;
+    std::size_t &n) const;
 
   exprt get_constant(const exprt &expr) const;
 
   // queries
-  bool has_eq(const std::pair<unsigned, unsigned> &p) const
+  bool has_eq(const std::pair<std::size_t, std::size_t> &p) const
   {
     return eq_set.same_set(p.first, p.second);
   }
 
-  bool has_le(const std::pair<unsigned, unsigned> &p) const
+  bool has_le(const std::pair<std::size_t, std::size_t> &p) const
   {
     return le_set.find(p)!=le_set.end();
   }
 
-  bool has_ne(const std::pair<unsigned, unsigned> &p) const
+  bool has_ne(const std::pair<std::size_t, std::size_t> &p) const
   {
     return ne_set.find(p)!=ne_set.end();
   }
 
-  tvt is_eq(std::pair<unsigned, unsigned> p) const;
-  tvt is_le(std::pair<unsigned, unsigned> p) const;
+  tvt is_eq(std::pair<std::size_t, std::size_t> p) const;
+  tvt is_le(std::pair<std::size_t, std::size_t> p) const;
 
-  tvt is_lt(std::pair<unsigned, unsigned> p) const
+  tvt is_lt(std::pair<std::size_t, std::size_t> p) const
   {
     return is_le(p) && !is_eq(p);
   }
 
-  tvt is_ge(std::pair<unsigned, unsigned> p) const
+  tvt is_ge(std::pair<std::size_t, std::size_t> p) const
   {
     std::swap(p.first, p.second);
     return is_eq(p) || is_lt(p);
   }
 
-  tvt is_gt(std::pair<unsigned, unsigned> p) const
+  tvt is_gt(std::pair<std::size_t, std::size_t> p) const
   {
     return !is_le(p);
   }
 
-  tvt is_ne(std::pair<unsigned, unsigned> p) const
+  tvt is_ne(std::pair<std::size_t, std::size_t> p) const
   {
     return !is_eq(p);
   }
 
-  void add(const std::pair<unsigned, unsigned> &p, ineq_sett &dest);
+  void add(const std::pair<std::size_t, std::size_t> &p, ineq_sett &dest);
 
-  void add_le(const std::pair<unsigned, unsigned> &p)
+  void add_le(const std::pair<std::size_t, std::size_t> &p)
   {
     add(p, le_set);
   }
 
-  void add_ne(const std::pair<unsigned, unsigned> &p)
+  void add_ne(const std::pair<std::size_t, std::size_t> &p)
   {
     add(p, ne_set);
   }
 
-  void add_eq(const std::pair<unsigned, unsigned> &eq);
+  void add_eq(const std::pair<std::size_t, std::size_t> &eq);
 
   void add_eq(
     ineq_sett &dest,
-    const std::pair<unsigned, unsigned> &eq,
-    const std::pair<unsigned, unsigned> &ineq);
+    const std::pair<std::size_t, std::size_t> &eq,
+    const std::pair<std::size_t, std::size_t> &ineq);
 };
 
 #endif // CPROVER_ANALYSES_INVARIANT_SET_H

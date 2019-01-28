@@ -566,7 +566,7 @@ bvt bv_pointerst::convert_bitvector(const exprt &expr)
 
     // erase offset bits
 
-    op0.erase(op0.begin()+0, op0.begin()+offset_bits);
+    op0.erase(op0.begin(), op0.begin() + static_cast<std::ptrdiff_t>(offset_bits));
 
     return bv_utils.zero_extension(op0, width);
   }
@@ -754,10 +754,13 @@ void bv_pointerst::do_postponed(
       bvt bv;
       encode(number, bv);
 
-      bv.erase(bv.begin(), bv.begin()+offset_bits);
+      bv.erase(
+        bv.begin(), bv.begin() + static_cast<std::ptrdiff_t>(offset_bits));
 
       bvt saved_bv=postponed.op;
-      saved_bv.erase(saved_bv.begin(), saved_bv.begin()+offset_bits);
+      saved_bv.erase(
+        saved_bv.begin(),
+        saved_bv.begin() + static_cast<std::ptrdiff_t>(offset_bits));
 
       POSTCONDITION(bv.size()==saved_bv.size());
       PRECONDITION(postponed.bv.size()==1);
@@ -800,10 +803,13 @@ void bv_pointerst::do_postponed(
       bvt bv;
       encode(number, bv);
 
-      bv.erase(bv.begin(), bv.begin()+offset_bits);
+      bv.erase(
+        bv.begin(), bv.begin() + static_cast<std::ptrdiff_t>(offset_bits));
 
       bvt saved_bv=postponed.op;
-      saved_bv.erase(saved_bv.begin(), saved_bv.begin()+offset_bits);
+      saved_bv.erase(
+        saved_bv.begin(),
+        saved_bv.begin() + static_cast<std::ptrdiff_t>(offset_bits));
 
       bvt size_bv = convert_bv(object_size);
 

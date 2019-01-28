@@ -136,7 +136,7 @@ void language_uit::show_symbol_table(bool brief)
     show_symbol_table_xml_ui(brief);
     break;
 
-  default:
+  case ui_message_handlert::uit::JSON_UI:
     error() << "cannot show symbol table in this format" << eom;
   }
 }

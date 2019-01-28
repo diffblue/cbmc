@@ -103,6 +103,7 @@ void global_may_alias_domaint::transform(
 
   const goto_programt::instructiont &instruction=*from;
 
+  // clang-format off
   switch(instruction.type)
   {
   case ASSIGN:
@@ -129,10 +130,26 @@ void global_may_alias_domaint::transform(
     }
     break;
 
-  default:
-    {
-    }
+  case FUNCTION_CALL:
+  case GOTO:
+  case CATCH:
+  case THROW:
+  case RETURN:
+  case ATOMIC_BEGIN:
+  case ATOMIC_END:
+  case LOCATION:
+  case START_THREAD:
+  case END_THREAD:
+  case ASSERT:
+  case ASSUME:
+  case SKIP:
+  case END_FUNCTION:
+  case OTHER:
+  case INCOMPLETE_GOTO:
+  case NO_INSTRUCTION_TYPE:
+    break;
   }
+  // clang-format on
 }
 
 void global_may_alias_domaint::output(

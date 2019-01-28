@@ -777,6 +777,7 @@ bool java_bytecode_languaget::typecheck(
 
   // Now incrementally elaborate methods
   // that are reachable from this entry point.
+  // clang-format off
   switch(lazy_methods_mode)
   {
     case LAZY_METHODS_MODE_CONTEXT_INSENSITIVE:
@@ -811,10 +812,11 @@ bool java_bytecode_languaget::typecheck(
         }
       }
       break;
-    default:
+    case LAZY_METHODS_MODE_EXTERNAL_DRIVER:
       // Our caller is in charge of elaborating methods on demand.
       break;
   }
+  // clang-format on
 
   // now instrument runtime exceptions
   java_bytecode_instrument(

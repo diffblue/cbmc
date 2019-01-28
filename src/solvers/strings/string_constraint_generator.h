@@ -36,7 +36,7 @@ public:
   operator()(const irep_idt &prefix, const typet &type = bool_typet());
 
 private:
-  unsigned symbol_count = 0;
+  std::size_t symbol_count = 0;
 
 #ifdef DEBUG
 public:
@@ -505,11 +505,11 @@ string_constraintst add_axioms_for_characters_in_integer_string(
   const array_string_exprt &str,
   const std::size_t max_string_length,
   const exprt &radix,
-  const unsigned long radix_ul);
+  const std::size_t radix_ul);
 string_constraintst add_axioms_for_correct_number_format(
   const array_string_exprt &str,
   const exprt &radix_as_char,
-  const unsigned long radix_ul,
+  const std::size_t radix_ul,
   const std::size_t max_size,
   const bool strict_formatting);
 std::pair<exprt, string_constraintst> add_axioms_for_parse_int(
@@ -526,16 +526,16 @@ exprt is_digit_with_radix(
   const exprt &chr,
   const bool strict_formatting,
   const exprt &radix_as_char,
-  const unsigned long radix_ul);
+  const std::size_t radix_ul);
 
 exprt get_numeric_value_from_character(
   const exprt &chr,
   const typet &char_type,
   const typet &type,
   const bool strict_formatting,
-  unsigned long radix_ul);
+  std::size_t radix_ul);
 
-size_t max_printed_string_length(const typet &type, unsigned long ul_radix);
+size_t max_printed_string_length(const typet &type, std::size_t ul_radix);
 
 std::string
 utf16_constant_array_to_java(const array_exprt &arr, std::size_t length);

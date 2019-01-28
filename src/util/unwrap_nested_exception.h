@@ -12,6 +12,6 @@ Author: Diffblue Ltd.
 #include <exception>
 #include <string>
 
-std::string unwrap_exception(const std::exception &e, int level = 0);
+std::string unwrap_exception(const std::exception &e, std::size_t level = 0);
 
 #endif // CPROVER_UTIL_UNWRAP_NESTED_EXCEPTION_H

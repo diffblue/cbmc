@@ -108,12 +108,12 @@ void symex_bmct::merge_goto(
 bool symex_bmct::should_stop_unwind(
   const symex_targett::sourcet &source,
   const goto_symex_statet::call_stackt &context,
-  unsigned unwind)
+  std::size_t unwind)
 {
   const irep_idt id = goto_programt::loop_id(source.function_id, *source.pc);
 
   tvt abort_unwind_decision;
-  unsigned this_loop_limit = std::numeric_limits<unsigned>::max();
+  std::size_t this_loop_limit = std::numeric_limits<std::size_t>::max();
 
   for(auto handler : loop_unwind_handlers)
   {
@@ -142,7 +142,7 @@ bool symex_bmct::should_stop_unwind(
   log.statistics() << (abort ? "Not unwinding" : "Unwinding") << " loop " << id
                    << " iteration " << unwind;
 
-  if(this_loop_limit != std::numeric_limits<unsigned>::max())
+  if(this_loop_limit != std::numeric_limits<std::size_t>::max())
     log.statistics() << " (" << this_loop_limit << " max)";
 
   log.statistics() << " " << source.pc->source_location << " thread "
@@ -154,10 +154,10 @@ bool symex_bmct::should_stop_unwind(
 bool symex_bmct::get_unwind_recursion(
   const irep_idt &id,
   unsigned thread_nr,
-  unsigned unwind)
+  std::size_t unwind)
 {
   tvt abort_unwind_decision;
-  unsigned this_loop_limit = std::numeric_limits<unsigned>::max();
+  std::size_t this_loop_limit = std::numeric_limits<std::size_t>::max();
 
   for(auto handler : recursion_unwind_handlers)
   {
@@ -189,7 +189,7 @@ bool symex_bmct::get_unwind_recursion(
     log.statistics() << (abort ? "Not unwinding" : "Unwinding") << " recursion "
                      << symbol.display_name() << " iteration " << unwind;
 
-    if(this_loop_limit != std::numeric_limits<unsigned>::max())
+    if(this_loop_limit != std::numeric_limits<std::size_t>::max())
       log.statistics() << " (" << this_loop_limit << " max)";
 
     log.statistics() << log.eom;

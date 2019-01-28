@@ -14,7 +14,7 @@ bool typecheckt::typecheck_main()
 {
   PRECONDITION(message_handler);
 
-  const unsigned errors_before=
+  const std::size_t errors_before =
     message_handler->get_message_count(messaget::M_ERROR);
 
   try

@@ -20,12 +20,12 @@ void float_approximationt::normalization_shift(bvt &fraction, bvt &exponent)
   bvt new_exponent=prop.new_variables(exponent.size());
 
   // i is the shift distance
-  for(unsigned i=0; i<fraction.size(); i++)
+  for(std::size_t i = 0; i < fraction.size(); i++)
   {
     bvt equal;
 
     // the bits above need to be zero
-    for(unsigned j=0; j<i; j++)
+    for(std::size_t j = 0; j < i; j++)
       equal.push_back(
         !fraction[fraction.size()-1-j]);
 
@@ -64,12 +64,12 @@ void float_approximationt::normalization_shift(bvt &fraction, bvt &exponent)
 }
 
 bvt float_approximationt::overapproximating_left_shift(
-  const bvt &src, unsigned dist)
+  const bvt &src, std::size_t dist)
 {
   bvt result;
   result.resize(src.size());
 
-  for(unsigned i=0; i<src.size(); i++)
+  for(std::size_t i = 0; i < src.size(); i++)
   {
     literalt l;
 

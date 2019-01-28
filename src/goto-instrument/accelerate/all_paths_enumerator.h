@@ -35,9 +35,9 @@ public:
   virtual bool next(patht &path);
 
 protected:
-  int backtrack(patht &path);
-  void complete_path(patht &path, int succ);
-  void extend_path(patht &path, goto_programt::targett t, int succ);
+  std::size_t backtrack(patht &path);
+  void complete_path(patht &path, std::size_t succ);
+  void extend_path(patht &path, goto_programt::targett t, std::size_t succ);
   bool is_looping(patht &path);
 
   goto_programt &goto_program;

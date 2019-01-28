@@ -28,6 +28,7 @@ bool value_set_domain_fit::transform(
 //      from_l->function << " " << from_l->location_number << " to " <<
 //      to_l->function << " " << to_l->location_number << '\n';
 
+  // clang-format off
   switch(from_l->type)
   {
   case GOTO:
@@ -53,11 +54,24 @@ bool value_set_domain_fit::transform(
     }
     break;
 
-  default:
-    {
-      // do nothing
-    }
+  case CATCH:
+  case THROW:
+  case DECL:
+  case DEAD:
+  case ATOMIC_BEGIN:
+  case ATOMIC_END:
+  case START_THREAD:
+  case END_THREAD:
+  case LOCATION:
+  case SKIP:
+  case ASSERT:
+  case ASSUME:
+  case INCOMPLETE_GOTO:
+  case NO_INSTRUCTION_TYPE:
+    // do nothing
+    break;
   }
+  // clang-format on
 
   return (value_set.changed);
 }

@@ -51,13 +51,13 @@ inline bool mini_bddt::is_false() const
   return node->node_number==0;
 }
 
-inline unsigned mini_bddt::var() const
+inline std::size_t mini_bddt::var() const
 {
   PRECONDITION_WITH_DIAGNOSTICS(is_initialized(), "BDD has to be initialized");
   return node->var;
 }
 
-inline unsigned mini_bddt::node_number() const
+inline std::size_t mini_bddt::node_number() const
 {
   PRECONDITION_WITH_DIAGNOSTICS(is_initialized(), "BDD has to be initialized");
   return node->node_number;
@@ -88,7 +88,7 @@ inline void mini_bddt::clear()
 
 inline mini_bdd_nodet::mini_bdd_nodet(
   class mini_bdd_mgrt *_mgr,
-  unsigned _var, unsigned _node_number,
+  std::size_t _var, std::size_t _node_number,
   const mini_bddt &_low, const mini_bddt &_high):
   mgr(_mgr), var(_var), node_number(_node_number),
   reference_counter(0),
@@ -117,7 +117,7 @@ inline void mini_bdd_nodet::add_reference()
 }
 
 inline mini_bdd_mgrt::reverse_keyt::reverse_keyt(
-  unsigned _var, const mini_bddt &_low, const mini_bddt &_high):
+  std::size_t _var, const mini_bddt &_low, const mini_bddt &_high):
   var(_var), low(_low.node->node_number), high(_high.node->node_number)
 {
 }

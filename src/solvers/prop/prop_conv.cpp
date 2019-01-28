@@ -248,7 +248,7 @@ literalt prop_conv_solvert::convert_bool(const exprt &expr)
     bvt b;
     b.reserve(op_bv.size()-1);
 
-    for(unsigned i=1; i<op_bv.size(); i++)
+    for(std::size_t i = 1; i < op_bv.size(); i++)
       b.push_back(prop.lequal(op_bv[0], op_bv[i]));
 
     prop.l_set_to_true(prop.lor(b));
@@ -473,12 +473,14 @@ decision_proceduret::resultt prop_conv_solvert::dec_solve()
 
   statistics() << "Solving with " << prop.solver_text() << eom;
 
+  // clang-format off
   switch(prop.prop_solve())
   {
     case propt::resultt::P_SATISFIABLE: return resultt::D_SATISFIABLE;
     case propt::resultt::P_UNSATISFIABLE: return resultt::D_UNSATISFIABLE;
-    default: return resultt::D_ERROR;
+    case propt::resultt::P_ERROR: return resultt::D_ERROR;
   }
+  // clang-format on
 
   UNREACHABLE;
 }

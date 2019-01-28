@@ -65,7 +65,15 @@ ci_lazy_methodst::ci_lazy_methodst(
 ///   class
 static bool references_class_model(const exprt &expr)
 {
+#ifdef _MSC_VER
+#include <util/pragma_push.def>
+#pragma warning(disable:4640)
+  // construction of local static object is not thread-safe
+#endif
   static const struct_tag_typet class_type("java::java.lang.Class");
+#ifdef _MSC_VER
+#include <util/pragma_pop.def>
+#endif
 
   for(auto it = expr.depth_begin(); it != expr.depth_end(); ++it)
   {

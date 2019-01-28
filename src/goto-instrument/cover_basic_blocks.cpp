@@ -61,7 +61,7 @@ cover_basic_blockst::cover_basic_blockst(const goto_programt &_goto_program)
     // update lines belonging to block
     const irep_idt &line = it->source_location.get_line();
     if(!line.empty())
-      block_info.lines.insert(unsafe_string2unsigned(id2string(line)));
+      block_info.lines.insert(unsafe_string2size_t(id2string(line)));
 
     // set representative program location to instrument
     if(
@@ -156,7 +156,7 @@ void cover_basic_blockst::update_covered_lines(block_infot &block_info)
 
   const auto &cover_set = block_info.lines;
   INVARIANT(!cover_set.empty(), "covered lines set must not be empty");
-  std::vector<unsigned> line_list(cover_set.begin(), cover_set.end());
+  std::vector<std::size_t> line_list(cover_set.begin(), cover_set.end());
 
   std::string covered_lines = format_number_range(line_list);
   block_info.source_location.set_basic_block_covered_lines(covered_lines);

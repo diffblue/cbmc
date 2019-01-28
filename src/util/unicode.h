@@ -35,7 +35,8 @@ template <typename It>
 std::vector<const char *> to_c_str_array(It b, It e)
 {
   // Assumes that walking the range will be faster than repeated allocation
-  std::vector<const char *> ret(std::distance(b, e) + 1, nullptr);
+  std::vector<const char *> ret(
+    static_cast<std::size_t>(std::distance(b, e) + 1), nullptr);
   std::transform(b, e, std::begin(ret), [] (const std::string & s)
     {
       return s.c_str();

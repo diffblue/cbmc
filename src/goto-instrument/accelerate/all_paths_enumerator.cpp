@@ -42,7 +42,7 @@ bool all_paths_enumeratort::next(patht &path)
     std::cout << "Enumerating next path...\n";
 #endif
 
-    int decision=backtrack(last_path);
+    std::size_t decision = backtrack(last_path);
     complete_path(last_path, decision);
 
     if(is_looping(last_path))
@@ -58,7 +58,7 @@ bool all_paths_enumeratort::next(patht &path)
   return false;
 }
 
-int all_paths_enumeratort::backtrack(patht &path)
+std::size_t all_paths_enumeratort::backtrack(patht &path)
 {
   // If we have a path of length 1 or 0, we can't backtrack any further.
   // That means we're done enumerating paths!
@@ -74,7 +74,7 @@ int all_paths_enumeratort::backtrack(patht &path)
   goto_programt::targett parent_loc=path.back().loc;
   const auto succs=goto_program.get_successors(parent_loc);
 
-  unsigned int ret=0;
+  std::size_t ret = 0;
 
   for(const auto &succ : succs)
   {
@@ -99,7 +99,7 @@ int all_paths_enumeratort::backtrack(patht &path)
   return backtrack(path);
 }
 
-void all_paths_enumeratort::complete_path(patht &path, int succ)
+void all_paths_enumeratort::complete_path(patht &path, std::size_t succ)
 {
   if(path.empty())
     return;
@@ -118,7 +118,7 @@ void all_paths_enumeratort::complete_path(patht &path, int succ)
 void all_paths_enumeratort::extend_path(
   patht &path,
   goto_programt::targett t,
-  int succ)
+  std::size_t succ)
 {
   goto_programt::targett next;
   exprt guard=true_exprt();

@@ -951,7 +951,7 @@ goto_programt::const_targett goto_program2codet::convert_goto_switch(
        it->case_last->location_number > max_target->location_number)
       max_target=it->case_last;
 
-  std::map<goto_programt::const_targett, unsigned> targets_done;
+  std::map<goto_programt::const_targett, std::size_t> targets_done;
   loop_last_stack.push_back(std::make_pair(max_target, false));
 
   // iterate over all <branch conditions, branch instruction, branch target>
@@ -1575,7 +1575,8 @@ void goto_program2codet::cleanup_code_block(
       operands.size()>1 && i<operands.size();
      ) // no ++i
   {
-    exprt::operandst::iterator it=operands.begin()+i;
+    exprt::operandst::iterator it =
+      operands.begin() + static_cast<std::ptrdiff_t>(i);
     // remove skip
     if(to_code(*it).get_statement()==ID_skip &&
        it->source_location().get_comment().empty())
@@ -1593,9 +1594,11 @@ void goto_program2codet::cleanup_code_block(
 
       if(!has_decl)
       {
-        operands.insert(operands.begin()+i+1,
-            it->operands().begin(), it->operands().end());
-        operands.erase(operands.begin()+i);
+        operands.insert(
+          operands.begin() + static_cast<std::ptrdiff_t>(i) + 1,
+          it->operands().begin(),
+          it->operands().end());
+        operands.erase(operands.begin() + static_cast<std::ptrdiff_t>(i));
         // no ++i
       }
       else

@@ -9,7 +9,7 @@
 
 
 BigInt
-pow (BigInt const &x, unsigned y)
+pow (BigInt const &x, std::size_t y)
 {
   BigInt a = x;
   BigInt r = 1;

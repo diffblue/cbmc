@@ -151,8 +151,8 @@ get_values(const VST &value_set, const namespacet &ns, const exprt &expr)
   return vals;
 }
 
-static std::size_t exprs_with_id(
-  const value_setst::valuest &exprs, const irep_idt &id)
+static std::ptrdiff_t
+exprs_with_id(const value_setst::valuest &exprs, const irep_idt &id)
 {
   return std::count_if(
     exprs.begin(),

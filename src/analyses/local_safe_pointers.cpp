@@ -122,6 +122,9 @@ void local_safe_pointerst::operator()(const goto_programt &goto_program)
     case RETURN:
     case THROW:
     case CATCH:
+    case END_FUNCTION:
+    case ATOMIC_BEGIN:
+    case ATOMIC_END:
       break;
 
     // Possible checks:
@@ -164,7 +167,13 @@ void local_safe_pointerst::operator()(const goto_programt &goto_program)
 
       break;
 
-    default:
+    case ASSIGN:
+    case START_THREAD:
+    case END_THREAD:
+    case FUNCTION_CALL:
+    case OTHER:
+    case INCOMPLETE_GOTO:
+    case NO_INSTRUCTION_TYPE:
       // Pessimistically assume all other instructions might overwrite any
       // pointer with a possibly-null value.
       checked_expressions.clear();

@@ -118,8 +118,13 @@ static void add_to_json(
     {{"function", json_stringt(function_identifier)},
      {"fileName",
       json_stringt(concat_dir_file(
+  // json_stringt function_json(end_function->function);
+  // json_stringt file_name_json(concat_dir_file(
         id2string(end_function->source_location.get_working_directory()),
-        id2string(end_function->source_location.get_file())))}});
+        id2string(end_function->source_location.get_file())));
+  //json_objectt entry(
+   // {{"function", std::move(function_json)},
+     //{"fileName", std::move(file_name_json)}});
 
   json_arrayt &dead_ins=entry["unreachableInstructions"].make_array();
 
@@ -142,8 +147,10 @@ static void add_to_json(
 
     // print info for file actually with full path
     const source_locationt &l=it->second->source_location;
+    jsont source_location_json(json(l));
+    json_stringt statement_json(s);
     json_objectt i_entry(
-      {{"sourceLocation", json(l)}, {"statement", json_stringt(s)}});
+      {{"sourceLocation", std::move(source_location_json)}, {"statement", std::move(statement_json)}});
     dead_ins.push_back(std::move(i_entry));
   }
 
@@ -246,12 +253,13 @@ static void json_output_function(
   const source_locationt &last_location,
   json_arrayt &dest)
 {
-  json_objectt entry(
-    {{"function", json_stringt(function)},
-     {"file name",
-      json_stringt(concat_dir_file(
+  json_stringt function_json(function);
+  json_stringt file_name_json(concat_dir_file(
         id2string(first_location.get_working_directory()),
-        id2string(first_location.get_file())))},
+        id2string(first_location.get_file())));
+  json_objectt entry(
+    {{"function", std::move(function_json)},
+     {"file name", std::move(file_name_json)},
      {"first line", json_numbert(id2string(first_location.get_line()))},
      {"last line", json_numbert(id2string(last_location.get_line()))}});
 

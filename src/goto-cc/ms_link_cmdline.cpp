@@ -11,7 +11,7 @@ Author: Daniel Kroening
 
 #include "ms_link_cmdline.h"
 
-#include <cassert>
+#include <cctype>
 #include <cstdlib>
 #include <cstring>
 #include <fstream>
@@ -124,8 +124,8 @@ void ms_link_cmdlinet::process_response_file(const std::string &file)
   std::string line;
   getline(infile, line);
   if(
-    line.size() >= 2 && line[0] == static_cast<char>(0xff) &&
-    line[1] == static_cast<char>(0xfe))
+    line.size() >= 2 && static_cast<unsigned char>(line[0]) == 0xffu &&
+    static_cast<unsigned char>(line[1]) == 0xfeu)
   {
     // Unicode, UTF-16 little endian
 
@@ -150,8 +150,9 @@ void ms_link_cmdlinet::process_response_file(const std::string &file)
 #endif
   }
   else if(
-    line.size() >= 3 && line[0] == static_cast<char>(0xef) &&
-    line[1] == static_cast<char>(0xbb) && line[2] == static_cast<char>(0xbf))
+    line.size() >= 3 && static_cast<unsigned char>(line[0]) == 0xefu &&
+    static_cast<unsigned char>(line[1]) == 0xbbu &&
+    static_cast<unsigned char>(line[2]) == 0xbfu)
   {
     // This is the UTF-8 BOM. We can proceed as usual, since
     // we use UTF-8 internally.
@@ -319,7 +320,9 @@ const char *ms_link_options[] = {
 static std::string to_upper_string(const std::string &s)
 {
   std::string result = s;
-  transform(result.begin(), result.end(), result.begin(), toupper);
+  transform(result.begin(), result.end(), result.begin(), [](char c) {
+    return static_cast<char>(std::toupper(c));
+  });
   return result;
 }
 

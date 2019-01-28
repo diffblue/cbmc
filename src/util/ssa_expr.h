@@ -78,21 +78,21 @@ public:
     return o.get_identifier();
   }
 
-  void set_level_0(unsigned i)
+  void set_level_0(std::size_t i)
   {
-    set(ID_L0, i);
+    set(ID_L0, static_cast<long long>(i));
     update_identifier();
   }
 
-  void set_level_1(unsigned i)
+  void set_level_1(std::size_t i)
   {
-    set(ID_L1, i);
+    set(ID_L1, static_cast<long long>(i));
     update_identifier();
   }
 
-  void set_level_2(unsigned i)
+  void set_level_2(std::size_t i)
   {
-    set(ID_L2, i);
+    set(ID_L2, static_cast<long long>(i));
     update_identifier();
   }
 

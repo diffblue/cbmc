@@ -55,7 +55,8 @@ bvt boolbvt::convert_unary_minus(const unary_minus_exprt &expr)
     {
       bvt tmp_op;
 
-      const auto sub_it = std::next(op_bv.begin(), sub_idx);
+      const auto sub_it =
+        std::next(op_bv.begin(), static_cast<std::ptrdiff_t>(sub_idx));
       std::copy_n(sub_it, sub_width, std::back_inserter(tmp_op));
 
       if(type.subtype().id() == ID_floatbv)

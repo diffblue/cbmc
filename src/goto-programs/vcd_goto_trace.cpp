@@ -113,9 +113,8 @@ void output_vcd(
 
   for(const auto &step : goto_trace.steps)
   {
-    switch(step.type)
-    {
-    case goto_trace_stept::typet::ASSIGNMENT:
+    // clang-format off
+    if(step.is_assignment())
       {
         auto lhs_object=step.get_lhs_object();
         if(lhs_object.has_value())
@@ -147,11 +146,6 @@ void output_vcd(
           }
         }
       }
-      break;
-
-    default:
-      {
-      }
-    }
+      // clang-format on
   }
 }

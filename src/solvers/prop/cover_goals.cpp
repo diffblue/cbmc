@@ -98,7 +98,7 @@ decision_proceduret::resultt cover_goalst::operator()()
       mark();
       break;
 
-    default:
+    case decision_proceduret::resultt::D_ERROR:
       error() << "decision procedure has failed" << eom;
       return dec_result;
     }

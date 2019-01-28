@@ -54,7 +54,7 @@ protected:
 
   inv_object_storet object_store;
 
-  typedef std::list<unsigned> object_listt;
+  typedef std::list<std::size_t> object_listt;
 
   void add_objects(const goto_programt &goto_program);
   void add_objects(const goto_functionst &goto_functions);

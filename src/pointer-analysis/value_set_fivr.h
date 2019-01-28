@@ -31,18 +31,18 @@ public:
   {
   }
 
-  unsigned to_function, from_function;
-  unsigned to_target_index, from_target_index;
+  std::size_t to_function, from_function;
+  std::size_t to_target_index, from_target_index;
   static object_numberingt object_numbering;
   static hash_numbering<irep_idt, irep_id_hash> function_numbering;
 
-  void set_from(const irep_idt &function, unsigned inx)
+  void set_from(const irep_idt &function, std::size_t inx)
   {
     from_function = function_numbering.number(function);
     from_target_index = inx;
   }
 
-  void set_to(const irep_idt &function, unsigned inx)
+  void set_to(const irep_idt &function, std::size_t inx)
   {
     to_function = function_numbering.number(function);
     to_target_index = inx;
@@ -104,32 +104,32 @@ public:
     class validity_ranget
     {
     public:
-      unsigned function;
-      unsigned from, to;
+      std::size_t function;
+      std::size_t from, to;
 
       validity_ranget():
         function(0), from(0), to(0)
       {
       }
 
-      validity_ranget(unsigned fnc, unsigned f, unsigned t):
+      validity_ranget(std::size_t fnc, std::size_t f, std::size_t t):
         function(fnc), from(f), to(t)
       {
       }
 
-      bool contains(unsigned f, unsigned line) const
+      bool contains(std::size_t f, std::size_t line) const
       {
         return (function==f && from<=line && line<=to);
       }
     };
 
     typedef std::list<validity_ranget> vrange_listt;
-    typedef std::map<unsigned, vrange_listt> validity_rangest;
+    typedef std::map<std::size_t, vrange_listt> validity_rangest;
     validity_rangest validity_ranges;
 
-    bool set_valid_at(unsigned inx, unsigned f, unsigned line);
-    bool set_valid_at(unsigned inx, const validity_ranget &vr);
-    bool is_valid_at(unsigned inx, unsigned f, unsigned line) const;
+    bool set_valid_at(std::size_t inx, std::size_t f, std::size_t line);
+    bool set_valid_at(std::size_t inx, const validity_ranget &vr);
+    bool is_valid_at(std::size_t inx, std::size_t f, std::size_t line) const;
   };
 
   exprt to_expr(object_map_dt::const_iterator it) const;
@@ -217,7 +217,7 @@ public:
 
   typedef std::unordered_set<exprt, irep_hash> expr_sett;
 
-  typedef std::unordered_set<unsigned int> dynamic_object_id_sett;
+  typedef std::unordered_set<std::size_t> dynamic_object_id_sett;
 
   #ifdef USE_DSTRING
   typedef std::map<idt, entryt> valuest;
@@ -386,7 +386,7 @@ protected:
     const entryt&,
     object_mapt&,
     flatten_seent&,
-    unsigned from_function) const;
+    std::size_t from_function) const;
 
   bool recursive_find(
     const irep_idt &ident,

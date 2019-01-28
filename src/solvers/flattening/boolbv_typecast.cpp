@@ -79,8 +79,10 @@ bool boolbvt::type_conversion(
     {
       // recursively do both halfs
       bvt lower, upper, lower_res, upper_res;
-      lower.assign(src.begin(), src.begin()+src.size()/2);
-      upper.assign(src.begin()+src.size()/2, src.end());
+      lower.assign(
+        src.begin(), src.begin() + static_cast<std::ptrdiff_t>(src.size() / 2));
+      upper.assign(
+        src.begin() + static_cast<std::ptrdiff_t>(src.size() / 2), src.end());
       type_conversion(
         src_type.subtype(), lower, dest_type.subtype(), lower_res);
       type_conversion(
@@ -191,7 +193,12 @@ bool boolbvt::type_conversion(
         dest=src;
         return false;
 
-      default:
+      case bvtypet::IS_C_BIT_FIELD:
+      case bvtypet::IS_UNKNOWN:
+      case bvtypet::IS_RANGE:
+      case bvtypet::IS_VERILOG_UNSIGNED:
+      case bvtypet::IS_VERILOG_SIGNED:
+      case bvtypet::IS_FIXED:
         if(src_type.id()==ID_bool)
         {
           // bool to float
@@ -320,6 +327,7 @@ bool boolbvt::type_conversion(
   case bvtypet::IS_UNSIGNED:
   case bvtypet::IS_SIGNED:
   case bvtypet::IS_C_ENUM:
+    // clang-format off
     switch(src_bvtype)
     {
     case bvtypet::IS_FLOAT: // float to integer
@@ -415,7 +423,10 @@ bool boolbvt::type_conversion(
       }
       break;
 
-    default:
+    case bvtypet::IS_C_BIT_FIELD:
+    case bvtypet::IS_UNKNOWN:
+    case bvtypet::IS_RANGE:
+    case bvtypet::IS_BV:
       if(src_type.id()==ID_bool)
       {
         // bool to integer
@@ -434,6 +445,7 @@ bool boolbvt::type_conversion(
         return false;
       }
     }
+    // clang-format on
     break;
 
   case bvtypet::IS_VERILOG_UNSIGNED:
@@ -509,7 +521,9 @@ bool boolbvt::type_conversion(
 
     return false;
 
-  default:
+  case bvtypet::IS_C_BIT_FIELD:
+  case bvtypet::IS_UNKNOWN:
+  case bvtypet::IS_VERILOG_SIGNED:
     if(dest_type.id()==ID_array)
     {
       if(src_width==dest_width)

@@ -20,8 +20,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/invariant.h>
 #include <util/threeval.h>
 
+#include <util/pragma_push.def>
+#ifdef _MSC_VER
+#pragma warning(disable:4640)
+  // construction of local static object is not thread-safe
+#endif
 #include <minisat/core/Solver.h>
 #include <minisat/simp/SimpSolver.h>
+#include <util/pragma_pop.def>
 
 #ifndef HAVE_MINISAT2
 #error "Expected HAVE_MINISAT2"
@@ -53,9 +59,9 @@ tvt satcheck_minisat2_baset<T>::l_get(literalt a) const
 
   using Minisat::lbool;
 
-  if(solver->model[a.var_no()]==l_True)
+  if(solver->model[static_cast<std::size_t>(a.var_no())] == l_True)
     result=tvt(true);
-  else if(solver->model[a.var_no()]==l_False)
+  else if(solver->model[static_cast<std::size_t>(a.var_no())] == l_False)
     result=tvt(false);
   else
     return tvt::unknown();
@@ -278,7 +284,7 @@ void satcheck_minisat2_baset<T>::set_assignment(literalt a, bool value)
 
   try
   {
-    unsigned v = a.var_no();
+    unsigned v = static_cast<unsigned>(a.var_no());
     bool sign = a.sign();
 
     // MiniSat2 kills the model in case of UNSAT
@@ -354,7 +360,7 @@ void satcheck_minisat_simplifiert::set_frozen(literalt a)
     if(!a.is_constant())
     {
       add_variables();
-      solver->setFrozen(a.var_no(), true);
+      solver->setFrozen(static_cast<int>(a.var_no()), true);
     }
   }
   catch(const Minisat::OutOfMemoryException &)
@@ -369,5 +375,5 @@ bool satcheck_minisat_simplifiert::is_eliminated(literalt a) const
 {
   PRECONDITION(!a.is_constant());
 
-  return solver->isEliminated(a.var_no());
+  return solver->isEliminated(static_cast<int>(a.var_no()));
 }

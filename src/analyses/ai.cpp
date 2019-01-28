@@ -95,11 +95,15 @@ jsont ai_baset::output_json(
     std::ostringstream out;
     goto_program.output_instruction(ns, function_id, out, *i_it);
 
+    json_numbert location_number_json(std::to_string(i_it->location_number));
+    json_stringt source_location_json(i_it->source_location.as_string());
+    jsont abstract_state_json(abstract_state_before(i_it)->output_json(*this, ns));
+    json_stringt instruction_json(out.str());
     json_objectt location(
-      {{"locationNumber", json_numbert(std::to_string(i_it->location_number))},
-       {"sourceLocation", json_stringt(i_it->source_location.as_string())},
-       {"abstractState", abstract_state_before(i_it)->output_json(*this, ns)},
-       {"instruction", json_stringt(out.str())}});
+      {{"locationNumber", std::move(location_number_json)},
+       {"sourceLocation", std::move(source_location_json)},
+       {"abstractState", std::move(abstract_state_json)},
+       {"instruction", std::move(instruction_json)}});
 
     contents.push_back(std::move(location));
   }

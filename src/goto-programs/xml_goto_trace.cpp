@@ -40,6 +40,7 @@ void convert(
     if(source_location.is_not_nil() && source_location.get_file()!="")
       xml_location=xml(source_location);
 
+    // clang-format off
     switch(step.type)
     {
     case goto_trace_stept::typet::ASSERT:
@@ -198,7 +199,18 @@ void convert(
       }
       break;
 
-    default:
+    case goto_trace_stept::typet::ATOMIC_BEGIN:
+    case goto_trace_stept::typet::ATOMIC_END:
+    case goto_trace_stept::typet::MEMORY_BARRIER:
+    case goto_trace_stept::typet::SPAWN:
+    case goto_trace_stept::typet::SHARED_WRITE:
+    case goto_trace_stept::typet::SHARED_READ:
+    case goto_trace_stept::typet::CONSTRAINT:
+    case goto_trace_stept::typet::DEAD:
+    case goto_trace_stept::typet::LOCATION:
+    case goto_trace_stept::typet::GOTO:
+    case goto_trace_stept::typet::ASSUME:
+    case goto_trace_stept::typet::NONE:
       if(source_location!=previous_source_location)
       {
         // just the source location
@@ -216,6 +228,7 @@ void convert(
         }
       }
     }
+    // clang-format on
 
     if(source_location.is_not_nil() && source_location.get_file()!="")
       previous_source_location=source_location;

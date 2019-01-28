@@ -50,7 +50,7 @@ void qdimacs_cnft::write_prefix(std::ostream &out) const
       out << "e";
       break;
 
-    default:
+    case quantifiert::typet::NONE:
       UNREACHABLE;
     }
 

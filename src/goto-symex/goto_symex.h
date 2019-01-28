@@ -288,7 +288,7 @@ protected:
   virtual bool should_stop_unwind(
     const symex_targett::sourcet &source,
     const goto_symex_statet::call_stackt &context,
-    unsigned unwind);
+    std::size_t unwind);
 
   virtual void loop_bound_exceeded(statet &, const exprt &guard);
 
@@ -321,7 +321,7 @@ protected:
   virtual bool get_unwind_recursion(
     const irep_idt &identifier,
     unsigned thread_nr,
-    unsigned unwind);
+    std::size_t unwind);
 
   void parameter_assignments(
     const irep_idt &function_identifier,

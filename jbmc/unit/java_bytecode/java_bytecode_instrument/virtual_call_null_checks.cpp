@@ -61,11 +61,10 @@ SCENARIO(
       {
         // This just checks that the class actually makes the expected call,
         // i.e. that it hasn't been optimised away or similar.
-        std::size_t found_virtualmethod_calls =
-          std::count_if(
-            main_function.body.instructions.begin(),
-            main_function.body.instructions.end(),
-            is_expected_virtualmethod_call);
+        auto found_virtualmethod_calls = std::count_if(
+          main_function.body.instructions.begin(),
+          main_function.body.instructions.end(),
+          is_expected_virtualmethod_call);
 
         REQUIRE(found_virtualmethod_calls == 1);
       }

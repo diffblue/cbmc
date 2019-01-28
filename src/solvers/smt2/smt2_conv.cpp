@@ -724,7 +724,7 @@ literalt smt2_convt::convert(const exprt &expr)
 
   find_symbols(expr);
 
-  literalt l(no_boolean_variables, false);
+  literalt l(static_cast<unsigned>(no_boolean_variables), false);
   no_boolean_variables++;
 
   out << "; convert\n";

@@ -77,9 +77,18 @@ void invariant_set_domaint::transform(
     invariant_set.make_threaded();
     break;
 
-  default:
-    {
-      // do nothing
-    }
+  case CATCH:
+  case THROW:
+  case DEAD:
+  case ATOMIC_BEGIN:
+  case ATOMIC_END:
+  case END_FUNCTION:
+  case LOCATION:
+  case END_THREAD:
+  case SKIP:
+  case INCOMPLETE_GOTO:
+  case NO_INSTRUCTION_TYPE:
+    // do nothing
+    break;
   }
 }

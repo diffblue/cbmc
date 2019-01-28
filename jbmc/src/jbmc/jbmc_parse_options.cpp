@@ -528,9 +528,9 @@ int jbmc_parse_optionst::doit()
       bmc.add_loop_unwind_handler(
         [&symbol_table](
           const goto_symex_statet::call_stackt &context,
-          unsigned loop_number,
-          unsigned unwind,
-          unsigned &max_unwind) {
+          std::size_t loop_number,
+          std::size_t unwind,
+          std::size_t &max_unwind) {
           return java_enum_static_init_unwind_handler(
             context, loop_number, unwind, max_unwind, symbol_table);
         });
@@ -1049,7 +1049,15 @@ bool jbmc_parse_optionst::process_goto_functions(
 
 bool jbmc_parse_optionst::can_generate_function_body(const irep_idt &name)
 {
+#ifdef _MSC_VER
+#include <util/pragma_push.def>
+#pragma warning(disable:4640)
+  // construction of local static object is not thread-safe
+#endif
   static const irep_idt initialize_id = INITIALIZE_FUNCTION;
+#ifdef _MSC_VER
+#include <util/pragma_pop.def>
+#endif
 
   return name != goto_functionst::entry_point() && name != initialize_id;
 }

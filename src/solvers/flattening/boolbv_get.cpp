@@ -80,12 +80,14 @@ exprt boolbvt::bv_get_rec(
   {
     if(!unknown[offset])
     {
+      // clang-format off
       switch(prop.l_get(bv[offset]).get_value())
       {
       case tvt::tv_enumt::TV_FALSE: return false_exprt();
       case tvt::tv_enumt::TV_TRUE:  return true_exprt();
-      default: return false_exprt(); // default
+      case tvt::tv_enumt::TV_UNKNOWN: return false_exprt(); // default
       }
+      // clang-format on
     }
 
     return nil_exprt();
@@ -228,6 +230,7 @@ exprt boolbvt::bv_get_rec(
     value=ch+value;
   }
 
+  // clang-format off
   switch(bvtype)
   {
   case bvtypet::IS_UNKNOWN:
@@ -253,7 +256,15 @@ exprt boolbvt::bv_get_rec(
     }
     break;
 
-  default:
+  case bvtypet::IS_C_BIT_FIELD:
+  case bvtypet::IS_VERILOG_UNSIGNED:
+  case bvtypet::IS_VERILOG_SIGNED:
+  case bvtypet::IS_C_BOOL:
+  case bvtypet::IS_FIXED:
+  case bvtypet::IS_FLOAT:
+  case bvtypet::IS_UNSIGNED:
+  case bvtypet::IS_SIGNED:
+  case bvtypet::IS_BV:
   case bvtypet::IS_C_ENUM:
   {
     const irep_idt bvrep = make_bvrep(
@@ -261,6 +272,7 @@ exprt boolbvt::bv_get_rec(
     return constant_exprt(bvrep, type);
   }
   }
+  // clang-format on
 
   return nil_exprt();
 }

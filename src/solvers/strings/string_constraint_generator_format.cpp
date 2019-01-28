@@ -227,7 +227,8 @@ static std::vector<format_elementt> parse_format_string(std::string s)
   {
     if(match.position() != 0)
     {
-      std::string pre_match = s.substr(0, match.position());
+      std::string pre_match =
+        s.substr(0, static_cast<std::size_t>(match.position()));
       al.emplace_back(pre_match);
     }
 
@@ -340,7 +341,7 @@ add_axioms_for_format_specifier(
   case format_specifiert::HASHCODE_UPPER:
   {
     format_specifiert fs_lower = fs;
-    fs_lower.conversion = tolower(fs.conversion);
+    fs_lower.conversion = static_cast<char>(tolower(fs.conversion));
     auto format_specifier_result = add_axioms_for_format_specifier(
       fresh_symbol,
       fs_lower,
@@ -371,12 +372,10 @@ add_axioms_for_format_specifier(
     message.warning() << "unimplemented format specifier: " << fs.conversion
                       << message.eom;
     return {array_pool.fresh_string(index_type, char_type), {}};
-  default:
-    message.error() << "invalid format specifier: " << fs.conversion
-                    << message.eom;
-    INVARIANT(
-      false, "format specifier must belong to [bBhHsScCdoxXeEfgGaAtT%n]");
   }
+
+  INVARIANT(
+    false, "format specifier must belong to [bBhHsScCdoxXeEfgGaAtT%n]");
 }
 
 /// Parse `s` and add axioms ensuring the output corresponds to the output of
@@ -430,7 +429,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_format(
             "number of format must match specifiers");
 
           // first argument `args[0]` corresponds to index 1
-          arg = to_struct_expr(args[fs.index - 1]);
+          arg = to_struct_expr(args[static_cast<std::size_t>(fs.index - 1)]);
         }
 
         auto result = add_axioms_for_format_specifier(
@@ -509,7 +508,8 @@ utf16_constant_array_to_java(const array_exprt &arr, std::size_t length)
   std::wstring out(length, '?');
 
   for(std::size_t i = 0; i < arr.operands().size() && i < length; i++)
-    out[i] = numeric_cast_v<unsigned>(to_constant_expr(arr.operands()[i]));
+    out[i] = static_cast<wchar_t>(
+      numeric_cast_v<unsigned>(to_constant_expr(arr.operands()[i])));
 
   return utf16_native_endian_to_java(out);
 }

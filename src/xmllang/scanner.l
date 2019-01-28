@@ -6,6 +6,14 @@
 
 %{
 
+#if defined _MSC_VER
+#pragma warning(disable:4365)
+// signed/unsigned mismatch
+#pragma warning(disable:4005)
+  // macro re-definition: flex conditonally defines INT32_MAX et al. and thus
+  // they are set before library headers get to define them
+#endif
+
 #include <cctype>
 #include <cstring>
 #include <cstdlib>
@@ -20,7 +28,7 @@
 static char *word(char *s)
 {
   char *buf;
-  int i, k;
+  std::size_t i, k;
   for (k = 0; isspace(s[k]) || s[k] == '<'; k++) ;
   for (i = k; s[i] && ! isspace(s[i]); i++) ;
   buf = (char *)malloc((i - k + 1) * sizeof(char));

@@ -57,9 +57,18 @@ void value_set_domain_templatet<VST>::transform(
     }
     break;
 
-  default:
-    {
-      // do nothing
-    }
+  case CATCH:
+  case THROW:
+  case START_THREAD:
+  case END_THREAD:
+  case ATOMIC_BEGIN:
+  case ATOMIC_END:
+  case ASSERT:
+  case LOCATION:
+  case SKIP:
+  case INCOMPLETE_GOTO:
+  case NO_INSTRUCTION_TYPE:
+    // do nothing
+    break;
   }
 }

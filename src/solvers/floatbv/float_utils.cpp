@@ -168,7 +168,7 @@ bvt float_utilst::conversion(
 
   int sourceSmallestNormalExponent=-((1 << (spec.e - 1)) - 1);
   int sourceSmallestDenormalExponent =
-    sourceSmallestNormalExponent - spec.f;
+    sourceSmallestNormalExponent - static_cast<int>(spec.f);
 
   // Using the fact that f doesn't include the hidden bit
 
@@ -389,7 +389,9 @@ bvt float_utilst::limit_distance(
   std::size_t nb_bits = address_bits(limit);
 
   bvt upper_bits=dist;
-  upper_bits.erase(upper_bits.begin(), upper_bits.begin()+nb_bits);
+  upper_bits.erase(
+    upper_bits.begin(),
+    upper_bits.begin() + static_cast<std::ptrdiff_t>(nb_bits));
   literalt or_upper_bits=prop.lor(upper_bits);
 
   bvt lower_bits=dist;
@@ -706,7 +708,8 @@ literalt float_utilst::exponent_all_ones(const bvt &src)
   bvt exponent=src;
 
   // removes the fractional part
-  exponent.erase(exponent.begin(), exponent.begin()+spec.f);
+  exponent.erase(
+    exponent.begin(), exponent.begin() + static_cast<std::ptrdiff_t>(spec.f));
 
   // removes the sign
   exponent.resize(spec.e);
@@ -719,7 +722,8 @@ literalt float_utilst::exponent_all_zeros(const bvt &src)
   bvt exponent=src;
 
   // removes the fractional part
-  exponent.erase(exponent.begin(), exponent.begin()+spec.f);
+  exponent.erase(
+    exponent.begin(), exponent.begin() + static_cast<std::ptrdiff_t>(spec.f));
 
   // removes the sign
   exponent.resize(spec.e);
@@ -794,9 +798,9 @@ void float_utilst::normalization_shift(bvt &fraction, bvt &exponent)
 
   bvt exponent_delta=bv_utils.zeros(exponent.size());
 
-  for(int d=depth-1; d>=0; d--)
+  for(std::size_t d = depth; d > 0; --d)
   {
-    std::size_t distance=(1<<d);
+    const std::size_t distance = 1ull << (d - 1);
     INVARIANT(fraction.size() > distance, "");
 
     // check if first 'distance'-many bits are zeros
@@ -812,8 +816,7 @@ void float_utilst::normalization_shift(bvt &fraction, bvt &exponent)
       bv_utils.select(prefix_is_zero, shifted, fraction);
 
     // add corresponding weight to exponent
-    INVARIANT(d < (signed)exponent_delta.size(), "");
-    exponent_delta[d]=prefix_is_zero;
+    exponent_delta[d - 1] = prefix_is_zero;
   }
 
   exponent=bv_utils.sub(exponent, exponent_delta);

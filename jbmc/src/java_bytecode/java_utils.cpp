@@ -46,12 +46,13 @@ unsigned java_local_variable_slots(const typet &t)
   return bitwidth == 64 ? 2u : 1u;
 }
 
-unsigned java_method_parameter_slots(const java_method_typet &t)
+method_offsett java_method_parameter_slots(const java_method_typet &t)
 {
-  unsigned slots=0;
+  method_offsett slots = 0;
 
   for(const auto &p : t.parameters())
-    slots+=java_local_variable_slots(p.type());
+    slots =
+      static_cast<method_offsett>(slots + java_local_variable_slots(p.type()));
 
   return slots;
 }
@@ -406,9 +407,17 @@ get_inherited_component(
 /// \return true if this static field is known never to be null
 bool is_non_null_library_global(const irep_idt &symbolid)
 {
+#ifdef _MSC_VER
+#include <util/pragma_push.def>
+#pragma warning(disable:4640)
+  // construction of local static object is not thread-safe
+#endif
   static const irep_idt in = "java::java.lang.System.in";
   static const irep_idt out = "java::java.lang.System.out";
   static const irep_idt err = "java::java.lang.System.err";
+#ifdef _MSC_VER
+#include <util/pragma_pop.def>
+#endif
   return symbolid == in || symbolid == out || symbolid == err;
 }
 

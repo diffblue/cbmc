@@ -2111,9 +2111,9 @@ public:
   {
   }
 
-  void set_instance(unsigned int instance);
+  void set_instance(std::size_t instance);
 
-  unsigned int get_instance() const;
+  std::size_t get_instance() const;
 
   exprt &valid()
   {

@@ -245,12 +245,12 @@ TEST_CASE("arbitrary precision integers", "[core][big-int][bigint]")
 
     REQUIRE(N == M);
 
-    REQUIRE(N.floorPow2() == 0);
+    REQUIRE(N.floorPow2() == 0U);
 
     N -= 1; // 0
-    REQUIRE(N.floorPow2() == 0);
+    REQUIRE(N.floorPow2() == 0U);
 
     N += 2; // 2
-    REQUIRE(N.floorPow2() == 1);
+    REQUIRE(N.floorPow2() == 1U);
   }
 }

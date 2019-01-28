@@ -115,8 +115,8 @@ unsigned instrumentert::goto2graph_cfg(
                    << visitor.max_thread << messaget::eom;
 
   /* SCCs which could host critical cycles */
-  unsigned interesting_sccs=0;
-  for(unsigned i=0; i<num_sccs; i++)
+  std::size_t interesting_sccs = 0;
+  for(std::size_t i = 0; i < num_sccs; i++)
     if(egraph_SCCs[i].size()>3)
       interesting_sccs++;
 

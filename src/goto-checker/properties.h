@@ -57,7 +57,7 @@ struct property_infot
 {
   property_infot(
     goto_programt::const_targett pc,
-    std::string description,
+    const std::string &description,
     property_statust status);
 
   /// A pointer to the corresponding goto instruction

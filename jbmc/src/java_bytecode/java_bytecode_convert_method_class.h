@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "ci_lazy_methods_needed.h"
 #include "java_bytecode_parse_tree.h"
 #include "java_bytecode_convert_class.h"
+#include "java_utils.h"
 
 #include <util/expanding_vector.h>
 #include <util/message.h>
@@ -66,8 +67,6 @@ public:
     convert(class_symbol, method);
   }
 
-  typedef uint16_t method_offsett;
-
 protected:
   symbol_table_baset &symbol_table;
   namespacet ns;
@@ -116,8 +115,8 @@ public:
   {
   public:
     symbol_exprt symbol_expr;
-    size_t start_pc;
-    size_t length;
+    method_offsett start_pc;
+    method_offsett length;
     bool is_parameter;
     std::vector<holet> holes;
 
@@ -143,7 +142,7 @@ protected:
 
   // return corresponding reference of variable
   const variablet &find_variable_for_slot(
-    size_t address,
+    method_offsett address,
     variablest &var_list);
 
   // JVM local variables
@@ -156,7 +155,7 @@ protected:
   exprt variable(
     const exprt &arg,
     char type_char,
-    size_t address,
+    method_offsett address,
     variable_cast_argumentt do_cast);
 
   // temporary variables

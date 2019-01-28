@@ -25,12 +25,12 @@ public:
   {
   }
 
-  typedef unsigned int post;
+  typedef std::size_t post;
 
-  int LookAhead(unsigned offset);
+  int LookAhead(std::size_t offset);
   int get_token(cpp_tokent &token);
   int get_token();
-  int LookAhead(unsigned offset, cpp_tokent &token);
+  int LookAhead(std::size_t offset, cpp_tokent &token);
 
   post Save();
   void Restore(post pos);

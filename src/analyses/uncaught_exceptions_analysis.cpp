@@ -125,8 +125,24 @@ void uncaught_exceptions_domaint::transform(
     join(uea.exceptions_map[function_name]);
     break;
   }
-  default:
-  {}
+  case DECL:
+  case DEAD:
+  case ASSIGN:
+  case RETURN:
+  case GOTO:
+  case ATOMIC_BEGIN:
+  case ATOMIC_END:
+  case START_THREAD:
+  case END_THREAD:
+  case END_FUNCTION:
+  case ASSERT:
+  case ASSUME:
+  case LOCATION:
+  case SKIP:
+  case OTHER:
+  case INCOMPLETE_GOTO:
+  case NO_INSTRUCTION_TYPE:
+    break;
   }
 }
 

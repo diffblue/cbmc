@@ -596,11 +596,11 @@ void cpp_convert_plain_type(typet &type)
   {
     // add width -- we use int, but the standard
     // doesn't guarantee that
-    type.set(ID_width, config.ansi_c.int_width);
+    type.set(ID_width, static_cast<long long>(config.ansi_c.int_width));
   }
   else if(type.id() == ID_c_bool)
   {
-    type.set(ID_width, config.ansi_c.bool_width);
+    type.set(ID_width, static_cast<long long>(config.ansi_c.bool_width));
   }
   else
   {

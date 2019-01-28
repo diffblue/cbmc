@@ -21,7 +21,7 @@ Author: Matt Lewis
 #include <set>
 #include <iosfwd>
 
-typedef unsigned int statet;
+typedef std::size_t statet;
 typedef std::set<statet> state_sett;
 
 class automatont

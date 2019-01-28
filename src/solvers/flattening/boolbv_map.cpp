@@ -96,7 +96,7 @@ void boolbv_mapt::get_literals(
   Forall_literals(it, literals)
   {
     literalt &l=*it;
-    const std::size_t bit=it-literals.begin();
+    const std::size_t bit = static_cast<std::size_t>(it - literals.begin());
 
     INVARIANT(
       bit < map_entry.literal_map.size(), "bit index shall be within bounds");
@@ -135,7 +135,7 @@ void boolbv_mapt::set_literals(
       literal.is_constant() || literal.var_no() < prop.no_variables(),
       "variable number of non-constant literals shall be within bounds");
 
-    const std::size_t bit = it - literals.begin();
+    const std::size_t bit = static_cast<std::size_t>(it - literals.begin());
 
     INVARIANT(
       bit < map_entry.literal_map.size(), "bit index shall be within bounds");

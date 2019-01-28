@@ -349,7 +349,15 @@ protected:
 
     std::list<event_idt>* initial_filtering(std::list<event_idt>* order)
     {
+#ifdef _MSC_VER
+#include <util/pragma_push.def>
+#pragma warning(disable:4640)
+  // construction of local static object is not thread-safe
+#endif
       static std::list<event_idt> new_order;
+#ifdef _MSC_VER
+#include <util/pragma_pop.def>
+#endif
 
       /* intersection */
       for(const auto &evt : *order)

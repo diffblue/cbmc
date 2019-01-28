@@ -325,7 +325,8 @@ bool c_preprocess_visual_studio(
 
     // This marks the command file as UTF-8, which Visual Studio
     // understands.
-    command_file << char(0xef) << char(0xbb) << char(0xbf);
+    command_file << (unsigned char)0xefu << (unsigned char)0xbbu
+                 << (unsigned char)0xbfu;
 
     command_file << "/nologo" << '\n';
     command_file << "/E" << '\n';

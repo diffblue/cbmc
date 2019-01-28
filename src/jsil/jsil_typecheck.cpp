@@ -924,7 +924,7 @@ bool jsil_typecheck(
   message_handlert &message_handler,
   const namespacet &)
 {
-  const unsigned errors_before=
+  const std::size_t errors_before =
     message_handler.get_message_count(messaget::M_ERROR);
 
   symbol_tablet symbol_table;

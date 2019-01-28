@@ -27,7 +27,7 @@ protected:
   // NOLINTNEXTLINE(readability/identifiers)
   typedef boolbvt SUB;
 
-  unsigned object_bits, offset_bits, bits;
+  std::size_t object_bits, offset_bits, bits;
 
   void encode(std::size_t object, bvt &bv);
 
