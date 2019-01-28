@@ -384,7 +384,7 @@ void cpp_typecheckt::typecheck_decl(codet &code)
       throw 0;
     }
 
-    convert_anonymous_union(declaration, code);
+    code = convert_anonymous_union(declaration);
     return;
   }
 

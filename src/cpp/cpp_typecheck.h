@@ -124,9 +124,7 @@ protected:
 
   void convert_pmop(exprt &expr);
 
-  void convert_anonymous_union(
-    cpp_declarationt &declaration,
-    codet &new_code);
+  codet convert_anonymous_union(cpp_declarationt &declaration);
 
   void convert_anon_struct_union_member(
     const cpp_declarationt &declaration,

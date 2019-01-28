@@ -217,7 +217,6 @@ bool flow_insensitive_analysis_baset::do_function_call(
     r->location_number=0;
 
     goto_programt::targett t=temp.add_instruction(END_FUNCTION);
-    t->code.set(ID_identifier, code.function());
     t->function=f_it->first;
     t->location_number=1;
 

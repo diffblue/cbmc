@@ -31,9 +31,7 @@ void cpp_typecheckt::convert(cpp_declarationt &declaration)
     convert_non_template_declaration(declaration);
 }
 
-void cpp_typecheckt::convert_anonymous_union(
-  cpp_declarationt &declaration,
-  codet &code)
+codet cpp_typecheckt::convert_anonymous_union(cpp_declarationt &declaration)
 {
   codet new_code(ID_decl_block);
   new_code.reserve_operands(declaration.declarators().size());
@@ -93,7 +91,7 @@ void cpp_typecheckt::convert_anonymous_union(
   symbol_table.get_writeable_ref(union_symbol.name)
     .type.set(ID_C_unnamed_object, symbol.base_name);
 
-  code.swap(new_code);
+  return new_code;
 }
 
 void cpp_typecheckt::convert_non_template_declaration(
@@ -135,8 +133,7 @@ void cpp_typecheckt::convert_non_template_declaration(
       throw 0;
     }
 
-    codet dummy;
-    convert_anonymous_union(declaration, dummy);
+    convert_anonymous_union(declaration);
   }
 
   // do the declarators (optional)

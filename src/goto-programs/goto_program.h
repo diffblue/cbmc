@@ -422,13 +422,14 @@ public:
     {
     }
 
-    explicit instructiont(goto_program_instruction_typet _type):
-      source_location(static_cast<const source_locationt &>(get_nil_irep())),
-      type(_type),
-      guard(true_exprt()),
-      location_number(0),
-      loop_number(0),
-      target_number(nil_target)
+    explicit instructiont(goto_program_instruction_typet _type)
+      : code(static_cast<const codet &>(get_nil_irep())),
+        source_location(static_cast<const source_locationt &>(get_nil_irep())),
+        type(_type),
+        guard(true_exprt()),
+        location_number(0),
+        loop_number(0),
+        target_number(nil_target)
     {
     }
 

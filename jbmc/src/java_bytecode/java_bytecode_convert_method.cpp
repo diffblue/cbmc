@@ -1206,7 +1206,7 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
       }
     }
 
-    codet catch_instruction;
+    optionalt<codet> catch_instruction;
 
     if(catch_type!=typet())
     {
@@ -1223,8 +1223,7 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
           "caught_exception",
           java_reference_type(catch_type));
       stack.push_back(catch_var);
-      code_landingpadt catch_statement(catch_var);
-      catch_instruction=catch_statement;
+      catch_instruction = code_landingpadt(catch_var);
     }
 
     exprt::operandst op = pop(stmt_bytecode_info.pop);
@@ -1677,10 +1676,10 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
     // Finally if this is the beginning of a catch block (already determined
     // before the big bytecode switch), insert the exception 'landing pad'
     // instruction before the actual instruction:
-    if(catch_instruction!=codet())
+    if(catch_instruction.has_value())
     {
       c.make_block();
-      c.operands().insert(c.operands().begin(), catch_instruction);
+      c.operands().insert(c.operands().begin(), *catch_instruction);
     }
 
     if(!i_it->source_location.get_line().empty())
