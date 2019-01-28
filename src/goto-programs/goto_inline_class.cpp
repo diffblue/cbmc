@@ -887,17 +887,17 @@ jsont goto_inlinet::goto_inline_logt::output_inline_log_json() const
 
     PRECONDITION(start->location_number <= end->location_number);
 
-    json_arrayt json_orig(
-      {json_numbert(std::to_string(info.begin_location_number)),
-       json_numbert(std::to_string(info.end_location_number))});
-    json_arrayt json_new({json_numbert(std::to_string(start->location_number)),
-                          json_numbert(std::to_string(end->location_number))});
+    json_arrayt json_orig{
+      json_numbert(std::to_string(info.begin_location_number)),
+      json_numbert(std::to_string(info.end_location_number))};
+    json_arrayt json_new{json_numbert(std::to_string(start->location_number)),
+                         json_numbert(std::to_string(end->location_number))};
 
-    json_objectt object(
-      {{"call", json_numbert(std::to_string(info.call_location_number))},
-       {"function", json_stringt(info.function.c_str())},
-       {"originalSegment", std::move(json_orig)},
-       {"inlinedSegment", std::move(json_new)}});
+    json_objectt object{
+      {"call", json_numbert(std::to_string(info.call_location_number))},
+      {"function", json_stringt(info.function.c_str())},
+      {"originalSegment", std::move(json_orig)},
+      {"inlinedSegment", std::move(json_new)}};
 
     json_inlined.push_back(std::move(object));
   }

@@ -346,11 +346,10 @@ jsont goto_unwindt::unwind_logt::output_log_json() const
     goto_programt::const_targett target=it->first;
     unsigned location_number=it->second;
 
-    json_objectt object(
-      {{"originalLocationNumber",
-        json_numbert(std::to_string(location_number))},
-       {"newLocationNumber",
-        json_numbert(std::to_string(target->location_number))}});
+    json_objectt object{
+      {"originalLocationNumber", json_numbert(std::to_string(location_number))},
+      {"newLocationNumber",
+       json_numbert(std::to_string(target->location_number))}};
 
     json_unwound.push_back(std::move(object));
   }

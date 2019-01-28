@@ -70,8 +70,8 @@ json_objectt show_goto_functions_jsont::convert(
       for(const goto_programt::instructiont &instruction :
         function.body.instructions)
       {
-        json_objectt instruction_entry(
-          {{"instructionId", json_stringt(instruction.to_string())}});
+        json_objectt instruction_entry{
+          {"instructionId", json_stringt(instruction.to_string())}};
 
         if(instruction.code.source_location().is_not_nil())
         {

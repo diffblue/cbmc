@@ -194,36 +194,36 @@ static void show_symbol_table_json_ui(
     if(symbol.value.is_not_nil())
       ptr->from_expr(symbol.value, value_str, ns);
 
-    json_objectt symbol_json(
-      {{"prettyName", json_stringt(symbol.pretty_name)},
-       {"name", json_stringt(symbol.name)},
-       {"baseName", json_stringt(symbol.base_name)},
-       {"mode", json_stringt(symbol.mode)},
-       {"module", json_stringt(symbol.module)},
+    json_objectt symbol_json{
+      {"prettyName", json_stringt(symbol.pretty_name)},
+      {"name", json_stringt(symbol.name)},
+      {"baseName", json_stringt(symbol.base_name)},
+      {"mode", json_stringt(symbol.mode)},
+      {"module", json_stringt(symbol.module)},
 
-       {"prettyType", json_stringt(type_str)},
-       {"prettyValue", json_stringt(value_str)},
+      {"prettyType", json_stringt(type_str)},
+      {"prettyValue", json_stringt(value_str)},
 
-       {"type", irep_converter.convert_from_irep(symbol.type)},
-       {"value", irep_converter.convert_from_irep(symbol.value)},
-       {"location", irep_converter.convert_from_irep(symbol.location)},
+      {"type", irep_converter.convert_from_irep(symbol.type)},
+      {"value", irep_converter.convert_from_irep(symbol.value)},
+      {"location", irep_converter.convert_from_irep(symbol.location)},
 
-       {"isType", jsont::json_boolean(symbol.is_type)},
-       {"isMacro", jsont::json_boolean(symbol.is_macro)},
-       {"isExported", jsont::json_boolean(symbol.is_exported)},
-       {"isInput", jsont::json_boolean(symbol.is_input)},
-       {"isOutput", jsont::json_boolean(symbol.is_output)},
-       {"isStateVar", jsont::json_boolean(symbol.is_state_var)},
-       {"isProperty", jsont::json_boolean(symbol.is_property)},
-       {"isStaticLifetime", jsont::json_boolean(symbol.is_static_lifetime)},
-       {"isThreadLocal", jsont::json_boolean(symbol.is_thread_local)},
-       {"isLvalue", jsont::json_boolean(symbol.is_lvalue)},
-       {"isFileLocal", jsont::json_boolean(symbol.is_file_local)},
-       {"isExtern", jsont::json_boolean(symbol.is_extern)},
-       {"isVolatile", jsont::json_boolean(symbol.is_volatile)},
-       {"isParameter", jsont::json_boolean(symbol.is_parameter)},
-       {"isAuxiliary", jsont::json_boolean(symbol.is_auxiliary)},
-       {"isWeak", jsont::json_boolean(symbol.is_weak)}});
+      {"isType", jsont::json_boolean(symbol.is_type)},
+      {"isMacro", jsont::json_boolean(symbol.is_macro)},
+      {"isExported", jsont::json_boolean(symbol.is_exported)},
+      {"isInput", jsont::json_boolean(symbol.is_input)},
+      {"isOutput", jsont::json_boolean(symbol.is_output)},
+      {"isStateVar", jsont::json_boolean(symbol.is_state_var)},
+      {"isProperty", jsont::json_boolean(symbol.is_property)},
+      {"isStaticLifetime", jsont::json_boolean(symbol.is_static_lifetime)},
+      {"isThreadLocal", jsont::json_boolean(symbol.is_thread_local)},
+      {"isLvalue", jsont::json_boolean(symbol.is_lvalue)},
+      {"isFileLocal", jsont::json_boolean(symbol.is_file_local)},
+      {"isExtern", jsont::json_boolean(symbol.is_extern)},
+      {"isVolatile", jsont::json_boolean(symbol.is_volatile)},
+      {"isParameter", jsont::json_boolean(symbol.is_parameter)},
+      {"isAuxiliary", jsont::json_boolean(symbol.is_auxiliary)},
+      {"isWeak", jsont::json_boolean(symbol.is_weak)}};
 
     result.push_back(id2string(symbol.name), std::move(symbol_json));
   }
@@ -265,15 +265,15 @@ static void show_symbol_table_brief_json_ui(
     if(symbol.type.is_not_nil())
       ptr->from_type(symbol.type, type_str, ns);
 
-    json_objectt symbol_json(
-      {{"prettyName", json_stringt(symbol.pretty_name)},
-       {"baseName", json_stringt(symbol.base_name)},
-       {"mode", json_stringt(symbol.mode)},
-       {"module", json_stringt(symbol.module)},
+    json_objectt symbol_json{
+      {"prettyName", json_stringt(symbol.pretty_name)},
+      {"baseName", json_stringt(symbol.base_name)},
+      {"mode", json_stringt(symbol.mode)},
+      {"module", json_stringt(symbol.module)},
 
-       {"prettyType", json_stringt(type_str)},
+      {"prettyType", json_stringt(type_str)},
 
-       {"type", irep_converter.convert_from_irep(symbol.type)}});
+      {"type", irep_converter.convert_from_irep(symbol.type)}};
 
     result.push_back(id2string(symbol.name), std::move(symbol_json));
   }

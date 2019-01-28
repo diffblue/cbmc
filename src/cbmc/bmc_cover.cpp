@@ -383,7 +383,7 @@ bool bmc_covert::operator()()
           {
             if(step.is_input())
             {
-              json_objectt json_input({{"id", json_stringt(step.io_id)}});
+              json_objectt json_input{{"id", json_stringt(step.io_id)}};
               if(step.io_args.size()==1)
                 json_input["value"]=
                   json(step.io_args.front(), bmc.ns, ID_unknown);

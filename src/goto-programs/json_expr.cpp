@@ -172,8 +172,8 @@ json_objectt json(const typet &type, const namespacet &ns, const irep_idt &mode)
       to_struct_type(type).components();
     for(const auto &component : components)
     {
-      json_objectt e({{"name", json_stringt(component.get_name())},
-                      {"type", json(component.type(), ns, mode)}});
+      json_objectt e{{"name", json_stringt(component.get_name())},
+                     {"type", json(component.type(), ns, mode)}};
       members.push_back(std::move(e));
     }
   }
@@ -185,8 +185,8 @@ json_objectt json(const typet &type, const namespacet &ns, const irep_idt &mode)
       to_union_type(type).components();
     for(const auto &component : components)
     {
-      json_objectt e({{"name", json_stringt(component.get_name())},
-                      {"type", json(component.type(), ns, mode)}});
+      json_objectt e{{"name", json_stringt(component.get_name())},
+                     {"type", json(component.type(), ns, mode)}};
       members.push_back(std::move(e));
     }
   }
@@ -348,8 +348,8 @@ json_objectt json(const exprt &expr, const namespacet &ns, const irep_idt &mode)
 
     forall_operands(it, expr)
     {
-      json_objectt e({{"index", json_numbert(std::to_string(index))},
-                      {"value", json(*it, ns, mode)}});
+      json_objectt e{{"index", json_numbert(std::to_string(index))},
+                     {"value", json(*it, ns, mode)}};
       elements.push_back(std::move(e));
       index++;
     }
@@ -370,8 +370,8 @@ json_objectt json(const exprt &expr, const namespacet &ns, const irep_idt &mode)
       json_arrayt &members = result["members"].make_array();
       for(std::size_t m = 0; m < expr.operands().size(); m++)
       {
-        json_objectt e({{"value", json(expr.operands()[m], ns, mode)},
-                        {"name", json_stringt(components[m].get_name())}});
+        json_objectt e{{"value", json(expr.operands()[m], ns, mode)},
+                       {"name", json_stringt(components[m].get_name())}};
         members.push_back(std::move(e));
       }
     }

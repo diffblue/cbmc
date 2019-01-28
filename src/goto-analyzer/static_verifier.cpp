@@ -12,6 +12,7 @@ Author: Martin Brain, martin.brain@cs.ox.ac.uk
 #include <util/message.h>
 #include <util/namespace.h>
 #include <util/options.h>
+#include <util/range.h>
 
 #include <goto-programs/goto_model.h>
 
@@ -20,11 +21,28 @@ Author: Martin Brain, martin.brain@cs.ox.ac.uk
 struct static_verifier_resultt
 {
   // clang-format off
-  enum { TRUE, FALSE, BOTTOM, UNKNOWN } status;
+  enum statust { TRUE, FALSE, BOTTOM, UNKNOWN } status;
   // clang-format on
   source_locationt source_location;
   irep_idt function_id;
 };
+
+/// Makes a status message string from a status.
+static const char *message(const static_verifier_resultt::statust &status)
+{
+  switch(status)
+  {
+  case static_verifier_resultt::TRUE:
+    return "SUCCESS";
+  case static_verifier_resultt::FALSE:
+    return "FAILURE (if reachable)";
+  case static_verifier_resultt::BOTTOM:
+    return "SUCCESS (unreachable)";
+  case static_verifier_resultt::UNKNOWN:
+    return "UNKNOWN";
+  }
+  UNREACHABLE;
+}
 
 static void static_verifier_json(
   const std::vector<static_verifier_resultt> &results,
@@ -32,36 +50,13 @@ static void static_verifier_json(
   std::ostream &out)
 {
   m.status() << "Writing JSON report" << messaget::eom;
-
-  json_arrayt json_result;
-
-  for(const auto &result : results)
-  {
-    json_objectt &j = json_result.push_back().make_object();
-
-    switch(result.status)
-    {
-    case static_verifier_resultt::TRUE:
-      j["status"] = json_stringt("SUCCESS");
-      break;
-
-    case static_verifier_resultt::FALSE:
-      j["status"] = json_stringt("FAILURE (if reachable)");
-      break;
-
-    case static_verifier_resultt::BOTTOM:
-      j["status"] = json_stringt("SUCCESS (unreachable)");
-      break;
-
-    case static_verifier_resultt::UNKNOWN:
-      j["status"] = json_stringt("UNKNOWN");
-      break;
-    }
-
-    j["sourceLocation"] = json(result.source_location);
-  }
-
-  out << json_result;
+  out << make_range(results)
+           .map([](const static_verifier_resultt &result) {
+             return json_objectt{
+               {"status", json_stringt{message(result.status)}},
+               {"sourceLocation", json(result.source_location)}};
+           })
+           .collect<json_arrayt>();
 }
 
 static void static_verifier_xml(
