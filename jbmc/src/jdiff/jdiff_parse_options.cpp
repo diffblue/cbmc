@@ -63,7 +63,7 @@ Author: Peter Schrammel
 // TODO: do not use language_uit for this; requires a refactoring of
 //   initialize_goto_model to support parsing specific command line files
 jdiff_parse_optionst::jdiff_parse_optionst(int argc, const char **argv)
-  : parse_options_baset(JDIFF_OPTIONS, argc, argv),
+  : parse_options_baset(JDIFF_OPTIONS, argc, argv, ui_message_handler),
     jdiff_languagest(cmdline, ui_message_handler, &options),
     ui_message_handler(cmdline, std::string("JDIFF ") + CBMC_VERSION),
     languages2(cmdline, ui_message_handler, &options)
@@ -74,7 +74,11 @@ jdiff_parse_optionst::jdiff_parse_optionst(int argc, const char **argv)
   int argc,
   const char **argv,
   const std::string &extra_options)
-  : parse_options_baset(JDIFF_OPTIONS + extra_options, argc, argv),
+  : parse_options_baset(
+      JDIFF_OPTIONS + extra_options,
+      argc,
+      argv,
+      ui_message_handler),
     jdiff_languagest(cmdline, ui_message_handler, &options),
     ui_message_handler(cmdline, std::string("JDIFF ") + CBMC_VERSION),
     languages2(cmdline, ui_message_handler, &options)
@@ -342,7 +346,6 @@ bool jdiff_parse_optionst::process_goto_program(
   const optionst &options,
   goto_modelt &goto_model)
 {
-  try
   {
     // remove function pointers
     status() << "Removing function pointers and virtual functions" << eom;
@@ -405,31 +408,6 @@ bool jdiff_parse_optionst::process_goto_program(
     // remove any skips introduced since coverage instrumentation
     remove_skip(goto_model);
     goto_model.goto_functions.update();
-  }
-
-  catch(const char *e)
-  {
-    error() << e << eom;
-    return true;
-  }
-
-  catch(const std::string &e)
-  {
-    error() << e << eom;
-    return true;
-  }
-
-  catch(int e)
-  {
-    error() << "Numeric exception: " << e << eom;
-    return true;
-  }
-
-  catch(const std::bad_alloc &)
-  {
-    error() << "Out of memory" << eom;
-    exit(CPROVER_EXIT_INTERNAL_OUT_OF_MEMORY);
-    return true;
   }
 
   return false;

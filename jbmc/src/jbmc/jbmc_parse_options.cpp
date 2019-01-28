@@ -70,7 +70,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <java_bytecode/simple_method_stubbing.h>
 
 jbmc_parse_optionst::jbmc_parse_optionst(int argc, const char **argv)
-  : parse_options_baset(JBMC_OPTIONS, argc, argv),
+  : parse_options_baset(JBMC_OPTIONS, argc, argv, ui_message_handler),
     messaget(ui_message_handler),
     ui_message_handler(cmdline, std::string("JBMC ") + CBMC_VERSION)
 {
@@ -80,7 +80,11 @@ jbmc_parse_optionst::jbmc_parse_optionst(int argc, const char **argv)
   int argc,
   const char **argv,
   const std::string &extra_options)
-  : parse_options_baset(JBMC_OPTIONS + extra_options, argc, argv),
+  : parse_options_baset(
+      JBMC_OPTIONS + extra_options,
+      argc,
+      argv,
+      ui_message_handler),
     messaget(ui_message_handler),
     ui_message_handler(cmdline, std::string("JBMC ") + CBMC_VERSION)
 {
@@ -425,22 +429,7 @@ int jbmc_parse_optionst::doit()
   //
 
   optionst options;
-  try
-  {
-    get_command_line_options(options);
-  }
-
-  catch(const char *error_msg)
-  {
-    error() << error_msg << eom;
-    return 6; // should contemplate EX_SOFTWARE from sysexits.h
-  }
-
-  catch(const std::string &error_msg)
-  {
-    error() << error_msg << eom;
-    return 6; // should contemplate EX_SOFTWARE from sysexits.h
-  }
+  get_command_line_options(options);
 
   //
   // Print a banner
@@ -636,28 +625,8 @@ int jbmc_parse_optionst::doit()
 
 bool jbmc_parse_optionst::set_properties(goto_modelt &goto_model)
 {
-  try
-  {
-    if(cmdline.isset("property"))
-      ::set_properties(goto_model, cmdline.get_values("property"));
-  }
-
-  catch(const char *e)
-  {
-    error() << e << eom;
-    return true;
-  }
-
-  catch(const std::string &e)
-  {
-    error() << e << eom;
-    return true;
-  }
-
-  catch(int)
-  {
-    return true;
-  }
+  if(cmdline.isset("property"))
+    ::set_properties(goto_model, cmdline.get_values("property"));
 
   return false;
 }
@@ -672,7 +641,6 @@ int jbmc_parse_optionst::get_goto_program(
     return 6;
   }
 
-  try
   {
     lazy_goto_modelt lazy_goto_model=lazy_goto_modelt::from_handler_object(
       *this, options, get_message_handler());
@@ -738,29 +706,6 @@ int jbmc_parse_optionst::get_goto_program(
     status() << config.object_bits_info() << eom;
   }
 
-  catch(const char *e)
-  {
-    error() << e << eom;
-    return 6;
-  }
-
-  catch(const std::string &e)
-  {
-    error() << e << eom;
-    return 6;
-  }
-
-  catch(int)
-  {
-    return 6;
-  }
-
-  catch(const std::bad_alloc &)
-  {
-    error() << "Out of memory" << eom;
-    return 6;
-  }
-
   return -1; // no error, continue
 }
 
@@ -776,7 +721,6 @@ void jbmc_parse_optionst::process_goto_function(
   bool using_symex_driven_loading =
     options.get_bool_option("symex-driven-lazy-loading");
 
-  try
   {
     // Removal of RTTI inspection:
     remove_instanceof(
@@ -861,24 +805,6 @@ void jbmc_parse_optionst::process_goto_function(
     // update the function member in each instruction
     function.update_instructions_function();
   }
-
-  catch(const char *e)
-  {
-    error() << e << eom;
-    throw;
-  }
-
-  catch(const std::string &e)
-  {
-    error() << e << eom;
-    throw;
-  }
-
-  catch(const std::bad_alloc &)
-  {
-    error() << "Out of memory" << eom;
-    throw;
-  }
 }
 
 bool jbmc_parse_optionst::show_loaded_functions(
@@ -933,7 +859,6 @@ bool jbmc_parse_optionst::process_goto_functions(
   goto_modelt &goto_model,
   const optionst &options)
 {
-  try
   {
     status() << "Running GOTO functions transformation passes" << eom;
 
@@ -1019,29 +944,6 @@ bool jbmc_parse_optionst::process_goto_functions(
 
     // remove any skips introduced
     remove_skip(goto_model);
-  }
-
-  catch(const char *e)
-  {
-    error() << e << eom;
-    return true;
-  }
-
-  catch(const std::string &e)
-  {
-    error() << e << eom;
-    return true;
-  }
-
-  catch(int)
-  {
-    return true;
-  }
-
-  catch(const std::bad_alloc &)
-  {
-    error() << "Out of memory" << eom;
-    return true;
   }
 
   return false;

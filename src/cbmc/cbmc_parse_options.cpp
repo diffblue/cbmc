@@ -71,7 +71,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "xml_interface.h"
 
 cbmc_parse_optionst::cbmc_parse_optionst(int argc, const char **argv)
-  : parse_options_baset(CBMC_OPTIONS, argc, argv),
+  : parse_options_baset(CBMC_OPTIONS, argc, argv, ui_message_handler),
     xml_interfacet(cmdline),
     messaget(ui_message_handler),
     ui_message_handler(cmdline, std::string("CBMC ") + CBMC_VERSION)
@@ -82,7 +82,11 @@ cbmc_parse_optionst::cbmc_parse_optionst(int argc, const char **argv)
   int argc,
   const char **argv,
   const std::string &extra_options)
-  : parse_options_baset(CBMC_OPTIONS + extra_options, argc, argv),
+  : parse_options_baset(
+      CBMC_OPTIONS + extra_options,
+      argc,
+      argv,
+      ui_message_handler),
     xml_interfacet(cmdline),
     messaget(ui_message_handler),
     ui_message_handler(cmdline, std::string("CBMC ") + CBMC_VERSION)

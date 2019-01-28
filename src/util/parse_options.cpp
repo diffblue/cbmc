@@ -25,10 +25,26 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "signal_catcher.h"
 
 parse_options_baset::parse_options_baset(
-  const std::string &_optstring, int argc, const char **argv)
+  const std::string &_optstring,
+  int argc,
+  const char **argv,
+  message_handlert &mh)
+  : log(mh)
 {
   std::string optstring=std::string("?h(help)")+_optstring;
   parse_result=cmdline.parse(argc, argv, optstring.c_str());
+
+  // DO NOT USE log HERE!
+  //
+  // The usual pattern of use is that the application class inherits from
+  // messaget and parse_options_baset using a member variable of type
+  // message_handlert to construct the messaget part.
+  //
+  // C++'s rules of initialisation mean that the constructors for
+  // messaget and then parse_options_base run before those of message_handlert.
+  // This means that the message_handlert object is uninitialised.
+  // Using it here will likely cause a hard to debug failure somewhere in
+  // the messaget code.
 }
 
 void parse_options_baset::help()
@@ -37,7 +53,7 @@ void parse_options_baset::help()
 
 void parse_options_baset::usage_error()
 {
-  std::cerr << "Usage error!\n\n";
+  log.error() << "Usage error!\n" << messaget::eom;
   help();
 }
 
@@ -46,7 +62,7 @@ void parse_options_baset::usage_error()
 void parse_options_baset::unknown_option_msg()
 {
   if(!cmdline.unknown_arg.empty())
-    std::cerr << "Unknown option: " << cmdline.unknown_arg << "\n";
+    log.error() << "Unknown option: " << cmdline.unknown_arg << messaget::eom;
 }
 
 int parse_options_baset::main()
@@ -77,43 +93,43 @@ int parse_options_baset::main()
   // CPROVER style exceptions in order of decreasing happiness
   catch(const invalid_command_line_argument_exceptiont &e)
   {
-    std::cerr << e.what() << '\n';
+    log.error() << e.what() << messaget::eom;
     return CPROVER_EXIT_USAGE_ERROR;
   }
   catch(const cprover_exception_baset &e)
   {
-    std::cerr << e.what() << '\n';
+    log.error() << e.what() << messaget::eom;
     return CPROVER_EXIT_EXCEPTION;
   }
   catch(const std::string &e)
   {
-    std::cerr << "C++ string exception : " << e << '\n';
+    log.error() << "C++ string exception : " << e << messaget::eom;
     return CPROVER_EXIT_EXCEPTION;
   }
   catch(const char *e)
   {
-    std::cerr << "C string exception : " << e << '\n';
+    log.error() << "C string exception : " << e << messaget::eom;
     return CPROVER_EXIT_EXCEPTION;
   }
   catch(int e)
   {
-    std::cerr << "Numeric exception : " << e << '\n';
+    log.error() << "Numeric exception : " << e << messaget::eom;
     return CPROVER_EXIT_EXCEPTION;
   }
   // C++ style exceptions
   catch(const std::bad_alloc &)
   {
-    std::cerr << "Out of memory" << '\n';
+    log.error() << "Out of memory" << messaget::eom;
     return CPROVER_EXIT_INTERNAL_OUT_OF_MEMORY;
   }
   catch(const std::exception &e)
   {
-    std::cerr << e.what() << '\n';
+    log.error() << e.what() << messaget::eom;
     return CPROVER_EXIT_EXCEPTION;
   }
   catch(...)
   {
-    std::cerr << "Unknown exception type!" << '\n';
+    log.error() << "Unknown exception type!" << messaget::eom;
     return CPROVER_EXIT_EXCEPTION;
   }
 }

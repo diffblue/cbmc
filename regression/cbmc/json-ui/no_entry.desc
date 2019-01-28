@@ -1,10 +1,10 @@
-KNOWNBUG
+CORE
 no_entry.c
 --json-ui
 activate-multi-line-match
 ^EXIT=6$
 ^SIGNAL=0$
-"messageText": "the program has no entry point",[\n ]*"messageType": "ERROR",
+"messageText": "the program has no entry point",[\n ]*"messageType": "ERROR"
 --
 ^warning: ignoring
 ^VERIFICATION SUCCESSFUL$
