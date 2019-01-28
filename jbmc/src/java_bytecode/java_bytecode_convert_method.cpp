@@ -2312,16 +2312,14 @@ void java_bytecode_convert_methodt::convert_athrow(
     // we translate athrow into
     // ASSERT false;
     // ASSUME false:
-    code_assertt assert_code;
-    assert_code.assertion() = false_exprt();
+    code_assertt assert_code(false_exprt{});
     source_locationt assert_location = location; // copy
     assert_location.set_comment("assertion at " + location.as_string());
     assert_location.set("user-provided", true);
     assert_location.set_property_class(ID_assertion);
     assert_code.add_source_location() = assert_location;
 
-    code_assumet assume_code;
-    assume_code.assumption() = false_exprt();
+    code_assumet assume_code(false_exprt{});
     source_locationt assume_location = location; // copy
     assume_location.set("user-provided", true);
     assume_code.add_source_location() = assume_location;

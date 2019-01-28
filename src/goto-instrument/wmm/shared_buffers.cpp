@@ -322,7 +322,7 @@ void shared_bufferst::write(
   target=goto_program.insert_before(target);
   target->guard=cond_expr;
   target->type=ASSERT;
-  target->code=code_assertt();
+  target->code = code_assertt(cond_expr);
   target->code.add_source_location()=source_location;
   target->source_location=source_location;
   target++;
