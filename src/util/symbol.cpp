@@ -176,3 +176,8 @@ bool symbolt::operator==(const symbolt &other) const
     is_volatile == other.is_volatile;
   // clang-format on
 }
+
+bool symbolt::operator!=(const symbolt &other) const
+{
+  return !(*this == other);
+}
