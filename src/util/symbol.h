@@ -126,6 +126,7 @@ public:
   bool is_well_formed() const;
 
   bool operator==(const symbolt &other) const;
+  bool operator!=(const symbolt &other) const;
 };
 
 std::ostream &operator<<(std::ostream &out, const symbolt &symbol);
