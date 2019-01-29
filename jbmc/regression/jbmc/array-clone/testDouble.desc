@@ -1,0 +1,9 @@
+CORE
+ArrayClone.class
+--function ArrayClone.cloneDoubleArray
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+Verify that clone works correctly for double arrays

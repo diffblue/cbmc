@@ -1,0 +1,9 @@
+CORE
+ArrayClone.class
+--function ArrayClone.cloneBooleanArray
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+Verify that the clone works on a boolean array
