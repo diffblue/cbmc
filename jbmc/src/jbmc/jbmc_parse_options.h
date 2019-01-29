@@ -40,7 +40,7 @@ class optionst;
 // clang-format off
 #define JBMC_OPTIONS \
   OPT_BMC \
-  "(preprocess)(slice-by-trace):" \
+  "(preprocess)" \
   OPT_FUNCTIONS \
   "(no-simplify)(full-slice)" \
   OPT_REACHABILITY_SLICER \
