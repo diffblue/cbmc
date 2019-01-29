@@ -99,6 +99,7 @@ jobs:
             - libubsan0
             - parallel
             - jq
+            - gdb
       before_install:
         - mkdir bin
         - ln -s /usr/bin/gcc-5 bin/gcc
@@ -134,6 +135,7 @@ jobs:
             - g++-5
             - libubsan0
             - jq
+            - gdb
       before_install:
         - mkdir bin
         - ln -s /usr/bin/gcc-5 bin/gcc
@@ -162,6 +164,7 @@ jobs:
             - libstdc++-5-dev
             - libubsan0
             - jq
+            - gdb
       before_install:
         - mkdir bin
         - ln -s /usr/bin/gcc-5 bin/gcc
@@ -189,6 +192,7 @@ jobs:
           packages:
             - g++-7
             - jq
+            - gdb
       before_install:
         - mkdir bin
         - ln -s /usr/bin/gcc-7 bin/gcc
@@ -216,6 +220,7 @@ jobs:
           packages:
             - g++-7
             - jq
+            - gdb
       before_install:
         - mkdir bin
         - ln -s /usr/bin/gcc-7 bin/gcc
@@ -249,6 +254,7 @@ jobs:
             - libubsan0
             - parallel
             - jq
+            - gdb
       before_install:
         - mkdir bin
         # Use gcc/g++ 5 for tests, as Clang doesn't work yet
