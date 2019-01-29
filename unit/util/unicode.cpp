@@ -15,9 +15,6 @@ Author: Vojtech Forejt, forejtv@diffblue.com
 
 #include <util/unicode.h>
 
-// the u8 prefix is only available from VS 2015 onwards
-#if !defined(_MSC_VER) || _MSC_VER >= 1900
-
 // This unit test compares our implementation with codecvt implementation,
 // checking bit-by-bit equivalence of results.
 
@@ -96,4 +93,3 @@ TEST_CASE("unicode4", "[core][util][unicode]")
   const std::string s = u8"дȚȨɌṡʒʸͼἨѶݔݺ→⅒⅀▤▞╢◍⛳⻥龍ンㄗㄸ";
   REQUIRE(compare_utf8_to_utf16(s));
 }
-#endif
