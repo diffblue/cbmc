@@ -711,7 +711,7 @@ bool generate_java_start_function(
     return_symbol.mode=ID_java;
     return_symbol.is_static_lifetime=false;
     return_symbol.name=JAVA_ENTRY_POINT_RETURN_SYMBOL;
-    return_symbol.base_name="return";
+    return_symbol.base_name = "return'";
     return_symbol.type = to_java_method_type(symbol.type).return_type();
 
     symbol_table.add(return_symbol);
