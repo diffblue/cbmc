@@ -139,7 +139,7 @@ static void create_static_function_call(
         call_args[i].type().id() == ID_pointer,
         "where overriding function argument types differ, "
         "those arguments must be pointer-typed");
-      call_args[i].make_typecast(need_type);
+      call_args[i] = typecast_exprt(call_args[i], need_type);
     }
   }
 }
