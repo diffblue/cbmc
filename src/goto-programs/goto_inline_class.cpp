@@ -315,37 +315,15 @@ void goto_inlinet::insert_function_body(
     call_location_number,
     identifier);
 
-#if 0
-  if(goto_function.is_hidden())
+  if(adjust_function)
   {
-    source_locationt new_source_location=
-      function.find_source_location();
-
-    if(new_source_location.is_not_nil())
+    Forall_goto_program_instructions(it, tmp)
     {
-      new_source_location.set_hide();
-
-      Forall_goto_program_instructions(it, tmp)
-      {
-        if(it->function==identifier)
-        {
-          // don't hide assignment to lhs
-          if(it->is_assign() && it->get_assign().lhs()==lhs)
-          {
-          }
-          else
-          {
-            replace_location(it->source_location, new_source_location);
-            replace_location(it->guard, new_source_location);
-            replace_location(it->code, new_source_location);
-          }
-
-          it->function=target->function;
-        }
-      }
+      replace_location(it->source_location, target->source_location);
+      replace_location(it->guard, target->source_location);
+      replace_location(it->code, target->source_location);
     }
   }
-#endif
 
   // kill call
   target->type=LOCATION;
