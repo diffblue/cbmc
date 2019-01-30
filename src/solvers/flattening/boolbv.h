@@ -238,6 +238,11 @@ protected:
   class quantifiert
   {
   public:
+    quantifiert(exprt _expr, literalt _l)
+      : expr(std::move(_expr)), l(std::move(_l))
+    {
+    }
+
     exprt expr;
     literalt l;
   };

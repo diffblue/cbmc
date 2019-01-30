@@ -1,0 +1,12 @@
+CORE
+main.c
+--cover location
+^\*\* 1 of 46 covered \(2.2%\)
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+All assertions are unreachable as each of the __CPROVER_assume evaluate to false
+(!exists i. i>=0 && i<2 ==> ... is equivalent to forall i. i>=0 && i<2 && ...,
+where neither i>=0 nor i<2 is actually true for all values of i).
