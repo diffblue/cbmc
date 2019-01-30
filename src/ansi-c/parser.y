@@ -1172,32 +1172,30 @@ basic_type_specifier:
         }
         ;
 
-/* no gcc type attributes after the following! */
 sue_declaration_specifier:
           declaration_qualifier_list elaborated_type_name
         {
           $$=merge($1, $2);
         }
-        | sue_type_specifier storage_class
+        | sue_type_specifier storage_class gcc_type_attribute_opt
         {
-          $$=merge($1, $2);
+          $$=merge($1, merge($2, $3));
         }
-        | sue_declaration_specifier declaration_qualifier
+        | sue_declaration_specifier declaration_qualifier gcc_type_attribute_opt
         {
-          $$=merge($1, $2);
+          $$=merge($1, merge($2, $3));
         }
         ;
 
-/* no gcc type attributes after the following! */
 sue_type_specifier:
           elaborated_type_name
         | type_qualifier_list elaborated_type_name
         {
           $$=merge($1, $2);
         }
-        | sue_type_specifier type_qualifier
+        | sue_type_specifier type_qualifier gcc_type_attribute_opt
         {
-          $$=merge($1, $2);
+          $$=merge($1, merge($2, $3));
         }
         ;
 
