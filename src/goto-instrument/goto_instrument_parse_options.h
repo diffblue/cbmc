@@ -135,7 +135,7 @@ public:
 
 protected:
   ui_message_handlert ui_message_handler;
-  virtual void register_languages();
+  void register_languages();
 
   void get_goto_program();
   void instrument_goto_program();

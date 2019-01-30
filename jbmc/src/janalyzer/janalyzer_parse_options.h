@@ -162,11 +162,11 @@ protected:
   ui_message_handlert ui_message_handler;
   goto_modelt goto_model;
 
-  virtual void register_languages();
+  void register_languages();
 
-  virtual void get_command_line_options(optionst &options);
+  void get_command_line_options(optionst &options);
 
-  virtual bool process_goto_program(const optionst &options);
+  bool process_goto_program(const optionst &options);
 
   virtual int perform_analysis(const optionst &options);
 
