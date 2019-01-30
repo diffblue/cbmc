@@ -260,8 +260,7 @@ instruction: TOK_LABEL TOK_IDENTIFIER
 rhs: expression
    | proc_ident_expr '(' expressions_opt ')' with_opt
    {
-     side_effect_expr_function_callt f;
-     f.function().swap(stack($1));
+     side_effect_expr_function_callt f(stack($1), {}, typet{}, {});
      if(stack($3).is_not_nil())
        f.arguments().swap(stack($3).operands());
 

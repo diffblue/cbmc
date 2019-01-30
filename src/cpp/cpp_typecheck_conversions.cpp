@@ -991,10 +991,11 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
               }
 
               // create temporary object
-              side_effect_expr_function_callt ctor_expr;
-              ctor_expr.add_source_location()=expr.source_location();
-              ctor_expr.function().swap(func_symb);
-              ctor_expr.arguments().push_back(tmp_expr);
+              side_effect_expr_function_callt ctor_expr(
+                std::move(func_symb),
+                {tmp_expr},
+                uninitialized_typet{},
+                expr.source_location());
               typecheck_side_effect_function_call(ctor_expr);
 
               new_expr.swap(ctor_expr);
@@ -1041,10 +1042,11 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
                 func_symb.swap(func_symb);
               }
 
-              side_effect_expr_function_callt ctor_expr;
-              ctor_expr.add_source_location()=expr.source_location();
-              ctor_expr.function().swap(func_symb);
-              ctor_expr.arguments().push_back(expr_deref);
+              side_effect_expr_function_callt ctor_expr(
+                std::move(func_symb),
+                {expr_deref},
+                uninitialized_typet{},
+                expr.source_location());
               typecheck_side_effect_function_call(ctor_expr);
 
               new_expr.swap(ctor_expr);
@@ -1101,9 +1103,11 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
         ac.copy_to_operands(expr);
         member_func.copy_to_operands(ac);
 
-        side_effect_expr_function_callt func_expr;
-        func_expr.add_source_location()=expr.source_location();
-        func_expr.function().swap(member_func);
+        side_effect_expr_function_callt func_expr(
+          std::move(member_func),
+          {},
+          uninitialized_typet{},
+          expr.source_location());
         typecheck_side_effect_function_call(func_expr);
 
         if(standard_conversion_sequence(func_expr, type, tmp_expr, tmp_rank))
@@ -1328,9 +1332,11 @@ bool cpp_typecheckt::reference_binding(
         ac.copy_to_operands(expr);
         member_func.copy_to_operands(ac);
 
-        side_effect_expr_function_callt func_expr;
-        func_expr.add_source_location()=expr.source_location();
-        func_expr.function().swap(member_func);
+        side_effect_expr_function_callt func_expr(
+          std::move(member_func),
+          {},
+          uninitialized_typet{},
+          expr.source_location());
         typecheck_side_effect_function_call(func_expr);
 
         // let's check if the returned value binds directly

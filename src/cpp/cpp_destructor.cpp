@@ -106,9 +106,8 @@ optionalt<codet> cpp_typecheckt::cpp_destructor(
     member.add(ID_component_cpp_name) = cpp_name;
     member.copy_to_operands(object);
 
-    side_effect_expr_function_callt function_call;
-    function_call.add_source_location()=source_location;
-    function_call.function().swap(member);
+    side_effect_expr_function_callt function_call(
+      std::move(member), {}, uninitialized_typet{}, source_location);
 
     typecheck_side_effect_function_call(function_call);
     already_typechecked(function_call);
