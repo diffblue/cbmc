@@ -311,8 +311,9 @@ static void infer_opaque_type_fields(
       if(instruction.statement == "getfield" ||
          instruction.statement == "putfield")
       {
-        const exprt &fieldref = instruction.args[0];
-        irep_idt class_symbol_id = fieldref.get(ID_class);
+        const fieldref_exprt &fieldref =
+          expr_dynamic_cast<fieldref_exprt>(instruction.args[0]);
+        irep_idt class_symbol_id = fieldref.class_name();
         const symbolt *class_symbol = symbol_table.lookup(class_symbol_id);
         INVARIANT(
           class_symbol != nullptr,
@@ -320,7 +321,7 @@ static void infer_opaque_type_fields(
 
         const java_class_typet *class_type =
           &to_java_class_type(class_symbol->type);
-        const irep_idt &component_name = fieldref.get(ID_component_name);
+        const irep_idt &component_name = fieldref.component_name();
         while(!class_type->has_component(component_name))
         {
           if(class_type->get_is_stub())
@@ -582,12 +583,10 @@ static void create_stub_global_symbols(
         INVARIANT(
           instruction.args.size() > 0,
           "get/putstatic should have at least one argument");
-        irep_idt component = instruction.args[0].get_string(ID_component_name);
-        INVARIANT(
-          !component.empty(), "get/putstatic should specify a component");
-        irep_idt class_id = instruction.args[0].get_string(ID_class);
-        INVARIANT(
-          !class_id.empty(), "get/putstatic should specify a class");
+        const fieldref_exprt &field_ref =
+          expr_dynamic_cast<fieldref_exprt>(instruction.args[0]);
+        irep_idt component = field_ref.component_name();
+        irep_idt class_id = field_ref.class_name();
 
         // The final 'true' parameter here includes interfaces, as they can
         // define static fields.
