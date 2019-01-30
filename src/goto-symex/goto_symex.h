@@ -776,9 +776,6 @@ protected:
   /// \param code: The cleaned up output instruction
   virtual void symex_output(statet &state, const codet &code);
 
-  /// A monotonically increasing index for each created dynamic object
-  static unsigned dynamic_counter;
-
   void rewrite_quantifiers(exprt &, statet &);
 
   /// \brief Symbolic execution paths to be resumed later

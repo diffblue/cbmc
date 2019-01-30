@@ -56,8 +56,6 @@ void goto_symext::symex_allocate(
   if(lhs.is_nil())
     return; // ignore
 
-  dynamic_counter++;
-
   exprt size = to_binary_expr(code).op0();
   optionalt<typet> object_type;
   auto function_symbol = outer_symbol_table.lookup(state.source.function_id);
@@ -137,18 +135,15 @@ void goto_symext::symex_allocate(
     {
       exprt &array_size = to_array_type(*object_type).size();
 
-      auxiliary_symbolt size_symbol;
-
-      size_symbol.base_name=
-        "dynamic_object_size"+std::to_string(dynamic_counter);
-      size_symbol.name =
-        SYMEX_DYNAMIC_PREFIX "::" + id2string(size_symbol.base_name);
-      size_symbol.type=tmp_size.type();
-      size_symbol.mode = mode;
+      symbolt &size_symbol = get_fresh_aux_symbol(
+        tmp_size.type(),
+        SYMEX_DYNAMIC_PREFIX,
+        "dynamic_object_size",
+        code.source_location(),
+        mode,
+        state.symbol_table);
       size_symbol.type.set(ID_C_constant, true);
       size_symbol.value = array_size;
-
-      state.symbol_table.add(size_symbol);
 
       auto array_size_rhs = array_size;
       array_size = size_symbol.symbol_expr();
@@ -158,17 +153,17 @@ void goto_symext::symex_allocate(
   }
 
   // value
-  symbolt value_symbol;
-
-  value_symbol.base_name="dynamic_object"+std::to_string(dynamic_counter);
-  value_symbol.name =
-    SYMEX_DYNAMIC_PREFIX "::" + id2string(value_symbol.base_name);
-  value_symbol.is_lvalue=true;
-  value_symbol.type = *object_type;
+  symbolt &value_symbol = get_fresh_aux_symbol(
+    *object_type,
+    SYMEX_DYNAMIC_PREFIX,
+    "dynamic_object",
+    code.source_location(),
+    mode,
+    state.symbol_table);
+  value_symbol.is_auxiliary = false;
+  value_symbol.is_thread_local = false;
+  value_symbol.is_file_local = false;
   value_symbol.type.set(ID_C_dynamic, true);
-  value_symbol.mode = mode;
-
-  state.symbol_table.add(value_symbol);
 
   // to allow constant propagation
   exprt zero_init = state.rename(to_binary_expr(code).op1(), ns).get();
@@ -471,47 +466,46 @@ void goto_symext::symex_cpp_new(
   const exprt &lhs,
   const side_effect_exprt &code)
 {
-  bool do_array;
-
-  PRECONDITION(code.type().id() == ID_pointer);
-
   const auto &pointer_type = to_pointer_type(code.type());
 
-  do_array =
+  const bool do_array =
     (code.get(ID_statement) == ID_cpp_new_array ||
      code.get(ID_statement) == ID_java_new_array_data);
 
-  dynamic_counter++;
-
-  const std::string count_string(std::to_string(dynamic_counter));
-
   // value
-  symbolt symbol;
-  symbol.base_name=
-    do_array?"dynamic_"+count_string+"_array":
-             "dynamic_"+count_string+"_value";
-  symbol.name = SYMEX_DYNAMIC_PREFIX "::" + id2string(symbol.base_name);
-  symbol.is_lvalue=true;
-  if(code.get(ID_statement)==ID_cpp_new_array ||
-     code.get(ID_statement)==ID_cpp_new)
-    symbol.mode=ID_cpp;
-  else if(code.get(ID_statement) == ID_java_new_array_data)
-    symbol.mode=ID_java;
-  else
-    INVARIANT_WITH_IREP(false, "Unexpected side effect expression", code);
-
+  optionalt<typet> type;
   if(do_array)
   {
     exprt size_arg =
       clean_expr(static_cast<const exprt &>(code.find(ID_size)), state, false);
-    symbol.type = array_typet(pointer_type.base_type(), size_arg);
+    type = array_typet(pointer_type.base_type(), size_arg);
   }
   else
-    symbol.type = pointer_type.base_type();
+    type = pointer_type.base_type();
 
+  irep_idt mode;
+  if(
+    code.get(ID_statement) == ID_cpp_new_array ||
+    code.get(ID_statement) == ID_cpp_new)
+  {
+    mode = ID_cpp;
+  }
+  else if(code.get(ID_statement) == ID_java_new_array_data)
+    mode = ID_java;
+  else
+    INVARIANT_WITH_IREP(false, "Unexpected side effect expression", code);
+
+  symbolt &symbol = get_fresh_aux_symbol(
+    *type,
+    SYMEX_DYNAMIC_PREFIX,
+    (do_array ? "dynamic_array" : "dynamic_value"),
+    code.source_location(),
+    mode,
+    state.symbol_table);
+  symbol.is_auxiliary = false;
+  symbol.is_thread_local = false;
+  symbol.is_file_local = false;
   symbol.type.set(ID_C_dynamic, true);
-
-  state.symbol_table.add(symbol);
 
   // make symbol expression
 

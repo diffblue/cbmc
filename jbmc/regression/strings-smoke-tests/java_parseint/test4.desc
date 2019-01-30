@@ -5,7 +5,7 @@ Test4
 ^SIGNAL=0$
 ^\[.*assertion.1\].* line 6.* FAILURE$
 ^\[.*assertion.2\].* line 9.* FAILURE$
-dynamic_object2=\{ '5', '0' \}
-dynamic_object2=\{ 'X', 'Y', 'Z', 'W' \}
+dynamic_object\$0=\{ '5', '0' \}
+dynamic_object\$0=\{ 'X', 'Y', 'Z', 'W' \}
 --
 non equal types
