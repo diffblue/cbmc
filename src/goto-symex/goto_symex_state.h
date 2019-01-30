@@ -220,6 +220,13 @@ public:
   typedef std::map<goto_programt::const_targett, goto_state_listt>
     goto_state_mapt;
 
+  // guards
+  static irep_idt guard_identifier()
+  {
+    static irep_idt id = "goto_symex::\\guard";
+    return id;
+  }
+
   // stack frames -- these are used for function calls and
   // for exceptions
   struct framet

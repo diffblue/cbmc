@@ -15,6 +15,8 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <util/ssa_expr.h>
 #include <util/symbol.h>
 
+#include "goto_symex_state.h"
+
 void symex_level0t::
 operator()(ssa_exprt &ssa_expr, const namespacet &ns, unsigned thread_nr)
 {
@@ -25,7 +27,7 @@ operator()(ssa_exprt &ssa_expr, const namespacet &ns, unsigned thread_nr)
   const irep_idt &obj_identifier = ssa_expr.get_object_name();
 
   // guards are not L0-renamed
-  if(obj_identifier == "goto_symex::\\guard")
+  if(obj_identifier == goto_symex_statet::guard_identifier())
     return;
 
   const symbolt *s;

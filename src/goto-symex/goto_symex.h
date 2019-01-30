@@ -84,7 +84,6 @@ public:
       target(_target),
       atomic_section_counter(0),
       log(mh),
-      guard_identifier("goto_symex::\\guard"),
       path_storage(path_storage),
       path_segment_vccs(0),
       _total_vccs(std::numeric_limits<unsigned>::max()),
@@ -237,10 +236,6 @@ protected:
     statet &,
     guardt &,
     bool keep_array);
-
-  // guards
-
-  const irep_idt guard_identifier;
 
   virtual void symex_goto(statet &);
   virtual void symex_start_thread(statet &);
