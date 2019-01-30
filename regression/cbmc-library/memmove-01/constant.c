@@ -30,7 +30,7 @@ void sort_items_by_criteria(int *item, int left, int right)
 
 int main(int argc, char *argv[])
 {
-  int a[7];
+  int a[7] = {0};
 
   // CBMC in some past version reported wrong results for 256, -2147221455,
   // -2147221455, -2147221455, 16, -2147483600, 16384
