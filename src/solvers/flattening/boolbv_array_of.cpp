@@ -37,15 +37,15 @@ bvt boolbvt::convert_array_of(const array_of_exprt &expr)
 
   const exprt &array_size=array_type.size();
 
-  mp_integer size;
+  const auto size = numeric_cast<mp_integer>(array_size);
 
-  if(to_integer(array_size, size))
+  if(!size.has_value())
     return conversion_failed(expr);
 
   const bvt &tmp = convert_bv(expr.what());
 
   INVARIANT(
-    size * tmp.size() == width,
+    *size * tmp.size() == width,
     "total array bit width shall equal the number of elements times the "
     "element bit with");
 

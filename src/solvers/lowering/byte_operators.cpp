@@ -67,12 +67,11 @@ static exprt unpack_rec(
     if(!unpack_byte_array && *element_width == 8)
       return src;
 
-    mp_integer num_elements;
-    if(to_integer(max_bytes, num_elements) &&
-       to_integer(array_type.size(), num_elements))
-    {
+    auto num_elements = numeric_cast<mp_integer>(max_bytes);
+    if(!num_elements.has_value())
+      num_elements = numeric_cast<mp_integer>(array_type.size());
+    if(!num_elements.has_value())
       throw non_const_array_sizet(array_type, max_bytes);
-    }
 
     // all array members will have the same structure; do this just
     // once and then replace the dummy symbol by a suitable index
@@ -80,7 +79,7 @@ static exprt unpack_rec(
     symbol_exprt dummy(ID_C_incomplete, subtype);
     exprt sub=unpack_rec(dummy, little_endian, max_bytes, ns, true);
 
-    for(mp_integer i=0; i<num_elements; ++i)
+    for(mp_integer i=0; i<*num_elements; ++i)
     {
       index_exprt index(src, from_integer(i, index_type()));
       replace_symbolt replace;
@@ -130,12 +129,13 @@ static exprt unpack_rec(
       bits = *bits_opt;
     else
     {
-      if(to_integer(max_bytes, bits))
+      bits_opt = numeric_cast<mp_integer>(max_bytes);
+      if(!bits_opt.has_value())
       {
         throw non_constant_widtht(src, max_bytes);
       }
       else
-        bits*=8;
+        bits = *bits_opt * 8;
     }
 
     for(mp_integer i=0; i<bits; i+=8)
@@ -233,16 +233,16 @@ exprt lower_byte_extract(const byte_extract_exprt &src, const namespacet &ns)
     const typet &subtype=array_type.subtype();
 
     auto element_width = pointer_offset_bits(subtype, ns);
-    mp_integer num_elements;
+    const auto num_elements = numeric_cast<mp_integer>(array_type.size());
     // TODO: consider ways of dealing with arrays of unknown subtype
     // size or with a subtype size that does not fit byte boundaries
     if(
       element_width.has_value() && *element_width >= 1 &&
-      *element_width % 8 == 0 && to_integer(array_type.size(), num_elements))
+      *element_width % 8 == 0 && num_elements.has_value())
     {
       array_exprt array({}, array_type);
 
-      for(mp_integer i=0; i<num_elements; ++i)
+      for(mp_integer i=0; i< *num_elements; ++i)
       {
         plus_exprt new_offset(
           unpacked.offset(),

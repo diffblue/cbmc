@@ -151,11 +151,9 @@ void smt2_convt::define_object_size(
   {
     const typet &type = o.type();
     exprt size_expr = size_of_expr(type, ns);
-    mp_integer object_size;
+    const auto object_size = numeric_cast<mp_integer>(size_expr);
 
-    if(o.id()!=ID_symbol ||
-       size_expr.is_nil() ||
-       to_integer(size_expr, object_size))
+    if(o.id() != ID_symbol || size_expr.is_nil() || !object_size.has_value())
     {
       ++number;
       continue;
@@ -164,10 +162,9 @@ void smt2_convt::define_object_size(
     out << "(assert (implies (= " <<
       "((_ extract " << h << " " << l << ") ";
     convert_expr(ptr);
-    out << ") (_ bv" << number << " "
-        << config.bv_encoding.object_bits << "))"
-        << "(= " << id << " (_ bv" << object_size.to_ulong() << " "
-        << size_width << "))))\n";
+    out << ") (_ bv" << number << " " << config.bv_encoding.object_bits << "))"
+        << "(= " << id << " (_ bv" << *object_size << " " << size_width
+        << "))))\n";
 
     ++number;
   }
@@ -3798,14 +3795,14 @@ void smt2_convt::convert_index(const index_exprt &expr)
 
       // this is easy for constant indicies
 
-      mp_integer index_int;
-      if(to_integer(expr.index(), index_int))
+      const auto index_int = numeric_cast<mp_integer>(expr.index());
+      if(!index_int.has_value())
       {
         SMT2_TODO("non-constant index on vectors");
       }
       else
       {
-        out << "(" << smt_typename << "." << index_int << " ";
+        out << "(" << smt_typename << "." << *index_int << " ";
         convert_expr(expr.array());
         out << ")";
       }

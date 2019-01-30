@@ -636,12 +636,12 @@ bool boolbvt::is_unbounded_array(const typet &type) const
 
   const exprt &size=to_array_type(type).size();
 
-  mp_integer s;
-  if(to_integer(size, s))
+  const auto s = numeric_cast<mp_integer>(size);
+  if(!s.has_value())
     return true;
 
   if(unbounded_array==unbounded_arrayt::U_AUTO)
-    if(s>MAX_FLATTENED_ARRAY_SIZE)
+    if(*s > MAX_FLATTENED_ARRAY_SIZE)
       return true;
 
   return false;

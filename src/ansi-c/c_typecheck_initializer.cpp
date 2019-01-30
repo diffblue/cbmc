@@ -91,8 +91,9 @@ exprt c_typecheck_baset::do_initializer_rec(
        to_array_type(full_type).is_complete())
     {
       // check size
-      mp_integer array_size;
-      if(to_integer(to_array_type(full_type).size(), array_size))
+      const auto array_size =
+        numeric_cast<mp_integer>(to_array_type(full_type).size());
+      if(!array_size.has_value())
       {
         error().source_location = value.source_location();
         error() << "array size needs to be constant, got "
@@ -100,20 +101,20 @@ exprt c_typecheck_baset::do_initializer_rec(
         throw 0;
       }
 
-      if(array_size<0)
+      if(*array_size < 0)
       {
         error().source_location = value.source_location();
         error() << "array size must not be negative" << eom;
         throw 0;
       }
 
-      if(mp_integer(tmp.operands().size())>array_size)
+      if(mp_integer(tmp.operands().size()) > *array_size)
       {
         // cut off long strings. gcc does a warning for this
-        tmp.operands().resize(numeric_cast_v<std::size_t>(array_size));
+        tmp.operands().resize(numeric_cast_v<std::size_t>(*array_size));
         tmp.type()=type;
       }
-      else if(mp_integer(tmp.operands().size())<array_size)
+      else if(mp_integer(tmp.operands().size()) < *array_size)
       {
         // fill up
         tmp.type()=type;
@@ -126,7 +127,7 @@ exprt c_typecheck_baset::do_initializer_rec(
                   << to_string(full_type.subtype()) << "'" << eom;
           throw 0;
         }
-        tmp.operands().resize(numeric_cast_v<std::size_t>(array_size), *zero);
+        tmp.operands().resize(numeric_cast_v<std::size_t>(*array_size), *zero);
       }
     }
 
@@ -152,8 +153,9 @@ exprt c_typecheck_baset::do_initializer_rec(
        to_array_type(full_type).is_complete())
     {
       // check size
-      mp_integer array_size;
-      if(to_integer(to_array_type(full_type).size(), array_size))
+      const auto array_size =
+        numeric_cast<mp_integer>(to_array_type(full_type).size());
+      if(!array_size.has_value())
       {
         error().source_location = value.source_location();
         error() << "array size needs to be constant, got "
@@ -161,20 +163,20 @@ exprt c_typecheck_baset::do_initializer_rec(
         throw 0;
       }
 
-      if(array_size<0)
+      if(*array_size < 0)
       {
         error().source_location = value.source_location();
         error() << "array size must not be negative" << eom;
         throw 0;
       }
 
-      if(mp_integer(tmp2.operands().size())>array_size)
+      if(mp_integer(tmp2.operands().size()) > *array_size)
       {
         // cut off long strings. gcc does a warning for this
-        tmp2.operands().resize(numeric_cast_v<std::size_t>(array_size));
+        tmp2.operands().resize(numeric_cast_v<std::size_t>(*array_size));
         tmp2.type()=type;
       }
-      else if(mp_integer(tmp2.operands().size())<array_size)
+      else if(mp_integer(tmp2.operands().size()) < *array_size)
       {
         // fill up
         tmp2.type()=type;
@@ -187,7 +189,7 @@ exprt c_typecheck_baset::do_initializer_rec(
                   << to_string(full_type.subtype()) << "'" << eom;
           throw 0;
         }
-        tmp2.operands().resize(numeric_cast_v<std::size_t>(array_size), *zero);
+        tmp2.operands().resize(numeric_cast_v<std::size_t>(*array_size), *zero);
       }
     }
 
@@ -319,9 +321,8 @@ void c_typecheck_baset::designator_enter(
     }
     else
     {
-      mp_integer array_size;
-
-      if(to_integer(array_type.size(), array_size))
+      const auto array_size = numeric_cast<mp_integer>(array_type.size());
+      if(!array_size.has_value())
       {
         error().source_location = array_type.size().source_location();
         error() << "array has non-constant size `"
@@ -329,7 +330,7 @@ void c_typecheck_baset::designator_enter(
         throw 0;
       }
 
-      entry.size = numeric_cast_v<std::size_t>(array_size);
+      entry.size = numeric_cast_v<std::size_t>(*array_size);
       entry.subtype=array_type.subtype();
     }
   }
@@ -337,9 +338,9 @@ void c_typecheck_baset::designator_enter(
   {
     const vector_typet &vector_type=to_vector_type(full_type);
 
-    mp_integer vector_size;
+    const auto vector_size = numeric_cast<mp_integer>(vector_type.size());
 
-    if(to_integer(vector_type.size(), vector_size))
+    if(!vector_size.has_value())
     {
       error().source_location = vector_type.size().source_location();
       error() << "vector has non-constant size `"
@@ -347,7 +348,7 @@ void c_typecheck_baset::designator_enter(
       throw 0;
     }
 
-    entry.size = numeric_cast_v<std::size_t>(vector_size);
+    entry.size = numeric_cast_v<std::size_t>(*vector_size);
     entry.subtype=vector_type.subtype();
   }
   else
@@ -735,7 +736,11 @@ designatort c_typecheck_baset::make_designator(
 
       if(to_array_type(full_type).size().is_nil())
         size=0;
-      else if(to_integer(to_array_type(full_type).size(), size))
+      else if(
+        const auto size_opt =
+          numeric_cast<mp_integer>(to_array_type(full_type).size()))
+        size = *size_opt;
+      else
       {
         error().source_location = d_op.op0().source_location();
         error() << "expected constant array size" << eom;

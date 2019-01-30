@@ -270,12 +270,12 @@ void cpp_typecheckt::zero_initializer(
 
       exprt component_size=size_of_expr(component.type(), *this);
 
-      mp_integer size_int;
-      if(!to_integer(component_size, size_int))
+      const auto size_int = numeric_cast<mp_integer>(component_size);
+      if(size_int.has_value())
       {
-        if(size_int>max_comp_size)
+        if(*size_int > max_comp_size)
         {
-          max_comp_size=size_int;
+          max_comp_size = *size_int;
           comp=component;
         }
       }

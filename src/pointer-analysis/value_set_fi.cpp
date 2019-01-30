@@ -553,19 +553,19 @@ void value_set_fit::get_value_set_rec(
         {
           if(expr.op0().type().id()!=ID_pointer)
           {
-            mp_integer i;
-            if(to_integer(expr.op0(), i))
+            const auto i = numeric_cast<mp_integer>(expr.op0());
+            if(!i.has_value())
               offset.reset();
             else
-              *offset = (expr.id() == ID_plus) ? i : -i;
+              *offset = (expr.id() == ID_plus) ? *i : -*i;
           }
           else
           {
-            mp_integer i;
-            if(to_integer(expr.op1(), i))
+            const auto i = numeric_cast<mp_integer>(expr.op1());
+            if(!i.has_value())
               offset.reset();
             else
-              *offset = (expr.id() == ID_plus) ? i : -i;
+              *offset = (expr.id() == ID_plus) ? *i : -*i;
           }
         }
         else
@@ -862,13 +862,13 @@ void value_set_fit::get_reference_set_sharing_rec(
           casted_index = index_expr;
 
         offsett o = a_it->second;
-        mp_integer i;
+        const auto i = numeric_cast<mp_integer>(offset);
 
         if(offset.is_zero())
         {
         }
-        else if(!to_integer(offset, i) && offset_is_zero(o))
-          *o = i;
+        else if(i.has_value() && offset_is_zero(o))
+          *o = *i;
         else
           o.reset();
 

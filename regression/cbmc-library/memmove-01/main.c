@@ -47,5 +47,11 @@ int main(int argc, char *argv[])
   printf("%d %d %d %d %d %d %d\n", a[0], a[1], a[2], a[3], a[4], a[5], a[6]);
 
   assert(a[0] == -2147483600);
+  assert(a[1] == -2147221455);
+  assert(a[2] == -2147221455);
+  assert(a[3] == -2147221455);
+  assert(a[4] == 16);
+  assert(a[5] == 256);
+  assert(a[6] == 16384);
   return 0;
 }

@@ -1,4 +1,4 @@
-CORE
+KNOWNBUG
 main.c
 --unwind 17
 ^EXIT=0$
@@ -6,3 +6,8 @@ main.c
 ^VERIFICATION SUCCESSFUL$
 --
 ^warning: ignoring
+--
+Since we cannot constant-propagate lsize, we generate byte_extract operations
+over an int-array of unknown size when invoking memmove. This could be fixed by
+not using array_copy/array_replace in memmove, extensions to the byte-operator
+lowering, or field-sensitive SSA (this regression test is fully deterministic).

@@ -841,17 +841,18 @@ bool string_abstractiont::build_array(const array_exprt &object,
     return true;
 
   const exprt &a_size=to_array_type(object.type()).size();
-  mp_integer size;
+  const auto size = numeric_cast<mp_integer>(a_size);
   // don't do anything, if we cannot determine the size
-  if(to_integer(a_size, size))
+  if(!size.has_value())
     return true;
   INVARIANT(
-    size == object.operands().size(), "wrong number of array object arguments");
+    *size == object.operands().size(),
+    "wrong number of array object arguments");
 
   exprt::operandst::const_iterator it=object.operands().begin();
-  for(mp_integer i=0; i<size; ++i, ++it)
+  for(mp_integer i = 0; i < *size; ++i, ++it)
     if(it->is_zero())
-      return build_symbol_constant(i, size, dest);
+      return build_symbol_constant(i, *size, dest);
 
   return true;
 }
@@ -1216,11 +1217,11 @@ goto_programt::targett string_abstractiont::value_assignments(
   if(lhs.type().id()==ID_array)
   {
     const exprt &a_size=to_array_type(lhs.type()).size();
-    mp_integer size;
+    const auto size = numeric_cast<mp_integer>(a_size);
     // don't do anything, if we cannot determine the size
-    if(to_integer(a_size, size))
+    if(!size.has_value())
       return target;
-    for(mp_integer i=0; i<size; ++i)
+    for(mp_integer i = 0; i < *size; ++i)
       target=value_assignments(dest, target,
           index_exprt(lhs, from_integer(i, a_size.type())),
           index_exprt(rhs, from_integer(i, a_size.type())));

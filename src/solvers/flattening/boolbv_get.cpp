@@ -302,12 +302,11 @@ exprt boolbvt::bv_get_unbounded_array(const exprt &expr) const
 
   if(size.id()!=ID_infinity)
   {
-    if(to_integer(size, size_mpint))
+    const auto size_opt = numeric_cast<mp_integer>(size);
+    if(!size_opt.has_value() || *size_opt < 0)
       return nil_exprt();
-
-    // simple sanity check
-    if(size_mpint<0)
-      return nil_exprt();
+    else
+      size_mpint = *size_opt;
   }
   else
     size_mpint=0;
@@ -344,14 +343,14 @@ exprt boolbvt::bv_get_unbounded_array(const exprt &expr) const
 
       if(!index_value.is_nil())
       {
-        mp_integer index_mpint;
+        const auto index_mpint = numeric_cast<mp_integer>(index_value);
 
-        if(!to_integer(index_value, index_mpint))
+        if(index_mpint.has_value())
         {
           if(value.is_nil())
-            values[index_mpint]=exprt(ID_unknown, type.subtype());
+            values[*index_mpint] = exprt(ID_unknown, type.subtype());
           else
-            values[index_mpint]=value;
+            values[*index_mpint] = value;
         }
       }
     }

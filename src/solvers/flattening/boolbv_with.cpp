@@ -144,16 +144,15 @@ void boolbvt::convert_with_array(
   }
 
   // Is the index a constant?
-  mp_integer op1_value;
-  if(!to_integer(op1, op1_value))
+  if(const auto op1_value = numeric_cast<mp_integer>(op1))
   {
     // Yes, it is!
     next_bv=prev_bv;
 
-    if(op1_value >= 0 && op1_value < *size) // bounds check
+    if(*op1_value >= 0 && *op1_value < *size) // bounds check
     {
       const std::size_t offset =
-        numeric_cast_v<std::size_t>(op1_value * op2_bv.size());
+        numeric_cast_v<std::size_t>(*op1_value * op2_bv.size());
 
       for(std::size_t j=0; j<op2_bv.size(); j++)
         next_bv[offset+j]=op2_bv[j];
@@ -186,13 +185,12 @@ void boolbvt::convert_with_bv(
 {
   literalt l=convert(op2);
 
-  mp_integer op1_value;
-  if(!to_integer(op1, op1_value))
+  if(const auto op1_value = numeric_cast<mp_integer>(op1))
   {
     next_bv=prev_bv;
 
-    if(op1_value<next_bv.size())
-      next_bv[numeric_cast_v<std::size_t>(op1_value)] = l;
+    if(*op1_value < next_bv.size())
+      next_bv[numeric_cast_v<std::size_t>(*op1_value)] = l;
 
     return;
   }
