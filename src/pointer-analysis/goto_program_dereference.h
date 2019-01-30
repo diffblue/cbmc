@@ -52,6 +52,7 @@ public:
   void pointer_checks(goto_functionst &goto_functions);
 
   void dereference_expression(
+    const irep_idt &function_id,
     goto_programt::const_targett target,
     exprt &expr);
 
@@ -93,6 +94,7 @@ protected:
 #if 0
   const std::set<irep_idt> *valid_local_variables;
 #endif
+  irep_idt current_function;
   goto_programt::const_targett current_target;
 
   /// Unused
@@ -106,6 +108,7 @@ protected:
 };
 
 void dereference(
+  const irep_idt &function_id,
   goto_programt::const_targett target,
   exprt &expr,
   const namespacet &,

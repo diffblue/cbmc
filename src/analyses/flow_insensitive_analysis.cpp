@@ -53,12 +53,12 @@ void flow_insensitive_analysis_baset::operator()(
   fixedpoint(goto_functions);
 }
 
-void flow_insensitive_analysis_baset::operator()(
-  const goto_programt &goto_program)
+void flow_insensitive_analysis_baset::
+operator()(const irep_idt &function_id, const goto_programt &goto_program)
 {
   initialize(goto_program);
   goto_functionst goto_functions;
-  fixedpoint(goto_program, goto_functions);
+  fixedpoint(function_id, goto_program, goto_functions);
 }
 
 void flow_insensitive_analysis_baset::output(
@@ -69,14 +69,14 @@ void flow_insensitive_analysis_baset::output(
   {
     out << "////\n" << "//// Function: " << f_it->first << "\n////\n\n";
 
-    output(f_it->second.body, f_it->first, out);
+    output(f_it->first, f_it->second.body, out);
   }
 }
 
 void flow_insensitive_analysis_baset::output(
-  const goto_programt &,
   const irep_idt &,
-  std::ostream &out) const
+  const goto_programt &,
+  std::ostream &out)
 {
   get_state().output(ns, out);
 }
@@ -99,6 +99,7 @@ flow_insensitive_analysis_baset::get_next(
 }
 
 bool flow_insensitive_analysis_baset::fixedpoint(
+  const irep_idt &function_id,
   const goto_programt &goto_program,
   const goto_functionst &goto_functions)
 {
@@ -119,7 +120,7 @@ bool flow_insensitive_analysis_baset::fixedpoint(
   {
     locationt l=get_next(working_set);
 
-    if(visit(l, working_set, goto_program, goto_functions))
+    if(visit(function_id, l, working_set, goto_program, goto_functions))
       new_data=true;
   }
 
@@ -127,6 +128,7 @@ bool flow_insensitive_analysis_baset::fixedpoint(
 }
 
 bool flow_insensitive_analysis_baset::visit(
+  const irep_idt &function_id,
   locationt l,
   working_sett &working_set,
   const goto_programt &goto_program,
@@ -157,16 +159,16 @@ bool flow_insensitive_analysis_baset::visit(
       // this is a big special case
       const code_function_callt &code = to_code_function_call(l->code);
 
-      changed=
-        do_function_call_rec(
-          l,
-          code.function(),
-          code.arguments(),
-          get_state(),
-          goto_functions);
+      changed = do_function_call_rec(
+        function_id,
+        l,
+        code.function(),
+        code.arguments(),
+        get_state(),
+        goto_functions);
     }
     else
-      changed = get_state().transform(ns, l, to_l);
+      changed = get_state().transform(ns, function_id, l, function_id, to_l);
 
     if(changed || !seen(to_l))
     {
@@ -193,6 +195,7 @@ bool flow_insensitive_analysis_baset::visit(
 }
 
 bool flow_insensitive_analysis_baset::do_function_call(
+  const irep_idt &calling_function,
   locationt l_call,
   const goto_functionst &goto_functions,
   const goto_functionst::function_mapt::const_iterator f_it,
@@ -221,9 +224,15 @@ bool flow_insensitive_analysis_baset::do_function_call(
     t->location_number=1;
 
     locationt l_next=l_call; l_next++;
-    bool new_data=state.transform(ns, l_call, r);
-    new_data = state.transform(ns, r, t) || new_data;
-    new_data = state.transform(ns, t, l_next) || new_data;
+    // do the edge from the call site to the simulated function (the artificial
+    // return statement that we just generated)
+    bool new_data =
+      state.transform(ns, calling_function, l_call, f_it->first, r);
+    // do the edge from the return to the artificial end-of-function
+    new_data = state.transform(ns, f_it->first, r, f_it->first, t) || new_data;
+    // do edge from (artificial) end of function to instruction after call
+    new_data =
+      state.transform(ns, f_it->first, t, calling_function, l_next) || new_data;
 
     return new_data;
   }
@@ -240,7 +249,8 @@ bool flow_insensitive_analysis_baset::do_function_call(
       l_begin->function == f_it->first, "function names have to match");
 
     // do the edge from the call site to the beginning of the function
-    new_data=state.transform(ns, l_call, l_begin);
+    new_data =
+      state.transform(ns, calling_function, l_call, f_it->first, l_begin);
 
     // do each function at least once
     if(functions_done.find(f_it->first)==
@@ -254,7 +264,7 @@ bool flow_insensitive_analysis_baset::do_function_call(
     if(new_data)
     {
       // recursive call
-      fixedpoint(goto_function.body, goto_functions);
+      fixedpoint(f_it->first, goto_function.body, goto_functions);
       new_data=true; // could be reset by fixedpoint
     }
   }
@@ -268,13 +278,16 @@ bool flow_insensitive_analysis_baset::do_function_call(
     // do edge from end of function to instruction after call
     locationt l_next=l_call;
     l_next++;
-    new_data = state.transform(ns, l_end, l_next) || new_data;
+    new_data =
+      state.transform(ns, f_it->first, l_end, calling_function, l_next) ||
+      new_data;
   }
 
   return new_data;
 }
 
 bool flow_insensitive_analysis_baset::do_function_call_rec(
+  const irep_idt &calling_function,
   locationt l_call,
   const exprt &function,
   const exprt::operandst &arguments,
@@ -301,13 +314,8 @@ bool flow_insensitive_analysis_baset::do_function_call_rec(
     if(it==goto_functions.function_map.end())
       throw "failed to find function "+id2string(identifier);
 
-    new_data =
-      do_function_call(
-        l_call,
-        goto_functions,
-        it,
-        arguments,
-        state);
+    new_data = do_function_call(
+      calling_function, l_call, goto_functions, it, arguments, state);
 
     recursion_set.erase(identifier);
   }
@@ -316,12 +324,21 @@ bool flow_insensitive_analysis_baset::do_function_call_rec(
     const auto &if_expr = to_if_expr(function);
 
     new_data = do_function_call_rec(
-      l_call, if_expr.true_case(), arguments, state, goto_functions);
+      calling_function,
+      l_call,
+      if_expr.true_case(),
+      arguments,
+      state,
+      goto_functions);
 
-    new_data =
-      do_function_call_rec(
-        l_call, if_expr.false_case(), arguments, state, goto_functions) ||
-      new_data;
+    new_data = do_function_call_rec(
+                 calling_function,
+                 l_call,
+                 if_expr.false_case(),
+                 arguments,
+                 state,
+                 goto_functions) ||
+               new_data;
   }
   else if(function.id()==ID_dereference)
   {
@@ -343,13 +360,14 @@ bool flow_insensitive_analysis_baset::do_function_call_rec(
 
         if(it!=goto_functions.function_map.end())
         {
-          new_data =
-            do_function_call_rec(
-              l_call,
-              o.object(),
-              arguments,
-              state,
-              goto_functions) || new_data;
+          new_data = do_function_call_rec(
+                       calling_function,
+                       l_call,
+                       o.object(),
+                       arguments,
+                       state,
+                       goto_functions) ||
+                     new_data;
         }
       }
     }
@@ -392,7 +410,7 @@ bool flow_insensitive_analysis_baset::fixedpoint(
   const goto_functionst &goto_functions)
 {
   functions_done.insert(it->first);
-  return fixedpoint(it->second.body, goto_functions);
+  return fixedpoint(it->first, it->second.body, goto_functions);
 }
 
 void flow_insensitive_analysis_baset::update(const goto_functionst &)

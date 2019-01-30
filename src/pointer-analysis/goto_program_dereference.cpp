@@ -227,7 +227,7 @@ void goto_program_dereferencet::get_value_set(
   const exprt &expr,
   value_setst::valuest &dest)
 {
-  value_sets.get_values(current_target, expr, dest);
+  value_sets.get_values(current_function, current_target, expr, dest);
 }
 
 /// Remove dereference expressions contained in `expr`.
@@ -357,9 +357,11 @@ void goto_program_dereferencet::dereference_instruction(
 
 /// Set the current target to `target` and remove derefence from expr.
 void goto_program_dereferencet::dereference_expression(
+  const irep_idt &function_id,
   goto_programt::const_targett target,
   exprt &expr)
 {
+  current_function = function_id;
   current_target=target;
   #if 0
   valid_local_variables=&target->local_variables;
@@ -448,6 +450,7 @@ void pointer_checks(
 /// Remove dereferences in `expr` using `value_sets` to determine to what
 /// objects the pointers may be pointing to.
 void dereference(
+  const irep_idt &function_id,
   goto_programt::const_targett target,
   exprt &expr,
   const namespacet &ns,
@@ -457,5 +460,5 @@ void dereference(
   symbol_tablet new_symbol_table;
   goto_program_dereferencet
     goto_program_dereference(ns, new_symbol_table, options, value_sets);
-  goto_program_dereference.dereference_expression(target, expr);
+  goto_program_dereference.dereference_expression(function_id, target, expr);
 }

@@ -159,7 +159,7 @@ void _rw_set_loct::read_write_rec(
       read_write_rec(*it, r, w, suffix, guard);
     }
     #else
-    dereference(target, tmp, ns, value_sets);
+    dereference(function_id, target, tmp, ns, value_sets);
 
     read_write_rec(tmp, r, w, suffix, guard);
     #endif

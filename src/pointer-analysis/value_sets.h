@@ -29,9 +29,10 @@ public:
 
   // this is not const to allow a lazy evaluation
   virtual void get_values(
+    const irep_idt &function_id,
     goto_programt::const_targett l,
     const exprt &expr,
-    valuest &dest)=0;
+    valuest &dest) = 0;
 
   virtual ~value_setst()
   {

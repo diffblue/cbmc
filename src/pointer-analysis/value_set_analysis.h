@@ -59,6 +59,7 @@ public:
 public:
   // interface value_sets
   virtual void get_values(
+    const irep_idt &,
     locationt l,
     const exprt &expr,
     value_setst::valuest &dest)

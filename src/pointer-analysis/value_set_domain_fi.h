@@ -29,32 +29,32 @@ public:
 //    return value_set.make_union(other.value_set);
 //  }
 
-  virtual void output(
-    const namespacet &ns,
-    std::ostream &out) const
+  void output(const namespacet &ns, std::ostream &out) const override
   {
     value_set.output(ns, out);
   }
 
-  virtual void initialize(const namespacet &)
+  void initialize(const namespacet &) override
   {
     value_set.clear();
   }
 
-  virtual bool transform(
+  bool transform(
     const namespacet &ns,
+    const irep_idt &function_from,
     locationt from_l,
-    locationt to_l);
+    const irep_idt &function_to,
+    locationt to_l) override;
 
-  virtual void get_reference_set(
+  void get_reference_set(
     const namespacet &ns,
     const exprt &expr,
-    expr_sett &expr_set)
+    expr_sett &expr_set) override
   {
     value_set.get_reference_set(expr, expr_set, ns);
   }
 
-  virtual void clear(void)
+  void clear(void) override
   {
     value_set.clear();
   }
