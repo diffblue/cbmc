@@ -238,7 +238,7 @@ exprt lower_byte_extract(const byte_extract_exprt &src, const namespacet &ns)
     // size or with a subtype size that does not fit byte boundaries
     if(
       element_width.has_value() && *element_width >= 1 &&
-      *element_width % 8 == 0 && to_integer(array_type.size(), num_elements))
+      *element_width % 8 == 0 && !to_integer(array_type.size(), num_elements))
     {
       array_exprt array({}, array_type);
 
