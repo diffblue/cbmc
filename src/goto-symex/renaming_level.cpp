@@ -18,7 +18,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include "goto_symex_state.h"
 
 void symex_level0t::
-operator()(ssa_exprt &ssa_expr, const namespacet &ns, unsigned thread_nr)
+operator()(ssa_exprt &ssa_expr, const namespacet &ns, unsigned thread_nr) const
 {
   // already renamed?
   if(!ssa_expr.get_level_0().empty())
@@ -42,7 +42,7 @@ operator()(ssa_exprt &ssa_expr, const namespacet &ns, unsigned thread_nr)
   ssa_expr.set_level_0(thread_nr);
 }
 
-void symex_level1t::operator()(ssa_exprt &ssa_expr)
+void symex_level1t::operator()(ssa_exprt &ssa_expr) const
 {
   // already renamed?
   if(!ssa_expr.get_level_1().empty())
