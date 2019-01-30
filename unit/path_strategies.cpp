@@ -21,7 +21,6 @@ Author: Kareem Khazem <karkhaz@karkhaz.com>, 2018
 
 #include <goto-checker/solver_factory.h>
 
-#include <langapi/language_ui.h>
 #include <langapi/mode.h>
 
 #include <util/cmdline.h>
