@@ -47,6 +47,13 @@ public:
 
   struct named_termt
   {
+    /// Default-constructing a symbol_exprt is deprecated, thus make sure we
+    /// always construct a named_termt from an initialized \p _name
+    named_termt(const exprt &_term, const symbol_exprt &_name)
+      : term(_term), name(_name)
+    {
+    }
+
     exprt term;
     symbol_exprt name;
   };

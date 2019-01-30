@@ -773,7 +773,7 @@ void java_bytecode_convert_methodt::setup_local_variables(
   // to calculate which variable to use, one uses the address of the instruction
   // that uses the variable, the size of the instruction and the start_pc /
   // length values in the local variable table
-  for(const auto &v : vars_with_holes)
+  for(auto &v : vars_with_holes)
   {
     if(v.is_parameter)
       continue;
@@ -807,12 +807,8 @@ void java_bytecode_convert_methodt::setup_local_variables(
     // Create a new local variable in the variables[] array, the result of
     // merging multiple local variables with equal name (parameters excluded)
     // into a single local variable with holes
-    variables[v.var.index].push_back(variablet());
-    auto &newv=variables[v.var.index].back();
-    newv.symbol_expr=result;
-    newv.start_pc=v.var.start_pc;
-    newv.length=v.var.length;
-    newv.holes=std::move(v.holes);
+    variables[v.var.index].emplace_back(
+      result, v.var.start_pc, v.var.length, false, std::move(v.holes));
 
     // Register the local variable in the symbol table
     symbolt new_symbol;
@@ -862,9 +858,7 @@ java_bytecode_convert_methodt::find_variable_for_slot(
   // with scope from 0 to SIZE_T_MAX
   // as it is at the end of the vector, it will only be taken into account
   // if no other variable is valid
-  size_t list_length=var_list.size();
-  var_list.resize(list_length+1);
-  var_list[list_length].start_pc=0;
-  var_list[list_length].length=std::numeric_limits<size_t>::max();
-  return var_list[list_length];
+  var_list.emplace_back(
+    symbol_exprt(irep_idt(), typet()), 0, std::numeric_limits<size_t>::max());
+  return var_list.back();
 }

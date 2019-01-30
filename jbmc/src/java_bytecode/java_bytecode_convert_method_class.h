@@ -118,10 +118,40 @@ public:
     symbol_exprt symbol_expr;
     size_t start_pc;
     size_t length;
-    bool is_parameter;
+    bool is_parameter = false;
     std::vector<holet> holes;
 
-    variablet() : symbol_expr(), start_pc(0), length(0), is_parameter(false)
+    variablet(
+      const symbol_exprt &_symbol_expr,
+      std::size_t _start_pc,
+      std::size_t _length)
+      : symbol_expr(_symbol_expr), start_pc(_start_pc), length(_length)
+    {
+    }
+
+    variablet(
+      const symbol_exprt &_symbol_expr,
+      std::size_t _start_pc,
+      std::size_t _length,
+      bool _is_parameter)
+      : symbol_expr(_symbol_expr),
+        start_pc(_start_pc),
+        length(_length),
+        is_parameter(_is_parameter)
+    {
+    }
+
+    variablet(
+      const symbol_exprt &_symbol_expr,
+      std::size_t _start_pc,
+      std::size_t _length,
+      bool _is_parameter,
+      std::vector<holet> &&_holes)
+      : symbol_expr(_symbol_expr),
+        start_pc(_start_pc),
+        length(_length),
+        is_parameter(_is_parameter),
+        holes(std::move(_holes))
     {
     }
   };

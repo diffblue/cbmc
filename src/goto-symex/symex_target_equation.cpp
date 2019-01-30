@@ -645,9 +645,9 @@ void symex_target_equationt::convert_io(
           step.converted_io_args.push_back(arg);
         else
         {
-          symbol_exprt symbol;
-          symbol.type()=arg.type();
-          symbol.set_identifier("symex::io::"+std::to_string(io_count++));
+          const irep_idt identifier =
+            "symex::io::" + std::to_string(io_count++);
+          symbol_exprt symbol(identifier, arg.type());
 
           equal_exprt eq(arg, symbol);
           merge_irep(eq);

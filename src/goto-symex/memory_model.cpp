@@ -84,8 +84,7 @@ void memory_model_baset::read_from(symex_target_equationt &equation)
         symbol_exprt s=nondet_bool_symbol("rf");
 
         // record the symbol
-        choice_symbols[
-          std::make_pair(r, w)]=s;
+        choice_symbols.emplace(std::make_pair(r, w), s);
 
         // We rely on the fact that there is at least
         // one write event that has guard 'true'.

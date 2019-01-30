@@ -440,8 +440,8 @@ int linker_script_merget::ls_data2instructions(
 
     // Linker-defined symbol_exprt pointing to start address
     symbol_exprt start_sym(d["start-symbol"].value, pointer_type(char_type()));
-    linker_values[d["start-symbol"].value]=std::make_pair(start_sym,
-        array_start);
+    linker_values.emplace(
+      d["start-symbol"].value, std::make_pair(start_sym, array_start));
 
     // Since the value of the pointer will be a random CBMC address, write a
     // note about the real address in the object file
@@ -479,7 +479,8 @@ int linker_script_merget::ls_data2instructions(
       plus_exprt array_end(array_start, array_size_expr);
 
       symbol_exprt end_sym(d["end-symbol"].value, pointer_type(char_type()));
-      linker_values[d["end-symbol"].value]=std::make_pair(end_sym, array_end);
+      linker_values.emplace(
+        d["end-symbol"].value, std::make_pair(end_sym, array_end));
 
       auto entry = std::find_if(
         to_json_array(data["addresses"]).begin(),
@@ -578,7 +579,8 @@ int linker_script_merget::ls_data2instructions(
     exprt rhs_tc(rhs);
     rhs_tc.make_typecast(pointer_type(char_type()));
 
-    linker_values[irep_idt(d["sym"].value)]=std::make_pair(lhs, rhs_tc);
+    linker_values.emplace(
+      irep_idt(d["sym"].value), std::make_pair(lhs, rhs_tc));
 
     code_assignt assign(lhs, rhs_tc);
     assign.add_source_location()=loc;
@@ -641,7 +643,8 @@ int linker_script_merget::ls_data2instructions(
     exprt rhs_tc(rhs);
     rhs_tc.make_typecast(pointer_type(char_type()));
 
-    linker_values[irep_idt(d["sym"].value)]=std::make_pair(lhs, rhs_tc);
+    linker_values.emplace(
+      irep_idt(d["sym"].value), std::make_pair(lhs, rhs_tc));
 
     code_assignt assign(lhs, rhs_tc);
     assign.add_source_location()=loc;

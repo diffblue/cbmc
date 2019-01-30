@@ -408,7 +408,7 @@ void goto_symext::locality(
 
     if(c_it != state.level1.current_names.end())
     {
-      frame.old_level1[l0_name]=c_it->second;
+      frame.old_level1.emplace(l0_name, c_it->second);
       c_it->second = std::make_pair(ssa, frame_nr);
     }
     else

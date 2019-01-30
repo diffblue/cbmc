@@ -16,15 +16,9 @@ Author: Daniel Kroening, kroening@kroening.com
 class ssa_exprt:public symbol_exprt
 {
 public:
-  ssa_exprt()
-  {
-    set(ID_C_SSA_symbol, true);
-  }
-
   /// Constructor
   /// \param expr: Expression to be converted to SSA symbol
-  explicit ssa_exprt(const exprt &expr):
-    symbol_exprt(expr.type())
+  explicit ssa_exprt(const exprt &expr) : symbol_exprt(irep_idt(), expr.type())
   {
     set(ID_C_SSA_symbol, true);
     add(ID_expression, expr);
