@@ -46,10 +46,19 @@ struct numeric_castt<mp_integer> final
 {
   optionalt<mp_integer> operator()(const exprt &expr) const
   {
-    mp_integer out;
-    if(expr.id() != ID_constant || to_integer(to_constant_expr(expr), out))
+    if(expr.id() != ID_constant)
       return {};
-    return out;
+    else
+      return operator()(to_constant_expr(expr));
+  }
+
+  optionalt<mp_integer> operator()(const constant_exprt &expr) const
+  {
+    mp_integer out;
+    if(to_integer(expr, out))
+      return {};
+    else
+      return out;
   }
 };
 
@@ -97,6 +106,15 @@ public:
 
   // Conversion from expression
   optionalt<T> operator()(const exprt &expr) const
+  {
+    if(expr.id() == ID_constant)
+      return numeric_castt<T>{}(to_constant_expr(expr));
+    else
+      return {};
+  }
+
+  // Conversion from expression
+  optionalt<T> operator()(const constant_exprt &expr) const
   {
     if(auto mpi_opt = numeric_castt<mp_integer>{}(expr))
       return numeric_castt<T>{}(*mpi_opt);
