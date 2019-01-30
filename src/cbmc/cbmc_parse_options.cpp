@@ -28,6 +28,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ansi-c/c_preprocess.h>
 #include <ansi-c/cprover_library.h>
 
+#include <assembler/remove_asm.h>
+
 #include <cpp/cprover_library.h>
 
 #include <goto-checker/all_properties_verifier.h>
@@ -46,7 +48,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/remove_returns.h>
 #include <goto-programs/remove_vector.h>
 #include <goto-programs/remove_complex.h>
-#include <goto-programs/remove_asm.h>
 #include <goto-programs/remove_unused_functions.h>
 #include <goto-programs/remove_skip.h>
 #include <goto-programs/rewrite_union.h>

@@ -18,10 +18,10 @@ Date:   December 2014
 #include <util/c_types.h>
 #include <util/string_constant.h>
 
-#include <assembler/assembler_parser.h>
+#include <goto-programs/goto_model.h>
+#include <goto-programs/remove_skip.h>
 
-#include "goto_model.h"
-#include "remove_skip.h"
+#include "assembler_parser.h"
 
 class remove_asmt
 {
@@ -74,17 +74,16 @@ void remove_asmt::gcc_asm_function_call(
   const code_asmt &code,
   goto_programt &dest)
 {
-  irep_idt function_identifier=function_base_name;
+  irep_idt function_identifier = function_base_name;
 
   code_function_callt::argumentst arguments;
 
-  const typet void_pointer=
-    pointer_type(void_typet());
+  const typet void_pointer = pointer_type(void_typet());
 
   // outputs
   forall_operands(it, code.op1())
   {
-    if(it->operands().size()==2)
+    if(it->operands().size() == 2)
     {
       arguments.push_back(
         typecast_exprt(address_of_exprt(it->op1()), void_pointer));
@@ -94,7 +93,7 @@ void remove_asmt::gcc_asm_function_call(
   // inputs
   forall_operands(it, code.op2())
   {
-    if(it->operands().size()==2)
+    if(it->operands().size() == 2)
     {
       arguments.push_back(
         typecast_exprt(address_of_exprt(it->op1()), void_pointer));
@@ -108,19 +107,19 @@ void remove_asmt::gcc_asm_function_call(
 
   code_function_callt function_call(std::move(fkt), std::move(arguments));
 
-  goto_programt::targett call=dest.add_instruction(FUNCTION_CALL);
-  call->code=function_call;
-  call->source_location=code.source_location();
+  goto_programt::targett call = dest.add_instruction(FUNCTION_CALL);
+  call->code = function_call;
+  call->source_location = code.source_location();
 
   // do we have it?
   if(!symbol_table.has_symbol(function_identifier))
   {
     symbolt symbol;
 
-    symbol.name=function_identifier;
-    symbol.type=fkt_type;
-    symbol.base_name=function_base_name;
-    symbol.value=nil_exprt();
+    symbol.name = function_identifier;
+    symbol.type = fkt_type;
+    symbol.base_name = function_base_name;
+    symbol.value = nil_exprt();
     symbol.mode = ID_C;
 
     symbol_table.add(symbol);
@@ -195,11 +194,11 @@ void remove_asmt::process_instruction(
   goto_programt::instructiont &instruction,
   goto_programt &dest)
 {
-  const code_asmt &code=to_code_asm(instruction.code);
+  const code_asmt &code = to_code_asm(instruction.code);
 
-  const irep_idt &flavor=code.get_flavor();
+  const irep_idt &flavor = code.get_flavor();
 
-  if(flavor==ID_gcc)
+  if(flavor == ID_gcc)
     process_instruction_gcc(code, dest);
   else if(flavor == ID_msc)
     process_instruction_msc(code, dest);
@@ -497,7 +496,7 @@ void remove_asmt::process_function(
       for(auto &instruction : tmp_dest.instructions)
         instruction.function = it->function;
 
-      goto_programt::targett next=it;
+      goto_programt::targett next = it;
       next++;
 
       goto_function.body.destructive_insert(next, tmp_dest);
