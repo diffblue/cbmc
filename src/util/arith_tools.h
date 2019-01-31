@@ -153,7 +153,7 @@ Target numeric_cast_v(const mp_integer &arg)
 /// \param arg: constant expression
 /// \return value of type Target
 template <typename Target>
-Target numeric_cast_v(const exprt &arg)
+Target numeric_cast_v(const constant_exprt &arg)
 {
   const auto maybe = numeric_castt<Target>{}(arg);
   INVARIANT_WITH_DIAGNOSTICS(

@@ -178,7 +178,8 @@ void bv_refinementt::check_SAT(approximationt &a)
     o1.unpack(a.op1_value);
 
     // get actual rounding mode
-    exprt rounding_mode_expr = get(float_op.rounding_mode());
+    constant_exprt rounding_mode_expr =
+      to_constant_expr(get(float_op.rounding_mode()));
     const std::size_t rounding_mode_int =
       numeric_cast_v<std::size_t>(rounding_mode_expr);
     ieee_floatt::rounding_modet rounding_mode =

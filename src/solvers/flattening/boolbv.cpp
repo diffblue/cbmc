@@ -72,9 +72,13 @@ bool boolbvt::literal(
       std::size_t element_width=boolbv_width(index_expr.type());
       CHECK_RETURN(element_width != 0);
 
-      mp_integer index = numeric_cast_v<mp_integer>(index_expr.index());
+      const auto &index = index_expr.index();
+      PRECONDITION(index.id() == ID_constant);
+      mp_integer index_int =
+        numeric_cast_v<mp_integer>(to_constant_expr(index));
 
-      std::size_t offset = numeric_cast_v<std::size_t>(index * element_width);
+      std::size_t offset =
+        numeric_cast_v<std::size_t>(index_int * element_width);
 
       return literal(index_expr.array(), bit+offset, dest);
     }

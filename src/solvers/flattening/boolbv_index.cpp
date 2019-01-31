@@ -61,7 +61,9 @@ bvt boolbvt::convert_index(const index_exprt &expr)
     }
 
     // Must have a finite size
-    mp_integer array_size = numeric_cast_v<mp_integer>(array_type.size());
+    mp_integer array_size =
+      numeric_cast_v<mp_integer>(to_constant_expr(array_type.size()));
+
     {
       // see if the index address is constant
       // many of these are compacted by simplify_expr

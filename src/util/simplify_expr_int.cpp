@@ -32,7 +32,8 @@ bool simplify_exprt::simplify_bswap(bswap_exprt &expr)
   {
     auto bits_per_byte = expr.get_bits_per_byte();
     std::size_t width=to_bitvector_type(expr.type()).get_width();
-    const mp_integer value = numeric_cast_v<mp_integer>(expr.op());
+    const mp_integer value =
+      numeric_cast_v<mp_integer>(to_constant_expr(expr.op()));
     std::vector<mp_integer> bytes;
 
     // take apart
@@ -1763,8 +1764,8 @@ bool simplify_exprt::simplify_inequality_constant(exprt &expr)
 
       if(changed)
       {
-        // adjust constant
-        mp_integer i = numeric_cast_v<mp_integer>(expr.op1());
+        // adjust the constant on the RHS
+        mp_integer i = numeric_cast_v<mp_integer>(to_constant_expr(expr.op1()));
         i-=constant;
         expr.op1()=from_integer(i, expr.op1().type());
 
@@ -1893,7 +1894,7 @@ bool simplify_exprt::simplify_inequality_constant(exprt &expr)
     }
     else if(expr.id()==ID_gt)
     {
-      mp_integer i = numeric_cast_v<mp_integer>(expr.op1());
+      mp_integer i = numeric_cast_v<mp_integer>(to_constant_expr(expr.op1()));
 
       if(i==max)
       {
@@ -1917,7 +1918,7 @@ bool simplify_exprt::simplify_inequality_constant(exprt &expr)
     }
     else if(expr.id()==ID_le)
     {
-      mp_integer i = numeric_cast_v<mp_integer>(expr.op1());
+      mp_integer i = numeric_cast_v<mp_integer>(to_constant_expr(expr.op1()));
 
       if(i==max)
       {

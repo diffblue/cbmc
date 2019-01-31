@@ -487,7 +487,7 @@ protected:
 
   exprt::operandst &convert_const(
     const irep_idt &statement,
-    const exprt &arg0,
+    const constant_exprt &arg0,
     exprt::operandst &results) const;
 
   void convert_dup2_x2(exprt::operandst &op, exprt::operandst &results);

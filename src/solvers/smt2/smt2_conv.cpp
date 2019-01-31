@@ -1314,7 +1314,8 @@ void smt2_convt::convert_expr(const exprt &expr)
 
       if(shift_expr.distance().type().id() == ID_integer)
       {
-        mp_integer i = numeric_cast_v<mp_integer>(shift_expr.distance());
+        const mp_integer i =
+          numeric_cast_v<mp_integer>(to_constant_expr(shift_expr.distance()));
 
         // shift distance must be bit vector
         std::size_t width_op0 = boolbv_width(shift_expr.op().type());
@@ -1450,9 +1451,10 @@ void smt2_convt::convert_expr(const exprt &expr)
   {
     const extractbit_exprt &extractbit_expr = to_extractbit_expr(expr);
 
-    if(expr.op1().is_constant())
+    if(extractbit_expr.index().is_constant())
     {
-      mp_integer i = numeric_cast_v<mp_integer>(extractbit_expr.index());
+      const mp_integer i =
+        numeric_cast_v<mp_integer>(to_constant_expr(extractbit_expr.index()));
 
       out << "(= ((_ extract " << i << " " << i << ") ";
       flatten2bv(extractbit_expr.src());
@@ -1477,8 +1479,10 @@ void smt2_convt::convert_expr(const exprt &expr)
       extractbits_expr.upper().is_constant() &&
       extractbits_expr.lower().is_constant())
     {
-      mp_integer op1_i = numeric_cast_v<mp_integer>(extractbits_expr.upper());
-      mp_integer op2_i = numeric_cast_v<mp_integer>(extractbits_expr.lower());
+      mp_integer op1_i =
+        numeric_cast_v<mp_integer>(to_constant_expr(extractbits_expr.upper()));
+      mp_integer op2_i =
+        numeric_cast_v<mp_integer>(to_constant_expr(extractbits_expr.lower()));
 
       if(op2_i>op1_i)
         std::swap(op1_i, op2_i);
@@ -2158,7 +2162,7 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
       // must be constant
       if(src.is_constant())
       {
-        mp_integer i = numeric_cast_v<mp_integer>(src);
+        mp_integer i = numeric_cast_v<mp_integer>(to_constant_expr(src));
         out << "(_ bv" << i << " " << to_width << ")";
       }
       else
@@ -2663,8 +2667,10 @@ void smt2_convt::convert_struct(const struct_exprt &expr)
 void smt2_convt::flatten_array(const exprt &expr)
 {
   const array_typet &array_type = to_array_type(expr.type());
+  const auto &size_expr = array_type.size();
+  PRECONDITION(size_expr.id() == ID_constant);
 
-  mp_integer size = numeric_cast_v<mp_integer>(array_type.size());
+  mp_integer size = numeric_cast_v<mp_integer>(to_constant_expr(size_expr));
   CHECK_RETURN_WITH_DIAGNOSTICS(size != 0, "can't convert zero-sized array");
 
   out << "(let ((?far ";
