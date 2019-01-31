@@ -1751,28 +1751,18 @@ inline range_typet &to_range_type(typet &type)
 /// Used to represent the short vectors used by CPU instruction sets such as
 /// MMX, SSE and AVX. They all provide registers that are something like
 /// 8 x int32, for example, and corresponding operations that operate
-/// element-wise on their operand vectors. Compared to \ref array_typet
-/// that has no element-wise operators. Note that `remove_vector.h` removes
-/// this data type by compilation into arrays.
+/// element-wise on their operand vectors. Compared to \ref array_typet,
+/// vector_typet has a fixed size whereas array_typet has no element-wise
+/// operators.
+/// Note that `remove_vector.h` removes this data type by compilation into
+/// arrays.
 class vector_typet:public type_with_subtypet
 {
 public:
-  vector_typet(
-    const typet &_subtype,
-    const exprt &_size):type_with_subtypet(ID_vector, _subtype)
-  {
-    size()=_size;
-  }
+  vector_typet(const typet &_subtype, const constant_exprt &_size);
 
-  const exprt &size() const
-  {
-    return static_cast<const exprt &>(find(ID_size));
-  }
-
-  exprt &size()
-  {
-    return static_cast<exprt &>(add(ID_size));
-  }
+  const constant_exprt &size() const;
+  constant_exprt &size();
 };
 
 /// Check whether a reference to a typet is a \ref vector_typet.

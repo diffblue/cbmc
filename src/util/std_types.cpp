@@ -283,3 +283,19 @@ bool is_constant_or_has_constant_components(
 
   return false;
 }
+
+vector_typet::vector_typet(const typet &_subtype, const constant_exprt &_size)
+  : type_with_subtypet(ID_vector, _subtype)
+{
+  size() = _size;
+}
+
+const constant_exprt &vector_typet::size() const
+{
+  return static_cast<const constant_exprt &>(find(ID_size));
+}
+
+constant_exprt &vector_typet::size()
+{
+  return static_cast<constant_exprt &>(add(ID_size));
+}

@@ -68,7 +68,7 @@ SCENARIO("byte_extract_lowering", "[core][solvers][lowering][byte_extract]")
     unsignedbv_typet u32(32);
     unsignedbv_typet u64(64);
 
-    exprt size = from_integer(8, size_type());
+    constant_exprt size = from_integer(8, size_type());
 
     std::vector<typet> types = {
       struct_typet({{"comp1", u32}, {"comp2", u64}}),
@@ -211,7 +211,7 @@ SCENARIO("byte_update_lowering", "[core][solvers][lowering][byte_update]")
     unsignedbv_typet u32(32);
     unsignedbv_typet u64(64);
 
-    exprt size = from_integer(8, size_type());
+    constant_exprt size = from_integer(8, size_type());
 
     std::vector<typet> types = {
     // TODO: only arrays and scalars
