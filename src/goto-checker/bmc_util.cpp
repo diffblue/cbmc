@@ -218,23 +218,21 @@ void slice(
                    << " remaining after simplification" << messaget::eom;
 }
 
-std::vector<irep_idt> update_properties_status_from_symex_target_equation(
+void update_properties_status_from_symex_target_equation(
   propertiest &properties,
+  std::unordered_set<irep_idt> &updated_properties,
   const symex_target_equationt &equation)
 {
-  std::vector<irep_idt> updated_properties;
-
   for(const auto &step : equation.SSA_steps)
   {
     if(!step.is_assert())
       continue;
 
     irep_idt property_id = step.get_property_id();
+    CHECK_RETURN(!property_id.empty());
 
-    if(property_id.empty())
-      continue;
-
-    // Don't set false properties; we wouldn't have traces for them.
+    // Don't update status of properties that are constant 'false';
+    // we wouldn't have traces for them.
     const auto status = step.cond_expr.is_true() ? property_statust::PASS
                                                  : property_statust::UNKNOWN;
     auto emplace_result = properties.emplace(
@@ -242,7 +240,7 @@ std::vector<irep_idt> update_properties_status_from_symex_target_equation(
 
     if(emplace_result.second)
     {
-      updated_properties.push_back(property_id);
+      updated_properties.insert(property_id);
     }
     else
     {
@@ -251,10 +249,15 @@ std::vector<irep_idt> update_properties_status_from_symex_target_equation(
       property_info.status |= status;
 
       if(property_info.status != old_status)
-        updated_properties.push_back(property_id);
+        updated_properties.insert(property_id);
     }
   }
+}
 
+void update_status_of_not_checked_properties(
+  propertiest &properties,
+  std::unordered_set<irep_idt> &updated_properties)
+{
   for(auto &property_pair : properties)
   {
     if(property_pair.second.status == property_statust::NOT_CHECKED)
@@ -262,9 +265,7 @@ std::vector<irep_idt> update_properties_status_from_symex_target_equation(
       // This could be a NOT_CHECKED, NOT_REACHABLE or PASS,
       // but the equation doesn't give us precise information.
       property_pair.second.status = property_statust::PASS;
-      updated_properties.push_back(property_pair.first);
+      updated_properties.insert(property_pair.first);
     }
   }
-
-  return updated_properties;
 }

@@ -17,6 +17,7 @@ Author: Daniel Kroening, Peter Schrammel
 #include <goto-programs/goto_model.h>
 
 class json_objectt;
+class json_stream_objectt;
 class xmlt;
 
 /// The status of a property
@@ -83,6 +84,9 @@ xmlt xml(const irep_idt &property_id, const property_infot &property_info);
 
 json_objectt
 json(const irep_idt &property_id, const property_infot &property_info);
+
+/// Write the property info into the given JSON stream object
+void json(json_stream_objectt &, const irep_idt &, const property_infot &);
 
 int result_to_exit_code(resultt result);
 

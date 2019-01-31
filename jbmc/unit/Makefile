@@ -86,7 +86,6 @@ BMC_DEPS =$(CPROVER_DIR)/src/cbmc/all_properties$(OBJEXT) \
           $(CPROVER_DIR)/src/cbmc/bmc$(OBJEXT) \
           $(CPROVER_DIR)/src/cbmc/bmc_cover$(OBJEXT) \
           $(CPROVER_DIR)/src/cbmc/cbmc_languages$(OBJEXT) \
-          $(CPROVER_DIR)/src/cbmc/counterexample_beautification$(OBJEXT) \
           $(CPROVER_DIR)/src/cbmc/fault_localization$(OBJEXT) \
           $(CPROVER_DIR)/src/cbmc/xml_interface$(OBJEXT) \
           $(CPROVER_DIR)/src/jsil/expr2jsil$(OBJEXT) \
@@ -131,6 +130,7 @@ CPROVER_LIBS =../src/java_bytecode/java_bytecode$(LIBEXT) \
               $(CPROVER_DIR)/src/pointer-analysis/pointer-analysis$(LIBEXT) \
               $(CPROVER_DIR)/src/langapi/langapi$(LIBEXT) \
               $(CPROVER_DIR)/src/xmllang/xmllang$(LIBEXT) \
+              $(CPROVER_DIR)/src/assembler/assembler$(LIBEXT) \
               $(CPROVER_DIR)/src/analyses/analyses$(LIBEXT) \
               $(CPROVER_DIR)/src/solvers/solvers$(LIBEXT) \
               $(BMC_DEPS) \

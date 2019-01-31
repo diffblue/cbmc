@@ -67,7 +67,7 @@ SRC += analyses/ai/ai.cpp \
        util/simplify_expr.cpp \
        util/small_map.cpp \
        util/small_shared_two_way_ptr.cpp \
-			 util/std_expr.cpp \
+       util/std_expr.cpp \
        util/string_utils/split_string.cpp \
        util/string_utils/strip_string.cpp \
        util/symbol_table.cpp \
@@ -95,7 +95,6 @@ BMC_DEPS =../src/cbmc/all_properties$(OBJEXT) \
           ../src/cbmc/bmc_cover$(OBJEXT) \
           ../src/cbmc/cbmc_languages$(OBJEXT) \
           ../src/cbmc/cbmc_parse_options$(OBJEXT) \
-          ../src/cbmc/counterexample_beautification$(OBJEXT) \
           ../src/cbmc/fault_localization$(OBJEXT) \
           ../src/cbmc/xml_interface$(OBJEXT) \
           ../src/goto-instrument/cover$(OBJEXT) \

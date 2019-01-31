@@ -20,9 +20,7 @@ incremental_goto_checkert::incremental_goto_checkert(
 {
 }
 
-incremental_goto_checkert::resultt::resultt(
-  progresst progress,
-  const std::vector<irep_idt> &updated_properties)
-  : progress(progress), updated_properties(updated_properties)
+incremental_goto_checkert::resultt::resultt(resultt::progresst progress)
+  : progress(progress)
 {
 }

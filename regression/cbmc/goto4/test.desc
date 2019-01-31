@@ -4,6 +4,6 @@ main.c
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[.*] line 5 assertion g == 0: SUCCESS$
-^\[.*] unwinding assertion loop 0: FAILURE$
+^\[.*] line 14 unwinding assertion loop 0: FAILURE$
 --
 ^warning: ignoring

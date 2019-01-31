@@ -9,8 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Counterexample Beautification
 
-#ifndef CPROVER_CBMC_COUNTEREXAMPLE_BEAUTIFICATION_H
-#define CPROVER_CBMC_COUNTEREXAMPLE_BEAUTIFICATION_H
+#ifndef CPROVER_GOTO_CHECKER_COUNTEREXAMPLE_BEAUTIFICATION_H
+#define CPROVER_GOTO_CHECKER_COUNTEREXAMPLE_BEAUTIFICATION_H
 
 #include <util/namespace.h>
 
@@ -25,8 +25,7 @@ public:
   {
   }
 
-  void
-  operator()(boolbvt &boolbv, const symex_target_equationt &equation);
+  void operator()(boolbvt &boolbv, const symex_target_equationt &equation);
 
 protected:
   void get_minimization_list(
@@ -34,9 +33,7 @@ protected:
     const symex_target_equationt &equation,
     minimization_listt &minimization_list);
 
-  void minimize(
-    const exprt &expr,
-    class prop_minimizet &prop_minimize);
+  void minimize(const exprt &expr, class prop_minimizet &prop_minimize);
 
   symex_target_equationt::SSA_stepst::const_iterator get_failed_property(
     const prop_convt &prop_conv,
@@ -46,4 +43,4 @@ protected:
   symex_target_equationt::SSA_stepst::const_iterator failed;
 };
 
-#endif // CPROVER_CBMC_COUNTEREXAMPLE_BEAUTIFICATION_H
+#endif // CPROVER_GOTO_CHECKER_COUNTEREXAMPLE_BEAUTIFICATION_H

@@ -13,7 +13,7 @@ Author: Daniel Kroening, Peter Schrammel
 
 #include <util/invariant.h>
 
-#include <goto-symex/memory_model_pso.h>
+#include <goto-symex/memory_model.h>
 #include <goto-symex/show_program.h>
 #include <goto-symex/show_vcc.h>
 
@@ -53,9 +53,15 @@ operator()(propertiest &properties)
     show_program(ns, equation);
   }
 
-  return resultt(
-    resultt::progresst::DONE,
-    update_properties_status_from_symex_target_equation(properties, equation));
+  resultt result(resultt::progresst::DONE);
+  update_properties_status_from_symex_target_equation(
+    properties, result.updated_properties, equation);
+  // Since we will not symex any further we can decide the status
+  // of all properties that do not occur in the equation now.
+  // The current behavior is PASS.
+  update_status_of_not_checked_properties(
+    properties, result.updated_properties);
+  return result;
 }
 
 void multi_path_symex_only_checkert::perform_symex()

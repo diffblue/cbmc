@@ -24,12 +24,13 @@ Author: Peter Schrammel
 #include <solvers/prop/literal_expr.h>
 
 #include <goto-symex/build_goto_trace.h>
+
 #include <goto-programs/xml_goto_trace.h>
 
 #include <goto-checker/bmc_util.h>
+#include <goto-checker/counterexample_beautification.h>
 #include <goto-checker/report_util.h>
 
-#include "counterexample_beautification.h"
 
 void fault_localizationt::freeze_guards()
 {
