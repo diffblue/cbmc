@@ -61,11 +61,9 @@ void goto_inlinet::parameter_assignments(
     {
       const symbolt &symbol=ns.lookup(identifier);
 
-      goto_programt::targett decl=dest.add_instruction();
-      decl->make_decl();
-      decl->code=code_declt(symbol.symbol_expr());
+      goto_programt::targett decl = dest.add(
+        goto_programt::make_decl(symbol.symbol_expr(), source_location));
       decl->code.add_source_location()=source_location;
-      decl->source_location=source_location;
       decl->function=adjust_function?target->function:function_name;
     }
 
@@ -169,11 +167,9 @@ void goto_inlinet::parameter_destruction(
     {
       const symbolt &symbol=ns.lookup(identifier);
 
-      goto_programt::targett dead=dest.add_instruction();
-      dead->make_dead();
-      dead->code=code_deadt(symbol.symbol_expr());
+      goto_programt::targett dead = dest.add(
+        goto_programt::make_dead(symbol.symbol_expr(), source_location));
       dead->code.add_source_location()=source_location;
-      dead->source_location=source_location;
       dead->function=adjust_function?target->function:function_name;
     }
   }

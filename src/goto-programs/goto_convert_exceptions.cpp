@@ -83,9 +83,8 @@ void goto_convertt::convert_msc_leave(
     convert(d_code, dest, mode);
   }
 
-  goto_programt::targett t=dest.add_instruction();
-  t->make_goto(targets.leave_target);
-  t->source_location=code.source_location();
+  dest.add(
+    goto_programt::make_goto(targets.leave_target, code.source_location()));
 }
 
 void goto_convertt::convert_try_catch(
@@ -112,8 +111,7 @@ void goto_convertt::convert_try_catch(
 
   // add a SKIP target for the end of everything
   goto_programt end;
-  goto_programt::targett end_target=end.add_instruction();
-  end_target->make_skip();
+  goto_programt::targett end_target = end.add(goto_programt::make_skip());
 
   // the first operand is the 'try' block
   convert(to_code(code.op0()), dest, mode);
@@ -124,7 +122,7 @@ void goto_convertt::convert_try_catch(
   catch_pop_instruction->code=code_pop_catcht();
 
   // add a goto to the end of the 'try' block
-  dest.add_instruction()->make_goto(end_target);
+  dest.add(goto_programt::make_goto(end_target));
 
   for(std::size_t i=1; i<code.operands().size(); i++)
   {
@@ -140,7 +138,7 @@ void goto_convertt::convert_try_catch(
     dest.destructive_append(tmp);
 
     // add a goto to the end of the 'catch' block
-    dest.add_instruction()->make_goto(end_target);
+    dest.add(goto_programt::make_goto(end_target));
   }
 
   catch_push_instruction->code=push_catch_code;
@@ -205,9 +203,8 @@ void goto_convertt::convert_CPROVER_throw(
       code.source_location(), targets.throw_stack_size, dest, mode);
 
     // add goto
-    goto_programt::targett t=dest.add_instruction();
-    t->make_goto(targets.throw_target);
-    t->source_location=code.source_location();
+    dest.add(
+      goto_programt::make_goto(targets.throw_target, code.source_location()));
   }
   else // otherwise, we do a return
   {
@@ -215,9 +212,8 @@ void goto_convertt::convert_CPROVER_throw(
     unwind_destructor_stack(code.source_location(), 0, dest, mode);
 
     // add goto
-    goto_programt::targett t=dest.add_instruction();
-    t->make_goto(targets.return_target);
-    t->source_location=code.source_location();
+    dest.add(
+      goto_programt::make_goto(targets.return_target, code.source_location()));
   }
 }
 
