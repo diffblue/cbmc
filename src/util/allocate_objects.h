@@ -79,9 +79,9 @@ public:
   void mark_created_symbols_as_input(code_blockt &init_code);
 
 private:
-  const irep_idt &symbol_mode;
-  const source_locationt &source_location;
-  const irep_idt &name_prefix;
+  const irep_idt symbol_mode;
+  const source_locationt source_location;
+  const irep_idt name_prefix;
 
   symbol_table_baset &symbol_table;
   const namespacet ns;
