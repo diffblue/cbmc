@@ -20,6 +20,7 @@ public:
   explicit goto_trace_storaget(const namespacet &);
   goto_trace_storaget(const goto_trace_storaget &) = delete;
 
+  /// Store trace that ends in a violated assertion
   const goto_tracet &insert(goto_tracet &&);
 
   const std::vector<goto_tracet> &all() const;

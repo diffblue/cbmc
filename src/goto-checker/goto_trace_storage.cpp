@@ -17,7 +17,7 @@ goto_trace_storaget::goto_trace_storaget(const namespacet &ns) : ns(ns)
 
 const goto_tracet &goto_trace_storaget::insert(goto_tracet &&trace)
 {
-  traces.push_back(trace);
+  traces.push_back(std::move(trace));
   const auto &last_step = traces.back().get_last_step();
   DATA_INVARIANT(
     last_step.is_assert(), "last goto trace step expected to be assertion");
