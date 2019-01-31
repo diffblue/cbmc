@@ -310,7 +310,7 @@ void goto_symext::merge_gotos(statet &state)
   statet::goto_state_listt &state_list=state_map_it->second;
 
   for(auto list_it = state_list.rbegin(); list_it != state_list.rend();
-      list_it++)
+      ++list_it)
     merge_goto(*list_it, state);
 
   // clean up to save some memory
