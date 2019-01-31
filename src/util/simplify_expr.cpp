@@ -1518,10 +1518,10 @@ exprt simplify_exprt::bits2expr(
   if(!type_bits.has_value() || *type_bits != bits.size())
     return nil_exprt();
 
-  if(type.id()==ID_unsignedbv ||
-     type.id()==ID_signedbv ||
-     type.id()==ID_floatbv ||
-     type.id()==ID_fixedbv)
+  if(
+    type.id() == ID_unsignedbv || type.id() == ID_signedbv ||
+    type.id() == ID_floatbv || type.id() == ID_fixedbv ||
+    type.id() == ID_c_bit_field || type.id() == ID_pointer)
   {
     endianness_mapt map(type, little_endian, ns);
 
@@ -1631,6 +1631,49 @@ exprt simplify_exprt::bits2expr(
     }
 
     return std::move(result);
+  }
+  else if(type.id() == ID_vector)
+  {
+    const vector_typet &vector_type = to_vector_type(type);
+
+    const std::size_t n_el = numeric_cast_v<std::size_t>(vector_type.size());
+
+    const auto el_size_opt = pointer_offset_bits(vector_type.subtype(), ns);
+    CHECK_RETURN(el_size_opt.has_value() && *el_size_opt > 0);
+
+    const std::size_t el_size = numeric_cast_v<std::size_t>(*el_size_opt);
+
+    vector_exprt result({}, vector_type);
+    result.reserve_operands(n_el);
+
+    for(std::size_t i = 0; i < n_el; ++i)
+    {
+      std::string el_bits = std::string(bits, i * el_size, el_size);
+      exprt el = bits2expr(el_bits, vector_type.subtype(), little_endian);
+      if(el.is_nil())
+        return nil_exprt();
+      result.add_to_operands(std::move(el));
+    }
+
+    return std::move(result);
+  }
+  else if(type.id() == ID_complex)
+  {
+    const complex_typet &complex_type = to_complex_type(type);
+
+    const auto sub_size_opt = pointer_offset_bits(complex_type.subtype(), ns);
+    CHECK_RETURN(sub_size_opt.has_value() && *sub_size_opt > 0);
+
+    const std::size_t sub_size = numeric_cast_v<std::size_t>(*sub_size_opt);
+
+    exprt real = bits2expr(
+      bits.substr(0, sub_size), complex_type.subtype(), little_endian);
+    exprt imag =
+      bits2expr(bits.substr(sub_size), complex_type.subtype(), little_endian);
+    if(real.is_nil() || imag.is_nil())
+      return nil_exprt();
+
+    return complex_exprt(real, imag, complex_type);
   }
 
   return nil_exprt();
