@@ -6,14 +6,14 @@
 
 .method public <init>()V
         aload_0
-        invokevirtual java/lang/Object/<init>()V
+        invokespecial java/lang/Object/<init>()V
         return
 .end method
 
 .method public f()I
         .limit stack 6
         .limit locals 1
-        .var 0 is this stack_typecast from begin to end
+        .var 0 is this Lstack_typecast; from begin to end
         .line 0
 begin:
 
