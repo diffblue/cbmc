@@ -202,8 +202,6 @@ public:
 
   // gotos
   typedef std::list<goto_statet> goto_state_listt;
-  typedef std::map<goto_programt::const_targett, goto_state_listt>
-    goto_state_mapt;
 
   // guards
   static irep_idt guard_identifier()
@@ -218,7 +216,7 @@ public:
   {
     // function calls
     irep_idt function_identifier;
-    goto_state_mapt goto_state_map;
+    std::map<goto_programt::const_targett, goto_state_listt> goto_state_map;
     symex_targett::sourcet calling_location;
 
     goto_programt::const_targett end_of_function;
