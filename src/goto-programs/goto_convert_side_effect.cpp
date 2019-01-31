@@ -167,30 +167,20 @@ void goto_convertt::remove_pre(
   {
     UNREACHABLE;
   }
-  else if(op_type.id()==ID_c_enum ||
-          op_type.id()==ID_c_enum_tag)
+
+  exprt constant;
+
+  if(constant_type.id() == ID_complex)
   {
-    rhs.copy_to_operands(expr.op0(), from_integer(1, signed_int_type()));
-    rhs.op0().make_typecast(signed_int_type());
-    rhs.type()=signed_int_type();
-    rhs.make_typecast(op_type);
+    exprt real = from_integer(1, constant_type.subtype());
+    exprt imag = from_integer(0, constant_type.subtype());
+    constant = complex_exprt(real, imag, to_complex_type(constant_type));
   }
   else
-  {
-    typet constant_type;
+    constant = from_integer(1, constant_type);
 
-    if(op_type.id()==ID_pointer)
-      constant_type=index_type();
-    else if(is_number(op_type) || op_type.id()==ID_c_bool)
-      constant_type=op_type;
-    else
-    {
-      UNREACHABLE;
-    }
-
-    rhs.add_to_operands(expr.op0(), from_integer(1, constant_type));
-    rhs.type()=expr.op0().type();
-  }
+  rhs.add_to_operands(expr.op0(), std::move(constant));
+  rhs.type() = expr.op0().type();
 
   code_assignt assignment(expr.op0(), rhs);
   assignment.add_source_location()=expr.find_source_location();
