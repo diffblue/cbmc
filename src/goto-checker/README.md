@@ -62,6 +62,12 @@ There are the following variants of goto verifiers at the moment:
   \ref all_properties_verifier_with_trace_storaget,
   \ref all_properties_verifiert does not require to store any traces.
   A trace ends at a violated property.
+* \ref cover_goals_verifier_with_trace_storaget : Determines the status of
+  all properties, but full traces with potentially several failing properties
+  (e.g. coverage goals) are stored and results reported after the
+  verification algorithm has terminated.
+  The reporting uses 'goals' rather than 'property' terminology. I.e.
+  a failing property means 'success' and a passing property 'failed'.
 
 There are the following variants of incremental goto checkers at the moment:
 * \ref multi_path_symex_checkert : The default mode of goto-symex. It explores
