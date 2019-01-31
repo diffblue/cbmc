@@ -53,7 +53,7 @@ operator()(propertiest &properties)
     show_program(ns, equation);
   }
 
-  resultt result;
+  resultt result(resultt::progresst::DONE);
   update_properties_status_from_symex_target_equation(
     properties, result.updated_properties, equation);
   return result;

@@ -49,7 +49,10 @@ public:
       DONE
     };
 
-    progresst progress = progresst::DONE;
+    progresst progress;
+
+    resultt() = delete;
+    explicit resultt(progresst);
 
     /// Changed properties since the last call to
     /// `incremental_goto_checkert::operator()`

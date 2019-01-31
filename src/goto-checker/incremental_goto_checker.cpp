@@ -19,3 +19,8 @@ incremental_goto_checkert::incremental_goto_checkert(
     log(ui_message_handler)
 {
 }
+
+incremental_goto_checkert::resultt::resultt(resultt::progresst progress)
+  : progress(progress)
+{
+}
