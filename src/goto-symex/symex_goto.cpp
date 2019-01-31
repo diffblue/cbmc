@@ -301,8 +301,7 @@ void goto_symext::merge_gotos(statet &state)
   statet::framet &frame=state.top();
 
   // first, see if this is a target at all
-  statet::goto_state_mapt::iterator state_map_it=
-    frame.goto_state_map.find(state.source.pc);
+  auto state_map_it = frame.goto_state_map.find(state.source.pc);
 
   if(state_map_it==frame.goto_state_map.end())
     return; // nothing to do
@@ -310,9 +309,7 @@ void goto_symext::merge_gotos(statet &state)
   // we need to merge
   statet::goto_state_listt &state_list=state_map_it->second;
 
-  for(statet::goto_state_listt::reverse_iterator
-      list_it=state_list.rbegin();
-      list_it!=state_list.rend();
+  for(auto list_it = state_list.rbegin(); list_it != state_list.rend();
       list_it++)
     merge_goto(*list_it, state);
 
