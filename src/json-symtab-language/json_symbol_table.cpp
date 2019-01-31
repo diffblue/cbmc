@@ -49,4 +49,6 @@ void symbol_table_from_json(const jsont &in, symbol_tablet &symbol_table)
         "symbol_table_from_json: duplicate symbol name `" +
         id2string(symbol.name) + "`");
   }
+
+  symbol_table.validate(validation_modet::EXCEPTION);
 }
