@@ -136,6 +136,7 @@ xmlt xml(const exprt &expr, const namespacet &ns)
   if(expr.id() == ID_constant)
   {
     const auto &constant_expr = to_constant_expr(expr);
+    const auto &value = constant_expr.get_value();
 
     const typet &type = expr.type();
 
@@ -175,10 +176,14 @@ xmlt xml(const exprt &expr, const namespacet &ns)
     }
     else if(type.id() == ID_c_enum)
     {
+      const auto width =
+        to_bitvector_type(to_c_enum_type(type).subtype()).get_width();
+
       result.name = "integer";
-      result.set_attribute("binary", constant_expr.get_string(ID_value));
       result.set_attribute(
-        "width", to_bitvector_type(to_c_enum_type(type).subtype()).get_width());
+        "binary",
+        integer2binary(numeric_cast_v<mp_integer>(constant_expr), width));
+      result.set_attribute("width", width);
       result.set_attribute("c_type", "enum");
 
       mp_integer i;
@@ -198,22 +203,28 @@ xmlt xml(const exprt &expr, const namespacet &ns)
     }
     else if(type.id() == ID_fixedbv)
     {
+      const auto width = to_fixedbv_type(type).get_width();
       result.name = "fixed";
-      result.set_attribute("width", to_bitvector_type(type).get_width());
-      result.set_attribute("binary", constant_expr.get_string(ID_value));
+      result.set_attribute("width", width);
+      result.set_attribute(
+        "binary", integer2binary(bvrep2integer(value, width, false), width));
       result.data = fixedbvt(constant_expr).to_ansi_c_string();
     }
     else if(type.id() == ID_floatbv)
     {
+      const auto width = to_floatbv_type(type).get_width();
       result.name = "float";
-      result.set_attribute("width", to_bitvector_type(type).get_width());
-      result.set_attribute("binary", constant_expr.get_string(ID_value));
+      result.set_attribute("width", width);
+      result.set_attribute(
+        "binary", integer2binary(bvrep2integer(value, width, false), width));
       result.data = ieee_floatt(constant_expr).to_ansi_c_string();
     }
     else if(type.id() == ID_pointer)
     {
+      const auto width = to_pointer_type(type).get_width();
       result.name = "pointer";
-      result.set_attribute("binary", constant_expr.get_string(ID_value));
+      result.set_attribute(
+        "binary", integer2binary(bvrep2integer(value, width, false), width));
       if(constant_expr.get(ID_value) == ID_NULL)
         result.data = "NULL";
     }
