@@ -1,0 +1,10 @@
+CORE
+main.c
+
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+^\[main.assertion.1\] line 12 should succeed: SUCCESS$
+^\[main.assertion.2\] line 15 should fail: FAILURE$
+--
+^warning: ignoring

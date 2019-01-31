@@ -16,6 +16,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
 
+#include <solvers/lowering/expr_lowering.h>
+
 bvt boolbvt::convert_index(const index_exprt &expr)
 {
   const exprt &array=expr.array();
@@ -47,7 +49,10 @@ bvt boolbvt::convert_index(const index_exprt &expr)
       for(std::size_t i=0; i<width; i++)
         bv[i]=prop.new_variable();
 
-      record_array_index(expr);
+      if(has_byte_operator(expr))
+        record_array_index(to_index_expr(lower_byte_operators(expr, ns)));
+      else
+        record_array_index(expr);
 
       // record type if array is a symbol
 

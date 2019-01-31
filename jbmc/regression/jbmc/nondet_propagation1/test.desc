@@ -1,0 +1,7 @@
+CORE
+andNot_Bug.class
+--depth 1600 --java-unwind-enum-static --java-max-vla-length 48 --unwind 4 --max-nondet-string-length 100  --function andNot_Bug.main
+^EXIT=0$
+^SIGNAL=0$
+--
+--

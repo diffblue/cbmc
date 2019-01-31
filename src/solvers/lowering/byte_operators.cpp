@@ -477,9 +477,7 @@ static exprt unpack_rec(
       auto component_bits = pointer_offset_bits(comp.type(), ns);
 
       // the next member would be misaligned, abort
-      if(
-        !component_bits.has_value() || *component_bits == 0 ||
-        *component_bits % 8 != 0)
+      if(!component_bits.has_value() || *component_bits % 8 != 0)
       {
         throw non_byte_alignedt(struct_type, comp, *component_bits);
       }
@@ -1282,9 +1280,7 @@ static exprt lower_byte_update_struct(
     auto element_width = pointer_offset_bits(comp.type(), ns);
 
     // the next member would be misaligned, abort
-    if(
-      !element_width.has_value() || *element_width == 0 ||
-      *element_width % 8 != 0)
+    if(!element_width.has_value() || *element_width % 8 != 0)
     {
       throw non_byte_alignedt(struct_type, comp, *element_width);
     }
@@ -1567,9 +1563,7 @@ static exprt lower_byte_update(
   }
 }
 
-static exprt lower_byte_update(
-  const byte_update_exprt &src,
-  const namespacet &ns)
+exprt lower_byte_update(const byte_update_exprt &src, const namespacet &ns)
 {
   DATA_INVARIANT(
     src.id() == ID_byte_update_little_endian ||
