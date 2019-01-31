@@ -814,6 +814,13 @@ public:
     return instructiont(code_returnt(), irep_idt(), l, RETURN, nil_exprt(), {});
   }
 
+  static instructiont make_return(
+    code_returnt c,
+    const source_locationt &l = source_locationt::nil())
+  {
+    return instructiont(std::move(c), irep_idt(), l, RETURN, nil_exprt(), {});
+  }
+
   static instructiont
   make_skip(const source_locationt &l = source_locationt::nil())
   {
