@@ -1,0 +1,9 @@
+CORE
+ArrayClone.class
+--function ArrayClone.cloneFloatArray
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+Verify that clone works correctly for float arrays
