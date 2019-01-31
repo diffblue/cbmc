@@ -127,6 +127,8 @@ xmlt xml(const exprt &expr, const namespacet &ns)
 
   if(expr.id() == ID_constant)
   {
+    const auto &constant_expr = to_constant_expr(expr);
+
     if(
       type.id() == ID_unsignedbv || type.id() == ID_signedbv ||
       type.id() == ID_c_bit_field)
@@ -135,7 +137,8 @@ xmlt xml(const exprt &expr, const namespacet &ns)
 
       result.name = "integer";
       result.set_attribute(
-        "binary", integer2binary(numeric_cast_v<mp_integer>(expr), width));
+        "binary",
+        integer2binary(numeric_cast_v<mp_integer>(constant_expr), width));
       result.set_attribute("width", width);
 
       const typet &underlying_type = type.id() == ID_c_bit_field
@@ -158,66 +161,65 @@ xmlt xml(const exprt &expr, const namespacet &ns)
         result.set_attribute("c_type", sig + "long long int");
 
       mp_integer i;
-      if(!to_integer(to_constant_expr(expr), i))
+      if(!to_integer(expr, i))
         result.data = integer2string(i);
     }
     else if(type.id() == ID_c_enum)
     {
       result.name = "integer";
-      result.set_attribute("binary", expr.get_string(ID_value));
+      result.set_attribute("binary", constant_expr.get_string(ID_value));
       result.set_attribute(
         "width", to_bitvector_type(to_c_enum_type(type).subtype()).get_width());
       result.set_attribute("c_type", "enum");
 
       mp_integer i;
-      if(!to_integer(to_constant_expr(expr), i))
+      if(!to_integer(constant_expr, i))
         result.data = integer2string(i);
     }
     else if(type.id() == ID_c_enum_tag)
     {
       constant_exprt tmp(
-        to_constant_expr(expr).get_value(),
-        ns.follow_tag(to_c_enum_tag_type(type)));
+        constant_expr.get_value(), ns.follow_tag(to_c_enum_tag_type(type)));
       return xml(tmp, ns);
     }
     else if(type.id() == ID_bv)
     {
       result.name = "bitvector";
-      result.set_attribute("binary", expr.get_string(ID_value));
+      result.set_attribute("binary", constant_expr.get_string(ID_value));
     }
     else if(type.id() == ID_fixedbv)
     {
       result.name = "fixed";
       result.set_attribute("width", to_bitvector_type(type).get_width());
-      result.set_attribute("binary", expr.get_string(ID_value));
-      result.data = fixedbvt(to_constant_expr(expr)).to_ansi_c_string();
+      result.set_attribute("binary", constant_expr.get_string(ID_value));
+      result.data = fixedbvt(constant_expr).to_ansi_c_string();
     }
     else if(type.id() == ID_floatbv)
     {
       result.name = "float";
       result.set_attribute("width", to_bitvector_type(type).get_width());
-      result.set_attribute("binary", expr.get_string(ID_value));
-      result.data = ieee_floatt(to_constant_expr(expr)).to_ansi_c_string();
+      result.set_attribute("binary", constant_expr.get_string(ID_value));
+      result.data = ieee_floatt(constant_expr).to_ansi_c_string();
     }
     else if(type.id() == ID_pointer)
     {
       result.name = "pointer";
-      result.set_attribute("binary", expr.get_string(ID_value));
-      if(expr.get(ID_value) == ID_NULL)
+      result.set_attribute("binary", constant_expr.get_string(ID_value));
+      if(constant_expr.get(ID_value) == ID_NULL)
         result.data = "NULL";
     }
     else if(type.id() == ID_bool)
     {
       result.name = "boolean";
-      result.set_attribute("binary", expr.is_true() ? "1" : "0");
-      result.data = expr.is_true() ? "TRUE" : "FALSE";
+      result.set_attribute("binary", constant_expr.is_true() ? "1" : "0");
+      result.data = constant_expr.is_true() ? "TRUE" : "FALSE";
     }
     else if(type.id() == ID_c_bool)
     {
       result.name = "integer";
       result.set_attribute("c_type", "_Bool");
-      result.set_attribute("binary", expr.get_string(ID_value));
-      const mp_integer b = numeric_cast_v<mp_integer>(expr);
+      result.set_attribute("binary", constant_expr.get_string(ID_value));
+      const mp_integer b = numeric_cast_v<mp_integer>(constant_expr);
       result.data = integer2string(b);
     }
     else
