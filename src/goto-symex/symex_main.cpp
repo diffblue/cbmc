@@ -53,7 +53,7 @@ void symex_transition(
     // 1. the transition from state.source.pc to "to" is not a backwards goto
     // or
     // 2. we are arriving from an outer loop
-    goto_symext::statet::framet &frame = state.top();
+    framet &frame = state.top();
     const goto_programt::instructiont &instruction=*to;
     for(const auto &i_e : instruction.incoming_edges)
       if(i_e->is_goto() && i_e->is_backwards_goto() &&

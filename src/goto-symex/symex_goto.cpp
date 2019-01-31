@@ -25,7 +25,7 @@ Author: Daniel Kroening, kroening@kroening.com
 void goto_symext::symex_goto(statet &state)
 {
   const goto_programt::instructiont &instruction=*state.source.pc;
-  statet::framet &frame=state.top();
+  framet &frame = state.top();
 
   if(state.guard.is_false())
   {
@@ -217,7 +217,7 @@ void goto_symext::symex_goto(statet &state)
   }
 
   // put into state-queue
-  statet::goto_state_listt &goto_state_list=
+  framet::goto_state_listt &goto_state_list =
     state.top().goto_state_map[new_state_pc];
 
   goto_state_list.emplace_back(state);
@@ -298,7 +298,7 @@ void goto_symext::symex_goto(statet &state)
 
 void goto_symext::merge_gotos(statet &state)
 {
-  statet::framet &frame=state.top();
+  framet &frame = state.top();
 
   // first, see if this is a target at all
   auto state_map_it = frame.goto_state_map.find(state.source.pc);
@@ -307,7 +307,7 @@ void goto_symext::merge_gotos(statet &state)
     return; // nothing to do
 
   // we need to merge
-  statet::goto_state_listt &state_list=state_map_it->second;
+  framet::goto_state_listt &state_list = state_map_it->second;
 
   for(auto list_it = state_list.rbegin(); list_it != state_list.rend();
       ++list_it)
