@@ -573,12 +573,28 @@ public:
     return instructions.insert(target, instructiont());
   }
 
+  /// Insertion before the instruction pointed-to by the given instruction
+  /// iterator `target`.
+  /// \return newly inserted location
+  targett insert_before(const_targett target, const instructiont &i)
+  {
+    return instructions.insert(target, i);
+  }
+
   /// Insertion after the instruction pointed-to by the given instruction
   /// iterator `target`.
   /// \return newly inserted location
   targett insert_after(const_targett target)
   {
     return instructions.insert(std::next(target), instructiont());
+  }
+
+  /// Insertion after the instruction pointed-to by the given instruction
+  /// iterator `target`.
+  /// \return newly inserted location
+  targett insert_after(const_targett target, const instructiont &i)
+  {
+    return instructions.insert(std::next(target), i);
   }
 
   /// Appends the given program `p` to `*this`. `p` is destroyed.
