@@ -38,16 +38,6 @@ class namespacet;
 class side_effect_exprt;
 class typecast_exprt;
 
-/// Functor generating fresh nondet symbols
-class symex_nondet_generatort
-{
-public:
-  nondet_symbol_exprt operator()(typet &type);
-
-private:
-  unsigned nondet_count = 0;
-};
-
 /// Configuration of the symbolic execution
 struct symex_configt final
 {
@@ -418,7 +408,6 @@ protected:
   virtual void symex_input(statet &, const codet &);
   virtual void symex_output(statet &, const codet &);
 
-  symex_nondet_generatort build_symex_nondet;
   static unsigned dynamic_counter;
 
   void rewrite_quantifiers(exprt &, statet &);

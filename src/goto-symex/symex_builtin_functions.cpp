@@ -178,7 +178,7 @@ void goto_symext::symex_allocate(
   }
   else
   {
-    const exprt nondet = build_symex_nondet(*object_type);
+    const exprt nondet = path_storage.build_symex_nondet(*object_type);
     const code_assignt assignment(value_symbol.symbol_expr(), nondet);
     symex_assign(state, assignment);
   }

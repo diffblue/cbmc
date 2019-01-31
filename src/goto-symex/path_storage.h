@@ -15,6 +15,16 @@
 
 #include <memory>
 
+/// Functor generating fresh nondet symbols
+class symex_nondet_generatort
+{
+public:
+  nondet_symbol_exprt operator()(const typet &type);
+
+private:
+  std::size_t nondet_count = 0;
+};
+
 /// \brief Storage for symbolic execution paths to be resumed later
 ///
 /// This data structure supports saving partially-executed symbolic
@@ -84,6 +94,9 @@ public:
   {
     return size() == 0;
   };
+
+  /// Counter for nondet objects, which require unique names
+  symex_nondet_generatort build_symex_nondet;
 
 private:
   // Derived classes should override these methods, allowing the base class to
