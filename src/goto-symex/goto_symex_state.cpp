@@ -343,25 +343,20 @@ void goto_symex_statet::rename(
   }
   else
   {
-    // this could go wrong, but we would have to re-typecheck ...
     rename(expr.type(), irep_idt(), ns, level);
 
     // do this recursively
     Forall_operands(it, expr)
       rename(*it, ns, level);
 
-    // some fixes
-    if(expr.id()==ID_with)
-      expr.type()=to_with_expr(expr).old().type();
-    else if(expr.id()==ID_if)
-    {
-      DATA_INVARIANT(
-        to_if_expr(expr).true_case().type() ==
-          to_if_expr(expr).false_case().type(),
-        "true case of to_if_expr should be of same type "
-        "as false case");
-      expr.type()=to_if_expr(expr).true_case().type();
-    }
+    INVARIANT(
+      (expr.id() != ID_with ||
+       expr.type() == to_with_expr(expr).old().type()) &&
+        (expr.id() != ID_if ||
+         (expr.type() == to_if_expr(expr).true_case().type() &&
+          expr.type() == to_if_expr(expr).false_case().type())),
+      "Type of renamed expr should be the same as operands for with_exprt and "
+      "if_exprt");
   }
 }
 
