@@ -238,8 +238,8 @@ public:
     };
     std::unordered_map<irep_idt, loop_infot> loop_iterations;
 
-    explicit framet(const symex_targett::sourcet &_calling_location)
-      : calling_location(_calling_location)
+    explicit framet(symex_targett::sourcet _calling_location)
+      : calling_location(std::move(_calling_location))
     {
     }
   };
