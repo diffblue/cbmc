@@ -220,7 +220,7 @@ void goto_symext::symex_goto(statet &state)
   statet::goto_state_listt &goto_state_list=
     state.top().goto_state_map[new_state_pc];
 
-  goto_state_list.push_back(statet::goto_statet(state));
+  goto_state_list.emplace_back(state);
 
   symex_transition(state, state_pc, backward);
 
@@ -281,7 +281,7 @@ void goto_symext::symex_goto(statet &state)
     }
     else
     {
-      statet::goto_statet &new_state = goto_state_list.back();
+      goto_statet &new_state = goto_state_list.back();
       if(!backward)
       {
         new_state.guard.add(guard_expr);
@@ -320,9 +320,7 @@ void goto_symext::merge_gotos(statet &state)
   frame.goto_state_map.erase(state_map_it);
 }
 
-void goto_symext::merge_goto(
-  const statet::goto_statet &goto_state,
-  statet &state)
+void goto_symext::merge_goto(const goto_statet &goto_state, statet &state)
 {
   // check atomic section
   if(state.atomic_section_id != goto_state.atomic_section_id)
@@ -342,9 +340,7 @@ void goto_symext::merge_goto(
   state.depth=std::min(state.depth, goto_state.depth);
 }
 
-void goto_symext::merge_value_sets(
-  const statet::goto_statet &src,
-  statet &dest)
+void goto_symext::merge_value_sets(const goto_statet &src, statet &dest)
 {
   if(dest.guard.is_false())
   {
@@ -403,7 +399,7 @@ static void for_each2(
 ///   \p l1_identifier
 /// \param dest_count: level 2 count in \p dest_state of \p l1_identifier
 static void merge_names(
-  const goto_symext::statet::goto_statet &goto_state,
+  const goto_statet &goto_state,
   goto_symext::statet &dest_state,
   const namespacet &ns,
   const guardt &diff_guard,
@@ -521,7 +517,7 @@ static void merge_names(
 }
 
 void goto_symext::phi_function(
-  const statet::goto_statet &goto_state,
+  const goto_statet &goto_state,
   statet &dest_state)
 {
   if(

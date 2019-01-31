@@ -30,6 +30,40 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "renaming_level.h"
 #include "symex_target_equation.h"
 
+/// Container for data that varies per program point, e.g. the constant
+/// propagator state, when state needs to branch. This is copied out of
+/// goto_symex_statet at a control-flow fork and then back into it at a
+/// control-flow merge.
+class goto_statet
+{
+public:
+  unsigned depth;
+  symex_level2t::current_namest level2_current_names;
+  value_sett value_set;
+  guardt guard;
+  symex_targett::sourcet source;
+  std::map<irep_idt, exprt> propagation;
+  unsigned atomic_section_id;
+  std::unordered_map<irep_idt, local_safe_pointerst> safe_pointers;
+  unsigned total_vccs, remaining_vccs;
+
+  // the below replicate levelt2 member functions
+  void
+  level2_get_variables(std::unordered_set<ssa_exprt, irep_hash> &vars) const
+  {
+    for(const auto &pair : level2_current_names)
+      vars.insert(pair.second.first);
+  }
+
+  unsigned level2_current_count(const irep_idt &identifier) const
+  {
+    const auto it = level2_current_names.find(identifier);
+    return it == level2_current_names.end() ? 0 : it->second.second;
+  }
+
+  goto_statet(const class goto_symex_statet &s);
+};
+
 /// Central data structure: state.
 
 /// The state is a persistent data structure that symex maintains as it
@@ -154,52 +188,6 @@ public:
   // uses level 1 names, and is used to
   // do dereferencing
   value_sett value_set;
-
-  /// Container for data that varies per program point, e.g. the constant
-  /// propagator state, when state needs to branch. This is copied out of
-  /// goto_symex_statet at a control-flow fork and then back into it at a
-  /// control-flow merge.
-  class goto_statet
-  {
-  public:
-    unsigned depth;
-    symex_level2t::current_namest level2_current_names;
-    value_sett value_set;
-    guardt guard;
-    symex_targett::sourcet source;
-    std::map<irep_idt, exprt> propagation;
-    unsigned atomic_section_id;
-    std::unordered_map<irep_idt, local_safe_pointerst> safe_pointers;
-    unsigned total_vccs, remaining_vccs;
-
-    explicit goto_statet(const goto_symex_statet &s)
-      : depth(s.depth),
-        level2_current_names(s.level2.current_names),
-        value_set(s.value_set),
-        guard(s.guard),
-        source(s.source),
-        propagation(s.propagation),
-        atomic_section_id(s.atomic_section_id),
-        safe_pointers(s.safe_pointers),
-        total_vccs(s.total_vccs),
-        remaining_vccs(s.remaining_vccs)
-    {
-    }
-
-    // the below replicate levelt2 member functions
-    void level2_get_variables(
-      std::unordered_set<ssa_exprt, irep_hash> &vars) const
-    {
-      for(const auto &pair : level2_current_names)
-        vars.insert(pair.second.first);
-    }
-
-    unsigned level2_current_count(const irep_idt &identifier) const
-    {
-      const auto it = level2_current_names.find(identifier);
-      return it==level2_current_names.end()?0:it->second.second;
-    }
-  };
 
   explicit goto_symex_statet(const goto_statet &s)
     : depth(s.depth),
@@ -354,5 +342,20 @@ private:
   /// private copy constructor as a delegate.
   goto_symex_statet(const goto_symex_statet &other) = default;
 };
+
+inline goto_statet::goto_statet(const class goto_symex_statet &s)
+  : depth(s.depth),
+    level2_current_names(s.level2.current_names),
+    value_set(s.value_set),
+    guard(s.guard),
+    source(s.source),
+    propagation(s.propagation),
+    atomic_section_id(s.atomic_section_id),
+    safe_pointers(s.safe_pointers),
+    total_vccs(s.total_vccs),
+    remaining_vccs(s.remaining_vccs)
+{
+}
+
 
 #endif // CPROVER_GOTO_SYMEX_GOTO_SYMEX_STATE_H
