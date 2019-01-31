@@ -1690,10 +1690,10 @@ optionalt<std::string> simplify_exprt::expr2bits(
   {
     const auto &value = to_constant_expr(expr).get_value();
 
-    if(type.id()==ID_unsignedbv ||
-       type.id()==ID_signedbv ||
-       type.id()==ID_floatbv ||
-       type.id()==ID_fixedbv)
+    if(
+      type.id() == ID_unsignedbv || type.id() == ID_signedbv ||
+      type.id() == ID_floatbv || type.id() == ID_fixedbv ||
+      type.id() == ID_c_bit_field || type.id() == ID_pointer)
     {
       const auto width = to_bitvector_type(type).get_width();
 
@@ -1721,20 +1721,9 @@ optionalt<std::string> simplify_exprt::expr2bits(
   {
     return expr2bits(to_union_expr(expr).op(), little_endian);
   }
-  else if(expr.id()==ID_struct)
-  {
-    std::string result;
-    forall_operands(it, expr)
-    {
-      auto tmp=expr2bits(*it, little_endian);
-      if(!tmp.has_value())
-        return {}; // failed
-      result+=tmp.value();
-    }
-
-    return result;
-  }
-  else if(expr.id()==ID_array)
+  else if(
+    expr.id() == ID_struct || expr.id() == ID_array || expr.id() == ID_vector ||
+    expr.id() == ID_complex)
   {
     std::string result;
     forall_operands(it, expr)
