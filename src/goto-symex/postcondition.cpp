@@ -134,7 +134,7 @@ void postconditiont::strengthen(exprt &dest)
       return;
 
     equal_exprt equality(SSA_step.ssa_lhs, SSA_step.ssa_rhs);
-    s.get_original_name(equality);
+    get_original_name(equality);
 
     if(dest.is_true())
       dest.swap(equality);
@@ -173,7 +173,7 @@ bool postconditiont::is_used(
         it++)
     {
       exprt tmp(*it);
-      s.get_original_name(tmp);
+      get_original_name(tmp);
       find_symbols(tmp, symbols);
     }
 

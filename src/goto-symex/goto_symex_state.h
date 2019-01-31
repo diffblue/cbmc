@@ -163,9 +163,6 @@ public:
     bool record_value,
     bool allow_pointer_unsoundness=false);
 
-  // undoes all levels of renaming
-  void get_original_name(exprt &expr) const;
-  void get_original_name(typet &type) const;
 protected:
   void rename_address(exprt &expr, const namespacet &ns, levelt level);
 

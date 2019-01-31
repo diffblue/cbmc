@@ -697,42 +697,6 @@ void goto_symex_statet::rename(
     l1_type_entry.first->second=type;
 }
 
-void goto_symex_statet::get_original_name(exprt &expr) const
-{
-  get_original_name(expr.type());
-
-  if(expr.id()==ID_symbol &&
-     expr.get_bool(ID_C_SSA_symbol))
-    expr=to_ssa_expr(expr).get_original_expr();
-  else
-    Forall_operands(it, expr)
-      get_original_name(*it);
-}
-
-void goto_symex_statet::get_original_name(typet &type) const
-{
-  // rename all the symbols with their last known value
-
-  if(type.id()==ID_array)
-  {
-    auto &array_type = to_array_type(type);
-    get_original_name(array_type.subtype());
-    get_original_name(array_type.size());
-  }
-  else if(type.id() == ID_struct || type.id() == ID_union)
-  {
-    struct_union_typet &s_u_type=to_struct_union_type(type);
-    struct_union_typet::componentst &components=s_u_type.components();
-
-    for(auto &component : components)
-      get_original_name(component.type());
-  }
-  else if(type.id()==ID_pointer)
-  {
-    get_original_name(to_pointer_type(type).subtype());
-  }
-}
-
 static void get_l1_name(exprt &expr)
 {
   // do not reset the type !

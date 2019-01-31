@@ -260,7 +260,7 @@ void goto_symext::dereference_rec(
       const irep_idt &expr_function = state.source.function_id;
       if(!expr_function.empty())
       {
-        state.get_original_name(to_check);
+        get_original_name(to_check);
 
         expr_is_not_null =
           state.safe_pointers.at(expr_function).is_safe_dereference(
