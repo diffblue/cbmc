@@ -103,6 +103,10 @@ xmlt xml(const typet &type, const namespacet &ns)
       e.new_element("type").new_element() = xml(component.type(), ns);
     }
   }
+  else if(type.id() == ID_struct_tag)
+  {
+    return xml(ns.follow_tag(to_struct_tag_type(type)), ns);
+  }
   else if(type.id() == ID_union)
   {
     result.name = "union";
@@ -115,6 +119,10 @@ xmlt xml(const typet &type, const namespacet &ns)
       e.new_element("type").new_element() = xml(component.type(), ns);
     }
   }
+  else if(type.id() == ID_union_tag)
+  {
+    return xml(ns.follow_tag(to_union_tag_type(type)), ns);
+  }
   else
     result.name = "unknown";
 
@@ -125,11 +133,11 @@ xmlt xml(const exprt &expr, const namespacet &ns)
 {
   xmlt result;
 
-  const typet &type = ns.follow(expr.type());
-
   if(expr.id() == ID_constant)
   {
     const auto &constant_expr = to_constant_expr(expr);
+
+    const typet &type = expr.type();
 
     if(
       type.id() == ID_unsignedbv || type.id() == ID_signedbv ||
@@ -237,6 +245,8 @@ xmlt xml(const exprt &expr, const namespacet &ns)
   else if(expr.id() == ID_struct)
   {
     result.name = "struct";
+
+    const typet &type = ns.follow(expr.type());
 
     // these are expected to have a struct type
     if(type.id() == ID_struct)
