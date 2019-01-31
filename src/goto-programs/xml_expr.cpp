@@ -133,14 +133,13 @@ xmlt xml(const exprt &expr, const namespacet &ns)
 
     if(
       type.id() == ID_unsignedbv || type.id() == ID_signedbv ||
-      type.id() == ID_c_bit_field)
+      type.id() == ID_c_bit_field || type.id() == ID_c_bool)
     {
+      mp_integer i = numeric_cast_v<mp_integer>(constant_expr);
       std::size_t width = to_bitvector_type(type).get_width();
 
       result.name = "integer";
-      result.set_attribute(
-        "binary",
-        integer2binary(numeric_cast_v<mp_integer>(constant_expr), width));
+      result.set_attribute("binary", integer2binary(i, width));
       result.set_attribute("width", width);
 
       const typet &underlying_type = type.id() == ID_c_bit_field
@@ -151,7 +150,9 @@ xmlt xml(const exprt &expr, const namespacet &ns)
 
       std::string sig = is_signed ? "" : "unsigned ";
 
-      if(width == config.ansi_c.char_width)
+      if(type.id() == ID_c_bool)
+        result.set_attribute("c_type", "_Bool");
+      else if(width == config.ansi_c.char_width)
         result.set_attribute("c_type", sig + "char");
       else if(width == config.ansi_c.int_width)
         result.set_attribute("c_type", sig + "int");
@@ -162,9 +163,7 @@ xmlt xml(const exprt &expr, const namespacet &ns)
       else if(width == config.ansi_c.long_long_int_width)
         result.set_attribute("c_type", sig + "long long int");
 
-      mp_integer i;
-      if(!to_integer(expr, i))
-        result.data = integer2string(i);
+      result.data = integer2string(i);
     }
     else if(type.id() == ID_c_enum)
     {
@@ -215,14 +214,6 @@ xmlt xml(const exprt &expr, const namespacet &ns)
       result.name = "boolean";
       result.set_attribute("binary", constant_expr.is_true() ? "1" : "0");
       result.data = constant_expr.is_true() ? "TRUE" : "FALSE";
-    }
-    else if(type.id() == ID_c_bool)
-    {
-      result.name = "integer";
-      result.set_attribute("c_type", "_Bool");
-      result.set_attribute("binary", constant_expr.get_string(ID_value));
-      const mp_integer b = numeric_cast_v<mp_integer>(constant_expr);
-      result.data = integer2string(b);
     }
     else
     {
