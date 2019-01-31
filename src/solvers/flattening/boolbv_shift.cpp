@@ -47,11 +47,12 @@ bvt boolbvt::convert_shift(const binary_exprt &expr)
   else
     UNREACHABLE;
 
-  // we allow a constant as shift distance
+  // we optimise for the special case where the shift distance
+  // is a constant
 
   if(expr.op1().is_constant())
   {
-    mp_integer i = numeric_cast_v<mp_integer>(expr.op1());
+    mp_integer i = numeric_cast_v<mp_integer>(to_constant_expr(expr.op1()));
 
     std::size_t distance;
 

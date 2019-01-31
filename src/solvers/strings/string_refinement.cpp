@@ -972,7 +972,7 @@ static std::string string_of_array(const array_exprt &arr)
     return std::string("");
 
   exprt size_expr = to_array_type(arr.type()).size();
-  auto n = numeric_cast_v<std::size_t>(size_expr);
+  auto n = numeric_cast_v<std::size_t>(to_constant_expr(size_expr));
   return utf16_constant_array_to_java(arr, n);
 }
 
@@ -1203,10 +1203,10 @@ static exprt negation_of_not_contains_constraint(
   const std::function<exprt(const exprt &)> &get)
 {
   // If the for all is vacuously true, the negation is false.
-  const auto lbe =
-    numeric_cast_v<mp_integer>(get(constraint.exists_lower_bound));
-  const auto ube =
-    numeric_cast_v<mp_integer>(get(constraint.exists_upper_bound));
+  const auto lbe = numeric_cast_v<mp_integer>(
+    to_constant_expr(get(constraint.exists_lower_bound)));
+  const auto ube = numeric_cast_v<mp_integer>(
+    to_constant_expr(get(constraint.exists_upper_bound)));
   const auto univ_bounds = and_exprt(
     binary_relation_exprt(get(constraint.univ_lower_bound), ID_le, univ_var),
     binary_relation_exprt(get(constraint.univ_upper_bound), ID_gt, univ_var));

@@ -92,7 +92,7 @@ static void remove_vector(exprt &expr)
       array_typet array_type=to_array_type(expr.type());
 
       const mp_integer dimension =
-        numeric_cast_v<mp_integer>(array_type.size());
+        numeric_cast_v<mp_integer>(to_constant_expr(array_type.size()));
 
       const typet subtype=array_type.subtype();
       // do component-wise:
@@ -119,7 +119,7 @@ static void remove_vector(exprt &expr)
       array_typet array_type=to_array_type(expr.type());
 
       const mp_integer dimension =
-        numeric_cast_v<mp_integer>(array_type.size());
+        numeric_cast_v<mp_integer>(to_constant_expr(array_type.size()));
 
       const typet subtype=array_type.subtype();
       // do component-wise:
@@ -150,7 +150,8 @@ static void remove_vector(exprt &expr)
         // (vector-type) x ==> { x, x, ..., x }
         remove_vector(expr.type());
         array_typet array_type = to_array_type(expr.type());
-        const auto dimension = numeric_cast_v<std::size_t>(array_type.size());
+        const auto dimension =
+          numeric_cast_v<std::size_t>(to_constant_expr(array_type.size()));
         exprt casted_op =
           typecast_exprt::conditional_cast(op, array_type.subtype());
         expr = array_exprt(exprt::operandst(dimension, casted_op), array_type);

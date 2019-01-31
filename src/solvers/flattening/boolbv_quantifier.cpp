@@ -87,8 +87,10 @@ get_quantifier_var_max(const exprt &var_expr, const exprt &quantifier_expr)
         continue;
       if(expr_eq(var_expr, x.op0()) && x.op1().id()==ID_constant)
       {
-        exprt over_expr=x.op1();
+        const constant_exprt &over_expr = to_constant_expr(x.op1());
+
         mp_integer over_i = numeric_cast_v<mp_integer>(over_expr);
+
         /**
          * Due to the ''simplify'',
          * the ''over_i'' value we obtain here is not the exact
@@ -115,7 +117,7 @@ get_quantifier_var_max(const exprt &var_expr, const exprt &quantifier_expr)
         continue;
       if(expr_eq(var_expr, y.op0()) && y.op1().id()==ID_constant)
       {
-        exprt over_expr=y.op1();
+        const constant_exprt &over_expr = to_constant_expr(y.op1());
         mp_integer over_i = numeric_cast_v<mp_integer>(over_expr);
         over_i-=1;
         res=from_integer(over_i, y.op1().type());
@@ -149,8 +151,8 @@ instantiate_quantifier(const quantifier_exprt &expr, const namespacet &ns)
   if(min_i.is_false() || max_i.is_false())
     return nullopt;
 
-  mp_integer lb = numeric_cast_v<mp_integer>(min_i);
-  mp_integer ub = numeric_cast_v<mp_integer>(max_i);
+  mp_integer lb = numeric_cast_v<mp_integer>(to_constant_expr(min_i));
+  mp_integer ub = numeric_cast_v<mp_integer>(to_constant_expr(max_i));
 
   if(lb>ub)
     return nullopt;

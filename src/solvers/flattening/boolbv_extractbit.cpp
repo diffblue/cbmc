@@ -19,11 +19,13 @@ Author: Daniel Kroening, kroening@kroening.com
 literalt boolbvt::convert_extractbit(const extractbit_exprt &expr)
 {
   const bvt &src_bv = convert_bv(expr.src());
+  const auto &index = expr.index();
 
   // constant?
-  if(expr.index().is_constant())
+  if(index.is_constant())
   {
-    mp_integer index_as_integer = numeric_cast_v<mp_integer>(expr.index());
+    mp_integer index_as_integer =
+      numeric_cast_v<mp_integer>(to_constant_expr(index));
 
     if(index_as_integer < 0 || index_as_integer >= src_bv.size())
       return prop.new_variable(); // out of range!
@@ -42,7 +44,7 @@ literalt boolbvt::convert_extractbit(const extractbit_exprt &expr)
   else
   {
     std::size_t src_bv_width = boolbv_width(expr.src().type());
-    std::size_t index_bv_width = boolbv_width(expr.index().type());
+    std::size_t index_bv_width = boolbv_width(index.type());
 
     if(src_bv_width == 0 || index_bv_width == 0)
       return SUB::convert_rest(expr);
@@ -52,7 +54,7 @@ literalt boolbvt::convert_extractbit(const extractbit_exprt &expr)
     unsignedbv_typet index_type(index_width);
 
     equal_exprt equality(
-      typecast_exprt::conditional_cast(expr.index(), index_type), exprt());
+      typecast_exprt::conditional_cast(index, index_type), exprt());
 
     if(prop.has_set_to())
     {

@@ -850,7 +850,8 @@ exprt invariant_sett::get_constant(const exprt &expr) const
 
         if(e.is_constant())
         {
-          const mp_integer value = numeric_cast_v<mp_integer>(e);
+          const mp_integer value =
+            numeric_cast_v<mp_integer>(to_constant_expr(e));
 
           if(expr.type().id()==ID_pointer)
           {

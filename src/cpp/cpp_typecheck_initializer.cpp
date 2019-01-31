@@ -231,7 +231,8 @@ void cpp_typecheckt::zero_initializer(
     if(size_expr.id()==ID_infinity)
       return; // don't initialize
 
-    const mp_integer size = numeric_cast_v<mp_integer>(size_expr);
+    const mp_integer size =
+      numeric_cast_v<mp_integer>(to_constant_expr(size_expr));
     CHECK_RETURN(size>=0);
 
     exprt::operandst empty_operands;

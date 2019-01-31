@@ -1677,8 +1677,12 @@ optionalt<exprt> simplify_exprt::bits2expr(
   else if(type.id()==ID_array)
   {
     const array_typet &array_type=to_array_type(type);
+    const auto &size_expr = array_type.size();
 
-    const std::size_t n_el = numeric_cast_v<std::size_t>(array_type.size());
+    PRECONDITION(size_expr.is_constant());
+
+    const std::size_t number_of_elements =
+      numeric_cast_v<std::size_t>(to_constant_expr(size_expr));
 
     const auto el_size_opt = pointer_offset_bits(array_type.subtype(), ns);
     CHECK_RETURN(el_size_opt.has_value() && *el_size_opt > 0);
@@ -1686,9 +1690,9 @@ optionalt<exprt> simplify_exprt::bits2expr(
     const std::size_t el_size = numeric_cast_v<std::size_t>(*el_size_opt);
 
     array_exprt result({}, array_type);
-    result.reserve_operands(n_el);
+    result.reserve_operands(number_of_elements);
 
-    for(std::size_t i=0; i<n_el; ++i)
+    for(std::size_t i = 0; i < number_of_elements; ++i)
     {
       std::string el_bits=std::string(bits, i*el_size, el_size);
       auto el = bits2expr(el_bits, array_type.subtype(), little_endian);

@@ -2172,7 +2172,7 @@ std::string expr2ct::convert_array(
       if(it==--src.operands().end())
         break;
 
-      const unsigned int ch = numeric_cast_v<unsigned>(*it);
+      const unsigned int ch = numeric_cast_v<unsigned>(to_constant_expr(*it));
 
       if(last_was_hex)
       {

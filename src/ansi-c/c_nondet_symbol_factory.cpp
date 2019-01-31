@@ -155,7 +155,9 @@ void symbol_factoryt::gen_nondet_array_init(
   const recursion_sett &recursion_set)
 {
   auto const &array_type = to_array_type(expr.type());
-  auto const array_size = numeric_cast_v<size_t>(array_type.size());
+  const auto &size = array_type.size();
+  PRECONDITION(size.id() == ID_constant);
+  auto const array_size = numeric_cast_v<size_t>(to_constant_expr(size));
   DATA_INVARIANT(array_size > 0, "Arrays should have positive size");
   for(size_t index = 0; index < array_size; ++index)
   {

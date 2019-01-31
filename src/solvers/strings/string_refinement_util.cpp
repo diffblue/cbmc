@@ -62,7 +62,8 @@ sparse_arrayt::sparse_arrayt(const with_exprt &expr)
   while(can_cast_expr<with_exprt>(ref.get()))
   {
     const auto &with_expr = expr_dynamic_cast<with_exprt>(ref.get());
-    const auto current_index = numeric_cast_v<std::size_t>(with_expr.where());
+    const auto current_index =
+      numeric_cast_v<std::size_t>(to_constant_expr(with_expr.where()));
     entries[current_index] = with_expr.new_value();
     ref = with_expr.old();
   }
