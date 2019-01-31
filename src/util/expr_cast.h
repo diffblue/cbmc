@@ -107,6 +107,32 @@ auto expr_try_dynamic_cast(TExpr &base)
   return ret;
 }
 
+/// \brief Try to cast a generic exprt to a specific derived class.
+/// \tparam T: The type to cast the \p base param to.
+/// \tparam TType: The original type to cast from, must be a exprt rvalue.
+/// \param base: A generic \ref exprt rvalue.
+/// \return Cast value in an optionalt<T> or empty if \a base is not an instance
+///         of T.
+template <typename T, typename TExpr>
+optionalt<T> expr_try_dynamic_cast(TExpr &&base)
+{
+  static_assert(
+    std::is_rvalue_reference<decltype(base)>::value,
+    "This template overload must only match where base is an rvalue.");
+  static_assert(
+    std::is_base_of<exprt, typename std::decay<TExpr>::type>::value,
+    "Tried to expr_try_dynamic_cast from something that wasn't an exprt.");
+  static_assert(
+    std::is_base_of<exprt, T>::value,
+    "The template argument T must be derived from exprt.");
+  static_assert(!std::is_const<TExpr>::value, "Attempted to move from const.");
+  if(!can_cast_expr<T>(base))
+    return {};
+  optionalt<T> ret{static_cast<T &&>(base)};
+  validate_expr(*ret);
+  return ret;
+}
+
 /// \brief Try to cast a reference to a generic typet to a specific derived
 ///   class
 /// \tparam T: The reference or const reference type to \a TUnderlying to cast
@@ -130,6 +156,32 @@ auto type_try_dynamic_cast(TType &base) ->
   if(!can_cast_type<typename std::remove_const<T>::type>(base))
     return nullptr;
   const auto ret = static_cast<returnt>(&base);
+  validate_type(*ret);
+  return ret;
+}
+
+/// \brief Try to cast a generic typet to a specific derived class.
+/// \tparam T: The type to cast the \p base param to.
+/// \tparam TType: The original type to cast from, must be a typet rvalue.
+/// \param base: A generic \ref typet rvalue.
+/// \return Cast value in an optionalt<T> or empty if \a base is not an instance
+///         of T.
+template <typename T, typename TType>
+optionalt<T> type_try_dynamic_cast(TType &&base)
+{
+  static_assert(
+    std::is_rvalue_reference<decltype(base)>::value,
+    "This template overload must only match where base is an rvalue.");
+  static_assert(
+    std::is_base_of<typet, typename std::decay<TType>::type>::value,
+    "Tried to type_try_dynamic_cast from something that wasn't an typet.");
+  static_assert(
+    std::is_base_of<typet, T>::value,
+    "The template argument T must be derived from typet.");
+  static_assert(!std::is_const<TType>::value, "Attempted to move from const.");
+  if(!can_cast_type<T>(base))
+    return {};
+  optionalt<T> ret{static_cast<T &&>(base)};
   validate_type(*ret);
   return ret;
 }
