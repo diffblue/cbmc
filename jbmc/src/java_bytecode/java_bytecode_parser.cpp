@@ -574,8 +574,10 @@ void java_bytecode_parsert::get_class_refs()
         field_type, parse_tree.class_refs);
       get_class_refs_rec(field_type);
     }
-    else if(const auto field_type = java_type_from_string(field.descriptor))
-      get_class_refs_rec(*field_type);
+    else
+    {
+      get_class_refs_rec(*java_type_from_string(field.descriptor));
+    }
   }
 
   for(const auto &method : parse_tree.parsed_class.methods)
@@ -594,8 +596,10 @@ void java_bytecode_parsert::get_class_refs()
         method_type, parse_tree.class_refs);
       get_class_refs_rec(method_type);
     }
-    else if(const auto method_type = java_type_from_string(method.descriptor))
-      get_class_refs_rec(*method_type);
+    else
+    {
+      get_class_refs_rec(*java_type_from_string(method.descriptor));
+    }
 
     for(const auto &var : method.local_variable_table)
     {
@@ -609,8 +613,10 @@ void java_bytecode_parsert::get_class_refs()
           var_type, parse_tree.class_refs);
         get_class_refs_rec(var_type);
       }
-      else if(const auto var_type = java_type_from_string(var.descriptor))
-        get_class_refs_rec(*var_type);
+      else
+      {
+        get_class_refs_rec(*java_type_from_string(var.descriptor));
+      }
     }
   }
 }
@@ -668,9 +674,7 @@ void java_bytecode_parsert::get_annotation_value_class_refs(const exprt &value)
   if(const auto &symbol_expr = expr_try_dynamic_cast<symbol_exprt>(value))
   {
     const irep_idt &value_id = symbol_expr->get_identifier();
-    const auto value_type = java_type_from_string(id2string(value_id));
-    if(value_type.has_value())
-      get_class_refs_rec(*value_type);
+    get_class_refs_rec(*java_type_from_string(id2string(value_id)));
   }
   else if(const auto &array_expr = expr_try_dynamic_cast<array_exprt>(value))
   {
