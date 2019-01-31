@@ -156,6 +156,7 @@ json_objectt json(const typet &type, const namespacet &ns, const irep_idt &mode)
   {
     result["name"] = json_stringt("array");
     result["subtype"] = json(to_array_type(type).subtype(), ns, mode);
+    result["size"] = json(to_array_type(type).size(), ns, mode);
   }
   else if(type.id() == ID_vector)
   {
