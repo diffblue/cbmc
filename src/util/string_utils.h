@@ -47,24 +47,49 @@ std::string trim_from_last_delimiter(
 /// \param b: Iterator pointing to first item to print
 /// \param e: Iterator pointing past last item to print
 /// \param delimiter: Object to print between each item in the iterator range
+/// \param transform_func: Transform to apply to the value returned by the
+///   iterator
 /// \return A reference to the ostream that was passed in
-template<typename Stream, typename It, typename Delimiter>
+template <
+  typename Stream,
+  typename It,
+  typename Delimiter,
+  typename TransformFunc>
 Stream &join_strings(
-  Stream &os,
+  Stream &&os,
   const It b,
   const It e,
-  const Delimiter &delimiter)
+  const Delimiter &delimiter,
+  TransformFunc &&transform_func)
 {
   if(b==e)
   {
     return os;
   }
-  os << *b;
+  os << transform_func(*b);
   for(auto it=std::next(b); it!=e; ++it)
   {
-    os << delimiter << *it;
+    os << delimiter << transform_func(*it);
   }
   return os;
+}
+
+/// Prints items to an stream, separated by a constant delimiter
+/// \tparam It: An iterator type
+/// \tparam Delimiter: A delimiter type which supports printing to ostreams
+/// \param os: An ostream to write to
+/// \param b: Iterator pointing to first item to print
+/// \param e: Iterator pointing past last item to print
+/// \param delimiter: Object to print between each item in the iterator range
+/// \return A reference to the ostream that was passed in
+template <typename Stream, typename It, typename Delimiter>
+Stream &
+join_strings(Stream &&os, const It b, const It e, const Delimiter &delimiter)
+{
+  using value_type = decltype(*b);
+  // Call auxiliary function with identity function
+  return join_strings(
+    os, b, e, delimiter, [](const value_type &x) { return x; });
 }
 
 /// Generic escaping of strings; this is not meant to be a particular
