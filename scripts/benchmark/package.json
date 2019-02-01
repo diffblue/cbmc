@@ -1,0 +1,25 @@
+{
+  "name": "benchmark-jbmc",
+  "version": "1.0.0",
+  "description": "Run jbmc on a list of methods",
+  "engines": {
+    "node": ">=10.15.1"
+  },
+  "main": "benchmark_java_project.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/diffblue/cbmc.git"
+  },
+  "author": "Romain Brenguier <romain.brenguier@diffblue.com>",
+  "private": "false",
+  "bugs": {
+    "url": "https://github.com/diffblue/cbmc/issues"
+  },
+  "homepage": "https://github.com/diffblue/cbmc#readme",
+  "dependencies": {
+    "commander": "2.19.0"
+  }
+}
