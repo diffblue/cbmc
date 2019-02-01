@@ -777,3 +777,14 @@ void show_goto_trace(
 }
 
 const trace_optionst trace_optionst::default_options = trace_optionst();
+
+std::vector<irep_idt> goto_tracet::get_all_property_ids() const
+{
+  std::vector<irep_idt> property_ids;
+  for(const auto &step : steps)
+  {
+    if(step.is_assert())
+      property_ids.push_back(step.property_id);
+  }
+  return property_ids;
+}

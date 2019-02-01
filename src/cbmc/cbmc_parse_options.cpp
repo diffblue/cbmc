@@ -36,6 +36,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-checker/all_properties_verifier.h>
 #include <goto-checker/all_properties_verifier_with_trace_storage.h>
 #include <goto-checker/bmc_util.h>
+#include <goto-checker/cover_goals_verifier_with_trace_storage.h>
 #include <goto-checker/multi_path_symex_checker.h>
 #include <goto-checker/multi_path_symex_only_checker.h>
 #include <goto-checker/properties.h>
@@ -73,6 +74,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <langapi/mode.h>
 
+#include "c_test_input_generator.h"
 #include "xml_interface.h"
 
 cbmc_parse_optionst::cbmc_parse_optionst(int argc, const char **argv)
@@ -578,6 +580,19 @@ int cbmc_parse_optionst::doit()
     }
   }
 
+  if(options.is_set("cover"))
+  {
+    cover_goals_verifier_with_trace_storaget<multi_path_symex_checkert>
+      verifier(options, ui_message_handler, goto_model);
+    (void)verifier();
+    verifier.report();
+
+    c_test_input_generatort test_generator(ui_message_handler, options);
+    test_generator(verifier.get_traces());
+
+    return CPROVER_EXIT_SUCCESS;
+  }
+
   std::unique_ptr<goto_verifiert> verifier = nullptr;
 
   if(
@@ -607,6 +622,7 @@ int cbmc_parse_optionst::doit()
 
   resultt result = (*verifier)();
   verifier->report();
+
   return result_to_exit_code(result);
 }
 
