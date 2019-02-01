@@ -17,8 +17,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 int main()
 {
-  miniBDD::mgr mgr;
-  miniBDD::BDD result;
+  mini_bdd_mgrt mgr;
+  mini_bddt result;
 
 #if 0
   {
@@ -55,7 +55,7 @@ int main()
   {
     auto a = mgr.Var("a");
     auto b = mgr.Var("b");
-    auto f = !a | b;
+    auto f = (!a) | b;
     auto fp = !b;
     result = f == fp;
   }
