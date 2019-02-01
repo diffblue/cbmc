@@ -51,6 +51,9 @@ The combination of these three concepts enables:
   without impacting others.
 
 There are the following variants of goto verifiers at the moment:
+* \ref stop_on_fail_verifiert : Checks all properties, but terminates
+  as soon as the first violated property is found and reports this violation.
+  A trace ends at a violated property.
 * \ref all_properties_verifier_with_trace_storaget : Determines the status of
   all properties and outputs results when the verification algorithm has
   terminated. A trace ends at a violated property.

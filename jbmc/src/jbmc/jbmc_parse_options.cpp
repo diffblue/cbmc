@@ -19,9 +19,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/config.h>
 #include <util/exit_codes.h>
 #include <util/invariant.h>
+#include <util/make_unique.h>
 #include <util/unicode.h>
-#include <util/xml.h>
 #include <util/version.h>
+#include <util/xml.h>
 
 #include <langapi/language.h>
 
@@ -29,6 +30,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-checker/all_properties_verifier.h>
 #include <goto-checker/all_properties_verifier_with_trace_storage.h>
+#include <goto-checker/stop_on_fail_verifier.h>
 
 #include <goto-programs/adjust_float_expressions.h>
 #include <goto-programs/lazy_goto_model.h>
@@ -566,11 +568,33 @@ int jbmc_parse_optionst::doit()
       }
     }
 
+    if(
+      options.get_bool_option("dimacs") ||
+      !options.get_option("outfile").empty())
+    {
+      if(!options.get_bool_option("paths"))
+      {
+        stop_on_fail_verifiert<multi_path_symex_checkert> verifier(
+          options, ui_message_handler, goto_model);
+        (void)verifier();
+        return CPROVER_EXIT_SUCCESS;
+      }
+    }
+
     std::unique_ptr<goto_verifiert> verifier = nullptr;
 
-    if(!options.get_bool_option("paths") && !options.is_set("cover"))
+    if(
+      !options.get_bool_option("paths") && !options.is_set("cover") &&
+      !options.get_bool_option("dimacs") &&
+      options.get_option("outfile").empty())
     {
-      if(!options.get_bool_option("stop-on-fail"))
+      if(options.get_bool_option("stop-on-fail"))
+      {
+        verifier = util_make_unique<
+          stop_on_fail_verifiert<java_multi_path_symex_checkert>>(
+          options, ui_message_handler, goto_model);
+      }
+      else
       {
         verifier = util_make_unique<all_properties_verifier_with_trace_storaget<
           java_multi_path_symex_checkert>>(
