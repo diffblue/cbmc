@@ -259,21 +259,26 @@ java_method_typet member_type_lazy(
 
   messaget message(message_handler);
 
-  typet member_type_from_descriptor=java_type_from_string(descriptor);
-  INVARIANT(member_type_from_descriptor.id()==ID_code, "Must be code type");
+  auto member_type_from_descriptor = java_type_from_string(descriptor);
+  INVARIANT(
+    member_type_from_descriptor.has_value() &&
+      member_type_from_descriptor->id() == ID_code,
+    "Must be code type");
   if(signature.has_value())
   {
     try
     {
-      typet member_type_from_signature=java_type_from_string(
-        signature.value(),
-        class_name);
-      INVARIANT(member_type_from_signature.id()==ID_code, "Must be code type");
+      auto member_type_from_signature =
+        java_type_from_string(signature.value(), class_name);
+      INVARIANT(
+        member_type_from_signature.has_value() &&
+          member_type_from_signature->id() == ID_code,
+        "Must be code type");
       if(
-        to_java_method_type(member_type_from_signature).parameters().size() ==
-        to_java_method_type(member_type_from_descriptor).parameters().size())
+        to_java_method_type(*member_type_from_signature).parameters().size() ==
+        to_java_method_type(*member_type_from_descriptor).parameters().size())
       {
-        return to_java_method_type(member_type_from_signature);
+        return to_java_method_type(*member_type_from_signature);
       }
       else
       {
@@ -294,7 +299,7 @@ java_method_typet member_type_lazy(
                         << message.eom;
     }
   }
-  return to_java_method_type(member_type_from_descriptor);
+  return to_java_method_type(*member_type_from_descriptor);
 }
 
 /// Retrieves the symbol of the lambda method associated with the given
@@ -460,24 +465,10 @@ void java_bytecode_convert_methodt::convert(
     if(!is_parameter(v))
       continue;
 
-    // Construct a fully qualified name for the parameter v,
-    // e.g. my.package.ClassName.myMethodName:(II)I::anIntParam, and then a
-    // symbol_exprt with the parameter and its type
-    typet t;
-    if(v.signature.has_value())
-    {
-      t=java_type_from_string_with_exception(
-        v.descriptor,
-        v.signature,
-        id2string(class_symbol.name));
-    }
-    else
-      t=java_type_from_string(v.descriptor);
-
     std::ostringstream id_oss;
     id_oss << method_id << "::" << v.name;
     irep_idt identifier(id_oss.str());
-    symbol_exprt result(identifier, t);
+    symbol_exprt result = symbol_exprt::typeless(identifier);
     result.set(ID_C_base_name, v.name);
 
     // Create a new variablet in the variables vector; in fact this entry will

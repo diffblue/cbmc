@@ -100,7 +100,7 @@ protected:
 
   const typet type_entry(u2 index)
   {
-    return java_type_from_string(id2string(pool_entry(index).s));
+    return *java_type_from_string(id2string(pool_entry(index).s));
   }
 
   void populate_bytecode_mnemonics_table()
@@ -547,10 +547,8 @@ void java_bytecode_parsert::get_class_refs()
       break;
 
     case CONSTANT_NameAndType:
-      {
-        typet t=java_type_from_string(id2string(pool_entry(c.ref2).s));
-        get_class_refs_rec(t);
-      }
+      get_class_refs_rec(
+        *java_type_from_string(id2string(pool_entry(c.ref2).s)));
       break;
 
     default: {}
@@ -562,23 +560,24 @@ void java_bytecode_parsert::get_class_refs()
   for(const auto &field : parse_tree.parsed_class.fields)
   {
     get_annotation_class_refs(field.annotations);
-    typet field_type;
+
     if(field.signature.has_value())
     {
-      field_type=java_type_from_string_with_exception(
+      typet field_type = *java_type_from_string_with_exception(
         field.descriptor,
         field.signature,
-        "java::"+id2string(parse_tree.parsed_class.name));
+        "java::" + id2string(parse_tree.parsed_class.name));
 
       // add generic type args to class refs as dependencies, same below for
       // method types and entries from the local variable type table
       get_dependencies_from_generic_parameters(
         field_type, parse_tree.class_refs);
+      get_class_refs_rec(field_type);
     }
     else
-      field_type=java_type_from_string(field.descriptor);
-
-    get_class_refs_rec(field_type);
+    {
+      get_class_refs_rec(*java_type_from_string(field.descriptor));
+    }
   }
 
   for(const auto &method : parse_tree.parsed_class.methods)
@@ -586,35 +585,38 @@ void java_bytecode_parsert::get_class_refs()
     get_annotation_class_refs(method.annotations);
     for(const auto &parameter_annotations : method.parameter_annotations)
       get_annotation_class_refs(parameter_annotations);
-    typet method_type;
+
     if(method.signature.has_value())
     {
-      method_type=java_type_from_string_with_exception(
+      typet method_type = *java_type_from_string_with_exception(
         method.descriptor,
         method.signature,
-        "java::"+id2string(parse_tree.parsed_class.name));
+        "java::" + id2string(parse_tree.parsed_class.name));
       get_dependencies_from_generic_parameters(
         method_type, parse_tree.class_refs);
+      get_class_refs_rec(method_type);
     }
     else
-      method_type=java_type_from_string(method.descriptor);
+    {
+      get_class_refs_rec(*java_type_from_string(method.descriptor));
+    }
 
-    get_class_refs_rec(method_type);
     for(const auto &var : method.local_variable_table)
     {
-      typet var_type;
       if(var.signature.has_value())
       {
-        var_type=java_type_from_string_with_exception(
+        typet var_type = *java_type_from_string_with_exception(
           var.descriptor,
           var.signature,
-          "java::"+id2string(parse_tree.parsed_class.name));
+          "java::" + id2string(parse_tree.parsed_class.name));
         get_dependencies_from_generic_parameters(
           var_type, parse_tree.class_refs);
+        get_class_refs_rec(var_type);
       }
       else
-        var_type=java_type_from_string(var.descriptor);
-      get_class_refs_rec(var_type);
+      {
+        get_class_refs_rec(*java_type_from_string(var.descriptor));
+      }
     }
   }
 }
@@ -672,8 +674,7 @@ void java_bytecode_parsert::get_annotation_value_class_refs(const exprt &value)
   if(const auto &symbol_expr = expr_try_dynamic_cast<symbol_exprt>(value))
   {
     const irep_idt &value_id = symbol_expr->get_identifier();
-    const typet value_type = java_type_from_string(id2string(value_id));
-    get_class_refs_rec(value_type);
+    get_class_refs_rec(*java_type_from_string(id2string(value_id)));
   }
   else if(const auto &array_expr = expr_try_dynamic_cast<array_exprt>(value))
   {

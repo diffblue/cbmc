@@ -794,9 +794,9 @@ void java_bytecode_convert_methodt::setup_local_variables(
     const std::string class_name = method_name.substr(0, class_name_end);
 
     const typet t = v.var.signature.has_value()
-                      ? java_type_from_string_with_exception(
+                      ? *java_type_from_string_with_exception(
                           v.var.descriptor, v.var.signature, class_name)
-                      : java_type_from_string(v.var.descriptor);
+                      : *java_type_from_string(v.var.descriptor);
 
     std::ostringstream id_oss;
     id_oss << method_id << "::" << v.var.start_pc << "::" << v.var.name;
