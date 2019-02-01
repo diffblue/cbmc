@@ -28,13 +28,7 @@ Author: Daniel Kroening, kroening@kroening.com
 static void get_l1_name(exprt &expr);
 
 goto_symex_statet::goto_symex_statet()
-  : depth(0),
-    symex_target(nullptr),
-    atomic_section_id(0),
-    total_vccs(0),
-    remaining_vccs(0),
-    record_events(true),
-    dirty()
+  : symex_target(nullptr), record_events(true), dirty()
 {
   threads.resize(1);
   new_frame();
@@ -741,7 +735,7 @@ void goto_symex_statet::print_backtrace(std::ostream &out) const
 /// Print the constant propagation map in a human-friendly format.
 /// This is primarily for use from the debugger; please don't delete me just
 /// because there aren't any current callers.
-void goto_symex_statet::output_propagation_map(std::ostream &out)
+void goto_statet::output_propagation_map(std::ostream &out)
 {
   for(const auto &name_value : propagation)
   {

@@ -37,18 +37,43 @@ Author: Daniel Kroening, kroening@kroening.com
 class goto_statet
 {
 public:
+  /// Distance from entry
   unsigned depth = 0;
+
   symex_level2t level2;
+
+  /// Uses level 1 names, and is used to do dereferencing
   value_sett value_set;
+
+  // A guard is a particular condition that has to pass for an instruction
+  // to be executed. The easiest example is an if/else: each instruction along
+  // the if branch will be guarded by the condition of the if (and if there
+  // is an else branch then instructions on it will be guarded by the negation
+  // of the condition of the if).
   guardt guard{true_exprt{}};
+
   symex_targett::sourcet source;
+
+  // Map L1 names to (L2) constants. Values will be evicted from this map
+  // when they become non-constant. This is used to propagate values that have
+  // been worked out to only have one possible value.
+  //
+  // "constants" can include symbols, but only in the context of an address-of
+  // op (i.e. &x can be propagated), and an address-taken thing should only be
+  // L1.
   std::map<irep_idt, exprt> propagation;
+
+  void output_propagation_map(std::ostream &);
+
+  /// Threads
   unsigned atomic_section_id = 0;
+
   std::unordered_map<irep_idt, local_safe_pointerst> safe_pointers;
   unsigned total_vccs = 0;
   unsigned remaining_vccs = 0;
 
-  goto_statet(const class goto_symex_statet &s);
+  explicit goto_statet(const class goto_symex_statet &s);
+  goto_statet() = default;
 };
 
 // stack frames -- these are used for function calls and
@@ -96,7 +121,7 @@ struct framet
 /// state will be copied into a \ref goto_statet, stored in a map for later
 /// reference and then merged again (via merge_goto) once it reaches a
 /// control-flow graph convergence.
-class goto_symex_statet final
+class goto_symex_statet final : public goto_statet
 {
 public:
   goto_symex_statet();
@@ -116,15 +141,6 @@ public:
   /// for error traces even after symbolic execution has finished.
   symbol_tablet symbol_table;
 
-  /// distance from entry
-  unsigned depth;
-
-  // A guard is a particular condition that has to pass for an instruction
-  // to be executed. The easiest example is an if/else: each instruction along
-  // the if branch will be guarded by the condition of the if (and if there
-  // is an else branch then instructions on it will be guarded by the negation
-  // of the condition of the if).
-  guardt guard{true_exprt{}};
   symex_targett::sourcet source;
   symex_target_equationt *symex_target;
 
@@ -133,17 +149,6 @@ public:
 
   symex_level0t level0;
   symex_level1t level1;
-  symex_level2t level2;
-
-  // Map L1 names to (L2) constants. Values will be evicted from this map
-  // when they become non-constant. This is used to propagate values that have
-  // been worked out to only have one possible value.
-  //
-  // "constants" can include symbols, but only in the context of an address-of
-  // op (i.e. &x can be propagated), and an address-taken thing should only be
-  // L1.
-  std::map<irep_idt, exprt> propagation;
-  void output_propagation_map(std::ostream &);
 
   // Symex renaming levels.
   enum levelt { L0=0, L1=1, L2=2 };
@@ -204,24 +209,8 @@ protected:
   l1_typest l1_types;
 
 public:
-  std::unordered_map<irep_idt, local_safe_pointerst> safe_pointers;
-
-  // uses level 1 names, and is used to
-  // do dereferencing
-  value_sett value_set;
-
-  explicit goto_symex_statet(const goto_statet &s)
-    : depth(s.depth),
-      guard(s.guard),
-      source(s.source),
-      propagation(s.propagation),
-      safe_pointers(s.safe_pointers),
-      value_set(s.value_set),
-      atomic_section_id(s.atomic_section_id),
-      total_vccs(s.total_vccs),
-      remaining_vccs(s.remaining_vccs)
+  explicit goto_symex_statet(const goto_statet &s) : goto_statet(s)
   {
-    level2.current_names = s.level2.current_names;
   }
 
   // gotos
@@ -273,14 +262,11 @@ public:
   void print_backtrace(std::ostream &) const;
 
   // threads
-  unsigned atomic_section_id;
   typedef std::pair<unsigned, std::list<guardt> > a_s_r_entryt;
   typedef std::list<guardt> a_s_w_entryt;
   std::unordered_map<ssa_exprt, a_s_r_entryt, irep_hash> read_in_atomic_section;
   std::unordered_map<ssa_exprt, a_s_w_entryt, irep_hash>
     written_in_atomic_section;
-
-  unsigned total_vccs, remaining_vccs;
 
   struct threadt
   {
