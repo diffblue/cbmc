@@ -213,7 +213,7 @@ protected:
   virtual void typecheck_c_bit_field_type(c_bit_field_typet &type);
   virtual void typecheck_typeof_type(typet &type);
   virtual void typecheck_array_type(array_typet &type);
-  virtual void typecheck_vector_type(vector_typet &type);
+  virtual void typecheck_vector_type(typet &type);
   virtual void typecheck_custom_type(typet &type);
   virtual void adjust_function_parameter(typet &type) const;
   virtual bool is_complete_type(const typet &type) const;

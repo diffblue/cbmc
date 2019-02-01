@@ -142,7 +142,11 @@ void cpp_typecheckt::typecheck_type(typet &type)
   }
   else if(type.id()==ID_vector)
   {
-    typecheck_vector_type(to_vector_type(type));
+    // already done
+  }
+  else if(type.id() == ID_frontend_vector)
+  {
+    typecheck_vector_type(type);
   }
   else if(type.id()==ID_code)
   {

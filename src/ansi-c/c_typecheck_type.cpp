@@ -99,7 +99,13 @@ void c_typecheck_baset::typecheck_type(typet &type)
     // nothing to do, these stay as is
   }
   else if(type.id()==ID_vector)
-    typecheck_vector_type(to_vector_type(type));
+  {
+    // already done
+  }
+  else if(type.id() == ID_frontend_vector)
+  {
+    typecheck_vector_type(type);
+  }
   else if(type.id()==ID_custom_unsignedbv ||
           type.id()==ID_custom_signedbv ||
           type.id()==ID_custom_floatbv ||
@@ -655,14 +661,17 @@ void c_typecheck_baset::typecheck_array_type(array_typet &type)
   }
 }
 
-void c_typecheck_baset::typecheck_vector_type(vector_typet &type)
+void c_typecheck_baset::typecheck_vector_type(typet &type)
 {
-  exprt &size=type.size();
-  source_locationt source_location=size.find_source_location();
+  // This turns the type with ID_frontend_vector into the type
+  // with ID_vector; the difference is that the latter has
+  // a constant as size, which we establish now.
+  exprt size = static_cast<const exprt &>(type.find(ID_size));
+  const source_locationt source_location = size.find_source_location();
 
   typecheck_expr(size);
 
-  typet &subtype=type.subtype();
+  typet subtype = type.subtype();
   typecheck_type(subtype);
 
   // we are willing to combine 'vector' with various
@@ -699,25 +708,24 @@ void c_typecheck_baset::typecheck_vector_type(vector_typet &type)
   }
 
   // the subtype must have constant size
-  exprt size_expr=size_of_expr(type.subtype(), *this);
+  exprt sub_size_expr = size_of_expr(subtype, *this);
 
-  simplify(size_expr, *this);
+  simplify(sub_size_expr, *this);
 
-  const auto sub_size = numeric_cast<mp_integer>(size_expr);
+  const auto sub_size = numeric_cast<mp_integer>(sub_size_expr);
 
   if(!sub_size.has_value())
   {
     error().source_location=source_location;
     error() << "failed to determine size of vector base type `"
-            << to_string(type.subtype()) << "'" << eom;
+            << to_string(subtype) << "'" << eom;
     throw 0;
   }
 
   if(*sub_size == 0)
   {
     error().source_location=source_location;
-    error() << "type had size 0: `"
-            << to_string(type.subtype()) << "'" << eom;
+    error() << "type had size 0: `" << to_string(subtype) << "'" << eom;
     throw 0;
   }
 
@@ -733,7 +741,11 @@ void c_typecheck_baset::typecheck_vector_type(vector_typet &type)
 
   s /= *sub_size;
 
-  type.size()=from_integer(s, signed_size_type());
+  // produce the type with ID_vector
+  vector_typet new_type(subtype, from_integer(s, signed_size_type()));
+  new_type.add_source_location() = source_location;
+  new_type.size().add_source_location() = source_location;
+  type = new_type;
 }
 
 void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
