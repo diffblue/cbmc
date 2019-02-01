@@ -169,7 +169,7 @@ void constant_propagator_domaint::transform(
   }
   else if(from->is_assume())
   {
-    two_way_propagate_rec(from->guard, ns, cp);
+    two_way_propagate_rec(from->get_condition(), ns, cp);
   }
   else if(from->is_goto())
   {
@@ -178,9 +178,9 @@ void constant_propagator_domaint::transform(
     // Comparing iterators is safe as the target must be within the same list
     // of instructions because this is a GOTO.
     if(from->get_target()==to)
-      g = from->guard;
+      g = from->get_condition();
     else
-      g = not_exprt(from->guard);
+      g = not_exprt(from->get_condition());
     partial_evaluate(values, g, ns);
     if(g.is_false())
      values.set_to_bottom();

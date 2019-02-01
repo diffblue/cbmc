@@ -24,14 +24,10 @@ exprt flow_insensitive_abstract_domain_baset::get_guard(
 {
   if(!from->is_goto())
     return true_exprt();
-
-  locationt next=from;
-  next++;
-
-  if(next==to)
-    return boolean_negate(from->guard);
-
-  return from->guard;
+  else if(std::next(from) == to)
+    return boolean_negate(from->get_condition());
+  else
+    return from->get_condition();
 }
 
 exprt flow_insensitive_abstract_domain_baset::get_return_lhs(locationt to) const

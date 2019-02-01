@@ -218,9 +218,12 @@ void cfg_baset<T, P, I>::compute_edges_goto(
   goto_programt::const_targett next_PC,
   entryt &entry)
 {
-  if(next_PC!=goto_program.instructions.end() &&
-     !instruction.guard.is_true())
+  if(
+    next_PC != goto_program.instructions.end() &&
+    !instruction.get_condition().is_true())
+  {
     this->add_edge(entry, entry_map[next_PC]);
+  }
 
   this->add_edge(entry, entry_map[instruction.get_target()]);
 }
@@ -400,7 +403,7 @@ void cfg_baset<T, P, I>::compute_edges(
 
   case ASSUME:
     // false guard -> no successor
-    if(instruction.guard.is_false())
+    if(instruction.get_condition().is_false())
       break;
 
   case ASSIGN:
