@@ -591,7 +591,8 @@ void ansi_c_convert_typet::write(typet &type)
 
   if(vector_size.is_not_nil())
   {
-    vector_typet new_type(type, vector_size);
+    type_with_subtypet new_type(ID_frontend_vector, type);
+    new_type.set(ID_size, vector_size);
     new_type.add_source_location()=vector_size.source_location();
     type=new_type;
   }
