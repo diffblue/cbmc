@@ -1529,12 +1529,10 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
       const bool is_assertions_disabled_field=
         field_name.find("$assertionsDisabled")!=std::string::npos;
 
+      const irep_idt field_id(
+        get_static_field(arg0.get_string(ID_class), field_name));
       const symbol_exprt symbol_expr(
-        get_static_field(arg0.get_string(ID_class), field_name), arg0.type());
-
-      INVARIANT(
-        symbol_table.has_symbol(symbol_expr.get_identifier()),
-        "getstatic symbol should have been created before method conversion");
+        symbol_table.lookup_ref(field_id).symbol_expr());
 
       convert_getstatic(
         arg0, symbol_expr, is_assertions_disabled_field, c, results);
@@ -1549,12 +1547,10 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
       PRECONDITION(op.size() == 1 && results.empty());
       const auto &field_name=arg0.get_string(ID_component_name);
 
+      const irep_idt field_id(
+        get_static_field(arg0.get_string(ID_class), field_name));
       const symbol_exprt symbol_expr(
-        get_static_field(arg0.get_string(ID_class), field_name), arg0.type());
-
-      INVARIANT(
-        symbol_table.has_symbol(symbol_expr.get_identifier()),
-        "putstatic symbol should have been created before method conversion");
+        symbol_table.lookup_ref(field_id).symbol_expr());
 
       c = convert_putstatic(i_it->source_location, arg0, op, symbol_expr);
     }
