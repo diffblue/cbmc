@@ -36,7 +36,7 @@ set(booleforce_source
     ${CMAKE_CURRENT_SOURCE_DIR}/sat/satcheck_booleforce.cpp
 )
 set(minibdd_source
-    ${CMAKE_CURRENT_SOURCE_DIR}/miniBDD/example.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/bdd/miniBDD/example.cpp
 )
 
 file(GLOB_RECURSE sources "*.cpp" "*.h")

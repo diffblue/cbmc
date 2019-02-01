@@ -11,8 +11,8 @@ Author: Diffblue Ltd.
 
 #include <testing-utils/use_catch.h>
 
+#include <solvers/bdd/miniBDD/miniBDD.h>
 #include <solvers/flattening/boolbv.h>
-#include <solvers/miniBDD/miniBDD.h>
 #include <solvers/prop/bdd_expr.h>
 
 #include <util/arith_tools.h>

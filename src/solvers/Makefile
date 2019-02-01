@@ -145,7 +145,7 @@ SRC = $(BOOLEFORCE_SRC) \
       floatbv/float_approximation.cpp \
       lowering/byte_operators.cpp \
       lowering/popcount.cpp \
-      miniBDD/miniBDD.cpp \
+      bdd/miniBDD/miniBDD.cpp \
       prop/bdd_expr.cpp \
       prop/cover_goals.cpp \
       prop/literal.cpp \

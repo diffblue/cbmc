@@ -11,10 +11,10 @@ Author: Daniel Kroening, kroening@kroening.com
 /// A minimalistic BDD library, following Bryant's original paper and Andersen's
 ///   lecture notes
 
-#ifndef CPROVER_SOLVERS_MINIBDD_MINIBDD_H
-#define CPROVER_SOLVERS_MINIBDD_MINIBDD_H
+#ifndef CPROVER_SOLVERS_BDD_MINIBDD_MINIBDD_H
+#define CPROVER_SOLVERS_BDD_MINIBDD_MINIBDD_H
 
-/*! \file solvers/miniBDD/miniBDD.h
+/*! \file solvers/bdd/miniBDD/miniBDD.h
  * \brief Small BDD implementation
  *
  * \author Daniel Kroening <kroening@kroening.com>
@@ -148,4 +148,4 @@ bool OneSat(const mini_bddt &v, std::map<unsigned, bool> &assignment);
 // inline functions
 #include "miniBDD.inc"
 
-#endif // CPROVER_SOLVERS_MINIBDD_MINIBDD_H
+#endif // CPROVER_SOLVERS_BDD_MINIBDD_MINIBDD_H
