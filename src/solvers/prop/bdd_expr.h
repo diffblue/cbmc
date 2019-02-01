@@ -21,7 +21,7 @@ Author: Michael Tautschnig, michael.tautschnig@qmul.ac.uk
 
 #include <util/expr.h>
 
-#include <bdd/bdd_miniBDD.h>
+#include <solvers/bdd/bdd.h>
 
 #include <unordered_map>
 
