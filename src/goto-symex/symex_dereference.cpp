@@ -238,7 +238,7 @@ exprt goto_symext::address_arithmetic(
 
   const typet &expr_type = expr.type();
   INVARIANT((expr_type.id()==ID_array && !keep_array) ||
-            base_type_eq(pointer_type(expr_type), result.type(), ns),
+            base_type_eq(expr_type, result.type().subtype(), ns),
             "either non-persistent array or pointer to result");
 
   return result;
