@@ -44,40 +44,25 @@ static std::string type2name_tag(
      symbol->type.id()!=ID_union)
     return type2name(symbol->type, ns, symbol_number);
 
-  std::string result;
-
   // assign each symbol a number when seen for the first time
   std::pair<symbol_numbert::iterator, bool> entry=
     symbol_number.insert(std::make_pair(
         identifier,
         std::make_pair(symbol_number.size(), true)));
 
+  std::string result = "SYM" +
+                       id2string(to_struct_union_type(symbol->type).get_tag()) +
+                       '#' + std::to_string(entry.first->second.first);
+
   // new entry, add definition
   if(entry.second)
   {
-    result="SYM#"+std::to_string(entry.first->second.first);
     result+="={";
     result+=type2name(symbol->type, ns, symbol_number);
     result+='}';
 
     entry.first->second.second=false;
   }
-#if 0
-  // in recursion, print the shorthand only
-  else if(entry.first->second.second)
-    result="SYM#"+std::to_string(entry.first->second.first);
-  // entering recursion
-  else
-  {
-    entry.first->second.second=true;
-    result=type2name(symbol->type, ns, symbol_number);
-    entry.first->second.second=false;
-  }
-#else
-  // shorthand only as structs/unions are always symbols
-  else
-    result="SYM#"+std::to_string(entry.first->second.first);
-#endif
 
   return result;
 }
