@@ -75,7 +75,7 @@ bddt bdd_exprt::from_expr_rec(const exprt &expr)
   else
   {
     std::pair<expr_mapt::iterator, bool> entry =
-      expr_map.insert(std::make_pair(expr, bdd_mgr.bdd_true()));
+      expr_map.emplace(expr, bdd_mgr.bdd_true());
 
     if(entry.second)
     {
