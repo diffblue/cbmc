@@ -149,14 +149,13 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_default()
     !options.get_bool_option("sat-preprocessor")) // no simplifier
   {
     // simplifier won't work with beautification
-    solver->set_prop(util_make_unique<satcheck_no_simplifiert>());
+    solver->set_prop(
+      util_make_unique<satcheck_no_simplifiert>(message_handler));
   }
   else // with simplifier
   {
-    solver->set_prop(util_make_unique<satcheckt>());
+    solver->set_prop(util_make_unique<satcheckt>(message_handler));
   }
-
-  solver->prop().set_message_handler(message_handler);
 
   auto bv_pointers = util_make_unique<bv_pointerst>(ns, solver->prop());
 
@@ -176,8 +175,7 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_dimacs()
   no_beautification();
   no_incremental_check();
 
-  auto prop = util_make_unique<dimacs_cnft>();
-  prop->set_message_handler(message_handler);
+  auto prop = util_make_unique<dimacs_cnft>(message_handler);
 
   std::string filename = options.get_option("outfile");
 
@@ -192,12 +190,10 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_bv_refinement()
     if(options.get_bool_option("sat-preprocessor"))
     {
       no_beautification();
-      return util_make_unique<satcheckt>();
+      return util_make_unique<satcheckt>(message_handler);
     }
-    return util_make_unique<satcheck_no_simplifiert>();
+    return util_make_unique<satcheck_no_simplifiert>(message_handler);
   }();
-
-  prop->set_message_handler(message_handler);
 
   bv_refinementt::infot info;
   info.ns = &ns;
@@ -225,8 +221,7 @@ solver_factoryt::get_string_refinement()
 {
   string_refinementt::infot info;
   info.ns = &ns;
-  auto prop = util_make_unique<satcheck_no_simplifiert>();
-  prop->set_message_handler(message_handler);
+  auto prop = util_make_unique<satcheck_no_simplifiert>(message_handler);
   info.prop = prop.get();
   info.refinement_bound = DEFAULT_MAX_NB_REFINEMENT;
   info.output_xml = output_xml_in_refinement;

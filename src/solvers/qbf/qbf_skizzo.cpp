@@ -40,10 +40,8 @@ propt::resultt qbf_skizzot::prop_solve()
     return resultt::P_SATISFIABLE;
 
   {
-    messaget::status() <<
-      "Skizzo: " <<
-      no_variables() << " variables, " <<
-      no_clauses() << " clauses" << eom;
+    log.status() << "Skizzo: " << no_variables() << " variables, "
+                 << no_clauses() << " clauses" << messaget::eom;
   }
 
   std::string qbf_tmp_file="sKizzo.qdimacs";
@@ -95,19 +93,19 @@ propt::resultt qbf_skizzot::prop_solve()
 
     if(!result_found)
     {
-      messaget::error() << "Skizzo failed: unknown result" << eom;
+      log.error() << "Skizzo failed: unknown result" << messaget::eom;
       return resultt::P_ERROR;
     }
   }
 
   if(result)
   {
-    messaget::status() << "Skizzo: TRUE" << eom;
+    log.status() << "Skizzo: TRUE" << messaget::eom;
     return resultt::P_SATISFIABLE;
   }
   else
   {
-    messaget::status() << "Skizzo: FALSE" << eom;
+    log.status() << "Skizzo: FALSE" << messaget::eom;
     return resultt::P_UNSATISFIABLE;
   }
 

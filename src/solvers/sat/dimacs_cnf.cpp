@@ -19,6 +19,11 @@ dimacs_cnft::dimacs_cnft():break_lines(false)
 {
 }
 
+dimacs_cnft::dimacs_cnft(message_handlert &message_handler) : dimacs_cnft()
+{
+  log.set_message_handler(message_handler);
+}
+
 void dimacs_cnft::set_assignment(literalt, bool)
 {
   UNIMPLEMENTED;

@@ -34,10 +34,8 @@ const std::string qbf_quantort::solver_text()
 propt::resultt qbf_quantort::prop_solve()
 {
   {
-    messaget::status() <<
-      "Quantor: " <<
-      no_variables() << " variables, " <<
-      no_clauses() << " clauses" << eom;
+    log.status() << "Quantor: " << no_variables() << " variables, "
+                 << no_clauses() << " clauses" << messaget::eom;
   }
 
   std::string qbf_tmp_file="quantor.qdimacs";
@@ -87,19 +85,19 @@ propt::resultt qbf_quantort::prop_solve()
 
     if(!result_found)
     {
-      messaget::error() << "Quantor failed: unknown result" << eom;
+      log.error() << "Quantor failed: unknown result" << messaget::eom;
       return resultt::P_ERROR;
     }
   }
 
   if(result)
   {
-    messaget::status() << "Quantor: TRUE" << eom;
+    log.status() << "Quantor: TRUE" << messaget::eom;
     return resultt::P_SATISFIABLE;
   }
   else
   {
-    messaget::status() << "Quantor: FALSE" << eom;
+    log.status() << "Quantor: FALSE" << messaget::eom;
     return resultt::P_UNSATISFIABLE;
   }
 

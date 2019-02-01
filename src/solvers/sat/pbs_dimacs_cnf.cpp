@@ -128,7 +128,7 @@ bool pbs_dimacs_cnft::pbs_solve()
 
   if(file.fail())
   {
-    error() << "Unable to read SAT results!" << eom;
+    log.error() << "Unable to read SAT results!" << messaget::eom;
     return false;
   }
 
@@ -194,7 +194,8 @@ bool pbs_dimacs_cnft::pbs_solve()
 #endif
       if(strstr(line.c_str(), "time out") != nullptr)
       {
-        status() << "WARNING:  TIMED OUT.  SOLUTION MAY BE INCORRECT." << eom;
+        log.status() << "WARNING:  TIMED OUT.  SOLUTION MAY BE INCORRECT."
+                     << messaget::eom;
         return satisfied;
       }
       sscanf(line.c_str(), "%*s %*s %*s %d", &opt_sum);
@@ -218,21 +219,21 @@ propt::resultt pbs_dimacs_cnft::prop_solve()
   pbfile.close();
 
   // We start counting at 1, thus there is one variable fewer.
-  messaget::statistics() << (no_variables() - 1) << " variables, "
-                         << clauses.size() << " clauses" << eom;
+  log.statistics() << (no_variables() - 1) << " variables, " << clauses.size()
+                   << " clauses" << messaget::eom;
 
   const bool result = pbs_solve();
 
   if(!result)
   {
-    messaget::status() << "PBS checker: system is UNSATISFIABLE" << eom;
+    log.status() << "PBS checker: system is UNSATISFIABLE" << messaget::eom;
   }
   else
   {
-    messaget::status() << "PBS checker: system is SATISFIABLE";
+    log.status() << "PBS checker: system is SATISFIABLE";
     if(optimize)
-      messaget::status() << " (distance " << opt_sum << ")";
-    messaget::status() << eom;
+      log.status() << " (distance " << opt_sum << ")";
+    log.status() << messaget::eom;
   }
 
   if(result)

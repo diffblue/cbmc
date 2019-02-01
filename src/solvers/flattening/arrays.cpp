@@ -48,7 +48,7 @@ literalt arrayst::record_array_equality(
   // check types
   if(!base_type_eq(op0.type(), op1.type(), ns))
   {
-    prop.error() << equality.pretty() << messaget::eom;
+    error() << equality.pretty() << messaget::eom;
     DATA_INVARIANT(
       false,
       "record_array_equality got equality without matching types");
@@ -116,7 +116,7 @@ void arrayst::collect_arrays(const exprt &a)
     // check types
     if(!base_type_eq(array_type, with_expr.old().type(), ns))
     {
-      prop.error() << a.pretty() << messaget::eom;
+      error() << a.pretty() << messaget::eom;
       DATA_INVARIANT(false, "collect_arrays got 'with' without matching types");
     }
 
@@ -134,7 +134,7 @@ void arrayst::collect_arrays(const exprt &a)
     // check types
     if(!base_type_eq(array_type, update_expr.old().type(), ns))
     {
-      prop.error() << a.pretty() << messaget::eom;
+      error() << a.pretty() << messaget::eom;
       DATA_INVARIANT(
         false,
         "collect_arrays got 'update' without matching types");
@@ -156,14 +156,14 @@ void arrayst::collect_arrays(const exprt &a)
     // check types
     if(!base_type_eq(array_type, if_expr.true_case().type(), ns))
     {
-      prop.error() << a.pretty() << messaget::eom;
+      error() << a.pretty() << messaget::eom;
       DATA_INVARIANT(false, "collect_arrays got if without matching types");
     }
 
     // check types
     if(!base_type_eq(array_type, if_expr.false_case().type(), ns))
     {
-      prop.error() << a.pretty() << messaget::eom;
+      error() << a.pretty() << messaget::eom;
       DATA_INVARIANT(false, "collect_arrays got if without matching types");
     }
 
@@ -511,7 +511,7 @@ void arrayst::add_array_constraints_with(
 
     if(index_expr.type()!=value.type())
     {
-      prop.error() << expr.pretty() << messaget::eom;
+      error() << expr.pretty() << messaget::eom;
       DATA_INVARIANT(
         false,
         "with-expression operand should match array element type");
@@ -580,7 +580,7 @@ void arrayst::add_array_constraints_update(
 
     if(index_expr.type()!=value.type())
     {
-      prop.error() << expr.pretty() << messaget::eom;
+      prop.message.error() << expr.pretty() << messaget::eom;
       DATA_INVARIANT(
         false,
         "update operand should match array element type");

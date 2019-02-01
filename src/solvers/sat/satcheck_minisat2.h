@@ -70,6 +70,7 @@ class satcheck_minisat_no_simplifiert:
 {
 public:
   satcheck_minisat_no_simplifiert();
+  explicit satcheck_minisat_no_simplifiert(message_handlert &message_handler);
   virtual const std::string solver_text();
 };
 
@@ -78,6 +79,7 @@ class satcheck_minisat_simplifiert:
 {
 public:
   satcheck_minisat_simplifiert();
+  explicit satcheck_minisat_simplifiert(message_handlert &message_handler);
   virtual const std::string solver_text() final;
   virtual void set_frozen(literalt a) final;
   bool is_eliminated(literalt a) const;
