@@ -98,7 +98,15 @@ elseif("${sat_impl}" STREQUAL "glucose")
     target_link_libraries(solvers glucose-condensed)
 endif()
 
-target_link_libraries(solvers util)
+if(CMAKE_USE_CUDD)
+    target_link_libraries(solvers util cudd-cplusplus cudd)
+    target_include_directories(solvers
+        PUBLIC
+        ${CUDD_INCLUDE}/cudd/
+    )
+else()
+    target_link_libraries(solvers util)
+endif()
 
 # Executable
 add_executable(smt2_solver smt2/smt2_solver.cpp)
