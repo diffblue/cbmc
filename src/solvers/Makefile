@@ -44,11 +44,9 @@ ifneq ($(SQUOLEM2),)
 endif
 
 ifneq ($(CUDD),)
-  CUDD_SRC=qbf/qbf_bdd_core.cpp qbf/qbf_skizzo_core.cpp
-  CUDD_INCLUDE=-I $(CUDD)/include
-  CUDD_LIB=-L $(CUDD)/cudd -L $(CUDD)/util -L $(CUDD)/mtr \
-           -L $(CUDD)/st -L $(CUDD)/obj -L $(CUDD)/dddmp \
-           -L $(CUDD)/epd -lobj -lcudd -lmtr -lst -lutil -lepd -ldddmp
+  CUDD_INCLUDE=-I $(CUDD)
+  CUDD_LIB=$(CUDD)/cudd/.libs/libcudd$(LIBEXT) $(CUDD)/cplusplus/.libs/libobj$(LIBEXT)
+  CP_CXXFLAGS += -DHAVE_CUDD
 endif
 
 ifneq ($(PICOSAT),)
