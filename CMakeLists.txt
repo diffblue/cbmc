@@ -40,6 +40,41 @@ if(${enable_cbmc_tests})
     enable_testing()
 endif()
 
+if(DEFINED CMAKE_USE_CUDD)
+    include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/DownloadProject.cmake")
+    message(STATUS "Downloading Cudd-3.0.0")
+    download_project(PROJ cudd
+            URL https://sourceforge.net/projects/cudd-mirror/files/cudd-3.0.0.tar.gz/download
+            URL_MD5 4fdafe4924b81648b908881c81fe6c30
+            CONFIGURE_COMMAND ./configure
+            BUILD_COMMAND make
+            )
+
+    if(EXISTS ${cudd_SOURCE_DIR}/Makefile)
+        add_custom_target(cudd-make
+                COMMAND make
+                WORKING_DIRECTORY ${cudd_SOURCE_DIR}
+                )
+    else()
+        add_custom_target(cudd-make
+                COMMAND ./configure && make
+                WORKING_DIRECTORY ${cudd_SOURCE_DIR}
+                )
+    endif()
+
+    add_library(cudd-cplusplus STATIC IMPORTED)
+    add_dependencies(cudd-cplusplus cudd-make)
+    set_property(TARGET cudd-cplusplus PROPERTY IMPORTED_LOCATION ${cudd_SOURCE_DIR}/cplusplus/.libs/libobj.a)
+
+    add_library(cudd STATIC IMPORTED)
+    add_dependencies(cudd cudd-make)
+    set_property(TARGET cudd PROPERTY IMPORTED_LOCATION ${cudd_SOURCE_DIR}/cudd/.libs/libcudd.a)
+
+    include_directories(${cudd_SOURCE_DIR})
+    add_compile_options(-DHAVE_CUDD)
+    set(CUDD_INCLUDE ${cudd_SOURCE_DIR} CACHE STRING "Record Cudd directory for includes")
+endif()
+
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR
    "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang" OR
    "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU"

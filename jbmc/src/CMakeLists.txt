@@ -10,6 +10,7 @@ macro(generic_includes name)
         ${CBMC_SOURCE_DIR}
         ${CMAKE_CURRENT_BINARY_DIR}
         ${CMAKE_CURRENT_SOURCE_DIR}
+        ${CUDD_INCLUDE}
     )
 endmacro(generic_includes)
 

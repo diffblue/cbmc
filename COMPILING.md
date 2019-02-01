@@ -282,3 +282,30 @@ To work with Eclipse, do the following:
 5. Click "Finish"
 6. Select Project -> Build All
 
+# OPTIONS AND VARIABLES
+
+## Compiling with CUDD
+
+Cudd is a BDD library which can be used instead of the builtin miniBDD
+implementation.
+
+If compiling with make:
+
+1. Download and compile Cudd:
+   ```
+   make -C src cudd-download
+   ```
+2. Uncomment the definition of `CUDD` in the file `src/config.inc`.
+3. Compile with `make -C src`
+
+If compiling with cmake:
+
+1. Add the `-DCMAKE_USE_CUDD=true` flag to the `cmake` configuration phase.
+   For instance:
+   ```
+   cmake -H. -Bbuild -DCMAKE_USE_CUDD=true
+   ```
+2. Run the build:
+   ```
+   cmake --build build
+   ```

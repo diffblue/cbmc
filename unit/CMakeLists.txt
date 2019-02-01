@@ -28,6 +28,7 @@ target_include_directories(unit
     ${CBMC_BINARY_DIR}
     ${CBMC_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CUDD_INCLUDE}
 )
 target_link_libraries(
         unit

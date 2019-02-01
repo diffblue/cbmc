@@ -21,7 +21,7 @@ Author: Michael Tautschnig, michael.tautschnig@qmul.ac.uk
 
 #include <util/expr.h>
 
-#include <solvers/miniBDD/miniBDD.h>
+#include <solvers/bdd/bdd.h>
 
 #include <unordered_map>
 
@@ -32,23 +32,24 @@ class namespacet;
 class bdd_exprt
 {
 public:
-  explicit bdd_exprt(const namespacet &_ns):ns(_ns) { }
+  explicit bdd_exprt(const namespacet &_ns) : ns(_ns), root(bdd_mgr.bdd_true())
+  {
+  }
 
   void from_expr(const exprt &expr);
   exprt as_expr() const;
 
 protected:
   const namespacet &ns;
-  mini_bdd_mgrt bdd_mgr;
-  mini_bddt root;
+  bdd_managert bdd_mgr;
+  bddt root;
 
-  typedef std::unordered_map<exprt, mini_bddt, irep_hash> expr_mapt;
+  typedef std::unordered_map<exprt, bddt, irep_hash> expr_mapt;
   expr_mapt expr_map;
-  typedef std::map<unsigned, exprt> node_mapt;
-  node_mapt node_map;
+  std::vector<exprt> node_map;
 
-  mini_bddt from_expr_rec(const exprt &expr);
-  exprt as_expr(const mini_bddt &r) const;
+  bddt from_expr_rec(const exprt &expr);
+  exprt as_expr(const bdd_nodet &r, bool complement) const;
 };
 
 #endif // CPROVER_SOLVERS_PROP_BDD_EXPR_H
