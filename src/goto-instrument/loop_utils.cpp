@@ -48,10 +48,9 @@ void build_havoc_code(
     exprt rhs =
       side_effect_expr_nondett(lhs.type(), loop_head->source_location);
 
-    goto_programt::targett t=dest.add_instruction(ASSIGN);
+    goto_programt::targett t = dest.add(goto_programt::make_assignment(
+      code_assignt(lhs, rhs), loop_head->source_location));
     t->function=loop_head->function;
-    t->source_location=loop_head->source_location;
-    t->code=code_assignt(lhs, rhs);
     t->code.add_source_location()=loop_head->source_location;
   }
 }
