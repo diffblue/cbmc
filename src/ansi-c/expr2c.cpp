@@ -195,8 +195,7 @@ std::string expr2ct::convert_rec(
 
   std::string q=new_qualifiers.as_string();
 
-  std::string d=
-    declarator==""?declarator:" "+declarator;
+  std::string d = declarator.empty() ? declarator : " " + declarator;
 
   if(src.find(ID_C_typedef).is_not_nil())
   {

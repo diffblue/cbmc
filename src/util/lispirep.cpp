@@ -32,7 +32,7 @@ void lisp2irep(const lispexprt &src, irept &dest)
         irept sub;
         lisp2irep(src[i], sub);
 
-        if(name=="")
+        if(name.empty())
           dest.move_to_sub(sub);
         else
           dest.move_to_named_sub(name, sub);

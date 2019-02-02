@@ -683,8 +683,9 @@ int gcc_modet::doit()
         {
           compiler.add_input_file(arg_it->arg);
         }
-        else if(language=="c" || language=="c++" ||
-                (language=="" && needs_preprocessing(arg_it->arg)))
+        else if(
+          language == "c" || language == "c++" ||
+          (language.empty() && needs_preprocessing(arg_it->arg)))
         {
           std::string new_suffix;
 

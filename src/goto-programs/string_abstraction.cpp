@@ -169,7 +169,7 @@ void string_abstractiont::add_str_arguments(
 
   for(const auto &identifier : fct.parameter_identifiers)
   {
-    if(identifier=="")
+    if(identifier.empty())
       continue; // ignore
 
     const symbolt &param_symbol = ns.lookup(identifier);

@@ -166,7 +166,7 @@ void cpp_typecheck_resolvet::remove_duplicates(
     else if(old_id.id() == ID_type && old_id.type().id() == ID_union_tag)
       id = to_union_tag_type(old_id.type()).get_identifier();
 
-    if(id=="")
+    if(id.empty())
     {
       if(other.insert(old_id).second)
         identifiers.push_back(old_id);

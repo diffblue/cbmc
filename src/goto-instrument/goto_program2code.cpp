@@ -1886,7 +1886,7 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
 
       // none found? make one
 
-      if(id=="")
+      if(id.empty())
       {
         irep_idt base_name="";
 
@@ -1900,7 +1900,7 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
             base_name="nondet_"+id2string(suffix);
         }
 
-        if(base_name=="")
+        if(base_name.empty())
         {
           unsigned count=0;
           while(symbol_table.symbols.find("nondet_"+std::to_string(count))!=

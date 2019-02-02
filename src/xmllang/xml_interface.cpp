@@ -32,7 +32,7 @@ static void get_xml_options(const xmlt &xml, cmdlinet &cmdline)
     std::string name = xml.get_attribute("name");
     std::string value = xml.get_attribute("actual");
 
-    if(name == "")
+    if(name.empty())
       cmdline.args.push_back(value);
     else
       cmdline.set(name, value);

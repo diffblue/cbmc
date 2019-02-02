@@ -100,7 +100,7 @@ void goto_symext::symex_assert(
   do_simplify(l2_condition);
 
   std::string msg = id2string(instruction.source_location.get_comment());
-  if(msg == "")
+  if(msg.empty())
     msg = "assertion";
 
   vcc(l2_condition, msg, state);

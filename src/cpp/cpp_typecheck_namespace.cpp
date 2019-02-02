@@ -20,7 +20,7 @@ void cpp_typecheckt::convert(cpp_namespace_spect &namespace_spec)
 
   const irep_idt &name=namespace_spec.get_namespace();
 
-  if(name=="")
+  if(name.empty())
   {
     // "unique namespace"
     error().source_location=namespace_spec.source_location();

@@ -106,7 +106,7 @@ void ansi_c_parsert::add_declarator(
   }
 
   // global?
-  if(current_scope().prefix=="")
+  if(current_scope().prefix.empty())
     ansi_c_declaration.set_is_global(true);
 
   // abstract?

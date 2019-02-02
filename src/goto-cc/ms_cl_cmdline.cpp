@@ -419,7 +419,7 @@ const char *ms_cl_prefixes[]=
 
 void ms_cl_cmdlinet::process_cl_option(const std::string &s)
 {
-  if(s=="")
+  if(s.empty())
     return;
 
   if(s[0]!='/' && s[0]!='-')

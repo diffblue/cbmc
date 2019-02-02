@@ -735,7 +735,7 @@ void value_sett::get_value_set_rec(
     }
     else if(statement==ID_allocate)
     {
-      assert(suffix=="");
+      PRECONDITION(suffix.empty());
 
       const typet &dynamic_type=
         static_cast<const typet &>(expr.find(ID_C_cxx_alloc_type));
@@ -749,7 +749,7 @@ void value_sett::get_value_set_rec(
     else if(statement==ID_cpp_new ||
             statement==ID_cpp_new_array)
     {
-      assert(suffix=="");
+      PRECONDITION(suffix.empty());
       assert(expr_type.id()==ID_pointer);
 
       dynamic_object_exprt dynamic_object(expr_type.subtype());
@@ -1465,7 +1465,7 @@ void value_sett::do_function_call(
       it++)
   {
     const irep_idt &identifier=it->get_identifier();
-    if(identifier=="")
+    if(identifier.empty())
       continue;
 
     const exprt v_expr=

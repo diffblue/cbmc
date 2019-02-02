@@ -229,7 +229,7 @@ std::string trace_numeric_value(
 
     forall_operands(it, expr)
     {
-      if(result=="")
+      if(result.empty())
         result="{ ";
       else
         result+=", ";

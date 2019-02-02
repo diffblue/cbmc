@@ -246,8 +246,7 @@ std::string expr2javat::convert_rec(
   qualifierst &new_qualifiers = *clone;
   new_qualifiers.read(src);
 
-  const std::string d=
-    declarator==""?declarator:(" "+declarator);
+  const std::string d = declarator.empty() ? declarator : (" " + declarator);
 
   const std::string q=
     new_qualifiers.as_string();
