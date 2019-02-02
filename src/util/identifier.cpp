@@ -43,6 +43,6 @@ void identifiert::parse(const std::string &s)
     }
 
     components.push_back(component);
-    component="";
+    component.clear();
   }
 }

@@ -1270,7 +1270,7 @@ void cpp_typecheck_resolvet::show_identifiers(
       else if(id_expr.id() == ID_pod_constructor)
       {
         out << "constructor ";
-        id="";
+        id.clear();
       }
       else if(id_expr.id()==ID_template_function_instance)
       {

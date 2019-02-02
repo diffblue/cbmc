@@ -287,13 +287,13 @@ std::string expr2ct::convert_rec(
     if(width==config.ansi_c.int_width)
     {
       if(is_signed)
-        sign_str="";
+        sign_str.clear();
       return q+sign_str+"int"+d;
     }
     else if(width==config.ansi_c.long_int_width)
     {
       if(is_signed)
-        sign_str="";
+        sign_str.clear();
       return q+sign_str+"long int"+d;
     }
     else if(width==config.ansi_c.char_width)
@@ -304,19 +304,19 @@ std::string expr2ct::convert_rec(
     else if(width==config.ansi_c.short_int_width)
     {
       if(is_signed)
-        sign_str="";
+        sign_str.clear();
       return q+sign_str+"short int"+d;
     }
     else if(width==config.ansi_c.long_long_int_width)
     {
       if(is_signed)
-        sign_str="";
+        sign_str.clear();
       return q+sign_str+"long long int"+d;
     }
     else if(width==128)
     {
       if(is_signed)
-        sign_str="";
+        sign_str.clear();
       return q + sign_str + "__int128" + d;
     }
     else

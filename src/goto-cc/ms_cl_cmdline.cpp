@@ -438,7 +438,7 @@ void ms_cl_cmdlinet::process_cl_option(const std::string &s)
       if(s.size()==2)
       {
         option.islong=false;
-        option.optstring="";
+        option.optstring.clear();
         option.optchar=s[1];
         optnr=getoptnr(option.optchar);
       }
@@ -474,7 +474,7 @@ void ms_cl_cmdlinet::process_cl_option(const std::string &s)
       if(ms_cl_prefix.size()==1)
       {
         option.islong=false;
-        option.optstring="";
+        option.optstring.clear();
         option.optchar=ms_cl_prefix[0];
         optnr=getoptnr(option.optchar);
       }

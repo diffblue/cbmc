@@ -169,7 +169,7 @@ bool cmdlinet::parse(int argc, const char **argv, const char *optstring)
       option.islong=true;
       option.optchar=0;
       option.isset=false;
-      option.optstring="";
+      option.optstring.clear();
 
       for(optstring++; optstring[0]!=')' && optstring[0]!=0; optstring++)
         option.optstring+=optstring[0];
@@ -181,7 +181,7 @@ bool cmdlinet::parse(int argc, const char **argv, const char *optstring)
     {
       option.islong=false;
       option.optchar=optstring[0];
-      option.optstring="";
+      option.optstring.clear();
       option.isset=false;
 
       optstring++;

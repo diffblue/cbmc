@@ -129,7 +129,7 @@ int armcc_modet::doit()
   }
   else
   {
-    compiler.output_file_object="";
+    compiler.output_file_object.clear();
     compiler.output_file_executable="a.out";
   }
 

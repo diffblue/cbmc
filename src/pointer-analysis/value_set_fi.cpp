@@ -57,7 +57,7 @@ void value_set_fit::output(
     if(has_prefix(id2string(e.identifier), "value_set::dynamic_object"))
     {
       display_name=id2string(e.identifier)+e.suffix;
-      identifier="";
+      identifier.clear();
     }
     else
     {

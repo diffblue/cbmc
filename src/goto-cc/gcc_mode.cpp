@@ -659,7 +659,7 @@ int gcc_modet::doit()
   }
   else
   {
-    compiler.output_file_object="";
+    compiler.output_file_object.clear();
     compiler.output_file_executable="a.out";
   }
 
@@ -721,14 +721,14 @@ int gcc_modet::doit()
         {
           language=arg_it->arg;
           if(language=="none")
-            language="";
+            language.clear();
         }
       }
       else if(has_prefix(arg_it->arg, "-x"))
       {
         language=std::string(arg_it->arg, 2, std::string::npos);
         if(language=="none")
-          language="";
+          language.clear();
       }
     }
   }
