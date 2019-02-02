@@ -29,7 +29,7 @@ Author: Daniel Kroening, kroening@kroening.com
 void inv_object_storet::output(std::ostream &out) const
 {
   for(std::size_t i=0; i<entries.size(); i++)
-    out << "STORE " << i << ": " << to_string(i, "") << '\n';
+    out << "STORE " << i << ": " << map[i] << '\n';
 }
 
 bool inv_object_storet::get(const exprt &expr, unsigned &n)
@@ -313,9 +313,7 @@ tvt invariant_sett::is_le(std::pair<unsigned, unsigned> p) const
   return tvt::unknown();
 }
 
-void invariant_sett::output(
-  const irep_idt &identifier,
-  std::ostream &out) const
+void invariant_sett::output(std::ostream &out) const
 {
   if(is_false)
   {
@@ -339,7 +337,7 @@ void invariant_sett::output(
           else
             out << " = ";
 
-          out << to_string(j, identifier);
+          out << to_string(j);
         }
 
       out << '\n';
@@ -347,23 +345,17 @@ void invariant_sett::output(
 
   for(const auto &bounds : bounds_map)
   {
-    out << to_string(bounds.first, identifier)
-        << " in " << bounds.second
-        << '\n';
+    out << to_string(bounds.first) << " in " << bounds.second << '\n';
   }
 
   for(const auto &le : le_set)
   {
-    out << to_string(le.first, identifier)
-        << " <= " << to_string(le.second, identifier)
-        << '\n';
+    out << to_string(le.first) << " <= " << to_string(le.second) << '\n';
   }
 
   for(const auto &ne : ne_set)
   {
-    out << to_string(ne.first, identifier)
-        << " != " << to_string(ne.second, identifier)
-        << '\n';
+    out << to_string(ne.first) << " != " << to_string(ne.second) << '\n';
   }
 }
 
@@ -881,19 +873,15 @@ exprt invariant_sett::get_constant(const exprt &expr) const
   return static_cast<const exprt &>(get_nil_irep());
 }
 
-std::string inv_object_storet::to_string(
-  unsigned a,
-  const irep_idt &) const
+std::string inv_object_storet::to_string(unsigned a) const
 {
   return id2string(map[a]);
 }
 
-std::string invariant_sett::to_string(
-  unsigned a,
-  const irep_idt &identifier) const
+std::string invariant_sett::to_string(unsigned a) const
 {
   PRECONDITION(object_store!=nullptr);
-  return object_store->to_string(a, identifier);
+  return object_store->to_string(a);
 }
 
 bool invariant_sett::make_union(const invariant_sett &other)

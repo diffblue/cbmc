@@ -51,9 +51,7 @@ public:
 
   void output(std::ostream &out) const;
 
-  std::string to_string(
-    unsigned n,
-    const irep_idt &identifier) const;
+  std::string to_string(unsigned n) const;
 
 protected:
   const namespacet &ns;
@@ -104,9 +102,7 @@ public:
   {
   }
 
-  void output(
-    const irep_idt &identifier,
-    std::ostream &out) const;
+  void output(std::ostream &out) const;
 
   // true = added something
   bool make_union(const invariant_sett &other_invariants);
@@ -219,9 +215,7 @@ protected:
 
   void modifies(unsigned a);
 
-  std::string to_string(
-    unsigned a,
-    const irep_idt &identifier) const;
+  std::string to_string(unsigned a) const;
 
   bool get_object(
     const exprt &expr,
