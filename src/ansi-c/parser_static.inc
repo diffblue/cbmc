@@ -224,7 +224,7 @@ static void make_subtype(typet &dest, typet &src)
       }
       else if(p->is_nil())
         assert(false);
-      else if(p->id()==irep_idt())
+      else if(p->id().empty())
         assert(false);
       else
       {
@@ -247,7 +247,7 @@ static void make_subtype(typet &dest, typet &src)
             auto &merged_type = to_merged_type(*p);
             p=&merged_type.last_type();
           }
-          else if(p->id()==irep_idt())
+          else if(p->id().empty())
             assert(false);
           else if(p->is_nil())
             assert(false);

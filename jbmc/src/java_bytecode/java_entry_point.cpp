@@ -542,7 +542,7 @@ main_function_resultt get_main_symbol(
     irep_idt main_symbol_id = resolve_friendly_method_name(
       config.main.value(), symbol_table, error_message);
 
-    if(main_symbol_id==irep_idt())
+    if(main_symbol_id.empty())
     {
       message.error()
         << "main symbol resolution failed: " << error_message << messaget::eom;

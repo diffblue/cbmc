@@ -290,7 +290,7 @@ public:
   /// Removes erase_entry (if set) from the controlled set.
   ~recursion_set_entryt()
   {
-    if(erase_entry!=irep_idt())
+    if(!erase_entry.empty())
       recursion_set.erase(erase_entry);
   }
 
@@ -303,10 +303,8 @@ public:
   /// \return true if added to the set (and therefore owned by this object)
   bool insert_entry(const irep_idt &entry)
   {
-    INVARIANT(
-      erase_entry==irep_idt(),
-      "insert_entry should only be called once");
-    INVARIANT(entry!=irep_idt(), "entry should be a struct tag");
+    INVARIANT(erase_entry.empty(), "insert_entry should only be called once");
+    INVARIANT(!entry.empty(), "entry should be a struct tag");
     bool ret=recursion_set.insert(entry).second;
     if(ret)
     {

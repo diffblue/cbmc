@@ -75,8 +75,7 @@ replace_symbolt actuals_replace_map(
   std::size_t count=0;
   for(const auto &p : parameters)
   {
-    if(p.get_identifier()!=irep_idt() &&
-       arguments.size()>count)
+    if(!p.get_identifier().empty() && arguments.size() > count)
     {
       const exprt a =
         typecast_exprt::conditional_cast(arguments[count], p.type());
