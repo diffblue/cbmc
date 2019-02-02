@@ -13,34 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/std_expr.h>
 
-void function_modifiest::get_modifies_lhs(
-  const local_may_aliast &local_may_alias,
-  const goto_programt::const_targett t,
-  const exprt &lhs,
-  modifiest &modifies)
-{
-  if(lhs.id()==ID_symbol)
-    modifies.insert(lhs);
-  else if(lhs.id()==ID_dereference)
-  {
-    modifiest m=local_may_alias.get(t, to_dereference_expr(lhs).pointer());
-    for(modifiest::const_iterator m_it=m.begin();
-        m_it!=m.end(); m_it++)
-      get_modifies_lhs(local_may_alias, t, *m_it, modifies);
-  }
-  else if(lhs.id()==ID_member)
-  {
-  }
-  else if(lhs.id()==ID_index)
-  {
-  }
-  else if(lhs.id()==ID_if)
-  {
-    get_modifies_lhs(local_may_alias, t, to_if_expr(lhs).true_case(), modifies);
-    get_modifies_lhs(
-      local_may_alias, t, to_if_expr(lhs).false_case(), modifies);
-  }
-}
+#include "loop_utils.h"
 
 void function_modifiest::get_modifies(
   const local_may_aliast &local_may_alias,

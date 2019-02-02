@@ -30,12 +30,6 @@ public:
     const goto_programt::const_targett,
     modifiest &);
 
-  void get_modifies_lhs(
-    const local_may_aliast &,
-    const goto_programt::const_targett,
-    const exprt &lhs,
-    modifiest &);
-
   void get_modifies_function(
     const exprt &,
     modifiest &);

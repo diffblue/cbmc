@@ -19,6 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/remove_skip.h>
 
 #include "function_modifies.h"
+#include "loop_utils.h"
 
 class havoc_loopst
 {
@@ -51,56 +52,10 @@ protected:
     const goto_programt::targett loop_head,
     const loopt &);
 
-  void build_havoc_code(
-    const goto_programt::targett loop_head,
-    const modifiest &modifies,
-    goto_programt &dest);
-
   void get_modifies(
     const loopt &,
     modifiest &);
-
-  goto_programt::targett get_loop_exit(const loopt &);
 };
-
-goto_programt::targett havoc_loopst::get_loop_exit(const loopt &loop)
-{
-  assert(!loop.empty());
-
-  // find the last instruction in the loop
-  std::map<unsigned, goto_programt::targett> loop_map;
-
-  for(loopt::const_iterator l_it=loop.begin();
-      l_it!=loop.end();
-      l_it++)
-    loop_map[(*l_it)->location_number]=*l_it;
-
-  // get the one with the highest number
-  goto_programt::targett last=(--loop_map.end())->second;
-
-  return ++last;
-}
-
-void havoc_loopst::build_havoc_code(
-  const goto_programt::targett loop_head,
-  const modifiest &modifies,
-  goto_programt &dest)
-{
-  for(modifiest::const_iterator
-      m_it=modifies.begin();
-      m_it!=modifies.end();
-      m_it++)
-  {
-    exprt lhs=*m_it;
-    exprt rhs =
-      side_effect_expr_nondett(lhs.type(), loop_head->source_location);
-
-    goto_programt::targett t = dest.add(goto_programt::make_assignment(
-      code_assignt(lhs, rhs), loop_head->source_location));
-    t->function=loop_head->function;
-    t->code.add_source_location()=loop_head->source_location;
-  }
-}
 
 void havoc_loopst::havoc_loop(
   const goto_programt::targett loop_head,
@@ -150,30 +105,8 @@ void havoc_loopst::get_modifies(
   const loopt &loop,
   modifiest &modifies)
 {
-  for(loopt::const_iterator
-      i_it=loop.begin(); i_it!=loop.end(); i_it++)
-  {
-    const goto_programt::instructiont &instruction=**i_it;
-
-    if(instruction.is_assign())
-    {
-      const exprt &lhs=to_code_assign(instruction.code).lhs();
-      function_modifies.get_modifies_lhs(local_may_alias, *i_it, lhs, modifies);
-    }
-    else if(instruction.is_function_call())
-    {
-      const code_function_callt &code_function_call=
-        to_code_function_call(instruction.code);
-      const exprt &lhs=code_function_call.lhs();
-
-      // return value assignment
-      if(lhs.is_not_nil())
-        function_modifies.get_modifies_lhs(
-          local_may_alias, *i_it, lhs, modifies);
-
-      function_modifies(code_function_call.function(), modifies);
-    }
-  }
+  for(const auto &instruction_it : loop)
+    function_modifies.get_modifies(local_may_alias, instruction_it, modifies);
 }
 
 void havoc_loopst::havoc_loops()

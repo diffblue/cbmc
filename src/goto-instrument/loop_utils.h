@@ -24,6 +24,12 @@ void get_modifies(
   const loopt &loop,
   modifiest &modifies);
 
+void get_modifies_lhs(
+  const local_may_aliast &local_may_alias,
+  goto_programt::const_targett t,
+  const exprt &lhs,
+  modifiest &modifies);
+
 void build_havoc_code(
   const goto_programt::targett loop_head,
   const modifiest &modifies,
