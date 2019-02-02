@@ -134,7 +134,7 @@ void value_set_fivrnst::output_entry(
       result+=from_expr(ns, identifier, o)+", ";
 
       if(o_it->second)
-        result += integer2string(*o_it->second) + "";
+        result += integer2string(*o_it->second);
       else
         result+='*';
 

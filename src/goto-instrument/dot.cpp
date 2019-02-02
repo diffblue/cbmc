@@ -192,12 +192,12 @@ void dott::write_dot_subgraph(
       std::set<goto_programt::const_targett> fres;
       find_next(instructions, it, tres, fres);
 
-      std::string tlabel="true";
-      std::string flabel="false";
-      if(fres.empty() || tres.empty())
+      std::string tlabel;
+      std::string flabel;
+      if(!fres.empty() && !tres.empty())
       {
-        tlabel="";
-        flabel="";
+        tlabel = "true";
+        flabel = "false";
       }
 
       typedef std::set<goto_programt::const_targett> t;

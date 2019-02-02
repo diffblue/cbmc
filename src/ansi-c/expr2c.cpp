@@ -479,9 +479,7 @@ std::string expr2ct::convert_rec(
 
     if(parameters.empty())
     {
-      if(code_type.has_ellipsis())
-        dest+=""; // empty!
-      else
+      if(!code_type.has_ellipsis())
         dest+="void"; // means 'no parameters'
     }
     else

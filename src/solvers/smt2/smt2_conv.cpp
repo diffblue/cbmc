@@ -832,7 +832,6 @@ std::string smt2_convt::type2id(const typet &type) const
   else
   {
     UNREACHABLE;
-    return "";
   }
 }
 

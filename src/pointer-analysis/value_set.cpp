@@ -181,7 +181,7 @@ void value_sett::output(const namespacet &ns, std::ostream &out) const
         result = "<" + from_expr(ns, identifier, o) + ", ";
 
         if(o_it->second)
-          result += integer2string(*o_it->second) + "";
+          result += integer2string(*o_it->second);
         else
           result += '*';
 

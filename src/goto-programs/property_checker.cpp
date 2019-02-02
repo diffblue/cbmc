@@ -21,7 +21,7 @@ std::string property_checkert::as_string(resultt result)
   case property_checkert::resultt::UNKNOWN: return "UNKNOWN";
   }
 
-  return "";
+  UNREACHABLE;
 }
 
 property_checkert::property_checkert(

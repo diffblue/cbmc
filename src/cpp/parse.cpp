@@ -839,9 +839,8 @@ bool Parser::rNamespaceSpec(cpp_namespace_spect &namespace_spec)
 
   irep_idt name;
 
-  if(lex.LookAhead(0)=='{')
-    name=""; // an anonymous namespace
-  else
+  // namespace might be anonymous
+  if(lex.LookAhead(0) != '{')
   {
     if(lex.get_token(tk2)==TOK_IDENTIFIER)
       name=tk2.data.get(ID_C_base_name);

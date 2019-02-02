@@ -79,6 +79,8 @@ public:
 class format_textt
 {
 public:
+  format_textt() = default;
+
   explicit format_textt(std::string _content) : content(_content)
   {
   }
@@ -106,7 +108,7 @@ public:
     TEXT
   } format_typet;
 
-  explicit format_elementt(format_typet _type) : type(_type), fstring("")
+  explicit format_elementt(format_typet _type) : type(_type)
   {
   }
 
@@ -114,7 +116,7 @@ public:
   {
   }
 
-  explicit format_elementt(format_specifiert fs) : type(SPECIFIER), fstring("")
+  explicit format_elementt(format_specifiert fs) : type(SPECIFIER)
   {
     fspec.push_back(fs);
   }
@@ -194,7 +196,7 @@ static bool check_format_string(std::string s)
 static format_specifiert format_specifier_of_match(std::smatch &m)
 {
   int index = m[1].str().empty() ? -1 : std::stoi(m[1].str());
-  std::string flag = m[2].str().empty() ? "" : m[2].str();
+  std::string flag = m[2].str();
   int width = m[3].str().empty() ? -1 : std::stoi(m[3].str());
   int precision = m[4].str().empty() ? -1 : std::stoi(m[4].str());
   std::string tT = m[5].str();

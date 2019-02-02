@@ -46,13 +46,8 @@ std::string cmdlinet::get_value(char option) const
 {
   auto i=getoptnr(option);
 
-  if(i.has_value())
-  {
-    if(options[*i].values.empty())
-      return "";
-    else
-      return options[*i].values.front();
-  }
+  if(i.has_value() && !options[*i].values.empty())
+    return options[*i].values.front();
   else
     return "";
 }
@@ -96,13 +91,8 @@ std::string cmdlinet::get_value(const char *option) const
 {
   auto i=getoptnr(option);
 
-  if(i.has_value())
-  {
-    if(options[*i].values.empty())
-      return "";
-    else
-      return options[*i].values.front();
-  }
+  if(i.has_value() && !options[*i].values.empty())
+    return options[*i].values.front();
   else
     return "";
 }
