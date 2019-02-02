@@ -2038,7 +2038,7 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
 
       out << " (ite (and ";
 
-      // some faction bit is not zero
+      // some fraction bit is not zero
       out << "(not (= ((_ extract " << (from_fraction_bits-1) << " 0) ?tcop) "
              "(_ bv0 " << from_fraction_bits << ")))";
 

@@ -785,7 +785,7 @@ void float_utilst::normalization_shift(bvt &fraction, bvt &exponent)
 
   // n-log-n alignment shifter.
   // The worst-case shift is the number of fraction
-  // bits minus one, in case the faction is one exactly.
+  // bits minus one, in case the fraction is one exactly.
   PRECONDITION(!fraction.empty());
   std::size_t depth = address_bits(fraction.size() - 1);
 
