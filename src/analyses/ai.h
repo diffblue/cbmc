@@ -157,7 +157,7 @@ public:
     const goto_functionst::goto_functiont &goto_function,
     std::ostream &out) const
   {
-    output(ns, "", goto_function.body, out);
+    output(ns, irep_idt(), goto_function.body, out);
   }
 
   /// Output the abstract states for the whole program as JSON
@@ -178,7 +178,7 @@ public:
     const namespacet &ns,
     const goto_programt &goto_program) const
   {
-    return output_json(ns, "", goto_program);
+    return output_json(ns, irep_idt(), goto_program);
   }
 
   /// Output the abstract states for a single function as JSON
@@ -186,7 +186,7 @@ public:
     const namespacet &ns,
     const goto_functionst::goto_functiont &goto_function) const
   {
-    return output_json(ns, "", goto_function.body);
+    return output_json(ns, irep_idt(), goto_function.body);
   }
 
   /// Output the abstract states for the whole program as XML
@@ -207,7 +207,7 @@ public:
     const namespacet &ns,
     const goto_programt &goto_program) const
   {
-    return output_xml(ns, "", goto_program);
+    return output_xml(ns, irep_idt(), goto_program);
   }
 
   /// Output the abstract states for a single function as XML
@@ -215,7 +215,7 @@ public:
     const namespacet &ns,
     const goto_functionst::goto_functiont &goto_function) const
   {
-    return output_xml(ns, "", goto_function.body);
+    return output_xml(ns, irep_idt(), goto_function.body);
   }
 
 protected:

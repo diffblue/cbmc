@@ -295,7 +295,7 @@ irep_idt get_string_argument_rec(const exprt &src)
     }
   }
 
-  return "";
+  return irep_idt();
 }
 
 irep_idt get_string_argument(const exprt &src, const namespacet &ns)

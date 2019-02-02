@@ -207,7 +207,7 @@ void local_safe_pointerst::output(
     }
 
     out << '\n';
-    goto_program.output_instruction(ns, "", out, *i_it);
+    goto_program.output_instruction(ns, irep_idt(), out, *i_it);
     out << '\n';
   }
 }
@@ -258,7 +258,7 @@ void local_safe_pointerst::output_safe_dereferences(
     }
 
     out << '\n';
-    goto_program.output_instruction(ns, "", out, *i_it);
+    goto_program.output_instruction(ns, irep_idt(), out, *i_it);
     out << '\n';
   }
 }

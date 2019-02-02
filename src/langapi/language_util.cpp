@@ -59,13 +59,13 @@ std::string type_to_name(
 std::string from_expr(const exprt &expr)
 {
   symbol_tablet symbol_table;
-  return from_expr(namespacet(symbol_table), "", expr);
+  return from_expr(namespacet(symbol_table), irep_idt(), expr);
 }
 
 std::string from_type(const typet &type)
 {
   symbol_tablet symbol_table;
-  return from_type(namespacet(symbol_table), "", type);
+  return from_type(namespacet(symbol_table), irep_idt(), type);
 }
 
 exprt to_expr(
@@ -91,5 +91,5 @@ exprt to_expr(
 std::string type_to_name(const typet &type)
 {
   symbol_tablet symbol_table;
-  return type_to_name(namespacet(symbol_table), "", type);
+  return type_to_name(namespacet(symbol_table), irep_idt(), type);
 }

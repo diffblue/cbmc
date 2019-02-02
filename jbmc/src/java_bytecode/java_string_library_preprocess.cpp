@@ -41,7 +41,7 @@ static irep_idt get_tag(const typet &type)
   else if(type.id() == ID_struct)
     return irep_idt("java::" + id2string(to_struct_type(type).get_tag()));
   else
-    return "";
+    return irep_idt();
 }
 
 /// \param type: a type

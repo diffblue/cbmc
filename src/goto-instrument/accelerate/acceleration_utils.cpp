@@ -157,7 +157,7 @@ bool acceleration_utilst::check_inductive(
 
 #ifdef DEBUG
   std::cout << "Checking following program for inductiveness:\n";
-  program.output(ns, "", std::cout);
+  program.output(ns, irep_idt(), std::cout);
 #endif
 
   try
@@ -440,7 +440,7 @@ bool acceleration_utilst::do_assumptions(
 
 #ifdef DEBUG
   std::cout << "Checking following program for monotonicity:\n";
-  program.output(ns, "", std::cout);
+  program.output(ns, irep_idt(), std::cout);
 #endif
 
   try

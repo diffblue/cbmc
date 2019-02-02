@@ -242,7 +242,7 @@ optionalt<exprt> expr_initializert<nondet>::expr_initializer_rec(
     if(!found)
     {
       // stupid empty union
-      union_exprt value("", nil_exprt(), type);
+      union_exprt value(irep_idt(), nil_exprt(), type);
       value.add_source_location() = source_location;
       return std::move(value);
     }

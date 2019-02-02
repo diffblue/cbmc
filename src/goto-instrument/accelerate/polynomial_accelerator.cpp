@@ -403,7 +403,7 @@ bool polynomial_acceleratort::fit_polynomial_sliced(
 
 #ifdef DEBUG
   std::cout << "Fitting polynomial with program:\n";
-  program.output(ns, "", std::cout);
+  program.output(ns, irep_idt(), std::cout);
 #endif
 
   // Now do an ASSERT(false) to grab a counterexample
@@ -699,7 +699,7 @@ bool polynomial_acceleratort::check_inductive(
 
 #ifdef DEBUG
   std::cout << "Checking following program for inductiveness:\n";
-  program.output(ns, "", std::cout);
+  program.output(ns, irep_idt(), std::cout);
 #endif
 
   try

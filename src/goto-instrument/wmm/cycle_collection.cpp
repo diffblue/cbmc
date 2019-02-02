@@ -89,8 +89,17 @@ void event_grapht::graph_explorert::collect_cycles(
   {
     event_idt source=*st_it;
     egraph.message.debug() << "explore " << egraph[source].id << messaget::eom;
-    backtrack(set_of_cycles, source, source,
-      false, max_po_trans, false, false, false, "", model);
+    backtrack(
+      set_of_cycles,
+      source,
+      source,
+      false,
+      max_po_trans,
+      false,
+      false,
+      false,
+      irep_idt(),
+      model);
 
     while(!marked_stack.empty())
     {
@@ -452,18 +461,17 @@ bool event_grapht::graph_explorert::backtrack(
           f=true;
         }
         else if(!mark[w])
-          f|=
-            backtrack(
-              set_of_cycles,
-              source,
-              w,
-              unsafe_met_updated,
-              po_trans,
-              false,
-              false,
-              false,
-              "",
-              model);
+          f |= backtrack(
+            set_of_cycles,
+            source,
+            w,
+            unsafe_met_updated,
+            po_trans,
+            false,
+            false,
+            false,
+            irep_idt(),
+            model);
       }
     }
 

@@ -347,7 +347,7 @@ void local_bitvector_analysist::output(
     }
 
     out << "\n";
-    goto_function.body.output_instruction(ns, "", out, *i_it);
+    goto_function.body.output_instruction(ns, irep_idt(), out, *i_it);
     out << "\n";
 
     l++;

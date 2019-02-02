@@ -712,7 +712,7 @@ public:
   /// Output goto-program to given stream
   std::ostream &output(std::ostream &out) const
   {
-    return output(namespacet(symbol_tablet()), "", out);
+    return output(namespacet(symbol_tablet()), irep_idt(), out);
   }
 
   /// Output a single instruction
