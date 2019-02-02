@@ -542,9 +542,6 @@ main_function_resultt get_main_symbol(
   }
   else
   {
-    // no function given, we look for the main class
-    assert(config.main=="");
-
     // are we given a main class?
     if(main_class.empty())
     {
