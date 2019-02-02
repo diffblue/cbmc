@@ -26,9 +26,9 @@ static std::string do_prefix(const std::string &s)
   return s;
 }
 
-static void irep2name(const irept &irep, std::string &result)
+static std::string irep2name(const irept &irep)
 {
-  result="";
+  std::string result;
 
   if(is_reference(static_cast<const typet&>(irep)))
     result+="reference";
@@ -48,7 +48,7 @@ static void irep2name(const irept &irep, std::string &result)
     result+=do_prefix(irep.id_string());
 
   if(irep.get_named_sub().empty() && irep.get_sub().empty())
-    return;
+    return result;
 
   result+='(';
   bool first=true;
@@ -64,9 +64,7 @@ static void irep2name(const irept &irep, std::string &result)
       result += do_prefix(name2string(it->first));
 
       result += '=';
-      std::string tmp;
-      irep2name(it->second, tmp);
-      result += tmp;
+      result += irep2name(it->second);
     }
 
   forall_named_irep(it, irep.get_named_sub())
@@ -80,9 +78,7 @@ static void irep2name(const irept &irep, std::string &result)
         result+=',';
       result+=do_prefix(name2string(it->first));
       result+='=';
-      std::string tmp;
-      irep2name(it->second, tmp);
-      result+=tmp;
+      result += irep2name(it->second);
     }
 
   forall_irep(it, irep.get_sub())
@@ -91,12 +87,12 @@ static void irep2name(const irept &irep, std::string &result)
       first=false;
     else
       result+=',';
-    std::string tmp;
-    irep2name(*it, tmp);
-    result+=tmp;
+    result += irep2name(*it);
   }
 
   result+=')';
+
+  return result;
 }
 
 std::string cpp_type2name(const typet &type)
@@ -175,9 +171,7 @@ std::string cpp_type2name(const typet &type)
   else
   {
     // give up
-    std::string tmp;
-    irep2name(type, tmp);
-    return tmp;
+    return irep2name(type);
   }
 
   return result;
@@ -185,7 +179,5 @@ std::string cpp_type2name(const typet &type)
 
 std::string cpp_expr2name(const exprt &expr)
 {
-  std::string tmp;
-  irep2name(expr, tmp);
-  return tmp;
+  return irep2name(expr);
 }
