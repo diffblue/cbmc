@@ -20,6 +20,9 @@ Date: March 2013
 #include <util/invariant.h>
 #include <goto-programs/goto_functions.h>
 
+/// Dirty variables are ones which have their address taken so we can't
+/// reliably work out where they may be assigned and are also considered shared
+/// state in the presence of multi-threading.
 class dirtyt
 {
 private:
