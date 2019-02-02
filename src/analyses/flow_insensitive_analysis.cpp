@@ -210,11 +210,9 @@ bool flow_insensitive_analysis_baset::do_function_call(
 
     goto_programt temp;
 
-    exprt rhs =
-      side_effect_expr_nondett(code.lhs().type(), l_call->source_location);
+    goto_programt::targett r = temp.add(goto_programt::make_return(code_returnt(
+      side_effect_expr_nondett(code.lhs().type(), l_call->source_location))));
 
-    goto_programt::targett r =
-      temp.add(goto_programt::make_return(code_returnt(rhs)));
     r->function=f_it->first;
     r->location_number=0;
 
