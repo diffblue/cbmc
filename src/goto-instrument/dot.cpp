@@ -338,14 +338,13 @@ void dott::write_edge(
   out << "Node_" << subgraphscount << "_" << from.location_number;
   out << " -> ";
   out << "Node_" << subgraphscount << "_" << to.location_number << " ";
-  if(label!="")
-    {
-      out << "[fontsize=20,label=\"" << label << "\"";
-      if(from.is_backwards_goto() &&
-          from.location_number > to.location_number)
-        out << ",color=red";
-      out << "]";
-    }
+  if(!label.empty())
+  {
+    out << "[fontsize=20,label=\"" << label << "\"";
+    if(from.is_backwards_goto() && from.location_number > to.location_number)
+      out << ",color=red";
+    out << "]";
+  }
   out << ";\n";
 }
 

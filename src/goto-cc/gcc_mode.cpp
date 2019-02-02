@@ -484,7 +484,7 @@ int gcc_modet::doit()
     cmdline.isset("mtune") ? cmdline.get_value("mtune") :
     cmdline.isset("mcpu")  ? cmdline.get_value("mcpu")  : "";
 
-  if(target_cpu!="")
+  if(!target_cpu.empty())
   {
     // Work out what CPROVER architecture we should target.
     for(auto &pair : arch_map)
@@ -821,7 +821,7 @@ int gcc_modet::preprocess(
   }
 
   // language, if given
-  if(language!="")
+  if(!language.empty())
   {
     new_argv.push_back("-x");
     new_argv.push_back(language);

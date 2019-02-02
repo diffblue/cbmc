@@ -433,7 +433,7 @@ bool compilet::parse(
   // Using '-x', the type of a file can be overridden;
   // otherwise, it's guessed from the extension.
 
-  if(override_language!="")
+  if(!override_language.empty())
   {
     if(override_language=="c++" || override_language=="c++-header")
       languagep = get_language_from_mode(ID_cpp);

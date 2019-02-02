@@ -26,30 +26,30 @@ void message_handlert::print(
 
   if(!file.empty())
   {
-    if(dest!="")
+    if(!dest.empty())
       dest+=' ';
     dest+="file "+id2string(file);
   }
   if(!line.empty())
   {
-    if(dest!="")
+    if(!dest.empty())
       dest+=' ';
     dest+="line "+id2string(line);
   }
   if(!column.empty())
   {
-    if(dest!="")
+    if(!dest.empty())
       dest+=' ';
     dest+="column "+id2string(column);
   }
   if(!function.empty())
   {
-    if(dest!="")
+    if(!dest.empty())
       dest+=' ';
     dest+="function "+id2string(function);
   }
 
-  if(dest!="")
+  if(!dest.empty())
     dest+=": ";
   dest+=message;
 

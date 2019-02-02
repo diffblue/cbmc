@@ -115,7 +115,7 @@ std::ostream &goto_programt::output_instruction(
       out << from_expr(ns, identifier, instruction.get_condition());
 
       const irep_idt &comment=instruction.source_location.get_comment();
-      if(comment!="")
+      if(!comment.empty())
         out << " // " << comment;
     }
 
@@ -453,7 +453,7 @@ std::string as_string(
 
     {
       const irep_idt &comment=i.source_location.get_comment();
-      if(comment!="")
+      if(!comment.empty())
         result+=" /* "+id2string(comment)+" */";
     }
     return result;

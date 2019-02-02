@@ -211,7 +211,7 @@ bool event_grapht::graph_explorert::backtrack(
      cycle cannot be with x */
   irep_idt avoid_at_the_end=var_to_avoid;
   bool no_comm=false;
-  if(avoid_at_the_end!="" && avoid_at_the_end==this_vertex.variable)
+  if(!avoid_at_the_end.empty() && avoid_at_the_end == this_vertex.variable)
     no_comm=true;
 
   /* if specified, maximum number of events reached */

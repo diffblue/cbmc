@@ -1198,8 +1198,7 @@ void cpp_typecheckt::typecheck_expr_member(
   }
 
   const irep_idt &component_name=expr.get(ID_component_name);
-
-  assert(component_name!="");
+  INVARIANT(!component_name.empty(), "component name should not be empty");
 
   exprt component;
   component.make_nil();
@@ -2131,7 +2130,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
     // special case for the initialization of parents
     if(member.get_bool(ID_C_not_accessible))
     {
-      assert(member.get(ID_C_access)!="");
+      PRECONDITION(!member.get(ID_C_access).empty());
       tmp_object_expr.set(ID_C_not_accessible, true);
       tmp_object_expr.set(ID_C_access, member.get(ID_C_access));
     }

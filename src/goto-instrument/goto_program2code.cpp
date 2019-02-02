@@ -1890,7 +1890,7 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
       {
         irep_idt base_name;
 
-        if(expr.type().get(ID_C_c_type)!="")
+        if(!expr.type().get(ID_C_c_type).empty())
         {
           irep_idt suffix;
           suffix=expr.type().get(ID_C_c_type);

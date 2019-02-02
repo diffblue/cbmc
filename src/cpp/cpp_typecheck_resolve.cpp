@@ -446,7 +446,7 @@ void cpp_typecheck_resolvet::disambiguate_functions(
     {
       std::size_t template_distance=0;
 
-      if(old_id.type().get(ID_C_template) != "")
+      if(!old_id.type().get(ID_C_template).empty())
         template_distance = old_id.type()
                               .find(ID_C_template_arguments)
                               .find(ID_arguments)
@@ -1011,7 +1011,7 @@ struct_tag_typet cpp_typecheck_resolvet::disambiguate_template_classes(
     if(!cpp_declaration.is_class_template())
       continue;
     irep_idt specialization_of=cpp_declaration.get_specialization_of();
-    if(specialization_of!="")
+    if(!specialization_of.empty())
       primary_templates.insert(specialization_of);
     else
       primary_templates.insert(id);

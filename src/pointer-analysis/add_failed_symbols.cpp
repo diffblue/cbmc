@@ -64,7 +64,7 @@ void add_failed_symbol_if_needed(
   if(!symbol.is_lvalue)
     return;
 
-  if(symbol.type.get(ID_C_failed_symbol)!="")
+  if(!symbol.type.get(ID_C_failed_symbol).empty())
     return;
 
   add_failed_symbol(symbol_table.get_writeable_ref(symbol.name), symbol_table);

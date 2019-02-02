@@ -63,8 +63,7 @@ bool inv_object_storet::get(const exprt &expr, unsigned &n)
 unsigned inv_object_storet::add(const exprt &expr)
 {
   std::string s=build_string(expr);
-
-  assert(s!="");
+  CHECK_RETURN(!s.empty());
 
   mapt::number_type n=map.number(s);
 

@@ -77,7 +77,7 @@ const symbolt &get_module(
   const std::string &module,
   message_handlert &message_handler)
 {
-  if(module!="")
+  if(!module.empty())
     return get_module_by_name(symbol_table, module, message_handler);
 
   symbolptr_listt symbolptr_list, main_symbolptr_list;

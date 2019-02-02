@@ -75,7 +75,7 @@ propt::resultt qbf_skizzot::prop_solve()
 
       std::getline(in, line);
 
-      if(line!="" && line[line.size()-1]=='\r')
+      if(!line.empty() && line[line.size() - 1] == '\r')
         line.resize(line.size()-1);
 
       if(line=="The instance evaluates to TRUE.")

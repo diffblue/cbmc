@@ -33,7 +33,7 @@ std::string source_locationt::as_string(bool print_cwd) const
 
   if(!file.empty())
   {
-    if(dest!="")
+    if(!dest.empty())
       dest+=' ';
     dest+="file ";
     if(print_cwd)
@@ -44,25 +44,25 @@ std::string source_locationt::as_string(bool print_cwd) const
   }
   if(!line.empty())
   {
-    if(dest!="")
+    if(!dest.empty())
       dest+=' ';
     dest+="line "+id2string(line);
   }
   if(!column.empty())
   {
-    if(dest!="")
+    if(!dest.empty())
       dest+=' ';
     dest+="column "+id2string(column);
   }
   if(!function.empty())
   {
-    if(dest!="")
+    if(!dest.empty())
       dest+=' ';
     dest+="function "+id2string(function);
   }
   if(!bytecode.empty())
   {
-    if(dest!="")
+    if(!dest.empty())
       dest+=' ';
     dest+="bytecode-index "+id2string(bytecode);
   }

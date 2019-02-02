@@ -79,7 +79,7 @@ std::string linkingt::type_to_string_verbose(
     std::string result=followed.id_string();
 
     const std::string &tag=followed.get_string(ID_tag);
-    if(tag!="")
+    if(!tag.empty())
       result+=" "+tag;
 
     if(to_struct_union_type(followed).is_incomplete())

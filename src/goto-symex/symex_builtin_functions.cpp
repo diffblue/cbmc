@@ -323,7 +323,7 @@ void goto_symext::symex_printf(
   const irep_idt format_string=
     get_string_argument(operands[0], ns);
 
-  if(format_string!="")
+  if(!format_string.empty())
     target.output_fmt(
       state.guard.as_expr(),
       state.source, "printf", format_string, args);

@@ -32,7 +32,7 @@ void parsert::parse_error(
   const std::string &before)
 {
   std::string tmp=message;
-  if(before!="")
+  if(!before.empty())
     tmp+=" before `"+before+"'";
 
   #if 0

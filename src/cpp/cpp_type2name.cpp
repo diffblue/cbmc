@@ -19,8 +19,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 static std::string do_prefix(const std::string &s)
 {
-  if(s.find(',')!=std::string::npos ||
-     (s!="" && isdigit(s[0])))
+  if(s.find(',') != std::string::npos || (!s.empty() && isdigit(s[0])))
     return std::to_string(s.size())+"_"+s;
 
   return s;

@@ -60,9 +60,9 @@ void label_properties(
     irep_idt function=it->source_location.get_function();
 
     std::string prefix=id2string(function);
-    if(it->source_location.get_property_class()!="")
+    if(!it->source_location.get_property_class().empty())
     {
-      if(prefix!="")
+      if(!prefix.empty())
         prefix+=".";
 
       std::string class_infix=
@@ -74,7 +74,7 @@ void label_properties(
       prefix+=class_infix;
     }
 
-    if(prefix!="")
+    if(!prefix.empty())
       prefix+=".";
 
     std::size_t &count=property_counters[prefix];

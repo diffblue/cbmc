@@ -199,7 +199,7 @@ static format_specifiert format_specifier_of_match(std::smatch &m)
   int precision = m[4].str().empty() ? -1 : std::stoi(m[4].str());
   std::string tT = m[5].str();
 
-  bool dt = (tT != "");
+  bool dt = !tT.empty();
   if(tT == "T")
     flag.push_back(format_specifiert::DATE_TIME_UPPER);
 

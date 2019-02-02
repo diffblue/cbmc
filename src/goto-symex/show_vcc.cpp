@@ -48,7 +48,7 @@ show_vcc_plain(messaget::mstreamt &out, const symex_target_equationt &equation)
     if(s_it->source.pc->source_location.is_not_nil())
       out << s_it->source.pc->source_location << '\n';
 
-    if(s_it->comment != "")
+    if(!s_it->comment.empty())
       out << s_it->comment << '\n';
 
     symex_target_equationt::SSA_stepst::const_iterator p_it =

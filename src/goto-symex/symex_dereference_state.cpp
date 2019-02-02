@@ -43,8 +43,7 @@ symex_dereference_statet::get_or_create_failed_symbol(const exprt &expr)
     const irep_idt &failed_symbol = ptr_symbol.type.get(ID_C_failed_symbol);
 
     const symbolt *symbol;
-    if(failed_symbol!="" &&
-        !ns.lookup(failed_symbol, symbol))
+    if(!failed_symbol.empty() && !ns.lookup(failed_symbol, symbol))
     {
       symbolt sym=*symbol;
       symbolt *sym_ptr=nullptr;
@@ -63,8 +62,7 @@ symex_dereference_statet::get_or_create_failed_symbol(const exprt &expr)
     const irep_idt &failed_symbol = ptr_symbol.type.get(ID_C_failed_symbol);
 
     const symbolt *symbol;
-    if(failed_symbol!="" &&
-        !ns.lookup(failed_symbol, symbol))
+    if(!failed_symbol.empty() && !ns.lookup(failed_symbol, symbol))
     {
       symbolt sym=*symbol;
       symbolt *sym_ptr=nullptr;

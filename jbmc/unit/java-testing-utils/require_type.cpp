@@ -470,7 +470,7 @@ require_type::require_struct_tag(const typet &type, const irep_idt &identifier)
 {
   REQUIRE(type.id() == ID_struct_tag);
   const struct_tag_typet &result = to_struct_tag_type(type);
-  if(identifier != "")
+  if(!identifier.empty())
   {
     REQUIRE(result.get_identifier() == identifier);
   }
