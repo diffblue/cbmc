@@ -1,0 +1,34 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - sed -i 's#/archive.ubuntu.com#/us-east-1.ec2.archive.ubuntu.com#g' /etc/apt/sources.list
+      - add-apt-repository ppa:ubuntu-toolchain-r/test -y
+      - apt-key adv --keyserver keyserver.ubuntu.com --recv-keys BA9EF27F
+      - add-apt-repository ppa:openjdk-r/ppa -y
+      - apt-get update -y
+      - apt-get install -y g++-5 clang-7 flex bison make git libwww-perl patch ccache libc6-dev-i386 jq
+      - apt-get install -y openjdk-8-jdk
+      - update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 1
+      - update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-5 1
+  build:
+    commands:
+      - echo Build started on `date`
+      - git submodule update --init --recursive
+      - make -C src CXX='ccache /usr/bin/clang++-7' CXX_FLAGS='-Qunused-arguments'
+      - make -C jbmc/src CXX='ccache /usr/bin/clang++-7' CXX_FLAGS='-Qunused-arguments'
+  post_build:
+    commands:
+      - make -C unit test CXX='ccache /usr/bin/clang++-7' CXX_FLAGS='-Qunused-arguments'
+      - make -C regression test
+      - scripts/delete_failing_smt2_solver_tests
+      - env PATH=$PATH:`pwd`/src/solvers make -C regression/cbmc test-cprover-smt2
+      - make -C jbmc/unit test CXX='ccache /usr/bin/clang++-7' CXX_FLAGS='-Qunused-arguments'
+      - make -C jbmc/regression test
+      - echo Build completed on `date`
+cache:
+  paths:
+    - '/var/cache/apt/**/*'
+    - '/var/lib/apt/lists/**/*'
+    - '/root/.ccache/**/*'
