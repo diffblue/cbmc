@@ -125,10 +125,9 @@ public:
 
   // language id / description
 
-  virtual std::string id() const { return ""; }
-  virtual std::string description() const { return ""; }
-  virtual std::set<std::string> extensions() const
-  { return std::set<std::string>(); }
+  virtual std::string id() const = 0;
+  virtual std::string description() const = 0;
+  virtual std::set<std::string> extensions() const = 0;
 
   // show parse tree
 
