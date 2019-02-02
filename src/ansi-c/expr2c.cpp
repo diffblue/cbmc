@@ -312,7 +312,7 @@ std::string expr2ct::convert_rec(
     {
       if(is_signed)
         sign_str="";
-      return q+sign_str+"__int128";
+      return q + sign_str + "__int128" + d;
     }
     else
     {
