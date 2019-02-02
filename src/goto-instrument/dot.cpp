@@ -104,7 +104,7 @@ void dott::write_dot_subgraph(
       if(it==instructions.end() ||
          seen.find(it)!=seen.end()) continue;
 
-      std::stringstream tmp("");
+      std::stringstream tmp;
       if(it->is_goto())
       {
         if(it->get_condition().is_true())

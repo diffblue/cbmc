@@ -1864,7 +1864,7 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
       // Replace by a function call to nondet_...
       // We first search for a suitable one in the symbol table.
 
-      irep_idt id="";
+      irep_idt id;
 
       for(symbol_tablet::symbolst::const_iterator
           it=symbol_table.symbols.begin();
@@ -1888,7 +1888,7 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
 
       if(id.empty())
       {
-        irep_idt base_name="";
+        irep_idt base_name;
 
         if(expr.type().get(ID_C_c_type)!="")
         {

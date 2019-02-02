@@ -277,7 +277,7 @@ std::string expr2javat::convert_rec(
     // so we make one up, loosely inspired by the syntax
     // of lambda expressions.
 
-    std::string dest="";
+    std::string dest;
 
     dest+='(';
     const java_method_typet::parameterst &parameters = method_type.parameters();

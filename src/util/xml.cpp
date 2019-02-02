@@ -213,7 +213,7 @@ void xmlt::set_attribute(
 /// \return the unescaped string
 std::string xmlt::unescape(const std::string &str)
 {
-  std::string result("");
+  std::string result;
 
   result.reserve(str.size());
 

@@ -872,7 +872,7 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
     recursive=false;
   }
 
-  std::string final_base_name="";
+  std::string final_base_name;
   template_args.make_nil();
 
   while(pos!=cpp_name.get_sub().end())

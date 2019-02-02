@@ -59,7 +59,7 @@ void get_goto_model(std::istream &in, goto_modelt &goto_model)
   language_filest language_files;
   language_files.set_message_handler(null_message_handler);
 
-  std::string filename("");
+  std::string filename;
 
   language_filet &language_file = language_files.add_file(filename);
 

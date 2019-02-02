@@ -58,7 +58,7 @@ static void print_with_indent(
 {
   const std::size_t p = indent_line.find_first_not_of(" \t");
   const std::string indent =
-    p == std::string::npos ? std::string("") : std::string(indent_line, 0, p);
+    p == std::string::npos ? std::string() : std::string(indent_line, 0, p);
   std::istringstream in(src);
   std::string src_line;
   while(std::getline(in, src_line))

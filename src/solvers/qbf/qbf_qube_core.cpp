@@ -51,7 +51,7 @@ propt::resultt qbf_qube_coret::prop_solve()
     write_qdimacs_cnf(out);
   }
 
-  std::string options="";
+  std::string options;
 
   // solve it
   int res=system((

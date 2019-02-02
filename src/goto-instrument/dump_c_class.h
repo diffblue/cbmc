@@ -71,7 +71,6 @@ protected:
 
     explicit typedef_infot(const irep_idt &name):
       typedef_name(name),
-      type_decl_str(""),
       early(false)
     {
     }
