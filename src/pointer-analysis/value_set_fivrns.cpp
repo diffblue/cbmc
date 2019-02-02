@@ -1065,7 +1065,7 @@ void value_set_fivrnst::do_function_call(
   {
     const std::string identifier="value_set::" + id2string(function) + "::" +
                                  "argument$"+std::to_string(i);
-    add_var(identifier, "");
+    add_var(identifier);
     const symbol_exprt dummy_lhs(identifier, arguments[i].type());
 
     assign(dummy_lhs, arguments[i], ns, true);
@@ -1090,10 +1090,10 @@ void value_set_fivrnst::do_function_call(
       it++)
   {
     const irep_idt &identifier=it->get_identifier();
-    if(identifier=="")
+    if(identifier.empty())
       continue;
 
-    add_var(identifier, "");
+    add_var(identifier);
 
     const exprt v_expr=
       symbol_exprt("value_set::" + id2string(function) + "::" +
@@ -1114,7 +1114,7 @@ void value_set_fivrnst::do_end_function(
 
   irep_idt rvs = std::string("value_set::return_value") +
                  std::to_string(from_function);
-  add_var(rvs, "");
+  add_var(rvs);
   symbol_exprt rhs(rvs, lhs.type());
 
   assign(lhs, rhs, ns);
@@ -1187,7 +1187,7 @@ void value_set_fivrnst::apply_code(
     {
       irep_idt rvs = std::string("value_set::return_value") +
                      std::to_string(from_function);
-      add_var(rvs, "");
+      add_var(rvs);
       symbol_exprt lhs(rvs, code.op0().type());
       assign(lhs, code.op0(), ns);
     }
