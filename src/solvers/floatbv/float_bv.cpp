@@ -893,7 +893,9 @@ void float_bvt::normalization_shift(
       if_exprt(prefix_is_zero, shifted, fraction);
 
     // add corresponding weight to exponent
-    INVARIANT(d < (signed int)exponent_bits, "");
+    INVARIANT(
+      d < (signed int)exponent_bits,
+      "depth must be smaller than exponent bits");
 
     exponent_delta=
       bitor_exprt(exponent_delta,

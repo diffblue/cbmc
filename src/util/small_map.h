@@ -73,7 +73,7 @@ public:
   }
 
 private:
-  static_assert(std::is_unsigned<Ind>::value, "");
+  static_assert(std::is_unsigned<Ind>::value, "Ind should be an unsigned type");
 
   typedef Ind index_fieldt;
 
@@ -167,7 +167,7 @@ private:
 
   static const std::size_t NUM = Num;
 
-  static_assert(NUM >= 2, "");
+  static_assert(NUM >= 2, "NUM should be at least 2");
 
   static constexpr std::size_t num_bits(const std::size_t n)
   {
@@ -187,9 +187,11 @@ private:
 
   static const index_fieldt MASK = ((index_fieldt)1 << BITS) - 1;
 
-  static_assert(S_BITS <= N_BITS, "");
+  static_assert(S_BITS <= N_BITS, "S_BITS should be no larger than N_BITS");
 
-  static_assert(std::numeric_limits<unsigned>::digits >= BITS, "");
+  static_assert(
+    std::numeric_limits<unsigned>::digits >= BITS,
+    "BITS must fit into an unsigned");
 
   // Internal
 
