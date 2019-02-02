@@ -2953,82 +2953,6 @@ public:
   }
 };
 
-/// \brief Bit-vector replication
-class replication_exprt:public binary_exprt
-{
-public:
-  DEPRECATED("use replication_exprt(times, value) instead")
-  replication_exprt():binary_exprt(ID_replication)
-  {
-  }
-
-  DEPRECATED("use replication_exprt(times, value) instead")
-  explicit replication_exprt(const typet &_type):
-    binary_exprt(ID_replication, _type)
-  {
-  }
-
-  replication_exprt(const exprt &_times, const exprt &_src):
-    binary_exprt(_times, ID_replication, _src)
-  {
-  }
-
-  exprt &times()
-  {
-    return op0();
-  }
-
-  const exprt &times() const
-  {
-    return op0();
-  }
-
-  exprt &op()
-  {
-    return op1();
-  }
-
-  const exprt &op() const
-  {
-    return op1();
-  }
-};
-
-/// \brief Cast an exprt to a \ref replication_exprt
-///
-/// \a expr must be known to be \ref replication_exprt.
-///
-/// \param expr: Source expression
-/// \return Object of type \ref replication_exprt
-inline const replication_exprt &to_replication_expr(const exprt &expr)
-{
-  PRECONDITION(expr.id()==ID_replication);
-  DATA_INVARIANT(
-    expr.operands().size()==2,
-    "Bit-wise replication must have two operands");
-  return static_cast<const replication_exprt &>(expr);
-}
-
-/// \copydoc to_replication_expr(const exprt &)
-inline replication_exprt &to_replication_expr(exprt &expr)
-{
-  PRECONDITION(expr.id()==ID_replication);
-  DATA_INVARIANT(
-    expr.operands().size()==2,
-    "Bit-wise replication must have two operands");
-  return static_cast<replication_exprt &>(expr);
-}
-
-template<> inline bool can_cast_expr<replication_exprt>(const exprt &base)
-{
-  return base.id()==ID_replication;
-}
-inline void validate_expr(const replication_exprt &value)
-{
-  validate_operands(value, 2, "Bit-wise replication must have two operands");
-}
-
-
 /// \brief Extracts a single bit of a bit-vector operand
 class extractbit_exprt:public binary_predicate_exprt
 {
@@ -4419,6 +4343,80 @@ public:
   {
   }
 };
+
+/// \brief Bit-vector replication
+class replication_exprt : public binary_exprt
+{
+public:
+  DEPRECATED("use replication_exprt(times, value) instead")
+  replication_exprt() : binary_exprt(ID_replication)
+  {
+  }
+
+  DEPRECATED("use replication_exprt(times, value) instead")
+  explicit replication_exprt(const typet &_type)
+    : binary_exprt(ID_replication, _type)
+  {
+  }
+
+  replication_exprt(const constant_exprt &_times, const exprt &_src)
+    : binary_exprt(_times, ID_replication, _src)
+  {
+  }
+
+  constant_exprt &times()
+  {
+    return static_cast<constant_exprt &>(op0());
+  }
+
+  const constant_exprt &times() const
+  {
+    return static_cast<const constant_exprt &>(op0());
+  }
+
+  exprt &op()
+  {
+    return op1();
+  }
+
+  const exprt &op() const
+  {
+    return op1();
+  }
+};
+
+/// \brief Cast an exprt to a \ref replication_exprt
+///
+/// \a expr must be known to be \ref replication_exprt.
+///
+/// \param expr: Source expression
+/// \return Object of type \ref replication_exprt
+inline const replication_exprt &to_replication_expr(const exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_replication);
+  DATA_INVARIANT(
+    expr.operands().size() == 2, "Bit-wise replication must have two operands");
+  return static_cast<const replication_exprt &>(expr);
+}
+
+/// \copydoc to_replication_expr(const exprt &)
+inline replication_exprt &to_replication_expr(exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_replication);
+  DATA_INVARIANT(
+    expr.operands().size() == 2, "Bit-wise replication must have two operands");
+  return static_cast<replication_exprt &>(expr);
+}
+
+template <>
+inline bool can_cast_expr<replication_exprt>(const exprt &base)
+{
+  return base.id() == ID_replication;
+}
+inline void validate_expr(const replication_exprt &value)
+{
+  validate_operands(value, 2, "Bit-wise replication must have two operands");
+}
 
 /// \brief Concatenation of bit-vector operands
 ///
