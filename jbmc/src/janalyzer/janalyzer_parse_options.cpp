@@ -405,7 +405,7 @@ int janalyzer_parse_optionst::perform_analysis(const optionst &options)
 
     if(cmdline.isset("show-taint"))
     {
-      taint_analysis(goto_model, taint_file, ui_message_handler, true, "");
+      taint_analysis(goto_model, taint_file, ui_message_handler, true);
       return CPROVER_EXIT_SUCCESS;
     }
     else
