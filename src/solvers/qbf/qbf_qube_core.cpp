@@ -15,8 +15,7 @@ Author: CM Wintersteiger
 #include <util/arith_tools.h>
 #include <util/invariant.h>
 
-qbf_qube_coret::qbf_qube_coret(message_handlert &message_handler)
-  : qdimacs_coret(message_handler)
+qbf_qube_coret::qbf_qube_coret() : qdimacs_coret()
 {
   break_lines=false;
   qbf_tmp_file="qube.qdimacs";

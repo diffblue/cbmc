@@ -29,7 +29,6 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 /// \param s1: array of characters expression
 /// \param s2: array of characters expression
 /// \param offset: integer expression
-/// \param message_handler: message handler
 /// \return an expression expression which is different from zero if there is
 ///   an exception to signal
 std::pair<exprt, string_constraintst> add_axioms_for_insert(
@@ -37,8 +36,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_insert(
   const array_string_exprt &res,
   const array_string_exprt &s1,
   const array_string_exprt &s2,
-  const exprt &offset,
-  message_handlert &message_handler)
+  const exprt &offset)
 {
   PRECONDITION(offset.type() == s1.length().type());
 
@@ -53,8 +51,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_insert(
   // Axiom 2.
   constraints.universal.push_back([&] { // NOLINT
     const symbol_exprt i = fresh_symbol("QA_insert1", index_type);
-    return string_constraintt(
-      i, offset1, equal_exprt(res[i], s1[i]), message_handler);
+    return string_constraintt(i, offset1, equal_exprt(res[i], s1[i]));
   }());
 
   // Axiom 3.
@@ -63,8 +60,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_insert(
     return string_constraintt(
       i,
       zero_if_negative(s2.length()),
-      equal_exprt(res[plus_exprt(i, offset1)], s2[i]),
-      message_handler);
+      equal_exprt(res[plus_exprt(i, offset1)], s2[i]));
   }());
 
   // Axiom 4.
@@ -74,8 +70,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_insert(
       i,
       offset1,
       zero_if_negative(s1.length()),
-      equal_exprt(res[plus_exprt(i, s2.length())], s1[i]),
-      message_handler);
+      equal_exprt(res[plus_exprt(i, s2.length())], s1[i]));
   }());
 
   return {from_integer(0, get_return_code_type()), std::move(constraints)};
@@ -94,9 +89,9 @@ exprt length_constraint_for_insert(
 /// Insertion of a string in another at a specific index
 ///
 // NOLINTNEXTLINE
-/// \copybrief add_axioms_for_insert(symbol_generatort &fresh_symbol, const array_string_exprt &, const array_string_exprt &, const array_string_exprt &, const exprt &, message_handlert &)
+/// \copybrief add_axioms_for_insert(symbol_generatort &fresh_symbol, const array_string_exprt &, const array_string_exprt &, const array_string_exprt &, const exprt &)
 // NOLINTNEXTLINE
-/// \link add_axioms_for_insert(symbol_generatort &fresh_symbol, const array_string_exprt&,const array_string_exprt&,const array_string_exprt&,const exprt&, message_handlert &)
+/// \link add_axioms_for_insert(symbol_generatort &fresh_symbol, const array_string_exprt&,const array_string_exprt&,const array_string_exprt&,const exprt&)
 ///   (More...) \endlink
 ///
 /// If `start` and `end` arguments are given then `substring(s2, start, end)`
@@ -106,14 +101,12 @@ exprt length_constraint_for_insert(
 ///   pointer `&res[0]`, refined_string `s1`, refined_string`s2`, integer
 ///   `offset`, optional integer `start` and optional integer `end`
 /// \param pool: pool of arrays representing strings
-/// \param message_handler: message handler
 /// \return an integer expression which is different from zero if there is an
 ///   exception to signal
 std::pair<exprt, string_constraintst> add_axioms_for_insert(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
-  array_poolt &pool,
-  message_handlert &message_handler)
+  array_poolt &pool)
 {
   PRECONDITION(f.arguments().size() == 5 || f.arguments().size() == 7);
   array_string_exprt s1 = get_string_expr(pool, f.arguments()[2]);
@@ -130,15 +123,12 @@ std::pair<exprt, string_constraintst> add_axioms_for_insert(
     const array_string_exprt substring =
       pool.fresh_string(index_type, char_type);
     return combine_results(
-      add_axioms_for_substring(
-        fresh_symbol, substring, s2, start, end, message_handler),
-      add_axioms_for_insert(
-        fresh_symbol, res, s1, substring, offset, message_handler));
+      add_axioms_for_substring(fresh_symbol, substring, s2, start, end),
+      add_axioms_for_insert(fresh_symbol, res, s1, substring, offset));
   }
   else // 5 arguments
   {
-    return add_axioms_for_insert(
-      fresh_symbol, res, s1, s2, offset, message_handler);
+    return add_axioms_for_insert(fresh_symbol, res, s1, s2, offset);
   }
 }
 
@@ -149,15 +139,13 @@ std::pair<exprt, string_constraintst> add_axioms_for_insert(
 ///   integer offset, and an integer
 /// \param array_pool: pool of arrays representing strings
 /// \param ns: namespace
-/// \param message_handler: message handler
 /// \return an expression
 DEPRECATED("should convert the value to string and call insert")
 std::pair<exprt, string_constraintst> add_axioms_for_insert_int(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
   array_poolt &array_pool,
-  const namespacet &ns,
-  message_handlert &message_handler)
+  const namespacet &ns)
 {
   PRECONDITION(f.arguments().size() == 5);
   const array_string_exprt s1 = get_string_expr(array_pool, f.arguments()[2]);
@@ -169,7 +157,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_insert_int(
   const array_string_exprt s2 = array_pool.fresh_string(index_type, char_type);
   return combine_results(
     add_axioms_for_string_of_int(s2, f.arguments()[4], 0, ns),
-    add_axioms_for_insert(fresh_symbol, res, s1, s2, offset, message_handler));
+    add_axioms_for_insert(fresh_symbol, res, s1, s2, offset));
 }
 
 /// add axioms corresponding to the StringBuilder.insert(Z) java function
@@ -178,14 +166,12 @@ std::pair<exprt, string_constraintst> add_axioms_for_insert_int(
 /// \param f: function application with three arguments: a string, an
 ///   integer offset, and a Boolean
 /// \param array_pool: pool of arrays representing strings
-/// \param message_handler: message handler
 /// \return a new string expression
 DEPRECATED("should convert the value to string and call insert")
 std::pair<exprt, string_constraintst> add_axioms_for_insert_bool(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
-  array_poolt &array_pool,
-  message_handlert &message_handler)
+  array_poolt &array_pool)
 {
   PRECONDITION(f.arguments().size() == 5);
   const array_string_exprt s1 = get_string_expr(array_pool, f.arguments()[0]);
@@ -197,7 +183,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_insert_bool(
   const array_string_exprt s2 = array_pool.fresh_string(index_type, char_type);
   return combine_results(
     add_axioms_from_bool(s2, f.arguments()[4]),
-    add_axioms_for_insert(fresh_symbol, res, s1, s2, offset, message_handler));
+    add_axioms_for_insert(fresh_symbol, res, s1, s2, offset));
 }
 
 /// Add axioms corresponding to the StringBuilder.insert(C) java function
@@ -206,13 +192,11 @@ std::pair<exprt, string_constraintst> add_axioms_for_insert_bool(
 /// \param f: function application with three arguments: a string, an
 ///   integer offset, and a character
 /// \param array_pool: pool of arrays representing strings
-/// \param message_handler: message handler
 /// \return an expression
 std::pair<exprt, string_constraintst> add_axioms_for_insert_char(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
-  array_poolt &array_pool,
-  message_handlert &message_handler)
+  array_poolt &array_pool)
 {
   PRECONDITION(f.arguments().size() == 5);
   const array_string_exprt res =
@@ -224,7 +208,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_insert_char(
   const array_string_exprt s2 = array_pool.fresh_string(index_type, char_type);
   return combine_results(
     add_axioms_from_char(s2, f.arguments()[4]),
-    add_axioms_for_insert(fresh_symbol, res, s1, s2, offset, message_handler));
+    add_axioms_for_insert(fresh_symbol, res, s1, s2, offset));
 }
 
 /// add axioms corresponding to the StringBuilder.insert(D) java function
@@ -234,15 +218,13 @@ std::pair<exprt, string_constraintst> add_axioms_for_insert_char(
 ///   integer offset, and a double
 /// \param array_pool: pool of arrays representing strings
 /// \param ns: namespace
-/// \param message_handler: message handler
 /// \return a string expression
 DEPRECATED("should convert the value to string and call insert")
 std::pair<exprt, string_constraintst> add_axioms_for_insert_double(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
   array_poolt &array_pool,
-  const namespacet &ns,
-  message_handlert &message_handler)
+  const namespacet &ns)
 {
   PRECONDITION(f.arguments().size() == 5);
   const array_string_exprt res =
@@ -254,8 +236,8 @@ std::pair<exprt, string_constraintst> add_axioms_for_insert_double(
   const array_string_exprt s2 = array_pool.fresh_string(index_type, char_type);
   return combine_results(
     add_axioms_for_string_of_float(
-      fresh_symbol, s2, f.arguments()[4], array_pool, ns, message_handler),
-    add_axioms_for_insert(fresh_symbol, res, s1, s2, offset, message_handler));
+      fresh_symbol, s2, f.arguments()[4], array_pool, ns),
+    add_axioms_for_insert(fresh_symbol, res, s1, s2, offset));
 }
 
 /// Add axioms corresponding to the StringBuilder.insert(F) java function
@@ -265,16 +247,13 @@ std::pair<exprt, string_constraintst> add_axioms_for_insert_double(
 ///   integer offset, and a float
 /// \param array_pool: pool of arrays representing strings
 /// \param ns: namespace
-/// \param message_handler: message handler
 /// \return a new string expression
 DEPRECATED("should convert the value to string and call insert")
 std::pair<exprt, string_constraintst> add_axioms_for_insert_float(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
   array_poolt &array_pool,
-  const namespacet &ns,
-  message_handlert &message_handler)
+  const namespacet &ns)
 {
-  return add_axioms_for_insert_double(
-    fresh_symbol, f, array_pool, ns, message_handler);
+  return add_axioms_for_insert_double(fresh_symbol, f, array_pool, ns);
 }

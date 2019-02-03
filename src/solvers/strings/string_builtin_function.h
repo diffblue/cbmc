@@ -43,9 +43,8 @@ public:
 
   /// Add constraints ensuring that the value of result expression of the
   /// builtin function corresponds to the value of the function call.
-  virtual string_constraintst constraints(
-    string_constraint_generatort &constraint_generator,
-    message_handlert &message_handler) const = 0;
+  virtual string_constraintst
+  constraints(string_constraint_generatort &constraint_generator) const = 0;
 
   /// Constraint ensuring that the length of the strings are coherent with
   /// the function call.
@@ -60,6 +59,9 @@ public:
   {
     return true;
   }
+
+private:
+  string_builtin_functiont() = default;
 
 protected:
   explicit string_builtin_functiont(exprt return_code)
@@ -138,9 +140,8 @@ public:
     return "concat_char";
   }
 
-  string_constraintst constraints(
-    string_constraint_generatort &generator,
-    message_handlert &message_handler) const override;
+  string_constraintst
+  constraints(string_constraint_generatort &generator) const override;
 
   exprt length_constraint() const override;
 };
@@ -176,9 +177,8 @@ public:
     return "set_char";
   }
 
-  string_constraintst constraints(
-    string_constraint_generatort &generator,
-    message_handlert &message_handler) const override;
+  string_constraintst
+  constraints(string_constraint_generatort &generator) const override;
 
   // \todo: length_constraint is not the best possible name because we also
   // \todo: add constraint about the return code
@@ -207,9 +207,8 @@ public:
     return "to_lower_case";
   }
 
-  string_constraintst constraints(
-    string_constraint_generatort &generator,
-    message_handlert &message_handler) const override;
+  string_constraintst
+  constraints(string_constraint_generatort &generator) const override;
 
   exprt length_constraint() const override
   {
@@ -252,15 +251,12 @@ public:
     return "to_upper_case";
   }
 
-  string_constraintst constraints(
-    class symbol_generatort &fresh_symbol,
-    message_handlert &message_handler) const;
+  string_constraintst constraints(class symbol_generatort &fresh_symbol) const;
 
-  string_constraintst constraints(
-    string_constraint_generatort &generator,
-    message_handlert &message_handler) const override
+  string_constraintst
+  constraints(string_constraint_generatort &generator) const override
   {
-    return constraints(generator.fresh_symbol, message_handler);
+    return constraints(generator.fresh_symbol);
   };
 
   exprt length_constraint() const override
@@ -314,9 +310,8 @@ public:
     return "insert";
   }
 
-  string_constraintst constraints(
-    string_constraint_generatort &generator,
-    message_handlert &message_handler) const override;
+  string_constraintst
+  constraints(string_constraint_generatort &generator) const override;
 
   exprt length_constraint() const override;
 
@@ -357,9 +352,8 @@ public:
     return "concat";
   }
 
-  string_constraintst constraints(
-    string_constraint_generatort &generator,
-    message_handlert &message_handler) const override;
+  string_constraintst
+  constraints(string_constraint_generatort &generator) const override;
 
   exprt length_constraint() const override;
 };
@@ -412,9 +406,8 @@ public:
     return "string_of_int";
   }
 
-  string_constraintst constraints(
-    string_constraint_generatort &generator,
-    message_handlert &message_handler) const override;
+  string_constraintst
+  constraints(string_constraint_generatort &generator) const override;
 
   exprt length_constraint() const override;
 
@@ -471,9 +464,8 @@ public:
     return {};
   }
 
-  string_constraintst constraints(
-    string_constraint_generatort &generator,
-    message_handlert &message_handler) const override;
+  string_constraintst
+  constraints(string_constraint_generatort &generator) const override;
 
   exprt length_constraint() const override
   {

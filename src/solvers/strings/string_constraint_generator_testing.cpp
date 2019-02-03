@@ -34,14 +34,12 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 /// \param prefix: an array of characters
 /// \param str: an array of characters
 /// \param offset: an integer
-/// \param message_handler: message handler
 /// \return Boolean expression `isprefix`
 std::pair<exprt, string_constraintst> add_axioms_for_is_prefix(
   symbol_generatort &fresh_symbol,
   const array_string_exprt &prefix,
   const array_string_exprt &str,
-  const exprt &offset,
-  message_handlert &message_handler)
+  const exprt &offset)
 {
   string_constraintst constraints;
   const symbol_exprt isprefix = fresh_symbol("isprefix");
@@ -62,10 +60,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_is_prefix(
     const exprt body = implies_exprt(
       isprefix, equal_exprt(str[plus_exprt(qvar, offset)], prefix[qvar]));
     return string_constraintt(
-      qvar,
-      maximum(from_integer(0, index_type), prefix.length()),
-      body,
-      message_handler);
+      qvar, maximum(from_integer(0, index_type), prefix.length()), body);
   }());
 
   // Axiom 3.
@@ -91,7 +86,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_is_prefix(
 /// given target.
 /// These axioms are detailed here:
 // NOLINTNEXTLINE
-/// string_constraint_generatort::add_axioms_for_is_prefix(const array_string_exprt &prefix, const array_string_exprt &str, const exprt &offset, message_handlert &message_handler)
+/// string_constraint_generatort::add_axioms_for_is_prefix(const array_string_exprt &prefix, const array_string_exprt &str, const exprt &offset)
 /// \todo The primitive should be renamed to `starts_with`.
 /// \todo Get rid of the boolean flag.
 /// \param fresh_symbol: generator of fresh symbols
@@ -101,14 +96,12 @@ std::pair<exprt, string_constraintst> add_axioms_for_is_prefix(
 /// \param swap_arguments: a Boolean telling whether the prefix is the second
 ///   argument or the first argument
 /// \param array_pool: pool of arrays representing strings
-/// \param message_handler: message handler
 /// \return boolean expression `isprefix`
 std::pair<exprt, string_constraintst> add_axioms_for_is_prefix(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
   bool swap_arguments,
-  array_poolt &array_pool,
-  message_handlert &message_handler)
+  array_poolt &array_pool)
 {
   const function_application_exprt::argumentst &args = f.arguments();
   PRECONDITION(f.type() == bool_typet() || f.type().id() == ID_c_bool);
@@ -119,8 +112,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_is_prefix(
     get_string_expr(array_pool, args[swap_arguments ? 0u : 1u]);
   const exprt offset =
     args.size() == 2 ? from_integer(0, s0.length().type()) : args[2];
-  auto pair =
-    add_axioms_for_is_prefix(fresh_symbol, s0, s1, offset, message_handler);
+  auto pair = add_axioms_for_is_prefix(fresh_symbol, s0, s1, offset);
   return {typecast_exprt(pair.first, f.type()), std::move(pair.second)};
 }
 
@@ -172,15 +164,13 @@ std::pair<exprt, string_constraintst> add_axioms_for_is_empty(
 /// \param swap_arguments: boolean flag telling whether the suffix is the second
 ///   argument or the first argument
 /// \param array_pool: pool of arrays representing strings
-/// \param message_handler: message handler
 /// \return Boolean expression `issuffix`
 DEPRECATED("should use `strings_startwith(s0, s1, s1.length - s0.length)`")
 std::pair<exprt, string_constraintst> add_axioms_for_is_suffix(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
   bool swap_arguments,
-  array_poolt &array_pool,
-  message_handlert &message_handler)
+  array_poolt &array_pool)
 {
   const function_application_exprt::argumentst &args = f.arguments();
   PRECONDITION(args.size() == 2); // bad args to string issuffix?
@@ -203,8 +193,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_is_suffix(
   string_constraintt a2(
     qvar,
     zero_if_negative(s0.length()),
-    implies_exprt(issuffix, equal_exprt(s0[qvar], s1[qvar_shifted])),
-    message_handler);
+    implies_exprt(issuffix, equal_exprt(s0[qvar], s1[qvar_shifted])));
   constraints.universal.push_back(a2);
 
   symbol_exprt witness = fresh_symbol("witness_not_suffix", index_type);
@@ -241,13 +230,11 @@ std::pair<exprt, string_constraintst> add_axioms_for_is_suffix(
 /// \param f: function application with arguments refined_string `s0`
 ///           refined_string `s1`
 /// \param array_pool: pool of arrays representing strings
-/// \param message_handler: message handler
 /// \return Boolean expression `contains`
 std::pair<exprt, string_constraintst> add_axioms_for_contains(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
-  array_poolt &array_pool,
-  message_handlert &message_handler)
+  array_poolt &array_pool)
 {
   PRECONDITION(f.arguments().size() == 2);
   PRECONDITION(f.type() == bool_typet() || f.type().id() == ID_c_bool);
@@ -276,8 +263,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_contains(
   string_constraintt a4(
     qvar,
     zero_if_negative(s1.length()),
-    implies_exprt(contains, equal_exprt(s1[qvar], s0[qvar_shifted])),
-    message_handler);
+    implies_exprt(contains, equal_exprt(s1[qvar], s0[qvar_shifted])));
   constraints.universal.push_back(a4);
 
   const string_not_contains_constraintt a5 = {

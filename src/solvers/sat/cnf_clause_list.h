@@ -23,10 +23,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class cnf_clause_listt:public cnft
 {
 public:
-  explicit cnf_clause_listt(message_handlert &message_handler)
-    : cnft(message_handler)
-  {
-  }
+  cnf_clause_listt() { }
   virtual ~cnf_clause_listt() { }
 
   virtual void lcnf(const bvt &bv);
@@ -85,11 +82,6 @@ protected:
 class cnf_clause_list_assignmentt:public cnf_clause_listt
 {
 public:
-  explicit cnf_clause_list_assignmentt(message_handlert &message_handler)
-    : cnf_clause_listt(message_handler)
-  {
-  }
-
   typedef std::vector<tvt> assignmentt;
 
   assignmentt &get_assignment()

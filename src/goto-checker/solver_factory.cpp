@@ -234,7 +234,8 @@ solver_factoryt::get_string_refinement()
   info.refine_arrays = options.get_bool_option("refine-arrays");
   info.refine_arithmetic = options.get_bool_option("refine-arithmetic");
 
-  auto prop_conv = util_make_unique<string_refinementt>(info, message_handler);
+  auto prop_conv = util_make_unique<string_refinementt>(info);
+  prop_conv->set_message_handler(message_handler);
   set_prop_conv_time_limit(*prop_conv);
   return util_make_unique<solvert>(std::move(prop_conv), std::move(prop));
 }

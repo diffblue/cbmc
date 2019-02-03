@@ -34,7 +34,6 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 /// \param s2: an array of characters expression
 /// \param start_index: integer expression
 /// \param end_index: integer expression
-/// \param message_handler: message handler
 /// \return integer expression `0`
 std::pair<exprt, string_constraintst> add_axioms_for_concat_substr(
   symbol_generatort &fresh_symbol,
@@ -42,8 +41,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_concat_substr(
   const array_string_exprt &s1,
   const array_string_exprt &s2,
   const exprt &start_index,
-  const exprt &end_index,
-  message_handlert &message_handler)
+  const exprt &end_index)
 {
   string_constraintst constraints;
   const typet &index_type = start_index.type();
@@ -59,10 +57,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_concat_substr(
     const symbol_exprt idx =
       fresh_symbol("QA_index_concat", res.length().type());
     return string_constraintt(
-      idx,
-      zero_if_negative(s1.length()),
-      equal_exprt(s1[idx], res[idx]),
-      message_handler);
+      idx, zero_if_negative(s1.length()), equal_exprt(s1[idx], res[idx]));
   }());
 
   // Axiom 3.
@@ -72,8 +67,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_concat_substr(
     const equal_exprt res_eq(
       res[plus_exprt(idx2, s1.length())], s2[plus_exprt(start1, idx2)]);
     const minus_exprt upper_bound(res.length(), s1.length());
-    return string_constraintt(
-      idx2, zero_if_negative(upper_bound), res_eq, message_handler);
+    return string_constraintt(idx2, zero_if_negative(upper_bound), res_eq);
   }());
 
   return {from_integer(0, get_return_code_type()), std::move(constraints)};
@@ -133,12 +127,11 @@ std::pair<exprt, string_constraintst> add_axioms_for_concat(
   symbol_generatort &fresh_symbol,
   const array_string_exprt &res,
   const array_string_exprt &s1,
-  const array_string_exprt &s2,
-  message_handlert &message_handler)
+  const array_string_exprt &s2)
 {
   exprt index_zero = from_integer(0, s2.length().type());
   return add_axioms_for_concat_substr(
-    fresh_symbol, res, s1, s2, index_zero, s2.length(), message_handler);
+    fresh_symbol, res, s1, s2, index_zero, s2.length());
 }
 
 /// Add axioms corresponding to the StringBuilder.appendCodePoint(I) function
@@ -146,13 +139,11 @@ std::pair<exprt, string_constraintst> add_axioms_for_concat(
 /// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with two arguments: a string and a code point
 /// \param array_pool: pool of arrays representing strings
-/// \param message_handler: message handler
 /// \return an expression
 std::pair<exprt, string_constraintst> add_axioms_for_concat_code_point(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
-  array_poolt &array_pool,
-  message_handlert &message_handler)
+  array_poolt &array_pool)
 {
   PRECONDITION(f.arguments().size() == 4);
   const array_string_exprt res =
@@ -164,5 +155,5 @@ std::pair<exprt, string_constraintst> add_axioms_for_concat_code_point(
     array_pool.fresh_string(index_type, char_type);
   return combine_results(
     add_axioms_for_code_point(code_point, f.arguments()[3]),
-    add_axioms_for_concat(fresh_symbol, res, s1, code_point, message_handler));
+    add_axioms_for_concat(fresh_symbol, res, s1, code_point));
 }

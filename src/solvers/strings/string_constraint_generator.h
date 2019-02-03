@@ -124,9 +124,7 @@ public:
   // string constraints for different string functions and add them
   // to the axiom list.
 
-  string_constraint_generatort(
-    const namespacet &ns,
-    message_handlert &message_handler);
+  explicit string_constraint_generatort(const namespacet &ns);
 
   std::pair<exprt, string_constraintst>
   add_axioms_for_function_application(const function_application_exprt &expr);
@@ -165,7 +163,7 @@ private:
     array_poolt &pool);
 
   // MEMBERS
-  messaget message;
+  const messaget message;
 
   // To each string on which hash_code was called we associate a symbol
   // representing the return value of the hash_code function.
@@ -182,23 +180,20 @@ std::pair<exprt, string_constraintst> add_axioms_for_concat(
   symbol_generatort &fresh_symbol,
   const array_string_exprt &res,
   const array_string_exprt &s1,
-  const array_string_exprt &s2,
-  message_handlert &message_handler);
+  const array_string_exprt &s2);
 std::pair<exprt, string_constraintst> add_axioms_for_concat_substr(
   symbol_generatort &fresh_symbol,
   const array_string_exprt &res,
   const array_string_exprt &s1,
   const array_string_exprt &s2,
   const exprt &start_index,
-  const exprt &end_index,
-  message_handlert &message_handler);
+  const exprt &end_index);
 std::pair<exprt, string_constraintst> add_axioms_for_insert(
   symbol_generatort &fresh_symbol,
   const array_string_exprt &res,
   const array_string_exprt &s1,
   const array_string_exprt &s2,
-  const exprt &offset,
-  message_handlert &message_handler);
+  const exprt &offset);
 std::pair<exprt, string_constraintst> add_axioms_for_string_of_int_with_radix(
   const array_string_exprt &res,
   const exprt &input_int,
@@ -211,13 +206,11 @@ string_constraintst add_constraint_on_characters(
   const array_string_exprt &s,
   const exprt &start,
   const exprt &end,
-  const std::string &char_set,
-  message_handlert &message_handler);
+  const std::string &char_set);
 std::pair<exprt, string_constraintst> add_axioms_for_constrain_characters(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
-  array_poolt &array_pool,
-  message_handlert &message_handler);
+  array_poolt &array_pool);
 
 // The following functions add axioms for the returned value
 // to be equal to the result of the function given as argument.
@@ -240,18 +233,15 @@ std::pair<exprt, string_constraintst> add_axioms_for_code_point_before(
 std::pair<exprt, string_constraintst> add_axioms_for_contains(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
-  array_poolt &array_pool,
-  message_handlert &message_handler);
+  array_poolt &array_pool);
 std::pair<exprt, string_constraintst> add_axioms_for_equals(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
-  array_poolt &pool,
-  message_handlert &message_handler);
+  array_poolt &pool);
 std::pair<exprt, string_constraintst> add_axioms_for_equals_ignore_case(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
-  array_poolt &pool,
-  message_handlert &message_handler);
+  array_poolt &pool);
 
 std::pair<exprt, string_constraintst> add_axioms_for_is_empty(
   symbol_generatort &fresh_symbol,
@@ -261,20 +251,17 @@ std::pair<exprt, string_constraintst> add_axioms_for_is_prefix(
   symbol_generatort &fresh_symbol,
   const array_string_exprt &prefix,
   const array_string_exprt &str,
-  const exprt &offset,
-  message_handlert &message_handler);
+  const exprt &offset);
 std::pair<exprt, string_constraintst> add_axioms_for_is_prefix(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
   bool swap_arguments,
-  array_poolt &array_pool,
-  message_handlert &message_handler);
+  array_poolt &array_pool);
 std::pair<exprt, string_constraintst> add_axioms_for_is_suffix(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
   bool swap_arguments,
-  array_poolt &array_pool,
-  message_handlert &message_handler);
+  array_poolt &array_pool);
 std::pair<exprt, string_constraintst> add_axioms_for_length(
   const function_application_exprt &f,
   array_poolt &array_pool);
@@ -284,14 +271,12 @@ add_axioms_for_empty_string(const function_application_exprt &f);
 std::pair<exprt, string_constraintst> add_axioms_for_copy(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
-  array_poolt &array_pool,
-  message_handlert &message_handler);
+  array_poolt &array_pool);
 
 std::pair<exprt, string_constraintst> add_axioms_for_concat_code_point(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
-  array_poolt &array_pool,
-  message_handlert &message_handler);
+  array_poolt &array_pool);
 std::pair<exprt, string_constraintst> add_axioms_for_constant(
   const array_string_exprt &res,
   irep_idt sval,
@@ -303,23 +288,20 @@ std::pair<exprt, string_constraintst> add_axioms_for_delete(
   const array_string_exprt &str,
   const exprt &start,
   const exprt &end,
-  array_poolt &array_pool,
-  message_handlert &message_handler);
+  array_poolt &array_pool);
 std::pair<exprt, string_constraintst> add_axioms_for_delete(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
-  array_poolt &array_pool,
-  message_handlert &message_handler);
+  array_poolt &array_pool);
 std::pair<exprt, string_constraintst> add_axioms_for_delete_char_at(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &expr,
-  array_poolt &array_pool,
-  message_handlert &message_handler);
+  array_poolt &array_pool);
 std::pair<exprt, string_constraintst> add_axioms_for_format(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
   array_poolt &array_pool,
-  messaget &message,
+  const messaget &message,
   const namespacet &ns);
 std::pair<exprt, string_constraintst> add_axioms_for_format(
   symbol_generatort &fresh_symbol,
@@ -327,42 +309,36 @@ std::pair<exprt, string_constraintst> add_axioms_for_format(
   const std::string &s,
   const exprt::operandst &args,
   array_poolt &array_pool,
-  messaget &message,
+  const messaget &message,
   const namespacet &ns);
 
 std::pair<exprt, string_constraintst> add_axioms_for_insert(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
-  array_poolt &pool,
-  message_handlert &message_handler);
+  array_poolt &pool);
 std::pair<exprt, string_constraintst> add_axioms_for_insert_int(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
   array_poolt &array_pool,
-  const namespacet &ns,
-  message_handlert &message_handler);
+  const namespacet &ns);
 std::pair<exprt, string_constraintst> add_axioms_for_insert_bool(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
-  array_poolt &array_pool,
-  message_handlert &message_handler);
+  array_poolt &array_pool);
 std::pair<exprt, string_constraintst> add_axioms_for_insert_char(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
-  array_poolt &array_pool,
-  message_handlert &message_handler);
+  array_poolt &array_pool);
 std::pair<exprt, string_constraintst> add_axioms_for_insert_float(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
   array_poolt &array_pool,
-  const namespacet &ns,
-  message_handlert &message_handler);
+  const namespacet &ns);
 std::pair<exprt, string_constraintst> add_axioms_for_insert_double(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
   array_poolt &array_pool,
-  const namespacet &ns,
-  message_handlert &message_handler);
+  const namespacet &ns);
 
 std::pair<exprt, string_constraintst> add_axioms_for_cprover_string(
   symbol_generatort &fresh_symbol,
@@ -379,14 +355,11 @@ std::pair<exprt, string_constraintst> add_axioms_for_string_of_int(
   const exprt &input_int,
   size_t max_size,
   const namespacet &ns);
-std::pair<exprt, string_constraintst> add_axioms_from_int_hex(
-  const array_string_exprt &res,
-  const exprt &i,
-  message_handlert &message_handler);
+std::pair<exprt, string_constraintst>
+add_axioms_from_int_hex(const array_string_exprt &res, const exprt &i);
 std::pair<exprt, string_constraintst> add_axioms_from_int_hex(
   const function_application_exprt &f,
-  array_poolt &array_pool,
-  message_handlert &message_handler);
+  array_poolt &array_pool);
 std::pair<exprt, string_constraintst> add_axioms_from_long(
   const function_application_exprt &f,
   array_poolt &array_pool,
@@ -405,37 +378,31 @@ std::pair<exprt, string_constraintst> add_axioms_for_index_of(
   symbol_generatort &fresh_symbol,
   const array_string_exprt &str,
   const exprt &c,
-  const exprt &from_index,
-  message_handlert &message_handler);
+  const exprt &from_index);
 std::pair<exprt, string_constraintst> add_axioms_for_index_of_string(
   symbol_generatort &fresh_symbol,
   const array_string_exprt &haystack,
   const array_string_exprt &needle,
-  const exprt &from_index,
-  message_handlert &message_handler);
+  const exprt &from_index);
 std::pair<exprt, string_constraintst> add_axioms_for_index_of(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
-  array_poolt &array_pool,
-  message_handlert &message_handler);
+  array_poolt &array_pool);
 std::pair<exprt, string_constraintst> add_axioms_for_last_index_of_string(
   symbol_generatort &fresh_symbol,
   const array_string_exprt &haystack,
   const array_string_exprt &needle,
-  const exprt &from_index,
-  message_handlert &message_handler);
+  const exprt &from_index);
 std::pair<exprt, string_constraintst> add_axioms_for_last_index_of(
   symbol_generatort &fresh_symbol,
   const array_string_exprt &str,
   const exprt &c,
-  const exprt &from_index,
-  message_handlert &message_handler);
+  const exprt &from_index);
 
 std::pair<exprt, string_constraintst> add_axioms_for_last_index_of(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
-  array_poolt &array_pool,
-  message_handlert &message_handler);
+  array_poolt &array_pool);
 
 /// \todo The specifications of these functions is only partial.
 /// We currently only specify that the string for NaN is "NaN", for infinity
@@ -446,15 +413,13 @@ std::pair<exprt, string_constraintst> add_axioms_for_string_of_float(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
   array_poolt &array_pool,
-  const namespacet &ns,
-  message_handlert &message_handler);
+  const namespacet &ns);
 std::pair<exprt, string_constraintst> add_axioms_for_string_of_float(
   symbol_generatort &fresh_symbol,
   const array_string_exprt &res,
   const exprt &f,
   array_poolt &array_pool,
-  const namespacet &ns,
-  message_handlert &message_handler);
+  const namespacet &ns);
 std::pair<exprt, string_constraintst> add_axioms_for_fractional_part(
   const array_string_exprt &res,
   const exprt &i,
@@ -464,14 +429,12 @@ std::pair<exprt, string_constraintst> add_axioms_from_float_scientific_notation(
   const array_string_exprt &res,
   const exprt &f,
   array_poolt &array_pool,
-  const namespacet &ns,
-  message_handlert &message_handler);
+  const namespacet &ns);
 std::pair<exprt, string_constraintst> add_axioms_from_float_scientific_notation(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
   array_poolt &array_pool,
-  const namespacet &ns,
-  message_handlert &message_handler);
+  const namespacet &ns);
 
 /// Add axioms corresponding to the String.valueOf(D) java function
 /// \todo The specifications is only partial.
@@ -479,19 +442,16 @@ std::pair<exprt, string_constraintst> add_axioms_from_double(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
   array_poolt &array_pool,
-  const namespacet &ns,
-  message_handlert &message_handler);
+  const namespacet &ns);
 
 std::pair<exprt, string_constraintst> add_axioms_for_replace(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
-  array_poolt &array_pool,
-  message_handlert &message_handler);
+  array_poolt &array_pool);
 std::pair<exprt, string_constraintst> add_axioms_for_set_length(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
-  array_poolt &array_pool,
-  message_handlert &message_handler);
+  array_poolt &array_pool);
 
 /// \todo The specification may not be correct for the case where the
 /// string is shorter than end. An actual java program should throw an
@@ -501,19 +461,16 @@ std::pair<exprt, string_constraintst> add_axioms_for_substring(
   const array_string_exprt &res,
   const array_string_exprt &str,
   const exprt &start,
-  const exprt &end,
-  message_handlert &message_handler);
+  const exprt &end);
 std::pair<exprt, string_constraintst> add_axioms_for_substring(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
-  array_poolt &array_pool,
-  message_handlert &message_handler);
+  array_poolt &array_pool);
 
 std::pair<exprt, string_constraintst> add_axioms_for_trim(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
-  array_poolt &array_pool,
-  message_handlert &message_handler);
+  array_poolt &array_pool);
 
 std::pair<exprt, string_constraintst> add_axioms_for_code_point(
   const array_string_exprt &res,
@@ -563,8 +520,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_parse_int(
 std::pair<exprt, string_constraintst> add_axioms_for_compare_to(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
-  array_poolt &array_pool,
-  message_handlert &message_handler);
+  array_poolt &array_pool);
 
 exprt is_digit_with_radix(
   const exprt &chr,

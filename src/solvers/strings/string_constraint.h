@@ -66,25 +66,21 @@ public:
   exprt upper_bound;
   exprt body;
 
+  string_constraintt() = delete;
+
   string_constraintt(
     const symbol_exprt &_univ_var,
     const exprt &lower_bound,
     const exprt &upper_bound,
-    const exprt &body,
-    message_handlert &message_handler);
+    const exprt &body);
 
   // Default bound inferior is 0
-  string_constraintt(
-    symbol_exprt univ_var,
-    exprt upper_bound,
-    exprt body,
-    message_handlert &message_handler)
+  string_constraintt(symbol_exprt univ_var, exprt upper_bound, exprt body)
     : string_constraintt(
         univ_var,
         from_integer(0, univ_var.type()),
         upper_bound,
-        body,
-        message_handler)
+        body)
   {
   }
 

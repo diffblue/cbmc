@@ -256,9 +256,7 @@ public:
   /// For all builtin call on which a test (or an unsupported buitin)
   /// result depends, add the corresponding constraints. For the other builtin
   /// only add constraints on the length.
-  void add_constraints(
-    string_constraint_generatort &generatort,
-    message_handlert &message_handler);
+  void add_constraints(string_constraint_generatort &generatort);
 
   /// Clear the content of the dependency graph
   void clear();

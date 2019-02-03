@@ -18,10 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class qdimacs_cnft:public dimacs_cnft
 {
 public:
-  explicit qdimacs_cnft(message_handlert &message_handler)
-    : dimacs_cnft(message_handler)
-  {
-  }
+  qdimacs_cnft() { }
   virtual ~qdimacs_cnft() { }
 
   virtual void write_qdimacs_cnf(std::ostream &out);

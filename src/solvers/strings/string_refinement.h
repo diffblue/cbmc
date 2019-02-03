@@ -75,7 +75,7 @@ public:
   {
   };
 
-  string_refinementt(const infot &, message_handlert &message_handler);
+  explicit string_refinementt(const infot &);
 
   std::string decision_procedure_text() const override
   {
@@ -90,7 +90,7 @@ private:
   // Base class
   typedef bv_refinementt supert;
 
-  string_refinementt(const infot &, bool, message_handlert &message_handler);
+  string_refinementt(const infot &, bool);
 
   const configt config_;
   std::size_t loop_bound_;

@@ -6,7 +6,6 @@ Author: Daniel Kroening
 
 \*******************************************************************/
 
-#include <testing-utils/message.h>
 #include <testing-utils/use_catch.h>
 
 // for debug output in case of failure
@@ -156,7 +155,7 @@ SCENARIO("float_utils", "[core][solvers][floatbv][float_utils]")
 
   for(unsigned i = 0; i < 200; i++)
   {
-    satcheckt satcheck(null_message_handler);
+    satcheckt satcheck;
     float_utilst float_utils(satcheck);
 
     GIVEN("Two random floating point numbers")
@@ -193,7 +192,7 @@ SCENARIO("float_approximation", "[core][solvers][floatbv][float_approximation]")
 
   for(unsigned i = 0; i < 200; i++)
   {
-    satcheckt satcheck(null_message_handler);
+    satcheckt satcheck;
     float_approximationt float_utils(satcheck);
 
     GIVEN("Two random floating point numbers")

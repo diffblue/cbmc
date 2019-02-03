@@ -273,7 +273,7 @@ add_axioms_for_format_specifier(
   const typet &index_type,
   const typet &char_type,
   array_poolt &array_pool,
-  messaget &message,
+  const messaget &message,
   const namespacet &ns)
 {
   string_constraintst constraints;
@@ -286,8 +286,8 @@ add_axioms_for_format_specifier(
       res, get_component_in_struct(arg, ID_int), 0, ns);
     return {res, std::move(return_code.second)};
   case format_specifiert::HEXADECIMAL_INTEGER:
-    return_code = add_axioms_from_int_hex(
-      res, get_component_in_struct(arg, ID_int), message.get_message_handler());
+    return_code =
+      add_axioms_from_int_hex(res, get_component_in_struct(arg, ID_int));
     return {res, std::move(return_code.second)};
   case format_specifiert::SCIENTIFIC:
     return_code = add_axioms_from_float_scientific_notation(
@@ -295,8 +295,7 @@ add_axioms_for_format_specifier(
       res,
       get_component_in_struct(arg, ID_float),
       array_pool,
-      ns,
-      message.get_message_handler());
+      ns);
     return {res, std::move(return_code.second)};
   case format_specifiert::DECIMAL_FLOAT:
     return_code = add_axioms_for_string_of_float(
@@ -304,8 +303,7 @@ add_axioms_for_format_specifier(
       res,
       get_component_in_struct(arg, ID_float),
       array_pool,
-      ns,
-      message.get_message_handler());
+      ns);
     return {res, std::move(return_code.second)};
   case format_specifiert::CHARACTER:
     return_code =
@@ -357,8 +355,7 @@ add_axioms_for_format_specifier(
       fresh_symbol("return_code_upper_case", get_return_code_type());
     const string_to_upper_case_builtin_functiont upper_case_function(
       return_code_upper_case, res, format_specifier_result.first);
-    auto upper_case_constraints = upper_case_function.constraints(
-      fresh_symbol, message.get_message_handler());
+    auto upper_case_constraints = upper_case_function.constraints(fresh_symbol);
     merge(upper_case_constraints, std::move(format_specifier_result.second));
     return {res, std::move(upper_case_constraints)};
   }
@@ -398,7 +395,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_format(
   const std::string &s,
   const exprt::operandst &args,
   array_poolt &array_pool,
-  messaget &message,
+  const messaget &message,
   const namespacet &ns)
 {
   string_constraintst constraints;
@@ -475,12 +472,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_format(
   {
     // Copy the first string
     auto result = add_axioms_for_substring(
-      fresh_symbol,
-      res,
-      str,
-      from_integer(0, index_type),
-      str.length(),
-      message.get_message_handler());
+      fresh_symbol, res, str, from_integer(0, index_type), str.length());
     merge(constraints, std::move(result.second));
     return {result.first, std::move(constraints)};
   }
@@ -491,19 +483,14 @@ std::pair<exprt, string_constraintst> add_axioms_for_format(
     const array_string_exprt &intermediary = intermediary_strings[i];
     const array_string_exprt fresh =
       array_pool.fresh_string(index_type, char_type);
-    auto result = add_axioms_for_concat(
-      fresh_symbol, fresh, str, intermediary, message.get_message_handler());
+    auto result = add_axioms_for_concat(fresh_symbol, fresh, str, intermediary);
     return_code = maximum(return_code, result.first);
     merge(constraints, std::move(result.second));
     str = fresh;
   }
 
-  auto result = add_axioms_for_concat(
-    fresh_symbol,
-    res,
-    str,
-    intermediary_strings.back(),
-    message.get_message_handler());
+  auto result =
+    add_axioms_for_concat(fresh_symbol, res, str, intermediary_strings.back());
   merge(constraints, std::move(result.second));
   return {maximum(result.first, return_code), std::move(constraints)};
 }
@@ -545,7 +532,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_format(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
   array_poolt &array_pool,
-  messaget &message,
+  const messaget &message,
   const namespacet &ns)
 {
   PRECONDITION(f.arguments().size() >= 3);

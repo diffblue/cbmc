@@ -13,8 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/invariant.h>
 
-qbf_quantort::qbf_quantort(message_handlert &message_handler)
-  : qdimacs_cnft(message_handler)
+qbf_quantort::qbf_quantort()
 {
 }
 
