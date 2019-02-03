@@ -9,13 +9,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_JAVA_BYTECODE_JAVA_CLASS_LOADER_BASE_H
 #define CPROVER_JAVA_BYTECODE_JAVA_CLASS_LOADER_BASE_H
 
-#include <util/message.h>
-
 #include "jar_pool.h"
 #include "java_bytecode_parse_tree.h"
 
+class message_handlert;
+
 /// Base class for maintaining classpath.
-class java_class_loader_baset : public messaget
+class java_class_loader_baset
 {
 public:
   /// Clear all classpath entries
@@ -56,15 +56,15 @@ protected:
 
   /// attempt to load a class from a classpath_entry
   optionalt<java_bytecode_parse_treet>
-  load_class(const irep_idt &class_name, const classpath_entryt &);
+  load_class(const irep_idt &class_name, const classpath_entryt &, message_handlert &);
 
   /// attempt to load a class from a given jar file
   optionalt<java_bytecode_parse_treet>
-  get_class_from_jar(const irep_idt &class_name, const std::string &jar_file);
+  get_class_from_jar(const irep_idt &class_name, const std::string &jar_file, message_handlert &);
 
   /// attempt to load a class from a given directory
   optionalt<java_bytecode_parse_treet>
-  get_class_from_directory(const irep_idt &class_name, const std::string &path);
+  get_class_from_directory(const irep_idt &class_name, const std::string &path, message_handlert &);
 };
 
 #endif // CPROVER_JAVA_BYTECODE_JAVA_CLASS_LOADER_BASE_H

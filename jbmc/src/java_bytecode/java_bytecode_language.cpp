@@ -331,12 +331,15 @@ void java_bytecode_languaget::initialize_class_loader()
     java_class_loader.add_classpath_entry(p);
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   java_class_loader.set_java_cp_include_files(
     language_options->java_cp_include_files);
   java_class_loader.add_load_classes(language_options->java_load_classes);
   if(language_options->string_refinement_enabled)
 =======
   java_class_loader.set_message_handler(message_handler);
+=======
+>>>>>>> java_class_loader(_base)t isn't a messaget
   java_class_loader.set_java_cp_include_files(java_cp_include_files);
   java_class_loader.add_load_classes(java_load_classes);
   if(string_refinement_enabled)
@@ -469,7 +472,7 @@ bool java_bytecode_languaget::parse(
       messaget log(message_handler);
       log.status() << "JAR file without entry point: loading class files"
                    << messaget::eom;
-      const auto classes = java_class_loader.load_entire_jar(path);
+      const auto classes = java_class_loader.load_entire_jar(path, message_handler);
       for(const auto &c : classes)
         main_jar_classes.push_back(c);
     }
@@ -486,7 +489,7 @@ bool java_bytecode_languaget::parse(
   {
     messaget log(message_handler);
     log.status() << "Java main class: " << main_class << messaget::eom;
-    java_class_loader(main_class);
+    java_class_loader(main_class, message_handler);
   }
 >>>>>>> languaget is not a messaget
 
@@ -1665,10 +1668,10 @@ bool java_bytecode_languaget::final(symbol_table_baset &)
   return false;
 }
 
-void java_bytecode_languaget::show_parse(std::ostream &out, message_handlert &)
+void java_bytecode_languaget::show_parse(std::ostream &out, message_handlert &message_handler)
 {
   java_class_loadert::parse_tree_with_overlayst &parse_trees =
-    java_class_loader(main_class);
+    java_class_loader(main_class, message_handler);
   parse_trees.front().output(out);
   if(parse_trees.size() > 1)
   {
