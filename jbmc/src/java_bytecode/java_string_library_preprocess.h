@@ -14,7 +14,6 @@ Date:   March 2017
 #ifndef CPROVER_JAVA_BYTECODE_JAVA_STRING_LIBRARY_PREPROCESS_H
 #define CPROVER_JAVA_BYTECODE_JAVA_STRING_LIBRARY_PREPROCESS_H
 
-#include <util/ui_message.h>
 #include <util/std_code.h>
 #include <util/symbol_table.h>
 #include <util/refined_string_type.h>
@@ -29,10 +28,12 @@ Date:   March 2017
 #include "character_refine_preprocess.h"
 #include "java_types.h"
 
+class message_handlert;
+
 // Arbitrary limit of 10 arguments for the number of arguments to String.format
 #define MAX_FORMAT_ARGS 10
 
-class java_string_library_preprocesst:public messaget
+class java_string_library_preprocesst
 {
 public:
   java_string_library_preprocesst()
@@ -48,8 +49,10 @@ public:
   bool implements_function(const irep_idt &function_id) const;
   void get_all_function_names(std::unordered_set<irep_idt> &methods) const;
 
-  codet
-  code_for_function(const symbolt &symbol, symbol_table_baset &symbol_table);
+  codet code_for_function(
+    const symbolt &symbol,
+    symbol_table_baset &symbol_table,
+    message_handlert &message_handler);
 
   codet replace_character_call(code_function_callt call)
   {
@@ -102,7 +105,8 @@ private:
     const java_method_typet &,
     const source_locationt &,
     const irep_idt &,
-    symbol_table_baset &)>
+    symbol_table_baset &,
+    message_handlert &)>
     conversion_functiont;
 
   typedef std::unordered_map<irep_idt, irep_idt> id_mapt;
@@ -149,31 +153,36 @@ private:
     const java_method_typet &type,
     const source_locationt &loc,
     const irep_idt &function_id,
-    symbol_table_baset &symbol_table);
+    symbol_table_baset &symbol_table,
+    message_handlert &message_handler);
 
   code_blockt make_copy_string_code(
     const java_method_typet &type,
     const source_locationt &loc,
     const irep_idt &function_id,
-    symbol_table_baset &symbol_table);
+    symbol_table_baset &symbol_table,
+    message_handlert &message_handler);
 
   code_blockt make_copy_constructor_code(
     const java_method_typet &type,
     const source_locationt &loc,
     const irep_idt &function_id,
-    symbol_table_baset &symbol_table);
+    symbol_table_baset &symbol_table,
+    message_handlert &message_handler);
 
   code_returnt make_string_length_code(
     const java_method_typet &type,
     const source_locationt &loc,
     const irep_idt &function_id,
-    symbol_table_baset &symbol_table);
+    symbol_table_baset &symbol_table,
+    message_handlert &message_handler);
 
   code_blockt make_class_identifier_code(
     const java_method_typet &type,
     const source_locationt &loc,
     const irep_idt &function_id,
-    symbol_table_baset &symbol_table);
+    symbol_table_baset &symbol_table,
+    message_handlert &message_handler);
 
   // Helper functions
   exprt::operandst process_parameters(
