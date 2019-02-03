@@ -38,14 +38,12 @@ public:
     asm_block_following=false;
   }
 
-  cpp_parsert():
-    mode(configt::ansi_ct::flavourt::ANSI),
-    recognize_wchar_t(true),
-    asm_block_following(false)
-  {
-  }
+  explicit cpp_parsert(message_handlert &message_handler);
 
 public:
+  // We use the ANSI-C scanner
+  ansi_c_parsert ansi_c_parser;
+
   // internal state
   ansi_c_parsert::modet mode;
 
@@ -70,7 +68,5 @@ public:
   unsigned parenthesis_counter;
   bool asm_block_following;
 };
-
-extern cpp_parsert cpp_parser;
 
 #endif // CPROVER_CPP_CPP_PARSER_H

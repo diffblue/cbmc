@@ -28,7 +28,7 @@ class update_exprt;
 class arrayst:public equalityt
 {
 public:
-  arrayst(const namespacet &_ns, propt &_prop);
+  arrayst(const namespacet &_ns, propt &_prop, message_handlert &message_handler);
 
   void post_process() override
   {
@@ -43,6 +43,8 @@ public:
   void record_array_index(const index_exprt &expr);
 
 protected:
+  const namespacet &ns;
+
   virtual void post_process_arrays()
   {
     add_array_constraints();

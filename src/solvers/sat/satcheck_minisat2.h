@@ -27,7 +27,7 @@ template<typename T>
 class satcheck_minisat2_baset:public cnf_solvert
 {
 public:
-  explicit satcheck_minisat2_baset(T *);
+  satcheck_minisat2_baset(T *, message_handlert &message_handler);
   virtual ~satcheck_minisat2_baset();
 
   virtual resultt prop_solve() override;
@@ -69,7 +69,6 @@ class satcheck_minisat_no_simplifiert:
   public satcheck_minisat2_baset<Minisat::Solver>
 {
 public:
-  satcheck_minisat_no_simplifiert();
   explicit satcheck_minisat_no_simplifiert(message_handlert &message_handler);
   virtual const std::string solver_text();
 };
@@ -78,7 +77,6 @@ class satcheck_minisat_simplifiert:
   public satcheck_minisat2_baset<Minisat::SimpSolver>
 {
 public:
-  satcheck_minisat_simplifiert();
   explicit satcheck_minisat_simplifiert(message_handlert &message_handler);
   virtual const std::string solver_text() final;
   virtual void set_frozen(literalt a) final;

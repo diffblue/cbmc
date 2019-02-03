@@ -405,9 +405,11 @@ string_constraint_generatort::add_axioms_for_function_application(
     return add_axioms_for_code_point_at(fresh_symbol, expr, array_pool);
   else if(id == ID_cprover_string_code_point_before_func)
     return add_axioms_for_code_point_before(fresh_symbol, expr, array_pool);
-  else if(id == ID_cprover_string_code_point_count_func)
+#if 0
+  else if(id==ID_cprover_string_code_point_count_func)
     return add_axioms_for_code_point_count(fresh_symbol, expr, array_pool);
-  else if(id == ID_cprover_string_offset_by_code_point_func)
+#endif
+  else if(id==ID_cprover_string_offset_by_code_point_func)
     return add_axioms_for_offset_by_code_point(fresh_symbol, expr);
   else if(id == ID_cprover_string_compare_to_func)
     return add_axioms_for_compare_to(fresh_symbol, expr, array_pool);
@@ -425,10 +427,12 @@ string_constraint_generatort::add_axioms_for_function_application(
     return add_axioms_for_insert_bool(fresh_symbol, expr, array_pool);
   else if(id == ID_cprover_string_insert_char_func)
     return add_axioms_for_insert_char(fresh_symbol, expr, array_pool);
+#if 0
   else if(id == ID_cprover_string_insert_double_func)
     return add_axioms_for_insert_double(fresh_symbol, expr, array_pool, ns);
   else if(id == ID_cprover_string_insert_float_func)
     return add_axioms_for_insert_float(fresh_symbol, expr, array_pool, ns);
+#endif
   else if(id == ID_cprover_string_substring_func)
     return add_axioms_for_substring(fresh_symbol, expr, array_pool);
   else if(id == ID_cprover_string_trim_func)
@@ -437,8 +441,10 @@ string_constraint_generatort::add_axioms_for_function_application(
     return add_axioms_for_empty_string(expr);
   else if(id == ID_cprover_string_copy_func)
     return add_axioms_for_copy(fresh_symbol, expr, array_pool);
+#if 0
   else if(id == ID_cprover_string_of_int_hex_func)
     return add_axioms_from_int_hex(expr, array_pool);
+#endif
   else if(id == ID_cprover_string_of_float_func)
     return add_axioms_for_string_of_float(fresh_symbol, expr, array_pool, ns);
   else if(id == ID_cprover_string_of_float_scientific_notation_func)

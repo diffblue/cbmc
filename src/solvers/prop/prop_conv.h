@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <map>
 
 #include <util/decision_procedure.h>
+#include <util/message.h>
 #include <util/expr.h>
 #include <util/std_expr.h>
 
@@ -27,9 +28,6 @@ Author: Daniel Kroening, kroening@kroening.com
 class prop_convt:public decision_proceduret
 {
 public:
-  explicit prop_convt(
-    const namespacet &_ns):
-    decision_proceduret(_ns) { }
   virtual ~prop_convt() { }
 
   // conversion to handle
@@ -67,11 +65,11 @@ public:
 
 /*! \brief TO_BE_DOCUMENTED
 */
-class prop_conv_solvert:public prop_convt
+class prop_conv_solvert : public prop_convt, public messaget
 {
 public:
-  prop_conv_solvert(const namespacet &_ns, propt &_prop):
-    prop_convt(_ns),
+  prop_conv_solvert(propt &_prop, message_handlert &message_handler):
+    messaget(message_handler),
     prop(_prop) { }
 
   virtual ~prop_conv_solvert() = default;

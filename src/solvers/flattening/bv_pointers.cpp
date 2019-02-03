@@ -81,8 +81,9 @@ literalt bv_pointerst::convert_rest(const exprt &expr)
 
 bv_pointerst::bv_pointerst(
   const namespacet &_ns,
-  propt &_prop):
-  boolbvt(_ns, _prop),
+  propt &_prop,
+  message_handlert &message_handler):
+  boolbvt(_ns, _prop, message_handler),
   pointer_logic(_ns)
 {
   object_bits=config.bv_encoding.object_bits;

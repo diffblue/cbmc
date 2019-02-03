@@ -54,7 +54,7 @@ void output_graphml(
   const optionst &);
 
 std::unique_ptr<memory_model_baset>
-get_memory_model(const optionst &options, const namespacet &);
+get_memory_model(const optionst &options, const namespacet &, message_handlert &);
 
 void setup_symex(
   symex_bmct &,

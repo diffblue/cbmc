@@ -26,11 +26,12 @@ language_uit::language_uit(
   const cmdlinet &cmdline,
   ui_message_handlert &_ui_message_handler,
   optionst *_options)
-  : _cmdline(cmdline),
+  : messaget(_ui_message_handler),
+  language_files(_ui_message_handler),
+  _cmdline(cmdline),
     ui_message_handler(_ui_message_handler),
     options(_options)
 {
-  set_message_handler(ui_message_handler);
 }
 
 /// Destructor
@@ -74,14 +75,13 @@ bool language_uit::parse(const std::string &filename)
   }
 
   languaget &language=*lf.language;
-  language.set_message_handler(get_message_handler());
 
   if(options != nullptr)
-    language.set_language_options(*options);
+    language.set_language_options(*options, get_message_handler());
 
   status() << "Parsing " << filename << eom;
 
-  if(language.parse(infile, filename))
+  if(language.parse(infile, filename, get_message_handler()))
   {
     if(get_ui()==ui_message_handlert::uit::PLAIN)
       std::cerr << "PARSING ERROR\n";
@@ -98,9 +98,7 @@ bool language_uit::typecheck()
 {
   status() << "Converting" << eom;
 
-  language_files.set_message_handler(*message_handler);
-
-  if(language_files.typecheck(symbol_table))
+  if(language_files.typecheck(symbol_table, *message_handler))
   {
     error() << "CONVERSION ERROR" << eom;
     return true;
@@ -111,8 +109,6 @@ bool language_uit::typecheck()
 
 bool language_uit::final()
 {
-  language_files.set_message_handler(*message_handler);
-
   if(language_files.final(symbol_table))
   {
     error() << "CONVERSION ERROR" << eom;

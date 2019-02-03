@@ -19,7 +19,7 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 class partial_order_concurrencyt:public messaget
 {
 public:
-  explicit partial_order_concurrencyt(const namespacet &_ns);
+  partial_order_concurrencyt(const namespacet &_ns, message_handlert &message_handler);
   virtual ~partial_order_concurrencyt();
 
   typedef symex_target_equationt::SSA_stept eventt;

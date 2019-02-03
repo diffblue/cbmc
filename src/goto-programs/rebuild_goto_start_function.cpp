@@ -52,14 +52,13 @@ bool rebuild_goto_start_function_baset<maybe_lazy_goto_modelt>::operator()()
   // Get the relevant languaget to generate the new entry point with
   std::unique_ptr<languaget> language=get_language_from_mode(mode);
   INVARIANT(language, "No language found for mode: "+id2string(mode));
-  language->set_message_handler(get_message_handler());
-  language->set_language_options(options);
+  language->set_language_options(options, get_message_handler());
 
   // To create a new entry point we must first remove the old one
   remove_existing_entry_point();
 
-  bool return_code=
-    language->generate_support_functions(goto_model.symbol_table);
+  bool return_code = language->generate_support_functions(
+    goto_model.symbol_table, get_message_handler());
 
   // Remove the function from the goto functions so it is copied back in
   // from the symbol table during goto_convert

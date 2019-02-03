@@ -122,11 +122,11 @@ goto_modelt load_goto_model_from_java_class(
   parse_java_language_options(command_line, options);
 
   // Configure the language, load the class files
-  language.set_message_handler(null_message_handler);
-  language.set_language_options(options);
-  language.parse(java_code_stream, filename);
-  language.typecheck(lazy_goto_model.symbol_table, "");
-  language.generate_support_functions(lazy_goto_model.symbol_table);
+  language.set_language_options(options, null_message_handler);
+  language.parse(java_code_stream, filename, null_message_handler);
+  language.typecheck(lazy_goto_model.symbol_table, "", null_message_handler);
+  language.generate_support_functions(
+    lazy_goto_model.symbol_table, null_message_handler);
   language.final(lazy_goto_model.symbol_table);
 
   lazy_goto_model.load_all_functions();

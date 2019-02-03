@@ -19,11 +19,6 @@ Author: Daniel Kroening, kroening@kroening.com
 class transt : public ternary_exprt
 {
 public:
-  DEPRECATED("use transt(op0, op1, op2) instead")
-  transt() : ternary_exprt(ID_trans)
-  {
-  }
-
   transt(
     const irep_idt &_id,
     const exprt &_op0,
@@ -96,11 +91,6 @@ inline void validate_expr(const transt &value)
 class power_exprt : public binary_exprt
 {
 public:
-  DEPRECATED("use power_exprt(lhs, rhs) instead")
-  power_exprt() : binary_exprt(ID_power)
-  {
-  }
-
   power_exprt(const exprt &_base, const exprt &_exp)
     : binary_exprt(_base, ID_power, _exp)
   {
@@ -142,11 +132,6 @@ inline void validate_expr(const power_exprt &value)
 class factorial_power_exprt : public binary_exprt
 {
 public:
-  DEPRECATED("use factorial_power_exprt(lhs, rhs) instead")
-  factorial_power_exprt() : binary_exprt(ID_factorial_power)
-  {
-  }
-
   factorial_power_exprt(const exprt &_base, const exprt &_exp)
     : binary_exprt(_base, ID_factorial_power, _exp)
   {

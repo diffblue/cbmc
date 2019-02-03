@@ -720,7 +720,10 @@ void value_set_fivrnst::get_reference_set_rec(
 
         // adjust type?
         if(ns.follow(struct_op.type())!=ns.follow(object.type()))
-          member_expr.compound().make_typecast(struct_op.type());
+        {
+          member_expr.compound() =
+            typecast_exprt(member_expr.compound(), struct_op.type());
+        }
 
         insert_from(dest, member_expr, o);
       }

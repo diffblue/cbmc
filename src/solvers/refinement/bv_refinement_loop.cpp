@@ -10,8 +10,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/xml.h>
 
-bv_refinementt::bv_refinementt(const infot &info):
-  bv_pointerst(*info.ns, *info.prop),
+bv_refinementt::bv_refinementt(const infot &info, message_handlert &message_handler):
+  bv_pointerst(*info.ns, *info.prop, message_handler),
   progress(false),
   config_(info)
 {

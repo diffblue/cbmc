@@ -382,7 +382,7 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
       equal_exprt equality(pointer_expr, object_pointer);
 
       if(ns.follow(equality.lhs().type())!=ns.follow(equality.rhs().type()))
-        equality.lhs().make_typecast(equality.rhs().type());
+        equality.lhs() = typecast_exprt(equality.lhs(), equality.rhs().type());
 
       result.pointer_guard=equality;
     }
@@ -452,7 +452,7 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
       result.value=index_expr;
 
       if(ns.follow(result.value.type())!=ns.follow(dereference_type))
-        result.value.make_typecast(dereference_type);
+        result.value = typecast_exprt(result.value, dereference_type);
     }
     else
     {
@@ -594,7 +594,7 @@ bool value_set_dereferencet::memory_model_bytes(
 
     // possibly need to convert
     if(!base_type_eq(result.type(), to_type, ns))
-      result.make_typecast(to_type);
+      result = typecast_exprt(result, to_type);
   }
   else
   {

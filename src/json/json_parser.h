@@ -16,21 +16,20 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/parser.h>
 #include <util/json.h>
 
-int yyjsonparse();
-void yyjsonrestart(FILE *input_file);
-
 class json_parsert:public parsert
 {
 public:
+  explicit json_parsert(message_handlert &message_handler)
+    : parsert(message_handler)
+  {
+  }
+
   typedef std::stack<jsont, std::vector<jsont> > stackt;
   stackt stack;
 
   jsont &top() { return stack.top(); }
 
-  virtual bool parse() override
-  {
-    return yyjsonparse()!=0;
-  }
+  bool parse() override;
 
   void push(const jsont &x)
   {
@@ -44,16 +43,8 @@ public:
     stack.pop();
   }
 
-  virtual void clear() override
-  {
-    stack=stackt();
-    yyjsonrestart(nullptr);
-  }
+  void clear() override;
 };
-
-extern json_parsert json_parser;
-
-int yyjsonerror(const std::string &error);
 
 // 'do it all' functions
 bool parse_json(

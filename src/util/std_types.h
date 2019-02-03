@@ -34,17 +34,6 @@ public:
   }
 };
 
-/// The NIL type, i.e., an invalid type, no value.
-/// \deprecated Use `optional<typet>` instead.
-// NOLINTNEXTLINE
-class DEPRECATED("Use `optional<typet>` instead.") nil_typet : public typet
-{
-public:
-  nil_typet():typet(static_cast<const typet &>(get_nil_irep()))
-  {
-  }
-};
-
 /// The empty type
 class empty_typet:public typet
 {
@@ -814,26 +803,11 @@ public:
     return_type() = _return_type;
   }
 
-  /// \deprecated
-  DEPRECATED("Use the two argument constructor instead")
-  code_typet():typet(ID_code)
-  {
-    // make sure these properties are always there to avoid problems
-    // with irept comparisons
-    add(ID_parameters);
-    add_type(ID_return_type);
-  }
-
   // used to be argumentt -- now uses standard terminology
 
   class parametert:public exprt
   {
   public:
-    DEPRECATED("use parametert(type) instead")
-    parametert():exprt(ID_parameter)
-    {
-    }
-
     explicit parametert(const typet &type):exprt(ID_parameter, type)
     {
     }
@@ -1799,11 +1773,6 @@ inline vector_typet &to_vector_type(typet &type)
 class complex_typet:public type_with_subtypet
 {
 public:
-  DEPRECATED("use complex_typet(type) instead")
-  complex_typet():type_with_subtypet(ID_complex)
-  {
-  }
-
   explicit complex_typet(const typet &_subtype):
     type_with_subtypet(ID_complex, _subtype)
   {

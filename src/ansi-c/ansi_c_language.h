@@ -34,7 +34,8 @@ Author: Daniel Kroening, kroening@kroening.com
 class ansi_c_languaget:public languaget
 {
 public:
-  void set_language_options(const optionst &options) override
+  void
+  set_language_options(const optionst &options, message_handlert &) override
   {
     object_factory_params.set(options);
   }
@@ -42,20 +43,24 @@ public:
   bool preprocess(
     std::istream &instream,
     const std::string &path,
-    std::ostream &outstream) override;
+    std::ostream &outstream,
+    message_handlert &message_handler) override;
 
   bool parse(
     std::istream &instream,
-    const std::string &path) override;
+    const std::string &path,
+    message_handlert &message_handler) override;
 
   bool generate_support_functions(
-    symbol_tablet &symbol_table) override;
+    symbol_tablet &symbol_table,
+    message_handlert &message_handler) override;
 
   bool typecheck(
     symbol_tablet &symbol_table,
-    const std::string &module) override;
+    const std::string &module,
+    message_handlert &message_handler) override;
 
-  void show_parse(std::ostream &out) override;
+  void show_parse(std::ostream &out, message_handlert &) override;
 
   ~ansi_c_languaget() override;
   ansi_c_languaget() { }
@@ -79,7 +84,8 @@ public:
     const std::string &code,
     const std::string &module,
     exprt &expr,
-    const namespacet &ns) override;
+    const namespacet &ns,
+    message_handlert &message_handler) override;
 
   std::unique_ptr<languaget> new_language() override
   { return util_make_unique<ansi_c_languaget>(); }

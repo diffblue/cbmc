@@ -9,6 +9,13 @@ int yyjsonlex();
 extern char *yyjsontext;
 extern int yyjsonleng; // really an int, not a size_t
 
+static json_parsert *json_parser;
+
+void json_parser_init(json_parsert *_json_parser)
+{
+  json_parser = _json_parser;
+}
+
 static std::string convert_TOK_STRING()
 {
   assert(yyjsontext[0]=='"');
@@ -52,7 +59,8 @@ static std::string convert_TOK_NUMBER()
 
 int yyjsonerror(const std::string &error)
 {
-  json_parser.parse_error(error, yyjsontext);
+  PRECONDITION(json_parser);
+  json_parser->parse_error(error, yyjsontext);
   return 0;
 }
 
@@ -69,8 +77,8 @@ int yyjsonerror(const std::string &error)
 document: value
         ;
 
-object  : '{' { json_parser.push(json_objectt()); } '}'
-        | '{' { json_parser.push(json_objectt()); } key_value_sequence '}'
+object  : '{' { json_parser->push(json_objectt()); } '}'
+        | '{' { json_parser->push(json_objectt()); } key_value_sequence '}'
         ;
 
 key_value_sequence:
@@ -84,19 +92,19 @@ key_value_pair:
           TOK_STRING
         {
           // we abuse the 'value' to temporarily store the key
-          json_parser.top().value=convert_TOK_STRING();
+          json_parser->top().value=convert_TOK_STRING();
         }
           ':' value
         {
           jsont tmp;
-          json_parser.pop(tmp);
-          to_json_object(json_parser.top())[json_parser.top().value].swap(tmp);
-          json_parser.top().value.clear(); // end abuse
+          json_parser->pop(tmp);
+          to_json_object(json_parser->top())[json_parser->top().value].swap(tmp);
+          json_parser->top().value.clear(); // end abuse
         }
         ;
 
-array   : '[' { json_parser.push(json_arrayt()); } ']'
-        | '[' { json_parser.push(json_arrayt()); } array_value_sequence ']'
+array   : '[' { json_parser->push(json_arrayt()); } ']'
+        | '[' { json_parser->push(json_arrayt()); } array_value_sequence ']'
         ;
 
 array_value_sequence:
@@ -108,22 +116,22 @@ array_value:
           value
         {
           jsont tmp;
-          json_parser.pop(tmp);
-          to_json_array(json_parser.top()).push_back(tmp);
+          json_parser->pop(tmp);
+          to_json_array(json_parser->top()).push_back(tmp);
         }
         ;
 
 value   : TOK_STRING
-        { json_parser.push(json_stringt(convert_TOK_STRING())); }
+        { json_parser->push(json_stringt(convert_TOK_STRING())); }
         | TOK_NUMBER
-        { json_parser.push(json_numbert(convert_TOK_NUMBER())); }
+        { json_parser->push(json_numbert(convert_TOK_NUMBER())); }
         | object
         | array
         | TOK_TRUE
-        { json_parser.push(json_truet()); }
+        { json_parser->push(json_truet()); }
         | TOK_FALSE
-        { json_parser.push(json_falset()); }
+        { json_parser->push(json_falset()); }
         | TOK_NULL
-        { json_parser.push(json_nullt()); }
+        { json_parser->push(json_nullt()); }
         ;
 

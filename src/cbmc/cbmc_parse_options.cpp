@@ -518,18 +518,17 @@ int cbmc_parse_optionst::doit()
       return CPROVER_EXIT_INCORRECT_TASK;
     }
 
-    language->set_language_options(options);
-    language->set_message_handler(get_message_handler());
+    language->set_language_options(options, get_message_handler());
 
     status() << "Parsing " << filename << eom;
 
-    if(language->parse(infile, filename))
+    if(language->parse(infile, filename, get_message_handler()))
     {
       error() << "PARSING ERROR" << eom;
       return CPROVER_EXIT_INCORRECT_TASK;
     }
 
-    language->show_parse(std::cout);
+    language->show_parse(std::cout, get_message_handler());
     return CPROVER_EXIT_SUCCESS;
   }
 
@@ -709,7 +708,7 @@ void cbmc_parse_optionst::preprocessing(const optionst &options)
     }
 
     std::unique_ptr<languaget> language=get_language_from_filename(filename);
-    language->set_language_options(options);
+    language->set_language_options(options, get_message_handler());
 
     if(language==nullptr)
     {
@@ -717,9 +716,7 @@ void cbmc_parse_optionst::preprocessing(const optionst &options)
       return;
     }
 
-    language->set_message_handler(get_message_handler());
-
-    if(language->preprocess(infile, filename, std::cout))
+    if(language->preprocess(infile, filename, std::cout, get_message_handler()))
       error() << "PREPROCESSING ERROR" << eom;
   }
 }
@@ -732,7 +729,7 @@ bool cbmc_parse_optionst::process_goto_program(
   {
     // Remove inline assembler; this needs to happen before
     // adding the library.
-    remove_asm(goto_model);
+    remove_asm(goto_model, log.get_message_handler());
 
     // add the library
     log.status() << "Adding CPROVER library (" << config.ansi_c.arch << ")"

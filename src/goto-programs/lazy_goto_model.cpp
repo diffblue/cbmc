@@ -55,7 +55,6 @@ lazy_goto_modelt::lazy_goto_modelt(
       driver_program_generate_function_body),
     message_handler(message_handler)
 {
-  language_files.set_message_handler(message_handler);
 }
 
 lazy_goto_modelt::lazy_goto_modelt(lazy_goto_modelt &&other)
@@ -160,12 +159,11 @@ void lazy_goto_modelt::initialize(
       }
 
       languaget &language=*lf.language;
-      language.set_message_handler(message_handler);
-      language.set_language_options(options);
+      language.set_language_options(options, message_handler);
 
       msg.status() << "Parsing " << filename << messaget::eom;
 
-      if(language.parse(infile, filename))
+      if(language.parse(infile, filename, message_handler))
       {
         throw invalid_source_file_exceptiont("PARSING ERROR");
       }
@@ -175,7 +173,7 @@ void lazy_goto_modelt::initialize(
 
     msg.status() << "Converting" << messaget::eom;
 
-    if(language_files.typecheck(symbol_table))
+    if(language_files.typecheck(symbol_table, message_handler))
     {
       throw invalid_source_file_exceptiont("CONVERSION ERROR");
     }
@@ -211,8 +209,8 @@ void lazy_goto_modelt::initialize(
   {
     // Allow all language front-ends to try to provide the user-specified
     // (--function) entry-point, or some language-specific default:
-    entry_point_generation_failed=
-      language_files.generate_support_functions(symbol_table);
+    entry_point_generation_failed =
+      language_files.generate_support_functions(symbol_table, message_handler);
   }
 
   if(entry_point_generation_failed)

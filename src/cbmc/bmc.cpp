@@ -47,8 +47,6 @@ decision_proceduret::resultt bmct::run_decision_procedure()
   status() << "Passing problem to "
            << prop_conv.decision_procedure_text() << eom;
 
-  prop_conv.set_message_handler(get_message_handler());
-
   auto solver_start = std::chrono::steady_clock::now();
 
   convert_symex_target_equation(equation, prop_conv, get_message_handler());
@@ -199,7 +197,7 @@ safety_checkert::resultt bmct::execute(
 safety_checkert::resultt bmct::run(
   abstract_goto_modelt &goto_model)
 {
-  memory_model = get_memory_model(options, ns);
+  memory_model = get_memory_model(options, ns, ui_message_handler);
   setup_symex(symex, ns, options, ui_message_handler);
 
   return execute(goto_model);
@@ -207,8 +205,6 @@ safety_checkert::resultt bmct::run(
 
 safety_checkert::resultt bmct::decide(const goto_functionst &goto_functions)
 {
-  prop_conv.set_message_handler(get_message_handler());
-
   if(options.get_bool_option("stop-on-fail"))
     return stop_on_fail();
   else

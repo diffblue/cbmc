@@ -40,6 +40,7 @@ public:
   bmc_covert(
     const goto_functionst &_goto_functions,
     bmct &_bmc):
+    messaget(_bmc.prop_conv.get_message_handler()),
     goto_functions(_goto_functions), solver(_bmc.prop_conv), bmc(_bmc)
   {
   }
@@ -188,8 +189,6 @@ void bmc_covert::satisfying_assignment()
 bool bmc_covert::operator()()
 {
   status() << "Passing problem to " << solver.decision_procedure_text() << eom;
-
-  solver.set_message_handler(get_message_handler());
 
   auto solver_start=std::chrono::steady_clock::now();
 

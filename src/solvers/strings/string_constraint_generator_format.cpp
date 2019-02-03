@@ -285,10 +285,12 @@ add_axioms_for_format_specifier(
     return_code = add_axioms_for_string_of_int(
       res, get_component_in_struct(arg, ID_int), 0, ns);
     return {res, std::move(return_code.second)};
+#if 0
   case format_specifiert::HEXADECIMAL_INTEGER:
     return_code =
       add_axioms_from_int_hex(res, get_component_in_struct(arg, ID_int));
     return {res, std::move(return_code.second)};
+#endif
   case format_specifiert::SCIENTIFIC:
     return_code = add_axioms_from_float_scientific_notation(
       fresh_symbol,

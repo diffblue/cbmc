@@ -80,7 +80,7 @@ void multi_path_symex_only_checkert::perform_symex()
   if(equation.has_threads())
   {
     std::unique_ptr<memory_model_baset> memory_model =
-      get_memory_model(options, ns);
+      get_memory_model(options, ns, ui_message_handler);
     memory_model->set_message_handler(ui_message_handler);
     (*memory_model)(equation);
   }

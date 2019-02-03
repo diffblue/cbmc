@@ -13,7 +13,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/invariant.h>
 
-qbf_skizzot::qbf_skizzot()
+qbf_skizzot::qbf_skizzot(message_handlert &message_handler)
+  : qdimacs_cnft(message_handler)
 {
   // skizzo crashes on broken lines
   break_lines=false;

@@ -5,7 +5,7 @@
 
 %{
 
-#define PARSER assembler_parser
+#define PARSER (*assembler_parser)
 #define YYSTYPE unsigned
 #undef  ECHO
 #define ECHO
@@ -53,8 +53,11 @@ string_lit      ("L"|"u"|"U"|"u8")?["]{s_char}*["]
 %x LINE_COMMENT
 
 %{
-void assemlber_scanner_init()
+static assembler_parsert *assembler_parser;
+
+void assembler_scanner_init(assembler_parsert *_assembler_parser)
 {
+  assembler_parser = _assembler_parser;
   YY_FLUSH_BUFFER;
   BEGIN(0);
 }
@@ -62,7 +65,8 @@ void assemlber_scanner_init()
 
 %%
 
-<INITIAL>.|\n   { BEGIN(GRAMMAR);
+<INITIAL>.|\n   { PRECONDITION(assembler_parser);
+                  BEGIN(GRAMMAR);
                   yyless(0); /* start again with this character */
                 }
 
@@ -105,3 +109,10 @@ void assemlber_scanner_init()
 %%
 
 int yywrap() { return 1; }
+
+int yyassemblererror(const std::string &error)
+{
+  PRECONDITION(assembler_parser);
+  assembler_parser->parse_error(error, yyassemblertext);
+  return 0;
+}

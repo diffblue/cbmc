@@ -29,7 +29,6 @@ Date: June 2006
 #include <util/unicode.h>
 #include <util/version.h>
 
-#include <ansi-c/ansi_c_language.h>
 #include <ansi-c/ansi_c_entry_point.h>
 
 #include <goto-programs/goto_convert.h>
@@ -417,21 +416,6 @@ bool compilet::parse(
   const std::string &file_name,
   language_filest &language_files)
 {
-  if(file_name=="-")
-    return parse_stdin();
-
-  #ifdef _MSC_VER
-  std::ifstream infile(widen(file_name));
-  #else
-  std::ifstream infile(file_name);
-  #endif
-
-  if(!infile)
-  {
-    error() << "failed to open input file `" << file_name << "'" << eom;
-    return true;
-  }
-
   std::unique_ptr<languaget> languagep;
 
   // Using '-x', the type of a file can be overridden;
@@ -444,7 +428,7 @@ bool compilet::parse(
     else
       languagep = get_language_from_mode(ID_C);
   }
-  else
+  else if(file_name != "-")
     languagep=get_language_from_filename(file_name);
 
   if(languagep==nullptr)
@@ -453,7 +437,20 @@ bool compilet::parse(
     return true;
   }
 
-  languagep->set_message_handler(get_message_handler());
+  if(file_name=="-")
+    return parse_stdin(*languagep);
+
+  #ifdef _MSC_VER
+  std::ifstream infile(widen(file_name));
+  #else
+  std::ifstream infile(file_name);
+  #endif
+
+  if(!infile)
+  {
+    error() << "failed to open input file `" << file_name << "'" << eom;
+    return true;
+  }
 
   language_filet &lf=language_files.add_file(file_name);
   lf.language=std::move(languagep);
@@ -478,13 +475,13 @@ bool compilet::parse(
       }
     }
 
-    lf.language->preprocess(infile, file_name, *os);
+    lf.language->preprocess(infile, file_name, *os, get_message_handler());
   }
   else
   {
     statistics() << "Parsing: " << file_name << eom;
 
-    if(lf.language->parse(infile, file_name))
+    if(lf.language->parse(infile, file_name, get_message_handler()))
     {
       error() << "PARSING ERROR" << eom;
       return true;
@@ -496,13 +493,10 @@ bool compilet::parse(
 }
 
 /// parses a source file (low-level parsing)
+/// \param language: source language processor
 /// \return true on error, false otherwise
-bool compilet::parse_stdin()
+bool compilet::parse_stdin(languaget &language)
 {
-  ansi_c_languaget language;
-
-  language.set_message_handler(get_message_handler());
-
   statistics() << "Parsing: (stdin)" << eom;
 
   if(mode==PREPROCESS_ONLY)
@@ -523,11 +517,11 @@ bool compilet::parse_stdin()
       }
     }
 
-    language.preprocess(std::cin, "", *os);
+    language.preprocess(std::cin, "", *os, get_message_handler());
   }
   else
   {
-    if(language.parse(std::cin, ""))
+    if(language.parse(std::cin, "", get_message_handler()))
     {
       error() << "PARSING ERROR" << eom;
       return true;
@@ -581,13 +575,12 @@ bool compilet::write_bin_object_file(
 bool compilet::parse_source(const std::string &file_name)
 {
   language_filest language_files;
-  language_files.set_message_handler(get_message_handler());
 
   if(parse(file_name, language_files))
     return true;
 
   // we just typecheck one file here
-  if(language_files.typecheck(goto_model.symbol_table))
+  if(language_files.typecheck(goto_model.symbol_table, get_message_handler()))
   {
     error() << "CONVERSION ERROR" << eom;
     return true;

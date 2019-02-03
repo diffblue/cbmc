@@ -20,7 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "message.h"
 #include "file_util.h"
 
-class parsert:public messaget
+class parsert
 {
 public:
   std::istream *in;
@@ -39,7 +39,7 @@ public:
     last_line.clear();
   }
 
-  parsert():in(nullptr) { clear(); }
+  explicit parsert(message_handlert &message_handler):messaget(message_handler), in(nullptr) { clear(); }
   virtual ~parsert() { }
 
   // The following are for the benefit of the scanner
@@ -130,6 +130,10 @@ public:
   {
     column+=token_width;
   }
+
+  // should be protected or even just be a reference to a message handler, but
+  // for now enables a step-by-step transition
+  messaget log;
 
 protected:
   source_locationt source_location;

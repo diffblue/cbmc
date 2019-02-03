@@ -329,6 +329,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_insert_char(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
   array_poolt &array_pool);
+#if 0
 std::pair<exprt, string_constraintst> add_axioms_for_insert_float(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
@@ -339,6 +340,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_insert_double(
   const function_application_exprt &f,
   array_poolt &array_pool,
   const namespacet &ns);
+#endif
 
 std::pair<exprt, string_constraintst> add_axioms_for_cprover_string(
   symbol_generatort &fresh_symbol,
@@ -357,9 +359,11 @@ std::pair<exprt, string_constraintst> add_axioms_for_string_of_int(
   const namespacet &ns);
 std::pair<exprt, string_constraintst>
 add_axioms_from_int_hex(const array_string_exprt &res, const exprt &i);
+#if 0
 std::pair<exprt, string_constraintst> add_axioms_from_int_hex(
   const function_application_exprt &f,
   array_poolt &array_pool);
+#endif
 std::pair<exprt, string_constraintst> add_axioms_from_long(
   const function_application_exprt &f,
   array_poolt &array_pool,

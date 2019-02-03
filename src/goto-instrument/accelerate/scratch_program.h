@@ -38,6 +38,7 @@ class scratch_programt:public goto_programt
 public:
   scratch_programt(symbol_tablet &_symbol_table, message_handlert &mh)
     : constant_propagation(true),
+    message_handler(mh),
       symbol_table(_symbol_table),
       symex_symbol_table(),
       ns(symbol_table, symex_symbol_table),
@@ -45,9 +46,9 @@ public:
       path_storage(),
       options(get_default_options()),
       symex(mh, symbol_table, equation, options, path_storage),
-      satcheck(util_make_unique<satcheckt>()),
-      satchecker(ns, *satcheck),
-      z3(ns, "accelerate", "", "", smt2_dect::solvert::Z3),
+      satcheck(util_make_unique<satcheckt>(mh)),
+      satchecker(ns, *satcheck, mh),
+      z3(ns, "accelerate", "", "", smt2_dect::solvert::Z3, mh),
       checker(&z3) // checker(&satchecker)
   {
   }
@@ -74,6 +75,7 @@ public:
   bool constant_propagation;
 
 protected:
+  message_handlert &message_handler;
   goto_symex_statet symex_state;
   goto_functionst functions;
   symbol_tablet &symbol_table;

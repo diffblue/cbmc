@@ -18,13 +18,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <string>
 #include <unordered_set>
 
-#include <util/message.h>
 #include <util/std_types.h>
 #include <util/symbol.h>
 #include <util/symbol_table_base.h>
 
 class symbol_tablet;
 class exprt;
+class message_handlert;
 class namespacet;
 class optionst;
 class typet;
@@ -35,11 +35,11 @@ class typet;
 #define HELP_FUNCTIONS \
   " --function name              set main function name\n"
 
-class languaget:public messaget
+class languaget
 {
 public:
   /// Set language-specific options
-  virtual void set_language_options(const optionst &)
+  virtual void set_language_options(const optionst &, message_handlert &)
   {
   }
 
@@ -48,7 +48,8 @@ public:
   virtual bool preprocess(
     std::istream &instream,
     const std::string &path,
-    std::ostream &outstream)
+    std::ostream &outstream,
+    message_handlert &)
   {
     // unused parameters
     (void)instream;
@@ -59,7 +60,8 @@ public:
 
   virtual bool parse(
     std::istream &instream,
-    const std::string &path)=0;
+    const std::string &path,
+    message_handlert &message_handler) = 0;
 
   /// Create language-specific support functions, such as __CPROVER_start,
   /// __CPROVER_initialize and language-specific library functions.
@@ -70,7 +72,8 @@ public:
   /// can influence its decisions (e.g. picking the types of input parameters
   /// and globals), whereas anything introduced during `final` cannot.
   virtual bool generate_support_functions(
-    symbol_tablet &symbol_table)=0;
+    symbol_tablet &symbol_table,
+    message_handlert &message_handler) = 0;
 
   // add external dependencies of a given module to set
 
@@ -99,13 +102,15 @@ public:
   /// in `symbol_table`. This will only be called if `methods_provided`
   /// advertised the given `function_id` could be provided by this `languaget`
   /// instance.
-  virtual void
-  convert_lazy_method(
-    const irep_idt &function_id, symbol_table_baset &symbol_table)
+  virtual void convert_lazy_method(
+    const irep_idt &function_id,
+    symbol_table_baset &symbol_table,
+    message_handlert &message_handler)
   {
     // unused parameters
     (void)function_id;
     (void)symbol_table;
+    (void)message_handler;
   }
 
   /// Final adjustments, e.g. initializing stub functions and globals that
@@ -114,14 +119,15 @@ public:
 
   // type check interfaces of currently parsed file
 
-  virtual bool interfaces(
-    symbol_tablet &symbol_table);
+  virtual bool
+  interfaces(symbol_tablet &symbol_table, message_handlert &message_handler);
 
   // type check a module in the currently parsed file
 
   virtual bool typecheck(
     symbol_tablet &symbol_table,
-    const std::string &module)=0;
+    const std::string &module,
+    message_handlert &message_handler) = 0;
 
   // language id / description
 
@@ -132,7 +138,7 @@ public:
 
   // show parse tree
 
-  virtual void show_parse(std::ostream &out)=0;
+  virtual void show_parse(std::ostream &out, message_handlert &message_handler)=0;
 
   // conversion of expressions
 
@@ -171,18 +177,24 @@ public:
   /// \param module: prefix to be used for identifiers
   /// \param expr: the parsed expression
   /// \param ns: a namespace
+  /// \param message_handler: a message handler
   /// \return false if the conversion succeeds
   virtual bool to_expr(
     const std::string &code,
     const std::string &module,
     exprt &expr,
-    const namespacet &ns)=0;
+    const namespacet &ns,
+    message_handlert &message_handler) = 0;
 
   virtual std::unique_ptr<languaget> new_language()=0;
 
   // constructor / destructor
 
-  languaget() { }
+  explicit languaget(message_handlert &message_handler)
+    : messaget(message_handler)
+  {
+  }
+
   virtual ~languaget() { }
 
 protected:

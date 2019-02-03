@@ -6,6 +6,7 @@ Author: Jesse Sigal, jesse.sigal@diffblue.com
 
 \*******************************************************************/
 
+#include <testing-utils/message.h>
 #include <testing-utils/use_catch.h>
 
 #include <java_bytecode/java_bytecode_language.h>
@@ -154,12 +155,12 @@ std::string create_info(std::vector<exprt> &lemmas, const namespacet &ns)
 /// \return SAT solver result
 decision_proceduret::resultt check_sat(const exprt &expr, const namespacet &ns)
 {
-  satcheck_no_simplifiert sat_check;
+  satcheck_no_simplifiert sat_check(null_message_handler);
   bv_refinementt::infot info;
   info.ns = &ns;
   info.prop = &sat_check;
   info.output_xml = false;
-  bv_refinementt solver(info);
+  bv_refinementt solver(info, null_message_handler);
   solver << expr;
   return solver();
 }

@@ -1846,7 +1846,8 @@ void c_typecheck_baset::typecheck_expr_side_effect(side_effect_exprt &expr)
 
     if(type0.id() == ID_c_enum_tag)
     {
-      if(follow_tag(to_c_enum_tag_type(type0)).is_incomplete())
+      const c_enum_typet &enum_type = follow_tag(to_c_enum_tag_type(type0));
+      if(enum_type.is_incomplete())
       {
         error().source_location = expr.source_location();
         error() << "operator `" << statement
@@ -1854,8 +1855,10 @@ void c_typecheck_baset::typecheck_expr_side_effect(side_effect_exprt &expr)
                 << to_string(type0) << "'" << eom;
         throw 0;
       }
-      else
-        expr.type()=type0;
+
+      // increment/decrement on underlying type
+      expr.op0() = typecast_exprt(expr.op0(), enum_type.subtype());
+      expr.type() = enum_type.subtype();
     }
     else if(type0.id() == ID_c_bit_field)
     {
@@ -1863,6 +1866,11 @@ void c_typecheck_baset::typecheck_expr_side_effect(side_effect_exprt &expr)
       typet underlying_type = to_c_bit_field_type(type0).subtype();
       expr.op0() = typecast_exprt(expr.op0(), underlying_type);
       expr.type()=underlying_type;
+    }
+    else if(type0.id() == ID_bool || type0.id() == ID_c_bool)
+    {
+      implicit_typecast_arithmetic(expr.op0());
+      expr.type() = expr.op0().type();
     }
     else if(is_numeric_type(type0))
     {
@@ -2598,10 +2606,11 @@ exprt c_typecheck_baset::do_special_functions(
       throw 0;
     }
 
-    expr.arguments()[0].make_typecast(bool_typet());
-    make_constant(expr.arguments()[0]);
+    exprt arg0 =
+      typecast_exprt::conditional_cast(expr.arguments()[0], bool_typet());
+    make_constant(arg0);
 
-    if(expr.arguments()[0].is_true())
+    if(arg0.is_true())
       return expr.arguments()[1];
     else
       return expr.arguments()[2];
@@ -2955,7 +2964,7 @@ void c_typecheck_baset::typecheck_expr_binary_arithmetic(exprt &expr)
     is_number(o_type1))
   {
     // convert op1 to the vector type
-    op1.make_typecast(o_type0);
+    op1 = typecast_exprt::conditional_cast(op1, o_type0);
     expr.type() = o_type0;
     return;
   }
@@ -2964,7 +2973,7 @@ void c_typecheck_baset::typecheck_expr_binary_arithmetic(exprt &expr)
     is_number(o_type0))
   {
     // convert op0 to the vector type
-    op0.make_typecast(o_type1);
+    op0 = typecast_exprt::conditional_cast(op0, o_type1);
     expr.type() = o_type1;
     return;
   }
@@ -3312,6 +3321,7 @@ void c_typecheck_baset::typecheck_side_effect_assignment(
   else if(statement==ID_assign_shl ||
           statement==ID_assign_shr)
   {
+    implicit_typecast_arithmetic(op0);
     implicit_typecast_arithmetic(op1);
 
     if(is_number(op1.type()))
@@ -3325,12 +3335,6 @@ void c_typecheck_baset::typecheck_side_effect_assignment(
         // distinguish arithmetic from logical shifts by looking at type
 
         typet underlying_type=op0.type();
-
-        if(underlying_type.id()==ID_c_enum_tag)
-        {
-          const auto &c_enum_type = to_c_enum_tag_type(underlying_type);
-          underlying_type=c_enum_type.subtype();
-        }
 
         if(underlying_type.id()==ID_unsignedbv ||
            underlying_type.id()==ID_c_bool)
@@ -3354,7 +3358,7 @@ void c_typecheck_baset::typecheck_side_effect_assignment(
     if(o_type0.id()==ID_bool ||
        o_type0.id()==ID_c_bool)
     {
-      implicit_typecast_arithmetic(op1);
+      implicit_typecast_arithmetic(op0, op1);
       if(op1.type().id()==ID_bool ||
          op1.type().id()==ID_c_bool ||
          op1.type().id()==ID_c_enum_tag ||
@@ -3367,7 +3371,7 @@ void c_typecheck_baset::typecheck_side_effect_assignment(
             o_type0.id()==ID_signedbv ||
             o_type0.id()==ID_c_bit_field)
     {
-      implicit_typecast(op1, o_type0);
+      implicit_typecast_arithmetic(op0, op1);
       return;
     }
     else if(o_type0.id()==ID_vector &&
@@ -3404,7 +3408,7 @@ void c_typecheck_baset::typecheck_side_effect_assignment(
     else if(o_type0.id()==ID_bool ||
             o_type0.id()==ID_c_bool)
     {
-      implicit_typecast_arithmetic(op1);
+      implicit_typecast_arithmetic(op0, op1);
       if(op1.type().id()==ID_bool ||
          op1.type().id()==ID_c_bool ||
          op1.type().id()==ID_c_enum_tag ||

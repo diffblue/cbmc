@@ -7,6 +7,7 @@ Author: Diffblue Ltd.
 
 \*******************************************************************/
 
+#include <testing-utils/message.h>
 #include <testing-utils/use_catch.h>
 
 #include <solvers/strings/string_refinement.h>
@@ -27,7 +28,7 @@ SCENARIO(
   register_language(new_java_bytecode_language);
   symbol_tablet symbol_table;
   namespacet ns(symbol_table);
-  messaget::mstreamt &stream = messaget().debug();
+  messaget::mstreamt &stream = messaget(null_message_handler).debug();
 
   GIVEN("Some equations")
   {

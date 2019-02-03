@@ -26,7 +26,7 @@ class bv_minimizet:public messaget
 {
 public:
   explicit bv_minimizet(boolbvt &_boolbv):
-    boolbv(_boolbv)
+    messaget(_boolbv.get_message_handler()), boolbv(_boolbv)
   {
   }
 
@@ -48,8 +48,8 @@ public:
     return "Bit vector minimizing SAT";
   }
 
-  explicit bv_minimizing_dect(const namespacet &_ns):
-    bv_pointerst(_ns, satcheck)
+  bv_minimizing_dect(const namespacet &_ns, message_handlert &message_handler)
+    : bv_pointerst(_ns, satcheck, message_handler), satcheck(message_handler)
   {
   }
 

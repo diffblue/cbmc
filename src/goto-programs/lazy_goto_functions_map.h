@@ -191,7 +191,8 @@ private:
     if(!body_provided)
     {
       // Fill in symbol table entry body if not already done
-      language_files.convert_lazy_method(name, function_symbol_table);
+      language_files.convert_lazy_method(
+        name, function_symbol_table, message_handler);
       body_provided = function_symbol_table.lookup_ref(name).value.is_not_nil();
 
       // Create goto_functiont

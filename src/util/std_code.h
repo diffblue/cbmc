@@ -35,11 +35,6 @@ Author: Daniel Kroening, kroening@kroening.com
 class codet:public exprt
 {
 public:
-  DEPRECATED("use codet(statement) instead")
-  codet() : exprt(ID_code, empty_typet())
-  {
-  }
-
   /// \param statement: Specifies the type of the `codet` to be constructed,
   ///   e.g. `ID_block` for a \ref code_blockt or `ID_assign` for a
   ///   \ref code_assignt.
@@ -496,12 +491,6 @@ inline code_deadt &to_code_dead(codet &code)
 class code_assumet:public codet
 {
 public:
-  DEPRECATED("use code_assumet(expr) instead")
-  code_assumet():codet(ID_assume)
-  {
-    operands().resize(1);
-  }
-
   explicit code_assumet(const exprt &expr):codet(ID_assume)
   {
     add_to_operands(expr);
@@ -548,12 +537,6 @@ inline void validate_expr(const code_assumet &x)
 class code_assertt:public codet
 {
 public:
-  DEPRECATED("use code_assertt(expr) instead")
-  code_assertt():codet(ID_assert)
-  {
-    operands().resize(1);
-  }
-
   explicit code_assertt(const exprt &expr):codet(ID_assert)
   {
     add_to_operands(expr);
@@ -614,14 +597,6 @@ code_blockt create_fatal_assertion(
 class code_ifthenelset:public codet
 {
 public:
-  DEPRECATED("use code_ifthenelset(condition, then_code[, else_code]) instead")
-  code_ifthenelset():codet(ID_ifthenelse)
-  {
-    operands().resize(3);
-    op1().make_nil();
-    op2().make_nil();
-  }
-
   /// An if \p condition then \p then_code else \p else_code statement.
   code_ifthenelset(
     const exprt &condition,
@@ -705,12 +680,6 @@ inline code_ifthenelset &to_code_ifthenelse(codet &code)
 class code_switcht:public codet
 {
 public:
-  DEPRECATED("use code_switcht(value, body) instead")
-  code_switcht():codet(ID_switch)
-  {
-    operands().resize(2);
-  }
-
   code_switcht(const exprt &_value, const codet &_body) : codet(ID_switch)
   {
     operands().resize(2);
@@ -767,12 +736,6 @@ inline code_switcht &to_code_switch(codet &code)
 class code_whilet:public codet
 {
 public:
-  DEPRECATED("use code_whilet(cond, body) instead")
-  code_whilet():codet(ID_while)
-  {
-    operands().resize(2);
-  }
-
   code_whilet(const exprt &_cond, const codet &_body) : codet(ID_while)
   {
     operands().resize(2);
@@ -829,12 +792,6 @@ inline code_whilet &to_code_while(codet &code)
 class code_dowhilet:public codet
 {
 public:
-  DEPRECATED("use code_dowhilet(cond, body) instead")
-  code_dowhilet():codet(ID_dowhile)
-  {
-    operands().resize(2);
-  }
-
   code_dowhilet(const exprt &_cond, const codet &_body) : codet(ID_dowhile)
   {
     operands().resize(2);
@@ -893,12 +850,6 @@ inline code_dowhilet &to_code_dowhile(codet &code)
 class code_fort:public codet
 {
 public:
-  DEPRECATED("use code_fort(init, cond, iter, body) instead")
-  code_fort():codet(ID_for)
-  {
-    operands().resize(4);
-  }
-
   /// A statement describing a for loop with initializer \p _init, loop
   /// condition \p _cond, increment \p _iter, and body \p _body.
   code_fort(
@@ -983,11 +934,6 @@ inline code_fort &to_code_for(codet &code)
 class code_gotot:public codet
 {
 public:
-  DEPRECATED("use code_gotot(label) instead")
-  code_gotot():codet(ID_goto)
-  {
-  }
-
   explicit code_gotot(const irep_idt &label):codet(ID_goto)
   {
     set_destination(label);
@@ -1036,14 +982,6 @@ inline code_gotot &to_code_goto(codet &code)
 class code_function_callt:public codet
 {
 public:
-  DEPRECATED("Use code_function_callt(...) instead")
-  code_function_callt():codet(ID_function_call)
-  {
-    operands().resize(3);
-    lhs().make_nil();
-    op2().id(ID_arguments);
-  }
-
   explicit code_function_callt(const exprt &_function) : codet(ID_function_call)
   {
     operands().resize(3);
@@ -1251,12 +1189,6 @@ inline void validate_expr(const code_returnt &x)
 class code_labelt:public codet
 {
 public:
-  DEPRECATED("use code_labelt(label) instead")
-  code_labelt():codet(ID_label)
-  {
-    operands().resize(1);
-  }
-
   explicit code_labelt(const irep_idt &_label):codet(ID_label)
   {
     operands().resize(1);
@@ -1321,12 +1253,6 @@ inline code_labelt &to_code_label(codet &code)
 class code_switch_caset:public codet
 {
 public:
-  DEPRECATED("use code_switch_caset(case_op, code) instead")
-  code_switch_caset():codet(ID_switch_case)
-  {
-    operands().resize(2);
-  }
-
   code_switch_caset(
     const exprt &_case_op, const codet &_code):codet(ID_switch_case)
   {
@@ -1499,12 +1425,6 @@ inline const code_asmt &to_code_asm(const codet &code)
 class code_expressiont:public codet
 {
 public:
-  DEPRECATED("use code_expressiont(expr) instead")
-  code_expressiont():codet(ID_expression)
-  {
-    operands().resize(1);
-  }
-
   explicit code_expressiont(const exprt &expr):codet(ID_expression)
   {
     add_to_operands(expr);
@@ -1555,19 +1475,6 @@ inline const code_expressiont &to_code_expression(const codet &code)
 class side_effect_exprt : public exprt
 {
 public:
-  DEPRECATED("use side_effect_exprt(statement, type, loc) instead")
-  explicit side_effect_exprt(const irep_idt &statement) : exprt(ID_side_effect)
-  {
-    set_statement(statement);
-  }
-
-  DEPRECATED("use side_effect_exprt(statement, type, loc) instead")
-  side_effect_exprt(const irep_idt &statement, const typet &_type)
-    : exprt(ID_side_effect, _type)
-  {
-    set_statement(statement);
-  }
-
   side_effect_exprt(
     const irep_idt &statement,
     const typet &_type,
@@ -1641,19 +1548,6 @@ inline const side_effect_exprt &to_side_effect_expr(const exprt &expr)
 class side_effect_expr_nondett:public side_effect_exprt
 {
 public:
-  DEPRECATED("use side_effect_expr_nondett(statement, type, loc) instead")
-  side_effect_expr_nondett():side_effect_exprt(ID_nondet)
-  {
-    set_nullable(true);
-  }
-
-  DEPRECATED("use side_effect_expr_nondett(statement, type, loc) instead")
-  explicit side_effect_expr_nondett(const typet &_type):
-    side_effect_exprt(ID_nondet, _type)
-  {
-    set_nullable(true);
-  }
-
   side_effect_expr_nondett(const typet &_type, const source_locationt &loc)
     : side_effect_exprt(ID_nondet, _type, loc)
   {
@@ -1779,45 +1673,6 @@ to_side_effect_expr_assign(const exprt &expr)
 class side_effect_expr_function_callt:public side_effect_exprt
 {
 public:
-  DEPRECATED(
-    "use side_effect_expr_function_callt("
-    "function, arguments, type, loc) instead")
-  side_effect_expr_function_callt()
-    : side_effect_exprt(ID_function_call, typet(), source_locationt())
-  {
-    operands().resize(2);
-    op1().id(ID_arguments);
-  }
-
-  DEPRECATED(
-    "use side_effect_expr_function_callt("
-    "function, arguments, type, loc) instead")
-  side_effect_expr_function_callt(
-    const exprt &_function,
-    const exprt::operandst &_arguments)
-    : side_effect_exprt(ID_function_call)
-  {
-    operands().resize(2);
-    op1().id(ID_arguments);
-    function() = _function;
-    arguments() = _arguments;
-  }
-
-  DEPRECATED(
-    "use side_effect_expr_function_callt("
-    "function, arguments, type, loc) instead")
-  side_effect_expr_function_callt(
-    const exprt &_function,
-    const exprt::operandst &_arguments,
-    const typet &_type)
-    : side_effect_exprt(ID_function_call, _type)
-  {
-    operands().resize(2);
-    op1().id(ID_arguments);
-    function() = _function;
-    arguments() = _arguments;
-  }
-
   side_effect_expr_function_callt(
     const exprt &_function,
     const exprt::operandst &_arguments,
@@ -1883,11 +1738,6 @@ inline const side_effect_expr_function_callt
 class side_effect_expr_throwt:public side_effect_exprt
 {
 public:
-  DEPRECATED("use side_effect_expr_throwt(exception_list) instead")
-  side_effect_expr_throwt():side_effect_exprt(ID_throw)
-  {
-  }
-
   side_effect_expr_throwt(
     const irept &exception_list,
     const typet &type,
@@ -2098,12 +1948,6 @@ static inline const code_landingpadt &to_code_landingpad(const codet &code)
 class code_try_catcht:public codet
 {
 public:
-  DEPRECATED("use code_try_catcht(try_code) instead")
-  code_try_catcht():codet(ID_try_catch)
-  {
-    operands().resize(1);
-  }
-
   /// A statement representing try \p _try_code catch ...
   explicit code_try_catcht(const codet &_try_code) : codet(ID_try_catch)
   {

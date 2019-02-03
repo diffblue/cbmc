@@ -9,6 +9,7 @@ Author: Diffblue Ltd.
 /// \file
 /// Unit tests for miniBDD
 
+#include <testing-utils/message.h>
 #include <testing-utils/use_catch.h>
 
 #include <solvers/bdd/miniBDD/miniBDD.h>
@@ -25,7 +26,8 @@ class bdd_propt : public propt
 public:
   mini_bdd_mgrt &mgr;
 
-  explicit bdd_propt(mini_bdd_mgrt &_mgr) : mgr(_mgr)
+  explicit bdd_propt(mini_bdd_mgrt &_mgr)
+    : propt(null_message_handler), mgr(_mgr)
   {
     // True and False
     bdd_map.push_back(mgr.False());
@@ -186,11 +188,9 @@ SCENARIO("miniBDD", "[core][solver][miniBDD]")
 {
   GIVEN("A bdd for x&!x")
   {
-    symbol_tablet symbol_table;
-    namespacet ns(symbol_table);
     mini_bdd_mgrt bdd_mgr;
     bdd_propt bdd_prop(bdd_mgr);
-    prop_conv_solvert solver(ns, bdd_prop);
+    prop_conv_solvert solver(bdd_prop, null_message_handler);
 
     symbol_exprt var("x", bool_typet());
     literalt result = solver.convert(and_exprt(var, not_exprt(var)));
@@ -204,7 +204,7 @@ SCENARIO("miniBDD", "[core][solver][miniBDD]")
     namespacet ns(symbol_table);
     mini_bdd_mgrt bdd_mgr;
     bdd_propt bdd_prop(bdd_mgr);
-    boolbvt boolbv(ns, bdd_prop);
+    boolbvt boolbv(ns, bdd_prop, null_message_handler);
 
     unsignedbv_typet type(2);
     symbol_exprt var("x", type);
@@ -222,7 +222,7 @@ SCENARIO("miniBDD", "[core][solver][miniBDD]")
     namespacet ns(symbol_table);
     mini_bdd_mgrt bdd_mgr;
     bdd_propt bdd_prop(bdd_mgr);
-    boolbvt boolbv(ns, bdd_prop);
+    boolbvt boolbv(ns, bdd_prop, null_message_handler);
 
     unsignedbv_typet type(32);
     symbol_exprt var("x", type);
@@ -239,7 +239,7 @@ SCENARIO("miniBDD", "[core][solver][miniBDD]")
     namespacet ns(symbol_table);
     mini_bdd_mgrt bdd_mgr;
     bdd_propt bdd_prop(bdd_mgr);
-    boolbvt boolbv(ns, bdd_prop);
+    boolbvt boolbv(ns, bdd_prop, null_message_handler);
 
     unsignedbv_typet type(4);
     symbol_exprt var_x("x", type);
@@ -257,7 +257,7 @@ SCENARIO("miniBDD", "[core][solver][miniBDD]")
     namespacet ns(symbol_table);
     mini_bdd_mgrt bdd_mgr;
     bdd_propt bdd_prop(bdd_mgr);
-    boolbvt boolbv(ns, bdd_prop);
+    boolbvt boolbv(ns, bdd_prop, null_message_handler);
 
     unsignedbv_typet type(8);
     symbol_exprt var_x("x", type);
@@ -274,7 +274,7 @@ SCENARIO("miniBDD", "[core][solver][miniBDD]")
     namespacet ns(symbol_table);
     mini_bdd_mgrt bdd_mgr;
     bdd_propt bdd_prop(bdd_mgr);
-    boolbvt boolbv(ns, bdd_prop);
+    boolbvt boolbv(ns, bdd_prop, null_message_handler);
 
     unsignedbv_typet type(8);
     symbol_exprt var_x("x", type);

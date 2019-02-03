@@ -4,14 +4,14 @@
 #include "xml_parser.h"
 
 int yyxmllex();
-extern char *yyxmltext;
+int yyxmlerror(const std::string &error);
 
-int yyxmlerror(const std::string &error)
+static xml_parsert *xml_parser;
+
+void xml_parser_init(xml_parsert *_xml_parser)
 {
-  xml_parser.parse_error(error, yyxmltext);
-  return 0;
+  xml_parser = _xml_parser;
 }
-
 %}
 
 %error-verbose
@@ -35,9 +35,9 @@ prolog
 
 XMLDecl_opt
  : STARTXMLDECL
-   { xml_parser.stack.push_back(&xml_parser.parse_tree.xml); }
+   { xml_parser->stack.push_back(&xml_parser->parse_tree.xml); }
    attribute_seq_opt
-   { xml_parser.stack.pop_back(); }
+   { xml_parser->stack.pop_back(); }
    ENDPI
  | /*empty*/
  ;
@@ -54,14 +54,14 @@ misc
 
 PI
  : STARTPI NAME
-   { free($2); xml_parser.stack.push_back(&xml_parser.parse_tree.xml); }
+   { free($2); xml_parser->stack.push_back(&xml_parser->parse_tree.xml); }
    attribute_seq_opt
-   { xml_parser.stack.pop_back(); }
+   { xml_parser->stack.pop_back(); }
    ENDPI
  ;
 
 element
- : START   { xml_parser.current().name=$1;
+ : START   { xml_parser->current().name=$1;
                                   free($1);
            }
    attribute_seq_opt
@@ -75,12 +75,12 @@ empty_or_content
  ;
 
 content
- : content DATA  { xml_parser.current().data+=xmlt::unescape($2); free($2); }
+ : content DATA  { xml_parser->current().data+=xmlt::unescape($2); free($2); }
  | content misc
  | content
-   { xml_parser.new_level(); }
+   { xml_parser->new_level(); }
    element
-   { xml_parser.stack.pop_back(); }
+   { xml_parser->stack.pop_back(); }
  | /*empty*/
  ;
 
@@ -95,7 +95,7 @@ attribute_seq_opt
  ;
 
 attribute
- : NAME EQ VALUE  { xml_parser.current().set_attribute(
+ : NAME EQ VALUE  { xml_parser->current().set_attribute(
                                     xmlt::unescape($1), xmlt::unescape($3));
                                   free($1); free($3);}
  ;

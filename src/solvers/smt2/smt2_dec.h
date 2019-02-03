@@ -22,7 +22,7 @@ protected:
 
 /*! \brief Decision procedure interface for various SMT 2.x solvers
 */
-class smt2_dect:protected smt2_stringstreamt, public smt2_convt
+class smt2_dect:protected smt2_stringstreamt, public smt2_convt, public messaget
 {
 public:
   smt2_dect(
@@ -30,8 +30,9 @@ public:
     const std::string &_benchmark,
     const std::string &_notes,
     const std::string &_logic,
-    solvert _solver):
-    smt2_convt(_ns, _benchmark, _notes, _logic, _solver, stringstream)
+    solvert _solver,
+    message_handlert &message_handler):
+    smt2_convt(_ns, _benchmark, _notes, _logic, _solver, stringstream, message_handler)
   {
   }
 

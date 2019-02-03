@@ -23,7 +23,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 arrayst::arrayst(
   const namespacet &_ns,
-  propt &_prop):equalityt(_ns, _prop)
+  propt &_prop,
+  message_handlert &message_handler):equalityt(_prop, message_handler), ns(_ns)
 {
   lazy_arrays = false;        // will be set to true when --refine is used
   incremental_cache = false;  // for incremental solving
@@ -598,8 +599,7 @@ void arrayst::add_array_constraints_update(
     {
       // we first build the guard
 
-      if(other_index.type()!=index.type())
-        other_index.make_typecast(index.type());
+      other_index = typecast_exprt::conditional_cast(other_index, index.type());
 
       literalt guard_lit=convert(equal_exprt(index, other_index));
 

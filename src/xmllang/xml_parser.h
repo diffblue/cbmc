@@ -14,11 +14,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "xml_parse_tree.h"
 
-int yyxmlparse();
-
 class xml_parsert:public parsert
 {
 public:
+  explicit xml_parsert(message_handlert &message_handler)
+    : parsert(message_handler)
+  {
+  }
+
   xml_parse_treet parse_tree;
 
   std::list<xmlt *> stack;
@@ -28,10 +31,7 @@ public:
     return *stack.back();
   }
 
-  virtual bool parse()
-  {
-    return yyxmlparse()!=0;
-  }
+  bool parse() override;
 
   void new_level()
   {
@@ -39,18 +39,8 @@ public:
     stack.push_back(&current().elements.back());
   }
 
-  virtual void clear()
-  {
-    parse_tree.clear();
-    // set up stack
-    stack.clear();
-    stack.push_back(&parse_tree.element);
-  }
+  void clear() override;
 };
-
-extern xml_parsert xml_parser;
-
-int yyxmlerror(const std::string &error);
 
 // 'do it all' functions
 bool parse_xml(

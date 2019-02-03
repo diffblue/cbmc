@@ -36,7 +36,7 @@ public:
     propt *prop=nullptr;
   };
 
-  explicit bv_refinementt(const infot &info);
+  bv_refinementt(const infot &info, message_handlert &message_handler);
 
   decision_proceduret::resultt dec_solve() override;
 

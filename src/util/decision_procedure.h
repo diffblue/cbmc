@@ -12,18 +12,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_UTIL_DECISION_PROCEDURE_H
 #define CPROVER_UTIL_DECISION_PROCEDURE_H
 
-#include "message.h"
+#include <iosfwd>
+#include <string>
 
 class exprt;
-class namespacet;
 
-class decision_proceduret:public messaget
+class decision_proceduret
 {
 public:
-  explicit decision_proceduret(const namespacet &_ns):ns(_ns)
-  {
-  }
-
   virtual ~decision_proceduret();
 
   // get a value from satisfying instance if satisfiable
@@ -56,9 +52,6 @@ public:
 
   // return a textual description of the decision procedure
   virtual std::string decision_procedure_text() const=0;
-
-protected:
-  const namespacet &ns;
 };
 
 inline decision_proceduret &operator<<(

@@ -19,7 +19,8 @@ void cpp_typecheckt::convert(cpp_static_assertt &cpp_static_assert)
   typecheck_expr(cpp_static_assert.op0());
   typecheck_expr(cpp_static_assert.op1());
 
-  cpp_static_assert.op0().make_typecast(bool_typet());
+  cpp_static_assert.op0() =
+    typecast_exprt::conditional_cast(cpp_static_assert.op0(), bool_typet());
   make_constant(cpp_static_assert.op0());
 
   if(cpp_static_assert.op0().is_true())

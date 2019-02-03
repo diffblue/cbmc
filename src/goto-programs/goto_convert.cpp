@@ -506,8 +506,8 @@ void goto_convertt::convert(
   else if(statement==ID_static_assert)
   {
     PRECONDITION(code.operands().size() == 2);
-    exprt assertion=code.op0();
-    assertion.make_typecast(bool_typet());
+    exprt assertion =
+      typecast_exprt::conditional_cast(code.op0(), bool_typet());
     simplify(assertion, ns);
     INVARIANT_WITH_DIAGNOSTICS(
       !assertion.is_false(),
@@ -714,20 +714,6 @@ void goto_convertt::convert_assign(
     // handle above side effects
     clean_expr(rhs, dest, mode);
 
-    if(lhs.id() == ID_typecast)
-    {
-      DATA_INVARIANT(
-        lhs.operands().size() == 1, "Typecast must have one operand");
-
-      // add a typecast to the rhs
-      exprt new_rhs = rhs;
-      rhs.make_typecast(lhs.op0().type());
-
-      // remove typecast from lhs
-      exprt tmp = lhs.op0();
-      lhs.swap(tmp);
-    }
-
     code_assignt new_assign(code);
     new_assign.lhs() = lhs;
     new_assign.rhs() = rhs;
@@ -751,16 +737,6 @@ void goto_convertt::convert_assign(
   {
     // do everything else
     clean_expr(rhs, dest, mode);
-
-    if(lhs.id()==ID_typecast)
-    {
-      // add a typecast to the rhs
-      rhs.make_typecast(to_typecast_expr(lhs).op().type());
-
-      // remove typecast from lhs
-      exprt tmp=lhs.op0();
-      lhs.swap(tmp);
-    }
 
     code_assignt new_assign(code);
     new_assign.lhs()=lhs;
