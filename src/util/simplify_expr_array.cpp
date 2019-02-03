@@ -111,8 +111,9 @@ bool simplify_exprt::simplify_index(exprt &expr)
       return false;
     }
   }
-  else if(array.id()==ID_constant ||
-          array.id()==ID_array)
+  else if(
+    array.id() == ID_constant || array.id() == ID_array ||
+    array.id() == ID_vector)
   {
     const auto i = numeric_cast<mp_integer>(expr.op1());
 
@@ -181,14 +182,18 @@ bool simplify_exprt::simplify_index(exprt &expr)
   else if(array.id()==ID_byte_extract_little_endian ||
           array.id()==ID_byte_extract_big_endian)
   {
-    if(array.type().id() == ID_array)
+    if(array.type().id() == ID_array || array.type().id() == ID_vector)
     {
-      const auto &array_type = to_array_type(array.type());
+      optionalt<typet> subtype;
+      if(array.type().id() == ID_array)
+        subtype = to_array_type(array.type()).subtype();
+      else
+        subtype = to_vector_type(array.type()).subtype();
 
       // This rewrites byte_extract(s, o, array_type)[i]
       // to byte_extract(s, o+offset, sub_type)
 
-      auto sub_size = pointer_offset_size(array_type.subtype(), ns);
+      auto sub_size = pointer_offset_size(*subtype, ns);
       if(!sub_size.has_value())
         return true;
 
