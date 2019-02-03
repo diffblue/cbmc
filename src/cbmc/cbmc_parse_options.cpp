@@ -618,18 +618,22 @@ int cbmc_parse_optionst::doit()
       return CPROVER_EXIT_INCORRECT_TASK;
     }
 
+<<<<<<< HEAD
     language->set_language_options(options);
     language->set_message_handler(ui_message_handler);
+=======
+    language->set_language_options(options, get_message_handler());
+>>>>>>> languaget is not a messaget
 
     log.status() << "Parsing " << filename << messaget::eom;
 
-    if(language->parse(infile, filename))
+    if(language->parse(infile, filename, get_message_handler()))
     {
       log.error() << "PARSING ERROR" << messaget::eom;
       return CPROVER_EXIT_INCORRECT_TASK;
     }
 
-    language->show_parse(std::cout);
+    language->show_parse(std::cout, get_message_handler());
     return CPROVER_EXIT_SUCCESS;
   }
 
@@ -859,8 +863,13 @@ void cbmc_parse_optionst::preprocessing(const optionst &options)
     return;
   }
 
+<<<<<<< HEAD
   std::unique_ptr<languaget> language = get_language_from_filename(filename);
   language->set_language_options(options);
+=======
+    std::unique_ptr<languaget> language=get_language_from_filename(filename);
+    language->set_language_options(options, get_message_handler());
+>>>>>>> languaget is not a messaget
 
   if(language == nullptr)
   {
@@ -868,10 +877,16 @@ void cbmc_parse_optionst::preprocessing(const optionst &options)
     return;
   }
 
+<<<<<<< HEAD
   language->set_message_handler(ui_message_handler);
 
   if(language->preprocess(infile, filename, std::cout))
     log.error() << "PREPROCESSING ERROR" << messaget::eom;
+=======
+    if(language->preprocess(infile, filename, std::cout, get_message_handler()))
+      error() << "PREPROCESSING ERROR" << eom;
+  }
+>>>>>>> languaget is not a messaget
 }
 
 bool cbmc_parse_optionst::process_goto_program(

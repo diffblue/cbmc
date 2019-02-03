@@ -186,13 +186,18 @@ void lazy_goto_modelt::initialize(
           "failed to figure out type of file '" + filename + '\'');
       }
 
+<<<<<<< HEAD:jbmc/src/java_bytecode/lazy_goto_model.cpp
       languaget &language = *lf.language;
       language.set_message_handler(message_handler);
       language.set_language_options(options);
+=======
+      languaget &language=*lf.language;
+      language.set_language_options(options, message_handler);
+>>>>>>> languaget is not a messaget:src/goto-programs/lazy_goto_model.cpp
 
       msg.status() << "Parsing " << filename << messaget::eom;
 
-      if(language.parse(infile, filename))
+      if(language.parse(infile, filename, message_handler))
       {
         throw invalid_source_file_exceptiont("PARSING ERROR");
       }

@@ -112,7 +112,14 @@ void parse_java_language_options(const cmdlinet &cmd, optionst &options)
     "java-lift-clinit-calls", cmd.isset("java-lift-clinit-calls"));
 }
 
+<<<<<<< HEAD
 prefix_filtert get_context(const optionst &options)
+=======
+/// Consume options that are java bytecode specific.
+void java_bytecode_languaget::set_language_options(
+  const optionst &options,
+  message_handlert &message_handler)
+>>>>>>> languaget is not a messaget
 {
   std::vector<std::string> context_include;
   std::vector<std::string> context_exclude;
@@ -200,9 +207,13 @@ java_bytecode_language_optionst::java_bytecode_language_optionst(
     {
       jsont json_cp_config;
       if(parse_json(
+<<<<<<< HEAD
            java_cp_include_files.substr(1),
            log.get_message_handler(),
            json_cp_config))
+=======
+           java_cp_include_files.substr(1), message_handler, json_cp_config))
+>>>>>>> languaget is not a messaget
         throw "cannot read JSON input configuration for JAR loading";
 
       if(!json_cp_config.is_object())
@@ -283,13 +294,29 @@ void java_bytecode_languaget::modules_provided(std::set<std::string> &)
 bool java_bytecode_languaget::preprocess(
   std::istream &,
   const std::string &,
-  std::ostream &)
+  std::ostream &,
+  message_handlert &)
 {
   // there is no preprocessing!
   return true;
 }
 
+<<<<<<< HEAD
 void java_bytecode_languaget::set_message_handler(
+=======
+/// We set the main class (i.e.\ class to start the class loading analysis from,
+/// see \ref java_class_loadert) depending on the file type of `path`.
+/// `path` can be the name of either a .class file or a .jar file.
+/// If it is a .class file, the top-level class in this file is the main class.
+/// If it is a .jar file, we first check for the main class in three steps
+/// 1) the argument of the --main-class command-line option,
+/// 2) the class implied by the argument of the --function option,
+/// 3) the manifest file of the JAR.
+/// If no main class was found, all classes in the JAR file are loaded.
+bool java_bytecode_languaget::parse(
+  std::istream &,
+  const std::string &path,
+>>>>>>> languaget is not a messaget
   message_handlert &message_handler)
 {
   java_class_loader.set_message_handler(message_handler);
@@ -303,10 +330,17 @@ void java_bytecode_languaget::initialize_class_loader()
   for(const auto &p : config.java.classpath)
     java_class_loader.add_classpath_entry(p);
 
+<<<<<<< HEAD
   java_class_loader.set_java_cp_include_files(
     language_options->java_cp_include_files);
   java_class_loader.add_load_classes(language_options->java_load_classes);
   if(language_options->string_refinement_enabled)
+=======
+  java_class_loader.set_message_handler(message_handler);
+  java_class_loader.set_java_cp_include_files(java_cp_include_files);
+  java_class_loader.add_load_classes(java_load_classes);
+  if(string_refinement_enabled)
+>>>>>>> languaget is not a messaget
   {
     string_preprocess.initialize_known_type_table();
 
@@ -398,7 +432,11 @@ bool java_bytecode_languaget::parse(
 
     // build an object to potentially limit which classes are loaded
     java_class_loader_limitt class_loader_limit(
+<<<<<<< HEAD
       get_message_handler(), language_options->java_cp_include_files);
+=======
+      message_handler, java_cp_include_files);
+>>>>>>> languaget is not a messaget
     if(config.java.main_class.empty())
     {
       // If we have an entry method, we can derive a main class.
@@ -428,7 +466,9 @@ bool java_bytecode_languaget::parse(
     // do we have one now?
     if(main_class.empty())
     {
-      status() << "JAR file without entry point: loading class files" << eom;
+      messaget log(message_handler);
+      log.status() << "JAR file without entry point: loading class files"
+                   << messaget::eom;
       const auto classes = java_class_loader.load_entire_jar(path);
       for(const auto &c : classes)
         main_jar_classes.push_back(c);
@@ -437,7 +477,18 @@ bool java_bytecode_languaget::parse(
       java_class_loader.add_classpath_entry(path);
   }
   else
+<<<<<<< HEAD
     main_class = config.java.main_class;
+=======
+    UNREACHABLE;
+
+  if(!main_class.empty())
+  {
+    messaget log(message_handler);
+    log.status() << "Java main class: " << main_class << messaget::eom;
+    java_class_loader(main_class);
+  }
+>>>>>>> languaget is not a messaget
 
   parse_from_main_class();
   return false;
@@ -805,7 +856,8 @@ static void create_stub_global_symbols(
 
 bool java_bytecode_languaget::typecheck(
   symbol_tablet &symbol_table,
-  const std::string &)
+  const std::string &,
+  message_handlert &message_handler)
 {
   PRECONDITION(language_options.has_value());
   // There are various cases in the Java front-end where pre-existing symbols
@@ -834,11 +886,19 @@ bool java_bytecode_languaget::typecheck(
     if(java_bytecode_convert_class(
          it->second,
          symbol_table,
+<<<<<<< HEAD
          get_message_handler(),
          language_options->max_user_array_length,
          method_bytecode,
          string_preprocess,
          language_options->no_load_classes))
+=======
+         message_handler,
+         max_user_array_length,
+         method_bytecode,
+         string_preprocess,
+         no_load_classes))
+>>>>>>> languaget is not a messaget
     {
       return true;
     }
@@ -854,11 +914,19 @@ bool java_bytecode_languaget::typecheck(
     if(java_bytecode_convert_class(
          class_trees.second,
          symbol_table,
+<<<<<<< HEAD
          get_message_handler(),
          language_options->max_user_array_length,
          method_bytecode,
          string_preprocess,
          language_options->no_load_classes))
+=======
+         message_handler,
+         max_user_array_length,
+         method_bytecode,
+         string_preprocess,
+         no_load_classes))
+>>>>>>> languaget is not a messaget
     {
       return true;
     }
@@ -917,10 +985,10 @@ bool java_bytecode_languaget::typecheck(
     }
     catch(missing_outer_class_symbol_exceptiont &)
     {
-      messaget::warning()
-        << "Not marking class " << c.first
-        << " implicitly generic due to missing outer class symbols"
-        << messaget::eom;
+      messaget log(message_handler);
+      log.warning() << "Not marking class " << c.first
+                    << " implicitly generic due to missing outer class symbols"
+                    << messaget::eom;
     }
   }
 
@@ -946,10 +1014,11 @@ bool java_bytecode_languaget::typecheck(
         parse_tree, symbol_table, language_options->string_refinement_enabled);
     }
   }
-  status() << "Java: added "
-           << (symbol_table.symbols.size() - before_constant_globals_size)
-           << " String or Class constant symbols"
-           << messaget::eom;
+
+  messaget log(message_handler);
+  log.status() << "Java: added "
+               << (symbol_table.symbols.size() - before_constant_globals_size)
+               << " String or Class constant symbols" << messaget::eom;
 
   // For each reference to a stub global (that is, a global variable declared on
   // a class we don't have bytecode for, and therefore don't know the static
@@ -968,7 +1037,7 @@ bool java_bytecode_languaget::typecheck(
       for(const java_bytecode_parse_treet &parse_tree : class_to_trees.second)
       {
         create_stub_global_symbols(
-          parse_tree, symbol_table_journal, class_hierarchy, *this);
+          parse_tree, symbol_table_journal, class_hierarchy, log);
       }
     }
 
@@ -988,6 +1057,7 @@ bool java_bytecode_languaget::typecheck(
   // that are reachable from this entry point.
   switch(language_options->lazy_methods_mode)
   {
+<<<<<<< HEAD
   case LAZY_METHODS_MODE_CONTEXT_INSENSITIVE:
     // ci = context-insensitive
     if(do_ci_lazy_method_conversion(symbol_table))
@@ -997,10 +1067,22 @@ bool java_bytecode_languaget::typecheck(
   {
     symbol_table_buildert symbol_table_builder =
       symbol_table_buildert::wrap(symbol_table);
+=======
+    case LAZY_METHODS_MODE_CONTEXT_INSENSITIVE:
+      // ci = context-insensitive
+      if(do_ci_lazy_method_conversion(symbol_table, message_handler))
+        return true;
+      break;
+    case LAZY_METHODS_MODE_EAGER:
+      {
+        symbol_table_buildert symbol_table_builder =
+          symbol_table_buildert::wrap(symbol_table);
+>>>>>>> languaget is not a messaget
 
     journalling_symbol_tablet journalling_symbol_table =
       journalling_symbol_tablet::wrap(symbol_table_builder);
 
+<<<<<<< HEAD
     // Convert all synthetic methods:
     for(const auto &function_id_and_type : synthetic_methods)
     {
@@ -1028,10 +1110,38 @@ bool java_bytecode_languaget::typecheck(
   case LAZY_METHODS_MODE_EXTERNAL_DRIVER:
     // Our caller is in charge of elaborating methods on demand.
     break;
+=======
+        // Convert all synthetic methods:
+        for(const auto &function_id_and_type : synthetic_methods)
+        {
+          convert_single_method(
+            function_id_and_type.first,
+            journalling_symbol_table,
+            message_handler);
+        }
+        // Convert all methods for which we have bytecode now
+        for(const auto &method_sig : method_bytecode)
+        {
+          convert_single_method(
+            method_sig.first, journalling_symbol_table, message_handler);
+        }
+        // Now convert all newly added string methods
+        for(const auto &fn_name : journalling_symbol_table.get_inserted())
+        {
+          if(string_preprocess.implements_function(fn_name))
+            convert_single_method(fn_name, symbol_table, message_handler);
+        }
+      }
+      break;
+    default:
+      // Our caller is in charge of elaborating methods on demand.
+      break;
+>>>>>>> languaget is not a messaget
   }
 
   // now instrument runtime exceptions
   java_bytecode_instrument(
+<<<<<<< HEAD
     symbol_table,
     language_options->throw_runtime_exceptions,
     get_message_handler());
@@ -1041,33 +1151,42 @@ bool java_bytecode_languaget::typecheck(
     symbol_table,
     get_message_handler(),
     language_options->string_refinement_enabled);
+=======
+    symbol_table, throw_runtime_exceptions, message_handler);
+
+  // now typecheck all
+  bool res = java_bytecode_typecheck(
+    symbol_table, message_handler, string_refinement_enabled);
+>>>>>>> languaget is not a messaget
 
   // now instrument thread-blocks and synchronized methods.
   if(language_options->threading_support)
   {
     convert_threadblock(symbol_table);
-    convert_synchronized_methods(symbol_table, get_message_handler());
+    convert_synchronized_methods(symbol_table, message_handler);
   }
 
   return res;
 }
 
 bool java_bytecode_languaget::generate_support_functions(
-  symbol_tablet &symbol_table)
+  symbol_tablet &symbol_table,
+  message_handlert &message_handler)
 {
   PRECONDITION(language_options.has_value());
 
   symbol_table_buildert symbol_table_builder =
     symbol_table_buildert::wrap(symbol_table);
 
-  main_function_resultt res=
-    get_main_symbol(symbol_table, main_class, get_message_handler());
+  main_function_resultt res =
+    get_main_symbol(symbol_table, main_class, message_handler);
   if(!res.is_success())
     return res.is_error();
 
   // Load the main function into the symbol table to get access to its
   // parameter names
-  convert_lazy_method(res.main_function.name, symbol_table_builder);
+  convert_lazy_method(
+    res.main_function.name, symbol_table_builder, message_handler);
 
   const symbolt &symbol =
     symbol_table_builder.lookup_ref(res.main_function.name);
@@ -1084,9 +1203,15 @@ bool java_bytecode_languaget::generate_support_functions(
   return java_entry_point(
     symbol_table_builder,
     main_class,
+<<<<<<< HEAD
     get_message_handler(),
     language_options->assume_inputs_non_null,
     language_options->assert_uncaught_exceptions,
+=======
+    message_handler,
+    assume_inputs_non_null,
+    assert_uncaught_exceptions,
+>>>>>>> languaget is not a messaget
     object_factory_parameters,
     get_pointer_type_selector(),
     language_options->string_refinement_enabled,
@@ -1109,11 +1234,13 @@ bool java_bytecode_languaget::generate_support_functions(
 /// instantiated (or evidence that an object of that type exists before the main
 /// function is entered, such as being passed as a parameter).
 /// \param symbol_table: global symbol table
+/// \param message_handler: message handler
 /// \return Elaborates lazily-converted methods that may be reachable starting
 ///   from the main entry point (usually provided with the --function command-
 ///   line option) (side-effect on the symbol_table). Returns false on success.
 bool java_bytecode_languaget::do_ci_lazy_method_conversion(
-  symbol_tablet &symbol_table)
+  symbol_tablet &symbol_table,
+  message_handlert &message_handler)
 {
   symbol_table_buildert symbol_table_builder =
     symbol_table_buildert::wrap(symbol_table);
@@ -1121,14 +1248,22 @@ bool java_bytecode_languaget::do_ci_lazy_method_conversion(
   lazy_class_to_declared_symbols_mapt class_to_declared_symbols;
 
   const method_convertert method_converter =
+<<<<<<< HEAD
     [this, &symbol_table_builder, &class_to_declared_symbols](
+=======
+    [this, &symbol_table_builder, &message_handler](
+>>>>>>> languaget is not a messaget
       const irep_idt &function_id,
       ci_lazy_methods_neededt lazy_methods_needed) {
       return convert_single_method(
         function_id,
         symbol_table_builder,
         std::move(lazy_methods_needed),
+<<<<<<< HEAD
         class_to_declared_symbols);
+=======
+        message_handler);
+>>>>>>> languaget is not a messaget
     };
 
   ci_lazy_methodst method_gather(
@@ -1139,7 +1274,7 @@ bool java_bytecode_languaget::do_ci_lazy_method_conversion(
     java_class_loader,
     language_options->java_load_classes,
     get_pointer_type_selector(),
-    get_message_handler(),
+    message_handler,
     synthetic_methods);
 
   return method_gather(symbol_table, method_bytecode, method_converter);
@@ -1181,9 +1316,11 @@ void java_bytecode_languaget::methods_provided(
 /// using eager method conversion.
 /// \param function_id: method ID to convert
 /// \param symtab: global symbol table
+/// \param message_handler: message handler
 void java_bytecode_languaget::convert_lazy_method(
   const irep_idt &function_id,
-  symbol_table_baset &symtab)
+  symbol_table_baset &symtab,
+  message_handlert &message_handler)
 {
   const symbolt &symbol = symtab.lookup_ref(function_id);
   if(symbol.value.is_not_nil())
@@ -1192,8 +1329,12 @@ void java_bytecode_languaget::convert_lazy_method(
   journalling_symbol_tablet symbol_table=
     journalling_symbol_tablet::wrap(symtab);
 
+<<<<<<< HEAD
   lazy_class_to_declared_symbols_mapt class_to_declared_symbols;
   convert_single_method(function_id, symbol_table, class_to_declared_symbols);
+=======
+  convert_single_method(function_id, symbol_table, message_handler);
+>>>>>>> languaget is not a messaget
 
   // Instrument runtime exceptions (unless symbol is a stub or is the
   // INITIALISE_FUNCTION).
@@ -1202,15 +1343,24 @@ void java_bytecode_languaget::convert_lazy_method(
     java_bytecode_instrument_symbol(
       symbol_table,
       symbol_table.get_writeable_ref(function_id),
+<<<<<<< HEAD
       language_options->throw_runtime_exceptions,
       get_message_handler());
+=======
+      throw_runtime_exceptions,
+      message_handler);
+>>>>>>> languaget is not a messaget
   }
 
   // now typecheck this function
   java_bytecode_typecheck_updated_symbols(
+<<<<<<< HEAD
     symbol_table,
     get_message_handler(),
     language_options->string_refinement_enabled);
+=======
+    symbol_table, message_handler, string_refinement_enabled);
+>>>>>>> languaget is not a messaget
 }
 
 /// Notify ci_lazy_methods, if present, of any static function calls made by
@@ -1276,13 +1426,21 @@ static void notify_static_method_calls(
 /// \param symbol_table: global symbol table
 /// \param needed_lazy_methods: optionally a collection of needed methods to
 ///   update with any methods touched during the conversion
+<<<<<<< HEAD
 /// \param class_to_declared_symbols: maps classes to the symbols that
 ///   they declare.
+=======
+/// \param message_handler: message handler
+>>>>>>> languaget is not a messaget
 bool java_bytecode_languaget::convert_single_method(
   const irep_idt &function_id,
   symbol_table_baset &symbol_table,
   optionalt<ci_lazy_methods_neededt> needed_lazy_methods,
+<<<<<<< HEAD
   lazy_class_to_declared_symbols_mapt &class_to_declared_symbols)
+=======
+  message_handlert &message_handler)
+>>>>>>> languaget is not a messaget
 {
   const symbolt &symbol = symbol_table.lookup_ref(function_id);
 
@@ -1457,9 +1615,15 @@ bool java_bytecode_languaget::convert_single_method_code(
       symbol_table.lookup_ref(cmb->get().class_id),
       cmb->get().method,
       symbol_table,
+<<<<<<< HEAD
       get_message_handler(),
       language_options->max_user_array_length,
       language_options->throw_assertion_error,
+=======
+      message_handler,
+      max_user_array_length,
+      throw_assertion_error,
+>>>>>>> languaget is not a messaget
       std::move(needed_lazy_methods),
       string_preprocess,
       class_hierarchy,
@@ -1501,7 +1665,7 @@ bool java_bytecode_languaget::final(symbol_table_baset &)
   return false;
 }
 
-void java_bytecode_languaget::show_parse(std::ostream &out)
+void java_bytecode_languaget::show_parse(std::ostream &out, message_handlert &)
 {
   java_class_loadert::parse_tree_with_overlayst &parse_trees =
     java_class_loader(main_class);
@@ -1546,7 +1710,8 @@ bool java_bytecode_languaget::to_expr(
   const std::string &code,
   const std::string &module,
   exprt &expr,
-  const namespacet &ns)
+  const namespacet &ns,
+  message_handlert &message_handler)
 {
 #if 0
   expr.make_nil();
@@ -1590,6 +1755,7 @@ bool java_bytecode_languaget::to_expr(
   (void)module;
   (void)expr;
   (void)ns;
+  (void)message_handler;
 #endif
 
   return true; // fail for now

@@ -540,6 +540,7 @@ int jbmc_parse_optionst::doit()
     cmdline.args.push_back(cmdline.get_value("gb"));
   }
 
+<<<<<<< HEAD
   // Shows the parse tree of the main class
   if(cmdline.isset("show-parse-tree"))
   {
@@ -547,17 +548,45 @@ int jbmc_parse_optionst::doit()
     CHECK_RETURN(language != nullptr);
     language->set_language_options(options);
     language->set_message_handler(ui_message_handler);
+=======
+    language->set_language_options(options, get_message_handler());
+>>>>>>> languaget is not a messaget
 
     log.status() << "Parsing ..." << messaget::eom;
 
+<<<<<<< HEAD
     if(static_cast<java_bytecode_languaget *>(language.get())->parse())
+=======
+    if(language->parse(infile, filename, get_message_handler()))
+>>>>>>> languaget is not a messaget
     {
       log.error() << "PARSING ERROR" << messaget::eom;
       return CPROVER_EXIT_PARSE_ERROR;
     }
 
+<<<<<<< HEAD
     language->show_parse(std::cout);
     return CPROVER_EXIT_SUCCESS;
+=======
+    language->show_parse(std::cout, get_message_handler());
+    return 0;
+  }
+
+  std::function<void(bmct &, const symbol_tablet &)> configure_bmc = nullptr;
+  if(options.get_bool_option("java-unwind-enum-static"))
+  {
+    configure_bmc = [](bmct &bmc, const symbol_tablet &symbol_table) {
+      bmc.add_loop_unwind_handler(
+        [&symbol_table](
+          const goto_symex_statet::call_stackt &context,
+          unsigned loop_number,
+          unsigned unwind,
+          unsigned &max_unwind) {
+          return java_enum_static_init_unwind_handler(
+            context, loop_number, unwind, max_unwind, symbol_table);
+        });
+    };
+>>>>>>> languaget is not a messaget
   }
 
   object_factory_params.set(options);
