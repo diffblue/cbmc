@@ -17,7 +17,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_bytecode_parser.h"
 
 java_class_loadert::parse_tree_with_overlayst &java_class_loadert::operator()(
-  const irep_idt &class_name)
+  const irep_idt &class_name,
+  message_handlert &message_handler)
 {
   std::stack<irep_idt> queue;
   // Always require java.lang.Object, as it is the base of
@@ -37,7 +38,7 @@ java_class_loadert::parse_tree_with_overlayst &java_class_loadert::operator()(
     queue.push(id);
 
   java_class_loader_limitt class_loader_limit(
-    get_message_handler(), java_cp_include_files);
+    message_handler, java_cp_include_files);
 
   while(!queue.empty())
   {
@@ -47,10 +48,11 @@ java_class_loadert::parse_tree_with_overlayst &java_class_loadert::operator()(
     if(class_map.count(c) != 0)
       continue;
 
-    debug() << "Reading class " << c << eom;
+    messaget log(message_handler);
+    log.debug() << "Reading class " << c << messaget::eom;
 
     parse_tree_with_overlayst &parse_trees =
-      get_parse_tree(class_loader_limit, c);
+      get_parse_tree(class_loader_limit, c, message_handler);
 
     // Add any dependencies to queue
     for(const java_bytecode_parse_treet &parse_tree : parse_trees)
@@ -103,6 +105,7 @@ static bool is_overlay_class(const java_bytecode_parse_treet::classt &c)
 /// to find the .class file.
 /// \param class_loader_limit: Filter to decide whether to load classes
 /// \param class_name: Name of class to load
+/// \param message_handler: message handler
 /// \return The list of valid implementations, including overlays
 /// \remarks
 ///   Allows multiple definitions of the same class to appear on the
@@ -111,15 +114,18 @@ static bool is_overlay_class(const java_bytecode_parse_treet::classt &c)
 java_class_loadert::parse_tree_with_overlayst &
 java_class_loadert::get_parse_tree(
   java_class_loader_limitt &class_loader_limit,
-  const irep_idt &class_name)
+  const irep_idt &class_name,
+  message_handlert &message_handler)
 {
   parse_tree_with_overlayst &parse_trees = class_map[class_name];
   PRECONDITION(parse_trees.empty());
 
+  messaget log(message_handler);
+
   // do we refuse to load?
   if(!class_loader_limit.load_class_file(class_name_to_jar_file(class_name)))
   {
-    debug() << "not loading " << class_name << " because of limit" << eom;
+    log.debug() << "not loading " << class_name << " because of limit" << messaget::eom;
     parse_trees.emplace_back(class_name);
     return parse_trees;
   }
@@ -127,7 +133,7 @@ java_class_loadert::get_parse_tree(
   // Rummage through the class path
   for(const auto &cp_entry : classpath_entries)
   {
-    auto parse_tree = load_class(class_name, cp_entry);
+    auto parse_tree = load_class(class_name, cp_entry, message_handler);
     if(parse_tree.has_value())
       parse_trees.emplace_back(std::move(*parse_tree));
   }
@@ -146,11 +152,11 @@ java_class_loadert::get_parse_tree(
         ++parse_tree_it;
         break;
       }
-      warning()
+      log.warning()
         << "Skipping class " << class_name
         << " marked with OverlayClassImplementation but found before"
           " original definition"
-        << eom;
+        << messaget::eom;
     }
     auto unloaded_or_overlay_out_of_order_it = parse_tree_it;
     ++parse_tree_it;
@@ -162,9 +168,9 @@ java_class_loadert::get_parse_tree(
     // Remove non-initial classes that aren't overlays
     if(!is_overlay_class(parse_tree_it->parsed_class))
     {
-      warning()
+      log.warning()
         << "Skipping duplicate definition of class " << class_name
-        << " not marked with OverlayClassImplementation" << eom;
+        << " not marked with OverlayClassImplementation" << messaget::eom;
       auto duplicate_non_overlay_it = parse_tree_it;
       ++parse_tree_it;
       parse_trees.erase(duplicate_non_overlay_it);
@@ -176,7 +182,7 @@ java_class_loadert::get_parse_tree(
     return parse_trees;
 
   // Not found or failed to load
-  warning() << "failed to load class `" << class_name << '\'' << eom;
+  log.warning() << "failed to load class `" << class_name << '\'' << messaget::eom;
   parse_trees.emplace_back(class_name);
   return parse_trees;
 }
@@ -184,9 +190,10 @@ java_class_loadert::get_parse_tree(
 /// Load all class files from a .jar file
 /// \param jar_path: the path for the .jar to load
 std::vector<irep_idt> java_class_loadert::load_entire_jar(
-  const std::string &jar_path)
+  const std::string &jar_path,
+  message_handlert &message_handler)
 {
-  auto classes = read_jar_file(jar_path);
+  auto classes = read_jar_file(jar_path, message_handler);
   if(!classes.has_value())
     return {};
 
@@ -194,7 +201,7 @@ std::vector<irep_idt> java_class_loadert::load_entire_jar(
     classpath_entryt(classpath_entryt::JAR, jar_path));
 
   for(const auto &c : *classes)
-    operator()(c);
+    operator()(c, message_handler);
 
   classpath_entries.pop_front();
 
@@ -202,8 +209,11 @@ std::vector<irep_idt> java_class_loadert::load_entire_jar(
 }
 
 optionalt<std::vector<irep_idt>>
-java_class_loadert::read_jar_file(const std::string &jar_path)
+java_class_loadert::read_jar_file(const std::string &jar_path,
+  message_handlert &message_handler)
 {
+  messaget log(message_handler);
+
   std::vector<std::string> filenames;
   try
   {
@@ -211,10 +221,10 @@ java_class_loadert::read_jar_file(const std::string &jar_path)
   }
   catch(const std::runtime_error &)
   {
-    error() << "failed to open JAR file `" << jar_path << "'" << eom;
+    log.error() << "failed to open JAR file `" << jar_path << "'" << messaget::eom;
     return {};
   }
-  debug() << "Adding JAR file `" << jar_path << "'" << eom;
+  log.debug() << "Adding JAR file `" << jar_path << "'" << messaget::eom;
 
   // Create a new entry in the map and initialize using the list of file names
   // that are in jar_filet
@@ -223,9 +233,9 @@ java_class_loadert::read_jar_file(const std::string &jar_path)
   {
     if(has_suffix(file_name, ".class"))
     {
-      debug()
+      log.debug()
         << "Found class file " << file_name << " in JAR `" << jar_path << "'"
-        << eom;
+        << messaget::eom;
       irep_idt class_name=file_to_class_name(file_name);
       classes.push_back(class_name);
     }

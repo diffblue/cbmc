@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_bytecode_parser.h"
 
 #include <util/file_util.h>
+#include <util/message.h>
 #include <util/suffix.h>
 
 #include <fstream>
@@ -110,15 +111,16 @@ java_class_loader_baset::class_name_to_os_file(const irep_idt &class_name)
 /// attempt to load a class from a classpath_entry
 optionalt<java_bytecode_parse_treet> java_class_loader_baset::load_class(
   const irep_idt &class_name,
-  const classpath_entryt &cp_entry)
+  const classpath_entryt &cp_entry,
+  message_handlert &message_handler)
 {
   switch(cp_entry.kind)
   {
   case classpath_entryt::JAR:
-    return get_class_from_jar(class_name, cp_entry.path);
+    return get_class_from_jar(class_name, cp_entry.path, message_handler);
 
   case classpath_entryt::DIRECTORY:
-    return get_class_from_directory(class_name, cp_entry.path);
+    return get_class_from_directory(class_name, cp_entry.path, message_handler);
   }
 
   UNREACHABLE;
@@ -127,12 +129,16 @@ optionalt<java_bytecode_parse_treet> java_class_loader_baset::load_class(
 /// Load class from jar file.
 /// \param class_name: name of class to load in Java source format
 /// \param jar_file: path of the jar file
+/// \param message_handler: message handler
 /// \return optional value of parse tree, empty if class cannot be loaded
 optionalt<java_bytecode_parse_treet>
 java_class_loader_baset::get_class_from_jar(
   const irep_idt &class_name,
-  const std::string &jar_file)
+  const std::string &jar_file,
+  message_handlert &message_handler)
 {
+  messaget log(message_handler);
+
   try
   {
     auto &jar = jar_pool(jar_file);
@@ -141,15 +147,15 @@ java_class_loader_baset::get_class_from_jar(
     if(!data.has_value())
       return {};
 
-    debug() << "Getting class `" << class_name << "' from JAR " << jar_file
-            << eom;
+    log.debug() << "Getting class `" << class_name << "' from JAR " << jar_file
+            << messaget::eom;
 
     std::istringstream istream(*data);
-    return java_bytecode_parse(istream, get_message_handler());
+    return java_bytecode_parse(istream, message_handler);
   }
   catch(const std::runtime_error &)
   {
-    error() << "failed to open JAR file `" << jar_file << "'" << eom;
+    log.error() << "failed to open JAR file `" << jar_file << "'" << messaget::eom;
     return {};
   }
 }
@@ -157,11 +163,13 @@ java_class_loader_baset::get_class_from_jar(
 /// Load class from directory.
 /// \param class_name: name of class to load in Java source format
 /// \param path: directory to load from
+/// \param message_handler: message handler
 /// \return optional value of parse tree, empty if class cannot be loaded
 optionalt<java_bytecode_parse_treet>
 java_class_loader_baset::get_class_from_directory(
   const irep_idt &class_name,
-  const std::string &path)
+  const std::string &path,
+  message_handlert &message_handler)
 {
   // Look in the given directory
   const std::string class_file = class_name_to_os_file(class_name);
@@ -169,9 +177,10 @@ java_class_loader_baset::get_class_from_directory(
 
   if(std::ifstream(full_path))
   {
-    debug() << "Getting class `" << class_name << "' from file " << full_path
-            << eom;
-    return java_bytecode_parse(full_path, get_message_handler());
+    messaget log(message_handler);
+    log.debug() << "Getting class `" << class_name << "' from file " << full_path
+            << messaget::eom;
+    return java_bytecode_parse(full_path, message_handler);
   }
   else
     return {};
