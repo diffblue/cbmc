@@ -19,7 +19,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/simplify_expr.h>
 #include <util/std_types.h>
 #include <util/string_constant.h>
-#include <util/type_eq.h>
 
 #include "anonymous_member.h"
 

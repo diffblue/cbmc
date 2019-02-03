@@ -14,7 +14,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 
 #include <util/arith_tools.h>
-#include <util/base_type.h>
 #include <util/c_types.h>
 #include <util/config.h>
 #include <util/cprover_prefix.h>
@@ -1064,9 +1063,9 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
 
   const typet expr_type=follow(expr.type());
 
-  if(expr_type.id()==ID_union &&
-     !base_type_eq(expr_type, op.type(), *this) &&
-     op.id()!=ID_initializer_list)
+  if(
+    expr_type.id() == ID_union && expr_type != op.type() &&
+    op.id() != ID_initializer_list)
   {
     // This is a GCC extension. It's either a 'temporary union',
     // where the argument is one of the member types.
@@ -1080,7 +1079,7 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
     // we need to find a member with the right type
     for(const auto &c : to_union_type(expr_type).components())
     {
-      if(base_type_eq(c.type(), op.type(), *this))
+      if(c.type() == op.type())
       {
         // found! build union constructor
         union_exprt union_expr(c.get_name(), op, expr.type());
@@ -1131,7 +1130,7 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
   const typet op_type = op.type();
 
   // cast to same type?
-  if(base_type_eq(expr_type, op_type, *this))
+  if(expr_type == op_type)
     return; // it's ok
 
   // vectors?
@@ -2516,8 +2515,7 @@ exprt c_typecheck_baset::do_special_functions(
       expr.arguments().front(), expr.arguments().back());
     equality_expr.add_source_location()=source_location;
 
-    if(!base_type_eq(equality_expr.lhs().type(),
-                     equality_expr.rhs().type(), *this))
+    if(equality_expr.lhs().type() != equality_expr.rhs().type())
     {
       error().source_location = f_op.source_location();
       error() << "equal expects two operands of same type" << eom;
