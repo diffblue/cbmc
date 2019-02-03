@@ -677,7 +677,7 @@ configt::ansi_ct::c_standardt configt::ansi_ct::default_c_standard()
   #if defined(__APPLE__)
   // By default, clang on the Mac builds C code in GNU C11
   return c_standardt::C11;
-  #elif defined(__FreeBSD__)
+  #elif defined(__FreeBSD__) || defined(__OpenBSD__)
   // By default, clang on FreeBSD builds C code in GNU C99
   return c_standardt::C99;
   #else
