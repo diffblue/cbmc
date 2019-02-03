@@ -405,6 +405,9 @@ protected:
   // for enforcing sharing in the expressions stored
   merge_irept merge_irep;
   void merge_ireps(SSA_stept &SSA_step);
+
+  // for unique I/O identifiers
+  std::size_t io_count = 0;
 };
 
 inline bool operator<(
