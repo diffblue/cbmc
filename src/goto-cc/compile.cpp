@@ -620,14 +620,14 @@ bool compilet::write_bin_object_file(
 optionalt<symbol_tablet> compilet::parse_source(const std::string &file_name)
 {
   language_filest language_files;
-  language_files.set_message_handler(log.get_message_handler());
 
   if(parse(file_name, language_files))
     return {};
 
   // we just typecheck one file here
   symbol_tablet file_symbol_table;
-  if(language_files.typecheck(file_symbol_table, keep_file_local))
+  if(language_files.typecheck(
+       file_symbol_table, keep_file_local, log.get_message_handler()))
   {
     log.error() << "CONVERSION ERROR" << messaget::eom;
     return {};
