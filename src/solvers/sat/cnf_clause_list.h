@@ -29,19 +29,25 @@ public:
   }
   virtual ~cnf_clause_listt() { }
 
-  virtual void lcnf(const bvt &bv);
+  void lcnf(const bvt &bv) override;
 
-  virtual const std::string solver_text()
+  const std::string solver_text() override
   { return "CNF clause list"; }
 
-  virtual tvt l_get(literalt) const
+  tvt l_get(literalt) const override
   {
     return tvt::unknown();
   }
 
-  virtual resultt prop_solve() { return resultt::P_ERROR; }
+  resultt prop_solve() override
+  {
+    return resultt::P_ERROR;
+  }
 
-  virtual size_t no_clauses() const { return clauses.size(); }
+  size_t no_clauses() const override
+  {
+    return clauses.size();
+  }
 
   typedef std::list<bvt> clausest;
 
@@ -97,7 +103,7 @@ public:
     return assignment;
   }
 
-  virtual tvt l_get(literalt literal) const
+  tvt l_get(literalt literal) const override
   {
     if(literal.is_true())
       return tvt(true);

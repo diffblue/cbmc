@@ -20,11 +20,11 @@ class satcheck_booleforce_baset:public cnf_solvert
 public:
   virtual ~satcheck_booleforce_baset();
 
-  virtual const std::string solver_text();
-  virtual resultt prop_solve();
-  virtual tvt l_get(literalt a) const;
+  const std::string solver_text() override;
+  resultt prop_solve() override;
+  tvt l_get(literalt a) const override;
 
-  virtual void lcnf(const bvt &bv);
+  void lcnf(const bvt &bv) override;
 };
 
 class satcheck_booleforcet:public satcheck_booleforce_baset

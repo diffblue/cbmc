@@ -48,13 +48,13 @@ public:
 
   bool pbs_solve();
 
-  virtual resultt prop_solve();
+  resultt prop_solve() override;
 
-  virtual tvt l_get(literalt a) const;
+  tvt l_get(literalt a) const override;
 
   // dummy functions
 
-  virtual const std::string solver_text()
+  const std::string solver_text() override
   {
     return "PBS - Pseudo Boolean/CNF Solver and Optimizer";
   }

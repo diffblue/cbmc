@@ -23,17 +23,23 @@ public:
   satcheck_cadicalt();
   virtual ~satcheck_cadicalt();
 
-  virtual const std::string solver_text() override;
-  virtual resultt prop_solve() override;
-  virtual tvt l_get(literalt a) const override;
+  const std::string solver_text() override;
+  resultt prop_solve() override;
+  tvt l_get(literalt a) const override;
 
-  virtual void lcnf(const bvt &bv) override;
-  virtual void set_assignment(literalt a, bool value) override;
+  void lcnf(const bvt &bv) override;
+  void set_assignment(literalt a, bool value) override;
 
-  virtual void set_assumptions(const bvt &_assumptions) override;
-  virtual bool has_set_assumptions() const override { return false; }
-  virtual bool has_is_in_conflict() const override { return false; }
-  virtual bool is_in_conflict(literalt a) const override;
+  void set_assumptions(const bvt &_assumptions) override;
+  bool has_set_assumptions() const override
+  {
+    return false;
+  }
+  bool has_is_in_conflict() const override
+  {
+    return false;
+  }
+  bool is_in_conflict(literalt a) const override;
 
 protected:
   // NOLINTNEXTLINE(readability/identifiers)
