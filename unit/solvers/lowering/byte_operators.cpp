@@ -62,6 +62,34 @@ SCENARIO("byte_extract_lowering", "[core][solvers][lowering][byte_extract]")
     }
   }
 
+  GIVEN("A an unbounded byte_extract over a bounded operand")
+  {
+    const exprt deadbeef = from_integer(0xdeadbeef, unsignedbv_typet(32));
+    const byte_extract_exprt be1(
+      ID_byte_extract_little_endian,
+      deadbeef,
+      from_integer(1, index_type()),
+      struct_typet(
+        {{"unbounded_array",
+          array_typet(
+            unsignedbv_typet(16), exprt(ID_infinity, size_type()))}}));
+
+    THEN("byte_extract lowering does not raise an exception")
+    {
+      const exprt lower_be1 = lower_byte_extract(be1, ns);
+
+      REQUIRE(!has_subexpr(lower_be1, ID_byte_extract_little_endian));
+      REQUIRE(lower_be1.type() == be1.type());
+
+      byte_extract_exprt be2 = be1;
+      be2.id(ID_byte_extract_big_endian);
+      const exprt lower_be2 = lower_byte_extract(be2, ns);
+
+      REQUIRE(!has_subexpr(lower_be2, ID_byte_extract_big_endian));
+      REQUIRE(lower_be2.type() == be2.type());
+    }
+  }
+
   GIVEN("A collection of types")
   {
     unsignedbv_typet u8(8);

@@ -312,7 +312,7 @@ exprt lower_byte_extract(const byte_extract_exprt &src, const namespacet &ns)
   if(!size_bits.has_value())
   {
     auto op0_bits = pointer_offset_bits(unpacked.op().type(), ns);
-    if(op0_bits.has_value())
+    if(!op0_bits.has_value())
     {
       throw non_const_byte_extraction_sizet(unpacked);
     }
