@@ -211,6 +211,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_insert_char(
     add_axioms_for_insert(fresh_symbol, res, s1, s2, offset));
 }
 
+#if 0
 /// add axioms corresponding to the StringBuilder.insert(D) java function
 /// \deprecated should convert the value to string and call insert
 /// \param fresh_symbol: generator of fresh symbols
@@ -257,3 +258,4 @@ std::pair<exprt, string_constraintst> add_axioms_for_insert_float(
 {
   return add_axioms_for_insert_double(fresh_symbol, f, array_pool, ns);
 }
+#endif

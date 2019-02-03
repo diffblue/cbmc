@@ -11,11 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_ASSEMBLER_ASSEMBLER_PARSER_H
 
 #include <util/parser.h>
-#include <util/expr.h>
-
-int yyassemblerlex();
-int yyassemblererror(const std::string &error);
-void assembler_scanner_init();
 
 class assembler_parsert:public parsert
 {
@@ -36,24 +31,14 @@ public:
     instructions.push_back(instructiont());
   }
 
-  assembler_parsert()
+  explicit assembler_parsert(message_handlert &message_handler)
+    : parsert(message_handler)
   {
   }
 
-  virtual bool parse()
-  {
-    yyassemblerlex();
-    return false;
-  }
+  bool parse() override;
 
-  virtual void clear()
-  {
-    parsert::clear();
-    instructions.clear();
-    // assembler_scanner_init();
-  }
+  void clear() override;
 };
-
-extern assembler_parsert assembler_parser;
 
 #endif // CPROVER_ASSEMBLER_ASSEMBLER_PARSER_H

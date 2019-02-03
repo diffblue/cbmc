@@ -23,7 +23,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 arrayst::arrayst(
   const namespacet &_ns,
-  propt &_prop):equalityt(_prop), ns(_ns)
+  propt &_prop,
+  message_handlert &message_handler):equalityt(_prop, message_handler), ns(_ns)
 {
   lazy_arrays = false;        // will be set to true when --refine is used
   incremental_cache = false;  // for incremental solving

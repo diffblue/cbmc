@@ -1987,7 +1987,7 @@ bool Parser::optStorageSpec(cpp_storage_spect &storage_spec)
 
   if(t==TOK_STATIC ||
      t==TOK_EXTERN ||
-     (t == TOK_AUTO && !ansi_c_parser.cpp11) ||
+     (t == TOK_AUTO && !parser.ansi_c_parser.cpp11) ||
      t==TOK_REGISTER ||
      t==TOK_MUTABLE ||
      t==TOK_GCC_ASM ||
@@ -2721,7 +2721,7 @@ bool Parser::rConstructorDecl(
 
     case TOK_DEFAULT: // C++0x
       {
-        if(!ansi_c_parser.cpp11)
+        if(!parser.ansi_c_parser.cpp11)
         {
           SyntaxError();
           return false;
@@ -2734,7 +2734,7 @@ bool Parser::rConstructorDecl(
 
     case TOK_DELETE: // C++0x
       {
-        if(!ansi_c_parser.cpp11)
+        if(!parser.ansi_c_parser.cpp11)
         {
           SyntaxError();
           return false;
@@ -2898,7 +2898,7 @@ bool Parser::rDeclaratorWithInit(
 
       if(lex.LookAhead(0)==TOK_DEFAULT) // C++0x
       {
-        if(!ansi_c_parser.cpp11)
+        if(!parser.ansi_c_parser.cpp11)
         {
           SyntaxError();
           return false;
@@ -2910,7 +2910,7 @@ bool Parser::rDeclaratorWithInit(
       }
       else if(lex.LookAhead(0)==TOK_DELETE) // C++0x
       {
-        if(!ansi_c_parser.cpp11)
+        if(!parser.ansi_c_parser.cpp11)
         {
           SyntaxError();
           return false;
@@ -8370,7 +8370,7 @@ bool Parser::operator()()
   return number_of_errors!=0;
 }
 
-bool cpp_parse()
+bool cpp_parse(cpp_parsert &cpp_parser)
 {
   Parser parser(cpp_parser);
   return parser();

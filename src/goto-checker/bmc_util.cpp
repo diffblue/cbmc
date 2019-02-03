@@ -143,16 +143,16 @@ void convert_symex_target_equation(
 }
 
 std::unique_ptr<memory_model_baset>
-get_memory_model(const optionst &options, const namespacet &ns)
+get_memory_model(const optionst &options, const namespacet &ns, message_handlert &message_handler)
 {
   const std::string mm = options.get_option("mm");
 
   if(mm.empty() || mm == "sc")
-    return util_make_unique<memory_model_sct>(ns);
+    return util_make_unique<memory_model_sct>(ns, message_handler);
   else if(mm == "tso")
-    return util_make_unique<memory_model_tsot>(ns);
+    return util_make_unique<memory_model_tsot>(ns, message_handler);
   else if(mm == "pso")
-    return util_make_unique<memory_model_psot>(ns);
+    return util_make_unique<memory_model_psot>(ns, message_handler);
   else
   {
     throw "invalid memory model '" + mm + "': use one of sc, tso, pso";

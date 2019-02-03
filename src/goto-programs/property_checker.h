@@ -22,10 +22,6 @@ Author: Daniel Kroening, kroening@kroening.com
 class property_checkert:public messaget
 {
 public:
-  property_checkert()
-  {
-  }
-
   explicit property_checkert(
     message_handlert &_message_handler);
 

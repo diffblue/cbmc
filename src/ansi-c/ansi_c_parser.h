@@ -21,14 +21,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "ansi_c_parse_tree.h"
 #include "ansi_c_scope.h"
 
-int yyansi_cparse();
-
 class ansi_c_parsert:public parsert
 {
 public:
   ansi_c_parse_treet parse_tree;
 
-  ansi_c_parsert():
+  explicit ansi_c_parsert(message_handlert &message_handler):
+    parsert(message_handler),
     tag_following(false),
     asm_block_following(false),
     parenthesis_counter(0),
@@ -41,27 +40,9 @@ public:
   {
   }
 
-  virtual bool parse() override
-  {
-    return yyansi_cparse()!=0;
-  }
+  bool parse() override;
 
-  virtual void clear() override
-  {
-    parsert::clear();
-    parse_tree.clear();
-
-    // scanner state
-    tag_following=false;
-    asm_block_following=false;
-    parenthesis_counter=0;
-    string_literal.clear();
-    pragma_pack.clear();
-
-    // set up global scope
-    scopes.clear();
-    scopes.push_back(scopet());
-  }
+  void clear() override;
 
   // internal state of the scanner
   bool tag_following;
@@ -148,10 +129,5 @@ public:
     return identifier;
   }
 };
-
-extern ansi_c_parsert ansi_c_parser;
-
-int yyansi_cerror(const std::string &error);
-void ansi_c_scanner_init();
 
 #endif // CPROVER_ANSI_C_ANSI_C_PARSER_H

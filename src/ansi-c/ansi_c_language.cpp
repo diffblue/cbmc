@@ -72,18 +72,15 @@ bool ansi_c_languaget::parse(
   ansi_c_internal_additions(code);
   std::istringstream codestr(code);
 
-  ansi_c_parser.clear();
+  ansi_c_parsert ansi_c_parser(message_handler);
   ansi_c_parser.set_file(ID_built_in);
   ansi_c_parser.in=&codestr;
-  ansi_c_parser.log.set_message_handler(message_handler);
   ansi_c_parser.for_has_scope=config.ansi_c.for_has_scope;
   ansi_c_parser.ts_18661_3_Floatn_types=config.ansi_c.ts_18661_3_Floatn_types;
   ansi_c_parser.Float128_type = config.ansi_c.Float128_type;
   ansi_c_parser.cpp98=false; // it's not C++
   ansi_c_parser.cpp11=false; // it's not C++
   ansi_c_parser.mode=config.ansi_c.mode;
-
-  ansi_c_scanner_init();
 
   bool result=ansi_c_parser.parse();
 
@@ -92,7 +89,6 @@ bool ansi_c_languaget::parse(
     ansi_c_parser.set_line_no(0);
     ansi_c_parser.set_file(path);
     ansi_c_parser.in=&i_preprocessed;
-    ansi_c_scanner_init();
     result=ansi_c_parser.parse();
   }
 
@@ -187,13 +183,12 @@ bool ansi_c_languaget::to_expr(
 
   // parsing
 
-  ansi_c_parser.clear();
+  ansi_c_parsert  ansi_c_parser(get_message_handler());
   ansi_c_parser.set_file(irep_idt());
   ansi_c_parser.in=&i_preprocessed;
   ansi_c_parser.log.set_message_handler(message_handler);
   ansi_c_parser.mode=config.ansi_c.mode;
   ansi_c_parser.ts_18661_3_Floatn_types=config.ansi_c.ts_18661_3_Floatn_types;
-  ansi_c_scanner_init();
 
   bool result=ansi_c_parser.parse();
 

@@ -16,34 +16,22 @@ Author: Michael Tautschnig, tautschn@amazon.com
 
 #include "jsil_parse_tree.h"
 
-int yyjsilparse();
-
 class jsil_parsert:public parsert
 {
 public:
+  explicit jsil_parsert(message_handlert &message_handler)
+    : parsert(message_handler)
+  {
+  }
+
   jsil_parse_treet parse_tree;
 
-  virtual bool parse() override
-  {
-    return yyjsilparse()!=0;
-  }
+  bool parse() override;
 
-  virtual void clear() override
-  {
-    parsert::clear();
-    parse_tree.clear();
-
-    // scanner state
-    string_literal.clear();
-  }
+  void clear() override;
 
   // internal state of the scanner
   std::string string_literal;
 };
-
-extern jsil_parsert jsil_parser;
-
-int yyjsilerror(const std::string &error);
-void jsil_scanner_init();
 
 #endif // CPROVER_JSIL_JSIL_PARSER_H

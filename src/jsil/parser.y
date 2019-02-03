@@ -1,12 +1,19 @@
 %{
 
 // #define YYDEBUG 1
-#define PARSER jsil_parser
+#define PARSER (*jsil_parser)
 
 #include "jsil_parser.h"
 
 int yyjsillex();
-extern char *yyjsiltext;
+int yyjsilerror(const std::string &error);
+
+static jsil_parsert *jsil_parser;
+
+void jsil_parser_init(jsil_parsert *_jsil_parser)
+{
+  jsil_parser = _jsil_parser;
+}
 
 #define YYSTYPE unsigned
 #define YYSTYPE_IS_TRIVIAL 1

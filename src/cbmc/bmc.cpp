@@ -197,7 +197,7 @@ safety_checkert::resultt bmct::execute(
 safety_checkert::resultt bmct::run(
   abstract_goto_modelt &goto_model)
 {
-  memory_model = get_memory_model(options, ns);
+  memory_model = get_memory_model(options, ns, ui_message_handler);
   setup_symex(symex, ns, options, ui_message_handler);
 
   return execute(goto_model);

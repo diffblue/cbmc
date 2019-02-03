@@ -68,9 +68,9 @@ public:
 class prop_conv_solvert : public prop_convt, public messaget
 {
 public:
-  explicit prop_conv_solvert(propt &_prop) : prop(_prop)
-  {
-  }
+  prop_conv_solvert(propt &_prop, message_handlert &message_handler):
+    messaget(message_handler),
+    prop(_prop) { }
 
   virtual ~prop_conv_solvert() = default;
 

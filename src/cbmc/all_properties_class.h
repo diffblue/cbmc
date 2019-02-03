@@ -25,6 +25,7 @@ public:
     const goto_functionst &_goto_functions,
     prop_convt &_solver,
     bmct &_bmc):
+    messaget(_solver.get_message_handler()),
     goto_functions(_goto_functions), solver(_solver), bmc(_bmc)
   {
   }

@@ -8,14 +8,19 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "assembler_parser.h"
 
-#include <iostream>
+int yyassemblerlex();
+void assembler_scanner_init(assembler_parsert *assembler_parser);
 
-assembler_parsert assembler_parser;
-
-extern char *yyassemblertext;
-
-int yyassemblererror(const std::string &error)
+bool assembler_parsert::parse()
 {
-  assembler_parser.parse_error(error, yyassemblertext);
-  return 0;
+  assembler_scanner_init(this);
+  yyassemblerlex();
+  return false;
+}
+
+void assembler_parsert::clear()
+{
+  parsert::clear();
+  instructions.clear();
+  assembler_scanner_init(nullptr);
 }

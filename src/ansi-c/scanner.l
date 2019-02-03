@@ -30,7 +30,7 @@ static int isatty(int) { return 0; }
 #include "literals/convert_string_literal.h"
 #include "literals/unescape_string.h"
 
-#define PARSER ansi_c_parser
+#define PARSER (*ansi_c_parser)
 #define YYSTYPE unsigned
 #undef  ECHO
 #define ECHO
@@ -43,6 +43,10 @@ extern int yyansi_cdebug;
 
 #define loc() \
   { newstack(yyansi_clval); PARSER.set_source_location(stack(yyansi_clval)); }
+
+static ansi_c_parsert *ansi_c_parser;
+
+int yyansi_cerror(const std::string &error);
 
 int make_identifier()
 {
@@ -245,8 +249,9 @@ CPROVER_PREFIX  "__CPROVER_"
 %x CPROVER_ID
 
 %{
-void ansi_c_scanner_init()
+void ansi_c_scanner_init(ansi_c_parsert *_ansi_c_parser)
 {
+  ansi_c_parser = _ansi_c_parser;
 #ifdef ANSI_C_DEBUG
   yyansi_cdebug=1;
 #endif
@@ -257,7 +262,8 @@ void ansi_c_scanner_init()
 
 %%
 
-<INITIAL>.|\n   { BEGIN(GRAMMAR);
+<INITIAL>.|\n   { PRECONDITION(ansi_c_parser);
+                  BEGIN(GRAMMAR);
                   yyless(0); /* start again with this character */
                 }
 
@@ -1726,3 +1732,10 @@ __decltype          { if(PARSER.cpp98 &&
 %%
 
 int yywrap() { return 1; }
+
+int yyansi_cerror(const std::string &error)
+{
+  PRECONDITION(ansi_c_parser);
+  ansi_c_parser->parse_error(error, yyansi_ctext);
+  return 0;
+}

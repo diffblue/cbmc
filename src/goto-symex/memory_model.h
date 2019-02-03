@@ -17,7 +17,7 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 class memory_model_baset:public partial_order_concurrencyt
 {
 public:
-  explicit memory_model_baset(const namespacet &_ns);
+  memory_model_baset(const namespacet &_ns, message_handlert &message_handler);
   virtual ~memory_model_baset();
 
   virtual void operator()(symex_target_equationt &)=0;

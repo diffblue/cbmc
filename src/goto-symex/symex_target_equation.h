@@ -387,8 +387,6 @@ public:
     return it;
   }
 
-  void output(std::ostream &out, const namespacet &ns) const;
-
   void clear()
   {
     SSA_steps.clear();

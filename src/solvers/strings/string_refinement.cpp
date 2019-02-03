@@ -163,8 +163,11 @@ static bool validate(const string_refinementt::infot &info)
   return true;
 }
 
-string_refinementt::string_refinementt(const infot &info, bool)
-  : supert(info),
+string_refinementt::string_refinementt(
+  const infot &info,
+  bool,
+  message_handlert &message_handler)
+  : supert(info, message_handler),
     config_(info),
     loop_bound_(info.refinement_bound),
     generator(*info.ns)
@@ -2059,7 +2062,7 @@ static optionalt<exprt> find_counter_example(
   message_handlert &message_handler)
 {
   satcheck_no_simplifiert sat_check(message_handler);
-  boolbvt solver(ns, sat_check);
+  boolbvt solver(ns, sat_check, message_handler);
   solver << axiom;
 
   if(solver() == decision_proceduret::resultt::D_SATISFIABLE)

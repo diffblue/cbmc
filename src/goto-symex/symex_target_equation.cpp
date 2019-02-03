@@ -694,17 +694,6 @@ void symex_target_equationt::merge_ireps(SSA_stept &SSA_step)
   // converted_io_args is merged in convert_io
 }
 
-void symex_target_equationt::output(
-  std::ostream &out,
-  const namespacet &ns) const
-{
-  for(const auto &step : SSA_steps)
-  {
-    step.output(ns, out);
-    out << "--------------\n";
-  }
-}
-
 void symex_target_equationt::SSA_stept::output(
   const namespacet &ns,
   std::ostream &out) const

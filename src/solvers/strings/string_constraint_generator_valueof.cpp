@@ -191,6 +191,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_string_of_int_with_radix(
   return {from_integer(0, get_return_code_type()), std::move(result2)};
 }
 
+#if 0
 /// Returns the integer value represented by the character.
 /// \param chr: a character expression in the following set:
 ///   0123456789abcdef
@@ -278,6 +279,7 @@ std::pair<exprt, string_constraintst> add_axioms_from_int_hex(
     char_array_of_pointer(array_pool, f.arguments()[1], f.arguments()[0]);
   return add_axioms_from_int_hex(res, f.arguments()[2]);
 }
+#endif
 
 /// Conversion from char to string
 ///

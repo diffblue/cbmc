@@ -11,15 +11,22 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_parser.h"
 
-#include <util/config.h>
+bool cpp_parse(cpp_parsert &);
 
-cpp_parsert cpp_parser;
+cpp_parsert::cpp_parsert(message_handlert &message_handler)
+  : 
+    parsert(message_handler),
+    ansi_c_parser(message_handler),
+    mode(configt::ansi_ct::flavourt::ANSI),
+    recognize_wchar_t(true),
+    token_buffer(ansi_c_parser),
+    asm_block_following(false)
+{
+}
 
-bool cpp_parse();
 
 bool cpp_parsert::parse()
 {
-  // We use the ANSI-C scanner
   ansi_c_parser.cpp98=true;
   ansi_c_parser.cpp11=
     config.cpp.cpp_standard==configt::cppt::cpp_standardt::CPP11 ||
@@ -29,7 +36,5 @@ bool cpp_parsert::parse()
   ansi_c_parser.in=in;
   ansi_c_parser.mode=mode;
   ansi_c_parser.set_file(get_file());
-  ansi_c_parser.log.set_message_handler(log.get_message_handler());
-
-  return cpp_parse();
+  return cpp_parse(*this);
 }

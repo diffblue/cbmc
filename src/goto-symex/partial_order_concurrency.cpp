@@ -17,7 +17,7 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 #include <util/simplify_expr.h>
 
 partial_order_concurrencyt::partial_order_concurrencyt(
-  const namespacet &_ns):ns(_ns)
+  const namespacet &_ns, message_handlert &message_handler):messaget(message_handler), ns(_ns)
 {
 }
 

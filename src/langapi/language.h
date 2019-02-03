@@ -190,7 +190,11 @@ public:
 
   // constructor / destructor
 
-  languaget() { }
+  explicit languaget(message_handlert &message_handler)
+    : messaget(message_handler)
+  {
+  }
+
   virtual ~languaget() { }
 
 protected:

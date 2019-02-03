@@ -160,7 +160,7 @@ decision_proceduret::resultt check_sat(const exprt &expr, const namespacet &ns)
   info.ns = &ns;
   info.prop = &sat_check;
   info.output_xml = false;
-  bv_refinementt solver(info);
+  bv_refinementt solver(info, null_message_handler);
   solver << expr;
   return solver();
 }
