@@ -27,9 +27,6 @@ Author: Daniel Kroening, kroening@kroening.com
 class prop_convt:public decision_proceduret
 {
 public:
-  explicit prop_convt(
-    const namespacet &_ns):
-    decision_proceduret(_ns) { }
   virtual ~prop_convt() { }
 
   // conversion to handle
@@ -70,9 +67,9 @@ public:
 class prop_conv_solvert:public prop_convt
 {
 public:
-  prop_conv_solvert(const namespacet &_ns, propt &_prop):
-    prop_convt(_ns),
-    prop(_prop) { }
+  explicit prop_conv_solvert(propt &_prop) : prop(_prop)
+  {
+  }
 
   virtual ~prop_conv_solvert() = default;
 

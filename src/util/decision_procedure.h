@@ -15,15 +15,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "message.h"
 
 class exprt;
-class namespacet;
 
 class decision_proceduret:public messaget
 {
 public:
-  explicit decision_proceduret(const namespacet &_ns):ns(_ns)
-  {
-  }
-
   virtual ~decision_proceduret();
 
   // get a value from satisfying instance if satisfiable
@@ -56,9 +51,6 @@ public:
 
   // return a textual description of the decision procedure
   virtual std::string decision_procedure_text() const=0;
-
-protected:
-  const namespacet &ns;
 };
 
 inline decision_proceduret &operator<<(

@@ -186,11 +186,9 @@ SCENARIO("miniBDD", "[core][solver][miniBDD]")
 {
   GIVEN("A bdd for x&!x")
   {
-    symbol_tablet symbol_table;
-    namespacet ns(symbol_table);
     mini_bdd_mgrt bdd_mgr;
     bdd_propt bdd_prop(bdd_mgr);
-    prop_conv_solvert solver(ns, bdd_prop);
+    prop_conv_solvert solver(bdd_prop);
 
     symbol_exprt var("x", bool_typet());
     literalt result = solver.convert(and_exprt(var, not_exprt(var)));
