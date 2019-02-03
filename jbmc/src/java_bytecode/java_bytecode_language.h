@@ -112,12 +112,17 @@ public:
 
   virtual ~java_bytecode_languaget();
   java_bytecode_languaget(
-    std::unique_ptr<select_pointer_typet> pointer_type_selector):
+    std::unique_ptr<select_pointer_typet> pointer_type_selector)
+    : threading_support(false),
       assume_inputs_non_null(false),
       object_factory_parameters(),
       max_user_array_length(0),
       lazy_methods_mode(lazy_methods_modet::LAZY_METHODS_MODE_EAGER),
       string_refinement_enabled(false),
+      throw_runtime_exceptions(false),
+      assert_uncaught_exceptions(false),
+      throw_assertion_error(false),
+      nondet_static(false),
       pointer_type_selector(std::move(pointer_type_selector))
   {
   }
