@@ -15,7 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class qbf_quantort:public qdimacs_cnft
 {
 public:
-  explicit qbf_quantort(message_handlert &message_handler);
+  qbf_quantort();
   virtual ~qbf_quantort();
 
   virtual const std::string solver_text();

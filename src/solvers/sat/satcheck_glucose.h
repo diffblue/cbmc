@@ -29,7 +29,7 @@ template <typename T>
 class satcheck_glucose_baset : public cnf_solvert, public hardness_collectort
 {
 public:
-  satcheck_glucose_baset(T *, message_handlert &message_handler);
+  explicit satcheck_glucose_baset(T *);
   virtual ~satcheck_glucose_baset();
 
   tvt l_get(literalt a) const override;
@@ -82,10 +82,14 @@ class satcheck_glucose_no_simplifiert:
   public satcheck_glucose_baset<Glucose::Solver>
 {
 public:
+<<<<<<< HEAD
   explicit satcheck_glucose_no_simplifiert(message_handlert &message_handler);
 <<<<<<< HEAD
   const std::string solver_text() override;
 =======
+=======
+  satcheck_glucose_no_simplifiert();
+>>>>>>> Revert "Require a message handler when constructing a propt"
   virtual const std::string solver_text();
 >>>>>>> Require a message handler when constructing a propt
 };
@@ -94,11 +98,15 @@ class satcheck_glucose_simplifiert:
   public satcheck_glucose_baset<Glucose::SimpSolver>
 {
 public:
+<<<<<<< HEAD
   explicit satcheck_glucose_simplifiert(message_handlert &message_handler);
 <<<<<<< HEAD
   const std::string solver_text() override;
   void set_frozen(literalt a) override;
 =======
+=======
+  satcheck_glucose_simplifiert();
+>>>>>>> Revert "Require a message handler when constructing a propt"
   virtual const std::string solver_text();
   virtual void set_frozen(literalt a);
 >>>>>>> Require a message handler when constructing a propt

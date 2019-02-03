@@ -195,7 +195,6 @@ static exprt int_of_hex_char(const exprt &chr)
 /// \deprecated use add_axioms_from_int_with_radix instead
 /// \param res: string expression for the result
 /// \param i: an integer argument
-/// \param message_handler: message handler
 /// \return code 0 on success
 <<<<<<< HEAD
 DEPRECATED(SINCE(2017, 10, 5, "use add_axioms_for_string_of_int_with_radix"))
@@ -205,11 +204,16 @@ string_constraint_generatort::add_axioms_from_int_hex(
   const exprt &i)
 =======
 DEPRECATED("use add_axioms_for_string_of_int_with_radix instead")
+<<<<<<< HEAD
 std::pair<exprt, string_constraintst> add_axioms_from_int_hex(
   const array_string_exprt &res,
   const exprt &i,
   message_handlert &message_handler)
 >>>>>>> Require a message handler when constructing a propt
+=======
+std::pair<exprt, string_constraintst>
+add_axioms_from_int_hex(const array_string_exprt &res, const exprt &i)
+>>>>>>> Revert "Require a message handler when constructing a propt"
 {
   const typet &type = i.type();
   PRECONDITION(type.id() == ID_signedbv);
@@ -276,18 +280,57 @@ string_constraint_generatort::add_axioms_from_int_hex(
   return add_axioms_from_int_hex(res, f.arguments()[2]);
 =======
 /// \param array_pool: pool of arrays representing strings
-/// \param message_handler: messsage handler
 /// \return code 0 on success
 std::pair<exprt, string_constraintst> add_axioms_from_int_hex(
   const function_application_exprt &f,
-  array_poolt &array_pool,
-  message_handlert &message_handler)
+  array_poolt &array_pool)
 {
   PRECONDITION(f.arguments().size() == 3);
   const array_string_exprt res =
     char_array_of_pointer(array_pool, f.arguments()[1], f.arguments()[0]);
+<<<<<<< HEAD
   return add_axioms_from_int_hex(res, f.arguments()[2], message_handler);
 >>>>>>> Require a message handler when constructing a propt
+=======
+  return add_axioms_from_int_hex(res, f.arguments()[2]);
+}
+
+/// Conversion from char to string
+///
+// NOLINTNEXTLINE
+/// \copybrief add_axioms_from_char(const array_string_exprt &res, const exprt &c)
+// NOLINTNEXTLINE
+/// \link add_axioms_from_char(const array_string_exprt &res, const exprt &c)
+///   (More...) \endlink
+/// \param f: function application with arguments integer `|res|`, character
+///   pointer `&res[0]` and character `c`
+/// \param array_pool: pool of arrays representing strings
+/// \return code 0 on success
+std::pair<exprt, string_constraintst> add_axioms_from_char(
+  const function_application_exprt &f,
+  array_poolt &array_pool)
+{
+  PRECONDITION(f.arguments().size() == 3);
+  const array_string_exprt res =
+    char_array_of_pointer(array_pool, f.arguments()[1], f.arguments()[0]);
+  return add_axioms_from_char(res, f.arguments()[2]);
+}
+
+/// Add axiom stating that string `res` has length 1 and the character
+/// it contains equals `c`.
+///
+/// This axiom is: \f$ |{\tt res}| = 1 \land {\tt res}[0] = {\tt c} \f$.
+/// \param res: array of characters expression
+/// \param c: character expression
+/// \return code 0 on success
+std::pair<exprt, string_constraintst>
+add_axioms_from_char(const array_string_exprt &res, const exprt &c)
+{
+  string_constraintst constraints;
+  constraints.existential = {
+    and_exprt(equal_exprt(res[0], c), length_eq(res, 1))};
+  return {from_integer(0, get_return_code_type()), std::move(constraints)};
+>>>>>>> Revert "Require a message handler when constructing a propt"
 }
 
 /// Add axioms making the return value true if the given string is a correct

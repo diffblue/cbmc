@@ -313,6 +313,7 @@ solver_factoryt::get_string_refinement()
       options.get_unsigned_int_option("max-node-refinement");
   info.refine_arrays = options.get_bool_option("refine-arrays");
   info.refine_arithmetic = options.get_bool_option("refine-arithmetic");
+<<<<<<< HEAD
   info.message_handler = &message_handler;
 
 <<<<<<< HEAD
@@ -322,6 +323,11 @@ solver_factoryt::get_string_refinement()
     std::move(decision_procedure), std::move(prop));
 =======
   auto prop_conv = util_make_unique<string_refinementt>(info, message_handler);
+=======
+
+  auto prop_conv = util_make_unique<string_refinementt>(info);
+  prop_conv->set_message_handler(message_handler);
+>>>>>>> Revert "Require a message handler when constructing a propt"
   set_prop_conv_time_limit(*prop_conv);
   return util_make_unique<solvert>(std::move(prop_conv), std::move(prop));
 >>>>>>> Require a message handler when constructing a propt

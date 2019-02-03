@@ -31,10 +31,8 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <util/ssa_expr.h>
 #include <util/string_constant.h>
 
-string_constraint_generatort::string_constraint_generatort(
-  const namespacet &ns,
-  message_handlert &message_handler)
-  : array_pool(fresh_symbol), ns(ns), message(message_handler)
+string_constraint_generatort::string_constraint_generatort(const namespacet &ns)
+  : array_pool(fresh_symbol), ns(ns)
 {
 }
 
@@ -125,15 +123,13 @@ void merge(string_constraintst &result, string_constraintst other)
 /// \param char_set: a string of the form "<low_char>-<high_char>" where
 ///   `<low_char>` and `<high_char>` are two characters, which represents the
 ///   set of characters that are between `low_char` and `high_char`.
-/// \param message_handler: message handler
 /// \return a string expression that is linked to the argument through axioms
 ///   that are added to the list
 string_constraintst string_constraint_generatort::add_constraint_on_characters(
   const array_string_exprt &s,
   const exprt &start,
   const exprt &end,
-  const std::string &char_set,
-  message_handlert &message_handler)
+  const std::string &char_set)
 {
   // Parse char_set
   PRECONDITION(char_set.length() == 3);
@@ -144,6 +140,7 @@ string_constraintst string_constraint_generatort::add_constraint_on_characters(
   const symbol_exprt qvar = fresh_symbol("char_constr", s.length_type());
   const exprt chr = s[qvar];
   const string_constraintt sc(
+<<<<<<< HEAD
     qvar,
     zero_if_negative(start),
     zero_if_negative(end),
@@ -153,6 +150,9 @@ string_constraintst string_constraint_generatort::add_constraint_on_characters(
     char_in_set,
     message_handler);
 >>>>>>> Require a message handler when constructing a propt
+=======
+    qvar, zero_if_negative(start), zero_if_negative(end), char_in_set);
+>>>>>>> Revert "Require a message handler when constructing a propt"
   return {{}, {sc}, {}};
 }
 
@@ -172,14 +172,17 @@ string_constraint_generatort::add_axioms_for_constrain_characters(
   const function_application_exprt &f)
 =======
 /// \param array_pool: pool of arrays representing strings
-/// \param message_handler: message handler
 /// \return integer expression whose value is zero
 std::pair<exprt, string_constraintst> add_axioms_for_constrain_characters(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
+<<<<<<< HEAD
   array_poolt &array_pool,
   message_handlert &message_handler)
 >>>>>>> Require a message handler when constructing a propt
+=======
+  array_poolt &array_pool)
+>>>>>>> Revert "Require a message handler when constructing a propt"
 {
   const auto &args = f.arguments();
   PRECONDITION(3 <= args.size() && args.size() <= 5);
@@ -199,8 +202,12 @@ std::pair<exprt, string_constraintst> add_axioms_for_constrain_characters(
     args.size() >= 4 ? args[3] : from_integer(0, s.length().type());
   const exprt &end = args.size() >= 5 ? args[4] : s.length();
   auto constraints = add_constraint_on_characters(
+<<<<<<< HEAD
     fresh_symbol, s, start, end, char_set_string.c_str(), message_handler);
 >>>>>>> Require a message handler when constructing a propt
+=======
+    fresh_symbol, s, start, end, char_set_string.c_str());
+>>>>>>> Revert "Require a message handler when constructing a propt"
   return {from_integer(0, get_return_code_type()), std::move(constraints)};
 }
 
@@ -233,7 +240,6 @@ optionalt<exprt> string_constraint_generatort::make_array_pointer_association(
 /// `string_exprt`, through adding axioms. Axioms are then added to enforce that
 /// the result corresponds to the function application.
 /// \param expr: an expression containing a function application
-/// \param message_handler: message handler
 /// \return expression corresponding to the result of the function application
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_function_application(
@@ -247,6 +253,7 @@ string_constraint_generatort::add_axioms_for_function_application(
     return add_axioms_for_length(expr);
   else if(id == ID_cprover_string_equal_func)
 <<<<<<< HEAD
+<<<<<<< HEAD
     return add_axioms_for_equals(expr);
   else if(id == ID_cprover_string_equals_ignore_case_func)
     return add_axioms_for_equals_ignore_case(expr);
@@ -257,11 +264,17 @@ string_constraint_generatort::add_axioms_for_function_application(
     return add_axioms_for_equals_ignore_case(
       fresh_symbol, expr, array_pool, message.get_message_handler());
 >>>>>>> Require a message handler when constructing a propt
+=======
+    return add_axioms_for_equals(fresh_symbol, expr, array_pool);
+  else if(id == ID_cprover_string_equals_ignore_case_func)
+    return add_axioms_for_equals_ignore_case(fresh_symbol, expr, array_pool);
+>>>>>>> Revert "Require a message handler when constructing a propt"
   else if(id == ID_cprover_string_is_empty_func)
     return add_axioms_for_is_empty(expr);
   else if(id == ID_cprover_string_char_at_func)
     return add_axioms_for_char_at(expr);
   else if(id == ID_cprover_string_is_prefix_func)
+<<<<<<< HEAD
 <<<<<<< HEAD
     return add_axioms_for_is_prefix(expr, false);
   else if(id == ID_cprover_string_is_suffix_func)
@@ -283,27 +296,29 @@ string_constraint_generatort::add_axioms_for_function_application(
 =======
     return add_axioms_for_is_prefix(
       fresh_symbol, expr, false, array_pool, message.get_message_handler());
+=======
+    return add_axioms_for_is_prefix(fresh_symbol, expr, false, array_pool);
+>>>>>>> Revert "Require a message handler when constructing a propt"
   else if(id == ID_cprover_string_is_suffix_func)
-    return add_axioms_for_is_suffix(
-      fresh_symbol, expr, false, array_pool, message.get_message_handler());
+    return add_axioms_for_is_suffix(fresh_symbol, expr, false, array_pool);
   else if(id == ID_cprover_string_startswith_func)
-    return add_axioms_for_is_prefix(
-      fresh_symbol, expr, true, array_pool, message.get_message_handler());
+    return add_axioms_for_is_prefix(fresh_symbol, expr, true, array_pool);
   else if(id == ID_cprover_string_endswith_func)
-    return add_axioms_for_is_suffix(
-      fresh_symbol, expr, true, array_pool, message.get_message_handler());
+    return add_axioms_for_is_suffix(fresh_symbol, expr, true, array_pool);
   else if(id == ID_cprover_string_contains_func)
-    return add_axioms_for_contains(
-      fresh_symbol, expr, array_pool, message.get_message_handler());
+    return add_axioms_for_contains(fresh_symbol, expr, array_pool);
   else if(id == ID_cprover_string_hash_code_func)
     return add_axioms_for_hash_code(expr, array_pool);
   else if(id == ID_cprover_string_index_of_func)
-    return add_axioms_for_index_of(
-      fresh_symbol, expr, array_pool, message.get_message_handler());
+    return add_axioms_for_index_of(fresh_symbol, expr, array_pool);
   else if(id == ID_cprover_string_last_index_of_func)
+<<<<<<< HEAD
     return add_axioms_for_last_index_of(
       fresh_symbol, expr, array_pool, message.get_message_handler());
 >>>>>>> Require a message handler when constructing a propt
+=======
+    return add_axioms_for_last_index_of(fresh_symbol, expr, array_pool);
+>>>>>>> Revert "Require a message handler when constructing a propt"
   else if(id == ID_cprover_string_parse_int_func)
     return add_axioms_for_parse_int(expr);
   else if(id == ID_cprover_string_code_point_at_func)
@@ -316,14 +331,19 @@ string_constraint_generatort::add_axioms_for_function_application(
     return add_axioms_for_offset_by_code_point(expr);
   else if(id == ID_cprover_string_compare_to_func)
 <<<<<<< HEAD
+<<<<<<< HEAD
     return add_axioms_for_compare_to(expr);
 =======
     return add_axioms_for_compare_to(
       fresh_symbol, expr, array_pool, message.get_message_handler());
 >>>>>>> Require a message handler when constructing a propt
+=======
+    return add_axioms_for_compare_to(fresh_symbol, expr, array_pool);
+>>>>>>> Revert "Require a message handler when constructing a propt"
   else if(id == ID_cprover_string_literal_func)
     return add_axioms_from_literal(expr);
   else if(id == ID_cprover_string_concat_code_point_func)
+<<<<<<< HEAD
 <<<<<<< HEAD
     return add_axioms_for_concat_code_point(expr);
   else if(id == ID_cprover_string_substring_func)
@@ -345,54 +365,50 @@ string_constraint_generatort::add_axioms_for_function_application(
 =======
     return add_axioms_for_concat_code_point(
       fresh_symbol, expr, array_pool, message.get_message_handler());
+=======
+    return add_axioms_for_concat_code_point(fresh_symbol, expr, array_pool);
+>>>>>>> Revert "Require a message handler when constructing a propt"
   else if(id == ID_cprover_string_insert_func)
-    return add_axioms_for_insert(
-      fresh_symbol, expr, array_pool, message.get_message_handler());
+    return add_axioms_for_insert(fresh_symbol, expr, array_pool);
   else if(id == ID_cprover_string_insert_int_func)
-    return add_axioms_for_insert_int(
-      fresh_symbol, expr, array_pool, ns, message.get_message_handler());
+    return add_axioms_for_insert_int(fresh_symbol, expr, array_pool, ns);
   else if(id == ID_cprover_string_insert_long_func)
-    return add_axioms_for_insert_int(
-      fresh_symbol, expr, array_pool, ns, message.get_message_handler());
+    return add_axioms_for_insert_int(fresh_symbol, expr, array_pool, ns);
   else if(id == ID_cprover_string_insert_bool_func)
-    return add_axioms_for_insert_bool(
-      fresh_symbol, expr, array_pool, message.get_message_handler());
+    return add_axioms_for_insert_bool(fresh_symbol, expr, array_pool);
   else if(id == ID_cprover_string_insert_char_func)
-    return add_axioms_for_insert_char(
-      fresh_symbol, expr, array_pool, message.get_message_handler());
+    return add_axioms_for_insert_char(fresh_symbol, expr, array_pool);
   else if(id == ID_cprover_string_insert_double_func)
-    return add_axioms_for_insert_double(
-      fresh_symbol, expr, array_pool, ns, message.get_message_handler());
+    return add_axioms_for_insert_double(fresh_symbol, expr, array_pool, ns);
   else if(id == ID_cprover_string_insert_float_func)
-    return add_axioms_for_insert_float(
-      fresh_symbol, expr, array_pool, ns, message.get_message_handler());
+    return add_axioms_for_insert_float(fresh_symbol, expr, array_pool, ns);
   else if(id == ID_cprover_string_substring_func)
-    return add_axioms_for_substring(
-      fresh_symbol, expr, array_pool, message.get_message_handler());
+    return add_axioms_for_substring(fresh_symbol, expr, array_pool);
   else if(id == ID_cprover_string_trim_func)
-    return add_axioms_for_trim(
-      fresh_symbol, expr, array_pool, message.get_message_handler());
+    return add_axioms_for_trim(fresh_symbol, expr, array_pool);
   else if(id == ID_cprover_string_empty_string_func)
     return add_axioms_for_empty_string(expr);
   else if(id == ID_cprover_string_copy_func)
-    return add_axioms_for_copy(
-      fresh_symbol, expr, array_pool, message.get_message_handler());
+    return add_axioms_for_copy(fresh_symbol, expr, array_pool);
   else if(id == ID_cprover_string_of_int_hex_func)
-    return add_axioms_from_int_hex(
-      expr, array_pool, message.get_message_handler());
+    return add_axioms_from_int_hex(expr, array_pool);
   else if(id == ID_cprover_string_of_float_func)
-    return add_axioms_for_string_of_float(
-      fresh_symbol, expr, array_pool, ns, message.get_message_handler());
+    return add_axioms_for_string_of_float(fresh_symbol, expr, array_pool, ns);
   else if(id == ID_cprover_string_of_float_scientific_notation_func)
     return add_axioms_from_float_scientific_notation(
-      fresh_symbol, expr, array_pool, ns, message.get_message_handler());
+      fresh_symbol, expr, array_pool, ns);
   else if(id == ID_cprover_string_of_double_func)
+<<<<<<< HEAD
     return add_axioms_from_double(
       fresh_symbol, expr, array_pool, ns, message.get_message_handler());
 >>>>>>> Require a message handler when constructing a propt
+=======
+    return add_axioms_from_double(fresh_symbol, expr, array_pool, ns);
+>>>>>>> Revert "Require a message handler when constructing a propt"
   else if(id == ID_cprover_string_of_long_func)
     return add_axioms_from_long(expr);
   else if(id == ID_cprover_string_set_length_func)
+<<<<<<< HEAD
 <<<<<<< HEAD
     return add_axioms_for_set_length(expr);
   else if(id == ID_cprover_string_delete_func)
@@ -406,23 +422,27 @@ string_constraint_generatort::add_axioms_for_function_application(
 =======
     return add_axioms_for_set_length(
       fresh_symbol, expr, array_pool, message.get_message_handler());
+=======
+    return add_axioms_for_set_length(fresh_symbol, expr, array_pool);
+>>>>>>> Revert "Require a message handler when constructing a propt"
   else if(id == ID_cprover_string_delete_func)
-    return add_axioms_for_delete(
-      fresh_symbol, expr, array_pool, message.get_message_handler());
+    return add_axioms_for_delete(fresh_symbol, expr, array_pool);
   else if(id == ID_cprover_string_delete_char_at_func)
-    return add_axioms_for_delete_char_at(
-      fresh_symbol, expr, array_pool, message.get_message_handler());
+    return add_axioms_for_delete_char_at(fresh_symbol, expr, array_pool);
   else if(id == ID_cprover_string_replace_func)
-    return add_axioms_for_replace(
-      fresh_symbol, expr, array_pool, message.get_message_handler());
+    return add_axioms_for_replace(fresh_symbol, expr, array_pool);
   else if(id == ID_cprover_string_intern_func)
     return add_axioms_for_intern(expr);
   else if(id == ID_cprover_string_format_func)
     return add_axioms_for_format(fresh_symbol, expr, array_pool, message, ns);
   else if(id == ID_cprover_string_constrain_characters_func)
+<<<<<<< HEAD
     return add_axioms_for_constrain_characters(
       fresh_symbol, expr, array_pool, message.get_message_handler());
 >>>>>>> Require a message handler when constructing a propt
+=======
+    return add_axioms_for_constrain_characters(fresh_symbol, expr, array_pool);
+>>>>>>> Revert "Require a message handler when constructing a propt"
   else
   {
     std::string msg(
@@ -446,15 +466,18 @@ string_constraint_generatort::add_axioms_for_copy(
   const function_application_exprt &f)
 =======
 /// \param array_pool: pool of arrays representing strings
-/// \param message_handler: message handler
 /// \return a new string expression
 DEPRECATED("should use substring instead")
 std::pair<exprt, string_constraintst> add_axioms_for_copy(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
+<<<<<<< HEAD
   array_poolt &array_pool,
   message_handlert &message_handler)
 >>>>>>> Require a message handler when constructing a propt
+=======
+  array_poolt &array_pool)
+>>>>>>> Revert "Require a message handler when constructing a propt"
 {
   const auto &args = f.arguments();
   PRECONDITION(args.size() == 3 || args.size() == 5);
@@ -469,8 +492,12 @@ std::pair<exprt, string_constraintst> add_axioms_for_copy(
 =======
   const exprt count = args.size() == 3 ? str.length() : args[4];
   return add_axioms_for_substring(
+<<<<<<< HEAD
     fresh_symbol, res, str, offset, plus_exprt(offset, count), message_handler);
 >>>>>>> Require a message handler when constructing a propt
+=======
+    fresh_symbol, res, str, offset, plus_exprt(offset, count));
+>>>>>>> Revert "Require a message handler when constructing a propt"
 }
 
 /// Length of a string

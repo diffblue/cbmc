@@ -44,10 +44,14 @@ void bv_refinementt::arrays_overapproximated()
   while(it!=lazy_array_constraints.end())
   {
 <<<<<<< HEAD
+<<<<<<< HEAD
     satcheck_no_simplifiert sat_check{log.get_message_handler()};
     bv_pointerst solver{ns, sat_check, log.get_message_handler()};
 =======
     satcheck_no_simplifiert sat_check(get_message_handler());
+=======
+    satcheck_no_simplifiert sat_check;
+>>>>>>> Revert "Require a message handler when constructing a propt"
     bv_pointerst solver(ns, sat_check);
 >>>>>>> Require a message handler when constructing a propt
     solver.unbounded_array=bv_pointerst::unbounded_arrayt::U_ALL;

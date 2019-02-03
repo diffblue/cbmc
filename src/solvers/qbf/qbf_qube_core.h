@@ -23,7 +23,7 @@ protected:
   assignmentt assignment;
 
 public:
-  explicit qbf_qube_coret(message_handlert &message_handler);
+  qbf_qube_coret();
   virtual ~qbf_qube_coret();
 
   virtual const std::string solver_text();

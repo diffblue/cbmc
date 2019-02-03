@@ -33,14 +33,12 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 /// \param str: an array of characters expression
 /// \param c: a character expression
 /// \param from_index: an integer expression
-/// \param message_handler: message handler
 /// \return integer expression `index`
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_index_of(
   const array_string_exprt &str,
   const exprt &c,
-  const exprt &from_index,
-  message_handlert &message_handler)
+  const exprt &from_index)
 {
   string_constraintst constraints;
   const typet &index_type = str.length_type();
@@ -70,8 +68,7 @@ string_constraint_generatort::add_axioms_for_index_of(
     n,
     lower_bound,
     zero_if_negative(index),
-    implies_exprt(contains, notequal_exprt(str[n], c)),
-    message_handler);
+    implies_exprt(contains, notequal_exprt(str[n], c)));
   constraints.universal.push_back(a4);
 
   symbol_exprt m = fresh_symbol("QA_index_of", index_type);
@@ -83,9 +80,13 @@ string_constraint_generatort::add_axioms_for_index_of(
     implies_exprt(not_exprt(contains), not_exprt(equal_exprt(str[m], c))));
 =======
     zero_if_negative(str.length()),
+<<<<<<< HEAD
     implies_exprt(not_exprt(contains), not_exprt(equal_exprt(str[m], c))),
     message_handler);
 >>>>>>> Require a message handler when constructing a propt
+=======
+    implies_exprt(not_exprt(contains), not_exprt(equal_exprt(str[m], c))));
+>>>>>>> Revert "Require a message handler when constructing a propt"
   constraints.universal.push_back(a5);
 
   return {index, std::move(constraints)};
@@ -113,15 +114,13 @@ string_constraint_generatort::add_axioms_for_index_of(
 /// \param haystack: an array of character expression
 /// \param needle: an array of character expression
 /// \param from_index: an integer expression
-/// \param message_handler: message handler
 /// \return integer expression `index` representing the first index of `needle`
 ///   in `haystack`
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_index_of_string(
   const array_string_exprt &haystack,
   const array_string_exprt &needle,
-  const exprt &from_index,
-  message_handlert &message_handler)
+  const exprt &from_index)
 {
   string_constraintst constraints;
   const typet &index_type = haystack.length_type();
@@ -149,8 +148,7 @@ string_constraint_generatort::add_axioms_for_index_of_string(
     qvar,
     zero_if_negative(array_pool.get_or_create_length(needle)),
     implies_exprt(
-      contains, equal_exprt(haystack[plus_exprt(qvar, offset)], needle[qvar])),
-    message_handler);
+      contains, equal_exprt(haystack[plus_exprt(qvar, offset)], needle[qvar])));
   constraints.universal.push_back(a3);
 
   // string_not contains_constraintt are formulas of the form:
@@ -216,15 +214,13 @@ string_constraint_generatort::add_axioms_for_index_of_string(
 /// \param haystack: an array of characters expression
 /// \param needle: an array of characters expression
 /// \param from_index: integer expression
-/// \param message_handler: message handler
 /// \return integer expression `index` representing the last index of `needle`
 ///         in `haystack` before or at `from_index`, or -1 if there is none
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_last_index_of_string(
   const array_string_exprt &haystack,
   const array_string_exprt &needle,
-  const exprt &from_index,
-  message_handlert &message_handler)
+  const exprt &from_index)
 {
   string_constraintst constraints;
   const typet &index_type = haystack.length_type();
@@ -251,6 +247,7 @@ string_constraint_generatort::add_axioms_for_last_index_of_string(
   symbol_exprt qvar = fresh_symbol("QA_index_of_string", index_type);
   equal_exprt constr3(haystack[plus_exprt(qvar, offset)], needle[qvar]);
   const string_constraintt a3(
+<<<<<<< HEAD
     qvar,
 <<<<<<< HEAD
     zero_if_negative(array_pool.get_or_create_length(needle)),
@@ -260,6 +257,9 @@ string_constraint_generatort::add_axioms_for_last_index_of_string(
     implies_exprt(contains, constr3),
     message_handler);
 >>>>>>> Require a message handler when constructing a propt
+=======
+    qvar, zero_if_negative(needle.length()), implies_exprt(contains, constr3));
+>>>>>>> Revert "Require a message handler when constructing a propt"
   constraints.universal.push_back(a3);
 
   // end_index is min(from_index, |str| - |substring|)
@@ -305,6 +305,7 @@ string_constraint_generatort::add_axioms_for_last_index_of_string(
 /// If the target is a character:
 // NOLINTNEXTLINE
 <<<<<<< HEAD
+<<<<<<< HEAD
 /// \copybrief add_axioms_for_index_of(const array_string_exprt&,const exprt&,const exprt&)
 // NOLINTNEXTLINE
 /// \link add_axioms_for_index_of(const array_string_exprt&,const exprt&,const exprt&)
@@ -313,6 +314,11 @@ string_constraint_generatort::add_axioms_for_last_index_of_string(
 // NOLINTNEXTLINE
 /// \link add_axioms_for_index_of(symbol_generatort &fresh_symbol, const array_string_exprt&,const exprt&,const exprt&, message_handlert&)
 >>>>>>> Require a message handler when constructing a propt
+=======
+/// \copybrief add_axioms_for_index_of(symbol_generatort &fresh_symbol, const array_string_exprt&,const exprt&,const exprt&)
+// NOLINTNEXTLINE
+/// \link add_axioms_for_index_of(symbol_generatort &fresh_symbol, const array_string_exprt&,const exprt&,const exprt&)
+>>>>>>> Revert "Require a message handler when constructing a propt"
 /// (More...) \endlink
 ///
 /// If the target is a refined_string:
@@ -330,14 +336,17 @@ string_constraint_generatort::add_axioms_for_index_of(
   const function_application_exprt &f)
 =======
 /// \param array_pool: pool of arrays representing strings
-/// \param message_handler: message handler
 /// \return integer expression
 std::pair<exprt, string_constraintst> add_axioms_for_index_of(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
+<<<<<<< HEAD
   array_poolt &array_pool,
   message_handlert &message_handler)
 >>>>>>> Require a message handler when constructing a propt
+=======
+  array_poolt &array_pool)
+>>>>>>> Revert "Require a message handler when constructing a propt"
 {
   const function_application_exprt::argumentst &args = f.arguments();
   PRECONDITION(args.size() == 2 || args.size() == 3);
@@ -353,6 +362,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_index_of(
   {
     return add_axioms_for_index_of(
 <<<<<<< HEAD
+<<<<<<< HEAD
       str, typecast_exprt(c, char_type), from_index);
 =======
       fresh_symbol,
@@ -361,6 +371,9 @@ std::pair<exprt, string_constraintst> add_axioms_for_index_of(
       from_index,
       message_handler);
 >>>>>>> Require a message handler when constructing a propt
+=======
+      fresh_symbol, str, typecast_exprt(c, char_type), from_index);
+>>>>>>> Revert "Require a message handler when constructing a propt"
   }
   else
   {
@@ -371,11 +384,15 @@ std::pair<exprt, string_constraintst> add_axioms_for_index_of(
         "string and the (un)signedbv case is already handled"));
     array_string_exprt sub = get_string_expr(array_pool, c);
 <<<<<<< HEAD
+<<<<<<< HEAD
     return add_axioms_for_index_of_string(str, sub, from_index);
 =======
     return add_axioms_for_index_of_string(
       fresh_symbol, str, sub, from_index, message_handler);
 >>>>>>> Require a message handler when constructing a propt
+=======
+    return add_axioms_for_index_of_string(fresh_symbol, str, sub, from_index);
+>>>>>>> Revert "Require a message handler when constructing a propt"
   }
 }
 
@@ -400,15 +417,13 @@ std::pair<exprt, string_constraintst> add_axioms_for_index_of(
 /// \param str: an array of characters expression
 /// \param c: a character expression
 /// \param from_index: an integer expression
-/// \param message_handler: message handler
 /// \return integer expression `index` representing the last index of `needle`
 ///   in `haystack` before or at `from_index`, or `-1` if there is none
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_last_index_of(
   const array_string_exprt &str,
   const exprt &c,
-  const exprt &from_index,
-  message_handlert &message_handler)
+  const exprt &from_index)
 {
   string_constraintst constraints;
   const typet &index_type = str.length_type();
@@ -441,16 +456,14 @@ string_constraint_generatort::add_axioms_for_last_index_of(
     n,
     zero_if_negative(plus_exprt(index, index1)),
     zero_if_negative(end_index),
-    implies_exprt(contains, notequal_exprt(str[n], c)),
-    message_handler);
+    implies_exprt(contains, notequal_exprt(str[n], c)));
   constraints.universal.push_back(a4);
 
   const symbol_exprt m = fresh_symbol("QA_last_index_of2", index_type);
   const string_constraintt a5(
     m,
     zero_if_negative(end_index),
-    implies_exprt(not_exprt(contains), notequal_exprt(str[m], c)),
-    message_handler);
+    implies_exprt(not_exprt(contains), notequal_exprt(str[m], c)));
   constraints.universal.push_back(a5);
 
   return {index, std::move(constraints)};
@@ -461,6 +474,7 @@ string_constraint_generatort::add_axioms_for_last_index_of(
 /// If the target is a character:
 // NOLINTNEXTLINE
 <<<<<<< HEAD
+<<<<<<< HEAD
 /// \copybrief add_axioms_for_last_index_of(const array_string_exprt&,const exprt&,const exprt&)
 // NOLINTNEXTLINE
 /// \link add_axioms_for_last_index_of(const array_string_exprt&,const exprt&,const exprt&)
@@ -469,6 +483,11 @@ string_constraint_generatort::add_axioms_for_last_index_of(
 // NOLINTNEXTLINE
 /// \link add_axioms_for_last_index_of(symbol_generatort &fresh_symbol, const array_string_exprt&,const exprt&,const exprt&, message_handlert &)
 >>>>>>> Require a message handler when constructing a propt
+=======
+/// \copybrief add_axioms_for_last_index_of(symbol_generatort &fresh_symbol, const array_string_exprt&,const exprt&,const exprt&)
+// NOLINTNEXTLINE
+/// \link add_axioms_for_last_index_of(symbol_generatort &fresh_symbol, const array_string_exprt&,const exprt&,const exprt&)
+>>>>>>> Revert "Require a message handler when constructing a propt"
 ///   (More...) \endlink
 ///
 /// If the target is a refined_string:
@@ -488,9 +507,13 @@ string_constraint_generatort::add_axioms_for_last_index_of(
 std::pair<exprt, string_constraintst> add_axioms_for_last_index_of(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
+<<<<<<< HEAD
   array_poolt &array_pool,
   message_handlert &message_handler)
 >>>>>>> Require a message handler when constructing a propt
+=======
+  array_poolt &array_pool)
+>>>>>>> Revert "Require a message handler when constructing a propt"
 {
   const function_application_exprt::argumentst &args = f.arguments();
   PRECONDITION(args.size() == 2 || args.size() == 3);
@@ -507,6 +530,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_last_index_of(
   {
     return add_axioms_for_last_index_of(
 <<<<<<< HEAD
+<<<<<<< HEAD
       str, typecast_exprt(c, char_type), from_index);
 =======
       fresh_symbol,
@@ -515,6 +539,9 @@ std::pair<exprt, string_constraintst> add_axioms_for_last_index_of(
       from_index,
       message_handler);
 >>>>>>> Require a message handler when constructing a propt
+=======
+      fresh_symbol, str, typecast_exprt(c, char_type), from_index);
+>>>>>>> Revert "Require a message handler when constructing a propt"
   }
   else
   {
@@ -523,7 +550,11 @@ std::pair<exprt, string_constraintst> add_axioms_for_last_index_of(
     return add_axioms_for_last_index_of_string(str, sub, from_index);
 =======
     return add_axioms_for_last_index_of_string(
+<<<<<<< HEAD
       fresh_symbol, str, sub, from_index, message_handler);
 >>>>>>> Require a message handler when constructing a propt
+=======
+      fresh_symbol, str, sub, from_index);
+>>>>>>> Revert "Require a message handler when constructing a propt"
   }
 }

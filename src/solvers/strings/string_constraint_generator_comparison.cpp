@@ -33,14 +33,17 @@ string_constraint_generatort::add_axioms_for_equals(
   const function_application_exprt &f)
 =======
 /// \param pool: pool of arrays representing strings
-/// \param message_handler: message handler
 /// \return Boolean expression `eq`
 std::pair<exprt, string_constraintst> add_axioms_for_equals(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
+<<<<<<< HEAD
   array_poolt &pool,
   message_handlert &message_handler)
 >>>>>>> Require a message handler when constructing a propt
+=======
+  array_poolt &pool)
+>>>>>>> Revert "Require a message handler when constructing a propt"
 {
   PRECONDITION(f.type() == bool_typet() || f.type().id() == ID_c_bool);
   PRECONDITION(f.arguments().size() == 2);
@@ -70,9 +73,13 @@ std::pair<exprt, string_constraintst> add_axioms_for_equals(
       implies_exprt(eq, equal_exprt(s1[qvar], s2[qvar])));
 =======
       zero_if_negative(s1.length()),
+<<<<<<< HEAD
       implies_exprt(eq, equal_exprt(s1[qvar], s2[qvar])),
       message_handler);
 >>>>>>> Require a message handler when constructing a propt
+=======
+      implies_exprt(eq, equal_exprt(s1[qvar], s2[qvar])));
+>>>>>>> Revert "Require a message handler when constructing a propt"
   }());
 
   // Axiom 3.
@@ -154,14 +161,17 @@ string_constraint_generatort::add_axioms_for_equals_ignore_case(
   const function_application_exprt &f)
 =======
 /// \param pool: pool of arrays representing strings
-/// \param message_handler: message handler
 /// \return Boolean expression `eq`
 std::pair<exprt, string_constraintst> add_axioms_for_equals_ignore_case(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
+<<<<<<< HEAD
   array_poolt &pool,
   message_handlert &message_handler)
 >>>>>>> Require a message handler when constructing a propt
+=======
+  array_poolt &pool)
+>>>>>>> Revert "Require a message handler when constructing a propt"
 {
   PRECONDITION(f.type() == bool_typet() || f.type().id() == ID_c_bool);
   PRECONDITION(f.arguments().size() == 2);
@@ -186,6 +196,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_equals_ignore_case(
   const exprt constr2 =
     character_equals_ignore_case(s1[qvar], s2[qvar], char_a, char_A, char_Z);
   const string_constraintt a2(
+<<<<<<< HEAD
     qvar,
 <<<<<<< HEAD
     zero_if_negative(array_pool.get_or_create_length(s1)),
@@ -195,6 +206,9 @@ std::pair<exprt, string_constraintst> add_axioms_for_equals_ignore_case(
     implies_exprt(eq, constr2),
     message_handler);
 >>>>>>> Require a message handler when constructing a propt
+=======
+    qvar, zero_if_negative(s1.length()), implies_exprt(eq, constr2));
+>>>>>>> Revert "Require a message handler when constructing a propt"
   constraints.universal.push_back(a2);
 
   const symbol_exprt witness =
@@ -243,14 +257,17 @@ string_constraint_generatort::add_axioms_for_compare_to(
   const function_application_exprt &f)
 =======
 /// \param pool: pool of arrays representing strings
-/// \param message_handler: message handler
 /// \return integer expression `res`
 std::pair<exprt, string_constraintst> add_axioms_for_compare_to(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
+<<<<<<< HEAD
   array_poolt &pool,
   message_handlert &message_handler)
 >>>>>>> Require a message handler when constructing a propt
+=======
+  array_poolt &pool)
+>>>>>>> Revert "Require a message handler when constructing a propt"
 {
   PRECONDITION(f.arguments().size() == 2);
   const typet &return_type = f.type();
@@ -277,9 +294,13 @@ std::pair<exprt, string_constraintst> add_axioms_for_compare_to(
     implies_exprt(res_null, equal_exprt(s1[i], s2[i])));
 =======
     zero_if_negative(s1.length()),
+<<<<<<< HEAD
     implies_exprt(res_null, equal_exprt(s1[i], s2[i])),
     message_handler);
 >>>>>>> Require a message handler when constructing a propt
+=======
+    implies_exprt(res_null, equal_exprt(s1[i], s2[i])));
+>>>>>>> Revert "Require a message handler when constructing a propt"
   constraints.universal.push_back(a2);
 
   const symbol_exprt x = fresh_symbol("index_compare_to", index_type);
@@ -328,8 +349,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_compare_to(
   const string_constraintt a4(
     i2,
     zero_if_negative(x),
-    implies_exprt(not_exprt(res_null), equal_exprt(s1[i2], s2[i2])),
-    message_handler);
+    implies_exprt(not_exprt(res_null), equal_exprt(s1[i2], s2[i2])));
   constraints.universal.push_back(a4);
 
   return {res, std::move(constraints)};

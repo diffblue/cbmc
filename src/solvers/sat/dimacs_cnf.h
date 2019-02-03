@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class dimacs_cnft:public cnf_clause_listt
 {
 public:
+  dimacs_cnft();
   explicit dimacs_cnft(message_handlert &);
   virtual ~dimacs_cnft() { }
 
@@ -45,7 +46,7 @@ protected:
 class dimacs_cnf_dumpt:public cnft
 {
 public:
-  dimacs_cnf_dumpt(std::ostream &_out, message_handlert &message_handler);
+  explicit dimacs_cnf_dumpt(std::ostream &_out);
   virtual ~dimacs_cnf_dumpt() { }
 
   const std::string solver_text() override
