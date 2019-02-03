@@ -26,20 +26,24 @@ public:
   virtual bool preprocess(
     std::istream &instream,
     const std::string &path,
-    std::ostream &outstream) override;
+    std::ostream &outstream,
+    message_handlert &) override;
 
   virtual bool parse(
     std::istream &instream,
-    const std::string &path) override;
+    const std::string &path,
+    message_handlert &message_handler) override;
 
   virtual bool generate_support_functions(
-    symbol_tablet &symbol_table) override;
+    symbol_tablet &symbol_table,
+    message_handlert &message_handler) override;
 
   virtual bool typecheck(
     symbol_tablet &context,
-    const std::string &module) override;
+    const std::string &module,
+    message_handlert &message_handler) override;
 
-  virtual void show_parse(std::ostream &out) override;
+  virtual void show_parse(std::ostream &out, message_handlert &) override;
 
   virtual ~jsil_languaget();
   jsil_languaget() { }
@@ -58,7 +62,8 @@ public:
     const std::string &code,
     const std::string &module,
     exprt &expr,
-    const namespacet &ns) override;
+    const namespacet &ns,
+    message_handlert &message_handler) override;
 
   virtual std::unique_ptr<languaget> new_language() override
   { return util_make_unique<jsil_languaget>(); }
@@ -69,7 +74,9 @@ public:
   virtual std::set<std::string> extensions() const override;
 
   virtual void modules_provided(std::set<std::string> &modules) override;
-  virtual bool interfaces(symbol_tablet &symbol_table) override;
+  virtual bool interfaces(
+    symbol_tablet &symbol_table,
+    message_handlert &message_handler) override;
 
 protected:
   jsil_parse_treet parse_tree;

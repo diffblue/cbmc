@@ -10,9 +10,10 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <memory>
 
-#include <util/symbol_table.h>
+#include <util/message.h>
 #include <util/namespace.h>
 #include <util/std_expr.h>
+#include <util/symbol_table.h>
 
 #include "language.h"
 #include "mode.h"
@@ -75,14 +76,13 @@ exprt to_expr(
 {
   std::unique_ptr<languaget> p(get_language_from_identifier(ns, identifier));
 
-  null_message_handlert null_message_handler;
-  p->set_message_handler(null_message_handler);
-
   const symbolt &symbol=ns.lookup(identifier);
 
   exprt expr;
 
-  if(p->to_expr(src, id2string(symbol.module), expr, ns))
+  null_message_handlert null_message_handler;
+
+  if(p->to_expr(src, id2string(symbol.module), expr, ns, null_message_handler))
     return nil_exprt();
 
   return expr;

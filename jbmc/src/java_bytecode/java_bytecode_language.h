@@ -88,27 +88,31 @@ enum lazy_methods_modet
 class java_bytecode_languaget:public languaget
 {
 public:
-  void set_language_options(const optionst &) override;
+  void set_language_options(const optionst &, message_handlert &) override;
 
   virtual bool preprocess(
     std::istream &instream,
     const std::string &path,
-    std::ostream &outstream) override;
+    std::ostream &outstream,
+    message_handlert &message_handler) override;
 
   bool parse(
     std::istream &instream,
-    const std::string &path) override;
+    const std::string &path,
+    message_handlert &message_handler) override;
 
   bool generate_support_functions(
-    symbol_tablet &symbol_table) override;
+    symbol_tablet &symbol_table,
+    message_handlert &message_handler) override;
 
   bool typecheck(
     symbol_tablet &context,
-    const std::string &module) override;
+    const std::string &module,
+    message_handlert &message_handler) override;
 
   virtual bool final(symbol_table_baset &context) override;
 
-  void show_parse(std::ostream &out) override;
+  void show_parse(std::ostream &out, message_handlert &) override;
 
   virtual ~java_bytecode_languaget();
   java_bytecode_languaget(
@@ -147,7 +151,8 @@ public:
     const std::string &code,
     const std::string &module,
     exprt &expr,
-    const namespacet &ns) override;
+    const namespacet &ns,
+    message_handlert &message_handler) override;
 
   std::unique_ptr<languaget> new_language() override
   { return util_make_unique<java_bytecode_languaget>(); }
@@ -161,22 +166,28 @@ public:
   methods_provided(std::unordered_set<irep_idt> &methods) const override;
   virtual void convert_lazy_method(
     const irep_idt &function_id,
-    symbol_table_baset &symbol_table) override;
+    symbol_table_baset &symbol_table,
+    message_handlert &message_handler) override;
 
 protected:
   void convert_single_method(
     const irep_idt &function_id,
-    symbol_table_baset &symbol_table)
+    symbol_table_baset &symbol_table,
+    message_handlert &message_handler)
   {
     convert_single_method(
-      function_id, symbol_table, optionalt<ci_lazy_methods_neededt>());
+      function_id,
+      symbol_table,
+      optionalt<ci_lazy_methods_neededt>(),
+      message_handler);
   }
   bool convert_single_method(
     const irep_idt &function_id,
     symbol_table_baset &symbol_table,
-    optionalt<ci_lazy_methods_neededt> needed_lazy_methods);
+    optionalt<ci_lazy_methods_neededt> needed_lazy_methods,
+    message_handlert &message_handler);
 
-  bool do_ci_lazy_method_conversion(symbol_tablet &);
+  bool do_ci_lazy_method_conversion(symbol_tablet &, message_handlert &);
   const select_pointer_typet &get_pointer_type_selector() const;
 
   irep_idt main_class;

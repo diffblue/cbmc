@@ -86,12 +86,11 @@ goto_modelt initialize_goto_model(
       }
 
       languaget &language=*lf.language;
-      language.set_message_handler(message_handler);
-      language.set_language_options(options);
+      language.set_language_options(options, message_handler);
 
       msg.status() << "Parsing " << filename << messaget::eom;
 
-      if(language.parse(infile, filename))
+      if(language.parse(infile, filename, message_handler))
       {
         throw invalid_source_file_exceptiont("PARSING ERROR");
       }

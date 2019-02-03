@@ -66,11 +66,10 @@ void get_goto_model(std::istream &in, goto_modelt &goto_model)
   language_file.language = get_default_language();
 
   languaget &language = *language_file.language;
-  language.set_message_handler(null_message_handler);
-  language.set_language_options(options);
+  language.set_language_options(options, null_message_handler);
 
   {
-    bool r = language.parse(in, filename);
+    bool r = language.parse(in, filename, null_message_handler);
     REQUIRE(!r);
   }
 

@@ -74,14 +74,13 @@ bool language_uit::parse(const std::string &filename)
   }
 
   languaget &language=*lf.language;
-  language.set_message_handler(get_message_handler());
 
   if(options != nullptr)
-    language.set_language_options(*options);
+    language.set_language_options(*options, get_message_handler());
 
   status() << "Parsing " << filename << eom;
 
-  if(language.parse(infile, filename))
+  if(language.parse(infile, filename, get_message_handler()))
   {
     if(get_ui()==ui_message_handlert::uit::PLAIN)
       std::cerr << "PARSING ERROR\n";

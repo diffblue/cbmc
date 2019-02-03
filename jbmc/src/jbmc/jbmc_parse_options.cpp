@@ -495,18 +495,17 @@ int jbmc_parse_optionst::doit()
       return 6;
     }
 
-    language->set_language_options(options);
-    language->set_message_handler(get_message_handler());
+    language->set_language_options(options, get_message_handler());
 
     status() << "Parsing " << filename << eom;
 
-    if(language->parse(infile, filename))
+    if(language->parse(infile, filename, get_message_handler()))
     {
       error() << "PARSING ERROR" << eom;
       return 6;
     }
 
-    language->show_parse(std::cout);
+    language->show_parse(std::cout, get_message_handler());
     return 0;
   }
 

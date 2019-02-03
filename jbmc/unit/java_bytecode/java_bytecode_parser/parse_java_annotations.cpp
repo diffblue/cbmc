@@ -173,13 +173,13 @@ SCENARIO(
       command_line.add_flag("no-lazy-methods");
       command_line.add_flag("no-refine-strings");
       test_java_bytecode_languaget language;
-      language.set_message_handler(null_message_handler);
       optionst options;
       parse_java_language_options(command_line, options);
-      language.set_language_options(options);
+      language.set_language_options(options, null_message_handler);
 
       std::istringstream java_code_stream("ignored");
-      language.parse(java_code_stream, "AnnotationsEverywhere.class");
+      language.parse(
+        java_code_stream, "AnnotationsEverywhere.class", null_message_handler);
       const java_class_loadert::parse_tree_with_overlayst &parse_trees =
         language.get_parse_trees_for_class("AnnotationsEverywhere");
       REQUIRE(parse_trees.size() == 1);

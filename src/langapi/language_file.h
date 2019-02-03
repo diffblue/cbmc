@@ -50,7 +50,8 @@ public:
 
   void convert_lazy_method(
     const irep_idt &id,
-    symbol_table_baset &symbol_table);
+    symbol_table_baset &symbol_table,
+    message_handlert &message_handler);
 
   explicit language_filet(const std::string &filename);
   language_filet(const language_filet &rhs);
@@ -123,7 +124,7 @@ public:
     PRECONDITION(symbol_table.has_symbol(id));
     lazy_method_mapt::iterator it=lazy_method_map.find(id);
     if(it!=lazy_method_map.end())
-      it->second->convert_lazy_method(id, symbol_table);
+      it->second->convert_lazy_method(id, symbol_table, get_message_handler());
   }
 
   bool can_convert_lazy_method(const irep_idt &id) const

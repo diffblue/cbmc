@@ -39,15 +39,16 @@ void language_filet::get_modules()
 
 void language_filet::convert_lazy_method(
   const irep_idt &id,
-  symbol_table_baset &symbol_table)
+  symbol_table_baset &symbol_table,
+  message_handlert &message_handler)
 {
-  language->convert_lazy_method(id, symbol_table);
+  language->convert_lazy_method(id, symbol_table, message_handler);
 }
 
 void language_filest::show_parse(std::ostream &out)
 {
   for(const auto &file : file_map)
-    file.second.language->show_parse(out);
+    file.second.language->show_parse(out, get_message_handler());
 }
 
 bool language_filest::parse()
@@ -68,7 +69,7 @@ bool language_filest::parse()
 
     languaget &language=*(file.second.language);
 
-    if(language.parse(infile, file.first))
+    if(language.parse(infile, file.first, get_message_handler()))
     {
       error() << "Parsing of " << file.first << " failed" << eom;
       return true;
@@ -88,7 +89,7 @@ bool language_filest::typecheck(symbol_tablet &symbol_table)
 
   for(auto &file : file_map)
   {
-    if(file.second.language->interfaces(symbol_table))
+    if(file.second.language->interfaces(symbol_table, get_message_handler()))
       return true;
   }
 
@@ -129,7 +130,8 @@ bool language_filest::typecheck(symbol_tablet &symbol_table)
   {
     if(file.second.modules.empty())
     {
-      if(file.second.language->typecheck(symbol_table, ""))
+      if(file.second.language->typecheck(
+           symbol_table, "", get_message_handler()))
         return true;
       // register lazy methods.
       // TODO: learn about modules and generalise this
@@ -160,7 +162,8 @@ bool language_filest::generate_support_functions(
   for(auto &file : file_map)
   {
     if(languages.insert(file.second.language->id()).second)
-      if(file.second.language->generate_support_functions(symbol_table))
+      if(file.second.language->generate_support_functions(
+           symbol_table, get_message_handler()))
         return true;
   }
 
@@ -186,7 +189,7 @@ bool language_filest::interfaces(
 {
   for(auto &file : file_map)
   {
-    if(file.second.language->interfaces(symbol_table))
+    if(file.second.language->interfaces(symbol_table, get_message_handler()))
       return true;
   }
 
@@ -251,7 +254,8 @@ bool language_filest::typecheck_module(
 
   status() << "Type-checking " << module.name << eom;
 
-  if(module.file->language->typecheck(symbol_table, module.name))
+  if(module.file->language->typecheck(
+       symbol_table, module.name, get_message_handler()))
   {
     module.in_progress=false;
     return true;
