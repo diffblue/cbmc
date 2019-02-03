@@ -144,36 +144,6 @@ jobs:
         - EXTRA_CXXFLAGS="-DDEBUG"
       script: echo "Not running any tests for a debug build."
 
-    # Ubuntu Linux with glibc using clang++-7, no-debug mode
-    - stage: Test different OS/CXX/Flags
-      os: linux
-      sudo: false
-      compiler: clang
-      cache: ccache
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-trusty-7
-          packages:
-            - libwww-perl
-            - g++-5
-            - clang-7
-            - libstdc++-5-dev
-            - libubsan0
-            - parallel
-            - jq
-      before_install:
-        - mkdir bin
-        - ln -s /usr/bin/gcc-5 bin/gcc
-        - ln -s /usr/bin/c++-5 bin/g++
-        - export CCACHE_CPP2=yes
-      # env: COMPILER=clang++-7 SAN_FLAGS="-fsanitize=undefined -fno-sanitize-recover=undefined,integer -fno-omit-frame-pointer"
-      env:
-        - COMPILER="ccache /usr/bin/clang++-7"
-        - EXTRA_CXXFLAGS="-Qunused-arguments -fcolor-diagnostics -DNDEBUG"
-        - CCACHE_CPP2=yes
-
     # Ubuntu Linux with glibc using clang++-7, debug mode, disable USE_DSTRING
     - stage: Test different OS/CXX/Flags
       os: linux
@@ -203,33 +173,6 @@ jobs:
         - EXTRA_CXXFLAGS="-Qunused-arguments -fcolor-diagnostics -DDEBUG -DUSE_STD_STRING"
         - CCACHE_CPP2=yes
       script: echo "Not running any tests for a debug build."
-
-    # cmake build using g++-5
-    - stage: Test different OS/CXX/Flags
-      os: linux
-      sudo: false
-      compiler: gcc
-      cache: ccache
-      env:
-        - BUILD_SYSTEM=cmake
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - g++-5
-            - jq
-      before_install:
-        - mkdir bin
-        - ln -s /usr/bin/gcc-5 bin/gcc
-        - ln -s /usr/bin/g++-5 bin/g++
-      install:
-        - ccache -z
-        - ccache --max-size=1G
-        - cmake -H. -Bbuild '-DCMAKE_BUILD_TYPE=Release'  '-DCMAKE_CXX_COMPILER=/usr/bin/g++-5'
-        - git submodule update --init --recursive
-        - cmake --build build -- -j4
-      script: (cd build; ctest -V -L CORE -j2)
 
     # cmake build using g++-7, enable CMAKE_USE_CUDD
     - stage: Test different OS/CXX/Flags
