@@ -19,6 +19,9 @@ Author: Daniel Kroening, kroening@kroening.com
 // slice an equation with respect to the assertions contained therein
 void slice(symex_target_equationt &equation);
 
+/// Undo whatever has been done by `slice`
+void revert_slice(symex_target_equationt &);
+
 // this simply slices away anything after the last assertion
 void simple_slice(symex_target_equationt &equation);
 
