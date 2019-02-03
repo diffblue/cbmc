@@ -36,6 +36,8 @@ std::string smt2_dect::decision_procedure_text() const
 
 decision_proceduret::resultt smt2_dect::dec_solve()
 {
+  ++number_of_solver_calls;
+
   temporary_filet temp_file_problem("smt2_dec_problem_", ""),
     temp_file_stdout("smt2_dec_stdout_", ""),
     temp_file_stderr("smt2_dec_stderr_", "");

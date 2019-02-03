@@ -119,6 +119,8 @@ public:
     log.warning() << "CPU limit ignored (not implemented)" << messaget::eom;
   }
 
+  std::size_t get_number_of_solver_calls() const;
+
 protected:
   virtual resultt do_prop_solve() = 0;
 
@@ -126,6 +128,7 @@ protected:
   bvt lcnf_bv;
 
   messaget log;
+  std::size_t number_of_solver_calls = 0;
 };
 
 #endif // CPROVER_SOLVERS_PROP_PROP_H
