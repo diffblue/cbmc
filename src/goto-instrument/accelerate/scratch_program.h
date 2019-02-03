@@ -41,7 +41,7 @@ public:
       symbol_table(_symbol_table),
       symex_symbol_table(),
       ns(symbol_table, symex_symbol_table),
-      equation(),
+      equation(mh),
       path_storage(),
       options(get_default_options()),
       symex(mh, symbol_table, equation, options, path_storage),

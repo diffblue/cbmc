@@ -49,7 +49,7 @@ operator()(propertiest &properties)
     symex_initialized = true;
 
     // Put initial state into the work list
-    symex_target_equationt equation;
+    symex_target_equationt equation(ui_message_handler);
     symex_bmct symex(
       ui_message_handler,
       goto_model.get_symbol_table(),

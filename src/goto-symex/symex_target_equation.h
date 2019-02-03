@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/invariant.h>
 #include <util/merge_irep.h>
+#include <util/message.h>
 #include <util/narrow.h>
 
 #include <goto-programs/goto_program.h>
@@ -37,6 +38,11 @@ class prop_convt;
 class symex_target_equationt:public symex_targett
 {
 public:
+  explicit symex_target_equationt(message_handlert &message_handler)
+    : log(message_handler)
+  {
+  }
+
   virtual ~symex_target_equationt() = default;
 
   /// \copydoc symex_targett::shared_read()
@@ -408,6 +414,8 @@ public:
   }
 
 protected:
+  messaget log;
+
   // for enforcing sharing in the expressions stored
   merge_irept merge_irep;
   void merge_ireps(SSA_stept &SSA_step);
