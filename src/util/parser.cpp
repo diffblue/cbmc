@@ -40,7 +40,7 @@ void parsert::parse_error(
   tmp_source_location.set_column(column-before.size());
   print(1, tmp, -1, tmp_source_location);
 #else
-  error().source_location=source_location;
-  error() << tmp << eom;
+  log.error().source_location = source_location;
+  log.error() << tmp << messaget::eom;
 #endif
 }
