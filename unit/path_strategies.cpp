@@ -376,16 +376,31 @@ void _check_with_strategy(
   of << program << std::endl;
   of.close();
 
-  register_language(new_ansi_c_language);
   cmdlinet cmdline;
   cmdline.args.push_back(tmp());
   config.main = std::string("main");
   config.set(cmdline);
 
+<<<<<<< HEAD
   optionst options;
   cbmc_parse_optionst::set_default_options(options);
   options.set_option("paths", true);
   options.set_option("exploration-strategy", strategy);
+=======
+  optionst opts;
+  cbmc_parse_optionst::set_default_options(opts);
+  opts.set_option("paths", true);
+  opts.set_option("exploration-strategy", strategy);
+
+  opts_callback(opts);
+
+  ui_message_handlert mh(cmdline, "path-explore");
+  mh.set_verbosity(0);
+  messaget log(mh);
+
+  register_language(new_ansi_c_language, mh);
+
+>>>>>>> To revert: language-is-a-messaget
   REQUIRE(is_valid_path_strategy(strategy));
   opts_callback(options);
 

@@ -7,14 +7,19 @@ Author: Diffblue Ltd.
 
 \*******************************************************************/
 
-#include <iostream>
+#include <testing-utils/message.h>
+#include <testing-utils/use_catch.h>
+
 #include <java_bytecode/java_bytecode_language.h>
 #include <java_bytecode/java_object_factory.h>
 #include <java_bytecode/java_root_class.h>
 #include <langapi/language_util.h>
 #include <langapi/mode.h>
+<<<<<<< HEAD
 #include <testing-utils/message.h>
 #include <testing-utils/use_catch.h>
+=======
+>>>>>>> To revert: language-is-a-messaget
 #include <util/expr.h>
 #include <util/namespace.h>
 #include <util/std_code.h>
@@ -27,7 +32,7 @@ SCENARIO(
   {
     source_locationt loc;
     symbol_tablet symbol_table;
-    register_language(new_java_bytecode_language);
+    register_language(new_java_bytecode_language, null_message_handler);
 
     // Add java.lang.Object to symbol table
     java_class_typet jlo_class_type;
@@ -42,8 +47,12 @@ SCENARIO(
     CHECK_RETURN(!failed);
 
     // Add java.lang.String to symbol table
+<<<<<<< HEAD
     java_string_library_preprocesst preprocess;
     preprocess.initialize_known_type_table();
+=======
+    java_string_library_preprocesst preprocess(null_message_handler);
+>>>>>>> To revert: language-is-a-messaget
     preprocess.add_string_type("java.lang.String", symbol_table);
     namespacet ns(symbol_table);
 

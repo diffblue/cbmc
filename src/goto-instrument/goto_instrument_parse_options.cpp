@@ -722,6 +722,7 @@ int goto_instrument_parse_optionst::doit()
           log.error() << "failed to write to '" << cmdline.args[1] << "'";
           return CPROVER_EXIT_CONVERSION_FAILED;
         }
+<<<<<<< HEAD
         if(is_header)
         {
           dump_c_type_header(
@@ -758,6 +759,26 @@ int goto_instrument_parse_optionst::doit()
             goto_model.goto_functions, h_libc, h_all, harness, ns, std::cout);
         }
       }
+=======
+        (is_cpp ? dump_cpp : dump_c)(
+          goto_model.goto_functions,
+          h_libc,
+          h_all,
+          harness,
+          ns,
+          out,
+          get_message_handler());
+      }
+      else
+        (is_cpp ? dump_cpp : dump_c)(
+          goto_model.goto_functions,
+          h_libc,
+          h_all,
+          harness,
+          ns,
+          std::cout,
+          get_message_handler());
+>>>>>>> To revert: language-is-a-messaget
 
       return CPROVER_EXIT_SUCCESS;
     }

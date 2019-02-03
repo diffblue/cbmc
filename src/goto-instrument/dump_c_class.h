@@ -117,6 +117,7 @@ public:
     const bool include_harness,
     const namespacet &_ns,
     language_factoryt factory,
+<<<<<<< HEAD
     const dump_c_configurationt config)
     : goto_functions(_goto_functions),
       copied_symbol_table(_ns.get_symbol_table()),
@@ -125,6 +126,15 @@ public:
       language(factory()),
       harness(include_harness),
       system_symbols(use_system_headers)
+=======
+    message_handlert &message_handler):
+    goto_functions(_goto_functions),
+    copied_symbol_table(_ns.get_symbol_table()),
+    ns(copied_symbol_table),
+    language(factory(message_handler)),
+    harness(include_harness),
+    system_symbols(use_system_headers)
+>>>>>>> To revert: language-is-a-messaget
   {
     system_symbols.set_use_all_headers(use_all_headers);
   }

@@ -98,6 +98,17 @@ void get_goto_model(std::istream &in, goto_modelt &goto_model)
 >>>>>>> languaget is not a messaget
 TEST_CASE("json symbol table read/write consistency")
 {
+<<<<<<< HEAD
+=======
+  register_language(new_ansi_c_language, null_message_handler);
+
+  cmdlinet cmdline;
+  config.main = "main";
+  config.set(cmdline);
+
+  goto_modelt goto_model;
+
+>>>>>>> To revert: language-is-a-messaget
   // Get symbol table associated with goto program
   const std::string program = "int main() { return 0; }\n";
   const auto goto_model = get_goto_model_from_c(program);

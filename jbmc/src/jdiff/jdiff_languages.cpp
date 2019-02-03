@@ -17,5 +17,5 @@ Author: Peter Schrammel
 
 void jdiff_parse_optionst::register_languages()
 {
-  register_language(new_java_bytecode_language);
+  register_language(new_java_bytecode_language, get_message_handler());
 }

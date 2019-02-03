@@ -141,7 +141,7 @@ SCENARIO(
   // Only called before loop, so should have a short path
   // h() { int hy = 0; }
 
-  register_language(new_ansi_c_language);
+  register_language(new_ansi_c_language, null_message_handler);
   config.ansi_c.set_LP64();
 
   goto_modelt goto_model;

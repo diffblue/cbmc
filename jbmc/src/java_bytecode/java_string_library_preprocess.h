@@ -35,8 +35,9 @@ Date:   March 2017
 class java_string_library_preprocesst:public messaget
 {
 public:
-  java_string_library_preprocesst()
-    : char_type(java_char_type()),
+  explicit java_string_library_preprocesst(message_handlert &message_handler)
+    : messaget(message_handler),
+      char_type(java_char_type()),
       index_type(java_int_type()),
       refined_string_type(index_type, pointer_type(char_type))
   {

@@ -23,9 +23,15 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 struct language_entryt
 {
+  language_entryt(message_handlert &_message_handler) :
+    message_handler(_message_handler)
+  {
+  }
+
   language_factoryt factory;
   std::set<std::string> extensions;
   irep_idt mode;
+  message_handlert &message_handler;
 };
 
 typedef std::list<language_entryt> languagest;
@@ -35,10 +41,11 @@ languagest languages;
 /// Note: registering a language is required for using the functions
 ///   in language_util.h
 /// \param factory: a language factory, e.g. `new_ansi_c_language`
-void register_language(language_factoryt factory)
+/// \param message_handler: message handler
+void register_language(language_factoryt factory, message_handlert &message_handler)
 {
-  languages.push_back(language_entryt());
-  std::unique_ptr<languaget> l(factory());
+  languages.push_back(language_entryt(message_handler));
+  std::unique_ptr<languaget> l(factory(message_handler));
   languages.back().factory=factory;
   languages.back().extensions=l->extensions();
   languages.back().mode=l->id();
@@ -51,7 +58,7 @@ std::unique_ptr<languaget> get_language_from_mode(const irep_idt &mode)
 {
   for(const auto &language : languages)
     if(mode == language.mode)
-      return language.factory();
+      return language.factory(language.message_handler);
 
   return nullptr;
 }
@@ -123,10 +130,10 @@ std::unique_ptr<languaget> get_language_from_filename(
         e_it!=l_it->extensions.end();
         e_it++)
       if(_stricmp(extension.c_str(), e_it->c_str())==0)
-        return l_it->factory();
+        return l_it->factory(l_it->message_handler);
     #else
     if(l_it->extensions.find(extension)!=l_it->extensions.end())
-      return l_it->factory();
+      return l_it->factory(l_it->message_handler);
     #endif
   }
 
@@ -138,5 +145,5 @@ std::unique_ptr<languaget> get_language_from_filename(
 std::unique_ptr<languaget> get_default_language()
 {
   PRECONDITION(!languages.empty());
-  return languages.front().factory();
+  return languages.front().factory(languages.front().message_handler);
 }

@@ -178,7 +178,7 @@ SCENARIO(
   "[core][solvers][refinement][string_constraint_instantiation]" XFAIL)
 {
   // For printing expression
-  register_language(new_java_bytecode_language);
+  register_language(new_java_bytecode_language, null_message_handler);
   std::unique_ptr<languaget> java_lang = get_language_from_mode(ID_java);
   symbol_tablet symtbl;
   const namespacet empty_ns(symtbl);

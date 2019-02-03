@@ -24,12 +24,18 @@ Author: Daniel Kroening, kroening@kroening.com
 
 void cbmc_parse_optionst::register_languages()
 {
+<<<<<<< HEAD
   register_language(new_ansi_c_language);
   register_language(new_statement_list_language);
   register_language(new_cpp_language);
   register_language(new_json_symtab_language);
+=======
+  register_language(new_ansi_c_language, get_message_handler());
+  register_language(new_cpp_language, get_message_handler());
+  register_language(new_json_symtab_language, get_message_handler());
+>>>>>>> To revert: language-is-a-messaget
 
 #ifdef HAVE_JSIL
-  register_language(new_jsil_language);
+  register_language(new_jsil_language, get_message_handler());
 #endif
 }
