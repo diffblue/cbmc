@@ -38,7 +38,7 @@ TEST_CASE("Assign a messaget")
   messaget msg1(handler1);
 
   // Assign messaget:
-  messaget msg2;
+  messaget msg2(handler1);
   msg2=msg1;
 
   // Change its handler:

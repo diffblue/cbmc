@@ -6,18 +6,19 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 
 \*******************************************************************/
 
-#include <iostream>
+#include <testing-utils/call_graph_test_utils.h>
+#include <testing-utils/message.h>
+#include <testing-utils/use_catch.h>
+
+#include <util/arith_tools.h>
+#include <util/c_types.h>
+#include <util/std_code.h>
+#include <util/symbol_table.h>
 
 #include <analyses/dependence_graph.h>
 #include <ansi-c/ansi_c_language.h>
 #include <goto-programs/goto_convert_functions.h>
 #include <langapi/mode.h>
-#include <testing-utils/call_graph_test_utils.h>
-#include <testing-utils/use_catch.h>
-#include <util/arith_tools.h>
-#include <util/c_types.h>
-#include <util/std_code.h>
-#include <util/symbol_table.h>
 
 const std::set<goto_programt::const_targett>&
     dependence_graph_test_get_control_deps(const dep_graph_domaint &domain)
@@ -83,8 +84,7 @@ SCENARIO("dependence_graph", "[core][analyses][dependence_graph]")
     goto_model.symbol_table.add(
       create_void_function_symbol("b", code_skipt()));
 
-    stream_message_handlert msg(std::cerr);
-    goto_convert(goto_model, msg);
+    goto_convert(goto_model, null_message_handler);
 
     WHEN("Constructing a dependence graph")
     {
