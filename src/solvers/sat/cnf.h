@@ -19,7 +19,10 @@ class cnft:public propt
 public:
   // For CNF, we don't use index 0 as a matter of principle,
   // so we'll start counting variables at 1.
-  cnft():_no_variables(1) { }
+  explicit cnft(message_handlert &message_handler)
+    : propt(message_handler), _no_variables(1)
+  {
+  }
   virtual ~cnft() { }
 
   virtual literalt land(literalt a, literalt b) override;
@@ -66,7 +69,8 @@ protected:
 class cnf_solvert:public cnft
 {
 public:
-  cnf_solvert():status(statust::INIT), clause_counter(0)
+  explicit cnf_solvert(message_handlert &message_handler)
+    : cnft(message_handler), status(statust::INIT), clause_counter(0)
   {
   }
 

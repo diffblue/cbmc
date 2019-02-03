@@ -19,6 +19,11 @@ Author: CM Wintersteiger
 class qdimacs_coret:public qdimacs_cnft
 {
 public:
+  explicit qdimacs_coret(message_handlert &message_handler)
+    : qdimacs_cnft(message_handler)
+  {
+  }
+
   virtual tvt l_get(literalt a) const=0;
   virtual bool is_in_core(literalt l) const=0;
 

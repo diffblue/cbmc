@@ -43,7 +43,7 @@ void bv_refinementt::arrays_overapproximated()
   std::list<lazy_constraintt>::iterator it=lazy_array_constraints.begin();
   while(it!=lazy_array_constraints.end())
   {
-    satcheck_no_simplifiert sat_check;
+    satcheck_no_simplifiert sat_check(get_message_handler());
     bv_pointerst solver(ns, sat_check);
     solver.unbounded_array=bv_pointerst::unbounded_arrayt::U_ALL;
 

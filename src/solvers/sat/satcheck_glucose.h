@@ -27,7 +27,7 @@ template<typename T>
 class satcheck_glucose_baset:public cnf_solvert
 {
 public:
-  explicit satcheck_glucose_baset(T *);
+  satcheck_glucose_baset(T *, message_handlert &message_handler);
   virtual ~satcheck_glucose_baset();
 
   virtual resultt prop_solve();
@@ -57,7 +57,7 @@ class satcheck_glucose_no_simplifiert:
   public satcheck_glucose_baset<Glucose::Solver>
 {
 public:
-  satcheck_glucose_no_simplifiert();
+  explicit satcheck_glucose_no_simplifiert(message_handlert &message_handler);
   virtual const std::string solver_text();
 };
 
@@ -65,7 +65,7 @@ class satcheck_glucose_simplifiert:
   public satcheck_glucose_baset<Glucose::SimpSolver>
 {
 public:
-  satcheck_glucose_simplifiert();
+  explicit satcheck_glucose_simplifiert(message_handlert &message_handler);
   virtual const std::string solver_text();
   virtual void set_frozen(literalt a);
   bool is_eliminated(literalt a) const;
