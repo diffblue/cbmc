@@ -177,8 +177,14 @@ public:
   /// Interface method to initiate the conversion into a decision procedure
   /// format. The method iterates over the equation, i.e. over the SSA steps and
   /// converts each type of step separately.
+<<<<<<< HEAD
   /// \param decision_procedure: A handle to a decision procedure interface
   void convert(decision_proceduret &decision_procedure);
+=======
+  /// \param prop_conv: A handle to a particular decision procedure interface
+  /// \param message_handler: message handler
+  void convert(prop_convt &prop_conv, message_handlert &message_handler);
+>>>>>>> A decision_proceduret isn't a messaget
 
   /// Interface method to initiate the conversion into a decision procedure
   /// format. The method iterates over the equation, i.e. over the SSA steps and
@@ -192,7 +198,12 @@ public:
   /// Converts assignments: set the equality _lhs==rhs_ to _True_.
   /// \param decision_procedure: A handle to a decision procedure
   ///  interface
+<<<<<<< HEAD
   void convert_assignments(decision_proceduret &decision_procedure);
+=======
+  /// \param message_handler: message handler
+  void convert_assignments(decision_proceduret &decision_procedure, message_handlert &message_handler) const;
+>>>>>>> A decision_proceduret isn't a messaget
 
   /// Converts declarations: these are effectively ignored by the decision
   /// procedure.
@@ -201,6 +212,7 @@ public:
   void convert_decls(decision_proceduret &decision_procedure);
 
   /// Converts assumptions: convert the expression the assumption represents.
+<<<<<<< HEAD
   /// \param decision_procedure: A handle to a decision procedure interface
   void convert_assumptions(decision_proceduret &decision_procedure);
 
@@ -224,6 +236,33 @@ public:
   /// Converts guards: convert the expression the guard represents.
   /// \param decision_procedure: A handle to a decision procedure interface
   void convert_guards(decision_proceduret &decision_procedure);
+=======
+  /// \param prop_conv: A handle to a particular decision procedure interface
+  /// \param message_handler: message handler
+  void convert_assumptions(prop_convt &prop_conv, message_handlert &message_handler);
+
+  /// Converts assertions: build a disjunction of negated assertions.
+  /// \param prop_conv: A handle to a particular decision procedure interface
+  /// \param message_handler: message handler
+  void convert_assertions(prop_convt &prop_conv, message_handlert &message_handler);
+
+  /// Converts constraints: set the represented condition to _True_.
+  /// \param decision_procedure: A handle to a particular decision procedure
+  ///  interface
+  /// \param message_handler: message handler
+  void convert_constraints(decision_proceduret &decision_procedure, message_handlert &message_handler) const;
+
+  /// Converts goto instructions: convert the expression representing the
+  /// condition of this goto.
+  /// \param prop_conv: A handle to a particular decision procedure interface
+  /// \param message_handler: message handler
+  void convert_goto_instructions(prop_convt &prop_conv, message_handlert &message_handler);
+
+  /// Converts guards: convert the expression the guard represents.
+  /// \param prop_conv: A handle to a particular decision procedure interface
+  /// \param message_handler: message handler
+  void convert_guards(prop_convt &prop_conv, message_handlert &message_handler);
+>>>>>>> A decision_proceduret isn't a messaget
 
   /// Converts function calls: for each argument build an equality between its
   /// symbol and the argument itself.

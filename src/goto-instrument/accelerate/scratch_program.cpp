@@ -65,7 +65,7 @@ bool scratch_programt::check_sat(bool do_slice, guard_managert &guard_manager)
     return false;
   }
 
-  equation.convert(*checker);
+  equation.convert(*checker, message_handler);
 
 #ifdef DEBUG
   std::cout << "Finished symex, invoking decision procedure.\n";

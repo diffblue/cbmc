@@ -24,9 +24,13 @@ protected:
 
 /*! \brief Decision procedure interface for various SMT 2.x solvers
 */
+<<<<<<< HEAD
 class smt2_dect : protected smt2_stringstreamt,
                   public smt2_convt,
                   public messaget
+=======
+class smt2_dect:protected smt2_stringstreamt, public smt2_convt, public messaget
+>>>>>>> A decision_proceduret isn't a messaget
 {
 public:
   smt2_dect(

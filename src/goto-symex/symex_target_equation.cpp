@@ -327,6 +327,7 @@ void symex_target_equationt::constraint(
   merge_ireps(SSA_step);
 }
 
+<<<<<<< HEAD
 void symex_target_equationt::convert_without_assertions(
   decision_proceduret &decision_procedure)
 {
@@ -355,13 +356,53 @@ void symex_target_equationt::convert_assignments(
 {
   std::size_t step_index = 0;
   for(auto &step : SSA_steps)
+=======
+void symex_target_equationt::convert(
+  prop_convt &prop_conv, message_handlert &message_handler)
+{
+  try
+  {
+    convert_guards(prop_conv, message_handler);
+    convert_assignments(prop_conv, message_handler);
+    convert_decls(prop_conv);
+    convert_assumptions(prop_conv, message_handler);
+    convert_assertions(prop_conv, message_handler);
+    convert_goto_instructions(prop_conv, message_handler);
+    convert_function_calls(prop_conv);
+    convert_io(prop_conv);
+    convert_constraints(prop_conv, message_handler);
+  }
+  catch(const equation_conversion_exceptiont &conversion_exception)
+  {
+    // unwrap the except and throw like normal
+    const std::string full_error = unwrap_exception(conversion_exception);
+    throw full_error;
+  }
+}
+
+void symex_target_equationt::convert_assignments(
+  decision_proceduret &decision_procedure, message_handlert &message_handler) const
+{
+  messaget log(message_handler);
+
+  for(const auto &step : SSA_steps)
+>>>>>>> A decision_proceduret isn't a messaget
   {
     if(step.is_assignment() && !step.ignore && !step.converted)
     {
+<<<<<<< HEAD
       log.conditional_output(log.debug(), [&step](messaget::mstreamt &mstream) {
         step.output(mstream);
         mstream << messaget::eom;
       });
+=======
+      log.conditional_output(
+        log.debug(),
+        [&step](messaget::mstreamt &mstream) {
+          step.output(mstream);
+          mstream << messaget::eom;
+        });
+>>>>>>> A decision_proceduret isn't a messaget
 
       decision_procedure.set_to_true(step.cond_expr);
       step.converted = true;
@@ -392,15 +433,23 @@ void symex_target_equationt::convert_decls(
 }
 
 void symex_target_equationt::convert_guards(
+<<<<<<< HEAD
   decision_proceduret &decision_procedure)
 {
   std::size_t step_index = 0;
+=======
+  prop_convt &prop_conv, message_handlert &message_handler)
+{
+  messaget log(message_handler);
+
+>>>>>>> A decision_proceduret isn't a messaget
   for(auto &step : SSA_steps)
   {
     if(step.ignore)
       step.guard_handle = false_exprt();
     else
     {
+<<<<<<< HEAD
       log.conditional_output(log.debug(), [&step](messaget::mstreamt &mstream) {
         step.output(mstream);
         mstream << messaget::eom;
@@ -409,15 +458,41 @@ void symex_target_equationt::convert_guards(
       step.guard_handle = decision_procedure.handle(step.guard);
       with_solver_hardness(
         decision_procedure, hardness_register_ssa(step_index, step));
+=======
+      log.conditional_output(
+        log.debug(),
+        [&step](messaget::mstreamt &mstream) {
+          step.output(mstream);
+          mstream << messaget::eom;
+        });
+
+      try
+      {
+        step.guard_literal = prop_conv.convert(step.guard);
+      }
+      catch(const bitvector_conversion_exceptiont &)
+      {
+        util_throw_with_nested(
+          equation_conversion_exceptiont(
+            "Error converting guard for step", step));
+      }
+>>>>>>> A decision_proceduret isn't a messaget
     }
     ++step_index;
   }
 }
 
 void symex_target_equationt::convert_assumptions(
+<<<<<<< HEAD
   decision_proceduret &decision_procedure)
 {
   std::size_t step_index = 0;
+=======
+  prop_convt &prop_conv, message_handlert &message_handler)
+{
+  messaget log(message_handler);
+
+>>>>>>> A decision_proceduret isn't a messaget
   for(auto &step : SSA_steps)
   {
     if(step.is_assume())
@@ -427,7 +502,12 @@ void symex_target_equationt::convert_assumptions(
       else
       {
         log.conditional_output(
+<<<<<<< HEAD
           log.debug(), [&step](messaget::mstreamt &mstream) {
+=======
+          log.debug(),
+          [&step](messaget::mstreamt &mstream) {
+>>>>>>> A decision_proceduret isn't a messaget
             step.output(mstream);
             mstream << messaget::eom;
           });
@@ -443,9 +523,16 @@ void symex_target_equationt::convert_assumptions(
 }
 
 void symex_target_equationt::convert_goto_instructions(
+<<<<<<< HEAD
   decision_proceduret &decision_procedure)
 {
   std::size_t step_index = 0;
+=======
+  prop_convt &prop_conv, message_handlert &message_handler)
+{
+  messaget log(message_handler);
+
+>>>>>>> A decision_proceduret isn't a messaget
   for(auto &step : SSA_steps)
   {
     if(step.is_goto())
@@ -455,7 +542,12 @@ void symex_target_equationt::convert_goto_instructions(
       else
       {
         log.conditional_output(
+<<<<<<< HEAD
           log.debug(), [&step](messaget::mstreamt &mstream) {
+=======
+          log.debug(),
+          [&step](messaget::mstreamt &mstream) {
+>>>>>>> A decision_proceduret isn't a messaget
             step.output(mstream);
             mstream << messaget::eom;
           });
@@ -470,17 +562,36 @@ void symex_target_equationt::convert_goto_instructions(
 }
 
 void symex_target_equationt::convert_constraints(
+<<<<<<< HEAD
   decision_proceduret &decision_procedure)
 {
   std::size_t step_index = 0;
   for(auto &step : SSA_steps)
+=======
+  decision_proceduret &decision_procedure, message_handlert &message_handler) const
+{
+  messaget log(message_handler);
+
+  for(const auto &step : SSA_steps)
+>>>>>>> A decision_proceduret isn't a messaget
   {
     if(step.is_constraint() && !step.ignore && !step.converted)
     {
+<<<<<<< HEAD
       log.conditional_output(log.debug(), [&step](messaget::mstreamt &mstream) {
         step.output(mstream);
         mstream << messaget::eom;
       });
+=======
+      if(!step.ignore)
+      {
+        log.conditional_output(
+          log.debug(),
+          [&step](messaget::mstreamt &mstream) {
+            step.output(mstream);
+            mstream << messaget::eom;
+          });
+>>>>>>> A decision_proceduret isn't a messaget
 
       decision_procedure.set_to_true(step.cond_expr);
       step.converted = true;
@@ -493,8 +604,12 @@ void symex_target_equationt::convert_constraints(
 }
 
 void symex_target_equationt::convert_assertions(
+<<<<<<< HEAD
   decision_proceduret &decision_procedure,
   bool optimized_for_single_assertions)
+=======
+  prop_convt &prop_conv, message_handlert &message_handler)
+>>>>>>> A decision_proceduret isn't a messaget
 {
   // we find out if there is only _one_ assertion,
   // which allows for a simpler formula
@@ -543,7 +658,11 @@ void symex_target_equationt::convert_assertions(
 
   exprt assumption=true_exprt();
 
+<<<<<<< HEAD
   std::vector<goto_programt::const_targett> involved_steps;
+=======
+  messaget log(message_handler);
+>>>>>>> A decision_proceduret isn't a messaget
 
   for(auto &step : SSA_steps)
   {
@@ -553,12 +672,21 @@ void symex_target_equationt::convert_assertions(
 
     if(step.is_assert() && !step.ignore && !step.converted)
     {
+<<<<<<< HEAD
       step.converted = true;
 
       log.conditional_output(log.debug(), [&step](messaget::mstreamt &mstream) {
         step.output(mstream);
         mstream << messaget::eom;
       });
+=======
+      log.conditional_output(
+        log.debug(),
+        [&step](messaget::mstreamt &mstream) {
+          step.output(mstream);
+          mstream << messaget::eom;
+        });
+>>>>>>> A decision_proceduret isn't a messaget
 
       implies_exprt implication(
         assumption,

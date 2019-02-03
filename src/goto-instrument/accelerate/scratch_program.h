@@ -41,6 +41,7 @@ public:
     message_handlert &mh,
     guard_managert &guard_manager)
     : constant_propagation(true),
+    message_handler(mh),
       symbol_table(_symbol_table),
       symex_symbol_table(),
       ns(symbol_table, symex_symbol_table),
@@ -77,6 +78,7 @@ public:
   bool constant_propagation;
 
 protected:
+  message_handlert &message_handler;
   std::unique_ptr<goto_symex_statet> symex_state;
   goto_functionst functions;
   symbol_tablet &symbol_table;
