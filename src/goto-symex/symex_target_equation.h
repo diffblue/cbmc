@@ -408,6 +408,9 @@ protected:
 
   // for unique I/O identifiers
   std::size_t io_count = 0;
+
+  // for unique function call argument identifiers
+  std::size_t argument_count = 0;
 };
 
 inline bool operator<(
