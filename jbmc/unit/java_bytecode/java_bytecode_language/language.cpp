@@ -49,25 +49,19 @@ SCENARIO(
   }
 }
 
-static void use_external_driver(java_bytecode_languaget &language)
-{
-  optionst options;
-  options.set_option("symex-driven-lazy-loading", true);
-  language.set_language_options(options);
-}
-
 SCENARIO(
   "LAZY_METHODS_MODE_EXTERNAL_DRIVER based generation of cprover_initialise",
   "[core][java_bytecode_language]")
 {
   java_bytecode_languaget language;
   null_message_handlert null_message_handler;
-  language.set_message_handler(null_message_handler);
-  use_external_driver(language);
+  optionst options;
+  options.set_option("symex-driven-lazy-loading", true);
+  language.set_language_options(options, null_message_handler);
   symbol_tablet symbol_table;
   GIVEN("java_bytecode_languaget::typecheck is run.")
   {
-    language.typecheck(symbol_table, "");
+    language.typecheck(symbol_table, "", null_message_handler);
     THEN("The " INITIALIZE_FUNCTION " is in the symbol table without code.")
     {
       const symbolt *const initialise =
@@ -79,7 +73,8 @@ SCENARIO(
       "java_bytecode_languaget::convert_lazy_method is used to "
       "generate " INITIALIZE_FUNCTION)
     {
-      language.convert_lazy_method(INITIALIZE_FUNCTION, symbol_table);
+      language.convert_lazy_method(
+        INITIALIZE_FUNCTION, symbol_table, null_message_handler);
       THEN("The " INITIALIZE_FUNCTION " is in the symbol table with code.")
       {
         const symbolt *const initialise =
@@ -97,12 +92,11 @@ TEST_CASE(
 {
   java_bytecode_languaget language;
   null_message_handlert null_message_handler;
-  language.set_message_handler(null_message_handler);
-  language.set_language_options(optionst{});
+  language.set_language_options(optionst{}, null_message_handler);
   symbol_tablet symbol_table;
   GIVEN("java_bytecode_languaget::typecheck is run.")
   {
-    language.typecheck(symbol_table, "");
+    language.typecheck(symbol_table, "", null_message_handler);
     THEN("The " INITIALIZE_FUNCTION
          " function is in the symbol table with code.")
     {

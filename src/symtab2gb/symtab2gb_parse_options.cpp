@@ -62,7 +62,6 @@ static void run_symtab2gb(
   stream_message_handlert message_handler{std::cerr};
 
   auto const symtab_language = new_json_symtab_language();
-  symtab_language->set_message_handler(message_handler);
 
   goto_modelt linked_goto_model{};
 
@@ -70,13 +69,14 @@ static void run_symtab2gb(
   {
     auto const &symtab_filename = symtab_filenames[ix];
     auto &symtab_file = symtab_files[ix];
-    if(failed(symtab_language->parse(symtab_file, symtab_filename)))
+    if(failed(
+         symtab_language->parse(symtab_file, symtab_filename, message_handler)))
     {
       throw invalid_source_file_exceptiont{
         "failed to parse symbol table from file '" + symtab_filename + "'"};
     }
     symbol_tablet symtab{};
-    if(failed(symtab_language->typecheck(symtab, "<unused>")))
+    if(failed(symtab_language->typecheck(symtab, "<unused>", message_handler)))
     {
       throw invalid_source_file_exceptiont{
         "failed to typecheck symbol table from file '" + symtab_filename + "'"};
