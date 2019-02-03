@@ -19,12 +19,13 @@ Author: Alex Groce
 class pbs_dimacs_cnft:public dimacs_cnft
 {
 public:
-  pbs_dimacs_cnft():
-    optimize(false),
-    maximize(false),
-    binary_search(false),
-    goal(0),
-    opt_sum(0)
+  explicit pbs_dimacs_cnft(message_handlert &message_handler)
+    : dimacs_cnft(message_handler),
+      optimize(false),
+      maximize(false),
+      binary_search(false),
+      goal(0),
+      opt_sum(0)
   {
   }
 

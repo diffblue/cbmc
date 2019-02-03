@@ -17,7 +17,9 @@ Author: Diffblue Ltd.
 /// \return true if `expr < 0` is unsatisfiable, false otherwise
 static bool cannot_be_neg(const exprt &expr)
 {
-  satcheck_no_simplifiert sat_check;
+  // this is an internal check, no need for user visibility
+  null_message_handlert null_message_handler;
+  satcheck_no_simplifiert sat_check(null_message_handler);
   symbol_tablet symbol_table;
   namespacet ns(symbol_table);
   boolbvt solver(ns, sat_check);
