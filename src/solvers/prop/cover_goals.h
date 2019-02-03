@@ -25,10 +25,18 @@ class message_handlert;
 class cover_goalst
 {
 public:
+<<<<<<< HEAD
   explicit cover_goalst(decision_proceduret &_decision_procedure)
     : _number_covered(0),
       _iterations(0),
       decision_procedure(_decision_procedure)
+=======
+  explicit cover_goalst(prop_convt &_prop_conv):
+    messaget(_prop_conv.get_message_handler()),
+    _number_covered(0),
+    _iterations(0),
+    prop_conv(_prop_conv)
+>>>>>>> WIP: message handler
   {
   }
 

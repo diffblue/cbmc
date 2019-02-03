@@ -21,7 +21,7 @@
 #include "xml_parser.h"
 #include "xml_y.tab.h"
 
-#define PARSER xml_parser
+#define PARSER (*xml_parser)
 
 //static int keep;  /* To store start condition */
 
@@ -67,6 +67,19 @@ string     \"([^"&]|{esc})*\"|\'([^'&]|{esc})*\'
 %s PI
 %s DTD
 
+%{
+static xml_parsert *xml_parser;
+
+void xml_scanner_init(xml_parsert *_xml_parser)
+{
+  xml_parser = _xml_parser;
+  YY_FLUSH_BUFFER;
+  BEGIN(0);
+}
+
+int yyxmlerror(const std::string &error);
+%}
+
 %%
 
 <INITIAL,PI>{ws}  {/* skip */}
@@ -95,3 +108,10 @@ string     \"([^"&]|{esc})*\"|\'([^'&]|{esc})*\'
 %%
 
 int yywrap() { return 1; }
+
+int yyxmlerror(const std::string &error)
+{
+  PRECONDITION(xml_parser);
+  xml_parser->parse_error(error, yyxmltext);
+  return 0;
+}

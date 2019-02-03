@@ -39,7 +39,7 @@ public:
     last_line.clear();
   }
 
-  parsert():in(nullptr) { clear(); }
+  explicit parsert(message_handlert &message_handler):messaget(message_handler), in(nullptr) { clear(); }
   virtual ~parsert() { }
 
   // The following are for the benefit of the scanner

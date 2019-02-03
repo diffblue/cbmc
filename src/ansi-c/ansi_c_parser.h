@@ -22,13 +22,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "ansi_c_parse_tree.h"
 #include "ansi_c_scope.h"
 
-int yyansi_cparse();
-
 class ansi_c_parsert:public parsert
 {
 public:
   ansi_c_parse_treet parse_tree;
 
+<<<<<<< HEAD
   ansi_c_parsert()
     : tag_following(false),
       asm_block_following(false),
@@ -38,14 +37,25 @@ public:
       cpp11(false),
       for_has_scope(false),
       ts_18661_3_Floatn_types(false)
+=======
+  explicit ansi_c_parsert(message_handlert &message_handler):
+    parsert(message_handler),
+    tag_following(false),
+    asm_block_following(false),
+    parenthesis_counter(0),
+    mode(modet::NONE),
+    cpp98(false),
+    cpp11(false),
+    for_has_scope(false),
+    ts_18661_3_Floatn_types(false),
+    Float128_type(false)
+>>>>>>> WIP: message handler
   {
   }
 
-  virtual bool parse() override
-  {
-    return yyansi_cparse()!=0;
-  }
+  bool parse() override;
 
+<<<<<<< HEAD
   virtual void clear() override
   {
     parsert::clear();
@@ -63,6 +73,9 @@ public:
     scopes.clear();
     scopes.push_back(scopet());
   }
+=======
+  void clear() override;
+>>>>>>> WIP: message handler
 
   // internal state of the scanner
   bool tag_following;
@@ -157,10 +170,5 @@ public:
     }
   }
 };
-
-extern ansi_c_parsert ansi_c_parser;
-
-int yyansi_cerror(const std::string &error);
-void ansi_c_scanner_init();
 
 #endif // CPROVER_ANSI_C_ANSI_C_PARSER_H

@@ -18,10 +18,12 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <util/invariant.h>
 
+class ansi_c_parsert;
+
 class cpp_token_buffert
 {
 public:
-  cpp_token_buffert():current_pos(0)
+  explicit cpp_token_buffert(ansi_c_parsert &_ansi_c_parser):ansi_c_parser(_ansi_c_parser), current_pos(0)
   {
   }
 
@@ -52,6 +54,7 @@ public:
   }
 
 protected:
+  ansi_c_parsert &ansi_c_parser;
   typedef std::list<cpp_tokent> tokenst;
   tokenst tokens;
 

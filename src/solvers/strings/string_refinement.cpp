@@ -152,8 +152,11 @@ static bool validate(const string_refinementt::infot &info)
   return true;
 }
 
-string_refinementt::string_refinementt(const infot &info, bool)
-  : supert(info),
+string_refinementt::string_refinementt(
+  const infot &info,
+  bool,
+  message_handlert &message_handler)
+  : supert(info, message_handler),
     config_(info),
     loop_bound_(info.refinement_bound),
     generator(*info.ns)
@@ -1910,6 +1913,7 @@ static optionalt<exprt> find_counter_example(
 <<<<<<< HEAD
   satcheck_no_simplifiert sat_check(message_handler);
 <<<<<<< HEAD
+<<<<<<< HEAD
   boolbvt solver(ns, sat_check, message_handler);
 =======
 =======
@@ -1917,6 +1921,9 @@ static optionalt<exprt> find_counter_example(
 >>>>>>> Revert "Require a message handler when constructing a propt"
   boolbvt solver(ns, sat_check);
 >>>>>>> Require a message handler when constructing a propt
+=======
+  boolbvt solver(ns, sat_check, message_handler);
+>>>>>>> WIP: message handler
   solver << axiom;
 
   if(solver() == decision_proceduret::resultt::D_SATISFIABLE)

@@ -21,6 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 #endif
 
+<<<<<<< HEAD
 #include <unordered_set>
 
 arrayst::arrayst(
@@ -28,6 +29,12 @@ arrayst::arrayst(
   propt &_prop,
   message_handlert &message_handler)
   : equalityt(_prop, message_handler), ns(_ns)
+=======
+arrayst::arrayst(
+  const namespacet &_ns,
+  propt &_prop,
+  message_handlert &message_handler):equalityt(_prop, message_handler), ns(_ns)
+>>>>>>> WIP: message handler
 {
   lazy_arrays = false;        // will be set to true when --refine is used
   incremental_cache = false;  // for incremental solving

@@ -34,10 +34,14 @@ class member_exprt;
 class boolbvt:public arrayst
 {
 public:
+<<<<<<< HEAD
   boolbvt(
     const namespacet &_ns,
     propt &_prop,
     message_handlert &message_handler)
+=======
+  boolbvt(const namespacet &_ns, propt &_prop, message_handlert &message_handler)
+>>>>>>> WIP: message handler
     : arrayst(_ns, _prop, message_handler),
       unbounded_array(unbounded_arrayt::U_NONE),
       boolbv_width(_ns),

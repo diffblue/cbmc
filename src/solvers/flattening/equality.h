@@ -19,10 +19,16 @@ Author: Daniel Kroening, kroening@kroening.com
 class equalityt:public prop_conv_solvert
 {
 public:
+<<<<<<< HEAD
   equalityt(propt &_prop, message_handlert &message_handler)
     : prop_conv_solvert(_prop, message_handler)
   {
   }
+=======
+  equalityt(
+    propt &_prop,
+    message_handlert &message_handler):prop_conv_solvert(_prop, message_handler) { }
+>>>>>>> WIP: message handler
 
   virtual literalt equality(const exprt &e1, const exprt &e2);
 

@@ -82,8 +82,14 @@ literalt bv_pointerst::convert_rest(const exprt &expr)
 bv_pointerst::bv_pointerst(
   const namespacet &_ns,
   propt &_prop,
+<<<<<<< HEAD
   message_handlert &message_handler)
   : boolbvt(_ns, _prop, message_handler), pointer_logic(_ns)
+=======
+  message_handlert &message_handler):
+  boolbvt(_ns, _prop, message_handler),
+  pointer_logic(_ns)
+>>>>>>> WIP: message handler
 {
   object_bits=config.bv_encoding.object_bits;
   std::size_t pointer_width = boolbv_width(pointer_type(empty_typet()));

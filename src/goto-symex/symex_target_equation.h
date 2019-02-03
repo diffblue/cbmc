@@ -306,8 +306,11 @@ public:
     return it;
   }
 
+<<<<<<< HEAD
   void output(std::ostream &out) const;
 
+=======
+>>>>>>> WIP: message handler
   void clear()
   {
     SSA_steps.clear();

@@ -16,6 +16,7 @@
 
 %{
 
+<<<<<<< HEAD
 #if defined _MSC_VER
 // signed/unsigned mismatch
 #pragma warning(disable:4365)
@@ -25,6 +26,9 @@
 #endif
 
 #define PARSER json_parser
+=======
+#define PARSER (*json_parser)
+>>>>>>> WIP: message handler
 
 #include "json_parser.h"
 #include "json_y.tab.h"
@@ -51,6 +55,17 @@ digits  {digit}+
 digit   [0-9]
 digit19 [1-9]
 e       e|e\+|e-|E|E\+|E- 
+
+%{
+static json_parsert *json_parser;
+
+void json_scanner_init(json_parsert *_json_parser)
+{
+  json_parser = _json_parser;
+  YY_FLUSH_BUFFER;
+  BEGIN(0);
+}
+%}
 
 %%
 

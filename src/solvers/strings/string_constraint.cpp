@@ -30,7 +30,11 @@ static bool cannot_be_neg(const exprt &expr)
 >>>>>>> Revert "Require a message handler when constructing a propt"
   symbol_tablet symbol_table;
   namespacet ns(symbol_table);
+<<<<<<< HEAD
   boolbvt solver{ns, sat_check, null_message_handler};
+=======
+  boolbvt solver(ns, sat_check, message_handler);
+>>>>>>> WIP: message handler
   const exprt zero = from_integer(0, expr.type());
   const binary_relation_exprt non_neg(expr, ID_lt, zero);
   solver << non_neg;

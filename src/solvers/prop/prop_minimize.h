@@ -24,7 +24,19 @@ Author: Daniel Kroening, kroening@kroening.com
 class prop_minimizet
 {
 public:
+<<<<<<< HEAD:src/solvers/prop/prop_minimize.h
   prop_minimizet(prop_convt &_prop_conv, message_handlert &message_handler);
+=======
+  explicit prop_minimizet(prop_convt &_prop_conv):
+    messaget(_prop_conv.get_message_handler()),
+    _iterations(0),
+    _number_satisfied(0),
+    _number_objectives(0),
+    _value(0),
+    prop_conv(_prop_conv)
+  {
+  }
+>>>>>>> WIP: message handler:src/solvers/prop/minimize.h
 
   void operator()();
 

@@ -37,7 +37,7 @@ public:
     message_handlert *message_handler = nullptr;
   };
 
-  explicit bv_refinementt(const infot &info);
+  bv_refinementt(const infot &info, message_handlert &message_handler);
 
   decision_proceduret::resultt dec_solve() override;
 

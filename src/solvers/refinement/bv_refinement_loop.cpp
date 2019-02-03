@@ -10,10 +10,17 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/xml.h>
 
+<<<<<<< HEAD
 bv_refinementt::bv_refinementt(const infot &info)
   : bv_pointerst(*info.ns, *info.prop, *info.message_handler),
     progress(false),
     config_(info)
+=======
+bv_refinementt::bv_refinementt(const infot &info, message_handlert &message_handler):
+  bv_pointerst(*info.ns, *info.prop, message_handler),
+  progress(false),
+  config_(info)
+>>>>>>> WIP: message handler
 {
   // check features we need
   PRECONDITION(prop.has_set_assumptions());

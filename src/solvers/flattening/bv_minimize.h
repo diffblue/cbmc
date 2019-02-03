@@ -25,8 +25,13 @@ typedef std::set<exprt> minimization_listt;
 class bv_minimizet
 {
 public:
+<<<<<<< HEAD
   bv_minimizet(boolbvt &_boolbv, message_handlert &message_handler)
     : boolbv(_boolbv), log(message_handler)
+=======
+  explicit bv_minimizet(boolbvt &_boolbv):
+    messaget(_boolbv.get_message_handler()), boolbv(_boolbv)
+>>>>>>> WIP: message handler
   {
   }
 
@@ -52,6 +57,7 @@ public:
 <<<<<<< HEAD
   bv_minimizing_dect(const namespacet &_ns, message_handlert &message_handler)
 <<<<<<< HEAD
+<<<<<<< HEAD
     : bv_pointerst(_ns, satcheck, message_handler),
       satcheck(message_handler),
       log(message_handler)
@@ -62,6 +68,9 @@ public:
   explicit bv_minimizing_dect(const namespacet &_ns):
     bv_pointerst(_ns, satcheck)
 >>>>>>> Revert "Require a message handler when constructing a propt"
+=======
+    : bv_pointerst(_ns, satcheck, message_handler), satcheck(message_handler)
+>>>>>>> WIP: message handler
   {
   }
 

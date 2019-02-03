@@ -11,12 +11,24 @@ Author: Michael Tautschnig, tautschn@amazon.com
 
 #include "jsil_parser.h"
 
-jsil_parsert jsil_parser;
+void jsil_parser_init(jsil_parsert *jsil_parser);
+void jsil_scanner_init(jsil_parsert *jsil_parser);
+int yyjsilparse();
 
-extern char *yyjsiltext;
-
-int yyjsilerror(const std::string &error)
+bool jsil_parsert::parse()
 {
-  jsil_parser.parse_error(error, yyjsiltext);
-  return 0;
+  jsil_scanner_init(this);
+  jsil_parser_init(this);
+  return yyjsilparse()!=0;
+}
+
+void jsil_parsert::clear()
+{
+  parsert::clear();
+  parse_tree.clear();
+
+  // scanner state
+  string_literal.clear();
+  jsil_parser_init(nullptr);
+  jsil_scanner_init(nullptr);
 }

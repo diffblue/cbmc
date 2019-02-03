@@ -17,8 +17,8 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 class memory_model_sct:public memory_model_baset
 {
 public:
-  explicit memory_model_sct(const namespacet &_ns):
-    memory_model_baset(_ns)
+  memory_model_sct(const namespacet &_ns, message_handlert &message_handler):
+    memory_model_baset(_ns, message_handler)
   {
   }
 

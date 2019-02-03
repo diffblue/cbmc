@@ -317,7 +317,7 @@ bool goto_diff_parse_optionst::process_goto_program(
   {
     // Remove inline assembler; this needs to happen before
     // adding the library.
-    remove_asm(goto_model);
+    remove_asm(goto_model, get_message_handler());
 
     // add the library
     log.status() << "Adding CPROVER library (" << config.ansi_c.arch << ")"

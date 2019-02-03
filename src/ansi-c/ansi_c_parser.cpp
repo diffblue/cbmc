@@ -10,7 +10,37 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "c_storage_spec.h"
 
-ansi_c_parsert ansi_c_parser;
+void ansi_c_parser_init(ansi_c_parsert *ansi_c_parser);
+void ansi_c_scanner_init(ansi_c_parsert *ansi_c_parser);
+int yyansi_cparse();
+
+bool ansi_c_parsert::parse()
+{
+  clear();
+  ansi_c_scanner_init(this);
+  ansi_c_parser_init(this);
+  return yyansi_cparse()!=0;
+}
+
+void ansi_c_parsert::clear()
+{
+  parsert::clear();
+  parse_tree.clear();
+
+  // scanner state
+  tag_following=false;
+  asm_block_following=false;
+  parenthesis_counter=0;
+  string_literal.clear();
+  pragma_pack.clear();
+
+  // set up global scope
+  scopes.clear();
+  scopes.push_back(scopet());
+
+  ansi_c_scanner_init(nullptr);
+  ansi_c_parser_init(nullptr);
+}
 
 ansi_c_id_classt ansi_c_parsert::lookup(
   const irep_idt &base_name,
@@ -71,14 +101,6 @@ void ansi_c_parsert::add_tag_with_body(irept &tag)
     identifier.prefixed_name=prefixed_name;
     tag.set(ID_identifier, prefixed_name);
   }
-}
-
-extern char *yyansi_ctext;
-
-int yyansi_cerror(const std::string &error)
-{
-  ansi_c_parser.parse_error(error, yyansi_ctext);
-  return 0;
 }
 
 void ansi_c_parsert::add_declarator(

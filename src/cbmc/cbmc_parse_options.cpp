@@ -941,11 +941,63 @@ bool cbmc_parse_optionst::process_goto_program(
   // of variables with static lifetime
   if(options.get_bool_option("nondet-static"))
   {
+<<<<<<< HEAD
     log.status() << "Adding nondeterministic initialization "
                     "of static/global variables"
                  << messaget::eom;
     nondet_static(goto_model);
   }
+=======
+    // Remove inline assembler; this needs to happen before
+    // adding the library.
+    remove_asm(goto_model, log.get_message_handler());
+
+    // add the library
+    log.status() << "Adding CPROVER library (" << config.ansi_c.arch << ")"
+                 << eom;
+    link_to_library(
+      goto_model, log.get_message_handler(), cprover_cpp_library_factory);
+    link_to_library(
+      goto_model, log.get_message_handler(), cprover_c_library_factory);
+
+    if(options.get_bool_option("string-abstraction"))
+      string_instrumentation(goto_model, log.get_message_handler());
+
+    // remove function pointers
+    log.status() << "Removal of function pointers and virtual functions" << eom;
+    remove_function_pointers(
+      log.get_message_handler(),
+      goto_model,
+      options.get_bool_option("pointer-check"));
+
+    mm_io(goto_model);
+
+    // instrument library preconditions
+    instrument_preconditions(goto_model);
+
+    // remove returns, gcc vectors, complex
+    remove_returns(goto_model);
+    remove_vector(goto_model);
+    remove_complex(goto_model);
+    rewrite_union(goto_model);
+
+    // add generic checks
+    log.status() << "Generic Property Instrumentation" << eom;
+    goto_check(options, goto_model);
+
+    // checks don't know about adjusted float expressions
+    adjust_float_expressions(goto_model);
+
+    // ignore default/user-specified initialization
+    // of variables with static lifetime
+    if(options.get_bool_option("nondet-static"))
+    {
+      log.status() << "Adding nondeterministic initialization "
+                      "of static/global variables"
+                   << eom;
+      nondet_static(goto_model);
+    }
+>>>>>>> WIP: message handler
 
   if(options.get_bool_option("string-abstraction"))
   {

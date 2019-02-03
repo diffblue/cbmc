@@ -52,12 +52,16 @@ public:
       symex(mh, symbol_table, equation, options, path_storage, guard_manager),
       satcheck(util_make_unique<satcheckt>(mh)),
       satchecker(ns, *satcheck, mh),
+<<<<<<< HEAD
 =======
       symex(mh, symbol_table, equation, options, path_storage),
       satcheck(util_make_unique<satcheckt>()),
       satchecker(ns, *satcheck),
 >>>>>>> Require a message handler when constructing a propt
       z3(ns, "accelerate", "", "", smt2_dect::solvert::Z3),
+=======
+      z3(ns, "accelerate", "", "", smt2_dect::solvert::Z3, mh),
+>>>>>>> WIP: message handler
       checker(&z3) // checker(&satchecker)
   {
   }

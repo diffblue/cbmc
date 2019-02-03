@@ -55,10 +55,11 @@ Date:   December 2014
 #include <goto-programs/goto_functions.h>
 
 class goto_modelt;
+class message_handlert;
 class symbol_tablet;
 
-void remove_asm(goto_functionst &, symbol_tablet &);
+void remove_asm(goto_functionst &, symbol_tablet &, message_handlert &);
 
-void remove_asm(goto_modelt &);
+void remove_asm(goto_modelt &, message_handlert &);
 
 #endif // CPROVER_ASSEMBLER_REMOVE_ASM_H

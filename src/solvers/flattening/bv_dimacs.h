@@ -17,11 +17,15 @@ Author: Daniel Kroening, kroening@kroening.com
 class bv_dimacst : public bv_pointerst
 {
 public:
+<<<<<<< HEAD
   bv_dimacst(
     const namespacet &_ns,
     propt &_prop,
     message_handlert &message_handler,
     const std::string &_filename)
+=======
+  bv_dimacst(const namespacet &_ns, propt &_prop, const std::string &_filename, message_handlert &message_handler)
+>>>>>>> WIP: message handler
     : bv_pointerst(_ns, _prop, message_handler), filename(_filename)
   {
   }

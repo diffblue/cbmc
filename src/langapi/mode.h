@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <memory> // unique_ptr
 
 class languaget;
+class message_handlert;
 class namespacet;
 
 std::unique_ptr<languaget> get_language_from_mode(const irep_idt &mode);

@@ -30,10 +30,14 @@ class update_exprt;
 class arrayst:public equalityt
 {
 public:
+<<<<<<< HEAD
   arrayst(
     const namespacet &_ns,
     propt &_prop,
     message_handlert &message_handler);
+=======
+  arrayst(const namespacet &_ns, propt &_prop, message_handlert &message_handler);
+>>>>>>> WIP: message handler
 
   void post_process() override
   {

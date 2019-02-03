@@ -372,8 +372,13 @@ int solver(std::istream &in)
   // this is our default verbosity
   message_handler.set_verbosity(messaget::M_STATISTICS);
 
+<<<<<<< HEAD
   satcheckt satcheck{message_handler};
   boolbvt boolbv{ns, satcheck, message_handler};
+=======
+  satcheckt satcheck(message_handler);
+  boolbvt boolbv(ns, satcheck, message_handler);
+>>>>>>> WIP: message handler
 
   smt2_solvert smt2_solver{in, boolbv};
   bool error_found = false;

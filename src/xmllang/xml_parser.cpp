@@ -8,11 +8,28 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "xml_parser.h"
 
-#include <cstdlib>
-#include <cstring>
 #include <fstream>
 
-xml_parsert xml_parser;
+void xml_parser_init(xml_parsert *_xml_parser);
+void xml_scanner_init(xml_parsert *_xml_parser);
+int yyxmlparse();
+
+bool xml_parsert::parse()
+{
+  xml_scanner_init(this);
+  xml_parser_init(this);
+  return yyxmlparse()!=0;
+}
+
+void xml_parsert::clear()
+{
+  parse_tree.clear();
+  // set up stack
+  stack.clear();
+  stack.push_back(&parse_tree.element);
+  xml_parser_init(nullptr);
+  xml_scanner_init(nullptr);
+}
 
 // 'do it all' function
 bool parse_xml(
@@ -21,12 +38,12 @@ bool parse_xml(
   message_handlert &message_handler,
   xmlt &dest)
 {
-  xml_parser.clear();
+  xml_parsert xml_parser(message_handler);
+
   xml_parser.set_file(filename);
   xml_parser.in=&in;
-  xml_parser.log.set_message_handler(message_handler);
 
-  bool result=yyxmlparse()!=0;
+  bool result = xml_parser.parse();
 
   // save result
   xml_parser.parse_tree.element.swap(dest);

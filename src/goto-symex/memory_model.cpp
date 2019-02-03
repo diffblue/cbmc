@@ -13,8 +13,14 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 
 #include <util/std_expr.h>
 
+<<<<<<< HEAD
 memory_model_baset::memory_model_baset(const namespacet &_ns)
   : partial_order_concurrencyt(_ns), var_cnt(0)
+=======
+memory_model_baset::memory_model_baset(const namespacet &_ns, message_handlert &message_handler):
+  partial_order_concurrencyt(_ns, message_handler),
+  var_cnt(0)
+>>>>>>> WIP: message handler
 {
 }
 
