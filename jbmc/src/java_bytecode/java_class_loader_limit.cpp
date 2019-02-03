@@ -57,8 +57,8 @@ void java_class_loader_limitt::setup_class_load_limit(
   if(use_regex_match)
   {
     regex_matcher=std::regex(java_cp_include_files);
-    debug() << "Limit loading to classes matching '" << java_cp_include_files
-            << "'" << eom;
+    log.debug() << "Limit loading to classes matching '"
+                << java_cp_include_files << "'" << messaget::eom;
   }
   else
   {
@@ -66,7 +66,7 @@ void java_class_loader_limitt::setup_class_load_limit(
     jsont json_cp_config;
     if(parse_json(
          java_cp_include_files.substr(1),
-         get_message_handler(),
+         log.get_message_handler(),
          json_cp_config))
       throw "cannot read JSON input configuration for JAR loading";
     if(!json_cp_config.is_object())
@@ -93,7 +93,8 @@ bool java_class_loader_limitt::load_class_file(const std::string &file_name)
     std::smatch string_matches;
     if(std::regex_match(file_name, string_matches, regex_matcher))
       return true;
-    debug() << file_name + " discarded since not matching loader regexp" << eom;
+    log.debug() << file_name + " discarded since not matching loader regexp"
+                << messaget::eom;
     return false;
   }
   else

@@ -292,7 +292,6 @@ bool java_bytecode_languaget::preprocess(
 void java_bytecode_languaget::set_message_handler(
   message_handlert &message_handler)
 {
-  java_class_loader.set_message_handler(message_handler);
   languaget::set_message_handler(message_handler);
 }
 
@@ -301,7 +300,7 @@ void java_bytecode_languaget::initialize_class_loader()
   java_class_loader.clear_classpath();
 
   for(const auto &p : config.java.classpath)
-    java_class_loader.add_classpath_entry(p);
+    java_class_loader.add_classpath_entry(p, get_message_handler());
 
   java_class_loader.set_java_cp_include_files(
     language_options->java_cp_include_files);
@@ -330,7 +329,7 @@ void java_bytecode_languaget::parse_from_main_class()
   {
     // Try to load class
     status() << "Trying to load Java main class: " << main_class << eom;
-    if(!java_class_loader.can_load_class(main_class))
+    if(!java_class_loader.can_load_class(main_class, get_message_handler()))
     {
       // Try to extract class name and load class
       const auto maybe_class_name =
@@ -342,7 +341,8 @@ void java_bytecode_languaget::parse_from_main_class()
       }
       status() << "Trying to load Java main class: " << maybe_class_name.value()
                << eom;
-      if(!java_class_loader.can_load_class(maybe_class_name.value()))
+      if(!java_class_loader.can_load_class(
+           maybe_class_name.value(), get_message_handler()))
       {
         throwMainClassLoadingError(id2string(main_class));
         return;
@@ -354,7 +354,8 @@ void java_bytecode_languaget::parse_from_main_class()
     }
     status() << "Found Java main class: " << main_class << eom;
     // Now really load it.
-    const auto &parse_trees = java_class_loader(main_class);
+    const auto &parse_trees =
+      java_class_loader(main_class, get_message_handler());
     if(parse_trees.empty() || !parse_trees.front().loading_successful)
     {
       throwMainClassLoadingError(id2string(main_class));
@@ -429,12 +430,13 @@ bool java_bytecode_languaget::parse(
     if(main_class.empty())
     {
       status() << "JAR file without entry point: loading class files" << eom;
-      const auto classes = java_class_loader.load_entire_jar(path);
+      const auto classes =
+        java_class_loader.load_entire_jar(path, get_message_handler());
       for(const auto &c : classes)
         main_jar_classes.push_back(c);
     }
     else
-      java_class_loader.add_classpath_entry(path);
+      java_class_loader.add_classpath_entry(path, get_message_handler());
   }
   else
     main_class = config.java.main_class;
@@ -1504,7 +1506,7 @@ bool java_bytecode_languaget::final(symbol_table_baset &)
 void java_bytecode_languaget::show_parse(std::ostream &out)
 {
   java_class_loadert::parse_tree_with_overlayst &parse_trees =
-    java_class_loader(main_class);
+    java_class_loader(main_class, get_message_handler());
   parse_trees.front().output(out);
   if(parse_trees.size() > 1)
   {

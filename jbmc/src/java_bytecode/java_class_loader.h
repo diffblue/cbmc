@@ -41,15 +41,17 @@ public:
   {
   }
 
-  parse_tree_with_overlayst &operator()(const irep_idt &class_name);
+  parse_tree_with_overlayst &
+  operator()(const irep_idt &class_name, message_handlert &);
 
   /// Checks whether \p class_name is parseable from the classpath,
   /// ignoring class loading limits.
-  bool can_load_class(const irep_idt &class_name);
+  bool can_load_class(const irep_idt &class_name, message_handlert &);
 
   parse_tree_with_overlayst &get_parse_tree(
     java_class_loader_limitt &class_loader_limit,
-    const irep_idt &class_name);
+    const irep_idt &class_name,
+    message_handlert &);
 
   /// Set the argument of the class loader limit \ref java_class_loader_limitt
   /// \param cp_include_files: argument string for java_class_loader_limit
@@ -74,7 +76,8 @@ public:
       java_load_classes.push_back(id);
   }
 
-  std::vector<irep_idt> load_entire_jar(const std::string &jar_path);
+  std::vector<irep_idt>
+  load_entire_jar(const std::string &jar_path, message_handlert &);
 
   /// Map from class names to the bytecode parse trees
   fixed_keys_map_wrappert<parse_tree_with_overridest_mapt>
@@ -103,7 +106,8 @@ private:
   /// Map from class names to the bytecode parse trees
   parse_tree_with_overridest_mapt class_map;
 
-  optionalt<std::vector<irep_idt>> read_jar_file(const std::string &jar_path);
+  optionalt<std::vector<irep_idt>>
+  read_jar_file(const std::string &jar_path, message_handlert &);
 };
 
 #endif // CPROVER_JAVA_BYTECODE_JAVA_CLASS_LOADER_H
