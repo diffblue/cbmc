@@ -280,8 +280,7 @@ bool base_type_eqt::base_type_eq_rec(
   return true;
 }
 
-/// Check types for equality across all levels of hierarchy. For equality
-/// in the top level of the hierarchy only use \ref type_eq.
+/// Check types for equality across all levels of hierarchy.
 /// Example:
 /// - `struct_typet {union_tag_typet("a")}` and `struct_typet {ns.lookup("a")
 ///   .type}` will compare equal.

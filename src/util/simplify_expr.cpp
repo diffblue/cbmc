@@ -29,7 +29,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "string_constant.h"
 #include "string_expr.h"
 #include "symbol.h"
-#include "type_eq.h"
 
 // #define DEBUGX
 
@@ -317,7 +316,7 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
   }
 
   // eliminate redundant typecasts
-  if(type_eq(expr.type(), expr.op0().type(), ns))
+  if(expr.type() == expr.op0().type())
   {
     exprt tmp;
     tmp.swap(expr.op0());
