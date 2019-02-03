@@ -113,7 +113,8 @@ public:
   virtual ~java_bytecode_languaget();
   java_bytecode_languaget(
     std::unique_ptr<select_pointer_typet> pointer_type_selector)
-    : threading_support(false),
+    : language_options_initialized(false),
+      threading_support(false),
       assume_inputs_non_null(false),
       object_factory_parameters(),
       max_user_array_length(0),
@@ -179,6 +180,7 @@ protected:
   bool do_ci_lazy_method_conversion(symbol_tablet &);
   const select_pointer_typet &get_pointer_type_selector() const;
 
+  bool language_options_initialized;
   irep_idt main_class;
   std::vector<irep_idt> main_jar_classes;
   java_class_loadert java_class_loader;
