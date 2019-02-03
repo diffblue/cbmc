@@ -150,7 +150,7 @@ void satcheck_minisat1_baset::lcnf(const bvt &bv)
   clause_counter++;
 }
 
-propt::resultt satcheck_minisat1_baset::prop_solve()
+propt::resultt satcheck_minisat1_baset::do_prop_solve()
 {
   PRECONDITION(status != ERROR);
 
@@ -262,11 +262,11 @@ const std::string satcheck_minisat1_prooft::solver_text()
   return "MiniSAT + Proof";
 }
 
-propt::resultt satcheck_minisat1_coret::prop_solve()
+propt::resultt satcheck_minisat1_coret::do_prop_solve()
 {
   propt::resultt r;
 
-  r=satcheck_minisat1_prooft::prop_solve();
+  r = satcheck_minisat1_prooft::do_prop_solve();
 
   if(status==UNSAT)
   {

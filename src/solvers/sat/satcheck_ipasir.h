@@ -24,8 +24,6 @@ public:
   /// This method returns the description produced by the linked SAT solver
   const std::string solver_text() override;
 
-  resultt prop_solve() override;
-
   /// This method returns the truth value for a literal of the current SAT model
   tvt l_get(literalt a) const override final;
 
@@ -47,6 +45,8 @@ public:
   }
 
 protected:
+  resultt do_prop_solve() override;
+
   void *solver;
 
   bvt assumptions;

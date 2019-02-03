@@ -24,7 +24,6 @@ public:
   virtual ~satcheck_cadicalt();
 
   const std::string solver_text() override;
-  resultt prop_solve() override;
   tvt l_get(literalt a) const override;
 
   void lcnf(const bvt &bv) override;
@@ -42,6 +41,8 @@ public:
   bool is_in_conflict(literalt a) const override;
 
 protected:
+  resultt do_prop_solve() override;
+
   // NOLINTNEXTLINE(readability/identifiers)
   CaDiCaL::Solver * solver;
 };

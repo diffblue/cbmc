@@ -30,7 +30,6 @@ public:
   satcheck_minisat2_baset(T *, message_handlert &message_handler);
   virtual ~satcheck_minisat2_baset();
 
-  resultt prop_solve() override;
   tvt l_get(literalt a) const override final;
 
   void lcnf(const bvt &bv) override final;
@@ -64,6 +63,8 @@ public:
   }
 
 protected:
+  resultt do_prop_solve() override;
+
   T *solver;
   uint32_t time_limit_seconds;
 

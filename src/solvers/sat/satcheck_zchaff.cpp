@@ -70,7 +70,7 @@ void satcheck_zchaff_baset::copy_cnf()
       reinterpret_cast<int*>(&((*it)[0])), it->size());
 }
 
-propt::resultt satcheck_zchaff_baset::prop_solve()
+propt::resultt satcheck_zchaff_baset::do_prop_solve()
 {
   // this is *not* incremental
   PRECONDITION(status == INIT);

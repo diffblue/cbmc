@@ -65,7 +65,7 @@ void satcheck_picosatt::lcnf(const bvt &bv)
   clause_counter++;
 }
 
-propt::resultt satcheck_picosatt::prop_solve()
+propt::resultt satcheck_picosatt::do_prop_solve()
 {
   PRECONDITION(status != ERROR);
 

@@ -48,8 +48,6 @@ public:
 
   bool pbs_solve();
 
-  resultt prop_solve() override;
-
   tvt l_get(literalt a) const override;
 
   // dummy functions
@@ -60,6 +58,8 @@ public:
   }
 
 protected:
+  resultt do_prop_solve() override;
+
   std::set<int> assigned;
 };
 

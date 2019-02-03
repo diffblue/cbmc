@@ -25,7 +25,6 @@ public:
   virtual ~satcheck_zchaff_baset();
 
   const std::string solver_text() override;
-  resultt prop_solve() override;
   tvt l_get(literalt a) const override;
   void set_assignment(literalt a, bool value) override;
   virtual void copy_cnf();
@@ -36,6 +35,8 @@ public:
   }
 
 protected:
+  resultt do_prop_solve() override;
+
   CSolver *solver;
 
   enum statust { INIT, SAT, UNSAT, ERROR };

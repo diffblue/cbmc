@@ -22,7 +22,6 @@ public:
   virtual ~satcheck_lingelingt();
 
   const std::string solver_text() override;
-  resultt prop_solve() override;
   tvt l_get(literalt a) const override;
 
   void lcnf(const bvt &bv) override;
@@ -41,6 +40,8 @@ public:
   void set_frozen(literalt a) override;
 
 protected:
+  resultt do_prop_solve() override;
+
   // NOLINTNEXTLINE(readability/identifiers)
   struct LGL * solver;
   bvt assumptions;

@@ -22,7 +22,6 @@ public:
   ~satcheck_picosatt();
 
   const std::string solver_text() override;
-  resultt prop_solve() override;
   tvt l_get(literalt a) const override;
 
   void lcnf(const bvt &bv) override;
@@ -40,6 +39,8 @@ public:
   }
 
 protected:
+  resultt do_prop_solve() override;
+
   bvt assumptions;
 
 private:

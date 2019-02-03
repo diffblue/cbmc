@@ -30,7 +30,6 @@ public:
   satcheck_glucose_baset(T *, message_handlert &message_handler);
   virtual ~satcheck_glucose_baset();
 
-  resultt prop_solve() override;
   tvt l_get(literalt a) const override;
 
   void lcnf(const bvt &bv) override;
@@ -53,6 +52,8 @@ public:
   }
 
 protected:
+  resultt do_prop_solve() override;
+
   T *solver;
 
   void add_variables();

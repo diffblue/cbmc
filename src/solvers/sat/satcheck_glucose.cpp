@@ -131,8 +131,8 @@ void satcheck_glucose_baset<T>::lcnf(const bvt &bv)
   }
 }
 
-template<typename T>
-propt::resultt satcheck_glucose_baset<T>::prop_solve()
+template <typename T>
+propt::resultt satcheck_glucose_baset<T>::do_prop_solve()
 {
   PRECONDITION(status != statust::ERROR);
 

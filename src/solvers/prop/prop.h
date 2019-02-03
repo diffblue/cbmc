@@ -97,7 +97,7 @@ public:
   // solving
   virtual const std::string solver_text()=0;
   enum class resultt { P_SATISFIABLE, P_UNSATISFIABLE, P_ERROR };
-  virtual resultt prop_solve()=0;
+  resultt prop_solve();
 
   // satisfying assignment
   virtual tvt l_get(literalt a) const=0;
@@ -120,6 +120,8 @@ public:
   }
 
 protected:
+  virtual resultt do_prop_solve() = 0;
+
   // to avoid a temporary for lcnf(...)
   bvt lcnf_bv;
 

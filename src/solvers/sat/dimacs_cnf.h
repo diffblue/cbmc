@@ -52,11 +52,6 @@ public:
 
   void lcnf(const bvt &bv) override;
 
-  resultt prop_solve() override
-  {
-    return resultt::P_ERROR;
-  }
-
   tvt l_get(literalt) const override
   {
     return tvt::unknown();
@@ -68,6 +63,11 @@ public:
   }
 
 protected:
+  resultt do_prop_solve() override
+  {
+    return resultt::P_ERROR;
+  }
+
   std::ostream &out;
 };
 

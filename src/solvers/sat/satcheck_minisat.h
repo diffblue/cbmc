@@ -25,7 +25,6 @@ public:
   virtual ~satcheck_minisat1_baset();
 
   const std::string solver_text() override;
-  resultt prop_solve() override;
   tvt l_get(literalt a) const override;
 
   void lcnf(const bvt &bv) final;
@@ -48,6 +47,8 @@ public:
   bool is_in_conflict(literalt l) const override;
 
 protected:
+  resultt do_prop_solve() override;
+
   // NOLINTNEXTLINE(readability/identifiers)
   class Solver *solver;
   void add_variables();
@@ -84,7 +85,6 @@ public:
   ~satcheck_minisat1_coret();
 
   const std::string solver_text() override;
-  resultt prop_solve() override;
 
   bool has_in_core() const
   {
@@ -99,5 +99,7 @@ public:
 
 protected:
   std::vector<bool> in_core;
+
+  resultt do_prop_solve() override;
 };
 #endif // CPROVER_SOLVERS_SAT_SATCHECK_MINISAT_H

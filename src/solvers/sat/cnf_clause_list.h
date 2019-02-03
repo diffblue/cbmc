@@ -39,11 +39,6 @@ public:
     return tvt::unknown();
   }
 
-  resultt prop_solve() override
-  {
-    return resultt::P_ERROR;
-  }
-
   size_t no_clauses() const override
   {
     return clauses.size();
@@ -82,6 +77,11 @@ public:
   }
 
 protected:
+  resultt do_prop_solve() override
+  {
+    return resultt::P_ERROR;
+  }
+
   clausest clauses;
 };
 

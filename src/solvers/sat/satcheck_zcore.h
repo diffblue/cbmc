@@ -21,7 +21,6 @@ public:
   virtual ~satcheck_zcoret();
 
   const std::string solver_text() override;
-  resultt prop_solve() override;
   tvt l_get(literalt a) const override;
 
   bool is_in_core(literalt l) const
@@ -30,6 +29,8 @@ public:
   }
 
 protected:
+  resultt do_prop_solve() override;
+
   std::set<unsigned> in_core;
 };
 

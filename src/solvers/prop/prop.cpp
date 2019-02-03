@@ -25,3 +25,8 @@ bvt propt::new_variables(std::size_t width)
     result[i]=new_variable();
   return result;
 }
+
+propt::resultt propt::prop_solve()
+{
+  return do_prop_solve();
+}

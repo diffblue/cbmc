@@ -93,7 +93,7 @@ void satcheck_ipasirt::lcnf(const bvt &bv)
   clause_counter++;
 }
 
-propt::resultt satcheck_ipasirt::prop_solve()
+propt::resultt satcheck_ipasirt::do_prop_solve()
 {
   INVARIANT(status!=statust::ERROR, "there cannot be an error");
 
