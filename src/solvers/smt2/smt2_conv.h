@@ -50,21 +50,21 @@ public:
     const std::string &_notes,
     const std::string &_logic,
     solvert _solver,
-    std::ostream &_out):
-    prop_convt(_ns),
-    use_FPA_theory(false),
-    use_datatypes(false),
-    use_array_of_bool(false),
-    emit_set_logic(true),
-    out(_out),
-    benchmark(_benchmark),
-    notes(_notes),
-    logic(_logic),
-    solver(_solver),
-    boolbv_width(_ns),
-    let_id_count(0),
-    pointer_logic(_ns),
-    no_boolean_variables(0)
+    std::ostream &_out)
+    : use_FPA_theory(false),
+      use_datatypes(false),
+      use_array_of_bool(false),
+      emit_set_logic(true),
+      ns(_ns),
+      out(_out),
+      benchmark(_benchmark),
+      notes(_notes),
+      logic(_logic),
+      solver(_solver),
+      boolbv_width(_ns),
+      let_id_count(0),
+      pointer_logic(_ns),
+      no_boolean_variables(0)
   {
     // We set some defaults differently
     // for some solvers.
@@ -128,6 +128,7 @@ public:
   void convert_literal(const literalt);
 
 protected:
+  const namespacet &ns;
   std::ostream &out;
   std::string benchmark, notes, logic;
   solvert solver;

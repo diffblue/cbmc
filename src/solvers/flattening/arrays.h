@@ -43,6 +43,8 @@ public:
   void record_array_index(const index_exprt &expr);
 
 protected:
+  const namespacet &ns;
+
   virtual void post_process_arrays()
   {
     add_array_constraints();
