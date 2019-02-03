@@ -21,9 +21,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 #endif
 
-arrayst::arrayst(
-  const namespacet &_ns,
-  propt &_prop):equalityt(_ns, _prop)
+arrayst::arrayst(const namespacet &_ns, propt &_prop)
+  : equalityt(_prop), ns(_ns)
 {
   lazy_arrays = false;        // will be set to true when --refine is used
   incremental_cache = false;  // for incremental solving

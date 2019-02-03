@@ -19,9 +19,9 @@ Author: Daniel Kroening, kroening@kroening.com
 class equalityt:public prop_conv_solvert
 {
 public:
-  equalityt(
-    const namespacet &_ns,
-    propt &_prop):prop_conv_solvert(_ns, _prop) { }
+  explicit equalityt(propt &_prop) : prop_conv_solvert(_prop)
+  {
+  }
 
   virtual literalt equality(const exprt &e1, const exprt &e2);
 
