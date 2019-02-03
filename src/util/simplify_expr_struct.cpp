@@ -15,7 +15,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "namespace.h"
 #include "pointer_offset_size.h"
 #include "std_expr.h"
-#include "type_eq.h"
 
 bool simplify_exprt::simplify_member(exprt &expr)
 {
@@ -207,7 +206,7 @@ bool simplify_exprt::simplify_member(exprt &expr)
   else if(op.id()==ID_union && op_type.id()==ID_union)
   {
     // trivial?
-    if(type_eq(to_union_expr(op).op().type(), expr.type(), ns))
+    if(to_union_expr(op).op().type() == expr.type())
     {
       exprt tmp=to_union_expr(op).op();
       expr.swap(tmp);
@@ -271,7 +270,7 @@ bool simplify_exprt::simplify_member(exprt &expr)
           equivalent_member.has_value() &&
           equivalent_member.value().id() != ID_byte_extract_little_endian &&
           equivalent_member.value().id() != ID_byte_extract_big_endian &&
-          type_eq(equivalent_member.value().type(), expr.type(), ns))
+          equivalent_member.value().type() == expr.type())
         {
           expr = equivalent_member.value();
           simplify_rec(expr);

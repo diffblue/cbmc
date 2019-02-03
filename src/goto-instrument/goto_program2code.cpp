@@ -20,7 +20,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/find_symbols.h>
 #include <util/prefix.h>
 #include <util/simplify_expr.h>
-#include <util/type_eq.h>
 
 void goto_program2codet::operator()()
 {
@@ -1876,7 +1875,7 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
         if(!has_prefix(id2string(it->second.base_name), "nondet_"))
           continue;
         const code_typet &code_type=to_code_type(it->second.type);
-        if(!type_eq(code_type.return_type(), expr.type(), ns))
+        if(code_type.return_type() != expr.type())
           continue;
         if(!code_type.parameters().empty())
           continue;

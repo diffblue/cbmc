@@ -19,7 +19,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/expr_util.h>
 #include <util/pointer_predicates.h>
 #include <util/string_constant.h>
-#include <util/type_eq.h>
 
 #include "pointer_arithmetic.h"
 
@@ -36,13 +35,14 @@ bool string_abstractiont::build_wrap(
   // #define build_wrap(a,b,c) build(a,b,c)
   // to avoid it
   const typet &a_t=build_abstraction_type(object.type());
-  /*assert(type_eq(dest.type(), a_t, ns) ||
+  /*assert(dest.type() == a_t ||
       (dest.type().id()==ID_array && a_t.id()==ID_pointer &&
-       type_eq(dest.type().subtype(), a_t.subtype(), ns)));
+       dest.type().subtype() == a_t.subtype()));
        */
-  if(!type_eq(dest.type(), a_t, ns) &&
-      !(dest.type().id()==ID_array && a_t.id()==ID_pointer &&
-       type_eq(dest.type().subtype(), a_t.subtype(), ns)))
+  if(
+    dest.type() != a_t &&
+    !(dest.type().id() == ID_array && a_t.id() == ID_pointer &&
+      dest.type().subtype() == a_t.subtype()))
   {
     warning() << "warning: inconsistent abstract type for "
               << object.pretty() << eom;
@@ -54,8 +54,7 @@ bool string_abstractiont::build_wrap(
 
 bool string_abstractiont::is_ptr_string_struct(const typet &type) const
 {
-  return type.id()==ID_pointer &&
-    type_eq(type.subtype(), string_struct, ns);
+  return type.id() == ID_pointer && type.subtype() == string_struct;
 }
 
 static inline bool is_ptr_argument(const typet &type)
@@ -323,8 +322,9 @@ exprt string_abstractiont::make_val_or_dummy_rec(goto_programt &dest,
     else
       return address_of_exprt(sym_expr);
   }
-  else if(eff_type.id()==ID_union ||
-      (eff_type.id()==ID_struct && !type_eq(eff_type, string_struct, ns)))
+  else if(
+    eff_type.id() == ID_union ||
+    (eff_type.id() == ID_struct && eff_type != string_struct))
   {
     const struct_union_typet &su_source=to_struct_union_type(source_type);
     const struct_union_typet::componentst &s_components=
@@ -406,8 +406,9 @@ symbol_exprt string_abstractiont::add_dummy_symbol_and_value(
   decl->code.add_source_location()=ref_instr->source_location;
 
   // set the value - may be nil
-  if(source_type.id()==ID_array && is_char_type(source_type.subtype()) &&
-      type_eq(type, string_struct, ns))
+  if(
+    source_type.id() == ID_array && is_char_type(source_type.subtype()) &&
+    type == string_struct)
   {
     new_symbol.value = struct_exprt(
       {build_unknown(whatt::IS_ZERO, false),
@@ -553,7 +554,7 @@ void string_abstractiont::abstract_function_call(
         abstract_type.id()==ID_pointer)
     {
       INVARIANT(
-        type_eq(str_args.back().type().subtype(), abstract_type.subtype(), ns),
+        str_args.back().type().subtype() == abstract_type.subtype(),
         "argument array type differs from formal parameter pointer type");
 
       index_exprt idx(str_args.back(), from_integer(0, index_type()));
@@ -743,10 +744,9 @@ bool string_abstractiont::build(const exprt &object, exprt &dest, bool write)
     if(build(to_typecast_expr(object).op(), dest, write))
       return true;
 
-    return !(type_eq(dest.type(), abstract_type, ns) ||
-        (dest.type().id()==ID_array &&
-         abstract_type.id()==ID_pointer &&
-         type_eq(dest.type().subtype(), abstract_type.subtype(), ns)));
+    return dest.type() != abstract_type ||
+           (dest.type().id() == ID_array && abstract_type.id() == ID_pointer &&
+            dest.type().subtype() == abstract_type.subtype());
   }
 
   if(object.id()==ID_string_constant)
@@ -1200,7 +1200,7 @@ goto_programt::targett string_abstractiont::value_assignments(
   if(rhs.id()==ID_if)
     return value_assignments_if(dest, target, lhs, to_if_expr(rhs));
 
-  PRECONDITION(type_eq(lhs.type(), rhs.type(), ns));
+  PRECONDITION(lhs.type() == rhs.type());
 
   if(lhs.type().id()==ID_array)
   {
@@ -1318,7 +1318,7 @@ exprt string_abstractiont::member(const exprt &a, whatt what)
     return a;
 
   PRECONDITION_WITH_DIAGNOSTICS(
-    type_eq(a.type(), string_struct, ns) || is_ptr_string_struct(a.type()),
+    a.type() == string_struct || is_ptr_string_struct(a.type()),
     "either the expression is not a string or it is not a pointer to one");
 
   exprt struct_op=

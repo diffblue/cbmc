@@ -13,7 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <algorithm>
 
 #include <util/prefix.h>
-#include <util/type_eq.h>
 
 #include "class_identifier.h"
 #include "goto_model.h"
@@ -131,7 +130,7 @@ static void create_static_function_call(
   {
     const typet &need_type = callee_parameters[i].type();
 
-    if(!type_eq(call_args[i].type(), need_type, ns))
+    if(call_args[i].type() != need_type)
     {
       // If this wasn't language agnostic code we'd also like to check
       // compatibility-- for example, Java overrides may have differing generic

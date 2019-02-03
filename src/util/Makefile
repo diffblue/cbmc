@@ -91,7 +91,6 @@ SRC = allocate_objects.cpp \
       threeval.cpp \
       timestamper.cpp \
       type.cpp \
-      type_eq.cpp \
       typecheck.cpp \
       ui_message.cpp \
       unicode.cpp \

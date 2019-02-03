@@ -22,7 +22,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/replace_expr.h>
 #include <util/source_location.h>
 #include <util/std_expr.h>
-#include <util/type_eq.h>
 
 #include <analyses/does_remove_const.h>
 
@@ -134,7 +133,7 @@ bool remove_function_pointerst::arg_is_type_compatible(
   const typet &call_type,
   const typet &function_type)
 {
-  if(type_eq(call_type, function_type, ns))
+  if(call_type == function_type)
     return true;
 
   // any integer-vs-enum-vs-pointer is ok
@@ -166,7 +165,7 @@ bool remove_function_pointerst::is_type_compatible(
   if(!return_value_used)
   {
   }
-  else if(type_eq(call_type.return_type(), empty_typet(), ns))
+  else if(call_type.return_type() == empty_typet())
   {
     // ok
   }
@@ -221,8 +220,7 @@ void remove_function_pointerst::fix_argument_types(
   {
     if(i<call_arguments.size())
     {
-      if(!type_eq(call_arguments[i].type(),
-                  function_parameters[i].type(), ns))
+      if(call_arguments[i].type() != function_parameters[i].type())
       {
         call_arguments[i] =
           typecast_exprt(call_arguments[i], function_parameters[i].type());
@@ -243,9 +241,7 @@ void remove_function_pointerst::fix_return_type(
   const code_typet &code_type = to_code_type(function_call.function().type());
 
   // type already ok?
-  if(type_eq(
-       function_call.lhs().type(),
-       code_type.return_type(), ns))
+  if(function_call.lhs().type() == code_type.return_type())
     return;
 
   const symbolt &function_symbol =
