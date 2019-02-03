@@ -65,7 +65,7 @@ bool jsil_languaget::parse(
   jsil_parser.clear();
   jsil_parser.set_file(path);
   jsil_parser.in=&instream;
-  jsil_parser.set_message_handler(message_handler);
+  jsil_parser.log.set_message_handler(message_handler);
 
   jsil_scanner_init();
   bool result=jsil_parser.parse();
@@ -141,7 +141,7 @@ bool jsil_languaget::to_expr(
   jsil_parser.clear();
   jsil_parser.set_file("");
   jsil_parser.in=&instream;
-  jsil_parser.set_message_handler(message_handler);
+  jsil_parser.log.set_message_handler(message_handler);
   jsil_scanner_init();
 
   bool result=jsil_parser.parse();
