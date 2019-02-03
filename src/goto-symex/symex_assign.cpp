@@ -27,8 +27,7 @@ void goto_symext::symex_assign(statet &state, const code_assignt &code)
   exprt rhs=code.rhs();
 
   DATA_INVARIANT(
-    base_type_eq(lhs.type(), rhs.type(), ns),
-    "assignments must be type consistent");
+    lhs.type() == rhs.type(), "assignments must be type consistent");
 
   clean_expr(lhs, state, true);
   clean_expr(rhs, state, false);

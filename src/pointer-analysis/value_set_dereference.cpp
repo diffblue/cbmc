@@ -18,7 +18,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/arith_tools.h>
 #include <util/array_name.h>
-#include <util/base_type.h>
 #include <util/byte_operators.h>
 #include <util/c_types.h>
 #include <util/config.h>
@@ -208,7 +207,7 @@ bool value_set_dereferencet::dereference_type_compare(
 #endif
   }
 
-  if(base_type_eq(object_type, dereference_type, ns))
+  if(object_type == dereference_type)
     return true; // ok, they just match
 
   // check for struct prefixes
@@ -314,7 +313,7 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
     const symbolt &memory_symbol=ns.lookup(CPROVER_PREFIX "memory");
     const symbol_exprt symbol_expr(memory_symbol.name, memory_symbol.type);
 
-    if(base_type_eq(memory_symbol.type.subtype(), dereference_type, ns))
+    if(memory_symbol.type.subtype() == dereference_type)
     {
       // Types match already, what a coincidence!
       // We can use an index expression.

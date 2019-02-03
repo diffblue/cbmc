@@ -16,7 +16,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/symbol_table.h>
 #include <util/simplify_expr.h>
-#include <util/base_type.h>
 #include <util/std_expr.h>
 #include <util/prefix.h>
 #include <util/std_code.h>
@@ -990,7 +989,7 @@ void value_set_fit::assign(
       }
       else
       {
-        if(!base_type_eq(rhs.type(), type, ns))
+        if(rhs.type() != type)
           throw "value_set_fit::assign type mismatch: "
                 "rhs.type():\n"+rhs.type().pretty()+"\n"+
                 "type:\n"+type.pretty();
@@ -1051,7 +1050,7 @@ void value_set_fit::assign(
     }
     else
     {
-      if(!base_type_eq(rhs.type(), type, ns))
+      if(rhs.type() != type)
         throw "value_set_fit::assign type mismatch: "
               "rhs.type():\n"+rhs.type().pretty()+"\n"+
               "type:\n"+type.pretty();

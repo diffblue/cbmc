@@ -12,7 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "goto_symex.h"
 
 #include <util/arith_tools.h>
-#include <util/base_type.h>
 #include <util/byte_operators.h>
 #include <util/c_types.h>
 #include <util/pointer_offset_size.h>
@@ -149,7 +148,7 @@ void goto_symext::symex_other(
     process_array_expr(state, src_array);
 
     // check for size (or type) mismatch and adjust
-    if(!base_type_eq(dest_array.type(), src_array.type(), ns))
+    if(dest_array.type() != src_array.type())
     {
       if(statement==ID_array_copy)
       {
@@ -217,7 +216,7 @@ void goto_symext::symex_other(
 
     const array_typet &array_type = to_array_type(array_expr.type());
 
-    if(!base_type_eq(array_type.subtype(), value.type(), ns))
+    if(array_type.subtype() != value.type())
       value = typecast_exprt(value, array_type.subtype());
 
     code_assignt assignment(array_expr, array_of_exprt(value, array_type));
@@ -250,7 +249,7 @@ void goto_symext::symex_other(
     code_assignt assignment(code.op2(), equal_exprt(array1, array2));
 
     // check for size (or type) mismatch
-    if(!base_type_eq(array1.type(), array2.type(), ns))
+    if(array1.type() != array2.type())
       assignment.lhs() = false_exprt();
 
     symex_assign(state, assignment);

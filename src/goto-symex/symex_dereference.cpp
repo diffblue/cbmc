@@ -12,7 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "goto_symex.h"
 
 #include <util/arith_tools.h>
-#include <util/base_type.h>
 #include <util/byte_operators.h>
 #include <util/c_types.h>
 #include <util/exception_utils.h>
@@ -61,7 +60,7 @@ exprt goto_symext::address_arithmetic(
 
       // turn &a of type T[i][j] into &(a[0][0])
       for(const typet *t = &(a.type().subtype());
-          t->id() == ID_array && !base_type_eq(expr.type(), *t, ns);
+          t->id() == ID_array && expr.type() != *t;
           t = &(t->subtype()))
         a.object()=index_exprt(a.object(), from_integer(0, index_type()));
     }
@@ -184,9 +183,10 @@ exprt goto_symext::address_arithmetic(
       "goto_symext::address_arithmetic does not handle " + expr.id_string());
 
   const typet &expr_type = expr.type();
-  INVARIANT((expr_type.id()==ID_array && !keep_array) ||
-            base_type_eq(pointer_type(expr_type), result.type(), ns),
-            "either non-persistent array or pointer to result");
+  INVARIANT(
+    (expr_type.id() == ID_array && !keep_array) ||
+      pointer_type(expr_type) == result.type(),
+    "either non-persistent array or pointer to result");
 
   return result;
 }
@@ -286,12 +286,11 @@ void goto_symext::dereference_rec(exprt &expr, statet &state)
     exprt &tc_op=to_typecast_expr(expr).op();
 
     // turn &array into &array[0] when casting to pointer-to-element-type
-    if(tc_op.id()==ID_address_of &&
-       to_address_of_expr(tc_op).object().type().id()==ID_array &&
-       base_type_eq(
-         expr.type(),
-         pointer_type(to_address_of_expr(tc_op).object().type().subtype()),
-         ns))
+    if(
+      tc_op.id() == ID_address_of &&
+      to_address_of_expr(tc_op).object().type().id() == ID_array &&
+      expr.type() ==
+        pointer_type(to_address_of_expr(tc_op).object().type().subtype()))
     {
       expr=
         address_of_exprt(

@@ -9,7 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "arrays.h"
 
 #include <util/arith_tools.h>
-#include <util/base_type.h>
 #include <util/format_expr.h>
 #include <util/namespace.h>
 #include <util/std_expr.h>
@@ -47,7 +46,7 @@ literalt arrayst::record_array_equality(
   const exprt &op1=equality.op1();
 
   // check types
-  if(!base_type_eq(op0.type(), op1.type(), ns))
+  if(op0.type() != op1.type())
   {
     error() << equality.pretty() << messaget::eom;
     DATA_INVARIANT(
@@ -115,7 +114,7 @@ void arrayst::collect_arrays(const exprt &a)
     const with_exprt &with_expr=to_with_expr(a);
 
     // check types
-    if(!base_type_eq(array_type, with_expr.old().type(), ns))
+    if(array_type != with_expr.old().type())
     {
       error() << a.pretty() << messaget::eom;
       DATA_INVARIANT(false, "collect_arrays got 'with' without matching types");
@@ -136,7 +135,7 @@ void arrayst::collect_arrays(const exprt &a)
     const update_exprt &update_expr=to_update_expr(a);
 
     // check types
-    if(!base_type_eq(array_type, update_expr.old().type(), ns))
+    if(array_type != update_expr.old().type())
     {
       error() << a.pretty() << messaget::eom;
       DATA_INVARIANT(
@@ -158,14 +157,14 @@ void arrayst::collect_arrays(const exprt &a)
     const if_exprt &if_expr=to_if_expr(a);
 
     // check types
-    if(!base_type_eq(array_type, if_expr.true_case().type(), ns))
+    if(array_type != if_expr.true_case().type())
     {
       error() << a.pretty() << messaget::eom;
       DATA_INVARIANT(false, "collect_arrays got if without matching types");
     }
 
     // check types
-    if(!base_type_eq(array_type, if_expr.false_case().type(), ns))
+    if(array_type != if_expr.false_case().type())
     {
       error() << a.pretty() << messaget::eom;
       DATA_INVARIANT(false, "collect_arrays got if without matching types");
@@ -655,7 +654,7 @@ void arrayst::add_array_constraints_array_of(
     index_exprt index_expr(expr, index, subtype);
 
     DATA_INVARIANT(
-      base_type_eq(index_expr.type(), expr.what().type(), ns),
+      index_expr.type() == expr.what().type(),
       "array_of operand type should match array element type");
 
     // add constraint

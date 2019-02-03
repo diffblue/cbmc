@@ -8,8 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "boolbv.h"
 
-#include <util/base_type.h>
-
 bvt boolbvt::convert_member(const member_exprt &expr)
 {
   const exprt &struct_op=expr.struct_op();
@@ -31,7 +29,7 @@ bvt boolbvt::convert_member(const member_exprt &expr)
     if(c.get_name() == component_name)
     {
       DATA_INVARIANT_WITH_DIAGNOSTICS(
-        base_type_eq(subtype, expr.type(), ns),
+        subtype == expr.type(),
         "component type shall match the member expression type",
         subtype.pretty(),
         expr.type().pretty());

@@ -15,7 +15,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 #endif
 
-#include <util/base_type.h>
 #include <util/cprover_prefix.h>
 #include <util/expr_util.h>
 #include <util/invariant.h>
@@ -83,7 +82,7 @@ void goto_inlinet::parameter_assignments(
     {
       // it should be the same exact type as the parameter,
       // subject to some exceptions
-      if(!base_type_eq(parameter_type, actual.type(), ns))
+      if(parameter_type != actual.type())
       {
         const typet &f_partype = parameter_type;
         const typet &f_acttype = actual.type();
