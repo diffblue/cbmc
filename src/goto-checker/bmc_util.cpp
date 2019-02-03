@@ -139,7 +139,7 @@ void convert_symex_target_equation(
   msg.status() << "converting SSA" << messaget::eom;
 
   // convert SSA
-  equation.convert(prop_conv);
+  equation.convert(prop_conv, message_handler);
 }
 
 std::unique_ptr<memory_model_baset>

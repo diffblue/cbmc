@@ -29,7 +29,6 @@ multi_path_symex_checkert::multi_path_symex_checkert(
     ui_message_handler,
     ui_message_handler.get_ui() == ui_message_handlert::uit::XML_UI);
   solver = solvers.get_solver();
-  solver->prop_conv().set_message_handler(ui_message_handler);
 }
 
 incremental_goto_checkert::resultt multi_path_symex_checkert::

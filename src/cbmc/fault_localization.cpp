@@ -247,8 +247,6 @@ fault_localizationt::run_decision_procedure(prop_convt &prop_conv)
   status() << "Passing problem to "
                << prop_conv.decision_procedure_text() << eom;
 
-  prop_conv.set_message_handler(bmc.get_message_handler());
-
   auto solver_start=std::chrono::steady_clock::now();
 
   convert_symex_target_equation(

@@ -189,8 +189,6 @@ bool bmc_covert::operator()()
 {
   status() << "Passing problem to " << solver.decision_procedure_text() << eom;
 
-  solver.set_message_handler(get_message_handler());
-
   auto solver_start=std::chrono::steady_clock::now();
 
   // Collect _all_ goals in `goal_map'.
