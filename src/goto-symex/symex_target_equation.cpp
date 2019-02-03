@@ -318,6 +318,19 @@ void symex_target_equationt::constraint(
   merge_ireps(SSA_step);
 }
 
+void symex_target_equationt::convert_without_assertions(
+  decision_proceduret &decision_procedure)
+{
+  convert_guards(decision_procedure);
+  convert_assignments(decision_procedure);
+  convert_decls(decision_procedure);
+  convert_assumptions(decision_procedure);
+  convert_goto_instructions(decision_procedure);
+  convert_function_calls(decision_procedure);
+  convert_io(decision_procedure);
+  convert_constraints(decision_procedure);
+}
+
 void symex_target_equationt::convert(decision_proceduret &decision_procedure)
 {
   convert_guards(decision_procedure);
