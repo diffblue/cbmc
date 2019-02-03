@@ -177,6 +177,15 @@ public:
   /// \param decision_procedure: A handle to a decision procedure interface
   void convert(decision_proceduret &decision_procedure);
 
+  /// Interface method to initiate the conversion into a decision procedure
+  /// format. The method iterates over the equation, i.e. over the SSA steps and
+  /// converts each type of step separately, except assertions.
+  /// This enables the caller to handle assertion conversion differently,
+  /// e.g. for incremental solving.
+  /// \param decision_procedure: A handle to a particular decision procedure
+  ///   interface
+  void convert_without_assertions(decision_proceduret &decision_procedure);
+
   /// Converts assignments: set the equality _lhs==rhs_ to _True_.
   /// \param decision_procedure: A handle to a decision procedure
   ///  interface
