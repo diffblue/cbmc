@@ -73,6 +73,66 @@ make_string(const std::vector<mp_integer> &array, const array_typet &array_type)
   return make_string(array.begin(), array.end(), array_type);
 }
 
+<<<<<<< HEAD
+=======
+std::vector<mp_integer> string_concatenation_builtin_functiont::eval(
+  const std::vector<mp_integer> &input1_value,
+  const std::vector<mp_integer> &input2_value,
+  const std::vector<mp_integer> &args_value) const
+{
+  const auto start_index =
+    args_value.size() > 0 && args_value[0] > 0 ? args_value[0] : mp_integer(0);
+  const mp_integer input2_size(input2_value.size());
+  const auto end_index =
+    args_value.size() > 1
+      ? std::max(std::min(args_value[1], input2_size), start_index)
+      : input2_size;
+
+  std::vector<mp_integer> eval_result(input1_value);
+  eval_result.insert(
+    eval_result.end(),
+    input2_value.begin() + numeric_cast_v<std::size_t>(start_index),
+    input2_value.begin() + numeric_cast_v<std::size_t>(end_index));
+  return eval_result;
+}
+
+string_constraintst string_concatenation_builtin_functiont::constraints(
+  string_constraint_generatort &generator,
+  message_handlert &message_handler) const
+
+{
+  auto pair = [&]() -> std::pair<exprt, string_constraintst> {
+    if(args.size() == 0)
+      return add_axioms_for_concat(
+        generator.fresh_symbol, result, input1, input2, message_handler);
+    if(args.size() == 2)
+    {
+      return add_axioms_for_concat_substr(
+        generator.fresh_symbol,
+        result,
+        input1,
+        input2,
+        args[0],
+        args[1],
+        message_handler);
+    }
+    UNREACHABLE;
+  }();
+  pair.second.existential.push_back(equal_exprt(pair.first, return_code));
+  return pair.second;
+}
+
+exprt string_concatenation_builtin_functiont::length_constraint() const
+{
+  if(args.size() == 0)
+    return length_constraint_for_concat(result, input1, input2);
+  if(args.size() == 2)
+    return length_constraint_for_concat_substr(
+      result, input1, input2, args[0], args[1]);
+  UNREACHABLE;
+}
+
+>>>>>>> Require a message handler when constructing a propt
 optionalt<exprt> string_concat_char_builtin_functiont::eval(
   const std::function<exprt(const exprt &)> &get_value) const
 {
@@ -101,7 +161,8 @@ optionalt<exprt> string_concat_char_builtin_functiont::eval(
 ///   * result[input.length] = character
 ///   * return_code = 0
 string_constraintst string_concat_char_builtin_functiont::constraints(
-  string_constraint_generatort &generator) const
+  string_constraint_generatort &generator,
+  message_handlert &message_handler) const
 {
   string_constraintst constraints;
   constraints.existential.push_back(length_constraint());
@@ -111,7 +172,7 @@ string_constraintst string_concat_char_builtin_functiont::constraints(
     const exprt upper_bound =
       zero_if_negative(array_pool.get_or_create_length(input));
     return string_constraintt(
-      idx, upper_bound, equal_exprt(input[idx], result[idx]));
+      idx, upper_bound, equal_exprt(input[idx], result[idx]), message_handler);
   }());
   constraints.existential.push_back(
     equal_exprt(result[array_pool.get_or_create_length(input)], character));
@@ -151,7 +212,8 @@ optionalt<exprt> string_set_char_builtin_functiont::eval(
 ///   3. forall 0 <= i < max(0, min(res.length, pos)). res[i] = str[i]
 ///   4. forall max(0, pos+1) <= i < res.length. res[i] = str[i]
 string_constraintst string_set_char_builtin_functiont::constraints(
-  string_constraint_generatort &generator) const
+  string_constraint_generatort &generator,
+  message_handlert &message_handler) const
 {
   string_constraintst constraints;
   constraints.existential.push_back(length_constraint());
@@ -167,9 +229,15 @@ string_constraintst string_set_char_builtin_functiont::constraints(
     const equal_exprt a3_body(result[q], input[q]);
     return string_constraintt(
       q,
+<<<<<<< HEAD
       zero_if_negative(
         minimum(array_pool.get_or_create_length(result), position)),
       a3_body);
+=======
+      minimum(zero_if_negative(result.length()), position),
+      a3_body,
+      message_handler);
+>>>>>>> Require a message handler when constructing a propt
   }());
   constraints.universal.push_back([&] {
     const symbol_exprt q2 =
@@ -177,9 +245,16 @@ string_constraintst string_set_char_builtin_functiont::constraints(
     const equal_exprt a4_body(result[q2], input[q2]);
     return string_constraintt(
       q2,
+<<<<<<< HEAD
       zero_if_negative(plus_exprt(position, from_integer(1, position.type()))),
       zero_if_negative(array_pool.get_or_create_length(result)),
       a4_body);
+=======
+      lower_bound,
+      zero_if_negative(result.length()),
+      a4_body,
+      message_handler);
+>>>>>>> Require a message handler when constructing a propt
   }());
   return constraints;
 }
@@ -279,7 +354,8 @@ static exprt is_lower_case(const exprt &character)
 /// characters: `diff = 'a'-'A' = 0x20` and `is_upper_case` is true for the
 /// upper case characters of Basic Latin and Latin-1 supplement of unicode.
 string_constraintst string_to_lower_case_builtin_functiont::constraints(
-  string_constraint_generatort &generator) const
+  string_constraint_generatort &generator,
+  message_handlert &message_handler) const
 {
   // \todo for now, only characters in Basic Latin and Latin-1 supplement
   // are supported (up to 0x100), we should add others using case mapping
@@ -301,8 +377,14 @@ string_constraintst string_to_lower_case_builtin_functiont::constraints(
     }();
     return string_constraintt(
       idx,
+<<<<<<< HEAD
       zero_if_negative(array_pool.get_or_create_length(result)),
       conditional_convert);
+=======
+      zero_if_negative(result.length()),
+      conditional_convert,
+      message_handler);
+>>>>>>> Require a message handler when constructing a propt
   }());
   return constraints;
 }
@@ -332,9 +414,11 @@ optionalt<exprt> string_to_upper_case_builtin_functiont::eval(
 ///        is_lower_case(str[i]) ? res[i] = str[i] - 0x20 : res[i] = str[i]
 ///
 /// \param fresh_symbol: generator of fresh symbols
+/// \param message_handler: message handler
 /// \return set of constraints
 string_constraintst string_to_upper_case_builtin_functiont::constraints(
-  symbol_generatort &fresh_symbol) const
+  symbol_generatort &fresh_symbol,
+  message_handlert &message_handler) const
 {
   string_constraintst constraints;
   constraints.existential.push_back(length_constraint());
@@ -349,11 +433,90 @@ string_constraintst string_to_upper_case_builtin_functiont::constraints(
       zero_if_negative(array_pool.get_or_create_length(result)),
       equal_exprt(
         result[idx],
-        if_exprt(is_lower_case(input[idx]), converted, input[idx])));
+        if_exprt(is_lower_case(input[idx]), converted, input[idx])),
+      message_handler);
   }());
   return constraints;
 }
 
+<<<<<<< HEAD
+=======
+std::vector<mp_integer> string_insertion_builtin_functiont::eval(
+  const std::vector<mp_integer> &input1_value,
+  const std::vector<mp_integer> &input2_value,
+  const std::vector<mp_integer> &args_value) const
+{
+  PRECONDITION(args_value.size() >= 1 && args_value.size() <= 3);
+  const auto offset = std::min(
+    std::max(args_value[0], mp_integer(0)), mp_integer(input1_value.size()));
+  const auto start = args_value.size() > 1
+                       ? std::max(args_value[1], mp_integer(0))
+                       : mp_integer(0);
+
+  const mp_integer input2_size(input2_value.size());
+  const auto end =
+    args_value.size() > 2
+      ? std::max(std::min(args_value[2], input2_size), mp_integer(0))
+      : input2_size;
+
+  std::vector<mp_integer> eval_result(input1_value);
+  eval_result.insert(
+    eval_result.begin() + numeric_cast_v<std::size_t>(offset),
+    input2_value.begin() + numeric_cast_v<std::size_t>(start),
+    input2_value.begin() + numeric_cast_v<std::size_t>(end));
+  return eval_result;
+}
+
+optionalt<exprt> string_insertion_builtin_functiont::eval(
+  const std::function<exprt(const exprt &)> &get_value) const
+{
+  const auto &input1_value = eval_string(input1, get_value);
+  const auto &input2_value = eval_string(input2, get_value);
+  if(!input2_value.has_value() || !input1_value.has_value())
+    return {};
+
+  std::vector<mp_integer> arg_values;
+  const auto &insert = std::back_inserter(arg_values);
+  const mp_integer unknown('?');
+  std::transform(
+    args.begin(), args.end(), insert, [&](const exprt &e) { // NOLINT
+      if(const auto val = numeric_cast<mp_integer>(get_value(e)))
+        return *val;
+      return unknown;
+    });
+
+  const auto result_value = eval(*input1_value, *input2_value, arg_values);
+  const auto length = from_integer(result_value.size(), result.length().type());
+  const array_typet type(result.type().subtype(), length);
+  return make_string(result_value, type);
+}
+
+string_constraintst string_insertion_builtin_functiont::constraints(
+  string_constraint_generatort &generator,
+  message_handlert &message_handler) const
+{
+  if(args.size() == 1)
+  {
+    auto pair = add_axioms_for_insert(
+      generator.fresh_symbol, result, input1, input2, args[0], message_handler);
+    pair.second.existential.push_back(equal_exprt(pair.first, return_code));
+    return pair.second;
+  }
+  if(args.size() == 3)
+    UNIMPLEMENTED;
+  UNREACHABLE;
+}
+
+exprt string_insertion_builtin_functiont::length_constraint() const
+{
+  if(args.size() == 1)
+    return length_constraint_for_insert(result, input1, input2);
+  if(args.size() == 3)
+    UNIMPLEMENTED;
+  UNREACHABLE;
+}
+
+>>>>>>> Require a message handler when constructing a propt
 /// Constructor from arguments of a function application.
 /// The arguments in `fun_args` should be in order:
 /// an integer `result.length`, a character pointer `&result[0]`,
@@ -404,7 +567,8 @@ optionalt<exprt> string_of_int_builtin_functiont::eval(
 }
 
 string_constraintst string_of_int_builtin_functiont::constraints(
-  string_constraint_generatort &generator) const
+  string_constraint_generatort &generator,
+  message_handlert &message_handler) const
 {
   auto pair =
     generator.add_axioms_for_string_of_int_with_radix(result, arg, radix, 0);
@@ -473,7 +637,8 @@ string_builtin_function_with_no_evalt::string_builtin_function_with_no_evalt(
 }
 
 string_constraintst string_builtin_function_with_no_evalt::constraints(
-  string_constraint_generatort &generator) const
+  string_constraint_generatort &generator,
+  message_handlert &message_handler) const
 {
   auto pair =
     generator.add_axioms_for_function_application(function_application);

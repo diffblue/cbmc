@@ -41,16 +41,22 @@ public:
     message_handlert &mh,
     guard_managert &guard_manager)
     : constant_propagation(true),
-    message_handler(mh),
+      message_handler(mh),
       symbol_table(_symbol_table),
       symex_symbol_table(),
       ns(symbol_table, symex_symbol_table),
       equation(mh),
       path_storage(),
       options(get_default_options()),
+<<<<<<< HEAD
       symex(mh, symbol_table, equation, options, path_storage, guard_manager),
       satcheck(util_make_unique<satcheckt>(mh)),
       satchecker(ns, *satcheck, mh),
+=======
+      symex(mh, symbol_table, equation, options, path_storage),
+      satcheck(util_make_unique<satcheckt>(mh)),
+      satchecker(ns, *satcheck),
+>>>>>>> Require a message handler when constructing a propt
       z3(ns, "accelerate", "", "", smt2_dect::solvert::Z3),
       checker(&z3) // checker(&satchecker)
   {

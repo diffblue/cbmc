@@ -315,10 +315,16 @@ solver_factoryt::get_string_refinement()
   info.refine_arithmetic = options.get_bool_option("refine-arithmetic");
   info.message_handler = &message_handler;
 
+<<<<<<< HEAD
   auto decision_procedure = util_make_unique<string_refinementt>(info);
   set_decision_procedure_time_limit(*decision_procedure);
   return util_make_unique<solvert>(
     std::move(decision_procedure), std::move(prop));
+=======
+  auto prop_conv = util_make_unique<string_refinementt>(info, message_handler);
+  set_prop_conv_time_limit(*prop_conv);
+  return util_make_unique<solvert>(std::move(prop_conv), std::move(prop));
+>>>>>>> Require a message handler when constructing a propt
 }
 
 std::unique_ptr<solver_factoryt::solvert>

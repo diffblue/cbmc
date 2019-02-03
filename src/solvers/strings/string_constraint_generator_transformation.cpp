@@ -34,10 +34,21 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 /// \todo We can reduce the number of constraints by merging 2 and 3.
 /// \param f: function application with arguments integer `|res|`, character
 ///   pointer `&res[0]`, refined_string `s1`, integer `k`
+<<<<<<< HEAD
 /// \return integer expression equal to `0`
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_set_length(
   const function_application_exprt &f)
+=======
+/// \param array_pool: pool of arrays representing strings
+/// \param message_handler: message handler
+/// \return integer expression equal to `0`
+std::pair<exprt, string_constraintst> add_axioms_for_set_length(
+  symbol_generatort &fresh_symbol,
+  const function_application_exprt &f,
+  array_poolt &array_pool,
+  message_handlert &message_handler)
+>>>>>>> Require a message handler when constructing a propt
 {
   PRECONDITION(f.arguments().size() == 4);
   string_constraintst constraints;
@@ -59,16 +70,29 @@ string_constraint_generatort::add_axioms_for_set_length(
   const symbol_exprt idx = fresh_symbol("QA_index_set_length", index_type);
   const string_constraintt a2(
     idx,
+<<<<<<< HEAD
     zero_if_negative(minimum(array_pool.get_or_create_length(s1), k)),
     equal_exprt(s1[idx], res[idx]));
+=======
+    zero_if_negative(minimum(s1.length(), k)),
+    equal_exprt(s1[idx], res[idx]),
+    message_handler);
+>>>>>>> Require a message handler when constructing a propt
   constraints.universal.push_back(a2);
 
   symbol_exprt idx2 = fresh_symbol("QA_index_set_length2", index_type);
   string_constraintt a3(
     idx2,
+<<<<<<< HEAD
     zero_if_negative(array_pool.get_or_create_length(s1)),
     zero_if_negative(array_pool.get_or_create_length(res)),
     equal_exprt(res[idx2], from_integer(0, char_type)));
+=======
+    zero_if_negative(s1.length()),
+    zero_if_negative(res.length()),
+    equal_exprt(res[idx2], from_integer(0, char_type)),
+    message_handler);
+>>>>>>> Require a message handler when constructing a propt
   constraints.universal.push_back(a3);
 
   return {from_integer(0, get_return_code_type()), std::move(constraints)};
@@ -77,9 +101,15 @@ string_constraint_generatort::add_axioms_for_set_length(
 /// Substring of a string between two indices
 ///
 // NOLINTNEXTLINE
+<<<<<<< HEAD
 /// \copybrief add_axioms_for_substring(const array_string_exprt &res, const array_string_exprt &str, const exprt &start, const exprt &end)
 // NOLINTNEXTLINE
 /// \link string_constraint_generatort::add_axioms_for_substring(const array_string_exprt &res, const array_string_exprt &str, const exprt &start, const exprt &end)
+=======
+/// \copybrief add_axioms_for_substring(symbol_generatort &fresh_symbol, const array_string_exprt &res, const array_string_exprt &str, const exprt &start, const exprt &end, message_handlert &)
+// NOLINTNEXTLINE
+/// \link string_constraint_generatort::add_axioms_for_substring(symbol_generatort &fresh_symbol, const array_string_exprt &res, const array_string_exprt &str, const exprt &start, const exprt &end, message_handlert&)
+>>>>>>> Require a message handler when constructing a propt
 ///   (More...) \endlink
 /// \warning The specification may not be correct for the case where the string
 /// is shorter than the end index
@@ -88,20 +118,38 @@ string_constraint_generatort::add_axioms_for_set_length(
 /// \param f: function application with arguments integer `|res|`, character
 ///   pointer `&res[0]`, refined_string `str`, integer `start`, optional integer
 ///   `end` with default value `|str|`.
+<<<<<<< HEAD
 /// \return integer expression which is different from 0 when there is an
 ///   exception to signal
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_substring(
   const function_application_exprt &f)
+=======
+/// \param array_pool: pool of arrays representing strings
+/// \param message_handler: message handler
+/// \return integer expression which is different from 0 when there is an
+///   exception to signal
+std::pair<exprt, string_constraintst> add_axioms_for_substring(
+  symbol_generatort &fresh_symbol,
+  const function_application_exprt &f,
+  array_poolt &array_pool,
+  message_handlert &message_handler)
+>>>>>>> Require a message handler when constructing a propt
 {
   const function_application_exprt::argumentst &args = f.arguments();
   PRECONDITION(args.size() == 4 || args.size() == 5);
   const array_string_exprt str = get_string_expr(array_pool, args[2]);
   const array_string_exprt res = array_pool.find(args[1], args[0]);
   const exprt &i = args[3];
+<<<<<<< HEAD
   const exprt j =
     args.size() == 5 ? args[4] : array_pool.get_or_create_length(str);
   return add_axioms_for_substring(res, str, i, j);
+=======
+  const exprt j = args.size() == 5 ? args[4] : str.length();
+  return add_axioms_for_substring(
+    fresh_symbol, res, str, i, j, message_handler);
+>>>>>>> Require a message handler when constructing a propt
 }
 
 /// Add axioms ensuring that `res` corresponds to the substring of `str`
@@ -117,13 +165,15 @@ string_constraint_generatort::add_axioms_for_substring(
 /// \param str: array of characters expression
 /// \param start: integer expression
 /// \param end: integer expression
+/// \param message_handler: message handler
 /// \return integer expression equal to zero
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_substring(
   const array_string_exprt &res,
   const array_string_exprt &str,
   const exprt &start,
-  const exprt &end)
+  const exprt &end,
+  message_handlert &message_handler)
 {
   const typet &index_type = str.length_type();
   PRECONDITION(start.type() == index_type);
@@ -143,8 +193,14 @@ string_constraint_generatort::add_axioms_for_substring(
     const symbol_exprt idx = fresh_symbol("QA_index_substring", index_type);
     return string_constraintt(
       idx,
+<<<<<<< HEAD
       zero_if_negative(array_pool.get_or_create_length(res)),
       equal_exprt(res[idx], str[plus_exprt(start1, idx)]));
+=======
+      zero_if_negative(res.length()),
+      equal_exprt(res[idx], str[plus_exprt(start1, idx)]),
+      message_handler);
+>>>>>>> Require a message handler when constructing a propt
   }());
 
   return {from_integer(0, get_return_code_type()), std::move(constraints)};
@@ -174,11 +230,23 @@ string_constraint_generatort::add_axioms_for_substring(
 /// \note Some of the constraints among 1, 2, 3, 4 and 5 seems to be redundant
 /// \param f: function application with arguments integer `|res|`, character
 ///   pointer `&res[0]`, refined_string `str`.
+<<<<<<< HEAD
 /// \return integer expression which is different from 0 when there is an
 ///   exception to signal
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_trim(
   const function_application_exprt &f)
+=======
+/// \param array_pool: pool of arrays representing strings
+/// \param message_handler: message handler
+/// \return integer expression which is different from 0 when there is an
+///   exception to signal
+std::pair<exprt, string_constraintst> add_axioms_for_trim(
+  symbol_generatort &fresh_symbol,
+  const function_application_exprt &f,
+  array_poolt &array_pool,
+  message_handlert &message_handler)
+>>>>>>> Require a message handler when constructing a propt
 {
   PRECONDITION(f.arguments().size() == 3);
   string_constraintst constraints;
@@ -212,7 +280,7 @@ string_constraint_generatort::add_axioms_for_trim(
 
   symbol_exprt n = fresh_symbol("QA_index_trim", index_type);
   binary_relation_exprt non_print(str[n], ID_le, space_char);
-  string_constraintt a6(n, zero_if_negative(idx), non_print);
+  string_constraintt a6(n, zero_if_negative(idx), non_print, message_handler);
   constraints.universal.push_back(a6);
 
   // Axiom 7.
@@ -222,17 +290,27 @@ string_constraint_generatort::add_axioms_for_trim(
       minus_exprt(array_pool.get_or_create_length(str), idx),
       array_pool.get_or_create_length(res));
     const binary_relation_exprt eqn2(
+<<<<<<< HEAD
       str[plus_exprt(
         idx, plus_exprt(array_pool.get_or_create_length(res), n2))],
       ID_le,
       space_char);
     return string_constraintt(n2, zero_if_negative(bound), eqn2);
+=======
+      str[plus_exprt(idx, plus_exprt(res.length(), n2))], ID_le, space_char);
+    return string_constraintt(
+      n2, zero_if_negative(bound), eqn2, message_handler);
+>>>>>>> Require a message handler when constructing a propt
   }());
 
   symbol_exprt n3 = fresh_symbol("QA_index_trim3", index_type);
   equal_exprt eqn3(res[n3], str[plus_exprt(n3, idx)]);
   string_constraintt a8(
+<<<<<<< HEAD
     n3, zero_if_negative(array_pool.get_or_create_length(res)), eqn3);
+=======
+    n3, zero_if_negative(res.length()), eqn3, message_handler);
+>>>>>>> Require a message handler when constructing a propt
   constraints.universal.push_back(a8);
 
   // Axiom 9.
@@ -301,10 +379,21 @@ static optionalt<std::pair<exprt, exprt>> to_char_pair(
 /// \param f: function application with arguments integer `|res|`, character
 ///   pointer `&res[0]`, refined_string `str`, character `old_char` and
 ///   character `new_char`
+<<<<<<< HEAD
 /// \return an integer expression equal to 0
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_replace(
   const function_application_exprt &f)
+=======
+/// \param array_pool: pool of arrays representing strings
+/// \param message_handler: message handler
+/// \return an integer expression equal to 0
+std::pair<exprt, string_constraintst> add_axioms_for_replace(
+  symbol_generatort &fresh_symbol,
+  const function_application_exprt &f,
+  array_poolt &array_pool,
+  message_handlert &message_handler)
+>>>>>>> Require a message handler when constructing a propt
 {
   PRECONDITION(f.arguments().size() == 5);
   string_constraintst constraints;
@@ -332,8 +421,14 @@ string_constraint_generatort::add_axioms_for_replace(
       equal_exprt(res[qvar], str[qvar]));
     string_constraintt a2(
       qvar,
+<<<<<<< HEAD
       zero_if_negative(array_pool.get_or_create_length(res)),
       and_exprt(case1, case2));
+=======
+      zero_if_negative(res.length()),
+      and_exprt(case1, case2),
+      message_handler);
+>>>>>>> Require a message handler when constructing a propt
     constraints.universal.push_back(a2);
     return {from_integer(0, f.type()), std::move(constraints)};
   }
@@ -343,10 +438,21 @@ string_constraint_generatort::add_axioms_for_replace(
 /// add axioms corresponding to the StringBuilder.deleteCharAt java function
 /// \param f: function application with two arguments, the first is a
 ///   string and the second is an index
+<<<<<<< HEAD
 /// \return an expression whose value is non null to signal an exception
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_delete_char_at(
   const function_application_exprt &f)
+=======
+/// \param array_pool: pool of arrays representing strings
+/// \param message_handler: message handler
+/// \return an expression whose value is non null to signal an exception
+std::pair<exprt, string_constraintst> add_axioms_for_delete_char_at(
+  symbol_generatort &fresh_symbol,
+  const function_application_exprt &f,
+  array_poolt &array_pool,
+  message_handlert &message_handler)
+>>>>>>> Require a message handler when constructing a propt
 {
   PRECONDITION(f.arguments().size() == 4);
   const array_string_exprt res =
@@ -354,7 +460,17 @@ string_constraint_generatort::add_axioms_for_delete_char_at(
   const array_string_exprt str = get_string_expr(array_pool, f.arguments()[2]);
   exprt index_one = from_integer(1, str.length_type());
   return add_axioms_for_delete(
+<<<<<<< HEAD
     res, str, f.arguments()[3], plus_exprt(f.arguments()[3], index_one));
+=======
+    fresh_symbol,
+    res,
+    str,
+    f.arguments()[3],
+    plus_exprt(f.arguments()[3], index_one),
+    array_pool,
+    message_handler);
+>>>>>>> Require a message handler when constructing a propt
 }
 
 /// Add axioms stating that `res` corresponds to the input `str`
@@ -370,13 +486,24 @@ string_constraint_generatort::add_axioms_for_delete_char_at(
 /// \param str: array of characters expression
 /// \param start: integer expression
 /// \param end: integer expression
+<<<<<<< HEAD
+=======
+/// \param array_pool: pool of arrays representing strings
+/// \param message_handler: message handler
+>>>>>>> Require a message handler when constructing a propt
 /// \return integer expression different from zero to signal an exception
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_delete(
   const array_string_exprt &res,
   const array_string_exprt &str,
   const exprt &start,
+<<<<<<< HEAD
   const exprt &end)
+=======
+  const exprt &end,
+  array_poolt &array_pool,
+  message_handlert &message_handler)
+>>>>>>> Require a message handler when constructing a propt
 {
   PRECONDITION(start.type() == str.length_type());
   PRECONDITION(end.type() == str.length_type());
@@ -388,31 +515,73 @@ string_constraint_generatort::add_axioms_for_delete(
     array_pool.fresh_string(index_type, char_type);
   return combine_results(
     add_axioms_for_substring(
+<<<<<<< HEAD
       sub1, str, from_integer(0, str.length_type()), start),
     combine_results(
       add_axioms_for_substring(
         sub2, str, end, array_pool.get_or_create_length(str)),
       add_axioms_for_concat(res, sub1, sub2)));
+=======
+      fresh_symbol,
+      sub1,
+      str,
+      from_integer(0, str.length().type()),
+      start,
+      message_handler),
+    combine_results(
+      add_axioms_for_substring(
+        fresh_symbol, sub2, str, end, str.length(), message_handler),
+      add_axioms_for_concat(fresh_symbol, res, sub1, sub2, message_handler)));
+>>>>>>> Require a message handler when constructing a propt
 }
 
 /// Remove a portion of a string
 ///
 // NOLINTNEXTLINE
+<<<<<<< HEAD
 /// \copybrief add_axioms_for_delete(const array_string_exprt &res, const array_string_exprt &str, const exprt &start, const exprt &end)
 // NOLINTNEXTLINE
 /// \link add_axioms_for_delete(const array_string_exprt &res, const array_string_exprt &str, const exprt &start, const exprt &end)
+=======
+/// \copybrief add_axioms_for_delete(symbol_generatort &fresh_symbol, const array_string_exprt &res, const array_string_exprt &str, const exprt &start, const exprt &end, array_poolt &array_pool, message_handlert &message_handler)
+// NOLINTNEXTLINE
+/// \link add_axioms_for_delete(symbol_generatort &fresh_symbol,const array_string_exprt &res, const array_string_exprt &str, const exprt &start, const exprt &end, array_poolt &array_pool, message_handlert &message_handler)
+>>>>>>> Require a message handler when constructing a propt
 ///   (More...) \endlink
 /// \param f: function application with arguments integer `|res|`, character
 ///   pointer `&res[0]`, refined_string `str`, integer `start` and integer `end`
+<<<<<<< HEAD
 /// \return an integer expression whose value is different from 0 to signal
 ///   an exception
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_delete(
   const function_application_exprt &f)
+=======
+/// \param array_pool: pool of arrays representing strings
+/// \param message_handler: message handler
+/// \return an integer expression whose value is different from 0 to signal
+///   an exception
+std::pair<exprt, string_constraintst> add_axioms_for_delete(
+  symbol_generatort &fresh_symbol,
+  const function_application_exprt &f,
+  array_poolt &array_pool,
+  message_handlert &message_handler)
+>>>>>>> Require a message handler when constructing a propt
 {
   PRECONDITION(f.arguments().size() == 5);
   const array_string_exprt res =
     array_pool.find(f.arguments()[1], f.arguments()[0]);
   const array_string_exprt arg = get_string_expr(array_pool, f.arguments()[2]);
+<<<<<<< HEAD
   return add_axioms_for_delete(res, arg, f.arguments()[3], f.arguments()[4]);
+=======
+  return add_axioms_for_delete(
+    fresh_symbol,
+    res,
+    arg,
+    f.arguments()[3],
+    f.arguments()[4],
+    array_pool,
+    message_handler);
+>>>>>>> Require a message handler when constructing a propt
 }

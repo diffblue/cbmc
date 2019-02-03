@@ -98,12 +98,18 @@ public:
 
   /// Add constraints ensuring that the value of result expression of the
   /// builtin function corresponds to the value of the function call.
+<<<<<<< HEAD
   /// The constraints are only added when deemed necessary, i.e. when
   /// maybe_testing_function() returns true, or when testing function depends on
   /// the result of this function.
   /// This logic is implemented in add_constraints().
   virtual string_constraintst
   constraints(string_constraint_generatort &constraint_generator) const = 0;
+=======
+  virtual string_constraintst constraints(
+    string_constraint_generatort &constraint_generator,
+    message_handlert &message_handler) const = 0;
+>>>>>>> Require a message handler when constructing a propt
 
   /// Constraint ensuring that the length of the strings are coherent with
   /// the function call.
@@ -199,8 +205,9 @@ public:
     return "concat_char";
   }
 
-  string_constraintst
-  constraints(string_constraint_generatort &generator) const override;
+  string_constraintst constraints(
+    string_constraint_generatort &generator,
+    message_handlert &message_handler) const override;
 
   exprt length_constraint() const override;
 };
@@ -236,8 +243,9 @@ public:
     return "set_char";
   }
 
-  string_constraintst
-  constraints(string_constraint_generatort &generator) const override;
+  string_constraintst constraints(
+    string_constraint_generatort &generator,
+    message_handlert &message_handler) const override;
 
   // \todo: length_constraint is not the best possible name because we also
   // \todo: add constraint about the return code
@@ -266,8 +274,9 @@ public:
     return "to_lower_case";
   }
 
-  string_constraintst
-  constraints(string_constraint_generatort &generator) const override;
+  string_constraintst constraints(
+    string_constraint_generatort &generator,
+    message_handlert &message_handler) const override;
 
   exprt length_constraint() const override
   {
@@ -314,12 +323,15 @@ public:
     return "to_upper_case";
   }
 
-  string_constraintst constraints(class symbol_generatort &fresh_symbol) const;
+  string_constraintst constraints(
+    class symbol_generatort &fresh_symbol,
+    message_handlert &message_handler) const;
 
-  string_constraintst
-  constraints(string_constraint_generatort &generator) const override
+  string_constraintst constraints(
+    string_constraint_generatort &generator,
+    message_handlert &message_handler) const override
   {
-    return constraints(generator.fresh_symbol);
+    return constraints(generator.fresh_symbol, message_handler);
   };
 
   exprt length_constraint() const override
@@ -332,6 +344,102 @@ public:
   };
 };
 
+<<<<<<< HEAD
+=======
+/// String inserting a string into another one
+class string_insertion_builtin_functiont : public string_builtin_functiont
+{
+public:
+  array_string_exprt result;
+  array_string_exprt input1;
+  array_string_exprt input2;
+  std::vector<exprt> args;
+
+  /// Constructor from arguments of a function application.
+  /// The arguments in `fun_args` should be in order:
+  /// an integer `result.length`, a character pointer `&result[0]`,
+  /// a string `arg1` of type refined_string_typet,
+  /// a string `arg2` of type refined_string_typet,
+  /// and potentially some arguments of primitive types.
+  string_insertion_builtin_functiont(
+    const exprt &return_code,
+    const std::vector<exprt> &fun_args,
+    array_poolt &array_pool);
+
+  optionalt<array_string_exprt> string_result() const override
+  {
+    return result;
+  }
+  std::vector<array_string_exprt> string_arguments() const override
+  {
+    return {input1, input2};
+  }
+
+  /// Evaluate the result from a concrete valuation of the arguments
+  virtual std::vector<mp_integer> eval(
+    const std::vector<mp_integer> &input1_value,
+    const std::vector<mp_integer> &input2_value,
+    const std::vector<mp_integer> &args_value) const;
+
+  optionalt<exprt>
+  eval(const std::function<exprt(const exprt &)> &get_value) const override;
+
+  std::string name() const override
+  {
+    return "insert";
+  }
+
+  string_constraintst constraints(
+    string_constraint_generatort &generator,
+    message_handlert &message_handler) const override;
+
+  exprt length_constraint() const override;
+
+  bool maybe_testing_function() const override
+  {
+    return false;
+  }
+
+protected:
+  explicit string_insertion_builtin_functiont(const exprt &return_code)
+    : string_builtin_functiont(return_code)
+  {
+  }
+};
+
+class string_concatenation_builtin_functiont final
+  : public string_insertion_builtin_functiont
+{
+public:
+  /// Constructor from arguments of a function application.
+  /// The arguments in `fun_args` should be in order:
+  /// an integer `result.length`, a character pointer `&result[0]`,
+  /// a string `arg1` of type refined_string_typet,
+  /// a string `arg2` of type refined_string_typet,
+  /// optionally followed by an integer `start` and an integer `end`.
+  string_concatenation_builtin_functiont(
+    const exprt &return_code,
+    const std::vector<exprt> &fun_args,
+    array_poolt &array_pool);
+
+  std::vector<mp_integer> eval(
+    const std::vector<mp_integer> &input1_value,
+    const std::vector<mp_integer> &input2_value,
+    const std::vector<mp_integer> &args_value) const override;
+
+  std::string name() const override
+  {
+    return "concat";
+  }
+
+  string_constraintst constraints(
+    string_constraint_generatort &generator,
+    message_handlert &message_handler) const override;
+
+  exprt length_constraint() const override;
+};
+
+>>>>>>> Require a message handler when constructing a propt
 /// String creation from other types
 class string_creation_builtin_functiont : public string_builtin_functiont
 {
@@ -380,8 +488,9 @@ public:
     return "string_of_int";
   }
 
-  string_constraintst
-  constraints(string_constraint_generatort &generator) const override;
+  string_constraintst constraints(
+    string_constraint_generatort &generator,
+    message_handlert &message_handler) const override;
 
   exprt length_constraint() const override;
 
@@ -440,8 +549,9 @@ public:
     return {};
   }
 
-  string_constraintst
-  constraints(string_constraint_generatort &generator) const override;
+  string_constraintst constraints(
+    string_constraint_generatort &generator,
+    message_handlert &message_handler) const override;
 
   exprt length_constraint() const override
   {

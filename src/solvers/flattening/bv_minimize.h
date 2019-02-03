@@ -50,9 +50,13 @@ public:
   }
 
   bv_minimizing_dect(const namespacet &_ns, message_handlert &message_handler)
+<<<<<<< HEAD
     : bv_pointerst(_ns, satcheck, message_handler),
       satcheck(message_handler),
       log(message_handler)
+=======
+    : bv_pointerst(_ns, satcheck), satcheck(message_handler)
+>>>>>>> Require a message handler when constructing a propt
   {
   }
 

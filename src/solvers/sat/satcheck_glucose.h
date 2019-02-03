@@ -83,7 +83,11 @@ class satcheck_glucose_no_simplifiert:
 {
 public:
   explicit satcheck_glucose_no_simplifiert(message_handlert &message_handler);
+<<<<<<< HEAD
   const std::string solver_text() override;
+=======
+  virtual const std::string solver_text();
+>>>>>>> Require a message handler when constructing a propt
 };
 
 class satcheck_glucose_simplifiert:
@@ -91,8 +95,13 @@ class satcheck_glucose_simplifiert:
 {
 public:
   explicit satcheck_glucose_simplifiert(message_handlert &message_handler);
+<<<<<<< HEAD
   const std::string solver_text() override;
   void set_frozen(literalt a) override;
+=======
+  virtual const std::string solver_text();
+  virtual void set_frozen(literalt a);
+>>>>>>> Require a message handler when constructing a propt
   bool is_eliminated(literalt a) const;
 };
 

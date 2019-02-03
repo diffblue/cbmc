@@ -153,16 +153,21 @@ static bool validate(const string_refinementt::infot &info)
   return true;
 }
 
-string_refinementt::string_refinementt(const infot &info, bool)
+string_refinementt::string_refinementt(
+  const infot &info,
+  bool,
+  message_handlert &message_handler)
   : supert(info),
     config_(info),
     loop_bound_(info.refinement_bound),
-    generator(*info.ns)
+    generator(*info.ns, message_handler)
 {
 }
 
-string_refinementt::string_refinementt(const infot &info)
-  : string_refinementt(info, validate(info))
+string_refinementt::string_refinementt(
+  const infot &info,
+  message_handlert &message_handler)
+  : string_refinementt(info, validate(info), message_handler)
 {
 }
 
@@ -702,8 +707,13 @@ decision_proceduret::resultt string_refinementt::dec_solve()
   dependencies.output_dot(log.debug());
 #endif
 
+<<<<<<< HEAD
   log.debug() << "dec_solve: add constraints" << messaget::eom;
   merge(constraints, dependencies.add_constraints(generator));
+=======
+  debug() << "dec_solve: add constraints" << eom;
+  dependencies.add_constraints(generator, get_message_handler());
+>>>>>>> Require a message handler when constructing a propt
 
 #ifdef DEBUG
   output_equations(log.debug(), equations);
@@ -1385,7 +1395,8 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
       axiom.univ_var,
       get(axiom.lower_bound),
       get(axiom.upper_bound),
-      get(axiom.body));
+      get(axiom.body),
+      stream.message.get_message_handler());
 
     exprt negaxiom = axiom_in_model.negation();
     negaxiom = simplify_expr(negaxiom, ns);
@@ -1907,7 +1918,11 @@ static optionalt<exprt> find_counter_example(
   message_handlert &message_handler)
 {
   satcheck_no_simplifiert sat_check(message_handler);
+<<<<<<< HEAD
   boolbvt solver(ns, sat_check, message_handler);
+=======
+  boolbvt solver(ns, sat_check);
+>>>>>>> Require a message handler when constructing a propt
   solver << axiom;
 
   if(solver() == decision_proceduret::resultt::D_SATISFIABLE)

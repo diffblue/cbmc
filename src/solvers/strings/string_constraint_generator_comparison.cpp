@@ -26,10 +26,21 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 ///          \lor (0 \le witness<|s_1| \land s_1[witness] \ne s_2[witness]) \f$
 /// \param f: function application with arguments refined_string `s1` and
 ///   refined_string `s2`
+<<<<<<< HEAD
 /// \return Boolean expression `eq`
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_equals(
   const function_application_exprt &f)
+=======
+/// \param pool: pool of arrays representing strings
+/// \param message_handler: message handler
+/// \return Boolean expression `eq`
+std::pair<exprt, string_constraintst> add_axioms_for_equals(
+  symbol_generatort &fresh_symbol,
+  const function_application_exprt &f,
+  array_poolt &pool,
+  message_handlert &message_handler)
+>>>>>>> Require a message handler when constructing a propt
 {
   PRECONDITION(f.type() == bool_typet() || f.type().id() == ID_c_bool);
   PRECONDITION(f.arguments().size() == 2);
@@ -54,8 +65,14 @@ string_constraint_generatort::add_axioms_for_equals(
     const symbol_exprt qvar = fresh_symbol("QA_equal", index_type);
     return string_constraintt(
       qvar,
+<<<<<<< HEAD
       zero_if_negative(array_pool.get_or_create_length(s1)),
       implies_exprt(eq, equal_exprt(s1[qvar], s2[qvar])));
+=======
+      zero_if_negative(s1.length()),
+      implies_exprt(eq, equal_exprt(s1[qvar], s2[qvar])),
+      message_handler);
+>>>>>>> Require a message handler when constructing a propt
   }());
 
   // Axiom 3.
@@ -130,10 +147,21 @@ static exprt character_equals_ignore_case(
 ///          \land\lnot {\tt equal\_ignore\_case}(s_1[witness],s_2[witness]) \f$
 /// \param f: function application with arguments refined_string `s1` and
 ///   refined_string `s2`
+<<<<<<< HEAD
 /// \return Boolean expression `eq`
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_equals_ignore_case(
   const function_application_exprt &f)
+=======
+/// \param pool: pool of arrays representing strings
+/// \param message_handler: message handler
+/// \return Boolean expression `eq`
+std::pair<exprt, string_constraintst> add_axioms_for_equals_ignore_case(
+  symbol_generatort &fresh_symbol,
+  const function_application_exprt &f,
+  array_poolt &pool,
+  message_handlert &message_handler)
+>>>>>>> Require a message handler when constructing a propt
 {
   PRECONDITION(f.type() == bool_typet() || f.type().id() == ID_c_bool);
   PRECONDITION(f.arguments().size() == 2);
@@ -159,8 +187,14 @@ string_constraint_generatort::add_axioms_for_equals_ignore_case(
     character_equals_ignore_case(s1[qvar], s2[qvar], char_a, char_A, char_Z);
   const string_constraintt a2(
     qvar,
+<<<<<<< HEAD
     zero_if_negative(array_pool.get_or_create_length(s1)),
     implies_exprt(eq, constr2));
+=======
+    zero_if_negative(s1.length()),
+    implies_exprt(eq, constr2),
+    message_handler);
+>>>>>>> Require a message handler when constructing a propt
   constraints.universal.push_back(a2);
 
   const symbol_exprt witness =
@@ -202,10 +236,21 @@ string_constraint_generatort::add_axioms_for_equals_ignore_case(
 ///   * \f$ \forall i'<x. res\ne 0 \Rightarrow s1[i]=s2[i] \f$
 /// \param f: function application with arguments refined_string `s1` and
 ///   refined_string `s2`
+<<<<<<< HEAD
 /// \return integer expression `res`
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_compare_to(
   const function_application_exprt &f)
+=======
+/// \param pool: pool of arrays representing strings
+/// \param message_handler: message handler
+/// \return integer expression `res`
+std::pair<exprt, string_constraintst> add_axioms_for_compare_to(
+  symbol_generatort &fresh_symbol,
+  const function_application_exprt &f,
+  array_poolt &pool,
+  message_handlert &message_handler)
+>>>>>>> Require a message handler when constructing a propt
 {
   PRECONDITION(f.arguments().size() == 2);
   const typet &return_type = f.type();
@@ -227,8 +272,14 @@ string_constraint_generatort::add_axioms_for_compare_to(
   const symbol_exprt i = fresh_symbol("QA_compare_to", index_type);
   const string_constraintt a2(
     i,
+<<<<<<< HEAD
     zero_if_negative(array_pool.get_or_create_length(s1)),
     implies_exprt(res_null, equal_exprt(s1[i], s2[i])));
+=======
+    zero_if_negative(s1.length()),
+    implies_exprt(res_null, equal_exprt(s1[i], s2[i])),
+    message_handler);
+>>>>>>> Require a message handler when constructing a propt
   constraints.universal.push_back(a2);
 
   const symbol_exprt x = fresh_symbol("index_compare_to", index_type);
@@ -277,7 +328,8 @@ string_constraint_generatort::add_axioms_for_compare_to(
   const string_constraintt a4(
     i2,
     zero_if_negative(x),
-    implies_exprt(not_exprt(res_null), equal_exprt(s1[i2], s2[i2])));
+    implies_exprt(not_exprt(res_null), equal_exprt(s1[i2], s2[i2])),
+    message_handler);
   constraints.universal.push_back(a4);
 
   return {res, std::move(constraints)};

@@ -330,7 +330,10 @@ void satcheck_minisat2_baset<T>::set_assumptions(const bvt &bv)
     {
       assumptions.push_back(assumption);
     }
+<<<<<<< HEAD
   }
+=======
+>>>>>>> Require a message handler when constructing a propt
 }
 
 satcheck_minisat_no_simplifiert::satcheck_minisat_no_simplifiert(
