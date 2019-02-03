@@ -26,10 +26,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "taint_parser.h"
 
-class taint_analysist:public messaget
+class taint_analysist
 {
 public:
-  taint_analysist()
+  explicit taint_analysist(message_handlert &message_handler)
+    : log(message_handler)
   {
   }
 
@@ -41,6 +42,7 @@ public:
     const std::string &json_file_name);
 
 protected:
+  messaget log;
   taint_parse_treet taint;
   class_hierarchyt class_hierarchy;
 
@@ -117,7 +119,8 @@ void taint_analysist::instrument(
 
             if(match)
             {
-              debug() << "MATCH " << rule.id << " on " << identifier << eom;
+              log.debug() << "MATCH " << rule.id << " on " << identifier
+                          << messaget::eom;
 
               exprt where=nil_exprt();
 
@@ -236,22 +239,24 @@ bool taint_analysist::operator()(
     json_arrayt json_result;
     bool use_json=!json_file_name.empty();
 
-    status() << "Reading taint file `" << taint_file_name
-             << "'" << eom;
+    log.status() << "Reading taint file `" << taint_file_name << "'"
+                 << messaget::eom;
 
-    if(taint_parser(taint_file_name, taint, get_message_handler()))
+    if(taint_parser(taint_file_name, taint, log.get_message_handler()))
     {
-      error() << "Failed to read taint definition file" << eom;
+      log.error() << "Failed to read taint definition file" << messaget::eom;
       return true;
     }
 
-    status() << "Got " << taint.rules.size()
-             << " taint definitions" << eom;
+    log.status() << "Got " << taint.rules.size() << " taint definitions"
+                 << messaget::eom;
 
-    taint.output(debug());
-    debug() << eom;
+    log.conditional_output(log.debug(), [this](messaget::mstreamt &mstream) {
+      taint.output(mstream);
+      mstream << messaget::eom;
+    });
 
-    status() << "Instrumenting taint" << eom;
+    log.status() << "Instrumenting taint" << messaget::eom;
 
     class_hierarchy(symbol_table);
 
@@ -266,13 +271,13 @@ bool taint_analysist::operator()(
     // do we have an entry point?
     if(have_entry_point)
     {
-      status() << "Working from entry point" << eom;
+      log.status() << "Working from entry point" << messaget::eom;
     }
     else
     {
-      status() << "No entry point found; "
-               << "we will consider the heads of all functions as reachable"
-               << eom;
+      log.status() << "No entry point found; "
+                   << "we will consider the heads of all functions as reachable"
+                   << messaget::eom;
 
       goto_programt end, gotos, calls;
 
@@ -304,7 +309,7 @@ bool taint_analysist::operator()(
       goto_functions.update();
     }
 
-    status() << "Data-flow analysis" << eom;
+    log.status() << "Data-flow analysis" << messaget::eom;
 
     custom_bitvector_analysist custom_bitvector_analysis;
     custom_bitvector_analysis(goto_functions, ns);
@@ -385,13 +390,13 @@ bool taint_analysist::operator()(
 
       if(!json_out)
       {
-        error() << "Failed to open json output `"
-                << json_file_name << "'" << eom;
+        log.error() << "Failed to open json output `" << json_file_name << "'"
+                    << messaget::eom;
         return true;
       }
 
-      status() << "Analysis result is written to `"
-               << json_file_name << "'" << eom;
+      log.status() << "Analysis result is written to `" << json_file_name << "'"
+                   << messaget::eom;
 
       json_out << json_result << '\n';
     }
@@ -400,17 +405,18 @@ bool taint_analysist::operator()(
   }
   catch(const char *error_msg)
   {
-    error() << error_msg << eom;
+    log.error() << error_msg << messaget::eom;
     return true;
   }
   catch(const std::string &error_msg)
   {
-    error() << error_msg << eom;
+    log.error() << error_msg << messaget::eom;
     return true;
   }
   catch(...)
   {
-    error() << "Caught unexpected error in taint_analysist::operator()" << eom;
+    log.error() << "Caught unexpected error in taint_analysist::operator()"
+                << messaget::eom;
     return true;
   }
 }
@@ -422,8 +428,7 @@ bool taint_analysis(
   bool show_full,
   const std::string &json_file_name)
 {
-  taint_analysist taint_analysis;
-  taint_analysis.set_message_handler(message_handler);
+  taint_analysist taint_analysis(message_handler);
   return taint_analysis(
     taint_file_name,
     goto_model.symbol_table,
