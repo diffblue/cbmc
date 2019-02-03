@@ -29,7 +29,6 @@ Date: June 2006
 #include <util/unicode.h>
 #include <util/version.h>
 
-#include <ansi-c/ansi_c_language.h>
 #include <ansi-c/ansi_c_entry_point.h>
 
 #include <goto-programs/goto_convert.h>
@@ -417,21 +416,6 @@ bool compilet::parse(
   const std::string &file_name,
   language_filest &language_files)
 {
-  if(file_name=="-")
-    return parse_stdin();
-
-  #ifdef _MSC_VER
-  std::ifstream infile(widen(file_name));
-  #else
-  std::ifstream infile(file_name);
-  #endif
-
-  if(!infile)
-  {
-    error() << "failed to open input file `" << file_name << "'" << eom;
-    return true;
-  }
-
   std::unique_ptr<languaget> languagep;
 
   // Using '-x', the type of a file can be overridden;
@@ -444,7 +428,7 @@ bool compilet::parse(
     else
       languagep = get_language_from_mode(ID_C);
   }
-  else
+  else if(file_name != "-")
     languagep=get_language_from_filename(file_name);
 
   if(languagep==nullptr)
@@ -454,6 +438,21 @@ bool compilet::parse(
   }
 
   languagep->set_message_handler(get_message_handler());
+
+  if(file_name == "-")
+    return parse_stdin(*languagep);
+
+#ifdef _MSC_VER
+  std::ifstream infile(widen(file_name));
+#else
+  std::ifstream infile(file_name);
+#endif
+
+  if(!infile)
+  {
+    error() << "failed to open input file `" << file_name << "'" << eom;
+    return true;
+  }
 
   language_filet &lf=language_files.add_file(file_name);
   lf.language=std::move(languagep);
@@ -496,13 +495,10 @@ bool compilet::parse(
 }
 
 /// parses a source file (low-level parsing)
+/// \param language: source language processor
 /// \return true on error, false otherwise
-bool compilet::parse_stdin()
+bool compilet::parse_stdin(languaget &language)
 {
-  ansi_c_languaget language;
-
-  language.set_message_handler(get_message_handler());
-
   statistics() << "Parsing: (stdin)" << eom;
 
   if(mode==PREPROCESS_ONLY)

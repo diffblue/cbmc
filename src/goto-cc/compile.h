@@ -21,6 +21,7 @@ Date: June 2006
 #include <goto-programs/goto_model.h>
 
 class language_filest;
+class languaget;
 
 class compilet : public messaget
 {
@@ -64,7 +65,7 @@ public:
   bool add_files_from_archive(const std::string &file_name, bool thin_archive);
 
   bool parse(const std::string &filename, language_filest &);
-  bool parse_stdin();
+  bool parse_stdin(languaget &);
   bool doit();
   bool compile();
   bool link();
