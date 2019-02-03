@@ -679,6 +679,7 @@ configt::ansi_ct::c_standardt configt::ansi_ct::default_c_standard()
   return c_standardt::C11;
   #elif defined(__FreeBSD__) || defined(__OpenBSD__)
   // By default, clang on FreeBSD builds C code in GNU C99
+  // By default, clang on OpenBSD builds C code in C99
   return c_standardt::C99;
   #else
   // By default, gcc 5.4 or higher use gnu11; older versions use gnu89
