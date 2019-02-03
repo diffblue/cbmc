@@ -2,14 +2,18 @@
 /* FUNCTION: putchar */
 
 #ifndef __CPROVER_STDIO_H_INCLUDED
-# if !defined(__OpenBSD__)
 #include <stdio.h>
-# else
-// on OpenBSD, there are some definitions that the checker does not like.
-#include <stdio_openbsd_compat.h>
-# endif
-
 #define __CPROVER_STDIO_H_INCLUDED
+#endif
+
+/* undefine macros in OpenBSD's stdio.h that are problematic to the checker. */
+#if defined(__OpenBSD__)
+#undef getchar
+#undef putchar
+#undef getc
+#undef feof
+#undef ferror
+#undef fileno
 #endif
 
 __CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
