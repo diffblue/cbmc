@@ -113,7 +113,7 @@ SCENARIO("byte_extract_lowering", "[core][solvers][lowering][byte_extract]")
                     {"pad", c_bit_field_typet(u8, 4)},
                     {"comp2", u8}}),
 #endif
-      // union_typet({{"compA", u32}, {"compB", u64}}),
+      union_typet({{"compA", u32}, {"compB", u64}}),
       c_enum_typet(u16),
       c_enum_typet(unsignedbv_typet(128)),
       array_typet(u8, size),
