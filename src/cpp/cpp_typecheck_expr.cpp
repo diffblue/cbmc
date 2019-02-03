@@ -16,7 +16,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #endif
 
 #include <util/arith_tools.h>
-#include <util/base_type.h>
 #include <util/c_types.h>
 #include <util/config.h>
 #include <util/expr_initializer.h>
@@ -2373,9 +2372,9 @@ void cpp_typecheckt::typecheck_method_application(
     if(expr.arguments().size()==func_type.parameters().size())
     {
       // this might be set up for base-class initialisation
-      if(!base_type_eq(expr.arguments().front().type(),
-                      func_type.parameters().front().type(),
-                      *this))
+      if(
+        expr.arguments().front().type() !=
+        func_type.parameters().front().type())
       {
         implicit_typecast(expr.arguments().front(), this_type);
         assert(is_reference(expr.arguments().front().type()));

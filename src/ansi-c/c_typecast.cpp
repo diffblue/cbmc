@@ -13,7 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 
 #include <util/arith_tools.h>
-#include <util/base_type.h>
 #include <util/c_types.h>
 #include <util/config.h>
 #include <util/expr_util.h>
@@ -551,7 +550,7 @@ void c_typecastt::implicit_typecast_followed(
         // very generous:
         // between any two function pointers it's ok
       }
-      else if(base_type_eq(src_sub, dest_sub, ns))
+      else if(src_sub == dest_sub)
       {
         // ok
       }
@@ -565,9 +564,9 @@ void c_typecastt::implicit_typecast_followed(
         // Also generous: between any to scalar types it's ok.
         // We should probably check the size.
       }
-      else if(src_sub.id()==ID_array &&
-              dest_sub.id()==ID_array &&
-              base_type_eq(src_sub.subtype(), dest_sub.subtype(), ns))
+      else if(
+        src_sub.id() == ID_array && dest_sub.id() == ID_array &&
+        src_sub.subtype() == dest_sub.subtype())
       {
         // we ignore the size of the top-level array
         // in the case of pointers to arrays
