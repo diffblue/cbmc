@@ -18,13 +18,101 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "flatten_byte_extract_exceptions.h"
 
-// clang-format off
+static exprt unpack_rec(
+  const exprt &src,
+  bool little_endian,
+  const exprt &max_bytes,
+  const namespacet &ns,
+  bool unpack_byte_array = false);
 
-/// rewrite an object into its individual bytes
-/// \par parameters: src  object to unpack
-/// little_endian  true, iff assumed endianness is little-endian
-/// max_bytes  if not nil, use as upper bound of the number of bytes to unpack
-/// ns  namespace for type lookups
+/// Rewrite an array or vector into its individual bytes.
+/// \param src: array/vector to unpack
+/// \param src_size: array/vector size; if not a constant, \p max_bytes must be
+///   a constant value, otherwise we fail with an exception
+/// \param element_width: bit width of array/vector elements
+/// \param little_endian: true, iff assumed endianness is little-endian
+/// \param max_bytes: if not nil, use as upper bound of the number of bytes to
+///   unpack
+/// \param ns: namespace for type lookups
+/// \return array_exprt holding unpacked elements
+static array_exprt unpack_array_vector(
+  const exprt &src,
+  const exprt &src_size,
+  const mp_integer &element_width,
+  bool little_endian,
+  const exprt &max_bytes,
+  const namespacet &ns)
+{
+  auto max_bytes_int = numeric_cast<mp_integer>(max_bytes);
+  auto num_elements = numeric_cast<mp_integer>(src_size);
+
+  if(!max_bytes_int && !num_elements)
+  {
+    throw non_const_array_sizet(src.type(), max_bytes);
+  }
+
+  mp_integer first_element = 0;
+
+  // refine the number of elements to extract in case the element width is known
+  // and a multiple of bytes; otherwise we will expand the entire array/vector
+  optionalt<mp_integer> max_elements;
+  if(element_width > 0 && element_width % 8 == 0)
+  {
+    mp_integer el_bytes = element_width / 8;
+
+    if(!num_elements)
+    {
+      // turn bytes into elements, rounding up
+      max_elements = (*max_bytes_int + el_bytes - 1) / el_bytes;
+    }
+  }
+
+  // the maximum number of bytes is an upper bound in case the size of the
+  // array/vector is unknown; if the element_width was usable above this will
+  // have been turned into a number of elements already
+  if(!num_elements)
+    num_elements = *max_elements;
+
+  const exprt src_simp = simplify_expr(src, ns);
+
+  exprt::operandst byte_operands;
+  for(mp_integer i = first_element; i < *num_elements; ++i)
+  {
+    exprt element;
+
+    if(
+      (src_simp.id() == ID_array || src_simp.id() == ID_vector) &&
+      i < src_simp.operands().size())
+    {
+      const std::size_t index_int = numeric_cast_v<std::size_t>(i);
+      element = src_simp.operands()[index_int];
+    }
+    else
+    {
+      element = index_exprt(src_simp, from_integer(i, index_type()));
+    }
+
+    // recursively unpack each element until so that we eventually just have an
+    // array of bytes left
+    exprt sub = unpack_rec(element, little_endian, max_bytes, ns, true);
+    byte_operands.insert(
+      byte_operands.end(), sub.operands().begin(), sub.operands().end());
+  }
+
+  const std::size_t size = byte_operands.size();
+  return array_exprt(
+    std::move(byte_operands),
+    array_typet(unsignedbv_typet(8), from_integer(size, size_type())));
+}
+
+/// Rewrite an object into its individual bytes.
+/// \param src: object to unpack
+/// \param little_endian: true, iff assumed endianness is little-endian
+/// \param max_bytes: if not nil, use as upper bound of the number of bytes to
+///   unpack
+/// \param ns: namespace for type lookups
+/// \param unpack_byte_array: if true, return unmodified \p src iff it is an
+//    array of bytes
 /// \return array of bytes in the sequence found in memory
 /// \throws flatten_byte_extract_exceptiont Raised is unable to unpack the
 /// object because of either non constant size, byte misalignment or
@@ -34,15 +122,8 @@ static exprt unpack_rec(
   bool little_endian,
   const exprt &max_bytes,
   const namespacet &ns,
-  bool unpack_byte_array=false)
+  bool unpack_byte_array)
 {
-  array_exprt array({},
-    array_typet(unsignedbv_typet(8), from_integer(0, size_type())));
-
-  // endianness_mapt should be the point of reference for mapping out
-  // endianness, but we need to work on elements here instead of
-  // individual bits
-
   if(src.type().id()==ID_array)
   {
     const array_typet &array_type=to_array_type(src.type());
@@ -51,54 +132,32 @@ static exprt unpack_rec(
     auto element_width = pointer_offset_bits(subtype, ns);
     CHECK_RETURN(element_width.has_value());
 
-    // this probably doesn't really matter
-    #if 0
-    INVARIANT(
-      element_width > 0,
-      "element width of array should be constant",
-      irep_pretty_diagnosticst(src.type()));
+    if(!unpack_byte_array && *element_width == 8)
+      return src;
 
-    INVARIANT(
-      element_width % 8 == 0,
-      "elements in array should be byte-aligned",
-      irep_pretty_diagnosticst(src.type()));
-    #endif
+    return unpack_array_vector(
+      src, array_type.size(), *element_width, little_endian, max_bytes, ns);
+  }
+  else if(src.type().id() == ID_vector)
+  {
+    const vector_typet &vector_type = to_vector_type(src.type());
+    const typet &subtype = vector_type.subtype();
+
+    auto element_width = pointer_offset_bits(subtype, ns);
+    CHECK_RETURN(element_width.has_value());
 
     if(!unpack_byte_array && *element_width == 8)
       return src;
 
-    auto num_elements = numeric_cast<mp_integer>(max_bytes);
-    if(!num_elements.has_value())
-      num_elements = numeric_cast<mp_integer>(array_type.size());
-    if(!num_elements.has_value())
-      throw non_const_array_sizet(array_type, max_bytes);
-
-    // all array members will have the same structure; do this just
-    // once and then replace the dummy symbol by a suitable index
-    // expression in the loop below
-    symbol_exprt dummy(ID_C_incomplete, subtype);
-    exprt sub=unpack_rec(dummy, little_endian, max_bytes, ns, true);
-
-    for(mp_integer i=0; i<*num_elements; ++i)
-    {
-      index_exprt index(src, from_integer(i, index_type()));
-      replace_symbolt replace;
-      replace.insert(dummy, index);
-
-      for(const auto &op : sub.operands())
-      {
-        exprt new_op=op;
-        replace(new_op);
-        simplify(new_op, ns);
-        array.copy_to_operands(new_op);
-      }
-    }
+    return unpack_array_vector(
+      src, vector_type.size(), *element_width, little_endian, max_bytes, ns);
   }
   else if(ns.follow(src.type()).id()==ID_struct)
   {
     const struct_typet &struct_type=to_struct_type(ns.follow(src.type()));
     const struct_typet::componentst &components=struct_type.components();
 
+    exprt::operandst byte_operands;
     for(const auto &comp : components)
     {
       auto element_width = pointer_offset_bits(comp.type(), ns);
@@ -114,9 +173,14 @@ static exprt unpack_rec(
       member_exprt member(src, comp.get_name(), comp.type());
       exprt sub=unpack_rec(member, little_endian, max_bytes, ns, true);
 
-      for(const auto& op : sub.operands())
-        array.copy_to_operands(op);
+      byte_operands.insert(
+        byte_operands.end(), sub.operands().begin(), sub.operands().end());
     }
+
+    const std::size_t size = byte_operands.size();
+    return array_exprt(
+      std::move(byte_operands),
+      array_typet(unsignedbv_typet(8), from_integer(size, size_type())));
   }
   else if(src.type().id()!=ID_empty)
   {
@@ -138,6 +202,7 @@ static exprt unpack_rec(
         bits = *bits_opt * 8;
     }
 
+    exprt::operandst byte_operands;
     for(mp_integer i=0; i<bits; i+=8)
     {
       extractbits_exprt extractbits(
@@ -146,17 +211,23 @@ static exprt unpack_rec(
         from_integer(i, index_type()),
         unsignedbv_typet(8));
 
+      // endianness_mapt should be the point of reference for mapping out
+      // endianness, but we need to work on elements here instead of
+      // individual bits
       if(little_endian)
-        array.copy_to_operands(extractbits);
+        byte_operands.push_back(extractbits);
       else
-        array.operands().insert(array.operands().begin(), extractbits);
+        byte_operands.insert(byte_operands.begin(), extractbits);
     }
+
+    const std::size_t size = byte_operands.size();
+    return array_exprt(
+      std::move(byte_operands),
+      array_typet(unsignedbv_typet(8), from_integer(size, size_type())));
   }
 
-  to_array_type(array.type()).size()=
-    from_integer(array.operands().size(), size_type());
-
-  return std::move(array);
+  return array_exprt(
+    {}, array_typet(unsignedbv_typet(8), from_integer(0, size_type())));
 }
 
 /// rewrite byte extraction from an array to byte extraction from a
@@ -233,12 +304,16 @@ exprt lower_byte_extract(const byte_extract_exprt &src, const namespacet &ns)
     const typet &subtype=array_type.subtype();
 
     auto element_width = pointer_offset_bits(subtype, ns);
-    const auto num_elements = numeric_cast<mp_integer>(array_type.size());
-    // TODO: consider ways of dealing with arrays of unknown subtype
-    // size or with a subtype size that does not fit byte boundaries
+    auto num_elements = numeric_cast<mp_integer>(array_type.size());
+    if(!num_elements.has_value())
+      num_elements = mp_integer(unpacked.op().operands().size());
+
+    // consider ways of dealing with arrays of unknown subtype size or with a
+    // subtype size that does not fit byte boundaries; currently we fall back to
+    // stitching together consecutive elements down below
     if(
       element_width.has_value() && *element_width >= 1 &&
-      *element_width % 8 == 0 && num_elements.has_value())
+      *element_width % 8 == 0)
     {
       array_exprt array({}, array_type);
 
@@ -256,6 +331,41 @@ exprt lower_byte_extract(const byte_extract_exprt &src, const namespacet &ns)
       }
 
       return simplify_expr(array, ns);
+    }
+  }
+  else if(src.type().id() == ID_vector)
+  {
+    const vector_typet &vector_type = to_vector_type(src.type());
+    const typet &subtype = vector_type.subtype();
+
+    mp_integer num_elements = numeric_cast_v<mp_integer>(vector_type.size());
+
+    auto element_width = pointer_offset_bits(subtype, ns);
+    CHECK_RETURN(element_width.has_value());
+
+    // consider ways of dealing with vectors of unknown subtype size or with a
+    // subtype size that does not fit byte boundaries; currently we fall back to
+    // stitching together consecutive elements down below
+    if(
+      element_width.has_value() && *element_width >= 1 &&
+      *element_width % 8 == 0)
+    {
+      vector_exprt vector(vector_type);
+
+      for(mp_integer i = 0; i < num_elements; ++i)
+      {
+        plus_exprt new_offset(
+          unpacked.offset(),
+          from_integer(i * (*element_width) / 8, unpacked.offset().type()));
+
+        byte_extract_exprt tmp(unpacked);
+        tmp.type() = subtype;
+        tmp.offset() = simplify_expr(new_offset, ns);
+
+        vector.copy_to_operands(lower_byte_extract(tmp, ns));
+      }
+
+      return simplify_expr(vector, ns);
     }
   }
   else if(ns.follow(src.type()).id()==ID_struct)
@@ -299,10 +409,13 @@ exprt lower_byte_extract(const byte_extract_exprt &src, const namespacet &ns)
   const exprt &root=unpacked.op();
   const exprt &offset=unpacked.offset();
 
-  const array_typet &array_type=to_array_type(root.type());
-  const typet &subtype=array_type.subtype();
+  optionalt<typet> subtype;
+  if(root.type().id() == ID_vector)
+    subtype = to_vector_type(root.type()).subtype();
+  else
+    subtype = to_array_type(root.type()).subtype();
 
-  auto subtype_bits = pointer_offset_bits(subtype, ns);
+  auto subtype_bits = pointer_offset_bits(*subtype, ns);
 
   DATA_INVARIANT(
     subtype_bits.has_value() && *subtype_bits == 8,
@@ -344,7 +457,7 @@ exprt lower_byte_extract(const byte_extract_exprt &src, const namespacet &ns)
   else // width_bytes>=2
   {
     concatenation_exprt concatenation(
-      std::move(op), bitvector_typet(subtype.id(), width_bytes * 8));
+      std::move(op), bitvector_typet(subtype->id(), width_bytes * 8));
     return simplify_expr(
       typecast_exprt(std::move(concatenation), src.type()), ns);
   }
@@ -649,4 +762,3 @@ exprt lower_byte_operators(const exprt &src, const namespacet &ns)
   else
     return tmp;
 }
-// clang-format on

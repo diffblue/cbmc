@@ -28,7 +28,7 @@ public:
 class non_const_array_sizet : public flatten_byte_extract_exceptiont
 {
 public:
-  non_const_array_sizet(const array_typet &array_type, const exprt &max_bytes)
+  non_const_array_sizet(const typet &array_type, const exprt &max_bytes)
     : flatten_byte_extract_exceptiont("cannot unpack array of non-const size"),
       max_bytes(max_bytes),
       array_type(array_type)
@@ -47,7 +47,7 @@ public:
 
 private:
   exprt max_bytes;
-  array_typet array_type;
+  typet array_type;
 
   std::string computed_error_message;
 };
