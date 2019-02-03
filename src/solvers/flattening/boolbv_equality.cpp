@@ -9,7 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "boolbv.h"
 
 #include <util/std_expr.h>
-#include <util/base_type.h>
 #include <util/invariant.h>
 
 #include <solvers/lowering/expr_lowering.h>
@@ -18,8 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 literalt boolbvt::convert_equality(const equal_exprt &expr)
 {
-  const bool is_base_type_eq =
-    base_type_eq(expr.lhs().type(), expr.rhs().type(), ns);
+  const bool is_base_type_eq = expr.lhs().type() == expr.rhs().type();
   DATA_INVARIANT_WITH_DIAGNOSTICS(
     is_base_type_eq,
     "types of expressions on each side of equality should match",
@@ -67,10 +65,8 @@ literalt boolbvt::convert_verilog_case_equality(
   // This is 4-valued comparison, i.e., z===z, x===x etc.
   // The result is always Boolean.
 
-  const bool is_base_type_eq =
-    base_type_eq(expr.lhs().type(), expr.rhs().type(), ns);
   DATA_INVARIANT_WITH_DIAGNOSTICS(
-    is_base_type_eq,
+    expr.lhs().type() == expr.rhs().type(),
     "lhs and rhs types should match in verilog_case_equality",
     irep_pretty_diagnosticst{expr.lhs()},
     irep_pretty_diagnosticst{expr.rhs()});

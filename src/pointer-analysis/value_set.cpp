@@ -15,7 +15,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ostream>
 
 #include <util/arith_tools.h>
-#include <util/base_type.h>
 #include <util/c_types.h>
 #include <util/pointer_offset_size.h>
 #include <util/simplify_expr.h>
@@ -1157,7 +1156,7 @@ void value_sett::assign(
       }
       else
       {
-        if(!base_type_eq(rhs.type(), type, ns))
+        if(rhs.type() != type)
           throw "value_sett::assign type mismatch: "
                 "rhs.type():\n"+rhs.type().pretty()+"\n"+
                 "type:\n"+type.pretty();
@@ -1185,7 +1184,7 @@ void value_sett::assign(
     }
     else
     {
-      if(!base_type_eq(rhs.type(), type, ns))
+      if(rhs.type() != type)
         throw "value_sett::assign type mismatch: "
           "rhs.type():\n"+rhs.type().pretty()+"\n"+
           "type:\n"+type.pretty();

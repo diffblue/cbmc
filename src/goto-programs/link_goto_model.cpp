@@ -13,7 +13,6 @@ Author: Michael Tautschnig, Daniel Kroening
 
 #include <unordered_set>
 
-#include <util/base_type.h>
 #include <util/symbol.h>
 #include <util/rename_symbol.h>
 
@@ -99,8 +98,9 @@ static bool link_functions(
       {
         // the linking code will have ensured that types match
         rename_symbol(src_func.type);
-        INVARIANT(base_type_eq(in_dest_symbol_table.type, src_func.type, ns),
-                  "linking ensures that types match");
+        INVARIANT(
+          in_dest_symbol_table.type == src_func.type,
+          "linking ensures that types match");
       }
     }
   }

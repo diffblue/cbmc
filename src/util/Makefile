@@ -1,7 +1,6 @@
 SRC = allocate_objects.cpp \
       arith_tools.cpp \
       array_name.cpp \
-      base_type.cpp \
       bv_arithmetic.cpp \
       byte_operators.cpp \
       c_types.cpp \
@@ -91,7 +90,6 @@ SRC = allocate_objects.cpp \
       threeval.cpp \
       timestamper.cpp \
       type.cpp \
-      type_eq.cpp \
       typecheck.cpp \
       ui_message.cpp \
       unicode.cpp \

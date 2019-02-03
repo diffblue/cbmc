@@ -707,7 +707,7 @@ void goto_programt::instructiont::validate(
         if(!ns.lookup(goto_id, table_symbol))
         {
           bool symbol_expr_type_matches_symbol_table =
-            base_type_eq(goto_symbol_expr.type(), table_symbol->type, ns);
+            goto_symbol_expr.type() == table_symbol->type;
 
           if(
             !symbol_expr_type_matches_symbol_table &&
@@ -716,10 +716,9 @@ void goto_programt::instructiont::validate(
             // Return removal sets the return type of a function symbol table
             // entry to 'void', but some callsites still expect the original
             // type (e.g. if a function is passed as a parameter)
-            symbol_expr_type_matches_symbol_table = base_type_eq(
-              goto_symbol_expr.type(),
-              original_return_type(ns.get_symbol_table(), goto_id),
-              ns);
+            symbol_expr_type_matches_symbol_table =
+              goto_symbol_expr.type() ==
+              original_return_type(ns.get_symbol_table(), goto_id);
 
             if(
               !symbol_expr_type_matches_symbol_table &&
@@ -743,7 +742,7 @@ void goto_programt::instructiont::validate(
                   table_symbol_type.return_type();
 
                 symbol_expr_type_matches_symbol_table =
-                  base_type_eq(goto_symbol_expr_type, table_symbol_type, ns);
+                  goto_symbol_expr_type == table_symbol_type;
               }
             }
           }
@@ -761,8 +760,8 @@ void goto_programt::instructiont::validate(
               auto symbol_table_array_type = to_array_type(table_symbol->type);
               symbol_table_array_type.size() = nil_exprt();
 
-              symbol_expr_type_matches_symbol_table = base_type_eq(
-                goto_symbol_expr.type(), symbol_table_array_type, ns);
+              symbol_expr_type_matches_symbol_table =
+                goto_symbol_expr.type() == symbol_table_array_type;
             }
           }
 

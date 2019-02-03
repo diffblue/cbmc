@@ -9,7 +9,6 @@ Author: Diffblue Ltd.
 #include "require_type.h"
 
 #include <testing-utils/use_catch.h>
-#include <util/base_type.h>
 #include <util/namespace.h>
 #include <util/symbol_table.h>
 
@@ -26,10 +25,8 @@ pointer_typet require_type::require_pointer(
   const pointer_typet &pointer = to_pointer_type(type);
 
   if(subtype)
-  {
-    namespacet ns{symbol_tablet{}};
-    base_type_eq(pointer.subtype(), subtype.value(), ns);
-  }
+    REQUIRE(pointer.subtype() == subtype.value());
+
   return pointer;
 }
 

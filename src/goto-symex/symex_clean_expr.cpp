@@ -12,7 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "goto_symex.h"
 
 #include <util/arith_tools.h>
-#include <util/base_type.h>
 #include <util/byte_operators.h>
 #include <util/c_types.h>
 #include <util/pointer_offset_size.h>
@@ -37,7 +36,7 @@ process_array_expr(exprt &expr, bool do_simplify, const namespacet &ns)
     process_array_expr(if_expr.true_case(), do_simplify, ns);
     process_array_expr(if_expr.false_case(), do_simplify, ns);
 
-    if(!base_type_eq(if_expr.true_case(), if_expr.false_case(), ns))
+    if(if_expr.true_case() != if_expr.false_case())
     {
       byte_extract_exprt be(
         byte_extract_id(),

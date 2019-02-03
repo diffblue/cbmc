@@ -18,7 +18,6 @@ Author:
 #include <util/unicode.h>
 #include <util/tempfile.h>
 #include <util/rename_symbol.h>
-#include <util/base_type.h>
 #include <util/config.h>
 
 #include "goto_model.h"

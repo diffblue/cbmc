@@ -17,7 +17,6 @@ Author: Peter Schrammel
 #endif
 
 #include <util/arith_tools.h>
-#include <util/base_type.h>
 #include <util/c_types.h>
 #include <util/cprover_prefix.h>
 #include <util/expr_util.h>
@@ -103,7 +102,7 @@ void constant_propagator_domaint::assign_rec(
     if(dest_values.is_constant(tmp))
     {
       DATA_INVARIANT(
-        base_type_eq(ns.lookup(s).type, tmp.type(), ns),
+        ns.lookup(s).type == tmp.type(),
         "type of constant to be replaced should match");
       dest_values.set_to(s, tmp);
     }
@@ -624,7 +623,7 @@ bool constant_propagator_domaint::valuest::meet(
     {
       const typet &m_id_type = ns.lookup(m.first).type;
       DATA_INVARIANT(
-        base_type_eq(m_id_type, m.second.type(), ns),
+        m_id_type == m.second.type(),
         "type of constant to be stored should match");
       set_to(symbol_exprt(m.first, m_id_type), m.second);
       changed=true;

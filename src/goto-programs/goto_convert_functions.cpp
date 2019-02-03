@@ -10,7 +10,6 @@ Date: June 2003
 
 #include "goto_convert_functions.h"
 
-#include <util/base_type.h>
 #include <util/fresh_symbol.h>
 #include <util/prefix.h>
 #include <util/std_code.h>

@@ -17,7 +17,6 @@ Author: Daniel Kroening, kroening@kroening.com,
 
 #include <util/symbol_table.h>
 #include <util/simplify_expr.h>
-#include <util/base_type.h>
 #include <util/std_expr.h>
 #include <util/prefix.h>
 #include <util/std_code.h>
@@ -798,7 +797,7 @@ void value_set_fivrnst::assign(
       }
       else
       {
-        if(!base_type_eq(rhs.type(), type, ns))
+        if(rhs.type() != type)
           throw
             "type mismatch:\nRHS: "+rhs.type().pretty()+"\n"+
             "LHS: "+type.pretty();
@@ -855,7 +854,7 @@ void value_set_fivrnst::assign(
     }
     else
     {
-      assert(base_type_eq(rhs.type(), type, ns));
+      DATA_INVARIANT(rhs.type() == type, "array type mismatch");
 
       if(rhs.id()==ID_array_of)
       {

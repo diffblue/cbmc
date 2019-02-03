@@ -13,7 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file util/std_expr.h
 /// API to expression classes
 
-#include "base_type.h"
 #include "expr_cast.h"
 #include "invariant.h"
 #include "std_types.h"
@@ -868,7 +867,7 @@ public:
     // check types
     DATA_CHECK(
       vm,
-      base_type_eq(expr.op0().type(), expr.op1().type(), ns),
+      expr.op0().type() == expr.op1().type(),
       "lhs and rhs of binary relation expression should have same type");
   }
 

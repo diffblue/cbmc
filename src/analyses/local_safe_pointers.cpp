@@ -11,7 +11,6 @@ Author: Diffblue Ltd
 
 #include "local_safe_pointers.h"
 
-#include <util/base_type.h>
 #include <util/expr_iterator.h>
 #include <util/expr_util.h>
 #include <util/format_expr.h>
@@ -277,7 +276,7 @@ bool local_safe_pointerst::is_non_null_at_program_point(
 bool local_safe_pointerst::base_type_comparet::operator()(
   const exprt &e1, const exprt &e2) const
 {
-  if(base_type_eq(e1, e2, ns))
+  if(e1 == e2)
     return false;
   else
     return e1 < e2;

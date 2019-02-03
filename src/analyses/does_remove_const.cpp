@@ -15,7 +15,6 @@ Author: Diffblue Ltd.
 #include <util/type.h>
 #include <util/expr.h>
 #include <util/std_code.h>
-#include <util/base_type.h>
 
 /// A naive analysis to look for casts that remove const-ness from pointers.
 /// \param goto_program: the goto program to check
@@ -74,7 +73,7 @@ bool does_remove_constt::does_expr_lose_const(const exprt &expr) const
   for(const exprt &op : expr.operands())
   {
     const typet &op_type=op.type();
-    if(base_type_eq(op_type, root_type, ns))
+    if(op_type == root_type)
     {
       // Is this child more const-qualified than the root
       if(!does_type_preserve_const_correctness(&root_type, &op_type))

@@ -8,7 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "boolbv.h"
 
-#include <util/base_type.h>
 #include <util/byte_operators.h>
 #include <util/arith_tools.h>
 #include <util/c_types.h>
@@ -48,7 +47,7 @@ bvt boolbvt::convert_member(const member_exprt &expr)
       if(c.get_name() == component_name)
       {
         DATA_INVARIANT_WITH_DIAGNOSTICS(
-          base_type_eq(subtype, expr.type(), ns),
+          subtype == expr.type(),
           "struct component type shall match the member expression type",
           subtype.pretty(),
           expr.type().pretty());

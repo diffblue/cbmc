@@ -11,7 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "dump_c.h"
 
-#include <util/base_type.h>
 #include <util/config.h>
 #include <util/find_symbols.h>
 #include <util/invariant.h>
@@ -1277,9 +1276,9 @@ void dump_ct::cleanup_expr(exprt &expr)
       expr.swap(tmp);
     }
   }
-  else if(expr.id()==ID_typecast &&
-      expr.op0().id()==ID_typecast &&
-      base_type_eq(expr.type(), expr.op0().type(), ns))
+  else if(
+    expr.id() == ID_typecast && expr.op0().id() == ID_typecast &&
+    expr.type() == expr.op0().type())
   {
     exprt tmp=expr.op0();
     expr.swap(tmp);
@@ -1309,8 +1308,7 @@ void dump_ct::cleanup_expr(exprt &expr)
           if(type.id()==ID_union &&
              type.get_bool(ID_C_transparent_union))
           {
-            if(it2->id()==ID_typecast &&
-               base_type_eq(it2->type(), type, ns))
+            if(it2->id() == ID_typecast && it2->type() == type)
               *it2=to_typecast_expr(*it2).op();
 
             // add a typecast for NULL or 0

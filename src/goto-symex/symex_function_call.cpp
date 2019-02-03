@@ -12,7 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "goto_symex.h"
 
 #include <util/arith_tools.h>
-#include <util/base_type.h>
 #include <util/byte_operators.h>
 #include <util/c_types.h>
 #include <util/exception_utils.h>
@@ -90,7 +89,7 @@ void goto_symext::parameter_assignments(
     else
     {
       // It should be the same exact type.
-      if(!base_type_eq(parameter_type, rhs.type(), ns))
+      if(parameter_type != rhs.type())
       {
         const typet &rhs_type = rhs.type();
 
@@ -446,4 +445,3 @@ static void locality(
     state.l1_history.insert(l1_name);
   }
 }
-

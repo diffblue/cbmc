@@ -12,7 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <list>
 
-#include "base_type.h"
 #include "expr.h"
 #include "expr_cast.h"
 #include "invariant.h"
@@ -313,14 +312,14 @@ public:
 
   static void validate(
     const codet &code,
-    const namespacet &ns,
+    const namespacet &,
     const validation_modet vm = validation_modet::INVARIANT)
   {
     check(code, vm);
 
     DATA_CHECK(
       vm,
-      base_type_eq(code.op0().type(), code.op1().type(), ns),
+      code.op0().type() == code.op1().type(),
       "lhs and rhs of assignment must have same type");
   }
 
@@ -1193,7 +1192,7 @@ public:
 
   static void validate(
     const codet &code,
-    const namespacet &ns,
+    const namespacet &,
     const validation_modet vm = validation_modet::INVARIANT)
   {
     check(code, vm);
@@ -1201,8 +1200,7 @@ public:
     if(code.op0().id() != ID_nil)
       DATA_CHECK(
         vm,
-        base_type_eq(
-          code.op0().type(), to_code_type(code.op1().type()).return_type(), ns),
+        code.op0().type() == to_code_type(code.op1().type()).return_type(),
         "function returns expression of wrong type");
   }
 

@@ -11,7 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <algorithm>
 
 #include "arith_tools.h"
-#include "base_type.h"
 #include "byte_operators.h"
 #include "c_types.h"
 #include "config.h"
@@ -28,7 +27,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "std_expr.h"
 #include "string_expr.h"
 #include "symbol.h"
-#include "type_eq.h"
 
 // #define DEBUGX
 
@@ -316,7 +314,7 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
   }
 
   // eliminate redundant typecasts
-  if(type_eq(expr.type(), expr.op0().type(), ns))
+  if(expr.type() == expr.op0().type())
   {
     exprt tmp;
     tmp.swap(expr.op0());
@@ -467,8 +465,8 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
       {
         exprt result=expr.op0();
 
-        if(result.operands().size()>=1 &&
-           base_type_eq(result.op0().type(), result.type(), ns))
+        if(
+          result.operands().size() >= 1 && result.op0().type() == result.type())
         {
           result.type()=expr.type();
 
@@ -832,8 +830,9 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
     const exprt &o=to_address_of_expr(operand).object();
 
     // turn &array into &array[0] when casting to pointer-to-element-type
-    if(o.type().id()==ID_array &&
-       base_type_eq(expr_type, pointer_type(o.type().subtype()), ns))
+    if(
+      o.type().id() == ID_array &&
+      expr_type == pointer_type(o.type().subtype()))
     {
       expr=address_of_exprt(index_exprt(o, from_integer(0, size_type())));
 
@@ -1820,7 +1819,7 @@ bool simplify_exprt::simplify_byte_extract(byte_extract_exprt &expr)
   {
     const auto &op_byte_update = to_byte_update_expr(expr.op());
 
-    if(base_type_eq(expr.type(), op_byte_update.value().type(), ns))
+    if(expr.type() == op_byte_update.value().type())
     {
       exprt tmp = op_byte_update.value();
       expr.swap(tmp);
@@ -1850,7 +1849,7 @@ bool simplify_exprt::simplify_byte_extract(byte_extract_exprt &expr)
   if(*offset == 0 && byte_extract_id() == expr.id())
   {
     // byte extract of full object is object
-    if(base_type_eq(expr.type(), expr.op().type(), ns))
+    if(expr.type() == expr.op().type())
     {
       exprt tmp = expr.op();
       expr.swap(tmp);
@@ -1982,8 +1981,7 @@ bool simplify_exprt::simplify_byte_update(byte_update_exprt &expr)
   if(
     expr.id() == expr.op().id() &&
     expr.offset() == to_byte_update_expr(expr.op()).offset() &&
-    base_type_eq(
-      expr.value().type(), to_byte_update_expr(expr.op()).value().type(), ns))
+    expr.value().type() == to_byte_update_expr(expr.op()).value().type())
   {
     expr.op()=expr.op().op0();
     return false;
@@ -2078,7 +2076,7 @@ bool simplify_exprt::simplify_byte_update(byte_update_exprt &expr)
           simplify_node(index_offset);
 
           // index_offset may need a typecast
-          if(!base_type_eq(offset.type(), index.type(), ns))
+          if(offset.type() != index.type())
           {
             typecast_exprt tmp(index_offset, offset.type());
             simplify_node(tmp);

@@ -11,7 +11,6 @@ Author: Daniel Kroening
 
 #include "graphml_witness.h"
 
-#include <util/base_type.h>
 #include <util/byte_operators.h>
 #include <util/c_types.h>
 #include <util/arith_tools.h>
@@ -75,8 +74,9 @@ std::string graphml_witnesst::convert_assign_rec(
   {
     // dereferencing may have resulted in an lhs that is the first
     // struct member; undo this
-    if(assign.lhs().id()==ID_member &&
-       !base_type_eq(assign.lhs().type(), assign.rhs().type(), ns))
+    if(
+      assign.lhs().id() == ID_member &&
+      assign.lhs().type() != assign.rhs().type())
     {
       code_assignt tmp=assign;
       tmp.lhs()=to_member_expr(assign.lhs()).struct_op();

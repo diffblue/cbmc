@@ -9,13 +9,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "simplify_expr_class.h"
 
 #include "arith_tools.h"
-#include "base_type.h"
 #include "byte_operators.h"
 #include "invariant.h"
 #include "namespace.h"
 #include "pointer_offset_size.h"
 #include "std_expr.h"
-#include "type_eq.h"
 
 bool simplify_exprt::simplify_member(exprt &expr)
 {
@@ -47,7 +45,7 @@ bool simplify_exprt::simplify_member(exprt &expr)
         {
           // found it!
           DATA_INVARIANT(
-            base_type_eq(op2.type(), expr.type(), ns),
+            op2.type() == expr.type(),
             "member expression type must match component type");
           exprt tmp;
           tmp.swap(op2);
@@ -139,7 +137,7 @@ bool simplify_exprt::simplify_member(exprt &expr)
       {
         std::size_t number=struct_type.component_number(component_name);
         DATA_INVARIANT(
-          base_type_eq(op.operands()[number].type(), expr.type(), ns),
+          op.operands()[number].type() == expr.type(),
           "member expression type must match component type");
         exprt tmp;
         tmp.swap(op.operands()[number]);
@@ -207,7 +205,7 @@ bool simplify_exprt::simplify_member(exprt &expr)
   else if(op.id()==ID_union && op_type.id()==ID_union)
   {
     // trivial?
-    if(type_eq(to_union_expr(op).op().type(), expr.type(), ns))
+    if(to_union_expr(op).op().type() == expr.type())
     {
       exprt tmp=to_union_expr(op).op();
       expr.swap(tmp);
@@ -242,7 +240,7 @@ bool simplify_exprt::simplify_member(exprt &expr)
   {
     // Try to look through member(cast(x)) if the cast is between structurally
     // identical types:
-    if(base_type_eq(op_type, op.op0().type(), ns))
+    if(op_type == op.op0().type())
     {
       expr.op0() = op.op0();
       simplify_member(expr);
@@ -271,7 +269,7 @@ bool simplify_exprt::simplify_member(exprt &expr)
           equivalent_member.is_not_nil() &&
           equivalent_member.id() != ID_byte_extract_little_endian &&
           equivalent_member.id() != ID_byte_extract_big_endian &&
-          type_eq(equivalent_member.type(), expr.type(), ns))
+          equivalent_member.type() == expr.type())
         {
           expr = equivalent_member;
           simplify_rec(expr);

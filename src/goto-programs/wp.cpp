@@ -15,7 +15,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/std_expr.h>
 #include <util/std_code.h>
-#include <util/base_type.h>
 
 #include <util/invariant.h>
 
@@ -79,7 +78,7 @@ aliasingt aliasing(
     return aliasing(e1, e2.op0().op0(), ns);
 
   // fairly radical. Ignores struct prefixes and the like.
-  if(!base_type_eq(e1.type(), e2.type(), ns))
+  if(e1.type() != e2.type())
     return aliasingt::A_MUSTNOT;
 
   // syntactically the same?

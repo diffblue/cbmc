@@ -330,7 +330,7 @@ static void add_equations_for_symbol_resolution(
       continue;
     }
 
-    if(!base_type_eq(lhs.type(), rhs.type(), ns))
+    if(lhs.type() != rhs.type())
     {
       stream << log_message << "non equal types lhs: " << format(lhs)
              << "\n####################### rhs: " << format(rhs) << eom;
