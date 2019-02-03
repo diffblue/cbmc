@@ -246,7 +246,7 @@ exprt lower_byte_extract(const byte_extract_exprt &src, const namespacet &ns)
       {
         plus_exprt new_offset(
           unpacked.offset(),
-          from_integer(i * (*element_width), unpacked.offset().type()));
+          from_integer(i * (*element_width) / 8, unpacked.offset().type()));
 
         byte_extract_exprt tmp(unpacked);
         tmp.type()=subtype;
