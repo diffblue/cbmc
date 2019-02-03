@@ -1465,8 +1465,7 @@ void dump_c(
   const bool use_all_headers,
   const bool include_harness,
   const namespacet &ns,
-  std::ostream &out,
-  message_handlert &message_handler)
+  std::ostream &out)
 {
   dump_ct goto2c(
     src,
@@ -1474,8 +1473,7 @@ void dump_c(
     use_all_headers,
     include_harness,
     ns,
-    new_ansi_c_language,
-    message_handler);
+    new_ansi_c_language);
   out << goto2c;
 }
 
@@ -1485,8 +1483,7 @@ void dump_cpp(
   const bool use_all_headers,
   const bool include_harness,
   const namespacet &ns,
-  std::ostream &out,
-  message_handlert &message_handler)
+  std::ostream &out)
 {
   dump_ct goto2cpp(
     src,
@@ -1494,8 +1491,7 @@ void dump_cpp(
     use_all_headers,
     include_harness,
     ns,
-    new_cpp_language,
-    message_handler);
+    new_cpp_language);
   out << goto2cpp;
 }
 

@@ -274,8 +274,10 @@ void compound_block_locationst::check_compound_block_locations(
   of << program << std::endl;
   of.close();
 
+  register_language(new_ansi_c_language);
   cmdlinet cmdline;
   cmdline.args.push_back(tmp());
+<<<<<<< HEAD
 <<<<<<< HEAD
   config.main = std::string("main");
 =======
@@ -286,12 +288,18 @@ void compound_block_locationst::check_compound_block_locations(
 
   register_language(new_ansi_c_language, mh);
 
+=======
+>>>>>>> Revert "To revert: language-is-a-messaget"
   config.main = "main";
 >>>>>>> To revert: language-is-a-messaget
   config.set(cmdline);
 
   optionst opts;
   cbmc_parse_optionst::set_default_options(opts);
+
+  ui_message_handlert mh(cmdline, "compound-block-locations");
+  mh.set_verbosity(0);
+  messaget log(mh);
 
   goto_modelt gm;
   int ret;

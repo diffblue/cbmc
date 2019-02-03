@@ -99,8 +99,12 @@ void get_goto_model(std::istream &in, goto_modelt &goto_model)
 TEST_CASE("json symbol table read/write consistency")
 {
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
   register_language(new_ansi_c_language, null_message_handler);
+=======
+  register_language(new_ansi_c_language);
+>>>>>>> Revert "To revert: language-is-a-messaget"
 
   cmdlinet cmdline;
   config.main = "main";

@@ -74,11 +74,6 @@ private:
   lazy_method_mapt lazy_method_map;
 
 public:
-  explicit language_filest(message_handlert &message_handler)
-    : messaget(message_handler)
-  {
-  }
-
   language_filet &add_file(const std::string &filename)
   {
     language_filet language_file(filename);

@@ -766,8 +766,7 @@ int goto_instrument_parse_optionst::doit()
           h_all,
           harness,
           ns,
-          out,
-          get_message_handler());
+          out);
       }
       else
         (is_cpp ? dump_cpp : dump_c)(
@@ -776,9 +775,13 @@ int goto_instrument_parse_optionst::doit()
           h_all,
           harness,
           ns,
+<<<<<<< HEAD
           std::cout,
           get_message_handler());
 >>>>>>> To revert: language-is-a-messaget
+=======
+          std::cout);
+>>>>>>> Revert "To revert: language-is-a-messaget"
 
       return CPROVER_EXIT_SUCCESS;
     }

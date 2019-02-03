@@ -376,6 +376,7 @@ void _check_with_strategy(
   of << program << std::endl;
   of.close();
 
+  register_language(new_ansi_c_language);
   cmdlinet cmdline;
   cmdline.args.push_back(tmp());
   config.main = std::string("main");
@@ -398,9 +399,12 @@ void _check_with_strategy(
   mh.set_verbosity(0);
   messaget log(mh);
 
+<<<<<<< HEAD
   register_language(new_ansi_c_language, mh);
 
 >>>>>>> To revert: language-is-a-messaget
+=======
+>>>>>>> Revert "To revert: language-is-a-messaget"
   REQUIRE(is_valid_path_strategy(strategy));
   opts_callback(options);
 

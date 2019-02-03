@@ -507,8 +507,8 @@ int jbmc_parse_optionst::doit()
       break;
   }
 
-  register_language(new_ansi_c_language, get_message_handler());
-  register_language(new_java_bytecode_language, get_message_handler());
+  register_language(new_ansi_c_language);
+  register_language(new_java_bytecode_language);
 
   if(!((cmdline.isset("jar") && cmdline.args.empty()) ||
        (cmdline.isset("gb") && cmdline.args.empty()) ||
