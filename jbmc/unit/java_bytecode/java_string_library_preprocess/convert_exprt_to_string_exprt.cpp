@@ -7,11 +7,13 @@ Author: Diffblue Ltd.
 
 \*******************************************************************/
 
+#include <testing-utils/use_catch.h>
+#include <testing-utils/message.h>
+
 #include <java_bytecode/java_bytecode_language.h>
 #include <java_bytecode/java_string_library_preprocess.h>
 #include <langapi/language_util.h>
 #include <langapi/mode.h>
-#include <testing-utils/use_catch.h>
 #include <util/c_types.h>
 #include <util/fresh_symbol.h>
 #include <util/namespace.h>
@@ -36,7 +38,7 @@ TEST_CASE("Convert exprt to string exprt")
     symbol_tablet symbol_table;
     namespacet ns(symbol_table);
     code_blockt code;
-    java_string_library_preprocesst preprocess;
+    java_string_library_preprocesst preprocess(null_message_handler);
     preprocess.add_string_type("java.lang.String", symbol_table);
     struct_tag_typet java_string_type("java::java.lang.String");
     symbol_exprt expr("a", pointer_type(java_string_type));
@@ -55,7 +57,7 @@ TEST_CASE("Convert exprt to string exprt")
 
       THEN("Code is produced")
       {
-        register_language(new_java_bytecode_language);
+        register_language(new_java_bytecode_language, null_message_handler);
 
         std::vector<std::string> code_string;
         const std::regex spaces("\\s+");

@@ -351,7 +351,6 @@ void _check_with_strategy(
   of << program << std::endl;
   of.close();
 
-  register_language(new_ansi_c_language);
   cmdlinet cmdline;
   cmdline.args.push_back(tmp());
   config.main = "main";
@@ -367,6 +366,8 @@ void _check_with_strategy(
   ui_message_handlert mh(cmdline, "path-explore");
   mh.set_verbosity(0);
   messaget log(mh);
+
+  register_language(new_ansi_c_language, mh);
 
   REQUIRE(is_valid_path_strategy(strategy));
   std::unique_ptr<path_storaget> worklist = get_path_strategy(strategy);

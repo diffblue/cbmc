@@ -45,7 +45,7 @@ SCENARIO("dependence_graph", "[core][analyses][dependence_graph]")
     // }
     // void b() { }
 
-    register_language(new_ansi_c_language);
+    register_language(new_ansi_c_language, null_message_handler);
 
     goto_modelt goto_model;
     namespacet ns(goto_model.symbol_table);

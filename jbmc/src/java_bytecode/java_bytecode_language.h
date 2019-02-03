@@ -116,7 +116,10 @@ public:
 
   virtual ~java_bytecode_languaget();
   java_bytecode_languaget(
-    std::unique_ptr<select_pointer_typet> pointer_type_selector):
+    std::unique_ptr<select_pointer_typet> pointer_type_selector,
+    message_handlert &message_handler):
+      languaget(message_handler),
+      java_class_loader(message_handler),
       threading_support(false),
       assume_inputs_non_null(false),
       object_factory_parameters(),
@@ -126,14 +129,16 @@ public:
       throw_runtime_exceptions(false),
       assert_uncaught_exceptions(false),
       throw_assertion_error(false),
+      string_preprocess(message_handler),
       nondet_static(false),
       pointer_type_selector(std::move(pointer_type_selector))
   {
   }
 
-  java_bytecode_languaget():
+  explicit java_bytecode_languaget(message_handlert &message_handler):
     java_bytecode_languaget(
-      std::unique_ptr<select_pointer_typet>(new select_pointer_typet()))
+      std::unique_ptr<select_pointer_typet>(new select_pointer_typet()),
+      message_handler)
   {
   }
 
@@ -155,7 +160,7 @@ public:
     message_handlert &message_handler) override;
 
   std::unique_ptr<languaget> new_language() override
-  { return util_make_unique<java_bytecode_languaget>(); }
+  { return util_make_unique<java_bytecode_languaget>(get_message_handler()); }
 
   std::string id() const override { return "java"; }
   std::string description() const override { return "Java Bytecode"; }
@@ -227,7 +232,7 @@ private:
   std::vector<load_extra_methodst> extra_methods;
 };
 
-std::unique_ptr<languaget> new_java_bytecode_language();
+std::unique_ptr<languaget> new_java_bytecode_language(message_handlert &message_handler);
 
 void parse_java_language_options(const cmdlinet &cmd, optionst &options);
 

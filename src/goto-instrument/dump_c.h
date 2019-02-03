@@ -14,13 +14,16 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/goto_functions.h>
 
+class message_handlert;
+
 void dump_c(
   const goto_functionst &src,
   const bool use_system_headers,
   const bool use_all_headers,
   const bool include_harness,
   const namespacet &ns,
-  std::ostream &out);
+  std::ostream &out,
+  message_handlert &message_handler);
 
 void dump_cpp(
   const goto_functionst &src,
@@ -28,6 +31,7 @@ void dump_cpp(
   const bool use_all_headers,
   const bool include_harness,
   const namespacet &ns,
-  std::ostream &out);
+  std::ostream &out,
+  message_handlert &message_handler);
 
 #endif // CPROVER_GOTO_INSTRUMENT_DUMP_C_H

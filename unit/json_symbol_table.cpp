@@ -94,7 +94,7 @@ void get_goto_model(std::istream &in, goto_modelt &goto_model)
 
 TEST_CASE("json symbol table read/write consistency")
 {
-  register_language(new_ansi_c_language);
+  register_language(new_ansi_c_language, null_message_handler);
 
   cmdlinet cmdline;
   config.main = "main";

@@ -666,7 +666,8 @@ int goto_instrument_parse_optionst::doit()
           h_all,
           harness,
           ns,
-          out);
+          out,
+          get_message_handler());
       }
       else
         (is_cpp ? dump_cpp : dump_c)(
@@ -675,7 +676,8 @@ int goto_instrument_parse_optionst::doit()
           h_all,
           harness,
           ns,
-          std::cout);
+          std::cout,
+          get_message_handler());
 
       return CPROVER_EXIT_SUCCESS;
     }

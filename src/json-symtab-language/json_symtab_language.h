@@ -51,7 +51,7 @@ public:
 
   std::unique_ptr<languaget> new_language() override
   {
-    return util_make_unique<json_symtab_languaget>();
+    return util_make_unique<json_symtab_languaget>(get_message_handler());
   }
 
   bool generate_support_functions(
@@ -65,15 +65,20 @@ public:
     return !entry_point_exists;
   }
 
+  explicit json_symtab_languaget(message_handlert &message_handler)
+    : languaget(message_handler)
+  {
+  }
+
   ~json_symtab_languaget() override = default;
 
 protected:
   jsont parsed_json_file;
 };
 
-inline std::unique_ptr<languaget> new_json_symtab_language()
+inline std::unique_ptr<languaget> new_json_symtab_language(message_handlert &message_handler)
 {
-  return util_make_unique<json_symtab_languaget>();
+  return util_make_unique<json_symtab_languaget>(message_handler);
 }
 
 #endif

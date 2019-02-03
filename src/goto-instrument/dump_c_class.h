@@ -30,11 +30,12 @@ public:
     const bool use_all_headers,
     const bool include_harness,
     const namespacet &_ns,
-    language_factoryt factory):
+    language_factoryt factory,
+    message_handlert &message_handler):
     goto_functions(_goto_functions),
     copied_symbol_table(_ns.get_symbol_table()),
     ns(copied_symbol_table),
-    language(factory()),
+    language(factory(message_handler)),
     harness(include_harness),
     system_symbols(use_system_headers)
   {
