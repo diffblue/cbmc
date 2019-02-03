@@ -124,6 +124,7 @@ SCENARIO("byte_extract_lowering", "[core][solvers][lowering][byte_extract]")
       signedbv_typet(24),
       signedbv_typet(128),
       // ieee_float_spect::single_precision().to_type(),
+      // generates the correct value, but remains wrapped in a typecast
       // pointer_typet(u64, 64),
       vector_typet(u8, size),
       vector_typet(u64, size),

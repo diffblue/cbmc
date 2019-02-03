@@ -264,6 +264,17 @@ static exprt unpack_rec(
         member, little_endian, offset_bytes, max_bytes, ns, true);
     }
   }
+  else if(src.type().id() == ID_pointer)
+  {
+    return unpack_rec(
+      typecast_exprt(
+        src, unsignedbv_typet(to_pointer_type(src.type()).get_width())),
+      little_endian,
+      offset_bytes,
+      max_bytes,
+      ns,
+      unpack_byte_array);
+  }
   else if(src.type().id()!=ID_empty)
   {
     // a basic type; we turn that into extractbits while considering
