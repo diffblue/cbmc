@@ -188,7 +188,10 @@ void run_property_decider(
   "(unwind):" \
   "(unwindset):" \
   "(graphml-witness):" \
-  "(unwindset):"
+  "(incremental-loop):" \
+  "(unwind-min):" \
+  "(unwind-max):" \
+  "(ignore-properties-before-unwind-min)"
 
 #define HELP_BMC \
   " --paths [strategy]           explore paths one at a time\n" \
@@ -201,6 +204,14 @@ void run_property_decider(
   " --unwind nr                  unwind nr times\n" \
   " --unwindset L:B,...          unwind loop L with a bound of B\n" \
   "                              (use --show-loops to get the loop IDs)\n" \
+  " --incremental-loop L         check properties after each unwinding\n" \
+  "                              of loop L\n" \
+  "                              (use --show-loops to get the loop IDs)\n" \
+  " --unwind-min nr              start incremental-loop after nr unwindings\n" \
+  " --unwind-max nr              stop incremental-loop after nr unwindings\n" \
+  " --ignore-properties-before-unwind-min\n" \
+  "                              do not check properties before unwind-min\n" \
+  "                              when using incremental-loop\n" \
   " --show-vcc                   show the verification conditions\n" \
   " --slice-formula              remove assignments unrelated to property\n" \
   " --unwinding-assertions       generate unwinding assertions (cannot be\n" \
