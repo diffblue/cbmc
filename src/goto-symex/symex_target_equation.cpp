@@ -351,11 +351,11 @@ void symex_target_equationt::convert(
 }
 
 void symex_target_equationt::convert_assignments(
-  decision_proceduret &decision_procedure) const
+  decision_proceduret &decision_procedure)
 {
-  for(const auto &step : SSA_steps)
+  for(auto &step : SSA_steps)
   {
-    if(step.is_assignment() && !step.ignore)
+    if(step.is_assignment() && !step.ignore && !step.converted)
     {
       decision_procedure.conditional_output(
         decision_procedure.debug(),
@@ -365,22 +365,23 @@ void symex_target_equationt::convert_assignments(
         });
 
       decision_procedure.set_to_true(step.cond_expr);
+      step.converted = true;
     }
   }
 }
 
-void symex_target_equationt::convert_decls(
-  prop_convt &prop_conv) const
+void symex_target_equationt::convert_decls(prop_convt &prop_conv)
 {
-  for(const auto &step : SSA_steps)
+  for(auto &step : SSA_steps)
   {
-    if(step.is_decl() && !step.ignore)
+    if(step.is_decl() && !step.ignore && !step.converted)
     {
       // The result is not used, these have no impact on
       // the satisfiability of the formula.
       try
       {
         prop_conv.convert(step.cond_expr);
+        step.converted = true;
       }
       catch(const bitvector_conversion_exceptiont &)
       {
@@ -489,31 +490,27 @@ void symex_target_equationt::convert_goto_instructions(
 }
 
 void symex_target_equationt::convert_constraints(
-  decision_proceduret &decision_procedure) const
+  decision_proceduret &decision_procedure)
 {
-  for(const auto &step : SSA_steps)
+  for(auto &step : SSA_steps)
   {
-    if(step.is_constraint())
+    if(step.is_constraint() && !step.ignore && !step.converted)
     {
-      if(!step.ignore)
-      {
-        decision_procedure.conditional_output(
-          decision_procedure.debug(),
-          [&step](messaget::mstreamt &mstream) {
-            step.output(mstream);
-            mstream << messaget::eom;
-          });
+      decision_procedure.conditional_output(
+        decision_procedure.debug(), [&step](messaget::mstreamt &mstream) {
+          step.output(mstream);
+          mstream << messaget::eom;
+        });
 
-        try
-        {
-          decision_procedure.set_to_true(step.cond_expr);
-        }
-        catch(const bitvector_conversion_exceptiont &)
-        {
-          util_throw_with_nested(
-            equation_conversion_exceptiont(
-              "Error converting constraints for step", step));
-        }
+      try
+      {
+        decision_procedure.set_to_true(step.cond_expr);
+        step.converted = true;
+      }
+      catch(const bitvector_conversion_exceptiont &)
+      {
+        util_throw_with_nested(equation_conversion_exceptiont(
+          "Error converting constraints for step", step));
       }
     }
   }
@@ -534,8 +531,13 @@ void symex_target_equationt::convert_assertions(
   {
     for(auto &step : SSA_steps)
     {
-      if(step.is_assert())
+      // ignore already converted assertions in the error trace
+      if(step.is_assert() && step.converted)
+        step.ignore = true;
+
+      if(step.is_assert() && !step.ignore && !step.converted)
       {
+        step.converted = true;
         prop_conv.set_to_false(step.cond_expr);
         step.cond_literal=const_literal(false);
         return; // prevent further assumptions!
@@ -556,8 +558,14 @@ void symex_target_equationt::convert_assertions(
 
   for(auto &step : SSA_steps)
   {
-    if(step.is_assert())
+    // ignore already converted assertions in the error trace
+    if(step.is_assert() && step.converted)
+      step.ignore = true;
+
+    if(step.is_assert() && !step.ignore && !step.converted)
     {
+      step.converted = true;
+
       prop_conv.conditional_output(
         prop_conv.debug(),
         [&step](messaget::mstreamt &mstream) {
