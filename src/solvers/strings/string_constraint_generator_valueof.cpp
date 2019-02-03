@@ -211,10 +211,13 @@ static exprt int_of_hex_char(const exprt &chr)
 /// \deprecated use add_axioms_from_int_with_radix instead
 /// \param res: string expression for the result
 /// \param i: an integer argument
+/// \param message_handler: message handler
 /// \return code 0 on success
 DEPRECATED("use add_axioms_for_string_of_int_with_radix instead")
-std::pair<exprt, string_constraintst>
-add_axioms_from_int_hex(const array_string_exprt &res, const exprt &i)
+std::pair<exprt, string_constraintst> add_axioms_from_int_hex(
+  const array_string_exprt &res,
+  const exprt &i,
+  message_handlert &message_handler)
 {
   const typet &type = i.type();
   PRECONDITION(type.id() == ID_signedbv);
@@ -268,15 +271,17 @@ add_axioms_from_int_hex(const array_string_exprt &res, const exprt &i)
 /// Add axioms corresponding to the Integer.toHexString(I) java function
 /// \param f: function application with an integer argument
 /// \param array_pool: pool of arrays representing strings
+/// \param message_handler: messsage handler
 /// \return code 0 on success
 std::pair<exprt, string_constraintst> add_axioms_from_int_hex(
   const function_application_exprt &f,
-  array_poolt &array_pool)
+  array_poolt &array_pool,
+  message_handlert &message_handler)
 {
   PRECONDITION(f.arguments().size() == 3);
   const array_string_exprt res =
     char_array_of_pointer(array_pool, f.arguments()[1], f.arguments()[0]);
-  return add_axioms_from_int_hex(res, f.arguments()[2]);
+  return add_axioms_from_int_hex(res, f.arguments()[2], message_handler);
 }
 
 /// Conversion from char to string

@@ -6,6 +6,7 @@ Author: Jesse Sigal, jesse.sigal@diffblue.com
 
 \*******************************************************************/
 
+#include <testing-utils/message.h>
 #include <testing-utils/use_catch.h>
 
 #include <java_bytecode/java_bytecode_language.h>
@@ -154,7 +155,7 @@ std::string create_info(std::vector<exprt> &lemmas, const namespacet &ns)
 /// \return SAT solver result
 decision_proceduret::resultt check_sat(const exprt &expr, const namespacet &ns)
 {
-  satcheck_no_simplifiert sat_check;
+  satcheck_no_simplifiert sat_check(null_message_handler);
   bv_refinementt::infot info;
   info.ns = &ns;
   info.prop = &sat_check;
@@ -199,7 +200,7 @@ SCENARIO(
       t.length_type());
 
     // Generating the corresponding axioms and simplifying, recording info
-    string_constraint_generatort generator(empty_ns);
+    string_constraint_generatort generator(empty_ns, null_message_handler);
     const auto pair = generator.add_axioms_for_function_application(func);
     const string_constraintst &constraints = pair.second;
 
@@ -294,7 +295,7 @@ SCENARIO(
                                                      a_array};
 
     // Create witness for axiom
-    string_constraint_generatort generator(empty_ns);
+    string_constraint_generatort generator(empty_ns, null_message_handler);
     std::unordered_map<string_not_contains_constraintt, symbol_exprt> witnesses;
     witnesses.emplace(vacuous, generator.fresh_symbol("w", t.witness_type()));
 
@@ -344,7 +345,7 @@ SCENARIO(
                                                      b_array};
 
     // Create witness for axiom
-    string_constraint_generatort generator(empty_ns);
+    string_constraint_generatort generator(empty_ns, null_message_handler);
     std::unordered_map<string_not_contains_constraintt, symbol_exprt> witnesses;
     witnesses.emplace(trivial, generator.fresh_symbol("w", t.witness_type()));
 
@@ -395,7 +396,7 @@ SCENARIO(
                                                      empty_array};
 
     // Create witness for axiom
-    string_constraint_generatort generator(empty_ns);
+    string_constraint_generatort generator(empty_ns, null_message_handler);
     std::unordered_map<string_not_contains_constraintt, symbol_exprt> witnesses;
     witnesses.emplace(trivial, generator.fresh_symbol("w", t.witness_type()));
 
@@ -448,7 +449,7 @@ SCENARIO(
                                                      ab_array};
 
     // Create witness for axiom
-    string_constraint_generatort generator(empty_ns);
+    string_constraint_generatort generator(empty_ns, null_message_handler);
     std::unordered_map<string_not_contains_constraintt, symbol_exprt> witnesses;
     witnesses.emplace(trivial, generator.fresh_symbol("w", t.witness_type()));
 
@@ -499,7 +500,7 @@ SCENARIO(
                                                      cd_array};
 
     // Create witness for axiom
-    string_constraint_generatort generator(empty_ns);
+    string_constraint_generatort generator(empty_ns, null_message_handler);
     std::unordered_map<string_not_contains_constraintt, symbol_exprt> witnesses;
     witnesses.emplace(trivial, generator.fresh_symbol("w", t.witness_type()));
 

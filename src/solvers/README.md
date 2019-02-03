@@ -383,17 +383,17 @@ allocates a new string before calling a primitive.
 \subsection comparisons Comparisons:
 
   * `cprover_string_compare_to` :
-   \copybrief add_axioms_for_compare_to(symbol_generatort &fresh_symbol,const function_application_exprt &f, array_poolt &array_pool)
-   \link add_axioms_for_compare_to(symbol_generatort &fresh_symbol,const function_application_exprt &f, array_poolt &array_pool) More... \endlink
+   \copybrief add_axioms_for_compare_to(symbol_generatort &fresh_symbol,const function_application_exprt &f, array_poolt &array_pool, message_handlert &message_handler)
+   \link add_axioms_for_compare_to(symbol_generatort &fresh_symbol,const function_application_exprt &f, array_poolt &array_pool, message_handlert &message_handler) More... \endlink
   * `cprover_string_contains` :
-  \copybrief add_axioms_for_contains(symbol_generatort &fresh_symbol,const function_application_exprt &f, array_poolt &array_pool)
-  \link add_axioms_for_contains(symbol_generatort &fresh_symbol,const function_application_exprt &f, array_poolt &array_pool) More... \endlink
+  \copybrief add_axioms_for_contains(symbol_generatort &fresh_symbol,const function_application_exprt &f, array_poolt &array_pool, message_handlert &message_handler)
+  \link add_axioms_for_contains(symbol_generatort &fresh_symbol,const function_application_exprt &f, array_poolt &array_pool, message_handlert &message_handler) More... \endlink
   * `cprover_string_equals` :
-  \copybrief add_axioms_for_equals(symbol_generatort &fresh_symbol,const function_application_exprt &f, array_poolt &array_pool)
-  \link add_axioms_for_equals(symbol_generatort &fresh_symbol,const function_application_exprt &f, array_poolt &array_pool) More... \endlink
+  \copybrief add_axioms_for_equals(symbol_generatort &fresh_symbol,const function_application_exprt &f, array_poolt &array_pool, message_handlert &message_handler)
+  \link add_axioms_for_equals(symbol_generatort &fresh_symbol,const function_application_exprt &f, array_poolt &array_pool, message_handlert &message_handler) More... \endlink
   * `cprover_string_equals_ignore_case` :
-  \copybrief add_axioms_for_equals_ignore_case(symbol_generatort &fresh_symbol,const function_application_exprt &f, array_poolt &array_pool)
-  \link add_axioms_for_equals_ignore_case(symbol_generatort &fresh_symbol,const function_application_exprt &f, array_poolt &array_pool) More... \endlink
+  \copybrief add_axioms_for_equals_ignore_case(symbol_generatort &fresh_symbol,const function_application_exprt &f, array_poolt &array_pool, message_handlert &message_handler)
+  \link add_axioms_for_equals_ignore_case(symbol_generatort &fresh_symbol,const function_application_exprt &f, array_poolt &array_pool, message_handlert &message_handler) More... \endlink
   * `cprover_string_hash_code` :
   \copybrief string_constraint_generatort::add_axioms_for_hash_code
   \link string_constraint_generatort::add_axioms_for_hash_code More... \endlink
@@ -401,11 +401,11 @@ allocates a new string before calling a primitive.
   \copybrief add_axioms_for_is_prefix
   \link add_axioms_for_is_prefix More... \endlink
   * `cprover_string_index_of` :
-  \copybrief add_axioms_for_index_of(symbol_generatort &fresh_symbol, const function_application_exprt &f, array_poolt &array_pool)
-  \link add_axioms_for_index_of(symbol_generatort &fresh_symbol, const function_application_exprt &f, array_poolt &array_pool) More... \endlink
+  \copybrief add_axioms_for_index_of(symbol_generatort &fresh_symbol, const function_application_exprt &f, array_poolt &array_pool, message_handlert &message_handler)
+  \link add_axioms_for_index_of(symbol_generatort &fresh_symbol, const function_application_exprt &f, array_poolt &array_pool, message_handlert &message_handler) More... \endlink
   * `cprover_string_last_index_of` :
-  \copybrief add_axioms_for_last_index_of(symbol_generatort &fresh_symbol, const function_application_exprt &f, array_poolt &array_pool)
-  \link add_axioms_for_last_index_of(symbol_generatort &fresh_symbol, const function_application_exprt &f, array_poolt &array_pool)  More... \endlink
+  \copybrief add_axioms_for_last_index_of(symbol_generatort &fresh_symbol, const function_application_exprt &f, array_poolt &array_pool, message_handlert &message_handler)
+  \link add_axioms_for_last_index_of(symbol_generatort &fresh_symbol, const function_application_exprt &f, array_poolt &array_pool, message_handlert &message_handler)  More... \endlink
 
 \subsection transformations Transformations:
 
@@ -416,20 +416,20 @@ allocates a new string before calling a primitive.
     \copybrief add_axioms_for_concat
     \link add_axioms_for_concat More... \endlink
   * `cprover_string_delete` :
-    \copybrief add_axioms_for_delete(symbol_generatort &fresh_symbol, const function_application_exprt &f, array_poolt &array_pool)
-    \link add_axioms_for_delete(symbol_generatort &fresh_symbol, const function_application_exprt &f, array_poolt &array_pool) More... \endlink
+    \copybrief add_axioms_for_delete(symbol_generatort &fresh_symbol, const function_application_exprt &f, array_poolt &array_pool, message_handlert &message_handler)
+    \link add_axioms_for_delete(symbol_generatort &fresh_symbol, const function_application_exprt &f, array_poolt &array_pool, message_handlert &message_handler) More... \endlink
   * `cprover_string_insert` :
-    \copybrief add_axioms_for_insert(symbol_generatort &fresh_symbol, const function_application_exprt &f, array_poolt &array_pool)
-    \link add_axioms_for_insert(symbol_generatort &fresh_symbol, const function_application_exprt &f, array_poolt &array_pool) More... \endlink
+    \copybrief add_axioms_for_insert(symbol_generatort &fresh_symbol, const function_application_exprt &f, array_poolt &array_pool, message_handlert &message_handler)
+    \link add_axioms_for_insert(symbol_generatort &fresh_symbol, const function_application_exprt &f, array_poolt &array_pool, message_handlert &message_handler) More... \endlink
   * `cprover_string_replace` :
-    \copybrief add_axioms_for_replace(symbol_generatort &fresh_symbol, const function_application_exprt &f, array_poolt &array_pool)
-    \link add_axioms_for_replace(symbol_generatort &fresh_symbol, const function_application_exprt &f, array_poolt &array_pool) More... \endlink
+    \copybrief add_axioms_for_replace(symbol_generatort &fresh_symbol, const function_application_exprt &f, array_poolt &array_pool, message_handlert &message_handler)
+    \link add_axioms_for_replace(symbol_generatort &fresh_symbol, const function_application_exprt &f, array_poolt &array_pool, message_handlert &message_handler) More... \endlink
   * `cprover_string_set_length` :
-    \copybrief add_axioms_for_set_length(symbol_generatort &fresh_symbol, const function_application_exprt &f, array_poolt &array_pool)
-    \link add_axioms_for_set_length(symbol_generatort &fresh_symbol, const function_application_exprt &f, array_poolt &array_pool) More... \endlink
+    \copybrief add_axioms_for_set_length(symbol_generatort &fresh_symbol, const function_application_exprt &f, array_poolt &array_pool, message_handlert &message_handler)
+    \link add_axioms_for_set_length(symbol_generatort &fresh_symbol, const function_application_exprt &f, array_poolt &array_pool, message_handlert &message_handler) More... \endlink
   * `cprover_string_substring` :
-    \copybrief add_axioms_for_substring(symbol_generatort &fresh_symbol, const function_application_exprt &f, array_poolt &array_pool)
-    \link add_axioms_for_substring(symbol_generatort &fresh_symbol, const function_application_exprt &f, array_poolt &array_pool) More... \endlink
+    \copybrief add_axioms_for_substring(symbol_generatort &fresh_symbol, const function_application_exprt &f, array_poolt &array_pool, message_handlert &message_handler)
+    \link add_axioms_for_substring(symbol_generatort &fresh_symbol, const function_application_exprt &f, array_poolt &array_pool, message_handlert &message_handler) More... \endlink
   * `cprover_string_to_lower_case` :
     \copybrief string_to_lower_case_builtin_functiont::constraints
     \link string_to_lower_case_builtin_functiont::constraints More... \endlink
@@ -437,8 +437,8 @@ allocates a new string before calling a primitive.
     \copybrief string_to_upper_case_builtin_functiont::constraints
     \link string_to_upper_case_builtin_functiont::constraints More... \endlink
   * `cprover_string_trim` :
-    \copybrief add_axioms_for_trim(symbol_generatort &fresh_symbol, const function_application_exprt &f, array_poolt &array_pool)
-    \link add_axioms_for_trim(symbol_generatort &fresh_symbol, const function_application_exprt &f, array_poolt &array_pool) More... \endlink
+    \copybrief add_axioms_for_trim(symbol_generatort &fresh_symbol, const function_application_exprt &f, array_poolt &array_pool, message_handlert &message_handler)
+    \link add_axioms_for_trim(symbol_generatort &fresh_symbol, const function_application_exprt &f, array_poolt &array_pool, message_handlert &message_handler) More... \endlink
 
 \subsection conversions Conversions:
 

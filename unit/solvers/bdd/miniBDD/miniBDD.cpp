@@ -9,6 +9,7 @@ Author: Diffblue Ltd.
 /// \file
 /// Unit tests for miniBDD
 
+#include <testing-utils/message.h>
 #include <testing-utils/use_catch.h>
 
 #include <solvers/bdd/miniBDD/miniBDD.h>
@@ -25,7 +26,8 @@ class bdd_propt : public propt
 public:
   mini_bdd_mgrt &mgr;
 
-  explicit bdd_propt(mini_bdd_mgrt &_mgr) : mgr(_mgr)
+  explicit bdd_propt(mini_bdd_mgrt &_mgr)
+    : propt(null_message_handler), mgr(_mgr)
   {
     // True and False
     bdd_map.push_back(mgr.False());

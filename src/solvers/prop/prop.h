@@ -24,7 +24,9 @@ Author: Daniel Kroening, kroening@kroening.com
 class propt
 {
 public:
-  propt() { }
+  explicit propt(message_handlert &message_handler) : log(message_handler)
+  {
+  }
 
   virtual ~propt() { }
 

@@ -293,9 +293,11 @@ void satcheck_minisat2_baset<T>::set_assignment(literalt a, bool value)
   }
 }
 
-template<typename T>
-satcheck_minisat2_baset<T>::satcheck_minisat2_baset(T *_solver):
-  solver(_solver), time_limit_seconds(0)
+template <typename T>
+satcheck_minisat2_baset<T>::satcheck_minisat2_baset(
+  T *_solver,
+  message_handlert &message_handler)
+  : cnf_solvert(message_handler), solver(_solver), time_limit_seconds(0)
 {
 }
 
@@ -336,28 +338,20 @@ void satcheck_minisat2_baset<T>::set_assumptions(const bvt &bv)
     }
 }
 
-satcheck_minisat_no_simplifiert::satcheck_minisat_no_simplifiert():
-  satcheck_minisat2_baset<Minisat::Solver>(new Minisat::Solver)
-{
-}
-
 satcheck_minisat_no_simplifiert::satcheck_minisat_no_simplifiert(
   message_handlert &message_handler)
-  : satcheck_minisat_no_simplifiert()
-{
-  log.set_message_handler(message_handler);
-}
-
-satcheck_minisat_simplifiert::satcheck_minisat_simplifiert():
-  satcheck_minisat2_baset<Minisat::SimpSolver>(new Minisat::SimpSolver)
+  : satcheck_minisat2_baset<Minisat::Solver>(
+      new Minisat::Solver,
+      message_handler)
 {
 }
 
 satcheck_minisat_simplifiert::satcheck_minisat_simplifiert(
   message_handlert &message_handler)
-  : satcheck_minisat_simplifiert()
+  : satcheck_minisat2_baset<Minisat::SimpSolver>(
+      new Minisat::SimpSolver,
+      message_handler)
 {
-  log.set_message_handler(message_handler);
 }
 
 void satcheck_minisat_simplifiert::set_frozen(literalt a)

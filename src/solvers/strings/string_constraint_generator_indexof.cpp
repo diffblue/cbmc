@@ -34,12 +34,14 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 /// \param str: an array of characters expression
 /// \param c: a character expression
 /// \param from_index: an integer expression
+/// \param message_handler: message handler
 /// \return integer expression `index`
 std::pair<exprt, string_constraintst> add_axioms_for_index_of(
   symbol_generatort &fresh_symbol,
   const array_string_exprt &str,
   const exprt &c,
-  const exprt &from_index)
+  const exprt &from_index,
+  message_handlert &message_handler)
 {
   string_constraintst constraints;
   const typet &index_type = str.length().type();
@@ -69,7 +71,8 @@ std::pair<exprt, string_constraintst> add_axioms_for_index_of(
     n,
     lower_bound,
     zero_if_negative(index),
-    implies_exprt(contains, notequal_exprt(str[n], c)));
+    implies_exprt(contains, notequal_exprt(str[n], c)),
+    message_handler);
   constraints.universal.push_back(a4);
 
   symbol_exprt m = fresh_symbol("QA_index_of", index_type);
@@ -77,7 +80,8 @@ std::pair<exprt, string_constraintst> add_axioms_for_index_of(
     m,
     lower_bound,
     zero_if_negative(str.length()),
-    implies_exprt(not_exprt(contains), not_exprt(equal_exprt(str[m], c))));
+    implies_exprt(not_exprt(contains), not_exprt(equal_exprt(str[m], c))),
+    message_handler);
   constraints.universal.push_back(a5);
 
   return {index, std::move(constraints)};
@@ -106,13 +110,15 @@ std::pair<exprt, string_constraintst> add_axioms_for_index_of(
 /// \param haystack: an array of character expression
 /// \param needle: an array of character expression
 /// \param from_index: an integer expression
+/// \param message_handler: message handler
 /// \return integer expression `index` representing the first index of `needle`
 ///   in `haystack`
 std::pair<exprt, string_constraintst> add_axioms_for_index_of_string(
   symbol_generatort &fresh_symbol,
   const array_string_exprt &haystack,
   const array_string_exprt &needle,
-  const exprt &from_index)
+  const exprt &from_index,
+  message_handlert &message_handler)
 {
   string_constraintst constraints;
   const typet &index_type = haystack.length().type();
@@ -136,7 +142,8 @@ std::pair<exprt, string_constraintst> add_axioms_for_index_of_string(
     qvar,
     zero_if_negative(needle.length()),
     implies_exprt(
-      contains, equal_exprt(haystack[plus_exprt(qvar, offset)], needle[qvar])));
+      contains, equal_exprt(haystack[plus_exprt(qvar, offset)], needle[qvar])),
+    message_handler);
   constraints.universal.push_back(a3);
 
   // string_not contains_constraintt are formulas of the form:
@@ -199,13 +206,15 @@ std::pair<exprt, string_constraintst> add_axioms_for_index_of_string(
 /// \param haystack: an array of characters expression
 /// \param needle: an array of characters expression
 /// \param from_index: integer expression
+/// \param message_handler: message handler
 /// \return integer expression `index` representing the last index of `needle`
 ///         in `haystack` before or at `from_index`, or -1 if there is none
 std::pair<exprt, string_constraintst> add_axioms_for_last_index_of_string(
   symbol_generatort &fresh_symbol,
   const array_string_exprt &haystack,
   const array_string_exprt &needle,
-  const exprt &from_index)
+  const exprt &from_index,
+  message_handlert &message_handler)
 {
   string_constraintst constraints;
   const typet &index_type = haystack.length().type();
@@ -228,7 +237,10 @@ std::pair<exprt, string_constraintst> add_axioms_for_last_index_of_string(
   symbol_exprt qvar = fresh_symbol("QA_index_of_string", index_type);
   equal_exprt constr3(haystack[plus_exprt(qvar, offset)], needle[qvar]);
   const string_constraintt a3(
-    qvar, zero_if_negative(needle.length()), implies_exprt(contains, constr3));
+    qvar,
+    zero_if_negative(needle.length()),
+    implies_exprt(contains, constr3),
+    message_handler);
   constraints.universal.push_back(a3);
 
   // end_index is min(from_index, |str| - |substring|)
@@ -270,9 +282,9 @@ std::pair<exprt, string_constraintst> add_axioms_for_last_index_of_string(
 ///
 /// If the target is a character:
 // NOLINTNEXTLINE
-/// \copybrief add_axioms_for_index_of(symbol_generatort &fresh_symbol, const array_string_exprt&,const exprt&,const exprt&)
+/// \copybrief add_axioms_for_index_of(symbol_generatort &fresh_symbol, const array_string_exprt&,const exprt&,const exprt&, message_handlert &)
 // NOLINTNEXTLINE
-/// \link add_axioms_for_index_of(symbol_generatort &fresh_symbol, const array_string_exprt&,const exprt&,const exprt&)
+/// \link add_axioms_for_index_of(symbol_generatort &fresh_symbol, const array_string_exprt&,const exprt&,const exprt&, message_handlert&)
 /// (More...) \endlink
 ///
 /// If the target is a refined_string:
@@ -285,11 +297,13 @@ std::pair<exprt, string_constraintst> add_axioms_for_last_index_of_string(
 ///   refined_string or character `needle`, and optional integer `from_index`
 ///   with default value `0`
 /// \param array_pool: pool of arrays representing strings
+/// \param message_handler: message handler
 /// \return integer expression
 std::pair<exprt, string_constraintst> add_axioms_for_index_of(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
-  array_poolt &array_pool)
+  array_poolt &array_pool,
+  message_handlert &message_handler)
 {
   const function_application_exprt::argumentst &args = f.arguments();
   PRECONDITION(args.size() == 2 || args.size() == 3);
@@ -304,7 +318,11 @@ std::pair<exprt, string_constraintst> add_axioms_for_index_of(
   if(c.type().id() == ID_unsignedbv || c.type().id() == ID_signedbv)
   {
     return add_axioms_for_index_of(
-      fresh_symbol, str, typecast_exprt(c, char_type), from_index);
+      fresh_symbol,
+      str,
+      typecast_exprt(c, char_type),
+      from_index,
+      message_handler);
   }
   else
   {
@@ -314,7 +332,8 @@ std::pair<exprt, string_constraintst> add_axioms_for_index_of(
         "c can only be a (un)signedbv or a refined "
         "string and the (un)signedbv case is already handled"));
     array_string_exprt sub = get_string_expr(array_pool, c);
-    return add_axioms_for_index_of_string(fresh_symbol, str, sub, from_index);
+    return add_axioms_for_index_of_string(
+      fresh_symbol, str, sub, from_index, message_handler);
   }
 }
 
@@ -340,13 +359,15 @@ std::pair<exprt, string_constraintst> add_axioms_for_index_of(
 /// \param str: an array of characters expression
 /// \param c: a character expression
 /// \param from_index: an integer expression
+/// \param message_handler: message handler
 /// \return integer expression `index` representing the last index of `needle`
 ///   in `haystack` before or at `from_index`, or `-1` if there is none
 std::pair<exprt, string_constraintst> add_axioms_for_last_index_of(
   symbol_generatort &fresh_symbol,
   const array_string_exprt &str,
   const exprt &c,
-  const exprt &from_index)
+  const exprt &from_index,
+  message_handlert &message_handler)
 {
   string_constraintst constraints;
   const typet &index_type = str.length().type();
@@ -378,14 +399,16 @@ std::pair<exprt, string_constraintst> add_axioms_for_last_index_of(
     n,
     zero_if_negative(plus_exprt(index, index1)),
     zero_if_negative(end_index),
-    implies_exprt(contains, notequal_exprt(str[n], c)));
+    implies_exprt(contains, notequal_exprt(str[n], c)),
+    message_handler);
   constraints.universal.push_back(a4);
 
   const symbol_exprt m = fresh_symbol("QA_last_index_of2", index_type);
   const string_constraintt a5(
     m,
     zero_if_negative(end_index),
-    implies_exprt(not_exprt(contains), notequal_exprt(str[m], c)));
+    implies_exprt(not_exprt(contains), notequal_exprt(str[m], c)),
+    message_handler);
   constraints.universal.push_back(a5);
 
   return {index, std::move(constraints)};
@@ -395,9 +418,9 @@ std::pair<exprt, string_constraintst> add_axioms_for_last_index_of(
 ///
 /// If the target is a character:
 // NOLINTNEXTLINE
-/// \copybrief add_axioms_for_last_index_of(symbol_generatort &fresh_symbol, const array_string_exprt&,const exprt&,const exprt&)
+/// \copybrief add_axioms_for_last_index_of(symbol_generatort &fresh_symbol, const array_string_exprt&,const exprt&,const exprt&, message_handlert &)
 // NOLINTNEXTLINE
-/// \link add_axioms_for_last_index_of(symbol_generatort &fresh_symbol, const array_string_exprt&,const exprt&,const exprt&)
+/// \link add_axioms_for_last_index_of(symbol_generatort &fresh_symbol, const array_string_exprt&,const exprt&,const exprt&, message_handlert &)
 ///   (More...) \endlink
 ///
 /// If the target is a refined_string:
@@ -414,7 +437,8 @@ std::pair<exprt, string_constraintst> add_axioms_for_last_index_of(
 std::pair<exprt, string_constraintst> add_axioms_for_last_index_of(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
-  array_poolt &array_pool)
+  array_poolt &array_pool,
+  message_handlert &message_handler)
 {
   const function_application_exprt::argumentst &args = f.arguments();
   PRECONDITION(args.size() == 2 || args.size() == 3);
@@ -429,12 +453,16 @@ std::pair<exprt, string_constraintst> add_axioms_for_last_index_of(
   if(c.type().id() == ID_unsignedbv || c.type().id() == ID_signedbv)
   {
     return add_axioms_for_last_index_of(
-      fresh_symbol, str, typecast_exprt(c, char_type), from_index);
+      fresh_symbol,
+      str,
+      typecast_exprt(c, char_type),
+      from_index,
+      message_handler);
   }
   else
   {
     const array_string_exprt sub = get_string_expr(array_pool, c);
     return add_axioms_for_last_index_of_string(
-      fresh_symbol, str, sub, from_index);
+      fresh_symbol, str, sub, from_index, message_handler);
   }
 }
