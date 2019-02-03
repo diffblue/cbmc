@@ -84,7 +84,6 @@ goto_modelt initialize_goto_model(
   }
 
   language_filest language_files;
-  language_files.set_message_handler(message_handler);
 
   goto_modelt goto_model;
 
@@ -129,7 +128,7 @@ goto_modelt initialize_goto_model(
 
     msg.status() << "Converting" << messaget::eom;
 
-    if(language_files.typecheck(goto_model.symbol_table))
+    if(language_files.typecheck(goto_model.symbol_table, message_handler))
     {
       throw invalid_source_file_exceptiont("CONVERSION ERROR");
     }

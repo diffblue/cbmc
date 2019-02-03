@@ -173,7 +173,8 @@ private:
     symbol_table_baset &function_symbol_table) const
   {
     // Fill in symbol table entry body if not already done
-    language_files.convert_lazy_method(name, function_symbol_table);
+    language_files.convert_lazy_method(
+      name, function_symbol_table, message_handler);
 
     underlying_mapt::iterator it = goto_functions.find(name);
     if(it != goto_functions.end())
