@@ -19,11 +19,6 @@ Author: Diffblue Ltd.
 class test_java_bytecode_languaget : public java_bytecode_languaget
 {
 public:
-  explicit test_java_bytecode_languaget(message_handlert &message_handler)
-    : java_bytecode_languaget(message_handler)
-  {
-  }
-
   std::vector<irep_idt> get_parsed_class_names()
   {
     std::vector<irep_idt> parsed_class_names;

@@ -63,11 +63,7 @@ public:
   void show_parse(std::ostream &out, message_handlert &) override;
 
   ~ansi_c_languaget() override;
-
-  explicit ansi_c_languaget(message_handlert &message_handler)
-    : languaget(message_handler)
-  {
-  }
+  ansi_c_languaget() { }
 
   bool from_expr(
     const exprt &expr,
@@ -92,7 +88,7 @@ public:
     message_handlert &message_handler) override;
 
   std::unique_ptr<languaget> new_language() override
-  { return util_make_unique<ansi_c_languaget>(get_message_handler()); }
+  { return util_make_unique<ansi_c_languaget>(); }
 
   std::string id() const override { return "C"; }
   std::string description() const override { return "ANSI-C 99"; }
@@ -107,6 +103,6 @@ protected:
   c_object_factory_parameterst object_factory_params;
 };
 
-std::unique_ptr<languaget> new_ansi_c_language(message_handlert &message_handler);
+std::unique_ptr<languaget> new_ansi_c_language();
 
 #endif // CPROVER_ANSI_C_ANSI_C_LANGUAGE_H

@@ -275,20 +275,18 @@ void compound_block_locationst::check_compound_block_locations(
   of << program << std::endl;
   of.close();
 
+  register_language(new_ansi_c_language);
   cmdlinet cmdline;
   cmdline.args.push_back(tmp());
-
-  ui_message_handlert mh(cmdline, "compound-block-locations");
-  mh.set_verbosity(0);
-  messaget log(mh);
-
-  register_language(new_ansi_c_language, mh);
-
   config.main = "main";
   config.set(cmdline);
 
   optionst opts;
   cbmc_parse_optionst::set_default_options(opts);
+
+  ui_message_handlert mh(cmdline, "compound-block-locations");
+  mh.set_verbosity(0);
+  messaget log(mh);
 
   goto_modelt gm;
   int ret;

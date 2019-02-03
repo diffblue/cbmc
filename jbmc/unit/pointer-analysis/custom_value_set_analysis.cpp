@@ -180,7 +180,7 @@ SCENARIO("test_value_set_analysis",
     optionst options;
     options.set_option("java-cp-include-files", "CustomVSATest.class");
 
-    register_language(new_java_bytecode_language, null_message_handler);
+    register_language(new_java_bytecode_language);
 
     goto_modelt goto_model = initialize_goto_model(
       {"pointer-analysis/CustomVSATest.jar"}, null_message_handler, options);

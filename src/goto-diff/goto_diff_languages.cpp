@@ -18,6 +18,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 void goto_diff_parse_optionst::register_languages()
 {
-  register_language(new_ansi_c_language, get_message_handler());
-  register_language(new_cpp_language, get_message_handler());
+  register_language(new_ansi_c_language);
+  register_language(new_cpp_language);
 }

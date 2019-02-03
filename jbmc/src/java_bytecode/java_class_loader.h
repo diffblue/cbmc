@@ -37,8 +37,7 @@ public:
   typedef std::function<std::vector<irep_idt>(const irep_idt &)>
     get_extra_class_refs_functiont;
 
-  explicit java_class_loadert(message_handlert &message_handler)
-    : java_class_loader_baset(message_handler)
+  java_class_loadert()
   {
   }
 

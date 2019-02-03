@@ -1188,9 +1188,9 @@ void java_bytecode_languaget::show_parse(std::ostream &out, message_handlert &)
   }
 }
 
-std::unique_ptr<languaget> new_java_bytecode_language(message_handlert &message_handler)
+std::unique_ptr<languaget> new_java_bytecode_language()
 {
-  return util_make_unique<java_bytecode_languaget>(message_handler);
+  return util_make_unique<java_bytecode_languaget>();
 }
 
 bool java_bytecode_languaget::from_expr(

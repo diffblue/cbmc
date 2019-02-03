@@ -37,7 +37,7 @@ symbol_tablet load_java_class_lazy(
   const std::string &class_path,
   const std::string &main)
 {
-  std::unique_ptr<languaget> lang = new_java_bytecode_language(null_message_handler);
+  std::unique_ptr<languaget> lang = new_java_bytecode_language();
 
   return load_java_class(java_class_name, class_path, main, std::move(lang));
 }
@@ -191,7 +191,7 @@ goto_modelt load_goto_model_from_java_class(
   command_line.add_flag("no-lazy-methods");
   command_line.add_flag("no-refine-strings");
 
-  std::unique_ptr<languaget> lang = new_java_bytecode_language(null_message_handler);
+  std::unique_ptr<languaget> lang = new_java_bytecode_language();
 
   return load_goto_model_from_java_class(
     java_class_name, class_path, main, std::move(lang), command_line);

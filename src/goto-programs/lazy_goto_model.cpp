@@ -47,7 +47,6 @@ lazy_goto_modelt::lazy_goto_modelt(
       driver_program_can_generate_function_body,
       driver_program_generate_function_body,
       message_handler),
-    language_files(message_handler),
     post_process_function(post_process_function),
     post_process_functions(post_process_functions),
     driver_program_can_generate_function_body(

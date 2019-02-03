@@ -23,11 +23,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 void cbmc_parse_optionst::register_languages()
 {
-  register_language(new_ansi_c_language, get_message_handler());
-  register_language(new_cpp_language, get_message_handler());
-  register_language(new_json_symtab_language, get_message_handler());
+  register_language(new_ansi_c_language);
+  register_language(new_cpp_language);
+  register_language(new_json_symtab_language);
 
 #ifdef HAVE_JSIL
-  register_language(new_jsil_language, get_message_handler());
+  register_language(new_jsil_language);
 #endif
 }

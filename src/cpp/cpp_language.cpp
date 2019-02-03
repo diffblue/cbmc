@@ -197,9 +197,9 @@ void cpp_languaget::show_parse(
     out << "UNKNOWN: " << item.pretty() << '\n';
 }
 
-std::unique_ptr<languaget> new_cpp_language(message_handlert &message_handler)
+std::unique_ptr<languaget> new_cpp_language()
 {
-  return util_make_unique<cpp_languaget>(message_handler);
+  return util_make_unique<cpp_languaget>();
 }
 
 bool cpp_languaget::from_expr(

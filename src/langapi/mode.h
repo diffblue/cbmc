@@ -26,7 +26,7 @@ std::unique_ptr<languaget> get_language_from_filename(
   const std::string &filename);
 std::unique_ptr<languaget> get_default_language();
 
-typedef std::unique_ptr<languaget> (*language_factoryt)(message_handlert &);
-void register_language(language_factoryt factory, message_handlert &message_handler);
+typedef std::unique_ptr<languaget> (*language_factoryt)();
+void register_language(language_factoryt factory);
 
 #endif // CPROVER_LANGAPI_MODE_H

@@ -61,11 +61,7 @@ public:
 
   // constructor, destructor
   ~cpp_languaget() override;
-
-  explicit cpp_languaget(message_handlert &message_handler)
-    : languaget(message_handler)
-  {
-  }
+  cpp_languaget() { }
 
   // conversion from expression into string
   bool from_expr(
@@ -93,7 +89,7 @@ public:
     message_handlert &message_handler) override;
 
   std::unique_ptr<languaget> new_language() override
-  { return util_make_unique<cpp_languaget>(get_message_handler()); }
+  { return util_make_unique<cpp_languaget>(); }
 
   std::string id() const override { return "cpp"; }
   std::string description() const override { return "C++"; }
@@ -115,6 +111,6 @@ protected:
   }
 };
 
-std::unique_ptr<languaget> new_cpp_language(message_handlert &message_handler);
+std::unique_ptr<languaget> new_cpp_language();
 
 #endif // CPROVER_CPP_CPP_LANGUAGE_H

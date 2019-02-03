@@ -76,9 +76,9 @@ goto_analyzer_parse_optionst::goto_analyzer_parse_optionst(
 
 void goto_analyzer_parse_optionst::register_languages()
 {
-  register_language(new_ansi_c_language, get_message_handler());
-  register_language(new_cpp_language, get_message_handler());
-  register_language(new_jsil_language, get_message_handler());
+  register_language(new_ansi_c_language);
+  register_language(new_cpp_language);
+  register_language(new_jsil_language);
 }
 
 void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)

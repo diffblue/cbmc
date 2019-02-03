@@ -24,7 +24,7 @@ SCENARIO(
   "[core][solvers][refinement][string_refinement]")
 {
   // For printing expression
-  register_language(new_java_bytecode_language, null_message_handler);
+  register_language(new_java_bytecode_language);
   symbol_tablet symbol_table;
   namespacet ns(symbol_table);
   messaget::mstreamt &stream = messaget().debug();

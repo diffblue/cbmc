@@ -103,9 +103,9 @@ void jsil_languaget::show_parse(std::ostream &out, message_handlert &)
   parse_tree.output(out);
 }
 
-std::unique_ptr<languaget> new_jsil_language(message_handlert &message_handler)
+std::unique_ptr<languaget> new_jsil_language()
 {
-  return util_make_unique<jsil_languaget>(message_handler);
+  return util_make_unique<jsil_languaget>();
 }
 
 bool jsil_languaget::from_expr(

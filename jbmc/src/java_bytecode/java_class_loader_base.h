@@ -18,11 +18,6 @@ Author: Daniel Kroening, kroening@kroening.com
 class java_class_loader_baset : public messaget
 {
 public:
-  explicit java_class_loader_baset(message_handlert &message_handler)
-    : messaget(message_handler)
-  {
-  }
-
   /// Clear all classpath entries
   void clear_classpath()
   {
