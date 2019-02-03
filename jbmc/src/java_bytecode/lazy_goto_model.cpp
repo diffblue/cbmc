@@ -57,7 +57,6 @@ lazy_goto_modelt::lazy_goto_modelt(
       driver_program_generate_function_body),
     message_handler(message_handler)
 {
-  language_files.set_message_handler(message_handler);
 }
 
 lazy_goto_modelt::lazy_goto_modelt(lazy_goto_modelt &&other)
@@ -207,7 +206,7 @@ void lazy_goto_modelt::initialize(
 
     msg.status() << "Converting" << messaget::eom;
 
-    if(language_files.typecheck(symbol_table))
+    if(language_files.typecheck(symbol_table, message_handler))
     {
       throw invalid_source_file_exceptiont("CONVERSION ERROR");
     }
@@ -258,7 +257,11 @@ void lazy_goto_modelt::initialize(
     // Allow all language front-ends to try to provide the user-specified
     // (--function) entry-point, or some language-specific default:
     entry_point_generation_failed =
+<<<<<<< HEAD:jbmc/src/java_bytecode/lazy_goto_model.cpp
       language_files.generate_support_functions(symbol_table);
+=======
+      language_files.generate_support_functions(symbol_table, message_handler);
+>>>>>>> language_filest is not a messaget:src/goto-programs/lazy_goto_model.cpp
   }
 
   if(entry_point_generation_failed)

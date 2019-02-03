@@ -83,7 +83,6 @@ goto_modelt initialize_goto_model(
   }
 
   language_filest language_files;
-  language_files.set_message_handler(message_handler);
 
   goto_modelt goto_model;
 
@@ -127,7 +126,7 @@ goto_modelt initialize_goto_model(
 
     msg.status() << "Converting" << messaget::eom;
 
-    if(language_files.typecheck(goto_model.symbol_table))
+    if(language_files.typecheck(goto_model.symbol_table, message_handler))
     {
       throw invalid_source_file_exceptiont("CONVERSION ERROR");
     }
@@ -169,6 +168,7 @@ goto_modelt initialize_goto_model(
   }
   else if(!binaries_provided_start)
   {
+<<<<<<< HEAD
     if(options.is_set("function"))
     {
       // no entry point is present; Use the mode of the specified entry function
@@ -183,6 +183,12 @@ goto_modelt initialize_goto_model(
       entry_point_generation_failed =
         language_files.generate_support_functions(goto_model.symbol_table);
     }
+=======
+    // Allow all language front-ends to try to provide the user-specified
+    // (--function) entry-point, or some language-specific default:
+    entry_point_generation_failed = language_files.generate_support_functions(
+      goto_model.symbol_table, message_handler);
+>>>>>>> language_filest is not a messaget
   }
 
   if(entry_point_generation_failed)

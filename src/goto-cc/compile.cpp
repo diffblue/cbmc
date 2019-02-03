@@ -603,13 +603,16 @@ bool compilet::write_bin_object_file(
 bool compilet::parse_source(const std::string &file_name)
 {
   language_filest language_files;
-  language_files.set_message_handler(get_message_handler());
 
   if(parse(file_name, language_files))
     return true;
 
   // we just typecheck one file here
+<<<<<<< HEAD
   if(language_files.typecheck(goto_model.symbol_table, keep_file_local))
+=======
+  if(language_files.typecheck(goto_model.symbol_table, get_message_handler()))
+>>>>>>> language_filest is not a messaget
   {
     error() << "CONVERSION ERROR" << eom;
     return true;

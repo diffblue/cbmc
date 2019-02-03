@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <fstream>
 
+#include <util/message.h>
 #include <util/object_factory_parameters.h>
 
 #include "language.h"
@@ -45,14 +46,16 @@ void language_filet::convert_lazy_method(
   language->convert_lazy_method(id, symbol_table, message_handler);
 }
 
-void language_filest::show_parse(std::ostream &out)
+void language_filest::show_parse(std::ostream &out, message_handlert &message_handler)
 {
   for(const auto &file : file_map)
-    file.second.language->show_parse(out, get_message_handler());
+    file.second.language->show_parse(out, message_handler);
 }
 
-bool language_filest::parse()
+bool language_filest::parse(message_handlert &message_handler)
 {
+  messaget log(message_handler);
+
   for(auto &file : file_map)
   {
     // open file
@@ -61,7 +64,7 @@ bool language_filest::parse()
 
     if(!infile)
     {
-      error() << "Failed to open " << file.first << eom;
+      log.error() << "Failed to open " << file.first << messaget::eom;
       return true;
     }
 
@@ -69,9 +72,9 @@ bool language_filest::parse()
 
     languaget &language=*(file.second.language);
 
-    if(language.parse(infile, file.first, get_message_handler()))
+    if(language.parse(infile, file.first, message_handler))
     {
-      error() << "Parsing of " << file.first << " failed" << eom;
+      log.error() << "Parsing of " << file.first << " failed" << messaget::eom;
       return true;
     }
 
@@ -85,13 +88,17 @@ bool language_filest::parse()
 
 bool language_filest::typecheck(
   symbol_tablet &symbol_table,
+<<<<<<< HEAD
   const bool keep_file_local)
+=======
+  message_handlert &message_handler)
+>>>>>>> language_filest is not a messaget
 {
   // typecheck interfaces
 
   for(auto &file : file_map)
   {
-    if(file.second.language->interfaces(symbol_table, get_message_handler()))
+    if(file.second.language->interfaces(symbol_table, message_handler))
       return true;
   }
 
@@ -133,6 +140,7 @@ bool language_filest::typecheck(
     if(file.second.modules.empty())
     {
 <<<<<<< HEAD
+<<<<<<< HEAD
       if(file.second.language->can_keep_file_local())
       {
         if(file.second.language->typecheck(symbol_table, "", keep_file_local))
@@ -146,6 +154,9 @@ bool language_filest::typecheck(
 =======
       if(file.second.language->typecheck(
            symbol_table, "", get_message_handler()))
+=======
+      if(file.second.language->typecheck(symbol_table, "", message_handler))
+>>>>>>> language_filest is not a messaget
         return true;
 >>>>>>> languaget is not a messaget
       // register lazy methods.
@@ -162,7 +173,11 @@ bool language_filest::typecheck(
 
   for(auto &module : module_map)
   {
+<<<<<<< HEAD
     if(typecheck_module(symbol_table, module.second, keep_file_local))
+=======
+    if(typecheck_module(symbol_table, module.second, message_handler))
+>>>>>>> language_filest is not a messaget
       return true;
   }
 
@@ -170,7 +185,8 @@ bool language_filest::typecheck(
 }
 
 bool language_filest::generate_support_functions(
-  symbol_tablet &symbol_table)
+  symbol_tablet &symbol_table,
+  message_handlert &message_handler)
 {
   std::set<std::string> languages;
 
@@ -178,7 +194,7 @@ bool language_filest::generate_support_functions(
   {
     if(languages.insert(file.second.language->id()).second)
       if(file.second.language->generate_support_functions(
-           symbol_table, get_message_handler()))
+           symbol_table, message_handler))
         return true;
   }
 
@@ -200,11 +216,12 @@ bool language_filest::final(symbol_table_baset &symbol_table)
 }
 
 bool language_filest::interfaces(
-  symbol_tablet &symbol_table)
+  symbol_tablet &symbol_table,
+  message_handlert &message_handler)
 {
   for(auto &file : file_map)
   {
-    if(file.second.language->interfaces(symbol_table, get_message_handler()))
+    if(file.second.language->interfaces(symbol_table, message_handler))
       return true;
   }
 
@@ -214,7 +231,11 @@ bool language_filest::interfaces(
 bool language_filest::typecheck_module(
   symbol_tablet &symbol_table,
   const std::string &module,
+<<<<<<< HEAD
   const bool keep_file_local)
+=======
+  message_handlert &message_handler)
+>>>>>>> language_filest is not a messaget
 {
   // check module map
 
@@ -222,28 +243,40 @@ bool language_filest::typecheck_module(
 
   if(it==module_map.end())
   {
-    error() << "found no file that provides module " << module << eom;
+    messaget log(message_handler);
+    log.error() << "found no file that provides module " << module
+                << messaget::eom;
     return true;
   }
 
+<<<<<<< HEAD
   return typecheck_module(symbol_table, it->second, keep_file_local);
+=======
+  return typecheck_module(symbol_table, it->second, message_handler);
+>>>>>>> language_filest is not a messaget
 }
 
 bool language_filest::typecheck_module(
   symbol_tablet &symbol_table,
   language_modulet &module,
+<<<<<<< HEAD
   const bool keep_file_local)
+=======
+  message_handlert &message_handler)
+>>>>>>> language_filest is not a messaget
 {
   // already typechecked?
 
   if(module.type_checked)
     return false;
 
+  messaget log(message_handler);
+
   // already in progress?
 
   if(module.in_progress)
   {
-    error() << "circular dependency in " << module.name << eom;
+    log.error() << "circular dependency in " << module.name << messaget::eom;
     return true;
   }
 
@@ -260,21 +293,31 @@ bool language_filest::typecheck_module(
       it!=dependency_set.end();
       it++)
   {
+<<<<<<< HEAD
     module.in_progress = !typecheck_module(symbol_table, *it, keep_file_local);
     if(module.in_progress == false)
+=======
+    if(typecheck_module(symbol_table, *it, message_handler))
+    {
+      module.in_progress=false;
+>>>>>>> language_filest is not a messaget
       return true;
   }
 
   // type check it
 
-  status() << "Type-checking " << module.name << eom;
+  log.status() << "Type-checking " << module.name << messaget::eom;
 
 <<<<<<< HEAD
   if(module.file->language->can_keep_file_local())
 =======
   if(module.file->language->typecheck(
+<<<<<<< HEAD
        symbol_table, module.name, get_message_handler()))
 >>>>>>> languaget is not a messaget
+=======
+       symbol_table, module.name, message_handler))
+>>>>>>> language_filest is not a messaget
   {
     module.in_progress = !module.file->language->typecheck(
       symbol_table, module.name, keep_file_local);

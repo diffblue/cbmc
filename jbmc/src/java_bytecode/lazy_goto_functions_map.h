@@ -191,6 +191,14 @@ private:
     // Second chance: see if language_filest can provide a body:
     if(!body_provided)
     {
+<<<<<<< HEAD:jbmc/src/java_bytecode/lazy_goto_functions_map.h
+=======
+      // Fill in symbol table entry body if not already done
+      language_files.convert_lazy_method(
+        name, function_symbol_table, message_handler);
+      body_provided = function_symbol_table.lookup_ref(name).value.is_not_nil();
+
+>>>>>>> language_filest is not a messaget:src/goto-programs/lazy_goto_functions_map.h
       // Create goto_functiont
       goto_convert_functionst convert_functions(
         function_symbol_table, message_handler);
