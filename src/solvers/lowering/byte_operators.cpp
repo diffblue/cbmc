@@ -343,8 +343,10 @@ exprt lower_byte_extract(const byte_extract_exprt &src, const namespacet &ns)
     return simplify_expr(typecast_exprt(op.front(), src.type()), ns);
   else // width_bytes>=2
   {
-    concatenation_exprt concatenation(std::move(op), src.type());
-    return simplify_expr(concatenation, ns);
+    concatenation_exprt concatenation(
+      std::move(op), bitvector_typet(subtype.id(), width_bytes * 8));
+    return simplify_expr(
+      typecast_exprt(std::move(concatenation), src.type()), ns);
   }
 }
 
