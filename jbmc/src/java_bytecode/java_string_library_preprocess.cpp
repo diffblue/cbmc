@@ -944,13 +944,17 @@ java_string_library_preprocesst::string_literal_to_string_expr(
 /// \param loc: location in the program_invocation_name
 /// \param function_id: function the generated code will be added to
 /// \param symbol_table: symbol table
+/// \param message_handler: a message handler
 /// \return Code corresponding to the Java conversion of floats to strings.
 code_blockt java_string_library_preprocesst::make_float_to_string_code(
   const java_method_typet &type,
   const source_locationt &loc,
   const irep_idt &function_id,
-  symbol_table_baset &symbol_table)
+  symbol_table_baset &symbol_table,
+  message_handlert &message_handler)
 {
+  (void)message_handler;
+
   // Getting the argument
   java_method_typet::parameterst params = type.parameters();
   PRECONDITION(params.size()==1);
@@ -1184,6 +1188,7 @@ code_blockt java_string_library_preprocesst::make_assign_function_from_call(
 /// \param loc: a location in the source
 /// \param symbol_table: the symbol table
 /// \param code: code block to which we are adding some assignments
+/// \param message_handler: message handler
 /// \return An expression containing a symbol `tmp_type_name` where `type_name`
 ///   is the given argument (ie. boolean, char etc.). Which represents the
 ///   primitive value contained in the given object.
@@ -1193,7 +1198,8 @@ java_string_library_preprocesst::get_primitive_value_of_object(
   irep_idt type_name,
   const source_locationt &loc,
   symbol_table_baset &symbol_table,
-  code_blockt &code)
+  code_blockt &code,
+  message_handlert &message_handler)
 {
   optionalt<struct_tag_typet> object_type;
 
@@ -1272,8 +1278,9 @@ java_string_library_preprocesst::get_primitive_value_of_object(
     }
   }
 
-  warning() << object_type->get_identifier()
-            << " not available to format function" << eom;
+  messaget log(message_handler);
+  log.warning() << object_type->get_identifier()
+                << " not available to format function" << messaget::eom;
   code.add(code_declt(value), loc);
   return value;
 }
@@ -1329,6 +1336,7 @@ dereference_exprt java_string_library_preprocesst::get_object_at_index(
 /// \param function_id: function the generated expression will be used in
 /// \param symbol_table: the symbol table
 /// \param code: code block to which we are adding some assignments
+/// \param message_handler: message handler
 /// \return An expression of type `structured_type` representing the possible
 ///         values of the argument at position `index` of `argv`.
 struct_exprt java_string_library_preprocesst::make_argument_for_format(
@@ -1338,7 +1346,8 @@ struct_exprt java_string_library_preprocesst::make_argument_for_format(
   const source_locationt &loc,
   const irep_idt &function_id,
   symbol_table_baset &symbol_table,
-  code_blockt &code)
+  code_blockt &code,
+  message_handlert &message_handler)
 {
   // Declarations of the fields of arg_i_struct
   // arg_i_struct is { arg_i_string_expr, tmp_int, tmp_char, ... }
@@ -1415,7 +1424,7 @@ struct_exprt java_string_library_preprocesst::make_argument_for_format(
     else if(name==ID_int || name==ID_float || name==ID_char || name==ID_boolean)
     {
       const auto value = get_primitive_value_of_object(
-        arg_i, name, loc, symbol_table, code_not_null);
+        arg_i, name, loc, symbol_table, code_not_null, message_handler);
       if(value.has_value())
         code_not_null.add(code_assignt(field_expr, *value), loc);
       else
@@ -1439,6 +1448,7 @@ struct_exprt java_string_library_preprocesst::make_argument_for_format(
 /// \param loc: location in the program_invocation_name
 /// \param function_id: function the generated code will be used in
 /// \param symbol_table: symbol table
+/// \param message_handler: message handler
 /// \return Code implementing the Java String.format function. Since the exact
 ///   class of the arguments is not known, we give as argument to the internal
 //    format function a structure containing the different possible types.
@@ -1446,7 +1456,8 @@ code_blockt java_string_library_preprocesst::make_string_format_code(
   const java_method_typet &type,
   const source_locationt &loc,
   const irep_idt &function_id,
-  symbol_table_baset &symbol_table)
+  symbol_table_baset &symbol_table,
+  message_handlert &message_handler)
 {
   PRECONDITION(type.parameters().size()==2);
   code_blockt code;
@@ -1473,9 +1484,15 @@ code_blockt java_string_library_preprocesst::make_string_format_code(
   std::vector<exprt> processed_args;
   processed_args.push_back(args[0]);
   for(std::size_t i=0; i<MAX_FORMAT_ARGS; ++i)
-    processed_args.push_back(
-      make_argument_for_format(
-        args[1], i, structured_type, loc, function_id, symbol_table, code));
+    processed_args.push_back(make_argument_for_format(
+      args[1],
+      i,
+      structured_type,
+      loc,
+      function_id,
+      symbol_table,
+      code,
+      message_handler));
 
   refined_string_exprt string_expr = string_expr_of_function(
     ID_cprover_string_format_func, processed_args, loc, symbol_table, code);
@@ -1495,6 +1512,7 @@ code_blockt java_string_library_preprocesst::make_string_format_code(
 /// \param loc: location in the source
 /// \param function_id: function the generated code will be added to
 /// \param symbol_table: the symbol table
+/// \param message_handler: a message handler
 /// \return Code corresponding to
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 /// Class class1;
@@ -1506,7 +1524,8 @@ code_blockt java_string_library_preprocesst::make_object_get_class_code(
   const java_method_typet &type,
   const source_locationt &loc,
   const irep_idt &function_id,
-  symbol_table_baset &symbol_table)
+  symbol_table_baset &symbol_table,
+  message_handlert &message_handler)
 {
   java_method_typet::parameterst params = type.parameters();
   PRECONDITION(!params.empty());
@@ -1650,6 +1669,7 @@ java_string_library_preprocesst::make_string_returning_function_from_call(
 /// \param loc: location in the source
 /// \param function_id: function the generated code will be added to
 /// \param symbol_table: symbol table
+/// \param message_handler: a message handler
 /// \return Code corresponding to:
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 /// string_expr = string_to_string_expr(arg0)
@@ -1662,8 +1682,11 @@ code_blockt java_string_library_preprocesst::make_copy_string_code(
   const java_method_typet &type,
   const source_locationt &loc,
   const irep_idt &function_id,
-  symbol_table_baset &symbol_table)
+  symbol_table_baset &symbol_table,
+  message_handlert &message_handler)
 {
+  (void)message_handler;
+
   // Code for the output
   code_blockt code;
 
@@ -1696,6 +1719,7 @@ code_blockt java_string_library_preprocesst::make_copy_string_code(
 /// \param loc: location in the source
 /// \param function_id: unused
 /// \param symbol_table: symbol table
+/// \param message_handler: a message handler
 /// \return Code corresponding to:
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 /// string_expr = java_string_to_string_expr(arg1)
@@ -1706,9 +1730,11 @@ code_blockt java_string_library_preprocesst::make_copy_constructor_code(
   const java_method_typet &type,
   const source_locationt &loc,
   const irep_idt &function_id,
-  symbol_table_baset &symbol_table)
+  symbol_table_baset &symbol_table,
+  message_handlert &message_handler)
 {
   (void)function_id;
+  (void)message_handler;
 
   // Code for the output
   code_blockt code;
@@ -1739,6 +1765,7 @@ code_blockt java_string_library_preprocesst::make_copy_constructor_code(
 /// \param loc: location in the source
 /// \param function_id: unused
 /// \param symbol_table: symbol table
+/// \param message_handler: a message handler
 /// \return Code corresponding to:
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 /// str_expr = java_string_to_string_expr(this)
@@ -1749,9 +1776,11 @@ code_returnt java_string_library_preprocesst::make_string_length_code(
   const java_method_typet &type,
   const source_locationt &loc,
   const irep_idt &function_id,
-  symbol_table_baset &symbol_table)
+  symbol_table_baset &symbol_table,
+  message_handlert &message_handler)
 {
   (void)function_id;
+  (void)message_handler;
 
   java_method_typet::parameterst params = type.parameters();
   PRECONDITION(!params[0].get_identifier().empty());
@@ -1802,11 +1831,13 @@ void java_string_library_preprocesst::get_all_function_names(
 /// code but for which no implementation is provided.
 /// \param symbol: symbol of the function to provide code for
 /// \param symbol_table: a symbol table
+/// \param message_handler: a message handler
 /// \return Code for the body of the String functions if they are part of the
 ///   supported String functions, nil_exprt otherwise.
 codet java_string_library_preprocesst::code_for_function(
   const symbolt &symbol,
-  symbol_table_baset &symbol_table)
+  symbol_table_baset &symbol_table,
+  message_handlert &message_handler)
 {
   const irep_idt &function_id = symbol.name;
   const java_method_typet &type = to_java_method_type(symbol.type);
@@ -1839,7 +1870,7 @@ codet java_string_library_preprocesst::code_for_function(
   INVARIANT(
     it != conversion_table.end(), "Couldn't retrieve code for string method");
 
-  return it->second(type, loc, function_id, symbol_table);
+  return it->second(type, loc, function_id, symbol_table, message_handler);
 }
 
 /// Check whether a class name is known as a string type.
@@ -1878,7 +1909,8 @@ void java_string_library_preprocesst::initialize_conversion_table()
       std::placeholders::_1,
       std::placeholders::_2,
       std::placeholders::_3,
-      std::placeholders::_4);
+      std::placeholders::_4,
+      std::placeholders::_5);
   conversion_table
     ["java::java.lang.String.<init>:(Ljava/lang/StringBuilder;)V"] = std::bind(
       &java_string_library_preprocesst::make_copy_constructor_code,
@@ -1886,7 +1918,8 @@ void java_string_library_preprocesst::initialize_conversion_table()
       std::placeholders::_1,
       std::placeholders::_2,
       std::placeholders::_3,
-      std::placeholders::_4);
+      std::placeholders::_4,
+      std::placeholders::_5);
   cprover_equivalent_to_java_constructor
     ["java::java.lang.String.<init>:()V"]=
       ID_cprover_string_empty_string_func;
@@ -1929,7 +1962,8 @@ void java_string_library_preprocesst::initialize_conversion_table()
         std::placeholders::_1,
         std::placeholders::_2,
         std::placeholders::_3,
-        std::placeholders::_4);
+        std::placeholders::_4,
+        std::placeholders::_5);
   cprover_equivalent_to_java_function
     ["java::java.lang.String.hashCode:()I"]=
       ID_cprover_string_hash_code_func;
@@ -1969,7 +2003,8 @@ void java_string_library_preprocesst::initialize_conversion_table()
     std::placeholders::_1,
     std::placeholders::_2,
     std::placeholders::_3,
-    std::placeholders::_4);
+    std::placeholders::_4,
+    std::placeholders::_5);
   cprover_equivalent_to_java_function
     ["java::org.cprover.CProverString.offsetByCodePoints:(Ljava/lang/"
      "String;II)I"] = ID_cprover_string_offset_by_code_point_func;
@@ -2008,7 +2043,8 @@ void java_string_library_preprocesst::initialize_conversion_table()
       std::placeholders::_1,
       std::placeholders::_2,
       std::placeholders::_3,
-      std::placeholders::_4);
+      std::placeholders::_4,
+      std::placeholders::_5);
   cprover_equivalent_to_java_string_returning_function
     ["java::java.lang.String.toUpperCase:()Ljava/lang/String;"]=
       ID_cprover_string_to_upper_case_func;
@@ -2028,7 +2064,8 @@ void java_string_library_preprocesst::initialize_conversion_table()
       std::placeholders::_1,
       std::placeholders::_2,
       std::placeholders::_3,
-      std::placeholders::_4);
+      std::placeholders::_4,
+      std::placeholders::_5);
   conversion_table["java::java.lang.String.valueOf:(F)Ljava/lang/String;"] =
     std::bind(
       &java_string_library_preprocesst::make_float_to_string_code,
@@ -2036,7 +2073,8 @@ void java_string_library_preprocesst::initialize_conversion_table()
       std::placeholders::_1,
       std::placeholders::_2,
       std::placeholders::_3,
-      std::placeholders::_4);
+      std::placeholders::_4,
+      std::placeholders::_5);
   cprover_equivalent_to_java_string_returning_function
     ["java::java.lang.String.valueOf:(I)Ljava/lang/String;"]=
       ID_cprover_string_of_int_func;
@@ -2052,7 +2090,8 @@ void java_string_library_preprocesst::initialize_conversion_table()
       std::placeholders::_1,
       std::placeholders::_2,
       std::placeholders::_3,
-      std::placeholders::_4);
+      std::placeholders::_4,
+      std::placeholders::_5);
   cprover_equivalent_to_java_constructor
     ["java::java.lang.StringBuilder.<init>:()V"]=
       ID_cprover_string_empty_string_func;
@@ -2122,7 +2161,8 @@ void java_string_library_preprocesst::initialize_conversion_table()
     std::placeholders::_1,
     std::placeholders::_2,
     std::placeholders::_3,
-    std::placeholders::_4);
+    std::placeholders::_4,
+    std::placeholders::_5);
   cprover_equivalent_to_java_assign_function
     ["java::java.lang.StringBuilder.setCharAt:(IC)V"]=
       ID_cprover_string_char_set_func;
@@ -2142,7 +2182,8 @@ void java_string_library_preprocesst::initialize_conversion_table()
       std::placeholders::_1,
       std::placeholders::_2,
       std::placeholders::_3,
-      std::placeholders::_4);
+      std::placeholders::_4,
+      std::placeholders::_5);
 
   // StringBuffer library
   conversion_table
@@ -2152,7 +2193,8 @@ void java_string_library_preprocesst::initialize_conversion_table()
       std::placeholders::_1,
       std::placeholders::_2,
       std::placeholders::_3,
-      std::placeholders::_4);
+      std::placeholders::_4,
+      std::placeholders::_5);
   cprover_equivalent_to_java_constructor
     ["java::java.lang.StringBuffer.<init>:()V"]=
       ID_cprover_string_empty_string_func;
@@ -2239,7 +2281,8 @@ void java_string_library_preprocesst::initialize_conversion_table()
       std::placeholders::_1,
       std::placeholders::_2,
       std::placeholders::_3,
-      std::placeholders::_4);
+      std::placeholders::_4,
+      std::placeholders::_5);
 
   // CharSequence library
   cprover_equivalent_to_java_function
@@ -2252,7 +2295,8 @@ void java_string_library_preprocesst::initialize_conversion_table()
       std::placeholders::_1,
       std::placeholders::_2,
       std::placeholders::_3,
-      std::placeholders::_4);
+      std::placeholders::_4,
+      std::placeholders::_5);
   conversion_table
     ["java::java.lang.CharSequence.length:()I"]=
       conversion_table["java::java.lang.String.length:()I"];
@@ -2265,7 +2309,8 @@ void java_string_library_preprocesst::initialize_conversion_table()
       std::placeholders::_1,
       std::placeholders::_2,
       std::placeholders::_3,
-      std::placeholders::_4);
+      std::placeholders::_4,
+      std::placeholders::_5);
   cprover_equivalent_to_java_function
     ["java::java.lang.Integer.parseInt:(Ljava/lang/String;)I"]=
       ID_cprover_string_parse_int_func;
@@ -2300,5 +2345,6 @@ void java_string_library_preprocesst::initialize_conversion_table()
       std::placeholders::_1,
       std::placeholders::_2,
       std::placeholders::_3,
-      std::placeholders::_4);
+      std::placeholders::_4,
+      std::placeholders::_5);
 }
