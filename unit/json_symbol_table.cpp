@@ -57,7 +57,6 @@ void get_goto_model(std::istream &in, goto_modelt &goto_model)
   messaget null_message(null_message_handler);
 
   language_filest language_files;
-  language_files.set_message_handler(null_message_handler);
 
   std::string filename("");
 
@@ -76,14 +75,16 @@ void get_goto_model(std::istream &in, goto_modelt &goto_model)
   language_file.get_modules();
 
   {
-    bool r = language_files.typecheck(goto_model.symbol_table);
+    bool r =
+      language_files.typecheck(goto_model.symbol_table, null_message_handler);
     REQUIRE(!r);
   }
 
   REQUIRE(!goto_model.symbol_table.has_symbol(goto_functionst::entry_point()));
 
   {
-    bool r = language_files.generate_support_functions(goto_model.symbol_table);
+    bool r = language_files.generate_support_functions(
+      goto_model.symbol_table, null_message_handler);
     REQUIRE(!r);
   }
 

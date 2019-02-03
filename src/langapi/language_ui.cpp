@@ -97,9 +97,7 @@ bool language_uit::typecheck()
 {
   status() << "Converting" << eom;
 
-  language_files.set_message_handler(*message_handler);
-
-  if(language_files.typecheck(symbol_table))
+  if(language_files.typecheck(symbol_table, *message_handler))
   {
     error() << "CONVERSION ERROR" << eom;
     return true;
@@ -110,8 +108,6 @@ bool language_uit::typecheck()
 
 bool language_uit::final()
 {
-  language_files.set_message_handler(*message_handler);
-
   if(language_files.final(symbol_table))
   {
     error() << "CONVERSION ERROR" << eom;
