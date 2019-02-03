@@ -26,38 +26,51 @@ public:
   /// Sets language specific options.
   /// \param options: Options that shall apply during the parse and
   ///   typecheck process.
-  void set_language_options(const optionst &options) override;
+  /// \param message_handler: Message handler.
+  void set_language_options(
+    const optionst &options,
+    message_handlert &message_handler) override;
 
   /// Parses input given by \p instream and saves this result to this
   /// instance's parse tree.
   /// \param instream: Input to parse.
   /// \param path: Path of the input.
+  /// \param message_handler: Message handler.
   /// \return False if successful.
-  bool parse(std::istream &instream, const std::string &path) override;
+  bool parse(
+    std::istream &instream,
+    const std::string &path,
+    message_handlert &message_handler) override;
 
   /// Currently unused.
-  bool generate_support_functions(symbol_table_baset &symbol_table) override;
+  bool generate_support_functions(
+    symbol_table_baset &symbol_table,
+    message_handlert &) override;
 
   /// Converts the current parse tree into a symbol table.
   /// \param [out] symbol_table: Object that shall be filled by this function.
   ///   If the symbol table is not empty when calling this function, its
   ///   contents are merged with the new entries.
   /// \param module: Name of the file that has been parsed.
+  /// \param message_handler: Message handler.
   /// \param keep_file_local: Set to true if local variables of this module
   ///   should be included in the table.
   /// \return False if no errors occurred, true otherwise.
   bool typecheck(
     symbol_table_baset &symbol_table,
     const std::string &module,
+    message_handlert &message_handler,
     const bool keep_file_local) override;
 
-  bool typecheck(symbol_table_baset &symbol_table, const std::string &module)
-    override;
+  bool typecheck(
+    symbol_table_baset &symbol_table,
+    const std::string &module,
+    message_handlert &) override;
 
   bool can_keep_file_local() override;
 
   /// Prints the parse tree to the given output stream.
-  void show_parse(std::ostream &out) override;
+  void show_parse(std::ostream &out, message_handlert &) override;
 
   // Constructor and destructor.
   ~statement_list_languaget() override;
@@ -92,12 +105,14 @@ public:
   /// \param module: prefix to be used for identifiers
   /// \param expr: the parsed expression
   /// \param ns: a namespace
+  /// \param message_handler: Message handler.
   /// \return false if the conversion succeeds
   bool to_expr(
     const std::string &code,
     const std::string &module,
     exprt &expr,
-    const namespacet &ns) override;
+    const namespacet &ns,
+    message_handlert &message_handler) override;
 
   std::unique_ptr<languaget> new_language() override;
 

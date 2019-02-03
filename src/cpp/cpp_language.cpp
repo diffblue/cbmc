@@ -57,10 +57,11 @@ void cpp_languaget::modules_provided(std::set<std::string> &modules)
 bool cpp_languaget::preprocess(
   std::istream &instream,
   const std::string &path,
-  std::ostream &outstream)
+  std::ostream &outstream,
+  message_handlert &message_handler)
 {
   if(path.empty())
-    return c_preprocess(instream, outstream, get_message_handler());
+    return c_preprocess(instream, outstream, message_handler);
 
   // check extension
 
@@ -77,12 +78,13 @@ bool cpp_languaget::preprocess(
     return false;
   }
 
-  return c_preprocess(path, outstream, get_message_handler());
+  return c_preprocess(path, outstream, message_handler);
 }
 
 bool cpp_languaget::parse(
   std::istream &instream,
-  const std::string &path)
+  const std::string &path,
+  message_handlert &message_handler)
 {
   // store the path
 
@@ -94,7 +96,7 @@ bool cpp_languaget::parse(
 
   cpp_internal_additions(o_preprocessed);
 
-  if(preprocess(instream, path, o_preprocessed))
+  if(preprocess(instream, path, o_preprocessed, message_handler))
     return true;
 
   std::istringstream i_preprocessed(o_preprocessed.str());
@@ -104,7 +106,7 @@ bool cpp_languaget::parse(
   cpp_parser.clear();
   cpp_parser.set_file(path);
   cpp_parser.in=&i_preprocessed;
-  cpp_parser.log.set_message_handler(get_message_handler());
+  cpp_parser.log.set_message_handler(message_handler);
   cpp_parser.mode=config.ansi_c.mode;
 
   bool result=cpp_parser.parse();
@@ -120,29 +122,31 @@ bool cpp_languaget::parse(
 
 bool cpp_languaget::typecheck(
   symbol_table_baset &symbol_table,
-  const std::string &module)
+  const std::string &module,
+  message_handlert &message_handler)
 {
   if(module.empty())
     return false;
 
   symbol_tablet new_symbol_table;
 
-  if(cpp_typecheck(
-      cpp_parse_tree, new_symbol_table, module, get_message_handler()))
+  if(cpp_typecheck(cpp_parse_tree, new_symbol_table, module, message_handler))
     return true;
 
-  remove_internal_symbols(new_symbol_table, get_message_handler(), false);
+  remove_internal_symbols(new_symbol_table, message_handler, false);
 
-  return linking(symbol_table, new_symbol_table, get_message_handler());
+  return linking(symbol_table, new_symbol_table, message_handler);
 }
 
-bool cpp_languaget::generate_support_functions(symbol_table_baset &symbol_table)
+bool cpp_languaget::generate_support_functions(
+  symbol_table_baset &symbol_table,
+  message_handlert &message_handler)
 {
   return ansi_c_entry_point(
-    symbol_table, get_message_handler(), object_factory_params);
+    symbol_table, message_handler, object_factory_params);
 }
 
-void cpp_languaget::show_parse(std::ostream &out)
+void cpp_languaget::show_parse(std::ostream &out, message_handlert &)
 {
   for(const auto &i : cpp_parse_tree.items)
     show_parse(out, i);
@@ -231,7 +235,8 @@ bool cpp_languaget::to_expr(
   const std::string &code,
   const std::string &,
   exprt &expr,
-  const namespacet &ns)
+  const namespacet &ns,
+  message_handlert &message_handler)
 {
   expr.make_nil();
 
@@ -244,7 +249,7 @@ bool cpp_languaget::to_expr(
   cpp_parser.clear();
   cpp_parser.set_file(irep_idt());
   cpp_parser.in=&i_preprocessed;
-  cpp_parser.log.set_message_handler(get_message_handler());
+  cpp_parser.log.set_message_handler(message_handler);
 
   bool result=cpp_parser.parse();
 
@@ -256,7 +261,7 @@ bool cpp_languaget::to_expr(
     // expr.swap(cpp_parser.parse_tree.declarations.front());
 
     // typecheck it
-    result=cpp_typecheck(expr, get_message_handler(), ns);
+    result = cpp_typecheck(expr, message_handler, ns);
   }
 
   // save some memory

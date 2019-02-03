@@ -674,10 +674,10 @@ determine which loading strategy to use.
 If [lazy_methods_mode](\ref java_bytecode_language_optionst::lazy_methods_mode) is
 \ref LAZY_METHODS_MODE_EAGER then eager loading is
 used. Under eager loading
-\ref java_bytecode_languaget::convert_single_method(const irep_idt &, symbol_table_baset &, lazy_class_to_declared_symbols_mapt &)
+\ref java_bytecode_languaget::convert_single_method(const irep_idt &, symbol_table_baset &, lazy_class_to_declared_symbols_mapt &, message_handlert &)
 is called once for each method listed in method_bytecode (described above). This
 then calls
-\ref java_bytecode_languaget::convert_single_method(const irep_idt &, symbol_table_baset &, optionalt<ci_lazy_methods_neededt>, lazy_class_to_declared_symbols_mapt &);
+\ref java_bytecode_languaget::convert_single_method(const irep_idt &, symbol_table_baset &, optionalt<ci_lazy_methods_neededt>, lazy_class_to_declared_symbols_mapt &, message_handlert &);
 
 without a ci_lazy_methods_neededt object, which calls
 \ref java_bytecode_convert_method, passing in the method parse tree. This in

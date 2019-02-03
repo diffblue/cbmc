@@ -201,7 +201,7 @@ private:
 
 struct java_bytecode_language_optionst
 {
-  java_bytecode_language_optionst(const optionst &options, messaget &log);
+  java_bytecode_language_optionst(const optionst &options, message_handlert &);
 
   java_bytecode_language_optionst() = default;
 
@@ -260,33 +260,37 @@ struct java_bytecode_language_optionst
 class java_bytecode_languaget:public languaget
 {
 public:
-  void set_language_options(const optionst &) override;
-
-  void set_message_handler(message_handlert &message_handler) override;
+  void set_language_options(const optionst &, message_handlert &) override;
 
   virtual bool preprocess(
     std::istream &instream,
     const std::string &path,
-    std::ostream &outstream) override;
+    std::ostream &outstream,
+    message_handlert &message_handler) override;
 
   // This is an extension to languaget
   // required because parsing of Java programs can be initiated without
   // opening a file first or providing a path to a file
   // as dictated by \ref languaget.
-  virtual bool parse();
+  virtual bool parse(message_handlert &);
 
   bool parse(
     std::istream &instream,
-    const std::string &path) override;
+    const std::string &path,
+    message_handlert &message_handler) override;
 
-  bool generate_support_functions(symbol_table_baset &symbol_table) override;
+  bool generate_support_functions(
+    symbol_table_baset &symbol_table,
+    message_handlert &message_handler) override;
 
-  bool
-  typecheck(symbol_table_baset &context, const std::string &module) override;
+  bool typecheck(
+    symbol_table_baset &context,
+    const std::string &module,
+    message_handlert &message_handler) override;
 
   virtual bool final(symbol_table_baset &context) override;
 
-  void show_parse(std::ostream &out) override;
+  void show_parse(std::ostream &out, message_handlert &) override;
 
   virtual ~java_bytecode_languaget();
   java_bytecode_languaget(
@@ -316,7 +320,8 @@ public:
     const std::string &code,
     const std::string &module,
     exprt &expr,
-    const namespacet &ns) override;
+    const namespacet &ns,
+    message_handlert &message_handler) override;
 
   std::unique_ptr<languaget> new_language() override
   { return util_make_unique<java_bytecode_languaget>(); }
@@ -330,32 +335,37 @@ public:
   methods_provided(std::unordered_set<irep_idt> &methods) const override;
   virtual void convert_lazy_method(
     const irep_idt &function_id,
-    symbol_table_baset &symbol_table) override;
+    symbol_table_baset &symbol_table,
+    message_handlert &message_handler) override;
 
 protected:
   void convert_single_method(
     const irep_idt &function_id,
     symbol_table_baset &symbol_table,
-    lazy_class_to_declared_symbols_mapt &class_to_declared_symbols)
+    lazy_class_to_declared_symbols_mapt &class_to_declared_symbols,
+    message_handlert &message_handler)
   {
     convert_single_method(
       function_id,
       symbol_table,
       optionalt<ci_lazy_methods_neededt>(),
-      class_to_declared_symbols);
+      class_to_declared_symbols,
+      message_handler);
   }
   bool convert_single_method(
     const irep_idt &function_id,
     symbol_table_baset &symbol_table,
     optionalt<ci_lazy_methods_neededt> needed_lazy_methods,
-    lazy_class_to_declared_symbols_mapt &class_to_declared_symbols);
+    lazy_class_to_declared_symbols_mapt &class_to_declared_symbols,
+    message_handlert &);
   bool convert_single_method_code(
     const irep_idt &function_id,
     symbol_table_baset &symbol_table,
     optionalt<ci_lazy_methods_neededt> needed_lazy_methods,
-    lazy_class_to_declared_symbols_mapt &class_to_declared_symbols);
+    lazy_class_to_declared_symbols_mapt &class_to_declared_symbols,
+    message_handlert &);
 
-  bool do_ci_lazy_method_conversion(symbol_table_baset &);
+  bool do_ci_lazy_method_conversion(symbol_table_baset &, message_handlert &);
   const select_pointer_typet &get_pointer_type_selector() const;
 
   optionalt<java_bytecode_language_optionst> language_options;
@@ -384,8 +394,8 @@ private:
   /// IDs of such objects to symbols that store their values.
   std::unordered_map<std::string, object_creation_referencet> references;
 
-  void parse_from_main_class();
-  void initialize_class_loader();
+  void parse_from_main_class(message_handlert &);
+  void initialize_class_loader(message_handlert &);
 };
 
 std::unique_ptr<languaget> new_java_bytecode_language();

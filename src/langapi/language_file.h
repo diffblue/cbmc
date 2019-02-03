@@ -50,7 +50,8 @@ public:
 
   void convert_lazy_method(
     const irep_idt &id,
-    symbol_table_baset &symbol_table);
+    symbol_table_baset &symbol_table,
+    message_handlert &message_handler);
 
   explicit language_filet(const std::string &filename);
   language_filet(const language_filet &rhs);
@@ -103,9 +104,11 @@ public:
 
   bool parse(message_handlert &message_handler);
 
-  void show_parse(std::ostream &out);
+  void show_parse(std::ostream &out, message_handlert &message_handler);
 
-  bool generate_support_functions(symbol_table_baset &symbol_table);
+  bool generate_support_functions(
+    symbol_table_baset &symbol_table,
+    message_handlert &message_handler);
 
   bool
 
@@ -121,7 +124,9 @@ public:
 
   bool final(symbol_table_baset &symbol_table);
 
-  bool interfaces(symbol_table_baset &symbol_table);
+  bool interfaces(
+    symbol_table_baset &symbol_table,
+    message_handlert &message_handler);
 
   // The method must have been added to the symbol table and registered
   // in lazy_method_map (currently always in language_filest::typecheck)
@@ -134,7 +139,7 @@ public:
     PRECONDITION(symbol_table.has_symbol(id));
     lazy_method_mapt::iterator it=lazy_method_map.find(id);
     if(it!=lazy_method_map.end())
-      it->second->convert_lazy_method(id, symbol_table);
+      it->second->convert_lazy_method(id, symbol_table, message_handler);
   }
 
   bool can_convert_lazy_method(const irep_idt &id) const

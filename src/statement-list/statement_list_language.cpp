@@ -22,32 +22,35 @@ Author: Matthias Weiss, matthias.weiss@diffblue.com
 #include <util/make_unique.h>
 #include <util/symbol_table.h>
 
-void statement_list_languaget::set_language_options(const optionst &options)
+void statement_list_languaget::set_language_options(
+  const optionst &options,
+  message_handlert &)
 {
   params = object_factory_parameterst{options};
 }
 
 bool statement_list_languaget::generate_support_functions(
-  symbol_table_baset &symbol_table)
+  symbol_table_baset &symbol_table,
+  message_handlert &message_handler)
 {
-  return statement_list_entry_point(symbol_table, get_message_handler());
+  return statement_list_entry_point(symbol_table, message_handler);
 }
 
 bool statement_list_languaget::typecheck(
   symbol_table_baset &symbol_table,
   const std::string &module,
+  message_handlert &message_handler,
   const bool keep_file_local)
 {
   symbol_tablet new_symbol_table;
 
   if(statement_list_typecheck(
-       parse_tree, new_symbol_table, module, get_message_handler()))
+       parse_tree, new_symbol_table, module, message_handler))
     return true;
 
-  remove_internal_symbols(
-    new_symbol_table, get_message_handler(), keep_file_local);
+  remove_internal_symbols(new_symbol_table, message_handler, keep_file_local);
 
-  if(linking(symbol_table, new_symbol_table, get_message_handler()))
+  if(linking(symbol_table, new_symbol_table, message_handler))
     return true;
 
   return false;
@@ -55,7 +58,8 @@ bool statement_list_languaget::typecheck(
 
 bool statement_list_languaget::parse(
   std::istream &instream,
-  const std::string &path)
+  const std::string &path,
+  message_handlert &message_handler)
 {
   statement_list_parser.clear();
   parse_path = path;
@@ -71,7 +75,7 @@ bool statement_list_languaget::parse(
   return result;
 }
 
-void statement_list_languaget::show_parse(std::ostream &out)
+void statement_list_languaget::show_parse(std::ostream &out, message_handlert &)
 {
   output_parse_tree(out, parse_tree);
 }
@@ -83,9 +87,10 @@ bool statement_list_languaget::can_keep_file_local()
 
 bool statement_list_languaget::typecheck(
   symbol_table_baset &symbol_table,
-  const std::string &module)
+  const std::string &module,
+  message_handlert &message_handler)
 {
-  return typecheck(symbol_table, module, true);
+  return typecheck(symbol_table, module, message_handler, true);
 }
 
 bool statement_list_languaget::from_expr(
@@ -118,7 +123,8 @@ bool statement_list_languaget::to_expr(
   const std::string &,
   const std::string &,
   exprt &,
-  const namespacet &)
+  const namespacet &,
+  message_handlert &)
 {
   return true;
 }

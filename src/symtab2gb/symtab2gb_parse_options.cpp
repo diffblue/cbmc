@@ -69,7 +69,6 @@ static void run_symtab2gb(
     cmdline_verbosity, messaget::M_STATISTICS, message_handler);
 
   auto const symtab_language = new_json_symtab_language();
-  symtab_language->set_message_handler(message_handler);
 
   symbol_tablet linked_symbol_table;
 
@@ -77,7 +76,8 @@ static void run_symtab2gb(
   {
     auto const &symtab_filename = symtab_filenames[ix];
     auto &symtab_file = symtab_files[ix];
-    if(failed(symtab_language->parse(symtab_file, symtab_filename)))
+    if(failed(
+         symtab_language->parse(symtab_file, symtab_filename, message_handler)))
     {
       source_locationt source_location;
       source_location.set_file(symtab_filename);
@@ -85,7 +85,7 @@ static void run_symtab2gb(
         "failed to parse symbol table", source_location};
     }
     symbol_tablet symtab{};
-    if(failed(symtab_language->typecheck(symtab, "<unused>")))
+    if(failed(symtab_language->typecheck(symtab, "<unused>", message_handler)))
     {
       source_locationt source_location;
       source_location.set_file(symtab_filename);

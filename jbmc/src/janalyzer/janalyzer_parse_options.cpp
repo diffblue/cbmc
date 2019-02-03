@@ -376,18 +376,18 @@ int janalyzer_parse_optionst::doit()
   {
     std::unique_ptr<languaget> language = get_language_from_mode(ID_java);
     CHECK_RETURN(language != nullptr);
-    language->set_language_options(options);
-    language->set_message_handler(ui_message_handler);
+    language->set_language_options(options, ui_message_handler);
 
     log.status() << "Parsing ..." << messaget::eom;
 
-    if(static_cast<java_bytecode_languaget *>(language.get())->parse())
+    if(static_cast<java_bytecode_languaget *>(language.get())
+         ->parse(ui_message_handler))
     {
       log.error() << "PARSING ERROR" << messaget::eom;
       return CPROVER_EXIT_PARSE_ERROR;
     }
 
-    language->show_parse(std::cout);
+    language->show_parse(std::cout, ui_message_handler);
     return CPROVER_EXIT_SUCCESS;
   }
 
