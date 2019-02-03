@@ -22,7 +22,7 @@ bool parse_json(
   json_parser.clear();
   json_parser.set_file(filename);
   json_parser.in=&in;
-  json_parser.set_message_handler(message_handler);
+  json_parser.log.set_message_handler(message_handler);
 
   bool result=json_parser.parse();
 
