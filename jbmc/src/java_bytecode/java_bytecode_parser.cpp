@@ -68,8 +68,10 @@ private:
   {
     if(index==0 || index>=constant_pool.size())
     {
-      error() << "invalid constant pool index (" << index << ")" << eom;
-      error() << "constant pool size: " << constant_pool.size() << eom;
+      log.error() << "invalid constant pool index (" << index << ")"
+                  << messaget::eom;
+      log.error() << "constant pool size: " << constant_pool.size()
+                  << messaget::eom;
       throw 0;
     }
 
@@ -119,7 +121,7 @@ private:
     {
       if(!*in)
       {
-        error() << "unexpected end of bytecode file" << eom;
+        log.error() << "unexpected end of bytecode file" << messaget::eom;
         throw 0;
       }
       in->get();
@@ -137,7 +139,7 @@ private:
     {
       if(!*in)
       {
-        error() << "unexpected end of bytecode file" << eom;
+        log.error() << "unexpected end of bytecode file" << messaget::eom;
         throw 0;
       }
       result <<= 8u;
@@ -386,19 +388,19 @@ bool java_bytecode_parsert::parse()
 
   catch(const char *message)
   {
-    error() << message << eom;
+    log.error() << message << messaget::eom;
     return true;
   }
 
   catch(const std::string &message)
   {
-    error() << message << eom;
+    log.error() << message << messaget::eom;
     return true;
   }
 
   catch(...)
   {
-    error() << "parsing error" << eom;
+    log.error() << "parsing error" << messaget::eom;
     return true;
   }
 
@@ -437,13 +439,13 @@ void java_bytecode_parsert::rClassFile()
 
   if(magic!=0xCAFEBABE)
   {
-    error() << "wrong magic" << eom;
+    log.error() << "wrong magic" << messaget::eom;
     throw 0;
   }
 
   if(major_version<44)
   {
-    error() << "unexpected major version" << eom;
+    log.error() << "unexpected major version" << messaget::eom;
     throw 0;
   }
 
@@ -643,7 +645,7 @@ void java_bytecode_parsert::rconstant_pool()
   const u2 constant_pool_count = read<u2>();
   if(constant_pool_count==0)
   {
-    error() << "invalid constant_pool_count" << eom;
+    log.error() << "invalid constant_pool_count" << messaget::eom;
     throw 0;
   }
 
@@ -685,7 +687,7 @@ void java_bytecode_parsert::rconstant_pool()
       // Eight-byte constants take up two entries in the constant_pool table.
       if(it==constant_pool.end())
       {
-        error() << "invalid double entry" << eom;
+        log.error() << "invalid double entry" << messaget::eom;
         throw 0;
       }
       it++;
@@ -709,8 +711,8 @@ void java_bytecode_parsert::rconstant_pool()
       break;
 
     default:
-      error() << "unknown constant pool entry (" << it->tag << ")"
-              << eom;
+      log.error() << "unknown constant pool entry (" << it->tag << ")"
+                  << messaget::eom;
       throw 0;
     }
   }
@@ -1142,7 +1144,7 @@ void java_bytecode_parsert::rbytecode(std::vector<instructiont> &instructions)
 
   if(address!=code_length)
   {
-    error() << "bytecode length mismatch" << eom;
+    log.error() << "bytecode length mismatch" << messaget::eom;
     throw 0;
   }
 }
@@ -1811,7 +1813,7 @@ optionalt<java_bytecode_parse_treet> java_bytecode_parse(
 {
   java_bytecode_parsert java_bytecode_parser(skip_instructions);
   java_bytecode_parser.in=&istream;
-  java_bytecode_parser.set_message_handler(message_handler);
+  java_bytecode_parser.log.set_message_handler(message_handler);
 
   bool parser_result=java_bytecode_parser.parse();
 
@@ -1980,9 +1982,15 @@ void java_bytecode_parsert::read_bootstrapmethods_entry()
 
     method_handle_infot method_handle{entry};
 
+<<<<<<< HEAD
     const u2 num_bootstrap_arguments = read<u2>();
     debug() << "INFO: parse BootstrapMethod handle " << num_bootstrap_arguments
             << " #args" << eom;
+=======
+    u2 num_bootstrap_arguments = read_u2();
+    log.debug() << "INFO: parse BootstrapMethod handle "
+                << num_bootstrap_arguments << " #args" << messaget::eom;
+>>>>>>> parsert is not a messaget
 
     // read u2 values of entry into vector
     std::vector<u2> u2_values(num_bootstrap_arguments);
@@ -2021,10 +2029,16 @@ void java_bytecode_parsert::read_bootstrapmethods_entry()
     // understand
     if(num_bootstrap_arguments < 3)
     {
+<<<<<<< HEAD
       store_unknown_method_handle(bootstrap_method_index);
       debug()
+=======
+      store_unknown_method_handle(
+        parsed_class, bootstrap_method_index, std::move(u2_values));
+      log.debug()
+>>>>>>> parsert is not a messaget
         << "format of BootstrapMethods entry not recognized: too few arguments"
-        << eom;
+        << messaget::eom;
       continue;
     }
 
@@ -2045,10 +2059,18 @@ void java_bytecode_parsert::read_bootstrapmethods_entry()
 
     if(!recognized)
     {
+<<<<<<< HEAD
       debug() << "format of BootstrapMethods entry not recognized: extra "
                  "arguments of wrong type"
               << eom;
       store_unknown_method_handle(bootstrap_method_index);
+=======
+      log.debug() << "format of BootstrapMethods entry not recognized: extra "
+                     "arguments of wrong type"
+                  << messaget::eom;
+      store_unknown_method_handle(
+        parsed_class, bootstrap_method_index, std::move(u2_values));
+>>>>>>> parsert is not a messaget
       continue;
     }
 
@@ -2062,23 +2084,40 @@ void java_bytecode_parsert::read_bootstrapmethods_entry()
       method_handle_argument.tag != CONSTANT_MethodHandle ||
       method_type_argument.tag != CONSTANT_MethodType)
     {
+<<<<<<< HEAD
       debug() << "format of BootstrapMethods entry not recognized: arguments "
                  "wrong type"
               << eom;
       store_unknown_method_handle(bootstrap_method_index);
+=======
+      log.debug()
+        << "format of BootstrapMethods entry not recognized: arguments "
+           "wrong type"
+        << messaget::eom;
+      store_unknown_method_handle(
+        parsed_class, bootstrap_method_index, std::move(u2_values));
+>>>>>>> parsert is not a messaget
       continue;
     }
 
-    debug() << "INFO: parse lambda handle" << eom;
+    log.debug() << "INFO: parse lambda handle" << messaget::eom;
     optionalt<lambda_method_handlet> lambda_method_handle =
       parse_method_handle(method_handle_infot{method_handle_argument});
 
     if(!lambda_method_handle.has_value())
     {
+<<<<<<< HEAD
       debug() << "format of BootstrapMethods entry not recognized: method "
                  "handle not recognised"
               << eom;
       store_unknown_method_handle(bootstrap_method_index);
+=======
+      log.debug() << "format of BootstrapMethods entry not recognized: method "
+                     "handle not recognised"
+                  << messaget::eom;
+      store_unknown_method_handle(
+        parsed_class, bootstrap_method_index, std::move(u2_values));
+>>>>>>> parsert is not a messaget
       continue;
     }
 
@@ -2086,6 +2125,7 @@ void java_bytecode_parsert::read_bootstrapmethods_entry()
     POSTCONDITION(
       lambda_method_handle->handle_type != method_handle_typet::UNKNOWN_HANDLE);
 
+<<<<<<< HEAD
     debug() << "lambda function reference "
             << id2string(lambda_method_handle->get_method_descriptor()
                            .base_method_name())
@@ -2095,6 +2135,21 @@ void java_bytecode_parsert::read_bootstrapmethods_entry()
             << "\n  method type is "
             << id2string(pool_entry(method_type_argument.ref1).s) << eom;
     parse_tree.parsed_class.add_method_handle(
+=======
+    lambda_method_handle->interface_type =
+      pool_entry(interface_type_argument.ref1).s;
+    lambda_method_handle->method_type = pool_entry(method_type_argument.ref1).s;
+    lambda_method_handle->u2_values = std::move(u2_values);
+    log.debug() << "lambda function reference "
+                << id2string(lambda_method_handle->lambda_method_name)
+                << " in class \"" << parsed_class.name << "\""
+                << "\n  interface type is "
+                << id2string(pool_entry(interface_type_argument.ref1).s)
+                << "\n  method type is "
+                << id2string(pool_entry(method_type_argument.ref1).s)
+                << messaget::eom;
+    parsed_class.add_method_handle(
+>>>>>>> parsert is not a messaget
       bootstrap_method_index, *lambda_method_handle);
   }
 }

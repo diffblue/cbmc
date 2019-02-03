@@ -35,6 +35,7 @@ void parsert::parse_error(
   if(!before.empty())
     tmp += " before '" + before + "'";
 
+<<<<<<< HEAD
 #if 0
   source_locationt tmp_source_location=source_location;
   tmp_source_location.set_column(column-before.size());
@@ -43,4 +44,8 @@ void parsert::parse_error(
   error().source_location=source_location;
   error() << tmp << eom;
 #endif
+=======
+  log.error().source_location = source_location;
+  log.error() << tmp << messaget::eom;
+>>>>>>> parsert is not a messaget
 }
