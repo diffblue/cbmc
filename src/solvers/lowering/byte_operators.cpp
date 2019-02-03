@@ -516,8 +516,22 @@ exprt lower_byte_extract(const byte_extract_exprt &src, const namespacet &ns)
       little_endian?(width_bytes-i-1):i;
 
     plus_exprt offset_i(from_integer(offset_int, offset.type()), offset);
-    index_exprt index_expr(root, offset_i);
-    op.push_back(index_expr);
+    simplify(offset_i, ns);
+
+    mp_integer index = 0;
+    if(
+      offset_i.is_constant() &&
+      (root.id() == ID_array || root.id() == ID_vector) &&
+      !to_integer(to_constant_expr(offset_i), index) &&
+      index < root.operands().size() && index >= 0)
+    {
+      // offset is constant and in range
+      op.push_back(root.operands()[numeric_cast_v<std::size_t>(index)]);
+    }
+    else
+    {
+      op.push_back(index_exprt(root, offset_i));
+    }
   }
 
   if(width_bytes==1)
