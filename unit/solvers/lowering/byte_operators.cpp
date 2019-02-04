@@ -224,8 +224,8 @@ SCENARIO("byte_extract_lowering", "[core][solvers][lowering][byte_extract]")
             REQUIRE(!has_subexpr(lower_be, ID_byte_extract_little_endian));
             REQUIRE(!has_subexpr(lower_be, ID_byte_extract_big_endian));
             REQUIRE(lower_be.type() == be.type());
-            REQUIRE(lower_be == r);
-            REQUIRE(lower_be_s == r);
+            REQUIRE(lower_be == *r);
+            REQUIRE(lower_be_s == *r);
           }
         }
       }
@@ -262,8 +262,6 @@ SCENARIO("byte_update_lowering", "[core][solvers][lowering][byte_update]")
       REQUIRE(lower_bu1.type() == bu1.type());
       REQUIRE(lower_bu1_s == from_integer(0xdead42ef, unsignedbv_typet(32)));
 
-#if 0
-      // this is currently broken, #2058 will fix it
       byte_update_exprt bu2 = bu1;
       bu2.id(ID_byte_update_big_endian);
       const exprt lower_bu2 = lower_byte_operators(bu2, ns);
@@ -273,7 +271,6 @@ SCENARIO("byte_update_lowering", "[core][solvers][lowering][byte_update]")
       REQUIRE(!has_subexpr(lower_bu2, ID_byte_update_big_endian));
       REQUIRE(lower_bu2.type() == bu2.type());
       REQUIRE(lower_bu2_s == from_integer(0xde42beef, unsignedbv_typet(32)));
-#endif
     }
   }
 
@@ -291,9 +288,8 @@ SCENARIO("byte_update_lowering", "[core][solvers][lowering][byte_update]")
     constant_exprt size = from_integer(8, size_type());
 
     std::vector<typet> types = {
-    // TODO: only arrays and scalars
-    // struct_typet({{"comp1", u16}, {"comp2", u16}}),
-    // struct_typet({{"comp1", u32}, {"comp2", u64}}),
+      struct_typet({{"comp1", u16}, {"comp2", u16}}),
+      struct_typet({{"comp1", u32}, {"comp2", u64}}),
 #if 0
       // not currently handled: components not byte aligned
       struct_typet({{"comp1", u32},
@@ -301,22 +297,21 @@ SCENARIO("byte_update_lowering", "[core][solvers][lowering][byte_update]")
                     {"pad", c_bit_field_typet(u8, 4)},
                     {"comp2", u8}}),
 #endif
-      // TODO: only arrays and scalars
-      // union_typet({{"compA", u32}, {"compB", u64}}),
-      // c_enum_typet(u16),
-      // c_enum_typet(unsignedbv_typet(128)),
-      // array_typet(u8, size),
-      // array_typet(s32, size),
-      // array_typet(u64, size),
+      union_typet({{"compA", u32}, {"compB", u64}}),
+      c_enum_typet(u16),
+      c_enum_typet(unsignedbv_typet(128)),
+      array_typet(u8, size),
+      array_typet(s32, size),
+      array_typet(u64, size),
       unsignedbv_typet(24),
       unsignedbv_typet(128),
       signedbv_typet(24),
       signedbv_typet(128),
       // ieee_float_spect::single_precision().to_type(),
+      // generates the correct value, but remains wrapped in a typecast
       // pointer_typet(u64, 64),
-      // TODO: only arrays and scalars
-      // vector_typet(u8, size),
-      // vector_typet(u64, size),
+      vector_typet(u8, size),
+      vector_typet(u64, size),
       // complex_typet(s16),
       // complex_typet(u64)
     };
@@ -388,10 +383,8 @@ SCENARIO("byte_update_lowering", "[core][solvers][lowering][byte_update]")
             REQUIRE(!has_subexpr(lower_bu, ID_byte_extract_big_endian));
             REQUIRE(!has_subexpr(lower_bu, ID_byte_extract_little_endian));
             REQUIRE(lower_bu.type() == bu.type());
-            // TODO: does not currently hold
-            // REQUIRE(lower_bu == r);
-            // TODO: does not currently hold
-            // REQUIRE(lower_bu_s == r);
+            REQUIRE(lower_bu == *r);
+            REQUIRE(lower_bu_s == *r);
           }
         }
       }
