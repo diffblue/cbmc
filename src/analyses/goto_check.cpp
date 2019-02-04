@@ -1834,18 +1834,16 @@ void goto_checkt::goto_check(
         if(local_bitvector_analysis->dirty(variable))
         {
           // need to mark the dead variable as dead
-          exprt address_of_expr=address_of_exprt(variable);
           exprt lhs=ns.lookup(CPROVER_PREFIX "dead_object").symbol_expr();
-          address_of_expr =
-            typecast_exprt::conditional_cast(address_of_expr, lhs.type());
-          const if_exprt rhs(
+          exprt address_of_expr = typecast_exprt::conditional_cast(
+            address_of_exprt(variable), lhs.type());
+          if_exprt rhs(
             side_effect_expr_nondett(bool_typet(), i.source_location),
-            address_of_expr,
-            lhs,
-            lhs.type());
+            std::move(address_of_expr),
+            lhs);
           goto_programt::targett t =
             new_code.add(goto_programt::make_assignment(
-              code_assignt(lhs, rhs), i.source_location));
+              code_assignt(std::move(lhs), std::move(rhs)), i.source_location));
           t->code.add_source_location()=i.source_location;
         }
       }
