@@ -414,7 +414,7 @@ public:
     }
     case method_handle_kindt::REF_invokeInterface:
     {
-      INVARIANT(ref_entry.get_tag() == CONSTANT_InterfaceMethodref, "");
+      INVARIANT(ref_entry.get_tag() == CONSTANT_InterfaceMethodref, "4.4.8");
       break;
     }
     }

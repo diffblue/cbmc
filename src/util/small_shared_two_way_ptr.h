@@ -38,8 +38,12 @@ public:
 
   typedef small_shared_two_way_pointeet<use_countt> pointeet;
 
-  static_assert(std::is_base_of<pointeet, U>::value, "");
-  static_assert(std::is_base_of<pointeet, V>::value, "");
+  static_assert(
+    std::is_base_of<pointeet, U>::value,
+    "pointeet must be a base of U");
+  static_assert(
+    std::is_base_of<pointeet, V>::value,
+    "pointeet must be a base of V");
 
   small_shared_two_way_ptrt() = default;
 
@@ -217,7 +221,7 @@ template <typename Num>
 class small_shared_two_way_pointeet
 {
 public:
-  static_assert(std::is_unsigned<Num>::value, "");
+  static_assert(std::is_unsigned<Num>::value, "Num must be an unsigned type");
 
   static const int bit_idx = std::numeric_limits<Num>::digits - 1;
   static const Num mask = ~((Num)1 << bit_idx);
