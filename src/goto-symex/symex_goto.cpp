@@ -243,8 +243,8 @@ void goto_symext::symex_goto(statet &state)
     }
     else
     {
-      symbol_exprt guard_symbol_expr=
-        symbol_exprt(guard_identifier, bool_typet());
+      symbol_exprt guard_symbol_expr =
+        symbol_exprt(statet::guard_identifier(), bool_typet());
       exprt new_rhs = boolean_negate(new_guard);
 
       ssa_exprt new_lhs(guard_symbol_expr);
@@ -394,7 +394,6 @@ static void for_each2(
 /// \param [in, out] dest_state: second state
 /// \param ns: namespace
 /// \param diff_guard: difference between the guards of the two states
-/// \param guard_identifier: prefix used for goto symex guards
 /// \param [out] log: logger for debug messages
 /// \param do_simplify: should the right-hand-side of the assignment that is
 ///   added to the target be simplified
@@ -408,7 +407,6 @@ static void merge_names(
   goto_symext::statet &dest_state,
   const namespacet &ns,
   const guardt &diff_guard,
-  const irep_idt &guard_identifier,
   messaget &log,
   const bool do_simplify,
   symex_target_equationt &target,
@@ -419,7 +417,7 @@ static void merge_names(
   const irep_idt l1_identifier = ssa.get_identifier();
   const irep_idt &obj_identifier = ssa.get_object_name();
 
-  if(obj_identifier == guard_identifier)
+  if(obj_identifier == goto_symext::statet::guard_identifier())
     return; // just a guard, don't bother
 
   if(goto_count == dest_count)
@@ -544,7 +542,6 @@ void goto_symext::phi_function(
         dest_state,
         ns,
         diff_guard,
-        guard_identifier,
         log,
         symex_config.simplify_opt,
         target,

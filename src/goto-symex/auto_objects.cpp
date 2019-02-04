@@ -87,7 +87,7 @@ void goto_symext::trigger_auto_object(
     const ssa_exprt &ssa_expr=to_ssa_expr(expr);
     const irep_idt &obj_identifier=ssa_expr.get_object_name();
 
-    if(obj_identifier!="goto_symex::\\guard")
+    if(obj_identifier != statet::guard_identifier())
     {
       const symbolt &symbol=
         ns.lookup(obj_identifier);

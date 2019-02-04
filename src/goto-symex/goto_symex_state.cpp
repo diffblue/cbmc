@@ -180,7 +180,7 @@ void goto_symex_statet::assignment(
 
 #if 0
   PRECONDITION(l1_identifier != get_original_name(l1_identifier)
-      || l1_identifier=="goto_symex::\\guard"
+      || l1_identifier == guard_identifier()
       || ns.lookup(l1_identifier).is_shared()
       || has_prefix(id2string(l1_identifier), "symex::invalid_object")
       || has_prefix(id2string(l1_identifier), "symex_dynamic::dynamic_object"));
@@ -372,9 +372,11 @@ bool goto_symex_statet::l2_thread_read_encoding(
   // is it a shared object?
   const irep_idt &obj_identifier=expr.get_object_name();
   if(
-    obj_identifier == "goto_symex::\\guard" ||
+    obj_identifier == guard_identifier() ||
     (!ns.lookup(obj_identifier).is_shared() && !(dirty)(obj_identifier)))
+  {
     return false;
+  }
 
   ssa_exprt ssa_l1=expr;
   ssa_l1.remove_level_2();
@@ -508,9 +510,11 @@ bool goto_symex_statet::l2_thread_write_encoding(
   // is it a shared object?
   const irep_idt &obj_identifier=expr.get_object_name();
   if(
-    obj_identifier == "goto_symex::\\guard" ||
+    obj_identifier == guard_identifier() ||
     (!ns.lookup(obj_identifier).is_shared() && !(dirty)(obj_identifier)))
+  {
     return false; // not shared
+  }
 
   // see whether we are within an atomic section
   if(atomic_section_id!=0)
