@@ -17,7 +17,7 @@ Date: April 2010
 #include <map>
 #include <memory> // unique_ptr
 
-#include <util/guard.h>
+#include "guard.h"
 
 #include <goto-programs/goto_model.h>
 

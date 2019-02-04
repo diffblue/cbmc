@@ -13,10 +13,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <ostream>
 
-#include "expr_util.h"
-#include "invariant.h"
-#include "simplify_utils.h"
-#include "std_expr.h"
+#include <util/expr_util.h>
+#include <util/invariant.h>
+#include <util/simplify_utils.h>
+#include <util/std_expr.h>
 
 void guardt::guard_expr(exprt &dest) const
 {

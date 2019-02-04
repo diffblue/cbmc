@@ -15,7 +15,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/simplify_expr.h>
 #include <util/std_code.h>
 #include <util/symbol_table.h>
-#include <util/guard.h>
 #include <util/options.h>
 
 /// \param expr: expression to check

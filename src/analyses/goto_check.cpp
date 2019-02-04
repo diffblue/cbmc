@@ -20,7 +20,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/cprover_prefix.h>
 #include <util/expr_util.h>
 #include <util/find_symbols.h>
-#include <util/guard.h>
 #include <util/ieee_float.h>
 #include <util/invariant.h>
 #include <util/make_unique.h>
@@ -36,6 +35,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/remove_skip.h>
 
+#include "guard.h"
 #include "local_bitvector_analysis.h"
 
 class goto_checkt

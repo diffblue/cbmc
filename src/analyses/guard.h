@@ -9,12 +9,12 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Guard Data Structure
 
-#ifndef CPROVER_UTIL_GUARD_H
-#define CPROVER_UTIL_GUARD_H
+#ifndef CPROVER_ANALYSES_GUARD_H
+#define CPROVER_ANALYSES_GUARD_H
 
 #include <iosfwd>
 
-#include "std_expr.h"
+#include <util/std_expr.h>
 
 class guardt
 {
@@ -54,4 +54,4 @@ private:
   exprt expr;
 };
 
-#endif // CPROVER_UTIL_GUARD_H
+#endif // CPROVER_ANALYSES_GUARD_H

@@ -16,9 +16,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <unordered_set>
 
 #include <analyses/dirty.h>
+#include <analyses/guard.h>
 
 #include <util/invariant.h>
-#include <util/guard.h>
 #include <util/std_expr.h>
 #include <util/ssa_expr.h>
 #include <util/make_unique.h>
