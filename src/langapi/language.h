@@ -184,9 +184,6 @@ public:
 
   languaget() { }
   virtual ~languaget() { }
-
-protected:
-  bool language_options_initialized=false;
 };
 
 #endif // CPROVER_UTIL_LANGUAGE_H
