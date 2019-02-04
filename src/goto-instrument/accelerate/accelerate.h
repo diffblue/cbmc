@@ -34,11 +34,13 @@ public:
     goto_programt &_program,
     goto_modelt &_goto_model,
     message_handlert &message_handler,
-    bool _use_z3)
+    bool _use_z3,
+    guard_managert &guard_manager)
     : message_handler(message_handler),
       program(_program),
       goto_functions(_goto_model.goto_functions),
       symbol_table(_goto_model.symbol_table),
+      guard_manager(guard_manager),
       ns(_goto_model.symbol_table),
       utils(symbol_table, message_handler, goto_functions),
       use_z3(_use_z3)
@@ -113,6 +115,7 @@ protected:
   goto_programt &program;
   goto_functionst &goto_functions;
   symbol_tablet &symbol_table;
+  guard_managert &guard_manager;
   namespacet ns;
   natural_loops_mutablet natural_loops;
   subsumed_pathst subsumed;
@@ -130,6 +133,7 @@ protected:
 void accelerate_functions(
   goto_modelt &,
   message_handlert &message_handler,
-  bool use_z3);
+  bool use_z3,
+  guard_managert &guard_manager);
 
 #endif // CPROVER_GOTO_INSTRUMENT_ACCELERATE_ACCELERATE_H

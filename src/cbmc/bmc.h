@@ -70,19 +70,22 @@ public:
     ui_message_handlert &_message_handler,
     prop_convt &_prop_conv,
     path_storaget &_path_storage,
-    std::function<bool(void)> callback_after_symex)
+    std::function<bool(void)> callback_after_symex,
+    guard_managert &guard_manager)
     : safety_checkert(ns, _message_handler),
       options(_options),
       outer_symbol_table(outer_symbol_table),
       ns(outer_symbol_table, symex_symbol_table),
       equation(_message_handler),
+      guard_manager(guard_manager),
       path_storage(_path_storage),
       symex(
         _message_handler,
         outer_symbol_table,
         equation,
         options,
-        path_storage),
+        path_storage,
+        guard_manager),
       prop_conv(_prop_conv),
       ui_message_handler(_message_handler),
       driver_callback_after_symex(callback_after_symex)
@@ -140,19 +143,22 @@ protected:
     prop_convt &_prop_conv,
     symex_target_equationt &_equation,
     path_storaget &_path_storage,
-    std::function<bool(void)> callback_after_symex)
+    std::function<bool(void)> callback_after_symex,
+    guard_managert &guard_manager)
     : safety_checkert(ns, _message_handler),
       options(_options),
       outer_symbol_table(outer_symbol_table),
       ns(outer_symbol_table),
       equation(_equation),
+      guard_manager(guard_manager),
       path_storage(_path_storage),
       symex(
         _message_handler,
         outer_symbol_table,
         equation,
         options,
-        path_storage),
+        path_storage,
+        guard_manager),
       prop_conv(_prop_conv),
       ui_message_handler(_message_handler),
       driver_callback_after_symex(callback_after_symex)
@@ -170,6 +176,7 @@ protected:
   symbol_tablet symex_symbol_table;
   namespacet ns;
   symex_target_equationt equation;
+  guard_managert &guard_manager;
   path_storaget &path_storage;
   symex_bmct symex;
   prop_convt &prop_conv;
@@ -231,6 +238,7 @@ public:
     symex_target_equationt &saved_equation,
     const goto_symex_statet &saved_state,
     path_storaget &path_storage,
+    guard_managert &guard_manager,
     std::function<bool(void)> callback_after_symex)
     : bmct(
         _options,
@@ -239,7 +247,8 @@ public:
         _prop_conv,
         saved_equation,
         path_storage,
-        callback_after_symex),
+        callback_after_symex,
+        guard_manager),
       saved_state(saved_state)
   {
   }

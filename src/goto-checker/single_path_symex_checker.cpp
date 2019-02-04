@@ -55,7 +55,8 @@ operator()(propertiest &properties)
       goto_model.get_symbol_table(),
       equation,
       options,
-      *worklist);
+      *worklist,
+      guard_manager);
     setup_symex(symex);
 
     symex.initialize_path_storage_from_entry_point_of(
@@ -70,7 +71,8 @@ operator()(propertiest &properties)
       goto_model.get_symbol_table(),
       resume.equation,
       options,
-      *worklist);
+      *worklist,
+      guard_manager);
     setup_symex(symex);
 
     symex.resume_symex_from_saved_state(

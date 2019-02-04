@@ -89,16 +89,19 @@ public:
   /// \param options: The options to use to configure this execution
   /// \param path_storage: Place to storage symbolic execution paths that have
   /// been halted and can be resumed later
+  /// \param guard_manager: Manager for creating guards
   goto_symext(
     message_handlert &mh,
     const symbol_tablet &outer_symbol_table,
     symex_target_equationt &_target,
     const optionst &options,
-    path_storaget &path_storage)
+    path_storaget &path_storage,
+    guard_managert &guard_manager)
     : should_pause_symex(false),
       symex_config(options),
       outer_symbol_table(outer_symbol_table),
       ns(outer_symbol_table),
+      guard_manager(guard_manager),
       target(_target),
       atomic_section_counter(0),
       log(mh),
@@ -244,6 +247,11 @@ protected:
   /// used during symbolic execution to look up names from the original
   /// goto-program, and the names of dynamically-created objects.
   namespacet ns;
+
+  /// Used to create guards. Guards created with different guard managers cannot
+  /// be combined together, so guards created by goto-symex should not escape
+  /// the scope of this manager.
+  guard_managert &guard_manager;
 
   /// The equation that this execution is building up
   symex_target_equationt &target;

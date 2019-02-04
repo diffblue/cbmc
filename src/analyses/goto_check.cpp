@@ -84,6 +84,7 @@ protected:
   const namespacet &ns;
   std::unique_ptr<local_bitvector_analysist> local_bitvector_analysis;
   goto_programt::const_targett current_target;
+  guard_managert guard_manager;
 
   void check_rec(
     const exprt &expr,
@@ -1650,7 +1651,7 @@ void goto_checkt::check_rec(const exprt &expr, guardt &guard, bool address)
 
 void goto_checkt::check(const exprt &expr)
 {
-  guardt guard{true_exprt{}};
+  guardt guard{true_exprt{}, guard_manager};
   check_rec(expr, guard, false);
 }
 
@@ -1782,7 +1783,7 @@ void goto_checkt::goto_check(
             "pointer dereference",
             i.source_location,
             pointer,
-            guardt(true_exprt()));
+            guardt(true_exprt(), guard_manager));
         }
       }
 
@@ -1820,7 +1821,7 @@ void goto_checkt::goto_check(
           "pointer dereference",
           i.source_location,
           pointer,
-          guardt(true_exprt()));
+          guardt(true_exprt(), guard_manager));
       }
 
       // this has no successor
@@ -1897,7 +1898,7 @@ void goto_checkt::goto_check(
           "memory-leak",
           source_location,
           eq,
-          guardt(true_exprt()));
+          guardt(true_exprt(), guard_manager));
       }
     }
 

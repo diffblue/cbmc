@@ -328,7 +328,8 @@ std::unique_ptr<goto_symext::statet> goto_symext::initialize_entry_point_state(
 
   // create and prepare the state
   auto state = util_make_unique<statet>(
-    symex_targett::sourcet(entry_point_id, start_function->body));
+    symex_targett::sourcet(entry_point_id, start_function->body),
+    guard_manager);
   CHECK_RETURN(!state->threads.empty());
   CHECK_RETURN(!state->call_stack().empty());
 

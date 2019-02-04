@@ -64,12 +64,15 @@ public:
   {
   }
 
-  void extract_polynomial(scratch_programt &program,
-                          std::set<std::pair<expr_listt, exprt> > &coefficients,
-                          polynomialt &polynomial);
+  void extract_polynomial(
+    scratch_programt &program,
+    std::set<std::pair<expr_listt, exprt>> &coefficients,
+    polynomialt &polynomial);
 
-  bool check_inductive(std::map<exprt, polynomialt> polynomials,
-                       patht &path);
+  bool check_inductive(
+    std::map<exprt, polynomialt> polynomials,
+    patht &path,
+    guard_managert &guard_manager);
   void stash_variables(scratch_programt &program,
                        expr_sett modified,
                        substitutiont &substitution);
@@ -82,9 +85,11 @@ public:
   void abstract_arrays(exprt &expr, expr_mapt &abstractions);
   void push_nondet(exprt &expr);
 
-  bool do_assumptions(std::map<exprt, polynomialt> polynomials,
-                      patht &body,
-                      exprt &guard);
+  bool do_assumptions(
+    std::map<exprt, polynomialt> polynomials,
+    patht &body,
+    exprt &guard,
+    guard_managert &guard_manager);
 
   typedef std::pair<exprt, exprt> expr_pairt;
   typedef std::vector<expr_pairt> expr_pairst;

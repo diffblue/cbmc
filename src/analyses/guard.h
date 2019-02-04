@@ -16,11 +16,26 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/std_expr.h>
 
+/// This is unused by this implementation of guards, but can be used by other
+/// implementations of the same interface.
+struct guard_managert
+{
+};
+
 class guardt
 {
 public:
-  explicit guardt(const exprt &e) : expr(e)
+  /// Construct a BDD from an expression
+  /// The \c guard_managert parameter is not used, but we keep it for uniformity
+  /// with other implementations of guards which may use it.
+  explicit guardt(const exprt &e, guard_managert &) : expr(e)
   {
+  }
+
+  guardt &operator=(const guardt &other)
+  {
+    expr = other.expr;
+    return *this;
   }
 
   void add(const exprt &expr);

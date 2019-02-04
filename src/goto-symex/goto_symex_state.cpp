@@ -29,10 +29,16 @@ Author: Daniel Kroening, kroening@kroening.com
 
 static void get_l1_name(exprt &expr);
 
-goto_symex_statet::goto_symex_statet(const symex_targett::sourcet &_source)
-  : goto_statet(_source), symex_target(nullptr), record_events(true), dirty()
+goto_symex_statet::goto_symex_statet(
+  const symex_targett::sourcet &_source,
+  guard_managert &manager)
+  : goto_statet(_source, manager),
+    guard_manager(manager),
+    symex_target(nullptr),
+    record_events(true),
+    dirty()
 {
-  threads.resize(1);
+  threads.emplace_back(guard_manager);
   call_stack().new_frame(source);
 }
 
@@ -385,7 +391,7 @@ bool goto_symex_statet::l2_thread_read_encoding(
   // see whether we are within an atomic section
   if(atomic_section_id!=0)
   {
-    guardt write_guard{false_exprt{}};
+    guardt write_guard{false_exprt{}, guard_manager};
 
     const auto a_s_writes = written_in_atomic_section.find(ssa_l1);
     if(a_s_writes!=written_in_atomic_section.end())
@@ -409,7 +415,7 @@ bool goto_symex_statet::l2_thread_read_encoding(
     // we cannot determine for sure that there has been a write already
     // so generate a read even if l1_identifier has been written on
     // all branches flowing into this read
-    guardt read_guard{false_exprt{}};
+    guardt read_guard{false_exprt{}, guard_manager};
 
     a_s_r_entryt &a_s_read=read_in_atomic_section[ssa_l1];
     for(const auto &a_s_read_guard : a_s_read.second)
@@ -427,7 +433,7 @@ bool goto_symex_statet::l2_thread_read_encoding(
 
     guardt cond = read_guard;
     if(!no_write.op().is_false())
-      cond |= guardt{no_write.op()};
+      cond |= guardt{no_write.op(), guard_manager};
 
     const renamedt<ssa_exprt, L2> l2_true_case = set_indices<L2>(ssa_l1, ns);
 

@@ -37,7 +37,7 @@ void goto_symext::symex_start_thread(statet &state)
 
   // put into thread vector
   std::size_t t=state.threads.size();
-  state.threads.push_back(statet::threadt());
+  state.threads.push_back(statet::threadt(guard_manager));
   // statet::threadt &cur_thread=state.threads[state.source.thread_nr];
   statet::threadt &new_thread=state.threads.back();
   new_thread.pc=thread_target;

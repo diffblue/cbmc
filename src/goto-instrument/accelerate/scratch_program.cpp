@@ -22,7 +22,7 @@ Author: Matt Lewis
 #include <iostream>
 #endif
 
-bool scratch_programt::check_sat(bool do_slice)
+bool scratch_programt::check_sat(bool do_slice, guard_managert &guard_manager)
 {
   fix_types();
 
@@ -36,7 +36,8 @@ bool scratch_programt::check_sat(bool do_slice)
 #endif
 
   symex_state = util_make_unique<goto_symex_statet>(
-    symex_targett::sourcet(goto_functionst::entry_point(), *this));
+    symex_targett::sourcet(goto_functionst::entry_point(), *this),
+    guard_manager);
   symex.symex_with_state(
     *symex_state,
     [this](const irep_idt &key) -> const goto_functionst::goto_functiont & {

@@ -12,9 +12,9 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #ifndef CPROVER_GOTO_SYMEX_GOTO_STATE_H
 #define CPROVER_GOTO_SYMEX_GOTO_STATE_H
 
+#include <analyses/guard.h>
 #include <analyses/local_safe_pointers.h>
 #include <pointer-analysis/value_set.h>
-#include <util/guard.h>
 
 #include "renaming_level.h"
 #include "symex_target_equation.h"
@@ -39,7 +39,7 @@ public:
   // the if branch will be guarded by the condition of the if (and if there
   // is an else branch then instructions on it will be guarded by the negation
   // of the condition of the if).
-  guardt guard{true_exprt{}};
+  guardt guard;
 
   symex_targett::sourcet source;
 
@@ -62,7 +62,11 @@ public:
 
   /// Constructors
   explicit goto_statet(const class goto_symex_statet &s);
-  explicit goto_statet(const symex_targett::sourcet &_source) : source(_source)
+
+  goto_statet(
+    const symex_targett::sourcet &_source,
+    guard_managert &guard_manager)
+    : guard(true_exprt(), guard_manager), source(_source)
   {
   }
 };

@@ -110,10 +110,10 @@ void acceleration_utilst::find_modified(
   }
 }
 
-
 bool acceleration_utilst::check_inductive(
   std::map<exprt, polynomialt> polynomials,
-  patht &path)
+  patht &path,
+  guard_managert &guard_manager)
 {
   // Checking that our polynomial is inductive with respect to the loop body is
   // equivalent to checking safety of the following program:
@@ -126,7 +126,7 @@ bool acceleration_utilst::check_inductive(
   // assert (target1==polynomial1);
   // assert (target2==polynomial2);
   // ...
-  scratch_programt program(symbol_table, message_handler);
+  scratch_programt program(symbol_table, message_handler, guard_manager);
   std::vector<exprt> polynomials_hold;
   substitutiont substitution;
 
@@ -162,7 +162,7 @@ bool acceleration_utilst::check_inductive(
 
   try
   {
-    if(program.check_sat())
+    if(program.check_sat(guard_manager))
     {
       // We found a counterexample to inductiveness... :-(
   #ifdef DEBUG
@@ -353,7 +353,8 @@ void acceleration_utilst::push_nondet(exprt &expr)
 bool acceleration_utilst::do_assumptions(
   std::map<exprt, polynomialt> polynomials,
   patht &path,
-  exprt &guard)
+  exprt &guard,
+  guard_managert &guard_manager)
 {
   // We want to check that if an assumption fails, the next iteration can't be
   // feasible again.  To do this we check the following program for safety:
@@ -380,7 +381,7 @@ bool acceleration_utilst::do_assumptions(
   // assert(!precondition);
 
   exprt condition=precondition(path);
-  scratch_programt program(symbol_table, message_handler);
+  scratch_programt program(symbol_table, message_handler, guard_manager);
 
   substitutiont substitution;
   stash_polynomials(program, polynomials, substitution, path);
@@ -445,7 +446,7 @@ bool acceleration_utilst::do_assumptions(
 
   try
   {
-    if(program.check_sat())
+    if(program.check_sat(guard_manager))
     {
   #ifdef DEBUG
       std::cout << "Path is not monotone\n";

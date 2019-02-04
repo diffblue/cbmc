@@ -35,6 +35,7 @@ protected:
   abstract_goto_modelt &goto_model;
   symbol_tablet symex_symbol_table;
   namespacet ns;
+  guard_managert guard_manager;
   std::unique_ptr<path_storaget> worklist;
 
   void equation_output(
