@@ -339,7 +339,7 @@ static void add_equations_for_symbol_resolution(
 
     if(is_char_pointer_type(rhs.type()))
     {
-      symbol_solver.make_union(lhs, rhs);
+      symbol_solver.make_union(lhs, simplify_expr(rhs, ns));
     }
     else if(rhs.id() == ID_function_application)
     {
@@ -439,7 +439,7 @@ static void add_string_equation_to_symbol_resolution(
 {
   if(eq.rhs().type() == string_typet())
   {
-    symbol_resolve.make_union(eq.lhs(), eq.rhs());
+    symbol_resolve.make_union(eq.lhs(), simplify_expr(eq.rhs(), ns));
   }
   else if(has_subtype(eq.lhs().type(), ID_string, ns))
   {
@@ -646,7 +646,10 @@ decision_proceduret::resultt string_refinementt::dec_solve()
   for(equal_exprt &eq : equations)
   {
     if(can_cast_expr<function_application_exprt>(eq.rhs()))
+    {
+      simplify(eq.rhs(), ns);
       string_id_symbol_resolve.replace_expr(eq.rhs());
+    }
   }
 
   // Generator is also used by get, so we have to use it as a class member
