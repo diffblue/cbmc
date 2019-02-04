@@ -38,7 +38,7 @@ class goto_statet
 {
 public:
   unsigned depth;
-  symex_level2t::current_namest level2_current_names;
+  symex_level2t level2;
   value_sett value_set;
   guardt guard;
   symex_targett::sourcet source;
@@ -46,20 +46,6 @@ public:
   unsigned atomic_section_id;
   std::unordered_map<irep_idt, local_safe_pointerst> safe_pointers;
   unsigned total_vccs, remaining_vccs;
-
-  // the below replicate levelt2 member functions
-  void
-  level2_get_variables(std::unordered_set<ssa_exprt, irep_hash> &vars) const
-  {
-    for(const auto &pair : level2_current_names)
-      vars.insert(pair.second.first);
-  }
-
-  unsigned level2_current_count(const irep_idt &identifier) const
-  {
-    const auto it = level2_current_names.find(identifier);
-    return it == level2_current_names.end() ? 0 : it->second.second;
-  }
 
   goto_statet(const class goto_symex_statet &s);
 };
@@ -234,7 +220,7 @@ public:
       total_vccs(s.total_vccs),
       remaining_vccs(s.remaining_vccs)
   {
-    level2.current_names = s.level2_current_names;
+    level2.current_names = s.level2.current_names;
   }
 
   // gotos
@@ -343,7 +329,7 @@ private:
 
 inline goto_statet::goto_statet(const class goto_symex_statet &s)
   : depth(s.depth),
-    level2_current_names(s.level2.current_names),
+    level2(s.level2),
     value_set(s.value_set),
     guard(s.guard),
     source(s.source),
@@ -354,6 +340,5 @@ inline goto_statet::goto_statet(const class goto_symex_statet &s)
     remaining_vccs(s.remaining_vccs)
 {
 }
-
 
 #endif // CPROVER_GOTO_SYMEX_GOTO_SYMEX_STATE_H
