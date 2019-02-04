@@ -39,9 +39,20 @@ multi_path_symex_only_checkert::multi_path_symex_only_checkert(
 incremental_goto_checkert::resultt multi_path_symex_only_checkert::
 operator()(propertiest &properties)
 {
-  perform_symex();
+  perform_symex(
+    goto_model,
+    symex,
+    symex_symbol_table,
+    equation,
+    options,
+    ns,
+    ui_message_handler);
 
-  output_coverage_report();
+  output_coverage_report(
+    options.get_option("symex-coverage-report"),
+    goto_model,
+    symex,
+    ui_message_handler);
 
   if(options.get_bool_option("show-vcc"))
   {
@@ -62,43 +73,4 @@ operator()(propertiest &properties)
   update_status_of_not_checked_properties(
     properties, result.updated_properties);
   return result;
-}
-
-void multi_path_symex_only_checkert::perform_symex()
-{
-  auto get_goto_function =
-    [this](const irep_idt &id) -> const goto_functionst::goto_functiont & {
-    return goto_model.get_goto_function(id);
-  };
-
-  // perform symbolic execution
-  symex.symex_from_entry_point_of(get_goto_function, symex_symbol_table);
-
-  // add a partial ordering, if required
-  // We won't be able to decide any properties by adding this,
-  // but we'd like to see the entire SSA.
-  if(equation.has_threads())
-  {
-    std::unique_ptr<memory_model_baset> memory_model =
-      get_memory_model(options, ns);
-    memory_model->set_message_handler(ui_message_handler);
-    (*memory_model)(equation);
-  }
-
-  log.statistics() << "size of program expression: "
-                   << equation.SSA_steps.size() << " steps" << messaget::eom;
-
-  slice(symex, equation, ns, options, ui_message_handler);
-}
-
-void multi_path_symex_only_checkert::output_coverage_report()
-{
-  std::string cov_out = options.get_option("symex-coverage-report");
-  if(
-    !cov_out.empty() &&
-    symex.output_coverage_report(goto_model.get_goto_functions(), cov_out))
-  {
-    log.error() << "Failed to write symex coverage report to '" << cov_out
-                << "'" << messaget::eom;
-  }
 }

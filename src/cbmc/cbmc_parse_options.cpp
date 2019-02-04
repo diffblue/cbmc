@@ -40,6 +40,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-checker/multi_path_symex_checker.h>
 #include <goto-checker/multi_path_symex_only_checker.h>
 #include <goto-checker/properties.h>
+#include <goto-checker/single_path_symex_checker.h>
+#include <goto-checker/single_path_symex_only_checker.h>
 #include <goto-checker/stop_on_fail_verifier.h>
 
 #include <goto-programs/adjust_float_expressions.h>
@@ -559,25 +561,39 @@ int cbmc_parse_optionst::doit()
     options.get_bool_option("program-only") ||
     options.get_bool_option("show-vcc"))
   {
-    if(!options.get_bool_option("paths"))
+    if(options.get_bool_option("paths"))
+    {
+      all_properties_verifiert<single_path_symex_only_checkert> verifier(
+        options, ui_message_handler, goto_model);
+      (void)verifier();
+    }
+    else
     {
       all_properties_verifiert<multi_path_symex_only_checkert> verifier(
         options, ui_message_handler, goto_model);
       (void)verifier();
-      return CPROVER_EXIT_SUCCESS;
     }
+
+    return CPROVER_EXIT_SUCCESS;
   }
 
   if(
     options.get_bool_option("dimacs") || !options.get_option("outfile").empty())
   {
-    if(!options.get_bool_option("paths"))
+    if(options.get_bool_option("paths"))
+    {
+      stop_on_fail_verifiert<single_path_symex_checkert> verifier(
+        options, ui_message_handler, goto_model);
+      (void)verifier();
+    }
+    else
     {
       stop_on_fail_verifiert<multi_path_symex_checkert> verifier(
         options, ui_message_handler, goto_model);
       (void)verifier();
-      return CPROVER_EXIT_SUCCESS;
     }
+
+    return CPROVER_EXIT_SUCCESS;
   }
 
   if(options.is_set("cover"))
@@ -596,20 +612,36 @@ int cbmc_parse_optionst::doit()
   std::unique_ptr<goto_verifiert> verifier = nullptr;
 
   if(
-    !options.get_bool_option("paths") && !options.is_set("cover") &&
-    !options.get_bool_option("dimacs") && options.get_option("outfile").empty())
+    !options.is_set("cover") && !options.get_bool_option("dimacs") &&
+    options.get_option("outfile").empty())
   {
     if(options.get_bool_option("stop-on-fail"))
     {
-      verifier =
-        util_make_unique<stop_on_fail_verifiert<multi_path_symex_checkert>>(
-          options, ui_message_handler, goto_model);
+      if(options.get_bool_option("paths"))
+      {
+        verifier =
+          util_make_unique<stop_on_fail_verifiert<single_path_symex_checkert>>(
+            options, ui_message_handler, goto_model);
+      }
+      else
+      {
+        verifier =
+          util_make_unique<stop_on_fail_verifiert<multi_path_symex_checkert>>(
+            options, ui_message_handler, goto_model);
+      }
     }
     else
     {
-      verifier = util_make_unique<
-        all_properties_verifier_with_trace_storaget<multi_path_symex_checkert>>(
-        options, ui_message_handler, goto_model);
+      if(options.get_bool_option("paths"))
+      {
+        verifier = util_make_unique<all_properties_verifier_with_trace_storaget<
+          single_path_symex_checkert>>(options, ui_message_handler, goto_model);
+      }
+      else
+      {
+        verifier = util_make_unique<all_properties_verifier_with_trace_storaget<
+          multi_path_symex_checkert>>(options, ui_message_handler, goto_model);
+      }
     }
   }
 
