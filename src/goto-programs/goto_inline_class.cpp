@@ -64,7 +64,6 @@ void goto_inlinet::parameter_assignments(
       goto_programt::targett decl = dest.add(
         goto_programt::make_decl(symbol.symbol_expr(), source_location));
       decl->code.add_source_location()=source_location;
-      decl->function=adjust_function?target->function:function_name;
     }
 
     // this is the actual parameter
@@ -127,8 +126,6 @@ void goto_inlinet::parameter_assignments(
       dest.add_instruction(ASSIGN);
       dest.instructions.back().source_location=source_location;
       dest.instructions.back().code.swap(assignment);
-      dest.instructions.back().function=
-        adjust_function?target->function:function_name;
     }
 
     if(it1!=arguments.end())
@@ -143,7 +140,6 @@ void goto_inlinet::parameter_assignments(
 
 void goto_inlinet::parameter_destruction(
   const goto_programt::targett target,
-  const irep_idt &function_name, // name of called function
   const code_typet &code_type, // type of called function
   goto_programt &dest)
 {
@@ -170,7 +166,6 @@ void goto_inlinet::parameter_destruction(
       goto_programt::targett dead = dest.add(
         goto_programt::make_dead(symbol.symbol_expr(), source_location));
       dead->code.add_source_location()=source_location;
-      dead->function=adjust_function?target->function:function_name;
     }
   }
 }
@@ -277,10 +272,6 @@ void goto_inlinet::insert_function_body(
     "final instruction of a function must be an END_FUNCTION");
   end.type=LOCATION;
 
-  if(adjust_function)
-    for(auto &instruction : body.instructions)
-      instruction.function=target->function;
-
   // make sure the inlined function does not introduce hiding
   if(goto_function.is_hidden())
   {
@@ -299,7 +290,7 @@ void goto_inlinet::insert_function_body(
     tmp1);
 
   goto_programt tmp2;
-  parameter_destruction(target, identifier, goto_function.type, tmp2);
+  parameter_destruction(target, goto_function.type, tmp2);
 
   goto_programt tmp;
   tmp.destructive_append(tmp1); // par assignment
@@ -324,37 +315,15 @@ void goto_inlinet::insert_function_body(
     call_location_number,
     identifier);
 
-#if 0
-  if(goto_function.is_hidden())
+  if(adjust_function)
   {
-    source_locationt new_source_location=
-      function.find_source_location();
-
-    if(new_source_location.is_not_nil())
+    Forall_goto_program_instructions(it, tmp)
     {
-      new_source_location.set_hide();
-
-      Forall_goto_program_instructions(it, tmp)
-      {
-        if(it->function==identifier)
-        {
-          // don't hide assignment to lhs
-          if(it->is_assign() && it->get_assign().lhs()==lhs)
-          {
-          }
-          else
-          {
-            replace_location(it->source_location, new_source_location);
-            replace_location(it->guard, new_source_location);
-            replace_location(it->code, new_source_location);
-          }
-
-          it->function=target->function;
-        }
-      }
+      replace_location(it->source_location, target->source_location);
+      replace_location(it->guard, target->source_location);
+      replace_location(it->code, target->source_location);
     }
   }
-#endif
 
   // kill call
   target->type=LOCATION;

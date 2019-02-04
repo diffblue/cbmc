@@ -120,7 +120,6 @@ void goto_unwindt::unwind(
 
     t->make_skip();
     t->source_location=loop_head->source_location;
-    t->function=loop_head->function;
     t->location_number=loop_head->location_number;
   }
   else if(unwind_strategy==unwind_strategyt::CONTINUE)
@@ -155,7 +154,6 @@ void goto_unwindt::unwind(
       UNREACHABLE;
 
     new_t->source_location=loop_head->source_location;
-    new_t->function=loop_head->function;
     new_t->location_number=loop_head->location_number;
     unwind_log.insert(new_t, loop_head->location_number);
   }
@@ -181,7 +179,6 @@ void goto_unwindt::unwind(
 
       t_goto->make_goto(goto_program.const_cast_target(loop_exit));
       t_goto->source_location=loop_exit->source_location;
-      t_goto->function=loop_exit->function;
       t_goto->guard=true_exprt();
       t_goto->location_number=loop_exit->location_number;
     }
@@ -193,7 +190,6 @@ void goto_unwindt::unwind(
 
     t_skip->make_skip();
     t_skip->source_location=loop_head->source_location;
-    t_skip->function=loop_head->function;
     t_skip->location_number=loop_head->location_number;
 
     // where to go for the next iteration
@@ -236,7 +232,6 @@ void goto_unwindt::unwind(
 
     t_skip->make_skip();
     t_skip->source_location=loop_head->source_location;
-    t_skip->function=loop_head->function;
     t_skip->location_number=loop_head->location_number;
 
     // redirect gotos into loop body

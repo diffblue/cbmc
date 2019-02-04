@@ -38,7 +38,6 @@ void remove_calls_no_bodyt::remove_call_no_body(
     goto_programt::targett t = tmp.add_instruction();
     t->make_other(code_expressiont(argument));
     t->source_location = target->source_location;
-    t->function = target->function;
   }
 
   // return value
@@ -51,7 +50,6 @@ void remove_calls_no_bodyt::remove_call_no_body(
 
     goto_programt::targett t = tmp.add_instruction(ASSIGN);
     t->source_location = target->source_location;
-    t->function = target->function;
     t->code.swap(code);
   }
 

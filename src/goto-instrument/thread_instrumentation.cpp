@@ -35,7 +35,6 @@ void thread_exit_instrumentation(goto_programt &goto_program)
   assert(end->is_end_function());
 
   source_locationt source_location=end->source_location;
-  irep_idt function=end->function;
 
   goto_program.insert_before_swap(end);
 
@@ -51,7 +50,6 @@ void thread_exit_instrumentation(goto_programt &goto_program)
 
   end->source_location=source_location;
   end->source_location.set_comment("mutexes must not be locked on thread exit");
-  end->function=function;
 }
 
 void thread_exit_instrumentation(goto_modelt &goto_model)

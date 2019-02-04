@@ -1900,9 +1900,6 @@ void goto_checkt::goto_check(
           i_it->source_location.set_java_bytecode_index(
             it->source_location.get_java_bytecode_index());
       }
-
-      if(i_it->function.empty())
-        i_it->function=it->function;
     }
 
     // insert new instructions -- make sure targets are not moved

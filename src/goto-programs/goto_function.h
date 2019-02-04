@@ -72,14 +72,6 @@ public:
     parameter_identifiers.clear();
   }
 
-  /// update the function member in each instruction
-  /// \param function_id: the `function_id` used for assigning empty function
-  ///   members
-  void update_instructions_function(const irep_idt &function_id)
-  {
-    body.update_instructions_function(function_id);
-  }
-
   void swap(goto_functiont &other)
   {
     body.swap(other.body);

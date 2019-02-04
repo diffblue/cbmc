@@ -39,7 +39,6 @@ SCENARIO(
     symbol_table.insert(fun_symbol);
     namespacet ns(symbol_table);
     instructions.back().make_assertion(x_le_10);
-    instructions.back().function = fun_name;
 
     WHEN("Instruction has no targets")
     {

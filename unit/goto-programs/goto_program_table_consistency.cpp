@@ -35,7 +35,6 @@ SCENARIO(
     auto &instructions = goto_function.body.instructions;
     instructions.emplace_back(goto_program_instruction_typet::ASSERT);
     instructions.back().make_assertion(x_le_10);
-    instructions.back().function = function_symbol.name;
 
     symbol_table.insert(function_symbol);
     WHEN("Symbol table has the right symbol")

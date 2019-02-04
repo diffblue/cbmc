@@ -204,9 +204,6 @@ void goto_convert_functionst::convert_function(
   // add "end of function"
   f.body.destructive_append(tmp_end_function);
 
-  // do function tags (they are empty at this point)
-  f.update_instructions_function(identifier);
-
   f.body.update();
 
   if(hide(f.body))

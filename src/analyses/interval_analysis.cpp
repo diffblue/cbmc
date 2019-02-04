@@ -82,7 +82,6 @@ void instrument_intervals(
       t->make_assumption(conjunction(assertion));
       i_it++; // goes to original instruction
       t->source_location=i_it->source_location;
-      t->function=i_it->function;
     }
   }
 }

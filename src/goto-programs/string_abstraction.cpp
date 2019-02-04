@@ -285,7 +285,6 @@ void string_abstractiont::make_decl_and_def(goto_programt &dest,
 
   goto_programt::targett decl1 =
     dest.add(goto_programt::make_decl(sym_expr, ref_instr->source_location));
-  decl1->function=ref_instr->function;
   decl1->code.add_source_location()=ref_instr->source_location;
 
   exprt val=symbol.value;
@@ -302,7 +301,6 @@ void string_abstractiont::make_decl_and_def(goto_programt &dest,
     goto_programt::targett assignment1=dest.add_instruction();
     assignment1->make_assignment();
     assignment1->source_location=ref_instr->source_location;
-    assignment1->function=ref_instr->function;
     assignment1->code=code_assignt(sym_expr, val);
     assignment1->code.add_source_location()=ref_instr->source_location;
   }
@@ -362,7 +360,6 @@ exprt string_abstractiont::make_val_or_dummy_rec(goto_programt &dest,
         goto_programt::targett assignment1=dest.add_instruction();
         assignment1->make_assignment();
         assignment1->source_location=ref_instr->source_location;
-        assignment1->function=ref_instr->function;
         assignment1->code=code_assignt(member, sym_expr);
         assignment1->code.add_source_location()=ref_instr->source_location;
       }
@@ -410,7 +407,6 @@ symbol_exprt string_abstractiont::add_dummy_symbol_and_value(
   goto_programt::targett decl=dest.add_instruction();
   decl->make_decl();
   decl->source_location=ref_instr->source_location;
-  decl->function=ref_instr->function;
   decl->code=code_declt(sym_expr);
   decl->code.add_source_location()=ref_instr->source_location;
 
@@ -436,7 +432,6 @@ symbol_exprt string_abstractiont::add_dummy_symbol_and_value(
     goto_programt::targett assignment1=dest.add_instruction();
     assignment1->make_assignment();
     assignment1->source_location=ref_instr->source_location;
-    assignment1->function=ref_instr->function;
     assignment1->code=code_assignt(sym_expr, new_symbol.value);
     assignment1->code.add_source_location()=ref_instr->source_location;
   }
@@ -1085,7 +1080,6 @@ goto_programt::targett string_abstractiont::abstract_pointer_assign(
     goto_programt::instructiont assignment;
     assignment.make_assignment();
     assignment.source_location=target->source_location;
-    assignment.function=target->function;
     assignment.code=code_assignt(new_lhs, new_rhs);
     assignment.code.add_source_location()=target->source_location;
     dest.insert_before_swap(target, assignment);
@@ -1181,14 +1175,12 @@ goto_programt::targett string_abstractiont::char_assign(
   goto_programt::targett assignment1=tmp.add_instruction();
   assignment1->make_assignment();
   assignment1->source_location=target->source_location;
-  assignment1->function=target->function;
   assignment1->code=code_assignt(i1, true_exprt());
   assignment1->code.add_source_location()=target->source_location;
 
   goto_programt::targett assignment2=tmp.add_instruction();
   assignment2->make_assignment();
   assignment2->source_location=target->source_location;
-  assignment2->function=target->function;
   assignment2->code=code_assignt(lhs, rhs);
   assignment2->code.add_source_location()=target->source_location;
 
@@ -1263,18 +1255,14 @@ goto_programt::targett string_abstractiont::value_assignments_if(
   goto_programt::targett else_target=tmp.add_instruction(SKIP);
   goto_programt::targett out_target=tmp.add_instruction(SKIP);
 
-  goto_else->function=target->function;
   goto_else->source_location=target->source_location;
   goto_else->make_goto(else_target, boolean_negate(rhs.cond()));
 
-  goto_out->function=target->function;
   goto_out->source_location=target->source_location;
   goto_out->make_goto(out_target, true_exprt());
 
-  else_target->function=target->function;
   else_target->source_location=target->source_location;
 
-  out_target->function=target->function;
   out_target->source_location=target->source_location;
 
   value_assignments(tmp, goto_out, lhs, rhs.true_case());
@@ -1302,7 +1290,6 @@ goto_programt::targett string_abstractiont::value_assignments_string_struct(
         member(lhs, whatt::IS_ZERO),
         member(rhs, whatt::IS_ZERO));
     assignment->code.add_source_location()=target->source_location;
-    assignment->function=target->function;
     assignment->source_location=target->source_location;
   }
 
@@ -1312,7 +1299,6 @@ goto_programt::targett string_abstractiont::value_assignments_string_struct(
         member(lhs, whatt::LENGTH),
         member(rhs, whatt::LENGTH));
     assignment->code.add_source_location()=target->source_location;
-    assignment->function=target->function;
     assignment->source_location=target->source_location;
   }
 
@@ -1322,7 +1308,6 @@ goto_programt::targett string_abstractiont::value_assignments_string_struct(
         member(lhs, whatt::SIZE),
         member(rhs, whatt::SIZE));
     assignment->code.add_source_location()=target->source_location;
-    assignment->function=target->function;
     assignment->source_location=target->source_location;
   }
 

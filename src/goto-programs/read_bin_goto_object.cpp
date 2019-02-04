@@ -100,7 +100,7 @@ static bool read_bin_goto_object_v4(
       goto_programt::instructiont &instruction=*itarget;
 
       irepconverter.reference_convert(in, instruction.code);
-      instruction.function = irepconverter.read_string_ref(in);
+      irepconverter.read_string_ref(in); // former function
       irepconverter.reference_convert(in, instruction.source_location);
       instruction.type = (goto_program_instruction_typet)
                               irepconverter.read_gb_word(in);

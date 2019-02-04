@@ -97,7 +97,6 @@ void nondet_static(
           side_effect_expr_nondett(
             sym.type(), original_instruction.source_location));
         i_it->source_location = original_instruction.source_location;
-        i_it->function = original_instruction.function;
       }
     }
     else if(instruction.is_function_call())

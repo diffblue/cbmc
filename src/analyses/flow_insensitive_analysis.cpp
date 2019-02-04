@@ -212,12 +212,9 @@ bool flow_insensitive_analysis_baset::do_function_call(
 
     goto_programt::targett r = temp.add(goto_programt::make_return(code_returnt(
       side_effect_expr_nondett(code.lhs().type(), l_call->source_location))));
-
-    r->function=f_it->first;
     r->location_number=0;
 
     goto_programt::targett t = temp.add(goto_programt::make_end_function());
-    t->function=f_it->first;
     t->location_number=1;
 
     locationt l_next=l_call; l_next++;
@@ -241,9 +238,6 @@ bool flow_insensitive_analysis_baset::do_function_call(
   {
     // get the state at the beginning of the function
     locationt l_begin=goto_function.body.instructions.begin();
-
-    DATA_INVARIANT(
-      l_begin->function == f_it->first, "function names have to match");
 
     // do the edge from the call site to the beginning of the function
     new_data =

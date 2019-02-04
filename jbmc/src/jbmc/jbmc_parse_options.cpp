@@ -840,9 +840,6 @@ void jbmc_parse_optionst::process_goto_function(
       function.compute_location_numbers();
       goto_function.body.compute_loop_numbers();
     }
-
-    // update the function member in each instruction
-    function.update_instructions_function();
   }
 }
 

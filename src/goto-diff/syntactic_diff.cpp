@@ -74,21 +74,6 @@ bool syntactic_difft::operator()()
       modified_functions.insert(it->first);
       continue;
     }
-
-    goto_programt::instructionst::const_iterator
-      i_it1=it->second.body.instructions.begin();
-    for(goto_programt::instructionst::const_iterator
-        i_it2=f_it->second.body.instructions.begin();
-        i_it1!=it->second.body.instructions.end() &&
-        i_it2!=f_it->second.body.instructions.end();
-        ++i_it1, ++i_it2)
-    {
-      if(i_it1->function != i_it2->function)
-      {
-        modified_functions.insert(it->first);
-        break;
-      }
-    }
   }
   forall_goto_functions(it, goto_model2.goto_functions)
   {

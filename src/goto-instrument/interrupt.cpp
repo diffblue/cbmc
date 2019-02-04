@@ -110,11 +110,9 @@ static void interrupt(
       t_goto->make_goto(t_orig);
       t_goto->source_location=source_location;
       t_goto->guard = side_effect_expr_nondett(bool_typet(), source_location);
-      t_goto->function=original_instruction.function;
 
       t_call->make_function_call(isr_call);
       t_call->source_location=source_location;
-      t_call->function=original_instruction.function;
 
       t_orig->swap(original_instruction);
 
@@ -138,11 +136,9 @@ static void interrupt(
       t_goto->make_goto(t_orig);
       t_goto->source_location=source_location;
       t_goto->guard = side_effect_expr_nondett(bool_typet(), source_location);
-      t_goto->function=i_it->function;
 
       t_call->make_function_call(isr_call);
       t_call->source_location=source_location;
-      t_call->function=i_it->function;
 
       i_it=t_call; // the for loop already counts us up
     }

@@ -91,7 +91,6 @@ void introduce_temporaries(
       new_i.make_assignment();
       new_i.code=code_assignt(symbol_expr, instruction.guard);
       new_i.source_location=instruction.source_location;
-      new_i.function=instruction.function;
 
       // replace guard
       instruction.guard=symbol_expr;

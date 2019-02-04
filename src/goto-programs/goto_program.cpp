@@ -680,13 +680,6 @@ void goto_programt::instructiont::validate(
   validate_full_code(code, ns, vm);
   validate_full_expr(guard, ns, vm);
 
-  const symbolt *table_symbol;
-  DATA_CHECK_WITH_DIAGNOSTICS(
-    vm,
-    !ns.lookup(function, table_symbol),
-    id2string(function) + " not found",
-    source_location);
-
   auto expr_symbol_finder = [&](const exprt &e) {
     find_symbols_sett typetags;
     find_type_symbols(e.type(), typetags);
@@ -704,12 +697,13 @@ void goto_programt::instructiont::validate(
 
   auto &current_source_location = source_location;
   auto type_finder =
-    [&ns, vm, &table_symbol, &current_source_location](const exprt &e) {
+    [&ns, vm, &current_source_location](const exprt &e) {
       if(e.id() == ID_symbol)
       {
         const auto &goto_symbol_expr = to_symbol_expr(e);
         const auto &goto_id = goto_symbol_expr.get_identifier();
 
+        const symbolt *table_symbol;
         if(!ns.lookup(goto_id, table_symbol))
         {
           bool symbol_expr_type_matches_symbol_table =
@@ -783,6 +777,7 @@ void goto_programt::instructiont::validate(
       }
     };
 
+  const symbolt *table_symbol;
   switch(type)
   {
   case NO_INSTRUCTION_TYPE:

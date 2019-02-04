@@ -110,7 +110,6 @@ void instrument_preconditions(
                             goto_model.goto_functions);
 
         source_locationt source_location=it->source_location;
-        irep_idt function=it->function;
 
         replace_symbolt r=actuals_replace_map(call, ns);
 
@@ -121,7 +120,6 @@ void instrument_preconditions(
           exprt instance=p->guard;
           r(instance);
           it->make_assertion(instance);
-          it->function=function;
           it->source_location=source_location;
           it->source_location.set_property_class(ID_precondition_instance);
           it->source_location.set_comment(p->source_location.get_comment());

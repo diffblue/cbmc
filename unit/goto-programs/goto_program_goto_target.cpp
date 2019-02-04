@@ -35,11 +35,9 @@ SCENARIO(
     auto &instructions = goto_function.body.instructions;
     instructions.emplace_back(goto_program_instruction_typet::ASSERT);
     instructions.back().make_assertion(x_le_10);
-    instructions.back().function = fun_name;
 
     instructions.emplace_back(goto_program_instruction_typet::GOTO);
     instructions.back().make_goto(instructions.begin());
-    instructions.back().function = fun_name;
 
     symbol.type = type1;
     symbol_table.insert(symbol);

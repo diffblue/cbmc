@@ -210,7 +210,6 @@ void remove_returnst::do_function_calls(
           t_a->make_assignment();
           t_a->source_location=i_it->source_location;
           t_a->code=code_assignt(function_call.lhs(), rhs);
-          t_a->function=i_it->function;
 
           // fry the previous assignment
           function_call.lhs().make_nil();
@@ -221,7 +220,6 @@ void remove_returnst::do_function_calls(
             t_d->make_dead();
             t_d->source_location=i_it->source_location;
             t_d->code = code_deadt(*return_value);
-            t_d->function=i_it->function;
           }
         }
       }

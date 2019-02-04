@@ -42,7 +42,6 @@ SCENARIO(
     goto_functiont goto_function;
     auto &instructions = goto_function.body.instructions;
     instructions.emplace_back(goto_program_instruction_typet::FUNCTION_CALL);
-    instructions.back().function = fun_symbol_name;
 
     var_symbol.type = type1;
     var_symbol2.type = type2;

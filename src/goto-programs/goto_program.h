@@ -264,9 +264,6 @@ public:
       return code;
     }
 
-    /// The function this instruction belongs to
-    irep_idt function;
-
     /// The location of the instruction in the source file
     source_locationt source_location;
 
@@ -436,13 +433,11 @@ public:
     /// Constructor that can set all members, passed by value
     instructiont(
       codet _code,
-      irep_idt _function,
       source_locationt _source_location,
       goto_program_instruction_typet _type,
       exprt _guard,
       targetst _targets)
       : code(std::move(_code)),
-        function(_function),
         source_location(std::move(_source_location)),
         type(_type),
         guard(std::move(_guard)),
@@ -459,7 +454,6 @@ public:
       swap(instruction.type, type);
       swap(instruction.guard, guard);
       swap(instruction.targets, targets);
-      swap(instruction.function, function);
     }
 
     /// Uniquely identify an invalid target or location
@@ -533,42 +527,6 @@ public:
   const_targett const_cast_target(const_targett t) const
   {
     return t;
-  }
-
-  /// Get the id of the function that contains the instruction pointed-to by the
-  /// given instruction iterator.
-  ///
-  /// \param l: instruction iterator
-  /// \return id of the function that contains the pointed-to goto instruction
-  static const irep_idt get_function_id(
-    const_targett l)
-  {
-    // The field `function` of an instruction may not always contain the id of
-    // the function it is currently in, due to goto program modifications such
-    // as inlining. For example, if an instruction in a function `f` is inlined
-    // into a function `g`, the instruction may, depending on the arguments to
-    // the inliner, retain the original value of `f` in the function field.
-    // However, instructions of type END_FUNCTION are never inlined into other
-    // functions, hence they contain the id of the function they are in. Thus,
-    // this function takes the END_FUNCTION instruction of the goto program and
-    // returns the value of its function field.
-
-    while(!l->is_end_function())
-      ++l;
-
-    return l->function;
-  }
-
-  /// Get the id of the function that contains the given goto program.
-  ///
-  /// \param p: the goto program
-  /// \return id of the function that contains the goto program
-  static const irep_idt get_function_id(
-    const goto_programt &p)
-  {
-    PRECONDITION(!p.empty());
-
-    return get_function_id(--p.instructions.end());
   }
 
   template <typename Target>
@@ -695,22 +653,6 @@ public:
     }
   }
 
-  /// Sets the `function` member of each instruction if not yet set
-  /// Note that a goto program need not be a goto function and therefore,
-  /// we cannot do this in update(), but only at the level of
-  /// of goto_functionst where goto programs are guaranteed to be
-  /// named functions.
-  void update_instructions_function(const irep_idt &function_id)
-  {
-    for(auto &instruction : instructions)
-    {
-      if(instruction.function.empty())
-      {
-        instruction.function = function_id;
-      }
-    }
-  }
-
   /// Compute location numbers
   void compute_location_numbers()
   {
@@ -811,14 +753,14 @@ public:
   static instructiont
   make_return(const source_locationt &l = source_locationt::nil())
   {
-    return instructiont(code_returnt(), irep_idt(), l, RETURN, nil_exprt(), {});
+    return instructiont(code_returnt(), l, RETURN, nil_exprt(), {});
   }
 
   static instructiont make_return(
     code_returnt c,
     const source_locationt &l = source_locationt::nil())
   {
-    return instructiont(std::move(c), irep_idt(), l, RETURN, nil_exprt(), {});
+    return instructiont(std::move(c), l, RETURN, nil_exprt(), {});
   }
 
   static instructiont
@@ -826,7 +768,6 @@ public:
   {
     return instructiont(
       static_cast<const codet &>(get_nil_irep()),
-      irep_idt(),
       l,
       SKIP,
       nil_exprt(),
@@ -837,7 +778,6 @@ public:
   {
     return instructiont(
       static_cast<const codet &>(get_nil_irep()),
-      irep_idt(),
       l,
       LOCATION,
       nil_exprt(),
@@ -849,7 +789,6 @@ public:
   {
     return instructiont(
       static_cast<const codet &>(get_nil_irep()),
-      irep_idt(),
       l,
       THROW,
       nil_exprt(),
@@ -861,7 +800,6 @@ public:
   {
     return instructiont(
       static_cast<const codet &>(get_nil_irep()),
-      irep_idt(),
       l,
       CATCH,
       nil_exprt(),
@@ -874,7 +812,6 @@ public:
   {
     return instructiont(
       static_cast<const codet &>(get_nil_irep()),
-      irep_idt(),
       l,
       ASSERT,
       exprt(g),
@@ -886,29 +823,26 @@ public:
     const source_locationt &l = source_locationt::nil())
   {
     return instructiont(
-      static_cast<const codet &>(get_nil_irep()), irep_idt(), l, ASSUME, g, {});
+      static_cast<const codet &>(get_nil_irep()), l, ASSUME, g, {});
   }
 
   static instructiont make_other(const codet &_code)
   {
-    return instructiont(
-      _code, irep_idt(), source_locationt::nil(), OTHER, nil_exprt(), {});
+    return instructiont(_code, source_locationt::nil(), OTHER, nil_exprt(), {});
   }
 
   static instructiont make_decl(
     const symbol_exprt &symbol,
     const source_locationt &l = source_locationt::nil())
   {
-    return instructiont(
-      code_declt(symbol), irep_idt(), l, DECL, nil_exprt(), {});
+    return instructiont(code_declt(symbol), l, DECL, nil_exprt(), {});
   }
 
   static instructiont make_dead(
     const symbol_exprt &symbol,
     const source_locationt &l = source_locationt::nil())
   {
-    return instructiont(
-      code_deadt(symbol), irep_idt(), l, DEAD, nil_exprt(), {});
+    return instructiont(code_deadt(symbol), l, DEAD, nil_exprt(), {});
   }
 
   static instructiont
@@ -916,7 +850,6 @@ public:
   {
     return instructiont(
       static_cast<const codet &>(get_nil_irep()),
-      irep_idt(),
       l,
       ATOMIC_BEGIN,
       nil_exprt(),
@@ -928,7 +861,6 @@ public:
   {
     return instructiont(
       static_cast<const codet &>(get_nil_irep()),
-      irep_idt(),
       l,
       ATOMIC_END,
       nil_exprt(),
@@ -940,7 +872,6 @@ public:
   {
     return instructiont(
       static_cast<const codet &>(get_nil_irep()),
-      irep_idt(),
       l,
       END_FUNCTION,
       nil_exprt(),
@@ -951,7 +882,7 @@ public:
     const code_gotot &_code,
     const source_locationt &l = source_locationt::nil())
   {
-    return instructiont(_code, irep_idt(), l, INCOMPLETE_GOTO, nil_exprt(), {});
+    return instructiont(_code, l, INCOMPLETE_GOTO, nil_exprt(), {});
   }
 
   static instructiont make_goto(
@@ -960,7 +891,6 @@ public:
   {
     return instructiont(
       static_cast<const codet &>(get_nil_irep()),
-      irep_idt(),
       l,
       GOTO,
       true_exprt(),
@@ -974,7 +904,6 @@ public:
   {
     return instructiont(
       static_cast<const codet &>(get_nil_irep()),
-      irep_idt(),
       l,
       GOTO,
       g,
@@ -985,21 +914,21 @@ public:
     const code_assignt &_code,
     const source_locationt &l = source_locationt::nil())
   {
-    return instructiont(_code, irep_idt(), l, ASSIGN, nil_exprt(), {});
+    return instructiont(_code, l, ASSIGN, nil_exprt(), {});
   }
 
   static instructiont make_decl(
     const code_declt &_code,
     const source_locationt &l = source_locationt::nil())
   {
-    return instructiont(_code, irep_idt(), l, DECL, nil_exprt(), {});
+    return instructiont(_code, l, DECL, nil_exprt(), {});
   }
 
   static instructiont make_function_call(
     const code_function_callt &_code,
     const source_locationt &l = source_locationt::nil())
   {
-    return instructiont(_code, irep_idt(), l, FUNCTION_CALL, nil_exprt(), {});
+    return instructiont(_code, l, FUNCTION_CALL, nil_exprt(), {});
   }
 };
 
