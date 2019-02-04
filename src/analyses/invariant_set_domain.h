@@ -49,7 +49,7 @@ public:
     if(has_values.is_known())
       out << has_values.to_string() << '\n';
     else
-      invariant_set.output("", out);
+      invariant_set.output(out);
   }
 
   virtual void transform(
