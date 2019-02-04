@@ -37,15 +37,16 @@ Author: Daniel Kroening, kroening@kroening.com
 class goto_statet
 {
 public:
-  unsigned depth;
+  unsigned depth = 0;
   symex_level2t level2;
   value_sett value_set;
-  guardt guard;
+  guardt guard{true_exprt{}};
   symex_targett::sourcet source;
   std::map<irep_idt, exprt> propagation;
-  unsigned atomic_section_id;
+  unsigned atomic_section_id = 0;
   std::unordered_map<irep_idt, local_safe_pointerst> safe_pointers;
-  unsigned total_vccs, remaining_vccs;
+  unsigned total_vccs = 0;
+  unsigned remaining_vccs = 0;
 
   goto_statet(const class goto_symex_statet &s);
 };
