@@ -184,6 +184,15 @@ bool simplify_exprt::simplify_function_application(exprt &expr)
       return true;
     }
 
+    mp_integer offset_int = 0;
+    if(function_app.arguments().size() == 3)
+    {
+      auto &offset = function_app.arguments()[2];
+      if(offset.id() != ID_constant)
+        return true;
+      offset_int = numeric_cast_v<mp_integer>(to_constant_expr(offset));
+    }
+
     const address_of_exprt &first_address_of =
       to_address_of_expr(first_argument.content());
     const address_of_exprt &second_address_of =
@@ -214,19 +223,46 @@ bool simplify_exprt::simplify_function_application(exprt &expr)
       return true;
     }
 
-    // If so, it'll be a string array that we can use.
-    const array_string_exprt &first_string = to_array_string_expr(
-      ns.lookup(first_string_array.get(ID_identifier)).value);
+    // get their initial values from the symbol table
+    const symbolt *symbol_ptr = nullptr;
+    if(ns.lookup(
+         to_symbol_expr(first_string_array).get_identifier(), symbol_ptr))
+      return true;
+    const exprt &first_value = symbol_ptr->value;
+    if(ns.lookup(
+         to_symbol_expr(second_string_array).get_identifier(), symbol_ptr))
+      return true;
+    const exprt &second_value = symbol_ptr->value;
 
-    const array_string_exprt &second_string = to_array_string_expr(
-      ns.lookup(second_string_array.get(ID_identifier)).value);
+    // only compare if both are arrays
+    if(first_value.id() != ID_array || second_value.id() != ID_array)
+      return true;
 
-    // If the lengths are the same we can do the .equals substitute.
-    if(first_string.length() == second_string.length())
+    // test whether second_value is a prefix of first_value
+    bool is_prefix =
+      offset_int >= 0 && mp_integer(first_value.operands().size()) >=
+                           offset_int + second_value.operands().size();
+    if(is_prefix)
     {
-      expr = from_integer(first_string == second_string ? 1 : 0, expr.type());
-      return false;
+      exprt::operandst::const_iterator second_it =
+        second_value.operands().begin();
+      for(const auto &first_op : first_value.operands())
+      {
+        if(offset_int > 0)
+          --offset_int;
+        else if(second_it == second_value.operands().end())
+          break;
+        else if(first_op != *second_it)
+        {
+          is_prefix = false;
+          break;
+        }
+        else
+          ++second_it;
+      }
     }
+    expr = from_integer(is_prefix ? 1 : 0, expr.type());
+    return false;
   }
 
   return true;
