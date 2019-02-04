@@ -262,3 +262,12 @@ void simple_slice(symex_target_equationt &equation)
       s_it->ignore=true;
   }
 }
+
+void revert_slice(symex_target_equationt &equation)
+{
+  // set ignore to false
+  for(auto step : equation.SSA_steps)
+  {
+    step.ignore = false;
+  }
+}
