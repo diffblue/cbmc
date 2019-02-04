@@ -20,13 +20,12 @@ Date:   March 2017
 #ifndef CPROVER_JAVA_BYTECODE_CHARACTER_REFINE_PREPROCESS_H
 #define CPROVER_JAVA_BYTECODE_CHARACTER_REFINE_PREPROCESS_H
 
-#include <util/ui_message.h>
 #include <util/std_code.h>
 #include <util/mp_arith.h>
 
 #include <unordered_map>
 
-class character_refine_preprocesst:public messaget
+class character_refine_preprocesst
 {
 public:
   void initialize_conversion_table();
