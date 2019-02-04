@@ -217,9 +217,9 @@ public:
     values.clear();
   }
 
-  void add_var(const idt &id, const std::string &suffix)
+  void add_var(const idt &id)
   {
-    get_entry(id, suffix);
+    get_entry(id, "");
   }
 
   void add_var(const entryt &e)

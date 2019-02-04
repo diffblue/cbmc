@@ -1264,7 +1264,7 @@ void value_set_fit::do_function_call(
   {
     const std::string identifier="value_set::" + id2string(function) + "::" +
                                  "argument$"+std::to_string(i);
-    add_var(identifier, "");
+    add_var(identifier);
     const symbol_exprt dummy_lhs(identifier, arguments[i].type());
     assign(dummy_lhs, arguments[i], ns);
   }
@@ -1282,7 +1282,7 @@ void value_set_fit::do_function_call(
     if(identifier.empty())
       continue;
 
-    add_var(identifier, "");
+    add_var(identifier);
 
     const exprt v_expr=
       symbol_exprt("value_set::" + id2string(function) + "::" +
