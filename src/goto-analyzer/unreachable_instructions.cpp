@@ -128,7 +128,7 @@ static void add_to_json(
       ++it)
   {
     std::ostringstream oss;
-    goto_program.output_instruction(ns, "", oss, *it->second);
+    goto_program.output_instruction(ns, function_identifier, oss, *it->second);
     std::string s=oss.str();
 
     std::string::size_type n=s.find('\n');

@@ -751,7 +751,7 @@ void goto_inlinet::output_inline_map(
         bool transitive=call.second;
 
         out << "  Call:\n";
-        goto_program.output_instruction(ns, "", out, *target);
+        goto_program.output_instruction(ns, id, out, *target);
         out << "  Transitive: " << transitive << "\n";
       }
     }
