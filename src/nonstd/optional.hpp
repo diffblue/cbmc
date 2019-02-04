@@ -356,7 +356,7 @@ struct alignment_of_hack
     alignment_of_hack();
 };
 
-template <unsigned A, unsigned S>
+template <std::size_t A, std::size_t S>
 struct alignment_logic
 {
     enum { value = A < S ? A : S };
