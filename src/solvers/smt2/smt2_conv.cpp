@@ -276,6 +276,9 @@ constant_exprt smt2_convt::parse_literal(
       constant_exprt s3 =
         parse_literal(src.get_sub()[3], unsignedbv_typet(floatbv_type.get_f()));
       // stitch the bits together
+      // TODO we do not store values as binary string anymore, this appears to
+      // be unused or untested
+      UNREACHABLE;
       std::string bits=id2string(s1.get_value())+
                        id2string(s2.get_value())+
                        id2string(s3.get_value());
@@ -418,6 +421,9 @@ exprt smt2_convt::parse_struct(
     if(!l.is_constant())
       return nil_exprt();
 
+    // TODO we do not store values as binary string anymore, this appears to
+    // be unused or untested
+    UNREACHABLE;
     irep_idt binary=to_constant_expr(l).get_value();
     if(binary.size()!=total_width)
       return nil_exprt();
@@ -3110,6 +3116,9 @@ void smt2_convt::convert_rounding_mode_FPA(const exprt &expr)
   {
     const constant_exprt &cexpr=to_constant_expr(expr);
 
+    // TODO we do not store values as binary string anymore, this appears to
+    // be unused or untested
+    UNREACHABLE;
     mp_integer value=binary2integer(id2string(cexpr.get_value()), false);
 
     if(value==0)
