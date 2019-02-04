@@ -21,7 +21,6 @@ Author: Kareem Khazem <karkhaz@karkhaz.com>, 2018
 
 #include <goto-programs/goto_model.h>
 
-#include <langapi/language_ui.h>
 #include <langapi/mode.h>
 
 #include <util/cmdline.h>
