@@ -3445,8 +3445,8 @@ inline const with_exprt &to_with_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_with);
   DATA_INVARIANT(
-    expr.operands().size()==3,
-    "Array/structure update must have three operands");
+    expr.operands().size() >= 3 && expr.operands().size() % 2 == 1,
+    "array/structure update must have at least three operands");
   return static_cast<const with_exprt &>(expr);
 }
 
@@ -3455,8 +3455,8 @@ inline with_exprt &to_with_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_with);
   DATA_INVARIANT(
-    expr.operands().size()==3,
-    "Array/structure update must have three operands");
+    expr.operands().size() >= 3 && expr.operands().size() % 2 == 1,
+    "array/structure update must have at least three operands");
   return static_cast<with_exprt &>(expr);
 }
 
@@ -3466,10 +3466,9 @@ template<> inline bool can_cast_expr<with_exprt>(const exprt &base)
 }
 inline void validate_expr(const with_exprt &value)
 {
-  validate_operands(
-    value,
-    3,
-    "Array/structure update must have three operands");
+  DATA_INVARIANT(
+    value.operands().size() % 2 == 1,
+    "array/structure update must have an odd number of operands");
 }
 
 class index_designatort : public expr_protectedt
