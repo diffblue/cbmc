@@ -26,6 +26,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <util/arith_tools.h>
 #include <util/deprecate.h>
 #include <util/pointer_predicates.h>
+#include <util/simplify_expr.h>
 #include <util/ssa_expr.h>
 #include <util/string_constant.h>
 
@@ -180,7 +181,7 @@ exprt string_constraint_generatort::associate_array_to_pointer(
                                       : f.arguments()[0]);
 
   const exprt &pointer_expr = f.arguments()[1];
-  array_pool.insert(pointer_expr, array_expr);
+  array_pool.insert(simplify_expr(pointer_expr, ns), array_expr);
   // created_strings.emplace(to_array_string_expr(array_expr));
   return from_integer(0, f.type());
 }

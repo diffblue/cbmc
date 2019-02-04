@@ -1,0 +1,14 @@
+CORE
+test_starts_with.class
+--verbosity 10 --max-nondet-string-length 1000 --function test_starts_with.main --unwind 1 --no-simplify
+^EXIT=10$
+^SIGNAL=0$
+^\[.*assertion.1\].* line 8.* SUCCESS$
+^\[.*assertion.2\].* line 9.* FAILURE$
+--
+non equal types
+--
+This test must also pass when not running simplification during goto-symex
+(--no-simplify). Prior to the changes in this commit the test would yield wrong
+results for either line 8, because the string solver was not able to identify
+the string object in a non-simplified expression.
