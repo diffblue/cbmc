@@ -15,7 +15,7 @@ Author: CM Wintersteiger
 class qbf_qubet:public qdimacs_cnft
 {
 public:
-  qbf_qubet();
+  explicit qbf_qubet(message_handlert &message_handler);
   virtual ~qbf_qubet();
 
   virtual const std::string solver_text();

@@ -48,8 +48,8 @@ public:
     return "Bit vector minimizing SAT";
   }
 
-  explicit bv_minimizing_dect(const namespacet &_ns):
-    bv_pointerst(_ns, satcheck)
+  bv_minimizing_dect(const namespacet &_ns, message_handlert &message_handler)
+    : bv_pointerst(_ns, satcheck), satcheck(message_handler)
   {
   }
 

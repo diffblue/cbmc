@@ -15,7 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class qbf_skizzot:public qdimacs_cnft
 {
 public:
-  qbf_skizzot();
+  explicit qbf_skizzot(message_handlert &message_handler);
   virtual ~qbf_skizzot();
 
   virtual const std::string solver_text();

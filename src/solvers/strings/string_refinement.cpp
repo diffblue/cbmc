@@ -38,7 +38,8 @@ static bool is_valid_string_constraint(
 static optionalt<exprt> find_counter_example(
   const namespacet &ns,
   const exprt &axiom,
-  const symbol_exprt &var);
+  const symbol_exprt &var,
+  message_handlert &message_handler);
 
 /// Check axioms takes the model given by the underlying solver and answers
 /// whether it satisfies the string constraints.
@@ -1304,8 +1305,11 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
       stream, axiom, axiom_in_model, negaxiom, with_concretized_arrays);
 
     if(
-      const auto &witness =
-        find_counter_example(ns, with_concretized_arrays, axiom.univ_var))
+      const auto &witness = find_counter_example(
+        ns,
+        with_concretized_arrays,
+        axiom.univ_var,
+        stream.message.get_message_handler()))
     {
       stream << std::string(4, ' ')
              << "- violated_for: " << format(axiom.univ_var) << "="
@@ -1335,7 +1339,9 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
     debug_check_axioms_step(
       stream, nc_axiom, nc_axiom, negated_axiom, negated_axiom);
 
-    if(const auto witness = find_counter_example(ns, negated_axiom, univ_var))
+    if(
+      const auto witness = find_counter_example(
+        ns, negated_axiom, univ_var, stream.message.get_message_handler()))
     {
       stream << std::string(4, ' ')
              << "- violated_for: " << univ_var.get_identifier() << "="
@@ -2046,14 +2052,16 @@ exprt string_refinementt::get(const exprt &expr) const
 /// \param ns: namespace
 /// \param [in] axiom: the axiom to be checked
 /// \param [in] var: the variable whose evaluation will be stored in witness
+/// \param message_handler: message handler
 /// \return the witness of the satisfying assignment if one
 ///   exists. If UNSAT, then behaviour is undefined.
 static optionalt<exprt> find_counter_example(
   const namespacet &ns,
   const exprt &axiom,
-  const symbol_exprt &var)
+  const symbol_exprt &var,
+  message_handlert &message_handler)
 {
-  satcheck_no_simplifiert sat_check;
+  satcheck_no_simplifiert sat_check(message_handler);
   boolbvt solver(ns, sat_check);
   solver << axiom;
 

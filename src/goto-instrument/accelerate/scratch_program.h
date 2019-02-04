@@ -45,7 +45,7 @@ public:
       path_storage(),
       options(get_default_options()),
       symex(mh, symbol_table, equation, options, path_storage),
-      satcheck(util_make_unique<satcheckt>()),
+      satcheck(util_make_unique<satcheckt>(mh)),
       satchecker(ns, *satcheck),
       z3(ns, "accelerate", "", "", smt2_dect::solvert::Z3),
       checker(&z3) // checker(&satchecker)
