@@ -9,9 +9,23 @@ Author: Malte Mues <mail.mues@gmail.com>
 
 #include <testing-utils/use_catch.h>
 
-#ifdef __linux__
-//  \file Test that the regex expression used work as expected.
-#define private public
+// clang-format off
+#if defined(__linux__) || \
+    defined(__FreeBSD_kernel__) || \
+    defined(__GNU__) || \
+    defined(__unix__) || \
+    defined(__CYGWIN__) || \
+    defined(__MACH__)
+// clang-format on
+
+#include <cstdio>
+#include <cstdlib>
+#include <regex>
+#include <string>
+
+#include <fstream>
+#include <iostream>
+
 #include <memory-analyzer/gdb_api.cpp>
 #include <string>
 

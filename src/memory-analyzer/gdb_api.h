@@ -15,7 +15,15 @@ Author: Malte Mues <mail.mues@gmail.com>
 /// gdb machine interface (see section "The GDB/MI Interface" in the
 /// gdb manual to communicate with gdb.
 
-#ifdef __linux__
+// clang-format off
+#if defined(__linux__) || \
+    defined(__FreeBSD_kernel__) || \
+    defined(__GNU__) || \
+    defined(__unix__) || \
+    defined(__CYGWIN__) || \
+    defined(__MACH__)
+// clang-format on
+
 #ifndef CPROVER_MEMORY_ANALYZER_GDB_API_H
 #define CPROVER_MEMORY_ANALYZER_GDB_API_H
 #include <unistd.h>
@@ -92,4 +100,4 @@ private:
 };
 
 #endif // CPROVER_MEMORY_ANALYZER_GDB_API_H
-#endif // __linux__
+#endif
