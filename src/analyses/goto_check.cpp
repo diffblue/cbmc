@@ -1834,7 +1834,6 @@ void goto_checkt::goto_check(
         if(local_bitvector_analysis->dirty(variable))
         {
           // need to mark the dead variable as dead
-          goto_programt::targett t=new_code.add_instruction(ASSIGN);
           exprt address_of_expr=address_of_exprt(variable);
           exprt lhs=ns.lookup(CPROVER_PREFIX "dead_object").symbol_expr();
           address_of_expr =
@@ -1844,8 +1843,9 @@ void goto_checkt::goto_check(
             address_of_expr,
             lhs,
             lhs.type());
-          t->source_location=i.source_location;
-          t->code=code_assignt(lhs, rhs);
+          goto_programt::targett t =
+            new_code.add(goto_programt::make_assignment(
+              code_assignt(lhs, rhs), i.source_location));
           t->code.add_source_location()=i.source_location;
         }
       }
@@ -1860,9 +1860,8 @@ void goto_checkt::goto_check(
         const symbol_exprt leak_expr=leak.symbol_expr();
 
         // add self-assignment to get helpful counterexample output
-        goto_programt::targett t=new_code.add_instruction();
-        t->make_assignment();
-        t->code=code_assignt(leak_expr, leak_expr);
+        new_code.add(
+          goto_programt::make_assignment(code_assignt(leak_expr, leak_expr)));
 
         source_locationt source_location;
         source_location.set_function(function_identifier);

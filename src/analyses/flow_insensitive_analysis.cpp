@@ -213,13 +213,12 @@ bool flow_insensitive_analysis_baset::do_function_call(
     exprt rhs =
       side_effect_expr_nondett(code.lhs().type(), l_call->source_location);
 
-    goto_programt::targett r=temp.add_instruction();
-    r->make_return();
-    r->code=code_returnt(rhs);
+    goto_programt::targett r =
+      temp.add(goto_programt::make_return(code_returnt(rhs)));
     r->function=f_it->first;
     r->location_number=0;
 
-    goto_programt::targett t=temp.add_instruction(END_FUNCTION);
+    goto_programt::targett t = temp.add(goto_programt::make_end_function());
     t->function=f_it->first;
     t->location_number=1;
 
