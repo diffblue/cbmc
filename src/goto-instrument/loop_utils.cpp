@@ -55,7 +55,7 @@ void build_havoc_code(
   }
 }
 
-static void get_modifies_lhs(
+void get_modifies_lhs(
   const local_may_aliast &local_may_alias,
   goto_programt::const_targett t,
   const exprt &lhs,
