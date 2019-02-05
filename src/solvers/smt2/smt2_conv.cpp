@@ -275,11 +275,15 @@ constant_exprt smt2_convt::parse_literal(
         parse_literal(src.get_sub()[2], unsignedbv_typet(floatbv_type.get_e()));
       constant_exprt s3 =
         parse_literal(src.get_sub()[3], unsignedbv_typet(floatbv_type.get_f()));
+
+      const auto s1_int = numeric_cast_v<mp_integer>(s1);
+      const auto s2_int = numeric_cast_v<mp_integer>(s2);
+      const auto s3_int = numeric_cast_v<mp_integer>(s3);
+
       // stitch the bits together
-      std::string bits=id2string(s1.get_value())+
-                       id2string(s2.get_value())+
-                       id2string(s3.get_value());
-      value=binary2integer(bits, false);
+      value = bitwise_or(
+        s1_int << (floatbv_type.get_e() + floatbv_type.get_f()),
+        bitwise_or((s2_int << floatbv_type.get_f()), s3_int));
     }
     else
       value=0;
@@ -414,13 +418,12 @@ exprt smt2_convt::parse_struct(
   {
     // These are just flattened, i.e., we expect to see a monster bit vector.
     std::size_t total_width=boolbv_width(type);
-    exprt l = parse_literal(src, unsignedbv_typet(total_width));
-    if(!l.is_constant())
-      return nil_exprt();
+    const auto l = parse_literal(src, unsignedbv_typet(total_width));
 
-    irep_idt binary=to_constant_expr(l).get_value();
-    if(binary.size()!=total_width)
-      return nil_exprt();
+    const irep_idt binary =
+      integer2binary(numeric_cast_v<mp_integer>(l), total_width);
+
+    CHECK_RETURN(binary.size() == total_width);
 
     std::size_t offset=0;
 
@@ -2371,7 +2374,7 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
       significand = 1;
       exponent = 0;
       a.build(significand, exponent);
-      val.set(ID_value, integer2binary(a.pack(), a.spec.width()));
+      val.set_value(integer2bvrep(a.pack(), a.spec.width()));
 
       convert_constant(val);
       out << " ";
@@ -2379,7 +2382,7 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
       significand = 0;
       exponent = 0;
       a.build(significand, exponent);
-      val.set(ID_value, integer2binary(a.pack(), a.spec.width()));
+      val.set_value(integer2bvrep(a.pack(), a.spec.width()));
 
       convert_constant(val);
       out << ")";
@@ -2780,7 +2783,7 @@ void smt2_convt::convert_constant(const constant_exprt &expr)
   }
   else if(expr_type.id()==ID_pointer)
   {
-    const irep_idt &value=expr.get(ID_value);
+    const irep_idt &value = expr.get_value();
 
     if(value==ID_NULL)
     {
@@ -3110,7 +3113,7 @@ void smt2_convt::convert_rounding_mode_FPA(const exprt &expr)
   {
     const constant_exprt &cexpr=to_constant_expr(expr);
 
-    mp_integer value=binary2integer(id2string(cexpr.get_value()), false);
+    mp_integer value = numeric_cast_v<mp_integer>(cexpr);
 
     if(value==0)
       out << "roundNearestTiesToEven";
