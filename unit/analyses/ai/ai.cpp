@@ -156,7 +156,7 @@ SCENARIO(
   symbolt g;
   g.name = "g";
   g.mode = ID_C;
-  g.type = code_typet({}, void_typet());
+  g.type = code_typet({}, empty_typet());
   g.value = code_assignt(gy.symbol_expr(), from_integer(0, signed_int_type()));
 
   // h:
@@ -169,7 +169,7 @@ SCENARIO(
   symbolt h;
   h.name = "h";
   h.mode = ID_C;
-  h.type = code_typet({}, void_typet());
+  h.type = code_typet({}, empty_typet());
   h.value = code_assignt(hy.symbol_expr(), from_integer(0, signed_int_type()));
 
   goto_model.symbol_table.add(g);
@@ -226,7 +226,7 @@ SCENARIO(
   symbolt f;
   f.name = "f";
   f.mode = ID_C;
-  f.type = code_typet({}, void_typet());
+  f.type = code_typet({}, empty_typet());
   f.value = f_body;
 
   goto_model.symbol_table.add(f);
@@ -236,7 +236,7 @@ SCENARIO(
   symbolt start;
   start.name = goto_functionst::entry_point();
   start.mode = ID_C;
-  start.type = code_typet({}, void_typet());
+  start.type = code_typet({}, empty_typet());
   start.value = make_void_call(f.symbol_expr());
 
   goto_model.symbol_table.add(start);

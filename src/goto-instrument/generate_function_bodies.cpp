@@ -266,7 +266,7 @@ protected:
       function.body.destructive_append(dest);
     }
 
-    if(function.type.return_type() != void_typet())
+    if(function.type.return_type() != empty_typet())
     {
       typet type(function.type.return_type());
       type.remove(ID_C_constant);
