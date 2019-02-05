@@ -25,6 +25,7 @@ phases:
     commands:
       - make -C unit test
       - make -C regression test
+      - make -C regression/cbmc test-paths-lifo
       - scripts/delete_failing_smt2_solver_tests
       - env PATH=$PATH:`pwd`/src/solvers make -C regression/cbmc test-cprover-smt2
       - make -C jbmc/unit test
