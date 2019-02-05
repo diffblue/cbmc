@@ -35,9 +35,9 @@ signedbv_typet java_int_type()
   return result;
 }
 
-void_typet java_void_type()
+empty_typet java_void_type()
 {
-  static const auto result = void_typet();
+  static const auto result = empty_typet();
   return result;
 }
 
