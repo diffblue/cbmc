@@ -222,11 +222,11 @@ protected:
 
   void trigger_auto_object(const exprt &, statet &);
   void initialize_auto_object(const exprt &, statet &);
-  void process_array_expr(statet &, exprt &, bool);
+  void process_array_expr(statet &, exprt &);
   exprt make_auto_object(const typet &, statet &);
-  virtual void dereference(exprt &, statet &, bool write);
+  virtual void dereference(exprt &, statet &);
 
-  void dereference_rec(exprt &, statet &, guardt &, bool write);
+  void dereference_rec(exprt &, statet &, guardt &);
   exprt address_arithmetic(
     const exprt &,
     statet &,
