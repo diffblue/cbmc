@@ -143,8 +143,7 @@ public:
   // for function call
   std::vector<exprt> function_arguments;
 
-  /*! \brief outputs the trace step in ASCII to a given stream
-  */
+  /// Outputs the trace step in ASCII to a given stream
   void output(
     const class namespacet &ns,
     std::ostream &out) const;
@@ -179,8 +178,7 @@ public:
     steps.clear();
   }
 
-  /*! \brief outputs the trace in ASCII to a given stream
-  */
+  /// Outputs the trace in ASCII to a given stream
   void output(
     const class namespacet &ns,
     std::ostream &out) const;
@@ -196,8 +194,8 @@ public:
     steps.push_back(step);
   }
 
-  // retrieves the final step in the trace for manipulation
-  // (used to fill a trace from code, hence non-const)
+  /// Retrieves the final step in the trace for manipulation
+  /// (used to fill a trace from code, hence non-const)
   goto_trace_stept &get_last_step()
   {
     return steps.back();
