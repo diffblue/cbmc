@@ -233,14 +233,6 @@ void show_goto_trace(
   const goto_tracet &,
   const trace_optionst &);
 
-void trace_value(
-  messaget::mstreamt &out,
-  const namespacet &,
-  const optionalt<symbol_exprt> &lhs_object,
-  const exprt &full_lhs,
-  const exprt &value,
-  const trace_optionst &);
-
 #define OPT_GOTO_TRACE                                                         \
   "(trace-json-extended)"                                                      \
   "(trace-show-function-calls)"                                                \

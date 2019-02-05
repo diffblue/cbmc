@@ -253,7 +253,7 @@ std::string trace_numeric_value(
   return "?";
 }
 
-void trace_value(
+static void trace_value(
   messaget::mstreamt &out,
   const namespacet &ns,
   const optionalt<symbol_exprt> &lhs_object,
