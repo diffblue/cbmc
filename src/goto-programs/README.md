@@ -579,3 +579,101 @@ C++ modules:
 Dependencies:
   - [linking folder](\ref linking).
   - [typecheck](\ref section-goto-typecheck).
+
+\section goto-trace-structure Goto Trace Structure
+
+In the \ref goto-programs directory.
+
+**Key classes:**
+* \ref goto_tracet
+* \ref goto_trace_stept
+* \ref goto_trace_stept::typet
+
+A trace represents the execution of a program as a series of steps. The class 
+\ref goto_tracet contains an ordered list of \ref goto_trace_stept, each 
+representing a step. The main step types used in a program are:
+- function call
+- function return
+- assignment
+
+There are many types of step in goto_trace_stept, which are listed here: 
+\ref goto_trace_stept::typet, but this overview will focus on the main types 
+used.
+
+\subsection general-step-structure General Step Structure
+
+Every goto_trace_stept has a type (\ref goto_trace_stept::typet), e.g. function
+call. The type of a step can be checked using the boolean functions such as 
+\ref goto_trace_stept::is_function_call(). 
+
+The meaning of the remainder of the members of goto_trace_stept depend on the
+step type.
+
+\subsection function-call-step-structure Function Calls
+
+A function call step has the \ref goto_trace_stept::typet
+\ref goto_trace_stept::typet::FUNCTION_CALL
+and signifies that the program is calling a function.
+The step contains a valid identifier of the function being called
+(\ref goto_trace_stept::called_function), a vector of the function arguments
+(\ref goto_trace_stept::function_arguments) and the identifier of the function
+of the call site (\ref goto_trace_stept::function_id).
+
+Following a function call, \ref assignment-step-structure assignments are made
+to each parameter, if there are any, including the `this` parameter.
+
+\subsection function-return-step-structure Function Return
+
+A function return step has the \ref goto_trace_stept::typet
+\ref goto_trace_stept::typet::FUNCTION_RETURN and signifies that the program is 
+exiting a function. \ref goto_trace_stept::function_id is the function being
+returned from.
+
+If the function has a return value, an \ref assignment-step-structure
+assignment will be made to a variable with identifier with suffix
+\ref remove_returns::RETURN_VALUE_SUFFIX.
+
+\subsection assignment-step-structure Assignment
+
+An assignment step has the \ref goto_trace_stept::typet
+\ref goto_trace_stept::typet::ASSIGNMENT and signifies that the program is
+making an assignment to a variable. For an assignment LHS = RHS, the step
+contains the symbol representing the LHS
+(\ref goto_trace_stept::full_lhs) and the value expression representing the RHS
+(\ref goto_trace_stept::full_lhs_value).
+
+\subsubsection java-assignments Java Assignments
+
+The expressions on each side vary depending on the type, whether its a
+member assignment, whether its an assignment by reference, etc. Some examples:
+- A global variable assignment will have a LHS \ref symbol_exprt containing the
+type information and an identifier that does not include a function
+identifier, e.g. `java::SomeClass.someGlobalField`, and a RHS expression
+containing the value, e.g. a \ref constant_exprt, a \ref struct_exprt or an
+\ref address_of_exprt.
+- A local variable assignment will have a LHS \ref symbol_exprt containing the
+type information and an identifier that includes a function identifier, e.g.
+a parameter assignment like `java::SomeClass.<init>:()V::this` which corresponds
+to a symbol with `is_static_lifetime` set to true
+- A member assignment will have a LHS \ref member_exprt containing the type
+information for the member, the component name (member name), and an operand for
+the containing class which contains an identifier for the containing class, a
+RHS expression containing the value. Inherited members have a nested member
+structure. Members of members are assigned using a series of single member
+assignments.
+- An array assignment consists of first assigning to a LHS \ref symbol_exprt 
+a RHS of type `java::array`, then if the array is non-empty it is followed by a
+series of \ref index_exprt assignments to assign elements to the array of the 
+required type. A notable exception to this assignment structure is when arrays
+are created non-deterministically for primitive types - these are created by 
+assigning an entire array to the `java::array` symbol instead of being built 
+using index assignments.
+
+\subsection other-steps Other steps
+
+In a trace of a program, there are other step types that are internal
+including:
+- \ref goto_trace_stept::typet::ASSERT (failure), used in bytecode
+instrumentation and properties
+- \ref goto_trace_stept::typet::LOCATION (location-only), appears in the
+trace when the source location changes.
