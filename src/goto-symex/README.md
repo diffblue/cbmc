@@ -276,3 +276,10 @@ digraph G {
   2 -> 3 [label="counter-examples"];
 }
 \enddot
+
+\section Concurrency
+
+\subsection Partial Order Concurrency
+
+The class \ref partial_order_concurrencyt provides an interface for
+implementing ordering of concurrent events.

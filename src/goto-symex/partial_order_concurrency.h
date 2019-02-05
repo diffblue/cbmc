@@ -16,6 +16,9 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 
 #include "symex_target_equation.h"
 
+/// Base class for implementing memory models via additional constraints for
+/// SSA equations. Provides methods for encoding ordering of shared read/write
+/// events.
 class partial_order_concurrencyt:public messaget
 {
 public:
@@ -35,6 +38,10 @@ public:
     AX_PROPAGATION=8
   };
 
+  /// Build identifier for the read/write clock variable
+  /// \param e: either shared read or shared write event
+  /// \param axiom: the clock variable to be used (as part of the identifier)
+  /// \return identifier representing the clock variable of the event
   static irep_idt rw_clock_id(
     event_it e,
     axiomt axiom=AX_PROPAGATION);
@@ -53,20 +60,36 @@ protected:
   typedef std::map<irep_idt, a_rect> address_mapt;
   address_mapt address_map;
 
+  /// First call \ref add_init_writes then for each shared read/write (or
+  /// spawn) populate:
+  /// 1) the _address_map_ (with a list of reads/writes for the address of each
+  ///   event)
+  /// 2) the _numbering_ map (with per-thread unique number of every event)
+  /// \param equation: the target equation (containing the events to be
+  ///   processed)
   void build_event_lists(symex_target_equationt &);
+
+  /// For each shared read event and for each shared write event that appears
+  /// after spawn or has false _guard_ prepend a shared write SSA step with
+  /// non-deterministic value.
+  /// \param equation: the target equation to be modified
   void add_init_writes(symex_target_equationt &);
 
   // a per-thread numbering of the events
   typedef std::map<event_it, unsigned> numberingt;
   numberingt numbering;
 
-  // produces the symbol ID for an event
+  /// Produce the symbol ID for an event
+  /// \param event: SSA step for the event
+  /// \return identifier
   static inline irep_idt id(event_it event)
   {
     return event->ssa_lhs.get_identifier();
   }
 
-  // produces an address ID for an event
+  /// Produce an address ID for an event
+  /// \param event: SSA step for the event
+  /// \return L1-renamed identifier
   irep_idt address(event_it event) const
   {
     ssa_exprt tmp=event->ssa_lhs;
@@ -74,19 +97,36 @@ protected:
     return tmp.get_identifier();
   }
 
-  // produce a clock symbol for some event
   typet clock_type;
+
+  /// Produce a clock symbol for some event
+  /// \param e: event is either shared read/write or spawn
+  /// \param axiom: clock variable
+  /// \return symbol of type _clock_type_ with id from \ref rw_clock_id
   symbol_exprt clock(event_it e, axiomt axiom);
+
+  /// Initialize the __clock_type__ so that it can be used to number events
   void build_clock_type();
 
-  // preprocess and add a constraint to equation
+  /// Simplify and add a constraint to equation
+  /// \param equation: target equation to be constrained with the \p cond
+  /// \param cond: condition expressing the constraint
+  /// \param msg: message for the constraint
+  /// \param source: the location of the constraint
   void add_constraint(
     symex_target_equationt &equation,
     const exprt &cond,
     const std::string &msg,
     const symex_targett::sourcet &source) const;
 
-  // the partial order constraint for two events
+  /// Build the partial order constraint for two events:
+  /// if \p e1 and \p e2 are in the same atomic section then constrain with
+  ///   equality between their clocks
+  /// otherwise constrain with \p e1 clock being less than \p e2 clock
+  /// \param e1: preceding event
+  /// \param e2: succeeding event
+  /// \param axioms: clocks to be included in the resulting constraint
+  /// \return conjunction of constraints (one of each clock)
   exprt before(event_it e1, event_it e2, unsigned axioms);
   virtual exprt before(event_it e1, event_it e2)=0;
 };
