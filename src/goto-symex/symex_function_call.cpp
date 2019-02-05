@@ -226,7 +226,6 @@ void goto_symext::symex_function_call_symbol(
     symex_function_call_code(get_goto_function, state, code);
 }
 
-/// do function call by inlining
 void goto_symext::symex_function_call_code(
   const get_goto_functiont &get_goto_function,
   statet &state,
