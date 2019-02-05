@@ -126,7 +126,7 @@ void local_safe_pointerst::operator()(const goto_programt &goto_program)
 
     // Possible checks:
     case ASSUME:
-      if(auto assume_check = get_null_checked_expr(instruction.guard))
+      if(auto assume_check = get_null_checked_expr(instruction.get_condition()))
       {
         if(assume_check->checked_when_taken)
           checked_expressions.insert(assume_check->checked_expr);
@@ -147,7 +147,9 @@ void local_safe_pointerst::operator()(const goto_programt &goto_program)
         // merge point and everything will be assumed maybe-null in any case.
         if(target_emplace_result.second)
         {
-          if(auto conditional_check = get_null_checked_expr(instruction.guard))
+          if(
+            auto conditional_check =
+              get_null_checked_expr(instruction.get_condition()))
           {
             // Add the GOTO condition to either the target or current state,
             // as appropriate:

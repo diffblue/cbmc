@@ -961,7 +961,7 @@ std::list<Target> goto_programt::get_successors(
   {
     std::list<Target> successors(i.targets.begin(), i.targets.end());
 
-    if(!i.guard.is_true() && next!=instructions.end())
+    if(!i.get_condition().is_true() && next != instructions.end())
       successors.push_back(next);
 
     return successors;
@@ -991,10 +991,9 @@ std::list<Target> goto_programt::get_successors(
 
   if(i.is_assume())
   {
-    return
-      !i.guard.is_false() && next!=instructions.end() ?
-      std::list<Target>{next} :
-      std::list<Target>();
+    return !i.get_condition().is_false() && next != instructions.end()
+             ? std::list<Target>{next}
+             : std::list<Target>();
   }
 
   if(next!=instructions.end())

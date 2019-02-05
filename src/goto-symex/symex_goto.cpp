@@ -34,7 +34,7 @@ void goto_symext::symex_goto(statet &state)
     return; // nothing to do
   }
 
-  exprt old_guard=instruction.guard;
+  exprt old_guard = instruction.get_condition();
   clean_expr(old_guard, state, false);
 
   exprt new_guard=old_guard;
