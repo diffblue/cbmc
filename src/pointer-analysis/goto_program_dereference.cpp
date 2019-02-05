@@ -26,7 +26,7 @@ Author: Daniel Kroening, kroening@kroening.com
 ///   comment which exists in the namespace.
 bool goto_program_dereferencet::has_failed_symbol(
   const exprt &expr,
-  const symbolt *&symbol)
+  const symbolt *&symbol) const
 {
   if(expr.id()==ID_symbol)
   {
@@ -225,7 +225,7 @@ void goto_program_dereferencet::dereference_rec(
 /// \param [out] dest: gets the value set
 void goto_program_dereferencet::get_value_set(
   const exprt &expr,
-  value_setst::valuest &dest)
+  value_setst::valuest &dest) const
 {
   value_sets.get_values(current_function, current_target, expr, dest);
 }

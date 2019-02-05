@@ -15,7 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 bool symex_dereference_statet::has_failed_symbol(
   const exprt &expr,
-  const symbolt *&symbol)
+  const symbolt *&symbol) const
 {
   const namespacet &ns=goto_symex.ns;
 
@@ -70,7 +70,7 @@ bool symex_dereference_statet::has_failed_symbol(
 
 void symex_dereference_statet::get_value_set(
   const exprt &expr,
-  value_setst::valuest &value_set)
+  value_setst::valuest &value_set) const
 {
   state.value_set.get_value_set(expr, value_set, goto_symex.ns);
 
