@@ -258,9 +258,10 @@ bool value_set_dereferencet::dereference_type_compare(
 /// \param pointer_expr: pointer expression that may point to `what`
 /// \return a `valuet` object containing `guard`, `value` and `ignore` fields.
 ///   The `ignore` field is true for a `null` object when `exclude_null_derefs`
-///   is true and integer addresses in java mode.
+///   is true (set by our creator when they know \p what cannot be null)
+////  and for integer addresses in java mode.
 ///   The guard is an appropriate check to determine whether `pointer_expr`
-///   really points to `what`.
+///   really points to `what`; for example `pointer_expr == &what`.
 ///   The value corresponds to the dereferenced pointer_expr assuming it is
 ///   pointing to the object described by `what`.
 ///   For example, we might return

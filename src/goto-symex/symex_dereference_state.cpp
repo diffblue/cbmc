@@ -13,6 +13,21 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/symbol_table.h>
 
+/// Get or create a failed symbol for the given pointer-typed expression. These
+/// are used as placeholders when dereferencing expressions that are illegal to
+/// dereference, such as null pointers. The \ref add_failed_symbols pass must
+/// have been run for this to do anything useful;  it annotates a pointer-typed
+/// symbol `p` with an `ID_C_failed_symbol` comment, which we then clone on
+/// demand due to L1 renaming.
+///
+/// For example, if \p expr is `p` and it has an `ID_C_failed_symbol` `p$object`
+/// (the naming convention used by `add_failed_symbols`), and the latest L1
+/// renaming of `p` is `p!2@4`, then we will create `p$object!2@4` if it doesn't
+/// already exist.
+///
+/// \param expr: expression to get or create a failed symbol for
+/// \param [out] symbol: failed symbol result
+/// \return true if we populated \p symbol
 bool symex_dereference_statet::get_or_create_failed_symbol(
   const exprt &expr,
   const symbolt *&symbol)
@@ -68,6 +83,7 @@ bool symex_dereference_statet::get_or_create_failed_symbol(
   return false;
 }
 
+/// Just forwards a value-set query to `state.value_set`
 void symex_dereference_statet::get_value_set(
   const exprt &expr,
   value_setst::valuest &value_set) const

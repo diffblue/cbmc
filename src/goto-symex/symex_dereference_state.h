@@ -16,6 +16,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_symex.h"
 
+/// Callback object that \ref goto_symext::dereference_rec provides to
+/// \ref value_set_dereferencet to provide value sets (from goto-symex's
+/// working value set) and retrieve or create failed symbols on demand.
+/// For details of symex-dereference's operation see
+/// \ref goto_symext::dereference
 class symex_dereference_statet:
   public dereference_callbackt
 {

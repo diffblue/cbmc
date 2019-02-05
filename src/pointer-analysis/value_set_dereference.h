@@ -55,8 +55,6 @@ public:
   /// \param pointer: A pointer-typed expression, to
   ///        be dereferenced.
   /// \param guard: A guard, which is assumed to hold when dereferencing.
-  /// \param mode: Indicates whether the dereferencing is a load or store
-  //    (unused).
   virtual exprt dereference(const exprt &pointer, const guardt &guard);
 
 private:

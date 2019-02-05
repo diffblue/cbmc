@@ -100,7 +100,6 @@ void goto_program_dereferencet::dereference_failure(
 /// and use `dereference` on subexpressions of the form `*p`
 /// \param expr: expression in which to remove dereferences
 /// \param guard: boolean expression assumed to hold when dereferencing
-/// \param mode: unused
 void goto_program_dereferencet::dereference_rec(exprt &expr, guardt &guard)
 {
   if(!has_subexpr(expr, ID_dereference))

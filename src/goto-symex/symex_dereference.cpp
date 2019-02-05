@@ -23,7 +23,19 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "symex_dereference_state.h"
 
-/// Evaluate an ID_address_of expression
+/// Transforms an lvalue expression by replacing any dereference operations it
+/// contains with explicit references to the objects they may point to (using
+/// \ref goto_symext::dereference_rec), and translates `byte_extract,` `member`
+/// and `index` operations into integer offsets from a root symbol (if any).
+/// These are ultimately expressed in the form
+/// `(target_type*)((char*)(&underlying_symbol) + offset)`.
+/// \param expr: expression to replace with normalised, dereference-free form
+/// \param state: working state. See \ref goto_symext::dereference for possible
+///   side-effects of a dereference operation.
+/// \param keep_array: if true and an underlying object is an array, return
+///   its address (`&array`); otherwise return the address of its first element
+///   (`&array[0]).
+/// \return the transformed lvalue expression
 exprt goto_symext::address_arithmetic(
   const exprt &expr,
   statet &state,
@@ -178,6 +190,13 @@ exprt goto_symext::address_arithmetic(
   return result;
 }
 
+/// If \p expr is a \ref dereference_exprt, replace it with explicit references
+/// to the objects it may point to. Otherwise recursively apply this function to
+/// \p expr's operands, with special cases for address-of (handled by \ref
+/// goto_symext::address_arithmetic) and certain common expression patterns
+/// such as `&struct.flexible_array[0]` (see inline comments in code).
+/// For full details of this method's pointer replacement and potential side-
+/// effects see \ref goto_symext::dereference
 void goto_symext::dereference_rec(exprt &expr, statet &state)
 {
   if(expr.id()==ID_dereference)
@@ -294,6 +313,43 @@ void goto_symext::dereference_rec(exprt &expr, statet &state)
   }
 }
 
+/// Replace all dereference operations within \p expr with explicit references
+/// to the objects they may refer to. For example, the expression `*p1 + *p2`
+/// might be rewritten to `obj1 + (p2 == &obj2 ? obj2 : obj3)` in the case where
+/// `p1` is known to point to `obj1` and `p2` points to either `obj2` or `obj3`.
+/// The expression, and any object references introduced, are renamed to L1 in
+/// the process (so in fact we would get `obj1!0@3 + (p2!0@1 == ....` rather
+/// than the exact example given above).
+///
+/// It may have two kinds of side-effect:
+///
+/// 1. When an expression may (or must) point to something which cannot legally
+///    be dereferenced, such as a null pointer or an integer cast to a pointer,
+///    a "failed object" is created instead, via one of two routes:
+///
+///    a. if the `add_failed_symbols` pass has been run then a pointer-typed
+///       symbol `x` will have a corresponding failed symbol `x$object`. This
+///       is replicated according to L1 renaming on demand, so for example on
+///       the first failed dereference of `x!5@10` we will create
+///       `x$object!5@10` and add that to the symbol table.
+///       This addition is made by
+///       \ref symex_dereference_statet::get_or_create_failed_symbol
+///
+///    b. if such a failed symbol can't be found then symex will create one of
+///       its own, called `symex::failed_symbol` with some suffix. This is done
+///       by \ref value_set_dereferencet::dereference
+///
+///    In either case any newly-created symbol is added to \p state's symbol
+///    table and \p expr is altered to refer to it. Typically when \p expr has
+///    some legal targets as well this results in an expression like
+///    `ptr == &real_obj ? real_obj : ptr$object`.
+///
+/// 2. Any object whose base-name ends with `auto_object` is automatically
+///    initialised when dereferenced for the first time, creating a tree of
+///    pointers leading to fresh objects each time such a pointer is
+///    dereferenced. If new objects are created by this mechanism then
+///    state will be altered (by `symex_assign`) to initialise them.
+///    See \ref auto_objects.cpp for details.
 void goto_symext::dereference(exprt &expr, statet &state)
 {
   // The expression needs to be renamed to level 1
