@@ -54,11 +54,6 @@ public:
   }
 };
 
-/// The void type, the same as \ref empty_typet.
-class void_typet:public empty_typet
-{
-};
-
 /// A reference into the symbol table
 class symbol_typet:public typet
 {
