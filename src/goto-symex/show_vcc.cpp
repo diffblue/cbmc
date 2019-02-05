@@ -23,9 +23,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/json_irep.h>
 #include <util/ui_message.h>
 
-void show_vcc_plain(
-  messaget::mstreamt &out,
-  const symex_target_equationt &equation)
+static void
+show_vcc_plain(messaget::mstreamt &out, const symex_target_equationt &equation)
 {
   bool has_threads = equation.has_threads();
   bool first = true;
@@ -99,9 +98,8 @@ void show_vcc_plain(
   }
 }
 
-void show_vcc_json(
-  std::ostream &out,
-  const symex_target_equationt &equation)
+static void
+show_vcc_json(std::ostream &out, const symex_target_equationt &equation)
 {
   json_objectt json_result;
 
