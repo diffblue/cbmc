@@ -198,7 +198,7 @@ Performs any post-processing, which is normally adding constraints that
 require some global knowledge of the formula, ex. for encoding arrays 
 into uninterpreted functions.
 
-Some key classes:
+**Some key classes:**
 
 \ref propt is instance of whichever solver is currently being used. This
 inherits from `decision_proceduret` whose interface has a fuller explanation 
@@ -228,7 +228,44 @@ To be documented.
 
 \subsection sat-solving-api-section SAT solving API
 
-To be documented.
+The basic SAT solver interface is in [cnf](\ref cnft). This inherits
+from the [propositional logic decision procedure wrapper](\ref propt).
+
+The interface supports the following operations by default:
+1. Boolean operations on literals (like `and`, `or`, `xor`), etc.
+These take as input two [literals](\ref literalt) and return as
+output another [literal](\ref literalt), applying Tseitin's
+transformation on them. Tseitin's transformation converts a
+propositional formula `F` into an equisatisfiable CNF formula
+that is linear in the size of `F`. For more information look at:
+https://en.wikipedia.org/wiki/Tseytin_transformation
+2. Generating new [literals](\ref literalt) and adding their
+variables to the formula and returning the number of variables
+or clauses the solver is operating with (with `no_variables`).
+
+This interface is then extended by the various solver interfaces
+which implement the interface by hooking into the solver
+related functions that implement the operations that they
+abstract. Solvers for which drivers exist include Minisat,
+Minisat2, Chaff, Picosat, Glucose, Cadical, Booleforce and Lingeling.
+
+For example, the Minisat 2 interface (in `satcheck_minisat2.h`)
+implements a method `prop_solve()` that hooks into Minisat 2's
+interface by initialising the variable list Minisat 2 will use,
+and then invoking the actual solver on the formula and checking
+whether the solver could manage find a satisfying assignment or
+not.
+
+For more details on how the particular drivers work, refer
+to them in their interface and implementation files, which follow
+the naming pattern `satcheck_x`, where `x` is the name of the
+solver.
+
+We also support any solver that can hook into [ipasir](http://www.cs.utexas.edu/users/moore/acl2/manuals/current/manual/index-seo.php/IPASIR____IPASIR). This is a
+generic incremental SAT solver API. This is handled by the
+`satcheck_ipasir.h` interface abstracts over `ipasir` with our own
+generic interface. For a description of the `ipasir` interface
+take a look at the following file: [ipasir.h](https://github.com/biotomas/ipasir/blob/master/ipasir.h)
 
 \section sat-smt-encoding SAT/SMT Encoding
 
