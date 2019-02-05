@@ -15,6 +15,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_types.h>
 #include <util/namespace.h>
 
+#include "java_types.h"
+
 /// dereference pointer expression
 /// \return dereferenced pointer
 static exprt clean_deref(const exprt &ptr)
@@ -94,8 +96,9 @@ exprt make_clean_pointer_cast(
   if(ptr.type()==target_type)
     return ptr;
 
-  if(ptr.type().subtype()==empty_typet() ||
-     target_type.subtype()==empty_typet())
+  if(
+    ptr.type().subtype() == java_void_type() ||
+    target_type.subtype() == java_void_type())
     return typecast_exprt(ptr, target_type);
 
   const typet &target_base=ns.follow(target_type.subtype());
@@ -106,7 +109,7 @@ exprt make_clean_pointer_cast(
     assert(
       bare_ptr.type().id()==ID_pointer &&
       "Non-pointer in make_clean_pointer_cast?");
-    if(bare_ptr.type().subtype()==empty_typet())
+    if(bare_ptr.type().subtype() == java_void_type())
       bare_ptr=bare_ptr.op0();
   }
 

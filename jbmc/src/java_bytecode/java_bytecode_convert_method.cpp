@@ -1225,7 +1225,7 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
     if(statement=="aconst_null")
     {
       assert(results.size()==1);
-      results[0]=null_pointer_exprt(java_reference_type(void_typet()));
+      results[0] = null_pointer_exprt(java_reference_type(java_void_type()));
     }
     else if(statement=="athrow")
     {
@@ -1349,7 +1349,7 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
         from_integer(
           std::next(i_it)->address,
           unsignedbv_typet(64));
-      results[0].type()=pointer_type(void_typet());
+      results[0].type() = pointer_type(java_void_type());
     }
     else if(statement=="ret")
     {
@@ -1981,8 +1981,8 @@ codet java_bytecode_convert_methodt::convert_monitorenterexit(
 
   // becomes a function call
   java_method_typet type(
-    {java_method_typet::parametert(java_reference_type(void_typet()))},
-    void_typet());
+    {java_method_typet::parametert(java_reference_type(java_void_type()))},
+    java_void_type());
   code_function_callt call(symbol_exprt(descriptor, type), {op[0]});
   call.add_source_location() = source_location;
   if(needed_lazy_methods && symbol_table.has_symbol(descriptor))
@@ -2725,7 +2725,7 @@ code_ifthenelset java_bytecode_convert_methodt::convert_ifnull(
   const mp_integer &number,
   const source_locationt &location) const
 {
-  const typecast_exprt lhs(op[0], java_reference_type(empty_typet()));
+  const typecast_exprt lhs(op[0], java_reference_type(java_void_type()));
   const exprt rhs(null_pointer_exprt(to_pointer_type(lhs.type())));
 
   const method_offsett label_number = numeric_cast_v<method_offsett>(number);
@@ -2747,7 +2747,7 @@ code_ifthenelset java_bytecode_convert_methodt::convert_ifnonull(
   const mp_integer &number,
   const source_locationt &location) const
 {
-  const typecast_exprt lhs(op[0], java_reference_type(empty_typet()));
+  const typecast_exprt lhs(op[0], java_reference_type(java_void_type()));
   const exprt rhs(null_pointer_exprt(to_pointer_type(lhs.type())));
 
   const method_offsett label_number = numeric_cast_v<method_offsett>(number);
@@ -2830,7 +2830,7 @@ code_blockt java_bytecode_convert_methodt::convert_ret(
     {
       auto address_ptr =
         from_integer(jsr_ret_targets[idx], unsignedbv_typet(64));
-      address_ptr.type() = pointer_type(void_typet());
+      address_ptr.type() = pointer_type(java_void_type());
 
       code_ifthenelset branch(equal_exprt(retvar, address_ptr), std::move(g));
 

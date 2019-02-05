@@ -224,7 +224,7 @@ code_ifthenelset java_bytecode_instrumentt::check_class_cast(
   binary_predicate_exprt class_cast_check(
     class1, ID_java_instanceof, class2);
 
-  pointer_typet voidptr=pointer_type(empty_typet());
+  pointer_typet voidptr = pointer_type(java_void_type());
   exprt null_check_op=class1;
   if(null_check_op.type()!=voidptr)
     null_check_op.make_typecast(voidptr);

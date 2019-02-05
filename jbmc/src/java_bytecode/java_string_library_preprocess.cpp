@@ -1291,7 +1291,7 @@ dereference_exprt java_string_library_preprocesst::get_object_at_index(
   std::size_t index)
 {
   dereference_exprt deref_objs(argv, argv.type().subtype());
-  pointer_typet empty_pointer=pointer_type(empty_typet());
+  pointer_typet empty_pointer = pointer_type(java_void_type());
   pointer_typet pointer_of_pointer=pointer_type(empty_pointer);
   member_exprt data_member(deref_objs, "data", pointer_of_pointer);
   plus_exprt data_pointer_plus_index(

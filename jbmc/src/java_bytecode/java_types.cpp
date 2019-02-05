@@ -209,7 +209,8 @@ typet java_type_from_char(char t)
   case 'f': return java_float_type();
   case 'd': return java_double_type();
   case 'z': return java_boolean_type();
-  case 'a': return java_reference_type(void_typet());
+  case 'a':
+    return java_reference_type(java_void_type());
   default:
     UNREACHABLE;
   }
