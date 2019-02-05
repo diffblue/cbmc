@@ -22,7 +22,7 @@ objects will be assigned the same number, eliminating redundant storage of the
 same data.
 
 Alternative approaches to the same problem include \ref irept sharing (but this
-only shares when a copy is taken; two identical irepts arrived at by different
+only shares when a copy is taken; two identical ireps arrived at by different
 routes will not be shared) and \ref merge_irept (which does merge identical
 ireps, but is still more expensive to compare than numbers).
 
