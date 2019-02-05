@@ -24,12 +24,32 @@ Date: July 2005
 
 #include <goto-programs/goto_program.h>
 
-/*! \brief TO_BE_DOCUMENTED
- * \ingroup gr_goto_symex
-*/
+/// Step of the trace of a GOTO program
+///
+/// A step is either:
+///   - an assignment
+///   - an assume statement
+///   - an assertion
+///   - a goto instruction
+///   - a constraint (unused)
+///   - a function call
+///   - a function return
+///   - a location (unused)
+///   - an output
+///   - an input
+///   - a declaration
+///   - a dead statement
+///   - a shared read (unused)
+///   - a shared write (unused)
+///   - a spawn statement
+///   - a memory barrier
+///   - an atomic begin (unused)
+///   - an atomic end (unused)
+/// \ingroup gr_goto_symex
 class goto_trace_stept
 {
 public:
+  /// Number of the step in the trace
   std::size_t step_nr;
 
   bool is_assignment() const      { return type==typet::ASSIGNMENT; }
@@ -145,9 +165,9 @@ public:
   }
 };
 
-/*! \brief TO_BE_DOCUMENTED
- * \ingroup gr_goto_symex
-*/
+/// Trace of a GOTO program.
+/// This is a wrapper for a list of steps.
+/// \ingroup gr_goto_symex
 class goto_tracet
 {
 public:
@@ -170,6 +190,7 @@ public:
     other.steps.swap(steps);
   }
 
+  /// Add a step at the end of the trace
   void add_step(const goto_trace_stept &step)
   {
     steps.push_back(step);
@@ -186,14 +207,23 @@ public:
   std::vector<irep_idt> get_all_property_ids() const;
 };
 
+/// Options for printing the trace using show_goto_trace
 struct trace_optionst
 {
+  /// Add rawLhs property to trace
   bool json_full_lhs;
+  /// Represent plain trace values in hex
   bool hex_representation;
+  /// Use prefix (`0b` or `0x`) for distinguishing the base of the
+  /// representation.
   bool base_prefix;
+  /// Show function calls in plain text trace
   bool show_function_calls;
+  /// Show original code in plain text trace
   bool show_code;
+  /// Give a compact trace
   bool compact_trace;
+  /// Give a stack trace only
   bool stack_trace;
 
   static const trace_optionst default_options;
@@ -222,6 +252,7 @@ private:
   };
 };
 
+/// Output the trace on the given stream \p out
 void show_goto_trace(
   messaget::mstreamt &out,
   const namespacet &ns,
