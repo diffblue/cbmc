@@ -310,11 +310,6 @@ protected:
     statet &,
     const exprt::operandst &arguments);
 
-  void locality(
-    const irep_idt &function_identifier,
-    statet &,
-    const goto_functionst::goto_functiont &);
-
   // exceptions
   void symex_throw(statet &);
   void symex_catch(statet &);
