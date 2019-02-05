@@ -224,14 +224,9 @@ private:
 
 void show_goto_trace(
   messaget::mstreamt &out,
-  const namespacet &,
-  const goto_tracet &);
-
-void show_goto_trace(
-  messaget::mstreamt &out,
-  const namespacet &,
-  const goto_tracet &,
-  const trace_optionst &);
+  const namespacet &ns,
+  const goto_tracet &goto_trace,
+  const trace_optionst &trace_options = trace_optionst::default_options);
 
 #define OPT_GOTO_TRACE                                                         \
   "(trace-json-extended)"                                                      \
