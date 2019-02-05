@@ -21,10 +21,9 @@ class symex_dereference_statet:
 {
 public:
   symex_dereference_statet(
-    goto_symext &_goto_symex,
-    goto_symext::statet &_state):
-    goto_symex(_goto_symex),
-    state(_state)
+    const goto_symext &_goto_symex,
+    goto_symext::statet &_state)
+    : goto_symex(_goto_symex), state(_state)
   {
   }
 
