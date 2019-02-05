@@ -342,6 +342,8 @@ mult /* mult */
         END_FUNCTION
 ```
 
+(The above result was produced using `cbmc version 5.11`)
+
 \section section-goto-transforms Subsequent Transformation
 
 It is normal for a program that calls `goto_convert` to immediately pass the
@@ -567,8 +569,6 @@ then it performs 'linking' of the temporary into a passed destination
 
 Details about linking of `::goto_modelt` instances can be found
 [here](\ref section-linking-goto-models).
-
-(The above result was produced using `cbmc version 5.11`)
 
 \section section-linking-goto-models Linking Goto Models
 
