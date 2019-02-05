@@ -227,14 +227,6 @@ protected:
   virtual void dereference(exprt &, statet &, bool write);
 
   void dereference_rec(exprt &, statet &, guardt &, bool write);
-
-  void dereference_rec_address_of(
-    exprt &,
-    statet &,
-    guardt &);
-
-  static bool is_index_member_symbol_if(const exprt &expr);
-
   exprt address_arithmetic(
     const exprt &,
     statet &,
