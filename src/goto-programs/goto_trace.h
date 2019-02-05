@@ -154,11 +154,8 @@ public:
   typedef std::list<goto_trace_stept> stepst;
   stepst steps;
 
-  irep_idt mode;
-
   void clear()
   {
-    mode.clear();
     steps.clear();
   }
 
@@ -171,7 +168,6 @@ public:
   void swap(goto_tracet &other)
   {
     other.steps.swap(steps);
-    other.mode.swap(mode);
   }
 
   void add_step(const goto_trace_stept &step)
