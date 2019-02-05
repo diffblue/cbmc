@@ -62,7 +62,7 @@ public:
   virtual exprt dereference(
     const exprt &pointer,
     const guardt &guard,
-    const modet mode);
+    const modet mode) const;
 
 private:
   const namespacet &ns;
@@ -92,14 +92,14 @@ private:
     }
   };
 
-  valuet build_reference_to(const exprt &what, const exprt &pointer);
+  valuet build_reference_to(const exprt &what, const exprt &pointer) const;
 
-  bool memory_model(exprt &value, const typet &type, const exprt &offset);
+  bool memory_model(exprt &value, const typet &type, const exprt &offset) const;
 
   bool memory_model_bytes(
     exprt &value,
     const typet &type,
-    const exprt &offset);
+    const exprt &offset) const;
 };
 
 #endif // CPROVER_POINTER_ANALYSIS_VALUE_SET_DEREFERENCE_H

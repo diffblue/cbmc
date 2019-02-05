@@ -35,7 +35,7 @@ Author: Daniel Kroening, kroening@kroening.com
 exprt value_set_dereferencet::dereference(
   const exprt &pointer,
   const guardt &guard,
-  const modet mode)
+  const modet mode) const
 {
   if(pointer.type().id()!=ID_pointer)
     throw "dereference expected pointer type, but got "+
@@ -270,7 +270,7 @@ bool value_set_dereferencet::dereference_type_compare(
 ///     .ignore = false}`
 value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
   const exprt &what,
-  const exprt &pointer_expr)
+  const exprt &pointer_expr) const
 {
   const typet &dereference_type = pointer_expr.type().subtype();
 
@@ -514,7 +514,7 @@ static bool is_a_bv_type(const typet &type)
 bool value_set_dereferencet::memory_model(
   exprt &value,
   const typet &to_type,
-  const exprt &offset)
+  const exprt &offset) const
 {
   // we will allow more or less arbitrary pointer type cast
 
@@ -560,7 +560,7 @@ bool value_set_dereferencet::memory_model(
 bool value_set_dereferencet::memory_model_bytes(
   exprt &value,
   const typet &to_type,
-  const exprt &offset)
+  const exprt &offset) const
 {
   const typet from_type=value.type();
 
