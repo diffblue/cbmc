@@ -123,8 +123,11 @@ void arrayst::collect_arrays(const exprt &a)
     collect_arrays(with_expr.old());
 
     // make sure this shows as an application
-    index_exprt index_expr(with_expr.old(), with_expr.where());
-    record_array_index(index_expr);
+    for(std::size_t i = 1; i < with_expr.operands().size(); i += 2)
+    {
+      index_exprt index_expr(with_expr.old(), with_expr.operands()[i]);
+      record_array_index(index_expr);
+    }
   }
   else if(a.id()==ID_update)
   {
@@ -502,11 +505,19 @@ void arrayst::add_array_constraints_with(
   const index_sett &index_set,
   const with_exprt &expr)
 {
+  const exprt::operandst &operands = expr.operands();
+  for(std::size_t i = 1; i + 1 < operands.size(); i += 2)
+    add_array_constraints_with(index_set, expr, operands[i], operands[i + 1]);
+}
+
+void arrayst::add_array_constraints_with(
+  const index_sett &index_set,
+  const with_exprt &expr,
+  const exprt &index,
+  const exprt &value)
+{
   // we got x=(y with [i:=v])
   // add constraint x[i]=v
-
-  const exprt &index=expr.where();
-  const exprt &value=expr.new_value();
 
   {
     index_exprt index_expr(expr, index, expr.type().subtype());
