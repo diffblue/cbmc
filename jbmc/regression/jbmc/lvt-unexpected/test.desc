@@ -1,6 +1,6 @@
 CORE symex-driven-lazy-loading-expected-failure
 unexpected.class
---verbosity 10 --show-symbol-table
+--show-symbol-table
 ^EXIT=0$
 ^SIGNAL=0$
 --

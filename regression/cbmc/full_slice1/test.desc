@@ -1,6 +1,6 @@
 CORE
 main.c
---full-slice --property main.assertion.1 --unwind 1 --verbosity 10
+--full-slice --property main.assertion.1 --unwind 1
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED

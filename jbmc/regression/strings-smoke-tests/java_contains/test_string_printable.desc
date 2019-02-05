@@ -1,6 +1,6 @@
 KNOWNBUG
 test_contains.class
---verbosity 10 --max-nondet-string-length 100 --string-printable --function test_contains.main
+--max-nondet-string-length 100 --string-printable --function test_contains.main
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[.*assertion.1\].* line 8.* SUCCESS$

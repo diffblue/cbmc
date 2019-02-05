@@ -1,6 +1,6 @@
 CORE
 test_index_of.class
---verbosity 10 --max-nondet-string-length 1000 --function test_index_of.main
+--max-nondet-string-length 1000 --function test_index_of.main
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

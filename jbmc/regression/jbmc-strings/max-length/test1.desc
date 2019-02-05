@@ -1,6 +1,6 @@
 CORE
 Test.class
---verbosity 10 --max-nondet-string-length 499999 --function Test.checkMaxInputLength
+--max-nondet-string-length 499999 --function Test.checkMaxInputLength
 ^EXIT=0$
 ^SIGNAL=0$
 assertion.* line 9 function java::Test.checkMaxInputLength.* bytecode-index 17: SUCCESS

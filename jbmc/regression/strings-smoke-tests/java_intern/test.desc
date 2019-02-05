@@ -1,6 +1,6 @@
 CORE
 test_intern.class
---verbosity 10 --max-nondet-string-length 1000 --function test_intern.main
+--max-nondet-string-length 1000 --function test_intern.main
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[.*assertion.1\].* line 9.* SUCCESS$

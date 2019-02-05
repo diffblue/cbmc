@@ -1,6 +1,6 @@
 CORE
 test_subsequence.class
---verbosity 10 --max-nondet-string-length 1000 --function test_subsequence.main
+--max-nondet-string-length 1000 --function test_subsequence.main
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
