@@ -26,6 +26,13 @@ void value_sets_to_xml(
   const goto_programt &goto_program,
   xmlt &dest);
 
+/// This template class implements a data-flow analysis which keeps track of
+/// what values different variables might have at different points in the
+/// program. It is used through the alias `value_set_analysist`, so `VSDT` is
+/// `value_set_domain_templatet<value_sett>`.
+///
+/// Note: it is currently based on `static_analysist`, which is obsolete. It
+/// should be moved onto `ait`.
 template<class VSDT>
 class value_set_analysis_templatet:
   public value_setst,
