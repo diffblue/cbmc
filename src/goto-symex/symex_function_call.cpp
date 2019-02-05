@@ -297,7 +297,7 @@ void goto_symext::symex_function_call_code(
 
   // produce a new frame
   PRECONDITION(!state.call_stack().empty());
-  goto_symex_statet::framet &frame=state.new_frame();
+  framet &frame = state.new_frame();
 
   // preserve locality of local variables
   locality(identifier, state, goto_function);
@@ -310,7 +310,7 @@ void goto_symext::symex_function_call_code(
   frame.function_identifier=identifier;
   frame.hidden_function=goto_function.is_hidden();
 
-  const goto_symex_statet::framet &p_frame=state.previous_frame();
+  const framet &p_frame = state.previous_frame();
   for(const auto &pair : p_frame.loop_iterations)
   {
     if(pair.second.is_recursion)
@@ -332,7 +332,7 @@ void goto_symext::pop_frame(statet &state)
   PRECONDITION(!state.call_stack().empty());
 
   {
-    statet::framet &frame=state.top();
+    framet &frame = state.top();
 
     // restore program counter
     symex_transition(state, frame.calling_location.pc, false);
@@ -391,7 +391,7 @@ void goto_symext::locality(
 
   get_local_identifiers(goto_function, local_identifiers);
 
-  statet::framet &frame=state.top();
+  framet &frame = state.top();
 
   for(std::set<irep_idt>::const_iterator
       it=local_identifiers.begin();
@@ -443,7 +443,7 @@ void goto_symext::locality(
 
 void goto_symext::return_assignment(statet &state)
 {
-  statet::framet &frame=state.top();
+  framet &frame = state.top();
 
   const goto_programt::instructiont &instruction=*state.source.pc;
   PRECONDITION(instruction.is_return());

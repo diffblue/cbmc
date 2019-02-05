@@ -50,7 +50,7 @@ void goto_symext::symex_start_thread(statet &state)
   #endif
 
   // create a copy of the local variables for the new thread
-  statet::framet &frame=state.top();
+  framet &frame = state.top();
 
   for(auto c_it = state.level2.current_names.begin();
       c_it != state.level2.current_names.end();

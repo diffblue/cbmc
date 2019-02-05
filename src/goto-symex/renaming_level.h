@@ -86,4 +86,10 @@ struct symex_level2t : public symex_renaming_levelt
   ~symex_level2t() override = default;
 };
 
+/// Undo all levels of renaming
+void get_original_name(exprt &expr);
+
+/// Undo all levels of renaming
+void get_original_name(typet &type);
+
 #endif // CPROVER_GOTO_SYMEX_RENAMING_LEVEL_H

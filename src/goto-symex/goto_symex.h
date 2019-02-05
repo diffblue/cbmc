@@ -256,17 +256,11 @@ protected:
   // gotos
   void merge_gotos(statet &);
 
-  virtual void merge_goto(
-    const statet::goto_statet &goto_state,
-    statet &);
+  virtual void merge_goto(const goto_statet &goto_state, statet &);
 
-  void merge_value_sets(
-    const statet::goto_statet &goto_state,
-    statet &dest);
+  void merge_value_sets(const goto_statet &goto_state, statet &dest);
 
-  void phi_function(
-    const statet::goto_statet &goto_state,
-    statet &);
+  void phi_function(const goto_statet &goto_state, statet &);
 
   // determine whether to unwind a loop -- true indicates abort,
   // with false we continue.
