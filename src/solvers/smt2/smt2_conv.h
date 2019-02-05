@@ -237,7 +237,7 @@ protected:
 
   // Parsing solver responses
   constant_exprt parse_literal(const irept &, const typet &type);
-  exprt parse_struct(const irept &s, const struct_typet &type);
+  struct_exprt parse_struct(const irept &s, const struct_typet &type);
   exprt parse_union(const irept &s, const union_typet &type);
   exprt parse_array(const irept &s, const array_typet &type);
   exprt parse_rec(const irept &s, const typet &type);

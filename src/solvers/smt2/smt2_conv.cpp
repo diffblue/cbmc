@@ -322,10 +322,12 @@ constant_exprt smt2_convt::parse_literal(
   }
   else if(type.id()==ID_c_enum_tag)
   {
-    return
-      from_integer(
-        value,
-        ns.follow_tag(to_c_enum_tag_type(type)));
+    constant_exprt result =
+      from_integer(value, ns.follow_tag(to_c_enum_tag_type(type)));
+
+    // restore the c_enum_tag type
+    result.type() = type;
+    return result;
   }
   else if(type.id()==ID_fixedbv ||
           type.id()==ID_floatbv)
@@ -335,7 +337,9 @@ constant_exprt smt2_convt::parse_literal(
   }
   else if(type.id()==ID_integer ||
           type.id()==ID_range)
+  {
     return from_integer(value, type);
+  }
   else
     INVARIANT(
       false,
@@ -388,9 +392,8 @@ exprt smt2_convt::parse_union(
   return union_exprt(first.get_name(), converted, type);
 }
 
-exprt smt2_convt::parse_struct(
-  const irept &src,
-  const struct_typet &type)
+struct_exprt
+smt2_convt::parse_struct(const irept &src, const struct_typet &type)
 {
   const struct_typet::componentst &components =
     type.components();
@@ -398,7 +401,7 @@ exprt smt2_convt::parse_struct(
   struct_exprt result(exprt::operandst(components.size(), nil_exprt()), type);
 
   if(components.empty())
-    return std::move(result);
+    return result;
 
   if(use_datatypes)
   {
@@ -406,7 +409,7 @@ exprt smt2_convt::parse_struct(
     //  (mk-struct.1 <component0> <component1> ... <componentN>)
 
     if(src.get_sub().size()!=components.size()+1)
-      return std::move(result); // give up
+      return result; // give up
 
     for(std::size_t i=0; i<components.size(); i++)
     {
@@ -446,20 +449,17 @@ exprt smt2_convt::parse_struct(
     }
   }
 
-  return std::move(result);
+  return result;
 }
 
-exprt smt2_convt::parse_rec(const irept &src, const typet &_type)
+exprt smt2_convt::parse_rec(const irept &src, const typet &type)
 {
-  const typet &type=ns.follow(_type);
-
-  if(type.id()==ID_signedbv ||
-     type.id()==ID_unsignedbv ||
-     type.id()==ID_integer ||
-     type.id()==ID_rational ||
-     type.id()==ID_real ||
-     type.id()==ID_fixedbv ||
-     type.id()==ID_floatbv)
+  if(
+    type.id() == ID_signedbv || type.id() == ID_unsignedbv ||
+    type.id() == ID_integer || type.id() == ID_rational ||
+    type.id() == ID_real || type.id() == ID_c_enum ||
+    type.id() == ID_c_enum_tag || type.id() == ID_fixedbv ||
+    type.id() == ID_floatbv)
   {
     return parse_literal(src, type);
   }
@@ -489,9 +489,24 @@ exprt smt2_convt::parse_rec(const irept &src, const typet &_type)
   {
     return parse_struct(src, to_struct_type(type));
   }
+  else if(type.id() == ID_struct_tag)
+  {
+    auto struct_expr =
+      parse_struct(src, ns.follow_tag(to_struct_tag_type(type)));
+    // restore the tag type
+    struct_expr.type() = type;
+    return std::move(struct_expr);
+  }
   else if(type.id()==ID_union)
   {
     return parse_union(src, to_union_type(type));
+  }
+  else if(type.id() == ID_union_tag)
+  {
+    auto union_expr = parse_union(src, ns.follow_tag(to_union_tag_type(type)));
+    // restore the tag type
+    union_expr.type() = type;
+    return union_expr;
   }
   else if(type.id()==ID_array)
   {
