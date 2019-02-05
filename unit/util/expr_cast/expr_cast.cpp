@@ -25,6 +25,13 @@ SCENARIO("expr_dynamic_cast",
   {
     const exprt &expr=symbol_expr;
 
+    // Check pointer overload is used, when casting from reference.
+    static_assert(
+      std::is_same<
+        decltype(expr_try_dynamic_cast<symbol_exprt>(expr)),
+        const symbol_exprt *>::value,
+      "expr_try_dynamic_cast on a reference parameter must return a pointer.");
+
     THEN("Try-casting from exprt reference to symbol_exprt pointer "
          "returns a value")
     {
@@ -95,6 +102,126 @@ SCENARIO("expr_dynamic_cast",
       "should be fine")
     {
       REQUIRE_NOTHROW(expr_dynamic_cast<symbol_exprt>(expr_ref));
+    }
+  }
+  GIVEN("An exprt value upcast from a symbolt")
+  {
+    exprt expr = symbol_exprt{};
+
+    THEN(
+      "Trying casting from an exprt lvalue to a symbol_exprt should yield a "
+      "non null pointer.")
+    {
+      symbol_exprt *result = expr_try_dynamic_cast<symbol_exprt>(expr);
+      REQUIRE(result != nullptr);
+    }
+
+    THEN(
+      "Trying casting from an exprt lvalue to a transt should yield a null "
+      "pointer.")
+    {
+      transt *result = expr_try_dynamic_cast<transt>(expr);
+      REQUIRE(result == nullptr);
+    }
+
+    THEN(
+      "Trying casting from an exprt rvalue reference to a symbol_exprt should "
+      "yield a non empty optional.")
+    {
+      optionalt<symbol_exprt> result =
+        expr_try_dynamic_cast<symbol_exprt>(std::move(expr));
+      REQUIRE(result.has_value());
+    }
+
+    THEN(
+      "Trying casting from an exprt rvalue reference to a transt should yield "
+      "a empty optional.")
+    {
+      optionalt<transt> result = expr_try_dynamic_cast<transt>(std::move(expr));
+      REQUIRE_FALSE(result.has_value());
+    }
+  }
+}
+
+SCENARIO("type_dynamic_cast", "[core][utils][expr_cast][type_dynamic_cast]")
+{
+  string_typet string_type;
+  GIVEN("A typet value upcast from a string_typet")
+  {
+    typet type = string_type;
+
+    THEN(
+      "Trying casting from a typet lvalue to a string_typet should yield a non "
+      "null pointer.")
+    {
+      string_typet *result = type_try_dynamic_cast<string_typet>(type);
+      REQUIRE(result != nullptr);
+    }
+
+    THEN(
+      "Trying casting from a typet lvalue to a struct_typet should yield a "
+      "null pointer.")
+    {
+      struct_typet *result = type_try_dynamic_cast<struct_typet>(type);
+      REQUIRE(result == nullptr);
+    }
+
+    THEN(
+      "Trying casting from a typet rvalue reference to a symbol_exprt should "
+      "yield a non empty optional.")
+    {
+      optionalt<string_typet> result =
+        type_try_dynamic_cast<string_typet>(std::move(type));
+      REQUIRE(result.has_value());
+    }
+
+    THEN(
+      "Trying casting from a typet rvalue reference to a struct_typet should "
+      "yield a empty optional.")
+    {
+      optionalt<struct_typet> result =
+        type_try_dynamic_cast<struct_typet>(std::move(type));
+      REQUIRE_FALSE(result.has_value());
+    }
+  }
+  GIVEN("A const typet reference upcast from a string_typet")
+  {
+    const typet &type = string_type;
+
+    THEN(
+      "Trying casting from a const reference to a string_typet should yield a "
+      "non null pointer to const.")
+    {
+      const string_typet *result = type_try_dynamic_cast<string_typet>(type);
+      REQUIRE(result != nullptr);
+    }
+
+    THEN(
+      "Trying casting from a const reference to a struct_typet should yield a "
+      "null pointer to const.")
+    {
+      const struct_typet *result = type_try_dynamic_cast<struct_typet>(type);
+      REQUIRE(result == nullptr);
+    }
+  }
+  GIVEN("A typet reference upcast from a string_typet")
+  {
+    typet &type = string_type;
+
+    THEN(
+      "Trying casting from a reference to a string_typet should yield a non "
+      "null pointer.")
+    {
+      string_typet *result = type_try_dynamic_cast<string_typet>(type);
+      REQUIRE(result != nullptr);
+    }
+
+    THEN(
+      "Trying casting from a reference to a struct_typet should yield a null "
+      "pointer.")
+    {
+      struct_typet *result = type_try_dynamic_cast<struct_typet>(type);
+      REQUIRE(result == nullptr);
     }
   }
 }
