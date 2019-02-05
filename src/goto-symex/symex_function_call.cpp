@@ -327,7 +327,7 @@ void goto_symext::symex_function_call_code(
 }
 
 /// pop one call frame
-void goto_symext::pop_frame(statet &state)
+static void pop_frame(goto_symext::statet &state)
 {
   PRECONDITION(!state.call_stack().empty());
 

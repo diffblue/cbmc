@@ -276,8 +276,6 @@ protected:
   virtual void loop_bound_exceeded(statet &, const exprt &guard);
 
   // function calls
-
-  void pop_frame(statet &);
   void return_assignment(statet &);
 
   virtual void no_body(const irep_idt &)
