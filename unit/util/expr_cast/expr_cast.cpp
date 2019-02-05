@@ -106,7 +106,7 @@ SCENARIO("expr_dynamic_cast",
   }
   GIVEN("An exprt value upcast from a symbolt")
   {
-    exprt expr = symbol_exprt{};
+    exprt expr = symbol_exprt::typeless(irep_idt());
 
     THEN(
       "Trying casting from an exprt lvalue to a symbol_exprt should yield a "
