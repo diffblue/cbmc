@@ -1,6 +1,6 @@
 CORE
 Test.class
---max-nondet-string-length 100 --function Test.bufferNonDetLoop --depth 10000 --unwind 5  --verbosity 10  --property 'java::Test.bufferNonDetLoop:(ILjava/lang/String;)Ljava/lang/String;.assertion.1'
+--max-nondet-string-length 100 --function Test.bufferNonDetLoop --depth 10000 --unwind 5   --property 'java::Test.bufferNonDetLoop:(ILjava/lang/String;)Ljava/lang/String;.assertion.1'
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$

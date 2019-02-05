@@ -1,6 +1,6 @@
 CORE
 main.c
---verbosity 10 --pointer-check --remove-const-function-pointers
+--pointer-check --remove-const-function-pointers
 ^\s*f2\(\);
 ^EXIT=0$
 ^SIGNAL=0$

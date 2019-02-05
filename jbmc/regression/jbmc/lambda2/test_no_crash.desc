@@ -1,6 +1,6 @@
 CORE symex-driven-lazy-loading-expected-failure
 SymStream.class
---no-lazy-methods --verbosity 10 --show-goto-functions
+--no-lazy-methods --show-goto-functions
 ^EXIT=0
 ^SIGNAL=0
 --

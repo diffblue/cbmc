@@ -1,6 +1,6 @@
 CORE
 annotations.class
---no-lazy-methods --verbosity 10 --show-symbol-table --function annotations.main
+--no-lazy-methods --show-symbol-table --function annotations.main
 ^EXIT=0$
 ^SIGNAL=0$
 ^Type\.\.\.\.\.\.\.\.: @java::ClassAnnotation struct annotations

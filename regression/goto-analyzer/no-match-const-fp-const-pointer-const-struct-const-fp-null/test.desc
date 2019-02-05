@@ -1,6 +1,6 @@
 CORE
 main.c
---show-goto-functions --verbosity 10 --pointer-check
+--show-goto-functions --pointer-check
 ^Removing function pointers and virtual functions$
 ^\s*ASSERT FALSE // invalid function pointer$
 replacing function pointer by 9 possible targets

@@ -1,6 +1,6 @@
 CORE
 Test.class
---verbosity 10 --function Test.check_char --max-nondet-string-length 100 --string-printable
+--function Test.check_char --max-nondet-string-length 100 --string-printable
 ^EXIT=0$
 ^SIGNAL=0$
 assertion.* file Test.java line 18 .* SUCCESS

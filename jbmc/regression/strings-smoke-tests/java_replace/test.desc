@@ -1,6 +1,6 @@
 FUTURE
 test_replace.class
---verbosity 10 --max-nondet-string-length 100
+--max-nondet-string-length 100
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

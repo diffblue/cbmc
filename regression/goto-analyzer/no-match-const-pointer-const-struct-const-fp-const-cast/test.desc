@@ -1,6 +1,6 @@
 CORE
 main.c
---show-goto-functions --verbosity 10 --pointer-check
+--show-goto-functions --pointer-check
 ^Removing function pointers and virtual functions$
 ^\s*IF container_pointer->fp == f1 THEN GOTO [0-9]$
 ^\s*IF container_pointer->fp == f2 THEN GOTO [0-9]$

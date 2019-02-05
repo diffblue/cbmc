@@ -1,6 +1,6 @@
 FUTURE
 test_float.class
---verbosity 10 --max-nondet-string-length 1000 --function test_float.main
+--max-nondet-string-length 1000 --function test_float.main
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

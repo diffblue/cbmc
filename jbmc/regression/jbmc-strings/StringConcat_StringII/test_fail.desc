@@ -1,6 +1,6 @@
 CORE
 Test.class
---max-nondet-string-length 10000 --verbosity 10 --function Test.testFail
+--max-nondet-string-length 10000 --function Test.testFail
 ^EXIT=10$
 ^SIGNAL=0$
 assertion at file Test.java line 38 .*: FAILURE

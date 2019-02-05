@@ -1,6 +1,6 @@
 CORE
 test_length.class
---verbosity 10 --max-nondet-string-length 1000 --function test_length.main
+--max-nondet-string-length 1000 --function test_length.main
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$

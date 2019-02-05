@@ -1,6 +1,6 @@
 CORE
 main.c
---verbosity 10 --pointer-check --remove-function-pointers
+--pointer-check --remove-function-pointers
 ^\s*IF fp_tbl\[.*i\] == f2 THEN GOTO [0-9]$
 ^\s*IF fp_tbl\[.*i\] == f3 THEN GOTO [0-9]$
 ^\s*IF fp_tbl\[.*i\] == f4 THEN GOTO [0-9]$

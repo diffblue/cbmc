@@ -1,6 +1,6 @@
 CORE
 test_sb_length.class
---verbosity 10 --max-nondet-string-length 1000 --function test_sb_length.main
+--max-nondet-string-length 1000 --function test_sb_length.main
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

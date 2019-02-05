@@ -1,6 +1,6 @@
 KNOWNBUG
 SymStream.class
---verbosity 10 --show-goto-functions
+--show-goto-functions
 lambda function reference org/symphonyoss/symphony/clients/model/SymUser\.toSymUser in class \"SymStream\"
 ^EXIT=0
 ^SIGNAL=0

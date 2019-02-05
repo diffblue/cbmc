@@ -1,6 +1,6 @@
 KNOWNBUG
 Test_hex.class
---verbosity 10 --max-nondet-string-length 1000 --function Test_hex.main
+--max-nondet-string-length 1000 --function Test_hex.main
 ^EXIT=10$
 ^SIGNAL=0$
 assertion.* line 7 .* SUCCESS$

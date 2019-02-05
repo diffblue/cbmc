@@ -1,6 +1,6 @@
 FUTURE
 test.class
---verbosity 10 --max-nondet-string-length 1000 --function test.check
+--max-nondet-string-length 1000 --function test.check
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

@@ -1,6 +1,6 @@
 CORE
 Test.class
---max-nondet-string-length 100 --function Test.bufferNonDetLoop5 --depth 10000 --unwind 3 --verbosity 10
+--max-nondet-string-length 100 --function Test.bufferNonDetLoop5 --depth 10000 --unwind 3
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
