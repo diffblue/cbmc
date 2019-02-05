@@ -9,7 +9,7 @@ Date:   September 2009
 \*******************************************************************/
 
 /// \file
-/// Remove function return values
+/// Replace function returns by assignments to global variables
 
 #include "remove_returns.h"
 
