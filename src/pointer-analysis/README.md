@@ -40,7 +40,10 @@ To be documented.
 
 \section pointer-analysis-analysis Value-set Analysis:
 
-To be documented.
+Value-set analysis is a framework for data-flow analyses which involve keeping
+track of what values different variables can have at different points in the
+program. The main classes are \ref value_set_analysis_templatet,
+\ref value_set_domain_templatet and \ref value_sett.
 
 \subsection pointer-analysis-variants Variants:
 
