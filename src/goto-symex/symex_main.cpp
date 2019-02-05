@@ -440,7 +440,7 @@ void goto_symext::symex_step(
 
   case ASSIGN:
     if(!state.guard.is_false())
-      symex_assign(state, to_code_assign(instruction.code));
+      symex_assign(state, instruction.get_assign());
 
     symex_transition(state);
     break;
@@ -448,8 +448,7 @@ void goto_symext::symex_step(
   case FUNCTION_CALL:
     if(!state.guard.is_false())
     {
-      code_function_callt deref_code=
-        to_code_function_call(instruction.code);
+      code_function_callt deref_code = instruction.get_function_call();
 
       if(deref_code.lhs().is_not_nil())
         clean_expr(deref_code.lhs(), state, true);

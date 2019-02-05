@@ -826,9 +826,11 @@ public:
       static_cast<const codet &>(get_nil_irep()), l, ASSUME, g, {});
   }
 
-  static instructiont make_other(const codet &_code)
+  static instructiont make_other(
+    const codet &_code,
+    const source_locationt &l = source_locationt::nil())
   {
-    return instructiont(_code, source_locationt::nil(), OTHER, nil_exprt(), {});
+    return instructiont(_code, l, OTHER, nil_exprt(), {});
   }
 
   static instructiont make_decl(

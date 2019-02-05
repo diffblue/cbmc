@@ -107,9 +107,8 @@ void remove_asmt::gcc_asm_function_call(
 
   code_function_callt function_call(std::move(fkt), std::move(arguments));
 
-  goto_programt::targett call = dest.add_instruction(FUNCTION_CALL);
-  call->code = function_call;
-  call->source_location = code.source_location();
+  dest.add(
+    goto_programt::make_function_call(function_call, code.source_location()));
 
   // do we have it?
   if(!symbol_table.has_symbol(function_identifier))
@@ -157,9 +156,8 @@ void remove_asmt::msc_asm_function_call(
 
   code_function_callt function_call(fkt);
 
-  goto_programt::targett call = dest.add_instruction(FUNCTION_CALL);
-  call->code = function_call;
-  call->source_location = code.source_location();
+  dest.add(
+    goto_programt::make_function_call(function_call, code.source_location()));
 
   // do we have it?
   if(!symbol_table.has_symbol(function_identifier))
@@ -194,7 +192,7 @@ void remove_asmt::process_instruction(
   goto_programt::instructiont &instruction,
   goto_programt &dest)
 {
-  const code_asmt &code = to_code_asm(instruction.code);
+  const code_asmt &code = to_code_asm(instruction.get_other());
 
   const irep_idt &flavor = code.get_flavor();
 
@@ -271,14 +269,15 @@ void remove_asmt::process_instruction_gcc(
       goto_programt::targett ab = tmp_dest.add_instruction(ATOMIC_BEGIN);
       ab->source_location = code.source_location();
 
-      goto_programt::targett t = tmp_dest.add_instruction(OTHER);
-      t->source_location = code.source_location();
-      t->code = codet(ID_fence);
-      t->code.add_source_location() = code.source_location();
-      t->code.set(ID_WWfence, true);
-      t->code.set(ID_RRfence, true);
-      t->code.set(ID_RWfence, true);
-      t->code.set(ID_WRfence, true);
+      codet code_fence(ID_fence);
+      code_fence.add_source_location() = code.source_location();
+      code_fence.set(ID_WWfence, true);
+      code_fence.set(ID_RRfence, true);
+      code_fence.set(ID_RWfence, true);
+      code_fence.set(ID_WRfence, true);
+
+      tmp_dest.add(
+        goto_programt::make_other(code_fence, code.source_location()));
     }
 
     if(command == "fstcw" || command == "fnstcw" || command == "fldcw") // x86
@@ -292,62 +291,67 @@ void remove_asmt::process_instruction_gcc(
     }
     else if(command == ID_sync) // Power
     {
-      goto_programt::targett t = tmp_dest.add_instruction(OTHER);
-      t->source_location = code.source_location();
-      t->code = codet(ID_fence);
-      t->code.add_source_location() = code.source_location();
-      t->code.set(ID_WWfence, true);
-      t->code.set(ID_RRfence, true);
-      t->code.set(ID_RWfence, true);
-      t->code.set(ID_WRfence, true);
-      t->code.set(ID_WWcumul, true);
-      t->code.set(ID_RWcumul, true);
-      t->code.set(ID_RRcumul, true);
-      t->code.set(ID_WRcumul, true);
+      codet code_fence(ID_fence);
+      code_fence.add_source_location() = code.source_location();
+      code_fence.set(ID_WWfence, true);
+      code_fence.set(ID_RRfence, true);
+      code_fence.set(ID_RWfence, true);
+      code_fence.set(ID_WRfence, true);
+      code_fence.set(ID_WWcumul, true);
+      code_fence.set(ID_RWcumul, true);
+      code_fence.set(ID_RRcumul, true);
+      code_fence.set(ID_WRcumul, true);
+
+      tmp_dest.add(
+        goto_programt::make_other(code_fence, code.source_location()));
     }
     else if(command == ID_lwsync) // Power
     {
-      goto_programt::targett t = tmp_dest.add_instruction(OTHER);
-      t->source_location = code.source_location();
-      t->code = codet(ID_fence);
-      t->code.add_source_location() = code.source_location();
-      t->code.set(ID_WWfence, true);
-      t->code.set(ID_RRfence, true);
-      t->code.set(ID_RWfence, true);
-      t->code.set(ID_WWcumul, true);
-      t->code.set(ID_RWcumul, true);
-      t->code.set(ID_RRcumul, true);
+      codet code_fence(ID_fence);
+      code_fence.add_source_location() = code.source_location();
+      code_fence.set(ID_WWfence, true);
+      code_fence.set(ID_RRfence, true);
+      code_fence.set(ID_RWfence, true);
+      code_fence.set(ID_WWcumul, true);
+      code_fence.set(ID_RWcumul, true);
+      code_fence.set(ID_RRcumul, true);
+
+      tmp_dest.add(
+        goto_programt::make_other(code_fence, code.source_location()));
     }
     else if(command == ID_isync) // Power
     {
-      goto_programt::targett t = tmp_dest.add_instruction(OTHER);
-      t->source_location = code.source_location();
-      t->code = codet(ID_fence);
-      t->code.add_source_location() = code.source_location();
+      codet code_fence(ID_fence);
+      code_fence.add_source_location() = code.source_location();
+
+      tmp_dest.add(
+        goto_programt::make_other(code_fence, code.source_location()));
       // doesn't do anything by itself,
       // needs to be combined with branch
     }
     else if(command == "dmb" || command == "dsb") // ARM
     {
-      goto_programt::targett t = tmp_dest.add_instruction(OTHER);
-      t->source_location = code.source_location();
-      t->code = codet(ID_fence);
-      t->code.add_source_location() = code.source_location();
-      t->code.set(ID_WWfence, true);
-      t->code.set(ID_RRfence, true);
-      t->code.set(ID_RWfence, true);
-      t->code.set(ID_WRfence, true);
-      t->code.set(ID_WWcumul, true);
-      t->code.set(ID_RWcumul, true);
-      t->code.set(ID_RRcumul, true);
-      t->code.set(ID_WRcumul, true);
+      codet code_fence(ID_fence);
+      code_fence.add_source_location() = code.source_location();
+      code_fence.set(ID_WWfence, true);
+      code_fence.set(ID_RRfence, true);
+      code_fence.set(ID_RWfence, true);
+      code_fence.set(ID_WRfence, true);
+      code_fence.set(ID_WWcumul, true);
+      code_fence.set(ID_RWcumul, true);
+      code_fence.set(ID_RRcumul, true);
+      code_fence.set(ID_WRcumul, true);
+
+      tmp_dest.add(
+        goto_programt::make_other(code_fence, code.source_location()));
     }
     else if(command == "isb") // ARM
     {
-      goto_programt::targett t = tmp_dest.add_instruction(OTHER);
-      t->source_location = code.source_location();
-      t->code = codet(ID_fence);
-      t->code.add_source_location() = code.source_location();
+      codet code_fence(ID_fence);
+      code_fence.add_source_location() = code.source_location();
+
+      tmp_dest.add(
+        goto_programt::make_other(code_fence, code.source_location()));
       // doesn't do anything by itself,
       // needs to be combined with branch
     }
@@ -436,14 +440,15 @@ void remove_asmt::process_instruction_msc(
       goto_programt::targett ab = tmp_dest.add_instruction(ATOMIC_BEGIN);
       ab->source_location = code.source_location();
 
-      goto_programt::targett t = tmp_dest.add_instruction(OTHER);
-      t->source_location = code.source_location();
-      t->code = codet(ID_fence);
-      t->code.add_source_location() = code.source_location();
-      t->code.set(ID_WWfence, true);
-      t->code.set(ID_RRfence, true);
-      t->code.set(ID_RWfence, true);
-      t->code.set(ID_WRfence, true);
+      codet code_fence(ID_fence);
+      code_fence.add_source_location() = code.source_location();
+      code_fence.set(ID_WWfence, true);
+      code_fence.set(ID_RRfence, true);
+      code_fence.set(ID_RWfence, true);
+      code_fence.set(ID_WRfence, true);
+
+      tmp_dest.add(
+        goto_programt::make_other(code_fence, code.source_location()));
     }
 
     if(command == "fstcw" || command == "fnstcw" || command == "fldcw") // x86

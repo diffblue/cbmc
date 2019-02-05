@@ -95,7 +95,7 @@ bool static_simplifier(
       }
       else if(i_it->is_assign())
       {
-        code_assignt &assign=to_code_assign(i_it->code);
+        code_assignt &assign = i_it->get_assign();
 
         // Simplification needs to be aware of which side of the
         // expression it is handling as:
@@ -115,7 +115,7 @@ bool static_simplifier(
       }
       else if(i_it->is_function_call())
       {
-        code_function_callt &fcall=to_code_function_call(i_it->code);
+        code_function_callt &fcall = i_it->get_function_call();
 
         bool unchanged =
           ai.abstract_state_before(i_it)->ai_simplify(fcall.function(), ns);
