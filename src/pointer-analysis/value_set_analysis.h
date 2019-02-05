@@ -58,11 +58,11 @@ public:
 
 public:
   // interface value_sets
-  virtual void get_values(
+  void get_values(
     const irep_idt &,
     locationt l,
     const exprt &expr,
-    value_setst::valuest &dest)
+    value_setst::valuest &dest) override
   {
     (*this)[l].value_set.get_value_set(expr, dest, baset::ns);
   }
