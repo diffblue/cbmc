@@ -17,14 +17,25 @@ Date: July 2005
 #include "symex_target_equation.h"
 #include "goto_symex_state.h"
 
-// builds a trace that stops at first failing assertion
+/// Build a trace by going through the steps of \p target and stopping at the
+/// first failing assertion
+/// \param target: SSA form of the program
+/// \param prop_conv: solver from which to get valuations
+/// \param ns: namespace
+/// \param [out] goto_trace: trace to which the steps of the trace get appended
 void build_goto_trace(
   const symex_target_equationt &target,
   const prop_convt &prop_conv,
   const namespacet &ns,
   goto_tracet &goto_trace);
 
-// builds a trace that stops after the given step
+/// Build a trace by going through the steps of \p target and stopping after
+/// the given step
+/// \param target: SSA form of the program
+/// \param last_step_to_keep: iterator pointing to the last step to keep
+/// \param prop_conv: solver from which to get valuations
+/// \param ns: namespace
+/// \param [out] goto_trace: trace to which the steps of the trace get appended
 void build_goto_trace(
   const symex_target_equationt &target,
   symex_target_equationt::SSA_stepst::const_iterator last_step_to_keep,
@@ -36,7 +47,14 @@ typedef std::function<
   bool(symex_target_equationt::SSA_stepst::const_iterator, const prop_convt &)>
   ssa_step_predicatet;
 
-// builds a trace that stops after the step matching a given condition
+/// Build a trace by going through the steps of \p target and stopping after
+/// the step matching a given condition
+/// \param target: SSA form of the program
+/// \param stop_after_predicate: function with an SSA step iterator and solver
+///   as argument, which should return true for the last step to keep
+/// \param prop_conv: solver from which to get valuations
+/// \param ns: namespace
+/// \param [out] goto_trace: trace to which the steps of the trace get appended
 void build_goto_trace(
   const symex_target_equationt &target,
   ssa_step_predicatet stop_after_predicate,

@@ -25,7 +25,7 @@ Author: Daniel Kroening
 
 #include "partial_order_concurrency.h"
 
-exprt build_full_lhs_rec(
+static exprt build_full_lhs_rec(
   const prop_convt &prop_conv,
   const namespacet &ns,
   const exprt &src_original, // original identifiers
@@ -104,7 +104,7 @@ exprt build_full_lhs_rec(
 
 /// set internal field for variable assignment related to dynamic_object[0-9]
 /// and dynamic_[0-9]_array.
-void set_internal_dynamic_object(
+static void set_internal_dynamic_object(
   const exprt &expr,
   goto_trace_stept &goto_trace_step,
   const namespacet &ns)
@@ -132,7 +132,7 @@ void set_internal_dynamic_object(
 
 /// set internal for variables assignments related to dynamic_object and CPROVER
 /// internal functions (e.g., __CPROVER_initialize)
-void update_internal_field(
+static void update_internal_field(
   const symex_target_equationt::SSA_stept &SSA_step,
   goto_trace_stept &goto_trace_step,
   const namespacet &ns)
