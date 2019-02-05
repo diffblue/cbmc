@@ -257,8 +257,8 @@ void acceleratet::make_overflow_loc(
   }
 
   goto_programt::targett t=program.insert_after(loop_header);
-  t->make_assignment();
-  t->code=code_assignt(overflow_var, false_exprt());
+  *t =
+    goto_programt::make_assignment(code_assignt(overflow_var, false_exprt()));
   t->swap(*loop_header);
   loop.insert(t);
   overflow_locs[loop_header].push_back(t);
@@ -360,8 +360,8 @@ void acceleratet::add_dirty_checks()
       it!=dirty_vars_map.end();
       ++it)
   {
-    goto_programt::instructiont assign(ASSIGN);
-    assign.code=code_assignt(it->second, false_exprt());
+    goto_programt::instructiont assign =
+      goto_programt::make_assignment(code_assignt(it->second, false_exprt()));
     program.insert_before_swap(program.instructions.begin(), assign);
   }
 
@@ -384,8 +384,8 @@ void acceleratet::add_dirty_checks()
 
       if(dirty_var!=dirty_vars_map.end())
       {
-        goto_programt::instructiont clear_flag(ASSIGN);
-        clear_flag.code=code_assignt(dirty_var->second, false_exprt());
+        goto_programt::instructiont clear_flag = goto_programt::make_assignment(
+          code_assignt(dirty_var->second, false_exprt()));
         program.insert_before_swap(it, clear_flag);
       }
     }

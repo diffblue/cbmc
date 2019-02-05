@@ -432,7 +432,7 @@ bool remove_exceptionst::instrument_function_call(
   goto_programt::targett next_it=instr_it;
   next_it++;
 
-  code_function_callt &function_call=to_code_function_call(instr_it->code);
+  code_function_callt &function_call = instr_it->get_function_call();
   DATA_INVARIANT(
     function_call.function().id()==ID_symbol,
     "identified expected to be a symbol");
@@ -493,7 +493,7 @@ void remove_exceptionst::instrument_exceptions(
   {
     if(instr_it->is_decl())
     {
-      code_declt decl=to_code_decl(instr_it->code);
+      code_declt decl = instr_it->get_decl();
       locals.push_back(decl.symbol());
     }
     // Is it a handler push/pop or catch landing-pad?

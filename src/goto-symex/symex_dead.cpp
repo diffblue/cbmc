@@ -21,7 +21,7 @@ void goto_symext::symex_dead(statet &state)
 {
   const goto_programt::instructiont &instruction=*state.source.pc;
 
-  const code_deadt &code = to_code_dead(instruction.code);
+  const code_deadt &code = instruction.get_dead();
 
   // We increase the L2 renaming to make these non-deterministic.
   // We also prevent propagation of old values.

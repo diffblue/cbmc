@@ -73,8 +73,8 @@ void taint_analysist::instrument(
     {
     case FUNCTION_CALL:
       {
-        const code_function_callt &function_call=
-          to_code_function_call(instruction.code);
+        const code_function_callt &function_call =
+          instruction.get_function_call();
         const exprt &function=function_call.function();
 
         if(function.id()==ID_symbol)

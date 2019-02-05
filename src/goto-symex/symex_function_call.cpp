@@ -447,7 +447,7 @@ void goto_symext::return_assignment(statet &state)
 
   const goto_programt::instructiont &instruction=*state.source.pc;
   PRECONDITION(instruction.is_return());
-  const code_returnt &code=to_code_return(instruction.code);
+  const code_returnt &code = instruction.get_return();
 
   target.location(state.guard.as_expr(), state.source);
 

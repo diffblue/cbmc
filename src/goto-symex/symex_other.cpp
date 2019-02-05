@@ -79,7 +79,7 @@ void goto_symext::symex_other(
 {
   const goto_programt::instructiont &instruction=*state.source.pc;
 
-  const codet &code = instruction.code;
+  const codet &code = instruction.get_other();
 
   const irep_idt &statement=code.get_statement();
 

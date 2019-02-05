@@ -48,8 +48,7 @@ bool value_set_domain_fit::transform(
 
   case FUNCTION_CALL:
     {
-      const code_function_callt &code=
-        to_code_function_call(from_l->code);
+      const code_function_callt &code = from_l->get_function_call();
 
       value_set.do_function_call(function_to, code.arguments(), ns);
     }
