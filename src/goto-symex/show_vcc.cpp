@@ -23,9 +23,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/json_irep.h>
 #include <util/ui_message.h>
 
-void show_vcc_plain(
-  messaget::mstreamt &out,
-  const symex_target_equationt &equation)
+/// Output equations from \p equation in plain text format to the given output
+/// stream \p out.
+/// Each equation is prefixed by a negative index, formatted `{-N}`
+static void
+show_vcc_plain(messaget::mstreamt &out, const symex_target_equationt &equation)
 {
   bool has_threads = equation.has_threads();
   bool first = true;
@@ -99,9 +101,16 @@ void show_vcc_plain(
   }
 }
 
-void show_vcc_json(
-  std::ostream &out,
-  const symex_target_equationt &equation)
+/// Output equations from \p equation in the JSON format to the given output
+/// stream \p out.
+/// The format is an array `vccs`, containing fields:
+///   - constraints, which is an array containing the constraints which apply
+///     to that equation
+///   - expression, a string containing the formatted expression
+///   - sourceLocation (optional), the corresponding location in the program
+///   - comment (optional)
+static void
+show_vcc_json(std::ostream &out, const symex_target_equationt &equation)
 {
   json_objectt json_result;
 
