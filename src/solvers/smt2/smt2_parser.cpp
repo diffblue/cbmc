@@ -394,6 +394,25 @@ exprt smt2_parsert::binary(irep_idt id, const exprt::operandst &op)
   return binary_exprt(op[0], id, op[1], op[0].type());
 }
 
+exprt smt2_parsert::function_application_ieee_float_eq(
+  const exprt::operandst &op)
+{
+  if(op.size() != 2)
+    throw error() << "FloatingPoint equality takes two operands";
+
+  if(op[0].type().id() != ID_floatbv || op[1].type().id() != ID_floatbv)
+    throw error() << "FloatingPoint equality takes FloatingPoint operands";
+
+  if(op[0].type() != op[1].type())
+  {
+    throw error() << "FloatingPoint equality takes FloatingPoint operands with "
+                  << "matching sort, but got " << smt2_format(op[0].type())
+                  << " vs " << smt2_format(op[1].type());
+  }
+
+  return ieee_float_equal_exprt(op[0], op[1]);
+}
+
 exprt smt2_parsert::function_application_ieee_float_op(
   const irep_idt &id,
   const exprt::operandst &op)
@@ -745,6 +764,16 @@ exprt smt2_parsert::function_application()
 
         return unary_predicate_exprt(ID_isinf, op[0]);
       }
+      else if(id == "fp.isNormal")
+      {
+        if(op.size() != 1)
+          throw error("fp.isNormal takes one operand");
+
+        if(op[0].type().id() != ID_floatbv)
+          throw error("fp.isNormal takes FloatingPoint operand");
+
+        return isnormal_exprt(op[0]);
+      }
       else if(id == "fp")
       {
         return function_application_fp(op);
@@ -753,6 +782,30 @@ exprt smt2_parsert::function_application()
         id == "fp.add" || id == "fp.mul" || id == "fp.sub" || id == "fp.div")
       {
         return function_application_ieee_float_op(id, op);
+      }
+      else if(id == "fp.eq")
+      {
+        return function_application_ieee_float_eq(op);
+      }
+      else if(id == "fp.leq")
+      {
+        return binary_predicate(ID_le, op);
+      }
+      else if(id == "fp.lt")
+      {
+        return binary_predicate(ID_lt, op);
+      }
+      else if(id == "fp.geq")
+      {
+        return binary_predicate(ID_ge, op);
+      }
+      else if(id == "fp.gt")
+      {
+        return binary_predicate(ID_gt, op);
+      }
+      else if(id == "fp.neg")
+      {
+        return unary(ID_unary_minus, op);
       }
       else
       {
