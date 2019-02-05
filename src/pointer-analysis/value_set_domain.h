@@ -17,6 +17,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "value_set.h"
 
+/// This is the domain for a value set analysis. It is intended to be the
+/// template parameter for `value_set_analysis_templatet`, so `VST` would be
+/// `value_sett`.
 template<class VST>
 class value_set_domain_templatet:public domain_baset
 {
