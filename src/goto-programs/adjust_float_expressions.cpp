@@ -20,6 +20,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_model.h"
 
+/// Iterate over an expression and check it or any of its subexpressions are
+/// floating point operations that haven't been adjusted with a rounding mode
+/// yet.
 static bool have_to_adjust_float_expressions(const exprt &expr)
 {
   if(expr.id()==ID_floatbv_plus ||
@@ -72,14 +75,16 @@ static bool have_to_adjust_float_expressions(const exprt &expr)
   return false;
 }
 
-/// This adds the rounding mode to floating-point operations, including those in
-/// vectors and complex numbers.
 void adjust_float_expressions(exprt &expr, const exprt &rounding_mode)
 {
   if(!have_to_adjust_float_expressions(expr))
     return;
 
   // recursive call
+  // Note that we do the recursion twice here; once in
+  // `have_to_adjust_float_expressions` and once here. Presumably this is to
+  // avoid breaking sharing (calling the non-const operands() function breaks
+  // sharing)
   for(auto &op : expr.operands())
     adjust_float_expressions(op, rounding_mode);
 
@@ -175,8 +180,6 @@ void adjust_float_expressions(exprt &expr, const exprt &rounding_mode)
   }
 }
 
-/// This adds the rounding mode to floating-point operations, including those in
-/// vectors and complex numbers.
 void adjust_float_expressions(exprt &expr, const namespacet &ns)
 {
   if(!have_to_adjust_float_expressions(expr))
