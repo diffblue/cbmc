@@ -21,9 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 // #define USE_UPDATE
 
-void goto_symext::symex_assign(
-  statet &state,
-  const code_assignt &code)
+void goto_symext::symex_assign(statet &state, const code_assignt &code)
 {
   exprt lhs=code.lhs();
   exprt rhs=code.rhs();

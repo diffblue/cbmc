@@ -34,9 +34,7 @@ exprt goto_symext::make_auto_object(const typet &type, statet &state)
   return symbol_exprt(symbol.name, symbol.type);
 }
 
-void goto_symext::initialize_auto_object(
-  const exprt &expr,
-  statet &state)
+void goto_symext::initialize_auto_object(const exprt &expr, statet &state)
 {
   const typet &type=ns.follow(expr.type());
 
@@ -77,9 +75,7 @@ void goto_symext::initialize_auto_object(
   }
 }
 
-void goto_symext::trigger_auto_object(
-  const exprt &expr,
-  statet &state)
+void goto_symext::trigger_auto_object(const exprt &expr, statet &state)
 {
   if(expr.id()==ID_symbol &&
      expr.get_bool(ID_C_SSA_symbol))
