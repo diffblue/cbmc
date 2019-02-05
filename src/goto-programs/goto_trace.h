@@ -24,12 +24,32 @@ Date: July 2005
 
 #include <goto-programs/goto_program.h>
 
-/*! \brief TO_BE_DOCUMENTED
- * \ingroup gr_goto_symex
-*/
+/// Step of the trace of a GOTO program
+///
+/// A step is either:
+///   - an assignment
+///   - an assume statement
+///   - an assertion
+///   - a goto instruction
+///   - a constraint (unused)
+///   - a function call
+///   - a function return
+///   - a location (unused)
+///   - an output
+///   - an input
+///   - a declaration
+///   - a dead statement
+///   - a shared read (unused)
+///   - a shared write (unused)
+///   - a spawn statement
+///   - a memory barrier
+///   - an atomic begin (unused)
+///   - an atomic end (unused)
+/// \ingroup gr_goto_symex
 class goto_trace_stept
 {
 public:
+  /// Number of the step in the trace
   std::size_t step_nr;
 
   bool is_assignment() const      { return type==typet::ASSIGNMENT; }
@@ -123,8 +143,7 @@ public:
   // for function call
   std::vector<exprt> function_arguments;
 
-  /*! \brief outputs the trace step in ASCII to a given stream
-  */
+  /// Outputs the trace step in ASCII to a given stream
   void output(
     const class namespacet &ns,
     std::ostream &out) const;
@@ -145,25 +164,21 @@ public:
   }
 };
 
-/*! \brief TO_BE_DOCUMENTED
- * \ingroup gr_goto_symex
-*/
+/// Trace of a GOTO program.
+/// This is a wrapper for a list of steps.
+/// \ingroup gr_goto_symex
 class goto_tracet
 {
 public:
   typedef std::list<goto_trace_stept> stepst;
   stepst steps;
 
-  irep_idt mode;
-
   void clear()
   {
-    mode.clear();
     steps.clear();
   }
 
-  /*! \brief outputs the trace in ASCII to a given stream
-  */
+  /// Outputs the trace in ASCII to a given stream
   void output(
     const class namespacet &ns,
     std::ostream &out) const;
@@ -171,16 +186,16 @@ public:
   void swap(goto_tracet &other)
   {
     other.steps.swap(steps);
-    other.mode.swap(mode);
   }
 
+  /// Add a step at the end of the trace
   void add_step(const goto_trace_stept &step)
   {
     steps.push_back(step);
   }
 
-  // retrieves the final step in the trace for manipulation
-  // (used to fill a trace from code, hence non-const)
+  /// Retrieves the final step in the trace for manipulation
+  /// (used to fill a trace from code, hence non-const)
   goto_trace_stept &get_last_step()
   {
     return steps.back();
@@ -188,23 +203,25 @@ public:
 
   /// Returns the property IDs of all assertions in the trace
   std::vector<irep_idt> get_all_property_ids() const;
-
-  // delete all steps after (not including) s
-  void trim_after(stepst::iterator s)
-  {
-    PRECONDITION(s != steps.end());
-    steps.erase(++s, steps.end());
-  }
 };
 
+/// Options for printing the trace using show_goto_trace
 struct trace_optionst
 {
+  /// Add rawLhs property to trace
   bool json_full_lhs;
+  /// Represent plain trace values in hex
   bool hex_representation;
+  /// Use prefix (`0b` or `0x`) for distinguishing the base of the
+  /// representation.
   bool base_prefix;
+  /// Show function calls in plain text trace
   bool show_function_calls;
+  /// Show original code in plain text trace
   bool show_code;
+  /// Give a compact trace
   bool compact_trace;
+  /// Give a stack trace only
   bool stack_trace;
 
   static const trace_optionst default_options;
@@ -233,24 +250,12 @@ private:
   };
 };
 
+/// Output the trace on the given stream \p out
 void show_goto_trace(
   messaget::mstreamt &out,
-  const namespacet &,
-  const goto_tracet &);
-
-void show_goto_trace(
-  messaget::mstreamt &out,
-  const namespacet &,
-  const goto_tracet &,
-  const trace_optionst &);
-
-void trace_value(
-  messaget::mstreamt &out,
-  const namespacet &,
-  const optionalt<symbol_exprt> &lhs_object,
-  const exprt &full_lhs,
-  const exprt &value,
-  const trace_optionst &);
+  const namespacet &ns,
+  const goto_tracet &goto_trace,
+  const trace_optionst &trace_options = trace_optionst::default_options);
 
 #define OPT_GOTO_TRACE                                                         \
   "(trace-json-extended)"                                                      \

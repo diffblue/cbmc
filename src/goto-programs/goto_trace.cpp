@@ -253,7 +253,7 @@ std::string trace_numeric_value(
   return "?";
 }
 
-void trace_value(
+static void trace_value(
   messaget::mstreamt &out,
   const namespacet &ns,
   const optionalt<symbol_exprt> &lhs_object,
@@ -766,14 +766,6 @@ void show_goto_trace(
     show_compact_goto_trace(out, ns, goto_trace, options);
   else
     show_full_goto_trace(out, ns, goto_trace, options);
-}
-
-void show_goto_trace(
-  messaget::mstreamt &out,
-  const namespacet &ns,
-  const goto_tracet &goto_trace)
-{
-  show_goto_trace(out, ns, goto_trace, trace_optionst::default_options);
 }
 
 const trace_optionst trace_optionst::default_options = trace_optionst();
