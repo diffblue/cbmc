@@ -298,6 +298,50 @@ In converting to a GOTO program this structure is changed in several ways:
   instruction. Each goto_programt should have precisely one such
   instruction.
 
+\subsection subsection-goto-function-example Example goto-program
+
+The following C program, in a file named `mult.c`:
+
+```
+unsigned mult(unsigned a, unsigned b)
+{
+  int acc = 0, i;
+  for (i = 0; i < b; i++)
+    acc += a;
+  return acc;
+}
+```
+
+is translated by `cbmc --show-goto-functions mult.c` into:
+
+```
+mult /* mult */
+        // 0 file third.c line 2 function mult
+        signed int acc;
+        // 1 file third.c line 2 function mult
+        acc = 0;
+        // 2 file third.c line 2 function mult
+        signed int i;
+        // 3 file third.c line 3 function mult
+        i = 0;
+        // 4 file third.c line 3 function mult
+     1: IF !((unsigned int)i < b) THEN GOTO 2
+        // 5 file third.c line 4 function mult
+        acc = (signed int)((unsigned int)acc + a);
+        // 6 file third.c line 3 function mult
+        i = i + 1;
+        // 7 file third.c line 3 function mult
+        GOTO 1
+        // 8 file third.c line 5 function mult
+     2: mult#return_value = (unsigned int)acc;
+        // 9 file third.c line 5 function mult
+        dead i;
+        // 10 file third.c line 5 function mult
+        dead acc;
+        // 11 file third.c line 6 function mult
+        END_FUNCTION
+```
+
 \section section-goto-transforms Subsequent Transformation
 
 It is normal for a program that calls `goto_convert` to immediately pass the
@@ -524,6 +568,7 @@ then it performs 'linking' of the temporary into a passed destination
 Details about linking of `::goto_modelt` instances can be found
 [here](\ref section-linking-goto-models).
 
+(The above result was produced using `cbmc version 5.11`)
 
 \section section-linking-goto-models Linking Goto Models
 
