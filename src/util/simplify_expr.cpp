@@ -1363,10 +1363,13 @@ bool simplify_exprt::simplify_with(exprt &expr)
       }
     }
   }
-  else if(with_expr.old().type().id() == ID_array)
+  else if(
+    with_expr.old().type().id() == ID_array ||
+    with_expr.old().type().id() == ID_vector)
   {
-    if(expr.op0().id()==ID_array ||
-       expr.op0().id()==ID_constant)
+    if(
+      expr.op0().id() == ID_array || expr.op0().id() == ID_constant ||
+      expr.op0().id() == ID_vector)
     {
       while(expr.operands().size()>1)
       {
