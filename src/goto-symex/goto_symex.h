@@ -226,11 +226,10 @@ protected:
   exprt make_auto_object(const typet &, statet &);
   virtual void dereference(exprt &, statet &);
 
-  void dereference_rec(exprt &, statet &, guardt &);
+  void dereference_rec(exprt &, statet &);
   exprt address_arithmetic(
     const exprt &,
     statet &,
-    guardt &,
     bool keep_array);
 
   virtual void symex_goto(statet &);
