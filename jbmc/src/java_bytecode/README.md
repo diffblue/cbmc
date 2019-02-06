@@ -736,3 +736,151 @@ See also \ref string-solver-interface.
 \section java-bytecode-conversion-example-section A worked example of converting java bytecode to codet
 
 To be documented.
+
+\section java-trace Java Trace Assumptions
+
+For high-level documentation about goto traces, see \ref goto-trace-structure.
+
+There are three types of assignments to construct all types of Java objects:
+- variable assignments (\ref symbol_exprt)
+- member assignments (\ref member_exprt)
+- index assignments (\ref index_exprt)
+
+We use the convention left-hand side (LHS) = right-hand side (RHS) to represent
+assignments in this document.
+
+The expressions on each side vary depending on the type, whether its a
+member assignment, whether its an assignment by reference, etc. Some examples:
+- A global variable assignment will have a LHS \ref symbol_exprt containing the
+type information and an identifier that does not include a function
+identifier, e.g. `java::SomeClass.someGlobalField`, and a RHS expression
+containing the value, e.g. a \ref constant_exprt, a \ref struct_exprt or an
+\ref address_of_exprt.
+See \ref java-trace-variable-assignment "Variable assignments".
+- A local variable assignment will have a LHS \ref symbol_exprt containing the
+type information and an identifier that includes a function identifier, e.g.
+a parameter assignment like `java::SomeClass.<init>:()V::this` which corresponds
+to a symbol with `is_static_lifetime` set to true.
+See \ref java-trace-variable-assignment "Variable assignments".
+- A member assignment will have a LHS \ref member_exprt containing the type
+information for the member, the component name (member name), and an operand for
+the containing class which contains an identifier for the containing class, a
+RHS expression containing the value. Inherited members have a nested member
+structure. Members of members are assigned using a series of single member
+assignments. See \ref java-trace-member-assignments "Member assignments".
+- An array assignment consists of first assigning to a LHS \ref symbol_exprt
+a RHS of type `java::array`, then if the array is non-empty it is followed by a
+series of \ref index_exprt assignments to assign elements to the array of the
+required type. A notable exception to this assignment structure is when arrays
+are created non-deterministically for primitive types - these are created by
+assigning an entire array to the `java::array` symbol instead of being built
+using index assignments.
+See \ref java-trace-array-assignments "Array assignments".
+
+\subsection java-trace-variable-assignment Variable assignments
+
+Variable assignments have LHS \ref symbol_exprt with an identifier that reflects
+the variable name and scope and a RHS that is one of the following
+(noting that Strings are an exception,
+see \ref java-trace-string-assignments "String assignments"):
+- \ref constant_exprt (primitives and addresses)
+- \ref struct_exprt (reference types, including Java arrays)
+- \ref array_exprt (data within Java arrays)
+
+A primitive variable assignment has the form:
+- \ref symbol_exprt = \ref constant_exprt with a value representing the primitive
+
+An assignment of a non-primitive (struct) variable can have the following forms:
+- \ref symbol_exprt = \ref struct_exprt
+- \ref symbol_exprt = \ref constant_exprt with an \ref address_of_exprt pointing to a symbol that has a \ref struct_exprt value
+
+\subsection java-trace-member-assignments Member assignments
+
+\ref struct_exprt that have members are constructed first by an assignment of
+the form
+- \ref symbol_exprt = \ref struct_exprt
+
+where the members of the \ref struct_exprt are zero-initialized (null for
+\ref struct_exprt and 0 for \ref constant_exprt)
+then members can be assigned. For primitive members, this is a simple assignment
+to the member:
+- \ref member_exprt of the \ref symbol_exprt containing the member = \ref constant_exprt with a value representing the primitive
+
+For members of reference type, the object to be assigned must first be created,
+then assigned by address, e.g.
+- \ref member_exprt of the \ref symbol_exprt containing the member = \ref constant_exprt with an \ref address_of_exprt pointing to a symbol that has a \ref struct_exprt value.
+
+This concept becomes clearer with an example.
+
+\subsection java-trace-member-assignment-example Worked example for member assignments
+
+Consider the trace for the function call to `Example.assignReferenceTypes()`,
+which assigns a value to the static field `globalReferenceTypeReferenceField`.
+
+```java
+public class Example {
+  static ReferenceTypeReferenceField globalReferenceTypeReferenceField;
+  public static void assignReferenceTypes() {
+    globalReferenceTypeReferenceField =
+        new ReferenceTypeReferenceField(new ReferenceTypePrimitiveField(5));
+}
+
+class ReferenceTypeReferenceField {
+  ReferenceTypePrimitiveField referenceField;
+  public ReferenceTypeReferenceField(ReferenceTypePrimitiveField r) {
+    referenceField = r;
+  }
+}
+
+class ReferenceTypePrimitiveField {
+  int primitiveField;
+  public ReferenceTypePrimitiveField(int i) {
+    primitiveField = i;
+  }
+}
+```
+
+There are 54 non-trivial steps in the trace to make this assignment.
+This example will give detail of the assignment steps only, filling in other
+steps with description.
+
+CProver initialize initializes the instance of the class containing the function under test, Example, to have `null` static field:
+- \ref symbol_exprt `java::ObjectReference.globalReferenceTypeReferenceField` = \ref constant_exprt with `null` value
+
+Objects are empty-initialized to build the assignment to `globalReferenceTypeReferenceField`.
+`symex_dynamic::dynamic_object1` represents `globalReferenceTypeReferenceField` and `symex_dynamic::dynamic_object2` represents `referenceField`.
+- \ref symbol_exprt `symex_dynamic::dynamic_object1` = \ref struct_exprt with `referenceField` set to `null` value
+- \ref symbol_exprt `symex_dynamic::dynamic_object2` = \ref struct_exprt with `primitiveField` set to `0`
+
+Call to the constructor of `ReferenceTypePrimitiveField`, initializing the parameters `this` and `i`
+- \ref symbol_exprt `java::ReferenceTypePrimitiveField.<init>:(I)V::this` = \ref constant_exprt with \ref address_of_exprt pointing to `symex_dynamic::dynamic_object2`
+- \ref symbol_exprt `java::ReferenceTypePrimitiveField.<init>:(I)V::i` = \ref constant_exprt with value `5`
+
+Call to the super constructor (Object). The `to_construct` parameter is internal
+- \ref symbol_exprt `java::java.lang.Object.<init>:()V::this` = \ref constant_exprt with \ref address_of_exprt pointing to `symex_dynamic::dynamic_object2`
+- \ref symbol_exprt `java::java.lang.Object.<init>:()V::to_construct` = \ref constant_exprt with \ref address_of_exprt pointing to `symex_dynamic::dynamic_object2`
+
+Setting the member of symex_dynamic::dynamic_object2, primitiveField. Note that primitives are always assigned using constant expressions with values.
+- \ref member_exprt `symex_dynamic::dynamic_object2.primitiveField` = \ref constant_exprt with value `5`
+
+Call to the constructor of ReferenceTypeReferenceField, initializing the parameters `this` and `r`
+- \ref symbol_exprt `java::ReferenceTypeReferenceField.<init>:(LReferenceTypePrimitiveField;)V::this` = \ref constant_exprt with \ref address_of_exprt pointing to `symex_dynamic::dynamic_object1`
+- \ref symbol_exprt `java::ReferenceTypeReferenceField.<init>:(LReferenceTypePrimitiveField;)V::r` = \ref constant_exprt with \ref address_of_exprt pointing to `symex_dynamic::dynamic_object2`
+
+Call to the super constructor (Object). The `to_construct` parameter is internal
+- \ref symbol_exprt `java::java.lang.Object.<init>:()V::this` = \ref constant_exprt with \ref address_of_exprt pointing to `symex_dynamic::dynamic_object1`
+- \ref symbol_exprt `java::java.lang.Object.<init>:()V::to_construct` = \ref constant_exprt with \ref address_of_exprt pointing to `symex_dynamic::dynamic_object1`
+
+Setting the member of symex_dynamic::dynamic_object1, referenceField. Note that this because referenceField is of struct type, it is assigned by reference.
+- \ref member_exprt `symex_dynamic::dynamic_object1.referenceField` = \ref constant_exprt with \ref address_of_exprt pointing to `symex_dynamic::dynamic_object2`
+
+Finally, the actual assignment to globalReferenceTypeReferenceField is done by reference to the object we built symex_dynamic::dynamic_object1
+- \ref symbol_exprt `java::ObjectReference.globalReferenceTypeReferenceField` = \ref constant_exprt with \ref address_of_exprt pointing to `symex_dynamic::dynamic_object1`
+
+\subsection java-trace-array-assignments Array assignments
+
+To be documented.
+
+\subsection java-trace-string-assignments String assignments
+
+To be documented.

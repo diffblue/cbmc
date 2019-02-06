@@ -642,32 +642,6 @@ contains the symbol representing the LHS
 (\ref goto_trace_stept::full_lhs) and the value expression representing the RHS
 (\ref goto_trace_stept::full_lhs_value).
 
-\subsubsection java-assignments Java Assignments
-
-The expressions on each side vary depending on the type, whether its a
-member assignment, whether its an assignment by reference, etc. Some examples:
-- A global variable assignment will have a LHS \ref symbol_exprt containing the
-type information and an identifier that does not include a function
-identifier, e.g. `java::SomeClass.someGlobalField`, and a RHS expression
-containing the value, e.g. a \ref constant_exprt, a \ref struct_exprt or an
-\ref address_of_exprt.
-- A local variable assignment will have a LHS \ref symbol_exprt containing the
-type information and an identifier that includes a function identifier, e.g.
-a parameter assignment like `java::SomeClass.<init>:()V::this` which corresponds
-to a symbol with `is_static_lifetime` set to true
-- A member assignment will have a LHS \ref member_exprt containing the type
-information for the member, the component name (member name), and an operand for
-the containing class which contains an identifier for the containing class, a
-RHS expression containing the value. Inherited members have a nested member
-structure. Members of members are assigned using a series of single member
-assignments.
-- An array assignment consists of first assigning to a LHS \ref symbol_exprt 
-a RHS of type `java::array`, then if the array is non-empty it is followed by a
-series of \ref index_exprt assignments to assign elements to the array of the 
-required type. A notable exception to this assignment structure is when arrays
-are created non-deterministically for primitive types - these are created by 
-assigning an entire array to the `java::array` symbol instead of being built 
-using index assignments.
 
 \subsection other-steps Other steps
 
@@ -677,3 +651,7 @@ including:
 instrumentation and properties
 - \ref goto_trace_stept::typet::LOCATION (location-only), appears in the
 trace when the source location changes.
+
+\subsection java-assignments Java Assignments
+
+See \ref java-trace.
