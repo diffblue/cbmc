@@ -883,4 +883,27 @@ To be documented.
 
 \subsection java-trace-string-assignments String assignments
 
-To be documented.
+"Strings" only exist in Java. This section refers to the `java.lang.String`
+object representation in GOTO. It can take one of the following forms:
+
+ - Most strings are `java.lang.String` objects with a data field assigned to a
+   symbol referring to a character array as its data  (internal array). All
+   assumptions are made on the internal array itself - string is just a shell.
+   String length doesn't have to match internal array's length (has to be less
+   or equal to the internal length). Also internal character arrays can be
+   shared between strings. String contents are stored in UTF-16 (as is the case
+   in Java)
+ - String literals are symbols with IDs starting with JAVA_STRING_LITERAL_PREFIX
+   with `pretty_name` property containing the value of the string in UTF-8. The
+   symbol usually refers to a character array.
+ - Constant expression where `type().id()` is `ID_string` with value set to
+   string's characters
+
+Strings in Java are immutable - string objects are only assigned to values upon
+creation. Also, as is the case with arrays, string objects can be used before
+they're defined.
+
+There are also mutable string-like objects - `java.lang.CharSequence` and its
+two implementatiosn - `java.lang.StringBuffer` and `java.lang.StringBuilder`.
+They are always represented as an object with data array storing its string
+value in UTF-16 form.
