@@ -354,7 +354,46 @@ protected:
   virtual std::unique_ptr<statet> make_temporary_state(const statet &s)=0;
 };
 
-// domainT is expected to be derived from ai_domain_baseT
+/// Base class for abstract interpretation. An actual analysis
+/// must (a) inherit from this class and (b) provide a domain class as a
+/// type argument, which must, in turn, inherit from \ref ai_domain_baset.
+///
+/// From a user's perspective, this class provides three main groups of
+/// functions:
+///
+/// 1. Running an analysis, via
+///    \ref ai_baset#operator()(const irep_idt&,const goto_programt&, <!--
+///    --> const namespacet&),
+///    \ref ai_baset#operator()(const goto_functionst&,const namespacet&)
+///    and \ref ai_baset#operator()(const goto_modelt&)
+/// 2. Accessing the results of an analysis, by looking up the result
+///    for a given location \p l using
+///    \ref ait#operator[](goto_programt::const_targett).
+/// 3. Outputting the results of the analysis; see
+///    \ref ai_baset#output(const namespacet&, const irep_idt&,
+///    const goto_programt&, std::ostream&)const et cetera.
+///
+/// A typical usage pattern would be to call the analysis first,
+/// and use `operator[]` afterwards to retrieve the results. The fixed
+/// point algorithm used is a standard worklist algorithm; the current
+/// implementation is flow- and path-sensitive, but not context-sensitive.
+///
+/// From an analysis developer's perspective, an analysis is implemented by
+/// inheriting from this class (or, if a concurrency-sensitive analysis is
+/// required, from \ref concurrency_aware_ait), providing a class implementing
+/// the abstract domain as the type for the \p domainT parameter. Most of the
+/// actual analysis functions (in particular, the minimal element, the lattice
+/// join, and the state transformer) are supplied using \p domainT.
+///
+/// To control the analysis in more detail, you can also override the following
+/// methods:
+/// - \ref ait#initialize(const irep_idt&, const goto_programt&),
+///   \ref ait#initialize(const irep_idt&,
+///   const goto_functionst::goto_functiont&) and
+///   \ref ait#initialize(const goto_functionst&), for pre-analysis
+///   initialization
+/// - \ref ait#finalize(), for post-analysis cleanup.
+///
 template<typename domainT>
 class ait:public ai_baset
 {
@@ -366,6 +405,7 @@ public:
 
   typedef goto_programt::const_targett locationt;
 
+  /// Find the analysis result for a given location.
   domainT &operator[](locationt l)
   {
     typename state_mapt::iterator it=state_map.find(l);
@@ -375,6 +415,7 @@ public:
     return it->second;
   }
 
+  /// Find the analysis result for a given location.
   const domainT &operator[](locationt l) const
   {
     typename state_mapt::const_iterator it=state_map.find(l);
@@ -384,6 +425,7 @@ public:
     return it->second;
   }
 
+  /// Used internally by the analysis.
   std::unique_ptr<statet> abstract_state_before(locationt t) const override
   {
     typename state_mapt::const_iterator it = state_map.find(t);
@@ -397,6 +439,7 @@ public:
     return util_make_unique<domainT>(it->second);
   }
 
+  /// Remove all analysis results.
   void clear() override
   {
     state_map.clear();
@@ -404,18 +447,23 @@ public:
   }
 
 protected:
+  /// Map from locations to domain elements, for the results of a static
+  /// analysis.
   typedef std::
     unordered_map<locationt, domainT, const_target_hash, pointee_address_equalt>
       state_mapt;
   state_mapt state_map;
 
-  // this one creates states, if need be
+  /// Look up the analysis state for a given location, instantiating a new state
+  /// if required. Used internally by the analysis.
   virtual statet &get_state(locationt l) override
   {
     return state_map[l]; // calls default constructor
   }
 
-  // this one just finds states
+  /// Look up the analysis state for a given location, throwing an exception if
+  /// no state is known.
+  /// Used internally by the analysis.
   const statet &find_state(locationt l) const override
   {
     typename state_mapt::const_iterator it=state_map.find(l);
@@ -425,6 +473,8 @@ protected:
     return it->second;
   }
 
+  /// Merge the state \p src, flowing from location \p from to
+  /// location \p to, into the state currently stored for location \p to.
   bool merge(const statet &src, locationt from, locationt to) override
   {
     statet &dest=get_state(to);
@@ -432,11 +482,15 @@ protected:
       static_cast<const domainT &>(src), from, to);
   }
 
+  /// Make a copy of \p s.
   std::unique_ptr<statet> make_temporary_state(const statet &s) override
   {
     return util_make_unique<domainT>(static_cast<const domainT &>(s));
   }
 
+  /// Internal: implementation of the fixed point function using
+  /// \ref ai_baset#sequential_fixedpoint(const goto_functionst&,
+  /// const namespacet&).
   void fixedpoint(
     const goto_functionst &goto_functions,
     const namespacet &ns) override
@@ -457,6 +511,17 @@ private:
   }
 };
 
+/// Base class for concurrency-aware abstract interpretation. See
+/// \ref ait for details.
+/// The only difference is that after the sequential fixed point construction,
+/// as done by \ref ait, another step is added to account for
+/// concurrently-executed instructions.
+/// Basically, it makes the analysis flow-insensitive by feeding results of a
+/// sequential execution back into the entry point, thereby accounting for any
+/// values computed by different threads. Compare
+/// [Martin Rinard, "Analysis of Multi-Threaded Programs", SAS 2001](
+/// http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.28.4747&<!--
+/// -->rep=rep1&type=pdf).
 template<typename domainT>
 class concurrency_aware_ait:public ait<domainT>
 {
