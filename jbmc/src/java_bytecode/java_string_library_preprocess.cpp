@@ -316,9 +316,8 @@ exprt::operandst java_string_library_preprocesst::process_operands(
   for(const auto &p : operands)
   {
     if(implements_java_char_sequence_pointer(p.type()))
-      ops.push_back(
-        convert_exprt_to_string_exprt(
-          p, loc, symbol_table, function_id, init_code));
+      ops.push_back(convert_exprt_to_string_exprt(
+        p, loc, symbol_table, function_id, init_code));
     else if(is_java_char_array_pointer_type(p.type()))
       ops.push_back(
         replace_char_array(p, loc, function_id, symbol_table, init_code));
