@@ -11,10 +11,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "c_typecheck_base.h"
 
-#include <util/invariant.h>
-#include <util/std_types.h>
-#include <util/prefix.h>
+#include <util/c_types.h>
 #include <util/config.h>
+#include <util/invariant.h>
+#include <util/prefix.h>
+#include <util/std_types.h>
 
 #include "expr2c.h"
 #include "type2name.h"
@@ -740,7 +741,7 @@ void c_typecheck_baset::typecheck_declaration(
 
       typecheck_spec_expr(static_cast<codet &>(contract), ID_C_spec_requires);
 
-      typet ret_type=empty_typet();
+      typet ret_type = void_type();
       if(new_symbol.type.id()==ID_code)
         ret_type=to_code_type(new_symbol.type).return_type();
       assert(parameter_map.empty());

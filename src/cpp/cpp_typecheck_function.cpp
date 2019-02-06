@@ -11,6 +11,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_typecheck.h"
 
+#include <util/c_types.h>
+
 #include <ansi-c/c_qualifiers.h>
 
 #include "cpp_template_type.h"
@@ -139,9 +141,8 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
   return_type=function_type.return_type();
 
   // constructor, destructor?
-  if(return_type.id()==ID_constructor ||
-     return_type.id()==ID_destructor)
-    return_type=empty_typet();
+  if(return_type.id() == ID_constructor || return_type.id() == ID_destructor)
+    return_type = void_type();
 
   typecheck_code(to_code(symbol.value));
 
