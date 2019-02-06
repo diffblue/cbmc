@@ -447,28 +447,3 @@ static void locality(
   }
 }
 
-void goto_symext::return_assignment(statet &state)
-{
-  framet &frame = state.top();
-
-  const goto_programt::instructiont &instruction=*state.source.pc;
-  PRECONDITION(instruction.is_return());
-  const code_returnt &code = instruction.get_return();
-
-  target.location(state.guard.as_expr(), state.source);
-
-  PRECONDITION(code.operands().size() == 1 || frame.return_value.is_nil());
-
-  exprt value = code.return_value();
-
-  if(frame.return_value.is_not_nil())
-  {
-    code_assignt assignment(frame.return_value, value);
-
-    INVARIANT(
-      base_type_eq(assignment.lhs().type(), assignment.rhs().type(), ns),
-      "goto_symext::return_assignment type mismatch");
-
-    symex_assign(state, assignment);
-  }
-}
