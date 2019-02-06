@@ -30,45 +30,6 @@ operator()(propertiest &properties)
 {
   resultt result(resultt::progresst::DONE);
 
-  // Unfortunately, the initial symex run is currently handled differently
-  // from the subsequent runs
-  if(!initial_symex_has_run)
-  {
-    initial_symex_has_run = true;
-    first_equation = symex_target_equationt();
-    symex_bmct symex(
-      ui_message_handler,
-      goto_model.get_symbol_table(),
-      first_equation.value(),
-      options,
-      *worklist);
-
-    setup_symex(symex);
-    perform_symex(
-      goto_model,
-      symex,
-      symex_symbol_table,
-      first_equation.value(),
-      options,
-      ns,
-      ui_message_handler);
-
-    output_coverage_report(
-      options.get_option("symex-coverage-report"),
-      goto_model,
-      symex,
-      ui_message_handler);
-
-    if(symex.get_remaining_vccs() > 0)
-    {
-      prepare(result, properties, first_equation.value());
-      decide(result, properties);
-
-      if(result.progress == resultt::progresst::FOUND_FAIL)
-        return result;
-    }
-  }
-
   // There might be more solutions from the previous equation.
   if(property_decider)
   {
@@ -77,24 +38,28 @@ operator()(propertiest &properties)
       return result;
   }
 
-  if(first_equation.has_value())
+  if(!worklist->empty())
   {
-    // We are in the second iteration. We don't need the equation
-    // from the first iteration anymore.
-    first_equation = {};
+    // We pop the item processed in the previous iteration.
+    worklist->pop();
   }
-  else
+
+  if(!symex_initialized)
   {
-    if(!worklist->empty())
-    {
-      // We are in iteration 3 or later; we pop the item processed
-      // in the previous iteration.
-      worklist->pop();
-    }
-    else
-    {
-      // We are already done.
-    }
+    symex_initialized = true;
+
+    // Put initial state into the work list
+    symex_target_equationt equation;
+    symex_bmct symex(
+      ui_message_handler,
+      goto_model.get_symbol_table(),
+      equation,
+      options,
+      *worklist);
+    setup_symex(symex);
+
+    symex.initialize_path_storage_from_entry_point_of(
+      goto_symext::get_goto_function(goto_model), symex_symbol_table);
   }
 
   while(!worklist->empty())
@@ -106,16 +71,15 @@ operator()(propertiest &properties)
       resume.equation,
       options,
       *worklist);
-
     setup_symex(symex);
-    perform_symex(
-      goto_model,
-      symex,
-      resume,
-      symex_symbol_table,
-      options,
-      ns,
-      ui_message_handler);
+
+    symex.resume_symex_from_saved_state(
+      goto_symext::get_goto_function(goto_model),
+      resume.state,
+      &resume.equation,
+      symex_symbol_table);
+    postprocess_equation(
+      symex, resume.equation, options, ns, ui_message_handler);
 
     output_coverage_report(
       options.get_option("symex-coverage-report"),

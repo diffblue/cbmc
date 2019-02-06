@@ -43,8 +43,7 @@ public:
   virtual ~single_path_symex_checkert() = default;
 
 protected:
-  bool initial_symex_has_run = false;
-  optionalt<symex_target_equationt> first_equation; // for building traces
+  bool symex_initialized = false;
   std::unique_ptr<goto_symex_property_decidert> property_decider;
 
   void prepare(
