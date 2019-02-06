@@ -48,6 +48,15 @@ public:
     set_statement(statement);
   }
 
+  /// \param statement: Specifies the type of the `codet` to be constructed,
+  ///   e.g. `ID_block` for a \ref code_blockt or `ID_assign` for a
+  ///   \ref code_assignt.
+  /// \param _op: any operands to be added
+  explicit codet(const irep_idt &statement, operandst _op) : codet(statement)
+  {
+    operands() = std::move(_op);
+  }
+
   void set_statement(const irep_idt &statement)
   {
     set(ID_statement, statement);
