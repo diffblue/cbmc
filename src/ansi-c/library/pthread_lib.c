@@ -731,7 +731,8 @@ int pthread_spin_trylock(pthread_spinlock_t *lock)
 int __VERIFIER_nondet_int();
 
 // no pthread_barrier_t on the Mac
-#ifndef __APPLE__
+// slightly different declaration on OpenBSD
+#if !defined(__APPLE__) && !defined(__OpenBSD__)
 inline int pthread_barrier_init(
   pthread_barrier_t *restrict barrier,
   const pthread_barrierattr_t *restrict attr, unsigned count)
@@ -747,6 +748,28 @@ inline int pthread_barrier_init(
   #endif
 
   int result=__VERIFIER_nondet_int();
+  return result;
+}
+#endif
+
+// pthread_barrier_init has a slightly different decl on OpenBSD
+#if defined(__OpenBSD__)
+inline int pthread_barrier_init(
+  pthread_barrier_t *restrict barrier,
+  pthread_barrierattr_t *restrict attr,
+  unsigned count)
+{
+__CPROVER_HIDE:;
+  (void)barrier;
+  (void)attr;
+  (void)count;
+
+#ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
+  __CPROVER_set_must(barrier, "barrier-init");
+  __CPROVER_clear_may(barrier, "barrier-destroyed");
+#endif
+
+  int result = __VERIFIER_nondet_int();
   return result;
 }
 #endif

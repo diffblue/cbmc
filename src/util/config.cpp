@@ -674,16 +674,17 @@ void configt::ansi_ct::set_arch_spec_sh4()
 
 configt::ansi_ct::c_standardt configt::ansi_ct::default_c_standard()
 {
-  #if defined(__APPLE__)
+#if defined(__APPLE__)
   // By default, clang on the Mac builds C code in GNU C11
   return c_standardt::C11;
-  #elif defined(__FreeBSD__)
+#elif defined(__FreeBSD__) || defined(__OpenBSD__)
   // By default, clang on FreeBSD builds C code in GNU C99
+  // By default, clang on OpenBSD builds C code in C99
   return c_standardt::C99;
-  #else
+#else
   // By default, gcc 5.4 or higher use gnu11; older versions use gnu89
   return c_standardt::C11;
-  #endif
+#endif
 }
 
 configt::cppt::cpp_standardt configt::cppt::default_cpp_standard()
