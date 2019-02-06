@@ -30,32 +30,28 @@ public:
     return value_set.make_union(other.value_set);
   }
 
-  virtual void output(
-    const namespacet &ns,
-    std::ostream &out) const
+  void output(const namespacet &ns, std::ostream &out) const override
   {
     value_set.output(ns, out);
   }
 
-  virtual void initialize(
-    const namespacet &,
-    locationt l)
+  void initialize(const namespacet &, locationt l) override
   {
     value_set.clear();
     value_set.location_number=l->location_number;
   }
 
-  virtual void transform(
+  void transform(
     const namespacet &ns,
     const irep_idt &function_from,
     locationt from_l,
     const irep_idt &function_to,
-    locationt to_l);
+    locationt to_l) override;
 
-  virtual void get_reference_set(
+  void get_reference_set(
     const namespacet &ns,
     const exprt &expr,
-    value_setst::valuest &dest)
+    value_setst::valuest &dest) override
   {
     value_set.get_reference_set(expr, dest, ns);
   }
@@ -63,6 +59,52 @@ public:
 
 typedef value_set_domain_templatet<value_sett> value_set_domaint;
 
-#include "value_set_domain_transform.inc"
+template <class VST>
+void value_set_domain_templatet<VST>::transform(
+  const namespacet &ns,
+  const irep_idt &,
+  locationt from_l,
+  const irep_idt &function_to,
+  locationt to_l)
+{
+  switch(from_l->type)
+  {
+  case GOTO:
+    // ignore for now
+    break;
+
+  case END_FUNCTION:
+  {
+    value_set.do_end_function(static_analysis_baset::get_return_lhs(to_l), ns);
+    break;
+  }
+
+  // Note intentional fall-through here:
+  case RETURN:
+  case OTHER:
+  case ASSIGN:
+  case DECL:
+  case DEAD:
+    value_set.apply_code(from_l->code, ns);
+    break;
+
+  case ASSUME:
+    value_set.guard(from_l->guard, ns);
+    break;
+
+  case FUNCTION_CALL:
+  {
+    const code_function_callt &code = to_code_function_call(from_l->code);
+
+    value_set.do_function_call(function_to, code.arguments(), ns);
+  }
+  break;
+
+  default:
+  {
+    // do nothing
+  }
+  }
+}
 
 #endif // CPROVER_POINTER_ANALYSIS_VALUE_SET_DOMAIN_H
