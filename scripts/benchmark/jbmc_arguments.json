@@ -1,0 +1,16 @@
+{
+    "json-ui": true,
+    "trace": true,
+    "classpath": ".",
+    "java-max-vla-length":  192,
+    "java-unwind-enum-static": true,
+    "max-nondet-string-length": 100,
+    "depth": false,
+    "java-assume-inputs-non-null": true,
+    "max-nondet-array-length": 10,
+    "max-nondet-string-length": 10,
+    "java-max-vla-length":  4097,
+    "string-printable": true,
+    "unwind": 1,
+    "timeout" : 60
+}
