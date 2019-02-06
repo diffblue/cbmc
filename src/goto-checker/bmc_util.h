@@ -70,6 +70,17 @@ void slice(
   const optionst &,
   ui_message_handlert &);
 
+/// Post process the equation
+/// - add partial order constraints
+/// - slice
+/// - perform validation
+void postprocess_equation(
+  symex_bmct &symex,
+  symex_target_equationt &equation,
+  const optionst &options,
+  const namespacet &ns,
+  ui_message_handlert &ui_message_handler);
+
 /// Perform symbolic execution from the entry point
 void perform_symex(
   abstract_goto_modelt &,

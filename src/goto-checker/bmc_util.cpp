@@ -302,7 +302,7 @@ void output_coverage_report(
   }
 }
 
-static void postprocess_equation(
+void postprocess_equation(
   symex_bmct &symex,
   symex_target_equationt &equation,
   const optionst &options,
