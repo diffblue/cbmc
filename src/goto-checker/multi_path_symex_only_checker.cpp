@@ -39,14 +39,9 @@ multi_path_symex_only_checkert::multi_path_symex_only_checkert(
 incremental_goto_checkert::resultt multi_path_symex_only_checkert::
 operator()(propertiest &properties)
 {
-  perform_symex(
-    goto_model,
-    symex,
-    symex_symbol_table,
-    equation,
-    options,
-    ns,
-    ui_message_handler);
+  symex.symex_from_entry_point_of(
+    goto_symext::get_goto_function(goto_model), symex_symbol_table);
+  postprocess_equation(symex, equation, options, ns, ui_message_handler);
 
   output_coverage_report(
     options.get_option("symex-coverage-report"),
