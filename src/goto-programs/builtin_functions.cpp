@@ -1402,9 +1402,11 @@ void goto_convertt::do_function_call_symbol(
     }
 
     // build (*ptr==oldval)?newval:*ptr
-    if_exprt if_expr(equal, arguments[2], deref_ptr, deref_ptr.type());
-    if(if_expr.op1().type()!=if_expr.type())
-      if_expr.op1().make_typecast(if_expr.type());
+    if_exprt if_expr(
+      equal,
+      typecast_exprt::conditional_cast(arguments[2], deref_ptr.type()),
+      deref_ptr,
+      deref_ptr.type());
 
     goto_programt::targett t3=dest.add_instruction(ASSIGN);
     t3->source_location=function.source_location();
@@ -1461,9 +1463,11 @@ void goto_convertt::do_function_call_symbol(
       equal.op1().make_typecast(equal.op0().type());
 
     // build (*ptr==oldval)?newval:*ptr
-    if_exprt if_expr(equal, arguments[2], deref_ptr, deref_ptr.type());
-    if(if_expr.op1().type()!=if_expr.type())
-      if_expr.op1().make_typecast(if_expr.type());
+    if_exprt if_expr(
+      equal,
+      typecast_exprt::conditional_cast(arguments[2], deref_ptr.type()),
+      deref_ptr,
+      deref_ptr.type());
 
     goto_programt::targett t3=dest.add_instruction(ASSIGN);
     t3->source_location=function.source_location();

@@ -362,9 +362,9 @@ static exprt lower_byte_update(
 
   const mp_integer &element_size = *element_size_opt;
 
-  if(src.op0().type().id()==ID_array)
+  if(src.op().type().id()==ID_array)
   {
-    const array_typet &array_type=to_array_type(src.op0().type());
+    const array_typet &array_type=to_array_type(src.op().type());
     const typet &subtype=array_type.subtype();
 
     // array of bitvectors?
@@ -531,14 +531,14 @@ static exprt lower_byte_update(
         subtype.id_string());
     }
   }
-  else if(src.op0().type().id()==ID_signedbv ||
-          src.op0().type().id()==ID_unsignedbv ||
-          src.op0().type().id()==ID_floatbv ||
-          src.op0().type().id()==ID_c_bool ||
-          src.op0().type().id()==ID_pointer)
+  else if(src.op().type().id()==ID_signedbv ||
+          src.op().type().id()==ID_unsignedbv ||
+          src.op().type().id()==ID_floatbv ||
+          src.op().type().id()==ID_c_bool ||
+          src.op().type().id()==ID_pointer)
   {
     // do a shift, mask and OR
-    const auto type_width = pointer_offset_bits(src.op0().type(), ns);
+    const auto type_width = pointer_offset_bits(src.op().type(), ns);
     CHECK_RETURN(type_width.has_value() && *type_width > 0);
     const std::size_t width = numeric_cast_v<std::size_t>(*type_width);
 
@@ -560,7 +560,7 @@ static exprt lower_byte_update(
           unsignedbv_typet(
             width - numeric_cast_v<std::size_t>(element_size) * 8)),
         src.value(),
-        src.op0().type());
+        src.op().type());
     else
       value_extended = src.value();
 
@@ -602,7 +602,7 @@ static exprt lower_byte_update(
     PRECONDITION_WITH_DIAGNOSTICS(
       false,
       "flatten_byte_update can only do arrays and scalars right now",
-      src.op0().type().id_string());
+      src.op().type().id_string());
   }
 }
 

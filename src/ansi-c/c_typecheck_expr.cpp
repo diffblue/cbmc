@@ -1673,8 +1673,8 @@ void c_typecheck_baset::typecheck_side_effect_gcc_conditional_expression(
   typecheck_expr_trinary(if_expr);
 
   // copy the result
-  expr.op0()=if_expr.op1();
-  expr.op1()=if_expr.op2();
+  expr.op0() = if_expr.true_case();
+  expr.op1() = if_expr.false_case();
   expr.type()=if_expr.type();
 }
 
