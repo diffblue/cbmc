@@ -25,12 +25,12 @@ void cpp_typecheckt::typecheck_code(codet &code)
 
   if(statement==ID_try_catch)
   {
-    code.type() = code_typet({}, empty_typet());
+    code.type() = empty_typet();
     typecheck_try_catch(code);
   }
   else if(statement==ID_member_initializer)
   {
-    code.type() = code_typet({}, empty_typet());
+    code.type() = empty_typet();
     typecheck_member_initializer(code);
   }
   else if(statement==ID_msc_if_exists ||
