@@ -1525,7 +1525,7 @@ void value_sett::apply_code_rec(
   }
   else if(statement==ID_assume)
   {
-    guard(to_code_assume(code).op0(), ns);
+    guard(to_code_assume(code).assumption(), ns);
   }
   else if(statement==ID_user_specified_predicate ||
           statement==ID_user_specified_parameter_predicates ||

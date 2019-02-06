@@ -326,8 +326,9 @@ void goto_program_dereferencet::dereference_instruction(
       function_call.function(),
       checks_only,
       value_set_dereferencet::modet::READ);
-    dereference_expr(
-      function_call.op2(), checks_only, value_set_dereferencet::modet::READ);
+
+    for(auto &arg : function_call.arguments())
+      dereference_expr(arg, checks_only, value_set_dereferencet::modet::READ);
   }
   else if(i.is_return())
   {

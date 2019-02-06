@@ -251,6 +251,12 @@ public:
   code_skipt():codet(ID_skip)
   {
   }
+
+protected:
+  using codet::op0;
+  using codet::op1;
+  using codet::op2;
+  using codet::op3;
 };
 
 template<> inline bool can_cast_expr<code_skipt>(const exprt &base)
@@ -330,6 +336,12 @@ public:
 
     validate(code, ns, vm);
   }
+
+protected:
+  using codet::op0;
+  using codet::op1;
+  using codet::op2;
+  using codet::op3;
 };
 
 template<> inline bool can_cast_expr<code_assignt>(const exprt &base)
@@ -468,6 +480,12 @@ public:
       "removing a non-symbol: " +
         id2string(to_symbol_expr(code.op0()).get_identifier()) + "from scope");
   }
+
+protected:
+  using codet::op0;
+  using codet::op1;
+  using codet::op2;
+  using codet::op3;
 };
 
 template<> inline bool can_cast_expr<code_deadt>(const exprt &base)
@@ -525,6 +543,12 @@ public:
   {
     return op0();
   }
+
+protected:
+  using codet::op0;
+  using codet::op1;
+  using codet::op2;
+  using codet::op3;
 };
 
 template<> inline bool can_cast_expr<code_assumet>(const exprt &base)
@@ -576,6 +600,12 @@ public:
   {
     return op0();
   }
+
+protected:
+  using codet::op0;
+  using codet::op1;
+  using codet::op2;
+  using codet::op3;
 };
 
 template<> inline bool can_cast_expr<code_assertt>(const exprt &base)
@@ -679,6 +709,12 @@ public:
   {
     return static_cast<codet &>(op2());
   }
+
+protected:
+  using codet::op0;
+  using codet::op1;
+  using codet::op2;
+  using codet::op3;
 };
 
 template<> inline bool can_cast_expr<code_ifthenelset>(const exprt &base)
@@ -741,6 +777,12 @@ public:
   {
     return static_cast<codet &>(op1());
   }
+
+protected:
+  using codet::op0;
+  using codet::op1;
+  using codet::op2;
+  using codet::op3;
 };
 
 template<> inline bool can_cast_expr<code_switcht>(const exprt &base)
@@ -801,6 +843,12 @@ public:
   {
     return static_cast<codet &>(op1());
   }
+
+protected:
+  using codet::op0;
+  using codet::op1;
+  using codet::op2;
+  using codet::op3;
 };
 
 template<> inline bool can_cast_expr<code_whilet>(const exprt &base)
@@ -861,6 +909,12 @@ public:
   {
     return static_cast<codet &>(op1());
   }
+
+protected:
+  using codet::op0;
+  using codet::op1;
+  using codet::op2;
+  using codet::op3;
 };
 
 template<> inline bool can_cast_expr<code_dowhilet>(const exprt &base)
@@ -950,6 +1004,12 @@ public:
   {
     return static_cast<codet &>(op3());
   }
+
+protected:
+  using codet::op0;
+  using codet::op1;
+  using codet::op2;
+  using codet::op3;
 };
 
 template<> inline bool can_cast_expr<code_fort>(const exprt &base)
@@ -999,6 +1059,12 @@ public:
   {
     return get(ID_destination);
   }
+
+protected:
+  using codet::op0;
+  using codet::op1;
+  using codet::op2;
+  using codet::op3;
 };
 
 template<> inline bool can_cast_expr<code_gotot>(const exprt &base)
@@ -1152,6 +1218,12 @@ public:
 
     validate(code, ns, vm);
   }
+
+protected:
+  using codet::op0;
+  using codet::op1;
+  using codet::op2;
+  using codet::op3;
 };
 
 template<> inline bool can_cast_expr<code_function_callt>(const exprt &base)
@@ -1216,6 +1288,12 @@ public:
   {
     DATA_CHECK(vm, code.operands().size() == 1, "return must have one operand");
   }
+
+protected:
+  using codet::op0;
+  using codet::op1;
+  using codet::op2;
+  using codet::op3;
 };
 
 template<> inline bool can_cast_expr<code_returnt>(const exprt &base)
@@ -1285,6 +1363,12 @@ public:
   {
     return static_cast<const codet &>(op0());
   }
+
+protected:
+  using codet::op0;
+  using codet::op1;
+  using codet::op2;
+  using codet::op3;
 };
 
 template<> inline bool can_cast_expr<code_labelt>(const exprt &base)
@@ -1356,6 +1440,12 @@ public:
   {
     return static_cast<const codet &>(op1());
   }
+
+protected:
+  using codet::op0;
+  using codet::op1;
+  using codet::op2;
+  using codet::op3;
 };
 
 template<> inline bool can_cast_expr<code_switch_caset>(const exprt &base)
@@ -1392,6 +1482,12 @@ public:
   code_breakt():codet(ID_break)
   {
   }
+
+protected:
+  using codet::op0;
+  using codet::op1;
+  using codet::op2;
+  using codet::op3;
 };
 
 template<> inline bool can_cast_expr<code_breakt>(const exprt &base)
@@ -1422,6 +1518,12 @@ public:
   code_continuet():codet(ID_continue)
   {
   }
+
+protected:
+  using codet::op0;
+  using codet::op1;
+  using codet::op2;
+  using codet::op3;
 };
 
 template<> inline bool can_cast_expr<code_continuet>(const exprt &base)
@@ -1511,6 +1613,12 @@ public:
   {
     return op0();
   }
+
+protected:
+  using codet::op0;
+  using codet::op1;
+  using codet::op2;
+  using codet::op3;
 };
 
 template<> inline bool can_cast_expr<code_expressiont>(const exprt &base)
@@ -1988,6 +2096,12 @@ public:
   const exception_listt &exception_list() const {
     return (const exception_listt &)find(ID_exception_list).get_sub();
   }
+
+protected:
+  using codet::op0;
+  using codet::op1;
+  using codet::op2;
+  using codet::op3;
 };
 
 template<> inline bool can_cast_expr<code_push_catcht>(const exprt &base)
@@ -2019,6 +2133,12 @@ public:
   code_pop_catcht():codet(ID_pop_catch)
   {
   }
+
+protected:
+  using codet::op0;
+  using codet::op1;
+  using codet::op2;
+  using codet::op3;
 };
 
 template<> inline bool can_cast_expr<code_pop_catcht>(const exprt &base)
@@ -2064,6 +2184,12 @@ class code_landingpadt:public codet
   {
     return op0();
   }
+
+protected:
+  using codet::op0;
+  using codet::op1;
+  using codet::op2;
+  using codet::op3;
 };
 
 template<> inline bool can_cast_expr<code_landingpadt>(const exprt &base)
@@ -2140,6 +2266,12 @@ public:
   {
     add_to_operands(to_catch, code_catch);
   }
+
+protected:
+  using codet::op0;
+  using codet::op1;
+  using codet::op2;
+  using codet::op3;
 };
 
 template<> inline bool can_cast_expr<code_try_catcht>(const exprt &base)
