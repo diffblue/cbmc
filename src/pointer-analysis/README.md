@@ -22,7 +22,7 @@ objects will be assigned the same number, eliminating redundant storage of the
 same data.
 
 Alternative approaches to the same problem include \ref irept sharing (but this
-only shares when a copy is taken; two identical irepts arrived at by different
+only shares when a copy is taken; two identical ireps arrived at by different
 routes will not be shared) and \ref merge_irept (which does merge identical
 ireps, but is still more expensive to compare than numbers).
 
@@ -40,7 +40,10 @@ To be documented.
 
 \section pointer-analysis-analysis Value-set Analysis:
 
-To be documented.
+Value-set analysis is a framework for data-flow analyses which involve keeping
+track of what values different variables can have at different points in the
+program. The main classes are \ref value_set_analysis_templatet,
+\ref value_set_domain_templatet and \ref value_sett.
 
 \subsection pointer-analysis-variants Variants:
 
