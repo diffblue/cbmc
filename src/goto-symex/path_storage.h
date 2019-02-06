@@ -68,16 +68,8 @@ public:
   /// that check that the worklist is always empty when symex finishes.
   virtual void clear() = 0;
 
-  /// \brief Add paths to resume to the storage
-  ///
-  /// Symbolic execution is suspended when we reach a conditional goto
-  /// instruction with two successors. Thus, we always add a pair of paths to
-  /// the path storage.
-  ///
-  /// \param next_instruction: the instruction following the goto instruction
-  /// \param jump_target: the target instruction of the goto instruction
-  virtual void
-  push(const patht &next_instruction, const patht &jump_target) = 0;
+  /// \brief Add a path to resume to the storage
+  virtual void push(const patht &) = 0;
 
   /// \brief Remove the next path to resume from the storage
   void pop()
@@ -109,7 +101,7 @@ private:
 class path_lifot : public path_storaget
 {
 public:
-  void push(const patht &, const patht &) override;
+  void push(const patht &) override;
   std::size_t size() const override;
   void clear() override;
 
@@ -126,7 +118,7 @@ private:
 class path_fifot : public path_storaget
 {
 public:
-  void push(const patht &, const patht &) override;
+  void push(const patht &) override;
   std::size_t size() const override;
   void clear() override;
 

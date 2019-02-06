@@ -29,12 +29,9 @@ path_storaget::patht &path_lifot::private_peek()
   return paths.back();
 }
 
-void path_lifot::push(
-  const path_storaget::patht &next_instruction,
-  const path_storaget::patht &jump_target)
+void path_lifot::push(const path_storaget::patht &path)
 {
-  paths.push_back(next_instruction);
-  paths.push_back(jump_target);
+  paths.push_back(path);
 }
 
 void path_lifot::private_pop()
@@ -62,12 +59,9 @@ path_storaget::patht &path_fifot::private_peek()
   return paths.front();
 }
 
-void path_fifot::push(
-  const path_storaget::patht &next_instruction,
-  const path_storaget::patht &jump_target)
+void path_fifot::push(const path_storaget::patht &path)
 {
-  paths.push_back(next_instruction);
-  paths.push_back(jump_target);
+  paths.push_back(path);
 }
 
 void path_fifot::private_pop()

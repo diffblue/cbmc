@@ -305,9 +305,9 @@ void goto_symext::resume_symex_from_saved_state(
       new_symbol_table);
 }
 
-void goto_symext::symex_from_entry_point_of(
+void goto_symext::initialize_entry_point_state(
   const get_goto_functiont &get_goto_function,
-  symbol_tablet &new_symbol_table)
+  statet &state)
 {
   const goto_functionst::goto_functiont *start_function;
   try
@@ -319,8 +319,6 @@ void goto_symext::symex_from_entry_point_of(
     throw unsupported_operation_exceptiont("the program has no entry point");
   }
 
-  statet state;
-
   state.run_validation_checks = symex_config.run_validation_checks;
 
   initialize_entry_point(
@@ -328,10 +326,32 @@ void goto_symext::symex_from_entry_point_of(
     get_goto_function,
     goto_functionst::entry_point(),
     start_function->body.instructions.begin(),
-    prev(start_function->body.instructions.end()));
+    std::prev(start_function->body.instructions.end()));
+}
+
+void goto_symext::symex_from_entry_point_of(
+  const get_goto_functiont &get_goto_function,
+  symbol_tablet &new_symbol_table)
+{
+  statet state;
+  initialize_entry_point_state(get_goto_function, state);
 
   symex_with_state(
     state, get_goto_function, new_symbol_table);
+}
+
+void goto_symext::initialize_path_storage_from_entry_point_of(
+  const get_goto_functiont &get_goto_function,
+  symbol_tablet &new_symbol_table)
+{
+  statet state;
+  initialize_entry_point_state(get_goto_function, state);
+
+  path_storaget::patht entry_point_start(target, state);
+  entry_point_start.state.saved_target = state.source.pc;
+  entry_point_start.state.has_saved_next_instruction = true;
+
+  path_storage.push(entry_point_start);
 }
 
 goto_symext::get_goto_functiont

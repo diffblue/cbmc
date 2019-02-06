@@ -110,6 +110,11 @@ public:
     const get_goto_functiont &get_goto_function,
     symbol_tablet &new_symbol_table);
 
+  /// Puts the initial state of the entry point function into the path storage
+  virtual void initialize_path_storage_from_entry_point_of(
+    const get_goto_functiont &get_goto_function,
+    symbol_tablet &new_symbol_table);
+
   /// Performs symbolic execution using a state and equation that have
   /// already been used to symex part of the program. The state is not
   /// re-initialized; instead, symbolic execution resumes from the program
@@ -158,6 +163,14 @@ protected:
     const irep_idt &function_identifier,
     goto_programt::const_targett pc,
     goto_programt::const_targett limit);
+
+  /// Initialize the symbolic execution and the given state with
+  /// the beginning of the entry point function.
+  /// \param get_goto_function: producer for GOTO functions
+  /// \param state: Symex state to initialize.
+  void initialize_entry_point_state(
+    const get_goto_functiont &get_goto_function,
+    statet &state);
 
   /// Invokes symex_step and verifies whether additional threads can be
   /// executed.
