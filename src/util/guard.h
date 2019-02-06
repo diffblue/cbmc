@@ -47,8 +47,8 @@ public:
     return expr.is_false();
   }
 
-  friend guardt &operator -= (guardt &g1, const guardt &g2);
-  friend guardt &operator |= (guardt &g1, const guardt &g2);
+  friend guardt &operator-=(guardt &g1, const guardt &g2);
+  friend guardt &operator|=(guardt &g1, const guardt &g2);
 
 private:
   exprt expr;
