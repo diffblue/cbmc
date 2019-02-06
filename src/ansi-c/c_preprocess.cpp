@@ -589,38 +589,38 @@ bool c_preprocess_gcc_clang(
     switch(config.cpp.cpp_standard)
     {
     case configt::cppt::cpp_standardt::CPP98:
-    #if defined(__OpenBSD__)
-      if (preprocessor==configt::ansi_ct::preprocessort::CLANG)
+#if defined(__OpenBSD__)
+      if(preprocessor==configt::ansi_ct::preprocessort::CLANG)
         argv.push_back("-std=c++98");
       else
-    #endif
+#endif
         argv.push_back("-std=gnu++98");
       break;
 
     case configt::cppt::cpp_standardt::CPP03:
-    #if defined(__OpenBSD__)
-      if (preprocessor==configt::ansi_ct::preprocessort::CLANG)
+#if defined(__OpenBSD__)
+      if(preprocessor==configt::ansi_ct::preprocessort::CLANG)
         argv.push_back("-std=c++03");
       else
-    #endif
+#endif
         argv.push_back("-std=gnu++03");
       break;
 
     case configt::cppt::cpp_standardt::CPP11:
-    #if defined(__OpenBSD__)
-      if (preprocessor==configt::ansi_ct::preprocessort::CLANG)
+#if defined(__OpenBSD__)
+      if(preprocessor==configt::ansi_ct::preprocessort::CLANG)
         argv.push_back("-std=c++11");
       else
-    #endif
+#endif
         argv.push_back("-std=gnu++11");
       break;
 
     case configt::cppt::cpp_standardt::CPP14:
-    #if defined(__OpenBSD__)
-      if (preprocessor==configt::ansi_ct::preprocessort::CLANG)
+#if defined(__OpenBSD__)
+      if(preprocessor==configt::ansi_ct::preprocessort::CLANG)
         argv.push_back("-std=c++14");
       else
-    #endif
+#endif
         argv.push_back("-std=gnu++14");
       break;
     }
@@ -630,29 +630,29 @@ bool c_preprocess_gcc_clang(
     switch(config.ansi_c.c_standard)
     {
     case configt::ansi_ct::c_standardt::C89:
-    #if defined(__OpenBSD__)
-      if (preprocessor==configt::ansi_ct::preprocessort::CLANG)
+#if defined(__OpenBSD__)
+      if(preprocessor==configt::ansi_ct::preprocessort::CLANG)
         argv.push_back("-std=c89");
       else
-    #endif
+#endif
         argv.push_back("-std=gnu89");
       break;
 
     case configt::ansi_ct::c_standardt::C99:
-    #if defined(__OpenBSD__)
-      if (preprocessor==configt::ansi_ct::preprocessort::CLANG)
+#if defined(__OpenBSD__)
+      if(preprocessor==configt::ansi_ct::preprocessort::CLANG)
         argv.push_back("-std=c99");
       else
-    #endif
+#endif
         argv.push_back("-std=gnu99");
       break;
 
     case configt::ansi_ct::c_standardt::C11:
-    #if defined(__OpenBSD__)
-      if (preprocessor==configt::ansi_ct::preprocessort::CLANG)
+#if defined(__OpenBSD__)
+      if(preprocessor==configt::ansi_ct::preprocessort::CLANG)
         argv.push_back("-std=c11");
       else
-    #endif
+#endif
         argv.push_back("-std=gnu11");
       break;
     }

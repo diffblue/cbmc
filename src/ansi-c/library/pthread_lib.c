@@ -756,19 +756,20 @@ inline int pthread_barrier_init(
 #if defined(__OpenBSD__)
 inline int pthread_barrier_init(
   pthread_barrier_t *restrict barrier,
-  pthread_barrierattr_t *restrict attr, unsigned count)
+  pthread_barrierattr_t *restrict attr,
+  unsigned count)
 {
-  __CPROVER_HIDE:;
+__CPROVER_HIDE:;
   (void)barrier;
   (void)attr;
   (void)count;
 
-  #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
+#ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
   __CPROVER_set_must(barrier, "barrier-init");
   __CPROVER_clear_may(barrier, "barrier-destroyed");
-  #endif
+#endif
 
-  int result=__VERIFIER_nondet_int();
+  int result = __VERIFIER_nondet_int();
   return result;
 }
 #endif
