@@ -1253,12 +1253,13 @@ inline void validate_expr(const code_returnt &x)
 class code_labelt:public codet
 {
 public:
-  DEPRECATED("use code_labelt(label) instead")
+  DEPRECATED("use code_labelt(label, _code) instead")
   code_labelt():codet(ID_label)
   {
     operands().resize(1);
   }
 
+  DEPRECATED("use code_labelt(label, _code) instead")
   explicit code_labelt(const irep_idt &_label):codet(ID_label)
   {
     operands().resize(1);
