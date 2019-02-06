@@ -122,8 +122,7 @@ void goto_symext::symex_goto(statet &state)
   {
     DATA_INVARIANT(
       instruction.targets.size() > 0,
-      "Instruction is an unconditional goto with no target: " +
-        instruction.code.pretty());
+      "Instruction is an unconditional goto with no target");
     symex_transition(state, instruction.get_target(), true);
     return;
   }
