@@ -62,6 +62,8 @@ public:
   const codet &first_statement() const;
   codet &last_statement();
   const codet &last_statement() const;
+
+  DEPRECATED("use code_blockt(...) instead")
   class code_blockt &make_block();
 
   /// Check that the code statement is well-formed (shallow checks only, i.e.,
