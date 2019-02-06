@@ -1963,8 +1963,8 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
   else if(expr.function().id() == ID_cpp_dummy_destructor)
   {
     // these don't do anything, e.g., (char*)->~char()
-    expr.set(ID_statement, ID_skip);
-    expr.type()=empty_typet();
+    typecast_exprt no_op(from_integer(0, signed_int_type()), void_type());
+    expr.swap(no_op);
     return;
   }
 

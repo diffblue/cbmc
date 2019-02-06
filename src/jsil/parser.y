@@ -198,9 +198,8 @@ statements_opt: /* empty */
 
 statements: statement
           {
-            newstack($$).id(ID_code);
-            to_code(stack($$)).set_statement(ID_block);
-            stack($$).add_to_operands(std::move(stack($1)));
+            code_blockt b({static_cast<codet &>(stack($1))});
+            newstack($$).swap(b);
           }
           | statements statement
           {
