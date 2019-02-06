@@ -29,6 +29,32 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "goto_convert_functions.h"
 #include "read_goto_binary.h"
 
+/// Generate an entry point that calls a function with the given name, based on
+/// the functions language mode in the symbol table
+static bool generate_entry_point_for_function(
+  const irep_idt &entry_function_name,
+  const optionst &options,
+  goto_modelt &goto_model,
+  message_handlert &message_handler)
+{
+  auto const entry_function_sym =
+    goto_model.symbol_table.lookup(entry_function_name);
+  if(entry_function_sym == nullptr)
+  {
+    throw invalid_command_line_argument_exceptiont{
+      // NOLINTNEXTLINE(whitespace/braces)
+      std::string{"couldn't find function with name `"} +
+        id2string(entry_function_name) + "' in symbol table",
+      "--function"};
+  }
+  PRECONDITION(!entry_function_sym->mode.empty());
+  auto const entry_language = get_language_from_mode(entry_function_sym->mode);
+  CHECK_RETURN(entry_language != nullptr);
+  entry_language->set_message_handler(message_handler);
+  entry_language->set_language_options(options);
+  return entry_language->generate_support_functions(goto_model.symbol_table);
+}
+
 goto_modelt initialize_goto_model(
   const std::vector<std::string> &files,
   message_handlert &message_handler,
@@ -133,10 +159,20 @@ goto_modelt initialize_goto_model(
   }
   else if(!binaries_provided_start)
   {
-    // Allow all language front-ends to try to provide the user-specified
-    // (--function) entry-point, or some language-specific default:
-    entry_point_generation_failed=
-      language_files.generate_support_functions(goto_model.symbol_table);
+    if(options.is_set("function"))
+    {
+      // no entry point is present; Use the mode of the specified entry function
+      // to generate one
+      entry_point_generation_failed = generate_entry_point_for_function(
+        options.get_option("function"), options, goto_model, message_handler);
+    }
+    if(entry_point_generation_failed || !options.is_set("function"))
+    {
+      // Allow all language front-ends to try to provide the user-specified
+      // (--function) entry-point, or some language-specific default:
+      entry_point_generation_failed =
+        language_files.generate_support_functions(goto_model.symbol_table);
+    }
   }
 
   if(entry_point_generation_failed)
