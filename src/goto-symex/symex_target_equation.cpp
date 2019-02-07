@@ -603,8 +603,6 @@ void symex_target_equationt::convert_assertions(
 void symex_target_equationt::convert_function_calls(
   decision_proceduret &dec_proc)
 {
-  std::size_t argument_count=0;
-
   for(auto &step : SSA_steps)
     if(!step.ignore)
     {
@@ -633,8 +631,6 @@ void symex_target_equationt::convert_function_calls(
 void symex_target_equationt::convert_io(
   decision_proceduret &dec_proc)
 {
-  std::size_t io_count=0;
-
   for(auto &step : SSA_steps)
     if(!step.ignore)
     {
