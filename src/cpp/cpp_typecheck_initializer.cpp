@@ -296,8 +296,8 @@ void cpp_typecheckt::zero_initializer(
     const unsignedbv_typet enum_type(
       to_bitvector_type(final_type.subtype()).get_width());
 
-    exprt zero(from_integer(0, enum_type));
-    zero.make_typecast(type);
+    exprt zero =
+      typecast_exprt::conditional_cast(from_integer(0, enum_type), type);
     already_typechecked(zero);
 
     code_assignt assign;

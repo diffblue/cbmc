@@ -72,9 +72,8 @@ void parameter_assignmentst::do_function_calls(
           t->source_location=i_it->source_location;
           const symbolt &lhs_symbol=ns.lookup(p_identifier);
           symbol_exprt lhs=lhs_symbol.symbol_expr();
-          exprt rhs=function_call.arguments()[nr];
-          if(rhs.type()!=lhs.type())
-            rhs.make_typecast(lhs.type());
+          exprt rhs = typecast_exprt::conditional_cast(
+            function_call.arguments()[nr], lhs.type());
           t->code=code_assignt(lhs, rhs);
         }
       }

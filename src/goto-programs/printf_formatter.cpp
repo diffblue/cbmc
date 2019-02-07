@@ -16,16 +16,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/c_types.h>
 #include <util/format_constant.h>
 #include <util/simplify_expr.h>
+#include <util/std_expr.h>
 
 const exprt printf_formattert::make_type(
   const exprt &src, const typet &dest)
 {
   if(src.type()==dest)
     return src;
-  exprt tmp=src;
-  tmp.make_typecast(dest);
-  simplify(tmp, ns);
-  return tmp;
+  return simplify_expr(typecast_exprt(src, dest), ns);
 }
 
 void printf_formattert::operator()(

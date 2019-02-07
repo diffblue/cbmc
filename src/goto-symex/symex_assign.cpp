@@ -269,8 +269,7 @@ void goto_symext::symex_assign_typecast(
   assignment_typet assignment_type)
 {
   // these may come from dereferencing on the lhs
-  exprt rhs_typecasted=rhs;
-  rhs_typecasted.make_typecast(lhs.op().type());
+  exprt rhs_typecasted = typecast_exprt::conditional_cast(rhs, lhs.op().type());
 
   exprt new_full_lhs=add_to_lhs(full_lhs, lhs);
 

@@ -379,12 +379,9 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
 
     if(o.offset().is_zero())
     {
-      equal_exprt equality(pointer_expr, object_pointer);
-
-      if(ns.follow(equality.lhs().type())!=ns.follow(equality.rhs().type()))
-        equality.lhs().make_typecast(equality.rhs().type());
-
-      result.pointer_guard=equality;
+      result.pointer_guard = equal_exprt(
+        typecast_exprt::conditional_cast(pointer_expr, object_pointer.type()),
+        object_pointer);
     }
     else
     {
@@ -446,13 +443,9 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
         // TODO: need to assert well-alignedness
       }
 
-      index_exprt index_expr=
-        index_exprt(root_object, adjusted_offset, root_object_type.subtype());
-
-      result.value=index_expr;
-
-      if(ns.follow(result.value.type())!=ns.follow(dereference_type))
-        result.value.make_typecast(dereference_type);
+      result.value = typecast_exprt::conditional_cast(
+        index_exprt(root_object, adjusted_offset, root_object_type.subtype()),
+        dereference_type);
     }
     else
     {
@@ -589,12 +582,9 @@ bool value_set_dereferencet::memory_model_bytes(
     *to_type_size == 1 && is_a_bv_type(from_type.subtype()) &&
     is_a_bv_type(to_type))
   {
-    // yes, can use 'index'
-    result = index_exprt(value, offset, from_type.subtype());
-
-    // possibly need to convert
-    if(!base_type_eq(result.type(), to_type, ns))
-      result.make_typecast(to_type);
+    // yes, can use 'index', but possibly need to convert
+    result = typecast_exprt::conditional_cast(
+      index_exprt(value, offset, from_type.subtype()), to_type);
   }
   else
   {

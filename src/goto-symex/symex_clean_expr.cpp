@@ -99,12 +99,10 @@ process_array_expr(exprt &expr, bool do_simplify, const namespacet &ns)
       const typet &array_size_type = prev_array_type.size().type();
       const typet &subtype = prev_array_type.subtype();
 
-      exprt new_offset(ode.offset());
-      if(new_offset.type() != array_size_type)
-        new_offset.make_typecast(array_size_type);
-      exprt subtype_size = size_of_expr(subtype, ns);
-      if(subtype_size.type() != array_size_type)
-        subtype_size.make_typecast(array_size_type);
+      exprt new_offset =
+        typecast_exprt::conditional_cast(ode.offset(), array_size_type);
+      exprt subtype_size = typecast_exprt::conditional_cast(
+        size_of_expr(subtype, ns), array_size_type);
       new_offset = div_exprt(new_offset, subtype_size);
       minus_exprt new_size(prev_array_type.size(), new_offset);
       if(do_simplify)

@@ -210,8 +210,7 @@ bool cpp_typecheckt::standard_conversion_integral_promotion(
     std::size_t width=to_signedbv_type(expr.type()).get_width();
     if(width >= config.ansi_c.int_width)
       return false;
-    new_expr=expr;
-    new_expr.make_typecast(int_type);
+    new_expr = typecast_exprt(expr, int_type);
     return true;
   }
 
@@ -220,24 +219,19 @@ bool cpp_typecheckt::standard_conversion_integral_promotion(
     std::size_t width=to_unsignedbv_type(expr.type()).get_width();
     if(width >= config.ansi_c.int_width)
       return false;
-    new_expr=expr;
-    if(width==config.ansi_c.int_width)
-      int_type.id(ID_unsignedbv);
-    new_expr.make_typecast(int_type);
+    new_expr = typecast_exprt(expr, int_type);
     return true;
   }
 
   if(expr.type().id() == ID_bool || expr.type().id() == ID_c_bool)
   {
-    new_expr = expr;
-    new_expr.make_typecast(int_type);
+    new_expr = typecast_exprt(expr, int_type);
     return true;
   }
 
   if(expr.type().id()==ID_c_enum_tag)
   {
-    new_expr=expr;
-    new_expr.make_typecast(int_type);
+    new_expr = typecast_exprt(expr, int_type);
     return true;
   }
 
@@ -271,8 +265,7 @@ bool cpp_typecheckt::standard_conversion_floating_point_promotion(
   c_qualifierst qual_from;
   qual_from.read(expr.type());
 
-  new_expr=expr;
-  new_expr.make_typecast(double_type());
+  new_expr = typecast_exprt(expr, double_type());
   qual_from.write(new_expr.type());
 
   return true;
@@ -328,8 +321,7 @@ bool cpp_typecheckt::standard_conversion_integral_conversion(
 
   c_qualifierst qual_from;
   qual_from.read(expr.type());
-  new_expr=expr;
-  new_expr.make_typecast(type);
+  new_expr = typecast_exprt::conditional_cast(expr, type);
   qual_from.write(new_expr.type());
 
   return true;
@@ -382,8 +374,7 @@ bool cpp_typecheckt::standard_conversion_floating_integral_conversion(
 
   c_qualifierst qual_from;
   qual_from.read(expr.type());
-  new_expr=expr;
-  new_expr.make_typecast(type);
+  new_expr = typecast_exprt::conditional_cast(expr, type);
   qual_from.write(new_expr.type());
 
   return true;
@@ -425,8 +416,7 @@ bool cpp_typecheckt::standard_conversion_floating_point_conversion(
   c_qualifierst qual_from;
 
   qual_from.read(expr.type());
-  new_expr=expr;
-  new_expr.make_typecast(type);
+  new_expr = typecast_exprt::conditional_cast(expr, type);
   qual_from.write(new_expr.type());
 
   return true;
@@ -508,8 +498,7 @@ bool cpp_typecheckt::standard_conversion_pointer(
   {
     c_qualifierst qual_from;
     qual_from.read(expr.type().subtype());
-    new_expr=expr;
-    new_expr.make_typecast(type);
+    new_expr = typecast_exprt::conditional_cast(expr, type);
     qual_from.write(new_expr.type().subtype());
     return true;
   }
@@ -614,8 +603,7 @@ bool cpp_typecheckt::standard_conversion_pointer_to_member(
   if(expr.id()==ID_constant &&
      expr.get(ID_value)==ID_NULL)
   {
-    new_expr=expr;
-    new_expr.make_typecast(type);
+    new_expr = typecast_exprt::conditional_cast(expr, type);
     return true;
   }
 
@@ -627,8 +615,7 @@ bool cpp_typecheckt::standard_conversion_pointer_to_member(
 
   if(subtype_typecast(to_struct, from_struct))
   {
-    new_expr=expr;
-    new_expr.make_typecast(type);
+    new_expr = typecast_exprt::conditional_cast(expr, type);
     return true;
   }
 
@@ -664,8 +651,7 @@ bool cpp_typecheckt::standard_conversion_boolean(
   typet Bool = c_bool_type();
   qual_from.write(Bool);
 
-  new_expr=expr;
-  new_expr.make_typecast(Bool);
+  new_expr = typecast_exprt::conditional_cast(expr, Bool);
   return true;
 }
 
@@ -705,7 +691,7 @@ bool cpp_typecheckt::standard_conversion_sequence(
 
   // we turn bit fields into their underlying type
   if(curr_expr.type().id()==ID_c_bit_field)
-    curr_expr.make_typecast(curr_expr.type().subtype());
+    curr_expr = typecast_exprt(curr_expr, curr_expr.type().subtype());
 
   if(curr_expr.type().id()==ID_array)
   {
@@ -791,7 +777,7 @@ bool cpp_typecheckt::standard_conversion_sequence(
       if(expr.type().subtype().id()==ID_nullptr)
       {
         // std::nullptr_t to _any_ pointer type is ok
-        new_expr.make_typecast(type);
+        new_expr = typecast_exprt::conditional_cast(new_expr, type);
       }
       else if(!standard_conversion_pointer(curr_expr, type, new_expr))
       {
@@ -1278,7 +1264,7 @@ bool cpp_typecheckt::reference_binding(
       {
         c_qualifierst qual_from;
         qual_from.read(expr.type());
-        new_expr.make_typecast(type);
+        new_expr = typecast_exprt::conditional_cast(new_expr, type);
         qual_from.write(new_expr.type().subtype());
       }
 
@@ -1805,8 +1791,7 @@ bool cpp_typecheckt::reinterpret_typecast(
      (type.id()==ID_unsignedbv || type.id()==ID_signedbv))
   {
     // pointer to integer, always ok
-    new_expr=e;
-    new_expr.make_typecast(type);
+    new_expr = typecast_exprt::conditional_cast(e, type);
     return true;
   }
 
@@ -1825,8 +1810,7 @@ bool cpp_typecheckt::reinterpret_typecast(
     }
     else
     {
-      new_expr=e;
-      new_expr.make_typecast(type);
+      new_expr = typecast_exprt::conditional_cast(e, type);
     }
     return true;
   }
@@ -1837,16 +1821,13 @@ bool cpp_typecheckt::reinterpret_typecast(
   {
     // pointer to pointer: we ok it all.
     // This is more generous than the standard.
-    new_expr=expr;
-    new_expr.make_typecast(type);
+    new_expr = typecast_exprt::conditional_cast(expr, type);
     return true;
   }
 
   if(is_reference(type) && e.get_bool(ID_C_lvalue))
   {
-    exprt tmp=address_of_exprt(e);
-    tmp.make_typecast(type);
-    new_expr.swap(tmp);
+    new_expr = typecast_exprt::conditional_cast(address_of_exprt(e), type);
     return true;
   }
 
@@ -1919,8 +1900,7 @@ bool cpp_typecheckt::static_typecast(
 
   if(type.id()==ID_empty)
   {
-    new_expr=e;
-    new_expr.make_typecast(type);
+    new_expr = typecast_exprt::conditional_cast(e, type);
     return true;
   }
 
@@ -1930,8 +1910,7 @@ bool cpp_typecheckt::static_typecast(
       e.type().id()==ID_unsignedbv ||
       e.type().id()==ID_c_enum_tag))
   {
-    new_expr=e;
-    new_expr.make_typecast(type);
+    new_expr = typecast_exprt::conditional_cast(e, type);
     new_expr.remove(ID_C_lvalue);
     return true;
   }
@@ -1966,9 +1945,8 @@ bool cpp_typecheckt::static_typecast(
 
       if(from.id()==ID_empty)
       {
-          e.make_typecast(type);
-          new_expr.swap(e);
-          return true;
+        new_expr = typecast_exprt::conditional_cast(e, type);
+        return true;
       }
 
       if(to.id()==ID_struct && from.id()==ID_struct)
@@ -2007,8 +1985,7 @@ bool cpp_typecheckt::static_typecast(
 
       if(subtype_typecast(from_struct, to_struct))
       {
-        new_expr=e;
-        new_expr.make_typecast(type);
+        new_expr = typecast_exprt::conditional_cast(e, type);
         return true;
       }
     }

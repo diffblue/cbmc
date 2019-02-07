@@ -102,7 +102,7 @@ void goto_inlinet::parameter_assignments(
             f_acttype.id()==ID_array &&
             f_partype.subtype()==f_acttype.subtype()))
         {
-          actual.make_typecast(par_type);
+          actual = typecast_exprt(actual, par_type);
         }
         else if((f_partype.id()==ID_signedbv ||
                  f_partype.id()==ID_unsignedbv ||
@@ -111,7 +111,7 @@ void goto_inlinet::parameter_assignments(
                  f_acttype.id()==ID_unsignedbv ||
                  f_acttype.id()==ID_bool))
         {
-          actual.make_typecast(par_type);
+          actual = typecast_exprt(actual, par_type);
         }
         else
         {
@@ -191,15 +191,10 @@ void goto_inlinet::replace_return(
           continue;
         }
 
-        code_assignt code_assign(lhs, it->code.op0());
-
-        // this may happen if the declared return type at the call site
-        // differs from the defined return type
-        if(code_assign.lhs().type()!=
-           code_assign.rhs().type())
-          code_assign.rhs().make_typecast(code_assign.lhs().type());
-
-        it->code=code_assign;
+        // a typecast may be necessary if the declared return type at the call
+        // site differs from the defined return type
+        it->code = code_assignt(
+          lhs, typecast_exprt::conditional_cast(it->code.op0(), lhs.type()));
         it->type=ASSIGN;
 
         it++;
