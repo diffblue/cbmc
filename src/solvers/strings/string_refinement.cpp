@@ -1213,6 +1213,12 @@ static exprt negation_of_not_contains_constraint(
 
   // The negated existential becomes an universal, and this is the unrolling of
   // that universal quantifier.
+  // Ff the upper bound is smaller than the lower bound (specifically, it might
+  // actually be negative as it is initially unconstrained) then there is
+  // nothing to do (and the reserve call would fail).
+  if(ube < lbe)
+    return and_exprt(univ_bounds, get(constraint.premise));
+
   std::vector<exprt> conjuncts;
   conjuncts.reserve(numeric_cast_v<std::size_t>(ube - lbe));
   for(mp_integer i = lbe; i < ube; ++i)
