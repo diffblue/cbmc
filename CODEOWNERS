@@ -33,14 +33,14 @@
 /src/solvers/refinement @martin-cs @romainbrenguier @peterschrammel
 /src/solvers/strings @martin-cs @romainbrenguier @peterschrammel
 /jbmc/src/java_bytecode/ @smowton @mgudemann @thk123 @cristina-david @cesaro @pkesseli @NathanJPhillips @peterschrammel
-/src/analyses/ @martin-cs @peterschrammel @chrisr-diffblue @thk123 @smowton
+/src/analyses/ @martin-cs @peterschrammel @chrisr-diffblue @thk123 @smowton @danpoe
 /src/pointer-analysis/ @martin-cs @peterschrammel @chrisr-diffblue @smowton
 
 
 # These files change frequently and changes are medium-risk
 
-/src/goto-analyzer/ @martin-cs @chrisr-diffblue @peterschrammel
-/src/goto-instrument/ @martin-cs @chrisr-diffblue @peterschrammel
+/src/goto-analyzer/ @martin-cs @chrisr-diffblue @peterschrammel @danpoe @hannes-steffenhagen-diffblue
+/src/goto-instrument/ @martin-cs @chrisr-diffblue @peterschrammel @danpoe @hannes-steffenhagen-diffblue
 /src/goto-diff/ @tautschnig @peterschrammel
 /jbmc/src/jbmc/ @smowton @mgudemann @cristina-david @cesaro @pkesseli @peterschrammel
 /jbmc/src/janalyzer/ @smowton @mgudemann @cristina-david @cesaro @pkesseli @peterschrammel
@@ -62,5 +62,5 @@
 /scripts/delete_failing_smt2_solver_tests
 /scripts/expected_doxygen_warnings.txt
 
-/.travis.yml @diffblue/devops @thk123 @forejtv @peterschrammel
+/.travis.yml @diffblue/devops @thk123 @forejtv @peterschrammel @chrisr-diffblue
 /appveyor.yml @diffblue/devops @thk123 @forejtv @peterschrammel
