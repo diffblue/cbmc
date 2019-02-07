@@ -162,9 +162,8 @@ SCENARIO("byte_extract_lowering", "[core][solvers][lowering][byte_extract]")
             const exprt lower_be = lower_byte_extract(be, ns);
             const exprt lower_be_s = simplify_expr(lower_be, ns);
 
-            // TODO: does not currently hold
-            // REQUIRE(!has_subexpr(lower_be, ID_byte_extract_little_endian));
-            // REQUIRE(!has_subexpr(lower_be, ID_byte_extract_big_endian));
+            REQUIRE(!has_subexpr(lower_be, ID_byte_extract_little_endian));
+            REQUIRE(!has_subexpr(lower_be, ID_byte_extract_big_endian));
             REQUIRE(lower_be.type() == be.type());
             // TODO: does not currently hold
             // REQUIRE(lower_be == r);
