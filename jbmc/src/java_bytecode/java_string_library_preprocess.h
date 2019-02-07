@@ -221,6 +221,7 @@ private:
   refined_string_exprt replace_char_array(
     const exprt &array_pointer,
     const source_locationt &loc,
+    const irep_idt &function_name,
     symbol_table_baset &symbol_table,
     code_blockt &code);
 

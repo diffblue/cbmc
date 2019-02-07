@@ -341,7 +341,8 @@ exprt::operandst java_string_library_preprocesst::process_operands(
         convert_exprt_to_string_exprt(
           p, loc, symbol_table, function_id, init_code));
     else if(is_java_char_array_pointer_type(p.type()))
-      ops.push_back(replace_char_array(p, loc, symbol_table, init_code));
+      ops.push_back(
+        replace_char_array(p, loc, function_id, symbol_table, init_code));
     else
       ops.push_back(p);
   }
@@ -447,12 +448,14 @@ static exprt get_data(const exprt &expr, const symbol_tablet &symbol_table)
 /// array.
 /// \param array_pointer: an expression of type char array pointer
 /// \param loc: location in the source
+/// \param function_id: name of the function in which the string is defined
 /// \param symbol_table: symbol table
 /// \param code: code block, in which some assignments will be added
 /// \return a string expression
 refined_string_exprt java_string_library_preprocesst::replace_char_array(
   const exprt &array_pointer,
   const source_locationt &loc,
+  const irep_idt &function_id,
   symbol_table_baset &symbol_table,
   code_blockt &code)
 {
