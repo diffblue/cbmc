@@ -441,10 +441,8 @@ void goto_symext::symex_step(
     break;
 
   case RETURN:
-    if(!state.guard.is_false())
-      return_assignment(state);
-
-    symex_transition(state);
+    // This case should have been removed by return-value removal
+    UNREACHABLE;
     break;
 
   case ASSIGN:

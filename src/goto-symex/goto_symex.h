@@ -275,15 +275,13 @@ protected:
 
   virtual void loop_bound_exceeded(statet &, const exprt &guard);
 
-  // function calls
-
-  void pop_frame(statet &);
-  void return_assignment(statet &);
-
   virtual void no_body(const irep_idt &)
   {
   }
 
+  /// Symbolic execution of a function call.
+  /// Only functions that are symbols are supported, see
+  /// \ref goto_symext::symex_function_call_symbol
   virtual void symex_function_call(
     const get_goto_functiont &,
     statet &,
@@ -291,11 +289,23 @@ protected:
 
   virtual void symex_end_of_function(statet &);
 
+  /// Symbolic execution of a call to a function call.
+  /// For functions \c CBMC_trace and functions starting with \c __CPROVER_fkt
+  /// see \ref goto_symext::symex_trace and
+  /// \ref goto_symext::symex_fkt
+  /// For non-special functions see
+  /// \ref goto_symext::symex_function_call_code
   virtual void symex_function_call_symbol(
     const get_goto_functiont &,
     statet &,
     const code_function_callt &);
 
+  /// Symbolic execution of a function call by inlining.
+  /// Records the call in \p target by appending a function call step and:
+  ///   - if the body is available create a new frame, assigns the parameters,
+  ///    and proceed to executing the code of the function.
+  ///   - otherwise assign a nondetministic value to the left-hand-side of the
+  ///     call when there is one
   virtual void symex_function_call_code(
     const get_goto_functiont &,
     statet &,
@@ -306,16 +316,17 @@ protected:
     unsigned thread_nr,
     unsigned unwind);
 
+  /// Iterates over \p arguments and assigns them to the parameters, which are
+  /// symbols whose name and type are deduced from the type of \p goto_function.
+  /// \param function_identifier: name of the function
+  /// \param goto_function: function whose parameters we want to assign
+  /// \param [out] state: state of the goto program
+  /// \param arguments: arguments that are passed to the function
   void parameter_assignments(
     const irep_idt &function_identifier,
     const goto_functionst::goto_functiont &,
     statet &,
     const exprt::operandst &arguments);
-
-  void locality(
-    const irep_idt &function_identifier,
-    statet &,
-    const goto_functionst::goto_functiont &);
 
   // exceptions
   void symex_throw(statet &);

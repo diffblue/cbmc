@@ -18,6 +18,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/exception_utils.h>
 #include <util/invariant.h>
 
+static void locality(
+  const irep_idt &function_identifier,
+  goto_symext::statet &state,
+  const goto_functionst::goto_functiont &goto_function,
+  const namespacet &ns);
+
 bool goto_symext::get_unwind_recursion(const irep_idt &, unsigned, unsigned)
 {
   return false;
@@ -220,7 +226,6 @@ void goto_symext::symex_function_call_symbol(
     symex_function_call_code(get_goto_function, state, code);
 }
 
-/// do function call by inlining
 void goto_symext::symex_function_call_code(
   const get_goto_functiont &get_goto_function,
   statet &state,
@@ -300,7 +305,7 @@ void goto_symext::symex_function_call_code(
   framet &frame = state.new_frame();
 
   // preserve locality of local variables
-  locality(identifier, state, goto_function);
+  locality(identifier, state, goto_function, ns);
 
   // assign actuals to formal parameters
   parameter_assignments(identifier, goto_function, state, arguments);
@@ -327,7 +332,7 @@ void goto_symext::symex_function_call_code(
 }
 
 /// pop one call frame
-void goto_symext::pop_frame(statet &state)
+static void pop_frame(goto_symext::statet &state)
 {
   PRECONDITION(!state.call_stack().empty());
 
@@ -378,10 +383,11 @@ void goto_symext::symex_end_of_function(statet &state)
 
 /// preserves locality of local variables of a given function by applying L1
 /// renaming to the local identifiers
-void goto_symext::locality(
+static void locality(
   const irep_idt &function_identifier,
-  statet &state,
-  const goto_functionst::goto_functiont &goto_function)
+  goto_symext::statet &state,
+  const goto_functionst::goto_functiont &goto_function,
+  const namespacet &ns)
 {
   unsigned &frame_nr=
     state.threads[state.source.thread_nr].function_frame[function_identifier];
@@ -441,28 +447,3 @@ void goto_symext::locality(
   }
 }
 
-void goto_symext::return_assignment(statet &state)
-{
-  framet &frame = state.top();
-
-  const goto_programt::instructiont &instruction=*state.source.pc;
-  PRECONDITION(instruction.is_return());
-  const code_returnt &code = instruction.get_return();
-
-  target.location(state.guard.as_expr(), state.source);
-
-  PRECONDITION(code.operands().size() == 1 || frame.return_value.is_nil());
-
-  exprt value = code.return_value();
-
-  if(frame.return_value.is_not_nil())
-  {
-    code_assignt assignment(frame.return_value, value);
-
-    INVARIANT(
-      base_type_eq(assignment.lhs().type(), assignment.rhs().type(), ns),
-      "goto_symext::return_assignment type mismatch");
-
-    symex_assign(state, assignment);
-  }
-}
