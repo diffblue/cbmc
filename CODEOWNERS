@@ -40,6 +40,7 @@
 # These files change frequently and changes are medium-risk
 
 /src/goto-analyzer/ @martin-cs @chrisr-diffblue @peterschrammel @danpoe @hannes-steffenhagen-diffblue
+/src/goto-harness/ @martin-cs @chrisr-diffblue @peterschrammel @danpoe @hannes-steffenhagen-diffblue
 /src/goto-instrument/ @martin-cs @chrisr-diffblue @peterschrammel @danpoe @hannes-steffenhagen-diffblue
 /src/goto-diff/ @tautschnig @peterschrammel
 /jbmc/src/jbmc/ @smowton @mgudemann @cristina-david @cesaro @pkesseli @peterschrammel
