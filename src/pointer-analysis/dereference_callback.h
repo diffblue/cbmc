@@ -32,8 +32,7 @@ public:
   virtual void
   get_value_set(const exprt &expr, value_setst::valuest &value_set) const = 0;
 
-  virtual bool
-  get_or_create_failed_symbol(const exprt &expr, const symbolt *&symbol) = 0;
+  virtual const symbolt *get_or_create_failed_symbol(const exprt &expr) = 0;
 };
 
 #endif // CPROVER_POINTER_ANALYSIS_DEREFERENCE_CALLBACK_H

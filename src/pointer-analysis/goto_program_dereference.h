@@ -69,8 +69,7 @@ protected:
   DEPRECATED("Unused")
   virtual bool is_valid_object(const irep_idt &identifier);
 
-  bool get_or_create_failed_symbol(const exprt &expr, const symbolt *&symbol)
-    override;
+  const symbolt *get_or_create_failed_symbol(const exprt &expr) override;
 
   DEPRECATED("Unused")
   virtual void dereference_failure(

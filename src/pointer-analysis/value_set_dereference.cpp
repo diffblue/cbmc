@@ -122,10 +122,11 @@ exprt value_set_dereferencet::dereference(
   {
     // first see if we have a "failed object" for this pointer
 
-    const symbolt *failed_symbol;
     exprt failure_value;
 
-    if(dereference_callback.get_or_create_failed_symbol(pointer, failed_symbol))
+    if(
+      const symbolt *failed_symbol =
+        dereference_callback.get_or_create_failed_symbol(pointer))
     {
       // yes!
       failure_value=failed_symbol->symbol_expr();

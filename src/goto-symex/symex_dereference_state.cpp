@@ -26,11 +26,9 @@ Author: Daniel Kroening, kroening@kroening.com
 /// already exist.
 ///
 /// \param expr: expression to get or create a failed symbol for
-/// \param [out] symbol: failed symbol result
-/// \return true if we populated \p symbol
-bool symex_dereference_statet::get_or_create_failed_symbol(
-  const exprt &expr,
-  const symbolt *&symbol)
+/// \return pointer to the failed symbol for \p expr, or nullptr if none
+const symbolt *
+symex_dereference_statet::get_or_create_failed_symbol(const exprt &expr)
 {
   const namespacet &ns=goto_symex.ns;
 
@@ -39,13 +37,14 @@ bool symex_dereference_statet::get_or_create_failed_symbol(
   {
     const ssa_exprt &ssa_expr=to_ssa_expr(expr);
     if(ssa_expr.get_original_expr().id()!=ID_symbol)
-      return false;
+      return nullptr;
 
     const symbolt &ptr_symbol=
       ns.lookup(to_ssa_expr(expr).get_object_name());
 
     const irep_idt &failed_symbol = ptr_symbol.type.get(ID_C_failed_symbol);
 
+    const symbolt *symbol;
     if(failed_symbol!="" &&
         !ns.lookup(failed_symbol, symbol))
     {
@@ -55,8 +54,7 @@ bool symex_dereference_statet::get_or_create_failed_symbol(
       state.rename(sym_expr, ns, goto_symex_statet::L1);
       sym.name=to_ssa_expr(sym_expr).get_identifier();
       state.symbol_table.move(sym, sym_ptr);
-      symbol=sym_ptr;
-      return true;
+      return sym_ptr;
     }
   }
   else if(expr.id()==ID_symbol)
@@ -66,6 +64,7 @@ bool symex_dereference_statet::get_or_create_failed_symbol(
 
     const irep_idt &failed_symbol = ptr_symbol.type.get(ID_C_failed_symbol);
 
+    const symbolt *symbol;
     if(failed_symbol!="" &&
         !ns.lookup(failed_symbol, symbol))
     {
@@ -75,12 +74,11 @@ bool symex_dereference_statet::get_or_create_failed_symbol(
       state.rename(sym_expr, ns, goto_symex_statet::L1);
       sym.name=to_ssa_expr(sym_expr).get_identifier();
       state.symbol_table.move(sym, sym_ptr);
-      symbol=sym_ptr;
-      return true;
+      return sym_ptr;
     }
   }
 
-  return false;
+  return nullptr;
 }
 
 /// Just forwards a value-set query to `state.value_set`

@@ -20,30 +20,28 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/options.h>
 
 /// \param expr: expression to check
-/// \param [out] symbol: symbol which gets assigned the value from the
-///   `failed_symbol` comment
-/// \return true when `expr` is a symbol, whose type contains a `failed_symbol`
-///   comment which exists in the namespace.
-bool goto_program_dereferencet::get_or_create_failed_symbol(
-  const exprt &expr,
-  const symbolt *&symbol)
+/// \return pointer to appropriate failed symbol for \p expr, or nullptr if none
+const symbolt *
+goto_program_dereferencet::get_or_create_failed_symbol(const exprt &expr)
 {
   if(expr.id()==ID_symbol)
   {
     if(expr.get_bool(ID_C_invalid_object))
-      return false;
+      return nullptr;
 
     const symbolt &ptr_symbol = ns.lookup(to_symbol_expr(expr));
 
     const irep_idt &failed_symbol = ptr_symbol.type.get(ID_C_failed_symbol);
 
     if(failed_symbol.empty())
-      return false;
+      return nullptr;
 
-    return !ns.lookup(failed_symbol, symbol);
+    const symbolt *symbol = nullptr;
+    ns.lookup(failed_symbol, symbol);
+    return symbol;
   }
 
-  return false;
+  return nullptr;
 }
 
 /// \deprecated
