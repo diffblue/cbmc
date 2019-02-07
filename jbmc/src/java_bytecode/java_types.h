@@ -368,7 +368,7 @@ unsignedbv_typet java_char_type();
 floatbv_typet java_float_type();
 floatbv_typet java_double_type();
 c_bool_typet java_boolean_type();
-void_typet java_void_type();
+empty_typet java_void_type();
 reference_typet java_reference_type(const typet &subtype);
 reference_typet java_lang_object_type();
 struct_tag_typet java_classname(const std::string &);

@@ -54,8 +54,8 @@ void record_function_outputs(
   code_blockt &init_code,
   symbol_tablet &symbol_table)
 {
-  bool has_return_value=
-    to_code_type(function.type).return_type()!=empty_typet();
+  bool has_return_value =
+    to_code_type(function.type).return_type() != void_type();
 
   if(has_return_value)
   {
@@ -232,7 +232,7 @@ bool generate_ansi_c_start_function(
   call_main.add_source_location()=symbol.location;
   call_main.function().add_source_location()=symbol.location;
 
-  if(to_code_type(symbol.type).return_type()!=empty_typet())
+  if(to_code_type(symbol.type).return_type() != void_type())
   {
     auxiliary_symbolt return_symbol;
     return_symbol.mode=ID_C;
@@ -515,7 +515,7 @@ bool generate_ansi_c_start_function(
   symbolt new_symbol;
 
   new_symbol.name=goto_functionst::entry_point();
-  new_symbol.type = code_typet({}, empty_typet());
+  new_symbol.type = code_typet({}, void_type());
   new_symbol.value.swap(init_code);
   new_symbol.mode=symbol.mode;
 

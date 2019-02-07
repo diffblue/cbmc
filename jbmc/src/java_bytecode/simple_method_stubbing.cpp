@@ -187,7 +187,7 @@ void java_simple_method_stubst::create_method_stub(symbolt &symbol)
   else
   {
     const typet &required_return_type = required_type.return_type();
-    if(required_return_type != empty_typet())
+    if(required_return_type != java_void_type())
     {
       symbolt &to_return_symbol = get_fresh_aux_symbol(
         required_return_type,

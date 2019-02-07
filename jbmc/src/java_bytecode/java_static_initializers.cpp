@@ -352,7 +352,7 @@ static void create_clinit_wrapper_symbols(
 
   // Create symbol for the "clinit_wrapper"
   symbolt wrapper_method_symbol;
-  const java_method_typet wrapper_method_type({}, void_typet());
+  const java_method_typet wrapper_method_type({}, java_void_type());
   wrapper_method_symbol.name = clinit_wrapper_name(class_name);
   wrapper_method_symbol.pretty_name = wrapper_method_symbol.name;
   wrapper_method_symbol.base_name = "clinit_wrapper";
@@ -790,7 +790,7 @@ void stub_global_initializer_factoryt::create_stub_global_initializer_symbols(
       "a class cannot be both incomplete, and so have stub static fields, and "
       "also define a static initializer");
 
-    const java_method_typet thunk_type({}, void_typet());
+    const java_method_typet thunk_type({}, java_void_type());
 
     symbolt static_init_symbol;
     static_init_symbol.name = static_init_name;

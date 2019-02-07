@@ -86,7 +86,7 @@ bv_pointerst::bv_pointerst(
   pointer_logic(_ns)
 {
   object_bits=config.bv_encoding.object_bits;
-  std::size_t pointer_width=boolbv_width(pointer_type(void_type()));
+  std::size_t pointer_width = boolbv_width(pointer_type(empty_typet()));
   offset_bits=pointer_width-object_bits;
   bits=pointer_width;
 }

@@ -118,7 +118,7 @@ int main(int argc, char** argv)
   else if(arg=="data-invariant-string")
     DATA_INVARIANT(false, "Test invariant failure");
   else if(arg=="irep")
-    INVARIANT_WITH_IREP(false, "error with irep", pointer_type(void_typet()));
+    INVARIANT_WITH_IREP(false, "error with irep", pointer_type(empty_typet()));
   else if(arg == "invariant-diagnostics")
     INVARIANT_WITH_DIAGNOSTICS(
       false,

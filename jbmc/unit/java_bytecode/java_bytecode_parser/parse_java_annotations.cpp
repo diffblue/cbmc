@@ -139,7 +139,7 @@ SCENARIO(
         const auto &id =
           to_symbol_expr(element_value_pair.value).get_identifier();
         const auto &java_type = java_type_from_string(id2string(id));
-        REQUIRE(*java_type == void_type());
+        REQUIRE(*java_type == java_void_type());
       }
     }
     WHEN("Parsing an annotation with an array field.")

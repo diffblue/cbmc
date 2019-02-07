@@ -54,7 +54,7 @@ SCENARIO("constant_propagator", "[core][analyses][constant_propagator]")
 
     symbolt main_function_symbol;
     main_function_symbol.name = "main";
-    main_function_symbol.type = code_typet({}, void_typet());
+    main_function_symbol.type = code_typet({}, empty_typet());
     main_function_symbol.value = code;
     main_function_symbol.mode = ID_C;
 
@@ -146,7 +146,7 @@ SCENARIO("constant_propagator", "[core][analyses][constant_propagator]")
 
     symbolt main_function_symbol;
     main_function_symbol.name = "main";
-    main_function_symbol.type = code_typet({}, void_typet());
+    main_function_symbol.type = code_typet({}, empty_typet());
     main_function_symbol.value = code;
     main_function_symbol.mode = ID_C;
 
@@ -295,7 +295,7 @@ SCENARIO("constant_propagator", "[core][analyses][constant_propagator]")
 
     symbolt main_function_symbol;
     main_function_symbol.name = "main";
-    main_function_symbol.type = code_typet({}, void_typet());
+    main_function_symbol.type = code_typet({}, empty_typet());
     main_function_symbol.value = program;
     main_function_symbol.mode = ID_C;
 

@@ -250,9 +250,10 @@ reference_typet reference_type(const typet &subtype)
   return reference_typet(subtype, config.ansi_c.pointer_width);
 }
 
-typet void_type()
+empty_typet void_type()
 {
-  return empty_typet();
+  static const auto result = empty_typet();
+  return result;
 }
 
 std::string c_type_as_string(const irep_idt &c_type)

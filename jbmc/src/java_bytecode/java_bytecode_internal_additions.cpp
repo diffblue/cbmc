@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_bytecode_internal_additions.h"
 
 // For INFLIGHT_EXCEPTION_VARIABLE_NAME
+#include "java_types.h"
 #include "remove_exceptions.h"
 
 #include <util/std_types.h>
@@ -37,7 +38,7 @@ void java_internal_additions(symbol_table_baset &dest)
     symbolt symbol;
     symbol.base_name = CPROVER_PREFIX "malloc_object";
     symbol.name=CPROVER_PREFIX "malloc_object";
-    symbol.type=pointer_type(empty_typet());
+    symbol.type = pointer_type(java_void_type());
     symbol.mode=ID_C;
     symbol.is_lvalue=true;
     symbol.is_state_var=true;
@@ -50,7 +51,7 @@ void java_internal_additions(symbol_table_baset &dest)
     symbol.base_name = INFLIGHT_EXCEPTION_VARIABLE_BASENAME;
     symbol.name = INFLIGHT_EXCEPTION_VARIABLE_NAME;
     symbol.mode = ID_java;
-    symbol.type = pointer_type(empty_typet());
+    symbol.type = pointer_type(java_void_type());
     symbol.type.set(ID_C_no_nondet_initialization, true);
     symbol.value = null_pointer_exprt(to_pointer_type(symbol.type));
     symbol.is_file_local = false;

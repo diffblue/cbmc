@@ -30,6 +30,8 @@ Date:   December 2016
 
 #include <analyses/uncaught_exceptions_analysis.h>
 
+#include "java_types.h"
+
 /// Lowers high-level exception descriptions into low-level operations suitable
 /// for symex and other analyses that don't understand the THROW or CATCH GOTO
 /// instructions.
@@ -228,7 +230,7 @@ void remove_exceptionst::instrument_exception_handler(
     const symbol_exprt thrown_global_symbol=
       get_inflight_exception_global();
     // next we reset the exceptional return to NULL
-    null_pointer_exprt null_voidptr((pointer_type(empty_typet())));
+    null_pointer_exprt null_voidptr((pointer_type(java_void_type())));
 
     // add the assignment @inflight_exception = NULL
     goto_programt::targett t_null=goto_program.insert_after(instr_it);
@@ -443,7 +445,7 @@ bool remove_exceptionst::instrument_function_call(
   {
     equal_exprt no_exception_currently_in_flight(
       get_inflight_exception_global(),
-      null_pointer_exprt(pointer_type(empty_typet())));
+      null_pointer_exprt(pointer_type(java_void_type())));
 
     if(symbol_table.lookup_ref(callee_id).type.get_bool(ID_C_must_not_throw))
     {

@@ -349,12 +349,7 @@ void cpp_typecheckt::default_assignop_value(
   source_locationt source_location=declarator.source_location();
   declarator.make_nil();
 
-  declarator.value().add_source_location()=source_location;
-  declarator.value().id(ID_code);
-  declarator.value().set(ID_statement, ID_block);
-  declarator.value().type() = code_typet({}, empty_typet());
-
-  exprt &block=declarator.value();
+  code_blockt block;
 
   std::string arg_name("ref");
 
@@ -405,12 +400,11 @@ void cpp_typecheckt::default_assignop_value(
   }
 
   // Finally we add the return statement
-  block.operands().push_back(exprt(ID_code));
-  exprt &ret_code=declarator.value().operands().back();
-  ret_code.operands().push_back(exprt(ID_dereference));
-  ret_code.op0().operands().push_back(exprt("cpp-this"));
-  ret_code.set(ID_statement, ID_return);
-  ret_code.type() = code_typet({}, empty_typet());
+  block.add(
+    code_returnt(dereference_exprt(exprt("cpp-this"), uninitialized_typet())));
+
+  declarator.value() = std::move(block);
+  declarator.value().add_source_location() = source_location;
 }
 
 /// Check a constructor initialization-list. An initializer has to be a data

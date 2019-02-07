@@ -592,7 +592,7 @@ void java_object_factoryt::gen_nondet_pointer_init(
 
   // If this is a void* we *must* initialise with null:
   // (This can currently happen for some cases of #exception_value)
-  bool must_be_null = subtype == empty_typet();
+  bool must_be_null = subtype == java_void_type();
 
   // If we may be about to initialize a non-null enum type, always run the
   // clinit_wrapper of its class first.

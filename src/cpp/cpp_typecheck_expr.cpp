@@ -219,7 +219,7 @@ void cpp_typecheckt::typecheck_expr_trinary(if_exprt &expr)
       expr.type()=expr.op1().type();
     else if(expr.op1().type().id()==ID_empty &&
             expr.op2().type().id()==ID_empty)
-      expr.type()=empty_typet();
+      expr.type() = void_type();
     else
     {
       error().source_location=expr.find_source_location();
@@ -738,8 +738,7 @@ void cpp_typecheckt::typecheck_expr_address_of(exprt &expr)
 
 void cpp_typecheckt::typecheck_expr_throw(exprt &expr)
 {
-  // these are of type void
-  expr.type()=empty_typet();
+  expr.type() = void_type();
 
   assert(expr.operands().size()==1 ||
          expr.operands().empty());
@@ -1514,7 +1513,7 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
         {code_typet::parametert(ptr_arg.type()),
          code_typet::parametert(ptr_arg.type().subtype()),
          code_typet::parametert(signed_int_type())},
-        empty_typet());
+        void_type());
       symbol_exprt result(identifier, t);
       result.add_source_location() = source_location;
       expr.swap(result);
@@ -1588,7 +1587,7 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
         {code_typet::parametert(ptr_arg.type()),
          code_typet::parametert(ptr_arg.type()),
          code_typet::parametert(signed_int_type())},
-        empty_typet());
+        void_type());
       symbol_exprt result(identifier, t);
       result.add_source_location() = source_location;
       expr.swap(result);
@@ -1636,7 +1635,7 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
          code_typet::parametert(ptr_arg.type()),
          code_typet::parametert(ptr_arg.type()),
          code_typet::parametert(signed_int_type())},
-        empty_typet());
+        void_type());
       symbol_exprt result(identifier, t);
       result.add_source_location() = source_location;
       expr.swap(result);
@@ -1964,8 +1963,8 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
   else if(expr.function().id() == ID_cpp_dummy_destructor)
   {
     // these don't do anything, e.g., (char*)->~char()
-    expr.set(ID_statement, ID_skip);
-    expr.type()=empty_typet();
+    typecast_exprt no_op(from_integer(0, signed_int_type()), void_type());
+    expr.swap(no_op);
     return;
   }
 

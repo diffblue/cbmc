@@ -38,7 +38,7 @@ static void create_initialize(symbol_table_baset &symbol_table)
   initialize.base_name=INITIALIZE_FUNCTION;
   initialize.mode=ID_java;
 
-  initialize.type = java_method_typet({}, empty_typet());
+  initialize.type = java_method_typet({}, java_void_type());
 
   code_blockt init_code;
 
@@ -225,7 +225,7 @@ static void java_static_lifetime_init(
         // Then call the init function:
         code_block.add(std::move(initializer_call));
       }
-      else if(sym.value.is_nil() && sym.type!=empty_typet())
+      else if(sym.value.is_nil() && sym.type != java_void_type())
       {
         const bool is_class_model =
           has_suffix(id2string(sym.name), "@class_model");
@@ -446,7 +446,7 @@ void java_record_outputs(
   result.reserve(parameters.size()+1);
 
   bool has_return_value =
-    to_java_method_type(function.type).return_type() != empty_typet();
+    to_java_method_type(function.type).return_type() != java_void_type();
 
   if(has_return_value)
   {
@@ -702,7 +702,7 @@ bool generate_java_start_function(
 
   // if the method return type is not void, store return value in a new variable
   // named 'return'
-  if(to_java_method_type(symbol.type).return_type() != empty_typet())
+  if(to_java_method_type(symbol.type).return_type() != java_void_type())
   {
     auxiliary_symbolt return_symbol;
     return_symbol.mode=ID_java;
@@ -720,7 +720,7 @@ bool generate_java_start_function(
   exc_symbol.mode=ID_java;
   exc_symbol.name=JAVA_ENTRY_POINT_EXCEPTION_SYMBOL;
   exc_symbol.base_name=exc_symbol.name;
-  exc_symbol.type=java_reference_type(empty_typet());
+  exc_symbol.type = java_reference_type(java_void_type());
   symbol_table.add(exc_symbol);
 
   // Zero-initialise the top-level exception catch variable:
@@ -792,7 +792,7 @@ bool generate_java_start_function(
   symbolt new_symbol;
 
   new_symbol.name=goto_functionst::entry_point();
-  new_symbol.type = java_method_typet({}, empty_typet());
+  new_symbol.type = java_method_typet({}, java_void_type());
   new_symbol.value.swap(init_code);
   new_symbol.mode=ID_java;
 

@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "c_typecheck_base.h"
 
+#include <util/c_types.h>
 #include <util/config.h>
 #include <util/expr_initializer.h>
 
@@ -575,7 +576,7 @@ void c_typecheck_baset::typecheck_gcc_computed_goto(codet &code)
   assert(dest.operands().size()==1);
 
   typecheck_expr(dest.op0());
-  dest.type()=empty_typet();
+  dest.type() = void_type();
 }
 
 void c_typecheck_baset::typecheck_ifthenelse(code_ifthenelset &code)
