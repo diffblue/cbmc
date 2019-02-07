@@ -35,7 +35,12 @@ bool scratch_programt::check_sat(bool do_slice)
   output(ns, "scratch", std::cout);
 #endif
 
-  symex.symex_with_state(symex_state, functions, symex_symbol_table);
+  symex.symex_with_state(
+    symex_state,
+    [this](const irep_idt &key) -> const goto_functionst::goto_functiont & {
+      return functions.function_map.at(key);
+    },
+    symex_symbol_table);
 
   if(do_slice)
   {

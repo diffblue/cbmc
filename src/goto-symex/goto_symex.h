@@ -15,7 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/options.h>
 #include <util/message.h>
 
-#include <goto-programs/goto_functions.h>
+#include <goto-programs/abstract_goto_model.h>
 
 #include "goto_symex_state.h"
 #include "path_storage.h"
@@ -97,6 +97,9 @@ public:
     std::function<const goto_functionst::goto_functiont &(const irep_idt &)>
     get_goto_functiont;
 
+  /// Return a function to get/load a goto function from the given goto model
+  static get_goto_functiont get_goto_function(abstract_goto_modelt &);
+
   /// \brief symex entire program starting from entry point
   ///
   /// The state that goto_symext maintains has a large memory footprint.
@@ -116,18 +119,6 @@ public:
     const statet &saved_state,
     symex_target_equationt *saved_equation,
     symbol_tablet &new_symbol_table);
-
-  //// \brief symex entire program starting from entry point
-  ///
-  /// This method uses the `state` argument as the symbolic execution
-  /// state, which is useful for examining the state after this method
-  /// returns. The state that goto_symext maintains has a large memory
-  /// footprint, so if keeping the state around is not necessary,
-  /// clients should instead call goto_symext::symex_from_entry_point_of().
-  virtual void symex_with_state(
-    statet &,
-    const goto_functionst &,
-    symbol_tablet &);
 
   //// \brief symex entire program starting from entry point
   ///

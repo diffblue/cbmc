@@ -229,26 +229,6 @@ void goto_symext::symex_threaded_step(
   }
 }
 
-static goto_symext::get_goto_functiont get_function_from_goto_functions(
-  const goto_functionst &goto_functions)
-{
-  return [&goto_functions](
-           const irep_idt &key) -> const goto_functionst::goto_functiont & {
-    return goto_functions.function_map.at(key);
-  };
-}
-
-void goto_symext::symex_with_state(
-  statet &state,
-  const goto_functionst &goto_functions,
-  symbol_tablet &new_symbol_table)
-{
-  symex_with_state(
-    state,
-    get_function_from_goto_functions(goto_functions),
-    new_symbol_table);
-}
-
 void goto_symext::symex_with_state(
   statet &state,
   const get_goto_functiont &get_goto_function,
@@ -352,6 +332,15 @@ void goto_symext::symex_from_entry_point_of(
 
   symex_with_state(
     state, get_goto_function, new_symbol_table);
+}
+
+goto_symext::get_goto_functiont
+goto_symext::get_goto_function(abstract_goto_modelt &goto_model)
+{
+  return [&goto_model](
+           const irep_idt &id) -> const goto_functionst::goto_functiont & {
+    return goto_model.get_goto_function(id);
+  };
 }
 
 /// do just one step
