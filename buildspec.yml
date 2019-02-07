@@ -12,6 +12,11 @@ phases:
       - apt-get install -y openjdk-8-jdk
       - update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 1
       - update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-5 1
+      - pwd
+      - gcc test.c
+      - ls
+      - a.out || true
+      - ./a.out true || true
   build:
     commands:
       - echo Build started on `date`
