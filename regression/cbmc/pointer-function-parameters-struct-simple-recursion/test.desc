@@ -1,4 +1,4 @@
-CORE
+CORE broken-smt-backend
 main.c
 --function func --min-null-tree-depth 10 --max-nondet-tree-depth 3 --pointer-check
 ^EXIT=0$

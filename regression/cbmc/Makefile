@@ -4,7 +4,7 @@ test:
 	@../test.pl -p -c "../../../src/cbmc/cbmc --validate-goto-model" -X smt-backend
 
 test-cprover-smt2:
-	@../test.pl -p -c "../../../src/cbmc/cbmc --cprover-smt2"
+	@../test.pl -p -c "../../../src/cbmc/cbmc --cprover-smt2" -X broken-smt-backend
 
 test-paths-lifo:
 	@../test.pl -p -c "../../../src/cbmc/cbmc --paths lifo" -X thorough-paths -X smt-backend

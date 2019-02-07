@@ -1,4 +1,4 @@
-CORE
+CORE broken-smt-backend
 main.c
 --bounds-check --pointer-check
 ^EXIT=10$
