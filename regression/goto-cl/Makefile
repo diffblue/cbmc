@@ -7,11 +7,13 @@ ifeq ($(BUILD_ENV_),MSVC)
 test:
 	@../test.pl -p -c ../../../src/goto-cc/goto-cl -X goto-link
 	@cp ../../src/goto-cc/goto-cl.exe ../../src/goto-cc/goto-link.exe
+	@chmod a+x ../../src/goto-cc/goto-link.exe
 	@../test.pl -p -c ../../../src/goto-cc/goto-link -I goto-link
 
 tests.log: ../test.pl
 	@../test.pl -p -c ../../../src/goto-cc/goto-cl -X goto-link
 	@cp ../../src/goto-cc/goto-cl.exe ../../src/goto-cc/goto-link.exe
+	@chmod a+x ../../src/goto-cc/goto-link.exe
 	@../test.pl -p -c ../../../src/goto-cc/goto-link -I goto-link
 
 else
