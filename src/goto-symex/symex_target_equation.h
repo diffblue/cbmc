@@ -171,12 +171,12 @@ public:
   /// Converts assignments: set the equality _lhs==rhs_ to _True_.
   /// \param decision_procedure: A handle to a particular decision procedure
   ///  interface
-  void convert_assignments(decision_proceduret &decision_procedure) const;
+  void convert_assignments(decision_proceduret &decision_procedure);
 
   /// Converts declarations: these are effectively ignored by the decision
   /// procedure.
   /// \param prop_conv: A handle to a particular decision procedure interface
-  void convert_decls(prop_convt &prop_conv) const;
+  void convert_decls(prop_convt &prop_conv);
 
   /// Converts assumptions: convert the expression the assumption represents.
   /// \param prop_conv: A handle to a particular decision procedure interface
@@ -189,7 +189,7 @@ public:
   /// Converts constraints: set the represented condition to _True_.
   /// \param decision_procedure: A handle to a particular decision procedure
   ///  interface
-  void convert_constraints(decision_proceduret &decision_procedure) const;
+  void convert_constraints(decision_proceduret &decision_procedure);
 
   /// Converts goto instructions: convert the expression representing the
   /// condition of this goto.
@@ -321,6 +321,9 @@ public:
     // for slicing
     bool ignore=false;
 
+    // for incremental conversion
+    bool converted = false;
+
     SSA_stept(const sourcet &_source, goto_trace_stept::typet _type)
       : source(_source),
         type(_type),
@@ -354,7 +357,7 @@ public:
   {
     return narrow_cast<std::size_t>(std::count_if(
       SSA_steps.begin(), SSA_steps.end(), [](const SSA_stept &step) {
-        return step.is_assert();
+        return step.is_assert() && !step.ignore && !step.converted;
       }));
   }
 
