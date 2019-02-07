@@ -4,6 +4,7 @@ SRC = \
   goto_harness_generator_factory.cpp \
   goto_harness_main.cpp \
   goto_harness_parse_options.cpp \
+  memory_snapshot_harness_generator.cpp \
   recursive_initialization.cpp \
   # Empty last line
 
@@ -13,6 +14,8 @@ OBJ += \
   ../big-int/big-int$(LIBEXT) \
   ../langapi/langapi$(LIBEXT) \
   ../linking/linking$(LIBEXT) \
+  ../json/json$(LIBEXT) \
+  ../json-symtab-language/json-symtab-language$(LIBEXT) \
   # Empty last line
 
 INCLUDES= -I ..

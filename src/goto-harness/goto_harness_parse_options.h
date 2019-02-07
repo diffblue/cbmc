@@ -23,6 +23,7 @@ Author: Diffblue Ltd.
   "(version)"                                                                  \
   GOTO_HARNESS_FACTORY_OPTIONS                                                 \
   FUNCTION_HARNESS_GENERATOR_OPTIONS                                           \
+  MEMORY_SNAPSHOT_HARNESS_GENERATOR_OPTIONS                                    \
 // end GOTO_HARNESS_OPTIONS
 
 // clang-format on

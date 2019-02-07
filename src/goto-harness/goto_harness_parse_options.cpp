@@ -25,6 +25,7 @@ Author: Diffblue Ltd.
 
 #include "function_call_harness_generator.h"
 #include "goto_harness_generator_factory.h"
+#include "memory_snapshot_harness_generator.h"
 
 // The basic idea is that this module is handling the following
 // sequence of events:
@@ -103,7 +104,8 @@ void goto_harness_parse_optionst::help()
        "generate\n"
     << "--harness-type             one of the harness types listed below\n"
     << "\n\n"
-    << FUNCTION_HARNESS_GENERATOR_HELP << messaget::eom;
+    << FUNCTION_HARNESS_GENERATOR_HELP << "\n\n"
+    << MEMORY_SNAPSHOT_HARNESS_GENERATOR_HELP << messaget::eom;
 }
 
 goto_harness_parse_optionst::goto_harness_parse_optionst(
@@ -162,6 +164,12 @@ goto_harness_generator_factoryt goto_harness_parse_optionst::make_factory()
     return util_make_unique<function_call_harness_generatort>(
       ui_message_handler);
   });
+
+  factory.register_generator("initialise-with-memory-snapshot", [this]() {
+    return util_make_unique<memory_snapshot_harness_generatort>(
+      ui_message_handler);
+  });
+
   return factory;
 }
 
