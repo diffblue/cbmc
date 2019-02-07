@@ -918,6 +918,15 @@ void smt2_convt::convert_expr(const exprt &expr)
   {
     convert_constant(to_constant_expr(expr));
   }
+  else if(expr.id() == ID_concatenation && expr.operands().size() == 1)
+  {
+    DATA_INVARIANT_WITH_DIAGNOSTICS(
+      expr.type() == expr.operands().front().type(),
+      "concatenation over a single operand should have matching types",
+      expr.pretty());
+
+    convert_expr(expr.operands().front());
+  }
   else if(expr.id()==ID_concatenation ||
           expr.id()==ID_bitand ||
           expr.id()==ID_bitor ||
