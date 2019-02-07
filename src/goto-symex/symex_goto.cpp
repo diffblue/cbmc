@@ -207,7 +207,8 @@ void goto_symext::symex_goto(statet &state)
     log.debug() << "Saving jump target '"
                 << jump_target.state.saved_target->source_location << "'"
                 << log.eom;
-    path_storage.push(next_instruction, jump_target);
+    path_storage.push(next_instruction);
+    path_storage.push(jump_target);
 
     // It is now up to the caller of symex to decide which path to continue
     // executing. Signal to the caller that states have been pushed (therefore

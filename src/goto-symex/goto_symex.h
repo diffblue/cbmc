@@ -15,7 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/options.h>
 #include <util/message.h>
 
-#include <goto-programs/goto_functions.h>
+#include <goto-programs/abstract_goto_model.h>
 
 #include "goto_symex_state.h"
 #include "path_storage.h"
@@ -97,6 +97,9 @@ public:
     std::function<const goto_functionst::goto_functiont &(const irep_idt &)>
     get_goto_functiont;
 
+  /// Return a function to get/load a goto function from the given goto model
+  static get_goto_functiont get_goto_function(abstract_goto_modelt &);
+
   /// \brief symex entire program starting from entry point
   ///
   /// The state that goto_symext maintains has a large memory footprint.
@@ -104,6 +107,11 @@ public:
   /// has completed, so use it if you don't care about having the state
   /// around afterwards.
   virtual void symex_from_entry_point_of(
+    const get_goto_functiont &get_goto_function,
+    symbol_tablet &new_symbol_table);
+
+  /// Puts the initial state of the entry point function into the path storage
+  virtual void initialize_path_storage_from_entry_point_of(
     const get_goto_functiont &get_goto_function,
     symbol_tablet &new_symbol_table);
 
@@ -116,18 +124,6 @@ public:
     const statet &saved_state,
     symex_target_equationt *saved_equation,
     symbol_tablet &new_symbol_table);
-
-  //// \brief symex entire program starting from entry point
-  ///
-  /// This method uses the `state` argument as the symbolic execution
-  /// state, which is useful for examining the state after this method
-  /// returns. The state that goto_symext maintains has a large memory
-  /// footprint, so if keeping the state around is not necessary,
-  /// clients should instead call goto_symext::symex_from_entry_point_of().
-  virtual void symex_with_state(
-    statet &,
-    const goto_functionst &,
-    symbol_tablet &);
 
   //// \brief symex entire program starting from entry point
   ///
@@ -167,6 +163,14 @@ protected:
     const irep_idt &function_identifier,
     goto_programt::const_targett pc,
     goto_programt::const_targett limit);
+
+  /// Initialize the symbolic execution and the given state with
+  /// the beginning of the entry point function.
+  /// \param get_goto_function: producer for GOTO functions
+  /// \param state: Symex state to initialize.
+  void initialize_entry_point_state(
+    const get_goto_functiont &get_goto_function,
+    statet &state);
 
   /// Invokes symex_step and verifies whether additional threads can be
   /// executed.

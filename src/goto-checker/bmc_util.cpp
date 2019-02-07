@@ -302,7 +302,7 @@ void output_coverage_report(
   }
 }
 
-static void postprocess_equation(
+void postprocess_equation(
   symex_bmct &symex,
   symex_target_equationt &equation,
   const optionst &options,
@@ -328,45 +328,4 @@ static void postprocess_equation(
   {
     symex.validate(validation_modet::INVARIANT);
   }
-}
-
-void perform_symex(
-  abstract_goto_modelt &goto_model,
-  symex_bmct &symex,
-  symbol_tablet &symex_symbol_table,
-  symex_target_equationt &equation,
-  const optionst &options,
-  const namespacet &ns,
-  ui_message_handlert &ui_message_handler)
-{
-  auto get_goto_function =
-    [&goto_model](
-      const irep_idt &id) -> const goto_functionst::goto_functiont & {
-    return goto_model.get_goto_function(id);
-  };
-
-  symex.symex_from_entry_point_of(get_goto_function, symex_symbol_table);
-
-  postprocess_equation(symex, equation, options, ns, ui_message_handler);
-}
-
-void perform_symex(
-  abstract_goto_modelt &goto_model,
-  symex_bmct &symex,
-  path_storaget::patht &resume,
-  symbol_tablet &symex_symbol_table,
-  const optionst &options,
-  const namespacet &ns,
-  ui_message_handlert &ui_message_handler)
-{
-  auto get_goto_function =
-    [&goto_model](
-      const irep_idt &id) -> const goto_functionst::goto_functiont & {
-    return goto_model.get_goto_function(id);
-  };
-
-  symex.resume_symex_from_saved_state(
-    get_goto_function, resume.state, &resume.equation, symex_symbol_table);
-
-  postprocess_equation(symex, resume.equation, options, ns, ui_message_handler);
 }
