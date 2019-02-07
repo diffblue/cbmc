@@ -588,6 +588,23 @@ public:
     return t;
   }
 
+  optionalt<const_targett> get_target(const unsigned location_number) const
+  {
+    PRECONDITION(!instructions.empty());
+
+    const unsigned start_location_number = instructions.front().location_number;
+
+    if(
+      location_number < start_location_number ||
+      location_number > instructions.back().location_number)
+    {
+      return nullopt;
+    }
+
+    return std::next(
+      instructions.begin(), location_number - start_location_number);
+  }
+
   template <typename Target>
   std::list<Target> get_successors(Target target) const;
 
