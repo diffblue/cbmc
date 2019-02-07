@@ -48,8 +48,8 @@ void _rw_set_loct::compute()
 {
   if(target->is_assign())
   {
-    assert(target->code.operands().size()==2);
-    assign(target->code.op0(), target->code.op1());
+    const auto &assignment = target->get_assign();
+    assign(assignment.lhs(), assignment.rhs());
   }
   else if(target->is_goto() ||
           target->is_assume() ||

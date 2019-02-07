@@ -379,7 +379,7 @@ void acceleratet::add_dirty_checks()
     // variables is clean _before_ clearing any dirty flags.
     if(it->is_assign())
     {
-      exprt &lhs=it->code.op0();
+      exprt &lhs = it->get_assign().lhs();
       expr_mapt::iterator dirty_var=dirty_vars_map.find(lhs);
 
       if(dirty_var!=dirty_vars_map.end())
@@ -398,7 +398,7 @@ void acceleratet::add_dirty_checks()
 
     if(it->is_assign())
     {
-      find_symbols(it->code.op1(), read);
+      find_symbols(it->get_assign().rhs(), read);
     }
 
     for(find_symbols_sett::iterator jt=read.begin();

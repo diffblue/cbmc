@@ -317,18 +317,19 @@ void goto_convertt::convert_label(
     // the body of the thread is expected to be
     // in the operand.
     DATA_INVARIANT(
-      code.op0().is_not_nil(), "op0 in magic thread creation label is null");
+      to_code_label(code).code().is_not_nil(),
+      "code() in magic thread creation label is null");
 
     // replace the magic thread creation label with a
     // thread block (START_THREAD...END_THREAD).
     code_blockt thread_body;
-    thread_body.add(to_code(code.op0()));
+    thread_body.add(to_code_label(code).code());
     thread_body.add_source_location()=code.source_location();
     generate_thread_block(thread_body, dest, mode);
   }
   else
   {
-    convert(to_code(code.op0()), tmp, mode);
+    convert(to_code_label(code).code(), tmp, mode);
 
     goto_programt::targett target=tmp.instructions.begin();
     dest.destructive_append(tmp);

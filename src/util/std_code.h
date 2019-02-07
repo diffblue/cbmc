@@ -48,6 +48,15 @@ public:
     set_statement(statement);
   }
 
+  /// \param statement: Specifies the type of the `codet` to be constructed,
+  ///   e.g. `ID_block` for a \ref code_blockt or `ID_assign` for a
+  ///   \ref code_assignt.
+  /// \param _op: any operands to be added
+  explicit codet(const irep_idt &statement, operandst _op) : codet(statement)
+  {
+    operands() = std::move(_op);
+  }
+
   void set_statement(const irep_idt &statement)
   {
     set(ID_statement, statement);
@@ -62,6 +71,8 @@ public:
   const codet &first_statement() const;
   codet &last_statement();
   const codet &last_statement() const;
+
+  DEPRECATED("use code_blockt(...) instead")
   class code_blockt &make_block();
 
   /// Check that the code statement is well-formed (shallow checks only, i.e.,
@@ -176,14 +187,14 @@ public:
     return result;
   }
 
-  explicit code_blockt(const std::vector<codet> &_statements):codet(ID_block)
+  explicit code_blockt(const std::vector<codet> &_statements)
+    : codet(ID_block, (const std::vector<exprt> &)_statements)
   {
-    operands()=(const std::vector<exprt> &)_statements;
   }
 
-  explicit code_blockt(std::vector<codet> &&_statements):codet(ID_block)
+  explicit code_blockt(std::vector<codet> &&_statements)
+    : codet(ID_block, std::move((std::vector<exprt> &&) _statements))
   {
-    operands()=std::move((std::vector<exprt> &&)_statements);
   }
 
   void add(const codet &code)
@@ -240,6 +251,12 @@ public:
   code_skipt():codet(ID_skip)
   {
   }
+
+protected:
+  using codet::op0;
+  using codet::op1;
+  using codet::op2;
+  using codet::op3;
 };
 
 template<> inline bool can_cast_expr<code_skipt>(const exprt &base)
@@ -261,9 +278,9 @@ public:
     operands().resize(2);
   }
 
-  code_assignt(const exprt &lhs, const exprt &rhs):codet(ID_assign)
+  code_assignt(const exprt &lhs, const exprt &rhs)
+    : codet(ID_assign, {lhs, rhs})
   {
-    add_to_operands(lhs, rhs);
   }
 
   exprt &lhs()
@@ -319,6 +336,12 @@ public:
 
     validate(code, ns, vm);
   }
+
+protected:
+  using codet::op0;
+  using codet::op1;
+  using codet::op2;
+  using codet::op3;
 };
 
 template<> inline bool can_cast_expr<code_assignt>(const exprt &base)
@@ -424,9 +447,8 @@ inline code_declt &to_code_decl(codet &code)
 class code_deadt:public codet
 {
 public:
-  explicit code_deadt(const symbol_exprt &symbol) : codet(ID_dead)
+  explicit code_deadt(const symbol_exprt &symbol) : codet(ID_dead, {symbol})
   {
-    add_to_operands(symbol);
   }
 
   symbol_exprt &symbol()
@@ -458,6 +480,12 @@ public:
       "removing a non-symbol: " +
         id2string(to_symbol_expr(code.op0()).get_identifier()) + "from scope");
   }
+
+protected:
+  using codet::op0;
+  using codet::op1;
+  using codet::op2;
+  using codet::op3;
 };
 
 template<> inline bool can_cast_expr<code_deadt>(const exprt &base)
@@ -502,9 +530,8 @@ public:
     operands().resize(1);
   }
 
-  explicit code_assumet(const exprt &expr):codet(ID_assume)
+  explicit code_assumet(const exprt &expr) : codet(ID_assume, {expr})
   {
-    add_to_operands(expr);
   }
 
   const exprt &assumption() const
@@ -516,6 +543,12 @@ public:
   {
     return op0();
   }
+
+protected:
+  using codet::op0;
+  using codet::op1;
+  using codet::op2;
+  using codet::op3;
 };
 
 template<> inline bool can_cast_expr<code_assumet>(const exprt &base)
@@ -554,9 +587,8 @@ public:
     operands().resize(1);
   }
 
-  explicit code_assertt(const exprt &expr):codet(ID_assert)
+  explicit code_assertt(const exprt &expr) : codet(ID_assert, {expr})
   {
-    add_to_operands(expr);
   }
 
   const exprt &assertion() const
@@ -568,6 +600,12 @@ public:
   {
     return op0();
   }
+
+protected:
+  using codet::op0;
+  using codet::op1;
+  using codet::op2;
+  using codet::op3;
 };
 
 template<> inline bool can_cast_expr<code_assertt>(const exprt &base)
@@ -627,16 +665,14 @@ public:
     const exprt &condition,
     const codet &then_code,
     const codet &else_code)
-    : codet(ID_ifthenelse)
+    : codet(ID_ifthenelse, {condition, then_code, else_code})
   {
-    add_to_operands(condition, then_code, else_code);
   }
 
   /// An if \p condition then \p then_code statement (no "else" case).
   code_ifthenelset(const exprt &condition, const codet &then_code)
-    : codet(ID_ifthenelse)
+    : codet(ID_ifthenelse, {condition, then_code, nil_exprt()})
   {
-    add_to_operands(condition, then_code, nil_exprt());
   }
 
   const exprt &cond() const
@@ -673,6 +709,12 @@ public:
   {
     return static_cast<codet &>(op2());
   }
+
+protected:
+  using codet::op0;
+  using codet::op1;
+  using codet::op2;
+  using codet::op3;
 };
 
 template<> inline bool can_cast_expr<code_ifthenelset>(const exprt &base)
@@ -711,11 +753,9 @@ public:
     operands().resize(2);
   }
 
-  code_switcht(const exprt &_value, const codet &_body) : codet(ID_switch)
+  code_switcht(const exprt &_value, const codet &_body)
+    : codet(ID_switch, {_value, _body})
   {
-    operands().resize(2);
-    value() = _value;
-    body() = _body;
   }
 
   const exprt &value() const
@@ -737,6 +777,12 @@ public:
   {
     return static_cast<codet &>(op1());
   }
+
+protected:
+  using codet::op0;
+  using codet::op1;
+  using codet::op2;
+  using codet::op3;
 };
 
 template<> inline bool can_cast_expr<code_switcht>(const exprt &base)
@@ -773,11 +819,9 @@ public:
     operands().resize(2);
   }
 
-  code_whilet(const exprt &_cond, const codet &_body) : codet(ID_while)
+  code_whilet(const exprt &_cond, const codet &_body)
+    : codet(ID_while, {_cond, _body})
   {
-    operands().resize(2);
-    cond() = _cond;
-    body() = _body;
   }
 
   const exprt &cond() const
@@ -799,6 +843,12 @@ public:
   {
     return static_cast<codet &>(op1());
   }
+
+protected:
+  using codet::op0;
+  using codet::op1;
+  using codet::op2;
+  using codet::op3;
 };
 
 template<> inline bool can_cast_expr<code_whilet>(const exprt &base)
@@ -835,11 +885,9 @@ public:
     operands().resize(2);
   }
 
-  code_dowhilet(const exprt &_cond, const codet &_body) : codet(ID_dowhile)
+  code_dowhilet(const exprt &_cond, const codet &_body)
+    : codet(ID_dowhile, {_cond, _body})
   {
-    operands().resize(2);
-    cond() = _cond;
-    body() = _body;
   }
 
   const exprt &cond() const
@@ -861,6 +909,12 @@ public:
   {
     return static_cast<codet &>(op1());
   }
+
+protected:
+  using codet::op0;
+  using codet::op1;
+  using codet::op2;
+  using codet::op3;
 };
 
 template<> inline bool can_cast_expr<code_dowhilet>(const exprt &base)
@@ -906,11 +960,8 @@ public:
     const exprt &_cond,
     const exprt &_iter,
     const codet &_body)
-    : codet(ID_for)
+    : codet(ID_for, {_init, _cond, _iter, _body})
   {
-    reserve_operands(4);
-    add_to_operands(_init, _cond, _iter);
-    add_to_operands(_body);
   }
 
   // nil or a statement
@@ -953,6 +1004,12 @@ public:
   {
     return static_cast<codet &>(op3());
   }
+
+protected:
+  using codet::op0;
+  using codet::op1;
+  using codet::op2;
+  using codet::op3;
 };
 
 template<> inline bool can_cast_expr<code_fort>(const exprt &base)
@@ -1002,6 +1059,12 @@ public:
   {
     return get(ID_destination);
   }
+
+protected:
+  using codet::op0;
+  using codet::op1;
+  using codet::op2;
+  using codet::op3;
 };
 
 template<> inline bool can_cast_expr<code_gotot>(const exprt &base)
@@ -1155,6 +1218,12 @@ public:
 
     validate(code, ns, vm);
   }
+
+protected:
+  using codet::op0;
+  using codet::op1;
+  using codet::op2;
+  using codet::op3;
 };
 
 template<> inline bool can_cast_expr<code_function_callt>(const exprt &base)
@@ -1192,9 +1261,8 @@ public:
     op0().make_nil();
   }
 
-  explicit code_returnt(const exprt &_op):codet(ID_return)
+  explicit code_returnt(const exprt &_op) : codet(ID_return, {_op})
   {
-    add_to_operands(_op);
   }
 
   const exprt &return_value() const
@@ -1220,6 +1288,12 @@ public:
   {
     DATA_CHECK(vm, code.operands().size() == 1, "return must have one operand");
   }
+
+protected:
+  using codet::op0;
+  using codet::op1;
+  using codet::op2;
+  using codet::op3;
 };
 
 template<> inline bool can_cast_expr<code_returnt>(const exprt &base)
@@ -1251,24 +1325,23 @@ inline void validate_expr(const code_returnt &x)
 class code_labelt:public codet
 {
 public:
-  DEPRECATED("use code_labelt(label) instead")
+  DEPRECATED("use code_labelt(label, _code) instead")
   code_labelt():codet(ID_label)
   {
     operands().resize(1);
   }
 
+  DEPRECATED("use code_labelt(label, _code) instead")
   explicit code_labelt(const irep_idt &_label):codet(ID_label)
   {
     operands().resize(1);
     set_label(_label);
   }
 
-  code_labelt(
-    const irep_idt &_label, const codet &_code):codet(ID_label)
+  code_labelt(const irep_idt &_label, const codet &_code)
+    : codet(ID_label, {_code})
   {
-    operands().resize(1);
     set_label(_label);
-    code()=_code;
   }
 
   const irep_idt &get_label() const
@@ -1290,6 +1363,12 @@ public:
   {
     return static_cast<const codet &>(op0());
   }
+
+protected:
+  using codet::op0;
+  using codet::op1;
+  using codet::op2;
+  using codet::op3;
 };
 
 template<> inline bool can_cast_expr<code_labelt>(const exprt &base)
@@ -1327,10 +1406,9 @@ public:
     operands().resize(2);
   }
 
-  code_switch_caset(
-    const exprt &_case_op, const codet &_code):codet(ID_switch_case)
+  code_switch_caset(const exprt &_case_op, const codet &_code)
+    : codet(ID_switch_case, {_case_op, _code})
   {
-    add_to_operands(_case_op, _code);
   }
 
   bool is_default() const
@@ -1362,6 +1440,12 @@ public:
   {
     return static_cast<const codet &>(op1());
   }
+
+protected:
+  using codet::op0;
+  using codet::op1;
+  using codet::op2;
+  using codet::op3;
 };
 
 template<> inline bool can_cast_expr<code_switch_caset>(const exprt &base)
@@ -1398,6 +1482,12 @@ public:
   code_breakt():codet(ID_break)
   {
   }
+
+protected:
+  using codet::op0;
+  using codet::op1;
+  using codet::op2;
+  using codet::op3;
 };
 
 template<> inline bool can_cast_expr<code_breakt>(const exprt &base)
@@ -1428,6 +1518,12 @@ public:
   code_continuet():codet(ID_continue)
   {
   }
+
+protected:
+  using codet::op0;
+  using codet::op1;
+  using codet::op2;
+  using codet::op3;
 };
 
 template<> inline bool can_cast_expr<code_continuet>(const exprt &base)
@@ -1458,9 +1554,8 @@ public:
   {
   }
 
-  explicit code_asmt(const exprt &expr):codet(ID_asm)
+  explicit code_asmt(const exprt &expr) : codet(ID_asm, {expr})
   {
-    add_to_operands(expr);
   }
 
   const irep_idt &get_flavor() const
@@ -1505,9 +1600,8 @@ public:
     operands().resize(1);
   }
 
-  explicit code_expressiont(const exprt &expr):codet(ID_expression)
+  explicit code_expressiont(const exprt &expr) : codet(ID_expression, {expr})
   {
-    add_to_operands(expr);
   }
 
   const exprt &expression() const
@@ -1519,6 +1613,12 @@ public:
   {
     return op0();
   }
+
+protected:
+  using codet::op0;
+  using codet::op1;
+  using codet::op2;
+  using codet::op3;
 };
 
 template<> inline bool can_cast_expr<code_expressiont>(const exprt &base)
@@ -1996,6 +2096,12 @@ public:
   const exception_listt &exception_list() const {
     return (const exception_listt &)find(ID_exception_list).get_sub();
   }
+
+protected:
+  using codet::op0;
+  using codet::op1;
+  using codet::op2;
+  using codet::op3;
 };
 
 template<> inline bool can_cast_expr<code_push_catcht>(const exprt &base)
@@ -2027,6 +2133,12 @@ public:
   code_pop_catcht():codet(ID_pop_catch)
   {
   }
+
+protected:
+  using codet::op0;
+  using codet::op1;
+  using codet::op2;
+  using codet::op3;
 };
 
 template<> inline bool can_cast_expr<code_pop_catcht>(const exprt &base)
@@ -2072,6 +2184,12 @@ class code_landingpadt:public codet
   {
     return op0();
   }
+
+protected:
+  using codet::op0;
+  using codet::op1;
+  using codet::op2;
+  using codet::op3;
 };
 
 template<> inline bool can_cast_expr<code_landingpadt>(const exprt &base)
@@ -2105,9 +2223,9 @@ public:
   }
 
   /// A statement representing try \p _try_code catch ...
-  explicit code_try_catcht(const codet &_try_code) : codet(ID_try_catch)
+  explicit code_try_catcht(const codet &_try_code)
+    : codet(ID_try_catch, {_try_code})
   {
-    add_to_operands(_try_code);
   }
 
   codet &try_code()
@@ -2148,6 +2266,12 @@ public:
   {
     add_to_operands(to_catch, code_catch);
   }
+
+protected:
+  using codet::op0;
+  using codet::op1;
+  using codet::op2;
+  using codet::op3;
 };
 
 template<> inline bool can_cast_expr<code_try_catcht>(const exprt &base)

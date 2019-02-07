@@ -326,7 +326,7 @@ void cpp_typecheckt::zero_initializer(
     code_assignt assign(object, *value);
     assign.add_source_location()=source_location;
 
-    typecheck_expr(assign.op0());
+    typecheck_expr(assign.lhs());
     assign.lhs().type().set(ID_C_constant, false);
     already_typechecked(assign.lhs());
 

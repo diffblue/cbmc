@@ -840,10 +840,10 @@ void jsil_typecheckt::typecheck_ifthenelse(code_ifthenelset &code)
 
 void jsil_typecheckt::typecheck_assign(code_assignt &code)
 {
-  typecheck_expr(code.op0());
-  typecheck_expr(code.op1());
+  typecheck_expr(code.lhs());
+  typecheck_expr(code.rhs());
 
-  make_type_compatible(code.op0(), code.op1().type(), false);
+  make_type_compatible(code.lhs(), code.rhs().type(), false);
 }
 
 /// typechecking procedure declaration; any other symbols should have been
