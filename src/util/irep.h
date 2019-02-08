@@ -81,20 +81,11 @@ inline const std::string &name2string(const irep_namet &n)
 class irept;
 const irept &get_nil_irep();
 
-/// \brief Base class for tree-like data structures with sharing
+/// A node with data in a tree, it contains:
 ///
-/// There are a large number of kinds of tree structured or tree-like data in
-/// CPROVER. \ref irept provides a single, unified representation for all of
-/// these, allowing structure sharing and reference counting of data. As
-/// such \ref irept is the basic unit of data in CPROVER.  Each \ref irept
-/// contains (or references, if reference counted data sharing is enabled, as
-/// it is by default - see the `SHARING` macro) a basic unit of data (of type
-/// \ref dt) which contains four things:
-///
-/// * \ref irept::dt::data : A string, which is returned when the \ref id()
-///   function is used. (Unless `USE_STD_STRING` is set, this is actually a
-///   \ref dstringt and thus an integer which is a reference into a string
-///   table.)
+/// * \ref irept::dt::data : A string (Unless `USE_STD_STRING` is set, this is
+///   actually a \ref dstringt and thus an integer which is a reference into a
+///   string table.)
 ///
 /// * \ref irept::dt::named_sub : A map from `irep_namet` (a string) to \ref
 ///   irept. This is used for named children, i.e.  subexpressions, parameters,
@@ -104,6 +95,86 @@ const irept &get_nil_irep();
 /// * \ref irept::dt::sub : A vector of \ref irept which is used to store
 ///   ordered but unnamed children.
 ///
+/// * \c ref_count : if sharing is activated, this is used to count the number
+///   of references to a node.
+///
+/// * \c hash_code : if HASH_CODE is activated, this is used to cache the
+///   result of the hash function.
+template <typename treet>
+class tree_nodet
+{
+public:
+  // These are not stable.
+  typedef std::vector<treet> subt;
+
+// named_subt has to provide stable references; with C++11 we could
+// use std::forward_list or std::vector< unique_ptr<T> > to save
+// memory and increase efficiency.
+
+#ifdef NAMED_SUB_IS_FORWARD_LIST
+  typedef std::forward_list<std::pair<irep_namet, treet>> named_subt;
+#else
+  typedef std::map<irep_namet, treet> named_subt;
+#endif
+
+  friend treet;
+
+#ifdef SHARING
+  unsigned ref_count = 1;
+#endif
+
+  /// This irep_idt is the only place to store data in an tree node
+  irep_idt data;
+
+  named_subt named_sub;
+  subt sub;
+
+#ifdef HASH_CODE
+  mutable std::size_t hash_code = 0;
+#endif
+
+  void clear()
+  {
+    data.clear();
+    sub.clear();
+    named_sub.clear();
+#ifdef HASH_CODE
+    hash_code = 0;
+#endif
+  }
+
+  void swap(tree_nodet &d)
+  {
+    d.data.swap(data);
+    d.sub.swap(sub);
+    d.named_sub.swap(named_sub);
+#ifdef HASH_CODE
+    std::swap(d.hash_code, hash_code);
+#endif
+  }
+
+  tree_nodet() = default;
+
+  explicit tree_nodet(irep_idt _data) : data(std::move(_data))
+  {
+  }
+
+  tree_nodet(irep_idt _data, named_subt _named_sub, subt _sub)
+    : data(std::move(_data)),
+      named_sub(std::move(_named_sub)),
+      sub(std::move(_sub))
+  {
+  }
+};
+
+/// \brief Base class for tree-like data structures with sharing
+///
+/// There are a large number of kinds of tree structured or tree-like data in
+/// CPROVER. \ref irept provides a single, unified representation for all of
+/// these, allowing structure sharing and reference counting of data. As
+/// such \ref irept is the basic unit of data in CPROVER.  Each \ref irept
+/// contains (or references, if reference counted data sharing is enabled, as
+/// it is by default - see the `SHARING` macro) to a node (see \ref tree_nodet).
 /// The \ref irept::pretty function outputs the explicit tree structure of
 /// an \ref irept and can be used to understand and debug problems with
 /// `irept`s.
@@ -155,6 +226,7 @@ public:
   // These are not stable.
   typedef std::vector<irept> subt;
 
+  typedef tree_nodet<irept> dt;
   // named_subt has to provide stable references; with C++11 we could
   // use std::forward_list or std::vector< unique_ptr<T> > to save
   // memory and increase efficiency.
@@ -339,60 +411,6 @@ public:
 
   /// count the number of named_sub elements that are not comments
   static std::size_t number_of_non_comments(const named_subt &);
-
-  class dt
-  {
-  private:
-    friend class irept;
-
-#ifdef SHARING
-    unsigned ref_count = 1;
-#endif
-
-    /// This irep_idt is the only place to store data in an irep, other than
-    /// the mere nesting structure
-    irep_idt data;
-
-    named_subt named_sub;
-    subt sub;
-
-#ifdef HASH_CODE
-    mutable std::size_t hash_code = 0;
-#endif
-
-    void clear()
-    {
-      data.clear();
-      sub.clear();
-      named_sub.clear();
-      #ifdef HASH_CODE
-      hash_code=0;
-      #endif
-    }
-
-    void swap(dt &d)
-    {
-      d.data.swap(data);
-      d.sub.swap(sub);
-      d.named_sub.swap(named_sub);
-      #ifdef HASH_CODE
-      std::swap(d.hash_code, hash_code);
-      #endif
-    }
-
-    dt() = default;
-
-    explicit dt(irep_idt _data) : data(std::move(_data))
-    {
-    }
-
-    dt(irep_idt _data, named_subt _named_sub, subt _sub)
-      : data(std::move(_data)),
-        named_sub(std::move(_named_sub)),
-        sub(std::move(_sub))
-    {
-    }
-  };
 
 protected:
   #ifdef SHARING
