@@ -290,7 +290,7 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
 
           xmlt &val_s=edge.new_element("data");
           val_s.set_attribute("key", "assumption.scope");
-          val_s.data=id2string(it->pc->source_location.get_function());
+          val_s.data = id2string(it->function_id);
         }
         else if(it->type==goto_trace_stept::typet::GOTO &&
                 it->pc->is_goto())
@@ -475,8 +475,7 @@ void graphml_witnesst::operator()(const symex_target_equationt &equation)
           graphml[to].has_invariant=true;
           code_assignt assign(it->ssa_full_lhs, it->ssa_rhs);
           graphml[to].invariant=convert_assign_rec(identifier, assign);
-          graphml[to].invariant_scope=
-            id2string(it->source.pc->source_location.get_function());
+          graphml[to].invariant_scope = id2string(it->source.function_id);
         }
         else if(it->is_goto() &&
                 it->source.pc->is_goto())
