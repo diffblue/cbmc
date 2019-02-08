@@ -869,7 +869,7 @@ void jbmc_parse_optionst::process_goto_function(
     if(using_symex_driven_loading)
     {
       // label the assertions
-      label_properties(goto_function.body);
+      label_properties(goto_function.body, function.get_function_id());
 
       goto_function.body.update();
       function.compute_location_numbers();
