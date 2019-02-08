@@ -18,6 +18,8 @@ Author: Daniel Kroening
 
 #include <goto-programs/goto_model.h>
 
+#include "source_lines.h"
+
 class cover_blocks_baset
 {
 public:
@@ -107,6 +109,9 @@ private:
 
     /// the set of lines belonging to this block
     std::unordered_set<std::size_t> lines;
+
+    /// the set of source code lines belonging to this block
+    source_linest source_lines;
   };
 
   /// map program locations to block numbers
@@ -117,6 +122,10 @@ private:
   /// create list of covered lines as CSV string and set as property of source
   /// location of basic block, compress to ranges if applicable
   static void update_covered_lines(block_infot &block_info);
+
+  /// create a string representing source lines and set as a property of source
+  /// location of basic block
+  static void update_source_lines(block_infot &block_info);
 
   /// If this block is a continuation of a previous block through unconditional
   /// forward gotos, return this blocks number.
@@ -134,6 +143,8 @@ private:
   std::vector<source_locationt> block_locations;
   // map java indexes to block indexes
   std::unordered_map<irep_idt, std::size_t> index_to_block;
+  // map block number to its source lines
+  std::vector<source_linest> block_source_lines;
 
 public:
   explicit cover_basic_blocks_javat(const goto_programt &_goto_program);

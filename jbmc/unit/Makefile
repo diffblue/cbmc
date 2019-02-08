@@ -111,6 +111,7 @@ CPROVER_LIBS =../src/java_bytecode/java_bytecode$(LIBEXT) \
               $(CPROVER_DIR)/src/goto-checker/goto-checker$(LIBEXT) \
               $(CPROVER_DIR)/src/goto-programs/goto-programs$(LIBEXT) \
               $(CPROVER_DIR)/src/goto-symex/goto-symex$(LIBEXT) \
+              $(CPROVER_DIR)/src/goto-instrument/source_lines$(OBJEXT) \
               $(CPROVER_DIR)/src/goto-instrument/cover$(OBJEXT) \
               $(CPROVER_DIR)/src/goto-instrument/cover_basic_blocks$(OBJEXT) \
               $(CPROVER_DIR)/src/goto-instrument/cover_filter$(OBJEXT) \
