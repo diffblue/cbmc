@@ -11,6 +11,7 @@ Author: Diffblue Ltd.
 #include <goto-programs/goto_convert.h>
 #include <goto-programs/goto_model.h>
 #include <util/allocate_objects.h>
+#include <util/arith_tools.h>
 #include <util/exception_utils.h>
 #include <util/std_code.h>
 #include <util/std_expr.h>
@@ -19,10 +20,31 @@ Author: Diffblue Ltd.
 #include "function_harness_generator_options.h"
 #include "goto_harness_parse_options.h"
 
+/// This contains implementation details of
+/// function call harness generator to avoid
+/// leaking them out into the header.
+/* NOLINTNEXTLINE(readability/identifier_spacing) */
 struct function_call_harness_generatort::implt
 {
   ui_message_handlert *message_handler;
   irep_idt function;
+  irep_idt harness_function_name;
+  symbol_tablet *symbol_table;
+  goto_functionst *goto_functions;
+
+  /// \see goto_harness_generatort::generate
+  void generate(goto_modelt &goto_model, const irep_idt &harness_function_name);
+  /// Non-deterministically initialise the parameters of the entry function
+  /// and insert function call to the passed code block.
+  void setup_parameters_and_call_entry_function(code_blockt &function_body);
+  /// Return a reference to the entry function or throw if it doesn't exist.
+  const symbolt &lookup_function_to_call();
+  /// Generate initialisation code for one lvalue inside block.
+  void generate_initialisation_code_for(code_blockt &block, const exprt &lhs);
+  /// Throw if the harness function already exists in the symbol table.
+  void ensure_harness_does_not_already_exist();
+  /// Update the goto-model with the new harness function.
+  void add_harness_function_to_goto_model(code_blockt function_body);
 };
 
 function_call_harness_generatort::function_call_harness_generatort(
@@ -53,76 +75,61 @@ void function_call_harness_generatort::generate(
   goto_modelt &goto_model,
   const irep_idt &harness_function_name)
 {
-  auto const &function = p_impl->function;
-  auto &symbol_table = goto_model.symbol_table;
-  auto function_found = symbol_table.lookup(function);
-  auto harness_function_found = symbol_table.lookup(harness_function_name);
+  p_impl->generate(goto_model, harness_function_name);
+}
 
-  if(function_found == nullptr)
-  {
-    throw invalid_command_line_argument_exceptiont{
-      "function that should be harnessed is not found " + id2string(function),
-      "--" FUNCTION_HARNESS_GENERATOR_FUNCTION_OPT};
-  }
-
-  if(harness_function_found != nullptr)
-  {
-    throw invalid_command_line_argument_exceptiont{
-      "harness function already in the symbol table " +
-        id2string(harness_function_name),
-      "--" GOTO_HARNESS_GENERATOR_HARNESS_FUNCTION_NAME_OPT};
-  }
-
-  auto allocate_objects = allocate_objectst{function_found->mode,
-                                            function_found->location,
-                                            "__goto_harness",
-                                            symbol_table};
-
-  // create body for the function
-  code_blockt function_body{};
-
-  const auto &function_type = to_code_type(function_found->type);
+void function_call_harness_generatort::implt::
+  setup_parameters_and_call_entry_function(code_blockt &function_body)
+{
+  const auto &function_to_call = lookup_function_to_call();
+  const auto &function_type = to_code_type(function_to_call.type);
   const auto &parameters = function_type.parameters();
 
   code_function_callt::operandst arguments{};
-  arguments.reserve(parameters.size());
 
+  auto allocate_objects = allocate_objectst{function_to_call.mode,
+                                            function_to_call.location,
+                                            "__goto_harness",
+                                            *symbol_table};
   for(const auto &parameter : parameters)
   {
     auto argument = allocate_objects.allocate_automatic_local_object(
       parameter.type(), parameter.get_base_name());
-    arguments.push_back(std::move(argument));
+    arguments.push_back(argument);
   }
-
-  code_function_callt function_call{function_found->symbol_expr(),
+  allocate_objects.declare_created_symbols(function_body);
+  for(auto const &argument : arguments)
+  {
+    generate_initialisation_code_for(function_body, argument);
+  }
+  code_function_callt function_call{function_to_call.symbol_expr(),
                                     std::move(arguments)};
-  function_call.add_source_location() = function_found->location;
+  function_call.add_source_location() = function_to_call.location;
 
   function_body.add(std::move(function_call));
+}
 
-  // create the function symbol
-  symbolt harness_function_symbol{};
-  harness_function_symbol.name = harness_function_symbol.base_name =
-    harness_function_symbol.pretty_name = harness_function_name;
+void function_call_harness_generatort::implt::generate(
+  goto_modelt &goto_model,
+  const irep_idt &harness_function_name)
+{
+  symbol_table = &goto_model.symbol_table;
+  goto_functions = &goto_model.goto_functions;
+  this->harness_function_name = harness_function_name;
+  ensure_harness_does_not_already_exist();
 
-  harness_function_symbol.is_lvalue = true;
-  harness_function_symbol.mode = function_found->mode;
-  harness_function_symbol.type = code_typet{{}, empty_typet{}};
-  harness_function_symbol.value = function_body;
+  // create body for the function
+  code_blockt function_body{};
 
-  symbol_table.insert(harness_function_symbol);
+  setup_parameters_and_call_entry_function(function_body);
+  add_harness_function_to_goto_model(std::move(function_body));
+}
 
-  goto_model.goto_functions.function_map[harness_function_name].type =
-    to_code_type(harness_function_symbol.type);
-  auto &body =
-    goto_model.goto_functions.function_map[harness_function_name].body;
-  goto_convert(
-    static_cast<const codet &>(harness_function_symbol.value),
-    goto_model.symbol_table,
-    body,
-    *p_impl->message_handler,
-    function_found->mode);
-  body.add(goto_programt::make_end_function());
+void function_call_harness_generatort::implt::generate_initialisation_code_for(
+  code_blockt &block,
+  const exprt &lhs)
+{
+  block.add(code_assignt{lhs, side_effect_expr_nondett{lhs.type()}});
 }
 
 void function_call_harness_generatort::validate_options()
@@ -131,4 +138,61 @@ void function_call_harness_generatort::validate_options()
     throw invalid_command_line_argument_exceptiont{
       "required parameter entry function not set",
       "--" FUNCTION_HARNESS_GENERATOR_FUNCTION_OPT};
+}
+
+const symbolt &
+function_call_harness_generatort::implt::lookup_function_to_call()
+{
+  auto function_found = symbol_table->lookup(function);
+
+  if(function_found == nullptr)
+  {
+    throw invalid_command_line_argument_exceptiont{
+      "function that should be harnessed is not found " + id2string(function),
+      "--" FUNCTION_HARNESS_GENERATOR_FUNCTION_OPT};
+  }
+
+  return *function_found;
+}
+
+void function_call_harness_generatort::implt::
+  ensure_harness_does_not_already_exist()
+{
+  if(symbol_table->lookup(harness_function_name))
+  {
+    throw invalid_command_line_argument_exceptiont{
+      "harness function already exists in the symbol table",
+      "--" GOTO_HARNESS_GENERATOR_HARNESS_FUNCTION_NAME_OPT};
+  }
+}
+
+void function_call_harness_generatort::implt::
+  add_harness_function_to_goto_model(code_blockt function_body)
+{
+  const auto &function_to_call = lookup_function_to_call();
+
+  // create the function symbol
+  symbolt harness_function_symbol{};
+  harness_function_symbol.name = harness_function_symbol.base_name =
+    harness_function_symbol.pretty_name = harness_function_name;
+
+  harness_function_symbol.is_lvalue = true;
+  harness_function_symbol.mode = function_to_call.mode;
+  harness_function_symbol.type = code_typet{{}, empty_typet{}};
+  harness_function_symbol.value = std::move(function_body);
+
+  symbol_table->insert(harness_function_symbol);
+
+  auto const &generated_harness =
+    symbol_table->lookup_ref(harness_function_name);
+  goto_functions->function_map[harness_function_name].type =
+    to_code_type(generated_harness.type);
+  auto &body = goto_functions->function_map[harness_function_name].body;
+  goto_convert(
+    static_cast<const codet &>(generated_harness.value),
+    *symbol_table,
+    body,
+    *message_handler,
+    function_to_call.mode);
+  body.add(goto_programt::make_end_function());
 }
