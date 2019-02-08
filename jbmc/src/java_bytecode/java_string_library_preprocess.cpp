@@ -1145,6 +1145,7 @@ code_blockt java_string_library_preprocesst::make_assign_function_from_call(
 ///   one of the following: ID_boolean, ID_char, ID_byte, ID_short, ID_int,
 ///   ID_long, ID_float, ID_double, ID_void
 /// \param loc: a location in the source
+/// \param function_id: the name of the function
 /// \param symbol_table: the symbol table
 /// \param code: code block to which we are adding some assignments
 /// \return An expression containing a symbol `tmp_type_name` where `type_name`
@@ -1155,6 +1156,7 @@ java_string_library_preprocesst::get_primitive_value_of_object(
   const exprt &object,
   irep_idt type_name,
   const source_locationt &loc,
+  const irep_idt &function_id,
   symbol_table_baset &symbol_table,
   code_blockt &code)
 {
@@ -1379,7 +1381,7 @@ struct_exprt java_string_library_preprocesst::make_argument_for_format(
     else if(name==ID_int || name==ID_float || name==ID_char || name==ID_boolean)
     {
       const auto value = get_primitive_value_of_object(
-        arg_i, name, loc, symbol_table, code_not_null);
+        arg_i, name, loc, function_id, symbol_table, code_not_null);
       if(value.has_value())
         code_not_null.add(code_assignt(field_expr, *value), loc);
       else

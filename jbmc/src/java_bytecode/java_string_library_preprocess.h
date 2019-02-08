@@ -327,6 +327,7 @@ private:
     const exprt &object,
     irep_idt type_name,
     const source_locationt &loc,
+    const irep_idt &function_id,
     symbol_table_baset &symbol_table,
     code_blockt &code);
 
