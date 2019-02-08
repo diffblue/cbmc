@@ -233,22 +233,23 @@ void remove_exceptionst::instrument_exception_handler(
     null_pointer_exprt null_voidptr((pointer_type(java_void_type())));
 
     // add the assignment @inflight_exception = NULL
-    goto_programt::targett t_null=goto_program.insert_after(instr_it);
-    t_null->make_assignment();
-    t_null->source_location=instr_it->source_location;
-    t_null->code=code_assignt(
-      thrown_global_symbol,
-      null_voidptr);
+    goto_program.insert_after(
+      instr_it,
+      goto_programt::make_assignment(
+        code_assignt(thrown_global_symbol, null_voidptr),
+        instr_it->source_location));
 
     // add the assignment exc = @inflight_exception (before the null assignment)
-    goto_programt::targett t_exc=goto_program.insert_after(instr_it);
-    t_exc->make_assignment();
-    t_exc->source_location=instr_it->source_location;
-    t_exc->code=code_assignt(
-      thrown_exception_local,
-      typecast_exprt(thrown_global_symbol, thrown_exception_local.type()));
+    goto_program.insert_after(
+      instr_it,
+      goto_programt::make_assignment(
+        code_assignt(
+          thrown_exception_local,
+          typecast_exprt(thrown_global_symbol, thrown_exception_local.type())),
+        instr_it->source_location));
   }
-  instr_it->make_skip();
+
+  instr_it->turn_into_skip();
 }
 
 /// Find the innermost universal exception handler for the current
@@ -349,9 +350,10 @@ void remove_exceptionst::add_exception_dispatch_sequence(
       if(!stack_catch[i][j].first.empty())
       {
         // Normal exception handler, make an instanceof check.
-        goto_programt::targett t_exc=goto_program.insert_after(instr_it);
-        t_exc->make_goto(new_state_pc, true_exprt());
-        t_exc->source_location=instr_it->source_location;
+        goto_programt::targett t_exc = goto_program.insert_after(
+          instr_it,
+          goto_programt::make_goto(
+            new_state_pc, true_exprt(), instr_it->source_location));
 
         // use instanceof to check that this is the correct handler
         struct_tag_typet type(stack_catch[i][j].first);
@@ -374,16 +376,14 @@ void remove_exceptionst::add_exception_dispatch_sequence(
     }
   }
 
-  default_dispatch->make_goto(default_target, true_exprt());
-  default_dispatch->source_location=instr_it->source_location;
+  *default_dispatch = goto_programt::make_goto(
+    default_target, true_exprt(), instr_it->source_location);
 
   // add dead instructions
   for(const auto &local : locals)
   {
-    goto_programt::targett t_dead=goto_program.insert_after(instr_it);
-    t_dead->make_dead();
-    t_dead->code=code_deadt(local);
-    t_dead->source_location=instr_it->source_location;
+    goto_program.insert_after(
+      instr_it, goto_programt::make_dead(local, instr_it->source_location));
   }
 }
 
@@ -451,8 +451,9 @@ bool remove_exceptionst::instrument_function_call(
     {
       // Function is annotated must-not-throw, but we can't prove that here.
       // Insert an ASSUME(@inflight_exception == null):
-      goto_programt::targett assume_null = goto_program.insert_after(instr_it);
-      assume_null->make_assumption(no_exception_currently_in_flight);
+      goto_program.insert_after(
+        instr_it,
+        goto_programt::make_assumption(no_exception_currently_in_flight));
     }
     else
     {
@@ -460,9 +461,12 @@ bool remove_exceptionst::instrument_function_call(
         function_identifier, goto_program, instr_it, stack_catch, locals);
 
       // add a null check (so that instanceof can be applied)
-      goto_programt::targett t_null=goto_program.insert_after(instr_it);
-      t_null->make_goto(next_it, no_exception_currently_in_flight);
-      t_null->source_location=instr_it->source_location;
+      goto_program.insert_after(
+        instr_it,
+        goto_programt::make_goto(
+          next_it,
+          no_exception_currently_in_flight,
+          instr_it->source_location));
     }
 
     return true;
@@ -566,7 +570,8 @@ void remove_exceptionst::instrument_exceptions(
           false,
           "CATCH opcode should be one of push-catch, pop-catch, landingpad");
       }
-      instr_it->make_skip();
+
+      instr_it->turn_into_skip();
       did_something = true;
     }
     else if(instr_it->type==THROW)

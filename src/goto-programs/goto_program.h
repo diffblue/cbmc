@@ -389,6 +389,7 @@ public:
     void complete_goto(targett _target)
     {
       PRECONDITION(type == INCOMPLETE_GOTO);
+      code.make_nil();
       targets.push_back(_target);
       type = GOTO;
     }
@@ -914,10 +915,23 @@ public:
   }
 
   static instructiont make_incomplete_goto(
+    const exprt &_cond,
+    const source_locationt &l = source_locationt::nil())
+  {
+    PRECONDITION(_cond.type().id() == ID_bool);
+    return instructiont(
+      static_cast<const codet &>(get_nil_irep()),
+      l,
+      INCOMPLETE_GOTO,
+      _cond,
+      {});
+  }
+
+  static instructiont make_incomplete_goto(
     const code_gotot &_code,
     const source_locationt &l = source_locationt::nil())
   {
-    return instructiont(_code, l, INCOMPLETE_GOTO, nil_exprt(), {});
+    return instructiont(_code, l, INCOMPLETE_GOTO, true_exprt(), {});
   }
 
   static instructiont make_goto(

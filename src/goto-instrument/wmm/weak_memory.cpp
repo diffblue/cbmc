@@ -87,10 +87,9 @@ void introduce_temporaries(
 
       symbol_exprt symbol_expr=new_symbol.symbol_expr();
 
-      goto_programt::instructiont new_i;
-      new_i.make_assignment();
-      new_i.code=code_assignt(symbol_expr, instruction.guard);
-      new_i.source_location=instruction.source_location;
+      goto_programt::instructiont new_i = goto_programt::make_assignment(
+        code_assignt(symbol_expr, instruction.guard),
+        instruction.source_location);
 
       // replace guard
       instruction.guard=symbol_expr;

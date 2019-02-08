@@ -118,7 +118,7 @@ void k_inductiont::process_loop(
     {
       if(t->is_assert())
         break;
-      t->make_skip();
+      t->turn_into_skip();
     }
 
     // now turn any assertions in iterations 0..k-1 into assumptions

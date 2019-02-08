@@ -469,9 +469,8 @@ int linker_script_merget::ls_data2instructions(
     // Instruction for start-address pointer in __CPROVER_initialize
     code_assignt start_assign(start_sym, array_start);
     start_assign.add_source_location()=start_loc;
-    goto_programt::instructiont start_assign_i;
-    start_assign_i.make_assignment(start_assign);
-    start_assign_i.source_location=start_loc;
+    goto_programt::instructiont start_assign_i =
+      goto_programt::make_assignment(start_assign, start_loc);
     initialize_instructions.push_front(start_assign_i);
 
     if(has_end) // Same for pointer to end of array
@@ -505,9 +504,8 @@ int linker_script_merget::ls_data2instructions(
 
       code_assignt end_assign(end_sym, array_end);
       end_assign.add_source_location()=end_loc;
-      goto_programt::instructiont end_assign_i;
-      end_assign_i.make_assignment(end_assign);
-      end_assign_i.source_location=end_loc;
+      goto_programt::instructiont end_assign_i =
+        goto_programt::make_assignment(end_assign, end_loc);
       initialize_instructions.push_front(end_assign_i);
     }
 
@@ -530,9 +528,8 @@ int linker_script_merget::ls_data2instructions(
     CHECK_RETURN(zi.has_value());
     code_assignt array_assign(array_expr, *zi);
     array_assign.add_source_location()=array_loc;
-    goto_programt::instructiont array_assign_i;
-    array_assign_i.make_assignment(array_assign);
-    array_assign_i.source_location=array_loc;
+    goto_programt::instructiont array_assign_i =
+      goto_programt::make_assignment(array_assign, array_loc);
     initialize_instructions.push_front(array_assign_i);
   }
 
@@ -583,9 +580,8 @@ int linker_script_merget::ls_data2instructions(
 
     code_assignt assign(lhs, rhs_tc);
     assign.add_source_location()=loc;
-    goto_programt::instructiont assign_i;
-    assign_i.make_assignment(assign);
-    assign_i.source_location=loc;
+    goto_programt::instructiont assign_i =
+      goto_programt::make_assignment(assign, loc);
     initialize_instructions.push_front(assign_i);
   }
   return 0;

@@ -53,7 +53,7 @@ SCENARIO(
     WHEN("Return type matches")
     {
       code_function_callt function_call(var_a, fun_foo, {});
-      instructions.back().make_function_call(function_call);
+      instructions.back() = goto_programt::make_function_call(function_call);
       REQUIRE(instructions.back().code.get_statement() == ID_function_call);
 
       THEN("The consistency check succeeds")
@@ -66,7 +66,7 @@ SCENARIO(
     WHEN("Return type differs from function type")
     {
       code_function_callt function_call(var_b, fun_foo, {});
-      instructions.back().make_function_call(function_call);
+      instructions.back() = goto_programt::make_function_call(function_call);
 
       THEN("The consistency check fails")
       {

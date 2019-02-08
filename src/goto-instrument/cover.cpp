@@ -274,8 +274,9 @@ static void instrument_cover_goals(
            successor->is_assume() &&
            successor->guard == i_it->guard)
         {
-          successor->make_skip();
+          successor->turn_into_skip();
         }
+
         i_it->type = goto_program_instruction_typet::ASSUME;
       }
     }

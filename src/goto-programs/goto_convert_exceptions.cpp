@@ -93,9 +93,8 @@ void goto_convertt::convert_try_catch(
     code.find_source_location());
 
   // add the CATCH-push instruction to 'dest'
-  goto_programt::targett catch_push_instruction=dest.add_instruction();
-  catch_push_instruction->make_catch();
-  catch_push_instruction->source_location=code.source_location();
+  goto_programt::targett catch_push_instruction =
+    dest.add(goto_programt::make_catch(code.source_location()));
 
   code_push_catcht push_catch_code;
 
@@ -112,9 +111,9 @@ void goto_convertt::convert_try_catch(
   convert(to_code(code.op0()), dest, mode);
 
   // add the CATCH-pop to the end of the 'try' block
-  goto_programt::targett catch_pop_instruction=dest.add_instruction();
-  catch_pop_instruction->make_catch();
-  catch_pop_instruction->code=code_pop_catcht();
+  goto_programt::targett catch_pop_instruction =
+    dest.add(goto_programt::make_catch());
+  catch_pop_instruction->code = code_pop_catcht();
 
   // add a goto to the end of the 'try' block
   dest.add(goto_programt::make_goto(end_target));

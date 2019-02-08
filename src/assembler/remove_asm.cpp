@@ -495,7 +495,7 @@ void remove_asmt::process_function(
     {
       goto_programt tmp_dest;
       process_instruction(*it, tmp_dest);
-      it->make_skip();
+      it->turn_into_skip();
       did_something = true;
 
       goto_programt::targett next = it;

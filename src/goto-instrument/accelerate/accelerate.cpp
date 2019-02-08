@@ -213,15 +213,17 @@ void acceleratet::insert_looping_path(
   goto_programt::targett loop_body=loop_header;
   ++loop_body;
 
-  goto_programt::targett jump=program.insert_before(loop_body);
-  jump->make_goto(
+  goto_programt::targett jump = program.insert_before(
     loop_body,
-    side_effect_expr_nondett(bool_typet(), loop_body->source_location));
+    goto_programt::make_goto(
+      loop_body,
+      side_effect_expr_nondett(bool_typet(), loop_body->source_location),
+      loop_body->source_location));
 
   program.destructive_insert(loop_body, looping_path);
 
-  jump=program.insert_before(loop_body);
-  jump->make_goto(back_jump, true_exprt());
+  jump = program.insert_before(
+    loop_body, goto_programt::make_goto(back_jump, true_exprt()));
 
   for(goto_programt::targett t=loop_header;
       t!=loop_body;
@@ -268,9 +270,9 @@ void acceleratet::make_overflow_loc(
   overflow_loc->swap(*loop_end);
   loop.insert(overflow_loc);
 
-  goto_programt::instructiont g(GOTO);
-  g.guard=not_exprt(overflow_var);
-  g.targets.push_back(overflow_loc);
+  goto_programt::instructiont g =
+    goto_programt::make_goto(overflow_loc, not_exprt(overflow_var));
+
   goto_programt::targett t2=program.insert_after(loop_end);
   *t2=g;
   t2->swap(*loop_end);
@@ -348,8 +350,8 @@ void acceleratet::set_dirty_vars(path_acceleratort &accelerator)
       << " for " << expr2c(*it, ns) << '\n';
 #endif
 
-    accelerator.pure_accelerator.add_instruction(ASSIGN)->code =
-      code_assignt(dirty_var, true_exprt());
+    accelerator.pure_accelerator.add(
+      goto_programt::make_assignment(code_assignt(dirty_var, true_exprt())));
   }
 }
 
@@ -413,8 +415,8 @@ void acceleratet::add_dirty_checks()
         continue;
       }
 
-      goto_programt::instructiont not_dirty(ASSUME);
-      not_dirty.guard=not_exprt(dirty_var->second);
+      goto_programt::instructiont not_dirty =
+        goto_programt::make_assumption(not_exprt(dirty_var->second));
       program.insert_before_swap(it, not_dirty);
     }
   }
@@ -475,11 +477,8 @@ void acceleratet::decl(symbol_exprt &sym, goto_programt::targett t, exprt init)
 {
   decl(sym, t);
 
-  goto_programt::targett assign=program.insert_before(t);
-  code_assignt code(sym, init);
-
-  assign->make_assignment();
-  assign->code=code;
+  program.insert_before(
+    t, goto_programt::make_assignment(code_assignt(sym, init)));
 }
 
 void acceleratet::insert_automaton(trace_automatont &automaton)

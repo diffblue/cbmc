@@ -590,16 +590,12 @@ void dump_ct::cleanup_decl(
   }
 
   goto_programt tmp;
-  goto_programt::targett t=tmp.add_instruction(DECL);
-  t->code=decl;
+  tmp.add(goto_programt::make_decl(decl.symbol()));
 
   if(value.is_not_nil())
-  {
-    t=tmp.add_instruction(ASSIGN);
-    t->code=code_assignt(decl.op0(), value);
-  }
+    tmp.add(goto_programt::make_assignment(code_assignt(decl.op0(), value)));
 
-  tmp.add_instruction(END_FUNCTION);
+  tmp.add(goto_programt::make_end_function());
 
   std::unordered_set<irep_idt> typedef_names;
   for(const auto &td : typedef_map)

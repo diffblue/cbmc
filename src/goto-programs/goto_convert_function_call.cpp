@@ -120,8 +120,7 @@ void goto_convertt::do_function_call_if(
 
   // do the z label
   goto_programt tmp_z;
-  goto_programt::targett z=tmp_z.add_instruction();
-  z->make_skip();
+  goto_programt::targett z = tmp_z.add(goto_programt::make_skip());
 
   // y: g();
   goto_programt tmp_y;
@@ -135,8 +134,8 @@ void goto_convertt::do_function_call_if(
     y=tmp_y.instructions.begin();
 
   // v: if(!c) goto y;
-  v->make_goto(y, boolean_negate(function.cond()));
-  v->source_location=function.cond().source_location();
+  *v = goto_programt::make_goto(
+    y, boolean_negate(function.cond()), function.cond().source_location());
 
   // w: f();
   goto_programt tmp_w;
@@ -147,7 +146,7 @@ void goto_convertt::do_function_call_if(
     tmp_w.add_instruction(SKIP);
 
   // x: goto z;
-  x->make_goto(z, true_exprt());
+  *x = goto_programt::make_goto(z, true_exprt());
 
   dest.destructive_append(tmp_v);
   dest.destructive_append(tmp_w);

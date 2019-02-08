@@ -132,12 +132,10 @@ void goto_convert_functionst::add_return(
 
   #endif
 
-  const side_effect_expr_nondett rhs(f.type.return_type(), source_location);
+  side_effect_expr_nondett rhs(f.type.return_type(), source_location);
 
-  goto_programt::targett t=f.body.add_instruction();
-  t->make_return();
-  t->code=code_returnt(rhs);
-  t->source_location=source_location;
+  f.body.add(
+    goto_programt::make_return(code_returnt(std::move(rhs)), source_location));
 }
 
 void goto_convert_functionst::convert_function(
@@ -195,13 +193,12 @@ void goto_convert_functionst::convert_function(
       has_prefix(id2string(identifier), "__VERIFIER_atomic_"))
   {
     goto_programt::instructiont a_begin;
-    a_begin.make_atomic_begin();
+    a_begin = goto_programt::make_atomic_begin();
     a_begin.source_location=f.body.instructions.front().source_location;
     f.body.insert_before_swap(f.body.instructions.begin(), a_begin);
 
-    goto_programt::targett a_end=f.body.add_instruction();
-    a_end->make_atomic_end();
-    a_end->source_location=end_location;
+    goto_programt::targett a_end =
+      f.body.add(goto_programt::make_atomic_end(end_location));
 
     Forall_goto_program_instructions(i_it, f.body)
     {

@@ -50,16 +50,18 @@ void branch(
         // negate condition
         i_it->set_condition(boolean_negate(i_it->get_condition()));
 
-        goto_programt::targett t1=body.insert_after(i_it);
-        t1->make_function_call(
-          function_to_call(goto_model.symbol_table, id, "taken"));
+        goto_programt::targett t1 = body.insert_after(
+          i_it,
+          goto_programt::make_function_call(
+            function_to_call(goto_model.symbol_table, id, "taken")));
 
-        goto_programt::targett t2=body.insert_after(t1);
-        t2->make_goto(i_it->get_target(), true_exprt());
+        goto_programt::targett t2 = body.insert_after(
+          t1, goto_programt::make_goto(i_it->get_target(), true_exprt()));
 
-        goto_programt::targett t3=body.insert_after(t2);
-        t3->make_function_call(
-          function_to_call(goto_model.symbol_table, id, "not-taken"));
+        goto_programt::targett t3 = body.insert_after(
+          t2,
+          goto_programt::make_function_call(
+            function_to_call(goto_model.symbol_table, id, "not-taken")));
         i_it->targets.clear();
         i_it->targets.push_back(t3);
       }

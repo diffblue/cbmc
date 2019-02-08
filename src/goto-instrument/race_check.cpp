@@ -187,7 +187,8 @@ static void race_check(
       goto_programt::instructiont original_instruction;
       original_instruction.swap(instruction);
 
-      instruction.make_skip();
+      instruction =
+        goto_programt::make_skip(original_instruction.source_location);
       i_it++;
 
       // now add assignments for what is written -- set
@@ -237,10 +238,11 @@ static void race_check(
         if(!is_shared(ns, e_it->second.symbol_expr))
           continue;
 
-        goto_programt::targett t=goto_program.insert_before(i_it);
-
-        t->make_assertion(w_guards.get_assertion(e_it->second));
-        t->source_location=original_instruction.source_location;
+        goto_programt::targett t = goto_program.insert_before(
+          i_it,
+          goto_programt::make_assertion(
+            w_guards.get_assertion(e_it->second),
+            original_instruction.source_location));
         t->source_location.set_comment(comment(e_it->second, false));
         i_it=++t;
       }
@@ -250,10 +252,11 @@ static void race_check(
         if(!is_shared(ns, e_it->second.symbol_expr))
           continue;
 
-        goto_programt::targett t=goto_program.insert_before(i_it);
-
-        t->make_assertion(w_guards.get_assertion(e_it->second));
-        t->source_location=original_instruction.source_location;
+        goto_programt::targett t = goto_program.insert_before(
+          i_it,
+          goto_programt::make_assertion(
+            w_guards.get_assertion(e_it->second),
+            original_instruction.source_location));
         t->source_location.set_comment(comment(e_it->second, true));
         i_it=++t;
       }

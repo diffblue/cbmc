@@ -22,7 +22,7 @@ void cover_path_instrumentert::instrument(
   const cover_blocks_baset &) const
 {
   if(is_non_cover_assertion(i_it))
-    i_it->make_skip();
+    i_it->turn_into_skip();
 
   // TODO: implement
 }
@@ -68,7 +68,7 @@ void cover_cover_instrumentert::instrument(
     }
   }
   else if(is_non_cover_assertion(i_it))
-    i_it->make_skip();
+    i_it->turn_into_skip();
 }
 
 void cover_instrument_end_of_function(
@@ -82,7 +82,7 @@ void cover_instrument_end_of_function(
   const std::string &comment =
     "additional goal to ensure reachability of end of function";
   goto_program.insert_before_swap(if_it);
-  if_it->make_assertion(false_exprt());
+  *if_it = goto_programt::make_assertion(false_exprt());
   if_it->source_location.set_comment(comment);
   if_it->source_location.set_property_class("reachability_constraint");
   if_it->source_location.set_function(function_id);

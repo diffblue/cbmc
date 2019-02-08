@@ -376,7 +376,7 @@ void goto_inlinet::expand_function_call(
               << eom;
 
     if(force_full)
-      target->make_skip();
+      target->turn_into_skip();
 
     return;
   }
@@ -390,7 +390,7 @@ void goto_inlinet::expand_function_call(
     warning() << "missing function `" << identifier << "' is ignored" << eom;
 
     if(force_full)
-      target->make_skip();
+      target->turn_into_skip();
 
     return;
   }

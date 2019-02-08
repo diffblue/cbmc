@@ -338,7 +338,10 @@ void reachability_slicert::slice(goto_functionst &goto_functions)
         if(
           !e.reaches_assertion && !e.reachable_from_assertion &&
           !i_it->is_end_function())
-          i_it->make_assumption(false_exprt());
+        {
+          *i_it = goto_programt::make_assumption(
+            false_exprt(), i_it->source_location);
+        }
       }
 
       // replace unreachable code by skip

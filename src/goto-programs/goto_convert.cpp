@@ -125,7 +125,7 @@ void goto_convertt::finish_gotos(goto_programt &dest, const irep_idt &mode)
 
       i.targets.push_back(l_it->second.first);
     }
-    else if(i.code.get_statement()==ID_goto)
+    else if(i.is_incomplete_goto())
     {
       const irep_idt &goto_label=i.code.get(ID_destination);
 
@@ -161,21 +161,21 @@ void goto_convertt::finish_gotos(goto_programt &dest, const irep_idt &mode)
         // is illegal for C++ non-pod types and impossible in Java in any case.
         if(not_prefix)
         {
-          debug().source_location = i.code.find_source_location();
+          debug().source_location = i.source_location;
           debug() << "encountered goto `" << goto_label
                   << "' that enters one or more lexical blocks; "
                   << "omitting constructors and destructors" << eom;
         }
         else
         {
-          debug().source_location = i.code.find_source_location();
+          debug().source_location = i.source_location;
           debug() << "adding goto-destructor code on jump to `" << goto_label
                   << "'" << eom;
 
           node_indext end_destruct = intersection_result.common_ancestor;
           goto_programt destructor_code;
           unwind_destructor_stack(
-            i.code.add_source_location(),
+            i.source_location,
             destructor_code,
             mode,
             end_destruct,
@@ -219,8 +219,8 @@ void goto_convertt::finish_computed_gotos(goto_programt &goto_program)
       goto_programt::targett t=
         goto_program.insert_after(g_it);
 
-      t->make_goto(label.second.first, guard);
-      t->source_location=i.source_location;
+      *t =
+        goto_programt::make_goto(label.second.first, guard, i.source_location);
     }
   }
 
@@ -269,7 +269,7 @@ void goto_convertt::optimize_guarded_gotos(goto_programt &dest)
     {
       it->set_target(it_goto_y->get_target());
       it->set_condition(boolean_negate(it->get_condition()));
-      it_goto_y->make_skip();
+      it_goto_y->turn_into_skip();
     }
   }
 }
@@ -819,9 +819,8 @@ void goto_convertt::convert_assert(
 
   clean_expr(cond, dest, mode);
 
-  goto_programt::targett t=dest.add_instruction(ASSERT);
-  t->guard.swap(cond);
-  t->source_location=code.source_location();
+  goto_programt::targett t =
+    dest.add(goto_programt::make_assertion(cond, code.source_location()));
   t->source_location.set(ID_property, ID_assertion);
   t->source_location.set("user-provided", true);
 }
@@ -844,9 +843,7 @@ void goto_convertt::convert_assume(
 
   clean_expr(op, dest, mode);
 
-  goto_programt::targett t=dest.add_instruction(ASSUME);
-  t->guard.swap(op);
-  t->source_location=code.source_location();
+  dest.add(goto_programt::make_assumption(op, code.source_location()));
 }
 
 void goto_convertt::convert_loop_invariant(
@@ -942,8 +939,8 @@ void goto_convertt::convert_for(
   targets.set_continue(tmp_x.instructions.begin());
 
   // v: if(!c) goto z;
-  v->make_goto(z, boolean_negate(cond));
-  v->source_location=cond.source_location();
+  *v =
+    goto_programt::make_goto(z, boolean_negate(cond), cond.source_location());
 
   // do the w label
   goto_programt tmp_w;
@@ -952,8 +949,7 @@ void goto_convertt::convert_for(
   // y: goto u;
   goto_programt tmp_y;
   goto_programt::targett y=tmp_y.add_instruction();
-  y->make_goto(u, true_exprt());
-  y->source_location=code.source_location();
+  *y = goto_programt::make_goto(u, true_exprt(), code.source_location());
 
   // loop invariant
   convert_loop_invariant(code, y, mode);
@@ -1013,8 +1009,7 @@ void goto_convertt::convert_while(
   convert(code.body(), tmp_x, mode);
 
   // y: if(c) goto v;
-  y->make_goto(v, true_exprt());
-  y->source_location=code.source_location();
+  *y = goto_programt::make_goto(v, true_exprt(), code.source_location());
 
   // loop invariant
   convert_loop_invariant(code, y, mode);
@@ -1082,8 +1077,7 @@ void goto_convertt::convert_dowhile(
   goto_programt::targett w=tmp_w.instructions.begin();
 
   // y: if(c) goto w;
-  y->make_goto(w, cond);
-  y->source_location=condition_location;
+  *y = goto_programt::make_goto(w, cond, condition_location);
 
   // loop invariant
   convert_loop_invariant(code, y, mode);
@@ -1315,9 +1309,8 @@ void goto_convertt::convert_continue(
 void goto_convertt::convert_goto(const code_gotot &code, goto_programt &dest)
 {
   // this instruction will be completed during post-processing
-  goto_programt::targett t = dest.add_instruction();
-  t->make_incomplete_goto(code);
-  t->source_location=code.source_location();
+  goto_programt::targett t =
+    dest.add(goto_programt::make_incomplete_goto(code, code.source_location()));
 
   // remember it to do the target later
   targets.gotos.emplace_back(t, targets.destructor_stack.get_current_node());
@@ -1560,8 +1553,7 @@ void goto_convertt::generate_ifthenelse(
 
   // do the z label
   goto_programt tmp_z;
-  goto_programt::targett z=tmp_z.add_instruction();
-  z->make_skip();
+  goto_programt::targett z = tmp_z.add(goto_programt::make_skip());
   // We deliberately don't set a location for 'z', it's a dummy
   // target.
 
@@ -1584,9 +1576,9 @@ void goto_convertt::generate_ifthenelse(
   tmp_w.swap(true_case);
 
   // x: goto z;
-  x->make_goto(z, true_exprt());
   CHECK_RETURN(!tmp_w.instructions.empty());
-  x->source_location=tmp_w.instructions.back().source_location;
+  *x = goto_programt::make_goto(
+    z, true_exprt(), tmp_w.instructions.back().source_location);
 
   dest.destructive_append(tmp_v);
   dest.destructive_append(tmp_w);
@@ -1628,9 +1620,8 @@ void goto_convertt::generate_conditional_branch(
     // next: skip;
 
     goto_programt tmp;
-    goto_programt::targett target_false=tmp.add_instruction();
-    target_false->make_skip();
-    target_false->source_location=source_location;
+    goto_programt::targett target_false =
+      tmp.add(goto_programt::make_skip(source_location));
 
     generate_conditional_branch(
       guard, target_true, target_false, source_location, dest, mode);
@@ -1906,14 +1897,12 @@ void goto_convertt::generate_thread_block(
 {
   goto_programt preamble, body, postamble;
 
-  goto_programt::targett c=body.add_instruction();
-  c->make_skip();
+  goto_programt::targett c = body.add(goto_programt::make_skip());
   convert(thread_body, body, mode);
 
   goto_programt::targett e=postamble.add_instruction(END_THREAD);
   e->source_location=thread_body.source_location();
-  goto_programt::targett z=postamble.add_instruction();
-  z->make_skip();
+  goto_programt::targett z = postamble.add(goto_programt::make_skip());
 
   goto_programt::targett a=preamble.add_instruction(START_THREAD);
   a->source_location=thread_body.source_location();

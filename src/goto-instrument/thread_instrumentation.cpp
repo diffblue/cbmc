@@ -46,9 +46,8 @@ void thread_exit_instrumentation(goto_programt &goto_program)
     "get_may",
     address_of_exprt(mutex_locked_string));
 
-  end->make_assertion(not_exprt(get_may));
+  *end = goto_programt::make_assertion(not_exprt(get_may), source_location);
 
-  end->source_location=source_location;
   end->source_location.set_comment("mutexes must not be locked on thread exit");
 }
 
@@ -100,15 +99,13 @@ void mutex_init_instrumentation(
 
       if(code_assign.lhs().type()==lock_type)
       {
-        goto_programt::targett t=goto_program.insert_after(it);
-
         const code_function_callt call(
           f_it->second.symbol_expr(),
           {address_of_exprt(code_assign.lhs()),
            address_of_exprt(string_constantt("mutex-init"))});
 
-        t->make_function_call(call);
-        t->source_location=it->source_location;
+        goto_program.insert_after(
+          it, goto_programt::make_function_call(call, it->source_location));
       }
     }
   }

@@ -29,10 +29,9 @@ Author: Matt Lewis
 
 void overflow_instrumentert::add_overflow_checks()
 {
-  goto_programt::targett init_overflow=program.insert_before(
-      program.instructions.begin());
-  init_overflow->make_assignment();
-  init_overflow->code=code_assignt(overflow_var, false_exprt());
+  program.insert_before(
+    program.instructions.begin(),
+    goto_programt::make_assignment(code_assignt(overflow_var, false_exprt())));
 
   program.compute_location_numbers();
   checked.clear();

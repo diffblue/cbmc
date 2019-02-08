@@ -21,7 +21,7 @@ void cover_location_instrumentert::instrument(
   const cover_blocks_baset &basic_blocks) const
 {
   if(is_non_cover_assertion(i_it))
-    i_it->make_skip();
+    i_it->turn_into_skip();
 
   const std::size_t block_nr = basic_blocks.block_of(i_it);
   const auto representative_instruction = basic_blocks.instruction_of(block_nr);
@@ -40,8 +40,7 @@ void cover_location_instrumentert::instrument(
       const std::string comment =
         "block " + b + " (lines " + source_lines + ")";
       goto_program.insert_before_swap(i_it);
-      i_it->make_assertion(false_exprt());
-      i_it->source_location = source_location;
+      *i_it = goto_programt::make_assertion(false_exprt(), source_location);
       initialize_source_location(i_it, comment, function_id);
       i_it++;
     }

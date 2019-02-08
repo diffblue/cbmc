@@ -1126,8 +1126,7 @@ void shared_bufferst::cfg_visitort::weak_memory(
           original_instruction.source_location;
 
         // ATOMIC_BEGIN: we make the whole thing atomic
-        instruction.make_atomic_begin();
-        instruction.source_location=source_location;
+        instruction = goto_programt::make_atomic_begin(source_location);
         i_it++;
 
         // we first perform (non-deterministically) up to 2 writes for
@@ -1261,9 +1260,8 @@ void shared_bufferst::cfg_visitort::weak_memory(
           }
 
         // ATOMIC_END
-        i_it=goto_program.insert_before(i_it);
-        i_it->make_atomic_end();
-        i_it->source_location=source_location;
+        i_it = goto_program.insert_before(
+          i_it, goto_programt::make_atomic_end(source_location));
         i_it++;
 
         i_it--; // the for loop already counts us up
@@ -1288,8 +1286,7 @@ void shared_bufferst::cfg_visitort::weak_memory(
         original_instruction.source_location;
 
       // ATOMIC_BEGIN
-      instruction.make_atomic_begin();
-      instruction.source_location=source_location;
+      instruction = goto_programt::make_atomic_begin(source_location);
       i_it++;
 
       // does it for all the previous statements
@@ -1302,9 +1299,8 @@ void shared_bufferst::cfg_visitort::weak_memory(
       }
 
       // ATOMIC_END
-      i_it=goto_program.insert_before(i_it);
-      i_it->make_atomic_end();
-      i_it->source_location=source_location;
+      i_it = goto_program.insert_before(
+        i_it, goto_programt::make_atomic_end(source_location));
       i_it++;
 
       i_it--; // the for loop already counts us up
@@ -1312,7 +1308,7 @@ void shared_bufferst::cfg_visitort::weak_memory(
     else if(is_lwfence(instruction, ns))
     {
       // po -- remove the lwfence
-      i_it->make_skip();
+      *i_it = goto_programt::make_skip(i_it->source_location);
     }
     else if(instruction.is_function_call())
     {
