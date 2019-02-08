@@ -266,8 +266,6 @@ protected:
     const code_ifthenelset &code,
     goto_programt &dest,
     const irep_idt &mode);
-  void
-  convert_init(const codet &code, goto_programt &dest, const irep_idt &mode);
   void convert_goto(const code_gotot &code, goto_programt &dest);
   void convert_gcc_computed_goto(const codet &code, goto_programt &dest);
   void convert_skip(const codet &code, goto_programt &dest);
