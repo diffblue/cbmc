@@ -94,10 +94,10 @@ event_idt event_grapht::copy_segment(event_idt begin, event_idt end)
   const abstract_eventt &end_event=operator[](end);
 
   /* not sure -- we should allow cross function cycles */
-  if(begin_event.source_location.get_file()!=end_event.source_location
-    .get_file()
-    || begin_event.source_location.get_function()!=end_event.source_location
-    .get_function())
+  if(
+    begin_event.source_location.get_file() !=
+      end_event.source_location.get_file() ||
+    begin_event.function_id != end_event.function_id)
     return end;
 
   if(duplicated_bodies.find(std::make_pair(begin_event, end_event))
