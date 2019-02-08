@@ -223,7 +223,8 @@ static void show_symbol_table_json_ui(
       {"isVolatile", jsont::json_boolean(symbol.is_volatile)},
       {"isParameter", jsont::json_boolean(symbol.is_parameter)},
       {"isAuxiliary", jsont::json_boolean(symbol.is_auxiliary)},
-      {"isWeak", jsont::json_boolean(symbol.is_weak)}};
+      {"isWeak", jsont::json_boolean(symbol.is_weak)},
+      {"hasLocalScope", jsont::json_boolean(symbol.has_local_scope)}};
 
     result.push_back(id2string(symbol.name), std::move(symbol_json));
   }

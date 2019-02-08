@@ -131,14 +131,14 @@ void ansi_c_declarationt::to_symbol(
   symbol.value=declarator.value();
   symbol.type=full_type(declarator);
   symbol.name=declarator.get_name();
-  symbol.pretty_name=symbol.name;
-  symbol.base_name=declarator.get_base_name();
+  symbol.display_name=declarator.get_base_name();
   symbol.is_type=get_is_typedef();
   symbol.location=declarator.source_location();
   symbol.is_extern=get_is_extern();
   symbol.is_macro=get_is_typedef() || get_is_enum_constant();
   symbol.is_parameter=get_is_parameter();
   symbol.is_weak=get_is_weak();
+  symbol.has_local_scope = !get_is_global();
 
   // is it a function?
 

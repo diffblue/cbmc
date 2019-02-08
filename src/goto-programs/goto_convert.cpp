@@ -771,23 +771,6 @@ void goto_convertt::convert_assign(
   }
 }
 
-void goto_convertt::convert_init(
-  const codet &code,
-  goto_programt &dest,
-  const irep_idt &mode)
-{
-  INVARIANT_WITH_DIAGNOSTICS(
-    code.operands().size() == 2,
-    "init statement takes two operands",
-    code.find_source_location());
-
-  // make it an assignment
-  codet assignment=code;
-  assignment.set_statement(ID_assign);
-
-  convert(to_code_assign(assignment), dest, mode);
-}
-
 void goto_convertt::convert_cpp_delete(
   const codet &code,
   goto_programt &dest)

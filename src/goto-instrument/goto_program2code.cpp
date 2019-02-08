@@ -1416,8 +1416,7 @@ void goto_program2codet::add_local_types(const typet &type)
       const irep_idt &identifier=to_symbol_type(type).get_identifier();
       const symbolt &symbol=ns.lookup(identifier);
 
-      if(symbol.location.get_function().empty() ||
-         !type_names_set.insert(identifier).second)
+      if(!symbol.has_local_scope || !type_names_set.insert(identifier).second)
         return;
 
       for(const auto &c : to_struct_union_type(full_type).components())
@@ -1432,8 +1431,7 @@ void goto_program2codet::add_local_types(const typet &type)
     const irep_idt &identifier=to_c_enum_tag_type(type).get_identifier();
     const symbolt &symbol=ns.lookup(identifier);
 
-    if(symbol.location.get_function().empty() ||
-       !type_names_set.insert(identifier).second)
+    if(!symbol.has_local_scope || !type_names_set.insert(identifier).second)
       return;
 
     assert(!identifier.empty());
@@ -1979,11 +1977,10 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
       const irep_idt &identifier=to_symbol_expr(expr).get_identifier();
       const symbolt &symbol=ns.lookup(identifier);
 
-      if(symbol.is_static_lifetime &&
-         symbol.type.id()!=ID_code &&
-         !symbol.is_extern &&
-         !symbol.location.get_function().empty() &&
-         local_static_set.insert(identifier).second)
+      if(
+        symbol.is_static_lifetime && symbol.type.id() != ID_code &&
+        !symbol.is_extern && symbol.has_local_scope &&
+        local_static_set.insert(identifier).second)
       {
         if(symbol.value.is_not_nil())
         {

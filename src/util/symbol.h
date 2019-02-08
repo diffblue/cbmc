@@ -42,20 +42,11 @@ public:
   /// Name of module the symbol belongs to
   irep_idt module;
 
-  /// Base (non-scoped) name
-  irep_idt base_name;
-
   /// Language mode
   irep_idt mode;
 
   /// Language-specific display name
-  irep_idt pretty_name;
-
-  /// Return language specific display name if present.
-  const irep_idt &display_name() const
-  {
-    return pretty_name.empty()?name:pretty_name;
-  }
+  irep_idt display_name;
 
   // global use
   bool is_type, is_macro, is_exported,
@@ -63,8 +54,8 @@ public:
 
   // ANSI-C
   bool is_static_lifetime, is_thread_local;
-  bool is_lvalue, is_file_local, is_extern, is_volatile,
-       is_parameter, is_auxiliary, is_weak;
+  bool is_lvalue, is_file_local, is_extern, is_volatile, is_parameter,
+    is_auxiliary, is_weak, has_local_scope;
 
   symbolt()
   {
@@ -78,13 +69,12 @@ public:
     value.make_nil();
     location.make_nil();
 
-    name=module=base_name=mode=pretty_name=irep_idt();
+    name=module=mode=display_name=irep_idt();
 
-    is_type=is_macro=is_exported=
-    is_input=is_output=is_state_var=is_property=
-    is_static_lifetime=is_thread_local=
-    is_lvalue=is_file_local=is_extern=is_volatile=
-    is_parameter=is_auxiliary=is_weak=false;
+    is_type = is_macro = is_exported = is_input = is_output = is_state_var =
+      is_property = is_static_lifetime = is_thread_local = is_lvalue =
+        is_file_local = is_extern = is_volatile = is_parameter = is_auxiliary =
+          is_weak = has_local_scope = false;
   }
 
   void swap(symbolt &b);
@@ -95,11 +85,6 @@ public:
   bool is_shared() const
   {
     return !is_thread_local;
-  }
-
-  bool is_procedure_local() const
-  {
-    return !is_static_lifetime;
   }
 
   bool is_function() const
@@ -158,13 +143,14 @@ public:
     is_thread_local=true;
     is_file_local=true;
     is_auxiliary=true;
+    has_local_scope = true;
   }
 
   auxiliary_symbolt(const irep_idt &name, const typet &type):
     auxiliary_symbolt()
   {
     this->name=name;
-    this->base_name=name;
+    this->display_name = name;
     this->type=type;
   }
 };
@@ -182,6 +168,7 @@ public:
     is_thread_local=true;
     is_file_local=true;
     is_parameter=true;
+    has_local_scope = true;
   }
 };
 

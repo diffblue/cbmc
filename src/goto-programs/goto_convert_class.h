@@ -15,11 +15,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <list>
 #include <vector>
 
+#include <util/allocate_objects.h>
+#include <util/guard.h>
+#include <util/message.h>
 #include <util/namespace.h>
 #include <util/replace_expr.h>
-#include <util/guard.h>
 #include <util/std_code.h>
-#include <util/message.h>
 
 #include "goto_program.h"
 
@@ -47,6 +48,7 @@ protected:
   symbol_table_baset &symbol_table;
   namespacet ns;
   std::string tmp_symbol_prefix;
+  lifetimet lifetime = lifetimet::STATIC_GLOBAL;
 
   void goto_convert_rec(
     const codet &code,
@@ -266,8 +268,6 @@ protected:
     const code_ifthenelset &code,
     goto_programt &dest,
     const irep_idt &mode);
-  void
-  convert_init(const codet &code, goto_programt &dest, const irep_idt &mode);
   void convert_goto(const code_gotot &code, goto_programt &dest);
   void convert_gcc_computed_goto(const codet &code, goto_programt &dest);
   void convert_skip(const codet &code, goto_programt &dest);
