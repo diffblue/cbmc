@@ -26,7 +26,7 @@ void make_assertions_false(goto_functionst &);
 void make_assertions_false(goto_modelt &);
 
 void label_properties(goto_functionst &);
-void label_properties(goto_programt &);
+void label_properties(goto_programt &, const irep_idt &);
 void label_properties(goto_modelt &);
 
 #endif // CPROVER_GOTO_PROGRAMS_SET_PROPERTIES_H
