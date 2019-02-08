@@ -47,6 +47,7 @@ void label_properties(goto_modelt &goto_model)
 
 void label_properties(
   goto_programt &goto_program,
+  const irep_idt &function_id,
   std::map<irep_idt, std::size_t> &property_counters)
 {
   for(goto_programt::instructionst::iterator
@@ -57,9 +58,7 @@ void label_properties(
     if(!it->is_assert())
       continue;
 
-    irep_idt function=it->source_location.get_function();
-
-    std::string prefix=id2string(function);
+    std::string prefix = id2string(function_id);
     if(it->source_location.get_property_class()!="")
     {
       if(prefix!="")
@@ -87,10 +86,10 @@ void label_properties(
   }
 }
 
-void label_properties(goto_programt &goto_program)
+void label_properties(goto_programt &goto_program, const irep_idt &function_id)
 {
   std::map<irep_idt, std::size_t> property_counters;
-  label_properties(goto_program, property_counters);
+  label_properties(goto_program, function_id, property_counters);
 }
 
 void set_properties(
@@ -126,7 +125,7 @@ void label_properties(goto_functionst &goto_functions)
       it=goto_functions.function_map.begin();
       it!=goto_functions.function_map.end();
       it++)
-    label_properties(it->second.body, property_counters);
+    label_properties(it->second.body, it->first, property_counters);
 }
 
 void make_assertions_false(goto_modelt &goto_model)
