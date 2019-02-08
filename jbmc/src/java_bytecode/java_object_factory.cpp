@@ -1498,6 +1498,22 @@ void java_object_factoryt::gen_nondet_enum_init(
   assignments.add(enum_assign);
 }
 
+static void assert_type_consistency(const code_blockt &assignments)
+{
+  // In future we'll be able to use codet::validate for this;
+  // at present that only verifies `lhs.type base_type_eq right.type`,
+  // whereas we want to check exact equality.
+  for(const auto &code : assignments.statements())
+  {
+    if(code.get_statement() != ID_assign)
+      continue;
+    const auto &assignment = to_code_assign(code);
+    INVARIANT(
+      assignment.lhs().type() == assignment.rhs().type(),
+      "object factory should produce type-consistent assignments");
+  }
+}
+
 /// Similar to `gen_nondet_init` below, but instead of allocating and
 /// non-deterministically initializing the the argument `expr` passed to that
 /// function, we create a static global object of type \p type and
@@ -1558,6 +1574,7 @@ exprt object_factory(
   state.add_created_symbol(main_symbol_ptr);
   state.declare_created_symbols(init_code);
 
+  assert_type_consistency(assignments);
   init_code.append(assignments);
   return object;
 }
@@ -1628,6 +1645,7 @@ void gen_nondet_init(
 
   state.declare_created_symbols(init_code);
 
+  assert_type_consistency(assignments);
   init_code.append(assignments);
 }
 
