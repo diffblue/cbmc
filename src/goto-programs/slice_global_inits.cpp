@@ -92,7 +92,9 @@ void slice_global_inits(goto_modelt &goto_model)
 
       if(!has_prefix(id2string(id), CPROVER_PREFIX) &&
          symbols.find(id)==symbols.end())
-        i_it->make_skip();
+      {
+        i_it->turn_into_skip();
+      }
     }
   }
 

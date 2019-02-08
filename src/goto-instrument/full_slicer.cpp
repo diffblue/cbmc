@@ -343,7 +343,9 @@ void full_slicert::operator()(
         const cfgt::entryt &e=cfg.entry_map[i_it];
         if(!i_it->is_end_function() && // always retained
            !cfg[e].node_required)
-          i_it->make_skip();
+        {
+          i_it->turn_into_skip();
+        }
 #ifdef DEBUG_FULL_SLICERT
         else
         {

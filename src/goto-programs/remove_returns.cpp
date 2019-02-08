@@ -129,10 +129,11 @@ void remove_returnst::replace_returns(
         code_assignt assignment(*return_symbol, i_it->code.op0());
 
         // now turn the `return' into `assignment'
-        i_it->make_assignment(assignment);
+        *i_it =
+          goto_programt::make_assignment(assignment, i_it->source_location);
       }
       else
-        i_it->make_skip();
+        i_it->turn_into_skip();
     }
   }
 }
@@ -361,8 +362,8 @@ bool remove_returnst::restore_returns(
 
       // replace "fkt#return_value=x;" by "return x;"
       const exprt rhs = assign.rhs();
-      i_it->make_return();
-      i_it->code = code_returnt(rhs);
+      *i_it =
+        goto_programt::make_return(code_returnt(rhs), i_it->source_location);
       did_something = true;
     }
   }

@@ -137,27 +137,23 @@ bool acceleration_utilst::check_inductive(
       ++it)
   {
     const equal_exprt holds(it->first, it->second.to_expr());
-    program.add_instruction(ASSUME)->guard=holds;
+    program.add(goto_programt::make_assumption(holds));
 
     polynomials_hold.push_back(holds);
   }
 
   program.append_path(path);
 
-  codet inc_loop_counter=
-    code_assignt(
-      loop_counter,
-      plus_exprt(loop_counter, from_integer(1, loop_counter.type())));
-  program.add_instruction(ASSIGN)->code=inc_loop_counter;
+  auto inc_loop_counter = code_assignt(
+    loop_counter,
+    plus_exprt(loop_counter, from_integer(1, loop_counter.type())));
+
+  program.add(goto_programt::make_assignment(inc_loop_counter));
 
   ensure_no_overflows(program);
 
-  for(std::vector<exprt>::iterator it=polynomials_hold.begin();
-      it!=polynomials_hold.end();
-      ++it)
-  {
-    program.add_instruction(ASSERT)->guard=*it;
-  }
+  for(const auto &p : polynomials_hold)
+    program.add(goto_programt::make_assertion(p));
 
 #ifdef DEBUG
   std::cout << "Checking following program for inductiveness:\n";
@@ -437,7 +433,7 @@ bool acceleration_utilst::do_assumptions(
 
   ensure_no_overflows(program);
 
-  program.add_instruction(ASSERT)->guard=condition;
+  program.add(goto_programt::make_assertion(condition));
 
   guard=not_exprt(condition);
   simplify(guard, ns);
@@ -497,7 +493,7 @@ void acceleration_utilst::ensure_no_overflows(scratch_programt &program)
 #endif
 
   instrumenter.add_overflow_checks();
-  program.add_instruction(ASSUME)->guard=not_exprt(overflow_var);
+  program.add(goto_programt::make_assumption(not_exprt(overflow_var)));
 
   // goto_functionst::goto_functiont fn;
   // fn.body.instructions.swap(program.instructions);

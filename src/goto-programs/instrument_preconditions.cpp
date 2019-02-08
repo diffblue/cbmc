@@ -119,8 +119,7 @@ void instrument_preconditions(
           goto_program.insert_before_swap(it);
           exprt instance = p->get_condition();
           r(instance);
-          it->make_assertion(instance);
-          it->source_location=source_location;
+          *it = goto_programt::make_assertion(instance, source_location);
           it->source_location.set_property_class(ID_precondition_instance);
           it->source_location.set_comment(p->source_location.get_comment());
           it++;

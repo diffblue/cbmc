@@ -271,7 +271,7 @@ static goto_programt::targett check_and_replace_target(
 
   std::for_each(
     target, target_instruction, [](goto_programt::instructiont &instr) {
-      instr.make_skip();
+      instr.turn_into_skip();
     });
 
   if(target_instruction->is_return())

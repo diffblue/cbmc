@@ -69,8 +69,7 @@ void mm_io(
             mm_io_r,
             {typecast_exprt(d.pointer(), pt), typecast_exprt(size, st)});
           goto_function.body.insert_before_swap(it);
-          it->make_function_call(fc);
-          it->source_location=source_location;
+          *it = goto_programt::make_function_call(fc, source_location);
           it++;
         }
       }
@@ -92,8 +91,7 @@ void mm_io(
              typecast_exprt(size, st),
              typecast_exprt(a.rhs(), vt)});
           goto_function.body.insert_before_swap(it);
-          it->make_function_call(fc);
-          it->source_location=source_location;
+          *it = goto_programt::make_function_call(fc, source_location);
           it++;
         }
       }

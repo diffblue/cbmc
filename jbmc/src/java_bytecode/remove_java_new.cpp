@@ -94,8 +94,8 @@ goto_programt::targett remove_java_newt::lower_java_new(
   malloc_expr.copy_to_operands(object_size);
   // could use true and get rid of the code below
   malloc_expr.copy_to_operands(false_exprt());
-  target->make_assignment(code_assignt(lhs, malloc_expr));
-  target->source_location = location;
+  *target =
+    goto_programt::make_assignment(code_assignt(lhs, malloc_expr), location);
 
   // zero-initialize the object
   dereference_exprt deref(lhs, object_type);
@@ -103,11 +103,10 @@ goto_programt::targett remove_java_newt::lower_java_new(
   CHECK_RETURN(zero_object.has_value());
   set_class_identifier(
     to_struct_expr(*zero_object), ns, to_struct_tag_type(object_type));
-  goto_programt::targett t_i = dest.insert_after(target);
-  t_i->make_assignment(code_assignt(deref, *zero_object));
-  t_i->source_location = location;
-
-  return t_i;
+  return dest.insert_after(
+    target,
+    goto_programt::make_assignment(
+      code_assignt(deref, *zero_object), location));
 }
 
 /// Replaces the instruction `lhs = new java_array_type` by
@@ -148,8 +147,8 @@ goto_programt::targett remove_java_newt::lower_java_new_array(
   // code use true and get rid of the code below
   malloc_expr.copy_to_operands(false_exprt());
 
-  target->make_assignment(code_assignt(lhs, malloc_expr));
-  target->source_location = location;
+  *target =
+    goto_programt::make_assignment(code_assignt(lhs, malloc_expr), location);
   goto_programt::targett next = std::next(target);
 
   const struct_typet &struct_type = to_struct_type(ns.follow(object_type));
@@ -165,18 +164,19 @@ goto_programt::targett remove_java_newt::lower_java_new_array(
   CHECK_RETURN(zero_object.has_value());
   set_class_identifier(
     to_struct_expr(*zero_object), ns, to_struct_tag_type(object_type));
-  goto_programt::targett t_i = dest.insert_before(next);
-  t_i->make_assignment(code_assignt(deref, *zero_object));
-  t_i->source_location = location;
+  dest.insert_before(
+    next,
+    goto_programt::make_assignment(
+      code_assignt(deref, *zero_object), location));
 
   // if it's an array, we need to set the length field
   member_exprt length(
     deref,
     struct_type.components()[1].get_name(),
     struct_type.components()[1].type());
-  goto_programt::targett t_s = dest.insert_before(next);
-  t_s->make_assignment(code_assignt(length, rhs.op0()));
-  t_s->source_location = location;
+  dest.insert_before(
+    next,
+    goto_programt::make_assignment(code_assignt(length, rhs.op0()), location));
 
   // we also need to allocate space for the data
   member_exprt data(
@@ -221,20 +221,19 @@ goto_programt::targett remove_java_newt::lower_java_new_array(
                                          .symbol_expr();
   code_declt array_decl(new_array_data_symbol);
   array_decl.add_source_location() = location;
-  goto_programt::targett t_array_decl = dest.insert_before(next);
-  t_array_decl->make_decl(array_decl);
-  t_array_decl->source_location = location;
-  goto_programt::targett t_p2 = dest.insert_before(next);
-  t_p2->make_assignment(
-    code_assignt(new_array_data_symbol, data_java_new_expr));
-  t_p2->source_location = location;
+  dest.insert_before(next, goto_programt::make_decl(array_decl, location));
+  dest.insert_before(
+    next,
+    goto_programt::make_assignment(
+      code_assignt(new_array_data_symbol, data_java_new_expr), location));
 
-  goto_programt::targett t_p = dest.insert_before(next);
   exprt cast_java_new = new_array_data_symbol;
   if(cast_java_new.type() != data.type())
     cast_java_new = typecast_exprt(cast_java_new, data.type());
-  t_p->make_assignment(code_assignt(data, cast_java_new));
-  t_p->source_location = location;
+  dest.insert_before(
+    next,
+    goto_programt::make_assignment(
+      code_assignt(data, cast_java_new), location));
 
   // zero-initialize the data
   if(!rhs.get_bool(ID_skip_initialize))
@@ -244,9 +243,7 @@ goto_programt::targett remove_java_newt::lower_java_new_array(
     CHECK_RETURN(zero_element.has_value());
     codet array_set(ID_array_set);
     array_set.copy_to_operands(new_array_data_symbol, *zero_element);
-    goto_programt::targett t_d = dest.insert_before(next);
-    t_d->make_other(array_set);
-    t_d->source_location = location;
+    dest.insert_before(next, goto_programt::make_other(array_set, location));
   }
 
   // multi-dimensional?
@@ -265,9 +262,8 @@ goto_programt::targett remove_java_newt::lower_java_new_array(
         .symbol_expr();
     code_declt decl(tmp_i);
     decl.add_source_location() = location;
-    goto_programt::targett t_decl = tmp.insert_before(tmp.instructions.begin());
-    t_decl->make_decl(decl);
-    t_decl->source_location = location;
+    tmp.insert_before(
+      tmp.instructions.begin(), goto_programt::make_decl(decl, location));
 
     side_effect_exprt sub_java_new = rhs;
     sub_java_new.operands().erase(sub_java_new.operands().begin());

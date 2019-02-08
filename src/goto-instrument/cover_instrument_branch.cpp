@@ -19,7 +19,7 @@ void cover_branch_instrumentert::instrument(
   const cover_blocks_baset &basic_blocks) const
 {
   if(is_non_cover_assertion(i_it))
-    i_it->make_skip();
+    i_it->turn_into_skip();
 
   if(i_it == goto_program.instructions.begin())
   {
@@ -29,9 +29,8 @@ void cover_branch_instrumentert::instrument(
 
     source_locationt source_location = i_it->source_location;
 
-    goto_programt::targett t = goto_program.insert_before(i_it);
-    t->make_assertion(false_exprt());
-    t->source_location = source_location;
+    goto_programt::targett t = goto_program.insert_before(
+      i_it, goto_programt::make_assertion(false_exprt(), source_location));
     initialize_source_location(t, comment, function_id);
   }
 
@@ -48,13 +47,11 @@ void cover_branch_instrumentert::instrument(
     source_locationt source_location = i_it->source_location;
 
     goto_program.insert_before_swap(i_it);
-    i_it->make_assertion(not_exprt(guard));
-    i_it->source_location = source_location;
+    *i_it = goto_programt::make_assertion(not_exprt(guard), source_location);
     initialize_source_location(i_it, true_comment, function_id);
 
     goto_program.insert_before_swap(i_it);
-    i_it->make_assertion(guard);
-    i_it->source_location = source_location;
+    *i_it = goto_programt::make_assertion(guard, source_location);
     initialize_source_location(i_it, false_comment, function_id);
 
     std::advance(i_it, 2);

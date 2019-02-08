@@ -264,10 +264,8 @@ void remove_function_pointerst::fix_return_type(
   exprt old_lhs=function_call.lhs();
   function_call.lhs()=tmp_symbol_expr;
 
-  goto_programt::targett t_assign=dest.add_instruction();
-  t_assign->make_assignment();
-  t_assign->code=code_assignt(
-    old_lhs, typecast_exprt(tmp_symbol_expr, old_lhs.type()));
+  dest.add(goto_programt::make_assignment(
+    code_assignt(old_lhs, typecast_exprt(tmp_symbol_expr, old_lhs.type()))));
 }
 
 void remove_function_pointerst::remove_function_pointer(
@@ -378,8 +376,7 @@ void remove_function_pointerst::remove_function_pointer(
   // the final target is a skip
   goto_programt final_skip;
 
-  goto_programt::targett t_final=final_skip.add_instruction();
-  t_final->make_skip();
+  goto_programt::targett t_final = final_skip.add(goto_programt::make_skip());
 
   // build the calls and gotos
 
@@ -389,8 +386,8 @@ void remove_function_pointerst::remove_function_pointer(
   for(const auto &fun : functions)
   {
     // call function
-    goto_programt::targett t1=new_code_calls.add_instruction();
-    t1->make_function_call(code);
+    goto_programt::targett t1 =
+      new_code_calls.add(goto_programt::make_function_call(code));
     t1->get_function_call().function() = fun;
 
     // the signature of the function might not match precisely
@@ -398,8 +395,7 @@ void remove_function_pointerst::remove_function_pointer(
 
     fix_return_type(function_id, t1->get_function_call(), new_code_calls);
     // goto final
-    goto_programt::targett t3=new_code_calls.add_instruction();
-    t3->make_goto(t_final, true_exprt());
+    new_code_calls.add(goto_programt::make_goto(t_final, true_exprt()));
 
     // goto to call
     const address_of_exprt address_of(fun, pointer_type(fun.type()));
@@ -407,15 +403,15 @@ void remove_function_pointerst::remove_function_pointer(
     const auto casted_address =
       typecast_exprt::conditional_cast(address_of, pointer.type());
 
-    goto_programt::targett t4=new_code_gotos.add_instruction();
-    t4->make_goto(t1, equal_exprt(pointer, casted_address));
+    new_code_gotos.add(
+      goto_programt::make_goto(t1, equal_exprt(pointer, casted_address)));
   }
 
   // fall-through
   if(add_safety_assertion)
   {
-    goto_programt::targett t=new_code_gotos.add_instruction();
-    t->make_assertion(false_exprt());
+    goto_programt::targett t =
+      new_code_gotos.add(goto_programt::make_assertion(false_exprt()));
     t->source_location.set_property_class("pointer dereference");
     t->source_location.set_comment("invalid function pointer");
   }

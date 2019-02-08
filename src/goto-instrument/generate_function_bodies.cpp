@@ -74,15 +74,13 @@ protected:
   {
     auto const &function_symbol = symbol_table.lookup_ref(function_name);
     // NOLINTNEXTLINE
-    auto add_instruction = [&]() {
-      auto instruction = function.body.add_instruction();
+    auto add_instruction = [&](goto_programt::instructiont &&i) {
+      auto instruction = function.body.add(std::move(i));
       instruction->source_location = function_symbol.location;
       return instruction;
     };
-    auto assume_instruction = add_instruction();
-    assume_instruction->make_assumption(false_exprt());
-    auto end_instruction = add_instruction();
-    end_instruction->make_end_function();
+    add_instruction(goto_programt::make_assumption(false_exprt()));
+    add_instruction(goto_programt::make_end_function());
   }
 };
 
@@ -96,22 +94,21 @@ protected:
   {
     auto const &function_symbol = symbol_table.lookup_ref(function_name);
     // NOLINTNEXTLINE
-    auto add_instruction = [&]() {
-      auto instruction = function.body.add_instruction();
+    auto add_instruction = [&](goto_programt::instructiont &&i) {
+      auto instruction = function.body.add(std::move(i));
       instruction->source_location = function_symbol.location;
       instruction->source_location.set_function(function_name);
       return instruction;
     };
-    auto assert_instruction = add_instruction();
-    assert_instruction->make_assertion(false_exprt());
+    auto assert_instruction =
+      add_instruction(goto_programt::make_assertion(false_exprt()));
     const namespacet ns(symbol_table);
     std::ostringstream comment_stream;
     comment_stream << id2string(ID_assertion) << " "
                    << format(assert_instruction->guard);
     assert_instruction->source_location.set_comment(comment_stream.str());
     assert_instruction->source_location.set_property_class(ID_assertion);
-    auto end_instruction = add_instruction();
-    end_instruction->make_end_function();
+    add_instruction(goto_programt::make_end_function());
   }
 };
 
@@ -126,25 +123,22 @@ protected:
   {
     auto const &function_symbol = symbol_table.lookup_ref(function_name);
     // NOLINTNEXTLINE
-    auto add_instruction = [&]() {
-      auto instruction = function.body.add_instruction();
+    auto add_instruction = [&](goto_programt::instructiont &&i) {
+      auto instruction = function.body.add(std::move(i));
       instruction->source_location = function_symbol.location;
       instruction->source_location.set_function(function_name);
       return instruction;
     };
-    auto assert_instruction = add_instruction();
-    assert_instruction->make_assertion(false_exprt());
-    assert_instruction->source_location.set_function(function_name);
+    auto assert_instruction =
+      add_instruction(goto_programt::make_assertion(false_exprt()));
     const namespacet ns(symbol_table);
     std::ostringstream comment_stream;
     comment_stream << id2string(ID_assertion) << " "
                    << format(assert_instruction->guard);
     assert_instruction->source_location.set_comment(comment_stream.str());
     assert_instruction->source_location.set_property_class(ID_assertion);
-    auto assume_instruction = add_instruction();
-    assume_instruction->make_assumption(false_exprt());
-    auto end_instruction = add_instruction();
-    end_instruction->make_end_function();
+    add_instruction(goto_programt::make_assumption(false_exprt()));
+    add_instruction(goto_programt::make_end_function());
   }
 };
 
@@ -209,8 +203,8 @@ protected:
   {
     auto const &function_symbol = symbol_table.lookup_ref(function_name);
     // NOLINTNEXTLINE
-    auto add_instruction = [&]() {
-      auto instruction = function.body.add_instruction();
+    auto add_instruction = [&](goto_programt::instructiont &&i) {
+      auto instruction = function.body.add(std::move(i));
       instruction->source_location = function_symbol.location;
       return instruction;
     };
@@ -223,7 +217,10 @@ protected:
         std::regex_match(
           id2string(parameter.get_base_name()), parameters_to_havoc))
       {
-        auto goto_instruction = add_instruction();
+        auto goto_instruction =
+          add_instruction(goto_programt::make_incomplete_goto(equal_exprt(
+            symbol_exprt(parameter.get_identifier(), parameter.type()),
+            null_pointer_exprt(to_pointer_type(parameter.type())))));
 
         const irep_idt base_name = parameter.get_base_name();
         CHECK_RETURN(!base_name.empty());
@@ -243,13 +240,8 @@ protected:
 
         function.body.destructive_append(dest);
 
-        auto label_instruction = add_instruction();
-        goto_instruction->make_goto(
-          label_instruction,
-          equal_exprt(
-            symbol_exprt(parameter.get_identifier(), parameter.type()),
-            null_pointer_exprt(to_pointer_type(parameter.type()))));
-        label_instruction->make_skip();
+        auto label_instruction = add_instruction(goto_programt::make_skip());
+        goto_instruction->complete_goto(label_instruction);
       }
     }
 
@@ -285,9 +277,7 @@ protected:
 
       aux_symbol.is_static_lifetime = false;
 
-      auto decl_instruction = add_instruction();
-      decl_instruction->make_decl();
-      decl_instruction->code = code_declt(aux_symbol.symbol_expr());
+      add_instruction(goto_programt::make_decl(aux_symbol.symbol_expr()));
 
       goto_programt dest;
 
@@ -304,17 +294,12 @@ protected:
       exprt return_expr = typecast_exprt::conditional_cast(
         aux_symbol.symbol_expr(), function.type.return_type());
 
-      auto return_instruction = add_instruction();
-      return_instruction->make_return();
-      return_instruction->code = code_returnt(return_expr);
+      add_instruction(goto_programt::make_return(code_returnt(return_expr)));
 
-      auto dead_instruction = add_instruction();
-      dead_instruction->make_dead();
-      dead_instruction->code = code_deadt(aux_symbol.symbol_expr());
+      add_instruction(goto_programt::make_dead(aux_symbol.symbol_expr()));
     }
 
-    auto end_function_instruction = add_instruction();
-    end_function_instruction->make_end_function();
+    add_instruction(goto_programt::make_end_function());
 
     remove_skip(function.body);
   }

@@ -1801,7 +1801,7 @@ void goto_checkt::goto_check(
           i.source_location.get_property_class()!="error label") ||
          (!is_user_provided && !enable_built_in_assertions))
       {
-        i.make_skip();
+        i.turn_into_skip();
         did_something = true;
       }
     }
@@ -1809,7 +1809,7 @@ void goto_checkt::goto_check(
     {
       if(!enable_assumptions)
       {
-        i.make_skip();
+        i.turn_into_skip();
         did_something = true;
       }
     }

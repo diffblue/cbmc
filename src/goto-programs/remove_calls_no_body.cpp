@@ -35,9 +35,8 @@ void remove_calls_no_bodyt::remove_call_no_body(
   // pointer dereferencing or the like
   for(const exprt &argument : arguments)
   {
-    goto_programt::targett t = tmp.add_instruction();
-    t->make_other(code_expressiont(argument));
-    t->source_location = target->source_location;
+    tmp.add(goto_programt::make_other(
+      code_expressiont(argument), target->source_location));
   }
 
   // return value

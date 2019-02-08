@@ -124,9 +124,8 @@ static std::pair<goto_programt::targett, bool> insert_nondet_init_code(
 
     // Insert an instruction declaring `aux_symbol` before `target`, being
     // careful to preserve jumps to `target`
-    goto_programt::instructiont decl_aux_symbol;
-    decl_aux_symbol.make_decl(code_declt(aux_symbol_expr));
-    decl_aux_symbol.source_location = source_loc;
+    goto_programt::instructiont decl_aux_symbol =
+      goto_programt::make_decl(code_declt(aux_symbol_expr), source_loc);
     goto_program.insert_before_swap(target, decl_aux_symbol);
 
     // Keep track of the new location of the instruction containing op.
@@ -142,10 +141,8 @@ static std::pair<goto_programt::targett, bool> insert_nondet_init_code(
         mode);
     goto_program.destructive_insert(target2, gen_nondet_init_instructions);
 
-    goto_programt::targett dead_aux_symbol = goto_program.insert_after(target2);
-    dead_aux_symbol->make_dead();
-    dead_aux_symbol->code = code_deadt(aux_symbol_expr);
-    dead_aux_symbol->source_location = source_loc;
+    goto_program.insert_after(
+      target2, goto_programt::make_dead(aux_symbol_expr, source_loc));
 
     // In theory target could have more than one operand which should be
     // replaced by convert_nondet, so we return target2 so that it

@@ -67,14 +67,12 @@ void parameter_assignmentst::do_function_calls(
 
         if(nr<function_call.arguments().size())
         {
-          goto_programt::targett t=tmp.add_instruction();
-          t->make_assignment();
-          t->source_location=i_it->source_location;
           const symbolt &lhs_symbol=ns.lookup(p_identifier);
           symbol_exprt lhs=lhs_symbol.symbol_expr();
           exprt rhs = typecast_exprt::conditional_cast(
             function_call.arguments()[nr], lhs.type());
-          t->code=code_assignt(lhs, rhs);
+          tmp.add(goto_programt::make_assignment(
+            code_assignt(lhs, rhs), i_it->source_location));
         }
       }
 

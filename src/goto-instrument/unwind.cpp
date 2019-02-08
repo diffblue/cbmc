@@ -115,12 +115,12 @@ void goto_unwindt::unwind(
 
   if(unwind_strategy==unwind_strategyt::PARTIAL)
   {
-    goto_programt::targett t=rest_program.add_instruction();
-    unwind_log.insert(t, loop_head->location_number);
+    goto_programt::targett t =
+      rest_program.add(goto_programt::make_skip(loop_head->source_location));
 
-    t->make_skip();
-    t->source_location=loop_head->source_location;
     t->location_number=loop_head->location_number;
+
+    unwind_log.insert(t, loop_head->location_number);
   }
   else if(unwind_strategy==unwind_strategyt::CONTINUE)
   {
@@ -144,12 +144,16 @@ void goto_unwindt::unwind(
         exit_cond=loop_head->guard;
     }
 
-    goto_programt::targett new_t=rest_program.add_instruction();
+    goto_programt::targett new_t;
 
     if(unwind_strategy==unwind_strategyt::ASSERT)
-      new_t->make_assertion(exit_cond);
+    {
+      new_t = rest_program.add(goto_programt::make_assertion(exit_cond));
+    }
     else if(unwind_strategy==unwind_strategyt::ASSUME)
-      new_t->make_assumption(exit_cond);
+    {
+      new_t = rest_program.add(goto_programt::make_assumption(exit_cond));
+    }
     else
       UNREACHABLE;
 
@@ -174,23 +178,24 @@ void goto_unwindt::unwind(
 
     if(!t_before->is_goto() || !t_before->guard.is_true())
     {
-      goto_programt::targett t_goto=goto_program.insert_before(loop_exit);
-      unwind_log.insert(t_goto, loop_exit->location_number);
-
-      t_goto->make_goto(
-        goto_program.const_cast_target(loop_exit), true_exprt());
-      t_goto->source_location=loop_exit->source_location;
+      goto_programt::targett t_goto = goto_program.insert_before(
+        loop_exit,
+        goto_programt::make_goto(
+          goto_program.const_cast_target(loop_exit),
+          true_exprt(),
+          loop_exit->source_location));
       t_goto->location_number=loop_exit->location_number;
+
+      unwind_log.insert(t_goto, loop_exit->location_number);
     }
 
     // add a skip before the loop exit
 
-    goto_programt::targett t_skip=goto_program.insert_before(loop_exit);
-    unwind_log.insert(t_skip, loop_exit->location_number);
-
-    t_skip->make_skip();
-    t_skip->source_location=loop_head->source_location;
+    goto_programt::targett t_skip = goto_program.insert_before(
+      loop_exit, goto_programt::make_skip(loop_head->source_location));
     t_skip->location_number=loop_head->location_number;
+
+    unwind_log.insert(t_skip, loop_exit->location_number);
 
     // where to go for the next iteration
     goto_programt::targett loop_iter=t_skip;
@@ -227,12 +232,11 @@ void goto_unwindt::unwind(
   {
     // insert skip for loop body
 
-    goto_programt::targett t_skip=goto_program.insert_before(loop_head);
-    unwind_log.insert(t_skip, loop_head->location_number);
-
-    t_skip->make_skip();
-    t_skip->source_location=loop_head->source_location;
+    goto_programt::targett t_skip = goto_program.insert_before(
+      loop_head, goto_programt::make_skip(loop_head->source_location));
     t_skip->location_number=loop_head->location_number;
+
+    unwind_log.insert(t_skip, loop_head->location_number);
 
     // redirect gotos into loop body
     Forall_goto_program_instructions(i_it, goto_program)

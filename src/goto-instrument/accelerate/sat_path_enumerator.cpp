@@ -252,9 +252,9 @@ void sat_path_enumeratort::build_fixed()
     exprt shadow=shadow_sym.symbol_expr();
     shadow_distinguishers[distinguisher]=shadow;
 
-    goto_programt::targett assign=fixed.insert_before(fixedt);
-    assign->make_assignment();
-    assign->code=code_assignt(shadow, false_exprt());
+    fixed.insert_before(
+      fixedt,
+      goto_programt::make_assignment(code_assignt(shadow, false_exprt())));
   }
 
   // We're going to iterate over the 2 programs in lockstep, which allows
@@ -269,7 +269,7 @@ void sat_path_enumeratort::build_fixed()
     if(loop.find(t)==loop.end())
     {
       // This instruction isn't part of the loop...  Just remove it.
-      fixedt->make_skip();
+      *fixedt = goto_programt::make_skip(fixedt->source_location);
       continue;
     }
 
@@ -280,9 +280,9 @@ void sat_path_enumeratort::build_fixed()
       exprt &distinguisher=d->second;
       exprt &shadow=shadow_distinguishers[distinguisher];
 
-      goto_programt::targett assign=fixed.insert_after(fixedt);
-      assign->make_assignment();
-      assign->code=code_assignt(shadow, true_exprt());
+      goto_programt::targett assign = fixed.insert_after(
+        fixedt,
+        goto_programt::make_assignment(code_assignt(shadow, true_exprt())));
 
       assign->swap(*fixedt);
       fixedt=assign;
@@ -346,7 +346,8 @@ void sat_path_enumeratort::build_fixed()
   {
     const exprt &shadow=shadow_distinguishers[expr];
 
-    fixed.insert_after(end)->make_assumption(equal_exprt(expr, shadow));
+    fixed.insert_after(
+      end, goto_programt::make_assumption(equal_exprt(expr, shadow)));
   }
 
   // Finally, let's remove all the skips we introduced and fix the

@@ -91,12 +91,12 @@ void nondet_static(
       if(is_nondet_initializable_static(sym, ns))
       {
         const goto_programt::instructiont original_instruction = instruction;
-        i_it->make_assignment();
-        i_it->code = code_assignt(
-          sym,
-          side_effect_expr_nondett(
-            sym.type(), original_instruction.source_location));
-        i_it->source_location = original_instruction.source_location;
+        *i_it = goto_programt::make_assignment(
+          code_assignt(
+            sym,
+            side_effect_expr_nondett(
+              sym.type(), original_instruction.source_location)),
+          original_instruction.source_location);
       }
     }
     else if(instruction.is_function_call())

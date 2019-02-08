@@ -427,8 +427,7 @@ void escape_analysist::insert_cleanup(
       code.arguments().push_back(arg);
     }
 
-    location->make_function_call(code);
-    location->source_location=source_location;
+    *location = goto_programt::make_function_call(code, source_location);
   }
 }
 

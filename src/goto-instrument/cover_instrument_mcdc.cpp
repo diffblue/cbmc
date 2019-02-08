@@ -626,7 +626,7 @@ void cover_mcdc_instrumentert::instrument(
   const cover_blocks_baset &) const
 {
   if(is_non_cover_assertion(i_it))
-    i_it->make_skip();
+    i_it->turn_into_skip();
 
   // 1. Each entry and exit point is invoked
   // 2. Each decision takes every possible outcome
@@ -661,8 +661,7 @@ void cover_mcdc_instrumentert::instrument(
 
       std::string comment_t = description + " `" + p_string + "' true";
       goto_program.insert_before_swap(i_it);
-      i_it->make_assertion(not_exprt(p));
-      i_it->source_location = source_location;
+      *i_it = goto_programt::make_assertion(not_exprt(p), source_location);
       i_it->source_location.set_comment(comment_t);
       i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
       i_it->source_location.set_property_class(property_class);
@@ -670,8 +669,7 @@ void cover_mcdc_instrumentert::instrument(
 
       std::string comment_f = description + " `" + p_string + "' false";
       goto_program.insert_before_swap(i_it);
-      i_it->make_assertion(p);
-      i_it->source_location = source_location;
+      *i_it = goto_programt::make_assertion(p, source_location);
       i_it->source_location.set_comment(comment_f);
       i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
       i_it->source_location.set_property_class(property_class);
@@ -696,8 +694,7 @@ void cover_mcdc_instrumentert::instrument(
         "MC/DC independence condition `" + p_string + "'";
 
       goto_program.insert_before_swap(i_it);
-      i_it->make_assertion(not_exprt(p));
-      i_it->source_location = source_location;
+      *i_it = goto_programt::make_assertion(not_exprt(p), source_location);
       i_it->source_location.set_comment(description);
       i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
       i_it->source_location.set_property_class(property_class);

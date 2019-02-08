@@ -174,7 +174,7 @@ goto_programt::targett remove_virtual_functionst::remove_virtual_function(
 
   if(functions.empty())
   {
-    target->make_skip();
+    target->turn_into_skip();
     remove_skip(goto_program, target, next_target);
     return next_target; // give up
   }
@@ -185,7 +185,7 @@ goto_programt::targett remove_virtual_functionst::remove_virtual_function(
   {
     if(!functions.front().symbol_expr.has_value())
     {
-      target->make_skip();
+      target->turn_into_skip();
       remove_skip(goto_program, target, next_target);
     }
     else
@@ -201,10 +201,8 @@ goto_programt::targett remove_virtual_functionst::remove_virtual_function(
   // the final target is a skip
   goto_programt final_skip;
 
-  goto_programt::targett t_final=final_skip.add_instruction();
-  t_final->source_location=vcall_source_loc;
-
-  t_final->make_skip();
+  goto_programt::targett t_final =
+    final_skip.add(goto_programt::make_skip(vcall_source_loc));
 
   // build the calls and gotos
 
@@ -228,9 +226,8 @@ goto_programt::targett remove_virtual_functionst::remove_virtual_function(
   // match any expected type:
   if(fallback_action==virtual_dispatch_fallback_actiont::ASSUME_FALSE)
   {
-    auto newinst=new_code_calls.add_instruction(ASSUME);
-    newinst->guard=false_exprt();
-    newinst->source_location=vcall_source_loc;
+    new_code_calls.add(
+      goto_programt::make_assumption(false_exprt(), vcall_source_loc));
   }
 
   // get initial identifier for grouping
@@ -251,18 +248,17 @@ goto_programt::targett remove_virtual_functionst::remove_virtual_function(
     if(insertit.second)
     {
       goto_programt::targett t1=new_code_calls.add_instruction();
-      t1->source_location=vcall_source_loc;
       if(fun.symbol_expr.has_value())
       {
-      // call function
-        t1->make_function_call(code);
+        // call function
+        *t1 = goto_programt::make_function_call(code, vcall_source_loc);
         create_static_function_call(
           t1->get_function_call(), *fun.symbol_expr, ns);
       }
       else
       {
         // No definition for this type; shouldn't be possible...
-        t1->make_assertion(false_exprt());
+        *t1 = goto_programt::make_assertion(false_exprt(), vcall_source_loc);
         t1->source_location.set_comment(
           "cannot find calls for " +
           id2string(code.function().get(ID_identifier)) + " dispatching " +
@@ -270,9 +266,8 @@ goto_programt::targett remove_virtual_functionst::remove_virtual_function(
       }
       insertit.first->second=t1;
       // goto final
-      goto_programt::targett t3=new_code_calls.add_instruction();
-      t3->source_location=vcall_source_loc;
-      t3->make_goto(t_final, true_exprt());
+      new_code_calls.add(
+        goto_programt::make_goto(t_final, true_exprt(), vcall_source_loc));
     }
 
     // Fall through to the default callee if possible:
@@ -308,9 +303,8 @@ goto_programt::targett remove_virtual_functionst::remove_virtual_function(
       }
       else
       {
-        goto_programt::targett new_goto = new_code_gotos.add_instruction();
-        new_goto->source_location = vcall_source_loc;
-        new_goto->make_goto(insertit.first->second, class_id_test);
+        new_code_gotos.add(goto_programt::make_goto(
+          insertit.first->second, class_id_test, vcall_source_loc));
       }
     }
   }
@@ -337,7 +331,7 @@ goto_programt::targett remove_virtual_functionst::remove_virtual_function(
   goto_program.destructive_insert(next_target, new_code);
 
   // finally, kill original invocation
-  target->make_skip();
+  target->turn_into_skip();
 
   // only remove skips within the virtual-function handling block
   remove_skip(goto_program, target, next_target);

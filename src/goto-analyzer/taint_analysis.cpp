@@ -166,21 +166,20 @@ void taint_analysist::instrument(
                   code_set_may.op0()=where;
                   code_set_may.op1()=
                     address_of_exprt(string_constantt(rule.taint));
-                  goto_programt::targett t=insert_after.add_instruction();
-                  t->make_other(code_set_may);
-                  t->source_location=instruction.source_location;
+                  insert_after.add(goto_programt::make_other(
+                    code_set_may, instruction.source_location));
                 }
                 break;
 
               case taint_parse_treet::rulet::SINK:
                 {
-                  goto_programt::targett t=insert_before.add_instruction();
                   binary_predicate_exprt get_may(
                     where,
                     "get_may",
                     address_of_exprt(string_constantt(rule.taint)));
-                  t->make_assertion(not_exprt(get_may));
-                  t->source_location=instruction.source_location;
+                  goto_programt::targett t =
+                    insert_before.add(goto_programt::make_assertion(
+                      not_exprt(get_may), instruction.source_location));
                   t->source_location.set_property_class(
                     "taint rule "+id2string(rule.id));
                   t->source_location.set_comment(rule.message);
@@ -194,9 +193,8 @@ void taint_analysist::instrument(
                   code_clear_may.op0()=where;
                   code_clear_may.op1()=
                     address_of_exprt(string_constantt(rule.taint));
-                  goto_programt::targett t=insert_after.add_instruction();
-                  t->make_other(code_clear_may);
-                  t->source_location=instruction.source_location;
+                  insert_after.add(goto_programt::make_other(
+                    code_clear_may, instruction.source_location));
                 }
                 break;
               }
@@ -285,14 +283,13 @@ bool taint_analysist::operator()(
            f_it->first!=goto_functionst::entry_point())
         {
           const symbolt &symbol = ns.lookup(f_it->first);
-          goto_programt::targett t=calls.add_instruction();
           const code_function_callt call(symbol.symbol_expr());
-          t->make_function_call(call);
-          calls.add_instruction()->make_goto(
-            end.instructions.begin(), true_exprt());
-          goto_programt::targett g=gotos.add_instruction();
-          g->make_goto(
-            t, side_effect_expr_nondett(bool_typet(), symbol.location));
+          goto_programt::targett t =
+            calls.add(goto_programt::make_function_call(call));
+          calls.add(
+            goto_programt::make_goto(end.instructions.begin(), true_exprt()));
+          gotos.add(goto_programt::make_goto(
+            t, side_effect_expr_nondett(bool_typet(), symbol.location)));
         }
 
       goto_functionst::goto_functiont &entry=

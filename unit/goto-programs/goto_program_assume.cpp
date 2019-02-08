@@ -38,7 +38,7 @@ SCENARIO(
     symbol_table.insert(symbol);
     symbol_table.insert(fun_symbol);
     namespacet ns(symbol_table);
-    instructions.back().make_assertion(x_le_10);
+    instructions.back() = goto_programt::make_assertion(x_le_10);
 
     WHEN("Instruction has no targets")
     {

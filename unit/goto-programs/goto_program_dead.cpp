@@ -33,10 +33,7 @@ SCENARIO(
 
     goto_functiont goto_function;
     auto &instructions = goto_function.body.instructions;
-    instructions.emplace_back(goto_program_instruction_typet::DEAD);
-    code_deadt removal(var_a);
-    instructions.back().make_dead();
-    instructions.back().code = removal;
+    instructions.emplace_back(goto_programt::make_dead(var_a));
     symbol_table.insert(fun_symbol);
 
     WHEN("Removing known symbol")
