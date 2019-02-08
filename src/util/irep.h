@@ -81,6 +81,20 @@ inline const std::string &name2string(const irep_namet &n)
 class irept;
 const irept &get_nil_irep();
 
+/// Used in tree_nodet for activating or not reference counting.
+/// tree_nodet uses inheritance from ref_count_ift instead of a field, so that
+/// it gets deleted if empty ([[no_unique_address]] only appears in C++20).
+template <bool enabled>
+struct ref_count_ift
+{
+};
+
+template <>
+struct ref_count_ift<true>
+{
+  unsigned ref_count = 1;
+};
+
 /// A node with data in a tree, it contains:
 ///
 /// * \ref irept::dt::data : A string (Unless `USE_STD_STRING` is set, this is
@@ -100,8 +114,8 @@ const irept &get_nil_irep();
 ///
 /// * \c hash_code : if HASH_CODE is activated, this is used to cache the
 ///   result of the hash function.
-template <typename treet>
-class tree_nodet
+template <typename treet, bool sharing = true>
+class tree_nodet : public ref_count_ift<sharing>
 {
 public:
   // These are not stable.
@@ -118,10 +132,6 @@ public:
 #endif
 
   friend treet;
-
-#ifdef SHARING
-  unsigned ref_count = 1;
-#endif
 
   /// This irep_idt is the only place to store data in an tree node
   irep_idt data;
@@ -226,10 +236,14 @@ public:
   // These are not stable.
   typedef std::vector<irept> subt;
 
-  typedef tree_nodet<irept> dt;
-  // named_subt has to provide stable references; with C++11 we could
-  // use std::forward_list or std::vector< unique_ptr<T> > to save
-  // memory and increase efficiency.
+#ifdef SHARING
+  typedef tree_nodet<irept, true> dt;
+#else
+  typedef tree_nodet<irept, false> dt;
+#endif
+// named_subt has to provide stable references; with C++11 we could
+// use std::forward_list or std::vector< unique_ptr<T> > to save
+// memory and increase efficiency.
 
 #ifdef NAMED_SUB_IS_FORWARD_LIST
   typedef std::forward_list<std::pair<irep_namet, irept>> named_subt;
