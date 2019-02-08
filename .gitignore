@@ -102,6 +102,8 @@ src/goto-cc/goto-cc
 src/goto-cc/goto-gcc
 src/goto-cc/goto-cc.exe
 src/goto-cc/goto-cl.exe
+src/goto-harness/goto-harness
+src/goto-harness/goto-harness.exe
 src/goto-instrument/goto-instrument
 src/goto-instrument/goto-instrument.exe
 src/solvers/smt2_solver
