@@ -177,10 +177,11 @@ protected:
   nodest nodes;
 
 public:
-  node_indext add_node()
+  template <typename... arguments>
+  node_indext add_node(arguments &&... values)
   {
     node_indext no=nodes.size();
-    nodes.push_back(nodet());
+    nodes.emplace_back(std::forward<arguments>(values)...);
     return no;
   }
 

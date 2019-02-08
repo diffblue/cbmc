@@ -1,0 +1,20 @@
+CORE
+main.c
+--unwind 10 --show-goto-functions
+activate-multi-line-match
+(?P<comment_block>\/\/ [0-9]+ file main\.c line [0-9]+ function main)[\s]*dead newAlloc0;[\s]*(?P>comment_block)[\s]*dead pc;[\s]*(?P>comment_block)[\s]*dead literal;[\s]*(?P>comment_block)[\s]*9: END_FUNCTION
+--
+--
+Checks for:
+
+       // 49 file main.c line 44 function main
+       dead newAlloc0;
+       // 50 file main.c line 44 function main
+       dead pc;
+       // 51 file main.c line 44 function main
+       dead literal;
+       // 52 file main.c line 45 function main
+    9: END_FUNCTION
+
+This asserts that when you've created a compound literal that both temp and real
+variable gets killed.

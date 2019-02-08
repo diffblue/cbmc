@@ -4,6 +4,7 @@ SRC = adjust_float_expressions.cpp \
       class_identifier.cpp \
       compute_called_functions.cpp \
       destructor.cpp \
+      destructor_tree.cpp \
       elf_reader.cpp \
       format_strings.cpp \
       goto_asm.cpp \

@@ -140,43 +140,48 @@ void goto_convertt::finish_gotos(goto_programt &dest, const irep_idt &mode)
 
       i.complete_goto(l_it->second.first);
 
-      // If the goto recorded a destructor stack, execute as much as is
-      // appropriate for however many automatic variables leave scope.
-      // We don't currently handle variables *entering* scope, which is illegal
-      // for C++ non-pod types and impossible in Java in any case.
-      auto goto_stack=g_it.second;
-      const auto &label_stack=l_it->second.second;
-      bool stack_is_prefix = label_stack.size() <= goto_stack.size();
-      for(
-        std::size_t idx = 0, ilim = label_stack.size();
-        idx != ilim && stack_is_prefix; ++idx)
-      {
-        stack_is_prefix &= goto_stack[idx] == label_stack[idx];
-      }
+      node_indext label_target = l_it->second.second;
+      node_indext goto_target = g_it.second;
 
-      if(!stack_is_prefix)
+      // Compare the currently-live variables on the path of the GOTO and label.
+      // We want to work out what variables should die during the jump.
+      ancestry_resultt intersection_result =
+        targets.destructor_stack.get_nearest_common_ancestor_info(
+          goto_target, label_target);
+
+      bool not_prefix =
+        intersection_result.right_depth_below_common_ancestor != 0;
+
+      // If our goto had no variables of note, just skip
+      if(goto_target != 0)
       {
-          debug().source_location=i.code.find_source_location();
+        // If the goto recorded a destructor stack, execute as much as is
+        // appropriate for however many automatic variables leave scope.
+        // We don't currently handle variables *entering* scope, which
+        // is illegal for C++ non-pod types and impossible in Java in any case.
+        if(not_prefix)
+        {
+          debug().source_location = i.code.find_source_location();
           debug() << "encountered goto `" << goto_label
                   << "' that enters one or more lexical blocks; "
                   << "omitting constructors and destructors" << eom;
-      }
-      else
-      {
-        auto unwind_to_size=label_stack.size();
-        if(unwind_to_size<goto_stack.size())
+        }
+        else
         {
-          debug().source_location=i.code.find_source_location();
-          debug() << "adding goto-destructor code on jump to `"
-                  << goto_label << "'" << eom;
+          debug().source_location = i.code.find_source_location();
+          debug() << "adding goto-destructor code on jump to `" << goto_label
+                  << "'" << eom;
+
+          node_indext end_destruct = intersection_result.common_ancestor;
           goto_programt destructor_code;
           unwind_destructor_stack(
             i.code.add_source_location(),
-            unwind_to_size,
             destructor_code,
-            goto_stack,
-            mode);
+            mode,
+            end_destruct,
+            goto_target);
           dest.destructive_insert(g_it.first, destructor_code);
+
           // This should leave iterators intact, as long as
           // goto_programt::instructionst is std::list.
         }
@@ -334,7 +339,8 @@ void goto_convertt::convert_label(
     goto_programt::targett target=tmp.instructions.begin();
     dest.destructive_append(tmp);
 
-    targets.labels.insert({label, {target, targets.destructor_stack}});
+    targets.labels.insert(
+      {label, {target, targets.destructor_stack.get_current_node()}});
     target->labels.push_front(label);
   }
 }
@@ -543,8 +549,9 @@ void goto_convertt::convert_block(
 {
   const source_locationt &end_location=code.end_location();
 
-  // this saves the size of the destructor stack
-  std::size_t old_stack_size=targets.destructor_stack.size();
+  // this saves the index of the destructor stack
+  node_indext old_stack_top =
+    targets.destructor_stack.get_current_node();
 
   // now convert block
   for(const auto &b_code : code.statements())
@@ -559,13 +566,10 @@ void goto_convertt::convert_block(
     // don't do destructors when we are unreachable
   }
   else
-    unwind_destructor_stack(end_location, old_stack_size, dest, mode);
+    unwind_destructor_stack(end_location, dest, mode, old_stack_top);
 
-  // remove those destructors
-  PRECONDITION(old_stack_size <= targets.destructor_stack.size());
-  targets.destructor_stack.erase(
-    targets.destructor_stack.begin() + old_stack_size,
-    targets.destructor_stack.end());
+  // Set the current node of our destructor stack back to before the block.
+  targets.destructor_stack.set_current_node(old_stack_top);
 }
 
 void goto_convertt::convert_expression(
@@ -648,7 +652,7 @@ void goto_convertt::convert_decl(
 
   {
     code_deadt code_dead(symbol_expr);
-    targets.destructor_stack.push_back(code_dead);
+    targets.destructor_stack.add(code_dead);
   }
 
   // do destructor
@@ -660,7 +664,7 @@ void goto_convertt::convert_decl(
     address_of_exprt this_expr(symbol_expr, pointer_type(symbol.type));
     destructor.arguments().push_back(this_expr);
 
-    targets.destructor_stack.push_back(destructor);
+    targets.destructor_stack.add(destructor);
   }
 }
 
@@ -1254,7 +1258,7 @@ void goto_convertt::convert_break(
 
   // need to process destructor stack
   unwind_destructor_stack(
-    code.source_location(), targets.break_stack_size, dest, mode);
+    code.source_location(), dest, mode, targets.break_stack_node);
 
   // add goto
   dest.add(
@@ -1313,7 +1317,7 @@ void goto_convertt::convert_return(
   }
 
   // Need to process _entire_ destructor stack.
-  unwind_destructor_stack(code.source_location(), 0, dest, mode);
+  unwind_destructor_stack(code.source_location(), dest, mode);
 
   // add goto to end-of-function
   dest.add(goto_programt::make_goto(
@@ -1332,7 +1336,7 @@ void goto_convertt::convert_continue(
 
   // need to process destructor stack
   unwind_destructor_stack(
-    code.source_location(), targets.continue_stack_size, dest, mode);
+    code.source_location(), dest, mode, targets.continue_stack_node);
 
   // add goto
   dest.add(
@@ -1347,7 +1351,7 @@ void goto_convertt::convert_goto(const code_gotot &code, goto_programt &dest)
   t->source_location=code.source_location();
 
   // remember it to do the target later
-  targets.gotos.push_back(std::make_pair(t, targets.destructor_stack));
+  targets.gotos.emplace_back(t, targets.destructor_stack.get_current_node());
 }
 
 void goto_convertt::convert_gcc_computed_goto(
@@ -1373,8 +1377,8 @@ void goto_convertt::convert_start_thread(
   start_thread->code=code;
 
   // remember it to do target later
-  targets.gotos.push_back(
-    std::make_pair(start_thread, targets.destructor_stack));
+  targets.gotos.emplace_back(
+    start_thread, targets.destructor_stack.get_current_node());
 }
 
 void goto_convertt::convert_end_thread(
