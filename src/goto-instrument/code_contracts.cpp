@@ -61,7 +61,9 @@ protected:
 
   const symbolt &new_tmp_symbol(
     const typet &type,
-    const source_locationt &source_location);
+    const source_locationt &source_location,
+    const irep_idt &function_id,
+    const irep_idt &mode);
 };
 
 static void check_apply_invariants(
@@ -248,14 +250,16 @@ void code_contractst::code_contracts(
 
 const symbolt &code_contractst::new_tmp_symbol(
   const typet &type,
-  const source_locationt &source_location)
+  const source_locationt &source_location,
+  const irep_idt &function_id,
+  const irep_idt &mode)
 {
   return get_fresh_aux_symbol(
     type,
-    id2string(source_location.get_function()),
+    id2string(function_id) + "::tmp_cc",
     "tmp_cc",
     source_location,
-    irep_idt(),
+    mode,
     symbol_table);
 }
 
@@ -301,7 +305,8 @@ void code_contractst::add_contract_check(
   g->source_location=skip->source_location;
 
   // prepare function call including all declarations
-  code_function_callt call(ns.lookup(function).symbol_expr());
+  const symbolt &function_symbol = ns.lookup(function);
+  code_function_callt call(function_symbol.symbol_expr());
   replace_symbolt replace;
 
   // decl ret
@@ -310,9 +315,12 @@ void code_contractst::add_contract_check(
     goto_programt::targett d=check.add_instruction(DECL);
     d->source_location=skip->source_location;
 
-    symbol_exprt r=
-      new_tmp_symbol(gf.type.return_type(),
-                     d->source_location).symbol_expr();
+    symbol_exprt r = new_tmp_symbol(
+                       gf.type.return_type(),
+                       d->source_location,
+                       function,
+                       function_symbol.mode)
+                       .symbol_expr();
     d->code=code_declt(r);
 
     call.lhs()=r;
@@ -330,9 +338,10 @@ void code_contractst::add_contract_check(
     goto_programt::targett d=check.add_instruction(DECL);
     d->source_location=skip->source_location;
 
-    symbol_exprt p=
-      new_tmp_symbol(p_it->type(),
-                     d->source_location).symbol_expr();
+    symbol_exprt p =
+      new_tmp_symbol(
+        p_it->type(), d->source_location, function, function_symbol.mode)
+        .symbol_expr();
     d->code=code_declt(p);
 
     call.arguments().push_back(p);

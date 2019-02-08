@@ -14,6 +14,8 @@ Date: June 2003
 #ifndef CPROVER_GOTO_PROGRAMS_REMOVE_FUNCTION_POINTERS_H
 #define CPROVER_GOTO_PROGRAMS_REMOVE_FUNCTION_POINTERS_H
 
+#include <util/irep.h>
+
 class goto_functionst;
 class goto_programt;
 class goto_modelt;
@@ -40,7 +42,8 @@ bool remove_function_pointers(
   symbol_tablet &symbol_table,
   const goto_functionst &goto_functions,
   goto_programt &goto_program,
+  const irep_idt &function_id,
   bool add_safety_assertion,
-  bool only_remove_const_fps=false);
+  bool only_remove_const_fps = false);
 
 #endif // CPROVER_GOTO_PROGRAMS_REMOVE_FUNCTION_POINTERS_H

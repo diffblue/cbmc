@@ -38,13 +38,14 @@ public:
   symbol_factoryt(
     symbol_tablet &_symbol_table,
     const source_locationt &loc,
+    const irep_idt &name_prefix,
     const c_object_factory_parameterst &object_factory_params,
     const lifetimet lifetime)
     : symbol_table(_symbol_table),
       loc(loc),
       ns(_symbol_table),
       object_factory_params(object_factory_params),
-      allocate_objects(ID_C, loc, loc.get_function(), symbol_table),
+      allocate_objects(ID_C, loc, name_prefix, symbol_table),
       lifetime(lifetime)
   {
   }

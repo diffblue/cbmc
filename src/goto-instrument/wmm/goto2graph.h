@@ -142,10 +142,16 @@ protected:
       local_may_aliast &local_may
 #endif
     ); // NOLINT(whitespace/parens)
-    void visit_cfg_fence(goto_programt::instructionst::iterator i_it);
+    void visit_cfg_fence(
+      goto_programt::instructionst::iterator i_it,
+      const irep_idt &function_id);
     void visit_cfg_skip(goto_programt::instructionst::iterator i_it);
-    void visit_cfg_lwfence(goto_programt::instructionst::iterator i_it);
-    void visit_cfg_asm_fence(goto_programt::instructionst::iterator i_it);
+    void visit_cfg_lwfence(
+      goto_programt::instructionst::iterator i_it,
+      const irep_idt &function_id);
+    void visit_cfg_asm_fence(
+      goto_programt::instructionst::iterator i_it,
+      const irep_idt &function_id);
     void visit_cfg_function_call(value_setst &value_sets,
       goto_programt::instructionst::iterator i_it,
       memory_modelt model,

@@ -34,6 +34,7 @@ public:
   irep_idt variable;
   unsigned id;
   source_locationt source_location;
+  irep_idt function_id;
   bool local;
 
   // for ASMfence
@@ -61,10 +62,20 @@ public:
   }
 
   abstract_eventt(
-    operationt _op, unsigned _th, irep_idt _var,
-    unsigned _id, source_locationt _loc, bool _local)
-    :operation(_op), thread(_th), variable(_var), id(_id),
-    source_location(_loc), local(_local)
+    operationt _op,
+    unsigned _th,
+    irep_idt _var,
+    unsigned _id,
+    source_locationt _loc,
+    irep_idt _function_id,
+    bool _local)
+    : operation(_op),
+      thread(_th),
+      variable(_var),
+      id(_id),
+      source_location(_loc),
+      function_id(_function_id),
+      local(_local)
   {
   }
 
@@ -74,6 +85,7 @@ public:
     irep_idt _var,
     unsigned _id,
     source_locationt _loc,
+    irep_idt _function_id,
     bool _local,
     bool WRf,
     bool WWf,
@@ -81,20 +93,21 @@ public:
     bool RWf,
     bool WWc,
     bool RWc,
-    bool RRc):
-    operation(_op),
-    thread(_th),
-    variable(_var),
-    id(_id),
-    source_location(_loc),
-    local(_local),
-    WRfence(RWf),
-    WWfence(WWf),
-    RRfence(RRf),
-    RWfence(WRf),
-    WWcumul(WWc),
-    RWcumul(RWc),
-    RRcumul(RRc)
+    bool RRc)
+    : operation(_op),
+      thread(_th),
+      variable(_var),
+      id(_id),
+      source_location(_loc),
+      function_id(_function_id),
+      local(_local),
+      WRfence(RWf),
+      WWfence(WWf),
+      RRfence(RRf),
+      RWfence(WRf),
+      WWcumul(WWc),
+      RWcumul(RWc),
+      RRcumul(RRc)
   {
   }
 
@@ -106,6 +119,7 @@ public:
     variable=other.variable;
     id=other.id;
     source_location=other.source_location;
+    function_id = other.function_id;
     local=other.local;
   }
 

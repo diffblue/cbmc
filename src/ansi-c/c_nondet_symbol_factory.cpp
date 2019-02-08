@@ -206,7 +206,12 @@ symbol_exprt c_nondet_symbol_factory(
   bool moving_symbol_failed=symbol_table.move(main_symbol, main_symbol_ptr);
   CHECK_RETURN(!moving_symbol_failed);
 
-  symbol_factoryt state(symbol_table, loc, object_factory_parameters, lifetime);
+  symbol_factoryt state(
+    symbol_table,
+    loc,
+    goto_functionst::entry_point(),
+    object_factory_parameters,
+    lifetime);
 
   code_blockt assignments;
   state.gen_nondet_init(assignments, main_symbol_expr);
