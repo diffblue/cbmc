@@ -316,13 +316,8 @@ bool simplify_exprt::simplify_div(exprt &expr)
     if(int_value0.has_value() && int_value1.has_value())
     {
       mp_integer result = *int_value0 / *int_value1;
-      exprt tmp=from_integer(result, expr_type);
-
-      if(tmp.is_not_nil())
-      {
-        expr.swap(tmp);
-        return false;
-      }
+      expr = from_integer(result, expr_type);
+      return false;
     }
   }
   else if(expr_type.id()==ID_rational)
@@ -419,13 +414,8 @@ bool simplify_exprt::simplify_mod(exprt &expr)
       if(int_value0.has_value() && int_value1.has_value())
       {
         mp_integer result = *int_value0 % *int_value1;
-        exprt tmp=from_integer(result, expr.type());
-
-        if(tmp.is_not_nil())
-        {
-          expr.swap(tmp);
-          return false;
-        }
+        expr = from_integer(result, expr.type());
+        return false;
       }
     }
   }
@@ -517,7 +507,6 @@ bool simplify_exprt::simplify_plus(exprt &expr)
                          to_constant_expr(*it)))
             {
               *it=from_integer(0, it->type());
-              CHECK_RETURN(it->is_not_nil());
               result=false;
             }
           }
@@ -550,7 +539,6 @@ bool simplify_exprt::simplify_plus(exprt &expr)
       {
         *(itm->second)=from_integer(0, expr.type());
         *it=from_integer(0, expr.type());
-        CHECK_RETURN(it->is_not_nil());
         expr_map.erase(itm);
         result=false;
       }
@@ -577,7 +565,6 @@ bool simplify_exprt::simplify_plus(exprt &expr)
   if(operands.empty())
   {
     expr = from_integer(0, plus_expr.type());
-    CHECK_RETURN(expr.is_not_nil());
     return false;
   }
   else if(operands.size()==1)
@@ -637,9 +624,7 @@ bool simplify_exprt::simplify_minus(exprt &expr)
 
     if(operands[0]==operands[1])
     {
-      exprt zero = from_integer(0, minus_expr.type());
-      CHECK_RETURN(zero.is_not_nil());
-      expr=zero;
+      expr = from_integer(0, minus_expr.type());
       return false;
     }
   }
@@ -1230,12 +1215,7 @@ bool simplify_exprt::simplify_unary_minus(exprt &expr)
       if(!int_value.has_value())
         return true;
 
-      exprt tmp = from_integer(-*int_value, expr.type());
-
-      if(tmp.is_nil())
-        return true;
-
-      expr.swap(tmp);
+      expr = from_integer(-*int_value, expr.type());
 
       return false;
     }
@@ -1776,7 +1756,6 @@ bool simplify_exprt::simplify_inequality_constant(exprt &expr)
           {
             constant+=i;
             *it=from_integer(0, it->type());
-            CHECK_RETURN(it->is_not_nil());
             changed=true;
           }
         }
