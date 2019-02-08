@@ -60,12 +60,10 @@ void symbolt::show(std::ostream &out) const
     out << " volatile";
   if(!mode.empty())
     out << " mode=" << mode;
-  if(!base_name.empty())
-    out << " base_name=" << base_name;
   if(!module.empty())
     out << " module=" << module;
-  if(!pretty_name.empty())
-    out << " pretty_name=" << pretty_name;
+  if(!display_name.empty())
+    out << " display_name=" << display_name;
   out << '\n';
   out << "  location: " << location << '\n';
 
@@ -92,9 +90,8 @@ void symbolt::swap(symbolt &b)
   SYM_SWAP1(type);
   SYM_SWAP1(value);
   SYM_SWAP1(name);
-  SYM_SWAP1(pretty_name);
+  SYM_SWAP1(display_name);
   SYM_SWAP1(module);
-  SYM_SWAP1(base_name);
   SYM_SWAP1(mode);
   SYM_SWAP1(location);
 
@@ -142,10 +139,7 @@ bool symbolt::is_well_formed() const
   // to have it's base name as a suffix to it's more
   // general name.
 
-  // Exception: Java symbols' base names do not have type signatures
-  // (for example, they can have name "someclass.method:(II)V" and base name
-  // "method")
-  if(!has_suffix(id2string(name), id2string(base_name)) && mode != ID_java)
+  if(!has_suffix(id2string(name), id2string(display_name)))
   {
     bool criterion_must_hold = true;
 
@@ -167,6 +161,13 @@ bool symbolt::is_well_formed() const
       {
         criterion_must_hold = false;
       }
+    }
+    // Exception: Java symbols' base names do not have type signatures
+    // (for example, they can have name "someclass.method:(II)V" and base name
+    // "method")
+    else if(mode == ID_java)
+    {
+      return id2string(name).find(id2string(display_name)) != std::string::npos;
     }
 
     // Linker renaming may have added $linkN suffixes to the name, and other
@@ -210,9 +211,8 @@ bool symbolt::operator==(const symbolt &other) const
     location == other.location &&
     name == other.name &&
     module == other.module &&
-    base_name == other.base_name &&
     mode == other.mode &&
-    pretty_name == other.pretty_name &&
+    display_name == other.display_name &&
     is_type == other.is_type &&
     is_macro == other.is_macro &&
     is_exported == other.is_exported &&
