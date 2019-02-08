@@ -535,6 +535,9 @@ void inline instrumentert::cfg_visitort::visit_cfg_duplicate(
       }
     }
 
+    // The code below uses heuristics to limit false positives: no cycles across
+    // inlined functions, which we would detect when file names or
+    // (user-provided) function names change _within a single goto_program_.
     if(!found_pos
       || new_targ->source_location.get_function()
         !=targ->source_location.get_function()
