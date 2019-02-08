@@ -11,7 +11,6 @@ Date:   June 2017
 #include "java_bytecode_instrument.h"
 
 #include <util/arith_tools.h>
-#include <util/fresh_symbol.h>
 #include <util/std_code.h>
 #include <util/std_expr.h>
 #include <util/c_types.h>
@@ -112,14 +111,8 @@ code_ifthenelset java_bytecode_instrumentt::throw_exception(
 
   // Allocate and throw an instance of the exception class:
 
-  symbolt &new_symbol=
-    get_fresh_aux_symbol(
-      exc_ptr_type,
-      "new_exception",
-      "new_exception",
-      original_loc,
-      ID_java,
-      symbol_table);
+  symbolt &new_symbol = fresh_java_symbol(
+    exc_ptr_type, "new_exception", original_loc, "new_exception", symbol_table);
 
   side_effect_exprt new_instance(ID_java_new, exc_ptr_type, original_loc);
   code_assignt assign_new(new_symbol.symbol_expr(), new_instance);

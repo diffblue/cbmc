@@ -9,7 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_object_factory.h"
 
 #include <util/expr_initializer.h>
-#include <util/fresh_symbol.h>
 #include <util/nondet_bool.h>
 #include <util/nondet.h>
 #include <util/pointer_offset_size.h>
@@ -20,6 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "generic_parameter_specialization_map_keys.h"
 #include "java_root_class.h"
 #include "java_string_literals.h"
+#include "java_utils.h"
 
 class java_object_factoryt
 {
@@ -442,13 +442,8 @@ void initialize_nondet_string_fields(
 
   /// \todo Refactor with make_nondet_string_expr
   // length_expr = nondet(int);
-  const symbolt length_sym = get_fresh_aux_symbol(
-    java_int_type(),
-    id2string(function_id),
-    "tmp_object_factory",
-    loc,
-    ID_java,
-    symbol_table);
+  const symbolt length_sym = fresh_java_symbol(
+    java_int_type(), "tmp_object_factory", loc, function_id, symbol_table);
   const symbol_exprt length_expr = length_sym.symbol_expr();
   const side_effect_expr_nondett nondet_length(length_expr.type(), loc);
   code.add(code_declt(length_expr));
@@ -476,10 +471,10 @@ void initialize_nondet_string_fields(
     index_exprt(data_expr, from_integer(0, java_int_type())));
 
   add_pointer_to_array_association(
-    array_pointer, data_expr, symbol_table, loc, code);
+    array_pointer, data_expr, symbol_table, loc, function_id, code);
 
   add_array_to_length_association(
-    data_expr, length_expr, symbol_table, loc, code);
+    data_expr, length_expr, symbol_table, loc, function_id, code);
 
   struct_expr.operands()[struct_type.component_number("data")] = array_pointer;
 
@@ -487,7 +482,7 @@ void initialize_nondet_string_fields(
   if(printable)
   {
     add_character_set_constraint(
-      array_pointer, length_expr, " -~", symbol_table, loc, code);
+      array_pointer, length_expr, " -~", symbol_table, loc, function_id, code);
   }
 }
 
@@ -745,12 +740,11 @@ symbol_exprt java_object_factoryt::gen_nondet_subtype_pointer_init(
   size_t depth,
   const source_locationt &location)
 {
-  symbolt new_symbol = get_fresh_aux_symbol(
+  symbolt new_symbol = fresh_java_symbol(
     replacement_pointer,
-    id2string(object_factory_parameters.function_id),
     "tmp_object_factory",
-    loc,
-    ID_java,
+    location,
+    object_factory_parameters.function_id,
     symbol_table);
 
   // Generate a new object into this new symbol

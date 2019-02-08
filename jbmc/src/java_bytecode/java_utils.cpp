@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "java_root_class.h"
 
+#include <util/fresh_symbol.h>
 #include <util/invariant.h>
 #include <util/mathematical_expr.h>
 #include <util/message.h>
@@ -433,3 +434,23 @@ const std::unordered_set<std::string> cprover_methods_to_ignore
   "endThread",
   "getCurrentThreadID"
 };
+
+/// \param type: type of new symbol
+/// \param basename_prefix: new symbol will be named
+///   function_name::basename_prefix$num
+/// \param source_location: new symbol source loc
+/// \param function_name: name of the function in which the symbol is defined
+/// \param symbol_table: table to add the new symbol to
+/// \return fresh-named symbol with the requested name pattern
+symbolt &fresh_java_symbol(
+  const typet &type,
+  const std::string &basename_prefix,
+  const source_locationt &source_location,
+  const irep_idt &function_name,
+  symbol_table_baset &symbol_table)
+{
+  PRECONDITION(!function_name.empty());
+  const std::string name_prefix = id2string(function_name);
+  return get_fresh_aux_symbol(
+    type, name_prefix, basename_prefix, source_location, ID_java, symbol_table);
+}

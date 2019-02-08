@@ -10,12 +10,12 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 /// Remove Instance-of Operators
 
 #include "remove_instanceof.h"
+#include "java_utils.h"
 
 #include <goto-programs/class_hierarchy.h>
 #include <goto-programs/class_identifier.h>
 #include <goto-programs/goto_convert.h>
 
-#include <util/fresh_symbol.h>
 #include <java_bytecode/java_types.h>
 
 #include <sstream>
@@ -116,20 +116,18 @@ bool remove_instanceoft::lower_instanceof(
   auto jlo = to_struct_tag_type(java_lang_object_type().subtype());
   exprt object_clsid = get_class_identifier_field(check_ptr, jlo, ns);
 
-  symbolt &clsid_tmp_sym = get_fresh_aux_symbol(
+  symbolt &clsid_tmp_sym = fresh_java_symbol(
     object_clsid.type(),
-    id2string(function_identifier),
     "class_identifier_tmp",
-    source_locationt(),
-    ID_java,
+    this_inst->source_location,
+    function_identifier,
     symbol_table);
 
-  symbolt &instanceof_result_sym = get_fresh_aux_symbol(
+  symbolt &instanceof_result_sym = fresh_java_symbol(
     bool_typet(),
-    id2string(function_identifier),
     "instanceof_result_tmp",
-    source_locationt(),
-    ID_java,
+    this_inst->source_location,
+    function_identifier,
     symbol_table);
 
   // Create

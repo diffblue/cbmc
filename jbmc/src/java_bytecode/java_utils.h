@@ -109,4 +109,11 @@ bool is_non_null_library_global(const irep_idt &);
 
 extern const std::unordered_set<std::string> cprover_methods_to_ignore;
 
+symbolt &fresh_java_symbol(
+  const typet &type,
+  const std::string &basename_prefix,
+  const source_locationt &source_location,
+  const irep_idt &function_name,
+  symbol_table_baset &symbol_table);
+
 #endif // CPROVER_JAVA_BYTECODE_JAVA_UTILS_H

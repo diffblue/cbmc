@@ -375,12 +375,11 @@ exprt::operandst java_build_arguments(
       // method(..., param, ...)
       //
 
-      const symbolt result_symbol = get_fresh_aux_symbol(
+      const symbolt result_symbol = fresh_java_symbol(
         p.type(),
-        id2string(function.name),
         "nondet_parameter_" + std::to_string(param_number),
         function.location,
-        ID_java,
+        function.name,
         symbol_table);
       main_arguments[param_number] = result_symbol.symbol_expr();
 
