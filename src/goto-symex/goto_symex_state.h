@@ -209,10 +209,6 @@ protected:
   l1_typest l1_types;
 
 public:
-  explicit goto_symex_statet(const goto_statet &s) : goto_statet(s)
-  {
-  }
-
   // gotos
   typedef std::list<goto_statet> goto_state_listt;
 
