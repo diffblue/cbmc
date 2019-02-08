@@ -10,6 +10,7 @@
 #include <util/message.h>
 #include <util/options.h>
 
+#include <analyses/dirty.h>
 #include <analyses/local_safe_pointers.h>
 
 #include <memory>
@@ -109,6 +110,10 @@ public:
   {
     return get_unique_index(l2_indices, id, 1);
   }
+
+  /// Local variables are considered 'dirty' if they've had an address taken and
+  /// therefore may be referred to by a pointer.
+  incremental_dirtyt dirty;
 
 private:
   // Derived classes should override these methods, allowing the base class to

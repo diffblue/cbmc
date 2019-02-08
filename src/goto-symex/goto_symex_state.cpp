@@ -39,7 +39,6 @@ goto_symex_statet::goto_symex_statet(
     guard_manager(manager),
     symex_target(nullptr),
     record_events(true),
-    dirty(),
     fresh_l2_name_provider(fresh_l2_name_provider)
 {
   threads.emplace_back(guard_manager);
@@ -352,10 +351,11 @@ bool goto_symex_statet::l2_thread_read_encoding(
     return false;
 
   // is it a shared object?
+  PRECONDITION(dirty != nullptr);
   const irep_idt &obj_identifier=expr.get_object_name();
   if(
     obj_identifier == guard_identifier() ||
-    (!ns.lookup(obj_identifier).is_shared() && !(dirty)(obj_identifier)))
+    (!ns.lookup(obj_identifier).is_shared() && !(*dirty)(obj_identifier)))
   {
     return false;
   }
@@ -476,10 +476,11 @@ goto_symex_statet::write_is_shared_resultt goto_symex_statet::write_is_shared(
   if(!record_events)
     return write_is_shared_resultt::NOT_SHARED;
 
+  PRECONDITION(dirty != nullptr);
   const irep_idt &obj_identifier = expr.get_object_name();
   if(
     obj_identifier == guard_identifier() ||
-    (!ns.lookup(obj_identifier).is_shared() && !(dirty)(obj_identifier)))
+    (!ns.lookup(obj_identifier).is_shared() && !(*dirty)(obj_identifier)))
   {
     return write_is_shared_resultt::NOT_SHARED;
   }
