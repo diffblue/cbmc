@@ -168,11 +168,9 @@ void dump_ct::operator()(std::ostream &os)
     const symbolt &symbol=ns.lookup(*it);
     const irep_idt &type_id=symbol.type.id();
 
-    if(symbol.is_type &&
-       symbol.location.get_function().empty() &&
-       (type_id==ID_struct ||
-        type_id==ID_union ||
-        type_id==ID_c_enum))
+    if(
+      symbol.is_type && !symbol.has_local_scope &&
+      (type_id == ID_struct || type_id == ID_union || type_id == ID_c_enum))
     {
       if(!system_symbols.is_symbol_internal_symbol(symbol, system_headers))
       {
@@ -293,7 +291,7 @@ void dump_ct::convert_compound_declaration(
     const symbolt &symbol,
     std::ostream &os_body)
 {
-  if(!symbol.location.get_function().empty())
+  if(symbol.has_local_scope)
     return;
 
   // do compound type body
@@ -737,8 +735,7 @@ void dump_ct::gather_global_typedefs()
   {
     const symbolt &symbol=symbol_entry.second;
 
-    if(symbol.is_macro && symbol.is_type &&
-       symbol.location.get_function().empty())
+    if(symbol.is_macro && symbol.is_type && !symbol.has_local_scope)
     {
       const irep_idt &typedef_str=symbol.type.get(ID_C_typedef);
       PRECONDITION(!typedef_str.empty());
@@ -843,9 +840,10 @@ void dump_ct::convert_global_variable(
     std::ostream &os,
     local_static_declst &local_static_decls)
 {
-  const irep_idt &func=symbol.location.get_function();
-  if((func.empty() || symbol.is_extern || symbol.value.is_not_nil()) &&
-      !converted_global.insert(symbol.name).second)
+  const bool global = !symbol.has_local_scope;
+  if(
+    (global || symbol.is_extern || symbol.value.is_not_nil()) &&
+    !converted_global.insert(symbol.name).second)
     return;
 
   code_declt d(symbol.symbol_expr());
@@ -856,8 +854,7 @@ void dump_ct::convert_global_variable(
 
   // add a tentative declaration to cater for symbols in the initializer
   // relying on it this symbol
-  if((func.empty() || symbol.is_extern) &&
-     (symbol.value.is_nil() || !syms.empty()))
+  if((global || symbol.is_extern) && (symbol.value.is_nil() || !syms.empty()))
   {
     os << "// " << symbol.name << '\n';
     os << "// " << symbol.location << '\n';
@@ -889,7 +886,7 @@ void dump_ct::convert_global_variable(
     d.copy_to_operands(symbol.value);
   }
 
-  if(!func.empty() && !symbol.is_extern)
+  if(!global && !symbol.is_extern)
   {
     local_static_decls.emplace(symbol.name, d);
   }

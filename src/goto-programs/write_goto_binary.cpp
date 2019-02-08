@@ -62,7 +62,7 @@ bool write_goto_binary_v5(
     flags = (flags << 1) | static_cast<int>(sym.is_state_var);
     flags = (flags << 1) | static_cast<int>(sym.is_parameter);
     flags = (flags << 1) | static_cast<int>(sym.is_auxiliary);
-    flags = (flags << 1) | static_cast<int>(false); // sym.binding;
+    flags = (flags << 1) | static_cast<int>(sym.has_local_scope);
     flags = (flags << 1) | static_cast<int>(sym.is_lvalue);
     flags = (flags << 1) | static_cast<int>(sym.is_static_lifetime);
     flags = (flags << 1) | static_cast<int>(sym.is_thread_local);

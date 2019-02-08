@@ -233,6 +233,7 @@ void cpp_typecheckt::typecheck_compound_type(
       cpp_scopes.current_scope().suffix;
     symbol.type.set(
       ID_tag, cpp_scopes.current_scope().prefix+id2string(symbol.base_name));
+    symbol.has_local_scope = !cpp_scopes.current_scope().is_global_scope();
 
     // move early, must be visible before doing body
     symbolt *new_symbol;

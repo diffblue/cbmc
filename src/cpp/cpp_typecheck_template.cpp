@@ -178,6 +178,7 @@ void cpp_typecheckt::typecheck_class_template(
 
   symbol.pretty_name=
     cpp_scopes.current_scope().prefix+id2string(symbol.base_name);
+  symbol.has_local_scope = !cpp_scopes.current_scope().is_global_scope();
 
   symbolt *new_symbol;
   if(symbol_table.move(symbol, new_symbol))

@@ -60,7 +60,7 @@ static bool read_bin_goto_object_v5(
     sym.is_state_var = (flags &(1 << 9))!=0;
     sym.is_parameter = (flags &(1 << 8))!=0;
     sym.is_auxiliary = (flags &(1 << 7))!=0;
-    // sym.binding = (flags &(1 << 6))!=0;
+    sym.has_local_scope = (flags & (1 << 6)) != 0;
     sym.is_lvalue = (flags &(1 << 5))!=0;
     sym.is_static_lifetime = (flags &(1 << 4))!=0;
     sym.is_thread_local = (flags &(1 << 3))!=0;

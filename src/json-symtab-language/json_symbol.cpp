@@ -107,6 +107,8 @@ symbolt symbol_from_json(const jsont &in)
       result.is_auxiliary = try_get_bool(kv.second, "isAuxiliary");
     else if(kv.first == "isWeak")
       result.is_weak = try_get_bool(kv.second, "isWeak");
+    else if(kv.first == "hasLocalScope")
+      result.has_local_scope = try_get_bool(kv.second, "hasLocalScope");
     else if(kv.first == "prettyType")
     {
     } // ignore

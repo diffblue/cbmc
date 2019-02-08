@@ -48,6 +48,8 @@ void symbolt::show(std::ostream &out) const
     out << " auxiliary";
   if(is_weak)
     out << " weak";
+  if(has_local_scope)
+    out << " local_scope";
   if(is_property)
     out << " property";
   if(is_state_var)
@@ -108,6 +110,7 @@ void symbolt::swap(symbolt &b)
   SYM_SWAP2(is_parameter);
   SYM_SWAP2(is_auxiliary);
   SYM_SWAP2(is_weak);
+  SYM_SWAP2(has_local_scope);
   SYM_SWAP2(is_lvalue);
   SYM_SWAP2(is_static_lifetime);
   SYM_SWAP2(is_thread_local);
@@ -220,6 +223,7 @@ bool symbolt::operator==(const symbolt &other) const
     is_parameter == other.is_parameter &&
     is_auxiliary == other.is_auxiliary &&
     is_weak == other.is_weak &&
+    has_local_scope == other.has_local_scope &&
     is_lvalue == other.is_lvalue &&
     is_static_lifetime == other.is_static_lifetime &&
     is_thread_local == other.is_thread_local &&

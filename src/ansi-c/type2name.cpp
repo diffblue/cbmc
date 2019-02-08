@@ -38,11 +38,18 @@ static std::string type2name_tag(
   if(ns.lookup(identifier, symbol))
     return "SYM#"+id2string(identifier)+"#";
 
+  std::string result;
+
+  // this isn't really a qualifier, but the linker needs to
+  // distinguish these - should likely be fixed in the linker instead
+  if(symbol->has_local_scope)
+    result += 'l';
+
   assert(symbol && symbol->is_type);
 
   if(symbol->type.id()!=ID_struct &&
      symbol->type.id()!=ID_union)
-    return type2name(symbol->type, ns, symbol_number);
+    return result + type2name(symbol->type, ns, symbol_number);
 
   // assign each symbol a number when seen for the first time
   std::pair<symbol_numbert::iterator, bool> entry=
@@ -50,9 +57,8 @@ static std::string type2name_tag(
         identifier,
         std::make_pair(symbol_number.size(), true)));
 
-  std::string result = "SYM" +
-                       id2string(to_struct_union_type(symbol->type).get_tag()) +
-                       '#' + std::to_string(entry.first->second.first);
+  result += "SYM" + id2string(to_struct_union_type(symbol->type).get_tag()) +
+            '#' + std::to_string(entry.first->second.first);
 
   // new entry, add definition
   if(entry.second)
@@ -98,11 +104,6 @@ static std::string type2name(
 
   if(type.get_bool(ID_C_noreturn))
     result+='n';
-
-  // this isn't really a qualifier, but the linker needs to
-  // distinguish these - should likely be fixed in the linker instead
-  if(!type.source_location().get_function().empty())
-    result+='l';
 
   if(type.id().empty())
     throw "empty type encountered";
