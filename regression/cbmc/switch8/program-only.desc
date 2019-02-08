@@ -1,0 +1,12 @@
+CORE
+main.c
+--pointer-check --program-only
+^EXIT=0$
+^SIGNAL=0$
+a!0@1#2 == 0$
+--
+^warning: ignoring
+a!0@1#1 == 0$
+--
+Symbolic execution should get to see the declarations in the body of a switch,
+even when they are outside any case statement.

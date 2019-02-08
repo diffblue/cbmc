@@ -428,7 +428,7 @@ protected:
   void typecheck_block(code_blockt &) override;
   void typecheck_ifthenelse(code_ifthenelset &) override;
   void typecheck_while(code_whilet &) override;
-  void typecheck_switch(code_switcht &) override;
+  void typecheck_switch(codet &) override;
 
   const struct_typet &this_struct_type();
 

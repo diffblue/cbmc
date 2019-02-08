@@ -58,7 +58,7 @@ void c_typecheck_baset::typecheck_code(codet &code)
   else if(statement==ID_for)
     typecheck_for(code);
   else if(statement==ID_switch)
-    typecheck_switch(to_code_switch(code));
+    typecheck_switch(code);
   else if(statement==ID_break)
     typecheck_break(code);
   else if(statement==ID_goto)
@@ -667,19 +667,16 @@ void c_typecheck_baset::typecheck_return(code_returnt &code)
   }
 }
 
-void c_typecheck_baset::typecheck_switch(code_switcht &code)
+void c_typecheck_baset::typecheck_switch(codet &code)
 {
-  if(code.operands().size()!=2)
-  {
-    error().source_location = code.source_location();
-    error() << "switch expects two operands" << eom;
-    throw 0;
-  }
+  // we expect a code_switcht, but might return either a code_switcht or a
+  // code_blockt, hence don't use code_switcht in the interface
+  code_switcht &code_switch = to_code_switch(code);
 
-  typecheck_expr(code.value());
+  typecheck_expr(code_switch.value());
 
   // this needs to be promoted
-  implicit_typecast_arithmetic(code.value());
+  implicit_typecast_arithmetic(code_switch.value());
 
   // save & set flags
 
@@ -687,10 +684,45 @@ void c_typecheck_baset::typecheck_switch(code_switcht &code)
   bool old_break_is_allowed(break_is_allowed);
   typet old_switch_op_type(switch_op_type);
 
-  switch_op_type=code.value().type();
+  switch_op_type = code_switch.value().type();
   break_is_allowed=case_is_allowed=true;
 
-  typecheck_code(code.body());
+  typecheck_code(code_switch.body());
+
+  if(code_switch.body().get_statement() == ID_block)
+  {
+    // Collect all declarations before the first case, if there is any case
+    // (including a default one).
+    code_blockt wrapping_block;
+
+    code_blockt &body_block = to_code_block(code_switch.body());
+    for(auto &statement : body_block.statements())
+    {
+      if(statement.get_statement() == ID_switch_case)
+        break;
+      else if(statement.get_statement() == ID_decl)
+      {
+        if(statement.operands().size() == 1)
+        {
+          wrapping_block.add(code_skipt());
+          wrapping_block.statements().back().swap(statement);
+        }
+        else
+        {
+          PRECONDITION(statement.operands().size() == 2);
+          wrapping_block.add(statement);
+          wrapping_block.statements().back().operands().pop_back();
+          statement.set_statement(ID_assign);
+        }
+      }
+    }
+
+    if(!wrapping_block.statements().empty())
+    {
+      wrapping_block.add(std::move(code));
+      code.swap(wrapping_block);
+    }
+  }
 
   // restore flags
   case_is_allowed=old_case_is_allowed;

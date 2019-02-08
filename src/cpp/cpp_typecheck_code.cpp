@@ -172,18 +172,19 @@ void cpp_typecheckt::typecheck_while(code_whilet &code)
     c_typecheck_baset::typecheck_while(code);
 }
 
-void cpp_typecheckt::typecheck_switch(code_switcht &code)
+void cpp_typecheckt::typecheck_switch(codet &code)
 {
   // In addition to the C syntax, C++ also allows a declaration
   // as condition. E.g.,
   // switch(int i=...) ...
 
-  if(code.value().id()==ID_code)
+  exprt &value = to_code_switch(code).value();
+  if(value.id() == ID_code)
   {
     // we shall rewrite that into
     // { int i=....; switch(i) .... }
 
-    codet decl=to_code(code.value());
+    codet decl = to_code(value);
     typecheck_decl(decl);
 
     assert(decl.get_statement()==ID_decl_block);
@@ -191,7 +192,7 @@ void cpp_typecheckt::typecheck_switch(code_switcht &code)
 
     // replace declaration by its symbol
     assert(decl.op0().op0().id()==ID_symbol);
-    code.value()=decl.op0().op0();
+    value = decl.op0().op0();
 
     c_typecheck_baset::typecheck_switch(code);
 
