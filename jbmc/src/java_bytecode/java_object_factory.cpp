@@ -890,7 +890,7 @@ void java_object_factoryt::gen_nondet_struct_init(
 
       // This code mirrors the `remove_java_new` pass:
       auto initial_object =
-        zero_initializer(struct_type, source_locationt(), ns);
+        zero_initializer(expr.type(), source_locationt(), ns);
       CHECK_RETURN(initial_object.has_value());
       const irep_idt qualified_clsid = "java::" + id2string(class_identifier);
       set_class_identifier(
