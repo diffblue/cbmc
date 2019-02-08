@@ -97,11 +97,6 @@ public:
     return !is_thread_local;
   }
 
-  bool is_procedure_local() const
-  {
-    return !is_static_lifetime;
-  }
-
   bool is_function() const
   {
     return !is_type && !is_macro && type.id()==ID_code;
