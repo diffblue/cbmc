@@ -121,9 +121,9 @@ public:
   // These are not stable.
   typedef std::vector<treet> subt;
 
-// named_subt has to provide stable references; with C++11 we could
-// use std::forward_list or std::vector< unique_ptr<T> > to save
-// memory and increase efficiency.
+  // named_subt has to provide stable references; we can
+  // use std::forward_list or std::vector< unique_ptr<T> > to save
+  // memory and increase efficiency.
 
 #ifdef NAMED_SUB_IS_FORWARD_LIST
   typedef std::forward_list<std::pair<irep_namet, treet>> named_subt;
@@ -177,8 +177,120 @@ public:
   }
 };
 
-/// \brief Base class for tree-like data structures with sharing
-///
+/// Base class for tree-like data structures with sharing
+template <typename derivedt>
+class sharing_treet
+{
+public:
+  using dt = tree_nodet<derivedt, true>;
+  using subt = typename dt::subt;
+  using named_subt = typename dt::named_subt;
+
+  /// Used to refer to this class from derived classes
+  using tree_implementationt = sharing_treet;
+
+  explicit sharing_treet(irep_idt _id) : data(new dt(std::move(_id)))
+  {
+  }
+
+  sharing_treet(irep_idt _id, named_subt _named_sub, subt _sub)
+    : data(new dt(std::move(_id), std::move(_named_sub), std::move(_sub)))
+  {
+  }
+
+  // constructor for blank irep
+  sharing_treet() : data(&empty_d)
+  {
+  }
+
+  // copy constructor
+  sharing_treet(const sharing_treet &irep) : data(irep.data)
+  {
+    if(data!=&empty_d)
+    {
+      // NOLINTNEXTLINE(build/deprecated)
+      PRECONDITION(data->ref_count != 0);
+      data->ref_count++;
+#ifdef IREP_DEBUG
+      std::cout << "COPY " << data << " " << data->ref_count << '\n';
+#endif
+    }
+  }
+
+  // Copy from rvalue reference.
+  // Note that this does avoid a branch compared to the
+  // standard copy constructor above.
+  sharing_treet(sharing_treet &&irep) : data(irep.data)
+  {
+#ifdef IREP_DEBUG
+    std::cout << "COPY MOVE\n";
+#endif
+    irep.data=&empty_d;
+  }
+
+  sharing_treet &operator=(const sharing_treet &irep)
+  {
+#ifdef IREP_DEBUG
+    std::cout << "ASSIGN\n";
+#endif
+
+    // Ordering is very important here!
+    // Consider self-assignment, which may destroy 'irep'
+    dt *irep_data=irep.data;
+    if(irep_data!=&empty_d)
+      irep_data->ref_count++;
+
+    remove_ref(data); // this may kill 'irep'
+    data=irep_data;
+
+    return *this;
+  }
+
+  // Note that the move assignment operator does avoid
+  // three branches compared to standard operator above.
+  sharing_treet &operator=(sharing_treet &&irep)
+  {
+#ifdef IREP_DEBUG
+    std::cout << "ASSIGN MOVE\n";
+#endif
+    // we simply swap two pointers
+    std::swap(data, irep.data);
+    return *this;
+  }
+
+  ~sharing_treet()
+  {
+    remove_ref(data);
+  }
+
+protected:
+  dt *data;
+  static dt empty_d;
+
+  static void remove_ref(dt *old_data);
+  static void nonrecursive_destructor(dt *old_data);
+  void detach();
+
+public:
+  const dt &read() const
+  {
+    return *data;
+  }
+
+  dt &write()
+  {
+    detach();
+#ifdef HASH_CODE
+    data->hash_code = 0;
+#endif
+    return *data;
+  }
+};
+
+// Static field initialization
+template <typename derivedt>
+typename sharing_treet<derivedt>::dt sharing_treet<derivedt>::empty_d;
+
 /// There are a large number of kinds of tree structured or tree-like data in
 /// CPROVER. \ref irept provides a single, unified representation for all of
 /// these, allowing structure sharing and reference counting of data. As
@@ -230,29 +342,33 @@ public:
 /// code / one semi-colon). The most common descendant of \ref codet is
 /// \ref code_assignt so a common pattern is to cast the \ref codet to an
 /// assignment and then recurse on the expression on either side.
+#ifdef SHARING
+class irept : public sharing_treet<irept>
+#else
 class irept
+#endif
 {
 public:
+#ifndef SHARING
   // These are not stable.
   typedef std::vector<irept> subt;
 
-#ifdef SHARING
-  typedef tree_nodet<irept, true> dt;
-#else
   typedef tree_nodet<irept, false> dt;
-#endif
-// named_subt has to provide stable references; with C++11 we could
-// use std::forward_list or std::vector< unique_ptr<T> > to save
-// memory and increase efficiency.
 
-#ifdef NAMED_SUB_IS_FORWARD_LIST
-  typedef std::forward_list<std::pair<irep_namet, irept>> named_subt;
-#else
-  typedef std::map<irep_namet, irept> named_subt;
+  typedef dt::named_subt named_subt;
 #endif
+  // named_subt has to provide stable references; with C++11 we could
+  // use std::forward_list or std::vector< unique_ptr<T> > to save
+  // memory and increase efficiency.
 
-  bool is_nil() const { return id()==ID_nil; }
-  bool is_not_nil() const { return id()!=ID_nil; }
+  bool is_nil() const
+  {
+    return id() == ID_nil;
+  }
+  bool is_not_nil() const
+  {
+    return id() != ID_nil;
+  }
 
 #if !defined(SHARING)
   explicit irept(const irep_idt &_id)
@@ -266,88 +382,22 @@ public:
     get_named_sub() = _named_sub;
     get_sub() = _sub;
   }
-#else
-  explicit irept(irep_idt _id) : data(new dt(std::move(_id)))
-  {
-  }
 
-  irept(irep_idt _id, named_subt _named_sub, subt _sub)
-    : data(new dt(std::move(_id), std::move(_named_sub), std::move(_sub)))
-  {
-  }
-#endif
-
-#ifdef SHARING
-  // constructor for blank irep
-  irept():data(&empty_d)
-  {
-  }
-
-  // copy constructor
-  irept(const irept &irep):data(irep.data)
-  {
-    if(data!=&empty_d)
-    {
-      // NOLINTNEXTLINE(build/deprecated)
-      PRECONDITION(data->ref_count != 0);
-      data->ref_count++;
-      #ifdef IREP_DEBUG
-      std::cout << "COPY " << data << " " << data->ref_count << '\n';
-      #endif
-    }
-  }
-
-  // Copy from rvalue reference.
-  // Note that this does avoid a branch compared to the
-  // standard copy constructor above.
-  irept(irept &&irep):data(irep.data)
-  {
-    #ifdef IREP_DEBUG
-    std::cout << "COPY MOVE\n";
-    #endif
-    irep.data=&empty_d;
-  }
-
-  irept &operator=(const irept &irep)
-  {
-    #ifdef IREP_DEBUG
-    std::cout << "ASSIGN\n";
-    #endif
-
-    // Ordering is very important here!
-    // Consider self-assignment, which may destroy 'irep'
-    dt *irep_data=irep.data;
-    if(irep_data!=&empty_d)
-      irep_data->ref_count++;
-
-    remove_ref(data); // this may kill 'irep'
-    data=irep_data;
-
-    return *this;
-  }
-
-  // Note that the move assignment operator does avoid
-  // three branches compared to standard operator above.
-  irept &operator=(irept &&irep)
-  {
-    #ifdef IREP_DEBUG
-    std::cout << "ASSIGN MOVE\n";
-    #endif
-    // we simply swap two pointers
-    std::swap(data, irep.data);
-    return *this;
-  }
-
-  ~irept()
-  {
-    remove_ref(data);
-  }
-
-  #else
   irept()
   {
   }
-  #endif
+#else
+  explicit irept(const irep_idt &_id) : sharing_treet(_id)
+  {
+  }
+
+  irept(const irep_idt &_id, const named_subt &_named_sub, const subt &_sub)
+    : sharing_treet(_id, _named_sub, _sub)
+  {
+  }
+
+  irept() = default;
+#endif
 
   const irep_idt &id() const
   { return read().data; }
@@ -427,30 +477,7 @@ public:
   static std::size_t number_of_non_comments(const named_subt &);
 
 protected:
-  #ifdef SHARING
-  dt *data;
-  static dt empty_d;
-
-  static void remove_ref(dt *old_data);
-  static void nonrecursive_destructor(dt *old_data);
-  void detach();
-
-public:
-  const dt &read() const
-  {
-    return *data;
-  }
-
-  dt &write()
-  {
-    detach();
-    #ifdef HASH_CODE
-    data->hash_code=0;
-    #endif
-    return *data;
-  }
-
-  #else
+#ifndef SHARING
   dt data;
 
 public:
@@ -510,5 +537,119 @@ struct diagnostics_helpert<irep_pretty_diagnosticst>
     return irep.irep.pretty();
   }
 };
+
+template <typename derivedt>
+void sharing_treet<derivedt>::detach()
+{
+#ifdef IREP_DEBUG
+  std::cout << "DETACH1: " << data << '\n';
+#endif
+
+  if(data == &empty_d)
+  {
+    data = new dt;
+
+#ifdef IREP_DEBUG
+    std::cout << "ALLOCATED " << data << '\n';
+#endif
+  }
+  else if(data->ref_count > 1)
+  {
+    dt *old_data(data);
+    data = new dt(*old_data);
+
+#ifdef IREP_DEBUG
+    std::cout << "ALLOCATED " << data << '\n';
+#endif
+
+    data->ref_count = 1;
+    remove_ref(old_data);
+  }
+
+  POSTCONDITION(data->ref_count == 1);
+
+#ifdef IREP_DEBUG
+  std::cout << "DETACH2: " << data << '\n';
+#endif
+}
+
+template <typename derivedt>
+void sharing_treet<derivedt>::remove_ref(dt *old_data)
+{
+  if(old_data == &empty_d)
+    return;
+
+#if 0
+    nonrecursive_destructor(old_data);
+#else
+
+  PRECONDITION(old_data->ref_count != 0);
+
+#ifdef IREP_DEBUG
+  std::cout << "R: " << old_data << " " << old_data->ref_count << '\n';
+#endif
+
+  old_data->ref_count--;
+  if(old_data->ref_count == 0)
+  {
+#ifdef IREP_DEBUG
+    std::cout << "D: " << pretty() << '\n';
+    std::cout << "DELETING " << old_data->data << " " << old_data << '\n';
+    old_data->clear();
+    std::cout << "DEALLOCATING " << old_data << "\n";
+#endif
+
+    // may cause recursive call
+    delete old_data;
+
+#ifdef IREP_DEBUG
+    std::cout << "DONE\n";
+#endif
+  }
+#endif
+}
+
+/// Does the same as remove_ref, but using an explicit stack instead of
+/// recursion.
+template <typename derivedt>
+void sharing_treet<derivedt>::nonrecursive_destructor(dt *old_data)
+{
+  std::vector<dt *> stack(1, old_data);
+
+  while(!stack.empty())
+  {
+    dt *d = stack.back();
+    stack.erase(--stack.end());
+    if(d == &empty_d)
+      continue;
+
+    INVARIANT(d->ref_count != 0, "All contents of the stack must be in use");
+    d->ref_count--;
+
+    if(d->ref_count == 0)
+    {
+      stack.reserve(
+        stack.size() + std::distance(d->named_sub.begin(), d->named_sub.end()) +
+        d->sub.size());
+
+      for(typename named_subt::iterator it = d->named_sub.begin();
+          it != d->named_sub.end();
+          it++)
+      {
+        stack.push_back(it->second.data);
+        it->second.data = &empty_d;
+      }
+
+      for(typename subt::iterator it = d->sub.begin(); it != d->sub.end(); it++)
+      {
+        stack.push_back(it->data);
+        it->data = &empty_d;
+      }
+
+      // now delete, won't do recursion
+      delete d;
+    }
+  }
+}
 
 #endif // CPROVER_UTIL_IREP_H

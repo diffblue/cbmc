@@ -27,10 +27,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 irept nil_rep_storage;
 
-#ifdef SHARING
-irept::dt irept::empty_d;
-#endif
-
 #ifdef NAMED_SUB_IS_FORWARD_LIST
 static inline bool named_subt_order(
   const std::pair<irep_namet, irept> &a,
@@ -58,128 +54,6 @@ const irept &get_nil_irep()
     nil_rep_storage.id(ID_nil);
   return nil_rep_storage;
 }
-
-#ifdef SHARING
-void irept::detach()
-{
-  #ifdef IREP_DEBUG
-  std::cout << "DETACH1: " << data << '\n';
-  #endif
-
-  if(data==&empty_d)
-  {
-    data=new dt;
-
-    #ifdef IREP_DEBUG
-    std::cout << "ALLOCATED " << data << '\n';
-    #endif
-  }
-  else if(data->ref_count>1)
-  {
-    dt *old_data(data);
-    data=new dt(*old_data);
-
-    #ifdef IREP_DEBUG
-    std::cout << "ALLOCATED " << data << '\n';
-    #endif
-
-    data->ref_count=1;
-    remove_ref(old_data);
-  }
-
-  POSTCONDITION(data->ref_count==1);
-
-  #ifdef IREP_DEBUG
-  std::cout << "DETACH2: " << data << '\n';
-  #endif
-}
-#endif
-
-#ifdef SHARING
-void irept::remove_ref(dt *old_data)
-{
-  if(old_data==&empty_d)
-    return;
-
-  #if 0
-  nonrecursive_destructor(old_data);
-  #else
-
-  PRECONDITION(old_data->ref_count!=0);
-
-  #ifdef IREP_DEBUG
-  std::cout << "R: " << old_data << " " << old_data->ref_count << '\n';
-  #endif
-
-  old_data->ref_count--;
-  if(old_data->ref_count==0)
-  {
-    #ifdef IREP_DEBUG
-    std::cout << "D: " << pretty() << '\n';
-    std::cout << "DELETING " << old_data->data
-              << " " << old_data << '\n';
-    old_data->clear();
-    std::cout << "DEALLOCATING " << old_data << "\n";
-    #endif
-
-    // may cause recursive call
-    delete old_data;
-
-    #ifdef IREP_DEBUG
-    std::cout << "DONE\n";
-    #endif
-  }
-  #endif
-}
-#endif
-
-/// Does the same as remove_ref, but using an explicit stack instead of
-/// recursion.
-#ifdef SHARING
-void irept::nonrecursive_destructor(dt *old_data)
-{
-  std::vector<dt *> stack(1, old_data);
-
-  while(!stack.empty())
-  {
-    dt *d=stack.back();
-    stack.erase(--stack.end());
-    if(d==&empty_d)
-      continue;
-
-    INVARIANT(d->ref_count!=0, "All contents of the stack must be in use");
-    d->ref_count--;
-
-    if(d->ref_count==0)
-    {
-      stack.reserve(
-        stack.size() + std::distance(d->named_sub.begin(), d->named_sub.end()) +
-        d->sub.size());
-
-      for(named_subt::iterator
-          it=d->named_sub.begin();
-          it!=d->named_sub.end();
-          it++)
-      {
-        stack.push_back(it->second.data);
-        it->second.data=&empty_d;
-      }
-
-      for(subt::iterator
-          it=d->sub.begin();
-          it!=d->sub.end();
-          it++)
-      {
-        stack.push_back(it->data);
-        it->data=&empty_d;
-      }
-
-      // now delete, won't do recursion
-      delete d;
-    }
-  }
-}
-#endif
 
 void irept::move_to_named_sub(const irep_namet &name, irept &irep)
 {
