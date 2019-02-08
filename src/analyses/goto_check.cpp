@@ -241,11 +241,7 @@ void goto_checkt::div_by_zero_check(
   // add divison by zero subgoal
 
   exprt zero=from_integer(0, expr.op1().type());
-
-  if(zero.is_nil())
-    throw "no zero of argument type of operator "+expr.id_string();
-
-  const notequal_exprt inequality(expr.op1(), zero);
+  const notequal_exprt inequality(expr.op1(), std::move(zero));
 
   add_guarded_claim(
     inequality,
@@ -289,11 +285,8 @@ void goto_checkt::undefined_shift_check(
     exprt width_expr=
       from_integer(to_bitvector_type(op_type).get_width(), distance_type);
 
-    if(width_expr.is_nil())
-      throw "no number for width for operator "+expr.id_string();
-
     add_guarded_claim(
-      binary_relation_exprt(expr.distance(), ID_lt, width_expr),
+      binary_relation_exprt(expr.distance(), ID_lt, std::move(width_expr)),
       "shift distance too large",
       "undefined-shift",
       expr.find_source_location(),
@@ -336,11 +329,7 @@ void goto_checkt::mod_by_zero_check(
   // add divison by zero subgoal
 
   exprt zero=from_integer(0, expr.op1().type());
-
-  if(zero.is_nil())
-    throw "no zero of argument type of operator "+expr.id_string();
-
-  const notequal_exprt inequality(expr.op1(), zero);
+  const notequal_exprt inequality(expr.op1(), std::move(zero));
 
   add_guarded_claim(
     inequality,
@@ -1270,10 +1259,10 @@ void goto_checkt::bounds_check(
         }
 
         exprt zero=from_integer(0, ode.offset().type());
-        assert(zero.is_not_nil());
 
         // the final offset must not be negative
-        binary_relation_exprt inequality(effective_offset, ID_ge, zero);
+        binary_relation_exprt inequality(
+          effective_offset, ID_ge, std::move(zero));
 
         add_guarded_claim(
           inequality,

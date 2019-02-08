@@ -214,7 +214,6 @@ exprt object_lower_bound(
   exprt p_offset=pointer_offset(pointer);
 
   exprt zero=from_integer(0, p_offset.type());
-  CHECK_RETURN(zero.is_not_nil());
 
   if(offset.is_not_nil())
   {
@@ -222,5 +221,5 @@ exprt object_lower_bound(
       p_offset, typecast_exprt::conditional_cast(offset, p_offset.type()));
   }
 
-  return binary_relation_exprt(p_offset, ID_lt, zero);
+  return binary_relation_exprt(std::move(p_offset), ID_lt, std::move(zero));
 }

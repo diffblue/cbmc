@@ -105,13 +105,12 @@ bvt boolbvt::convert_index(const index_exprt &expr)
 
       binary_relation_exprt lower_bound(
         from_integer(0, index.type()), ID_le, index);
-      CHECK_RETURN(lower_bound.lhs().is_not_nil());
       binary_relation_exprt upper_bound(
         index, ID_lt, from_integer(array_size, index.type()));
-      CHECK_RETURN(upper_bound.rhs().is_not_nil());
 
-      and_exprt range_condition(lower_bound, upper_bound);
-      implies_exprt implication(range_condition, value_equality);
+      and_exprt range_condition(std::move(lower_bound), std::move(upper_bound));
+      implies_exprt implication(
+        std::move(range_condition), std::move(value_equality));
 
       // Simplify may remove the lower bound if the type
       // is correct.

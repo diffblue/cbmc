@@ -333,7 +333,6 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
       op_type.id() == ID_floatbv ? ID_ieee_float_notequal : ID_notequal,
       from_integer(0, op_type));
     inequality.add_source_location()=expr.source_location();
-    CHECK_RETURN(inequality.rhs().is_not_nil());
     simplify_node(inequality);
     expr.swap(inequality);
     return false;
@@ -592,13 +591,11 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
         if(operand.is_true())
         {
           expr=from_integer(1, expr_type);
-          CHECK_RETURN(expr.is_not_nil());
           return false;
         }
         else if(operand.is_false())
         {
           expr=from_integer(0, expr_type);
-          CHECK_RETURN(expr.is_not_nil());
           return false;
         }
       }
