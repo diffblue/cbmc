@@ -461,8 +461,7 @@ void linkingt::duplicate_code_symbol(
     // return type are an error as we would end up with assignments with
     // mismatching types; as we currently do not patch these by inserting type
     // casts we need to fail hard
-    if(!old_symbol.location.get_function().empty() &&
-       old_symbol.value.is_nil())
+    if(old_symbol.type.get_bool(ID_C_incomplete) && old_symbol.value.is_nil())
     {
       if(base_type_eq(old_t.return_type(), new_t.return_type(), ns))
          link_warning(
@@ -479,8 +478,8 @@ void linkingt::duplicate_code_symbol(
       old_symbol.location=new_symbol.location;
       old_symbol.is_weak=new_symbol.is_weak;
     }
-    else if(!new_symbol.location.get_function().empty() &&
-            new_symbol.value.is_nil())
+    else if(
+      new_symbol.type.get_bool(ID_C_incomplete) && new_symbol.value.is_nil())
     {
       if(base_type_eq(old_t.return_type(), new_t.return_type(), ns))
         link_warning(

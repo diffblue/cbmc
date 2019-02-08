@@ -728,8 +728,9 @@ void goto_convertt::do_function_call_symbol(
     a->source_location=function.source_location();
     a->source_location.set("user-provided", true);
   }
-  else if(identifier=="assert" &&
-          !ns.lookup(identifier).location.get_function().empty())
+  else if(
+    identifier == "assert" && symbol->type.get_bool(ID_C_incomplete) &&
+    to_code_type(symbol->type).return_type() == signed_int_type())
   {
     if(arguments.size()!=1)
     {
