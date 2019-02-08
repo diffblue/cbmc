@@ -199,11 +199,11 @@ void instrumentert::cfg_visitort::visit_cfg_function(
       #ifdef ATOMIC_BREAK
       visit_cfg_thread();
       #elif defined ATOMIC_FENCE
-      visit_cfg_fence(i_it);
-      #else
+      visit_cfg_fence(i_it, function_id);
+#else
       /* propagates */
       visit_cfg_propagate(i_it);
-      #endif
+#endif
     }
     /* a:=b -o-> Rb -po-> Wa */
     else if(instruction.is_assign())
@@ -222,11 +222,11 @@ void instrumentert::cfg_visitort::visit_cfg_function(
     else if(is_fence(instruction, instrumenter.ns))
     {
       instrumenter.message.debug() << "Constructing a fence" << messaget::eom;
-      visit_cfg_fence(i_it);
+      visit_cfg_fence(i_it, function_id);
     }
     else if(model!=TSO && is_lwfence(instruction, instrumenter.ns))
     {
-      visit_cfg_lwfence(i_it);
+      visit_cfg_lwfence(i_it, function_id);
     }
     else if(model==TSO && is_lwfence(instruction, instrumenter.ns))
     {
@@ -236,7 +236,7 @@ void instrumentert::cfg_visitort::visit_cfg_function(
     else if(instruction.is_other()
       && instruction.code.get_statement()==ID_fence)
     {
-      visit_cfg_asm_fence(i_it);
+      visit_cfg_asm_fence(i_it, function_id);
     }
     else if(instruction.is_function_call())
     {
@@ -745,11 +745,18 @@ void instrumentert::cfg_visitort::visit_cfg_function_call(
 }
 
 void instrumentert::cfg_visitort::visit_cfg_lwfence(
-  goto_programt::instructionst::iterator i_it)
+  goto_programt::instructionst::iterator i_it,
+  const irep_idt &function_id)
 {
   const goto_programt::instructiont &instruction=*i_it;
-  const abstract_eventt new_fence_event(abstract_eventt::operationt::Lwfence,
-    thread, "f", instrumenter.unique_id++, instruction.source_location, false);
+  const abstract_eventt new_fence_event(
+    abstract_eventt::operationt::Lwfence,
+    thread,
+    "f",
+    instrumenter.unique_id++,
+    instruction.source_location,
+    function_id,
+    false);
   const event_idt new_fence_node=egraph.add_node();
   egraph[new_fence_node](new_fence_event);
   const event_idt new_fence_gnode=egraph_alt.add_node();
@@ -777,7 +784,8 @@ void instrumentert::cfg_visitort::visit_cfg_lwfence(
 }
 
 void instrumentert::cfg_visitort::visit_cfg_asm_fence(
-  goto_programt::instructionst::iterator i_it)
+  goto_programt::instructionst::iterator i_it,
+  const irep_idt &function_id)
 {
   const goto_programt::instructiont &instruction=*i_it;
   bool WRfence=instruction.code.get_bool(ID_WRfence);
@@ -787,9 +795,21 @@ void instrumentert::cfg_visitort::visit_cfg_asm_fence(
   bool WWcumul=instruction.code.get_bool(ID_WWcumul);
   bool RRcumul=instruction.code.get_bool(ID_RRcumul);
   bool RWcumul=instruction.code.get_bool(ID_RWcumul);
-  const abstract_eventt new_fence_event(abstract_eventt::operationt::ASMfence,
-    thread, "asm", instrumenter.unique_id++, instruction.source_location,
-    false, WRfence, WWfence, RRfence, RWfence, WWcumul, RWcumul, RRcumul);
+  const abstract_eventt new_fence_event(
+    abstract_eventt::operationt::ASMfence,
+    thread,
+    "asm",
+    instrumenter.unique_id++,
+    instruction.source_location,
+    function_id,
+    false,
+    WRfence,
+    WWfence,
+    RRfence,
+    RWfence,
+    WWcumul,
+    RWcumul,
+    RRcumul);
   const event_idt new_fence_node=egraph.add_node();
   egraph[new_fence_node](new_fence_event);
   const event_idt new_fence_gnode=egraph_alt.add_node();
@@ -870,9 +890,14 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
     assert(read_expr);
 #endif
 
-    const abstract_eventt new_read_event(abstract_eventt::operationt::Read,
-      thread, id2string(read), instrumenter.unique_id++,
-      instruction.source_location, local(read));
+    const abstract_eventt new_read_event(
+      abstract_eventt::operationt::Read,
+      thread,
+      id2string(read),
+      instrumenter.unique_id++,
+      instruction.source_location,
+      function_id,
+      local(read));
 
     const event_idt new_read_node=egraph.add_node();
     egraph[new_read_node]=new_read_event;
@@ -968,9 +993,14 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
     // assert(write_expr);
 
     /* creates Write */
-    const abstract_eventt new_write_event(abstract_eventt::operationt::Write,
-      thread, id2string(write), instrumenter.unique_id++,
-      instruction.source_location, local(write));
+    const abstract_eventt new_write_event(
+      abstract_eventt::operationt::Write,
+      thread,
+      id2string(write),
+      instrumenter.unique_id++,
+      instruction.source_location,
+      function_id,
+      local(write));
 
     const event_idt new_write_node=egraph.add_node();
     egraph[new_write_node](new_write_event);
@@ -1140,11 +1170,18 @@ void instrumentert::cfg_visitort::visit_cfg_assign(
 }
 
 void instrumentert::cfg_visitort::visit_cfg_fence(
-  goto_programt::instructionst::iterator i_it)
+  goto_programt::instructionst::iterator i_it,
+  const irep_idt &function_id)
 {
   const goto_programt::instructiont &instruction=*i_it;
-  const abstract_eventt new_fence_event(abstract_eventt::operationt::Fence,
-    thread, "F", instrumenter.unique_id++, instruction.source_location, false);
+  const abstract_eventt new_fence_event(
+    abstract_eventt::operationt::Fence,
+    thread,
+    "F",
+    instrumenter.unique_id++,
+    instruction.source_location,
+    function_id,
+    false);
   const event_idt new_fence_node=egraph.add_node();
   egraph[new_fence_node](new_fence_event);
   const event_idt new_fence_gnode=egraph_alt.add_node();
@@ -1443,7 +1480,7 @@ void inline instrumentert::print_outputs_local(
       if(render_po_aligned)
         same_po[ev.thread].insert(*it_e);
       if(render_by_function)
-        same_file[ev.source_location.get_function()].insert(*it_e);
+        same_file[ev.function_id].insert(*it_e);
       else if(render_by_file)
         same_file[ev.source_location.get_file()].insert(*it_e);
       if(ev.thread>max_thread)
