@@ -40,7 +40,7 @@ public:
     symex_target_equationt equation;
     goto_symex_statet state;
 
-    explicit patht(const symex_target_equationt &e, const goto_symex_statet &s)
+    patht(const symex_target_equationt &e, const goto_symex_statet &s)
       : equation(e), state(s, &equation)
     {
     }
