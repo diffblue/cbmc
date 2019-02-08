@@ -169,12 +169,14 @@ private:
     const exprt &lhs,
     const std::size_t initial_depth,
     const source_locationt &source_location,
+    const irep_idt &function_id,
     symbol_tablet &symbol_table,
     goto_programt &dest) const
   {
     symbol_factoryt symbol_factory(
       symbol_table,
       source_location,
+      function_id,
       object_factory_parameters,
       lifetimet::DYNAMIC);
 
@@ -235,6 +237,7 @@ protected:
           dereference_expr,
           1, // depth 1 since we pass the dereferenced pointer
           function_symbol.location,
+          function_name,
           symbol_table,
           dest);
 
@@ -260,6 +263,7 @@ protected:
         symbol_exprt(global_sym.name, global_sym.type),
         0,
         function_symbol.location,
+        irep_idt(),
         symbol_table,
         dest);
 
@@ -291,6 +295,7 @@ protected:
         aux_symbol.symbol_expr(),
         0,
         function_symbol.location,
+        function_name,
         symbol_table,
         dest);
 

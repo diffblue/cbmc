@@ -42,7 +42,9 @@ public:
 
   void operator()(goto_functionst &goto_functions);
 
-  bool remove_function_pointers(goto_programt &goto_program);
+  bool remove_function_pointers(
+    goto_programt &goto_program,
+    const irep_idt &function_id);
 
   // a set of function symbols
   using functionst = remove_const_function_pointerst::functionst;
@@ -51,10 +53,12 @@ public:
   /// target in the given goto-program by a case-split
   /// over a given set of functions
   /// \param goto_program: The goto program that contains target
+  /// \param function_id: Name of function containing the target
   /// \param target: location with function call with function pointer
   /// \param functions: The set of functions to consider
   void remove_function_pointer(
     goto_programt &goto_program,
+    const irep_idt &function_id,
     goto_programt::targett target,
     const functionst &functions);
 
@@ -76,9 +80,11 @@ protected:
   /// target in the given goto-program by determining
   /// functions that have a compatible signature
   /// \param goto_program: The goto program that contains target
+  /// \param function_id: Name of function containing the target
   /// \param target: location with function call with function pointer
   void remove_function_pointer(
     goto_programt &goto_program,
+    const irep_idt &function_id,
     goto_programt::targett target);
 
   std::unordered_set<irep_idt> address_taken;
@@ -97,6 +103,7 @@ protected:
 
   void fix_argument_types(code_function_callt &function_call);
   void fix_return_type(
+    const irep_idt &in_function_id,
     code_function_callt &function_call,
     goto_programt &dest);
 };
@@ -225,6 +232,7 @@ void remove_function_pointerst::fix_argument_types(
 }
 
 void remove_function_pointerst::fix_return_type(
+  const irep_idt &in_function_id,
   code_function_callt &function_call,
   goto_programt &dest)
 {
@@ -245,7 +253,7 @@ void remove_function_pointerst::fix_return_type(
 
   symbolt &tmp_symbol = get_fresh_aux_symbol(
     code_type.return_type(),
-    id2string(function_call.source_location().get_function()),
+    id2string(in_function_id),
     "tmp_return_val_" + id2string(function_symbol.base_name),
     function_call.source_location(),
     function_symbol.mode,
@@ -264,6 +272,7 @@ void remove_function_pointerst::fix_return_type(
 
 void remove_function_pointerst::remove_function_pointer(
   goto_programt &goto_program,
+  const irep_idt &function_id,
   goto_programt::targett target)
 {
   const code_function_callt &code = target->get_function_call();
@@ -352,11 +361,12 @@ void remove_function_pointerst::remove_function_pointer(
     }
   }
 
-  remove_function_pointer(goto_program, target, functions);
+  remove_function_pointer(goto_program, function_id, target, functions);
 }
 
 void remove_function_pointerst::remove_function_pointer(
   goto_programt &goto_program,
+  const irep_idt &function_id,
   goto_programt::targett target,
   const functionst &functions)
 {
@@ -386,7 +396,7 @@ void remove_function_pointerst::remove_function_pointer(
     // the signature of the function might not match precisely
     fix_argument_types(t1->get_function_call());
 
-    fix_return_type(t1->get_function_call(), new_code_calls);
+    fix_return_type(function_id, t1->get_function_call(), new_code_calls);
     // goto final
     goto_programt::targett t3=new_code_calls.add_instruction();
     t3->make_goto(t_final, true_exprt());
@@ -466,7 +476,8 @@ void remove_function_pointerst::remove_function_pointer(
 }
 
 bool remove_function_pointerst::remove_function_pointers(
-  goto_programt &goto_program)
+  goto_programt &goto_program,
+  const irep_idt &function_id)
 {
   bool did_something=false;
 
@@ -477,7 +488,7 @@ bool remove_function_pointerst::remove_function_pointers(
 
       if(code.function().id()==ID_dereference)
       {
-        remove_function_pointer(goto_program, target);
+        remove_function_pointer(goto_program, function_id, target);
         did_something=true;
       }
     }
@@ -499,7 +510,7 @@ void remove_function_pointerst::operator()(goto_functionst &functions)
   {
     goto_programt &goto_program=f_it->second.body;
 
-    if(remove_function_pointers(goto_program))
+    if(remove_function_pointers(goto_program, f_it->first))
       did_something=true;
   }
 
@@ -507,10 +518,12 @@ void remove_function_pointerst::operator()(goto_functionst &functions)
     functions.compute_location_numbers();
 }
 
-bool remove_function_pointers(message_handlert &_message_handler,
+bool remove_function_pointers(
+  message_handlert &_message_handler,
   symbol_tablet &symbol_table,
   const goto_functionst &goto_functions,
   goto_programt &goto_program,
+  const irep_idt &function_id,
   bool add_safety_assertion,
   bool only_remove_const_fps)
 {
@@ -522,7 +535,7 @@ bool remove_function_pointers(message_handlert &_message_handler,
       only_remove_const_fps,
       goto_functions);
 
-  return rfp.remove_function_pointers(goto_program);
+  return rfp.remove_function_pointers(goto_program, function_id);
 }
 
 void remove_function_pointers(
