@@ -2,7 +2,7 @@ CORE dfcc-only
 main.c
 --dfcc main --enforce-contract baz _ --pointer-primitive-check
 ^\[free.frees.\d+\].*Check that ptr is freeable: FAILURE
-^\[baz.assigns.\d+\].*Check that \*a is assignable: SUCCESS$
+^\[baz_wrapped_for_contract_checking.assigns.\d+\].*Check that \*a is assignable: SUCCESS$
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$

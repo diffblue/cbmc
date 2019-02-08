@@ -1,9 +1,9 @@
 CORE dfcc-only
 main.c
 --dfcc main --enforce-contract foo
-^\[foo.assertion.\d+\].*in1 is rw_ok: SUCCESS$
-^\[foo.assertion.\d+\].*in2 is rw_ok: SUCCESS$
-^\[foo.assertion.\d+\].*in1 and in2 do not alias: SUCCESS$
+^\[foo_wrapped_for_contract_checking.assertion.\d+\].*in1 is rw_ok: SUCCESS$
+^\[foo_wrapped_for_contract_checking.assertion.\d+\].*in2 is rw_ok: SUCCESS$
+^\[foo_wrapped_for_contract_checking.assertion.\d+\].*in1 and in2 do not alias: SUCCESS$
 ^\[foo.postcondition.\d+\].*Check ensures clause of contract contract::foo for function foo: FAILURE$
 ^EXIT=10$
 ^SIGNAL=0$

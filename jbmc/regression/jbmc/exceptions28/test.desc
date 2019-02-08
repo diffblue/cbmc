@@ -1,7 +1,7 @@
 CORE
 test
 --unwind 10
-^\[java::test.main:\(\[Ljava/lang/String;\)V\.1\] line 7 no uncaught exception: FAILURE$
+^\[__CPROVER__start\.1\] line 7 no uncaught exception: FAILURE$
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$

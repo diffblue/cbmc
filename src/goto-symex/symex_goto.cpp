@@ -940,8 +940,7 @@ void goto_symext::loop_bound_exceeded(
   {
     // Generate VCC for unwinding assertion.
     const std::string property_id =
-      id2string(state.source.pc->source_location().get_function()) +
-      ".unwind." + loop_number;
+      id2string(state.source.function_id) + ".unwind." + loop_number;
     vcc(
       negated_cond,
       property_id,

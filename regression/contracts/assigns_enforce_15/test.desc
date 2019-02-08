@@ -1,9 +1,9 @@
 CORE
 main.c
 --enforce-contract foo --enforce-contract baz --enforce-contract qux
-^\[foo.assigns.\d+\] line \d+ Check that \*x is valid: SUCCESS$
-^\[baz.assigns.\d+\] line \d+ Check that global is assignable: FAILURE$
-^\[qux.assigns.\d+\] line \d+ Check that global is assignable: FAILURE$
+^\[__CPROVER_contracts_original_foo.assigns.\d+\] line \d+ Check that \*x is valid: SUCCESS$
+^\[__CPROVER_contracts_original_baz.assigns.\d+\] line \d+ Check that global is assignable: FAILURE$
+^\[__CPROVER_contracts_original_qux.assigns.\d+\] line \d+ Check that global is assignable: FAILURE$
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$

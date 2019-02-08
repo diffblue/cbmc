@@ -3,7 +3,7 @@ main.c
 --dfcc main --enforce-contract f
 ^EXIT=0$
 ^SIGNAL=0$
-^\[f\.assigns.\d+\] line \d+ Check that \*a is assignable: SUCCESS
+^\[f_wrapped_for_contract_checking\.assigns.\d+\] line \d+ Check that \*a is assignable: SUCCESS
 ^VERIFICATION SUCCESSFUL$
 --
 --

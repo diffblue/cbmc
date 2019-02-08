@@ -4,9 +4,9 @@ main.c
 ^EXIT=0$
 ^SIGNAL=0$
 \[foo.postcondition.\d+\] line \d+ Check ensures clause( of contract contract::foo for function foo)?: SUCCESS
-\[foo.assigns.\d+\] line \d+ Check that \*x is assignable: SUCCESS
-\[foo.assigns.\d+\] line \d+ Check that x\[\(.* int\)5\] is assignable: SUCCESS
-\[foo.assigns.\d+\] line \d+ Check that x\[\(.* int\)9\] is assignable: SUCCESS
+\[foo_wrapped_for_contract_checking.assigns.\d+\] line \d+ Check that \*x is assignable: SUCCESS
+\[foo_wrapped_for_contract_checking.assigns.\d+\] line \d+ Check that x\[\(.* int\)5\] is assignable: SUCCESS
+\[foo_wrapped_for_contract_checking.assigns.\d+\] line \d+ Check that x\[\(.* int\)9\] is assignable: SUCCESS
 ^VERIFICATION SUCCESSFUL$
 --
 --

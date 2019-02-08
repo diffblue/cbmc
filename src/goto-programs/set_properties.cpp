@@ -67,13 +67,12 @@ void label_properties(
       it->source_location_nonconst().set_function(function_identifier);
     }
 
-    irep_idt function = it->source_location().get_function();
+    PRECONDITION(!function_identifier.empty());
+    std::string prefix = id2string(function_identifier);
 
-    std::string prefix=id2string(function);
     if(!it->source_location().get_property_class().empty())
     {
-      if(!prefix.empty())
-        prefix+=".";
+      prefix += ".";
 
       std::string class_infix =
         id2string(it->source_location().get_property_class());
@@ -84,8 +83,7 @@ void label_properties(
       prefix+=class_infix;
     }
 
-    if(!prefix.empty())
-      prefix+=".";
+    prefix += ".";
 
     std::size_t &count=property_counters[prefix];
 

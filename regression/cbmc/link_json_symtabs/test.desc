@@ -3,7 +3,7 @@ one.json_symtab
 two.json_symtab
 ^EXIT=0$
 ^SIGNAL=0$
-\[1\] file two.adb line [0-9]+ assertion: SUCCESS
+\[two\.1\] file two.adb line [0-9]+ assertion: SUCCESS
 ^VERIFICATION SUCCESSFUL$
 --
 ^warning: ignoring

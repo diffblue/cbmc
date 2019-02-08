@@ -3,9 +3,9 @@ main.c
 --enforce-contract f1 --enforce-contract f2 --enforce-contract f3 --enforce-contract f4
 ^EXIT=10$
 ^SIGNAL=0$
-^\[f1.assigns.\d+\] line \d+ Check that p->y is assignable: FAILURE$
-^\[f2.assigns.\d+\] line \d+ Check that p->x is assignable: FAILURE$
-^\[f3.assigns.\d+\] line \d+ Check that p->y is assignable: SUCCESS$
+^\[__CPROVER_contracts_original_f1.assigns.\d+\] line \d+ Check that p->y is assignable: FAILURE$
+^\[__CPROVER_contracts_original_f2.assigns.\d+\] line \d+ Check that p->x is assignable: FAILURE$
+^\[__CPROVER_contracts_original_f3.assigns.\d+\] line \d+ Check that p->y is assignable: SUCCESS$
 ^VERIFICATION FAILED$
 --
 --

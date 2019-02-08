@@ -3,8 +3,8 @@ main.c
 --enforce-contract foo
 ^EXIT=10$
 ^SIGNAL=0$
-^\[foo.assigns.\d+\] line \d+ Check that __CPROVER_POINTER_OBJECT\((\(.+\))?y\) is assignable: FAILURE$
-^\[foo.assigns.\d+\] line \d+ Check that x is assignable: FAILURE$
+^\[__CPROVER_contracts_original_foo.assigns.\d+\] line \d+ Check that __CPROVER_POINTER_OBJECT\((\(.+\))?y\) is assignable: FAILURE$
+^\[__CPROVER_contracts_original_foo.assigns.\d+\] line \d+ Check that x is assignable: FAILURE$
 ^VERIFICATION FAILED$
 --
 --

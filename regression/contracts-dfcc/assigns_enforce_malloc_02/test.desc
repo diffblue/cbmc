@@ -2,9 +2,9 @@ CORE dfcc-only
 main.c
 --dfcc main --enforce-contract f
 main.c function f
-^\[f.assigns.\d+\] line 7 Check that ptr is assignable: SUCCESS$
-^\[f.assigns.\d+\] line 12 Check that \*ptr is assignable: SUCCESS$
-^\[f.assigns.\d+\] line 13 Check that n is assignable: SUCCESS$
+^\[f_wrapped_for_contract_checking.assigns.\d+\] line 7 Check that ptr is assignable: SUCCESS$
+^\[f_wrapped_for_contract_checking.assigns.\d+\] line 12 Check that \*ptr is assignable: SUCCESS$
+^\[f_wrapped_for_contract_checking.assigns.\d+\] line 13 Check that n is assignable: SUCCESS$
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

@@ -7,7 +7,7 @@ main.c
 ^\[bar.assigns.\d+\] line \d+ Check that \*x is assignable: SUCCESS$
 ^\[bar.assigns.\d+\] line \d+ Check that \*y is assignable: SUCCESS$
 ^\[baz.assigns.\d+\] line \d+ Check that \*z is assignable: SUCCESS$
-^\[foo.assigns.\d+\] line \d+ Check that \*x is assignable: SUCCESS$
+^\[foo_wrapped_for_contract_checking.assigns.\d+\] line \d+ Check that \*x is assignable: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 --
 --

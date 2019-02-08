@@ -45,11 +45,14 @@ void show_properties(
 /// \param property: irep_idt that identifies property
 /// \param goto_functions: program in which to search for
 ///   the property
-/// \return optional<source_locationt> the location of the
-///   property, if found.
-optionalt<source_locationt> find_property(
-    const irep_idt &property,
-    const goto_functionst &goto_functions);
+/// \return A pair of function identifier and source location, where the
+///   function identifier is that of the GOTO function that contains the ASSERT
+///   instruction labelled by \p property, if any such property label exists.
+///   The source location is that of the ASSERT instruction matching the
+///   property. The function identifier and source location's function attribute
+///   are not necessarily equal.
+optionalt<std::pair<irep_idt, source_locationt>>
+find_property(const irep_idt &property, const goto_functionst &goto_functions);
 
 /// \brief Collects the properties in the goto program into a `json_arrayt`
 /// \param json_properties: JSON array to hold the properties

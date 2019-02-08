@@ -4,7 +4,7 @@ main.c
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[f1.postcondition.\d+\] line \d+ Check ensures clause of contract contract::f1 for function f1: SUCCESS$
-^\[f1.assigns.\d+\] line \d+ Check that arr\[\(.*\)\d\] is assignable: SUCCESS$
+^\[f1_wrapped_for_contract_checking.assigns.\d+\] line \d+ Check that arr\[\(.*\)\d\] is assignable: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 --
 ^warning: ignoring
