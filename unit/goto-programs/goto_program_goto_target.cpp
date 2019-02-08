@@ -37,7 +37,7 @@ SCENARIO(
     instructions.back().make_assertion(x_le_10);
 
     instructions.emplace_back(goto_program_instruction_typet::GOTO);
-    instructions.back().make_goto(instructions.begin());
+    instructions.back().make_goto(instructions.begin(), true_exprt());
 
     symbol.type = type1;
     symbol_table.insert(symbol);

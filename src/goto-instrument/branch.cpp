@@ -56,7 +56,7 @@ void branch(
           function_to_call(goto_model.symbol_table, id, "taken"));
 
         goto_programt::targett t2=body.insert_after(t1);
-        t2->make_goto(i_it->get_target());
+        t2->make_goto(i_it->get_target(), true_exprt());
 
         goto_programt::targett t3=body.insert_after(t2);
         t3->make_function_call(

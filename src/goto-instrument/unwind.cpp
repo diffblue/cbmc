@@ -177,9 +177,9 @@ void goto_unwindt::unwind(
       goto_programt::targett t_goto=goto_program.insert_before(loop_exit);
       unwind_log.insert(t_goto, loop_exit->location_number);
 
-      t_goto->make_goto(goto_program.const_cast_target(loop_exit));
+      t_goto->make_goto(
+        goto_program.const_cast_target(loop_exit), true_exprt());
       t_goto->source_location=loop_exit->source_location;
-      t_goto->guard=true_exprt();
       t_goto->location_number=loop_exit->location_number;
     }
 
