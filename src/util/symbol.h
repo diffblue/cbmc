@@ -63,8 +63,8 @@ public:
 
   // ANSI-C
   bool is_static_lifetime, is_thread_local;
-  bool is_lvalue, is_file_local, is_extern, is_volatile,
-       is_parameter, is_auxiliary, is_weak;
+  bool is_lvalue, is_file_local, is_extern, is_volatile, is_parameter,
+    is_auxiliary, is_weak, has_local_scope;
 
   symbolt()
   {
@@ -80,11 +80,10 @@ public:
 
     name=module=base_name=mode=pretty_name=irep_idt();
 
-    is_type=is_macro=is_exported=
-    is_input=is_output=is_state_var=is_property=
-    is_static_lifetime=is_thread_local=
-    is_lvalue=is_file_local=is_extern=is_volatile=
-    is_parameter=is_auxiliary=is_weak=false;
+    is_type = is_macro = is_exported = is_input = is_output = is_state_var =
+      is_property = is_static_lifetime = is_thread_local = is_lvalue =
+        is_file_local = is_extern = is_volatile = is_parameter = is_auxiliary =
+          is_weak = has_local_scope = false;
   }
 
   void swap(symbolt &b);
@@ -153,6 +152,7 @@ public:
     is_thread_local=true;
     is_file_local=true;
     is_auxiliary=true;
+    has_local_scope = true;
   }
 
   auxiliary_symbolt(const irep_idt &name, const typet &type):
@@ -177,6 +177,7 @@ public:
     is_thread_local=true;
     is_file_local=true;
     is_parameter=true;
+    has_local_scope = true;
   }
 };
 

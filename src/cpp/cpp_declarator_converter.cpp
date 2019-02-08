@@ -426,6 +426,8 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
   symbol.is_type=is_typedef;
   symbol.is_macro=is_typedef && !is_template_parameter;
   symbol.pretty_name=pretty_name;
+  symbol.has_local_scope =
+    !cpp_typecheck.cpp_scopes.current_scope().is_global_scope();
 
   // Constant? These are propagated.
   if(symbol.type.get_bool(ID_C_constant) &&

@@ -139,6 +139,7 @@ void ansi_c_declarationt::to_symbol(
   symbol.is_macro=get_is_typedef() || get_is_enum_constant();
   symbol.is_parameter=get_is_parameter();
   symbol.is_weak=get_is_weak();
+  symbol.has_local_scope = !get_is_global();
 
   // is it a function?
 
