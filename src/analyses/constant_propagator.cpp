@@ -478,8 +478,9 @@ void constant_propagator_domaint::valuest::set_dirty_to_top(
 
     const symbolt &symbol=ns.lookup(id);
 
-    if((!symbol.is_procedure_local() || dirty(id)) &&
-       !symbol.type.get_bool(ID_C_constant))
+    if(
+      (symbol.is_static_lifetime || dirty(id)) &&
+      !symbol.type.get_bool(ID_C_constant))
     {
       it = replace_const.erase(it);
     }
