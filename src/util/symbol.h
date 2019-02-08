@@ -42,20 +42,11 @@ public:
   /// Name of module the symbol belongs to
   irep_idt module;
 
-  /// Base (non-scoped) name
-  irep_idt base_name;
-
   /// Language mode
   irep_idt mode;
 
   /// Language-specific display name
-  irep_idt pretty_name;
-
-  /// Return language specific display name if present.
-  const irep_idt &display_name() const
-  {
-    return pretty_name.empty()?name:pretty_name;
-  }
+  irep_idt display_name;
 
   // global use
   bool is_type, is_macro, is_exported,
@@ -78,7 +69,7 @@ public:
     value.make_nil();
     location.make_nil();
 
-    name=module=base_name=mode=pretty_name=irep_idt();
+    name=module=mode=display_name=irep_idt();
 
     is_type = is_macro = is_exported = is_input = is_output = is_state_var =
       is_property = is_static_lifetime = is_thread_local = is_lvalue =
@@ -159,7 +150,7 @@ public:
     auxiliary_symbolt()
   {
     this->name=name;
-    this->base_name=name;
+    this->display_name = name;
     this->type=type;
   }
 };
