@@ -695,6 +695,7 @@ void add_array_to_length_association(
 ///   lower case ascii letters.
 /// \param symbol_table: the symbol table
 /// \param loc: source location
+/// \param function_id: the name of the function
 /// \param [out] code: code block to which declaration and calls get added
 void add_character_set_constraint(
   const exprt &pointer,
@@ -702,6 +703,7 @@ void add_character_set_constraint(
   const irep_idt &char_set,
   symbol_table_baset &symbol_table,
   const source_locationt &loc,
+  const irep_idt &function_id,
   code_blockt &code)
 {
   PRECONDITION(pointer.type().id() == ID_pointer);

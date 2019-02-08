@@ -487,7 +487,7 @@ void initialize_nondet_string_fields(
   if(printable)
   {
     add_character_set_constraint(
-      array_pointer, length_expr, " -~", symbol_table, loc, code);
+      array_pointer, length_expr, " -~", symbol_table, loc, function_id, code);
   }
 }
 

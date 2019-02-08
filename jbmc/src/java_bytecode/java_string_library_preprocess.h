@@ -361,6 +361,7 @@ void add_character_set_constraint(
   const irep_idt &char_set,
   symbol_table_baset &symbol_table,
   const source_locationt &loc,
+  const irep_idt &function_id,
   code_blockt &code);
 
 #endif // CPROVER_JAVA_BYTECODE_JAVA_STRING_LIBRARY_PREPROCESS_H
