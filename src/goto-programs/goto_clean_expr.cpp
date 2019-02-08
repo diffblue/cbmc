@@ -34,7 +34,7 @@ symbol_exprt goto_convertt::make_compound_literal(
     source_location,
     mode,
     symbol_table);
-  new_symbol.is_static_lifetime=source_location.get_function().empty();
+  new_symbol.is_static_lifetime = lifetime != lifetimet::AUTOMATIC_LOCAL;
   new_symbol.value=expr;
 
   // The value might depend on a variable, thus
