@@ -230,11 +230,6 @@ private:
     const source_locationt &loc,
     symbol_table_baset &symbol_table);
 
-  symbol_exprt fresh_array(
-    const typet &type,
-    const source_locationt &loc,
-    symbol_tablet &symbol_table);
-
   refined_string_exprt decl_string_expr(
     const source_locationt &loc,
     const irep_idt &function_id,

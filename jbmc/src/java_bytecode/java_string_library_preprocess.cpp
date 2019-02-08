@@ -241,27 +241,6 @@ void java_string_library_preprocesst::add_string_type(
   string_symbol->mode = ID_java;
 }
 
-/// add a symbol in the table with static lifetime and name containing
-/// `cprover_string_array` and given type
-/// \param type: an array type
-/// \param location: a location in the program
-/// \param symbol_table: symbol table
-symbol_exprt java_string_library_preprocesst::fresh_array(
-  const typet &type,
-  const source_locationt &location,
-  symbol_tablet &symbol_table)
-{
-  symbolt array_symbol=get_fresh_aux_symbol(
-    type,
-    "cprover_string_array",
-    "cprover_string_array",
-    location,
-    ID_java,
-    symbol_table);
-  array_symbol.is_static_lifetime=true;
-  return array_symbol.symbol_expr();
-}
-
 /// calls string_refine_preprocesst::process_operands with a list of parameters.
 /// \param params: a list of function parameters
 /// \param loc: location in the source
