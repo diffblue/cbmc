@@ -328,42 +328,6 @@ exprt::operandst java_string_library_preprocesst::process_operands(
   return ops;
 }
 
-/// Converts the operands of the equals function to string expressions and
-/// outputs these conversions. As a side effect of the conversions it adds some
-/// code to init_code.
-/// \param operands: a list of expressions
-/// \param loc: location in the source
-/// \param symbol_table: symbol table
-/// \param init_code: code block, in which declaration of some arguments may be
-///   added
-/// \return a list of expressions
-exprt::operandst
-java_string_library_preprocesst::process_equals_function_operands(
-  const exprt::operandst &operands,
-  const source_locationt &loc,
-  symbol_table_baset &symbol_table,
-  code_blockt &init_code)
-{
-  PRECONDITION(operands.size()==2);
-  exprt::operandst ops;
-  const exprt &op0=operands[0];
-  const exprt &op1 = operands[1];
-  PRECONDITION(implements_java_char_sequence_pointer(op0.type()));
-
-  ops.push_back(
-    convert_exprt_to_string_exprt(
-      op0, loc, symbol_table, loc.get_function(), init_code));
-
-  // TODO: Manage the case where we have a non-String Object (this should
-  // probably be handled upstream. At any rate, the following code should be
-  // protected with assertions on the type of op1.
-  const typecast_exprt tcast(op1, to_pointer_type(op0.type()));
-  ops.push_back(
-    convert_exprt_to_string_exprt(
-      tcast, loc, symbol_table, loc.get_function(), init_code));
-  return ops;
-}
-
 /// Finds the type of the data component
 /// \param type: a type containing a "data" component
 /// \param symbol_table: symbol table

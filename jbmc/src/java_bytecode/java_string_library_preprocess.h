@@ -212,12 +212,6 @@ private:
     symbol_table_baset &symbol_table,
     code_blockt &init_code);
 
-  exprt::operandst process_equals_function_operands(
-    const exprt::operandst &operands,
-    const source_locationt &loc,
-    symbol_table_baset &symbol_table,
-    code_blockt &init_code);
-
   refined_string_exprt replace_char_array(
     const exprt &array_pointer,
     const source_locationt &loc,
