@@ -219,9 +219,8 @@ void goto_convertt::finish_computed_gotos(goto_programt &goto_program)
       goto_programt::targett t=
         goto_program.insert_after(g_it);
 
-      t->make_goto(label.second.first);
+      t->make_goto(label.second.first, guard);
       t->source_location=i.source_location;
-      t->guard=guard;
     }
   }
 
@@ -969,8 +968,7 @@ void goto_convertt::convert_for(
   targets.set_continue(tmp_x.instructions.begin());
 
   // v: if(!c) goto z;
-  v->make_goto(z);
-  v->guard = boolean_negate(cond);
+  v->make_goto(z, boolean_negate(cond));
   v->source_location=cond.source_location();
 
   // do the w label
@@ -980,8 +978,7 @@ void goto_convertt::convert_for(
   // y: goto u;
   goto_programt tmp_y;
   goto_programt::targett y=tmp_y.add_instruction();
-  y->make_goto(u);
-  y->guard=true_exprt();
+  y->make_goto(u, true_exprt());
   y->source_location=code.source_location();
 
   // loop invariant
@@ -1042,8 +1039,7 @@ void goto_convertt::convert_while(
   convert(code.body(), tmp_x, mode);
 
   // y: if(c) goto v;
-  y->make_goto(v);
-  y->guard=true_exprt();
+  y->make_goto(v, true_exprt());
   y->source_location=code.source_location();
 
   // loop invariant
@@ -1112,8 +1108,7 @@ void goto_convertt::convert_dowhile(
   goto_programt::targett w=tmp_w.instructions.begin();
 
   // y: if(c) goto w;
-  y->make_goto(w);
-  y->guard=cond;
+  y->make_goto(w, cond);
   y->source_location=condition_location;
 
   // loop invariant
@@ -1615,7 +1610,7 @@ void goto_convertt::generate_ifthenelse(
   tmp_w.swap(true_case);
 
   // x: goto z;
-  x->make_goto(z);
+  x->make_goto(z, true_exprt());
   CHECK_RETURN(!tmp_w.instructions.empty());
   x->source_location=tmp_w.instructions.back().source_location;
 

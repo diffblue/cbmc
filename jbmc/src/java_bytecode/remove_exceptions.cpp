@@ -350,7 +350,7 @@ void remove_exceptionst::add_exception_dispatch_sequence(
       {
         // Normal exception handler, make an instanceof check.
         goto_programt::targett t_exc=goto_program.insert_after(instr_it);
-        t_exc->make_goto(new_state_pc);
+        t_exc->make_goto(new_state_pc, true_exprt());
         t_exc->source_location=instr_it->source_location;
 
         // use instanceof to check that this is the correct handler
@@ -374,7 +374,7 @@ void remove_exceptionst::add_exception_dispatch_sequence(
     }
   }
 
-  default_dispatch->make_goto(default_target);
+  default_dispatch->make_goto(default_target, true_exprt());
   default_dispatch->source_location=instr_it->source_location;
 
   // add dead instructions
@@ -461,9 +461,8 @@ bool remove_exceptionst::instrument_function_call(
 
       // add a null check (so that instanceof can be applied)
       goto_programt::targett t_null=goto_program.insert_after(instr_it);
-      t_null->make_goto(next_it);
+      t_null->make_goto(next_it, no_exception_currently_in_flight);
       t_null->source_location=instr_it->source_location;
-      t_null->guard=no_exception_currently_in_flight;
     }
 
     return true;

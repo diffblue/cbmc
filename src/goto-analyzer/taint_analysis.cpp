@@ -288,7 +288,8 @@ bool taint_analysist::operator()(
           goto_programt::targett t=calls.add_instruction();
           const code_function_callt call(symbol.symbol_expr());
           t->make_function_call(call);
-          calls.add_instruction()->make_goto(end.instructions.begin());
+          calls.add_instruction()->make_goto(
+            end.instructions.begin(), true_exprt());
           goto_programt::targett g=gotos.add_instruction();
           g->make_goto(
             t, side_effect_expr_nondett(bool_typet(), symbol.location));

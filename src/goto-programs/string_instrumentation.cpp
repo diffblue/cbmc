@@ -888,8 +888,7 @@ void string_instrumentationt::invalidate_buffer(
 
   goto_programt::targett back=dest.add_instruction();
   back->source_location=target->source_location;
-  back->make_goto(check);
-  back->guard=true_exprt();
+  back->make_goto(check, true_exprt());
 
   goto_programt::targett exit=dest.add_instruction();
   exit->source_location=target->source_location;
@@ -909,22 +908,19 @@ void string_instrumentationt::invalidate_buffer(
   const plus_exprt b_plus_i(bufp, cntr_sym.symbol_expr());
   const dereference_exprt deref(b_plus_i, buf_type.subtype());
 
-  check->make_goto(exit);
+  exprt condition;
 
   if(limit==0)
-    check->guard=
-      binary_relation_exprt(
-        cntr_sym.symbol_expr(),
-        ID_ge,
-        buffer_size(bufp));
+    condition =
+      binary_relation_exprt(cntr_sym.symbol_expr(), ID_ge, buffer_size(bufp));
   else
-    check->guard=
-      binary_relation_exprt(
-        cntr_sym.symbol_expr(),
-        ID_gt,
-        from_integer(limit, unsigned_int_type()));
+    condition = binary_relation_exprt(
+      cntr_sym.symbol_expr(), ID_gt, from_integer(limit, unsigned_int_type()));
+
+  check->make_goto(exit, condition);
 
   const side_effect_expr_nondett nondet(
     buf_type.subtype(), target->source_location);
+
   invalidate->code=code_assignt(deref, nondet);
 }

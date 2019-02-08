@@ -135,8 +135,7 @@ void goto_convertt::do_function_call_if(
     y=tmp_y.instructions.begin();
 
   // v: if(!c) goto y;
-  v->make_goto(y);
-  v->guard = boolean_negate(function.cond());
+  v->make_goto(y, boolean_negate(function.cond()));
   v->source_location=function.cond().source_location();
 
   // w: f();
@@ -148,7 +147,7 @@ void goto_convertt::do_function_call_if(
     tmp_w.add_instruction(SKIP);
 
   // x: goto z;
-  x->make_goto(z);
+  x->make_goto(z, true_exprt());
 
   dest.destructive_append(tmp_v);
   dest.destructive_append(tmp_w);
