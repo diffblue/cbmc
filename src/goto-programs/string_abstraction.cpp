@@ -454,7 +454,7 @@ goto_programt::targett string_abstractiont::abstract(
   case GOTO:
   case ASSERT:
   case ASSUME:
-    if(has_string_macros(it->guard))
+    if(has_string_macros(it->get_condition()))
       replace_string_macros(it->guard, false, it->source_location);
     break;
 

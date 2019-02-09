@@ -45,11 +45,10 @@ void branch(
       // T': id("not-taken");   t3
       // ...
 
-      if(i_it->is_goto() &&
-         !i_it->guard.is_constant())
+      if(i_it->is_goto() && !i_it->get_condition().is_constant())
       {
         // negate condition
-        i_it->guard = boolean_negate(i_it->guard);
+        i_it->guard = boolean_negate(i_it->get_condition());
 
         goto_programt::targett t1=body.insert_after(i_it);
         t1->make_function_call(
