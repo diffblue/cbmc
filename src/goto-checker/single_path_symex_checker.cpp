@@ -155,7 +155,7 @@ void single_path_symex_checkert::prepare(
     properties, result.updated_properties, equation);
 
   property_decider = util_make_unique<goto_symex_property_decidert>(
-    goto_symex_property_decidert(options, ui_message_handler, equation, ns));
+    options, ui_message_handler, equation, ns);
 
   log.status() << "Passing problem to "
                << property_decider->get_solver().decision_procedure_text()
