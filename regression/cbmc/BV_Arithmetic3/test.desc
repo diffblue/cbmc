@@ -1,6 +1,6 @@
 CORE
 main.c
-
+--verbosity 8
 ^EXIT=0$
 ^SIGNAL=0$
 (Starting CEGAR Loop|^Generated 1 VCC\(s\), 0 remaining after simplification$)
