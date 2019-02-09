@@ -447,6 +447,10 @@ int goto_instrument_parse_optionst::doit()
     if(cmdline.isset("check-call-sequence"))
     {
       do_remove_returns();
+
+      // recalculate numbers, etc.
+      goto_model.goto_functions.update();
+
       check_call_sequence(goto_model);
       return CPROVER_EXIT_SUCCESS;
     }
@@ -1443,6 +1447,9 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   {
     do_indirect_call_and_rtti_removal();
 
+    // recalculate numbers, etc.
+    goto_model.goto_functions.update();
+
     status() << "Performing a reachability slice" << eom;
     if(cmdline.isset("property"))
       reachability_slicer(goto_model, cmdline.get_values("property"));
@@ -1454,6 +1461,9 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   {
     do_indirect_call_and_rtti_removal();
 
+    // recalculate numbers, etc.
+    goto_model.goto_functions.update();
+
     status() << "Performing a function pointer reachability slice" << eom;
     function_path_reachability_slicer(
       goto_model, cmdline.get_comma_separated_values("fp-reachability-slice"));
@@ -1464,6 +1474,9 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   {
     do_indirect_call_and_rtti_removal();
     do_remove_returns();
+
+    // recalculate numbers, etc.
+    goto_model.goto_functions.update();
 
     status() << "Performing a full slice" << eom;
     if(cmdline.isset("property"))
