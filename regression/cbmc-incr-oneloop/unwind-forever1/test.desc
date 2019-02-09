@@ -1,7 +1,10 @@
-CORE
+THOROUGH
 main.c
- --incremental-check main.0
-^EXIT=142$
+--incremental-loop main.0 --unwinding-assertions
+^EXIT=(142|14)$
 ^SIGNAL=0$
 --
 ^warning: ignoring
+--
+Tests whether goto-symex does not stop early.
+Mac OS exit code is 14
