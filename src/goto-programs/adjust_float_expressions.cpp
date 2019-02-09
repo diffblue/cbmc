@@ -200,7 +200,9 @@ void adjust_float_expressions(
   Forall_goto_program_instructions(it, goto_function.body)
   {
     adjust_float_expressions(it->code, ns);
-    adjust_float_expressions(it->guard, ns);
+
+    if(it->has_condition())
+      adjust_float_expressions(it->guard, ns);
   }
 }
 

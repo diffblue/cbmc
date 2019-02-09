@@ -315,8 +315,10 @@ void goto_inlinet::insert_function_body(
     Forall_goto_program_instructions(it, tmp)
     {
       replace_location(it->source_location, target->source_location);
-      replace_location(it->guard, target->source_location);
       replace_location(it->code, target->source_location);
+
+      if(it->has_condition())
+        replace_location(it->guard, target->source_location);
     }
   }
 

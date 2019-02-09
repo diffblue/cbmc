@@ -67,8 +67,9 @@ void slice_global_inits(goto_modelt &goto_model)
     {
       const codet &code = i_it->code;
       find_symbols(code, symbols, true, false);
-      const exprt &expr = i_it->guard;
-      find_symbols(expr, symbols, true, false);
+
+      if(i_it->has_condition())
+        find_symbols(i_it->get_condition(), symbols, true, false);
     }
   }
 

@@ -104,7 +104,9 @@ void rewrite_union(goto_functionst::goto_functiont &goto_function)
   Forall_goto_program_instructions(it, goto_function.body)
   {
     rewrite_union(it->code);
-    rewrite_union(it->guard);
+
+    if(it->has_condition())
+      rewrite_union(it->guard);
   }
 }
 

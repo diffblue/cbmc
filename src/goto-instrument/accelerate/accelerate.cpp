@@ -393,7 +393,8 @@ void acceleratet::add_dirty_checks()
     // the right hand side of an assignment.  Assume each is not dirty.
     find_symbols_sett read;
 
-    find_symbols(it->guard, read);
+    if(it->has_condition())
+      find_symbols(it->get_condition(), read);
 
     if(it->is_assign())
     {

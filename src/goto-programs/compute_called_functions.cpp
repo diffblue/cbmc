@@ -56,7 +56,9 @@ void compute_address_taken_functions(
 {
   forall_goto_program_instructions(it, goto_program)
   {
-    compute_address_taken_functions(it->guard, address_taken);
+    if(it->has_condition())
+      compute_address_taken_functions(it->get_condition(), address_taken);
+
     compute_address_taken_functions(it->code, address_taken);
   }
 }

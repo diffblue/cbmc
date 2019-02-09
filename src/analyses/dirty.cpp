@@ -20,7 +20,9 @@ void dirtyt::build(const goto_functiont &goto_function)
   forall_goto_program_instructions(it, goto_function.body)
   {
     find_dirty(it->code);
-    find_dirty(it->guard);
+
+    if(it->has_condition())
+      find_dirty(it->get_condition());
   }
 }
 

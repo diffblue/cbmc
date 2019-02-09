@@ -274,10 +274,16 @@ public:
     /// Use get_condition() to read
     exprt guard;
 
+    /// Does this instruction have a condition?
+    bool has_condition() const
+    {
+      return is_goto() || is_incomplete_goto() || is_assume() || is_assert();
+    }
+
     /// Get the condition of gotos, assume, assert
     const exprt &get_condition() const
     {
-      PRECONDITION(is_goto() || is_assume() || is_assert());
+      PRECONDITION(has_condition());
       return guard;
     }
 

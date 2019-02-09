@@ -288,7 +288,9 @@ static void remove_complex(
   Forall_goto_program_instructions(it, goto_function.body)
   {
     remove_complex(it->code);
-    remove_complex(it->guard);
+
+    if(it->has_condition())
+      remove_complex(it->guard);
   }
 }
 

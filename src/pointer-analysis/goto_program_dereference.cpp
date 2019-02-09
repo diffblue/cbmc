@@ -292,7 +292,8 @@ void goto_program_dereferencet::dereference_instruction(
   #endif
   goto_programt::instructiont &i=*target;
 
-  dereference_expr(i.guard, checks_only);
+  if(i.has_condition())
+    dereference_expr(i.guard, checks_only);
 
   if(i.is_assign())
   {
