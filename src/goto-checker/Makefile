@@ -15,6 +15,7 @@ SRC = bmc_util.cpp \
       solver_factory.cpp \
       symex_coverage.cpp \
       symex_bmc.cpp \
+      symex_bmc_incremental_one_loop.cpp \
       # Empty last line
 
 INCLUDES= -I ..
