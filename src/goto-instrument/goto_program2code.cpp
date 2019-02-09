@@ -144,17 +144,17 @@ void goto_program2codet::scan_for_varargs()
 }
 
 goto_programt::const_targett goto_program2codet::convert_instruction(
-    goto_programt::const_targett target,
-    goto_programt::const_targett upper_bound,
-    codet &dest)
+  goto_programt::const_targett target,
+  goto_programt::const_targett upper_bound,
+  code_blockt &dest)
 {
   assert(target!=goto_program.instructions.end());
 
   if(target->type!=ASSERT &&
      !target->source_location.get_comment().empty())
   {
-    dest.copy_to_operands(code_skipt());
-    dest.operands().back().add_source_location().set_comment(
+    dest.add(code_skipt());
+    dest.statements().back().add_source_location().set_comment(
       target->source_location.get_comment());
   }
 
@@ -178,12 +178,12 @@ goto_programt::const_targett goto_program2codet::convert_instruction(
     case END_FUNCTION:
     case DEAD:
       // ignore for now
-      dest.copy_to_operands(code_skipt());
+      dest.add(code_skipt());
       return target;
 
     case FUNCTION_CALL:
     case OTHER:
-      dest.copy_to_operands(target->code);
+      dest.add(target->code);
       return target;
 
     case ASSIGN:
@@ -197,13 +197,13 @@ goto_programt::const_targett goto_program2codet::convert_instruction(
 
     case ASSERT:
       system_headers.insert("assert.h");
-      dest.copy_to_operands(code_assertt(target->guard));
-      dest.operands().back().add_source_location().set_comment(
-          target->source_location.get_comment());
+      dest.add(code_assertt(target->guard));
+      dest.statements().back().add_source_location().set_comment(
+        target->source_location.get_comment());
       return target;
 
     case ASSUME:
-      dest.copy_to_operands(code_assumet(target->guard));
+      dest.add(code_assumet(target->guard));
       return target;
 
     case GOTO:
@@ -213,8 +213,8 @@ goto_programt::const_targett goto_program2codet::convert_instruction(
       return convert_start_thread(target, upper_bound, dest);
 
     case END_THREAD:
-      dest.copy_to_operands(code_assumet(false_exprt()));
-      dest.operands().back().add_source_location().set_comment("END_THREAD");
+      dest.add(code_assumet(false_exprt()));
+      dest.statements().back().add_source_location().set_comment("END_THREAD");
       return target;
 
     case ATOMIC_BEGIN:
@@ -225,7 +225,7 @@ goto_programt::const_targett goto_program2codet::convert_instruction(
           target->is_atomic_begin() ? CPROVER_PREFIX "atomic_begin"
                                     : CPROVER_PREFIX "atomic_end",
           void_t));
-        dest.add_to_operands(std::move(f));
+        dest.add(std::move(f));
         return target;
       }
 
@@ -246,10 +246,10 @@ goto_programt::const_targett goto_program2codet::convert_instruction(
 }
 
 void goto_program2codet::convert_labels(
-    goto_programt::const_targett target,
-    codet &dest)
+  goto_programt::const_targett target,
+  code_blockt &dest)
 {
-  codet *latest_block=&dest;
+  code_blockt *latest_block = &dest;
 
   irep_idt target_label;
   if(target->is_target())
@@ -259,9 +259,9 @@ void goto_program2codet::convert_labels(
     code_labelt l(label.str(), code_blockt());
     l.add_source_location()=target->source_location;
     target_label=l.get_label();
-    latest_block->add_to_operands(std::move(l));
-    latest_block=&to_code_label(
-        to_code(latest_block->operands().back())).code();
+    latest_block->add(std::move(l));
+    latest_block =
+      &to_code_block(to_code_label(latest_block->statements().back()).code());
   }
 
   for(goto_programt::instructiont::labelst::const_iterator
@@ -281,19 +281,19 @@ void goto_program2codet::convert_labels(
 
     code_labelt l(*it, code_blockt());
     l.add_source_location()=target->source_location;
-    latest_block->add_to_operands(std::move(l));
-    latest_block=&to_code_label(
-        to_code(latest_block->operands().back())).code();
+    latest_block->add(std::move(l));
+    latest_block =
+      &to_code_block(to_code_label(latest_block->statements().back()).code());
   }
 
   if(latest_block!=&dest)
-    latest_block->copy_to_operands(code_skipt());
+    latest_block->add(code_skipt());
 }
 
 goto_programt::const_targett goto_program2codet::convert_assign(
-    goto_programt::const_targett target,
-    goto_programt::const_targett upper_bound,
-    codet &dest)
+  goto_programt::const_targett target,
+  goto_programt::const_targett upper_bound,
+  code_blockt &dest)
 {
   const code_assignt &a=to_code_assign(target->code);
 
@@ -306,9 +306,9 @@ goto_programt::const_targett goto_program2codet::convert_assign(
 }
 
 goto_programt::const_targett goto_program2codet::convert_assign_varargs(
-    goto_programt::const_targett target,
-    goto_programt::const_targett upper_bound,
-    codet &dest)
+  goto_programt::const_targett target,
+  goto_programt::const_targett upper_bound,
+  code_blockt &dest)
 {
   const code_assignt &assign=to_code_assign(target->code);
 
@@ -323,7 +323,7 @@ goto_programt::const_targett goto_program2codet::convert_assign_varargs(
       {this_va_list_expr});
     f.arguments().back().type().id(ID_gcc_builtin_va_list);
 
-    dest.add_to_operands(std::move(f));
+    dest.add(std::move(f));
   }
   else if(r.id()==ID_address_of)
   {
@@ -332,7 +332,7 @@ goto_programt::const_targett goto_program2codet::convert_assign_varargs(
       {this_va_list_expr, to_address_of_expr(r).object()});
     f.arguments().front().type().id(ID_gcc_builtin_va_list);
 
-    dest.add_to_operands(std::move(f));
+    dest.add(std::move(f));
   }
   else if(r.id()==ID_side_effect &&
           to_side_effect_expr(r).get_statement()==ID_gcc_builtin_va_arg_next)
@@ -367,7 +367,7 @@ goto_programt::const_targett goto_program2codet::convert_assign_varargs(
          type_of.arguments().push_back(f.lhs());
          f.arguments().push_back(type_of);
 
-         dest.add_to_operands(std::move(f));
+         dest.add(std::move(f));
          return next;
        }
     }
@@ -386,7 +386,7 @@ goto_programt::const_targett goto_program2codet::convert_assign_varargs(
 
     code_expressiont void_f(typecast_exprt(f, empty_typet()));
 
-    dest.add_to_operands(std::move(void_f));
+    dest.add(std::move(void_f));
   }
   else
   {
@@ -395,15 +395,15 @@ goto_programt::const_targett goto_program2codet::convert_assign_varargs(
       {this_va_list_expr, r});
     f.arguments().front().type().id(ID_gcc_builtin_va_list);
 
-    dest.add_to_operands(std::move(f));
+    dest.add(std::move(f));
   }
 
   return target;
 }
 
 void goto_program2codet::convert_assign_rec(
-    const code_assignt &assign,
-    codet &dest)
+  const code_assignt &assign,
+  code_blockt &dest)
 {
   if(assign.rhs().id()==ID_array)
   {
@@ -420,13 +420,13 @@ void goto_program2codet::convert_assign_rec(
     }
   }
   else
-    dest.copy_to_operands(assign);
+    dest.add(assign);
 }
 
 goto_programt::const_targett goto_program2codet::convert_return(
-    goto_programt::const_targett target,
-    goto_programt::const_targett upper_bound,
-    codet &dest)
+  goto_programt::const_targett target,
+  goto_programt::const_targett upper_bound,
+  code_blockt &dest)
 {
   const code_returnt &ret=to_code_return(target->code);
 
@@ -434,7 +434,9 @@ goto_programt::const_targett goto_program2codet::convert_return(
   if(!ret.has_return_value() ||
      ret.return_value().id()!=ID_side_effect ||
      to_side_effect_expr(ret.return_value()).get_statement()!=ID_nondet)
-    dest.copy_to_operands(ret);
+  {
+    dest.add(ret);
+  }
 
   // all v3 (or later) goto programs have an explicit GOTO after return
   goto_programt::const_targett next=target;
@@ -454,9 +456,9 @@ goto_programt::const_targett goto_program2codet::convert_return(
 }
 
 goto_programt::const_targett goto_program2codet::convert_decl(
-    goto_programt::const_targett target,
-    goto_programt::const_targett upper_bound,
-    codet &dest)
+  goto_programt::const_targett target,
+  goto_programt::const_targett upper_bound,
+  code_blockt &dest)
 {
   code_declt d=to_code_decl(target->code);
   symbol_exprt &symbol = d.symbol();
@@ -485,7 +487,9 @@ goto_programt::const_targett goto_program2codet::convert_decl(
        va_list_expr.find(lhs)==va_list_expr.end())
     {
       if(next->is_assign())
+      {
         d.copy_to_operands(to_code_assign(next->code).rhs());
+      }
       else
       {
         // could hack this by just erasing the first operand
@@ -507,7 +511,7 @@ goto_programt::const_targett goto_program2codet::convert_decl(
     remove_const(symbol.type());
 
   if(move_to_dest)
-    dest.add_to_operands(std::move(d));
+    dest.add(std::move(d));
   else
     toplevel_block.add(d);
 
@@ -515,9 +519,9 @@ goto_programt::const_targett goto_program2codet::convert_decl(
 }
 
 goto_programt::const_targett goto_program2codet::convert_do_while(
-    goto_programt::const_targett target,
-    goto_programt::const_targett loop_end,
-    codet &dest)
+  goto_programt::const_targett target,
+  goto_programt::const_targett loop_end,
+  code_blockt &dest)
 {
   assert(loop_end->is_goto() && loop_end->is_backwards_goto());
 
@@ -529,20 +533,20 @@ goto_programt::const_targett goto_program2codet::convert_do_while(
   loop_last_stack.push_back(std::make_pair(loop_end, true));
 
   for( ; target!=loop_end; ++target)
-    target=convert_instruction(target, loop_end, d.body());
+    target = convert_instruction(target, loop_end, to_code_block(d.body()));
 
   loop_last_stack.pop_back();
 
-  convert_labels(loop_end, d.body());
+  convert_labels(loop_end, to_code_block(d.body()));
 
-  dest.add_to_operands(std::move(d));
+  dest.add(std::move(d));
   return target;
 }
 
 goto_programt::const_targett goto_program2codet::convert_goto(
-    goto_programt::const_targett target,
-    goto_programt::const_targett upper_bound,
-    codet &dest)
+  goto_programt::const_targett target,
+  goto_programt::const_targett upper_bound,
+  code_blockt &dest)
 {
   assert(target->is_goto());
   // we only do one target for now
@@ -563,9 +567,9 @@ goto_programt::const_targett goto_program2codet::convert_goto(
 }
 
 goto_programt::const_targett goto_program2codet::convert_goto_while(
-    goto_programt::const_targett target,
-    goto_programt::const_targett loop_end,
-    codet &dest)
+  goto_programt::const_targett target,
+  goto_programt::const_targett loop_end,
+  code_blockt &dest)
 {
   assert(loop_end->is_goto() && loop_end->is_backwards_goto());
 
@@ -586,24 +590,24 @@ goto_programt::const_targett goto_program2codet::convert_goto_while(
   }
   else if(target->guard.is_true())
   {
-    target=convert_goto_goto(target, w.body());
+    target = convert_goto_goto(target, to_code_block(w.body()));
   }
   else
   {
-    target=convert_goto_switch(target, loop_end, w.body());
+    target = convert_goto_switch(target, loop_end, to_code_block(w.body()));
   }
 
   loop_last_stack.push_back(std::make_pair(loop_end, true));
 
   for(++target; target!=loop_end; ++target)
-    target=convert_instruction(target, loop_end, w.body());
+    target = convert_instruction(target, loop_end, to_code_block(w.body()));
 
   loop_last_stack.pop_back();
 
-  convert_labels(loop_end, w.body());
+  convert_labels(loop_end, to_code_block(w.body()));
   if(loop_end->guard.is_false())
   {
-    w.body().add_to_operands(code_breakt());
+    to_code_block(w.body()).add(code_breakt());
   }
   else if(!loop_end->guard.is_true())
   {
@@ -612,7 +616,7 @@ goto_programt::const_targett goto_program2codet::convert_goto_while(
 
     copy_source_location(target, i);
 
-    w.body().add_to_operands(std::move(i));
+    to_code_block(w.body()).add(std::move(i));
   }
 
   if(w.body().has_operands() &&
@@ -647,7 +651,7 @@ goto_programt::const_targett goto_program2codet::convert_goto_while(
     }
   }
 
-  dest.add_to_operands(std::move(w));
+  dest.add(std::move(w));
 
   return target;
 }
@@ -872,9 +876,9 @@ bool goto_program2codet::remove_default(
 }
 
 goto_programt::const_targett goto_program2codet::convert_goto_switch(
-    goto_programt::const_targett target,
-    goto_programt::const_targett upper_bound,
-    codet &dest)
+  goto_programt::const_targett target,
+  goto_programt::const_targett upper_bound,
+  code_blockt &dest)
 {
   // try to figure out whether this was a switch/case
   exprt eq_cand=target->guard;
@@ -926,7 +930,7 @@ goto_programt::const_targett goto_program2codet::convert_goto_switch(
   // add any instructions that go in the body of the switch before any cases
   goto_programt::const_targett orig_target=target;
   for(target=cases_start; target!=first_target; ++target)
-    target=convert_instruction(target, first_target, s.body());
+    target = convert_instruction(target, first_target, to_code_block(s.body()));
 
   std::set<unsigned> processed_locations;
 
@@ -1021,7 +1025,7 @@ goto_programt::const_targett goto_program2codet::convert_goto_switch(
 
     csc.code().swap(c);
     targets_done[it->case_start]=s.body().operands().size();
-    s.body().add_to_operands(std::move(csc));
+    to_code_block(s.body()).add(std::move(csc));
   }
 
   loop_last_stack.pop_back();
@@ -1046,14 +1050,14 @@ goto_programt::const_targett goto_program2codet::convert_goto_switch(
       }
     }
 
-  dest.add_to_operands(std::move(s));
+  dest.add(std::move(s));
   return max_target;
 }
 
 goto_programt::const_targett goto_program2codet::convert_goto_if(
-    goto_programt::const_targett target,
-    goto_programt::const_targett upper_bound,
-    codet &dest)
+  goto_programt::const_targett target,
+  goto_programt::const_targett upper_bound,
+  code_blockt &dest)
 {
   goto_programt::const_targett else_case=target->get_target();
   goto_programt::const_targett before_else=else_case;
@@ -1070,7 +1074,7 @@ goto_programt::const_targett goto_program2codet::convert_goto_if(
     // 1: ...
     if(before_else==target)
     {
-      dest.copy_to_operands(code_skipt());
+      dest.add(code_skipt());
       return target;
     }
 
@@ -1107,27 +1111,30 @@ goto_programt::const_targett goto_program2codet::convert_goto_if(
   if(has_else)
   {
     for(++target; target!=before_else; ++target)
-      target = convert_instruction(target, before_else, i.then_case());
+      target =
+        convert_instruction(target, before_else, to_code_block(i.then_case()));
 
-    convert_labels(before_else, i.then_case());
+    convert_labels(before_else, to_code_block(i.then_case()));
 
     for(++target; target!=end_if; ++target)
-      target = convert_instruction(target, end_if, i.else_case());
+      target =
+        convert_instruction(target, end_if, to_code_block(i.else_case()));
   }
   else
   {
     for(++target; target!=end_if; ++target)
-      target = convert_instruction(target, end_if, i.then_case());
+      target =
+        convert_instruction(target, end_if, to_code_block(i.then_case()));
   }
 
-  dest.add_to_operands(std::move(i));
+  dest.add(std::move(i));
   return --target;
 }
 
 goto_programt::const_targett goto_program2codet::convert_goto_break_continue(
-    goto_programt::const_targett target,
-    goto_programt::const_targett upper_bound,
-    codet &dest)
+  goto_programt::const_targett target,
+  goto_programt::const_targett upper_bound,
+  code_blockt &dest)
 {
   assert(!loop_last_stack.empty());
   const cfg_dominatorst &dominators=loops.get_dominator_info();
@@ -1151,7 +1158,7 @@ goto_programt::const_targett goto_program2codet::convert_goto_break_continue(
 
   if(target->get_target()==next)
   {
-    dest.copy_to_operands(code_skipt());
+    dest.add(code_skipt());
     // skip over all dead instructions
     return --next;
   }
@@ -1167,9 +1174,9 @@ goto_programt::const_targett goto_program2codet::convert_goto_break_continue(
     copy_source_location(target, i);
 
     if(i.cond().is_true())
-      dest.add_to_operands(std::move(i.then_case()));
+      dest.add(std::move(i.then_case()));
     else
-      dest.add_to_operands(std::move(i));
+      dest.add(std::move(i));
 
     return target;
   }
@@ -1197,9 +1204,9 @@ goto_programt::const_targett goto_program2codet::convert_goto_break_continue(
     copy_source_location(target, i);
 
     if(i.cond().is_true())
-      dest.add_to_operands(std::move(i.then_case()));
+      dest.add(std::move(i.then_case()));
     else
-      dest.add_to_operands(std::move(i));
+      dest.add(std::move(i));
 
     return target;
   }
@@ -1209,7 +1216,7 @@ goto_programt::const_targett goto_program2codet::convert_goto_break_continue(
 
 goto_programt::const_targett goto_program2codet::convert_goto_goto(
   goto_programt::const_targett target,
-  codet &dest)
+  code_blockt &dest)
 {
   // filter out useless goto 1; 1: ...
   goto_programt::const_targett next=target;
@@ -1260,17 +1267,17 @@ goto_programt::const_targett goto_program2codet::convert_goto_goto(
   copy_source_location(target, i);
 
   if(i.cond().is_true())
-    dest.add_to_operands(std::move(i.then_case()));
+    dest.add(std::move(i.then_case()));
   else
-    dest.add_to_operands(std::move(i));
+    dest.add(std::move(i));
 
   return target;
 }
 
 goto_programt::const_targett goto_program2codet::convert_start_thread(
-    goto_programt::const_targett target,
-    goto_programt::const_targett upper_bound,
-    codet &dest)
+  goto_programt::const_targett target,
+  goto_programt::const_targett upper_bound,
+  code_blockt &dest)
 {
   assert(target->is_start_thread());
 
@@ -1294,7 +1301,7 @@ goto_programt::const_targett goto_program2codet::convert_start_thread(
     assert(thread_start->location_number > this_end->location_number);
 
     codet b=code_blockt();
-    convert_instruction(next, this_end, b);
+    convert_instruction(next, this_end, to_code_block(b));
 
     for(goto_programt::instructiont::labelst::const_iterator
         it=target->labels.begin();
@@ -1311,7 +1318,7 @@ goto_programt::const_targett goto_program2codet::convert_start_thread(
       }
 
     assert(b.get_statement()==ID_label);
-    dest.add_to_operands(std::move(b));
+    dest.add(std::move(b));
     return this_end;
   }
 
@@ -1349,7 +1356,7 @@ goto_programt::const_targett goto_program2codet::convert_start_thread(
     system_headers.insert("pthread.h");
 
     const null_pointer_exprt n(pointer_type(empty_typet()));
-    dest.add_to_operands(code_function_callt(
+    dest.add(code_function_callt(
       cf.lhs(),
       symbol_exprt("pthread_create", code_typet({}, empty_typet())),
       {n, n, cf.function(), cf.arguments().front()}));
@@ -1359,7 +1366,8 @@ goto_programt::const_targett goto_program2codet::convert_start_thread(
 
   codet b=code_blockt();
   for( ; thread_start!=thread_end; ++thread_start)
-    thread_start=convert_instruction(thread_start, upper_bound, b);
+    thread_start =
+      convert_instruction(thread_start, upper_bound, to_code_block(b));
 
   for(goto_programt::instructiont::labelst::const_iterator
       it=target->labels.begin();
@@ -1376,13 +1384,13 @@ goto_programt::const_targett goto_program2codet::convert_start_thread(
     }
 
   assert(b.get_statement()==ID_label);
-  dest.add_to_operands(std::move(b));
+  dest.add(std::move(b));
   return thread_end;
 }
 
 goto_programt::const_targett goto_program2codet::convert_throw(
-    goto_programt::const_targett target,
-    codet &)
+  goto_programt::const_targett target,
+  code_blockt &)
 {
   // this isn't really clear as throw is not supported in expr2cpp either
   UNREACHABLE;
@@ -1390,9 +1398,9 @@ goto_programt::const_targett goto_program2codet::convert_throw(
 }
 
 goto_programt::const_targett goto_program2codet::convert_catch(
-    goto_programt::const_targett target,
-    goto_programt::const_targett,
-    codet &)
+  goto_programt::const_targett target,
+  goto_programt::const_targett,
+  code_blockt &)
 {
   // this isn't really clear as catch is not supported in expr2cpp either
   UNREACHABLE;
