@@ -43,6 +43,8 @@ exprt goto_symex_property_decidert::goalt::as_expr() const
 void goto_symex_property_decidert::
   update_properties_goals_from_symex_target_equation(propertiest &properties)
 {
+  goal_map.clear();
+
   for(symex_target_equationt::SSA_stepst::iterator it =
         equation.SSA_steps.begin();
       it != equation.SSA_steps.end();
