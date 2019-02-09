@@ -465,7 +465,7 @@ void symex_target_equationt::convert_assertions(
     {
       // ignore already converted assertions in the error trace
       if(step.is_assert() && step.converted)
-        step.ignore = true;
+        step.hidden = true;
 
       if(step.is_assert() && !step.ignore && !step.converted)
       {
@@ -492,7 +492,7 @@ void symex_target_equationt::convert_assertions(
   {
     // ignore already converted assertions in the error trace
     if(step.is_assert() && step.converted)
-      step.ignore = true;
+      step.hidden = true;
 
     if(step.is_assert() && !step.ignore && !step.converted)
     {
