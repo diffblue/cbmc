@@ -123,57 +123,53 @@ protected:
   void remove_const(typet &type);
 
   goto_programt::const_targett convert_instruction(
-      goto_programt::const_targett target,
-      goto_programt::const_targett upper_bound,
-      codet &dest);
+    goto_programt::const_targett target,
+    goto_programt::const_targett upper_bound,
+    code_blockt &dest);
 
-  void convert_labels(
-      goto_programt::const_targett target,
-      codet &dest);
+  void convert_labels(goto_programt::const_targett target, code_blockt &dest);
 
   goto_programt::const_targett convert_assign(
-      goto_programt::const_targett target,
-      goto_programt::const_targett upper_bound,
-      codet &dest);
+    goto_programt::const_targett target,
+    goto_programt::const_targett upper_bound,
+    code_blockt &dest);
 
   goto_programt::const_targett convert_assign_varargs(
-      goto_programt::const_targett target,
-      goto_programt::const_targett upper_bound,
-      codet &dest);
+    goto_programt::const_targett target,
+    goto_programt::const_targett upper_bound,
+    code_blockt &dest);
 
-  void convert_assign_rec(
-      const code_assignt &assign,
-      codet &dest);
+  void convert_assign_rec(const code_assignt &assign, code_blockt &dest);
 
   goto_programt::const_targett convert_return(
-      goto_programt::const_targett target,
-      goto_programt::const_targett upper_bound,
-      codet &dest);
+    goto_programt::const_targett target,
+    goto_programt::const_targett upper_bound,
+    code_blockt &dest);
 
   goto_programt::const_targett convert_decl(
-      goto_programt::const_targett target,
-      goto_programt::const_targett upper_bound,
-      codet &dest);
+    goto_programt::const_targett target,
+    goto_programt::const_targett upper_bound,
+    code_blockt &dest);
 
   goto_programt::const_targett convert_do_while(
-      goto_programt::const_targett target,
-      goto_programt::const_targett loop_end,
-      codet &dest);
+    goto_programt::const_targett target,
+    goto_programt::const_targett loop_end,
+    code_blockt &dest);
 
   goto_programt::const_targett convert_goto(
-      goto_programt::const_targett target,
-      goto_programt::const_targett upper_bound,
-      codet &dest);
+    goto_programt::const_targett target,
+    goto_programt::const_targett upper_bound,
+    code_blockt &dest);
 
   goto_programt::const_targett convert_goto_while(
-      goto_programt::const_targett target,
-      goto_programt::const_targett loop_end,
-      codet &dest);
+    goto_programt::const_targett target,
+    goto_programt::const_targett loop_end,
+    code_blockt &dest);
 
   goto_programt::const_targett convert_goto_switch(
-      goto_programt::const_targett target,
-      goto_programt::const_targett upper_bound,
-      codet &dest);
+    goto_programt::const_targett target,
+    goto_programt::const_targett upper_bound,
+    code_blockt &dest);
 
   goto_programt::const_targett get_cases(
     goto_programt::const_targett target,
@@ -195,32 +191,30 @@ protected:
     goto_programt::const_targett default_target);
 
   goto_programt::const_targett convert_goto_if(
-      goto_programt::const_targett target,
-      goto_programt::const_targett upper_bound,
-      codet &dest);
+    goto_programt::const_targett target,
+    goto_programt::const_targett upper_bound,
+    code_blockt &dest);
 
   goto_programt::const_targett convert_goto_break_continue(
-      goto_programt::const_targett target,
-      goto_programt::const_targett upper_bound,
-      codet &dest);
+    goto_programt::const_targett target,
+    goto_programt::const_targett upper_bound,
+    code_blockt &dest);
 
-  goto_programt::const_targett convert_goto_goto(
-      goto_programt::const_targett target,
-      codet &dest);
+  goto_programt::const_targett
+  convert_goto_goto(goto_programt::const_targett target, code_blockt &dest);
 
   goto_programt::const_targett convert_start_thread(
-      goto_programt::const_targett target,
-      goto_programt::const_targett upper_bound,
-      codet &dest);
+    goto_programt::const_targett target,
+    goto_programt::const_targett upper_bound,
+    code_blockt &dest);
 
-  goto_programt::const_targett convert_throw(
-      goto_programt::const_targett target,
-      codet &dest);
+  goto_programt::const_targett
+  convert_throw(goto_programt::const_targett target, code_blockt &dest);
 
   goto_programt::const_targett convert_catch(
-      goto_programt::const_targett target,
-      goto_programt::const_targett upper_bound,
-      codet &dest);
+    goto_programt::const_targett target,
+    goto_programt::const_targett upper_bound,
+    code_blockt &dest);
 };
 
 #endif // CPROVER_GOTO_INSTRUMENT_GOTO_PROGRAM2CODE_H
