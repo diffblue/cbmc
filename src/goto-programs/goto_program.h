@@ -423,10 +423,7 @@ public:
       : code(static_cast<const codet &>(get_nil_irep())),
         source_location(static_cast<const source_locationt &>(get_nil_irep())),
         type(_type),
-        guard(true_exprt()),
-        location_number(0),
-        loop_number(0),
-        target_number(nil_target)
+        guard(true_exprt())
     {
     }
 
@@ -463,14 +460,14 @@ public:
     /// A globally unique number to identify a program location.
     /// It's guaranteed to be ordered in program order within
     /// one goto_program.
-    unsigned location_number;
+    unsigned location_number = 0;
 
     /// Number unique per function to identify loops
-    unsigned loop_number;
+    unsigned loop_number = 0;
 
     /// A number to identify branch targets.
     /// This is \ref nil_target if it's not a target.
-    unsigned target_number;
+    unsigned target_number = nil_target;
 
     /// Returns true if the instruction is a backwards branch.
     bool is_backwards_goto() const
