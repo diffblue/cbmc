@@ -17,6 +17,8 @@ Date: June 2003
 #include <util/symbol_table.h>
 #include <util/symbol_table_builder.h>
 
+#include <linking/static_lifetime_init.h>
+
 #include "goto_inline.h"
 
 goto_convert_functionst::goto_convert_functionst(
@@ -154,6 +156,10 @@ void goto_convert_functionst::convert_function(
      symbol.is_compiled()) /* goto_inline may have removed the body */
     return;
 
+  lifetimet parent_lifetime = lifetime;
+  lifetime = identifier == INITIALIZE_FUNCTION ? lifetimet::STATIC_GLOBAL
+                                               : lifetimet::AUTOMATIC_LOCAL;
+
   const codet &code=to_code(symbol.value);
 
   source_locationt end_location;
@@ -208,6 +214,8 @@ void goto_convert_functionst::convert_function(
 
   if(hide(f.body))
     f.make_hidden();
+
+  lifetime = parent_lifetime;
 }
 
 void goto_convert(
