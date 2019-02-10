@@ -1,8 +1,11 @@
-CORE
+FUTURE
 main.c
---incremental-loop main.0 --stop-when-unsat
+--incremental-loop main.0 --stop-when-pass
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
 --
 ^warning: ignoring
+--
+Step case of k-induction for a single loop:
+incrementally try for increasing k as long as there are failing assertions.
