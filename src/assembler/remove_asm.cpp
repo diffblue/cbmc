@@ -47,13 +47,13 @@ protected:
     goto_programt::instructiont &instruction,
     goto_programt &dest);
 
-  void process_instruction_gcc(const code_asmt &, goto_programt &dest);
+  void process_instruction_gcc(const code_asm_gcct &, goto_programt &dest);
 
   void process_instruction_msc(const code_asmt &, goto_programt &dest);
 
   void gcc_asm_function_call(
     const irep_idt &function_base_name,
-    const code_asmt &code,
+    const code_asm_gcct &code,
     goto_programt &dest);
 
   void msc_asm_function_call(
@@ -71,7 +71,7 @@ protected:
 /// \param dest: Goto program to append the function call to
 void remove_asmt::gcc_asm_function_call(
   const irep_idt &function_base_name,
-  const code_asmt &code,
+  const code_asm_gcct &code,
   goto_programt &dest)
 {
   irep_idt function_identifier = function_base_name;
@@ -81,7 +81,7 @@ void remove_asmt::gcc_asm_function_call(
   const typet void_pointer = pointer_type(empty_typet());
 
   // outputs
-  forall_operands(it, code.op1())
+  forall_operands(it, code.outputs())
   {
     if(it->operands().size() == 2)
     {
@@ -91,7 +91,7 @@ void remove_asmt::gcc_asm_function_call(
   }
 
   // inputs
-  forall_operands(it, code.op2())
+  forall_operands(it, code.inputs())
   {
     if(it->operands().size() == 2)
     {
@@ -197,7 +197,7 @@ void remove_asmt::process_instruction(
   const irep_idt &flavor = code.get_flavor();
 
   if(flavor == ID_gcc)
-    process_instruction_gcc(code, dest);
+    process_instruction_gcc(to_code_asm_gcc(code), dest);
   else if(flavor == ID_msc)
     process_instruction_msc(code, dest);
   else
@@ -210,10 +210,10 @@ void remove_asmt::process_instruction(
 /// \param code: The inline assembly code statement to translate
 /// \param dest: The goto program to append the new instructions to
 void remove_asmt::process_instruction_gcc(
-  const code_asmt &code,
+  const code_asm_gcct &code,
   goto_programt &dest)
 {
-  const irep_idt &i_str = to_string_constant(code.op0()).get_value();
+  const irep_idt &i_str = to_string_constant(code.asm_text()).get_value();
 
   std::istringstream str(id2string(i_str));
   assembler_parser.clear();

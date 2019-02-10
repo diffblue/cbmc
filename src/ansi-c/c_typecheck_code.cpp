@@ -76,7 +76,7 @@ void c_typecheck_baset::typecheck_code(codet &code)
   {
   }
   else if(statement==ID_asm)
-    typecheck_asm(code);
+    typecheck_asm(to_code_asm(code));
   else if(statement==ID_start_thread)
     typecheck_start_thread(code);
   else if(statement==ID_gcc_local_label)
@@ -133,28 +133,28 @@ void c_typecheck_baset::typecheck_code(codet &code)
   }
 }
 
-void c_typecheck_baset::typecheck_asm(codet &code)
+void c_typecheck_baset::typecheck_asm(code_asmt &code)
 {
-  const irep_idt flavor=to_code_asm(code).get_flavor();
+  const irep_idt flavor = code.get_flavor();
 
   if(flavor==ID_gcc)
   {
     // These have 5 operands.
-    // The first parameter is a string.
-    // Parameters 1, 2, 3, 4 are lists of expressions.
+    // The first operand is a string.
+    // Operands 1, 2, 3, 4 are lists of expressions.
 
-    // Parameter 1: OutputOperands
-    // Parameter 2: InputOperands
-    // Parameter 3: Clobbers
-    // Parameter 4: GotoLabels
+    // Operand 1: OutputOperands
+    // Operand 2: InputOperands
+    // Operand 3: Clobbers
+    // Operand 4: GotoLabels
 
-    assert(code.operands().size()==5);
+    auto &code_asm_gcc = to_code_asm_gcc(code);
 
-    typecheck_expr(code.op0());
+    typecheck_expr(code_asm_gcc.asm_text());
 
-    for(std::size_t i=1; i<code.operands().size(); i++)
+    for(std::size_t i = 1; i < code_asm_gcc.operands().size(); i++)
     {
-      exprt &list=code.operands()[i];
+      exprt &list = code_asm_gcc.operands()[i];
       Forall_operands(it, list)
         typecheck_expr(*it);
     }
