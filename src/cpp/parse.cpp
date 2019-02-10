@@ -7920,9 +7920,7 @@ bool Parser::rGCCAsmStatement(codet &statement)
   if(lex.get_token(tk)!=TOK_GCC_ASM)
     return false;
 
-  statement=codet(ID_asm);
-  statement.set(ID_flavor, ID_gcc);
-  statement.operands().resize(5); // always has 5 operands
+  statement = code_asm_gcct();
   set_location(statement, tk);
 
   if(lex.LookAhead(0)==TOK_VOLATILE)

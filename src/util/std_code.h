@@ -1675,6 +1675,101 @@ inline const code_asmt &to_code_asm(const codet &code)
   return static_cast<const code_asmt &>(code);
 }
 
+/// \ref codet representation of an inline assembler statement,
+/// for the gcc flavor.
+class code_asm_gcct : public code_asmt
+{
+public:
+  code_asm_gcct()
+  {
+    set_flavor(ID_gcc);
+    operands().resize(5);
+  }
+
+  exprt &asm_text()
+  {
+    return op0();
+  }
+
+  const exprt &asm_text() const
+  {
+    return op0();
+  }
+
+  exprt &outputs()
+  {
+    return op1();
+  }
+
+  const exprt &outputs() const
+  {
+    return op1();
+  }
+
+  exprt &inputs()
+  {
+    return op2();
+  }
+
+  const exprt &inputs() const
+  {
+    return op2();
+  }
+
+  exprt &clobbers()
+  {
+    return op3();
+  }
+
+  const exprt &clobbers() const
+  {
+    return op3();
+  }
+
+  exprt &labels()
+  {
+    return operands()[4];
+  }
+
+  const exprt &labels() const
+  {
+    return operands()[4];
+  }
+
+protected:
+  using code_asmt::op0;
+  using code_asmt::op1;
+  using code_asmt::op2;
+  using code_asmt::op3;
+};
+
+template <>
+inline bool can_cast_expr<code_asm_gcct>(const exprt &base)
+{
+  return detail::can_cast_code_impl(base, ID_asm);
+}
+
+// to_code_asm_gcc only checks the code statement, so no validate_expr is
+// provided for code_asmt
+
+inline code_asm_gcct &to_code_asm_gcc(codet &code)
+{
+  PRECONDITION(code.get_statement() == ID_asm);
+  PRECONDITION(to_code_asm(code).get_flavor() == ID_gcc);
+  DATA_INVARIANT(
+    code.operands().size() == 5, "code_asm_gcc must have give operands");
+  return static_cast<code_asm_gcct &>(code);
+}
+
+inline const code_asm_gcct &to_code_asm_gcc(const codet &code)
+{
+  PRECONDITION(code.get_statement() == ID_asm);
+  PRECONDITION(to_code_asm(code).get_flavor() == ID_gcc);
+  DATA_INVARIANT(
+    code.operands().size() == 5, "code_asm_gcc must have give operands");
+  return static_cast<const code_asm_gcct &>(code);
+}
+
 /// \ref codet representation of an expression statement.
 /// It has one operand, which is the expression it stores.
 class code_expressiont:public codet
