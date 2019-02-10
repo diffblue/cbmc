@@ -35,6 +35,8 @@ symex_bmc_incremental_one_loopt::symex_bmc_incremental_one_loopt(
       options.is_set("unwind-min") ? options.get_signed_int_option("unwind-min")
                                    : 0)
 {
+  ignore_assertions =
+    options.get_bool_option("ignore-properties-before-unwind-min");
 }
 
 bool symex_bmc_incremental_one_loopt::should_stop_unwind(

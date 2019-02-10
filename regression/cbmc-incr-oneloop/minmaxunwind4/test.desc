@@ -1,8 +1,10 @@
 CORE
 main.c
---unwind-min 6 --unwind-max 8 --incremental-loop main.0
+--unwind-min 6 --unwind-max 8 --incremental-loop main.0 --ignore-properties-before-unwind-min
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
+^Generated 1 VCC\(s\), \d+ remaining after simplification$
 --
+^Generated 6 VCC\(s\), \d+ remaining after simplification$
 ^warning: ignoring
