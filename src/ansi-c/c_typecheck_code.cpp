@@ -42,7 +42,7 @@ void c_typecheck_baset::typecheck_code(codet &code)
   else if(statement==ID_switch_case)
     typecheck_switch_case(to_code_switch_case(code));
   else if(statement==ID_gcc_switch_case_range)
-    typecheck_gcc_switch_case_range(code);
+    typecheck_gcc_switch_case_range(to_code_gcc_switch_case_range(code));
   else if(statement==ID_block)
     typecheck_block(to_code_block(code));
   else if(statement==ID_decl_block)
@@ -515,18 +515,9 @@ void c_typecheck_baset::typecheck_switch_case(code_switch_caset &code)
   }
 }
 
-void c_typecheck_baset::typecheck_gcc_switch_case_range(codet &code)
+void c_typecheck_baset::typecheck_gcc_switch_case_range(
+  code_gcc_switch_case_ranget &code)
 {
-  if(code.operands().size()!=3)
-  {
-    error().source_location = code.source_location();
-    error() << "gcc_switch_case_range expected to have three operands"
-            << eom;
-    throw 0;
-  }
-
-  typecheck_code(to_code(code.op2()));
-
   if(!case_is_allowed)
   {
     error().source_location = code.source_location();
@@ -534,12 +525,13 @@ void c_typecheck_baset::typecheck_gcc_switch_case_range(codet &code)
     throw 0;
   }
 
-  typecheck_expr(code.op0());
-  typecheck_expr(code.op1());
-  implicit_typecast(code.op0(), switch_op_type);
-  implicit_typecast(code.op1(), switch_op_type);
-  make_constant(code.op0());
-  make_constant(code.op1());
+  typecheck_expr(code.lower());
+  typecheck_expr(code.upper());
+  implicit_typecast(code.lower(), switch_op_type);
+  implicit_typecast(code.upper(), switch_op_type);
+  make_constant(code.lower());
+  make_constant(code.upper());
+  typecheck_code(code.code());
 }
 
 void c_typecheck_baset::typecheck_gcc_local_label(codet &)

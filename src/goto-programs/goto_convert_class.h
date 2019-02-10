@@ -283,7 +283,7 @@ protected:
     goto_programt &dest,
     const irep_idt &mode);
   void convert_gcc_switch_case_range(
-    const codet &code,
+    const code_gcc_switch_case_ranget &,
     goto_programt &dest,
     const irep_idt &mode);
   void convert_function_call(
