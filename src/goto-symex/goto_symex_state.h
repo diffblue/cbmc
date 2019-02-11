@@ -141,7 +141,6 @@ public:
   /// for error traces even after symbolic execution has finished.
   symbol_tablet symbol_table;
 
-  symex_targett::sourcet source;
   symex_target_equationt *symex_target;
 
   // we remember all L1 renamings
