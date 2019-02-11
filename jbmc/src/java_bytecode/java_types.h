@@ -516,8 +516,7 @@ public:
 /// \return true if type is a generic Java parameter type
 inline bool is_java_generic_parameter(const typet &type)
 {
-  return type.id() == ID_pointer &&
-         is_java_generic_parameter_tag(type.subtype());
+  return is_reference(type) && is_java_generic_parameter_tag(type.subtype());
 }
 
 /// \param type: source type
@@ -636,8 +635,7 @@ public:
 template <>
 inline bool can_cast_type<java_generic_typet>(const typet &type)
 {
-  return is_reference(type) &&
-         type.subtype().get_bool(ID_C_java_generic_symbol);
+  return is_reference(type) && is_java_generic_struct_tag_type(type.subtype());
 }
 
 /// \param type: the type to check
