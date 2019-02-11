@@ -127,7 +127,7 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
     code_typet::parametert &this_parameter_expr=parameters.front();
     function_scope.this_expr=exprt(ID_symbol, this_parameter_expr.type());
     function_scope.this_expr.set(
-      ID_identifier, this_parameter_expr.get(ID_C_identifier));
+      ID_identifier, this_parameter_expr.get_identifier());
   }
   else
     function_scope.this_expr.make_nil();

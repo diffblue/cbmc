@@ -639,7 +639,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
           arg_symb.location=func_symb.location;
           arg_symb.type=arg.type();
 
-          arg.set(ID_C_identifier, arg_symb.name);
+          arg.set_identifier(arg_symb.name);
 
           // add the parameter to the symbol table
           const bool failed=!symbol_table.insert(std::move(arg_symb)).second;
@@ -648,7 +648,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
 
         // do the body of the function
         typecast_exprt late_cast(
-          lookup(args[0].get(ID_C_identifier)).symbol_expr(),
+          lookup(args[0].get_identifier()).symbol_expr(),
           to_code_type(component.type()).parameters()[0].type());
 
         side_effect_expr_function_callt expr_call(
@@ -661,7 +661,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
         for(const auto &arg : args)
         {
           expr_call.arguments().push_back(
-            lookup(arg.get(ID_C_identifier)).symbol_expr());
+            lookup(arg.get_identifier()).symbol_expr());
         }
 
         if(code_type.return_type().id()!=ID_empty &&
