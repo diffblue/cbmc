@@ -175,14 +175,9 @@ static void output_single_property_plain(
                << messaget::eom;
 }
 
-static void
-output_properties_plain(const propertiest &properties, messaget &log)
+static std::vector<propertiest::const_iterator>
+get_sorted_properties(const propertiest &properties)
 {
-  if(properties.empty())
-    return;
-
-  log.result() << "\n** Results:" << messaget::eom;
-  // collect properties in a vector
   std::vector<propertiest::const_iterator> sorted_properties;
   for(auto p_it = properties.begin(); p_it != properties.end(); p_it++)
     sorted_properties.push_back(p_it);
@@ -204,6 +199,17 @@ output_properties_plain(const propertiest &properties, messaget &log)
       else
         return id2string(pit1->first) < id2string(pit2->first);
     });
+  return sorted_properties;
+}
+
+static void output_properties_plain(
+  const std::vector<propertiest::const_iterator> &sorted_properties,
+  messaget &log)
+{
+  if(sorted_properties.empty())
+    return;
+
+  log.result() << "\n** Results:" << messaget::eom;
   // now show in the order we have determined
   irep_idt previous_function;
   irep_idt current_file;
@@ -253,7 +259,8 @@ void output_properties(
   {
   case ui_message_handlert::uit::PLAIN:
   {
-    output_properties_plain(properties, log);
+    const auto sorted_properties = get_sorted_properties(properties);
+    output_properties_plain(sorted_properties, log);
     output_iterations(properties, iterations, log);
     break;
   }
@@ -292,18 +299,19 @@ void output_properties_with_traces(
   {
   case ui_message_handlert::uit::PLAIN:
   {
-    output_properties_plain(properties, log);
-    for(const auto &property_pair : properties)
+    const auto sorted_properties = get_sorted_properties(properties);
+    output_properties_plain(sorted_properties, log);
+    for(const auto &property_it : sorted_properties)
     {
-      if(property_pair.second.status == property_statust::FAIL)
+      if(property_it->second.status == property_statust::FAIL)
       {
         log.result() << "\n"
-                     << "Trace for " << property_pair.first << ":"
+                     << "Trace for " << property_it->first << ":"
                      << "\n";
         show_goto_trace(
           log.result(),
           traces.get_namespace(),
-          traces[property_pair.first],
+          traces[property_it->first],
           trace_options);
         log.result() << messaget::eom;
       }
