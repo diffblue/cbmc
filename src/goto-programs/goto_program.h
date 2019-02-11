@@ -332,6 +332,13 @@ public:
       code.make_nil();
     }
 
+    /// Transforms an existing instruction into a skip,
+    /// retaining the source_location
+    void turn_into_skip()
+    {
+      clear(SKIP);
+    }
+
     void make_return() { clear(RETURN); }
     void make_skip() { clear(SKIP); }
     void make_location(const source_locationt &l)
