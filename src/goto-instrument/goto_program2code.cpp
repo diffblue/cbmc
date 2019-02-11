@@ -92,8 +92,7 @@ void goto_program2codet::build_dead_map()
   // record last dead X
   forall_goto_program_instructions(target, goto_program)
     if(target->is_dead())
-      dead_map[to_code_dead(target->code).get_identifier()]=
-        target->location_number;
+      dead_map[target->get_dead().get_identifier()] = target->location_number;
 }
 
 void goto_program2codet::scan_for_varargs()
@@ -103,8 +102,8 @@ void goto_program2codet::scan_for_varargs()
   forall_goto_program_instructions(target, goto_program)
     if(target->is_assign())
     {
-      const exprt &l=to_code_assign(target->code).lhs();
-      const exprt &r=to_code_assign(target->code).rhs();
+      const exprt &l = target->get_assign().lhs();
+      const exprt &r = target->get_assign().rhs();
 
       // find va_arg_next
       if(r.id()==ID_side_effect &&
@@ -182,8 +181,11 @@ goto_programt::const_targett goto_program2codet::convert_instruction(
       return target;
 
     case FUNCTION_CALL:
+      dest.add(target->get_function_call());
+      return target;
+
     case OTHER:
-      dest.add(target->code);
+      dest.add(target->get_other());
       return target;
 
     case ASSIGN:
@@ -295,7 +297,7 @@ goto_programt::const_targett goto_program2codet::convert_assign(
   goto_programt::const_targett upper_bound,
   code_blockt &dest)
 {
-  const code_assignt &a=to_code_assign(target->code);
+  const code_assignt &a = target->get_assign();
 
   if(va_list_expr.find(a.lhs())!=va_list_expr.end())
     return convert_assign_varargs(target, upper_bound, dest);
@@ -310,7 +312,7 @@ goto_programt::const_targett goto_program2codet::convert_assign_varargs(
   goto_programt::const_targett upper_bound,
   code_blockt &dest)
 {
-  const code_assignt &assign=to_code_assign(target->code);
+  const code_assignt &assign = target->get_assign();
 
   const exprt this_va_list_expr=assign.lhs();
   const exprt &r=skip_typecast(assign.rhs());
@@ -357,19 +359,19 @@ goto_programt::const_targett goto_program2codet::convert_assign_varargs(
     if(next!=upper_bound &&
        next->is_assign())
     {
-       const exprt &n_r=to_code_assign(next->code).rhs();
-       if(n_r.id()==ID_dereference &&
-          skip_typecast(to_dereference_expr(n_r).pointer())==
-          this_va_list_expr)
-       {
-         f.lhs()=to_code_assign(next->code).lhs();
+      const exprt &n_r = next->get_assign().rhs();
+      if(
+        n_r.id() == ID_dereference &&
+        skip_typecast(to_dereference_expr(n_r).pointer()) == this_va_list_expr)
+      {
+        f.lhs() = next->get_assign().lhs();
 
-         type_of.arguments().push_back(f.lhs());
-         f.arguments().push_back(type_of);
+        type_of.arguments().push_back(f.lhs());
+        f.arguments().push_back(type_of);
 
-         dest.add(std::move(f));
-         return next;
-       }
+        dest.add(std::move(f));
+        return next;
+      }
     }
 
     // assignment not found, still need a proper typeof expression
@@ -428,7 +430,7 @@ goto_programt::const_targett goto_program2codet::convert_return(
   goto_programt::const_targett upper_bound,
   code_blockt &dest)
 {
-  const code_returnt &ret=to_code_return(target->code);
+  const code_returnt &ret = target->get_return();
 
   // add return instruction unless original code was missing a return
   if(!ret.has_return_value() ||
@@ -460,7 +462,7 @@ goto_programt::const_targett goto_program2codet::convert_decl(
   goto_programt::const_targett upper_bound,
   code_blockt &dest)
 {
-  code_declt d=to_code_decl(target->code);
+  code_declt d = target->get_decl();
   symbol_exprt &symbol = d.symbol();
 
   goto_programt::const_targett next=target;
@@ -480,20 +482,19 @@ goto_programt::const_targett goto_program2codet::convert_decl(
      !next->is_target() &&
      (next->is_assign() || next->is_function_call()))
   {
-    exprt lhs=next->is_assign() ?
-      to_code_assign(next->code).lhs() :
-      to_code_function_call(next->code).lhs();
+    exprt lhs = next->is_assign() ? next->get_assign().lhs()
+                                  : next->get_function_call().lhs();
     if(lhs==symbol &&
        va_list_expr.find(lhs)==va_list_expr.end())
     {
       if(next->is_assign())
       {
-        d.copy_to_operands(to_code_assign(next->code).rhs());
+        d.copy_to_operands(next->get_assign().rhs());
       }
       else
       {
         // could hack this by just erasing the first operand
-        const code_function_callt &f=to_code_function_call(next->code);
+        const code_function_callt &f = next->get_function_call();
         side_effect_expr_function_callt call(
           f.function(), f.arguments(), typet{}, source_locationt{});
         d.copy_to_operands(call);
@@ -1348,10 +1349,10 @@ goto_programt::const_targett goto_program2codet::convert_start_thread(
   // suitable signature
   if(
     thread_start->is_function_call() &&
-    to_code_function_call(thread_start->code).arguments().size() == 1 &&
+    thread_start->get_function_call().arguments().size() == 1 &&
     after_thread_start == thread_end)
   {
-    const code_function_callt &cf = to_code_function_call(thread_start->code);
+    const code_function_callt &cf = thread_start->get_function_call();
 
     system_headers.insert("pthread.h");
 
