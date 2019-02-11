@@ -116,7 +116,7 @@ jobs:
       compiler: clang
       cache: ccache
       before_install:
-        - HOMEBREW_NO_AUTO_UPDATE=1 brew install ccache parallel
+        - HOMEBREW_NO_AUTO_UPDATE=1 brew install ccache parallel gdb
         - export PATH=$PATH:/usr/local/opt/ccache/libexec
       env: COMPILER="ccache clang++"
 
@@ -276,7 +276,7 @@ jobs:
       compiler: clang
       cache: ccache
       before_install:
-        - HOMEBREW_NO_AUTO_UPDATE=1 brew install ccache
+        - HOMEBREW_NO_AUTO_UPDATE=1 brew install ccache gdb
         - export PATH=$PATH:/usr/local/opt/ccache/libexec
       env:
         - BUILD_SYSTEM=cmake
