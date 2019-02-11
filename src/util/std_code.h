@@ -1474,6 +1474,92 @@ inline code_switch_caset &to_code_switch_case(codet &code)
   return static_cast<code_switch_caset &>(code);
 }
 
+/// \ref codet representation of a switch-case, i.e.\ a `case` statement
+/// within a `switch`. This is the variant that takes a range,
+/// which is a gcc extension.
+class code_gcc_switch_case_ranget : public codet
+{
+public:
+  code_gcc_switch_case_ranget(exprt _lower, exprt _upper, codet _code)
+    : codet(
+        ID_gcc_switch_case_range,
+        {std::move(_lower), std::move(_upper), std::move(_code)})
+  {
+  }
+
+  /// lower bound of range
+  const exprt &lower() const
+  {
+    return op0();
+  }
+
+  /// lower bound of range
+  exprt &lower()
+  {
+    return op0();
+  }
+
+  /// upper bound of range
+  const exprt &upper() const
+  {
+    return op1();
+  }
+
+  /// upper bound of range
+  exprt &upper()
+  {
+    return op1();
+  }
+
+  /// the statement to be executed when the case applies
+  codet &code()
+  {
+    return static_cast<codet &>(op2());
+  }
+
+  /// the statement to be executed when the case applies
+  const codet &code() const
+  {
+    return static_cast<const codet &>(op2());
+  }
+
+protected:
+  using codet::op0;
+  using codet::op1;
+  using codet::op2;
+  using codet::op3;
+};
+
+template <>
+inline bool can_cast_expr<code_gcc_switch_case_ranget>(const exprt &base)
+{
+  return detail::can_cast_code_impl(base, ID_gcc_switch_case_range);
+}
+
+inline void validate_expr(const code_gcc_switch_case_ranget &x)
+{
+  validate_operands(x, 3, "gcc-switch-case-range must have three operands");
+}
+
+inline const code_gcc_switch_case_ranget &
+to_code_gcc_switch_case_range(const codet &code)
+{
+  PRECONDITION(code.get_statement() == ID_gcc_switch_case_range);
+  DATA_INVARIANT(
+    code.operands().size() == 3,
+    "gcc-switch-case-range must have three operands");
+  return static_cast<const code_gcc_switch_case_ranget &>(code);
+}
+
+inline code_gcc_switch_case_ranget &to_code_gcc_switch_case_range(codet &code)
+{
+  PRECONDITION(code.get_statement() == ID_gcc_switch_case_range);
+  DATA_INVARIANT(
+    code.operands().size() == 3,
+    "gcc-switch-case-range must have three operands");
+  return static_cast<code_gcc_switch_case_ranget &>(code);
+}
+
 /// \ref codet representation of a `break` statement (within a `for` or `while`
 /// loop).
 class code_breakt:public codet

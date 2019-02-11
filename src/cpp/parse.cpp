@@ -7414,12 +7414,6 @@ bool Parser::rStatement(codet &statement)
         if(!rExpression(range_end, false))
           return false;
 
-        statement=codet(ID_gcc_switch_case_range);
-        statement.operands().resize(3);
-        statement.op0()=case_expr;
-        statement.op1()=range_end;
-        set_location(statement, tk1);
-
         if(lex.get_token(tk2)!=':')
           return false;
 
@@ -7427,7 +7421,11 @@ bool Parser::rStatement(codet &statement)
         if(!rStatement(statement2))
           return false;
 
-        statement.op2().swap(statement2);
+        code_gcc_switch_case_ranget code(
+          std::move(case_expr), std::move(range_end), std::move(statement2));
+        set_location(code, tk1);
+
+        statement = std::move(code);
       }
       else
       {

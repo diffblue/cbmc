@@ -384,17 +384,12 @@ void goto_convertt::convert_switch_case(
 }
 
 void goto_convertt::convert_gcc_switch_case_range(
-  const codet &code,
+  const code_gcc_switch_case_ranget &code,
   goto_programt &dest,
   const irep_idt &mode)
 {
-  INVARIANT_WITH_DIAGNOSTICS(
-    code.operands().size() == 3,
-    "GCC's switch-case-range statement expected to have three operands",
-    code.find_source_location());
-
-  const auto lb = numeric_cast<mp_integer>(code.op0());
-  const auto ub = numeric_cast<mp_integer>(code.op1());
+  const auto lb = numeric_cast<mp_integer>(code.lower());
+  const auto ub = numeric_cast<mp_integer>(code.upper());
 
   INVARIANT_WITH_DIAGNOSTICS(
     lb.has_value() && ub.has_value(),
@@ -409,7 +404,7 @@ void goto_convertt::convert_gcc_switch_case_range(
   }
 
   goto_programt tmp;
-  convert(to_code(code.op2()), tmp, mode);
+  convert(code.code(), tmp, mode);
 
   goto_programt::targett target = tmp.instructions.begin();
   dest.destructive_append(tmp);
@@ -425,7 +420,7 @@ void goto_convertt::convert_gcc_switch_case_range(
   exprt::operandst &case_op_dest = cases_entry->second->second;
 
   for(mp_integer i = *lb; i <= *ub; ++i)
-    case_op_dest.push_back(from_integer(i, code.op0().type()));
+    case_op_dest.push_back(from_integer(i, code.lower().type()));
 }
 
 /// converts 'code' and appends the result to 'dest'
@@ -459,7 +454,8 @@ void goto_convertt::convert(
   else if(statement==ID_switch_case)
     convert_switch_case(to_code_switch_case(code), dest, mode);
   else if(statement==ID_gcc_switch_case_range)
-    convert_gcc_switch_case_range(code, dest, mode);
+    convert_gcc_switch_case_range(
+      to_code_gcc_switch_case_range(code), dest, mode);
   else if(statement==ID_for)
     convert_for(to_code_for(code), dest, mode);
   else if(statement==ID_while)
