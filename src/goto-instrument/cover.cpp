@@ -253,12 +253,12 @@ std::unique_ptr<cover_configt> get_cover_config(
 
 /// Instruments a single goto program based on the given configuration
 /// \param cover_config: configuration, produced using get_cover_config
-/// \param function_id: function name
+/// \param function_symbol: symbol of the function to be instrumented
 /// \param function: function to instrument
 /// \param message_handler: log output
 static void instrument_cover_goals(
   const cover_configt &cover_config,
-  const irep_idt &function_id,
+  const symbolt &function_symbol,
   goto_functionst::goto_functiont &function,
   message_handlert &message_handler)
 {
@@ -284,10 +284,10 @@ static void instrument_cover_goals(
 
   bool changed = false;
 
-  if(cover_config.function_filters(function_id, function))
+  if(cover_config.function_filters(function_symbol, function))
   {
     instrument_cover_goals(
-      function_id,
+      function_symbol.name,
       function.body,
       cover_config.cover_instrumenters,
       cover_config.mode,
@@ -297,9 +297,9 @@ static void instrument_cover_goals(
 
   if(
     cover_config.traces_must_terminate &&
-    function_id == goto_functionst::entry_point())
+    function_symbol.name == goto_functionst::entry_point())
   {
-    cover_instrument_end_of_function(function_id, function.body);
+    cover_instrument_end_of_function(function_symbol.name, function.body);
     changed = true;
   }
 
@@ -316,9 +316,11 @@ void instrument_cover_goals(
   goto_model_functiont &function,
   message_handlert &message_handler)
 {
+  const symbolt function_symbol =
+    function.get_symbol_table().lookup_ref(function.get_function_id());
   instrument_cover_goals(
     cover_config,
-    function.get_function_id(),
+    function_symbol,
     function.get_goto_function(),
     message_handler);
 
@@ -356,9 +358,10 @@ bool instrument_cover_goals(
 
   Forall_goto_functions(f_it, goto_functions)
   {
-    cover_config->mode = symbol_table.lookup(f_it->first)->mode;
+    const symbolt function_symbol = symbol_table.lookup_ref(f_it->first);
+    cover_config->mode = function_symbol.mode;
     instrument_cover_goals(
-      *cover_config, f_it->first, f_it->second, message_handler);
+      *cover_config, function_symbol, f_it->second, message_handler);
   }
   goto_functions.compute_location_numbers();
 

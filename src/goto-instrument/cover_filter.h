@@ -15,8 +15,9 @@ Author: Daniel Kroening
 #include <regex>
 #include <memory>
 
-#include <util/message.h>
 #include <util/invariant.h>
+#include <util/message.h>
+#include <util/symbol.h>
 
 #include <goto-programs/goto_model.h>
 
@@ -35,7 +36,7 @@ public:
 
   /// Returns true if the function passes the filter criteria
   virtual bool operator()(
-    const irep_idt &identifier,
+    const symbolt &identifier,
     const goto_functionst::goto_functiont &goto_function) const = 0;
 
   /// Can be called after final filter application to report
@@ -85,7 +86,7 @@ public:
   /// \param identifier: function name
   /// \param goto_function: goto function
   bool operator()(
-    const irep_idt &identifier,
+    const symbolt &identifier,
     const goto_functionst::goto_functiont &goto_function) const
   {
     for(const auto &filter : filters)
@@ -151,7 +152,7 @@ public:
   }
 
   bool operator()(
-    const irep_idt &identifier,
+    const symbolt &identifier,
     const goto_functionst::goto_functiont &goto_function) const override;
 };
 
@@ -168,7 +169,7 @@ public:
   }
 
   bool operator()(
-    const irep_idt &identifier,
+    const symbolt &identifier,
     const goto_functionst::goto_functiont &goto_function) const override;
 
 private:
@@ -185,7 +186,7 @@ public:
   }
 
   bool operator()(
-    const irep_idt &identifier,
+    const symbolt &identifier,
     const goto_functionst::goto_functiont &goto_function) const override;
 };
 
