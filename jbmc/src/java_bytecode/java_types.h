@@ -407,21 +407,21 @@ bool equal_java_types(const typet &type1, const typet &type2);
 /// Class to hold a Java generic type parameter (also called type variable),
 /// e.g., `T` in `List<T>`.
 /// The bound can specify type requirements.
-class java_generic_parametert:public reference_typet
+class java_generic_parameter_tagt : public struct_tag_typet
 {
 public:
   typedef struct_tag_typet type_variablet;
 
-  java_generic_parametert(
+  java_generic_parameter_tagt(
     const irep_idt &_type_var_name,
     const struct_tag_typet &_bound)
-    : reference_typet(java_reference_type(_bound))
+    : struct_tag_typet(_bound)
   {
     set(ID_C_java_generic_parameter, true);
     type_variables().push_back(struct_tag_typet(_type_var_name));
   }
 
-  /// \return the type variable as symbol type
+  /// \return the type variable as struct tag type
   const type_variablet &type_variable() const
   {
     PRECONDITION(!type_variables().empty());
@@ -431,7 +431,7 @@ public:
   type_variablet &type_variable_ref()
   {
     PRECONDITION(!type_variables().empty());
-    return const_cast<type_variablet &>(type_variables().front());
+    return type_variables().front();
   }
 
   const irep_idt get_name() const
@@ -455,10 +455,69 @@ private:
 /// Checks whether the type is a java generic parameter/variable, e.g., `T` in
 /// `List<T>`.
 /// \param type: the type to check
+/// \return true if type is a generic Java parameter tag type
+inline bool is_java_generic_parameter_tag(const typet &type)
+{
+  return type.get_bool(ID_C_java_generic_parameter);
+}
+
+/// \param type: source type
+/// \return cast of type into a java_generic_parametert
+inline const java_generic_parameter_tagt &
+to_java_generic_parameter_tag(const typet &type)
+{
+  PRECONDITION(is_java_generic_parameter_tag(type));
+  return static_cast<const java_generic_parameter_tagt &>(type);
+}
+
+/// \param type: source type
+/// \return cast of type into a java_generic_parameter_tag
+inline java_generic_parameter_tagt &to_java_generic_parameter_tag(typet &type)
+{
+  PRECONDITION(is_java_generic_parameter_tag(type));
+  return static_cast<java_generic_parameter_tagt &>(type);
+}
+
+/// Reference that points to a java_generic_parameter_tagt. All information is
+/// stored on the underlying tag.
+class java_generic_parametert : public reference_typet
+{
+public:
+  typedef struct_tag_typet type_variablet;
+
+  java_generic_parametert(
+    const irep_idt &_type_var_name,
+    const struct_tag_typet &_bound)
+    : reference_typet(java_reference_type(
+        java_generic_parameter_tagt(_type_var_name, _bound)))
+  {
+  }
+
+  /// \return the type variable as symbol type
+  const type_variablet &type_variable() const
+  {
+    return to_java_generic_parameter_tag(subtype()).type_variable();
+  }
+
+  type_variablet &type_variable_ref()
+  {
+    return to_java_generic_parameter_tag(subtype()).type_variable_ref();
+  }
+
+  const irep_idt get_name() const
+  {
+    return to_java_generic_parameter_tag(subtype()).get_name();
+  }
+};
+
+/// Checks whether the type is a java generic parameter/variable, e.g., `T` in
+/// `List<T>`.
+/// \param type: the type to check
 /// \return true if type is a generic Java parameter type
 inline bool is_java_generic_parameter(const typet &type)
 {
-  return type.get_bool(ID_C_java_generic_parameter);
+  return type.id() == ID_pointer &&
+         is_java_generic_parameter_tag(type.subtype());
 }
 
 /// \param type: source type
@@ -493,36 +552,92 @@ inline java_generic_parametert &to_java_generic_parameter(typet &type)
 /// - in `HashMap<List<T>, V>` it would contain two elements, the first of
 ///   type `java_generic_typet` and the second of type
 ///   `java_generic_parametert`.
+class java_generic_struct_tag_typet : public struct_tag_typet
+{
+public:
+  typedef std::vector<reference_typet> generic_typest;
+
+  explicit java_generic_struct_tag_typet(const struct_tag_typet &type)
+    : struct_tag_typet(type)
+  {
+    set(ID_C_java_generic_symbol, true);
+  }
+
+  java_generic_struct_tag_typet(
+    const struct_tag_typet &type,
+    const std::string &base_ref,
+    const std::string &class_name_prefix);
+
+  const generic_typest &generic_types() const
+  {
+    return (const generic_typest &)(find(ID_generic_types).get_sub());
+  }
+
+  generic_typest &generic_types()
+  {
+    return (generic_typest &)(add(ID_generic_types).get_sub());
+  }
+
+  optionalt<size_t>
+  generic_type_index(const java_generic_parametert &type) const;
+};
+
+/// \param type: the type to check
+/// \return true if the type is a symbol type with generics
+inline bool is_java_generic_struct_tag_type(const typet &type)
+{
+  return type.get_bool(ID_C_java_generic_symbol);
+}
+
+/// \param type: the type to convert
+/// \return the converted type
+inline const java_generic_struct_tag_typet &
+to_java_generic_struct_tag_type(const typet &type)
+{
+  PRECONDITION(is_java_generic_struct_tag_type(type));
+  return static_cast<const java_generic_struct_tag_typet &>(type);
+}
+
+/// \param type: the type to convert
+/// \return the converted type
+inline java_generic_struct_tag_typet &
+to_java_generic_struct_tag_type(typet &type)
+{
+  PRECONDITION(is_java_generic_struct_tag_type(type));
+  return static_cast<java_generic_struct_tag_typet &>(type);
+}
+
+/// Reference that points to a java_generic_struct_tag_typet. All information is
+/// stored on the underlying tag.
 class java_generic_typet:public reference_typet
 {
 public:
-  typedef std::vector<reference_typet> generic_type_argumentst;
+  typedef java_generic_struct_tag_typet::generic_typest generic_type_argumentst;
 
-  explicit java_generic_typet(const typet &_type):
-    reference_typet(java_reference_type(_type))
+  explicit java_generic_typet(const typet &_type)
+    : reference_typet(java_reference_type(
+        java_generic_struct_tag_typet(to_struct_tag_type(_type))))
   {
-    set(ID_C_java_generic_type, true);
   }
 
   /// \return vector of type variables
   const generic_type_argumentst &generic_type_arguments() const
   {
-    return (const generic_type_argumentst &)(
-      find(ID_type_variables).get_sub());
+    return to_java_generic_struct_tag_type(subtype()).generic_types();
   }
 
   /// \return vector of type variables
   generic_type_argumentst &generic_type_arguments()
   {
-    return (generic_type_argumentst &)(
-      add(ID_type_variables).get_sub());
+    return to_java_generic_struct_tag_type(subtype()).generic_types();
   }
 };
 
 template <>
 inline bool can_cast_type<java_generic_typet>(const typet &type)
 {
-  return is_reference(type) && type.get_bool(ID_C_java_generic_type);
+  return is_reference(type) &&
+         type.subtype().get_bool(ID_C_java_generic_symbol);
 }
 
 /// \param type: the type to check
@@ -760,58 +875,6 @@ void get_dependencies_from_generic_parameters(
 void get_dependencies_from_generic_parameters(
   const typet &,
   std::set<irep_idt> &);
-
-/// Type for a generic symbol, extends struct_tag_typet with a
-/// vector of java generic types.
-/// This is used to store the type of generic superclasses and interfaces.
-class java_generic_struct_tag_typet : public struct_tag_typet
-{
-public:
-  typedef std::vector<reference_typet> generic_typest;
-
-  java_generic_struct_tag_typet(
-    const struct_tag_typet &type,
-    const std::string &base_ref,
-    const std::string &class_name_prefix);
-
-  const generic_typest &generic_types() const
-  {
-    return (const generic_typest &)(find(ID_generic_types).get_sub());
-  }
-
-  generic_typest &generic_types()
-  {
-    return (generic_typest &)(add(ID_generic_types).get_sub());
-  }
-
-  optionalt<size_t>
-  generic_type_index(const java_generic_parametert &type) const;
-};
-
-/// \param type: the type to check
-/// \return true if the type is a symbol type with generics
-inline bool is_java_generic_struct_tag_type(const typet &type)
-{
-  return type.get_bool(ID_C_java_generic_symbol);
-}
-
-/// \param type: the type to convert
-/// \return the converted type
-inline const java_generic_struct_tag_typet &
-to_java_generic_struct_tag_type(const typet &type)
-{
-  PRECONDITION(is_java_generic_struct_tag_type(type));
-  return static_cast<const java_generic_struct_tag_typet &>(type);
-}
-
-/// \param type: the type to convert
-/// \return the converted type
-inline java_generic_struct_tag_typet &
-to_java_generic_struct_tag_type(typet &type)
-{
-  PRECONDITION(is_java_generic_struct_tag_type(type));
-  return static_cast<java_generic_struct_tag_typet &>(type);
-}
 
 /// Take a signature string and remove everything in angle brackets allowing for
 /// the type to be parsed normally, for example

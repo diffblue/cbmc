@@ -140,7 +140,9 @@ bool require_java_generic_type_argument_expectation(
   case require_type::type_argument_kindt::Inst:
   {
     REQUIRE(!is_java_generic_parameter(type_argument));
-    REQUIRE(type_argument.subtype() == struct_tag_typet(expected.description));
+    REQUIRE(
+      to_struct_tag_type(type_argument.subtype()).get_identifier() ==
+      expected.description);
     return true;
   }
   }
