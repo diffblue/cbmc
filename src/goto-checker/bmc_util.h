@@ -35,6 +35,9 @@ void convert_symex_target_equation(
   prop_convt &,
   message_handlert &);
 
+/// Outputs a message that an error trace is being built
+void message_building_error_trace(messaget &);
+
 void build_error_trace(
   goto_tracet &,
   const namespacet &,

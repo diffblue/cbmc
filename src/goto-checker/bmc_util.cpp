@@ -32,6 +32,11 @@ Author: Daniel Kroening, Peter Schrammel
 
 #include "symex_bmc.h"
 
+void message_building_error_trace(messaget &log)
+{
+  log.status() << "Building error trace" << messaget::eom;
+}
+
 void build_error_trace(
   goto_tracet &goto_trace,
   const namespacet &ns,
@@ -39,8 +44,8 @@ void build_error_trace(
   const prop_convt &prop_conv,
   ui_message_handlert &ui_message_handler)
 {
-  messaget msg(ui_message_handler);
-  msg.status() << "Building error trace" << messaget::eom;
+  messaget log(ui_message_handler);
+  message_building_error_trace(log);
 
   build_goto_trace(symex_target_equation, prop_conv, ns, goto_trace);
 }
