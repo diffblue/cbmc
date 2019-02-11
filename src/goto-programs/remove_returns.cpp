@@ -206,20 +206,19 @@ void remove_returnst::do_function_calls(
             rhs = side_effect_expr_nondett(
               function_call.lhs().type(), i_it->source_location);
 
-          goto_programt::targett t_a=goto_program.insert_after(i_it);
-          t_a->make_assignment();
-          t_a->source_location=i_it->source_location;
-          t_a->code=code_assignt(function_call.lhs(), rhs);
+          goto_programt::targett t_a = goto_program.insert_after(
+            i_it,
+            goto_programt::make_assignment(
+              code_assignt(function_call.lhs(), rhs), i_it->source_location));
 
           // fry the previous assignment
           function_call.lhs().make_nil();
 
           if(!is_stub)
           {
-            goto_programt::targett t_d=goto_program.insert_after(t_a);
-            t_d->make_dead();
-            t_d->source_location=i_it->source_location;
-            t_d->code = code_deadt(*return_value);
+            goto_program.insert_after(
+              t_a,
+              goto_programt::make_dead(*return_value, i_it->source_location));
           }
         }
       }
