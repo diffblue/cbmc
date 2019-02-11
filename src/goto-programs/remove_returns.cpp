@@ -44,7 +44,7 @@ protected:
     const irep_idt &function_id,
     goto_functionst::goto_functiont &function);
 
-  void do_function_calls(
+  bool do_function_calls(
     function_is_stubt function_is_stub,
     goto_programt &goto_program);
 
@@ -142,10 +142,14 @@ void remove_returnst::replace_returns(
 /// \param function_is_stub: function (irep_idt -> bool) that determines whether
 ///   a given function ID is a stub
 /// \param goto_program: program to transform
-void remove_returnst::do_function_calls(
+/// \return True if, and only if, instructions have been inserted. In that case
+///   the caller must invoke an appropriate method to update location numbers.
+bool remove_returnst::do_function_calls(
   function_is_stubt function_is_stub,
   goto_programt &goto_program)
 {
+  bool requires_update = false;
+
   Forall_goto_program_instructions(i_it, goto_program)
   {
     if(i_it->is_function_call())
@@ -221,6 +225,8 @@ void remove_returnst::do_function_calls(
               t_a,
               goto_programt::make_dead(*return_value, i_it->source_location));
           }
+
+          requires_update = true;
         }
 
         // update the call
@@ -228,6 +234,8 @@ void remove_returnst::do_function_calls(
       }
     }
   }
+
+  return requires_update;
 }
 
 void remove_returnst::operator()(goto_functionst &goto_functions)
@@ -244,7 +252,8 @@ void remove_returnst::operator()(goto_functionst &goto_functions)
     };
 
     replace_returns(it->first, it->second);
-    do_function_calls(function_is_stub, it->second.body);
+    if(do_function_calls(function_is_stub, it->second.body))
+      goto_functions.compute_location_numbers(it->second.body);
   }
 }
 
@@ -261,7 +270,8 @@ void remove_returnst::operator()(
     return;
 
   replace_returns(model_function.get_function_id(), goto_function);
-  do_function_calls(function_is_stub, goto_function.body);
+  if(do_function_calls(function_is_stub, goto_function.body))
+    model_function.compute_location_numbers();
 }
 
 /// removes returns
