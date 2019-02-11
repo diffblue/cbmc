@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/c_types.h>
 #include <util/config.h>
 #include <util/expr_initializer.h>
+#include <util/range.h>
 
 #include "ansi_c_declaration.h"
 
@@ -152,11 +153,12 @@ void c_typecheck_baset::typecheck_asm(code_asmt &code)
 
     typecheck_expr(code_asm_gcc.asm_text());
 
-    for(std::size_t i = 1; i < code_asm_gcc.operands().size(); i++)
+    // the operands are lists of expressions
+    for(auto &op : ranget<exprt::operandst::iterator>(
+          code_asm_gcc.operands().begin() + 1, code_asm_gcc.operands().end()))
     {
-      exprt &list = code_asm_gcc.operands()[i];
-      Forall_operands(it, list)
-        typecheck_expr(*it);
+      for(auto &expr : op.operands())
+        typecheck_expr(expr);
     }
   }
   else if(flavor==ID_msc)
