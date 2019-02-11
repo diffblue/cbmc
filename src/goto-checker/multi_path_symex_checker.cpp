@@ -109,20 +109,44 @@ operator()(propertiest &properties)
   return result;
 }
 
-goto_tracet multi_path_symex_checkert::build_trace() const
+goto_tracet multi_path_symex_checkert::build_full_trace() const
+{
+  goto_tracet goto_trace;
+  build_goto_trace(
+    equation,
+    equation.SSA_steps.end(),
+    property_decider.get_solver(),
+    ns,
+    goto_trace);
+
+  return goto_trace;
+}
+
+goto_tracet multi_path_symex_checkert::build_shortest_trace() const
 {
   if(options.get_bool_option("beautify"))
   {
     counterexample_beautificationt()(
       dynamic_cast<boolbvt &>(property_decider.get_solver()), equation);
   }
+
   goto_tracet goto_trace;
-  ::build_error_trace(
-    goto_trace,
-    ns,
+  build_goto_trace(equation, property_decider.get_solver(), ns, goto_trace);
+
+  return goto_trace;
+}
+
+goto_tracet
+multi_path_symex_checkert::build_trace(const irep_idt &property_id) const
+{
+  goto_tracet goto_trace;
+  build_goto_trace(
     equation,
+    ssa_step_matches_failing_property(property_id),
     property_decider.get_solver(),
-    ui_message_handler);
+    ns,
+    goto_trace);
+
   return goto_trace;
 }
 

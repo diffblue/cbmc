@@ -50,7 +50,8 @@ public:
 
     case resultt::FAIL:
     {
-      goto_tracet goto_trace = incremental_goto_checker.build_trace();
+      message_building_error_trace(log);
+      goto_tracet goto_trace = incremental_goto_checker.build_shortest_trace();
       output_error_trace(
         goto_trace,
         incremental_goto_checker.get_namespace(),

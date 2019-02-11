@@ -34,7 +34,9 @@ public:
 
   resultt operator()(propertiest &) override;
 
-  goto_tracet build_trace() const override;
+  goto_tracet build_full_trace() const override;
+  goto_tracet build_shortest_trace() const override;
+  goto_tracet build_trace(const irep_idt &) const override;
   const namespacet &get_namespace() const override;
 
   void output_error_witness(const goto_tracet &) override;
