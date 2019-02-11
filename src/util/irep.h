@@ -291,6 +291,52 @@ public:
 template <typename derivedt>
 typename sharing_treet<derivedt>::dt sharing_treet<derivedt>::empty_d;
 
+/// Base class for tree-like data structures without sharing
+template <typename derivedt>
+class non_sharing_treet
+{
+public:
+  using dt = tree_nodet<derivedt, false>;
+  using subt = typename dt::subt;
+  using named_subt = typename dt::named_subt;
+
+  /// Used to refer to this class from derived classes
+  using tree_implementationt = non_sharing_treet;
+
+  explicit non_sharing_treet(const irep_idt &_id)
+  {
+    write().data = _id;
+  }
+
+  non_sharing_treet(
+    const irep_idt &_id,
+    const named_subt &_named_sub,
+    const subt &_sub)
+  {
+    write().data = _id;
+    write().named_sub = _named_sub;
+    write().sub = _sub;
+  }
+
+  non_sharing_treet() = default;
+
+  const dt &read() const
+  {
+    return data;
+  }
+
+  dt &write()
+  {
+#ifdef HASH_CODE
+    data.hash_code = 0;
+#endif
+    return data;
+  }
+
+protected:
+  dt data;
+};
+
 /// There are a large number of kinds of tree structured or tree-like data in
 /// CPROVER. \ref irept provides a single, unified representation for all of
 /// these, allowing structure sharing and reference counting of data. As
@@ -342,24 +388,15 @@ typename sharing_treet<derivedt>::dt sharing_treet<derivedt>::empty_d;
 /// code / one semi-colon). The most common descendant of \ref codet is
 /// \ref code_assignt so a common pattern is to cast the \ref codet to an
 /// assignment and then recurse on the expression on either side.
-#ifdef SHARING
-class irept : public sharing_treet<irept>
-#else
 class irept
+#ifdef SHARING
+  : public sharing_treet<irept>
+#else
+  : public non_sharing_treet<irept>
 #endif
 {
 public:
-#ifndef SHARING
-  // These are not stable.
-  typedef std::vector<irept> subt;
-
-  typedef tree_nodet<irept, false> dt;
-
-  typedef dt::named_subt named_subt;
-#endif
-  // named_subt has to provide stable references; with C++11 we could
-  // use std::forward_list or std::vector< unique_ptr<T> > to save
-  // memory and increase efficiency.
+  using baset = tree_implementationt;
 
   bool is_nil() const
   {
@@ -370,34 +407,16 @@ public:
     return id() != ID_nil;
   }
 
-#if !defined(SHARING)
-  explicit irept(const irep_idt &_id)
-  {
-    id(_id);
-  }
-
-  irept(const irep_idt &_id, const named_subt &_named_sub, const subt &_sub)
-  {
-    id(_id);
-    get_named_sub() = _named_sub;
-    get_sub() = _sub;
-  }
-
-  irept()
-  {
-  }
-#else
-  explicit irept(const irep_idt &_id) : sharing_treet(_id)
+  explicit irept(const irep_idt &_id) : baset(_id)
   {
   }
 
   irept(const irep_idt &_id, const named_subt &_named_sub, const subt &_sub)
-    : sharing_treet(_id, _named_sub, _sub)
+    : baset(_id, _named_sub, _sub)
   {
   }
 
   irept() = default;
-#endif
 
   const irep_idt &id() const
   { return read().data; }
@@ -469,31 +488,11 @@ public:
 
   std::string pretty(unsigned indent=0, unsigned max_indent=0) const;
 
-public:
   static bool is_comment(const irep_namet &name)
   { return !name.empty() && name[0]=='#'; }
 
   /// count the number of named_sub elements that are not comments
   static std::size_t number_of_non_comments(const named_subt &);
-
-protected:
-#ifndef SHARING
-  dt data;
-
-public:
-  const dt &read() const
-  {
-    return data;
-  }
-
-  dt &write()
-  {
-    #ifdef HASH_CODE
-    data.hash_code=0;
-    #endif
-    return data;
-  }
-  #endif
 };
 
 // NOLINTNEXTLINE(readability/identifiers)
