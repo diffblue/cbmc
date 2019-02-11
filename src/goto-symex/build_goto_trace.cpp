@@ -13,12 +13,12 @@ Author: Daniel Kroening
 
 #include "build_goto_trace.h"
 
-#include <cassert>
-
 #include <util/arith_tools.h>
 #include <util/byte_operators.h>
 #include <util/simplify_expr.h>
 #include <util/threeval.h>
+
+#include <goto-programs/goto_functions.h>
 
 #include <solvers/prop/prop_conv.h>
 #include <solvers/prop/prop.h>
