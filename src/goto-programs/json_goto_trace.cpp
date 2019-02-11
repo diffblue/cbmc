@@ -132,9 +132,6 @@ void convert_decl(
   }
   else
   {
-    DATA_INVARIANT(
-      step.full_lhs_value.is_not_nil(),
-      "full_lhs_value in assignment must not be nil");
     full_lhs_value = json(step.full_lhs_value, ns, ID_unknown);
   }
 
