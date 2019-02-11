@@ -50,6 +50,17 @@ void build_error_trace(
   build_goto_trace(symex_target_equation, prop_conv, ns, goto_trace);
 }
 
+ssa_step_predicatet
+ssa_step_matches_failing_property(const irep_idt &property_id)
+{
+  return [property_id](
+           symex_target_equationt::SSA_stepst::const_iterator step,
+           const prop_convt &prop_conv) {
+    return step->is_assert() && step->get_property_id() == property_id &&
+           prop_conv.l_get(step->cond_literal).is_false();
+  };
+}
+
 void output_error_trace(
   const goto_tracet &goto_trace,
   const namespacet &ns,
