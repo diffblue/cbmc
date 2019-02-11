@@ -290,7 +290,11 @@ static void remove_complex(
     remove_complex(it->code);
 
     if(it->has_condition())
-      remove_complex(it->guard);
+    {
+      exprt c = it->get_condition();
+      remove_complex(c);
+      it->set_condition(c);
+    }
   }
 }
 

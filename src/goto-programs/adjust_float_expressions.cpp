@@ -202,7 +202,11 @@ void adjust_float_expressions(
     adjust_float_expressions(it->code, ns);
 
     if(it->has_condition())
-      adjust_float_expressions(it->guard, ns);
+    {
+      exprt c = it->get_condition();
+      adjust_float_expressions(c, ns);
+      it->set_condition(c);
+    }
   }
 }
 

@@ -318,7 +318,11 @@ void goto_inlinet::insert_function_body(
       replace_location(it->code, target->source_location);
 
       if(it->has_condition())
-        replace_location(it->guard, target->source_location);
+      {
+        exprt c = it->get_condition();
+        replace_location(c, target->source_location);
+        it->set_condition(c);
+      }
     }
   }
 

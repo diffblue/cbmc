@@ -223,7 +223,11 @@ void remove_vector(goto_functionst::goto_functiont &goto_function)
     remove_vector(it->code);
 
     if(it->has_condition())
-      remove_vector(it->guard);
+    {
+      exprt c = it->get_condition();
+      remove_vector(c);
+      it->set_condition(c);
+    }
   }
 }
 

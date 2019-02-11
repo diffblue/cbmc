@@ -106,7 +106,11 @@ void rewrite_union(goto_functionst::goto_functiont &goto_function)
     rewrite_union(it->code);
 
     if(it->has_condition())
-      rewrite_union(it->guard);
+    {
+      exprt c = it->get_condition();
+      rewrite_union(c);
+      it->set_condition(c);
+    }
   }
 }
 

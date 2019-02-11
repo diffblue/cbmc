@@ -35,7 +35,11 @@ static void rename_symbols_in_function(
     rename_symbol(iit->code);
 
     if(iit->has_condition())
-      rename_symbol(iit->guard);
+    {
+      exprt c = iit->get_condition();
+      rename_symbol(c);
+      iit->set_condition(c);
+    }
   }
 }
 
