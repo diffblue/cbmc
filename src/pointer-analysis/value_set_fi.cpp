@@ -989,10 +989,10 @@ void value_set_fit::assign(
       }
       else
       {
-        if(rhs.type() != type)
+        if(rhs.type() != lhs.type())
           throw "value_set_fit::assign type mismatch: "
                 "rhs.type():\n"+rhs.type().pretty()+"\n"+
-                "type:\n"+type.pretty();
+                "type:\n"+lhs.type().pretty();
 
         if(rhs.id()==ID_struct ||
            rhs.id()==ID_constant)

@@ -1154,10 +1154,10 @@ void value_sett::assign(
       }
       else
       {
-        if(rhs.type() != type)
+        if(rhs.type() != lhs.type())
           throw "value_sett::assign type mismatch: "
                 "rhs.type():\n"+rhs.type().pretty()+"\n"+
-                "type:\n"+type.pretty();
+                "lhs.type():\n"+lhs.type().pretty();
 
         rhs_member=make_member(rhs, name, ns);
 

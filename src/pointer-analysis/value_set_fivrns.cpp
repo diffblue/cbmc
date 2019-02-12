@@ -797,10 +797,9 @@ void value_set_fivrnst::assign(
       }
       else
       {
-        if(rhs.type() != type)
-          throw
-            "type mismatch:\nRHS: "+rhs.type().pretty()+"\n"+
-            "LHS: "+type.pretty();
+        if(rhs.type() != lhs.type())
+          throw "type mismatch:\nRHS: " + rhs.type().pretty() + "\n" +
+            "LHS: " + lhs.type().pretty();
 
         if(rhs.id()==ID_struct ||
            rhs.id()==ID_constant)
