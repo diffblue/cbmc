@@ -40,11 +40,18 @@ protected:
   bdd_managert bdd_mgr;
 
   typedef std::unordered_map<exprt, bddt, irep_hash> expr_mapt;
+
   expr_mapt expr_map;
+
+  /// Mapping from BDD variables to expressions: the expression at index \c i
+  /// of \p node_map corresponds to the i-th variable
   std::vector<exprt> node_map;
 
   bddt from_expr_rec(const exprt &expr);
-  exprt as_expr(const bdd_nodet &r, bool complement) const;
+  exprt as_expr(
+    const bdd_nodet &r,
+    bool complement,
+    std::unordered_map<bdd_nodet::idt, exprt> &cache) const;
 };
 
 #endif // CPROVER_SOLVERS_PROP_BDD_EXPR_H
