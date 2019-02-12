@@ -145,37 +145,47 @@ void merge_irept::operator()(irept &irep)
 
 const irept &merge_irept::merged(const irept &irep)
 {
-  irep_storet::const_iterator entry=irep_store.find(irep);
-  if(entry!=irep_store.end())
-    return *entry;
-
-  irept new_irep(irep.id());
+  auto entry = irep_store.insert(irep);
+  if(!entry.second)
+    return *entry.first;
 
   const irept::subt &src_sub=irep.get_sub();
-  irept::subt &dest_sub=new_irep.get_sub();
-  dest_sub.reserve(src_sub.size());
+  irept::subt *dest_sub_ptr = nullptr;
 
+  std::size_t index = 0;
   forall_irep(it, src_sub)
-    dest_sub.push_back(merged(*it)); // recursive call
-
-  const irept::named_subt &src_named_sub=irep.get_named_sub();
-  irept::named_subt &dest_named_sub=new_irep.get_named_sub();
-
-#ifdef NAMED_SUB_IS_FORWARD_LIST
-  irept::named_subt::iterator before = dest_named_sub.before_begin();
-#endif
-  forall_named_irep(it, src_named_sub)
   {
-#ifdef NAMED_SUB_IS_FORWARD_LIST
-    dest_named_sub.emplace_after(
-      before, it->first, merged(it->second)); // recursive call
-    ++before;
-#else
-    dest_named_sub[it->first]=merged(it->second); // recursive call
-#endif
+    const irept &op = merged(*it); // recursive call
+    if(&op.read() != &(it->read()))
+    {
+      if(!dest_sub_ptr)
+        dest_sub_ptr = &(const_cast<irept &>(*entry.first)).get_sub();
+      (*dest_sub_ptr)[index] = op;
+    }
+    ++index;
   }
 
-  return *irep_store.insert(std::move(new_irep)).first;
+  const irept::named_subt &src_named_sub=irep.get_named_sub();
+  irept::named_subt *dest_named_sub_ptr = nullptr;
+
+  std::ptrdiff_t advance_by = 0;
+  forall_named_irep(it, src_named_sub)
+  {
+    if(!irept::is_comment(it->first))
+    {
+      const irept &op = merged(it->second); // recursive call
+      if(&op.read() != &(it->second.read()))
+      {
+        if(!dest_named_sub_ptr)
+          dest_named_sub_ptr =
+            &(const_cast<irept &>(*entry.first)).get_named_sub();
+        std::next(dest_named_sub_ptr->begin(), advance_by)->second = op;
+      }
+    }
+    ++advance_by;
+  }
+
+  return *entry.first;
 }
 
 void merge_full_irept::operator()(irept &irep)
