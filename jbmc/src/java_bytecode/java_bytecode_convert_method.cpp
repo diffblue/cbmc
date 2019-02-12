@@ -1531,6 +1531,8 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
 
       const irep_idt field_id(
         get_static_field(arg0.get_string(ID_class), field_name));
+
+      // Symbol should have been populated by java_bytecode_convert_class:
       const symbol_exprt symbol_expr(
         symbol_table.lookup_ref(field_id).symbol_expr());
 
@@ -1549,6 +1551,8 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
 
       const irep_idt field_id(
         get_static_field(arg0.get_string(ID_class), field_name));
+
+      // Symbol should have been populated by java_bytecode_convert_class:
       const symbol_exprt symbol_expr(
         symbol_table.lookup_ref(field_id).symbol_expr());
 
