@@ -149,28 +149,12 @@ public:
 protected:
   const symex_configt symex_config;
 
-  /// Initialise the symbolic execution and the given state with <code>pc</code>
-  /// as entry point.
-  /// \param state: Symex state to initialise.
-  /// \param get_goto_function: producer for GOTO functions
-  /// \param function_identifier: The function in which the instructions are
-  /// \param pc: first instruction to symex
-  /// \param limit: final instruction, which itself will not
-  ///   be symexed.
-  void initialize_entry_point(
-    statet &state,
-    const get_goto_functiont &get_goto_function,
-    const irep_idt &function_identifier,
-    goto_programt::const_targett pc,
-    goto_programt::const_targett limit);
-
   /// Initialize the symbolic execution and the given state with
   /// the beginning of the entry point function.
   /// \param get_goto_function: producer for GOTO functions
-  /// \param state: Symex state to initialize.
-  void initialize_entry_point_state(
-    const get_goto_functiont &get_goto_function,
-    statet &state);
+  /// \return Initialized symex state.
+  std::unique_ptr<statet>
+  initialize_entry_point_state(const get_goto_functiont &get_goto_function);
 
   /// Invokes symex_step and verifies whether additional threads can be
   /// executed.

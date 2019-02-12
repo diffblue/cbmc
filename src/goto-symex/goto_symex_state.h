@@ -72,8 +72,11 @@ public:
   unsigned total_vccs = 0;
   unsigned remaining_vccs = 0;
 
+  /// Constructors
   explicit goto_statet(const class goto_symex_statet &s);
-  goto_statet() = default;
+  explicit goto_statet(const symex_targett::sourcet &_source) : source(_source)
+  {
+  }
 };
 
 // stack frames -- these are used for function calls and
@@ -124,7 +127,7 @@ struct framet
 class goto_symex_statet final : public goto_statet
 {
 public:
-  goto_symex_statet();
+  explicit goto_symex_statet(const symex_targett::sourcet &);
   ~goto_symex_statet();
 
   /// \brief Fake "copy constructor" that initializes the `symex_target` member

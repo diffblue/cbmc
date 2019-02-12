@@ -159,34 +159,6 @@ void goto_symext::rewrite_quantifiers(exprt &expr, statet &state)
   }
 }
 
-void goto_symext::initialize_entry_point(
-  statet &state,
-  const get_goto_functiont &get_goto_function,
-  const irep_idt &function_id,
-  const goto_programt::const_targett pc,
-  const goto_programt::const_targett limit)
-{
-  PRECONDITION(!state.threads.empty());
-  PRECONDITION(!state.call_stack().empty());
-  state.source = symex_targett::sourcet(function_id, pc);
-  state.top().end_of_function=limit;
-  state.top().calling_location.pc=state.top().end_of_function;
-  state.symex_target=&target;
-
-  const goto_functiont &entry_point_function = get_goto_function(function_id);
-
-  state.top().hidden_function = entry_point_function.is_hidden();
-
-  auto emplace_safe_pointers_result =
-    state.safe_pointers.emplace(function_id, local_safe_pointerst{ns});
-  if(emplace_safe_pointers_result.second)
-    emplace_safe_pointers_result.first->second(entry_point_function.body);
-
-  state.dirty.populate_dirty_for_function(function_id, entry_point_function);
-
-  symex_transition(state, state.source.pc, false);
-}
-
 static void
 switch_to_thread(goto_symex_statet &state, const unsigned int thread_nb)
 {
@@ -305,50 +277,69 @@ void goto_symext::resume_symex_from_saved_state(
       new_symbol_table);
 }
 
-void goto_symext::initialize_entry_point_state(
-  const get_goto_functiont &get_goto_function,
-  statet &state)
+std::unique_ptr<goto_symext::statet> goto_symext::initialize_entry_point_state(
+  const get_goto_functiont &get_goto_function)
 {
+  const irep_idt entry_point_id = goto_functionst::entry_point();
+
   const goto_functionst::goto_functiont *start_function;
   try
   {
-    start_function = &get_goto_function(goto_functionst::entry_point());
+    start_function = &get_goto_function(entry_point_id);
   }
   catch(const std::out_of_range &)
   {
     throw unsupported_operation_exceptiont("the program has no entry point");
   }
 
-  state.run_validation_checks = symex_config.run_validation_checks;
+  // create and prepare the state
+  auto state = util_make_unique<statet>(
+    symex_targett::sourcet(entry_point_id, start_function->body));
+  CHECK_RETURN(!state->threads.empty());
+  CHECK_RETURN(!state->call_stack().empty());
 
-  initialize_entry_point(
-    state,
-    get_goto_function,
-    goto_functionst::entry_point(),
-    start_function->body.instructions.begin(),
-    std::prev(start_function->body.instructions.end()));
+  goto_programt::const_targett limit =
+    std::prev(start_function->body.instructions.end());
+  state->top().end_of_function = limit;
+  state->top().calling_location.pc = state->top().end_of_function;
+  state->top().hidden_function = start_function->is_hidden();
+
+  state->symex_target = &target;
+
+  state->run_validation_checks = symex_config.run_validation_checks;
+
+  // initialize support analyses
+  auto emplace_safe_pointers_result =
+    state->safe_pointers.emplace(entry_point_id, local_safe_pointerst{ns});
+  if(emplace_safe_pointers_result.second)
+    emplace_safe_pointers_result.first->second(start_function->body);
+
+  state->dirty.populate_dirty_for_function(entry_point_id, *start_function);
+
+  // make the first step onto the instruction pointed to by the initial program
+  // counter
+  symex_transition(*state, state->source.pc, false);
+
+  return state;
 }
 
 void goto_symext::symex_from_entry_point_of(
   const get_goto_functiont &get_goto_function,
   symbol_tablet &new_symbol_table)
 {
-  statet state;
-  initialize_entry_point_state(get_goto_function, state);
+  auto state = initialize_entry_point_state(get_goto_function);
 
-  symex_with_state(
-    state, get_goto_function, new_symbol_table);
+  symex_with_state(*state, get_goto_function, new_symbol_table);
 }
 
 void goto_symext::initialize_path_storage_from_entry_point_of(
   const get_goto_functiont &get_goto_function,
   symbol_tablet &new_symbol_table)
 {
-  statet state;
-  initialize_entry_point_state(get_goto_function, state);
+  auto state = initialize_entry_point_state(get_goto_function);
 
-  path_storaget::patht entry_point_start(target, state);
-  entry_point_start.state.saved_target = state.source.pc;
+  path_storaget::patht entry_point_start(target, *state);
+  entry_point_start.state.saved_target = state->source.pc;
   entry_point_start.state.has_saved_next_instruction = true;
 
   path_storage.push(entry_point_start);
