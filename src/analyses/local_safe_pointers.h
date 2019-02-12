@@ -25,10 +25,12 @@ class local_safe_pointerst
 {
   /// Comparator that regards type-equal expressions as equal, and otherwise
   /// uses the natural (operator<) ordering on irept.
-  class type_comparet
+  struct type_comparet
   {
-  public:
-    bool operator()(const exprt &e1, const exprt &e2) const;
+    bool operator()(const exprt &e1, const exprt &e2) const
+    {
+      return e1.type() != e2.type() && e1 < e2;
+    }
   };
 
   std::map<unsigned, std::set<exprt, type_comparet>> non_null_expressions;
