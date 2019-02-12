@@ -21,8 +21,8 @@ Author: CM Wintersteiger
 
 #include <goto-programs/goto_model.h>
 
-/// Writes a goto program to disc, using goto binary format ver 5
-bool write_goto_binary_v5(
+/// Writes a goto program to disc, using goto binary format
+bool write_goto_binary(
   std::ostream &out,
   const symbol_tablet &symbol_table,
   const goto_functionst &goto_functions,
@@ -157,8 +157,7 @@ bool write_goto_binary(
       "unknown goto binary version " + std::to_string(version),
       "supported version = " + std::to_string(GOTO_BINARY_VERSION));
   else
-    return write_goto_binary_v5(
-      out, symbol_table, goto_functions, irepconverter);
+    return write_goto_binary(out, symbol_table, goto_functions, irepconverter);
 }
 
 /// Writes a goto program to disc

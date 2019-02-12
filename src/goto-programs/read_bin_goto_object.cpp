@@ -19,11 +19,12 @@ Date: June 2006
 #include <util/irep_serialization.h>
 
 #include "goto_functions.h"
+#include "write_goto_binary.h"
 
-/// read goto binary format v5
+/// read goto binary format
 /// \par parameters: input stream, symbol_table, functions
 /// \return true on error, false otherwise
-static bool read_bin_goto_object_v5(
+static bool read_bin_goto_object(
   std::istream &in,
   symbol_tablet &symbol_table,
   goto_functionst &functions,
@@ -218,23 +219,19 @@ bool read_bin_goto_object(
   {
     std::size_t version=irepconverter.read_gb_word(in);
 
-    switch(version)
+    if(version < GOTO_BINARY_VERSION)
     {
-    case 1:
-    case 2:
-    case 3:
-    case 4:
       message.error() <<
           "The input was compiled with an old version of "
           "goto-cc; please recompile" << messaget::eom;
       return true;
-
-    case 5:
-      return read_bin_goto_object_v5(
-        in, symbol_table, functions, irepconverter);
-      break;
-
-    default:
+    }
+    else if(version == GOTO_BINARY_VERSION)
+    {
+      return read_bin_goto_object(in, symbol_table, functions, irepconverter);
+    }
+    else
+    {
       message.error() <<
           "The input was compiled with an unsupported version of "
           "goto-cc; please recompile" << messaget::eom;
