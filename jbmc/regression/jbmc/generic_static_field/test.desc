@@ -1,0 +1,15 @@
+CORE
+Test.class
+--function Test.test --validate-goto-model --show-goto-functions
+^EXIT=0$
+^SIGNAL=0$
+Test\.test:\(\)LTest;#return_value = static_field;
+--
+^warning: ignoring
+--
+This checks that the return value type matches the static field -- if it didn't,
+either --validate-goto-model would throw because of a mismatching assignment, or
+a cast would be used to adjust the type.
+
+The original motivation for this test was that generic field references could
+accidentally omit generic arguments that were present in function types.
