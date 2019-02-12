@@ -11,7 +11,6 @@ Author: Diffblue Ltd
 
 #include "local_safe_pointers.h"
 
-#include <util/base_type.h>
 #include <util/expr_iterator.h>
 #include <util/expr_util.h>
 #include <util/format_expr.h>
@@ -82,8 +81,7 @@ static optionalt<goto_null_checkt> get_null_checked_expr(const exprt &expr)
 /// \param goto_program: program to analyse
 void local_safe_pointerst::operator()(const goto_programt &goto_program)
 {
-  std::set<exprt, base_type_comparet> checked_expressions(
-    base_type_comparet{ns});
+  std::set<exprt, type_comparet> checked_expressions(type_comparet{});
 
   for(const auto &instruction : goto_program.instructions)
   {
@@ -98,8 +96,7 @@ void local_safe_pointerst::operator()(const goto_programt &goto_program)
         checked_expressions = findit->second;
       else
       {
-        checked_expressions =
-          std::set<exprt, base_type_comparet>(base_type_comparet{ns});
+        checked_expressions = std::set<exprt, type_comparet>(type_comparet{});
       }
     }
 
@@ -179,8 +176,11 @@ void local_safe_pointerst::operator()(const goto_programt &goto_program)
 /// \param out: stream to write output to
 /// \param goto_program: GOTO program analysed (the same one passed to
 ///   operator())
+/// \param ns: namespace
 void local_safe_pointerst::output(
-  std::ostream &out, const goto_programt &goto_program)
+  std::ostream &out,
+  const goto_programt &goto_program,
+  const namespacet &ns)
 {
   forall_goto_program_instructions(i_it, goto_program)
   {
@@ -220,8 +220,11 @@ void local_safe_pointerst::output(
 /// \param out: stream to write output to
 /// \param goto_program: GOTO program analysed (the same one passed to
 ///   operator())
+/// \param ns: namespace
 void local_safe_pointerst::output_safe_dereferences(
-  std::ostream &out, const goto_programt &goto_program)
+  std::ostream &out,
+  const goto_programt &goto_program,
+  const namespacet &ns)
 {
   forall_goto_program_instructions(i_it, goto_program)
   {
@@ -274,10 +277,10 @@ bool local_safe_pointerst::is_non_null_at_program_point(
   return findit->second.count(*tocheck) != 0;
 }
 
-bool local_safe_pointerst::base_type_comparet::operator()(
-  const exprt &e1, const exprt &e2) const
+bool local_safe_pointerst::type_comparet::
+operator()(const exprt &e1, const exprt &e2) const
 {
-  if(base_type_eq(e1, e2, ns))
+  if(e1.type() == e2.type())
     return false;
   else
     return e1 < e2;

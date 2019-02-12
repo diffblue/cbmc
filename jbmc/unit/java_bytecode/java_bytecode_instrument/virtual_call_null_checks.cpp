@@ -74,7 +74,7 @@ SCENARIO(
         // This analysis checks that any usage of a pointer is preceded by an
         // assumption that it is non-null
         // (e.g. assume(x != nullptr); y = x->...)
-        local_safe_pointerst safe_pointers(ns);
+        local_safe_pointerst safe_pointers;
         safe_pointers(main_function.body);
 
         for(auto instrit = main_function.body.instructions.begin(),
