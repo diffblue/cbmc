@@ -97,7 +97,7 @@ bool cpp_typecheck_fargst::match(
 
     // "this" is a special case -- we turn the pointer type
     // into a reference type to do the type matching
-    if(it==ops.begin() && parameter.get(ID_C_base_name)==ID_this)
+    if(it == ops.begin() && parameter.get_base_name() == ID_this)
     {
       type.set(ID_C_reference, true);
       type.set(ID_C_this, true);

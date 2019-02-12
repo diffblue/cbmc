@@ -706,7 +706,7 @@ void cpp_typecheckt::typecheck_expr_address_of(exprt &expr)
     code_typet &code_type=to_code_type(op.type().subtype());
 
     code_typet::parameterst &args=code_type.parameters();
-    if(args.size() > 0 && args[0].get(ID_C_base_name)==ID_this)
+    if(!args.empty() && args[0].get_base_name() == ID_this)
     {
       // it's a pointer to member function
       const struct_tag_typet symbol(code_type.get(ID_C_member_name));
@@ -2192,21 +2192,23 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
     // we are willing to add an "address_of"
     // for the sake of operator overloading
 
-    const irept::subt &arguments=
-      expr.function().type().find(ID_arguments).get_sub();
+    const code_typet::parameterst &parameters =
+      to_code_type(expr.function().type()).parameters();
 
-    if(arguments.size()>=1 &&
-       arguments.front().get(ID_C_base_name)==ID_this &&
-       expr.arguments().size()>=1)
+    if(
+      !parameters.empty() && parameters.front().get_base_name() == ID_this &&
+      !expr.arguments().empty())
     {
-      const exprt &argument=
-      static_cast<const exprt &>(arguments.front());
+      const code_typet::parametert &parameter = parameters.front();
 
-      exprt &operand=expr.op1();
-      assert(argument.type().id()==ID_pointer);
+      exprt &operand = expr.arguments().front();
+      INVARIANT(
+        parameter.type().id() == ID_pointer,
+        "`this' parameter should be a pointer");
 
-      if(operand.type().id()!=ID_pointer &&
-         operand.type()==argument.type().subtype())
+      if(
+        operand.type().id() != ID_pointer &&
+        operand.type() == parameter.type().subtype())
       {
         address_of_exprt tmp(operand, pointer_type(operand.type()));
         tmp.add_source_location()=operand.source_location();
