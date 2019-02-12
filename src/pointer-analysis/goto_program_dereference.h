@@ -69,7 +69,7 @@ protected:
   DEPRECATED("Unused")
   virtual bool is_valid_object(const irep_idt &identifier);
 
-  bool has_failed_symbol(const exprt &expr, const symbolt *&symbol) override;
+  const symbolt *get_or_create_failed_symbol(const exprt &expr) override;
 
   DEPRECATED("Unused")
   virtual void dereference_failure(
@@ -77,19 +77,16 @@ protected:
     const std::string &msg,
     const guardt &guard);
 
-  void get_value_set(const exprt &expr, value_setst::valuest &dest) override;
+  void
+  get_value_set(const exprt &expr, value_setst::valuest &dest) const override;
 
   void dereference_instruction(
     goto_programt::targett target,
     bool checks_only=false);
 
 protected:
-  void dereference_rec(
-    exprt &expr, guardt &guard, const value_set_dereferencet::modet mode);
-  void dereference_expr(
-    exprt &expr,
-    const bool checks_only,
-    const value_set_dereferencet::modet mode);
+  void dereference_rec(exprt &expr, guardt &guard);
+  void dereference_expr(exprt &expr, const bool checks_only);
 
 #if 0
   const std::set<irep_idt> *valid_local_variables;

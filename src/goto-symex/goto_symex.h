@@ -222,23 +222,14 @@ protected:
 
   void trigger_auto_object(const exprt &, statet &);
   void initialize_auto_object(const exprt &, statet &);
-  void process_array_expr(statet &, exprt &, bool);
+  void process_array_expr(statet &, exprt &);
   exprt make_auto_object(const typet &, statet &);
-  virtual void dereference(exprt &, statet &, bool write);
+  virtual void dereference(exprt &, statet &);
 
-  void dereference_rec(exprt &, statet &, guardt &, bool write);
-
-  void dereference_rec_address_of(
-    exprt &,
-    statet &,
-    guardt &);
-
-  static bool is_index_member_symbol_if(const exprt &expr);
-
+  void dereference_rec(exprt &, statet &);
   exprt address_arithmetic(
     const exprt &,
     statet &,
-    guardt &,
     bool keep_array);
 
   virtual void symex_goto(statet &);

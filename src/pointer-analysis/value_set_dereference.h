@@ -50,19 +50,12 @@ public:
 
   virtual ~value_set_dereferencet() { }
 
-  enum class modet { READ, WRITE };
-
   /// Dereference the given pointer-expression. Any errors are
   /// reported to the callback method given in the constructor.
   /// \param pointer: A pointer-typed expression, to
   ///        be dereferenced.
   /// \param guard: A guard, which is assumed to hold when dereferencing.
-  /// \param mode: Indicates whether the dereferencing is a load or store
-  //    (unused).
-  virtual exprt dereference(
-    const exprt &pointer,
-    const guardt &guard,
-    const modet mode);
+  virtual exprt dereference(const exprt &pointer, const guardt &guard);
 
 private:
   const namespacet &ns;

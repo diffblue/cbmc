@@ -145,8 +145,8 @@ void goto_symext::symex_other(
     clean_expr(src_array, state, false);
 
     // obtain the actual arrays
-    process_array_expr(state, dest_array, true);
-    process_array_expr(state, src_array, false);
+    process_array_expr(state, dest_array);
+    process_array_expr(state, src_array);
 
     // check for size (or type) mismatch and adjust
     if(!base_type_eq(dest_array.type(), src_array.type(), ns))
@@ -195,7 +195,7 @@ void goto_symext::symex_other(
     clean_expr(array_expr, state, false);
 
     // obtain the actual array(s)
-    process_array_expr(state, array_expr, true);
+    process_array_expr(state, array_expr);
 
     // prepare to build the array_of
     exprt value = code.op1();
@@ -244,8 +244,8 @@ void goto_symext::symex_other(
     clean_expr(array2, state, false);
 
     // obtain the actual arrays
-    process_array_expr(state, array1, false);
-    process_array_expr(state, array2, false);
+    process_array_expr(state, array1);
+    process_array_expr(state, array2);
 
     code_assignt assignment(code.op2(), equal_exprt(array1, array2));
 
@@ -274,7 +274,7 @@ void goto_symext::symex_other(
     exprt object(code.op0());
     clean_expr(object, state, false);
 
-    process_array_expr(state, object, true);
+    process_array_expr(state, object);
     havoc_rec(state, guardt(true_exprt()), object);
   }
   else

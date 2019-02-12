@@ -20,30 +20,28 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/options.h>
 
 /// \param expr: expression to check
-/// \param [out] symbol: symbol which gets assigned the value from the
-///   `failed_symbol` comment
-/// \return true when `expr` is a symbol, whose type contains a `failed_symbol`
-///   comment which exists in the namespace.
-bool goto_program_dereferencet::has_failed_symbol(
-  const exprt &expr,
-  const symbolt *&symbol)
+/// \return pointer to appropriate failed symbol for \p expr, or nullptr if none
+const symbolt *
+goto_program_dereferencet::get_or_create_failed_symbol(const exprt &expr)
 {
   if(expr.id()==ID_symbol)
   {
     if(expr.get_bool(ID_C_invalid_object))
-      return false;
+      return nullptr;
 
     const symbolt &ptr_symbol = ns.lookup(to_symbol_expr(expr));
 
     const irep_idt &failed_symbol = ptr_symbol.type.get(ID_C_failed_symbol);
 
     if(failed_symbol.empty())
-      return false;
+      return nullptr;
 
-    return !ns.lookup(failed_symbol, symbol);
+    const symbolt *symbol = nullptr;
+    ns.lookup(failed_symbol, symbol);
+    return symbol;
   }
 
-  return false;
+  return nullptr;
 }
 
 /// \deprecated
@@ -100,11 +98,7 @@ void goto_program_dereferencet::dereference_failure(
 /// and use `dereference` on subexpressions of the form `*p`
 /// \param expr: expression in which to remove dereferences
 /// \param guard: boolean expression assumed to hold when dereferencing
-/// \param mode: unused
-void goto_program_dereferencet::dereference_rec(
-  exprt &expr,
-  guardt &guard,
-  const value_set_dereferencet::modet mode)
+void goto_program_dereferencet::dereference_rec(exprt &expr, guardt &guard)
 {
   if(!has_subexpr(expr, ID_dereference))
     return;
@@ -124,7 +118,7 @@ void goto_program_dereferencet::dereference_rec(
               op.pretty();
 
       if(has_subexpr(op, ID_dereference))
-        dereference_rec(op, guard, value_set_dereferencet::modet::READ);
+        dereference_rec(op, guard);
 
       if(expr.id()==ID_or)
         guard.add(boolean_negate(op));
@@ -148,7 +142,7 @@ void goto_program_dereferencet::dereference_rec(
       throw msg;
     }
 
-    dereference_rec(expr.op0(), guard, value_set_dereferencet::modet::READ);
+    dereference_rec(expr.op0(), guard);
 
     bool o1 = has_subexpr(expr.op1(), ID_dereference);
     bool o2 = has_subexpr(expr.op2(), ID_dereference);
@@ -157,7 +151,7 @@ void goto_program_dereferencet::dereference_rec(
     {
       guardt old_guard=guard;
       guard.add(expr.op0());
-      dereference_rec(expr.op1(), guard, mode);
+      dereference_rec(expr.op1(), guard);
       guard = std::move(old_guard);
     }
 
@@ -165,7 +159,7 @@ void goto_program_dereferencet::dereference_rec(
     {
       guardt old_guard=guard;
       guard.add(boolean_negate(expr.op0()));
-      dereference_rec(expr.op2(), guard, mode);
+      dereference_rec(expr.op2(), guard);
       guard = std::move(old_guard);
     }
 
@@ -185,7 +179,7 @@ void goto_program_dereferencet::dereference_rec(
   }
 
   Forall_operands(it, expr)
-    dereference_rec(*it, guard, mode);
+    dereference_rec(*it, guard);
 
   if(expr.id()==ID_dereference)
   {
@@ -194,8 +188,7 @@ void goto_program_dereferencet::dereference_rec(
 
     dereference_location=expr.find_source_location();
 
-    exprt tmp=dereference.dereference(
-      expr.op0(), guard, mode);
+    exprt tmp = dereference.dereference(expr.op0(), guard);
 
     expr.swap(tmp);
   }
@@ -213,7 +206,7 @@ void goto_program_dereferencet::dereference_rec(
       exprt tmp1(ID_plus, expr.op0().type());
       tmp1.operands().swap(expr.operands());
 
-      exprt tmp2=dereference.dereference(tmp1, guard, mode);
+      exprt tmp2 = dereference.dereference(tmp1, guard);
       tmp2.swap(expr);
     }
   }
@@ -225,7 +218,7 @@ void goto_program_dereferencet::dereference_rec(
 /// \param [out] dest: gets the value set
 void goto_program_dereferencet::get_value_set(
   const exprt &expr,
-  value_setst::valuest &dest)
+  value_setst::valuest &dest) const
 {
   value_sets.get_values(current_function, current_target, expr, dest);
 }
@@ -235,21 +228,19 @@ void goto_program_dereferencet::get_value_set(
 /// \param checks_only: when true, execute the substitution on a copy of expr
 ///   so that `expr` stays unchanged. In that case the only observable effect
 ///   is whether an exception would be thrown.
-/// \param mode: unused
 void goto_program_dereferencet::dereference_expr(
   exprt &expr,
-  const bool checks_only,
-  const value_set_dereferencet::modet mode)
+  const bool checks_only)
 {
   guardt guard{true_exprt{}};
 
   if(checks_only)
   {
     exprt tmp(expr);
-    dereference_rec(tmp, guard, mode);
+    dereference_rec(tmp, guard);
   }
   else
-    dereference_rec(expr, guard, mode);
+    dereference_rec(expr, guard);
 }
 
 void goto_program_dereferencet::dereference_program(
@@ -301,39 +292,31 @@ void goto_program_dereferencet::dereference_instruction(
   #endif
   goto_programt::instructiont &i=*target;
 
-  dereference_expr(i.guard, checks_only, value_set_dereferencet::modet::READ);
+  dereference_expr(i.guard, checks_only);
 
   if(i.is_assign())
   {
     auto &assignment = i.get_assign();
 
-    dereference_expr(
-      assignment.lhs(), checks_only, value_set_dereferencet::modet::WRITE);
-    dereference_expr(
-      assignment.rhs(), checks_only, value_set_dereferencet::modet::READ);
+    dereference_expr(assignment.lhs(), checks_only);
+    dereference_expr(assignment.rhs(), checks_only);
   }
   else if(i.is_function_call())
   {
     code_function_callt &function_call = i.get_function_call();
 
     if(function_call.lhs().is_not_nil())
-      dereference_expr(
-        function_call.lhs(),
-        checks_only,
-        value_set_dereferencet::modet::WRITE);
+      dereference_expr(function_call.lhs(), checks_only);
 
-    dereference_expr(
-      function_call.function(),
-      checks_only,
-      value_set_dereferencet::modet::READ);
+    dereference_expr(function_call.function(), checks_only);
 
     for(auto &arg : function_call.arguments())
-      dereference_expr(arg, checks_only, value_set_dereferencet::modet::READ);
+      dereference_expr(arg, checks_only);
   }
   else if(i.is_return())
   {
     Forall_operands(it, i.get_return())
-      dereference_expr(*it, checks_only, value_set_dereferencet::modet::READ);
+      dereference_expr(*it, checks_only);
   }
   else if(i.is_other())
   {
@@ -345,13 +328,12 @@ void goto_program_dereferencet::dereference_instruction(
       if(code.operands().size() != 1)
         throw "expression expects one operand";
 
-      dereference_expr(
-        code.op0(), checks_only, value_set_dereferencet::modet::READ);
+      dereference_expr(code.op0(), checks_only);
     }
     else if(statement==ID_printf)
     {
       for(auto &op : code.operands())
-        dereference_expr(op, checks_only, value_set_dereferencet::modet::READ);
+        dereference_expr(op, checks_only);
     }
   }
 }
@@ -368,7 +350,7 @@ void goto_program_dereferencet::dereference_expression(
   valid_local_variables=&target->local_variables;
   #endif
 
-  dereference_expr(expr, false, value_set_dereferencet::modet::READ);
+  dereference_expr(expr, false);
 }
 
 /// Throw an exception in case removing dereferences from the program would

@@ -13,9 +13,22 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/symbol_table.h>
 
-bool symex_dereference_statet::has_failed_symbol(
-  const exprt &expr,
-  const symbolt *&symbol)
+/// Get or create a failed symbol for the given pointer-typed expression. These
+/// are used as placeholders when dereferencing expressions that are illegal to
+/// dereference, such as null pointers. The \ref add_failed_symbols pass must
+/// have been run for this to do anything useful;  it annotates a pointer-typed
+/// symbol `p` with an `ID_C_failed_symbol` comment, which we then clone on
+/// demand due to L1 renaming.
+///
+/// For example, if \p expr is `p` and it has an `ID_C_failed_symbol` `p$object`
+/// (the naming convention used by `add_failed_symbols`), and the latest L1
+/// renaming of `p` is `p!2@4`, then we will create `p$object!2@4` if it doesn't
+/// already exist.
+///
+/// \param expr: expression to get or create a failed symbol for
+/// \return pointer to the failed symbol for \p expr, or nullptr if none
+const symbolt *
+symex_dereference_statet::get_or_create_failed_symbol(const exprt &expr)
 {
   const namespacet &ns=goto_symex.ns;
 
@@ -24,13 +37,14 @@ bool symex_dereference_statet::has_failed_symbol(
   {
     const ssa_exprt &ssa_expr=to_ssa_expr(expr);
     if(ssa_expr.get_original_expr().id()!=ID_symbol)
-      return false;
+      return nullptr;
 
     const symbolt &ptr_symbol=
       ns.lookup(to_ssa_expr(expr).get_object_name());
 
     const irep_idt &failed_symbol = ptr_symbol.type.get(ID_C_failed_symbol);
 
+    const symbolt *symbol;
     if(failed_symbol!="" &&
         !ns.lookup(failed_symbol, symbol))
     {
@@ -40,8 +54,7 @@ bool symex_dereference_statet::has_failed_symbol(
       state.rename(sym_expr, ns, goto_symex_statet::L1);
       sym.name=to_ssa_expr(sym_expr).get_identifier();
       state.symbol_table.move(sym, sym_ptr);
-      symbol=sym_ptr;
-      return true;
+      return sym_ptr;
     }
   }
   else if(expr.id()==ID_symbol)
@@ -51,6 +64,7 @@ bool symex_dereference_statet::has_failed_symbol(
 
     const irep_idt &failed_symbol = ptr_symbol.type.get(ID_C_failed_symbol);
 
+    const symbolt *symbol;
     if(failed_symbol!="" &&
         !ns.lookup(failed_symbol, symbol))
     {
@@ -60,17 +74,17 @@ bool symex_dereference_statet::has_failed_symbol(
       state.rename(sym_expr, ns, goto_symex_statet::L1);
       sym.name=to_ssa_expr(sym_expr).get_identifier();
       state.symbol_table.move(sym, sym_ptr);
-      symbol=sym_ptr;
-      return true;
+      return sym_ptr;
     }
   }
 
-  return false;
+  return nullptr;
 }
 
+/// Just forwards a value-set query to `state.value_set`
 void symex_dereference_statet::get_value_set(
   const exprt &expr,
-  value_setst::valuest &value_set)
+  value_setst::valuest &value_set) const
 {
   state.value_set.get_value_set(expr, value_set, goto_symex.ns);
 

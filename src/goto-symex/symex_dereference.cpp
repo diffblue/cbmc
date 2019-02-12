@@ -23,76 +23,22 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "symex_dereference_state.h"
 
-void goto_symext::dereference_rec_address_of(
-  exprt &expr,
-  statet &state,
-  guardt &guard)
-{
-  // Could be member, could be if, could be index.
-
-  if(expr.id()==ID_member)
-    dereference_rec_address_of(
-      to_member_expr(expr).struct_op(), state, guard);
-  else if(expr.id()==ID_if)
-  {
-    // the condition is not an address
-    dereference_rec(
-      to_if_expr(expr).cond(), state, guard, false);
-
-    // add to guard?
-    dereference_rec_address_of(
-      to_if_expr(expr).true_case(), state, guard);
-    dereference_rec_address_of(
-      to_if_expr(expr).false_case(), state, guard);
-  }
-  else if(expr.id()==ID_index)
-  {
-    // the index is not an address
-    dereference_rec(
-      to_index_expr(expr).index(), state, guard, false);
-
-    // the array _is_ an address
-    dereference_rec_address_of(
-      to_index_expr(expr).array(), state, guard);
-  }
-  else
-  {
-    // give up and dereference
-
-    dereference_rec(expr, state, guard, false);
-  }
-}
-
-bool goto_symext::is_index_member_symbol_if(const exprt &expr)
-{
-  // Could be member, could be if, could be index.
-
-  if(expr.id()==ID_member)
-  {
-    return is_index_member_symbol_if(
-      to_member_expr(expr).struct_op());
-  }
-  else if(expr.id()==ID_if)
-  {
-    return
-      is_index_member_symbol_if(to_if_expr(expr).true_case()) &&
-      is_index_member_symbol_if(to_if_expr(expr).false_case());
-  }
-  else if(expr.id()==ID_index)
-  {
-    return is_index_member_symbol_if(to_index_expr(expr).array());
-  }
-  else if(expr.id()==ID_symbol)
-    return true;
-  else
-    return false;
-}
-
-/// Evaluate an ID_address_of expression
+/// Transforms an lvalue expression by replacing any dereference operations it
+/// contains with explicit references to the objects they may point to (using
+/// \ref goto_symext::dereference_rec), and translates `byte_extract,` `member`
+/// and `index` operations into integer offsets from a root symbol (if any).
+/// These are ultimately expressed in the form
+/// `(target_type*)((char*)(&underlying_symbol) + offset)`.
+/// \param expr: expression to replace with normalised, dereference-free form
+/// \param state: working state. See \ref goto_symext::dereference for possible
+///   side-effects of a dereference operation.
+/// \param keep_array: if true and an underlying object is an array, return
+///   its address (`&array`); otherwise return the address of its first element
+///   (`&array[0]).
+/// \return the transformed lvalue expression
 exprt goto_symext::address_arithmetic(
   const exprt &expr,
   statet &state,
-  guardt &guard,
   bool keep_array)
 {
   exprt result;
@@ -106,7 +52,7 @@ exprt goto_symext::address_arithmetic(
     const byte_extract_exprt &be=to_byte_extract_expr(expr);
 
     // recursive call
-    result=address_arithmetic(be.op(), state, guard, keep_array);
+    result = address_arithmetic(be.op(), state, keep_array);
 
     if(be.op().type().id() == ID_array && result.id() == ID_address_of)
     {
@@ -124,7 +70,7 @@ exprt goto_symext::address_arithmetic(
 
     // there could be further dereferencing in the offset
     exprt offset=be.offset();
-    dereference_rec(offset, state, guard, false);
+    dereference_rec(offset, state);
 
     result=plus_exprt(result, offset);
 
@@ -149,7 +95,7 @@ exprt goto_symext::address_arithmetic(
       byte_extract_id(), ode.root_object(), ode.offset(), expr.type());
 
     // recursive call
-    result=address_arithmetic(be, state, guard, keep_array);
+    result = address_arithmetic(be, state, keep_array);
 
     do_simplify(result);
   }
@@ -160,20 +106,20 @@ exprt goto_symext::address_arithmetic(
     // just grab the pointer, but be wary of further dereferencing
     // in the pointer itself
     result=to_dereference_expr(expr).pointer();
-    dereference_rec(result, state, guard, false);
+    dereference_rec(result, state);
   }
   else if(expr.id()==ID_if)
   {
     if_exprt if_expr=to_if_expr(expr);
 
     // the condition is not an address
-    dereference_rec(if_expr.cond(), state, guard, false);
+    dereference_rec(if_expr.cond(), state);
 
     // recursive call
-    if_expr.true_case()=
-      address_arithmetic(if_expr.true_case(), state, guard, keep_array);
-    if_expr.false_case()=
-      address_arithmetic(if_expr.false_case(), state, guard, keep_array);
+    if_expr.true_case() =
+      address_arithmetic(if_expr.true_case(), state, keep_array);
+    if_expr.false_case() =
+      address_arithmetic(if_expr.false_case(), state, keep_array);
 
     result=if_expr;
   }
@@ -184,7 +130,7 @@ exprt goto_symext::address_arithmetic(
   {
     // give up, just dereference
     result=expr;
-    dereference_rec(result, state, guard, false);
+    dereference_rec(result, state);
 
     // turn &array into &array[0]
     if(result.type().id() == ID_array && !keep_array)
@@ -208,7 +154,7 @@ exprt goto_symext::address_arithmetic(
         from_integer(offset, index_type()),
         expr.type());
 
-      result=address_arithmetic(be, state, guard, keep_array);
+      result = address_arithmetic(be, state, keep_array);
 
       do_simplify(result);
     }
@@ -219,7 +165,7 @@ exprt goto_symext::address_arithmetic(
   {
     const typecast_exprt &tc_expr = to_typecast_expr(expr);
 
-    result = address_arithmetic(tc_expr.op(), state, guard, keep_array);
+    result = address_arithmetic(tc_expr.op(), state, keep_array);
 
     // treat &array as &array[0]
     const typet &expr_type = expr.type();
@@ -244,11 +190,14 @@ exprt goto_symext::address_arithmetic(
   return result;
 }
 
-void goto_symext::dereference_rec(
-  exprt &expr,
-  statet &state,
-  guardt &guard,
-  const bool write)
+/// If \p expr is a \ref dereference_exprt, replace it with explicit references
+/// to the objects it may point to. Otherwise recursively apply this function to
+/// \p expr's operands, with special cases for address-of (handled by \ref
+/// goto_symext::address_arithmetic) and certain common expression patterns
+/// such as `&struct.flexible_array[0]` (see inline comments in code).
+/// For full details of this method's pointer replacement and potential side-
+/// effects see \ref goto_symext::dereference
+void goto_symext::dereference_rec(exprt &expr, statet &state)
 {
   if(expr.id()==ID_dereference)
   {
@@ -272,7 +221,7 @@ void goto_symext::dereference_rec(
     tmp1.swap(to_dereference_expr(expr).pointer());
 
     // first make sure there are no dereferences in there
-    dereference_rec(tmp1, state, guard, false);
+    dereference_rec(tmp1, state);
 
     // we need to set up some elaborate call-backs
     symex_dereference_statet symex_dereference_state(*this, state);
@@ -285,13 +234,7 @@ void goto_symext::dereference_rec(
       expr_is_not_null);
 
     // std::cout << "**** " << format(tmp1) << '\n';
-    exprt tmp2=
-      dereference.dereference(
-        tmp1,
-        guard,
-        write?
-          value_set_dereferencet::modet::WRITE:
-          value_set_dereferencet::modet::READ);
+    exprt tmp2 = dereference.dereference(tmp1, guardt(true_exprt()));
     // std::cout << "**** " << format(tmp2) << '\n';
 
     expr.swap(tmp2);
@@ -317,7 +260,7 @@ void goto_symext::dereference_rec(
     tmp.add_source_location()=expr.source_location();
 
     // recursive call
-    dereference_rec(tmp, state, guard, write);
+    dereference_rec(tmp, state);
 
     expr.swap(tmp);
   }
@@ -336,7 +279,6 @@ void goto_symext::dereference_rec(
     expr = address_arithmetic(
       object,
       state,
-      guard,
       to_pointer_type(expr.type()).subtype().id() == ID_array);
   }
   else if(expr.id()==ID_typecast)
@@ -357,24 +299,58 @@ void goto_symext::dereference_rec(
             to_address_of_expr(tc_op).object(),
             from_integer(0, index_type())));
 
-      dereference_rec(expr, state, guard, write);
+      dereference_rec(expr, state);
     }
     else
     {
-      dereference_rec(tc_op, state, guard, write);
+      dereference_rec(tc_op, state);
     }
   }
   else
   {
     Forall_operands(it, expr)
-      dereference_rec(*it, state, guard, write);
+      dereference_rec(*it, state);
   }
 }
 
-void goto_symext::dereference(
-  exprt &expr,
-  statet &state,
-  const bool write)
+/// Replace all dereference operations within \p expr with explicit references
+/// to the objects they may refer to. For example, the expression `*p1 + *p2`
+/// might be rewritten to `obj1 + (p2 == &obj2 ? obj2 : obj3)` in the case where
+/// `p1` is known to point to `obj1` and `p2` points to either `obj2` or `obj3`.
+/// The expression, and any object references introduced, are renamed to L1 in
+/// the process (so in fact we would get `obj1!0@3 + (p2!0@1 == ....` rather
+/// than the exact example given above).
+///
+/// It may have two kinds of side-effect:
+///
+/// 1. When an expression may (or must) point to something which cannot legally
+///    be dereferenced, such as a null pointer or an integer cast to a pointer,
+///    a "failed object" is created instead, via one of two routes:
+///
+///    a. if the `add_failed_symbols` pass has been run then a pointer-typed
+///       symbol `x` will have a corresponding failed symbol `x$object`. This
+///       is replicated according to L1 renaming on demand, so for example on
+///       the first failed dereference of `x!5@10` we will create
+///       `x$object!5@10` and add that to the symbol table.
+///       This addition is made by
+///       \ref symex_dereference_statet::get_or_create_failed_symbol
+///
+///    b. if such a failed symbol can't be found then symex will create one of
+///       its own, called `symex::failed_symbol` with some suffix. This is done
+///       by \ref value_set_dereferencet::dereference
+///
+///    In either case any newly-created symbol is added to \p state's symbol
+///    table and \p expr is altered to refer to it. Typically when \p expr has
+///    some legal targets as well this results in an expression like
+///    `ptr == &real_obj ? real_obj : ptr$object`.
+///
+/// 2. Any object whose base-name ends with `auto_object` is automatically
+///    initialised when dereferenced for the first time, creating a tree of
+///    pointers leading to fresh objects each time such a pointer is
+///    dereferenced. If new objects are created by this mechanism then
+///    state will be altered (by `symex_assign`) to initialise them.
+///    See \ref auto_objects.cpp for details.
+void goto_symext::dereference(exprt &expr, statet &state)
 {
   // The expression needs to be renamed to level 1
   // in order to distinguish addresses of local variables
@@ -384,8 +360,7 @@ void goto_symext::dereference(
   state.rename(expr, ns, goto_symex_statet::L1);
 
   // start the recursion!
-  guardt guard{true_exprt{}};
-  dereference_rec(expr, state, guard, write);
+  dereference_rec(expr, state);
   // dereferencing may introduce new symbol_exprt
   // (like __CPROVER_memory)
   state.rename(expr, ns, goto_symex_statet::L1);

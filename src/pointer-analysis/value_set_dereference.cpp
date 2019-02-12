@@ -34,8 +34,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 exprt value_set_dereferencet::dereference(
   const exprt &pointer,
-  const guardt &guard,
-  const modet mode)
+  const guardt &guard)
 {
   if(pointer.type().id()!=ID_pointer)
     throw "dereference expected pointer type, but got "+
@@ -52,8 +51,8 @@ exprt value_set_dereferencet::dereference(
     true_guard.add(if_expr.cond());
     false_guard.add(not_exprt(if_expr.cond()));
 
-    exprt true_case=dereference(if_expr.true_case(), true_guard, mode);
-    exprt false_case=dereference(if_expr.false_case(), false_guard, mode);
+    exprt true_case = dereference(if_expr.true_case(), true_guard);
+    exprt false_case = dereference(if_expr.false_case(), false_guard);
 
     return if_exprt(if_expr.cond(), true_case, false_case);
   }
@@ -123,11 +122,11 @@ exprt value_set_dereferencet::dereference(
   {
     // first see if we have a "failed object" for this pointer
 
-    const symbolt *failed_symbol;
     exprt failure_value;
 
-    if(dereference_callback.has_failed_symbol(
-         pointer, failed_symbol))
+    if(
+      const symbolt *failed_symbol =
+        dereference_callback.get_or_create_failed_symbol(pointer))
     {
       // yes!
       failure_value=failed_symbol->symbol_expr();
@@ -260,9 +259,10 @@ bool value_set_dereferencet::dereference_type_compare(
 /// \param pointer_expr: pointer expression that may point to `what`
 /// \return a `valuet` object containing `guard`, `value` and `ignore` fields.
 ///   The `ignore` field is true for a `null` object when `exclude_null_derefs`
-///   is true and integer addresses in java mode.
+///   is true (set by our creator when they know \p what cannot be null)
+////  and for integer addresses in java mode.
 ///   The guard is an appropriate check to determine whether `pointer_expr`
-///   really points to `what`.
+///   really points to `what`; for example `pointer_expr == &what`.
 ///   The value corresponds to the dereferenced pointer_expr assuming it is
 ///   pointing to the object described by `what`.
 ///   For example, we might return

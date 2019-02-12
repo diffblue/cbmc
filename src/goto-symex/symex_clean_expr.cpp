@@ -120,18 +120,14 @@ process_array_expr(exprt &expr, bool do_simplify, const namespacet &ns)
   }
 }
 
-void goto_symext::process_array_expr(statet &state, exprt &expr, bool is_lhs)
+void goto_symext::process_array_expr(statet &state, exprt &expr)
 {
   symex_dereference_statet symex_dereference_state(*this, state);
 
   value_set_dereferencet dereference(
     ns, state.symbol_table, symex_dereference_state, language_mode, false);
 
-  expr = dereference.dereference(
-    expr,
-    guardt{true_exprt()},
-    is_lhs ? value_set_dereferencet::modet::WRITE
-           : value_set_dereferencet::modet::READ);
+  expr = dereference.dereference(expr, guardt{true_exprt()});
 
   ::process_array_expr(expr, symex_config.simplify_opt, ns);
 }
@@ -180,7 +176,7 @@ void goto_symext::clean_expr(
   const bool write)
 {
   replace_nondet(expr, path_storage.build_symex_nondet);
-  dereference(expr, state, write);
+  dereference(expr, state);
 
   // make sure all remaining byte extract operations use the root
   // object to avoid nesting of with/update and byte_update when on
