@@ -17,9 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/abstract_goto_model.h>
 
-#include "goto_symex_state.h"
 #include "path_storage.h"
-#include "symex_target_equation.h"
 
 class byte_extract_exprt;
 class typet;

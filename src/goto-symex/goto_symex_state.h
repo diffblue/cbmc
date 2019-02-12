@@ -16,7 +16,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <unordered_set>
 
 #include <analyses/dirty.h>
-#include <analyses/local_safe_pointers.h>
 
 #include <util/invariant.h>
 #include <util/guard.h>
@@ -68,7 +67,6 @@ public:
   /// Threads
   unsigned atomic_section_id = 0;
 
-  std::unordered_map<irep_idt, local_safe_pointerst> safe_pointers;
   unsigned total_vccs = 0;
   unsigned remaining_vccs = 0;
 
@@ -320,7 +318,6 @@ inline goto_statet::goto_statet(const class goto_symex_statet &s)
     source(s.source),
     propagation(s.propagation),
     atomic_section_id(s.atomic_section_id),
-    safe_pointers(s.safe_pointers),
     total_vccs(s.total_vccs),
     remaining_vccs(s.remaining_vccs)
 {

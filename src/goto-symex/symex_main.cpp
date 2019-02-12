@@ -310,7 +310,7 @@ std::unique_ptr<goto_symext::statet> goto_symext::initialize_entry_point_state(
 
   // initialize support analyses
   auto emplace_safe_pointers_result =
-    state->safe_pointers.emplace(entry_point_id, local_safe_pointerst{});
+    path_storage.safe_pointers.emplace(entry_point_id, local_safe_pointerst{});
   if(emplace_safe_pointers_result.second)
     emplace_safe_pointers_result.first->second(start_function->body);
 
