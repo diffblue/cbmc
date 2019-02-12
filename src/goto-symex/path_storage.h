@@ -5,15 +5,17 @@
 #ifndef CPROVER_GOTO_SYMEX_PATH_STORAGE_H
 #define CPROVER_GOTO_SYMEX_PATH_STORAGE_H
 
-#include "goto_symex_state.h"
-#include "symex_target_equation.h"
-
-#include <util/options.h>
 #include <util/cmdline.h>
-#include <util/ui_message.h>
 #include <util/invariant.h>
+#include <util/message.h>
+#include <util/options.h>
+
+#include <analyses/local_safe_pointers.h>
 
 #include <memory>
+
+#include "goto_symex_state.h"
+#include "symex_target_equation.h"
 
 /// Functor generating fresh nondet symbols
 class symex_nondet_generatort
@@ -89,6 +91,12 @@ public:
 
   /// Counter for nondet objects, which require unique names
   symex_nondet_generatort build_symex_nondet;
+
+  /// Map function identifiers to \ref local_safe_pointerst instances. This is
+  /// to identify derferences that are guaranteed to be safe in a given
+  /// execution context, thus helping to avoid symex to follow spurious
+  /// error-handling paths.
+  std::unordered_map<irep_idt, local_safe_pointerst> safe_pointers;
 
 private:
   // Derived classes should override these methods, allowing the base class to

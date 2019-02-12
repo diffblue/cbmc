@@ -211,9 +211,8 @@ void goto_symext::dereference_rec(exprt &expr, statet &state)
       {
         get_original_name(to_check);
 
-        expr_is_not_null =
-          state.safe_pointers.at(expr_function).is_safe_dereference(
-            to_check, state.source.pc);
+        expr_is_not_null = path_storage.safe_pointers.at(expr_function)
+                             .is_safe_dereference(to_check, state.source.pc);
       }
     }
 
