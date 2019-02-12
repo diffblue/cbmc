@@ -14,6 +14,7 @@ Author: Daniel Kroening, Peter Schrammel
 
 #include "goto_verifier.h"
 
+#include "bmc_util.h"
 #include "cover_goals_report_util.h"
 #include "goto_trace_storage.h"
 #include "incremental_goto_checker.h"
@@ -41,7 +42,8 @@ public:
           incremental_goto_checkert::resultt::progresst::DONE)
     {
       // we've got a trace; store it and link it to the covered goals
-      (void)traces.insert_all(incremental_goto_checker.build_trace());
+      message_building_error_trace(log);
+      (void)traces.insert_all(incremental_goto_checker.build_full_trace());
 
       ++iterations;
     }

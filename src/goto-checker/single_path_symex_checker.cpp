@@ -110,7 +110,20 @@ operator()(propertiest &properties)
   return result;
 }
 
-goto_tracet single_path_symex_checkert::build_trace() const
+goto_tracet single_path_symex_checkert::build_full_trace() const
+{
+  goto_tracet goto_trace;
+  build_goto_trace(
+    property_decider->get_equation(),
+    property_decider->get_equation().SSA_steps.end(),
+    property_decider->get_solver(),
+    ns,
+    goto_trace);
+
+  return goto_trace;
+}
+
+goto_tracet single_path_symex_checkert::build_shortest_trace() const
 {
   if(options.get_bool_option("beautify"))
   {
@@ -118,13 +131,28 @@ goto_tracet single_path_symex_checkert::build_trace() const
       dynamic_cast<boolbvt &>(property_decider->get_solver()),
       property_decider->get_equation());
   }
+
   goto_tracet goto_trace;
-  ::build_error_trace(
-    goto_trace,
-    ns,
+  build_goto_trace(
     property_decider->get_equation(),
     property_decider->get_solver(),
-    ui_message_handler);
+    ns,
+    goto_trace);
+
+  return goto_trace;
+}
+
+goto_tracet
+single_path_symex_checkert::build_trace(const irep_idt &property_id) const
+{
+  goto_tracet goto_trace;
+  build_goto_trace(
+    property_decider->get_equation(),
+    ssa_step_matches_failing_property(property_id),
+    property_decider->get_solver(),
+    ns,
+    goto_trace);
+
   return goto_trace;
 }
 

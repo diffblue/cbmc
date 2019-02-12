@@ -14,6 +14,7 @@ Author: Daniel Kroening, Peter Schrammel
 
 #include "goto_verifier.h"
 
+#include "bmc_util.h"
 #include "goto_trace_storage.h"
 #include "incremental_goto_checker.h"
 #include "properties.h"
@@ -37,11 +38,23 @@ public:
 
   resultt operator()() override
   {
-    while(incremental_goto_checker(properties).progress !=
-          incremental_goto_checkert::resultt::progresst::DONE)
+    while(true)
     {
-      // we've got an error trace; store it and link it to the failed properties
-      (void)traces.insert(incremental_goto_checker.build_trace());
+      const auto result = incremental_goto_checker(properties);
+      if(result.progress == incremental_goto_checkert::resultt::progresst::DONE)
+        break;
+
+      // we've got an error trace
+      message_building_error_trace(log);
+      for(const auto &property_id : result.updated_properties)
+      {
+        if(properties.at(property_id).status == property_statust::FAIL)
+        {
+          // get correctly truncated error trace for property and store it
+          (void)traces.insert(
+            incremental_goto_checker.build_trace(property_id));
+        }
+      }
 
       ++iterations;
     }
