@@ -271,17 +271,6 @@ bool local_safe_pointerst::is_non_null_at_program_point(
   auto findit = non_null_expressions.find(program_point->location_number);
   if(findit == non_null_expressions.end())
     return false;
-  const exprt *tocheck = &expr;
-  while(tocheck->id() == ID_typecast)
-    tocheck = &tocheck->op0();
-  return findit->second.count(*tocheck) != 0;
-}
 
-bool local_safe_pointerst::type_comparet::
-operator()(const exprt &e1, const exprt &e2) const
-{
-  if(e1.type() == e2.type())
-    return false;
-  else
-    return e1 < e2;
+  return findit->second.count(skip_typecast(expr)) != 0;
 }
