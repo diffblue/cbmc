@@ -320,17 +320,17 @@ int goto_instrument_parse_optionst::doit()
 
       forall_goto_functions(it, goto_model.goto_functions)
       {
-        local_safe_pointerst local_safe_pointers(ns);
+        local_safe_pointerst local_safe_pointers;
         local_safe_pointers(it->second.body);
         std::cout << ">>>>\n";
         std::cout << ">>>> " << it->first << '\n';
         std::cout << ">>>>\n";
         if(cmdline.isset("show-local-safe-pointers"))
-          local_safe_pointers.output(std::cout, it->second.body);
+          local_safe_pointers.output(std::cout, it->second.body, ns);
         else
         {
           local_safe_pointers.output_safe_dereferences(
-            std::cout, it->second.body);
+            std::cout, it->second.body, ns);
         }
         std::cout << '\n';
       }
