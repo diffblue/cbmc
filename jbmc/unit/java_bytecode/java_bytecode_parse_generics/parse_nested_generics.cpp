@@ -30,8 +30,8 @@ SCENARIO(
     {
       const struct_typet::componentt &field_component =
         require_type::require_component(class_type, "field");
-      require_type::require_pointer(
-        field_component.type(), struct_tag_typet("java::Generic"));
+      require_type::require_pointer_to_tag(
+        field_component.type(), "java::Generic");
 
       THEN("The pointer should be generic")
       {
@@ -53,8 +53,8 @@ SCENARIO(
     {
       const struct_typet::componentt &field_component =
         require_type::require_component(class_type, "field2");
-      require_type::require_pointer(
-        field_component.type(), struct_tag_typet("java::Generic"));
+      require_type::require_pointer_to_tag(
+        field_component.type(), "java::Generic");
 
       THEN("The pointer should be generic")
       {
@@ -76,8 +76,8 @@ SCENARIO(
     {
       const struct_typet::componentt &field_component =
         require_type::require_component(class_type, "field3");
-      require_type::require_pointer(
-        field_component.type(), struct_tag_typet("java::Generic"));
+      require_type::require_pointer_to_tag(
+        field_component.type(), "java::Generic");
 
       THEN("The pointer should be generic")
       {
@@ -106,8 +106,8 @@ SCENARIO(
     {
       const struct_typet::componentt &field_component =
         require_type::require_component(class_type, "field4");
-      require_type::require_pointer(
-        field_component.type(), struct_tag_typet("java::Generic"));
+      require_type::require_pointer_to_tag(
+        field_component.type(), "java::Generic");
 
       THEN("The pointer should be generic")
       {
@@ -136,8 +136,8 @@ SCENARIO(
     {
       const struct_typet::componentt &field_component =
         require_type::require_component(class_type, "field5");
-      require_type::require_pointer(
-        field_component.type(), struct_tag_typet("java::Generic"));
+      require_type::require_pointer_to_tag(
+        field_component.type(), "java::Generic");
 
       THEN("The pointer should be generic")
       {
@@ -162,8 +162,8 @@ SCENARIO(
     {
       const struct_typet::componentt &field_component =
         require_type::require_component(class_type, "field6");
-      require_type::require_pointer(
-        field_component.type(), struct_tag_typet("java::Generic"));
+      require_type::require_pointer_to_tag(
+        field_component.type(), "java::Generic");
 
       THEN("The pointer should be generic")
       {
@@ -188,8 +188,8 @@ SCENARIO(
     {
       const struct_typet::componentt &field_component =
         require_type::require_component(class_type, "field7");
-      require_type::require_pointer(
-        field_component.type(), struct_tag_typet("java::Generic"));
+      require_type::require_pointer_to_tag(
+        field_component.type(), "java::Generic");
 
       THEN("The pointer should be generic")
       {
@@ -214,8 +214,8 @@ SCENARIO(
     {
       const struct_typet::componentt &field_component =
         require_type::require_component(class_type, "field8");
-      require_type::require_pointer(
-        field_component.type(), struct_tag_typet("java::GenericTwoParam"));
+      require_type::require_pointer_to_tag(
+        field_component.type(), "java::GenericTwoParam");
 
       THEN("The pointer should be generic")
       {
@@ -245,8 +245,8 @@ SCENARIO(
     {
       const struct_typet::componentt &field_component =
         require_type::require_component(class_type, "field9");
-      require_type::require_pointer(
-        field_component.type(), struct_tag_typet("java::GenericTwoParam"));
+      require_type::require_pointer_to_tag(
+        field_component.type(), "java::GenericTwoParam");
 
       THEN("The pointer should be generic")
       {
@@ -276,8 +276,8 @@ SCENARIO(
     {
       const struct_typet::componentt &field_component =
         require_type::require_component(class_type, "field10");
-      require_type::require_pointer(
-        field_component.type(), struct_tag_typet("java::GenericTwoParam"));
+      require_type::require_pointer_to_tag(
+        field_component.type(), "java::GenericTwoParam");
 
       THEN("The pointer should be generic")
       {
@@ -307,8 +307,8 @@ SCENARIO(
     {
       const struct_typet::componentt &field_component =
         require_type::require_component(class_type, "field11");
-      require_type::require_pointer(
-        field_component.type(), struct_tag_typet("java::GenericTwoParam"));
+      require_type::require_pointer_to_tag(
+        field_component.type(), "java::GenericTwoParam");
 
       THEN("The pointer should be generic")
       {
@@ -333,8 +333,8 @@ SCENARIO(
     {
       const struct_typet::componentt &field_component =
         require_type::require_component(class_type, "field12");
-      require_type::require_pointer(
-        field_component.type(), struct_tag_typet("java::GenericTwoParam"));
+      require_type::require_pointer_to_tag(
+        field_component.type(), "java::GenericTwoParam");
 
       THEN("The pointer should be generic")
       {
@@ -366,8 +366,8 @@ SCENARIO(
     {
       const struct_typet::componentt &field_component =
         require_type::require_component(class_type, "field13");
-      require_type::require_pointer(
-        field_component.type(), struct_tag_typet("java::GenericTwoParam"));
+      require_type::require_pointer_to_tag(
+        field_component.type(), "java::GenericTwoParam");
 
       THEN("The pointer should be generic")
       {
@@ -424,8 +424,7 @@ SCENARIO(
     {
       const auto &param_type =
         require_type::require_parameter(function_call, "input");
-      require_type::require_pointer(
-        param_type.type(), struct_tag_typet("java::Generic"));
+      require_type::require_pointer_to_tag(param_type.type(), "java::Generic");
 
       THEN("The pointer should be generic")
       {
@@ -462,8 +461,7 @@ SCENARIO(
     {
       const auto &param_type =
         require_type::require_parameter(function_call, "input");
-      require_type::require_pointer(
-        param_type.type(), struct_tag_typet("java::Generic"));
+      require_type::require_pointer_to_tag(param_type.type(), "java::Generic");
 
       THEN("The pointer should be generic")
       {
@@ -500,8 +498,7 @@ SCENARIO(
     {
       const auto &param_type =
         require_type::require_parameter(function_call, "input");
-      require_type::require_pointer(
-        param_type.type(), struct_tag_typet("java::Generic"));
+      require_type::require_pointer_to_tag(param_type.type(), "java::Generic");
 
       THEN("The pointer should be generic")
       {
@@ -545,8 +542,7 @@ SCENARIO(
     {
       const auto &param_type =
         require_type::require_parameter(function_call, "input");
-      require_type::require_pointer(
-        param_type.type(), struct_tag_typet("java::Generic"));
+      require_type::require_pointer_to_tag(param_type.type(), "java::Generic");
 
       THEN("The pointer should be generic")
       {
@@ -590,8 +586,7 @@ SCENARIO(
     {
       const auto &param_type =
         require_type::require_parameter(function_call, "input");
-      require_type::require_pointer(
-        param_type.type(), struct_tag_typet("java::Generic"));
+      require_type::require_pointer_to_tag(param_type.type(), "java::Generic");
 
       THEN("The pointer should be generic")
       {
@@ -631,8 +626,7 @@ SCENARIO(
     {
       const auto &param_type =
         require_type::require_parameter(function_call, "input");
-      require_type::require_pointer(
-        param_type.type(), struct_tag_typet("java::Generic"));
+      require_type::require_pointer_to_tag(param_type.type(), "java::Generic");
 
       THEN("The pointer should be generic")
       {
@@ -672,8 +666,7 @@ SCENARIO(
     {
       const auto &param_type =
         require_type::require_parameter(function_call, "input");
-      require_type::require_pointer(
-        param_type.type(), struct_tag_typet("java::Generic"));
+      require_type::require_pointer_to_tag(param_type.type(), "java::Generic");
 
       THEN("The pointer should be generic")
       {
@@ -713,8 +706,8 @@ SCENARIO(
     {
       const auto &param_type =
         require_type::require_parameter(function_call, "input");
-      require_type::require_pointer(
-        param_type.type(), struct_tag_typet("java::GenericTwoParam"));
+      require_type::require_pointer_to_tag(
+        param_type.type(), "java::GenericTwoParam");
 
       THEN("The pointer should be generic")
       {
@@ -758,8 +751,8 @@ SCENARIO(
     {
       const auto &param_type =
         require_type::require_parameter(function_call, "input");
-      require_type::require_pointer(
-        param_type.type(), struct_tag_typet("java::GenericTwoParam"));
+      require_type::require_pointer_to_tag(
+        param_type.type(), "java::GenericTwoParam");
 
       THEN("The pointer should be generic")
       {
@@ -803,8 +796,8 @@ SCENARIO(
     {
       const auto &param_type =
         require_type::require_parameter(function_call, "input");
-      require_type::require_pointer(
-        param_type.type(), struct_tag_typet("java::GenericTwoParam"));
+      require_type::require_pointer_to_tag(
+        param_type.type(), "java::GenericTwoParam");
 
       THEN("The pointer should be generic")
       {
@@ -848,8 +841,8 @@ SCENARIO(
     {
       const auto &param_type =
         require_type::require_parameter(function_call, "input");
-      require_type::require_pointer(
-        param_type.type(), struct_tag_typet("java::GenericTwoParam"));
+      require_type::require_pointer_to_tag(
+        param_type.type(), "java::GenericTwoParam");
 
       THEN("The pointer should be generic")
       {
@@ -889,8 +882,8 @@ SCENARIO(
     {
       const auto &param_type =
         require_type::require_parameter(function_call, "input");
-      require_type::require_pointer(
-        param_type.type(), struct_tag_typet("java::GenericTwoParam"));
+      require_type::require_pointer_to_tag(
+        param_type.type(), "java::GenericTwoParam");
 
       THEN("The pointer should be generic")
       {
@@ -936,8 +929,8 @@ SCENARIO(
     {
       const auto &param_type =
         require_type::require_parameter(function_call, "input");
-      require_type::require_pointer(
-        param_type.type(), struct_tag_typet("java::GenericTwoParam"));
+      require_type::require_pointer_to_tag(
+        param_type.type(), "java::GenericTwoParam");
 
       THEN("The pointer should be generic")
       {
@@ -981,8 +974,8 @@ SCENARIO(
 
     THEN("The return type is correct")
     {
-      require_type::require_pointer(
-        function_call.return_type(), struct_tag_typet("java::Generic"));
+      require_type::require_pointer_to_tag(
+        function_call.return_type(), "java::Generic");
 
       THEN("The pointer should be generic")
       {
@@ -1017,8 +1010,8 @@ SCENARIO(
 
     THEN("The return type is correct")
     {
-      require_type::require_pointer(
-        function_call.return_type(), struct_tag_typet("java::Generic"));
+      require_type::require_pointer_to_tag(
+        function_call.return_type(), "java::Generic");
 
       THEN("The pointer should be generic")
       {
@@ -1053,8 +1046,8 @@ SCENARIO(
 
     THEN("The return type is correct")
     {
-      require_type::require_pointer(
-        function_call.return_type(), struct_tag_typet("java::Generic"));
+      require_type::require_pointer_to_tag(
+        function_call.return_type(), "java::Generic");
 
       THEN("The pointer should be generic")
       {
@@ -1095,8 +1088,8 @@ SCENARIO(
 
     THEN("The return type is correct")
     {
-      require_type::require_pointer(
-        function_call.return_type(), struct_tag_typet("java::Generic"));
+      require_type::require_pointer_to_tag(
+        function_call.return_type(), "java::Generic");
 
       THEN("The pointer should be generic")
       {
@@ -1137,8 +1130,8 @@ SCENARIO(
 
     THEN("The return type is correct")
     {
-      require_type::require_pointer(
-        function_call.return_type(), struct_tag_typet("java::Generic"));
+      require_type::require_pointer_to_tag(
+        function_call.return_type(), "java::Generic");
 
       THEN("The pointer should be generic")
       {
@@ -1176,8 +1169,8 @@ SCENARIO(
 
     THEN("The return type is correct")
     {
-      require_type::require_pointer(
-        function_call.return_type(), struct_tag_typet("java::Generic"));
+      require_type::require_pointer_to_tag(
+        function_call.return_type(), "java::Generic");
 
       THEN("The pointer should be generic")
       {
@@ -1215,8 +1208,8 @@ SCENARIO(
 
     THEN("The return type is correct")
     {
-      require_type::require_pointer(
-        function_call.return_type(), struct_tag_typet("java::Generic"));
+      require_type::require_pointer_to_tag(
+        function_call.return_type(), "java::Generic");
 
       THEN("The pointer should be generic")
       {
@@ -1254,8 +1247,8 @@ SCENARIO(
 
     THEN("The return type is correct")
     {
-      require_type::require_pointer(
-        function_call.return_type(), struct_tag_typet("java::GenericTwoParam"));
+      require_type::require_pointer_to_tag(
+        function_call.return_type(), "java::GenericTwoParam");
 
       THEN("The pointer should be generic")
       {
@@ -1297,8 +1290,8 @@ SCENARIO(
 
     THEN("The return type is correct")
     {
-      require_type::require_pointer(
-        function_call.return_type(), struct_tag_typet("java::GenericTwoParam"));
+      require_type::require_pointer_to_tag(
+        function_call.return_type(), "java::GenericTwoParam");
 
       THEN("The pointer should be generic")
       {
@@ -1340,8 +1333,8 @@ SCENARIO(
 
     THEN("The return type is correct")
     {
-      require_type::require_pointer(
-        function_call.return_type(), struct_tag_typet("java::GenericTwoParam"));
+      require_type::require_pointer_to_tag(
+        function_call.return_type(), "java::GenericTwoParam");
 
       THEN("The pointer should be generic")
       {
@@ -1383,8 +1376,8 @@ SCENARIO(
 
     THEN("The return type is correct")
     {
-      require_type::require_pointer(
-        function_call.return_type(), struct_tag_typet("java::GenericTwoParam"));
+      require_type::require_pointer_to_tag(
+        function_call.return_type(), "java::GenericTwoParam");
 
       THEN("The pointer should be generic")
       {
@@ -1422,8 +1415,8 @@ SCENARIO(
 
     THEN("The return type is correct")
     {
-      require_type::require_pointer(
-        function_call.return_type(), struct_tag_typet("java::GenericTwoParam"));
+      require_type::require_pointer_to_tag(
+        function_call.return_type(), "java::GenericTwoParam");
 
       THEN("The pointer should be generic")
       {
@@ -1467,8 +1460,8 @@ SCENARIO(
 
     THEN("The return type is correct")
     {
-      require_type::require_pointer(
-        function_call.return_type(), struct_tag_typet("java::GenericTwoParam"));
+      require_type::require_pointer_to_tag(
+        function_call.return_type(), "java::GenericTwoParam");
 
       THEN("The pointer should be generic")
       {

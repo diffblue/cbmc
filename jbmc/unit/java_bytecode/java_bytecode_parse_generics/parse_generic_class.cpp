@@ -46,8 +46,7 @@ SCENARIO(
       {
         const struct_union_typet::componentt &field_g =
           require_type::require_component(class_struct, "g");
-        require_type::require_pointer(
-          field_g.type(), struct_tag_typet("java::Generic"));
+        require_type::require_pointer_to_tag(field_g.type(), "java::Generic");
 
         THEN("It is generic with parameter pointing to java.lang.Integer")
         {

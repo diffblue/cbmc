@@ -31,8 +31,8 @@ SCENARIO(
     THEN("There is a field f1 of generic type with correct arguments")
     {
       const auto &field = require_type::require_component(generic_class, "f1");
-      require_type::require_pointer(
-        field.type(), struct_tag_typet(outer_class_prefix + "$Inner"));
+      require_type::require_pointer_to_tag(
+        field.type(), outer_class_prefix + "$Inner");
       require_type::require_java_generic_type(
         field.type(),
         {{require_type::type_argument_kindt::Var, outer_class_prefix + "::T"}});
@@ -40,9 +40,8 @@ SCENARIO(
     THEN("There is a field f2 of generic type with correct arguments")
     {
       const auto &field = require_type::require_component(generic_class, "f2");
-      require_type::require_pointer(
-        field.type(),
-        struct_tag_typet(outer_class_prefix + "$Inner$InnerInner"));
+      require_type::require_pointer_to_tag(
+        field.type(), outer_class_prefix + "$Inner$InnerInner");
       require_type::require_java_generic_type(
         field.type(),
         {{require_type::type_argument_kindt::Var, outer_class_prefix + "::T"}});
@@ -50,8 +49,8 @@ SCENARIO(
     THEN("There is a field f3 of generic type with correct arguments")
     {
       const auto &field = require_type::require_component(generic_class, "f3");
-      require_type::require_pointer(
-        field.type(), struct_tag_typet(outer_class_prefix + "$GenericInner"));
+      require_type::require_pointer_to_tag(
+        field.type(), outer_class_prefix + "$GenericInner");
       require_type::require_java_generic_type(
         field.type(),
         {{require_type::type_argument_kindt::Var, outer_class_prefix + "::T"},
@@ -85,8 +84,7 @@ SCENARIO(
         "parameter of the outer class")
       {
         const auto &field = require_type::require_component(java_class, "t2");
-        require_type::require_pointer(
-          field.type(), struct_tag_typet("java::Generic"));
+        require_type::require_pointer_to_tag(field.type(), "java::Generic");
         require_type::require_java_generic_type(
           field.type(),
           {{require_type::type_argument_kindt::Var,
@@ -122,8 +120,7 @@ SCENARIO(
         "parameter of the outer class")
       {
         const auto &field = require_type::require_component(java_class, "tt2");
-        require_type::require_pointer(
-          field.type(), struct_tag_typet("java::Generic"));
+        require_type::require_pointer_to_tag(field.type(), "java::Generic");
         const java_generic_typet &generic_field =
           require_type::require_java_generic_type(
             field.type(),
@@ -171,8 +168,8 @@ SCENARIO(
       {
         const auto &field =
           require_type::require_component(generic_class, "gt2");
-        require_type::require_pointer(
-          field.type(), struct_tag_typet("java::GenericTwoParam"));
+        require_type::require_pointer_to_tag(
+          field.type(), "java::GenericTwoParam");
         require_type::require_java_generic_type(
           field.type(),
           {{require_type::type_argument_kindt::Var,

@@ -43,8 +43,7 @@ SCENARIO(
       {
         const struct_typet::componentt &field =
           require_type::require_component(class_struct, "f2");
-        require_type::require_pointer(
-          field.type(), struct_tag_typet("java::Generic"));
+        require_type::require_pointer_to_tag(field.type(), "java::Generic");
         THEN("The pointer should be generic")
         {
           require_type::require_java_generic_type(
@@ -57,8 +56,7 @@ SCENARIO(
       {
         const struct_typet::componentt &field =
           require_type::require_component(class_struct, "f3");
-        require_type::require_pointer(
-          field.type(), struct_tag_typet("java::Generic"));
+        require_type::require_pointer_to_tag(field.type(), "java::Generic");
         THEN("The pointer should be generic")
         {
           require_type::require_java_generic_type(
@@ -72,8 +70,7 @@ SCENARIO(
       {
         const struct_typet::componentt &field =
           require_type::require_component(class_struct, "f4");
-        require_type::require_pointer(
-          field.type(), struct_tag_typet("java::Generic"));
+        require_type::require_pointer_to_tag(field.type(), "java::Generic");
         THEN("The pointer should be generic")
         {
           const java_generic_typet &generic_field =
@@ -93,8 +90,7 @@ SCENARIO(
       {
         const struct_typet::componentt &field =
           require_type::require_component(class_struct, "f5");
-        require_type::require_pointer(
-          field.type(), struct_tag_typet("java::Generic"));
+        require_type::require_pointer_to_tag(field.type(), "java::Generic");
         THEN("The pointer should be generic")
         {
           const java_generic_typet &generic_field =
@@ -122,8 +118,8 @@ SCENARIO(
       {
         const struct_typet::componentt &field =
           require_type::require_component(class_struct, "f6");
-        require_type::require_pointer(
-          field.type(), struct_tag_typet("java::GenericTwoParam"));
+        require_type::require_pointer_to_tag(
+          field.type(), "java::GenericTwoParam");
         THEN("The pointer should be generic")
         {
           require_type::require_java_generic_type(
@@ -137,8 +133,8 @@ SCENARIO(
       {
         const struct_typet::componentt &field =
           require_type::require_component(class_struct, "f7");
-        require_type::require_pointer(
-          field.type(), struct_tag_typet("java::GenericTwoParam"));
+        require_type::require_pointer_to_tag(
+          field.type(), "java::GenericTwoParam");
         THEN("The pointer should be generic")
         {
           require_type::require_java_generic_type(
@@ -152,8 +148,8 @@ SCENARIO(
       {
         const struct_typet::componentt &field =
           require_type::require_component(class_struct, "f8");
-        require_type::require_pointer(
-          field.type(), struct_tag_typet("java::GenericTwoParam"));
+        require_type::require_pointer_to_tag(
+          field.type(), "java::GenericTwoParam");
         THEN("The pointer should be generic")
         {
           require_type::require_java_generic_type(
@@ -169,8 +165,8 @@ SCENARIO(
       {
         const struct_typet::componentt &field =
           require_type::require_component(class_struct, "f9");
-        require_type::require_pointer(
-          field.type(), struct_tag_typet("java::GenericTwoParam"));
+        require_type::require_pointer_to_tag(
+          field.type(), "java::GenericTwoParam");
         THEN("The pointer should be generic")
         {
           require_type::require_java_generic_type(
@@ -186,8 +182,8 @@ SCENARIO(
       {
         const struct_typet::componentt &field =
           require_type::require_component(class_struct, "f10");
-        require_type::require_pointer(
-          field.type(), struct_tag_typet("java::GenericTwoParam"));
+        require_type::require_pointer_to_tag(
+          field.type(), "java::GenericTwoParam");
         THEN("The pointer should be generic")
         {
           require_type::require_java_generic_type(
@@ -203,8 +199,8 @@ SCENARIO(
       {
         const struct_typet::componentt &field =
           require_type::require_component(class_struct, "f11");
-        require_type::require_pointer(
-          field.type(), struct_tag_typet("java::GenericTwoParam"));
+        require_type::require_pointer_to_tag(
+          field.type(), "java::GenericTwoParam");
         THEN("The pointer should be generic")
         {
           const java_generic_typet &generic_field =
