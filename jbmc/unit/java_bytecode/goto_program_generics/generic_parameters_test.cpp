@@ -316,9 +316,9 @@ SCENARIO(
 
         // Trace the assignments back to the declaration of the generic type
         // and verify that it is what we expect.
-        const auto &tmp_object_struct =
-          to_struct_type(tmp_object_declaration.symbol().type());
-        REQUIRE(tmp_object_struct.get_tag() == "Wrapper");
+        const auto &tmp_object_struct_tag =
+          to_struct_tag_type(tmp_object_declaration.symbol().type());
+        REQUIRE(tmp_object_struct_tag.get_identifier() == "java::Wrapper");
 
         THEN("Object 'v' has field 'field' of type IWrapper")
         {
@@ -366,9 +366,9 @@ SCENARIO(
 
         // Trace the assignments back to the declaration of the generic type
         // and verify that it is what we expect.
-        const auto &tmp_object_struct =
-          to_struct_type(tmp_object_declaration.symbol().type());
-        REQUIRE(tmp_object_struct.get_tag() == "Wrapper");
+        const auto &tmp_object_struct_tag =
+          to_struct_tag_type(tmp_object_declaration.symbol().type());
+        REQUIRE(tmp_object_struct_tag.get_identifier() == "java::Wrapper");
 
         THEN(
           "Object 'v' has field 'field' of type Object (upper bound of the "
@@ -416,11 +416,11 @@ SCENARIO(
 
         // Trace the assignments back to the declaration of the generic type
         // and verify that it is what we expect.
-        const auto &tmp_object_struct =
-          to_struct_type(tmp_object_declaration.symbol().type());
+        const auto &tmp_object_struct_tag =
+          to_struct_tag_type(tmp_object_declaration.symbol().type());
         REQUIRE(
-          tmp_object_struct.get_tag() ==
-          "GenericFields$GenericInnerOuter$Outer");
+          tmp_object_struct_tag.get_identifier() ==
+          "java::GenericFields$GenericInnerOuter$Outer");
 
         THEN("Object 'v' has field 'field' of type InnerClass")
         {
@@ -481,11 +481,11 @@ SCENARIO(
 
         // Trace the assignments back to the declaration of the generic type
         // and verify that it is what we expect.
-        const auto &tmp_object_struct =
-          to_struct_type(tmp_object_declaration.symbol().type());
+        const auto &tmp_object_struct_tag =
+          to_struct_tag_type(tmp_object_declaration.symbol().type());
         REQUIRE(
-          tmp_object_struct.get_tag() ==
-          "GenericFields$GenericRewriteParameter$A");
+          tmp_object_struct_tag.get_identifier() ==
+          "java::GenericFields$GenericRewriteParameter$A");
 
         THEN("Object 'v' has field 'value' of type Integer")
         {

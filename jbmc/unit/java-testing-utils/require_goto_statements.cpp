@@ -315,6 +315,8 @@ const irep_idt &require_goto_statements::require_struct_component_assignment(
   const std::vector<codet> &entry_point_instructions,
   const symbol_tablet &symbol_table)
 {
+  namespacet ns(symbol_table);
+
   // First we need to find the assignments to the component belonging to
   // the structure_name object
   const auto &component_assignments =
@@ -361,14 +363,13 @@ const irep_idt &require_goto_statements::require_struct_component_assignment(
   // After we have found the declaration of the final assignment's
   // right hand side, then we want to identify that the type
   // is the one we expect, e.g.:
-  // struct java.lang.Integer { __CPROVER_string @class_identifier; }
-  // tmp_object_factory$2;
+  // struct java.lang.Integer tmp_object_factory$2;
   const auto &component_declaration =
     require_goto_statements::require_declaration_of_name(
       component_tmp_name, entry_point_instructions);
-  REQUIRE(component_declaration.symbol().type().id() == ID_struct);
+  REQUIRE(component_declaration.symbol().type().id() == ID_struct_tag);
   const auto &component_struct =
-    to_struct_type(component_declaration.symbol().type());
+    ns.follow_tag(to_struct_tag_type(component_declaration.symbol().type()));
   REQUIRE(component_struct.get(ID_name) == component_type_name);
 
   return component_tmp_name;

@@ -249,9 +249,11 @@ void java_object_factoryt::gen_pointer_target_init(
   PRECONDITION(expr.type().id() == ID_pointer);
   PRECONDITION(update_in_place != update_in_placet::MAY_UPDATE_IN_PLACE);
 
-  if(target_type.id() == ID_struct)
+  const typet &followed_target_type = ns.follow(target_type);
+
+  if(followed_target_type.id() == ID_struct)
   {
-    const auto &target_class_type = to_java_class_type(target_type);
+    const auto &target_class_type = to_java_class_type(followed_target_type);
     if(has_prefix(id2string(target_class_type.get_tag()), "java::array["))
     {
       gen_nondet_array_init(
@@ -565,10 +567,11 @@ void java_object_factoryt::gen_nondet_pointer_init(
   // When we visit for 2nd time a type AND the maximum depth is exceeded, we set
   // the pointer to NULL instead of recursively initializing the struct to which
   // it points.
-  const typet &subtype=ns.follow(pointer_type.subtype());
-  if(subtype.id()==ID_struct)
+  const typet &subtype = pointer_type.subtype();
+  const typet &followed_subtype = ns.follow(subtype);
+  if(followed_subtype.id() == ID_struct)
   {
-    const struct_typet &struct_type=to_struct_type(subtype);
+    const struct_typet &struct_type = to_struct_type(followed_subtype);
     const irep_idt &struct_tag=struct_type.get_tag();
 
     // If this is a recursive type of some kind AND the depth is exceeded, set
@@ -604,7 +607,9 @@ void java_object_factoryt::gen_nondet_pointer_init(
   // decide to do this for all types, we should do it here.
   // Note also that this logic is mirrored in
   // ci_lazy_methodst::initialize_instantiated_classes.
-  if(const auto class_type = type_try_dynamic_cast<java_class_typet>(subtype))
+  if(
+    const auto class_type =
+      type_try_dynamic_cast<java_class_typet>(followed_subtype))
   {
     if(class_type->get_base("java::java.lang.Enum") && !must_be_null)
     {
@@ -1024,8 +1029,8 @@ void java_object_factoryt::gen_nondet_init(
   update_in_placet update_in_place,
   const source_locationt &location)
 {
-  const typet &type = override_type.has_value() ? ns.follow(*override_type)
-                                                : ns.follow(expr.type());
+  const typet &type = override_type.has_value() ? *override_type : expr.type();
+  const typet &followed_type = ns.follow(type);
 
   if(type.id()==ID_pointer)
   {
@@ -1049,9 +1054,9 @@ void java_object_factoryt::gen_nondet_init(
       update_in_place,
       location);
   }
-  else if(type.id()==ID_struct)
+  else if(followed_type.id() == ID_struct)
   {
-    const struct_typet struct_type=to_struct_type(type);
+    const struct_typet struct_type = to_struct_type(followed_type);
 
     // If we are about to initialize a generic class (as a superclass object
     // for a different object), add its concrete types to the map and delete
