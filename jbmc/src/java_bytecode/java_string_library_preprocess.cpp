@@ -775,11 +775,11 @@ codet java_string_library_preprocesst::code_assign_components_to_java_string(
   if(is_constructor)
   {
     // A String has a field Object with @clsid = String
-    const symbolt &jlo_symbol = *symbol_table.lookup("java::java.lang.Object");
-    const struct_typet &jlo_struct = to_struct_type(jlo_symbol.type);
-    struct_exprt jlo_init({}, jlo_struct);
+    struct_tag_typet jlo_tag("java::java.lang.Object");
+    struct_exprt jlo_init({}, jlo_tag);
     irep_idt clsid = get_tag(lhs.type().subtype());
-    java_root_class_init(jlo_init, jlo_struct, clsid);
+    namespacet ns(symbol_table);
+    java_root_class_init(jlo_init, ns.follow_tag(jlo_tag), clsid);
 
     struct_exprt struct_rhs({jlo_init, rhs_length, rhs_array}, deref.type());
     return code_assignt(
@@ -1455,8 +1455,7 @@ code_blockt java_string_library_preprocesst::make_object_get_class_code(
   code_blockt code;
 
   // > Class class1;
-  const pointer_typet class_type =
-    java_reference_type(symbol_table.lookup_ref("java::java.lang.Class").type);
+  const pointer_typet &class_type = to_pointer_type(type.return_type());
   const symbolt &class1_sym = fresh_java_symbol(
     class_type, "class_symbol", loc, function_id, symbol_table);
   const symbol_exprt class1 = class1_sym.symbol_expr();
