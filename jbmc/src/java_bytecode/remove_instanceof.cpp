@@ -211,7 +211,7 @@ bool remove_instanceoft::lower_instanceof(
     // GOTO programs before the target instruction without inserting into the
     // wrong basic block.
     goto_program.insert_before_swap(target);
-    *target = goto_programt::make_skip();
+    target->turn_into_skip();
     // Actually alter the now-moved instruction:
     ++target;
   }

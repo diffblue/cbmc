@@ -914,7 +914,7 @@ void disjunctive_polynomial_accelerationt::build_fixed()
     if(loop.find(t)==loop.end())
     {
       // This instruction isn't part of the loop...  Just remove it.
-      *fixedt = goto_programt::make_skip(fixedt->source_location);
+      fixedt->turn_into_skip();
       continue;
     }
 
