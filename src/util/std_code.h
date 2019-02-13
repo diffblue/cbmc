@@ -364,7 +364,7 @@ template<> inline bool can_cast_expr<code_assignt>(const exprt &base)
 
 inline void validate_expr(const code_assignt & x)
 {
-  validate_operands(x, 2, "assignment must have two operands");
+  code_assignt::check(x);
 }
 
 inline const code_assignt &to_code_assign(const codet &code)
@@ -432,29 +432,20 @@ template<> inline bool can_cast_expr<code_declt>(const exprt &base)
 
 inline void validate_expr(const code_declt &x)
 {
-  validate_operands(x, 1, "decls must have one or more operands", true);
+  code_declt::check(x);
 }
 
 inline const code_declt &to_code_decl(const codet &code)
 {
   PRECONDITION(code.get_statement() == ID_decl);
-
-  // will be size()==1 in the future
-  DATA_INVARIANT(
-    code.operands().size() >= 1, "decls must have one or more operands");
-  DATA_INVARIANT(
-    code.op0().id() == ID_symbol, "decls symbols must be a \"symbol\"");
-
+  code_declt::check(code);
   return static_cast<const code_declt &>(code);
 }
 
 inline code_declt &to_code_decl(codet &code)
 {
   PRECONDITION(code.get_statement() == ID_decl);
-
-  // will be size()==1 in the future
-  DATA_INVARIANT(
-    code.operands().size() >= 1, "decls must have one or more operands");
+  code_declt::check(code);
   return static_cast<code_declt &>(code);
 }
 
@@ -510,28 +501,20 @@ template<> inline bool can_cast_expr<code_deadt>(const exprt &base)
 
 inline void validate_expr(const code_deadt &x)
 {
-  validate_operands(x, 1, "dead statement must have one operand");
+  code_deadt::check(x);
 }
 
 inline const code_deadt &to_code_dead(const codet &code)
 {
   PRECONDITION(code.get_statement() == ID_dead);
-  DATA_INVARIANT(
-    code.operands().size() == 1, "dead statement must have one operand");
-  DATA_INVARIANT(
-    to_unary_expr(code).op().id() == ID_symbol,
-    "dead statement must take symbol operand");
+  code_deadt::check(code);
   return static_cast<const code_deadt &>(code);
 }
 
 inline code_deadt &to_code_dead(codet &code)
 {
   PRECONDITION(code.get_statement() == ID_dead);
-  DATA_INVARIANT(
-    code.operands().size() == 1, "dead statement must have one operand");
-  DATA_INVARIANT(
-    to_unary_expr(code).op().id() == ID_symbol,
-    "dead statement must take symbol operand");
+  code_deadt::check(code);
   return static_cast<code_deadt &>(code);
 }
 
@@ -1242,18 +1225,20 @@ template<> inline bool can_cast_expr<code_function_callt>(const exprt &base)
 
 inline void validate_expr(const code_function_callt &x)
 {
-  validate_operands(x, 3, "function calls must have three operands");
+  code_function_callt::check(x);
 }
 
 inline const code_function_callt &to_code_function_call(const codet &code)
 {
   PRECONDITION(code.get_statement() == ID_function_call);
+  code_function_callt::check(code);
   return static_cast<const code_function_callt &>(code);
 }
 
 inline code_function_callt &to_code_function_call(codet &code)
 {
   PRECONDITION(code.get_statement() == ID_function_call);
+  code_function_callt::check(code);
   return static_cast<code_function_callt &>(code);
 }
 
@@ -1305,18 +1290,20 @@ template<> inline bool can_cast_expr<code_returnt>(const exprt &base)
 
 inline void validate_expr(const code_returnt &x)
 {
-  validate_operands(x, 1, "return must have one operand");
+  code_returnt::check(x);
 }
 
 inline const code_returnt &to_code_return(const codet &code)
 {
   PRECONDITION(code.get_statement() == ID_return);
+  code_returnt::check(code);
   return static_cast<const code_returnt &>(code);
 }
 
 inline code_returnt &to_code_return(codet &code)
 {
   PRECONDITION(code.get_statement() == ID_return);
+  code_returnt::check(code);
   return static_cast<code_returnt &>(code);
 }
 
