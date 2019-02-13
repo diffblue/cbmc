@@ -39,8 +39,7 @@ SCENARIO(
       {
         const java_method_typet::parametert &param_x =
           require_type::require_parameter(func_code, "x");
-        require_type::require_pointer(
-          param_x.type(), struct_tag_typet("java::Generic"));
+        require_type::require_pointer_to_tag(param_x.type(), "java::Generic");
 
         THEN("x is generic with parameter pointing to java.lang.Integer")
         {
@@ -54,8 +53,7 @@ SCENARIO(
       THEN("It has return type pointing to Generic")
       {
         const typet return_type = func_code.return_type();
-        require_type::require_pointer(
-          return_type, struct_tag_typet("java::Generic"));
+        require_type::require_pointer_to_tag(return_type, "java::Generic");
 
         THEN("It is generic with parameter pointing to java.lang.Integer")
         {
@@ -88,8 +86,7 @@ SCENARIO(
       {
         const java_method_typet::parametert &param_s =
           require_type::require_parameter(func_code, "s");
-        require_type::require_pointer(
-          param_s.type(), struct_tag_typet("java::Generic"));
+        require_type::require_pointer_to_tag(param_s.type(), "java::Generic");
 
         THEN("s is generic with parameter pointing to java.lang.String")
         {
@@ -103,8 +100,7 @@ SCENARIO(
       THEN("It has return type pointing to Generic")
       {
         const typet return_type = func_code.return_type();
-        require_type::require_pointer(
-          return_type, struct_tag_typet("java::Generic"));
+        require_type::require_pointer_to_tag(return_type, "java::Generic");
 
         THEN("It is generic with parameter pointing to java.lang.Integer")
         {
@@ -137,8 +133,7 @@ SCENARIO(
       {
         const java_method_typet::parametert &param_x =
           require_type::require_parameter(func_code, "x");
-        require_type::require_pointer(
-          param_x.type(), struct_tag_typet("java::Generic"));
+        require_type::require_pointer_to_tag(param_x.type(), "java::Generic");
 
         THEN("x is generic with parameter pointing to java.lang.Integer")
         {
@@ -153,8 +148,7 @@ SCENARIO(
       {
         const java_method_typet::parametert &param_y =
           require_type::require_parameter(func_code, "y");
-        require_type::require_pointer(
-          param_y.type(), struct_tag_typet("java::Generic"));
+        require_type::require_pointer_to_tag(param_y.type(), "java::Generic");
 
         THEN("y is generic with parameter pointing to java.lang.Integer")
         {
@@ -168,8 +162,7 @@ SCENARIO(
       THEN("It has return type pointing to Generic")
       {
         const typet return_type = func_code.return_type();
-        require_type::require_pointer(
-          return_type, struct_tag_typet("java::Generic"));
+        require_type::require_pointer_to_tag(return_type, "java::Generic");
 
         THEN("It is generic with parameter pointing to java.lang.Integer")
         {
@@ -202,8 +195,7 @@ SCENARIO(
       {
         const java_method_typet::parametert &param_s =
           require_type::require_parameter(func_code, "s");
-        require_type::require_pointer(
-          param_s.type(), struct_tag_typet("java::Generic"));
+        require_type::require_pointer_to_tag(param_s.type(), "java::Generic");
 
         THEN("s is generic with parameter pointing to java.lang.String")
         {
@@ -218,8 +210,7 @@ SCENARIO(
       {
         const java_method_typet::parametert &param_b =
           require_type::require_parameter(func_code, "b");
-        require_type::require_pointer(
-          param_b.type(), struct_tag_typet("java::Generic"));
+        require_type::require_pointer_to_tag(param_b.type(), "java::Generic");
 
         THEN("b is generic with parameter pointing to java.lang.Boolean")
         {
@@ -233,8 +224,7 @@ SCENARIO(
       THEN("It has return type pointing to Generic")
       {
         const typet return_type = func_code.return_type();
-        require_type::require_pointer(
-          return_type, struct_tag_typet("java::Generic"));
+        require_type::require_pointer_to_tag(return_type, "java::Generic");
 
         THEN("It is generic with parameter pointing to java.lang.Integer")
         {
@@ -268,15 +258,14 @@ SCENARIO(
       {
         const java_method_typet::parametert &param_inner =
           require_type::require_parameter(func_code, "inner");
-        require_type::require_pointer(
-          param_inner.type(), struct_tag_typet(class_prefix + "$Inner"));
+        require_type::require_pointer_to_tag(
+          param_inner.type(), class_prefix + "$Inner");
       }
 
       THEN("It has return type pointing to Generic")
       {
         const typet return_type = func_code.return_type();
-        require_type::require_pointer(
-          return_type, struct_tag_typet("java::Generic"));
+        require_type::require_pointer_to_tag(return_type, "java::Generic");
 
         THEN("It is generic with parameter pointing to java.lang.Integer")
         {

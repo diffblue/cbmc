@@ -461,6 +461,14 @@ require_type::require_struct_tag(const typet &type, const irep_idt &identifier)
   return result;
 }
 
+const pointer_typet
+require_type::require_pointer_to_tag(const typet &type, const irep_idt &tag)
+{
+  const auto pointer_type = require_type::require_pointer(type, {});
+  require_type::require_struct_tag(pointer_type.subtype(), tag);
+  return pointer_type;
+}
+
 /// Verify a given type is a java generic symbol type
 /// \param type: The type to check
 /// \param identifier: The identifier to match

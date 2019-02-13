@@ -32,8 +32,9 @@ SCENARIO(
 
     THEN("It is an array")
     {
-      const pointer_typet &field_t_pointer = require_type::require_pointer(
-        field_t.type(), struct_tag_typet("java::array[reference]"));
+      const pointer_typet &field_t_pointer =
+        require_type::require_pointer_to_tag(
+          field_t.type(), "java::array[reference]");
 
       const struct_tag_typet &field_t_subtype =
         to_struct_tag_type(field_t_pointer.subtype());
@@ -57,8 +58,9 @@ SCENARIO(
 
     THEN("It is an array")
     {
-      const pointer_typet &field_t2_pointer = require_type::require_pointer(
-        field_t2.type(), struct_tag_typet("java::array[reference]"));
+      const pointer_typet &field_t2_pointer =
+        require_type::require_pointer_to_tag(
+          field_t2.type(), "java::array[reference]");
 
       const struct_tag_typet &field_t2_subtype =
         to_struct_tag_type(field_t2_pointer.subtype());
@@ -69,8 +71,7 @@ SCENARIO(
       THEN("The elements have type Generic<T>")
       {
         const typet &element = java_array_element_type(field_t2_subtype);
-        require_type::require_pointer(
-          element, struct_tag_typet("java::Generic"));
+        require_type::require_pointer_to_tag(element, "java::Generic");
         require_type::require_java_generic_type(
           element,
           {{require_type::type_argument_kindt::Var, class_prefix + "::T"}});
@@ -85,8 +86,9 @@ SCENARIO(
 
     THEN("It is an array")
     {
-      const pointer_typet &field_t3_pointer = require_type::require_pointer(
-        field_t3.type(), struct_tag_typet("java::array[reference]"));
+      const pointer_typet &field_t3_pointer =
+        require_type::require_pointer_to_tag(
+          field_t3.type(), "java::array[reference]");
 
       const struct_tag_typet &field_t3_subtype =
         to_struct_tag_type(field_t3_pointer.subtype());
@@ -97,8 +99,7 @@ SCENARIO(
       THEN("The elements have type Generic<Integer>")
       {
         const typet &element = java_array_element_type(field_t3_subtype);
-        require_type::require_pointer(
-          element, struct_tag_typet("java::Generic"));
+        require_type::require_pointer_to_tag(element, "java::Generic");
         require_type::require_java_generic_type(
           element,
           {{require_type::type_argument_kindt::Inst,
