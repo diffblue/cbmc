@@ -17,9 +17,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 literalt boolbvt::convert_equality(const equal_exprt &expr)
 {
-  const bool is_base_type_eq = expr.lhs().type() == expr.rhs().type();
+  const bool equality_types_match = expr.lhs().type() == expr.rhs().type();
   DATA_INVARIANT_WITH_DIAGNOSTICS(
-    is_base_type_eq,
+    equality_types_match,
     "types of expressions on each side of equality should match",
     irep_pretty_diagnosticst{expr.lhs()},
     irep_pretty_diagnosticst{expr.rhs()});
