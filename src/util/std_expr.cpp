@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "expr_util.h"
 #include "mathematical_types.h"
 #include "pointer_offset_size.h"
+#include "simplify_expr.h"
 
 bool constant_exprt::value_is_zero_string() const
 {
@@ -145,6 +146,7 @@ void object_descriptor_exprt::build(
     offset()=from_integer(0, index_type());
 
   build_object_descriptor_rec(ns, expr, *this);
+  simplify(offset(), ns);
 }
 
 shift_exprt::shift_exprt(
