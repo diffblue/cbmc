@@ -493,8 +493,7 @@ public:
     DATA_CHECK(
       vm,
       code.op0().id() == ID_symbol,
-      "removing a non-symbol: " +
-        id2string(to_symbol_expr(code.op0()).get_identifier()) + "from scope");
+      "removing a non-symbol: " + id2string(code.op0().id()) + "from scope");
   }
 
 protected:
