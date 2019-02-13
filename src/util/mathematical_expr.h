@@ -79,18 +79,18 @@ inline void validate_expr(const transt &value)
 inline const transt &to_trans_expr(const exprt &expr)
 {
   PRECONDITION(expr.id() == ID_trans);
-  DATA_INVARIANT(
-    expr.operands().size() == 3, "Transition systems must have three operands");
-  return static_cast<const transt &>(expr);
+  const transt &ret = static_cast<const transt &>(expr);
+  validate_expr(ret);
+  return ret;
 }
 
 /// \copydoc to_trans_expr(const exprt &)
 inline transt &to_trans_expr(exprt &expr)
 {
   PRECONDITION(expr.id() == ID_trans);
-  DATA_INVARIANT(
-    expr.operands().size() == 3, "Transition systems must have three operands");
-  return static_cast<transt &>(expr);
+  transt &ret = static_cast<transt &>(expr);
+  validate_expr(ret);
+  return ret;
 }
 
 /// \brief Exponentiation
@@ -128,16 +128,18 @@ inline void validate_expr(const power_exprt &value)
 inline const power_exprt &to_power_expr(const exprt &expr)
 {
   PRECONDITION(expr.id() == ID_power);
-  DATA_INVARIANT(expr.operands().size() == 2, "Power must have two operands");
-  return static_cast<const power_exprt &>(expr);
+  const power_exprt &ret = static_cast<const power_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
 }
 
 /// \copydoc to_power_expr(const exprt &)
 inline power_exprt &to_power_expr(exprt &expr)
 {
   PRECONDITION(expr.id() == ID_power);
-  DATA_INVARIANT(expr.operands().size() == 2, "Power must have two operands");
-  return static_cast<power_exprt &>(expr);
+  power_exprt &ret = static_cast<power_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
 }
 
 /// \brief Falling factorial power
@@ -175,18 +177,19 @@ inline void validate_expr(const factorial_power_exprt &value)
 inline const factorial_power_exprt &to_factorial_power_expr(const exprt &expr)
 {
   PRECONDITION(expr.id() == ID_factorial_power);
-  DATA_INVARIANT(
-    expr.operands().size() == 2, "Factorial power must have two operands");
-  return static_cast<const factorial_power_exprt &>(expr);
+  const factorial_power_exprt &ret =
+    static_cast<const factorial_power_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
 }
 
 /// \copydoc to_factorial_power_expr(const exprt &)
 inline factorial_power_exprt &to_factorial_expr(exprt &expr)
 {
   PRECONDITION(expr.id() == ID_factorial_power);
-  DATA_INVARIANT(
-    expr.operands().size() == 2, "Factorial power must have two operands");
-  return static_cast<factorial_power_exprt &>(expr);
+  factorial_power_exprt &ret = static_cast<factorial_power_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
 }
 
 class tuple_exprt : public multi_ary_exprt
@@ -263,18 +266,20 @@ inline const function_application_exprt &
 to_function_application_expr(const exprt &expr)
 {
   PRECONDITION(expr.id() == ID_function_application);
-  DATA_INVARIANT(
-    expr.operands().size() == 2, "Function application must have two operands");
-  return static_cast<const function_application_exprt &>(expr);
+  const function_application_exprt &ret =
+    static_cast<const function_application_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
 }
 
 /// \copydoc to_function_application_expr(const exprt &)
 inline function_application_exprt &to_function_application_expr(exprt &expr)
 {
   PRECONDITION(expr.id() == ID_function_application);
-  DATA_INVARIANT(
-    expr.operands().size() == 2, "Function application must have two operands");
-  return static_cast<function_application_exprt &>(expr);
+  function_application_exprt &ret =
+    static_cast<function_application_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
 }
 
 /// \brief A base class for quantifier expressions
@@ -319,6 +324,8 @@ inline bool can_cast_expr<quantifier_exprt>(const exprt &base)
 inline void validate_expr(const quantifier_exprt &value)
 {
   validate_operands(value, 2, "quantifier expressions must have two operands");
+  DATA_INVARIANT(
+    value.op0().id() == ID_symbol, "quantified variable shall be a symbol");
 }
 
 /// \brief Cast an exprt to a \ref quantifier_exprt
@@ -329,23 +336,19 @@ inline void validate_expr(const quantifier_exprt &value)
 /// \return Object of type \ref quantifier_exprt
 inline const quantifier_exprt &to_quantifier_expr(const exprt &expr)
 {
-  DATA_INVARIANT(
-    expr.operands().size() == 2,
-    "quantifier expressions must have two operands");
-  DATA_INVARIANT(
-    expr.op0().id() == ID_symbol, "quantified variable shall be a symbol");
-  return static_cast<const quantifier_exprt &>(expr);
+  PRECONDITION(can_cast_expr<quantifier_exprt>(expr));
+  const quantifier_exprt &ret = static_cast<const quantifier_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
 }
 
 /// \copydoc to_quantifier_expr(const exprt &)
 inline quantifier_exprt &to_quantifier_expr(exprt &expr)
 {
-  DATA_INVARIANT(
-    expr.operands().size() == 2,
-    "quantifier expressions must have two operands");
-  DATA_INVARIANT(
-    expr.op0().id() == ID_symbol, "quantified variable shall be a symbol");
-  return static_cast<quantifier_exprt &>(expr);
+  PRECONDITION(can_cast_expr<quantifier_exprt>(expr));
+  quantifier_exprt &ret = static_cast<quantifier_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
 }
 
 /// \brief A forall expression
@@ -361,19 +364,17 @@ public:
 inline const forall_exprt &to_forall_expr(const exprt &expr)
 {
   PRECONDITION(expr.id() == ID_forall);
-  DATA_INVARIANT(
-    expr.operands().size() == 2,
-    "forall expressions have exactly two operands");
-  return static_cast<const forall_exprt &>(expr);
+  const forall_exprt &ret = static_cast<const forall_exprt &>(expr);
+  validate_expr(static_cast<const quantifier_exprt &>(ret));
+  return ret;
 }
 
 inline forall_exprt &to_forall_expr(exprt &expr)
 {
   PRECONDITION(expr.id() == ID_forall);
-  DATA_INVARIANT(
-    expr.operands().size() == 2,
-    "forall expressions have exactly two operands");
-  return static_cast<forall_exprt &>(expr);
+  forall_exprt &ret = static_cast<forall_exprt &>(expr);
+  validate_expr(static_cast<const quantifier_exprt &>(ret));
+  return ret;
 }
 
 /// \brief An exists expression
@@ -389,19 +390,17 @@ public:
 inline const exists_exprt &to_exists_expr(const exprt &expr)
 {
   PRECONDITION(expr.id() == ID_exists);
-  DATA_INVARIANT(
-    expr.operands().size() == 2,
-    "exists expressions have exactly two operands");
-  return static_cast<const exists_exprt &>(expr);
+  const exists_exprt &ret = static_cast<const exists_exprt &>(expr);
+  validate_expr(static_cast<const quantifier_exprt &>(ret));
+  return ret;
 }
 
 inline exists_exprt &to_exists_expr(exprt &expr)
 {
   PRECONDITION(expr.id() == ID_exists);
-  DATA_INVARIANT(
-    expr.operands().size() == 2,
-    "exists expressions have exactly two operands");
-  return static_cast<exists_exprt &>(expr);
+  exists_exprt &ret = static_cast<exists_exprt &>(expr);
+  validate_expr(static_cast<const quantifier_exprt &>(ret));
+  return ret;
 }
 
 #endif // CPROVER_UTIL_MATHEMATICAL_EXPR_H
