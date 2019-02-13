@@ -571,8 +571,10 @@ template<> inline bool can_cast_expr<code_assumet>(const exprt &base)
   return detail::can_cast_code_impl(base, ID_assume);
 }
 
-// to_code_assume only checks the code statement, so no validate_expr is
-// provided for code_assumet
+inline void validate_expr(const code_assumet &x)
+{
+  validate_operands(x, 1, "assume must have one operand");
+}
 
 inline const code_assumet &to_code_assume(const codet &code)
 {
@@ -584,11 +586,6 @@ inline code_assumet &to_code_assume(codet &code)
 {
   PRECONDITION(code.get_statement() == ID_assume);
   return static_cast<code_assumet &>(code);
-}
-
-inline void validate_expr(const code_assumet &x)
-{
-  validate_operands(x, 1, "assume must have one operand");
 }
 
 /// A non-fatal assertion, which checks a condition then permits execution to
@@ -628,8 +625,10 @@ template<> inline bool can_cast_expr<code_assertt>(const exprt &base)
   return detail::can_cast_code_impl(base, ID_assert);
 }
 
-// to_code_assert only checks the code statement, so no validate_expr is
-// provided for code_assertt
+inline void validate_expr(const code_assertt &x)
+{
+  validate_operands(x, 1, "assert must have one operand");
+}
 
 inline const code_assertt &to_code_assert(const codet &code)
 {
@@ -641,11 +640,6 @@ inline code_assertt &to_code_assert(codet &code)
 {
   PRECONDITION(code.get_statement() == ID_assert);
   return static_cast<code_assertt &>(code);
-}
-
-inline void validate_expr(const code_assertt &x)
-{
-  validate_operands(x, 1, "assert must have one operand");
 }
 
 /// Create a fatal assertion, which checks a condition and then halts if it does
@@ -1246,8 +1240,10 @@ template<> inline bool can_cast_expr<code_function_callt>(const exprt &base)
   return detail::can_cast_code_impl(base, ID_function_call);
 }
 
-// to_code_function_call only checks the code statement, so no validate_expr is
-// provided for code_function_callt
+inline void validate_expr(const code_function_callt &x)
+{
+  validate_operands(x, 3, "function calls must have three operands");
+}
 
 inline const code_function_callt &to_code_function_call(const codet &code)
 {
@@ -1259,11 +1255,6 @@ inline code_function_callt &to_code_function_call(codet &code)
 {
   PRECONDITION(code.get_statement() == ID_function_call);
   return static_cast<code_function_callt &>(code);
-}
-
-inline void validate_expr(const code_function_callt &x)
-{
-  validate_operands(x, 3, "function calls must have three operands");
 }
 
 /// \ref codet representation of a "return from a function" statement.
@@ -1312,8 +1303,10 @@ template<> inline bool can_cast_expr<code_returnt>(const exprt &base)
   return detail::can_cast_code_impl(base, ID_return);
 }
 
-// to_code_return only checks the code statement, so no validate_expr is
-// provided for code_returnt
+inline void validate_expr(const code_returnt &x)
+{
+  validate_operands(x, 1, "return must have one operand");
+}
 
 inline const code_returnt &to_code_return(const codet &code)
 {
@@ -1325,11 +1318,6 @@ inline code_returnt &to_code_return(codet &code)
 {
   PRECONDITION(code.get_statement() == ID_return);
   return static_cast<code_returnt &>(code);
-}
-
-inline void validate_expr(const code_returnt &x)
-{
-  validate_operands(x, 1, "return must have one operand");
 }
 
 /// \ref codet representation of a label for branch targets.
@@ -1760,8 +1748,10 @@ inline bool can_cast_expr<code_asm_gcct>(const exprt &base)
   return detail::can_cast_code_impl(base, ID_asm);
 }
 
-// to_code_asm_gcc only checks the code statement, so no validate_expr is
-// provided for code_asmt
+inline void validate_expr(const code_asm_gcct &x)
+{
+  validate_operands(x, 5, "code_asm_gcc must have five operands");
+}
 
 inline code_asm_gcct &to_code_asm_gcc(codet &code)
 {
