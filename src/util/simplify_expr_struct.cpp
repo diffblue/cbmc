@@ -262,9 +262,6 @@ bool simplify_exprt::simplify_member(exprt &expr)
 
         // Guess: turning this into a byte-extract operation is not really an
         // optimisation.
-        // The type_eq check is because get_subexpression_at_offset uses
-        // base_type_eq, whereas in the context of a simplifier we should not
-        // change the type of the expression.
         if(
           equivalent_member.has_value() &&
           equivalent_member.value().id() != ID_byte_extract_little_endian &&
