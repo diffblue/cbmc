@@ -156,13 +156,13 @@ void constant_propagator_domaint::transform(
 
   if(from->is_decl())
   {
-    const code_declt &code_decl=to_code_decl(from->code);
+    const auto &code_decl = from->get_decl();
     const symbol_exprt &symbol = code_decl.symbol();
     values.set_to_top(symbol);
   }
   else if(from->is_assign())
   {
-    const code_assignt &assignment=to_code_assign(from->code);
+    const auto &assignment = from->get_assign();
     const exprt &lhs=assignment.lhs();
     const exprt &rhs=assignment.rhs();
     assign_rec(values, lhs, rhs, ns, cp, true);
@@ -189,12 +189,12 @@ void constant_propagator_domaint::transform(
   }
   else if(from->is_dead())
   {
-    const code_deadt &code_dead=to_code_dead(from->code);
+    const auto &code_dead = from->get_dead();
     values.set_to_top(code_dead.symbol());
   }
   else if(from->is_function_call())
   {
-    const code_function_callt &function_call=to_code_function_call(from->code);
+    const auto &function_call = from->get_function_call();
     const exprt &function=function_call.function();
 
     if(function.id()==ID_symbol)
