@@ -593,7 +593,7 @@ void dump_ct::cleanup_decl(
   tmp.add(goto_programt::make_decl(decl.symbol()));
 
   if(value.is_not_nil())
-    tmp.add(goto_programt::make_assignment(code_assignt(decl.op0(), value)));
+    tmp.add(goto_programt::make_assignment(decl.symbol(), value));
 
   tmp.add(goto_programt::make_end_function());
 

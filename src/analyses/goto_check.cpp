@@ -1852,7 +1852,7 @@ void goto_checkt::goto_check(
             lhs);
           goto_programt::targett t =
             new_code.add(goto_programt::make_assignment(
-              code_assignt(std::move(lhs), std::move(rhs)), i.source_location));
+              std::move(lhs), std::move(rhs), i.source_location));
           t->code.add_source_location()=i.source_location;
         }
       }
@@ -1867,8 +1867,7 @@ void goto_checkt::goto_check(
         const symbol_exprt leak_expr=leak.symbol_expr();
 
         // add self-assignment to get helpful counterexample output
-        new_code.add(
-          goto_programt::make_assignment(code_assignt(leak_expr, leak_expr)));
+        new_code.add(goto_programt::make_assignment(leak_expr, leak_expr));
 
         source_locationt source_location;
         source_location.set_function(function_identifier);
