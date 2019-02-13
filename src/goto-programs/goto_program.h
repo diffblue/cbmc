@@ -271,14 +271,27 @@ public:
     goto_program_instruction_typet type;
 
     /// Guard for gotos, assume, assert
-    /// Use get_condition() to read
+    /// Use get_condition() to read, and set_condition(c) to write.
     exprt guard;
+
+    /// Does this instruction have a condition?
+    bool has_condition() const
+    {
+      return is_goto() || is_incomplete_goto() || is_assume() || is_assert();
+    }
 
     /// Get the condition of gotos, assume, assert
     const exprt &get_condition() const
     {
-      PRECONDITION(is_goto() || is_assume() || is_assert());
+      PRECONDITION(has_condition());
       return guard;
+    }
+
+    /// Set the condition of gotos, assume, assert
+    void set_condition(exprt c)
+    {
+      PRECONDITION(has_condition());
+      guard = std::move(c);
     }
 
     // The below will eventually become a single target only.

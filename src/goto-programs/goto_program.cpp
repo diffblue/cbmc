@@ -73,10 +73,9 @@ std::ostream &goto_programt::output_instruction(
     break;
 
   case GOTO:
-    if(!instruction.guard.is_true())
+    if(!instruction.get_condition().is_true())
     {
-      out << "IF "
-          << from_expr(ns, identifier, instruction.guard)
+      out << "IF " << from_expr(ns, identifier, instruction.get_condition())
           << " THEN ";
     }
 
@@ -112,7 +111,7 @@ std::ostream &goto_programt::output_instruction(
       out << "ASSERT ";
 
     {
-      out << from_expr(ns, identifier, instruction.guard);
+      out << from_expr(ns, identifier, instruction.get_condition());
 
       const irep_idt &comment=instruction.source_location.get_comment();
       if(comment!="")
@@ -276,7 +275,7 @@ std::list<exprt> expressions_read(
   case ASSUME:
   case ASSERT:
   case GOTO:
-    dest.push_back(instruction.guard);
+    dest.push_back(instruction.get_condition());
     break;
 
   case RETURN:
@@ -416,9 +415,9 @@ std::string as_string(
     return "(NO INSTRUCTION TYPE)";
 
   case GOTO:
-    if(!i.guard.is_true())
+    if(!i.get_condition().is_true())
     {
-      result += "IF " + from_expr(ns, function, i.guard) + " THEN ";
+      result += "IF " + from_expr(ns, function, i.get_condition()) + " THEN ";
     }
 
     result+="GOTO ";
@@ -449,7 +448,7 @@ std::string as_string(
     else
       result+="ASSERT ";
 
-    result += from_expr(ns, function, i.guard);
+    result += from_expr(ns, function, i.get_condition());
 
     {
       const irep_idt &comment=i.source_location.get_comment();
@@ -634,7 +633,7 @@ void goto_programt::copy_from(const goto_programt &src)
 bool goto_programt::has_assertion() const
 {
   for(const auto &i : instructions)
-    if(i.is_assert() && !i.guard.is_true())
+    if(i.is_assert() && !i.get_condition().is_true())
       return true;
 
   return false;

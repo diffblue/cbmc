@@ -43,11 +43,10 @@ goto_programt::targett acceleratet::find_back_jump(
       ++it)
   {
     goto_programt::targett t=*it;
-    if(t->is_goto() &&
-        t->guard.is_true() &&
-        t->targets.size()==1 &&
-        t->targets.front()==loop_header &&
-        t->location_number > back_jump->location_number)
+    if(
+      t->is_goto() && t->get_condition().is_true() && t->targets.size() == 1 &&
+      t->targets.front() == loop_header &&
+      t->location_number > back_jump->location_number)
     {
       back_jump=t;
     }
@@ -394,7 +393,8 @@ void acceleratet::add_dirty_checks()
     // the right hand side of an assignment.  Assume each is not dirty.
     find_symbols_sett read;
 
-    find_symbols(it->guard, read);
+    if(it->has_condition())
+      find_symbols(it->get_condition(), read);
 
     if(it->is_assign())
     {

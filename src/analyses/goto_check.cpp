@@ -1671,7 +1671,8 @@ void goto_checkt::goto_check(
        i.is_target())
       assertions.clear();
 
-    check(i.guard);
+    if(i.has_condition())
+      check(i.get_condition());
 
     // magic ERROR label?
     for(const auto &label : error_labels)

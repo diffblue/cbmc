@@ -109,9 +109,12 @@ void goto_convert_functionst::add_return(
     while(true)
     {
       // unconditional goto, say from while(1)?
-      if(last_instruction->is_goto() &&
-         last_instruction->guard.is_true())
+      if(
+        last_instruction->is_goto() &&
+        last_instruction->get_condition().is_true())
+      {
         return;
+      }
 
       // return?
       if(last_instruction->is_return())

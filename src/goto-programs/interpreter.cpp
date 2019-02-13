@@ -368,7 +368,7 @@ void interpretert::step()
 /// executes a goto instruction
 void interpretert::execute_goto()
 {
-  if(evaluate_boolean(pc->guard))
+  if(evaluate_boolean(pc->get_condition()))
   {
     if(pc->targets.empty())
       throw "taken goto without target";
@@ -728,13 +728,13 @@ void interpretert::assign(
 
 void interpretert::execute_assume()
 {
-  if(!evaluate_boolean(pc->guard))
+  if(!evaluate_boolean(pc->get_condition()))
     throw "assumption failed";
 }
 
 void interpretert::execute_assert()
 {
-  if(!evaluate_boolean(pc->guard))
+  if(!evaluate_boolean(pc->get_condition()))
   {
     if((target_assert==pc) || stop_on_assertion)
       throw "program assertion reached";

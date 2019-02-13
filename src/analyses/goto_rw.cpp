@@ -762,7 +762,10 @@ void goto_rw(
   case ASSUME:
   case ASSERT:
     rw_set.get_objects_rec(
-      function, target, rw_range_sett::get_modet::READ, target->guard);
+      function,
+      target,
+      rw_range_sett::get_modet::READ,
+      target->get_condition());
     break;
 
   case RETURN:

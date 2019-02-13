@@ -256,7 +256,7 @@ bool static_verifier(
       if(!i_it->is_assert())
         continue;
 
-      exprt e(i_it->guard);
+      exprt e(i_it->get_condition());
       auto dp = ai.abstract_state_before(i_it);
       const ai_domain_baset &domain(*dp);
       domain.ai_simplify(e, ns);

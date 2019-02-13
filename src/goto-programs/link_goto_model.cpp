@@ -33,7 +33,13 @@ static void rename_symbols_in_function(
   Forall_goto_program_instructions(iit, program)
   {
     rename_symbol(iit->code);
-    rename_symbol(iit->guard);
+
+    if(iit->has_condition())
+    {
+      exprt c = iit->get_condition();
+      rename_symbol(c);
+      iit->set_condition(c);
+    }
   }
 }
 
@@ -144,7 +150,9 @@ static bool link_functions(
       Forall_goto_program_instructions(iit, dest_it->second.body)
       {
         object_type_updates(iit->code);
-        object_type_updates(iit->guard);
+
+        if(iit->has_condition())
+          object_type_updates(iit->guard);
       }
   }
 

@@ -81,8 +81,8 @@ void show_properties(
         property_l=xml(source_location);
 
         xml_property.new_element("description").data=id2string(description);
-        xml_property.new_element("expression").data=
-          from_expr(ns, identifier, ins.guard);
+        xml_property.new_element("expression").data =
+          from_expr(ns, identifier, ins.get_condition());
 
         msg.result() << xml_property;
       }
@@ -97,7 +97,8 @@ void show_properties(
 
       msg.result() << "  " << ins.source_location << '\n'
                    << "  " << description << '\n'
-                   << "  " << from_expr(ns, identifier, ins.guard) << '\n';
+                   << "  " << from_expr(ns, identifier, ins.get_condition())
+                   << '\n';
 
       msg.result() << messaget::eom;
       break;
@@ -134,7 +135,8 @@ void convert_properties_json(
       {"class", json_stringt(property_class)},
       {"sourceLocation", json(source_location)},
       {"description", json_stringt(description)},
-      {"expression", json_stringt(from_expr(ns, identifier, ins.guard))}};
+      {"expression",
+       json_stringt(from_expr(ns, identifier, ins.get_condition()))}};
 
     if(!source_location.get_basic_block_covered_lines().empty())
       json_property["coveredLines"] =

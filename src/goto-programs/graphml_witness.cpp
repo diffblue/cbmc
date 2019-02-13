@@ -160,7 +160,7 @@ static bool filter_out(
      prev_it->pc->source_location==it->pc->source_location)
     return true;
 
-  if(it->is_goto() && it->pc->guard.is_true())
+  if(it->is_goto() && it->pc->get_condition().is_true())
     return true;
 
   const source_locationt &source_location=it->pc->source_location;
@@ -376,12 +376,12 @@ void graphml_witnesst::operator()(const symex_target_equationt &equation)
   {
     const source_locationt &source_location=it->source.pc->source_location;
 
-    if(it->hidden ||
-       (!it->is_assignment() && !it->is_goto() && !it->is_assert()) ||
-       (it->is_goto() && it->source.pc->guard.is_true()) ||
-       source_location.is_nil() ||
-       source_location.is_built_in() ||
-       source_location.get_line().empty())
+    if(
+      it->hidden ||
+      (!it->is_assignment() && !it->is_goto() && !it->is_assert()) ||
+      (it->is_goto() && it->source.pc->get_condition().is_true()) ||
+      source_location.is_nil() || source_location.is_built_in() ||
+      source_location.get_line().empty())
     {
       step_to_node[step_nr]=sink;
 

@@ -756,11 +756,13 @@ void constant_propagator_ait::replace(
       continue;
 
     replace_types_rec(d.values.replace_const, it->code);
-    replace_types_rec(d.values.replace_const, it->guard);
 
     if(it->is_goto() || it->is_assume() || it->is_assert())
     {
-      constant_propagator_domaint::partial_evaluate(d.values, it->guard, ns);
+      exprt c = it->get_condition();
+      replace_types_rec(d.values.replace_const, c);
+      constant_propagator_domaint::partial_evaluate(d.values, c, ns);
+      it->set_condition(c);
     }
     else if(it->is_assign())
     {
