@@ -178,6 +178,7 @@ public:
   class instructiont final
   {
   public:
+    /// Do not read or modify directly -- use get_X() instead
     codet code;
 
     /// Get the assignment for ASSIGN
@@ -352,34 +353,64 @@ public:
       clear(SKIP);
     }
 
+    DEPRECATED("use goto_programt::make_return() instead")
     void make_return() { clear(RETURN); }
+
+    DEPRECATED("use goto_programt::make_skip() instead")
     void make_skip() { clear(SKIP); }
+
+    DEPRECATED("use goto_programt::make_location() instead")
     void make_location(const source_locationt &l)
     { clear(LOCATION); source_location=l; }
+
+    DEPRECATED("use goto_programt::make_throw() instead")
     void make_throw() { clear(THROW); }
+
+    DEPRECATED("use goto_programt::make_catch() instead")
     void make_catch() { clear(CATCH); }
+
+    DEPRECATED("use goto_programt::make_assertion() instead")
     void make_assertion(const exprt &g) { clear(ASSERT); guard=g; }
+
+    DEPRECATED("use goto_programt::make_assumption() instead")
     void make_assumption(const exprt &g) { clear(ASSUME); guard=g; }
+
+    DEPRECATED("use goto_programt::make_assignment() instead")
     void make_assignment() { clear(ASSIGN); }
+
+    DEPRECATED("use goto_programt::make_other() instead")
     void make_other(const codet &_code) { clear(OTHER); code=_code; }
+
+    DEPRECATED("use goto_programt::make_decl() instead")
     void make_decl() { clear(DECL); }
+
+    DEPRECATED("use goto_programt::make_dead() instead")
     void make_dead() { clear(DEAD); }
+
+    DEPRECATED("use goto_programt::make_atomic_begin() instead")
     void make_atomic_begin() { clear(ATOMIC_BEGIN); }
+
+    DEPRECATED("use goto_programt::make_atomic_end() instead")
     void make_atomic_end() { clear(ATOMIC_END); }
+
+    DEPRECATED("use goto_programt::make_atomic_end_function() instead")
     void make_end_function() { clear(END_FUNCTION); }
 
+    DEPRECATED("use goto_programt::make_incomplete_goto() instead")
     void make_incomplete_goto(const code_gotot &_code)
     {
       clear(INCOMPLETE_GOTO);
       code = _code;
     }
 
+    DEPRECATED("use goto_programt::make_goto() instead")
     void make_goto(targett _target)
     {
       clear(GOTO);
       targets.push_back(_target);
     }
 
+    DEPRECATED("use goto_programt::make_goto() instead")
     void make_goto(targett _target, const exprt &g)
     {
       make_goto(_target);
@@ -394,18 +425,21 @@ public:
       type = GOTO;
     }
 
+    DEPRECATED("use goto_programt::make_assignment() instead")
     void make_assignment(const code_assignt &_code)
     {
       clear(ASSIGN);
       code=_code;
     }
 
+    DEPRECATED("use goto_programt::make_decl() instead")
     void make_decl(const code_declt &_code)
     {
       clear(DECL);
       code=_code;
     }
 
+    DEPRECATED("use goto_programt::make_function_call() instead")
     void make_function_call(const code_function_callt &_code)
     {
       clear(FUNCTION_CALL);
