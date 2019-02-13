@@ -451,16 +451,6 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
   {
     return SUB::convert_byte_extract(to_byte_extract_expr(expr));
   }
-  else
-  {
-    INVARIANT(
-      expr.id() != ID_byte_update_little_endian,
-      "byte-wise pointer updates are unsupported");
-
-    INVARIANT(
-      expr.id() != ID_byte_update_big_endian,
-      "byte-wise pointer updates are unsupported");
-  }
 
   return conversion_failed(expr);
 }
