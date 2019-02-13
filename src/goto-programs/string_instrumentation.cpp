@@ -296,13 +296,11 @@ void string_instrumentationt::do_sprintf(
 
   if(call.lhs().is_not_nil())
   {
-    goto_programt::targett return_assignment=tmp.add_instruction(ASSIGN);
-    return_assignment->source_location=target->source_location;
-
     exprt rhs =
       side_effect_expr_nondett(call.lhs().type(), target->source_location);
 
-    return_assignment->code=code_assignt(call.lhs(), rhs);
+    tmp.add(
+      goto_programt::make_assignment(call.lhs(), rhs, target->source_location));
   }
 
   target->turn_into_skip();
@@ -337,13 +335,11 @@ void string_instrumentationt::do_snprintf(
 
   if(call.lhs().is_not_nil())
   {
-    goto_programt::targett return_assignment=tmp.add_instruction(ASSIGN);
-    return_assignment->source_location=target->source_location;
-
     exprt rhs =
       side_effect_expr_nondett(call.lhs().type(), target->source_location);
 
-    return_assignment->code=code_assignt(call.lhs(), rhs);
+    tmp.add(
+      goto_programt::make_assignment(call.lhs(), rhs, target->source_location));
   }
 
   target->turn_into_skip();
@@ -369,13 +365,11 @@ void string_instrumentationt::do_fscanf(
 
   if(call.lhs().is_not_nil())
   {
-    goto_programt::targett return_assignment=tmp.add_instruction(ASSIGN);
-    return_assignment->source_location=target->source_location;
-
     exprt rhs =
       side_effect_expr_nondett(call.lhs().type(), target->source_location);
 
-    return_assignment->code=code_assignt(call.lhs(), rhs);
+    tmp.add(
+      goto_programt::make_assignment(call.lhs(), rhs, target->source_location));
   }
 
   target->turn_into_skip();
@@ -560,14 +554,12 @@ void string_instrumentationt::do_format_string_write(
           const exprt &argument=arguments[argument_start_inx+args];
           const typet &arg_type = argument.type();
 
-          goto_programt::targett assignment=dest.add_instruction(ASSIGN);
-          assignment->source_location=target->source_location;
-
           const dereference_exprt lhs(argument, arg_type.subtype());
 
           side_effect_expr_nondett rhs(lhs.type(), target->source_location);
 
-          assignment->code=code_assignt(lhs, rhs);
+          dest.add(
+            goto_programt::make_assignment(lhs, rhs, target->source_location));
 
           args++;
           break;
@@ -602,14 +594,12 @@ void string_instrumentationt::do_format_string_write(
       }
       else
       {
-        goto_programt::targett assignment=dest.add_instruction(ASSIGN);
-        assignment->source_location=target->source_location;
-
         dereference_exprt lhs(arguments[i], arg_type.subtype());
 
         side_effect_expr_nondett rhs(lhs.type(), target->source_location);
 
-        assignment->code=code_assignt(lhs, rhs);
+        dest.add(
+          goto_programt::make_assignment(lhs, rhs, target->source_location));
       }
     }
   }
@@ -804,11 +794,8 @@ void string_instrumentationt::do_strerror(
   address_of_exprt ptr(index);
 
   // make that zero-terminated
-  {
-    goto_programt::targett assignment2=tmp.add_instruction(ASSIGN);
-    assignment2->code=code_assignt(is_zero_string(ptr, true), true_exprt());
-    assignment2->source_location=it->source_location;
-  }
+  tmp.add(goto_programt::make_assignment(
+    is_zero_string(ptr, true), true_exprt(), it->source_location));
 
   // assign address
   {
@@ -851,23 +838,21 @@ void string_instrumentationt::invalidate_buffer(
   // create a loop that runs over the buffer
   // and invalidates every element
 
-  goto_programt::targett init=dest.add_instruction(ASSIGN);
-  init->source_location=target->source_location;
-  init->code=
-    code_assignt(cntr_sym.symbol_expr(), from_integer(0, cntr_sym.type));
+  dest.add(goto_programt::make_assignment(
+    cntr_sym.symbol_expr(),
+    from_integer(0, cntr_sym.type),
+    target->source_location));
 
   goto_programt::targett check=dest.add_instruction();
 
   goto_programt::targett invalidate=dest.add_instruction(ASSIGN);
   invalidate->source_location=target->source_location;
 
-  goto_programt::targett increment=dest.add_instruction(ASSIGN);
-  increment->source_location=target->source_location;
-
   const plus_exprt plus(
     cntr_sym.symbol_expr(), from_integer(1, unsigned_int_type()));
 
-  increment->code=code_assignt(cntr_sym.symbol_expr(), plus);
+  dest.add(goto_programt::make_assignment(
+    cntr_sym.symbol_expr(), plus, target->source_location));
 
   dest.add(
     goto_programt::make_goto(check, true_exprt(), target->source_location));

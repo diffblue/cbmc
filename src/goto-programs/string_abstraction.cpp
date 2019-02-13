@@ -1281,30 +1281,27 @@ goto_programt::targett string_abstractiont::value_assignments_string_struct(
   goto_programt tmp;
 
   {
-    goto_programt::targett assignment=tmp.add_instruction(ASSIGN);
-    assignment->code=code_assignt(
-        member(lhs, whatt::IS_ZERO),
-        member(rhs, whatt::IS_ZERO));
+    goto_programt::targett assignment = tmp.add(goto_programt::make_assignment(
+      member(lhs, whatt::IS_ZERO),
+      member(rhs, whatt::IS_ZERO),
+      target->source_location));
     assignment->code.add_source_location()=target->source_location;
-    assignment->source_location=target->source_location;
   }
 
   {
-    goto_programt::targett assignment=tmp.add_instruction(ASSIGN);
-    assignment->code=code_assignt(
-        member(lhs, whatt::LENGTH),
-        member(rhs, whatt::LENGTH));
+    goto_programt::targett assignment = tmp.add(goto_programt::make_assignment(
+      member(lhs, whatt::LENGTH),
+      member(rhs, whatt::LENGTH),
+      target->source_location));
     assignment->code.add_source_location()=target->source_location;
-    assignment->source_location=target->source_location;
   }
 
   {
-    goto_programt::targett assignment=tmp.add_instruction(ASSIGN);
-    assignment->code=code_assignt(
-        member(lhs, whatt::SIZE),
-        member(rhs, whatt::SIZE));
+    goto_programt::targett assignment = tmp.add(goto_programt::make_assignment(
+      member(lhs, whatt::SIZE),
+      member(rhs, whatt::SIZE),
+      target->source_location));
     assignment->code.add_source_location()=target->source_location;
-    assignment->source_location=target->source_location;
   }
 
   goto_programt::targett last=target;
