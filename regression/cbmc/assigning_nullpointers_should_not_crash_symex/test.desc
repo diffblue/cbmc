@@ -1,0 +1,10 @@
+KNOWNBUG
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+This tests for the regression described in https://github.com/diffblue/cbmc/issues/4168
