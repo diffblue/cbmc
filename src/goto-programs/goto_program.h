@@ -945,11 +945,22 @@ public:
       {_target});
   }
 
+  /// Create an assignment instruction
   static instructiont make_assignment(
     const code_assignt &_code,
     const source_locationt &l = source_locationt::nil())
   {
     return instructiont(_code, l, ASSIGN, nil_exprt(), {});
+  }
+
+  /// Create an assignment instruction
+  static instructiont make_assignment(
+    exprt lhs,
+    exprt rhs,
+    const source_locationt &l = source_locationt::nil())
+  {
+    return instructiont(
+      code_assignt(std::move(lhs), std::move(rhs)), l, ASSIGN, nil_exprt(), {});
   }
 
   static instructiont make_decl(
@@ -959,11 +970,26 @@ public:
     return instructiont(_code, l, DECL, nil_exprt(), {});
   }
 
+  /// Create a function call instruction
   static instructiont make_function_call(
     const code_function_callt &_code,
     const source_locationt &l = source_locationt::nil())
   {
     return instructiont(_code, l, FUNCTION_CALL, nil_exprt(), {});
+  }
+
+  /// Create a function call instruction
+  static instructiont make_function_call(
+    exprt function,
+    code_function_callt::argumentst arguments,
+    const source_locationt &l = source_locationt::nil())
+  {
+    return instructiont(
+      code_function_callt(std::move(function), std::move(arguments)),
+      l,
+      FUNCTION_CALL,
+      nil_exprt(),
+      {});
   }
 };
 
