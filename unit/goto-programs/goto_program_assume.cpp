@@ -31,14 +31,13 @@ SCENARIO(
     binary_relation_exprt x_le_10(varx, ID_le, val10);
 
     goto_functiont goto_function;
-    auto &instructions = goto_function.body.instructions;
-    instructions.emplace_back(goto_program_instruction_typet::ASSUME);
+    auto assertion =
+      goto_function.body.add(goto_programt::make_assertion(x_le_10));
 
     symbol.type = type1;
     symbol_table.insert(symbol);
     symbol_table.insert(fun_symbol);
     namespacet ns(symbol_table);
-    instructions.back() = goto_programt::make_assertion(x_le_10);
 
     WHEN("Instruction has no targets")
     {
@@ -51,7 +50,7 @@ SCENARIO(
 
     WHEN("Instruction has a target")
     {
-      instructions.back().targets.push_back(instructions.begin());
+      assertion->targets.push_back(assertion);
       THEN("The consistency check fails")
       {
         REQUIRE_THROWS_AS(

@@ -32,8 +32,7 @@ SCENARIO(
     symbol_exprt var_a(var_symbol_name, type1);
 
     goto_functiont goto_function;
-    auto &instructions = goto_function.body.instructions;
-    instructions.emplace_back(goto_programt::make_decl(var_a));
+    goto_function.body.add(goto_programt::make_decl(var_a));
     symbol_table.insert(fun_symbol);
 
     WHEN("Declaring known symbol")
