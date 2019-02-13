@@ -19,6 +19,7 @@ Author: Diffblue Ltd.
 
 #include "function_harness_generator_options.h"
 #include "goto_harness_parse_options.h"
+#include "recursive_initialization.h"
 
 /// This contains implementation details of
 /// function call harness generator to avoid
@@ -32,6 +33,9 @@ struct function_call_harness_generatort::implt
   symbol_tablet *symbol_table;
   goto_functionst *goto_functions;
   bool nondet_globals = false;
+
+  recursive_initialization_configt recursive_initialization_config;
+  std::unique_ptr<recursive_initializationt> recursive_initialization;
 
   /// \see goto_harness_generatort::generate
   void generate(goto_modelt &goto_model, const irep_idt &harness_function_name);
@@ -71,6 +75,18 @@ void function_call_harness_generatort::handle_option(
   else if(option == FUNCTION_HARNESS_GENERATOR_NONDET_GLOBALS_OPT)
   {
     p_impl->nondet_globals = true;
+  }
+  else if(option == FUNCTION_HARNESS_GENERATOR_MIN_NULL_TREE_DEPTH_OPT)
+  {
+    auto const value = require_exactly_one_value(option, values);
+    p_impl->recursive_initialization_config.min_null_tree_depth =
+      std::stoul(value);
+  }
+  else if(option == FUNCTION_HARNESS_GENERATOR_MAX_NONDET_TREE_DEPTH_OPT)
+  {
+    auto const value = require_exactly_one_value(option, values);
+    p_impl->recursive_initialization_config.max_nondet_tree_depth =
+      std::stoul(value);
   }
   else
   {
@@ -123,6 +139,10 @@ void function_call_harness_generatort::implt::generate(
 {
   symbol_table = &goto_model.symbol_table;
   goto_functions = &goto_model.goto_functions;
+  const auto &function_to_call = lookup_function_to_call();
+  recursive_initialization_config.mode = function_to_call.mode;
+  recursive_initialization = util_make_unique<recursive_initializationt>(
+    recursive_initialization_config, goto_model);
   this->harness_function_name = harness_function_name;
   ensure_harness_does_not_already_exist();
 
@@ -156,7 +176,7 @@ void function_call_harness_generatort::implt::generate_initialisation_code_for(
   code_blockt &block,
   const exprt &lhs)
 {
-  block.add(code_assignt{lhs, side_effect_expr_nondett{lhs.type()}});
+  recursive_initialization->initialize(lhs, 0, block);
 }
 
 void function_call_harness_generatort::validate_options()

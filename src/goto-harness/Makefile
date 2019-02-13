@@ -4,6 +4,7 @@ SRC = \
   goto_harness_generator_factory.cpp \
   goto_harness_main.cpp \
   goto_harness_parse_options.cpp \
+  recursive_initialization.cpp \
   # Empty last line
 
 OBJ += \
