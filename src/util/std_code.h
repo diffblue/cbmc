@@ -1255,10 +1255,8 @@ inline void validate_expr(const code_function_callt &x)
 class code_returnt:public codet
 {
 public:
-  code_returnt():codet(ID_return)
+  code_returnt() : codet(ID_return, {nil_exprt()})
   {
-    operands().resize(1);
-    op0().make_nil();
   }
 
   explicit code_returnt(const exprt &_op) : codet(ID_return, {_op})
@@ -1277,8 +1275,6 @@ public:
 
   bool has_return_value() const
   {
-    if(operands().empty())
-      return false; // backwards compatibility
     return return_value().is_not_nil();
   }
 

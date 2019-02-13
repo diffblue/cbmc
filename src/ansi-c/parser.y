@@ -2426,7 +2426,11 @@ jump_statement:
         | TOK_BREAK ';'
         { $$=$1; statement($$, ID_break); }
         | TOK_RETURN ';'
-        { $$=$1; statement($$, ID_return); }
+        {
+          $$=$1;
+          statement($$, ID_return);
+          stack($$).operands().push_back(nil_exprt());
+        }
         | TOK_RETURN comma_expression ';'
         { $$=$1; statement($$, ID_return); mto($$, $2); }
         ;

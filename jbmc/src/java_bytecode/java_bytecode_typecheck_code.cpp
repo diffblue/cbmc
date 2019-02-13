@@ -52,8 +52,8 @@ void java_bytecode_typecheckt::typecheck_code(codet &code)
   }
   else if(statement==ID_return)
   {
-    if(code.operands().size()==1)
-      typecheck_expr(code.op0());
+    code_returnt &code_return = to_code_return(code);
+    typecheck_expr(code_return.return_value());
   }
   else if(statement==ID_function_call)
   {

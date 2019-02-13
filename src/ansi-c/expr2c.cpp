@@ -2587,8 +2587,7 @@ std::string expr2ct::convert_code_return(
   const codet &src,
   unsigned indent)
 {
-  if(!src.operands().empty() &&
-     src.operands().size()!=1)
+  if(src.operands().size() != 1)
   {
     unsigned precedence;
     return convert_norep(src, precedence);

@@ -1510,11 +1510,13 @@ void value_sett::apply_code_rec(
   }
   else if(statement==ID_return)
   {
+    const code_returnt &code_return = to_code_return(code);
     // this is turned into an assignment
-    if(code.operands().size()==1)
+    if(code_return.has_return_value())
     {
-      symbol_exprt lhs("value_set::return_value", code.op0().type());
-      assign(lhs, code.op0(), ns, false, false);
+      symbol_exprt lhs(
+        "value_set::return_value", code_return.return_value().type());
+      assign(lhs, code_return.return_value(), ns, false, false);
     }
   }
   else if(statement==ID_array_set)

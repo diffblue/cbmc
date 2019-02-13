@@ -415,12 +415,10 @@ void java_bytecode_instrumentt::instrument_code(codet &code)
   }
   else if(statement==ID_return)
   {
-    if(code.operands().size()==1)
-    {
-      code_blockt block;
-      add_expr_instrumentation(block, code.op0());
-      prepend_instrumentation(code, block);
-    }
+    code_blockt block;
+    code_returnt &code_return = to_code_return(code);
+    add_expr_instrumentation(block, code_return.return_value());
+    prepend_instrumentation(code, block);
   }
   else if(statement==ID_function_call)
   {

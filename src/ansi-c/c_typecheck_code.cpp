@@ -68,7 +68,7 @@ void c_typecheck_baset::typecheck_code(codet &code)
   else if(statement==ID_continue)
     typecheck_continue(code);
   else if(statement==ID_return)
-    typecheck_return(code);
+    typecheck_return(to_code_return(code));
   else if(statement==ID_decl)
     typecheck_decl(code);
   else if(statement==ID_assign)
@@ -630,49 +630,40 @@ void c_typecheck_baset::typecheck_start_thread(codet &code)
   typecheck_code(to_code(code.op0()));
 }
 
-void c_typecheck_baset::typecheck_return(codet &code)
+void c_typecheck_baset::typecheck_return(code_returnt &code)
 {
-  if(code.operands().empty())
+  if(code.has_return_value())
   {
-    if(
-      return_type.id() != ID_empty && return_type.id() != ID_constructor &&
-      return_type.id() != ID_destructor)
-    {
-      // gcc doesn't actually complain, it just warns!
-      warning().source_location = code.source_location();
-      warning() << "non-void function should return a value" << eom;
-
-      code.copy_to_operands(
-        side_effect_expr_nondett(return_type, code.source_location()));
-    }
-  }
-  else if(code.operands().size()==1)
-  {
-    typecheck_expr(code.op0());
+    typecheck_expr(code.return_value());
 
     if(return_type.id() == ID_empty)
     {
       // gcc doesn't actually complain, it just warns!
-      if(code.op0().type().id() != ID_empty)
+      if(code.return_value().type().id() != ID_empty)
       {
         warning().source_location=code.source_location();
 
         warning() << "function has return void ";
         warning() << "but a return statement returning ";
-        warning() << to_string(code.op0().type());
+        warning() << to_string(code.return_value().type());
         warning() << eom;
 
-        code.op0() = typecast_exprt(code.op0(), return_type);
+        code.return_value() = typecast_exprt(code.return_value(), return_type);
       }
     }
     else
-      implicit_typecast(code.op0(), return_type);
+      implicit_typecast(code.return_value(), return_type);
   }
-  else
+  else if(
+    return_type.id() != ID_empty && return_type.id() != ID_constructor &&
+    return_type.id() != ID_destructor)
   {
-    error().source_location = code.source_location();
-    error() << "return expected to have 0 or 1 operands" << eom;
-    throw 0;
+    // gcc doesn't actually complain, it just warns!
+    warning().source_location = code.source_location();
+    warning() << "non-void function should return a value" << eom;
+
+    code.return_value() =
+      side_effect_expr_nondett(return_type, code.source_location());
   }
 }
 
