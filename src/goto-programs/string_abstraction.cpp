@@ -35,9 +35,9 @@ bool string_abstractiont::build_wrap(
   // #define build_wrap(a,b,c) build(a,b,c)
   // to avoid it
   const typet &a_t=build_abstraction_type(object.type());
-  /*assert(type_eq(dest.type(), a_t, ns) ||
+  /*assert(dest.type() == a_t ||
       (dest.type().id()==ID_array && a_t.id()==ID_pointer &&
-       type_eq(dest.type().subtype(), a_t.subtype(), ns)));
+       dest.type().subtype() == a_t.subtype()));
        */
   if(
     dest.type() != a_t &&
