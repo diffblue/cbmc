@@ -562,13 +562,17 @@ inline void validate_expr(const code_assumet &x)
 inline const code_assumet &to_code_assume(const codet &code)
 {
   PRECONDITION(code.get_statement() == ID_assume);
-  return static_cast<const code_assumet &>(code);
+  const code_assumet &ret = static_cast<const code_assumet &>(code);
+  validate_expr(ret);
+  return ret;
 }
 
 inline code_assumet &to_code_assume(codet &code)
 {
   PRECONDITION(code.get_statement() == ID_assume);
-  return static_cast<code_assumet &>(code);
+  code_assumet &ret = static_cast<code_assumet &>(code);
+  validate_expr(ret);
+  return ret;
 }
 
 /// A non-fatal assertion, which checks a condition then permits execution to
@@ -616,13 +620,17 @@ inline void validate_expr(const code_assertt &x)
 inline const code_assertt &to_code_assert(const codet &code)
 {
   PRECONDITION(code.get_statement() == ID_assert);
-  return static_cast<const code_assertt &>(code);
+  const code_assertt &ret = static_cast<const code_assertt &>(code);
+  validate_expr(ret);
+  return ret;
 }
 
 inline code_assertt &to_code_assert(codet &code)
 {
   PRECONDITION(code.get_statement() == ID_assert);
-  return static_cast<code_assertt &>(code);
+  code_assertt &ret = static_cast<code_assertt &>(code);
+  validate_expr(ret);
+  return ret;
 }
 
 /// Create a fatal assertion, which checks a condition and then halts if it does
@@ -722,17 +730,17 @@ inline void validate_expr(const code_ifthenelset &x)
 inline const code_ifthenelset &to_code_ifthenelse(const codet &code)
 {
   PRECONDITION(code.get_statement() == ID_ifthenelse);
-  DATA_INVARIANT(
-    code.operands().size() == 3, "if-then-else must have three operands");
-  return static_cast<const code_ifthenelset &>(code);
+  const code_ifthenelset &ret = static_cast<const code_ifthenelset &>(code);
+  validate_expr(code);
+  return ret;
 }
 
 inline code_ifthenelset &to_code_ifthenelse(codet &code)
 {
   PRECONDITION(code.get_statement() == ID_ifthenelse);
-  DATA_INVARIANT(
-    code.operands().size() == 3, "if-then-else must have three operands");
-  return static_cast<code_ifthenelset &>(code);
+  code_ifthenelset &ret = static_cast<code_ifthenelset &>(code);
+  validate_expr(code);
+  return ret;
 }
 
 /// \ref codet representing a `switch` statement.
@@ -790,15 +798,17 @@ inline void validate_expr(const code_switcht &x)
 inline const code_switcht &to_code_switch(const codet &code)
 {
   PRECONDITION(code.get_statement() == ID_switch);
-  DATA_INVARIANT(code.operands().size() == 2, "switch must have two operands");
-  return static_cast<const code_switcht &>(code);
+  const code_switcht &ret = static_cast<const code_switcht &>(code);
+  validate_expr(code);
+  return ret;
 }
 
 inline code_switcht &to_code_switch(codet &code)
 {
   PRECONDITION(code.get_statement() == ID_switch);
-  DATA_INVARIANT(code.operands().size() == 2, "switch must have two operands");
-  return static_cast<code_switcht &>(code);
+  code_switcht &ret = static_cast<code_switcht &>(code);
+  validate_expr(code);
+  return ret;
 }
 
 /// \ref codet representing a `while` statement.
@@ -856,15 +866,17 @@ inline void validate_expr(const code_whilet &x)
 inline const code_whilet &to_code_while(const codet &code)
 {
   PRECONDITION(code.get_statement() == ID_while);
-  DATA_INVARIANT(code.operands().size() == 2, "while must have two operands");
-  return static_cast<const code_whilet &>(code);
+  const code_whilet &ret = static_cast<const code_whilet &>(code);
+  validate_expr(code);
+  return ret;
 }
 
 inline code_whilet &to_code_while(codet &code)
 {
   PRECONDITION(code.get_statement() == ID_while);
-  DATA_INVARIANT(code.operands().size() == 2, "while must have two operands");
-  return static_cast<code_whilet &>(code);
+  code_whilet &ret = static_cast<code_whilet &>(code);
+  validate_expr(code);
+  return ret;
 }
 
 /// \ref codet representation of a `do while` statement.
@@ -922,17 +934,17 @@ inline void validate_expr(const code_dowhilet &x)
 inline const code_dowhilet &to_code_dowhile(const codet &code)
 {
   PRECONDITION(code.get_statement() == ID_dowhile);
-  DATA_INVARIANT(
-    code.operands().size() == 2, "do-while must have two operands");
-  return static_cast<const code_dowhilet &>(code);
+  const code_dowhilet &ret = static_cast<const code_dowhilet &>(code);
+  validate_expr(code);
+  return ret;
 }
 
 inline code_dowhilet &to_code_dowhile(codet &code)
 {
   PRECONDITION(code.get_statement() == ID_dowhile);
-  DATA_INVARIANT(
-    code.operands().size() == 2, "do-while must have two operands");
-  return static_cast<code_dowhilet &>(code);
+  code_dowhilet &ret = static_cast<code_dowhilet &>(code);
+  validate_expr(code);
+  return ret;
 }
 
 /// \ref codet representation of a `for` statement.
@@ -1017,15 +1029,17 @@ inline void validate_expr(const code_fort &x)
 inline const code_fort &to_code_for(const codet &code)
 {
   PRECONDITION(code.get_statement() == ID_for);
-  DATA_INVARIANT(code.operands().size() == 4, "for must have four operands");
-  return static_cast<const code_fort &>(code);
+  const code_fort &ret = static_cast<const code_fort &>(code);
+  validate_expr(code);
+  return ret;
 }
 
 inline code_fort &to_code_for(codet &code)
 {
   PRECONDITION(code.get_statement() == ID_for);
-  DATA_INVARIANT(code.operands().size() == 4, "for must have four operands");
-  return static_cast<code_fort &>(code);
+  code_fort &ret = static_cast<code_fort &>(code);
+  validate_expr(code);
+  return ret;
 }
 
 /// \ref codet representation of a `goto` statement.
@@ -1072,15 +1086,17 @@ inline void validate_expr(const code_gotot &x)
 inline const code_gotot &to_code_goto(const codet &code)
 {
   PRECONDITION(code.get_statement() == ID_goto);
-  DATA_INVARIANT(code.operands().empty(), "goto must not have operands");
-  return static_cast<const code_gotot &>(code);
+  const code_gotot &ret = static_cast<const code_gotot &>(code);
+  validate_expr(code);
+  return ret;
 }
 
 inline code_gotot &to_code_goto(codet &code)
 {
   PRECONDITION(code.get_statement() == ID_goto);
-  DATA_INVARIANT(code.operands().empty(), "goto must not have operands");
-  return static_cast<code_gotot &>(code);
+  code_gotot &ret = static_cast<code_gotot &>(code);
+  validate_expr(code);
+  return ret;
 }
 
 /// \ref codet representation of a function call statement.
@@ -1370,15 +1386,17 @@ inline void validate_expr(const code_labelt &x)
 inline const code_labelt &to_code_label(const codet &code)
 {
   PRECONDITION(code.get_statement() == ID_label);
-  DATA_INVARIANT(code.operands().size() == 1, "label must have one operand");
-  return static_cast<const code_labelt &>(code);
+  const code_labelt &ret = static_cast<const code_labelt &>(code);
+  validate_expr(code);
+  return ret;
 }
 
 inline code_labelt &to_code_label(codet &code)
 {
   PRECONDITION(code.get_statement() == ID_label);
-  DATA_INVARIANT(code.operands().size() == 1, "label must have one operand");
-  return static_cast<code_labelt &>(code);
+  code_labelt &ret = static_cast<code_labelt &>(code);
+  validate_expr(code);
+  return ret;
 }
 
 /// \ref codet representation of a switch-case, i.e.\ a `case` statement within
@@ -1447,17 +1465,17 @@ inline void validate_expr(const code_switch_caset &x)
 inline const code_switch_caset &to_code_switch_case(const codet &code)
 {
   PRECONDITION(code.get_statement() == ID_switch_case);
-  DATA_INVARIANT(
-    code.operands().size() == 2, "switch-case must have two operands");
-  return static_cast<const code_switch_caset &>(code);
+  const code_switch_caset &ret = static_cast<const code_switch_caset &>(code);
+  validate_expr(code);
+  return ret;
 }
 
 inline code_switch_caset &to_code_switch_case(codet &code)
 {
   PRECONDITION(code.get_statement() == ID_switch_case);
-  DATA_INVARIANT(
-    code.operands().size() == 2, "switch-case must have two operands");
-  return static_cast<code_switch_caset &>(code);
+  code_switch_caset &ret = static_cast<code_switch_caset &>(code);
+  validate_expr(code);
+  return ret;
 }
 
 /// \ref codet representation of a switch-case, i.e.\ a `case` statement
@@ -1531,19 +1549,19 @@ inline const code_gcc_switch_case_ranget &
 to_code_gcc_switch_case_range(const codet &code)
 {
   PRECONDITION(code.get_statement() == ID_gcc_switch_case_range);
-  DATA_INVARIANT(
-    code.operands().size() == 3,
-    "gcc-switch-case-range must have three operands");
-  return static_cast<const code_gcc_switch_case_ranget &>(code);
+  const code_gcc_switch_case_ranget &ret =
+    static_cast<const code_gcc_switch_case_ranget &>(code);
+  validate_expr(code);
+  return ret;
 }
 
 inline code_gcc_switch_case_ranget &to_code_gcc_switch_case_range(codet &code)
 {
   PRECONDITION(code.get_statement() == ID_gcc_switch_case_range);
-  DATA_INVARIANT(
-    code.operands().size() == 3,
-    "gcc-switch-case-range must have three operands");
-  return static_cast<code_gcc_switch_case_ranget &>(code);
+  code_gcc_switch_case_ranget &ret =
+    static_cast<code_gcc_switch_case_ranget &>(code);
+  validate_expr(code);
+  return ret;
 }
 
 /// \ref codet representation of a `break` statement (within a `for` or `while`
@@ -1744,18 +1762,18 @@ inline code_asm_gcct &to_code_asm_gcc(codet &code)
 {
   PRECONDITION(code.get_statement() == ID_asm);
   PRECONDITION(to_code_asm(code).get_flavor() == ID_gcc);
-  DATA_INVARIANT(
-    code.operands().size() == 5, "code_asm_gcc must have give operands");
-  return static_cast<code_asm_gcct &>(code);
+  code_asm_gcct &ret = static_cast<code_asm_gcct &>(code);
+  validate_expr(code);
+  return ret;
 }
 
 inline const code_asm_gcct &to_code_asm_gcc(const codet &code)
 {
   PRECONDITION(code.get_statement() == ID_asm);
   PRECONDITION(to_code_asm(code).get_flavor() == ID_gcc);
-  DATA_INVARIANT(
-    code.operands().size() == 5, "code_asm_gcc must have give operands");
-  return static_cast<const code_asm_gcct &>(code);
+  const code_asm_gcct &ret = static_cast<const code_asm_gcct &>(code);
+  validate_expr(code);
+  return ret;
 }
 
 /// \ref codet representation of an expression statement.
@@ -1803,17 +1821,17 @@ inline void validate_expr(const code_expressiont &x)
 inline code_expressiont &to_code_expression(codet &code)
 {
   PRECONDITION(code.get_statement() == ID_expression);
-  DATA_INVARIANT(
-    code.operands().size() == 1, "expression statement must have one operand");
-  return static_cast<code_expressiont &>(code);
+  code_expressiont &ret = static_cast<code_expressiont &>(code);
+  validate_expr(code);
+  return ret;
 }
 
 inline const code_expressiont &to_code_expression(const codet &code)
 {
   PRECONDITION(code.get_statement() == ID_expression);
-  DATA_INVARIANT(
-    code.operands().size() == 1, "expression statement must have one operand");
-  return static_cast<const code_expressiont &>(code);
+  const code_expressiont &ret = static_cast<const code_expressiont &>(code);
+  validate_expr(code);
+  return ret;
 }
 
 /// An expression containing a side effect.
@@ -2456,17 +2474,17 @@ inline void validate_expr(const code_try_catcht &x)
 inline const code_try_catcht &to_code_try_catch(const codet &code)
 {
   PRECONDITION(code.get_statement() == ID_try_catch);
-  DATA_INVARIANT(
-    code.operands().size() >= 3, "try-catch must have three or more operands");
-  return static_cast<const code_try_catcht &>(code);
+  const code_try_catcht &ret = static_cast<const code_try_catcht &>(code);
+  validate_expr(code);
+  return ret;
 }
 
 inline code_try_catcht &to_code_try_catch(codet &code)
 {
   PRECONDITION(code.get_statement() == ID_try_catch);
-  DATA_INVARIANT(
-    code.operands().size() >= 3, "try-catch must have three or more operands");
-  return static_cast<code_try_catcht &>(code);
+  code_try_catcht &ret = static_cast<code_try_catcht &>(code);
+  validate_expr(code);
+  return ret;
 }
 
 /// This class is used to interface between a language frontend
