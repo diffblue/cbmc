@@ -412,8 +412,11 @@ public:
     const codet &code,
     const validation_modet vm = validation_modet::INVARIANT)
   {
+    // will be size()==1 in the future
     DATA_CHECK(
-      vm, code.operands().size() == 1, "declaration must have one operand");
+      vm,
+      code.operands().size() >= 1,
+      "declaration must have one or more operands");
     DATA_CHECK(
       vm,
       code.op0().id() == ID_symbol,
