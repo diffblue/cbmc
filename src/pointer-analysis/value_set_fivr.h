@@ -24,6 +24,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "object_numbering.h"
 
+class codet;
+
 class value_set_fivrt
 {
 public:
@@ -307,9 +309,7 @@ public:
     object_mapt &dest,
     const object_mapt &src) const;
 
-  void apply_code(
-    const exprt &code,
-    const namespacet &ns);
+  void apply_code(const codet &code, const namespacet &ns);
 
   bool handover();
 

@@ -24,6 +24,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "object_numbering.h"
 
+class codet;
+
 class value_set_fit
 {
 public:
@@ -271,9 +273,7 @@ public:
     return make_union(new_values.values);
   }
 
-  void apply_code(
-    const exprt &code,
-    const namespacet &ns);
+  void apply_code(const codet &code, const namespacet &ns);
 
   void assign(
     const exprt &lhs,

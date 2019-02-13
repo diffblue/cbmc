@@ -1310,16 +1310,14 @@ void value_set_fit::do_end_function(
   assign(lhs, rhs, ns);
 }
 
-void value_set_fit::apply_code(
-  const exprt &code,
-  const namespacet &ns)
+void value_set_fit::apply_code(const codet &code, const namespacet &ns)
 {
   const irep_idt &statement=code.get(ID_statement);
 
   if(statement==ID_block)
   {
-    forall_operands(it, code)
-      apply_code(*it, ns);
+    for(const auto &stmt : to_code_block(code).statements())
+      apply_code(stmt, ns);
   }
   else if(statement==ID_function_call)
   {
@@ -1372,12 +1370,13 @@ void value_set_fit::apply_code(
   }
   else if(statement==ID_return)
   {
+    const code_returnt &code_return = to_code_return(code);
     // this is turned into an assignment
-    if(code.operands().size()==1)
+    if(code_return.has_return_value())
     {
       std::string rvs="value_set::return_value"+std::to_string(from_function);
-      symbol_exprt lhs(rvs, code.op0().type());
-      assign(lhs, code.op0(), ns);
+      symbol_exprt lhs(rvs, code_return.return_value().type());
+      assign(lhs, code_return.return_value(), ns);
     }
   }
   else if(statement==ID_fence)

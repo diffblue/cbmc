@@ -7344,7 +7344,7 @@ bool Parser::rStatement(codet &statement)
 
     lex.get_token(tk1);
 
-    statement=codet(ID_return);
+    statement = code_returnt();
     set_location(statement, tk1);
 
     if(lex.LookAhead(0)==';')
@@ -7375,7 +7375,7 @@ bool Parser::rStatement(codet &statement)
       if(lex.get_token(tk2)!=';')
         return false;
 
-      statement.add_to_operands(std::move(exp));
+      to_code_return(statement).return_value() = std::move(exp);
     }
 
     return true;
