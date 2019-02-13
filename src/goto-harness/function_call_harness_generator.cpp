@@ -31,9 +31,13 @@ struct function_call_harness_generatort::implt
   irep_idt harness_function_name;
   symbol_tablet *symbol_table;
   goto_functionst *goto_functions;
+  bool nondet_globals = false;
 
   /// \see goto_harness_generatort::generate
   void generate(goto_modelt &goto_model, const irep_idt &harness_function_name);
+  /// Iterate over the symbol table and generate initialisation code for
+  /// globals into the function body.
+  void generate_nondet_globals(code_blockt &function_body);
   /// Non-deterministically initialise the parameters of the entry function
   /// and insert function call to the passed code block.
   void setup_parameters_and_call_entry_function(code_blockt &function_body);
@@ -63,6 +67,10 @@ void function_call_harness_generatort::handle_option(
   if(option == FUNCTION_HARNESS_GENERATOR_FUNCTION_OPT)
   {
     p_impl->function = require_exactly_one_value(option, values);
+  }
+  else if(option == FUNCTION_HARNESS_GENERATOR_NONDET_GLOBALS_OPT)
+  {
+    p_impl->nondet_globals = true;
   }
   else
   {
@@ -121,8 +129,27 @@ void function_call_harness_generatort::implt::generate(
   // create body for the function
   code_blockt function_body{};
 
+  generate_nondet_globals(function_body);
   setup_parameters_and_call_entry_function(function_body);
   add_harness_function_to_goto_model(std::move(function_body));
+}
+
+void function_call_harness_generatort::implt::generate_nondet_globals(
+  code_blockt &function_body)
+{
+  if(nondet_globals)
+  {
+    for(const auto &symbol_table_entry : *symbol_table)
+    {
+      const auto &symbol = symbol_table_entry.second;
+      if(
+        symbol.is_static_lifetime && symbol.is_lvalue &&
+        !has_prefix(id2string(symbol.name), CPROVER_PREFIX))
+      {
+        generate_initialisation_code_for(function_body, symbol.symbol_expr());
+      }
+    }
+  }
 }
 
 void function_call_harness_generatort::implt::generate_initialisation_code_for(
