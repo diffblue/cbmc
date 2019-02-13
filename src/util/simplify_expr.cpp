@@ -570,6 +570,17 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
         expr=from_integer(int_value, expr_type);
         return false;
       }
+      else if(expr_type_id == ID_c_enum_tag)
+      {
+        const auto &c_enum_type = ns.follow_tag(to_c_enum_tag_type(expr_type));
+        if(!c_enum_type.is_incomplete()) // possibly incomplete
+        {
+          exprt tmp = from_integer(int_value, c_enum_type);
+          tmp.type() = expr_type; // we maintain the tag type
+          expr = tmp;
+          return false;
+        }
+      }
     }
     else if(op_type_id==ID_rational)
     {
