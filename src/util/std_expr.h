@@ -778,7 +778,7 @@ inline bool can_cast_expr<binary_exprt>(const exprt &base)
 
 inline void validate_expr(const binary_exprt &value)
 {
-  validate_operands(value, 2, "Binary expressions must have two operands");
+  binary_exprt::check(value);
 }
 
 /// \brief Cast an exprt to a \ref binary_exprt
@@ -789,18 +789,14 @@ inline void validate_expr(const binary_exprt &value)
 /// \return Object of type \ref binary_exprt
 inline const binary_exprt &to_binary_expr(const exprt &expr)
 {
-  DATA_INVARIANT(
-    expr.operands().size()==2,
-    "Binary expressions must have two operands");
+  binary_exprt::check(expr);
   return static_cast<const binary_exprt &>(expr);
 }
 
 /// \copydoc to_binary_expr(const exprt &)
 inline binary_exprt &to_binary_expr(exprt &expr)
 {
-  DATA_INVARIANT(
-    expr.operands().size()==2,
-    "Binary expressions must have two operands");
+  binary_exprt::check(expr);
   return static_cast<binary_exprt &>(expr);
 }
 
@@ -921,7 +917,7 @@ inline bool can_cast_expr<binary_relation_exprt>(const exprt &base)
 
 inline void validate_expr(const binary_relation_exprt &value)
 {
-  validate_operands(value, 2, "Binary relations must have two operands");
+  binary_relation_exprt::check(value);
 }
 
 /// \brief Cast an exprt to a \ref binary_relation_exprt
@@ -932,18 +928,14 @@ inline void validate_expr(const binary_relation_exprt &value)
 /// \return Object of type \ref binary_relation_exprt
 inline const binary_relation_exprt &to_binary_relation_expr(const exprt &expr)
 {
-  DATA_INVARIANT(
-    expr.operands().size()==2,
-    "Binary relations must have two operands");
+  binary_relation_exprt::check(expr);
   return static_cast<const binary_relation_exprt &>(expr);
 }
 
 /// \copydoc to_binary_relation_expr(const exprt &)
 inline binary_relation_exprt &to_binary_relation_expr(exprt &expr)
 {
-  DATA_INVARIANT(
-    expr.operands().size()==2,
-    "Binary relations must have two operands");
+  binary_relation_exprt::check(expr);
   return static_cast<binary_relation_exprt &>(expr);
 }
 
@@ -1457,7 +1449,7 @@ inline bool can_cast_expr<equal_exprt>(const exprt &base)
 
 inline void validate_expr(const equal_exprt &value)
 {
-  validate_operands(value, 2, "Equality must have two operands");
+  equal_exprt::check(value);
 }
 
 /// \brief Cast an exprt to an \ref equal_exprt
