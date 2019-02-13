@@ -115,6 +115,8 @@ exprt is_not_zero(
     src_type.id()==ID_floatbv?ID_ieee_float_notequal:ID_notequal;
 
   exprt zero=from_integer(0, src_type);
+  // Use tag type if applicable:
+  zero.type() = src.type();
 
   binary_relation_exprt comparison(src, id, std::move(zero));
   comparison.add_source_location()=src.source_location();
