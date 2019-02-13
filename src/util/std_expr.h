@@ -354,6 +354,11 @@ inline bool can_cast_expr<unary_exprt>(const exprt &base)
   return base.operands().size() == 1;
 }
 
+inline void validate_expr(const unary_exprt &value)
+{
+  validate_operands(value, 1, "Unary expressions must have one operand");
+}
+
 /// \brief Cast an exprt to a \ref unary_exprt
 ///
 /// \a expr must be known to be \ref unary_exprt.
@@ -774,6 +779,11 @@ inline bool can_cast_expr<binary_exprt>(const exprt &base)
   return base.operands().size() == 2;
 }
 
+inline void validate_expr(const binary_exprt &value)
+{
+  validate_operands(value, 2, "Binary expressions must have two operands");
+}
+
 /// \brief Cast an exprt to a \ref binary_exprt
 ///
 /// \a expr must be known to be \ref binary_exprt.
@@ -910,6 +920,11 @@ template <>
 inline bool can_cast_expr<binary_relation_exprt>(const exprt &base)
 {
   return can_cast_expr<binary_exprt>(base);
+}
+
+inline void validate_expr(const binary_relation_exprt &value)
+{
+  validate_operands(value, 2, "Binary relations must have two operands");
 }
 
 /// \brief Cast an exprt to a \ref binary_relation_exprt
@@ -2657,10 +2672,10 @@ inline bool can_cast_expr<bitnot_exprt>(const exprt &base)
   return base.id() == ID_bitnot;
 }
 
-// inline void validate_expr(const bitnot_exprt &value)
-// {
-//   validate_operands(value, 1, "Bit-wise not must have one operand");
-// }
+inline void validate_expr(const bitnot_exprt &value)
+{
+  validate_operands(value, 1, "Bit-wise not must have one operand");
+}
 
 /// \brief Cast an exprt to a \ref bitnot_exprt
 ///
@@ -2671,8 +2686,8 @@ inline bool can_cast_expr<bitnot_exprt>(const exprt &base)
 inline const bitnot_exprt &to_bitnot_expr(const exprt &expr)
 {
   PRECONDITION(expr.id()==ID_bitnot);
-  // DATA_INVARIANT(expr.operands().size()==1,
-  //                "Bit-wise not must have one operand");
+  DATA_INVARIANT(
+    expr.operands().size() == 1, "Bit-wise not must have one operand");
   return static_cast<const bitnot_exprt &>(expr);
 }
 
@@ -2680,8 +2695,8 @@ inline const bitnot_exprt &to_bitnot_expr(const exprt &expr)
 inline bitnot_exprt &to_bitnot_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_bitnot);
-  // DATA_INVARIANT(expr.operands().size()==1,
-  //                "Bit-wise not must have one operand");
+  DATA_INVARIANT(
+    expr.operands().size() == 1, "Bit-wise not must have one operand");
   return static_cast<bitnot_exprt &>(expr);
 }
 
@@ -2900,13 +2915,16 @@ public:
   }
 };
 
-// The to_*_expr function for this type doesn't do any checks before casting,
-// therefore the implementation is essentially a static_cast.
-// Enabling expr_dynamic_cast would hide this; instead use static_cast directly.
-// inline void validate_expr(const shift_exprt &value)
-// {
-//   validate_operands(value, 2, "Shifts must have two operands");
-// }
+template <>
+inline bool can_cast_expr<shift_exprt>(const exprt &base)
+{
+  return base.id() == ID_shl || base.id() == ID_ashr || base.id() == ID_lshr;
+}
+
+inline void validate_expr(const shift_exprt &value)
+{
+  validate_operands(value, 2, "Shifts must have two operands");
+}
 
 /// \brief Cast an exprt to a \ref shift_exprt
 ///
@@ -3516,6 +3534,8 @@ inline bool can_cast_expr<with_exprt>(const exprt &base)
 
 inline void validate_expr(const with_exprt &value)
 {
+  validate_operands(
+    value, 3, "array/structure update must have at least 3 operands", true);
   DATA_INVARIANT(
     value.operands().size() % 2 == 1,
     "array/structure update must have an odd number of operands");
@@ -4286,18 +4306,18 @@ public:
   }
 };
 
-// The to_*_expr function for this type doesn't do any checks before casting,
-// therefore the implementation is essentially a static_cast.
-// Enabling expr_dynamic_cast would hide this; instead use static_cast directly.
-// template<>
-// inline void validate_expr<ieee_float_op_exprt>(
-//   const ieee_float_op_exprt &value)
-// {
-//   validate_operands(
-//     value,
-//     3,
-//     "IEEE float operations must have three arguments");
-// }
+template <>
+inline bool can_cast_expr<ieee_float_op_exprt>(const exprt &base)
+{
+  return base.id() == ID_floatbv_plus || base.id() == ID_floatbv_minus ||
+         base.id() == ID_floatbv_div || base.id() == ID_floatbv_mult;
+}
+
+inline void validate_expr(const ieee_float_op_exprt &value)
+{
+  validate_operands(
+    value, 3, "IEEE float operations must have three arguments");
+}
 
 /// \brief Cast an exprt to an \ref ieee_float_op_exprt
 ///
@@ -4747,6 +4767,18 @@ public:
     operands().push_back(value);
   }
 };
+
+template <>
+inline bool can_cast_expr<cond_exprt>(const exprt &base)
+{
+  return base.id() == ID_cond;
+}
+
+inline void validate_expr(const cond_exprt &value)
+{
+  DATA_INVARIANT(
+    value.operands().size() % 2 == 0, "cond must have even number of operands");
+}
 
 /// \brief Cast an exprt to a \ref cond_exprt
 ///
