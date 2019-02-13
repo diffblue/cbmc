@@ -310,3 +310,22 @@ If compiling with cmake:
    ```
    cmake --build build
    ```
+
+## Use BDDs for guards
+
+There are two implementation for symex guards. The default one uses the
+internal representation of expression. The other one uses BDDs and
+though experimental, it is expected to have better performance,
+in particular when used in conjunction with CUDD.
+
+To use the BDD implementation of guards, add the `BDD_GUARDS`
+compilation flag:
+  * If compiling with make:
+    ```
+    make -C src CXXFLAGS="-O2 -DBDD_GUARDS"
+    ```
+  * If compiling with CMake:
+    ```
+    cmake -H. -Bbuild -DCMAKE_CXX_FLAGS="-DBDD_GUARDS"
+    ```
+    and then `cmake --build build`
