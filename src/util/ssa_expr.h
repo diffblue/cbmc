@@ -37,8 +37,13 @@ public:
 
   irep_idt get_object_name() const
   {
+    const exprt &original_expr = get_original_expr();
+
+    if(original_expr.id() == ID_symbol)
+      return to_symbol_expr(original_expr).get_identifier();
+
     object_descriptor_exprt ode;
-    ode.object()=get_original_expr();
+    ode.object() = original_expr;
     return to_symbol_expr(ode.root_object()).get_identifier();
   }
 
