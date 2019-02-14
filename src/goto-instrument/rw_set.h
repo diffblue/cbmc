@@ -18,7 +18,6 @@ Date: February 2006
 #include <vector>
 #include <set>
 
-#include <util/guard.h>
 #include <util/std_expr.h>
 
 #include <goto-programs/goto_model.h>
@@ -158,17 +157,17 @@ protected:
 
   void read(const exprt &expr)
   {
-    read_write_rec(expr, true, false, "", guardt(true_exprt()));
+    read_write_rec(expr, true, false, "", exprt::operandst());
   }
 
-  void read(const exprt &expr, const guardt &guard)
+  void read(const exprt &expr, const exprt::operandst &guard_conjuncts)
   {
-    read_write_rec(expr, true, false, "", guard);
+    read_write_rec(expr, true, false, "", guard_conjuncts);
   }
 
   void write(const exprt &expr)
   {
-    read_write_rec(expr, false, true, "", guardt(true_exprt()));
+    read_write_rec(expr, false, true, "", exprt::operandst());
   }
 
   void compute();
@@ -177,9 +176,10 @@ protected:
 
   void read_write_rec(
     const exprt &expr,
-    bool r, bool w,
+    bool r,
+    bool w,
     const std::string &suffix,
-    const guardt &guard);
+    const exprt::operandst &guard_conjuncts);
 };
 
 class rw_set_loct:public _rw_set_loct
