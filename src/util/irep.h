@@ -303,19 +303,13 @@ public:
   /// Used to refer to this class from derived classes
   using tree_implementationt = non_sharing_treet;
 
-  explicit non_sharing_treet(const irep_idt &_id)
+  explicit non_sharing_treet(irep_idt _id) : data(std::move(_id))
   {
-    write().data = _id;
   }
 
-  non_sharing_treet(
-    const irep_idt &_id,
-    const named_subt &_named_sub,
-    const subt &_sub)
+  non_sharing_treet(irep_idt _id, named_subt _named_sub, subt _sub)
+    : data(std::move(_id), std::move(_named_sub), std::move(_sub))
   {
-    write().data = _id;
-    write().named_sub = _named_sub;
-    write().sub = _sub;
   }
 
   non_sharing_treet() = default;
