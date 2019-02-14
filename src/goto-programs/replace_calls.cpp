@@ -70,7 +70,7 @@ void replace_callst::operator()(
     if(!ins.is_function_call())
       continue;
 
-    code_function_callt &cfc = ins.get_function_call();
+    auto cfc = ins.get_function_call();
     exprt &function = cfc.function();
 
     PRECONDITION(function.id() == ID_symbol);
@@ -114,6 +114,8 @@ void replace_callst::operator()(
     // Finally modify the call
     function.type() = f_it2->second.type;
     se.set_identifier(new_id);
+
+    ins.set_function_call(cfc);
   }
 }
 

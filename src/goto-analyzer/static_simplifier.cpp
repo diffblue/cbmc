@@ -95,7 +95,7 @@ bool static_simplifier(
       }
       else if(i_it->is_assign())
       {
-        code_assignt &assign = i_it->get_assign();
+        auto assign = i_it->get_assign();
 
         // Simplification needs to be aware of which side of the
         // expression it is handling as:
@@ -111,11 +111,14 @@ bool static_simplifier(
         if(unchanged_lhs && unchanged_rhs)
           unmodified.assigns++;
         else
+        {
           simplified.assigns++;
+          i_it->set_assign(assign);
+        }
       }
       else if(i_it->is_function_call())
       {
-        code_function_callt &fcall = i_it->get_function_call();
+        auto fcall = i_it->get_function_call();
 
         bool unchanged =
           ai.abstract_state_before(i_it)->ai_simplify(fcall.function(), ns);
@@ -128,7 +131,10 @@ bool static_simplifier(
         if(unchanged)
           unmodified.function_calls++;
         else
+        {
           simplified.function_calls++;
+          i_it->set_function_call(fcall);
+        }
       }
     }
   }

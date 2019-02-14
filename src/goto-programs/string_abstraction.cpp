@@ -489,22 +489,27 @@ goto_programt::targett string_abstractiont::abstract_assign(
   goto_programt &dest,
   goto_programt::targett target)
 {
-  code_assignt &assign = target->get_assign();
-
-  exprt &lhs=assign.lhs();
-  exprt &rhs=assign.rhs();
-
-  if(has_string_macros(lhs))
   {
-    replace_string_macros(lhs, true, target->source_location);
-    move_lhs_arithmetic(lhs, rhs);
+    code_assignt assign = target->get_assign();
+
+    exprt &lhs = assign.lhs();
+    exprt &rhs = assign.rhs();
+
+    if(has_string_macros(lhs))
+    {
+      replace_string_macros(lhs, true, target->source_location);
+      move_lhs_arithmetic(lhs, rhs);
+    }
+
+    if(has_string_macros(rhs))
+      replace_string_macros(rhs, false, target->source_location);
+
+    target->set_assign(assign);
   }
 
-  if(has_string_macros(rhs))
-    replace_string_macros(rhs, false, target->source_location);
+  const typet &type = target->get_assign().lhs().type();
 
-  const typet &type = lhs.type();
-  if(type.id()==ID_pointer || type.id()==ID_array)
+  if(type.id() == ID_pointer)
     return abstract_pointer_assign(dest, target);
   else if(is_char_type(type))
     return abstract_char_assign(dest, target);
@@ -515,7 +520,8 @@ goto_programt::targett string_abstractiont::abstract_assign(
 void string_abstractiont::abstract_function_call(
   goto_programt::targett target)
 {
-  code_function_callt &call = target->get_function_call();
+  code_function_callt call = target->get_function_call();
+
   code_function_callt::argumentst &arguments=call.arguments();
   code_function_callt::argumentst str_args;
 
@@ -563,6 +569,8 @@ void string_abstractiont::abstract_function_call(
   }
 
   arguments.insert(arguments.end(), str_args.begin(), str_args.end());
+
+  target->set_function_call(call);
 }
 
 bool string_abstractiont::has_string_macros(const exprt &expr)
