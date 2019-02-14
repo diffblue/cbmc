@@ -1,4 +1,4 @@
-CORE
+CORE broken-smt-backend
 main.c
 --no-simplify
 ^EXIT=0$

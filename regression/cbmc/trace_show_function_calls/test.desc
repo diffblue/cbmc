@@ -1,4 +1,4 @@
-CORE
+CORE broken-smt-backend
 main.c
 --trace --trace-show-function-calls
 ^EXIT=10$
