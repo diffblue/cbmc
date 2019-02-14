@@ -21,64 +21,59 @@ Author: Daniel Kroening, kroening@kroening.com
 static exprt unpack_rec(
   const exprt &src,
   bool little_endian,
-  const exprt &offset_bytes,
-  const exprt &max_bytes,
+  const optionalt<mp_integer> &offset_bytes,
+  const optionalt<mp_integer> &max_bytes,
   const namespacet &ns,
   bool unpack_byte_array = false);
 
 /// Rewrite an array or vector into its individual bytes.
 /// \param src: array/vector to unpack
-/// \param src_size: array/vector size; if not a constant, \p max_bytes must be
-///   a constant value, otherwise we fail with an exception
+/// \param src_size: array/vector size; if not a constant and thus not set,
+///   \p max_bytes must be a known constant value, otherwise we fail with an
+///   exception
 /// \param element_bits: bit width of array/vector elements
 /// \param little_endian: true, iff assumed endianness is little-endian
-/// \param offset_bytes: if not nil, bytes prior to this offset will be filled
+/// \param offset_bytes: if set, bytes prior to this offset will be filled
 ///   with nil values
-/// \param max_bytes: if not nil, use as upper bound of the number of bytes to
+/// \param max_bytes: if set, use as upper bound of the number of bytes to
 ///   unpack
 /// \param ns: namespace for type lookups
 /// \return array_exprt holding unpacked elements
 static array_exprt unpack_array_vector(
   const exprt &src,
-  const exprt &src_size,
+  const optionalt<mp_integer> &src_size,
   const mp_integer &element_bits,
   bool little_endian,
-  const exprt &offset_bytes,
-  const exprt &max_bytes,
+  const optionalt<mp_integer> &offset_bytes,
+  const optionalt<mp_integer> &max_bytes,
   const namespacet &ns)
 {
-  auto max_bytes_int = numeric_cast<mp_integer>(max_bytes);
-  auto num_elements = numeric_cast<mp_integer>(src_size);
-
-  if(!max_bytes_int && !num_elements)
-  {
-    throw non_const_array_sizet(src.type(), max_bytes);
-  }
+  if(!src_size.has_value() && !max_bytes.has_value())
+    throw non_const_array_sizet(src.type(), nil_exprt());
 
   exprt::operandst byte_operands;
   mp_integer first_element = 0;
 
   // refine the number of elements to extract in case the element width is known
   // and a multiple of bytes; otherwise we will expand the entire array/vector
-  optionalt<mp_integer> max_elements;
+  optionalt<mp_integer> num_elements = src_size;
   if(element_bits > 0 && element_bits % 8 == 0)
   {
     mp_integer el_bytes = element_bits / 8;
 
-    if(!num_elements)
+    if(!num_elements.has_value())
     {
       // turn bytes into elements, rounding up
-      max_elements = (*max_bytes_int + el_bytes - 1) / el_bytes;
+      num_elements = (*max_bytes + el_bytes - 1) / el_bytes;
     }
 
-    if(auto offset_bytes_int = numeric_cast<mp_integer>(offset_bytes))
+    if(offset_bytes.has_value())
     {
       // compute offset as number of elements
-      first_element = *offset_bytes_int / el_bytes;
+      first_element = *offset_bytes / el_bytes;
       // insert offset_bytes-many nil bytes into the output array
-      *offset_bytes_int -= *offset_bytes_int % el_bytes;
       byte_operands.resize(
-        numeric_cast_v<std::size_t>(*offset_bytes_int),
+        numeric_cast_v<std::size_t>(*offset_bytes - (*offset_bytes % el_bytes)),
         from_integer(0, unsignedbv_typet(8)));
     }
   }
@@ -87,7 +82,7 @@ static array_exprt unpack_array_vector(
   // array/vector is unknown; if element_bits was usable above this will
   // have been turned into a number of elements already
   if(!num_elements)
-    num_elements = *max_elements;
+    num_elements = *max_bytes;
 
   const exprt src_simp = simplify_expr(src, ns);
 
@@ -109,8 +104,7 @@ static array_exprt unpack_array_vector(
 
     // recursively unpack each element until so that we eventually just have an
     // array of bytes left
-    exprt sub =
-      unpack_rec(element, little_endian, nil_exprt(), max_bytes, ns, true);
+    exprt sub = unpack_rec(element, little_endian, {}, max_bytes, ns, true);
     byte_operands.insert(
       byte_operands.end(), sub.operands().begin(), sub.operands().end());
   }
@@ -124,22 +118,22 @@ static array_exprt unpack_array_vector(
 /// Rewrite an object into its individual bytes.
 /// \param src: object to unpack
 /// \param little_endian: true, iff assumed endianness is little-endian
-/// \param offset_bytes: if not nil, bytes prior to this offset will be filled
-///   with nil values
-/// \param max_bytes: if not nil, use as upper bound of the number of bytes to
+/// \param offset_bytes: if set, bytes prior to this offset will be filled with
+///   nil values
+/// \param max_bytes: if set, use as upper bound of the number of bytes to
 ///   unpack
 /// \param ns: namespace for type lookups
 /// \param unpack_byte_array: if true, return unmodified \p src iff it is an
 //    array of bytes
 /// \return array of bytes in the sequence found in memory
-/// \throws flatten_byte_extract_exceptiont Raised is unable to unpack the
+/// \throws flatten_byte_extract_exceptiont Raised if unable to unpack the
 /// object because of either non constant size, byte misalignment or
 /// non-constant component width.
 static exprt unpack_rec(
   const exprt &src,
   bool little_endian,
-  const exprt &offset_bytes,
-  const exprt &max_bytes,
+  const optionalt<mp_integer> &offset_bytes,
+  const optionalt<mp_integer> &max_bytes,
   const namespacet &ns,
   bool unpack_byte_array)
 {
@@ -154,9 +148,11 @@ static exprt unpack_rec(
     if(!unpack_byte_array && *element_bits == 8)
       return src;
 
+    const auto constant_size_or_nullopt =
+      numeric_cast<mp_integer>(array_type.size());
     return unpack_array_vector(
       src,
-      array_type.size(),
+      constant_size_or_nullopt,
       *element_bits,
       little_endian,
       offset_bytes,
@@ -176,7 +172,7 @@ static exprt unpack_rec(
 
     return unpack_array_vector(
       src,
-      vector_type.size(),
+      numeric_cast_v<mp_integer>(vector_type.size()),
       *element_bits,
       little_endian,
       offset_bytes,
@@ -203,29 +199,22 @@ static exprt unpack_rec(
         throw non_byte_alignedt(struct_type, comp, *component_bits);
       }
 
-      exprt offset_in_member = nil_exprt();
-      auto offset_in_member_int = numeric_cast<mp_integer>(offset_bytes);
-      exprt max_bytes_left = nil_exprt();
-      auto max_bytes_left_int = numeric_cast<mp_integer>(max_bytes);
+      optionalt<mp_integer> offset_in_member;
+      optionalt<mp_integer> max_bytes_left;
 
-      if(offset_in_member_int.has_value())
+      if(offset_bytes.has_value())
       {
-        *offset_in_member_int -= member_offset_bits / 8;
-        // if the offset is negative, offset_in_member remains nil, which has
+        offset_in_member = *offset_bytes - member_offset_bits / 8;
+        // if the offset is negative, offset_in_member remains unset, which has
         // the same effect as setting it to zero
-        if(*offset_in_member_int >= 0)
-        {
-          offset_in_member =
-            from_integer(*offset_in_member_int, offset_bytes.type());
-        }
+        if(*offset_in_member < 0)
+          offset_in_member.reset();
       }
 
-      if(max_bytes_left_int.has_value())
+      if(max_bytes.has_value())
       {
-        *max_bytes_left_int -= member_offset_bits / 8;
-        if(*max_bytes_left_int >= 0)
-          max_bytes_left = from_integer(*max_bytes_left_int, max_bytes.type());
-        else
+        max_bytes_left = *max_bytes - member_offset_bits / 8;
+        if(*max_bytes_left < 0)
           break;
       }
 
@@ -256,16 +245,10 @@ static exprt unpack_rec(
 
     if(bits_opt.has_value())
       bits = *bits_opt;
+    else if(max_bytes.has_value())
+      bits = *max_bytes * 8;
     else
-    {
-      bits_opt = numeric_cast<mp_integer>(max_bytes);
-      if(!bits_opt.has_value())
-      {
-        throw non_constant_widtht(src, max_bytes);
-      }
-      else
-        bits = *bits_opt * 8;
-    }
+      throw non_constant_widtht(src, nil_exprt());
 
     exprt::operandst byte_operands;
     for(mp_integer i=0; i<bits; i+=8)
@@ -352,19 +335,22 @@ exprt lower_byte_extract(const byte_extract_exprt &src, const namespacet &ns)
   // determine an upper bound of the number of bytes we might need
   exprt upper_bound=size_of_expr(src.type(), ns);
   if(upper_bound.is_not_nil())
-    upper_bound=
-      simplify_expr(
-        plus_exprt(
-          upper_bound,
-          typecast_exprt(src.offset(), upper_bound.type())),
-        ns);
+    upper_bound = simplify_expr(
+      plus_exprt(
+        upper_bound,
+        typecast_exprt::conditional_cast(src.offset(), upper_bound.type())),
+      ns);
 
-  exprt lb = src.offset();
-  if(!lb.is_constant())
-    lb.make_nil();
+  const auto lower_bound_or_nullopt = numeric_cast<mp_integer>(src.offset());
+  const auto upper_bound_or_nullopt = numeric_cast<mp_integer>(upper_bound);
 
   byte_extract_exprt unpacked(src);
-  unpacked.op() = unpack_rec(src.op(), little_endian, lb, upper_bound, ns);
+  unpacked.op() = unpack_rec(
+    src.op(),
+    little_endian,
+    lower_bound_or_nullopt,
+    upper_bound_or_nullopt,
+    ns);
 
   if(src.type().id()==ID_array)
   {
