@@ -160,17 +160,21 @@ static std::pair<goto_programt::targett, bool> insert_nondet_init_code(
 /// \param goto_program: The goto program to modify.
 /// \param symbol_table: The global symbol table.
 /// \param message_handler: Handles logging.
-/// \param object_factory_parameters: Parameters for the generation of nondet
-///   objects.
+/// \param user_object_factory_parameters: Parameters for the generation of
+///   nondet objects.
 /// \param mode: Language mode
 void convert_nondet(
   const irep_idt &function_identifier,
   goto_programt &goto_program,
   symbol_table_baset &symbol_table,
   message_handlert &message_handler,
-  const java_object_factory_parameterst &object_factory_parameters,
+  const java_object_factory_parameterst &user_object_factory_parameters,
   const irep_idt &mode)
 {
+  java_object_factory_parameterst object_factory_parameters =
+    user_object_factory_parameters;
+  object_factory_parameters.function_id = function_identifier;
+
   bool changed = false;
   auto instruction_iterator = goto_program.instructions.begin();
 
@@ -200,14 +204,12 @@ void convert_nondet(
   const java_object_factory_parameterst &object_factory_parameters,
   const irep_idt &mode)
 {
-  java_object_factory_parameterst parameters = object_factory_parameters;
-  parameters.function_id = function.get_function_id();
   convert_nondet(
     function.get_function_id(),
     function.get_goto_function().body,
     function.get_symbol_table(),
     message_handler,
-    parameters,
+    object_factory_parameters,
     mode);
 
   function.compute_location_numbers();
@@ -227,8 +229,6 @@ void convert_nondet(
 
     if(symbol.mode==ID_java)
     {
-      java_object_factory_parameterst parameters = object_factory_parameters;
-      parameters.function_id = f_it.first;
       convert_nondet(
         f_it.first,
         f_it.second.body,
