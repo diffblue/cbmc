@@ -19,6 +19,7 @@ Author: Daniel Poetzl
 #include <functional>
 #include <map>
 #include <memory>
+#include <set>
 #include <stack>
 #include <stdexcept>
 #include <string>
