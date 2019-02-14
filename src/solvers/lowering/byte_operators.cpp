@@ -30,7 +30,7 @@ static exprt unpack_rec(
 /// \param src: array/vector to unpack
 /// \param src_size: array/vector size; if not a constant, \p max_bytes must be
 ///   a constant value, otherwise we fail with an exception
-/// \param element_width: bit width of array/vector elements
+/// \param element_bits: bit width of array/vector elements
 /// \param little_endian: true, iff assumed endianness is little-endian
 /// \param offset_bytes: if not nil, bytes prior to this offset will be filled
 ///   with nil values
@@ -41,7 +41,7 @@ static exprt unpack_rec(
 static array_exprt unpack_array_vector(
   const exprt &src,
   const exprt &src_size,
-  const mp_integer &element_width,
+  const mp_integer &element_bits,
   bool little_endian,
   const exprt &offset_bytes,
   const exprt &max_bytes,
@@ -61,9 +61,9 @@ static array_exprt unpack_array_vector(
   // refine the number of elements to extract in case the element width is known
   // and a multiple of bytes; otherwise we will expand the entire array/vector
   optionalt<mp_integer> max_elements;
-  if(element_width > 0 && element_width % 8 == 0)
+  if(element_bits > 0 && element_bits % 8 == 0)
   {
-    mp_integer el_bytes = element_width / 8;
+    mp_integer el_bytes = element_bits / 8;
 
     if(!num_elements)
     {
@@ -84,7 +84,7 @@ static array_exprt unpack_array_vector(
   }
 
   // the maximum number of bytes is an upper bound in case the size of the
-  // array/vector is unknown; if the element_width was usable above this will
+  // array/vector is unknown; if element_bits was usable above this will
   // have been turned into a number of elements already
   if(!num_elements)
     num_elements = *max_elements;
@@ -148,16 +148,16 @@ static exprt unpack_rec(
     const array_typet &array_type=to_array_type(src.type());
     const typet &subtype=array_type.subtype();
 
-    auto element_width = pointer_offset_bits(subtype, ns);
-    CHECK_RETURN(element_width.has_value());
+    auto element_bits = pointer_offset_bits(subtype, ns);
+    CHECK_RETURN(element_bits.has_value());
 
-    if(!unpack_byte_array && *element_width == 8)
+    if(!unpack_byte_array && *element_bits == 8)
       return src;
 
     return unpack_array_vector(
       src,
       array_type.size(),
-      *element_width,
+      *element_bits,
       little_endian,
       offset_bytes,
       max_bytes,
@@ -168,16 +168,16 @@ static exprt unpack_rec(
     const vector_typet &vector_type = to_vector_type(src.type());
     const typet &subtype = vector_type.subtype();
 
-    auto element_width = pointer_offset_bits(subtype, ns);
-    CHECK_RETURN(element_width.has_value());
+    auto element_bits = pointer_offset_bits(subtype, ns);
+    CHECK_RETURN(element_bits.has_value());
 
-    if(!unpack_byte_array && *element_width == 8)
+    if(!unpack_byte_array && *element_bits == 8)
       return src;
 
     return unpack_array_vector(
       src,
       vector_type.size(),
-      *element_width,
+      *element_bits,
       little_endian,
       offset_bytes,
       max_bytes,
@@ -193,14 +193,14 @@ static exprt unpack_rec(
     exprt::operandst byte_operands;
     for(const auto &comp : components)
     {
-      auto element_width = pointer_offset_bits(comp.type(), ns);
+      auto component_bits = pointer_offset_bits(comp.type(), ns);
 
       // the next member would be misaligned, abort
       if(
-        !element_width.has_value() || *element_width == 0 ||
-        *element_width % 8 != 0)
+        !component_bits.has_value() || *component_bits == 0 ||
+        *component_bits % 8 != 0)
       {
-        throw non_byte_alignedt(struct_type, comp, *element_width);
+        throw non_byte_alignedt(struct_type, comp, *component_bits);
       }
 
       exprt offset_in_member = nil_exprt();
@@ -239,7 +239,7 @@ static exprt unpack_rec(
       byte_operands.insert(
         byte_operands.end(), sub.operands().begin(), sub.operands().end());
 
-      member_offset_bits += *element_width;
+      member_offset_bits += *component_bits;
     }
 
     const std::size_t size = byte_operands.size();
@@ -371,7 +371,7 @@ exprt lower_byte_extract(const byte_extract_exprt &src, const namespacet &ns)
     const array_typet &array_type=to_array_type(src.type());
     const typet &subtype=array_type.subtype();
 
-    auto element_width = pointer_offset_bits(subtype, ns);
+    auto element_bits = pointer_offset_bits(subtype, ns);
     auto num_elements = numeric_cast<mp_integer>(array_type.size());
     if(!num_elements.has_value())
       num_elements = mp_integer(unpacked.op().operands().size());
@@ -379,9 +379,7 @@ exprt lower_byte_extract(const byte_extract_exprt &src, const namespacet &ns)
     // consider ways of dealing with arrays of unknown subtype size or with a
     // subtype size that does not fit byte boundaries; currently we fall back to
     // stitching together consecutive elements down below
-    if(
-      element_width.has_value() && *element_width >= 1 &&
-      *element_width % 8 == 0)
+    if(element_bits.has_value() && *element_bits >= 1 && *element_bits % 8 == 0)
     {
       array_exprt array({}, array_type);
 
@@ -389,7 +387,7 @@ exprt lower_byte_extract(const byte_extract_exprt &src, const namespacet &ns)
       {
         plus_exprt new_offset(
           unpacked.offset(),
-          from_integer(i * (*element_width) / 8, unpacked.offset().type()));
+          from_integer(i * (*element_bits) / 8, unpacked.offset().type()));
 
         byte_extract_exprt tmp(unpacked);
         tmp.type()=subtype;
@@ -408,15 +406,13 @@ exprt lower_byte_extract(const byte_extract_exprt &src, const namespacet &ns)
 
     mp_integer num_elements = numeric_cast_v<mp_integer>(vector_type.size());
 
-    auto element_width = pointer_offset_bits(subtype, ns);
-    CHECK_RETURN(element_width.has_value());
+    auto element_bits = pointer_offset_bits(subtype, ns);
+    CHECK_RETURN(element_bits.has_value());
 
     // consider ways of dealing with vectors of unknown subtype size or with a
     // subtype size that does not fit byte boundaries; currently we fall back to
     // stitching together consecutive elements down below
-    if(
-      element_width.has_value() && *element_width >= 1 &&
-      *element_width % 8 == 0)
+    if(element_bits.has_value() && *element_bits >= 1 && *element_bits % 8 == 0)
     {
       vector_exprt vector(vector_type);
 
@@ -424,7 +420,7 @@ exprt lower_byte_extract(const byte_extract_exprt &src, const namespacet &ns)
       {
         plus_exprt new_offset(
           unpacked.offset(),
-          from_integer(i * (*element_width) / 8, unpacked.offset().type()));
+          from_integer(i * (*element_bits) / 8, unpacked.offset().type()));
 
         byte_extract_exprt tmp(unpacked);
         tmp.type() = subtype;
@@ -446,12 +442,12 @@ exprt lower_byte_extract(const byte_extract_exprt &src, const namespacet &ns)
 
     for(const auto &comp : components)
     {
-      auto element_width = pointer_offset_bits(comp.type(), ns);
+      auto component_bits = pointer_offset_bits(comp.type(), ns);
 
       // the next member would be misaligned, abort
       if(
-        !element_width.has_value() || *element_width == 0 ||
-        *element_width % 8 != 0)
+        !component_bits.has_value() || *component_bits == 0 ||
+        *component_bits % 8 != 0)
       {
         failed=true;
         break;
