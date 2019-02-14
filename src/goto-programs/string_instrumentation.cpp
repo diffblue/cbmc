@@ -84,43 +84,43 @@ protected:
   void do_sprintf(
     goto_programt &dest,
     goto_programt::targett it,
-    code_function_callt &call);
+    const code_function_callt &);
   void do_snprintf(
     goto_programt &dest,
     goto_programt::targett it,
-    code_function_callt &call);
+    const code_function_callt &);
   void do_strcat(
     goto_programt &dest,
     goto_programt::targett it,
-    code_function_callt &call);
+    const code_function_callt &);
   void do_strncmp(
     goto_programt &dest,
     goto_programt::targett it,
-    code_function_callt &call);
+    const code_function_callt &);
   void do_strchr(
     goto_programt &dest,
     goto_programt::targett it,
-    code_function_callt &call);
+    const code_function_callt &);
   void do_strrchr(
     goto_programt &dest,
     goto_programt::targett it,
-    code_function_callt &call);
+    const code_function_callt &);
   void do_strstr(
     goto_programt &dest,
     goto_programt::targett it,
-    code_function_callt &call);
+    const code_function_callt &);
   void do_strtok(
     goto_programt &dest,
     goto_programt::targett it,
-    code_function_callt &call);
+    const code_function_callt &);
   void do_strerror(
     goto_programt &dest,
     goto_programt::targett it,
-    code_function_callt &call);
+    const code_function_callt &);
   void do_fscanf(
     goto_programt &dest,
     goto_programt::targett it,
-    code_function_callt &call);
+    const code_function_callt &);
 
   void do_format_string_read(
     goto_programt &dest,
@@ -222,8 +222,8 @@ void string_instrumentationt::do_function_call(
   goto_programt &dest,
   goto_programt::targett target)
 {
-  code_function_callt &call = target->get_function_call();
-  exprt &function=call.function();
+  const code_function_callt &call = target->get_function_call();
+  const exprt &function = call.function();
   // const exprt &lhs=call.lhs();
 
   if(function.id()==ID_symbol)
@@ -272,7 +272,7 @@ void string_instrumentationt::do_function_call(
 void string_instrumentationt::do_sprintf(
   goto_programt &dest,
   goto_programt::targett target,
-  code_function_callt &call)
+  const code_function_callt &call)
 {
   const code_function_callt::argumentst &arguments=call.arguments();
 
@@ -312,7 +312,7 @@ void string_instrumentationt::do_sprintf(
 void string_instrumentationt::do_snprintf(
   goto_programt &dest,
   goto_programt::targett target,
-  code_function_callt &call)
+  const code_function_callt &call)
 {
   const code_function_callt::argumentst &arguments=call.arguments();
 
@@ -353,7 +353,7 @@ void string_instrumentationt::do_snprintf(
 void string_instrumentationt::do_fscanf(
   goto_programt &dest,
   goto_programt::targett target,
-  code_function_callt &call)
+  const code_function_callt &call)
 {
   const code_function_callt::argumentst &arguments=call.arguments();
 
@@ -618,14 +618,14 @@ void string_instrumentationt::do_format_string_write(
 void string_instrumentationt::do_strncmp(
   goto_programt &,
   goto_programt::targett,
-  code_function_callt &)
+  const code_function_callt &)
 {
 }
 
 void string_instrumentationt::do_strchr(
   goto_programt &dest,
   goto_programt::targett target,
-  code_function_callt &call)
+  const code_function_callt &call)
 {
   const code_function_callt::argumentst &arguments=call.arguments();
 
@@ -650,7 +650,7 @@ void string_instrumentationt::do_strchr(
 void string_instrumentationt::do_strrchr(
   goto_programt &dest,
   goto_programt::targett target,
-  code_function_callt &call)
+  const code_function_callt &call)
 {
   const code_function_callt::argumentst &arguments=call.arguments();
 
@@ -675,7 +675,7 @@ void string_instrumentationt::do_strrchr(
 void string_instrumentationt::do_strstr(
   goto_programt &dest,
   goto_programt::targett target,
-  code_function_callt &call)
+  const code_function_callt &call)
 {
   const code_function_callt::argumentst &arguments=call.arguments();
 
@@ -706,7 +706,7 @@ void string_instrumentationt::do_strstr(
 void string_instrumentationt::do_strtok(
   goto_programt &dest,
   goto_programt::targett target,
-  code_function_callt &call)
+  const code_function_callt &call)
 {
   const code_function_callt::argumentst &arguments=call.arguments();
 
@@ -737,7 +737,7 @@ void string_instrumentationt::do_strtok(
 void string_instrumentationt::do_strerror(
   goto_programt &dest,
   goto_programt::targett it,
-  code_function_callt &call)
+  const code_function_callt &call)
 {
   if(call.lhs().is_nil())
   {
