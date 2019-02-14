@@ -72,8 +72,6 @@ process_array_expr(exprt &expr, bool do_simplify, const namespacet &ns)
   {
     object_descriptor_exprt ode;
     ode.build(expr, ns);
-    if(do_simplify)
-      simplify(ode.offset(), ns);
 
     expr = ode.root_object();
 

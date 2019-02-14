@@ -21,6 +21,8 @@ SCENARIO(
   "Instantiate generic parameters of superclasses",
   "[core][goto_program_generics][generic_bases_test]")
 {
+  config.ansi_c.set_LP64();
+
   GIVEN(
     "A class extending a generic class instantiated with a standard library "
     "class")

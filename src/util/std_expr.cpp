@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "expr_util.h"
 #include "mathematical_types.h"
 #include "pointer_offset_size.h"
+#include "simplify_expr.h"
 
 bool constant_exprt::value_is_zero_string() const
 {
@@ -72,10 +73,11 @@ static void build_object_descriptor_rec(
     exprt sub_size=size_of_expr(expr.type(), ns);
     CHECK_RETURN(sub_size.is_not_nil());
 
-    dest.offset()=
-      plus_exprt(dest.offset(),
-                 mult_exprt(typecast_exprt(index.index(), index_type()),
-                            typecast_exprt(sub_size, index_type())));
+    dest.offset() = plus_exprt(
+      dest.offset(),
+      mult_exprt(
+        typecast_exprt::conditional_cast(index.index(), index_type()),
+        typecast_exprt::conditional_cast(sub_size, index_type())));
   }
   else if(expr.id()==ID_member)
   {
@@ -87,9 +89,8 @@ static void build_object_descriptor_rec(
     exprt offset=member_offset_expr(member, ns);
     CHECK_RETURN(offset.is_not_nil());
 
-    dest.offset()=
-      plus_exprt(dest.offset(),
-                 typecast_exprt(offset, index_type()));
+    dest.offset() = plus_exprt(
+      dest.offset(), typecast_exprt::conditional_cast(offset, index_type()));
   }
   else if(expr.id()==ID_byte_extract_little_endian ||
           expr.id()==ID_byte_extract_big_endian)
@@ -100,10 +101,10 @@ static void build_object_descriptor_rec(
 
     build_object_descriptor_rec(ns, be.op(), dest);
 
-    dest.offset()=
-      plus_exprt(dest.offset(),
-                 typecast_exprt(to_byte_extract_expr(expr).offset(),
-                                index_type()));
+    dest.offset() = plus_exprt(
+      dest.offset(),
+      typecast_exprt::conditional_cast(
+        to_byte_extract_expr(expr).offset(), index_type()));
   }
   else if(expr.id()==ID_typecast)
   {
@@ -145,6 +146,7 @@ void object_descriptor_exprt::build(
     offset()=from_integer(0, index_type());
 
   build_object_descriptor_rec(ns, expr, *this);
+  simplify(offset(), ns);
 }
 
 shift_exprt::shift_exprt(
