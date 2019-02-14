@@ -236,6 +236,34 @@ static exprt unpack_rec(
       std::move(byte_operands),
       array_typet(unsignedbv_typet(8), from_integer(size, size_type())));
   }
+  else if(src.type().id() == ID_union || src.type().id() == ID_union_tag)
+  {
+    const union_typet &union_type = to_union_type(ns.follow(src.type()));
+    const union_typet::componentst &components = union_type.components();
+
+    mp_integer max_width = 0;
+    typet max_comp_type;
+    irep_idt max_comp_name;
+
+    for(const auto &comp : components)
+    {
+      auto element_width = pointer_offset_bits(comp.type(), ns);
+
+      if(!element_width.has_value() || *element_width <= max_width)
+        continue;
+
+      max_width = *element_width;
+      max_comp_type = comp.type();
+      max_comp_name = comp.get_name();
+    }
+
+    if(max_width > 0)
+    {
+      member_exprt member(src, max_comp_name, max_comp_type);
+      return unpack_rec(
+        member, little_endian, offset_bytes, max_bytes, ns, true);
+    }
+  }
   else if(src.type().id()!=ID_empty)
   {
     // a basic type; we turn that into extractbits while considering
@@ -454,6 +482,36 @@ exprt lower_byte_extract(const byte_extract_exprt &src, const namespacet &ns)
 
     if(!failed)
       return simplify_expr(s, ns);
+  }
+  else if(src.type().id() == ID_union || src.type().id() == ID_union_tag)
+  {
+    const union_typet &union_type = to_union_type(ns.follow(src.type()));
+    const union_typet::componentst &components = union_type.components();
+
+    mp_integer max_width = 0;
+    typet max_comp_type;
+    irep_idt max_comp_name;
+
+    for(const auto &comp : components)
+    {
+      auto element_width = pointer_offset_bits(comp.type(), ns);
+
+      if(!element_width.has_value() || *element_width <= max_width)
+        continue;
+
+      max_width = *element_width;
+      max_comp_type = comp.type();
+      max_comp_name = comp.get_name();
+    }
+
+    if(max_width > 0)
+    {
+      byte_extract_exprt tmp(unpacked);
+      tmp.type() = max_comp_type;
+
+      return union_exprt(
+        max_comp_name, lower_byte_extract(tmp, ns), union_type);
+    }
   }
 
   const exprt &root=unpacked.op();
