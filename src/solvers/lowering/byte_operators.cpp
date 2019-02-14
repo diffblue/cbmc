@@ -21,6 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 static exprt unpack_rec(
   const exprt &src,
   bool little_endian,
+  const exprt &offset_bytes,
   const exprt &max_bytes,
   const namespacet &ns,
   bool unpack_byte_array = false);
@@ -31,6 +32,8 @@ static exprt unpack_rec(
 ///   a constant value, otherwise we fail with an exception
 /// \param element_width: bit width of array/vector elements
 /// \param little_endian: true, iff assumed endianness is little-endian
+/// \param offset_bytes: if not nil, bytes prior to this offset will be filled
+///   with nil values
 /// \param max_bytes: if not nil, use as upper bound of the number of bytes to
 ///   unpack
 /// \param ns: namespace for type lookups
@@ -40,6 +43,7 @@ static array_exprt unpack_array_vector(
   const exprt &src_size,
   const mp_integer &element_width,
   bool little_endian,
+  const exprt &offset_bytes,
   const exprt &max_bytes,
   const namespacet &ns)
 {
@@ -51,6 +55,7 @@ static array_exprt unpack_array_vector(
     throw non_const_array_sizet(src.type(), max_bytes);
   }
 
+  exprt::operandst byte_operands;
   mp_integer first_element = 0;
 
   // refine the number of elements to extract in case the element width is known
@@ -65,6 +70,17 @@ static array_exprt unpack_array_vector(
       // turn bytes into elements, rounding up
       max_elements = (*max_bytes_int + el_bytes - 1) / el_bytes;
     }
+
+    if(auto offset_bytes_int = numeric_cast<mp_integer>(offset_bytes))
+    {
+      // compute offset as number of elements
+      first_element = *offset_bytes_int / el_bytes;
+      // insert offset_bytes-many nil bytes into the output array
+      *offset_bytes_int -= *offset_bytes_int % el_bytes;
+      byte_operands.resize(
+        numeric_cast_v<std::size_t>(*offset_bytes_int),
+        from_integer(0, unsignedbv_typet(8)));
+    }
   }
 
   // the maximum number of bytes is an upper bound in case the size of the
@@ -75,7 +91,6 @@ static array_exprt unpack_array_vector(
 
   const exprt src_simp = simplify_expr(src, ns);
 
-  exprt::operandst byte_operands;
   for(mp_integer i = first_element; i < *num_elements; ++i)
   {
     exprt element;
@@ -94,7 +109,8 @@ static array_exprt unpack_array_vector(
 
     // recursively unpack each element until so that we eventually just have an
     // array of bytes left
-    exprt sub = unpack_rec(element, little_endian, max_bytes, ns, true);
+    exprt sub =
+      unpack_rec(element, little_endian, nil_exprt(), max_bytes, ns, true);
     byte_operands.insert(
       byte_operands.end(), sub.operands().begin(), sub.operands().end());
   }
@@ -108,6 +124,8 @@ static array_exprt unpack_array_vector(
 /// Rewrite an object into its individual bytes.
 /// \param src: object to unpack
 /// \param little_endian: true, iff assumed endianness is little-endian
+/// \param offset_bytes: if not nil, bytes prior to this offset will be filled
+///   with nil values
 /// \param max_bytes: if not nil, use as upper bound of the number of bytes to
 ///   unpack
 /// \param ns: namespace for type lookups
@@ -120,6 +138,7 @@ static array_exprt unpack_array_vector(
 static exprt unpack_rec(
   const exprt &src,
   bool little_endian,
+  const exprt &offset_bytes,
   const exprt &max_bytes,
   const namespacet &ns,
   bool unpack_byte_array)
@@ -136,7 +155,13 @@ static exprt unpack_rec(
       return src;
 
     return unpack_array_vector(
-      src, array_type.size(), *element_width, little_endian, max_bytes, ns);
+      src,
+      array_type.size(),
+      *element_width,
+      little_endian,
+      offset_bytes,
+      max_bytes,
+      ns);
   }
   else if(src.type().id() == ID_vector)
   {
@@ -150,12 +175,20 @@ static exprt unpack_rec(
       return src;
 
     return unpack_array_vector(
-      src, vector_type.size(), *element_width, little_endian, max_bytes, ns);
+      src,
+      vector_type.size(),
+      *element_width,
+      little_endian,
+      offset_bytes,
+      max_bytes,
+      ns);
   }
   else if(ns.follow(src.type()).id()==ID_struct)
   {
     const struct_typet &struct_type=to_struct_type(ns.follow(src.type()));
     const struct_typet::componentst &components=struct_type.components();
+
+    mp_integer member_offset_bits = 0;
 
     exprt::operandst byte_operands;
     for(const auto &comp : components)
@@ -170,11 +203,43 @@ static exprt unpack_rec(
         throw non_byte_alignedt(struct_type, comp, *element_width);
       }
 
+      exprt offset_in_member = nil_exprt();
+      auto offset_in_member_int = numeric_cast<mp_integer>(offset_bytes);
+      exprt max_bytes_left = nil_exprt();
+      auto max_bytes_left_int = numeric_cast<mp_integer>(max_bytes);
+
+      if(offset_in_member_int.has_value())
+      {
+        *offset_in_member_int -= member_offset_bits / 8;
+        // if the offset is negative, offset_in_member remains nil, which has
+        // the same effect as setting it to zero
+        if(*offset_in_member_int >= 0)
+        {
+          offset_in_member =
+            from_integer(*offset_in_member_int, offset_bytes.type());
+        }
+      }
+
+      if(max_bytes_left_int.has_value())
+      {
+        *max_bytes_left_int -= member_offset_bits / 8;
+        if(*max_bytes_left_int >= 0)
+          max_bytes_left = from_integer(*max_bytes_left_int, max_bytes.type());
+        else
+          break;
+      }
+
       member_exprt member(src, comp.get_name(), comp.type());
-      exprt sub=unpack_rec(member, little_endian, max_bytes, ns, true);
+      if(src.id() == ID_struct)
+        simplify(member, ns);
+
+      exprt sub = unpack_rec(
+        member, little_endian, offset_in_member, max_bytes_left, ns, true);
 
       byte_operands.insert(
         byte_operands.end(), sub.operands().begin(), sub.operands().end());
+
+      member_offset_bits += *element_width;
     }
 
     const std::size_t size = byte_operands.size();
@@ -294,9 +359,12 @@ exprt lower_byte_extract(const byte_extract_exprt &src, const namespacet &ns)
           typecast_exprt(src.offset(), upper_bound.type())),
         ns);
 
+  exprt lb = src.offset();
+  if(!lb.is_constant())
+    lb.make_nil();
+
   byte_extract_exprt unpacked(src);
-  unpacked.op()=
-    unpack_rec(src.op(), little_endian, upper_bound, ns);
+  unpacked.op() = unpack_rec(src.op(), little_endian, lb, upper_bound, ns);
 
   if(src.type().id()==ID_array)
   {
