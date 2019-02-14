@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/mp_arith.h>
 #include <util/reference_counting.h>
+#include <util/sharing_map.h>
 
 #include "object_numbering.h"
 #include "value_sets.h"
@@ -294,11 +295,7 @@ public:
   ///
   /// The components of the ID are thus duplicated in the `valuest` key and in
   /// `entryt` fields.
-#ifdef USE_DSTRING
-  typedef std::map<irep_idt, entryt> valuest;
-#else
-  typedef std::unordered_map<irep_idt, entryt, string_hash> valuest;
-#endif
+  typedef sharing_mapt<irep_idt, entryt> valuest;
 
   /// Gets values pointed to by `expr`, including following dereference
   /// operators (i.e. this is not a simple lookup in `valuest`).
@@ -318,28 +315,31 @@ public:
     values.clear();
   }
 
-  /// Finds an entry in this value-set. The interface differs from get_entry
-  /// because get_value_set_rec wants to check for a struct's first component
-  /// before stripping the suffix as is done in get_entry.
+  /// Finds an entry in this value-set. The interface differs from
+  /// \ref update_entry because get_value_set_rec wants to check for a struct's
+  /// first component before stripping the suffix as is done in
+  /// \ref update_entry.
   /// \param id: identifier to find.
   /// \return a constant pointer to an entry if found, or null otherwise.
-  ///   Note the pointer may be invalidated by insert operations, including
-  ///   get_entry.
-  entryt *find_entry(const irep_idt &id);
-
-  /// Const version of \ref find_entry
   const entryt *find_entry(const irep_idt &id) const;
 
-  /// Gets or inserts an entry in this value-set.
+  /// Adds or replaces an entry in this value-set.
   /// \param e: entry to find. Its `id` and `suffix` fields will be used
   ///   to find a corresponding entry; if a fresh entry is created its
-  ///   `object_map` (RHS value set) will be copied; otherwise it will be
-  ///   ignored. Therefore it should probably be left blank and any RHS updates
-  ///   conducted against the returned reference.
+  ///   `object_map` (RHS value set) will be merged with or replaced by \p
+  ///   new_values, depending on the value of \p add_to_sets. If an entry
+  ///   already exists, the object map of \p e is ignored.
   /// \param type: type of `e.identifier`, used to determine whether `e`'s
   ///   suffix should be used to find a field-sensitive value-set or whether
   ///   a single entry should be shared by all of symbol `e.identifier`.
-  entryt &get_entry(const entryt &e, const typet &type);
+  /// \param new_values: values to be stored for the entry.
+  /// \param add_to_sets: if true, merge in \p new_values instead of replacing
+  ///   the existing values.
+  void update_entry(
+    const entryt &e,
+    const typet &type,
+    const object_mapt &new_values,
+    bool add_to_sets);
 
   /// Pretty-print this value-set
   /// \param ns: global namespace
@@ -460,42 +460,25 @@ public:
     exprt &expr,
     const namespacet &ns) const;
 
-private:
-  /// Helper method for \ref get_entry_for_symbol
-  template <class maybe_const_value_sett>
-  static auto get_entry_for_symbol(
-    maybe_const_value_sett &value_set,
-    irep_idt identifier,
-    const typet &type,
-    const std::string &suffix,
-    const namespacet &ns) ->
-    typename std::conditional<std::is_const<maybe_const_value_sett>::value,
-                              const value_sett::entryt *,
-                              value_sett::entryt *>::type;
-
-public:
-  /// Get the entry for the symbol and suffix
+  /// Get the index of the symbol and suffix
   /// \param identifier: The identifier for the symbol
   /// \param type: The type of the symbol
   /// \param suffix: The suffix for the entry
   /// \param ns: The global namespace, for following \p type if it is a
   ///   struct tag type or a union tag type
-  /// \return The entry for the symbol and suffix
-  value_sett::entryt *get_entry_for_symbol(
-    irep_idt identifier,
-    const typet &type,
-    const std::string &suffix,
-    const namespacet &ns);
-
-  /// const version of /ref get_entry_for_symbol
-  const value_sett::entryt *get_entry_for_symbol(
+  /// \return The index if the symbol is known, else `nullopt`.
+  optionalt<irep_idt> get_index_of_symbol(
     irep_idt identifier,
     const typet &type,
     const std::string &suffix,
     const namespacet &ns) const;
 
+  /// Update the entry stored at \p index by erasing any values listed in
+  /// \p values_to_erase.
+  /// \param index: index in the value set
+  /// \param values_to_erase: set of values to remove from the entry
   void erase_values_from_entry(
-    entryt &entry,
+    const irep_idt &index,
     const std::unordered_set<exprt, irep_hash> &values_to_erase);
 
 protected:
