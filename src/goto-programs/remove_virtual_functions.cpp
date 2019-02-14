@@ -247,24 +247,31 @@ goto_programt::targett remove_virtual_functionst::remove_virtual_function(
     // Only create one call sequence per possible target:
     if(insertit.second)
     {
-      goto_programt::targett t1=new_code_calls.add_instruction();
       if(fun.symbol_expr.has_value())
       {
         // call function
-        *t1 = goto_programt::make_function_call(code, vcall_source_loc);
+        goto_programt::targett t1 = new_code_calls.add(
+          goto_programt::make_function_call(code, vcall_source_loc));
+
         create_static_function_call(
           t1->get_function_call(), *fun.symbol_expr, ns);
+
+        insertit.first->second = t1;
       }
       else
       {
+        goto_programt::targett t1 = new_code_calls.add(
+          goto_programt::make_assertion(false_exprt(), vcall_source_loc));
+
         // No definition for this type; shouldn't be possible...
-        *t1 = goto_programt::make_assertion(false_exprt(), vcall_source_loc);
         t1->source_location.set_comment(
           "cannot find calls for " +
           id2string(code.function().get(ID_identifier)) + " dispatching " +
           id2string(fun.class_id));
+
+        insertit.first->second = t1;
       }
-      insertit.first->second=t1;
+
       // goto final
       new_code_calls.add(
         goto_programt::make_goto(t_final, true_exprt(), vcall_source_loc));
