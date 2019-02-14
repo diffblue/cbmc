@@ -44,56 +44,6 @@ goto_program_dereferencet::get_or_create_failed_symbol(const exprt &expr)
   return nullptr;
 }
 
-/// \deprecated
-bool goto_program_dereferencet::is_valid_object(
-  const irep_idt &identifier)
-{
-  const symbolt &symbol=ns.lookup(identifier);
-
-  if(symbol.type.id()==ID_code)
-    return true;
-
-  if(symbol.is_static_lifetime)
-    return true; // global/static
-
-  #if 0
-  return valid_local_variables->find(symbol.name)!=
-     valid_local_variables->end(); // valid local
-  #else
-  return true;
-  #endif
-}
-
-/// \deprecated
-void goto_program_dereferencet::dereference_failure(
-  const std::string &property,
-  const std::string &msg,
-  const guardt &guard)
-{
-  exprt guard_expr=guard.as_expr();
-
-  if(assertions.insert(guard_expr).second)
-  {
-    guard_expr = boolean_negate(guard_expr);
-
-    // first try simplifier on it
-    if(options.get_bool_option("simplify"))
-      simplify(guard_expr, ns);
-
-    if(!guard_expr.is_true())
-    {
-      goto_program_instruction_typet type=
-        options.get_bool_option("assert-to-assume")?ASSUME:ASSERT;
-
-      goto_programt::targett t=new_code.add_instruction(type);
-      t->guard.swap(guard_expr);
-      t->source_location=dereference_location;
-      t->source_location.set_property_class(property);
-      t->source_location.set_comment("dereference failure: "+msg);
-    }
-  }
-}
-
 /// Turn subexpression of `expr` of the form `&*p` into p
 /// and use `dereference` on subexpressions of the form `*p`
 /// \param expr: expression in which to remove dereferences
@@ -166,8 +116,6 @@ void goto_program_dereferencet::dereference_rec(exprt &expr)
     if(expr.operands().size()!=1)
       throw "dereference expects one operand";
 
-    dereference_location=expr.find_source_location();
-
     exprt tmp = dereference.dereference(expr.op0());
 
     expr.swap(tmp);
@@ -181,8 +129,6 @@ void goto_program_dereferencet::dereference_rec(exprt &expr)
 
     if(expr.op0().type().id()==ID_pointer)
     {
-      dereference_location=expr.find_source_location();
-
       exprt tmp1(ID_plus, expr.op0().type());
       tmp1.operands().swap(expr.operands());
 
@@ -231,8 +177,6 @@ void goto_program_dereferencet::dereference_program(
       it++)
   {
     new_code.clear();
-    assertions.clear();
-
     dereference_instruction(it, checks_only);
 
     // insert new instructions
@@ -265,9 +209,6 @@ void goto_program_dereferencet::dereference_instruction(
   bool checks_only)
 {
   current_target=target;
-  #if 0
-  valid_local_variables=&target->local_variables;
-  #endif
   goto_programt::instructiont &i=*target;
 
   if(i.has_condition())
@@ -329,43 +270,7 @@ void goto_program_dereferencet::dereference_expression(
 {
   current_function = function_id;
   current_target=target;
-  #if 0
-  valid_local_variables=&target->local_variables;
-  #endif
-
   dereference_expr(expr, false);
-}
-
-/// Throw an exception in case removing dereferences from the program would
-/// throw an exception.
-void goto_program_dereferencet::pointer_checks(
-  goto_programt &goto_program)
-{
-  dereference_program(goto_program, true);
-}
-
-/// Throw an exception in case removing dereferences from the program would
-/// throw an exception.
-void goto_program_dereferencet::pointer_checks(
-  goto_functionst &goto_functions)
-{
-  dereference_program(goto_functions, true);
-}
-
-/// \deprecated
-void remove_pointers(
-  goto_programt &goto_program,
-  symbol_tablet &symbol_table,
-  value_setst &value_sets)
-{
-  namespacet ns(symbol_table);
-
-  optionst options;
-
-  goto_program_dereferencet
-    goto_program_dereference(ns, symbol_table, options, value_sets);
-
-  goto_program_dereference.dereference_program(goto_program);
 }
 
 /// Remove dereferences in all expressions contained in the program
@@ -385,32 +290,6 @@ void remove_pointers(
 
   Forall_goto_functions(it, goto_model.goto_functions)
     goto_program_dereference.dereference_program(it->second.body);
-}
-
-/// \deprecated
-void pointer_checks(
-  goto_programt &goto_program,
-  symbol_tablet &symbol_table,
-  const optionst &options,
-  value_setst &value_sets)
-{
-  namespacet ns(symbol_table);
-  goto_program_dereferencet
-    goto_program_dereference(ns, symbol_table, options, value_sets);
-  goto_program_dereference.pointer_checks(goto_program);
-}
-
-/// \deprecated
-void pointer_checks(
-  goto_functionst &goto_functions,
-  symbol_tablet &symbol_table,
-  const optionst &options,
-  value_setst &value_sets)
-{
-  namespacet ns(symbol_table);
-  goto_program_dereferencet
-    goto_program_dereference(ns, symbol_table, options, value_sets);
-  goto_program_dereference.pointer_checks(goto_functions);
 }
 
 /// Remove dereferences in `expr` using `value_sets` to determine to what
