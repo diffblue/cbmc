@@ -104,8 +104,8 @@ SCENARIO("byte_extract_lowering", "[core][solvers][lowering][byte_extract]")
     constant_exprt size = from_integer(8, size_type());
 
     std::vector<typet> types = {
-    // struct_typet({{"comp1", u16}, {"comp2", u16}}),
-    // struct_typet({{"comp1", u32}, {"comp2", u64}}),
+      struct_typet({{"comp1", u16}, {"comp2", u16}}),
+      struct_typet({{"comp1", u32}, {"comp2", u64}}),
 #if 0
       // not currently handled: components not byte aligned
       struct_typet({{"comp1", u32},
@@ -114,8 +114,8 @@ SCENARIO("byte_extract_lowering", "[core][solvers][lowering][byte_extract]")
                     {"comp2", u8}}),
 #endif
       // union_typet({{"compA", u32}, {"compB", u64}}),
-      // c_enum_typet(u16),
-      // c_enum_typet(unsignedbv_typet(128)),
+      c_enum_typet(u16),
+      c_enum_typet(unsignedbv_typet(128)),
       // array_typet(u8, size),
       // array_typet(s32, size),
       // array_typet(u64, size),
@@ -193,10 +193,8 @@ SCENARIO("byte_extract_lowering", "[core][solvers][lowering][byte_extract]")
             REQUIRE(!has_subexpr(lower_be, ID_byte_extract_little_endian));
             REQUIRE(!has_subexpr(lower_be, ID_byte_extract_big_endian));
             REQUIRE(lower_be.type() == be.type());
-            // TODO: does not currently hold
-            // REQUIRE(lower_be == r);
-            // TODO: does not currently hold
-            // REQUIRE(lower_be_s == r);
+            REQUIRE(lower_be == r);
+            REQUIRE(lower_be_s == r);
           }
         }
       }
