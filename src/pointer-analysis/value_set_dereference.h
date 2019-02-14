@@ -19,7 +19,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "dereference_callback.h"
 
 class symbol_tablet;
-class guardt;
 class optionst;
 class symbolt;
 
@@ -52,10 +51,8 @@ public:
 
   /// Dereference the given pointer-expression. Any errors are
   /// reported to the callback method given in the constructor.
-  /// \param pointer: A pointer-typed expression, to
-  ///        be dereferenced.
-  /// \param guard: A guard, which is assumed to hold when dereferencing.
-  exprt dereference(const exprt &pointer, const guardt &guard);
+  /// \param pointer: A pointer-typed expression, to be dereferenced.
+  exprt dereference(const exprt &pointer);
 
 private:
   const namespacet &ns;

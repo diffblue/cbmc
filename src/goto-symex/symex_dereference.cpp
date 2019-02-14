@@ -234,7 +234,7 @@ void goto_symext::dereference_rec(exprt &expr, statet &state)
       expr_is_not_null);
 
     // std::cout << "**** " << format(tmp1) << '\n';
-    exprt tmp2 = dereference.dereference(tmp1, guardt(true_exprt()));
+    exprt tmp2 = dereference.dereference(tmp1);
     // std::cout << "**** " << format(tmp2) << '\n';
 
     expr.swap(tmp2);

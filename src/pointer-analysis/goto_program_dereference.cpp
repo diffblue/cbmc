@@ -188,7 +188,7 @@ void goto_program_dereferencet::dereference_rec(exprt &expr, guardt &guard)
 
     dereference_location=expr.find_source_location();
 
-    exprt tmp = dereference.dereference(expr.op0(), guard);
+    exprt tmp = dereference.dereference(expr.op0());
 
     expr.swap(tmp);
   }
@@ -206,7 +206,7 @@ void goto_program_dereferencet::dereference_rec(exprt &expr, guardt &guard)
       exprt tmp1(ID_plus, expr.op0().type());
       tmp1.operands().swap(expr.operands());
 
-      exprt tmp2 = dereference.dereference(tmp1, guard);
+      exprt tmp2 = dereference.dereference(tmp1);
       tmp2.swap(expr);
     }
   }
