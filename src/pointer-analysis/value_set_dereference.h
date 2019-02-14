@@ -24,7 +24,7 @@ class optionst;
 class symbolt;
 
 /// Wrapper for a function dereferencing pointer expressions using a value set.
-class value_set_dereferencet
+class value_set_dereferencet final
 {
 public:
   /// \param _ns: Namespace
@@ -55,7 +55,7 @@ public:
   /// \param pointer: A pointer-typed expression, to
   ///        be dereferenced.
   /// \param guard: A guard, which is assumed to hold when dereferencing.
-  virtual exprt dereference(const exprt &pointer, const guardt &guard);
+  exprt dereference(const exprt &pointer, const guardt &guard);
 
 private:
   const namespacet &ns;
