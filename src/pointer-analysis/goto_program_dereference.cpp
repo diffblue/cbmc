@@ -97,8 +97,7 @@ void goto_program_dereferencet::dereference_failure(
 /// Turn subexpression of `expr` of the form `&*p` into p
 /// and use `dereference` on subexpressions of the form `*p`
 /// \param expr: expression in which to remove dereferences
-/// \param guard: boolean expression assumed to hold when dereferencing
-void goto_program_dereferencet::dereference_rec(exprt &expr, guardt &guard)
+void goto_program_dereferencet::dereference_rec(exprt &expr)
 {
   if(!has_subexpr(expr, ID_dereference))
     return;
@@ -109,8 +108,6 @@ void goto_program_dereferencet::dereference_rec(exprt &expr, guardt &guard)
       throw expr.id_string()+" must be Boolean, but got "+
             expr.pretty();
 
-    guardt old_guard=guard;
-
     for(auto &op : expr.operands())
     {
       if(!op.is_boolean())
@@ -118,15 +115,8 @@ void goto_program_dereferencet::dereference_rec(exprt &expr, guardt &guard)
               op.pretty();
 
       if(has_subexpr(op, ID_dereference))
-        dereference_rec(op, guard);
-
-      if(expr.id()==ID_or)
-        guard.add(boolean_negate(op));
-      else
-        guard.add(op);
+        dereference_rec(op);
     }
-
-    guard = std::move(old_guard);
     return;
   }
   else if(expr.id()==ID_if)
@@ -142,26 +132,16 @@ void goto_program_dereferencet::dereference_rec(exprt &expr, guardt &guard)
       throw msg;
     }
 
-    dereference_rec(expr.op0(), guard);
+    dereference_rec(expr.op0());
 
     bool o1 = has_subexpr(expr.op1(), ID_dereference);
     bool o2 = has_subexpr(expr.op2(), ID_dereference);
 
     if(o1)
-    {
-      guardt old_guard=guard;
-      guard.add(expr.op0());
-      dereference_rec(expr.op1(), guard);
-      guard = std::move(old_guard);
-    }
+      dereference_rec(expr.op1());
 
     if(o2)
-    {
-      guardt old_guard=guard;
-      guard.add(boolean_negate(expr.op0()));
-      dereference_rec(expr.op2(), guard);
-      guard = std::move(old_guard);
-    }
+      dereference_rec(expr.op2());
 
     return;
   }
@@ -179,7 +159,7 @@ void goto_program_dereferencet::dereference_rec(exprt &expr, guardt &guard)
   }
 
   Forall_operands(it, expr)
-    dereference_rec(*it, guard);
+    dereference_rec(*it);
 
   if(expr.id()==ID_dereference)
   {
@@ -232,15 +212,13 @@ void goto_program_dereferencet::dereference_expr(
   exprt &expr,
   const bool checks_only)
 {
-  guardt guard{true_exprt{}};
-
   if(checks_only)
   {
     exprt tmp(expr);
-    dereference_rec(tmp, guard);
+    dereference_rec(tmp);
   }
   else
-    dereference_rec(expr, guard);
+    dereference_rec(expr);
 }
 
 void goto_program_dereferencet::dereference_program(

@@ -87,7 +87,7 @@ protected:
     bool checks_only=false);
 
 protected:
-  void dereference_rec(exprt &expr, guardt &guard);
+  void dereference_rec(exprt &expr);
   void dereference_expr(exprt &expr, const bool checks_only);
 
 #if 0
