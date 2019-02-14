@@ -125,8 +125,8 @@ SCENARIO("byte_extract_lowering", "[core][solvers][lowering][byte_extract]")
       signedbv_typet(128),
       // ieee_float_spect::single_precision().to_type(),
       // pointer_typet(u64, 64),
-      // vector_typet(u8, size),
-      // vector_typet(u64, size),
+      vector_typet(u8, size),
+      vector_typet(u64, size),
       // complex_typet(s16),
       // complex_typet(u64)
     };
