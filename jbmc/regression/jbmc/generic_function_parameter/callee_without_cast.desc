@@ -1,0 +1,9 @@
+CORE
+Test.class
+--function Test.main --show-goto-functions
+^EXIT=0$
+^SIGNAL=0$
+this \. Test.callee:\(LTest;\)V\(param\);
+--
+--
+Test and callee have matching parameter types, so there should be no cast at the callsite.
