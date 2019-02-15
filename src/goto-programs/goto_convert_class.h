@@ -17,7 +17,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <unordered_set>
 
 #include <util/allocate_objects.h>
-#include <util/guard.h>
 #include <util/message.h>
 #include <util/namespace.h>
 #include <util/replace_expr.h>

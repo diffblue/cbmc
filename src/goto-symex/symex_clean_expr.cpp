@@ -125,7 +125,7 @@ void goto_symext::process_array_expr(statet &state, exprt &expr)
   value_set_dereferencet dereference(
     ns, state.symbol_table, symex_dereference_state, language_mode, false);
 
-  expr = dereference.dereference(expr, guardt{true_exprt()});
+  expr = dereference.dereference(expr);
 
   ::process_array_expr(expr, symex_config.simplify_opt, ns);
 }

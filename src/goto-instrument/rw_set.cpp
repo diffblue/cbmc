@@ -79,14 +79,15 @@ void _rw_set_loct::compute()
 void _rw_set_loct::assign(const exprt &lhs, const exprt &rhs)
 {
   read(rhs);
-  read_write_rec(lhs, false, true, "", guardt(true_exprt()));
+  read_write_rec(lhs, false, true, "", exprt::operandst());
 }
 
 void _rw_set_loct::read_write_rec(
   const exprt &expr,
-  bool r, bool w,
+  bool r,
+  bool w,
   const std::string &suffix,
-  const guardt &guard)
+  const exprt::operandst &guard_conjuncts)
 {
   if(expr.id()==ID_symbol)
   {
@@ -96,16 +97,16 @@ void _rw_set_loct::read_write_rec(
 
     if(r)
     {
-      const auto &entry =
-        r_entries.emplace(object, entryt(symbol_expr, object, guard.as_expr()));
+      const auto &entry = r_entries.emplace(
+        object, entryt(symbol_expr, object, conjunction(guard_conjuncts)));
 
       track_deref(entry.first->second, true);
     }
 
     if(w)
     {
-      const auto &entry =
-        w_entries.emplace(object, entryt(symbol_expr, object, guard.as_expr()));
+      const auto &entry = w_entries.emplace(
+        object, entryt(symbol_expr, object, conjunction(guard_conjuncts)));
 
       track_deref(entry.first->second, false);
     }
@@ -114,20 +115,21 @@ void _rw_set_loct::read_write_rec(
   {
     assert(expr.operands().size()==1);
     const std::string &component_name=expr.get_string(ID_component_name);
-    read_write_rec(expr.op0(), r, w, "."+component_name+suffix, guard);
+    read_write_rec(
+      expr.op0(), r, w, "." + component_name + suffix, guard_conjuncts);
   }
   else if(expr.id()==ID_index)
   {
     // we don't distinguish the array elements for now
     assert(expr.operands().size()==2);
-    read_write_rec(expr.op0(), r, w, "[]"+suffix, guard);
-    read(expr.op1(), guard);
+    read_write_rec(expr.op0(), r, w, "[]" + suffix, guard_conjuncts);
+    read(expr.op1(), guard_conjuncts);
   }
   else if(expr.id()==ID_dereference)
   {
     assert(expr.operands().size()==1);
     set_track_deref();
-    read(expr.op0(), guard);
+    read(expr.op0(), guard_conjuncts);
 
     exprt tmp=expr;
     #ifdef LOCAL_MAY
@@ -147,25 +149,25 @@ void _rw_set_loct::read_write_rec(
         entryt &entry=r_entries[object];
         entry.object=object;
         entry.symbol_expr=symbol_exprt(ID_unknown);
-        entry.guard=guard.as_expr(); // should 'OR'
+        entry.guard = conjunction(guard_conjuncts); // should 'OR'
 
         continue;
       }
       #endif
-      read_write_rec(*it, r, w, suffix, guard);
+      read_write_rec(*it, r, w, suffix, guard_conjuncts);
     }
     #else
     dereference(function_id, target, tmp, ns, value_sets);
 
-    read_write_rec(tmp, r, w, suffix, guard);
-    #endif
+    read_write_rec(tmp, r, w, suffix, guard_conjuncts);
+#endif
 
     reset_track_deref();
   }
   else if(expr.id()==ID_typecast)
   {
     assert(expr.operands().size()==1);
-    read_write_rec(expr.op0(), r, w, suffix, guard);
+    read_write_rec(expr.op0(), r, w, suffix, guard_conjuncts);
   }
   else if(expr.id()==ID_address_of)
   {
@@ -174,20 +176,20 @@ void _rw_set_loct::read_write_rec(
   else if(expr.id()==ID_if)
   {
     assert(expr.operands().size()==3);
-    read(expr.op0(), guard);
+    read(expr.op0(), guard_conjuncts);
 
-    guardt true_guard(guard);
-    true_guard.add(expr.op0());
+    exprt::operandst true_guard = guard_conjuncts;
+    true_guard.push_back(expr.op0());
     read_write_rec(expr.op1(), r, w, suffix, true_guard);
 
-    guardt false_guard(guard);
-    false_guard.add(not_exprt(expr.op0()));
+    exprt::operandst false_guard = guard_conjuncts;
+    false_guard.push_back(not_exprt(expr.op0()));
     read_write_rec(expr.op2(), r, w, suffix, false_guard);
   }
   else
   {
     forall_operands(it, expr)
-      read_write_rec(*it, r, w, suffix, guard);
+      read_write_rec(*it, r, w, suffix, guard_conjuncts);
   }
 }
 

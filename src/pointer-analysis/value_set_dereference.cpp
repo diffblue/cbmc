@@ -32,9 +32,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/simplify_expr.h>
 #include <util/ssa_expr.h>
 
-exprt value_set_dereferencet::dereference(
-  const exprt &pointer,
-  const guardt &guard)
+exprt value_set_dereferencet::dereference(const exprt &pointer)
 {
   if(pointer.type().id()!=ID_pointer)
     throw "dereference expected pointer type, but got "+
@@ -44,16 +42,8 @@ exprt value_set_dereferencet::dereference(
   if(pointer.id()==ID_if)
   {
     const if_exprt &if_expr=to_if_expr(pointer);
-    // push down the if
-    guardt true_guard=guard;
-    guardt false_guard=guard;
-
-    true_guard.add(if_expr.cond());
-    false_guard.add(not_exprt(if_expr.cond()));
-
-    exprt true_case = dereference(if_expr.true_case(), true_guard);
-    exprt false_case = dereference(if_expr.false_case(), false_guard);
-
+    exprt true_case = dereference(if_expr.true_case());
+    exprt false_case = dereference(if_expr.false_case());
     return if_exprt(if_expr.cond(), true_case, false_case);
   }
 
