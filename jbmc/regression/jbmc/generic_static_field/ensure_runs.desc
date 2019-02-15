@@ -1,0 +1,10 @@
+CORE
+Test.class
+--function Test.test --validate-goto-model
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+This just checks the generated GOTO passes validation; the main test is in check_static_field_use.desc
