@@ -1,0 +1,10 @@
+CORE
+Base.class
+--function Base.main
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+\[java::Impl1\.f:\(Ljava/lang/Object;\)V.assertion\.1\] line 23 assertion at file Base.java line 23 function java::Impl1\.f:\(Ljava/lang/Object;\)V bytecode-index 5: FAILURE
+\[java::Impl1\.g:\(Ljava/lang/String;\)V.assertion\.1\] line 24 assertion at file Base.java line 24 function java::Impl1\.g:\(Ljava/lang/String;\)V bytecode-index 5: FAILURE
+\[java::Impl2\.f:\(Ljava/lang/Object;\)V.assertion\.1\] line 30 assertion at file Base.java line 30 function java::Impl2\.f:\(Ljava/lang/Object;\)V bytecode-index 5: FAILURE
+\[java::Impl2\.g:\(Ljava/lang/String;\)V.assertion\.1\] line 31 assertion at file Base.java line 31 function java::Impl2\.g:\(Ljava/lang/String;\)V bytecode-index 5: FAILURE
