@@ -21,6 +21,7 @@
 #include <util/simplify_expr.h>
 #include <util/simplify_expr_class.h>
 #include <util/std_types.h>
+#include <util/string_constant.h>
 #include <util/symbol_table.h>
 
 SCENARIO("byte_extract_lowering", "[core][solvers][lowering][byte_extract]")
@@ -87,6 +88,35 @@ SCENARIO("byte_extract_lowering", "[core][solvers][lowering][byte_extract]")
 
       REQUIRE(!has_subexpr(lower_be2, ID_byte_extract_big_endian));
       REQUIRE(lower_be2.type() == be2.type());
+    }
+  }
+
+  GIVEN("A a byte_extract from a string constant")
+  {
+    string_constantt s("ABCD");
+    const byte_extract_exprt be1(
+      ID_byte_extract_little_endian,
+      s,
+      from_integer(1, index_type()),
+      unsignedbv_typet(16));
+
+    THEN("byte_extract lowering yields the expected value")
+    {
+      const exprt lower_be1 = lower_byte_extract(be1, ns);
+
+      REQUIRE(!has_subexpr(lower_be1, ID_byte_extract_little_endian));
+      REQUIRE(lower_be1.type() == be1.type());
+      REQUIRE(
+        lower_be1 == from_integer((int{'C'} << 8) + 'B', unsignedbv_typet(16)));
+
+      byte_extract_exprt be2 = be1;
+      be2.id(ID_byte_extract_big_endian);
+      const exprt lower_be2 = lower_byte_extract(be2, ns);
+
+      REQUIRE(!has_subexpr(lower_be2, ID_byte_extract_big_endian));
+      REQUIRE(lower_be2.type() == be2.type());
+      REQUIRE(
+        lower_be2 == from_integer((int{'B'} << 8) + 'C', unsignedbv_typet(16)));
     }
   }
 

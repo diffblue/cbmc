@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_offset_size.h>
 #include <util/replace_symbol.h>
 #include <util/simplify_expr.h>
+#include <util/string_constant.h>
 
 #include "flatten_byte_extract_exceptions.h"
 
@@ -269,6 +270,26 @@ static exprt unpack_rec(
     return unpack_rec(
       typecast_exprt(
         src, unsignedbv_typet(to_pointer_type(src.type()).get_width())),
+      little_endian,
+      offset_bytes,
+      max_bytes,
+      ns,
+      unpack_byte_array);
+  }
+  else if(src.id() == ID_string_constant)
+  {
+    return unpack_rec(
+      to_string_constant(src).to_array_expr(),
+      little_endian,
+      offset_bytes,
+      max_bytes,
+      ns,
+      unpack_byte_array);
+  }
+  else if(src.id() == ID_constant && src.type().id() == ID_string)
+  {
+    return unpack_rec(
+      string_constantt(to_constant_expr(src).get_value()).to_array_expr(),
       little_endian,
       offset_bytes,
       max_bytes,
