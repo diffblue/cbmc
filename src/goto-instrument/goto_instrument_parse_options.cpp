@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <memory>
 
 #include <util/config.h>
+#include <util/exception_utils.h>
 #include <util/exit_codes.h>
 #include <util/json.h>
 #include <util/string2int.h>
@@ -823,6 +824,14 @@ int goto_instrument_parse_optionst::doit()
         return CPROVER_EXIT_CONVERSION_FAILED;
       else
         return CPROVER_EXIT_SUCCESS;
+    }
+    else if(cmdline.args.size() < 2)
+    {
+      throw invalid_command_line_argument_exceptiont(
+        "Invalid number of positional arguments passed",
+        "[in] [out]",
+        "goto-instrument needs one input and one output file, aside from other "
+        "flags");
     }
 
     help();
