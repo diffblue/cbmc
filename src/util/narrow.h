@@ -38,4 +38,17 @@ output_type narrow(input_type input)
   return output;
 }
 
+/// Run-time checked narrow cast. Throws a std::out_of_range error
+/// if the input cannot be converted to the output_type without data lass
+template <typename output_type, typename input_type>
+output_type narrow_or_throw_out_of_range(input_type input)
+{
+  auto const result = narrow_cast<input_type>(input);
+  if(result != input)
+  {
+    throw std::out_of_range{"narrowing gave a different value than expected"};
+  }
+  return result;
+}
+
 #endif // CPROVER_UTIL_NARROW_H
