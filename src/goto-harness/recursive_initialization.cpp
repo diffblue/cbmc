@@ -26,20 +26,21 @@ recursive_initializationt::recursive_initializationt(
 void recursive_initializationt::initialize(
   const exprt &lhs,
   std::size_t depth,
+  const recursion_sett &known_tags,
   code_blockt &body)
 {
   auto const &type = lhs.type();
   if(type.id() == ID_struct_tag)
   {
-    initialize_struct_tag(lhs, depth, body);
+    initialize_struct_tag(lhs, depth, known_tags, body);
   }
   else if(type.id() == ID_pointer)
   {
-    initialize_pointer(lhs, depth, body);
+    initialize_pointer(lhs, depth, known_tags, body);
   }
   else
   {
-    initialize_nondet(lhs, depth, body);
+    initialize_nondet(lhs, depth, known_tags, body);
   }
 }
 
@@ -64,20 +65,24 @@ symbol_exprt recursive_initializationt::get_malloc_function()
 void recursive_initializationt::initialize_struct_tag(
   const exprt &lhs,
   std::size_t depth,
+  const recursion_sett &known_tags,
   code_blockt &body)
 {
   PRECONDITION(lhs.type().id() == ID_struct_tag);
   auto const &type = to_struct_tag_type(lhs.type());
+  auto new_known_tags = known_tags;
+  new_known_tags.insert(type.get_identifier());
   auto const &ns = namespacet{goto_model.symbol_table};
   for(auto const &component : ns.follow_tag(type).components())
   {
-    initialize(member_exprt{lhs, component}, depth, body);
+    initialize(member_exprt{lhs, component}, depth, new_known_tags, body);
   }
 }
 
 void recursive_initializationt::initialize_pointer(
   const exprt &lhs,
   std::size_t depth,
+  const recursion_sett &known_tags,
   code_blockt &body)
 {
   PRECONDITION(lhs.type().id() == ID_pointer);
@@ -92,17 +97,24 @@ void recursive_initializationt::initialize_pointer(
     allocate_objects.allocate_automatic_local_object(type.subtype(), "pointee");
   allocate_objects.declare_created_symbols(body);
   body.add(code_assignt{lhs, null_pointer_exprt{type}});
-  if(depth < initialization_config.max_nondet_tree_depth)
+  bool is_unknown_struct_tag =
+    can_cast_type<tag_typet>(type.subtype()) &&
+    known_tags.find(to_tag_type(type.subtype()).get_identifier()) ==
+      known_tags.end();
+
+  if(
+    depth < initialization_config.max_nondet_tree_depth ||
+    is_unknown_struct_tag)
   {
     if(depth < initialization_config.min_null_tree_depth)
     {
-      initialize(pointee, depth + 1, body);
+      initialize(pointee, depth + 1, known_tags, body);
       body.add(code_assignt{lhs, address_of_exprt{pointee}});
     }
     else
     {
       code_blockt then_case{};
-      initialize(pointee, depth + 1, then_case);
+      initialize(pointee, depth + 1, known_tags, then_case);
       then_case.add(code_assignt{lhs, address_of_exprt{pointee}});
       body.add(code_ifthenelset{choice, then_case});
     }
@@ -112,6 +124,7 @@ void recursive_initializationt::initialize_pointer(
 void recursive_initializationt::initialize_nondet(
   const exprt &lhs,
   std::size_t depth,
+  const recursion_sett &known_tags,
   code_blockt &body)
 {
   body.add(code_assignt{lhs, side_effect_expr_nondett{lhs.type()}});

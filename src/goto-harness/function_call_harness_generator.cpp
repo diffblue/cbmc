@@ -15,6 +15,7 @@ Author: Diffblue Ltd.
 #include <util/exception_utils.h>
 #include <util/std_code.h>
 #include <util/std_expr.h>
+#include <util/string2int.h>
 #include <util/ui_message.h>
 
 #include "function_harness_generator_options.h"
@@ -79,14 +80,34 @@ void function_call_harness_generatort::handle_option(
   else if(option == FUNCTION_HARNESS_GENERATOR_MIN_NULL_TREE_DEPTH_OPT)
   {
     auto const value = require_exactly_one_value(option, values);
-    p_impl->recursive_initialization_config.min_null_tree_depth =
-      std::stoul(value);
+    auto const min_null_tree_depth = string2optional<std::size_t>(value, 10);
+    if(min_null_tree_depth.has_value())
+    {
+      p_impl->recursive_initialization_config.min_null_tree_depth =
+        min_null_tree_depth.value();
+    }
+    else
+    {
+      throw invalid_command_line_argument_exceptiont{
+        "failed to convert `" + value + "' to integer",
+        "--" FUNCTION_HARNESS_GENERATOR_MIN_NULL_TREE_DEPTH_OPT};
+    }
   }
   else if(option == FUNCTION_HARNESS_GENERATOR_MAX_NONDET_TREE_DEPTH_OPT)
   {
     auto const value = require_exactly_one_value(option, values);
-    p_impl->recursive_initialization_config.max_nondet_tree_depth =
-      std::stoul(value);
+    auto const max_nondet_tree_depth = string2optional<std::size_t>(value, 10);
+    if(max_nondet_tree_depth.has_value())
+    {
+      p_impl->recursive_initialization_config.max_nondet_tree_depth =
+        max_nondet_tree_depth.value();
+    }
+    else
+    {
+      throw invalid_command_line_argument_exceptiont{
+        "failed to convert `" + value + "' to integer",
+        "--" FUNCTION_HARNESS_GENERATOR_MAX_NONDET_TREE_DEPTH_OPT};
+    }
   }
   else
   {
@@ -176,7 +197,7 @@ void function_call_harness_generatort::implt::generate_initialisation_code_for(
   code_blockt &block,
   const exprt &lhs)
 {
-  recursive_initialization->initialize(lhs, 0, block);
+  recursive_initialization->initialize(lhs, 0, {}, block);
 }
 
 void function_call_harness_generatort::validate_options()
