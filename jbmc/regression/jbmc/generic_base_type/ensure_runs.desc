@@ -1,0 +1,10 @@
+CORE
+Test.class
+--function Test.main
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+\[java::Test\.callee:\(LBase;\)V\.assertion\.1\] line 18 assertion at file Base\.java line 18 function java::Test\.callee:\(LBase;\)V bytecode-index 5: FAILURE
+\[java::Test\.callee2:\(LBase;\)V\.assertion\.1\] line 19 assertion at file Base\.java line 19 function java::Test\.callee2:\(LBase;\)V bytecode-index 5: FAILURE
+--
+^warning: ignoring
