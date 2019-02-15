@@ -43,6 +43,7 @@ protected:
   bvt convert_bitvector(const exprt &expr) override; // no cache
 
   exprt bv_get_rec(
+    const exprt &expr,
     const bvt &bv,
     const std::vector<bool> &unknown,
     std::size_t offset,
