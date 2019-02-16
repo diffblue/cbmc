@@ -129,7 +129,7 @@ void goto_convertt::do_function_call_if(
   do_function_call(lhs, function.false_case(), arguments, tmp_y, mode);
 
   if(tmp_y.instructions.empty())
-    y=tmp_y.add_instruction(SKIP);
+    y = tmp_y.add(goto_programt::make_skip());
   else
     y=tmp_y.instructions.begin();
 
@@ -143,7 +143,7 @@ void goto_convertt::do_function_call_if(
   do_function_call(lhs, function.true_case(), arguments, tmp_w, mode);
 
   if(tmp_w.instructions.empty())
-    tmp_w.add_instruction(SKIP);
+    tmp_w.add(goto_programt::make_skip());
 
   // x: goto z;
   *x = goto_programt::make_goto(z, true_exprt());
@@ -162,11 +162,8 @@ void goto_convertt::do_function_call_other(
   goto_programt &dest)
 {
   // don't know what to do with it
-  goto_programt::targett t=dest.add_instruction(FUNCTION_CALL);
-
   code_function_callt function_call(lhs, function, arguments);
   function_call.add_source_location()=function.source_location();
-
-  t->source_location=function.source_location();
-  t->code.swap(function_call);
+  dest.add(goto_programt::make_function_call(
+    function_call, function.source_location()));
 }

@@ -24,7 +24,7 @@ void goto_convertt::convert_msc_try_finally(
     code.find_source_location());
 
   goto_programt tmp;
-  tmp.add_instruction(SKIP)->source_location=code.source_location();
+  tmp.add(goto_programt::make_skip(code.source_location()));
 
   {
     // save 'leave' target
@@ -153,7 +153,7 @@ void goto_convertt::convert_CPROVER_try_catch(
 
   // this is where we go after 'throw'
   goto_programt tmp;
-  tmp.add_instruction(SKIP)->source_location=code.source_location();
+  tmp.add(goto_programt::make_skip(code.source_location()));
 
   // set 'throw' target
   throw_targett throw_target(targets);
@@ -183,13 +183,8 @@ void goto_convertt::convert_CPROVER_throw(
   const irep_idt &mode)
 {
   // set the 'exception' flag
-  {
-    goto_programt::targett t_set_exception=
-      dest.add_instruction(ASSIGN);
-
-    t_set_exception->source_location=code.source_location();
-    t_set_exception->code = code_assignt(exception_flag(mode), true_exprt());
-  }
+  dest.add(goto_programt::make_assignment(
+    exception_flag(mode), true_exprt(), code.source_location()));
 
   // do we catch locally?
   if(targets.throw_set)

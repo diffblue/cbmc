@@ -235,7 +235,7 @@ bool polynomial_acceleratort::accelerate(
   // assume(guard);
   // assume(no overflows in previous code);
 
-  program.add_instruction(ASSUME)->guard=guard;
+  program.add(goto_programt::make_assumption(guard));
 
   program.assign(
     loop_counter,
@@ -261,7 +261,7 @@ bool polynomial_acceleratort::accelerate(
     return false;
   }
 
-  program.add_instruction(ASSUME)->guard=guard_last;
+  program.add(goto_programt::make_assumption(guard_last));
   program.fix_types();
 
   if(path_is_monotone)
@@ -406,9 +406,7 @@ bool polynomial_acceleratort::fit_polynomial_sliced(
 #endif
 
   // Now do an ASSERT(false) to grab a counterexample
-  goto_programt::targett assertion=program.add_instruction(ASSERT);
-  assertion->guard=false_exprt();
-
+  program.add(goto_programt::make_assertion(false_exprt()));
 
   // If the path is satisfiable, we've fitted a polynomial.  Extract the
   // relevant coefficients and return the expression.
@@ -600,7 +598,7 @@ void polynomial_acceleratort::assert_for_values(
   exprt overflow_expr;
   overflow.overflow_expr(rhs, overflow_expr);
 
-  program.add_instruction(ASSUME)->guard=not_exprt(overflow_expr);
+  program.add(goto_programt::make_assumption(not_exprt(overflow_expr)));
 
   rhs=typecast_exprt(rhs, target.type());
 
@@ -609,8 +607,7 @@ void polynomial_acceleratort::assert_for_values(
   const equal_exprt polynomial_holds(target, rhs);
 
   // Finally, assert that the polynomial equals the variable we're fitting.
-  goto_programt::targett assumption=program.add_instruction(ASSUME);
-  assumption->guard=polynomial_holds;
+  program.add(goto_programt::make_assumption(polynomial_holds));
 }
 
 void polynomial_acceleratort::cone_of_influence(
@@ -680,24 +677,23 @@ bool polynomial_acceleratort::check_inductive(
       ++it)
   {
     const equal_exprt holds(it->first, it->second.to_expr());
-    program.add_instruction(ASSUME)->guard=holds;
+    program.add(goto_programt::make_assumption(holds));
 
     polynomials_hold.push_back(holds);
   }
 
   program.append(body);
 
-  codet inc_loop_counter=
-    code_assignt(
-      loop_counter,
-      plus_exprt(loop_counter, from_integer(1, loop_counter.type())));
-  program.add_instruction(ASSIGN)->code=inc_loop_counter;
+  auto inc_loop_counter = code_assignt(
+    loop_counter,
+    plus_exprt(loop_counter, from_integer(1, loop_counter.type())));
+  program.add(goto_programt::make_assignment(inc_loop_counter));
 
   for(std::vector<exprt>::iterator it=polynomials_hold.begin();
       it!=polynomials_hold.end();
       ++it)
   {
-    program.add_instruction(ASSERT)->guard=*it;
+    program.add(goto_programt::make_assertion(*it));
   }
 
 #ifdef DEBUG

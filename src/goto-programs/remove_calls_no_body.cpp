@@ -47,9 +47,7 @@ void remove_calls_no_bodyt::remove_call_no_body(
     code_assignt code(lhs, rhs);
     code.add_source_location() = target->source_location;
 
-    goto_programt::targett t = tmp.add_instruction(ASSIGN);
-    t->source_location = target->source_location;
-    t->code.swap(code);
+    tmp.add(goto_programt::make_assignment(code, target->source_location));
   }
 
   // kill call
