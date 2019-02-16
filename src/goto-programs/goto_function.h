@@ -16,6 +16,7 @@ Date: May 2018
 
 #include <iosfwd>
 
+#include <util/deprecate.h>
 #include <util/find_symbols.h>
 #include <util/std_types.h>
 
@@ -29,16 +30,15 @@ public:
   goto_programt body;
 
   /// The type of the function, indicating the return type and parameter types
+  DEPRECATED("Get the type from the symbol table instead")
   code_typet type;
 
   typedef std::vector<irep_idt> parameter_identifierst;
 
   /// The identifiers of the parameters of this function
   ///
-  /// Note: This variable is currently unused and the vector is thus always
-  /// empty. In the future the code base may be refactored to fill in the
-  /// parameter identifiers here when creating a `goto_functiont`. For now the
-  /// parameter identifiers should be retrieved from the type (`code_typet`).
+  /// Note: This is now the preferred way of getting the identifiers of the
+  /// parameters. The identifiers in the type will go away.
   parameter_identifierst parameter_identifiers;
 
   bool body_available() const
@@ -46,16 +46,27 @@ public:
     return !body.instructions.empty();
   }
 
+  void set_parameter_identifiers(const code_typet &code_type)
+  {
+    parameter_identifiers.clear();
+    parameter_identifiers.reserve(code_type.parameters().size());
+    for(const auto &parameter : code_type.parameters())
+      parameter_identifiers.push_back(parameter.get_identifier());
+  }
+
+  DEPRECATED("Get the type from the symbol table instead")
   bool is_inlined() const
   {
     return type.get_bool(ID_C_inlined);
   }
 
+  DEPRECATED("Get the type from the symbol table instead")
   bool is_hidden() const
   {
     return type.get_bool(ID_C_hide);
   }
 
+  DEPRECATED("Get the type from the symbol table instead")
   void make_hidden()
   {
     type.set(ID_C_hide, true);

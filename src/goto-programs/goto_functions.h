@@ -117,6 +117,9 @@ public:
     {
       const goto_functiont &goto_function = entry.second;
       const auto &function_name = entry.first;
+      const symbolt &function_symbol = ns.lookup(function_name);
+      const code_typet::parameterst &parameters =
+        to_code_type(function_symbol.type).parameters();
 
       DATA_CHECK(
         vm,
@@ -124,6 +127,26 @@ public:
         id2string(function_name) + " type inconsistency\ngoto program type: " +
           goto_function.type.id_string() +
           "\nsymbol table type: " + ns.lookup(function_name).type.id_string());
+
+      DATA_CHECK(
+        vm,
+        goto_function.parameter_identifiers.size() == parameters.size(),
+        id2string(function_name) + " parameter count inconsistency\n" +
+          "goto program: " +
+          std::to_string(goto_function.parameter_identifiers.size()) +
+          "\nsymbol table: " + std::to_string(parameters.size()));
+
+      auto it = goto_function.parameter_identifiers.begin();
+      for(const auto &parameter : parameters)
+      {
+        DATA_CHECK(
+          vm,
+          it->empty() || ns.lookup(*it).type == parameter.type(),
+          id2string(function_name) + " parameter type inconsistency\n" +
+            "goto program: " + ns.lookup(*it).type.id_string() +
+            "\nsymbol table: " + parameter.type().id_string());
+        ++it;
+      }
 
       goto_function.validate(ns, vm);
     }

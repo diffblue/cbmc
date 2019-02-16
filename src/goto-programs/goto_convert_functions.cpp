@@ -151,7 +151,10 @@ void goto_convert_functionst::convert_function(
   // make tmp variables local to function
   tmp_symbol_prefix=id2string(symbol.name)+"::$tmp";
 
-  f.type=to_code_type(symbol.type);
+  // store the parameter identifiers in the goto functions
+  const code_typet &code_type = to_code_type(symbol.type);
+  f.type = code_type;
+  f.set_parameter_identifiers(code_type);
 
   if(symbol.value.is_nil() ||
      symbol.is_compiled()) /* goto_inline may have removed the body */

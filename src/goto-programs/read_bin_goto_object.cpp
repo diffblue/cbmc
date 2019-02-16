@@ -72,10 +72,12 @@ static bool read_bin_goto_object(
 
     if(!sym.is_type && sym.type.id()==ID_code)
     {
-      // makes sure there is an empty function
-      // for every function symbol and fixes
-      // the function types.
-      functions.function_map[sym.name].type=to_code_type(sym.type);
+      // makes sure there is an empty function for every function symbol
+      auto entry = functions.function_map.emplace(sym.name, goto_functiont());
+
+      const code_typet &code_type = to_code_type(sym.type);
+      entry.first->second.type = code_type;
+      entry.first->second.set_parameter_identifiers(code_type);
     }
 
     symbol_table.add(sym);
