@@ -76,6 +76,13 @@ json_objectt test_inputst::to_json(
     goal_refs.push_back(json_stringt(goal_id));
   }
   json_result["coveredGoals"] = std::move(goal_refs);
+
+  if(print_trace)
+  {
+    json_arrayt json_trace;
+    convert(ns, goto_trace, json_trace);
+    json_result["trace"] = std::move(json_trace);
+  }
   return json_result;
 }
 
