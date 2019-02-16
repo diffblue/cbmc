@@ -1760,7 +1760,7 @@ optionalt<std::string> simplify_exprt::expr2bits(
     if(
       type.id() == ID_unsignedbv || type.id() == ID_signedbv ||
       type.id() == ID_floatbv || type.id() == ID_fixedbv ||
-      type.id() == ID_c_bit_field || type.id() == ID_pointer)
+      type.id() == ID_c_bit_field)
     {
       const auto width = to_bitvector_type(type).get_width();
 
@@ -1772,6 +1772,13 @@ optionalt<std::string> simplify_exprt::expr2bits(
         result[map.map_bit(i)] = get_bvrep_bit(value, width, i) ? '1' : '0';
 
       return result;
+    }
+    else if(type.id() == ID_pointer)
+    {
+      if(value == ID_NULL && config.ansi_c.NULL_is_zero)
+        return std::string('0', to_bitvector_type(type).get_width());
+      else
+        return {};
     }
     else if(type.id() == ID_c_enum_tag)
     {
