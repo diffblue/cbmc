@@ -183,11 +183,11 @@ SCENARIO("byte_extract_lowering", "[core][solvers][lowering][byte_extract]")
           REQUIRE(type_bits);
           const auto type_bits_int = numeric_cast_v<std::size_t>(*type_bits);
           REQUIRE(type_bits_int <= oss.str().size());
-          const exprt s = simp.bits2expr(
+          const auto s = simp.bits2expr(
             oss.str().substr(0, type_bits_int),
             t1,
             endianness == ID_byte_extract_little_endian);
-          REQUIRE(s.is_not_nil());
+          REQUIRE(s.has_value());
 
           for(const auto &t2 : types)
           {
@@ -209,14 +209,14 @@ SCENARIO("byte_extract_lowering", "[core][solvers][lowering][byte_extract]")
             const auto type_bits_2_int =
               numeric_cast_v<std::size_t>(*type_bits_2);
             REQUIRE(type_bits_2_int <= oss.str().size());
-            const exprt r = simp.bits2expr(
+            const auto r = simp.bits2expr(
               oss.str().substr(0, type_bits_2_int),
               t2,
               endianness == ID_byte_extract_little_endian);
-            REQUIRE(r.is_not_nil());
+            REQUIRE(r.has_value());
 
             const byte_extract_exprt be(
-              endianness, s, from_integer(2, index_type()), t2);
+              endianness, *s, from_integer(2, index_type()), t2);
 
             const exprt lower_be = lower_byte_extract(be, ns);
             const exprt lower_be_s = simplify_expr(lower_be, ns);
@@ -343,9 +343,9 @@ SCENARIO("byte_update_lowering", "[core][solvers][lowering][byte_update]")
           const auto type_bits_int = numeric_cast_v<std::size_t>(*type_bits);
           REQUIRE(type_bits_int <= oss.str().size());
           const std::string s_string = oss.str().substr(0, type_bits_int);
-          const exprt s = simp.bits2expr(
+          const auto s = simp.bits2expr(
             s_string, t1, endianness == ID_byte_update_little_endian);
-          REQUIRE(s.is_not_nil());
+          REQUIRE(s.has_value());
 
           for(const auto &t2 : types)
           {
@@ -368,18 +368,18 @@ SCENARIO("byte_update_lowering", "[core][solvers][lowering][byte_update]")
               numeric_cast_v<std::size_t>(*type_bits_2);
             REQUIRE(type_bits_2_int <= oss.str().size());
             const std::string u_string = oss.str().substr(0, type_bits_2_int);
-            const exprt u = simp.bits2expr(
+            const auto u = simp.bits2expr(
               u_string, t2, endianness == ID_byte_update_little_endian);
-            REQUIRE(u.is_not_nil());
+            REQUIRE(u.has_value());
 
             std::string r_string = s_string;
             r_string.replace(16, u_string.size(), u_string);
-            const exprt r = simp.bits2expr(
+            const auto r = simp.bits2expr(
               r_string, t1, endianness == ID_byte_update_little_endian);
-            REQUIRE(r.is_not_nil());
+            REQUIRE(r.has_value());
 
             const byte_update_exprt bu(
-              endianness, s, from_integer(2, index_type()), u);
+              endianness, *s, from_integer(2, index_type()), *u);
 
             const exprt lower_bu = lower_byte_operators(bu, ns);
             const exprt lower_bu_s = simplify_expr(lower_bu, ns);

@@ -1554,7 +1554,7 @@ bool simplify_exprt::simplify_object(exprt &expr)
   return true;
 }
 
-exprt simplify_exprt::bits2expr(
+optionalt<exprt> simplify_exprt::bits2expr(
   const std::string &bits,
   const typet &type,
   bool little_endian)
@@ -1563,7 +1563,7 @@ exprt simplify_exprt::bits2expr(
   auto type_bits = pointer_offset_bits(type, ns);
 
   if(!type_bits.has_value() || *type_bits != bits.size())
-    return nil_exprt();
+    return {};
 
   if(
     type.id() == ID_unsignedbv || type.id() == ID_signedbv ||
@@ -1583,16 +1583,26 @@ exprt simplify_exprt::bits2expr(
   }
   else if(type.id()==ID_c_enum)
   {
-    exprt val = bits2expr(bits, to_c_enum_type(type).subtype(), little_endian);
-    val.type() = type;
-    return val;
+    auto val = bits2expr(bits, to_c_enum_type(type).subtype(), little_endian);
+    if(val.has_value())
+    {
+      val->type() = type;
+      return *val;
+    }
+    else
+      return {};
   }
   else if(type.id()==ID_c_enum_tag)
   {
-    exprt val =
+    auto val =
       bits2expr(bits, ns.follow_tag(to_c_enum_tag_type(type)), little_endian);
-    val.type() = type;
-    return val;
+    if(val.has_value())
+    {
+      val->type() = type;
+      return *val;
+    }
+    else
+      return {};
   }
   else if(type.id()==ID_union)
   {
@@ -1603,19 +1613,24 @@ exprt simplify_exprt::bits2expr(
 
     for(const auto &component : components)
     {
-      exprt val=bits2expr(bits, component.type(), little_endian);
-      if(val.is_nil())
+      auto val = bits2expr(bits, component.type(), little_endian);
+      if(!val.has_value())
         continue;
 
-      return union_exprt(component.get_name(), val, type);
+      return union_exprt(component.get_name(), *val, type);
     }
   }
   else if(type.id() == ID_union_tag)
   {
-    exprt val =
+    auto val =
       bits2expr(bits, ns.follow_tag(to_union_tag_type(type)), little_endian);
-    val.type() = type;
-    return val;
+    if(val.has_value())
+    {
+      val->type() = type;
+      return *val;
+    }
+    else
+      return {};
   }
   else if(type.id()==ID_struct)
   {
@@ -1637,10 +1652,10 @@ exprt simplify_exprt::bits2expr(
         numeric_cast_v<std::size_t>(m_offset_bits),
         numeric_cast_v<std::size_t>(*m_size));
 
-      exprt comp=bits2expr(comp_bits, component.type(), little_endian);
-      if(comp.is_nil())
-        return nil_exprt();
-      result.add_to_operands(std::move(comp));
+      auto comp = bits2expr(comp_bits, component.type(), little_endian);
+      if(!comp.has_value())
+        return {};
+      result.add_to_operands(std::move(*comp));
 
       m_offset_bits += *m_size;
     }
@@ -1649,10 +1664,15 @@ exprt simplify_exprt::bits2expr(
   }
   else if(type.id() == ID_struct_tag)
   {
-    exprt val =
+    auto val =
       bits2expr(bits, ns.follow_tag(to_struct_tag_type(type)), little_endian);
-    val.type() = type;
-    return val;
+    if(val.has_value())
+    {
+      val->type() = type;
+      return *val;
+    }
+    else
+      return {};
   }
   else if(type.id()==ID_array)
   {
@@ -1671,10 +1691,10 @@ exprt simplify_exprt::bits2expr(
     for(std::size_t i=0; i<n_el; ++i)
     {
       std::string el_bits=std::string(bits, i*el_size, el_size);
-      exprt el = bits2expr(el_bits, array_type.subtype(), little_endian);
-      if(el.is_nil())
-        return nil_exprt();
-      result.add_to_operands(std::move(el));
+      auto el = bits2expr(el_bits, array_type.subtype(), little_endian);
+      if(!el.has_value())
+        return {};
+      result.add_to_operands(std::move(*el));
     }
 
     return std::move(result);
@@ -1696,10 +1716,10 @@ exprt simplify_exprt::bits2expr(
     for(std::size_t i = 0; i < n_el; ++i)
     {
       std::string el_bits = std::string(bits, i * el_size, el_size);
-      exprt el = bits2expr(el_bits, vector_type.subtype(), little_endian);
-      if(el.is_nil())
-        return nil_exprt();
-      result.add_to_operands(std::move(el));
+      auto el = bits2expr(el_bits, vector_type.subtype(), little_endian);
+      if(!el.has_value())
+        return {};
+      result.add_to_operands(std::move(*el));
     }
 
     return std::move(result);
@@ -1713,17 +1733,17 @@ exprt simplify_exprt::bits2expr(
 
     const std::size_t sub_size = numeric_cast_v<std::size_t>(*sub_size_opt);
 
-    exprt real = bits2expr(
+    auto real = bits2expr(
       bits.substr(0, sub_size), complex_type.subtype(), little_endian);
-    exprt imag =
+    auto imag =
       bits2expr(bits.substr(sub_size), complex_type.subtype(), little_endian);
-    if(real.is_nil() || imag.is_nil())
-      return nil_exprt();
+    if(!real.has_value() || !imag.has_value())
+      return {};
 
-    return complex_exprt(real, imag, complex_type);
+    return complex_exprt(*real, *imag, complex_type);
   }
 
-  return nil_exprt();
+  return {};
 }
 
 optionalt<std::string> simplify_exprt::expr2bits(
@@ -1903,15 +1923,12 @@ bool simplify_exprt::simplify_byte_extract(byte_extract_exprt &expr)
       numeric_cast_v<std::size_t>(*offset * 8),
       numeric_cast_v<std::size_t>(*el_size));
 
-    exprt tmp=
-      bits2expr(
-        el_bits,
-        expr.type(),
-        expr.id()==ID_byte_extract_little_endian);
+    auto tmp = bits2expr(
+      el_bits, expr.type(), expr.id() == ID_byte_extract_little_endian);
 
-    if(tmp.is_not_nil())
+    if(tmp.has_value())
     {
-      expr.swap(tmp);
+      expr.swap(*tmp);
       return false;
     }
   }
@@ -1958,15 +1975,12 @@ bool simplify_exprt::simplify_byte_extract(byte_extract_exprt &expr)
       numeric_cast_v<std::size_t>(*offset * 8),
       numeric_cast_v<std::size_t>(*el_size));
 
-    exprt tmp=
-      bits2expr(
-        bits_cut,
-        expr.type(),
-        expr.id()==ID_byte_extract_little_endian);
+    auto tmp = bits2expr(
+      bits_cut, expr.type(), expr.id() == ID_byte_extract_little_endian);
 
-    if(tmp.is_not_nil())
+    if(tmp.has_value())
     {
-      expr.swap(tmp);
+      expr.swap(*tmp);
 
       return false;
     }

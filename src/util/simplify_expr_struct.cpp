@@ -228,11 +228,11 @@ bool simplify_exprt::simplify_member(exprt &expr)
         std::string bits_cut =
           std::string(*bits, 0, numeric_cast_v<std::size_t>(target_bits));
 
-        exprt tmp=bits2expr(bits_cut, expr.type(), true);
+        auto tmp = bits2expr(bits_cut, expr.type(), true);
 
-        if(tmp.is_not_nil())
+        if(tmp.has_value())
         {
-          expr=tmp;
+          expr = *tmp;
           return false;
         }
       }

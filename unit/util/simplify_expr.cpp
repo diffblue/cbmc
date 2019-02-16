@@ -94,17 +94,17 @@ TEST_CASE("expr2bits and bits2expr respect bit order")
   REQUIRE(le.has_value());
   REQUIRE(le->size() == 32);
 
-  const exprt should_be_deadbeef1 =
+  const auto should_be_deadbeef1 =
     simp.bits2expr(*le, unsignedbv_typet(32), true);
-  REQUIRE(deadbeef == should_be_deadbeef1);
+  REQUIRE(deadbeef == *should_be_deadbeef1);
 
   const auto be = simp.expr2bits(deadbeef, false);
   REQUIRE(be.has_value());
   REQUIRE(be->size() == 32);
 
-  const exprt should_be_deadbeef2 =
+  const auto should_be_deadbeef2 =
     simp.bits2expr(*be, unsignedbv_typet(32), false);
-  REQUIRE(deadbeef == should_be_deadbeef2);
+  REQUIRE(deadbeef == *should_be_deadbeef2);
 }
 
 TEST_CASE("Simplify extractbit")

@@ -1127,11 +1127,11 @@ bool simplify_exprt::simplify_extractbits(extractbits_exprt &expr)
       numeric_cast_v<std::size_t>(*end),
       numeric_cast_v<std::size_t>(*start - *end + 1));
 
-    exprt result = bits2expr(extracted_value, expr.type(), true);
-    if(result.is_nil())
+    auto result = bits2expr(extracted_value, expr.type(), true);
+    if(!result.has_value())
       return true;
 
-    expr.swap(result);
+    expr.swap(*result);
 
     return false;
   }
