@@ -1,0 +1,13 @@
+CORE
+main.c
+--signed-overflow-check --conversion-check
+^EXIT=10$
+^SIGNAL=0$
+^\[.*\] .* arithmetic overflow on signed \+ in .*: SUCCESS
+^\[.*\] .* arithmetic overflow on signed type conversion in .*: FAILURE$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+The addition is done in signed int; hence, the overflow is only detected
+on conversion.
