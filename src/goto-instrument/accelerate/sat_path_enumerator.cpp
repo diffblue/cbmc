@@ -79,7 +79,7 @@ bool sat_path_enumeratort::next(patht &path)
     program.assume(new_path);
   }
 
-  program.add_instruction(ASSERT)->guard=false_exprt();
+  program.add(goto_programt::make_assertion(false_exprt()));
 
   try
   {
@@ -227,13 +227,13 @@ void sat_path_enumeratort::build_fixed()
   // As such, any path that jumps outside of the loop or jumps backwards
   // to a location other than the loop header (i.e. a nested loop) is not
   // one we're interested in, and we'll redirect it to this assume(false).
-  goto_programt::targett kill=fixed.add_instruction(ASSUME);
-  kill->guard=false_exprt();
+  goto_programt::targett kill =
+    fixed.add(goto_programt::make_assumption(false_exprt()));
 
   // Make a sentinel instruction to mark the end of the loop body.
   // We'll use this as the new target for any back-jumps to the loop
   // header.
-  goto_programt::targett end=fixed.add_instruction(SKIP);
+  goto_programt::targett end = fixed.add(goto_programt::make_skip());
 
   // A pointer to the start of the fixed-path body.  We'll be using this to
   // iterate over the fixed-path body, but for now it's just a pointer to the

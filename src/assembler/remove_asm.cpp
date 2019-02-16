@@ -266,8 +266,7 @@ void remove_asmt::process_instruction_gcc(
 
     if(x86_32_locked_atomic)
     {
-      goto_programt::targett ab = tmp_dest.add_instruction(ATOMIC_BEGIN);
-      ab->source_location = code.source_location();
+      tmp_dest.add(goto_programt::make_atomic_begin(code.source_location()));
 
       codet code_fence(ID_fence);
       code_fence.add_source_location() = code.source_location();
@@ -360,8 +359,7 @@ void remove_asmt::process_instruction_gcc(
 
     if(x86_32_locked_atomic)
     {
-      goto_programt::targett ae = tmp_dest.add_instruction(ATOMIC_END);
-      ae->source_location = code.source_location();
+      tmp_dest.add(goto_programt::make_atomic_end(code.source_location()));
 
       x86_32_locked_atomic = false;
     }
@@ -437,8 +435,7 @@ void remove_asmt::process_instruction_msc(
 
     if(x86_32_locked_atomic)
     {
-      goto_programt::targett ab = tmp_dest.add_instruction(ATOMIC_BEGIN);
-      ab->source_location = code.source_location();
+      tmp_dest.add(goto_programt::make_atomic_begin(code.source_location()));
 
       codet code_fence(ID_fence);
       code_fence.add_source_location() = code.source_location();
@@ -465,8 +462,7 @@ void remove_asmt::process_instruction_msc(
 
     if(x86_32_locked_atomic)
     {
-      goto_programt::targett ae = tmp_dest.add_instruction(ATOMIC_END);
-      ae->source_location = code.source_location();
+      tmp_dest.add(goto_programt::make_atomic_end(code.source_location()));
 
       x86_32_locked_atomic = false;
     }

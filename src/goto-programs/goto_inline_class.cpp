@@ -116,9 +116,7 @@ void goto_inlinet::parameter_assignments(
       code_assignt assignment(symbol_exprt(identifier, parameter_type), actual);
       assignment.add_source_location()=source_location;
 
-      dest.add_instruction(ASSIGN);
-      dest.instructions.back().source_location=source_location;
-      dest.instructions.back().code.swap(assignment);
+      dest.add(goto_programt::make_assignment(assignment, source_location));
     }
 
     if(it1!=arguments.end())

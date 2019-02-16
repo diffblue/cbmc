@@ -906,16 +906,15 @@ void goto_convertt::convert_for(
 
   // do the z label
   goto_programt tmp_z;
-  goto_programt::targett z=tmp_z.add_instruction(SKIP);
-  z->source_location=code.source_location();
+  goto_programt::targett z =
+    tmp_z.add(goto_programt::make_skip(code.source_location()));
 
   // do the x label
   goto_programt tmp_x;
 
   if(code.iter().is_nil())
   {
-    tmp_x.add_instruction(SKIP);
-    tmp_x.instructions.back().source_location=code.source_location();
+    tmp_x.add(goto_programt::make_skip(code.source_location()));
   }
   else
   {
@@ -924,10 +923,7 @@ void goto_convertt::convert_for(
     clean_expr(tmp_B, tmp_x, mode, false);
 
     if(tmp_x.instructions.empty())
-    {
-      tmp_x.add_instruction(SKIP);
-      tmp_x.instructions.back().source_location=code.source_location();
-    }
+      tmp_x.add(goto_programt::make_skip(code.source_location()));
   }
 
   // optimize the v label
@@ -948,8 +944,8 @@ void goto_convertt::convert_for(
 
   // y: goto u;
   goto_programt tmp_y;
-  goto_programt::targett y=tmp_y.add_instruction();
-  *y = goto_programt::make_goto(u, true_exprt(), code.source_location());
+  goto_programt::targett y = tmp_y.add(
+    goto_programt::make_goto(u, true_exprt(), code.source_location()));
 
   // loop invariant
   convert_loop_invariant(code, y, mode);

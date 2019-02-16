@@ -276,7 +276,7 @@ bool taint_analysist::operator()(
 
       goto_programt end, gotos, calls;
 
-      end.add_instruction(END_FUNCTION);
+      end.add(goto_programt::make_end_function());
 
       forall_goto_functions(f_it, goto_functions)
         if(f_it->second.body_available() &&
