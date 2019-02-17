@@ -263,9 +263,7 @@ void convert_return(
   json_call_return["internal"] = jsont::json_boolean(step.internal);
   json_call_return["thread"] = json_numbert(std::to_string(step.thread_nr));
 
-  const irep_idt &function_identifier =
-    (step.type == goto_trace_stept::typet::FUNCTION_CALL) ? step.called_function
-                                                          : step.function_id;
+  const irep_idt &function_identifier = step.called_function;
 
   const symbolt &symbol = ns.lookup(function_identifier);
   json_call_return["function"] =
