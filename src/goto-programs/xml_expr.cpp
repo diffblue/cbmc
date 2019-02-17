@@ -179,16 +179,13 @@ xmlt xml(const exprt &expr, const namespacet &ns)
       const auto width =
         to_bitvector_type(to_c_enum_type(type).subtype()).get_width();
 
+      const auto integer_value = bvrep2integer(value, width, false);
       result.name = "integer";
-      result.set_attribute(
-        "binary",
-        integer2binary(numeric_cast_v<mp_integer>(constant_expr), width));
+      result.set_attribute("binary", integer2binary(integer_value, width));
       result.set_attribute("width", width);
       result.set_attribute("c_type", "enum");
 
-      mp_integer i;
-      if(!to_integer(constant_expr, i))
-        result.data = integer2string(i);
+      result.data = integer2string(integer_value);
     }
     else if(type.id() == ID_c_enum_tag)
     {
