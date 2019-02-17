@@ -44,10 +44,13 @@ void goto_convertt::remove_assignment(
 
   if(statement==ID_assign)
   {
-    exprt tmp=expr;
-    tmp.id(ID_code);
-    // just interpret as code
-    convert_assign(to_code_assign(to_code(tmp)), dest, mode);
+    exprt new_lhs = skip_typecast(expr.op0());
+    exprt new_rhs =
+      typecast_exprt::conditional_cast(expr.op1(), new_lhs.type());
+    code_assignt assign(std::move(new_lhs), std::move(new_rhs));
+    assign.add_source_location() = expr.source_location();
+
+    convert_assign(assign, dest, mode);
   }
   else if(statement==ID_assign_plus ||
           statement==ID_assign_minus ||
@@ -107,7 +110,11 @@ void goto_convertt::remove_assignment(
     rhs.type() = expr.op0().type();
     rhs.add_source_location() = expr.source_location();
 
-    code_assignt assignment(expr.op0(), rhs);
+    exprt new_lhs = skip_typecast(expr.op0());
+    rhs = typecast_exprt::conditional_cast(rhs, new_lhs.type());
+    rhs.add_source_location() = expr.source_location();
+
+    code_assignt assignment(new_lhs, rhs);
     assignment.add_source_location()=expr.source_location();
 
     convert(assignment, dest, mode);
