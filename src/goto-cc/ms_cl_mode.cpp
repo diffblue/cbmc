@@ -65,6 +65,9 @@ int ms_cl_modet::doit()
 
   debug() << "Visual Studio mode " << ms_cl_version << eom;
 
+  // model validation
+  compiler.validate_goto_model = cmdline.isset("validate-goto-model");
+
   // get configuration
   config.set(cmdline);
 

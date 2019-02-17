@@ -542,6 +542,12 @@ bool compilet::write_bin_object_file(
   const std::string &file_name,
   const goto_modelt &src_goto_model)
 {
+  if(validate_goto_model)
+  {
+    status() << "Validating goto model" << eom;
+    src_goto_model.validate(validation_modet::INVARIANT);
+  }
+
   statistics() << "Writing binary format object `"
                << file_name << "'" << eom;
 

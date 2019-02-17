@@ -34,6 +34,7 @@ public:
   bool echo_file_name;
   std::string working_directory;
   std::string override_language;
+  bool validate_goto_model = false;
 
   enum { PREPROCESS_ONLY, // gcc -E
          COMPILE_ONLY, // gcc -c
