@@ -29,8 +29,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ansi-c/ansi_c_language.h>
 
 #include <goto-checker/all_properties_verifier.h>
+#include <goto-checker/all_properties_verifier_with_fault_localization.h>
 #include <goto-checker/all_properties_verifier_with_trace_storage.h>
 #include <goto-checker/stop_on_fail_verifier.h>
+#include <goto-checker/stop_on_fail_verifier_with_fault_localization.h>
 
 #include <goto-programs/adjust_float_expressions.h>
 #include <goto-programs/lazy_goto_model.h>
@@ -613,9 +615,19 @@ int jbmc_parse_optionst::doit()
         }
         else
         {
-          verifier = util_make_unique<
-            stop_on_fail_verifiert<java_multi_path_symex_checkert>>(
-            options, ui_message_handler, goto_model);
+          if(options.get_bool_option("localize-faults"))
+          {
+            verifier =
+              util_make_unique<stop_on_fail_verifier_with_fault_localizationt<
+                java_multi_path_symex_checkert>>(
+                options, ui_message_handler, goto_model);
+          }
+          else
+          {
+            verifier = util_make_unique<
+              stop_on_fail_verifiert<java_multi_path_symex_checkert>>(
+              options, ui_message_handler, goto_model);
+          }
         }
       }
       else
@@ -629,10 +641,20 @@ int jbmc_parse_optionst::doit()
         }
         else
         {
-          verifier =
-            util_make_unique<all_properties_verifier_with_trace_storaget<
-              java_multi_path_symex_checkert>>(
-              options, ui_message_handler, goto_model);
+          if(options.get_bool_option("localize-faults"))
+          {
+            verifier =
+              util_make_unique<all_properties_verifier_with_fault_localizationt<
+                java_multi_path_symex_checkert>>(
+                options, ui_message_handler, goto_model);
+          }
+          else
+          {
+            verifier =
+              util_make_unique<all_properties_verifier_with_trace_storaget<
+                java_multi_path_symex_checkert>>(
+                options, ui_message_handler, goto_model);
+          }
         }
       }
     }
