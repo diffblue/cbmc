@@ -206,7 +206,11 @@ json_objectt json(const typet &type, const namespacet &ns, const irep_idt &mode)
 
 static std::string binary(const constant_exprt &src)
 {
-  const auto width = to_bitvector_type(src.type()).get_width();
+  std::size_t width;
+  if(src.type().id() == ID_c_enum)
+    width = to_bitvector_type(to_c_enum_type(src.type()).subtype()).get_width();
+  else
+    width = to_bitvector_type(src.type()).get_width();
   const auto int_val = bvrep2integer(src.get_value(), width, false);
   return integer2binary(int_val, width);
 }

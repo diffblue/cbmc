@@ -1,0 +1,11 @@
+CORE
+main.c
+--json-ui --function test --trace
+activate-multi-line-match
+EXIT=10
+SIGNAL=0
+VERIFICATION FAILED
+\{\n\s*"hidden": false,\n\s*"inputID": "e",\n\s*"internal": true,\n\s*"mode": "C",\n\s*"sourceLocation": \{(\n.*)*\},\n\s*"stepType": "input",\n\s*"thread": 0,\n\s*"values": \[\n\s*\{\n\s*"binary": "000000000000000000000000000000(0|1){2}",\n\s*"data": ".*E(1|2|3)",\n\s*"name": "integer",\n\s*"type": "enum",\n\s*"width": 32\n\s*\}\n\s*\]\n\s*\},
+\{\n\s*"hidden": false,\n\s*"inputID": "t",\n\s*"internal": true,\n\s*"mode": "C",\n\s*"sourceLocation": \{(\n.*)*\},\n\s*"stepType": "input",\n\s*"thread": 0,\n\s*"values": \[\n\s*\{\n\s*"binary": "000000000000000000000000000000(0|1){2}",\n\s*"data": ".*T(1|2|3)",\n\s*"name": "integer",\n\s*"type": "enum",\n\s*"width": 32\n\s*\}\n\s*\]\n\s*\},
+--
+^warning: ignoring
