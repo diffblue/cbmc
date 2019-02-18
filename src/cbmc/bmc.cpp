@@ -29,8 +29,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-checker/report_util.h>
 #include <goto-checker/solver_factory.h>
 
-#include "fault_localization.h"
-
 /// Hook used by CEGIS to selectively freeze variables
 /// in the SAT solver after the SSA formula is added to the solver.
 /// Freezing variables is necessary to make use of incremental
@@ -137,13 +135,6 @@ safety_checkert::resultt bmct::execute(
     {
       return cover(goto_functions)?
         safety_checkert::resultt::ERROR:safety_checkert::resultt::SAFE;
-    }
-
-    if(options.get_option("localize-faults")!="")
-    {
-      fault_localizationt fault_localization(
-        goto_functions, *this, options);
-      return fault_localization();
     }
 
     // any properties to check at all?

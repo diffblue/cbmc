@@ -197,7 +197,6 @@ protected:
   friend class bmc_covert;
   template <template <class goalt> class covert>
   friend class bmc_goal_covert;
-  friend class fault_localizationt;
 
 private:
   /// \brief Class-specific symbolic execution
