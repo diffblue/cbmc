@@ -1,4 +1,6 @@
-SRC = jbmc_main.cpp \
+SRC = all_properties.cpp \
+      bmc.cpp \
+      jbmc_main.cpp \
       jbmc_parse_options.cpp \
       # Empty last line
 
@@ -39,8 +41,6 @@ OBJ += ../$(CPROVER_DIR)/src/ansi-c/ansi-c$(LIBEXT) \
       ../$(CPROVER_DIR)/src/util/util$(LIBEXT) \
       ../miniz/miniz$(OBJEXT) \
       ../$(CPROVER_DIR)/src/json/json$(LIBEXT) \
-      ../$(CPROVER_DIR)/src/cbmc/all_properties$(OBJEXT) \
-      ../$(CPROVER_DIR)/src/cbmc/bmc$(OBJEXT) \
       # Empty last line
 
 INCLUDES= -I .. -I ../$(CPROVER_DIR)/src

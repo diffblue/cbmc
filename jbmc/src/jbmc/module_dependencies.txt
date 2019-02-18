@@ -1,6 +1,5 @@
 analyses
 ansi-c # should go away
-cbmc # bmc.h - will go away
 goto-checker
 goto-instrument
 goto-programs
@@ -11,5 +10,7 @@ langapi # should go away
 linking
 pointer-analysis
 solvers/refinement
+solvers/prop
+solvers/sat
 solvers/strings
 util
