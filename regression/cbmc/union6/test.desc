@@ -1,4 +1,4 @@
-CORE
+CORE broken-smt-backend
 main.c
 --little-endian
 ^EXIT=0$
@@ -6,3 +6,6 @@ main.c
 ^VERIFICATION SUCCESSFUL$
 --
 ^warning: ignoring
+--
+This test reports a VERIFICATION ERROR when running with the SMT2 solver on
+Windows only.
