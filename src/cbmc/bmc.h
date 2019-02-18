@@ -191,12 +191,7 @@ protected:
   virtual resultt all_properties(const goto_functionst &goto_functions);
   virtual resultt stop_on_fail();
 
-  bool cover(const goto_functionst &goto_functions);
-
   friend class bmc_all_propertiest;
-  friend class bmc_covert;
-  template <template <class goalt> class covert>
-  friend class bmc_goal_covert;
 
 private:
   /// \brief Class-specific symbolic execution

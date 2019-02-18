@@ -46,24 +46,24 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/validate_goto_model.h>
 #include <goto-programs/write_goto_binary.h>
 
-#include <pointer-analysis/value_set_analysis.h>
-#include <pointer-analysis/goto_program_dereference.h>
 #include <pointer-analysis/add_failed_symbols.h>
+#include <pointer-analysis/goto_program_dereference.h>
 #include <pointer-analysis/show_value_sets.h>
+#include <pointer-analysis/value_set_analysis.h>
 
-#include <analyses/natural_loops.h>
-#include <analyses/global_may_alias.h>
-#include <analyses/local_bitvector_analysis.h>
-#include <analyses/custom_bitvector_analysis.h>
-#include <analyses/escape_analysis.h>
 #include <analyses/call_graph.h>
+#include <analyses/constant_propagator.h>
+#include <analyses/custom_bitvector_analysis.h>
+#include <analyses/dependence_graph.h>
+#include <analyses/escape_analysis.h>
+#include <analyses/global_may_alias.h>
 #include <analyses/interval_analysis.h>
 #include <analyses/interval_domain.h>
-#include <analyses/reaching_definitions.h>
-#include <analyses/dependence_graph.h>
-#include <analyses/constant_propagator.h>
 #include <analyses/is_threaded.h>
+#include <analyses/local_bitvector_analysis.h>
 #include <analyses/local_safe_pointers.h>
+#include <analyses/natural_loops.h>
+#include <analyses/reaching_definitions.h>
 
 #include <ansi-c/ansi_c_language.h>
 #include <ansi-c/c_object_factory_parameters.h>
