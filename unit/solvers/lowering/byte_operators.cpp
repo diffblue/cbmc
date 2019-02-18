@@ -158,8 +158,8 @@ SCENARIO("byte_extract_lowering", "[core][solvers][lowering][byte_extract]")
       // pointer_typet(u64, 64),
       vector_typet(u8, size),
       vector_typet(u64, size),
-      // complex_typet(s16),
-      // complex_typet(u64)
+      complex_typet(s16),
+      complex_typet(u64)
     };
 
     simplify_exprt simp(ns);

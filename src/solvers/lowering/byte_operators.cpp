@@ -351,6 +351,48 @@ static array_exprt unpack_array_vector(
     array_typet(unsignedbv_typet(8), from_integer(size, size_type())));
 }
 
+/// Rewrite a complex_exprt into its individual bytes.
+/// \param src: complex-typed expression to unpack
+/// \param little_endian: true, iff assumed endianness is little-endian
+/// \param ns: namespace for type lookups
+/// \return array_exprt holding unpacked elements
+static array_exprt
+unpack_complex(const exprt &src, bool little_endian, const namespacet &ns)
+{
+  const complex_typet &complex_type = to_complex_type(src.type());
+  const typet &subtype = complex_type.subtype();
+
+  auto subtype_bits = pointer_offset_bits(subtype, ns);
+  CHECK_RETURN(subtype_bits.has_value());
+  CHECK_RETURN(*subtype_bits % 8 == 0);
+
+  exprt sub_real = unpack_rec(
+    complex_real_exprt{src},
+    little_endian,
+    mp_integer{0},
+    *subtype_bits / 8,
+    ns,
+    true);
+  exprt::operandst byte_operands = std::move(sub_real.operands());
+
+  exprt sub_imag = unpack_rec(
+    complex_imag_exprt{src},
+    little_endian,
+    mp_integer{0},
+    *subtype_bits / 8,
+    ns,
+    true);
+  byte_operands.insert(
+    byte_operands.end(),
+    std::make_move_iterator(sub_imag.operands().begin()),
+    std::make_move_iterator(sub_imag.operands().end()));
+
+  const std::size_t size = byte_operands.size();
+  return array_exprt{
+    std::move(byte_operands),
+    array_typet{unsignedbv_typet(8), from_integer(size, size_type())}};
+}
+
 /// Rewrite an object into its individual bytes.
 /// \param src: object to unpack
 /// \param little_endian: true, iff assumed endianness is little-endian
@@ -415,7 +457,11 @@ static exprt unpack_rec(
       max_bytes,
       ns);
   }
-  else if(ns.follow(src.type()).id()==ID_struct)
+  else if(src.type().id() == ID_complex)
+  {
+    return unpack_complex(src, little_endian, ns);
+  }
+  else if(src.type().id() == ID_struct || src.type().id() == ID_struct_tag)
   {
     const struct_typet &struct_type=to_struct_type(ns.follow(src.type()));
     const struct_typet::componentst &components=struct_type.components();
@@ -573,6 +619,43 @@ static exprt unpack_rec(
     {}, array_typet(unsignedbv_typet(8), from_integer(0, size_type())));
 }
 
+/// Rewrite a byte extraction of a complex-typed result to byte extraction of
+/// the individual components that make up a \ref complex_exprt.
+/// \param src: Original byte extract expression
+/// \param unpacked: Byte extraction with root operand expanded into array (via
+///   \ref unpack_rec)
+/// \param ns: Namespace
+/// \return An expression if the subtype size is known, else `nullopt` so that a
+/// fall-back to more generic code can be used.
+static optionalt<exprt> lower_byte_extract_complex(
+  const byte_extract_exprt &src,
+  const byte_extract_exprt &unpacked,
+  const namespacet &ns)
+{
+  const complex_typet &complex_type = to_complex_type(src.type());
+  const typet &subtype = complex_type.subtype();
+
+  auto subtype_bits = pointer_offset_bits(subtype, ns);
+  if(!subtype_bits.has_value() || *subtype_bits % 8 != 0)
+    return {};
+
+  // offset remains unchanged
+  byte_extract_exprt real{unpacked};
+  real.type() = subtype;
+
+  const plus_exprt new_offset{
+    unpacked.offset(),
+    from_integer(*subtype_bits / 8, unpacked.offset().type())};
+  byte_extract_exprt imag{unpacked};
+  imag.type() = subtype;
+  imag.offset() = simplify_expr(new_offset, ns);
+
+  return simplify_expr(
+    complex_exprt{
+      lower_byte_extract(real, ns), lower_byte_extract(imag, ns), complex_type},
+    ns);
+}
+
 /// rewrite byte extraction from an array to byte extraction from a
 /// concatenation of array index expressions
 exprt lower_byte_extract(const byte_extract_exprt &src, const namespacet &ns)
@@ -712,7 +795,15 @@ exprt lower_byte_extract(const byte_extract_exprt &src, const namespacet &ns)
       return simplify_expr(vector_exprt(std::move(operands), vector_type), ns);
     }
   }
-  else if(ns.follow(src.type()).id()==ID_struct)
+  else if(src.type().id() == ID_complex)
+  {
+    auto result = lower_byte_extract_complex(src, unpacked, ns);
+    if(result.has_value())
+      return std::move(*result);
+
+    // else fall back to generic lowering that uses bit masks, below
+  }
+  else if(src.type().id() == ID_struct || src.type().id() == ID_struct_tag)
   {
     const struct_typet &struct_type=to_struct_type(ns.follow(src.type()));
     const struct_typet::componentst &components=struct_type.components();
