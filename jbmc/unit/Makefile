@@ -82,24 +82,6 @@ java-testing-utils/java-testing-utils$(LIBEXT): jprover.dir
 java-testing-utils-clean:
 	$(MAKE) $(MAKEARGS) -C java-testing-utils clean
 
-# We need to link bmc.o to the unit test, so here's everything it depends on...
-BMC_DEPS =$(CPROVER_DIR)/src/cbmc/all_properties$(OBJEXT) \
-          $(CPROVER_DIR)/src/cbmc/bmc$(OBJEXT) \
-          $(CPROVER_DIR)/src/cbmc/bmc_cover$(OBJEXT) \
-          $(CPROVER_DIR)/src/cbmc/fault_localization$(OBJEXT) \
-          $(CPROVER_DIR)/src/jsil/expr2jsil$(OBJEXT) \
-          $(CPROVER_DIR)/src/jsil/jsil_convert$(OBJEXT) \
-          $(CPROVER_DIR)/src/jsil/jsil_entry_point$(OBJEXT) \
-          $(CPROVER_DIR)/src/jsil/jsil_internal_additions$(OBJEXT) \
-          $(CPROVER_DIR)/src/jsil/jsil_language$(OBJEXT) \
-          $(CPROVER_DIR)/src/jsil/jsil_lex.yy$(OBJEXT) \
-          $(CPROVER_DIR)/src/jsil/jsil_parser$(OBJEXT) \
-          $(CPROVER_DIR)/src/jsil/jsil_parse_tree$(OBJEXT) \
-          $(CPROVER_DIR)/src/jsil/jsil_typecheck$(OBJEXT) \
-          $(CPROVER_DIR)/src/jsil/jsil_types$(OBJEXT) \
-          $(CPROVER_DIR)/src/jsil/jsil_y.tab$(OBJEXT) \
-          # Empty last line
-
 CPROVER_LIBS =../src/java_bytecode/java_bytecode$(LIBEXT) \
               ../src/miniz/miniz$(OBJEXT) \
               $(CPROVER_DIR)/src/ansi-c/ansi-c$(LIBEXT) \
@@ -133,7 +115,6 @@ CPROVER_LIBS =../src/java_bytecode/java_bytecode$(LIBEXT) \
               $(CPROVER_DIR)/src/assembler/assembler$(LIBEXT) \
               $(CPROVER_DIR)/src/analyses/analyses$(LIBEXT) \
               $(CPROVER_DIR)/src/solvers/solvers$(LIBEXT) \
-              $(BMC_DEPS) \
               # Empty last line
 
 OBJ += $(CPROVER_LIBS) \
