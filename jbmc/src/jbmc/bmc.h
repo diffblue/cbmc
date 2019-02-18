@@ -15,22 +15,21 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <list>
 #include <map>
 
+#include <util/decision_procedure.h>
 #include <util/invariant.h>
 #include <util/options.h>
 #include <util/ui_message.h>
-#include <util/decision_procedure.h>
 
 #include <goto-checker/symex_bmc.h>
 
 #include <goto-programs/goto_trace.h>
 
-#include <goto-symex/symex_target_equation.h>
 #include <goto-symex/path_storage.h>
+#include <goto-symex/symex_target_equation.h>
 
 #include <goto-programs/goto_model.h>
 #include <goto-programs/safety_checker.h>
 #include <goto-symex/memory_model.h>
-
 
 class cbmc_solverst;
 
@@ -39,7 +38,7 @@ class cbmc_solverst;
 /// Higher-level architectural information on symbolic execution is
 /// documented in the \ref symex-overview
 /// "Symbolic execution module page".
-class bmct:public safety_checkert
+class bmct : public safety_checkert
 {
 public:
   /// \brief Constructor for path exploration with freshly-initialized state
@@ -100,11 +99,12 @@ public:
   resultt run(abstract_goto_modelt &);
   void setup();
   safety_checkert::resultt execute(abstract_goto_modelt &);
-  virtual ~bmct() { }
+  virtual ~bmct()
+  {
+  }
 
   // the safety_checkert interface
-  virtual resultt operator()(
-    const goto_functionst &goto_functions)
+  virtual resultt operator()(const goto_functionst &goto_functions)
   {
     return run(goto_functions);
   }
@@ -114,8 +114,8 @@ public:
     symex.add_loop_unwind_handler(handler);
   }
 
-  void add_unwind_recursion_handler(
-    symex_bmct::recursion_unwind_handlert handler)
+  void
+  add_unwind_recursion_handler(symex_bmct::recursion_unwind_handlert handler)
   {
     symex.add_recursion_unwind_handler(handler);
   }
@@ -207,8 +207,8 @@ private:
   /// invoke the symbolic executor in a class-specific way. This
   /// implementation invokes goto_symext::operator() to perform
   /// full-program model-checking from the entry point of the program.
-  virtual void perform_symbolic_execution(
-    goto_symext::get_goto_functiont get_goto_function);
+  virtual void
+  perform_symbolic_execution(goto_symext::get_goto_functiont get_goto_function);
 
   /// Optional callback, to be run after symex but before handing the resulting
   /// equation to the solver. If it returns true then we will skip the solver

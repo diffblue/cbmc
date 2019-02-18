@@ -42,8 +42,8 @@ void bmct::freeze_program_variables()
 
 decision_proceduret::resultt bmct::run_decision_procedure()
 {
-  status() << "Passing problem to "
-           << prop_conv.decision_procedure_text() << eom;
+  status() << "Passing problem to " << prop_conv.decision_procedure_text()
+           << eom;
 
   auto solver_start = std::chrono::steady_clock::now();
 
@@ -54,7 +54,7 @@ decision_proceduret::resultt bmct::run_decision_procedure()
 
   status() << "Running " << prop_conv.decision_procedure_text() << eom;
 
-  decision_proceduret::resultt dec_result=prop_conv.dec_solve();
+  decision_proceduret::resultt dec_result = prop_conv.dec_solve();
 
   {
     auto solver_stop = std::chrono::steady_clock::now();
@@ -67,14 +67,13 @@ decision_proceduret::resultt bmct::run_decision_procedure()
   return dec_result;
 }
 
-safety_checkert::resultt bmct::execute(
-  abstract_goto_modelt &goto_model)
+safety_checkert::resultt bmct::execute(abstract_goto_modelt &goto_model)
 {
   try
   {
-    auto get_goto_function = [&goto_model](const irep_idt &id) ->
-      const goto_functionst::goto_functiont &
-    {
+    auto get_goto_function =
+      [&goto_model](
+        const irep_idt &id) -> const goto_functionst::goto_functiont & {
       return goto_model.get_goto_function(id);
     };
 
@@ -84,8 +83,7 @@ safety_checkert::resultt bmct::execute(
     // iterators pointing into it, must not be stored by this function or its
     // callees, as goto_model.get_goto_function (as used by symex)
     // will have side-effects on it.
-    const goto_functionst &goto_functions =
-      goto_model.get_goto_functions();
+    const goto_functionst &goto_functions = goto_model.get_goto_functions();
 
     // This provides the driver program the opportunity to do things like a
     // symbol-table or goto-functions dump instead of actually running the
@@ -108,16 +106,15 @@ safety_checkert::resultt bmct::execute(
       (*memory_model)(equation);
     }
 
-    statistics() << "size of program expression: "
-                 << equation.SSA_steps.size()
+    statistics() << "size of program expression: " << equation.SSA_steps.size()
                  << " steps" << eom;
 
     slice(symex, equation, ns, options, ui_message_handler);
 
     // coverage report
-    std::string cov_out=options.get_option("symex-coverage-report");
-    if(!cov_out.empty() &&
-       symex.output_coverage_report(goto_functions, cov_out))
+    std::string cov_out = options.get_option("symex-coverage-report");
+    if(
+      !cov_out.empty() && symex.output_coverage_report(goto_functions, cov_out))
     {
       error() << "Failed to write symex coverage report" << eom;
       return safety_checkert::resultt::ERROR;
@@ -156,7 +153,7 @@ safety_checkert::resultt bmct::execute(
   catch(const std::string &error_str)
   {
     messaget message(get_message_handler());
-    message.error().source_location=symex.last_source_location;
+    message.error().source_location = symex.last_source_location;
     message.error() << error_str << messaget::eom;
 
     return safety_checkert::resultt::ERROR;
@@ -165,7 +162,7 @@ safety_checkert::resultt bmct::execute(
   catch(const char *error_str)
   {
     messaget message(get_message_handler());
-    message.error().source_location=symex.last_source_location;
+    message.error().source_location = symex.last_source_location;
     message.error() << error_str << messaget::eom;
 
     return safety_checkert::resultt::ERROR;
@@ -178,9 +175,7 @@ safety_checkert::resultt bmct::execute(
   }
 }
 
-
-safety_checkert::resultt bmct::run(
-  abstract_goto_modelt &goto_model)
+safety_checkert::resultt bmct::run(abstract_goto_modelt &goto_model)
 {
   memory_model = get_memory_model(options, ns);
   setup_symex(symex, ns, options, ui_message_handler);
@@ -222,8 +217,7 @@ safety_checkert::resultt bmct::stop_on_fail()
     return resultt::UNSAFE;
 
   default:
-    if(options.get_bool_option("dimacs") ||
-       options.get_option("outfile")!="")
+    if(options.get_bool_option("dimacs") || options.get_option("outfile") != "")
       return resultt::SAFE;
 
     error() << "decision procedure failed" << eom;
