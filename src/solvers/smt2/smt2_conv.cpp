@@ -622,102 +622,11 @@ void smt2_convt::convert_byte_extract(const byte_extract_exprt &expr)
 
 void smt2_convt::convert_byte_update(const byte_update_exprt &expr)
 {
-  #if 0
-  // The situation: expr.op0 needs to be split in 3 parts
-  // |<--- L --->|<--- M --->|<--- R --->|
-  // where M is the expr.op1'th byte
-  // We need to output L expr.op2 R
-
-  mp_integer i = numeric_cast_v<mp_integer>(expr.op());
-
-  std::size_t total_width=boolbv_width(expr.op().type());
-  CHECK_RETURN_WITH_DIAGNOSTICS(
-    total_width != 0,
-    "failed to get width of byte_update");
-
-  std::size_t value_width=boolbv_width(expr.value().type());
-
-  mp_integer upper, lower; // of the byte
-  mp_integer max=total_width-1;
-
-  if(expr.id()==ID_byte_update_little_endian)
-  {
-    lower = i*8;
-    upper = lower+value_width-1;
-  }
-  else if(expr.id()==ID_byte_update_big_endian)
-  {
-    upper = max-(i*8);
-    lower = max-((i+1)*8-1);
-  }
-  else
-    UNEXPECTEDCASE("byte update neither big nor little endian");
-
-  unflatten(BEGIN, expr.type());
-
-  if(upper==max)
-  {
-    if(lower==0) // the update expression is expr.value()
-    {
-      flatten2bv(expr.value());
-    }
-    else // uppermost byte selected, only R needed
-    {
-      out << "(concat ";
-      flatten2bv(expr.value());
-      out << " ((_ extract " << lower-1 << " 0) ";
-      flatten2bv(expr.op());
-      out << "))";
-    }
-  }
-  else
-  {
-    if(lower==0) // lowermost byte selected, only L needed
-    {
-      out << "(concat ";
-      out << "((_ extract " << max << " " << (upper+1) << ") ";
-      flatten2bv(expr.op());
-      out << ") ";
-      flatten2bv(expr.value());
-      out << ")";
-    }
-    else // byte in the middle selected, L & R needed
-    {
-      out << "(concat (concat ";
-      out << "((_ extract " << max << " " << (upper+1) << ") ";
-      flatten2bv(expr.op());
-      out << ") ";
-      flatten2bv(expr.value());
-      out << ") ((_ extract " << (lower-1) << " 0) ";
-      flatten2bv(expr.op());
-      out << "))";
-    }
-  }
-
-  unflatten(END, expr.type());
-
-  #else
-
-  // We'll do an AND-mask for op(), and then OR-in
-  // the value() shifted by the offset * 8.
-
-  std::size_t total_width=boolbv_width(expr.op().type());
-  std::size_t value_width=boolbv_width(expr.value().type());
-
-  mp_integer mask=power(2, value_width)-1;
-  exprt one_mask=from_integer(mask, unsignedbv_typet(total_width));
-
-  const mult_exprt distance(
-    expr.offset(), from_integer(8, expr.offset().type()));
-
-  const bitand_exprt and_expr(expr.op(), bitnot_exprt(one_mask));
-  const typecast_exprt ext_value(expr.value(), one_mask.type());
-  const bitor_exprt or_expr(and_expr, shl_exprt(ext_value, distance));
-
+  // we just run the flattener
+  exprt flattened_expr = lower_byte_update(expr, ns);
   unflatten(wheret::BEGIN, expr.type());
-  flatten2bv(or_expr);
+  convert_expr(flattened_expr);
   unflatten(wheret::END, expr.type());
-  #endif
 }
 
 literalt smt2_convt::convert(const exprt &expr)

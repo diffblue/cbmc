@@ -1,4 +1,4 @@
-CORE broken-smt-backend
+CORE
 main.c
 --unwind 2 --pointer-check
 ^EXIT=10$
