@@ -6,3 +6,5 @@ main.c
 ^VERIFICATION FAILED$
 --
 ^warning: ignoring
+This test actually passes when using the SMT2 back-end, but takes 68 seconds to
+do so.
