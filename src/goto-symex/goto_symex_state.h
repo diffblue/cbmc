@@ -184,6 +184,8 @@ public:
 
   ssa_exprt rename_level0_ssa(ssa_exprt ssa, const namespacet &ns);
 
+  ssa_exprt rename_level1_ssa(ssa_exprt ssa, const namespacet &ns);
+
   template <levelt level = L2>
   void rename(typet &type, const irep_idt &l1_identifier, const namespacet &ns);
 

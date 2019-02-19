@@ -272,6 +272,15 @@ goto_symex_statet::rename_level0_ssa(ssa_exprt ssa, const namespacet &ns)
   return ssa;
 }
 
+ssa_exprt
+goto_symex_statet::rename_level1_ssa(ssa_exprt ssa, const namespacet &ns)
+{
+  set_l1_indices(ssa, ns);
+  rename<L1>(ssa.type(), ssa.get_identifier(), ns);
+  ssa.update_type();
+  return ssa;
+}
+
 template <goto_symex_statet::levelt level>
 void goto_symex_statet::rename(exprt &expr, const namespacet &ns)
 {
@@ -288,9 +297,7 @@ void goto_symex_statet::rename(exprt &expr, const namespacet &ns)
     }
     else if(level == L1)
     {
-      set_l1_indices(ssa, ns);
-      rename<level>(expr.type(), ssa.get_identifier(), ns);
-      ssa.update_type();
+      ssa = rename_level1_ssa(std::move(ssa), ns);
     }
     else if(level==L2)
     {
