@@ -2303,6 +2303,32 @@ bool simplify_exprt::simplify_byte_update(byte_update_exprt &expr)
   return true;
 }
 
+bool simplify_exprt::simplify_complex(exprt &expr)
+{
+  if(expr.id() == ID_complex_real)
+  {
+    complex_real_exprt &complex_real_expr = to_complex_real_expr(expr);
+
+    if(complex_real_expr.op().id() == ID_complex)
+    {
+      expr = to_complex_expr(complex_real_expr.op()).real();
+      return false;
+    }
+  }
+  else if(expr.id() == ID_complex_imag)
+  {
+    complex_imag_exprt &complex_imag_expr = to_complex_imag_expr(expr);
+
+    if(complex_imag_expr.op().id() == ID_complex)
+    {
+      expr = to_complex_expr(complex_imag_expr.op()).imag();
+      return false;
+    }
+  }
+
+  return true;
+}
+
 bool simplify_exprt::simplify_node_preorder(exprt &expr)
 {
   bool result=true;
@@ -2445,6 +2471,8 @@ bool simplify_exprt::simplify_node(exprt &expr)
     result = simplify_popcount(to_popcount_expr(expr)) && result;
   else if(expr.id() == ID_function_application)
     result = simplify_function_application(expr) && result;
+  else if(expr.id() == ID_complex_real || expr.id() == ID_complex_imag)
+    result = simplify_complex(expr) && result;
 
   #ifdef DEBUGX
   if(!result

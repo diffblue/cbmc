@@ -113,6 +113,7 @@ public:
   bool simplify_abs(exprt &expr);
   bool simplify_sign(exprt &expr);
   bool simplify_popcount(popcount_exprt &expr);
+  bool simplify_complex(exprt &expr);
 
   /// Attempt to simplify mathematical function applications if we have
   /// enough information to do so. Currently focused on constant comparisons.
