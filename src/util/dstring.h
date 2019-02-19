@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <string>
 
 #include "invariant.h"
+#include "magic.h"
 #include "string_container.h"
 
 /// \ref dstringt has one field, an unsigned integer \ref no which is an index
@@ -219,5 +220,20 @@ struct diagnostics_helpert<dstringt>
     return as_string(dstring);
   }
 };
+
+dstringt get_dstring_number(std::size_t);
+
+/// equivalent to dstringt(std::to_string(value)), i.e., produces a string
+/// from a number
+template <typename T>
+static inline
+  typename std::enable_if<std::is_integral<T>::value, dstringt>::type
+  to_dstring(T value)
+{
+  if(value >= 0 && value <= static_cast<T>(DSTRING_NUMBERS_MAX))
+    return get_dstring_number(value);
+  else
+    return std::to_string(value);
+}
 
 #endif // CPROVER_UTIL_DSTRING_H
