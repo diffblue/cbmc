@@ -24,6 +24,8 @@ public:
   const goto_tracet &insert(goto_tracet &&);
 
   /// Store trace that contains multiple violated assertions
+  /// \note Only property IDs that are not part of any already stored trace
+  ///   are mapped to the given trace.
   const goto_tracet &insert_all(goto_tracet &&);
 
   const std::vector<goto_tracet> &all() const;
