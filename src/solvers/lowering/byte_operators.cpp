@@ -417,19 +417,19 @@ exprt lower_byte_extract(const byte_extract_exprt &src, const namespacet &ns)
     const array_typet &array_type=to_array_type(src.type());
     const typet &subtype=array_type.subtype();
 
-    auto element_bits = pointer_offset_bits(subtype, ns);
-    auto num_elements = numeric_cast<mp_integer>(array_type.size());
-    if(!num_elements.has_value())
-      num_elements = mp_integer(unpacked.op().operands().size());
-
     // consider ways of dealing with arrays of unknown subtype size or with a
     // subtype size that does not fit byte boundaries; currently we fall back to
     // stitching together consecutive elements down below
+    auto element_bits = pointer_offset_bits(subtype, ns);
     if(element_bits.has_value() && *element_bits >= 1 && *element_bits % 8 == 0)
     {
-      array_exprt array({}, array_type);
+      auto num_elements = numeric_cast<std::size_t>(array_type.size());
+      if(!num_elements.has_value())
+        num_elements = unpacked.op().operands().size();
 
-      for(mp_integer i=0; i< *num_elements; ++i)
+      exprt::operandst operands;
+      operands.reserve(*num_elements);
+      for(std::size_t i = 0; i < *num_elements; ++i)
       {
         plus_exprt new_offset(
           unpacked.offset(),
@@ -439,10 +439,10 @@ exprt lower_byte_extract(const byte_extract_exprt &src, const namespacet &ns)
         tmp.type()=subtype;
         tmp.offset()=new_offset;
 
-        array.copy_to_operands(lower_byte_extract(tmp, ns));
+        operands.push_back(lower_byte_extract(tmp, ns));
       }
 
-      return simplify_expr(array, ns);
+      return simplify_expr(array_exprt(std::move(operands), array_type), ns);
     }
   }
   else if(src.type().id() == ID_vector)
@@ -450,19 +450,18 @@ exprt lower_byte_extract(const byte_extract_exprt &src, const namespacet &ns)
     const vector_typet &vector_type = to_vector_type(src.type());
     const typet &subtype = vector_type.subtype();
 
-    mp_integer num_elements = numeric_cast_v<mp_integer>(vector_type.size());
-
-    auto element_bits = pointer_offset_bits(subtype, ns);
-    CHECK_RETURN(element_bits.has_value());
-
     // consider ways of dealing with vectors of unknown subtype size or with a
     // subtype size that does not fit byte boundaries; currently we fall back to
     // stitching together consecutive elements down below
+    auto element_bits = pointer_offset_bits(subtype, ns);
     if(element_bits.has_value() && *element_bits >= 1 && *element_bits % 8 == 0)
     {
-      vector_exprt vector(vector_type);
+      const std::size_t num_elements =
+        numeric_cast_v<std::size_t>(vector_type.size());
 
-      for(mp_integer i = 0; i < num_elements; ++i)
+      exprt::operandst operands;
+      operands.reserve(num_elements);
+      for(std::size_t i = 0; i < num_elements; ++i)
       {
         plus_exprt new_offset(
           unpacked.offset(),
@@ -472,10 +471,10 @@ exprt lower_byte_extract(const byte_extract_exprt &src, const namespacet &ns)
         tmp.type() = subtype;
         tmp.offset() = simplify_expr(new_offset, ns);
 
-        vector.copy_to_operands(lower_byte_extract(tmp, ns));
+        operands.push_back(lower_byte_extract(tmp, ns));
       }
 
-      return simplify_expr(vector, ns);
+      return simplify_expr(vector_exprt(std::move(operands), vector_type), ns);
     }
   }
   else if(ns.follow(src.type()).id()==ID_struct)
