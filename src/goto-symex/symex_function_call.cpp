@@ -418,17 +418,17 @@ static void locality(
     // identifiers may be shared among functions
     // (e.g., due to inlining or other code restructuring)
 
-    state.rename<goto_symex_statet::L1>(ssa, ns);
+    ssa_exprt ssa_l1 = state.rename_level1_ssa(std::move(ssa), ns);
 
-    irep_idt l1_name=ssa.get_identifier();
+    irep_idt l1_name = ssa_l1.get_identifier();
     unsigned offset=0;
 
     while(state.l1_history.find(l1_name)!=state.l1_history.end())
     {
       symex_renaming_levelt::increase_counter(c_it);
       ++offset;
-      ssa.set_level_1(frame_nr+offset);
-      l1_name=ssa.get_identifier();
+      ssa_l1.set_level_1(frame_nr + offset);
+      l1_name = ssa_l1.get_identifier();
     }
 
     // now unique -- store

@@ -163,7 +163,7 @@ void goto_symex_statet::assignment(
   bool allow_pointer_unsoundness)
 {
   // identifier should be l0 or l1, make sure it's l1
-  rename<L1>(lhs, ns);
+  lhs = rename_level1_ssa(std::move(lhs), ns);
   irep_idt l1_identifier=lhs.get_identifier();
 
   // the type might need renaming

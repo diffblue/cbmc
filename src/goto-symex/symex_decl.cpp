@@ -37,9 +37,8 @@ void goto_symext::symex_decl(statet &state, const symbol_exprt &expr)
   // We increase the L2 renaming to make these non-deterministic.
   // We also prevent propagation of old values.
 
-  ssa_exprt ssa(expr);
-  state.rename<goto_symex_statet::L1>(ssa, ns);
-  const irep_idt &l1_identifier=ssa.get_identifier();
+  ssa_exprt ssa = state.rename_level1_ssa(ssa_exprt{expr}, ns);
+  const irep_idt &l1_identifier = ssa.get_identifier();
 
   // rename type to L2
   state.rename(ssa.type(), l1_identifier, ns);
