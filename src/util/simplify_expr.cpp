@@ -2514,9 +2514,7 @@ bool simplify_exprt::simplify_rec(exprt &expr)
 
   // We work on a copy to prevent unnecessary destruction of sharing.
   exprt tmp=expr;
-  bool result=true;
-
-  result=simplify_node_preorder(tmp);
+  bool result = simplify_node_preorder(tmp);
 
   if(!simplify_node(tmp))
     result=false;
