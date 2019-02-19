@@ -2474,17 +2474,18 @@ bool simplify_exprt::simplify_node(exprt &expr)
   else if(expr.id() == ID_complex_real || expr.id() == ID_complex_imag)
     result = simplify_complex(expr) && result;
 
-  #ifdef DEBUGX
-  if(!result
-     #ifdef DEBUG_ON_DEMAND
-     && debug_on
-     #endif
-     )
+#ifdef DEBUGX
+  if(
+    !result
+#ifdef DEBUG_ON_DEMAND
+    && debug_on
+#endif
+  )
   {
     std::cout << "===== " << old.id() << ": " << format(old) << '\n'
               << " ---> " << format(expr) << '\n';
   }
-  #endif
+#endif
 
   return result;
 }
