@@ -714,11 +714,15 @@ exprt lower_byte_extract(const byte_extract_exprt &src, const namespacet &ns)
   // determine an upper bound of the number of bytes we might need
   exprt upper_bound=size_of_expr(src.type(), ns);
   if(upper_bound.is_not_nil())
+  {
     upper_bound = simplify_expr(
       plus_exprt(
         upper_bound,
         typecast_exprt::conditional_cast(src.offset(), upper_bound.type())),
       ns);
+  }
+  else if(src.type().id() == ID_empty)
+    upper_bound = from_integer(0, size_type());
 
   const auto lower_bound_or_nullopt = numeric_cast<mp_integer>(src.offset());
   const auto upper_bound_or_nullopt = numeric_cast<mp_integer>(upper_bound);
@@ -1570,9 +1574,11 @@ exprt lower_byte_update(const byte_update_exprt &src, const namespacet &ns)
       src.id() == ID_byte_update_big_endian,
     "byte update expression should either be little or big endian");
 
-  const irep_idt extract_opcode = src.id() == ID_byte_update_little_endian
-                                    ? ID_byte_extract_little_endian
-                                    : ID_byte_extract_big_endian;
+  // An update of a void-typed object or update by a void-typed value is the
+  // source operand (this is questionable, but may arise when dereferencing
+  // invalid pointers).
+  if(src.type().id() == ID_empty || src.value().type().id() == ID_empty)
+    return src.op();
 
   // byte_update lowering proceeds as follows:
   // 1) Determine the size of the update, with the size of the object to be
@@ -1605,6 +1611,10 @@ exprt lower_byte_update(const byte_update_exprt &src, const namespacet &ns)
       numeric_cast_v<std::size_t>(to_constant_expr(object_size_expr));
     non_const_update_bound = std::move(update_size_expr);
   }
+
+  const irep_idt extract_opcode = src.id() == ID_byte_update_little_endian
+                                    ? ID_byte_extract_little_endian
+                                    : ID_byte_extract_big_endian;
 
   const byte_extract_exprt byte_extract_expr{
     extract_opcode,
