@@ -127,9 +127,12 @@ void goto_symex_property_decidert::update_properties_status_from_goals(
   case decision_proceduret::resultt::D_SATISFIABLE:
     for(auto &goal_pair : goal_map)
     {
-      if(solver->prop_conv().l_get(goal_pair.second.condition).is_true())
+      auto &status = properties.at(goal_pair.first).status;
+      if(
+        solver->prop_conv().l_get(goal_pair.second.condition).is_true() &&
+        status != property_statust::FAIL)
       {
-        properties.at(goal_pair.first).status |= property_statust::FAIL;
+        status |= property_statust::FAIL;
         updated_properties.insert(goal_pair.first);
       }
     }
