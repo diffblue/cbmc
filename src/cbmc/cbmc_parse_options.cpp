@@ -232,12 +232,6 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
 
   if(cmdline.isset("localize-faults"))
     options.set_option("localize-faults", true);
-  if(cmdline.isset("localize-faults-method"))
-  {
-    options.set_option(
-      "localize-faults-method",
-      cmdline.get_value("localize-faults-method"));
-  }
 
   if(cmdline.isset("unwind"))
     options.set_option("unwind", cmdline.get_value("unwind"));

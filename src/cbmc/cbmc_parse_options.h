@@ -76,7 +76,7 @@ class optionst;
   "(string-abstraction)(no-arch)(arch):" \
   "(round-to-nearest)(round-to-plus-inf)(round-to-minus-inf)(round-to-zero)" \
   OPT_FLUSH \
-  "(localize-faults)(localize-faults-method):" \
+  "(localize-faults)" \
   OPT_GOTO_TRACE \
   OPT_VALIDATE \
   OPT_ANSI_C_LANGUAGE \
