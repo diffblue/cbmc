@@ -180,7 +180,7 @@ public:
   /// A full explanation of SSA (which is why we do this renaming) is in
   /// the SSA section of background-concepts.md.
   template <levelt level = L2>
-  void rename(exprt &expr, const namespacet &ns);
+  exprt rename(exprt expr, const namespacet &ns);
 
   ssa_exprt rename_level0_ssa(ssa_exprt ssa, const namespacet &ns);
 

@@ -282,7 +282,7 @@ goto_symex_statet::rename_level1_ssa(ssa_exprt ssa, const namespacet &ns)
 }
 
 template <goto_symex_statet::levelt level>
-void goto_symex_statet::rename(exprt &expr, const namespacet &ns)
+exprt goto_symex_statet::rename(exprt expr, const namespacet &ns)
 {
   // rename all the symbols with their last known value
 
@@ -330,13 +330,9 @@ void goto_symex_statet::rename(exprt &expr, const namespacet &ns)
   {
     // we never rename function symbols
     if(as_const(expr).type().id() == ID_code)
-    {
       rename<level>(expr.type(), to_symbol_expr(expr).get_identifier(), ns);
-      return;
-    }
-
-    expr=ssa_exprt(expr);
-    rename<level>(expr, ns);
+    else
+      expr = rename<level>(ssa_exprt(expr), ns);
   }
   else if(expr.id()==ID_address_of)
   {
@@ -351,7 +347,7 @@ void goto_symex_statet::rename(exprt &expr, const namespacet &ns)
 
     // do this recursively
     Forall_operands(it, expr)
-      rename<level>(*it, ns);
+      *it = rename<level>(std::move(*it), ns);
 
     const exprt &c_expr = as_const(expr);
     INVARIANT(
@@ -363,6 +359,7 @@ void goto_symex_statet::rename(exprt &expr, const namespacet &ns)
       "Type of renamed expr should be the same as operands for with_exprt and "
       "if_exprt");
   }
+  return expr;
 }
 
 /// thread encoding
@@ -572,13 +569,13 @@ void goto_symex_statet::rename_address(exprt &expr, const namespacet &ns)
       expr.type() = to_array_type(index_expr.array().type()).subtype();
 
       // the index is not an address
-      rename<level>(index_expr.index(), ns);
+      index_expr.index() = rename<level>(std::move(index_expr.index()), ns);
     }
     else if(expr.id()==ID_if)
     {
       // the condition is not an address
       if_exprt &if_expr=to_if_expr(expr);
-      rename<level>(if_expr.cond(), ns);
+      if_expr.cond() = rename<level>(std::move(if_expr.cond()), ns);
       rename_address<level>(if_expr.true_case(), ns);
       rename_address<level>(if_expr.false_case(), ns);
 
@@ -717,7 +714,7 @@ void goto_symex_statet::rename(
   {
     auto &array_type = to_array_type(type);
     rename<level>(array_type.subtype(), irep_idt(), ns);
-    rename<level>(array_type.size(), ns);
+    array_type.size() = rename<level>(std::move(array_type.size()), ns);
   }
   else if(type.id() == ID_struct || type.id() == ID_union)
   {
@@ -728,7 +725,10 @@ void goto_symex_statet::rename(
     {
       // be careful, or it might get cyclic
       if(component.type().id() == ID_array)
-        rename<level>(to_array_type(component.type()).size(), ns);
+      {
+        auto &array_type = to_array_type(component.type());
+        array_type.size() = rename<level>(std::move(array_type.size()), ns);
+      }
       else if(component.type().id() != ID_pointer)
         rename<level>(component.type(), irep_idt(), ns);
     }

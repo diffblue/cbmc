@@ -37,8 +37,9 @@ void goto_symext::symex_dead(statet &state)
     else
       rhs=exprt(ID_invalid);
 
-    state.rename<goto_symex_statet::L1>(rhs, ns);
-    state.value_set.assign(ssa, rhs, ns, true, false);
+    const exprt l1_rhs =
+      state.rename<goto_symex_statet::L1>(std::move(rhs), ns);
+    state.value_set.assign(ssa, l1_rhs, ns, true, false);
   }
 
   const irep_idt &l1_identifier = ssa.get_identifier();
