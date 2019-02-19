@@ -380,7 +380,7 @@ void acceleratet::add_dirty_checks()
     // variables is clean _before_ clearing any dirty flags.
     if(it->is_assign())
     {
-      exprt &lhs = it->get_assign().lhs();
+      const exprt &lhs = it->get_assign().lhs();
       expr_mapt::iterator dirty_var=dirty_vars_map.find(lhs);
 
       if(dirty_var!=dirty_vars_map.end())

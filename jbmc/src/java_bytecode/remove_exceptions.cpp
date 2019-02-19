@@ -434,7 +434,8 @@ bool remove_exceptionst::instrument_function_call(
   goto_programt::targett next_it=instr_it;
   next_it++;
 
-  code_function_callt &function_call = instr_it->get_function_call();
+  const code_function_callt &function_call = instr_it->get_function_call();
+
   DATA_INVARIANT(
     function_call.function().id()==ID_symbol,
     "identified expected to be a symbol");

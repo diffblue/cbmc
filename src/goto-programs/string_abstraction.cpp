@@ -1046,13 +1046,13 @@ void string_abstractiont::move_lhs_arithmetic(exprt &lhs, exprt &rhs)
 
 goto_programt::targett string_abstractiont::abstract_pointer_assign(
   goto_programt &dest,
-  goto_programt::targett target)
+  const goto_programt::targett target)
 {
-  code_assignt &assign = target->get_assign();
+  const code_assignt &assign = target->get_assign();
 
-  exprt &lhs=assign.lhs();
-  exprt rhs=assign.rhs();
-  exprt *rhsp=&(assign.rhs());
+  const exprt &lhs = assign.lhs();
+  const exprt rhs = assign.rhs();
+  const exprt *rhsp = &(assign.rhs());
 
   while(rhsp->id()==ID_typecast)
     rhsp=&(rhsp->op0());
@@ -1077,9 +1077,8 @@ goto_programt::targett string_abstractiont::abstract_pointer_assign(
       code_assignt(new_lhs, new_rhs), target->source_location);
     assignment.code.add_source_location()=target->source_location;
     dest.insert_before_swap(target, assignment);
-    ++target;
 
-    return target;
+    return std::next(target);
   }
   else
   {
@@ -1091,10 +1090,10 @@ goto_programt::targett string_abstractiont::abstract_char_assign(
   goto_programt &dest,
   goto_programt::targett target)
 {
-  code_assignt &assign = target->get_assign();
+  const code_assignt &assign = target->get_assign();
 
-  exprt &lhs=assign.lhs();
-  exprt *rhsp=&(assign.rhs());
+  const exprt &lhs = assign.lhs();
+  const exprt *rhsp = &(assign.rhs());
 
   while(rhsp->id()==ID_typecast)
     rhsp=&(rhsp->op0());
