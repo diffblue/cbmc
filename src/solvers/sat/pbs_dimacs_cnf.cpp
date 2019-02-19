@@ -205,7 +205,7 @@ bool pbs_dimacs_cnft::pbs_solve()
   return satisfied;
 }
 
-propt::resultt pbs_dimacs_cnft::prop_solve()
+propt::resultt pbs_dimacs_cnft::do_prop_solve()
 {
   std::ofstream file("temp.cnf");
 

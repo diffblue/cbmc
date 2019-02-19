@@ -35,11 +35,14 @@ public:
   {
   }
 
-  virtual resultt dec_solve();
-  virtual std::string decision_procedure_text() const;
+  resultt dec_solve() override;
+  std::string decision_procedure_text() const override;
 
   // yes, we are incremental!
-  virtual bool has_set_assumptions() const { return true; }
+  bool has_set_assumptions() const override
+  {
+    return true;
+  }
 
 protected:
   resultt read_result(std::istream &in);

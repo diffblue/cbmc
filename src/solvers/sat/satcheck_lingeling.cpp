@@ -63,7 +63,7 @@ void satcheck_lingelingt::lcnf(const bvt &bv)
   clause_counter++;
 }
 
-propt::resultt satcheck_lingelingt::prop_solve()
+propt::resultt satcheck_lingelingt::do_prop_solve()
 {
   PRECONDITION(status != ERROR);
 

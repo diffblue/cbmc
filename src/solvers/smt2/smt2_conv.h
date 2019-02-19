@@ -133,6 +133,8 @@ public:
   void convert_type(const typet &);
   void convert_literal(const literalt);
 
+  std::size_t get_number_of_solver_calls() const override;
+
 protected:
   const namespacet &ns;
   std::ostream &out;
@@ -141,6 +143,8 @@ protected:
 
   bvt assumptions;
   boolbv_widtht boolbv_width;
+
+  std::size_t number_of_solver_calls = 0;
 
   void write_header();
   void write_footer(std::ostream &);

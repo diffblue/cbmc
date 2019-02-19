@@ -25,3 +25,14 @@ bvt propt::new_variables(std::size_t width)
     result[i]=new_variable();
   return result;
 }
+
+propt::resultt propt::prop_solve()
+{
+  ++number_of_solver_calls;
+  return do_prop_solve();
+}
+
+std::size_t propt::get_number_of_solver_calls() const
+{
+  return number_of_solver_calls;
+}

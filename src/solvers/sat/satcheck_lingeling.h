@@ -21,20 +21,27 @@ public:
   satcheck_lingelingt();
   virtual ~satcheck_lingelingt();
 
-  virtual const std::string solver_text();
-  virtual resultt prop_solve();
-  virtual tvt l_get(literalt a) const;
+  const std::string solver_text() override;
+  tvt l_get(literalt a) const override;
 
-  virtual void lcnf(const bvt &bv);
-  virtual void set_assignment(literalt a, bool value);
+  void lcnf(const bvt &bv) override;
+  void set_assignment(literalt a, bool value) override;
 
-  virtual void set_assumptions(const bvt &_assumptions);
-  virtual bool has_set_assumptions() const { return true; }
-  virtual bool has_is_in_conflict() const { return true; }
-  virtual bool is_in_conflict(literalt a) const;
-  virtual void set_frozen(literalt a);
+  void set_assumptions(const bvt &_assumptions) override;
+  bool has_set_assumptions() const override
+  {
+    return true;
+  }
+  bool has_is_in_conflict() const override
+  {
+    return true;
+  }
+  bool is_in_conflict(literalt a) const override;
+  void set_frozen(literalt a) override;
 
 protected:
+  resultt do_prop_solve() override;
+
   // NOLINTNEXTLINE(readability/identifiers)
   struct LGL * solver;
   bvt assumptions;

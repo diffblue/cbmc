@@ -512,3 +512,8 @@ void prop_conv_solvert::print_assignment(std::ostream &out) const
   for(const auto &symbol : symbols)
     out << symbol.first << " = " << prop.l_get(symbol.second) << '\n';
 }
+
+std::size_t prop_conv_solvert::get_number_of_solver_calls() const
+{
+  return prop.get_number_of_solver_calls();
+}

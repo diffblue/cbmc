@@ -65,7 +65,7 @@ void satcheck_cadicalt::lcnf(const bvt &bv)
   clause_counter++;
 }
 
-propt::resultt satcheck_cadicalt::prop_solve()
+propt::resultt satcheck_cadicalt::do_prop_solve()
 {
   INVARIANT(status != statust::ERROR, "there cannot be an error");
 

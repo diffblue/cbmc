@@ -45,29 +45,29 @@ public:
   dimacs_cnf_dumpt(std::ostream &_out, message_handlert &message_handler);
   virtual ~dimacs_cnf_dumpt() { }
 
-  virtual const std::string solver_text()
+  const std::string solver_text() override
   {
     return "DIMACS CNF Dumper";
   }
 
-  virtual void lcnf(const bvt &bv);
+  void lcnf(const bvt &bv) override;
 
-  virtual resultt prop_solve()
-  {
-    return resultt::P_ERROR;
-  }
-
-  virtual tvt l_get(literalt) const
+  tvt l_get(literalt) const override
   {
     return tvt::unknown();
   }
 
-  virtual size_t no_clauses() const
+  size_t no_clauses() const override
   {
     return 0;
   }
 
 protected:
+  resultt do_prop_solve() override
+  {
+    return resultt::P_ERROR;
+  }
+
   std::ostream &out;
 };
 
