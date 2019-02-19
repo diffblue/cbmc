@@ -19,6 +19,241 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "flatten_byte_extract_exceptions.h"
 
+static exprt bv_to_expr(
+  const exprt &bitvector_expr,
+  const typet &target_type,
+  const namespacet &ns);
+
+/// Convert a bitvector-typed expression \p bitvector_expr to a struct-typed
+/// expression. See \ref bv_to_expr for an overview.
+static struct_exprt bv_to_struct_expr(
+  const exprt &bitvector_expr,
+  const struct_typet &struct_type,
+  const namespacet &ns)
+{
+  const struct_typet::componentst &components = struct_type.components();
+
+  exprt::operandst operands;
+  operands.reserve(components.size());
+  std::size_t member_offset_bits = 0;
+  for(const auto &comp : components)
+  {
+    const auto component_bits_opt = pointer_offset_bits(comp.type(), ns);
+    std::size_t component_bits;
+    if(component_bits_opt.has_value())
+      component_bits = numeric_cast_v<std::size_t>(*component_bits_opt);
+    else
+      component_bits = to_bitvector_type(bitvector_expr.type()).get_width() -
+                       member_offset_bits;
+
+    if(component_bits == 0)
+    {
+      operands.push_back(constant_exprt{irep_idt{}, comp.type()});
+      continue;
+    }
+
+    bitvector_typet type{bitvector_expr.type().id(), component_bits};
+    operands.push_back(bv_to_expr(
+      extractbits_exprt{bitvector_expr,
+                        member_offset_bits + component_bits - 1,
+                        member_offset_bits,
+                        std::move(type)},
+      comp.type(),
+      ns));
+
+    if(component_bits_opt.has_value())
+      member_offset_bits += component_bits;
+  }
+
+  return struct_exprt{std::move(operands), struct_type};
+}
+
+/// Convert a bitvector-typed expression \p bitvector_expr to an array-typed
+/// expression. See \ref bv_to_expr for an overview.
+static array_exprt bv_to_array_expr(
+  const exprt &bitvector_expr,
+  const array_typet &array_type,
+  const namespacet &ns)
+{
+  auto num_elements = numeric_cast<std::size_t>(array_type.size());
+  auto subtype_bits = pointer_offset_bits(array_type.subtype(), ns);
+
+  const std::size_t total_bits =
+    to_bitvector_type(bitvector_expr.type()).get_width();
+  if(!num_elements.has_value())
+  {
+    if(!subtype_bits.has_value() || *subtype_bits == 0)
+      num_elements = total_bits;
+    else
+      num_elements = total_bits / numeric_cast_v<std::size_t>(*subtype_bits);
+  }
+  DATA_INVARIANT(
+    !num_elements.has_value() || !subtype_bits.has_value() ||
+      *subtype_bits * *num_elements == total_bits,
+    "subtype width times array size should be total bitvector width");
+
+  exprt::operandst operands;
+  operands.reserve(*num_elements);
+  for(std::size_t i = 0; i < *num_elements; ++i)
+  {
+    if(subtype_bits.has_value())
+    {
+      const std::size_t subtype_bits_int =
+        numeric_cast_v<std::size_t>(*subtype_bits);
+      bitvector_typet type{bitvector_expr.type().id(), subtype_bits_int};
+      operands.push_back(bv_to_expr(
+        extractbits_exprt{bitvector_expr,
+                          ((i + 1) * subtype_bits_int) - 1,
+                          i * subtype_bits_int,
+                          std::move(type)},
+        array_type.subtype(),
+        ns));
+    }
+    else
+    {
+      operands.push_back(bv_to_expr(bitvector_expr, array_type.subtype(), ns));
+    }
+  }
+
+  return array_exprt{std::move(operands), array_type};
+}
+
+/// Convert a bitvector-typed expression \p bitvector_expr to a vector-typed
+/// expression. See \ref bv_to_expr for an overview.
+static vector_exprt bv_to_vector_expr(
+  const exprt &bitvector_expr,
+  const vector_typet &vector_type,
+  const namespacet &ns)
+{
+  const std::size_t num_elements =
+    numeric_cast_v<std::size_t>(vector_type.size());
+  auto subtype_bits = pointer_offset_bits(vector_type.subtype(), ns);
+  DATA_INVARIANT(
+    !subtype_bits.has_value() ||
+      *subtype_bits * num_elements ==
+        to_bitvector_type(bitvector_expr.type()).get_width(),
+    "subtype width times vector size should be total bitvector width");
+
+  exprt::operandst operands;
+  operands.reserve(num_elements);
+  for(std::size_t i = 0; i < num_elements; ++i)
+  {
+    if(subtype_bits.has_value())
+    {
+      const std::size_t subtype_bits_int =
+        numeric_cast_v<std::size_t>(*subtype_bits);
+      bitvector_typet type{bitvector_expr.type().id(), subtype_bits_int};
+      operands.push_back(bv_to_expr(
+        extractbits_exprt{bitvector_expr,
+                          ((i + 1) * subtype_bits_int) - 1,
+                          i * subtype_bits_int,
+                          std::move(type)},
+        vector_type.subtype(),
+        ns));
+    }
+    else
+    {
+      operands.push_back(bv_to_expr(bitvector_expr, vector_type.subtype(), ns));
+    }
+  }
+
+  return vector_exprt{std::move(operands), vector_type};
+}
+
+/// Convert a bitvector-typed expression \p bitvector_expr to a complex-typed
+/// expression. See \ref bv_to_expr for an overview.
+static complex_exprt bv_to_complex_expr(
+  const exprt &bitvector_expr,
+  const complex_typet &complex_type,
+  const namespacet &ns)
+{
+  const std::size_t total_bits =
+    to_bitvector_type(bitvector_expr.type()).get_width();
+  const auto subtype_bits_opt = pointer_offset_bits(complex_type.subtype(), ns);
+  std::size_t subtype_bits;
+  if(subtype_bits_opt.has_value())
+  {
+    subtype_bits = numeric_cast_v<std::size_t>(*subtype_bits_opt);
+    DATA_INVARIANT(
+      subtype_bits * 2 == total_bits,
+      "subtype width should be half of the total bitvector width");
+  }
+  else
+    subtype_bits = total_bits / 2;
+
+  const bitvector_typet type{bitvector_expr.type().id(), subtype_bits};
+
+  return complex_exprt{
+    bv_to_expr(
+      extractbits_exprt{bitvector_expr, subtype_bits - 1, 0, type},
+      complex_type.subtype(),
+      ns),
+    bv_to_expr(
+      extractbits_exprt{
+        bitvector_expr, subtype_bits * 2 - 1, subtype_bits, type},
+      complex_type.subtype(),
+      ns),
+    complex_type};
+}
+
+/// Convert a bitvector-typed expression \p bitvector_expr to an expression of
+/// type \p target_type. If \p target_type is a bitvector type this may be a
+/// no-op or a typecast. For composite types such as structs, the bitvectors
+/// corresponding to the individual members are extracted and then a compound
+/// expression is built from those extracted members. When the size of a
+/// component isn't constant we fall back to computing its size based on the
+/// width of \p bitvector_expr.
+/// \param bitvector_expr: Bitvector-typed expression to extract from.
+/// \param target_type: Type of the expression to build.
+/// \param ns: Namespace to resolve tag types.
+/// \return Expression of type \p target_type constructed from sequences of bits
+/// from \p bitvector_expr.
+static exprt bv_to_expr(
+  const exprt &bitvector_expr,
+  const typet &target_type,
+  const namespacet &ns)
+{
+  PRECONDITION(can_cast_type<bitvector_typet>(bitvector_expr.type()));
+
+  if(
+    can_cast_type<bitvector_typet>(target_type) ||
+    target_type.id() == ID_c_enum || target_type.id() == ID_c_enum_tag ||
+    target_type.id() == ID_string)
+  {
+    return simplify_expr(
+      typecast_exprt::conditional_cast(bitvector_expr, target_type), ns);
+  }
+
+  if(target_type.id() == ID_struct)
+  {
+    return bv_to_struct_expr(bitvector_expr, to_struct_type(target_type), ns);
+  }
+  else if(target_type.id() == ID_struct_tag)
+  {
+    struct_exprt result = bv_to_struct_expr(
+      bitvector_expr, ns.follow_tag(to_struct_tag_type(target_type)), ns);
+    result.type() = target_type;
+    return std::move(result);
+  }
+  else if(target_type.id() == ID_array)
+  {
+    return bv_to_array_expr(bitvector_expr, to_array_type(target_type), ns);
+  }
+  else if(target_type.id() == ID_vector)
+  {
+    return bv_to_vector_expr(bitvector_expr, to_vector_type(target_type), ns);
+  }
+  else if(target_type.id() == ID_complex)
+  {
+    return bv_to_complex_expr(bitvector_expr, to_complex_type(target_type), ns);
+  }
+  else
+  {
+    PRECONDITION_WITH_DIAGNOSTICS(
+      false, "bv_to_expr does not yet support ", target_type.id_string());
+  }
+}
+
 static exprt unpack_rec(
   const exprt &src,
   bool little_endian,
@@ -500,7 +735,7 @@ exprt lower_byte_extract(const byte_extract_exprt &src, const namespacet &ns)
 
       plus_exprt new_offset(
         unpacked.offset(),
-        typecast_exprt(
+        typecast_exprt::conditional_cast(
           member_offset_expr(struct_type, comp.get_name(), ns),
           unpacked.offset().type()));
 
@@ -606,13 +841,16 @@ exprt lower_byte_extract(const byte_extract_exprt &src, const namespacet &ns)
   }
 
   if(width_bytes==1)
-    return simplify_expr(typecast_exprt(op.front(), src.type()), ns);
+  {
+    return simplify_expr(
+      typecast_exprt::conditional_cast(op.front(), src.type()), ns);
+  }
   else // width_bytes>=2
   {
     concatenation_exprt concatenation(
       std::move(op), bitvector_typet(subtype->id(), width_bytes * 8));
-    return simplify_expr(
-      typecast_exprt(std::move(concatenation), src.type()), ns);
+
+    return bv_to_expr(concatenation, src.type(), ns);
   }
 }
 
