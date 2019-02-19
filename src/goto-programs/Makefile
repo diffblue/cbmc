@@ -49,6 +49,7 @@ SRC = adjust_float_expressions.cpp \
       remove_skip.cpp \
       remove_unreachable.cpp \
       remove_unused_functions.cpp \
+      remove_variable_length_array_member.cpp \
       remove_vector.cpp \
       remove_virtual_functions.cpp \
       rewrite_union.cpp \
