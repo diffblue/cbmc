@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/byte_operators.h>
 #include <util/c_types.h>
+#include <util/endianness_map.h>
 #include <util/expr_util.h>
 #include <util/namespace.h>
 #include <util/pointer_offset_size.h>
@@ -25,13 +26,47 @@ Author: Daniel Kroening, kroening@kroening.com
 static exprt bv_to_expr(
   const exprt &bitvector_expr,
   const typet &target_type,
+  const endianness_mapt &endianness_map,
   const namespacet &ns);
+
+struct boundst
+{
+  std::size_t lb;
+  std::size_t ub;
+};
+
+/// Map bit boundaries according to endianness.
+static boundst map_bounds(
+  const endianness_mapt &endianness_map,
+  std::size_t lower_bound,
+  std::size_t upper_bound)
+{
+  boundst result;
+  result.lb = lower_bound;
+  result.ub = upper_bound;
+
+  if(result.ub < endianness_map.number_of_bits())
+  {
+    result.lb = endianness_map.map_bit(result.lb);
+    result.ub = endianness_map.map_bit(result.ub);
+
+    // big-endian bounds need swapping
+    if(result.ub < result.lb)
+    {
+      result.lb = endianness_map.number_of_bits() - result.lb - 1;
+      result.ub = endianness_map.number_of_bits() - result.ub - 1;
+    }
+  }
+
+  return result;
+}
 
 /// Convert a bitvector-typed expression \p bitvector_expr to a struct-typed
 /// expression. See \ref bv_to_expr for an overview.
 static struct_exprt bv_to_struct_expr(
   const exprt &bitvector_expr,
   const struct_typet &struct_type,
+  const endianness_mapt &endianness_map,
   const namespacet &ns)
 {
   const struct_typet::componentst &components = struct_type.components();
@@ -55,13 +90,15 @@ static struct_exprt bv_to_struct_expr(
       continue;
     }
 
+    const auto bounds = map_bounds(
+      endianness_map,
+      member_offset_bits,
+      member_offset_bits + component_bits - 1);
     bitvector_typet type{bitvector_expr.type().id(), component_bits};
     operands.push_back(bv_to_expr(
-      extractbits_exprt{bitvector_expr,
-                        member_offset_bits + component_bits - 1,
-                        member_offset_bits,
-                        std::move(type)},
+      extractbits_exprt{bitvector_expr, bounds.ub, bounds.lb, std::move(type)},
       comp.type(),
+      endianness_map,
       ns));
 
     if(component_bits_opt.has_value())
@@ -76,6 +113,7 @@ static struct_exprt bv_to_struct_expr(
 static array_exprt bv_to_array_expr(
   const exprt &bitvector_expr,
   const array_typet &array_type,
+  const endianness_mapt &endianness_map,
   const namespacet &ns)
 {
   auto num_elements = numeric_cast<std::size_t>(array_type.size());
@@ -103,18 +141,20 @@ static array_exprt bv_to_array_expr(
     {
       const std::size_t subtype_bits_int =
         numeric_cast_v<std::size_t>(*subtype_bits);
+      const auto bounds = map_bounds(
+        endianness_map, i * subtype_bits_int, ((i + 1) * subtype_bits_int) - 1);
       bitvector_typet type{bitvector_expr.type().id(), subtype_bits_int};
       operands.push_back(bv_to_expr(
-        extractbits_exprt{bitvector_expr,
-                          ((i + 1) * subtype_bits_int) - 1,
-                          i * subtype_bits_int,
-                          std::move(type)},
+        extractbits_exprt{
+          bitvector_expr, bounds.ub, bounds.lb, std::move(type)},
         array_type.subtype(),
+        endianness_map,
         ns));
     }
     else
     {
-      operands.push_back(bv_to_expr(bitvector_expr, array_type.subtype(), ns));
+      operands.push_back(
+        bv_to_expr(bitvector_expr, array_type.subtype(), endianness_map, ns));
     }
   }
 
@@ -126,6 +166,7 @@ static array_exprt bv_to_array_expr(
 static vector_exprt bv_to_vector_expr(
   const exprt &bitvector_expr,
   const vector_typet &vector_type,
+  const endianness_mapt &endianness_map,
   const namespacet &ns)
 {
   const std::size_t num_elements =
@@ -145,18 +186,20 @@ static vector_exprt bv_to_vector_expr(
     {
       const std::size_t subtype_bits_int =
         numeric_cast_v<std::size_t>(*subtype_bits);
+      const auto bounds = map_bounds(
+        endianness_map, i * subtype_bits_int, ((i + 1) * subtype_bits_int) - 1);
       bitvector_typet type{bitvector_expr.type().id(), subtype_bits_int};
       operands.push_back(bv_to_expr(
-        extractbits_exprt{bitvector_expr,
-                          ((i + 1) * subtype_bits_int) - 1,
-                          i * subtype_bits_int,
-                          std::move(type)},
+        extractbits_exprt{
+          bitvector_expr, bounds.ub, bounds.lb, std::move(type)},
         vector_type.subtype(),
+        endianness_map,
         ns));
     }
     else
     {
-      operands.push_back(bv_to_expr(bitvector_expr, vector_type.subtype(), ns));
+      operands.push_back(
+        bv_to_expr(bitvector_expr, vector_type.subtype(), endianness_map, ns));
     }
   }
 
@@ -168,6 +211,7 @@ static vector_exprt bv_to_vector_expr(
 static complex_exprt bv_to_complex_expr(
   const exprt &bitvector_expr,
   const complex_typet &complex_type,
+  const endianness_mapt &endianness_map,
   const namespacet &ns)
 {
   const std::size_t total_bits =
@@ -184,17 +228,22 @@ static complex_exprt bv_to_complex_expr(
   else
     subtype_bits = total_bits / 2;
 
+  const auto bounds_real = map_bounds(endianness_map, 0, subtype_bits - 1);
+  const auto bounds_imag =
+    map_bounds(endianness_map, subtype_bits, subtype_bits * 2 - 1);
+
   const bitvector_typet type{bitvector_expr.type().id(), subtype_bits};
 
   return complex_exprt{
     bv_to_expr(
-      extractbits_exprt{bitvector_expr, subtype_bits - 1, 0, type},
+      extractbits_exprt{bitvector_expr, bounds_real.ub, bounds_real.lb, type},
       complex_type.subtype(),
+      endianness_map,
       ns),
     bv_to_expr(
-      extractbits_exprt{
-        bitvector_expr, subtype_bits * 2 - 1, subtype_bits, type},
+      extractbits_exprt{bitvector_expr, bounds_imag.ub, bounds_imag.lb, type},
       complex_type.subtype(),
+      endianness_map,
       ns),
     complex_type};
 }
@@ -209,11 +258,13 @@ static complex_exprt bv_to_complex_expr(
 /// \param bitvector_expr: Bitvector-typed expression to extract from.
 /// \param target_type: Type of the expression to build.
 /// \param ns: Namespace to resolve tag types.
+/// \param endianness_map: Endianness map.
 /// \return Expression of type \p target_type constructed from sequences of bits
 /// from \p bitvector_expr.
 static exprt bv_to_expr(
   const exprt &bitvector_expr,
   const typet &target_type,
+  const endianness_mapt &endianness_map,
   const namespacet &ns)
 {
   PRECONDITION(can_cast_type<bitvector_typet>(bitvector_expr.type()));
@@ -229,26 +280,33 @@ static exprt bv_to_expr(
 
   if(target_type.id() == ID_struct)
   {
-    return bv_to_struct_expr(bitvector_expr, to_struct_type(target_type), ns);
+    return bv_to_struct_expr(
+      bitvector_expr, to_struct_type(target_type), endianness_map, ns);
   }
   else if(target_type.id() == ID_struct_tag)
   {
     struct_exprt result = bv_to_struct_expr(
-      bitvector_expr, ns.follow_tag(to_struct_tag_type(target_type)), ns);
+      bitvector_expr,
+      ns.follow_tag(to_struct_tag_type(target_type)),
+      endianness_map,
+      ns);
     result.type() = target_type;
     return std::move(result);
   }
   else if(target_type.id() == ID_array)
   {
-    return bv_to_array_expr(bitvector_expr, to_array_type(target_type), ns);
+    return bv_to_array_expr(
+      bitvector_expr, to_array_type(target_type), endianness_map, ns);
   }
   else if(target_type.id() == ID_vector)
   {
-    return bv_to_vector_expr(bitvector_expr, to_vector_type(target_type), ns);
+    return bv_to_vector_expr(
+      bitvector_expr, to_vector_type(target_type), endianness_map, ns);
   }
   else if(target_type.id() == ID_complex)
   {
-    return bv_to_complex_expr(bitvector_expr, to_complex_type(target_type), ns);
+    return bv_to_complex_expr(
+      bitvector_expr, to_complex_type(target_type), endianness_map, ns);
   }
   else
   {
@@ -354,6 +412,164 @@ static array_exprt unpack_array_vector(
     array_typet(unsignedbv_typet(8), from_integer(size, size_type())));
 }
 
+/// Extract bytes from a sequence of bitvector-typed elements.
+/// \param bit_fields: operands to concatenate
+/// \param total_bits: total bit width of operands
+/// \param [out] dest: target to append unpacked bytes to
+/// \param little_endian: true, iff assumed endianness is little-endian
+/// \param offset_bytes: if set, bytes prior to this offset will be filled
+///   with nil values
+/// \param max_bytes: if set, use as upper bound of the number of bytes to
+///   unpack
+/// \param ns: namespace for type lookups
+static void process_bit_fields(
+  exprt::operandst &&bit_fields,
+  std::size_t total_bits,
+  exprt::operandst &dest,
+  bool little_endian,
+  const optionalt<mp_integer> &offset_bytes,
+  const optionalt<mp_integer> &max_bytes,
+  const namespacet &ns)
+{
+  const concatenation_exprt concatenation{std::move(bit_fields),
+                                          unsignedbv_typet{total_bits}};
+
+  exprt sub =
+    unpack_rec(concatenation, little_endian, offset_bytes, max_bytes, ns, true);
+
+  dest.insert(
+    dest.end(),
+    std::make_move_iterator(sub.operands().begin()),
+    std::make_move_iterator(sub.operands().end()));
+}
+
+/// Rewrite a struct-typed expression into its individual bytes.
+/// \param src: struct-typed expression to unpack
+/// \param little_endian: true, iff assumed endianness is little-endian
+/// \param offset_bytes: if set, bytes prior to this offset will be filled
+///   with nil values
+/// \param max_bytes: if set, use as upper bound of the number of bytes to
+///   unpack
+/// \param ns: namespace for type lookups
+/// \return array_exprt holding unpacked elements
+static array_exprt unpack_struct(
+  const exprt &src,
+  bool little_endian,
+  const optionalt<mp_integer> &offset_bytes,
+  const optionalt<mp_integer> &max_bytes,
+  const namespacet &ns)
+{
+  const struct_typet &struct_type = to_struct_type(ns.follow(src.type()));
+  const struct_typet::componentst &components = struct_type.components();
+
+  optionalt<mp_integer> offset_in_member;
+  optionalt<mp_integer> max_bytes_left;
+  optionalt<std::pair<exprt::operandst, std::size_t>> bit_fields;
+
+  mp_integer member_offset_bits = 0;
+  exprt::operandst byte_operands;
+  for(auto it = components.begin(); it != components.end(); ++it)
+  {
+    const auto &comp = *it;
+    auto component_bits = pointer_offset_bits(comp.type(), ns);
+
+    // We can only handle a member of unknown width when it is the last member
+    // and is byte-aligned. Members of unknown width in the middle would leave
+    // us with unknown alignment of subsequent members, and queuing them up as
+    // bit fields is not possible either as the total width of the concatenation
+    // could not be determined.
+    if(
+      !component_bits.has_value() &&
+      (std::next(it) != components.end() || bit_fields.has_value()))
+      throw non_constant_widtht(src, nil_exprt());
+
+    member_exprt member(src, comp.get_name(), comp.type());
+    if(src.id() == ID_struct)
+      simplify(member, ns);
+
+    // Is it a byte-aligned member?
+    if(member_offset_bits % 8 == 0)
+    {
+      if(bit_fields.has_value())
+      {
+        process_bit_fields(
+          std::move(bit_fields->first),
+          bit_fields->second,
+          byte_operands,
+          little_endian,
+          offset_in_member,
+          max_bytes_left,
+          ns);
+        bit_fields.reset();
+      }
+
+      if(offset_bytes.has_value())
+      {
+        offset_in_member = *offset_bytes - member_offset_bits / 8;
+        // if the offset is negative, offset_in_member remains unset, which has
+        // the same effect as setting it to zero
+        if(*offset_in_member < 0)
+          offset_in_member.reset();
+      }
+
+      if(max_bytes.has_value())
+      {
+        max_bytes_left = *max_bytes - member_offset_bits / 8;
+        if(*max_bytes_left < 0)
+          break;
+      }
+    }
+
+    if(
+      member_offset_bits % 8 != 0 ||
+      (component_bits.has_value() && *component_bits % 8 != 0))
+    {
+      if(!bit_fields.has_value())
+        bit_fields = std::make_pair(exprt::operandst{}, std::size_t{0});
+
+      const std::size_t bits_int = numeric_cast_v<std::size_t>(*component_bits);
+      bit_fields->first.insert(
+        little_endian ? bit_fields->first.begin() : bit_fields->first.end(),
+        typecast_exprt::conditional_cast(member, unsignedbv_typet{bits_int}));
+      bit_fields->second += bits_int;
+
+      member_offset_bits += *component_bits;
+
+      continue;
+    }
+
+    INVARIANT(
+      !bit_fields.has_value(),
+      "all preceding members should have been processed");
+
+    exprt sub = unpack_rec(
+      member, little_endian, offset_in_member, max_bytes_left, ns, true);
+
+    byte_operands.insert(
+      byte_operands.end(),
+      std::make_move_iterator(sub.operands().begin()),
+      std::make_move_iterator(sub.operands().end()));
+
+    if(component_bits.has_value())
+      member_offset_bits += *component_bits;
+  }
+
+  if(bit_fields.has_value())
+    process_bit_fields(
+      std::move(bit_fields->first),
+      bit_fields->second,
+      byte_operands,
+      little_endian,
+      offset_in_member,
+      max_bytes_left,
+      ns);
+
+  const std::size_t size = byte_operands.size();
+  return array_exprt{
+    std::move(byte_operands),
+    array_typet{unsignedbv_typet{8}, from_integer(size, size_type())}};
+}
+
 /// Rewrite a complex_exprt into its individual bytes.
 /// \param src: complex-typed expression to unpack
 /// \param little_endian: true, iff assumed endianness is little-endian
@@ -408,8 +624,7 @@ unpack_complex(const exprt &src, bool little_endian, const namespacet &ns)
 //    array of bytes
 /// \return array of bytes in the sequence found in memory
 /// \throws flatten_byte_extract_exceptiont Raised if unable to unpack the
-/// object because of either non constant size, byte misalignment or
-/// non-constant component width.
+/// object because of either non-constant size or non-constant component width.
 static exprt unpack_rec(
   const exprt &src,
   bool little_endian,
@@ -466,58 +681,7 @@ static exprt unpack_rec(
   }
   else if(src.type().id() == ID_struct || src.type().id() == ID_struct_tag)
   {
-    const struct_typet &struct_type=to_struct_type(ns.follow(src.type()));
-    const struct_typet::componentst &components=struct_type.components();
-
-    mp_integer member_offset_bits = 0;
-
-    exprt::operandst byte_operands;
-    for(const auto &comp : components)
-    {
-      auto component_bits = pointer_offset_bits(comp.type(), ns);
-
-      // the next member would be misaligned, abort
-      if(!component_bits.has_value() || *component_bits % 8 != 0)
-      {
-        throw non_byte_alignedt(struct_type, comp, *component_bits);
-      }
-
-      optionalt<mp_integer> offset_in_member;
-      optionalt<mp_integer> max_bytes_left;
-
-      if(offset_bytes.has_value())
-      {
-        offset_in_member = *offset_bytes - member_offset_bits / 8;
-        // if the offset is negative, offset_in_member remains unset, which has
-        // the same effect as setting it to zero
-        if(*offset_in_member < 0)
-          offset_in_member.reset();
-      }
-
-      if(max_bytes.has_value())
-      {
-        max_bytes_left = *max_bytes - member_offset_bits / 8;
-        if(*max_bytes_left < 0)
-          break;
-      }
-
-      member_exprt member(src, comp.get_name(), comp.type());
-      if(src.id() == ID_struct)
-        simplify(member, ns);
-
-      exprt sub = unpack_rec(
-        member, little_endian, offset_in_member, max_bytes_left, ns, true);
-
-      byte_operands.insert(
-        byte_operands.end(), sub.operands().begin(), sub.operands().end());
-
-      member_offset_bits += *component_bits;
-    }
-
-    const std::size_t size = byte_operands.size();
-    return array_exprt(
-      std::move(byte_operands),
-      array_typet(unsignedbv_typet(8), from_integer(size, size_type())));
+    return unpack_struct(src, little_endian, offset_bytes, max_bytes, ns);
   }
   else if(src.type().id() == ID_union || src.type().id() == ID_union_tag)
   {
@@ -946,7 +1110,8 @@ exprt lower_byte_extract(const byte_extract_exprt &src, const namespacet &ns)
     concatenation_exprt concatenation(
       std::move(op), bitvector_typet(subtype->id(), width_bytes * 8));
 
-    return bv_to_expr(concatenation, src.type(), ns);
+    endianness_mapt map(src.type(), little_endian, ns);
+    return bv_to_expr(concatenation, src.type(), map, ns);
   }
 }
 
@@ -1283,13 +1448,7 @@ static exprt lower_byte_update_struct(
   {
     auto element_width = pointer_offset_bits(comp.type(), ns);
 
-    // the next member would be misaligned, abort
-    if(!element_width.has_value() || *element_width % 8 != 0)
-    {
-      throw non_byte_alignedt(struct_type, comp, *element_width);
-    }
-
-    member_exprt member{src.op(), comp.get_name(), comp.type()};
+    exprt member = member_exprt{src.op(), comp.get_name(), comp.type()};
 
     // compute the update offset relative to this struct member - will be
     // negative if we are already in the middle of the update or beyond it
@@ -1341,7 +1500,7 @@ static exprt lower_byte_update_struct(
         ns);
     }
 
-    mp_integer update_elements = *element_width / 8;
+    mp_integer update_elements = (*element_width + 7) / 8;
     exprt::operandst::const_iterator first =
       value_as_byte_array.operands().begin();
     exprt::operandst::const_iterator end = value_as_byte_array.operands().end();
@@ -1366,6 +1525,23 @@ static exprt lower_byte_update_struct(
     exprt::operandst update_values(first, end);
     const std::size_t update_size = update_values.size();
 
+    const std::size_t shift =
+      numeric_cast_v<std::size_t>(member_offset_bits % 8);
+    const std::size_t element_bits_int =
+      numeric_cast_v<std::size_t>(*element_width);
+
+    const bool little_endian = src.id() == ID_byte_update_little_endian;
+    if(shift != 0)
+    {
+      member =
+        concatenation_exprt{typecast_exprt::conditional_cast(
+                              member, unsignedbv_typet{element_bits_int}),
+                            from_integer(0, unsignedbv_typet{shift}),
+                            unsignedbv_typet{shift + element_bits_int}};
+      if(!little_endian)
+        member.op0().swap(member.op1());
+    }
+
     byte_update_exprt bu{
       src.id(),
       std::move(member),
@@ -1373,7 +1549,18 @@ static exprt lower_byte_update_struct(
       array_exprt{std::move(update_values),
                   array_typet{unsignedbv_typet{8},
                               from_integer(update_size, size_type())}}};
-    elements.push_back(lower_byte_operators(bu, ns));
+
+    if(shift == 0)
+      elements.push_back(lower_byte_operators(bu, ns));
+    else
+    {
+      elements.push_back(typecast_exprt::conditional_cast(
+        extractbits_exprt{lower_byte_operators(bu, ns),
+                          element_bits_int - 1 + (little_endian ? shift : 0),
+                          (little_endian ? shift : 0),
+                          unsignedbv_typet{element_bits_int}},
+        comp.type()));
+    }
 
     member_offset_bits += *element_width;
   }
@@ -1493,10 +1680,10 @@ static exprt lower_byte_update(
     // offset and bit-or
     const auto type_width = pointer_offset_bits(src.type(), ns);
     CHECK_RETURN(type_width.has_value() && *type_width > 0);
+    const std::size_t type_bits = numeric_cast_v<std::size_t>(*type_width);
 
     const std::size_t update_size = value_as_byte_array.operands().size();
-    const std::size_t width =
-      std::max(numeric_cast_v<std::size_t>(*type_width), update_size * 8);
+    const std::size_t width = std::max(type_bits, update_size * 8);
 
     const bool is_little_endian = src.id() == ID_byte_update_little_endian;
 
@@ -1524,7 +1711,17 @@ static exprt lower_byte_update(
 
     // original_bits &= ~mask
     exprt val_before =
-      typecast_exprt::conditional_cast(src.op(), unsignedbv_typet{width});
+      typecast_exprt::conditional_cast(src.op(), unsignedbv_typet{type_bits});
+    if(width > type_bits)
+    {
+      val_before = concatenation_exprt{
+        from_integer(0, unsignedbv_typet{width - type_bits}),
+        val_before,
+        unsignedbv_typet{width}};
+
+      if(!is_little_endian)
+        val_before.op0().swap(val_before.op1());
+    }
     bitand_exprt bitand_expr{val_before, bitnot_exprt{mask_shifted}};
 
     // concatenate and zero-extend the value
@@ -1556,6 +1753,18 @@ static exprt lower_byte_update(
 
     // original_bits |= newvalue
     bitor_exprt bitor_expr{bitand_expr, value_shifted};
+
+    if(!is_little_endian && width > type_bits)
+    {
+      return simplify_expr(
+        typecast_exprt::conditional_cast(
+          extractbits_exprt{bitor_expr,
+                            width - 1,
+                            width - type_bits,
+                            unsignedbv_typet{type_bits}},
+          src.type()),
+        ns);
+    }
 
     return simplify_expr(
       typecast_exprt::conditional_cast(bitor_expr, src.type()), ns);
