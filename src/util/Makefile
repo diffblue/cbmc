@@ -18,6 +18,7 @@ SRC = allocate_objects.cpp \
       file_util.cpp \
       find_macros.cpp \
       find_symbols.cpp \
+      fixed_integer.cpp \
       fixedbv.cpp \
       format_constant.cpp \
       format_expr.cpp \
