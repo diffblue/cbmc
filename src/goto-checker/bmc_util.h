@@ -57,6 +57,8 @@ void output_error_trace(
   const trace_optionst &,
   ui_message_handlert &);
 
+void freeze_guards(const symex_target_equationt &, prop_convt &);
+
 void output_graphml(const goto_tracet &, const namespacet &, const optionst &);
 void output_graphml(
   const symex_target_equationt &,

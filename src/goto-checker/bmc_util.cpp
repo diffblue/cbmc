@@ -102,6 +102,19 @@ void output_error_trace(
   }
 }
 
+void freeze_guards(
+  const symex_target_equationt &equation,
+  prop_convt &prop_conv)
+{
+  for(const auto &step : equation.SSA_steps)
+  {
+    if(!step.guard_literal.is_constant())
+      prop_conv.set_frozen(step.guard_literal);
+    if(step.is_assert() && !step.cond_literal.is_constant())
+      prop_conv.set_frozen(step.cond_literal);
+  }
+}
+
 /// outputs an error witness in graphml format
 void output_graphml(
   const goto_tracet &goto_trace,

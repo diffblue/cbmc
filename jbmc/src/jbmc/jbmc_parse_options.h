@@ -77,7 +77,7 @@ class optionst;
   OPT_FLUSH \
   JAVA_BYTECODE_LANGUAGE_OPTIONS \
   "(java-unwind-enum-static)" \
-  "(localize-faults)(localize-faults-method):" \
+  "(localize-faults)" \
   "(java-threading)" \
   OPT_GOTO_TRACE \
   OPT_VALIDATE \

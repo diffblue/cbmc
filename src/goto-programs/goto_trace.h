@@ -201,6 +201,11 @@ public:
     return steps.back();
   }
 
+  const goto_trace_stept &get_last_step() const
+  {
+    return steps.back();
+  }
+
   /// Returns the property IDs of all assertions in the trace
   std::vector<irep_idt> get_all_property_ids() const;
 };

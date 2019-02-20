@@ -15,6 +15,7 @@ Author: Daniel Kroening, Peter Schrammel
 
 #include "bmc_util.h"
 #include "counterexample_beautification.h"
+#include "goto_symex_fault_localizer.h"
 
 multi_path_symex_checkert::multi_path_symex_checkert(
   const optionst &options,
@@ -76,6 +77,9 @@ operator()(propertiest &properties)
       properties);
     property_decider.convert_goals();
     property_decider.freeze_goal_variables();
+
+    if(options.get_bool_option("localize-faults"))
+      freeze_guards(equation, property_decider.get_solver());
 
     const auto solver_stop = std::chrono::steady_clock::now();
     solver_runtime += std::chrono::duration<double>(solver_stop - solver_start);
@@ -164,4 +168,13 @@ void multi_path_symex_checkert::output_error_witness(
   const goto_tracet &error_trace)
 {
   output_graphml(error_trace, ns, options);
+}
+
+fault_location_infot
+multi_path_symex_checkert::localize_fault(const irep_idt &property_id) const
+{
+  goto_symex_fault_localizert fault_localizer(
+    options, ui_message_handler, equation, property_decider.get_solver());
+
+  return fault_localizer(property_id);
 }

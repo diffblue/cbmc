@@ -21,7 +21,12 @@ const goto_tracet &goto_trace_storaget::insert(goto_tracet &&trace)
   const auto &last_step = traces.back().get_last_step();
   DATA_INVARIANT(
     last_step.is_assert(), "last goto trace step expected to be assertion");
-  property_id_to_trace_index.emplace(last_step.property_id, traces.size() - 1);
+  const auto emplace_result = property_id_to_trace_index.emplace(
+    last_step.property_id, traces.size() - 1);
+  INVARIANT(
+    emplace_result.second,
+    "cannot associate more than one error trace with property " +
+      id2string(last_step.property_id));
   return traces.back();
 }
 
