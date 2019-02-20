@@ -1,0 +1,9 @@
+CORE
+main.c
+--pointer-check --bounds-check
+^EXIT=10$
+^SIGNAL=0$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+--
+^warning: ignoring

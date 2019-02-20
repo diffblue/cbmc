@@ -22,6 +22,7 @@ void __CPROVER_cleanup(const void *, const void *);
 __CPROVER_bool __CPROVER_get_must(const void *, const char *);
 __CPROVER_bool __CPROVER_get_may(const void *, const char *);
 
+void __CPROVER_printf(const char *format, ...);
 void __CPROVER_input(const char *id, ...);
 void __CPROVER_output(const char *id, ...);
 void __CPROVER_cover(__CPROVER_bool condition);

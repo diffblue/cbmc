@@ -203,33 +203,10 @@ void goto_convertt::do_printf(
 {
   const irep_idt &f_id = function.get_identifier();
 
-  if(f_id==CPROVER_PREFIX "printf" ||
-     f_id=="printf")
-  {
-    const typet &return_type = to_code_type(function.type()).return_type();
-    side_effect_exprt printf_code(
-      ID_printf, return_type, function.source_location());
+  PRECONDITION(f_id == CPROVER_PREFIX "printf");
 
-    printf_code.operands()=arguments;
-    printf_code.add_source_location()=function.source_location();
-
-    if(lhs.is_not_nil())
-    {
-      code_assignt assignment(lhs, printf_code);
-      assignment.add_source_location()=function.source_location();
-      copy(assignment, ASSIGN, dest);
-    }
-    else
-    {
-      printf_code.id(ID_code);
-      printf_code.type() = code_typet(
-        code_typet::parameterst(to_code_type(function.type()).parameters()),
-        empty_typet());
-      copy(to_code(printf_code), OTHER, dest);
-    }
-  }
-  else
-    UNREACHABLE;
+  codet printf_code(ID_printf, arguments, function.source_location());
+  copy(printf_code, OTHER, dest);
 }
 
 void goto_convertt::do_scanf(
@@ -926,15 +903,6 @@ void goto_convertt::do_function_call_symbol(
   else if(identifier==CPROVER_PREFIX "array_replace")
   {
     do_array_op(ID_array_replace, lhs, function, arguments, dest);
-  }
-  else if(identifier=="printf")
-  /*
-          identifier=="fprintf" ||
-          identifier=="sprintf" ||
-          identifier=="snprintf")
-  */
-  {
-    do_printf(lhs, function, arguments, dest);
   }
   else if(identifier=="__assert_fail" ||
           identifier=="_assert" ||

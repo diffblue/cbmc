@@ -62,6 +62,16 @@ using nondeterminism, as described [here](../modeling/nondeterminism/)). The
 string constant is followed by an arbitrary number of values of
 arbitrary types.
 
+#### \_\_CPROVER\_printf
+
+```C
+void __CPROVER_printf(const char *format, ...);
+```
+
+The function **\_\_CPROVER\_printf** implements the C `printf` function (without
+any return value). The observable effect is that its output is shown within a
+counterexample trace.
+
 #### \_\_CPROVER\_cover
 
 ```C
