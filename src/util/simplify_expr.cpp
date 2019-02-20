@@ -26,6 +26,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "rational_tools.h"
 #include "simplify_utils.h"
 #include "std_expr.h"
+#include "string_constant.h"
 #include "string_expr.h"
 #include "symbol.h"
 #include "type_eq.h"
@@ -1794,6 +1795,10 @@ optionalt<std::string> simplify_exprt::expr2bits(
       return expr2bits(
         constant_exprt(value, to_c_enum_type(type).subtype()), little_endian);
     }
+  }
+  else if(expr.id() == ID_string_constant)
+  {
+    return expr2bits(to_string_constant(expr).to_array_expr(), little_endian);
   }
   else if(expr.id()==ID_union)
   {

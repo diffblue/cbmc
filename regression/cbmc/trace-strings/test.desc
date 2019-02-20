@@ -1,0 +1,10 @@
+CORE
+main.c
+--trace
+^EXIT=10$
+^SIGNAL=0$
+c="abc"
+c=\{ 'b', 'c', 0 \}
+^VERIFICATION FAILED$
+--
+^warning: ignoring

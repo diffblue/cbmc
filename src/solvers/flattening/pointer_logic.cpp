@@ -104,6 +104,20 @@ exprt pointer_logict::pointer_expr(
   // https://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/Pointer-Arith.html
   if(subtype.id() == ID_empty)
     subtype = char_type();
+  if(object_expr.id() == ID_string_constant)
+  {
+    subtype = object_expr.type();
+
+    // a string constant must be array-typed with fixed size
+    const array_typet &array_type = to_array_type(object_expr.type());
+    mp_integer array_size =
+      numeric_cast_v<mp_integer>(to_constant_expr(array_type.size()));
+    if(array_size > pointer.offset)
+    {
+      to_array_type(subtype).size() =
+        from_integer(array_size - pointer.offset, array_type.size().type());
+    }
+  }
   exprt deep_object =
     get_subexpression_at_offset(object_expr, pointer.offset, subtype, ns);
   CHECK_RETURN(deep_object.is_not_nil());
