@@ -9,6 +9,7 @@ Author: Diffblue Ltd.
 #include "recursive_initialization.h"
 
 #include <util/allocate_objects.h>
+#include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/fresh_symbol.h>
 #include <util/irep.h>
@@ -37,6 +38,10 @@ void recursive_initializationt::initialize(
   else if(type.id() == ID_pointer)
   {
     initialize_pointer(lhs, depth, known_tags, body);
+  }
+  else if(type.id() == ID_array)
+  {
+    initialize_array(lhs, depth, known_tags, body);
   }
   else
   {
@@ -137,4 +142,24 @@ void recursive_initializationt::initialize_nondet(
   code_blockt &body)
 {
   body.add(code_assignt{lhs, side_effect_expr_nondett{lhs.type()}});
+}
+
+void recursive_initializationt::initialize_array(
+  const exprt &array,
+  std::size_t depth,
+  const recursion_sett &known_tags,
+  code_blockt &body)
+{
+  PRECONDITION(array.type().id() == ID_array);
+  const auto &array_type = to_array_type(array.type());
+  const auto array_size =
+    numeric_cast_v<std::size_t>(to_constant_expr(array_type.size()));
+  for(std::size_t index = 0; index < array_size; index++)
+  {
+    initialize(
+      index_exprt(array, from_integer(index, size_type())),
+      depth,
+      known_tags,
+      body);
+  }
 }

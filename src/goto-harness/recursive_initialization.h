@@ -69,6 +69,13 @@ private:
     std::size_t depth,
     const recursion_sett &known_tags,
     code_blockt &body);
+  // array stuff
+  // static array handling
+  void initialize_array(
+    const exprt &array,
+    std::size_t depth,
+    const recursion_sett &known_tags,
+    code_blockt &body);
 };
 
 #endif // CPROVER_GOTO_HARNESS_RECURSIVE_INITIALIZATION_H
