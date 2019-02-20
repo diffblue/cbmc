@@ -111,11 +111,6 @@ protected:
     const index_sett &index_set, const if_exprt &exprt);
   void add_array_constraints_with(
     const index_sett &index_set, const with_exprt &expr);
-  void add_array_constraints_with(
-    const index_sett &index_set,
-    const with_exprt &expr,
-    const exprt &index,
-    const exprt &value);
   void add_array_constraints_update(
     const index_sett &index_set, const update_exprt &expr);
   void add_array_constraints_array_of(

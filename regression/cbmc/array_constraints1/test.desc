@@ -1,0 +1,9 @@
+CORE broken-smt-backend
+main.c
+--unwind 2 --pointer-check
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+^\*\* 2 of 14
+--
+^warning: ignoring
