@@ -302,3 +302,36 @@ void recursive_initializationt::initialize_dynamic_array(
 
   body.add(code_assignt{pointer, index_exprt{arrays, nondet_index}});
 }
+
+std::string recursive_initialization_configt::to_string() const
+{
+  std::ostringstream out{};
+  out << "recursive_initialization_config {"
+      << "\n  min_null_tree_depth = " << min_null_tree_depth
+      << "\n  max_nondet_tree_depth = " << max_nondet_tree_depth
+      << "\n  mode = " << mode
+      << "\n  max_dynamic_array_size = " << max_dynamic_array_size
+      << "\n  min_dynamic_array_size = " << min_dynamic_array_size
+      << "\n  pointers_to_treat_as_arrays = [";
+  for(auto const &pointer : pointers_to_treat_as_arrays)
+  {
+    out << "\n    " << pointer;
+  }
+  out << "\n  ]"
+      << "\n  variables_that_hold_array_sizes = [";
+  for(auto const &array_size : variables_that_hold_array_sizes)
+  {
+    out << "\n    " << array_size;
+  }
+  out << "\n  ]";
+  out << "\n  array_name_to_associated_size_variable = [";
+  for(auto const &associated_array_size :
+      array_name_to_associated_array_size_variable)
+  {
+    out << "\n    " << associated_array_size.first << " -> "
+        << associated_array_size.second;
+  }
+  out << "\n  ]";
+  out << "\n}";
+  return out.str();
+}

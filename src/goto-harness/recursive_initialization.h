@@ -31,6 +31,8 @@ struct recursive_initialization_configt
   std::set<irep_idt> pointers_to_treat_as_arrays;
   std::set<irep_idt> variables_that_hold_array_sizes;
   std::map<irep_idt, irep_idt> array_name_to_associated_array_size_variable;
+
+  std::string to_string() const; // for debugging purposes
 };
 
 /// Class for generating initialisation code
