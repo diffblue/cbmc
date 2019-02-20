@@ -621,7 +621,12 @@ static bool requires_renaming(const typet &type, const namespacet &ns)
     for(auto &component : components)
     {
       // be careful, or it might get cyclic
-      if(
+      if(component.type().id() == ID_array)
+      {
+        if(!to_array_type(component.type()).size().is_constant())
+          return true;
+      }
+      else if(
         component.type().id() != ID_pointer &&
         requires_renaming(component.type(), ns))
       {
