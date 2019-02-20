@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/byte_operators.h>
 #include <util/c_types.h>
 #include <util/exception_utils.h>
+#include <util/fresh_symbol.h>
 #include <util/invariant.h>
 #include <util/prefix.h>
 #include <util/range.h>
@@ -47,6 +48,7 @@ void goto_symext::parameter_assignments(
   {
     INVARIANT(
       !identifier.empty(), "function parameter must have an identifier");
+    state.call_stack().top().parameter_names.push_back(identifier);
 
     const symbolt &symbol=ns.lookup(identifier);
     symbol_exprt lhs=symbol.symbol_expr();
@@ -147,30 +149,20 @@ void goto_symext::parameter_assignments(
   if(function_type.has_ellipsis())
   {
     // These are va_arg arguments; their types may differ from call to call
-    std::size_t va_count=0;
-    const symbolt *va_sym=nullptr;
-    while(!ns.lookup(
-        id2string(function_identifier)+"::va_arg"+std::to_string(va_count),
-        va_sym))
-      ++va_count;
-
-    for( ; it1!=arguments.end(); it1++, va_count++)
+    for(; it1 != arguments.end(); it1++)
     {
-      irep_idt id=
-        id2string(function_identifier)+"::va_arg"+std::to_string(va_count);
+      symbolt &va_arg = get_fresh_aux_symbol(
+        it1->type(),
+        id2string(function_identifier),
+        "va_arg",
+        state.source.pc->source_location,
+        ns.lookup(function_identifier).mode,
+        state.symbol_table);
+      va_arg.is_parameter = true;
 
-      // add to symbol table
-      symbolt symbol;
-      symbol.name=id;
-      symbol.base_name="va_arg"+std::to_string(va_count);
-      symbol.mode=ID_C;
-      symbol.type=it1->type();
+      state.call_stack().top().parameter_names.push_back(va_arg.name);
 
-      state.symbol_table.insert(std::move(symbol));
-
-      symbol_exprt lhs=symbol_exprt(id, it1->type());
-
-      symex_assign(state, code_assignt(lhs, *it1));
+      symex_assign(state, code_assignt{va_arg.symbol_expr(), *it1});
     }
   }
   else if(it1!=arguments.end())

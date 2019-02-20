@@ -52,8 +52,8 @@ void goto_symext::symex_assign(statet &state, const code_assignt &code)
       PRECONDITION(lhs.is_nil());
       symex_printf(state, side_effect_expr);
     }
-    else if(statement==ID_gcc_builtin_va_arg_next)
-      symex_gcc_builtin_va_arg_next(state, lhs, side_effect_expr);
+    else if(statement == ID_va_start)
+      symex_va_start(state, lhs, side_effect_expr);
     else
       UNREACHABLE;
   }

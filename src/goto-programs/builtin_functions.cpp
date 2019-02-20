@@ -1080,10 +1080,10 @@ void goto_convertt::do_function_call_symbol(
   else if(identifier==ID_gcc_builtin_va_arg)
   {
     // This does two things.
-    // 1) Move list pointer to next argument.
-    //    Done by gcc_builtin_va_arg_next.
-    // 2) Return value of argument.
+    // 1) Return value of argument.
     //    This is just dereferencing.
+    // 2) Move list pointer to next argument.
+    //    This is just an increment.
 
     if(arguments.size()!=1)
     {
@@ -1095,25 +1095,21 @@ void goto_convertt::do_function_call_symbol(
 
     exprt list_arg=make_va_list(arguments[0]);
 
-    {
-      side_effect_exprt rhs(
-        ID_gcc_builtin_va_arg_next,
-        list_arg.type(),
-        function.source_location());
-      rhs.copy_to_operands(list_arg);
-      rhs.set(ID_C_va_arg_type, to_code_type(function.type()).return_type());
-      dest.add(goto_programt::make_assignment(
-        list_arg, rhs, function.source_location()));
-    }
-
     if(lhs.is_not_nil())
     {
       typet t=pointer_type(lhs.type());
-      dereference_exprt rhs(typecast_exprt(list_arg, t), lhs.type());
+      dereference_exprt rhs{typecast_exprt(dereference_exprt{list_arg}, t)};
       rhs.add_source_location()=function.source_location();
       dest.add(
         goto_programt::make_assignment(lhs, rhs, function.source_location()));
     }
+
+    code_assignt assign{
+      list_arg, plus_exprt{list_arg, from_integer(1, pointer_diff_type())}};
+    assign.rhs().set(
+      ID_C_va_arg_type, to_code_type(function.type()).return_type());
+    dest.add(goto_programt::make_assignment(
+      std::move(assign), function.source_location()));
   }
   else if(identifier=="__builtin_va_copy")
   {
@@ -1138,7 +1134,7 @@ void goto_convertt::do_function_call_symbol(
     dest.add(goto_programt::make_assignment(
       dest_expr, src_expr, function.source_location()));
   }
-  else if(identifier=="__builtin_va_start")
+  else if(identifier == "__builtin_va_start" || identifier == "__va_start")
   {
     // Set the list argument to be the address of the
     // parameter argument.
@@ -1151,8 +1147,6 @@ void goto_convertt::do_function_call_symbol(
     }
 
     exprt dest_expr=make_va_list(arguments[0]);
-    const typecast_exprt src_expr(
-      address_of_exprt(arguments[1]), dest_expr.type());
 
     if(!is_lvalue(dest_expr))
     {
@@ -1161,8 +1155,13 @@ void goto_convertt::do_function_call_symbol(
       throw 0;
     }
 
+    side_effect_exprt rhs{
+      ID_va_start, dest_expr.type(), function.source_location()};
+    rhs.add_to_operands(
+      typecast_exprt{address_of_exprt{arguments[1]}, dest_expr.type()});
+
     dest.add(goto_programt::make_assignment(
-      dest_expr, src_expr, function.source_location()));
+      std::move(dest_expr), std::move(rhs), function.source_location()));
   }
   else if(identifier=="__builtin_va_end")
   {

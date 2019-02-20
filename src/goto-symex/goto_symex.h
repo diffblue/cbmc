@@ -610,10 +610,9 @@ protected:
   /// \return The resulting expression
   static exprt add_to_lhs(const exprt &lhs, const exprt &what);
 
-  virtual void symex_gcc_builtin_va_arg_next(
-    statet &state,
-    const exprt &lhs,
-    const side_effect_exprt &code);
+  virtual void
+  symex_va_start(statet &, const exprt &lhs, const side_effect_exprt &);
+
   /// Symbolically execute an assignment instruction that has an `allocate` on
   /// the right hand side
   /// \param state: Symbolic execution state for current instruction

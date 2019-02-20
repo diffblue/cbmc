@@ -26,6 +26,7 @@ struct framet
   irep_idt function_identifier;
   std::map<goto_programt::const_targett, goto_state_listt> goto_state_map;
   symex_targett::sourcet calling_location;
+  std::vector<irep_idt> parameter_names;
 
   goto_programt::const_targett end_of_function;
   exprt return_value = nil_exprt();
