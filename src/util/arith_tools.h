@@ -19,12 +19,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 class typet;
 
-// this one will go away
-// returns 'true' on error
-/// \deprecated: use the constant_exprt version instead
-DEPRECATED("Use the constant_exprt version instead")
-bool to_integer(const exprt &expr, mp_integer &int_value);
-
 // returns 'true' on error
 bool to_integer(const constant_exprt &expr, mp_integer &int_value);
 
