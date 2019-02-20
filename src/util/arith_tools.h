@@ -10,12 +10,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_UTIL_ARITH_TOOLS_H
 #define CPROVER_UTIL_ARITH_TOOLS_H
 
+#include "deprecate.h"
 #include "invariant.h"
 #include "mp_arith.h"
 #include "optional.h"
 #include "std_expr.h"
 
-#include "deprecate.h"
+#include <limits>
 
 class typet;
 
