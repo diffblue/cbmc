@@ -199,6 +199,23 @@ void function_call_harness_generatort::validate_options()
       "--" FUNCTION_HARNESS_GENERATOR_FUNCTION_OPT};
 }
 
+std::size_t function_call_harness_generatort::require_one_size_value(
+  const std::string &option,
+  const std::list<std::string> &values)
+{
+  auto const string_value = require_exactly_one_value(option, values);
+  auto value = string2optional<std::size_t>(string_value, 10);
+  if(value.has_value())
+  {
+    return value.value();
+  }
+  else
+  {
+    throw invalid_command_line_argument_exceptiont{
+      "failed to parse `" + string_value + "' as integer", "--" + option};
+  }
+}
+
 const symbolt &
 function_call_harness_generatort::implt::lookup_function_to_call()
 {
