@@ -15,6 +15,7 @@ Author: Diffblue Ltd.
 #include <util/std_code.h>
 #include <util/std_expr.h>
 #include <util/string2int.h>
+#include <util/string_utils.h>
 #include <util/ui_message.h>
 
 #include <goto-programs/goto_convert.h>
@@ -45,9 +46,6 @@ struct function_call_harness_generatort::implt
   /// Iterate over the symbol table and generate initialisation code for
   /// globals into the function body.
   void generate_nondet_globals(code_blockt &function_body);
-  /// Non-deterministically initialise the parameters of the entry function
-  /// and insert function call to the passed code block.
-  void setup_parameters_and_call_entry_function(code_blockt &function_body);
   /// Return a reference to the entry function or throw if it doesn't exist.
   const symbolt &lookup_function_to_call();
   /// Generate initialisation code for one lvalue inside block.
@@ -56,6 +54,14 @@ struct function_call_harness_generatort::implt
   void ensure_harness_does_not_already_exist();
   /// Update the goto-model with the new harness function.
   void add_harness_function_to_goto_model(code_blockt function_body);
+  /// declare local variables for each of the parameters of the entry function
+  /// and return them
+  code_function_callt::argumentst declare_arguments(code_blockt &function_body);
+  /// write initialisation code for each of the arguments into function_body,
+  /// then insert a call to the entry function with the arguments
+  void call_function(
+    const code_function_callt::argumentst &arguments,
+    code_blockt &function_body);
 };
 
 function_call_harness_generatort::function_call_harness_generatort(
@@ -125,55 +131,26 @@ void function_call_harness_generatort::generate(
   p_impl->generate(goto_model, harness_function_name);
 }
 
-void function_call_harness_generatort::implt::
-  setup_parameters_and_call_entry_function(code_blockt &function_body)
-{
-  const auto &function_to_call = lookup_function_to_call();
-  const auto &function_type = to_code_type(function_to_call.type);
-  const auto &parameters = function_type.parameters();
-
-  code_function_callt::operandst arguments{};
-
-  auto allocate_objects = allocate_objectst{function_to_call.mode,
-                                            function_to_call.location,
-                                            "__goto_harness",
-                                            *symbol_table};
-  for(const auto &parameter : parameters)
-  {
-    auto argument = allocate_objects.allocate_automatic_local_object(
-      parameter.type(), parameter.get_base_name());
-    arguments.push_back(argument);
-  }
-  allocate_objects.declare_created_symbols(function_body);
-  for(auto const &argument : arguments)
-  {
-    generate_initialisation_code_for(function_body, argument);
-  }
-  code_function_callt function_call{function_to_call.symbol_expr(),
-                                    std::move(arguments)};
-  function_call.add_source_location() = function_to_call.location;
-
-  function_body.add(std::move(function_call));
-}
-
 void function_call_harness_generatort::implt::generate(
   goto_modelt &goto_model,
   const irep_idt &harness_function_name)
 {
   symbol_table = &goto_model.symbol_table;
   goto_functions = &goto_model.goto_functions;
-  const auto &function_to_call = lookup_function_to_call();
-  recursive_initialization_config.mode = function_to_call.mode;
-  recursive_initialization = util_make_unique<recursive_initializationt>(
-    recursive_initialization_config, goto_model);
   this->harness_function_name = harness_function_name;
+  const auto &function_to_call = lookup_function_to_call();
   ensure_harness_does_not_already_exist();
 
   // create body for the function
   code_blockt function_body{};
+  auto const arguments = declare_arguments(function_body);
+
+  recursive_initialization_config.mode = function_to_call.mode;
+  recursive_initialization = util_make_unique<recursive_initializationt>(
+    recursive_initialization_config, goto_model);
 
   generate_nondet_globals(function_body);
-  setup_parameters_and_call_entry_function(function_body);
+  call_function(arguments, function_body);
   add_harness_function_to_goto_model(std::move(function_body));
 }
 
@@ -277,4 +254,45 @@ void function_call_harness_generatort::implt::
     *message_handler,
     function_to_call.mode);
   body.add(goto_programt::make_end_function());
+}
+
+code_function_callt::argumentst
+function_call_harness_generatort::implt::declare_arguments(
+  code_blockt &function_body)
+{
+  const auto &function_to_call = lookup_function_to_call();
+  const auto &function_type = to_code_type(function_to_call.type);
+  const auto &parameters = function_type.parameters();
+
+  code_function_callt::operandst arguments{};
+
+  auto allocate_objects = allocate_objectst{function_to_call.mode,
+                                            function_to_call.location,
+                                            "__goto_harness",
+                                            *symbol_table};
+  for(const auto &parameter : parameters)
+  {
+    auto argument = allocate_objects.allocate_automatic_local_object(
+      parameter.type(), parameter.get_base_name());
+    arguments.push_back(argument);
+  }
+
+  allocate_objects.declare_created_symbols(function_body);
+  return arguments;
+}
+
+void function_call_harness_generatort::implt::call_function(
+  const code_function_callt::argumentst &arguments,
+  code_blockt &function_body)
+{
+  auto const &function_to_call = lookup_function_to_call();
+  for(auto const &argument : arguments)
+  {
+    generate_initialisation_code_for(function_body, argument);
+  }
+  code_function_callt function_call{function_to_call.symbol_expr(),
+                                    std::move(arguments)};
+  function_call.add_source_location() = function_to_call.location;
+
+  function_body.add(std::move(function_call));
 }
