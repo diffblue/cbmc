@@ -438,18 +438,15 @@ void goto_symext::symex_assign_byte_extract(
   // we have byte_extract_X(object, offset)=value
   // turn into object=byte_update_X(object, offset, value)
 
-  exprt new_rhs;
-
+  irep_idt byte_update_id;
   if(lhs.id()==ID_byte_extract_little_endian)
-    new_rhs.id(ID_byte_update_little_endian);
+    byte_update_id = ID_byte_update_little_endian;
   else if(lhs.id()==ID_byte_extract_big_endian)
-    new_rhs.id(ID_byte_update_big_endian);
+    byte_update_id = ID_byte_update_big_endian;
   else
     UNREACHABLE;
 
-  new_rhs.copy_to_operands(lhs.op(), lhs.offset(), rhs);
-  new_rhs.type()=lhs.op().type();
-
+  const byte_update_exprt new_rhs{byte_update_id, lhs.op(), lhs.offset(), rhs};
   exprt new_full_lhs=add_to_lhs(full_lhs, lhs);
 
   symex_assign_rec(
