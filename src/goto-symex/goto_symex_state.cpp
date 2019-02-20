@@ -701,6 +701,9 @@ void goto_symex_statet::rename(
     }
   }
 
+  // expand struct and union tag types
+  type = ns.follow(type);
+
   if(type.id()==ID_array)
   {
     auto &array_type = to_array_type(type);
@@ -724,24 +727,6 @@ void goto_symex_statet::rename(
   else if(type.id()==ID_pointer)
   {
     rename(to_pointer_type(type).subtype(), irep_idt(), ns, level);
-  }
-  else if(type.id() == ID_symbol_type)
-  {
-    const symbolt &symbol = ns.lookup(to_symbol_type(type));
-    type = symbol.type;
-    rename(type, l1_identifier, ns, level);
-  }
-  else if(type.id() == ID_union_tag)
-  {
-    const symbolt &symbol = ns.lookup(to_union_tag_type(type));
-    type = symbol.type;
-    rename(type, l1_identifier, ns, level);
-  }
-  else if(type.id() == ID_struct_tag)
-  {
-    const symbolt &symbol = ns.lookup(to_struct_tag_type(type));
-    type=symbol.type;
-    rename(type, l1_identifier, ns, level);
   }
 
   if(level==L2 &&

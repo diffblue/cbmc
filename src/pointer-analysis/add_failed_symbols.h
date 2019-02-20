@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_POINTER_ANALYSIS_ADD_FAILED_SYMBOLS_H
 
 #include <util/irep.h>
+#include <util/optional.h>
 
 class symbol_table_baset;
 class symbolt;
@@ -27,8 +28,7 @@ void add_failed_symbol_if_needed(
 
 irep_idt failed_symbol_id(const irep_idt &identifier);
 
-exprt get_failed_symbol(
-  const symbol_exprt &expr,
-  const namespacet &ns);
+optionalt<symbol_exprt>
+get_failed_symbol(const symbol_exprt &expr, const namespacet &ns);
 
 #endif // CPROVER_POINTER_ANALYSIS_ADD_FAILED_SYMBOLS_H

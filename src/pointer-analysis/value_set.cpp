@@ -1471,12 +1471,9 @@ void value_sett::apply_code_rec(
       (lhs_type.id() == ID_array && lhs_type.subtype().id() == ID_pointer))
     {
       // assign the address of the failed object
-      exprt failed=get_failed_symbol(to_symbol_expr(lhs), ns);
-
-      if(failed.is_not_nil())
+      if(auto failed = get_failed_symbol(to_symbol_expr(lhs), ns))
       {
-        address_of_exprt address_of_expr(
-          failed, to_pointer_type(lhs.type()));
+        address_of_exprt address_of_expr(*failed, to_pointer_type(lhs.type()));
         assign(lhs, address_of_expr, ns, false, false);
       }
       else
