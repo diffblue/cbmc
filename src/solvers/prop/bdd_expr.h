@@ -25,21 +25,19 @@ Author: Michael Tautschnig, michael.tautschnig@qmul.ac.uk
 
 #include <unordered_map>
 
-/*! \brief TO_BE_DOCUMENTED
-*/
+/// Conversion between \c exprt and \c bbdt
+/// This encapsulate a bdd_managert, thus BDDs created with this class should
+/// only be combined with BDDs created using the same instance of
+/// \ref bdd_exprt .
+/// See unit tests in unit/solvers/prop/bdd_expr.cpp for examples.
 class bdd_exprt
 {
 public:
-  explicit bdd_exprt() : root(bdd_mgr.bdd_true())
-  {
-  }
-
-  void from_expr(const exprt &expr);
-  exprt as_expr() const;
+  bddt from_expr(const exprt &expr);
+  exprt as_expr(const bddt &root) const;
 
 protected:
   bdd_managert bdd_mgr;
-  bddt root;
 
   typedef std::unordered_map<exprt, bddt, irep_hash> expr_mapt;
   expr_mapt expr_map;

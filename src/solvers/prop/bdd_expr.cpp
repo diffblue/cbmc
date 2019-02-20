@@ -88,9 +88,9 @@ bddt bdd_exprt::from_expr_rec(const exprt &expr)
   }
 }
 
-void bdd_exprt::from_expr(const exprt &expr)
+bddt bdd_exprt::from_expr(const exprt &expr)
 {
-  root=from_expr_rec(expr);
+  return from_expr_rec(expr);
 }
 
 exprt bdd_exprt::as_expr(const bdd_nodet &r, bool complement) const
@@ -148,7 +148,7 @@ exprt bdd_exprt::as_expr(const bdd_nodet &r, bool complement) const
     as_expr(r.else_branch(), r.else_branch().is_complement() != complement));
 }
 
-exprt bdd_exprt::as_expr() const
+exprt bdd_exprt::as_expr(const bddt &root) const
 {
   const bdd_nodet node = bdd_mgr.bdd_node(root);
   return as_expr(node, node.is_complement());
