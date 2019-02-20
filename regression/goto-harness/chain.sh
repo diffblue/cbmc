@@ -23,5 +23,11 @@ if [ -e "${name}-mod.gb" ] ; then
   rm -f "${name}-mod.gb"
 fi
 
-$goto_harness "${name}.gb" "${name}-mod.gb" --harness-function-name $entry_point ${args} 
-$cbmc --function $entry_point "${name}-mod.gb" --unwind 20 --unwinding-assertions
+# `# some comment` is an inline comment - basically, cause bash to execute an empty command
+
+$goto_harness "${name}.gb" "${name}-mod.gb" --harness-function-name $entry_point ${args}
+$cbmc --function $entry_point "${name}-mod.gb" \
+  --pointer-check `# because we want to see out of bounds errors` \
+  --unwind 11 `# with the way we set up arrays symex can't figure out loop bounds automatically` \
+  --unwinding-assertions `# we want to make sure we don't accidentally pass tests because we didn't unwind enough` \
+  # cbmc args end

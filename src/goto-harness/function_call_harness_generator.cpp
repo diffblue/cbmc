@@ -21,6 +21,10 @@ Author: Diffblue Ltd.
 #include <goto-programs/goto_convert.h>
 #include <goto-programs/goto_model.h>
 
+#include <algorithm>
+#include <iterator>
+#include <set>
+
 #include "function_harness_generator_options.h"
 #include "goto_harness_parse_options.h"
 #include "recursive_initialization.h"
@@ -40,6 +44,12 @@ struct function_call_harness_generatort::implt
 
   recursive_initialization_configt recursive_initialization_config;
   std::unique_ptr<recursive_initializationt> recursive_initialization;
+
+  std::set<irep_idt> function_parameters_to_treat_as_arrays;
+  std::set<irep_idt> function_arguments_to_treat_as_arrays;
+
+  std::map<irep_idt, irep_idt> function_argument_to_associated_array_size;
+  std::map<irep_idt, irep_idt> function_parameter_to_associated_array_size;
 
   /// \see goto_harness_generatort::generate
   void generate(goto_modelt &goto_model, const irep_idt &harness_function_name);
@@ -117,6 +127,57 @@ void function_call_harness_generatort::handle_option(
         "--" FUNCTION_HARNESS_GENERATOR_MAX_NONDET_TREE_DEPTH_OPT};
     }
   }
+  else if(option == FUNCTION_HARNESS_GENERATOR_MAX_ARRAY_SIZE_OPT)
+  {
+    p_impl->recursive_initialization_config.max_dynamic_array_size =
+      require_one_size_value(
+        FUNCTION_HARNESS_GENERATOR_MAX_ARRAY_SIZE_OPT, values);
+  }
+  else if(option == FUNCTION_HARNESS_GENERATOR_MIN_ARRAY_SIZE_OPT)
+  {
+    p_impl->recursive_initialization_config.min_dynamic_array_size =
+      require_one_size_value(
+        FUNCTION_HARNESS_GENERATOR_MIN_ARRAY_SIZE_OPT, values);
+  }
+  else if(option == FUNCTION_HARNESS_GENERATOR_TREAT_POINTER_AS_ARRAY_OPT)
+  {
+    p_impl->function_parameters_to_treat_as_arrays.insert(
+      values.begin(), values.end());
+  }
+  else if(option == FUNCTION_HARNESS_GENERATOR_ASSOCIATED_ARRAY_SIZE_OPT)
+  {
+    for(auto const &array_size_pair : values)
+    {
+      try
+      {
+        std::string array;
+        std::string size;
+        split_string(array_size_pair, ':', array, size);
+        // --associated-array-size implies --treat-pointer-as-array
+        // but it is not an error to specify both, so we don't check
+        // for duplicates here
+        p_impl->function_parameters_to_treat_as_arrays.insert(array);
+        auto const inserted =
+          p_impl->function_parameter_to_associated_array_size.emplace(
+            array, size);
+        if(!inserted.second)
+        {
+          throw invalid_command_line_argument_exceptiont{
+            "can not have two associated array sizes for one array",
+            "--" FUNCTION_HARNESS_GENERATOR_ASSOCIATED_ARRAY_SIZE_OPT};
+        }
+      }
+      catch(const deserialization_exceptiont &)
+      {
+        throw invalid_command_line_argument_exceptiont{
+          "`" + array_size_pair +
+            "' is in an invalid format for array size pair",
+          "--" FUNCTION_HARNESS_GENERATOR_ASSOCIATED_ARRAY_SIZE_OPT,
+          "array_name:size_name, where both are the names of function "
+          "parameters"};
+      }
+    }
+  }
   else
   {
     throw invalid_command_line_argument_exceptiont{
@@ -145,7 +206,17 @@ void function_call_harness_generatort::implt::generate(
   code_blockt function_body{};
   auto const arguments = declare_arguments(function_body);
 
+  // configure and create recursive initialisation object
   recursive_initialization_config.mode = function_to_call.mode;
+  recursive_initialization_config.pointers_to_treat_as_arrays =
+    function_arguments_to_treat_as_arrays;
+  recursive_initialization_config.array_name_to_associated_array_size_variable =
+    function_argument_to_associated_array_size;
+  for(const auto &pair : function_argument_to_associated_array_size)
+  {
+    recursive_initialization_config.variables_that_hold_array_sizes.insert(
+      pair.second);
+  }
   recursive_initialization = util_make_unique<recursive_initializationt>(
     recursive_initialization_config, goto_model);
 
@@ -197,6 +268,15 @@ void function_call_harness_generatort::validate_options()
     throw invalid_command_line_argument_exceptiont{
       "required parameter entry function not set",
       "--" FUNCTION_HARNESS_GENERATOR_FUNCTION_OPT};
+  if(
+    p_impl->recursive_initialization_config.min_dynamic_array_size >
+    p_impl->recursive_initialization_config.max_dynamic_array_size)
+  {
+    throw invalid_command_line_argument_exceptiont{
+      "min dynamic array size cannot be greater than max dynamic array size",
+      "--" FUNCTION_HARNESS_GENERATOR_MIN_ARRAY_SIZE_OPT
+      " --" FUNCTION_HARNESS_GENERATOR_MAX_ARRAY_SIZE_OPT};
+  }
 }
 
 std::size_t function_call_harness_generatort::require_one_size_value(
@@ -287,13 +367,41 @@ function_call_harness_generatort::implt::declare_arguments(
                                             function_to_call.location,
                                             "__goto_harness",
                                             *symbol_table};
+  std::map<irep_idt, irep_idt> parameter_name_to_argument_name;
   for(const auto &parameter : parameters)
   {
     auto argument = allocate_objects.allocate_automatic_local_object(
       parameter.type(), parameter.get_base_name());
+    parameter_name_to_argument_name.insert(
+      {parameter.get_base_name(), argument.get_identifier()});
     arguments.push_back(argument);
   }
 
+  for(const auto &pair : parameter_name_to_argument_name)
+  {
+    auto const &parameter_name = pair.first;
+    auto const &argument_name = pair.second;
+    if(function_parameters_to_treat_as_arrays.count(parameter_name) != 0)
+    {
+      function_arguments_to_treat_as_arrays.insert(argument_name);
+    }
+    auto it = function_parameter_to_associated_array_size.find(parameter_name);
+    if(it != function_parameter_to_associated_array_size.end())
+    {
+      auto const &associated_array_size_parameter = it->second;
+      auto associated_array_size_argument =
+        parameter_name_to_argument_name.find(associated_array_size_parameter);
+      if(
+        associated_array_size_argument == parameter_name_to_argument_name.end())
+      {
+        throw invalid_command_line_argument_exceptiont{
+          "associated array size is not there",
+          "--" FUNCTION_HARNESS_GENERATOR_ASSOCIATED_ARRAY_SIZE_OPT};
+      }
+      function_argument_to_associated_array_size.insert(
+        {argument_name, associated_array_size_argument->second});
+    }
+  }
   allocate_objects.declare_created_symbols(function_body);
   return arguments;
 }

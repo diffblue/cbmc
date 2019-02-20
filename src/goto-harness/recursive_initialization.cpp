@@ -13,6 +13,7 @@ Author: Diffblue Ltd.
 #include <util/c_types.h>
 #include <util/fresh_symbol.h>
 #include <util/irep.h>
+#include <util/optional_utils.h>
 #include <util/std_code.h>
 #include <util/std_expr.h>
 
@@ -26,7 +27,7 @@ recursive_initializationt::recursive_initializationt(
 
 void recursive_initializationt::initialize(
   const exprt &lhs,
-  std::size_t depth,
+  const std::size_t depth,
   const recursion_sett &known_tags,
   code_blockt &body)
 {
@@ -37,7 +38,16 @@ void recursive_initializationt::initialize(
   }
   else if(type.id() == ID_pointer)
   {
-    initialize_pointer(lhs, depth, known_tags, body);
+    if(
+      lhs.id() == ID_symbol &&
+      should_be_treated_as_array(to_symbol_expr(lhs).get_identifier()))
+    {
+      initialize_dynamic_array(lhs, depth, known_tags, body);
+    }
+    else
+    {
+      initialize_pointer(lhs, depth, known_tags, body);
+    }
   }
   else if(type.id() == ID_array)
   {
@@ -69,7 +79,7 @@ symbol_exprt recursive_initializationt::get_malloc_function()
 
 void recursive_initializationt::initialize_struct_tag(
   const exprt &lhs,
-  std::size_t depth,
+  const std::size_t depth,
   const recursion_sett &known_tags,
   code_blockt &body)
 {
@@ -86,7 +96,7 @@ void recursive_initializationt::initialize_struct_tag(
 
 void recursive_initializationt::initialize_pointer(
   const exprt &lhs,
-  std::size_t depth,
+  const std::size_t depth,
   const recursion_sett &known_tags,
   code_blockt &body)
 {
@@ -137,16 +147,21 @@ void recursive_initializationt::initialize_pointer(
 
 void recursive_initializationt::initialize_nondet(
   const exprt &lhs,
-  std::size_t depth,
+  const std::size_t depth,
   const recursion_sett &known_tags,
   code_blockt &body)
 {
-  body.add(code_assignt{lhs, side_effect_expr_nondett{lhs.type()}});
+  if(
+    lhs.id() != ID_symbol ||
+    !is_array_size_parameter(to_symbol_expr(lhs).get_identifier()))
+  {
+    body.add(code_assignt{lhs, side_effect_expr_nondett{lhs.type()}});
+  }
 }
 
 void recursive_initializationt::initialize_array(
   const exprt &array,
-  std::size_t depth,
+  const std::size_t depth,
   const recursion_sett &known_tags,
   code_blockt &body)
 {
@@ -162,4 +177,128 @@ void recursive_initializationt::initialize_array(
       known_tags,
       body);
   }
+}
+
+bool recursive_initializationt::should_be_treated_as_array(
+  const irep_idt &array_name) const
+{
+  return initialization_config.pointers_to_treat_as_arrays.find(array_name) !=
+         initialization_config.pointers_to_treat_as_arrays.end();
+}
+
+bool recursive_initializationt::is_array_size_parameter(
+  const irep_idt &cmdline_arg) const
+{
+  return initialization_config.variables_that_hold_array_sizes.find(
+           cmdline_arg) !=
+         initialization_config.variables_that_hold_array_sizes.end();
+}
+
+optionalt<irep_idt> recursive_initializationt::get_associated_size_variable(
+  const irep_idt &array_name) const
+{
+  return optional_lookup(
+    initialization_config.array_name_to_associated_array_size_variable,
+    array_name);
+}
+
+void recursive_initializationt::initialize_dynamic_array(
+  const exprt &pointer,
+  const std::size_t depth,
+  const recursion_sett &known_tags,
+  code_blockt &body)
+{
+  PRECONDITION(pointer.type().id() == ID_pointer);
+
+  // size_t number_of_arrays = max_array_size - min_array_size;
+  // T *arrays[number_of_arrays];
+  //
+  // T array1[min_array_size];
+  // initialize(array1);
+  // arrays[0] = &array1[0];
+  //
+  // T array2[min_array_size+1];
+  // initialize(array2);
+  // arrays[1] = &array2[0];
+  //
+  // ... and so on ...
+  //
+  // T arrayN[max_array_size];
+  // initialize(arrayN);
+  // arrays[number_of_arrays-1] = &arrayN[0];
+  //
+  // size_t array_index;
+  // assume(0 <= array_index < number_of_arrays);
+  // actual_size = array_index + min_array_size;
+  // array_pointer = arrays[array_index];
+
+  const auto &pointer_type = to_pointer_type(pointer.type());
+  allocate_objectst allocate_objects{initialization_config.mode,
+                                     pointer_type.source_location(),
+                                     "initializer",
+                                     goto_model.symbol_table};
+  const auto min_array_size = initialization_config.min_dynamic_array_size;
+  const auto max_array_size = initialization_config.max_dynamic_array_size;
+  PRECONDITION(max_array_size >= min_array_size);
+  const auto number_of_arrays = max_array_size - min_array_size + 1;
+
+  auto const array_variables = [&]() {
+    std::vector<symbol_exprt> array_variables;
+    for(auto array_size = min_array_size; array_size <= max_array_size;
+        array_size++)
+    {
+      array_variables.push_back(
+        allocate_objects.allocate_automatic_local_object(
+          array_typet{pointer_type.subtype(),
+                      from_integer(array_size, size_type())},
+          "array"));
+    }
+    return array_variables;
+  }();
+
+  const auto arrays = allocate_objects.allocate_automatic_local_object(
+    array_typet{pointer_type, from_integer(number_of_arrays, size_type())},
+    "arrays");
+
+  const auto nondet_index = allocate_objects.allocate_automatic_local_object(
+    size_type(), "nondet_index");
+
+  allocate_objects.declare_created_symbols(body);
+
+  {
+    std::size_t array_counter = 0;
+    for(const auto &array_variable : array_variables)
+    {
+      initialize(array_variable, depth + 1, known_tags, body);
+      body.add(code_assignt{
+        index_exprt{arrays, from_integer(array_counter++, size_type())},
+        address_of_exprt{
+          index_exprt{array_variable, from_integer(0, size_type())}}});
+    }
+    INVARIANT(array_counter == number_of_arrays, "initialized all arrays");
+  }
+
+  body.add(code_assumet{and_exprt{
+    binary_relation_exprt{nondet_index, ID_ge, from_integer(0, size_type())},
+    binary_relation_exprt{
+      nondet_index, ID_lt, from_integer(number_of_arrays, size_type())}}});
+
+  if(pointer.id() == ID_symbol)
+  {
+    const auto array_id = to_symbol_expr(pointer).get_identifier();
+    const auto size_var = get_associated_size_variable(array_id);
+    if(size_var.has_value())
+    {
+      const auto size_var_symbol_expr =
+        goto_model.symbol_table.lookup_ref(size_var.value()).symbol_expr();
+      body.add(code_assignt{
+        size_var_symbol_expr,
+        typecast_exprt{
+          plus_exprt{nondet_index,
+                     from_integer(min_array_size, nondet_index.type())},
+          size_var_symbol_expr.type()}});
+    }
+  }
+
+  body.add(code_assignt{pointer, index_exprt{arrays, nondet_index}});
 }
