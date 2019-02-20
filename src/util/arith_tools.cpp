@@ -16,13 +16,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <algorithm>
 
-bool to_integer(const exprt &expr, mp_integer &int_value)
-{
-  if(!expr.is_constant())
-    return true;
-  return to_integer(to_constant_expr(expr), int_value);
-}
-
 bool to_integer(const constant_exprt &expr, mp_integer &int_value)
 {
   const irep_idt &value=expr.get_value();
