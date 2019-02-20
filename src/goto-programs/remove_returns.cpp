@@ -150,7 +150,7 @@ void remove_returnst::do_function_calls(
   {
     if(i_it->is_function_call())
     {
-      code_function_callt &function_call = i_it->get_function_call();
+      code_function_callt function_call = i_it->get_function_call();
 
       INVARIANT(
         function_call.function().id() == ID_symbol,
@@ -222,6 +222,9 @@ void remove_returnst::do_function_calls(
               goto_programt::make_dead(*return_value, i_it->source_location));
           }
         }
+
+        // update the call
+        i_it->set_function_call(function_call);
       }
     }
   }
@@ -355,7 +358,8 @@ bool remove_returnst::restore_returns(
   {
     if(i_it->is_assign())
     {
-      code_assignt &assign = i_it->get_assign();
+      const auto &assign = i_it->get_assign();
+
       if(assign.lhs().id()!=ID_symbol ||
          to_symbol_expr(assign.lhs()).get_identifier()!=rv_name_id)
         continue;
@@ -384,7 +388,7 @@ void remove_returnst::undo_function_calls(
   {
     if(i_it->is_function_call())
     {
-      code_function_callt &function_call = i_it->get_function_call();
+      code_function_callt function_call = i_it->get_function_call();
 
       // ignore function pointers
       if(function_call.function().id()!=ID_symbol)
@@ -401,8 +405,8 @@ void remove_returnst::undo_function_calls(
 
       // find "f(...); lhs=f#return_value; DEAD f#return_value;"
       // and revert to "lhs=f(...);"
-      goto_programt::instructionst::iterator next=i_it;
-      ++next;
+      goto_programt::instructionst::iterator next = std::next(i_it);
+
       INVARIANT(
         next!=goto_program.instructions.end(),
         "non-void function call must be followed by #return_value read");
@@ -422,6 +426,8 @@ void remove_returnst::undo_function_calls(
 
       // restore the previous assignment
       function_call.lhs()=assign.lhs();
+
+      i_it->set_function_call(function_call);
 
       // remove the assignment and subsequent dead
       // i_it remains valid

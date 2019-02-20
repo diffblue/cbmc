@@ -319,7 +319,9 @@ void remove_function_pointerst::remove_function_pointer(
 
     if(functions.size()==1)
     {
-      target->get_function_call().function() = *functions.cbegin();
+      auto call = target->get_function_call();
+      call.function() = *functions.cbegin();
+      target->set_function_call(call);
       return;
     }
   }
@@ -386,14 +388,18 @@ void remove_function_pointerst::remove_function_pointer(
   for(const auto &fun : functions)
   {
     // call function
-    goto_programt::targett t1 =
-      new_code_calls.add(goto_programt::make_function_call(code));
-    t1->get_function_call().function() = fun;
+    auto new_call = code;
+    new_call.function() = fun;
 
     // the signature of the function might not match precisely
-    fix_argument_types(t1->get_function_call());
+    fix_argument_types(new_call);
 
-    fix_return_type(function_id, t1->get_function_call(), new_code_calls);
+    goto_programt tmp;
+    fix_return_type(function_id, new_call, tmp);
+
+    auto call = new_code_calls.add(goto_programt::make_function_call(new_call));
+    new_code_calls.destructive_append(tmp);
+
     // goto final
     new_code_calls.add(goto_programt::make_goto(t_final, true_exprt()));
 
@@ -404,7 +410,7 @@ void remove_function_pointerst::remove_function_pointer(
       typecast_exprt::conditional_cast(address_of, pointer.type());
 
     new_code_gotos.add(
-      goto_programt::make_goto(t1, equal_exprt(pointer, casted_address)));
+      goto_programt::make_goto(call, equal_exprt(pointer, casted_address)));
   }
 
   // fall-through

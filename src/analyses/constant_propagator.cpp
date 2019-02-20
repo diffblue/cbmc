@@ -761,37 +761,50 @@ void constant_propagator_ait::replace(
     {
       exprt c = it->get_condition();
       replace_types_rec(d.values.replace_const, c);
-      constant_propagator_domaint::partial_evaluate(d.values, c, ns);
-      it->set_condition(c);
+      if(!constant_propagator_domaint::partial_evaluate(d.values, c, ns))
+        it->set_condition(c);
     }
     else if(it->is_assign())
     {
-      exprt &rhs=to_code_assign(it->code).rhs();
-      constant_propagator_domaint::partial_evaluate(d.values, rhs, ns);
+      auto assign = it->get_assign();
+      exprt &rhs = assign.rhs();
 
-      if(rhs.id()==ID_constant)
-        rhs.add_source_location() =
-          to_code_assign(it->code).lhs().source_location();
+      if(!constant_propagator_domaint::partial_evaluate(d.values, rhs, ns))
+      {
+        if(rhs.id() == ID_constant)
+          rhs.add_source_location() = assign.lhs().source_location();
+        it->set_assign(assign);
+      }
     }
     else if(it->is_function_call())
     {
-      exprt &function = to_code_function_call(it->code).function();
-      constant_propagator_domaint::partial_evaluate(d.values, function, ns);
+      auto call = it->get_function_call();
 
-      exprt::operandst &args=
-        to_code_function_call(it->code).arguments();
+      bool call_changed = false;
 
-      for(auto &arg : args)
+      if(!constant_propagator_domaint::partial_evaluate(
+           d.values, call.function(), ns))
       {
-        constant_propagator_domaint::partial_evaluate(d.values, arg, ns);
+        call_changed = true;
       }
+
+      for(auto &arg : call.arguments())
+        if(!constant_propagator_domaint::partial_evaluate(d.values, arg, ns))
+          call_changed = true;
+
+      if(call_changed)
+        it->set_function_call(call);
     }
     else if(it->is_other())
     {
       if(it->get_other().get_statement() == ID_expression)
       {
-        constant_propagator_domaint::partial_evaluate(
-          d.values, it->get_other(), ns);
+        auto c = to_code_expression(it->get_other());
+        if(!constant_propagator_domaint::partial_evaluate(
+             d.values, c.expression(), ns))
+        {
+          it->set_other(c);
+        }
       }
     }
   }

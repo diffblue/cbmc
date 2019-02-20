@@ -190,8 +190,9 @@ goto_programt::targett remove_virtual_functionst::remove_virtual_function(
     }
     else
     {
-      create_static_function_call(
-        target->get_function_call(), *functions.front().symbol_expr, ns);
+      auto c = target->get_function_call();
+      create_static_function_call(c, *functions.front().symbol_expr, ns);
+      target->set_function_call(c);
     }
     return next_target;
   }
@@ -250,11 +251,12 @@ goto_programt::targett remove_virtual_functionst::remove_virtual_function(
       if(fun.symbol_expr.has_value())
       {
         // call function
-        goto_programt::targett t1 = new_code_calls.add(
-          goto_programt::make_function_call(code, vcall_source_loc));
+        auto new_call = code;
 
-        create_static_function_call(
-          t1->get_function_call(), *fun.symbol_expr, ns);
+        create_static_function_call(new_call, *fun.symbol_expr, ns);
+
+        goto_programt::targett t1 = new_code_calls.add(
+          goto_programt::make_function_call(new_call, vcall_source_loc));
 
         insertit.first->second = t1;
       }

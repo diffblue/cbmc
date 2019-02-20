@@ -220,14 +220,14 @@ void goto_program_dereferencet::dereference_instruction(
 
   if(i.is_assign())
   {
-    auto &assignment = i.get_assign();
-
+    auto assignment = i.get_assign();
     dereference_expr(assignment.lhs(), checks_only);
     dereference_expr(assignment.rhs(), checks_only);
+    i.set_assign(assignment);
   }
   else if(i.is_function_call())
   {
-    code_function_callt &function_call = i.get_function_call();
+    code_function_callt function_call = i.get_function_call();
 
     if(function_call.lhs().is_not_nil())
       dereference_expr(function_call.lhs(), checks_only);
@@ -236,15 +236,22 @@ void goto_program_dereferencet::dereference_instruction(
 
     for(auto &arg : function_call.arguments())
       dereference_expr(arg, checks_only);
+
+    i.set_function_call(function_call);
   }
   else if(i.is_return())
   {
-    Forall_operands(it, i.get_return())
-      dereference_expr(*it, checks_only);
+    auto r = i.get_return();
+
+    if(r.return_value().is_not_nil())
+    {
+      dereference_expr(r.return_value(), checks_only);
+      i.set_return(r);
+    }
   }
   else if(i.is_other())
   {
-    auto &code = i.get_other();
+    auto code = i.get_other();
     const irep_idt &statement = code.get_statement();
 
     if(statement==ID_expression)
@@ -252,13 +259,15 @@ void goto_program_dereferencet::dereference_instruction(
       if(code.operands().size() != 1)
         throw "expression expects one operand";
 
-      dereference_expr(code.op0(), checks_only);
+      dereference_expr(to_code_expression(code).expression(), checks_only);
     }
     else if(statement==ID_printf)
     {
       for(auto &op : code.operands())
         dereference_expr(op, checks_only);
     }
+
+    i.set_other(code);
   }
 }
 

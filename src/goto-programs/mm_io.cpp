@@ -45,7 +45,7 @@ void mm_io(
 
     if(it->is_assign())
     {
-      auto &a = it->get_assign();
+      auto a = it->get_assign();
       collect_deref_expr(a.rhs(), deref_expr_r);
 
       if(mm_io_r.is_not_nil())
@@ -60,7 +60,8 @@ void mm_io(
           irep_idt r_identifier=id2string(identifier)+RETURN_VALUE_SUFFIX;
           symbol_exprt return_value(r_identifier, ct.return_type());
           if_exprt if_expr(integer_address(d.pointer()), return_value, d);
-          replace_expr(d, if_expr, a.rhs());
+          if(!replace_expr(d, if_expr, a.rhs()))
+            it->set_assign(a);
 
           const typet &pt=ct.parameters()[0].type();
           const typet &st=ct.parameters()[1].type();

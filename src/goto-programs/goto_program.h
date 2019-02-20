@@ -188,11 +188,11 @@ public:
       return to_code_assign(code);
     }
 
-    /// Get the assignment for ASSIGN
-    code_assignt &get_assign()
+    /// Set the assignment for ASSIGN
+    void set_assign(code_assignt c)
     {
       PRECONDITION(is_assign());
-      return to_code_assign(code);
+      code = std::move(c);
     }
 
     /// Get the declaration for DECL
@@ -202,11 +202,11 @@ public:
       return to_code_decl(code);
     }
 
-    /// Get the declaration for DECL
-    code_declt &get_decl()
+    /// Set the declaration for DECL
+    void set_decl(code_declt c)
     {
       PRECONDITION(is_decl());
-      return to_code_decl(code);
+      code = std::move(c);
     }
 
     /// Get the dead statement for DEAD
@@ -216,11 +216,11 @@ public:
       return to_code_dead(code);
     }
 
-    /// Get the dead statement for DEAD
-    code_deadt &get_dead()
+    /// Set the dead statement for DEAD
+    void set_dead(code_deadt c)
     {
       PRECONDITION(is_dead());
-      return to_code_dead(code);
+      code = std::move(c);
     }
 
     /// Get the return statement for READ
@@ -230,11 +230,11 @@ public:
       return to_code_return(code);
     }
 
-    /// Get the return statement for READ
-    code_returnt &get_return()
+    /// Set the return statement for READ
+    void set_return(code_returnt c)
     {
       PRECONDITION(is_return());
-      return to_code_return(code);
+      code = std::move(c);
     }
 
     /// Get the function call for FUNCTION_CALL
@@ -244,11 +244,11 @@ public:
       return to_code_function_call(code);
     }
 
-    /// Get the function call for FUNCTION_CALL
-    code_function_callt &get_function_call()
+    /// Set the function call for FUNCTION_CALL
+    void set_function_call(code_function_callt c)
     {
       PRECONDITION(is_function_call());
-      return to_code_function_call(code);
+      code = std::move(c);
     }
 
     /// Get the statement for OTHER
@@ -258,11 +258,11 @@ public:
       return code;
     }
 
-    /// Get the statement for OTHER
-    codet &get_other()
+    /// Set the statement for OTHER
+    void set_other(codet &c)
     {
       PRECONDITION(is_other());
-      return code;
+      code = std::move(c);
     }
 
     /// The location of the instruction in the source file
