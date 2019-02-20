@@ -3617,8 +3617,8 @@ std::string expr2ct::convert_with_precedence(
       return convert_prob_uniform(src, precedence=16);
     else if(statement==ID_statement_expression)
       return convert_statement_expression(src, precedence=15);
-    else if(statement==ID_gcc_builtin_va_arg_next)
-      return convert_function(src, "gcc_builtin_va_arg_next");
+    else if(statement == ID_va_start)
+      return convert_function(src, CPROVER_PREFIX "va_start");
     else
       return convert_norep(src, precedence);
   }

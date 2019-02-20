@@ -104,9 +104,10 @@ void goto_program2codet::scan_for_varargs()
       const exprt &l = target->get_assign().lhs();
       const exprt &r = target->get_assign().rhs();
 
-      // find va_arg_next
-      if(r.id()==ID_side_effect &&
-         to_side_effect_expr(r).get_statement()==ID_gcc_builtin_va_arg_next)
+      // find va_start
+      if(
+        r.id() == ID_side_effect &&
+        to_side_effect_expr(r).get_statement() == ID_va_start)
       {
         assert(r.has_operands());
         va_list_expr.insert(r.op0());
@@ -308,16 +309,17 @@ goto_programt::const_targett goto_program2codet::convert_assign_varargs(
 
     dest.add(std::move(f));
   }
-  else if(r.id()==ID_address_of)
+  else if(
+    r.id() == ID_side_effect &&
+    to_side_effect_expr(r).get_statement() == ID_va_start)
   {
     code_function_callt f(
-      symbol_exprt("va_start", code_typet({}, empty_typet())),
-      {this_va_list_expr, to_address_of_expr(r).object()});
+      symbol_exprt(ID_va_start, code_typet({}, empty_typet())),
+      {this_va_list_expr, to_address_of_expr(skip_typecast(r.op0())).object()});
 
     dest.add(std::move(f));
   }
-  else if(r.id()==ID_side_effect &&
-          to_side_effect_expr(r).get_statement()==ID_gcc_builtin_va_arg_next)
+  else if(r.id() == ID_plus)
   {
     code_function_callt f(
       symbol_exprt("va_arg", code_typet({}, empty_typet())),

@@ -14,6 +14,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/expr_initializer.h>
+#include <util/expr_util.h>
+#include <util/fresh_symbol.h>
 #include <util/invariant_utils.h>
 #include <util/optional.h>
 #include <util/pointer_offset_size.h>
@@ -206,24 +208,44 @@ void goto_symext::symex_allocate(
     code_assignt(lhs, typecast_exprt::conditional_cast(rhs, lhs.type())));
 }
 
-irep_idt get_symbol(const exprt &src)
+/// Construct an entry for the var args array. Visual Studio complicates this as
+/// we need to put immediate values or pointers in there, depending on the size
+/// of the parameter.
+static exprt va_list_entry(
+  const irep_idt &parameter,
+  const pointer_typet &lhs_type,
+  const namespacet &ns)
 {
-  if(src.id()==ID_typecast)
-    return get_symbol(to_typecast_expr(src).op());
-  else if(src.id()==ID_address_of)
+  static const pointer_typet void_ptr_type = pointer_type(empty_typet{});
+
+  symbol_exprt parameter_expr = ns.lookup(parameter).symbol_expr();
+
+  // Visual Studio has va_list == char* and stores parameters of size no
+  // greater than the size of a pointer as immediate values
+  if(lhs_type.subtype().id() != ID_pointer)
   {
-    exprt op=to_address_of_expr(src).object();
-    if(op.id()==ID_symbol &&
-       op.get_bool(ID_C_SSA_symbol))
-      return to_ssa_expr(op).get_object_name();
-    else
-      return irep_idt();
+    auto parameter_size = size_of_expr(parameter_expr.type(), ns);
+    CHECK_RETURN(parameter_size.has_value());
+
+    binary_predicate_exprt fits_slot{
+      *parameter_size,
+      ID_le,
+      from_integer(lhs_type.get_width(), parameter_size->type())};
+
+    return if_exprt{
+      fits_slot,
+      typecast_exprt::conditional_cast(parameter_expr, void_ptr_type),
+      typecast_exprt::conditional_cast(
+        address_of_exprt{parameter_expr}, void_ptr_type)};
   }
   else
-    return irep_idt();
+  {
+    return typecast_exprt::conditional_cast(
+      address_of_exprt{std::move(parameter_expr)}, void_ptr_type);
+  }
 }
 
-void goto_symext::symex_gcc_builtin_va_arg_next(
+void goto_symext::symex_va_start(
   statet &state,
   const exprt &lhs,
   const side_effect_exprt &code)
@@ -233,42 +255,52 @@ void goto_symext::symex_gcc_builtin_va_arg_next(
   if(lhs.is_nil())
     return; // ignore
 
-  // to allow constant propagation
-  exprt tmp = state.rename(code.op0(), ns).get();
-  do_simplify(tmp);
-  irep_idt id=get_symbol(tmp);
+  // create an array holding pointers to the parameters, starting after the
+  // parameter that the operand points to
+  const exprt &op = skip_typecast(code.op0());
+  // this must be the address of a symbol
+  const irep_idt start_parameter =
+    to_ssa_expr(to_address_of_expr(op).object()).get_object_name();
 
-  const auto zero = zero_initializer(lhs.type(), code.source_location(), ns);
-  CHECK_RETURN(zero.has_value());
-  exprt rhs(*zero);
-
-  if(!id.empty())
+  exprt::operandst va_arg_operands;
+  bool parameter_id_found = false;
+  for(auto &parameter : state.call_stack().top().parameter_names)
   {
-    // strip last name off id to get function name
-    std::size_t pos=id2string(id).rfind("::");
-    if(pos!=std::string::npos)
+    if(!parameter_id_found)
     {
-      irep_idt function_identifier=std::string(id2string(id), 0, pos);
-      std::string base=id2string(function_identifier)+"::va_arg";
-
-      if(has_prefix(id2string(id), base))
-        id=base+std::to_string(
-          safe_string2unsigned(
-            std::string(id2string(id), base.size(), std::string::npos))+1);
-      else
-        id=base+"0";
-
-      const symbolt *symbol;
-      if(!ns.lookup(id, symbol))
-      {
-        const symbol_exprt symbol_expr(symbol->name, symbol->type);
-        rhs = typecast_exprt::conditional_cast(
-          address_of_exprt(symbol_expr), lhs.type());
-      }
+      parameter_id_found = parameter == start_parameter;
+      continue;
     }
-  }
 
-  symex_assign(state, code_assignt(lhs, rhs));
+    va_arg_operands.push_back(
+      va_list_entry(parameter, to_pointer_type(lhs.type()), ns));
+  }
+  const std::size_t va_arg_size = va_arg_operands.size();
+  exprt array =
+    array_exprt{std::move(va_arg_operands),
+                array_typet{pointer_type(empty_typet{}),
+                            from_integer(va_arg_size, size_type())}};
+
+  symbolt &va_array = get_fresh_aux_symbol(
+    array.type(),
+    id2string(state.source.function_id),
+    "va_args",
+    state.source.pc->source_location,
+    ns.lookup(state.source.function_id).mode,
+    state.symbol_table);
+  va_array.value = array;
+
+  clean_expr(array, state, false);
+  array = state.rename(std::move(array), ns).get();
+  do_simplify(array);
+  symex_assign(state, code_assignt{va_array.symbol_expr(), std::move(array)});
+
+  exprt rhs = address_of_exprt{
+    index_exprt{va_array.symbol_expr(), from_integer(0, index_type())}};
+  rhs = state.rename(std::move(rhs), ns).get();
+  symex_assign(
+    state,
+    code_assignt{lhs, typecast_exprt::conditional_cast(rhs, lhs.type())});
 }
 
 irep_idt get_string_argument_rec(const exprt &src)
