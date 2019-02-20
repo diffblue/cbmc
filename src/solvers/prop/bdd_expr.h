@@ -25,14 +25,12 @@ Author: Michael Tautschnig, michael.tautschnig@qmul.ac.uk
 
 #include <unordered_map>
 
-class namespacet;
-
 /*! \brief TO_BE_DOCUMENTED
 */
 class bdd_exprt
 {
 public:
-  explicit bdd_exprt(const namespacet &_ns) : ns(_ns), root(bdd_mgr.bdd_true())
+  explicit bdd_exprt() : root(bdd_mgr.bdd_true())
   {
   }
 
@@ -40,7 +38,6 @@ public:
   exprt as_expr() const;
 
 protected:
-  const namespacet &ns;
   bdd_managert bdd_mgr;
   bddt root;
 

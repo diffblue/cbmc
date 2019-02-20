@@ -341,7 +341,7 @@ SCENARIO("miniBDD", "[core][solver][miniBDD]")
       REQUIRE(oss.str() == "(a ∧ b) ∨ ¬a");
     }
 
-    bdd_exprt t(ns);
+    bdd_exprt t;
     t.from_expr(o);
 
     {

@@ -23,7 +23,7 @@ SCENARIO("bdd_expr", "[core][solver][prop][bdd_expr]")
 
   GIVEN("A bdd for x&!x")
   {
-    bdd_exprt bdd{ns};
+    bdd_exprt bdd;
     const symbol_exprt var("x", bool_typet());
     bdd.from_expr(and_exprt(var, not_exprt(var)));
     REQUIRE(bdd.as_expr() == false_exprt());
@@ -34,12 +34,12 @@ SCENARIO("bdd_expr", "[core][solver][prop][bdd_expr]")
     const symbol_exprt a("a", bool_typet());
     const symbol_exprt b("b", bool_typet());
 
-    bdd_exprt bdd{ns};
+    bdd_exprt bdd;
     bdd.from_expr(or_exprt(and_exprt(a, b), not_exprt(a)));
 
     THEN("It is equal to the BDD for (!a|b)")
     {
-      bdd_exprt bdd2{ns};
+      bdd_exprt bdd2;
       bdd2.from_expr(or_exprt(not_exprt(a), b));
       REQUIRE(bdd.as_expr() == bdd2.as_expr());
     }
@@ -50,7 +50,7 @@ SCENARIO("bdd_expr", "[core][solver][prop][bdd_expr]")
     const symbol_exprt a("a", bool_typet());
     const symbol_exprt b("b", bool_typet());
 
-    bdd_exprt bdd{ns};
+    bdd_exprt bdd;
     bdd.from_expr(and_exprt(a, not_exprt(b)));
 
     WHEN("It is converted to an exprt")
