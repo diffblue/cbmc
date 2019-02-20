@@ -303,19 +303,19 @@ void goto_symext::symex_va_start(
     code_assignt{lhs, typecast_exprt::conditional_cast(rhs, lhs.type())});
 }
 
-irep_idt get_string_argument_rec(const exprt &src)
+static irep_idt get_string_argument_rec(const exprt &src)
 {
   if(src.id()==ID_typecast)
   {
-    PRECONDITION(src.operands().size() == 1);
-    return get_string_argument_rec(src.op0());
+    return get_string_argument_rec(to_typecast_expr(src).op());
   }
   else if(src.id()==ID_address_of)
   {
-    PRECONDITION(src.operands().size() == 1);
-    if(src.op0().id()==ID_index)
+    const exprt &object = to_address_of_expr(src).object();
+
+    if(object.id() == ID_index)
     {
-      const auto &index_expr = to_index_expr(src.op0());
+      const auto &index_expr = to_index_expr(object);
 
       if(
         index_expr.array().id() == ID_string_constant &&
@@ -325,16 +325,45 @@ irep_idt get_string_argument_rec(const exprt &src)
         return to_string_constant(fmt_str).get_value();
       }
     }
+    else if(object.id() == ID_string_constant)
+    {
+      return to_string_constant(object).get_value();
+    }
   }
 
   return irep_idt();
 }
 
-irep_idt get_string_argument(const exprt &src, const namespacet &ns)
+static irep_idt get_string_argument(const exprt &src, const namespacet &ns)
 {
   exprt tmp=src;
   simplify(tmp, ns);
   return get_string_argument_rec(tmp);
+}
+
+/// Return an expression if \p operands fulfills all criteria that we expect of
+/// the expression to be a variable argument list.
+static optionalt<exprt> get_va_args(const exprt::operandst &operands)
+{
+  if(operands.size() != 2)
+    return {};
+
+  const exprt &second_op = skip_typecast(operands.back());
+  if(second_op.id() != ID_address_of)
+    return {};
+
+  if(second_op.type() != pointer_type(pointer_type(empty_typet{})))
+    return {};
+
+  const exprt &object = to_address_of_expr(second_op).object();
+  if(object.id() != ID_index)
+    return {};
+
+  const index_exprt &index_expr = to_index_expr(object);
+  if(!index_expr.index().is_zero())
+    return {};
+  else
+    return index_expr.array();
 }
 
 void goto_symext::symex_printf(
@@ -343,14 +372,44 @@ void goto_symext::symex_printf(
 {
   PRECONDITION(!rhs.operands().empty());
 
-  exprt tmp_rhs = state.rename(rhs, ns).get();
+  exprt tmp_rhs = rhs;
+  clean_expr(tmp_rhs, state, false);
+  tmp_rhs = state.rename(std::move(tmp_rhs), ns).get();
   do_simplify(tmp_rhs);
 
   const exprt::operandst &operands=tmp_rhs.operands();
   std::list<exprt> args;
 
-  for(std::size_t i=1; i<operands.size(); i++)
-    args.push_back(operands[i]);
+  // we either have any number of operands or a va_list as second operand
+  optionalt<exprt> va_args = get_va_args(operands);
+
+  if(!va_args.has_value())
+  {
+    args.insert(args.end(), std::next(operands.begin()), operands.end());
+  }
+  else
+  {
+    clean_expr(*va_args, state, false);
+    *va_args = state.rename(*va_args, ns).get();
+    if(va_args->id() != ID_array)
+    {
+      // we were not able to constant-propagate va_args, and thus don't have
+      // sufficient information to generate printf -- give up
+      return;
+    }
+
+    for(const auto &op : va_args->operands())
+    {
+      exprt parameter = skip_typecast(op);
+      if(parameter.id() == ID_address_of)
+        parameter = to_address_of_expr(parameter).object();
+      clean_expr(parameter, state, false);
+      parameter = state.rename(std::move(parameter), ns).get();
+      do_simplify(parameter);
+
+      args.push_back(std::move(parameter));
+    }
+  }
 
   const irep_idt format_string=
     get_string_argument(operands[0], ns);

@@ -22,7 +22,7 @@ inline int putchar(int c)
 {
   __CPROVER_HIDE:;
   __CPROVER_bool error=__VERIFIER_nondet___CPROVER_bool();
-  printf("%c", c);
+  __CPROVER_printf("%c", c);
   return (error?-1:c);
 }
 
@@ -41,7 +41,7 @@ inline int puts(const char *s)
   __CPROVER_HIDE:;
   __CPROVER_bool error=__VERIFIER_nondet___CPROVER_bool();
   int ret=__VERIFIER_nondet_int();
-  printf("%s\n", s);
+  __CPROVER_printf("%s\n", s);
   if(error) ret=-1; else __CPROVER_assume(ret>=0);
   return ret;
 }
@@ -768,7 +768,7 @@ void perror(const char *s)
     #endif
     // should go to stderr
     if(s[0]!=0)
-      printf("%s: ", s);
+      __CPROVER_printf("%s: ", s);
   }
 
   // TODO: print errno error
@@ -918,6 +918,31 @@ inline int vsscanf(const char *restrict s, const char *restrict format, va_list 
   (void)*s;
   (void)*format;
   (void)arg;
+  return result;
+}
+
+/* FUNCTION: printf */
+
+#ifndef __CPROVER_STDIO_H_INCLUDED
+#  include <stdio.h>
+#  define __CPROVER_STDIO_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_STDARG_H_INCLUDED
+#  include <stdarg.h>
+#  define __CPROVER_STDARG_H_INCLUDED
+#endif
+
+int __VERIFIER_nondet_int();
+
+inline int printf(const char *format, ...)
+{
+__CPROVER_HIDE:;
+  int result = __VERIFIER_nondet_int();
+  va_list list;
+  va_start(list, format);
+  __CPROVER_printf(format, list);
+  va_end(list);
   return result;
 }
 
