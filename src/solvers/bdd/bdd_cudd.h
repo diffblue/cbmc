@@ -51,10 +51,13 @@ public:
     return bdd_nodet(Cudd_E(node));
   }
 
+  /// Return type for \ref id()
+  using idt = DdNode *;
+
   /// Unique identifier of the node
-  long id() const
+  idt id() const
   {
-    return (long)node;
+    return node;
   }
 
 private:

@@ -55,10 +55,13 @@ public:
     return bdd_nodet(node->low.node, bdd_var_to_index);
   }
 
+  /// Return type for \ref id()
+  using idt = mini_bdd_nodet *;
+
   /// Unique identifier of the node
-  long id() const
+  idt id() const
   {
-    return (long)node;
+    return node;
   }
 
 private:
