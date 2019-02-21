@@ -84,7 +84,7 @@ void goto_symext::symex_start_thread(statet &state)
     // make copy
     ssa_exprt rhs=c_it->second.first;
 
-    guardt guard{true_exprt{}};
+    exprt::operandst lhs_conditions;
     const bool record_events=state.record_events;
     state.record_events=false;
     symex_assign_symbol(
@@ -92,7 +92,7 @@ void goto_symext::symex_start_thread(statet &state)
       lhs_l1,
       nil_exprt(),
       rhs,
-      guard,
+      lhs_conditions,
       symex_targett::assignment_typet::HIDDEN);
     state.record_events=record_events;
   }
@@ -123,13 +123,13 @@ void goto_symext::symex_start_thread(statet &state)
       rhs = *zero;
     }
 
-    guardt guard{true_exprt{}};
+    exprt::operandst lhs_conditions;
     symex_assign_symbol(
       state,
       lhs,
       nil_exprt(),
       rhs,
-      guard,
+      lhs_conditions,
       symex_targett::assignment_typet::HIDDEN);
   }
 }

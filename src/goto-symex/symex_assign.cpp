@@ -71,8 +71,14 @@ void goto_symext::symex_assign(statet &state, const code_assignt &code)
     if(state.source.pc->source_location.get_hide())
       assignment_type=symex_targett::assignment_typet::HIDDEN;
 
-    guardt guard{true_exprt{}}; // NOT the state guard!
-    symex_assign_rec(state, lhs, nil_exprt(), rhs, guard, assignment_type);
+    exprt::operandst lhs_if_then_else_conditions;
+    symex_assign_rec(
+      state,
+      lhs,
+      nil_exprt(),
+      rhs,
+      lhs_if_then_else_conditions,
+      assignment_type);
   }
 }
 
@@ -115,7 +121,7 @@ void goto_symext::symex_assign_rec(
   const exprt &lhs,
   const exprt &full_lhs,
   const exprt &rhs,
-  guardt &guard,
+  exprt::operandst &guard,
   assignment_typet assignment_type)
 {
   if(lhs.id()==ID_symbol &&
@@ -197,15 +203,15 @@ void goto_symext::symex_assign_symbol(
   const ssa_exprt &lhs, // L1
   const exprt &full_lhs,
   const exprt &rhs,
-  guardt &guard,
+  exprt::operandst &guard,
   assignment_typet assignment_type)
 {
   exprt ssa_rhs=rhs;
 
   // put assignment guard into the rhs
-  if(!guard.is_true())
+  if(!guard.empty())
   {
-    if_exprt tmp_ssa_rhs(guard.as_expr(), ssa_rhs, lhs, ssa_rhs.type());
+    if_exprt tmp_ssa_rhs(conjunction(guard), ssa_rhs, lhs, ssa_rhs.type());
     tmp_ssa_rhs.swap(ssa_rhs);
   }
 
@@ -228,9 +234,6 @@ void goto_symext::symex_assign_symbol(
   exprt l2_full_lhs = state.rename(std::move(ssa_full_lhs), ns);
   state.record_events=record_events;
 
-  guardt tmp_guard(state.guard);
-  tmp_guard.append(guard);
-
   // do the assignment
   const symbolt &symbol =
     ns.lookup(to_symbol_expr(ssa_lhs.get_original_expr()));
@@ -248,14 +251,20 @@ void goto_symext::symex_assign_symbol(
               << messaget::eom;
     });
 
+  // Temporarily add the state guard
+  guard.emplace_back(state.guard.as_expr());
+
   target.assignment(
-    tmp_guard.as_expr(),
+    conjunction(guard),
     ssa_lhs,
     l2_full_lhs,
     add_to_lhs(full_lhs, ssa_lhs.get_original_expr()),
     l2_rhs,
     state.source,
     assignment_type);
+
+  // Restore the guard
+  guard.pop_back();
 }
 
 void goto_symext::symex_assign_typecast(
@@ -263,7 +272,7 @@ void goto_symext::symex_assign_typecast(
   const typecast_exprt &lhs,
   const exprt &full_lhs,
   const exprt &rhs,
-  guardt &guard,
+  exprt::operandst &guard,
   assignment_typet assignment_type)
 {
   // these may come from dereferencing on the lhs
@@ -280,7 +289,7 @@ void goto_symext::symex_assign_array(
   const index_exprt &lhs,
   const exprt &full_lhs,
   const exprt &rhs,
-  guardt &guard,
+  exprt::operandst &guard,
   assignment_typet assignment_type)
 {
   const exprt &lhs_array=lhs.array();
@@ -327,7 +336,7 @@ void goto_symext::symex_assign_struct_member(
   const member_exprt &lhs,
   const exprt &full_lhs,
   const exprt &rhs,
-  guardt &guard,
+  exprt::operandst &guard,
   assignment_typet assignment_type)
 {
   // Symbolic execution of a struct member assignment.
@@ -397,30 +406,27 @@ void goto_symext::symex_assign_if(
   const if_exprt &lhs,
   const exprt &full_lhs,
   const exprt &rhs,
-  guardt &guard,
+  exprt::operandst &guard,
   assignment_typet assignment_type)
 {
   // we have (c?a:b)=e;
-
-  guardt old_guard=guard;
-
   exprt renamed_guard = state.rename(lhs.cond(), ns);
   do_simplify(renamed_guard);
 
   if(!renamed_guard.is_false())
   {
-    guard.add(renamed_guard);
+    guard.push_back(renamed_guard);
     symex_assign_rec(
       state, lhs.true_case(), full_lhs, rhs, guard, assignment_type);
-    guard = std::move(old_guard);
+    guard.pop_back();
   }
 
   if(!renamed_guard.is_true())
   {
-    guard.add(not_exprt(renamed_guard));
+    guard.push_back(not_exprt(renamed_guard));
     symex_assign_rec(
       state, lhs.false_case(), full_lhs, rhs, guard, assignment_type);
-    guard = std::move(old_guard);
+    guard.pop_back();
   }
 }
 
@@ -429,7 +435,7 @@ void goto_symext::symex_assign_byte_extract(
   const byte_extract_exprt &lhs,
   const exprt &full_lhs,
   const exprt &rhs,
-  guardt &guard,
+  exprt::operandst &guard,
   assignment_typet assignment_type)
 {
   // we have byte_extract_X(object, offset)=value

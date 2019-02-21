@@ -445,49 +445,49 @@ protected:
     const exprt &lhs,
     const exprt &full_lhs,
     const exprt &rhs,
-    guardt &,
+    exprt::operandst &,
     assignment_typet);
   void symex_assign_symbol(
     statet &,
     const ssa_exprt &lhs,
     const exprt &full_lhs,
     const exprt &rhs,
-    guardt &,
+    exprt::operandst &,
     assignment_typet);
   void symex_assign_typecast(
     statet &,
     const typecast_exprt &lhs,
     const exprt &full_lhs,
     const exprt &rhs,
-    guardt &,
+    exprt::operandst &,
     assignment_typet);
   void symex_assign_array(
     statet &,
     const index_exprt &lhs,
     const exprt &full_lhs,
     const exprt &rhs,
-    guardt &,
+    exprt::operandst &,
     assignment_typet);
   void symex_assign_struct_member(
     statet &,
     const member_exprt &lhs,
     const exprt &full_lhs,
     const exprt &rhs,
-    guardt &,
+    exprt::operandst &,
     assignment_typet);
   void symex_assign_if(
     statet &,
     const if_exprt &lhs,
     const exprt &full_lhs,
     const exprt &rhs,
-    guardt &,
+    exprt::operandst &,
     assignment_typet);
   void symex_assign_byte_extract(
     statet &,
     const byte_extract_exprt &lhs,
     const exprt &full_lhs,
     const exprt &rhs,
-    guardt &,
+    exprt::operandst &,
     assignment_typet);
 
   /// Store the \p what expression by recursively descending into the operands
