@@ -30,8 +30,6 @@ Author: Daniel Kroening, kroening@kroening.com
 const symbolt *
 symex_dereference_statet::get_or_create_failed_symbol(const exprt &expr)
 {
-  const namespacet &ns=goto_symex.ns;
-
   if(expr.id()==ID_symbol &&
      expr.get_bool(ID_C_SSA_symbol))
   {
@@ -86,7 +84,7 @@ void symex_dereference_statet::get_value_set(
   const exprt &expr,
   value_setst::valuest &value_set) const
 {
-  state.value_set.get_value_set(expr, value_set, goto_symex.ns);
+  state.value_set.get_value_set(expr, value_set, ns);
 
   #if 0
   std::cout << "**************************\n";

@@ -122,7 +122,7 @@ process_array_expr(exprt &expr, bool do_simplify, const namespacet &ns)
 
 void goto_symext::process_array_expr(statet &state, exprt &expr)
 {
-  symex_dereference_statet symex_dereference_state(*this, state);
+  symex_dereference_statet symex_dereference_state(state, ns);
 
   value_set_dereferencet dereference(
     ns, state.symbol_table, symex_dereference_state, language_mode, false);
