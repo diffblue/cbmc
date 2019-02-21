@@ -60,13 +60,9 @@ bool local_bitvector_analysist::merge(points_tot &a, points_tot &b)
 /// \return return 'true' iff we track the object with given identifier
 bool local_bitvector_analysist::is_tracked(const irep_idt &identifier)
 {
-  localst::locals_mapt::const_iterator it=locals.locals_map.find(identifier);
-  if(it==locals.locals_map.end() ||
-     it->second.type().id()!=ID_pointer ||
-     dirty(identifier))
-    return false;
-
-  return true;
+  localst::locals_sett::const_iterator it = locals.locals.find(identifier);
+  return it != locals.locals.end() && ns.lookup(*it).type.id() == ID_pointer &&
+         !dirty(identifier);
 }
 
 void local_bitvector_analysist::assign_lhs(
@@ -254,9 +250,11 @@ void local_bitvector_analysist::build()
   // Gather the objects we track, and
   // feed in sufficiently bad defaults for their value
   // in the entry location.
-  for(const auto &local : locals.locals_map)
-    if(is_tracked(local.first))
-      loc_infos[0][pointers.number(local.first)]=flagst::mk_unknown();
+  for(const auto &local : locals.locals)
+  {
+    if(is_tracked(local))
+      loc_infos[0][pointers.number(local)] = flagst::mk_unknown();
+  }
 
   while(!work_queue.empty())
   {
