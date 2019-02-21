@@ -20,8 +20,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/xml.h>
 #include <util/json.h>
 
+#include <solvers/prop/prop_conv.h>
 #include <solvers/sat/satcheck.h>
-#include <solvers/prop/literal_expr.h>
 
 #include <goto-symex/build_goto_trace.h>
 #include <goto-programs/xml_goto_trace.h>

@@ -12,6 +12,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_ANSI_C_ANSI_C_CONVERT_TYPE_H
 #define CPROVER_ANSI_C_ANSI_C_CONVERT_TYPE_H
 
+#include <list>
+
 #include <util/message.h>
 
 #include "c_qualifiers.h"

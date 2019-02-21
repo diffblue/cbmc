@@ -21,7 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/xml_irep.h>
 
 #include <solvers/prop/cover_goals.h>
-#include <solvers/prop/literal_expr.h>
+#include <solvers/prop/prop_conv.h>
 
 #include <goto-symex/build_goto_trace.h>
 
