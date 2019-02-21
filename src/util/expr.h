@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_UTIL_EXPR_H
 #define CPROVER_UTIL_EXPR_H
 
+#include "deprecate.h"
 #include "type.h"
 #include "validate_expressions.h"
 #include "validate_types.h"

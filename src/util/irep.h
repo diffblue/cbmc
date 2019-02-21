@@ -13,7 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <string>
 #include <vector>
 
-#include "deprecate.h"
 #include "invariant.h"
 #include "irep_ids.h"
 
@@ -208,7 +207,6 @@ public:
   {
     if(data!=&empty_d)
     {
-      // NOLINTNEXTLINE(build/deprecated)
       PRECONDITION(data->ref_count != 0);
       data->ref_count++;
 #ifdef IREP_DEBUG
@@ -433,9 +431,6 @@ public:
   const irep_idt &get(const irep_namet &name) const;
   bool get_bool(const irep_namet &name) const;
   signed int get_int(const irep_namet &name) const;
-  /// \deprecated use get_size_t instead
-  DEPRECATED("Use get_size_t instead")
-  unsigned int get_unsigned_int(const irep_namet &name) const;
   std::size_t get_size_t(const irep_namet &name) const;
   long long get_long_long(const irep_namet &name) const;
 
