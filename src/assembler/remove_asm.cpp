@@ -122,14 +122,14 @@ void remove_asmt::gcc_asm_function_call(
     symbol.mode = ID_C;
 
     symbol_table.add(symbol);
-  }
 
-  if(
-    goto_functions.function_map.find(function_identifier) ==
-    goto_functions.function_map.end())
+    goto_functions.function_map.emplace(function_identifier, goto_functiont());
+  }
+  else
   {
-    auto &f = goto_functions.function_map[function_identifier];
-    f.type = fkt_type;
+    DATA_INVARIANT(
+      symbol_table.lookup_ref(function_identifier).type == fkt_type,
+      "function types should match");
   }
 }
 
@@ -171,14 +171,14 @@ void remove_asmt::msc_asm_function_call(
     symbol.mode = ID_C;
 
     symbol_table.add(symbol);
-  }
 
-  if(
-    goto_functions.function_map.find(function_identifier) ==
-    goto_functions.function_map.end())
+    goto_functions.function_map.emplace(function_identifier, goto_functiont());
+  }
+  else
   {
-    auto &f = goto_functions.function_map[function_identifier];
-    f.type = fkt_type;
+    DATA_INVARIANT(
+      symbol_table.lookup_ref(function_identifier).type == fkt_type,
+      "function types should match");
   }
 }
 

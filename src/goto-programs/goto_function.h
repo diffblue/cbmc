@@ -16,25 +16,19 @@ Date: May 2018
 
 #include <iosfwd>
 
-#include <util/deprecate.h>
 #include <util/find_symbols.h>
 #include <util/std_types.h>
 
 #include "goto_program.h"
 
-/// A goto function, consisting of function type (see #type), function body (see
-/// #body), and parameter identifiers (see #parameter_identifiers).
+/// A goto function, consisting of function body (see #body) and parameter
+/// identifiers (see #parameter_identifiers).
 class goto_functiont
 {
 public:
   goto_programt body;
 
-  /// The type of the function, indicating the return type and parameter types
-  DEPRECATED(SINCE(2019, 2, 16, "Get the type from the symbol table instead"))
-  code_typet type;
-
   typedef std::vector<irep_idt> parameter_identifierst;
-
   /// The identifiers of the parameters of this function
   ///
   /// Note: This is now the preferred way of getting the identifiers of the
@@ -54,12 +48,6 @@ public:
       parameter_identifiers.push_back(parameter.get_identifier());
   }
 
-  DEPRECATED(SINCE(2019, 2, 16, "Get the type from the symbol table instead"))
-  bool is_inlined() const
-  {
-    return type.get_bool(ID_C_inlined);
-  }
-
   bool is_hidden() const
   {
     return function_is_hidden;
@@ -70,14 +58,13 @@ public:
     function_is_hidden = true;
   }
 
-  goto_functiont() : body(), type({}, empty_typet()), function_is_hidden(false)
+  goto_functiont() : body(), function_is_hidden(false)
   {
   }
 
   void clear()
   {
     body.clear();
-    type.clear();
     parameter_identifiers.clear();
     function_is_hidden = false;
   }
@@ -85,7 +72,6 @@ public:
   void swap(goto_functiont &other)
   {
     body.swap(other.body);
-    type.swap(other.type);
     parameter_identifiers.swap(other.parameter_identifiers);
     std::swap(function_is_hidden, other.function_is_hidden);
   }
@@ -93,7 +79,6 @@ public:
   void copy_from(const goto_functiont &other)
   {
     body.copy_from(other.body);
-    type = other.type;
     parameter_identifiers = other.parameter_identifiers;
     function_is_hidden = other.function_is_hidden;
   }
@@ -103,7 +88,6 @@ public:
 
   goto_functiont(goto_functiont &&other)
     : body(std::move(other.body)),
-      type(std::move(other.type)),
       parameter_identifiers(std::move(other.parameter_identifiers)),
       function_is_hidden(other.function_is_hidden)
   {
@@ -112,7 +96,6 @@ public:
   goto_functiont &operator=(goto_functiont &&other)
   {
     body = std::move(other.body);
-    type = std::move(other.type);
     parameter_identifiers = std::move(other.parameter_identifiers);
     function_is_hidden = other.function_is_hidden;
     return *this;

@@ -217,8 +217,6 @@ static void remove_vector(symbol_tablet &symbol_table)
 /// removes vector data type
 void remove_vector(goto_functionst::goto_functiont &goto_function)
 {
-  remove_vector(goto_function.type);
-
   for(auto &i : goto_function.body.instructions)
     i.transform([](exprt e) -> optionalt<exprt> {
       if(have_to_remove_vector(e))

@@ -111,13 +111,6 @@ void goto_functionst::validate(const namespacet &ns, const validation_modet vm)
 
     DATA_CHECK(
       vm,
-      goto_function.type == ns.lookup(function_name).type,
-      id2string(function_name) + " type inconsistency\ngoto program type: " +
-        goto_function.type.id_string() +
-        "\nsymbol table type: " + ns.lookup(function_name).type.id_string());
-
-    DATA_CHECK(
-      vm,
       goto_function.parameter_identifiers.size() == parameters.size(),
       id2string(function_name) + " parameter count inconsistency\n" +
         "goto program: " +

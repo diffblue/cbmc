@@ -94,8 +94,6 @@ void replace_callst::operator()(
     auto f_it2 = goto_functions.function_map.find(new_id);
     PRECONDITION(f_it2 != goto_functions.function_map.end());
 
-    PRECONDITION(base_type_eq(f_it1->second.type, f_it2->second.type, ns));
-
     // check that returns have not been removed
     if(to_code_type(function.type()).return_type().id() != ID_empty)
     {

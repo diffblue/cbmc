@@ -749,8 +749,6 @@ bool code_contractst::enforce_contract(const std::string &fun_to_enforce)
 
   goto_functiont &wrapper = goto_functions.function_map[original];
   wrapper.parameter_identifiers = mangled_fun->second.parameter_identifiers;
-  if(mangled_fun->second.type.is_not_nil())
-    wrapper.type = mangled_fun->second.type;
   wrapper.body.add(goto_programt::make_end_function(sl));
   add_contract_check(original, mangled, wrapper.body);
   return false;

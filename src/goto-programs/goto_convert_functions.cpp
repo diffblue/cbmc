@@ -155,7 +155,6 @@ void goto_convert_functionst::convert_function(
 
   // store the parameter identifiers in the goto functions
   const code_typet &code_type = to_code_type(symbol.type);
-  f.type = code_type;
   f.set_parameter_identifiers(code_type);
 
   if(

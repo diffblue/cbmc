@@ -64,7 +64,6 @@ void generate_function_bodiest::generate_parameter_names(
       symbol_table.add(new_param_sym);
     }
   }
-  function.type = to_code_type(function_symbol.type);
   function.set_parameter_identifiers(to_code_type(function_symbol.type));
 }
 
@@ -591,8 +590,6 @@ void generate_function_bodies(
     model.symbol_table.lookup_ref(havoc_function_symbol.name);
 
   // convert to get the function stub to goto-model
-  model.goto_functions.function_map[havoc_function_symbol.name].type =
-    to_code_type(generated_havoc.type);
   goto_convert(model.symbol_table, model.goto_functions, message_handler);
 
   // now generate body as above

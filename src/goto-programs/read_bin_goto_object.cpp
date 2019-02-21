@@ -74,10 +74,7 @@ static bool read_bin_goto_object(
     {
       // makes sure there is an empty function for every function symbol
       auto entry = functions.function_map.emplace(sym.name, goto_functiont());
-
-      const code_typet &code_type = to_code_type(sym.type);
-      entry.first->second.type = code_type;
-      entry.first->second.set_parameter_identifiers(code_type);
+      entry.first->second.set_parameter_identifiers(to_code_type(sym.type));
     }
 
     symbol_table.add(sym);

@@ -453,10 +453,6 @@ void function_call_harness_generatort::implt::
 
   symbol_table->insert(harness_function_symbol);
 
-  auto const &generated_harness =
-    symbol_table->lookup_ref(harness_function_name);
-  goto_functions->function_map[harness_function_name].type =
-    to_code_type(generated_harness.type);
   goto_convert(*symbol_table, *goto_functions, *message_handler);
 }
 
