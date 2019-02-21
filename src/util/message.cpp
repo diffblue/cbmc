@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "message.h"
 
+#include "json.h"
 #include "string2int.h"
 
 void message_handlert::print(
@@ -139,4 +140,15 @@ void messaget::conditional_output(
   {
     output_generator(mstream);
   }
+}
+
+messaget::mstreamt &messaget::mstreamt::operator<<(const json_objectt &data)
+{
+  if(this->tellp() > 0)
+    *this << eom; // force end of previous message
+  if(message.message_handler)
+  {
+    message.message_handler->print(message_level, data);
+  }
+  return *this;
 }

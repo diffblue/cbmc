@@ -17,9 +17,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "deprecate.h"
 #include "invariant.h"
-#include "json.h"
 #include "source_location.h"
 
+class json_objectt;
+class jsont;
 class xmlt;
 
 class message_handlert
@@ -248,16 +249,7 @@ public:
       return *this;
     }
 
-    mstreamt &operator << (const json_objectt &data)
-    {
-      if(this->tellp() > 0)
-        *this << eom; // force end of previous message
-      if(message.message_handler)
-      {
-        message.message_handler->print(message_level, data);
-      }
-      return *this;
-    }
+    mstreamt &operator<<(const json_objectt &data);
 
     template <class T>
     mstreamt &operator << (const T &x)
