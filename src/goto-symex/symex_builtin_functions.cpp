@@ -102,7 +102,7 @@ void goto_symext::symex_allocate(
 
           object_type = array_typet(*tmp_type, s);
         }
-        else
+        else if(alloc_size.has_value())
         {
           if(*alloc_size == *elem_size)
             object_type = *tmp_type;
