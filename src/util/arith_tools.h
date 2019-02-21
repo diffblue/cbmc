@@ -20,7 +20,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 class typet;
 
-// returns 'true' on error
+/// Convert a constant expression \p expr to an arbitrary-precision integer.
+/// \param  expr: Source expression
+/// \param [out] int_value: Integer value (only modified if conversion succeeds)
+/// \return False if, and only if, the conversion was successful.
 bool to_integer(const constant_exprt &expr, mp_integer &int_value);
 
 // returns 'true' on error
