@@ -33,7 +33,7 @@ const goto_tracet &goto_trace_storaget::insert(goto_tracet &&trace)
 const goto_tracet &goto_trace_storaget::insert_all(goto_tracet &&trace)
 {
   traces.push_back(std::move(trace));
-  const auto &all_property_ids = traces.back().get_all_property_ids();
+  const auto &all_property_ids = traces.back().get_failed_property_ids();
   DATA_INVARIANT(
     !all_property_ids.empty(), "a trace must violate at least one assertion");
   for(const auto &property_id : all_property_ids)

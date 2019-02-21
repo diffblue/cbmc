@@ -206,8 +206,8 @@ public:
     return steps.back();
   }
 
-  /// Returns the property IDs of all assertions in the trace
-  std::vector<irep_idt> get_all_property_ids() const;
+  /// Returns the property IDs of all failed assertions in the trace
+  std::set<irep_idt> get_failed_property_ids() const;
 };
 
 /// Options for printing the trace using show_goto_trace

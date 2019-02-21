@@ -71,7 +71,7 @@ json_objectt test_inputst::to_json(
   }
 
   json_arrayt goal_refs;
-  for(const auto &goal_id : goto_trace.get_all_property_ids())
+  for(const auto &goal_id : goto_trace.get_failed_property_ids())
   {
     goal_refs.push_back(json_stringt(goal_id));
   }
@@ -112,7 +112,7 @@ xmlt test_inputst::to_xml(
     }
   }
 
-  for(const auto &goal_id : goto_trace.get_all_property_ids())
+  for(const auto &goal_id : goto_trace.get_failed_property_ids())
   {
     xmlt &xml_goal = xml_result.new_element("goal");
     xml_goal.set_attribute("id", id2string(goal_id));
