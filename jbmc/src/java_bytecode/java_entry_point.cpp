@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/config.h>
 #include <util/expr_initializer.h>
+#include <util/journalling_symbol_table.h>
 #include <util/string_constant.h>
 #include <util/suffix.h>
 
@@ -154,8 +155,14 @@ static void java_static_lifetime_init(
   for(const auto &entry : symbol_table.symbols)
     symbol_names.push_back(entry.first);
 
-  for(const auto &symname : symbol_names)
+  // Don't use a for-each loop here because the loop extends the list, and the
+  // for-each loop may only read `.end()` once.
+  for(
+    auto symbol_it = symbol_names.begin();
+    symbol_it != symbol_names.end();
+    ++symbol_it)
   {
+    const auto &symname = *symbol_it;
     const symbolt &sym=*symbol_table.lookup(symname);
     if(should_init_symbol(sym))
     {
@@ -172,9 +179,17 @@ static void java_static_lifetime_init(
         exprt name_literal(ID_java_string_literal);
         name_literal.set(ID_value, to_class_type(class_symbol.type).get_tag());
 
+        journalling_symbol_tablet journalling_table =
+          journalling_symbol_tablet::wrap(symbol_table);
+
         symbol_exprt class_name_literal =
           get_or_create_string_literal_symbol(
-            name_literal, symbol_table, string_refinement_enabled);
+            name_literal, journalling_table, string_refinement_enabled);
+
+        // If that created any new symbols make sure we initialise those too:
+        const auto &new_symbols = journalling_table.get_inserted();
+        symbol_names.insert(
+          symbol_names.end(), new_symbols.begin(), new_symbols.end());
 
         // Call the literal initializer method instead of a nondet initializer:
 
