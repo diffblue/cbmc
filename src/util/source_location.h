@@ -13,7 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "invariant.h"
 #include "irep.h"
 #include "optional.h"
-#include "prefix.h"
 
 #include <string>
 
@@ -175,12 +174,7 @@ public:
     return get_bool(ID_hide);
   }
 
-  static bool is_built_in(const std::string &s)
-  {
-    std::string built_in1="<built-in-"; // "<built-in-additions>";
-    std::string built_in2="<builtin-"; // "<builtin-architecture-strings>";
-    return has_prefix(s, built_in1) || has_prefix(s, built_in2);
-  }
+  static bool is_built_in(const std::string &s);
 
   bool is_built_in() const
   {

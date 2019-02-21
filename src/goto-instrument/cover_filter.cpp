@@ -11,6 +11,8 @@ Author: Peter Schrammel
 
 #include "cover_filter.h"
 
+#include <util/prefix.h>
+
 #include <linking/static_lifetime_init.h>
 
 /// Filter out functions that are not considered provided by the user

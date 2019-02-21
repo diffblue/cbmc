@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/c_types.h>
 #include <util/config.h>
+#include <util/prefix.h>
 #include <util/run.h>
 #include <util/suffix.h>
 #include <util/tempfile.h>

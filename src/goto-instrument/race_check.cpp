@@ -13,6 +13,8 @@ Date: February 2006
 
 #include "race_check.h"
 
+#include <util/prefix.h>
+
 #include <goto-programs/remove_skip.h>
 
 #include <linking/static_lifetime_init.h>

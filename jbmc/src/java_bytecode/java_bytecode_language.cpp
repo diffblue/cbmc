@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/invariant.h>
 #include <util/journalling_symbol_table.h>
 #include <util/options.h>
+#include <util/prefix.h>
 #include <util/string2int.h>
 #include <util/suffix.h>
 #include <util/symbol_table.h>

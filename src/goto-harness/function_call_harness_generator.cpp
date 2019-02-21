@@ -8,15 +8,17 @@ Author: Diffblue Ltd.
 
 #include "function_call_harness_generator.h"
 
-#include <goto-programs/goto_convert.h>
-#include <goto-programs/goto_model.h>
 #include <util/allocate_objects.h>
 #include <util/arith_tools.h>
 #include <util/exception_utils.h>
+#include <util/prefix.h>
 #include <util/std_code.h>
 #include <util/std_expr.h>
 #include <util/string2int.h>
 #include <util/ui_message.h>
+
+#include <goto-programs/goto_convert.h>
+#include <goto-programs/goto_model.h>
 
 #include "function_harness_generator_options.h"
 #include "goto_harness_parse_options.h"

@@ -21,6 +21,7 @@ Date: June 2006
 #include <util/config.h>
 #include <util/file_util.h>
 #include <util/get_base_name.h>
+#include <util/prefix.h>
 #include <util/run.h>
 #include <util/suffix.h>
 #include <util/symbol_table_builder.h>
