@@ -1,0 +1,11 @@
+KNOWNBUG
+windows-preprocessed.i
+--winx64
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+The preprocessed file was generated from va_list3/main.c using Visual Studio
+2017.
