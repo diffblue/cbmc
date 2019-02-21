@@ -1863,12 +1863,13 @@ std::string expr2ct::convert_constant(
       if(src.find(ID_C_c_sizeof_type).is_not_nil() &&
          sizeof_nesting==0)
       {
-        const exprt sizeof_expr = build_sizeof_expr(to_constant_expr(src), ns);
+        const auto sizeof_expr_opt =
+          build_sizeof_expr(to_constant_expr(src), ns);
 
-        if(sizeof_expr.is_not_nil())
+        if(sizeof_expr_opt.has_value())
         {
           ++sizeof_nesting;
-          dest=convert(sizeof_expr)+" /*"+dest+"*/ ";
+          dest = convert(sizeof_expr_opt.value()) + " /*" + dest + "*/ ";
           --sizeof_nesting;
         }
       }

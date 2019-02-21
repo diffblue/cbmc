@@ -644,11 +644,10 @@ static exprt unpack_rec(
     if(!unpack_byte_array && *element_bits == 8)
       return src;
 
-    const auto constant_size_or_nullopt =
-      numeric_cast<mp_integer>(array_type.size());
+    const auto constant_size_opt = numeric_cast<mp_integer>(array_type.size());
     return unpack_array_vector(
       src,
-      constant_size_or_nullopt,
+      constant_size_opt,
       *element_bits,
       little_endian,
       offset_bytes,
@@ -876,28 +875,26 @@ exprt lower_byte_extract(const byte_extract_exprt &src, const namespacet &ns)
   const bool little_endian = src.id() == ID_byte_extract_little_endian;
 
   // determine an upper bound of the number of bytes we might need
-  exprt upper_bound=size_of_expr(src.type(), ns);
-  if(upper_bound.is_not_nil())
+  auto upper_bound_opt = size_of_expr(src.type(), ns);
+  if(upper_bound_opt.has_value())
   {
-    upper_bound = simplify_expr(
+    upper_bound_opt = simplify_expr(
       plus_exprt(
-        upper_bound,
-        typecast_exprt::conditional_cast(src.offset(), upper_bound.type())),
+        upper_bound_opt.value(),
+        typecast_exprt::conditional_cast(
+          src.offset(), upper_bound_opt.value().type())),
       ns);
   }
   else if(src.type().id() == ID_empty)
-    upper_bound = from_integer(0, size_type());
+    upper_bound_opt = from_integer(0, size_type());
 
-  const auto lower_bound_or_nullopt = numeric_cast<mp_integer>(src.offset());
-  const auto upper_bound_or_nullopt = numeric_cast<mp_integer>(upper_bound);
+  const auto lower_bound_int_opt = numeric_cast<mp_integer>(src.offset());
+  const auto upper_bound_int_opt =
+    numeric_cast<mp_integer>(upper_bound_opt.value_or(nil_exprt()));
 
   byte_extract_exprt unpacked(src);
   unpacked.op() = unpack_rec(
-    src.op(),
-    little_endian,
-    lower_bound_or_nullopt,
-    upper_bound_or_nullopt,
-    ns);
+    src.op(), little_endian, lower_bound_int_opt, upper_bound_int_opt, ns);
 
   if(src.type().id()==ID_array)
   {
@@ -993,11 +990,19 @@ exprt lower_byte_extract(const byte_extract_exprt &src, const namespacet &ns)
         break;
       }
 
+      auto member_offset_opt =
+        member_offset_expr(struct_type, comp.get_name(), ns);
+
+      if(!member_offset_opt.has_value())
+      {
+        failed = true;
+        break;
+      }
+
       plus_exprt new_offset(
         unpacked.offset(),
         typecast_exprt::conditional_cast(
-          member_offset_expr(struct_type, comp.get_name(), ns),
-          unpacked.offset().type()));
+          member_offset_opt.value(), unpacked.offset().type()));
 
       byte_extract_exprt tmp(unpacked);
       tmp.type()=comp.type();
@@ -1204,9 +1209,12 @@ static exprt lower_byte_update_array_vector_non_const(
 
   // do all arithmetic below using index/offset types - the array theory
   // back-end is really picky about indices having the same type
+  auto subtype_size_opt = size_of_expr(subtype, ns);
+  CHECK_RETURN(subtype_size_opt.has_value());
+
   const exprt subtype_size = simplify_expr(
     typecast_exprt::conditional_cast(
-      size_of_expr(subtype, ns), src.offset().type()),
+      subtype_size_opt.value(), src.offset().type()),
     ns);
 
   // compute the index of the first element of the array/vector that may be
@@ -1478,11 +1486,14 @@ static exprt lower_byte_update_struct(
                                         ? ID_byte_extract_little_endian
                                         : ID_byte_extract_big_endian;
 
+      auto src_size_opt = size_of_expr(src.type(), ns);
+      CHECK_RETURN(src_size_opt.has_value());
+
       const byte_extract_exprt byte_extract_expr{
         extract_opcode,
         src.op(),
         from_integer(0, src.offset().type()),
-        array_typet{unsignedbv_typet{8}, size_of_expr(src.type(), ns)}};
+        array_typet{unsignedbv_typet{8}, src_size_opt.value()}};
 
       byte_update_exprt bu = src;
       bu.op() = lower_byte_extract(byte_extract_expr, ns);
@@ -1799,26 +1810,26 @@ exprt lower_byte_update(const byte_update_exprt &src, const namespacet &ns)
   // 4) Construct a new object.
   std::size_t max_update_bytes = 0;
   optionalt<exprt> non_const_update_bound;
-  exprt update_size_expr = size_of_expr(src.value().type(), ns);
-  CHECK_RETURN(update_size_expr.is_not_nil());
+  auto update_size_expr_opt = size_of_expr(src.value().type(), ns);
+  CHECK_RETURN(update_size_expr_opt.has_value());
 
-  simplify(update_size_expr, ns);
-  if(update_size_expr.is_constant())
-    max_update_bytes =
-      numeric_cast_v<std::size_t>(to_constant_expr(update_size_expr));
+  simplify(update_size_expr_opt.value(), ns);
+  if(update_size_expr_opt.value().is_constant())
+    max_update_bytes = numeric_cast_v<std::size_t>(
+      to_constant_expr(update_size_expr_opt.value()));
   else
   {
-    exprt object_size_expr = size_of_expr(src.type(), ns);
-    CHECK_RETURN(object_size_expr.is_not_nil());
-    simplify(object_size_expr, ns);
-    if(!object_size_expr.is_constant())
+    auto object_size_expr_opt = size_of_expr(src.type(), ns);
+    CHECK_RETURN(object_size_expr_opt.has_value());
+    simplify(object_size_expr_opt.value(), ns);
+    if(!object_size_expr_opt.value().is_constant())
     {
-      throw non_constant_widtht(src, update_size_expr);
+      throw non_constant_widtht(src, update_size_expr_opt.value());
     }
 
-    max_update_bytes =
-      numeric_cast_v<std::size_t>(to_constant_expr(object_size_expr));
-    non_const_update_bound = std::move(update_size_expr);
+    max_update_bytes = numeric_cast_v<std::size_t>(
+      to_constant_expr(object_size_expr_opt.value()));
+    non_const_update_bound = std::move(update_size_expr_opt.value());
   }
 
   const irep_idt extract_opcode = src.id() == ID_byte_update_little_endian

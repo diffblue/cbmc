@@ -782,13 +782,13 @@ void bv_pointerst::do_postponed(
       if(expr.id() != ID_symbol)
         continue;
 
-      const exprt size_expr = size_of_expr(expr.type(), ns);
+      const auto size_expr = size_of_expr(expr.type(), ns);
 
-      if(size_expr.is_nil())
+      if(!size_expr.has_value())
         continue;
 
-      const exprt object_size =
-        typecast_exprt::conditional_cast(size_expr, postponed.expr.type());
+      const exprt object_size = typecast_exprt::conditional_cast(
+        size_expr.value(), postponed.expr.type());
 
       // only compare object part
       bvt bv;

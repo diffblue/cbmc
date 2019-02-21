@@ -693,11 +693,19 @@ void c_typecheck_baset::typecheck_vector_type(typet &type)
   }
 
   // the subtype must have constant size
-  exprt sub_size_expr = size_of_expr(subtype, *this);
+  auto sub_size_expr_opt = size_of_expr(subtype, *this);
 
-  simplify(sub_size_expr, *this);
+  if(!sub_size_expr_opt.has_value())
+  {
+    error().source_location = source_location;
+    error() << "failed to determine size of vector base type `"
+            << to_string(subtype) << "'" << eom;
+    throw 0;
+  }
 
-  const auto sub_size = numeric_cast<mp_integer>(sub_size_expr);
+  simplify(sub_size_expr_opt.value(), *this);
+
+  const auto sub_size = numeric_cast<mp_integer>(sub_size_expr_opt.value());
 
   if(!sub_size.has_value())
   {

@@ -150,10 +150,12 @@ void smt2_convt::define_object_size(
   for(const auto &o : pointer_logic.objects)
   {
     const typet &type = o.type();
-    exprt size_expr = size_of_expr(type, ns);
-    const auto object_size = numeric_cast<mp_integer>(size_expr);
+    auto size_expr = size_of_expr(type, ns);
+    const auto object_size =
+      numeric_cast<mp_integer>(size_expr.value_or(nil_exprt()));
 
-    if(o.id() != ID_symbol || size_expr.is_nil() || !object_size.has_value())
+    if(
+      o.id() != ID_symbol || !size_expr.has_value() || !object_size.has_value())
     {
       ++number;
       continue;

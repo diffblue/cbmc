@@ -823,10 +823,14 @@ void cpp_typecheckt::typecheck_expr_new(exprt &expr)
 
   // we add the size of the object for convenience of the
   // runtime library
+  auto size_of_opt = size_of_expr(expr.type().subtype(), *this);
 
-  exprt &sizeof_expr=static_cast<exprt &>(expr.add(ID_sizeof));
-  sizeof_expr=size_of_expr(expr.type().subtype(), *this);
-  sizeof_expr.add(ID_C_c_sizeof_type)=expr.type().subtype();
+  if(size_of_opt.has_value())
+  {
+    auto &sizeof_expr = static_cast<exprt &>(expr.add(ID_sizeof));
+    sizeof_expr = size_of_opt.value();
+    sizeof_expr.add(ID_C_c_sizeof_type) = expr.type().subtype();
+  }
 }
 
 static exprt collect_comma_expression(const exprt &src)

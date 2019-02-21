@@ -440,15 +440,15 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
     else
     {
       // try to build a member/index expression - do not use byte_extract
-      exprt subexpr = get_subexpression_at_offset(
+      auto subexpr = get_subexpression_at_offset(
         root_object_subexpression, o.offset(), dereference_type, ns);
-      if(subexpr.is_not_nil())
-        simplify(subexpr, ns);
-      if(subexpr.is_not_nil() && subexpr.id() != byte_extract_id())
+      if(subexpr.has_value())
+        simplify(subexpr.value(), ns);
+      if(subexpr.has_value() && subexpr.value().id() != byte_extract_id())
       {
         // Successfully found a member, array index, or combination thereof
         // that matches the desired type and offset:
-        result.value = subexpr;
+        result.value = subexpr.value();
         return result;
       }
 

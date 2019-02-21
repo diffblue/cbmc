@@ -205,14 +205,14 @@ void goto_symext::symex_other(
     // byte array
     if(array_expr.type().id() != ID_array)
     {
-      exprt array_size = size_of_expr(array_expr.type(), ns);
-      do_simplify(array_size);
-      array_expr =
-        byte_extract_exprt(
-          byte_extract_id(),
-          array_expr,
-          from_integer(0, index_type()),
-          array_typet(char_type(), array_size));
+      auto array_size = size_of_expr(array_expr.type(), ns);
+      CHECK_RETURN(array_size.has_value());
+      do_simplify(array_size.value());
+      array_expr = byte_extract_exprt(
+        byte_extract_id(),
+        array_expr,
+        from_integer(0, index_type()),
+        array_typet(char_type(), array_size.value()));
     }
 
     const array_typet &array_type = to_array_type(array_expr.type());

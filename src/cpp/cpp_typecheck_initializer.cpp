@@ -266,9 +266,10 @@ void cpp_typecheckt::zero_initializer(
       if(component.type().id()==ID_code)
         continue;
 
-      exprt component_size=size_of_expr(component.type(), *this);
+      auto component_size_opt = size_of_expr(component.type(), *this);
 
-      const auto size_int = numeric_cast<mp_integer>(component_size);
+      const auto size_int =
+        numeric_cast<mp_integer>(component_size_opt.value_or(nil_exprt()));
       if(size_int.has_value())
       {
         if(*size_int > max_comp_size)

@@ -662,11 +662,12 @@ bool simplify_exprt::simplify_object_size(exprt &expr)
     if(op.op0().id()==ID_symbol)
     {
       // just get the type
-      exprt size = size_of_expr(op.op0().type(), ns);
+      auto size_opt = size_of_expr(op.op0().type(), ns);
 
-      if(size.is_not_nil())
+      if(size_opt.has_value())
       {
         const typet &expr_type = expr.type();
+        exprt size = size_opt.value();
 
         if(size.type() != expr_type)
         {

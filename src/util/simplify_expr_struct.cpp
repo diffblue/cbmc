@@ -259,7 +259,7 @@ bool simplify_exprt::simplify_member(exprt &expr)
         member_offset(to_struct_type(op_type), component_name, ns);
       if(requested_offset.has_value())
       {
-        exprt equivalent_member = get_subexpression_at_offset(
+        auto equivalent_member = get_subexpression_at_offset(
           op.op0(), *requested_offset, expr.type(), ns);
 
         // Guess: turning this into a byte-extract operation is not really an
@@ -268,12 +268,12 @@ bool simplify_exprt::simplify_member(exprt &expr)
         // base_type_eq, whereas in the context of a simplifier we should not
         // change the type of the expression.
         if(
-          equivalent_member.is_not_nil() &&
-          equivalent_member.id() != ID_byte_extract_little_endian &&
-          equivalent_member.id() != ID_byte_extract_big_endian &&
-          type_eq(equivalent_member.type(), expr.type(), ns))
+          equivalent_member.has_value() &&
+          equivalent_member.value().id() != ID_byte_extract_little_endian &&
+          equivalent_member.value().id() != ID_byte_extract_big_endian &&
+          type_eq(equivalent_member.value().type(), expr.type(), ns))
         {
-          expr = equivalent_member;
+          expr = equivalent_member.value();
           simplify_rec(expr);
           return false;
         }
