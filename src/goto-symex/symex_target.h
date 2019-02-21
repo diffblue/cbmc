@@ -152,11 +152,15 @@ public:
 
   /// Record return from a function.
   /// \param guard: Precondition for returning from a function
+  /// \param function_id: Name of the function from which we return
   /// \param source: Pointer to location in the input GOTO program of this
   /// \param hidden: Should this step be recorded as hidden?
   ///  function return
-  virtual void
-  function_return(const exprt &guard, const sourcet &source, bool hidden) = 0;
+  virtual void function_return(
+    const exprt &guard,
+    const irep_idt &function_id,
+    const sourcet &source,
+    bool hidden) = 0;
 
   /// Record a location.
   /// \param guard: Precondition for reaching this location

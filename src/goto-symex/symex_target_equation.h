@@ -85,8 +85,11 @@ public:
     bool hidden);
 
   /// \copydoc symex_targett::function_return()
-  virtual void
-  function_return(const exprt &guard, const sourcet &source, bool hidden);
+  virtual void function_return(
+    const exprt &guard,
+    const irep_idt &function_id,
+    const sourcet &source,
+    bool hidden);
 
   /// \copydoc symex_targett::location()
   virtual void location(

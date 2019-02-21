@@ -1,0 +1,11 @@
+CORE
+main.c
+--xml-ui
+activate-multi-line-match
+EXIT=10
+SIGNAL=0
+VERIFICATION FAILED
+<function_call hidden="false" step_nr="18" thread="0">\n\s*<function display_name="no_body" identifier="no_body">
+<function_return hidden="false" step_nr="19" thread="0">\n\s*<function display_name="no_body" identifier="no_body">
+--
+^warning: ignoring
