@@ -887,6 +887,111 @@ void goto_programt::instructiont::validate(
   }
 }
 
+void goto_programt::instructiont::transform(
+  std::function<optionalt<exprt>(exprt)> f)
+{
+  switch(type)
+  {
+  case OTHER:
+    if(get_other().get_statement() == ID_expression)
+    {
+      auto new_expression = f(to_code_expression(get_other()).expression());
+      if(new_expression.has_value())
+      {
+        auto new_other = to_code_expression(get_other());
+        new_other.expression() = *new_expression;
+        set_other(new_other);
+      }
+    }
+    break;
+
+  case RETURN:
+  {
+    auto new_return_value = f(get_return().return_value());
+    if(new_return_value.has_value())
+    {
+      auto new_return = get_return();
+      new_return.return_value() = *new_return_value;
+      set_return(new_return);
+    }
+  }
+  break;
+
+  case ASSIGN:
+  {
+    auto new_assign_lhs = f(get_assign().lhs());
+    auto new_assign_rhs = f(get_assign().rhs());
+    if(new_assign_lhs.has_value() || new_assign_rhs.has_value())
+    {
+      auto new_assignment = get_assign();
+      new_assignment.lhs() = new_assign_lhs.value_or(new_assignment.lhs());
+      new_assignment.rhs() = new_assign_rhs.value_or(new_assignment.rhs());
+      set_assign(new_assignment);
+    }
+  }
+  break;
+
+  case DECL:
+  {
+    auto new_symbol = f(get_decl().symbol());
+    if(new_symbol.has_value())
+    {
+      auto new_decl = get_decl();
+      new_decl.symbol() = to_symbol_expr(*new_symbol);
+      set_decl(new_decl);
+    }
+  }
+  break;
+
+  case DEAD:
+  {
+    auto new_symbol = f(get_dead().symbol());
+    if(new_symbol.has_value())
+    {
+      auto new_dead = get_dead();
+      new_dead.symbol() = to_symbol_expr(*new_symbol);
+      set_dead(new_dead);
+    }
+  }
+  break;
+
+  case FUNCTION_CALL:
+  {
+    auto new_call = get_function_call();
+    bool change = false;
+
+    auto new_lhs = f(new_call.lhs());
+    if(new_lhs.has_value())
+    {
+      new_call.lhs() = *new_lhs;
+      change = true;
+    }
+
+    for(auto &a : new_call.arguments())
+    {
+      auto new_a = f(a);
+      if(new_a.has_value())
+      {
+        a = *new_a;
+        change = true;
+      }
+    }
+
+    if(change)
+      set_function_call(new_call);
+  }
+  break;
+
+  default:
+    if(has_condition())
+    {
+      auto new_condition = f(get_condition());
+      if(new_condition.has_value())
+        set_condition(new_condition.value());
+    }
+  }
+}
+
 bool goto_programt::equals(const goto_programt &other) const
 {
   if(instructions.size() != other.instructions.size())
