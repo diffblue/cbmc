@@ -121,24 +121,7 @@ void goto_program2codet::scan_for_varargs()
     }
 
   if(!va_list_expr.empty())
-  {
     system_headers.insert("stdarg.h");
-
-    code_typet &code_type=
-      to_code_type(symbol_table.get_writeable_ref(func_name).type);
-    code_typet::parameterst &parameters=code_type.parameters();
-
-    for(code_typet::parameterst::iterator
-        it2=parameters.begin();
-        it2!=parameters.end();
-        ++it2)
-    {
-      const symbol_exprt arg=
-        ns.lookup(it2->get_identifier()).symbol_expr();
-      if(va_list_expr.find(arg)!=va_list_expr.end())
-        it2->type().id(ID_gcc_builtin_va_list);
-    }
-  }
 }
 
 goto_programt::const_targett goto_program2codet::convert_instruction(
@@ -322,7 +305,6 @@ goto_programt::const_targett goto_program2codet::convert_assign_varargs(
     code_function_callt f(
       symbol_exprt("va_end", code_typet({}, empty_typet())),
       {this_va_list_expr});
-    f.arguments().back().type().id(ID_gcc_builtin_va_list);
 
     dest.add(std::move(f));
   }
@@ -331,7 +313,6 @@ goto_programt::const_targett goto_program2codet::convert_assign_varargs(
     code_function_callt f(
       symbol_exprt("va_start", code_typet({}, empty_typet())),
       {this_va_list_expr, to_address_of_expr(r).object()});
-    f.arguments().front().type().id(ID_gcc_builtin_va_list);
 
     dest.add(std::move(f));
   }
@@ -341,7 +322,6 @@ goto_programt::const_targett goto_program2codet::convert_assign_varargs(
     code_function_callt f(
       symbol_exprt("va_arg", code_typet({}, empty_typet())),
       {this_va_list_expr});
-    f.arguments().back().type().id(ID_gcc_builtin_va_list);
 
     // we do not bother to set the correct types here, they are not relevant for
     // generating the correct dumped output
@@ -394,7 +374,6 @@ goto_programt::const_targett goto_program2codet::convert_assign_varargs(
     code_function_callt f(
       symbol_exprt("va_copy", code_typet({}, empty_typet())),
       {this_va_list_expr, r});
-    f.arguments().front().type().id(ID_gcc_builtin_va_list);
 
     dest.add(std::move(f));
   }
@@ -1452,9 +1431,6 @@ void goto_program2codet::cleanup_code(
 {
   if(code.get_statement()==ID_decl)
   {
-    if(va_list_expr.find(code.op0())!=va_list_expr.end())
-      code.op0().type().id(ID_gcc_builtin_va_list);
-
     if(code.operands().size()==2 &&
        code.op1().id()==ID_side_effect &&
        to_side_effect_expr(code.op1()).get_statement()==ID_function_call)
