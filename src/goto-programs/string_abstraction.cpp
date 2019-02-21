@@ -166,31 +166,30 @@ void string_abstractiont::add_str_arguments(
 {
   symbolt &fct_symbol=*symbol_table.get_writeable(name);
 
-  code_typet::parameterst &parameters=
-    to_code_type(fct.type).parameters();
   code_typet::parameterst str_args;
 
-  for(code_typet::parameterst::iterator
-      it=parameters.begin();
-      it!=parameters.end();
-      ++it)
+  for(const auto &identifier : fct.parameter_identifiers)
   {
-    const typet &abstract_type=build_abstraction_type(it->type());
-    if(abstract_type.is_nil())
-      continue;
-
-    const irep_idt &identifier=it->get_identifier();
     if(identifier=="")
       continue; // ignore
 
-    add_argument(str_args, fct_symbol, abstract_type,
-        id2string(it->get_base_name())+arg_suffix,
-        id2string(identifier)+arg_suffix);
+    const symbolt &param_symbol = ns.lookup(identifier);
+    const typet &abstract_type = build_abstraction_type(param_symbol.type);
+    if(abstract_type.is_nil())
+      continue;
+
+    add_argument(
+      str_args,
+      fct_symbol,
+      abstract_type,
+      id2string(param_symbol.base_name) + arg_suffix,
+      id2string(identifier) + arg_suffix);
 
     current_args.insert(identifier);
   }
 
-  parameters.insert(parameters.end(), str_args.begin(), str_args.end());
+  for(const auto &new_param : str_args)
+    fct.parameter_identifiers.push_back(new_param.get_identifier());
   code_typet::parameterst &symb_parameters=
     to_code_type(fct_symbol.type).parameters();
   symb_parameters.insert(

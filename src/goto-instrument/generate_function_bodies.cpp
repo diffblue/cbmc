@@ -35,9 +35,11 @@ void generate_function_bodiest::generate_parameter_names(
   symbol_tablet &symbol_table,
   const irep_idt &function_name) const
 {
-  const namespacet ns(symbol_table);
+  auto &function_symbol = symbol_table.get_writeable_ref(function_name);
+  auto &parameters = to_code_type(function_symbol.type).parameters();
+
   int param_counter = 0;
-  for(auto &parameter : function.type.parameters())
+  for(auto &parameter : parameters)
   {
     if(parameter.get_identifier().empty())
     {
@@ -53,15 +55,14 @@ void generate_function_bodiest::generate_parameter_names(
       new_param_sym.name = new_param_identifier;
       new_param_sym.type = parameter.type();
       new_param_sym.base_name = param_base_name;
-      auto const &function_symbol = symbol_table.lookup_ref(function_name);
       new_param_sym.mode = function_symbol.mode;
       new_param_sym.module = function_symbol.module;
       new_param_sym.location = function_symbol.location;
       symbol_table.add(new_param_sym);
     }
   }
-  auto &function_symbol = symbol_table.get_writeable_ref(function_name);
-  function_symbol.type = function.type;
+  function.type = to_code_type(function_symbol.type);
+  function.set_parameter_identifiers(to_code_type(function_symbol.type));
 }
 
 class assume_false_generate_function_bodiest : public generate_function_bodiest

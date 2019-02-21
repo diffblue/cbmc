@@ -27,6 +27,13 @@ static void rename_symbols_in_function(
   irep_idt &new_function_name,
   const rename_symbolt &rename_symbol)
 {
+  for(auto &identifier : function.parameter_identifiers)
+  {
+    auto entry = rename_symbol.expr_map.find(identifier);
+    if(entry != rename_symbol.expr_map.end())
+      identifier = entry->second;
+  }
+
   goto_programt &program=function.body;
   rename_symbol(function.type);
 
