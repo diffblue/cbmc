@@ -1,0 +1,11 @@
+CORE
+main.c
+--xml-ui --function test --trace
+activate-multi-line-match
+EXIT=10
+SIGNAL=0
+VERIFICATION FAILED
+<input hidden="false" step_nr="\d+" thread="0">\n\s*<input_id>e</input_id>\n\s*<value>.*E(1|2|3)</value>\n\s*<value_expression>\n\s*<integer binary="000000000000000000000000000000(0|1){2}" c_type="enum" width="32">(0|1|2)</integer>\n\s*</value_expression>
+<input hidden="false" step_nr="\d+" thread="0">\n\s*<input_id>t</input_id>\n\s*<value>.*T(1|2|3)</value>\n\s*<value_expression>\n\s*<integer binary="000000000000000000000000000000(0|1){2}" c_type="enum" width="32">(0|1|2)</integer>\n\s*</value_expression>
+--
+^warning: ignoring
