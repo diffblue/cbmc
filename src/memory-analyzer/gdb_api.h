@@ -41,6 +41,23 @@ public:
   explicit gdb_apit(const char *binary, const bool log = false);
   ~gdb_apit();
 
+  struct pointer_valuet
+  {
+    pointer_valuet(
+      const std::string &address = "",
+      const std::string &pointee = "",
+      const std::string &character = "",
+      const optionalt<std::string> &string = nullopt)
+      : address(address), pointee(pointee), character(character), string(string)
+    {
+    }
+
+    const std::string address;
+    const std::string pointee;
+    const std::string character;
+    const optionalt<std::string> string;
+  };
+
   void create_gdb_process();
   void terminate_gdb_process();
 
@@ -48,7 +65,7 @@ public:
   void run_gdb_from_core(const std::string &corefile);
 
   std::string get_value(const std::string &expr);
-  std::string get_memory(const std::string &expr);
+  pointer_valuet get_memory(const std::string &expr);
 
   const commandst &get_command_log();
 
@@ -86,6 +103,27 @@ protected:
   bool most_recent_line_has_tag(const std::string &tag);
   bool was_command_accepted();
   void check_command_accepted();
+
+  static std::string r_opt(const std::string &regex);
+
+  static std::string
+  r_or(const std::string &regex_left, const std::string &regex_right);
+
+  // regex group for hex memory address (part of the output of gdb when printing
+  // a pointer), matches e.g. 0x601040 and extracts 0x601040
+  const std::string r_hex_addr = R"((0x(?:0|[1-9a-f][0-9a-f]*)))";
+
+  // regex group for identifier (optional part of the output of gdb when
+  // printing a pointer), matches e.g. <abc> and extracts abc
+  const std::string r_id = R"(<([^<>]+)>)";
+
+  // regex group for octal encoded char (optional part of the output of gdb when
+  // printing a pointer), matches e.g. \"\\003\" and extracts \\003
+  const std::string r_char = R"(\\"(\\\\[0-7]{3})\\")";
+
+  // regex group for string (optional part of the output of gdb when printing a
+  // pointer), matches e.g. \"abc\" and extracts \"abc\"
+  const std::string r_string = R"((\\".*\\"))";
 };
 
 class gdb_interaction_exceptiont : public cprover_exception_baset

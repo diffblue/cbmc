@@ -45,11 +45,14 @@ void check_for_gdb()
 
 class gdb_api_testt : public gdb_apit
 {
+public:
   explicit gdb_api_testt(const char *binary) : gdb_apit(binary)
   {
   }
 
   friend void gdb_api_internals_test();
+
+  using gdb_apit::r_hex_addr;
 };
 
 void gdb_api_internals_test()
@@ -153,7 +156,10 @@ TEST_CASE("gdb api test", "[core][memory-analyzer]")
     }
   }
 
-  gdb_apit gdb_api("test");
+  gdb_api_testt gdb_api("test");
+
+  std::regex hex_addr(gdb_api.r_hex_addr);
+
   gdb_api.create_gdb_process();
 
   SECTION("breakpoint is hit")
@@ -174,24 +180,73 @@ TEST_CASE("gdb api test", "[core][memory-analyzer]")
       gdb_api.run_gdb_to_breakpoint("checkpoint3"), gdb_interaction_exceptiont);
   }
 
-  SECTION("query memory")
+  SECTION("query variables, primitive types")
   {
     const bool r = gdb_api.run_gdb_to_breakpoint("checkpoint");
     REQUIRE(r);
 
     REQUIRE(gdb_api.get_value("x") == "8");
-    REQUIRE(gdb_api.get_value("s") == "abc");
+    REQUIRE(gdb_api.get_value("y") == "2.5");
+    REQUIRE(gdb_api.get_value("z") == "c");
+  }
 
-    const std::regex regex(R"(0x[1-9a-f][0-9a-f]*)");
+  SECTION("query pointers")
+  {
+    const bool r = gdb_api.run_gdb_to_breakpoint("checkpoint");
+    REQUIRE(r);
 
     {
-      std::string address = gdb_api.get_memory("p");
-      REQUIRE(std::regex_match(address, regex));
+      auto value = gdb_api.get_memory("s");
+      REQUIRE(std::regex_match(value.address, hex_addr));
+      REQUIRE(value.pointee.empty());
+      REQUIRE(value.character.empty());
+      REQUIRE(*value.string == "abc");
     }
 
     {
-      std::string address = gdb_api.get_memory("vp");
-      REQUIRE(std::regex_match(address, regex));
+      auto value = gdb_api.get_memory("p");
+      REQUIRE(std::regex_match(value.address, hex_addr));
+      REQUIRE(value.pointee == "x");
+      REQUIRE(value.character.empty());
+      REQUIRE(!value.string);
+    }
+
+    {
+      auto value = gdb_api.get_memory("vp");
+      REQUIRE(std::regex_match(value.address, hex_addr));
+      REQUIRE(value.pointee == "x");
+      REQUIRE(value.character.empty());
+      REQUIRE(!value.string);
+    }
+
+    {
+      auto value = gdb_api.get_memory("np");
+      REQUIRE(value.address == "0x0");
+      REQUIRE(value.pointee.empty());
+      REQUIRE(value.character.empty());
+      REQUIRE(!value.string);
+    }
+
+    {
+      auto value = gdb_api.get_memory("vp_string");
+      REQUIRE(std::regex_match(value.address, hex_addr));
+      REQUIRE(value.pointee.empty());
+      REQUIRE(value.character.empty());
+      REQUIRE(!value.string);
+    }
+  }
+
+  SECTION("query expressions")
+  {
+    const bool r = gdb_api.run_gdb_to_breakpoint("checkpoint");
+    REQUIRE(r);
+
+    {
+      auto value = gdb_api.get_memory("&x");
+      REQUIRE(std::regex_match(value.address, hex_addr));
+      REQUIRE(value.pointee == "x");
+      REQUIRE(value.character.empty());
+      REQUIRE(!value.string);
     }
   }
 #endif

@@ -25,6 +25,8 @@ Author: Malte Mues <mail.mues@gmail.com>
 #include <cstring>
 #include <regex>
 
+#include <iostream>
+
 #include "gdb_api.h"
 
 #include <goto-programs/goto_model.h>
@@ -358,32 +360,36 @@ std::string gdb_apit::eval_expr(const std::string &expr)
 /// \param expr an expression of pointer type (e.g., `&x` with `x` being of type
 ///   `int` or `p` with `p` being of type `int *`)
 /// \return memory address in hex format
-std::string gdb_apit::get_memory(const std::string &expr)
+gdb_apit::pointer_valuet gdb_apit::get_memory(const std::string &expr)
 {
   PRECONDITION(gdb_state == gdb_statet::STOPPED);
 
-  std::string mem;
+  std::string value = eval_expr(expr);
 
-  // regex matching a hex memory address followed by an optional identifier in
-  // angle brackets (e.g., `0x601060 <x>`)
-  std::regex regex(R"(^(0x[1-9a-f][0-9a-f]*)( <.*>)?)");
-
-  const std::string value = eval_expr(expr);
+  std::regex regex(
+    r_hex_addr + r_opt(' ' + r_id) + r_opt(' ' + r_or(r_char, r_string)));
 
   std::smatch result;
-  if(regex_match(value, result, regex))
+  const bool b = regex_match(value, result, regex);
+  CHECK_RETURN(b);
+
+  optionalt<std::string> opt_string;
+  const std::string string = result[4];
+
+  if(!string.empty())
   {
-    // return hex address only
-    return result[1];
-  }
-  else
-  {
-    throw gdb_interaction_exceptiont(
-      "value `" + value +
-      "` is not a memory address or has unrecognised format");
+    const std::size_t len = string.length();
+
+    INVARIANT(len >= 4, "");
+    INVARIANT(string[0] == '\\', "");
+    INVARIANT(string[1] == '"', "");
+    INVARIANT(string[len - 2] == '\\', "");
+    INVARIANT(string[len - 1] == '"', "");
+
+    opt_string = string.substr(2, len - 4);
   }
 
-  UNREACHABLE;
+  return pointer_valuet(result[1], result[2], result[3], opt_string);
 }
 
 /// Get value of the given value expression
@@ -398,25 +404,15 @@ std::string gdb_apit::get_value(const std::string &expr)
 
   const std::string value = eval_expr(expr);
 
+  // Get char value
   {
-    // get string from char pointer
-    const std::regex regex(R"(0x[1-9a-f][0-9a-f]* \\"(.*)\\")");
+    // matches e.g. 99 'c' and extracts c
+    std::regex regex(R"([^ ]+ '([^']+)')");
 
     std::smatch result;
-    if(regex_match(value, result, regex))
-    {
-      return result[1];
-    }
-  }
+    const bool b = regex_match(value, result, regex);
 
-  // this case will go away eventually, once client code has been refactored to
-  // use get_memory() instead
-  {
-    // get void pointer address
-    const std::regex regex(R"(0x[1-9a-f][0-9a-f]*)");
-
-    std::smatch result;
-    if(regex_match(value, result, regex))
+    if(b)
     {
       return result[1];
     }
@@ -498,6 +494,17 @@ void gdb_apit::check_command_accepted()
 {
   bool was_accepted = was_command_accepted();
   CHECK_RETURN(was_accepted);
+}
+
+std::string gdb_apit::r_opt(const std::string &regex)
+{
+  return R"((?:)" + regex + R"()?)";
+}
+
+std::string
+gdb_apit::r_or(const std::string &regex_left, const std::string &regex_right)
+{
+  return R"((?:)" + regex_left + '|' + regex_right + R"())";
 }
 
 #endif
