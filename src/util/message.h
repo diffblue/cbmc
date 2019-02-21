@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <sstream>
 #include <string>
 
+#include "deprecate.h"
 #include "invariant.h"
 #include "json.h"
 #include "source_location.h"

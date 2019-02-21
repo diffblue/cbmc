@@ -109,11 +109,6 @@ int irept::get_int(const irep_namet &name) const
   return unsafe_string2int(get_string(name));
 }
 
-unsigned int irept::get_unsigned_int(const irep_namet &name) const
-{
-  return unsafe_string2unsigned(get_string(name));
-}
-
 std::size_t irept::get_size_t(const irep_namet &name) const
 {
   return unsafe_string2size_t(get_string(name));
