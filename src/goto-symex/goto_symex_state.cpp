@@ -34,14 +34,14 @@ goto_symex_statet::goto_symex_statet(const symex_targett::sourcet &_source)
   new_frame();
 }
 
-goto_symex_statet::~goto_symex_statet()=default;
+goto_symex_statet::~goto_symex_statet() = default;
 
 /// write to a variable
 static bool check_renaming(const exprt &expr);
 
 static bool check_renaming(const typet &type)
 {
-  if(type.id()==ID_array)
+  if(type.id() == ID_array)
     return check_renaming(to_array_type(type).size());
   else if(type.id() == ID_struct || type.id() == ID_union)
   {
@@ -60,13 +60,13 @@ static bool check_renaming_l1(const exprt &expr)
   if(check_renaming(expr.type()))
     return true;
 
-  if(expr.id()==ID_symbol)
+  if(expr.id() == ID_symbol)
   {
     if(!expr.get_bool(ID_C_SSA_symbol))
-      return expr.type().id()!=ID_code;
+      return expr.type().id() != ID_code;
     if(!to_ssa_expr(expr).get_level_2().empty())
       return true;
-    if(to_ssa_expr(expr).get_original_expr().type()!=expr.type())
+    if(to_ssa_expr(expr).get_original_expr().type() != expr.type())
       return true;
   }
   else
@@ -98,13 +98,13 @@ static bool check_renaming(const exprt &expr)
     return check_renaming_l1(index_expr.array()) ||
            check_renaming(index_expr.index());
   }
-  else if(expr.id()==ID_symbol)
+  else if(expr.id() == ID_symbol)
   {
     if(!expr.get_bool(ID_C_SSA_symbol))
-      return expr.type().id()!=ID_code;
+      return expr.type().id() != ID_code;
     if(to_ssa_expr(expr).get_level_2().empty())
       return true;
-    if(to_ssa_expr(expr).get_original_expr().type()!=expr.type())
+    if(to_ssa_expr(expr).get_original_expr().type() != expr.type())
       return true;
   }
   else
@@ -153,8 +153,8 @@ protected:
 };
 
 void goto_symex_statet::assignment(
-  ssa_exprt &lhs, // L0/L1
-  const exprt &rhs,  // L2
+  ssa_exprt &lhs,   // L0/L1
+  const exprt &rhs, // L2
   const namespacet &ns,
   bool rhs_is_simplified,
   bool record_value,
@@ -162,7 +162,7 @@ void goto_symex_statet::assignment(
 {
   // identifier should be l0 or l1, make sure it's l1
   rename(lhs, ns, L1);
-  irep_idt l1_identifier=lhs.get_identifier();
+  irep_idt l1_identifier = lhs.get_identifier();
 
   // the type might need renaming
   rename(lhs.type(), l1_identifier, ns);
@@ -187,7 +187,7 @@ void goto_symex_statet::assignment(
   set_l2_indices(lhs, ns);
 
   // in case we happen to be multi-threaded, record the memory access
-  bool is_shared=l2_thread_write_encoding(lhs, ns);
+  bool is_shared = l2_thread_write_encoding(lhs, ns);
 
   if(run_validation_checks)
   {
@@ -224,11 +224,11 @@ void goto_symex_statet::assignment(
     value_set.assign(l1_lhs, l1_rhs, ns, rhs_is_simplified, is_shared);
   }
 
-  #if 0
+#if 0
   std::cout << "Assigning " << l1_identifier << '\n';
   value_set.output(ns, std::cout);
   std::cout << "**********************\n";
-  #endif
+#endif
 }
 
 void goto_symex_statet::set_l0_indices(
@@ -261,10 +261,7 @@ void goto_symex_statet::set_l2_indices(
   ssa_expr.set_level_2(level2.current_count(ssa_expr.get_identifier()));
 }
 
-void goto_symex_statet::rename(
-  exprt &expr,
-  const namespacet &ns,
-  levelt level)
+void goto_symex_statet::rename(exprt &expr, const namespacet &ns, levelt level)
 {
   // This condition is just here to increase indentation, to make the following
   // commit diffs nicer.
@@ -361,11 +358,11 @@ bool goto_symex_statet::l2_thread_read_encoding(
   const namespacet &ns)
 {
   // do we have threads?
-  if(threads.size()<=1)
+  if(threads.size() <= 1)
     return false;
 
   // is it a shared object?
-  const irep_idt &obj_identifier=expr.get_object_name();
+  const irep_idt &obj_identifier = expr.get_object_name();
   if(
     obj_identifier == guard_identifier() ||
     (!ns.lookup(obj_identifier).is_shared() && !(dirty)(obj_identifier)))
@@ -373,23 +370,23 @@ bool goto_symex_statet::l2_thread_read_encoding(
     return false;
   }
 
-  ssa_exprt ssa_l1=expr;
+  ssa_exprt ssa_l1 = expr;
   ssa_l1.remove_level_2();
-  const irep_idt &l1_identifier=ssa_l1.get_identifier();
+  const irep_idt &l1_identifier = ssa_l1.get_identifier();
   const exprt guard_as_expr = guard.as_expr();
 
   // see whether we are within an atomic section
-  if(atomic_section_id!=0)
+  if(atomic_section_id != 0)
   {
     guardt write_guard{false_exprt{}};
 
     const auto a_s_writes = written_in_atomic_section.find(ssa_l1);
-    if(a_s_writes!=written_in_atomic_section.end())
+    if(a_s_writes != written_in_atomic_section.end())
     {
       for(const auto &guard_in_list : a_s_writes->second)
       {
         guardt g = guard_in_list;
-        g-=guard;
+        g -= guard;
         if(g.is_true())
           // there has already been a write to l1_identifier within
           // this atomic section under the same guard, or a guard
@@ -407,11 +404,11 @@ bool goto_symex_statet::l2_thread_read_encoding(
     // all branches flowing into this read
     guardt read_guard{false_exprt{}};
 
-    a_s_r_entryt &a_s_read=read_in_atomic_section[ssa_l1];
+    a_s_r_entryt &a_s_read = read_in_atomic_section[ssa_l1];
     for(const auto &a_s_read_guard : a_s_read.second)
     {
       guardt g = a_s_read_guard; // copy
-      g-=guard;
+      g -= guard;
       if(g.is_true())
         // there has already been a read l1_identifier within
         // this atomic section under the same guard, or a guard
@@ -434,21 +431,21 @@ bool goto_symex_statet::l2_thread_read_encoding(
         level2.current_names.emplace(l1_identifier, std::make_pair(ssa_l1, 0))
           .first;
       symex_renaming_levelt::increase_counter(level2_it);
-      a_s_read.first=level2.current_count(l1_identifier);
+      a_s_read.first = level2.current_count(l1_identifier);
     }
 
     to_ssa_expr(tmp.false_case()).set_level_2(a_s_read.first);
 
     if(cond.is_false())
     {
-      exprt t=tmp.false_case();
+      exprt t = tmp.false_case();
       t.swap(tmp);
     }
 
-    const bool record_events_bak=record_events;
-    record_events=false;
+    const bool record_events_bak = record_events;
+    record_events = false;
     assignment(ssa_l1, tmp, ns, true, true);
-    record_events=record_events_bak;
+    record_events = record_events_bak;
 
     symex_target->assignment(
       guard_as_expr,
@@ -460,7 +457,7 @@ bool goto_symex_statet::l2_thread_read_encoding(
       symex_targett::assignment_typet::PHI);
 
     set_l2_indices(ssa_l1, ns);
-    expr=ssa_l1;
+    expr = ssa_l1;
 
     a_s_read.second.push_back(guard);
     if(!no_write.op().is_false())
@@ -477,18 +474,18 @@ bool goto_symex_statet::l2_thread_read_encoding(
   if(!record_events)
   {
     set_l2_indices(ssa_l1, ns);
-    expr=ssa_l1;
+    expr = ssa_l1;
     return true;
   }
 
   // produce a fresh L2 name
   symex_renaming_levelt::increase_counter(level2_it);
   set_l2_indices(ssa_l1, ns);
-  expr=ssa_l1;
+  expr = ssa_l1;
 
   // and record that
   INVARIANT_STRUCTURED(
-    symex_target!=nullptr, nullptr_exceptiont, "symex_target is null");
+    symex_target != nullptr, nullptr_exceptiont, "symex_target is null");
   symex_target->shared_read(guard_as_expr, expr, atomic_section_id, source);
 
   return true;
@@ -503,7 +500,7 @@ bool goto_symex_statet::l2_thread_write_encoding(
     return false;
 
   // is it a shared object?
-  const irep_idt &obj_identifier=expr.get_object_name();
+  const irep_idt &obj_identifier = expr.get_object_name();
   if(
     obj_identifier == guard_identifier() ||
     (!ns.lookup(obj_identifier).is_shared() && !(dirty)(obj_identifier)))
@@ -512,9 +509,9 @@ bool goto_symex_statet::l2_thread_write_encoding(
   }
 
   // see whether we are within an atomic section
-  if(atomic_section_id!=0)
+  if(atomic_section_id != 0)
   {
-    ssa_exprt ssa_l1=expr;
+    ssa_exprt ssa_l1 = expr;
     ssa_l1.remove_level_2();
 
     written_in_atomic_section[ssa_l1].push_back(guard);
@@ -522,14 +519,10 @@ bool goto_symex_statet::l2_thread_write_encoding(
   }
 
   // record a shared write
-  symex_target->shared_write(
-    guard.as_expr(),
-    expr,
-    atomic_section_id,
-    source);
+  symex_target->shared_write(guard.as_expr(), expr, atomic_section_id, source);
 
   // do we have threads?
-  return threads.size()>1;
+  return threads.size() > 1;
 }
 
 void goto_symex_statet::rename_address(
@@ -537,10 +530,9 @@ void goto_symex_statet::rename_address(
   const namespacet &ns,
   levelt level)
 {
-  if(expr.id()==ID_symbol &&
-     expr.get_bool(ID_C_SSA_symbol))
+  if(expr.id() == ID_symbol && expr.get_bool(ID_C_SSA_symbol))
   {
-    ssa_exprt &ssa=to_ssa_expr(expr);
+    ssa_exprt &ssa = to_ssa_expr(expr);
 
     // only do L1!
     set_l1_indices(ssa, ns);
@@ -548,16 +540,16 @@ void goto_symex_statet::rename_address(
     rename(expr.type(), ssa.get_identifier(), ns, level);
     ssa.update_type();
   }
-  else if(expr.id()==ID_symbol)
+  else if(expr.id() == ID_symbol)
   {
-    expr=ssa_exprt(expr);
+    expr = ssa_exprt(expr);
     rename_address(expr, ns, level);
   }
   else
   {
-    if(expr.id()==ID_index)
+    if(expr.id() == ID_index)
     {
-      index_exprt &index_expr=to_index_expr(expr);
+      index_exprt &index_expr = to_index_expr(expr);
 
       rename_address(index_expr.array(), ns, level);
       PRECONDITION(index_expr.array().type().id() == ID_array);
@@ -566,19 +558,19 @@ void goto_symex_statet::rename_address(
       // the index is not an address
       rename(index_expr.index(), ns, level);
     }
-    else if(expr.id()==ID_if)
+    else if(expr.id() == ID_if)
     {
       // the condition is not an address
-      if_exprt &if_expr=to_if_expr(expr);
+      if_exprt &if_expr = to_if_expr(expr);
       rename(if_expr.cond(), ns, level);
       rename_address(if_expr.true_case(), ns, level);
       rename_address(if_expr.false_case(), ns, level);
 
-      if_expr.type()=if_expr.true_case().type();
+      if_expr.type() = if_expr.true_case().type();
     }
-    else if(expr.id()==ID_member)
+    else if(expr.id() == ID_member)
     {
-      member_exprt &member_expr=to_member_expr(expr);
+      member_exprt &member_expr = to_member_expr(expr);
 
       rename_address(member_expr.struct_op(), ns, level);
 
@@ -589,12 +581,12 @@ void goto_symex_statet::rename_address(
         member_expr.struct_op().type().id() != ID_struct_tag &&
         member_expr.struct_op().type().id() != ID_union_tag)
       {
-        const struct_union_typet &su_type=
+        const struct_union_typet &su_type =
           to_struct_union_type(member_expr.struct_op().type());
-        const struct_union_typet::componentt &comp=
+        const struct_union_typet::componentt &comp =
           su_type.get_component(member_expr.get_component_name());
         PRECONDITION(comp.is_not_nil());
-        expr.type()=comp.type();
+        expr.type() = comp.type();
       }
       else
         rename(expr.type(), irep_idt(), ns, level);
@@ -680,23 +672,22 @@ void goto_symex_statet::rename(
   // to the given level
 
   std::pair<l1_typest::iterator, bool> l1_type_entry;
-  if(level==L2 &&
-     !l1_identifier.empty())
+  if(level == L2 && !l1_identifier.empty())
   {
-    l1_type_entry=l1_types.insert(std::make_pair(l1_identifier, type));
+    l1_type_entry = l1_types.insert(std::make_pair(l1_identifier, type));
 
     if(!l1_type_entry.second) // was already in map
     {
       // do not change a complete array type to an incomplete one
 
-      const typet &type_prev=l1_type_entry.first->second;
+      const typet &type_prev = l1_type_entry.first->second;
 
-      if(type.id()!=ID_array ||
-         type_prev.id()!=ID_array ||
-         to_array_type(type).is_incomplete() ||
-         to_array_type(type_prev).is_complete())
+      if(
+        type.id() != ID_array || type_prev.id() != ID_array ||
+        to_array_type(type).is_incomplete() ||
+        to_array_type(type_prev).is_complete())
       {
-        type=l1_type_entry.first->second;
+        type = l1_type_entry.first->second;
         return;
       }
     }
@@ -705,7 +696,7 @@ void goto_symex_statet::rename(
   // expand struct and union tag types
   type = ns.follow(type);
 
-  if(type.id()==ID_array)
+  if(type.id() == ID_array)
   {
     auto &array_type = to_array_type(type);
     rename(array_type.subtype(), irep_idt(), ns, level);
@@ -713,8 +704,8 @@ void goto_symex_statet::rename(
   }
   else if(type.id() == ID_struct || type.id() == ID_union)
   {
-    struct_union_typet &s_u_type=to_struct_union_type(type);
-    struct_union_typet::componentst &components=s_u_type.components();
+    struct_union_typet &s_u_type = to_struct_union_type(type);
+    struct_union_typet::componentst &components = s_u_type.components();
 
     for(auto &component : components)
     {
@@ -725,22 +716,20 @@ void goto_symex_statet::rename(
         rename(component.type(), irep_idt(), ns, level);
     }
   }
-  else if(type.id()==ID_pointer)
+  else if(type.id() == ID_pointer)
   {
     rename(to_pointer_type(type).subtype(), irep_idt(), ns, level);
   }
 
-  if(level==L2 &&
-     !l1_identifier.empty())
-    l1_type_entry.first->second=type;
+  if(level == L2 && !l1_identifier.empty())
+    l1_type_entry.first->second = type;
 }
 
 static void get_l1_name(exprt &expr)
 {
   // do not reset the type !
 
-  if(expr.id()==ID_symbol &&
-     expr.get_bool(ID_C_SSA_symbol))
+  if(expr.id() == ID_symbol && expr.get_bool(ID_C_SSA_symbol))
     to_ssa_expr(expr).remove_level_2();
   else
     Forall_operands(it, expr)
