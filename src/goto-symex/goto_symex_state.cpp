@@ -612,8 +612,7 @@ static bool requires_renaming(const typet &type, const namespacet &ns)
     return requires_renaming(array_type.subtype(), ns) ||
            !array_type.size().is_constant();
   }
-  else if(
-    type.id() == ID_struct || type.id() == ID_union || type.id() == ID_class)
+  else if(type.id() == ID_struct || type.id() == ID_union)
   {
     const struct_union_typet &s_u_type = to_struct_union_type(type);
     const struct_union_typet::componentst &components = s_u_type.components();
