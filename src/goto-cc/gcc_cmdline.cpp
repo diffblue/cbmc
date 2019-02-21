@@ -49,6 +49,7 @@ const char *goto_cc_options_without_argument[]=
   "--big-endian",
   "--no-arch",
   "--partial-inlining",
+  "--validate-goto-model",
   "-?",
   nullptr
 };

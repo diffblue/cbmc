@@ -51,6 +51,9 @@ int cw_modet::doit()
 
   debug() << "CodeWarrior mode" << eom;
 
+  // model validation
+  compiler.validate_goto_model = cmdline.isset("validate-goto-model");
+
   // get configuration
   config.set(cmdline);
 

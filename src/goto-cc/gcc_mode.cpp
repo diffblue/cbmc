@@ -423,6 +423,9 @@ int gcc_modet::doit()
       debug() << "GCC mode" << eom;
   }
 
+  // model validation
+  compiler.validate_goto_model = cmdline.isset("validate-goto-model");
+
   // determine actions to be undertaken
   if(cmdline.isset('S'))
     compiler.mode=compilet::ASSEMBLE_ONLY;

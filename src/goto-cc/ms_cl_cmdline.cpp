@@ -22,6 +22,7 @@ Author: Daniel Kroening
 /// parses the command line options into a cmdlinet
 /// \par parameters: argument count, argument strings
 /// \return none
+// clang-format off
 const char *non_ms_cl_options[]=
 {
   "--show-symbol-table",
@@ -44,8 +45,10 @@ const char *non_ms_cl_options[]=
   "--partial-inlining",
   "--verbosity",
   "--function",
+  "--validate-goto-model",
   nullptr
 };
+// clang-format on
 
 bool ms_cl_cmdlinet::parse(const std::vector<std::string> &arguments)
 {

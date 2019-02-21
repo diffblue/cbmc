@@ -96,6 +96,9 @@ int ld_modet::doit()
   // determine actions to be undertaken
   compiler.mode = compilet::LINK_LIBRARY;
 
+  // model validation
+  compiler.validate_goto_model = cmdline.isset("validate-goto-model");
+
   // get configuration
   config.set(cmdline);
 

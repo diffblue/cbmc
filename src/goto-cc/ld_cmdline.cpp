@@ -22,6 +22,7 @@ const char *goto_ld_options_with_argument[]=
   "--verbosity",
   "--native-compiler",
   "--native-linker",
+  "--validate-goto-model",
   nullptr
 };
 
