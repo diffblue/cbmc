@@ -2003,13 +2003,13 @@ bool simplify_exprt::simplify_byte_extract(byte_extract_exprt &expr)
   }
 
   // try to refine it down to extracting from a member or an index in an array
-  exprt subexpr =
+  auto subexpr =
     get_subexpression_at_offset(expr.op(), *offset, expr.type(), ns);
-  if(subexpr.is_nil() || subexpr == expr)
+  if(!subexpr.has_value() || subexpr.value() == expr)
     return true;
 
-  simplify_rec(subexpr);
-  expr.swap(subexpr);
+  simplify_rec(subexpr.value());
+  expr.swap(subexpr.value());
   return false;
 }
 

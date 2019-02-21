@@ -1056,8 +1056,10 @@ void goto_checkt::pointer_validity_check(
 
   const exprt &pointer=expr.pointer();
 
-  auto conditions =
-    address_check(pointer, size_of_expr(expr.type(), ns));
+  auto size_of_expr_opt = size_of_expr(expr.type(), ns);
+  CHECK_RETURN(size_of_expr_opt.has_value());
+
+  auto conditions = address_check(pointer, size_of_expr_opt.value());
 
   for(const auto &c : conditions)
   {
@@ -1329,12 +1331,11 @@ void goto_checkt::bounds_check(
       expr,
       guard);
 
-    exprt type_size=size_of_expr(ode.root_object().type(), ns);
-    if(type_size.is_not_nil())
-      type_matches_size=
-        equal_exprt(
-          size,
-          typecast_exprt(type_size, size.type()));
+    auto type_size_opt = size_of_expr(ode.root_object().type(), ns);
+
+    if(type_size_opt.has_value())
+      type_matches_size =
+        equal_exprt(size, typecast_exprt(type_size_opt.value(), size.type()));
   }
 
   const exprt &size=array_type.id()==ID_array ?
@@ -1360,12 +1361,14 @@ void goto_checkt::bounds_check(
     // that member, it behaves as if that member were replaced with the longest
     // array (with the same element type) that would not make the structure
     // larger than the object being accessed; [...]
-    const exprt type_size = size_of_expr(ode.root_object().type(), ns);
+    const auto type_size_opt = size_of_expr(ode.root_object().type(), ns);
+    CHECK_RETURN(type_size_opt.has_value());
 
     binary_relation_exprt inequality(
-      typecast_exprt::conditional_cast(ode.offset(), type_size.type()),
+      typecast_exprt::conditional_cast(
+        ode.offset(), type_size_opt.value().type()),
       ID_lt,
-      type_size);
+      type_size_opt.value());
 
     add_guarded_claim(
       implies_exprt(type_matches_size, inequality),
@@ -1542,10 +1545,9 @@ void goto_checkt::check_rec(const exprt &expr, guardt &guard, bool address)
 
     // we rewrite s->member into *(s+member_offset)
     // to avoid requiring memory safety of the entire struct
+    auto member_offset_opt = member_offset_expr(member, ns);
 
-    exprt member_offset=member_offset_expr(member, ns);
-
-    if(member_offset.is_not_nil())
+    if(member_offset_opt.has_value())
     {
       pointer_typet new_pointer_type = to_pointer_type(deref.pointer().type());
       new_pointer_type.subtype() = expr.type();
@@ -1557,7 +1559,8 @@ void goto_checkt::check_rec(const exprt &expr, guardt &guard, bool address)
       const exprt new_address = typecast_exprt(
         plus_exprt(
           char_pointer,
-          typecast_exprt::conditional_cast(member_offset, pointer_diff_type())),
+          typecast_exprt::conditional_cast(
+            member_offset_opt.value(), pointer_diff_type())),
         char_pointer.type());
 
       const exprt new_address_casted =

@@ -227,9 +227,8 @@ pointer_offset_bits(const typet &type, const namespacet &ns)
     return {};
 }
 
-exprt member_offset_expr(
-  const member_exprt &member_expr,
-  const namespacet &ns)
+optionalt<exprt>
+member_offset_expr(const member_exprt &member_expr, const namespacet &ns)
 {
   // need to distinguish structs and unions
   const typet &type=ns.follow(member_expr.struct_op().type());
@@ -239,10 +238,10 @@ exprt member_offset_expr(
   else if(type.id()==ID_union)
     return from_integer(0, size_type());
   else
-    return nil_exprt();
+    return {};
 }
 
-exprt member_offset_expr(
+optionalt<exprt> member_offset_expr(
   const struct_typet &type,
   const irep_idt &member,
   const namespacet &ns)
@@ -277,10 +276,10 @@ exprt member_offset_expr(
       DATA_INVARIANT(
         bit_field_bits == 0, "padding ensures offset at byte boundaries");
       const typet &subtype = c.type();
-      exprt sub_size=size_of_expr(subtype, ns);
-      if(sub_size.is_nil())
-        return nil_exprt(); // give up
-      result=plus_exprt(result, sub_size);
+      auto sub_size = size_of_expr(subtype, ns);
+      if(!sub_size.has_value())
+        return {}; // give up
+      result = plus_exprt(result, sub_size.value());
     }
   }
 
@@ -289,9 +288,7 @@ exprt member_offset_expr(
   return result;
 }
 
-exprt size_of_expr(
-  const typet &type,
-  const namespacet &ns)
+optionalt<exprt> size_of_expr(const typet &type, const namespacet &ns)
 {
   if(type.id()==ID_array)
   {
@@ -306,19 +303,20 @@ exprt size_of_expr(
         return from_integer((*bits + 7) / 8, size_type());
     }
 
-    exprt sub = size_of_expr(array_type.subtype(), ns);
-    if(sub.is_nil())
-      return nil_exprt();
+    auto sub = size_of_expr(array_type.subtype(), ns);
+    if(!sub.has_value())
+      return {};
 
     // get size
     const auto size = array_type.size();
 
     if(size.is_nil())
-      return nil_exprt();
+      return {};
 
-    const auto size_casted = typecast_exprt::conditional_cast(size, sub.type());
+    const auto size_casted =
+      typecast_exprt::conditional_cast(size, sub.value().type());
 
-    mult_exprt result(size_casted, sub);
+    mult_exprt result(size_casted, sub.value());
     simplify(result, ns);
 
     return std::move(result);
@@ -336,32 +334,33 @@ exprt size_of_expr(
         return from_integer((*bits + 7) / 8, size_type());
     }
 
-    exprt sub = size_of_expr(vector_type.subtype(), ns);
-    if(sub.is_nil())
-      return nil_exprt();
+    auto sub = size_of_expr(vector_type.subtype(), ns);
+    if(!sub.has_value())
+      return {};
 
     // get size
     const auto size = to_vector_type(type).size();
 
     if(size.is_nil())
-      return nil_exprt();
+      return {};
 
-    const auto size_casted = typecast_exprt::conditional_cast(size, sub.type());
+    const auto size_casted =
+      typecast_exprt::conditional_cast(size, sub.value().type());
 
-    mult_exprt result(size_casted, sub);
+    mult_exprt result(size_casted, sub.value());
     simplify(result, ns);
 
     return std::move(result);
   }
   else if(type.id()==ID_complex)
   {
-    exprt sub = size_of_expr(to_complex_type(type).subtype(), ns);
-    if(sub.is_nil())
-      return nil_exprt();
+    auto sub = size_of_expr(to_complex_type(type).subtype(), ns);
+    if(!sub.has_value())
+      return {};
 
-    const exprt size=from_integer(2, sub.type());
+    const exprt size = from_integer(2, sub.value().type());
 
-    mult_exprt result(size, sub);
+    mult_exprt result(size, sub.value());
     simplify(result, ns);
 
     return std::move(result);
@@ -397,11 +396,11 @@ exprt size_of_expr(
         DATA_INVARIANT(
           bit_field_bits == 0, "padding ensures offset at byte boundaries");
         const typet &subtype = c.type();
-        exprt sub_size=size_of_expr(subtype, ns);
-        if(sub_size.is_nil())
-          return nil_exprt();
+        auto sub_size_opt = size_of_expr(subtype, ns);
+        if(!sub_size_opt.has_value())
+          return {};
 
-        result=plus_exprt(result, sub_size);
+        result = plus_exprt(result, sub_size_opt.value());
       }
     }
 
@@ -429,9 +428,10 @@ exprt size_of_expr(
       {
         max_bytes=-1;
 
-        sub_size=size_of_expr(subtype, ns);
-        if(sub_size.is_nil())
-          return nil_exprt();
+        auto sub_size_opt = size_of_expr(subtype, ns);
+        if(!sub_size_opt.has_value())
+          return {};
+        sub_size = sub_size_opt.value();
       }
       else
       {
@@ -524,7 +524,7 @@ exprt size_of_expr(
     return from_integer(32/8, size_type());
   }
   else
-    return nil_exprt();
+    return {};
 }
 
 optionalt<mp_integer>
@@ -589,15 +589,14 @@ compute_pointer_offset(const exprt &expr, const namespacet &ns)
   return {}; // don't know
 }
 
-exprt build_sizeof_expr(
-  const constant_exprt &expr,
-  const namespacet &ns)
+optionalt<exprt>
+build_sizeof_expr(const constant_exprt &expr, const namespacet &ns)
 {
   const typet &type=
     static_cast<const typet &>(expr.find(ID_C_c_sizeof_type));
 
   if(type.is_nil())
-    return nil_exprt();
+    return {};
 
   const auto type_size = pointer_offset_size(type, ns);
   auto val = numeric_cast<mp_integer>(expr);
@@ -606,7 +605,7 @@ exprt build_sizeof_expr(
     !type_size.has_value() || *type_size < 0 || !val.has_value() ||
     *val < *type_size || (*type_size == 0 && *val > 0))
   {
-    return nil_exprt();
+    return {};
   }
 
   const typet t(size_type());
@@ -634,7 +633,7 @@ exprt build_sizeof_expr(
   return typecast_exprt::conditional_cast(result, expr.type());
 }
 
-exprt get_subexpression_at_offset(
+optionalt<exprt> get_subexpression_at_offset(
   const exprt &expr,
   const mp_integer &offset_bytes,
   const typet &target_type_raw,
@@ -660,7 +659,7 @@ exprt get_subexpression_at_offset(
   const typet &source_type = ns.follow(expr.type());
   const auto target_size_bits = pointer_offset_bits(target_type_raw, ns);
   if(!target_size_bits.has_value())
-    return nil_exprt();
+    return {};
 
   if(source_type.id()==ID_struct)
   {
@@ -671,7 +670,7 @@ exprt get_subexpression_at_offset(
     {
       const auto m_size_bits = pointer_offset_bits(component.type(), ns);
       if(!m_size_bits.has_value())
-        return nil_exprt();
+        return {};
 
       // if this member completely contains the target, and this member is
       // byte-aligned, recurse into it
@@ -698,7 +697,7 @@ exprt get_subexpression_at_offset(
       !elem_size_bits.has_value() || *elem_size_bits == 0 ||
       *elem_size_bits % 8 != 0)
     {
-      return nil_exprt();
+      return {};
     }
 
     if(*target_size_bits <= *elem_size_bits)
@@ -720,7 +719,7 @@ exprt get_subexpression_at_offset(
     target_type_raw);
 }
 
-exprt get_subexpression_at_offset(
+optionalt<exprt> get_subexpression_at_offset(
   const exprt &expr,
   const exprt &offset,
   const typet &target_type,
@@ -729,7 +728,7 @@ exprt get_subexpression_at_offset(
   const auto offset_bytes = numeric_cast<mp_integer>(offset);
 
   if(!offset_bytes.has_value())
-    return nil_exprt();
+    return {};
   else
     return get_subexpression_at_offset(expr, *offset_bytes, target_type, ns);
 }

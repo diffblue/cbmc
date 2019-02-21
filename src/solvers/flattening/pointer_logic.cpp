@@ -115,9 +115,10 @@ exprt pointer_logict::pointer_expr(
         from_integer(array_size - pointer.offset, array_type.size().type());
     }
   }
-  exprt deep_object =
+  auto deep_object_opt =
     get_subexpression_at_offset(object_expr, pointer.offset, subtype, ns);
-  CHECK_RETURN(deep_object.is_not_nil());
+  CHECK_RETURN(deep_object_opt.has_value());
+  exprt deep_object = deep_object_opt.value();
   simplify(deep_object, ns);
   if(deep_object.id() != byte_extract_id())
     return typecast_exprt::conditional_cast(

@@ -87,12 +87,15 @@ exprt good_pointer_def(
   const pointer_typet &pointer_type = to_pointer_type(pointer.type());
   const typet &dereference_type=pointer_type.subtype();
 
+  const auto size_of_expr_opt = size_of_expr(dereference_type, ns);
+  CHECK_RETURN(size_of_expr_opt.has_value());
+
   const or_exprt good_dynamic_tmp1(
     not_exprt(malloc_object(pointer, ns)),
     and_exprt(
       not_exprt(dynamic_object_lower_bound(pointer, nil_exprt())),
-      not_exprt(dynamic_object_upper_bound(
-        pointer, ns, size_of_expr(dereference_type, ns)))));
+      not_exprt(
+        dynamic_object_upper_bound(pointer, ns, size_of_expr_opt.value()))));
 
   const and_exprt good_dynamic_tmp2(
     not_exprt(deallocated(pointer, ns)), good_dynamic_tmp1);
@@ -106,7 +109,7 @@ exprt good_pointer_def(
 
   const or_exprt bad_other(
     object_lower_bound(pointer, nil_exprt()),
-    object_upper_bound(pointer, size_of_expr(dereference_type, ns)));
+    object_upper_bound(pointer, size_of_expr_opt.value()));
 
   const or_exprt good_other(dynamic_object(pointer), not_exprt(bad_other));
 

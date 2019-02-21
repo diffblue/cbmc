@@ -157,13 +157,13 @@ exprt allocate_objectst::allocate_dynamic_object(
   }
 
   // build size expression
-  exprt object_size = size_of_expr(allocate_type, ns);
-  INVARIANT(!object_size.is_nil(), "Size of objects should be known");
+  auto object_size = size_of_expr(allocate_type, ns);
+  INVARIANT(object_size.has_value(), "Size of objects should be known");
 
   // malloc expression
   side_effect_exprt malloc_expr(
     ID_allocate, pointer_type(allocate_type), source_location);
-  malloc_expr.copy_to_operands(object_size);
+  malloc_expr.copy_to_operands(object_size.value());
   malloc_expr.copy_to_operands(false_exprt());
 
   // create a symbol for the malloc expression so we can initialize

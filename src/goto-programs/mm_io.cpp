@@ -65,10 +65,12 @@ void mm_io(
 
           const typet &pt=ct.parameters()[0].type();
           const typet &st=ct.parameters()[1].type();
-          exprt size=size_of_expr(d.type(), ns);
+          auto size_opt = size_of_expr(d.type(), ns);
+          CHECK_RETURN(size_opt.has_value());
           const code_function_callt fc(
             mm_io_r,
-            {typecast_exprt(d.pointer(), pt), typecast_exprt(size, st)});
+            {typecast_exprt(d.pointer(), pt),
+             typecast_exprt(size_opt.value(), st)});
           goto_function.body.insert_before_swap(it);
           *it = goto_programt::make_function_call(fc, source_location);
           it++;
@@ -85,11 +87,12 @@ void mm_io(
           const typet &pt=ct.parameters()[0].type();
           const typet &st=ct.parameters()[1].type();
           const typet &vt=ct.parameters()[2].type();
-          exprt size=size_of_expr(d.type(), ns);
+          auto size_opt = size_of_expr(d.type(), ns);
+          CHECK_RETURN(size_opt.has_value());
           const code_function_callt fc(
             mm_io_w,
             {typecast_exprt(d.pointer(), pt),
-             typecast_exprt(size, st),
+             typecast_exprt(size_opt.value(), st),
              typecast_exprt(a.rhs(), vt)});
           goto_function.body.insert_before_swap(it);
           *it = goto_programt::make_function_call(fc, source_location);

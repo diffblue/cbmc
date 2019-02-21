@@ -609,11 +609,10 @@ void c_typecheck_baset::typecheck_expr_builtin_offsetof(exprt &expr)
 
           if(type.id()==ID_struct)
           {
-            exprt o=
-              member_offset_expr(
-                to_struct_type(type), component_name, *this);
+            auto o_opt =
+              member_offset_expr(to_struct_type(type), component_name, *this);
 
-            if(o.is_nil())
+            if(!o_opt.has_value())
             {
               error().source_location = expr.source_location();
               error() << "offsetof failed to determine offset of `"
@@ -621,9 +620,9 @@ void c_typecheck_baset::typecheck_expr_builtin_offsetof(exprt &expr)
               throw 0;
             }
 
-            o = typecast_exprt::conditional_cast(o, size_type());
-
-            result=plus_exprt(result, o);
+            result = plus_exprt(
+              result,
+              typecast_exprt::conditional_cast(o_opt.value(), size_type()));
           }
 
           type=struct_union_type.get_component(component_name).type();
@@ -643,10 +642,10 @@ void c_typecheck_baset::typecheck_expr_builtin_offsetof(exprt &expr)
               {
                 if(type.id()==ID_struct)
                 {
-                  exprt o = member_offset_expr(
+                  auto o_opt = member_offset_expr(
                     to_struct_type(type), c.get_name(), *this);
 
-                  if(o.is_nil())
+                  if(!o_opt.has_value())
                   {
                     error().source_location = expr.source_location();
                     error() << "offsetof failed to determine offset of `"
@@ -654,9 +653,10 @@ void c_typecheck_baset::typecheck_expr_builtin_offsetof(exprt &expr)
                     throw 0;
                   }
 
-                  o = typecast_exprt::conditional_cast(o, size_type());
-
-                  result=plus_exprt(result, o);
+                  result = plus_exprt(
+                    result,
+                    typecast_exprt::conditional_cast(
+                      o_opt.value(), size_type()));
                 }
 
                 typet tmp = follow(c.type());
@@ -695,11 +695,18 @@ void c_typecheck_baset::typecheck_expr_builtin_offsetof(exprt &expr)
       // still need to typecheck index
       typecheck_expr(index);
 
-      exprt sub_size=size_of_expr(type.subtype(), *this);
+      auto sub_size_opt = size_of_expr(type.subtype(), *this);
+
+      if(!sub_size_opt.has_value())
+      {
+        error().source_location = expr.source_location();
+        error() << "offsetof failed to determine array element size" << eom;
+        throw 0;
+      }
 
       index = typecast_exprt::conditional_cast(index, size_type());
 
-      result=plus_exprt(result, mult_exprt(sub_size, index));
+      result = plus_exprt(result, mult_exprt(sub_size_opt.value(), index));
 
       typet tmp=type.subtype();
       type=tmp;
@@ -966,18 +973,20 @@ void c_typecheck_baset::typecheck_expr_sizeof(exprt &expr)
   {
     // This is a gcc extension.
     // https://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/Pointer-Arith.html
-    new_expr = size_of_expr(char_type(), *this);
+    new_expr = from_integer(1, size_type());
   }
   else
   {
-    new_expr = size_of_expr(type, *this);
+    auto size_of_opt = size_of_expr(type, *this);
 
-    if(new_expr.is_nil())
+    if(!size_of_opt.has_value())
     {
       error().source_location = expr.source_location();
       error() << "type has no size: " << to_string(type) << eom;
       throw 0;
     }
+
+    new_expr = size_of_opt.value();
   }
 
   new_expr.swap(expr);

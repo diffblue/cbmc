@@ -86,12 +86,12 @@ goto_programt::targett remove_java_newt::lower_java_new(
   typet object_type = rhs.type().subtype();
 
   // build size expression
-  exprt object_size = size_of_expr(object_type, ns);
-  CHECK_RETURN(object_size.is_not_nil());
+  const auto object_size = size_of_expr(object_type, ns);
+  CHECK_RETURN(object_size.has_value());
 
   // we produce a malloc side-effect, which stays
   side_effect_exprt malloc_expr(ID_allocate, rhs.type(), location);
-  malloc_expr.copy_to_operands(object_size);
+  malloc_expr.copy_to_operands(*object_size);
   // could use true and get rid of the code below
   malloc_expr.copy_to_operands(false_exprt());
   *target =
@@ -138,12 +138,12 @@ goto_programt::targett remove_java_newt::lower_java_new_array(
   PRECONDITION(ns.follow(object_type).id() == ID_struct);
 
   // build size expression
-  exprt object_size = size_of_expr(object_type, ns);
-  CHECK_RETURN(!object_size.is_nil());
+  const auto object_size = size_of_expr(object_type, ns);
+  CHECK_RETURN(object_size.has_value());
 
   // we produce a malloc side-effect, which stays
   side_effect_exprt malloc_expr(ID_allocate, rhs.type(), location);
-  malloc_expr.copy_to_operands(object_size);
+  malloc_expr.copy_to_operands(*object_size);
   // code use true and get rid of the code below
   malloc_expr.copy_to_operands(false_exprt());
 

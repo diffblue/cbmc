@@ -70,14 +70,14 @@ static void build_object_descriptor_rec(
 
     build_object_descriptor_rec(ns, index.array(), dest);
 
-    exprt sub_size=size_of_expr(expr.type(), ns);
-    CHECK_RETURN(sub_size.is_not_nil());
+    auto sub_size = size_of_expr(expr.type(), ns);
+    CHECK_RETURN(sub_size.has_value());
 
     dest.offset() = plus_exprt(
       dest.offset(),
       mult_exprt(
         typecast_exprt::conditional_cast(index.index(), index_type()),
-        typecast_exprt::conditional_cast(sub_size, index_type())));
+        typecast_exprt::conditional_cast(sub_size.value(), index_type())));
   }
   else if(expr.id()==ID_member)
   {
@@ -86,11 +86,12 @@ static void build_object_descriptor_rec(
 
     build_object_descriptor_rec(ns, struct_op, dest);
 
-    exprt offset=member_offset_expr(member, ns);
-    CHECK_RETURN(offset.is_not_nil());
+    auto offset = member_offset_expr(member, ns);
+    CHECK_RETURN(offset.has_value());
 
     dest.offset() = plus_exprt(
-      dest.offset(), typecast_exprt::conditional_cast(offset, index_type()));
+      dest.offset(),
+      typecast_exprt::conditional_cast(offset.value(), index_type()));
   }
   else if(expr.id()==ID_byte_extract_little_endian ||
           expr.id()==ID_byte_extract_big_endian)
