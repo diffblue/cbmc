@@ -6,15 +6,15 @@ test:
 
 	@echo "Testing KNOWNBUG fail"
 
-	@../test.pl -p -c ../program_runner.sh -K
+	@../test.pl -e -p -c ../program_runner.sh -K
 
 tests.log:
 	pwd
-	@../test.pl -p -c ../program_runner.sh
+	@../test.pl -e -p -c ../program_runner.sh
 
 	@echo "Testing KNOWNBUG fail"
 
-	@../test.pl -p -c ../program_runner.sh -K
+	@../test.pl -e -p -c ../program_runner.sh -K
 
 show:
 	@for dir in *; do \

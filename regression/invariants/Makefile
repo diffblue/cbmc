@@ -11,10 +11,10 @@ include ../../src/config.inc
 include ../../src/common
 
 test: driver$(EXEEXT)
-	@../test.pl -p -c ../driver
+	@../test.pl -e -p -c ../driver
 
 tests.log: ../test.pl driver$(EXEEXT)
-	@../test.pl -p -c ../driver
+	@../test.pl -e -p -c ../driver
 
 show:
 	@for dir in *; do \

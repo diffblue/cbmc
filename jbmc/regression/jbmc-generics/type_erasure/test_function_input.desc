@@ -1,8 +1,8 @@
 CORE
 TestClass.class
 --function TestClass.testFunctionWithInput
-EXIT=0
-SIGNAL=0
+^EXIT=0$
+^SIGNAL=0$
 VERIFICATION SUCCESSFUL
 --
 --

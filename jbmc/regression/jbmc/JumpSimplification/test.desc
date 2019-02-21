@@ -2,8 +2,8 @@ CORE
 Test.class
 --show-goto-functions --function Test.foo
 activate-multi-line-match
-EXIT=0
-SIGNAL=0
+^EXIT=0$
+^SIGNAL=0$
 IF \w* <= 0 THEN GOTO 1\n\s*//.*\n\s*//.*\n\s*\w*::
 --
 IF !\(\w* <= 0\) THEN GOTO 1\n\s*//.*\n.*GOTO 2\n\s*//.*\n\s*//.*\n\s*1: \w*::

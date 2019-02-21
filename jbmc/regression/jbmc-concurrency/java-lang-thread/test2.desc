@@ -1,5 +1,6 @@
 CORE
 A.class
 --function 'A.me2:()V' --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar` --java-threading
+^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$

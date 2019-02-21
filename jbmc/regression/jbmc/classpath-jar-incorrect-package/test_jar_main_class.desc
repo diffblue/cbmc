@@ -2,6 +2,7 @@ KNOWNBUG
 test.jar
 --main-class Test.class
 ^EXIT=6$
+^SIGNAL=0$
 --
 Java main class: Test
 failed to open input file `Test.class'

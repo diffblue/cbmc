@@ -6,7 +6,7 @@ test:
 ifeq (, $(shell which jq))
 	echo "JBMC JSON-UI tests skipped (can't find 'jq' in your path)"
 else
-	@../$(CPROVER_DIR)/regression/test.pl -p -c "../chain.sh ../../../src/jbmc/jbmc"
+	@../$(CPROVER_DIR)/regression/test.pl -e -p -c "../chain.sh ../../../src/jbmc/jbmc"
 endif
 
 tests.log: ../$(CPROVER_DIR)/regression/test.pl test

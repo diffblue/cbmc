@@ -1,6 +1,8 @@
 CORE symex-driven-lazy-loading-expected-failure
 A.class
 --reachability-slice --function A.foo --show-goto-functions
+^EXIT=0$
+^SIGNAL=0$
 = \(int\)\(short\)1001
 = \(int\)\(short\)1002
 = \(int\)\(short\)1003

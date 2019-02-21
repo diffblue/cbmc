@@ -3,6 +3,8 @@ test.txt
 
 activate-multi-line-match
 Hello\nAnother\nWorld
+^EXIT=0$
+^SIGNAL=0$
 --
 --
 This isn't really a known bug perse, instead this test should fail (since these

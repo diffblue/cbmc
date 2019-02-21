@@ -11,11 +11,11 @@ tests.log: ../test.pl
 else
 test:
 	-@ln -s goto-cc ../../src/goto-cc/goto-gcc
-	@../test.pl -p -c ../../../src/goto-cc/goto-gcc
+	@../test.pl -e -p -c ../../../src/goto-cc/goto-gcc
 
 tests.log: ../test.pl
 	-@ln -s goto-cc ../../src/goto-cc/goto-gcc
-	@../test.pl -p -c ../../../src/goto-cc/goto-gcc
+	@../test.pl -e -p -c ../../../src/goto-cc/goto-gcc
 
 endif
 

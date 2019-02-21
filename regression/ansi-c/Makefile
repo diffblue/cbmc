@@ -10,10 +10,10 @@ else
 endif
 
 test:
-	@../test.pl -p -c $(exe)
+	@../test.pl -e -p -c $(exe)
 
 tests.log: ../test.pl
-	@../test.pl -p -c $(exe)
+	@../test.pl -e -p -c $(exe)
 
 show:
 	@for dir in *; do \

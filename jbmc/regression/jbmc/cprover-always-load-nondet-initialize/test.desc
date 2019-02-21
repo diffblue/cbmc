@@ -1,8 +1,8 @@
 KNOWNBUG
 Test.class
 --function Test.test --show-goto-functions
-EXIT=0
-SIGNAL=0
+^EXIT=0$
+^SIGNAL=0$
 ObjectWithNondetInitialize\.cproverNondetInitialize\(\)
 --
 --

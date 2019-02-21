@@ -12,11 +12,11 @@ else
 endif
 
 test:
-	@../test.pl -p -c '../chain.sh $(exe) ../../../src/goto-analyzer/goto-analyzer $(is_windows)'
+	@../test.pl -e -p -c '../chain.sh $(exe) ../../../src/goto-analyzer/goto-analyzer $(is_windows)'
 
 tests.log:
 	pwd
-	@../test.pl -p -c '../chain.sh $(exe) ../../../src/goto-analyzer/goto-analyzer $(is_windows)'
+	@../test.pl -e -p -c '../chain.sh $(exe) ../../../src/goto-analyzer/goto-analyzer $(is_windows)'
 
 show:
 	@for dir in *; do \

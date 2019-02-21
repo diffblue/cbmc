@@ -9,4 +9,6 @@ block 5 \(lines main.c:main:20\): SATISFIED
 block 6 \(lines main.c:main:15,21,22\): SATISFIED
 block 7 \(lines main.c:main:24,25\): SATISFIED
 block 1 \(lines main.c:foo:6-9\): SATISFIED
+^EXIT=0$
+^SIGNAL=0$
 --

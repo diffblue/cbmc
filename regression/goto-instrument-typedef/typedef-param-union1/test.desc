@@ -3,8 +3,8 @@ main.c
 --show-symbol-table
 // Enable multi-line checking
 activate-multi-line-match
-EXIT=0
-SIGNAL=0
+^EXIT=0$
+^SIGNAL=0$
 Base name\.+: tag_union_param\nMode\.+: C\nType\.+: union tag_union_name
 Base name\.+: myunion_param\nMode\.+: C\nType\.+: MYUNION
 --

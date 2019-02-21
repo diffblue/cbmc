@@ -4,8 +4,8 @@ main.c
 activate-multi-line-match
 main -> moo\nmain -> foo
 foo -> moo\nfoo -> boo
-SIGNAL=0
-EXIT=0
+^SIGNAL=0$
+^EXIT=0$
 --
 main -> boo
 boo -> foo

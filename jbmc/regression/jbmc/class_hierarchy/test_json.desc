@@ -2,6 +2,6 @@ CORE symex-driven-lazy-loading-expected-failure
 HierarchyTest.class
 --show-class-hierarchy --json-ui
 activate-multi-line-match
-EXIT=0
-SIGNAL=0
+^EXIT=0$
+^SIGNAL=0$
 \{\n *"isAbstract": true,\n *"name": "java::HierarchyTest",\n *"parents": \[\n *"java::java.lang.Object"\n *\],\n *"children": \[\n *"java::HierarchyTestChild(1|2)",\n *"java::HierarchyTestChild(1|2)"\n *\]\n *\},\n *\{\n *"isAbstract": false,\n *"name": "java::HierarchyTestGrandchild",\n *"parents": \[\n *"java::HierarchyTestChild1",\n *"java::HierarchyTestInterface1",\n *"java::HierarchyTestInterface2"\n *\],\n *"children": \[\n *\]\n *\},\n *\{\n *"isAbstract": false,\n *"name": "java::HierarchyTestChild2",\n *"parents": \[\n *"java::HierarchyTest"\n *\],\n *"children": \[\n *\]\n *\},\n *\{\n *"isAbstract": false,\n *"name": "java::HierarchyTestChild1",\n *"parents": \[\n *"java::HierarchyTest"\n *\],\n *"children": \[\n *"java::HierarchyTestGrandchild"\n *\]\n *\},\n *\{\n *"isAbstract": true,\n *"name": "java::HierarchyTestInterface1",\n *"parents": \[\n *"java::java.lang.Object"\n *\],\n *"children": \[\n *"java::HierarchyTestGrandchild"\n *\]\n *\},\n *\{\n *"isAbstract": true,\n *"name": "java::HierarchyTestInterface2",\n *"parents": \[\n *"java::java.lang.Object"\n *\],\n *"children": \[\n *"java::HierarchyTestGrandchild"\n *\]\n *\},

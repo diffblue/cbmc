@@ -1,6 +1,8 @@
 CORE
 test.c
 --reachability-slice-fb --show-goto-functions
+^EXIT=0$
+^SIGNAL=0$
 target_kept
 reachable_before_target_caller_1_kept
 reachable_after_target_caller_1_kept
