@@ -15,15 +15,15 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <list>
 
 #include <util/decision_procedure.h>
-#include <util/message.h>
 
 #include "literal.h"
 
+class message_handlert;
 class prop_convt;
 
 /// Try to cover some given set of goals incrementally. This can be seen as a
 /// heuristic variant of SAT-based set-cover. No minimality guarantee.
-class cover_goalst:public messaget
+class cover_goalst
 {
 public:
   explicit cover_goalst(prop_convt &_prop_conv):
@@ -36,7 +36,7 @@ public:
   virtual ~cover_goalst();
 
   // returns result of last run on success
-  decision_proceduret::resultt operator()();
+  decision_proceduret::resultt operator()(message_handlert &);
 
   // the goals
 

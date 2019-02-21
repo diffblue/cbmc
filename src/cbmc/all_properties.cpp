@@ -97,7 +97,6 @@ safety_checkert::resultt bmc_all_propertiest::operator()()
 
   cover_goalst cover_goals(solver);
 
-  cover_goals.set_message_handler(get_message_handler());
   cover_goals.register_observer(*this);
 
   for(const auto &g : goal_map)
@@ -112,7 +111,8 @@ safety_checkert::resultt bmc_all_propertiest::operator()()
 
   bool error=false;
 
-  decision_proceduret::resultt result=cover_goals();
+  const decision_proceduret::resultt result =
+    cover_goals(get_message_handler());
 
   if(result==decision_proceduret::resultt::D_ERROR)
   {
