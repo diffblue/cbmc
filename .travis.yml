@@ -201,7 +201,7 @@ jobs:
         - cmake --build build -- -j4
       script: (cd build; bin/unit "[core][irept]")
 
-    # cmake build using g++-7, enable CMAKE_USE_CUDD
+    # cmake build using g++-7, enable CMAKE_USE_CUDD and BDD_GUARDS
     - stage: Test different OS/CXX/Flags
       os: linux
       sudo: false
@@ -223,7 +223,7 @@ jobs:
       install:
         - ccache -z
         - ccache --max-size=1G
-        - cmake -H. -Bbuild '-DCMAKE_BUILD_TYPE=Release'  '-DCMAKE_CXX_COMPILER=/usr/bin/g++-7' '-DCMAKE_USE_CUDD=true'
+        - cmake -H. -Bbuild '-DCMAKE_BUILD_TYPE=Release'  '-DCMAKE_CXX_COMPILER=/usr/bin/g++-7' '-DCMAKE_USE_CUDD=true' -DCMAKE_CXX_FLAGS="-DBDD_GUARDS"
         - git submodule update --init --recursive
         - cmake --build build -- -j4
       script: (cd build; ctest -V -L CORE -j2)
