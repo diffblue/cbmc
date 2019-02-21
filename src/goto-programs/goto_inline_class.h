@@ -178,13 +178,13 @@ protected:
   void parameter_assignments(
     const goto_programt::targett target,
     const irep_idt &function_name,
-    const code_typet &code_type,
+    const goto_functiont::parameter_identifierst &parameter_identifiers,
     const exprt::operandst &arguments,
     goto_programt &dest);
 
   void parameter_destruction(
     const goto_programt::targett target,
-    const code_typet &code_type,
+    const goto_functiont::parameter_identifierst &parameter_identifiers,
     goto_programt &dest);
 
   // goto functions that were already inlined transitively
