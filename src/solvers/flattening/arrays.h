@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_SOLVERS_FLATTENING_ARRAYS_H
 #define CPROVER_SOLVERS_FLATTENING_ARRAYS_H
 
+#include <list>
 #include <set>
 
 #include <util/union_find.h>

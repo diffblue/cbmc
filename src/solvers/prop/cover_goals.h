@@ -12,9 +12,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_SOLVERS_PROP_COVER_GOALS_H
 #define CPROVER_SOLVERS_PROP_COVER_GOALS_H
 
+#include <list>
+
+#include <util/decision_procedure.h>
 #include <util/message.h>
 
-#include "prop_conv.h"
+#include "literal.h"
+
+class prop_convt;
 
 /// Try to cover some given set of goals incrementally. This can be seen as a
 /// heuristic variant of SAT-based set-cover. No minimality guarantee.

@@ -11,7 +11,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_ASSEMBLER_ASSEMBLER_PARSER_H
 
 #include <util/parser.h>
-#include <util/expr.h>
+
+#include <list>
 
 int yyassemblerlex();
 int yyassemblererror(const std::string &error);

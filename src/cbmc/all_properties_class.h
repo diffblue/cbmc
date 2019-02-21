@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_CBMC_ALL_PROPERTIES_CLASS_H
 
 #include <solvers/prop/cover_goals.h>
+#include <solvers/prop/literal_expr.h>
 
 #include "bmc.h"
 
