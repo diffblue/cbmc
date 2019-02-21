@@ -11,9 +11,11 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #define CPROVER_JAVA_BYTECODE_EXPR2JAVA_H
 
 #include <cmath>
+#include <limits>
 #include <numeric>
 #include <sstream>
 #include <string>
+
 #include <ansi-c/expr2c_class.h>
 
 class expr2javat:public expr2ct

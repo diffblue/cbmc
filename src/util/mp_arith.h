@@ -10,12 +10,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_UTIL_MP_ARITH_H
 #define CPROVER_UTIL_MP_ARITH_H
 
-#include <string>
 #include <iosfwd>
-#include <limits>
+#include <string>
 
 #include "big-int/bigint.hh"
-#include "optional.h"
 #include "deprecate.h"
 
 // NOLINTNEXTLINE(readability/identifiers)
