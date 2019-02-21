@@ -219,17 +219,16 @@ void remove_vector(goto_functionst::goto_functiont &goto_function)
 {
   remove_vector(goto_function.type);
 
-  Forall_goto_program_instructions(it, goto_function.body)
-  {
-    remove_vector(it->code);
-
-    if(it->has_condition())
-    {
-      exprt c = it->get_condition();
-      remove_vector(c);
-      it->set_condition(c);
-    }
-  }
+  for(auto &i : goto_function.body.instructions)
+    i.transform([](exprt e) -> optionalt<exprt> {
+      if(have_to_remove_vector(e))
+      {
+        remove_vector(e);
+        return e;
+      }
+      else
+        return {};
+    });
 }
 
 /// removes vector data type

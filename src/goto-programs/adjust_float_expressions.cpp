@@ -197,17 +197,16 @@ void adjust_float_expressions(
   goto_functionst::goto_functiont &goto_function,
   const namespacet &ns)
 {
-  Forall_goto_program_instructions(it, goto_function.body)
-  {
-    adjust_float_expressions(it->code, ns);
-
-    if(it->has_condition())
-    {
-      exprt c = it->get_condition();
-      adjust_float_expressions(c, ns);
-      it->set_condition(c);
-    }
-  }
+  for(auto &i : goto_function.body.instructions)
+    i.transform([&ns](exprt expr) -> optionalt<exprt> {
+      if(have_to_adjust_float_expressions(expr))
+      {
+        adjust_float_expressions(expr, ns);
+        return expr;
+      }
+      else
+        return {};
+    });
 }
 
 void adjust_float_expressions(

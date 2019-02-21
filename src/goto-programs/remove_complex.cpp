@@ -285,17 +285,16 @@ static void remove_complex(
 {
   remove_complex(goto_function.type);
 
-  Forall_goto_program_instructions(it, goto_function.body)
-  {
-    remove_complex(it->code);
-
-    if(it->has_condition())
-    {
-      exprt c = it->get_condition();
-      remove_complex(c);
-      it->set_condition(c);
-    }
-  }
+  for(auto &i : goto_function.body.instructions)
+    i.transform([](exprt e) -> optionalt<exprt> {
+      if(have_to_remove_complex(e))
+      {
+        remove_complex(e);
+        return e;
+      }
+      else
+        return {};
+    });
 }
 
 /// removes complex data type
