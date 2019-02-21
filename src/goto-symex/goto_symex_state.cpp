@@ -266,91 +266,92 @@ void goto_symex_statet::rename(
   const namespacet &ns,
   levelt level)
 {
-  // rename all the symbols with their last known value
-
-  if(expr.id()==ID_symbol &&
-     expr.get_bool(ID_C_SSA_symbol))
+  // This condition is just here to increase indentation, to make the following
+  // commit diffs nicer.
+  if(true)
   {
-    ssa_exprt &ssa=to_ssa_expr(expr);
+    // rename all the symbols with their last known value
 
-    if(level == L0)
+    if(expr.id() == ID_symbol && expr.get_bool(ID_C_SSA_symbol))
     {
-      set_l0_indices(ssa, ns);
-      rename(expr.type(), ssa.get_identifier(), ns, level);
-      ssa.update_type();
-    }
-    else if(level == L1)
-    {
-      set_l1_indices(ssa, ns);
-      rename(expr.type(), ssa.get_identifier(), ns, level);
-      ssa.update_type();
-    }
-    else if(level==L2)
-    {
-      set_l1_indices(ssa, ns);
-      rename(expr.type(), ssa.get_identifier(), ns, level);
-      ssa.update_type();
+      ssa_exprt &ssa = to_ssa_expr(expr);
 
-      if(l2_thread_read_encoding(ssa, ns))
+      if(level == L0)
       {
-        // renaming taken care of by l2_thread_encoding
+        set_l0_indices(ssa, ns);
+        rename(expr.type(), ssa.get_identifier(), ns, level);
+        ssa.update_type();
       }
-      else if(!ssa.get_level_2().empty())
+      else if(level == L1)
       {
-        // already at L2
+        set_l1_indices(ssa, ns);
+        rename(expr.type(), ssa.get_identifier(), ns, level);
+        ssa.update_type();
       }
-      else
+      else if(level == L2)
       {
-        // We also consider propagation if we go up to L2.
-        // L1 identifiers are used for propagation!
-        auto p_it = propagation.find(ssa.get_identifier());
+        set_l1_indices(ssa, ns);
+        rename(expr.type(), ssa.get_identifier(), ns, level);
+        ssa.update_type();
 
-        if(p_it != propagation.end())
-          expr=p_it->second; // already L2
+        if(l2_thread_read_encoding(ssa, ns))
+        {
+          // renaming taken care of by l2_thread_encoding
+        }
+        else if(!ssa.get_level_2().empty())
+        {
+          // already at L2
+        }
         else
-          set_l2_indices(ssa, ns);
+        {
+          // We also consider propagation if we go up to L2.
+          // L1 identifiers are used for propagation!
+          auto p_it = propagation.find(ssa.get_identifier());
+
+          if(p_it != propagation.end())
+            expr = p_it->second; // already L2
+          else
+            set_l2_indices(ssa, ns);
+        }
       }
     }
-  }
-  else if(expr.id()==ID_symbol)
-  {
-    // we never rename function symbols
-    if(expr.type().id() == ID_code)
+    else if(expr.id() == ID_symbol)
     {
-      rename(
-        expr.type(),
-        to_symbol_expr(expr).get_identifier(),
-        ns,
-        level);
+      // we never rename function symbols
+      if(expr.type().id() == ID_code)
+      {
+        rename(expr.type(), to_symbol_expr(expr).get_identifier(), ns, level);
 
-      return;
+        return;
+      }
+
+      expr = ssa_exprt(expr);
+      rename(expr, ns, level);
     }
+    else if(expr.id() == ID_address_of)
+    {
+      auto &address_of_expr = to_address_of_expr(expr);
+      rename_address(address_of_expr.object(), ns, level);
+      to_pointer_type(expr.type()).subtype() = address_of_expr.object().type();
+    }
+    else
+    {
+      rename(expr.type(), irep_idt(), ns, level);
 
-    expr=ssa_exprt(expr);
-    rename(expr, ns, level);
-  }
-  else if(expr.id()==ID_address_of)
-  {
-    auto &address_of_expr = to_address_of_expr(expr);
-    rename_address(address_of_expr.object(), ns, level);
-    to_pointer_type(expr.type()).subtype() = address_of_expr.object().type();
-  }
-  else
-  {
-    rename(expr.type(), irep_idt(), ns, level);
+      // do this recursively
+      Forall_operands(it, expr)
+        rename(*it, ns, level);
 
-    // do this recursively
-    Forall_operands(it, expr)
-      rename(*it, ns, level);
-
-    INVARIANT(
-      (expr.id() != ID_with ||
-       expr.type() == to_with_expr(expr).old().type()) &&
-        (expr.id() != ID_if ||
-         (expr.type() == to_if_expr(expr).true_case().type() &&
-          expr.type() == to_if_expr(expr).false_case().type())),
-      "Type of renamed expr should be the same as operands for with_exprt and "
-      "if_exprt");
+      INVARIANT(
+        (expr.id() != ID_with ||
+         expr.type() == to_with_expr(expr).old().type()) &&
+          (expr.id() != ID_if ||
+           (expr.type() == to_if_expr(expr).true_case().type() &&
+            expr.type() == to_if_expr(expr).false_case().type())),
+        "Type of renamed expr should be the same as operands for with_exprt "
+        "and "
+        "if_exprt");
+    }
   }
 }
 
