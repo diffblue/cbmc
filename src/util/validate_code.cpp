@@ -43,6 +43,10 @@ void call_on_code(const codet &code, Args &&... args)
   {
     CALL_ON_CODE(code_returnt);
   }
+  else if(code.get_statement() == ID_block)
+  {
+    CALL_ON_CODE(code_blockt);
+  }
   else
   {
 #ifdef REPORT_UNIMPLEMENTED_CODE_CHECKS
