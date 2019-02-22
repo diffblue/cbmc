@@ -49,7 +49,7 @@ inline bool is_c_int_derivate(const typet &type)
 /// of the pointer has been a char type in the c program.
 inline bool is_c_char_pointer(const typet &type)
 {
-  return is_pointer(type) && is_c_char(type.subtype());
+  return type.id() == ID_pointer && is_c_char(type.subtype());
 }
 
 /// This function checks, whether type is a pointer and the target type
@@ -57,7 +57,7 @@ inline bool is_c_char_pointer(const typet &type)
 /// is_c_int_derivate answers is used for checking the int type.
 inline bool is_c_int_derivate_pointer(const typet &type)
 {
-  return is_pointer(type) && is_c_int_derivate(type.subtype());
+  return type.id() == ID_pointer && is_c_int_derivate(type.subtype());
 }
 
 /// This function checks, whether the type
@@ -73,7 +73,7 @@ inline bool is_c_enum(const typet &type)
 /// \param c_enum the enum type memeber_name is supposed to be part of.
 /// \return value a constant, that could be assigned as value for an expression
 /// with type c_enum.
-constant_exprt convert_memeber_name_to_enum_value(
+constant_exprt convert_member_name_to_enum_value(
   const std::string &member_name,
   const c_enum_typet &c_enum)
 {
