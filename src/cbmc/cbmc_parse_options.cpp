@@ -860,7 +860,12 @@ bool cbmc_parse_optionst::process_goto_program(
     // instrument cover goals
     if(options.is_set("cover"))
     {
-      if(instrument_cover_goals(options, goto_model, log.get_message_handler()))
+      const auto cover_config = get_cover_config(
+        options, goto_model.symbol_table, log.get_message_handler());
+      if(!cover_config)
+        return true;
+      if(instrument_cover_goals(
+           options, *cover_config, goto_model, log.get_message_handler()))
         return true;
     }
 

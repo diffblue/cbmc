@@ -329,11 +329,13 @@ void instrument_cover_goals(
 
 /// Instruments goto functions based on given command line options
 /// \param options: the options
+/// \param cover_config: configuration, produced using get_cover_config
 /// \param symbol_table: the symbol table
 /// \param goto_functions: the goto functions
 /// \param message_handler: a message handler
 bool instrument_cover_goals(
   const optionst &options,
+  const cover_configt &cover_config,
   const symbol_tablet &symbol_table,
   goto_functionst &goto_functions,
   message_handlert &message_handler)
@@ -342,13 +344,8 @@ bool instrument_cover_goals(
   msg.status() << "Rewriting existing assertions as assumptions"
                << messaget::eom;
 
-  std::unique_ptr<cover_configt> cover_config =
-    get_cover_config(options, symbol_table, message_handler);
-  if(!cover_config)
-    return true;
-
   if(
-    cover_config->traces_must_terminate &&
+    cover_config.traces_must_terminate &&
     !goto_functions.function_map.count(goto_functions.entry_point()))
   {
     msg.error() << "cover-traces-must-terminate: invalid entry point ["
@@ -359,29 +356,31 @@ bool instrument_cover_goals(
   Forall_goto_functions(f_it, goto_functions)
   {
     const symbolt function_symbol = symbol_table.lookup_ref(f_it->first);
-    cover_config->mode = function_symbol.mode;
     instrument_cover_goals(
-      *cover_config, function_symbol, f_it->second, message_handler);
+      cover_config, function_symbol, f_it->second, message_handler);
   }
   goto_functions.compute_location_numbers();
 
-  cover_config->function_filters.report_anomalies();
-  cover_config->goal_filters.report_anomalies();
+  cover_config.function_filters.report_anomalies();
+  cover_config.goal_filters.report_anomalies();
 
   return false;
 }
 
 /// Instruments a goto model based on given command line options
 /// \param options: the options
+/// \param cover_config: configuration, produced using get_cover_config
 /// \param goto_model: the goto model
 /// \param message_handler: a message handler
 bool instrument_cover_goals(
   const optionst &options,
+  const cover_configt &cover_config,
   goto_modelt &goto_model,
   message_handlert &message_handler)
 {
   return instrument_cover_goals(
     options,
+    cover_config,
     goto_model.symbol_table,
     goto_model.goto_functions,
     message_handler);

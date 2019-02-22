@@ -14,7 +14,6 @@ Date: May 2016
 #ifndef CPROVER_GOTO_INSTRUMENT_COVER_H
 #define CPROVER_GOTO_INSTRUMENT_COVER_H
 
-#include <goto-programs/goto_model.h>
 #include "cover_filter.h"
 #include "cover_instrument.h"
 
@@ -46,12 +45,14 @@ struct cover_configt
 
 void instrument_cover_goals(
   const symbol_tablet &,
+  const cover_configt &,
   goto_functionst &,
   coverage_criteriont,
   message_handlert &message_handler);
 
 void instrument_cover_goals(
   const symbol_tablet &,
+  const cover_configt &,
   goto_programt &,
   coverage_criteriont,
   message_handlert &message_handler);
@@ -68,12 +69,14 @@ void parse_cover_options(const cmdlinet &, optionst &);
 
 bool instrument_cover_goals(
   const optionst &,
+  const cover_configt &,
   const symbol_tablet &,
   goto_functionst &,
   message_handlert &);
 
 bool instrument_cover_goals(
   const optionst &,
+  const cover_configt &,
   goto_modelt &,
   message_handlert &);
 
