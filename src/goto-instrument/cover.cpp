@@ -251,13 +251,13 @@ cover_configt get_cover_config(
 /// Build data structures controlling coverage from command-line options.
 /// Include options that depend on the main function specified by the user.
 /// \param options: command-line options
-/// \param main_id: symbol of the user-specified main program function
+/// \param main_function_id: symbol of the user-specified main program function
 /// \param symbol_table: global symbol table
 /// \param message_handler: used to log incorrect option specifications
 /// \return a cover_configt on success, or null otherwise.
 cover_configt get_cover_config(
   const optionst &options,
-  const irep_idt &main_id,
+  const irep_idt &main_function_id,
   const symbol_tablet &symbol_table,
   message_handlert &message_handler)
 {
@@ -269,13 +269,13 @@ cover_configt get_cover_config(
   // cover entry point function only
   if(cover_only == "function")
   {
-    const symbolt &main_symbol = symbol_table.lookup_ref(main_id);
+    const symbolt &main_symbol = symbol_table.lookup_ref(main_function_id);
     cover_config.function_filters.add(util_make_unique<single_function_filtert>(
       message_handler, main_symbol.name));
   }
   else if(cover_only == "file")
   {
-    const symbolt &main_symbol = symbol_table.lookup_ref(main_id);
+    const symbolt &main_symbol = symbol_table.lookup_ref(main_function_id);
     cover_config.function_filters.add(util_make_unique<file_filtert>(
       message_handler, main_symbol.location.get_file()));
   }
