@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cstdlib>
 #include <iostream>
 
+#include <util/as_const.h>
 #include <util/base_exceptions.h>
 #include <util/exception_utils.h>
 #include <util/expr_util.h>
@@ -315,7 +316,7 @@ void goto_symex_statet::rename(
   else if(expr.id()==ID_symbol)
   {
     // we never rename function symbols
-    if(expr.type().id() == ID_code)
+    if(as_const(expr).type().id() == ID_code)
     {
       rename(
         expr.type(),
@@ -333,7 +334,8 @@ void goto_symex_statet::rename(
   {
     auto &address_of_expr = to_address_of_expr(expr);
     rename_address(address_of_expr.object(), ns, level);
-    to_pointer_type(expr.type()).subtype() = address_of_expr.object().type();
+    to_pointer_type(expr.type()).subtype() =
+      as_const(address_of_expr).object().type();
   }
   else
   {
@@ -343,12 +345,13 @@ void goto_symex_statet::rename(
     Forall_operands(it, expr)
       rename(*it, ns, level);
 
+    const exprt &c_expr = as_const(expr);
     INVARIANT(
       (expr.id() != ID_with ||
-       expr.type() == to_with_expr(expr).old().type()) &&
+       c_expr.type() == to_with_expr(c_expr).old().type()) &&
         (expr.id() != ID_if ||
-         (expr.type() == to_if_expr(expr).true_case().type() &&
-          expr.type() == to_if_expr(expr).false_case().type())),
+         (c_expr.type() == to_if_expr(c_expr).true_case().type() &&
+          c_expr.type() == to_if_expr(c_expr).false_case().type())),
       "Type of renamed expr should be the same as operands for with_exprt and "
       "if_exprt");
   }
