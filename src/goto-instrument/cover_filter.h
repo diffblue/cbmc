@@ -156,6 +156,42 @@ public:
     const goto_functionst::goto_functiont &goto_function) const override;
 };
 
+class file_filtert : public function_filter_baset
+{
+public:
+  explicit file_filtert(
+    message_handlert &message_handler,
+    const irep_idt &file_id)
+    : function_filter_baset(message_handler), file_id(file_id)
+  {
+  }
+
+  bool operator()(
+    const symbolt &identifier,
+    const goto_functionst::goto_functiont &goto_function) const override;
+
+private:
+  irep_idt file_id;
+};
+
+class single_function_filtert : public function_filter_baset
+{
+public:
+  explicit single_function_filtert(
+    message_handlert &message_handler,
+    const irep_idt &function_id)
+    : function_filter_baset(message_handler), function_id(function_id)
+  {
+  }
+
+  bool operator()(
+    const symbolt &identifier,
+    const goto_functionst::goto_functiont &goto_function) const override;
+
+private:
+  irep_idt function_id;
+};
+
 /// Filters functions that match the provided pattern
 class include_pattern_filtert : public function_filter_baset
 {

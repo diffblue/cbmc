@@ -165,23 +165,29 @@ parse_coverage_criterion(const std::string &criterion_string)
 void parse_cover_options(const cmdlinet &cmdline, optionst &options)
 {
   options.set_option("cover", cmdline.get_values("cover"));
-  std::string cover_include_pattern =
-    cmdline.get_value("cover-include-pattern");
-  if(cmdline.isset("cover-function-only"))
-  {
-    std::regex special_characters(
-      "\\.|\\\\|\\*|\\+|\\?|\\{|\\}|\\[|\\]|\\(|\\)|\\^|\\$|\\|");
-    cover_include_pattern =
-      ".*" + std::regex_replace(config.main, special_characters, "\\$&") + ".*";
-  }
-  options.set_option("cover-include-pattern", cover_include_pattern);
+  options.set_option(
+    "cover-include-pattern", cmdline.get_value("cover-include-pattern"));
   options.set_option("no-trivial-tests", cmdline.isset("no-trivial-tests"));
+
+  std::string cover_only = cmdline.get_value("cover-only");
+
+  if(!cover_only.empty() && cmdline.isset("cover-function-only"))
+    throw invalid_command_line_argument_exceptiont(
+      "at most one of --cover-only and --cover-function-only can be used",
+      "--cover-only");
+
+  options.set_option("cover-only", cmdline.get_value("cover-only"));
+  if(cmdline.isset("cover-function-only"))
+    options.set_option("cover-only", "function");
+
   options.set_option(
     "cover-traces-must-terminate",
     cmdline.isset("cover-traces-must-terminate"));
 }
 
 /// Build data structures controlling coverage from command-line options.
+/// Do not include the options that depend on the main function specified by the
+/// user.
 /// \param options: command-line options
 /// \param symbol_table: global symbol table
 /// \param message_handler: used to log incorrect option specifications
@@ -231,7 +237,6 @@ std::unique_ptr<cover_configt> get_cover_config(
     return {};
   }
 
-  // cover entry point function only
   std::string cover_include_pattern =
     options.get_option("cover-include-pattern");
   if(!cover_include_pattern.empty())
@@ -247,6 +252,51 @@ std::unique_ptr<cover_configt> get_cover_config(
 
   cover_config->traces_must_terminate =
     options.get_bool_option("cover-traces-must-terminate");
+
+  return cover_config;
+}
+
+/// Build data structures controlling coverage from command-line options.
+/// Include options that depend on the main function specified by the user.
+/// \param options: command-line options
+/// \param main_id: symbol of the user-specified main program function
+/// \param symbol_table: global symbol table
+/// \param message_handler: used to log incorrect option specifications
+/// \return a cover_configt on success, or null otherwise.
+std::unique_ptr<cover_configt> get_cover_config(
+  const optionst &options,
+  const irep_idt &main_id,
+  const symbol_tablet &symbol_table,
+  message_handlert &message_handler)
+{
+  messaget msg(message_handler);
+  std::unique_ptr<cover_configt> cover_config =
+    get_cover_config(options, symbol_table, message_handler);
+
+  if(!cover_config)
+    return {};
+
+  std::string cover_only = options.get_option("cover-only");
+  const symbolt main_symbol = symbol_table.lookup_ref(main_id);
+
+  // cover entry point function only
+  if(cover_only == "function")
+  {
+    cover_config->function_filters.add(
+      util_make_unique<single_function_filtert>(
+        message_handler, main_symbol.name));
+  }
+  else if(cover_only == "file")
+  {
+    cover_config->function_filters.add(util_make_unique<file_filtert>(
+      message_handler, main_symbol.location.get_file()));
+  }
+  else if(!cover_only.empty())
+  {
+    msg.error() << "Argument to --cover-only not recognized: " << cover_only
+                << messaget::eom;
+    return {};
+  }
 
   return cover_config;
 }
@@ -286,11 +336,14 @@ static void instrument_cover_goals(
 
   if(cover_config.function_filters(function_symbol, function))
   {
+    messaget msg(message_handler);
+    msg.debug() << "Instrumenting coverage for function "
+                << id2string(function_symbol.name) << messaget::eom;
     instrument_cover_goals(
       function_symbol.name,
       function.body,
       cover_config.cover_instrumenters,
-      cover_config.mode,
+      function_symbol.mode,
       message_handler);
     changed = true;
   }

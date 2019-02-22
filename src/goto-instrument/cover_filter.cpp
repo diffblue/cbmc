@@ -45,6 +45,34 @@ bool internal_functions_filtert::operator()(
   return true;
 }
 
+/// Filter out all functions except those defined in the file that is given
+/// in the constructor.
+/// \param function: the function under consideration
+/// \param goto_function: a goto function
+/// \return returns true if `function` is defined in the file
+/// given in the constructor
+bool file_filtert::operator()(
+  const symbolt &function,
+  const goto_functionst::goto_functiont &goto_function) const
+{
+  (void)goto_function; // unused parameter
+  return function.location.get_file() == file_id;
+}
+
+/// Filter out all functions except for one particular function given
+/// in the constructor.
+/// \param function: the function under consideration
+/// \param goto_function: a goto function
+/// \return returns true if `function` is different from the
+/// function given in the constructor
+bool single_function_filtert::operator()(
+  const symbolt &function,
+  const goto_functionst::goto_functiont &goto_function) const
+{
+  (void)goto_function; // unused parameter
+  return function.name == function_id;
+}
+
 /// Filter functions whose name matches the regex
 /// \param function: the function under consideration
 /// \param goto_function: a goto function
