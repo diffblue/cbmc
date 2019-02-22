@@ -74,14 +74,12 @@ void instrument_cover_goals(
 void parse_cover_options(const cmdlinet &, optionst &);
 
 bool instrument_cover_goals(
-  const optionst &,
   const cover_configt &,
   const symbol_tablet &,
   goto_functionst &,
   message_handlert &);
 
 bool instrument_cover_goals(
-  const optionst &,
   const cover_configt &,
   goto_modelt &,
   message_handlert &);

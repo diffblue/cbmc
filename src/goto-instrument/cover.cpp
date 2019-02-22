@@ -369,13 +369,11 @@ void instrument_cover_goals(
 }
 
 /// Instruments goto functions based on given command line options
-/// \param options: the options
 /// \param cover_config: configuration, produced using get_cover_config
 /// \param symbol_table: the symbol table
 /// \param goto_functions: the goto functions
 /// \param message_handler: a message handler
 bool instrument_cover_goals(
-  const optionst &options,
   const cover_configt &cover_config,
   const symbol_tablet &symbol_table,
   goto_functionst &goto_functions,
@@ -409,18 +407,15 @@ bool instrument_cover_goals(
 }
 
 /// Instruments a goto model based on given command line options
-/// \param options: the options
 /// \param cover_config: configuration, produced using get_cover_config
 /// \param goto_model: the goto model
 /// \param message_handler: a message handler
 bool instrument_cover_goals(
-  const optionst &options,
   const cover_configt &cover_config,
   goto_modelt &goto_model,
   message_handlert &message_handler)
 {
   return instrument_cover_goals(
-    options,
     cover_config,
     goto_model.symbol_table,
     goto_model.goto_functions,

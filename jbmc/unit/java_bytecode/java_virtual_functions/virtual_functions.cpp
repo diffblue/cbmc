@@ -130,11 +130,7 @@ SCENARIO(
         const auto cover_config =
           get_cover_config(options, new_table, null_message_handler);
         REQUIRE_FALSE(instrument_cover_goals(
-          options,
-          cover_config,
-          new_table,
-          new_goto_functions,
-          null_message_handler));
+          cover_config, new_table, new_goto_functions, null_message_handler));
 
         auto function = new_goto_functions.function_map.find(function_name);
         REQUIRE(function != new_goto_functions.function_map.end());
