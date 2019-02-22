@@ -829,6 +829,10 @@ std::string smt2_convt::type2id(const typet &type) const
   {
     return type2id(ns.follow_tag(to_c_enum_tag_type(type)).subtype());
   }
+  else if(type.id() == ID_pointer)
+  {
+    return "p" + std::to_string(to_pointer_type(type).get_width());
+  }
   else
   {
     UNREACHABLE;
