@@ -324,24 +324,22 @@ void code_contractst::add_contract_check(
   }
 
   // decl parameter1 ...
-  for(code_typet::parameterst::const_iterator
-      p_it=gf.type.parameters().begin();
-      p_it!=gf.type.parameters().end();
-      ++p_it)
+  for(const auto &parameter : gf.parameter_identifiers)
   {
-    symbol_exprt p =
-      new_tmp_symbol(
-        p_it->type(), skip->source_location, function, function_symbol.mode)
-        .symbol_expr();
+    PRECONDITION(!parameter.empty());
+    const symbolt &parameter_symbol = ns.lookup(parameter);
+
+    symbol_exprt p = new_tmp_symbol(
+                       parameter_symbol.type,
+                       skip->source_location,
+                       function,
+                       parameter_symbol.mode)
+                       .symbol_expr();
     check.add(goto_programt::make_decl(p, skip->source_location));
 
     call.arguments().push_back(p);
 
-    if(!p_it->get_identifier().empty())
-    {
-      symbol_exprt cur_p(p_it->get_identifier(), p_it->type());
-      replace.insert(cur_p, p);
-    }
+    replace.insert(parameter_symbol.symbol_expr(), p);
   }
 
   // assume(requires)

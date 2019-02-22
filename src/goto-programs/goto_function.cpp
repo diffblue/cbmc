@@ -21,12 +21,9 @@ void get_local_identifiers(
 {
   goto_function.body.get_decl_identifiers(dest);
 
-  const code_typet::parameterst &parameters = goto_function.type.parameters();
-
   // add parameters
-  for(const auto &param : parameters)
+  for(const auto &identifier : goto_function.parameter_identifiers)
   {
-    const irep_idt &identifier = param.get_identifier();
     if(identifier != "")
       dest.insert(identifier);
   }

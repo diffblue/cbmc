@@ -209,26 +209,24 @@ protected:
       instruction->source_location = function_symbol.location;
       return instruction;
     };
+
     const namespacet ns(symbol_table);
-    for(auto const &parameter : function.type.parameters())
+    for(auto const &parameter : function.parameter_identifiers)
     {
+      const symbolt &parameter_symbol = ns.lookup(parameter);
       if(
-        parameter.type().id() == ID_pointer &&
-        !parameter.type().subtype().get_bool(ID_C_constant) &&
+        parameter_symbol.type.id() == ID_pointer &&
+        !parameter_symbol.type.subtype().get_bool(ID_C_constant) &&
         std::regex_match(
-          id2string(parameter.get_base_name()), parameters_to_havoc))
+          id2string(parameter_symbol.base_name), parameters_to_havoc))
       {
         auto goto_instruction =
           add_instruction(goto_programt::make_incomplete_goto(equal_exprt(
-            symbol_exprt(parameter.get_identifier(), parameter.type()),
-            null_pointer_exprt(to_pointer_type(parameter.type())))));
-
-        const irep_idt base_name = parameter.get_base_name();
-        CHECK_RETURN(!base_name.empty());
+            parameter_symbol.symbol_expr(),
+            null_pointer_exprt(to_pointer_type(parameter_symbol.type)))));
 
         dereference_exprt dereference_expr(
-          symbol_exprt(parameter.get_identifier(), parameter.type()),
-          parameter.type().subtype());
+          parameter_symbol.symbol_expr(), parameter_symbol.type.subtype());
 
         goto_programt dest;
         havoc_expr_rec(

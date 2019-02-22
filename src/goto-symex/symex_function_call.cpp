@@ -41,29 +41,17 @@ void goto_symext::parameter_assignments(
   // iterates over the arguments
   exprt::operandst::const_iterator it1=arguments.begin();
 
-  // these are the types of the parameters
-  const code_typet::parameterst &parameter_types=
-    function_type.parameters();
-
   // iterates over the types of the parameters
-  for(code_typet::parameterst::const_iterator
-      it2=parameter_types.begin();
-      it2!=parameter_types.end();
-      it2++)
+  for(const auto &identifier : goto_function.parameter_identifiers)
   {
-    const code_typet::parametert &parameter=*it2;
-
-    // this is the type that the n-th argument should have
-    const typet &parameter_type=parameter.type();
-
-    const irep_idt &identifier=parameter.get_identifier();
-
     INVARIANT(
-      !identifier.empty(),
-      "function pointer parameter must have an identifier");
+      !identifier.empty(), "function parameter must have an identifier");
 
     const symbolt &symbol=ns.lookup(identifier);
     symbol_exprt lhs=symbol.symbol_expr();
+
+    // this is the type that the n-th argument should have
+    const typet &parameter_type = symbol.type;
 
     exprt rhs;
 

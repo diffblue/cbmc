@@ -31,7 +31,7 @@ Author: Daniel Kroening, kroening@kroening.com
 void goto_inlinet::parameter_assignments(
   const goto_programt::targett target,
   const irep_idt &function_name, // name of called function
-  const code_typet &code_type, // type of called function
+  const goto_functiont::parameter_identifierst &parameter_identifiers,
   const exprt::operandst &arguments, // arguments of call
   goto_programt &dest)
 {
@@ -43,28 +43,21 @@ void goto_inlinet::parameter_assignments(
   // iterates over the operands
   exprt::operandst::const_iterator it1=arguments.begin();
 
-  const code_typet::parameterst &parameter_types=
-    code_type.parameters();
-
-  // iterates over the types of the parameters
-  for(const auto &parameter : parameter_types)
+  // iterates over the parameters
+  for(const auto &identifier : parameter_identifiers)
   {
-    // this is the type the n-th argument should be
-    const typet &par_type = parameter.type();
-
-    const irep_idt &identifier=parameter.get_identifier();
-
     DATA_INVARIANT(
       !identifier.empty(),
       source_location.as_string() + ": no identifier for function parameter");
 
-    {
-      const symbolt &symbol=ns.lookup(identifier);
+    const symbolt &symbol = ns.lookup(identifier);
 
-      goto_programt::targett decl = dest.add(
-        goto_programt::make_decl(symbol.symbol_expr(), source_location));
-      decl->code.add_source_location()=source_location;
-    }
+    // this is the type the n-th argument should have
+    const typet &parameter_type = symbol.type;
+
+    goto_programt::targett decl =
+      dest.add(goto_programt::make_decl(symbol.symbol_expr(), source_location));
+    decl->code.add_source_location() = source_location;
 
     // this is the actual parameter
     exprt actual;
@@ -77,7 +70,7 @@ void goto_inlinet::parameter_assignments(
                 << "not enough arguments, "
                 << "inserting non-deterministic value" << eom;
 
-      actual = side_effect_expr_nondett(par_type, source_location);
+      actual = side_effect_expr_nondett(parameter_type, source_location);
     }
     else
       actual=*it1;
@@ -90,9 +83,9 @@ void goto_inlinet::parameter_assignments(
     {
       // it should be the same exact type as the parameter,
       // subject to some exceptions
-      if(!base_type_eq(par_type, actual.type(), ns))
+      if(!base_type_eq(parameter_type, actual.type(), ns))
       {
-        const typet &f_partype = par_type;
+        const typet &f_partype = parameter_type;
         const typet &f_acttype = actual.type();
 
         // we are willing to do some conversion
@@ -102,7 +95,7 @@ void goto_inlinet::parameter_assignments(
             f_acttype.id()==ID_array &&
             f_partype.subtype()==f_acttype.subtype()))
         {
-          actual = typecast_exprt(actual, par_type);
+          actual = typecast_exprt(actual, f_partype);
         }
         else if((f_partype.id()==ID_signedbv ||
                  f_partype.id()==ID_unsignedbv ||
@@ -111,7 +104,7 @@ void goto_inlinet::parameter_assignments(
                  f_acttype.id()==ID_unsignedbv ||
                  f_acttype.id()==ID_bool))
         {
-          actual = typecast_exprt(actual, par_type);
+          actual = typecast_exprt(actual, f_partype);
         }
         else
         {
@@ -120,7 +113,7 @@ void goto_inlinet::parameter_assignments(
       }
 
       // adds an assignment of the actual parameter to the formal parameter
-      code_assignt assignment(symbol_exprt(identifier, par_type), actual);
+      code_assignt assignment(symbol_exprt(identifier, parameter_type), actual);
       assignment.add_source_location()=source_location;
 
       dest.add_instruction(ASSIGN);
@@ -140,7 +133,7 @@ void goto_inlinet::parameter_assignments(
 
 void goto_inlinet::parameter_destruction(
   const goto_programt::targett target,
-  const code_typet &code_type, // type of called function
+  const goto_functiont::parameter_identifierst &parameter_identifiers,
   goto_programt &dest)
 {
   PRECONDITION(target->is_function_call());
@@ -148,14 +141,8 @@ void goto_inlinet::parameter_destruction(
 
   const source_locationt &source_location=target->source_location;
 
-  const code_typet::parameterst &parameter_types=
-    code_type.parameters();
-
-  // iterates over the types of the parameters
-  for(const auto &parameter : parameter_types)
+  for(const auto &identifier : parameter_identifiers)
   {
-    const irep_idt &identifier=parameter.get_identifier();
-
     INVARIANT(
       !identifier.empty(),
       source_location.as_string() + ": no identifier for function parameter");
@@ -278,14 +265,10 @@ void goto_inlinet::insert_function_body(
 
   goto_programt tmp1;
   parameter_assignments(
-    target,
-    identifier,
-    goto_function.type,
-    arguments,
-    tmp1);
+    target, identifier, goto_function.parameter_identifiers, arguments, tmp1);
 
   goto_programt tmp2;
-  parameter_destruction(target, goto_function.type, tmp2);
+  parameter_destruction(target, goto_function.parameter_identifiers, tmp2);
 
   goto_programt tmp;
   tmp.destructive_append(tmp1); // par assignment

@@ -811,16 +811,14 @@ void interpretert::execute_function_call()
     }
 
     // assign the arguments
-    const code_typet::parameterst &parameters=
-      to_code_type(f_it->second.type).parameters();
-
-    if(argument_values.size()<parameters.size())
+    const auto &parameter_identifiers = f_it->second.parameter_identifiers;
+    if(argument_values.size() < parameter_identifiers.size())
       throw "not enough arguments";
 
-    for(std::size_t i=0; i<parameters.size(); i++)
+    for(std::size_t i = 0; i < parameter_identifiers.size(); i++)
     {
-      const code_typet::parametert &a=parameters[i];
-      const symbol_exprt symbol_expr(a.get_identifier(), a.type());
+      const symbol_exprt symbol_expr =
+        ns.lookup(parameter_identifiers[i]).symbol_expr();
       assign(evaluate_address(symbol_expr), argument_values[i]);
     }
 
