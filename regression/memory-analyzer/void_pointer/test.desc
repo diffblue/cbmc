@@ -1,16 +1,5 @@
-CORE
+KNOWNBUG
 void_pointer.exe
 --breakpoint void_pointer.c:17 --symbols a_void_pointer,a_second_void_pointer,a_third_void_pointer,blob
-analyzing symbol: blob
-GENERATED CODE: 
-\{
-  a_void_pointer = NULL;
-  char char_a_second_void_pointer_0\[\]="test_string";
-  a_second_void_pointer = \(char \*\)&char_a_second_void_pointer_0;
-  char char_a_third_void_pointer_1\[\]=\{ -13, -13, 'H', -1, '\\\\', '\\\\', -1 \};
-  a_third_void_pointer = \(char \*\)&char_a_third_void_pointer_1;
-  blob.size = 7;
-  blob.data = \(char \*\)&char_a_third_void_pointer_1;
-\}
---
---
+^EXIT=0$
+^SIGNAL=0$

@@ -1,4 +1,4 @@
-CORE
+FUTURE
 arrays.exe
 --breakpoint manipulate_data --symbols test_struct
 analyzing symbol: test_struct
@@ -20,5 +20,5 @@ GENERATED CODE:
     \{ .text=\(char \*\)&_test_struct_childs3_options1_text_5 \} \} \} \} \};
   test_struct = &test_struct_0;
 \}
---
---
+^EXIT=0$
+^SIGNAL=0$

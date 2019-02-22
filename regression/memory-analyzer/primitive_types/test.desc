@@ -1,27 +1,5 @@
-CORE
+FUTURE
 primitive_types.exe
 --breakpoint my_function --symbols e,f,f_1,d,g,h
-analyzing symbol: e
-analyzing symbol: f
-analyzing symbol: f_1
-analyzing symbol: d
-analyzing symbol: g
-analyzing symbol: h
-GENERATED CODE: 
-\{
-  e = 17;
-  f = &e;
-  f_1 = &e;
-  char d_b_0\[\]="test2";
-  d.a = 4;
-  d.b = \(char \*\)&d_b_0;
-  d.c = -32;
-  struct mapping_things g_1=\{ .a=0, .b=\(\(char \*\)NULL\), .c=0 \};
-  g = &g_1;
-  char h_2\[\]="test";
-  h = \(char \*\)&h_2;
-}
-^EXIT=0
-^SIGNAL=0
---
---
+^EXIT=0$
+^SIGNAL=0$
