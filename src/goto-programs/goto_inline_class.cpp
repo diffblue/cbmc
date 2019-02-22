@@ -53,7 +53,7 @@ void goto_inlinet::parameter_assignments(
     const symbolt &symbol = ns.lookup(identifier);
 
     // this is the type the n-th argument should have
-    const typet &par_type = symbol.type;
+    const typet &parameter_type = symbol.type;
 
     goto_programt::targett decl =
       dest.add(goto_programt::make_decl(symbol.symbol_expr(), source_location));
@@ -70,7 +70,7 @@ void goto_inlinet::parameter_assignments(
                 << "not enough arguments, "
                 << "inserting non-deterministic value" << eom;
 
-      actual = side_effect_expr_nondett(par_type, source_location);
+      actual = side_effect_expr_nondett(parameter_type, source_location);
     }
     else
       actual=*it1;
@@ -83,9 +83,9 @@ void goto_inlinet::parameter_assignments(
     {
       // it should be the same exact type as the parameter,
       // subject to some exceptions
-      if(!base_type_eq(par_type, actual.type(), ns))
+      if(!base_type_eq(parameter_type, actual.type(), ns))
       {
-        const typet &f_partype = par_type;
+        const typet &f_partype = parameter_type;
         const typet &f_acttype = actual.type();
 
         // we are willing to do some conversion
@@ -95,7 +95,7 @@ void goto_inlinet::parameter_assignments(
             f_acttype.id()==ID_array &&
             f_partype.subtype()==f_acttype.subtype()))
         {
-          actual = typecast_exprt(actual, par_type);
+          actual = typecast_exprt(actual, f_partype);
         }
         else if((f_partype.id()==ID_signedbv ||
                  f_partype.id()==ID_unsignedbv ||
@@ -104,7 +104,7 @@ void goto_inlinet::parameter_assignments(
                  f_acttype.id()==ID_unsignedbv ||
                  f_acttype.id()==ID_bool))
         {
-          actual = typecast_exprt(actual, par_type);
+          actual = typecast_exprt(actual, f_partype);
         }
         else
         {
@@ -113,7 +113,7 @@ void goto_inlinet::parameter_assignments(
       }
 
       // adds an assignment of the actual parameter to the formal parameter
-      code_assignt assignment(symbol_exprt(identifier, par_type), actual);
+      code_assignt assignment(symbol_exprt(identifier, parameter_type), actual);
       assignment.add_source_location()=source_location;
 
       dest.add_instruction(ASSIGN);
