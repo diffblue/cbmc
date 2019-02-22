@@ -9,9 +9,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_object_factory.h"
 
 #include <util/expr_initializer.h>
-#include <util/nondet_bool.h>
 #include <util/nondet.h>
+#include <util/nondet_bool.h>
 #include <util/pointer_offset_size.h>
+#include <util/prefix.h>
 
 #include <goto-programs/class_identifier.h>
 #include <goto-programs/goto_functions.h>

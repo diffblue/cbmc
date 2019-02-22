@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "namespace.h"
 #include "pointer_offset_size.h"
 #include "pointer_predicates.h"
+#include "prefix.h"
 #include "std_expr.h"
 #include "string_constant.h"
 #include "threeval.h"

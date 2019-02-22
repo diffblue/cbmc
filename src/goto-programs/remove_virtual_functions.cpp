@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <algorithm>
 
+#include <util/prefix.h>
 #include <util/type_eq.h>
 
 #include "class_identifier.h"

@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/c_types.h>
 #include <util/exception_utils.h>
 #include <util/invariant.h>
+#include <util/prefix.h>
 
 static void locality(
   const irep_idt &function_identifier,

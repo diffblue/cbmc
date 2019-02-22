@@ -11,6 +11,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ostream>
 
 #include "file_util.h"
+#include "prefix.h"
+
+bool source_locationt::is_built_in(const std::string &s)
+{
+  std::string built_in1 = "<built-in-"; // "<built-in-additions>";
+  std::string built_in2 = "<builtin-";  // "<builtin-architecture-strings>";
+  return has_prefix(s, built_in1) || has_prefix(s, built_in2);
+}
 
 /// \par parameters: print_cwd, print the absolute path to the file
 std::string source_locationt::as_string(bool print_cwd) const

@@ -15,7 +15,7 @@ Author: Diffblue Ltd
 
 #include <util/arith_tools.h>
 #include <util/mathematical_types.h>
-#include <util/message.h>
+#include <util/prefix.h>
 
 static bool starts_with_x(const exprt &e, const namespacet &)
 {

@@ -18,6 +18,7 @@ Date: 2012
 #include <fstream>
 
 #include <util/options.h>
+#include <util/prefix.h>
 
 #include <linking/static_lifetime_init.h>
 

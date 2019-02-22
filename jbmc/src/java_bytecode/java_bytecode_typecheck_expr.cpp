@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/arith_tools.h>
 #include <util/expr_initializer.h>
+#include <util/prefix.h>
 #include <util/unicode.h>
 
 #include "java_pointer_casts.h"

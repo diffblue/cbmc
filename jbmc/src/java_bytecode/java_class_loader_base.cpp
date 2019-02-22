@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_bytecode_parser.h"
 
 #include <util/file_util.h>
+#include <util/prefix.h>
 #include <util/suffix.h>
 
 #include <fstream>

@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/base_type.h>
 #include <util/c_types.h>
 #include <util/pointer_offset_size.h>
+#include <util/prefix.h>
 #include <util/simplify_expr.h>
 
 #include <langapi/language_util.h>

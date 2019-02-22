@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/invariant_utils.h>
 #include <util/optional.h>
 #include <util/pointer_offset_size.h>
+#include <util/prefix.h>
 #include <util/simplify_expr.h>
 #include <util/string2int.h>
 #include <util/string_constant.h>

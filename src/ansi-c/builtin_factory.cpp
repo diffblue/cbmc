@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "ansi_c_typecheck.h"
 
 #include <util/config.h>
+#include <util/prefix.h>
 #include <util/string_utils.h>
 
 #include <ostream>

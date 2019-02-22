@@ -11,6 +11,7 @@ Author: Diffblue Ltd.
 
 #include <regex>
 
+#include <util/prefix.h>
 #include <util/symbol_table.h>
 
 /// For a given user provided pattern, return a regex, having dealt with the

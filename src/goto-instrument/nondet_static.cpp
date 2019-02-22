@@ -19,6 +19,8 @@ Date: November 2011
 
 #include "nondet_static.h"
 
+#include <util/prefix.h>
+
 #include <goto-programs/goto_model.h>
 
 #include <linking/static_lifetime_init.h>
