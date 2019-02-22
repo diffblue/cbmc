@@ -1,38 +1,52 @@
-// Copyright 2018 Author: Malte Mues <mail.mues@gmail.com>
+/*******************************************************************\
+
+Module: Memory Analyzer
+
+Author: Malte Mues <mail.mues@gmail.com>
+        Daniel Poetzl
+
+\*******************************************************************/
 
 /// \file
 /// This code does the command line parsing for the memory-analyzer tool
 
+// clang-format off
+#if defined(__linux__) || \
+    defined(__FreeBSD_kernel__) || \
+    defined(__GNU__) || \
+    defined(__unix__) || \
+    defined(__CYGWIN__) || \
+    defined(__MACH__)
+// clang-format on
+
 #ifndef CPROVER_MEMORY_ANALYZER_MEMORY_ANALYZER_PARSE_OPTIONS_H
 #define CPROVER_MEMORY_ANALYZER_MEMORY_ANALYZER_PARSE_OPTIONS_H
-#ifdef __linux__
+
 #include <util/parse_options.h>
 #include <util/ui_message.h>
 
 // clang-format off
-#define MEMMORY_ANALYZER_OPTIONS \
+#define MEMORY_ANALYZER_OPTIONS \
+  "(version)" \
+  "(json-ui)" \
   "(core-file):" \
   "(breakpoint):" \
-  "(symbols):"
-
+  "(symbols):" \
+  "(symtab-snapshot)" \
+  "(output-file):"
 // clang-format on
 
-class memory_analyzer_parse_optionst : public parse_options_baset,
-                                       public messaget
+class memory_analyzer_parse_optionst : public parse_options_baset
 {
 public:
+  memory_analyzer_parse_optionst(int argc, const char *argv[]);
+
   int doit() override;
   void help() override;
 
-  memory_analyzer_parse_optionst(int argc, const char **argv)
-    : parse_options_baset(MEMMORY_ANALYZER_OPTIONS, argc, argv),
-      messaget(ui_message_handler),
-      ui_message_handler(cmdline, "memory-analyzer")
-  {
-  }
-
 protected:
-  ui_message_handlert ui_message_handler;
+  messaget message;
 };
-#endif // __linux__
+
 #endif // CPROVER_MEMORY_ANALYZER_MEMORY_ANALYZER_PARSE_OPTIONS_H
+#endif

@@ -1,102 +1,187 @@
-// Copyright 2018 Author: Malte Mues <mail.mues@gmail.com>
+/*******************************************************************\
+
+Module: Memory Analyzer
+
+Author: Malte Mues <mail.mues@gmail.com>
+        Daniel Poetzl
+
+\*******************************************************************/
 
 /// \file
 /// Commandline parser for the memory analyzer executing main work.
 
-#ifdef __linux__
+// clang-format off
+#if defined(__linux__) || \
+    defined(__FreeBSD_kernel__) || \
+    defined(__GNU__) || \
+    defined(__unix__) || \
+    defined(__CYGWIN__) || \
+    defined(__MACH__)
+// clang-format on
 
 #include "memory_analyzer_parse_options.h"
 #include "analyze_symbol.h"
 #include "gdb_api.h"
 
+#include <fstream>
+
+#include <ansi-c/ansi_c_language.h>
+
 #include <goto-programs/goto_model.h>
 #include <goto-programs/read_goto_binary.h>
+#include <goto-programs/show_symbol_table.h>
+
+#include <langapi/mode.h>
+
 #include <util/config.h>
 #include <util/exit_codes.h>
 #include <util/message.h>
 #include <util/string_utils.h>
+#include <util/version.h>
+
+memory_analyzer_parse_optionst::memory_analyzer_parse_optionst(
+  int argc,
+  const char *argv[])
+  : parse_options_baset(
+      MEMORY_ANALYZER_OPTIONS,
+      argc,
+      argv,
+      std::string("MEMORY-ANALYZER ") + CBMC_VERSION),
+    message(ui_message_handler)
+{
+}
 
 int memory_analyzer_parse_optionst::doit()
 {
-  // This script is the entry point and has to make sure
-  // that the config object is set to a valid architecture.
-  // config is later used to determine right size for types.
-  // If config is not set, you might see a bunch of types with
-  // size 0.
-  // It might be desierable to convert this into flags in the future.
-  config.ansi_c.mode = configt::ansi_ct::flavourt::GCC;
-  config.ansi_c.set_arch_spec_x86_64();
+  if(cmdline.isset("version"))
+  {
+    message.status() << CBMC_VERSION << '\n';
+    return CPROVER_EXIT_SUCCESS;
+  }
+
+  config.set(cmdline);
 
   if(cmdline.args.size() != 1)
   {
-    error() << "Please provide one binary with symbols to process" << eom;
-    return CPROVER_EXIT_USAGE_ERROR;
+    throw invalid_command_line_argument_exceptiont(
+      "no binary provided for analysis", "<binary>");
   }
 
-  std::string binary = cmdline.args[0];
+  if(!cmdline.isset("symbols"))
+  {
+    throw invalid_command_line_argument_exceptiont(
+      "need to provide symbols to analyse via --symbols", "--symbols");
+  }
 
-  gdb_apit gdb_api = gdb_apit(binary.c_str());
+  const bool core_file = cmdline.isset("core-file");
+  const bool breakpoint = cmdline.isset("breakpoint");
+
+  if(!(core_file ^ breakpoint))
+  {
+    throw invalid_command_line_argument_exceptiont(
+      "need to provide either option --core-file or option --breakpoint", "");
+  }
+
+  const bool output_file = cmdline.isset("output-file");
+  const bool symtab_snapshot = cmdline.isset("symtab-snapshot");
+
+  if(symtab_snapshot && output_file)
+  {
+    throw invalid_command_line_argument_exceptiont(
+      "printing to a file is not supported for symbol table snapshot output",
+      "--symtab-snapshot");
+  }
+
+  register_language(new_ansi_c_language);
+
+  std::string binary = cmdline.args.front();
+
+  gdb_apit gdb_api(binary.c_str());
   gdb_api.create_gdb_process();
 
-  if(cmdline.isset("core-file"))
+  if(core_file)
   {
     std::string core_file = cmdline.get_value("core-file");
     gdb_api.run_gdb_from_core(core_file);
   }
-  else if(cmdline.isset("breakpoint"))
+  else if(breakpoint)
   {
     std::string breakpoint = cmdline.get_value("breakpoint");
     gdb_api.run_gdb_to_breakpoint(breakpoint);
   }
-  else
+
+  const std::string symbol_list(cmdline.get_value("symbols"));
+  std::vector<std::string> result;
+  split_string(symbol_list, ',', result, true, true);
+
+  auto opt = read_goto_binary(binary, ui_message_handler);
+
+  if(!opt.has_value())
   {
-    error() << "Either the 'core-file' or 'breakpoint; flag must be provided\n"
-            << "Cannot execute memory-analyzer. Going to shut it down...\n"
-            << messaget::eom;
-
-    gdb_api.terminate_gdb_process();
-
-    help();
-    return CPROVER_EXIT_USAGE_ERROR;
+    throw deserialization_exceptiont(
+      "cannot read goto binary `" + binary + "`");
   }
 
-  if(cmdline.isset("symbols"))
+  const goto_modelt goto_model(std::move(opt.value()));
+
+  symbol_analyzert analyzer(goto_model.symbol_table, gdb_api);
+
+  analyzer.analyze_symbols(result);
+
+  std::ofstream file;
+
+  if(output_file)
   {
-    const std::string symbol_list(cmdline.get_value("symbols"));
-    std::vector<std::string> result;
-    split_string(symbol_list, ',', result, false, false);
+    file.open(cmdline.get_value("output-file"));
+  }
 
-    goto_modelt goto_model;
-    read_goto_binary(binary, goto_model, ui_message_handler);
+  std::ostream &out =
+    output_file ? (std::ostream &)file : (std::ostream &)message.result();
 
-    symbol_analyzert analyzer(
-      goto_model.symbol_table, gdb_api, ui_message_handler);
-
-    for(auto it = result.begin(); it != result.end(); it++)
-    {
-      messaget::result() << "analyzing symbol: " << (*it) << "\n";
-      analyzer.analyse_symbol(*it);
-    }
-
-    messaget::result() << "GENERATED CODE: \n" << messaget::eom;
-    messaget::result() << analyzer.get_code() << "\n" << messaget::eom;
-
-    gdb_api.terminate_gdb_process();
-    return CPROVER_EXIT_SUCCESS;
+  if(symtab_snapshot)
+  {
+    symbol_tablet snapshot = analyzer.get_snapshot_as_symbol_table();
+    show_symbol_table(snapshot, ui_message_handler);
   }
   else
   {
-    error() << "It is required to provide the symbols flag in order to make "
-            << "this tool work.\n"
-            << messaget::eom;
+    std::string snapshot = analyzer.get_snapshot_as_c_code();
+    out << snapshot;
   }
-  gdb_api.terminate_gdb_process();
-  help();
-  return CPROVER_EXIT_USAGE_ERROR;
+
+  if(output_file)
+  {
+    file.close();
+  }
+  else
+  {
+    message.result() << messaget::eom;
+  }
+
+  return CPROVER_EXIT_SUCCESS;
 }
 
 void memory_analyzer_parse_optionst::help()
 {
+  message.status()
+    << '\n'
+    << banner_string("Memory-Analyzer", CBMC_VERSION) << '\n'
+    << align_center_with_border("Copyright (C) 2019") << '\n'
+    << align_center_with_border("Malte Mues, Diffblue Ltd.") << '\n'
+    << align_center_with_border("info@diffblue.com") << '\n'
+    << '\n'
+    << "Usage:                       Purpose:\n"
+    << '\n'
+    << " memory-analyzer [-?] [-h] [--help]  show help\n"
+    << " memory-analyzer --version           show version\n"
+    << " memory-analyzer <options> <binary>  analyze binary"
+    << "\n"
+    << " --core-file <file>           analyze from core file\n"
+    << " --breakpoint <breakpoint>    analyze from breakpoint\n"
+    << " --symbols <symbol-list>      list of symbols to analyze\n"
+    << " --symtab-snapshot            output snapshot as symbol table\n"
+    << " --output-file <file>         write snapshot to file\n"
+    << messaget::eom;
 }
 
-#endif // __linux__
+#endif
