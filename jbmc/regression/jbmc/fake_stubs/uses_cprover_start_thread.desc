@@ -1,0 +1,9 @@
+CORE
+Test.class
+--function Test.main --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar` --show-goto-functions
+org\.cprover\.CProver\.startThread:\(I\)V
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Companion to the main test.desc that checks the function under test uses org.cprover.CProver.startThread(int)

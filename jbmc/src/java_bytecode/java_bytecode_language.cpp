@@ -924,30 +924,7 @@ void java_bytecode_languaget::methods_provided(
   string_preprocess.get_all_function_names(methods);
   // Add all concrete methods to map
   for(const auto &kv : method_bytecode)
-  {
-    const std::string &method_id = id2string(kv.first);
-
-    // Avoid advertising org.cprover.CProver methods that the Java frontend will
-    // never provide bodies for (java_bytecode_convert_method always leaves them
-    // bodyless with intent for the driver program to stub them):
-    if(has_prefix(method_id, cprover_class_prefix))
-    {
-      std::size_t method_name_end_offset =
-        method_id.find(':', cprover_class_prefix.length());
-      INVARIANT(
-        method_name_end_offset != std::string::npos,
-        "org.cprover.CProver method should have a postfix type descriptor");
-
-      const std::string method_name =
-        method_id.substr(
-          cprover_class_prefix.length(),
-          method_name_end_offset - cprover_class_prefix.length());
-
-      if(cprover_methods_to_ignore.count(method_name))
-        continue;
-    }
     methods.insert(kv.first);
-  }
   // Add all synthetic methods to map
   for(const auto &kv : synthetic_methods)
     methods.insert(kv.first);
