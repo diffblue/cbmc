@@ -93,8 +93,17 @@ void recursive_initializationt::initialize_pointer(
                                      goto_model.symbol_table};
   exprt choice =
     allocate_objects.allocate_automatic_local_object(bool_typet{}, "choice");
-  auto pointee =
-    allocate_objects.allocate_automatic_local_object(type.subtype(), "pointee");
+  symbolt &pointee_symbol = get_fresh_aux_symbol(
+    type.subtype(),
+    "__goto_harness",
+    "pointee",
+    lhs.source_location(),
+    initialization_config.mode,
+    goto_model.symbol_table);
+  pointee_symbol.is_static_lifetime = true;
+  pointee_symbol.is_lvalue = true;
+
+  auto pointee = pointee_symbol.symbol_expr();
   allocate_objects.declare_created_symbols(body);
   body.add(code_assignt{lhs, null_pointer_exprt{type}});
   bool is_unknown_struct_tag =

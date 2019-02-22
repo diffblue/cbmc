@@ -180,15 +180,27 @@ void function_call_harness_generatort::implt::generate_nondet_globals(
 {
   if(nondet_globals)
   {
+    // generating initialisation code may introduce new globals
+    // i.e. modify the symbol table.
+    // Modifying the symbol table while iterating over it is not
+    // a good idea, therefore we just collect the names of globals
+    // we need to initialise first and then generate the
+    // initialisation code for all of them.
+    auto globals = std::vector<symbol_exprt>{};
     for(const auto &symbol_table_entry : *symbol_table)
     {
       const auto &symbol = symbol_table_entry.second;
       if(
         symbol.is_static_lifetime && symbol.is_lvalue &&
+        symbol.type.id() != ID_code &&
         !has_prefix(id2string(symbol.name), CPROVER_PREFIX))
       {
-        generate_initialisation_code_for(function_body, symbol.symbol_expr());
+        globals.push_back(symbol.symbol_expr());
       }
+    }
+    for(auto const &global : globals)
+    {
+      generate_initialisation_code_for(function_body, global);
     }
   }
 }
