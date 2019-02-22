@@ -57,10 +57,10 @@ void instrument_cover_goals(
   coverage_criteriont,
   message_handlert &message_handler);
 
-std::unique_ptr<cover_configt>
+cover_configt
 get_cover_config(const optionst &, const symbol_tablet &, message_handlert &);
 
-std::unique_ptr<cover_configt> get_cover_config(
+cover_configt get_cover_config(
   const optionst &,
   const irep_idt &main_id,
   const symbol_tablet &,

@@ -153,7 +153,7 @@ parse_coverage_criterion(const std::string &criterion_string)
   {
     std::stringstream s;
     s << "unknown coverage criterion " << '\'' << criterion_string << '\'';
-    throw s.str();
+    throw invalid_command_line_argument_exceptiont(s.str(), "--cover");
   }
 
   return c;
@@ -192,17 +192,16 @@ void parse_cover_options(const cmdlinet &cmdline, optionst &options)
 /// \param symbol_table: global symbol table
 /// \param message_handler: used to log incorrect option specifications
 /// \return a cover_configt on success, or null otherwise.
-std::unique_ptr<cover_configt> get_cover_config(
+cover_configt get_cover_config(
   const optionst &options,
   const symbol_tablet &symbol_table,
   message_handlert &message_handler)
 {
-  messaget msg(message_handler);
-  std::unique_ptr<cover_configt> cover_config =
-    util_make_unique<cover_configt>();
-  function_filterst &function_filters = cover_config->function_filters;
-  goal_filterst &goal_filters = cover_config->goal_filters;
-  cover_instrumenterst &instrumenters = cover_config->cover_instrumenters;
+  cover_configt cover_config;
+  function_filterst &function_filters =
+    cover_config.cover_configt::function_filters;
+  goal_filterst &goal_filters = cover_config.goal_filters;
+  cover_instrumenterst &instrumenters = cover_config.cover_instrumenters;
 
   function_filters.add(
     util_make_unique<internal_functions_filtert>(message_handler));
@@ -211,30 +210,23 @@ std::unique_ptr<cover_configt> get_cover_config(
 
   optionst::value_listt criteria_strings = options.get_list_option("cover");
 
-  cover_config->keep_assertions = false;
+  cover_config.keep_assertions = false;
   for(const auto &criterion_string : criteria_strings)
   {
-    try
-    {
-      coverage_criteriont c = parse_coverage_criterion(criterion_string);
+    coverage_criteriont c = parse_coverage_criterion(criterion_string);
 
-      if(c == coverage_criteriont::ASSERTION)
-        cover_config->keep_assertions = true;
+    if(c == coverage_criteriont::ASSERTION)
+      cover_config.keep_assertions = true;
 
-      instrumenters.add_from_criterion(c, symbol_table, goal_filters);
-    }
-    catch(const std::string &e)
-    {
-      msg.error() << e << messaget::eom;
-      return {};
-    }
+    instrumenters.add_from_criterion(c, symbol_table, goal_filters);
   }
 
-  if(cover_config->keep_assertions && criteria_strings.size() > 1)
+  if(cover_config.keep_assertions && criteria_strings.size() > 1)
   {
-    msg.error() << "assertion coverage cannot currently be used together with "
-                << "other coverage criteria" << messaget::eom;
-    return {};
+    std::stringstream s;
+    s << "assertion coverage cannot currently be used together with other"
+      << "coverage criteria";
+    throw invalid_command_line_argument_exceptiont(s.str(), "--cover");
   }
 
   std::string cover_include_pattern =
@@ -250,7 +242,7 @@ std::unique_ptr<cover_configt> get_cover_config(
     function_filters.add(
       util_make_unique<trivial_functions_filtert>(message_handler));
 
-  cover_config->traces_must_terminate =
+  cover_config.traces_must_terminate =
     options.get_bool_option("cover-traces-must-terminate");
 
   return cover_config;
@@ -263,18 +255,14 @@ std::unique_ptr<cover_configt> get_cover_config(
 /// \param symbol_table: global symbol table
 /// \param message_handler: used to log incorrect option specifications
 /// \return a cover_configt on success, or null otherwise.
-std::unique_ptr<cover_configt> get_cover_config(
+cover_configt get_cover_config(
   const optionst &options,
   const irep_idt &main_id,
   const symbol_tablet &symbol_table,
   message_handlert &message_handler)
 {
-  messaget msg(message_handler);
-  std::unique_ptr<cover_configt> cover_config =
+  cover_configt cover_config =
     get_cover_config(options, symbol_table, message_handler);
-
-  if(!cover_config)
-    return {};
 
   std::string cover_only = options.get_option("cover-only");
   const symbolt main_symbol = symbol_table.lookup_ref(main_id);
@@ -282,20 +270,19 @@ std::unique_ptr<cover_configt> get_cover_config(
   // cover entry point function only
   if(cover_only == "function")
   {
-    cover_config->function_filters.add(
-      util_make_unique<single_function_filtert>(
-        message_handler, main_symbol.name));
+    cover_config.function_filters.add(util_make_unique<single_function_filtert>(
+      message_handler, main_symbol.name));
   }
   else if(cover_only == "file")
   {
-    cover_config->function_filters.add(util_make_unique<file_filtert>(
+    cover_config.function_filters.add(util_make_unique<file_filtert>(
       message_handler, main_symbol.location.get_file()));
   }
   else if(!cover_only.empty())
   {
-    msg.error() << "Argument to --cover-only not recognized: " << cover_only
-                << messaget::eom;
-    return {};
+    std::stringstream s;
+    s << "Argument to --cover-only not recognized: " << cover_only;
+    throw invalid_command_line_argument_exceptiont(s.str(), "--cover-only");
   }
 
   return cover_config;

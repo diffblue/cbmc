@@ -129,10 +129,9 @@ SCENARIO(
         options.set_option("cover", "location");
         const auto cover_config =
           get_cover_config(options, new_table, null_message_handler);
-        REQUIRE(cover_config);
         REQUIRE_FALSE(instrument_cover_goals(
           options,
-          *cover_config,
+          cover_config,
           new_table,
           new_goto_functions,
           null_message_handler));
