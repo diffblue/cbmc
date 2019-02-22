@@ -1,17 +1,35 @@
-// Copyrigth 2018 Author: Malte Mues <mail.mues@gmail.com>
-#ifdef __linux__
+/*******************************************************************\
+
+Module: Symbol Analyzer
+
+Author: Malte Mues <mail.mues@gmail.com>
+        Daniel Poetzl
+
+\*******************************************************************/
+
+// clang-format off
+#if defined(__linux__) || \
+    defined(__FreeBSD_kernel__) || \
+    defined(__GNU__) || \
+    defined(__unix__) || \
+    defined(__CYGWIN__) || \
+    defined(__MACH__)
+// clang-format on
 
 #include "analyze_symbol.h"
-#include "gdb_api.h"
 
 #include <algorithm>
 #include <regex>
 
+#include <iostream>
+
 #include <goto-programs/goto_model.h>
 #include <goto-programs/read_goto_binary.h>
+
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/c_types_util.h>
+#include <util/config.h>
 #include <util/cout_message.h>
 #include <util/expr.h>
 #include <util/expr_initializer.h>
@@ -23,483 +41,371 @@
 #include <util/string_constant.h>
 
 symbol_analyzert::symbol_analyzert(
-  const symbol_tablet &st,
-  gdb_apit &gdb,
-  message_handlert &handler)
-  : messaget(handler),
-    gdb_api(gdb),
-    ns(st),
+  const symbol_tablet &symbol_table,
+  gdb_apit &gdb_api)
+  : gdb_api(gdb_api),
+    symbol_table(symbol_table),
+    ns(symbol_table),
     c_converter(ns, expr2c_configurationt::clean_configuration),
-    id_counter(0)
+    allocate_objects(ID_C, source_locationt(), "", this->symbol_table)
 {
 }
 
-void symbol_analyzert::analyse_symbol(const std::string &symbol_name)
+void symbol_analyzert::analyze_symbols(const std::vector<std::string> &symbols)
 {
-  const symbolt symbol = ns.lookup(symbol_name);
-  const symbol_exprt symbol_expr(symbol.name, symbol.type);
-
-  if(is_c_char_pointer(symbol.type))
+  // record addresses of given symbols
+  for(const auto &id : symbols)
   {
-    process_char_pointer(symbol_expr, symbol.location);
-  }
-  else if(is_void_pointer(symbol.type))
-  {
-    const exprt target_expr =
-      fill_void_pointer_with_values(symbol_expr, symbol.location);
+    const symbol_exprt symbol_expr(id, typet());
+    const address_of_exprt aoe(symbol_expr);
 
-    add_assignment(symbol_expr, target_expr);
-  }
-  else if(is_pointer(symbol.type))
-  {
-    const std::string memory_location = gdb_api.get_memory(symbol_name);
+    const std::string c_expr = c_converter.convert(aoe);
+    const pointer_valuet &value = gdb_api.get_memory(c_expr);
+    CHECK_RETURN(value.pointee.empty() || (value.pointee == id));
 
-    if(memory_location != "0x0")
-    {
-      const exprt target_symbol = process_any_pointer_target(
-        symbol_expr, memory_location, symbol.location);
-      const address_of_exprt reference_to_target(target_symbol);
-      add_assignment(symbol_expr, reference_to_target);
-    }
-    else
-    {
-      const exprt null_ptr = zero_initializer(symbol.type, symbol.location, ns);
-      add_assignment(symbol_expr, null_ptr);
-    }
-  }
-  else
-  {
-    const typet target_type = ns.follow(symbol.type);
-    const exprt target_expr = fill_expr_with_values(
-      symbol_name,
-      zero_initializer(target_type, symbol.location, ns),
-      target_type,
-      symbol.location);
-
-    if(is_struct(target_type))
-    {
-      const struct_typet structt = to_struct_type(target_type);
-
-      for(std::size_t i = 0; i < target_expr.operands().size(); ++i)
-      {
-        auto &member_declaration = structt.components()[i];
-        if(!member_declaration.get_is_padding())
-        {
-          const auto &operand = target_expr.operands()[i];
-
-          const symbol_exprt symbol_op(
-            id2string(symbol.name) + "." +
-              id2string(member_declaration.get(ID_name)),
-            operand.type());
-          add_assignment(symbol_op, operand);
-        }
-      }
-    }
-    else
-    {
-      add_assignment(symbol_expr, target_expr);
-    }
-
-    try
-    {
-      const std::string memory_location = gdb_api.get_memory("&" + symbol_name);
-      values[memory_location] = symbol_expr;
-    }
-    catch(gdb_inaccessible_memoryt e)
-    {
-      warning() << "Couldn't access memory location for " << symbol_name << "\n"
-                << "continue execution anyhow."
-                << "You might want to check results for correctness!"
-                << messaget::eom;
-    }
-  }
-  process_outstanding_assignments();
-}
-
-std::string symbol_analyzert::get_code()
-{
-  return c_converter.convert(generated_code);
-}
-
-void symbol_analyzert::add_assignment(
-  const symbol_exprt &symbol,
-  const exprt &value)
-{
-  generated_code.add(code_assignt(symbol, value));
-}
-
-void symbol_analyzert::process_char_pointer(
-  const symbol_exprt &symbol,
-  const source_locationt &location)
-{
-  const std::string memory_location =
-    gdb_api.get_memory(id2string(symbol.get_identifier()));
-  const exprt target_object =
-    declare_and_initalize_char_ptr(symbol, memory_location, location);
-
-  add_assignment(symbol, target_object);
-}
-
-array_exprt create_char_array_from_string(
-  std::string &values,
-  const bitvector_typet &type,
-  const source_locationt &location,
-  const namespacet &ns)
-{
-  const std::regex single_char_pattern(
-    "(?:(?:(?:\\\\)?([0-9]{3}))|([\\\\]{2}|\\S))");
-  std::smatch result;
-  std::vector<std::string> array_content;
-  size_t content_size = type.get_width();
-  while(regex_search(values, result, single_char_pattern))
-  {
-    if(!result[1].str().empty())
-    {
-      // Char are octal encoded in gdb output.
-      mp_integer int_value = string2integer(result[1], OCTAL_SYSTEM);
-      array_content.push_back(integer2binary(int_value, content_size));
-    }
-    else if(!result[2].str().empty())
-    {
-      char token = result[2].str()[0];
-      array_content.push_back(integer2binary(token, content_size));
-    }
-    else
-    {
-      throw symbol_analysis_exceptiont(
-        "It is not supposed that non group match");
-    }
-    values = result.suffix().str();
+    values.insert(std::make_pair(value.address, symbol_expr));
   }
 
-  exprt size = from_integer(array_content.size(), size_type());
-  array_typet new_array_type(type, size);
-  array_exprt result_array =
-    to_array_expr(zero_initializer(new_array_type, location, ns));
-
-  for(size_t i = 0; i < array_content.size(); ++i)
+  for(const auto &id : symbols)
   {
-    result_array.operands()[i].set(ID_value, array_content[i]);
-  }
-
-  return result_array;
-}
-
-code_declt
-symbol_analyzert::declare_instance(const std::string &prefix, const typet &type)
-{
-  std::string safe_prefix = prefix;
-  std::replace(safe_prefix.begin(), safe_prefix.end(), '.', '_');
-  std::replace(safe_prefix.begin(), safe_prefix.end(), '-', '_');
-  std::replace(safe_prefix.begin(), safe_prefix.end(), '>', '_');
-  std::replace(safe_prefix.begin(), safe_prefix.end(), '&', '_');
-  std::replace(safe_prefix.begin(), safe_prefix.end(), '*', '_');
-  safe_prefix.erase(
-    std::remove(safe_prefix.begin(), safe_prefix.end(), '('),
-    safe_prefix.end());
-  safe_prefix.erase(
-    std::remove(safe_prefix.begin(), safe_prefix.end(), ')'),
-    safe_prefix.end());
-  safe_prefix.erase(
-    std::remove(safe_prefix.begin(), safe_prefix.end(), '['),
-    safe_prefix.end());
-  safe_prefix.erase(
-    std::remove(safe_prefix.begin(), safe_prefix.end(), ']'),
-    safe_prefix.end());
-  safe_prefix.erase(
-    std::remove(safe_prefix.begin(), safe_prefix.end(), ' '),
-    safe_prefix.end());
-
-  const std::string var_id = safe_prefix + "_" + std::to_string(id_counter);
-  ++id_counter;
-  const code_declt declaration(symbol_exprt(var_id, type));
-  return declaration;
-}
-
-exprt symbol_analyzert::declare_and_initalize_char_ptr(
-  const symbol_exprt &symbol,
-  const std::string &memory_location,
-  const source_locationt &location)
-{
-  const std::regex octal_encoding_pattern("(\\\\[0-9]{3})");
-
-  auto it = values.find(memory_location);
-  if(it == values.end())
-  {
-    std::string value = gdb_api.get_value(id2string(symbol.get_identifier()));
-
-    exprt init = string_constantt(value);
-
-    if(regex_search(value, octal_encoding_pattern))
-    {
-      bitvector_typet bv_type = to_bitvector_type(symbol.type().subtype());
-      init = create_char_array_from_string(value, bv_type, location, ns);
-    }
-
-    code_declt target_object =
-      declare_instance(id2string(symbol.get_identifier()), init.type());
-
-    target_object.operands().resize(2);
-    target_object.op1() = init;
-    generated_code.add(target_object);
-    const address_of_exprt deref_pointer(target_object.symbol());
-    const exprt casted_if_needed =
-      typecast_exprt::conditional_cast(deref_pointer, symbol.type());
-    values[memory_location] = casted_if_needed;
-    return casted_if_needed;
-  }
-  else
-  {
-    return it->second;
+    analyze_symbol(id);
   }
 }
 
-exprt symbol_analyzert::process_any_pointer_target(
-  const symbol_exprt &symbol,
-  const std::string memory_location,
-  const source_locationt &location)
+void symbol_analyzert::analyze_symbol(const std::string &symbol_name)
 {
-  auto it = values.find(memory_location);
-  if(it == values.end())
-  {
-    const place_holder_exprt recursion_breaker(memory_location);
-    values[memory_location] = recursion_breaker;
-
-    const typet target_type = ns.follow(symbol.type().subtype());
-    const code_declt target_object = get_pointer_target(
-      id2string(symbol.get_identifier()), target_type, location);
-    generated_code.add(target_object);
-    values[memory_location] = target_object.symbol();
-    return target_object.symbol();
-  }
-  else
-  {
-    return it->second;
-  }
-}
-
-code_declt symbol_analyzert::get_pointer_target(
-  const std::string pointer_name,
-  const typet &type,
-  const source_locationt &location)
-{
-  code_declt declaration = declare_instance(pointer_name, type);
-
-  const std::string deref_pointer = "(*" + pointer_name + ")";
-  const exprt target_expr = fill_expr_with_values(
-    deref_pointer, zero_initializer(type, location, ns), type, location);
-
-  declaration.operands().resize(2);
-  declaration.op1() = target_expr;
-  return declaration;
-}
-
-exprt symbol_analyzert::fill_array_with_values(
-  const std::string &symbol_id,
-  exprt &array,
-  const typet &type,
-  const source_locationt &location)
-{
-  for(size_t i = 0; i < array.operands().size(); ++i)
-  {
-    const std::string cell_access = symbol_id + "[" + std::to_string(i) + "]";
-    const typet target_type = ns.follow(array.operands()[i].type());
-    if(is_c_char_pointer(target_type))
-    {
-      const std::string memory_location = gdb_api.get_memory(cell_access);
-      const symbol_exprt char_ptr(cell_access, target_type);
-      array.operands()[i] =
-        declare_and_initalize_char_ptr(char_ptr, memory_location, location);
-    }
-    else
-    {
-      array.operands()[i] = fill_expr_with_values(
-        cell_access, array.operands()[i], target_type, location);
-    }
-  }
-  return array;
-}
-
-exprt symbol_analyzert::fill_expr_with_values(
-  const std::string &symbol_id,
-  exprt expr,
-  const typet &type,
-  const source_locationt &location)
-{
-  if(expr.is_constant() && (is_c_int_derivate(type) || is_c_char(type)))
-  {
-    const std::string value = gdb_api.get_value(symbol_id);
-    const mp_integer int_rep = string2integer(value, DECIMAL_SYSTEM);
-    return from_integer(int_rep, type);
-  }
-  else if(expr.is_constant() && is_c_bool(type))
-  {
-    const std::string value = gdb_api.get_value(symbol_id);
-    return from_c_boolean_value(value, type);
-  }
-  else if(expr.is_constant() && is_c_enum(expr.type()))
-  {
-    const std::string value = gdb_api.get_value(symbol_id);
-    return convert_memeber_name_to_enum_value(
-      value, to_c_enum_type(expr.type()));
-  }
-  else if(is_struct(type))
-  {
-    return fill_struct_with_values(symbol_id, expr, type, location);
-  }
-  else if(is_array(type))
-  {
-    expr = fill_array_with_values(symbol_id, expr, type, location);
-  }
-  else
-  {
-    throw symbol_analysis_exceptiont(
-      "unexpected thing:  " + expr.pretty() + "\nexception end\n");
-  }
-  return expr;
-}
-
-exprt symbol_analyzert::fill_char_struct_member_with_values(
-  const symbol_exprt &field_access,
-  const exprt &default_expr,
-  const source_locationt &location)
-{
-  const std::string memory_location =
-    gdb_api.get_memory(id2string(field_access.get_identifier()));
-  if(memory_location != "0x0")
-  {
-    return declare_and_initalize_char_ptr(
-      field_access, memory_location, location);
-  }
-  return default_expr;
-}
-
-exprt symbol_analyzert::fill_struct_with_values(
-  const std::string &symbol_id,
-  exprt &expr,
-  const typet &type,
-  const source_locationt &location)
-{
-  const struct_typet structt = to_struct_type(type);
-  for(size_t i = 0; i < expr.operands().size(); ++i)
-  {
-    exprt &operand = expr.operands()[i];
-    const typet &resolved_type = ns.follow(operand.type());
-    if(!structt.components()[i].get_is_padding())
-    {
-      std::string field_access =
-        symbol_id + "." + id2string(structt.components()[i].get_name());
-      symbol_exprt field_symbol(field_access, resolved_type);
-
-      if(is_c_char_pointer(resolved_type))
-      {
-        operand =
-          fill_char_struct_member_with_values(field_symbol, operand, location);
-      }
-      else if(is_void_pointer(resolved_type))
-      {
-        operand = fill_void_pointer_with_values(field_symbol, location);
-      }
-      else if(is_struct(resolved_type))
-      {
-        code_declt declaration = declare_instance(field_access, resolved_type);
-
-        const exprt target_expr = fill_expr_with_values(
-          field_access,
-          zero_initializer(resolved_type, location, ns),
-          resolved_type,
-          location);
-
-        declaration.operands().resize(2);
-        declaration.op1() = target_expr;
-        generated_code.add(declaration);
-        operand = declaration.symbol();
-      }
-      else if(is_pointer(resolved_type))
-      {
-        const std::string memory_location = gdb_api.get_memory(field_access);
-
-        if(memory_location != "0x0")
-        {
-          const exprt target_sym =
-            process_any_pointer_target(field_symbol, memory_location, location);
-
-          if(target_sym.id() == ID_skip_initialize)
-          {
-            outstanding_assigns[field_symbol] =
-              id2string(target_sym.get(ID_identifier));
-          }
-          else
-          {
-            operand = address_of_exprt(target_sym);
-          }
-        }
-      }
-      else if(is_array(resolved_type))
-      {
-        operand = fill_array_with_values(
-          field_access, operand, resolved_type, location);
-      }
-      else
-      {
-        const std::string value = gdb_api.get_value(field_access);
-
-        if(is_c_int_derivate(resolved_type))
-        {
-          const mp_integer int_rep = string2integer(value, DECIMAL_SYSTEM);
-          const constant_exprt constant = from_integer(int_rep, operand.type());
-          expr.operands()[i] = constant;
-        }
-      }
-    }
-  }
-  return expr;
-}
-
-exprt symbol_analyzert::fill_void_pointer_with_values(
-  const symbol_exprt &pointer_symbol,
-  const source_locationt &location)
-{
-  const std::string &pointer_name = id2string(pointer_symbol.get_identifier());
-  const std::string &char_casted = "(char *)" + pointer_name;
-  exprt zero_ptr = zero_initializer(pointer_symbol.type(), location, ns);
+  const symbolt &symbol = ns.lookup(symbol_name);
+  const symbol_exprt symbol_expr = symbol.symbol_expr();
 
   try
   {
-    const typet &new_char_pointer = pointer_type(char_type());
-    const symbol_exprt char_access_symbol(char_casted, new_char_pointer);
+    const typet target_type = symbol.type;
 
-    const std::string memory_location = gdb_api.get_memory(pointer_name);
+    const auto zero_expr = zero_initializer(target_type, symbol.location, ns);
+    CHECK_RETURN(zero_expr);
 
-    if(memory_location == "0x0")
-    {
-      return zero_ptr;
-    }
-    return declare_and_initalize_char_ptr(
-      char_access_symbol, memory_location, location);
+    const exprt target_expr =
+      get_expr_value(symbol_expr, *zero_expr, symbol.location);
+
+    add_assignment(symbol_expr, target_expr);
   }
-  catch(gdb_inaccessible_memoryt)
+  catch(gdb_interaction_exceptiont e)
   {
-    // It is not directly what is supposed to happen,
-    // but doesn't corupt gdbs process state. So it's save to continue.
-    // Anyhow, you should inspect the result and value of field_access
-    // manually before using the state for verifcation.
-    // Field access stays zero initalized.
-    warning() << "Could not deal with void pointer: " << pointer_name
-              << "\nThe value is potential unsafe and need review\n"
-              << messaget::eom;
+    throw analysis_exceptiont(e.what());
   }
 
-  return zero_ptr;
+  process_outstanding_assignments();
+}
+
+/// Get memory snapshot as C code
+std::string symbol_analyzert::get_snapshot_as_c_code()
+{
+  code_blockt generated_code;
+
+  allocate_objects.declare_created_symbols(generated_code);
+
+  for(auto const &pair : assignments)
+  {
+    generated_code.add(code_assignt(pair.first, pair.second));
+  }
+
+  return c_converter.convert(generated_code);
+}
+
+/// Get memory snapshot as symbol table
+symbol_tablet symbol_analyzert::get_snapshot_as_symbol_table()
+{
+  symbol_tablet snapshot;
+
+  for(const auto &pair : assignments)
+  {
+    const symbol_exprt &symbol_expr = to_symbol_expr(pair.first);
+    const irep_idt id = symbol_expr.get_identifier();
+
+    INVARIANT(symbol_table.has_symbol(id), "symbol must exist in symbol table");
+
+    const symbolt &symbol = symbol_table.lookup_ref(id);
+
+    symbolt snapshot_symbol(symbol);
+    snapshot_symbol.value = pair.second;
+
+    snapshot.insert(snapshot_symbol);
+  }
+
+  // Also add type symbols to the snapshot
+  for(const auto &pair : symbol_table)
+  {
+    const symbolt &symbol = pair.second;
+
+    if(symbol.is_type)
+    {
+      snapshot.insert(symbol);
+    }
+  }
+
+  return snapshot;
+}
+
+void symbol_analyzert::add_assignment(const exprt &lhs, const exprt &value)
+{
+  assignments.push_back(std::make_pair(lhs, value));
+}
+
+exprt symbol_analyzert::get_char_pointer_value(
+  const exprt &expr,
+  const std::string &memory_location,
+  const source_locationt &location)
+{
+  PRECONDITION(expr.type().id() == ID_pointer);
+  PRECONDITION(is_c_char(expr.type().subtype()));
+  PRECONDITION(memory_location != "0x0");
+
+  auto it = values.find(memory_location);
+
+  if(it == values.end())
+  {
+    std::string c_expr = c_converter.convert(expr);
+    pointer_valuet value = gdb_api.get_memory(c_expr);
+    CHECK_RETURN(value.string);
+    std::string string = *value.string;
+
+    string_constantt init(string);
+    CHECK_RETURN(to_array_type(init.type()).is_complete());
+
+    symbol_exprt dummy(pointer_typet(init.type(), config.ansi_c.pointer_width));
+    code_blockt assignments;
+
+    const symbol_exprt new_symbol =
+      to_symbol_expr(allocate_objects.allocate_automatic_local_object(
+        assignments, dummy, init.type()));
+
+    add_assignment(new_symbol, init);
+
+    values.insert(std::make_pair(memory_location, new_symbol));
+
+    return new_symbol;
+  }
+  else
+  {
+    return it->second;
+  }
+}
+
+exprt symbol_analyzert::get_non_char_pointer_value(
+  const exprt &expr,
+  const std::string memory_location,
+  const source_locationt &location)
+{
+  PRECONDITION(expr.type().id() == ID_pointer);
+  PRECONDITION(!is_c_char(expr.type().subtype()));
+  PRECONDITION(memory_location != "0x0");
+
+  auto it = values.find(memory_location);
+
+  if(it == values.end())
+  {
+    values.insert(std::make_pair(memory_location, nil_exprt()));
+
+    const typet target_type = expr.type().subtype();
+
+    symbol_exprt dummy(expr.type());
+    code_blockt assignments;
+
+    const symbol_exprt new_symbol =
+      to_symbol_expr(allocate_objects.allocate_automatic_local_object(
+        assignments, dummy, target_type));
+
+    dereference_exprt dereference_expr(expr);
+
+    const auto zero_expr = zero_initializer(target_type, location, ns);
+    CHECK_RETURN(zero_expr);
+
+    const exprt target_expr =
+      get_expr_value(dereference_expr, *zero_expr, location);
+
+    // add assignment of value to newly created symbol
+    add_assignment(new_symbol, target_expr);
+
+    values[memory_location] = new_symbol;
+
+    return new_symbol;
+  }
+  else
+  {
+    return it->second;
+  }
+}
+
+exprt symbol_analyzert::get_pointer_value(
+  const exprt &expr,
+  const exprt &zero_expr,
+  const source_locationt &location)
+{
+  PRECONDITION(zero_expr.id() == ID_constant);
+
+  PRECONDITION(expr.type().id() == ID_pointer);
+  PRECONDITION(expr.type() == zero_expr.type());
+
+  std::string c_expr = c_converter.convert(expr);
+  const pointer_valuet value = gdb_api.get_memory(c_expr);
+
+  const std::string memory_location = value.address;
+
+  if(memory_location != "0x0")
+  {
+    if(is_c_char(expr.type().subtype()))
+    {
+      return get_char_pointer_value(expr, memory_location, location);
+    }
+    else
+    {
+      const exprt target_expr =
+        get_non_char_pointer_value(expr, memory_location, location);
+
+      if(target_expr.id() == ID_nil)
+      {
+        outstanding_assignments[expr] = memory_location;
+      }
+      else
+      {
+        return address_of_exprt(target_expr);
+      }
+    }
+  }
+
+  return zero_expr;
+}
+
+exprt symbol_analyzert::get_array_value(
+  const exprt &expr,
+  const exprt &array,
+  const source_locationt &location)
+{
+  PRECONDITION(array.id() == ID_array);
+
+  PRECONDITION(expr.type().id() == ID_array);
+  PRECONDITION(expr.type() == array.type());
+
+  exprt new_array(array);
+
+  for(size_t i = 0; i < new_array.operands().size(); ++i)
+  {
+    const index_exprt index_expr(expr, from_integer(i, index_type()));
+
+    exprt &operand = new_array.operands()[i];
+
+    operand = get_expr_value(index_expr, operand, location);
+  }
+
+  return new_array;
+}
+
+exprt symbol_analyzert::get_expr_value(
+  const exprt &expr,
+  const exprt &zero_expr,
+  const source_locationt &location)
+{
+  PRECONDITION(expr.type() == zero_expr.type());
+
+  const typet &type = expr.type();
+
+  if(is_c_int_derivate(type))
+  {
+    INVARIANT(zero_expr.is_constant(), "zero initializer is a constant");
+
+    std::string c_expr = c_converter.convert(expr);
+    const std::string value = gdb_api.get_value(c_expr);
+
+    const mp_integer int_rep = string2integer(value);
+
+    return from_integer(int_rep, type);
+  }
+  else if(is_c_char(type))
+  {
+    INVARIANT(zero_expr.is_constant(), "zero initializer is a constant");
+
+    return zero_expr; // currently left at 0
+  }
+  else if(type.id() == ID_c_bool)
+  {
+    INVARIANT(zero_expr.is_constant(), "zero initializer is a constant");
+
+    std::string c_expr = c_converter.convert(expr);
+    const std::string value = gdb_api.get_value(c_expr);
+
+    return from_c_boolean_value(value, type);
+  }
+  else if(type.id() == ID_c_enum)
+  {
+    INVARIANT(zero_expr.is_constant(), "zero initializer is a constant");
+
+    std::string c_expr = c_converter.convert(expr);
+    const std::string value = gdb_api.get_value(c_expr);
+
+    return convert_member_name_to_enum_value(value, to_c_enum_type(type));
+  }
+  else if(type.id() == ID_struct_tag)
+  {
+    return get_struct_value(expr, zero_expr, location);
+  }
+  else if(type.id() == ID_array)
+  {
+    return get_array_value(expr, zero_expr, location);
+  }
+  else if(type.id() == ID_pointer)
+  {
+    INVARIANT(zero_expr.is_constant(), "zero initializer is a constant");
+
+    return get_pointer_value(expr, zero_expr, location);
+  }
+  else
+  {
+    throw analysis_exceptiont("unexpected expression:\n" + expr.pretty());
+  }
+
+  return zero_expr;
+}
+
+exprt symbol_analyzert::get_struct_value(
+  const exprt &expr,
+  const exprt &zero_expr,
+  const source_locationt &location)
+{
+  PRECONDITION(zero_expr.id() == ID_struct);
+
+  PRECONDITION(expr.type().id() == ID_struct_tag);
+  PRECONDITION(expr.type() == zero_expr.type());
+
+  exprt new_expr(zero_expr);
+
+  const struct_tag_typet &struct_tag_type = to_struct_tag_type(expr.type());
+  const struct_typet struct_type = ns.follow_tag(struct_tag_type);
+
+  for(size_t i = 0; i < new_expr.operands().size(); ++i)
+  {
+    const struct_typet::componentt &component = struct_type.components()[i];
+
+    if(component.get_is_padding())
+    {
+      continue;
+    }
+
+    exprt &operand = new_expr.operands()[i];
+    member_exprt member_expr(expr, component);
+
+    operand = get_expr_value(member_expr, operand, location);
+  }
+
+  return new_expr;
 }
 
 void symbol_analyzert::process_outstanding_assignments()
 {
-  for(auto it = outstanding_assigns.begin(); it != outstanding_assigns.end();
-      ++it)
+  for(const auto &pair : outstanding_assignments)
   {
-    const address_of_exprt reference_to_target(values[it->second]);
-    generated_code.add(code_assignt(it->first, reference_to_target));
+    const address_of_exprt aoe(values[pair.second]);
+    add_assignment(pair.first, aoe);
   }
 }
+
 #endif
