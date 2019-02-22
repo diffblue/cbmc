@@ -1,0 +1,5 @@
+CORE
+main.exe
+--breakpoint checkpoint --symbols x,p,st,a --symtab-snapshot --json-ui
+^EXIT=0$
+^SIGNAL=0$

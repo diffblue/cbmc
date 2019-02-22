@@ -1,0 +1,8 @@
+CORE
+main.exe
+--breakpoint checkpoint --symbols st
+signed int tmp;
+tmp = 3;
+st = \{ .c1=1, .c2=&tmp \};
+^EXIT=0$
+^SIGNAL=0$

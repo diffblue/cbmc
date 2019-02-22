@@ -1,0 +1,6 @@
+CORE
+main.exe
+--breakpoint checkpoint --symbols st
+st = \{ \.c=1, \.t=\{ \.i=2 \} \};
+^EXIT=0$
+^SIGNAL=0$

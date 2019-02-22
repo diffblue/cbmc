@@ -1,0 +1,8 @@
+KNOWNBUG
+main.exe
+--breakpoint checkpoint --symbols st
+char tmp[4];
+tmp = "abc";
+st = \{ .c1=1, .c2=tmp \};
+^EXIT=0$
+^SIGNAL=0$
