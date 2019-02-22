@@ -169,7 +169,7 @@ protected:
 void goto_checkt::collect_allocations(
   const goto_functionst &goto_functions)
 {
-  if(!enable_pointer_check)
+  if(!enable_pointer_check && !enable_bounds_check)
     return;
 
   forall_goto_functions(itf, goto_functions)
@@ -1296,10 +1296,29 @@ void goto_checkt::bounds_check(
 
     binary_relation_exprt inequality(effective_offset, ID_lt, size_casted);
 
+    exprt::operandst alloc_disjuncts;
+    for(const auto &a : allocations)
+    {
+      typecast_exprt int_ptr{pointer, a.first.type()};
+
+      binary_relation_exprt lower_bound_check{a.first, ID_le, int_ptr};
+
+      plus_exprt upper_bound{
+        int_ptr,
+        typecast_exprt::conditional_cast(ode.offset(), int_ptr.type())};
+
+      binary_relation_exprt upper_bound_check{
+        std::move(upper_bound), ID_lt, plus_exprt{a.first, a.second}};
+
+      alloc_disjuncts.push_back(
+        and_exprt{std::move(lower_bound_check), std::move(upper_bound_check)});
+    }
+
+    exprt in_bounds_of_some_explicit_allocation = disjunction(alloc_disjuncts);
+
     or_exprt precond(
-      and_exprt(
-        dynamic_object(pointer),
-        not_exprt(malloc_object(pointer, ns))),
+      std::move(in_bounds_of_some_explicit_allocation),
+      and_exprt(dynamic_object(pointer), not_exprt(malloc_object(pointer, ns))),
       inequality);
 
     add_guarded_claim(
