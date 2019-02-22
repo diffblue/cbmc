@@ -1,0 +1,10 @@
+CORE
+main.c
+--property inc.overflow.1 --property inc.overflow.2 --slice-formula --signed-overflow-check --conversion-check
+^EXIT=10$
+^SIGNAL=0$
+VERIFICATION FAILED
+\[inc\.overflow\.2\] line 3 arithmetic overflow on signed type conversion in \(signed short int\)\(\(signed int\)x \+ 1\): FAILURE
+\[inc\.overflow\.1\] line 3 arithmetic overflow on signed \+ in \(signed int\)x \+ 1: SUCCESS
+--
+^warning: ignoring
