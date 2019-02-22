@@ -1,7 +1,8 @@
-KNOWNBUG
+CORE
 main.c
 
 ^EXIT=6$
 ^SIGNAL=0$
-expected to have pointer argument
+__sync_\* primitives take a pointer as first argument
+CONVERSION ERROR
 --

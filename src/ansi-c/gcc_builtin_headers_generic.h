@@ -62,23 +62,13 @@ int __builtin_vsprintf(char*, const char*, __builtin_va_list);
 int __builtin_vsscanf(const char*, const char*, __builtin_va_list);
 
 // atomics
-int __sync_fetch_and_add();
-int __sync_fetch_and_sub();
-int __sync_fetch_and_or();
-int __sync_fetch_and_and();
-int __sync_fetch_and_xor();
-int __sync_fetch_and_nand();
-int __sync_add_and_fetch();
-int __sync_sub_and_fetch();
-int __sync_or_and_fetch();
-int __sync_and_and_fetch();
-int __sync_xor_and_fetch();
-int __sync_nand_and_fetch();
-_Bool __sync_bool_compare_and_swap();
-int __sync_val_compare_and_swap();
 void __sync_synchronize();
-int __sync_lock_test_and_set();
-void __sync_lock_release();
+_Bool __atomic_test_and_set(void *, int);
+void __atomic_clear(_Bool *, int);
+void __atomic_thread_fence(int);
+void __atomic_signal_fence(int);
+_Bool __atomic_always_lock_free(__CPROVER_size_t, void *);
+_Bool __atomic_is_lock_free(__CPROVER_size_t, void *);
 
 // other
 int __builtin_choose_expr(_Bool, ...);

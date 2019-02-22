@@ -1945,6 +1945,23 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
       {
         // yes, it's a builtin
       }
+      else if(
+        auto gcc_polymorphic = typecheck_gcc_polymorphic_builtin(
+          identifier, expr.arguments(), f_op.source_location()))
+      {
+        if(!symbol_table.has_symbol(gcc_polymorphic->get_identifier()))
+        {
+          symbolt new_symbol;
+
+          new_symbol.name = gcc_polymorphic->get_identifier();
+          new_symbol.base_name = gcc_polymorphic->get_identifier();
+          new_symbol.location = f_op.source_location();
+          new_symbol.type = gcc_polymorphic->type();
+          new_symbol.mode = ID_C;
+
+          symbol_table.add(new_symbol);
+        }
+      }
       else
       {
         // This is an undeclared function that's not a builtin.
@@ -2765,48 +2782,6 @@ exprt c_typecheck_baset::do_special_functions(
 
     return tmp;
   }
-  else if(identifier=="__sync_fetch_and_add" ||
-          identifier=="__sync_fetch_and_sub" ||
-          identifier=="__sync_fetch_and_or" ||
-          identifier=="__sync_fetch_and_and" ||
-          identifier=="__sync_fetch_and_xor" ||
-          identifier=="__sync_fetch_and_nand" ||
-          identifier=="__sync_add_and_fetch" ||
-          identifier=="__sync_sub_and_fetch" ||
-          identifier=="__sync_or_and_fetch" ||
-          identifier=="__sync_and_and_fetch" ||
-          identifier=="__sync_xor_and_fetch" ||
-          identifier=="__sync_nand_and_fetch" ||
-          identifier=="__sync_val_compare_and_swap" ||
-          identifier=="__sync_lock_test_and_set" ||
-          identifier=="__sync_lock_release")
-  {
-    // These are polymorphic, see
-    // http://gcc.gnu.org/onlinedocs/gcc-4.1.1/gcc/Atomic-Builtins.html
-
-    // adjust return type of function to match pointer subtype
-    if(expr.arguments().empty())
-    {
-      error().source_location = f_op.source_location();
-      error() << "__sync_* primitives take as least one argument" << eom;
-      throw 0;
-    }
-
-    typecheck_function_call_arguments(expr);
-
-    exprt &ptr_arg=expr.arguments().front();
-
-    if(ptr_arg.type().id()!=ID_pointer)
-    {
-      error().source_location = f_op.source_location();
-      error() << "__sync_* primitives take pointer as first argument" << eom;
-      throw 0;
-    }
-
-    expr.type()=expr.arguments().front().type().subtype();
-
-    return expr;
-  }
   else if(
     identifier == CPROVER_PREFIX "overflow_minus" ||
     identifier == CPROVER_PREFIX "overflow_mult" ||
@@ -3570,4 +3545,360 @@ void c_typecheck_baset::make_constant_index(exprt &expr)
     error() << "conversion to integer constant failed" << eom;
     throw 0;
   }
+}
+
+optionalt<symbol_exprt> c_typecheck_baset::typecheck_gcc_polymorphic_builtin(
+  const irep_idt &identifier,
+  const exprt::operandst &arguments,
+  const source_locationt &source_location)
+{
+  // the arguments need not be type checked just yet, thus do not make
+  // assumptions that would require type checking
+
+  if(
+    identifier == ID___sync_fetch_and_add ||
+    identifier == ID___sync_fetch_and_sub ||
+    identifier == ID___sync_fetch_and_or ||
+    identifier == ID___sync_fetch_and_and ||
+    identifier == ID___sync_fetch_and_xor ||
+    identifier == ID___sync_fetch_and_nand ||
+    identifier == ID___sync_add_and_fetch ||
+    identifier == ID___sync_sub_and_fetch ||
+    identifier == ID___sync_or_and_fetch ||
+    identifier == ID___sync_and_and_fetch ||
+    identifier == ID___sync_xor_and_fetch ||
+    identifier == ID___sync_nand_and_fetch ||
+    identifier == ID___sync_bool_compare_and_swap ||
+    identifier == ID___sync_val_compare_and_swap ||
+    identifier == ID___sync_lock_test_and_set ||
+    identifier == ID___sync_lock_release)
+  {
+    // These are polymorphic, see
+    // http://gcc.gnu.org/onlinedocs/gcc-4.1.1/gcc/Atomic-Builtins.html
+
+    // adjust return type of function to match pointer subtype
+    if(arguments.empty())
+    {
+      error().source_location = source_location;
+      error() << "__sync_* primitives take as least one argument" << eom;
+      throw 0;
+    }
+
+    const exprt &ptr_arg = arguments.front();
+
+    if(ptr_arg.type().id() != ID_pointer)
+    {
+      error().source_location = source_location;
+      error() << "__sync_* primitives take a pointer as first argument" << eom;
+      throw 0;
+    }
+
+    typet return_type = ptr_arg.type().subtype();
+    if(identifier == ID___sync_bool_compare_and_swap)
+      return_type = c_bool_type();
+    else if(identifier == ID___sync_lock_release)
+      return_type = void_type();
+
+    code_typet t{{code_typet::parametert(ptr_arg.type())}, return_type};
+    t.make_ellipsis();
+    symbol_exprt result{identifier, t};
+    result.add_source_location() = source_location;
+
+    return std::move(result);
+  }
+  else if(identifier == ID___atomic_load_n)
+  {
+    // These are polymorphic
+    // https://gcc.gnu.org/onlinedocs/gcc/_005f_005fatomic-Builtins.html
+    // type __atomic_load_n(type *ptr, int memorder)
+
+    if(arguments.size() != 2)
+    {
+      error().source_location = source_location;
+      error() << identifier << " expects two arguments" << eom;
+      throw 0;
+    }
+
+    const exprt &ptr_arg = arguments.front();
+
+    if(ptr_arg.type().id() != ID_pointer)
+    {
+      error().source_location = source_location;
+      error() << identifier << " takes a pointer as first argument" << eom;
+      throw 0;
+    }
+
+    const code_typet t(
+      {code_typet::parametert(ptr_arg.type()),
+       code_typet::parametert(signed_int_type())},
+      ptr_arg.type().subtype());
+    symbol_exprt result(identifier, t);
+    result.add_source_location() = source_location;
+    return std::move(result);
+  }
+  else if(identifier == ID___atomic_store_n)
+  {
+    // These are polymorphic
+    // https://gcc.gnu.org/onlinedocs/gcc/_005f_005fatomic-Builtins.html
+    // void __atomic_store_n(type *ptr, type val, int memorder)
+
+    if(arguments.size() != 3)
+    {
+      error().source_location = source_location;
+      error() << identifier << " expects three arguments" << eom;
+      throw 0;
+    }
+
+    const exprt &ptr_arg = arguments.front();
+
+    if(ptr_arg.type().id() != ID_pointer)
+    {
+      error().source_location = source_location;
+      error() << identifier << " takes a pointer as first argument" << eom;
+      throw 0;
+    }
+
+    const code_typet t(
+      {code_typet::parametert(ptr_arg.type()),
+       code_typet::parametert(ptr_arg.type().subtype()),
+       code_typet::parametert(signed_int_type())},
+      void_type());
+    symbol_exprt result(identifier, t);
+    result.add_source_location() = source_location;
+    return std::move(result);
+  }
+  else if(identifier == ID___atomic_exchange_n)
+  {
+    // These are polymorphic
+    // https://gcc.gnu.org/onlinedocs/gcc/_005f_005fatomic-Builtins.html
+    // type __atomic_exchange_n(type *ptr, type val, int memorder)
+
+    if(arguments.size() != 3)
+    {
+      error().source_location = source_location;
+      error() << identifier << " expects three arguments" << eom;
+      throw 0;
+    }
+
+    const exprt &ptr_arg = arguments.front();
+
+    if(ptr_arg.type().id() != ID_pointer)
+    {
+      error().source_location = source_location;
+      error() << identifier << " takes a pointer as first argument" << eom;
+      throw 0;
+    }
+
+    const code_typet t(
+      {code_typet::parametert(ptr_arg.type()),
+       code_typet::parametert(ptr_arg.type().subtype()),
+       code_typet::parametert(signed_int_type())},
+      ptr_arg.type().subtype());
+    symbol_exprt result(identifier, t);
+    result.add_source_location() = source_location;
+    return std::move(result);
+  }
+  else if(identifier == ID___atomic_load || identifier == ID___atomic_store)
+  {
+    // void __atomic_load(type *ptr, type *ret, int memorder)
+    // void __atomic_store(type *ptr, type *val, int memorder)
+
+    if(arguments.size() != 3)
+    {
+      error().source_location = source_location;
+      error() << identifier << " expects three arguments" << eom;
+      throw 0;
+    }
+
+    if(arguments[0].type().id() != ID_pointer)
+    {
+      error().source_location = source_location;
+      error() << identifier << " takes a pointer as first argument" << eom;
+      throw 0;
+    }
+
+    if(arguments[1].type().id() != ID_pointer)
+    {
+      error().source_location = source_location;
+      error() << identifier << " takes a pointer as second argument" << eom;
+      throw 0;
+    }
+
+    const exprt &ptr_arg = arguments.front();
+
+    const code_typet t(
+      {code_typet::parametert(ptr_arg.type()),
+       code_typet::parametert(ptr_arg.type()),
+       code_typet::parametert(signed_int_type())},
+      void_type());
+    symbol_exprt result(identifier, t);
+    result.add_source_location() = source_location;
+    return std::move(result);
+  }
+  else if(identifier == ID___atomic_exchange)
+  {
+    // void __atomic_exchange(type *ptr, type *val, type *ret, int memorder)
+
+    if(arguments.size() != 4)
+    {
+      error().source_location = source_location;
+      error() << identifier << " expects four arguments" << eom;
+      throw 0;
+    }
+
+    if(arguments[0].type().id() != ID_pointer)
+    {
+      error().source_location = source_location;
+      error() << identifier << " takes a pointer as first argument" << eom;
+      throw 0;
+    }
+
+    if(arguments[1].type().id() != ID_pointer)
+    {
+      error().source_location = source_location;
+      error() << identifier << " takes a pointer as second argument" << eom;
+      throw 0;
+    }
+
+    if(arguments[2].type().id() != ID_pointer)
+    {
+      error().source_location = source_location;
+      error() << identifier << " takes a pointer as third argument" << eom;
+      throw 0;
+    }
+
+    const exprt &ptr_arg = arguments.front();
+
+    const code_typet t(
+      {code_typet::parametert(ptr_arg.type()),
+       code_typet::parametert(ptr_arg.type()),
+       code_typet::parametert(ptr_arg.type()),
+       code_typet::parametert(signed_int_type())},
+      void_type());
+    symbol_exprt result(identifier, t);
+    result.add_source_location() = source_location;
+    return std::move(result);
+  }
+  else if(
+    identifier == ID___atomic_compare_exchange_n ||
+    identifier == ID___atomic_compare_exchange)
+  {
+    // bool __atomic_compare_exchange_n(type *ptr, type *expected, type
+    // desired, bool weak, int success_memorder, int failure_memorder)
+    // bool __atomic_compare_exchange(type *ptr, type *expected, type
+    // *desired, bool weak, int success_memorder, int failure_memorder)
+
+    if(arguments.size() != 6)
+    {
+      error().source_location = source_location;
+      error() << identifier << " expects six arguments" << eom;
+      throw 0;
+    }
+
+    if(arguments[0].type().id() != ID_pointer)
+    {
+      error().source_location = source_location;
+      error() << identifier << " takes a pointer as first argument" << eom;
+      throw 0;
+    }
+
+    if(arguments[1].type().id() != ID_pointer)
+    {
+      error().source_location = source_location;
+      error() << identifier << " takes a pointer as second argument" << eom;
+      throw 0;
+    }
+
+    if(
+      identifier == ID___atomic_compare_exchange &&
+      arguments[2].type().id() != ID_pointer)
+    {
+      error().source_location = source_location;
+      error() << identifier << " takes a pointer as third argument" << eom;
+      throw 0;
+    }
+
+    const exprt &ptr_arg = arguments.front();
+
+    code_typet::parameterst parameters;
+    parameters.push_back(code_typet::parametert(ptr_arg.type()));
+    parameters.push_back(code_typet::parametert(ptr_arg.type()));
+
+    if(identifier == ID___atomic_compare_exchange)
+      parameters.push_back(code_typet::parametert(ptr_arg.type()));
+    else
+      parameters.push_back(code_typet::parametert(ptr_arg.type().subtype()));
+
+    parameters.push_back(code_typet::parametert(c_bool_type()));
+    parameters.push_back(code_typet::parametert(signed_int_type()));
+    parameters.push_back(code_typet::parametert(signed_int_type()));
+    code_typet t(std::move(parameters), c_bool_type());
+    symbol_exprt result(identifier, t);
+    result.add_source_location() = source_location;
+    return std::move(result);
+  }
+  else if(
+    identifier == ID___atomic_add_fetch ||
+    identifier == ID___atomic_sub_fetch ||
+    identifier == ID___atomic_and_fetch ||
+    identifier == ID___atomic_xor_fetch || identifier == ID___atomic_or_fetch ||
+    identifier == ID___atomic_nand_fetch)
+  {
+    if(arguments.size() != 3)
+    {
+      error().source_location = source_location;
+      error() << "__atomic_*_fetch primitives take three arguments" << eom;
+      throw 0;
+    }
+
+    const exprt &ptr_arg = arguments.front();
+
+    if(ptr_arg.type().id() != ID_pointer)
+    {
+      error().source_location = source_location;
+      error() << "__atomic_*_fetch primitives take pointer as first argument"
+              << eom;
+      throw 0;
+    }
+
+    code_typet t(
+      {code_typet::parametert(ptr_arg.type())}, ptr_arg.type().subtype());
+    t.make_ellipsis();
+    symbol_exprt result(identifier, t);
+    result.add_source_location() = source_location;
+    return std::move(result);
+  }
+  else if(
+    identifier == ID___atomic_fetch_add ||
+    identifier == ID___atomic_fetch_sub ||
+    identifier == ID___atomic_fetch_and ||
+    identifier == ID___atomic_fetch_xor || identifier == ID___atomic_fetch_or ||
+    identifier == ID___atomic_fetch_nand)
+  {
+    if(arguments.size() != 3)
+    {
+      error().source_location = source_location;
+      error() << "__atomic_fetch_* primitives take three arguments" << eom;
+      throw 0;
+    }
+
+    const exprt &ptr_arg = arguments.front();
+
+    if(ptr_arg.type().id() != ID_pointer)
+    {
+      error().source_location = source_location;
+      error() << "__atomic_fetch_* primitives take pointer as first argument"
+              << eom;
+      throw 0;
+    }
+
+    code_typet t(
+      {code_typet::parametert(ptr_arg.type())}, ptr_arg.type().subtype());
+    t.make_ellipsis();
+    symbol_exprt result(identifier, t);
+    result.add_source_location() = source_location;
+    return std::move(result);
+  }
+
+  return {};
 }
