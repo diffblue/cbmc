@@ -1026,3 +1026,64 @@ inline int vasprintf(char **ptr, const char *fmt, va_list ap)
 
   return i;
 }
+
+/* FUNCTION: __acrt_iob_func */
+
+#ifdef _WIN32
+
+#  ifndef __CPROVER_STDIO_H_INCLUDED
+#    include <stdio.h>
+#    define __CPROVER_STDIO_H_INCLUDED
+#  endif
+
+inline FILE *__acrt_iob_func(unsigned fd)
+{
+  static FILE stdin_file;
+  static FILE stdout_file;
+  static FILE stderr_file;
+
+  switch(fd)
+  {
+  case 0:
+    return &stdin_file;
+  case 1:
+    return &stdout_file;
+  case 2:
+    return &stderr_file;
+  default:
+    return (FILE *)0;
+  }
+}
+
+#endif
+
+/* FUNCTION: __stdio_common_vfprintf */
+
+#ifdef _WIN32
+
+#  ifndef __CPROVER_STDIO_H_INCLUDED
+#    include <stdio.h>
+#    define __CPROVER_STDIO_H_INCLUDED
+#  endif
+
+#  ifndef __CPROVER_STDARG_H_INCLUDED
+#    include <stdarg.h>
+#    define __CPROVER_STDARG_H_INCLUDED
+#  endif
+
+inline int __stdio_common_vfprintf(
+  unsigned __int64 options,
+  FILE *stream,
+  char const *format,
+  _locale_t locale,
+  va_list args)
+{
+  (void)options;
+  (void)locale;
+
+  if(stream == __acrt_iob_func(1))
+    __CPROVER_printf(format, args);
+  return 0;
+}
+
+#endif
