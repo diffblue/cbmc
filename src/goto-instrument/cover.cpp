@@ -265,16 +265,17 @@ cover_configt get_cover_config(
     get_cover_config(options, symbol_table, message_handler);
 
   std::string cover_only = options.get_option("cover-only");
-  const symbolt main_symbol = symbol_table.lookup_ref(main_id);
 
   // cover entry point function only
   if(cover_only == "function")
   {
+    const symbolt &main_symbol = symbol_table.lookup_ref(main_id);
     cover_config.function_filters.add(util_make_unique<single_function_filtert>(
       message_handler, main_symbol.name));
   }
   else if(cover_only == "file")
   {
+    const symbolt &main_symbol = symbol_table.lookup_ref(main_id);
     cover_config.function_filters.add(util_make_unique<file_filtert>(
       message_handler, main_symbol.location.get_file()));
   }
