@@ -1,4 +1,4 @@
-CORE broken-smt-backend
+KNOWNBUG broken-smt-backend
 main.c
 --trace --trace-show-function-calls
 ^EXIT=10$
@@ -6,6 +6,8 @@ main.c
 Function call: function_to_call\(-2147483647\) \(depth 2\)
 Function return from function_to_call \(depth 1\)
 Function call: function_to_call\(-2\) \(depth 2\)
+Function call: function_without_body\(123\) \(depth 2\)
+Function return from function_without_body \(depth 1\)
 ^VERIFICATION FAILED$
 --
 ^warning: ignoring

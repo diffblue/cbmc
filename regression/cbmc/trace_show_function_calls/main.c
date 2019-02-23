@@ -4,6 +4,8 @@ int function_to_call(int a)
   return a + local;
 }
 
+int function_without_body(int p);
+
 int main()
 {
   int a;
@@ -15,6 +17,7 @@ int main()
   a = -2147483647;
   a = function_to_call(a);
   b = function_to_call(b);
+  a = function_without_body(123);
 
   __CPROVER_assert(0, "");
 }
