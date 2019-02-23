@@ -992,6 +992,48 @@ void goto_programt::instructiont::transform(
   }
 }
 
+void goto_programt::instructiont::apply(
+  std::function<void(const exprt &)> f) const
+{
+  switch(type)
+  {
+  case OTHER:
+    if(get_other().get_statement() == ID_expression)
+      f(to_code_expression(get_other()).expression());
+    break;
+
+  case RETURN:
+    f(get_return().return_value());
+    break;
+
+  case ASSIGN:
+    f(get_assign().lhs());
+    f(get_assign().rhs());
+    break;
+
+  case DECL:
+    f(get_decl().symbol());
+    break;
+
+  case DEAD:
+    f(get_dead().symbol());
+    break;
+
+  case FUNCTION_CALL:
+  {
+    const auto &call = get_function_call();
+    f(call.lhs());
+    for(auto &a : call.arguments())
+      f(a);
+  }
+  break;
+
+  default:
+    if(has_condition())
+      f(get_condition());
+  }
+}
+
 bool goto_programt::equals(const goto_programt &other) const
 {
   if(instructions.size() != other.instructions.size())
