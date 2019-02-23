@@ -186,14 +186,7 @@ void concurrency_instrumentationt::collect(
   forall_goto_program_instructions(i_it, goto_program)
   {
     if(is_threaded(i_it))
-    {
-      if(i_it->is_assign())
-        collect(i_it->code);
-      else if(i_it->is_assume() || i_it->is_assert() || i_it->is_goto())
-        collect(i_it->guard);
-      else if(i_it->is_function_call())
-        collect(i_it->code);
-    }
+      i_it->apply([this](const exprt &e) { collect(e); });
   }
 }
 

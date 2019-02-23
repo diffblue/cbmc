@@ -66,8 +66,8 @@ void full_slicert::add_decl_dead(
     return;
 
   find_symbols_sett syms;
-  find_symbols(node.PC->code, syms);
-  find_symbols(node.PC->guard, syms);
+
+  node.PC->apply([&syms](const exprt &e) { find_symbols(e, syms); });
 
   for(find_symbols_sett::const_iterator
       it=syms.begin();

@@ -61,15 +61,11 @@ void slice_global_inits(goto_modelt &goto_model)
     if(it == goto_functions.function_map.end())
       continue;
 
-    const goto_programt &goto_program = it->second.body;
-
-    forall_goto_program_instructions(i_it, goto_program)
+    for(const auto &i : it->second.body.instructions)
     {
-      const codet &code = i_it->code;
-      find_symbols(code, symbols, true, false);
-
-      if(i_it->has_condition())
-        find_symbols(i_it->get_condition(), symbols, true, false);
+      i.apply([&symbols](const exprt &expr) {
+        find_symbols(expr, symbols, true, false);
+      });
     }
   }
 
@@ -77,6 +73,7 @@ void slice_global_inits(goto_modelt &goto_model)
 
   goto_functionst::function_mapt::iterator f_it;
   f_it=goto_functions.function_map.find(INITIALIZE_FUNCTION);
+
   if(f_it == goto_functions.function_map.end())
     throw incorrect_goto_program_exceptiont("initialize function not found");
 
