@@ -526,7 +526,7 @@ void goto_convertt::remove_statement_expression(
     exprt e=to_code_assign(last).lhs();
     code_assignt assignment(tmp_symbol_expr, e);
     assignment.add_source_location()=source_location;
-    code.operands().push_back(assignment);
+    to_code_block(code).add(std::move(assignment));
   }
   else
   {
