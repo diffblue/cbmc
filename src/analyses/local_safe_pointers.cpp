@@ -11,6 +11,7 @@ Author: Diffblue Ltd
 
 #include "local_safe_pointers.h"
 
+#include <util/base_type.h>
 #include <util/expr_iterator.h>
 #include <util/expr_util.h>
 #include <util/format_expr.h>
@@ -81,7 +82,8 @@ static optionalt<goto_null_checkt> get_null_checked_expr(const exprt &expr)
 /// \param goto_program: program to analyse
 void local_safe_pointerst::operator()(const goto_programt &goto_program)
 {
-  std::set<exprt, type_comparet> checked_expressions(type_comparet{});
+  std::set<exprt, base_type_comparet> checked_expressions(
+    base_type_comparet{ns});
 
   for(const auto &instruction : goto_program.instructions)
   {
@@ -96,7 +98,8 @@ void local_safe_pointerst::operator()(const goto_programt &goto_program)
         checked_expressions = findit->second;
       else
       {
-        checked_expressions = std::set<exprt, type_comparet>(type_comparet{});
+        checked_expressions =
+          std::set<exprt, base_type_comparet>(base_type_comparet{ns});
       }
     }
 
@@ -185,11 +188,8 @@ void local_safe_pointerst::operator()(const goto_programt &goto_program)
 /// \param out: stream to write output to
 /// \param goto_program: GOTO program analysed (the same one passed to
 ///   operator())
-/// \param ns: namespace
 void local_safe_pointerst::output(
-  std::ostream &out,
-  const goto_programt &goto_program,
-  const namespacet &ns)
+  std::ostream &out, const goto_programt &goto_program)
 {
   forall_goto_program_instructions(i_it, goto_program)
   {
@@ -229,11 +229,8 @@ void local_safe_pointerst::output(
 /// \param out: stream to write output to
 /// \param goto_program: GOTO program analysed (the same one passed to
 ///   operator())
-/// \param ns: namespace
 void local_safe_pointerst::output_safe_dereferences(
-  std::ostream &out,
-  const goto_programt &goto_program,
-  const namespacet &ns)
+  std::ostream &out, const goto_programt &goto_program)
 {
   forall_goto_program_instructions(i_it, goto_program)
   {
@@ -250,17 +247,12 @@ void local_safe_pointerst::output_safe_dereferences(
       out << "{";
       bool first = true;
       i_it->apply([&first, &out](const exprt &e) {
-        for(auto subexpr_it = e.depth_begin(), subexpr_end = e.depth_end();
-            subexpr_it != subexpr_end;
-            ++subexpr_it)
+        if(e.id() == ID_dereference)
         {
-          if(subexpr_it->id() == ID_dereference)
-          {
-            if(!first)
-              out << ", ";
-            first = true;
-            format_rec(out, to_dereference_expr(*subexpr_it).pointer());
-          }
+          if(!first)
+            out << ", ";
+          first = true;
+          format_rec(out, to_dereference_expr(e).pointer());
         }
       });
       out << "}";
@@ -281,6 +273,17 @@ bool local_safe_pointerst::is_non_null_at_program_point(
   auto findit = non_null_expressions.find(program_point->location_number);
   if(findit == non_null_expressions.end())
     return false;
+  const exprt *tocheck = &expr;
+  while(tocheck->id() == ID_typecast)
+    tocheck = &tocheck->op0();
+  return findit->second.count(*tocheck) != 0;
+}
 
-  return findit->second.count(skip_typecast(expr)) != 0;
+bool local_safe_pointerst::base_type_comparet::operator()(
+  const exprt &e1, const exprt &e2) const
+{
+  if(base_type_eq(e1, e2, ns))
+    return false;
+  else
+    return e1 < e2;
 }
