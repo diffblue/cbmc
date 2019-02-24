@@ -1951,10 +1951,33 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
       {
         if(!symbol_table.has_symbol(gcc_polymorphic->get_identifier()))
         {
+          const irep_idt &identifier = gcc_polymorphic->get_identifier();
+
+          auto &parameters = to_code_type(gcc_polymorphic->type()).parameters();
+          for(std::size_t i = 0; i < parameters.size(); ++i)
+          {
+            const std::string base_name = "p_" + std::to_string(i);
+
+            parameter_symbolt new_symbol;
+
+            new_symbol.name = id2string(identifier) + "::" + base_name;
+            new_symbol.base_name = base_name;
+            new_symbol.location = f_op.source_location();
+            new_symbol.type = parameters[i].type();
+            new_symbol.is_parameter = true;
+            new_symbol.is_lvalue = true;
+            new_symbol.mode = ID_C;
+
+            parameters[i].set_identifier(new_symbol.name);
+            parameters[i].set_base_name(new_symbol.base_name);
+
+            symbol_table.add(new_symbol);
+          }
+
           symbolt new_symbol;
 
-          new_symbol.name = gcc_polymorphic->get_identifier();
-          new_symbol.base_name = gcc_polymorphic->get_identifier();
+          new_symbol.name = identifier;
+          new_symbol.base_name = identifier;
           new_symbol.location = f_op.source_location();
           new_symbol.type = gcc_polymorphic->type();
           new_symbol.mode = ID_C;
