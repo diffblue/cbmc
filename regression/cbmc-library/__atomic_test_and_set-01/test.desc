@@ -1,0 +1,9 @@
+CORE
+main.c
+--pointer-check --bounds-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^\*\*\*\* WARNING: no body for function
+^warning: ignoring
