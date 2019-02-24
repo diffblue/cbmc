@@ -1,8 +1,8 @@
 CORE
-main.c
+two.c
 
 ^EXIT=6$
 ^SIGNAL=0$
-takes a pointer as first argument
+expects at least two arguments
 CONVERSION ERROR
 --
