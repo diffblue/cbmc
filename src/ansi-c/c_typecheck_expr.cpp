@@ -3966,15 +3966,17 @@ optionalt<symbol_exprt> c_typecheck_baset::typecheck_gcc_polymorphic_builtin(
     if(ptr_arg.type().id() != ID_pointer)
     {
       error().source_location = source_location;
-      error() << "__atomic_*_fetch primitives take pointer as first argument"
+      error() << "__atomic_*_fetch primitives take a pointer as first argument"
               << eom;
       throw 0;
     }
 
     code_typet t(
-      {code_typet::parametert(ptr_arg.type())}, ptr_arg.type().subtype());
-    t.make_ellipsis();
-    symbol_exprt result(identifier, t);
+      {code_typet::parametert(ptr_arg.type()),
+       code_typet::parametert(ptr_arg.type().subtype()),
+       code_typet::parametert(signed_int_type())},
+      ptr_arg.type().subtype());
+    symbol_exprt result(identifier, std::move(t));
     result.add_source_location() = source_location;
     return std::move(result);
   }
@@ -3997,15 +3999,17 @@ optionalt<symbol_exprt> c_typecheck_baset::typecheck_gcc_polymorphic_builtin(
     if(ptr_arg.type().id() != ID_pointer)
     {
       error().source_location = source_location;
-      error() << "__atomic_fetch_* primitives take pointer as first argument"
+      error() << "__atomic_fetch_* primitives take a pointer as first argument"
               << eom;
       throw 0;
     }
 
     code_typet t(
-      {code_typet::parametert(ptr_arg.type())}, ptr_arg.type().subtype());
-    t.make_ellipsis();
-    symbol_exprt result(identifier, t);
+      {code_typet::parametert(ptr_arg.type()),
+       code_typet::parametert(ptr_arg.type().subtype()),
+       code_typet::parametert(signed_int_type())},
+      ptr_arg.type().subtype());
+    symbol_exprt result(identifier, std::move(t));
     result.add_source_location() = source_location;
     return std::move(result);
   }
