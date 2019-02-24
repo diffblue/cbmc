@@ -777,6 +777,8 @@ void goto_programt::instructiont::validate(
       }
     };
 
+  // this option is always set to false until all source locations
+  // are reliably set correctly (future work)
   if(goto_model_validation_options.check_source_location)
   {
     DATA_CHECK(
@@ -787,13 +789,13 @@ void goto_programt::instructiont::validate(
     DATA_CHECK(
       vm,
       code.source_location().is_not_nil(),
-      "each instruction \"code\" field, must have non nil source location");
+      "each instruction code field, must have non nil source location");
 
     DATA_CHECK(
       vm,
       source_location == code.source_location(),
       "instruction source location and"
-      " instruction \"code\" field source location must be the same");
+      " instruction code field source location must be the same");
   }
 
   const symbolt *table_symbol;

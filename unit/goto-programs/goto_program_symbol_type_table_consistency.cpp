@@ -10,9 +10,9 @@ Author: Diffblue Ltd.
 
 #include <util/arith_tools.h>
 
-#include <goto-programs/goto_function.h>        
+#include <goto-programs/goto_function.h>
 #include <goto-programs/validate_goto_model.h>
-        
+
 SCENARIO(
   "Validation of consistent program/table pair (type-wise)",
   "[core][goto-programs][validate]")
@@ -42,12 +42,10 @@ SCENARIO(
     goto_programt::instructiont end_function_instruction;
     end_function_instruction.make_end_function();
     instructions.push_back(end_function_instruction);
-    instructions.back().function = function_symbol.name;
 
-    goto_model_validation_optionst validation_options;
-    // required as this test has no entry point, but calls the top-level
-    // 'goto_model.validate()'
-    validation_options.entry_point_exists = false;
+    goto_model_validation_optionst validation_options{
+      goto_model_validation_optionst::set_optionst::all_false};
+    validation_options.function_pointer_calls_removed = true;
 
     symbol_table.insert(function_symbol);
     WHEN("Symbol table has the right symbol type")
@@ -74,7 +72,8 @@ SCENARIO(
       THEN("The consistency check fails")
       {
         REQUIRE_THROWS_AS(
-          goto_function.validate(ns, validation_modet::EXCEPTION, validation_options),
+          goto_function.validate(
+            ns, validation_modet::EXCEPTION, validation_options),
           incorrect_goto_program_exceptiont);
       }
     }

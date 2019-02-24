@@ -41,9 +41,11 @@ SCENARIO(
     goto_programt::instructiont end_function_instruction;
     end_function_instruction.make_end_function();
     instructions.push_back(end_function_instruction);
-    instructions.back().function = function_symbol.name;
 
-    goto_model_validation_optionst validation_options;
+    goto_model_validation_optionst validation_options{
+      goto_model_validation_optionst::set_optionst::all_false};
+    validation_options.entry_point_exists = true;
+    validation_options.function_pointer_calls_removed = true;
 
     symbol_table.insert(function_symbol);
     WHEN("Symbol table has the right symbol")
@@ -64,7 +66,8 @@ SCENARIO(
       THEN("The consistency check fails")
       {
         REQUIRE_THROWS_AS(
-          goto_function.validate(ns, validation_modet::EXCEPTION, validation_options),
+          goto_function.validate(
+            ns, validation_modet::EXCEPTION, validation_options),
           incorrect_goto_program_exceptiont);
       }
     }

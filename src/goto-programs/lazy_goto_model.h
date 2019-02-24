@@ -249,7 +249,8 @@ public:
   /// reported via DATA_INVARIANT violations or exceptions.
   void validate(
     const validation_modet vm,
-    const goto_model_validation_optionst &goto_model_validation_options) const override
+    const goto_model_validation_optionst &goto_model_validation_options)
+    const override
   {
     goto_model->validate(vm, goto_model_validation_options);
   }

@@ -46,10 +46,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-checker/stop_on_fail_verifier.h>
 #include <goto-checker/stop_on_fail_verifier_with_fault_localization.h>
 
-#include <goto-instrument/cover.h>
-#include <goto-instrument/full_slicer.h>
-#include <goto-instrument/nondet_static.h>
-#include <goto-instrument/reachability_slicer.h>
 #include <goto-programs/adjust_float_expressions.h>
 #include <goto-programs/initialize_goto_model.h>
 #include <goto-programs/instrument_preconditions.h>
@@ -60,9 +56,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/remove_complex.h>
 #include <goto-programs/remove_function_pointers.h>
 #include <goto-programs/remove_returns.h>
-#include <goto-programs/remove_vector.h>
-#include <goto-programs/remove_complex.h>
-#include <goto-programs/remove_unused_functions.h>
 #include <goto-programs/remove_skip.h>
 #include <goto-programs/remove_unused_functions.h>
 #include <goto-programs/remove_vector.h>
@@ -74,6 +67,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/string_abstraction.h>
 #include <goto-programs/string_instrumentation.h>
 #include <goto-programs/validate_goto_model.h>
+
+#include <goto-instrument/cover.h>
+#include <goto-instrument/full_slicer.h>
+#include <goto-instrument/nondet_static.h>
+#include <goto-instrument/reachability_slicer.h>
 
 #include <goto-symex/path_storage.h>
 
@@ -553,12 +551,10 @@ int cbmc_parse_optionst::doit()
 
   if(cmdline.isset("validate-goto-model"))
   {
-    goto_model_validation_optionst goto_model_validation_options{true};
-    // this option is temporarily disabled until all source locations
-    // are reliably set correctly
-    goto_model_validation_options.check_source_location = false;
     goto_model.validate(
-      validation_modet::INVARIANT, goto_model_validation_options);
+      validation_modet::INVARIANT,
+      goto_model_validation_optionst{
+        goto_model_validation_optionst::set_optionst::all_true});
   }
 
   if(

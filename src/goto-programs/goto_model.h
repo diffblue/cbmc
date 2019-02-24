@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "abstract_goto_model.h"
 #include "goto_functions.h"
+#include "validate_goto_model.h"
 
 // A model is a pair consisting of a symbol table
 // and the CFGs for the functions.
@@ -96,9 +97,15 @@ public:
   /// reported via DATA_INVARIANT violations or exceptions.
   void validate(
     const validation_modet vm,
-    const goto_model_validation_optionst &goto_model_validation_options) const override
+    const goto_model_validation_optionst &goto_model_validation_options)
+    const override
   {
     symbol_table.validate(vm);
+
+    // Does a number of checks at the function_mapt level to ensure the
+    // goto_program is well formed. Does not call any validate methods
+    // (at the goto_functiont level or below)
+    validate_goto_model(goto_functions, vm, goto_model_validation_options);
 
     const namespacet ns(symbol_table);
     goto_functions.validate(ns, vm, goto_model_validation_options);
@@ -146,12 +153,18 @@ public:
   /// reported via DATA_INVARIANT violations or exceptions.
   void validate(
     const validation_modet vm,
-    const goto_model_validation_optionst &goto_model_validation_options) const override
+    const goto_model_validation_optionst &goto_model_validation_options)
+    const override
   {
     symbol_table.validate(vm);
 
+    // Does a number of checks at the function_mapt level to ensure the
+    // goto_program is well formed. Does not call any validate methods
+    // (at the goto_functiont level or below)
+    validate_goto_model(goto_functions, vm, goto_model_validation_options);
+
     const namespacet ns(symbol_table);
-    goto_functions.validate(ns, vm,  goto_model_validation_options);
+    goto_functions.validate(ns, vm, goto_model_validation_options);
   }
 
 private:

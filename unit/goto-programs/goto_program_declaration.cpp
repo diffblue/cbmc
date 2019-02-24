@@ -37,7 +37,10 @@ SCENARIO(
     instructions.emplace_back(goto_programt::make_decl(var_a));
     symbol_table.insert(fun_symbol);
 
-    goto_model_validation_optionst validation_options;
+    goto_model_validation_optionst validation_options{
+      goto_model_validation_optionst::set_optionst::all_false};
+    validation_options.entry_point_exists = true;
+    validation_options.function_pointer_calls_removed = true;
 
     WHEN("Declaring known symbol")
     {
@@ -59,7 +62,8 @@ SCENARIO(
       THEN("The consistency check fails")
       {
         REQUIRE_THROWS_AS(
-          goto_function.body.validate(ns, validation_modet::EXCEPTION, validation_options),
+          goto_function.body.validate(
+            ns, validation_modet::EXCEPTION, validation_options),
           incorrect_goto_program_exceptiont);
       }
     }

@@ -57,7 +57,8 @@ public:
   // virtual void validate(const validation_modet vm) const = 0;
   virtual void validate(
     const validation_modet vm,
-    const goto_model_validation_optionst &goto_model_validation_options) const = 0;
+    const goto_model_validation_optionst &goto_model_validation_options)
+    const = 0;
 };
 
 #endif

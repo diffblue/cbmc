@@ -1,14 +1,13 @@
 /*******************************************************************\
+ Module: Unit tests for goto_program::validate
 
-  Module: Unit tests for goto_program::validate
+ Author: Diffblue Ltd.
 
-  Author: Diffblue Ltd.
-
- \*******************************************************************/
+\*******************************************************************/
 
 #include <goto-programs/goto_function.h>
 #include <goto-programs/validate_goto_model.h>
-#include <testing-utils/catch.hpp>
+#include <testing-utils/use_catch.h>
 #include <util/arith_tools.h>
 
 #include <util/c_types.h>
@@ -31,7 +30,6 @@ SCENARIO(
     goto_programt::instructiont instruction;
     instruction.make_end_function();
     instructions.push_back(instruction);
-    instructions.back().function = fun_name; // if not set will fail id test
     instructions.back().source_location.id("id_any_valid_id");
 
     codet instruction_code_field;
@@ -45,7 +43,9 @@ SCENARIO(
 
     WHEN("the source locations are set and identical")
     {
-      goto_model_validation_optionst validation_options{false};
+      goto_model_validation_optionst validation_options{
+        goto_model_validation_optionst ::set_optionst::all_false};
+
       validation_options.check_source_location = true;
 
       THEN("The consistency check succeeds")
@@ -59,7 +59,9 @@ SCENARIO(
     {
       instructions.back().source_location.make_nil();
 
-      goto_model_validation_optionst validation_options{false};
+      goto_model_validation_optionst validation_options{
+        goto_model_validation_optionst ::set_optionst::all_false};
+
       validation_options.check_source_location = true;
 
       THEN("The consistency check fails")
@@ -76,7 +78,9 @@ SCENARIO(
       auto &expr = static_cast<exprt &>(instructions.back().code);
       expr.add_source_location().make_nil();
 
-      goto_model_validation_optionst validation_options{false};
+      goto_model_validation_optionst validation_options{
+        goto_model_validation_optionst ::set_optionst::all_false};
+
       validation_options.check_source_location = true;
 
       THEN("The consistency check fails")
@@ -95,7 +99,9 @@ SCENARIO(
       auto &expr = static_cast<exprt &>(instructions.back().code);
       expr.add_source_location().id("id_any_valid_id_2");
 
-      goto_model_validation_optionst validation_options{false};
+      goto_model_validation_optionst validation_options{
+        goto_model_validation_optionst ::set_optionst::all_false};
+
       validation_options.check_source_location = true;
 
       THEN("The consistency check fails")

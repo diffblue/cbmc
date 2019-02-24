@@ -72,4 +72,3 @@ void goto_functiont::validate(
 
   validate_full_type(type, ns, vm);
 }
-
