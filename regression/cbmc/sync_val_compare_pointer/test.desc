@@ -3,6 +3,6 @@ main.c
 
 ^EXIT=6$
 ^SIGNAL=0$
-primitives take a pointer as first argument
+__sync_val_compare_and_swap takes a pointer as first argument
 CONVERSION ERROR
 --

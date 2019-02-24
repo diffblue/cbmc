@@ -1,7 +1,8 @@
-KNOWNBUG
+CORE
 main.c
 
 ^EXIT=6$
 ^SIGNAL=0$
-expected to have at least three arguments
+expects at least three arguments
+CONVERSION ERROR
 --

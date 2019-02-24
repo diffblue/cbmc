@@ -3568,8 +3568,6 @@ optionalt<symbol_exprt> c_typecheck_baset::typecheck_gcc_polymorphic_builtin(
     identifier == ID___sync_and_and_fetch ||
     identifier == ID___sync_xor_and_fetch ||
     identifier == ID___sync_nand_and_fetch ||
-    identifier == ID___sync_bool_compare_and_swap ||
-    identifier == ID___sync_val_compare_and_swap ||
     identifier == ID___sync_lock_test_and_set)
   {
     // These are polymorphic, see
@@ -3592,13 +3590,49 @@ optionalt<symbol_exprt> c_typecheck_baset::typecheck_gcc_polymorphic_builtin(
       throw 0;
     }
 
-    typet return_type = ptr_arg.type().subtype();
-    if(identifier == ID___sync_bool_compare_and_swap)
-      return_type = c_bool_type();
-
-    code_typet t{{code_typet::parametert(ptr_arg.type())}, return_type};
+    code_typet t{{code_typet::parametert(ptr_arg.type())},
+                 ptr_arg.type().subtype()};
     t.make_ellipsis();
     symbol_exprt result{identifier, t};
+    result.add_source_location() = source_location;
+
+    return std::move(result);
+  }
+  else if(
+    identifier == ID___sync_bool_compare_and_swap ||
+    identifier == ID___sync_val_compare_and_swap)
+  {
+    // These are polymorphic, see
+    // https://gcc.gnu.org/onlinedocs/gcc/_005f_005fsync-Builtins.html
+
+    // adjust return type of function to match pointer subtype
+    if(arguments.size() < 3)
+    {
+      error().source_location = source_location;
+      error() << identifier << " expects at least three arguments" << eom;
+      throw 0;
+    }
+
+    const exprt &ptr_arg = arguments.front();
+
+    if(ptr_arg.type().id() != ID_pointer)
+    {
+      error().source_location = source_location;
+      error() << identifier << " takes a pointer as first argument" << eom;
+      throw 0;
+    }
+
+    const typet &subtype = ptr_arg.type().subtype();
+    typet sync_return_type = subtype;
+    if(identifier == ID___sync_bool_compare_and_swap)
+      sync_return_type = c_bool_type();
+
+    code_typet t{{code_typet::parametert(ptr_arg.type()),
+                  code_typet::parametert(subtype),
+                  code_typet::parametert(subtype)},
+                 sync_return_type};
+    t.make_ellipsis();
+    symbol_exprt result{identifier, std::move(t)};
     result.add_source_location() = source_location;
 
     return std::move(result);
