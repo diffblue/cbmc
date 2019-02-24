@@ -3570,8 +3570,7 @@ optionalt<symbol_exprt> c_typecheck_baset::typecheck_gcc_polymorphic_builtin(
     identifier == ID___sync_nand_and_fetch ||
     identifier == ID___sync_bool_compare_and_swap ||
     identifier == ID___sync_val_compare_and_swap ||
-    identifier == ID___sync_lock_test_and_set ||
-    identifier == ID___sync_lock_release)
+    identifier == ID___sync_lock_test_and_set)
   {
     // These are polymorphic, see
     // http://gcc.gnu.org/onlinedocs/gcc-4.1.1/gcc/Atomic-Builtins.html
@@ -3596,12 +3595,39 @@ optionalt<symbol_exprt> c_typecheck_baset::typecheck_gcc_polymorphic_builtin(
     typet return_type = ptr_arg.type().subtype();
     if(identifier == ID___sync_bool_compare_and_swap)
       return_type = c_bool_type();
-    else if(identifier == ID___sync_lock_release)
-      return_type = void_type();
 
     code_typet t{{code_typet::parametert(ptr_arg.type())}, return_type};
     t.make_ellipsis();
     symbol_exprt result{identifier, t};
+    result.add_source_location() = source_location;
+
+    return std::move(result);
+  }
+  else if(identifier == ID___sync_lock_release)
+  {
+    // This is polymorphic, see
+    // https://gcc.gnu.org/onlinedocs/gcc/_005f_005fsync-Builtins.html
+
+    // adjust return type of function to match pointer subtype
+    if(arguments.empty())
+    {
+      error().source_location = source_location;
+      error() << identifier << " expects at least one argument" << eom;
+      throw 0;
+    }
+
+    const exprt &ptr_arg = arguments.front();
+
+    if(ptr_arg.type().id() != ID_pointer)
+    {
+      error().source_location = source_location;
+      error() << identifier << " takes a pointer as first argument" << eom;
+      throw 0;
+    }
+
+    code_typet t{{code_typet::parametert(ptr_arg.type())}, void_type()};
+    t.make_ellipsis();
+    symbol_exprt result{identifier, std::move(t)};
     result.add_source_location() = source_location;
 
     return std::move(result);
