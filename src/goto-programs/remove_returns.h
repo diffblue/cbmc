@@ -66,18 +66,7 @@ Date:   September 2009
 /// r = func#return_value;
 ///
 /// ```
-///
-/// As `return` instructions are removed, the return types of the function types
-/// are set to void as well (represented by the type `empty_typet`). This
-/// applies both to the functions (i.e., the member `type` of `goto_functiont`)
-/// and to the call sites (i.e., the type
-/// `to_code_function_call(code).function().type()` with `code` being the code
-/// member of the `instructiont` instance that represents the function call).
-///
-/// The types of function pointer expressions in the goto program are however
-/// not changed. For example, in an assignment where `func` is assigned to a
-/// function pointer, such as `int (*f)(void) = func`, the function types
-/// appearing in the lhs and rhs both retain the integer return type.
+/// `remove_returns()` does not change the signature of the function.
 
 #ifndef CPROVER_GOTO_PROGRAMS_REMOVE_RETURNS_H
 #define CPROVER_GOTO_PROGRAMS_REMOVE_RETURNS_H
@@ -105,9 +94,5 @@ void remove_returns(goto_modelt &);
 void restore_returns(symbol_table_baset &, goto_functionst &);
 
 void restore_returns(goto_modelt &);
-
-code_typet original_return_type(
-  const symbol_table_baset &symbol_table,
-  const irep_idt &function_id);
 
 #endif // CPROVER_GOTO_PROGRAMS_REMOVE_RETURNS_H

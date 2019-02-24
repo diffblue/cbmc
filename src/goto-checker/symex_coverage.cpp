@@ -160,9 +160,8 @@ goto_program_coverage_recordt::goto_program_coverage_recordt(
   // </method>
   xml.set_attribute("name", id2string(gf_it->first));
 
-  code_typet sig_type =
-    original_return_type(ns.get_symbol_table(), gf_it->first);
-  xml.set_attribute("signature", from_type(ns, gf_it->first, sig_type));
+  xml.set_attribute(
+    "signature", from_type(ns, gf_it->first, gf_it->second.type));
 
   xml.set_attribute("line-rate", rate_detailed(lines_covered, lines_total));
   xml.set_attribute("branch-rate", rate(branches_covered, branches_total));

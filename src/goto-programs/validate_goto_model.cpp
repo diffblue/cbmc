@@ -133,13 +133,7 @@ void validate_goto_modelt::check_returns_removed()
         DATA_CHECK(
           vm,
           function_call.lhs().is_nil(),
-          "function call return should be nil");
-
-        const auto &callee = to_code_type(function_call.function().type());
-        DATA_CHECK(
-          vm,
-          callee.return_type().id() == ID_empty,
-          "called function must have empty return type");
+          "function call lhs return should be nil");
       }
     }
   }

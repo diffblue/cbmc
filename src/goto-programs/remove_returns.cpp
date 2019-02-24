@@ -106,13 +106,6 @@ void remove_returnst::replace_returns(
   // add return_value symbol to symbol_table, if not already created:
   const auto return_symbol = get_or_create_return_value_symbol(function_id);
 
-  // look up the function symbol
-  symbolt &function_symbol = *symbol_table.get_writeable(function_id);
-
-  // make the return type 'void'
-  function.type.return_type() = empty_typet();
-  function_symbol.type = function.type;
-
   goto_programt &goto_program = function.body;
 
   Forall_goto_program_instructions(i_it, goto_program)
@@ -164,73 +157,56 @@ bool remove_returnst::do_function_calls(
       const irep_idt function_id =
         to_symbol_expr(function_call.function()).get_identifier();
 
-      optionalt<symbol_exprt> return_value;
-      typet old_return_type;
-      bool is_stub = function_is_stub(function_id);
-
-      if(is_stub)
-      {
-        old_return_type =
-          to_code_type(function_call.function().type()).return_type();
-      }
-      else
-      {
-        // The callee may or may not already have been transformed by this pass,
-        // so its symbol-table entry may already have void return type.
-        // To simplify matters, create its return-value global now (if not
-        // already done), and use that to determine its true return type.
-        return_value = get_or_create_return_value_symbol(function_id);
-        if(!return_value.has_value()) // really void-typed?
-          continue;
-        old_return_type = return_value->type();
-      }
-
       // Do we return anything?
-      if(old_return_type != empty_typet())
+      if(
+        to_code_type(function_call.function().type()).return_type() !=
+          empty_typet() &&
+        function_call.lhs().is_not_nil())
       {
         // replace "lhs=f(...)" by
         // "f(...); lhs=f#return_value; DEAD f#return_value;"
 
-        // fix the type
-        to_code_type(function_call.function().type()).return_type()=
-          empty_typet();
+        exprt rhs;
 
-        if(function_call.lhs().is_not_nil())
+        bool is_stub = function_is_stub(function_id);
+        optionalt<symbol_exprt> return_value;
+
+        if(!is_stub)
         {
-          exprt rhs;
+          return_value = get_or_create_return_value_symbol(function_id);
+          CHECK_RETURN(return_value.has_value());
 
-          if(!is_stub)
-          {
-            // The return type in the definition of the function may differ
-            // from the return type in the declaration.  We therefore do a
-            // cast.
-            rhs = typecast_exprt::conditional_cast(
-              *return_value, function_call.lhs().type());
-          }
-          else
-            rhs = side_effect_expr_nondett(
-              function_call.lhs().type(), i_it->source_location);
+          // The return type in the definition of the function may differ
+          // from the return type in the declaration.  We therefore do a
+          // cast.
+          rhs = typecast_exprt::conditional_cast(
+            *return_value, function_call.lhs().type());
+        }
+        else
+        {
+          rhs = side_effect_expr_nondett(
+            function_call.lhs().type(), i_it->source_location);
+        }
 
-          goto_programt::targett t_a = goto_program.insert_after(
-            i_it,
-            goto_programt::make_assignment(
-              code_assignt(function_call.lhs(), rhs), i_it->source_location));
+        goto_programt::targett t_a = goto_program.insert_after(
+          i_it,
+          goto_programt::make_assignment(
+            code_assignt(function_call.lhs(), rhs), i_it->source_location));
 
-          // fry the previous assignment
-          function_call.lhs().make_nil();
+        // fry the previous assignment
+        function_call.lhs().make_nil();
 
-          if(!is_stub)
-          {
-            goto_program.insert_after(
-              t_a,
-              goto_programt::make_dead(*return_value, i_it->source_location));
-          }
-
-          requires_update = true;
+        if(!is_stub)
+        {
+          goto_program.insert_after(
+            t_a,
+            goto_programt::make_dead(*return_value, i_it->source_location));
         }
 
         // update the call
         i_it->set_function_call(function_call);
+
+        requires_update = true;
       }
     }
   }
@@ -309,31 +285,6 @@ void remove_returns(goto_modelt &goto_model)
   rr(goto_model.goto_functions);
 }
 
-/// Get code type of a function that has had remove_returns run upon it
-/// \param symbol_table: global symbol table
-/// \param function_id: function to get the type of
-/// \return the function's type with its `return_type()` restored to its
-///   original value
-code_typet original_return_type(
-  const symbol_table_baset &symbol_table,
-  const irep_idt &function_id)
-{
-  // look up the function symbol
-  const symbolt &function_symbol = symbol_table.lookup_ref(function_id);
-  code_typet type = to_code_type(function_symbol.type);
-
-  // do we have X#return_value?
-  std::string rv_name=id2string(function_id)+RETURN_VALUE_SUFFIX;
-
-  symbol_tablet::symbolst::const_iterator rv_it=
-    symbol_table.symbols.find(rv_name);
-
-  if(rv_it != symbol_table.symbols.end())
-    type.return_type() = rv_it->second.type;
-
-  return type;
-}
-
 /// turns an assignment to fkt#return_value back into 'return x'
 bool remove_returnst::restore_returns(
   goto_functionst::function_mapt::iterator f_it)
@@ -348,13 +299,6 @@ bool remove_returnst::restore_returns(
 
   if(rv_it==symbol_table.symbols.end())
     return true;
-
-  // look up the function symbol
-  symbolt &function_symbol=*symbol_table.get_writeable(function_id);
-
-  // restore the return type
-  f_it->second.type=original_return_type(symbol_table, function_id);
-  function_symbol.type=f_it->second.type;
 
   // remove the return_value symbol from the symbol_table
   irep_idt rv_name_id=rv_it->second.name;
@@ -406,12 +350,6 @@ void remove_returnst::undo_function_calls(
 
       const irep_idt function_id=
         to_symbol_expr(function_call.function()).get_identifier();
-
-      const symbolt &function_symbol=ns.lookup(function_id);
-
-      // fix the type
-      to_code_type(function_call.function().type()).return_type()=
-        to_code_type(function_symbol.type).return_type();
 
       // find "f(...); lhs=f#return_value; DEAD f#return_value;"
       // and revert to "lhs=f(...);"
