@@ -1981,6 +1981,13 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
           new_symbol.location = f_op.source_location();
           new_symbol.type = gcc_polymorphic->type();
           new_symbol.mode = ID_C;
+          code_blockt implementation =
+            instantiate_gcc_polymorphic_builtin(*gcc_polymorphic);
+          typet parent_return_type = return_type;
+          return_type = to_code_type(gcc_polymorphic->type()).return_type();
+          typecheck_code(implementation);
+          return_type = parent_return_type;
+          new_symbol.value = implementation;
 
           symbol_table.add(new_symbol);
         }
@@ -3985,4 +3992,350 @@ optionalt<symbol_exprt> c_typecheck_baset::typecheck_gcc_polymorphic_builtin(
   }
 
   return {};
+}
+
+static symbolt result_symbol(
+  const irep_idt &identifier,
+  const typet &type,
+  const source_locationt &source_location,
+  symbol_tablet &symbol_table)
+{
+  symbolt symbol;
+  symbol.name = id2string(identifier) + "::1::result";
+  symbol.base_name = "result";
+  symbol.type = type;
+  symbol.mode = ID_C;
+  symbol.location = source_location;
+  symbol.is_file_local = true;
+  symbol.is_lvalue = true;
+  symbol.is_thread_local = true;
+
+  symbol_table.add(symbol);
+
+  return symbol;
+}
+
+code_blockt c_typecheck_baset::instantiate_gcc_polymorphic_builtin(
+  const symbol_exprt &function_symbol)
+{
+  const irep_idt &identifier = function_symbol.get_identifier();
+  const code_typet &code_type = to_code_type(function_symbol.type());
+  const source_locationt &source_location = function_symbol.source_location();
+
+  std::vector<symbol_exprt> parameter_exprs;
+  parameter_exprs.reserve(code_type.parameters().size());
+  for(const auto &parameter : code_type.parameters())
+  {
+    parameter_exprs.push_back(lookup(parameter.get_identifier()).symbol_expr());
+  }
+
+  code_blockt block;
+
+  if(
+    identifier == ID___sync_fetch_and_add ||
+    identifier == ID___sync_fetch_and_sub ||
+    identifier == ID___sync_fetch_and_or ||
+    identifier == ID___sync_fetch_and_and ||
+    identifier == ID___sync_fetch_and_xor ||
+    identifier == ID___sync_fetch_and_nand)
+  {
+    // type __sync_fetch_and_OP(type *ptr, type value, ...)
+    // { type result; result = *ptr; *ptr = result OP value; return result; }
+    const typet &type = code_type.return_type();
+
+    const symbol_exprt result =
+      result_symbol(identifier, type, source_location, symbol_table)
+        .symbol_expr();
+    block.add(codet{ID_decl_block, {code_declt{result}}});
+
+    // place operations on *ptr in an atomic section
+    block.add(code_expressiont{side_effect_expr_function_callt{
+      symbol_exprt::typeless(CPROVER_PREFIX "atomic_begin"),
+      {},
+      code_typet{{}, void_type()},
+      source_location}});
+
+    // build *ptr
+    const dereference_exprt deref_ptr{parameter_exprs[0]};
+
+    block.add(code_assignt{result, deref_ptr});
+
+    // build *ptr = result OP arguments[1];
+    irep_idt op_id = identifier == ID___sync_fetch_and_add
+                       ? ID_plus
+                       : identifier == ID___sync_fetch_and_sub
+                           ? ID_minus
+                           : identifier == ID___sync_fetch_and_or
+                               ? ID_bitor
+                               : identifier == ID___sync_fetch_and_and
+                                   ? ID_bitand
+                                   : identifier == ID___sync_fetch_and_xor
+                                       ? ID_bitxor
+                                       : identifier == ID___sync_fetch_and_nand
+                                           ? ID_bitnand
+                                           : ID_nil;
+    binary_exprt op_expr{result, op_id, parameter_exprs[1], type};
+    block.add(code_assignt{deref_ptr, std::move(op_expr)});
+
+    // this instruction implies an mfence, i.e., WRfence
+    block.add(code_expressiont{side_effect_expr_function_callt{
+      symbol_exprt::typeless(CPROVER_PREFIX "fence"),
+      {string_constantt{ID_WRfence}},
+      typet{},
+      source_location}});
+
+    block.add(code_expressiont{side_effect_expr_function_callt{
+      symbol_exprt::typeless(CPROVER_PREFIX "atomic_end"),
+      {},
+      code_typet{{}, void_type()},
+      source_location}});
+
+    block.add(code_returnt{result});
+  }
+  else if(
+    identifier == ID___sync_add_and_fetch ||
+    identifier == ID___sync_sub_and_fetch ||
+    identifier == ID___sync_or_and_fetch ||
+    identifier == ID___sync_and_and_fetch ||
+    identifier == ID___sync_xor_and_fetch ||
+    identifier == ID___sync_nand_and_fetch)
+  {
+    // type __sync_OP_and_fetch(type *ptr, type value, ...)
+    // { type result; result = *ptr OP value; *ptr = result; return result; }
+    const typet &type = code_type.return_type();
+
+    const symbol_exprt result =
+      result_symbol(identifier, type, source_location, symbol_table)
+        .symbol_expr();
+    block.add(codet{ID_decl_block, {code_declt{result}}});
+
+    // place operations on *ptr in an atomic section
+    block.add(code_expressiont{side_effect_expr_function_callt{
+      symbol_exprt::typeless(CPROVER_PREFIX "atomic_begin"),
+      {},
+      code_typet{{}, void_type()},
+      source_location}});
+
+    // build *ptr
+    const dereference_exprt deref_ptr{parameter_exprs[0]};
+
+    // build result = *ptr OP arguments[1];
+    irep_idt op_id = identifier == ID___sync_add_and_fetch
+                       ? ID_plus
+                       : identifier == ID___sync_sub_and_fetch
+                           ? ID_minus
+                           : identifier == ID___sync_or_and_fetch
+                               ? ID_bitor
+                               : identifier == ID___sync_and_and_fetch
+                                   ? ID_bitand
+                                   : identifier == ID___sync_xor_and_fetch
+                                       ? ID_bitxor
+                                       : identifier == ID___sync_nand_and_fetch
+                                           ? ID_bitnand
+                                           : ID_nil;
+    binary_exprt op_expr{deref_ptr, op_id, parameter_exprs[1], type};
+    block.add(code_assignt{result, std::move(op_expr)});
+
+    block.add(code_assignt{deref_ptr, result});
+
+    // this instruction implies an mfence, i.e., WRfence
+    block.add(code_expressiont{side_effect_expr_function_callt{
+      symbol_exprt::typeless(CPROVER_PREFIX "fence"),
+      {string_constantt{ID_WRfence}},
+      typet{},
+      source_location}});
+
+    block.add(code_expressiont{side_effect_expr_function_callt{
+      symbol_exprt::typeless(CPROVER_PREFIX "atomic_end"),
+      {},
+      code_typet{{}, void_type()},
+      source_location}});
+
+    block.add(code_returnt{result});
+  }
+  else if(identifier == ID___sync_bool_compare_and_swap)
+  {
+    // These builtins perform an atomic compare and swap. That is, if the
+    // current value of *ptr is oldval, then write newval into *ptr.  The
+    // "bool" version returns true if the comparison is successful and
+    // newval was written.  The "val" version returns the contents of *ptr
+    // before the operation.
+
+    // _Bool __sync_bool_compare_and_swap(type *ptr, type old, type new, ...)
+    // { _Bool result = *ptr == old; if(result) *ptr = new; return result; }
+
+    const symbol_exprt result =
+      result_symbol(identifier, c_bool_type(), source_location, symbol_table)
+        .symbol_expr();
+    block.add(codet{ID_decl_block, {code_declt{result}}});
+
+    // place operations on *ptr in an atomic section
+    block.add(code_expressiont{side_effect_expr_function_callt{
+      symbol_exprt::typeless(CPROVER_PREFIX "atomic_begin"),
+      {},
+      code_typet{{}, void_type()},
+      source_location}});
+
+    // build *ptr
+    const dereference_exprt deref_ptr{parameter_exprs[0]};
+
+    block.add(code_assignt{
+      result,
+      typecast_exprt::conditional_cast(
+        equal_exprt{deref_ptr, parameter_exprs[1]}, result.type())});
+
+    code_assignt assign{deref_ptr, parameter_exprs[2]};
+    assign.add_source_location() = source_location;
+    block.add(code_ifthenelset{result, std::move(assign)});
+
+    // this instruction implies an mfence, i.e., WRfence
+    block.add(code_expressiont{side_effect_expr_function_callt{
+      symbol_exprt::typeless(CPROVER_PREFIX "fence"),
+      {string_constantt{ID_WRfence}},
+      typet{},
+      source_location}});
+
+    block.add(code_expressiont{side_effect_expr_function_callt{
+      symbol_exprt::typeless(CPROVER_PREFIX "atomic_end"),
+      {},
+      code_typet{{}, void_type()},
+      source_location}});
+
+    block.add(code_returnt{result});
+  }
+  else if(identifier == ID___sync_val_compare_and_swap)
+  {
+    // type __sync_val_compare_and_swap(type *ptr, type old, type new, ...)
+    // { type result = *ptr; if(result == old) *ptr = new; return result; }
+    const typet &type = code_type.return_type();
+
+    const symbol_exprt result =
+      result_symbol(identifier, type, source_location, symbol_table)
+        .symbol_expr();
+    block.add(codet{ID_decl_block, {code_declt{result}}});
+
+    // place operations on *ptr in an atomic section
+    block.add(code_expressiont{side_effect_expr_function_callt{
+      symbol_exprt::typeless(CPROVER_PREFIX "atomic_begin"),
+      {},
+      code_typet{{}, void_type()},
+      source_location}});
+
+    // build *ptr
+    const dereference_exprt deref_ptr{parameter_exprs[0]};
+
+    block.add(code_assignt{result, deref_ptr});
+
+    code_assignt assign{deref_ptr, parameter_exprs[2]};
+    assign.add_source_location() = source_location;
+    block.add(code_ifthenelset{equal_exprt{result, parameter_exprs[1]},
+                               std::move(assign)});
+
+    // this instruction implies an mfence, i.e., WRfence
+    block.add(code_expressiont{side_effect_expr_function_callt{
+      symbol_exprt::typeless(CPROVER_PREFIX "fence"),
+      {string_constantt{ID_WRfence}},
+      typet{},
+      source_location}});
+
+    block.add(code_expressiont{side_effect_expr_function_callt{
+      symbol_exprt::typeless(CPROVER_PREFIX "atomic_end"),
+      {},
+      code_typet{{}, void_type()},
+      source_location}});
+
+    block.add(code_returnt{result});
+  }
+  else if(identifier == ID___sync_lock_test_and_set)
+  {
+    // type __sync_lock_test_and_set (type *ptr, type value, ...)
+
+    // This builtin, as described by Intel, is not a traditional
+    // test-and-set operation, but rather an atomic exchange operation.
+    // It writes value into *ptr, and returns the previous contents of
+    // *ptr.  Many targets have only minimal support for such locks, and
+    // do not support a full exchange operation.  In this case, a target
+    // may support reduced functionality here by which the only valid
+    // value to store is the immediate constant 1.  The exact value
+    // actually stored in *ptr is implementation defined.
+    const typet &type = code_type.return_type();
+
+    const symbol_exprt result =
+      result_symbol(identifier, type, source_location, symbol_table)
+        .symbol_expr();
+    block.add(codet{ID_decl_block, {code_declt{result}}});
+
+    // place operations on *ptr in an atomic section
+    block.add(code_expressiont{side_effect_expr_function_callt{
+      symbol_exprt::typeless(CPROVER_PREFIX "atomic_begin"),
+      {},
+      code_typet{{}, void_type()},
+      source_location}});
+
+    // build *ptr
+    const dereference_exprt deref_ptr{parameter_exprs[0]};
+
+    block.add(code_assignt{result, deref_ptr});
+
+    block.add(code_assignt{deref_ptr, parameter_exprs[1]});
+
+    // This built-in function is not a full barrier, but rather an acquire
+    // barrier.
+    block.add(code_expressiont{side_effect_expr_function_callt{
+      symbol_exprt::typeless(CPROVER_PREFIX "fence"),
+      {string_constantt{ID_RRfence}, {string_constantt{ID_RRfence}}},
+      typet{},
+      source_location}});
+
+    block.add(code_expressiont{side_effect_expr_function_callt{
+      symbol_exprt::typeless(CPROVER_PREFIX "atomic_end"),
+      {},
+      code_typet{{}, void_type()},
+      source_location}});
+
+    block.add(code_returnt{result});
+  }
+  else if(identifier == ID___sync_lock_release)
+  {
+    // void __sync_lock_release (type *ptr, ...)
+
+    // This built-in function releases the lock acquired by
+    // __sync_lock_test_and_set. Normally this means writing the constant 0 to
+    // *ptr.
+    const typet &type = to_pointer_type(parameter_exprs[0].type()).subtype();
+
+    // place operations on *ptr in an atomic section
+    block.add(code_expressiont{side_effect_expr_function_callt{
+      symbol_exprt::typeless(CPROVER_PREFIX "atomic_begin"),
+      {},
+      code_typet{{}, void_type()},
+      source_location}});
+
+    block.add(code_assignt{dereference_exprt{parameter_exprs[0]},
+                           typecast_exprt::conditional_cast(
+                             from_integer(0, signed_int_type()), type)});
+
+    // This built-in function is not a full barrier, but rather a release
+    // barrier.
+    block.add(code_expressiont{side_effect_expr_function_callt{
+      symbol_exprt::typeless(CPROVER_PREFIX "fence"),
+      {string_constantt{ID_WRfence}, {string_constantt{ID_WWfence}}},
+      typet{},
+      source_location}});
+
+    block.add(code_expressiont{side_effect_expr_function_callt{
+      symbol_exprt::typeless(CPROVER_PREFIX "atomic_end"),
+      {},
+      code_typet{{}, void_type()},
+      source_location}});
+  }
+  else
+  {
+    UNREACHABLE;
+  }
+
+  for(auto &statement : block.statements())
+    statement.add_source_location() = source_location;
+
+  return block;
 }
