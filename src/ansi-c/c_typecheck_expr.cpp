@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "c_typecheck_base.h"
 
+#include <atomic>
 #include <cassert>
 
 #include <util/arith_tools.h>
@@ -4056,12 +4057,10 @@ code_blockt c_typecheck_baset::instantiate_gcc_polymorphic_builtin(
   code_blockt block;
 
   if(
-    identifier == ID___sync_fetch_and_add ||
-    identifier == ID___sync_fetch_and_sub ||
-    identifier == ID___sync_fetch_and_or ||
-    identifier == ID___sync_fetch_and_and ||
-    identifier == ID___sync_fetch_and_xor ||
-    identifier == ID___sync_fetch_and_nand)
+    identifier == ID___atomic_fetch_add ||
+    identifier == ID___atomic_fetch_sub || identifier == ID___atomic_fetch_or ||
+    identifier == ID___atomic_fetch_and ||
+    identifier == ID___atomic_fetch_xor || identifier == ID___atomic_fetch_nand)
   {
     // type __sync_fetch_and_OP(type *ptr, type value, ...)
     // { type result; result = *ptr; *ptr = result OP value; return result; }
@@ -4085,26 +4084,25 @@ code_blockt c_typecheck_baset::instantiate_gcc_polymorphic_builtin(
     block.add(code_assignt{result, deref_ptr});
 
     // build *ptr = result OP arguments[1];
-    irep_idt op_id = identifier == ID___sync_fetch_and_add
+    irep_idt op_id = identifier == ID___atomic_fetch_add
                        ? ID_plus
-                       : identifier == ID___sync_fetch_and_sub
+                       : identifier == ID___atomic_fetch_sub
                            ? ID_minus
-                           : identifier == ID___sync_fetch_and_or
+                           : identifier == ID___atomic_fetch_or
                                ? ID_bitor
-                               : identifier == ID___sync_fetch_and_and
+                               : identifier == ID___atomic_fetch_and
                                    ? ID_bitand
-                                   : identifier == ID___sync_fetch_and_xor
+                                   : identifier == ID___atomic_fetch_xor
                                        ? ID_bitxor
-                                       : identifier == ID___sync_fetch_and_nand
+                                       : identifier == ID___atomic_fetch_nand
                                            ? ID_bitnand
                                            : ID_nil;
     binary_exprt op_expr{result, op_id, parameter_exprs[1], type};
     block.add(code_assignt{deref_ptr, std::move(op_expr)});
 
-    // this instruction implies an mfence, i.e., WRfence
     block.add(code_expressiont{side_effect_expr_function_callt{
-      symbol_exprt::typeless(CPROVER_PREFIX "fence"),
-      {string_constantt{ID_WRfence}},
+      symbol_exprt::typeless("__atomic_thread_fence"),
+      {parameter_exprs[2]},
       typet{},
       source_location}});
 
@@ -4117,12 +4115,10 @@ code_blockt c_typecheck_baset::instantiate_gcc_polymorphic_builtin(
     block.add(code_returnt{result});
   }
   else if(
-    identifier == ID___sync_add_and_fetch ||
-    identifier == ID___sync_sub_and_fetch ||
-    identifier == ID___sync_or_and_fetch ||
-    identifier == ID___sync_and_and_fetch ||
-    identifier == ID___sync_xor_and_fetch ||
-    identifier == ID___sync_nand_and_fetch)
+    identifier == ID___atomic_add_fetch ||
+    identifier == ID___atomic_sub_fetch || identifier == ID___atomic_or_fetch ||
+    identifier == ID___atomic_and_fetch ||
+    identifier == ID___atomic_xor_fetch || identifier == ID___atomic_nand_fetch)
   {
     // type __sync_OP_and_fetch(type *ptr, type value, ...)
     // { type result; result = *ptr OP value; *ptr = result; return result; }
@@ -4144,17 +4140,17 @@ code_blockt c_typecheck_baset::instantiate_gcc_polymorphic_builtin(
     const dereference_exprt deref_ptr{parameter_exprs[0]};
 
     // build result = *ptr OP arguments[1];
-    irep_idt op_id = identifier == ID___sync_add_and_fetch
+    irep_idt op_id = identifier == ID___atomic_add_fetch
                        ? ID_plus
-                       : identifier == ID___sync_sub_and_fetch
+                       : identifier == ID___atomic_sub_fetch
                            ? ID_minus
-                           : identifier == ID___sync_or_and_fetch
+                           : identifier == ID___atomic_or_fetch
                                ? ID_bitor
-                               : identifier == ID___sync_and_and_fetch
+                               : identifier == ID___atomic_and_fetch
                                    ? ID_bitand
-                                   : identifier == ID___sync_xor_and_fetch
+                                   : identifier == ID___atomic_xor_fetch
                                        ? ID_bitxor
-                                       : identifier == ID___sync_nand_and_fetch
+                                       : identifier == ID___atomic_nand_fetch
                                            ? ID_bitnand
                                            : ID_nil;
     binary_exprt op_expr{deref_ptr, op_id, parameter_exprs[1], type};
@@ -4164,8 +4160,8 @@ code_blockt c_typecheck_baset::instantiate_gcc_polymorphic_builtin(
 
     // this instruction implies an mfence, i.e., WRfence
     block.add(code_expressiont{side_effect_expr_function_callt{
-      symbol_exprt::typeless(CPROVER_PREFIX "fence"),
-      {string_constantt{ID_WRfence}},
+      symbol_exprt::typeless("__atomic_thread_fence"),
+      {parameter_exprs[2]},
       typet{},
       source_location}});
 
@@ -4176,6 +4172,35 @@ code_blockt c_typecheck_baset::instantiate_gcc_polymorphic_builtin(
       source_location}});
 
     block.add(code_returnt{result});
+  }
+  else if(
+    identifier == ID___sync_fetch_and_add ||
+    identifier == ID___sync_fetch_and_sub ||
+    identifier == ID___sync_fetch_and_or ||
+    identifier == ID___sync_fetch_and_and ||
+    identifier == ID___sync_fetch_and_xor ||
+    identifier == ID___sync_fetch_and_nand ||
+    identifier == ID___sync_add_and_fetch ||
+    identifier == ID___sync_sub_and_fetch ||
+    identifier == ID___sync_or_and_fetch ||
+    identifier == ID___sync_and_and_fetch ||
+    identifier == ID___sync_xor_and_fetch ||
+    identifier == ID___sync_nand_and_fetch)
+  {
+    // implement by calling their __atomic_ counterparts with memorder SEQ_CST
+    std::string atomic_name = "__atomic_" + id2string(identifier).substr(7);
+    atomic_name.replace(atomic_name.find("_and_"), 5, "_");
+
+    exprt::operandst arguments{
+      parameter_exprs[0],
+      parameter_exprs[1],
+      from_integer(std::memory_order_seq_cst, signed_int_type())};
+
+    block.add(code_returnt{
+      side_effect_expr_function_callt{symbol_exprt::typeless(atomic_name),
+                                      std::move(arguments),
+                                      typet{},
+                                      source_location}});
   }
   else if(identifier == ID___sync_bool_compare_and_swap)
   {
