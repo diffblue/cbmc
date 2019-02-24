@@ -713,37 +713,24 @@ void goto_programt::instructiont::validate(
             !symbol_expr_type_matches_symbol_table &&
             table_symbol->type.id() == ID_code)
           {
-            // Return removal sets the return type of a function symbol table
-            // entry to 'void', but some callsites still expect the original
-            // type (e.g. if a function is passed as a parameter)
-            symbol_expr_type_matches_symbol_table =
-              goto_symbol_expr.type() ==
-              original_return_type(ns.get_symbol_table(), goto_id);
-
+            // If a function declaration and its definition are in different
+            // translation units they may have different return types.
+            // Thus, the return type in the symbol table may differ
+            // from the return type in the symbol expr.
             if(
-              !symbol_expr_type_matches_symbol_table &&
-              goto_symbol_expr.type().id() == ID_code)
+              goto_symbol_expr.type().source_location().get_file() !=
+              table_symbol->type.source_location().get_file())
             {
-              // If a function declaration and its definition are in different
-              // translation units they may have different return types,
-              // which remove_returns patches up with a typecast. If thats
-              // the case, then the return type in the symbol table may differ
-              // from the return type in the symbol expr
-              if(
-                goto_symbol_expr.type().source_location().get_file() !=
-                table_symbol->type.source_location().get_file())
-              {
-                // temporarily fixup the return types
-                auto goto_symbol_expr_type =
-                  to_code_type(goto_symbol_expr.type());
-                auto table_symbol_type = to_code_type(table_symbol->type);
+              // temporarily fixup the return types
+              auto goto_symbol_expr_type =
+                to_code_type(goto_symbol_expr.type());
+              auto table_symbol_type = to_code_type(table_symbol->type);
 
-                goto_symbol_expr_type.return_type() =
-                  table_symbol_type.return_type();
+              goto_symbol_expr_type.return_type() =
+                table_symbol_type.return_type();
 
-                symbol_expr_type_matches_symbol_table =
-                  base_type_eq(goto_symbol_expr_type, table_symbol_type, ns);
-              }
+              symbol_expr_type_matches_symbol_table =
+                base_type_eq(goto_symbol_expr_type, table_symbol_type, ns);
             }
           }
 

@@ -2089,16 +2089,14 @@ void java_bytecode_convert_methodt::convert_invoke(
   // less accurate.
   if(method_symbol != symbol_table.symbols.end())
   {
-    const auto &restored_type =
-      original_return_type(symbol_table, invoked_method_id);
     // Note the number of parameters might change here due to constructors using
     // invokespecial will have zero arguments (the `this` is added below)
     // but the symbol for the <init> will have the this parameter.
     INVARIANT(
       to_java_method_type(arg0.type()).return_type().id() ==
-        restored_type.return_type().id(),
+        to_code_type(method_symbol->second.type).return_type().id(),
       "Function return type must not change in kind");
-    arg0.type() = restored_type;
+    arg0.type() = method_symbol->second.type;
   }
 
   // Note arg0 and arg0.type() are subject to many side-effects in this method,
