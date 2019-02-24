@@ -3571,13 +3571,13 @@ optionalt<symbol_exprt> c_typecheck_baset::typecheck_gcc_polymorphic_builtin(
     identifier == ID___sync_lock_test_and_set)
   {
     // These are polymorphic, see
-    // http://gcc.gnu.org/onlinedocs/gcc-4.1.1/gcc/Atomic-Builtins.html
+    // https://gcc.gnu.org/onlinedocs/gcc/_005f_005fsync-Builtins.html
 
     // adjust return type of function to match pointer subtype
-    if(arguments.empty())
+    if(arguments.size() < 2)
     {
       error().source_location = source_location;
-      error() << "__sync_* primitives take as least one argument" << eom;
+      error() << identifier << " expects at least two arguments" << eom;
       throw 0;
     }
 
@@ -3586,14 +3586,15 @@ optionalt<symbol_exprt> c_typecheck_baset::typecheck_gcc_polymorphic_builtin(
     if(ptr_arg.type().id() != ID_pointer)
     {
       error().source_location = source_location;
-      error() << "__sync_* primitives take a pointer as first argument" << eom;
+      error() << identifier << " takes a pointer as first argument" << eom;
       throw 0;
     }
 
-    code_typet t{{code_typet::parametert(ptr_arg.type())},
+    code_typet t{{code_typet::parametert(ptr_arg.type()),
+                  code_typet::parametert(ptr_arg.type().subtype())},
                  ptr_arg.type().subtype()};
     t.make_ellipsis();
-    symbol_exprt result{identifier, t};
+    symbol_exprt result{identifier, std::move(t)};
     result.add_source_location() = source_location;
 
     return std::move(result);
