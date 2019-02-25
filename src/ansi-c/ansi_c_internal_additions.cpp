@@ -148,6 +148,7 @@ void ansi_c_internal_additions(std::string &code)
     "const void *" CPROVER_PREFIX "memory_leak=0;\n"
     "void *" CPROVER_PREFIX "allocate("
       CPROVER_PREFIX "size_t size, " CPROVER_PREFIX "bool zero);\n"
+    "const void *" CPROVER_PREFIX "alloca_object = 0;\n"
 
     // this is ANSI-C
     "extern " CPROVER_PREFIX "thread_local const char __func__["
