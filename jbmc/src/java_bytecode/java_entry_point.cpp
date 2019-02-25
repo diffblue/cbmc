@@ -456,9 +456,6 @@ void java_record_outputs(
   const java_method_typet::parameterst &parameters =
     to_java_method_type(function.type).parameters();
 
-  exprt::operandst result;
-  result.reserve(parameters.size()+1);
-
   bool has_return_value =
     to_java_method_type(function.type).return_type() != java_void_type();
 
