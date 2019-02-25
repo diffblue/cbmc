@@ -1,8 +1,9 @@
-KNOWNBUG
+CORE pthread
 main.c
---pointer-check --bounds-check
-^EXIT=0$
+--bounds-check
+^EXIT=10$
 ^SIGNAL=0$
-^VERIFICATION SUCCESSFUL$
+^\*\* 1 of 2 failed
+^VERIFICATION FAILED$
 --
 ^warning: ignoring

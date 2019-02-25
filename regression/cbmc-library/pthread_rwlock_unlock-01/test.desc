@@ -1,4 +1,4 @@
-KNOWNBUG
+KNOWNBUG pthread
 main.c
 --pointer-check --bounds-check
 ^EXIT=0$
