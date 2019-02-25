@@ -19,6 +19,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #define JAVA_ENTRY_POINT_RETURN_SYMBOL "return'"
 #define JAVA_ENTRY_POINT_EXCEPTION_SYMBOL "uncaught_exception'"
 
+using build_argumentst =
+  std::function<std::pair<code_blockt, std::vector<exprt>>(
+    const symbolt &function,
+    symbol_table_baset &symbol_table)>;
+
 /// Given the \p symbol_table and the \p main_class to test, this function
 /// generates a new function __CPROVER__start that calls the method under tests.
 ///
@@ -52,6 +57,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// (deterministically) set to null. This is a source of underapproximation in
 /// our approach to test generation, and should perhaps be fixed in the future.
 ///
+/// \param build_arguments: The function which builds the `codet`s which
+///   initialise the arguments for a function.
 /// \return true if error occurred on entry point search
 bool java_entry_point(
   class symbol_table_baset &symbol_table,
@@ -61,7 +68,8 @@ bool java_entry_point(
   bool assert_uncaught_exceptions,
   const java_object_factory_parameterst &object_factory_parameters,
   const select_pointer_typet &pointer_type_selector,
-  bool string_refinement_enabled);
+  bool string_refinement_enabled,
+  const build_argumentst &build_arguments);
 
 struct main_function_resultt
 {
@@ -125,19 +133,43 @@ main_function_resultt get_main_symbol(
 /// \param symbol: The symbol representing the function to call
 /// \param symbol_table: Global symbol table
 /// \param message_handler: Where to write output to
-/// \param assume_init_pointers_not_null: When creating pointers, assume they
-///   always take a non-null value.
 /// \param assert_uncaught_exceptions: Add an uncaught-exception check
 /// \param object_factory_parameters: Parameters for creation of arguments
 /// \param pointer_type_selector: Logic for substituting types of pointers
+/// \param build_arguments: The function which builds the `codet`s which
+///   initialise the arguments for a function.
 /// \return true if error occurred on entry point search, false otherwise
 bool generate_java_start_function(
   const symbolt &symbol,
   class symbol_table_baset &symbol_table,
   class message_handlert &message_handler,
-  bool assume_init_pointers_not_null,
   bool assert_uncaught_exceptions,
   const java_object_factory_parameterst &object_factory_parameters,
+  const select_pointer_typet &pointer_type_selector,
+  const build_argumentst &build_arguments);
+
+/// \param function: The function under test, for which to build the arguments.
+/// \param symbol_table: For the purposes of adding any local variables
+///   generated or any functions which are generated and called.
+/// \param assume_init_pointers_not_null: If this is true then any reference
+///   type parameters to the function under tests are assumed to be non-null.
+/// \param object_factory_parameters: Configuration of the object factory.
+/// \param pointer_type_selector: Means of selecting the type of value
+///   constructed for reference types which are initialised by the code
+///   returned.
+/// \returns A pairing of the code to initialise the arguments and a std::vector
+///   of the expressions for these arguments. The vector contains one element
+///   per parameter of \p function. The vector of expressions can be used as
+///   arguments for \p function. The code returned allocates the objects used as
+///   test arguments for the function under test (\p function) and
+///   non-deterministically initializes them. This code returned must be placed
+///   into the code block of the function call, before the function call.
+///   Typically this code block would be  __CPROVER__start.
+std::pair<code_blockt, std::vector<exprt>> java_build_arguments(
+  const symbolt &function,
+  symbol_table_baset &symbol_table,
+  bool assume_init_pointers_not_null,
+  java_object_factory_parameterst object_factory_parameters,
   const select_pointer_typet &pointer_type_selector);
 
 #endif // CPROVER_JAVA_BYTECODE_JAVA_ENTRY_POINT_H

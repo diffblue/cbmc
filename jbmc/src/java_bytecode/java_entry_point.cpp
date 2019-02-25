@@ -291,23 +291,6 @@ bool is_java_main(const symbolt &function)
   return named_main && is_static && has_correct_type && public_access;
 }
 
-/// \param function: The function under test, for which to build the arguments.
-/// \param symbol_table: For the purposes of adding any local variables
-///   generated or any functions which are generated and called.
-/// \param assume_init_pointers_not_null: If this is true then any reference
-///   type parameters to the function under tests are assumed to be non-null.
-/// \param object_factory_parameters: Configuration of the object factory.
-/// \param pointer_type_selector: Means of selecting the type of value
-///   constructed for reference types which are initialised by the code
-///   returned.
-/// \returns A pairing of the code to initialise the arguments and a std::vector
-///   of the expressions for these arguments. The vector contains one element
-///   per parameter of \p function. The vector of expressions can be used as
-///   arguments for \p function. The code returned allocates the objects used as
-///   test arguments for the function under test (\p function) and
-///   non-deterministically initializes them. This code returned must be placed
-///   into the code block of the function call, before the function call.
-///   Typically this code block would be  __CPROVER__start.
 std::pair<code_blockt, std::vector<exprt>> java_build_arguments(
   const symbolt &function,
   symbol_table_baset &symbol_table,
@@ -608,7 +591,8 @@ bool java_entry_point(
   bool assert_uncaught_exceptions,
   const java_object_factory_parameterst &object_factory_parameters,
   const select_pointer_typet &pointer_type_selector,
-  bool string_refinement_enabled)
+  bool string_refinement_enabled,
+  const build_argumentst &build_arguments)
 {
   // check if the entry point is already there
   if(symbol_table.symbols.find(goto_functionst::entry_point())!=
@@ -639,20 +623,20 @@ bool java_entry_point(
     symbol,
     symbol_table,
     message_handler,
-    assume_init_pointers_not_null,
     assert_uncaught_exceptions,
     object_factory_parameters,
-    pointer_type_selector);
+    pointer_type_selector,
+    build_arguments);
 }
 
 bool generate_java_start_function(
   const symbolt &symbol,
   symbol_table_baset &symbol_table,
   message_handlert &message_handler,
-  bool assume_init_pointers_not_null,
   bool assert_uncaught_exceptions,
   const java_object_factory_parameterst &object_factory_parameters,
-  const select_pointer_typet &pointer_type_selector)
+  const select_pointer_typet &pointer_type_selector,
+  const build_argumentst &build_arguments)
 {
   messaget message(message_handler);
   code_blockt init_code;
@@ -720,12 +704,7 @@ bool generate_java_start_function(
   // create code that allocates the objects used as test arguments and
   // non-deterministically initializes them
   const std::pair<code_blockt, std::vector<exprt>> main_arguments =
-    java_build_arguments(
-      symbol,
-      symbol_table,
-      assume_init_pointers_not_null,
-      object_factory_parameters,
-      pointer_type_selector);
+    build_arguments(symbol, symbol_table);
   init_code.append(main_arguments.first);
   call_main.arguments() = main_arguments.second;
 
