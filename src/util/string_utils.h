@@ -96,6 +96,4 @@ join_strings(Stream &&os, const It b, const It e, const Delimiter &delimiter)
 /// programming language.
 std::string escape(const std::string &);
 
-void replace_all(std::string &, const std::string &, const std::string &);
-
 #endif
