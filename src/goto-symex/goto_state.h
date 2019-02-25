@@ -55,6 +55,12 @@ public:
   unsigned atomic_section_id = 0;
 
   /// Constructors
+  goto_statet() = default;
+  goto_statet &operator=(const goto_statet &other) = default;
+  goto_statet &operator=(goto_statet &&other) = default;
+  goto_statet(const goto_statet &other) = default;
+  goto_statet(goto_statet &&other) = default;
+
   explicit goto_statet(const class goto_symex_statet &s);
 
   explicit goto_statet(guard_managert &guard_manager)

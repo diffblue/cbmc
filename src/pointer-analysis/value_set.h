@@ -45,6 +45,11 @@ public:
   {
   }
 
+  value_sett(value_sett &&other)
+    : location_number(other.location_number), values(std::move(other.values))
+  {
+  }
+
   virtual ~value_sett() = default;
 
   value_sett(const value_sett &other) = default;
