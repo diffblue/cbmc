@@ -66,10 +66,8 @@ void goto_symext::symex_decl(statet &state, const symbol_exprt &expr)
   }
 
   // L2 renaming
-  bool is_new =
-    state.level2.current_names.emplace(l1_identifier, std::make_pair(ssa, 1))
-      .second;
-  CHECK_RETURN(is_new);
+  std::size_t generation = state.increase_generation(l1_identifier, ssa);
+  CHECK_RETURN(generation == 1);
 
   const bool record_events=state.record_events;
   state.record_events=false;

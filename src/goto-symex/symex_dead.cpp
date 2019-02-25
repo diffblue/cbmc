@@ -43,7 +43,6 @@ void goto_symext::symex_dead(statet &state)
   // map is safe as 1) it is local to a path and 2) this instance can no longer
   // appear
   state.propagation.erase(l1_identifier);
-
   // increment the L2 index to ensure a merge on join points will propagate the
   // value for branches that are still live
   state.increase_generation_if_exists(l1_identifier);

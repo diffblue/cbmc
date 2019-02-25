@@ -210,7 +210,17 @@ void goto_symext::symex_goto(statet &state)
   // merge_gotos when we visit new_state_pc
   framet::goto_state_listt &goto_state_list =
     state.call_stack().top().goto_state_map[new_state_pc];
-  goto_state_list.emplace_back(state.source, state);
+
+  // If the guard is true (and the alternative branch unreachable) we can move
+  // the state in this case as it'll never be accessed on the alternate branch.
+  if(new_guard.is_true())
+  {
+    goto_state_list.emplace_back(state.source, std::move(state));
+  }
+  else
+  {
+    goto_state_list.emplace_back(state.source, state);
+  }
 
   symex_transition(state, state_pc, backward);
 
@@ -319,20 +329,28 @@ void goto_symext::merge_goto(
       "atomic sections differ across branches",
       state.source.pc->source_location);
 
-  // do SSA phi functions
-  phi_function(goto_state, state);
+  if(!goto_state.guard.is_false())
+  {
+    if(state.guard.is_false())
+    {
+      // Important to note that we're moving into our base class here.
+      static_cast<goto_statet &>(state) = std::move(goto_state);
+    }
+    else
+    {
+      // do SSA phi functions
+      phi_function(goto_state, state);
 
-  // merge value sets
-  if(state.guard.is_false() && !goto_state.guard.is_false())
-    state.value_set = std::move(goto_state.value_set);
-  else if(!goto_state.guard.is_false())
-    state.value_set.make_union(goto_state.value_set);
+      // merge value sets
+      state.value_set.make_union(goto_state.value_set);
 
-  // adjust guard
-  state.guard|=goto_state.guard;
+      // adjust guard
+      state.guard |= goto_state.guard;
 
-  // adjust depth
-  state.depth=std::min(state.depth, goto_state.depth);
+      // adjust depth
+      state.depth = std::min(state.depth, goto_state.depth);
+    }
+  }
 }
 
 /// Applies f to `(k, ssa, i, j)` if the first map maps k to (ssa, i) and
