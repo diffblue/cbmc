@@ -768,7 +768,7 @@ void bv_pointerst::do_postponed(
       if(!is_dynamic)
         l2=!l2;
 
-      prop.l_set_to(prop.limplies(l1, l2), true);
+      prop.l_set_to_true(prop.limplies(l1, l2));
     }
   }
   else if(postponed.expr.id()==ID_object_size)
@@ -814,7 +814,7 @@ void bv_pointerst::do_postponed(
       literalt l1=bv_utils.equal(bv, saved_bv);
       literalt l2=bv_utils.equal(postponed.bv, size_bv);
 
-      prop.l_set_to(prop.limplies(l1, l2), true);
+      prop.l_set_to_true(prop.limplies(l1, l2));
     }
   }
   else

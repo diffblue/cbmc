@@ -540,7 +540,7 @@ bvt bv_utilst::negate(const bvt &bv)
 
 bvt bv_utilst::negate_no_overflow(const bvt &bv)
 {
-  prop.l_set_to(overflow_negate(bv), false);
+  prop.l_set_to_false(overflow_negate(bv));
   return negate(bv);
 }
 
@@ -780,9 +780,7 @@ bvt bv_utilst::absolute_value(const bvt &bv)
 
 bvt bv_utilst::cond_negate_no_overflow(const bvt &bv, literalt cond)
 {
-  prop.l_set_to(
-    prop.limplies(cond, !overflow_negate(bv)),
-    true);
+  prop.l_set_to_true(prop.limplies(cond, !overflow_negate(bv)));
 
   return cond_negate(bv, cond);
 }
@@ -802,7 +800,7 @@ bvt bv_utilst::signed_multiplier_no_overflow(
 
   bvt result=unsigned_multiplier_no_overflow(neg0, neg1);
 
-  prop.l_set_to(result[result.size()-1], false);
+  prop.l_set_to_false(result[result.size() - 1]);
 
   literalt result_sign=prop.lxor(sign0, sign1);
 
