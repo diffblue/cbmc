@@ -4,6 +4,6 @@ main.c
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
-^[[:space:]]*r2=1u \(.*\)$
+^[[:space:]]*r2=1u(l)? \(.*\)$
 --
 ^warning: ignoring

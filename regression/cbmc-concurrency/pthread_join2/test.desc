@@ -1,4 +1,4 @@
-CORE
+CORE pthread
 main.c
 --unwind 2
 ^EXIT=10$
