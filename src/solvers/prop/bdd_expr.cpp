@@ -119,11 +119,14 @@ exprt bdd_exprt::as_expr(const bdd_nodet &r, bool complement) const
       if(r.else_branch().is_complement() != complement)
       {
         return and_exprt(
-          n_expr, as_expr(r.then_branch(), complement != r.is_complement()));
+          n_expr,
+          as_expr(
+            r.then_branch(), complement != r.then_branch().is_complement()));
       }
       return or_exprt(
         not_exprt(n_expr),
-        as_expr(r.then_branch(), complement != r.is_complement()));
+        as_expr(
+          r.then_branch(), complement != r.then_branch().is_complement()));
     }
   }
   else if(r.then_branch().is_constant())

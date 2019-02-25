@@ -44,4 +44,25 @@ SCENARIO("bdd_expr", "[core][solver][prop][bdd_expr]")
       REQUIRE(bdd.as_expr() == bdd2.as_expr());
     }
   }
+
+  GIVEN("A bdd for (a&!b)")
+  {
+    const symbol_exprt a("a", bool_typet());
+    const symbol_exprt b("b", bool_typet());
+
+    bdd_exprt bdd{ns};
+    bdd.from_expr(and_exprt(a, not_exprt(b)));
+
+    WHEN("It is converted to an exprt")
+    {
+      const exprt result = bdd.as_expr();
+      THEN("It is equal to the expression (a & !b) or (!b & a)")
+      {
+        REQUIRE(result.id() == ID_and);
+        REQUIRE(result.operands().size() == 2);
+        REQUIRE((result.op0() == a || result.op1() == a));
+        REQUIRE((result.op0() == not_exprt(b) || result.op1() == not_exprt(b)));
+      }
+    }
+  }
 }
