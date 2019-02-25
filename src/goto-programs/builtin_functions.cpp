@@ -1065,15 +1065,14 @@ void goto_convertt::do_function_call_symbol(
       throw 0;
     }
 
-    goto_programt::targett t=dest.add_instruction(OTHER);
-    t->source_location=function.source_location();
-    t->code.set(ID_statement, ID_fence);
-
+    codet fence(ID_fence);
     forall_expr(it, arguments)
     {
       const irep_idt kind=get_string_constant(*it);
-      t->code.set(kind, true);
+      fence.set(kind, true);
     }
+
+    dest.add(goto_programt::make_other(fence, function.source_location()));
   }
   else if(identifier=="__builtin_prefetch")
   {
@@ -1268,10 +1267,9 @@ void goto_convertt::do_function_call_symbol(
     t3->code=code_assignt(deref_ptr, op_expr);
 
     // this instruction implies an mfence, i.e., WRfence
-    goto_programt::targett t4=dest.add_instruction(OTHER);
-    t4->source_location=function.source_location();
-    t4->code=codet(ID_fence);
-    t4->code.set(ID_WRfence, true);
+    codet fence(ID_fence);
+    fence.set(ID_WRfence, true);
+    dest.add(goto_programt::make_other(fence, function.source_location()));
 
     goto_programt::targett t5=dest.add_instruction(ATOMIC_END);
     t5->source_location=function.source_location();
@@ -1339,10 +1337,9 @@ void goto_convertt::do_function_call_symbol(
     }
 
     // this instruction implies an mfence, i.e., WRfence
-    goto_programt::targett t4=dest.add_instruction(OTHER);
-    t4->source_location=function.source_location();
-    t4->code=codet(ID_fence);
-    t4->code.set(ID_WRfence, true);
+    codet fence(ID_fence);
+    fence.set(ID_WRfence, true);
+    dest.add(goto_programt::make_other(fence, function.source_location()));
 
     goto_programt::targett t5=dest.add_instruction(ATOMIC_END);
     t5->source_location=function.source_location();
@@ -1410,10 +1407,9 @@ void goto_convertt::do_function_call_symbol(
     t3->code=code_assignt(deref_ptr, if_expr);
 
     // this instruction implies an mfence, i.e., WRfence
-    goto_programt::targett t4=dest.add_instruction(OTHER);
-    t4->source_location=function.source_location();
-    t4->code=codet(ID_fence);
-    t4->code.set(ID_WRfence, true);
+    codet fence(ID_fence);
+    fence.set(ID_WRfence, true);
+    dest.add(goto_programt::make_other(fence, function.source_location()));
 
     goto_programt::targett t5=dest.add_instruction(ATOMIC_END);
     t5->source_location=function.source_location();
@@ -1471,10 +1467,9 @@ void goto_convertt::do_function_call_symbol(
     t3->code=code_assignt(deref_ptr, if_expr);
 
     // this instruction implies an mfence, i.e., WRfence
-    goto_programt::targett t4=dest.add_instruction(OTHER);
-    t4->source_location=function.source_location();
-    t4->code=codet(ID_fence);
-    t4->code.set(ID_WRfence, true);
+    codet fence(ID_fence);
+    fence.set(ID_WRfence, true);
+    dest.add(goto_programt::make_other(fence, function.source_location()));
 
     goto_programt::targett t5=dest.add_instruction(ATOMIC_END);
     t5->source_location=function.source_location();
