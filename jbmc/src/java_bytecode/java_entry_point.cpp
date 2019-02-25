@@ -28,6 +28,19 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #define JAVA_MAIN_METHOD "main:([Ljava/lang/String;)V"
 
+static optionalt<codet> record_return_value(
+  const symbolt &function,
+  const symbol_table_baset &symbol_table);
+
+static code_blockt record_pointer_parameters(
+  const symbolt &function,
+  const std::vector<exprt> &arguments,
+  const symbol_table_baset &symbol_table);
+
+static codet record_exception(
+  const symbolt &function,
+  const symbol_table_baset &symbol_table);
+
 static void create_initialize(symbol_table_baset &symbol_table)
 {
   // If __CPROVER_initialize already exists, replace it. It may already exist
@@ -447,77 +460,95 @@ exprt::operandst java_build_arguments(
   return main_arguments;
 }
 
-void java_record_outputs(
+/// Mark return value, pointer type parameters and the exception as outputs.
+static code_blockt java_record_outputs(
   const symbolt &function,
   const exprt::operandst &main_arguments,
-  code_blockt &init_code,
   symbol_table_baset &symbol_table)
+{
+  code_blockt init_code;
+
+  if(auto return_value = record_return_value(function, symbol_table))
+  {
+    init_code.add(std::move(*return_value));
+  }
+
+  init_code.append(
+    record_pointer_parameters(function, main_arguments, symbol_table));
+
+  init_code.add(record_exception(function, symbol_table));
+
+  return init_code;
+}
+
+static optionalt<codet> record_return_value(
+  const symbolt &function,
+  const symbol_table_baset &symbol_table)
+{
+  if(to_java_method_type(function.type).return_type() == java_void_type())
+    return {};
+
+  const symbolt &return_symbol =
+    *symbol_table.lookup(JAVA_ENTRY_POINT_RETURN_SYMBOL);
+
+  codet output(ID_output);
+  output.operands().resize(2);
+  output.op0() = address_of_exprt(index_exprt(
+    string_constantt(return_symbol.base_name), from_integer(0, index_type())));
+  output.op1() = return_symbol.symbol_expr();
+  output.add_source_location() = function.location;
+  return output;
+}
+
+static code_blockt record_pointer_parameters(
+  const symbolt &function,
+  const std::vector<exprt> &arguments,
+  const symbol_table_baset &symbol_table)
 {
   const java_method_typet::parameterst &parameters =
     to_java_method_type(function.type).parameters();
 
-  bool has_return_value =
-    to_java_method_type(function.type).return_type() != java_void_type();
+  code_blockt init_code;
 
-  if(has_return_value)
+  for(std::size_t param_number = 0; param_number < parameters.size();
+      param_number++)
   {
-    // record return value
+    const symbolt &p_symbol =
+      *symbol_table.lookup(parameters[param_number].get_identifier());
+
+    if(!can_cast_type<pointer_typet>(p_symbol.type))
+      continue;
+
     codet output(ID_output);
     output.operands().resize(2);
-
-    const symbolt &return_symbol=
-      *symbol_table.lookup(JAVA_ENTRY_POINT_RETURN_SYMBOL);
-
-    output.op0()=
-      address_of_exprt(
-        index_exprt(
-          string_constantt(return_symbol.base_name),
-          from_integer(0, index_type())));
-    output.op1()=return_symbol.symbol_expr();
-    output.add_source_location()=function.location;
+    output.op0() = address_of_exprt(index_exprt(
+      string_constantt(p_symbol.base_name), from_integer(0, index_type())));
+    output.op1() = arguments[param_number];
+    output.add_source_location() = function.location;
 
     init_code.add(std::move(output));
   }
+  return init_code;
+}
 
-  for(std::size_t param_number=0;
-      param_number<parameters.size();
-      param_number++)
-  {
-    const symbolt &p_symbol=
-      *symbol_table.lookup(parameters[param_number].get_identifier());
-
-    if(p_symbol.type.id()==ID_pointer)
-    {
-      // record as an output
-      codet output(ID_output);
-      output.operands().resize(2);
-      output.op0()=
-        address_of_exprt(
-          index_exprt(
-            string_constantt(p_symbol.base_name),
-            from_integer(0, index_type())));
-      output.op1()=main_arguments[param_number];
-      output.add_source_location()=function.location;
-
-      init_code.add(std::move(output));
-    }
-  }
-
+static codet record_exception(
+  const symbolt &function,
+  const symbol_table_baset &symbol_table)
+{
   // record exceptional return variable as output
   codet output(ID_output);
   output.operands().resize(2);
 
   // retrieve the exception variable
-  const symbolt exc_symbol=*symbol_table.lookup(
-    JAVA_ENTRY_POINT_EXCEPTION_SYMBOL);
+  const symbolt &exc_symbol =
+    symbol_table.lookup_ref(JAVA_ENTRY_POINT_EXCEPTION_SYMBOL);
 
   output.op0()=address_of_exprt(
     index_exprt(string_constantt(exc_symbol.base_name),
                 from_integer(0, index_type())));
   output.op1()=exc_symbol.symbol_expr();
   output.add_source_location()=function.location;
-
-  init_code.add(std::move(output));
+  return output;
 }
 
 main_function_resultt get_main_symbol(
@@ -788,8 +819,8 @@ bool generate_java_start_function(
   // Converge normal and exceptional return:
   init_code.add(std::move(after_catch));
 
-  // declare certain (which?) variables as test outputs
-  java_record_outputs(symbol, main_arguments, init_code, symbol_table);
+  // Mark return value, pointer type parameters and the exception as outputs.
+  init_code.append(java_record_outputs(symbol, main_arguments, symbol_table));
 
   // add uncaught-exception check if requested
   if(assert_uncaught_exceptions)
