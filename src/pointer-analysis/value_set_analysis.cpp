@@ -46,7 +46,7 @@ void value_sets_to_xml(
       xmlt &var=i.new_element("variable");
       var.new_element("identifier").data = id2string(values_entry.first);
 
-      #if 0
+#if 0
       const value_sett::expr_sett &expr_set=
         v_it->second.expr_set();
 
@@ -61,7 +61,7 @@ void value_sets_to_xml(
         var.new_element("value").data=
           xmlt::escape(value_str);
       }
-      #endif
+#endif
     }
   }
 }
