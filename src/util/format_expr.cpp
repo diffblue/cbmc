@@ -184,8 +184,20 @@ static std::ostream &format_rec(std::ostream &os, const constant_exprt &src)
     return os << '"' << escape(id2string(src.get_value())) << '"';
   else if(type == ID_floatbv)
     return os << ieee_floatt(src);
-  else if(type == ID_pointer && src.is_zero())
-    return os << src.get_value();
+  else if(type == ID_pointer)
+  {
+    if(src.is_zero())
+      return os << ID_NULL;
+    else
+    {
+      // Non-null pointer constants have both a value and optionally
+      // an operand with a symbolic address
+      if(src.operands().size() == 1)
+        return format_rec(os, to_unary_expr(src).op());
+      else
+        return os << src.pretty();
+    }
+  }
   else
     return os << src.pretty();
 }
