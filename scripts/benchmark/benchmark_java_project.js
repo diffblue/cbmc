@@ -66,7 +66,7 @@ function readNumberOfGoals(stdout) {
     return 0;
 }
 function readJsonFile(fileName) {
-    return JSON.parse(fs.readFileSync(filename, 'utf8'));
+    return JSON.parse(fs.readFileSync(fileName, 'utf8'));
 }
 
 /// Read the options from tools.json and launch the executable
@@ -92,7 +92,7 @@ function run(executable, modelsPath, argumentsFile, functionName,
     // timeout isn't a jbmc option but only used by this script
     const timeout = config.timeout;
     config['timeout'] = false;
-    commandLine = `${executable} ${classFile} ${configToString(config)}`
+    commandLine = `${executable} ${classFile} ${argsToString(config)}`
     const startTime = new Date();
     try {
         const timeCommand = "export TIME=\"%U\"; /usr/bin/time --quiet -o tmp_time.out "
