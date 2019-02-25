@@ -402,7 +402,7 @@ static void locality(
     (void)state.add_object(
       ns.lookup(param).symbol_expr(),
       [&path_storage, &frame_nr](const irep_idt &l0_name) {
-        return path_storage.get_unique_index(l0_name, frame_nr);
+        return path_storage.get_unique_l1_index(l0_name, frame_nr);
       },
       ns);
   }

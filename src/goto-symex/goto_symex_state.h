@@ -42,7 +42,10 @@ Author: Daniel Kroening, kroening@kroening.com
 class goto_symex_statet final : public goto_statet
 {
 public:
-  goto_symex_statet(const symex_targett::sourcet &, guard_managert &manager);
+  goto_symex_statet(
+    const symex_targett::sourcet &,
+    guard_managert &manager,
+    std::function<std::size_t(const irep_idt &)> fresh_l2_name_provider);
   ~goto_symex_statet();
 
   /// \brief Fake "copy constructor" that initializes the `symex_target` member
@@ -202,7 +205,17 @@ public:
   unsigned total_vccs = 0;
   unsigned remaining_vccs = 0;
 
+  /// Allocates a fresh L2 name for the given L1 identifier, and makes it the
+  //  latest generation on this path.
+  void increase_generation(const irep_idt l1_identifier, const ssa_exprt &lhs);
+
+  /// Increases the generation of the L1 identifier. Does nothing if there
+  /// isn't an expression keyed by it.
+  void increase_generation_if_exists(const irep_idt identifier);
+
 private:
+  std::function<std::size_t(const irep_idt &)> fresh_l2_name_provider;
+
   /// \brief Dangerous, do not use
   ///
   /// Copying a state S1 to S2 risks S2 pointing to a deallocated
