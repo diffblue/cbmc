@@ -3,7 +3,9 @@ default: tests.log
 include ../../src/config.inc
 include ../../src/common
 
-ifeq ($(BUILD_ENV_),MSVC)
+ifeq ($(filter-out OSX MSVC,$(BUILD_ENV_)),)
+	# no POSIX threads on Windows
+	# for OSX we'd need sound handling of pointers in multi-threaded programs
 	no_pthread = -X pthread
 endif
 
