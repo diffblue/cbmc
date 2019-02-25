@@ -41,16 +41,12 @@ void value_sets_to_xml(
     xmlt &i=dest.new_element("instruction");
     i.new_element()=::xml(location);
 
-    for(value_sett::valuest::const_iterator
-        v_it=value_set.values.begin();
-        v_it!=value_set.values.end();
-        v_it++)
+    for(const auto &values_entry : value_set.values)
     {
       xmlt &var=i.new_element("variable");
-      var.new_element("identifier").data=
-        id2string(v_it->first);
+      var.new_element("identifier").data = id2string(values_entry.first);
 
-      #if 0
+#if 0
       const value_sett::expr_sett &expr_set=
         v_it->second.expr_set();
 
@@ -65,7 +61,7 @@ void value_sets_to_xml(
         var.new_element("value").data=
           xmlt::escape(value_str);
       }
-      #endif
+#endif
     }
   }
 }

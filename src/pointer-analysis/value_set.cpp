@@ -99,14 +99,11 @@ void value_sett::output(
   const namespacet &ns,
   std::ostream &out) const
 {
-  for(valuest::const_iterator
-      v_it=values.begin();
-      v_it!=values.end();
-      v_it++)
+  for(const auto &values_entry : values)
   {
     irep_idt identifier, display_name;
 
-    const entryt &e=v_it->second;
+    const entryt &e = values_entry.second;
 
     if(has_prefix(id2string(e.identifier), "value_set::dynamic_object"))
     {
