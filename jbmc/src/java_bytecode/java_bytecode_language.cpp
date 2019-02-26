@@ -862,7 +862,15 @@ bool java_bytecode_languaget::generate_support_functions(
     assert_uncaught_exceptions,
     object_factory_parameters,
     get_pointer_type_selector(),
-    string_refinement_enabled);
+    string_refinement_enabled,
+    [&](const symbolt &function, symbol_table_baset &symbol_table) {
+      return java_build_arguments(
+        function,
+        symbol_table,
+        assume_inputs_non_null,
+        object_factory_parameters,
+        get_pointer_type_selector());
+    });
 }
 
 /// Uses a simple context-insensitive ('ci') analysis to determine which methods
