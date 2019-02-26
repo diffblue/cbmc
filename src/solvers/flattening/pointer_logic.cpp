@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/c_types.h>
 #include <util/invariant.h>
 #include <util/pointer_offset_size.h>
+#include <util/pointer_predicates.h>
 #include <util/prefix.h>
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
@@ -26,8 +27,9 @@ bool pointer_logict::is_dynamic_object(const exprt &expr) const
     return true;
 
   if(expr.id()==ID_symbol)
-    if(has_prefix(id2string(to_symbol_expr(expr).get_identifier()),
-                  "symex_dynamic::"))
+    if(has_prefix(
+         id2string(to_symbol_expr(expr).get_identifier()),
+         SYMEX_DYNAMIC_PREFIX))
       return true;
 
   return false;

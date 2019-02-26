@@ -21,6 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/format.h>
 #include <util/format_expr.h>
 #include <util/invariant.h>
+#include <util/pointer_predicates.h>
 #include <util/prefix.h>
 #include <util/std_expr.h>
 
@@ -178,7 +179,7 @@ void goto_symex_statet::assignment(
       || l1_identifier == guard_identifier()
       || ns.lookup(l1_identifier).is_shared()
       || has_prefix(id2string(l1_identifier), "symex::invalid_object")
-      || has_prefix(id2string(l1_identifier), "symex_dynamic::dynamic_object"));
+      || has_prefix(id2string(l1_identifier), SYMEX_DYNAMIC_PREFIX "dynamic_object"));
 #endif
 
   // do the l2 renaming

@@ -18,6 +18,7 @@ Date: February 2006
 #include <goto-programs/remove_skip.h>
 
 #include <linking/static_lifetime_init.h>
+#include <util/pointer_predicates.h>
 
 #include "rw_set.h"
 
@@ -123,14 +124,13 @@ static bool is_shared(const namespacet &ns, const symbol_exprt &symbol_expr)
 {
   const irep_idt &identifier=symbol_expr.get_identifier();
 
-  if(identifier==CPROVER_PREFIX "alloc" ||
-     identifier==CPROVER_PREFIX "alloc_size" ||
-     identifier=="stdin" ||
-     identifier=="stdout" ||
-     identifier=="stderr" ||
-     identifier=="sys_nerr" ||
-     has_prefix(id2string(identifier), "symex::invalid_object") ||
-     has_prefix(id2string(identifier), "symex_dynamic::dynamic_object"))
+  if(
+    identifier == CPROVER_PREFIX "alloc" ||
+    identifier == CPROVER_PREFIX "alloc_size" || identifier == "stdin" ||
+    identifier == "stdout" || identifier == "stderr" ||
+    identifier == "sys_nerr" ||
+    has_prefix(id2string(identifier), "symex::invalid_object") ||
+    has_prefix(id2string(identifier), SYMEX_DYNAMIC_PREFIX "dynamic_object"))
     return false; // no race check
 
   const symbolt &symbol=ns.lookup(identifier);
