@@ -57,6 +57,18 @@ using build_argumentst =
 /// (deterministically) set to null. This is a source of underapproximation in
 /// our approach to test generation, and should perhaps be fixed in the future.
 ///
+/// \param symbol_table: Global symbol table
+/// \param main_class: Identifier of a class within which the main method to be
+///   analysed exists. This may be empty if the intention is not to analyse the
+///   main method.
+/// \param message_handler: Where to write output to.
+/// \param assume_init_pointers_not_null: If this is true then any reference
+///   type parameters to the function under tests are assumed to be non-null.
+/// \param assert_uncaught_exceptions: Add an uncaught-exception check.
+/// \param object_factory_parameters: Parameters for creation of arguments.
+/// \param pointer_type_selector: Logic for substituting types of pointers.
+/// \param string_refinement_enabled: If true, string refinement's string data
+///   structure will also be initialised and added to the symbol table.
 /// \param build_arguments: The function which builds the `codet`s which
 ///   initialise the arguments for a function.
 /// \return true if error occurred on entry point search
