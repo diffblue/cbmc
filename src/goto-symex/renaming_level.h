@@ -18,6 +18,14 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <util/irep.h>
 #include <util/ssa_expr.h>
 
+/// Symex renaming level names.
+enum levelt
+{
+  L0 = 0,
+  L1 = 1,
+  L2 = 2
+};
+
 /// Wrapper for a \c current_names map, which maps each identifier to an SSA
 /// expression and a counter.
 /// This is extended by the different symex_level structures which are used

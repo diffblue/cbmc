@@ -263,7 +263,7 @@ void goto_symex_statet::set_l2_indices(
   ssa_expr = level2(std::move(l1));
 }
 
-template <goto_symex_statet::levelt level>
+template <levelt level>
 ssa_exprt goto_symex_statet::rename_ssa(ssa_exprt ssa, const namespacet &ns)
 {
   static_assert(
@@ -282,11 +282,10 @@ ssa_exprt goto_symex_statet::rename_ssa(ssa_exprt ssa, const namespacet &ns)
 }
 
 /// Ensure `rename_ssa` gets compiled for L0
-template ssa_exprt goto_symex_statet::rename_ssa<goto_symex_statet::L0>(
-  ssa_exprt ssa,
-  const namespacet &ns);
+template ssa_exprt
+goto_symex_statet::rename_ssa<L0>(ssa_exprt ssa, const namespacet &ns);
 
-template <goto_symex_statet::levelt level>
+template <levelt level>
 exprt goto_symex_statet::rename(exprt expr, const namespacet &ns)
 {
   // rename all the symbols with their last known value
@@ -544,7 +543,7 @@ bool goto_symex_statet::l2_thread_write_encoding(
   return threads.size()>1;
 }
 
-template <goto_symex_statet::levelt level>
+template <levelt level>
 void goto_symex_statet::rename_address(exprt &expr, const namespacet &ns)
 {
   if(expr.id()==ID_symbol &&
@@ -669,7 +668,7 @@ static bool requires_renaming(const typet &type, const namespacet &ns)
   return false;
 }
 
-template <goto_symex_statet::levelt level>
+template <levelt level>
 void goto_symex_statet::rename(
   typet &type,
   const irep_idt &l1_identifier,
