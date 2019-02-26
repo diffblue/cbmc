@@ -24,4 +24,4 @@ if [ -e "${name}-mod.gb" ] ; then
 fi
 
 $goto_harness "${name}.gb" "${name}-mod.gb" --harness-function-name $entry_point ${args} 
-$cbmc --function $entry_point "${name}-mod.gb"
+$cbmc --function $entry_point "${name}-mod.gb" --unwind 20 --unwinding-assertions
