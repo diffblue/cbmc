@@ -59,6 +59,35 @@ struct symex_renaming_levelt
   }
 };
 
+/// Wrapper for expressions or types which have been renamed up to a given
+/// \p level
+template <typename underlyingt, levelt level>
+class renamedt
+{
+public:
+  static_assert(
+    std::is_base_of<exprt, underlyingt>::value ||
+      std::is_base_of<typet, underlyingt>::value,
+    "underlyingt should inherit from exprt or typet");
+
+  const underlyingt &get() const
+  {
+    return value;
+  }
+
+private:
+  underlyingt value;
+
+  friend struct symex_level0t;
+  friend struct symex_level1t;
+  friend struct symex_level2t;
+
+  /// Only symex_levelXt classes can create renamedt objects
+  explicit renamedt(underlyingt value) : value(std::move(value))
+  {
+  }
+};
+
 /// Functor to set the level 0 renaming of SSA expressions.
 /// Level 0 corresponds to threads.
 /// The renaming is built for one particular interleaving.
