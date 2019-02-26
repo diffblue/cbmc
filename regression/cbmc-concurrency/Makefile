@@ -1,10 +1,19 @@
 default: tests.log
 
+include ../../src/config.inc
+include ../../src/common
+
+ifeq ($(filter-out OSX MSVC,$(BUILD_ENV_)),)
+	# no POSIX threads on Windows
+	# for OSX we'd need sound handling of pointers in multi-threaded programs
+	no_pthread = -X pthread
+endif
+
 test:
-	@../test.pl -c ../../../src/cbmc/cbmc
+	@../test.pl -e -p -c ../../../src/cbmc/cbmc $(no_pthread)
 
 tests.log: ../test.pl
-	@../test.pl -c ../../../src/cbmc/cbmc
+	@../test.pl -e -p -c ../../../src/cbmc/cbmc $(no_pthread)
 
 show:
 	@for dir in *; do \

@@ -1,4 +1,4 @@
-CORE
+CORE pthread
 main.c
 --mm tso
 ^EXIT=0$

@@ -1,4 +1,4 @@
-CORE
+CORE pthread
 main.c
 --unwind 1 --no-unwinding-assertions
 ^EXIT=0$

@@ -6,3 +6,5 @@ main.c
 ^VERIFICATION SUCCESSFUL$
 --
 ^warning: ignoring
+--
+Some past change broke this test such that we now report verification failures.

@@ -7,6 +7,7 @@ DIRS = cbmc \
        ansi-c \
        goto-instrument \
        cpp \
+       cbmc-concurrency \
        cbmc-cover \
        goto-instrument-typedef \
        smt2_solver \

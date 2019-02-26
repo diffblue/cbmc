@@ -1,10 +1,10 @@
-CORE
+CORE pthread
 main.c
 --all-properties
 ^EXIT=10$
 ^SIGNAL=0$
-^\[main\.assertion\.1\] assertion i==1: FAILURE$
-^\[main\.assertion\.2\] assertion i==2: SUCCESS$
+^\[main\.assertion\.1\] line 21 assertion i==1: FAILURE$
+^\[main\.assertion\.2\] line 22 assertion i==2: SUCCESS$
 ^\*\* 1 of 2 failed 
 --
 ^warning: ignoring

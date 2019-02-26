@@ -1,8 +1,8 @@
 CORE
 main.c
 
-^EXIT=10$
+^EXIT=6$
 ^SIGNAL=0$
-^file main.c line 12 function spawn: start_thread in atomic section detected$
+^spawning threads out of atomic sections is not allowed
 --
 ^warning: ignoring

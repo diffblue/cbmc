@@ -1,4 +1,4 @@
-KNOWNBUG
+KNOWNBUG pthread
 main.c
 -D_ENABLE_CHAIN_ --unwind 2
 ^EXIT=0$

@@ -1,5 +1,4 @@
 #include <stdlib.h>
-#include <pthread.h>
 
 _Bool set_done;
 int *ptr;

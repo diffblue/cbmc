@@ -1,4 +1,4 @@
-CORE
+CORE pthread
 main.c
 --error-label ERROR
 ^EXIT=10$
