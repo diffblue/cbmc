@@ -23,16 +23,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 bool pointer_logict::is_dynamic_object(const exprt &expr) const
 {
-  if(expr.type().get_bool(ID_C_dynamic))
-    return true;
-
-  if(expr.id()==ID_symbol)
-    if(has_prefix(
-         id2string(to_symbol_expr(expr).get_identifier()),
-         SYMEX_DYNAMIC_PREFIX))
-      return true;
-
-  return false;
+  return expr.type().get_bool(ID_C_dynamic) ||
+         (expr.id() == ID_symbol &&
+          has_prefix(
+            id2string(to_symbol_expr(expr).get_identifier()),
+            SYMEX_DYNAMIC_PREFIX));
 }
 
 void pointer_logict::get_dynamic_objects(std::vector<std::size_t> &o) const
