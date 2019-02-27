@@ -200,13 +200,13 @@ cover_configt get_cover_config(
   cover_configt cover_config;
   function_filterst &function_filters =
     cover_config.cover_configt::function_filters;
-  goal_filterst &goal_filters = cover_config.goal_filters;
+  std::unique_ptr<goal_filterst> &goal_filters = cover_config.goal_filters;
   cover_instrumenterst &instrumenters = cover_config.cover_instrumenters;
 
   function_filters.add(
     util_make_unique<internal_functions_filtert>(message_handler));
 
-  goal_filters.add(util_make_unique<internal_goals_filtert>(message_handler));
+  goal_filters->add(util_make_unique<internal_goals_filtert>(message_handler));
 
   optionst::value_listt criteria_strings = options.get_list_option("cover");
 
@@ -218,7 +218,7 @@ cover_configt get_cover_config(
     if(c == coverage_criteriont::ASSERTION)
       cover_config.keep_assertions = true;
 
-    instrumenters.add_from_criterion(c, symbol_table, goal_filters);
+    instrumenters.add_from_criterion(c, symbol_table, *goal_filters);
   }
 
   if(cover_config.keep_assertions && criteria_strings.size() > 1)
@@ -401,7 +401,7 @@ bool instrument_cover_goals(
   goto_functions.compute_location_numbers();
 
   cover_config.function_filters.report_anomalies();
-  cover_config.goal_filters.report_anomalies();
+  cover_config.goal_filters->report_anomalies();
 
   return false;
 }
