@@ -182,9 +182,10 @@ public:
   template <levelt level = L2>
   exprt rename(exprt expr, const namespacet &ns);
 
-  ssa_exprt rename_level0_ssa(ssa_exprt ssa, const namespacet &ns);
-
-  ssa_exprt rename_level1_ssa(ssa_exprt ssa, const namespacet &ns);
+  /// Version of rename which is specialized for SSA exprt.
+  /// Implementation only exists for level L0 and L1.
+  template <levelt level>
+  ssa_exprt rename_ssa(ssa_exprt ssa, const namespacet &ns);
 
   template <levelt level = L2>
   void rename(typet &type, const irep_idt &l1_identifier, const namespacet &ns);

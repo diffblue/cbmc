@@ -50,8 +50,8 @@ symex_dereference_statet::get_or_create_failed_symbol(const exprt &expr)
     {
       symbolt sym=*symbol;
       symbolt *sym_ptr=nullptr;
-      const ssa_exprt sym_expr =
-        state.rename_level1_ssa(ssa_exprt{sym.symbol_expr()}, ns);
+      const ssa_exprt sym_expr = state.rename_ssa<goto_symex_statet::L1>(
+        ssa_exprt{sym.symbol_expr()}, ns);
       sym.name = sym_expr.get_identifier();
       state.symbol_table.move(sym, sym_ptr);
       return sym_ptr;
@@ -70,8 +70,8 @@ symex_dereference_statet::get_or_create_failed_symbol(const exprt &expr)
     {
       symbolt sym=*symbol;
       symbolt *sym_ptr=nullptr;
-      const ssa_exprt sym_expr =
-        state.rename_level1_ssa(ssa_exprt{sym.symbol_expr()}, ns);
+      const ssa_exprt sym_expr = state.rename_ssa<goto_symex_statet::L1>(
+        ssa_exprt{sym.symbol_expr()}, ns);
       sym.name = sym_expr.get_identifier();
       state.symbol_table.move(sym, sym_ptr);
       return sym_ptr;

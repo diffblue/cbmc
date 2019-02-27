@@ -163,7 +163,7 @@ void goto_symex_statet::assignment(
   bool allow_pointer_unsoundness)
 {
   // identifier should be l0 or l1, make sure it's l1
-  lhs = rename_level1_ssa(std::move(lhs), ns);
+  lhs = rename_ssa<L1>(std::move(lhs), ns);
   irep_idt l1_identifier=lhs.get_identifier();
 
   // the type might need renaming
@@ -263,23 +263,28 @@ void goto_symex_statet::set_l2_indices(
   ssa_expr.set_level_2(level2.current_count(ssa_expr.get_identifier()));
 }
 
-ssa_exprt
-goto_symex_statet::rename_level0_ssa(ssa_exprt ssa, const namespacet &ns)
+template <goto_symex_statet::levelt level>
+ssa_exprt goto_symex_statet::rename_ssa(ssa_exprt ssa, const namespacet &ns)
 {
-  set_l0_indices(ssa, ns);
-  rename<L0>(ssa.type(), ssa.get_identifier(), ns);
+  static_assert(
+    level == L0 || level == L1,
+    "rename_ssa can only be used for levels L0 and L1");
+  if(level == L0)
+    set_l0_indices(ssa, ns);
+  else if(level == L1)
+    set_l1_indices(ssa, ns);
+  else
+    UNREACHABLE;
+
+  rename<level>(ssa.type(), ssa.get_identifier(), ns);
   ssa.update_type();
   return ssa;
 }
 
-ssa_exprt
-goto_symex_statet::rename_level1_ssa(ssa_exprt ssa, const namespacet &ns)
-{
-  set_l1_indices(ssa, ns);
-  rename<L1>(ssa.type(), ssa.get_identifier(), ns);
-  ssa.update_type();
-  return ssa;
-}
+/// Ensure `rename_ssa` gets compiled for L0
+template ssa_exprt goto_symex_statet::rename_ssa<goto_symex_statet::L0>(
+  ssa_exprt ssa,
+  const namespacet &ns);
 
 template <goto_symex_statet::levelt level>
 exprt goto_symex_statet::rename(exprt expr, const namespacet &ns)
@@ -293,11 +298,11 @@ exprt goto_symex_statet::rename(exprt expr, const namespacet &ns)
 
     if(level == L0)
     {
-      ssa = rename_level0_ssa(std::move(ssa), ns);
+      ssa = rename_ssa<L0>(std::move(ssa), ns);
     }
     else if(level == L1)
     {
-      ssa = rename_level1_ssa(std::move(ssa), ns);
+      ssa = rename_ssa<L1>(std::move(ssa), ns);
     }
     else if(level==L2)
     {
@@ -332,7 +337,7 @@ exprt goto_symex_statet::rename(exprt expr, const namespacet &ns)
     if(as_const(expr).type().id() == ID_code)
       rename<level>(expr.type(), to_symbol_expr(expr).get_identifier(), ns);
     else
-      expr = rename<level>(ssa_exprt(expr), ns);
+      expr = rename<level>(ssa_exprt{expr}, ns);
   }
   else if(expr.id()==ID_address_of)
   {
