@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 let program = require('commander');
-let execSync = require('child_process').execSync;
+let execFileSync = require('child_process').execFileSync;
 let fs = require('fs');
 
 // Parse options and launch jbmc
@@ -27,24 +27,27 @@ program
     })
     .parse(process.argv);
 
-/// Convert the args to a string of the form "--arg-name arg-value ..."
-function argsToString(args) {
-    let string = "";
+/// Convert the args to an argument array
+function argsToArray(args) {
+    let result = [];
     const keys = Object.keys(args);
     for (let i = 0; i < keys.length; i++) {
         if (typeof args[keys[i]] === "boolean") {
             if (args[keys[i]])
-                string += ` --${keys[i]}`;
+                result.push(`--${keys[i]}`);
         }
         else if (Array.isArray(args[keys[i]])) {
-            for (let j = 0; j < args[keys[i]].length; j++)
-                string += ` --${keys[i]} "${args[keys[i]][j]}"`;
+            for (let j = 0; j < args[keys[i]].length; j++) {
+                result.push(`--${keys[i]}`);
+                result.push(`${args[keys[i]][j]}`);
+            }
         }
         else {
-            string += ` --${keys[i]} "${args[keys[i]]}"`;
+            result.push(`--${keys[i]}`);
+            result.push(`${args[keys[i]]}`);
         }
     }
-    return string;
+    return result;
 }
 
 /// Get the coverage info from the json output if available
@@ -92,18 +95,16 @@ function run(executable, modelsPath, argumentsFile, functionName,
     // timeout isn't a jbmc option but only used by this script
     const timeout = config.timeout;
     config['timeout'] = false;
-    commandLine = `${executable} ${classFile} ${argsToString(config)}`
+    let command = [executable, classFile, ...argsToArray(config)];
     const startTime = new Date();
     try {
-        const timeCommand = "export TIME=\"%U\"; /usr/bin/time --quiet -o tmp_time.out "
-            + commandLine;
-        const output =
-            execSync(timeCommand, { timeout: 1000 * timeout }).toString();
+        const wrapper = __dirname + "/process_wrapper.sh";
+        const output = execFileSync(wrapper, command, { timeout: 1000 * timeout }).toString();
         let execTime = fs.readFileSync('tmp_time.out', 'utf8').split('\n')[0];
         let result = {
             classFile: classFile, function: functionName,
             execTime: execTime, success: true,
-            commandLine: commandLine
+            commandLine: command
         }
         if (showProperties) {
             result.goals = readNumberOfGoals(output);
@@ -115,7 +116,7 @@ function run(executable, modelsPath, argumentsFile, functionName,
         return JSON.stringify({
             classFile: classFile, function: functionName,
             execTime: (new Date() - startTime) / 1000, success: false,
-            commandLine: commandLine
+            commandLine: command
         });
     }
 }
