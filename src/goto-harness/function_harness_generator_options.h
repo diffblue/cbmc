@@ -20,6 +20,8 @@ Author: Diffblue Ltd.
   "treat-pointer-as-array"
 #define FUNCTION_HARNESS_GENERATOR_ASSOCIATED_ARRAY_SIZE_OPT                   \
   "associated-array-size"
+#define FUNCTION_HARNESS_GENERATOR_TREAT_POINTER_AS_CSTRING                    \
+  "treat-pointer-as-cstring"
 
 // clang-format off
 #define FUNCTION_HARNESS_GENERATOR_OPTIONS                                     \
@@ -31,6 +33,7 @@ Author: Diffblue Ltd.
   "(" FUNCTION_HARNESS_GENERATOR_MAX_ARRAY_SIZE_OPT "):"                       \
   "(" FUNCTION_HARNESS_GENERATOR_TREAT_POINTER_AS_ARRAY_OPT "):"               \
   "(" FUNCTION_HARNESS_GENERATOR_ASSOCIATED_ARRAY_SIZE_OPT "):"                \
+  "(" FUNCTION_HARNESS_GENERATOR_TREAT_POINTER_AS_CSTRING "):"                 \
 // FUNCTION_HARNESS_GENERATOR_OPTIONS
 
 // clang-format on

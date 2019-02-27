@@ -1,0 +1,8 @@
+CORE
+main.c
+--harness-type call-function --function function --treat-pointer-as-cstring pointer --associated-array-size pointer:size
+\[function.assertion.\d+\] line \d+ assertion pointer\[size - 1\] == \'\\0\': SUCCESS
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--

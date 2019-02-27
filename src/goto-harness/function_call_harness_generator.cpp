@@ -48,6 +48,9 @@ struct function_call_harness_generatort::implt
   std::set<irep_idt> function_parameters_to_treat_as_arrays;
   std::set<irep_idt> function_arguments_to_treat_as_arrays;
 
+  std::set<irep_idt> function_parameters_to_treat_as_cstrings;
+  std::set<irep_idt> function_arguments_to_treat_as_cstrings;
+
   std::map<irep_idt, irep_idt> function_argument_to_associated_array_size;
   std::map<irep_idt, irep_idt> function_parameter_to_associated_array_size;
 
@@ -178,6 +181,11 @@ void function_call_harness_generatort::handle_option(
       }
     }
   }
+  else if(option == FUNCTION_HARNESS_GENERATOR_TREAT_POINTER_AS_CSTRING)
+  {
+    p_impl->function_parameters_to_treat_as_cstrings.insert(
+      values.begin(), values.end());
+  }
   else
   {
     throw invalid_command_line_argument_exceptiont{
@@ -217,6 +225,8 @@ void function_call_harness_generatort::implt::generate(
     recursive_initialization_config.variables_that_hold_array_sizes.insert(
       pair.second);
   }
+  recursive_initialization_config.pointers_to_treat_as_cstrings =
+    function_arguments_to_treat_as_cstrings;
   recursive_initialization = util_make_unique<recursive_initializationt>(
     recursive_initialization_config, goto_model);
 
@@ -385,6 +395,12 @@ function_call_harness_generatort::implt::declare_arguments(
     {
       function_arguments_to_treat_as_arrays.insert(argument_name);
     }
+
+    if(function_parameters_to_treat_as_cstrings.count(parameter_name) != 0)
+    {
+      function_arguments_to_treat_as_cstrings.insert(argument_name);
+    }
+
     auto it = function_parameter_to_associated_array_size.find(parameter_name);
     if(it != function_parameter_to_associated_array_size.end())
     {
