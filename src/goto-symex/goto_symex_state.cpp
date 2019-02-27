@@ -274,7 +274,7 @@ ssa_exprt goto_symex_statet::rename_ssa(ssa_exprt ssa, const namespacet &ns)
   return ssa;
 }
 
-/// Ensure `rename_ssa` gets compiled for L0
+// explicitly instantiate templates
 template ssa_exprt
 goto_symex_statet::rename_ssa<L0>(ssa_exprt ssa, const namespacet &ns);
 template ssa_exprt
@@ -301,8 +301,13 @@ exprt goto_symex_statet::rename(exprt expr, const namespacet &ns)
     else if(level==L2)
     {
       ssa = set_indices<L1>(std::move(ssa), ns).get();
-      rename<level>(expr.type(), ssa.get_identifier(), ns);
-      ssa.update_type();
+      if(
+        auto renamed_type =
+          rename_type<level>(expr.type(), ssa.get_identifier(), ns))
+      {
+        ssa.type() = std::move(*renamed_type);
+        ssa.update_type();
+      }
 
       if(l2_thread_read_encoding(ssa, ns))
       {
@@ -327,11 +332,18 @@ exprt goto_symex_statet::rename(exprt expr, const namespacet &ns)
   }
   else if(expr.id()==ID_symbol)
   {
-    const auto &type = as_const(expr).type();
-
     // we never rename function symbols
-    if(type.id() == ID_code || type.id() == ID_mathematical_function)
-      rename<level>(expr.type(), to_symbol_expr(expr).get_identifier(), ns);
+    if(
+      expr.type().id() == ID_code ||
+      expr.type().id() == ID_mathematical_function)
+    {
+      if(
+        auto renamed_type = rename_type<level>(
+          expr.type(), to_symbol_expr(expr).get_identifier(), ns))
+      {
+        expr.type() = std::move(*renamed_type);
+      }
+    }
     else
       expr = rename<level>(ssa_exprt{expr}, ns);
   }
@@ -344,7 +356,10 @@ exprt goto_symex_statet::rename(exprt expr, const namespacet &ns)
   }
   else
   {
-    rename<level>(expr.type(), irep_idt(), ns);
+    if(auto renamed_type = rename_type<level>(expr.type(), irep_idt(), ns))
+    {
+      expr.type() = std::move(*renamed_type);
+    }
 
     // do this recursively
     Forall_operands(it, expr)
@@ -362,8 +377,6 @@ exprt goto_symex_statet::rename(exprt expr, const namespacet &ns)
   }
   return expr;
 }
-
-template exprt goto_symex_statet::rename<L1>(exprt expr, const namespacet &ns);
 
 /// thread encoding
 bool goto_symex_statet::l2_thread_read_encoding(
@@ -548,8 +561,13 @@ void goto_symex_statet::rename_address(exprt &expr, const namespacet &ns)
     // only do L1!
     ssa = set_indices<L1>(std::move(ssa), ns).get();
 
-    rename<level>(expr.type(), ssa.get_identifier(), ns);
-    ssa.update_type();
+    if(
+      auto renamed_type =
+        rename_type<level>(expr.type(), ssa.get_identifier(), ns))
+    {
+      ssa.type() = std::move(*renamed_type);
+      ssa.update_type();
+    }
   }
   else if(expr.id()==ID_symbol)
   {
@@ -668,10 +686,28 @@ void goto_symex_statet::rename(
   const irep_idt &l1_identifier,
   const namespacet &ns)
 {
+  if(auto renamed = rename_type<level>(type, l1_identifier, ns))
+    type = std::move(*renamed);
+}
+
+// explicitly instantiate templates
+/// \cond
+template void goto_symex_statet::rename<L2>(
+  typet &type,
+  const irep_idt &l1_identifier,
+  const namespacet &ns);
+/// \endcond
+
+template <levelt level>
+optionalt<typet> goto_symex_statet::rename_type(
+  const typet &type,
+  const irep_idt &l1_identifier,
+  const namespacet &ns)
+{
   // check whether there are symbol expressions in the type; if not, there
   // is no need to expand the struct/union tags in the type
   if(!requires_renaming(type, ns))
-    return; // no action
+    return {};
 
   // rename all the symbols with their last known value
   // to the given level
@@ -693,46 +729,92 @@ void goto_symex_statet::rename(
          to_array_type(type).is_incomplete() ||
          to_array_type(type_prev).is_complete())
       {
-        type=l1_type_entry.first->second;
-        return;
+        return l1_type_entry.first->second;
       }
     }
   }
 
-  // expand struct and union tag types
-  type = ns.follow(type);
+  optionalt<typet> result;
 
   if(type.id()==ID_array)
   {
     auto &array_type = to_array_type(type);
-    rename<level>(array_type.subtype(), irep_idt(), ns);
-    array_type.size() = rename<level>(std::move(array_type.size()), ns);
+    auto renamed_subtype =
+      rename_type<level>(array_type.subtype(), irep_idt(), ns);
+    auto renamed_size = rename<level>(array_type.size(), ns);
+
+    if(renamed_subtype.has_value() || renamed_size != array_type.size())
+    {
+      array_typet result_type = array_type;
+
+      if(renamed_subtype.has_value())
+        result_type.subtype() = std::move(*renamed_subtype);
+
+      if(renamed_size != array_type.size())
+        result_type.size() = std::move(renamed_size);
+
+      result = std::move(result_type);
+    }
   }
   else if(type.id() == ID_struct || type.id() == ID_union)
   {
-    struct_union_typet &s_u_type=to_struct_union_type(type);
-    struct_union_typet::componentst &components=s_u_type.components();
+    struct_union_typet s_u_type = to_struct_union_type(type);
+    bool modified = false;
 
-    for(auto &component : components)
+    struct_union_typet::componentst::iterator comp_it =
+      s_u_type.components().begin();
+    for(auto &component : to_struct_union_type(type).components())
     {
       // be careful, or it might get cyclic
       if(component.type().id() == ID_array)
       {
         auto &array_type = to_array_type(component.type());
-        array_type.size() = rename<level>(std::move(array_type.size()), ns);
+        auto renamed_expr = rename<level>(array_type.size(), ns);
+        if(renamed_expr != array_type.size())
+        {
+          to_array_type(comp_it->type()).size() = std::move(renamed_expr);
+          modified = true;
+        }
       }
       else if(component.type().id() != ID_pointer)
-        rename<level>(component.type(), irep_idt(), ns);
+      {
+        if(
+          auto renamed_type =
+            rename_type<level>(component.type(), irep_idt(), ns))
+        {
+          comp_it->type() = std::move(*renamed_type);
+          modified = true;
+        }
+      }
+
+      ++comp_it;
     }
+
+    if(modified)
+      result = std::move(s_u_type);
   }
   else if(type.id()==ID_pointer)
   {
-    rename<level>(to_pointer_type(type).subtype(), irep_idt(), ns);
+    auto renamed_subtype =
+      rename_type<level>(to_pointer_type(type).subtype(), irep_idt(), ns);
+    if(renamed_subtype.has_value())
+    {
+      result = pointer_typet{std::move(*renamed_subtype),
+                             to_pointer_type(type).get_width()};
+    }
+  }
+  else if(type.id() == ID_struct_tag || type.id() == ID_union_tag)
+  {
+    const typet &followed_type = ns.follow(type);
+    result = rename_type<level>(followed_type, l1_identifier, ns);
+    if(!result.has_value())
+      result = followed_type;
   }
 
-  if(level==L2 &&
-     !l1_identifier.empty())
-    l1_type_entry.first->second=type;
+  if(level == L2 && !l1_identifier.empty() && result.has_value())
+    l1_type_entry.first->second = *result;
+
+  return result;
 }
 
 static void get_l1_name(exprt &expr)

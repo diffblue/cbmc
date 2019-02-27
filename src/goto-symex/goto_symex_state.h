@@ -98,6 +98,8 @@ public:
   template <levelt level>
   ssa_exprt rename_ssa(ssa_exprt ssa, const namespacet &ns);
 
+  /// Perform renaming of expressions contained in types, which is necessary for
+  /// arrays of non-constant size.
   template <levelt level = L2>
   void rename(typet &type, const irep_idt &l1_identifier, const namespacet &ns);
 
@@ -112,6 +114,11 @@ public:
 protected:
   template <levelt>
   void rename_address(exprt &expr, const namespacet &ns);
+  template <levelt>
+  optionalt<typet> rename_type(
+    const typet &type,
+    const irep_idt &l1_identifier,
+    const namespacet &ns);
 
   /// Update values up to \c level.
   template <levelt level>
