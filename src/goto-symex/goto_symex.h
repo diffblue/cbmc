@@ -308,6 +308,28 @@ protected:
   virtual void symex_other(statet &state);
 
   void symex_assert(const goto_programt::instructiont &, statet &);
+
+  /// Try to filter value sets based on whether possible values of a
+  /// pointer-typed symbol make the condition true or false. We only do this
+  /// when there is only one pointer-typed symbol in \p condition.
+  /// \param state: The current state
+  /// \param condition: The condition which is being evaluated, which it expects
+  ///   will not have been cleaned or renamed. In practice, it's fine if it has
+  ///   been cleaned and renamed up to level L1.
+  /// \param value_set_for_true_case: A pointer to the value set that possible
+  ///   values should be removed from if they make the condition false, or
+  ///   nullptr if this shouldn't be done
+  /// \param value_set_for_false_case: A pointer to the value set that possible
+  ///   values should be removed from if they make the condition true, or
+  ///   nullptr if this shouldn't be done
+  /// \param ns: A namespace
+  void try_filter_value_sets(
+    goto_symex_statet &state,
+    exprt condition,
+    value_sett *value_set_for_true_case,
+    value_sett *value_set_for_false_case,
+    const namespacet &ns);
+
   virtual void vcc(
     const exprt &,
     const std::string &msg,

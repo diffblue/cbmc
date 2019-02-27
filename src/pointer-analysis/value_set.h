@@ -455,6 +455,19 @@ public:
     exprt &expr,
     const namespacet &ns) const;
 
+  /// Get the entry for the symbol and suffix
+  /// \param identifier: The identifier for the symbol
+  /// \param type: The type of the symbol
+  /// \param suffix: The suffix for the entry
+  /// \param ns: The global namespace, for following \p type if it is a
+  ///   struct tag type or a union tag type
+  /// \return The entry for the symbol and suffix
+  const value_sett::entryt *get_entry_for_symbol(
+    const irep_idt identifier,
+    const typet &type,
+    const std::string &suffix,
+    const namespacet &ns) const;
+
 protected:
   /// Reads the set of objects pointed to by `expr`, including making
   /// recursive lookups for dereference operations etc.
