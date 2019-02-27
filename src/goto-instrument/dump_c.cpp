@@ -61,10 +61,10 @@ void dump_ct::operator()(std::ostream &os)
     {
       typet &type=it2->type();
 
-      if(type.id() == ID_symbol_type && type.get_bool(ID_C_transparent_union))
+      if(type.id() == ID_union_tag && type.get_bool(ID_C_transparent_union))
       {
-        symbolt new_type_sym=
-          ns.lookup(to_symbol_type(type).get_identifier());
+        symbolt new_type_sym =
+          ns.lookup(to_union_tag_type(type).get_identifier());
 
         new_type_sym.name=id2string(new_type_sym.name)+"$transparent";
         new_type_sym.type.set(ID_C_transparent_union, true);
@@ -72,7 +72,7 @@ void dump_ct::operator()(std::ostream &os)
         // we might have it already, in which case this has no effect
         symbols_transparent.add(new_type_sym);
 
-        to_symbol_type(type).set_identifier(new_type_sym.name);
+        to_union_tag_type(type).set_identifier(new_type_sym.name);
         type.remove(ID_C_transparent_union);
       }
     }
@@ -181,9 +181,16 @@ void dump_ct::operator()(std::ostream &os)
 
         if(type_id==ID_c_enum)
           convert_compound_enum(symbol.type, global_decl_stream);
-        else
-          global_decl_stream << type_to_string(symbol_typet(symbol.name))
+        else if(type_id == ID_struct)
+        {
+          global_decl_stream << type_to_string(struct_tag_typet{symbol.name})
                              << ";\n\n";
+        }
+        else
+        {
+          global_decl_stream << type_to_string(union_tag_typet{symbol.name})
+                             << ";\n\n";
+        }
       }
     }
     else if(symbol.is_static_lifetime && symbol.type.id()!=ID_code)
@@ -297,10 +304,12 @@ void dump_ct::convert_compound_declaration(
     return;
 
   // do compound type body
-  if(symbol.type.id()==ID_struct ||
-     symbol.type.id()==ID_union ||
-     symbol.type.id()==ID_c_enum)
-    convert_compound(symbol.type, symbol_typet(symbol.name), true, os_body);
+  if(symbol.type.id() == ID_struct)
+    convert_compound(symbol.type, struct_tag_typet(symbol.name), true, os_body);
+  else if(symbol.type.id() == ID_union)
+    convert_compound(symbol.type, union_tag_typet(symbol.name), true, os_body);
+  else if(symbol.type.id() == ID_c_enum)
+    convert_compound(symbol.type, c_enum_tag_typet(symbol.name), true, os_body);
 }
 
 void dump_ct::convert_compound(
@@ -346,7 +355,13 @@ void dump_ct::convert_compound(
           it!=syms.end();
           ++it)
       {
-        symbol_typet s_type(*it);
+        const symbolt &type_symbol = ns.lookup(*it);
+        irep_idt tag_kind =
+          type_symbol.type.id() == ID_c_enum
+            ? ID_c_enum_tag
+            : (type_symbol.type.id() == ID_union ? ID_union_tag
+                                                 : ID_struct_tag);
+        tag_typet s_type(tag_kind, *it);
         convert_compound(s_type, s_type, recursive, os);
       }
     }
@@ -378,7 +393,7 @@ void dump_ct::convert_compound(
     UNREACHABLE;
     /*
     assert(parent_it->id() == ID_base);
-    assert(parent_it->get(ID_type) == ID_symbol_type);
+    assert(parent_it->get(ID_type) == ID_struct_tag);
 
     const irep_idt &base_id=
       parent_it->find(ID_type).get(ID_identifier);
@@ -1183,7 +1198,11 @@ void dump_ct::insert_local_type_decls(
     // a comment block ...
     std::ostringstream os_body;
     os_body << *it << " */\n";
-    convert_compound(type, symbol_typet(*it), false, os_body);
+    irep_idt tag_kind =
+      type.id() == ID_c_enum
+        ? ID_c_enum_tag
+        : (type.id() == ID_union ? ID_union_tag : ID_struct_tag);
+    convert_compound(type, tag_typet(tag_kind, *it), false, os_body);
     os_body << "/*";
 
     code_skipt skip;
