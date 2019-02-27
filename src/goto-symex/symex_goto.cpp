@@ -20,6 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 
 #include <analyses/dirty.h>
+#include <util/replace_symbol.h>
 #include <util/simplify_expr.h>
 
 void goto_symext::symex_goto(statet &state)
@@ -213,6 +214,18 @@ void goto_symext::symex_goto(statet &state)
   goto_state_list.emplace_back(state);
 
   symex_transition(state, state_pc, backward);
+
+  if(!new_guard.is_true())
+  {
+    // update our value-set when particular objects are only compatible with
+    // one or other branch
+    try_filter_value_sets(
+      state,
+      instruction.get_condition(),
+      backward ? &state.value_set : &goto_state_list.back().value_set,
+      !backward ? &state.value_set : &goto_state_list.back().value_set,
+      ns);
+  }
 
   // adjust guards
   if(new_guard.is_true())
