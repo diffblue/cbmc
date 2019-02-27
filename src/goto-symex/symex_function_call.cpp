@@ -261,7 +261,7 @@ void goto_symext::symex_function_call_code(
   // read the arguments -- before the locality renaming
   exprt::operandst arguments = call.arguments();
   for(auto &a : arguments)
-    state.rename(a, ns);
+    a = state.rename(std::move(a), ns);
 
   // we hide the call if the caller and callee are both hidden
   const bool hidden = state.top().hidden_function && goto_function.is_hidden();
@@ -395,8 +395,8 @@ static void locality(
       it++)
   {
     // get L0 name
-    ssa_exprt ssa(ns.lookup(*it).symbol_expr());
-    state.rename(ssa, ns, goto_symex_statet::L0);
+    ssa_exprt ssa = state.rename_ssa<goto_symex_statet::L0>(
+      ssa_exprt{ns.lookup(*it).symbol_expr()}, ns);
     const irep_idt l0_name=ssa.get_identifier();
 
     // save old L1 name for popping the frame
@@ -418,17 +418,18 @@ static void locality(
     // identifiers may be shared among functions
     // (e.g., due to inlining or other code restructuring)
 
-    state.rename(ssa, ns, goto_symex_statet::L1);
+    ssa_exprt ssa_l1 =
+      state.rename_ssa<goto_symex_statet::L1>(std::move(ssa), ns);
 
-    irep_idt l1_name=ssa.get_identifier();
+    irep_idt l1_name = ssa_l1.get_identifier();
     unsigned offset=0;
 
     while(state.l1_history.find(l1_name)!=state.l1_history.end())
     {
       symex_renaming_levelt::increase_counter(c_it);
       ++offset;
-      ssa.set_level_1(frame_nr+offset);
-      l1_name=ssa.get_identifier();
+      ssa_l1.set_level_1(frame_nr + offset);
+      l1_name = ssa_l1.get_identifier();
     }
 
     // now unique -- store

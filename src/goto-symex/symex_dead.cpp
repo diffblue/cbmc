@@ -26,8 +26,7 @@ void goto_symext::symex_dead(statet &state)
   // We increase the L2 renaming to make these non-deterministic.
   // We also prevent propagation of old values.
 
-  ssa_exprt ssa(code.symbol());
-  state.rename(ssa, ns, goto_symex_statet::L1);
+  ssa_exprt ssa = state.rename_ssa<statet::L1>(ssa_exprt{code.symbol()}, ns);
 
   // in case of pointers, put something into the value set
   if(code.symbol().type().id() == ID_pointer)
@@ -38,12 +37,12 @@ void goto_symext::symex_dead(statet &state)
     else
       rhs=exprt(ID_invalid);
 
-    state.rename(rhs, ns, goto_symex_statet::L1);
-    state.value_set.assign(ssa, rhs, ns, true, false);
+    const exprt l1_rhs =
+      state.rename<goto_symex_statet::L1>(std::move(rhs), ns);
+    state.value_set.assign(ssa, l1_rhs, ns, true, false);
   }
 
-  ssa_exprt ssa_lhs=to_ssa_expr(ssa);
-  const irep_idt &l1_identifier=ssa_lhs.get_identifier();
+  const irep_idt &l1_identifier = ssa.get_identifier();
 
   // prevent propagation
   state.propagation.erase(l1_identifier);

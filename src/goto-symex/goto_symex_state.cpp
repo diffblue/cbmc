@@ -163,11 +163,11 @@ void goto_symex_statet::assignment(
   bool allow_pointer_unsoundness)
 {
   // identifier should be l0 or l1, make sure it's l1
-  rename(lhs, ns, L1);
+  lhs = rename_ssa<L1>(std::move(lhs), ns);
   irep_idt l1_identifier=lhs.get_identifier();
 
   // the type might need renaming
-  rename(lhs.type(), l1_identifier, ns);
+  rename<L2>(lhs.type(), l1_identifier, ns);
   lhs.update_type();
   if(run_validation_checks)
   {
@@ -263,10 +263,31 @@ void goto_symex_statet::set_l2_indices(
   ssa_expr.set_level_2(level2.current_count(ssa_expr.get_identifier()));
 }
 
-void goto_symex_statet::rename(
-  exprt &expr,
-  const namespacet &ns,
-  levelt level)
+template <goto_symex_statet::levelt level>
+ssa_exprt goto_symex_statet::rename_ssa(ssa_exprt ssa, const namespacet &ns)
+{
+  static_assert(
+    level == L0 || level == L1,
+    "rename_ssa can only be used for levels L0 and L1");
+  if(level == L0)
+    set_l0_indices(ssa, ns);
+  else if(level == L1)
+    set_l1_indices(ssa, ns);
+  else
+    UNREACHABLE;
+
+  rename<level>(ssa.type(), ssa.get_identifier(), ns);
+  ssa.update_type();
+  return ssa;
+}
+
+/// Ensure `rename_ssa` gets compiled for L0
+template ssa_exprt goto_symex_statet::rename_ssa<goto_symex_statet::L0>(
+  ssa_exprt ssa,
+  const namespacet &ns);
+
+template <goto_symex_statet::levelt level>
+exprt goto_symex_statet::rename(exprt expr, const namespacet &ns)
 {
   // rename all the symbols with their last known value
 
@@ -277,20 +298,16 @@ void goto_symex_statet::rename(
 
     if(level == L0)
     {
-      set_l0_indices(ssa, ns);
-      rename(expr.type(), ssa.get_identifier(), ns, level);
-      ssa.update_type();
+      ssa = rename_ssa<L0>(std::move(ssa), ns);
     }
     else if(level == L1)
     {
-      set_l1_indices(ssa, ns);
-      rename(expr.type(), ssa.get_identifier(), ns, level);
-      ssa.update_type();
+      ssa = rename_ssa<L1>(std::move(ssa), ns);
     }
     else if(level==L2)
     {
       set_l1_indices(ssa, ns);
-      rename(expr.type(), ssa.get_identifier(), ns, level);
+      rename<level>(expr.type(), ssa.get_identifier(), ns);
       ssa.update_type();
 
       if(l2_thread_read_encoding(ssa, ns))
@@ -318,33 +335,24 @@ void goto_symex_statet::rename(
   {
     // we never rename function symbols
     if(as_const(expr).type().id() == ID_code)
-    {
-      rename(
-        expr.type(),
-        to_symbol_expr(expr).get_identifier(),
-        ns,
-        level);
-
-      return;
-    }
-
-    expr=ssa_exprt(expr);
-    rename(expr, ns, level);
+      rename<level>(expr.type(), to_symbol_expr(expr).get_identifier(), ns);
+    else
+      expr = rename<level>(ssa_exprt{expr}, ns);
   }
   else if(expr.id()==ID_address_of)
   {
     auto &address_of_expr = to_address_of_expr(expr);
-    rename_address(address_of_expr.object(), ns, level);
+    rename_address<level>(address_of_expr.object(), ns);
     to_pointer_type(expr.type()).subtype() =
       as_const(address_of_expr).object().type();
   }
   else
   {
-    rename(expr.type(), irep_idt(), ns, level);
+    rename<level>(expr.type(), irep_idt(), ns);
 
     // do this recursively
     Forall_operands(it, expr)
-      rename(*it, ns, level);
+      *it = rename<level>(std::move(*it), ns);
 
     const exprt &c_expr = as_const(expr);
     INVARIANT(
@@ -356,6 +364,7 @@ void goto_symex_statet::rename(
       "Type of renamed expr should be the same as operands for with_exprt and "
       "if_exprt");
   }
+  return expr;
 }
 
 /// thread encoding
@@ -535,10 +544,8 @@ bool goto_symex_statet::l2_thread_write_encoding(
   return threads.size()>1;
 }
 
-void goto_symex_statet::rename_address(
-  exprt &expr,
-  const namespacet &ns,
-  levelt level)
+template <goto_symex_statet::levelt level>
+void goto_symex_statet::rename_address(exprt &expr, const namespacet &ns)
 {
   if(expr.id()==ID_symbol &&
      expr.get_bool(ID_C_SSA_symbol))
@@ -548,13 +555,13 @@ void goto_symex_statet::rename_address(
     // only do L1!
     set_l1_indices(ssa, ns);
 
-    rename(expr.type(), ssa.get_identifier(), ns, level);
+    rename<level>(expr.type(), ssa.get_identifier(), ns);
     ssa.update_type();
   }
   else if(expr.id()==ID_symbol)
   {
     expr=ssa_exprt(expr);
-    rename_address(expr, ns, level);
+    rename_address<level>(expr, ns);
   }
   else
   {
@@ -562,20 +569,20 @@ void goto_symex_statet::rename_address(
     {
       index_exprt &index_expr=to_index_expr(expr);
 
-      rename_address(index_expr.array(), ns, level);
+      rename_address<level>(index_expr.array(), ns);
       PRECONDITION(index_expr.array().type().id() == ID_array);
       expr.type() = to_array_type(index_expr.array().type()).subtype();
 
       // the index is not an address
-      rename(index_expr.index(), ns, level);
+      index_expr.index() = rename<level>(std::move(index_expr.index()), ns);
     }
     else if(expr.id()==ID_if)
     {
       // the condition is not an address
       if_exprt &if_expr=to_if_expr(expr);
-      rename(if_expr.cond(), ns, level);
-      rename_address(if_expr.true_case(), ns, level);
-      rename_address(if_expr.false_case(), ns, level);
+      if_expr.cond() = rename<level>(std::move(if_expr.cond()), ns);
+      rename_address<level>(if_expr.true_case(), ns);
+      rename_address<level>(if_expr.false_case(), ns);
 
       if_expr.type()=if_expr.true_case().type();
     }
@@ -583,7 +590,7 @@ void goto_symex_statet::rename_address(
     {
       member_exprt &member_expr=to_member_expr(expr);
 
-      rename_address(member_expr.struct_op(), ns, level);
+      rename_address<level>(member_expr.struct_op(), ns);
 
       // type might not have been renamed in case of nesting of
       // structs and pointers/arrays
@@ -600,17 +607,17 @@ void goto_symex_statet::rename_address(
         expr.type()=comp.type();
       }
       else
-        rename(expr.type(), irep_idt(), ns, level);
+        rename<level>(expr.type(), irep_idt(), ns);
     }
     else
     {
       // this could go wrong, but we would have to re-typecheck ...
-      rename(expr.type(), irep_idt(), ns, level);
+      rename<level>(expr.type(), irep_idt(), ns);
 
       // do this recursively; we assume here
       // that all the operands are addresses
       Forall_operands(it, expr)
-        rename_address(*it, ns, level);
+        rename_address<level>(*it, ns);
     }
   }
 }
@@ -668,11 +675,11 @@ static bool requires_renaming(const typet &type, const namespacet &ns)
   return false;
 }
 
+template <goto_symex_statet::levelt level>
 void goto_symex_statet::rename(
   typet &type,
   const irep_idt &l1_identifier,
-  const namespacet &ns,
-  levelt level)
+  const namespacet &ns)
 {
   // check whether there are symbol expressions in the type; if not, there
   // is no need to expand the struct/union tags in the type
@@ -711,8 +718,8 @@ void goto_symex_statet::rename(
   if(type.id()==ID_array)
   {
     auto &array_type = to_array_type(type);
-    rename(array_type.subtype(), irep_idt(), ns, level);
-    rename(array_type.size(), ns, level);
+    rename<level>(array_type.subtype(), irep_idt(), ns);
+    array_type.size() = rename<level>(std::move(array_type.size()), ns);
   }
   else if(type.id() == ID_struct || type.id() == ID_union)
   {
@@ -723,14 +730,17 @@ void goto_symex_statet::rename(
     {
       // be careful, or it might get cyclic
       if(component.type().id() == ID_array)
-        rename(to_array_type(component.type()).size(), ns, level);
+      {
+        auto &array_type = to_array_type(component.type());
+        array_type.size() = rename<level>(std::move(array_type.size()), ns);
+      }
       else if(component.type().id() != ID_pointer)
-        rename(component.type(), irep_idt(), ns, level);
+        rename<level>(component.type(), irep_idt(), ns);
     }
   }
   else if(type.id()==ID_pointer)
   {
-    rename(to_pointer_type(type).subtype(), irep_idt(), ns, level);
+    rename<level>(to_pointer_type(type).subtype(), irep_idt(), ns);
   }
 
   if(level==L2 &&

@@ -37,8 +37,7 @@ void goto_symext::symex_goto(statet &state)
   exprt old_guard = instruction.get_condition();
   clean_expr(old_guard, state, false);
 
-  exprt new_guard=old_guard;
-  state.rename(new_guard, ns);
+  exprt new_guard = state.rename(old_guard, ns);
   do_simplify(new_guard);
 
   if(new_guard.is_false())
@@ -248,8 +247,8 @@ void goto_symext::symex_goto(statet &state)
         symbol_exprt(statet::guard_identifier(), bool_typet());
       exprt new_rhs = boolean_negate(new_guard);
 
-      ssa_exprt new_lhs(guard_symbol_expr);
-      state.rename(new_lhs, ns, goto_symex_statet::L1);
+      ssa_exprt new_lhs =
+        state.rename_ssa<statet::L1>(ssa_exprt{guard_symbol_expr}, ns);
       state.assignment(new_lhs, new_rhs, ns, true, false);
 
       guardt guard{true_exprt{}};
@@ -269,8 +268,7 @@ void goto_symext::symex_goto(statet &state)
         original_source,
         symex_targett::assignment_typet::GUARD);
 
-      guard_expr = boolean_negate(guard_symbol_expr);
-      state.rename(guard_expr, ns);
+      guard_expr = state.rename(boolean_negate(guard_symbol_expr), ns);
     }
 
     if(state.has_saved_jump_target)

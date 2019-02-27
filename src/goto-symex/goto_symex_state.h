@@ -179,12 +179,16 @@ public:
   ///
   /// A full explanation of SSA (which is why we do this renaming) is in
   /// the SSA section of background-concepts.md.
-  void rename(exprt &expr, const namespacet &ns, levelt level=L2);
-  void rename(
-    typet &type,
-    const irep_idt &l1_identifier,
-    const namespacet &ns,
-    levelt level=L2);
+  template <levelt level = L2>
+  exprt rename(exprt expr, const namespacet &ns);
+
+  /// Version of rename which is specialized for SSA exprt.
+  /// Implementation only exists for level L0 and L1.
+  template <levelt level>
+  ssa_exprt rename_ssa(ssa_exprt ssa, const namespacet &ns);
+
+  template <levelt level = L2>
+  void rename(typet &type, const irep_idt &l1_identifier, const namespacet &ns);
 
   void assignment(
     ssa_exprt &lhs, // L0/L1
@@ -195,7 +199,8 @@ public:
     bool allow_pointer_unsoundness=false);
 
 protected:
-  void rename_address(exprt &expr, const namespacet &ns, levelt level);
+  template <levelt>
+  void rename_address(exprt &expr, const namespacet &ns);
 
   /// Update level 0 values.
   void set_l0_indices(ssa_exprt &expr, const namespacet &ns);

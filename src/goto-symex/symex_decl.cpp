@@ -37,9 +37,8 @@ void goto_symext::symex_decl(statet &state, const symbol_exprt &expr)
   // We increase the L2 renaming to make these non-deterministic.
   // We also prevent propagation of old values.
 
-  ssa_exprt ssa(expr);
-  state.rename(ssa, ns, goto_symex_statet::L1);
-  const irep_idt &l1_identifier=ssa.get_identifier();
+  ssa_exprt ssa = state.rename_ssa<statet::L1>(ssa_exprt{expr}, ns);
+  const irep_idt &l1_identifier = ssa.get_identifier();
 
   // rename type to L2
   state.rename(ssa.type(), l1_identifier, ns);
@@ -54,8 +53,8 @@ void goto_symext::symex_decl(statet &state, const symbol_exprt &expr)
     else
       rhs=exprt(ID_invalid);
 
-    state.rename(rhs, ns, goto_symex_statet::L1);
-    state.value_set.assign(ssa, rhs, ns, true, false);
+    exprt l1_rhs = state.rename<goto_symex_statet::L1>(std::move(rhs), ns);
+    state.value_set.assign(ssa, l1_rhs, ns, true, false);
   }
 
   // prevent propagation
@@ -70,7 +69,11 @@ void goto_symext::symex_decl(statet &state, const symbol_exprt &expr)
   symex_renaming_levelt::increase_counter(level2_it);
   const bool record_events=state.record_events;
   state.record_events=false;
-  state.rename(ssa, ns);
+  exprt expr_l2 = state.rename(std::move(ssa), ns);
+  INVARIANT(
+    expr_l2.id() == ID_symbol && expr_l2.get_bool(ID_C_SSA_symbol),
+    "symbol to declare should not be replaced by constant propagation");
+  ssa = to_ssa_expr(expr_l2);
   state.record_events=record_events;
 
   // we hide the declaration of auxiliary variables

@@ -73,8 +73,8 @@ void goto_symext::symex_start_thread(statet &state)
       std::forward_as_tuple(lhs.get_l1_object_identifier()),
       std::forward_as_tuple(lhs, 0));
     CHECK_RETURN(emplace_result.second);
-    state.rename(lhs, ns, goto_symex_statet::L1);
-    const irep_idt l1_name=lhs.get_l1_object_identifier();
+    const ssa_exprt lhs_l1 = state.rename_ssa<statet::L1>(std::move(lhs), ns);
+    const irep_idt l1_name = lhs_l1.get_l1_object_identifier();
     // store it
     state.l1_history.insert(l1_name);
     new_thread.call_stack.back().local_objects.insert(l1_name);
@@ -87,7 +87,7 @@ void goto_symext::symex_start_thread(statet &state)
     state.record_events=false;
     symex_assign_symbol(
       state,
-      lhs,
+      lhs_l1,
       nil_exprt(),
       rhs,
       guard,
