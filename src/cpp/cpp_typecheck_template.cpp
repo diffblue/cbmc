@@ -808,7 +808,7 @@ cpp_scopet &cpp_typecheckt::typecheck_template_parameters(
 
     if(cpp_declarator_converter.is_typedef)
     {
-      parameter = exprt(ID_type, symbol_typet(symbol.name));
+      parameter = exprt(ID_type, struct_tag_typet(symbol.name));
       parameter.type().add_source_location()=declaration.find_location();
     }
     else

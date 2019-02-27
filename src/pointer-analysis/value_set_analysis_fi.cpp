@@ -190,7 +190,7 @@ bool value_set_analysis_fit::check_type(const typet &type)
   }
   else if(type.id()==ID_array)
     return check_type(type.subtype());
-  else if(type.id() == ID_symbol_type)
+  else if(type.id() == ID_struct_tag || type.id() == ID_union_tag)
     return check_type(ns.follow(type));
 
   return false;

@@ -16,19 +16,16 @@ Date: September 2011
 #include <util/std_expr.h>
 #include <util/symbol_table.h>
 
-bool is_volatile(
-  const symbol_tablet &symbol_table,
-  const typet &src)
+static bool is_volatile(const namespacet &ns, const typet &src)
 {
   if(src.get_bool(ID_C_volatile))
     return true;
 
-  if(src.id()==ID_symbol)
+  if(
+    src.id() == ID_struct_tag || src.id() == ID_union_tag ||
+    src.id() == ID_c_enum_tag)
   {
-    symbol_tablet::symbolst::const_iterator s_it=
-      symbol_table.symbols.find(to_symbol_type(src).get_identifier());
-    assert(s_it!=symbol_table.symbols.end());
-    return is_volatile(symbol_table, s_it->second.type);
+    return is_volatile(ns, ns.follow(src));
   }
 
   return false;
@@ -42,7 +39,8 @@ void nondet_volatile_rhs(const symbol_tablet &symbol_table, exprt &expr)
   if(expr.id()==ID_symbol ||
      expr.id()==ID_dereference)
   {
-    if(is_volatile(symbol_table, expr.type()))
+    const namespacet ns(symbol_table);
+    if(is_volatile(ns, expr.type()))
     {
       typet t=expr.type();
       t.remove(ID_C_volatile);
