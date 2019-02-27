@@ -34,10 +34,10 @@ void goto_symext::symex_goto(statet &state)
     return; // nothing to do
   }
 
-  exprt old_guard = instruction.get_condition();
-  clean_expr(old_guard, state, false);
+  exprt new_guard = instruction.get_condition();
+  clean_expr(new_guard, state, false);
 
-  exprt new_guard = state.rename(old_guard, ns);
+  new_guard = state.rename(std::move(new_guard), ns);
   do_simplify(new_guard);
 
   if(new_guard.is_false())
