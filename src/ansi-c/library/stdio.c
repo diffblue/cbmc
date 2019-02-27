@@ -790,7 +790,7 @@ void perror(const char *s)
 
 inline int fscanf(FILE *restrict stream, const char *restrict format, ...)
 {
-  __CPOVER_HIDE:;
+__CPROVER_HIDE:;
   va_list list;
   va_start(list, format);
   int result=vfscanf(stream, format, list);
@@ -812,7 +812,7 @@ inline int fscanf(FILE *restrict stream, const char *restrict format, ...)
 
 inline int scanf(const char *restrict format, ...)
 {
-  __CPOVER_HIDE:;
+__CPROVER_HIDE:;
   va_list list;
   va_start(list, format);
   int result=vfscanf(stdin, format, list);
@@ -834,7 +834,7 @@ inline int scanf(const char *restrict format, ...)
 
 inline int sscanf(const char *restrict s, const char *restrict format, ...)
 {
-  __CPOVER_HIDE:;
+__CPROVER_HIDE:;
   va_list list;
   va_start(list, format);
   int result=vsscanf(s, format, list);
