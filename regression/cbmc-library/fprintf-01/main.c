@@ -1,9 +1,9 @@
 #include <assert.h>
 #include <stdio.h>
 
-int main()
+int main(int argc, char *argv[])
 {
-  fprintf();
-  assert(0);
+  fprintf(stdout, "some string %s: %d\n", argv[0], 42);
+  fprintf(stderr, "some other string\n");
   return 0;
 }
