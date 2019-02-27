@@ -391,7 +391,6 @@ int __VERIFIER_nondet_int();
 
 inline int fileno(FILE *stream)
 {
-// just return nondet
 __CPROVER_HIDE:;
   if(stream == stdin)
     return 0;
@@ -401,6 +400,7 @@ __CPROVER_HIDE:;
     return 2;
 
   int return_value=__VERIFIER_nondet_int();
+  __CPROVER_assume(return_value >= -1);
 
 #if !defined(__linux__) || defined(__GLIBC__)
   (void)*stream;
