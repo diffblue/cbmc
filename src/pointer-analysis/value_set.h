@@ -139,7 +139,7 @@ public:
     ~object_map_dt()=default;
   };
 
-  /// Converts an `object_map_dt` entry `object_number -> offset` into an
+  /// Converts an `object_map_dt` element `object_number -> offset` into an
   /// `object_descriptor_exprt` with
   /// `.object() == object_numbering.at(object_number)` and
   /// `.offset() == offset`.
@@ -159,29 +159,29 @@ public:
   /// be shared between the two `value_sett` instances.
   typedef reference_counting<object_map_dt> object_mapt;
 
-  /// Sets an entry in object map `dest` to match an existing entry `it`
-  /// from a different map. Any existing entry for the same `exprt` is
+  /// Sets an element in object map `dest` to match an existing element `it`
+  /// from a different map. Any existing element for the same `exprt` is
   /// overwritten.
   /// \param dest: object map to update.
-  /// \param it: iterator pointing to new entry
+  /// \param it: iterator pointing to new element
   void set(object_mapt &dest, const object_map_dt::value_type &it) const
   {
     dest.write()[it.first]=it.second;
   }
 
-  /// Merges an existing entry into an object map. If the destination map
-  /// has an existing entry for the same expression with a different offset
+  /// Merges an existing element into an object map. If the destination map
+  /// has an existing element for the same expression with a different offset
   /// its offset is marked unknown (so e.g. `x -> 0` and `x -> 1` merge into
   /// `x -> ?`).
   /// \param dest: object map to update.
-  /// \param it: iterator pointing to new entry
+  /// \param it: iterator pointing to new element
   bool insert(object_mapt &dest, const object_map_dt::value_type &it) const
   {
     return insert(dest, it.first, it.second);
   }
 
   /// Adds an expression to an object map, with unknown offset. If the
-  /// destination map has an existing entry for the same expression
+  /// destination map has an existing element for the same expression
   /// its offset is marked unknown.
   /// \param dest: object map to update
   /// \param src: expression to add
@@ -191,7 +191,7 @@ public:
   }
 
   /// Adds an expression to an object map, with known offset. If the
-  /// destination map has an existing entry for the same expression
+  /// destination map has an existing element for the same expression
   /// with a differing offset its offset is marked unknown.
   /// \param dest: object map to update
   /// \param src: expression to add
@@ -205,7 +205,7 @@ public:
   }
 
   /// Adds a numbered expression and offset to an object map. If the
-  /// destination map has an existing entry for the same expression
+  /// destination map has an existing element for the same expression
   /// with a differing offset its offset is marked unknown.
   /// \param dest: object map to update
   /// \param n: object number to add; must be mapped to the corresponding
@@ -217,7 +217,7 @@ public:
     const offsett &offset) const;
 
   /// Adds an expression and offset to an object map. If the
-  /// destination map has an existing entry for the same expression
+  /// destination map has an existing element for the same expression
   /// with a differing offset its offset is marked unknown.
   /// \param dest: object map to update
   /// \param expr: expression to add
@@ -230,7 +230,7 @@ public:
   /// Represents a row of a `value_sett`. For example, this might represent
   /// `dynamic_object1.field1 -> { <dynamic_object2, 0> }`, with
   /// `identifier == dynamic_object1`, `suffix` == `.field1` and
-  /// a single-entry `object_map` representing `{ <dynamic_object2, 0> }`.
+  /// a single-element `object_map` representing `{ <dynamic_object2, 0> }`.
   struct entryt
   {
     object_mapt object_map;
