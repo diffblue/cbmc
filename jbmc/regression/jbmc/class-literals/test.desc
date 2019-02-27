@@ -1,4 +1,4 @@
-CORE
+CORE bdd-expected-timeout
 Test.class
 --function Test.main
 ^EXIT=0$
@@ -6,3 +6,8 @@ Test.class
 ^VERIFICATION SUCCESSFUL$
 --
 ^warning: ignoring
+--
+This test is deactivated for the build with BDDs because it takes more
+than 10 minutes for the test to complete.
+This is due to the size of the BDD representing the guards growing more than
+they do when represented as exprt.
