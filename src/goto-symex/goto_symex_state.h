@@ -115,6 +115,8 @@ protected:
   template <levelt>
   optionalt<exprt> rename_address(const exprt &expr, const namespacet &ns);
   template <levelt>
+  optionalt<exprt> rename_expr(const exprt &expr, const namespacet &ns);
+  template <levelt>
   optionalt<typet> rename_type(
     const typet &type,
     const irep_idt &l1_identifier,
