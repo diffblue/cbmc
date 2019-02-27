@@ -113,7 +113,7 @@ public:
 
 protected:
   template <levelt>
-  void rename_address(exprt &expr, const namespacet &ns);
+  optionalt<exprt> rename_address(const exprt &expr, const namespacet &ns);
   template <levelt>
   optionalt<typet> rename_type(
     const typet &type,
