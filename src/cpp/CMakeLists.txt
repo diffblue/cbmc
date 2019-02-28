@@ -22,9 +22,11 @@ add_custom_command(
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-add_custom_target(cpp_library_check
-    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/library-check.stamp
+if(NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+    add_custom_target(cpp_library_check
+        DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/library-check.stamp
 )
+endif()
 
 ################################################################################
 
