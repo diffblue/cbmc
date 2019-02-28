@@ -58,6 +58,11 @@ void symex_level1t::operator()(ssa_exprt &ssa_expr) const
   ssa_expr.set_level_1(it->second.second);
 }
 
+void symex_level2t::operator()(ssa_exprt &ssa_expr) const
+{
+  ssa_expr.set_level_2(current_count(ssa_expr.get_identifier()));
+}
+
 void symex_level1t::restore_from(
   const symex_renaming_levelt::current_namest &other)
 {

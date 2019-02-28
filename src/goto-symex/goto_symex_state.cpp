@@ -260,7 +260,7 @@ void goto_symex_statet::set_l2_indices(
     return;
   level0(ssa_expr, ns, source.thread_nr);
   level1(ssa_expr);
-  ssa_expr.set_level_2(level2.current_count(ssa_expr.get_identifier()));
+  level2(ssa_expr);
 }
 
 template <goto_symex_statet::levelt level>
