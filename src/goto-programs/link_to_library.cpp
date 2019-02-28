@@ -28,11 +28,62 @@ void link_to_library(
     void(const std::set<irep_idt> &, symbol_tablet &, message_handlert &)>
     &library)
 {
-  link_to_library(
-    goto_model.symbol_table,
-    goto_model.goto_functions,
-    message_handler,
-    library);
+  // this needs a fixedpoint, as library functions
+  // may depend on other library functions
+
+  std::set<irep_idt> added_functions;
+
+  while(true)
+  {
+    std::unordered_set<irep_idt> called_functions =
+      compute_called_functions(goto_model.goto_functions);
+
+    // eliminate those for which we already have a body
+
+    std::set<irep_idt> missing_functions;
+
+    for(const auto &id : called_functions)
+    {
+      goto_functionst::function_mapt::const_iterator f_it =
+        goto_model.goto_functions.function_map.find(id);
+
+      if(
+        f_it != goto_model.goto_functions.function_map.end() &&
+        f_it->second.body_available())
+      {
+        // it's overridden!
+      }
+      else if(added_functions.find(id) != added_functions.end())
+      {
+        // already added
+      }
+      else
+        missing_functions.insert(id);
+    }
+
+    // done?
+    if(missing_functions.empty())
+      break;
+
+    library(missing_functions, goto_model.symbol_table, message_handler);
+
+    // convert to CFG
+    for(const auto &id : missing_functions)
+    {
+      if(
+        goto_model.symbol_table.symbols.find(id) !=
+        goto_model.symbol_table.symbols.end())
+      {
+        goto_convert(
+          id,
+          goto_model.symbol_table,
+          goto_model.goto_functions,
+          message_handler);
+      }
+
+      added_functions.insert(id);
+    }
+  }
 }
 
 /// Complete missing function definitions using the \p library.
