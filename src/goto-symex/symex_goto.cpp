@@ -216,10 +216,10 @@ void goto_symext::symex_goto(statet &state)
     return;
   }
 
-  // put into state-queue
+  // put a copy of the current state into the state-queue, to be used by
+  // merge_gotos when we visit new_state_pc
   framet::goto_state_listt &goto_state_list =
     state.top().goto_state_map[new_state_pc];
-
   goto_state_list.emplace_back(state);
 
   symex_transition(state, state_pc, backward);
