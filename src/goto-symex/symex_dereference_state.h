@@ -25,16 +25,14 @@ class symex_dereference_statet:
   public dereference_callbackt
 {
 public:
-  symex_dereference_statet(
-    const goto_symext &_goto_symex,
-    goto_symext::statet &_state)
-    : goto_symex(_goto_symex), state(_state)
+  symex_dereference_statet(goto_symext::statet &_state, const namespacet &ns)
+    : state(_state), ns(ns)
   {
   }
 
 protected:
-  const goto_symext &goto_symex;
   goto_symext::statet &state;
+  const namespacet &ns;
 
   void get_value_set(const exprt &expr, value_setst::valuest &value_set)
     const override;

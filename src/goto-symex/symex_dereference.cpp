@@ -224,7 +224,7 @@ void goto_symext::dereference_rec(exprt &expr, statet &state)
     dereference_rec(tmp1, state);
 
     // we need to set up some elaborate call-backs
-    symex_dereference_statet symex_dereference_state(*this, state);
+    symex_dereference_statet symex_dereference_state(state, ns);
 
     value_set_dereferencet dereference(
       ns,
