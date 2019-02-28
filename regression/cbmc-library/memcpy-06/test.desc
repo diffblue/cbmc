@@ -2,8 +2,8 @@ CORE
 main.c
 
 function 'memcpy' is not declared
-parameter "memcpy::dst" type mismatch
-^EXIT=6$
+Linking library function 'memcpy' failed
+^EXIT=0$
 ^SIGNAL=0$
 --
 ^warning: ignoring
