@@ -16,6 +16,7 @@ SRC += analyses/ai/ai.cpp \
        analyses/does_remove_const/is_type_at_least_as_const_as.cpp \
        big-int/big-int.cpp \
        compound_block_locations.cpp \
+       goto-instrument/cover/cover_only.cpp \
        goto-programs/goto_model_function_type_consistency.cpp \
        goto-programs/goto_program_assume.cpp \
        goto-programs/goto_program_dead.cpp \
