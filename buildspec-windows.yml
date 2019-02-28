@@ -3,12 +3,19 @@ version: 0.2
 phases:
   install:
     commands:
-      - choco install cyg-get -y --no-progress
+      - choco install cmake cyg-get -y --no-progress
       - cyg-get bash patch bison flex make wget perl jq
       - nuget install clcache -OutputDirectory "c:\tools" -ExcludeVersion -Version 4.1.0
 
   build:
     commands:
+      - |
+        cmd /c '"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86 && set' | `
+        .{process{ if ($_ -match '^([^=]+)=(.*)') { Set-Variable $matches[1] $matches[2] } }}
+        $env:Path = "C:\Program Files\CMake\bin;$env:Path"
+        cmake -Bbuild -S. -G "NMake Makefiles"
+        cmake --build build
+
       - |
         $env:Path = "C:\tools\cygwin\bin;$env:Path"
         bash -c "make -C src minisat2-download DOWNLOADER=wget"
