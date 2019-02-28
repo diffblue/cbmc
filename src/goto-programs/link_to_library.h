@@ -24,7 +24,10 @@ class symbol_tablet;
 void link_to_library(
   goto_modelt &,
   message_handlert &,
-  const std::function<
-    void(const std::set<irep_idt> &, symbol_tablet &, message_handlert &)> &);
+  const std::function<void(
+    const std::set<irep_idt> &,
+    const symbol_tablet &,
+    symbol_tablet &,
+    message_handlert &)> &);
 
 #endif // CPROVER_GOTO_PROGRAMS_LINK_TO_LIBRARY_H
