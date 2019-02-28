@@ -1120,13 +1120,13 @@ bool acceleration_utilst::assign_array(
   {
     replace_expr(
       loop_counter, from_integer(0, loop_counter.type()), lower_bound);
-    simplify_expr(lower_bound, ns);
+    lower_bound = simplify_expr(std::move(lower_bound), ns);
   }
   else
   {
     replace_expr(
       loop_counter, from_integer(0, loop_counter.type()), upper_bound);
-    simplify_expr(upper_bound, ns);
+    upper_bound = simplify_expr(std::move(upper_bound), ns);
   }
 
   if(stride==0)
