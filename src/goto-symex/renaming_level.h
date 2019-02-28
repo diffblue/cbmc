@@ -56,8 +56,10 @@ struct symex_renaming_levelt
 /// The renaming is built for one particular interleaving.
 struct symex_level0t : public symex_renaming_levelt
 {
-  void operator()(ssa_exprt &ssa_expr, const namespacet &ns, unsigned thread_nr)
-    const;
+  ssa_exprt operator()(
+    ssa_exprt ssa_expr,
+    const namespacet &ns,
+    unsigned thread_nr) const;
 
   symex_level0t() = default;
   ~symex_level0t() override = default;
@@ -68,7 +70,7 @@ struct symex_level0t : public symex_renaming_levelt
 /// This is to preserve locality in case of recursion
 struct symex_level1t : public symex_renaming_levelt
 {
-  void operator()(ssa_exprt &ssa_expr) const;
+  ssa_exprt operator()(ssa_exprt ssa_expr) const;
 
   /// Insert the content of \p other into this renaming
   void restore_from(const current_namest &other);
@@ -82,7 +84,7 @@ struct symex_level1t : public symex_renaming_levelt
 /// This is to ensure each variable is only assigned once.
 struct symex_level2t : public symex_renaming_levelt
 {
-  void operator()(ssa_exprt &ssa_expr) const;
+  ssa_exprt operator()(ssa_exprt ssa_expr) const;
 
   symex_level2t() = default;
   ~symex_level2t() override = default;
