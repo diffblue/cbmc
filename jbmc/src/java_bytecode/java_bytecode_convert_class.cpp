@@ -138,12 +138,13 @@ private:
     return method.has_annotation(ID_overlay_method);
   }
 
-  /// Check if a method is an ignored method by searching for
-  /// `ID_ignored_method` in its list of annotations.
+  /// Check if a method is an ignored method, by one of two mechanisms:
   ///
-  /// An ignored method is a method with the annotation
-  /// \@IgnoredMethodImplementation. They will be ignored by JBMC. They are
-  /// intended for use in
+  /// 1. If the class under consideration is org.cprover.CProver, and the method
+  /// is listed as ignored.
+  ///
+  /// 2. If it has the annotation\@IgnoredMethodImplementation.
+  /// This kind of ignord method is intended for use in
   /// [overlay classes](\ref java_class_loader.cpp::is_overlay_class), in
   /// particular for methods which must exist in the overlay class so that
   /// it will compile, e.g. default constructors, but which we do not want
@@ -154,11 +155,17 @@ private:
   /// [overlay method](\ref java_bytecode_convert_classt::is_overlay_method)
   /// or an ignored method.
   ///
+  /// \param class_name: class the method is declared on
   /// \param method: a `methodt` object from a java bytecode parse tree
   /// \return true if the method is an ignored method, else false
-  static bool is_ignored_method(const methodt &method)
+  static bool is_ignored_method(
+    const irep_idt &class_name, const methodt &method)
   {
-    return method.has_annotation(ID_ignored_method);
+    static irep_idt org_cprover_CProver_name = "org.cprover.CProver";
+    return
+      (class_name == org_cprover_CProver_name &&
+       cprover_methods_to_ignore.count(id2string(method.name)) != 0) ||
+      method.has_annotation(ID_ignored_method);
   }
 
   bool check_field_exists(
@@ -504,7 +511,7 @@ void java_bytecode_convert_classt::convert(
       const irep_idt method_identifier =
         qualified_classname + "." + id2string(method.name)
           + ":" + method.descriptor;
-      if(is_ignored_method(method))
+      if(is_ignored_method(c.name, method))
       {
         debug()
           << "Ignoring method:  '" << method_identifier << "'"
@@ -552,7 +559,7 @@ void java_bytecode_convert_classt::convert(
     const irep_idt method_identifier=
       qualified_classname + "." + id2string(method.name)
         + ":" + method.descriptor;
-    if(is_ignored_method(method))
+    if(is_ignored_method(c.name, method))
     {
       debug()
         << "Ignoring method:  '" << method_identifier << "'"

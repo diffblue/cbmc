@@ -398,6 +398,15 @@ void java_bytecode_convert_method_lazy(
   symbol_table.add(method_symbol);
 }
 
+static irep_idt get_method_identifier(
+  const irep_idt &class_identifier,
+  const java_bytecode_parse_treet::methodt &method)
+{
+  return
+    id2string(class_identifier) + "." + id2string(method.name) + ":" +
+    method.descriptor;
+}
+
 void java_bytecode_convert_methodt::convert(
   const symbolt &class_symbol,
   const methodt &m)
@@ -406,8 +415,9 @@ void java_bytecode_convert_methodt::convert(
   // (e.g. "my.package.ClassName.myMethodName:(II)I") and query the symbol table
   // to retrieve the symbol (constructed by java_bytecode_convert_method_lazy)
   // associated to the method
-  const irep_idt method_identifier=
-    id2string(class_symbol.name)+"."+id2string(m.name)+":"+m.descriptor;
+  const irep_idt method_identifier =
+    get_method_identifier(class_symbol.name, m);
+
   method_id=method_identifier;
 
   // Obtain a std::vector of java_method_typet::parametert objects from the
@@ -3077,16 +3087,6 @@ void java_bytecode_convert_method(
   bool threading_support)
 
 {
-  if(std::regex_match(
-       id2string(class_symbol.name),
-       std::regex(".*org\\.cprover\\.CProver.*")) &&
-     cprover_methods_to_ignore.count(id2string(method.name)))
-  {
-    // Ignore these methods; fall back to the driver program's
-    // stubbing behaviour.
-    return;
-  }
-
   java_bytecode_convert_methodt java_bytecode_convert_method(
     symbol_table,
     message_handler,

@@ -1,0 +1,11 @@
+CORE
+Test.class
+--function Test.main --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+This calls CProver.startThread, which is special-cased by the Java front-end (which omits the method's body
+in hope of the front-end handling it like a stub), and doesn't get its parameter names assigned by the usual
+mechanism (setting the names when the stub is discovered for the first time)
