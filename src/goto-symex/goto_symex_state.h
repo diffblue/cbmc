@@ -127,9 +127,6 @@ protected:
   l1_typest l1_types;
 
 public:
-  // gotos
-  typedef std::list<goto_statet> goto_state_listt;
-
   // guards
   static irep_idt guard_identifier()
   {
