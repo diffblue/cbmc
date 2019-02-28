@@ -79,8 +79,6 @@ std::ostream &format_rec(std::ostream &os, const typet &type)
     return os << "struct " << to_struct_tag_type(type).get_identifier();
   else if(id == ID_c_enum_tag)
     return os << "c_enum " << to_c_enum_tag_type(type).get_identifier();
-  else if(id == ID_symbol_type)
-    return os << "symbol_type " << to_symbol_type(type).get_identifier();
   else if(id == ID_signedbv)
     return os << "signedbv[" << to_signedbv_type(type).get_width() << ']';
   else if(id == ID_unsignedbv)

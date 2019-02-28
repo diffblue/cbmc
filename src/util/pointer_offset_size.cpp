@@ -203,10 +203,6 @@ pointer_offset_bits(const typet &type, const namespacet &ns)
 
     return mp_integer(to_bitvector_type(type).get_width());
   }
-  else if(type.id() == ID_symbol_type)
-  {
-    return pointer_offset_bits(ns.follow(type), ns);
-  }
   else if(type.id() == ID_union_tag)
   {
     return pointer_offset_bits(ns.follow_tag(to_union_tag_type(type)), ns);
@@ -502,10 +498,6 @@ optionalt<exprt> size_of_expr(const typet &type, const namespacet &ns)
     if(bytes*8!=width)
       bytes++;
     return from_integer(bytes, size_type());
-  }
-  else if(type.id() == ID_symbol_type)
-  {
-    return size_of_expr(ns.follow(type), ns);
   }
   else if(type.id() == ID_union_tag)
   {

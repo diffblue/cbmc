@@ -97,9 +97,6 @@ static exprt simplify_json_expr(const exprt &src)
 /// \return a json object
 json_objectt json(const typet &type, const namespacet &ns, const irep_idt &mode)
 {
-  if(type.id() == ID_symbol_type)
-    return json(ns.follow(type), ns, mode);
-
   json_objectt result;
 
   if(type.id() == ID_unsignedbv)

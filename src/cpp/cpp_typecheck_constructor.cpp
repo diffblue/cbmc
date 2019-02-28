@@ -442,8 +442,8 @@ void cpp_typecheckt::check_member_initializers(
       for(const auto &b : bases)
       {
         if(
-          to_symbol_type(member_type).get_identifier() ==
-          to_symbol_type(b.type()).get_identifier())
+          to_struct_tag_type(member_type).get_identifier() ==
+          to_struct_tag_type(b.type()).get_identifier())
         {
           ok=true;
           break;
@@ -483,14 +483,15 @@ void cpp_typecheckt::check_member_initializers(
         if(c.type().id() != ID_struct_tag)
           continue;
 
-        const symbolt &symb = lookup(to_symbol_type(c.type()).get_identifier());
+        const symbolt &symb =
+          lookup(to_struct_tag_type(c.type()).get_identifier());
         if(symb.type.id()!=ID_struct)
           break;
 
         // check for a direct parent
         for(const auto &b : bases)
         {
-          if(symb.name == to_symbol_type(b.type()).get_identifier())
+          if(symb.name == to_struct_tag_type(b.type()).get_identifier())
           {
             ok=true;
             break;
@@ -513,7 +514,7 @@ void cpp_typecheckt::check_member_initializers(
         {
           if(
             member_type.get(ID_identifier) ==
-            to_symbol_type(b.type()).get_identifier())
+            to_struct_tag_type(b.type()).get_identifier())
           {
             ok=true;
             break;
@@ -638,8 +639,8 @@ void cpp_typecheckt::full_member_initialization(
           break;
 
         if(
-          to_symbol_type(b.type()).get_identifier() ==
-          to_symbol_type(member_type).get_identifier())
+          to_struct_tag_type(b.type()).get_identifier() ==
+          to_struct_tag_type(member_type).get_identifier())
         {
           final_initializers.move_to_sub(initializer);
           found=true;

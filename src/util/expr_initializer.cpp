@@ -261,19 +261,6 @@ optionalt<exprt> expr_initializert<nondet>::expr_initializer_rec(
       return std::move(value);
     }
   }
-  else if(type_id == ID_symbol_type)
-  {
-    auto result = expr_initializer_rec(ns.follow(type), source_location);
-
-    if(!result.has_value())
-      return {};
-
-    // we might have mangled the type for arrays, so keep that
-    if(type.id() != ID_array)
-      result->type() = type;
-
-    return *result;
-  }
   else if(type_id==ID_c_enum_tag)
   {
     auto result = expr_initializer_rec(

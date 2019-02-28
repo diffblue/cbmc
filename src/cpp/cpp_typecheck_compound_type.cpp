@@ -894,7 +894,6 @@ void cpp_typecheckt::typecheck_friend_declaration(
 
     // TODO
     //    typecheck_type(ftype);
-    //    assert(ftype.id()==ID_symbol_type);
     //    symbol.type.add("ID_C_friends").move_to_sub(ftype);
 
     return;

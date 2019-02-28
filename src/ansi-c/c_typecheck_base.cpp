@@ -415,8 +415,6 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
        to_array_type(final_new).size().is_not_nil() &&
        final_old.subtype()==final_new.subtype())
     {
-      // we don't do symbol types for arrays anymore
-      PRECONDITION(old_symbol.type.id() != ID_symbol_type);
       old_symbol.type=new_symbol.type;
     }
     else if(

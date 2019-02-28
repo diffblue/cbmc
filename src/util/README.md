@@ -104,10 +104,10 @@ stored in two [sub](\ref irept::dt::sub)s named “subtype” (a single type) an
 “subtypes” (a vector of types). For pre-defined types see `std_types.h` and
 `mathematical_types.h`.
 
-\subsubsection symbol_typet_section symbol_typet
+\subsubsection tag_typet_section tag_typet
 
-\ref symbol_typet is a type used to store a reference to the symbol table. The
-full \ref symbolt can be retrieved using the identifier of \ref symbol_typet.
+\ref tag_typet is a type used to store a reference to the symbol table. The
+full \ref symbolt can be retrieved using the identifier of \ref tag_typet.
 
 \subsection exprt_section exprt
 
@@ -174,7 +174,7 @@ Local variables' symbol values are always ignored;
 any initialiser must be explicitly assigned after they are instantiated by a
 declaration (\ref code_declt).
 
-Symbol expressions (\ref symbol_exprt) and types (\ref symbol_typet) refer to
+Symbol expressions (\ref symbol_exprt) and types (\ref tag_typet) refer to
 symbols stored in a symbol table. Symbol expressions can be thought of as
 referring to the table for more detail about a symbol (for example, is it a
 local or a global variable, or perhaps a function?), and have a type which must
@@ -198,8 +198,8 @@ found. Note class \ref multi_namespacet can layer arbitrary numbers of symbol
 tables, while for historical reasons \ref namespacet can layer up to two.
 
 The namespace wrapper class also provides the \ref namespacet::follow
-operation, which dereferences a `symbol_typet` to retrieve the type it refers
-to, including following a symbol_typet which refers to another symbol which
+operation, which dereferences a `tag_typet` to retrieve the type it refers
+to, including following a type tag which refers to another symbol which
 eventually refers to a 'real' type.
 
 \subsubsection symbolt_lifetime Symbol lifetimes

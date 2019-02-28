@@ -1410,31 +1410,22 @@ goto_programt::const_targett goto_program2codet::convert_catch(
 
 void goto_program2codet::add_local_types(const typet &type)
 {
-  if(type.id() == ID_symbol_type)
+  if(type.id() == ID_struct_tag || type.id() == ID_union_tag)
   {
     const typet &full_type=ns.follow(type);
 
-    if(full_type.id()==ID_pointer ||
-       full_type.id()==ID_array)
-    {
-      add_local_types(full_type.subtype());
-    }
-    else if(full_type.id()==ID_struct ||
-            full_type.id()==ID_union)
-    {
-      const irep_idt &identifier=to_symbol_type(type).get_identifier();
-      const symbolt &symbol=ns.lookup(identifier);
+    const irep_idt &identifier = to_tag_type(type).get_identifier();
+    const symbolt &symbol = ns.lookup(identifier);
 
-      if(symbol.location.get_function().empty() ||
-         !type_names_set.insert(identifier).second)
-        return;
+    if(
+      symbol.location.get_function().empty() ||
+      !type_names_set.insert(identifier).second)
+      return;
 
-      for(const auto &c : to_struct_union_type(full_type).components())
-        add_local_types(c.type());
+    for(const auto &c : to_struct_union_type(full_type).components())
+      add_local_types(c.type());
 
-      assert(!identifier.empty());
-      type_names.push_back(identifier);
-    }
+    type_names.push_back(identifier);
   }
   else if(type.id()==ID_c_enum_tag)
   {
@@ -1633,9 +1624,9 @@ void goto_program2codet::remove_const(typet &type)
   if(type.get_bool(ID_C_constant))
     type.remove(ID_C_constant);
 
-  if(type.id() == ID_symbol_type)
+  if(type.id() == ID_struct_tag || type.id() == ID_union_tag)
   {
-    const irep_idt &identifier=to_symbol_type(type).get_identifier();
+    const irep_idt &identifier = to_tag_type(type).get_identifier();
     if(!const_removed.insert(identifier).second)
       return;
 
@@ -1833,8 +1824,9 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
     if(no_typecast)
       return;
 
-    DATA_INVARIANT(expr.type().id() == ID_symbol_type,
-                   "type of union/struct expressions");
+    DATA_INVARIANT(
+      expr.type().id() == ID_struct_tag || expr.type().id() == ID_union_tag,
+      "union/struct expressions should have a tag type");
 
     const typet &t=expr.type();
 

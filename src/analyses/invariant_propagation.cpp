@@ -191,8 +191,6 @@ bool invariant_propagationt::check_type(const typet &type) const
     return false;
   else if(type.id()==ID_array)
     return false;
-  else if(type.id() == ID_symbol_type)
-    return check_type(ns.follow(type));
   else if(type.id()==ID_unsignedbv ||
           type.id()==ID_signedbv)
     return true;

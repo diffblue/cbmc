@@ -54,56 +54,6 @@ public:
   }
 };
 
-/// A reference into the symbol table
-class symbol_typet:public typet
-{
-public:
-  explicit symbol_typet(const irep_idt &identifier) : typet(ID_symbol_type)
-  {
-    set_identifier(identifier);
-  }
-
-  void set_identifier(const irep_idt &identifier)
-  {
-    set(ID_identifier, identifier);
-  }
-
-  const irep_idt &get_identifier() const
-  {
-    return get(ID_identifier);
-  }
-};
-
-/// Check whether a reference to a typet is a \ref symbol_typet.
-/// \param type: Source type.
-/// \return True if \p type is a \ref symbol_typet.
-template <>
-inline bool can_cast_type<symbol_typet>(const typet &type)
-{
-  return type.id() == ID_symbol_type;
-}
-
-/// \brief Cast a typet to a \ref symbol_typet.
-///
-/// This is an unchecked conversion. \a type must be known to be
-/// \ref symbol_typet. Will fail with a precondition violation if type
-/// doesn't match.
-///
-/// \param type: Source type.
-/// \return Object of type \ref symbol_typet.
-inline const symbol_typet &to_symbol_type(const typet &type)
-{
-  PRECONDITION(can_cast_type<symbol_typet>(type));
-  return static_cast<const symbol_typet &>(type);
-}
-
-/// \copydoc to_symbol_type(const typet &)
-inline symbol_typet &to_symbol_type(typet &type)
-{
-  PRECONDITION(can_cast_type<symbol_typet>(type));
-  return static_cast<symbol_typet &>(type);
-}
-
 /// Base type for structs and unions
 ///
 /// For example C structs, C unions, C++ classes, Java classes.

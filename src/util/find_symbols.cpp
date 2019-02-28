@@ -156,8 +156,6 @@ void find_symbols(kindt kind, const typet &src, find_symbols_sett &dest)
       //  dest.insert(identifier);
     }
   }
-  else if(src.id() == ID_symbol_type)
-    dest.insert(to_symbol_type(src).get_identifier());
   else if(src.id()==ID_array)
   {
     // do the size -- the subtype is already done

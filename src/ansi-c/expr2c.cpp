@@ -440,43 +440,6 @@ std::string expr2ct::convert_rec(
   {
     return convert_array_type(src, qualifiers, declarator);
   }
-  else if(src.id() == ID_symbol_type)
-  {
-    symbol_typet symbolic_type=to_symbol_type(src);
-    const irep_idt &typedef_identifer=symbolic_type.get(ID_typedef);
-
-    // Providing we have a valid identifer, we can just use that rather than
-    // trying to find the concrete type
-    if(typedef_identifer!="")
-    {
-      return q+id2string(typedef_identifer)+d;
-    }
-    else
-    {
-      const typet &followed=ns.follow(src);
-
-      if(followed.id()==ID_struct)
-      {
-        std::string dest=q+"struct";
-        const irep_idt &tag=to_struct_type(followed).get_tag();
-        if(tag!="")
-          dest+=" "+id2string(tag);
-        dest+=d;
-        return dest;
-      }
-      else if(followed.id()==ID_union)
-      {
-        std::string dest=q+"union";
-        const irep_idt &tag=to_union_type(followed).get_tag();
-        if(tag!="")
-          dest+=" "+id2string(tag);
-        dest+=d;
-        return dest;
-      }
-      else
-        return convert_rec(followed, new_qualifiers, declarator);
-    }
-  }
   else if(src.id()==ID_struct_tag)
   {
     const struct_tag_typet &struct_tag_type=

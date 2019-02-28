@@ -3916,9 +3916,6 @@ void smt2_convt::unflatten(
   const typet &type,
   unsigned nesting)
 {
-  if(type.id() == ID_symbol_type)
-    return unflatten(where, ns.follow(type));
-
   if(type.id()==ID_bool)
   {
     if(where==wheret::BEGIN)
@@ -4444,8 +4441,6 @@ void smt2_convt::convert_type(const typet &type)
     out << "Real";
   else if(type.id()==ID_integer)
     out << "Int";
-  else if(type.id() == ID_symbol_type)
-    convert_type(ns.follow(type));
   else if(type.id()==ID_complex)
   {
     if(use_datatypes)
@@ -4656,17 +4651,6 @@ void smt2_convt::find_symbols_rec(
   else if(type.id()==ID_pointer)
   {
     find_symbols_rec(type.subtype(), recstack);
-  }
-  else if(type.id() == ID_symbol_type)
-  {
-    const symbol_typet &st=to_symbol_type(type);
-    const irep_idt &id=st.get_identifier();
-
-    if(recstack.find(id)==recstack.end())
-    {
-      recstack.insert(id);
-      find_symbols_rec(ns.follow(type), recstack);
-    }
   }
   else if(type.id() == ID_struct_tag)
   {

@@ -595,7 +595,6 @@ void goto_symex_statet::rename_address(exprt &expr, const namespacet &ns)
       // type might not have been renamed in case of nesting of
       // structs and pointers/arrays
       if(
-        member_expr.struct_op().type().id() != ID_symbol_type &&
         member_expr.struct_op().type().id() != ID_struct_tag &&
         member_expr.struct_op().type().id() != ID_union_tag)
       {
@@ -655,11 +654,6 @@ static bool requires_renaming(const typet &type, const namespacet &ns)
   else if(type.id() == ID_pointer)
   {
     return requires_renaming(to_pointer_type(type).subtype(), ns);
-  }
-  else if(type.id() == ID_symbol_type)
-  {
-    const symbolt &symbol = ns.lookup(to_symbol_type(type));
-    return requires_renaming(symbol.type, ns);
   }
   else if(type.id() == ID_union_tag)
   {

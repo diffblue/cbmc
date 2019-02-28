@@ -25,9 +25,6 @@ Author: Daniel Kroening
 
 xmlt xml(const typet &type, const namespacet &ns)
 {
-  if(type.id() == ID_symbol_type)
-    return xml(ns.follow(type), ns);
-
   xmlt result;
 
   if(type.id() == ID_unsignedbv)
