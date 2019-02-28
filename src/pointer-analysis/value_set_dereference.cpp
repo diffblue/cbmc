@@ -293,15 +293,6 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
   }
   else if(root_object.id()==ID_dynamic_object)
   {
-    // const dynamic_object_exprt &dynamic_object=
-    //  to_dynamic_object_expr(root_object);
-
-    // the object produced by malloc
-    exprt malloc_object=
-      ns.lookup(CPROVER_PREFIX "malloc_object").symbol_expr();
-
-    exprt is_malloc_object=same_object(pointer_expr, malloc_object);
-
     // constraint that it actually is a dynamic object
     // this is also our guard
     result.pointer_guard = dynamic_object(pointer_expr);
