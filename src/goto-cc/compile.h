@@ -26,9 +26,6 @@ class languaget;
 class compilet : public messaget
 {
 public:
-  // compilation results
-  goto_modelt goto_model;
-
   // configuration
   bool echo_file_name;
   bool validate_goto_model = false;
@@ -63,10 +60,10 @@ public:
   bool parse(const std::string &filename, language_filest &);
   bool parse_stdin(languaget &);
   bool doit();
-  bool compile();
-  bool link();
+  optionalt<symbol_tablet> compile();
+  bool link(optionalt<symbol_tablet> &&symbol_table);
 
-  bool parse_source(const std::string &);
+  optionalt<symbol_tablet> parse_source(const std::string &);
 
   /// Writes the goto functions of \p src_goto_model to a binary format object
   /// file.
@@ -133,7 +130,7 @@ protected:
 
   void add_compiler_specific_defines() const;
 
-  void convert_symbols(goto_functionst &dest);
+  void convert_symbols(goto_modelt &);
 
   bool add_written_cprover_symbols(const symbol_tablet &symbol_table);
   std::map<irep_idt, symbolt> written_macros;
