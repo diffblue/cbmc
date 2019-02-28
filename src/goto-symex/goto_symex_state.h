@@ -24,46 +24,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/make_unique.h>
 #include <goto-programs/goto_function.h>
 
+#include "frame.h"
 #include "goto_state.h"
 #include "renaming_level.h"
 #include "symex_target_equation.h"
-
-// stack frames -- these are used for function calls and
-// for exceptions
-struct framet
-{
-  // gotos
-  using goto_state_listt = std::list<goto_statet>;
-
-  // function calls
-  irep_idt function_identifier;
-  std::map<goto_programt::const_targett, goto_state_listt> goto_state_map;
-  symex_targett::sourcet calling_location;
-
-  goto_programt::const_targett end_of_function;
-  exprt return_value = nil_exprt();
-  bool hidden_function = false;
-
-  symex_renaming_levelt::current_namest old_level1;
-
-  std::set<irep_idt> local_objects;
-
-  // exceptions
-  std::map<irep_idt, goto_programt::targett> catch_map;
-
-  // loop and recursion unwinding
-  struct loop_infot
-  {
-    unsigned count = 0;
-    bool is_recursion = false;
-  };
-  std::unordered_map<irep_idt, loop_infot> loop_iterations;
-
-  explicit framet(symex_targett::sourcet _calling_location)
-    : calling_location(std::move(_calling_location))
-  {
-  }
-};
 
 /// \brief Central data structure: state.
 ///
