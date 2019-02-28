@@ -1,3 +1,5 @@
+#include <string.h>
+
 struct mystruct {
   int x;
   char y;
