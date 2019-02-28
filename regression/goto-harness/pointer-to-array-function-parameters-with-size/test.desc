@@ -1,0 +1,12 @@
+CORE
+test.c
+--harness-type call-function --function test --treat-pointer-as-array arr --associated-array-size arr:sz
+^EXIT=0$
+^SIGNAL=0$
+\[test.pointer_dereference.1\] line \d+ dereference failure: pointer NULL in arr\[\(signed( long)* int\)i\]: SUCCESS
+\[test.pointer_dereference.2\] line \d+ dereference failure: pointer invalid in arr\[\(signed( long)* int\)i\]: SUCCESS
+\[test.pointer_dereference.3\] line \d+ dereference failure: deallocated dynamic object in arr\[\(signed( long)* int\)i\]: SUCCESS
+\[test.pointer_dereference.4\] line \d+ dereference failure: dead object in arr\[\(signed( long)* int\)i\]: SUCCESS
+\[test.pointer_dereference.5\] line \d+ dereference failure: pointer outside dynamic object bounds in arr\[\(signed( long)* int\)i\]: SUCCESS
+\[test.pointer_dereference.6\] line \d+ dereference failure: pointer outside object bounds in arr\[\(signed( long)* int\)i\]: SUCCESS
+--

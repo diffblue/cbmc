@@ -15,10 +15,15 @@ Author: Diffblue Ltd.
 #include <util/std_code.h>
 #include <util/std_expr.h>
 #include <util/string2int.h>
+#include <util/string_utils.h>
 #include <util/ui_message.h>
 
 #include <goto-programs/goto_convert.h>
 #include <goto-programs/goto_model.h>
+
+#include <algorithm>
+#include <iterator>
+#include <set>
 
 #include "function_harness_generator_options.h"
 #include "goto_harness_parse_options.h"
@@ -40,14 +45,17 @@ struct function_call_harness_generatort::implt
   recursive_initialization_configt recursive_initialization_config;
   std::unique_ptr<recursive_initializationt> recursive_initialization;
 
+  std::set<irep_idt> function_parameters_to_treat_as_arrays;
+  std::set<irep_idt> function_arguments_to_treat_as_arrays;
+
+  std::map<irep_idt, irep_idt> function_argument_to_associated_array_size;
+  std::map<irep_idt, irep_idt> function_parameter_to_associated_array_size;
+
   /// \see goto_harness_generatort::generate
   void generate(goto_modelt &goto_model, const irep_idt &harness_function_name);
   /// Iterate over the symbol table and generate initialisation code for
   /// globals into the function body.
   void generate_nondet_globals(code_blockt &function_body);
-  /// Non-deterministically initialise the parameters of the entry function
-  /// and insert function call to the passed code block.
-  void setup_parameters_and_call_entry_function(code_blockt &function_body);
   /// Return a reference to the entry function or throw if it doesn't exist.
   const symbolt &lookup_function_to_call();
   /// Generate initialisation code for one lvalue inside block.
@@ -56,6 +64,14 @@ struct function_call_harness_generatort::implt
   void ensure_harness_does_not_already_exist();
   /// Update the goto-model with the new harness function.
   void add_harness_function_to_goto_model(code_blockt function_body);
+  /// declare local variables for each of the parameters of the entry function
+  /// and return them
+  code_function_callt::argumentst declare_arguments(code_blockt &function_body);
+  /// write initialisation code for each of the arguments into function_body,
+  /// then insert a call to the entry function with the arguments
+  void call_function(
+    const code_function_callt::argumentst &arguments,
+    code_blockt &function_body);
 };
 
 function_call_harness_generatort::function_call_harness_generatort(
@@ -111,6 +127,57 @@ void function_call_harness_generatort::handle_option(
         "--" FUNCTION_HARNESS_GENERATOR_MAX_NONDET_TREE_DEPTH_OPT};
     }
   }
+  else if(option == FUNCTION_HARNESS_GENERATOR_MAX_ARRAY_SIZE_OPT)
+  {
+    p_impl->recursive_initialization_config.max_dynamic_array_size =
+      require_one_size_value(
+        FUNCTION_HARNESS_GENERATOR_MAX_ARRAY_SIZE_OPT, values);
+  }
+  else if(option == FUNCTION_HARNESS_GENERATOR_MIN_ARRAY_SIZE_OPT)
+  {
+    p_impl->recursive_initialization_config.min_dynamic_array_size =
+      require_one_size_value(
+        FUNCTION_HARNESS_GENERATOR_MIN_ARRAY_SIZE_OPT, values);
+  }
+  else if(option == FUNCTION_HARNESS_GENERATOR_TREAT_POINTER_AS_ARRAY_OPT)
+  {
+    p_impl->function_parameters_to_treat_as_arrays.insert(
+      values.begin(), values.end());
+  }
+  else if(option == FUNCTION_HARNESS_GENERATOR_ASSOCIATED_ARRAY_SIZE_OPT)
+  {
+    for(auto const &array_size_pair : values)
+    {
+      try
+      {
+        std::string array;
+        std::string size;
+        split_string(array_size_pair, ':', array, size);
+        // --associated-array-size implies --treat-pointer-as-array
+        // but it is not an error to specify both, so we don't check
+        // for duplicates here
+        p_impl->function_parameters_to_treat_as_arrays.insert(array);
+        auto const inserted =
+          p_impl->function_parameter_to_associated_array_size.emplace(
+            array, size);
+        if(!inserted.second)
+        {
+          throw invalid_command_line_argument_exceptiont{
+            "can not have two associated array sizes for one array",
+            "--" FUNCTION_HARNESS_GENERATOR_ASSOCIATED_ARRAY_SIZE_OPT};
+        }
+      }
+      catch(const deserialization_exceptiont &)
+      {
+        throw invalid_command_line_argument_exceptiont{
+          "`" + array_size_pair +
+            "' is in an invalid format for array size pair",
+          "--" FUNCTION_HARNESS_GENERATOR_ASSOCIATED_ARRAY_SIZE_OPT,
+          "array_name:size_name, where both are the names of function "
+          "parameters"};
+      }
+    }
+  }
   else
   {
     throw invalid_command_line_argument_exceptiont{
@@ -125,55 +192,36 @@ void function_call_harness_generatort::generate(
   p_impl->generate(goto_model, harness_function_name);
 }
 
-void function_call_harness_generatort::implt::
-  setup_parameters_and_call_entry_function(code_blockt &function_body)
-{
-  const auto &function_to_call = lookup_function_to_call();
-  const auto &function_type = to_code_type(function_to_call.type);
-  const auto &parameters = function_type.parameters();
-
-  code_function_callt::operandst arguments{};
-
-  auto allocate_objects = allocate_objectst{function_to_call.mode,
-                                            function_to_call.location,
-                                            "__goto_harness",
-                                            *symbol_table};
-  for(const auto &parameter : parameters)
-  {
-    auto argument = allocate_objects.allocate_automatic_local_object(
-      parameter.type(), parameter.get_base_name());
-    arguments.push_back(argument);
-  }
-  allocate_objects.declare_created_symbols(function_body);
-  for(auto const &argument : arguments)
-  {
-    generate_initialisation_code_for(function_body, argument);
-  }
-  code_function_callt function_call{function_to_call.symbol_expr(),
-                                    std::move(arguments)};
-  function_call.add_source_location() = function_to_call.location;
-
-  function_body.add(std::move(function_call));
-}
-
 void function_call_harness_generatort::implt::generate(
   goto_modelt &goto_model,
   const irep_idt &harness_function_name)
 {
   symbol_table = &goto_model.symbol_table;
   goto_functions = &goto_model.goto_functions;
-  const auto &function_to_call = lookup_function_to_call();
-  recursive_initialization_config.mode = function_to_call.mode;
-  recursive_initialization = util_make_unique<recursive_initializationt>(
-    recursive_initialization_config, goto_model);
   this->harness_function_name = harness_function_name;
+  const auto &function_to_call = lookup_function_to_call();
   ensure_harness_does_not_already_exist();
 
   // create body for the function
   code_blockt function_body{};
+  auto const arguments = declare_arguments(function_body);
+
+  // configure and create recursive initialisation object
+  recursive_initialization_config.mode = function_to_call.mode;
+  recursive_initialization_config.pointers_to_treat_as_arrays =
+    function_arguments_to_treat_as_arrays;
+  recursive_initialization_config.array_name_to_associated_array_size_variable =
+    function_argument_to_associated_array_size;
+  for(const auto &pair : function_argument_to_associated_array_size)
+  {
+    recursive_initialization_config.variables_that_hold_array_sizes.insert(
+      pair.second);
+  }
+  recursive_initialization = util_make_unique<recursive_initializationt>(
+    recursive_initialization_config, goto_model);
 
   generate_nondet_globals(function_body);
-  setup_parameters_and_call_entry_function(function_body);
+  call_function(arguments, function_body);
   add_harness_function_to_goto_model(std::move(function_body));
 }
 
@@ -220,6 +268,32 @@ void function_call_harness_generatort::validate_options()
     throw invalid_command_line_argument_exceptiont{
       "required parameter entry function not set",
       "--" FUNCTION_HARNESS_GENERATOR_FUNCTION_OPT};
+  if(
+    p_impl->recursive_initialization_config.min_dynamic_array_size >
+    p_impl->recursive_initialization_config.max_dynamic_array_size)
+  {
+    throw invalid_command_line_argument_exceptiont{
+      "min dynamic array size cannot be greater than max dynamic array size",
+      "--" FUNCTION_HARNESS_GENERATOR_MIN_ARRAY_SIZE_OPT
+      " --" FUNCTION_HARNESS_GENERATOR_MAX_ARRAY_SIZE_OPT};
+  }
+}
+
+std::size_t function_call_harness_generatort::require_one_size_value(
+  const std::string &option,
+  const std::list<std::string> &values)
+{
+  auto const string_value = require_exactly_one_value(option, values);
+  auto value = string2optional<std::size_t>(string_value, 10);
+  if(value.has_value())
+  {
+    return value.value();
+  }
+  else
+  {
+    throw invalid_command_line_argument_exceptiont{
+      "failed to parse `" + string_value + "' as integer", "--" + option};
+  }
 }
 
 const symbolt &
@@ -277,4 +351,73 @@ void function_call_harness_generatort::implt::
     *message_handler,
     function_to_call.mode);
   body.add(goto_programt::make_end_function());
+}
+
+code_function_callt::argumentst
+function_call_harness_generatort::implt::declare_arguments(
+  code_blockt &function_body)
+{
+  const auto &function_to_call = lookup_function_to_call();
+  const auto &function_type = to_code_type(function_to_call.type);
+  const auto &parameters = function_type.parameters();
+
+  code_function_callt::operandst arguments{};
+
+  auto allocate_objects = allocate_objectst{function_to_call.mode,
+                                            function_to_call.location,
+                                            "__goto_harness",
+                                            *symbol_table};
+  std::map<irep_idt, irep_idt> parameter_name_to_argument_name;
+  for(const auto &parameter : parameters)
+  {
+    auto argument = allocate_objects.allocate_automatic_local_object(
+      parameter.type(), parameter.get_base_name());
+    parameter_name_to_argument_name.insert(
+      {parameter.get_base_name(), argument.get_identifier()});
+    arguments.push_back(argument);
+  }
+
+  for(const auto &pair : parameter_name_to_argument_name)
+  {
+    auto const &parameter_name = pair.first;
+    auto const &argument_name = pair.second;
+    if(function_parameters_to_treat_as_arrays.count(parameter_name) != 0)
+    {
+      function_arguments_to_treat_as_arrays.insert(argument_name);
+    }
+    auto it = function_parameter_to_associated_array_size.find(parameter_name);
+    if(it != function_parameter_to_associated_array_size.end())
+    {
+      auto const &associated_array_size_parameter = it->second;
+      auto associated_array_size_argument =
+        parameter_name_to_argument_name.find(associated_array_size_parameter);
+      if(
+        associated_array_size_argument == parameter_name_to_argument_name.end())
+      {
+        throw invalid_command_line_argument_exceptiont{
+          "associated array size is not there",
+          "--" FUNCTION_HARNESS_GENERATOR_ASSOCIATED_ARRAY_SIZE_OPT};
+      }
+      function_argument_to_associated_array_size.insert(
+        {argument_name, associated_array_size_argument->second});
+    }
+  }
+  allocate_objects.declare_created_symbols(function_body);
+  return arguments;
+}
+
+void function_call_harness_generatort::implt::call_function(
+  const code_function_callt::argumentst &arguments,
+  code_blockt &function_body)
+{
+  auto const &function_to_call = lookup_function_to_call();
+  for(auto const &argument : arguments)
+  {
+    generate_initialisation_code_for(function_body, argument);
+  }
+  code_function_callt function_call{function_to_call.symbol_expr(),
+                                    std::move(arguments)};
+  function_call.add_source_location() = function_to_call.location;
+
+  function_body.add(std::move(function_call));
 }

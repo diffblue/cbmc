@@ -36,6 +36,9 @@ protected:
   void validate_options() override;
 
 private:
+  std::size_t require_one_size_value(
+    const std::string &option,
+    const std::list<std::string> &values);
   struct implt;
   std::unique_ptr<implt> p_impl;
 };

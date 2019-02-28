@@ -1,0 +1,8 @@
+CORE
+test.c
+--harness-type call-function --function min_array_size_test --max-array-size 3 --min-array-size 3 --associated-array-size arr:sz
+VERIFICATION SUCCESSFUL
+^EXIT=0$
+^SIGNAL=0$
+--
+unwinding assertion loop \d: FAILURE

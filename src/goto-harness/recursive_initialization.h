@@ -10,10 +10,12 @@ Author: Diffblue Ltd.
 #define CPROVER_GOTO_HARNESS_RECURSIVE_INITIALIZATION_H
 
 #include <map>
+#include <set>
 
 #include <goto-programs/goto_model.h>
 #include <util/expr.h>
 #include <util/message.h>
+#include <util/optional.h>
 #include <util/std_types.h>
 
 struct recursive_initialization_configt
@@ -21,6 +23,16 @@ struct recursive_initialization_configt
   std::size_t min_null_tree_depth = 1;
   std::size_t max_nondet_tree_depth = 2;
   irep_idt mode;
+
+  // array stuff
+  std::size_t max_dynamic_array_size = 2;
+  std::size_t min_dynamic_array_size = 1;
+
+  std::set<irep_idt> pointers_to_treat_as_arrays;
+  std::set<irep_idt> variables_that_hold_array_sizes;
+  std::map<irep_idt, irep_idt> array_name_to_associated_array_size_variable;
+
+  std::string to_string() const; // for debugging purposes
 };
 
 /// Class for generating initialisation code
@@ -69,6 +81,21 @@ private:
     std::size_t depth,
     const recursion_sett &known_tags,
     code_blockt &body);
+  void initialize_array(
+    const exprt &array,
+    std::size_t depth,
+    const recursion_sett &known_tags,
+    code_blockt &body);
+  void initialize_dynamic_array(
+    const exprt &pointer,
+    std::size_t depth,
+    const recursion_sett &known_tags,
+    code_blockt &body);
+
+  bool should_be_treated_as_array(const irep_idt &pointer_name) const;
+  bool is_array_size_parameter(const irep_idt &cmdline_arg) const;
+  optionalt<irep_idt>
+  get_associated_size_variable(const irep_idt &array_name) const;
 };
 
 #endif // CPROVER_GOTO_HARNESS_RECURSIVE_INITIALIZATION_H

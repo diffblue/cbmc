@@ -1,0 +1,8 @@
+CORE
+test.c
+--harness-type call-function --function is_prefix_of --treat-pointer-as-array string --treat-pointer-as-array prefix --associated-array-size string:string_size --associated-array-size prefix:prefix_size --max-array-size 5
+^SIGNAL=0$
+^EXIT=0$
+VERIFICATION SUCCESSFUL
+--
+unwinding assertion loop \d+: FAILURE

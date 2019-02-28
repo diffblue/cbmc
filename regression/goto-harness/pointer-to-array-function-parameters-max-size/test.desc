@@ -1,0 +1,14 @@
+CORE
+test.c
+--harness-type call-function --function test --max-array-size 10 --associated-array-size arr:sz
+\[test.assertion.1\] line \d+ assertion sz < 10: FAILURE
+\[test.pointer_dereference.\d+\] line \d+ dereference failure: pointer NULL in arr\[\(signed( long)* int\)i\]: SUCCESS
+\[test.pointer_dereference.\d+\] line \d+ dereference failure: pointer invalid in arr\[\(signed( long)* int\)i\]: SUCCESS
+\[test.pointer_dereference.\d+\] line \d+ dereference failure: deallocated dynamic object in arr\[\(signed( long)* int\)i\]: SUCCESS
+\[test.pointer_dereference.\d+\] line \d+ dereference failure: dead object in arr\[\(signed( long)* int\)i\]: SUCCESS
+\[test.pointer_dereference.\d+\] line \d+ dereference failure: pointer outside object bounds in arr\[\(signed( long)* int\)i\]: SUCCESS
+\[test.pointer_dereference.\d+\] line \d+ dereference failure: pointer outside object bounds in arr\[\(signed( long)* int\)i\]: SUCCESS
+^EXIT=10$
+^SIGNAL=0$
+--
+unwinding assertion loop \d: FAILURE
