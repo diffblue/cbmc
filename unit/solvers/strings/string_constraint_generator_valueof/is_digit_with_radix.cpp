@@ -29,7 +29,9 @@ static exprt actual(
   const namespacet ns(symtab);
 
   return simplify_expr(
-    is_digit_with_radix(chr, strict_formatting, radix_as_char, radix_ul), ns);
+    is_digit_with_radix(
+      std::move(chr), strict_formatting, radix_as_char, radix_ul),
+    ns);
 }
 
 /// Get the simplified return value of is_digit_with_radix called with a radix

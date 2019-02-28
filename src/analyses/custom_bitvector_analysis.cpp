@@ -529,8 +529,7 @@ void custom_bitvector_domaint::transform(
       if(to!=from->get_target())
         guard = boolean_negate(guard);
 
-      exprt result=eval(guard, cba);
-      exprt result2=simplify_expr(result, ns);
+      const exprt result2 = simplify_expr(eval(guard, cba), ns);
 
       if(result2.is_false())
         make_bottom();
@@ -787,7 +786,7 @@ void custom_bitvector_analysist::check(
 
         exprt tmp = eval(i_it->get_condition(), i_it);
         const namespacet ns(goto_model.symbol_table);
-        result=simplify_expr(tmp, ns);
+        result = simplify_expr(std::move(tmp), ns);
 
         description=i_it->source_location.get_comment();
       }

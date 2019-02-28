@@ -48,7 +48,7 @@ bool ai_domain_baset::ai_simplify_lhs(exprt &condition, const namespacet &ns)
     index_exprt ie = to_index_expr(condition);
     bool no_simplification = ai_simplify(ie.index(), ns);
     if(!no_simplification)
-      condition = simplify_expr(ie, ns);
+      condition = simplify_expr(std::move(ie), ns);
 
     return no_simplification;
   }
@@ -57,7 +57,7 @@ bool ai_domain_baset::ai_simplify_lhs(exprt &condition, const namespacet &ns)
     dereference_exprt de = to_dereference_expr(condition);
     bool no_simplification = ai_simplify(de.pointer(), ns);
     if(!no_simplification)
-      condition = simplify_expr(de, ns); // So *(&x) -> x
+      condition = simplify_expr(std::move(de), ns); // So *(&x) -> x
 
     return no_simplification;
   }
@@ -70,7 +70,7 @@ bool ai_domain_baset::ai_simplify_lhs(exprt &condition, const namespacet &ns)
     // must also be addressable
     bool no_simplification = ai_simplify_lhs(me.compound(), ns);
     if(!no_simplification)
-      condition = simplify_expr(me, ns);
+      condition = simplify_expr(std::move(me), ns);
 
     return no_simplification;
   }

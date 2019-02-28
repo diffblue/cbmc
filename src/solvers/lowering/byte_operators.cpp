@@ -1012,7 +1012,7 @@ exprt lower_byte_extract(const byte_extract_exprt &src, const namespacet &ns)
     }
 
     if(!failed)
-      return simplify_expr(s, ns);
+      return simplify_expr(std::move(s), ns);
   }
   else if(src.type().id() == ID_union || src.type().id() == ID_union_tag)
   {
@@ -1183,7 +1183,7 @@ static exprt lower_byte_update_byte_array_vector(
       result.add_to_operands(where, update_value);
   }
 
-  return simplify_expr(result, ns);
+  return simplify_expr(std::move(result), ns);
 }
 
 /// Apply a byte update \p src to an array/vector typed operand, using the byte
@@ -1328,7 +1328,7 @@ static exprt lower_byte_update_array_vector_non_const(
     result.add_to_operands(std::move(where), std::move(element));
   }
 
-  return simplify_expr(result, ns);
+  return simplify_expr(std::move(result), ns);
 }
 
 /// Apply a byte update \p src to an array/vector typed operand using the byte

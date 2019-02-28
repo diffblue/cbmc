@@ -343,9 +343,7 @@ bool taint_analysist::operator()(
 
         exprt result =
           custom_bitvector_analysis.eval(i_it->get_condition(), i_it);
-        exprt result2=simplify_expr(result, ns);
-
-        if(result2.is_true())
+        if(simplify_expr(std::move(result), ns).is_true())
           continue;
 
         if(first)
