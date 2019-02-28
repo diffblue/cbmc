@@ -33,7 +33,7 @@ goto_symex_statet::goto_symex_statet(const symex_targett::sourcet &_source)
   : goto_statet(_source), symex_target(nullptr), record_events(true), dirty()
 {
   threads.resize(1);
-  new_frame();
+  call_stack().new_frame(source);
 }
 
 goto_symex_statet::~goto_symex_statet()=default;

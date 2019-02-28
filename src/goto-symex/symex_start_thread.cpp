@@ -42,7 +42,7 @@ void goto_symext::symex_start_thread(statet &state)
   statet::threadt &new_thread=state.threads.back();
   new_thread.pc=thread_target;
   new_thread.guard=state.guard;
-  new_thread.call_stack.push_back(state.top());
+  new_thread.call_stack.push_back(state.call_stack().top());
   new_thread.call_stack.back().local_objects.clear();
   new_thread.call_stack.back().goto_state_map.clear();
   #if 0
@@ -50,7 +50,7 @@ void goto_symext::symex_start_thread(statet &state)
   #endif
 
   // create a copy of the local variables for the new thread
-  framet &frame = state.top();
+  framet &frame = state.call_stack().top();
 
   for(auto c_it = state.level2.current_names.begin();
       c_it != state.level2.current_names.end();

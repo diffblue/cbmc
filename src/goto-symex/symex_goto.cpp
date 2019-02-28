@@ -25,7 +25,6 @@ Author: Daniel Kroening, kroening@kroening.com
 void goto_symext::symex_goto(statet &state)
 {
   const goto_programt::instructiont &instruction=*state.source.pc;
-  framet &frame = state.top();
 
   exprt new_guard = instruction.get_condition();
   clean_expr(new_guard, state, false);
@@ -80,7 +79,7 @@ void goto_symext::symex_goto(statet &state)
     const auto loop_id =
       goto_programt::loop_id(state.source.function_id, *state.source.pc);
 
-    unsigned &unwind = frame.loop_iterations[loop_id].count;
+    unsigned &unwind = state.call_stack().top().loop_iterations[loop_id].count;
     unwind++;
 
     if(should_stop_unwind(state.source, state.call_stack(), unwind))
@@ -210,7 +209,7 @@ void goto_symext::symex_goto(statet &state)
   // put a copy of the current state into the state-queue, to be used by
   // merge_gotos when we visit new_state_pc
   framet::goto_state_listt &goto_state_list =
-    state.top().goto_state_map[new_state_pc];
+    state.call_stack().top().goto_state_map[new_state_pc];
   goto_state_list.emplace_back(state);
 
   symex_transition(state, state_pc, backward);
@@ -288,7 +287,7 @@ void goto_symext::symex_goto(statet &state)
 
 void goto_symext::merge_gotos(statet &state)
 {
-  framet &frame = state.top();
+  framet &frame = state.call_stack().top();
 
   // first, see if this is a target at all
   auto state_map_it = frame.goto_state_map.find(state.source.pc);
@@ -563,7 +562,7 @@ void goto_symext::loop_bound_exceeded(
 
 bool goto_symext::should_stop_unwind(
   const symex_targett::sourcet &,
-  const goto_symex_statet::call_stackt &,
+  const call_stackt &,
   unsigned)
 {
   // by default, we keep going

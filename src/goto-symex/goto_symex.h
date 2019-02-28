@@ -345,7 +345,7 @@ protected:
   /// \return true indicates abort, with false we continue
   virtual bool should_stop_unwind(
     const symex_targett::sourcet &source,
-    const goto_symex_statet::call_stackt &context,
+    const call_stackt &context,
     unsigned unwind);
 
   virtual void loop_bound_exceeded(statet &state, const exprt &guard);

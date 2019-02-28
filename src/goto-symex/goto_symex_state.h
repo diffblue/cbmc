@@ -24,6 +24,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/make_unique.h>
 #include <goto-programs/goto_function.h>
 
+#include "call_stack.h"
 #include "frame.h"
 #include "goto_state.h"
 #include "renaming_level.h"
@@ -136,8 +137,6 @@ public:
     return id;
   }
 
-  typedef std::vector<framet> call_stackt;
-
   call_stackt &call_stack()
   {
     PRECONDITION(source.thread_nr < threads.size());
@@ -149,28 +148,6 @@ public:
     PRECONDITION(source.thread_nr < threads.size());
     return threads[source.thread_nr].call_stack;
   }
-
-  framet &top()
-  {
-    PRECONDITION(!call_stack().empty());
-    return call_stack().back();
-  }
-
-  const framet &top() const
-  {
-    PRECONDITION(!call_stack().empty());
-    return call_stack().back();
-  }
-
-  framet &new_frame()
-  {
-    call_stack().emplace_back(source);
-    return top();
-  }
-
-  void pop_frame() { call_stack().pop_back(); }
-
-  const framet &previous_frame() { return *(--(--call_stack().end())); }
 
   void print_backtrace(std::ostream &) const;
 

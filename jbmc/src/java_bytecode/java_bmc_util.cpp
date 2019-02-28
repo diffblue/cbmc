@@ -28,7 +28,7 @@ void java_setup_symex(
     //  for some reason)
     symex.add_loop_unwind_handler(
       [&goto_model](
-        const goto_symex_statet::call_stackt &context,
+        const call_stackt &context,
         unsigned loop_num,
         unsigned unwind,
         unsigned &max_unwind)
