@@ -2574,9 +2574,8 @@ bool simplify(exprt &expr, const namespacet &ns)
   return simplify_exprt(ns).simplify(expr);
 }
 
-exprt simplify_expr(const exprt &src, const namespacet &ns)
+exprt simplify_expr(exprt src, const namespacet &ns)
 {
-  exprt tmp=src;
-  simplify_exprt(ns).simplify(tmp);
-  return tmp;
+  simplify_exprt(ns).simplify(src);
+  return src;
 }
