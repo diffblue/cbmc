@@ -23,8 +23,8 @@ add_custom_command(
 )
 
 if(NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-add_custom_target(cpp_library_check
-    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/library-check.stamp
+    add_custom_target(cpp_library_check
+        DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/library-check.stamp
 )
 endif()
 
