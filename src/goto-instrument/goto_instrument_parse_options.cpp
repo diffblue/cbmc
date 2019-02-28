@@ -135,10 +135,7 @@ int goto_instrument_parse_optionst::doit()
 
       if(validate_only || cmdline.isset("validate-goto-model"))
       {
-        goto_model.validate(
-          validation_modet::EXCEPTION,
-          goto_model_validation_optionst{
-            goto_model_validation_optionst::set_optionst::all_true});
+        goto_model.validate(validation_modet::EXCEPTION);
 
         if(validate_only)
         {
@@ -151,10 +148,7 @@ int goto_instrument_parse_optionst::doit()
 
     if(cmdline.isset("validate-goto-model"))
     {
-      goto_model.validate(
-        validation_modet::INVARIANT,
-        goto_model_validation_optionst{
-          goto_model_validation_optionst::set_optionst::all_true});
+      goto_model.validate();
     }
 
     {

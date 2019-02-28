@@ -550,10 +550,7 @@ int jbmc_parse_optionst::doit()
 
     if(cmdline.isset("validate-goto-model"))
     {
-      goto_model.validate(
-        validation_modet::INVARIANT,
-        goto_model_validation_optionst{
-          goto_model_validation_optionst::set_optionst::all_true});
+      goto_model.validate();
     }
 
     if(
@@ -694,10 +691,7 @@ int jbmc_parse_optionst::doit()
 
     if(cmdline.isset("validate-goto-model"))
     {
-      lazy_goto_model.validate(
-        validation_modet::INVARIANT,
-        goto_model_validation_optionst{
-          goto_model_validation_optionst::set_optionst::all_true});
+      lazy_goto_model.validate();
     }
 
     // Provide show-goto-functions and similar dump functions after symex

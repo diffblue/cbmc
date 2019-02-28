@@ -113,8 +113,7 @@ public:
   /// reported via DATA_INVARIANT violations or exceptions.
   void validate(
     const namespacet &ns,
-    const validation_modet vm,
-    const goto_model_validation_optionst &goto_model_validation_options) const
+    const validation_modet vm) const
   {
     for(const auto &entry : function_map)
     {
@@ -151,7 +150,7 @@ public:
         ++it;
       }
 
-      goto_function.validate(ns, vm, goto_model_validation_options);
+      goto_function.validate(ns, vm);
     }
   }
 };

@@ -21,7 +21,6 @@ Date: May 2018
 #include <util/std_types.h>
 
 #include "goto_program.h"
-#include "validate_goto_model.h"
 
 /// A goto function, consisting of function type (see #type), function body (see
 /// #body), and parameter identifiers (see #parameter_identifiers).
@@ -122,8 +121,7 @@ public:
   /// reported via DATA_INVARIANT violations or exceptions.
   void validate(
     const namespacet &ns,
-    const validation_modet vm,
-    const goto_model_validation_optionst &goto_model_validation_options) const;
+    const validation_modet vm) const;
 };
 
 void get_local_identifiers(const goto_functiont &, std::set<irep_idt> &dest);

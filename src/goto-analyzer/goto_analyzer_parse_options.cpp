@@ -406,10 +406,7 @@ int goto_analyzer_parse_optionst::doit()
 
   if(cmdline.isset("validate-goto-model"))
   {
-    goto_model.validate(
-      validation_modet::INVARIANT,
-      goto_model_validation_optionst{
-        goto_model_validation_optionst::set_optionst::all_true});
+    goto_model.validate();
   }
 
   // show it?

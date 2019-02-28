@@ -547,10 +547,7 @@ bool compilet::write_bin_object_file(
   if(validate_goto_model)
   {
     status() << "Validating goto model" << eom;
-    src_goto_model.validate(
-      validation_modet::INVARIANT,
-      goto_model_validation_optionst{
-        goto_model_validation_optionst::set_optionst::all_true});
+    src_goto_model.validate();
   }
 
   statistics() << "Writing binary format object `"

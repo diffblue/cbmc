@@ -197,9 +197,6 @@ goto_modelt initialize_goto_model(
     goto_model_validation_optionst goto_model_validation_options{
       goto_model_validation_optionst ::set_optionst::all_false};
 
-    // temporarily disabled until regression tests fixed
-    goto_model_validation_options.entry_point_exists = false;
-
     goto_model.validate(
       validation_modet::INVARIANT, goto_model_validation_options);
   }

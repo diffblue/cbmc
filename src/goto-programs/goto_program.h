@@ -18,7 +18,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <sstream>
 #include <string>
 
-#include "validate_goto_model.h"
 #include <util/invariant.h>
 #include <util/namespace.h>
 #include <util/source_location.h>
@@ -555,11 +554,7 @@ public:
     ///
     /// The validation mode indicates whether well-formedness check failures are
     /// reported via DATA_INVARIANT violations or exceptions.
-    void validate(
-      const namespacet &ns,
-      const validation_modet vm,
-      const goto_model_validation_optionst &goto_model_validation_options)
-      const;
+    void validate(const namespacet &ns, const validation_modet vm) const;
 
     /// Apply given transformer to all expressions; no return value
     /// means no change needed.
@@ -819,14 +814,11 @@ public:
   ///
   /// The validation mode indicates whether well-formedness check failures are
   /// reported via DATA_INVARIANT violations or exceptions.
-  void validate(
-    const namespacet &ns,
-    const validation_modet vm,
-    const goto_model_validation_optionst &goto_model_validation_options) const
+  void validate(const namespacet &ns, const validation_modet vm) const
   {
     for(const instructiont &ins : instructions)
     {
-      ins.validate(ns, vm, goto_model_validation_options);
+      ins.validate(ns, vm);
     }
   }
 

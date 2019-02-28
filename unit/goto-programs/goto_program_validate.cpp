@@ -186,32 +186,6 @@ SCENARIO("Validation of a goto program", "[core][goto-programs][validate]")
 
   /// check_returns_removed()
   WHEN(
-    "not all returns have been removed - a function has return type "
-    "non-empty")
-  {
-    THEN("fail!")
-    {
-      goto_convert(goto_model, null_message_handler);
-
-      auto &function_map = goto_model.goto_functions.function_map;
-      auto it = function_map.find("f");
-      it->second.type.return_type() = signedbv_typet{32};
-
-      goto_model_validation_optionst validation_options{
-        goto_model_validation_optionst ::set_optionst::all_false};
-
-      validation_options.check_returns_removed = true;
-
-      REQUIRE_THROWS_AS(
-        validate_goto_model(
-          goto_model.goto_functions,
-          validation_modet::EXCEPTION,
-          validation_options),
-        incorrect_goto_program_exceptiont);
-    }
-  }
-
-  WHEN(
     "not all returns have been removed - an instruction is of type "
     "'return'")
   {
@@ -380,16 +354,11 @@ SCENARIO("Validation of a goto program", "[core][goto-programs][validate]")
       function_f.body.instructions.erase(
         std::prev(function_f.body.instructions.end()));
 
-      // goto_function.validate checks by default (if a function has a body)
-      // that the last instruction of a function body marks the function's end.
-      goto_model_validation_optionst validation_options{
-        goto_model_validation_optionst ::set_optionst::all_false};
-
       namespacet ns(goto_model.symbol_table);
 
       REQUIRE_THROWS_AS(
         function_f.validate(
-          ns, validation_modet::EXCEPTION, validation_options),
+          ns, validation_modet::EXCEPTION),
         incorrect_goto_program_exceptiont);
     }
   }
@@ -401,15 +370,10 @@ SCENARIO("Validation of a goto program", "[core][goto-programs][validate]")
       goto_convert(goto_model, null_message_handler);
       auto &function_f = goto_model.goto_functions.function_map["f"];
 
-      // goto_function.validate checks by default (if a function has a body)
-      // that the last instruction of a function body marks the function's end.
-      goto_model_validation_optionst validation_options{
-        goto_model_validation_optionst ::set_optionst::all_false};
-
       namespacet ns(goto_model.symbol_table);
 
       REQUIRE_NOTHROW(function_f.validate(
-        ns, validation_modet::EXCEPTION, validation_options));
+        ns, validation_modet::EXCEPTION));
     }
   }
 }

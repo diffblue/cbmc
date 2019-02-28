@@ -11,7 +11,6 @@ Author: Diffblue Ltd.
 #include <util/arith_tools.h>
 
 #include <goto-programs/goto_function.h>
-#include <goto-programs/validate_goto_model.h>
 
 SCENARIO(
   "Validation of well-formed assert/assume codes",
@@ -41,17 +40,11 @@ SCENARIO(
     namespacet ns(symbol_table);
     instructions.back() = goto_programt::make_assertion(x_le_10);
 
-    goto_model_validation_optionst validation_options{
-      goto_model_validation_optionst::set_optionst::all_false};
-    validation_options.entry_point_exists = true;
-    validation_options.function_pointer_calls_removed = true;
-
     WHEN("Instruction has no targets")
     {
       THEN("The consistency check succeeds")
       {
-        goto_function.body.validate(
-          ns, validation_modet::INVARIANT, validation_options);
+        goto_function.body.validate(ns, validation_modet::INVARIANT);
         REQUIRE(true);
       }
     }
@@ -62,8 +55,7 @@ SCENARIO(
       THEN("The consistency check fails")
       {
         REQUIRE_THROWS_AS(
-          goto_function.body.validate(
-            ns, validation_modet::EXCEPTION, validation_options),
+          goto_function.body.validate(ns, validation_modet::EXCEPTION),
           incorrect_goto_program_exceptiont);
       }
     }

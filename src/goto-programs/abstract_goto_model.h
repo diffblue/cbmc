@@ -13,6 +13,7 @@ Author: Diffblue Ltd.
 #define CPROVER_GOTO_PROGRAMS_ABSTRACT_GOTO_MODEL_H
 
 #include "goto_functions.h"
+#include "validate_goto_model.h"
 #include <util/symbol_table.h>
 
 /// Abstract interface to eager or lazy GOTO models

@@ -106,8 +106,7 @@ void validate_goto_modelt::function_pointer_calls_removed()
     {
       if(instr.is_function_call())
       {
-        const code_function_callt &function_call =
-          to_code_function_call(instr.code);
+        const code_function_callt &function_call = instr.get_function_call();
         DATA_CHECK(
           vm,
           function_call.function().id() == ID_symbol,
@@ -122,10 +121,6 @@ void validate_goto_modelt::check_returns_removed()
   for(const auto &fun : function_map)
   {
     const goto_functiont &goto_function = fun.second;
-    DATA_CHECK(
-      vm,
-      goto_function.type.return_type().id() == ID_empty,
-      "functions must have empty return type");
 
     for(const auto &instr : goto_function.body.instructions)
     {
@@ -134,7 +129,7 @@ void validate_goto_modelt::check_returns_removed()
 
       if(instr.is_function_call())
       {
-        const auto &function_call = to_code_function_call(instr.code);
+        const auto &function_call = instr.get_function_call();
         DATA_CHECK(
           vm,
           function_call.lhs().is_nil(),
@@ -194,7 +189,7 @@ void validate_goto_modelt::check_called_functions()
       // check functions that are called
       if(instr.is_function_call())
       {
-        const auto &function_call = to_code_function_call(instr.code);
+        const auto &function_call = instr.get_function_call();
         const irep_idt &identifier =
           to_symbol_expr(function_call.function()).get_identifier();
 

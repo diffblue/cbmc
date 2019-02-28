@@ -96,9 +96,9 @@ public:
   /// The validation mode indicates whether well-formedness check failures are
   /// reported via DATA_INVARIANT violations or exceptions.
   void validate(
-    const validation_modet vm,
-    const goto_model_validation_optionst &goto_model_validation_options)
-    const override
+    const validation_modet vm = validation_modet::INVARIANT,
+    const goto_model_validation_optionst &goto_model_validation_options =
+      goto_model_validation_optionst{}) const override
   {
     symbol_table.validate(vm);
 
@@ -108,7 +108,7 @@ public:
     validate_goto_model(goto_functions, vm, goto_model_validation_options);
 
     const namespacet ns(symbol_table);
-    goto_functions.validate(ns, vm, goto_model_validation_options);
+    goto_functions.validate(ns, vm);
   }
 };
 
@@ -164,7 +164,7 @@ public:
     validate_goto_model(goto_functions, vm, goto_model_validation_options);
 
     const namespacet ns(symbol_table);
-    goto_functions.validate(ns, vm, goto_model_validation_options);
+    goto_functions.validate(ns, vm);
   }
 
 private:

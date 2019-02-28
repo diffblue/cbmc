@@ -15,29 +15,26 @@ Date: Oct 2018
 class goto_model_validation_optionst final
 {
 public:
-  bool entry_point_exists;
-  bool function_pointer_calls_removed;
-  bool check_returns_removed;
-  bool check_called_functions;
-  bool check_source_location;
+  // this check is disabled by default (not all goto programs
+  // have an entry point)
+  bool entry_point_exists = false;
+
+  bool function_pointer_calls_removed = true;
+  bool check_returns_removed = true;
+  bool check_called_functions = true;
 
 private:
   void set_all_flags(bool options_value)
   {
-    // temporarily disabled until adjustments made for regression tests that
-    // have no entry point(e.g. testing json-ui warnings when there
-    // is no entry point)
-    entry_point_exists = false;
+    entry_point_exists = options_value;
     function_pointer_calls_removed = options_value;
     check_returns_removed = options_value;
     check_called_functions = options_value;
-
-    // this option is temporarily disabled until all source locations
-    // are reliably set correctly
-    check_source_location = false;
   }
 
 public:
+  goto_model_validation_optionst() = default;
+
   enum class set_optionst
   {
     all_true,

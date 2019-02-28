@@ -9,7 +9,6 @@ Author: Diffblue Ltd.
 #include <testing-utils/use_catch.h>
 
 #include <goto-programs/goto_function.h>
-#include <goto-programs/validate_goto_model.h>
 
 #include <util/arith_tools.h>
 
@@ -37,11 +36,6 @@ SCENARIO(
     instructions.emplace_back(goto_programt::make_decl(var_a));
     symbol_table.insert(fun_symbol);
 
-    goto_model_validation_optionst validation_options{
-      goto_model_validation_optionst::set_optionst::all_false};
-    validation_options.entry_point_exists = true;
-    validation_options.function_pointer_calls_removed = true;
-
     WHEN("Declaring known symbol")
     {
       symbol_table.insert(var_symbol);
@@ -49,8 +43,7 @@ SCENARIO(
 
       THEN("The consistency check succeeds")
       {
-        goto_function.body.validate(
-          ns, validation_modet::INVARIANT, validation_options);
+        goto_function.body.validate(ns, validation_modet::INVARIANT);
         REQUIRE(true);
       }
     }
@@ -62,8 +55,7 @@ SCENARIO(
       THEN("The consistency check fails")
       {
         REQUIRE_THROWS_AS(
-          goto_function.body.validate(
-            ns, validation_modet::EXCEPTION, validation_options),
+          goto_function.body.validate(ns, validation_modet::EXCEPTION),
           incorrect_goto_program_exceptiont);
       }
     }

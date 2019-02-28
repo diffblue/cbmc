@@ -35,8 +35,7 @@ void get_local_identifiers(
 /// reported via DATA_INVARIANT violations or exceptions.
 void goto_functiont::validate(
   const namespacet &ns,
-  const validation_modet vm,
-  const goto_model_validation_optionst &goto_model_validation_options) const
+  const validation_modet vm) const
 {
   // function body must end with an END_FUNCTION instruction
   if(body_available())
@@ -47,7 +46,7 @@ void goto_functiont::validate(
       "last instruction should be of end function type");
   }
 
-  body.validate(ns, vm, goto_model_validation_options);
+  body.validate(ns, vm);
 
   find_symbols_sett typetags;
   find_type_symbols(type, typetags);

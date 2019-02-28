@@ -9,7 +9,6 @@ Author: Diffblue Ltd.
 #include <testing-utils/use_catch.h>
 
 #include <goto-programs/goto_function.h>
-#include <goto-programs/validate_goto_model.h>
 
 #include <util/arith_tools.h>
 
@@ -44,18 +43,12 @@ SCENARIO(
     symbol_table.insert(fun_symbol);
     namespacet ns(symbol_table);
 
-    goto_model_validation_optionst validation_options{
-      goto_model_validation_optionst::set_optionst::all_false};
-    validation_options.entry_point_exists = true;
-    validation_options.function_pointer_calls_removed = true;
-
     WHEN("Target is a target")
     {
       instructions.front().target_number = 1;
       THEN("The consistency check succeeds")
       {
-        goto_function.body.validate(
-          ns, validation_modet::INVARIANT, validation_options);
+        goto_function.body.validate(ns, validation_modet::INVARIANT);
         REQUIRE(true);
       }
     }
@@ -65,8 +58,7 @@ SCENARIO(
       THEN("The consistency check fails")
       {
         REQUIRE_THROWS_AS(
-          goto_function.body.validate(
-            ns, validation_modet::EXCEPTION, validation_options),
+          goto_function.body.validate(ns, validation_modet::EXCEPTION),
           incorrect_goto_program_exceptiont);
       }
     }
