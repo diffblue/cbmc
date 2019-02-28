@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <functional>
 #include <set>
 
+#include <util/deprecate.h>
 #include <util/irep.h>
 
 class goto_functionst;
@@ -22,6 +23,7 @@ class goto_modelt;
 class message_handlert;
 class symbol_tablet;
 
+DEPRECATED("Use link_to_library(goto_model, ...) instead")
 void link_to_library(
   symbol_tablet &,
   goto_functionst &,
