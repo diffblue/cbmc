@@ -50,9 +50,11 @@ add_custom_command(
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-add_custom_target(c_library_check
-    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/library-check.stamp
+if(NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+    add_custom_target(c_library_check
+        DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/library-check.stamp
 )
+endif()
 
 ################################################################################
 
@@ -101,6 +103,12 @@ set(extra_dependencies
     ${CMAKE_CURRENT_BINARY_DIR}/windows_builtin_headers.inc
     ${CMAKE_CURRENT_BINARY_DIR}/library-check.stamp
 )
+
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+    list(REMOVE_ITEM
+         extra_dependencies
+         ${CMAKE_CURRENT_BINARY_DIR}/library-check.stamp)
+endif()
 
 file(GLOB_RECURSE sources "*.cpp" "*.h")
 
