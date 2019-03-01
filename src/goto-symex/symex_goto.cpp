@@ -211,26 +211,25 @@ void goto_symext::symex_goto(statet &state)
   framet::goto_state_listt &goto_state_list =
     state.call_stack().top().goto_state_map[new_state_pc];
 
-  // If the guard is true (and the alternative branch unreachable) we can move
-  // the state in this case as it'll never be accessed on the alternate branch.
+  // On an unconditional GOTO we don't need our state, as it will be overwritten
+  // by merge_goto. Therefore we move it onto goto_state_list instead of copying
+  // as usual.
   if(new_guard.is_true())
   {
+    // The move here only moves goto_statet, the base class of goto_symex_statet
+    // and not the entire thing.
     goto_state_list.emplace_back(state.source, std::move(state));
-  }
-  else
-  {
-    goto_state_list.emplace_back(state.source, state);
-  }
 
-  symex_transition(state, state_pc, backward);
+    symex_transition(state, state_pc, backward);
 
-  // adjust guards
-  if(new_guard.is_true())
-  {
     state.guard = guardt(false_exprt(), guard_manager);
   }
   else
   {
+    goto_state_list.emplace_back(state.source, state);
+
+    symex_transition(state, state_pc, backward);
+
     // produce new guard symbol
     exprt guard_expr;
 
