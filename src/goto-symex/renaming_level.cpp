@@ -17,18 +17,18 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 #include "goto_symex_state.h"
 
-ssa_exprt symex_level0t::
+renamedt<ssa_exprt, L0> symex_level0t::
 operator()(ssa_exprt ssa_expr, const namespacet &ns, unsigned thread_nr) const
 {
   // already renamed?
   if(!ssa_expr.get_level_0().empty())
-    return ssa_expr;
+    return renamedt<ssa_exprt, L0>{std::move(ssa_expr)};
 
   const irep_idt &obj_identifier = ssa_expr.get_object_name();
 
   // guards are not L0-renamed
   if(obj_identifier == goto_symex_statet::guard_identifier())
-    return ssa_expr;
+    return renamedt<ssa_exprt, L0>{std::move(ssa_expr)};
 
   const symbolt *s;
   const bool found_l0 = !ns.lookup(obj_identifier, s);
@@ -36,11 +36,11 @@ operator()(ssa_exprt ssa_expr, const namespacet &ns, unsigned thread_nr) const
 
   // don't rename shared variables or functions
   if(s->type.id() == ID_code || s->is_shared())
-    return ssa_expr;
+    return renamedt<ssa_exprt, L0>{std::move(ssa_expr)};
 
   // rename!
   ssa_expr.set_level_0(thread_nr);
-  return ssa_expr;
+  return renamedt<ssa_exprt, L0>{ssa_expr};
 }
 
 ssa_exprt symex_level1t::operator()(ssa_exprt ssa_expr) const

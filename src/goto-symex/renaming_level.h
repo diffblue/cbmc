@@ -93,7 +93,7 @@ private:
 /// The renaming is built for one particular interleaving.
 struct symex_level0t : public symex_renaming_levelt
 {
-  ssa_exprt operator()(
+  renamedt<ssa_exprt, L0> operator()(
     ssa_exprt ssa_expr,
     const namespacet &ns,
     unsigned thread_nr) const;
