@@ -49,8 +49,7 @@ SCENARIO(
       const namespacet ns(symbol_table);
       THEN("The consistency check succeeds")
       {
-        goto_function.validate(
-          ns, validation_modet::INVARIANT);
+        goto_function.validate(ns, validation_modet::INVARIANT);
         REQUIRE(true);
       }
     }
@@ -60,8 +59,7 @@ SCENARIO(
       THEN("The consistency check fails")
       {
         REQUIRE_THROWS_AS(
-          goto_function.validate(
-            ns, validation_modet::EXCEPTION),
+          goto_function.validate(ns, validation_modet::EXCEPTION),
           incorrect_goto_program_exceptiont);
       }
     }

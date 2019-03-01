@@ -357,8 +357,7 @@ SCENARIO("Validation of a goto program", "[core][goto-programs][validate]")
       namespacet ns(goto_model.symbol_table);
 
       REQUIRE_THROWS_AS(
-        function_f.validate(
-          ns, validation_modet::EXCEPTION),
+        function_f.validate(ns, validation_modet::EXCEPTION),
         incorrect_goto_program_exceptiont);
     }
   }
@@ -372,8 +371,7 @@ SCENARIO("Validation of a goto program", "[core][goto-programs][validate]")
 
       namespacet ns(goto_model.symbol_table);
 
-      REQUIRE_NOTHROW(function_f.validate(
-        ns, validation_modet::EXCEPTION));
+      REQUIRE_NOTHROW(function_f.validate(ns, validation_modet::EXCEPTION));
     }
   }
 }

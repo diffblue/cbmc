@@ -111,9 +111,7 @@ public:
   ///
   /// The validation mode indicates whether well-formedness check failures are
   /// reported via DATA_INVARIANT violations or exceptions.
-  void validate(
-    const namespacet &ns,
-    const validation_modet vm) const
+  void validate(const namespacet &ns, const validation_modet vm) const
   {
     for(const auto &entry : function_map)
     {

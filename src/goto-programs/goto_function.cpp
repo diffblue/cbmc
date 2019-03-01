@@ -33,9 +33,8 @@ void get_local_identifiers(
 ///
 /// The validation mode indicates whether well-formedness check failures are
 /// reported via DATA_INVARIANT violations or exceptions.
-void goto_functiont::validate(
-  const namespacet &ns,
-  const validation_modet vm) const
+void goto_functiont::validate(const namespacet &ns, const validation_modet vm)
+  const
 {
   // function body must end with an END_FUNCTION instruction
   if(body_available())
