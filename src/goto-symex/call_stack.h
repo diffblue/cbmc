@@ -34,6 +34,7 @@ public:
 
   void pop()
   {
+    PRECONDITION(!empty());
     pop_back();
   }
 
