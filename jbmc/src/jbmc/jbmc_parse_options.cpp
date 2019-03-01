@@ -511,17 +511,17 @@ int jbmc_parse_optionst::doit()
   std::function<void(bmct &, const symbol_tablet &)> configure_bmc = nullptr;
   if(options.get_bool_option("java-unwind-enum-static"))
   {
-    configure_bmc = [](bmct &bmc, const symbol_tablet &symbol_table) {
-      bmc.add_loop_unwind_handler(
-        [&symbol_table](
-          const call_stackt &context,
-          unsigned loop_number,
-          unsigned unwind,
-          unsigned &max_unwind) {
+    configure_bmc =
+      [](bmct &bmc, const symbol_tablet &symbol_table) {
+        bmc.add_loop_unwind_handler([&symbol_table](
+                                      const call_stackt &context,
+                                      unsigned loop_number,
+                                      unsigned unwind,
+                                      unsigned &max_unwind) {
           return java_enum_static_init_unwind_handler(
             context, loop_number, unwind, max_unwind, symbol_table);
         });
-    };
+      };
   }
 
   object_factory_params.set(options);
