@@ -12,7 +12,7 @@
 /src/goto-cc/ @kroening @tautschnig
 /src/linking/ @kroening @tautschnig
 /src/memory-models/ @kroening @tautschnig
-/src/goto-symex/ @kroening @tautschnig @peterschrammel
+/src/goto-symex/ @kroening @tautschnig @peterschrammel @smowton
 /src/json/ @kroening @tautschnig @peterschrammel
 /src/langapi/ @kroening @tautschnig @peterschrammel
 /src/xmllang/ @kroening @tautschnig @peterschrammel
@@ -41,7 +41,7 @@
 
 /src/goto-analyzer/ @martin-cs @chrisr-diffblue @peterschrammel @danpoe @hannes-steffenhagen-diffblue
 /src/goto-harness/ @martin-cs @chrisr-diffblue @peterschrammel @danpoe @hannes-steffenhagen-diffblue
-/src/goto-instrument/ @martin-cs @chrisr-diffblue @peterschrammel @danpoe @hannes-steffenhagen-diffblue
+/src/goto-instrument/ @martin-cs @chrisr-diffblue @peterschrammel @danpoe @hannes-steffenhagen-diffblue @smowton
 /src/goto-diff/ @tautschnig @peterschrammel
 /jbmc/src/jbmc/ @smowton @mgudemann @cristina-david @cesaro @pkesseli @peterschrammel
 /jbmc/src/janalyzer/ @smowton @mgudemann @cristina-david @cesaro @pkesseli @peterschrammel
