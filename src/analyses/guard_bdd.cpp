@@ -44,24 +44,22 @@ guard_bddt &guard_bddt::operator=(guard_bddt &&other)
   return *this;
 }
 
-void guard_bddt::guard_expr(exprt &dest) const
+exprt guard_bddt::guard_expr(exprt expr) const
 {
   if(is_true())
   {
     // do nothing
+    return expr;
   }
   else
   {
-    if(dest.is_false())
+    if(expr.is_false())
     {
-      dest = boolean_negate(as_expr());
+      return boolean_negate(as_expr());
     }
     else
     {
-      implies_exprt tmp;
-      tmp.op0() = as_expr();
-      tmp.op1().swap(dest);
-      dest.swap(tmp);
+      return implies_exprt{as_expr(), expr};
     }
   }
 }

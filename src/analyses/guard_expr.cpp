@@ -18,22 +18,22 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/simplify_utils.h>
 #include <util/std_expr.h>
 
-void guard_exprt::guard_expr(exprt &dest) const
+exprt guard_exprt::guard_expr(exprt expr) const
 {
   if(is_true())
   {
     // do nothing
+    return expr;
   }
   else
   {
-    if(dest.is_false())
+    if(expr.is_false())
     {
-      dest = boolean_negate(as_expr());
+      return boolean_negate(as_expr());
     }
     else
     {
-      implies_exprt tmp(as_expr(), dest);
-      dest.swap(tmp);
+      return implies_exprt{as_expr(), expr};
     }
   }
 }

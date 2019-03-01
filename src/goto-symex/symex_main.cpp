@@ -116,8 +116,7 @@ void goto_symext::vcc(
   if(condition.is_true())
     return;
 
-  exprt guarded_condition = condition;
-  state.guard.guard_expr(guarded_condition);
+  const exprt guarded_condition = state.guard.guard_expr(condition);
 
   state.remaining_vccs++;
   target.assertion(state.guard.as_expr(), guarded_condition, msg, state.source);
@@ -146,8 +145,7 @@ void goto_symext::symex_assume_l2(statet &state, const exprt &cond)
 
   if(state.threads.size()==1)
   {
-    exprt tmp = rewritten_cond;
-    state.guard.guard_expr(tmp);
+    exprt tmp = state.guard.guard_expr(rewritten_cond);
     target.assumption(state.guard.as_expr(), tmp, state.source);
   }
   // symex_target_equationt::convert_assertions would fail to

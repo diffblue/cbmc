@@ -55,7 +55,9 @@ public:
   /// This can vary according to the guard implementation.
   static constexpr bool is_always_simplified = false;
 
-  void guard_expr(exprt &dest) const;
+  /// Return `guard => dest` or a simplified variant thereof if either guard or
+  /// dest are trivial.
+  exprt guard_expr(exprt expr) const;
 
   bool is_true() const
   {
