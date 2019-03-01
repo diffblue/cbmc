@@ -261,9 +261,9 @@ void goto_symex_statet::set_l2_indices(
 {
   if(!ssa_expr.get_level_2().empty())
     return;
-  renamedt<ssa_exprt, L1> l1 =
-    level1(level0(std::move(ssa_expr), ns, source.thread_nr);
-  ssa_expr = level2(l1.get());
+  renamedt<ssa_exprt, L2> l2 =
+    level2(level1(level0(std::move(ssa_expr), ns, source.thread_nr)));
+  ssa_expr = l2.get();
 }
 
 template <levelt level>
@@ -287,6 +287,8 @@ ssa_exprt goto_symex_statet::rename_ssa(ssa_exprt ssa, const namespacet &ns)
 /// Ensure `rename_ssa` gets compiled for L0
 template ssa_exprt
 goto_symex_statet::rename_ssa<L0>(ssa_exprt ssa, const namespacet &ns);
+template ssa_exprt
+goto_symex_statet::rename_ssa<L1>(ssa_exprt ssa, const namespacet &ns);
 
 template <levelt level>
 exprt goto_symex_statet::rename(exprt expr, const namespacet &ns)
@@ -368,6 +370,8 @@ exprt goto_symex_statet::rename(exprt expr, const namespacet &ns)
   }
   return expr;
 }
+
+template exprt goto_symex_statet::rename<L1>(exprt expr, const namespacet &ns);
 
 /// thread encoding
 bool goto_symex_statet::l2_thread_read_encoding(

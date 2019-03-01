@@ -121,7 +121,7 @@ struct symex_level1t : public symex_renaming_levelt
 /// This is to ensure each variable is only assigned once.
 struct symex_level2t : public symex_renaming_levelt
 {
-  ssa_exprt operator()(ssa_exprt ssa_expr) const;
+  renamedt<ssa_exprt, L2> operator()(renamedt<ssa_exprt, L1> l1_expr) const;
 
   symex_level2t() = default;
   ~symex_level2t() override = default;

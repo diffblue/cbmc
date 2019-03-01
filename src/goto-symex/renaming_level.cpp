@@ -60,10 +60,11 @@ operator()(renamedt<ssa_exprt, L0> l0_expr) const
   return renamedt<ssa_exprt, L1>{std::move(l0_expr.value)};
 }
 
-ssa_exprt symex_level2t::operator()(ssa_exprt ssa_expr) const
+renamedt<ssa_exprt, L2> symex_level2t::
+operator()(renamedt<ssa_exprt, L1> l1_expr) const
 {
-  ssa_expr.set_level_2(current_count(ssa_expr.get_identifier()));
-  return ssa_expr;
+  l1_expr.value.set_level_2(current_count(l1_expr.get().get_identifier()));
+  return renamedt<ssa_exprt, L2>{std::move(l1_expr.value)};
 }
 
 void symex_level1t::restore_from(
