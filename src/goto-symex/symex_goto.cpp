@@ -106,15 +106,13 @@ void goto_symext::symex_goto(statet &state)
     }
   }
 
-  exprt simpl_state_guard = state.guard.as_expr();
-  do_simplify(simpl_state_guard);
-
   // No point executing both branches of an unconditional goto.
   if(
     new_guard.is_true() && // We have an unconditional goto, AND
-    // either there are no blocks between us and the target in the
-    // surrounding scope
-    (simpl_state_guard.is_true() ||
+    // either there are no reachable blocks between us and the target in the
+    // surrounding scope (because state.guard == true implies there is no path
+    // around this GOTO instruction)
+    (state.guard.is_true() ||
      // or there is another block, but we're doing path exploration so
      // we're going to skip over it for now and return to it later.
      symex_config.doing_path_exploration))
