@@ -37,11 +37,6 @@ SCENARIO(
 
     goto_model_validation_optionst validation_options{
       goto_model_validation_optionst::set_optionst::all_false};
-    // required as this test has no entry point, but calls the top-level
-    // 'goto_model.validate()'
-    validation_options.entry_point_exists = false;
-    validation_options.function_pointer_calls_removed = true;
-    validation_options.check_called_functions = true;
 
     WHEN("Symbol table has the right type")
     {
