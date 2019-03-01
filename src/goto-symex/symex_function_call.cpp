@@ -194,8 +194,18 @@ void goto_symext::symex_function_call(
 void goto_symext::symex_function_call_symbol(
   const get_goto_functiont &get_goto_function,
   statet &state,
-  const code_function_callt &code)
+  const code_function_callt &original_code)
 {
+  code_function_callt code = original_code;
+
+  if(code.lhs().is_not_nil())
+    clean_expr(code.lhs(), state, true);
+
+  clean_expr(code.function(), state, false);
+
+  Forall_expr(it, code.arguments())
+    clean_expr(*it, state, false);
+
   target.location(state.guard.as_expr(), state.source);
 
   PRECONDITION(code.function().id() == ID_symbol);
@@ -437,4 +447,3 @@ static void locality(
     state.l1_history.insert(l1_name);
   }
 }
-

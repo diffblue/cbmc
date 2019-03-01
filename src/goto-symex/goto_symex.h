@@ -223,12 +223,14 @@ protected:
   virtual void symex_dead(statet &);
   virtual void symex_other(statet &);
 
+  void symex_assert(const goto_programt::instructiont &, statet &);
   virtual void vcc(
     const exprt &,
     const std::string &msg,
     statet &);
 
   virtual void symex_assume(statet &, const exprt &cond);
+  void symex_assume_l2(statet &, const exprt &cond);
 
   // gotos
   void merge_gotos(statet &);

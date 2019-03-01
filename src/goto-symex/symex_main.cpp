@@ -76,51 +76,71 @@ void symex_transition(goto_symext::statet &state)
   symex_transition(state, next, false);
 }
 
+void goto_symext::symex_assert(
+  const goto_programt::instructiont &instruction,
+  statet &state)
+{
+  exprt condition = instruction.get_condition();
+  clean_expr(condition, state, false);
+
+  // we are willing to re-write some quantified expressions
+  if(has_subexpr(condition, ID_exists) || has_subexpr(condition, ID_forall))
+  {
+    // have negation pushed inwards as far as possible
+    do_simplify(condition);
+    rewrite_quantifiers(condition, state);
+  }
+
+  // now rename, enables propagation
+  exprt l2_condition = state.rename(std::move(condition), ns);
+
+  // now try simplifier on it
+  do_simplify(l2_condition);
+
+  std::string msg = id2string(instruction.source_location.get_comment());
+  if(msg == "")
+    msg = "assertion";
+
+  vcc(l2_condition, msg, state);
+}
+
 void goto_symext::vcc(
-  const exprt &vcc_expr,
+  const exprt &condition,
   const std::string &msg,
   statet &state)
 {
   state.total_vccs++;
   path_segment_vccs++;
 
-  exprt expr=vcc_expr;
-
-  // we are willing to re-write some quantified expressions
-  if(has_subexpr(expr, ID_exists) || has_subexpr(expr, ID_forall))
-  {
-    // have negation pushed inwards as far as possible
-    do_simplify(expr);
-    rewrite_quantifiers(expr, state);
-  }
-
-  // now rename, enables propagation
-  exprt l2_expr = state.rename(std::move(expr), ns);
-
-  // now try simplifier on it
-  do_simplify(l2_expr);
-
-  if(l2_expr.is_true())
+  if(condition.is_true())
     return;
 
-  state.guard.guard_expr(l2_expr);
+  exprt guarded_condition = condition;
+  state.guard.guard_expr(guarded_condition);
 
   state.remaining_vccs++;
-  target.assertion(state.guard.as_expr(), l2_expr, msg, state.source);
+  target.assertion(state.guard.as_expr(), guarded_condition, msg, state.source);
 }
 
 void goto_symext::symex_assume(statet &state, const exprt &cond)
 {
   exprt simplified_cond=cond;
 
+  clean_expr(simplified_cond, state, false);
+  simplified_cond = state.rename(std::move(simplified_cond), ns);
   do_simplify(simplified_cond);
 
-  if(simplified_cond.is_true())
+  symex_assume_l2(state, simplified_cond);
+}
+
+void goto_symext::symex_assume_l2(statet &state, const exprt &cond)
+{
+  if(cond.is_true())
     return;
 
   if(state.threads.size()==1)
   {
-    exprt tmp=simplified_cond;
+    exprt tmp = cond;
     state.guard.guard_expr(tmp);
     target.assumption(state.guard.as_expr(), tmp, state.source);
   }
@@ -131,7 +151,7 @@ void goto_symext::symex_assume(statet &state, const exprt &cond)
   // x=0;                   assume(x==1);
   // assert(x!=42);         x=42;
   else
-    state.guard.add(simplified_cond);
+    state.guard.add(cond);
 
   if(state.atomic_section_id!=0 &&
      state.guard.is_false())
@@ -402,31 +422,21 @@ void goto_symext::symex_step(
     break;
 
   case GOTO:
-    symex_goto(state);
+    if(!state.guard.is_false())
+      symex_goto(state);
+    else
+      symex_transition(state);
     break;
 
   case ASSUME:
     if(!state.guard.is_false())
-    {
-      exprt tmp = instruction.get_condition();
-      clean_expr(tmp, state, false);
-      symex_assume(state, state.rename(std::move(tmp), ns));
-    }
-
+      symex_assume(state, instruction.get_condition());
     symex_transition(state);
     break;
 
   case ASSERT:
     if(!state.guard.is_false())
-    {
-      std::string msg=id2string(state.source.pc->source_location.get_comment());
-      if(msg=="")
-        msg="assertion";
-      exprt tmp(instruction.get_condition());
-      clean_expr(tmp, state, false);
-      vcc(tmp, msg, state);
-    }
-
+      symex_assert(instruction, state);
     symex_transition(state);
     break;
 
@@ -445,17 +455,8 @@ void goto_symext::symex_step(
   case FUNCTION_CALL:
     if(!state.guard.is_false())
     {
-      code_function_callt deref_code = instruction.get_function_call();
-
-      if(deref_code.lhs().is_not_nil())
-        clean_expr(deref_code.lhs(), state, true);
-
-      clean_expr(deref_code.function(), state, false);
-
-      Forall_expr(it, deref_code.arguments())
-        clean_expr(*it, state, false);
-
-      symex_function_call(get_goto_function, state, deref_code);
+      symex_function_call(
+        get_goto_function, state, instruction.get_function_call());
     }
     else
       symex_transition(state);
@@ -464,14 +465,12 @@ void goto_symext::symex_step(
   case OTHER:
     if(!state.guard.is_false())
       symex_other(state);
-
     symex_transition(state);
     break;
 
   case DECL:
     if(!state.guard.is_false())
       symex_decl(state);
-
     symex_transition(state);
     break;
 
