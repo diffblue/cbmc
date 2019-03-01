@@ -250,9 +250,9 @@ void goto_symex_statet::set_l1_indices(
     return;
   if(!ssa_expr.get_level_1().empty())
     return;
-  renamedt<ssa_exprt, L0> l0 =
-    level0(std::move(ssa_expr), ns, source.thread_nr);
-  ssa_expr = level1(l0.get());
+  renamedt<ssa_exprt, L1> l1 =
+    level1(level0(std::move(ssa_expr), ns, source.thread_nr));
+  ssa_expr = l1.get();
 }
 
 void goto_symex_statet::set_l2_indices(
@@ -261,10 +261,9 @@ void goto_symex_statet::set_l2_indices(
 {
   if(!ssa_expr.get_level_2().empty())
     return;
-  renamedt<ssa_exprt, L0> l0 =
-    level0(std::move(ssa_expr), ns, source.thread_nr);
-  ssa_exprt l1 = level1(l0.get());
-  ssa_expr = level2(std::move(l1));
+  renamedt<ssa_exprt, L1> l1 =
+    level1(level0(std::move(ssa_expr), ns, source.thread_nr);
+  ssa_expr = level2(l1.get());
 }
 
 template <levelt level>

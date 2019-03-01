@@ -107,7 +107,7 @@ struct symex_level0t : public symex_renaming_levelt
 /// This is to preserve locality in case of recursion
 struct symex_level1t : public symex_renaming_levelt
 {
-  ssa_exprt operator()(ssa_exprt ssa_expr) const;
+  renamedt<ssa_exprt, L1> operator()(renamedt<ssa_exprt, L0> l0_expr) const;
 
   /// Insert the content of \p other into this renaming
   void restore_from(const current_namest &other);
