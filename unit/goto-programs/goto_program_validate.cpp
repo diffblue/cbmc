@@ -14,13 +14,13 @@
 
 #include <testing-utils/message.h>
 
-#include <goto-programs/goto_convert_functions.h>
-#include <goto-programs/validate_goto_model.h>
-
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/std_code.h>
 #include <util/validate.h>
+
+#include <goto-programs/goto_convert_functions.h>
+#include <goto-programs/validate_goto_model.h>
 
 SCENARIO("Validation of a goto program", "[core][goto-programs][validate]")
 {
