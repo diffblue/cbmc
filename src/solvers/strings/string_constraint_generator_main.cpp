@@ -346,8 +346,8 @@ static irep_idt get_function_name(const function_application_exprt &expr)
 {
   const exprt &name = expr.function();
   PRECONDITION(name.id() == ID_symbol);
-  return is_ssa_expr(name) ? to_ssa_expr(name).get_object_name()
-                           : to_symbol_expr(name).get_identifier();
+  PRECONDITION(!is_ssa_expr(name));
+  return to_symbol_expr(name).get_identifier();
 }
 
 optionalt<exprt> string_constraint_generatort::make_array_pointer_association(
