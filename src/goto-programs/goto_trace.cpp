@@ -522,21 +522,16 @@ void show_full_goto_trace(
       break;
 
     case goto_trace_stept::typet::ASSUME:
-      if(!step.cond_value)
+      if(step.cond_value && step.pc->is_assume())
       {
-        out << '\n';
-        out << "Violated assumption:" << '\n';
+        out << "\n";
+        out << "Assumption:\n";
+
         if(!step.pc->source_location.is_nil())
           out << "  " << step.pc->source_location << '\n';
 
-        if(step.pc->is_assume())
-        {
-          out << "  "
-              << from_expr(ns, step.function_id, step.pc->get_condition())
-              << '\n';
-        }
-
-        out << '\n';
+        out << "  " << from_expr(ns, step.function_id, step.pc->get_condition())
+            << '\n';
       }
       break;
 
