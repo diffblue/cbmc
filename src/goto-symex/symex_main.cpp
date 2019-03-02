@@ -237,7 +237,10 @@ void goto_symext::symex_with_state(
 
     ~reset_namespacet()
     {
+      // Get symbol table 1, the outer symbol table from the GOTO program
       const symbol_tablet &st = ns.get_symbol_table();
+      // Move a new namespace containing this symbol table over the top of the
+      // current one
       ns = namespacet(st);
     }
 

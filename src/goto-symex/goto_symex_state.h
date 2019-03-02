@@ -114,8 +114,8 @@ struct framet
   }
 };
 
-/// Central data structure: state.
-
+/// \brief Central data structure: state.
+///
 /// The state is a persistent data structure that symex maintains as it
 /// executes. As we walk over each instruction, state will be updated reflecting
 /// their effects until a branch occurs (such as an if), where parts of the
