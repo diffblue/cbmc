@@ -47,6 +47,14 @@ public:
 
   virtual ~value_sett() = default;
 
+  value_sett(const value_sett &other) = default;
+
+  value_sett &operator=(value_sett &&other)
+  {
+    values = std::move(other.values);
+    return *this;
+  }
+
   static bool field_sensitive(const irep_idt &id, const typet &type);
 
   /// Matches the location_number field of the instruction that corresponds
