@@ -58,6 +58,7 @@ protected:
   //
   void add_return(
     goto_functionst::goto_functiont &,
+    const typet &return_type,
     const source_locationt &);
 };
 

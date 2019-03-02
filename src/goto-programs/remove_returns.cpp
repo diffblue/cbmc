@@ -101,10 +101,11 @@ void remove_returnst::replace_returns(
   const irep_idt &function_id,
   goto_functionst::goto_functiont &function)
 {
-  typet return_type = function.type.return_type();
+  // look up the function symbol
+  symbolt &function_symbol = *symbol_table.get_writeable(function_id);
 
   // returns something but void?
-  if(return_type == empty_typet())
+  if(to_code_type(function_symbol.type).return_type() == empty_typet())
     return;
 
   // add return_value symbol to symbol_table, if not already created:

@@ -42,8 +42,6 @@ void goto_symext::parameter_assignments(
   statet &state,
   const exprt::operandst &arguments)
 {
-  const code_typet &function_type=goto_function.type;
-
   // iterates over the arguments
   exprt::operandst::const_iterator it1=arguments.begin();
 
@@ -151,7 +149,7 @@ void goto_symext::parameter_assignments(
       it1++;
   }
 
-  if(function_type.has_ellipsis())
+  if(to_code_type(ns.lookup(function_identifier).type).has_ellipsis())
   {
     // These are va_arg arguments; their types may differ from call to call
     for(; it1 != arguments.end(); it1++)

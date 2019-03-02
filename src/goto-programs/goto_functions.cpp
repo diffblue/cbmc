@@ -137,5 +137,17 @@ void goto_functionst::validate(const namespacet &ns, const validation_modet vm)
     }
 
     goto_function.validate(ns, vm);
+
+    // Check that a void function does not contain any RETURN instructions
+    if(to_code_type(function_symbol.type).return_type().id() == ID_empty)
+    {
+      forall_goto_program_instructions(instruction, goto_function.body)
+      {
+        DATA_CHECK(
+          vm,
+          !instruction->is_return(),
+          "void function should not return a value");
+      }
+    }
   }
 }

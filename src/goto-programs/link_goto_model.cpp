@@ -100,6 +100,11 @@ static bool link_functions(
         in_dest_symbol_table.parameter_identifiers.swap(
           src_func.parameter_identifiers);
         in_dest_symbol_table.type=src_func.type;
+        // the linking code will have ensured that types match
+        INVARIANT(
+          base_type_eq(
+            dest_symbol_table.lookup_ref(final_id).type, src_func.type, ns),
+          "linking ensures that types match");
       }
       else if(src_func.body.instructions.empty() ||
               src_ns.lookup(src_it->first).is_weak)

@@ -321,9 +321,10 @@ protected:
       function.body.destructive_append(dest);
     }
 
-    if(function.type.return_type() != empty_typet())
+    const typet &return_type = to_code_type(function_symbol.type).return_type();
+    if(return_type != empty_typet())
     {
-      typet type(function.type.return_type());
+      typet type(return_type);
       type.remove(ID_C_constant);
 
       symbolt &aux_symbol = get_fresh_aux_symbol(
@@ -350,8 +351,8 @@ protected:
 
       function.body.destructive_append(dest);
 
-      exprt return_expr = typecast_exprt::conditional_cast(
-        aux_symbol.symbol_expr(), function.type.return_type());
+      exprt return_expr =
+        typecast_exprt::conditional_cast(aux_symbol.symbol_expr(), return_type);
 
       add_instruction(goto_programt::make_return(code_returnt(return_expr)));
 
