@@ -49,5 +49,5 @@ void goto_symext::symex_throw(statet &state)
   #endif
 
   // An un-caught exception. Behaves like assume(0);
-  symex_assume(state, false_exprt());
+  symex_assume_l2(state, false_exprt());
 }

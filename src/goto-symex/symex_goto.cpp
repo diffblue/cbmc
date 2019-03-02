@@ -27,13 +27,6 @@ void goto_symext::symex_goto(statet &state)
   const goto_programt::instructiont &instruction=*state.source.pc;
   framet &frame = state.top();
 
-  if(state.guard.is_false())
-  {
-    // next instruction
-    symex_transition(state);
-    return; // nothing to do
-  }
-
   exprt new_guard = instruction.get_condition();
   clean_expr(new_guard, state, false);
 
@@ -75,9 +68,9 @@ void goto_symext::symex_goto(statet &state)
       // generate assume(false) or a suitable negation if this
       // instruction is a conditional goto
       if(new_guard.is_true())
-        symex_assume(state, false_exprt());
+        symex_assume_l2(state, false_exprt());
       else
-        symex_assume(state, not_exprt(new_guard));
+        symex_assume_l2(state, not_exprt(new_guard));
 
       // next instruction
       symex_transition(state);
@@ -552,9 +545,10 @@ void goto_symext::loop_bound_exceeded(
     if(symex_config.unwinding_assertions)
     {
       // Generate VCC for unwinding assertion.
-      vcc(negated_cond,
-          "unwinding assertion loop "+std::to_string(loop_number),
-          state);
+      vcc(
+        negated_cond,
+        "unwinding assertion loop " + std::to_string(loop_number),
+        state);
 
       // add to state guard to prevent further assignments
       state.guard.add(negated_cond);
@@ -562,7 +556,7 @@ void goto_symext::loop_bound_exceeded(
     else
     {
       // generate unwinding assumption, unless we permit partial loops
-      symex_assume(state, negated_cond);
+      symex_assume_l2(state, negated_cond);
     }
   }
 }
