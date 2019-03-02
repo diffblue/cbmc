@@ -9,7 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_UTIL_ALLOCATE_OBJECTS_H
 #define CPROVER_UTIL_ALLOCATE_OBJECTS_H
 
-#include "base_type.h"
 #include "expr.h"
 #include "namespace.h"
 #include "source_location.h"

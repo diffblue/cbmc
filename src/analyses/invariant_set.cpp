@@ -15,7 +15,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/arith_tools.h>
 #include <util/base_exceptions.h>
-#include <util/base_type.h>
 #include <util/c_types.h>
 #include <util/expr_util.h>
 #include <util/namespace.h>

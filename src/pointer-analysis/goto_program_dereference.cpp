@@ -13,7 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/expr_util.h>
 #include <util/simplify_expr.h>
-#include <util/base_type.h>
 #include <util/std_code.h>
 #include <util/symbol_table.h>
 #include <util/guard.h>
