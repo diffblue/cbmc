@@ -90,7 +90,7 @@ size_t find_closing_delimiter(
 exprt make_function_application(
   const irep_idt &function_name,
   const exprt::operandst &arguments,
-  const typet &type,
+  const typet &range,
   symbol_table_baset &symbol_table);
 
 irep_idt strip_java_namespace_prefix(const irep_idt &to_strip);

@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/fresh_symbol.h>
 #include <util/invariant.h>
 #include <util/mathematical_expr.h>
+#include <util/mathematical_types.h>
 #include <util/message.h>
 #include <util/prefix.h>
 #include <util/std_types.h>
@@ -252,13 +253,14 @@ void java_add_components_to_class(
 /// \return newly created symbol
 static auxiliary_symbolt declare_function(
   const irep_idt &function_name,
-  const typet &type,
+  const mathematical_function_typet &type,
   symbol_table_baset &symbol_table)
 {
   auxiliary_symbolt func_symbol;
   func_symbol.base_name=function_name;
   func_symbol.pretty_name=function_name;
   func_symbol.is_static_lifetime=false;
+  func_symbol.is_state_var = false;
   func_symbol.mode=ID_java;
   func_symbol.name=function_name;
   func_symbol.type=type;
@@ -267,24 +269,32 @@ static auxiliary_symbolt declare_function(
   return func_symbol;
 }
 
-/// Create a function application expression.
+/// Create a (mathematical) function application expression.
+/// The application has the type of the codomain (range) of the function.
 /// \param function_name: the name of the function
-/// \param arguments: a list of arguments
-/// \param type: return type of the function
+/// \param arguments: a list of arguments (an element of the domain)
+/// \param range: return type (codomain) of the function
 /// \param symbol_table: a symbol table
 /// \return a function application expression representing:
 ///   `function_name(arguments)`
 exprt make_function_application(
   const irep_idt &function_name,
   const exprt::operandst &arguments,
-  const typet &type,
+  const typet &range,
   symbol_table_baset &symbol_table)
 {
+  std::vector<typet> argument_types;
+  for(const auto &arg : arguments)
+    argument_types.push_back(arg.type());
+
   // Declaring the function
-  const auto symbol = declare_function(function_name, type, symbol_table);
+  const auto symbol = declare_function(
+    function_name,
+    mathematical_function_typet(std::move(argument_types), range),
+    symbol_table);
 
   // Function application
-  return function_application_exprt(symbol.symbol_expr(), arguments, type);
+  return function_application_exprt(symbol.symbol_expr(), arguments, range);
 }
 
 /// Strip java:: prefix from given identifier
