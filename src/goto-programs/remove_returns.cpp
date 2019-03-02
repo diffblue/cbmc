@@ -74,6 +74,7 @@ remove_returnst::get_or_create_return_value_symbol(const irep_idt &function_id)
 
   auxiliary_symbolt new_symbol;
   new_symbol.is_static_lifetime = true;
+  new_symbol.is_auxiliary = true;
   new_symbol.module = function_symbol.module;
   new_symbol.base_name =
     id2string(function_symbol.base_name) + RETURN_VALUE_SUFFIX;
