@@ -64,11 +64,12 @@ static bool check_renaming_l1(const exprt &expr)
 
   if(expr.id()==ID_symbol)
   {
+    const auto &type = expr.type();
     if(!expr.get_bool(ID_C_SSA_symbol))
-      return expr.type().id()!=ID_code;
+      return type.id() != ID_code && type.id() != ID_mathematical_function;
     if(!to_ssa_expr(expr).get_level_2().empty())
       return true;
-    if(to_ssa_expr(expr).get_original_expr().type()!=expr.type())
+    if(to_ssa_expr(expr).get_original_expr().type() != type)
       return true;
   }
   else
@@ -102,11 +103,12 @@ static bool check_renaming(const exprt &expr)
   }
   else if(expr.id()==ID_symbol)
   {
+    const auto &type = expr.type();
     if(!expr.get_bool(ID_C_SSA_symbol))
-      return expr.type().id()!=ID_code;
+      return type.id() != ID_code && type.id() != ID_mathematical_function;
     if(to_ssa_expr(expr).get_level_2().empty())
       return true;
-    if(to_ssa_expr(expr).get_original_expr().type()!=expr.type())
+    if(to_ssa_expr(expr).get_original_expr().type() != type)
       return true;
   }
   else
@@ -337,8 +339,10 @@ exprt goto_symex_statet::rename(exprt expr, const namespacet &ns)
   }
   else if(expr.id()==ID_symbol)
   {
+    const auto &type = as_const(expr).type();
+
     // we never rename function symbols
-    if(as_const(expr).type().id() == ID_code)
+    if(type.id() == ID_code || type.id() == ID_mathematical_function)
       rename<level>(expr.type(), to_symbol_expr(expr).get_identifier(), ns);
     else
       expr = rename<level>(ssa_exprt{expr}, ns);
