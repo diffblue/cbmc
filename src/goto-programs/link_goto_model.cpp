@@ -104,7 +104,7 @@ static bool link_functions(
       {
         // just keep the old one in dest
       }
-      else if(in_dest_symbol_table.type.get_bool(ID_C_inlined))
+      else if(to_code_type(ns.lookup(final_id).type).get_inlined())
       {
         // ok, we silently ignore
       }

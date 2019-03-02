@@ -49,7 +49,7 @@ public:
   property_mapt property_map;
 
 protected:
-  void initialize_property_map(const goto_functionst &);
+  void initialize_property_map(const goto_modelt &);
 };
 
 #endif // CPROVER_GOTO_PROGRAMS_PROPERTY_CHECKER_H

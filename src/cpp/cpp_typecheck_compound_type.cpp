@@ -1293,7 +1293,7 @@ void cpp_typecheckt::typecheck_member_function(
   component.set(ID_prefix, id2string(identifier) + "::");
 
   if(value.is_not_nil())
-    type.set(ID_C_inlined, true);
+    to_code_type(type).set_inlined(true);
 
   symbol.name=identifier;
   symbol.base_name=component.get_base_name();

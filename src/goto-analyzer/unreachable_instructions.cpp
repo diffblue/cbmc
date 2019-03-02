@@ -173,9 +173,12 @@ void unreachable_instructions(
 
     // f_it->first may be a link-time renamed version, use the
     // base_name instead; do not list inlined functions
-    if(called.find(decl.base_name)!=called.end() ||
-       f_it->second.is_inlined())
+    if(
+      called.find(decl.base_name) != called.end() ||
+      to_code_type(decl.type).get_inlined())
+    {
       unreachable_instructions(goto_program, dead_map);
+    }
     else
       all_unreachable(goto_program, dead_map);
 
@@ -295,10 +298,12 @@ static void list_functions(
 
     // f_it->first may be a link-time renamed version, use the
     // base_name instead; do not list inlined functions
-    if(unreachable ==
-       (called.find(decl.base_name)!=called.end() ||
-        f_it->second.is_inlined()))
+    if(
+      unreachable == (called.find(decl.base_name) != called.end() ||
+                      to_code_type(decl.type).get_inlined()))
+    {
       continue;
+    }
 
     source_locationt first_location=decl.location;
 
