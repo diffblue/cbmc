@@ -165,8 +165,12 @@ bool simplify_exprt::simplify_function_application(exprt &expr)
 {
   const function_application_exprt &function_app =
     to_function_application_expr(expr);
-  irep_idt func_id =
-    function_app.function().find(ID_expression).get(ID_identifier);
+
+  if(function_app.function().id() != ID_symbol)
+    return true;
+
+  const irep_idt func_id =
+    to_symbol_expr(function_app.function()).get_identifier();
 
   // Starts-with is used for .equals.
   if(func_id == ID_cprover_string_startswith_func)
