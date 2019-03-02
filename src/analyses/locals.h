@@ -31,11 +31,11 @@ public:
   // but including the function parameters.
   bool is_local(const irep_idt &identifier) const
   {
-    return locals_map.find(identifier)!=locals_map.end();
+    return locals.find(identifier) != locals.end();
   }
 
-  typedef std::map<irep_idt, symbol_exprt> locals_mapt;
-  locals_mapt locals_map;
+  typedef std::unordered_set<irep_idt> locals_sett;
+  locals_sett locals;
 
 protected:
   void build(const goto_functiont &goto_function);

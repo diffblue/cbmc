@@ -25,11 +25,13 @@ class local_bitvector_analysist
 public:
   typedef goto_functionst::goto_functiont goto_functiont;
 
-  explicit local_bitvector_analysist(
-    const goto_functiont &_goto_function):
-    dirty(_goto_function),
-    locals(_goto_function),
-    cfg(_goto_function.body)
+  local_bitvector_analysist(
+    const goto_functiont &_goto_function,
+    const namespacet &ns)
+    : dirty(_goto_function),
+      locals(_goto_function),
+      cfg(_goto_function.body),
+      ns(ns)
   {
     build();
   }
@@ -176,6 +178,7 @@ public:
     const exprt &src);
 
 protected:
+  const namespacet &ns;
   void build();
 
   typedef std::stack<unsigned> work_queuet;

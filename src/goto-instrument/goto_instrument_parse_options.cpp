@@ -299,7 +299,7 @@ int goto_instrument_parse_optionst::doit()
 
       forall_goto_functions(it, goto_model.goto_functions)
       {
-        local_bitvector_analysist local_bitvector_analysis(it->second);
+        local_bitvector_analysist local_bitvector_analysis(it->second, ns);
         std::cout << ">>>>\n";
         std::cout << ">>>> " << it->first << '\n';
         std::cout << ">>>>\n";

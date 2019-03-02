@@ -18,20 +18,18 @@ Date: March 2013
 void localst::build(const goto_functiont &goto_function)
 {
   forall_goto_program_instructions(it, goto_function.body)
+  {
     if(it->is_decl())
-    {
-      const code_declt &code_decl=to_code_decl(it->code);
-      locals_map.emplace(code_decl.get_identifier(), code_decl.symbol());
-    }
+      locals.insert(it->get_decl().get_identifier());
+  }
 
-  for(const auto &param : goto_function.type.parameters())
-    locals_map.emplace(
-      param.get_identifier(),
-      symbol_exprt(param.get_identifier(), param.type()));
+  locals.insert(
+    goto_function.parameter_identifiers.begin(),
+    goto_function.parameter_identifiers.end());
 }
 
 void localst::output(std::ostream &out) const
 {
-  for(const auto &local : locals_map)
-    out << local.first << "\n";
+  for(const auto &local : locals)
+    out << local << "\n";
 }

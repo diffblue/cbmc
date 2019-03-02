@@ -1675,7 +1675,7 @@ void goto_checkt::goto_check(
 
   if(enable_pointer_check)
     local_bitvector_analysis =
-      util_make_unique<local_bitvector_analysist>(goto_function);
+      util_make_unique<local_bitvector_analysist>(goto_function, ns);
 
   goto_programt &goto_program=goto_function.body;
 
