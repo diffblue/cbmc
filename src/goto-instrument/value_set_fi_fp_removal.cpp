@@ -13,7 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <pointer-analysis/value_set_analysis_fi.h>
 
-#include <util/base_type.h>
 #include <util/c_types.h>
 #include <util/expanding_vector.h>
 #include <util/fresh_symbol.h>
