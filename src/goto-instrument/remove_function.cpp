@@ -39,7 +39,8 @@ void remove_function(
                     << " in goto program" << messaget::eom;
     return;
   }
-  else if(entry->second.is_inlined())
+  else if(to_code_type(goto_model.symbol_table.lookup_ref(identifier).type)
+            .get_inlined())
   {
     message.warning() << "Function " << identifier << " is inlined, "
                       << "instantiations will not be removed"

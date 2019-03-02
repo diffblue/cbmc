@@ -309,10 +309,6 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
 
   if(final_new.id()==ID_code)
   {
-    bool inlined=
-       (new_symbol.type.get_bool(ID_C_inlined) ||
-        old_symbol.type.get_bool(ID_C_inlined));
-
     if(final_old.id()!=ID_code)
     {
       error().source_location=new_symbol.location;
@@ -327,6 +323,8 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
     code_typet &old_ct=to_code_type(old_symbol.type);
     code_typet &new_ct=to_code_type(new_symbol.type);
 
+    const bool inlined = old_ct.get_inlined() || new_ct.get_inlined();
+
     if(old_ct.has_ellipsis() && !new_ct.has_ellipsis())
       old_ct=new_ct;
     else if(!old_ct.has_ellipsis() && new_ct.has_ellipsis())
@@ -334,8 +332,8 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
 
     if(inlined)
     {
-      old_symbol.type.set(ID_C_inlined, true);
-      new_symbol.type.set(ID_C_inlined, true);
+      old_ct.set_inlined(true);
+      new_ct.set_inlined(true);
     }
 
     // do body
@@ -348,7 +346,7 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
         // definition is marked as "extern inline"
 
         if(
-          old_symbol.type.get_bool(ID_C_inlined) &&
+          old_ct.get_inlined() &&
           (config.ansi_c.mode == configt::ansi_ct::flavourt::GCC ||
            config.ansi_c.mode == configt::ansi_ct::flavourt::CLANG ||
            config.ansi_c.mode == configt::ansi_ct::flavourt::ARM ||

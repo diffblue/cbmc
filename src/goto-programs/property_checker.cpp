@@ -30,12 +30,15 @@ property_checkert::property_checkert(
 {
 }
 
-void property_checkert::initialize_property_map(
-  const goto_functionst &goto_functions)
+void property_checkert::initialize_property_map(const goto_modelt &goto_model)
 {
-  forall_goto_functions(it, goto_functions)
-    if(!it->second.is_inlined() ||
-       it->first==goto_functions.entry_point())
+  const namespacet ns(goto_model.symbol_table);
+
+  forall_goto_functions(it, goto_model.goto_functions)
+  {
+    if(
+      !to_code_type(ns.lookup(it->first).type).get_inlined() ||
+      it->first == goto_functionst::entry_point())
     {
       const goto_programt &goto_program=it->second.body;
 
@@ -53,4 +56,5 @@ void property_checkert::initialize_property_map(
         property_status.location=i_it;
       }
     }
+  }
 }

@@ -462,7 +462,7 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
     symbol.is_macro=true;
 
   if(member_spec.is_inline())
-    symbol.type.set(ID_C_inlined, true);
+    to_code_type(symbol.type).set_inlined(true);
 
   if(!symbol.is_type)
   {

@@ -150,7 +150,7 @@ void ansi_c_declarationt::to_symbol(
     symbol.is_file_local=get_is_static();
 
     if(get_is_inline())
-      symbol.type.set(ID_C_inlined, true);
+      to_code_type(symbol.type).set_inlined(true);
 
     if(
       config.ansi_c.mode == configt::ansi_ct::flavourt::GCC ||

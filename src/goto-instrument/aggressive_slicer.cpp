@@ -39,9 +39,11 @@ void aggressive_slicert::note_functions_to_keep(
 
 void aggressive_slicert::get_all_functions_containing_properties()
 {
+  const namespacet ns(goto_model.symbol_table);
+
   for(const auto &fct : goto_model.goto_functions.function_map)
   {
-    if(!fct.second.is_inlined())
+    if(!to_code_type(ns.lookup(fct.first).type).get_inlined())
     {
       for(const auto &ins : fct.second.body.instructions)
         if(ins.is_assert())
