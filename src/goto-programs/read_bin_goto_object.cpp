@@ -160,7 +160,15 @@ static bool read_bin_goto_object(
     f.body.update();
 
     if(hidden)
+    {
       f.make_hidden();
+      // can be removed with the next goto-binary version update as the
+      // information is guaranteed to be stored in the symbol table
+#if GOTO_BINARY_VERSION > 5
+#error This code should be removed
+#endif
+      symbol_table.get_writeable_ref(fname).set_hidden();
+    }
   }
 
   functions.compute_location_numbers();

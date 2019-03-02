@@ -274,8 +274,9 @@ void goto_symext::symex_function_call_code(
     a = state.rename(std::move(a), ns);
 
   // we hide the call if the caller and callee are both hidden
+  const bool callee_is_hidden = ns.lookup(identifier).is_hidden();
   const bool hidden =
-    state.call_stack().top().hidden_function && goto_function.is_hidden();
+    state.call_stack().top().hidden_function && callee_is_hidden;
 
   // record the call
   target.function_call(
@@ -314,7 +315,7 @@ void goto_symext::symex_function_call_code(
   frame.end_of_function=--goto_function.body.instructions.end();
   frame.return_value=call.lhs();
   frame.function_identifier=identifier;
-  frame.hidden_function=goto_function.is_hidden();
+  frame.hidden_function = callee_is_hidden;
 
   const framet &p_frame = state.call_stack().previous_frame();
   for(const auto &pair : p_frame.loop_iterations)
