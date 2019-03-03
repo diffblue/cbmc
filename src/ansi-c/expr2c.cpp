@@ -493,14 +493,7 @@ std::string expr2ct::convert_rec(
         else
           dest+=", ";
 
-        if(p.get_identifier().empty())
-          dest += convert(p.type());
-        else
-        {
-          std::string arg_declarator =
-            convert(symbol_exprt(p.get_identifier(), p.type()));
-          dest += convert_rec(p.type(), c_qualifierst(), arg_declarator);
-        }
+        dest += convert(p.type());
       }
 
       if(code_type.has_ellipsis())
