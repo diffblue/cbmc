@@ -250,7 +250,7 @@ bool bmc_covert::operator()()
 
   status() << "Running " << solver.decision_procedure_text() << eom;
 
-  cover_goals();
+  cover_goals(get_message_handler());
 
   {
     auto solver_stop=std::chrono::steady_clock::now();

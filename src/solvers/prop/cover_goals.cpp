@@ -11,6 +11,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "cover_goals.h"
 
+#include <util/message.h>
+
 #include "literal_expr.h"
 #include "prop_conv.h"
 
@@ -69,7 +71,8 @@ void cover_goalst::freeze_goal_variables()
 }
 
 /// Try to cover all goals
-decision_proceduret::resultt cover_goalst::operator()()
+decision_proceduret::resultt cover_goalst::
+operator()(message_handlert &message_handler)
 {
   _iterations=_number_covered=0;
 
@@ -98,8 +101,11 @@ decision_proceduret::resultt cover_goalst::operator()()
       break;
 
     default:
-      error() << "decision procedure has failed" << eom;
+    {
+      messaget log(message_handler);
+      log.error() << "decision procedure has failed" << messaget::eom;
       return dec_result;
+    }
     }
   }
   while(dec_result==decision_proceduret::resultt::D_SATISFIABLE &&
