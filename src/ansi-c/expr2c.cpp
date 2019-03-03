@@ -485,21 +485,21 @@ std::string expr2ct::convert_rec(
     }
     else
     {
-      for(code_typet::parameterst::const_iterator
-          it=parameters.begin();
-          it!=parameters.end();
-          it++)
+      bool first = true;
+      for(const auto &p : parameters)
       {
-        if(it!=parameters.begin())
+        if(first)
+          first = false;
+        else
           dest+=", ";
 
-        if(it->get_identifier().empty())
-          dest+=convert(it->type());
+        if(p.get_identifier().empty())
+          dest += convert(p.type());
         else
         {
-          std::string arg_declarator=
-            convert(symbol_exprt(it->get_identifier(), it->type()));
-          dest+=convert_rec(it->type(), c_qualifierst(), arg_declarator);
+          std::string arg_declarator =
+            convert(symbol_exprt(p.get_identifier(), p.type()));
+          dest += convert_rec(p.type(), c_qualifierst(), arg_declarator);
         }
       }
 
