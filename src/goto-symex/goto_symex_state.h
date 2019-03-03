@@ -150,9 +150,6 @@ public:
   symex_level0t level0;
   symex_level1t level1;
 
-  // Symex renaming levels.
-  enum levelt { L0=0, L1=1, L2=2 };
-
   /// Rewrites symbol expressions in \ref exprt, applying a suffix to each
   /// symbol reflecting its most recent version, which differs depending on
   /// which level you requested. Each level also updates its predecessors, so

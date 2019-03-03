@@ -405,8 +405,8 @@ static void locality(
       it++)
   {
     // get L0 name
-    ssa_exprt ssa = state.rename_ssa<goto_symex_statet::L0>(
-      ssa_exprt{ns.lookup(*it).symbol_expr()}, ns);
+    ssa_exprt ssa =
+      state.rename_ssa<L0>(ssa_exprt{ns.lookup(*it).symbol_expr()}, ns);
     const irep_idt l0_name=ssa.get_identifier();
 
     // save old L1 name for popping the frame
@@ -428,8 +428,7 @@ static void locality(
     // identifiers may be shared among functions
     // (e.g., due to inlining or other code restructuring)
 
-    ssa_exprt ssa_l1 =
-      state.rename_ssa<goto_symex_statet::L1>(std::move(ssa), ns);
+    ssa_exprt ssa_l1 = state.rename_ssa<L1>(std::move(ssa), ns);
 
     irep_idt l1_name = ssa_l1.get_identifier();
     unsigned offset=0;

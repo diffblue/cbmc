@@ -17,18 +17,18 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 #include "goto_symex_state.h"
 
-void symex_level0t::
-operator()(ssa_exprt &ssa_expr, const namespacet &ns, unsigned thread_nr) const
+renamedt<ssa_exprt, L0> symex_level0t::
+operator()(ssa_exprt ssa_expr, const namespacet &ns, unsigned thread_nr) const
 {
   // already renamed?
   if(!ssa_expr.get_level_0().empty())
-    return;
+    return renamedt<ssa_exprt, L0>{std::move(ssa_expr)};
 
   const irep_idt &obj_identifier = ssa_expr.get_object_name();
 
   // guards are not L0-renamed
   if(obj_identifier == goto_symex_statet::guard_identifier())
-    return;
+    return renamedt<ssa_exprt, L0>{std::move(ssa_expr)};
 
   const symbolt *s;
   const bool found_l0 = !ns.lookup(obj_identifier, s);
@@ -36,26 +36,35 @@ operator()(ssa_exprt &ssa_expr, const namespacet &ns, unsigned thread_nr) const
 
   // don't rename shared variables or functions
   if(s->type.id() == ID_code || s->is_shared())
-    return;
+    return renamedt<ssa_exprt, L0>{std::move(ssa_expr)};
 
   // rename!
   ssa_expr.set_level_0(thread_nr);
+  return renamedt<ssa_exprt, L0>{ssa_expr};
 }
 
-void symex_level1t::operator()(ssa_exprt &ssa_expr) const
+renamedt<ssa_exprt, L1> symex_level1t::
+operator()(renamedt<ssa_exprt, L0> l0_expr) const
 {
-  // already renamed?
-  if(!ssa_expr.get_level_1().empty())
-    return;
+  if(!l0_expr.get().get_level_1().empty())
+    return renamedt<ssa_exprt, L1>{std::move(l0_expr.value)};
 
-  const irep_idt l0_name = ssa_expr.get_l1_object_identifier();
+  const irep_idt l0_name = l0_expr.get().get_l1_object_identifier();
 
   const auto it = current_names.find(l0_name);
   if(it == current_names.end())
-    return;
+    return renamedt<ssa_exprt, L1>{std::move(l0_expr.value)};
 
   // rename!
-  ssa_expr.set_level_1(it->second.second);
+  l0_expr.value.set_level_1(it->second.second);
+  return renamedt<ssa_exprt, L1>{std::move(l0_expr.value)};
+}
+
+renamedt<ssa_exprt, L2> symex_level2t::
+operator()(renamedt<ssa_exprt, L1> l1_expr) const
+{
+  l1_expr.value.set_level_2(current_count(l1_expr.get().get_identifier()));
+  return renamedt<ssa_exprt, L2>{std::move(l1_expr.value)};
 }
 
 void symex_level1t::restore_from(

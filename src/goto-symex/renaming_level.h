@@ -18,6 +18,14 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <util/irep.h>
 #include <util/ssa_expr.h>
 
+/// Symex renaming level names.
+enum levelt
+{
+  L0 = 0,
+  L1 = 1,
+  L2 = 2
+};
+
 /// Wrapper for a \c current_names map, which maps each identifier to an SSA
 /// expression and a counter.
 /// This is extended by the different symex_level structures which are used
@@ -51,13 +59,44 @@ struct symex_renaming_levelt
   }
 };
 
+/// Wrapper for expressions or types which have been renamed up to a given
+/// \p level
+template <typename underlyingt, levelt level>
+class renamedt
+{
+public:
+  static_assert(
+    std::is_base_of<exprt, underlyingt>::value ||
+      std::is_base_of<typet, underlyingt>::value,
+    "underlyingt should inherit from exprt or typet");
+
+  const underlyingt &get() const
+  {
+    return value;
+  }
+
+private:
+  underlyingt value;
+
+  friend struct symex_level0t;
+  friend struct symex_level1t;
+  friend struct symex_level2t;
+
+  /// Only symex_levelXt classes can create renamedt objects
+  explicit renamedt(underlyingt value) : value(std::move(value))
+  {
+  }
+};
+
 /// Functor to set the level 0 renaming of SSA expressions.
 /// Level 0 corresponds to threads.
 /// The renaming is built for one particular interleaving.
 struct symex_level0t : public symex_renaming_levelt
 {
-  void operator()(ssa_exprt &ssa_expr, const namespacet &ns, unsigned thread_nr)
-    const;
+  renamedt<ssa_exprt, L0> operator()(
+    ssa_exprt ssa_expr,
+    const namespacet &ns,
+    unsigned thread_nr) const;
 
   symex_level0t() = default;
   ~symex_level0t() override = default;
@@ -68,7 +107,7 @@ struct symex_level0t : public symex_renaming_levelt
 /// This is to preserve locality in case of recursion
 struct symex_level1t : public symex_renaming_levelt
 {
-  void operator()(ssa_exprt &ssa_expr) const;
+  renamedt<ssa_exprt, L1> operator()(renamedt<ssa_exprt, L0> l0_expr) const;
 
   /// Insert the content of \p other into this renaming
   void restore_from(const current_namest &other);
@@ -82,6 +121,8 @@ struct symex_level1t : public symex_renaming_levelt
 /// This is to ensure each variable is only assigned once.
 struct symex_level2t : public symex_renaming_levelt
 {
+  renamedt<ssa_exprt, L2> operator()(renamedt<ssa_exprt, L1> l1_expr) const;
+
   symex_level2t() = default;
   ~symex_level2t() override = default;
 };
