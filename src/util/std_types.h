@@ -801,6 +801,7 @@ public:
     // The following for methods will go away;
     // these should not be part of the signature of a function,
     // but rather part of the body.
+    DEPRECATED("Use goto_functiont::parameter_identifiers instead")
     void set_identifier(const irep_idt &identifier)
     {
       set(ID_C_identifier, identifier);
@@ -811,6 +812,7 @@ public:
       set(ID_C_base_name, name);
     }
 
+    DEPRECATED("Use goto_functiont::parameter_identifiers instead")
     const irep_idt &get_identifier() const
     {
       return get(ID_C_identifier);
