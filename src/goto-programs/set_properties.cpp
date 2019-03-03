@@ -109,8 +109,7 @@ void set_properties(
   property_set.insert(properties.begin(), properties.end());
 
   Forall_goto_functions(it, goto_functions)
-    if(!it->second.is_inlined())
-      set_properties(it->second.body, property_set);
+    set_properties(it->second.body, property_set);
 
   if(!property_set.empty())
     throw invalid_command_line_argument_exceptiont(
