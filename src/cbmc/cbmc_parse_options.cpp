@@ -608,69 +608,60 @@ int cbmc_parse_optionst::doit()
   std::unique_ptr<goto_verifiert> verifier = nullptr;
 
   if(
-    !options.is_set("cover") && !options.get_bool_option("dimacs") &&
-    options.get_option("outfile").empty())
+    options.get_bool_option("stop-on-fail") && options.get_bool_option("paths"))
   {
-    if(options.get_bool_option("stop-on-fail"))
+    verifier =
+      util_make_unique<stop_on_fail_verifiert<single_path_symex_checkert>>(
+        options, ui_message_handler, goto_model);
+  }
+  else if(
+    options.get_bool_option("stop-on-fail") &&
+    !options.get_bool_option("paths"))
+  {
+    if(options.get_bool_option("localize-faults"))
     {
-      if(options.get_bool_option("paths"))
-      {
-        verifier =
-          util_make_unique<stop_on_fail_verifiert<single_path_symex_checkert>>(
-            options, ui_message_handler, goto_model);
-      }
-      else
-      {
-        if(options.get_bool_option("localize-faults"))
-        {
-          verifier =
-            util_make_unique<stop_on_fail_verifier_with_fault_localizationt<
-              multi_path_symex_checkert>>(
-              options, ui_message_handler, goto_model);
-        }
-        else
-        {
-          verifier =
-            util_make_unique<stop_on_fail_verifiert<multi_path_symex_checkert>>(
-              options, ui_message_handler, goto_model);
-        }
-      }
+      verifier =
+        util_make_unique<stop_on_fail_verifier_with_fault_localizationt<
+          multi_path_symex_checkert>>(options, ui_message_handler, goto_model);
     }
     else
     {
-      if(options.get_bool_option("paths"))
-      {
-        verifier = util_make_unique<all_properties_verifier_with_trace_storaget<
-          single_path_symex_checkert>>(options, ui_message_handler, goto_model);
-      }
-      else
-      {
-        if(options.get_bool_option("localize-faults"))
-        {
-          verifier =
-            util_make_unique<all_properties_verifier_with_fault_localizationt<
-              multi_path_symex_checkert>>(
-              options, ui_message_handler, goto_model);
-        }
-        else
-        {
-          verifier =
-            util_make_unique<all_properties_verifier_with_trace_storaget<
-              multi_path_symex_checkert>>(
-              options, ui_message_handler, goto_model);
-        }
-      }
+      verifier =
+        util_make_unique<stop_on_fail_verifiert<multi_path_symex_checkert>>(
+          options, ui_message_handler, goto_model);
     }
   }
-
-  // fall back until everything has been ported to goto-checker
-  if(verifier == nullptr)
+  else if(
+    !options.get_bool_option("stop-on-fail") &&
+    options.get_bool_option("paths"))
   {
-    return bmct::do_language_agnostic_bmc(
-      options, goto_model, ui_message_handler);
+    verifier = util_make_unique<
+      all_properties_verifier_with_trace_storaget<single_path_symex_checkert>>(
+      options, ui_message_handler, goto_model);
+  }
+  else if(
+    !options.get_bool_option("stop-on-fail") &&
+    !options.get_bool_option("paths"))
+  {
+    if(options.get_bool_option("localize-faults"))
+    {
+      verifier =
+        util_make_unique<all_properties_verifier_with_fault_localizationt<
+          multi_path_symex_checkert>>(options, ui_message_handler, goto_model);
+    }
+    else
+    {
+      verifier = util_make_unique<
+        all_properties_verifier_with_trace_storaget<multi_path_symex_checkert>>(
+        options, ui_message_handler, goto_model);
+    }
+  }
+  else
+  {
+    UNREACHABLE;
   }
 
-  resultt result = (*verifier)();
+  const resultt result = (*verifier)();
   verifier->report();
 
   return result_to_exit_code(result);
