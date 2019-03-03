@@ -818,10 +818,7 @@ exprt smt2_parsert::function_application()
           if(id_it->second.type.id()==ID_mathematical_function)
           {
             return function_application_exprt(
-              symbol_exprt(final_id, id_it->second.type),
-              op,
-              to_mathematical_function_type(
-                id_it->second.type).codomain());
+              symbol_exprt(final_id, id_it->second.type), op);
           }
           else
             return symbol_exprt(final_id, id_it->second.type);

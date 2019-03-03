@@ -192,6 +192,7 @@ class function_application_exprt : public binary_exprt
 public:
   using argumentst = exprt::operandst;
 
+  DEPRECATED("use function_application_exprt(fkt, arg) instead")
   function_application_exprt(
     const symbol_exprt &_function,
     const argumentst &_arguments,
@@ -200,6 +201,10 @@ public:
   {
     arguments() = _arguments;
   }
+
+  function_application_exprt(
+    const symbol_exprt &_function,
+    argumentst _arguments);
 
   symbol_exprt &function()
   {
