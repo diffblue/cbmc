@@ -87,9 +87,17 @@ static bool read_bin_goto_object(
 
   for(std::size_t fct_index = 0; fct_index < count; ++fct_index)
   {
+    // read the function identifier
     irep_idt fname=irepconverter.read_gb_string(in);
     goto_functionst::goto_functiont &f = functions.function_map[fname];
 
+    // read the parameter idenntifiers
+    const std::size_t param_count = irepconverter.read_gb_word(in); // # parameters
+    f.parameter_identifiers.reserve(param_count);
+    for(std::size_t param_index = 0; param_index < param_count; param_index++)
+      f.parameter_identifiers.push_back(irepconverter.read_string_ref(in));
+
+    // now read the instructions
     typedef std::map<goto_programt::targett, std::list<unsigned> > target_mapt;
     target_mapt target_map;
     typedef std::map<unsigned, goto_programt::targett> rev_target_mapt;

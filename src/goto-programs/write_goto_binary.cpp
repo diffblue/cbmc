@@ -90,6 +90,11 @@ bool write_goto_binary(
       // instead they are saved in a custom binary format
 
       write_gb_string(out, id2string(fct.first)); // name
+
+      write_gb_word(out, fct.second.parameter_identifiers.size()); // # parameters
+      for(const auto &id : fct.second.parameter_identifiers)
+        irepconverter.write_string_ref(out, id);
+
       write_gb_word(out, fct.second.body.instructions.size()); // # instructions
 
       forall_goto_program_instructions(i_it, fct.second.body)
