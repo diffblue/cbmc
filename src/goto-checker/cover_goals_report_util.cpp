@@ -90,22 +90,28 @@ static void output_goals_json(
     log.status() << messaget::eom; // force end of previous message
   json_stream_objectt &json_result =
     ui_message_handler.get_json_stream().push_back_stream_object();
+  json_stream_arrayt &goals_array = json_result.push_back_stream_array("goals");
   for(const auto &property_pair : properties)
   {
     const property_infot &property_info = property_pair.second;
 
-    json_result["status"] = json_stringt(
+    json_objectt json_goal;
+    json_goal["status"] = json_stringt(
       property_info.status == property_statust::FAIL ? "satisfied" : "failed");
-    json_result["goal"] = json_stringt(property_pair.first);
-    json_result["description"] = json_stringt(property_info.description);
+    json_goal["goal"] = json_stringt(property_pair.first);
+    json_goal["description"] = json_stringt(property_info.description);
 
     if(property_info.pc->source_location.is_not_nil())
-      json_result["sourceLocation"] = json(property_info.pc->source_location);
+      json_goal["sourceLocation"] = json(property_info.pc->source_location);
+
+    goals_array.push_back(std::move(json_goal));
   }
-  json_result["totalGoals"] = json_numbert(std::to_string(properties.size()));
   const std::size_t goals_covered =
     count_properties(properties, property_statust::FAIL);
-  json_result["goalsCovered"] = json_numbert(std::to_string(goals_covered));
+  json_result.push_back(
+    "goalsCovered", json_numbert(std::to_string(goals_covered)));
+  json_result.push_back(
+    "totalGoals", json_numbert(std::to_string(properties.size())));
 }
 
 void output_goals(
