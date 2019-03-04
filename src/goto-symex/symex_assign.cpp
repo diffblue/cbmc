@@ -65,7 +65,7 @@ void goto_symext::symex_assign(statet &state, const code_assignt &code)
       assignment_type=symex_targett::assignment_typet::HIDDEN;
 
     // We hide if we are in a hidden function.
-    if(state.top().hidden_function)
+    if(state.call_stack().top().hidden_function)
       assignment_type=symex_targett::assignment_typet::HIDDEN;
 
     // We hide if we are executing a hidden instruction.

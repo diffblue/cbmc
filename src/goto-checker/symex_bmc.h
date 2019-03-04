@@ -42,7 +42,7 @@ public:
   /// enforced. They return true to halt unwinding, false to authorise
   /// unwinding, or Unknown to indicate they have no opinion.
   typedef std::function<
-    tvt(const goto_symex_statet::call_stackt &, unsigned, unsigned, unsigned &)>
+    tvt(const call_stackt &, unsigned, unsigned, unsigned &)>
     loop_unwind_handlert;
 
   /// Recursion unwind handlers take the function ID, the unwind count so far,
@@ -98,7 +98,7 @@ protected:
 
   bool should_stop_unwind(
     const symex_targett::sourcet &source,
-    const goto_symex_statet::call_stackt &context,
+    const call_stackt &context,
     unsigned unwind) override;
 
   bool get_unwind_recursion(

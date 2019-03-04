@@ -105,7 +105,7 @@ void symex_bmct::merge_goto(goto_statet &&goto_state, statet &state)
 
 bool symex_bmct::should_stop_unwind(
   const symex_targett::sourcet &source,
-  const goto_symex_statet::call_stackt &context,
+  const call_stackt &context,
   unsigned unwind)
 {
   const irep_idt id = goto_programt::loop_id(source.function_id, *source.pc);

@@ -124,7 +124,7 @@ void goto_symext::parameter_assignments(
       assignment_typet assignment_type;
 
       // We hide if we are in a hidden function.
-      if(state.top().hidden_function)
+      if(state.call_stack().top().hidden_function)
         assignment_type =
           symex_targett::assignment_typet::HIDDEN_ACTUAL_PARAMETER;
       else
@@ -243,10 +243,10 @@ void goto_symext::symex_function_call_code(
   if(emplace_safe_pointers_result.second)
     emplace_safe_pointers_result.first->second(goto_function.body);
 
-  const bool stop_recursing=get_unwind_recursion(
+  const bool stop_recursing = get_unwind_recursion(
     identifier,
     state.source.thread_nr,
-    state.top().loop_iterations[identifier].count);
+    state.call_stack().top().loop_iterations[identifier].count);
 
   // see if it's too much
   if(stop_recursing)
@@ -274,7 +274,8 @@ void goto_symext::symex_function_call_code(
     a = state.rename(std::move(a), ns);
 
   // we hide the call if the caller and callee are both hidden
-  const bool hidden = state.top().hidden_function && goto_function.is_hidden();
+  const bool hidden =
+    state.call_stack().top().hidden_function && goto_function.is_hidden();
 
   // record the call
   target.function_call(
@@ -302,7 +303,7 @@ void goto_symext::symex_function_call_code(
 
   // produce a new frame
   PRECONDITION(!state.call_stack().empty());
-  framet &frame = state.new_frame();
+  framet &frame = state.call_stack().new_frame(state.source);
 
   // preserve locality of local variables
   locality(identifier, state, goto_function, ns);
@@ -315,7 +316,7 @@ void goto_symext::symex_function_call_code(
   frame.function_identifier=identifier;
   frame.hidden_function=goto_function.is_hidden();
 
-  const framet &p_frame = state.previous_frame();
+  const framet &p_frame = state.call_stack().previous_frame();
   for(const auto &pair : p_frame.loop_iterations)
   {
     if(pair.second.is_recursion)
@@ -336,7 +337,7 @@ static void pop_frame(goto_symext::statet &state)
   PRECONDITION(!state.call_stack().empty());
 
   {
-    framet &frame = state.top();
+    const framet &frame = state.call_stack().top();
 
     // restore program counter
     symex_transition(state, frame.calling_location.pc, false);
@@ -365,13 +366,13 @@ static void pop_frame(goto_symext::statet &state)
     }
   }
 
-  state.pop_frame();
+  state.call_stack().pop();
 }
 
 /// do function call by inlining
 void goto_symext::symex_end_of_function(statet &state)
 {
-  const bool hidden = state.top().hidden_function;
+  const bool hidden = state.call_stack().top().hidden_function;
 
   // first record the return
   target.function_return(
@@ -397,7 +398,7 @@ static void locality(
 
   get_local_identifiers(goto_function, local_identifiers);
 
-  framet &frame = state.top();
+  framet &frame = state.call_stack().top();
 
   for(std::set<irep_idt>::const_iterator
       it=local_identifiers.begin();

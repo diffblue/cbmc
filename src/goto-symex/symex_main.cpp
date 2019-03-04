@@ -53,7 +53,7 @@ void symex_transition(
     // 1. the transition from state.source.pc to "to" is not a backwards goto
     // or
     // 2. we are arriving from an outer loop
-    framet &frame = state.top();
+    framet &frame = state.call_stack().top();
     const goto_programt::instructiont &instruction=*to;
     for(const auto &i_e : instruction.incoming_edges)
       if(i_e->is_goto() && i_e->is_backwards_goto() &&
@@ -257,7 +257,7 @@ void goto_symext::symex_with_state(
   // as state.symbol_table might go out of scope
   reset_namespacet reset_ns(ns);
 
-  PRECONDITION(state.top().end_of_function->is_end_function());
+  PRECONDITION(state.call_stack().top().end_of_function->is_end_function());
 
   symex_threaded_step(state, get_goto_function);
   if(should_pause_symex)
@@ -323,9 +323,10 @@ std::unique_ptr<goto_symext::statet> goto_symext::initialize_entry_point_state(
 
   goto_programt::const_targett limit =
     std::prev(start_function->body.instructions.end());
-  state->top().end_of_function = limit;
-  state->top().calling_location.pc = state->top().end_of_function;
-  state->top().hidden_function = start_function->is_hidden();
+  state->call_stack().top().end_of_function = limit;
+  state->call_stack().top().calling_location.pc =
+    state->call_stack().top().end_of_function;
+  state->call_stack().top().hidden_function = start_function->is_hidden();
 
   state->symex_target = &target;
 

@@ -18,7 +18,7 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 #include <util/threeval.h>
 
 tvt java_enum_static_init_unwind_handler(
-  const goto_symex_statet::call_stackt &context,
+  const call_stackt &context,
   unsigned loop_number,
   unsigned unwind_count,
   unsigned &unwind_max,

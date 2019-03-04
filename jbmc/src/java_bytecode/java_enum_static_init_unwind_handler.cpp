@@ -24,8 +24,7 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 /// \param context: the current call stack
 /// \return the name of an enclosing function that may be defined on the
 ///   relevant enum type, or an empty string if we don't find one.
-static irep_idt
-find_enum_function_on_stack(const goto_symex_statet::call_stackt &context)
+static irep_idt find_enum_function_on_stack(const call_stackt &context)
 {
   static irep_idt reference_array_clone_id =
     "java::array[reference].clone:()Ljava/lang/Object;";
@@ -64,7 +63,7 @@ find_enum_function_on_stack(const goto_symex_statet::call_stackt &context)
 ///   unwind_count is <= the enumeration size, or unknown (defer / no decision)
 ///   otherwise.
 tvt java_enum_static_init_unwind_handler(
-  const goto_symex_statet::call_stackt &context,
+  const call_stackt &context,
   unsigned loop_number,
   unsigned unwind_count,
   unsigned &unwind_max,
