@@ -170,8 +170,8 @@ optionalt<T> type_try_dynamic_cast(TType &&base)
   static_assert(!std::is_const<TType>::value, "Attempted to move from const.");
   if(!can_cast_type<T>(base))
     return {};
+  TType::check(base);
   optionalt<T> ret{static_cast<T &&>(base)};
-  validate_type(*ret);
   return ret;
 }
 

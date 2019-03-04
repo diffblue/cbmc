@@ -1130,7 +1130,8 @@ public:
     const typet &type,
     const validation_modet vm = validation_modet::INVARIANT)
   {
-    DATA_CHECK(!type.get(ID_width).empty(), "bitvector type must have width");
+    DATA_CHECK(
+      vm, !type.get(ID_width).empty(), "bitvector type must have width");
   }
 };
 
@@ -1241,7 +1242,7 @@ public:
     const validation_modet vm = validation_modet::INVARIANT)
   {
     DATA_CHECK(
-      !type.get(ID_width).empty(), "signed bitvector type must have width");
+      vm, !type.get(ID_width).empty(), "signed bitvector type must have width");
   }
 };
 
@@ -1305,7 +1306,7 @@ public:
     const validation_modet vm = validation_modet::INVARIANT)
   {
     DATA_CHECK(
-      !type.get(ID_width).empty(), "fixed bitvector type must have width");
+      vm, !type.get(ID_width).empty(), "fixed bitvector type must have width");
   }
 };
 
@@ -1367,7 +1368,7 @@ public:
     const validation_modet vm = validation_modet::INVARIANT)
   {
     DATA_CHECK(
-      !type.get(ID_width).empty(), "float bitvector type must have width");
+      vm, !type.get(ID_width).empty(), "float bitvector type must have width");
   }
 };
 
@@ -1469,7 +1470,7 @@ public:
     const typet &type,
     const validation_modet vm = validation_modet::INVARIANT)
   {
-    DATA_CHECK(!type.get(ID_width).empty(), "pointer must have width");
+    DATA_CHECK(vm, !type.get(ID_width).empty(), "pointer must have width");
   }
 };
 
@@ -1567,7 +1568,7 @@ public:
     const typet &type,
     const validation_modet vm = validation_modet::INVARIANT)
   {
-    DATA_CHECK(!type.get(ID_width).empty(), "C bool type must have width");
+    DATA_CHECK(vm, !type.get(ID_width).empty(), "C bool type must have width");
   }
 };
 
