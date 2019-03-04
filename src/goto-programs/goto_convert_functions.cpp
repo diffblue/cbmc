@@ -141,36 +141,55 @@ void goto_convert_functionst::convert_function(
   const irep_idt &identifier,
   goto_functionst::goto_functiont &f)
 {
-  const symbolt &symbol=ns.lookup(identifier);
-  const irep_idt mode = symbol.mode;
-
   if(f.body_available())
     return; // already converted
 
-  // make tmp variables local to function
-  tmp_symbol_prefix=id2string(symbol.name)+"::$tmp";
-
-  // store the parameter identifiers in the goto functions
+  // copy the method signature
+  const symbolt &symbol = ns.lookup(identifier);
   const code_typet &code_type = to_code_type(symbol.type);
   f.type = code_type;
-  f.set_parameter_identifiers(code_type);
 
-  if(symbol.value.is_nil() ||
-     symbol.is_compiled()) /* goto_inline may have removed the body */
+  if(
+    symbol.value.is_nil() ||
+    symbol.is_compiled()) /* goto_inline may have removed the body */
+  {
     return;
+  }
+
+  const irep_idt mode = symbol.mode;
+
+  // make tmp variables local to function
+  tmp_symbol_prefix = id2string(symbol.name) + "::$tmp";
 
   lifetimet parent_lifetime = lifetime;
   lifetime = identifier == INITIALIZE_FUNCTION ? lifetimet::STATIC_GLOBAL
                                                : lifetimet::AUTOMATIC_LOCAL;
 
-  const codet &code=to_code(symbol.value);
+  const auto &code = to_code(symbol.value);
 
   source_locationt end_location;
 
-  if(code.get_statement()==ID_block)
-    end_location=to_code_block(code).end_location();
+  // distinguish the case of a given code_function_body and the legacy
+  // way of passing the parameter identifiers; the latter will go away
+  if(code.get_statement() == ID_function_body)
+  {
+    const auto &body = to_code_function_body(to_code(symbol.value));
+
+    // set the parameter identifiers
+    f.parameter_identifiers = body.get_parameter_identifiers();
+
+    end_location = body.block().end_location();
+  }
   else
-    end_location.make_nil();
+  {
+    // set the parameter identifiers
+    f.set_parameter_identifiers(code_type);
+
+    if(code.id() == ID_block)
+      end_location = to_code_block(code).end_location();
+    else
+      end_location = code.source_location();
+  }
 
   goto_programt tmp_end_function;
   goto_programt::targett end_function=tmp_end_function.add_instruction();
@@ -184,7 +203,10 @@ void goto_convert_functionst::convert_function(
     f.type.return_type().id()!=ID_constructor &&
     f.type.return_type().id()!=ID_destructor;
 
-  goto_convert_rec(code, f.body, mode);
+  if(code.get_statement() == ID_function_body)
+    goto_convert_rec(to_code_function_body(code).block(), f.body, mode);
+  else
+    goto_convert_rec(code, f.body, mode);
 
   // add non-det return value, if needed
   if(targets.has_return_value)

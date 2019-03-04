@@ -503,9 +503,10 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
 
 void c_typecheck_baset::typecheck_function_body(symbolt &symbol)
 {
-  code_typet &code_type=to_code_type(symbol.type);
+  const code_typet &code_type = to_code_type(symbol.type);
 
-  assert(symbol.value.is_not_nil());
+  PRECONDITION(symbol.value.id() == ID_code);
+  PRECONDITION(to_code(symbol.value).get_statement() == ID_block);
 
   // reset labels
   labels_used.clear();
@@ -519,21 +520,24 @@ void c_typecheck_baset::typecheck_function_body(symbolt &symbol)
 
   unsigned anon_counter=0;
 
+  std::vector<irep_idt> parameter_identifiers;
+  parameter_identifiers.reserve(code_type.parameters().size());
+
   // Add the parameter declarations into the symbol table.
-  for(auto &p : code_type.parameters())
+  for(const auto &p : code_type.parameters())
   {
+    irep_idt base_name;
+
     // may be anonymous
     if(p.get_base_name().empty())
-    {
-      irep_idt base_name="#anon"+std::to_string(anon_counter++);
-      p.set_base_name(base_name);
-    }
+      base_name = "#anon" + std::to_string(anon_counter++);
+    else
+      base_name = p.get_base_name();
 
     // produce identifier
-    irep_idt base_name = p.get_base_name();
-    irep_idt identifier=id2string(symbol.name)+"::"+id2string(base_name);
-
-    p.set_identifier(identifier);
+    const irep_idt identifier =
+      id2string(symbol.name) + "::" + id2string(base_name);
+    parameter_identifiers.push_back(identifier);
 
     parameter_symbolt p_symbol;
 
@@ -560,6 +564,12 @@ void c_typecheck_baset::typecheck_function_body(symbolt &symbol)
       throw 0;
     }
   }
+
+  // now produce function body, which is code plus parameter identifiers
+  code_function_bodyt code_function_body(
+    parameter_identifiers, std::move(to_code_block(to_code(symbol.value))));
+
+  symbol.value = std::move(code_function_body);
 }
 
 void c_typecheck_baset::apply_asm_label(
