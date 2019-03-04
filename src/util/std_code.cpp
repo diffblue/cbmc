@@ -145,3 +145,25 @@ code_blockt create_fatal_assertion(
 
   return result;
 }
+
+std::vector<irep_idt> code_function_bodyt::get_parameter_identifiers() const
+{
+  const auto &sub = find(ID_parameters).get_sub();
+  std::vector<irep_idt> result;
+  result.reserve(sub.size());
+  for(const auto &s : sub)
+    result.push_back(s.get(ID_identifier));
+  return result;
+}
+
+void code_function_bodyt::set_parameter_identifiers(
+  const std::vector<irep_idt> &parameter_identifiers)
+{
+  auto &sub = add(ID_parameters).get_sub();
+  sub.reserve(parameter_identifiers.size());
+  for(const auto &id : parameter_identifiers)
+  {
+    sub.push_back(irept(ID_parameter));
+    sub.back().set(ID_identifier, id);
+  }
+}
