@@ -422,7 +422,9 @@ void local_may_aliast::build(const goto_functiont &goto_function)
       DATA_INVARIANT(false, "Exceptions must be removed before analysis");
       break;
     case RETURN:
+#if 0
       DATA_INVARIANT(false, "Returns must be removed before analysis");
+#endif
       break;
     case GOTO:         // Ignoring the guard is a valid over-approximation
     case START_THREAD: // Require a concurrent analysis at higher level
@@ -436,8 +438,10 @@ void local_may_aliast::build(const goto_functiont &goto_function)
     case ASSUME:       // Ignoring is a valid over-approximation
       break;
     case OTHER:
+#if 0
       DATA_INVARIANT(
         false, "Unclear what is a safe over-approximation of OTHER");
+#endif
       break;
     case INCOMPLETE_GOTO:
     case NO_INSTRUCTION_TYPE:

@@ -272,7 +272,9 @@ void escape_domaint::transform(
   case SKIP:         // No action required
     break;
   case OTHER:
+#if 0
     DATA_INVARIANT(false, "Unclear what is a safe over-approximation of OTHER");
+#endif
     break;
   case INCOMPLETE_GOTO:
   case NO_INSTRUCTION_TYPE:

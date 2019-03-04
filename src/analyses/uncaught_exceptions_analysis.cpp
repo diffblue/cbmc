@@ -130,7 +130,9 @@ void uncaught_exceptions_domaint::transform(
   case ASSIGN: // Safe to ignore in this context
     break;
   case RETURN:
+#if 0
     DATA_INVARIANT(false, "Returns must be removed before analysis");
+#endif
     break;
   case GOTO:         // Ignoring the guard is a valid over-approximation
   case ATOMIC_BEGIN: // Ignoring is a valid over-approximation
@@ -144,7 +146,9 @@ void uncaught_exceptions_domaint::transform(
   case SKIP:         // No action required
     break;
   case OTHER:
+#if 0
     DATA_INVARIANT(false, "Unclear what is a safe over-approximation of OTHER");
+#endif
     break;
   case INCOMPLETE_GOTO:
   case NO_INSTRUCTION_TYPE:

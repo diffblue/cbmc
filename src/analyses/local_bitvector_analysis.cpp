@@ -310,11 +310,15 @@ void local_bitvector_analysist::build()
 
     case CATCH:
     case THROW:
+#if 0
       DATA_INVARIANT(false, "Exceptions must be removed before analysis");
       break;
+#endif
     case RETURN:
+#if 0
       DATA_INVARIANT(false, "Returns must be removed before analysis");
       break;
+#endif
     case ATOMIC_BEGIN: // Ignoring is a valid over-approximation
     case ATOMIC_END:   // Ignoring is a valid over-approximation
     case LOCATION:     // No action required
@@ -327,8 +331,10 @@ void local_bitvector_analysist::build()
     case END_FUNCTION: // No action required
       break;
     case OTHER:
+#if 0
       DATA_INVARIANT(
         false, "Unclear what is a safe over-approximation of OTHER");
+#endif
       break;
     case INCOMPLETE_GOTO:
     case NO_INSTRUCTION_TYPE:
