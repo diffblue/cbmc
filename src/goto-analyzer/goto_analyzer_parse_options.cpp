@@ -40,6 +40,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/set_properties.h>
 #include <goto-programs/show_properties.h>
 #include <goto-programs/show_symbol_table.h>
+#include <goto-programs/validate_goto_model.h>
 
 #include <analyses/is_threaded.h>
 #include <analyses/goto_check.h>
@@ -405,7 +406,7 @@ int goto_analyzer_parse_optionst::doit()
 
   if(cmdline.isset("validate-goto-model"))
   {
-    goto_model.validate(validation_modet::INVARIANT);
+    goto_model.validate();
   }
 
   // show it?

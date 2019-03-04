@@ -64,6 +64,7 @@ SRC = adjust_float_expressions.cpp \
       string_abstraction.cpp \
       string_instrumentation.cpp \
       system_library_symbols.cpp \
+      validate_goto_model.cpp \
       vcd_goto_trace.cpp \
       wp.cpp \
       write_goto_binary.cpp \

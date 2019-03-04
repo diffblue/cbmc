@@ -13,6 +13,7 @@ Author: Diffblue Ltd.
 #define CPROVER_GOTO_PROGRAMS_ABSTRACT_GOTO_MODEL_H
 
 #include "goto_functions.h"
+#include "validate_goto_model.h"
 #include <util/symbol_table.h>
 
 /// Abstract interface to eager or lazy GOTO models
@@ -54,7 +55,11 @@ public:
   ///
   /// The validation mode indicates whether well-formedness check failures are
   /// reported via DATA_INVARIANT violations or exceptions.
-  virtual void validate(const validation_modet vm) const = 0;
+  // virtual void validate(const validation_modet vm) const = 0;
+  virtual void validate(
+    const validation_modet vm,
+    const goto_model_validation_optionst &goto_model_validation_options)
+    const = 0;
 };
 
 #endif

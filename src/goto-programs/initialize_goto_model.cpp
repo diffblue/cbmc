@@ -194,7 +194,11 @@ goto_modelt initialize_goto_model(
 
   if(options.is_set("validate-goto-model"))
   {
-    goto_model.validate(validation_modet::EXCEPTION);
+    goto_model_validation_optionst goto_model_validation_options{
+      goto_model_validation_optionst ::set_optionst::all_false};
+
+    goto_model.validate(
+      validation_modet::INVARIANT, goto_model_validation_options);
   }
 
   // stupid hack

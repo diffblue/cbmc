@@ -35,6 +35,7 @@ Date: June 2006
 #include <goto-programs/goto_convert.h>
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/read_goto_binary.h>
+#include <goto-programs/validate_goto_model.h>
 #include <goto-programs/write_goto_binary.h>
 
 #include <langapi/language_file.h>
@@ -546,7 +547,7 @@ bool compilet::write_bin_object_file(
   if(validate_goto_model)
   {
     status() << "Validating goto model" << eom;
-    src_goto_model.validate(validation_modet::INVARIANT);
+    src_goto_model.validate();
   }
 
   statistics() << "Writing binary format object `"

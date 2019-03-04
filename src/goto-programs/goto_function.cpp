@@ -36,6 +36,15 @@ void get_local_identifiers(
 void goto_functiont::validate(const namespacet &ns, const validation_modet vm)
   const
 {
+  // function body must end with an END_FUNCTION instruction
+  if(body_available())
+  {
+    DATA_CHECK(
+      vm,
+      body.instructions.back().is_end_function(),
+      "last instruction should be of end function type");
+  }
+
   body.validate(ns, vm);
 
   find_symbols_sett typetags;

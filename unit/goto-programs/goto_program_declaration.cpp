@@ -8,9 +8,9 @@ Author: Diffblue Ltd.
 
 #include <testing-utils/use_catch.h>
 
-#include <goto-programs/goto_function.h>
-
 #include <util/arith_tools.h>
+
+#include <goto-programs/goto_function.h>
 
 SCENARIO(
   "Validation of well-formed declaration codes",

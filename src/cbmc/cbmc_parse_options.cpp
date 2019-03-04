@@ -53,24 +53,25 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/loop_ids.h>
 #include <goto-programs/mm_io.h>
 #include <goto-programs/read_goto_binary.h>
+#include <goto-programs/remove_complex.h>
 #include <goto-programs/remove_function_pointers.h>
 #include <goto-programs/remove_returns.h>
-#include <goto-programs/remove_vector.h>
-#include <goto-programs/remove_complex.h>
-#include <goto-programs/remove_unused_functions.h>
 #include <goto-programs/remove_skip.h>
+#include <goto-programs/remove_unused_functions.h>
+#include <goto-programs/remove_vector.h>
 #include <goto-programs/rewrite_union.h>
 #include <goto-programs/set_properties.h>
 #include <goto-programs/show_goto_functions.h>
-#include <goto-programs/show_symbol_table.h>
 #include <goto-programs/show_properties.h>
+#include <goto-programs/show_symbol_table.h>
 #include <goto-programs/string_abstraction.h>
 #include <goto-programs/string_instrumentation.h>
+#include <goto-programs/validate_goto_model.h>
 
-#include <goto-instrument/reachability_slicer.h>
+#include <goto-instrument/cover.h>
 #include <goto-instrument/full_slicer.h>
 #include <goto-instrument/nondet_static.h>
-#include <goto-instrument/cover.h>
+#include <goto-instrument/reachability_slicer.h>
 
 #include <goto-symex/path_storage.h>
 
@@ -550,7 +551,7 @@ int cbmc_parse_optionst::doit()
 
   if(cmdline.isset("validate-goto-model"))
   {
-    goto_model.validate(validation_modet::INVARIANT);
+    goto_model.validate();
   }
 
   if(
