@@ -2490,4 +2490,54 @@ inline code_try_catcht &to_code_try_catch(codet &code)
   return static_cast<code_try_catcht &>(code);
 }
 
+/// This class is used to interface between a language frontend
+/// and goto-convert -- it communicates the identifiers of the parameters
+/// of a function or method
+class code_function_bodyt : public codet
+{
+public:
+  explicit code_function_bodyt(
+    const std::vector<irep_idt> &parameter_identifiers,
+    code_blockt _block)
+    : codet(ID_function_body, {std::move(_block)})
+  {
+    set_parameter_identifiers(parameter_identifiers);
+  }
+
+  code_blockt &block()
+  {
+    return to_code_block(to_code(op0()));
+  }
+
+  const code_blockt &block() const
+  {
+    return to_code_block(to_code(op0()));
+  }
+
+  std::vector<irep_idt> get_parameter_identifiers() const;
+  void set_parameter_identifiers(const std::vector<irep_idt> &);
+
+protected:
+  using codet::op0;
+  using codet::op1;
+  using codet::op2;
+  using codet::op3;
+};
+
+inline const code_function_bodyt &to_code_function_body(const codet &code)
+{
+  PRECONDITION(code.get_statement() == ID_function_body);
+  DATA_INVARIANT(
+    code.operands().size() == 1, "code_function_body must have one operand");
+  return static_cast<const code_function_bodyt &>(code);
+}
+
+inline code_function_bodyt &to_code_function_body(codet &code)
+{
+  PRECONDITION(code.get_statement() == ID_function_body);
+  DATA_INVARIANT(
+    code.operands().size() == 1, "code_function_body must have one operand");
+  return static_cast<code_function_bodyt &>(code);
+}
+
 #endif // CPROVER_UTIL_STD_CODE_H
