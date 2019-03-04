@@ -215,7 +215,10 @@ void goto_convert_functionst::convert_function(
   f.body.update();
 
   if(hide(f.body))
+  {
     f.make_hidden();
+    symbol_table.get_writeable_ref(identifier).set_hidden();
+  }
 
   lifetime = parent_lifetime;
 }

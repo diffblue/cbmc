@@ -335,7 +335,8 @@ std::unique_ptr<goto_symext::statet> goto_symext::initialize_entry_point_state(
   state->call_stack().top().end_of_function = limit;
   state->call_stack().top().calling_location.pc =
     state->call_stack().top().end_of_function;
-  state->call_stack().top().hidden_function = start_function->is_hidden();
+  state->call_stack().top().hidden_function =
+    ns.lookup(entry_point_id).is_hidden();
 
   state->symex_target = &target;
 
