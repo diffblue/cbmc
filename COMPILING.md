@@ -34,14 +34,15 @@ We assume that you have a Debian/Ubuntu or Red Hat-like distribution.
    yum install gcc72-c++ flex bison perl-libwww-perl patch tar
    ```
 
-   To compile JBMC, you additionally need the JDK and Maven 3.
+   To compile JBMC, you additionally need the JDK and Maven 3. You also
+   need jq if you wish to run the entire test suite.
    On Debian-like distributions, do as root:
    ```
-   apt-get install openjdk-8-jdk maven
+   apt-get install openjdk-8-jdk maven jq
    ```
    On Red Hat/Fedora or derivates, do as root:
    ```
-   dnf install java-1.8.0-openjdk-devel maven
+   dnf install java-1.8.0-openjdk-devel maven jq
    ```
 
 2. As a user, get the CBMC source via
