@@ -186,6 +186,15 @@ inline void validate_expr(const factorial_power_exprt &value)
   validate_operands(value, 2, "Factorial power must have two operands");
 }
 
+class tuple_exprt : public multi_ary_exprt
+{
+public:
+  explicit tuple_exprt(exprt::operandst operands)
+    : multi_ary_exprt(ID_tuple, std::move(operands), typet())
+  {
+  }
+};
+
 /// \brief Application of (mathematical) function
 class function_application_exprt : public binary_exprt
 {
@@ -197,9 +206,12 @@ public:
     const symbol_exprt &_function,
     const argumentst &_arguments,
     const typet &_type)
-    : binary_exprt(_function, ID_function_application, exprt(), _type)
+    : binary_exprt(
+        _function,
+        ID_function_application,
+        tuple_exprt(_arguments),
+        _type)
   {
-    arguments() = _arguments;
   }
 
   function_application_exprt(

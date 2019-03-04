@@ -15,7 +15,7 @@ function_application_exprt::function_application_exprt(
   : binary_exprt(
       _function,
       ID_function_application,
-      multi_ary_exprt(irep_idt(), std::move(_arguments), typet()),
+      tuple_exprt(std::move(_arguments)),
       to_mathematical_function_type(_function.type()).codomain())
 {
   const auto &domain = to_mathematical_function_type(_function.type()).domain();
