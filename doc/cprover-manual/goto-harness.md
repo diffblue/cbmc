@@ -261,3 +261,52 @@ options.
 If you have a function that takes an array parameter, but without an associated
 size parameter, you can also use the `--treat-pointer-as-array <parameter-name>`
 option.
+
+---
+
+If you want to non-deterministically initialise a pointer
+as a C string (character array with last element `'\0'`)
+then you can do that like this:
+
+``` C
+// nondet_string.c
+
+#include <assert.h>
+
+void function(char *pointer, int size)
+{
+  assert(pointer[size-1] == '\0');
+}
+```
+
+Then call the following:
+
+```
+$ goto-cc -o nondet_string.gb nondet_string.c
+$ goto-harness \
+  --harness-function-name harness \
+  --harness-type call-function \
+  --function function \
+  --treat-pointer-as-cstring pointer \
+  --associated-array-size pointer:size \
+  nondet_string.gb nondet_string-mod.gb
+$ cbmc --function harness nondet_string-mod.gb
+```
+
+Note that C strings are supported by the same mechanism
+behind the non-deterministic initialisation of pointers
+and arrays, so the same command line arguments apply, in
+particular `--associated-array-size`.
+
+This will result in:
+
+```
+[...]
+
+** Results:
+main.c function function
+[function.assertion.1] line 5 assertion pointer[size-1] == '\0': SUCCESS
+
+** 0 of 1 failed (1 iterations)
+VERIFICATION SUCCESSFUL
+```

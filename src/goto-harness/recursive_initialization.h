@@ -32,6 +32,8 @@ struct recursive_initialization_configt
   std::set<irep_idt> variables_that_hold_array_sizes;
   std::map<irep_idt, irep_idt> array_name_to_associated_array_size_variable;
 
+  std::set<irep_idt> pointers_to_treat_as_cstrings;
+
   std::string to_string() const; // for debugging purposes
 };
 
@@ -81,12 +83,31 @@ private:
     std::size_t depth,
     const recursion_sett &known_tags,
     code_blockt &body);
+
+  using array_convertert = std::function<void(
+    const exprt &pointer,
+    std::size_t length,
+    std::size_t current_index,
+    std::size_t depth,
+    const recursion_sett &known_tags,
+    code_blockt &body)>;
+  array_convertert default_array_member_initialization();
+  array_convertert cstring_member_initialization();
+
   void initialize_array(
     const exprt &array,
     std::size_t depth,
     const recursion_sett &known_tags,
-    code_blockt &body);
+    code_blockt &body,
+    array_convertert array_member_initialization);
   void initialize_dynamic_array(
+    const exprt &pointer,
+    std::size_t depth,
+    const recursion_sett &known_tags,
+    code_blockt &body,
+    array_convertert array_member_initialization);
+
+  void initialize_cstring(
     const exprt &pointer,
     std::size_t depth,
     const recursion_sett &known_tags,
@@ -96,6 +117,7 @@ private:
   bool is_array_size_parameter(const irep_idt &cmdline_arg) const;
   optionalt<irep_idt>
   get_associated_size_variable(const irep_idt &array_name) const;
+  bool should_be_treated_as_cstring(const irep_idt &pointer_name) const;
 };
 
 #endif // CPROVER_GOTO_HARNESS_RECURSIVE_INITIALIZATION_H

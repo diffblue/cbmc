@@ -17,6 +17,8 @@ Author: Diffblue Ltd.
 #include <util/std_code.h>
 #include <util/std_expr.h>
 
+#include <functional>
+
 recursive_initializationt::recursive_initializationt(
   recursive_initialization_configt initialization_config,
   goto_modelt &goto_model)
@@ -38,20 +40,27 @@ void recursive_initializationt::initialize(
   }
   else if(type.id() == ID_pointer)
   {
-    if(
-      lhs.id() == ID_symbol &&
-      should_be_treated_as_array(to_symbol_expr(lhs).get_identifier()))
+    if(lhs.id() == ID_symbol)
     {
-      initialize_dynamic_array(lhs, depth, known_tags, body);
+      auto const &lhs_symbol = to_symbol_expr(lhs);
+      if(should_be_treated_as_cstring(lhs_symbol.get_identifier()))
+      {
+        initialize_cstring(lhs, depth, known_tags, body);
+        return;
+      }
+      else if(should_be_treated_as_array(lhs_symbol.get_identifier()))
+      {
+        initialize_dynamic_array(
+          lhs, depth, known_tags, body, default_array_member_initialization());
+        return;
+      }
     }
-    else
-    {
-      initialize_pointer(lhs, depth, known_tags, body);
-    }
+    initialize_pointer(lhs, depth, known_tags, body);
   }
   else if(type.id() == ID_array)
   {
-    initialize_array(lhs, depth, known_tags, body);
+    initialize_array(
+      lhs, depth, known_tags, body, default_array_member_initialization());
   }
   else
   {
@@ -163,7 +172,8 @@ void recursive_initializationt::initialize_array(
   const exprt &array,
   const std::size_t depth,
   const recursion_sett &known_tags,
-  code_blockt &body)
+  code_blockt &body,
+  array_convertert array_member_initialization)
 {
   PRECONDITION(array.type().id() == ID_array);
   const auto &array_type = to_array_type(array.type());
@@ -171,11 +181,8 @@ void recursive_initializationt::initialize_array(
     numeric_cast_v<std::size_t>(to_constant_expr(array_type.size()));
   for(std::size_t index = 0; index < array_size; index++)
   {
-    initialize(
-      index_exprt(array, from_integer(index, size_type())),
-      depth,
-      known_tags,
-      body);
+    array_member_initialization(
+      array, array_size, index, depth, known_tags, body);
   }
 }
 
@@ -202,11 +209,19 @@ optionalt<irep_idt> recursive_initializationt::get_associated_size_variable(
     array_name);
 }
 
+bool recursive_initializationt::should_be_treated_as_cstring(
+  const irep_idt &pointer_name) const
+{
+  return initialization_config.pointers_to_treat_as_cstrings.count(
+           pointer_name) != 0;
+}
+
 void recursive_initializationt::initialize_dynamic_array(
   const exprt &pointer,
   const std::size_t depth,
   const recursion_sett &known_tags,
-  code_blockt &body)
+  code_blockt &body,
+  array_convertert array_initialization)
 {
   PRECONDITION(pointer.type().id() == ID_pointer);
 
@@ -269,7 +284,8 @@ void recursive_initializationt::initialize_dynamic_array(
     std::size_t array_counter = 0;
     for(const auto &array_variable : array_variables)
     {
-      initialize(array_variable, depth + 1, known_tags, body);
+      initialize_array(
+        array_variable, depth + 1, known_tags, body, array_initialization);
       body.add(code_assignt{
         index_exprt{arrays, from_integer(array_counter++, size_type())},
         address_of_exprt{
@@ -303,6 +319,16 @@ void recursive_initializationt::initialize_dynamic_array(
   body.add(code_assignt{pointer, index_exprt{arrays, nondet_index}});
 }
 
+void recursive_initializationt::initialize_cstring(
+  const exprt &pointer,
+  std::size_t depth,
+  const recursion_sett &known_tags,
+  code_blockt &body)
+{
+  initialize_dynamic_array(
+    pointer, depth, known_tags, body, cstring_member_initialization());
+}
+
 std::string recursive_initialization_configt::to_string() const
 {
   std::ostringstream out{};
@@ -332,6 +358,60 @@ std::string recursive_initialization_configt::to_string() const
         << associated_array_size.second;
   }
   out << "\n  ]";
+  out << "\n  pointers_to_treat_as_cstrings = [";
+  for(const auto &pointer_to_treat_as_string_name :
+      pointers_to_treat_as_cstrings)
+  {
+    out << "\n    " << pointer_to_treat_as_string_name << std::endl;
+  }
+  out << "\n  ]";
   out << "\n}";
   return out.str();
+}
+
+recursive_initializationt::array_convertert
+recursive_initializationt::default_array_member_initialization()
+{
+  return [this](
+           const exprt &array,
+           const std::size_t length,
+           const std::size_t current_index,
+           const std::size_t depth,
+           const recursion_sett &known_tags,
+           code_blockt &body) {
+    PRECONDITION(array.type().id() == ID_array);
+    initialize(
+      index_exprt{array, from_integer(current_index, size_type())},
+      depth,
+      known_tags,
+      body);
+  };
+}
+
+recursive_initializationt::array_convertert
+recursive_initializationt::cstring_member_initialization()
+{
+  return [this](
+           const exprt &array,
+           const std::size_t length,
+           const std::size_t current_index,
+           const std::size_t depth,
+           const recursion_sett &known_tags,
+           code_blockt &body) {
+    PRECONDITION(array.type().id() == ID_array);
+    PRECONDITION(array.type().subtype() == char_type());
+    auto const member =
+      index_exprt{array, from_integer(current_index, size_type())};
+    if(current_index + 1 == length)
+    {
+      body.add(code_assignt{member, from_integer(0, array.type().subtype())});
+    }
+    else
+    {
+      initialize(member, depth, known_tags, body);
+      // We shouldn't have `\0` anywhere but at the end of a string.
+      body.add(code_assumet{
+        notequal_exprt{member, from_integer(0, array.type().subtype())}});
+    }
+  };
 }
