@@ -54,9 +54,9 @@ literalt bv_pointerst::convert_rest(const exprt &expr)
       literalt l=prop.new_variable();
 
       postponed_list.push_back(postponedt());
-      postponed_list.back().op=convert_bv(operands[0]);
+      postponed_list.back().op = convert_bv(operands[0]);
       postponed_list.back().bv.push_back(l);
-      postponed_list.back().expr=expr;
+      postponed_list.back().expr = expr;
 
       return l;
     }
@@ -734,7 +734,7 @@ void bv_pointerst::add_addr(const exprt &expr, bvt &bv)
 void bv_pointerst::do_postponed(
   const postponedt &postponed)
 {
-  if(postponed.expr.id()==ID_dynamic_object)
+  if(postponed.expr.id() == ID_dynamic_object)
   {
     const pointer_logict::objectst &objects=
       pointer_logic.objects;
