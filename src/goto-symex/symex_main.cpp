@@ -138,6 +138,10 @@ void goto_symext::symex_assume_l2(statet &state, const exprt &cond)
   if(cond.is_true())
     return;
 
+  // we are willing to re-write some quantified expressions
+  if(has_subexpr(simplified_cond, ID_exists))
+    rewrite_quantifiers(simplified_cond, state);
+
   if(state.threads.size()==1)
   {
     exprt tmp = cond;
@@ -160,9 +164,14 @@ void goto_symext::symex_assume_l2(statet &state, const exprt &cond)
 
 void goto_symext::rewrite_quantifiers(exprt &expr, statet &state)
 {
-  if(expr.id()==ID_forall)
+  const bool is_assert = state.source.pc->is_assert();
+
+  if(
+    (is_assert && expr.id() == ID_forall) ||
+    (!is_assert && expr.id() == ID_exists))
   {
-    // forall X. P -> P
+    // for assertions e can rewrite "forall X. P" to "P", and
+    // for assumptions we can rewrite "exists X. P" to "P"
     // we keep the quantified variable unique by means of L2 renaming
     auto &quant_expr = to_quantifier_expr(expr);
     symbol_exprt tmp0 =
