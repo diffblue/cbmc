@@ -1,0 +1,12 @@
+CORE
+main.c
+--pointer-check --bounds-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Our logic for constructing assertion over structs with flexible array members
+was wrong, because it could conflate dynamic allocation sizes across different
+objects.

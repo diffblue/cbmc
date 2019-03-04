@@ -1333,8 +1333,22 @@ void goto_checkt::bounds_check(
     auto type_size_opt = size_of_expr(ode.root_object().type(), ns);
 
     if(type_size_opt.has_value())
-      type_matches_size =
-        equal_exprt(size, typecast_exprt(type_size_opt.value(), size.type()));
+    {
+      // Build a predicate that evaluates to true iff the size reported by
+      // sizeof (i.e., compile-time size) matches the actual run-time size. The
+      // run-time size for a dynamic (i.e., heap-allocated) object is determined
+      // by the dynamic_size(ns) expression, which can only be used when
+      // malloc_object(pointer, ns) evaluates to true for a given pointer.
+      type_matches_size = if_exprt{
+        dynamic_object(pointer),
+        and_exprt{malloc_object(pointer, ns),
+                  equal_exprt{typecast_exprt::conditional_cast(
+                                dynamic_size(ns), type_size_opt->type()),
+                              *type_size_opt}},
+        equal_exprt{typecast_exprt::conditional_cast(
+                      object_size(pointer), type_size_opt->type()),
+                    *type_size_opt}};
+    }
   }
 
   const exprt &size=array_type.id()==ID_array ?
