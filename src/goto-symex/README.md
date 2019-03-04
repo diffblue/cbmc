@@ -262,7 +262,6 @@ In the \ref goto-symex directory.
 * \ref symex_target_equationt
 * \ref prop_convt
 * \ref bmct
-* \ref fault_localizationt
 * \ref counterexample_beautificationt
 
 \dot
