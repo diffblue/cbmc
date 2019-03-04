@@ -83,13 +83,14 @@ void goto_symext::symex_assert(
   exprt condition = instruction.get_condition();
   clean_expr(condition, state, false);
 
-  // we are willing to re-write some quantified expressions
+  // First, push negations in and perhaps convert existential quantifiers into
+  // universals:
   if(has_subexpr(condition, ID_exists) || has_subexpr(condition, ID_forall))
-  {
-    // have negation pushed inwards as far as possible
     do_simplify(condition);
+
+  // Second, L2-rename universal quantifiers:
+  if(has_subexpr(condition, ID_forall))
     rewrite_quantifiers(condition, state);
-  }
 
   // now rename, enables propagation
   exprt l2_condition = state.rename(std::move(condition), ns);
@@ -139,12 +140,13 @@ void goto_symext::symex_assume_l2(statet &state, const exprt &cond)
     return;
 
   // we are willing to re-write some quantified expressions
-  if(has_subexpr(simplified_cond, ID_exists))
-    rewrite_quantifiers(simplified_cond, state);
+  exprt rewritten_cond = cond;
+  if(has_subexpr(rewritten_cond, ID_exists))
+    rewrite_quantifiers(rewritten_cond, state);
 
   if(state.threads.size()==1)
   {
-    exprt tmp = cond;
+    exprt tmp = rewritten_cond;
     state.guard.guard_expr(tmp);
     target.assumption(state.guard.as_expr(), tmp, state.source);
   }
@@ -155,7 +157,7 @@ void goto_symext::symex_assume_l2(statet &state, const exprt &cond)
   // x=0;                   assume(x==1);
   // assert(x!=42);         x=42;
   else
-    state.guard.add(cond);
+    state.guard.add(rewritten_cond);
 
   if(state.atomic_section_id!=0 &&
      state.guard.is_false())
