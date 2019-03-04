@@ -13,7 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cassert>
 
-#include <util/base_type.h>
 #include <util/c_types.h>
 #include <util/fresh_symbol.h>
 #include <util/invariant.h>
