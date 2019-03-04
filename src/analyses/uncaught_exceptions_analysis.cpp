@@ -125,23 +125,30 @@ void uncaught_exceptions_domaint::transform(
     join(uea.exceptions_map[function_name]);
     break;
   }
-  case DECL:
-  case DEAD:
-  case ASSIGN:
+  case DECL:   // Safe to ignore in this context
+  case DEAD:   // Safe to ignore in this context
+  case ASSIGN: // Safe to ignore in this context
+    break;
   case RETURN:
-  case GOTO:
-  case ATOMIC_BEGIN:
-  case ATOMIC_END:
-  case START_THREAD:
-  case END_THREAD:
-  case END_FUNCTION:
-  case ASSERT:
-  case ASSUME:
-  case LOCATION:
-  case SKIP:
+    DATA_INVARIANT(false, "Returns must be removed before analysis");
+    break;
+  case GOTO:         // Ignoring the guard is a valid over-approximation
+  case ATOMIC_BEGIN: // Ignoring is a valid over-approximation
+  case ATOMIC_END:   // Ignoring is a valid over-approximation
+  case START_THREAD: // Require a concurrent analysis at higher level
+  case END_THREAD:   // Require a concurrent analysis at higher level
+  case END_FUNCTION: // No action required
+  case ASSERT:       // No action required
+  case ASSUME:       // Ignoring is a valid over-approximation
+  case LOCATION:     // No action required
+  case SKIP:         // No action required
+    break;
   case OTHER:
+    DATA_INVARIANT(false, "Unclear what is a safe over-approximation of OTHER");
+    break;
   case INCOMPLETE_GOTO:
   case NO_INSTRUCTION_TYPE:
+    DATA_INVARIANT(false, "Only complete instructions can be analyzed");
     break;
   }
 }
