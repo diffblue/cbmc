@@ -41,7 +41,6 @@ OBJ += ../$(CPROVER_DIR)/src/ansi-c/ansi-c$(LIBEXT) \
       ../$(CPROVER_DIR)/src/json/json$(LIBEXT) \
       ../$(CPROVER_DIR)/src/cbmc/all_properties$(OBJEXT) \
       ../$(CPROVER_DIR)/src/cbmc/bmc$(OBJEXT) \
-      ../$(CPROVER_DIR)/src/cbmc/bmc_cover$(OBJEXT) \
       # Empty last line
 
 INCLUDES= -I .. -I ../$(CPROVER_DIR)/src

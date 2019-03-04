@@ -98,7 +98,6 @@ testing-utils-clean:
 # We need to link bmc.o to the unit test, so here's everything it depends on...
 BMC_DEPS =../src/cbmc/all_properties$(OBJEXT) \
           ../src/cbmc/bmc$(OBJEXT) \
-          ../src/cbmc/bmc_cover$(OBJEXT) \
           ../src/cbmc/c_test_input_generator$(OBJEXT) \
           ../src/cbmc/cbmc_languages$(OBJEXT) \
           ../src/cbmc/cbmc_parse_options$(OBJEXT) \

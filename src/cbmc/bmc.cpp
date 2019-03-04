@@ -131,12 +131,6 @@ safety_checkert::resultt bmct::execute(
       return safety_checkert::resultt::SAFE; // to indicate non-error
     }
 
-    if(!options.get_list_option("cover").empty())
-    {
-      return cover(goto_functions)?
-        safety_checkert::resultt::ERROR:safety_checkert::resultt::SAFE;
-    }
-
     // any properties to check at all?
     if(
       !options.get_bool_option("program-only") &&
