@@ -431,12 +431,18 @@ void rw_range_sett::get_objects_address_of(const exprt &object)
      object.id() == ID_label ||
      object.id() == ID_array ||
      object.id() == ID_null_object)
+  {
     // constant, nothing to do
     return;
+  }
   else if(object.id()==ID_symbol)
+  {
     get_objects_rec(get_modet::READ, object);
+  }
   else if(object.id()==ID_dereference)
+  {
     get_objects_rec(get_modet::READ, object);
+  }
   else if(object.id()==ID_index)
   {
     const index_exprt &index=to_index_expr(object);

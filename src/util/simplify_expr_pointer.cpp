@@ -466,15 +466,18 @@ bool simplify_exprt::simplify_inequality_pointer_object(exprt &expr)
 
     if(op.id()==ID_address_of)
     {
-      if(op.operands().size()!=1 ||
-         (op.op0().id()!=ID_symbol &&
-          op.op0().id()!=ID_dynamic_object &&
-          op.op0().id()!=ID_string_constant))
+      if(
+        op.operands().size() != 1 ||
+        (op.op0().id() != ID_symbol && op.op0().id() != ID_dynamic_object &&
+         op.op0().id() != ID_string_constant))
+      {
         return true;
+      }
     }
-    else if(op.id()!=ID_constant ||
-            op.get(ID_value)!=ID_NULL)
+    else if(op.id() != ID_constant || op.get(ID_value) != ID_NULL)
+    {
       return true;
+    }
   }
 
   bool equal=expr.op0().op0()==expr.op1().op0();
