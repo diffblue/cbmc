@@ -352,7 +352,7 @@ public:
 template <>
 inline bool can_cast_expr<fieldref_exprt>(const exprt &base)
 {
-  return base.get(ID_class) != ID_nil && base.get(ID_component_name) != ID_nil;
+  return !base.get(ID_class).empty() && !base.get(ID_component_name).empty();
 }
 
 #endif // CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_PARSE_TREE_H
