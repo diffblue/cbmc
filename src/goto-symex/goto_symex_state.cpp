@@ -156,20 +156,23 @@ protected:
   }
 };
 
+template <>
 renamedt<ssa_exprt, L0>
-goto_symex_statet::set_l0_indices(ssa_exprt ssa_expr, const namespacet &ns)
+goto_symex_statet::set_indices<L0>(ssa_exprt ssa_expr, const namespacet &ns)
 {
   return level0(std::move(ssa_expr), ns, source.thread_nr);
 }
 
+template <>
 renamedt<ssa_exprt, L1>
-goto_symex_statet::set_l1_indices(ssa_exprt ssa_expr, const namespacet &ns)
+goto_symex_statet::set_indices<L1>(ssa_exprt ssa_expr, const namespacet &ns)
 {
   return level1(level0(std::move(ssa_expr), ns, source.thread_nr));
 }
 
+template <>
 renamedt<ssa_exprt, L2>
-goto_symex_statet::set_l2_indices(ssa_exprt ssa_expr, const namespacet &ns)
+goto_symex_statet::set_indices<L2>(ssa_exprt ssa_expr, const namespacet &ns)
 {
   return level2(level1(level0(std::move(ssa_expr), ns, source.thread_nr)));
 }
@@ -206,7 +209,7 @@ void goto_symex_statet::assignment(
   const auto level2_it =
     level2.current_names.emplace(l1_identifier, std::make_pair(lhs, 0)).first;
   symex_renaming_levelt::increase_counter(level2_it);
-  lhs = set_l2_indices(std::move(lhs), ns).get();
+  lhs = set_indices<L2>(std::move(lhs), ns).get();
 
   // in case we happen to be multi-threaded, record the memory access
   bool is_shared=l2_thread_write_encoding(lhs, ns);
@@ -260,9 +263,9 @@ ssa_exprt goto_symex_statet::rename_ssa(ssa_exprt ssa, const namespacet &ns)
     level == L0 || level == L1,
     "rename_ssa can only be used for levels L0 and L1");
   if(level == L0)
-    ssa = set_l0_indices(std::move(ssa), ns).get();
+    ssa = set_indices<L0>(std::move(ssa), ns).get();
   else if(level == L1)
-    ssa = set_l1_indices(std::move(ssa), ns).get();
+    ssa = set_indices<L1>(std::move(ssa), ns).get();
   else
     UNREACHABLE;
 
@@ -297,7 +300,7 @@ exprt goto_symex_statet::rename(exprt expr, const namespacet &ns)
     }
     else if(level==L2)
     {
-      ssa = set_l1_indices(std::move(ssa), ns).get();
+      ssa = set_indices<L1>(std::move(ssa), ns).get();
       rename<level>(expr.type(), ssa.get_identifier(), ns);
       ssa.update_type();
 
@@ -318,7 +321,7 @@ exprt goto_symex_statet::rename(exprt expr, const namespacet &ns)
         if(p_it != propagation.end())
           expr=p_it->second; // already L2
         else
-          ssa = set_l2_indices(std::move(ssa), ns).get();
+          ssa = set_indices<L2>(std::move(ssa), ns).get();
       }
     }
   }
@@ -432,7 +435,7 @@ bool goto_symex_statet::l2_thread_read_encoding(
     if(!no_write.op().is_false())
       cond |= guardt{no_write.op()};
 
-    const renamedt<ssa_exprt, L2> l2_true_case = set_l2_indices(ssa_l1, ns);
+    const renamedt<ssa_exprt, L2> l2_true_case = set_indices<L2>(ssa_l1, ns);
 
     if(a_s_read.second.empty())
     {
@@ -442,7 +445,7 @@ bool goto_symex_statet::l2_thread_read_encoding(
       symex_renaming_levelt::increase_counter(level2_it);
       a_s_read.first=level2.current_count(l1_identifier);
     }
-    const renamedt<ssa_exprt, L2> l2_false_case = set_l2_indices(ssa_l1, ns);
+    const renamedt<ssa_exprt, L2> l2_false_case = set_indices<L2>(ssa_l1, ns);
 
     exprt tmp;
     if(cond.is_false())
@@ -464,7 +467,7 @@ bool goto_symex_statet::l2_thread_read_encoding(
       source,
       symex_targett::assignment_typet::PHI);
 
-    expr = set_l2_indices(std::move(ssa_l1), ns).get();
+    expr = set_indices<L2>(std::move(ssa_l1), ns).get();
 
     a_s_read.second.push_back(guard);
     if(!no_write.op().is_false())
@@ -480,13 +483,13 @@ bool goto_symex_statet::l2_thread_read_encoding(
   // No event and no fresh index, but avoid constant propagation
   if(!record_events)
   {
-    expr = set_l2_indices(std::move(ssa_l1), ns).get();
+    expr = set_indices<L2>(std::move(ssa_l1), ns).get();
     return true;
   }
 
   // produce a fresh L2 name
   symex_renaming_levelt::increase_counter(level2_it);
-  expr = set_l2_indices(std::move(ssa_l1), ns).get();
+  expr = set_indices<L2>(std::move(ssa_l1), ns).get();
 
   // and record that
   INVARIANT_STRUCTURED(
@@ -543,7 +546,7 @@ void goto_symex_statet::rename_address(exprt &expr, const namespacet &ns)
     ssa_exprt &ssa=to_ssa_expr(expr);
 
     // only do L1!
-    ssa = set_l1_indices(std::move(ssa), ns).get();
+    ssa = set_indices<L1>(std::move(ssa), ns).get();
 
     rename<level>(expr.type(), ssa.get_identifier(), ns);
     ssa.update_type();
