@@ -193,6 +193,10 @@ protected:
 
   friend class bmc_all_propertiest;
 
+  // \todo remove these two declarations once test-gen dependency is fixed
+  bool cover(const goto_functionst &goto_functions);
+  friend class bmc_covert;
+
 private:
   /// \brief Class-specific symbolic execution
   ///
