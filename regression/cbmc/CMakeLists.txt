@@ -5,7 +5,7 @@ add_test_pl_tests(
 add_test_pl_profile(
     "cbmc-paths-lifo"
     "$<TARGET_FILE:cbmc> --paths lifo"
-    "-C;-X;thorough-paths;-X;smt-backend;-s;paths-lifo"
+    "-C;-X;thorough-paths;-X;smt-backend;-X;paths-lifo-expected-failure;-s;paths-lifo"
     "CORE"
 )
 
