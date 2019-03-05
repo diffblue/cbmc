@@ -156,6 +156,24 @@ protected:
   }
 };
 
+renamedt<ssa_exprt, L0>
+goto_symex_statet::set_l0_indices(ssa_exprt ssa_expr, const namespacet &ns)
+{
+  return level0(std::move(ssa_expr), ns, source.thread_nr);
+}
+
+renamedt<ssa_exprt, L1>
+goto_symex_statet::set_l1_indices(ssa_exprt ssa_expr, const namespacet &ns)
+{
+  return level1(level0(std::move(ssa_expr), ns, source.thread_nr));
+}
+
+renamedt<ssa_exprt, L2>
+goto_symex_statet::set_l2_indices(ssa_exprt ssa_expr, const namespacet &ns)
+{
+  return level2(level1(level0(std::move(ssa_expr), ns, source.thread_nr)));
+}
+
 void goto_symex_statet::assignment(
   ssa_exprt &lhs, // L0/L1
   const exprt &rhs,  // L2
@@ -233,24 +251,6 @@ void goto_symex_statet::assignment(
   value_set.output(ns, std::cout);
   std::cout << "**********************\n";
   #endif
-}
-
-renamedt<ssa_exprt, L0>
-goto_symex_statet::set_l0_indices(ssa_exprt ssa_expr, const namespacet &ns)
-{
-  return level0(std::move(ssa_expr), ns, source.thread_nr);
-}
-
-renamedt<ssa_exprt, L1>
-goto_symex_statet::set_l1_indices(ssa_exprt ssa_expr, const namespacet &ns)
-{
-  return level1(level0(std::move(ssa_expr), ns, source.thread_nr));
-}
-
-renamedt<ssa_exprt, L2>
-goto_symex_statet::set_l2_indices(ssa_exprt ssa_expr, const namespacet &ns)
-{
-  return level2(level1(level0(std::move(ssa_expr), ns, source.thread_nr)));
 }
 
 template <levelt level>
