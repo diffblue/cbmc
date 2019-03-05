@@ -46,8 +46,12 @@ operator()(ssa_exprt ssa_expr, const namespacet &ns, unsigned thread_nr) const
 renamedt<ssa_exprt, L1> symex_level1t::
 operator()(renamedt<ssa_exprt, L0> l0_expr) const
 {
-  if(!l0_expr.get().get_level_1().empty())
+  if(
+    !l0_expr.get().get_level_1().empty() ||
+    !l0_expr.get().get_level_2().empty())
+  {
     return renamedt<ssa_exprt, L1>{std::move(l0_expr.value)};
+  }
 
   const irep_idt l0_name = l0_expr.get().get_l1_object_identifier();
 

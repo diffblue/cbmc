@@ -241,17 +241,10 @@ goto_symex_statet::set_l0_indices(ssa_exprt ssa_expr, const namespacet &ns)
   return level0(std::move(ssa_expr), ns, source.thread_nr);
 }
 
-void goto_symex_statet::set_l1_indices(
-  ssa_exprt &ssa_expr,
-  const namespacet &ns)
+renamedt<ssa_exprt, L1>
+goto_symex_statet::set_l1_indices(ssa_exprt ssa_expr, const namespacet &ns)
 {
-  if(!ssa_expr.get_level_2().empty())
-    return;
-  if(!ssa_expr.get_level_1().empty())
-    return;
-  renamedt<ssa_exprt, L1> l1 =
-    level1(level0(std::move(ssa_expr), ns, source.thread_nr));
-  ssa_expr = l1.get();
+  return level1(level0(std::move(ssa_expr), ns, source.thread_nr));
 }
 
 void goto_symex_statet::set_l2_indices(
@@ -274,7 +267,7 @@ ssa_exprt goto_symex_statet::rename_ssa(ssa_exprt ssa, const namespacet &ns)
   if(level == L0)
     ssa = set_l0_indices(std::move(ssa), ns).get();
   else if(level == L1)
-    set_l1_indices(ssa, ns);
+    ssa = set_l1_indices(std::move(ssa), ns).get();
   else
     UNREACHABLE;
 
@@ -309,7 +302,7 @@ exprt goto_symex_statet::rename(exprt expr, const namespacet &ns)
     }
     else if(level==L2)
     {
-      set_l1_indices(ssa, ns);
+      ssa = set_l1_indices(std::move(ssa), ns).get();
       rename<level>(expr.type(), ssa.get_identifier(), ns);
       ssa.update_type();
 
@@ -560,7 +553,7 @@ void goto_symex_statet::rename_address(exprt &expr, const namespacet &ns)
     ssa_exprt &ssa=to_ssa_expr(expr);
 
     // only do L1!
-    set_l1_indices(ssa, ns);
+    ssa = set_l1_indices(std::move(ssa), ns).get();
 
     rename<level>(expr.type(), ssa.get_identifier(), ns);
     ssa.update_type();

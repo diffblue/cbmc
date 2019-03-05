@@ -117,7 +117,7 @@ protected:
   renamedt<ssa_exprt, L0> set_l0_indices(ssa_exprt expr, const namespacet &ns);
 
   /// Update level 0 and 1 values.
-  void set_l1_indices(ssa_exprt &expr, const namespacet &ns);
+  renamedt<ssa_exprt, L1> set_l1_indices(ssa_exprt expr, const namespacet &ns);
 
   /// Update level 0, 1 and 2 values.
   void set_l2_indices(ssa_exprt &expr, const namespacet &ns);
