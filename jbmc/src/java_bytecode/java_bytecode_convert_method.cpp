@@ -2637,13 +2637,16 @@ exprt::operandst &java_bytecode_convert_methodt::convert_cmp2(
   isnan_exprt nan_op1(op[1]);
   exprt one = from_integer(1, result_type);
   exprt minus_one = from_integer(-1, result_type);
+
   results[0] = if_exprt(
     or_exprt(nan_op0, nan_op1),
     nan_result,
     if_exprt(
-      ieee_float_equal_exprt(op[0], op[1]),
+      // no need to use ieee_float_equal since NaN is already ruled out
+      equal_exprt(op[0], op[1]),
       from_integer(0, result_type),
       if_exprt(binary_relation_exprt(op[0], ID_lt, op[1]), minus_one, one)));
+
   return results;
 }
 
