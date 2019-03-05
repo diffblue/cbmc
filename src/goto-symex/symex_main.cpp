@@ -639,6 +639,11 @@ void goto_symext::try_filter_value_sets(
   value_setst::valuest value_set_elements;
   state.value_set.get_value_set(*symbol_expr, value_set_elements, ns);
 
+  std::vector<exprt> delete_from_value_set_for_true_case;
+  std::vector<exprt> delete_from_value_set_for_false_case;
+  delete_from_value_set_for_true_case.reserve(value_set_elements.size());
+  delete_from_value_set_for_false_case.reserve(value_set_elements.size());
+
   // Try evaluating the condition with the symbol replaced by a pointer to each
   // one of its possible values in turn. If that leads to a true for some
   // value_set_element then we can delete it from the value set that will be
@@ -679,19 +684,31 @@ void goto_symext::try_filter_value_sets(
 
     if(value_set_for_true_case && modified_condition.is_false())
     {
-      value_sett::entryt *entry = const_cast<value_sett::entryt *>(
-        value_set_for_true_case->get_entry_for_symbol(
-          symbol_expr->get_identifier(), symbol_type, "", ns));
-      value_set_for_true_case->erase_value_from_entry(
-        *entry, value_set_element);
+      delete_from_value_set_for_true_case.emplace_back(value_set_element);
     }
     else if(value_set_for_false_case && modified_condition.is_true())
     {
-      value_sett::entryt *entry = const_cast<value_sett::entryt *>(
-        value_set_for_false_case->get_entry_for_symbol(
-          symbol_expr->get_identifier(), symbol_type, "", ns));
-      value_set_for_false_case->erase_value_from_entry(
-        *entry, value_set_element);
+      delete_from_value_set_for_false_case.emplace_back(value_set_element);
+    }
+  }
+  if(value_set_for_true_case && !delete_from_value_set_for_true_case.empty())
+  {
+    value_sett::entryt *entry = const_cast<value_sett::entryt *>(
+      value_set_for_true_case->get_entry_for_symbol(
+        symbol_expr->get_identifier(), symbol_type, "", ns));
+    for(const exprt &value_to_erase : delete_from_value_set_for_true_case)
+    {
+      value_set_for_true_case->erase_value_from_entry(*entry, value_to_erase);
+    }
+  }
+  if(value_set_for_false_case && !delete_from_value_set_for_false_case.empty())
+  {
+    value_sett::entryt *entry = const_cast<value_sett::entryt *>(
+      value_set_for_false_case->get_entry_for_symbol(
+        symbol_expr->get_identifier(), symbol_type, "", ns));
+    for(const exprt &value_to_erase : delete_from_value_set_for_false_case)
+    {
+      value_set_for_false_case->erase_value_from_entry(*entry, value_to_erase);
     }
   }
 }
