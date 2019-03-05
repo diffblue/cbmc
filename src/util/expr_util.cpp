@@ -33,6 +33,7 @@ bool is_lvalue(const exprt &expr)
   else
     return false;
 }
+
 exprt make_binary(const exprt &expr)
 {
   const exprt::operandst &operands=expr.operands();
