@@ -32,11 +32,8 @@ void instrument_intervals(
 {
   std::set<symbol_exprt> symbols;
 
-  forall_goto_program_instructions(i_it, goto_function.body)
-  {
-    find_symbols(i_it->code, symbols);
-    find_symbols(i_it->guard, symbols);
-  }
+  for(const auto &i : goto_function.body.instructions)
+    i.apply([&symbols](const exprt &e) { find_symbols(e, symbols); });
 
   Forall_goto_program_instructions(i_it, goto_function.body)
   {

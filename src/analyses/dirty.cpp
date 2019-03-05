@@ -17,13 +17,8 @@ Date: March 2013
 
 void dirtyt::build(const goto_functiont &goto_function)
 {
-  forall_goto_program_instructions(it, goto_function.body)
-  {
-    find_dirty(it->code);
-
-    if(it->has_condition())
-      find_dirty(it->get_condition());
-  }
+  for(const auto &i : goto_function.body.instructions)
+    i.apply([this](const exprt &e) { find_dirty(e); });
 }
 
 void dirtyt::find_dirty(const exprt &expr)

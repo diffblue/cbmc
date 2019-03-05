@@ -559,6 +559,9 @@ public:
     /// Apply given transformer to all expressions; no return value
     /// means no change needed.
     void transform(std::function<optionalt<exprt>(exprt)>);
+
+    /// Apply given function to all expressions
+    void apply(std::function<void(const exprt &)>) const;
   };
 
   // Never try to change this to vector-we mutate the list while iterating
