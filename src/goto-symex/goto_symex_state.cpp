@@ -235,13 +235,10 @@ void goto_symex_statet::assignment(
   #endif
 }
 
-void goto_symex_statet::set_l0_indices(
-  ssa_exprt &ssa_expr,
-  const namespacet &ns)
+renamedt<ssa_exprt, L0>
+goto_symex_statet::set_l0_indices(ssa_exprt ssa_expr, const namespacet &ns)
 {
-  renamedt<ssa_exprt, L0> renamed =
-    level0(std::move(ssa_expr), ns, source.thread_nr);
-  ssa_expr = renamed.get();
+  return level0(std::move(ssa_expr), ns, source.thread_nr);
 }
 
 void goto_symex_statet::set_l1_indices(
@@ -275,7 +272,7 @@ ssa_exprt goto_symex_statet::rename_ssa(ssa_exprt ssa, const namespacet &ns)
     level == L0 || level == L1,
     "rename_ssa can only be used for levels L0 and L1");
   if(level == L0)
-    set_l0_indices(ssa, ns);
+    ssa = set_l0_indices(std::move(ssa), ns).get();
   else if(level == L1)
     set_l1_indices(ssa, ns);
   else
