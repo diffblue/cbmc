@@ -67,6 +67,8 @@ operator()(renamedt<ssa_exprt, L0> l0_expr) const
 renamedt<ssa_exprt, L2> symex_level2t::
 operator()(renamedt<ssa_exprt, L1> l1_expr) const
 {
+  if(!l1_expr.get().get_level_2().empty())
+    return renamedt<ssa_exprt, L2>{std::move(l1_expr.value)};
   l1_expr.value.set_level_2(current_count(l1_expr.get().get_identifier()));
   return renamedt<ssa_exprt, L2>{std::move(l1_expr.value)};
 }

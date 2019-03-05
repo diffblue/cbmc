@@ -188,7 +188,7 @@ void goto_symex_statet::assignment(
   const auto level2_it =
     level2.current_names.emplace(l1_identifier, std::make_pair(lhs, 0)).first;
   symex_renaming_levelt::increase_counter(level2_it);
-  set_l2_indices(lhs, ns);
+  lhs = set_l2_indices(std::move(lhs), ns).get();
 
   // in case we happen to be multi-threaded, record the memory access
   bool is_shared=l2_thread_write_encoding(lhs, ns);
@@ -247,15 +247,10 @@ goto_symex_statet::set_l1_indices(ssa_exprt ssa_expr, const namespacet &ns)
   return level1(level0(std::move(ssa_expr), ns, source.thread_nr));
 }
 
-void goto_symex_statet::set_l2_indices(
-  ssa_exprt &ssa_expr,
-  const namespacet &ns)
+renamedt<ssa_exprt, L2>
+goto_symex_statet::set_l2_indices(ssa_exprt ssa_expr, const namespacet &ns)
 {
-  if(!ssa_expr.get_level_2().empty())
-    return;
-  renamedt<ssa_exprt, L2> l2 =
-    level2(level1(level0(std::move(ssa_expr), ns, source.thread_nr)));
-  ssa_expr = l2.get();
+  return level2(level1(level0(std::move(ssa_expr), ns, source.thread_nr)));
 }
 
 template <levelt level>
@@ -323,7 +318,7 @@ exprt goto_symex_statet::rename(exprt expr, const namespacet &ns)
         if(p_it != propagation.end())
           expr=p_it->second; // already L2
         else
-          set_l2_indices(ssa, ns);
+          ssa = set_l2_indices(std::move(ssa), ns).get();
       }
     }
   }
@@ -437,8 +432,7 @@ bool goto_symex_statet::l2_thread_read_encoding(
     if(!no_write.op().is_false())
       cond |= guardt{no_write.op()};
 
-    if_exprt tmp(cond.as_expr(), ssa_l1, ssa_l1);
-    set_l2_indices(to_ssa_expr(tmp.true_case()), ns);
+    const renamedt<ssa_exprt, L2> l2_true_case = set_l2_indices(ssa_l1, ns);
 
     if(a_s_read.second.empty())
     {
@@ -448,14 +442,13 @@ bool goto_symex_statet::l2_thread_read_encoding(
       symex_renaming_levelt::increase_counter(level2_it);
       a_s_read.first=level2.current_count(l1_identifier);
     }
+    const renamedt<ssa_exprt, L2> l2_false_case = set_l2_indices(ssa_l1, ns);
 
-    to_ssa_expr(tmp.false_case()).set_level_2(a_s_read.first);
-
+    exprt tmp;
     if(cond.is_false())
-    {
-      exprt t=tmp.false_case();
-      t.swap(tmp);
-    }
+      tmp = l2_false_case.get();
+    else
+      tmp = if_exprt{cond.as_expr(), l2_true_case.get(), l2_false_case.get()};
 
     const bool record_events_bak=record_events;
     record_events=false;
@@ -471,8 +464,7 @@ bool goto_symex_statet::l2_thread_read_encoding(
       source,
       symex_targett::assignment_typet::PHI);
 
-    set_l2_indices(ssa_l1, ns);
-    expr=ssa_l1;
+    expr = set_l2_indices(std::move(ssa_l1), ns).get();
 
     a_s_read.second.push_back(guard);
     if(!no_write.op().is_false())
@@ -488,15 +480,13 @@ bool goto_symex_statet::l2_thread_read_encoding(
   // No event and no fresh index, but avoid constant propagation
   if(!record_events)
   {
-    set_l2_indices(ssa_l1, ns);
-    expr=ssa_l1;
+    expr = set_l2_indices(std::move(ssa_l1), ns).get();
     return true;
   }
 
   // produce a fresh L2 name
   symex_renaming_levelt::increase_counter(level2_it);
-  set_l2_indices(ssa_l1, ns);
-  expr=ssa_l1;
+  expr = set_l2_indices(std::move(ssa_l1), ns).get();
 
   // and record that
   INVARIANT_STRUCTURED(
