@@ -1,0 +1,9 @@
+CORE
+main.c
+--apply-code-contracts
+^EXIT=1$
+^SIGNAL=0$
+^main.c:\d+:\d+: error: size argument to points_to_valid_memory must be coercible to size_t$
+^CONVERSION ERROR$
+--
+--

@@ -2131,10 +2131,10 @@ exprt c_typecheck_baset::do_special_functions(
     if(expr.arguments().size() == 2)
     {
       if(
-        expr.arguments()[1].type() != ID_unsignedbv &&
-        expr.arguments()[1].type() != ID_signedbv)
+        expr.arguments()[1].type().id() != ID_unsignedbv &&
+        expr.arguments()[1].type().id() != ID_signedbv)
       {
-        err_location(f_op);
+        error().source_location = f_op.source_location();
         error() << "size argument to points_to_valid_memory"
                 << " must be coercible to size_t" << eom;
         throw 0;
