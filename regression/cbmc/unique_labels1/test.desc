@@ -1,0 +1,12 @@
+CORE
+main.c
+bar.c
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+assertion\.2
+--
+Each of the assertions in the two functions named "foo" should have a unique
+prefix, and thus be numbered "<prefix>.assertion.1."
