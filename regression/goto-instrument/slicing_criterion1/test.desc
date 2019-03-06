@@ -1,0 +1,6 @@
+CORE
+main.c
+--reachability-slice
+^Reason: no slicing criterion found$
+^EXIT=1$
+^SIGNAL=0$
