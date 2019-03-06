@@ -92,7 +92,65 @@ To be documented.
 
 \subsection analyses-dependence-graph Data- and control-dependence analysis (dependence_grapht)
 
-To be documented.
+### Dependence graph
+
+Implemented in `src/analyses/dependence_graph.h(cpp)`. It is a graph and an
+abstract interpreter at the same time. The abstract interpretation nature
+allows a dependence graph to [build itself](#Construction)
+(the graph) from a given GOTO program.
+
+A dependence graph extends the class `grapht` with `dep_nodet` as the type of
+nodes (see `src/util/graph.h` for more details about
+[graph representation]("../util/README.md")).
+The `dep_nodet` extends `graph_nodet<dep_edget>` with an iterator to a GOTO
+program instruction. It means that each graph node corresponds to a particular
+program instruction. A labelled edge `(u, v)` of a dependence graph expresses
+a dependency of the program instruction corresponding to node `u` on the program
+instruction corresponding to node `v`. The label of the edge (data of the
+type `dep_edget` attached to the edge) denotes the kind of dependency. It can be
+`control-dependency`, `data-dependency`, or both.  
+
+#### Control dependency
+
+An instruction `j` corresponding to node `v` is control-dependent on instruction
+`i` corresponding to node `u` if and only if `j` post-dominates at least one
+but not all successors instructions of `i`.
+
+An instruction `j` post-dominates an instruction `i` if and only if each
+execution path going through `i` eventually reaches `j`. 
+
+Post-dominators analysis is implemented in `src/analyses/cfg_dominators.h(cpp)`.
+
+#### Data dependency
+
+The instruction `j` corresponding to node `v` is data-dependent on the
+instruction `i` corresponding to node `u` if and only if `j` may read data from
+the memory location defined (i.e. written) by `i`.
+
+The reaching definitions analysis is used together with the read-write ranges
+analysis to check whether one instruction may read data writen by another
+instruction. For more details see `src/analyses/reaching_definitions.h(cpp)` and
+`src/analyses/goto_rw.h(cpp)`.
+
+#### Construction
+
+The dependence graph extends the standard abstract interpreter class `ait`
+with post-dominators analysis and reaching definitions analysis. The domain of
+the abstract interpreter is defined in the class `dep_graph_domaint`.
+
+For each instruction `i` an instance of `dep_graph_domaint` associated with `i`
+is created. The instance stores a set `control_deps` of program
+instructions the instruction `i` depends on via control-dependency, and a set
+`data_deps` of program instructions the instruction `i` depends on via
+data-dependency. These sets are updated (increased) during the computation,
+until a fix-point is reached.
+
+The construction of a dependence graph is started by calling its `initialize`
+method and then, once a fix-point is reached by the abstract interpreter, the
+method `finalize` converts data in the interpreter's domain (i.e. from
+`dep_graph_domaint` instances) into edges of the graph. Nodes of the graph are
+created during the run of the abstract interpreter; they are linked to the
+corresponding program instructions.
 
 \subsection analyses-dirtyt Address-taken lvalue analysis (dirtyt)
 

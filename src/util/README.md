@@ -383,3 +383,48 @@ _not_ be extended - but it may be helpful to be aware of where this happens.
     These are in the process of being removed - no new output should go
     via `std::cout` or `std::cerr`, but should instead use the
     \ref messaget and \ref message_handlert infrastructure.
+
+
+\subsection Graph
+### Graph
+
+Implemented in `src/util/graph.h` as `grapht` class. The `grapht` class
+represents a directed graph. However, an undirected graph can be emulated by
+inserting for each edge (u, v) also (v, u). A multi-graph is not supported
+though, because parallel edges are not allowed between vertices. 
+ 
+#### Data representation
+
+A graph is defined by a template class `grapht<N>`, where `N` is the type of the
+nodes of the graph. The class `grapht` stores the nodes in a vector. A user of
+the graph is supposed to access the nodes via their indices in the vector. The
+node type `N` must meet these requirements:
+- It must be default constructible; the common way how to insert a node to the
+  graph is to call method `add_node` which pushes a new default-constructed
+  instance of `N` to the end of the vector and returns its index.
+  Then `operator[]` can be used to obtain a reference to the pushed instance and
+  set its content as desired.
+- It must define a type `edget`, representing type of data attached to any edge
+  of the graph; in case edges should not have any data attached, then one can
+  use a predefined class `empty_edget`. The type must be default-constructible.
+- It must define a type `edgets` as an associative container compatible with the
+  type `std::map<std::size_t, edget>`. 
+- It must define publicly accessible members of the type `edgest`, named `in`
+  and `out`. The members represent edges in the graph. Namely, if `u` is an
+  index of some node in the graph and `v` is a key in the map `in` (resp. `out`)
+  of that node, then `(v, u)` (resp. `(u, v)`) represent an edge in the graph,
+  with attached data `in[v]` (resp. `out[v]`).
+- It must define methods `add_in`, `erase_in`, and `add_out`, `erase_out` for
+  insertion and removal of values to and from the maps `in` and `out`.
+- It must define a method `pretty` converting the node to a "pretty" string. 
+
+One can use a predefined template class `graph_nodet<E>` as the template
+parameter `N` of the graph. The template parameter `E` allows to define the type
+`edget`.
+
+#### Graph algorithms
+ 
+The graph implementation comes with several graph algorithms. We describe each
+of them in following paragraphs.
+
+TODO!
