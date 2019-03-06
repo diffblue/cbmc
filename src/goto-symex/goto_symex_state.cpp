@@ -262,13 +262,7 @@ ssa_exprt goto_symex_statet::rename_ssa(ssa_exprt ssa, const namespacet &ns)
   static_assert(
     level == L0 || level == L1,
     "rename_ssa can only be used for levels L0 and L1");
-  if(level == L0)
-    ssa = set_indices<L0>(std::move(ssa), ns).get();
-  else if(level == L1)
-    ssa = set_indices<L1>(std::move(ssa), ns).get();
-  else
-    UNREACHABLE;
-
+  ssa = set_indices<level>(std::move(ssa), ns).get();
   rename<level>(ssa.type(), ssa.get_identifier(), ns);
   ssa.update_type();
   return ssa;
