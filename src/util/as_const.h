@@ -16,4 +16,8 @@ const T &as_const(T &value)
   return static_cast<const T &>(value);
 }
 
+/// Deleted to avoid calling as_const on an xvalue
+template <typename T>
+void as_const(T &&) = delete;
+
 #endif // CPROVER_UTIL_AS_CONST_H
