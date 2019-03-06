@@ -123,6 +123,12 @@ public:
     return is_auxiliary;
   }
 
+  /// Returns true iff the symbol belongs to the global scope.
+  bool is_global() const
+  {
+    return is_static_lifetime && is_lvalue;
+  }
+
   /// Mark a symbol for internal use. This is advisory and may be utilized,
   /// e.g., to filter output.
   void set_hidden()
