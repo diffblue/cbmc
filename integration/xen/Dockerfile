@@ -9,6 +9,7 @@ RUN apt-get update && apt-get --no-install-recommends -y install \
 
 ADD integration/xen/docker_compile_xen.sh docker_compile_xen.sh
 ADD src /tmp/cbmc/src
+ADD scripts /tmp/cbmc/scripts
 RUN ./docker_compile_xen.sh
 VOLUME /tmp/cbmc
 VOLUME /tmp/xen_compilation
