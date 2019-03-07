@@ -28,7 +28,14 @@ public:
   /// Distance from entry
   unsigned depth = 0;
 
+protected:
   symex_level2t level2;
+
+public:
+  const symex_level2t &get_level2() const
+  {
+    return level2;
+  }
 
   /// Uses level 1 names, and is used to do dereferencing
   value_sett value_set;

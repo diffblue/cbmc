@@ -214,6 +214,12 @@ public:
   /// isn't an expression keyed by it.
   void increase_generation_if_exists(const irep_idt identifier);
 
+  /// Drops an L1 name from the local L2 map
+  void drop_l1_name(symex_renaming_levelt::current_namest::const_iterator it)
+  {
+    level2.current_names.erase(it);
+  }
+
 private:
   std::function<std::size_t(const irep_idt &)> fresh_l2_name_provider;
 

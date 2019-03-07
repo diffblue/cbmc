@@ -70,7 +70,7 @@ void goto_symext::symex_atomic_end(statet &state)
   for(const auto &pair : state.written_in_atomic_section)
   {
     ssa_exprt w = pair.first;
-    w.set_level_2(state.level2.current_count(w.get_identifier()));
+    w.set_level_2(state.get_level2().current_count(w.get_identifier()));
 
     // guard is the disjunction over writes
     PRECONDITION(!pair.second.empty());

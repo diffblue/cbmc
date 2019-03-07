@@ -522,8 +522,8 @@ void goto_symext::phi_function(
   statet &dest_state)
 {
   if(
-    goto_state.level2.current_names.empty() &&
-    dest_state.level2.current_names.empty())
+    goto_state.get_level2().current_names.empty() &&
+    dest_state.get_level2().current_names.empty())
     return;
 
   guardt diff_guard = goto_state.guard;
@@ -531,8 +531,8 @@ void goto_symext::phi_function(
   diff_guard -= dest_state.guard;
 
   for_each2(
-    goto_state.level2.current_names,
-    dest_state.level2.current_names,
+    goto_state.get_level2().current_names,
+    dest_state.get_level2().current_names,
     [&](const ssa_exprt &ssa, unsigned goto_count, unsigned dest_count) {
       merge_names(
         goto_state,
