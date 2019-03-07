@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/byte_operators.h>
 #include <util/c_types.h>
 #include <util/exception_utils.h>
+#include <util/expr_util.h>
 #include <util/invariant.h>
 #include <util/pointer_offset_size.h>
 
@@ -363,4 +364,30 @@ void goto_symext::dereference(exprt &expr, statet &state)
   // dereferencing may introduce new symbol_exprt
   // (like __CPROVER_memory)
   expr = state.rename<L1>(std::move(l1_expr), ns);
+
+  // Dereferencing is likely to introduce new member-of-if constructs --
+  // for example, "x->field" may have become "(x == &o1 ? o1 : o2).field."
+  // Run expression simplification, which converts that to
+  // (x == &o1 ? o1.field : o2.field))
+  // before applying field sensitivity. Field sensitivity can then turn such
+  // field-of-symbol expressions into atomic SSA expressions instead of having
+  // to rewrite all of 'o1' otherwise.
+  // Even without field sensitivity this can be beneficial: for example,
+  // "(b ? s1 : s2).member := X" results in
+  // (b ? s1 : s2) := (b ? s1 : s2) with (member := X)
+  // and then
+  // s1 := b ? ((b ? s1 : s2) with (member := X)) : s1
+  // when all we need is
+  // s1 := s1 with (member := X) [and guard b]
+  // s2 := s2 with (member := X) [and guard !b]
+  do_simplify(expr);
+
+  if(symex_config.run_validation_checks)
+  {
+    // make sure simplify has not re-introduced any dereferencing that
+    // had previously been cleaned away
+    INVARIANT(
+      !has_subexpr(expr, ID_dereference),
+      "simplify re-introduced dereferencing");
+  }
 }
