@@ -1,0 +1,10 @@
+KNOWNBUG broken-smt-backend
+main.c
+-DEQUALITY
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Times out. See #4337.
