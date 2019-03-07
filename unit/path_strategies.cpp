@@ -16,10 +16,11 @@ Author: Kareem Khazem <karkhaz@karkhaz.com>, 2018
 
 #include <ansi-c/ansi_c_language.h>
 
-#include <cbmc/bmc.h>
 #include <cbmc/cbmc_parse_options.h>
 
-#include <goto-checker/solver_factory.h>
+#include <goto-checker/bmc_util.h>
+#include <goto-checker/goto_symex_property_decider.h>
+#include <goto-checker/symex_bmc.h>
 
 #include <langapi/mode.h>
 
@@ -42,8 +43,8 @@ Author: Kareem Khazem <karkhaz@karkhaz.com>, 2018
 // `goto` instruction.
 //
 // Whenever symbolic execution reaches the end of a path, you should expect a
-// result. Results are either SUCCESS, meaning that verification of that path
-// succeeded, or FAILURE, meaning that there was an assertion failure on that
+// result. Results are either DONE, meaning that verification of that path
+// succeeded, or FOUND_FAIL, meaning that there was an assertion failure on that
 // path.
 //
 // To figure out what the events should be, run CBMC on the test program with
@@ -80,14 +81,18 @@ SCENARIO("path strategies")
       "lifo",
       opts_callback,
       c,
-      {symex_eventt::resume(symex_eventt::enumt::JUMP, 7),
+      {// Entry state is line 0
+       symex_eventt::resume(symex_eventt::enumt::NEXT, 0),
+       symex_eventt::resume(symex_eventt::enumt::JUMP, 7),
        symex_eventt::resume(symex_eventt::enumt::NEXT, 5),
        symex_eventt::result(symex_eventt::enumt::SUCCESS)});
     check_with_strategy(
       "fifo",
       opts_callback,
       c,
-      {symex_eventt::resume(symex_eventt::enumt::NEXT, 5),
+      {// Entry state is line 0
+       symex_eventt::resume(symex_eventt::enumt::NEXT, 0),
+       symex_eventt::resume(symex_eventt::enumt::NEXT, 5),
        symex_eventt::resume(symex_eventt::enumt::JUMP, 7),
        symex_eventt::result(symex_eventt::enumt::SUCCESS)});
   }
@@ -120,7 +125,9 @@ SCENARIO("path strategies")
       "lifo",
       opts_callback,
       c,
-      {// Outer else, inner else
+      {// Entry state is line 0
+       symex_eventt::resume(symex_eventt::enumt::NEXT, 0),
+       // Outer else, inner else
        symex_eventt::resume(symex_eventt::enumt::JUMP, 13),
        symex_eventt::resume(symex_eventt::enumt::JUMP, 16),
        // Outer else, inner if
@@ -136,7 +143,9 @@ SCENARIO("path strategies")
       "fifo",
       opts_callback,
       c,
-      {// Expand outer if, but don't continue depth-first
+      {// Entry state is line 0
+       symex_eventt::resume(symex_eventt::enumt::NEXT, 0),
+       // Expand outer if, but don't continue depth-first
        symex_eventt::resume(symex_eventt::enumt::NEXT, 6),
        // Jump to outer else, but again don't continue depth-first
        symex_eventt::resume(symex_eventt::enumt::JUMP, 13),
@@ -175,6 +184,9 @@ SCENARIO("path strategies")
       opts_callback,
       c,
       {
+        // Entry state is line 0
+        symex_eventt::resume(symex_eventt::enumt::NEXT, 0),
+
         // The path where x != 1 and we have nothing to check:
         symex_eventt::resume(symex_eventt::enumt::JUMP, 11),
 
@@ -204,6 +216,9 @@ SCENARIO("path strategies")
       opts_callback,
       c,
       {
+        // Entry state is line 0
+        symex_eventt::resume(symex_eventt::enumt::NEXT, 0),
+
         // First the path where we enter the if-block at line 4 then on hitting
         // the branch at line 6 consider skipping straight to the end, but find
         // nothing there to investigate:
@@ -257,7 +272,9 @@ SCENARIO("path strategies")
         "lifo",
         no_halt_callback,
         c,
-        {symex_eventt::resume(symex_eventt::enumt::JUMP, 7),
+        {// Entry state is line 0
+         symex_eventt::resume(symex_eventt::enumt::NEXT, 0),
+         symex_eventt::resume(symex_eventt::enumt::JUMP, 7),
          symex_eventt::result(symex_eventt::enumt::FAILURE),
          symex_eventt::resume(symex_eventt::enumt::NEXT, 5),
          symex_eventt::result(symex_eventt::enumt::FAILURE),
@@ -270,7 +287,9 @@ SCENARIO("path strategies")
         "lifo",
         halt_callback,
         c,
-        {symex_eventt::resume(symex_eventt::enumt::JUMP, 7),
+        {// Entry state is line 0
+         symex_eventt::resume(symex_eventt::enumt::NEXT, 0),
+         symex_eventt::resume(symex_eventt::enumt::JUMP, 7),
          symex_eventt::result(symex_eventt::enumt::FAILURE),
          // Overall result
          symex_eventt::result(symex_eventt::enumt::FAILURE)});
@@ -283,24 +302,24 @@ SCENARIO("path strategies")
 
 void symex_eventt::validate_result(
   listt &events,
-  const safety_checkert::resultt result,
+  const incremental_goto_checkert::resultt::progresst result,
   std::size_t &counter)
 {
   INFO(
     "Expecting result to be '"
-    << (result == safety_checkert::resultt::SAFE ? "success" : "failure")
+    << (result == incremental_goto_checkert::resultt::progresst::DONE
+          ? "success"
+          : "failure")
     << "' (item at index [" << counter << "] in expected results list");
   ++counter;
 
-  REQUIRE(result != safety_checkert::resultt::ERROR);
-
-  if(result == safety_checkert::resultt::SAFE)
+  if(result == incremental_goto_checkert::resultt::progresst::DONE)
   {
     REQUIRE(!events.empty());
     REQUIRE(events.front().first == symex_eventt::enumt::SUCCESS);
     events.pop_front();
   }
-  else if(result == safety_checkert::resultt::UNSAFE)
+  else
   {
     REQUIRE(!events.empty());
     REQUIRE(events.front().first == symex_eventt::enumt::FAILURE);
@@ -315,23 +334,25 @@ void symex_eventt::validate_resume(
 {
   REQUIRE(!events.empty());
 
-  int dst = std::stoi(state.saved_target->source_location.get_line().c_str());
+  int dst = 0;
+  if(!state.saved_target->source_location.get_line().empty())
+    dst = std::stoi(state.saved_target->source_location.get_line().c_str());
 
-  if(state.has_saved_jump_target)
-  {
-    INFO(
-      "Expecting resume to be 'jump' to line "
-      << dst << " (item at index [" << counter
-      << "] in expected resumes list)");
-    REQUIRE(events.front().first == symex_eventt::enumt::JUMP);
-  }
-  else if(state.has_saved_next_instruction)
+  if(state.has_saved_next_instruction)
   {
     INFO(
       "Expecting resume to be 'next' to line "
       << dst << " (item at index [" << counter
       << "] in expected resumes list)");
     REQUIRE(events.front().first == symex_eventt::enumt::NEXT);
+  }
+  else if(state.has_saved_jump_target)
+  {
+    INFO(
+      "Expecting resume to be 'jump' to line "
+      << dst << " (item at index [" << counter
+      << "] in expected resumes list)");
+    REQUIRE(events.front().first == symex_eventt::enumt::JUMP);
   }
   else
     REQUIRE(false);
@@ -342,11 +363,8 @@ void symex_eventt::validate_resume(
   events.pop_front();
 }
 
-// This is a simplified version of bmct::do_language_agnostic_bmc, without all
-// the edge cases to deal with java programs, bytecode loaded on demand, etc. We
-// need to replicate some of this stuff because the worklist is a local variable
-// of do_language_agnostic_bmc, and we need to check the worklist every time
-// symex returns.
+// This is a simplified copy of single_path_symex_checkert
+// because we have to check the worklist every time goto-symex returns.
 void _check_with_strategy(
   const std::string &strategy,
   const std::string &program,
@@ -366,95 +384,122 @@ void _check_with_strategy(
   config.main = "main";
   config.set(cmdline);
 
-  optionst opts;
-  cbmc_parse_optionst::set_default_options(opts);
-  opts.set_option("paths", true);
-  opts.set_option("exploration-strategy", strategy);
-
-  opts_callback(opts);
-
-  ui_message_handlert mh(cmdline, "path-explore");
-  mh.set_verbosity(0);
-  messaget log(mh);
-
+  optionst options;
+  cbmc_parse_optionst::set_default_options(options);
+  options.set_option("paths", true);
+  options.set_option("exploration-strategy", strategy);
   REQUIRE(is_valid_path_strategy(strategy));
+  opts_callback(options);
+
+  ui_message_handlert ui_message_handler(cmdline, "path-explore");
+  ui_message_handler.set_verbosity(0);
+  messaget log(ui_message_handler);
+
+  goto_modelt goto_model;
+  int ret;
+  ret = cbmc_parse_optionst::get_goto_program(
+    goto_model, options, cmdline, log, ui_message_handler);
+  REQUIRE(ret == -1);
+
+  symbol_tablet symex_symbol_table;
+  namespacet ns(goto_model.get_symbol_table(), symex_symbol_table);
+  propertiest properties(initialize_properties(goto_model));
   std::unique_ptr<path_storaget> worklist = get_path_strategy(strategy);
   guard_managert guard_manager;
 
-  goto_modelt gm;
-  int ret;
-  ret = cbmc_parse_optionst::get_goto_program(gm, opts, cmdline, log, mh);
-  REQUIRE(ret == -1);
+  {
+    // Put initial state into the work list
+    symex_target_equationt equation(ui_message_handler);
+    symex_bmct symex(
+      ui_message_handler,
+      goto_model.get_symbol_table(),
+      equation,
+      options,
+      *worklist,
+      guard_manager);
+    setup_symex(symex, ns, options, ui_message_handler);
 
-  namespacet ns(gm.get_symbol_table());
-  solver_factoryt solver_factory(opts, ns, mh, false);
-  std::unique_ptr<solver_factoryt::solvert> cbmc_solver =
-    solver_factory.get_solver();
-  prop_convt &initial_pc = cbmc_solver->prop_conv();
-  std::function<bool(void)> callback = []() { return false; };
+    symex.initialize_path_storage_from_entry_point_of(
+      goto_symext::get_goto_function(goto_model), symex_symbol_table);
+  }
 
-  safety_checkert::resultt overall_result = safety_checkert::resultt::SAFE;
   std::size_t expected_results_cnt = 0;
-
-  bmct bmc(
-    opts,
-    gm.get_symbol_table(),
-    mh,
-    initial_pc,
-    *worklist,
-    callback,
-    guard_manager);
-  safety_checkert::resultt tmp_result = bmc.run(gm);
-
-  if(tmp_result != safety_checkert::resultt::PAUSED)
-  {
-    symex_eventt::validate_result(events, tmp_result, expected_results_cnt);
-    overall_result &= tmp_result;
-  }
-
-  if(
-    overall_result == safety_checkert::resultt::UNSAFE &&
-    opts.get_bool_option("stop-on-fail") && opts.is_set("paths"))
-  {
-    worklist->clear();
-  }
-
   while(!worklist->empty())
   {
-    cbmc_solver = solver_factory.get_solver();
-    prop_convt &pc = cbmc_solver->prop_conv();
     path_storaget::patht &resume = worklist->peek();
 
     symex_eventt::validate_resume(events, resume.state, expected_results_cnt);
 
-    path_explorert pe(
-      opts,
-      gm.get_symbol_table(),
-      mh,
-      pc,
+    symex_bmct symex(
+      ui_message_handler,
+      goto_model.get_symbol_table(),
       resume.equation,
-      resume.state,
+      options,
       *worklist,
-      guard_manager,
-      callback);
-    tmp_result = pe.run(gm);
+      guard_manager);
+    setup_symex(symex, ns, options, ui_message_handler);
 
-    if(tmp_result != safety_checkert::resultt::PAUSED)
+    symex.resume_symex_from_saved_state(
+      goto_symext::get_goto_function(goto_model),
+      resume.state,
+      &resume.equation,
+      symex_symbol_table);
+    postprocess_equation(
+      symex, resume.equation, options, ns, ui_message_handler);
+
+    incremental_goto_checkert::resultt result(
+      incremental_goto_checkert::resultt::progresst::DONE);
+
+    if(symex.get_remaining_vccs() > 0)
     {
-      symex_eventt::validate_result(events, tmp_result, expected_results_cnt);
-      overall_result &= tmp_result;
+      update_properties_status_from_symex_target_equation(
+        properties, result.updated_properties, resume.equation);
+
+      goto_symex_property_decidert property_decider(
+        options, ui_message_handler, resume.equation, ns);
+
+      const auto solver_runtime = prepare_property_decider(
+        properties, resume.equation, property_decider, ui_message_handler);
+
+      run_property_decider(
+        result,
+        properties,
+        property_decider,
+        ui_message_handler,
+        solver_runtime,
+        false);
+
+      symex_eventt::validate_result(
+        events, result.progress, expected_results_cnt);
     }
+
     worklist->pop();
 
     if(
-      overall_result == safety_checkert::resultt::UNSAFE &&
-      opts.get_bool_option("stop-on-fail"))
+      result.progress ==
+        incremental_goto_checkert::resultt::progresst::FOUND_FAIL &&
+      options.get_bool_option("stop-on-fail"))
     {
       worklist->clear();
     }
+
+    if(worklist->empty())
+    {
+      update_status_of_not_checked_properties(
+        properties, result.updated_properties);
+
+      update_status_of_unknown_properties(
+        properties, result.updated_properties);
+    }
   }
 
-  symex_eventt::validate_result(events, overall_result, expected_results_cnt);
+  const resultt overall_result = determine_result(properties);
+  symex_eventt::validate_result(
+    events,
+    overall_result == resultt::FAIL
+      ? incremental_goto_checkert::resultt::progresst::FOUND_FAIL
+      : incremental_goto_checkert::resultt::progresst::DONE,
+    expected_results_cnt);
 
   INFO("The expected results list contains " << events.size() << " items");
   REQUIRE(events.empty());

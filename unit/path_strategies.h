@@ -6,7 +6,8 @@
 #define CPROVER_PATH_STRATEGIES_H
 
 #include <goto-programs/goto_model.h>
-#include <goto-programs/safety_checker.h>
+
+#include <goto-checker/incremental_goto_checker.h>
 
 #include <goto-symex/goto_symex_state.h>
 
@@ -38,7 +39,7 @@ public:
 
   static void validate_result(
     listt &events,
-    const safety_checkert::resultt result,
+    const incremental_goto_checkert::resultt::progresst result,
     std::size_t &);
 
   static void
