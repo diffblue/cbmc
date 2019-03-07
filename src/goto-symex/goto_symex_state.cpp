@@ -773,14 +773,16 @@ void goto_symex_statet::print_backtrace(std::ostream &out) const
   }
 }
 
-void goto_symex_statet::add_object(
-  ssa_exprt &ssa,
-  std::size_t l1_index,
+ssa_exprt goto_symex_statet::add_object(
+  const symbol_exprt &expr,
+  std::function<std::size_t(const irep_idt &)> index_generator,
   const namespacet &ns)
 {
   framet &frame = call_stack().top();
 
+  ssa_exprt ssa = rename_ssa<L0>(ssa_exprt{expr}, ns);
   const irep_idt l0_name = ssa.get_identifier();
+  const std::size_t l1_index = index_generator(l0_name);
 
   // save old L1 name, if any
   auto existing_or_new_entry = level1.current_names.emplace(
@@ -797,4 +799,6 @@ void goto_symex_statet::add_object(
   ssa = rename_ssa<L1>(std::move(ssa), ns);
   const bool inserted = frame.local_objects.insert(ssa.get_identifier()).second;
   INVARIANT(inserted, "l1_name expected to be unique by construction");
+
+  return ssa;
 }

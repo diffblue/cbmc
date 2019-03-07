@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_SYMEX_GOTO_SYMEX_STATE_H
 #define CPROVER_GOTO_SYMEX_GOTO_SYMEX_STATE_H
 
+#include <functional>
 #include <memory>
 #include <unordered_set>
 
@@ -140,10 +141,16 @@ public:
     return threads[source.thread_nr].call_stack;
   }
 
-  /// Create a new instance of the L0-renamed object \p ssa. As part of this,
-  /// turn \p ssa into an L1-renamed SSA expression. When doing so, use
-  /// \p l1_index as the L1 index, which must not previously have been used.
-  void add_object(ssa_exprt &ssa, std::size_t l1_index, const namespacet &ns);
+  /// Instantiate the object \p expr. An instance of an object is an L1-renamed
+  /// SSA expression such that its L1-index has not previously been used.
+  /// \param expr: Symbol to be instantiated
+  /// \param index_generator: A function to produce a new index for a given name
+  /// \param ns: A namespace
+  /// \return L1-renamed SSA expression
+  ssa_exprt add_object(
+    const symbol_exprt &expr,
+    std::function<std::size_t(const irep_idt &)> index_generator,
+    const namespacet &ns);
 
   void print_backtrace(std::ostream &) const;
 

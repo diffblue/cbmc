@@ -399,12 +399,11 @@ static void locality(
 
   for(const auto &param : goto_function.parameter_identifiers)
   {
-    // get L0 name
-    ssa_exprt ssa =
-      state.rename_ssa<L0>(ssa_exprt{ns.lookup(param).symbol_expr()}, ns);
-
-    const std::size_t fresh_l1_index =
-      path_storage.get_unique_index(ssa.get_identifier(), frame_nr);
-    state.add_object(ssa, fresh_l1_index, ns);
+    (void)state.add_object(
+      ns.lookup(param).symbol_expr(),
+      [&path_storage, &frame_nr](const irep_idt &l0_name) {
+        return path_storage.get_unique_index(l0_name, frame_nr);
+      },
+      ns);
   }
 }
