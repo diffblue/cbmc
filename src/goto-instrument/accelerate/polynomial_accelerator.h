@@ -34,11 +34,13 @@ public:
   polynomial_acceleratort(
     message_handlert &message_handler,
     const symbol_tablet &_symbol_table,
-    const goto_functionst &_goto_functions)
+    const goto_functionst &_goto_functions,
+    guard_managert &guard_manager)
     : message_handler(message_handler),
       symbol_table(const_cast<symbol_tablet &>(_symbol_table)),
       ns(symbol_table),
       goto_functions(_goto_functions),
+      guard_manager(guard_manager),
       utils(symbol_table, message_handler, goto_functions, loop_counter)
   {
     loop_counter=nil_exprt();
@@ -48,11 +50,13 @@ public:
     message_handlert &message_handler,
     const symbol_tablet &_symbol_table,
     const goto_functionst &_goto_functions,
-    exprt &_loop_counter)
+    exprt &_loop_counter,
+    guard_managert &guard_manager)
     : message_handler(message_handler),
       symbol_table(const_cast<symbol_tablet &>(_symbol_table)),
       ns(symbol_table),
       goto_functions(_goto_functions),
+      guard_manager(guard_manager),
       utils(symbol_table, message_handler, goto_functions, loop_counter),
       loop_counter(_loop_counter)
   {
@@ -153,6 +157,7 @@ protected:
   symbol_tablet &symbol_table;
   const namespacet ns;
   const goto_functionst &goto_functions;
+  guard_managert &guard_manager;
   acceleration_utilst utils;
 
   exprt loop_counter;

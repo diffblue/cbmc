@@ -217,7 +217,7 @@ void goto_symext::symex_goto(statet &state)
   // adjust guards
   if(new_guard.is_true())
   {
-    state.guard = guardt(false_exprt());
+    state.guard = guardt(false_exprt(), guard_manager);
   }
   else
   {
@@ -241,7 +241,7 @@ void goto_symext::symex_goto(statet &state)
         state.rename_ssa<L1>(ssa_exprt{guard_symbol_expr}, ns);
       state.assignment(new_lhs, new_rhs, ns, true, false);
 
-      guardt guard{true_exprt{}};
+      guardt guard{true_exprt{}, guard_manager};
 
       log.conditional_output(
         log.debug(),

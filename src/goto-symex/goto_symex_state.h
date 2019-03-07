@@ -16,9 +16,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <unordered_set>
 
 #include <analyses/dirty.h>
+#include <analyses/guard.h>
 
 #include <util/invariant.h>
-#include <util/guard.h>
 #include <util/std_expr.h>
 #include <util/ssa_expr.h>
 #include <util/make_unique.h>
@@ -41,7 +41,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class goto_symex_statet final : public goto_statet
 {
 public:
-  explicit goto_symex_statet(const symex_targett::sourcet &);
+  goto_symex_statet(const symex_targett::sourcet &, guard_managert &manager);
   ~goto_symex_statet();
 
   /// \brief Fake "copy constructor" that initializes the `symex_target` member
@@ -58,6 +58,8 @@ public:
   /// for error traces even after symbolic execution has finished.
   symbol_tablet symbol_table;
 
+  // Manager is required to be able to resize the thread vector
+  guard_managert &guard_manager;
   symex_target_equationt *symex_target;
 
   symex_level0t level0;
@@ -155,10 +157,14 @@ public:
   struct threadt
   {
     goto_programt::const_targett pc;
-    guardt guard{true_exprt{}};
+    guardt guard;
     call_stackt call_stack;
     std::map<irep_idt, unsigned> function_frame;
     unsigned atomic_section_id = 0;
+    explicit threadt(guard_managert &guard_manager)
+      : guard(true_exprt(), guard_manager)
+    {
+    }
   };
 
   std::vector<threadt> threads;

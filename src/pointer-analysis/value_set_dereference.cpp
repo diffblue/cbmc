@@ -24,7 +24,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/cprover_prefix.h>
 #include <util/format_type.h>
 #include <util/fresh_symbol.h>
-#include <util/guard.h>
 #include <util/options.h>
 #include <util/pointer_offset_size.h>
 #include <util/pointer_predicates.h>

@@ -32,7 +32,8 @@ multi_path_symex_only_checkert::multi_path_symex_only_checkert(
       goto_model.get_symbol_table(),
       equation,
       options,
-      path_storage)
+      path_storage,
+      guard_manager)
 {
   setup_symex(symex, ns, options, ui_message_handler);
 }

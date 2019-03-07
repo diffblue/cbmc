@@ -17,7 +17,7 @@ Date: April 2010
 #include <map>
 #include <memory> // unique_ptr
 
-#include <util/guard.h>
+#include "guard.h"
 
 #include <goto-programs/goto_model.h>
 
@@ -352,8 +352,11 @@ class rw_guarded_range_set_value_sett:public rw_range_set_value_sett
 public:
   rw_guarded_range_set_value_sett(
     const namespacet &_ns,
-    value_setst &_value_sets):
-    rw_range_set_value_sett(_ns, _value_sets)
+    value_setst &_value_sets,
+    guard_managert &guard_manager)
+    : rw_range_set_value_sett(_ns, _value_sets),
+      guard_manager(guard_manager),
+      guard(true_exprt(), guard_manager)
   {
   }
 
@@ -370,7 +373,7 @@ public:
     get_modet mode,
     const exprt &expr) override
   {
-    guard = guardt(true_exprt());
+    guard = guardt(true_exprt(), guard_manager);
 
     rw_range_set_value_sett::get_objects_rec(_function, _target, mode, expr);
   }
@@ -384,7 +387,8 @@ public:
   }
 
 protected:
-  guardt guard = guardt(true_exprt());
+  guard_managert &guard_manager;
+  guardt guard;
 
   using rw_range_sett::get_objects_rec;
 

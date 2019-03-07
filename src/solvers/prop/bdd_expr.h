@@ -25,31 +25,33 @@ Author: Michael Tautschnig, michael.tautschnig@qmul.ac.uk
 
 #include <unordered_map>
 
-class namespacet;
-
-/*! \brief TO_BE_DOCUMENTED
-*/
+/// Conversion between \c exprt and \c bbdt
+/// This encapsulate a bdd_managert, thus BDDs created with this class should
+/// only be combined with BDDs created using the same instance of
+/// \ref bdd_exprt .
+/// See unit tests in unit/solvers/prop/bdd_expr.cpp for examples.
 class bdd_exprt
 {
 public:
-  explicit bdd_exprt(const namespacet &_ns) : ns(_ns), root(bdd_mgr.bdd_true())
-  {
-  }
-
-  void from_expr(const exprt &expr);
-  exprt as_expr() const;
+  bddt from_expr(const exprt &expr);
+  exprt as_expr(const bddt &root) const;
 
 protected:
-  const namespacet &ns;
   bdd_managert bdd_mgr;
-  bddt root;
 
   typedef std::unordered_map<exprt, bddt, irep_hash> expr_mapt;
+
   expr_mapt expr_map;
+
+  /// Mapping from BDD variables to expressions: the expression at index \c i
+  /// of \p node_map corresponds to the i-th variable
   std::vector<exprt> node_map;
 
   bddt from_expr_rec(const exprt &expr);
-  exprt as_expr(const bdd_nodet &r, bool complement) const;
+  exprt as_expr(
+    const bdd_nodet &r,
+    bool complement,
+    std::unordered_map<bdd_nodet::idt, exprt> &cache) const;
 };
 
 #endif // CPROVER_SOLVERS_PROP_BDD_EXPR_H

@@ -257,6 +257,7 @@ int bmct::do_language_agnostic_bmc(
   namespacet ns(symbol_table);
   messaget message(ui);
   std::unique_ptr<path_storaget> worklist;
+  guard_managert guard_manager;
   std::string strategy = opts.get_option("exploration-strategy");
   worklist = get_path_strategy(strategy);
   try
@@ -268,7 +269,14 @@ int bmct::do_language_agnostic_bmc(
       std::unique_ptr<solver_factoryt::solvert> cbmc_solver =
         solvers.get_solver();
       prop_convt &pc = cbmc_solver->prop_conv();
-      bmct bmc(opts, symbol_table, ui, pc, *worklist, callback_after_symex);
+      bmct bmc(
+        opts,
+        symbol_table,
+        ui,
+        pc,
+        *worklist,
+        callback_after_symex,
+        guard_manager);
       if(driver_configure_bmc)
         driver_configure_bmc(bmc, symbol_table);
       tmp_result = bmc.run(model);
@@ -319,6 +327,7 @@ int bmct::do_language_agnostic_bmc(
         resume.equation,
         resume.state,
         *worklist,
+        guard_manager,
         callback_after_symex);
       if(driver_configure_bmc)
         driver_configure_bmc(pe, symbol_table);

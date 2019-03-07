@@ -36,22 +36,28 @@ public:
     goto_programt &_goto_program,
     natural_loops_mutablet::natural_loopt &_loop,
     goto_programt::targett _loop_header,
-    int _path_limit)
+    int _path_limit,
+    guard_managert &guard_manager)
     : symbol_table(_symbol_table),
       goto_functions(_goto_functions),
       goto_program(_goto_program),
       loop(_loop),
       loop_header(_loop_header),
-      polynomial_accelerator(message_handler, symbol_table, goto_functions),
+      guard_manager(guard_manager),
+      polynomial_accelerator(
+        message_handler,
+        symbol_table,
+        goto_functions,
+        guard_manager),
       path_limit(_path_limit),
-      path_enumerator(
-        util_make_unique<sat_path_enumeratort>(
-          message_handler,
-          symbol_table,
-          goto_functions,
-          goto_program,
-          loop,
-          loop_header))
+      path_enumerator(util_make_unique<sat_path_enumeratort>(
+        message_handler,
+        symbol_table,
+        goto_functions,
+        goto_program,
+        loop,
+        loop_header,
+        guard_manager))
   {
   }
 
@@ -63,6 +69,7 @@ protected:
   goto_programt &goto_program;
   natural_loops_mutablet::natural_loopt &loop;
   goto_programt::targett loop_header;
+  guard_managert &guard_manager;
   polynomial_acceleratort polynomial_accelerator;
   int path_limit;
 

@@ -31,6 +31,7 @@ protected:
   symbol_tablet symex_symbol_table;
   namespacet ns;
   symex_target_equationt equation;
+  guard_managert guard_manager;
   path_fifot path_storage; // should go away
   symex_bmct symex;
 };

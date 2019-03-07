@@ -20,13 +20,14 @@ SCENARIO("bdd_expr", "[core][solver][prop][bdd_expr]")
 {
   symbol_tablet symbol_table;
   namespacet ns{symbol_table};
+  bdd_exprt bdd_expr_converter;
 
   GIVEN("A bdd for x&!x")
   {
-    bdd_exprt bdd{ns};
     const symbol_exprt var("x", bool_typet());
-    bdd.from_expr(and_exprt(var, not_exprt(var)));
-    REQUIRE(bdd.as_expr() == false_exprt());
+    const bddt bdd =
+      bdd_expr_converter.from_expr(and_exprt(var, not_exprt(var)));
+    REQUIRE(bdd_expr_converter.as_expr(bdd) == false_exprt());
   }
 
   GIVEN("A bdd for (a&b)|!a")
@@ -34,14 +35,14 @@ SCENARIO("bdd_expr", "[core][solver][prop][bdd_expr]")
     const symbol_exprt a("a", bool_typet());
     const symbol_exprt b("b", bool_typet());
 
-    bdd_exprt bdd{ns};
-    bdd.from_expr(or_exprt(and_exprt(a, b), not_exprt(a)));
+    const bddt bdd =
+      bdd_expr_converter.from_expr(or_exprt(and_exprt(a, b), not_exprt(a)));
 
     THEN("It is equal to the BDD for (!a|b)")
     {
-      bdd_exprt bdd2{ns};
-      bdd2.from_expr(or_exprt(not_exprt(a), b));
-      REQUIRE(bdd.as_expr() == bdd2.as_expr());
+      const bddt bdd2 = bdd_expr_converter.from_expr(or_exprt(not_exprt(a), b));
+      REQUIRE(
+        bdd_expr_converter.as_expr(bdd) == bdd_expr_converter.as_expr(bdd2));
     }
   }
 
@@ -50,12 +51,11 @@ SCENARIO("bdd_expr", "[core][solver][prop][bdd_expr]")
     const symbol_exprt a("a", bool_typet());
     const symbol_exprt b("b", bool_typet());
 
-    bdd_exprt bdd{ns};
-    bdd.from_expr(and_exprt(a, not_exprt(b)));
+    const bddt bdd = bdd_expr_converter.from_expr(and_exprt(a, not_exprt(b)));
 
     WHEN("It is converted to an exprt")
     {
-      const exprt result = bdd.as_expr();
+      const exprt result = bdd_expr_converter.as_expr(bdd);
       THEN("It is equal to the expression (a & !b) or (!b & a)")
       {
         REQUIRE(result.id() == ID_and);

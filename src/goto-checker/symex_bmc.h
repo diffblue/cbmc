@@ -30,7 +30,8 @@ public:
     const symbol_tablet &outer_symbol_table,
     symex_target_equationt &_target,
     const optionst &options,
-    path_storaget &path_storage);
+    path_storaget &path_storage,
+    guard_managert &guard_manager);
 
   // To show progress
   source_locationt last_source_location;

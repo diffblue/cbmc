@@ -764,8 +764,9 @@ int goto_instrument_parse_optionst::doit()
       remove_calls_no_body(goto_model.goto_functions);
 
       status() << "Accelerating" << eom;
+      guard_managert guard_manager;
       accelerate_functions(
-        goto_model, get_message_handler(), cmdline.isset("z3"));
+        goto_model, get_message_handler(), cmdline.isset("z3"), guard_manager);
       remove_skip(goto_model);
     }
 

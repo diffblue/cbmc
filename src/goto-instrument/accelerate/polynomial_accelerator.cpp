@@ -58,7 +58,7 @@ bool polynomial_acceleratort::accelerate(
 
   expr_sett targets;
   std::map<exprt, polynomialt> polynomials;
-  scratch_programt program(symbol_table, message_handler);
+  scratch_programt program{symbol_table, message_handler, guard_manager};
   goto_programt::instructionst assigns;
 
   utils.find_modified(body, targets);
@@ -178,7 +178,8 @@ bool polynomial_acceleratort::accelerate(
 
   try
   {
-    path_is_monotone=utils.do_assumptions(polynomials, loop, guard);
+    path_is_monotone =
+      utils.do_assumptions(polynomials, loop, guard, guard_manager);
   }
   catch(const std::string &s)
   {
@@ -284,7 +285,7 @@ bool polynomial_acceleratort::fit_polynomial_sliced(
   std::vector<expr_listt> parameters;
   std::set<std::pair<expr_listt, exprt> > coefficients;
   expr_listt exprs;
-  scratch_programt program(symbol_table, message_handler);
+  scratch_programt program{symbol_table, message_handler, guard_manager};
   exprt overflow_var =
     utils.fresh_symbol("polynomial::overflow", bool_typet()).symbol_expr();
   overflow_instrumentert overflow(program, overflow_var, symbol_table);
@@ -412,7 +413,7 @@ bool polynomial_acceleratort::fit_polynomial_sliced(
   // relevant coefficients and return the expression.
   try
   {
-    if(program.check_sat())
+    if(program.check_sat(guard_manager))
     {
       utils.extract_polynomial(program, coefficients, polynomial);
       return true;
@@ -666,7 +667,7 @@ bool polynomial_acceleratort::check_inductive(
   // assert (target1==polynomial1);
   // assert (target2==polynomial2);
   // ...
-  scratch_programt program(symbol_table, message_handler);
+  scratch_programt program{symbol_table, message_handler, guard_manager};
   std::vector<exprt> polynomials_hold;
   substitutiont substitution;
 
@@ -703,7 +704,7 @@ bool polynomial_acceleratort::check_inductive(
 
   try
   {
-    if(program.check_sat())
+    if(program.check_sat(guard_manager))
     {
       // We found a counterexample to inductiveness... :-(
   #ifdef DEBUG

@@ -23,8 +23,15 @@ symex_bmct::symex_bmct(
   const symbol_tablet &outer_symbol_table,
   symex_target_equationt &_target,
   const optionst &options,
-  path_storaget &path_storage)
-  : goto_symext(mh, outer_symbol_table, _target, options, path_storage),
+  path_storaget &path_storage,
+  guard_managert &guard_manager)
+  : goto_symext(
+      mh,
+      outer_symbol_table,
+      _target,
+      options,
+      path_storage,
+      guard_manager),
     record_coverage(!options.get_option("symex-coverage-report").empty()),
     symex_coverage(ns)
 {

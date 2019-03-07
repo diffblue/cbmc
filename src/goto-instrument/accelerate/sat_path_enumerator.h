@@ -39,7 +39,8 @@ public:
     goto_functionst &_goto_functions,
     goto_programt &_goto_program,
     natural_loops_mutablet::natural_loopt &_loop,
-    goto_programt::targett _loop_header)
+    goto_programt::targett _loop_header,
+    guard_managert &guard_manager)
     : message_handler(message_handler),
       symbol_table(_symbol_table),
       ns(symbol_table),
@@ -47,7 +48,8 @@ public:
       goto_program(_goto_program),
       loop(_loop),
       loop_header(_loop_header),
-      utils(symbol_table, message_handler, goto_functions, loop_counter)
+      utils(symbol_table, message_handler, goto_functions, loop_counter),
+      guard_manager(guard_manager)
   {
     find_distinguishing_points();
     build_fixed();
@@ -75,6 +77,7 @@ protected:
   typedef std::map<exprt, bool> distinguish_valuest;
 
   acceleration_utilst utils;
+  guard_managert &guard_manager;
   exprt loop_counter;
   distinguish_mapt distinguishing_points;
   std::list<exprt> distinguishers;

@@ -369,6 +369,7 @@ void _check_with_strategy(
 
   REQUIRE(is_valid_path_strategy(strategy));
   std::unique_ptr<path_storaget> worklist = get_path_strategy(strategy);
+  guard_managert guard_manager;
 
   goto_modelt gm;
   int ret;
@@ -385,7 +386,14 @@ void _check_with_strategy(
   safety_checkert::resultt overall_result = safety_checkert::resultt::SAFE;
   std::size_t expected_results_cnt = 0;
 
-  bmct bmc(opts, gm.get_symbol_table(), mh, initial_pc, *worklist, callback);
+  bmct bmc(
+    opts,
+    gm.get_symbol_table(),
+    mh,
+    initial_pc,
+    *worklist,
+    callback,
+    guard_manager);
   safety_checkert::resultt tmp_result = bmc.run(gm);
 
   if(tmp_result != safety_checkert::resultt::PAUSED)
@@ -417,6 +425,7 @@ void _check_with_strategy(
       resume.equation,
       resume.state,
       *worklist,
+      guard_manager,
       callback);
     tmp_result = pe.run(gm);
 
