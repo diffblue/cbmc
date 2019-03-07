@@ -326,6 +326,7 @@ install:
   - make -C src/cpp library_check
   - make -C src "CXX=${COMPILER} ${EXTRA_CXXFLAGS}" -j3
   - make -C jbmc/src "CXX=${COMPILER} ${EXTRA_CXXFLAGS}" -j3
+  - ./scripts/run_variant_tests.sh -j3
 
 script:
   - if [ -e bin/gcc ] ; then export PATH=$PWD/bin:$PATH ; fi ;
