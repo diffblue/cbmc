@@ -12,7 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "pointer_offset_size.h"
 
 #include "arith_tools.h"
-#include "base_type.h"
 #include "byte_operators.h"
 #include "c_types.h"
 #include "invariant.h"
@@ -631,7 +630,7 @@ optionalt<exprt> get_subexpression_at_offset(
   const typet &target_type_raw,
   const namespacet &ns)
 {
-  if(offset_bytes == 0 && base_type_eq(expr.type(), target_type_raw, ns))
+  if(offset_bytes == 0 && expr.type() == target_type_raw)
   {
     exprt result = expr;
 

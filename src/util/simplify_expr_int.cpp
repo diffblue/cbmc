@@ -11,7 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 
 #include "arith_tools.h"
-#include "base_type.h"
 #include "bv_arithmetic.h"
 #include "byte_operators.h"
 #include "config.h"
@@ -940,9 +939,7 @@ bool simplify_exprt::simplify_concatenation(exprt &expr)
   }
 
   // { x } = x
-  if(
-    expr.operands().size() == 1 &&
-    base_type_eq(expr.op0().type(), expr.type(), ns))
+  if(expr.operands().size() == 1 && expr.op0().type() == expr.type())
   {
     exprt tmp;
     tmp.swap(expr.op0());
@@ -1301,7 +1298,7 @@ bool simplify_exprt::simplify_inequality(exprt &expr)
   exprt tmp1=expr.op1();
 
   // types must match
-  if(!base_type_eq(tmp0.type(), tmp1.type(), ns))
+  if(tmp0.type() != tmp1.type())
     return true;
 
   // if rhs is ID_if (and lhs is not), swap operands for == and !=

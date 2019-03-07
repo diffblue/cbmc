@@ -9,7 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "simplify_expr_class.h"
 
 #include "arith_tools.h"
-#include "base_type.h"
 #include "byte_operators.h"
 #include "invariant.h"
 #include "namespace.h"
@@ -46,7 +45,7 @@ bool simplify_exprt::simplify_member(exprt &expr)
         {
           // found it!
           DATA_INVARIANT(
-            base_type_eq(op2.type(), expr.type(), ns),
+            op2.type() == expr.type(),
             "member expression type must match component type");
           exprt tmp;
           tmp.swap(op2);
@@ -138,7 +137,7 @@ bool simplify_exprt::simplify_member(exprt &expr)
       {
         std::size_t number=struct_type.component_number(component_name);
         DATA_INVARIANT(
-          base_type_eq(op.operands()[number].type(), expr.type(), ns),
+          op.operands()[number].type() == expr.type(),
           "member expression type must match component type");
         exprt tmp;
         tmp.swap(op.operands()[number]);
@@ -241,7 +240,7 @@ bool simplify_exprt::simplify_member(exprt &expr)
   {
     // Try to look through member(cast(x)) if the cast is between structurally
     // identical types:
-    if(base_type_eq(op_type, op.op0().type(), ns))
+    if(op_type == op.op0().type())
     {
       expr.op0() = op.op0();
       simplify_member(expr);
@@ -263,9 +262,6 @@ bool simplify_exprt::simplify_member(exprt &expr)
 
         // Guess: turning this into a byte-extract operation is not really an
         // optimisation.
-        // The type_eq check is because get_subexpression_at_offset uses
-        // base_type_eq, whereas in the context of a simplifier we should not
-        // change the type of the expression.
         if(
           equivalent_member.has_value() &&
           equivalent_member.value().id() != ID_byte_extract_little_endian &&

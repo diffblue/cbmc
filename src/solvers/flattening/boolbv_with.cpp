@@ -11,7 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_types.h>
 #include <util/std_expr.h>
 #include <util/arith_tools.h>
-#include <util/base_type.h>
 #include <util/config.h>
 
 #include "bv_endianness_map.h"
@@ -230,7 +229,7 @@ void boolbvt::convert_with_struct(
 
     if(c.get_name() == component_name)
     {
-      if(!base_type_eq(subtype, op2.type(), ns))
+      if(subtype != op2.type())
       {
         error().source_location=type.source_location();
         error() << "with/struct: component `" << component_name

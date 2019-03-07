@@ -12,7 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "smt2_conv.h"
 
 #include <util/arith_tools.h>
-#include <util/base_type.h>
 #include <util/c_types.h>
 #include <util/config.h>
 #include <util/expr_util.h>
@@ -1078,7 +1077,7 @@ void smt2_convt::convert_expr(const exprt &expr)
     const equal_exprt &equal_expr = to_equal_expr(expr);
 
     DATA_INVARIANT(
-      base_type_eq(equal_expr.op0().type(), equal_expr.op1().type(), ns),
+      equal_expr.op0().type() == equal_expr.op1().type(),
       "operands of equal expression shall have same type");
 
     out << "(= ";
@@ -1092,7 +1091,7 @@ void smt2_convt::convert_expr(const exprt &expr)
     const notequal_exprt &notequal_expr = to_notequal_expr(expr);
 
     DATA_INVARIANT(
-      base_type_eq(notequal_expr.op0().type(), notequal_expr.op1().type(), ns),
+      notequal_expr.op0().type() == notequal_expr.op1().type(),
       "operands of not equal expression shall have same type");
 
     out << "(not (= ";
@@ -1110,7 +1109,7 @@ void smt2_convt::convert_expr(const exprt &expr)
       expr.operands().size() == 2,
       "float equal and not equal expressions must have two operands");
     DATA_INVARIANT(
-      base_type_eq(expr.op0().type(), expr.op1().type(), ns),
+      expr.op0().type() == expr.op1().type(),
       "operands of float equal and not equal expressions shall have same type");
 
     // The FPA theory properly treats NaN and negative zero.

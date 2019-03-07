@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ostream>
 #include <iomanip>
 
+#include <util/base_type.h>
 #include <util/expr_iterator.h>
 #include <util/find_symbols.h>
 #include <util/invariant.h>
@@ -715,10 +716,9 @@ void goto_programt::instructiont::validate(
             // Return removal sets the return type of a function symbol table
             // entry to 'void', but some callsites still expect the original
             // type (e.g. if a function is passed as a parameter)
-            symbol_expr_type_matches_symbol_table = base_type_eq(
-              goto_symbol_expr.type(),
-              original_return_type(ns.get_symbol_table(), goto_id),
-              ns);
+            symbol_expr_type_matches_symbol_table =
+              goto_symbol_expr.type() ==
+              original_return_type(ns.get_symbol_table(), goto_id);
 
             if(
               !symbol_expr_type_matches_symbol_table &&
@@ -760,8 +760,8 @@ void goto_programt::instructiont::validate(
               auto symbol_table_array_type = to_array_type(table_symbol->type);
               symbol_table_array_type.size() = nil_exprt();
 
-              symbol_expr_type_matches_symbol_table = base_type_eq(
-                goto_symbol_expr.type(), symbol_table_array_type, ns);
+              symbol_expr_type_matches_symbol_table =
+                goto_symbol_expr.type() == symbol_table_array_type;
             }
           }
 
