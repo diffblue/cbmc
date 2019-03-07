@@ -276,7 +276,7 @@ void allocate_objectst::mark_created_symbols_as_input(code_blockt &init_code)
 /// \param lhs : pointer which will be allocated
 /// \param size : size of the object
 /// \return code allocation object and assigning `lhs`
-codet make_allocate_code(const symbol_exprt &lhs, const exprt &size)
+code_assignt make_allocate_code(const symbol_exprt &lhs, const exprt &size)
 {
   side_effect_exprt alloc(ID_allocate, lhs.type(), lhs.source_location());
   alloc.add_to_operands(size);
