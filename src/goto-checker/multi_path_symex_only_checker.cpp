@@ -26,6 +26,7 @@ multi_path_symex_only_checkert::multi_path_symex_only_checkert(
   : incremental_goto_checkert(options, ui_message_handler),
     goto_model(goto_model),
     ns(goto_model.get_symbol_table(), symex_symbol_table),
+    equation(ui_message_handler),
     symex(
       ui_message_handler,
       goto_model.get_symbol_table(),

@@ -22,7 +22,9 @@ protected:
 
 /*! \brief Decision procedure interface for various SMT 2.x solvers
 */
-class smt2_dect:protected smt2_stringstreamt, public smt2_convt
+class smt2_dect : protected smt2_stringstreamt,
+                  public smt2_convt,
+                  public messaget
 {
 public:
   smt2_dect(

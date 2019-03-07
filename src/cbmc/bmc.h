@@ -75,7 +75,7 @@ public:
       options(_options),
       outer_symbol_table(outer_symbol_table),
       ns(outer_symbol_table, symex_symbol_table),
-      equation(),
+      equation(_message_handler),
       path_storage(_path_storage),
       symex(
         _message_handler,

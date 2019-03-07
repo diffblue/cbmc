@@ -359,12 +359,10 @@ void symex_target_equationt::convert_assignments(
   {
     if(step.is_assignment() && !step.ignore && !step.converted)
     {
-      decision_procedure.conditional_output(
-        decision_procedure.debug(),
-        [&step](messaget::mstreamt &mstream) {
-          step.output(mstream);
-          mstream << messaget::eom;
-        });
+      log.conditional_output(log.debug(), [&step](messaget::mstreamt &mstream) {
+        step.output(mstream);
+        mstream << messaget::eom;
+      });
 
       decision_procedure.set_to_true(step.cond_expr);
       step.converted = true;
@@ -404,12 +402,10 @@ void symex_target_equationt::convert_guards(
       step.guard_literal=const_literal(false);
     else
     {
-      prop_conv.conditional_output(
-        prop_conv.debug(),
-        [&step](messaget::mstreamt &mstream) {
-          step.output(mstream);
-          mstream << messaget::eom;
-        });
+      log.conditional_output(log.debug(), [&step](messaget::mstreamt &mstream) {
+        step.output(mstream);
+        mstream << messaget::eom;
+      });
 
       try
       {
@@ -436,9 +432,8 @@ void symex_target_equationt::convert_assumptions(
         step.cond_literal=const_literal(true);
       else
       {
-        prop_conv.conditional_output(
-          prop_conv.debug(),
-          [&step](messaget::mstreamt &mstream) {
+        log.conditional_output(
+          log.debug(), [&step](messaget::mstreamt &mstream) {
             step.output(mstream);
             mstream << messaget::eom;
           });
@@ -469,9 +464,8 @@ void symex_target_equationt::convert_goto_instructions(
         step.cond_literal=const_literal(true);
       else
       {
-        prop_conv.conditional_output(
-          prop_conv.debug(),
-          [&step](messaget::mstreamt &mstream) {
+        log.conditional_output(
+          log.debug(), [&step](messaget::mstreamt &mstream) {
             step.output(mstream);
             mstream << messaget::eom;
           });
@@ -498,11 +492,10 @@ void symex_target_equationt::convert_constraints(
   {
     if(step.is_constraint() && !step.ignore && !step.converted)
     {
-      decision_procedure.conditional_output(
-        decision_procedure.debug(), [&step](messaget::mstreamt &mstream) {
-          step.output(mstream);
-          mstream << messaget::eom;
-        });
+      log.conditional_output(log.debug(), [&step](messaget::mstreamt &mstream) {
+        step.output(mstream);
+        mstream << messaget::eom;
+      });
 
       try
       {
@@ -568,12 +561,10 @@ void symex_target_equationt::convert_assertions(
     {
       step.converted = true;
 
-      prop_conv.conditional_output(
-        prop_conv.debug(),
-        [&step](messaget::mstreamt &mstream) {
-          step.output(mstream);
-          mstream << messaget::eom;
-        });
+      log.conditional_output(log.debug(), [&step](messaget::mstreamt &mstream) {
+        step.output(mstream);
+        mstream << messaget::eom;
+      });
 
       implies_exprt implication(
         assumption,

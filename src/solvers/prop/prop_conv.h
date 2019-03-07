@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/decision_procedure.h>
 #include <util/expr.h>
+#include <util/message.h>
 #include <util/std_expr.h>
 
 #include "literal.h"
@@ -67,7 +68,7 @@ public:
 
 /*! \brief TO_BE_DOCUMENTED
 */
-class prop_conv_solvert:public prop_convt
+class prop_conv_solvert : public prop_convt, public messaget
 {
 public:
   explicit prop_conv_solvert(propt &_prop) : prop(_prop)

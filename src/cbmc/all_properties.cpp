@@ -54,8 +54,6 @@ safety_checkert::resultt bmc_all_propertiest::operator()()
 {
   status() << "Passing problem to " << solver.decision_procedure_text() << eom;
 
-  solver.set_message_handler(get_message_handler());
-
   auto solver_start=std::chrono::steady_clock::now();
 
   convert_symex_target_equation(

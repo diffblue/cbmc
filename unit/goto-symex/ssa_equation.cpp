@@ -6,6 +6,7 @@ Author: Diffblue Ltd.
 
 \*******************************************************************/
 
+#include <testing-utils/message.h>
 #include <testing-utils/use_catch.h>
 
 #include <util/arith_tools.h>
@@ -27,7 +28,7 @@ SCENARIO("Validation of well-formed SSA steps", "[core][goto-symex][validate]")
 
     goto_programt goto_program;
     goto_program.add_instruction(END_FUNCTION);
-    symex_target_equationt equation;
+    symex_target_equationt equation(null_message_handler);
     symex_targett::sourcet at_end_function(fun_name, goto_program);
     equation.SSA_steps.emplace_back(
       at_end_function, goto_trace_stept::typet::FUNCTION_RETURN);

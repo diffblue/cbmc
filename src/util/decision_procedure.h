@@ -12,11 +12,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_UTIL_DECISION_PROCEDURE_H
 #define CPROVER_UTIL_DECISION_PROCEDURE_H
 
-#include "message.h"
+#include <iosfwd>
+#include <string>
 
 class exprt;
 
-class decision_proceduret:public messaget
+class decision_proceduret
 {
 public:
   virtual ~decision_proceduret();

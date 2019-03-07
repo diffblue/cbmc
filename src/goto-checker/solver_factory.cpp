@@ -268,6 +268,8 @@ solver_factoryt::get_smt2(smt2_dect::solvert solver)
     if(options.get_bool_option("fpa"))
       smt2_dec->use_FPA_theory = true;
 
+    smt2_dec->set_message_handler(message_handler);
+
     set_prop_conv_time_limit(*smt2_dec);
     return util_make_unique<solvert>(std::move(smt2_dec));
   }
@@ -283,8 +285,6 @@ solver_factoryt::get_smt2(smt2_dect::solvert solver)
 
     if(options.get_bool_option("fpa"))
       smt2_conv->use_FPA_theory = true;
-
-    smt2_conv->set_message_handler(message_handler);
 
     set_prop_conv_time_limit(*smt2_conv);
     return util_make_unique<solvert>(std::move(smt2_conv));
@@ -313,8 +313,6 @@ solver_factoryt::get_smt2(smt2_dect::solvert solver)
 
     if(options.get_bool_option("fpa"))
       smt2_conv->use_FPA_theory = true;
-
-    smt2_conv->set_message_handler(message_handler);
 
     set_prop_conv_time_limit(*smt2_conv);
     return util_make_unique<solvert>(std::move(smt2_conv), std::move(out));
