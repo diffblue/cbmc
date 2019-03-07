@@ -95,6 +95,10 @@ private:
     const irep_idt &basename_prefix);
 };
 
+/// Create code allocating object of size `size` and assigning it to `lhs`
+/// \param lhs : pointer which will be allocated
+/// \param size : size of the object
+/// \return code allocation object and assigning `lhs`
 code_assignt make_allocate_code(const symbol_exprt &lhs, const exprt &size);
 
 #endif // CPROVER_UTIL_ALLOCATE_OBJECTS_H
