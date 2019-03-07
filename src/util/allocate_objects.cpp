@@ -271,3 +271,15 @@ void allocate_objectst::mark_created_symbols_as_input(code_blockt &init_code)
     init_code.add(std::move(input_code));
   }
 }
+
+/// Create code allocating object of size `size` and assigning it to `lhs`
+/// \param lhs : pointer which will be allocated
+/// \param size : size of the object
+/// \return code allocation object and assigning `lhs`
+codet make_allocate_code(const symbol_exprt &lhs, const exprt &size)
+{
+  side_effect_exprt alloc(ID_allocate, lhs.type(), lhs.source_location());
+  alloc.add_to_operands(size);
+  alloc.add_to_operands(false_exprt());
+  return code_assignt(lhs, alloc);
+}

@@ -95,4 +95,6 @@ private:
     const irep_idt &basename_prefix);
 };
 
+codet make_allocate_code(const symbol_exprt &lhs, const exprt &size);
+
 #endif // CPROVER_UTIL_ALLOCATE_OBJECTS_H
