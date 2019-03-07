@@ -37,13 +37,15 @@ void goto_symext::symex_decl(statet &state, const symbol_exprt &expr)
   // each declaration introduces a new object, which we record as a fresh L1
   // index
 
-  ssa_exprt ssa = state.rename_ssa<L0>(ssa_exprt{expr}, ns);
   // We use "1" as the first level-1 index, which is in line with doing so for
   // level-2 indices (but it's an arbitrary choice, we have just always been
   // doing it this way).
-  const std::size_t fresh_l1_index =
-    path_storage.get_unique_index(ssa.get_identifier(), 1);
-  state.add_object(ssa, fresh_l1_index, ns);
+  ssa_exprt ssa = state.add_object(
+    expr,
+    [this](const irep_idt &l0_name) {
+      return path_storage.get_unique_index(l0_name, 1);
+    },
+    ns);
   const irep_idt &l1_identifier = ssa.get_identifier();
 
   // rename type to L2
