@@ -30,10 +30,15 @@ verification algorithm. Incremental goto checkers keep the state of the
 analysis and can be queried by the goto verifier repeatedly to return
 their results incrementally. A query to an incremental goto checker
 either returns when a violated property has been found or the
-verification algorithm has terminated. If a violated property has been
-found then additional information (e.g. a trace) can be retrieved
-from the incremental goto checker (if it supports that).
-See \ref incremental_goto_checkert.
+verification algorithm has terminated.  See \ref incremental_goto_checkert.
+Incremental goto checkers can provide additional functionality by implementing
+the respective interfaces:
+* \ref goto_trace_providert : If a violated property has been
+  found then a trace can be retrieved from the incremental goto checker.
+* \ref fault_localization_providert : If a violated property has been
+  found then a likely fault location can be determined.
+* \ref witness_providert : A witness can be output (for violated
+  and proved properties).
 
 The combination of these three concepts enables:
 * _Verification algorithms can be used interchangeably._
@@ -53,7 +58,7 @@ The combination of these three concepts enables:
 There are the following variants of goto verifiers at the moment:
 * \ref stop_on_fail_verifiert : Checks all properties, but terminates
   as soon as the first violated property is found and reports this violation.
-  A trace ends at a violated property.
+  A trace ends at a violated property. Witnesses are output.
 * \ref all_properties_verifier_with_trace_storaget : Determines the status of
   all properties and outputs results when the verification algorithm has
   terminated. A trace ends at a violated property.
@@ -68,16 +73,36 @@ There are the following variants of goto verifiers at the moment:
   verification algorithm has terminated.
   The reporting uses 'goals' rather than 'property' terminology. I.e.
   a failing property means 'success' and a passing property 'failed'.
+* \ref stop_on_fail_verifier_with_fault_localizationt : Same as
+  \ref stop_on_fail_verifiert, but also finds and reports
+  the most likely fault location. Requires an incremental goto checker
+  that provides fault localization.
+* \ref all_properties_verifier_with_fault_localizationt : Same as
+  \ref all_properties_verifier_with_trace_storaget, but also finds and reports
+  the most likely fault location. Requires an incremental goto checker
+  that provides fault localization.
 
 There are the following variants of incremental goto checkers at the moment:
 * \ref multi_path_symex_checkert : The default mode of goto-symex. It explores
   all paths and applies aggressive path merging to generate a formula
   (aka 'equation') that is passed to the SAT/SMT solver. It supports
   determining the status of all properties, but not adding new properties
-  after the first invocation.
+  after the first invocation. It provides traces, fault localization and witness
+  output.
 * \ref multi_path_symex_only_checkert : Same as \ref multi_path_symex_checkert,
+  but does not call the SAT/SMT solver. It can only decide the status of
+  properties by the simplifications that goto-symex performs.
+* \ref single_path_symex_checkert : Activated with option `--paths`. It
+  explores paths one by one and generates a formula (aka 'equation') for each
+  path and passes it to the SAT/SMT solver. It supports
+  determining the status of all properties, but not adding new properties
+  after the first invocation. It provides traces and witness output.
+* \ref single_path_symex_only_checkert : Same as
+  \ref single_path_symex_checkert,
   but does not call the SAT/SMT solver. It can only decide the status of
   properties by the simplifications that goto-symex performs.
 * There are variants for Java that perform a Java-specific preprocessing:
   \ref java_multi_path_symex_checkert,
-  \ref java_multi_path_symex_only_checkert
+  \ref java_multi_path_symex_only_checkert,
+  \ref java_single_path_symex_checkert,
+  \ref java_single_path_symex_only_checkert
