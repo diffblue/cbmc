@@ -1,0 +1,13 @@
+CORE
+Test.class
+--function Test.main --validate-goto-model
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+This test ensures that the member_exprt generated to return a qualified generic
+field has the correct type, otherwise we'll fail model validation.
+Prior to ec4160829cc9c22ff71e647dd2894439720ad89c we would have created a
+non-matching type (Generic<Integer> vs. Generic)
