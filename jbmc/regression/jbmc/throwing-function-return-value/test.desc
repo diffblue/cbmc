@@ -1,0 +1,18 @@
+CORE
+Test.class
+--function Test.main --show-vcc
+java::Test\.main:\(Z\)V::14::t1!0@1#\d+ = address_of\(symex_dynamic::dynamic_object\d+\)
+java::Test\.main:\(Z\)V::9::x!0@1#\d+ = 5 \+ java::Test\.main:\(Z\)V::9::x!0@1#\d+
+^EXIT=0$
+^SIGNAL=0$
+--
+return_value!0#0
+java::Sub\.g:\(\)
+--
+This checks that when a function may throw, we can nonetheless constant-propagate
+and populate the value-set for the normal-return path. In particular we don't
+expect to see any reference to a zero-generation return value (indicating
+reading the return-value when not defined), nor do we expect to see any code
+from the Sub class, which is not accessible and can only be reached when
+constant propagation has lost information to the point we're not sure which type
+virtual calls against Test may find.
