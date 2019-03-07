@@ -202,7 +202,8 @@ void goto_symex_statet::assignment(
       || l1_identifier == guard_identifier()
       || ns.lookup(l1_identifier).is_shared()
       || has_prefix(id2string(l1_identifier), "symex::invalid_object")
-      || has_prefix(id2string(l1_identifier), SYMEX_DYNAMIC_PREFIX "dynamic_object"));
+      || has_prefix(id2string(l1_identifier),
+                    SYMEX_DYNAMIC_PREFIX "::dynamic_object"));
 #endif
 
   // do the l2 renaming
