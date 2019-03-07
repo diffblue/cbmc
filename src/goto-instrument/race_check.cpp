@@ -130,7 +130,7 @@ static bool is_shared(const namespacet &ns, const symbol_exprt &symbol_expr)
     identifier == "stdout" || identifier == "stderr" ||
     identifier == "sys_nerr" ||
     has_prefix(id2string(identifier), "symex::invalid_object") ||
-    has_prefix(id2string(identifier), SYMEX_DYNAMIC_PREFIX "dynamic_object"))
+    has_prefix(id2string(identifier), SYMEX_DYNAMIC_PREFIX "::dynamic_object"))
     return false; // no race check
 
   const symbolt &symbol=ns.lookup(identifier);

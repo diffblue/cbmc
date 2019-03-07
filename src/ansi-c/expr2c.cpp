@@ -1648,7 +1648,7 @@ std::string expr2ct::convert_symbol(const exprt &src)
     dest=id2string(entry->second);
 
     #if 0
-    if(has_prefix(id2string(id), SYMEX_DYNAMIC_PREFIX "dynamic_object"))
+    if(has_prefix(id2string(id), SYMEX_DYNAMIC_PREFIX "::dynamic_object"))
     {
       if(sizeof_nesting++ == 0)
         dest+=" /*"+convert(src.type());

@@ -459,9 +459,9 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
         }
         else if(
           !contains_symbol_prefix(
-            it->full_lhs_value, SYMEX_DYNAMIC_PREFIX "dynamic_object") &&
+            it->full_lhs_value, SYMEX_DYNAMIC_PREFIX "::dynamic_object") &&
           !contains_symbol_prefix(
-            it->full_lhs, SYMEX_DYNAMIC_PREFIX "dynamic_object") &&
+            it->full_lhs, SYMEX_DYNAMIC_PREFIX "::dynamic_object") &&
           lhs_id.find("thread") == std::string::npos &&
           lhs_id.find("mutex") == std::string::npos &&
           (!it->full_lhs_value.is_constant() ||
