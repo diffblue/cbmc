@@ -90,6 +90,7 @@ symbol_exprt get_or_create_string_literal_symbol(
   new_symbol.mode = ID_java;
   new_symbol.is_type = false;
   new_symbol.is_lvalue = true;
+  new_symbol.is_state_var = true;
   new_symbol.is_static_lifetime = true;
 
   namespacet ns(symbol_table);
