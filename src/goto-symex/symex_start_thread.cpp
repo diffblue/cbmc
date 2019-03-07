@@ -66,6 +66,9 @@ void goto_symext::symex_start_thread(statet &state)
 
     // get L0 name for current thread
     lhs.set_level_0(t);
+    const irep_idt &l0_name = lhs.get_identifier();
+    std::size_t l1_index = path_storage.get_unique_index(l0_name, 0);
+    CHECK_RETURN(l1_index == 0);
 
     // set up L1 name
     auto emplace_result = state.level1.current_names.emplace(
@@ -76,7 +79,6 @@ void goto_symext::symex_start_thread(statet &state)
     const ssa_exprt lhs_l1 = state.rename_ssa<L1>(std::move(lhs), ns);
     const irep_idt l1_name = lhs_l1.get_l1_object_identifier();
     // store it
-    state.l1_history.insert(l1_name);
     new_thread.call_stack.back().local_objects.insert(l1_name);
 
     // make copy

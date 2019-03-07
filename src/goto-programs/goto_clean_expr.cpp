@@ -45,7 +45,8 @@ symbol_exprt goto_convertt::make_compound_literal(
 
   // The lifetime of compound literals is really that of
   // the block they are in.
-  copy(code_declt(result), DECL, dest);
+  if(!new_symbol.is_static_lifetime)
+    copy(code_declt(result), DECL, dest);
 
   code_assignt code_assign(result, expr);
   code_assign.add_source_location()=source_location;
