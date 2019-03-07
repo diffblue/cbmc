@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "c_types.h"
 #include "expr_util.h"
 #include "mathematical_types.h"
+#include "namespace.h"
 #include "pointer_offset_size.h"
 #include "simplify_expr.h"
 
@@ -225,4 +226,44 @@ const exprt &object_descriptor_exprt::root_object() const
   }
 
   return *p;
+}
+
+/// Check that the member expression has the right number of operands, refers
+/// to a component that exists on its underlying compound type, and uses the
+/// same type as is declared on that compound type. Throws or raises an
+/// invariant if not, according to validation mode.
+/// \param expr: expression to validate
+/// \param ns: global namespace
+/// \param vm: validation mode (see \ref exprt::validate)
+void member_exprt::validate(
+  const exprt &expr,
+  const namespacet &ns,
+  const validation_modet vm)
+{
+  check(expr, vm);
+
+  const auto &member_expr = to_member_expr(expr);
+
+  const typet &compound_type = ns.follow(member_expr.compound().type());
+  const auto *struct_union_type =
+    type_try_dynamic_cast<struct_union_typet>(compound_type);
+  DATA_CHECK(
+    vm,
+    struct_union_type != nullptr,
+    "member must address a struct, union or compatible type");
+
+  const auto &component =
+    struct_union_type->get_component(member_expr.get_component_name());
+
+  DATA_CHECK(
+    vm,
+    component.is_not_nil(),
+    "member component '" + id2string(member_expr.get_component_name()) +
+      "' must exist on addressed type");
+
+  DATA_CHECK(
+    vm,
+    component.type() == member_expr.type(),
+    "member expression's type must match the addressed struct or union "
+    "component");
 }
