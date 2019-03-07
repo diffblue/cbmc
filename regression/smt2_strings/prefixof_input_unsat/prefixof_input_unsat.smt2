@@ -1,0 +1,5 @@
+(declare-const in1 String)
+(declare-const in2 String)
+(assert (< (str.len in2) (str.len in1)))
+(assert (str.prefixof in1 in2))
+(check-sat)
