@@ -120,6 +120,8 @@ array_string_exprt array_poolt::make_char_array_for_char_pointer(
         if_expr.cond(),
         to_array_type(t.type()).size(),
         to_array_type(f.type()).size()));
+    // BEWARE: this expression is possibly type-inconsistent and must not be
+    // used for any purposes other than passing it to concretisation
     return to_array_string_expr(if_exprt(if_expr.cond(), t, f, array_type));
   }
   const bool is_constant_array =

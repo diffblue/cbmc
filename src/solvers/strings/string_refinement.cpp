@@ -854,6 +854,49 @@ decision_proceduret::resultt string_refinementt::dec_solve()
   return resultt::D_ERROR;
 }
 
+/// In a best-effort manner, try to clean up the type inconsistencies introduced
+/// by \ref array_poolt::make_char_array_for_char_pointer, which creates
+/// conditional expressions for the size of arrays. The cleanup is achieved by
+/// removing branches that are found to be infeasible, and by simplifying the
+/// conditional size expressions previously generated.
+/// \param expr: Expression to be cleaned
+/// \param ns: Namespace
+/// \return Cleaned expression
+static exprt adjust_if_recursive(exprt expr, const namespacet &ns)
+{
+  for(auto it = expr.depth_begin(); it != expr.depth_end();)
+  {
+    if(it->id() == ID_if)
+    {
+      if_exprt if_expr = to_if_expr(*it);
+      const exprt simp_cond = simplify_expr(if_expr.cond(), ns);
+      if(simp_cond.is_true())
+      {
+        it.mutate() = adjust_if_recursive(if_expr.true_case(), ns);
+        it.next_sibling_or_parent();
+      }
+      else if(simp_cond.is_false())
+      {
+        it.mutate() = adjust_if_recursive(if_expr.false_case(), ns);
+        it.next_sibling_or_parent();
+      }
+      else if(
+        it->type().id() == ID_array &&
+        to_array_type(it->type()).size().id() == ID_if)
+      {
+        simplify(to_array_type(it.mutate().type()).size(), ns);
+        ++it;
+      }
+      else
+        ++it;
+    }
+    else
+      ++it;
+  }
+
+  return expr;
+}
+
 /// Add the given lemma to the solver.
 /// \param lemma: a Boolean expression
 /// \param simplify_lemma: whether the lemma should be simplified before being
@@ -869,7 +912,10 @@ void string_refinementt::add_lemma(
 
   exprt simple_lemma = lemma;
   if(simplify_lemma)
+  {
+    simple_lemma = adjust_if_recursive(std::move(simple_lemma), ns);
     simplify(simple_lemma, ns);
+  }
 
   if(simple_lemma.is_true())
   {
@@ -917,7 +963,7 @@ static optionalt<exprt> get_array(
 {
   const auto eom = messaget::eom;
   const exprt &size = arr.length();
-  exprt arr_val = simplify_expr(super_get(arr), ns);
+  exprt arr_val = simplify_expr(adjust_if_recursive(super_get(arr), ns), ns);
   exprt size_val = super_get(size);
   size_val = simplify_expr(size_val, ns);
   const typet char_type = arr.type().subtype();

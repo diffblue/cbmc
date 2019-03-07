@@ -265,8 +265,7 @@ bool simplify_exprt::simplify_member(exprt &expr)
         if(
           equivalent_member.has_value() &&
           equivalent_member.value().id() != ID_byte_extract_little_endian &&
-          equivalent_member.value().id() != ID_byte_extract_big_endian &&
-          equivalent_member.value().type() == expr.type())
+          equivalent_member.value().id() != ID_byte_extract_big_endian)
         {
           expr = equivalent_member.value();
           simplify_rec(expr);

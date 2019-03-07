@@ -2548,6 +2548,7 @@ bool simplify_exprt::simplify_rec(exprt &expr)
 
   if(!result)
   {
+    POSTCONDITION(tmp.type() == expr.type());
     expr.swap(tmp);
 
     #ifdef USE_CACHE
