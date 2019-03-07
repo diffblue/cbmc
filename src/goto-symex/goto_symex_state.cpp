@@ -632,54 +632,6 @@ void goto_symex_statet::rename_address(exprt &expr, const namespacet &ns)
   }
 }
 
-/// Return true if, and only if, the \p type or one of its subtypes requires SSA
-/// renaming. Renaming is necessary when symbol expressions occur within the
-/// type, which is the case for arrays of non-constant size.
-static bool requires_renaming(const typet &type, const namespacet &ns)
-{
-  if(type.id() == ID_array)
-  {
-    const auto &array_type = to_array_type(type);
-    return requires_renaming(array_type.subtype(), ns) ||
-           !array_type.size().is_constant();
-  }
-  else if(
-    type.id() == ID_struct || type.id() == ID_union || type.id() == ID_class)
-  {
-    const struct_union_typet &s_u_type = to_struct_union_type(type);
-    const struct_union_typet::componentst &components = s_u_type.components();
-
-    for(auto &component : components)
-    {
-      // be careful, or it might get cyclic
-      if(
-        component.type().id() != ID_pointer &&
-        requires_renaming(component.type(), ns))
-      {
-        return true;
-      }
-    }
-
-    return false;
-  }
-  else if(type.id() == ID_pointer)
-  {
-    return requires_renaming(to_pointer_type(type).subtype(), ns);
-  }
-  else if(type.id() == ID_union_tag)
-  {
-    const symbolt &symbol = ns.lookup(to_union_tag_type(type));
-    return requires_renaming(symbol.type, ns);
-  }
-  else if(type.id() == ID_struct_tag)
-  {
-    const symbolt &symbol = ns.lookup(to_struct_tag_type(type));
-    return requires_renaming(symbol.type, ns);
-  }
-
-  return false;
-}
-
 template <levelt level>
 void goto_symex_statet::rename(
   typet &type,
@@ -704,32 +656,26 @@ optionalt<typet> goto_symex_statet::rename_type(
   const irep_idt &l1_identifier,
   const namespacet &ns)
 {
-  // check whether there are symbol expressions in the type; if not, there
-  // is no need to expand the struct/union tags in the type
-  if(!requires_renaming(type, ns))
-    return {};
-
   // rename all the symbols with their last known value
   // to the given level
 
-  std::pair<l1_typest::iterator, bool> l1_type_entry;
   if(level==L2 &&
      !l1_identifier.empty())
   {
-    l1_type_entry=l1_types.insert(std::make_pair(l1_identifier, type));
+    auto l1_type_entry = l1_types.find(l1_identifier);
 
-    if(!l1_type_entry.second) // was already in map
+    if(l1_type_entry != l1_types.end())
     {
       // do not change a complete array type to an incomplete one
 
-      const typet &type_prev=l1_type_entry.first->second;
+      const typet &type_prev = l1_type_entry->second;
 
       if(type.id()!=ID_array ||
          type_prev.id()!=ID_array ||
          to_array_type(type).is_incomplete() ||
          to_array_type(type_prev).is_complete())
       {
-        return l1_type_entry.first->second;
+        return l1_type_entry->second;
       }
     }
   }
@@ -805,14 +751,11 @@ optionalt<typet> goto_symex_statet::rename_type(
   }
   else if(type.id() == ID_struct_tag || type.id() == ID_union_tag)
   {
-    const typet &followed_type = ns.follow(type);
-    result = rename_type<level>(followed_type, l1_identifier, ns);
-    if(!result.has_value())
-      result = followed_type;
+    result = rename_type<level>(ns.follow(type), l1_identifier, ns);
   }
 
   if(level == L2 && !l1_identifier.empty() && result.has_value())
-    l1_type_entry.first->second = *result;
+    l1_types.emplace(l1_identifier, *result);
 
   return result;
 }

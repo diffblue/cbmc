@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.c
 
 ^EXIT=0$
@@ -8,5 +8,4 @@ main.c
 ^warning: ignoring
 --
 Just like pointers, array members may have subtypes of the same type as the
-containing struct. requires_renaming fails to catch this case, which results in
-unbounded recursion.
+containing struct.
