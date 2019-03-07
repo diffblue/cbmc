@@ -61,6 +61,17 @@ public:
   }
 };
 
+template <>
+inline bool can_cast_expr<transt>(const exprt &base)
+{
+  return base.id() == ID_trans;
+}
+
+inline void validate_expr(const transt &value)
+{
+  validate_operands(value, 3, "Transition systems must have three operands");
+}
+
 /// Cast an exprt to a \ref transt
 /// \a expr must be known to be \ref transt.
 /// \param expr: Source expression
@@ -68,28 +79,18 @@ public:
 inline const transt &to_trans_expr(const exprt &expr)
 {
   PRECONDITION(expr.id() == ID_trans);
-  DATA_INVARIANT(
-    expr.operands().size() == 3, "Transition systems must have three operands");
-  return static_cast<const transt &>(expr);
+  const transt &ret = static_cast<const transt &>(expr);
+  validate_expr(ret);
+  return ret;
 }
 
 /// \copydoc to_trans_expr(const exprt &)
 inline transt &to_trans_expr(exprt &expr)
 {
   PRECONDITION(expr.id() == ID_trans);
-  DATA_INVARIANT(
-    expr.operands().size() == 3, "Transition systems must have three operands");
-  return static_cast<transt &>(expr);
-}
-
-template <>
-inline bool can_cast_expr<transt>(const exprt &base)
-{
-  return base.id() == ID_trans;
-}
-inline void validate_expr(const transt &value)
-{
-  validate_operands(value, 3, "Transition systems must have three operands");
+  transt &ret = static_cast<transt &>(expr);
+  validate_expr(ret);
+  return ret;
 }
 
 /// \brief Exponentiation
@@ -107,6 +108,17 @@ public:
   }
 };
 
+template <>
+inline bool can_cast_expr<power_exprt>(const exprt &base)
+{
+  return base.id() == ID_power;
+}
+
+inline void validate_expr(const power_exprt &value)
+{
+  validate_operands(value, 2, "Power must have two operands");
+}
+
 /// \brief Cast an exprt to a \ref power_exprt
 ///
 /// \a expr must be known to be \ref power_exprt.
@@ -116,26 +128,18 @@ public:
 inline const power_exprt &to_power_expr(const exprt &expr)
 {
   PRECONDITION(expr.id() == ID_power);
-  DATA_INVARIANT(expr.operands().size() == 2, "Power must have two operands");
-  return static_cast<const power_exprt &>(expr);
+  const power_exprt &ret = static_cast<const power_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
 }
 
 /// \copydoc to_power_expr(const exprt &)
 inline power_exprt &to_power_expr(exprt &expr)
 {
   PRECONDITION(expr.id() == ID_power);
-  DATA_INVARIANT(expr.operands().size() == 2, "Power must have two operands");
-  return static_cast<power_exprt &>(expr);
-}
-
-template <>
-inline bool can_cast_expr<power_exprt>(const exprt &base)
-{
-  return base.id() == ID_power;
-}
-inline void validate_expr(const power_exprt &value)
-{
-  validate_operands(value, 2, "Power must have two operands");
+  power_exprt &ret = static_cast<power_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
 }
 
 /// \brief Falling factorial power
@@ -153,6 +157,17 @@ public:
   }
 };
 
+template <>
+inline bool can_cast_expr<factorial_power_exprt>(const exprt &base)
+{
+  return base.id() == ID_factorial_power;
+}
+
+inline void validate_expr(const factorial_power_exprt &value)
+{
+  validate_operands(value, 2, "Factorial power must have two operands");
+}
+
 /// \brief Cast an exprt to a \ref factorial_power_exprt
 ///
 /// \a expr must be known to be \ref factorial_power_exprt.
@@ -162,28 +177,19 @@ public:
 inline const factorial_power_exprt &to_factorial_power_expr(const exprt &expr)
 {
   PRECONDITION(expr.id() == ID_factorial_power);
-  DATA_INVARIANT(
-    expr.operands().size() == 2, "Factorial power must have two operands");
-  return static_cast<const factorial_power_exprt &>(expr);
+  const factorial_power_exprt &ret =
+    static_cast<const factorial_power_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
 }
 
 /// \copydoc to_factorial_power_expr(const exprt &)
 inline factorial_power_exprt &to_factorial_expr(exprt &expr)
 {
   PRECONDITION(expr.id() == ID_factorial_power);
-  DATA_INVARIANT(
-    expr.operands().size() == 2, "Factorial power must have two operands");
-  return static_cast<factorial_power_exprt &>(expr);
-}
-
-template <>
-inline bool can_cast_expr<factorial_power_exprt>(const exprt &base)
-{
-  return base.id() == ID_factorial_power;
-}
-inline void validate_expr(const factorial_power_exprt &value)
-{
-  validate_operands(value, 2, "Factorial power must have two operands");
+  factorial_power_exprt &ret = static_cast<factorial_power_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
 }
 
 class tuple_exprt : public multi_ary_exprt
@@ -239,6 +245,17 @@ public:
   }
 };
 
+template <>
+inline bool can_cast_expr<function_application_exprt>(const exprt &base)
+{
+  return base.id() == ID_function_application;
+}
+
+inline void validate_expr(const function_application_exprt &value)
+{
+  validate_operands(value, 2, "Function application must have two operands");
+}
+
 /// \brief Cast an exprt to a \ref function_application_exprt
 ///
 /// \a expr must be known to be \ref function_application_exprt.
@@ -249,28 +266,20 @@ inline const function_application_exprt &
 to_function_application_expr(const exprt &expr)
 {
   PRECONDITION(expr.id() == ID_function_application);
-  DATA_INVARIANT(
-    expr.operands().size() == 2, "Function application must have two operands");
-  return static_cast<const function_application_exprt &>(expr);
+  const function_application_exprt &ret =
+    static_cast<const function_application_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
 }
 
 /// \copydoc to_function_application_expr(const exprt &)
 inline function_application_exprt &to_function_application_expr(exprt &expr)
 {
   PRECONDITION(expr.id() == ID_function_application);
-  DATA_INVARIANT(
-    expr.operands().size() == 2, "Function application must have two operands");
-  return static_cast<function_application_exprt &>(expr);
-}
-
-template <>
-inline bool can_cast_expr<function_application_exprt>(const exprt &base)
-{
-  return base.id() == ID_function_application;
-}
-inline void validate_expr(const function_application_exprt &value)
-{
-  validate_operands(value, 2, "Function application must have two operands");
+  function_application_exprt &ret =
+    static_cast<function_application_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
 }
 
 /// \brief A base class for quantifier expressions
@@ -306,33 +315,6 @@ public:
   }
 };
 
-/// \brief Cast an exprt to a \ref quantifier_exprt
-///
-/// \a expr must be known to be \ref quantifier_exprt.
-///
-/// \param expr: Source expression
-/// \return Object of type \ref quantifier_exprt
-inline const quantifier_exprt &to_quantifier_expr(const exprt &expr)
-{
-  DATA_INVARIANT(
-    expr.operands().size() == 2,
-    "quantifier expressions must have two operands");
-  DATA_INVARIANT(
-    expr.op0().id() == ID_symbol, "quantified variable shall be a symbol");
-  return static_cast<const quantifier_exprt &>(expr);
-}
-
-/// \copydoc to_quantifier_expr(const exprt &)
-inline quantifier_exprt &to_quantifier_expr(exprt &expr)
-{
-  DATA_INVARIANT(
-    expr.operands().size() == 2,
-    "quantifier expressions must have two operands");
-  DATA_INVARIANT(
-    expr.op0().id() == ID_symbol, "quantified variable shall be a symbol");
-  return static_cast<quantifier_exprt &>(expr);
-}
-
 template <>
 inline bool can_cast_expr<quantifier_exprt>(const exprt &base)
 {
@@ -342,6 +324,31 @@ inline bool can_cast_expr<quantifier_exprt>(const exprt &base)
 inline void validate_expr(const quantifier_exprt &value)
 {
   validate_operands(value, 2, "quantifier expressions must have two operands");
+  DATA_INVARIANT(
+    value.op0().id() == ID_symbol, "quantified variable shall be a symbol");
+}
+
+/// \brief Cast an exprt to a \ref quantifier_exprt
+///
+/// \a expr must be known to be \ref quantifier_exprt.
+///
+/// \param expr: Source expression
+/// \return Object of type \ref quantifier_exprt
+inline const quantifier_exprt &to_quantifier_expr(const exprt &expr)
+{
+  PRECONDITION(can_cast_expr<quantifier_exprt>(expr));
+  const quantifier_exprt &ret = static_cast<const quantifier_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
+}
+
+/// \copydoc to_quantifier_expr(const exprt &)
+inline quantifier_exprt &to_quantifier_expr(exprt &expr)
+{
+  PRECONDITION(can_cast_expr<quantifier_exprt>(expr));
+  quantifier_exprt &ret = static_cast<quantifier_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
 }
 
 /// \brief A forall expression
@@ -357,19 +364,17 @@ public:
 inline const forall_exprt &to_forall_expr(const exprt &expr)
 {
   PRECONDITION(expr.id() == ID_forall);
-  DATA_INVARIANT(
-    expr.operands().size() == 2,
-    "forall expressions have exactly two operands");
-  return static_cast<const forall_exprt &>(expr);
+  const forall_exprt &ret = static_cast<const forall_exprt &>(expr);
+  validate_expr(static_cast<const quantifier_exprt &>(ret));
+  return ret;
 }
 
 inline forall_exprt &to_forall_expr(exprt &expr)
 {
   PRECONDITION(expr.id() == ID_forall);
-  DATA_INVARIANT(
-    expr.operands().size() == 2,
-    "forall expressions have exactly two operands");
-  return static_cast<forall_exprt &>(expr);
+  forall_exprt &ret = static_cast<forall_exprt &>(expr);
+  validate_expr(static_cast<const quantifier_exprt &>(ret));
+  return ret;
 }
 
 /// \brief An exists expression
@@ -385,19 +390,17 @@ public:
 inline const exists_exprt &to_exists_expr(const exprt &expr)
 {
   PRECONDITION(expr.id() == ID_exists);
-  DATA_INVARIANT(
-    expr.operands().size() == 2,
-    "exists expressions have exactly two operands");
-  return static_cast<const exists_exprt &>(expr);
+  const exists_exprt &ret = static_cast<const exists_exprt &>(expr);
+  validate_expr(static_cast<const quantifier_exprt &>(ret));
+  return ret;
 }
 
 inline exists_exprt &to_exists_expr(exprt &expr)
 {
   PRECONDITION(expr.id() == ID_exists);
-  DATA_INVARIANT(
-    expr.operands().size() == 2,
-    "exists expressions have exactly two operands");
-  return static_cast<exists_exprt &>(expr);
+  exists_exprt &ret = static_cast<exists_exprt &>(expr);
+  validate_expr(static_cast<const quantifier_exprt &>(ret));
+  return ret;
 }
 
 #endif // CPROVER_UTIL_MATHEMATICAL_EXPR_H
