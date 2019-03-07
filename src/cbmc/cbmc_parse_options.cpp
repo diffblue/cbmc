@@ -485,8 +485,9 @@ int cbmc_parse_optionst::doit()
 
   if(cmdline.isset("show-parse-tree"))
   {
-    if(cmdline.args.size()!=1 ||
-       is_goto_binary(cmdline.args[0]))
+    if(
+      cmdline.args.size() != 1 ||
+      is_goto_binary(cmdline.args[0], ui_message_handler))
     {
       error() << "Please give exactly one source file" << eom;
       return CPROVER_EXIT_INCORRECT_TASK;

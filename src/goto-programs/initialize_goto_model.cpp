@@ -75,7 +75,7 @@ goto_modelt initialize_goto_model(
 
   for(const auto &file : files)
   {
-    if(is_goto_binary(file))
+    if(is_goto_binary(file, message_handler))
       binaries.push_back(file);
     else
       sources.push_back(file);

@@ -128,7 +128,7 @@ void lazy_goto_modelt::initialize(
 
   for(const auto &file : files)
   {
-    if(is_goto_binary(file))
+    if(is_goto_binary(file, message_handler))
       binaries.push_back(file);
     else
       sources.push_back(file);
