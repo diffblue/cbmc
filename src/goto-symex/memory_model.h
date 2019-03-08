@@ -38,6 +38,11 @@ protected:
 
   void read_from(symex_target_equationt &equation);
 
+  symbol_exprt register_read_from_choice_symbol(
+    const event_it &r,
+    const event_it &w,
+    symex_target_equationt &equation);
+
   // maps thread numbers to an event list
   typedef std::map<unsigned, event_listt> per_thread_mapt;
 };

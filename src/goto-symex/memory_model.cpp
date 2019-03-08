@@ -69,34 +69,8 @@ void memory_model_baset::read_from(symex_target_equationt &equation)
         if(po(r, w))
           continue; // contradicts po
 
-        bool is_rfi=
-          w->source.thread_nr==r->source.thread_nr;
-
-        symbol_exprt s=nondet_bool_symbol("rf");
-
-        // record the symbol
-        choice_symbols.emplace(std::make_pair(r, w), s);
-
-        // We rely on the fact that there is at least
-        // one write event that has guard 'true'.
-        implies_exprt read_from(s,
-            and_exprt(w->guard,
-              equal_exprt(r->ssa_lhs, w->ssa_lhs)));
-
-        // Uses only the write's guard as precondition, read's guard
-        // follows from rf_some
-        add_constraint(equation,
-          read_from, is_rfi?"rfi":"rf", r->source);
-
-        if(!is_rfi)
-        {
-          // if r reads from w, then w must have happened before r
-          const implies_exprt cond(s, before(w, r));
-          add_constraint(equation,
-            cond, "rf-order", r->source);
-        }
-
-        rf_some_operands.push_back(s);
+        rf_some_operands.push_back(
+          register_read_from_choice_symbol(r, w, equation));
       }
 
       // value equals the one of some write
@@ -119,4 +93,39 @@ void memory_model_baset::read_from(symex_target_equationt &equation)
         implies_exprt(r->guard, rf_some), "rf-some", r->source);
     }
   }
+}
+
+symbol_exprt memory_model_baset::register_read_from_choice_symbol(
+  const event_it &r,
+  const event_it &w,
+  symex_target_equationt &equation)
+{
+  bool is_rfi=
+    w->source.thread_nr==r->source.thread_nr;
+
+  symbol_exprt s=nondet_bool_symbol("rf");
+
+  // record the symbol
+  choice_symbols.emplace(std::make_pair(r, w), s);
+
+  // We rely on the fact that there is at least
+  // one write event that has guard 'true'.
+  implies_exprt read_from(s,
+                          and_exprt(w->guard,
+                                    equal_exprt(r->ssa_lhs, w->ssa_lhs)));
+
+  // Uses only the write's guard as precondition, read's guard
+  // follows from rf_some
+  add_constraint(equation,
+                 read_from, is_rfi?"rfi":"rf", r->source);
+
+  if(!is_rfi)
+  {
+    // if r reads from w, then w must have happened before r
+    const implies_exprt cond(s, before(w, r));
+    add_constraint(equation,
+                   cond, "rf-order", r->source);
+  }
+
+  return s;
 }
