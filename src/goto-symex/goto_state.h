@@ -57,9 +57,6 @@ public:
   /// Threads
   unsigned atomic_section_id = 0;
 
-  unsigned total_vccs = 0;
-  unsigned remaining_vccs = 0;
-
   /// Constructors
   explicit goto_statet(const class goto_symex_statet &s);
 
