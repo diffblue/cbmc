@@ -112,7 +112,7 @@ exprt bdd_exprt::as_expr(
       return true_exprt();
   }
 
-  auto index = numeric_cast_v<std::size_t>(r.index());
+  auto index = narrow<std::size_t>(r.index());
   INVARIANT(index < node_map.size(), "Index should be in node_map");
   const exprt &n_expr = node_map[index];
 
