@@ -67,10 +67,6 @@ void memory_model_baset::read_from(symex_target_equationt &equation)
         }
       }
 
-      // value equals the one of some write
-
-      exprt rf_some = disjunction(rf_choice_symbols);
-
       // uninitialised global symbol like symex_dynamic::dynamic_object*
       // or *$object
       if(!rf_choice_symbols.empty())
@@ -79,7 +75,7 @@ void memory_model_baset::read_from(symex_target_equationt &equation)
         // by each entry in rf_some
         add_constraint(
           equation,
-          implies_exprt(read_event->guard, rf_some),
+          implies_exprt{read_event->guard, disjunction(rf_choice_symbols)},
           "rf-some",
           read_event->source);
       }
@@ -98,23 +94,21 @@ symbol_exprt memory_model_baset::register_read_from_choice_symbol(
   choice_symbols.emplace(std::make_pair(r, w), s);
 
   bool is_rfi = w->source.thread_nr == r->source.thread_nr;
-  // We rely on the fact that there is at least
-  // one write event that has guard 'true'.
-  implies_exprt read_from(s,
-                          and_exprt(w->guard,
-                                    equal_exprt(r->ssa_lhs, w->ssa_lhs)));
-
   // Uses only the write's guard as precondition, read's guard
   // follows from rf_some
-  add_constraint(equation,
-                 read_from, is_rfi?"rfi":"rf", r->source);
+  add_constraint(
+    equation,
+    // We rely on the fact that there is at least
+    // one write event that has guard 'true'.
+    implies_exprt{s, and_exprt{w->guard, equal_exprt{r->ssa_lhs, w->ssa_lhs}}},
+    is_rfi ? "rfi" : "rf",
+    r->source);
 
   if(!is_rfi)
   {
     // if r reads from w, then w must have happened before r
-    const implies_exprt cond(s, before(w, r));
-    add_constraint(equation,
-                   cond, "rf-order", r->source);
+    add_constraint(
+      equation, implies_exprt{s, before(w, r)}, "rf-order", r->source);
   }
 
   return s;
