@@ -1167,12 +1167,55 @@ inline bv_typet &to_bv_type(typet &type)
   return static_cast<bv_typet &>(type);
 }
 
-/// Fixed-width bit-vector with unsigned binary interpretation
-class unsignedbv_typet:public bitvector_typet
+/// Fixed-width bit-vector representing a signed or unsigned integer
+class integer_bitvector_typet : public bitvector_typet
 {
 public:
-  explicit unsignedbv_typet(std::size_t width):
-    bitvector_typet(ID_unsignedbv, width)
+  integer_bitvector_typet(const irep_idt &id, std::size_t width)
+    : bitvector_typet(id, width)
+  {
+  }
+};
+
+/// Check whether a reference to a typet is an \ref integer_bitvector_typet.
+/// \param type: Source type.
+/// \return True if \p type is an \ref integer_bitvector_typet.
+template <>
+inline bool can_cast_type<integer_bitvector_typet>(const typet &type)
+{
+  return type.id() == ID_signedbv || type.id() == ID_unsignedbv;
+}
+
+/// \brief Cast a typet to an \ref integer_bitvector_typet
+///
+/// This is an unchecked conversion. \a type must be known to be \ref
+/// integer_bitvector_typet. Will fail with a precondition violation if type
+/// doesn't match.
+///
+/// \param type: Source type.
+/// \return Object of type \ref integer_bitvector_typet.
+inline const integer_bitvector_typet &
+to_integer_bitvector_type(const typet &type)
+{
+  PRECONDITION(can_cast_type<integer_bitvector_typet>(type));
+
+  return static_cast<const integer_bitvector_typet &>(type);
+}
+
+/// \copydoc to_integer_bitvector_type(const typet &type)
+inline integer_bitvector_typet &to_integer_bitvector_type(typet &type)
+{
+  PRECONDITION(can_cast_type<integer_bitvector_typet>(type));
+
+  return static_cast<integer_bitvector_typet &>(type);
+}
+
+/// Fixed-width bit-vector with unsigned binary interpretation
+class unsignedbv_typet : public integer_bitvector_typet
+{
+public:
+  explicit unsignedbv_typet(std::size_t width)
+    : integer_bitvector_typet(ID_unsignedbv, width)
   {
   }
 
@@ -1223,11 +1266,11 @@ inline unsignedbv_typet &to_unsignedbv_type(typet &type)
 }
 
 /// Fixed-width bit-vector with two's complement interpretation
-class signedbv_typet:public bitvector_typet
+class signedbv_typet : public integer_bitvector_typet
 {
 public:
-  explicit signedbv_typet(std::size_t width):
-    bitvector_typet(ID_signedbv, width)
+  explicit signedbv_typet(std::size_t width)
+    : integer_bitvector_typet(ID_signedbv, width)
   {
   }
 
