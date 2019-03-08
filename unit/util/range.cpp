@@ -57,6 +57,45 @@ SCENARIO("range tests", "[core][util][range]")
       ++it;
       REQUIRE(it == filtered_range.end());
     }
+
+    THEN("Drop first 2 elements")
+    {
+      auto range = make_range(list);
+      auto drop_range = range.drop(2);
+      auto it = drop_range.begin();
+      REQUIRE(*it == "acdef");
+      drop_range = std::move(drop_range).drop(1);
+      REQUIRE(drop_range.empty());
+      // Check the original is unmodified
+      REQUIRE(!range.empty());
+      REQUIRE(*range.begin() == "abc");
+    }
+    THEN("Drop first 5 elements")
+    {
+      auto range = make_range(list);
+      auto skip_range = range.drop(5);
+      REQUIRE(skip_range.empty());
+      // Check the original is unmodified
+      REQUIRE(!range.empty());
+      REQUIRE(*range.begin() == "abc");
+    }
+    THEN("Drop first 2 elements, move version")
+    {
+      auto range = make_range(list);
+      range = std::move(range).drop(2);
+      REQUIRE(!range.empty());
+      auto it = range.begin();
+      REQUIRE(*it == "acdef");
+      range = std::move(range).drop(1);
+      REQUIRE(range.empty());
+    }
+    THEN("Drop first 5 elements, move version")
+    {
+      auto range = make_range(list);
+      range = std::move(range).drop(5);
+      REQUIRE(range.empty());
+    }
+
     THEN(
       "A const instance of a `filter_iteratort` can mutate the input "
       "collection.")

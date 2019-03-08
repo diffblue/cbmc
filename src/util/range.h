@@ -289,7 +289,8 @@ struct ranget final
 public:
   using value_type = typename iteratort::value_type;
 
-  ranget(iteratort begin, iteratort end) : begin_value(begin), end_value(end)
+  ranget(iteratort begin, iteratort end)
+    : begin_value(std::move(begin)), end_value(std::move(end))
   {
   }
 
@@ -339,6 +340,24 @@ public:
   bool empty() const
   {
     return begin_value == end_value;
+  }
+
+  /// Return an new range containing the same elements except for the first
+  /// \p count elements.
+  /// If the range has fewer elements, returns an empty range.
+  ranget<iteratort> drop(std::size_t count) &&
+  {
+    for(; count > 0 && begin_value != end_value; --count)
+      ++begin_value;
+    return ranget<iteratort>{std::move(begin_value), std::move(end_value)};
+  }
+
+  /// Return an new range containing the same elements except for the first
+  /// \p count elements.
+  /// If the range has fewer elements, returns an empty range.
+  ranget<iteratort> drop(std::size_t count) const &
+  {
+    return ranget<iteratort>{begin(), end()}.drop(count);
   }
 
   iteratort begin() const
