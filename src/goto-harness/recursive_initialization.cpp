@@ -11,6 +11,7 @@ Author: Diffblue Ltd.
 #include <util/allocate_objects.h>
 #include <util/arith_tools.h>
 #include <util/c_types.h>
+#include <util/code_util.h>
 #include <util/fresh_symbol.h>
 #include <util/irep.h>
 #include <util/optional_utils.h>
@@ -129,7 +130,7 @@ void recursive_initializationt::initialize_pointer(
 
   auto pointee = pointee_symbol.symbol_expr();
   allocate_objects.declare_created_symbols(body);
-  body.add(code_assignt{lhs, null_pointer_exprt{type}});
+  body.add(get_null_assignment(lhs, type, type.source_location()));
   bool is_unknown_struct_tag =
     can_cast_type<tag_typet>(type.subtype()) &&
     known_tags.find(to_tag_type(type.subtype()).get_identifier()) ==

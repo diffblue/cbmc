@@ -16,6 +16,7 @@ Author: Diffblue Ltd.
 #include <util/allocate_objects.h>
 #include <util/arith_tools.h>
 #include <util/c_types.h>
+#include <util/code_util.h>
 #include <util/fresh_symbol.h>
 #include <util/namespace.h>
 #include <util/nondet_bool.h>
@@ -62,8 +63,7 @@ void symbol_factoryt::gen_nondet_init(
         recursion_set.find(struct_tag) != recursion_set.end() &&
         depth >= object_factory_params.max_nondet_tree_depth)
       {
-        assignments.add(code_assignt(expr, null_pointer_exprt(pointer_type)));
-
+        assignments.add(get_null_assignment(expr, pointer_type, loc));
         return;
       }
     }
@@ -91,9 +91,7 @@ void symbol_factoryt::gen_nondet_init(
       //           <code from recursive call to gen_nondet_init() with
       //             tmp$<temporary_counter>>
       // And the next line is labelled label2
-      auto set_null_inst=code_assignt(expr, null_pointer_exprt(pointer_type));
-      set_null_inst.add_source_location()=loc;
-
+      auto set_null_inst = get_null_assignment(expr, pointer_type, loc);
       code_ifthenelset null_check(
         side_effect_expr_nondett(bool_typet(), loc),
         std::move(set_null_inst),

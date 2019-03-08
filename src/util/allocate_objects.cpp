@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "arith_tools.h"
 #include "c_types.h"
+#include "code_util.h"
 #include "fresh_symbol.h"
 #include "pointer_offset_size.h"
 #include "string_constant.h"
@@ -147,11 +148,8 @@ exprt allocate_objectst::allocate_dynamic_object(
   if(allocate_type.id() == ID_empty)
   {
     // make null
-    null_pointer_exprt null_pointer_expr(to_pointer_type(target_expr.type()));
-    code_assignt code(target_expr, null_pointer_expr);
-    code.add_source_location() = source_location;
-    output_code.add(code);
-
+    output_code.add(get_null_assignment(
+      target_expr, to_pointer_type(target_expr.type()), source_location));
     return exprt();
   }
 
