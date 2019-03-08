@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "std_types.h"
 
 #include "arith_tools.h"
+#include "bv_arithmetic.h"
 #include "namespace.h"
 #include "std_expr.h"
 #include "string2int.h"
@@ -163,12 +164,12 @@ mp_integer range_typet::get_to() const
 
 mp_integer signedbv_typet::smallest() const
 {
-  return -power(2, get_width()-1);
+  return bv_spect(*this).min_value();
 }
 
 mp_integer signedbv_typet::largest() const
 {
-  return power(2, get_width()-1)-1;
+  return bv_spect(*this).max_value();
 }
 
 constant_exprt signedbv_typet::zero_expr() const
@@ -188,12 +189,12 @@ constant_exprt signedbv_typet::largest_expr() const
 
 mp_integer unsignedbv_typet::smallest() const
 {
-  return 0;
+  return bv_spect(*this).min_value();
 }
 
 mp_integer unsignedbv_typet::largest() const
 {
-  return power(2, get_width())-1;
+  return bv_spect(*this).max_value();
 }
 
 constant_exprt unsignedbv_typet::zero_expr() const
