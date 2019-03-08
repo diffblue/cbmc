@@ -268,8 +268,7 @@ void allocate_objectst::mark_created_symbols_as_input(code_blockt &init_code)
 
 code_assignt make_allocate_code(const symbol_exprt &lhs, const exprt &size)
 {
-  side_effect_exprt alloc(ID_allocate, lhs.type(), lhs.source_location());
-  alloc.add_to_operands(size);
-  alloc.add_to_operands(false_exprt());
+  side_effect_exprt alloc{
+    ID_allocate, {size, false_exprt()}, lhs.type(), lhs.source_location()};
   return code_assignt(lhs, alloc);
 }
