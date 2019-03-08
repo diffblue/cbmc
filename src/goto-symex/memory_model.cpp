@@ -51,40 +51,38 @@ void memory_model_baset::read_from(symex_target_equationt &equation)
 
   for(const auto &address : address_map)
   {
-    const a_rect &a_rec=address.second;
-
-    for(const auto &read_event : a_rec.reads)
+    for(const auto &read_event : address.second.reads)
     {
-      const event_it r=read_event;
-
-      exprt::operandst rf_some_operands;
-      rf_some_operands.reserve(a_rec.writes.size());
+      exprt::operandst rf_choice_symbols;
+      rf_choice_symbols.reserve(address.second.writes.size());
 
       // this is quadratic in #events per address
-      for(const auto &write_event : a_rec.writes)
+      for(const auto &write_event : address.second.writes)
       {
-        const event_it w=write_event;
-
         // rf cannot contradict program order
-        if(po(r, w))
+        if(po(read_event, write_event))
           continue; // contradicts po
 
-        rf_some_operands.push_back(
-          register_read_from_choice_symbol(r, w, equation));
+        rf_choice_symbols.push_back(
+          register_read_from_choice_symbol(read_event, write_event, equation));
       }
 
       // value equals the one of some write
-      exprt rf_some = disjunction(rf_some_operands);
+
+      exprt rf_some = disjunction(rf_choice_symbols);
 
       // uninitialised global symbol like symex_dynamic::dynamic_object*
       // or *$object
-      if(rf_some_operands.empty())
+      if(rf_choice_symbols.empty())
         continue;
 
       // Add the read's guard, each of the writes' guards is implied
       // by each entry in rf_some
-      add_constraint(equation,
-        implies_exprt(r->guard, rf_some), "rf-some", r->source);
+      add_constraint(
+        equation,
+        implies_exprt(read_event->guard, rf_some),
+        "rf-some",
+        read_event->source);
     }
   }
 }
