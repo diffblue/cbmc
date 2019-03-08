@@ -11,13 +11,10 @@ Author: Michael Tautschnig, michael.tautschnig@qmul.ac.uk
 
 #include "bdd_expr.h"
 
-#include <util/arith_tools.h>
 #include <util/expr_util.h>
 #include <util/format_expr.h>
 #include <util/invariant.h>
 #include <util/std_expr.h>
-
-#include <sstream>
 
 bddt bdd_exprt::from_expr_rec(const exprt &expr)
 {
