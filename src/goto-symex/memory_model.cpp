@@ -49,30 +49,21 @@ void memory_model_baset::read_from(symex_target_equationt &equation)
   // make them match at least one
   // (internal or external) write.
 
-  for(address_mapt::const_iterator
-      a_it=address_map.begin();
-      a_it!=address_map.end();
-      a_it++)
+  for(const auto &address : address_map)
   {
-    const a_rect &a_rec=a_it->second;
+    const a_rect &a_rec=address.second;
 
-    for(event_listt::const_iterator
-        r_it=a_rec.reads.begin();
-        r_it!=a_rec.reads.end();
-        r_it++)
+    for(const auto &read_event : a_rec.reads)
     {
-      const event_it r=*r_it;
+      const event_it r=read_event;
 
       exprt::operandst rf_some_operands;
       rf_some_operands.reserve(a_rec.writes.size());
 
       // this is quadratic in #events per address
-      for(event_listt::const_iterator
-          w_it=a_rec.writes.begin();
-          w_it!=a_rec.writes.end();
-          ++w_it)
+      for(const auto &write_event : a_rec.writes)
       {
-        const event_it w=*w_it;
+        const event_it w=write_event;
 
         // rf cannot contradict program order
         if(po(r, w))
