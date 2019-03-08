@@ -26,7 +26,6 @@ Date:   April 2017
 #include <util/string_expr.h>
 
 #include "java_types.h"
-#include "java_object_factory.h"
 #include "java_utils.h"
 
 #include "java_string_library_preprocess.h"

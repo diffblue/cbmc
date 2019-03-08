@@ -159,12 +159,6 @@ exprt allocate_objectst::allocate_dynamic_object(
   auto object_size = size_of_expr(allocate_type, ns);
   INVARIANT(object_size.has_value(), "Size of objects should be known");
 
-  // malloc expression
-  side_effect_exprt malloc_expr(
-    ID_allocate, pointer_type(allocate_type), source_location);
-  malloc_expr.copy_to_operands(object_size.value());
-  malloc_expr.copy_to_operands(false_exprt());
-
   // create a symbol for the malloc expression so we can initialize
   // without having to do it potentially through a double-deref, which
   // breaks the to-SSA phase.
@@ -178,8 +172,8 @@ exprt allocate_objectst::allocate_dynamic_object(
 
   symbols_created.push_back(&malloc_sym);
 
-  code_assignt assign(malloc_sym.symbol_expr(), malloc_expr);
-  assign.add_source_location() = source_location;
+  code_assignt assign =
+    make_allocate_code(malloc_sym.symbol_expr(), object_size.value());
   output_code.add(assign);
 
   exprt malloc_symbol_expr = typecast_exprt::conditional_cast(
@@ -270,4 +264,11 @@ void allocate_objectst::mark_created_symbols_as_input(code_blockt &init_code)
     input_code.add_source_location() = source_location;
     init_code.add(std::move(input_code));
   }
+}
+
+code_assignt make_allocate_code(const symbol_exprt &lhs, const exprt &size)
+{
+  side_effect_exprt alloc{
+    ID_allocate, {size, false_exprt()}, lhs.type(), lhs.source_location()};
+  return code_assignt(lhs, alloc);
 }
