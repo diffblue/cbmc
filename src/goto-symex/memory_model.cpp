@@ -60,11 +60,11 @@ void memory_model_baset::read_from(symex_target_equationt &equation)
       for(const auto &write_event : address.second.writes)
       {
         // rf cannot contradict program order
-        if(po(read_event, write_event))
-          continue; // contradicts po
-
-        rf_choice_symbols.push_back(
-          register_read_from_choice_symbol(read_event, write_event, equation));
+        if(!po(read_event, write_event))
+        {
+          rf_choice_symbols.push_back(register_read_from_choice_symbol(
+            read_event, write_event, equation));
+        }
       }
 
       // value equals the one of some write
@@ -73,16 +73,16 @@ void memory_model_baset::read_from(symex_target_equationt &equation)
 
       // uninitialised global symbol like symex_dynamic::dynamic_object*
       // or *$object
-      if(rf_choice_symbols.empty())
-        continue;
-
-      // Add the read's guard, each of the writes' guards is implied
-      // by each entry in rf_some
-      add_constraint(
-        equation,
-        implies_exprt(read_event->guard, rf_some),
-        "rf-some",
-        read_event->source);
+      if(!rf_choice_symbols.empty())
+      {
+        // Add the read's guard, each of the writes' guards is implied
+        // by each entry in rf_some
+        add_constraint(
+          equation,
+          implies_exprt(read_event->guard, rf_some),
+          "rf-some",
+          read_event->source);
+      }
     }
   }
 }
@@ -92,14 +92,12 @@ symbol_exprt memory_model_baset::register_read_from_choice_symbol(
   const event_it &w,
   symex_target_equationt &equation)
 {
-  bool is_rfi=
-    w->source.thread_nr==r->source.thread_nr;
-
   symbol_exprt s=nondet_bool_symbol("rf");
 
   // record the symbol
   choice_symbols.emplace(std::make_pair(r, w), s);
 
+  bool is_rfi = w->source.thread_nr == r->source.thread_nr;
   // We rely on the fact that there is at least
   // one write event that has guard 'true'.
   implies_exprt read_from(s,
