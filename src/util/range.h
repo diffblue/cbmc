@@ -289,7 +289,8 @@ struct ranget final
 public:
   using value_type = typename iteratort::value_type;
 
-  ranget(iteratort begin, iteratort end) : begin_value(begin), end_value(end)
+  ranget(iteratort begin, iteratort end)
+    : begin_value(std::move(begin)), end_value(std::move(end))
   {
   }
 
