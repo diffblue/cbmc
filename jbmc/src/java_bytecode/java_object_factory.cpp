@@ -351,19 +351,6 @@ public:
   }
 };
 
-/// Get max value for an integer type
-/// \param type:
-///   Type to find maximum value for
-/// \return Maximum integer value
-static mp_integer max_value(const typet &type)
-{
-  if(type.id() == ID_signedbv)
-    return to_signedbv_type(type).largest();
-  else if(type.id() == ID_unsignedbv)
-    return to_unsignedbv_type(type).largest();
-  UNREACHABLE;
-}
-
 /// Initialise length and data fields for a nondeterministic String structure.
 ///
 /// If the structure is not a nondeterministic structure, the call results in
@@ -458,7 +445,9 @@ void initialize_nondet_string_fields(
   code.add(code_assumet(binary_relation_exprt(length_expr, ID_ge, min_length)));
 
   // assume (length_expr <= max_input_length)
-  if(max_nondet_string_length <= max_value(length_expr.type()))
+  if(
+    max_nondet_string_length <=
+    to_integer_bitvector_type(length_expr.type()).largest())
   {
     exprt max_length =
       from_integer(max_nondet_string_length, length_expr.type());

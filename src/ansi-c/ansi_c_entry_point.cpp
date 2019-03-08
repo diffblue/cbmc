@@ -377,18 +377,8 @@ bool generate_ansi_c_start_function(
         }
 
         // assume envp_size is INTMAX-1
-        mp_integer max;
-
-        if(envp_size_symbol.type.id()==ID_signedbv)
-        {
-          max=to_signedbv_type(envp_size_symbol.type).largest();
-        }
-        else if(envp_size_symbol.type.id()==ID_unsignedbv)
-        {
-          max=to_unsignedbv_type(envp_size_symbol.type).largest();
-        }
-        else
-          UNREACHABLE;
+        const mp_integer max =
+          to_integer_bitvector_type(envp_size_symbol.type).largest();
 
         exprt max_minus_one=from_integer(max-1, envp_size_symbol.type);
 
