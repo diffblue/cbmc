@@ -121,6 +121,54 @@ public:
   }
 };
 
+template <typename Target, typename Source, typename = void, typename = void, typename = void, typename = void>
+struct numeric_cast_integralt final
+{
+};
+
+template <typename Target, typename Source>
+struct numeric_cast_integralt<
+  Target,
+  Source,
+  typename std::enable_if<std::is_integral<Target>::value>::type,
+  typename std::enable_if<std::is_integral<Source>::value>::type,
+  typename std::enable_if<std::is_signed<Target>::value>::type,
+  typename std::enable_if<std::is_signed<Source>::value>::type>
+// Conversion between to signed integral types
+{
+  optionalt<Target> operator()(Source i) const
+  {
+    if(sizeof(Source) <= sizeof(Target))
+      return static_cast<Target>(i);
+    if(i <= static_cast<Source>(std::numeric_limits<Target>::max())
+       && i >= static_cast<Source>(std::numeric_limits<Target>::min()))
+      return narrow_cast<Source>(i);
+    return {};
+  }
+};
+
+  // Conversion between to unsigned integral types
+template <typename Target, typename Source>
+struct numeric_cast_integralt<
+  Target,
+  Source,
+  typename std::enable_if<std::is_integral<Target>::value>::type,
+  typename std::enable_if<std::is_integral<Source>::value>::type,
+  typename std::enable_if<!std::is_signed<Target>::value>::type,
+  typename std::enable_if<!std::is_signed<Source>::value>::type
+>
+{
+
+  optionalt<Target> operator()(Source i) const
+  {
+    if(sizeof(Source) <= sizeof(Target))
+      return static_cast<Target>(i);
+    if(i <= static_cast<Source>(std::numeric_limits<Target>::max()))
+      return narrow_cast<Source>(i);
+    return {};
+  }
+};
+
 /// Converts an expression to any integral type
 /// \tparam Target: type to convert to
 /// \param arg: expression to convert
@@ -158,6 +206,31 @@ Target numeric_cast_v(const constant_exprt &arg)
     maybe,
     "expression should be convertible to target integral type",
     irep_pretty_diagnosticst(arg));
+  return *maybe;
+}
+
+/// Convert between to integral types of same sign
+/// An invariant will fail if the conversion is not possible.
+/// \tparam Target: type to convert to
+/// \param arg: numeric value
+/// \return value of type Target
+template <typename Target>
+optionalt<Target> numeric_cast(std::size_t arg)
+{
+  return numeric_cast_integralt<Target, std::size_t>{}(arg);
+}
+
+/// Convert between to integral types of same sign
+/// An invariant will fail if the conversion is not possible.
+/// \tparam Target: type to convert to
+/// \param arg: numeric value
+/// \return value of type Target
+template <typename Target, typename Source>
+Target numeric_cast_v(std::size_t arg)
+{
+  const auto maybe = numeric_cast_integralt<Target, std::size_t>{}(arg);
+  INVARIANT(
+    maybe, "value should be convertible to target integral type: " + arg);
   return *maybe;
 }
 
