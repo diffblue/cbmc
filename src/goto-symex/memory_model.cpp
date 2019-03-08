@@ -74,18 +74,12 @@ void memory_model_baset::read_from(symex_target_equationt &equation)
       }
 
       // value equals the one of some write
-      exprt rf_some;
+      exprt rf_some = disjunction(rf_some_operands);
 
       // uninitialised global symbol like symex_dynamic::dynamic_object*
       // or *$object
       if(rf_some_operands.empty())
         continue;
-      else if(rf_some_operands.size()==1)
-        rf_some=rf_some_operands.front();
-      else
-      {
-        rf_some = or_exprt(std::move(rf_some_operands));
-      }
 
       // Add the read's guard, each of the writes' guards is implied
       // by each entry in rf_some
