@@ -36,7 +36,7 @@ public:
   }
 
   /// Type of indexes of Boolean variables
-  using indext = int;
+  using indext = unsigned int;
 
   /// Label on the node, corresponds to the index of a Boolean variable
   indext index() const
