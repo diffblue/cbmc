@@ -1176,10 +1176,21 @@ public:
   {
   }
 
+  /// Return the smallest value that can be represented using this type.
   mp_integer smallest() const;
+  /// Return the largest value that can be represented using this type.
   mp_integer largest() const;
+
+  // If we ever need any of the following three methods in \ref fixedbv_typet or
+  // \ref floatbv_typet, we might want to move them to a new class
+  // numeric_bitvector_typet, which would be between integer_bitvector_typet and
+  // bitvector_typet in the hierarchy.
+
+  /// Return an expression representing the smallest value of this type.
   constant_exprt smallest_expr() const;
+  /// Return an expression representing the zero value of this type.
   constant_exprt zero_expr() const;
+  /// Return an expression representing the largest value of this type.
   constant_exprt largest_expr() const;
 };
 
