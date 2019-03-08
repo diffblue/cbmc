@@ -11,6 +11,7 @@ Author: Michael Tautschnig, michael.tautschnig@qmul.ac.uk
 
 #include "bdd_expr.h"
 
+#include <util/arith_tools.h>
 #include <util/expr_util.h>
 #include <util/format_expr.h>
 #include <util/invariant.h>
@@ -111,8 +112,9 @@ exprt bdd_exprt::as_expr(
       return true_exprt();
   }
 
-  INVARIANT(r.index() < node_map.size(), "Index should be in node_map");
-  const exprt &n_expr = node_map[r.index()];
+  auto index = numeric_cast_v<std::size_t>(r.index());
+  INVARIANT(index < node_map.size(), "Index should be in node_map");
+  const exprt &n_expr = node_map[index];
 
   // Look-up cache for already computed value
   auto insert_result = cache.emplace(r.id(), nil_exprt());
