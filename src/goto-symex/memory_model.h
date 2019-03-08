@@ -23,7 +23,10 @@ public:
   virtual void operator()(symex_target_equationt &)=0;
 
 protected:
-  // program order
+  /// In-thread program order
+  /// \param e1: preceding event
+  /// \param e2: following event
+  /// \return true if e1 precedes e2 in program order
   bool po(event_it e1, event_it e2);
 
   // produce fresh symbols
@@ -36,8 +39,19 @@ protected:
     std::pair<event_it, event_it>, symbol_exprt> choice_symbolst;
   choice_symbolst choice_symbols;
 
+  /// For each read `r` from every address we collect the choice symbols `S`
+  ///   via \ref register_read_from_choice_symbol (for potential read-write
+  ///   pairs) and add a constraint r.guard => \/S.
+  /// \param equation: symex equation where the new constraint should be added
   void read_from(symex_target_equationt &equation);
 
+  /// Introduce a new choice symbol `s` for the pair (\p r, \p w)
+  /// add constraint s => (w.guard /\ r.lhs=w.lhs)
+  /// add constraint s => before(w,r) [if \p w is from another thread]
+  /// \param r: read event
+  /// \param w: write event
+  /// \param equation: symex equation where the new constraints should be added
+  /// \return the new choice symbol
   symbol_exprt register_read_from_choice_symbol(
     const event_it &r,
     const event_it &w,
