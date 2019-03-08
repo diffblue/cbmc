@@ -6,6 +6,7 @@ SRC = allocate_objects.cpp \
       byte_operators.cpp \
       c_types.cpp \
       cmdline.cpp \
+      code_util.cpp \
       config.cpp \
       cout_message.cpp \
       decision_procedure.cpp \

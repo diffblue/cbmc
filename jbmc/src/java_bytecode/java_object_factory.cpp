@@ -8,6 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "java_object_factory.h"
 
+#include <util/code_util.h>
 #include <util/expr_initializer.h>
 #include <util/nondet.h>
 #include <util/nondet_bool.h>
@@ -58,10 +59,6 @@ class java_object_factoryt
   const select_pointer_typet &pointer_type_selector;
 
   allocate_objectst allocate_objects;
-
-  code_assignt get_null_assignment(
-    const exprt &expr,
-    const pointer_typet &ptr_type);
 
   void gen_pointer_target_init(
     code_blockt &assignments,
@@ -184,17 +181,6 @@ private:
     update_in_placet update_in_place,
     const source_locationt &location);
 };
-
-/// Returns a codet that assigns \p expr, of type \p ptr_type, a NULL value.
-code_assignt java_object_factoryt::get_null_assignment(
-  const exprt &expr,
-  const pointer_typet &ptr_type)
-{
-  null_pointer_exprt null_pointer_expr(ptr_type);
-  code_assignt code(expr, null_pointer_expr);
-  code.add_source_location()=loc;
-  return code;
-}
 
 /// Initializes the pointer-typed lvalue expression `expr` to point to an object
 /// of type `target_type`, recursively nondet-initializing the members of that
@@ -571,7 +557,7 @@ void java_object_factoryt::gen_nondet_pointer_init(
     {
       if(update_in_place==update_in_placet::NO_UPDATE_IN_PLACE)
       {
-        assignments.add(get_null_assignment(expr, pointer_type));
+        assignments.add(get_null_assignment(expr, pointer_type, loc));
       }
       // Otherwise leave it as it is.
       return;
@@ -650,7 +636,7 @@ void java_object_factoryt::gen_nondet_pointer_init(
     update_in_placet::NO_UPDATE_IN_PLACE,
     location);
 
-  auto set_null_inst=get_null_assignment(expr, pointer_type);
+  auto set_null_inst = get_null_assignment(expr, pointer_type, loc);
 
   const bool allow_null = depth > object_factory_parameters.min_null_tree_depth;
 
