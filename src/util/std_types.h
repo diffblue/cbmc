@@ -1175,6 +1175,12 @@ public:
     : bitvector_typet(id, width)
   {
   }
+
+  mp_integer smallest() const;
+  mp_integer largest() const;
+  constant_exprt smallest_expr() const;
+  constant_exprt zero_expr() const;
+  constant_exprt largest_expr() const;
 };
 
 /// Check whether a reference to a typet is an \ref integer_bitvector_typet.
@@ -1218,12 +1224,6 @@ public:
     : integer_bitvector_typet(ID_unsignedbv, width)
   {
   }
-
-  mp_integer smallest() const;
-  mp_integer largest() const;
-  constant_exprt smallest_expr() const;
-  constant_exprt zero_expr() const;
-  constant_exprt largest_expr() const;
 
   static void check(
     const typet &type,
@@ -1273,12 +1273,6 @@ public:
     : integer_bitvector_typet(ID_signedbv, width)
   {
   }
-
-  mp_integer smallest() const;
-  mp_integer largest() const;
-  constant_exprt smallest_expr() const;
-  constant_exprt zero_expr() const;
-  constant_exprt largest_expr() const;
 
   static void check(
     const typet &type,

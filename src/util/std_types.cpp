@@ -162,52 +162,27 @@ mp_integer range_typet::get_to() const
   return string2integer(get_string(ID_to));
 }
 
-mp_integer signedbv_typet::smallest() const
+mp_integer integer_bitvector_typet::smallest() const
 {
   return bv_spect(*this).min_value();
 }
 
-mp_integer signedbv_typet::largest() const
+mp_integer integer_bitvector_typet::largest() const
 {
   return bv_spect(*this).max_value();
 }
 
-constant_exprt signedbv_typet::zero_expr() const
+constant_exprt integer_bitvector_typet::zero_expr() const
 {
   return from_integer(0, *this);
 }
 
-constant_exprt signedbv_typet::smallest_expr() const
+constant_exprt integer_bitvector_typet::smallest_expr() const
 {
   return from_integer(smallest(), *this);
 }
 
-constant_exprt signedbv_typet::largest_expr() const
-{
-  return from_integer(largest(), *this);
-}
-
-mp_integer unsignedbv_typet::smallest() const
-{
-  return bv_spect(*this).min_value();
-}
-
-mp_integer unsignedbv_typet::largest() const
-{
-  return bv_spect(*this).max_value();
-}
-
-constant_exprt unsignedbv_typet::zero_expr() const
-{
-  return from_integer(0, *this);
-}
-
-constant_exprt unsignedbv_typet::smallest_expr() const
-{
-  return from_integer(smallest(), *this);
-}
-
-constant_exprt unsignedbv_typet::largest_expr() const
+constant_exprt integer_bitvector_typet::largest_expr() const
 {
   return from_integer(largest(), *this);
 }
