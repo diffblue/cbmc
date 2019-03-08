@@ -35,8 +35,11 @@ public:
     return Cudd_IsComplement(node) != 0;
   }
 
+  /// Type of indexes of Boolean variables
+  using indext = int;
+
   /// Label on the node, corresponds to the index of a Boolean variable
-  std::size_t index() const
+  indext index() const
   {
     return Cudd_NodeReadIndex(node);
   }
@@ -147,7 +150,7 @@ public:
     return bddt(cudd.bddZero());
   }
 
-  bddt bdd_variable(std::size_t index)
+  bddt bdd_variable(bdd_nodet::indext index)
   {
     return bddt(cudd.bddVar(index));
   }

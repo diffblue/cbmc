@@ -39,8 +39,11 @@ public:
     return node->node_number == 0;
   }
 
+  /// Type of indexes of Boolean variables
+  using indext = std::size_t;
+
   /// Label on the node, corresponds to the index of a Boolean variable
-  std::size_t index() const
+  indext index() const
   {
     return bdd_var_to_index.at(node->var);
   }
@@ -158,7 +161,7 @@ public:
     return bddt(False());
   }
 
-  bddt bdd_variable(std::size_t index)
+  bddt bdd_variable(bdd_nodet::indext index)
   {
     auto it = index_to_bdd.find(index);
     if(it != index_to_bdd.end())
