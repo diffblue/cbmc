@@ -14,6 +14,7 @@ containing the code for a different part of the system.
   * \ref linking
 
 - Symbolic Execution
+  * \ref goto-checker
   * \ref goto-symex
 
 - Static Analyses
@@ -36,9 +37,10 @@ containing the code for a different part of the system.
 
   * \ref cbmc
   * \ref goto-analyzer
-  * \ref goto-instrument
-  * \ref goto-diff
   * \ref goto-cc
+  * \ref goto-diff
+  * \ref goto-harness
+  * \ref goto-instrument
   * \ref jbmc
 
 - Utilities
