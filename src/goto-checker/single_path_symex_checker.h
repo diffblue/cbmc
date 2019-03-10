@@ -47,12 +47,6 @@ public:
 protected:
   bool symex_initialized = false;
   std::unique_ptr<goto_symex_property_decidert> property_decider;
-
-  void prepare(
-    resultt &result,
-    propertiest &properties,
-    symex_target_equationt &equation);
-  void decide(resultt &result, propertiest &properties);
 };
 
 #endif // CPROVER_GOTO_CHECKER_SINGLE_PATH_SYMEX_CHECKER_H

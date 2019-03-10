@@ -33,7 +33,14 @@ operator()(propertiest &properties)
   // There might be more solutions from the previous equation.
   if(property_decider)
   {
-    decide(result, properties);
+    run_property_decider(
+      result,
+      properties,
+      *property_decider,
+      ui_message_handler,
+      std::chrono::duration<double>(0),
+      false);
+
     if(result.progress == resultt::progresst::FOUND_FAIL)
       return result;
   }
@@ -91,8 +98,22 @@ operator()(propertiest &properties)
 
     if(symex.get_remaining_vccs() > 0)
     {
-      prepare(result, properties, resume.equation);
-      decide(result, properties);
+      update_properties_status_from_symex_target_equation(
+        properties, result.updated_properties, resume.equation);
+
+      property_decider = util_make_unique<goto_symex_property_decidert>(
+        options, ui_message_handler, resume.equation, ns);
+
+      const auto solver_runtime = prepare_property_decider(
+        properties, resume.equation, *property_decider, ui_message_handler);
+
+      run_property_decider(
+        result,
+        properties,
+        *property_decider,
+        ui_message_handler,
+        solver_runtime,
+        false);
 
       if(result.progress == resultt::progresst::FOUND_FAIL)
         return result;
@@ -174,59 +195,4 @@ void single_path_symex_checkert::output_proof()
   // This is incorrect, but the best we can do at the moment.
   const path_storaget::patht &resume = worklist->peek();
   output_graphml(resume.equation, ns, options);
-}
-
-void single_path_symex_checkert::prepare(
-  resultt &result,
-  propertiest &properties,
-  symex_target_equationt &equation)
-{
-  update_properties_status_from_symex_target_equation(
-    properties, result.updated_properties, equation);
-
-  property_decider = util_make_unique<goto_symex_property_decidert>(
-    options, ui_message_handler, equation, ns);
-
-  log.status() << "Passing problem to "
-               << property_decider->get_solver().decision_procedure_text()
-               << messaget::eom;
-
-  convert_symex_target_equation(
-    equation, property_decider->get_solver(), ui_message_handler);
-  property_decider->update_properties_goals_from_symex_target_equation(
-    properties);
-  property_decider->convert_goals();
-  property_decider->freeze_goal_variables();
-}
-
-void single_path_symex_checkert::decide(
-  resultt &result,
-  propertiest &properties)
-{
-  auto solver_start = std::chrono::steady_clock::now();
-
-  log.status() << "Running "
-               << property_decider->get_solver().decision_procedure_text()
-               << messaget::eom;
-
-  property_decider->add_constraint_from_goals(
-    [&properties](const irep_idt &property_id) {
-      return is_property_to_check(properties.at(property_id).status);
-    });
-
-  decision_proceduret::resultt dec_result = property_decider->solve();
-
-  property_decider->update_properties_status_from_goals(
-    properties, result.updated_properties, dec_result, false);
-
-  auto solver_stop = std::chrono::steady_clock::now();
-  log.status()
-    << "Runtime decision procedure: "
-    << std::chrono::duration<double>(solver_stop - solver_start).count() << "s"
-    << messaget::eom;
-
-  if(dec_result == decision_proceduret::resultt::D_SATISFIABLE)
-  {
-    result.progress = resultt::progresst::FOUND_FAIL;
-  }
 }

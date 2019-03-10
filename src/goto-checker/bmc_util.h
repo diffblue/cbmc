@@ -12,14 +12,17 @@ Author: Daniel Kroening, Peter Schrammel
 #ifndef CPROVER_GOTO_CHECKER_BMC_UTIL_H
 #define CPROVER_GOTO_CHECKER_BMC_UTIL_H
 
+#include <chrono>
 #include <memory>
 
 #include <goto-programs/safety_checker.h>
 #include <goto-symex/build_goto_trace.h>
 #include <goto-symex/path_storage.h>
 
+#include "incremental_goto_checker.h"
 #include "properties.h"
 
+class goto_symex_property_decidert;
 class goto_tracet;
 class memory_model_baset;
 class message_handlert;
@@ -135,6 +138,39 @@ void update_status_of_not_checked_properties(
 void update_status_of_unknown_properties(
   propertiest &properties,
   std::unordered_set<irep_idt> &updated_properties);
+
+/// Converts the equation and sets up the property decider,
+/// but does not call solve.
+/// \param [in,out] properties: Sets the status of properties to be checked to
+///   UNKNOWN
+/// \param [in,out] equation: The equation that will be converted
+/// \param [in,out] property_decider: The property decider that we are going to
+///   set up
+/// \param [in,out] ui_message_handler: For logging
+/// \return The runtime for converting the equation
+std::chrono::duration<double> prepare_property_decider(
+  propertiest &properties,
+  symex_target_equationt &equation,
+  goto_symex_property_decidert &property_decider,
+  ui_message_handlert &ui_message_handler);
+
+/// Runs the property decider to solve the equation
+/// \param [in,out] result: For recording the progress and the updated
+///   properties
+/// \param [in,out] properties: The status will be updated
+/// \param [in,out] property_decider: The property decider that will solve the
+///   equation
+/// \param [in,out] ui_message_handler: For logging
+/// \param solver_runtime: The solver runtime will be added and output
+/// \param set_pass: If true then update UNKNOWN properties to PASS
+///   if the solver returns UNSATISFIABLE
+void run_property_decider(
+  incremental_goto_checkert::resultt &result,
+  propertiest &properties,
+  goto_symex_property_decidert &property_decider,
+  ui_message_handlert &ui_message_handler,
+  std::chrono::duration<double> solver_runtime,
+  bool set_pass = true);
 
 // clang-format off
 #define OPT_BMC \
