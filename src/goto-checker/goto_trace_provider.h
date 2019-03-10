@@ -23,6 +23,8 @@ class goto_trace_providert
 {
 public:
   /// Builds and returns the complete trace
+  /// \note If slicing is used then the trace will not be complete.
+  ///   E.g. with simple-slice it will end at the last assertion.
   virtual goto_tracet build_full_trace() const = 0;
 
   /// Builds and returns the trace up to the first failed property
