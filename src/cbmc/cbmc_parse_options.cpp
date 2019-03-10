@@ -114,6 +114,7 @@ void cbmc_parse_optionst::set_default_options(optionst &options)
   options.set_option("pretty-names", true);
   options.set_option("propagation", true);
   options.set_option("sat-preprocessor", true);
+  options.set_option("simple-slice", true);
   options.set_option("simplify", true);
   options.set_option("simplify-if", true);
 

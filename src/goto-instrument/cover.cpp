@@ -165,6 +165,10 @@ parse_coverage_criterion(const std::string &criterion_string)
 void parse_cover_options(const cmdlinet &cmdline, optionst &options)
 {
   options.set_option("cover", cmdline.get_values("cover"));
+
+  // allow retrieving full traces
+  options.set_option("simple-slice", false);
+
   options.set_option(
     "cover-include-pattern", cmdline.get_value("cover-include-pattern"));
   options.set_option("no-trivial-tests", cmdline.isset("no-trivial-tests"));

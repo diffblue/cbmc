@@ -233,7 +233,7 @@ void slice(
     }
     else
     {
-      if(options.get_list_option("cover").empty())
+      if(options.get_bool_option("simple-slice"))
       {
         simple_slice(symex_target_equation);
         msg.statistics() << "simple slicing removed "
