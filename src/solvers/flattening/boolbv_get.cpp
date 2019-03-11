@@ -31,6 +31,11 @@ exprt boolbvt::get(const exprt &expr) const
     if(it!=map.mapping.end())
     {
       const boolbv_mapt::map_entryt &map_entry=it->second;
+      // an input expression must either be untyped (this is used for obtaining
+      // the value of clock symbols, which do not have a fixed type as the clock
+      // type is computed during symbolic execution) or match the type stored in
+      // the mapping
+      PRECONDITION(expr.type() == typet() || expr.type() == map_entry.type);
 
       if(is_unbounded_array(map_entry.type))
         return bv_get_unbounded_array(expr);
