@@ -17,6 +17,8 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 #include <cplusplus/cuddObj.hh>
 
+#include <util/narrow.h>
+
 class bdd_managert;
 class bddt;
 class bdd_nodet;
@@ -36,7 +38,7 @@ public:
   }
 
   /// Type of indexes of Boolean variables
-  using indext = int;
+  using indext = unsigned int;
 
   /// Label on the node, corresponds to the index of a Boolean variable
   indext index() const
@@ -152,7 +154,7 @@ public:
 
   bddt bdd_variable(bdd_nodet::indext index)
   {
-    return bddt(cudd.bddVar(index));
+    return bddt(cudd.bddVar(narrow_cast<int>(index)));
   }
 
   bdd_nodet bdd_node(const bddt &bdd) const
