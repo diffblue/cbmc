@@ -336,7 +336,7 @@ goto_symex_statet::rename(exprt expr, const namespacet &ns)
       "if_exprt");
 
     if(level == L2)
-      field_sensitivity.apply(ns, expr, false);
+      field_sensitivity.apply(ns, *this, expr, false);
 
     return renamedt<exprt, level>{std::move(expr)};
   }
@@ -365,7 +365,7 @@ bool goto_symex_statet::l2_thread_read_encoding(
   }
 
   // only continue if an indivisible object is being accessed
-  if(field_sensitivityt::is_divisible(ns, expr))
+  if(field_sensitivityt::is_divisible(expr))
     return false;
 
   ssa_exprt ssa_l1=expr;
@@ -494,7 +494,7 @@ goto_symex_statet::write_is_shared_resultt goto_symex_statet::write_is_shared(
   }
 
   // only continue if an indivisible object is being accessed
-  if(field_sensitivityt::is_divisible(ns, expr))
+  if(field_sensitivityt::is_divisible(expr))
     return write_is_shared_resultt::NOT_SHARED;
 
   if(atomic_section_id != 0)

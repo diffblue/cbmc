@@ -18,8 +18,11 @@ Author: Michael Tautschnig
 
 // #define ENABLE_ARRAY_FIELD_SENSITIVITY
 
-void field_sensitivityt::apply(const namespacet &ns, exprt &expr, bool write)
-  const
+void field_sensitivityt::apply(
+  const namespacet &ns,
+  goto_symex_statet &state,
+  exprt &expr,
+  bool write) const
 {
   if(!run_apply)
     return;
@@ -27,12 +30,12 @@ void field_sensitivityt::apply(const namespacet &ns, exprt &expr, bool write)
   if(expr.id() != ID_address_of)
   {
     Forall_operands(it, expr)
-      apply(ns, *it, write);
+      apply(ns, state, *it, write);
   }
 
   if(expr.id() == ID_symbol && expr.get_bool(ID_C_SSA_symbol) && !write)
   {
-    expr = get_fields(ns, to_ssa_expr(expr));
+    expr = get_fields(ns, state, to_ssa_expr(expr));
   }
   else if(
     !write && expr.id() == ID_member &&
@@ -64,10 +67,15 @@ void field_sensitivityt::apply(const namespacet &ns, exprt &expr, bool write)
       // place the entire member expression, not just the struct operand, in an
       // SSA expression
       ssa_exprt tmp = to_ssa_expr(member.struct_op());
+      bool was_l2 = !tmp.get_level_2().empty();
+
+      tmp.remove_level_2();
       member.struct_op() = tmp.get_original_expr();
       tmp.set_expression(member);
-
-      expr.swap(tmp);
+      if(was_l2)
+        expr = state.rename(tmp, ns).get();
+      else
+        expr.swap(tmp);
     }
   }
 #ifdef ENABLE_ARRAY_FIELD_SENSITIVITY
@@ -88,10 +96,15 @@ void field_sensitivityt::apply(const namespacet &ns, exprt &expr, bool write)
       // place the entire index expression, not just the array operand, in an
       // SSA expression
       ssa_exprt tmp = to_ssa_expr(index.array());
+      bool was_l2 = !tmp.get_level_2().empty();
+
+      tmp.remove_level_2();
       index.array() = tmp.get_original_expr();
       tmp.set_expression(index);
-
-      expr.swap(tmp);
+      if(was_l2)
+        expr = state.rename(tmp, ns).get();
+      else
+        expr.swap(tmp);
     }
   }
 #endif // ENABLE_ARRAY_FIELD_SENSITIVITY
@@ -99,7 +112,8 @@ void field_sensitivityt::apply(const namespacet &ns, exprt &expr, bool write)
 
 exprt field_sensitivityt::get_fields(
   const namespacet &ns,
-  const ssa_exprt &ssa_expr)
+  goto_symex_statet &state,
+  const ssa_exprt &ssa_expr) const
 {
   if(ssa_expr.type().id() == ID_struct || ssa_expr.type().id() == ID_struct_tag)
   {
@@ -115,8 +129,13 @@ exprt field_sensitivityt::get_fields(
     {
       const member_exprt member(struct_op, comp.get_name(), comp.type());
       ssa_exprt tmp = ssa_expr;
+      bool was_l2 = !tmp.get_level_2().empty();
+      tmp.remove_level_2();
       tmp.set_expression(member);
-      result.copy_to_operands(get_fields(ns, tmp));
+      if(was_l2)
+        result.add_to_operands(state.rename(tmp, ns).get());
+      else
+        result.add_to_operands(get_fields(ns, state, tmp));
     }
 
     return std::move(result);
@@ -139,8 +158,13 @@ exprt field_sensitivityt::get_fields(
     {
       const index_exprt index(array, from_integer(i, index_type()));
       ssa_exprt tmp = ssa_expr;
+      bool was_l2 = !tmp.get_level_2().empty();
+      tmp.remove_level_2();
       tmp.set_expression(index);
-      result.copy_to_operands(get_fields(ns, tmp));
+      if(was_l2)
+        result.add_to_operands(state.rename(tmp, ns).get());
+      else
+        result.add_to_operands(get_fields(ns, state, tmp));
     }
 
     return std::move(result);
@@ -157,7 +181,7 @@ void field_sensitivityt::field_assignments(
   symex_targett &target)
 {
   exprt lhs_fs = lhs;
-  apply(ns, lhs_fs, false);
+  apply(ns, state, lhs_fs, false);
 
   bool run_apply_bak = run_apply;
   run_apply = false;
@@ -257,9 +281,19 @@ void field_sensitivityt::field_assignments_rec(
   }
 }
 
-bool field_sensitivityt::is_divisible(
-  const namespacet &ns,
-  const ssa_exprt &expr)
+bool field_sensitivityt::is_divisible(const ssa_exprt &expr)
 {
-  return expr != get_fields(ns, expr);
+  if(expr.type().id() == ID_struct || expr.type().id() == ID_struct_tag)
+    return true;
+
+#ifdef ENABLE_ARRAY_FIELD_SENSITIVITY
+  if(
+    expr.type().id() == ID_array &&
+    to_array_type(expr.type()).size().id() == ID_constant)
+  {
+    return true;
+  }
+#endif
+
+  return false;
 }

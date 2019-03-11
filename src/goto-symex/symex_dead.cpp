@@ -24,7 +24,7 @@ void goto_symext::symex_dead(statet &state)
 
   ssa_exprt ssa = state.rename_ssa<L1>(ssa_exprt{code.symbol()}, ns).get();
 
-  const exprt fields = field_sensitivityt::get_fields(ns, ssa);
+  const exprt fields = state.field_sensitivity.get_fields(ns, state, ssa);
   find_symbols_sett fields_set;
   find_symbols(fields, fields_set);
 

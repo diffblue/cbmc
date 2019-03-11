@@ -208,16 +208,15 @@ void goto_symext::symex_assign_rec(
 /// \ref goto_symext::symex_assign_struct_member have done, but now making use
 /// of the index/member that may only be known after renaming to L2 has taken
 /// place.
+/// \param [in, out] state: symbolic execution state to perform renaming
 /// \param [in,out] ssa_rhs: right-hand side
 /// \param [in,out] lhs_mod: left-hand side
 /// \param ns: namespace
-/// \param field_sensitivity: field sensitivity object to turn left-hand side
-///   into individual fields
 static void rewrite_with_to_field_symbols(
+  goto_symext::statet &state,
   exprt &ssa_rhs,
   ssa_exprt &lhs_mod,
-  const namespacet &ns,
-  const field_sensitivityt &field_sensitivity)
+  const namespacet &ns)
 {
 #ifdef USE_UPDATE
   while(ssa_rhs.id() == ID_update &&
@@ -243,7 +242,7 @@ static void rewrite_with_to_field_symbols(
         update.new_value().type());
     }
 
-    field_sensitivity.apply(field_sensitive_lhs, true);
+    state.field_sensitivity.apply(state, field_sensitive_lhs, true);
 
     if(field_sensitive_lhs.id() != ID_symbol)
       break;
@@ -272,7 +271,7 @@ static void rewrite_with_to_field_symbols(
         with_expr.new_value().type());
     }
 
-    field_sensitivity.apply(ns, field_sensitive_lhs, true);
+    state.field_sensitivity.apply(ns, state, field_sensitive_lhs, true);
 
     if(field_sensitive_lhs.id() != ID_symbol)
       break;
@@ -292,10 +291,10 @@ static void rewrite_with_to_field_symbols(
 /// \param ns: namespace
 /// \param do_simplify: set to true if, and only if, simplification is enabled
 static void shift_indexed_access_to_lhs(
+  goto_symext::statet &state,
   exprt &ssa_rhs,
   ssa_exprt &lhs_mod,
   const namespacet &ns,
-  const field_sensitivityt &field_sensitivity,
   bool do_simplify)
 {
   if(
@@ -360,7 +359,7 @@ static void shift_indexed_access_to_lhs(
     }
   }
 
-  rewrite_with_to_field_symbols(ssa_rhs, lhs_mod, ns, field_sensitivity);
+  rewrite_with_to_field_symbols(state, ssa_rhs, lhs_mod, ns);
 }
 
 void goto_symext::symex_assign_symbol(
@@ -385,7 +384,7 @@ void goto_symext::symex_assign_symbol(
   ssa_exprt lhs_mod = lhs;
 
   shift_indexed_access_to_lhs(
-    l2_rhs, lhs_mod, ns, state.field_sensitivity, symex_config.simplify_opt);
+    state, l2_rhs, lhs_mod, ns, symex_config.simplify_opt);
 
   do_simplify(l2_rhs);
 

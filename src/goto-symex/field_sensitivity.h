@@ -42,29 +42,35 @@ public:
   /// written to (i.e., \p write is true); in such a case only translations from
   /// existing member or index expressions into symbols are performed.
   /// \param ns: a namespace to resolve type symbols/tag types
+  /// \param [in,out] state: symbolic execution state
   /// \param [in,out] expr: an expression to be (recursively) transformed - this
   ///   parameter is both input and output.
   /// \param write: set to true if the expression is to be used as an lvalue.
-  void apply(const namespacet &ns, exprt &expr, bool write) const;
+  void
+  apply(const namespacet &ns, goto_symex_statet &state, exprt &expr, bool write)
+    const;
 
   /// Compute an expression representing the individual components of a
   /// field-sensitive SSA representation of \p ssa_expr.
   /// \param ns: a namespace to resolve type symbols/tag types
+  /// \param [in,out] state: symbolic execution state
   /// \param ssa_expr: the expression to evaluate
   /// \return Expanded expression; for example, for a \p ssa_expr of some struct
   ///   type, a `struct_exprt` with each component now being an SSA expression
   ///   is built.
-  static exprt get_fields(const namespacet &ns, const ssa_exprt &ssa_expr);
+  exprt get_fields(
+    const namespacet &ns,
+    goto_symex_statet &state,
+    const ssa_exprt &ssa_expr) const;
 
   /// Determine whether \p expr would translate to an atomic SSA expression
   /// (returns false) or a composite object made of several SSA expressions as
   /// components (such as a struct with each member becoming an individual SSA
   /// expression, return true in this case).
-  /// \param ns: a namespace to resolve type symbols/tag types
   /// \param expr: the expression to evaluate
   /// \return False, if and only if, \p expr would be a single field-sensitive
   /// SSA expression.
-  static bool is_divisible(const namespacet &ns, const ssa_exprt &expr);
+  static bool is_divisible(const ssa_exprt &expr);
 
 private:
   /// whether or not to invoke \ref field_sensitivityt::apply
