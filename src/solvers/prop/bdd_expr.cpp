@@ -11,13 +11,10 @@ Author: Michael Tautschnig, michael.tautschnig@qmul.ac.uk
 
 #include "bdd_expr.h"
 
-#include <util/arith_tools.h>
 #include <util/expr_util.h>
 #include <util/format_expr.h>
 #include <util/invariant.h>
 #include <util/std_expr.h>
-
-#include <sstream>
 
 bddt bdd_exprt::from_expr_rec(const exprt &expr)
 {
@@ -112,7 +109,7 @@ exprt bdd_exprt::as_expr(
       return true_exprt();
   }
 
-  auto index = numeric_cast_v<std::size_t>(r.index());
+  auto index = narrow<std::size_t>(r.index());
   INVARIANT(index < node_map.size(), "Index should be in node_map");
   const exprt &n_expr = node_map[index];
 
