@@ -585,7 +585,8 @@ bool c_preprocess_gcc_clang(
      has_suffix(file, ".C") ||
   #endif
      has_suffix(file, ".c++") || has_suffix(file, ".C++") ||
-     has_suffix(file, ".cp") || has_suffix(file, ".CP"))
+     has_suffix(file, ".cp") || has_suffix(file, ".CP") ||
+     has_suffix(file, ".cc") || has_suffix(file, ".cxx"))
   {
     switch(config.cpp.cpp_standard)
     {
