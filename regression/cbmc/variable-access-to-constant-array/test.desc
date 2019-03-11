@@ -1,4 +1,4 @@
-THOROUGH broken-smt-backend
+CORE broken-smt-backend
 main.c
 
 ^EXIT=10$
@@ -12,4 +12,4 @@ do so.
 
 Field-sensitive encoding of array accesses for an array of 2^16 elements is very
 expensive. We might consider some bounds up to which we actually do field
-expansion.
+expansion, or at least need to mark this test as "THOROUGH."
