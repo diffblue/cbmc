@@ -65,51 +65,18 @@ operator()(propertiest &properties)
     if(!has_properties_to_check(properties))
       return result;
 
-    log.status() << "Passing problem to "
-                 << property_decider.get_solver().decision_procedure_text()
-                 << messaget::eom;
-
-    const auto solver_start = std::chrono::steady_clock::now();
-
-    convert_symex_target_equation(
-      equation, property_decider.get_solver(), ui_message_handler);
-    property_decider.update_properties_goals_from_symex_target_equation(
-      properties);
-    property_decider.convert_goals();
-    property_decider.freeze_goal_variables();
+    solver_runtime += prepare_property_decider(
+      properties, equation, property_decider, ui_message_handler);
 
     if(options.get_bool_option("localize-faults"))
       freeze_guards(equation, property_decider.get_solver());
 
-    const auto solver_stop = std::chrono::steady_clock::now();
-    solver_runtime += std::chrono::duration<double>(solver_stop - solver_start);
-
-    log.status() << "Running "
-                 << property_decider.get_solver().decision_procedure_text()
-                 << messaget::eom;
     equation_generated = true;
   }
 
-  const auto solver_start = std::chrono::steady_clock::now();
+  run_property_decider(
+    result, properties, property_decider, ui_message_handler, solver_runtime);
 
-  property_decider.add_constraint_from_goals(
-    [&properties](const irep_idt &property_id) {
-      return is_property_to_check(properties.at(property_id).status);
-    });
-
-  decision_proceduret::resultt dec_result = property_decider.solve();
-
-  property_decider.update_properties_status_from_goals(
-    properties, result.updated_properties, dec_result);
-
-  const auto solver_stop = std::chrono::steady_clock::now();
-  solver_runtime += std::chrono::duration<double>(solver_stop - solver_start);
-  log.status() << "Runtime decision procedure: " << solver_runtime.count()
-               << "s" << messaget::eom;
-
-  result.progress = dec_result == decision_proceduret::resultt::D_SATISFIABLE
-                      ? resultt::progresst::FOUND_FAIL
-                      : resultt::progresst::DONE;
   return result;
 }
 

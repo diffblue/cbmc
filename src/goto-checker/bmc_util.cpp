@@ -30,6 +30,7 @@ Author: Daniel Kroening, Peter Schrammel
 #include <util/make_unique.h>
 #include <util/ui_message.h>
 
+#include "goto_symex_property_decider.h"
 #include "symex_bmc.h"
 
 void message_building_error_trace(messaget &log)
@@ -356,5 +357,65 @@ void postprocess_equation(
   if(options.get_bool_option("validate-ssa-equation"))
   {
     symex.validate(validation_modet::INVARIANT);
+  }
+}
+
+std::chrono::duration<double> prepare_property_decider(
+  propertiest &properties,
+  symex_target_equationt &equation,
+  goto_symex_property_decidert &property_decider,
+  ui_message_handlert &ui_message_handler)
+{
+  auto solver_start = std::chrono::steady_clock::now();
+
+  messaget log(ui_message_handler);
+  log.status() << "Passing problem to "
+               << property_decider.get_solver().decision_procedure_text()
+               << messaget::eom;
+
+  convert_symex_target_equation(
+    equation, property_decider.get_solver(), ui_message_handler);
+  property_decider.update_properties_goals_from_symex_target_equation(
+    properties);
+  property_decider.convert_goals();
+  property_decider.freeze_goal_variables();
+
+  auto solver_stop = std::chrono::steady_clock::now();
+  return std::chrono::duration<double>(solver_stop - solver_start);
+}
+
+void run_property_decider(
+  incremental_goto_checkert::resultt &result,
+  propertiest &properties,
+  goto_symex_property_decidert &property_decider,
+  ui_message_handlert &ui_message_handler,
+  std::chrono::duration<double> solver_runtime,
+  bool set_pass)
+{
+  auto solver_start = std::chrono::steady_clock::now();
+
+  messaget log(ui_message_handler);
+  log.status() << "Running "
+               << property_decider.get_solver().decision_procedure_text()
+               << messaget::eom;
+
+  property_decider.add_constraint_from_goals(
+    [&properties](const irep_idt &property_id) {
+      return is_property_to_check(properties.at(property_id).status);
+    });
+
+  decision_proceduret::resultt dec_result = property_decider.solve();
+
+  property_decider.update_properties_status_from_goals(
+    properties, result.updated_properties, dec_result, set_pass);
+
+  auto solver_stop = std::chrono::steady_clock::now();
+  solver_runtime += std::chrono::duration<double>(solver_stop - solver_start);
+  log.status() << "Runtime decision procedure: " << solver_runtime.count()
+               << "s" << messaget::eom;
+
+  if(dec_result == decision_proceduret::resultt::D_SATISFIABLE)
+  {
+    result.progress = incremental_goto_checkert::resultt::progresst::FOUND_FAIL;
   }
 }
