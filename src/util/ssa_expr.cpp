@@ -16,7 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 /// If \p expr is a symbol "s" add to \p os "s!l0@l1#l2" and to \p l1_object_os
 /// "s!l0@l1".
 /// If \p expr is a member or index expression, recursively apply the procedure
-/// and add ".component_name" or "[index]" to \p os.
+/// and add "..component_name" or "[[index]]" to \p os.
 static void build_ssa_identifier_rec(
   const exprt &expr,
   const irep_idt &l0,
@@ -31,8 +31,8 @@ static void build_ssa_identifier_rec(
 
     build_ssa_identifier_rec(member.struct_op(), l0, l1, l2, os, l1_object_os);
 
-    os << '.' << member.get_component_name();
-    l1_object_os << '.' << member.get_component_name();
+    os << ".." << member.get_component_name();
+    l1_object_os << ".." << member.get_component_name();
   }
   else if(expr.id()==ID_index)
   {
@@ -42,8 +42,8 @@ static void build_ssa_identifier_rec(
 
     const mp_integer idx =
       numeric_cast_v<mp_integer>(to_constant_expr(index.index()));
-    os << '[' << idx << ']';
-    l1_object_os << '[' << idx << ']';
+    os << "[[" << idx << "]]";
+    l1_object_os << "[[" << idx << "]]";
   }
   else if(expr.id()==ID_symbol)
   {
