@@ -241,6 +241,10 @@ void goto_symext::dereference_rec(exprt &expr, statet &state, bool write)
 
     // this may yield a new auto-object
     trigger_auto_object(expr, state);
+
+    // ...and may have introduced a member-of-symbol construct with a
+    // corresponding SSA symbol:
+    state.field_sensitivity.apply(ns, state, expr, write);
   }
   else if(
     expr.id() == ID_index && to_index_expr(expr).array().id() == ID_member &&
