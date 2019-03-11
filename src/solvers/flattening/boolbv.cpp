@@ -573,11 +573,11 @@ bool boolbvt::boolbv_set_equality_to_true(const equal_exprt &expr)
   if(!equality_propagation)
     return true;
 
-  const typet &type=ns.follow(expr.lhs().type());
+  const typet &type = expr.lhs().type();
 
-  if(expr.lhs().id()==ID_symbol &&
-     type==ns.follow(expr.rhs().type()) &&
-     type.id()!=ID_bool)
+  if(
+    expr.lhs().id() == ID_symbol && type == expr.rhs().type() &&
+    type.id() != ID_bool)
   {
     // see if it is an unbounded array
     if(is_unbounded_array(type))
