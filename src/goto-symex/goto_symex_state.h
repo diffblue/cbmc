@@ -197,6 +197,9 @@ public:
   /// \brief Should the additional validation checks be run?
   bool run_validation_checks;
 
+  unsigned total_vccs = 0;
+  unsigned remaining_vccs = 0;
+
 private:
   /// \brief Dangerous, do not use
   ///
@@ -218,9 +221,7 @@ inline goto_statet::goto_statet(const class goto_symex_statet &s)
     guard(s.guard),
     source(s.source),
     propagation(s.propagation),
-    atomic_section_id(s.atomic_section_id),
-    total_vccs(s.total_vccs),
-    remaining_vccs(s.remaining_vccs)
+    atomic_section_id(s.atomic_section_id)
 {
 }
 
