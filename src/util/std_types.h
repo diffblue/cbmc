@@ -1167,20 +1167,74 @@ inline bv_typet &to_bv_type(typet &type)
   return static_cast<bv_typet &>(type);
 }
 
-/// Fixed-width bit-vector with unsigned binary interpretation
-class unsignedbv_typet:public bitvector_typet
+/// Fixed-width bit-vector representing a signed or unsigned integer
+class integer_bitvector_typet : public bitvector_typet
 {
 public:
-  explicit unsignedbv_typet(std::size_t width):
-    bitvector_typet(ID_unsignedbv, width)
+  integer_bitvector_typet(const irep_idt &id, std::size_t width)
+    : bitvector_typet(id, width)
   {
   }
 
+  /// Return the smallest value that can be represented using this type.
   mp_integer smallest() const;
+  /// Return the largest value that can be represented using this type.
   mp_integer largest() const;
+
+  // If we ever need any of the following three methods in \ref fixedbv_typet or
+  // \ref floatbv_typet, we might want to move them to a new class
+  // numeric_bitvector_typet, which would be between integer_bitvector_typet and
+  // bitvector_typet in the hierarchy.
+
+  /// Return an expression representing the smallest value of this type.
   constant_exprt smallest_expr() const;
+  /// Return an expression representing the zero value of this type.
   constant_exprt zero_expr() const;
+  /// Return an expression representing the largest value of this type.
   constant_exprt largest_expr() const;
+};
+
+/// Check whether a reference to a typet is an \ref integer_bitvector_typet.
+/// \param type: Source type.
+/// \return True if \p type is an \ref integer_bitvector_typet.
+template <>
+inline bool can_cast_type<integer_bitvector_typet>(const typet &type)
+{
+  return type.id() == ID_signedbv || type.id() == ID_unsignedbv;
+}
+
+/// \brief Cast a typet to an \ref integer_bitvector_typet
+///
+/// This is an unchecked conversion. \a type must be known to be \ref
+/// integer_bitvector_typet. Will fail with a precondition violation if type
+/// doesn't match.
+///
+/// \param type: Source type.
+/// \return Object of type \ref integer_bitvector_typet.
+inline const integer_bitvector_typet &
+to_integer_bitvector_type(const typet &type)
+{
+  PRECONDITION(can_cast_type<integer_bitvector_typet>(type));
+
+  return static_cast<const integer_bitvector_typet &>(type);
+}
+
+/// \copydoc to_integer_bitvector_type(const typet &type)
+inline integer_bitvector_typet &to_integer_bitvector_type(typet &type)
+{
+  PRECONDITION(can_cast_type<integer_bitvector_typet>(type));
+
+  return static_cast<integer_bitvector_typet &>(type);
+}
+
+/// Fixed-width bit-vector with unsigned binary interpretation
+class unsignedbv_typet : public integer_bitvector_typet
+{
+public:
+  explicit unsignedbv_typet(std::size_t width)
+    : integer_bitvector_typet(ID_unsignedbv, width)
+  {
+  }
 
   static void check(
     const typet &type,
@@ -1223,19 +1277,13 @@ inline unsignedbv_typet &to_unsignedbv_type(typet &type)
 }
 
 /// Fixed-width bit-vector with two's complement interpretation
-class signedbv_typet:public bitvector_typet
+class signedbv_typet : public integer_bitvector_typet
 {
 public:
-  explicit signedbv_typet(std::size_t width):
-    bitvector_typet(ID_signedbv, width)
+  explicit signedbv_typet(std::size_t width)
+    : integer_bitvector_typet(ID_signedbv, width)
   {
   }
-
-  mp_integer smallest() const;
-  mp_integer largest() const;
-  constant_exprt smallest_expr() const;
-  constant_exprt zero_expr() const;
-  constant_exprt largest_expr() const;
 
   static void check(
     const typet &type,

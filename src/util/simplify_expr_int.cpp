@@ -11,7 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 
 #include "arith_tools.h"
-#include "bv_arithmetic.h"
 #include "byte_operators.h"
 #include "config.h"
 #include "expr_util.h"
@@ -1879,8 +1878,7 @@ bool simplify_exprt::simplify_inequality_constant(exprt &expr)
   if(expr.op0().type().id()==ID_unsignedbv ||
      expr.op0().type().id()==ID_signedbv)
   {
-    bv_spect spec(expr.op0().type());
-    mp_integer max(spec.max_value());
+    mp_integer max(to_integer_bitvector_type(expr.op0().type()).largest());
 
     if(expr.id()==ID_notequal)
     {
