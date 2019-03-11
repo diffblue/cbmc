@@ -37,6 +37,7 @@ std::set<std::string> cpp_languaget::extensions() const
   s.insert("cpp");
   s.insert("CPP");
   s.insert("cc");
+  s.insert("cp");
   s.insert("c++");
   s.insert("ii");
   s.insert("cxx");
