@@ -1728,6 +1728,22 @@ public:
     : multi_ary_exprt(ID_array_list, std::move(_operands), _type)
   {
   }
+
+  const array_typet &type() const
+  {
+    return static_cast<const array_typet &>(multi_ary_exprt::type());
+  }
+
+  array_typet &type()
+  {
+    return static_cast<array_typet &>(multi_ary_exprt::type());
+  }
+
+  /// add an index/value pair
+  void add(exprt index, exprt value)
+  {
+    add_to_operands(std::move(index), std::move(value));
+  }
 };
 
 template <>
@@ -1739,6 +1755,22 @@ inline bool can_cast_expr<array_list_exprt>(const exprt &base)
 inline void validate_expr(const array_list_exprt &value)
 {
   PRECONDITION(value.operands().size() % 2 == 0);
+}
+
+inline const array_list_exprt &to_array_list_expr(const exprt &expr)
+{
+  PRECONDITION(can_cast_expr<array_list_exprt>(expr));
+  auto &ret = static_cast<const array_list_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
+}
+
+inline array_list_exprt &to_array_list_expr(exprt &expr)
+{
+  PRECONDITION(can_cast_expr<array_list_exprt>(expr));
+  auto &ret = static_cast<array_list_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
 }
 
 /// \brief Vector constructor from list of elements
