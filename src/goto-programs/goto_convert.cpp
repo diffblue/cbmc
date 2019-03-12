@@ -216,11 +216,9 @@ void goto_convertt::finish_computed_gotos(goto_programt &goto_program)
 
       const equal_exprt guard(pointer, address_of_exprt(label_expr));
 
-      goto_programt::targett t=
-        goto_program.insert_after(g_it);
-
-      *t =
-        goto_programt::make_goto(label.second.first, guard, i.source_location);
+      goto_program.insert_after(
+        g_it,
+        goto_programt::make_goto(label.second.first, guard, i.source_location));
     }
   }
 

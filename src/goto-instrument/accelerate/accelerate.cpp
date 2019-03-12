@@ -258,24 +258,19 @@ void acceleratet::make_overflow_loc(
     loop.insert(added.begin(), added.end());
   }
 
-  goto_programt::targett t=program.insert_after(loop_header);
-  *t =
-    goto_programt::make_assignment(code_assignt(overflow_var, false_exprt()));
+  goto_programt::targett t = program.insert_after(
+    loop_header,
+    goto_programt::make_assignment(code_assignt(overflow_var, false_exprt())));
   t->swap(*loop_header);
   loop.insert(t);
   overflow_locs[loop_header].push_back(t);
 
-  goto_programt::instructiont s(SKIP);
-  overflow_loc=program.insert_after(loop_end);
-  *overflow_loc=s;
+  overflow_loc = program.insert_after(loop_end, goto_programt::make_skip());
   overflow_loc->swap(*loop_end);
   loop.insert(overflow_loc);
 
-  goto_programt::instructiont g =
-    goto_programt::make_goto(overflow_loc, not_exprt(overflow_var));
-
-  goto_programt::targett t2=program.insert_after(loop_end);
-  *t2=g;
+  goto_programt::targett t2 = program.insert_after(
+    loop_end, goto_programt::make_goto(overflow_loc, not_exprt(overflow_var)));
   t2->swap(*loop_end);
   overflow_locs[overflow_loc].push_back(t2);
   loop.insert(t2);
