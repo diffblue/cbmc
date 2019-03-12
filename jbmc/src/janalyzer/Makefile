@@ -11,6 +11,7 @@ OBJ += ../$(CPROVER_DIR)/src/ansi-c/ansi-c$(LIBEXT) \
       ../$(CPROVER_DIR)/src/pointer-analysis/pointer-analysis$(LIBEXT) \
       ../$(CPROVER_DIR)/src/langapi/langapi$(LIBEXT) \
       ../$(CPROVER_DIR)/src/json/json$(LIBEXT) \
+      ../$(CPROVER_DIR)/src/solvers/solvers$(LIBEXT) \
       ../$(CPROVER_DIR)/src/util/util$(LIBEXT) \
       ..//miniz/miniz$(OBJEXT) \
       ../$(CPROVER_DIR)/src/goto-analyzer/static_show_domain$(OBJEXT) \

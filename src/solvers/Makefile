@@ -44,9 +44,7 @@ ifneq ($(SQUOLEM2),)
 endif
 
 ifneq ($(CUDD),)
-  CUDD_INCLUDE=-I $(CUDD)
   CUDD_LIB=$(CUDD)/cudd/.libs/libcudd$(LIBEXT) $(CUDD)/cplusplus/.libs/libobj$(LIBEXT)
-  CP_CXXFLAGS += -DHAVE_CUDD
 endif
 
 ifneq ($(PICOSAT),)

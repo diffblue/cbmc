@@ -195,6 +195,16 @@ ifneq ($(CADICAL),)
 endif
 
 
+ifneq ($(CUDD),)
+  CP_CXXFLAGS += -DHAVE_CUDD
+ifeq ($(CPROVER_DIR),)
+  INCLUDES += -I $(CUDD) -I $(CUDD)/cudd
+else
+  INCLUDES += -I ../$(CPROVER_DIR)/src/solvers/$(CUDD)
+  INCLUDES += -I ../$(CPROVER_DIR)/src/solvers/$(CUDD)/cudd
+endif
+endif
+
 
 first_target: all
 

@@ -41,6 +41,10 @@ CLEANFILES = analyses$(LIBEXT)
 
 all: analyses$(LIBEXT)
 
+ifneq ($(CUDD),)
+  OBJ += $(CUDD)/cudd/.libs/libcudd$(LIBEXT) $(CUDD)/cplusplus/.libs/libobj$(LIBEXT)
+endif
+
 ###############################################################################
 
 analyses$(LIBEXT): $(OBJ)
