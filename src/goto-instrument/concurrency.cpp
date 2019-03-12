@@ -124,7 +124,11 @@ void concurrency_instrumentationt::instrument(
       instrument(code.rhs());
     }
     else if(it->is_assume() || it->is_assert() || it->is_goto())
-      instrument(it->guard);
+    {
+      exprt cond = it->get_condition();
+      instrument(cond);
+      it->set_condition(cond);
+    }
     else if(it->is_function_call())
     {
       code_function_callt &code=to_code_function_call(it->code);

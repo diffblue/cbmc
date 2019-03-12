@@ -198,7 +198,7 @@ goto_programt::const_targett goto_program2codet::convert_instruction(
 
     case ASSERT:
       system_headers.insert("assert.h");
-      dest.add(code_assertt(target->guard));
+      dest.add(code_assertt(target->get_condition()));
       dest.statements().back().add_source_location().set_comment(
         target->source_location.get_comment());
       return target;
@@ -847,11 +847,12 @@ bool goto_program2codet::remove_default(
           break;
       }
 
-      if(next_case!=goto_program.instructions.end() &&
-         next_case==default_target &&
-         (!it->case_last->is_goto() ||
-          (it->case_last->guard.is_true() &&
-           it->case_last->get_target()==default_target)))
+      if(
+        next_case != goto_program.instructions.end() &&
+        next_case == default_target &&
+        (!it->case_last->is_goto() ||
+         (it->case_last->get_condition().is_true() &&
+          it->case_last->get_target() == default_target)))
       {
         // if there is no goto here, yet we got here, all others would
         // branch to this - we don't need default

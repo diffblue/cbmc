@@ -450,7 +450,11 @@ goto_programt::targett string_abstractiont::abstract(
   case ASSERT:
   case ASSUME:
     if(has_string_macros(it->get_condition()))
-      replace_string_macros(it->guard, false, it->source_location);
+    {
+      exprt tmp = it->get_condition();
+      replace_string_macros(tmp, false, it->source_location);
+      it->set_condition(tmp);
+    }
     break;
 
   case FUNCTION_CALL:

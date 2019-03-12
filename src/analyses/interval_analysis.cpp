@@ -43,9 +43,9 @@ void instrument_intervals(
     }
     else
     {
-      goto_programt::const_targett previous=i_it;
-      previous--;
-      if(previous->is_goto() && !previous->guard.is_true())
+      goto_programt::const_targett previous = std::prev(i_it);
+
+      if(previous->is_goto() && !previous->get_condition().is_true())
       {
         // we follow a branch, instrument
       }

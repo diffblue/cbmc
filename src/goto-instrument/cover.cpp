@@ -312,9 +312,10 @@ static void instrument_cover_goals(
       if(i_it->is_assert())
       {
         auto successor = std::next(i_it);
-        if(successor != function.body.instructions.end() &&
-           successor->is_assume() &&
-           successor->guard == i_it->guard)
+        if(
+          successor != function.body.instructions.end() &&
+          successor->is_assume() &&
+          successor->get_condition() == i_it->get_condition())
         {
           successor->turn_into_skip();
         }

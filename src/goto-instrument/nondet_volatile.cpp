@@ -107,12 +107,12 @@ void nondet_volatile(
       // do return value
       nondet_volatile_lhs(symbol_table, code_function_call.lhs());
     }
-    else if(instruction.is_assert() ||
-            instruction.is_assume() ||
-            instruction.is_goto())
+    else if(instruction.has_condition())
     {
-      // do guard
-      nondet_volatile_rhs(symbol_table, instruction.guard);
+      // do condition
+      exprt cond = instruction.get_condition();
+      nondet_volatile_rhs(symbol_table, cond);
+      instruction.set_condition(cond);
     }
   }
 }

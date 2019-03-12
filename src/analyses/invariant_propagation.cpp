@@ -256,6 +256,6 @@ void invariant_propagationt::simplify(goto_programt &goto_program)
     ::simplify(simplified_guard, ns);
 
     if(invariant_set.implies(simplified_guard).is_true())
-      i_it->guard=true_exprt();
+      i_it->set_condition(true_exprt());
   }
 }

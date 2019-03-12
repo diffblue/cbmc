@@ -134,14 +134,14 @@ void goto_unwindt::unwind(
 
     exprt exit_cond = false_exprt(); // default is false
 
-    if(!t->guard.is_true()) // cond in backedge
+    if(!t->get_condition().is_true()) // cond in backedge
     {
-      exit_cond = boolean_negate(t->guard);
+      exit_cond = boolean_negate(t->get_condition());
     }
     else if(loop_head->is_goto())
     {
       if(loop_head->get_target()==loop_exit) // cond in forward edge
-        exit_cond=loop_head->guard;
+        exit_cond = loop_head->get_condition();
     }
 
     goto_programt::targett new_t;
@@ -176,7 +176,7 @@ void goto_unwindt::unwind(
     goto_programt::const_targett t_before=loop_exit;
     t_before--;
 
-    if(!t_before->is_goto() || !t_before->guard.is_true())
+    if(!t_before->is_goto() || !t_before->get_condition().is_true())
     {
       goto_programt::targett t_goto = goto_program.insert_before(
         loop_exit,

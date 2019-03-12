@@ -65,33 +65,45 @@ bool static_simplifier(
 
       if(i_it->is_assert())
       {
-        bool unchanged =
-          ai.abstract_state_before(i_it)->ai_simplify(i_it->guard, ns);
+        exprt cond = i_it->get_condition();
+
+        bool unchanged = ai.abstract_state_before(i_it)->ai_simplify(cond, ns);
 
         if(unchanged)
           unmodified.asserts++;
         else
+        {
           simplified.asserts++;
+          i_it->set_condition(cond);
+        }
       }
       else if(i_it->is_assume())
       {
-        bool unchanged =
-          ai.abstract_state_before(i_it)->ai_simplify(i_it->guard, ns);
+        exprt cond = i_it->get_condition();
+
+        bool unchanged = ai.abstract_state_before(i_it)->ai_simplify(cond, ns);
 
         if(unchanged)
           unmodified.assumes++;
         else
+        {
           simplified.assumes++;
+          i_it->set_condition(cond);
+        }
       }
       else if(i_it->is_goto())
       {
-        bool unchanged =
-          ai.abstract_state_before(i_it)->ai_simplify(i_it->guard, ns);
+        exprt cond = i_it->get_condition();
+
+        bool unchanged = ai.abstract_state_before(i_it)->ai_simplify(cond, ns);
 
         if(unchanged)
           unmodified.gotos++;
         else
+        {
           simplified.gotos++;
+          i_it->set_condition(cond);
+        }
       }
       else if(i_it->is_assign())
       {

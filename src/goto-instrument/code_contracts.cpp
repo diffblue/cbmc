@@ -86,9 +86,8 @@ static void check_apply_invariants(
       loop_end=*it;
 
   // see whether we have an invariant
-  exprt invariant=
-    static_cast<const exprt&>(
-      loop_end->guard.find(ID_C_spec_loop_invariant));
+  exprt invariant = static_cast<const exprt &>(
+    loop_end->get_condition().find(ID_C_spec_loop_invariant));
   if(invariant.is_nil())
     return;
 
@@ -138,9 +137,8 @@ static void check_apply_invariants(
 
   // assert the invariant at the end of the loop body
   {
-    goto_programt::instructiont a(ASSERT);
-    a.guard=invariant;
-    a.source_location=loop_end->source_location;
+    goto_programt::instructiont a =
+      goto_programt::make_assertion(invariant, loop_end->source_location);
     a.source_location.set_comment("Loop invariant not preserved");
     goto_function.body.insert_before_swap(loop_end, a);
     ++loop_end;
@@ -150,9 +148,9 @@ static void check_apply_invariants(
   loop_end->targets.clear();
   loop_end->type=ASSUME;
   if(loop_head->is_goto())
-    loop_end->guard = false_exprt();
+    loop_end->set_condition(false_exprt());
   else
-    loop_end->guard = boolean_negate(loop_end->guard);
+    loop_end->set_condition(boolean_negate(loop_end->get_condition()));
 }
 
 void code_contractst::apply_contract(
@@ -208,9 +206,8 @@ void code_contractst::apply_contract(
 
   if(requires.is_not_nil())
   {
-    goto_programt::instructiont a(ASSERT);
-    a.guard=requires;
-    a.source_location=target->source_location;
+    goto_programt::instructiont a =
+      goto_programt::make_assertion(requires, target->source_location);
 
     goto_program.insert_before_swap(target, a);
     ++target;
@@ -345,22 +342,24 @@ void code_contractst::add_contract_check(
   // assume(requires)
   if(requires.is_not_nil())
   {
-    goto_programt::targett a = check.add(
-      goto_programt::make_assumption(requires, requires.source_location()));
-
     // rewrite any use of parameters
-    replace(a->guard);
+    exprt requires_cond = requires;
+    replace(requires_cond);
+
+    check.add(goto_programt::make_assumption(
+      requires_cond, requires.source_location()));
   }
 
   // ret=function(parameter1, ...)
   check.add(goto_programt::make_function_call(call, skip->source_location));
 
-  // assert(ensures)
-  goto_programt::targett a = check.add(
-    goto_programt::make_assertion(ensures, ensures.source_location()));
-
   // rewrite any use of __CPROVER_return_value
-  replace(a->guard);
+  exprt ensures_cond = ensures;
+  replace(ensures_cond);
+
+  // assert(ensures)
+  check.add(
+    goto_programt::make_assertion(ensures_cond, ensures.source_location()));
 
   // assume(false)
   check.add(
