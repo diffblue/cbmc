@@ -227,9 +227,32 @@ void memory_snapshot_harness_generatort::get_memory_snapshot(
     throw deserialization_exceptiont("failed to read JSON memory snapshot");
   }
 
-  // throws a deserialization_exceptiont or an incorrect_goto_program_exceptiont
-  // on failure to read JSON symbol table
-  symbol_table_from_json(json, snapshot);
+  if(json.is_array())
+  {
+    // since memory-analyzer produces an array JSON we need to search it
+    // to find the first JSON object that is a symbol table
+    const auto &jarr = to_json_array(json);
+    for(auto const &arr_element : jarr)
+    {
+      if(!arr_element.is_object())
+        continue;
+      const auto &json_obj = to_json_object(arr_element);
+      const auto it = json_obj.find("symbolTable");
+      if(it != json_obj.end())
+      {
+        symbol_table_from_json(json_obj, snapshot);
+        return;
+      }
+    }
+    throw deserialization_exceptiont(
+      "JSON memory snapshot does not contain symbol table");
+  }
+  else
+  {
+    // throws a deserialization_exceptiont or an incorrect_goto_program_exceptiont
+    // on failure to read JSON symbol table
+    symbol_table_from_json(json, snapshot);
+  }
 }
 
 void memory_snapshot_harness_generatort::generate(
