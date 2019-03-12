@@ -99,9 +99,8 @@ void w_guardst::add_initialization(goto_programt &goto_program) const
   {
     exprt symbol=ns.lookup(*it).symbol_expr();
 
-    t=goto_program.insert_before(t);
-    t->type=ASSIGN;
-    t->code=code_assignt(symbol, false_exprt());
+    t = goto_program.insert_before(
+      t, goto_programt::make_assignment(symbol, false_exprt()));
 
     t++;
   }
@@ -199,14 +198,12 @@ static void race_check(
         if(!is_shared(ns, e_it->second.symbol_expr))
           continue;
 
-        goto_programt::targett t=goto_program.insert_before(i_it);
-
-        t->type=ASSIGN;
-        t->code=code_assignt(
-          w_guards.get_w_guard_expr(e_it->second),
-          e_it->second.guard);
-
-        t->source_location=original_instruction.source_location;
+        goto_programt::targett t = goto_program.insert_before(
+          i_it,
+          goto_programt::make_assignment(
+            w_guards.get_w_guard_expr(e_it->second),
+            e_it->second.guard,
+            original_instruction.source_location));
         i_it=++t;
       }
 
@@ -223,15 +220,13 @@ static void race_check(
         if(!is_shared(ns, e_it->second.symbol_expr))
           continue;
 
-        goto_programt::targett t=goto_program.insert_before(i_it);
-
-        t->type=ASSIGN;
-        t->code=code_assignt(
-          w_guards.get_w_guard_expr(e_it->second),
-          false_exprt());
-
-        t->source_location=original_instruction.source_location;
-        i_it=++t;
+        goto_programt::targett t = goto_program.insert_before(
+          i_it,
+          goto_programt::make_assignment(
+            w_guards.get_w_guard_expr(e_it->second),
+            false_exprt(),
+            original_instruction.source_location));
+        i_it = std::next(t);
       }
 
       // now add assertions for what is read and written

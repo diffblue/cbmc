@@ -286,10 +286,9 @@ void overflow_instrumentert::accumulate_overflow(
   const exprt &expr,
   goto_programt::targetst &added)
 {
-  goto_programt::instructiont a(ASSIGN);
-  a.code=code_assignt(overflow_var, or_exprt(overflow_var, expr));
-  goto_programt::targett assignment=program.insert_after(t);
-  *assignment=a;
+  goto_programt::targett assignment = program.insert_after(
+    t,
+    goto_programt::make_assignment(overflow_var, or_exprt(overflow_var, expr)));
   assignment->swap(*t);
 
   added.push_back(assignment);
