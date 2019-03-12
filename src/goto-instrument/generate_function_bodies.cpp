@@ -106,7 +106,7 @@ protected:
     const namespacet ns(symbol_table);
     std::ostringstream comment_stream;
     comment_stream << id2string(ID_assertion) << " "
-                   << format(assert_instruction->guard);
+                   << format(assert_instruction->get_condition());
     assert_instruction->source_location.set_comment(comment_stream.str());
     assert_instruction->source_location.set_property_class(ID_assertion);
     add_instruction(goto_programt::make_end_function());
@@ -135,7 +135,7 @@ protected:
     const namespacet ns(symbol_table);
     std::ostringstream comment_stream;
     comment_stream << id2string(ID_assertion) << " "
-                   << format(assert_instruction->guard);
+                   << format(assert_instruction->get_condition());
     assert_instruction->source_location.set_comment(comment_stream.str());
     assert_instruction->source_location.set_property_class(ID_assertion);
     add_instruction(goto_programt::make_assumption(false_exprt()));

@@ -1470,7 +1470,7 @@ void goto_convertt::generate_ifthenelse(
   {
     // The above conjunction deliberately excludes the instance
     // if(some) { label: assert(false); }
-    true_case.instructions.back().guard=boolean_negate(guard);
+    true_case.instructions.back().set_condition(boolean_negate(guard));
     dest.destructive_append(true_case);
     true_case.instructions.clear();
     if(
@@ -1488,7 +1488,7 @@ void goto_convertt::generate_ifthenelse(
   {
     // The above conjunction deliberately excludes the instance
     // if(some) ... else { label: assert(false); }
-    false_case.instructions.back().guard=guard;
+    false_case.instructions.back().set_condition(guard);
     dest.destructive_append(false_case);
     false_case.instructions.clear();
     if(
@@ -1507,7 +1507,7 @@ void goto_convertt::generate_ifthenelse(
     true_case.instructions.front().labels.empty() &&
     true_case.instructions.back().labels.empty())
   {
-    true_case.instructions.front().guard = boolean_negate(guard);
+    true_case.instructions.front().set_condition(boolean_negate(guard));
     true_case.instructions.erase(--true_case.instructions.end());
     dest.destructive_append(true_case);
     true_case.instructions.clear();

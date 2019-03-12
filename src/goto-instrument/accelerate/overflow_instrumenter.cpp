@@ -64,7 +64,8 @@ void overflow_instrumentert::add_overflow_checks(
     add_overflow_checks(t, assignment.rhs(), added);
   }
 
-  add_overflow_checks(t, t->guard, added);
+  if(t->has_condition())
+    add_overflow_checks(t, t->get_condition(), added);
 
   checked.insert(t->location_number);
 }

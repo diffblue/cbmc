@@ -95,7 +95,7 @@ goto_programt::targett scratch_programt::assign(
 goto_programt::targett scratch_programt::assume(const exprt &guard)
 {
   targett instruction=add_instruction(ASSUME);
-  instruction->guard=guard;
+  instruction->set_condition(guard);
 
   return instruction;
 }
@@ -143,7 +143,9 @@ void scratch_programt::fix_types()
     }
     else if(it->is_assume() || it->is_assert())
     {
-      ::fix_types(it->guard);
+      exprt cond = it->get_condition();
+      ::fix_types(cond);
+      it->set_condition(cond);
     }
   }
 }
@@ -162,12 +164,12 @@ void scratch_programt::append_path(patht &path)
     {
       if(it->guard.id()!=ID_nil)
       {
-        add_instruction(ASSUME)->guard=it->guard;
+        add_instruction(ASSUME)->set_condition(it->guard);
       }
     }
     else if(it->loc->is_assert())
     {
-      add_instruction(ASSUME)->guard=it->loc->guard;
+      add_instruction(ASSUME)->set_condition(it->loc->get_condition());
     }
   }
 }

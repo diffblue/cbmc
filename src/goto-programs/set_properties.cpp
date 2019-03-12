@@ -136,21 +136,12 @@ void make_assertions_false(goto_modelt &goto_model)
 void make_assertions_false(
   goto_functionst &goto_functions)
 {
-  for(goto_functionst::function_mapt::iterator
-      f_it=goto_functions.function_map.begin();
-      f_it!=goto_functions.function_map.end();
-      f_it++)
+  for(auto &f : goto_functions.function_map)
   {
-    goto_programt &goto_program=f_it->second.body;
-
-    for(goto_programt::instructionst::iterator
-        i_it=goto_program.instructions.begin();
-        i_it!=goto_program.instructions.end();
-        i_it++)
+    for(auto &i : f.second.body.instructions)
     {
-      if(!i_it->is_assert())
-        continue;
-      i_it->guard=false_exprt();
+      if(i.is_assert())
+        i.set_condition(false_exprt());
     }
   }
 }

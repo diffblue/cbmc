@@ -83,8 +83,8 @@ void k_inductiont::process_loop(
       goto_unwindt::unwind_strategyt::PARTIAL);
 
     // assume the loop condition has become false
-    goto_programt::instructiont assume(ASSUME);
-    assume.guard=loop_guard;
+    goto_programt::instructiont assume =
+      goto_programt::make_assumption(loop_guard);
     goto_function.body.insert_before_swap(loop_exit, assume);
   }
 
@@ -135,8 +135,8 @@ void k_inductiont::process_loop(
     }
 
     // assume the loop condition has become false
-    goto_programt::instructiont assume(ASSUME);
-    assume.guard=loop_guard;
+    goto_programt::instructiont assume =
+      goto_programt::make_assumption(loop_guard);
     goto_function.body.insert_before_swap(loop_exit, assume);
 
     // Now havoc at the loop head. Use insert_swap to

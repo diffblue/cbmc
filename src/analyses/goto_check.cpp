@@ -118,7 +118,7 @@ protected:
   void conversion_check(const exprt &, const guardt &);
   void float_overflow_check(const exprt &, const guardt &);
   void nan_check(const exprt &, const guardt &);
-  void rw_ok_check(exprt &);
+  optionalt<exprt> rw_ok_check(exprt);
 
   std::string array_name(const exprt &);
 
@@ -1447,7 +1447,7 @@ void goto_checkt::add_guarded_claim(
     std::string source_expr_string;
     get_language_from_mode(mode)->from_expr(src_expr, source_expr_string, ns);
 
-    t->guard.swap(new_expr);
+    t->set_condition(std::move(new_expr));
     t->source_location=source_location;
     t->source_location.set_comment(comment+" in "+source_expr_string);
     t->source_location.set_property_class(property_class);
@@ -1656,10 +1656,19 @@ void goto_checkt::check(const exprt &expr)
 }
 
 /// expand the r_ok and w_ok predicates
-void goto_checkt::rw_ok_check(exprt &expr)
+optionalt<exprt> goto_checkt::rw_ok_check(exprt expr)
 {
+  bool modified = false;
+
   for(auto &op : expr.operands())
-    rw_ok_check(op);
+  {
+    auto op_result = rw_ok_check(op);
+    if(op_result.has_value())
+    {
+      op = *op_result;
+      modified = true;
+    }
+  }
 
   if(expr.id() == ID_r_ok || expr.id() == ID_w_ok)
   {
@@ -1668,12 +1677,18 @@ void goto_checkt::rw_ok_check(exprt &expr)
       expr.operands().size() == 2, "r/w_ok must have two operands");
 
     const auto conditions = address_check(expr.op0(), expr.op1());
+
     exprt::operandst conjuncts;
+
     for(const auto &c : conditions)
       conjuncts.push_back(c.assertion);
 
-    expr = conjunction(conjuncts);
+    return conjunction(conjuncts);
   }
+  else if(modified)
+    return std::move(expr);
+  else
+    return {};
 }
 
 void goto_checkt::goto_check(
@@ -1720,7 +1735,7 @@ void goto_checkt::goto_check(
 
         goto_programt::targett t=new_code.add_instruction(type);
 
-        t->guard=false_exprt();
+        t->set_condition(false_exprt());
         t->source_location=i.source_location;
         t->source_location.set_property_class("error label");
         t->source_location.set_comment("error label "+label);
@@ -1831,7 +1846,9 @@ void goto_checkt::goto_check(
     {
       bool is_user_provided=i.source_location.get_bool("user-provided");
 
-      rw_ok_check(i.guard);
+      auto rw_ok_cond = rw_ok_check(i.get_condition());
+      if(rw_ok_cond.has_value())
+        i.set_condition(*rw_ok_cond);
 
       if((is_user_provided && !enable_assertions &&
           i.source_location.get_property_class()!="error label") ||

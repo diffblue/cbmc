@@ -156,10 +156,10 @@ static bool link_functions(
     Forall_goto_functions(dest_it, dest_functions)
       Forall_goto_program_instructions(iit, dest_it->second.body)
       {
-        object_type_updates(iit->code);
-
-        if(iit->has_condition())
-          object_type_updates(iit->guard);
+        iit->transform([&object_type_updates](exprt expr) {
+          object_type_updates(expr);
+          return expr;
+        });
       }
   }
 

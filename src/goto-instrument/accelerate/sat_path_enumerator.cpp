@@ -184,7 +184,7 @@ void sat_path_enumeratort::build_path(
       // If this was a conditional branch (it probably was), figure out
       // if we hit the "taken" or "not taken" branch & accumulate the
       // appropriate guard.
-      cond=not_exprt(t->guard);
+      cond = not_exprt(t->get_condition());
 
       for(goto_programt::targetst::iterator it=t->targets.begin();
           it!=t->targets.end();
@@ -192,7 +192,7 @@ void sat_path_enumeratort::build_path(
       {
         if(next==*it)
         {
-          cond=t->guard;
+          cond = t->get_condition();
           break;
         }
       }

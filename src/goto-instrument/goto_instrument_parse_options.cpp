@@ -601,8 +601,8 @@ int goto_instrument_parse_optionst::doit()
         {
           if(ins.code.is_not_nil())
             status() << ins.code.pretty() << eom;
-          if(ins.guard.is_not_nil())
-            status() << "[guard] " << ins.guard.pretty() << eom;
+          if(ins.has_condition())
+            status() << "[guard] " << ins.get_condition().pretty() << eom;
         }
       return CPROVER_EXIT_SUCCESS;
     }

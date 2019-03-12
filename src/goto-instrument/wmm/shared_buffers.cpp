@@ -319,12 +319,8 @@ void shared_bufferst::write(
   const exprt cond_expr=
     not_exprt(and_exprt(buff1_used_expr, buff0_used_expr));
 
-  target=goto_program.insert_before(target);
-  target->guard=cond_expr;
-  target->type=ASSERT;
-  target->code = code_assertt(cond_expr);
-  target->code.add_source_location()=source_location;
-  target->source_location=source_location;
+  target = goto_program.insert_before(
+    target, goto_programt::make_assertion(cond_expr, source_location));
   target++;
 
   // We update writers ownership of the values in the buffer
