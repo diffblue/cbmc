@@ -1751,8 +1751,7 @@ inline union_exprt &to_union_expr(exprt &expr)
 class struct_exprt : public multi_ary_exprt
 {
 public:
-  DEPRECATED(
-    SINCE(2019, 1, 12, "use struct_exprt(component_name, value, type) instead"))
+  DEPRECATED(SINCE(2019, 1, 12, "use struct_exprt(operands, type) instead"))
   explicit struct_exprt(const typet &_type) : multi_ary_exprt(ID_struct, _type)
   {
   }
