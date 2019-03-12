@@ -48,7 +48,8 @@ public:
   /// throws if no generator with the supplied name is registered.
   std::unique_ptr<goto_harness_generatort> factory(
     const std::string &generator_name,
-    const generator_optionst &generator_options);
+    const generator_optionst &generator_options,
+    const goto_modelt &goto_model);
 
 private:
   std::map<std::string, build_generatort> generators;

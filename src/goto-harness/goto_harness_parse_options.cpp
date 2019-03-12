@@ -50,11 +50,6 @@ int goto_harness_parse_optionst::doit()
 
   auto factory_options = collect_generate_factory_options();
 
-  // Initialise harness generator
-  auto harness_generator =
-    factory.factory(got_harness_config.harness_type, factory_options);
-  CHECK_RETURN(harness_generator != nullptr);
-
   // This just sets up the defaults (and would interpret options such as --32).
   config.set(cmdline);
 
@@ -67,7 +62,27 @@ int goto_harness_parse_optionst::doit()
                                      got_harness_config.in_file + "'"};
   }
   auto goto_model = std::move(read_goto_binary_result.value());
+
+  // This has to be called after the defaults are set up (as per the
+  // config.set(cmdline) above) otherwise, e.g. the architecture specification
+  // will be unknown.
   config.set_from_symbol_table(goto_model.symbol_table);
+
+  if(goto_model.symbol_table.has_symbol(
+       got_harness_config.harness_function_name))
+  {
+    throw invalid_command_line_argument_exceptiont(
+      "harness function `" +
+        id2string(got_harness_config.harness_function_name) +
+        "` already in "
+        "the symbol table",
+      "--" GOTO_HARNESS_GENERATOR_HARNESS_FUNCTION_NAME_OPT);
+  }
+
+  // Initialise harness generator
+  auto harness_generator = factory.factory(
+    got_harness_config.harness_type, factory_options, goto_model);
+  CHECK_RETURN(harness_generator != nullptr);
 
   harness_generator->generate(
     goto_model, got_harness_config.harness_function_name);

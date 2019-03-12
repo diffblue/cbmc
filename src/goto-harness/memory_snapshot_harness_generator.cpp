@@ -21,6 +21,8 @@ Author: Daniel Poetzl
 #include <util/string_utils.h>
 #include <util/symbol_table.h>
 
+#include <linking/static_lifetime_init.h>
+
 #include "goto_harness_generator_factory.h"
 
 void memory_snapshot_harness_generatort::handle_option(
@@ -29,7 +31,7 @@ void memory_snapshot_harness_generatort::handle_option(
 {
   if(option == "memory-snapshot")
   {
-    memory_snapshot = require_exactly_one_value(option, values);
+    memory_snapshot_file = require_exactly_one_value(option, values);
   }
   else if(option == "initial-location")
   {
@@ -40,14 +42,14 @@ void memory_snapshot_harness_generatort::handle_option(
     split_string(initial_location, ':', start, true);
 
     if(
-      start.size() == 0 || (start.size() >= 1 && start.front().empty()) ||
+      start.empty() || start.front().empty() ||
       (start.size() == 2 && start.back().empty()) || start.size() > 2)
     {
       throw invalid_command_line_argument_exceptiont(
         "invalid initial location specification", "--initial-location");
     }
 
-    function = start.front();
+    entry_function_name = start.front();
 
     if(start.size() == 2)
     {
@@ -62,25 +64,78 @@ void memory_snapshot_harness_generatort::handle_option(
   }
 }
 
-void memory_snapshot_harness_generatort::validate_options()
+void memory_snapshot_harness_generatort::validate_options(
+  const goto_modelt &goto_model)
 {
-  if(memory_snapshot.empty())
+  if(memory_snapshot_file.empty())
   {
     throw invalid_command_line_argument_exceptiont(
       "option --memory_snapshot is required",
       "--harness-type initialise-from-memory-snapshot");
   }
 
-  if(function.empty())
+  if(entry_function_name.empty())
   {
     INVARIANT(
-      location_number.has_value(),
+      !location_number.has_value(),
       "when `function` is empty then the option --initial-location was not "
       "given and thus `location_number` was not set");
 
     throw invalid_command_line_argument_exceptiont(
       "option --initial-location is required",
       "--harness-type initialise-from-memory-snapshot");
+  }
+
+  const auto &goto_functions = goto_model.goto_functions;
+  const auto &goto_function =
+    goto_functions.function_map.find(entry_function_name);
+  if(goto_function == goto_functions.function_map.end())
+  {
+    throw invalid_command_line_argument_exceptiont(
+      "unknown initial location specification", "--initial-location");
+  }
+
+  if(!goto_function->second.body_available())
+  {
+    throw invalid_command_line_argument_exceptiont(
+      "given function `" + id2string(entry_function_name) +
+        "` does not have a body",
+      "--initial-location");
+  }
+
+  if(location_number.has_value())
+  {
+    const auto &goto_program = goto_function->second.body;
+    const auto opt_it = goto_program.get_target(*location_number);
+
+    if(!opt_it.has_value())
+    {
+      throw invalid_command_line_argument_exceptiont(
+        "no instruction with location number " +
+          std::to_string(*location_number) + " in function " +
+          id2string(entry_function_name),
+        "--initial-location");
+    }
+  }
+
+  if(goto_functions.function_map.count(INITIALIZE_FUNCTION) == 0)
+  {
+    throw invalid_command_line_argument_exceptiont(
+      "invalid input program: " + std::string(INITIALIZE_FUNCTION) +
+        " not found",
+      "<in>");
+  }
+
+  const symbol_tablet &symbol_table = goto_model.symbol_table;
+  const symbolt *called_function_symbol =
+    symbol_table.lookup(entry_function_name);
+
+  if(called_function_symbol == nullptr)
+  {
+    throw invalid_command_line_argument_exceptiont(
+      "function `" + id2string(entry_function_name) +
+        "` not found in the symbol table",
+      "--initial-location");
   }
 }
 
@@ -90,75 +145,60 @@ void memory_snapshot_harness_generatort::add_init_section(
   goto_functionst &goto_functions = goto_model.goto_functions;
   symbol_tablet &symbol_table = goto_model.symbol_table;
 
-  goto_functiont &goto_function = goto_functions.function_map[function];
-  const symbolt &function_symbol = symbol_table.lookup_ref(function);
+  goto_functiont &goto_function =
+    goto_functions.function_map[entry_function_name];
+  const symbolt &function_symbol = symbol_table.lookup_ref(entry_function_name);
 
   goto_programt &goto_program = goto_function.body;
 
-  const symbolt &symbol = get_fresh_aux_symbol(
+  // introduce a symbol for a Boolean variable to indicate the point at which
+  // the function initialisation is completed
+  symbolt &func_init_done_symbol = get_fresh_aux_symbol(
     bool_typet(),
-    id2string(function),
+    id2string(entry_function_name),
     "func_init_done",
-    source_locationt(),
+    function_symbol.location,
     function_symbol.mode,
     symbol_table);
+  func_init_done_symbol.is_static_lifetime = true;
+  func_init_done_symbol.value = false_exprt();
 
-  const symbol_exprt &var = symbol.symbol_expr();
+  const symbol_exprt func_init_done_var = func_init_done_symbol.symbol_expr();
 
-  // initialise var in __CPROVER_initialize if it is present
-  const auto f_it =
-    goto_functions.function_map.find(CPROVER_PREFIX "initialize");
-
-  if(f_it != goto_functions.function_map.end())
-  {
-    goto_programt &goto_program = f_it->second.body;
-
-    auto init_it =
-      goto_program.insert_before(std::prev(goto_program.instructions.end()));
-
-    init_it->make_assignment(code_assignt(var, false_exprt()));
-  }
+  // initialise func_init_done_var in __CPROVER_initialize if it is present
+  // so that it's FALSE value is visible before the harnessed function is called
+  goto_programt &cprover_initialize =
+    goto_functions.function_map.find(INITIALIZE_FUNCTION)->second.body;
+  cprover_initialize.insert_before(
+    std::prev(cprover_initialize.instructions.end()),
+    goto_programt::make_assignment(
+      code_assignt(func_init_done_var, false_exprt())));
 
   const goto_programt::const_targett start_it =
     goto_program.instructions.begin();
 
-  goto_programt::const_targett it;
+  auto ins_it1 = goto_program.insert_before(
+    start_it,
+    goto_programt::make_goto(goto_program.const_cast_target(start_it)));
+  ins_it1->guard = func_init_done_var;
 
-  if(location_number.has_value())
-  {
-    const auto opt_it = goto_program.get_target(*location_number);
+  auto ins_it2 = goto_program.insert_after(
+    ins_it1,
+    goto_programt::make_assignment(
+      code_assignt(func_init_done_var, true_exprt())));
 
-    if(!opt_it.has_value())
-    {
-      throw invalid_command_line_argument_exceptiont(
-        "no instruction with location number " +
-          std::to_string(*location_number) + " in function " +
-          id2string(function),
-        "--initial-location");
-    }
-
-    it = *opt_it;
-  }
-  else
-  {
-    it = start_it;
-  }
-
-  auto ins_it1 = goto_program.insert_before(start_it);
-  ins_it1->make_goto(goto_program.const_cast_target(start_it));
-  ins_it1->guard = var;
-
-  auto ins_it2 = goto_program.insert_after(ins_it1);
-  ins_it2->make_assignment(code_assignt(var, true_exprt()));
-
-  auto ins_it3 = goto_program.insert_after(ins_it2);
-  ins_it3->make_goto(goto_program.const_cast_target(it));
+  goto_program.compute_location_numbers();
+  goto_program.insert_after(
+    ins_it2,
+    goto_programt::make_goto(goto_program.const_cast_target(
+      location_number.has_value() ? *goto_program.get_target(*location_number)
+                                  : start_it)));
 }
 
-void memory_snapshot_harness_generatort::add_assignments_to_globals(
-  const symbol_tablet &snapshot,
-  code_blockt &code) const
+code_blockt memory_snapshot_harness_generatort::add_assignments_to_globals(
+  const symbol_tablet &snapshot) const
 {
+  code_blockt code;
   for(const auto &pair : snapshot)
   {
     const symbolt &symbol = pair.second;
@@ -166,10 +206,9 @@ void memory_snapshot_harness_generatort::add_assignments_to_globals(
     if(!symbol.is_static_lifetime)
       continue;
 
-    code_assignt code_assign(symbol.symbol_expr(), symbol.value);
-
-    code.add(code_assign);
+    code.add(code_assignt{symbol.symbol_expr(), symbol.value});
   }
+  return code;
 }
 
 void memory_snapshot_harness_generatort::add_call_with_nondet_arguments(
@@ -182,26 +221,28 @@ void memory_snapshot_harness_generatort::add_call_with_nondet_arguments(
 
   for(const code_typet::parametert &parameter : code_type.parameters())
   {
-    arguments.push_back(side_effect_expr_nondett(parameter.type()));
+    arguments.push_back(side_effect_expr_nondett{
+      parameter.type(), called_function_symbol.location});
   }
 
-  code_function_callt function_call(
-    called_function_symbol.symbol_expr(), arguments);
-  code.add(function_call);
+  code.add(code_function_callt{called_function_symbol.symbol_expr(),
+                               std::move(arguments)});
 }
 
-void memory_snapshot_harness_generatort::insert_function(
-  goto_modelt &goto_model,
-  const symbolt &function) const
+void memory_snapshot_harness_generatort::
+  insert_harness_function_into_goto_model(
+    goto_modelt &goto_model,
+    const symbolt &function) const
 {
   const auto r = goto_model.symbol_table.insert(function);
   CHECK_RETURN(r.second);
 
-  auto f_it = goto_model.goto_functions.function_map.insert(
-    std::make_pair(function.name, goto_functiont()));
-  CHECK_RETURN(f_it.second);
+  auto function_iterator_pair = goto_model.goto_functions.function_map.emplace(
+    function.name, goto_functiont{});
 
-  goto_functiont &harness_function = f_it.first->second;
+  CHECK_RETURN(function_iterator_pair.second);
+
+  goto_functiont &harness_function = function_iterator_pair.first->second;
   harness_function.type = to_code_type(function.type);
 
   goto_convert(
@@ -220,7 +261,7 @@ void memory_snapshot_harness_generatort::get_memory_snapshot(
 {
   jsont json;
 
-  const bool r = parse_json(memory_snapshot, message_handler, json);
+  const bool r = parse_json(memory_snapshot_file, message_handler, json);
 
   if(r)
   {
@@ -249,7 +290,8 @@ void memory_snapshot_harness_generatort::get_memory_snapshot(
   }
   else
   {
-    // throws a deserialization_exceptiont or an incorrect_goto_program_exceptiont
+    // throws a deserialization_exceptiont or an
+    // incorrect_goto_program_exceptiont
     // on failure to read JSON symbol table
     symbol_table_from_json(json, snapshot);
   }
@@ -260,52 +302,17 @@ void memory_snapshot_harness_generatort::generate(
   const irep_idt &harness_function_name)
 {
   symbol_tablet snapshot;
-  get_memory_snapshot(memory_snapshot, snapshot);
+  get_memory_snapshot(memory_snapshot_file, snapshot);
 
   symbol_tablet &symbol_table = goto_model.symbol_table;
   goto_functionst &goto_functions = goto_model.goto_functions;
 
-  const symbolt *called_function_symbol = symbol_table.lookup(function);
-
-  if(called_function_symbol == nullptr)
-  {
-    throw invalid_command_line_argument_exceptiont(
-      "function `" + id2string(function) + "` not found in the symbol table",
-      "--initial-location");
-  }
-
-  {
-    const auto f_it = goto_functions.function_map.find(function);
-
-    if(f_it == goto_functions.function_map.end())
-    {
-      throw invalid_command_line_argument_exceptiont(
-        "goto function `" + id2string(function) + "` not found",
-        "--initial-location");
-    }
-
-    if(!f_it->second.body_available())
-    {
-      throw invalid_command_line_argument_exceptiont(
-        "given function `" + id2string(function) + "` does not have a body",
-        "--initial-location");
-    }
-  }
+  const symbolt *called_function_symbol =
+    symbol_table.lookup(entry_function_name);
 
   add_init_section(goto_model);
 
-  if(symbol_table.has_symbol(harness_function_name))
-  {
-    throw invalid_command_line_argument_exceptiont(
-      "harness function `" + id2string(harness_function_name) +
-        "` already in "
-        "the symbol table",
-      "--" GOTO_HARNESS_GENERATOR_HARNESS_FUNCTION_NAME_OPT);
-  }
-
-  code_blockt harness_function_body;
-
-  add_assignments_to_globals(snapshot, harness_function_body);
+  code_blockt harness_function_body = add_assignments_to_globals(snapshot);
 
   add_call_with_nondet_arguments(
     *called_function_symbol, harness_function_body);
@@ -323,7 +330,7 @@ void memory_snapshot_harness_generatort::generate(
   harness_function_symbol.value = harness_function_body;
 
   // Add harness function to goto model and symbol table
-  insert_function(goto_model, harness_function_symbol);
+  insert_harness_function_into_goto_model(goto_model, harness_function_symbol);
 
   goto_functions.update();
 }

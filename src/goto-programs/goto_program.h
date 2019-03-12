@@ -601,8 +601,13 @@ public:
       return nullopt;
     }
 
-    return std::next(
-      instructions.begin(), location_number - start_location_number);
+    auto location_target =
+      std::next(instructions.begin(), location_number - start_location_number);
+
+    // location numbers are contiguous unless new instructions are inserted
+    // here we check that nobody inserted any instruction into our function
+    CHECK_RETURN(location_target->location_number == location_number);
+    return location_target;
   }
 
   template <typename Target>

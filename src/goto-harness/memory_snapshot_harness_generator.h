@@ -54,26 +54,26 @@ protected:
     const std::string &option,
     const std::list<std::string> &values) override;
 
-  void validate_options() override;
+  void validate_options(const goto_modelt &goto_model) override;
 
   void
   get_memory_snapshot(const std::string &file, symbol_tablet &snapshot) const;
 
   void add_init_section(goto_modelt &goto_model) const;
 
-  void add_assignments_to_globals(
-    const symbol_tablet &snapshot,
-    code_blockt &code) const;
+  code_blockt add_assignments_to_globals(const symbol_tablet &snapshot) const;
 
   void add_call_with_nondet_arguments(
     const symbolt &called_function_symbol,
     code_blockt &code) const;
 
-  void insert_function(goto_modelt &goto_model, const symbolt &function) const;
+  void insert_harness_function_into_goto_model(
+    goto_modelt &goto_model,
+    const symbolt &function) const;
 
-  std::string memory_snapshot;
+  std::string memory_snapshot_file;
 
-  irep_idt function;
+  irep_idt entry_function_name;
   optionalt<unsigned> location_number;
 
   message_handlert &message_handler;

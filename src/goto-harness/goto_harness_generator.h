@@ -35,7 +35,7 @@ protected:
     const std::list<std::string> &values) = 0;
 
   /// Check if options are in a sane state, throw otherwise
-  virtual void validate_options() = 0;
+  virtual void validate_options(const goto_modelt &goto_model) = 0;
 
   /// Returns the only value of a single element list,
   /// throws an exception if not passed a single element list
