@@ -492,16 +492,16 @@ static code_blockt record_pointer_parameters(
   for(std::size_t param_number = 0; param_number < parameters.size();
       param_number++)
   {
-    const symbolt &p_symbol =
-      *symbol_table.lookup(parameters[param_number].get_identifier());
+    const symbolt *p_symbol =
+      symbol_table.lookup(parameters[param_number].get_identifier());
 
-    if(!can_cast_type<pointer_typet>(p_symbol.type))
+    if(!p_symbol || !can_cast_type<pointer_typet>(p_symbol->type))
       continue;
 
     codet output(ID_output);
     output.operands().resize(2);
     output.op0() = address_of_exprt(index_exprt(
-      string_constantt(p_symbol.base_name), from_integer(0, index_type())));
+      string_constantt(p_symbol->base_name), from_integer(0, index_type())));
     output.op1() = arguments[param_number];
     output.add_source_location() = function.location;
 

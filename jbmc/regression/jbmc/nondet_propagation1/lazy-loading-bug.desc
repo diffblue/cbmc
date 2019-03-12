@@ -1,0 +1,13 @@
+CORE
+andNot_Bug.class
+--depth 1600 --java-unwind-enum-static --java-max-vla-length 48 --unwind 4 --max-nondet-string-length 100 andNot_Pass.class --function andNot_Pass.main
+^\*\* 1 of \d+ failed
+VERIFICATION FAILED
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+This somewhat bogus test (both andNot_Pass.class and andNot_Bug.class are
+specified on the command line) resulted in a segmentation fault when used with
+symex-driven-lazy-loading. Even though that's a bogus command line, user input
+should never trigger a segmentation fault.
