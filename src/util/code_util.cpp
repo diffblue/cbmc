@@ -13,8 +13,7 @@ code_assignt get_null_assignment(
   const pointer_typet &ptr_type,
   const source_locationt &loc)
 {
-  null_pointer_exprt null_pointer_expr(ptr_type);
-  code_assignt code(expr, null_pointer_expr);
+  code_assignt code{expr, null_pointer_exprt{ptr_type}};
   code.add_source_location() = loc;
   return code;
 }
