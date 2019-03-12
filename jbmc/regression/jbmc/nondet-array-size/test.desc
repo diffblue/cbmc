@@ -1,0 +1,16 @@
+CORE
+TestClass.class
+--function "TestClass.minimalJbmc" --unwind 5 --max-nondet-string-length 10 --java-unwind-enum-static --trace --json-ui
+^EXIT=10$
+^SIGNAL=0$
+VERIFICATION FAILED
+--
+--
+Verify that when an array's size is determined by an array input, the resulting
+trace is valid.
+To compile this source file, use:
+
+```bash
+$ javac -g TestClass.java -cp ../../../lib/java-models-library/target/classes/:.
+```
+to have the cprover library on the class path.
