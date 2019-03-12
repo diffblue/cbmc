@@ -71,6 +71,12 @@ public:
   {
   }
 
+  exprt(const irep_idt &id, typet type, source_locationt loc)
+    : exprt(id, std::move(type))
+  {
+    add_source_location() = std::move(loc);
+  }
+
   /// Return the type of the expression
   typet &type() { return static_cast<typet &>(add(ID_type)); }
   const typet &type() const
