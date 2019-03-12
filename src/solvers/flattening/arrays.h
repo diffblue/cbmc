@@ -46,6 +46,8 @@ public:
   literalt record_array_equality(const equal_exprt &expr);
   void record_array_index(const index_exprt &expr);
 
+  exprt get(const exprt &expr) const override;
+
 protected:
   const namespacet &ns;
 
@@ -65,6 +67,7 @@ protected:
   // elements are added while references are held
   typedef std::list<array_equalityt> array_equalitiest;
   array_equalitiest array_equalities;
+  std::unordered_map<exprt, exprt, irep_hash> lhs_rhs_map;
 
   // this is used to find the clusters of arrays being compared
   union_find<exprt> arrays;

@@ -67,7 +67,18 @@ literalt arrayst::record_array_equality(
   collect_arrays(op0);
   collect_arrays(op1);
 
+  lhs_rhs_map.emplace(op0, op1);
+
   return array_equalities.back().l;
+}
+
+exprt arrayst::get(const exprt &expr) const
+{
+  auto it = lhs_rhs_map.find(expr);
+  if(it != lhs_rhs_map.end() && it->first != it->second)
+    return get(it->second);
+  else
+    return SUB::get(expr);
 }
 
 void arrayst::collect_indices()

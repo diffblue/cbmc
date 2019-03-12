@@ -977,6 +977,8 @@ static optionalt<exprt> get_array(
 {
   const exprt &size = arr.length();
   exprt arr_val = simplify_expr(adjust_if_recursive(super_get(arr), ns), ns);
+  if(arr_val.id() == ID_array)
+    return std::move(arr_val);
   exprt size_val = super_get(size);
   size_val = simplify_expr(size_val, ns);
   const typet char_type = arr.type().subtype();
