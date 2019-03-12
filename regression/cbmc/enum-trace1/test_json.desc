@@ -1,4 +1,4 @@
-CORE
+CORE broken-smt-backend
 main.c
 --json-ui --function test --trace
 activate-multi-line-match

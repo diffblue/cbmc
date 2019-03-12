@@ -118,6 +118,10 @@ void convert_decl(
   const symbolt *symbol;
   irep_idt base_name, display_name;
 
+  DATA_INVARIANT(
+    step.full_lhs_value.is_not_nil(),
+    "full_lhs_value in assignment must not be nil");
+
   if(!ns.lookup(identifier, symbol))
   {
     base_name = symbol->base_name;
@@ -132,9 +136,6 @@ void convert_decl(
   }
   else
   {
-    DATA_INVARIANT(
-      step.full_lhs_value.is_not_nil(),
-      "full_lhs_value in assignment must not be nil");
     full_lhs_value = json(step.full_lhs_value, ns, ID_unknown);
   }
 
