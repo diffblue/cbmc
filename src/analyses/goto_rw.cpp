@@ -300,7 +300,7 @@ void rw_range_sett::get_objects_array(
   const range_spect &range_start,
   const range_spect &size)
 {
-  const array_typet &array_type = to_array_type(expr.type());
+  const array_typet &array_type = expr.type();
 
   auto subtype_bits = pointer_offset_bits(array_type.subtype(), ns);
 

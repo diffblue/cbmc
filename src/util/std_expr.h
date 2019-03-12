@@ -1681,6 +1681,16 @@ public:
     : multi_ary_exprt(ID_array, std::move(_operands), _type)
   {
   }
+
+  const array_typet &type() const
+  {
+    return static_cast<const array_typet &>(multi_ary_exprt::type());
+  }
+
+  array_typet &type()
+  {
+    return static_cast<array_typet &>(multi_ary_exprt::type());
+  }
 };
 
 template <>
