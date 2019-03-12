@@ -32,7 +32,8 @@ static void get_l1_name(exprt &expr);
 goto_symex_statet::goto_symex_statet(
   const symex_targett::sourcet &_source,
   guard_managert &manager)
-  : goto_statet(_source, manager),
+  : goto_statet(manager),
+    source(_source),
     guard_manager(manager),
     symex_target(nullptr),
     record_events(true),

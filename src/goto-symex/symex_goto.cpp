@@ -210,7 +210,7 @@ void goto_symext::symex_goto(statet &state)
   // merge_gotos when we visit new_state_pc
   framet::goto_state_listt &goto_state_list =
     state.call_stack().top().goto_state_map[new_state_pc];
-  goto_state_list.emplace_back(state);
+  goto_state_list.emplace_back(state.source, state);
 
   symex_transition(state, state_pc, backward);
 
@@ -270,7 +270,7 @@ void goto_symext::symex_goto(statet &state)
     }
     else
     {
-      goto_statet &new_state = goto_state_list.back();
+      goto_statet &new_state = goto_state_list.back().second;
       if(!backward)
       {
         new_state.guard.add(guard_expr);
@@ -300,13 +300,18 @@ void goto_symext::merge_gotos(statet &state)
 
   for(auto list_it = state_list.rbegin(); list_it != state_list.rend();
       ++list_it)
-    merge_goto(std::move(*list_it), state);
+  {
+    merge_goto(list_it->first, std::move(list_it->second), state);
+  }
 
   // clean up to save some memory
   frame.goto_state_map.erase(state_map_it);
 }
 
-void goto_symext::merge_goto(goto_statet &&goto_state, statet &state)
+void goto_symext::merge_goto(
+  const symex_targett::sourcet &,
+  goto_statet &&goto_state,
+  statet &state)
 {
   // check atomic section
   if(state.atomic_section_id != goto_state.atomic_section_id)

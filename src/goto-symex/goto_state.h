@@ -17,7 +17,6 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <pointer-analysis/value_set.h>
 
 #include "renaming_level.h"
-#include "symex_target_equation.h"
 
 /// Container for data that varies per program point, e.g. the constant
 /// propagator state, when state needs to branch. This is copied out of
@@ -41,8 +40,6 @@ public:
   // of the condition of the if).
   guardt guard;
 
-  symex_targett::sourcet source;
-
   // Map L1 names to (L2) constants. Values will be evicted from this map
   // when they become non-constant. This is used to propagate values that have
   // been worked out to only have one possible value.
@@ -60,10 +57,8 @@ public:
   /// Constructors
   explicit goto_statet(const class goto_symex_statet &s);
 
-  goto_statet(
-    const symex_targett::sourcet &_source,
-    guard_managert &guard_manager)
-    : guard(true_exprt(), guard_manager), source(_source)
+  explicit goto_statet(guard_managert &guard_manager)
+    : guard(true_exprt(), guard_manager)
   {
   }
 };

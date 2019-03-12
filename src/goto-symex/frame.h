@@ -13,12 +13,14 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #define CPROVER_GOTO_SYMEX_FRAME_H
 
 #include "goto_state.h"
+#include "symex_target.h"
 
 /// Stack frames -- these are used for function calls and for exceptions
 struct framet
 {
   // gotos
-  using goto_state_listt = std::list<goto_statet>;
+  using goto_state_listt =
+    std::list<std::pair<symex_targett::sourcet, goto_statet>>;
 
   // function calls
   irep_idt function_identifier;

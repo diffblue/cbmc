@@ -336,9 +336,13 @@ protected:
   /// Merge a single branch, the symbolic state of which is held in \p
   /// goto_state, into the current overall symbolic state. \p goto_state is no
   /// longer expected to be valid afterwards.
+  /// \param source: source associated with the incoming \p goto_state
   /// \param goto_state: A state to be merged into this location
   /// \param state: Symbolic execution state to be updated
-  virtual void merge_goto(goto_statet &&goto_state, statet &state);
+  virtual void merge_goto(
+    const symex_targett::sourcet &source,
+    goto_statet &&goto_state,
+    statet &state);
 
   /// Merge the SSA assignments from goto_state into dest_state
   /// \param goto_state: A state to be merged into this location
