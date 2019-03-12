@@ -122,8 +122,7 @@ optionalt<exprt> expr_initializert<nondet>::expr_initializer_rec(
       // we initialize this with an empty array
 
       array_exprt value({}, array_type);
-      value.type().id(ID_array);
-      value.type().set(ID_size, from_integer(0, size_type()));
+      value.type().size() = from_integer(0, size_type());
       value.add_source_location()=source_location;
       return std::move(value);
     }
