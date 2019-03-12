@@ -1671,11 +1671,6 @@ inline array_of_exprt &to_array_of_expr(exprt &expr)
 class array_exprt : public multi_ary_exprt
 {
 public:
-  DEPRECATED("use array_exprt(type) instead")
-  array_exprt() : multi_ary_exprt(ID_array)
-  {
-  }
-
   DEPRECATED("use array_exprt(operands, type) instead")
   explicit array_exprt(const array_typet &_type)
     : multi_ary_exprt(ID_array, _type)
