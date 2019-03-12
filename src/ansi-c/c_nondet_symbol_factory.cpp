@@ -62,7 +62,8 @@ void symbol_factoryt::gen_nondet_init(
         recursion_set.find(struct_tag) != recursion_set.end() &&
         depth >= object_factory_params.max_nondet_tree_depth)
       {
-        assignments.add(code_assignt(expr, null_pointer_exprt(pointer_type)));
+        assignments.add(
+          code_assignt{expr, null_pointer_exprt{pointer_type}, loc});
 
         return;
       }
@@ -91,8 +92,8 @@ void symbol_factoryt::gen_nondet_init(
       //           <code from recursive call to gen_nondet_init() with
       //             tmp$<temporary_counter>>
       // And the next line is labelled label2
-      auto set_null_inst=code_assignt(expr, null_pointer_exprt(pointer_type));
-      set_null_inst.add_source_location()=loc;
+      const code_assignt set_null_inst{
+        expr, null_pointer_exprt{pointer_type}, loc};
 
       code_ifthenelset null_check(
         side_effect_expr_nondett(bool_typet(), loc),
