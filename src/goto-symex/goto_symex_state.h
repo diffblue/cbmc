@@ -54,6 +54,8 @@ public:
     symex_target = target;
   }
 
+  symex_targett::sourcet source;
+
   /// contains symbols that are minted during symbolic execution, such as
   /// dynamically created objects etc. The names in this table are needed
   /// for error traces even after symbolic execution has finished.
@@ -219,7 +221,6 @@ inline goto_statet::goto_statet(const class goto_symex_statet &s)
     level2(s.level2),
     value_set(s.value_set),
     guard(s.guard),
-    source(s.source),
     propagation(s.propagation),
     atomic_section_id(s.atomic_section_id)
 {
