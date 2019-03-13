@@ -25,6 +25,7 @@ class code_typet;
 class symbol_tablet;
 class code_assignt;
 class code_function_callt;
+class dereference_callbackt;
 class exprt;
 class goto_symex_statet;
 class guardt;
@@ -267,18 +268,24 @@ protected:
   /// \param state
   /// \param write
   void clean_expr(exprt &expr, statet &state, bool write);
+  void clean_expr(
+    exprt &expr,
+    statet &state,
+    bool write,
+    dereference_callbackt &dereference_callback);
 
   void trigger_auto_object(const exprt &, statet &);
   void initialize_auto_object(const exprt &, statet &);
   void process_array_expr(statet &, exprt &);
   exprt make_auto_object(const typet &, statet &);
-  virtual void dereference(exprt &, statet &);
+  virtual void dereference(exprt &, statet &, dereference_callbackt &);
 
-  void dereference_rec(exprt &, statet &);
+  void dereference_rec(exprt &, statet &, dereference_callbackt &);
   exprt address_arithmetic(
     const exprt &,
     statet &,
-    bool keep_array);
+    bool keep_array,
+    dereference_callbackt &dereference_callback);
 
   /// Symbolically execute a GOTO instruction
   /// \param state: Symbolic execution state for current instruction

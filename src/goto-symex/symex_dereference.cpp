@@ -39,7 +39,8 @@ Author: Daniel Kroening, kroening@kroening.com
 exprt goto_symext::address_arithmetic(
   const exprt &expr,
   statet &state,
-  bool keep_array)
+  bool keep_array,
+  dereference_callbackt &dereference_callback)
 {
   exprt result;
 
@@ -52,7 +53,7 @@ exprt goto_symext::address_arithmetic(
     const byte_extract_exprt &be=to_byte_extract_expr(expr);
 
     // recursive call
-    result = address_arithmetic(be.op(), state, keep_array);
+    result = address_arithmetic(be.op(), state, keep_array, dereference_callback);
 
     if(be.op().type().id() == ID_array && result.id() == ID_address_of)
     {
@@ -70,7 +71,7 @@ exprt goto_symext::address_arithmetic(
 
     // there could be further dereferencing in the offset
     exprt offset=be.offset();
-    dereference_rec(offset, state);
+    dereference_rec(offset, state, dereference_callback);
 
     result=plus_exprt(result, offset);
 
@@ -95,7 +96,7 @@ exprt goto_symext::address_arithmetic(
       byte_extract_id(), ode.root_object(), ode.offset(), expr.type());
 
     // recursive call
-    result = address_arithmetic(be, state, keep_array);
+    result = address_arithmetic(be, state, keep_array, dereference_callback);
 
     do_simplify(result);
   }
@@ -106,20 +107,20 @@ exprt goto_symext::address_arithmetic(
     // just grab the pointer, but be wary of further dereferencing
     // in the pointer itself
     result=to_dereference_expr(expr).pointer();
-    dereference_rec(result, state);
+    dereference_rec(result, state, dereference_callback);
   }
   else if(expr.id()==ID_if)
   {
     if_exprt if_expr=to_if_expr(expr);
 
     // the condition is not an address
-    dereference_rec(if_expr.cond(), state);
+    dereference_rec(if_expr.cond(), state, dereference_callback);
 
     // recursive call
     if_expr.true_case() =
-      address_arithmetic(if_expr.true_case(), state, keep_array);
+      address_arithmetic(if_expr.true_case(), state, keep_array, dereference_callback);
     if_expr.false_case() =
-      address_arithmetic(if_expr.false_case(), state, keep_array);
+      address_arithmetic(if_expr.false_case(), state, keep_array, dereference_callback);
 
     result=if_expr;
   }
@@ -130,7 +131,7 @@ exprt goto_symext::address_arithmetic(
   {
     // give up, just dereference
     result=expr;
-    dereference_rec(result, state);
+    dereference_rec(result, state, dereference_callback);
 
     // turn &array into &array[0]
     if(result.type().id() == ID_array && !keep_array)
@@ -154,7 +155,7 @@ exprt goto_symext::address_arithmetic(
         from_integer(offset, index_type()),
         expr.type());
 
-      result = address_arithmetic(be, state, keep_array);
+      result = address_arithmetic(be, state, keep_array, dereference_callback);
 
       do_simplify(result);
     }
@@ -165,7 +166,7 @@ exprt goto_symext::address_arithmetic(
   {
     const typecast_exprt &tc_expr = to_typecast_expr(expr);
 
-    result = address_arithmetic(tc_expr.op(), state, keep_array);
+    result = address_arithmetic(tc_expr.op(), state, keep_array, dereference_callback);
 
     // treat &array as &array[0]
     const typet &expr_type = expr.type();
@@ -197,7 +198,10 @@ exprt goto_symext::address_arithmetic(
 /// such as `&struct.flexible_array[0]` (see inline comments in code).
 /// For full details of this method's pointer replacement and potential side-
 /// effects see \ref goto_symext::dereference
-void goto_symext::dereference_rec(exprt &expr, statet &state)
+void goto_symext::dereference_rec(
+  exprt &expr,
+  statet &state,
+  dereference_callbackt &dereference_callback)
 {
   if(expr.id()==ID_dereference)
   {
@@ -220,15 +224,12 @@ void goto_symext::dereference_rec(exprt &expr, statet &state)
     tmp1.swap(to_dereference_expr(expr).pointer());
 
     // first make sure there are no dereferences in there
-    dereference_rec(tmp1, state);
-
-    // we need to set up some elaborate call-backs
-    symex_dereference_statet symex_dereference_state(state, ns);
+    dereference_rec(tmp1, state, dereference_callback);
 
     value_set_dereferencet dereference(
       ns,
       state.symbol_table,
-      symex_dereference_state,
+      dereference_callback,
       language_mode,
       expr_is_not_null);
 
@@ -259,7 +260,7 @@ void goto_symext::dereference_rec(exprt &expr, statet &state)
     tmp.add_source_location()=expr.source_location();
 
     // recursive call
-    dereference_rec(tmp, state);
+    dereference_rec(tmp, state, dereference_callback);
 
     expr.swap(tmp);
   }
@@ -278,7 +279,7 @@ void goto_symext::dereference_rec(exprt &expr, statet &state)
     expr = address_arithmetic(
       object,
       state,
-      to_pointer_type(expr.type()).subtype().id() == ID_array);
+      to_pointer_type(expr.type()).subtype().id() == ID_array, dereference_callback);
   }
   else if(expr.id()==ID_typecast)
   {
@@ -298,17 +299,17 @@ void goto_symext::dereference_rec(exprt &expr, statet &state)
             to_address_of_expr(tc_op).object(),
             from_integer(0, index_type())));
 
-      dereference_rec(expr, state);
+      dereference_rec(expr, state, dereference_callback);
     }
     else
     {
-      dereference_rec(tc_op, state);
+      dereference_rec(tc_op, state, dereference_callback);
     }
   }
   else
   {
     Forall_operands(it, expr)
-      dereference_rec(*it, state);
+      dereference_rec(*it, state, dereference_callback);
   }
 }
 
@@ -349,7 +350,10 @@ void goto_symext::dereference_rec(exprt &expr, statet &state)
 ///    dereferenced. If new objects are created by this mechanism then
 ///    state will be altered (by `symex_assign`) to initialise them.
 ///    See \ref auto_objects.cpp for details.
-void goto_symext::dereference(exprt &expr, statet &state)
+void goto_symext::dereference(
+  exprt &expr,
+  statet &state,
+  dereference_callbackt &dereference_callback)
 {
   // The expression needs to be renamed to level 1
   // in order to distinguish addresses of local variables
@@ -359,7 +363,7 @@ void goto_symext::dereference(exprt &expr, statet &state)
   exprt l1_expr = state.rename<L1>(expr, ns);
 
   // start the recursion!
-  dereference_rec(l1_expr, state);
+  dereference_rec(l1_expr, state, dereference_callback);
   // dereferencing may introduce new symbol_exprt
   // (like __CPROVER_memory)
   expr = state.rename<L1>(std::move(l1_expr), ns);
