@@ -48,82 +48,81 @@ public:
   symex_targett::sourcet source;
   goto_trace_stept::typet type;
 
-  // NOLINTNEXTLINE(whitespace/line_length)
   bool is_assert() const
   {
     return type == goto_trace_stept::typet::ASSERT;
   }
-  // NOLINTNEXTLINE(whitespace/line_length)
+
   bool is_assume() const
   {
     return type == goto_trace_stept::typet::ASSUME;
   }
-  // NOLINTNEXTLINE(whitespace/line_length)
+
   bool is_assignment() const
   {
     return type == goto_trace_stept::typet::ASSIGNMENT;
   }
-  // NOLINTNEXTLINE(whitespace/line_length)
+
   bool is_goto() const
   {
     return type == goto_trace_stept::typet::GOTO;
   }
-  // NOLINTNEXTLINE(whitespace/line_length)
+
   bool is_constraint() const
   {
     return type == goto_trace_stept::typet::CONSTRAINT;
   }
-  // NOLINTNEXTLINE(whitespace/line_length)
+
   bool is_location() const
   {
     return type == goto_trace_stept::typet::LOCATION;
   }
-  // NOLINTNEXTLINE(whitespace/line_length)
+
   bool is_output() const
   {
     return type == goto_trace_stept::typet::OUTPUT;
   }
-  // NOLINTNEXTLINE(whitespace/line_length)
+
   bool is_decl() const
   {
     return type == goto_trace_stept::typet::DECL;
   }
-  // NOLINTNEXTLINE(whitespace/line_length)
+
   bool is_function_call() const
   {
     return type == goto_trace_stept::typet::FUNCTION_CALL;
   }
-  // NOLINTNEXTLINE(whitespace/line_length)
+
   bool is_function_return() const
   {
     return type == goto_trace_stept::typet::FUNCTION_RETURN;
   }
-  // NOLINTNEXTLINE(whitespace/line_length)
+
   bool is_shared_read() const
   {
     return type == goto_trace_stept::typet::SHARED_READ;
   }
-  // NOLINTNEXTLINE(whitespace/line_length)
+
   bool is_shared_write() const
   {
     return type == goto_trace_stept::typet::SHARED_WRITE;
   }
-  // NOLINTNEXTLINE(whitespace/line_length)
+
   bool is_spawn() const
   {
     return type == goto_trace_stept::typet::SPAWN;
   }
-  // NOLINTNEXTLINE(whitespace/line_length)
+
   bool is_memory_barrier() const
   {
     return type == goto_trace_stept::typet::MEMORY_BARRIER;
   }
-  // NOLINTNEXTLINE(whitespace/line_length)
+
   bool is_atomic_begin() const
   {
     return type == goto_trace_stept::typet::ATOMIC_BEGIN;
   }
-  // NOLINTNEXTLINE(whitespace/line_length)
+
   bool is_atomic_end() const
   {
     return type == goto_trace_stept::typet::ATOMIC_END;
