@@ -16,7 +16,7 @@ Author: Diffblue Ltd.
 
 #include <util/format_expr.h>
 
-#include "symex_target_equation.h"
+#include "ssa_step.h"
 
 class equation_conversion_exceptiont : public std::runtime_error
 {
