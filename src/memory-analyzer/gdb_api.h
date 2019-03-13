@@ -29,13 +29,17 @@ Author: Malte Mues <mail.mues@gmail.com>
 #include <unistd.h>
 
 #include <exception>
+#include <forward_list>
 
 #include <util/exception_utils.h>
 
 class gdb_apit
 {
 public:
+  using commandst = std::forward_list<std::string>;
+
   explicit gdb_apit(const char *binary, const bool log = false);
+  ~gdb_apit();
 
   void create_gdb_process();
   void terminate_gdb_process();
@@ -46,22 +50,22 @@ public:
   std::string get_value(const std::string &expr);
   std::string get_memory(const std::string &expr);
 
-  const std::vector<std::string> &get_command_log();
+  const commandst &get_command_log();
 
 protected:
   const char *binary;
 
-  FILE *input_stream;
-  FILE *output_stream;
+  FILE *response_stream;
+  FILE *command_stream;
 
   const bool log;
-  std::vector<std::string> command_log;
+  commandst command_log;
 
   enum class gdb_statet
   {
     NOT_CREATED,
     CREATED,
-    STOPPED
+    STOPPED // valid state, reached e.g. after breakpoint was hit
   };
 
   gdb_statet gdb_state;
@@ -79,9 +83,9 @@ protected:
   gdb_output_recordt
   get_most_recent_record(const std::string &tag, const bool must_exist = false);
 
-  static bool has_tag(const std::string &tag, const std::string &line);
-
   bool most_recent_line_has_tag(const std::string &tag);
+  bool was_command_accepted();
+  void check_command_accepted();
 };
 
 class gdb_interaction_exceptiont : public cprover_exception_baset

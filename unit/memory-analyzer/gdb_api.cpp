@@ -60,9 +60,7 @@ void gdb_api_internals_test()
   {
     gdb_api_testt gdb_api("test");
 
-    gdb_api_testt::gdb_output_recordt gor;
-
-    gor = gdb_api.parse_gdb_output_record(
+    gdb_api_testt::gdb_output_recordt gor = gdb_api.parse_gdb_output_record(
       "a = \"1\", b = \"2\", c = {1, 2}, d = [3, 4], e=\"0x0\"");
 
     REQUIRE(gor["a"] == "1");
@@ -77,11 +75,9 @@ void gdb_api_internals_test()
     gdb_api_testt gdb_api("test");
 
     FILE *f = fopen("memory-analyzer/input.txt", "r");
-    gdb_api.input_stream = f;
+    gdb_api.response_stream = f;
 
-    std::string line;
-
-    line = gdb_api.read_next_line();
+    std::string line = gdb_api.read_next_line();
     REQUIRE(line == "abc\n");
 
     line = gdb_api.read_next_line();
@@ -98,10 +94,8 @@ void gdb_api_internals_test()
     gdb_api.create_gdb_process();
 
     // check input and output streams
-    REQUIRE(!ferror(gdb_api.input_stream));
-    REQUIRE(!ferror(gdb_api.output_stream));
-
-    gdb_api.terminate_gdb_process();
+    REQUIRE(!ferror(gdb_api.response_stream));
+    REQUIRE(!ferror(gdb_api.command_stream));
   }
 }
 
@@ -127,8 +121,6 @@ TEST_CASE("gdb api test", "[core][memory-analyzer]")
     {
       const bool r = gdb_api.run_gdb_to_breakpoint("checkpoint");
       REQUIRE(r);
-
-      gdb_api.terminate_gdb_process();
     }
     catch(const gdb_interaction_exceptiont &e)
     {
@@ -154,8 +146,6 @@ TEST_CASE("gdb api test", "[core][memory-analyzer]")
       file.close();
 
       std::cerr << "=== gdb log end ===\n";
-
-      gdb_api.terminate_gdb_process();
 
       return;
     }
@@ -203,6 +193,5 @@ TEST_CASE("gdb api test", "[core][memory-analyzer]")
     }
   }
 
-  gdb_api.terminate_gdb_process();
 #endif
 }
