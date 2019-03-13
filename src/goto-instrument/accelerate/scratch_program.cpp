@@ -26,7 +26,7 @@ bool scratch_programt::check_sat(bool do_slice, guard_managert &guard_manager)
 {
   fix_types();
 
-  add_instruction(END_FUNCTION);
+  add(goto_programt::make_end_function());
 
   remove_skip(*this);
 
@@ -85,19 +85,12 @@ goto_programt::targett scratch_programt::assign(
   const exprt &lhs,
   const exprt &rhs)
 {
-  code_assignt assignment(lhs, rhs);
-  targett instruction=add_instruction(ASSIGN);
-  instruction->code=assignment;
-
-  return instruction;
+  return add(goto_programt::make_assignment(lhs, rhs));
 }
 
 goto_programt::targett scratch_programt::assume(const exprt &guard)
 {
-  targett instruction=add_instruction(ASSUME);
-  instruction->set_condition(guard);
-
-  return instruction;
+  return add(goto_programt::make_assumption(guard));
 }
 
 static void fix_types(exprt &expr)
@@ -164,12 +157,12 @@ void scratch_programt::append_path(patht &path)
     {
       if(it->guard.id()!=ID_nil)
       {
-        add_instruction(ASSUME)->set_condition(it->guard);
+        add(goto_programt::make_assumption(it->guard));
       }
     }
     else if(it->loc->is_assert())
     {
-      add_instruction(ASSUME)->set_condition(it->loc->get_condition());
+      add(goto_programt::make_assumption(it->loc->get_condition()));
     }
   }
 }
@@ -192,7 +185,7 @@ void scratch_programt::append_loop(
   (void)loop_header; // unused parameter
   assume(false_exprt());
 
-  goto_programt::targett end=add_instruction(SKIP);
+  goto_programt::targett end = add(goto_programt::make_skip());
 
   update();
 
