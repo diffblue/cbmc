@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/config.h>
+#include <util/expr_iterator.h>
 #include <util/expr_util.h>
 #include <util/fixedbv.h>
 #include <util/format_expr.h>
@@ -612,24 +613,6 @@ void smt2_convt::convert_address_of_rec(
         expr.id_string());
 }
 
-void smt2_convt::convert_byte_extract(const byte_extract_exprt &expr)
-{
-  // we just run the flattener
-  exprt flattened_expr = lower_byte_extract(expr, ns);
-  unflatten(wheret::BEGIN, expr.type());
-  convert_expr(flattened_expr);
-  unflatten(wheret::END, expr.type());
-}
-
-void smt2_convt::convert_byte_update(const byte_update_exprt &expr)
-{
-  // we just run the flattener
-  exprt flattened_expr = lower_byte_update(expr, ns);
-  unflatten(wheret::BEGIN, expr.type());
-  convert_expr(flattened_expr);
-  unflatten(wheret::END, expr.type());
-}
-
 literalt smt2_convt::convert(const exprt &expr)
 {
   PRECONDITION(expr.type().id() == ID_bool);
@@ -647,7 +630,7 @@ literalt smt2_convt::convert(const exprt &expr)
 
   out << "\n";
 
-  find_symbols(expr);
+  exprt prepared_expr = prepare_for_convert_expr(expr);
 
   literalt l(no_boolean_variables, false);
   no_boolean_variables++;
@@ -656,7 +639,7 @@ literalt smt2_convt::convert(const exprt &expr)
   out << "(define-fun ";
   convert_literal(l);
   out << " () Bool ";
-  convert_expr(expr);
+  convert_expr(prepared_expr);
   out << ")" << "\n";
 
   return l;
@@ -1431,12 +1414,14 @@ void smt2_convt::convert_expr(const exprt &expr)
   else if(expr.id()==ID_byte_extract_little_endian ||
           expr.id()==ID_byte_extract_big_endian)
   {
-    convert_byte_extract(to_byte_extract_expr(expr));
+    INVARIANT(
+      false, "byte_extract ops should be lowered in prepare_for_convert_expr");
   }
   else if(expr.id()==ID_byte_update_little_endian ||
           expr.id()==ID_byte_update_big_endian)
   {
-    convert_byte_update(to_byte_update_expr(expr));
+    INVARIANT(
+      false, "byte_update ops should be lowered in prepare_for_convert_expr");
   }
   else if(expr.id()==ID_width)
   {
@@ -4058,7 +4043,7 @@ void smt2_convt::set_to(const exprt &expr, bool value)
 
         id.type=equal_expr.lhs().type();
         find_symbols(id.type);
-        find_symbols(equal_expr.rhs());
+        exprt prepared_rhs = prepare_for_convert_expr(equal_expr.rhs());
 
         std::string smt2_identifier=convert_identifier(identifier);
         smt2_identifiers.insert(smt2_identifier);
@@ -4068,7 +4053,7 @@ void smt2_convt::set_to(const exprt &expr, bool value)
 
         convert_type(equal_expr.lhs().type());
         out << " ";
-        convert_expr(equal_expr.rhs());
+        convert_expr(prepared_rhs);
 
         out << ")" << "\n";
         return; // done
@@ -4076,12 +4061,12 @@ void smt2_convt::set_to(const exprt &expr, bool value)
     }
   }
 
-  find_symbols(expr);
+  exprt prepared_expr = prepare_for_convert_expr(expr);
 
-  #if 0
+#if 0
   out << "; CONV: "
       << format(expr) << "\n";
-  #endif
+#endif
 
   out << "; set_to " << (value?"true":"false") << "\n"
       << "(assert ";
@@ -4089,15 +4074,68 @@ void smt2_convt::set_to(const exprt &expr, bool value)
   if(!value)
   {
     out << "(not ";
-    convert_expr(expr);
+    convert_expr(prepared_expr);
     out << ")";
   }
   else
-    convert_expr(expr);
+    convert_expr(prepared_expr);
 
   out << ")" << "\n"; // assert
 
   return;
+}
+
+/// Lower byte_update and byte_extract operations within \p expr. Return an
+/// equivalent expression that doesn't use byte operators.
+/// Note this replaces operators post-order (compare \ref lower_byte_operators,
+/// which uses a pre-order walk, replacing in child expressions before the
+/// parent). Pre-order replacement currently fails regression tests: see
+/// https://github.com/diffblue/cbmc/issues/4380
+exprt smt2_convt::lower_byte_operators(const exprt &expr)
+{
+  exprt lowered_expr = expr;
+
+  for(auto it = lowered_expr.depth_begin(), itend = lowered_expr.depth_end();
+      it != itend;
+      ++it)
+  {
+    if(
+      it->id() == ID_byte_extract_little_endian ||
+      it->id() == ID_byte_extract_big_endian)
+    {
+      it.mutate() = lower_byte_extract(to_byte_extract_expr(*it), ns);
+    }
+    else if(
+      it->id() == ID_byte_update_little_endian ||
+      it->id() == ID_byte_update_big_endian)
+    {
+      it.mutate() = lower_byte_update(to_byte_update_expr(*it), ns);
+    }
+  }
+
+  return lowered_expr;
+}
+
+/// Perform steps necessary before an expression is passed to \ref convert_expr
+/// 1. Replace byte operators (byte_extract, _update) with equivalent
+///    expressions
+/// 2. Call find_symbols to create auxiliary symbols, e.g. for array
+///    expressions.
+/// \param expr: expression to prepare
+/// \return equivalent expression suitable for convert_expr.
+exprt smt2_convt::prepare_for_convert_expr(const exprt &expr)
+{
+  // First, replace byte operators, because they may introduce new array
+  // expressions that must be seen by find_symbols:
+  exprt lowered_expr = lower_byte_operators(expr);
+  INVARIANT(
+    !has_byte_operator(lowered_expr),
+    "lower_byte_operators should remove all byte operators");
+
+  // Now create symbols for all composite expressions present in lowered_expr:
+  find_symbols(lowered_expr);
+
+  return lowered_expr;
 }
 
 void smt2_convt::find_symbols(const exprt &expr)
