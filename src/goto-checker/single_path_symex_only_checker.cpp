@@ -53,7 +53,9 @@ operator()(propertiest &properties)
       goto_symext::get_goto_function(goto_model), symex_symbol_table);
   }
 
-  while(!worklist->empty())
+  while(!worklist->empty() &&
+        (options.get_bool_option("paths-symex-explore-all") ||
+         has_properties_to_check(properties)))
   {
     path_storaget::patht &resume = worklist->peek();
     symex_bmct symex(

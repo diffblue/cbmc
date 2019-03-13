@@ -279,7 +279,10 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
 
   // generate unwinding assertions
   if(cmdline.isset("unwinding-assertions"))
+  {
     options.set_option("unwinding-assertions", true);
+    options.set_option("paths-symex-explore-all", true);
+  }
 
   if(cmdline.isset("partial-loops"))
     options.set_option("partial-loops", true);
@@ -416,9 +419,12 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   }
 
   if(cmdline.isset("symex-coverage-report"))
+  {
     options.set_option(
       "symex-coverage-report",
       cmdline.get_value("symex-coverage-report"));
+    options.set_option("paths-symex-explore-all", true);
+  }
 
   if(cmdline.isset("validate-ssa-equation"))
   {
