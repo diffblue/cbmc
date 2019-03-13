@@ -22,19 +22,16 @@ public:
   postconditiont(
     const namespacet &_ns,
     const value_sett &_value_set,
-    const symex_target_equationt::SSA_stept &_SSA_step,
-    const goto_symex_statet &_s):
-    ns(_ns),
-    value_set(_value_set),
-    SSA_step(_SSA_step),
-    s(_s)
+    const SSA_stept &_SSA_step,
+    const goto_symex_statet &_s)
+    : ns(_ns), value_set(_value_set), SSA_step(_SSA_step), s(_s)
   {
   }
 
 protected:
   const namespacet &ns;
   const value_sett &value_set;
-  const symex_target_equationt::SSA_stept &SSA_step;
+  const SSA_stept &SSA_step;
   const goto_symex_statet &s;
 
 public:

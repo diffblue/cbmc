@@ -46,8 +46,7 @@ operator()(const irep_idt &failed_property_id)
   return fault_location;
 }
 
-const symex_target_equationt::SSA_stept &
-goto_symex_fault_localizert::collect_guards(
+const SSA_stept &goto_symex_fault_localizert::collect_guards(
   const irep_idt &failed_property_id,
   localization_pointst &localization_points,
   fault_location_infot &fault_location)
@@ -74,7 +73,7 @@ goto_symex_fault_localizert::collect_guards(
 }
 
 bool goto_symex_fault_localizert::check(
-  const symex_target_equationt::SSA_stept &failed_step,
+  const SSA_stept &failed_step,
   const localization_pointst &localization_points,
   const localization_points_valuet &value)
 {
@@ -116,7 +115,7 @@ void goto_symex_fault_localizert::update_scores(
 }
 
 void goto_symex_fault_localizert::localize_linear(
-  const symex_target_equationt::SSA_stept &failed_step,
+  const SSA_stept &failed_step,
   const localization_pointst &localization_points)
 {
   localization_points_valuet v(localization_points.size(), tvt::unknown());

@@ -58,7 +58,7 @@ void partial_order_concurrencyt::add_init_writes(
     {
       init_steps.emplace_back(
         e_it->source, goto_trace_stept::typet::SHARED_WRITE);
-      symex_target_equationt::SSA_stept &SSA_step=init_steps.back();
+      SSA_stept &SSA_step = init_steps.back();
 
       SSA_step.guard=true_exprt();
       // no SSA L2 index, thus nondet value
