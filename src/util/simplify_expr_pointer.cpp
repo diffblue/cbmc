@@ -553,7 +553,8 @@ bool simplify_exprt::simplify_dynamic_object(exprt &expr)
       const irep_idt identifier=to_symbol_expr(op.op0()).get_identifier();
 
       // this is for the benefit of symex
-      expr.make_bool(has_prefix(id2string(identifier), SYMEX_DYNAMIC_PREFIX));
+      expr.make_bool(
+        has_prefix(id2string(identifier), SYMEX_DYNAMIC_PREFIX "::"));
       return false;
     }
     else if(op.op0().id()==ID_string_constant)
