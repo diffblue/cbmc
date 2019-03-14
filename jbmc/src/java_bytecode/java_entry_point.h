@@ -169,6 +169,7 @@ bool generate_java_start_function(
 /// \param pointer_type_selector: Means of selecting the type of value
 ///   constructed for reference types which are initialised by the code
 ///   returned.
+/// \param message_handler: log
 /// \returns A pairing of the code to initialise the arguments and a std::vector
 ///   of the expressions for these arguments. The vector contains one element
 ///   per parameter of \p function. The vector of expressions can be used as
@@ -182,6 +183,7 @@ std::pair<code_blockt, std::vector<exprt>> java_build_arguments(
   symbol_table_baset &symbol_table,
   bool assume_init_pointers_not_null,
   java_object_factory_parameterst object_factory_parameters,
-  const select_pointer_typet &pointer_type_selector);
+  const select_pointer_typet &pointer_type_selector,
+  message_handlert &message_handler);
 
 #endif // CPROVER_JAVA_BYTECODE_JAVA_ENTRY_POINT_H

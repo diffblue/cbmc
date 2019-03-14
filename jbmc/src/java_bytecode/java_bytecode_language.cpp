@@ -869,7 +869,8 @@ bool java_bytecode_languaget::generate_support_functions(
         symbol_table,
         assume_inputs_non_null,
         object_factory_parameters,
-        get_pointer_type_selector());
+        get_pointer_type_selector(),
+        get_message_handler());
     });
 }
 
@@ -1068,14 +1069,16 @@ bool java_bytecode_languaget::convert_single_method(
           symbol_table,
           nondet_static,
           object_factory_parameters,
-          get_pointer_type_selector());
+          get_pointer_type_selector(),
+          get_message_handler());
       else
         writable_symbol.value = get_clinit_wrapper_body(
           function_id,
           symbol_table,
           nondet_static,
           object_factory_parameters,
-          get_pointer_type_selector());
+          get_pointer_type_selector(),
+          get_message_handler());
       break;
     case synthetic_method_typet::STUB_CLASS_STATIC_INITIALIZER:
       writable_symbol.value =
@@ -1083,7 +1086,8 @@ bool java_bytecode_languaget::convert_single_method(
           function_id,
           symbol_table,
           object_factory_parameters,
-          get_pointer_type_selector());
+          get_pointer_type_selector(),
+          get_message_handler());
       break;
     }
     // Notify lazy methods of static calls made from the newly generated

@@ -87,7 +87,8 @@ exprt object_factory(
   java_object_factory_parameterst parameters,
   lifetimet lifetime,
   const source_locationt &location,
-  const select_pointer_typet &pointer_type_selector);
+  const select_pointer_typet &pointer_type_selector,
+  message_handlert &log);
 
 exprt object_factory(
   const typet &type,
@@ -96,7 +97,8 @@ exprt object_factory(
   symbol_tablet &symbol_table,
   const java_object_factory_parameterst &object_factory_parameters,
   lifetimet lifetime,
-  const source_locationt &location);
+  const source_locationt &location,
+  message_handlert &log);
 
 enum class update_in_placet
 {
@@ -114,7 +116,8 @@ void gen_nondet_init(
   lifetimet lifetime,
   const java_object_factory_parameterst &object_factory_parameters,
   const select_pointer_typet &pointer_type_selector,
-  update_in_placet update_in_place);
+  update_in_placet update_in_place,
+  message_handlert &log);
 
 void gen_nondet_init(
   const exprt &expr,
@@ -124,6 +127,7 @@ void gen_nondet_init(
   bool skip_classid,
   lifetimet lifetime,
   const java_object_factory_parameterst &object_factory_parameters,
-  update_in_placet update_in_place);
+  update_in_placet update_in_place,
+  message_handlert &log);
 
 #endif // CPROVER_JAVA_BYTECODE_JAVA_OBJECT_FACTORY_H

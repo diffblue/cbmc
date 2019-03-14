@@ -59,6 +59,9 @@ class java_object_factoryt
 
   allocate_objectst allocate_objects;
 
+  /// Log for reporting warnings and errors in object creation
+  messaget log;
+
   code_assignt get_null_assignment(
     const exprt &expr,
     const pointer_typet &ptr_type);
@@ -84,7 +87,8 @@ public:
     const source_locationt &loc,
     const java_object_factory_parameterst _object_factory_parameters,
     symbol_table_baset &_symbol_table,
-    const select_pointer_typet &pointer_type_selector)
+    const select_pointer_typet &pointer_type_selector,
+    message_handlert &log)
     : loc(loc),
       object_factory_parameters(_object_factory_parameters),
       symbol_table(_symbol_table),
@@ -94,7 +98,8 @@ public:
         ID_java,
         loc,
         object_factory_parameters.function_id,
-        symbol_table)
+        symbol_table),
+      log(log)
   {}
 
   void gen_nondet_array_init(
@@ -1517,7 +1522,8 @@ exprt object_factory(
   java_object_factory_parameterst parameters,
   lifetimet lifetime,
   const source_locationt &loc,
-  const select_pointer_typet &pointer_type_selector)
+  const select_pointer_typet &pointer_type_selector,
+  message_handlert &log)
 {
   irep_idt identifier=id2string(goto_functionst::entry_point())+
     "::"+id2string(base_name);
@@ -1538,10 +1544,7 @@ exprt object_factory(
   CHECK_RETURN(!moving_symbol_failed);
 
   java_object_factoryt state(
-    loc,
-    parameters,
-    symbol_table,
-    pointer_type_selector);
+    loc, parameters, symbol_table, pointer_type_selector, log);
   code_blockt assignments;
   state.gen_nondet_init(
     assignments,
@@ -1594,6 +1597,7 @@ exprt object_factory(
 ///   MAY_UPDATE_IN_PLACE: generate a runtime nondet branch between the NO_
 ///   and MUST_ cases.
 ///   MUST_UPDATE_IN_PLACE: reinitialize an existing object
+/// \param log: used to report object construction warnings and failures
 /// \return `init_code` gets an instruction sequence to initialize or
 ///   reinitialize `expr` and child objects it refers to. `symbol_table` is
 ///   modified with any new symbols created. This includes any necessary
@@ -1607,13 +1611,11 @@ void gen_nondet_init(
   lifetimet lifetime,
   const java_object_factory_parameterst &object_factory_parameters,
   const select_pointer_typet &pointer_type_selector,
-  update_in_placet update_in_place)
+  update_in_placet update_in_place,
+  message_handlert &log)
 {
   java_object_factoryt state(
-    loc,
-    object_factory_parameters,
-    symbol_table,
-    pointer_type_selector);
+    loc, object_factory_parameters, symbol_table, pointer_type_selector, log);
   code_blockt assignments;
   state.gen_nondet_init(
     assignments,
@@ -1641,7 +1643,8 @@ exprt object_factory(
   symbol_tablet &symbol_table,
   const java_object_factory_parameterst &object_factory_parameters,
   lifetimet lifetime,
-  const source_locationt &location)
+  const source_locationt &location,
+  message_handlert &log)
 {
   select_pointer_typet pointer_type_selector;
   return object_factory(
@@ -1652,7 +1655,8 @@ exprt object_factory(
     object_factory_parameters,
     lifetime,
     location,
-    pointer_type_selector);
+    pointer_type_selector,
+    log);
 }
 
 /// Call gen_nondet_init() above with a default (identity) pointer_type_selector
@@ -1664,7 +1668,8 @@ void gen_nondet_init(
   bool skip_classid,
   lifetimet lifetime,
   const java_object_factory_parameterst &object_factory_parameters,
-  update_in_placet update_in_place)
+  update_in_placet update_in_place,
+  message_handlert &log)
 {
   select_pointer_typet pointer_type_selector;
   gen_nondet_init(
@@ -1676,7 +1681,8 @@ void gen_nondet_init(
     lifetime,
     object_factory_parameters,
     pointer_type_selector,
-    update_in_place);
+    update_in_place,
+    log);
 }
 
 /// Adds a call for the given method to the end of `assignments` if the method

@@ -195,13 +195,15 @@ gen_clinit_eqexpr(const exprt &expr, const clinit_statest state)
 ///   if nondet-static is true)
 /// \param pointer_type_selector: used to choose concrete types for abstract-
 ///   typed globals and fields (only needed if nondet-static is true)
+/// \param message_handler: log
 static void clinit_wrapper_do_recursive_calls(
   symbol_table_baset &symbol_table,
   const irep_idt &class_name,
   code_blockt &init_body,
   const bool nondet_static,
   const java_object_factory_parameterst &object_factory_parameters,
-  const select_pointer_typet &pointer_type_selector)
+  const select_pointer_typet &pointer_type_selector,
+  message_handlert &message_handler)
 {
   const symbolt &class_symbol = symbol_table.lookup_ref(class_name);
   for(const auto &base : to_class_type(class_symbol.type).bases())
@@ -265,7 +267,8 @@ static void clinit_wrapper_do_recursive_calls(
         lifetimet::DYNAMIC,
         parameters,
         pointer_type_selector,
-        update_in_placet::NO_UPDATE_IN_PLACE);
+        update_in_placet::NO_UPDATE_IN_PLACE,
+        message_handler);
     }
   }
 }
@@ -447,13 +450,15 @@ static void create_clinit_wrapper_symbols(
 ///   if nondet-static is true)
 /// \param pointer_type_selector: used to choose concrete types for abstract-
 ///   typed globals and fields (only needed if nondet-static is true)
+/// \param message_handler: log output
 /// \return the body of the static initializer wrapper
 code_blockt get_thread_safe_clinit_wrapper_body(
   const irep_idt &function_id,
   symbol_table_baset &symbol_table,
   const bool nondet_static,
   const java_object_factory_parameterst &object_factory_parameters,
-  const select_pointer_typet &pointer_type_selector)
+  const select_pointer_typet &pointer_type_selector,
+  message_handlert &message_handler)
 {
   const symbolt &wrapper_method_symbol = symbol_table.lookup_ref(function_id);
   irep_idt class_name = wrapper_method_symbol.type.get(ID_C_class);
@@ -605,7 +610,8 @@ code_blockt get_thread_safe_clinit_wrapper_body(
       init_body,
       nondet_static,
       object_factory_parameters,
-      pointer_type_selector);
+      pointer_type_selector,
+      message_handler);
     function_body.append(init_body);
   }
 
@@ -637,13 +643,15 @@ code_blockt get_thread_safe_clinit_wrapper_body(
 ///   if nondet-static is true)
 /// \param pointer_type_selector: used to choose concrete types for abstract-
 ///   typed globals and fields (only needed if nondet-static is true)
+/// \param message_handler: log output
 /// \return the body of the static initializer wrapper
 code_ifthenelset get_clinit_wrapper_body(
   const irep_idt &function_id,
   symbol_table_baset &symbol_table,
   const bool nondet_static,
   const java_object_factory_parameterst &object_factory_parameters,
-  const select_pointer_typet &pointer_type_selector)
+  const select_pointer_typet &pointer_type_selector,
+  message_handlert &message_handler)
 {
   // Assume that class C extends class C' and implements interfaces
   // I1, ..., In. We now create the following function (possibly recursively
@@ -687,7 +695,8 @@ code_ifthenelset get_clinit_wrapper_body(
     init_body,
     nondet_static,
     object_factory_parameters,
-    pointer_type_selector);
+    pointer_type_selector,
+    message_handler);
 
   // the entire body of the function is an if-then-else
   return code_ifthenelset(std::move(check_already_run), std::move(init_body));
@@ -828,12 +837,14 @@ void stub_global_initializer_factoryt::create_stub_global_initializer_symbols(
 ///   the stub globals and objects reachable from them
 /// \param pointer_type_selector: used to choose concrete types for abstract-
 ///   typed globals and fields.
+/// \param message_handler: log output
 /// \return synthetic static initializer body.
 code_blockt stub_global_initializer_factoryt::get_stub_initializer_body(
   const irep_idt &function_id,
   symbol_table_baset &symbol_table,
   const java_object_factory_parameterst &object_factory_parameters,
-  const select_pointer_typet &pointer_type_selector)
+  const select_pointer_typet &pointer_type_selector,
+  message_handlert &message_handler)
 {
   const symbolt &stub_initializer_symbol = symbol_table.lookup_ref(function_id);
   irep_idt class_id = stub_initializer_symbol.type.get(ID_C_class);
@@ -875,7 +886,8 @@ code_blockt stub_global_initializer_factoryt::get_stub_initializer_body(
       lifetimet::DYNAMIC,
       parameters,
       pointer_type_selector,
-      update_in_placet::NO_UPDATE_IN_PLACE);
+      update_in_placet::NO_UPDATE_IN_PLACE,
+      message_handler);
   }
 
   return static_init_body;

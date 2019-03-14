@@ -57,7 +57,8 @@ static goto_programt get_gen_nondet_init_instructions(
     skip_classid,
     lifetimet::DYNAMIC,
     object_factory_parameters,
-    update_in_placet::NO_UPDATE_IN_PLACE);
+    update_in_placet::NO_UPDATE_IN_PLACE,
+    message_handler);
 
   goto_programt instructions;
   goto_convert(
