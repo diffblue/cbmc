@@ -42,22 +42,18 @@ class const_unique_depth_iteratort;
 struct depth_iterator_expr_statet final
 {
   typedef exprt::operandst::const_iterator operands_iteratort;
-  inline depth_iterator_expr_statet(
-    const exprt &expr,
-    operands_iteratort it,
-    operands_iteratort end):
-    expr(expr), it(it), end(end) { }
+  explicit depth_iterator_expr_statet(const exprt &expr) : expr(expr), op_idx(0)
+  {
+  }
   std::reference_wrapper<const exprt> expr;
-  operands_iteratort it;
-  operands_iteratort end;
+  std::size_t op_idx;
 };
 
 inline bool operator==(
   const depth_iterator_expr_statet &left,
   const depth_iterator_expr_statet &right)
 {
-  return distance(left.it, left.end) == distance(right.it, right.end) &&
-         left.expr.get() == right.expr.get();
+  return left.op_idx == right.op_idx && left.expr.get() == right.expr.get();
 }
 
 /// Depth first search iterator base - iterates over supplied expression
@@ -100,16 +96,19 @@ public:
     PRECONDITION(!m_stack.empty());
     while(true)
     {
-      if(m_stack.back().it==m_stack.back().end)
+      if(m_stack.back().op_idx == m_stack.back().expr.get().operands().size())
       {
         m_stack.pop_back();
         if(m_stack.empty())
           break;
       }
       // Check eg. if we haven't seen this node before
-      else if(this->downcast().push_expr(*m_stack.back().it))
+      else if(this->downcast().push_expr(
+                m_stack.back().expr.get().operands()[m_stack.back().op_idx]))
+      {
         break;
-      m_stack.back().it++;
+      }
+      ++m_stack.back().op_idx;
     }
     return this->downcast();
   }
@@ -120,7 +119,7 @@ public:
     m_stack.pop_back();
     if(!m_stack.empty())
     {
-      ++m_stack.back().it;
+      ++m_stack.back().op_idx;
       return ++(*this);
     }
     return this->downcast();
@@ -185,18 +184,11 @@ protected:
     for(auto &state : m_stack)
     {
       // This deliberately breaks sharing as expr is now non-const
-      auto &operands = expr->operands();
-      // Get iterators into the operands of the new expr corresponding to the
-      // ones into the operands of the old expr
-      const auto it = operands.end() - (state.end - state.it);
+      (void)expr->write();
       state.expr = *expr;
-      state.it=it;
-      state.end=operands.end();
       // Get the expr for the next level down to use in the next iteration
-      if(!(state==m_stack.back()))
-      {
-        expr = &*it;
-      }
+      if(!(state == m_stack.back()))
+        expr = &expr->operands()[state.op_idx];
     }
     return *expr;
   }
@@ -208,7 +200,7 @@ protected:
   ///   false otherwise. If returning false, child will not be iterated over.
   bool push_expr(const exprt &expr)
   {
-    m_stack.emplace_back(expr, expr.operands().begin(), expr.operands().end());
+    m_stack.emplace_back(expr);
     return true;
   }
 
