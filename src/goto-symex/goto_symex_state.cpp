@@ -472,31 +472,46 @@ void goto_symex_statet::increase_generation_if_exists(const irep_idt identifier)
   current_names_iter->second.second = fresh_l2_name_provider(identifier);
 }
 
+goto_symex_statet::write_is_shared_resultt goto_symex_statet::write_is_shared(
+  const ssa_exprt &expr,
+  const namespacet &ns) const
+{
+  if(!record_events)
+    return write_is_shared_resultt::NOT_SHARED;
+
+  const irep_idt &obj_identifier = expr.get_object_name();
+  if(
+    obj_identifier == guard_identifier() ||
+    (!ns.lookup(obj_identifier).is_shared() && !(dirty)(obj_identifier)))
+  {
+    return write_is_shared_resultt::NOT_SHARED;
+  }
+
+  if(atomic_section_id != 0)
+    return write_is_shared_resultt::IN_ATOMIC_SECTION;
+
+  return write_is_shared_resultt::SHARED;
+}
+
 /// thread encoding
 bool goto_symex_statet::l2_thread_write_encoding(
   const ssa_exprt &expr,
   const namespacet &ns)
 {
-  if(!record_events)
+  switch(write_is_shared(expr, ns))
+  {
+  case write_is_shared_resultt::NOT_SHARED:
     return false;
-
-  // is it a shared object?
-  const irep_idt &obj_identifier=expr.get_object_name();
-  if(
-    obj_identifier == guard_identifier() ||
-    (!ns.lookup(obj_identifier).is_shared() && !(dirty)(obj_identifier)))
+  case write_is_shared_resultt::IN_ATOMIC_SECTION:
   {
-    return false; // not shared
-  }
-
-  // see whether we are within an atomic section
-  if(atomic_section_id!=0)
-  {
-    ssa_exprt ssa_l1=expr;
+    ssa_exprt ssa_l1 = expr;
     ssa_l1.remove_level_2();
 
     written_in_atomic_section[ssa_l1].push_back(guard);
     return false;
+  }
+  case write_is_shared_resultt::SHARED:
+    break;
   }
 
   // record a shared write
@@ -507,7 +522,7 @@ bool goto_symex_statet::l2_thread_write_encoding(
     source);
 
   // do we have threads?
-  return threads.size()>1;
+  return threads.size() > 1;
 }
 
 template <levelt level>

@@ -181,8 +181,17 @@ public:
 
   std::vector<threadt> threads;
 
+  enum class write_is_shared_resultt
+  {
+    NOT_SHARED,
+    IN_ATOMIC_SECTION,
+    SHARED
+  };
+
   bool l2_thread_read_encoding(ssa_exprt &expr, const namespacet &ns);
   bool l2_thread_write_encoding(const ssa_exprt &expr, const namespacet &ns);
+  write_is_shared_resultt
+  write_is_shared(const ssa_exprt &expr, const namespacet &ns) const;
 
   bool record_events;
 
