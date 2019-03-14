@@ -32,9 +32,9 @@ protected:
   void get_symbols(const exprt &expr);
   void get_symbols(const typet &type);
 
-  void slice(symex_target_equationt::SSA_stept &SSA_step);
-  void slice_assignment(symex_target_equationt::SSA_stept &SSA_step);
-  void slice_decl(symex_target_equationt::SSA_stept &SSA_step);
+  void slice(SSA_stept &SSA_step);
+  void slice_assignment(SSA_stept &SSA_step);
+  void slice_decl(SSA_stept &SSA_step);
 };
 
 #endif // CPROVER_GOTO_SYMEX_SYMEX_SLICE_CLASS_H

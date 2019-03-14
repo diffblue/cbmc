@@ -25,13 +25,13 @@ public:
     const namespacet &_ns,
     value_setst &_value_sets,
     const goto_programt::const_targett _target,
-    const symex_target_equationt::SSA_stept &_SSA_step,
-    const goto_symex_statet &_s):
-    ns(_ns),
-    value_sets(_value_sets),
-    target(_target),
-    SSA_step(_SSA_step),
-    s(_s)
+    const SSA_stept &_SSA_step,
+    const goto_symex_statet &_s)
+    : ns(_ns),
+      value_sets(_value_sets),
+      target(_target),
+      SSA_step(_SSA_step),
+      s(_s)
   {
   }
 
@@ -39,7 +39,7 @@ protected:
   const namespacet &ns;
   value_setst &value_sets;
   const goto_programt::const_targett target;
-  const symex_target_equationt::SSA_stept &SSA_step;
+  const SSA_stept &SSA_step;
   const goto_symex_statet &s;
   void compute_rec(exprt &dest);
 

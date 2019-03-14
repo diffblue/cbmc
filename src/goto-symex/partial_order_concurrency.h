@@ -25,7 +25,7 @@ public:
   explicit partial_order_concurrencyt(const namespacet &_ns);
   virtual ~partial_order_concurrencyt();
 
-  typedef symex_target_equationt::SSA_stept eventt;
+  typedef SSA_stept eventt;
   typedef symex_target_equationt::SSA_stepst eventst;
   typedef eventst::const_iterator event_it;
 

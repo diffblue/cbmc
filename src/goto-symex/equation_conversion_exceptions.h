@@ -16,14 +16,14 @@ Author: Diffblue Ltd.
 
 #include <util/format_expr.h>
 
-#include "symex_target_equation.h"
+#include "ssa_step.h"
 
 class equation_conversion_exceptiont : public std::runtime_error
 {
 public:
   equation_conversion_exceptiont(
     const std::string &message,
-    const symex_target_equationt::SSA_stept &step)
+    const SSA_stept &step)
     : runtime_error(message), step(step)
   {
     std::ostringstream error_msg;
@@ -40,7 +40,7 @@ public:
   }
 
 private:
-  symex_target_equationt::SSA_stept step;
+  SSA_stept step;
   std::string error_message;
 };
 

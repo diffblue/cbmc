@@ -24,7 +24,7 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \param count: Step number, incremented after output
 static void show_step(
   const namespacet &ns,
-  const symex_target_equationt::SSA_stept &step,
+  const SSA_stept &step,
   const std::string &annotation,
   std::size_t &count)
 {

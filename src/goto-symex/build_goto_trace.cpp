@@ -134,7 +134,7 @@ static void set_internal_dynamic_object(
 /// set internal for variables assignments related to dynamic_object and CPROVER
 /// internal functions (e.g., __CPROVER_initialize)
 static void update_internal_field(
-  const symex_target_equationt::SSA_stept &SSA_step,
+  const SSA_stept &SSA_step,
   goto_trace_stept &goto_trace_step,
   const namespacet &ns)
 {
@@ -201,7 +201,7 @@ void build_goto_trace(
       last_step_to_keep = it;
     }
 
-    const symex_target_equationt::SSA_stept &SSA_step=*it;
+    const SSA_stept &SSA_step = *it;
 
     if(prop_conv.l_get(SSA_step.guard_literal)!=tvt(true))
       continue;

@@ -48,7 +48,7 @@ digraph G {
 \subsection symex-overview Overview
 
 The \ref bmct class gets a reference to an \ref symex_target_equationt
-"equation" (initially, an empty list of \ref symex_target_equationt::SSA_stept
+"equation" (initially, an empty list of \ref SSA_stept
 "single-static assignment steps") and a goto-program from the frontend.
 The \ref bmct creates a goto_symext to symbolically execute the
 goto-program, thereby filling the equation, which can then be passed
