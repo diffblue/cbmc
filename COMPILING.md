@@ -219,6 +219,9 @@ require manual modification of build files.
      ```
      You shoud also install [Homebrew](https://brew.sh), after which you can
      run `brew install cmake` to install CMake.
+   - On platforms where installing the Java Development Kit and Maven is
+     difficult, you can avoid needing these dependencies by not building
+     JBMC. Just pass `-DWITH_JBMC=OFF` to cmake in step (4) below.
    - On Windows, ensure you have Visual Studio 2015 or later installed.
      Then, download CMake from the [official download
      page](https://cmake.org/download).

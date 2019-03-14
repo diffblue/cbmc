@@ -117,7 +117,10 @@ add_subdirectory(src)
 add_subdirectory(regression)
 add_subdirectory(unit)
 
-add_subdirectory(jbmc)
+set(CBMC_CXX_STANDARD 11)
+set(CBMC_CXX_STANDARD_REQUIRED true)
+set(CBMC_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY
+    "Developer ID Application: Daniel Kroening")
 
 set_target_properties(
     analyses
@@ -152,20 +155,13 @@ set_target_properties(
     util
     xml
 
-    java_bytecode
-    java-models-library
-    jbmc
-    jbmc-lib
-    janalyzer
-    janalyzer-lib
-    jdiff
-    jdiff-lib
-    java-testing-utils
-    java-unit
-    miniz
-
     PROPERTIES
-    CXX_STANDARD 11
-    CXX_STANDARD_REQUIRED true
-    XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "Developer ID Application: Daniel Kroening"
+    CXX_STANDARD ${CBMC_CXX_STANDARD}
+    CXX_STANDARD_REQUIRED ${CBMC_CXX_STANDARD_REQUIRED}
+    XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY ${CBMC_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY}
 )
+
+option(WITH_JBMC "Build the JBMC Java front-end" ON)
+if(WITH_JBMC)
+    add_subdirectory(jbmc)
+endif()
