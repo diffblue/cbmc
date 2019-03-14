@@ -557,11 +557,6 @@ int cbmc_parse_optionst::doit()
   if(set_properties())
     return CPROVER_EXIT_SET_PROPERTIES_FAILED;
 
-  if(cmdline.isset("validate-goto-model"))
-  {
-    goto_model.validate();
-  }
-
   if(
     options.get_bool_option("program-only") ||
     options.get_bool_option("show-vcc"))
@@ -712,6 +707,11 @@ int cbmc_parse_optionst::get_goto_program(
 
     if(cbmc_parse_optionst::process_goto_program(goto_model, options, log))
       return CPROVER_EXIT_INTERNAL_ERROR;
+
+    if(cmdline.isset("validate-goto-model"))
+    {
+      goto_model.validate();
+    }
 
     // show it?
     if(cmdline.isset("show-loops"))
