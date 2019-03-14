@@ -1,0 +1,12 @@
+CORE
+test.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+0 remaining after simplification$
+--
+^warning: ignoring
+--
+Assumption and GOTO condition propagation means this test should be
+entirely decided by symex.

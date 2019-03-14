@@ -1,0 +1,14 @@
+CORE
+Test.class
+--function Test.main
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+1 remaining after simplification$
+--
+^warning: ignoring
+--
+The function "unreachable" should be successfully noted as unreachable by symex,
+but the final uncaught-exception test in __CPROVER__start is not yet decidable
+in symex, as it requires symex to note that within a catch block
+@inflight_exception is definitely *not* null, which it can't just yet.
