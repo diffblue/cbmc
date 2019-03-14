@@ -12,6 +12,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <algorithm>
 
+#include <util/expr_iterator.h>
+#include <util/expr_util.h>
 #include <util/fresh_symbol.h>
 #include <util/prefix.h>
 
@@ -145,6 +147,55 @@ static void create_static_function_call(
   }
 }
 
+/// If \p argument_for_this contains a dereference then create a temporary
+/// variable for it and use that instead
+/// \param [in,out] argument_for_this: The first argument of the function call
+/// \param symbol_table: The symbol table to add the new symbol to
+/// \param vcall_source_loc: The source location of the function call, which is
+///   used for new instructions that are added
+/// \param [out] new_code_for_this_argument: New instructions are added here
+static void process_this_argument(
+  exprt &argument_for_this,
+  symbol_table_baset &symbol_table,
+  const source_locationt &vcall_source_loc,
+  goto_programt &new_code_for_this_argument)
+{
+  if(has_subexpr(argument_for_this, ID_dereference))
+  {
+    // Create a temporary for the `this` argument. This is so that
+    // \ref goto_symext::try_filter_value_sets can reduce the value-set for
+    // `this` to those elements with the correct class identifier.
+    symbolt &temp_symbol = get_fresh_aux_symbol(
+      argument_for_this.type(),
+      "remove_virtual_functions", // TODO: pass function name in to use here?
+      "this_argument",
+      vcall_source_loc,
+      ID_java, //TODO: get this from somewhere
+      symbol_table);
+    const symbol_exprt temp_var_for_this = temp_symbol.symbol_expr();
+
+    new_code_for_this_argument.add(
+      goto_programt::make_decl(temp_var_for_this, vcall_source_loc));
+    new_code_for_this_argument.add(
+      goto_programt::make_assignment(
+        temp_var_for_this, argument_for_this, vcall_source_loc));
+
+    // Add null check for temp_var_for_this, as the old one won't work any more. We should
+    // really use java_bytecode_instrumentt::check_null_dereference(), but it is
+    // in jbmc rather than cbmc. Or we could use create_fatal_assertion(), but it
+    // returns a code_blockt, which is a bit inconvenient.
+    const notequal_exprt null_check(
+      temp_var_for_this,
+      null_pointer_exprt(to_pointer_type(temp_var_for_this.type())));
+    new_code_for_this_argument.add(
+      goto_programt::make_assertion(null_check, vcall_source_loc));
+    new_code_for_this_argument.add(
+      goto_programt::make_assumption(null_check, vcall_source_loc));
+
+    argument_for_this = temp_var_for_this;
+  }
+}
+
 /// Replace virtual function call with a static function call
 /// Achieved by substituting a virtual function with its most derived
 /// implementation. If there's a type mismatch between implementation
@@ -199,34 +250,16 @@ goto_programt::targett remove_virtual_functionst::remove_virtual_function(
 
   const auto &vcall_source_loc=target->source_location;
 
-  // TODO: only make a temporary when argument_for_this contains a dereference
-
-  // Create a temporary for the `this` argument. This is so that value-set
-  // filtering in symex will reduce the value-set for `this` to those with the
-  // correct class identifier.
+  code_function_callt code(target->get_function_call());
   goto_programt new_code_for_this_argument;
 
-  const code_function_callt &original_code = target->get_function_call();
-  exprt argument_for_this = original_code.arguments()[0];
-  symbolt &temporary_for_this = get_fresh_aux_symbol(
-    argument_for_this.type(),
-    "remove_virtual_functions", // TODO: pass function name in to use here?
-    "this_argument",
+  process_this_argument(
+    code.arguments()[0],
+    symbol_table,
     vcall_source_loc,
-    ID_java, //TODO: get this from somewhere
-    symbol_table);
-  const symbol_exprt this_expr = temporary_for_this.symbol_expr();
-  const typet &this_type = this_expr.type();
+    new_code_for_this_argument);
 
-  new_code_for_this_argument.add(
-    goto_programt::make_decl(this_expr, vcall_source_loc));
-  new_code_for_this_argument.add(
-    goto_programt::make_assignment(
-      this_expr, argument_for_this, vcall_source_loc));
-
-  // Adjust the function call to use \p temporary_for_this as its first argument
-  code_function_callt code(original_code);
-  code.arguments()[0] = this_expr;
+  const exprt &this_expr = code.arguments()[0];
 
   // Create a skip as the final target for each branch to jump to at the end
   goto_programt final_skip;
@@ -239,9 +272,10 @@ goto_programt::targett remove_virtual_functionst::remove_virtual_function(
   goto_programt new_code_calls;
   goto_programt new_code_gotos;
 
-  INVARIANT(this_type.id() == ID_pointer, "this parameter must be a pointer");
   INVARIANT(
-    this_type.subtype() != empty_typet(),
+    this_expr.type().id() == ID_pointer, "this parameter must be a pointer");
+  INVARIANT(
+    this_expr.type().subtype() != empty_typet(),
     "this parameter must not be a void pointer");
 
   // So long as `this` is already not `void*` typed, the second parameter
