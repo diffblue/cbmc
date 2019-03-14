@@ -50,6 +50,7 @@ SRC += analyses/ai/ai.cpp \
        util/cmdline.cpp \
        util/expr_cast/expr_cast.cpp \
        util/expr.cpp \
+       util/expr_iterator.cpp \
        util/file_util.cpp \
        util/format_number_range.cpp \
        util/get_base_name.cpp \
