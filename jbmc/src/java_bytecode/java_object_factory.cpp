@@ -1457,7 +1457,13 @@ bool java_object_factoryt::gen_nondet_enum_init(
   const irep_idt &class_name = java_class_type.get_name();
   const irep_idt values_name = id2string(class_name) + ".$VALUES";
   if(!ns.get_symbol_table().has_symbol(values_name))
+  {
+    log.warning() << values_name
+                  << " is missing, so the corresponding Enum "
+                     "type will nondet initialised"
+                  << messaget::eom;
     return false;
+  }
 
   const symbolt &values = ns.lookup(values_name);
 
