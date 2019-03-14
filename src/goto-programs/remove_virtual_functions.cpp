@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <algorithm>
 
+#include <util/fresh_symbol.h>
 #include <util/prefix.h>
 
 #include "class_identifier.h"
@@ -168,7 +169,6 @@ goto_programt::targett remove_virtual_functionst::remove_virtual_function(
   INVARIANT(
     target->is_function_call(),
     "remove_virtual_function must target a FUNCTION_CALL instruction");
-  const code_function_callt &code = target->get_function_call();
 
   goto_programt::targett next_target = std::next(target);
 
@@ -199,7 +199,36 @@ goto_programt::targett remove_virtual_functionst::remove_virtual_function(
 
   const auto &vcall_source_loc=target->source_location;
 
-  // the final target is a skip
+  // TODO: only make a temporary when argument_for_this contains a dereference
+
+  // Create a temporary for the `this` argument. This is so that value-set
+  // filtering in symex will reduce the value-set for `this` to those with the
+  // correct class identifier.
+  goto_programt new_code_for_this_argument;
+
+  const code_function_callt &original_code = target->get_function_call();
+  exprt argument_for_this = original_code.arguments()[0];
+  symbolt &temporary_for_this = get_fresh_aux_symbol(
+    argument_for_this.type(),
+    "remove_virtual_functions", // TODO: pass function name in to use here?
+    "this_argument",
+    vcall_source_loc,
+    ID_java, //TODO: get this from somewhere
+    symbol_table);
+  const symbol_exprt this_expr = temporary_for_this.symbol_expr();
+  const typet &this_type = this_expr.type();
+
+  new_code_for_this_argument.add(
+    goto_programt::make_decl(this_expr, vcall_source_loc));
+  new_code_for_this_argument.add(
+    goto_programt::make_assignment(
+      this_expr, argument_for_this, vcall_source_loc));
+
+  // Adjust the function call to use \p temporary_for_this as its first argument
+  code_function_callt code(original_code);
+  code.arguments()[0] = this_expr;
+
+  // Create a skip as the final target for each branch to jump to at the end
   goto_programt final_skip;
 
   goto_programt::targett t_final =
@@ -210,9 +239,6 @@ goto_programt::targett remove_virtual_functionst::remove_virtual_function(
   goto_programt new_code_calls;
   goto_programt new_code_gotos;
 
-  exprt this_expr=code.arguments()[0];
-
-  const typet &this_type=this_expr.type();
   INVARIANT(this_type.id() == ID_pointer, "this parameter must be a pointer");
   INVARIANT(
     this_type.subtype() != empty_typet(),
@@ -321,6 +347,7 @@ goto_programt::targett remove_virtual_functionst::remove_virtual_function(
   goto_programt new_code;
 
   // patch them all together
+  new_code.destructive_append(new_code_for_this_argument);
   new_code.destructive_append(new_code_gotos);
   new_code.destructive_append(new_code_calls);
   new_code.destructive_append(final_skip);
