@@ -30,7 +30,7 @@ void remove_virtual_functions(
   goto_modelt &goto_model);
 
 void remove_virtual_functions(
-  const symbol_table_baset &symbol_table,
+  symbol_table_baset &symbol_table,
   goto_functionst &goto_functions);
 
 /// Remove virtual functions from one function.
@@ -112,7 +112,7 @@ goto_programt::targett remove_virtual_function(
 ///   overridden functions will be stored.
 void collect_virtual_function_callees(
   const exprt &function,
-  const symbol_tablet &symbol_table,
+  symbol_tablet &symbol_table,
   const class_hierarchyt &class_hierarchy,
   dispatch_table_entriest &overridden_functions);
 

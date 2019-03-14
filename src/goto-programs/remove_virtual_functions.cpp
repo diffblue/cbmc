@@ -23,7 +23,7 @@ class remove_virtual_functionst
 {
 public:
   remove_virtual_functionst(
-    const symbol_table_baset &_symbol_table,
+    symbol_table_baset &_symbol_table,
     const class_hierarchyt &_class_hierarchy);
 
   void operator()(goto_functionst &goto_functions);
@@ -40,7 +40,7 @@ public:
 
 protected:
   const namespacet ns;
-  const symbol_table_baset &symbol_table;
+  symbol_table_baset &symbol_table;
 
   const class_hierarchyt &class_hierarchy;
 
@@ -64,7 +64,7 @@ protected:
 };
 
 remove_virtual_functionst::remove_virtual_functionst(
-  const symbol_table_baset &_symbol_table,
+  symbol_table_baset &_symbol_table,
   const class_hierarchyt &_class_hierarchy)
   : ns(_symbol_table),
     symbol_table(_symbol_table),
@@ -588,7 +588,7 @@ void remove_virtual_functionst::operator()(goto_functionst &functions)
 /// Remove virtual function calls from all functions in the specified
 /// list and replace them with their most derived implementations
 void remove_virtual_functions(
-  const symbol_table_baset &symbol_table,
+  symbol_table_baset &symbol_table,
   goto_functionst &goto_functions)
 {
   class_hierarchyt class_hierarchy;
@@ -665,7 +665,7 @@ goto_programt::targett remove_virtual_function(
 
 void collect_virtual_function_callees(
   const exprt &function,
-  const symbol_table_baset &symbol_table,
+  symbol_table_baset &symbol_table,
   const class_hierarchyt &class_hierarchy,
   dispatch_table_entriest &overridden_functions)
 {
