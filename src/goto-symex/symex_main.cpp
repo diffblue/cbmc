@@ -160,6 +160,8 @@ void goto_symext::symex_assume_l2(statet &state, const exprt &cond)
   if(state.atomic_section_id!=0 &&
      state.guard.is_false())
     symex_atomic_end(state);
+
+  state.apply_condition(cond, state, ns);
 }
 
 void goto_symext::rewrite_quantifiers(exprt &expr, statet &state)

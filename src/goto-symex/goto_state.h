@@ -75,6 +75,11 @@ public:
   {
   }
 
+  void apply_condition(
+    const exprt &condition, // L2
+    const goto_symex_statet &previous_state,
+    const namespacet &ns);
+
   std::size_t increase_generation(
     const irep_idt l1_identifier,
     const ssa_exprt &lhs,

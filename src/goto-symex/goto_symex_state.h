@@ -233,6 +233,11 @@ public:
     level2.current_names.erase(it);
   }
 
+  std::function<std::size_t(const irep_idt &)> get_l2_name_provider() const
+  {
+    return fresh_l2_name_provider;
+  }
+
 private:
   std::function<std::size_t(const irep_idt &)> fresh_l2_name_provider;
 
