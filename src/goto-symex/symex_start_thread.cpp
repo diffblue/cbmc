@@ -76,7 +76,7 @@ void goto_symext::symex_start_thread(statet &state)
       std::forward_as_tuple(lhs.get_l1_object_identifier()),
       std::forward_as_tuple(lhs, 0));
     CHECK_RETURN(emplace_result.second);
-    const ssa_exprt lhs_l1 = state.rename_ssa<L1>(std::move(lhs), ns);
+    const ssa_exprt lhs_l1 = state.rename_ssa<L1>(std::move(lhs), ns).get();
     const irep_idt l1_name = lhs_l1.get_l1_object_identifier();
     // store it
     new_thread.call_stack.back().local_objects.insert(l1_name);

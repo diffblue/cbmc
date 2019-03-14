@@ -87,8 +87,9 @@ private:
   friend struct symex_level0t;
   friend struct symex_level1t;
   friend struct symex_level2t;
+  friend class goto_symex_statet;
 
-  /// Only symex_levelXt classes can create renamedt objects
+  /// Only the friend classes can create renamedt objects
   explicit renamedt(underlyingt value) : value(std::move(value))
   {
   }

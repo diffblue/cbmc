@@ -21,7 +21,7 @@ void goto_symext::symex_dead(statet &state)
 
   const code_deadt &code = instruction.get_dead();
 
-  ssa_exprt ssa = state.rename_ssa<L1>(ssa_exprt{code.symbol()}, ns);
+  ssa_exprt ssa = state.rename_ssa<L1>(ssa_exprt{code.symbol()}, ns).get();
   const irep_idt &l1_identifier = ssa.get_identifier();
 
   // we cannot remove the object from the L1 renaming map, because L1 renaming

@@ -93,7 +93,7 @@ void goto_symext::symex_assert(
     rewrite_quantifiers(condition, state);
 
   // now rename, enables propagation
-  exprt l2_condition = state.rename(std::move(condition), ns);
+  exprt l2_condition = state.rename(std::move(condition), ns).get();
 
   // now try simplifier on it
   do_simplify(l2_condition);
@@ -127,7 +127,7 @@ void goto_symext::symex_assume(statet &state, const exprt &cond)
   exprt simplified_cond=cond;
 
   clean_expr(simplified_cond, state, false);
-  simplified_cond = state.rename(std::move(simplified_cond), ns);
+  simplified_cond = state.rename(std::move(simplified_cond), ns).get();
   do_simplify(simplified_cond);
 
   symex_assume_l2(state, simplified_cond);

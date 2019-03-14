@@ -161,7 +161,7 @@ void goto_symex_statet::assignment(
   bool allow_pointer_unsoundness)
 {
   // identifier should be l0 or l1, make sure it's l1
-  lhs = rename_ssa<L1>(std::move(lhs), ns);
+  lhs = rename_ssa<L1>(std::move(lhs), ns).get();
   irep_idt l1_identifier=lhs.get_identifier();
 
   // the type might need renaming
@@ -230,7 +230,8 @@ void goto_symex_statet::assignment(
 }
 
 template <levelt level>
-ssa_exprt goto_symex_statet::rename_ssa(ssa_exprt ssa, const namespacet &ns)
+renamedt<ssa_exprt, level>
+goto_symex_statet::rename_ssa(ssa_exprt ssa, const namespacet &ns)
 {
   static_assert(
     level == L0 || level == L1,
@@ -238,17 +239,18 @@ ssa_exprt goto_symex_statet::rename_ssa(ssa_exprt ssa, const namespacet &ns)
   ssa = set_indices<level>(std::move(ssa), ns).get();
   rename<level>(ssa.type(), ssa.get_identifier(), ns);
   ssa.update_type();
-  return ssa;
+  return renamedt<ssa_exprt, level>{ssa};
 }
 
 /// Ensure `rename_ssa` gets compiled for L0
-template ssa_exprt
+template renamedt<ssa_exprt, L0>
 goto_symex_statet::rename_ssa<L0>(ssa_exprt ssa, const namespacet &ns);
-template ssa_exprt
+template renamedt<ssa_exprt, L1>
 goto_symex_statet::rename_ssa<L1>(ssa_exprt ssa, const namespacet &ns);
 
 template <levelt level>
-exprt goto_symex_statet::rename(exprt expr, const namespacet &ns)
+renamedt<exprt, level>
+goto_symex_statet::rename(exprt expr, const namespacet &ns)
 {
   // rename all the symbols with their last known value
 
@@ -259,11 +261,13 @@ exprt goto_symex_statet::rename(exprt expr, const namespacet &ns)
 
     if(level == L0)
     {
-      ssa = rename_ssa<L0>(std::move(ssa), ns);
+      return renamedt<exprt, level>{
+        std::move(rename_ssa<L0>(std::move(ssa), ns).value)};
     }
     else if(level == L1)
     {
-      ssa = rename_ssa<L1>(std::move(ssa), ns);
+      return renamedt<exprt, level>{
+        std::move(rename_ssa<L1>(std::move(ssa), ns).value)};
     }
     else if(level==L2)
     {
@@ -290,6 +294,7 @@ exprt goto_symex_statet::rename(exprt expr, const namespacet &ns)
         else
           ssa = set_indices<L2>(std::move(ssa), ns).get();
       }
+      return renamedt<exprt, level>(std::move(ssa));
     }
   }
   else if(expr.id()==ID_symbol)
@@ -298,9 +303,12 @@ exprt goto_symex_statet::rename(exprt expr, const namespacet &ns)
 
     // we never rename function symbols
     if(type.id() == ID_code || type.id() == ID_mathematical_function)
+    {
       rename<level>(expr.type(), to_symbol_expr(expr).get_identifier(), ns);
+      return renamedt<exprt, level>{std::move(expr)};
+    }
     else
-      expr = rename<level>(ssa_exprt{expr}, ns);
+      return rename<level>(ssa_exprt{expr}, ns);
   }
   else if(expr.id()==ID_address_of)
   {
@@ -308,6 +316,7 @@ exprt goto_symex_statet::rename(exprt expr, const namespacet &ns)
     rename_address<level>(address_of_expr.object(), ns);
     to_pointer_type(expr.type()).subtype() =
       as_const(address_of_expr).object().type();
+    return renamedt<exprt, level>{std::move(expr)};
   }
   else
   {
@@ -315,7 +324,7 @@ exprt goto_symex_statet::rename(exprt expr, const namespacet &ns)
 
     // do this recursively
     Forall_operands(it, expr)
-      *it = rename<level>(std::move(*it), ns);
+      *it = rename<level>(std::move(*it), ns).get();
 
     const exprt &c_expr = as_const(expr);
     INVARIANT(
@@ -326,11 +335,12 @@ exprt goto_symex_statet::rename(exprt expr, const namespacet &ns)
           c_expr.type() == to_if_expr(c_expr).false_case().type())),
       "Type of renamed expr should be the same as operands for with_exprt and "
       "if_exprt");
+    return renamedt<exprt, level>{std::move(expr)};
   }
-  return expr;
 }
 
-template exprt goto_symex_statet::rename<L1>(exprt expr, const namespacet &ns);
+template renamedt<exprt, L1>
+goto_symex_statet::rename<L1>(exprt expr, const namespacet &ns);
 
 /// thread encoding
 bool goto_symex_statet::l2_thread_read_encoding(
@@ -555,13 +565,14 @@ void goto_symex_statet::rename_address(exprt &expr, const namespacet &ns)
       expr.type() = to_array_type(index_expr.array().type()).subtype();
 
       // the index is not an address
-      index_expr.index() = rename<level>(std::move(index_expr.index()), ns);
+      index_expr.index() =
+        rename<level>(std::move(index_expr.index()), ns).get();
     }
     else if(expr.id()==ID_if)
     {
       // the condition is not an address
       if_exprt &if_expr=to_if_expr(expr);
-      if_expr.cond() = rename<level>(std::move(if_expr.cond()), ns);
+      if_expr.cond() = rename<level>(std::move(if_expr.cond()), ns).get();
       rename_address<level>(if_expr.true_case(), ns);
       rename_address<level>(if_expr.false_case(), ns);
 
@@ -694,7 +705,7 @@ void goto_symex_statet::rename(
   {
     auto &array_type = to_array_type(type);
     rename<level>(array_type.subtype(), irep_idt(), ns);
-    array_type.size() = rename<level>(std::move(array_type.size()), ns);
+    array_type.size() = rename<level>(std::move(array_type.size()), ns).get();
   }
   else if(type.id() == ID_struct || type.id() == ID_union)
   {
@@ -707,7 +718,8 @@ void goto_symex_statet::rename(
       if(component.type().id() == ID_array)
       {
         auto &array_type = to_array_type(component.type());
-        array_type.size() = rename<level>(std::move(array_type.size()), ns);
+        array_type.size() =
+          rename<level>(std::move(array_type.size()), ns).get();
       }
       else if(component.type().id() != ID_pointer)
         rename<level>(component.type(), irep_idt(), ns);
@@ -768,7 +780,7 @@ ssa_exprt goto_symex_statet::add_object(
 {
   framet &frame = call_stack().top();
 
-  ssa_exprt ssa = rename_ssa<L0>(ssa_exprt{expr}, ns);
+  ssa_exprt ssa = rename_ssa<L0>(ssa_exprt{expr}, ns).get();
   const irep_idt l0_name = ssa.get_identifier();
   const std::size_t l1_index = index_generator(l0_name);
 
@@ -784,7 +796,7 @@ ssa_exprt goto_symex_statet::add_object(
     existing_or_new_entry.first->second = std::make_pair(ssa, l1_index);
   }
 
-  ssa = rename_ssa<L1>(std::move(ssa), ns);
+  ssa = rename_ssa<L1>(std::move(ssa), ns).get();
   const bool inserted = frame.local_objects.insert(ssa.get_identifier()).second;
   INVARIANT(inserted, "l1_name expected to be unique by construction");
 

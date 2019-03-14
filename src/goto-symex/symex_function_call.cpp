@@ -272,7 +272,7 @@ void goto_symext::symex_function_call_code(
   // read the arguments -- before the locality renaming
   exprt::operandst arguments = call.arguments();
   for(auto &a : arguments)
-    a = state.rename(std::move(a), ns);
+    a = state.rename(std::move(a), ns).get();
 
   // we hide the call if the caller and callee are both hidden
   const bool callee_is_hidden = ns.lookup(identifier).is_hidden();
