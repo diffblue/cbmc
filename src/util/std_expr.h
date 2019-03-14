@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file util/std_expr.h
 /// API to expression classes
 
+#include "as_const.h"
 #include "expr_cast.h"
 #include "invariant.h"
 #include "std_types.h"
@@ -969,20 +970,20 @@ public:
     operands() = std::move(_operands);
   }
 
-  multi_ary_exprt(const exprt &_lhs, const irep_idt &_id, const exprt &_rhs)
-    : expr_protectedt(_id, _lhs.type())
+  multi_ary_exprt(exprt _lhs, const irep_idt &_id, exprt _rhs)
+    : expr_protectedt(_id, as_const(_lhs).type())
   {
-    add_to_operands(_lhs, _rhs);
+    add_to_operands(std::move(_lhs), std::move(_rhs));
   }
 
   multi_ary_exprt(
-    const exprt &_lhs,
+    exprt _lhs,
     const irep_idt &_id,
-    const exprt &_rhs,
+    exprt _rhs,
     const typet &_type)
     : expr_protectedt(_id, _type)
   {
-    add_to_operands(_lhs, _rhs);
+    add_to_operands(std::move(_lhs), std::move(_rhs));
   }
 
   // In contrast to exprt::opX, the methods
@@ -1069,18 +1070,13 @@ public:
   {
   }
 
-  plus_exprt(
-    const exprt &_lhs,
-    const exprt &_rhs):
-    multi_ary_exprt(_lhs, ID_plus, _rhs)
+  plus_exprt(exprt _lhs, exprt _rhs)
+    : multi_ary_exprt(std::move(_lhs), ID_plus, std::move(_rhs))
   {
   }
 
-  plus_exprt(
-    const exprt &_lhs,
-    const exprt &_rhs,
-    const typet &_type):
-    multi_ary_exprt(_lhs, ID_plus, _rhs, _type)
+  plus_exprt(exprt _lhs, exprt _rhs, const typet &_type)
+    : multi_ary_exprt(_lhs, ID_plus, _rhs, _type)
   {
   }
 
@@ -1187,10 +1183,8 @@ public:
   {
   }
 
-  mult_exprt(
-    const exprt &_lhs,
-    const exprt &_rhs):
-    multi_ary_exprt(_lhs, ID_mult, _rhs)
+  mult_exprt(exprt _lhs, exprt _rhs)
+    : multi_ary_exprt(std::move(_lhs), ID_mult, std::move(_rhs))
   {
   }
 };
@@ -2410,22 +2404,24 @@ public:
   {
   }
 
-  and_exprt(const exprt &op0, const exprt &op1):
-    multi_ary_exprt(op0, ID_and, op1, bool_typet())
+  and_exprt(exprt op0, exprt op1)
+    : multi_ary_exprt(std::move(op0), ID_and, std::move(op1), bool_typet())
   {
   }
 
-  and_exprt(const exprt &op0, const exprt &op1, const exprt &op2)
-    : multi_ary_exprt(ID_and, {op0, op1, op2}, bool_typet())
+  and_exprt(exprt op0, exprt op1, exprt op2)
+    : multi_ary_exprt(
+        ID_and,
+        {std::move(op0), std::move(op1), std::move(op2)},
+        bool_typet())
   {
   }
 
-  and_exprt(
-    const exprt &op0,
-    const exprt &op1,
-    const exprt &op2,
-    const exprt &op3)
-    : multi_ary_exprt(ID_and, {op0, op1, op2, op3}, bool_typet())
+  and_exprt(exprt op0, exprt op1, exprt op2, exprt op3)
+    : multi_ary_exprt(
+        ID_and,
+        {std::move(op0), std::move(op1), std::move(op2), std::move(op3)},
+        bool_typet())
   {
   }
 
@@ -2526,22 +2522,24 @@ public:
   {
   }
 
-  or_exprt(const exprt &op0, const exprt &op1):
-    multi_ary_exprt(op0, ID_or, op1, bool_typet())
+  or_exprt(exprt op0, exprt op1)
+    : multi_ary_exprt(std::move(op0), ID_or, std::move(op1), bool_typet())
   {
   }
 
-  or_exprt(const exprt &op0, const exprt &op1, const exprt &op2)
-    : multi_ary_exprt(ID_or, {op0, op1, op2}, bool_typet())
+  or_exprt(exprt op0, exprt op1, exprt op2)
+    : multi_ary_exprt(
+        ID_or,
+        {std::move(op0), std::move(op1), std::move(op2)},
+        bool_typet())
   {
   }
 
-  or_exprt(
-    const exprt &op0,
-    const exprt &op1,
-    const exprt &op2,
-    const exprt &op3)
-    : multi_ary_exprt(ID_or, {op0, op1, op2, op3}, bool_typet())
+  or_exprt(exprt op0, exprt op1, exprt op2, exprt op3)
+    : multi_ary_exprt(
+        ID_or,
+        {std::move(op0), std::move(op1), std::move(op2), std::move(op3)},
+        bool_typet())
   {
   }
 
