@@ -460,22 +460,6 @@ bool goto_symex_statet::l2_thread_read_encoding(
 }
 
 /// Allocates a fresh L2 name for the given L1 identifier, and makes it the
-/// latest generation on this path.
-/// \return the newly allocated generation number
-std::size_t goto_symex_statet::increase_generation(
-  const irep_idt l1_identifier,
-  const ssa_exprt &lhs)
-{
-  auto current_emplace_res =
-    level2.current_names.emplace(l1_identifier, std::make_pair(lhs, 0));
-
-  current_emplace_res.first->second.second =
-    fresh_l2_name_provider(l1_identifier);
-
-  return current_emplace_res.first->second.second;
-}
-
-/// Allocates a fresh L2 name for the given L1 identifier, and makes it the
 /// latest generation on this path. Does nothing if there isn't an expression
 /// keyed by the l1 identifier.
 void goto_symex_statet::increase_generation_if_exists(const irep_idt identifier)

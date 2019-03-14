@@ -74,6 +74,11 @@ public:
     : guard(true_exprt(), guard_manager)
   {
   }
+
+  std::size_t increase_generation(
+    const irep_idt l1_identifier,
+    const ssa_exprt &lhs,
+    std::function<std::size_t(const irep_idt &)> fresh_l2_name_provider);
 };
 
 #endif // CPROVER_GOTO_SYMEX_GOTO_STATE_H

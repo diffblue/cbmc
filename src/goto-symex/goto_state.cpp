@@ -20,3 +20,17 @@ void goto_statet::output_propagation_map(std::ostream &out)
     out << name_value.first << " <- " << format(name_value.second) << "\n";
   }
 }
+
+std::size_t goto_statet::increase_generation(
+  const irep_idt l1_identifier,
+  const ssa_exprt &lhs,
+  std::function<std::size_t(const irep_idt &)> fresh_l2_name_provider)
+{
+  auto current_emplace_res =
+    level2.current_names.emplace(l1_identifier, std::make_pair(lhs, 0));
+
+  current_emplace_res.first->second.second =
+    fresh_l2_name_provider(l1_identifier);
+
+  return current_emplace_res.first->second.second;
+}

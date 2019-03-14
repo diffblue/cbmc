@@ -208,7 +208,11 @@ public:
   /// Allocates a fresh L2 name for the given L1 identifier, and makes it the
   //  latest generation on this path.
   std::size_t
-  increase_generation(const irep_idt l1_identifier, const ssa_exprt &lhs);
+  increase_generation(const irep_idt l1_identifier, const ssa_exprt &lhs)
+  {
+    return goto_statet::increase_generation(
+      l1_identifier, lhs, fresh_l2_name_provider);
+  }
 
   /// Increases the generation of the L1 identifier. Does nothing if there
   /// isn't an expression keyed by it.
