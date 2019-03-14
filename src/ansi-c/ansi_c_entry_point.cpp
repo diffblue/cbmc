@@ -268,10 +268,12 @@ bool generate_ansi_c_start_function(
         argc_symbol.is_lvalue = true;
         argc_symbol.mode = ID_C;
 
-        if(!symbol_table.insert(std::move(argc_symbol)).second)
+        auto r = symbol_table.insert(argc_symbol);
+        if(!r.second && r.first != argc_symbol)
         {
           messaget message(message_handler);
-          message.error() << "failed to insert argc symbol" << messaget::eom;
+          message.error() << "argc already exists but is not usable"
+                          << messaget::eom;
           return true;
         }
       }
@@ -295,10 +297,12 @@ bool generate_ansi_c_start_function(
         argv_symbol.is_lvalue = true;
         argv_symbol.mode = ID_C;
 
-        if(!symbol_table.insert(std::move(argv_symbol)).second)
+        auto r = symbol_table.insert(argv_symbol);
+        if(!r.second && r.first != argv_symbol)
         {
           messaget message(message_handler);
-          message.error() << "failed to insert argv symbol" << messaget::eom;
+          message.error() << "argv already exists but is not usable"
+                          << messaget::eom;
           return true;
         }
       }
