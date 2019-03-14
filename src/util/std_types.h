@@ -69,10 +69,10 @@ public:
   public:
     componentt() = default;
 
-    componentt(const irep_idt &_name, const typet &_type)
+    componentt(const irep_idt &_name, typet _type)
     {
       set_name(_name);
-      type()=_type;
+      type().swap(_type);
     }
 
     const irep_idt &get_name() const
@@ -148,8 +148,7 @@ public:
 
   typedef std::vector<componentt> componentst;
 
-  struct_union_typet(const irep_idt &_id, componentst &&_components)
-    : typet(_id)
+  struct_union_typet(const irep_idt &_id, componentst _components) : typet(_id)
   {
     components() = std::move(_components);
   }
@@ -244,7 +243,7 @@ public:
   {
   }
 
-  explicit struct_typet(componentst &&_components)
+  explicit struct_typet(componentst _components)
     : struct_union_typet(ID_struct, std::move(_components))
   {
   }
@@ -263,7 +262,7 @@ public:
   public:
     struct_tag_typet &type();
     const struct_tag_typet &type() const;
-    explicit baset(const struct_tag_typet &base);
+    explicit baset(struct_tag_typet base);
   };
 
   typedef std::vector<baset> basest;
@@ -398,7 +397,7 @@ public:
   {
   }
 
-  explicit union_typet(componentst &&_components)
+  explicit union_typet(componentst _components)
     : struct_union_typet(ID_union, std::move(_components))
   {
   }
@@ -621,8 +620,8 @@ inline enumeration_typet &to_enumeration_type(typet &type)
 class c_enum_typet:public type_with_subtypet
 {
 public:
-  explicit c_enum_typet(const typet &_subtype):
-    type_with_subtypet(ID_c_enum, _subtype)
+  explicit c_enum_typet(typet _subtype)
+    : type_with_subtypet(ID_c_enum, std::move(_subtype))
   {
   }
 
@@ -743,20 +742,10 @@ public:
   /// Constructs a new code type, i.e., function type.
   /// \param _parameters: The vector of function parameters.
   /// \param _return_type: The return type.
-  code_typet(parameterst &&_parameters, typet &&_return_type) : typet(ID_code)
+  code_typet(parameterst _parameters, typet _return_type) : typet(ID_code)
   {
     parameters().swap(_parameters);
     return_type().swap(_return_type);
-  }
-
-  /// Constructs a new code type, i.e., function type.
-  /// \param _parameters: The vector of function parameters.
-  /// \param _return_type: The return type.
-  code_typet(parameterst &&_parameters, const typet &_return_type)
-    : typet(ID_code)
-  {
-    parameters().swap(_parameters);
-    return_type() = _return_type;
   }
 
   /// \deprecated
@@ -986,11 +975,10 @@ inline code_typet &to_code_type(typet &type)
 class array_typet:public type_with_subtypet
 {
 public:
-  array_typet(
-    const typet &_subtype,
-    const exprt &_size):type_with_subtypet(ID_array, _subtype)
+  array_typet(typet _subtype, exprt _size)
+    : type_with_subtypet(ID_array, std::move(_subtype))
   {
-    size()=_size;
+    add(ID_size, std::move(_size));
   }
 
   const exprt &size() const
@@ -1458,10 +1446,10 @@ inline floatbv_typet &to_floatbv_type(typet &type)
 class c_bit_field_typet:public bitvector_typet
 {
 public:
-  explicit c_bit_field_typet(const typet &_subtype, std::size_t width)
+  explicit c_bit_field_typet(typet _subtype, std::size_t width)
     : bitvector_typet(ID_c_bit_field, width)
   {
-    subtype() = _subtype;
+    subtype().swap(_subtype);
   }
 
   // These have a sub-type
@@ -1503,10 +1491,10 @@ inline c_bit_field_typet &to_c_bit_field_type(typet &type)
 class pointer_typet:public bitvector_typet
 {
 public:
-  pointer_typet(const typet &_subtype, std::size_t width)
+  pointer_typet(typet _subtype, std::size_t width)
     : bitvector_typet(ID_pointer, width)
   {
-    subtype() = _subtype;
+    subtype().swap(_subtype);
   }
 
   signedbv_typet difference_type() const
@@ -1561,8 +1549,8 @@ inline pointer_typet &to_pointer_type(typet &type)
 class reference_typet:public pointer_typet
 {
 public:
-  reference_typet(const typet &_subtype, std::size_t _width):
-    pointer_typet(_subtype, _width)
+  reference_typet(typet _subtype, std::size_t _width)
+    : pointer_typet(std::move(_subtype), _width)
   {
     set(ID_C_reference, true);
   }
@@ -1798,8 +1786,8 @@ public:
   {
   }
 
-  explicit complex_typet(const typet &_subtype):
-    type_with_subtypet(ID_complex, _subtype)
+  explicit complex_typet(typet _subtype)
+    : type_with_subtypet(ID_complex, std::move(_subtype))
   {
   }
 };

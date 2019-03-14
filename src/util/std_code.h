@@ -206,10 +206,10 @@ public:
     add_to_operands(std::move(code));
   }
 
-  void add(codet code, const source_locationt &loc)
+  void add(codet code, source_locationt loc)
   {
-    code.add_source_location() = loc;
-    add(code);
+    code.add_source_location().swap(loc);
+    add(std::move(code));
   }
 
   void append(const code_blockt &extra_block);
@@ -290,8 +290,8 @@ public:
     operands().resize(2);
   }
 
-  code_assignt(const exprt &lhs, const exprt &rhs)
-    : codet(ID_assign, {lhs, rhs})
+  code_assignt(exprt lhs, exprt rhs)
+    : codet(ID_assign, {std::move(lhs), std::move(rhs)})
   {
   }
 
@@ -387,9 +387,8 @@ inline code_assignt &to_code_assign(codet &code)
 class code_declt:public codet
 {
 public:
-  explicit code_declt(const symbol_exprt &symbol) : codet(ID_decl)
+  explicit code_declt(symbol_exprt symbol) : codet(ID_decl, {std::move(symbol)})
   {
-    add_to_operands(symbol);
   }
 
   symbol_exprt &symbol()
@@ -453,7 +452,7 @@ inline code_declt &to_code_decl(codet &code)
 class code_deadt:public codet
 {
 public:
-  explicit code_deadt(const symbol_exprt &symbol) : codet(ID_dead, {symbol})
+  explicit code_deadt(symbol_exprt symbol) : codet(ID_dead, {std::move(symbol)})
   {
   }
 
@@ -527,7 +526,7 @@ public:
     operands().resize(1);
   }
 
-  explicit code_assumet(const exprt &expr) : codet(ID_assume, {expr})
+  explicit code_assumet(exprt expr) : codet(ID_assume, {std::move(expr)})
   {
   }
 
@@ -585,7 +584,7 @@ public:
     operands().resize(1);
   }
 
-  explicit code_assertt(const exprt &expr) : codet(ID_assert, {expr})
+  explicit code_assertt(exprt expr) : codet(ID_assert, {std::move(expr)})
   {
   }
 
@@ -660,17 +659,18 @@ public:
   }
 
   /// An if \p condition then \p then_code else \p else_code statement.
-  code_ifthenelset(
-    const exprt &condition,
-    const codet &then_code,
-    const codet &else_code)
-    : codet(ID_ifthenelse, {condition, then_code, else_code})
+  code_ifthenelset(exprt condition, codet then_code, codet else_code)
+    : codet(
+        ID_ifthenelse,
+        {std::move(condition), std::move(then_code), std::move(else_code)})
   {
   }
 
   /// An if \p condition then \p then_code statement (no "else" case).
-  code_ifthenelset(const exprt &condition, const codet &then_code)
-    : codet(ID_ifthenelse, {condition, then_code, nil_exprt()})
+  code_ifthenelset(exprt condition, codet then_code)
+    : codet(
+        ID_ifthenelse,
+        {std::move(condition), std::move(then_code), nil_exprt()})
   {
   }
 
@@ -752,8 +752,8 @@ public:
     operands().resize(2);
   }
 
-  code_switcht(const exprt &_value, const codet &_body)
-    : codet(ID_switch, {_value, _body})
+  code_switcht(exprt _value, codet _body)
+    : codet(ID_switch, {std::move(_value), std::move(_body)})
   {
   }
 
@@ -820,8 +820,8 @@ public:
     operands().resize(2);
   }
 
-  code_whilet(const exprt &_cond, const codet &_body)
-    : codet(ID_while, {_cond, _body})
+  code_whilet(exprt _cond, codet _body)
+    : codet(ID_while, {std::move(_cond), std::move(_body)})
   {
   }
 
@@ -888,8 +888,8 @@ public:
     operands().resize(2);
   }
 
-  code_dowhilet(const exprt &_cond, const codet &_body)
-    : codet(ID_dowhile, {_cond, _body})
+  code_dowhilet(exprt _cond, codet _body)
+    : codet(ID_dowhile, {std::move(_cond), std::move(_body)})
   {
   }
 
@@ -958,12 +958,13 @@ public:
 
   /// A statement describing a for loop with initializer \p _init, loop
   /// condition \p _cond, increment \p _iter, and body \p _body.
-  code_fort(
-    const exprt &_init,
-    const exprt &_cond,
-    const exprt &_iter,
-    const codet &_body)
-    : codet(ID_for, {_init, _cond, _iter, _body})
+  code_fort(exprt _init, exprt _cond, exprt _iter, codet _body)
+    : codet(
+        ID_for,
+        {std::move(_init),
+         std::move(_cond),
+         std::move(_iter),
+         std::move(_body)})
   {
   }
 
@@ -1114,46 +1115,27 @@ public:
     op2().id(ID_arguments);
   }
 
-  explicit code_function_callt(const exprt &_function) : codet(ID_function_call)
+  explicit code_function_callt(exprt _function)
+    : codet(
+        ID_function_call,
+        {nil_exprt(), std::move(_function), exprt(ID_arguments)})
   {
-    operands().resize(3);
-    lhs().make_nil();
-    op2().id(ID_arguments);
-    function() = _function;
   }
 
   typedef exprt::operandst argumentst;
 
-  code_function_callt(
-    const exprt &_lhs,
-    const exprt &_function,
-    argumentst &&_arguments)
-    : code_function_callt(_function)
-  {
-    lhs() = _lhs;
-    arguments() = std::move(_arguments);
-  }
-
-  code_function_callt(
-    const exprt &_lhs,
-    const exprt &_function,
-    const argumentst &_arguments)
-    : code_function_callt(_function)
-  {
-    lhs() = _lhs;
-    arguments() = _arguments;
-  }
-
-  code_function_callt(const exprt &_function, argumentst &&_arguments)
-    : code_function_callt(_function)
+  code_function_callt(exprt _lhs, exprt _function, argumentst _arguments)
+    : codet(
+        ID_function_call,
+        {std::move(_lhs), std::move(_function), exprt(ID_arguments)})
   {
     arguments() = std::move(_arguments);
   }
 
-  code_function_callt(const exprt &_function, const argumentst &_arguments)
-    : code_function_callt(_function)
+  code_function_callt(exprt _function, argumentst _arguments)
+    : code_function_callt(std::move(_function))
   {
-    arguments() = _arguments;
+    arguments() = std::move(_arguments);
   }
 
   exprt &lhs()
@@ -1264,7 +1246,7 @@ public:
   {
   }
 
-  explicit code_returnt(const exprt &_op) : codet(ID_return, {_op})
+  explicit code_returnt(exprt _op) : codet(ID_return, {std::move(_op)})
   {
   }
 
@@ -1338,8 +1320,8 @@ public:
     set_label(_label);
   }
 
-  code_labelt(const irep_idt &_label, const codet &_code)
-    : codet(ID_label, {_code})
+  code_labelt(const irep_idt &_label, codet _code)
+    : codet(ID_label, {std::move(_code)})
   {
     set_label(_label);
   }
@@ -1408,8 +1390,8 @@ public:
     operands().resize(2);
   }
 
-  code_switch_caset(const exprt &_case_op, const codet &_code)
-    : codet(ID_switch_case, {_case_op, _code})
+  code_switch_caset(exprt _case_op, codet _code)
+    : codet(ID_switch_case, {std::move(_case_op), std::move(_code)})
   {
   }
 
@@ -1642,7 +1624,7 @@ public:
   {
   }
 
-  explicit code_asmt(const exprt &expr) : codet(ID_asm, {expr})
+  explicit code_asmt(exprt expr) : codet(ID_asm, {std::move(expr)})
   {
   }
 
@@ -1785,7 +1767,8 @@ public:
     operands().resize(1);
   }
 
-  explicit code_expressiont(const exprt &expr) : codet(ID_expression, {expr})
+  explicit code_expressiont(exprt expr)
+    : codet(ID_expression, {std::move(expr)})
   {
   }
 
@@ -1853,27 +1836,27 @@ public:
     set_statement(statement);
   }
 
-  side_effect_exprt(
-    const irep_idt &statement,
-    const typet &_type,
-    const source_locationt &loc)
-    : exprt(ID_side_effect, _type)
-  {
-    set_statement(statement);
-    add_source_location() = loc;
-  }
-
   /// constructor with operands
   side_effect_exprt(
     const irep_idt &statement,
-    operandst &&_operands,
-    const typet &_type,
-    const source_locationt &loc)
-    : exprt(ID_side_effect, _type)
+    operandst _operands,
+    typet _type,
+    source_locationt loc)
+    : exprt(ID_side_effect, std::move(_type))
   {
     set_statement(statement);
     operands() = std::move(_operands);
-    add_source_location() = loc;
+    add_source_location().swap(loc);
+  }
+
+  side_effect_exprt(
+    const irep_idt &statement,
+    typet _type,
+    source_locationt loc)
+    : exprt(ID_side_effect, std::move(_type))
+  {
+    set_statement(statement);
+    add_source_location().swap(loc);
   }
 
   const irep_idt &get_statement() const
@@ -1939,8 +1922,8 @@ public:
     set_nullable(true);
   }
 
-  side_effect_expr_nondett(const typet &_type, const source_locationt &loc)
-    : side_effect_exprt(ID_nondet, _type, loc)
+  side_effect_expr_nondett(typet _type, source_locationt loc)
+    : side_effect_exprt(ID_nondet, std::move(_type), std::move(loc))
   {
     set_nullable(true);
   }
@@ -1996,25 +1979,15 @@ public:
 
   /// construct an assignment side-effect, given lhs, rhs and the type
   side_effect_expr_assignt(
-    const exprt &_lhs,
-    const exprt &_rhs,
-    const typet &_type,
-    const source_locationt &loc)
-    : side_effect_exprt(ID_assign, {_lhs, _rhs}, _type, loc)
-  {
-  }
-
-  /// construct an assignment side-effect, given lhs, rhs and the type
-  side_effect_expr_assignt(
-    exprt &&_lhs,
-    exprt &&_rhs,
-    typet &&_type,
-    const source_locationt &loc)
+    exprt _lhs,
+    exprt _rhs,
+    typet _type,
+    source_locationt loc)
     : side_effect_exprt(
         ID_assign,
         {std::move(_lhs), std::move(_rhs)},
         std::move(_type),
-        loc)
+        std::move(loc))
   {
   }
 
@@ -2104,17 +2077,17 @@ public:
   }
 
   side_effect_expr_function_callt(
-    const exprt &_function,
-    const exprt::operandst &_arguments,
-    const typet &_type,
-    const source_locationt &loc)
+    exprt _function,
+    exprt::operandst _arguments,
+    typet _type,
+    source_locationt loc)
     : side_effect_exprt(
         ID_function_call,
-        {_function, exprt(ID_arguments)},
-        _type,
-        loc)
+        {std::move(_function),
+         multi_ary_exprt{ID_arguments, std::move(_arguments), typet{}}},
+        std::move(_type),
+        std::move(loc))
   {
-    arguments() = _arguments;
   }
 
   exprt &function()
@@ -2174,12 +2147,12 @@ public:
   }
 
   side_effect_expr_throwt(
-    const irept &exception_list,
-    const typet &type,
-    const source_locationt &loc)
-    : side_effect_exprt(ID_throw, type, loc)
+    irept exception_list,
+    typet type,
+    source_locationt loc)
+    : side_effect_exprt(ID_throw, std::move(type), std::move(loc))
   {
-    set(ID_exception_list, exception_list);
+    set(ID_exception_list, std::move(exception_list));
   }
 };
 
@@ -2356,11 +2329,12 @@ class code_landingpadt:public codet
   {
     operands().resize(1);
   }
-  explicit code_landingpadt(const exprt &catch_expr):
-  codet(ID_exception_landingpad)
+
+  explicit code_landingpadt(exprt catch_expr)
+    : codet(ID_exception_landingpad, {std::move(catch_expr)})
   {
-    add_to_operands(catch_expr);
   }
+
   const exprt &catch_expr() const
   {
     return op0();
@@ -2408,8 +2382,8 @@ public:
   }
 
   /// A statement representing try \p _try_code catch ...
-  explicit code_try_catcht(const codet &_try_code)
-    : codet(ID_try_catch, {_try_code})
+  explicit code_try_catcht(codet _try_code)
+    : codet(ID_try_catch, {std::move(_try_code)})
   {
   }
 

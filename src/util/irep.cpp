@@ -189,7 +189,7 @@ irept &irept::add(const irep_namet &name)
 #endif
 }
 
-irept &irept::add(const irep_namet &name, const irept &irep)
+irept &irept::add(const irep_namet &name, irept irep)
 {
   named_subt &s = get_named_sub();
 
@@ -202,18 +202,20 @@ irept &irept::add(const irep_namet &name, const irept &irep)
     named_subt::iterator before = s.before_begin();
     while(std::next(before) != it)
       ++before;
-    it = s.emplace_after(before, name, irep);
+    it = s.emplace_after(before, name, std::move(irep));
   }
   else
-    it->second=irep;
+    it->second = std::move(irep);
 
   return it->second;
 #else
-  std::pair<named_subt::iterator, bool> entry=
-    s.insert(std::make_pair(name, irep));
+  std::pair<named_subt::iterator, bool> entry = s.emplace(
+    std::piecewise_construct,
+    std::forward_as_tuple(name),
+    std::forward_as_tuple(irep));
 
   if(!entry.second)
-    entry.first->second=irep;
+    entry.first->second = std::move(irep);
 
   return entry.first->second;
 #endif

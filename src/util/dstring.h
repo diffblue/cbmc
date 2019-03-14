@@ -71,6 +71,18 @@ public:
   {
   }
 
+  dstringt(const dstringt &) = default;
+
+  /// Move constructor. There is no need and no point in actually destroying the
+  /// source object \p other, this is effectively just a copy constructor.
+#ifdef __GNUC__
+  constexpr
+#endif
+    dstringt(dstringt &&other)
+    : no(other.no)
+  {
+  }
+
   // access
 
   bool empty() const
@@ -135,6 +147,14 @@ public:
 
   dstringt &operator=(const dstringt &b)
   { no=b.no; return *this; }
+
+  /// Move assignment. There is no need and no point in actually destroying the
+  /// source object \p other, this is effectively just an assignment.
+  dstringt &operator=(dstringt &&other)
+  {
+    no = other.no;
+    return *this;
+  }
 
   // output
 

@@ -80,7 +80,8 @@ const struct_tag_typet &struct_typet::baset::type() const
   return to_struct_tag_type(exprt::type());
 }
 
-struct_typet::baset::baset(const struct_tag_typet &base) : exprt(ID_base, base)
+struct_typet::baset::baset(struct_tag_typet base)
+  : exprt(ID_base, std::move(base))
 {
 }
 

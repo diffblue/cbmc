@@ -421,7 +421,7 @@ public:
 
   const irept &find(const irep_namet &name) const;
   irept &add(const irep_namet &name);
-  irept &add(const irep_namet &name, const irept &irep);
+  irept &add(const irep_namet &name, irept irep);
 
   const std::string &get_string(const irep_namet &name) const
   {
@@ -435,9 +435,13 @@ public:
   long long get_long_long(const irep_namet &name) const;
 
   void set(const irep_namet &name, const irep_idt &value)
-  { add(name).id(value); }
-  void set(const irep_namet &name, const irept &irep)
-  { add(name, irep); }
+  {
+    add(name, irept(value));
+  }
+  void set(const irep_namet &name, irept irep)
+  {
+    add(name, std::move(irep));
+  }
   void set(const irep_namet &name, const long long value);
 
   void remove(const irep_namet &name);

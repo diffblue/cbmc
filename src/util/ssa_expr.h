@@ -18,7 +18,7 @@ class ssa_exprt:public symbol_exprt
 public:
   /// Constructor
   /// \param expr: Expression to be converted to SSA symbol
-  explicit ssa_exprt(const exprt &expr) : symbol_exprt(irep_idt(), expr.type())
+  explicit ssa_exprt(const exprt &expr) : symbol_exprt(expr.type())
   {
     set(ID_C_SSA_symbol, true);
     add(ID_expression, expr);
@@ -42,15 +42,13 @@ public:
     if(original_expr.id() == ID_symbol)
       return to_symbol_expr(original_expr).get_identifier();
 
-    object_descriptor_exprt ode;
-    ode.object() = original_expr;
+    object_descriptor_exprt ode(original_expr);
     return to_symbol_expr(ode.root_object()).get_identifier();
   }
 
   const ssa_exprt get_l1_object() const
   {
-    object_descriptor_exprt ode;
-    ode.object()=get_original_expr();
+    object_descriptor_exprt ode(get_original_expr());
 
     ssa_exprt root(ode.root_object());
     root.set(ID_L0, get(ID_L0));
