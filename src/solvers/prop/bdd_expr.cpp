@@ -91,6 +91,30 @@ bddt bdd_exprt::from_expr(const exprt &expr)
   return from_expr_rec(expr);
 }
 
+/// Conjunction of two expressions. If the second is already an `and_exprt`
+/// add to its operands instead of creating a new expression.
+static exprt make_and(exprt a, exprt b)
+{
+  if(b.id() == ID_and)
+  {
+    b.add_to_operands(std::move(a));
+    return b;
+  }
+  return and_exprt{std::move(a), std::move(b)};
+}
+
+/// Disjunction of two expressions. If the second is already an `or_exprt`
+/// add to its operands instead of creating a new expression.
+static exprt make_or(exprt a, exprt b)
+{
+  if(b.id() == ID_or)
+  {
+    b.add_to_operands(std::move(a));
+    return b;
+  }
+  return or_exprt{std::move(a), std::move(b)};
+}
+
 /// Helper function for \c bddt to \c exprt conversion
 /// \param r: node to convert
 /// \param complement: whether we want the negation of the expression
@@ -130,14 +154,14 @@ exprt bdd_exprt::as_expr(
         {
           if(r.else_branch().is_complement() != complement)
           {
-            return and_exprt(
+            return make_and(
               n_expr,
               as_expr(
                 r.then_branch(),
                 complement != r.then_branch().is_complement(),
                 cache));
           }
-          return or_exprt(
+          return make_or(
             not_exprt(n_expr),
             as_expr(
               r.then_branch(),
@@ -149,14 +173,14 @@ exprt bdd_exprt::as_expr(
       {
         if(r.then_branch().is_complement() != complement)
         {
-          return and_exprt(
+          return make_and(
             not_exprt(n_expr),
             as_expr(
               r.else_branch(),
               complement != r.else_branch().is_complement(),
               cache));
         }
-        return or_exprt(
+        return make_or(
           n_expr,
           as_expr(
             r.else_branch(),
