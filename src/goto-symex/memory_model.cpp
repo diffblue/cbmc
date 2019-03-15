@@ -13,9 +13,8 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 
 #include <util/std_expr.h>
 
-memory_model_baset::memory_model_baset(const namespacet &_ns):
-  partial_order_concurrencyt(_ns),
-  var_cnt(0)
+memory_model_baset::memory_model_baset(const namespacet &_ns)
+  : partial_order_concurrencyt(_ns), var_cnt(0)
 {
 }
 
@@ -23,19 +22,17 @@ memory_model_baset::~memory_model_baset()
 {
 }
 
-symbol_exprt memory_model_baset::nondet_bool_symbol(
-  const std::string &prefix)
+symbol_exprt memory_model_baset::nondet_bool_symbol(const std::string &prefix)
 {
   return symbol_exprt(
-    "memory_model::choice_"+prefix+std::to_string(var_cnt++),
-    bool_typet());
+    "memory_model::choice_" + prefix + std::to_string(var_cnt++), bool_typet());
 }
 
 bool memory_model_baset::po(event_it e1, event_it e2)
 {
   // within same thread
-  if(e1->source.thread_nr==e2->source.thread_nr)
-    return numbering[e1]<numbering[e2];
+  if(e1->source.thread_nr == e2->source.thread_nr)
+    return numbering[e1] < numbering[e2];
   else
   {
     // in general un-ordered, with exception of thread-spawning
@@ -88,7 +85,7 @@ symbol_exprt memory_model_baset::register_read_from_choice_symbol(
   const event_it &w,
   symex_target_equationt &equation)
 {
-  symbol_exprt s=nondet_bool_symbol("rf");
+  symbol_exprt s = nondet_bool_symbol("rf");
 
   // record the symbol
   choice_symbols.emplace(std::make_pair(r, w), s);
