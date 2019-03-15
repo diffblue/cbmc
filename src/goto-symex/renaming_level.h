@@ -16,6 +16,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <unordered_set>
 
 #include <util/irep.h>
+#include <util/simplify_expr.h>
 #include <util/ssa_expr.h>
 
 /// Symex renaming level names.
@@ -79,6 +80,11 @@ public:
   const underlyingt &get() const
   {
     return value;
+  }
+
+  void simplify(const namespacet &ns)
+  {
+    (void)::simplify(value, ns);
   }
 
 private:
