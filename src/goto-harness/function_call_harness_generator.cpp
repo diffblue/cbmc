@@ -272,7 +272,8 @@ void function_call_harness_generatort::implt::generate_initialisation_code_for(
   recursive_initialization->initialize(lhs, 0, {}, block);
 }
 
-void function_call_harness_generatort::validate_options()
+void function_call_harness_generatort::validate_options(
+  const goto_modelt &goto_model)
 {
   if(p_impl->function == ID_empty)
     throw invalid_command_line_argument_exceptiont{

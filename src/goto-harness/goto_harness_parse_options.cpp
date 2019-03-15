@@ -25,6 +25,7 @@ Author: Diffblue Ltd.
 
 #include "function_call_harness_generator.h"
 #include "goto_harness_generator_factory.h"
+#include "memory_snapshot_harness_generator.h"
 
 // The basic idea is that this module is handling the following
 // sequence of events:
@@ -49,11 +50,6 @@ int goto_harness_parse_optionst::doit()
 
   auto factory_options = collect_generate_factory_options();
 
-  // Initialise harness generator
-  auto harness_generator =
-    factory.factory(got_harness_config.harness_type, factory_options);
-  CHECK_RETURN(harness_generator != nullptr);
-
   // This just sets up the defaults (and would interpret options such as --32).
   config.set(cmdline);
 
@@ -66,7 +62,27 @@ int goto_harness_parse_optionst::doit()
                                      got_harness_config.in_file + "'"};
   }
   auto goto_model = std::move(read_goto_binary_result.value());
+
+  // This has to be called after the defaults are set up (as per the
+  // config.set(cmdline) above) otherwise, e.g. the architecture specification
+  // will be unknown.
   config.set_from_symbol_table(goto_model.symbol_table);
+
+  if(goto_model.symbol_table.has_symbol(
+       got_harness_config.harness_function_name))
+  {
+    throw invalid_command_line_argument_exceptiont(
+      "harness function `" +
+        id2string(got_harness_config.harness_function_name) +
+        "` already in "
+        "the symbol table",
+      "--" GOTO_HARNESS_GENERATOR_HARNESS_FUNCTION_NAME_OPT);
+  }
+
+  // Initialise harness generator
+  auto harness_generator = factory.factory(
+    got_harness_config.harness_type, factory_options, goto_model);
+  CHECK_RETURN(harness_generator != nullptr);
 
   harness_generator->generate(
     goto_model, got_harness_config.harness_function_name);
@@ -103,7 +119,8 @@ void goto_harness_parse_optionst::help()
        "generate\n"
     << "--harness-type             one of the harness types listed below\n"
     << "\n\n"
-    << FUNCTION_HARNESS_GENERATOR_HELP << messaget::eom;
+    << FUNCTION_HARNESS_GENERATOR_HELP << "\n\n"
+    << MEMORY_SNAPSHOT_HARNESS_GENERATOR_HELP << messaget::eom;
 }
 
 goto_harness_parse_optionst::goto_harness_parse_optionst(
@@ -162,6 +179,12 @@ goto_harness_generator_factoryt goto_harness_parse_optionst::make_factory()
     return util_make_unique<function_call_harness_generatort>(
       ui_message_handler);
   });
+
+  factory.register_generator("initialise-with-memory-snapshot", [this]() {
+    return util_make_unique<memory_snapshot_harness_generatort>(
+      ui_message_handler);
+  });
+
   return factory;
 }
 

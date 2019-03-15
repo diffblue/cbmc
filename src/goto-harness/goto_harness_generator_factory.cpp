@@ -31,7 +31,8 @@ void goto_harness_generator_factoryt::register_generator(
 std::unique_ptr<goto_harness_generatort>
 goto_harness_generator_factoryt::factory(
   const std::string &generator_name,
-  const generator_optionst &generator_options)
+  const generator_optionst &generator_options,
+  const goto_modelt &goto_model)
 {
   auto it = generators.find(generator_name);
 
@@ -42,7 +43,7 @@ goto_harness_generator_factoryt::factory(
     {
       generator->handle_option(option.first, option.second);
     }
-    generator->validate_options();
+    generator->validate_options(goto_model);
 
     return generator;
   }

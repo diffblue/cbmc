@@ -1,0 +1,181 @@
+{
+  "symbolTable": {
+    "x": {
+      "baseName": "x",
+      "isAuxiliary": false,
+      "isExported": false,
+      "isExtern": false,
+      "isFileLocal": false,
+      "isInput": false,
+      "isLvalue": true,
+      "isMacro": false,
+      "isOutput": false,
+      "isParameter": false,
+      "isProperty": false,
+      "isStateVar": false,
+      "isStaticLifetime": true,
+      "isThreadLocal": false,
+      "isType": false,
+      "isVolatile": false,
+      "isWeak": false,
+      "location": {},
+      "mode": "C",
+      "module": "test",
+      "name": "x",
+      "prettyName": "x",
+      "type": {
+        "id": "array",
+        "namedSub": {
+          "#source_location": {},
+          "size": {
+            "id": "constant",
+            "namedSub": {
+              "type": {
+                "id": "signedbv",
+                "namedSub": {
+                  "#c_type": {
+                    "id": "signed_long_int"
+                  },
+                  "width": {
+                    "id": "64"
+                  }
+                }
+              },
+              "value": {
+                "id": "3"
+              }
+            }
+          }
+        },
+        "sub": [
+          {
+            "id": "signedbv",
+            "namedSub": {
+              "#c_type": {
+                "id": "signed_int"
+              },
+              "width": {
+                "id": "32"
+              }
+            }
+          }
+        ]
+      },
+      "value": {
+        "id": "array",
+        "namedSub": {
+          "#source_location": {},
+          "type": {
+            "id": "array",
+            "namedSub": {
+              "#source_location": {},
+              "size": {
+                "id": "constant",
+                "namedSub": {
+                  "type": {
+                    "id": "signedbv",
+                    "namedSub": {
+                      "#c_type": {
+                        "id": "signed_long_int"
+                      },
+                      "width": {
+                        "id": "64"
+                      }
+                    }
+                  },
+                  "value": {
+                    "id": "3"
+                  }
+                }
+              }
+            },
+            "sub": [
+              {
+                "id": "signedbv",
+                "namedSub": {
+                  "#c_type": {
+                    "id": "signed_int"
+                  },
+                  "width": {
+                    "id": "32"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "sub": [
+          {
+            "id": "constant",
+            "namedSub": {
+              "#base": {
+                "id": "10"
+              },
+              "#source_location": {},
+              "type": {
+                "id": "signedbv",
+                "namedSub": {
+                  "#c_type": {
+                    "id": "signed_int"
+                  },
+                  "width": {
+                    "id": "32"
+                  }
+                }
+              },
+              "value": {
+                "id": "4"
+              }
+            }
+          },
+          {
+            "id": "constant",
+            "namedSub": {
+              "#base": {
+                "id": "10"
+              },
+              "#source_location": {},
+              "type": {
+                "id": "signedbv",
+                "namedSub": {
+                  "#c_type": {
+                    "id": "signed_int"
+                  },
+                  "width": {
+                    "id": "32"
+                  }
+                }
+              },
+              "value": {
+                "id": "5"
+              }
+            }
+          },
+          {
+            "id": "constant",
+            "namedSub": {
+              "#base": {
+                "id": "10"
+              },
+              "#source_location": {},
+              "type": {
+                "id": "signedbv",
+                "namedSub": {
+                  "#c_type": {
+                    "id": "signed_int"
+                  },
+                  "width": {
+                    "id": "32"
+                  }
+                }
+              },
+              "value": {
+                "id": "6"
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

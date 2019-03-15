@@ -24,8 +24,9 @@ if [ -e "${name}-mod.gb" ] ; then
 fi
 
 # `# some comment` is an inline comment - basically, cause bash to execute an empty command
-
+$cbmc --show-goto-functions "${name}.gb"
 $goto_harness "${name}.gb" "${name}-mod.gb" --harness-function-name $entry_point ${args}
+$cbmc --show-goto-functions "${name}-mod.gb"
 $cbmc --function $entry_point "${name}-mod.gb" \
   --pointer-check `# because we want to see out of bounds errors` \
   --unwind 11 `# with the way we set up arrays symex can't figure out loop bounds automatically` \
