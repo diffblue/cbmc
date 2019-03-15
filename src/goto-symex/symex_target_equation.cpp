@@ -188,7 +188,7 @@ void symex_target_equationt::location(
 void symex_target_equationt::function_call(
   const exprt &guard,
   const irep_idt &function_id,
-  const std::vector<exprt> &ssa_function_arguments,
+  const std::vector<renamedt<exprt, L2>> &function_arguments,
   const sourcet &source,
   const bool hidden)
 {
@@ -197,7 +197,8 @@ void symex_target_equationt::function_call(
 
   SSA_step.guard = guard;
   SSA_step.called_function = function_id;
-  SSA_step.ssa_function_arguments = ssa_function_arguments;
+  for(const auto &arg : function_arguments)
+    SSA_step.ssa_function_arguments.emplace_back(arg.get());
   SSA_step.hidden = hidden;
 
   merge_ireps(SSA_step);

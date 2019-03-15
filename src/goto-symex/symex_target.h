@@ -14,6 +14,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/goto_program.h>
 
+#include "renaming_level.h"
+
 class ssa_exprt;
 class symbol_exprt;
 
@@ -155,7 +157,7 @@ public:
   virtual void function_call(
     const exprt &guard,
     const irep_idt &function_id,
-    const std::vector<exprt> &ssa_function_arguments,
+    const std::vector<renamedt<exprt, L2>> &ssa_function_arguments,
     const sourcet &source,
     bool hidden) = 0;
 

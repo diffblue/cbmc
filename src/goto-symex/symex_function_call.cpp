@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/exception_utils.h>
 #include <util/invariant.h>
 #include <util/prefix.h>
+#include <util/range.h>
 
 static void locality(
   const irep_idt &function_identifier,
@@ -270,9 +271,10 @@ void goto_symext::symex_function_call_code(
   }
 
   // read the arguments -- before the locality renaming
-  exprt::operandst arguments = call.arguments();
-  for(auto &a : arguments)
-    a = state.rename(std::move(a), ns).get();
+  const exprt::operandst &arguments = call.arguments();
+  const std::vector<renamedt<exprt, L2>> renamed_arguments =
+    make_range(arguments).map(
+      [&](const exprt &a) { return state.rename(a, ns); });
 
   // we hide the call if the caller and callee are both hidden
   const bool callee_is_hidden = ns.lookup(identifier).is_hidden();
@@ -281,7 +283,7 @@ void goto_symext::symex_function_call_code(
 
   // record the call
   target.function_call(
-    state.guard.as_expr(), identifier, arguments, state.source, hidden);
+    state.guard.as_expr(), identifier, renamed_arguments, state.source, hidden);
 
   if(!goto_function.body_available())
   {
