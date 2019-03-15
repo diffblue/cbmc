@@ -224,13 +224,14 @@ void symex_target_equationt::output(
   const exprt &guard,
   const sourcet &source,
   const irep_idt &output_id,
-  const std::list<exprt> &args)
+  const std::list<renamedt<exprt, L2>> &args)
 {
   SSA_steps.emplace_back(source, goto_trace_stept::typet::OUTPUT);
   SSA_stept &SSA_step=SSA_steps.back();
 
   SSA_step.guard=guard;
-  SSA_step.io_args=args;
+  for(const auto &arg : args)
+    SSA_step.io_args.emplace_back(arg.get());
   SSA_step.io_id=output_id;
 
   merge_ireps(SSA_step);

@@ -191,7 +191,7 @@ public:
     const exprt &guard,
     const sourcet &source,
     const irep_idt &output_id,
-    const std::list<exprt> &args)=0;
+    const std::list<renamedt<exprt, L2>> &args) = 0;
 
   /// Record formatted output.
   /// \param guard: Precondition for writing to the output

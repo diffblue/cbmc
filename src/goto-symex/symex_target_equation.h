@@ -109,7 +109,7 @@ public:
     const exprt &guard,
     const sourcet &source,
     const irep_idt &output_id,
-    const std::list<exprt> &args);
+    const std::list<renamedt<exprt, L2>> &args);
 
   /// \copydoc symex_targett::output_fmt()
   virtual void output_fmt(

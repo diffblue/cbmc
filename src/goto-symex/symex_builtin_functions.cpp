@@ -358,13 +358,14 @@ void goto_symext::symex_output(
   PRECONDITION(code.operands().size() >= 2);
   exprt id_arg = state.rename(code.op0(), ns).get();
 
-  std::list<exprt> args;
+  std::list<renamedt<exprt, L2>> args;
 
   for(std::size_t i=1; i<code.operands().size(); i++)
   {
-    exprt l2_arg = state.rename(code.operands()[i], ns).get();
-    do_simplify(l2_arg);
-    args.emplace_back(std::move(l2_arg));
+    renamedt<exprt, L2> l2_arg = state.rename(code.operands()[i], ns);
+    if(symex_config.simplify_opt)
+      l2_arg.simplify(ns);
+    args.emplace_back(l2_arg);
   }
 
   const irep_idt output_id=get_string_argument(id_arg, ns);
@@ -470,12 +471,12 @@ void goto_symext::symex_trace(
 
   if(symex_config.debug_level >= debug_lvl)
   {
-    std::list<exprt> vars;
+    std::list<renamedt<exprt, L2>> vars;
 
     irep_idt event = to_string_constant(code.arguments()[1].op0()).get_value();
 
     for(std::size_t j=2; j<code.arguments().size(); j++)
-      vars.push_back(state.rename(code.arguments()[j], ns).get());
+      vars.push_back(state.rename(code.arguments()[j], ns));
 
     target.output(state.guard.as_expr(), state.source, event, vars);
   }
