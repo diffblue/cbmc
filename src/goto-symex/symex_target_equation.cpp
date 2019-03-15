@@ -304,14 +304,14 @@ void symex_target_equationt::assertion(
 
 void symex_target_equationt::goto_instruction(
   const exprt &guard,
-  const exprt &cond,
+  const renamedt<exprt, L2> &cond,
   const sourcet &source)
 {
   SSA_steps.emplace_back(source, goto_trace_stept::typet::GOTO);
   SSA_stept &SSA_step=SSA_steps.back();
 
   SSA_step.guard=guard;
-  SSA_step.cond_expr=cond;
+  SSA_step.cond_expr = cond.get();
 
   merge_ireps(SSA_step);
 }

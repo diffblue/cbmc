@@ -248,8 +248,8 @@ public:
   ///  goto instruction
   virtual void goto_instruction(
     const exprt &guard,
-    const exprt &cond,
-    const sourcet &source)=0;
+    const renamedt<exprt, L2> &cond,
+    const sourcet &source) = 0;
 
   /// Record a _global_ constraint: there is no guard limiting its scope.
   /// \param cond: Condition represented by this constraint

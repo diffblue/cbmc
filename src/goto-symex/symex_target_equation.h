@@ -142,7 +142,7 @@ public:
   /// \copydoc symex_targett::goto_instruction()
   virtual void goto_instruction(
     const exprt &guard,
-    const exprt &cond,
+    const renamedt<exprt, L2> &cond,
     const sourcet &source);
 
   /// \copydoc symex_targett::constraint()
