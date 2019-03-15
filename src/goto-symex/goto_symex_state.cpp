@@ -31,13 +31,15 @@ static void get_l1_name(exprt &expr);
 
 goto_symex_statet::goto_symex_statet(
   const symex_targett::sourcet &_source,
-  guard_managert &manager)
+  guard_managert &manager,
+  std::function<std::size_t(const irep_idt &)> fresh_l2_name_provider)
   : goto_statet(manager),
     source(_source),
     guard_manager(manager),
     symex_target(nullptr),
     record_events(true),
-    dirty()
+    dirty(),
+    fresh_l2_name_provider(fresh_l2_name_provider)
 {
   threads.emplace_back(guard_manager);
   call_stack().new_frame(source);
@@ -213,9 +215,7 @@ void goto_symex_statet::assignment(
 #endif
 
   // do the l2 renaming
-  const auto level2_it =
-    level2.current_names.emplace(l1_identifier, std::make_pair(lhs, 0)).first;
-  symex_renaming_levelt::increase_counter(level2_it);
+  increase_generation(l1_identifier, lhs);
   lhs = set_indices<L2>(std::move(lhs), ns).get();
 
   // in case we happen to be multi-threaded, record the memory access
@@ -440,10 +440,7 @@ bool goto_symex_statet::l2_thread_read_encoding(
 
     if(a_s_read.second.empty())
     {
-      auto level2_it =
-        level2.current_names.emplace(l1_identifier, std::make_pair(ssa_l1, 0))
-          .first;
-      symex_renaming_levelt::increase_counter(level2_it);
+      increase_generation(l1_identifier, ssa_l1);
       a_s_read.first=level2.current_count(l1_identifier);
     }
     const renamedt<ssa_exprt, L2> l2_false_case = set_indices<L2>(ssa_l1, ns);
@@ -477,10 +474,6 @@ bool goto_symex_statet::l2_thread_read_encoding(
     return true;
   }
 
-  const auto level2_it =
-    level2.current_names.emplace(l1_identifier, std::make_pair(ssa_l1, 0))
-      .first;
-
   // No event and no fresh index, but avoid constant propagation
   if(!record_events)
   {
@@ -489,7 +482,7 @@ bool goto_symex_statet::l2_thread_read_encoding(
   }
 
   // produce a fresh L2 name
-  symex_renaming_levelt::increase_counter(level2_it);
+  increase_generation(l1_identifier, ssa_l1);
   expr = set_indices<L2>(std::move(ssa_l1), ns).get();
 
   // and record that
@@ -498,6 +491,35 @@ bool goto_symex_statet::l2_thread_read_encoding(
   symex_target->shared_read(guard_as_expr, expr, atomic_section_id, source);
 
   return true;
+}
+
+/// Allocates a fresh L2 name for the given L1 identifier, and makes it the
+/// latest generation on this path.
+/// \return the newly allocated generation number
+std::size_t goto_symex_statet::increase_generation(
+  const irep_idt l1_identifier,
+  const ssa_exprt &lhs)
+{
+  auto current_emplace_res =
+    level2.current_names.emplace(l1_identifier, std::make_pair(lhs, 0));
+
+  current_emplace_res.first->second.second =
+    fresh_l2_name_provider(l1_identifier);
+
+  return current_emplace_res.first->second.second;
+}
+
+/// Allocates a fresh L2 name for the given L1 identifier, and makes it the
+/// latest generation on this path. Does nothing if there isn't an expression
+/// keyed by the l1 identifier.
+void goto_symex_statet::increase_generation_if_exists(const irep_idt identifier)
+{
+  // If we can't find the name in the local scope, this is a no-op.
+  auto current_names_iter = level2.current_names.find(identifier);
+  if(current_names_iter == level2.current_names.end())
+    return;
+
+  current_names_iter->second.second = fresh_l2_name_provider(identifier);
 }
 
 /// thread encoding

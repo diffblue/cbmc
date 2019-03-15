@@ -210,17 +210,26 @@ void goto_symext::symex_goto(statet &state)
   // merge_gotos when we visit new_state_pc
   framet::goto_state_listt &goto_state_list =
     state.call_stack().top().goto_state_map[new_state_pc];
-  goto_state_list.emplace_back(state.source, state);
 
-  symex_transition(state, state_pc, backward);
-
-  // adjust guards
+  // On an unconditional GOTO we don't need our state, as it will be overwritten
+  // by merge_goto. Therefore we move it onto goto_state_list instead of copying
+  // as usual.
   if(new_guard.is_true())
   {
+    // The move here only moves goto_statet, the base class of goto_symex_statet
+    // and not the entire thing.
+    goto_state_list.emplace_back(state.source, std::move(state));
+
+    symex_transition(state, state_pc, backward);
+
     state.guard = guardt(false_exprt(), guard_manager);
   }
   else
   {
+    goto_state_list.emplace_back(state.source, state);
+
+    symex_transition(state, state_pc, backward);
+
     // produce new guard symbol
     exprt guard_expr;
 
@@ -319,20 +328,28 @@ void goto_symext::merge_goto(
       "atomic sections differ across branches",
       state.source.pc->source_location);
 
-  // do SSA phi functions
-  phi_function(goto_state, state);
+  if(!goto_state.guard.is_false())
+  {
+    if(state.guard.is_false())
+    {
+      // Important to note that we're moving into our base class here.
+      static_cast<goto_statet &>(state) = std::move(goto_state);
+    }
+    else
+    {
+      // do SSA phi functions
+      phi_function(goto_state, state);
 
-  // merge value sets
-  if(state.guard.is_false() && !goto_state.guard.is_false())
-    state.value_set = std::move(goto_state.value_set);
-  else if(!goto_state.guard.is_false())
-    state.value_set.make_union(goto_state.value_set);
+      // merge value sets
+      state.value_set.make_union(goto_state.value_set);
 
-  // adjust guard
-  state.guard|=goto_state.guard;
+      // adjust guard
+      state.guard |= goto_state.guard;
 
-  // adjust depth
-  state.depth=std::min(state.depth, goto_state.depth);
+      // adjust depth
+      state.depth = std::min(state.depth, goto_state.depth);
+    }
+  }
 }
 
 /// Applies f to `(k, ssa, i, j)` if the first map maps k to (ssa, i) and
@@ -505,8 +522,8 @@ void goto_symext::phi_function(
   statet &dest_state)
 {
   if(
-    goto_state.level2.current_names.empty() &&
-    dest_state.level2.current_names.empty())
+    goto_state.get_level2().current_names.empty() &&
+    dest_state.get_level2().current_names.empty())
     return;
 
   guardt diff_guard = goto_state.guard;
@@ -514,8 +531,8 @@ void goto_symext::phi_function(
   diff_guard -= dest_state.guard;
 
   for_each2(
-    goto_state.level2.current_names,
-    dest_state.level2.current_names,
+    goto_state.get_level2().current_names,
+    dest_state.get_level2().current_names,
     [&](const ssa_exprt &ssa, unsigned goto_count, unsigned dest_count) {
       merge_names(
         goto_state,

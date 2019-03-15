@@ -45,7 +45,5 @@ void goto_symext::symex_dead(statet &state)
   state.propagation.erase(l1_identifier);
   // increment the L2 index to ensure a merge on join points will propagate the
   // value for branches that are still live
-  auto level2_it = state.level2.current_names.find(l1_identifier);
-  if(level2_it != state.level2.current_names.end())
-    symex_renaming_levelt::increase_counter(level2_it);
+  state.increase_generation_if_exists(l1_identifier);
 }

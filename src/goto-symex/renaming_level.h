@@ -32,7 +32,13 @@ enum levelt
 /// during symex to ensure static single assignment (SSA) form.
 struct symex_renaming_levelt
 {
+  symex_renaming_levelt() = default;
   virtual ~symex_renaming_levelt() = default;
+  symex_renaming_levelt &
+  operator=(const symex_renaming_levelt &other) = default;
+  symex_renaming_levelt &operator=(symex_renaming_levelt &&other) = default;
+  symex_renaming_levelt(const symex_renaming_levelt &other) = default;
+  symex_renaming_levelt(symex_renaming_levelt &&other) = default;
 
   /// Map identifier to ssa_exprt and counter
   typedef std::map<irep_idt, std::pair<ssa_exprt, unsigned>> current_namest;
@@ -125,6 +131,10 @@ struct symex_level2t : public symex_renaming_levelt
 
   symex_level2t() = default;
   ~symex_level2t() override = default;
+  symex_level2t &operator=(const symex_level2t &other) = default;
+  symex_level2t &operator=(symex_level2t &&other) = default;
+  symex_level2t(const symex_level2t &other) = default;
+  symex_level2t(symex_level2t &&other) = default;
 };
 
 /// Undo all levels of renaming

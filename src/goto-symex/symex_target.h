@@ -53,6 +53,15 @@ public:
         pc(_goto_program.instructions.begin())
     {
     }
+
+    sourcet(sourcet &&other) noexcept
+      : thread_nr(other.thread_nr), function_id(other.function_id), pc(other.pc)
+    {
+    }
+
+    sourcet(const sourcet &other) = default;
+    sourcet &operator=(const sourcet &other) = default;
+    sourcet &operator=(sourcet &&other) = default;
   };
 
   enum class assignment_typet

@@ -349,8 +349,8 @@ static void pop_frame(goto_symext::statet &state)
     state.level1.restore_from(frame.old_level1);
 
     // clear function-locals from L2 renaming
-    for(auto c_it = state.level2.current_names.begin();
-        c_it != state.level2.current_names.end();) // no ++c_it
+    for(auto c_it = state.get_level2().current_names.begin();
+        c_it != state.get_level2().current_names.end();) // no ++c_it
     {
       const irep_idt l1_o_id=c_it->second.first.get_l1_object_identifier();
       // could use iteration over local_objects as l1_o_id is prefix
@@ -364,7 +364,7 @@ static void pop_frame(goto_symext::statet &state)
       }
       auto cur = c_it;
       ++c_it;
-      state.level2.current_names.erase(cur);
+      state.drop_l1_name(cur);
     }
   }
 
@@ -402,7 +402,7 @@ static void locality(
     (void)state.add_object(
       ns.lookup(param).symbol_expr(),
       [&path_storage, &frame_nr](const irep_idt &l0_name) {
-        return path_storage.get_unique_index(l0_name, frame_nr);
+        return path_storage.get_unique_l1_index(l0_name, frame_nr);
       },
       ns);
   }

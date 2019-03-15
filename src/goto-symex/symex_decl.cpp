@@ -43,7 +43,7 @@ void goto_symext::symex_decl(statet &state, const symbol_exprt &expr)
   ssa_exprt ssa = state.add_object(
     expr,
     [this](const irep_idt &l0_name) {
-      return path_storage.get_unique_index(l0_name, 1);
+      return path_storage.get_unique_l1_index(l0_name, 1);
     },
     ns);
   const irep_idt &l1_identifier = ssa.get_identifier();
@@ -66,10 +66,9 @@ void goto_symext::symex_decl(statet &state, const symbol_exprt &expr)
   }
 
   // L2 renaming
-  bool is_new =
-    state.level2.current_names.emplace(l1_identifier, std::make_pair(ssa, 1))
-      .second;
-  CHECK_RETURN(is_new);
+  std::size_t generation = state.increase_generation(l1_identifier, ssa);
+  CHECK_RETURN(generation == 1);
+
   const bool record_events=state.record_events;
   state.record_events=false;
   exprt expr_l2 = state.rename(std::move(ssa), ns);

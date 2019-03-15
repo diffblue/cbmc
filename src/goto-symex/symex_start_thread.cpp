@@ -52,8 +52,8 @@ void goto_symext::symex_start_thread(statet &state)
   // create a copy of the local variables for the new thread
   framet &frame = state.call_stack().top();
 
-  for(auto c_it = state.level2.current_names.begin();
-      c_it != state.level2.current_names.end();
+  for(auto c_it = state.get_level2().current_names.begin();
+      c_it != state.get_level2().current_names.end();
       ++c_it)
   {
     const irep_idt l1_o_id=c_it->second.first.get_l1_object_identifier();
@@ -67,7 +67,7 @@ void goto_symext::symex_start_thread(statet &state)
     // get L0 name for current thread
     lhs.set_level_0(t);
     const irep_idt &l0_name = lhs.get_identifier();
-    std::size_t l1_index = path_storage.get_unique_index(l0_name, 0);
+    std::size_t l1_index = path_storage.get_unique_l1_index(l0_name, 0);
     CHECK_RETURN(l1_index == 0);
 
     // set up L1 name

@@ -98,8 +98,30 @@ public:
   /// error-handling paths.
   std::unordered_map<irep_idt, local_safe_pointerst> safe_pointers;
 
-  /// Provide a unique index for a given \p id, starting from \p minimum_index.
-  std::size_t get_unique_index(const irep_idt &id, std::size_t minimum_index)
+  /// Provide a unique L1 index for a given \p id, starting from
+  /// \p minimum_index.
+  std::size_t get_unique_l1_index(const irep_idt &id, std::size_t minimum_index)
+  {
+    return get_unique_index(l1_indices, id, minimum_index);
+  }
+
+  std::size_t get_unique_l2_index(const irep_idt &id)
+  {
+    return get_unique_index(l2_indices, id, 1);
+  }
+
+private:
+  // Derived classes should override these methods, allowing the base class to
+  // enforce preconditions.
+  virtual patht &private_peek() = 0;
+  virtual void private_pop() = 0;
+
+  typedef std::unordered_map<irep_idt, std::size_t> name_index_mapt;
+
+  std::size_t get_unique_index(
+    name_index_mapt &unique_index_map,
+    const irep_idt &id,
+    std::size_t minimum_index)
   {
     auto entry = unique_index_map.emplace(id, minimum_index);
 
@@ -109,14 +131,9 @@ public:
     return entry.first->second;
   }
 
-private:
-  // Derived classes should override these methods, allowing the base class to
-  // enforce preconditions.
-  virtual patht &private_peek() = 0;
-  virtual void private_pop() = 0;
-
   /// Storage used by \ref get_unique_index.
-  std::unordered_map<irep_idt, std::size_t> unique_index_map;
+  name_index_mapt l1_indices;
+  name_index_mapt l2_indices;
 };
 
 /// \brief LIFO save queue: depth-first search, try to finish paths

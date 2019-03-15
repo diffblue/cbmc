@@ -73,8 +73,7 @@ operator()(renamedt<ssa_exprt, L1> l1_expr) const
   return renamedt<ssa_exprt, L2>{std::move(l1_expr.value)};
 }
 
-void symex_level1t::restore_from(
-  const symex_renaming_levelt::current_namest &other)
+void symex_level1t::restore_from(const current_namest &other)
 {
   auto it = current_names.begin();
   for(const auto &pair : other)
