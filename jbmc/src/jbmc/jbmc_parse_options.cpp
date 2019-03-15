@@ -549,11 +549,6 @@ int jbmc_parse_optionst::doit()
     if(set_properties(goto_model))
       return 7; // should contemplate EX_USAGE from sysexits.h
 
-    if(cmdline.isset("validate-goto-model"))
-    {
-      goto_model.validate();
-    }
-
     if(
       options.get_bool_option("program-only") ||
       options.get_bool_option("show-vcc"))
@@ -768,6 +763,11 @@ int jbmc_parse_optionst::get_goto_program(
       std::move(lazy_goto_model));
     if(goto_model == nullptr)
       return 6;
+
+    if(cmdline.isset("validate-goto-model"))
+    {
+      goto_model->validate();
+    }
 
     // show it?
     if(cmdline.isset("show-loops"))
