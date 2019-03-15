@@ -11,6 +11,7 @@ Author: Diffblue Ltd.
 #include <java_bytecode/java_bytecode_language.h>
 #include <java_bytecode/java_object_factory.h>
 #include <langapi/mode.h>
+#include <testing-utils/message.h>
 #include <testing-utils/use_catch.h>
 #include <util/expr_iterator.h>
 
@@ -106,7 +107,8 @@ initialise_nondet_object_of_type(const typet &type, symbol_tablet &symbol_table)
     parameters,
     lifetimet::AUTOMATIC_LOCAL,
     source_locationt(),
-    pointer_selector);
+    pointer_selector,
+    null_message_handler);
 
   return created_code;
 }

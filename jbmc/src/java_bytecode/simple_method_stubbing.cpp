@@ -126,7 +126,8 @@ void java_simple_method_stubst::create_method_stub_at(
     lifetimet::DYNAMIC,
     parameters,
     update_in_place ? update_in_placet::MUST_UPDATE_IN_PLACE
-                    : update_in_placet::NO_UPDATE_IN_PLACE);
+                    : update_in_placet::NO_UPDATE_IN_PLACE,
+    message_handler);
 
   // Insert new_instructions into parent block.
   if(!new_instructions.statements().empty())
@@ -209,7 +210,8 @@ void java_simple_method_stubst::create_method_stub(symbolt &symbol)
           false,
           lifetimet::AUTOMATIC_LOCAL, // Irrelevant as type is primitive
           parameters,
-          update_in_placet::NO_UPDATE_IN_PLACE);
+          update_in_placet::NO_UPDATE_IN_PLACE,
+          message_handler);
       }
       else
         create_method_stub_at(

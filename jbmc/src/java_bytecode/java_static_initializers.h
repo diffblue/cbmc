@@ -15,8 +15,9 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 
 #include <unordered_set>
 
-#include <util/symbol_table.h>
+#include <util/message.h>
 #include <util/std_code.h>
+#include <util/symbol_table.h>
 
 irep_idt clinit_wrapper_name(const irep_idt &class_name);
 
@@ -32,14 +33,16 @@ code_blockt get_thread_safe_clinit_wrapper_body(
   symbol_table_baset &symbol_table,
   const bool nondet_static,
   const java_object_factory_parameterst &object_factory_parameters,
-  const select_pointer_typet &pointer_type_selector);
+  const select_pointer_typet &pointer_type_selector,
+  message_handlert &message_handler);
 
 code_ifthenelset get_clinit_wrapper_body(
   const irep_idt &function_id,
   symbol_table_baset &symbol_table,
   const bool nondet_static,
   const java_object_factory_parameterst &object_factory_parameters,
-  const select_pointer_typet &pointer_type_selector);
+  const select_pointer_typet &pointer_type_selector,
+  message_handlert &message_handler);
 
 class stub_global_initializer_factoryt
 {
@@ -57,7 +60,8 @@ public:
     const irep_idt &function_id,
     symbol_table_baset &symbol_table,
     const java_object_factory_parameterst &object_factory_parameters,
-    const select_pointer_typet &pointer_type_selector);
+    const select_pointer_typet &pointer_type_selector,
+    message_handlert &message_handler);
 };
 
 void create_stub_global_initializers(

@@ -258,7 +258,8 @@ static void java_static_lifetime_init(
           lifetimet::STATIC_GLOBAL,
           parameters,
           pointer_type_selector,
-          update_in_placet::NO_UPDATE_IN_PLACE);
+          update_in_placet::NO_UPDATE_IN_PLACE,
+          message_handler);
       }
       else if(sym.value.is_not_nil())
       {
@@ -296,7 +297,8 @@ std::pair<code_blockt, std::vector<exprt>> java_build_arguments(
   symbol_table_baset &symbol_table,
   bool assume_init_pointers_not_null,
   java_object_factory_parameterst object_factory_parameters,
-  const select_pointer_typet &pointer_type_selector)
+  const select_pointer_typet &pointer_type_selector,
+  message_handlert &message_handler)
 {
   const java_method_typet::parameterst &parameters =
     to_java_method_type(function.type).parameters();
@@ -354,7 +356,8 @@ std::pair<code_blockt, std::vector<exprt>> java_build_arguments(
         factory_parameters,
         lifetimet::AUTOMATIC_LOCAL,
         function.location,
-        pointer_type_selector);
+        pointer_type_selector,
+        message_handler);
     }
     else
     {
@@ -400,7 +403,8 @@ std::pair<code_blockt, std::vector<exprt>> java_build_arguments(
           factory_parameters,
           lifetimet::DYNAMIC,
           function.location,
-          pointer_type_selector);
+          pointer_type_selector,
+          message_handler);
         init_code_for_type.add(
           code_assignt(
             result_symbol.symbol_expr(),

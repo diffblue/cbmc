@@ -13,6 +13,7 @@ Author: Diffblue Ltd.
 #include <java_bytecode/java_root_class.h>
 #include <langapi/language_util.h>
 #include <langapi/mode.h>
+#include <testing-utils/message.h>
 #include <testing-utils/use_catch.h>
 #include <util/expr.h>
 #include <util/namespace.h>
@@ -61,7 +62,8 @@ SCENARIO(
         false,
         lifetimet::DYNAMIC,
         object_factory_parameters,
-        update_in_placet::NO_UPDATE_IN_PLACE);
+        update_in_placet::NO_UPDATE_IN_PLACE,
+        null_message_handler);
 
       THEN("Code is produced")
       {
