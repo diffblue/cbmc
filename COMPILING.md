@@ -314,6 +314,10 @@ If compiling with cmake:
    cmake --build build
    ```
 
+If compiling with cmake Ninja generator (`cmake -G Ninja`), the extra step
+`cmake --build build --target cudd-make` may be necessary between step 1 and 2
+because of a problem in the tracking of dependencies.
+
 ## Use BDDs for guards
 
 There are two implementation for symex guards. The default one uses the
