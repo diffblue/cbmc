@@ -1,0 +1,11 @@
+CORE
+main.c
+--little-endian
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Note this is identical to test byte_update2, except that the array 'x' has
+constant size.

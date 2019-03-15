@@ -154,8 +154,6 @@ protected:
   void flatten_array(const exprt &);
 
   // specific expressions go here
-  void convert_byte_update(const byte_update_exprt &expr);
-  void convert_byte_extract(const byte_extract_exprt &expr);
   void convert_typecast(const typecast_exprt &expr);
   void convert_floatbv_typecast(const floatbv_typecast_exprt &expr);
   void convert_struct(const struct_exprt &expr);
@@ -182,6 +180,8 @@ protected:
   std::string convert_identifier(const irep_idt &identifier);
 
   // auxiliary methods
+  exprt prepare_for_convert_expr(const exprt &expr);
+  exprt lower_byte_operators(const exprt &expr);
   void find_symbols(const exprt &expr);
   void find_symbols(const typet &type);
   void find_symbols_rec(const typet &type, std::set<irep_idt> &recstack);

@@ -1041,7 +1041,7 @@ exprt lower_byte_extract(const byte_extract_exprt &src, const namespacet &ns)
       tmp.type() = max_comp_type;
 
       return union_exprt(
-        max_comp_name, lower_byte_extract(tmp, ns), union_type);
+        max_comp_name, lower_byte_extract(tmp, ns), src.type());
     }
   }
 
