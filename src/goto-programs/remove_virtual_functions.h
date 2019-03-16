@@ -90,6 +90,7 @@ typedef std::map<irep_idt, dispatch_table_entryt> dispatch_table_entries_mapt;
 
 goto_programt::targett remove_virtual_function(
   goto_modelt &goto_model,
+  const irep_idt &function_id,
   goto_programt &goto_program,
   goto_programt::targett instruction,
   const dispatch_table_entriest &dispatch_table,
@@ -97,6 +98,7 @@ goto_programt::targett remove_virtual_function(
 
 goto_programt::targett remove_virtual_function(
   symbol_tablet &symbol_table,
+  const irep_idt &function_id,
   goto_programt &goto_program,
   goto_programt::targett instruction,
   const dispatch_table_entriest &dispatch_table,

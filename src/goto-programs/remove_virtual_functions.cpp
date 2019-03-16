@@ -31,9 +31,12 @@ public:
 
   void operator()(goto_functionst &goto_functions);
 
-  bool remove_virtual_functions(goto_programt &goto_program);
+  bool remove_virtual_functions(
+    const irep_idt &function_id,
+    goto_programt &goto_program);
 
   goto_programt::targett remove_virtual_function(
+    const irep_idt &function_id,
     goto_programt &goto_program,
     goto_programt::targett target,
     const dispatch_table_entriest &functions,
@@ -48,6 +51,7 @@ protected:
   const class_hierarchyt &class_hierarchy;
 
   goto_programt::targett remove_virtual_function(
+    const irep_idt &function_id,
     goto_programt &goto_program,
     goto_programt::targett target);
   typedef std::function<
@@ -77,12 +81,15 @@ remove_virtual_functionst::remove_virtual_functionst(
 
 /// Replace specified virtual function call with a static call to its
 /// most derived implementation
+/// \param function_id: The identifier of the function we are currently
+///   analysing
 /// \param [in,out] goto_program: GOTO program to modify
 /// \param target: iterator to a function in the supplied GOTO program
 ///   to replace. Must point to a virtual function call.
 /// \return Returns a pointer to the statement in the supplied GOTO
 ///   program after replaced function call
 goto_programt::targett remove_virtual_functionst::remove_virtual_function(
+  const irep_idt &function_id,
   goto_programt &goto_program,
   goto_programt::targett target)
 {
@@ -100,6 +107,7 @@ goto_programt::targett remove_virtual_functionst::remove_virtual_function(
   get_functions(function, functions);
 
   return remove_virtual_function(
+    function_id,
     goto_program,
     target,
     functions,
@@ -149,12 +157,15 @@ static void create_static_function_call(
 
 /// If \p argument_for_this contains a dereference then create a temporary
 /// variable for it and use that instead
+/// \param function_id: The identifier of the function we are currently
+///   analysing
 /// \param [in,out] argument_for_this: The first argument of the function call
 /// \param symbol_table: The symbol table to add the new symbol to
 /// \param vcall_source_loc: The source location of the function call, which is
 ///   used for new instructions that are added
 /// \param [out] new_code_for_this_argument: New instructions are added here
 static void process_this_argument(
+  const irep_idt &function_id,
   exprt &argument_for_this,
   symbol_table_baset &symbol_table,
   const source_locationt &vcall_source_loc,
@@ -167,10 +178,10 @@ static void process_this_argument(
     // `this` to those elements with the correct class identifier.
     symbolt &temp_symbol = get_fresh_aux_symbol(
       argument_for_this.type(),
-      "remove_virtual_functions", // TODO: pass function name in to use here?
+      id2string(function_id),
       "this_argument",
       vcall_source_loc,
-      ID_java, //TODO: get this from somewhere
+      symbol_table.lookup_ref(function_id).mode,
       symbol_table);
     const symbol_exprt temp_var_for_this = temp_symbol.symbol_expr();
 
@@ -201,6 +212,8 @@ static void process_this_argument(
 /// implementation. If there's a type mismatch between implementation
 /// and the instance type or if fallback_action is set to
 /// ASSUME_FALSE, then function is substituted with a call to ASSUME(false)
+/// \param function_id: The identifier of the function we are currently
+///   analysing
 /// \param [in,out] goto_program: GOTO program to modify
 /// \param target: Iterator to the GOTO instruction in the supplied
 ///   GOTO program to be removed. Must point to a function call
@@ -212,6 +225,7 @@ static void process_this_argument(
 /// \return Returns a pointer to the statement in the supplied GOTO
 ///   program after replaced function call
 goto_programt::targett remove_virtual_functionst::remove_virtual_function(
+  const irep_idt &function_id,
   goto_programt &goto_program,
   goto_programt::targett target,
   const dispatch_table_entriest &functions,
@@ -254,6 +268,7 @@ goto_programt::targett remove_virtual_functionst::remove_virtual_function(
   goto_programt new_code_for_this_argument;
 
   process_this_argument(
+    function_id,
     code.arguments()[0],
     symbol_table,
     vcall_source_loc,
@@ -595,6 +610,7 @@ exprt remove_virtual_functionst::get_method(
 /// them with calls to their most derived implementations. Returns
 /// true if at least one function has been replaced.
 bool remove_virtual_functionst::remove_virtual_functions(
+  const irep_idt &function_id,
   goto_programt &goto_program)
 {
   bool did_something=false;
@@ -610,7 +626,7 @@ bool remove_virtual_functionst::remove_virtual_functions(
 
       if(code.function().id()==ID_virtual_function)
       {
-        target = remove_virtual_function(goto_program, target);
+        target = remove_virtual_function(function_id, goto_program, target);
         did_something=true;
         continue;
       }
@@ -636,9 +652,10 @@ void remove_virtual_functionst::operator()(goto_functionst &functions)
       f_it!=functions.function_map.end();
       f_it++)
   {
+    const irep_idt &function_id = f_it->first;
     goto_programt &goto_program=f_it->second.body;
 
-    if(remove_virtual_functions(goto_program))
+    if(remove_virtual_functions(function_id, goto_program))
       did_something=true;
   }
 
@@ -671,7 +688,8 @@ void remove_virtual_functions(goto_model_functiont &function)
   class_hierarchyt class_hierarchy;
   class_hierarchy(function.get_symbol_table());
   remove_virtual_functionst rvf(function.get_symbol_table(), class_hierarchy);
-  rvf.remove_virtual_functions(function.get_goto_function().body);
+  rvf.remove_virtual_functions(
+    function.get_function_id(), function.get_goto_function().body);
 }
 
 /// Replace virtual function call with a static function call
@@ -680,6 +698,8 @@ void remove_virtual_functions(goto_model_functiont &function)
 /// and the instance type or if fallback_action is set to
 /// ASSUME_FALSE, then function is substituted with a call to ASSUME(false)
 /// \param symbol_table: Symbol table
+/// \param function_id: The identifier of the function we are currently
+///   analysing
 /// \param [in,out] goto_program: GOTO program to modify
 /// \param instruction: Iterator to the GOTO instruction in the supplied
 ///   GOTO program to be removed. Must point to a function call
@@ -692,6 +712,7 @@ void remove_virtual_functions(goto_model_functiont &function)
 ///   program after replaced function call
 goto_programt::targett remove_virtual_function(
   symbol_tablet &symbol_table,
+  const irep_idt &function_id,
   goto_programt &goto_program,
   goto_programt::targett instruction,
   const dispatch_table_entriest &dispatch_table,
@@ -702,7 +723,7 @@ goto_programt::targett remove_virtual_function(
   remove_virtual_functionst rvf(symbol_table, class_hierarchy);
 
   goto_programt::targett next = rvf.remove_virtual_function(
-    goto_program, instruction, dispatch_table, fallback_action);
+    function_id, goto_program, instruction, dispatch_table, fallback_action);
 
   goto_program.update();
 
@@ -711,6 +732,7 @@ goto_programt::targett remove_virtual_function(
 
 goto_programt::targett remove_virtual_function(
   goto_modelt &goto_model,
+  const irep_idt &function_id,
   goto_programt &goto_program,
   goto_programt::targett instruction,
   const dispatch_table_entriest &dispatch_table,
@@ -718,6 +740,7 @@ goto_programt::targett remove_virtual_function(
 {
   return remove_virtual_function(
     goto_model.symbol_table,
+    function_id,
     goto_program,
     instruction,
     dispatch_table,
