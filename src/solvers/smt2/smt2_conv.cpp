@@ -2280,12 +2280,13 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
     // adding the rounding mode.  See
     // smt2_convt::convert_floatbv_typecast.
     // The exception is bool and c_bool to float.
+    const auto &dest_floatbv_type = to_floatbv_type(dest_type);
 
     if(src_type.id()==ID_bool)
     {
       constant_exprt val(irep_idt(), dest_type);
 
-      ieee_floatt a(to_floatbv_type(dest_type));
+      ieee_floatt a(dest_floatbv_type);
 
       mp_integer significand;
       mp_integer exponent;
@@ -2315,6 +2316,23 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
       // turn into proper bool
       const typecast_exprt tmp(src, bool_typet());
       convert_typecast(typecast_exprt(tmp, dest_type));
+    }
+    else if(src_type.id() == ID_bv)
+    {
+      if(to_bv_type(src_type).get_width() != dest_floatbv_type.get_width())
+      {
+        UNEXPECTEDCASE("Typecast bv -> float with wrong width");
+      }
+
+      if(use_FPA_theory)
+      {
+        out << "((_ to_fp " << dest_floatbv_type.get_e() << " "
+            << dest_floatbv_type.get_f() + 1 << ") ";
+        convert_expr(src);
+        out << ')';
+      }
+      else
+        convert_expr(src);
     }
     else
       UNEXPECTEDCASE("Unknown typecast "+src_type.id_string()+" -> float");
