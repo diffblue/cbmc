@@ -47,7 +47,13 @@ bool smt2irept::parse()
       switch(next_token())
       {
       case END_OF_FILE:
-        throw error("unexpected end of file");
+        if(stack.empty())
+        {
+          result = irept(irep_idt());
+          return false;
+        }
+        else
+          throw error("unexpected end of file");
 
       case STRING_LITERAL:
       case NUMERAL:
