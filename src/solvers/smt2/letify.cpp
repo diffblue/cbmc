@@ -83,12 +83,16 @@ exprt letifyt::substitute_let(const exprt &expr, const seen_expressionst &map)
   if(expr.operands().empty())
     return expr;
 
-  let_visitort lv(map);
-
   exprt tmp = expr;
 
   for(auto &op : tmp.operands())
-    op.visit(lv);
+  {
+    op.visit([&map](exprt &expr) {
+      seen_expressionst::const_iterator it = map.find(expr);
+      if(it != map.end() && it->second.count >= letifyt::LET_COUNT)
+        expr = it->second.let_symbol;
+    });
+  }
 
   return tmp;
 }

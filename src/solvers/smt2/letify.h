@@ -41,26 +41,6 @@ protected:
   using seen_expressionst = irep_hash_mapt<exprt, let_count_idt>;
 #endif
 
-  class let_visitort : public expr_visitort
-  {
-    const seen_expressionst &let_map;
-
-  public:
-    explicit let_visitort(const seen_expressionst &map) : let_map(map)
-    {
-    }
-
-    void operator()(exprt &expr)
-    {
-      seen_expressionst::const_iterator it = let_map.find(expr);
-      if(it != let_map.end() && it->second.count >= letifyt::LET_COUNT)
-      {
-        const symbol_exprt &symb = it->second.let_symbol;
-        expr = symb;
-      }
-    }
-  };
-
   void collect_bindings(
     const exprt &expr,
     seen_expressionst &map,
