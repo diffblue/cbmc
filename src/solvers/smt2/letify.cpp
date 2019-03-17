@@ -32,8 +32,8 @@ void letifyt::collect_bindings(
   if(expr.operands().empty())
     return;
 
-  Forall_operands(it, expr)
-    collect_bindings(*it, map, let_order);
+  for(auto &op : expr.operands())
+    collect_bindings(op, map, let_order);
 
   INVARIANT(
     map.find(expr) == map.end(), "expression should not have been seen yet");
@@ -85,8 +85,8 @@ exprt letifyt::substitute_let(exprt &expr, const seen_expressionst &map)
 
   let_visitort lv(map);
 
-  Forall_operands(it, expr)
-    it->visit(lv);
+  for(auto &op : expr.operands())
+    op.visit(lv);
 
   return expr;
 }
