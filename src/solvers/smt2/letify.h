@@ -16,7 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class letifyt
 {
 public:
-  exprt operator()(exprt &expr);
+  exprt operator()(const exprt &);
 
 protected:
   // to produce a fresh ID for each new let
@@ -62,17 +62,17 @@ protected:
   };
 
   void collect_bindings(
-    exprt &expr,
+    const exprt &expr,
     seen_expressionst &map,
     std::vector<exprt> &let_order);
 
   static exprt letify_rec(
-    exprt &expr,
+    const exprt &expr,
     std::vector<exprt> &let_order,
     const seen_expressionst &map,
     std::size_t i);
 
-  static exprt substitute_let(exprt &expr, const seen_expressionst &map);
+  static exprt substitute_let(const exprt &expr, const seen_expressionst &map);
 };
 
 #endif // CPROVER_SOLVERS_SMT2_LETIFY_H

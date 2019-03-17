@@ -15,7 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 
 void letifyt::collect_bindings(
-  exprt &expr,
+  const exprt &expr,
   seen_expressionst &map,
   std::vector<exprt> &let_order)
 {
@@ -47,7 +47,7 @@ void letifyt::collect_bindings(
 }
 
 exprt letifyt::letify_rec(
-  exprt &expr,
+  const exprt &expr,
   std::vector<exprt> &let_order,
   const seen_expressionst &map,
   std::size_t i)
@@ -68,7 +68,7 @@ exprt letifyt::letify_rec(
     letify_rec(expr, let_order, map, i + 1));
 }
 
-exprt letifyt::operator()(exprt &expr)
+exprt letifyt::operator()(const exprt &expr)
 {
   seen_expressionst map;
   std::vector<exprt> let_order;
@@ -78,15 +78,17 @@ exprt letifyt::operator()(exprt &expr)
   return letify_rec(expr, let_order, map, 0);
 }
 
-exprt letifyt::substitute_let(exprt &expr, const seen_expressionst &map)
+exprt letifyt::substitute_let(const exprt &expr, const seen_expressionst &map)
 {
   if(expr.operands().empty())
     return expr;
 
   let_visitort lv(map);
 
-  for(auto &op : expr.operands())
+  exprt tmp = expr;
+
+  for(auto &op : tmp.operands())
     op.visit(lv);
 
-  return expr;
+  return tmp;
 }
