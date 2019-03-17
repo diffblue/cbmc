@@ -73,7 +73,7 @@ propt::resultt satcheck_picosatt::do_prop_solve()
     std::string msg=
       std::to_string(_no_variables-1)+" variables, "+
       std::to_string(picosat_added_original_clauses(picosat))+" clauses";
-    messaget::statistics() << msg << messaget::eom;
+    log.statistics() << msg << messaget::eom;
   }
 
   std::string msg;
@@ -85,7 +85,7 @@ propt::resultt satcheck_picosatt::do_prop_solve()
   if(res==PICOSAT_SATISFIABLE)
   {
     msg="SAT checker: instance is SATISFIABLE";
-    messaget::status() << msg << messaget::eom;
+    log.status() << msg << messaget::eom;
     status=SAT;
     return P_SATISFIABLE;
   }
@@ -95,7 +95,7 @@ propt::resultt satcheck_picosatt::do_prop_solve()
       res == PICOSAT_UNSATISFIABLE,
       "picosat result should report either sat or unsat");
     msg="SAT checker: instance is UNSATISFIABLE";
-    messaget::status() << msg << messaget::eom;
+    log.status() << msg << messaget::eom;
   }
 
   status=UNSAT;

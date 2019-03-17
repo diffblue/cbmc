@@ -154,8 +154,8 @@ propt::resultt satcheck_minisat1_baset::do_prop_solve()
 {
   PRECONDITION(status != ERROR);
 
-  messaget::statistics() << (_no_variables - 1) << " variables, "
-                         << solver->nClauses() << " clauses" << messaget::eom;
+  log.statistics() << (_no_variables - 1) << " variables, "
+                   << solver->nClauses() << " clauses" << messaget::eom;
 
   add_variables();
 
@@ -179,7 +179,7 @@ propt::resultt satcheck_minisat1_baset::do_prop_solve()
     if(solver->solve(MiniSat_assumptions))
     {
       msg="SAT checker: instance is SATISFIABLE";
-      messaget::status() << msg << messaget::eom;
+      log.status() << msg << messaget::eom;
       status=SAT;
       return P_SATISFIABLE;
     }
@@ -187,7 +187,7 @@ propt::resultt satcheck_minisat1_baset::do_prop_solve()
       msg="SAT checker: instance is UNSATISFIABLE";
   }
 
-  messaget::status() << msg << messaget::eom;
+  log.status() << msg << messaget::eom;
   status=UNSAT;
   return P_UNSATISFIABLE;
 }

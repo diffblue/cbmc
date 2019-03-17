@@ -41,7 +41,7 @@ propt::resultt satcheck_zcoret::do_prop_solve()
     std::string msg=
       std::to_string(no_variables()-1)+" variables, "+
       std::to_string(no_clauses())+" clauses";
-    messaget::statistics() << msg << messaget::eom;
+    log.statistics() << msg << messaget::eom;
   }
 
   // get the core

@@ -97,15 +97,15 @@ propt::resultt satcheck_ipasirt::do_prop_solve()
 {
   INVARIANT(status!=statust::ERROR, "there cannot be an error");
 
-  messaget::statistics() << (no_variables() - 1) << " variables, "
-                         << clause_counter << " clauses" << eom;
+  log.statistics() << (no_variables() - 1) << " variables, " << clause_counter
+                   << " clauses" << messaget::eom;
 
   // use the internal representation, as ipasir does not support reporting the
   // status
   if(status==statust::UNSAT)
   {
-    messaget::status() <<
-      "SAT checker inconsistent: instance is UNSATISFIABLE" << eom;
+    log.status() << "SAT checker inconsistent: instance is UNSATISFIABLE"
+                 << messaget::eom;
   }
   else
   {
@@ -116,8 +116,8 @@ propt::resultt satcheck_ipasirt::do_prop_solve()
 
     if(has_false)
     {
-      messaget::status() <<
-        "got FALSE as assumption: instance is UNSATISFIABLE" << eom;
+      log.status() << "got FALSE as assumption: instance is UNSATISFIABLE"
+                   << messaget::eom;
     }
     else
     {
@@ -129,20 +129,19 @@ propt::resultt satcheck_ipasirt::do_prop_solve()
       int solver_state=ipasir_solve(solver);
       if(10==solver_state)
       {
-        messaget::status() <<
-          "SAT checker: instance is SATISFIABLE" << eom;
+        log.status() << "SAT checker: instance is SATISFIABLE" << messaget::eom;
         status=statust::SAT;
         return resultt::P_SATISFIABLE;
       }
       else if(20==solver_state)
       {
-        messaget::status() <<
-          "SAT checker: instance is UNSATISFIABLE" << eom;
+        log.status() << "SAT checker: instance is UNSATISFIABLE"
+                     << messaget::eom;
       }
       else
       {
-        messaget::status() <<
-          "SAT checker: solving returned without solution" << eom;
+        log.status() << "SAT checker: solving returned without solution"
+                     << messaget::eom;
         throw analysis_exceptiont(
           "solving inside IPASIR SAT solver has been interrupted");
       }

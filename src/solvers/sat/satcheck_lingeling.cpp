@@ -72,7 +72,7 @@ propt::resultt satcheck_lingelingt::do_prop_solve()
     std::string msg=
       std::to_string(no_variables()-1)+" variables, "+
       std::to_string(clause_counter)+" clauses";
-    messaget::statistics() << msg << messaget::eom;
+    log.statistics() << msg << messaget::eom;
   }
 
   std::string msg;
@@ -86,7 +86,7 @@ propt::resultt satcheck_lingelingt::do_prop_solve()
   if(res==10)
   {
     msg="SAT checker: instance is SATISFIABLE";
-    messaget::status() << msg << messaget::eom;
+    log.status() << msg << messaget::eom;
     status=SAT;
     return P_SATISFIABLE;
   }
@@ -94,7 +94,7 @@ propt::resultt satcheck_lingelingt::do_prop_solve()
   {
     INVARIANT(res == 20, "result value is either 10 or 20");
     msg="SAT checker: instance is UNSATISFIABLE";
-    messaget::status() << msg << messaget::eom;
+    log.status() << msg << messaget::eom;
   }
 
   status=UNSAT;
