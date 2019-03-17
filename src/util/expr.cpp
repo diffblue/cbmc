@@ -243,7 +243,7 @@ const source_locationt &exprt::find_source_location() const
   return static_cast<const source_locationt &>(get_nil_irep());
 }
 
-void exprt::visit(expr_visitort &visitor)
+void exprt::visit(std::function<void(exprt &)> visitor)
 {
   std::stack<exprt *> stack;
 
@@ -256,12 +256,12 @@ void exprt::visit(expr_visitort &visitor)
 
     visitor(expr);
 
-    Forall_operands(it, expr)
-      stack.push(&(*it));
+    for(auto &op : expr.operands())
+      stack.push(&op);
   }
 }
 
-void exprt::visit(const_expr_visitort &visitor) const
+void exprt::visit(std::function<void(const exprt &)> visitor) const
 {
   std::stack<const exprt *> stack;
 
@@ -274,9 +274,19 @@ void exprt::visit(const_expr_visitort &visitor) const
 
     visitor(expr);
 
-    forall_operands(it, expr)
-      stack.push(&(*it));
+    for(auto &op : expr.operands())
+      stack.push(&op);
   }
+}
+
+void exprt::visit(expr_visitort &visitor)
+{
+  visit([&visitor](exprt &e) { visitor(e); });
+}
+
+void exprt::visit(const_expr_visitort &visitor) const
+{
+  visit([&visitor](const exprt &e) { visitor(e); });
 }
 
 depth_iteratort exprt::depth_begin()
