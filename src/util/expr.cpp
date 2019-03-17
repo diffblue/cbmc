@@ -244,6 +244,50 @@ const source_locationt &exprt::find_source_location() const
 }
 
 template <typename T>
+void visit_post_template(std::function<void(T &)> visitor, T *_expr)
+{
+  struct stack_entryt
+  {
+    T *e;
+    bool operands_pushed;
+    explicit stack_entryt(T *_e) : e(_e), operands_pushed(false)
+    {
+    }
+  };
+
+  std::stack<stack_entryt> stack;
+
+  stack.emplace(_expr);
+
+  while(!stack.empty())
+  {
+    auto &top = stack.top();
+    if(top.operands_pushed)
+    {
+      visitor(*top.e);
+      stack.pop();
+    }
+    else
+    {
+      // do modification of 'top' before pushing in case 'top' isn't stable
+      top.operands_pushed = true;
+      for(auto &op : top.e->operands())
+        stack.emplace(&op);
+    }
+  }
+}
+
+void exprt::visit_post(std::function<void(exprt &)> visitor)
+{
+  visit_post_template(visitor, this);
+}
+
+void exprt::visit_post(std::function<void(const exprt &)> visitor) const
+{
+  visit_post_template(visitor, this);
+}
+
+template <typename T>
 static void visit_pre_template(std::function<void(T &)> visitor, T *_expr)
 {
   std::stack<T *> stack;
