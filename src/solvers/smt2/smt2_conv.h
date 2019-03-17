@@ -24,6 +24,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <solvers/flattening/boolbv_width.h>
 #include <solvers/flattening/pointer_logic.h>
 
+#include "letify.h"
+
 class typecast_exprt;
 class constant_exprt;
 class index_exprt;
@@ -62,7 +64,6 @@ public:
       logic(_logic),
       solver(_solver),
       boolbv_width(_ns),
-      let_id_count(0),
       pointer_logic(_ns),
       no_boolean_variables(0)
   {
@@ -187,59 +188,7 @@ protected:
   void find_symbols_rec(const typet &type, std::set<irep_idt> &recstack);
 
   // letification
-  struct let_count_idt
-  {
-    let_count_idt(std::size_t _count, const symbol_exprt &_let_symbol)
-      : count(_count), let_symbol(_let_symbol)
-    {
-    }
-
-    std::size_t count;
-    symbol_exprt let_symbol;
-  };
-
-#ifdef HASH_CODE
-  typedef std::unordered_map<exprt, let_count_idt, irep_hash> seen_expressionst;
-#else
-  typedef irep_hash_mapt<exprt, let_count_idt> seen_expressionst;
-#endif
-
-  std::size_t let_id_count;
-  static const std::size_t LET_COUNT = 2;
-
-  class let_visitort:public expr_visitort
-  {
-    const seen_expressionst &let_map;
-
-  public:
-    explicit let_visitort(const seen_expressionst &map):let_map(map) { }
-
-    void operator()(exprt &expr)
-    {
-      seen_expressionst::const_iterator it=let_map.find(expr);
-      if(it != let_map.end() && it->second.count >= LET_COUNT)
-      {
-        const symbol_exprt &symb = it->second.let_symbol;
-        expr=symb;
-      }
-    }
-  };
-
-  exprt letify(exprt &expr);
-  exprt letify_rec(
-    exprt &expr,
-    std::vector<exprt> &let_order,
-    const seen_expressionst &map,
-    std::size_t i);
-
-  void collect_bindings(
-    exprt &expr,
-    seen_expressionst &map,
-    std::vector<exprt> &let_order);
-
-  exprt substitute_let(
-    exprt &expr,
-    const seen_expressionst &map);
+  letifyt letify;
 
   // Parsing solver responses
   constant_exprt parse_literal(const irept &, const typet &type);
