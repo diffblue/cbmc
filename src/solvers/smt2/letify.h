@@ -66,13 +66,13 @@ protected:
     seen_expressionst &map,
     std::vector<exprt> &let_order);
 
-  exprt letify_rec(
+  static exprt letify_rec(
     exprt &expr,
     std::vector<exprt> &let_order,
     const seen_expressionst &map,
     std::size_t i);
 
-  exprt substitute_let(exprt &expr, const seen_expressionst &map);
+  static exprt substitute_let(exprt &expr, const seen_expressionst &map);
 };
 
 #endif // CPROVER_SOLVERS_SMT2_LETIFY_H
