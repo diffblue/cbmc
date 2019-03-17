@@ -141,18 +141,8 @@ void validate_goto_modelt::check_returns_removed()
 
 void validate_goto_modelt::check_called_functions()
 {
-  class test_for_function_addresst : public const_expr_visitort
-  {
-  public:
-    test_for_function_addresst(
-      const function_mapt &function_map,
-      const validation_modet &vm)
-      : function_map{function_map}, vm{vm}
-    {
-    }
-
-    void operator()(const exprt &expr) override
-    {
+  auto test_for_function_address =
+    [this](const exprt &expr) {
       if(expr.id() == ID_address_of)
       {
         const auto &pointee = to_address_of_expr(expr).object();
@@ -168,13 +158,7 @@ void validate_goto_modelt::check_called_functions()
             "function map");
         }
       }
-    }
-
-  private:
-    const function_mapt &function_map;
-    const validation_modet &vm;
-  };
-  test_for_function_addresst test_for_function_address(function_map, vm);
+    };
 
   for(const auto &fun : function_map)
   {
