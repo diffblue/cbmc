@@ -1641,34 +1641,14 @@ compute_inverse_function(const exprt &qvar, const exprt &val, const exprt &f)
   return sum_over_map(elems, f.type(), neg);
 }
 
-class find_qvar_visitort : public const_expr_visitort
-{
-private:
-  const exprt &qvar_;
-
-public:
-  bool found;
-
-  explicit find_qvar_visitort(const exprt &qvar) : qvar_(qvar), found(false)
-  {
-  }
-
-  void operator()(const exprt &expr) override
-  {
-    if(expr == qvar_)
-      found = true;
-  }
-};
-
 /// look for the symbol and return true if it is found
 /// \param index: an index expression
 /// \param qvar: a symbol expression
 /// \return a Boolean
 static bool find_qvar(const exprt &index, const symbol_exprt &qvar)
 {
-  find_qvar_visitort v2(qvar);
-  index.visit(v2);
-  return v2.found;
+  return std::find(index.depth_begin(), index.depth_end(), qvar) !=
+         index.depth_end();
 }
 
 /// Add to the index set all the indices that appear in the formulas and the
