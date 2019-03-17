@@ -155,10 +155,70 @@ static void create_static_function_call(
   }
 }
 
+/// Duplicate ASSUME instructions involving \p argument_for_this for
+/// \p temp_var_for_this. We only look at the ASSERT and ASSUME instructions
+/// which directly precede the virtual function call. This is mainly aimed at
+/// null checks, because \ref local_safe_pointerst would otherwise lose track
+/// of known-not-null pointers due to the newly introduced assignment.
+/// \param goto_program: The goto program containing the virtual function call
+/// \param instr_it: Iterator to the virtual function call in \p goto_program
+/// \param argument_for_this: The original expression for the this argument of
+///   the virtual function call
+/// \param temp_var_for_this: The new expression for the this argument of the
+///   virtual function call
+/// \return A goto program consisting of all the amended asserts and assumes
+static goto_programt analyse_checks_directly_preceding_function_call(
+  const goto_programt &goto_program,
+  goto_programt::const_targett instr_it,
+  const exprt &argument_for_this,
+  const symbol_exprt &temp_var_for_this)
+{
+  goto_programt checks_directly_preceding_function_call;
+
+  while(instr_it != goto_program.instructions.cbegin())
+  {
+    instr_it = std::prev(instr_it);
+
+    if(instr_it->type == ASSERT)
+    {
+      continue;
+    }
+
+    if(instr_it->type != ASSUME)
+    {
+      break;
+    }
+
+    exprt guard = instr_it->get_condition();
+
+    bool changed = false;
+    for(auto expr_it = guard.depth_begin(); expr_it != guard.depth_end();
+        ++expr_it)
+    {
+      if(*expr_it == argument_for_this)
+      {
+        expr_it.mutate() = temp_var_for_this;
+        changed = true;
+      }
+    }
+
+    if(changed)
+    {
+      checks_directly_preceding_function_call.insert_before(
+        checks_directly_preceding_function_call.instructions.cbegin(),
+        goto_programt::make_assumption(guard));
+    }
+  }
+
+  return checks_directly_preceding_function_call;
+}
+
 /// If \p argument_for_this contains a dereference then create a temporary
 /// variable for it and use that instead
 /// \param function_id: The identifier of the function we are currently
 ///   analysing
+/// \param goto_program: The goto program containing the virtual function call
+/// \param target: Iterator to the virtual function call in \p goto_program
 /// \param [in,out] argument_for_this: The first argument of the function call
 /// \param symbol_table: The symbol table to add the new symbol to
 /// \param vcall_source_loc: The source location of the function call, which is
@@ -166,6 +226,8 @@ static void create_static_function_call(
 /// \param [out] new_code_for_this_argument: New instructions are added here
 static void process_this_argument(
   const irep_idt &function_id,
+  const goto_programt &goto_program,
+  const goto_programt::targett target,
   exprt &argument_for_this,
   symbol_table_baset &symbol_table,
   const source_locationt &vcall_source_loc,
@@ -191,17 +253,12 @@ static void process_this_argument(
       goto_programt::make_assignment(
         temp_var_for_this, argument_for_this, vcall_source_loc));
 
-    // Add null check for temp_var_for_this, as the old one won't work any more. We should
-    // really use java_bytecode_instrumentt::check_null_dereference(), but it is
-    // in jbmc rather than cbmc. Or we could use create_fatal_assertion(), but it
-    // returns a code_blockt, which is a bit inconvenient.
-    const notequal_exprt null_check(
-      temp_var_for_this,
-      null_pointer_exprt(to_pointer_type(temp_var_for_this.type())));
-    new_code_for_this_argument.add(
-      goto_programt::make_assertion(null_check, vcall_source_loc));
-    new_code_for_this_argument.add(
-      goto_programt::make_assumption(null_check, vcall_source_loc));
+    goto_programt checks_directly_preceding_function_call =
+      analyse_checks_directly_preceding_function_call(
+        goto_program, target, argument_for_this, temp_var_for_this);
+
+    new_code_for_this_argument.destructive_append(
+      checks_directly_preceding_function_call);
 
     argument_for_this = temp_var_for_this;
   }
@@ -269,6 +326,8 @@ goto_programt::targett remove_virtual_functionst::remove_virtual_function(
 
   process_this_argument(
     function_id,
+    goto_program,
+    target,
     code.arguments()[0],
     symbol_table,
     vcall_source_loc,
