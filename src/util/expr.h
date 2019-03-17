@@ -324,10 +324,13 @@ protected:
   }
 
 public:
+  /// These are pre-order traversal visitors, i.e.,
+  /// the visitor is executed on a node _before_ its children
+  /// have been visited.
   void visit(class expr_visitort &visitor);
   void visit(class const_expr_visitort &visitor) const;
-  void visit(std::function<void(exprt &)>);
-  void visit(std::function<void(const exprt &)>) const;
+  void visit_pre(std::function<void(exprt &)>);
+  void visit_pre(std::function<void(const exprt &)>) const;
 
   depth_iteratort depth_begin();
   depth_iteratort depth_end();
