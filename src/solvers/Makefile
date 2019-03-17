@@ -250,7 +250,7 @@ endif
 solvers$(LIBEXT): $(OBJ) $(SOLVER_LIB)
 	$(LINKLIB)
 
--include $(smt2/smt2_solver$(DEPEXT))
+-include smt2/smt2_solver$(DEPEXT)
 
 smt2_solver$(EXEEXT): $(OBJ) smt2/smt2_solver$(OBJEXT) \
 	../util/util$(LIBEXT) ../big-int/big-int$(LIBEXT) $(SOLVER_LIB)
