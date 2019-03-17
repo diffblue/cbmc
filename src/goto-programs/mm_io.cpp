@@ -23,11 +23,10 @@ void collect_deref_expr(
   const exprt &src,
   std::set<dereference_exprt> &dest)
 {
-  if(src.id()==ID_dereference)
-    dest.insert(to_dereference_expr(src));
-
-  for(const auto & op : src.operands())
-    collect_deref_expr(op, dest); // recursive call
+  src.visit_pre([&dest](const exprt &e) {
+    if(e.id() == ID_dereference)
+      dest.insert(to_dereference_expr(e));
+  });
 }
 
 void mm_io(
