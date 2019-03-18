@@ -19,9 +19,12 @@ Author: Daniel Poetzl
 #include <util/message.h>
 #include <util/optional.h>
 
+// clang-format off
 #define MEMORY_SNAPSHOT_HARNESS_GENERATOR_OPTIONS                              \
   "(memory-snapshot):"                                                         \
-  "(initial-location):" // MEMORY_SNAPSHOT_HARNESS_GENERATOR_OPTIONS
+  "(initial-location):"                                                        \
+  "(havoc-variables):" // MEMORY_SNAPSHOT_HARNESS_GENERATOR_OPTIONS
+// clang-format on
 
 // clang-format off
 #define MEMORY_SNAPSHOT_HARNESS_GENERATOR_HELP                                 \
@@ -31,6 +34,8 @@ Author: Daniel Poetzl
   "--initial-location <func[:<n>]>\n"                                          \
   "                              use given function and location number as "   \
   "entry\n                              point\n"                               \
+  "--havoc-variables vars        initialise variables from vars to\n"          \
+  "                              non-deterministic values"                     \
   // MEMORY_SNAPSHOT_HARNESS_GENERATOR_HELP
 // clang-format on
 
@@ -61,8 +66,9 @@ protected:
 
   void add_init_section(goto_modelt &goto_model) const;
 
-  code_blockt add_assignments_to_globals(const symbol_tablet &snapshot) const;
-
+  code_blockt add_assignments_to_globals(
+    const symbol_tablet &snapshot,
+    goto_modelt &goto_model) const;
   void add_call_with_nondet_arguments(
     const symbolt &called_function_symbol,
     code_blockt &code) const;
@@ -75,6 +81,7 @@ protected:
 
   irep_idt entry_function_name;
   optionalt<unsigned> location_number;
+  std::unordered_set<irep_idt> variables_to_havoc;
 
   message_handlert &message_handler;
 };
