@@ -1,0 +1,8 @@
+CORE
+main.c
+--harness-type initialise-with-memory-snapshot --memory-snapshot ../load-snapshot-json-snapshots/global-struct-snapshot.json --initial-location main:3 --havoc-variables simple
+^EXIT=10$
+^SIGNAL=0$
+^\[main.assertion.1\] line \d+ assertion simple.j > simple.i: FAILURE$
+--
+^warning: ignoring

@@ -24,6 +24,7 @@ Author: Daniel Poetzl
 #include <linking/static_lifetime_init.h>
 
 #include "goto_harness_generator_factory.h"
+#include "recursive_initialization.h"
 
 void memory_snapshot_harness_generatort::handle_option(
   const std::string &option,
@@ -55,6 +56,10 @@ void memory_snapshot_harness_generatort::handle_option(
     {
       location_number = optionalt<unsigned>(safe_string2unsigned(start.back()));
     }
+  }
+  else if(option == "havoc-variables")
+  {
+    variables_to_havoc.insert(values.begin(), values.end());
   }
   else
   {
@@ -196,17 +201,27 @@ void memory_snapshot_harness_generatort::add_init_section(
 }
 
 code_blockt memory_snapshot_harness_generatort::add_assignments_to_globals(
-  const symbol_tablet &snapshot) const
+  const symbol_tablet &snapshot,
+  goto_modelt &goto_model) const
 {
+  recursive_initializationt recursive_initialization{
+    recursive_initialization_configt{}, goto_model};
+
   code_blockt code;
   for(const auto &pair : snapshot)
   {
     const symbolt &symbol = pair.second;
-
     if(!symbol.is_static_lifetime)
       continue;
 
-    code.add(code_assignt{symbol.symbol_expr(), symbol.value});
+    if(variables_to_havoc.count(symbol.base_name) == 0)
+    {
+      code.add(code_assignt{symbol.symbol_expr(), symbol.value});
+    }
+    else
+    {
+      recursive_initialization.initialize(symbol.symbol_expr(), 0, {}, code);
+    }
   }
   return code;
 }
@@ -312,7 +327,8 @@ void memory_snapshot_harness_generatort::generate(
 
   add_init_section(goto_model);
 
-  code_blockt harness_function_body = add_assignments_to_globals(snapshot);
+  code_blockt harness_function_body =
+    add_assignments_to_globals(snapshot, goto_model);
 
   add_call_with_nondet_arguments(
     *called_function_symbol, harness_function_body);
