@@ -50,6 +50,14 @@ function argsToArray(args) {
     return result;
 }
 
+function arrayToString(args) {
+    let result = "";
+    for(let i = 0; i < args.length; i++) {
+        result = result + args[i] + " ";
+    }
+    return result
+}
+
 /// Get the coverage info from the json output if available
 function readCoverageInfo(stdout) {
     const jsonOutput = JSON.parse(stdout);
@@ -104,7 +112,7 @@ function run(executable, modelsPath, argumentsFile, functionName,
         let result = {
             classFile: classFile, function: functionName,
             execTime: execTime, success: true,
-            commandLine: command
+            commandLine: arrayToString(command)
         }
         if (showProperties) {
             result.goals = readNumberOfGoals(output);
@@ -116,7 +124,7 @@ function run(executable, modelsPath, argumentsFile, functionName,
         return JSON.stringify({
             classFile: classFile, function: functionName,
             execTime: (new Date() - startTime) / 1000, success: false,
-            commandLine: command
+            commandLine: arrayToString(command)
         });
     }
 }
