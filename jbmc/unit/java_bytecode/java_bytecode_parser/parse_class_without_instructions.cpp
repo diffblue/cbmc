@@ -41,8 +41,14 @@ static void check_class_structure(
 
   REQUIRE(method_f.is_public);
   REQUIRE(method_f.annotations.size() == 1);
+  REQUIRE(method_f.local_variable_table.size() == 2);
+  REQUIRE(method_f.local_variable_table[0].name == "this");
+  REQUIRE(method_f.local_variable_table[1].name == "y");
   REQUIRE(method_constructor.is_public);
   REQUIRE(method_constructor.annotations.size() == 0);
+  REQUIRE(method_f.local_variable_table.size() == 2);
+  REQUIRE(method_constructor.local_variable_table[0].name == "this");
+  REQUIRE(method_constructor.local_variable_table[1].name == "this$0");
 }
 
 SCENARIO(
@@ -72,6 +78,12 @@ SCENARIO(
           REQUIRE(methodone.instructions.size() == 0);
           REQUIRE(methodtwo.instructions.size() == 0);
         }
+
+        THEN("Neither method should have an exception table")
+        {
+          REQUIRE(methodone.exception_table.empty());
+          REQUIRE(methodtwo.exception_table.empty());
+        }
       }
     }
   }
@@ -98,6 +110,12 @@ SCENARIO(
         {
           REQUIRE(methodone.instructions.size() != 0);
           REQUIRE(methodtwo.instructions.size() != 0);
+        }
+
+        const auto &method_f = methodone.name == "f" ? methodone : methodtwo;
+        THEN("f should have an exception table")
+        {
+          REQUIRE(!method_f.exception_table.empty());
         }
       }
     }
