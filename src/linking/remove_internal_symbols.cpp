@@ -71,11 +71,12 @@ static void get_symbols(
 ///          http://gcc.gnu.org/ml/gcc/2006-11/msg00006.html
 ///          on "extern inline"
 /// \param symbol_table: symbol table to clean up
-void remove_internal_symbols(
-  symbol_tablet &symbol_table)
+/// \param handler: log handler
+void remove_internal_symbols(symbol_tablet &symbol_table, message_handlert &mh)
 {
   namespacet ns(symbol_table);
   find_symbols_sett exported;
+  messaget log(mh);
 
   // we retain certain special ones
   find_symbols_sett special;
