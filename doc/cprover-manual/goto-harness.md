@@ -13,9 +13,10 @@ having to manually construct an appropriate environment.
 
 We have two types of harnesses we can generate for now:
 
-* The `memory-snapshot` harness. TODO: Daniel can document this.
 * The `function-call` harness, which automatically synthesises an environment
 without having any information about the program state.
+* The `memory-snapshot` harness, which loads an existing program state (in form
+of a JSON file) and selectively _havoc-ing_ some variables.
 
 It is used similarly to how `goto-instrument` is used by modifying an existing
 GOTO binary, as produced by `goto-cc`.
@@ -306,6 +307,105 @@ This will result in:
 ** Results:
 main.c function function
 [function.assertion.1] line 5 assertion pointer[size-1] == '\0': SUCCESS
+
+** 0 of 1 failed (1 iterations)
+VERIFICATION SUCCESSFUL
+```
+
+### The memory snapshot harness
+
+The `function-call` harness is used in situations in which we want the analysed
+function to work in arbitrary environment. If we want to analyse a function
+starting from a _real_ program state, we can call the `memory-snapshot` harness
+instead.
+
+Furthermore, the program state of interest may be taken at a particular location
+within a function. In that case we do not want the harness to instrument the
+whole function but rather to allow starting the execution from a specific
+initial location (specified via `--initial-location func[:<n>]`). Note that the
+initial location does not have to be the first instruction of a function: we can
+also specify the _location number_ `n` to set the initial location inside our
+function. The _location numbers_ do not have to coincide with the lines of the
+program code. To find the _location number_ run CBMC with
+`--show-goto-functions`. Most commonly, the _location number_ is the instruction
+of the break-point used to extract the program state for the memory snapshot.
+
+Say we want to check the assertion in the following code:
+
+```C
+// main.c
+#include <assert.h>
+
+unsigned int x;
+unsigned int y;
+
+unsigned int nondet_int() {
+  unsigned int z;
+  return z;
+}
+
+void checkpoint() {}
+
+unsigned int complex_function_which_returns_one() {
+  unsigned int i = 0;
+  while(++i < 1000001) {
+    if(nondet_int() && ((i & 1) == 1))
+      break;
+  }
+  return i & 1;
+}
+
+void fill_array(unsigned int* arr, unsigned int size) {
+  for (unsigned int i = 0; i < size; i++)
+    arr[i]=nondet_int();
+}
+
+unsigned int array_sum(unsigned int* arr, unsigned int size) {
+  unsigned int sum = 0;
+  for (unsigned int i = 0; i < size; i++)
+    sum += arr[i];
+  return sum;
+}
+
+const unsigned int array_size = 100000;
+
+int main() {
+  x = complex_function_which_returns_one();
+  unsigned int large_array[array_size];
+  fill_array(large_array, array_size);
+  y = array_sum(large_array, array_size);
+  checkpoint();
+  assert(y + 2 > x);
+  return 0;
+}
+```
+
+But are not particularly interested in analysing the complex function, since we
+trust that its implementation is correct. Hence we run the above program
+stopping after the assignments to `x` and `x` and storing the program state,
+e.g. using the `memory-analyzer`, in a JSON file `snapshot.json`. Then run the
+harness and verify the assertion with:
+
+```
+$ goto-cc -o main.gb main.c
+$ goto-harness \
+  --harness-function-name harness \
+  --harness-type initialise-with-memory-snapshot \
+  --memory-snapshot snapshot.json \
+  --initial-location checkpoint \
+  --havoc-variables x \
+  main.gb main-mod.gb
+$ cbmc --function harness main-mod.gb
+```
+
+This will result in:
+
+```
+[...]
+
+** Results:
+main.c function main
+[main.assertion.1] line 42 assertion y + 2 > x: SUCCESS
 
 ** 0 of 1 failed (1 iterations)
 VERIFICATION SUCCESSFUL
