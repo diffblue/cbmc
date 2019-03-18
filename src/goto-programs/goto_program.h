@@ -393,7 +393,7 @@ public:
     DEPRECATED("use goto_programt::make_atomic_end() instead")
     void make_atomic_end() { clear(ATOMIC_END); }
 
-    DEPRECATED("use goto_programt::make_atomic_end_function() instead")
+    DEPRECATED("use goto_programt::make_end_function() instead")
     void make_end_function() { clear(END_FUNCTION); }
 
     DEPRECATED("use goto_programt::make_incomplete_goto() instead")
