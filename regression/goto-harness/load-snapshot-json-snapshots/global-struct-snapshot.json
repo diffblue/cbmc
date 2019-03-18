@@ -1,0 +1,357 @@
+  {
+    "symbolTable": {
+      "__CPROVER_size_t": {
+        "baseName": "__CPROVER_size_t",
+        "isAuxiliary": false,
+        "isExported": false,
+        "isExtern": false,
+        "isFileLocal": true,
+        "isInput": false,
+        "isLvalue": false,
+        "isMacro": true,
+        "isOutput": false,
+        "isParameter": false,
+        "isProperty": false,
+        "isStateVar": false,
+        "isStaticLifetime": false,
+        "isThreadLocal": true,
+        "isType": true,
+        "isVolatile": false,
+        "isWeak": false,
+        "location": {
+          "id": "",
+          "namedSub": {
+            "file": {
+              "id": "<built-in-additions>"
+            },
+            "line": {
+              "id": "1"
+            },
+            "working_directory": {
+              "id": "/home/diffblue/petr.bauch/code/cbmc/regression/memory-analyzer"
+            }
+          }
+        },
+        "mode": "C",
+        "module": "main",
+        "name": "__CPROVER_size_t",
+        "prettyName": "__CPROVER_size_t",
+        "prettyType": "__CPROVER_size_t",
+        "prettyValue": "",
+        "type": {
+          "id": "unsignedbv",
+          "namedSub": {
+            "#c_type": {
+              "id": "unsigned_long_int"
+            },
+            "#source_location": {
+              "id": "",
+              "namedSub": {
+                "file": {
+                  "id": "<built-in-additions>"
+                },
+                "line": {
+                  "id": "1"
+                },
+                "working_directory": {
+                  "id": "/home/diffblue/petr.bauch/code/cbmc/regression/memory-analyzer"
+                }
+              }
+            },
+            "#typedef": {
+              "id": "__CPROVER_size_t"
+            },
+            "width": {
+              "id": "64"
+            }
+          }
+        },
+        "value": {
+          "id": "nil"
+        }
+      },
+      "simple": {
+        "baseName": "simple",
+        "isAuxiliary": false,
+        "isExported": false,
+        "isExtern": false,
+        "isFileLocal": false,
+        "isInput": false,
+        "isLvalue": true,
+        "isMacro": false,
+        "isOutput": false,
+        "isParameter": false,
+        "isProperty": false,
+        "isStateVar": false,
+        "isStaticLifetime": true,
+        "isThreadLocal": false,
+        "isType": false,
+        "isVolatile": false,
+        "isWeak": false,
+        "location": {
+          "id": "",
+          "namedSub": {
+            "file": {
+              "id": "main.c"
+            },
+            "line": {
+              "id": "6"
+            },
+            "working_directory": {
+              "id": "/home/diffblue/petr.bauch/code/cbmc/regression/memory-analyzer"
+            }
+          }
+        },
+        "mode": "C",
+        "module": "main",
+        "name": "simple",
+        "prettyName": "simple",
+        "prettyType": "struct simple_str",
+        "prettyValue": "{ .i=1, .j=2 }",
+        "type": {
+          "id": "struct_tag",
+          "namedSub": {
+            "#source_location": {
+              "id": "",
+              "namedSub": {
+                "file": {
+                  "id": "main.c"
+                },
+                "line": {
+                  "id": "3"
+                },
+                "working_directory": {
+                  "id": "/home/diffblue/petr.bauch/code/cbmc/regression/memory-analyzer"
+                }
+              }
+            },
+            "identifier": {
+              "id": "tag-simple_str"
+            }
+          }
+        },
+        "value": {
+          "id": "struct",
+          "namedSub": {
+            "#source_location": {
+              "id": "",
+              "namedSub": {
+                "file": {
+                  "id": "main.c"
+                },
+                "line": {
+                  "id": "6"
+                },
+                "working_directory": {
+                  "id": "/home/diffblue/petr.bauch/code/cbmc/regression/memory-analyzer"
+                }
+              }
+            },
+            "type": {
+              "id": "struct_tag",
+              "namedSub": {
+                "#source_location": {
+                  "id": "",
+                  "namedSub": {
+                    "file": {
+                      "id": "main.c"
+                    },
+                    "line": {
+                      "id": "3"
+                    },
+                    "working_directory": {
+                      "id": "/home/diffblue/petr.bauch/code/cbmc/regression/memory-analyzer"
+                    }
+                  }
+                },
+                "identifier": {
+                  "id": "tag-simple_str"
+                }
+              }
+            }
+          },
+          "sub": [
+            {
+              "id": "constant",
+              "namedSub": {
+                "type": {
+                  "id": "signedbv",
+                  "namedSub": {
+                    "#c_type": {
+                      "id": "signed_int"
+                    },
+                    "width": {
+                      "id": "32"
+                    }
+                  }
+                },
+                "value": {
+                  "id": "1"
+                }
+              }
+            },
+            {
+              "id": "constant",
+              "namedSub": {
+                "type": {
+                  "id": "signedbv",
+                  "namedSub": {
+                    "#c_type": {
+                      "id": "signed_int"
+                    },
+                    "width": {
+                      "id": "32"
+                    }
+                  }
+                },
+                "value": {
+                  "id": "2"
+                }
+              }
+            }
+          ]
+        }
+      },
+      "tag-simple_str": {
+        "baseName": "simple_str",
+        "isAuxiliary": false,
+        "isExported": false,
+        "isExtern": false,
+        "isFileLocal": false,
+        "isInput": false,
+        "isLvalue": false,
+        "isMacro": false,
+        "isOutput": false,
+        "isParameter": false,
+        "isProperty": false,
+        "isStateVar": false,
+        "isStaticLifetime": false,
+        "isThreadLocal": false,
+        "isType": true,
+        "isVolatile": false,
+        "isWeak": false,
+        "location": {
+          "id": "",
+          "namedSub": {
+            "file": {
+              "id": "main.c"
+            },
+            "line": {
+              "id": "3"
+            },
+            "working_directory": {
+              "id": "/home/diffblue/petr.bauch/code/cbmc/regression/memory-analyzer"
+            }
+          }
+        },
+        "mode": "C",
+        "module": "main",
+        "name": "tag-simple_str",
+        "prettyName": "struct simple_str",
+        "prettyType": "struct simple_str { signed int i; signed int j; }",
+        "prettyValue": "",
+        "type": {
+          "id": "struct",
+          "namedSub": {
+            "#source_location": {
+              "id": "",
+              "namedSub": {
+                "file": {
+                  "id": "main.c"
+                },
+                "line": {
+                  "id": "3"
+                },
+                "working_directory": {
+                  "id": "/home/diffblue/petr.bauch/code/cbmc/regression/memory-analyzer"
+                }
+              }
+            },
+            "components": {
+              "id": "",
+              "sub": [
+                {
+                  "id": "",
+                  "namedSub": {
+                    "#source_location": {
+                      "id": "",
+                      "namedSub": {
+                        "file": {
+                          "id": "main.c"
+                        },
+                        "line": {
+                          "id": "4"
+                        },
+                        "working_directory": {
+                          "id": "/home/diffblue/petr.bauch/code/cbmc/regression/memory-analyzer"
+                        }
+                      }
+                    },
+                    "name": {
+                      "id": "i"
+                    },
+                    "pretty_name": {
+                      "id": "i"
+                    },
+                    "type": {
+                      "id": "signedbv",
+                      "namedSub": {
+                        "#c_type": {
+                          "id": "signed_int"
+                        },
+                        "width": {
+                          "id": "32"
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "",
+                  "namedSub": {
+                    "#source_location": {
+                      "id": "",
+                      "namedSub": {
+                        "file": {
+                          "id": "main.c"
+                        },
+                        "line": {
+                          "id": "5"
+                        },
+                        "working_directory": {
+                          "id": "/home/diffblue/petr.bauch/code/cbmc/regression/memory-analyzer"
+                        }
+                      }
+                    },
+                    "name": {
+                      "id": "j"
+                    },
+                    "pretty_name": {
+                      "id": "j"
+                    },
+                    "type": {
+                      "id": "signedbv",
+                      "namedSub": {
+                        "#c_type": {
+                          "id": "signed_int"
+                        },
+                        "width": {
+                          "id": "32"
+                        }
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            "tag": {
+              "id": "simple_str"
+            }
+          }
+        },
+        "value": {
+          "id": "nil"
+        }
+      }
+    }
+  }
