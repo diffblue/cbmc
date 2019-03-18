@@ -13,7 +13,7 @@ endif
 #CXXFLAGS += -O0 -g
 
 # With GCC this adds function names in stack backtraces
-#LINKFLAGS="-rdynamic"
+#LINKFLAGS = -rdynamic
 
 # If GLPK is available; this is used by goto-instrument and musketeer.
 #LIB_GLPK = -lglpk
