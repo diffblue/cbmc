@@ -46,11 +46,10 @@ protected:
     seen_expressionst &map,
     std::vector<exprt> &let_order);
 
-  static exprt letify_rec(
+  static exprt letify(
     const exprt &expr,
-    std::vector<exprt> &let_order,
-    const seen_expressionst &map,
-    std::size_t i);
+    const std::vector<exprt> &let_order,
+    const seen_expressionst &map);
 
   static exprt substitute_let(const exprt &expr, const seen_expressionst &map);
 };
