@@ -11,8 +11,6 @@ Author: Daniel Kroening, Peter Schrammel
 
 #include "single_path_symex_checker.h"
 
-#include <chrono>
-
 #include "bmc_util.h"
 #include "counterexample_beautification.h"
 #include "symex_bmc.h"
@@ -34,12 +32,7 @@ operator()(propertiest &properties)
   if(property_decider)
   {
     run_property_decider(
-      result,
-      properties,
-      *property_decider,
-      ui_message_handler,
-      std::chrono::duration<double>(0),
-      false);
+      result, properties, *property_decider, std::chrono::duration<double>(0));
 
     if(result.progress == resultt::progresst::FOUND_FAIL)
       return result;
@@ -70,16 +63,11 @@ operator()(propertiest &properties)
       property_decider = util_make_unique<goto_symex_property_decidert>(
         options, ui_message_handler, path.equation, ns);
 
-      const auto solver_runtime = prepare_property_decider(
-        properties, path.equation, *property_decider, ui_message_handler);
+      const auto solver_runtime =
+        prepare_property_decider(properties, path.equation, *property_decider);
 
       run_property_decider(
-        result,
-        properties,
-        *property_decider,
-        ui_message_handler,
-        solver_runtime,
-        false);
+        result, properties, *property_decider, solver_runtime);
 
       if(result.progress == resultt::progresst::FOUND_FAIL)
         return result;
@@ -99,6 +87,33 @@ bool single_path_symex_checkert::is_ready_to_decide(
   const path_storaget::patht &)
 {
   return symex.get_remaining_vccs() > 0;
+}
+
+std::chrono::duration<double>
+single_path_symex_checkert::prepare_property_decider(
+  propertiest &properties,
+  symex_target_equationt &equation,
+  goto_symex_property_decidert &property_decider)
+{
+  std::chrono::duration<double> solver_runtime = ::prepare_property_decider(
+    properties, equation, property_decider, ui_message_handler);
+
+  return solver_runtime;
+}
+
+void single_path_symex_checkert::run_property_decider(
+  incremental_goto_checkert::resultt &result,
+  propertiest &properties,
+  goto_symex_property_decidert &property_decider,
+  std::chrono::duration<double> solver_runtime)
+{
+  ::run_property_decider(
+    result,
+    properties,
+    property_decider,
+    ui_message_handler,
+    solver_runtime,
+    false);
 }
 
 goto_tracet single_path_symex_checkert::build_full_trace() const
