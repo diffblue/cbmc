@@ -32,6 +32,7 @@ SRC += analyses/ai/ai.cpp \
        interpreter/interpreter.cpp \
        json/json_parser.cpp \
        json_symbol_table.cpp \
+       memory-analyzer/gdb_api.cpp \
        path_strategies.cpp \
        pointer-analysis/value_set.cpp \
        solvers/bdd/miniBDD/miniBDD.cpp \
