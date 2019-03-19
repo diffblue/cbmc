@@ -2430,7 +2430,6 @@ code_blockt java_bytecode_convert_methodt::convert_multianewarray(
   const exprt::operandst &op,
   exprt::operandst &results)
 {
-  PRECONDITION(!location.get_line().empty());
   const reference_typet ref_type = java_reference_type(arg0.type());
   side_effect_exprt java_new_array(ID_java_new_array, ref_type, location);
   java_new_array.operands() = op;

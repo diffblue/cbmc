@@ -1,0 +1,10 @@
+CORE
+multinewarrayNoDebug.class
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+If recompiling the class file, use `-g:none` to eliminate all debug info, including line number tables.
