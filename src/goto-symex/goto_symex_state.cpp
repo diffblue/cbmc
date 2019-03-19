@@ -459,19 +459,6 @@ bool goto_symex_statet::l2_thread_read_encoding(
   return true;
 }
 
-/// Allocates a fresh L2 name for the given L1 identifier, and makes it the
-/// latest generation on this path. Does nothing if there isn't an expression
-/// keyed by the l1 identifier.
-void goto_symex_statet::increase_generation_if_exists(const irep_idt identifier)
-{
-  // If we can't find the name in the local scope, this is a no-op.
-  auto current_names_iter = level2.current_names.find(identifier);
-  if(current_names_iter == level2.current_names.end())
-    return;
-
-  current_names_iter->second.second = fresh_l2_name_provider(identifier);
-}
-
 goto_symex_statet::write_is_shared_resultt goto_symex_statet::write_is_shared(
   const ssa_exprt &expr,
   const namespacet &ns) const
