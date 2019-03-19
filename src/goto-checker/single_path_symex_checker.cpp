@@ -55,59 +55,23 @@ operator()(propertiest &properties)
   {
     symex_initialized = true;
 
-    // Put initial state into the work list
-    symex_target_equationt equation(ui_message_handler);
-    symex_bmct symex(
-      ui_message_handler,
-      goto_model.get_symbol_table(),
-      equation,
-      options,
-      *worklist,
-      guard_manager);
-    setup_symex(symex);
-
-    symex.initialize_path_storage_from_entry_point_of(
-      goto_symext::get_goto_function(goto_model), symex_symbol_table);
+    initialize_worklist();
   }
 
-  while(!worklist->empty() &&
-        (options.get_bool_option("paths-symex-explore-all") ||
-         has_properties_to_check(properties)))
+  while(!has_finished_exploration(properties))
   {
-    path_storaget::patht &resume = worklist->peek();
-    symex_bmct symex(
-      ui_message_handler,
-      goto_model.get_symbol_table(),
-      resume.equation,
-      options,
-      *worklist,
-      guard_manager);
-    setup_symex(symex);
+    path_storaget::patht &path = worklist->peek();
+    const bool ready_to_decide = resume_path(path);
 
-    symex.resume_symex_from_saved_state(
-      goto_symext::get_goto_function(goto_model),
-      resume.state,
-      &resume.equation,
-      symex_symbol_table);
-    postprocess_equation(
-      symex, resume.equation, options, ns, ui_message_handler);
-
-    output_coverage_report(
-      options.get_option("symex-coverage-report"),
-      goto_model,
-      symex,
-      ui_message_handler);
-
-    if(symex.get_remaining_vccs() > 0)
+    if(ready_to_decide)
     {
-      update_properties_status_from_symex_target_equation(
-        properties, result.updated_properties, resume.equation);
+      update_properties(properties, result.updated_properties, path.equation);
 
       property_decider = util_make_unique<goto_symex_property_decidert>(
-        options, ui_message_handler, resume.equation, ns);
+        options, ui_message_handler, path.equation, ns);
 
       const auto solver_runtime = prepare_property_decider(
-        properties, resume.equation, *property_decider, ui_message_handler);
+        properties, path.equation, *property_decider, ui_message_handler);
 
       run_property_decider(
         result,
@@ -124,15 +88,17 @@ operator()(propertiest &properties)
     worklist->pop();
   }
 
-  // For now, we assume that NOT_REACHED properties are PASS.
-  update_status_of_not_checked_properties(
-    properties, result.updated_properties);
-
-  // For now, we assume that UNKNOWN properties are PASS.
-  update_status_of_unknown_properties(properties, result.updated_properties);
+  final_update_properties(properties, result.updated_properties);
 
   // Worklist is empty: we are done.
   return result;
+}
+
+bool single_path_symex_checkert::is_ready_to_decide(
+  const symex_bmct &symex,
+  const path_storaget::patht &)
+{
+  return symex.get_remaining_vccs() > 0;
 }
 
 goto_tracet single_path_symex_checkert::build_full_trace() const

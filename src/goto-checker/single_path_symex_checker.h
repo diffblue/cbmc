@@ -47,6 +47,9 @@ public:
 protected:
   bool symex_initialized = false;
   std::unique_ptr<goto_symex_property_decidert> property_decider;
+
+  bool
+  is_ready_to_decide(const symex_bmct &, const path_storaget::patht &) override;
 };
 
 #endif // CPROVER_GOTO_CHECKER_SINGLE_PATH_SYMEX_CHECKER_H

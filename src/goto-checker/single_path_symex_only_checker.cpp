@@ -37,56 +37,78 @@ operator()(propertiest &properties)
 {
   resultt result(resultt::progresst::DONE);
 
+  initialize_worklist();
+
+  while(!has_finished_exploration(properties))
   {
-    // Put initial state into the work list
-    symex_target_equationt equation(ui_message_handler);
-    symex_bmct symex(
-      ui_message_handler,
-      goto_model.get_symbol_table(),
-      equation,
-      options,
-      *worklist,
-      guard_manager);
-    setup_symex(symex);
+    path_storaget::patht &path = worklist->peek();
 
-    symex.initialize_path_storage_from_entry_point_of(
-      goto_symext::get_goto_function(goto_model), symex_symbol_table);
-  }
+    (void)resume_path(path);
 
-  while(!worklist->empty() &&
-        (options.get_bool_option("paths-symex-explore-all") ||
-         has_properties_to_check(properties)))
-  {
-    path_storaget::patht &resume = worklist->peek();
-    symex_bmct symex(
-      ui_message_handler,
-      goto_model.get_symbol_table(),
-      resume.equation,
-      options,
-      *worklist,
-      guard_manager);
-    setup_symex(symex);
-
-    symex.resume_symex_from_saved_state(
-      goto_symext::get_goto_function(goto_model),
-      resume.state,
-      &resume.equation,
-      symex_symbol_table);
-    postprocess_equation(
-      symex, resume.equation, options, ns, ui_message_handler);
-
-    equation_output(symex, resume.equation);
-
-    update_properties_status_from_symex_target_equation(
-      properties, result.updated_properties, resume.equation);
+    update_properties(properties, result.updated_properties, path.equation);
 
     worklist->pop();
   }
 
-  // For now, we assume that NOT_REACHED properties are PASS.
-  update_status_of_not_checked_properties(
-    properties, result.updated_properties);
+  final_update_properties(properties, result.updated_properties);
+
   return result;
+}
+
+void single_path_symex_only_checkert::initialize_worklist()
+{
+  // Put initial state into the work list
+  symex_target_equationt equation(ui_message_handler);
+  symex_bmct symex(
+    ui_message_handler,
+    goto_model.get_symbol_table(),
+    equation,
+    options,
+    *worklist,
+    guard_manager);
+  setup_symex(symex);
+
+  symex.initialize_path_storage_from_entry_point_of(
+    goto_symext::get_goto_function(goto_model), symex_symbol_table);
+}
+
+bool single_path_symex_only_checkert::has_finished_exploration(
+  const propertiest &properties)
+{
+  return worklist->empty() ||
+         (!options.get_bool_option("paths-symex-explore-all") &&
+          !has_properties_to_check(properties));
+}
+
+bool single_path_symex_only_checkert::resume_path(path_storaget::patht &path)
+{
+  symex_bmct symex(
+    ui_message_handler,
+    goto_model.get_symbol_table(),
+    path.equation,
+    options,
+    *worklist,
+    guard_manager);
+  setup_symex(symex);
+
+  symex.resume_symex_from_saved_state(
+    goto_symext::get_goto_function(goto_model),
+    path.state,
+    &path.equation,
+    symex_symbol_table);
+  postprocess_equation(symex, path.equation, options, ns, ui_message_handler);
+
+  equation_output(symex, path.equation);
+
+  return is_ready_to_decide(symex, path);
+}
+
+bool single_path_symex_only_checkert::is_ready_to_decide(
+  const symex_bmct &,
+  const path_storaget::patht &)
+{
+  // we don't check anything here
+  return false;
 }
 
 void single_path_symex_only_checkert::equation_output(
@@ -114,4 +136,24 @@ void single_path_symex_only_checkert::equation_output(
 void single_path_symex_only_checkert::setup_symex(symex_bmct &symex)
 {
   ::setup_symex(symex, ns, options, ui_message_handler);
+}
+
+void single_path_symex_only_checkert::update_properties(
+  propertiest &properties,
+  std::unordered_set<irep_idt> &updated_properties,
+  const symex_target_equationt &equation)
+{
+  update_properties_status_from_symex_target_equation(
+    properties, updated_properties, equation);
+}
+
+void single_path_symex_only_checkert::final_update_properties(
+  propertiest &properties,
+  std::unordered_set<irep_idt> &updated_properties)
+{
+  // For now, we assume that NOT_REACHED properties are PASS.
+  update_status_of_not_checked_properties(properties, updated_properties);
+
+  // For now, we assume that UNKNOWN properties are PASS.
+  update_status_of_unknown_properties(properties, updated_properties);
 }
