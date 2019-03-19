@@ -56,19 +56,35 @@ operator()(propertiest &properties)
     if(!has_properties_to_check(properties))
       return result;
 
-    solver_runtime += prepare_property_decider(
-      properties, equation, property_decider, ui_message_handler);
-
-    if(options.get_bool_option("localize-faults"))
-      freeze_guards(equation, property_decider.get_solver());
+    solver_runtime += prepare_property_decider(properties);
 
     equation_generated = true;
   }
 
-  run_property_decider(
-    result, properties, property_decider, ui_message_handler, solver_runtime);
+  run_property_decider(result, properties, solver_runtime);
 
   return result;
+}
+
+std::chrono::duration<double>
+multi_path_symex_checkert::prepare_property_decider(propertiest &properties)
+{
+  std::chrono::duration<double> solver_runtime = ::prepare_property_decider(
+    properties, equation, property_decider, ui_message_handler);
+
+  if(options.get_bool_option("localize-faults"))
+    freeze_guards(equation, property_decider.get_solver());
+
+  return solver_runtime;
+}
+
+void multi_path_symex_checkert::run_property_decider(
+  incremental_goto_checkert::resultt &result,
+  propertiest &properties,
+  std::chrono::duration<double> solver_runtime)
+{
+  ::run_property_decider(
+    result, properties, property_decider, ui_message_handler, solver_runtime);
 }
 
 goto_tracet multi_path_symex_checkert::build_full_trace() const
