@@ -22,6 +22,36 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <analyses/dirty.h>
 #include <util/simplify_expr.h>
 
+/// Propagate constants and points-to information implied by a GOTO condition.
+/// See \ref goto_statet::apply_condition for aspects of this which are common
+/// to GOTO and ASSUME instructions.
+/// \param current_state: state prior to the GOTO instruction
+/// \param jump_taken_state: state following taking the GOTO
+/// \param jump_not_taken_state: fall-through state
+/// \param new_guard: GOTO condition, L2 renamed and simplified
+/// \param ns: global namespace
+static void apply_goto_condition(
+  const goto_symex_statet &current_state,
+  goto_statet &jump_taken_state,
+  goto_statet &jump_not_taken_state,
+  const exprt &new_guard,
+  const namespacet &ns)
+{
+  jump_taken_state.apply_condition(new_guard, current_state, ns);
+
+  // Try to find a negative condition that implies an equality constraint on
+  // the branch-not-taken path.
+  // Could use not_exprt + simplify, but let's avoid paying that cost on quite
+  // a hot path:
+  if(new_guard.id() == ID_not)
+    jump_not_taken_state.apply_condition(new_guard.op0(), current_state, ns);
+  else if(new_guard.id() == ID_notequal)
+  {
+    jump_not_taken_state.apply_condition(
+      equal_exprt(new_guard.op0(), new_guard.op1()), current_state, ns);
+  }
+}
+
 void goto_symext::symex_goto(statet &state)
 {
   const goto_programt::instructiont &instruction=*state.source.pc;
@@ -229,6 +259,17 @@ void goto_symext::symex_goto(statet &state)
     goto_state_list.emplace_back(state.source, state);
 
     symex_transition(state, state_pc, backward);
+
+    if(!symex_config.doing_path_exploration)
+    {
+      // This doesn't work for --paths (single-path mode) yet, as in multi-path
+      // mode we remove the implied constants at a control-flow merge, but in
+      // single-path mode we don't run merge_gotos.
+      auto &taken_state = backward ? state : goto_state_list.back().second;
+      auto &not_taken_state = backward ? goto_state_list.back().second : state;
+
+      apply_goto_condition(state, taken_state, not_taken_state, new_guard, ns);
+    }
 
     // produce new guard symbol
     exprt guard_expr;

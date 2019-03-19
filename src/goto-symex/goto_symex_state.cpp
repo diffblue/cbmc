@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 /// Symbolic Execution
 
 #include "goto_symex_state.h"
+#include "goto_symex_is_constant.h"
 
 #include <cstdlib>
 #include <iostream>
@@ -129,41 +130,6 @@ static bool check_renaming(const exprt &expr)
 
   return false;
 }
-
-class goto_symex_is_constantt : public is_constantt
-{
-protected:
-  bool is_constant(const exprt &expr) const override
-  {
-    if(expr.id() == ID_mult)
-    {
-      // propagate stuff with sizeof in it
-      forall_operands(it, expr)
-      {
-        if(it->find(ID_C_c_sizeof_type).is_not_nil())
-          return true;
-        else if(!is_constant(*it))
-          return false;
-      }
-
-      return true;
-    }
-    else if(expr.id() == ID_with)
-    {
-      // this is bad
-      /*
-      forall_operands(it, expr)
-      if(!is_constant(expr.op0()))
-      return false;
-
-      return true;
-      */
-      return false;
-    }
-
-    return is_constantt::is_constant(expr);
-  }
-};
 
 template <>
 renamedt<ssa_exprt, L0>
@@ -494,22 +460,6 @@ bool goto_symex_statet::l2_thread_read_encoding(
 }
 
 /// Allocates a fresh L2 name for the given L1 identifier, and makes it the
-/// latest generation on this path.
-/// \return the newly allocated generation number
-std::size_t goto_symex_statet::increase_generation(
-  const irep_idt l1_identifier,
-  const ssa_exprt &lhs)
-{
-  auto current_emplace_res =
-    level2.current_names.emplace(l1_identifier, std::make_pair(lhs, 0));
-
-  current_emplace_res.first->second.second =
-    fresh_l2_name_provider(l1_identifier);
-
-  return current_emplace_res.first->second.second;
-}
-
-/// Allocates a fresh L2 name for the given L1 identifier, and makes it the
 /// latest generation on this path. Does nothing if there isn't an expression
 /// keyed by the l1 identifier.
 void goto_symex_statet::increase_generation_if_exists(const irep_idt identifier)
@@ -522,31 +472,46 @@ void goto_symex_statet::increase_generation_if_exists(const irep_idt identifier)
   current_names_iter->second.second = fresh_l2_name_provider(identifier);
 }
 
+goto_symex_statet::write_is_shared_resultt goto_symex_statet::write_is_shared(
+  const ssa_exprt &expr,
+  const namespacet &ns) const
+{
+  if(!record_events)
+    return write_is_shared_resultt::NOT_SHARED;
+
+  const irep_idt &obj_identifier = expr.get_object_name();
+  if(
+    obj_identifier == guard_identifier() ||
+    (!ns.lookup(obj_identifier).is_shared() && !(dirty)(obj_identifier)))
+  {
+    return write_is_shared_resultt::NOT_SHARED;
+  }
+
+  if(atomic_section_id != 0)
+    return write_is_shared_resultt::IN_ATOMIC_SECTION;
+
+  return write_is_shared_resultt::SHARED;
+}
+
 /// thread encoding
 bool goto_symex_statet::l2_thread_write_encoding(
   const ssa_exprt &expr,
   const namespacet &ns)
 {
-  if(!record_events)
+  switch(write_is_shared(expr, ns))
+  {
+  case write_is_shared_resultt::NOT_SHARED:
     return false;
-
-  // is it a shared object?
-  const irep_idt &obj_identifier=expr.get_object_name();
-  if(
-    obj_identifier == guard_identifier() ||
-    (!ns.lookup(obj_identifier).is_shared() && !(dirty)(obj_identifier)))
+  case write_is_shared_resultt::IN_ATOMIC_SECTION:
   {
-    return false; // not shared
-  }
-
-  // see whether we are within an atomic section
-  if(atomic_section_id!=0)
-  {
-    ssa_exprt ssa_l1=expr;
+    ssa_exprt ssa_l1 = expr;
     ssa_l1.remove_level_2();
 
     written_in_atomic_section[ssa_l1].push_back(guard);
     return false;
+  }
+  case write_is_shared_resultt::SHARED:
+    break;
   }
 
   // record a shared write
@@ -557,7 +522,7 @@ bool goto_symex_statet::l2_thread_write_encoding(
     source);
 
   // do we have threads?
-  return threads.size()>1;
+  return threads.size() > 1;
 }
 
 template <levelt level>

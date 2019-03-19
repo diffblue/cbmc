@@ -181,8 +181,17 @@ public:
 
   std::vector<threadt> threads;
 
+  enum class write_is_shared_resultt
+  {
+    NOT_SHARED,
+    IN_ATOMIC_SECTION,
+    SHARED
+  };
+
   bool l2_thread_read_encoding(ssa_exprt &expr, const namespacet &ns);
   bool l2_thread_write_encoding(const ssa_exprt &expr, const namespacet &ns);
+  write_is_shared_resultt
+  write_is_shared(const ssa_exprt &expr, const namespacet &ns) const;
 
   bool record_events;
 
@@ -208,7 +217,11 @@ public:
   /// Allocates a fresh L2 name for the given L1 identifier, and makes it the
   //  latest generation on this path.
   std::size_t
-  increase_generation(const irep_idt l1_identifier, const ssa_exprt &lhs);
+  increase_generation(const irep_idt l1_identifier, const ssa_exprt &lhs)
+  {
+    return goto_statet::increase_generation(
+      l1_identifier, lhs, fresh_l2_name_provider);
+  }
 
   /// Increases the generation of the L1 identifier. Does nothing if there
   /// isn't an expression keyed by it.
@@ -218,6 +231,11 @@ public:
   void drop_l1_name(symex_renaming_levelt::current_namest::const_iterator it)
   {
     level2.current_names.erase(it);
+  }
+
+  std::function<std::size_t(const irep_idt &)> get_l2_name_provider() const
+  {
+    return fresh_l2_name_provider;
   }
 
 private:

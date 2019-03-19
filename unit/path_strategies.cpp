@@ -160,14 +160,14 @@ SCENARIO("path strategies")
       "/*  1 */   int main()                          \n"
       "/*  2 */   {                                   \n"
       "/*  3 */     int x;                            \n"
-      "/*  4 */     " CPROVER_PREFIX
-      "assume(x == 1); \n"
+      "/*  4 */     if(x == 1) {                      \n"
       "/*  5 */                                       \n"
-      "/*  6 */     while(x)                          \n"
-      "/*  7 */       --x;                            \n"
+      "/*  6 */       while(x)                        \n"
+      "/*  7 */         --x;                          \n"
       "/*  8 */                                       \n"
-      "/*  9 */     assert(x);                        \n"
-      "/* 10 */   }                                   \n";
+      "/*  9 */       assert(x);                      \n"
+      "/* 10 */     }                                 \n"
+      "/* 11 */   }                                   \n";
     // clang-format on
 
     check_with_strategy(
@@ -175,8 +175,12 @@ SCENARIO("path strategies")
       opts_callback,
       c,
       {
+        // The path where x != 1 and we have nothing to check:
+        symex_eventt::resume(symex_eventt::enumt::JUMP, 11),
+
         // The path where we skip the loop body. Successful because the path is
         // implausible, we cannot have skipped the body if x == 1.
+        symex_eventt::resume(symex_eventt::enumt::NEXT, 6),
         symex_eventt::resume(symex_eventt::enumt::JUMP, 9),
         symex_eventt::result(symex_eventt::enumt::SUCCESS),
 
@@ -200,6 +204,12 @@ SCENARIO("path strategies")
       opts_callback,
       c,
       {
+        // First the path where we enter the if-block at line 4 then on hitting
+        // the branch at line 6 consider skipping straight to the end, but find
+        // nothing there to investigate:
+        symex_eventt::resume(symex_eventt::enumt::NEXT, 6),
+        symex_eventt::resume(symex_eventt::enumt::JUMP, 11),
+
         // The path where we skip the loop body. Successful because the path is
         // implausible, we cannot have skipped the body if x == 1.
         //
