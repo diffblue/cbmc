@@ -34,6 +34,15 @@ protected:
   guard_managert guard_manager;
   path_fifot path_storage; // should go away
   symex_bmct symex;
+
+  /// Generates the equation by running goto-symex
+  virtual void generate_equation();
+
+  /// Updates the \p properties from the `equation` and
+  /// adds their property IDs to \p updated_properties.
+  virtual void update_properties(
+    propertiest &properties,
+    std::unordered_set<irep_idt> &updated_properties);
 };
 
 #endif // CPROVER_GOTO_CHECKER_MULTI_PATH_SYMEX_ONLY_CHECKER_H
