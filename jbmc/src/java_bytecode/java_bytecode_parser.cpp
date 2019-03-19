@@ -1222,35 +1222,44 @@ void java_bytecode_parsert::rmethod_attribute(methodt &method)
 
   irep_idt attribute_name=pool_entry(attribute_name_index).s;
 
-  if(attribute_name == "Code" && !skip_instructions)
+  if(attribute_name == "Code")
   {
     UNUSED_u2(max_stack);
     UNUSED_u2(max_locals);
 
-    rbytecode(method.instructions);
+    if(skip_instructions)
+      skip_bytes(read_u4());
+    else
+      rbytecode(method.instructions);
 
     u2 exception_table_length=read_u2();
-    method.exception_table.resize(exception_table_length);
-
-    for(std::size_t e=0; e<exception_table_length; e++)
+    if(skip_instructions)
+      skip_bytes(exception_table_length * 8u);
+    else
     {
-      u2 start_pc=read_u2();
-      u2 end_pc=read_u2();
+      method.exception_table.resize(exception_table_length);
 
-      // from the class file format spec ("4.7.3. The Code Attribute" for Java8)
-      INVARIANT(
-        start_pc < end_pc,
-        "The start_pc must be less than the end_pc as this is the range the "
-        "exception is active");
+      for(std::size_t e = 0; e < exception_table_length; e++)
+      {
+        u2 start_pc = read_u2();
+        u2 end_pc = read_u2();
 
-      u2 handler_pc=read_u2();
-      u2 catch_type=read_u2();
-      method.exception_table[e].start_pc=start_pc;
-      method.exception_table[e].end_pc=end_pc;
-      method.exception_table[e].handler_pc=handler_pc;
-      if(catch_type!=0)
-        method.exception_table[e].catch_type =
-          to_struct_tag_type(pool_entry(catch_type).expr.type());
+        // From the class file format spec ("4.7.3. The Code Attribute" for
+        // Java8)
+        INVARIANT(
+          start_pc < end_pc,
+          "The start_pc must be less than the end_pc as this is the range the "
+          "exception is active");
+
+        u2 handler_pc = read_u2();
+        u2 catch_type = read_u2();
+        method.exception_table[e].start_pc = start_pc;
+        method.exception_table[e].end_pc = end_pc;
+        method.exception_table[e].handler_pc = handler_pc;
+        if(catch_type != 0)
+          method.exception_table[e].catch_type =
+            to_struct_tag_type(pool_entry(catch_type).expr.type());
+      }
     }
 
     u2 attributes_count=read_u2();
