@@ -81,7 +81,7 @@ propt::resultt satcheck_zchaff_baset::do_prop_solve()
     std::string msg=
       std::to_string(solver->num_variables())+" variables, "+
       std::to_string(solver->clauses().size())+" clauses";
-    messaget::statistics() << msg << messaget::eom;
+    log.statistics() << msg << messaget::eom;
   }
 
   SAT_StatusT result=(SAT_StatusT)solver->solve();
@@ -120,7 +120,7 @@ propt::resultt satcheck_zchaff_baset::do_prop_solve()
       break;
     }
 
-    messaget::status() << msg << messaget::eom;
+    log.status() << msg << messaget::eom;
   }
 
   if(result==SATISFIABLE)
