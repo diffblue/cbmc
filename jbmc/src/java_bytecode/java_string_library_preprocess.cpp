@@ -831,16 +831,8 @@ void java_string_library_preprocesst::code_assign_java_string_to_string_expr(
 {
   PRECONDITION(implements_java_char_sequence_pointer(rhs.type()));
 
-  typet deref_type;
-  if(rhs.type().subtype().id() == ID_struct_tag)
-    deref_type =
-      symbol_table
-        .lookup_ref(to_struct_tag_type(rhs.type().subtype()).get_identifier())
-        .type;
-  else
-    deref_type=rhs.type().subtype();
-
-  const dereference_exprt deref = checked_dereference(rhs, deref_type);
+  const dereference_exprt deref =
+    checked_dereference(rhs, rhs.type().subtype());
 
   // Although we should not reach this code if rhs is null, the association
   // `pointer -> length` is added to the solver anyway, so we have to make sure
