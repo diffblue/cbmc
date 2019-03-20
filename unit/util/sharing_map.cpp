@@ -385,7 +385,7 @@ void sharing_map_sharing_stats_test()
 {
   SECTION("count nodes")
   {
-    std::set<void *> marked;
+    std::set<const void *> marked;
     smt sm;
     int count = 0;
 
@@ -410,7 +410,7 @@ void sharing_map_sharing_stats_test()
 
   SECTION("marking")
   {
-    std::set<void *> marked;
+    std::set<const void *> marked;
     smt sm;
 
     fill(sm);

@@ -105,6 +105,9 @@ class sharing_node_baset
 SN_TYPE_PAR_DEF class sharing_node_innert : public sharing_node_baset
 {
 public:
+  typedef small_shared_two_way_ptrt<SN_PTR_TYPE_ARGS> datat;
+  typedef typename datat::use_countt use_countt;
+
   typedef d_internalt<SN_TYPE_ARGS> d_it;
   typedef d_containert<SN_TYPE_ARGS> d_ct;
 
@@ -134,6 +137,11 @@ public:
     return data == other.data;
   }
 
+  use_countt use_count() const
+  {
+    return data.use_count();
+  }
+
   void swap(sharing_node_innert &other)
   {
     data.swap(other.data);
@@ -151,43 +159,11 @@ public:
     return data.is_derived_v();
   }
 
-  d_it &write_internal()
-  {
-    if(!data)
-    {
-      data = make_shared_derived_u<SN_PTR_TYPE_ARGS>();
-    }
-    else if(data.use_count() > 1)
-    {
-      data = make_shared_derived_u<SN_PTR_TYPE_ARGS>(*data.get_derived_u());
-    }
-
-    SN_ASSERT(data.use_count() == 1);
-
-    return *data.get_derived_u();
-  }
-
   const d_it &read_internal() const
   {
     SN_ASSERT(!empty());
 
     return *data.get_derived_u();
-  }
-
-  d_ct &write_container()
-  {
-    if(!data)
-    {
-      data = make_shared_derived_v<SN_PTR_TYPE_ARGS>();
-    }
-    else if(data.use_count() > 1)
-    {
-      data = make_shared_derived_v<SN_PTR_TYPE_ARGS>(*data.get_derived_v());
-    }
-
-    SN_ASSERT(data.use_count() == 1);
-
-    return *data.get_derived_v();
   }
 
   const d_ct &read_container() const
@@ -338,7 +314,40 @@ public:
     SN_ASSERT_USE(r, r == 1);
   }
 
-  small_shared_two_way_ptrt<SN_PTR_TYPE_ARGS> data;
+protected:
+  d_it &write_internal()
+  {
+    if(!data)
+    {
+      data = make_shared_derived_u<SN_PTR_TYPE_ARGS>();
+    }
+    else if(data.use_count() > 1)
+    {
+      data = make_shared_derived_u<SN_PTR_TYPE_ARGS>(*data.get_derived_u());
+    }
+
+    SN_ASSERT(data.use_count() == 1);
+
+    return *data.get_derived_u();
+  }
+
+  d_ct &write_container()
+  {
+    if(!data)
+    {
+      data = make_shared_derived_v<SN_PTR_TYPE_ARGS>();
+    }
+    else if(data.use_count() > 1)
+    {
+      data = make_shared_derived_v<SN_PTR_TYPE_ARGS>(*data.get_derived_v());
+    }
+
+    SN_ASSERT(data.use_count() == 1);
+
+    return *data.get_derived_v();
+  }
+
+  datat data;
 };
 
 // Leafs
@@ -357,6 +366,9 @@ public:
 SN_TYPE_PAR_DEF class sharing_node_leaft : public sharing_node_baset
 {
 public:
+  typedef small_shared_ptrt<SN_PTR_TYPE_ARG> datat;
+  typedef decltype(datat().use_count()) use_countt;
+
   typedef d_leaft<SN_TYPE_ARGS> d_lt;
 
   sharing_node_leaft(const keyT &k, const valueT &v)
@@ -392,30 +404,14 @@ public:
     return data == other.data;
   }
 
+  use_countt use_count() const
+  {
+    return data.use_count();
+  }
+
   void swap(sharing_node_leaft &other)
   {
     data.swap(other.data);
-  }
-
-  d_lt &write()
-  {
-    if(!data)
-    {
-      data = make_small_shared_ptr<d_lt>();
-    }
-    else if(data.use_count() > 1)
-    {
-      data = make_small_shared_ptr<d_lt>(*data);
-    }
-
-    SN_ASSERT(data.use_count() == 1);
-
-    return *data;
-  }
-
-  const d_lt &read() const
-  {
-    return *data;
   }
 
   // Accessors
@@ -445,7 +441,29 @@ public:
     return write().v;
   }
 
-  small_shared_ptrt<SN_PTR_TYPE_ARG> data;
+  const d_lt &read() const
+  {
+    return *data;
+  }
+
+protected:
+  d_lt &write()
+  {
+    if(!data)
+    {
+      data = make_small_shared_ptr<d_lt>();
+    }
+    else if(data.use_count() > 1)
+    {
+      data = make_small_shared_ptr<d_lt>(*data);
+    }
+
+    SN_ASSERT(data.use_count() == 1);
+
+    return *data;
+  }
+
+  datat data;
 };
 
 #endif
