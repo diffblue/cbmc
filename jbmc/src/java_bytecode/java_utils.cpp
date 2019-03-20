@@ -174,9 +174,9 @@ irep_idt resolve_friendly_method_name(
   }
 }
 
-dereference_exprt checked_dereference(const exprt &expr, const typet &type)
+dereference_exprt checked_dereference(const exprt &expr)
 {
-  dereference_exprt result(expr, type);
+  dereference_exprt result(expr);
   // tag it so it's easy to identify during instrumentation
   result.set(ID_java_member_access, true);
   return result;

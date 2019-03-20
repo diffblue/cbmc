@@ -641,7 +641,7 @@ static member_exprt to_member(
 
   const irep_idt &component_name = field_reference.component_name();
 
-  exprt accessed_object = checked_dereference(typed_pointer, class_type);
+  exprt accessed_object = checked_dereference(typed_pointer);
   const auto type_of = [&ns](const exprt &object) {
     return to_struct_type(ns.follow(object.type()));
   };
