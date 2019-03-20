@@ -597,7 +597,7 @@ protected:
   ///@}
 
 public:
-  unsigned get_total_vccs()
+  unsigned get_total_vccs() const
   {
     INVARIANT(
       _total_vccs != std::numeric_limits<unsigned>::max(),
@@ -606,7 +606,7 @@ public:
     return _total_vccs;
   }
 
-  unsigned get_remaining_vccs()
+  unsigned get_remaining_vccs() const
   {
     INVARIANT(
       _remaining_vccs != std::numeric_limits<unsigned>::max(),

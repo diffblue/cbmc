@@ -41,9 +41,7 @@ multi_path_symex_only_checkert::multi_path_symex_only_checkert(
 incremental_goto_checkert::resultt multi_path_symex_only_checkert::
 operator()(propertiest &properties)
 {
-  symex.symex_from_entry_point_of(
-    goto_symext::get_goto_function(goto_model), symex_symbol_table);
-  postprocess_equation(symex, equation, options, ns, ui_message_handler);
+  generate_equation();
 
   output_coverage_report(
     options.get_option("symex-coverage-report"),
@@ -62,12 +60,25 @@ operator()(propertiest &properties)
   }
 
   resultt result(resultt::progresst::DONE);
+  update_properties(properties, result.updated_properties);
+  return result;
+}
+
+void multi_path_symex_only_checkert::generate_equation()
+{
+  symex.symex_from_entry_point_of(
+    goto_symext::get_goto_function(goto_model), symex_symbol_table);
+  postprocess_equation(symex, equation, options, ns, ui_message_handler);
+}
+
+void multi_path_symex_only_checkert::update_properties(
+  propertiest &properties,
+  std::unordered_set<irep_idt> &updated_properties)
+{
   update_properties_status_from_symex_target_equation(
-    properties, result.updated_properties, equation);
+    properties, updated_properties, equation);
   // Since we will not symex any further we can decide the status
   // of all properties that do not occur in the equation now.
   // The current behavior is PASS.
-  update_status_of_not_checked_properties(
-    properties, result.updated_properties);
-  return result;
+  update_status_of_not_checked_properties(properties, updated_properties);
 }

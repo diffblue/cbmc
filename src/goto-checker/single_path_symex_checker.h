@@ -12,6 +12,8 @@ Author: Daniel Kroening, Peter Schrammel
 #ifndef CPROVER_GOTO_CHECKER_SINGLE_PATH_SYMEX_CHECKER_H
 #define CPROVER_GOTO_CHECKER_SINGLE_PATH_SYMEX_CHECKER_H
 
+#include <chrono>
+
 #include <util/optional.h>
 
 #include "goto_symex_property_decider.h"
@@ -47,6 +49,29 @@ public:
 protected:
   bool symex_initialized = false;
   std::unique_ptr<goto_symex_property_decidert> property_decider;
+
+  bool
+  is_ready_to_decide(const symex_bmct &, const path_storaget::patht &) override;
+
+  /// Prepare the \p property_decider for solving. This sets up the data
+  /// structures for tracking goal literals, sets the status of \p properties to
+  /// be checked to UNKNOWN and pushes the equation into the solver.
+  /// \return the time taken (pushing into the solver is a costly operation)
+  virtual std::chrono::duration<double> prepare_property_decider(
+    propertiest &properties,
+    symex_target_equationt &equation,
+    goto_symex_property_decidert &property_decider);
+
+  /// Run the \p property_decider, which calls the SAT solver, and set the
+  /// status of checked \p properties accordingly. The property IDs of updated
+  /// properties are added to the `result.updated_properties` and the goto
+  /// checker's progress (DONE, FOUND_FAIL) is set in \p result.
+  /// The \p solver_runtime will be logged.
+  virtual void run_property_decider(
+    incremental_goto_checkert::resultt &result,
+    propertiest &properties,
+    goto_symex_property_decidert &property_decider,
+    std::chrono::duration<double> solver_runtime);
 };
 
 #endif // CPROVER_GOTO_CHECKER_SINGLE_PATH_SYMEX_CHECKER_H

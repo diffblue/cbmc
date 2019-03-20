@@ -42,9 +42,7 @@ operator()(propertiest &properties)
   // we haven't got an equation yet
   if(!equation_generated)
   {
-    symex.symex_from_entry_point_of(
-      goto_symext::get_goto_function(goto_model), symex_symbol_table);
-    postprocess_equation(symex, equation, options, ns, ui_message_handler);
+    generate_equation();
 
     output_coverage_report(
       options.get_option("symex-coverage-report"),
@@ -52,32 +50,41 @@ operator()(propertiest &properties)
       symex,
       ui_message_handler);
 
-    // This might add new properties such as unwinding assertions, for instance.
-    update_properties_status_from_symex_target_equation(
-      properties, result.updated_properties, equation);
-    // Since we will not symex any further we can decide the status
-    // of all properties that do not occur in the equation now.
-    // The current behavior is PASS.
-    update_status_of_not_checked_properties(
-      properties, result.updated_properties);
+    update_properties(properties, result.updated_properties);
 
     // Have we got anything to check? Otherwise we return DONE.
     if(!has_properties_to_check(properties))
       return result;
 
-    solver_runtime += prepare_property_decider(
-      properties, equation, property_decider, ui_message_handler);
-
-    if(options.get_bool_option("localize-faults"))
-      freeze_guards(equation, property_decider.get_solver());
+    solver_runtime += prepare_property_decider(properties);
 
     equation_generated = true;
   }
 
-  run_property_decider(
-    result, properties, property_decider, ui_message_handler, solver_runtime);
+  run_property_decider(result, properties, solver_runtime);
 
   return result;
+}
+
+std::chrono::duration<double>
+multi_path_symex_checkert::prepare_property_decider(propertiest &properties)
+{
+  std::chrono::duration<double> solver_runtime = ::prepare_property_decider(
+    properties, equation, property_decider, ui_message_handler);
+
+  if(options.get_bool_option("localize-faults"))
+    freeze_guards(equation, property_decider.get_solver());
+
+  return solver_runtime;
+}
+
+void multi_path_symex_checkert::run_property_decider(
+  incremental_goto_checkert::resultt &result,
+  propertiest &properties,
+  std::chrono::duration<double> solver_runtime)
+{
+  ::run_property_decider(
+    result, properties, property_decider, ui_message_handler, solver_runtime);
 }
 
 goto_tracet multi_path_symex_checkert::build_full_trace() const
