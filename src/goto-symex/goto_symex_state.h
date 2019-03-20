@@ -223,14 +223,16 @@ public:
       l1_identifier, lhs, fresh_l2_name_provider);
   }
 
-  /// Increases the generation of the L1 identifier. Does nothing if there
-  /// isn't an expression keyed by it.
-  void increase_generation_if_exists(const irep_idt identifier);
-
   /// Drops an L1 name from the local L2 map
   void drop_l1_name(symex_renaming_levelt::current_namest::const_iterator it)
   {
     level2.current_names.erase(it);
+  }
+
+  /// Drops an L1 name from the local L2 map
+  void drop_l1_name(const irep_idt &l1_identifier)
+  {
+    level2.current_names.erase(l1_identifier);
   }
 
   std::function<std::size_t(const irep_idt &)> get_l2_name_provider() const
