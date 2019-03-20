@@ -61,6 +61,7 @@ TEST_CASE("Small shared two-way pointer")
   SECTION("Basic")
   {
     spt sp1;
+    REQUIRE(!sp1);
     REQUIRE(sp1.use_count() == 0);
 
     const d1t *p;
@@ -86,6 +87,10 @@ TEST_CASE("Small shared two-way pointer")
     REQUIRE(sp1.use_count() == 3);
     REQUIRE(sp2.use_count() == 3);
     REQUIRE(sp3.use_count() == 3);
+
+    sp1.reset();
+    REQUIRE(!sp1);
+    REQUIRE(sp1.use_count() == 0);
   }
 
   SECTION("Creation")
