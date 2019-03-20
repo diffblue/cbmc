@@ -113,18 +113,18 @@ public:
   typedef typename d_ct::leaft leaft;
   typedef typename d_ct::leaf_listt leaf_listt;
 
-  sharing_node_innert() : data(empty_data)
+  sharing_node_innert()
   {
   }
 
   bool empty() const
   {
-    return data == empty_data;
+    return !data;
   }
 
   void clear()
   {
-    data = empty_data;
+    data.reset();
   }
 
   bool shares_with(const sharing_node_innert &other) const
@@ -153,7 +153,7 @@ public:
 
   d_it &write_internal()
   {
-    if(data == empty_data)
+    if(!data)
     {
       data = make_shared_derived_u<SN_PTR_TYPE_ARGS>();
     }
@@ -176,7 +176,7 @@ public:
 
   d_ct &write_container()
   {
-    if(data == empty_data)
+    if(!data)
     {
       data = make_shared_derived_v<SN_PTR_TYPE_ARGS>();
     }
@@ -339,12 +339,7 @@ public:
   }
 
   small_shared_two_way_ptrt<SN_PTR_TYPE_ARGS> data;
-  static small_shared_two_way_ptrt<SN_PTR_TYPE_ARGS> empty_data;
 };
-
-SN_TYPE_PAR_DEF small_shared_two_way_ptrt<SN_PTR_TYPE_ARGS>
-  sharing_node_innert<SN_TYPE_ARGS>::empty_data =
-    small_shared_two_way_ptrt<SN_PTR_TYPE_ARGS>();
 
 // Leafs
 
@@ -364,7 +359,7 @@ SN_TYPE_PAR_DEF class sharing_node_leaft : public sharing_node_baset
 public:
   typedef d_leaft<SN_TYPE_ARGS> d_lt;
 
-  sharing_node_leaft(const keyT &k, const valueT &v) : data(empty_data)
+  sharing_node_leaft(const keyT &k, const valueT &v)
   {
     SN_ASSERT(empty());
 
@@ -384,12 +379,12 @@ public:
 
   bool empty() const
   {
-    return data == empty_data;
+    return !data;
   }
 
   void clear()
   {
-    data = empty_data;
+    data.reset();
   }
 
   bool shares_with(const sharing_node_leaft &other) const
@@ -404,9 +399,7 @@ public:
 
   d_lt &write()
   {
-    SN_ASSERT(data.use_count() > 0);
-
-    if(data == empty_data)
+    if(!data)
     {
       data = make_small_shared_ptr<d_lt>();
     }
@@ -453,11 +446,6 @@ public:
   }
 
   small_shared_ptrt<SN_PTR_TYPE_ARG> data;
-  static small_shared_ptrt<SN_PTR_TYPE_ARG> empty_data;
 };
-
-SN_TYPE_PAR_DEF small_shared_ptrt<SN_PTR_TYPE_ARG>
-  sharing_node_leaft<SN_TYPE_ARGS>::empty_data =
-    make_small_shared_ptr<SN_PTR_TYPE_ARG>();
 
 #endif
