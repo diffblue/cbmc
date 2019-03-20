@@ -26,6 +26,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <solvers/prop/literal.h>
 
+#include "renaming_level.h"
 #include "ssa_step.h"
 #include "symex_target.h"
 
@@ -87,7 +88,7 @@ public:
   virtual void function_call(
     const exprt &guard,
     const irep_idt &function_id,
-    const std::vector<exprt> &ssa_function_arguments,
+    const std::vector<renamedt<exprt, L2>> &ssa_function_arguments,
     const sourcet &source,
     bool hidden);
 
@@ -108,7 +109,7 @@ public:
     const exprt &guard,
     const sourcet &source,
     const irep_idt &output_id,
-    const std::list<exprt> &args);
+    const std::list<renamedt<exprt, L2>> &args);
 
   /// \copydoc symex_targett::output_fmt()
   virtual void output_fmt(
@@ -141,7 +142,7 @@ public:
   /// \copydoc symex_targett::goto_instruction()
   virtual void goto_instruction(
     const exprt &guard,
-    const exprt &cond,
+    const renamedt<exprt, L2> &cond,
     const sourcet &source);
 
   /// \copydoc symex_targett::constraint()

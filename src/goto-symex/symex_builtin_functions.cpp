@@ -72,7 +72,7 @@ void goto_symext::symex_allocate(
   else
   {
     // to allow constant propagation
-    exprt tmp_size = state.rename(size, ns);
+    exprt tmp_size = state.rename(size, ns).get();
     simplify(tmp_size, ns);
 
     // special treatment for sizeof(T)*x
@@ -165,7 +165,7 @@ void goto_symext::symex_allocate(
   state.symbol_table.add(value_symbol);
 
   // to allow constant propagation
-  exprt zero_init = state.rename(code.op1(), ns);
+  exprt zero_init = state.rename(code.op1(), ns).get();
   simplify(zero_init, ns);
 
   INVARIANT(
@@ -234,7 +234,7 @@ void goto_symext::symex_gcc_builtin_va_arg_next(
     return; // ignore
 
   // to allow constant propagation
-  exprt tmp = state.rename(code.op0(), ns);
+  exprt tmp = state.rename(code.op0(), ns).get();
   do_simplify(tmp);
   irep_idt id=get_symbol(tmp);
 
@@ -311,7 +311,7 @@ void goto_symext::symex_printf(
 {
   PRECONDITION(!rhs.operands().empty());
 
-  exprt tmp_rhs = state.rename(rhs, ns);
+  exprt tmp_rhs = state.rename(rhs, ns).get();
   do_simplify(tmp_rhs);
 
   const exprt::operandst &operands=tmp_rhs.operands();
@@ -335,13 +335,13 @@ void goto_symext::symex_input(
 {
   PRECONDITION(code.operands().size() >= 2);
 
-  exprt id_arg = state.rename(code.op0(), ns);
+  exprt id_arg = state.rename(code.op0(), ns).get();
 
   std::list<exprt> args;
 
   for(std::size_t i=1; i<code.operands().size(); i++)
   {
-    exprt l2_arg = state.rename(code.operands()[i], ns);
+    exprt l2_arg = state.rename(code.operands()[i], ns).get();
     do_simplify(l2_arg);
     args.emplace_back(std::move(l2_arg));
   }
@@ -356,15 +356,16 @@ void goto_symext::symex_output(
   const codet &code)
 {
   PRECONDITION(code.operands().size() >= 2);
-  exprt id_arg = state.rename(code.op0(), ns);
+  exprt id_arg = state.rename(code.op0(), ns).get();
 
-  std::list<exprt> args;
+  std::list<renamedt<exprt, L2>> args;
 
   for(std::size_t i=1; i<code.operands().size(); i++)
   {
-    exprt l2_arg = state.rename(code.operands()[i], ns);
-    do_simplify(l2_arg);
-    args.emplace_back(std::move(l2_arg));
+    renamedt<exprt, L2> l2_arg = state.rename(code.operands()[i], ns);
+    if(symex_config.simplify_opt)
+      l2_arg.simplify(ns);
+    args.emplace_back(l2_arg);
   }
 
   const irep_idt output_id=get_string_argument(id_arg, ns);
@@ -470,7 +471,7 @@ void goto_symext::symex_trace(
 
   if(symex_config.debug_level >= debug_lvl)
   {
-    std::list<exprt> vars;
+    std::list<renamedt<exprt, L2>> vars;
 
     irep_idt event = to_string_constant(code.arguments()[1].op0()).get_value();
 

@@ -96,12 +96,12 @@ public:
   /// A full explanation of SSA (which is why we do this renaming) is in
   /// the SSA section of background-concepts.md.
   template <levelt level = L2>
-  exprt rename(exprt expr, const namespacet &ns);
+  renamedt<exprt, level> rename(exprt expr, const namespacet &ns);
 
   /// Version of rename which is specialized for SSA exprt.
   /// Implementation only exists for level L0 and L1.
   template <levelt level>
-  ssa_exprt rename_ssa(ssa_exprt ssa, const namespacet &ns);
+  renamedt<ssa_exprt, level> rename_ssa(ssa_exprt ssa, const namespacet &ns);
 
   template <levelt level = L2>
   void rename(typet &type, const irep_idt &l1_identifier, const namespacet &ns);

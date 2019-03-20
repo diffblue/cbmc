@@ -59,8 +59,10 @@ void goto_symext::symex_goto(statet &state)
   exprt new_guard = instruction.get_condition();
   clean_expr(new_guard, state, false);
 
-  new_guard = state.rename(std::move(new_guard), ns);
-  do_simplify(new_guard);
+  renamedt<exprt, L2> renamed_guard = state.rename(std::move(new_guard), ns);
+  if(symex_config.simplify_opt)
+    renamed_guard.simplify(ns);
+  new_guard = renamed_guard.get();
 
   if(new_guard.is_false())
   {
@@ -71,7 +73,7 @@ void goto_symext::symex_goto(statet &state)
     return; // nothing to do
   }
 
-  target.goto_instruction(state.guard.as_expr(), new_guard, state.source);
+  target.goto_instruction(state.guard.as_expr(), renamed_guard, state.source);
 
   DATA_INVARIANT(
     !instruction.targets.empty(), "goto should have at least one target");
@@ -288,7 +290,7 @@ void goto_symext::symex_goto(statet &state)
       exprt new_rhs = boolean_negate(new_guard);
 
       ssa_exprt new_lhs =
-        state.rename_ssa<L1>(ssa_exprt{guard_symbol_expr}, ns);
+        state.rename_ssa<L1>(ssa_exprt{guard_symbol_expr}, ns).get();
       state.assignment(new_lhs, new_rhs, ns, true, false);
 
       guardt guard{true_exprt{}, guard_manager};
@@ -308,7 +310,7 @@ void goto_symext::symex_goto(statet &state)
         original_source,
         symex_targett::assignment_typet::GUARD);
 
-      guard_expr = state.rename(boolean_negate(guard_symbol_expr), ns);
+      guard_expr = state.rename(boolean_negate(guard_symbol_expr), ns).get();
     }
 
     if(state.has_saved_jump_target)

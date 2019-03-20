@@ -215,7 +215,7 @@ void goto_symext::symex_assign_symbol(
     tmp_ssa_rhs.swap(ssa_rhs);
   }
 
-  exprt l2_rhs = state.rename(std::move(ssa_rhs), ns);
+  exprt l2_rhs = state.rename(std::move(ssa_rhs), ns).get();
   do_simplify(l2_rhs);
 
   ssa_exprt ssa_lhs=lhs;
@@ -231,7 +231,7 @@ void goto_symext::symex_assign_symbol(
   ssa_full_lhs=add_to_lhs(ssa_full_lhs, ssa_lhs);
   const bool record_events=state.record_events;
   state.record_events=false;
-  exprt l2_full_lhs = state.rename(std::move(ssa_full_lhs), ns);
+  exprt l2_full_lhs = state.rename(std::move(ssa_full_lhs), ns).get();
   state.record_events=record_events;
 
   // do the assignment
@@ -410,7 +410,7 @@ void goto_symext::symex_assign_if(
   assignment_typet assignment_type)
 {
   // we have (c?a:b)=e;
-  exprt renamed_guard = state.rename(lhs.cond(), ns);
+  exprt renamed_guard = state.rename(lhs.cond(), ns).get();
   do_simplify(renamed_guard);
 
   if(!renamed_guard.is_false())

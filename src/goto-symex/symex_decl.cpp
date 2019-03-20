@@ -61,7 +61,7 @@ void goto_symext::symex_decl(statet &state, const symbol_exprt &expr)
     else
       rhs=exprt(ID_invalid);
 
-    exprt l1_rhs = state.rename<L1>(std::move(rhs), ns);
+    exprt l1_rhs = state.rename<L1>(std::move(rhs), ns).get();
     state.value_set.assign(ssa, l1_rhs, ns, true, false);
   }
 
@@ -71,7 +71,7 @@ void goto_symext::symex_decl(statet &state, const symbol_exprt &expr)
 
   const bool record_events=state.record_events;
   state.record_events=false;
-  exprt expr_l2 = state.rename(std::move(ssa), ns);
+  exprt expr_l2 = state.rename(std::move(ssa), ns).get();
   INVARIANT(
     expr_l2.id() == ID_symbol && expr_l2.get_bool(ID_C_SSA_symbol),
     "symbol to declare should not be replaced by constant propagation");

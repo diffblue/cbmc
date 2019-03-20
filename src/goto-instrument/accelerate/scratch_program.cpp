@@ -74,7 +74,7 @@ bool scratch_programt::check_sat(bool do_slice, guard_managert &guard_manager)
 
 exprt scratch_programt::eval(const exprt &e)
 {
-  return checker->get(symex_state->rename<L2>(e, ns));
+  return checker->get(symex_state->rename<L2>(e, ns).get());
 }
 
 void scratch_programt::append(goto_programt::instructionst &new_instructions)

@@ -16,6 +16,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <unordered_set>
 
 #include <util/irep.h>
+#include <util/simplify_expr.h>
 #include <util/ssa_expr.h>
 
 /// Symex renaming level names.
@@ -81,14 +82,20 @@ public:
     return value;
   }
 
+  void simplify(const namespacet &ns)
+  {
+    (void)::simplify(value, ns);
+  }
+
 private:
   underlyingt value;
 
   friend struct symex_level0t;
   friend struct symex_level1t;
   friend struct symex_level2t;
+  friend class goto_symex_statet;
 
-  /// Only symex_levelXt classes can create renamedt objects
+  /// Only the friend classes can create renamedt objects
   explicit renamedt(underlyingt value) : value(std::move(value))
   {
   }

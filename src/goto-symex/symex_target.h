@@ -14,6 +14,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/goto_program.h>
 
+#include "renaming_level.h"
+
 class ssa_exprt;
 class symbol_exprt;
 
@@ -155,7 +157,7 @@ public:
   virtual void function_call(
     const exprt &guard,
     const irep_idt &function_id,
-    const std::vector<exprt> &ssa_function_arguments,
+    const std::vector<renamedt<exprt, L2>> &ssa_function_arguments,
     const sourcet &source,
     bool hidden) = 0;
 
@@ -189,7 +191,7 @@ public:
     const exprt &guard,
     const sourcet &source,
     const irep_idt &output_id,
-    const std::list<exprt> &args)=0;
+    const std::list<renamedt<exprt, L2>> &args) = 0;
 
   /// Record formatted output.
   /// \param guard: Precondition for writing to the output
@@ -246,8 +248,8 @@ public:
   ///  goto instruction
   virtual void goto_instruction(
     const exprt &guard,
-    const exprt &cond,
-    const sourcet &source)=0;
+    const renamedt<exprt, L2> &cond,
+    const sourcet &source) = 0;
 
   /// Record a _global_ constraint: there is no guard limiting its scope.
   /// \param cond: Condition represented by this constraint
