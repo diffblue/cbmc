@@ -108,7 +108,7 @@ void java_simple_method_stubst::create_method_stub_at(
   // If it's a constructor the thing we're constructing has already
   // been allocated by this point.
   if(is_constructor)
-    to_init = dereference_exprt(to_init, expected_base);
+    to_init = dereference_exprt(to_init);
 
   java_object_factory_parameterst parameters = object_factory_parameters;
   if(assume_non_null)
