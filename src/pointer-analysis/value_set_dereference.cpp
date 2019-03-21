@@ -74,7 +74,8 @@ exprt value_set_dereferencet::dereference(const exprt &pointer)
       it!=points_to_set.end();
       it++)
   {
-    valuet value = build_reference_to(*it, pointer);
+    valuet value =
+      build_reference_to(*it, pointer, exclude_null_derefs, language_mode, ns);
 
 #if 0
     std::cout << "V: " << format(value.pointer_guard) << " --> ";
@@ -179,7 +180,8 @@ exprt value_set_dereferencet::dereference(const exprt &pointer)
 /// - object_type=(int *), dereference_type=(void **) is not ok;
 bool value_set_dereferencet::dereference_type_compare(
   const typet &object_type,
-  const typet &dereference_type) const
+  const typet &dereference_type,
+  const namespacet &ns)
 {
   const typet *object_unwrapped = &object_type;
   const typet *dereference_unwrapped = &dereference_type;
@@ -245,6 +247,11 @@ bool value_set_dereferencet::dereference_type_compare(
 ///   ID_unknown, ID_invalid, or an object_descriptor_exprt giving a referred
 ///   object and offset.
 /// \param pointer_expr: pointer expression that may point to `what`
+/// \param exclude_null_derefs: Ignore value-set entries that indicate a
+///   given dereference may follow a null pointer
+/// \param language_mode: Mode for any new symbols created to represent a
+///   dereference failure
+/// \param ns: A namespace
 /// \return a `valuet` object containing `guard`, `value` and `ignore` fields.
 ///   The `ignore` field is true for a `null` object when `exclude_null_derefs`
 ///   is true (set by our creator when they know \p what cannot be null)
@@ -258,7 +265,10 @@ bool value_set_dereferencet::dereference_type_compare(
 ///     .ignore = false}`
 value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
   const exprt &what,
-  const exprt &pointer_expr)
+  const exprt &pointer_expr,
+  const bool exclude_null_derefs,
+  const irep_idt language_mode,
+  const namespacet &ns)
 {
   const typet &dereference_type = pointer_expr.type().subtype();
 
@@ -324,8 +334,9 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
 
       result.value=index_expr;
     }
-    else if(dereference_type_compare(
-              memory_symbol.type.subtype(), dereference_type))
+    else if(
+      dereference_type_compare(
+        memory_symbol.type.subtype(), dereference_type, ns))
     {
       const index_exprt index_expr(
         symbol_expr,
@@ -372,18 +383,19 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
 
     exprt root_object_subexpression=root_object;
 
-    if(dereference_type_compare(object_type, dereference_type) &&
-       o.offset().is_zero())
+    if(
+      dereference_type_compare(object_type, dereference_type, ns) &&
+      o.offset().is_zero())
     {
       // The simplest case: types match, and offset is zero!
       // This is great, we are almost done.
 
       result.value = typecast_exprt::conditional_cast(object, dereference_type);
     }
-    else if(root_object_type.id()==ID_array &&
-            dereference_type_compare(
-              root_object_type.subtype(),
-              dereference_type))
+    else if(
+      root_object_type.id() == ID_array &&
+      dereference_type_compare(
+        root_object_type.subtype(), dereference_type, ns))
     {
       // We have an array with a subtype that matches
       // the dereferencing type.
@@ -451,7 +463,7 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
       else
         offset=o.offset();
 
-      if(memory_model(result.value, dereference_type, offset))
+      if(memory_model(result.value, dereference_type, offset, ns))
       {
         // ok, done
       }
@@ -486,7 +498,8 @@ static bool is_a_bv_type(const typet &type)
 bool value_set_dereferencet::memory_model(
   exprt &value,
   const typet &to_type,
-  const exprt &offset)
+  const exprt &offset,
+  const namespacet &ns)
 {
   // we will allow more or less arbitrary pointer type cast
 
@@ -518,7 +531,7 @@ bool value_set_dereferencet::memory_model(
 
   // otherwise, we will stitch it together from bytes
 
-  return memory_model_bytes(value, to_type, offset);
+  return memory_model_bytes(value, to_type, offset, ns);
 }
 
 /// Replace `value` by an expression of type `to_type` corresponding to the
@@ -532,7 +545,8 @@ bool value_set_dereferencet::memory_model(
 bool value_set_dereferencet::memory_model_bytes(
   exprt &value,
   const typet &to_type,
-  const exprt &offset)
+  const exprt &offset,
+  const namespacet &ns)
 {
   const typet from_type=value.type();
 
