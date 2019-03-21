@@ -267,3 +267,36 @@ void member_exprt::validate(
     "member expression's type must match the addressed struct or union "
     "component");
 }
+
+/// Check that the dereference expression has the right number of operands,
+/// refers to something with a pointer type, and that its type is the subtype
+/// of that pointer type. Throws or raises an invariant if not, according to
+/// validation mode.
+/// \param expr: expression to validate
+/// \param ns: global namespace
+/// \param vm: validation mode (see \ref exprt::validate)
+void dereference_exprt::validate(
+  const exprt &expr,
+  const namespacet &ns,
+  const validation_modet vm)
+{
+  check(expr, vm);
+
+  const auto &dereference_expr = to_dereference_expr(expr);
+
+  const typet &type_of_operand = dereference_expr.pointer().type();
+
+  const pointer_typet *pointer_type =
+    type_try_dynamic_cast<pointer_typet>(type_of_operand);
+
+  DATA_CHECK(
+    vm,
+    pointer_type,
+    "dereference expression's operand must have a pointer type");
+
+  DATA_CHECK(
+    vm,
+    dereference_expr.type() == pointer_type->subtype(),
+    "dereference expression's type must match the subtype of the type of its "
+    "operand");
+}

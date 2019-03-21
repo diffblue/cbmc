@@ -401,8 +401,7 @@ refined_string_exprt java_string_library_preprocesst::replace_char_array(
   code_blockt &code)
 {
   // array is *array_pointer
-  const dereference_exprt array =
-    checked_dereference(array_pointer, array_pointer.type().subtype());
+  const dereference_exprt array = checked_dereference(array_pointer);
   // array_data is array_pointer-> data
   const exprt array_data = get_data(array, symbol_table);
   const symbolt &sym_char_array = fresh_java_symbol(
@@ -769,7 +768,7 @@ codet java_string_library_preprocesst::code_assign_components_to_java_string(
   bool is_constructor)
 {
   PRECONDITION(implements_java_char_sequence_pointer(lhs.type()));
-  dereference_exprt deref=checked_dereference(lhs, lhs.type().subtype());
+  dereference_exprt deref = checked_dereference(lhs);
 
   if(is_constructor)
   {
@@ -781,8 +780,7 @@ codet java_string_library_preprocesst::code_assign_components_to_java_string(
     java_root_class_init(jlo_init, ns.follow_tag(jlo_tag), clsid);
 
     struct_exprt struct_rhs({jlo_init, rhs_length, rhs_array}, deref.type());
-    return code_assignt(
-      checked_dereference(lhs, lhs.type().subtype()), struct_rhs);
+    return code_assignt(checked_dereference(lhs), struct_rhs);
   }
   else
   {
@@ -831,16 +829,7 @@ void java_string_library_preprocesst::code_assign_java_string_to_string_expr(
 {
   PRECONDITION(implements_java_char_sequence_pointer(rhs.type()));
 
-  typet deref_type;
-  if(rhs.type().subtype().id() == ID_struct_tag)
-    deref_type =
-      symbol_table
-        .lookup_ref(to_struct_tag_type(rhs.type().subtype()).get_identifier())
-        .type;
-  else
-    deref_type=rhs.type().subtype();
-
-  const dereference_exprt deref = checked_dereference(rhs, deref_type);
+  const dereference_exprt deref = checked_dereference(rhs);
 
   // Although we should not reach this code if rhs is null, the association
   // `pointer -> length` is added to the solver anyway, so we have to make sure
@@ -1462,9 +1451,7 @@ code_blockt java_string_library_preprocesst::make_object_get_class_code(
 
   // class_identifier is this->@class_identifier
   const member_exprt class_identifier(
-    checked_dereference(this_obj, this_obj.type().subtype()),
-    "@class_identifier",
-    string_typet());
+    checked_dereference(this_obj), "@class_identifier", string_typet());
 
   // string_expr = cprover_string_literal(this->@class_identifier)
   const refined_string_exprt string_expr = string_expr_of_function(
@@ -1693,8 +1680,7 @@ code_returnt java_string_library_preprocesst::make_string_length_code(
   const java_method_typet::parameterst &params = type.parameters();
   PRECONDITION(!params[0].get_identifier().empty());
   const symbol_exprt arg_this{params[0].get_identifier(), params[0].type()};
-  const dereference_exprt deref =
-    checked_dereference(arg_this, arg_this.type().subtype());
+  const dereference_exprt deref = checked_dereference(arg_this);
 
   code_returnt ret(get_length(deref, symbol_table));
   ret.add_source_location() = loc;

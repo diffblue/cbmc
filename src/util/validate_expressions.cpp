@@ -41,6 +41,10 @@ void call_on_expr(const exprt &expr, Args &&... args)
   {
     CALL_ON_EXPR(member_exprt);
   }
+  else if(expr.id() == ID_dereference)
+  {
+    CALL_ON_EXPR(dereference_exprt);
+  }
   else
   {
 #ifdef REPORT_UNIMPLEMENTED_EXPRESSION_CHECKS
