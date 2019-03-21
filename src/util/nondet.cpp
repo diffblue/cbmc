@@ -17,6 +17,7 @@ symbol_exprt generate_nondet_int(
   const exprt &min_value_expr,
   const exprt &max_value_expr,
   const std::string &name_prefix,
+  const std::string &basename_prefix,
   const irep_idt &mode,
   const source_locationt &source_location,
   symbol_table_baset &symbol_table,
@@ -26,10 +27,14 @@ symbol_exprt generate_nondet_int(
   const typet &int_type = min_value_expr.type();
 
   // Declare a symbol for the non deterministic integer.
-  const symbol_exprt &nondet_symbol =
-    get_fresh_aux_symbol(
-      int_type, name_prefix, "nondet_int", source_location, mode, symbol_table)
-      .symbol_expr();
+  const symbol_exprt &nondet_symbol = get_fresh_aux_symbol(
+                                        int_type,
+                                        name_prefix,
+                                        basename_prefix,
+                                        source_location,
+                                        mode,
+                                        symbol_table)
+                                        .symbol_expr();
   instructions.add(code_declt(nondet_symbol));
 
   // Assign the symbol any non deterministic integer value.
@@ -54,6 +59,7 @@ symbol_exprt generate_nondet_int(
   const mp_integer &min_value,
   const mp_integer &max_value,
   const std::string &name_prefix,
+  const std::string &basename_prefix,
   const typet &int_type,
   const irep_idt &mode,
   const source_locationt &source_location,
@@ -65,6 +71,7 @@ symbol_exprt generate_nondet_int(
     from_integer(min_value, int_type),
     from_integer(max_value, int_type),
     name_prefix,
+    basename_prefix,
     mode,
     source_location,
     symbol_table,
@@ -90,6 +97,7 @@ code_blockt generate_nondet_switch(
     0,
     switch_cases.size() - 1,
     id2string(name_prefix),
+    "nondet_int",
     int_type,
     mode,
     source_location,
