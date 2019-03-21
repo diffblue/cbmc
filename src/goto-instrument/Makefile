@@ -1,4 +1,5 @@
-SRC = accelerate/accelerate.cpp \
+SRC = abstract_loops.cpp \
+      accelerate/accelerate.cpp \
       accelerate/acceleration_utils.cpp \
       accelerate/all_paths_enumerator.cpp \
       accelerate/cone_of_influence.cpp \

@@ -29,6 +29,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <analyses/goto_check.h>
 
+#include "abstract_loops.h"
 #include "aggressive_slicer.h"
 #include "generate_function_bodies.h"
 
@@ -84,6 +85,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(cav11)" \
   OPT_TIMESTAMP \
   "(show-natural-loops)(accelerate)(havoc-loops)" \
+  OPT_ABSTRACT_LOOPS \
   "(error-label):(string-abstraction)" \
   "(verbosity):(version)(xml-ui)(json-ui)(show-loops)" \
   "(accelerate)(constant-propagator)" \

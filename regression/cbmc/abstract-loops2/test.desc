@@ -1,0 +1,17 @@
+CORE
+main.c
+--bounds-check --pointer-check --abstract-loops --abstractset boo.0,main.0 --show-goto-functions
+^EXIT=0$
+^SIGNAL=0$
+ASSUME j < 10
+ASSUME j >= 0
+--
+ASSUME i < 10
+ASSUME i >= 0
+^warning: ignoring
+--
+This test ensures that the loops with loop variable i are not shrunk (so they
+appear in unwinding). Although the second loop in main is shrinkable, it is not
+in the target loop set provided by --abstractset, thus it shouldn't be shrunk.
+The test also ensures the loop in boo() with loop variable j is shrunk and the
+constraints are correctly applied.

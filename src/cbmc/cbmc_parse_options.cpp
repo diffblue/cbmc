@@ -161,6 +161,12 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   if(cmdline.isset("full-slice"))
     options.set_option("full-slice", true);
 
+  if(cmdline.isset("abstract-loops"))
+    options.set_option("abstract-loops", true);
+
+  if(cmdline.isset("abstractset"))
+    options.set_option("abstractset", cmdline.get_value("abstractset"));
+
   if(cmdline.isset("show-symex-strategies"))
   {
     status() << show_path_strategies() << eom;
@@ -895,6 +901,24 @@ bool cbmc_parse_optionst::process_goto_program(
         reachability_slicer(goto_model);
     }
 
+    if(options.get_bool_option("abstract-loops"))
+    {
+      // make sure location numbers are set
+      goto_model.goto_functions.update();
+
+      log.status() << "Abstracting loops" << eom;
+      loop_mapt target_loop_map;
+      if(options.is_set("abstractset"))
+      {
+        if(parse_absloopset(options.get_option("abstractset"), target_loop_map))
+        {
+          log.error() << "failed to parse input loop" << eom;
+          return true;
+        }
+      }
+      abstract_loops(goto_model, target_loop_map);
+    }
+
     // full slice?
     if(options.get_bool_option("full-slice"))
     {
@@ -993,6 +1017,7 @@ void cbmc_parse_optionst::help()
     HELP_REACHABILITY_SLICER_FB
     " --full-slice                 run full slicer (experimental)\n" // NOLINT(*)
     " --drop-unused-functions      drop functions trivially unreachable from main function\n" // NOLINT(*)
+    HELP_ABSTRACT_LOOPS
     "\n"
     "Semantic transformations:\n"
     // NOLINTNEXTLINE(whitespace/line_length)

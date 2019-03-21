@@ -93,6 +93,10 @@ public:
     const ai_baset &ai,
     const namespacet &ns) const final override;
 
+  typedef std::set<goto_programt::const_targett> depst;
+  depst get_data_deps() const;
+  depst get_control_deps() const;
+
   jsont output_json(
     const ai_baset &ai,
     const namespacet &ns) const override;
@@ -182,7 +186,6 @@ private:
   node_indext node_id;
   bool has_changed;
 
-  typedef std::set<goto_programt::const_targett> depst;
 
   // Set of locations with control instructions on which the instruction at this
   // location has a control dependency on
