@@ -128,6 +128,10 @@ void goto_symext::symex_assume(statet &state, const exprt &cond)
   simplified_cond = state.rename(std::move(simplified_cond), ns).get();
   do_simplify(simplified_cond);
 
+  // apply_condition must come after rename because it might change the
+  // constant propagator and the value-set and we read from those in rename
+  state.apply_condition(simplified_cond, state, ns);
+
   symex_assume_l2(state, simplified_cond);
 }
 
@@ -158,8 +162,6 @@ void goto_symext::symex_assume_l2(statet &state, const exprt &cond)
   if(state.atomic_section_id!=0 &&
      state.guard.is_false())
     symex_atomic_end(state);
-
-  state.apply_condition(cond, state, ns);
 }
 
 void goto_symext::rewrite_quantifiers(exprt &expr, statet &state)
