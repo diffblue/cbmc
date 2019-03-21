@@ -47,6 +47,12 @@ public:
     set_statement(statement);
   }
 
+  codet(const irep_idt &statement, source_locationt loc)
+    : exprt(ID_code, empty_typet(), std::move(loc))
+  {
+    set_statement(statement);
+  }
+
   /// \param statement: Specifies the type of the `codet` to be constructed,
   ///   e.g. `ID_block` for a \ref code_blockt or `ID_assign` for a
   ///   \ref code_assignt.
@@ -54,6 +60,12 @@ public:
   explicit codet(const irep_idt &statement, operandst _op) : codet(statement)
   {
     operands() = std::move(_op);
+  }
+
+  codet(const irep_idt &statement, operandst op, source_locationt loc)
+    : codet(statement, std::move(loc))
+  {
+    operands() = std::move(op);
   }
 
   void set_statement(const irep_idt &statement)
@@ -292,6 +304,11 @@ public:
 
   code_assignt(exprt lhs, exprt rhs)
     : codet(ID_assign, {std::move(lhs), std::move(rhs)})
+  {
+  }
+
+  code_assignt(exprt lhs, exprt rhs, source_locationt loc)
+    : codet(ID_assign, {std::move(lhs), std::move(rhs)}, std::move(loc))
   {
   }
 
@@ -1842,21 +1859,19 @@ public:
     operandst _operands,
     typet _type,
     source_locationt loc)
-    : exprt(ID_side_effect, std::move(_type))
+    : exprt(ID_side_effect, std::move(_type), std::move(loc))
   {
     set_statement(statement);
     operands() = std::move(_operands);
-    add_source_location().swap(loc);
   }
 
   side_effect_exprt(
     const irep_idt &statement,
     typet _type,
     source_locationt loc)
-    : exprt(ID_side_effect, std::move(_type))
+    : exprt(ID_side_effect, std::move(_type), std::move(loc))
   {
     set_statement(statement);
-    add_source_location().swap(loc);
   }
 
   const irep_idt &get_statement() const

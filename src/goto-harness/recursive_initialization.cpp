@@ -129,7 +129,7 @@ void recursive_initializationt::initialize_pointer(
 
   auto pointee = pointee_symbol.symbol_expr();
   allocate_objects.declare_created_symbols(body);
-  body.add(code_assignt{lhs, null_pointer_exprt{type}});
+  body.add(code_assignt{lhs, null_pointer_exprt{type}, type.source_location()});
   bool is_unknown_struct_tag =
     can_cast_type<tag_typet>(type.subtype()) &&
     known_tags.find(to_tag_type(type.subtype()).get_identifier()) ==
