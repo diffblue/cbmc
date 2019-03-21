@@ -1,0 +1,18 @@
+CORE
+virtual_filter_value_sets.class
+--show-vcc --function virtual_filter_value_sets.test_with_deref
+^EXIT=0$
+^SIGNAL=0$
+java::B\.f:\(\)I#return_value!0#.* = 9$
+--
+java::B\.f:\(\)I#return_value!0#.* = .*byte_extract_.*_endian
+^warning: ignoring
+--
+When B.f is called on `c.a_field`, it is guarded by a conditional which implies
+that `c.a_field` must be a B. Symex should filter the value set for `c.a_field`
+to remove anything which doesn't satisfy that condition. It will then be able
+to determine that the return value of B.f is 9. If it thinks that `c.a_field`
+might contain an A then it will create a more complicated expression for the
+return value of B.f, which will include byte_extract_little_endian or
+byte_extract_big_endian, as this is what it will produce when trying to read
+the field `int flag` from a class that doesn't have any fields.
