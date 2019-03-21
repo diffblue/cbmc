@@ -8,6 +8,7 @@ Author: Diffblue Ltd.
 
 #include "nondet.h"
 
+#include "allocate_objects.h"
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/fresh_symbol.h>
@@ -16,25 +17,17 @@ Author: Diffblue Ltd.
 symbol_exprt generate_nondet_int(
   const exprt &min_value_expr,
   const exprt &max_value_expr,
-  const std::string &name_prefix,
   const std::string &basename_prefix,
-  const irep_idt &mode,
   const source_locationt &source_location,
-  symbol_table_baset &symbol_table,
+  allocate_objectst &allocate_objects,
   code_blockt &instructions)
 {
   PRECONDITION(min_value_expr.type() == max_value_expr.type());
   const typet &int_type = min_value_expr.type();
 
   // Declare a symbol for the non deterministic integer.
-  const symbol_exprt &nondet_symbol = get_fresh_aux_symbol(
-                                        int_type,
-                                        name_prefix,
-                                        basename_prefix,
-                                        source_location,
-                                        mode,
-                                        symbol_table)
-                                        .symbol_expr();
+  const symbol_exprt &nondet_symbol =
+    allocate_objects.allocate_automatic_local_object(int_type, basename_prefix);
   instructions.add(code_declt(nondet_symbol));
 
   // Assign the symbol any non deterministic integer value.
@@ -58,23 +51,19 @@ symbol_exprt generate_nondet_int(
 symbol_exprt generate_nondet_int(
   const mp_integer &min_value,
   const mp_integer &max_value,
-  const std::string &name_prefix,
   const std::string &basename_prefix,
   const typet &int_type,
-  const irep_idt &mode,
   const source_locationt &source_location,
-  symbol_table_baset &symbol_table,
+  allocate_objectst &allocate_objects,
   code_blockt &instructions)
 {
   PRECONDITION(min_value <= max_value);
   return generate_nondet_int(
     from_integer(min_value, int_type),
     from_integer(max_value, int_type),
-    name_prefix,
     basename_prefix,
-    mode,
     source_location,
-    symbol_table,
+    allocate_objects,
     instructions);
 }
 
@@ -93,15 +82,16 @@ code_blockt generate_nondet_switch(
 
   code_blockt result_block;
 
+  allocate_objectst allocate_objects{
+    mode, source_location, name_prefix, symbol_table};
+
   const symbol_exprt &switch_value = generate_nondet_int(
     0,
     switch_cases.size() - 1,
-    id2string(name_prefix),
     "nondet_int",
     int_type,
-    mode,
     source_location,
-    symbol_table,
+    allocate_objects,
     result_block);
 
   code_blockt switch_block;
