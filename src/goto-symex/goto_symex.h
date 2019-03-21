@@ -315,6 +315,22 @@ protected:
   virtual void symex_other(statet &state);
 
   void symex_assert(const goto_programt::instructiont &, statet &);
+
+  /// Propagate constants and points-to information implied by a GOTO condition.
+  /// See \ref goto_statet::apply_condition for aspects of this which are common
+  /// to GOTO and ASSUME instructions.
+  /// \param current_state: state prior to the GOTO instruction
+  /// \param jump_taken_state: state following taking the GOTO
+  /// \param jump_not_taken_state: fall-through state
+  /// \param new_guard: GOTO condition, L2 renamed and simplified
+  /// \param ns: global namespace
+  void apply_goto_condition(
+    goto_symex_statet &current_state,
+    goto_statet &jump_taken_state,
+    goto_statet &jump_not_taken_state,
+    const exprt &new_guard,
+    const namespacet &ns);
+
   virtual void vcc(
     const exprt &,
     const std::string &msg,
