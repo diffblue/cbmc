@@ -1,0 +1,29 @@
+CORE paths-lifo-expected-failure
+main.c
+--show-vcc
+^EXIT=0$
+^SIGNAL=0$
+main::1::c1!0@1#. = 1
+main::1::c2!0@1#. = 1
+main::1::c3!0@1#. = 1
+main::1::c4!0@1#. = 1
+main::1::c5!0@1#. = 1
+main::1::c6!0@1#. = 1
+main::1::c7!0@1#. = 1
+main::1::c8!0@1#. = 1
+main::1::c9!0@1#. = 1
+main::1::c10!0@1#. = 1
+main::1::c11!0@1#. = 1
+main::1::c12!0@1#. = 1
+main::1::c13!0@1#. = 1
+main::1::c14!0@1#. = 1
+--
+^warning: ignoring
+main::1::c15!0@1#. = 1
+main::1::c16!0@1#. = 1
+--
+This test does not work in single-path mode as it relies on convergence
+behaviour (p15 and p16 are restricted on only one branch of an if-else diamond).
+
+See comments in main.c for explanations on why each of the assignments
+is or isn't expected to appear in the output.
