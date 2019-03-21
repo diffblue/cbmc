@@ -1,6 +1,4 @@
-SRC = all_properties.cpp \
-      bmc.cpp \
-      c_test_input_generator.cpp \
+SRC = c_test_input_generator.cpp \
       cbmc_languages.cpp \
       cbmc_main.cpp \
       cbmc_parse_options.cpp \

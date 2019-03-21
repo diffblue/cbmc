@@ -31,7 +31,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <solvers/strings/string_refinement.h>
 
-#include "bmc.h"
 #include "xml_interface.h"
 
 class goto_functionst;
