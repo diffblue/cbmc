@@ -85,6 +85,7 @@ SRC += analyses/ai/ai.cpp \
 
 INCLUDES= -I ../src/ -I.
 
+CPROVER_DIR = .
 include ../src/config.inc
 include ../src/common
 

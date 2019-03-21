@@ -28,6 +28,7 @@ OBJ += ../$(CPROVER_DIR)/src/ansi-c/ansi-c$(LIBEXT) \
       ../$(CPROVER_DIR)/src/analyses/analyses$(LIBEXT) \
       ../$(CPROVER_DIR)/src/langapi/langapi$(LIBEXT) \
       ../$(CPROVER_DIR)/src/xmllang/xmllang$(LIBEXT) \
+      ../$(CPROVER_DIR)/src/solvers/solvers$(LIBEXT) \
       ../$(CPROVER_DIR)/src/util/util$(LIBEXT) \
       ../miniz/miniz$(OBJEXT) \
       ../$(CPROVER_DIR)/src/json/json$(LIBEXT) \

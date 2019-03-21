@@ -19,6 +19,7 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../langapi/langapi$(LIBEXT) \
       ../json/json$(LIBEXT) \
       ../assembler/assembler$(LIBEXT) \
+      ../solvers/solvers$(LIBEXT) \
       ../util/util$(LIBEXT) \
       # Empty last line
 
