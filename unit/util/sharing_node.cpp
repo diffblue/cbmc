@@ -47,7 +47,6 @@ TEST_CASE("Sharing node", "[core][util]")
     {
       const leaft leaf(1, 2);
 
-      REQUIRE(!leaf.empty());
       REQUIRE(leaf.shares_with(leaf));
       REQUIRE(leaf.get_key() == 1);
       REQUIRE(leaf.get_value() == 2);
