@@ -25,6 +25,7 @@ void goto_symext::apply_goto_condition(
   goto_symex_statet &current_state,
   goto_statet &jump_taken_state,
   goto_statet &jump_not_taken_state,
+  const exprt &original_guard,
   const exprt &new_guard,
   const namespacet &ns)
 {
@@ -261,7 +262,13 @@ void goto_symext::symex_goto(statet &state)
       auto &taken_state = backward ? state : goto_state_list.back().second;
       auto &not_taken_state = backward ? goto_state_list.back().second : state;
 
-      apply_goto_condition(state, taken_state, not_taken_state, new_guard, ns);
+      apply_goto_condition(
+        state,
+        taken_state,
+        not_taken_state,
+        instruction.get_condition(),
+        new_guard,
+        ns);
     }
 
     // produce new guard symbol
