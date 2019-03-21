@@ -1,0 +1,13 @@
+CORE
+Main.class
+--show-goto-functions --function Main.twoCandidatesNoDerefs
+^EXIT=0$
+^SIGNAL=0$
+a \. A\.f:\(\)V\(\);$
+a \. B\.f:\(\)V\(\);$
+--
+this_argument
+--
+The temporary variable `this_argument` should not be created, because it
+is only created when there is a dispatch table and the `this` argument has a
+dereference in it. The former condition is true but the latter is false.

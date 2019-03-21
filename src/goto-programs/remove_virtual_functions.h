@@ -30,7 +30,7 @@ void remove_virtual_functions(
   goto_modelt &goto_model);
 
 void remove_virtual_functions(
-  const symbol_table_baset &symbol_table,
+  symbol_table_baset &symbol_table,
   goto_functionst &goto_functions);
 
 /// Remove virtual functions from one function.
@@ -90,6 +90,7 @@ typedef std::map<irep_idt, dispatch_table_entryt> dispatch_table_entries_mapt;
 
 goto_programt::targett remove_virtual_function(
   goto_modelt &goto_model,
+  const irep_idt &function_id,
   goto_programt &goto_program,
   goto_programt::targett instruction,
   const dispatch_table_entriest &dispatch_table,
@@ -97,6 +98,7 @@ goto_programt::targett remove_virtual_function(
 
 goto_programt::targett remove_virtual_function(
   symbol_tablet &symbol_table,
+  const irep_idt &function_id,
   goto_programt &goto_program,
   goto_programt::targett instruction,
   const dispatch_table_entriest &dispatch_table,
@@ -112,7 +114,7 @@ goto_programt::targett remove_virtual_function(
 ///   overridden functions will be stored.
 void collect_virtual_function_callees(
   const exprt &function,
-  const symbol_tablet &symbol_table,
+  symbol_tablet &symbol_table,
   const class_hierarchyt &class_hierarchy,
   dispatch_table_entriest &overridden_functions);
 

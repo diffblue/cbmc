@@ -116,6 +116,12 @@ SCENARIO(
 {
   symbol_tablet symbol_table = load_java_class(
     "VirtualFunctionsTestParent", "./java_bytecode/goto-programs/");
+  const irep_idt test_program_id = "java::testProgram:()V";
+  symbolt test_program_symbol{};
+  test_program_symbol.mode = ID_java;
+  test_program_symbol.name = test_program_id;
+  test_program_symbol.base_name = test_program_id;
+  symbol_table.insert(test_program_symbol);
   namespacet ns(symbol_table);
 
   goto_programt test_program;
@@ -147,6 +153,7 @@ SCENARIO(
 
     remove_virtual_function(
       symbol_table,
+      test_program_id,
       test_program,
       virtual_call_inst,
       dispatch_table,
@@ -178,6 +185,7 @@ SCENARIO(
 
     remove_virtual_function(
       symbol_table,
+      test_program_id,
       test_program,
       virtual_call_inst,
       dispatch_table,
@@ -220,6 +228,7 @@ SCENARIO(
 
     remove_virtual_function(
       symbol_table,
+      test_program_id,
       test_program,
       virtual_call_inst,
       dispatch_table,
@@ -271,6 +280,7 @@ SCENARIO(
 
     remove_virtual_function(
       symbol_table,
+      test_program_id,
       test_program,
       virtual_call_inst,
       dispatch_table,

@@ -1,0 +1,12 @@
+CORE
+Main.class
+--show-goto-functions --function Main.oneCandidate
+^EXIT=0$
+^SIGNAL=0$
+B\.f:\(\)V\(\);$
+--
+this_argument
+--
+The temporary variable `this_argument` should not be created, because it
+is only created when there is a dispatch table and the `this` argument has a
+dereference in it, neither of which is the case here.
