@@ -14,6 +14,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 #include <memory>
 
+#include <pointer-analysis/value_set_dereference.h>
+
 #include <util/exception_utils.h>
 #include <util/expr_iterator.h>
 #include <util/expr_util.h>
@@ -581,52 +583,6 @@ find_unique_pointer_typed_symbol(const exprt &expr)
   return return_value;
 }
 
-/// This is a simplified version of value_set_dereferencet::build_reference_to.
-/// It ignores the ID_dynamic_object case (which doesn't occur in goto-symex)
-/// and gives up for integer addresses and non-trivial symbols
-/// \param value_set_element: An element of a value-set
-/// \param type: the type of the expression that might point to
-///   \p value_set_element
-/// \return An expression for the value of the pointer indicated by \p
-///   value_set_element if it is easy to determine, or an empty optionalt
-///   otherwise
-static optionalt<exprt>
-value_set_element_to_expr(exprt value_set_element, pointer_typet type)
-{
-  const object_descriptor_exprt *object_descriptor =
-    expr_try_dynamic_cast<object_descriptor_exprt>(value_set_element);
-  if(!object_descriptor)
-  {
-    return {};
-  }
-
-  const exprt &root_object = object_descriptor->root_object();
-  const exprt &object = object_descriptor->object();
-
-  if(root_object.id() == ID_null_object)
-  {
-    return null_pointer_exprt{type};
-  }
-  else if(root_object.id() == ID_integer_address)
-  {
-    return {};
-  }
-  else
-  {
-    // We should do something like
-    // value_set_dereference::dereference_type_compare, which deals with
-    // arrays having types containing void
-    if(object_descriptor->offset().is_zero() && object.type() == type.subtype())
-    {
-      return address_of_exprt(object);
-    }
-    else
-    {
-      return {};
-    }
-  }
-}
-
 void goto_symext::try_filter_value_sets(
   goto_symex_statet &state,
   exprt condition,
@@ -661,18 +617,29 @@ void goto_symext::try_filter_value_sets(
   // used if the condition is false, and vice versa.
   for(const auto &value_set_element : value_set_elements)
   {
-    optionalt<exprt> possible_value =
-      value_set_element_to_expr(value_set_element, symbol_type);
+    const bool exclude_null_derefs = false;
+    value_set_dereferencet::valuet possible_value =
+      value_set_dereferencet::build_reference_to(
+        value_set_element,
+        *symbol_expr,
+        exclude_null_derefs,
+        language_mode,
+        ns);
 
-    if(!possible_value)
+    if(possible_value.ignore)
     {
       continue;
     }
 
+    exprt replacement_expr =
+      possible_value.value.is_nil()
+        ? static_cast<exprt>(null_pointer_exprt{symbol_type})
+        : static_cast<exprt>(address_of_exprt{possible_value.value});
+
     exprt modified_condition(condition);
 
     address_of_aware_replace_symbolt replace_symbol{};
-    replace_symbol.insert(*symbol_expr, *possible_value);
+    replace_symbol.insert(*symbol_expr, replacement_expr);
     replace_symbol(modified_condition);
 
     // This do_simplify() is needed for the following reason: if `condition` is
