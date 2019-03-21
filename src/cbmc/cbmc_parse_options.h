@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ansi-c/ansi_c_language.h>
 #include <ansi-c/c_object_factory_parameters.h>
 
+#include <util/cmdline_definition.h>
 #include <util/parse_options.h>
 #include <util/timestamper.h>
 #include <util/ui_message.h>
@@ -38,49 +39,45 @@ class goto_functionst;
 class optionst;
 
 // clang-format off
-#define CBMC_OPTIONS \
-  OPT_BMC \
-  "(preprocess)(slice-by-trace):" \
-  OPT_FUNCTIONS \
-  "(no-simplify)(full-slice)" \
-  OPT_REACHABILITY_SLICER \
-  "(debug-level):(no-propagation)(no-simplify-if)" \
-  "(document-subgoals)(outfile):(test-preprocessor)" \
-  "D:I:(c89)(c99)(c11)(cpp98)(cpp03)(cpp11)" \
-  "(object-bits):" \
-  OPT_GOTO_CHECK \
-  "(no-assertions)(no-assumptions)" \
-  "(xml-ui)(xml-interface)(json-ui)" \
-  "(smt1)(smt2)(fpa)(cvc3)(cvc4)(boolector)(yices)(z3)(mathsat)" \
-  "(cprover-smt2)" \
-  "(no-sat-preprocessor)" \
-  "(beautify)" \
-  "(dimacs)(refine)(max-node-refinement):(refine-arrays)(refine-arithmetic)"\
-  OPT_STRING_REFINEMENT_CBMC \
-  "(16)(32)(64)(LP64)(ILP64)(LLP64)(ILP32)(LP32)" \
-  "(little-endian)(big-endian)" \
-  OPT_SHOW_GOTO_FUNCTIONS \
-  OPT_SHOW_PROPERTIES \
-  "(show-symbol-table)(show-parse-tree)" \
-  "(drop-unused-functions)" \
-  "(property):(stop-on-fail)(trace)" \
-  "(error-label):(verbosity):(no-library)" \
-  "(nondet-static)" \
-  "(version)" \
-  "(cover):(symex-coverage-report):" \
-  "(mm):" \
-  OPT_TIMESTAMP \
-  "(i386-linux)(i386-macos)(i386-win32)(win32)(winx64)(gcc)" \
-  "(ppc-macos)(unsigned-char)" \
-  "(arrays-uf-always)(arrays-uf-never)" \
-  "(string-abstraction)(no-arch)(arch):" \
-  "(round-to-nearest)(round-to-plus-inf)(round-to-minus-inf)(round-to-zero)" \
-  OPT_FLUSH \
-  "(localize-faults)" \
-  OPT_GOTO_TRACE \
-  OPT_VALIDATE \
-  OPT_ANSI_C_LANGUAGE \
-  "(claim):(show-claims)(floatbv)(all-claims)(all-properties)" // legacy, and will eventually disappear // NOLINT(whitespace/line_length)
+const cmdline_definitiont ui_options
+{
+  {
+    "json-ui",
+    {},
+    "use JSON-formatted output",
+    "Other options",
+    {}
+  },
+  {
+    "xml-ui",
+    {},
+    "use XML-formatted output",
+    "Other options",
+    {}
+  }
+};
+
+const cmdline_definitiont cbmc_options(
+  ui_options
+  + cmdline_definitiont{
+    {
+      "preprocess",
+      {},
+      "stop after preprocessing. "
+      "This is a veeeeeeeeeeeeeeeeery long help text. "
+      "This is a veeeeeeeeeeeeeeeeery long help text.",
+      "C/C++ frontend options",
+      {}
+    },
+    {
+      "slice-by-trace",
+      cmdline_optiont::argumentt{"f", "string"},
+      "",
+      "",
+      cmdline_optiont::deprecatedt("-slice-by-trace has been removed")
+    }
+  }
+  + ui_options);
 // clang-format on
 
 class cbmc_parse_optionst:
@@ -96,7 +93,7 @@ public:
   cbmc_parse_optionst(
     int argc,
     const char **argv,
-    const std::string &extra_options);
+    const cmdline_definitiont &extra_options);
 
   /// \brief Set the options that have default values
   ///
