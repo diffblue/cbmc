@@ -9,11 +9,11 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Pointer Dereferencing
 
-#ifndef CPROVER_POINTER_ANALYSIS_POINTER_OFFSET_SUM_H
-#define CPROVER_POINTER_ANALYSIS_POINTER_OFFSET_SUM_H
+#ifndef CPROVER_UTIL_POINTER_OFFSET_SUM_H
+#define CPROVER_UTIL_POINTER_OFFSET_SUM_H
 
-#include <util/expr.h>
+#include "expr.h"
 
 exprt pointer_offset_sum(const exprt &a, const exprt &b);
 
-#endif // CPROVER_POINTER_ANALYSIS_POINTER_OFFSET_SUM_H
+#endif // CPROVER_UTIL_POINTER_OFFSET_SUM_H
