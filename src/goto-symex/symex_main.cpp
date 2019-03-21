@@ -617,6 +617,11 @@ void goto_symext::try_filter_value_sets(
   // used if the condition is false, and vice versa.
   for(const auto &value_set_element : value_set_elements)
   {
+    if(value_set_element.id() == ID_unknown)
+    {
+      continue;
+    }
+
     const bool exclude_null_derefs = false;
     value_set_dereferencet::valuet possible_value =
       value_set_dereferencet::build_reference_to(
