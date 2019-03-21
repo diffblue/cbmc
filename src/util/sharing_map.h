@@ -350,7 +350,7 @@ protected:
 
   std::size_t count_unmarked_nodes(
     bool leafs_only,
-    std::set<void *> &marked,
+    std::set<const void *> &marked,
     bool mark = true) const;
 
   // dummy element returned when no element was found
@@ -423,8 +423,10 @@ SHARING_MAPT(void)
 }
 
 SHARING_MAPT(std::size_t)
-::count_unmarked_nodes(bool leafs_only, std::set<void *> &marked, bool mark)
-  const
+::count_unmarked_nodes(
+  bool leafs_only,
+  std::set<const void *> &marked,
+  bool mark) const
 {
   if(empty())
     return 0;
@@ -447,8 +449,10 @@ SHARING_MAPT(std::size_t)
 
     // internal node or container node
     const innert *ip = static_cast<const innert *>(bp);
-    const unsigned use_count = ip->data.use_count();
-    void *raw_ptr = ip->data.get();
+    const unsigned use_count = ip->use_count();
+    const void *raw_ptr = ip->is_internal()
+                            ? (const void *)&ip->read_internal()
+                            : (const void *)&ip->read_container();
 
     if(use_count >= 2)
     {
@@ -488,8 +492,8 @@ SHARING_MAPT(std::size_t)
 
       for(const auto &l : ll)
       {
-        const unsigned leaf_use_count = l.data.use_count();
-        void *leaf_raw_ptr = l.data.get();
+        const unsigned leaf_use_count = l.use_count();
+        const void *leaf_raw_ptr = &l.read();
 
         if(leaf_use_count >= 2)
         {
@@ -528,7 +532,7 @@ SHARING_MAPT3(Iterator, , sharing_map_statst)
   Iterator end,
   std::function<sharing_mapt &(const Iterator)> f)
 {
-  std::set<void *> marked;
+  std::set<const void *> marked;
   sharing_map_statst sms;
 
   // We do a separate pass over the tree for each statistic. This is not very

@@ -101,30 +101,13 @@ public:
 
   ~small_shared_two_way_ptrt()
   {
-    if(!p)
-    {
-      return;
-    }
+    destruct();
+  }
 
-    auto use_count = p->use_count();
-
-    if(use_count == 1)
-    {
-      if(p->is_derived_u())
-      {
-        U *u = static_cast<U *>(p);
-        delete u;
-      }
-      else
-      {
-        V *v = static_cast<V *>(p);
-        delete v;
-      }
-    }
-    else
-    {
-      p->decrement_use_count();
-    }
+  void reset()
+  {
+    destruct();
+    p = nullptr;
   }
 
   void swap(small_shared_two_way_ptrt &rhs)
@@ -186,6 +169,34 @@ public:
   }
 
 private:
+  void destruct()
+  {
+    if(!p)
+    {
+      return;
+    }
+
+    auto use_count = p->use_count();
+
+    if(use_count == 1)
+    {
+      if(p->is_derived_u())
+      {
+        U *u = static_cast<U *>(p);
+        delete u;
+      }
+      else
+      {
+        V *v = static_cast<V *>(p);
+        delete v;
+      }
+    }
+    else
+    {
+      p->decrement_use_count();
+    }
+  }
+
   pointeet *p = nullptr;
 };
 

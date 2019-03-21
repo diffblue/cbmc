@@ -7,7 +7,37 @@
 #include <testing-utils/use_catch.h>
 #include <util/sharing_node.h>
 
-void sharing_node_test()
+class leaft : public sharing_node_leaft<int, int>
+{
+public:
+  leaft(const int &a, const int &b) : sharing_node_leaft<int, int>(a, b)
+  {
+  }
+  friend void sharing_node_internals_test();
+};
+
+void sharing_node_internals_test()
+{
+  SECTION("Leaf test")
+  {
+    // Detaching
+    {
+      leaft leaf(1, 2);
+
+      auto p = leaf.data.get();
+      leaf.write();
+
+      REQUIRE(leaf.data.get() == p);
+    }
+  }
+}
+
+TEST_CASE("Sharing node internals", "[core][util]")
+{
+  sharing_node_internals_test();
+}
+
+TEST_CASE("Sharing node", "[core][util]")
 {
   SECTION("Leaf test")
   {
@@ -44,16 +74,6 @@ void sharing_node_test()
       v = 3;
       REQUIRE(leaf2.get_value() == 3);
       REQUIRE(!leaf2.shares_with(leaf1));
-    }
-
-    // Detaching
-    {
-      leaft leaf(1, 2);
-
-      auto p = leaf.data.get();
-      leaf.write();
-
-      REQUIRE(leaf.data.get() == p);
     }
   }
 
@@ -200,9 +220,4 @@ void sharing_node_test()
 
     REQUIRE(map2.shares_with(map));
   }
-}
-
-TEST_CASE("Sharing node")
-{
-  sharing_node_test();
 }
