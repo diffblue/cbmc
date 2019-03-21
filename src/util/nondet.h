@@ -13,6 +13,25 @@ Author: Diffblue Ltd.
 #include <util/std_expr.h>
 #include <util/symbol_table.h>
 
+/// Same as \ref generate_nondet_int(
+///   const mp_integer &min_value,
+///   const mp_integer &max_value,
+///   const std::string &name_prefix,
+///   const typet &int_type,
+///   const irep_idt &mode,
+///   const source_locationt &source_location,
+///   symbol_table_baset &symbol_table,
+///   code_blockt &instructions)
+/// except the minimum and maximum values are represented as exprts.
+symbol_exprt generate_nondet_int(
+  const exprt &min_value_expr,
+  const exprt &max_value_expr,
+  const std::string &name_prefix,
+  const irep_idt &mode,
+  const source_locationt &source_location,
+  symbol_table_baset &symbol_table,
+  code_blockt &instructions);
+
 /// Gets a fresh nondet choice in range (min_value, max_value). GOTO generated
 /// resembles:
 /// ```

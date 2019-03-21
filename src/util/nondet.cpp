@@ -14,16 +14,16 @@ Author: Diffblue Ltd.
 #include <util/symbol.h>
 
 symbol_exprt generate_nondet_int(
-  const mp_integer &min_value,
-  const mp_integer &max_value,
+  const exprt &min_value_expr,
+  const exprt &max_value_expr,
   const std::string &name_prefix,
-  const typet &int_type,
   const irep_idt &mode,
   const source_locationt &source_location,
   symbol_table_baset &symbol_table,
   code_blockt &instructions)
 {
-  PRECONDITION(min_value < max_value);
+  PRECONDITION(min_value_expr.type() == max_value_expr.type());
+  const typet &int_type = min_value_expr.type();
 
   // Declare a symbol for the non deterministic integer.
   const symbol_exprt &nondet_symbol =
@@ -40,18 +40,35 @@ symbol_exprt generate_nondet_int(
   // Constrain the non deterministic integer with a lower bound of `min_value`.
   //   ASSUME(name_prefix::nondet_int >= min_value)
   instructions.add(
-    code_assumet(
-      binary_predicate_exprt(
-        nondet_symbol, ID_ge, from_integer(min_value, int_type))));
+    code_assumet(binary_predicate_exprt(nondet_symbol, ID_ge, min_value_expr)));
 
   // Constrain the non deterministic integer with an upper bound of `max_value`.
   //   ASSUME(name_prefix::nondet_int <= max_value)
   instructions.add(
-    code_assumet(
-      binary_predicate_exprt(
-        nondet_symbol, ID_le, from_integer(max_value, int_type))));
+    code_assumet(binary_predicate_exprt(nondet_symbol, ID_le, max_value_expr)));
 
   return nondet_symbol;
+}
+
+symbol_exprt generate_nondet_int(
+  const mp_integer &min_value,
+  const mp_integer &max_value,
+  const std::string &name_prefix,
+  const typet &int_type,
+  const irep_idt &mode,
+  const source_locationt &source_location,
+  symbol_table_baset &symbol_table,
+  code_blockt &instructions)
+{
+  PRECONDITION(min_value < max_value);
+  return generate_nondet_int(
+    from_integer(min_value, int_type),
+    from_integer(max_value, int_type),
+    name_prefix,
+    mode,
+    source_location,
+    symbol_table,
+    instructions);
 }
 
 code_blockt generate_nondet_switch(
