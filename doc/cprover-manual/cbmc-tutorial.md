@@ -109,7 +109,7 @@ hold and which do not. Using the SAT solver, CBMC detects that the
 property for the object bounds of `argv` does not hold, and will display:
 
 ```plaintext
-[main.pointer_dereference.6] dereference failure: pointer outside object bounds in argv[(signed long int)2]: FAILURE
+[main.pointer_dereference.6] line 7 dereference failure: pointer outside object bounds in argv[(signed long int)2]: FAILURE
 ```
 
 ### Counterexample Traces
