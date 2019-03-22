@@ -9,10 +9,11 @@ Author: Diffblue Ltd.
 #ifndef CPROVER_JAVA_BYTECODE_NONDET_H
 #define CPROVER_JAVA_BYTECODE_NONDET_H
 
-#include <util/allocate_objects.h>
-#include <util/std_code.h>
-#include <util/std_expr.h>
-#include <util/symbol_table.h>
+#include "std_code.h"
+#include "std_expr.h"
+
+class allocate_objectst;
+class symbol_table_baset;
 
 /// Same as \ref generate_nondet_int(
 ///   const mp_integer &min_value,
