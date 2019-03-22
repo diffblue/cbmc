@@ -14,6 +14,7 @@ Author: Daniel Kroening
 #include <util/config.h>
 #include <util/find_symbols.h>
 #include <util/namespace.h>
+#include <util/std_code.h>
 #include <util/std_types.h>
 #include <util/symbol_table.h>
 
@@ -56,6 +57,20 @@ static void get_symbols(
         // identifiers for prototypes need not exist
         if(!ns.lookup(p.get_identifier(), s))
           working_set.push_back(s);
+      }
+
+      if(
+        symbol.value.id() == ID_code &&
+        to_code(symbol.value).get_statement() == ID_function_body)
+      {
+        for(const auto &p : to_code_function_body(to_code(symbol.value))
+                              .get_parameter_identifiers())
+          if(!p.empty())
+          {
+            const symbolt *s;
+            if(!ns.lookup(p, s))
+              working_set.push_back(s);
+          }
       }
     }
   }
