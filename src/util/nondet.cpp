@@ -60,7 +60,7 @@ symbol_exprt generate_nondet_int(
   symbol_table_baset &symbol_table,
   code_blockt &instructions)
 {
-  PRECONDITION(min_value < max_value);
+  PRECONDITION(min_value <= max_value);
   return generate_nondet_int(
     from_integer(min_value, int_type),
     from_integer(max_value, int_type),
