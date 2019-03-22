@@ -1,4 +1,4 @@
-FUTURE
+FUTURE cvc4_bug
 regexp_range_input_sat.smt2
 
 ^EXIT=0$
@@ -6,3 +6,7 @@ regexp_range_input_sat.smt2
 ^sat$
 --
 error
+--
+cvc4 (--strings-exp):
+re.range expects constant bounds
+(cvc4 1.7-prerelease [git master e1dc3932])

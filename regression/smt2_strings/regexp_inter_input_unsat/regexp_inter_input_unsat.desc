@@ -1,4 +1,4 @@
-FUTURE
+FUTURE cvc4_bug
 regexp_inter_input_unsat.smt2
 
 ^EXIT=0$
@@ -6,3 +6,10 @@ regexp_inter_input_unsat.smt2
 ^unsat$
 --
 error
+--
+cvc4 (--strings-exp):
+re.inter seems to not be constrained enough, as
+(assert (str.in.re "abc" (re.inter (str.to.re in1) (str.to.re in2))))
+allows a model where in1=="abc" and in2=="a".
+(cvc4 1.7-prerelease [git master e1dc3932])
+
