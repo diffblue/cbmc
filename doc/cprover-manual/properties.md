@@ -136,8 +136,8 @@ program, or it is desirable to replace bodies of functions with certain
 predetermined stubs (for example to confirm that these functions are never
 called, or to indicate that these functions will never return). For this purpose
 goto-instrument provides the `--generate-function-body` option, that takes a
-regular expression (in [ECMAScript syntax]
-(http://en.cppreference.com/w/cpp/regex/ecmascript)) that describes the names of
+regular expression (in [ECMAScript
+syntax](http://en.cppreference.com/w/cpp/regex/ecmascript)) that describes the names of
 the functions to generate. Note that this will only generate bodies for
 functions that do not already have one; If one wishes to replace the body of a
 function with an existing definition, the `--remove-function-body` option can be

@@ -1,11 +1,11 @@
-[CPROVER Manual TOC](../../)
+[CPROVER Manual TOC](../)
 
 ## Test Suite Generation with CBMC
 
 ### A Small Tutorial with a Case Study
 
 We assume that CBMC is installed on your system. If not, follow
-\ref man_install-cbmc "these instructions".
+[these instructions](../../installation/).
 
 CBMC can be used to automatically generate test cases that satisfy a
 certain [code coverage](https://en.wikipedia.org/wiki/Code_coverage)
@@ -196,7 +196,8 @@ instrumented goals in the PID function `climb_pid_run`, the loop must be
 unwound enough times. For example, `climb_pid_run` needs to
 be called at least six times for evaluating the condition
 `climb_sum_err>MAX_CLIMB_SUM_ERR` in line 48 to *true*. This corresponds
-to Test 5. To learn more about loop unwinding take a look at [Understanding Loop Unwinding](cbmc-loops.shtml).
+to Test 5. To learn more about loop unwinding take a look at [Understanding Loop
+Unwinding](../../cbmc-unwinding/).
 
 In this tutorial, we present the automatic test suite generation
 functionality of CBMC, by applying the MC/DC code coverage criterion to

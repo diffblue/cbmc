@@ -28,7 +28,7 @@ to detect this problem and reports that the "upper bound property" of
 the buffer has been violated. CBMC is capable of checking these
 lower and upper bounds, even for arrays with dynamic size. A detailed
 discussion of the properties that CBMC can check
-automatically is \ref man_instrumentation-properties "here".
+automatically is [here](../../properties/).
 
 ### First Steps
 
@@ -74,7 +74,7 @@ preliminary static analysis, which relies on computing a fixed point on
 various [abstract
 domains](http://en.wikipedia.org/wiki/Abstract_interpretation). More
 detail on automatically generated properties is provided
-\ref man_instrumentation-properties "here".
+[here](../../properties/).
 
 Note that these automatically generated properties need not necessarily
 correspond to bugs – these are just *potential* flaws, as abstract
@@ -281,7 +281,7 @@ violates an assertion. Without unwinding assertions, or when using the
 `--depth` command line switch, CBMC does not prove the program correct,
 but it can be helpful to find program bugs. The various command line
 options that CBMC offers for loop unwinding are described in the section
-on \ref man_cbmc-loops "understanding loop unwinding".
+on [understanding loop unwinding](../../cbmc-unwinding/).
 
 ### A Note About Compilers and the ANSI-C Library
 
@@ -319,7 +319,7 @@ be found in the menu *Visual Studio Tools*.
 Note that in both cases, only header files are available. CBMC only
 comes with a small set of definitions, which includes functions such as
 `malloc`. Detailed information about the built-in definitions is
-\ref man_instrumentation-libraries "here".
+[here](../../goto-cc/).
 
 ### Further Reading
 
