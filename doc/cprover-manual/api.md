@@ -146,7 +146,7 @@ the array **dest** with the given value.
 
 #### Uninterpreted Functions
 
-Uninterpreted functions are documented \ref man_modelling-nondet "here".
+Uninterpreted functions are documented [here](../modeling/nondeterminism/)).
 
 ### Predefined Types and Symbols
 
