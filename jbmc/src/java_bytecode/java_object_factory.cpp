@@ -156,13 +156,6 @@ private:
     size_t depth,
     const source_locationt &location);
 
-  const symbol_exprt gen_nondet_int_init(
-    code_blockt &assignments,
-    const std::string &basename_prefix,
-    const exprt &min_length_expr,
-    const exprt &max_length_expr,
-    const source_locationt &location);
-
   void gen_method_call_if_present(
     code_blockt &assignments,
     const exprt &instance_expr,
@@ -1089,53 +1082,6 @@ void java_object_factoryt::declare_created_symbols(code_blockt &init_code)
   allocate_objects.declare_created_symbols(init_code);
 }
 
-/// Nondeterministically initializes an int i in the range min <= i <= max,
-/// where min is the integer represented by `min_value_expr` and max is the
-/// integer represented by `max_value_expr`.
-/// \param [out] assignments: A code block that the initializing assignments
-///   will be appended to.
-/// \param basename_prefix: Used for naming the newly created symbol.
-/// \param min_value_expr: Represents the minimum value for the integer.
-/// \param max_value_expr: Represents the maximum value for the integer.
-/// \param location: Source location associated with nondet-initialization.
-/// \return A symbol expression for the resulting integer.
-const symbol_exprt java_object_factoryt::gen_nondet_int_init(
-  code_blockt &assignments,
-  const std::string &basename_prefix,
-  const exprt &min_value_expr,
-  const exprt &max_value_expr,
-  const source_locationt &location)
-{
-  PRECONDITION(min_value_expr.type() == max_value_expr.type());
-
-  const symbol_exprt &int_symbol_expr =
-    allocate_objects.allocate_automatic_local_object(
-      min_value_expr.type(), basename_prefix);
-
-  // Nondet-initialize it
-  gen_nondet_init(
-    assignments,
-    int_symbol_expr,
-    false, // is_sub
-    irep_idt(),
-    false,                      // skip_classid
-    lifetimet::AUTOMATIC_LOCAL, // immaterial, type is primitive
-    {},                         // no override type
-    0,                          // depth is immaterial, always non-null
-    update_in_placet::NO_UPDATE_IN_PLACE,
-    location);
-
-  // Insert assumptions to bound its value
-  const auto min_assume_expr =
-    binary_relation_exprt(int_symbol_expr, ID_ge, min_value_expr);
-  const auto max_assume_expr =
-    binary_relation_exprt(int_symbol_expr, ID_le, max_value_expr);
-  assignments.add(code_assumet(min_assume_expr));
-  assignments.add(code_assumet(max_assume_expr));
-
-  return int_symbol_expr;
-}
-
 /// Allocates a fresh array and emits an assignment writing to \p lhs the
 /// address of the new array.  Single-use at the moment, but useful to keep as a
 /// separate function for downstream branches.
@@ -1158,12 +1104,13 @@ void java_object_factoryt::allocate_nondet_length_array(
   const typet &element_type,
   const source_locationt &location)
 {
-  const auto &length_sym_expr = gen_nondet_int_init(
-    assignments,
-    "nondet_array_length",
+  const auto &length_sym_expr = generate_nondet_int(
     from_integer(0, java_int_type()),
     max_length_expr,
-    location);
+    "nondet_array_length",
+    location,
+    allocate_objects,
+    assignments);
 
   side_effect_exprt java_new_array(ID_java_new_array, lhs.type(), loc);
   java_new_array.copy_to_operands(length_sym_expr);
@@ -1462,12 +1409,13 @@ bool java_object_factoryt::gen_nondet_enum_init(
   const member_exprt enum_array_expr =
     member_exprt(deref_expr, "data", comps[2].type());
 
-  const symbol_exprt &index_expr = gen_nondet_int_init(
-    assignments,
-    "enum_index_init",
+  const symbol_exprt &index_expr = generate_nondet_int(
     from_integer(0, java_int_type()),
     minus_exprt(length_expr, from_integer(1, java_int_type())),
-    location);
+    "enum_index_init",
+    location,
+    allocate_objects,
+    assignments);
 
   // Generate statement using pointer arithmetic to access array element:
   // expr = (expr.type())*(enum_array_expr + index_expr);
