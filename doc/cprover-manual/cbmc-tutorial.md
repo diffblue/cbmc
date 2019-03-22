@@ -135,16 +135,18 @@ In the example above, we used a program that starts with a `main`
 function. However, CBMC is aimed at embedded software, and these kinds
 of programs usually have different entry points. Furthermore, CBMC is
 also useful for verifying program modules. Consider the following
-example, called file2.c:
+example, called [file2.c](https://raw.githubusercontent.com/diffblue/cbmc/develop/doc/cprover-manual/file2.c):
 
 ```C
 int array[10];
-int sum() {
+
+int sum()
+{
   unsigned i, sum;
 
-  sum=0;
-  for(i=0; i<10; i++)
-    sum+=array[i];
+  sum = 0;
+  for(i = 0; i < 10; i++)
+    sum += array[i];
 
   return sum;
 }
