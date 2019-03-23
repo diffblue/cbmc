@@ -7,28 +7,49 @@
 #include <testing-utils/use_catch.h>
 #include <util/sharing_node.h>
 
-class leaft : public sharing_node_leaft<int, int>
+// could be an internal node or a container node
+class innert : public sharing_node_innert<int, int>
 {
 public:
-  leaft(const int &a, const int &b) : sharing_node_leaft<int, int>(a, b)
-  {
-  }
   friend void sharing_node_internals_test();
 };
 
 void sharing_node_internals_test()
 {
-  SECTION("Leaf test")
+  SECTION("Internal node test")
   {
-    // Detaching
-    {
-      leaft leaf(1, 2);
+    innert internal;
+    REQUIRE(!internal.data);
 
-      auto p = leaf.data.get();
-      leaf.write();
+    internal.write_internal();
+    REQUIRE(internal.data);
+    REQUIRE(internal.data.use_count() == 1);
 
-      REQUIRE(leaf.data.get() == p);
-    }
+    innert internal2(internal);
+    REQUIRE(internal.use_count() == 2);
+    REQUIRE(internal2.use_count() == 2);
+
+    internal2.write_internal();
+    REQUIRE(internal.use_count() == 1);
+    REQUIRE(internal2.use_count() == 1);
+  }
+
+  SECTION("Container node test")
+  {
+    innert container;
+    REQUIRE(!container.data);
+
+    container.write_container();
+    REQUIRE(container.data);
+    REQUIRE(container.data.use_count() == 1);
+
+    innert container2(container);
+    REQUIRE(container.use_count() == 2);
+    REQUIRE(container2.use_count() == 2);
+
+    container2.write_container();
+    REQUIRE(container.use_count() == 1);
+    REQUIRE(container2.use_count() == 1);
   }
 }
 
