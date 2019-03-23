@@ -466,7 +466,13 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
 
           xmlt &val_s = edge.new_element("data");
           val_s.set_attribute("key", "assumption.scope");
-          val_s.data = id2string(it->function_id);
+          irep_idt function_id = it->function_id;
+          const symbolt *symbol_ptr = nullptr;
+          if(!ns.lookup(lhs_id, symbol_ptr) && symbol_ptr->is_parameter)
+          {
+            function_id = lhs_id.substr(0, lhs_id.find("::"));
+          }
+          val_s.data = id2string(function_id);
 
           if(has_prefix(val.data, "\\result ="))
           {

@@ -1,0 +1,10 @@
+CORE
+main.c
+--graphml-witness - --unwindset main.0:1 --unwinding-assertions
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+<data key="assumption">foo = \(\(float \*\)0\);</data>
+<data key="assumption.scope">one</data>
+--
+^warning: ignoring
