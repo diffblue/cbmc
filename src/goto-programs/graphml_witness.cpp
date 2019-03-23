@@ -278,13 +278,60 @@ static bool contains_symbol_prefix(const exprt &expr, const std::string &prefix)
 /// counterexample witness
 void graphml_witnesst::operator()(const goto_tracet &goto_trace)
 {
+  unsigned int max_thread_idx = 0;
+  bool trace_has_violation = false;
+  for(goto_tracet::stepst::const_iterator it = goto_trace.steps.begin();
+      it != goto_trace.steps.end();
+      ++it)
+  {
+    if(it->thread_nr > max_thread_idx)
+      max_thread_idx = it->thread_nr;
+    if(it->is_assert() && !it->cond_value)
+      trace_has_violation = true;
+  }
+
   graphml.key_values["sourcecodelang"]="C";
 
   const graphmlt::node_indext sink=graphml.add_node();
   graphml[sink].node_name="sink";
-  graphml[sink].thread_nr=0;
   graphml[sink].is_violation=false;
   graphml[sink].has_invariant=false;
+
+  if(max_thread_idx > 0 && trace_has_violation)
+  {
+    std::vector<graphmlt::node_indext> nodes;
+
+    for(unsigned int i = 0; i <= max_thread_idx + 1; ++i)
+    {
+      nodes.push_back(graphml.add_node());
+      graphml[nodes.back()].node_name = "N" + std::to_string(i);
+      graphml[nodes.back()].is_violation = i == max_thread_idx + 1;
+      graphml[nodes.back()].has_invariant = false;
+    }
+
+    for(auto it = nodes.cbegin(); std::next(it) != nodes.cend(); ++it)
+    {
+      xmlt edge("edge");
+      edge.set_attribute("source", graphml[*it].node_name);
+      edge.set_attribute("target", graphml[*std::next(it)].node_name);
+      const auto thread_id = std::distance(nodes.cbegin(), it);
+      xmlt &data = edge.new_element("data");
+      data.set_attribute("key", "createThread");
+      data.data = std::to_string(thread_id);
+      if(thread_id == 0)
+      {
+        xmlt &data = edge.new_element("data");
+        data.set_attribute("key", "enterFunction");
+        data.data = "main";
+      }
+      graphml[*std::next(it)].in[*it].xml_node = edge;
+      graphml[*it].out[*std::next(it)].xml_node = edge;
+    }
+
+    // we do not provide any further details as CPAchecker does not seem to
+    // handle more detailed concurrency witnesses
+    return;
+  }
 
   // step numbers start at 1
   std::vector<std::size_t> step_to_node(goto_trace.steps.size()+1, 0);
@@ -324,13 +371,14 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
       std::to_string(it->pc->location_number)+"."+std::to_string(it->step_nr);
     graphml[node].file=source_location.get_file();
     graphml[node].line=source_location.get_line();
-    graphml[node].thread_nr=it->thread_nr;
     graphml[node].is_violation=
       it->type==goto_trace_stept::typet::ASSERT && !it->cond_value;
     graphml[node].has_invariant=false;
 
     step_to_node[it->step_nr]=node;
   }
+
+  unsigned thread_id = 0;
 
   // build edges
   for(goto_tracet::stepst::const_iterator
@@ -364,6 +412,7 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
     case goto_trace_stept::typet::ASSIGNMENT:
     case goto_trace_stept::typet::ASSERT:
     case goto_trace_stept::typet::GOTO:
+    case goto_trace_stept::typet::SPAWN:
       {
         xmlt edge(
           "edge",
@@ -379,6 +428,10 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
           xmlt &data_l=edge.new_element("data");
           data_l.set_attribute("key", "startline");
           data_l.data=id2string(graphml[from].line);
+
+          xmlt &data_t=edge.new_element("data");
+          data_t.set_attribute("key", "threadId");
+          data_t.data=std::to_string(it->thread_nr);
         }
 
         const auto lhs_object = it->get_lhs_object();
@@ -387,11 +440,19 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
           lhs_object.has_value())
         {
           const std::string &lhs_id = id2string(lhs_object->get_identifier());
-          if(
+          if(lhs_id.find("pthread_create::thread") != std::string::npos)
+          {
+            xmlt &data_t = edge.new_element("data");
+            data_t.set_attribute("key", "createThread");
+            data_t.data = std::to_string(++thread_id);
+          }
+          else if(
             !contains_symbol_prefix(
               it->full_lhs_value, SYMEX_DYNAMIC_PREFIX "dynamic_object") &&
             !contains_symbol_prefix(
               it->full_lhs, SYMEX_DYNAMIC_PREFIX "dynamic_object") &&
+            lhs_id.find("thread") == std::string::npos &&
+            lhs_id.find("mutex") == std::string::npos &&
             (!it->full_lhs_value.is_constant() ||
              !it->full_lhs_value.has_operands() ||
              !has_prefix(
@@ -434,7 +495,6 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
     case goto_trace_stept::typet::OUTPUT:
     case goto_trace_stept::typet::SHARED_READ:
     case goto_trace_stept::typet::SHARED_WRITE:
-    case goto_trace_stept::typet::SPAWN:
     case goto_trace_stept::typet::MEMORY_BARRIER:
     case goto_trace_stept::typet::ATOMIC_BEGIN:
     case goto_trace_stept::typet::ATOMIC_END:
@@ -456,7 +516,6 @@ void graphml_witnesst::operator()(const symex_target_equationt &equation)
 
   const graphmlt::node_indext sink=graphml.add_node();
   graphml[sink].node_name="sink";
-  graphml[sink].thread_nr=0;
   graphml[sink].is_violation=false;
   graphml[sink].has_invariant=false;
 
@@ -502,7 +561,6 @@ void graphml_witnesst::operator()(const symex_target_equationt &equation)
       std::to_string(step_nr);
     graphml[node].file=source_location.get_file();
     graphml[node].line=source_location.get_line();
-    graphml[node].thread_nr=it->source.thread_nr;
     graphml[node].is_violation=false;
     graphml[node].has_invariant=false;
 
@@ -543,6 +601,7 @@ void graphml_witnesst::operator()(const symex_target_equationt &equation)
     case goto_trace_stept::typet::ASSIGNMENT:
     case goto_trace_stept::typet::ASSERT:
     case goto_trace_stept::typet::GOTO:
+    case goto_trace_stept::typet::SPAWN:
       {
         xmlt edge(
           "edge",
@@ -587,7 +646,6 @@ void graphml_witnesst::operator()(const symex_target_equationt &equation)
     case goto_trace_stept::typet::OUTPUT:
     case goto_trace_stept::typet::SHARED_READ:
     case goto_trace_stept::typet::SHARED_WRITE:
-    case goto_trace_stept::typet::SPAWN:
     case goto_trace_stept::typet::MEMORY_BARRIER:
     case goto_trace_stept::typet::ATOMIC_BEGIN:
     case goto_trace_stept::typet::ATOMIC_END:

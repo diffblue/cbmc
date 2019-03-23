@@ -16,9 +16,6 @@ main.c
   <key attr.name="enterLoopHead" attr.type="boolean" for="edge" id="enterLoopHead">
     <default>false</default>
   </key>
-  <key attr.name="threadNumber" attr.type="int" for="node" id="thread">
-    <default>0</default>
-  </key>
   <key attr.name="sourcecodeLanguage" attr.type="string" for="graph" id="sourcecodelang"/>
   <key attr.name="programFile" attr.type="string" for="graph" id="programfile"/>
   <key attr.name="programHash" attr.type="string" for="graph" id="programhash"/>
