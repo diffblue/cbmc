@@ -141,7 +141,9 @@ std::string graphml_witnesst::convert_assign_rec(
     exprt clean_rhs=assign.rhs();
     remove_l0_l1(clean_rhs);
 
-    std::string lhs = expr_to_string(ns, identifier, assign.lhs());
+    exprt clean_lhs = assign.lhs();
+    remove_l0_l1(clean_lhs);
+    std::string lhs = expr_to_string(ns, identifier, clean_lhs);
     if(lhs.find('$')!=std::string::npos)
       lhs="\\result";
 
