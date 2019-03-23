@@ -29,14 +29,17 @@ This example assumes a Unix-like machine.
 1.  Download the sources of wu-ftpd from
     [here](ftp://ftp.wu-ftpd.org/pub/wu-ftpd/wu-ftpd-current.tar.gz).
 
-2.  Unpack the sources by running ` tar xfz wu-ftpd-current.tar.gz`.
+2.  Unpack the sources by running
+
+        tar xfz wu-ftpd-current.tar.gz
 
 3.  Change to the source directory, for example by entering,
-    `cd wu-ftpd-2.6.2`.
+
+        cd wu-ftpd-2.6.2
 
 4.  Configure the project for verification by running:
 
-    `./configure YACC=byacc CC=goto-cc --host=none-none-none`
+        ./configure YACC=byacc CC=goto-cc --host=none-none-none
 
 5.  Build the project by running `make`. This creates multiple model
     files in the `src` directory. Among them is a model for the main
@@ -44,7 +47,7 @@ This example assumes a Unix-like machine.
 
 6.  Run a model-checker, for example CBMC, on the model file:
 
-        `cbmc src/ftpd`
+        cbmc src/ftpd
 
     CBMC automatically recognizes that the file is a goto binary.
 
@@ -68,7 +71,9 @@ A helpful command that accomplishes this task successfully for many
 projects is:
 
 ```plaintext
-for i in `find . -name Makefile`; do   sed -e 's/^\(\s*CC[ \t]*=\)\(.*$\)/\1goto-cc/g' -i $i done
+for i in `find . -name Makefile`; do
+  sed -e 's/^\(\s*CC[ \t]*=\)\(.*$\)/\1goto-cc/g' -i $i
+done
 ```
 
 Here are additional examples on how to use goto-cc:

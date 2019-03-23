@@ -1,11 +1,11 @@
-[CPROVER Manual TOC](../../)
+[CPROVER Manual TOC](../)
 
 ## Test Suite Generation with CBMC
 
 ### A Small Tutorial with a Case Study
 
 We assume that CBMC is installed on your system. If not, follow
-\ref man_install-cbmc "these instructions".
+[these instructions](../../installation/).
 
 CBMC can be used to automatically generate test cases that satisfy a
 certain [code coverage](https://en.wikipedia.org/wiki/Code_coverage)
@@ -36,83 +36,83 @@ the figure below.
 ![The pid controller](https://github.com/diffblue/cbmc/raw/develop/doc/assets/pid.png "The pid controller")
 
 ```
-    01: // CONSTANTS:
-    02: #define MAX_CLIMB_SUM_ERR 10
-    03: #define MAX_CLIMB 1
-    04:
-    05: #define CLOCK 16
-    06: #define MAX_PPRZ (CLOCK*600)
-    07:
-    08: #define CLIMB_LEVEL_GAZ 0.31
-    09: #define CLIMB_GAZ_OF_CLIMB 0.75
-    10: #define CLIMB_PITCH_OF_VZ_PGAIN 0.05
-    11: #define CLIMB_PGAIN -0.03
-    12: #define CLIMB_IGAIN 0.1
-    13:
-    14: const float pitch_of_vz_pgain=CLIMB_PITCH_OF_VZ_PGAIN;
-    15: const float climb_pgain=CLIMB_PGAIN;
-    16: const float climb_igain=CLIMB_IGAIN;
-    17: const float nav_pitch=0;
-    18:
-    19: /** PID function INPUTS */
-    20: // The user input: target speed in vertical direction
-    21: float desired_climb;
-    22: // Vertical speed of the UAV detected by GPS sensor
-    23: float estimator_z_dot;
-    24:
-    25: /** PID function OUTPUTS */
-    26: float desired_gaz;
-    27: float desired_pitch;
-    28:
-    29: /** The state variable: accumulated error in the control */
-    30: float climb_sum_err=0;
-    31:
-    32: /** Computes desired_gaz and desired_pitch */
-    33: void climb_pid_run()
-    34: {
-    35:
-    36:   float err=estimator_z_dot-desired_climb;
-    37:
-    38:   float fgaz=climb_pgain*(err+climb_igain*climb_sum_err)+CLIMB_LEVEL_GAZ+CLIMB_GAZ_OF_CLIMB*desired_climb;
-    39:
-    40:   float pprz=fgaz*MAX_PPRZ;
-    41:   desired_gaz=((pprz>=0 && pprz<=MAX_PPRZ) ? pprz : (pprz>MAX_PPRZ ? MAX_PPRZ : 0));
-    42:
-    43:   /** pitch offset for climb */
-    44:   float pitch_of_vz=(desired_climb>0) ? desired_climb*pitch_of_vz_pgain : 0;
-    45:   desired_pitch=nav_pitch+pitch_of_vz;
-    46:
-    47:   climb_sum_err=err+climb_sum_err;
-    48:   if (climb_sum_err>MAX_CLIMB_SUM_ERR) climb_sum_err=MAX_CLIMB_SUM_ERR;
-    49:   if (climb_sum_err<-MAX_CLIMB_SUM_ERR) climb_sum_err=-MAX_CLIMB_SUM_ERR;
-    50:
-    51: }
-    52:
-    53: int main()
-    54: {
-    55:
-    56:   while(1)
-    57:   {
-    58:     /** Non-deterministic input values */
-    59:     desired_climb=nondet_float();
-    60:     estimator_z_dot=nondet_float();
-    61:
-    62:     /** Range of input values */
-    63:     __CPROVER_assume(desired_climb>=-MAX_CLIMB && desired_climb<=MAX_CLIMB);
-    64:     __CPROVER_assume(estimator_z_dot>=-MAX_CLIMB && estimator_z_dot<=MAX_CLIMB);
-    65:
-    66:     __CPROVER_input("desired_climb", desired_climb);
-    67:     __CPROVER_input("estimator_z_dot", estimator_z_dot);
-    68:
-    69:     climb_pid_run();
-    70:
-    71:     __CPROVER_output("desired_gaz", desired_gaz);
-    72:     __CPROVER_output("desired_pitch", desired_pitch);
-    73:
-    74:   }
-    75:
-    76:   return 0;
-    77: }
+01: // CONSTANTS:
+02: #define MAX_CLIMB_SUM_ERR 10
+03: #define MAX_CLIMB 1
+04:
+05: #define CLOCK 16
+06: #define MAX_PPRZ (CLOCK*600)
+07:
+08: #define CLIMB_LEVEL_GAZ 0.31
+09: #define CLIMB_GAZ_OF_CLIMB 0.75
+10: #define CLIMB_PITCH_OF_VZ_PGAIN 0.05
+11: #define CLIMB_PGAIN -0.03
+12: #define CLIMB_IGAIN 0.1
+13:
+14: const float pitch_of_vz_pgain=CLIMB_PITCH_OF_VZ_PGAIN;
+15: const float climb_pgain=CLIMB_PGAIN;
+16: const float climb_igain=CLIMB_IGAIN;
+17: const float nav_pitch=0;
+18:
+19: /** PID function INPUTS */
+20: // The user input: target speed in vertical direction
+21: float desired_climb;
+22: // Vertical speed of the UAV detected by GPS sensor
+23: float estimator_z_dot;
+24:
+25: /** PID function OUTPUTS */
+26: float desired_gaz;
+27: float desired_pitch;
+28:
+29: /** The state variable: accumulated error in the control */
+30: float climb_sum_err=0;
+31:
+32: /** Computes desired_gaz and desired_pitch */
+33: void climb_pid_run()
+34: {
+35:
+36:   float err=estimator_z_dot-desired_climb;
+37:
+38:   float fgaz=climb_pgain*(err+climb_igain*climb_sum_err)+CLIMB_LEVEL_GAZ+CLIMB_GAZ_OF_CLIMB*desired_climb;
+39:
+40:   float pprz=fgaz*MAX_PPRZ;
+41:   desired_gaz=((pprz>=0 && pprz<=MAX_PPRZ) ? pprz : (pprz>MAX_PPRZ ? MAX_PPRZ : 0));
+42:
+43:   /** pitch offset for climb */
+44:   float pitch_of_vz=(desired_climb>0) ? desired_climb*pitch_of_vz_pgain : 0;
+45:   desired_pitch=nav_pitch+pitch_of_vz;
+46:
+47:   climb_sum_err=err+climb_sum_err;
+48:   if (climb_sum_err>MAX_CLIMB_SUM_ERR) climb_sum_err=MAX_CLIMB_SUM_ERR;
+49:   if (climb_sum_err<-MAX_CLIMB_SUM_ERR) climb_sum_err=-MAX_CLIMB_SUM_ERR;
+50:
+51: }
+52:
+53: int main()
+54: {
+55:
+56:   while(1)
+57:   {
+58:     /** Non-deterministic input values */
+59:     desired_climb=nondet_float();
+60:     estimator_z_dot=nondet_float();
+61:
+62:     /** Range of input values */
+63:     __CPROVER_assume(desired_climb>=-MAX_CLIMB && desired_climb<=MAX_CLIMB);
+64:     __CPROVER_assume(estimator_z_dot>=-MAX_CLIMB && estimator_z_dot<=MAX_CLIMB);
+65:
+66:     __CPROVER_input("desired_climb", desired_climb);
+67:     __CPROVER_input("estimator_z_dot", estimator_z_dot);
+68:
+69:     climb_pid_run();
+70:
+71:     __CPROVER_output("desired_gaz", desired_gaz);
+72:     __CPROVER_output("desired_pitch", desired_pitch);
+73:
+74:   }
+75:
+76:   return 0;
+77: }
 ```
 
 To test the PID controller, we construct a main control loop,
@@ -196,7 +196,8 @@ instrumented goals in the PID function `climb_pid_run`, the loop must be
 unwound enough times. For example, `climb_pid_run` needs to
 be called at least six times for evaluating the condition
 `climb_sum_err>MAX_CLIMB_SUM_ERR` in line 48 to *true*. This corresponds
-to Test 5. To learn more about loop unwinding take a look at [Understanding Loop Unwinding](cbmc-loops.shtml).
+to Test 5. To learn more about loop unwinding take a look at [Understanding Loop
+Unwinding](../../cbmc-unwinding/).
 
 In this tutorial, we present the automatic test suite generation
 functionality of CBMC, by applying the MC/DC code coverage criterion to

@@ -32,11 +32,10 @@ informal description of the assertion. It is shown in the list of
 properties together with the condition.
 
 The assertion language of the CPROVER tools is identical to the language
-used for expressions. Note that \ref man_modelling-nondet
-"nondeterminism"
-can be exploited in order to check a range of choices. As an example,
-the following code fragment asserts that **all** elements of the array
-are zero:
+used for expressions.  Note that
+[nondeterminism](../../modeling-nondeterminism/) can be exploited in order
+to check a range of choices.  As an example, the following code fragment
+asserts that **all** elements of the array are zero:
 
 ```C
 int a[100], i;

@@ -136,8 +136,8 @@ program, or it is desirable to replace bodies of functions with certain
 predetermined stubs (for example to confirm that these functions are never
 called, or to indicate that these functions will never return). For this purpose
 goto-instrument provides the `--generate-function-body` option, that takes a
-regular expression (in [ECMAScript syntax]
-(http://en.cppreference.com/w/cpp/regex/ecmascript)) that describes the names of
+regular expression (in [ECMAScript
+syntax](http://en.cppreference.com/w/cpp/regex/ecmascript)) that describes the names of
 the functions to generate. Note that this will only generate bodies for
 functions that do not already have one; If one wishes to replace the body of a
 function with an existing definition, the `--remove-function-body` option can be
@@ -193,14 +193,14 @@ Now, we can compile the program and detect that the error functions are indeed
 called by invoking these commands:
 
 ```
-    goto-cc error_example.c -o error_example.goto
-    # Replace all functions ending with _error
-    # (Excluding those starting with __)
-    # With ones that have an assert(false) body
-    goto-instrument error_example.goto error_example_replaced.goto \
-      --generate-function-body '(?!__).*_error' \
-      --generate-function-body-options assert-false
-    cbmc error_example_replaced.goto
+goto-cc error_example.c -o error_example.goto
+# Replace all functions ending with _error
+# (Excluding those starting with __)
+# With ones that have an assert(false) body
+goto-instrument error_example.goto error_example_replaced.goto \
+  --generate-function-body '(?!__).*_error' \
+  --generate-function-body-options assert-false
+cbmc error_example_replaced.goto
 ```
 
 Which gets us the output
