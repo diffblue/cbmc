@@ -266,7 +266,7 @@ int do_something_with_complex(struct Complex *complex)
 ```
 
 A note on limitations: Because only static information is used for code
-generation, arrays of unknown size and pointers will not be affected by this;
+generation, arrays of unknown size and pointers will not be affected by this.
 Which means that for code like this:
 
 ```C
