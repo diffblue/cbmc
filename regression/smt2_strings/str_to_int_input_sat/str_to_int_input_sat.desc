@@ -1,0 +1,8 @@
+FUTURE
+str_to_int_input_sat.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^sat$
+--
+error

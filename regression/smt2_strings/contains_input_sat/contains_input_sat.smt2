@@ -1,0 +1,7 @@
+(declare-const needle String)
+(declare-const haystack String)
+(assert (> (str.len needle) 3))
+(assert (> (str.len haystack) 10))
+(assert (not (= needle haystack)))
+(assert (str.contains haystack needle))
+(check-sat)

@@ -1,0 +1,8 @@
+(declare-const container String)
+(declare-const target String)
+(declare-const replacement String)
+(assert (< (str.len target) (str.len container)))
+(assert (> (str.len replacement) 2))
+(define-fun replaced () String (str.replace container target replacement))
+(assert (= replaced "axydefabcdef"))
+(check-sat)

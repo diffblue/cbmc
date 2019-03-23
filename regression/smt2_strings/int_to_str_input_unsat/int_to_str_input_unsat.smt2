@@ -1,0 +1,6 @@
+(declare-const str String)
+(declare-const number Int)
+(assert (< (str.len str) 4))
+(assert (> number 10000))
+(assert (= (int.to.str number) str))
+(check-sat)

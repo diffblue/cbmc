@@ -1,0 +1,7 @@
+(declare-const str String)
+(declare-const suffix String)
+(assert (> (str.len suffix) 3))
+(assert (not (= str suffix)))
+(assert (str.suffixof suffix str))
+(check-sat)
+(get-model)

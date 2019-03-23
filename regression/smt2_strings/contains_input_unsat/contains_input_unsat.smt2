@@ -1,0 +1,5 @@
+(declare-const needle String)
+(declare-const haystack String)
+(assert (< (str.len haystack) (str.len needle)))
+(assert (str.contains haystack needle))
+(check-sat)

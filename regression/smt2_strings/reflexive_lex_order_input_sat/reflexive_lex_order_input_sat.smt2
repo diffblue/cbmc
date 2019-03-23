@@ -1,0 +1,6 @@
+(declare-const in1 String)
+(declare-const in2 String)
+(assert (not (= in1 in2)))
+(assert (> (str.len in1) 3))
+(assert (str.<= in1 in2))
+(check-sat)

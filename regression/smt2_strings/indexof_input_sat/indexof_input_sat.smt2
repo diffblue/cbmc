@@ -1,0 +1,8 @@
+(declare-const haystack String)
+(declare-const needle String)
+(declare-const start Int)
+(declare-const index Int)
+(assert (> index 3))
+(assert (> (str.len needle) 0))
+(assert (= (str.indexof haystack needle start) index))
+(check-sat)
