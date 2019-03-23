@@ -1,5 +1,15 @@
 Here a few minimalistic coding rules for the CPROVER source tree.
 
+# Interfaces
+- With any changes, consider the impact on other users of the code base. Users
+  frequently carry their own set of patches or build tools on top of the code
+  base. Large-scale changes negatively impact both scenarios.
+- Tools that link against the code base can reasonably expect a stable
+  interface. We consider as public interface any objects, procedures, or classes
+  (and their methods) that are meant to be used outside a single directory.
+- See below for how to document interfaces and how to mark parts of interfaces
+  as deprecated.
+
 # Whitespaces
 
 Formatting is enforced using clang-format. For more information about this, see
