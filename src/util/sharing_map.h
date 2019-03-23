@@ -24,9 +24,11 @@ Author: Daniel Poetzl
 #include <stdexcept>
 #include <string>
 #include <tuple>
+#include <type_traits>
 #include <vector>
 
 #include "irep.h"
+#include "optional.h"
 #include "sharing_node.h"
 #include "threeval.h"
 
@@ -37,26 +39,70 @@ Author: Daniel Poetzl
 #endif
 
 // clang-format off
-#define SHARING_MAPT(R) \
-  template <class keyT, class valueT, class hashT, class equalT> \
-  R sharing_mapt<keyT, valueT, hashT, equalT>
 
-#define SHARING_MAPT2(CV, ST) \
-  template <class keyT, class valueT, class hashT, class equalT> \
-  CV typename sharing_mapt<keyT, valueT, hashT, equalT>::ST \
-    sharing_mapt<keyT, valueT, hashT, equalT>
+/// Macro to abbreviate the out-of-class definitions of methods and static
+/// variables of sharing_mapt.
+///
+/// \param type the return type of the method or the type of the static variable
+#define SHARING_MAPT(type) \
+  template < \
+    typename keyT, \
+    typename valueT, \
+    bool fail_if_equal, \
+    typename hashT, \
+    typename equalT> \
+  type sharing_mapt<keyT, valueT, fail_if_equal, hashT, equalT>
 
-#define SHARING_MAPT3(T, CV, ST) \
-  template <class keyT, class valueT, class hashT, class equalT> \
-  template <class T> \
-  CV typename sharing_mapt<keyT, valueT, hashT, equalT>::ST \
-    sharing_mapt<keyT, valueT, hashT, equalT>
+/// Macro to abbreviate the out-of-class definitions of methods of sharing_mapt
+/// with a return type that is defined within the class.
+///
+/// \param cv_qualifiers the cv qualifiers of the return type of the method
+/// \param return_type the return type of the method defined within sharing_mapt
+#define SHARING_MAPT2(cv_qualifiers, return_type) \
+  template < \
+    typename keyT, \
+    typename valueT, \
+    bool fail_if_equal, \
+    typename hashT, \
+    typename equalT> \
+  cv_qualifiers typename \
+    sharing_mapt<keyT, valueT, fail_if_equal, hashT, equalT>::return_type \
+    sharing_mapt<keyT, valueT, fail_if_equal, hashT, equalT>
+
+/// Macro to abbreviate the out-of-class definitions of template methods of
+/// sharing_mapt with a single template parameter and with a return type that is
+/// defined within the class.
+///
+/// \param template_parameter name of the template parameter
+/// \param cv_qualifiers the cv qualifiers of the return type of the method
+/// \param return_type the return type of the method defined within sharing_mapt
+#define SHARING_MAPT3(template_parameter, cv_qualifiers, return_type) \
+  template < \
+    typename keyT, \
+    typename valueT, \
+    bool fail_if_equal, \
+    typename hashT, \
+    typename equalT> \
+  template <class template_parameter> \
+  cv_qualifiers typename \
+    sharing_mapt<keyT, valueT, fail_if_equal, hashT, equalT>::return_type \
+    sharing_mapt<keyT, valueT, fail_if_equal, hashT, equalT>
+
+/// Macro to abbreviate the out-of-class definitions of template methods of
+/// sharing_mapt with a single template parameter.
+///
+/// \param template_parameter name of the template parameter
+/// \param return_type the return type of the method
+#define SHARING_MAPT4(template_parameter, return_type) \
+  template < \
+    typename keyT, \
+    typename valueT, \
+    bool fail_if_equal, \
+    typename hashT, \
+    typename equalT> \
+  template <class template_parameter> \
+  return_type sharing_mapt<keyT, valueT, fail_if_equal, hashT, equalT>
 // clang-format on
-
-// Note: Due to a bug in Visual Studio we need to add an additional "const"
-// qualifier to the return values of insert(), place(), and find(). The type
-// defined in sharing_mapt already includes the const qualifier, but it is lost
-// when accessed from outside the class. This is fixed in Visual Studio 15.6.
 
 /// A map implemented as a tree where subtrees can be shared between different
 /// maps.
@@ -73,7 +119,7 @@ Author: Daniel Poetzl
 /// purposes of determining the position of the key-value pair in the trie. The
 /// actual key-value pairs are stored in the leaf nodes. Collisions (i.e., two
 /// different keys yield the same "string"), are handled by chaining the
-/// corresponding key-value pairs in a `std::list`.
+/// corresponding key-value pairs in a `std::forward_list`.
 ///
 /// The use of a trie in combination with hashing has the advantage that the
 /// tree is unlikely to degenerate (if the number of hash collisions is low).
@@ -92,20 +138,24 @@ Author: Daniel Poetzl
 /// to one of the maps, nodes are copied and sharing is lessened as described in
 /// the following.
 ///
-/// Retrieval, insertion, and removal operations interact with sharing as
+/// The replace(), insert(), and erase() operations interact with sharing as
 /// follows:
-/// - When a non-const reference to a value in the map that is contained in a
-/// shared subtree is retrieved, the nodes on the path from the root of the
-/// subtree to the corresponding key-value pair (and the key-value pair itself)
-/// are copied and integrated with the map.
-/// - When a key-value pair is inserted into the map and its position is in a
-/// shared subtree, already existing nodes from the root of the subtree to the
-/// position of the key-value pair are copied and integrated with the map, and
-/// new nodes are created as needed.
+/// - When a key-value pair is inserted into the map (or a value of an existing
+/// pair is replaced) and its position is in a shared subtree, already existing
+/// nodes from the root of the subtree to the position of the key-value pair are
+/// copied and integrated with the map, and new nodes are created as needed.
 /// - When a key-value pair is erased from the map that is in a shared subtree,
 /// nodes from the root of the subtree to the last node that will still exist on
 /// the path to the erased element after the element has been removed are
 /// copied and integrated with the map, and the remaining nodes are removed.
+///
+/// The replace() operation is the only method where sharing could unnecessarily
+/// be broken. This would happen when replacing an old value with a new equal
+/// value. The sharing map provides a debug mode to detect such cases. When the
+/// template parameter `fail_if_equal` is set to true, then the replace() method
+/// yields an invariant violation when the new value is equal to the old value.
+/// For this to work, the type of the values stored in the map needs to have a
+/// defined equality operator (operator==).
 ///
 /// Several methods take a hint indicating whether the element is known not to
 /// be in the map (`false`), known to be in the map (`true`), or it is unknown
@@ -124,10 +174,12 @@ Author: Daniel Poetzl
 ///
 /// The first two symbols denote dynamic properties of a given map, whereas the
 /// last two symbols are static configuration parameters of the map class.
-template <class keyT,
-          class valueT,
-          class hashT = std::hash<keyT>,
-          class equalT = std::equal_to<keyT>>
+template <
+  typename keyT,
+  typename valueT,
+  bool fail_if_equal = false,
+  typename hashT = std::hash<keyT>,
+  typename equalT = std::equal_to<keyT>>
 class sharing_mapt
 {
 public:
@@ -137,24 +189,11 @@ public:
 
   typedef keyT key_type;
   typedef valueT mapped_type;
-  typedef std::pair<const key_type, mapped_type> value_type;
 
   typedef hashT hash;
   typedef equalT key_equal;
 
   typedef std::size_t size_type;
-
-  /// Return type of methods that retrieve a const reference to a value. First
-  /// component is a reference to the value (or a dummy value if the given key
-  /// does not exist), and the second component indicates if the value with the
-  /// given key was found.
-  typedef const std::pair<const mapped_type &, const bool> const_find_type;
-
-  /// Return type of methods that retrieve a reference to a value. First
-  /// component is a reference to the value (or a dummy value if the given key
-  /// does not exist), and the second component indicates if the value with the
-  /// given key was found.
-  typedef const std::pair<mapped_type &, const bool> find_type;
 
   typedef std::vector<key_type> keyst;
 
@@ -167,6 +206,18 @@ protected:
   typedef typename innert::to_mapt to_mapt;
   typedef typename innert::leaf_listt leaf_listt;
 
+  struct truet
+  {
+    bool operator()(const mapped_type &lhs, const mapped_type &rhs)
+    {
+      return true;
+    }
+  };
+
+  typedef
+    typename std::conditional<fail_if_equal, std::equal_to<valueT>, truet>::type
+      value_equalt;
+
 public:
   // interface
 
@@ -176,36 +227,14 @@ public:
     const keyst &ks,
     const tvt &key_exists = tvt::unknown()); // applies to all keys
 
-  // return true if element was inserted
-  const_find_type insert(
-    const key_type &k,
-    const mapped_type &v,
-    const tvt &key_exists=tvt::unknown());
+  template <class valueU>
+  void insert(const key_type &k, valueU &&m);
 
-  const_find_type insert(
-    const value_type &p,
-    const tvt &key_exists=tvt::unknown());
+  template <class valueU>
+  void replace(const key_type &k, valueU &&m);
 
-  find_type place(
-    const key_type &k,
-    const mapped_type &v);
-
-  find_type place(
-    const value_type &p);
-
-  find_type find(
-    const key_type &k,
-    const tvt &key_exists=tvt::unknown());
-
-  const_find_type find(const key_type &k) const;
-
-  mapped_type &at(
-    const key_type &k,
-    const tvt &key_exists=tvt::unknown());
-
-  const mapped_type &at(const key_type &k) const;
-
-  mapped_type &operator[](const key_type &k);
+  optionalt<std::reference_wrapper<const mapped_type>>
+  find(const key_type &k) const;
 
   /// Swap with other map
   ///
@@ -433,6 +462,7 @@ SHARING_MAPT(std::size_t)
 
   unsigned count = 0;
 
+  // depth, node pointer
   typedef std::pair<unsigned, const baset *> stack_itemt;
 
   std::stack<stack_itemt> stack;
@@ -887,7 +917,7 @@ SHARING_MAPT2(, size_type)
   return cnt;
 }
 
-/// Insert element, return const reference
+/// Insert element, element must not exist in map
 ///
 /// Complexity:
 /// - Worst case: O(H * S + M)
@@ -895,97 +925,38 @@ SHARING_MAPT2(, size_type)
 ///
 /// \param k: The key of the element to insert
 /// \param m: The mapped value to insert
-/// \param key_exists: Hint to indicate whether the element is known to exist
-///   (possible values `false` or `unknown`)
-/// \return Pair of const reference to existing or newly inserted element, and
-///   boolean indicating if new element was inserted
-SHARING_MAPT2(const, const_find_type)
-::insert(const key_type &k, const mapped_type &m, const tvt &key_exists)
+SHARING_MAPT4(valueU, void)
+::insert(const key_type &k, valueU &&m)
 {
-  SM_ASSERT(!key_exists.is_true());
-  SM_ASSERT(!key_exists.is_false() || !has_key(k));
-
-  if(key_exists.is_unknown())
-  {
-    const leaft *lp = as_const(this)->get_leaf_node(k);
-    if(lp != nullptr)
-      return const_find_type(lp->get_value(), false);
-  }
-
   innert *cp = get_container_node(k);
   SM_ASSERT(cp != nullptr);
 
-  const leaft *lp = cp->place_leaf(k, m);
+  cp->place_leaf(k, std::forward<valueU>(m));
   num++;
-
-  return const_find_type(lp->get_value(), true);
 }
 
-// Insert element, return const reference
-SHARING_MAPT2(const, const_find_type)
-::insert(const value_type &p, const tvt &key_exists)
-{
-  return insert(p.first, p.second, key_exists);
-}
-
-/// Insert element, return non-const reference
+/// Replace element, element must exist in map
 ///
 /// Complexity:
 /// - Worst case: O(H * S + M)
 /// - Best case: O(H)
 ///
 /// \param k: The key of the element to insert
-/// \param m: The mapped value to insert
-/// \return Pair of reference to existing or newly inserted element, and boolean
-///   indicating if new element was inserted
-SHARING_MAPT2(const, find_type)::place(const key_type &k, const mapped_type &m)
+/// \param m: The mapped value to replace the old value with
+SHARING_MAPT4(valueU, void)
+::replace(const key_type &k, valueU &&m)
 {
   innert *cp = get_container_node(k);
   SM_ASSERT(cp != nullptr);
 
   leaft *lp = cp->find_leaf(k);
+  PRECONDITION(lp != nullptr); // key must exist in map
 
-  if(lp != nullptr)
-    return find_type(lp->get_value(), false);
+  INVARIANT(
+    value_equalt()(as_const(lp)->get_value(), m),
+    "values should not be replaced with equal values to maximize sharing");
 
-  lp = cp->place_leaf(k, m);
-  num++;
-
-  return find_type(lp->get_value(), true);
-}
-
-/// Insert element, return non-const reference
-SHARING_MAPT2(const, find_type)::place(const value_type &p)
-{
-  return place(p.first, p.second);
-}
-
-/// Find element
-///
-/// Complexity:
-/// - Worst case: O(H * S + M)
-/// - Best case: O(H)
-///
-/// \param k: The key of the element to search for
-/// \param key_exists: Hint to indicate whether the element is known to exist
-///   (possible values `unknown` or `true`)
-/// \return Pair of reference to found value (or dummy value if not found), and
-///   boolean indicating if element was found.
-SHARING_MAPT2(const, find_type)::find(const key_type &k, const tvt &key_exists)
-{
-  SM_ASSERT(!key_exists.is_false());
-  SM_ASSERT(!key_exists.is_true() || has_key(k));
-
-  if(key_exists.is_unknown() && !has_key(k))
-    return find_type(dummy, false);
-
-  innert *cp = get_container_node(k);
-  SM_ASSERT(cp != nullptr);
-
-  leaft *lp = cp->find_leaf(k);
-  SM_ASSERT(lp != nullptr);
-
-  return find_type(lp->get_value(), true);
+  lp->set_value(std::forward<valueU>(m));
 }
 
 /// Find element
@@ -995,70 +966,16 @@ SHARING_MAPT2(const, find_type)::find(const key_type &k, const tvt &key_exists)
 /// - Best case: O(H)
 ///
 /// \param k: The key of the element to search
-/// \return Pair of const reference to found value (or dummy value if not
-///   found), and boolean indicating if element was found.
-SHARING_MAPT2(const, const_find_type)::find(const key_type &k) const
+/// \return optionalt containing a const reference to the value if found
+SHARING_MAPT2(optionalt<std::reference_wrapper<const, mapped_type>>)::find(
+  const key_type &k) const
 {
   const leaft *lp = get_leaf_node(k);
 
   if(lp == nullptr)
-    return const_find_type(dummy, false);
+    return {};
 
-  return const_find_type(lp->get_value(), true);
-}
-
-/// Get element at key
-///
-/// Complexity:
-/// - Worst case: O(H * S + M)
-/// - Best case: O(H)
-///
-/// \param k: The key of the element
-/// \param key_exists: Hint to indicate whether the element is known to exist
-///   (possible values `unknown` or `true`)
-/// \throw `std::out_of_range` if key not found
-/// \return The mapped value
-SHARING_MAPT2(, mapped_type &)::at(
-  const key_type &k,
-  const tvt &key_exists)
-{
-  find_type r=find(k, key_exists);
-
-  if(!r.second)
-    throw std::out_of_range(not_found_msg);
-
-  return r.first;
-}
-
-/// Get element at key
-///
-/// Complexity:
-/// - Worst case: O(H * log(S) + M)
-/// - Best case: O(H)
-///
-/// \param k: The key of the element
-/// \throw std::out_of_range if key not found
-/// \return The mapped value
-SHARING_MAPT2(const, mapped_type &)::at(const key_type &k) const
-{
-  const_find_type r=find(k);
-  if(!r.second)
-    throw std::out_of_range(not_found_msg);
-
-  return r.first;
-}
-
-/// Get element at key, insert new if non-existent
-///
-/// Complexity:
-/// - Worst case: O(H * S + M)
-/// - Best case: O(H)
-///
-/// \param k: The key of the element
-/// \return The mapped value
-SHARING_MAPT2(, mapped_type &)::operator[](const key_type &k)
-{
-  return place(k, mapped_type()).first;
+  return optionalt<std::reference_wrapper<const mapped_type>>(lp->get_value());
 }
 
 // static constants
