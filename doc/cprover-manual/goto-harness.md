@@ -91,7 +91,7 @@ entry function for analysis, or further modify it with `goto-harness` or
 `goto-instrument` or other tools.
 
 The example above demonstrates the most simple case, which is roughly the same
-as the entry point `cbmc` automically generates for functions. However, the
+as the entry point `cbmc` automatically generates for functions. However, the
 `function-call` harness can also non-deterministically initialise global
 variables, array and struct elements. Consider this more complicated example:
 

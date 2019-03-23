@@ -20,7 +20,7 @@ The normal build system for the project may be used to build the
 software, but the outcome will be a model file with suitable detail for
 verification, as opposed to a flat executable program. Note that goto-cc
 comes in different variants depending on the compilation environment.
-These variants are described [here](goto-cc-variants.shtml).
+These variants are described [here](variants/).
 
 ### Example: Building wu-ftpd
 

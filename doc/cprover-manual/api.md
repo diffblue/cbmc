@@ -87,7 +87,7 @@ void __CPROVER_cover(_Bool condition);
 ```
 
 This statement defines a custom coverage criterion, for usage with the
-[test suite generation feature](cover.shtml).
+[test suite generation feature](../test-suite/).
 
 #### \_\_CPROVER\_isnan, \_\_CPROVER\_isfinite, \_\_CPROVER\_isinf, \_\_CPROVER\_isnormal, \_\_CPROVER\_sign
 

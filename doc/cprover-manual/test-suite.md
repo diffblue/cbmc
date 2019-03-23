@@ -5,7 +5,7 @@
 ### A Small Tutorial with a Case Study
 
 We assume that CBMC is installed on your system. If not, follow
-[these instructions](../../installation/).
+[these instructions](../installation/).
 
 CBMC can be used to automatically generate test cases that satisfy a
 certain [code coverage](https://en.wikipedia.org/wiki/Code_coverage)
@@ -197,12 +197,12 @@ unwound enough times. For example, `climb_pid_run` needs to
 be called at least six times for evaluating the condition
 `climb_sum_err>MAX_CLIMB_SUM_ERR` in line 48 to *true*. This corresponds
 to Test 5. To learn more about loop unwinding take a look at [Understanding Loop
-Unwinding](../../cbmc-unwinding/).
+Unwinding](../cbmc/unwinding/).
 
 In this tutorial, we present the automatic test suite generation
 functionality of CBMC, by applying the MC/DC code coverage criterion to
 a PID controller case study. In addition to `--cover mcdc`, other
-coverage criteria such as `branch`, `decision`, and `path`. are also
+coverage criteria such as `branch`, `decision`, and `path` are also
 available when calling CBMC.
 
 ### Coverage Criteria

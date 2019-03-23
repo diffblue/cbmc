@@ -284,7 +284,7 @@ violates an assertion. Without unwinding assertions, or when using the
 `--depth` command line switch, CBMC does not prove the program correct,
 but it can be helpful to find program bugs. The various command line
 options that CBMC offers for loop unwinding are described in the section
-on [understanding loop unwinding](../../cbmc-unwinding/).
+on [understanding loop unwinding](../../cbmc/unwinding/).
 
 ### A Note About Compilers and the ANSI-C Library
 

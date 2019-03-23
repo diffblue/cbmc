@@ -203,20 +203,22 @@ goto-instrument error_example.goto error_example_replaced.goto \
 cbmc error_example_replaced.goto
 ```
 
-Which gets us the output
+This generates the following output:
 
-> ** Results:
-> error_example.c function api_error
-> [api_error.assertion.1] line 4 assertion false: FAILURE
->
-> error_example.c function internal_error
-> [internal_error.assertion.1] line 5 assertion false: FAILURE
->
-> ** 2 of 2 failed (2 iterations)
-> VERIFICATION FAILED
+```
+** Results:
+error_example.c function api_error
+[api_error.assertion.1] line 4 assertion false: FAILURE
 
-As opposed to the verification success we would have seen without the
-instrumentation step.
+error_example.c function internal_error
+[internal_error.assertion.1] line 5 assertion false: FAILURE
+
+** 2 of 2 failed (2 iterations)
+VERIFICATION FAILED
+```
+
+Without the instrumentation step we would have seen
+"VERIFICATION SUCCESSFUL".
 
 The havoc option takes further parameters `globals` and `params` with this
 syntax: `havoc[,globals:<regex>][,params:<regex>]` (where the square brackets
@@ -241,10 +243,10 @@ int do_something_with_complex(struct Complex *complex);
 And the command line
 
 ```
-    goto-instrument in.goto out.goto
-      --generate-function-body do_something_with_complex
-      --generate-function-body-options
-        'havoc,params:.*,globals:AGlobalComplex'
+goto-instrument in.goto out.goto
+  --generate-function-body do_something_with_complex
+  --generate-function-body-options
+    'havoc,params:.*,globals:AGlobalComplex'
 ```
 
 The goto code equivalent of the following will be generated:
@@ -264,7 +266,7 @@ int do_something_with_complex(struct Complex *complex)
 ```
 
 A note on limitations: Because only static information is used for code
-generation, arrays of unknown size and pointers will not be affected by this;
+generation, arrays of unknown size and pointers will not be affected by this.
 Which means that for code like this:
 
 ```C

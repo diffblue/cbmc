@@ -1,4 +1,4 @@
-[CPROVER Manual TOC](../)
+[CPROVER Manual TOC](../../)
 
 ## Variants of goto-cc
 
