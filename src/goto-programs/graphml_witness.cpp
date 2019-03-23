@@ -413,78 +413,78 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
     case goto_trace_stept::typet::ASSERT:
     case goto_trace_stept::typet::GOTO:
     case goto_trace_stept::typet::SPAWN:
+    {
+      xmlt edge(
+        "edge",
+        {{"source", graphml[from].node_name},
+         {"target", graphml[to].node_name}},
+        {});
+
       {
-        xmlt edge(
-          "edge",
-          {{"source", graphml[from].node_name},
-           {"target", graphml[to].node_name}},
-          {});
+        xmlt &data_f = edge.new_element("data");
+        data_f.set_attribute("key", "originfile");
+        data_f.data = id2string(graphml[from].file);
 
-        {
-          xmlt &data_f=edge.new_element("data");
-          data_f.set_attribute("key", "originfile");
-          data_f.data=id2string(graphml[from].file);
+        xmlt &data_l = edge.new_element("data");
+        data_l.set_attribute("key", "startline");
+        data_l.data = id2string(graphml[from].line);
 
-          xmlt &data_l=edge.new_element("data");
-          data_l.set_attribute("key", "startline");
-          data_l.data=id2string(graphml[from].line);
-
-          xmlt &data_t=edge.new_element("data");
-          data_t.set_attribute("key", "threadId");
-          data_t.data=std::to_string(it->thread_nr);
-        }
-
-        const auto lhs_object = it->get_lhs_object();
-        if(
-          it->type == goto_trace_stept::typet::ASSIGNMENT &&
-          lhs_object.has_value())
-        {
-          const std::string &lhs_id = id2string(lhs_object->get_identifier());
-          if(lhs_id.find("pthread_create::thread") != std::string::npos)
-          {
-            xmlt &data_t = edge.new_element("data");
-            data_t.set_attribute("key", "createThread");
-            data_t.data = std::to_string(++thread_id);
-          }
-          else if(
-            !contains_symbol_prefix(
-              it->full_lhs_value, SYMEX_DYNAMIC_PREFIX "dynamic_object") &&
-            !contains_symbol_prefix(
-              it->full_lhs, SYMEX_DYNAMIC_PREFIX "dynamic_object") &&
-            lhs_id.find("thread") == std::string::npos &&
-            lhs_id.find("mutex") == std::string::npos &&
-            (!it->full_lhs_value.is_constant() ||
-             !it->full_lhs_value.has_operands() ||
-             !has_prefix(
-               id2string(it->full_lhs_value.op0().get(ID_value)), "INVALID-")))
-          {
-            xmlt &val = edge.new_element("data");
-            val.set_attribute("key", "assumption");
-
-            code_assignt assign{it->full_lhs, it->full_lhs_value};
-            val.data = convert_assign_rec(lhs_id, assign);
-
-            xmlt &val_s = edge.new_element("data");
-            val_s.set_attribute("key", "assumption.scope");
-            val_s.data = id2string(it->function_id);
-
-            if(has_prefix(val.data, "\\result ="))
-            {
-              xmlt &val_f = edge.new_element("data");
-              val_f.set_attribute("key", "assumption.resultfunction");
-              val_f.data = id2string(it->function_id);
-            }
-          }
-        }
-        else if(it->type==goto_trace_stept::typet::GOTO &&
-                it->pc->is_goto())
-        {
-        }
-
-        graphml[to].in[from].xml_node=edge;
-        graphml[from].out[to].xml_node=edge;
+        xmlt &data_t = edge.new_element("data");
+        data_t.set_attribute("key", "threadId");
+        data_t.data = std::to_string(it->thread_nr);
       }
+
+      const auto lhs_object = it->get_lhs_object();
+      if(
+        it->type == goto_trace_stept::typet::ASSIGNMENT &&
+        lhs_object.has_value())
+      {
+        const std::string &lhs_id = id2string(lhs_object->get_identifier());
+        if(lhs_id.find("pthread_create::thread") != std::string::npos)
+        {
+          xmlt &data_t = edge.new_element("data");
+          data_t.set_attribute("key", "createThread");
+          data_t.data = std::to_string(++thread_id);
+        }
+        else if(
+          !contains_symbol_prefix(
+            it->full_lhs_value, SYMEX_DYNAMIC_PREFIX "dynamic_object") &&
+          !contains_symbol_prefix(
+            it->full_lhs, SYMEX_DYNAMIC_PREFIX "dynamic_object") &&
+          lhs_id.find("thread") == std::string::npos &&
+          lhs_id.find("mutex") == std::string::npos &&
+          (!it->full_lhs_value.is_constant() ||
+           !it->full_lhs_value.has_operands() ||
+           !has_prefix(
+             id2string(it->full_lhs_value.op0().get(ID_value)), "INVALID-")))
+        {
+          xmlt &val = edge.new_element("data");
+          val.set_attribute("key", "assumption");
+
+          code_assignt assign{it->full_lhs, it->full_lhs_value};
+          val.data = convert_assign_rec(lhs_id, assign);
+
+          xmlt &val_s = edge.new_element("data");
+          val_s.set_attribute("key", "assumption.scope");
+          val_s.data = id2string(it->function_id);
+
+          if(has_prefix(val.data, "\\result ="))
+          {
+            xmlt &val_f = edge.new_element("data");
+            val_f.set_attribute("key", "assumption.resultfunction");
+            val_f.data = id2string(it->function_id);
+          }
+        }
+      }
+      else if(it->type == goto_trace_stept::typet::GOTO && it->pc->is_goto())
+      {
+      }
+
+      graphml[to].in[from].xml_node = edge;
+      graphml[from].out[to].xml_node = edge;
+
       break;
+    }
 
     case goto_trace_stept::typet::DECL:
     case goto_trace_stept::typet::FUNCTION_CALL:
@@ -602,40 +602,40 @@ void graphml_witnesst::operator()(const symex_target_equationt &equation)
     case goto_trace_stept::typet::ASSERT:
     case goto_trace_stept::typet::GOTO:
     case goto_trace_stept::typet::SPAWN:
+    {
+      xmlt edge(
+        "edge",
+        {{"source", graphml[from].node_name},
+         {"target", graphml[to].node_name}},
+        {});
+
       {
-        xmlt edge(
-          "edge",
-          {{"source", graphml[from].node_name},
-           {"target", graphml[to].node_name}},
-          {});
+        xmlt &data_f = edge.new_element("data");
+        data_f.set_attribute("key", "originfile");
+        data_f.data = id2string(graphml[from].file);
 
-        {
-          xmlt &data_f=edge.new_element("data");
-          data_f.set_attribute("key", "originfile");
-          data_f.data=id2string(graphml[from].file);
-
-          xmlt &data_l=edge.new_element("data");
-          data_l.set_attribute("key", "startline");
-          data_l.data=id2string(graphml[from].line);
-        }
-
-        if((it->is_assignment() ||
-            it->is_decl()) &&
-           it->ssa_rhs.is_not_nil() &&
-           it->ssa_full_lhs.is_not_nil())
-        {
-          irep_idt identifier=it->ssa_lhs.get_object_name();
-
-          graphml[to].has_invariant=true;
-          code_assignt assign(it->ssa_lhs, it->ssa_rhs);
-          graphml[to].invariant=convert_assign_rec(identifier, assign);
-          graphml[to].invariant_scope = id2string(it->source.function_id);
-        }
-
-        graphml[to].in[from].xml_node=edge;
-        graphml[from].out[to].xml_node=edge;
+        xmlt &data_l = edge.new_element("data");
+        data_l.set_attribute("key", "startline");
+        data_l.data = id2string(graphml[from].line);
       }
+
+      if(
+        (it->is_assignment() || it->is_decl()) && it->ssa_rhs.is_not_nil() &&
+        it->ssa_full_lhs.is_not_nil())
+      {
+        irep_idt identifier = it->ssa_lhs.get_object_name();
+
+        graphml[to].has_invariant = true;
+        code_assignt assign(it->ssa_lhs, it->ssa_rhs);
+        graphml[to].invariant = convert_assign_rec(identifier, assign);
+        graphml[to].invariant_scope = id2string(it->source.function_id);
+      }
+
+      graphml[to].in[from].xml_node = edge;
+      graphml[from].out[to].xml_node = edge;
+
       break;
+    }
 
     case goto_trace_stept::typet::DECL:
     case goto_trace_stept::typet::FUNCTION_CALL:
