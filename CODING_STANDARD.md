@@ -1,5 +1,15 @@
 Here a few minimalistic coding rules for the CPROVER source tree.
 
+# Interfaces
+- With any changes, consider the impact on other users of the code base. Users
+  frequently carry their own set of patches or build tools on top of the code
+  base. Large-scale changes negatively impact both scenarios.
+- Tools that link against the code base can reasonably expect a stable
+  interface. We consider as public interface any objects, procedures, or classes
+  (and their methods) that are meant to be used outside a single directory.
+- See below for how to document interfaces and how to mark parts of interfaces
+  as deprecated.
+
 # Whitespaces
 
 Formatting is enforced using clang-format. For more information about this, see
@@ -101,6 +111,16 @@ Formatting is enforced using clang-format. For more information about this, see
 - Use comments to explain the non-obvious
 - Use #if 0 for commenting out source code
 - Use #ifdef DEBUG to guard debug code
+- When deprecating interfaces, use the `DEPRECATED` macro, preferably together
+  with `SINCE`. For example,
+  ```
+  DEPRECATED(SINCE(2019, 1, 31, "use other_method() instead"))
+  void deprecated_method();
+  ```
+  marks `deprecated_method` as deprecated as of 2019-01-31. Any deprecated
+  functionality should remain in place for at least six months from the date of
+  deprecation. Before deprecating code, all in-tree uses should be replaced or
+  marked as deprecated.
 
 # Naming
 - Identifiers should make clear the purpose of the thing they are naming. 
