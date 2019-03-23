@@ -183,7 +183,7 @@ public:
 
   // constructors, destructor
 
-  DEPRECATED("use messaget(message_handler) instead")
+  DEPRECATED(SINCE(2019, 1, 7, "use messaget(message_handler) instead"))
   messaget():
     message_handler(nullptr),
     mstream(M_DEBUG, *this)

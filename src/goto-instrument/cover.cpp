@@ -58,7 +58,7 @@ void instrument_cover_goals(
 /// \deprecated use instrument_cover_goals(goto_programt &goto_program,
 /// const cover_instrumenterst &instrumenters,
 /// message_handlert &message_handler, const irep_idt mode) instead
-DEPRECATED("use instrument_cover_goals(goto_programt &...) instead")
+DEPRECATED(SINCE(2018, 2, 9, "use instrument_cover_goals goto_programt &..."))
 void instrument_cover_goals(
   const symbol_tablet &symbol_table,
   const irep_idt &function_id,

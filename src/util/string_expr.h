@@ -114,7 +114,11 @@ inline const array_string_exprt &to_array_string_expr(const exprt &expr)
 class refined_string_exprt : public struct_exprt
 {
 public:
-  DEPRECATED("use refined_string_exprt(length, content, type) instead")
+  DEPRECATED(SINCE(
+    2019,
+    1,
+    12,
+    "use refined_string_exprt(length, content, type) instead"))
   refined_string_exprt() : struct_exprt()
   {
   }

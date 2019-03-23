@@ -30,7 +30,7 @@ public:
   goto_programt body;
 
   /// The type of the function, indicating the return type and parameter types
-  DEPRECATED("Get the type from the symbol table instead")
+  DEPRECATED(SINCE(2019, 2, 16, "Get the type from the symbol table instead"))
   code_typet type;
 
   typedef std::vector<irep_idt> parameter_identifierst;
@@ -54,19 +54,19 @@ public:
       parameter_identifiers.push_back(parameter.get_identifier());
   }
 
-  DEPRECATED("Get the type from the symbol table instead")
+  DEPRECATED(SINCE(2019, 2, 16, "Get the type from the symbol table instead"))
   bool is_inlined() const
   {
     return type.get_bool(ID_C_inlined);
   }
 
-  DEPRECATED("Get the type from the symbol table instead")
+  DEPRECATED(SINCE(2019, 2, 16, "Get the type from the symbol table instead"))
   bool is_hidden() const
   {
     return type.get_bool(ID_C_hide);
   }
 
-  DEPRECATED("Get the type from the symbol table instead")
+  DEPRECATED(SINCE(2019, 2, 16, "Get the type from the symbol table instead"))
   void make_hidden()
   {
     type.set(ID_C_hide, true);

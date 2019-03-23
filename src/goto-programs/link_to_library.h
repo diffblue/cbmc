@@ -23,7 +23,7 @@ class goto_modelt;
 class message_handlert;
 class symbol_tablet;
 
-DEPRECATED("Use link_to_library(goto_model, ...) instead")
+DEPRECATED(SINCE(2019, 2, 28, "Use link_to_library(goto_model, ...) instead"))
 void link_to_library(
   symbol_tablet &,
   goto_functionst &,
