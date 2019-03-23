@@ -487,7 +487,7 @@ string_constraint_generatort::add_axioms_for_function_application(
 ///   or three arguments: string, integer offset and count
 /// \param array_pool: pool of arrays representing strings
 /// \return a new string expression
-DEPRECATED("should use substring instead")
+DEPRECATED(SINCE(2017, 10, 5, "should use substring instead"))
 std::pair<exprt, string_constraintst> add_axioms_for_copy(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,

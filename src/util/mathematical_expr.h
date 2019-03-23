@@ -19,7 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class transt : public ternary_exprt
 {
 public:
-  DEPRECATED("use transt(op0, op1, op2) instead")
+  DEPRECATED(SINCE(2019, 1, 12, "use transt(op0, op1, op2) instead"))
   transt() : ternary_exprt(ID_trans)
   {
   }
@@ -97,7 +97,7 @@ inline transt &to_trans_expr(exprt &expr)
 class power_exprt : public binary_exprt
 {
 public:
-  DEPRECATED("use power_exprt(lhs, rhs) instead")
+  DEPRECATED(SINCE(2018, 9, 21, "use power_exprt(lhs, rhs) instead"))
   power_exprt() : binary_exprt(ID_power)
   {
   }
@@ -146,7 +146,7 @@ inline power_exprt &to_power_expr(exprt &expr)
 class factorial_power_exprt : public binary_exprt
 {
 public:
-  DEPRECATED("use factorial_power_exprt(lhs, rhs) instead")
+  DEPRECATED(SINCE(2018, 9, 21, "use factorial_power_exprt(lhs, rhs) instead"))
   factorial_power_exprt() : binary_exprt(ID_factorial_power)
   {
   }
@@ -207,7 +207,8 @@ class function_application_exprt : public binary_exprt
 public:
   using argumentst = exprt::operandst;
 
-  DEPRECATED("use function_application_exprt(fkt, arg) instead")
+  DEPRECATED(
+    SINCE(2019, 3, 3, "use function_application_exprt(fkt, arg) instead"))
   function_application_exprt(
     const symbol_exprt &_function,
     const argumentst &_arguments,

@@ -121,14 +121,22 @@ public:
   void reserve_operands(operandst::size_type n)
   { operands().reserve(n) ; }
 
-  DEPRECATED("use add_to_operands(std::move(expr)) instead")
+  DEPRECATED(SINCE(2018, 10, 1, "use add_to_operands(std::move(expr)) instead"))
   void move_to_operands(exprt &expr);
 
-  DEPRECATED("use add_to_operands(std::move(e1), std::move(e2)) instead")
+  DEPRECATED(SINCE(
+    2018,
+    10,
+    1,
+    "use add_to_operands(std::move(e1), std::move(e2)) instead"))
   void move_to_operands(exprt &e1, exprt &e2);
 
-  DEPRECATED(
-    "use add_to_operands(std::move(e1), std::move(e2), std::move(e3)) instead")
+  DEPRECATED(SINCE(
+    2018,
+    10,
+    1,
+    "use add_to_operands(std::move(e1), std::move(e2), std::move(e3))"
+    "instead"))
   void move_to_operands(exprt &e1, exprt &e2, exprt &e3);
 
   /// Copy the given argument to the end of `exprt`'s operands.
@@ -225,7 +233,7 @@ public:
     op.push_back(std::move(e3));
   }
 
-  DEPRECATED("use typecast_exprt() instead")
+  DEPRECATED(SINCE(2019, 1, 19, "use typecast_exprt() instead"))
   void make_typecast(const typet &_type);
 
   void make_bool(bool value);

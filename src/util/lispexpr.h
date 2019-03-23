@@ -6,8 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-
-// THIS HEADER IS DEPRECATED AND WILL GO AWAY
+// THIS HEADER IS DEPRECATED (since 2015-06-30) AND WILL GO AWAY
 
 #ifndef CPROVER_UTIL_LISPEXPR_H
 #define CPROVER_UTIL_LISPEXPR_H

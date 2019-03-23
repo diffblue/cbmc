@@ -140,7 +140,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_insert(
 /// \param array_pool: pool of arrays representing strings
 /// \param ns: namespace
 /// \return an expression
-DEPRECATED("should convert the value to string and call insert")
+DEPRECATED(SINCE(2017, 10, 5, "convert the value to string and call insert"))
 std::pair<exprt, string_constraintst> add_axioms_for_insert_int(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
@@ -167,7 +167,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_insert_int(
 ///   integer offset, and a Boolean
 /// \param array_pool: pool of arrays representing strings
 /// \return a new string expression
-DEPRECATED("should convert the value to string and call insert")
+DEPRECATED(SINCE(2017, 10, 5, "convert the value to string and call insert"))
 std::pair<exprt, string_constraintst> add_axioms_for_insert_bool(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
@@ -219,7 +219,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_insert_char(
 /// \param array_pool: pool of arrays representing strings
 /// \param ns: namespace
 /// \return a string expression
-DEPRECATED("should convert the value to string and call insert")
+DEPRECATED(SINCE(2017, 10, 5, "convert the value to string and call insert"))
 std::pair<exprt, string_constraintst> add_axioms_for_insert_double(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
@@ -248,7 +248,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_insert_double(
 /// \param array_pool: pool of arrays representing strings
 /// \param ns: namespace
 /// \return a new string expression
-DEPRECATED("should convert the value to string and call insert")
+DEPRECATED(SINCE(2017, 10, 5, "convert the value to string and call insert"))
 std::pair<exprt, string_constraintst> add_axioms_for_insert_float(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,

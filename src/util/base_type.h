@@ -18,13 +18,13 @@ class exprt;
 class typet;
 class namespacet;
 
-DEPRECATED("Use == instead")
+DEPRECATED(SINCE(2019, 1, 22, "Use == instead"))
 bool base_type_eq(
   const typet &type1,
   const typet &type2,
   const namespacet &ns);
 
-DEPRECATED("Use == instead")
+DEPRECATED(SINCE(2019, 1, 22, "Use == instead"))
 bool base_type_eq(
   const exprt &expr1,
   const exprt &expr2,

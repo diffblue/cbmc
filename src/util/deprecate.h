@@ -23,4 +23,7 @@ Author: Diffblue Ltd.
 #define DEPRECATED(msg)
 #endif
 
+#define SINCE(year, month, day, msg)                                           \
+  "deprecated since " #year "-" #month "-" #day "; " msg
+
 #endif // CPROVER_UTIL_DEPRECATE_H

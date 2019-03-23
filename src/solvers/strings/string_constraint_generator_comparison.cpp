@@ -303,7 +303,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_compare_to(
 /// \deprecated never tested
 /// \param f: function application with one string argument
 /// \return a string expression
-DEPRECATED("never tested")
+DEPRECATED(SINCE(2017, 10, 5, "never tested"))
 std::pair<symbol_exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_intern(
   const function_application_exprt &f)

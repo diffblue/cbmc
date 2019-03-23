@@ -42,7 +42,7 @@ static unsigned long to_integer_or_default(
 /// \param array_pool: pool of arrays representing strings
 /// \param ns: namespace
 /// \return a new string expression
-DEPRECATED("should use add_axioms_for_string_of_int instead")
+DEPRECATED(SINCE(2017, 10, 5, "use add_axioms_for_string_of_int instead"))
 std::pair<exprt, string_constraintst> add_axioms_from_long(
   const function_application_exprt &f,
   array_poolt &array_pool,
@@ -63,7 +63,7 @@ std::pair<exprt, string_constraintst> add_axioms_from_long(
 /// \param f: function application with a Boolean argument
 /// \param array_pool: pool of arrays representing strings
 /// \return a new string expression
-DEPRECATED("This is Java specific and should be implemented in Java instead")
+DEPRECATED(SINCE(2017, 10, 5, "Java specific, should be implemented in Java"))
 std::pair<exprt, string_constraintst> add_axioms_from_bool(
   const function_application_exprt &f,
   array_poolt &array_pool)
@@ -80,7 +80,7 @@ std::pair<exprt, string_constraintst> add_axioms_from_bool(
 /// \param res: string expression for the result
 /// \param b: Boolean expression
 /// \return code 0 on success
-DEPRECATED("This is Java specific and should be implemented in Java instead")
+DEPRECATED(SINCE(2017, 10, 5, "Java specific, should be implemented in Java"))
 std::pair<exprt, string_constraintst>
 add_axioms_from_bool(const array_string_exprt &res, const exprt &b)
 {
@@ -212,7 +212,7 @@ static exprt int_of_hex_char(const exprt &chr)
 /// \param res: string expression for the result
 /// \param i: an integer argument
 /// \return code 0 on success
-DEPRECATED("use add_axioms_for_string_of_int_with_radix instead")
+DEPRECATED(SINCE(2017, 10, 5, "use add_axioms_for_string_of_int_with_radix"))
 std::pair<exprt, string_constraintst>
 add_axioms_from_int_hex(const array_string_exprt &res, const exprt &i)
 {

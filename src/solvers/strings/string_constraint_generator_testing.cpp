@@ -123,7 +123,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_is_prefix(
 /// \param f: function application with a string argument
 /// \param array_pool: pool of arrays representing strings
 /// \return a Boolean expression
-DEPRECATED("should use `string_length(s)==0` instead")
+DEPRECATED(SINCE(2017, 10, 5, "should use `string_length s == 0` instead"))
 std::pair<exprt, string_constraintst> add_axioms_for_is_empty(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
@@ -165,7 +165,8 @@ std::pair<exprt, string_constraintst> add_axioms_for_is_empty(
 ///   argument or the first argument
 /// \param array_pool: pool of arrays representing strings
 /// \return Boolean expression `issuffix`
-DEPRECATED("should use `strings_startwith(s0, s1, s1.length - s0.length)`")
+/// \deprecated Should use `strings_startwith(s0, s1, s1.length - s0.length)`.
+DEPRECATED(SINCE(2018, 6, 6, "should use strings_startwith"))
 std::pair<exprt, string_constraintst> add_axioms_for_is_suffix(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
