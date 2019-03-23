@@ -67,6 +67,7 @@ if("${sat_impl}" STREQUAL "minisat2")
         URL http://ftp.debian.org/debian/pool/main/m/minisat2/minisat2_2.2.1.orig.tar.gz
         PATCH_COMMAND patch -p1 -i ${CBMC_SOURCE_DIR}/../scripts/minisat-2.2.1-patch
         COMMAND cmake -E copy ${CBMC_SOURCE_DIR}/../scripts/minisat2_CMakeLists.txt CMakeLists.txt
+        URL_MD5 27faa19ee0508660bd6fb7f894646d42
     )
 
     add_subdirectory(${minisat2_SOURCE_DIR} ${minisat2_BINARY_DIR})
@@ -85,6 +86,7 @@ elseif("${sat_impl}" STREQUAL "glucose")
         URL http://www.labri.fr/perso/lsimon/downloads/softwares/glucose-syrup.tgz
         PATCH_COMMAND patch -p1 -i ${CBMC_SOURCE_DIR}/../scripts/glucose-syrup-patch
         COMMAND cmake -E copy ${CBMC_SOURCE_DIR}/../scripts/glucose_CMakeLists.txt CMakeLists.txt
+        URL_MD5 b6f040a6c28f011f3be994663338f548
     )
 
     add_subdirectory(${glucose_SOURCE_DIR} ${glucose_BINARY_DIR})
