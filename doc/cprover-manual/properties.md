@@ -243,10 +243,10 @@ int do_something_with_complex(struct Complex *complex);
 And the command line
 
 ```
-    goto-instrument in.goto out.goto
-      --generate-function-body do_something_with_complex
-      --generate-function-body-options
-        'havoc,params:.*,globals:AGlobalComplex'
+goto-instrument in.goto out.goto
+  --generate-function-body do_something_with_complex
+  --generate-function-body-options
+    'havoc,params:.*,globals:AGlobalComplex'
 ```
 
 The goto code equivalent of the following will be generated:
