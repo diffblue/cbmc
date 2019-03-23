@@ -1846,13 +1846,6 @@ class side_effect_exprt : public exprt
 {
 public:
   DEPRECATED(
-    SINCE(2018, 6, 28, "use side_effect_exprt(statement, type, loc) instead"))
-  explicit side_effect_exprt(const irep_idt &statement) : exprt(ID_side_effect)
-  {
-    set_statement(statement);
-  }
-
-  DEPRECATED(
     SINCE(2018, 8, 9, "use side_effect_exprt(statement, type, loc) instead"))
   side_effect_exprt(const irep_idt &statement, const typet &_type)
     : exprt(ID_side_effect, _type)
@@ -1931,16 +1924,6 @@ inline const side_effect_exprt &to_side_effect_expr(const exprt &expr)
 class side_effect_expr_nondett:public side_effect_exprt
 {
 public:
-  DEPRECATED(SINCE(
-    2018,
-    6,
-    28,
-    "use side_effect_expr_nondett(statement, type, loc) instead"))
-  side_effect_expr_nondett():side_effect_exprt(ID_nondet)
-  {
-    set_nullable(true);
-  }
-
   DEPRECATED(SINCE(
     2018,
     8,
@@ -2069,36 +2052,6 @@ class side_effect_expr_function_callt:public side_effect_exprt
 public:
   DEPRECATED(SINCE(
     2018,
-    6,
-    28,
-    "use side_effect_expr_function_callt("
-    "function, arguments, type, loc) instead"))
-  side_effect_expr_function_callt()
-    : side_effect_exprt(ID_function_call, typet(), source_locationt())
-  {
-    operands().resize(2);
-    op1().id(ID_arguments);
-  }
-
-  DEPRECATED(SINCE(
-    2018,
-    8,
-    9,
-    "use side_effect_expr_function_callt("
-    "function, arguments, type, loc) instead"))
-  side_effect_expr_function_callt(
-    const exprt &_function,
-    const exprt::operandst &_arguments)
-    : side_effect_exprt(ID_function_call)
-  {
-    operands().resize(2);
-    op1().id(ID_arguments);
-    function() = _function;
-    arguments() = _arguments;
-  }
-
-  DEPRECATED(SINCE(
-    2018,
     8,
     9,
     "use side_effect_expr_function_callt("
@@ -2180,12 +2133,6 @@ inline const side_effect_expr_function_callt
 class side_effect_expr_throwt:public side_effect_exprt
 {
 public:
-  DEPRECATED(
-    SINCE(2018, 6, 28, "use side_effect_expr_throwt(exception_list) instead"))
-  side_effect_expr_throwt():side_effect_exprt(ID_throw)
-  {
-  }
-
   side_effect_expr_throwt(
     irept exception_list,
     typet type,
