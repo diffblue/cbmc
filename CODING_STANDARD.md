@@ -101,6 +101,16 @@ Formatting is enforced using clang-format. For more information about this, see
 - Use comments to explain the non-obvious
 - Use #if 0 for commenting out source code
 - Use #ifdef DEBUG to guard debug code
+- When deprecating interfaces, use the `DEPRECATED` macro, preferably together
+  with `SINCE`. For example,
+  ```
+  DEPRECATED(SINCE(2019, 1, 31, "use other_method() instead"))
+  void deprecated_method();
+  ```
+  marks `deprecated_method` as deprecated as of 2019-01-31. Any deprecated
+  functionality should remain in place for at least six months from the date of
+  deprecation. Before deprecating code, all in-tree uses should be replaced or
+  marked as deprecated.
 
 # Naming
 - Identifiers should make clear the purpose of the thing they are naming. 
