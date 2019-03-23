@@ -152,6 +152,31 @@ std::string graphml_witnesst::convert_assign_rec(
         break;
     }
   }
+  else if(assign.rhs().id() == ID_with)
+  {
+    const with_exprt &with_expr = to_with_expr(assign.rhs());
+    const auto &ops = with_expr.operands();
+
+    for(std::size_t i = 1; i < ops.size(); i += 2)
+    {
+      if(!result.empty())
+        result += ' ';
+
+      if(ops[i].id() == ID_member_name)
+      {
+        const member_exprt member{
+          assign.lhs(), ops[i].get(ID_component_name), ops[i + 1].type()};
+        result +=
+          convert_assign_rec(identifier, code_assignt(member, ops[i + 1]));
+      }
+      else
+      {
+        const index_exprt index{assign.lhs(), ops[i]};
+        result +=
+          convert_assign_rec(identifier, code_assignt(index, ops[i + 1]));
+      }
+    }
+  }
   else
   {
     exprt clean_rhs=assign.rhs();
@@ -527,7 +552,7 @@ void graphml_witnesst::operator()(const symex_target_equationt &equation)
           irep_idt identifier=it->ssa_lhs.get_object_name();
 
           graphml[to].has_invariant=true;
-          code_assignt assign(it->ssa_full_lhs, it->ssa_rhs);
+          code_assignt assign(it->ssa_lhs, it->ssa_rhs);
           graphml[to].invariant=convert_assign_rec(identifier, assign);
           graphml[to].invariant_scope = id2string(it->source.function_id);
         }
