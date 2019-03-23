@@ -34,11 +34,6 @@ Author: Daniel Kroening, kroening@kroening.com
 class codet:public exprt
 {
 public:
-  DEPRECATED(SINCE(2018, 6, 28, "use codet(statement) instead"))
-  codet() : exprt(ID_code, empty_typet())
-  {
-  }
-
   /// \param statement: Specifies the type of the `codet` to be constructed,
   ///   e.g. `ID_block` for a \ref code_blockt or `ID_assign` for a
   ///   \ref code_assignt.
@@ -537,12 +532,6 @@ inline code_deadt &to_code_dead(codet &code)
 class code_assumet:public codet
 {
 public:
-  DEPRECATED(SINCE(2018, 6, 28, "use code_assumet(expr) instead"))
-  code_assumet():codet(ID_assume)
-  {
-    operands().resize(1);
-  }
-
   explicit code_assumet(exprt expr) : codet(ID_assume, {std::move(expr)})
   {
   }
@@ -595,12 +584,6 @@ inline code_assumet &to_code_assume(codet &code)
 class code_assertt:public codet
 {
 public:
-  DEPRECATED(SINCE(2018, 6, 28, "use code_assertt(expr) instead"))
-  code_assertt():codet(ID_assert)
-  {
-    operands().resize(1);
-  }
-
   explicit code_assertt(exprt expr) : codet(ID_assert, {std::move(expr)})
   {
   }
@@ -767,12 +750,6 @@ inline code_ifthenelset &to_code_ifthenelse(codet &code)
 class code_switcht:public codet
 {
 public:
-  DEPRECATED(SINCE(2018, 6, 28, "use code_switcht(value, body) instead"))
-  code_switcht():codet(ID_switch)
-  {
-    operands().resize(2);
-  }
-
   code_switcht(exprt _value, codet _body)
     : codet(ID_switch, {std::move(_value), std::move(_body)})
   {
@@ -835,12 +812,6 @@ inline code_switcht &to_code_switch(codet &code)
 class code_whilet:public codet
 {
 public:
-  DEPRECATED(SINCE(2018, 6, 28, "use code_whilet(cond, body) instead"))
-  code_whilet():codet(ID_while)
-  {
-    operands().resize(2);
-  }
-
   code_whilet(exprt _cond, codet _body)
     : codet(ID_while, {std::move(_cond), std::move(_body)})
   {
@@ -903,12 +874,6 @@ inline code_whilet &to_code_while(codet &code)
 class code_dowhilet:public codet
 {
 public:
-  DEPRECATED(SINCE(2018, 6, 28, "use code_dowhilet(cond, body) instead"))
-  code_dowhilet():codet(ID_dowhile)
-  {
-    operands().resize(2);
-  }
-
   code_dowhilet(exprt _cond, codet _body)
     : codet(ID_dowhile, {std::move(_cond), std::move(_body)})
   {
@@ -1068,11 +1033,6 @@ inline code_fort &to_code_for(codet &code)
 class code_gotot:public codet
 {
 public:
-  DEPRECATED(SINCE(2018, 6, 28, "use code_gotot(label) instead"))
-  code_gotot():codet(ID_goto)
-  {
-  }
-
   explicit code_gotot(const irep_idt &label):codet(ID_goto)
   {
     set_destination(label);
@@ -1129,14 +1089,6 @@ inline code_gotot &to_code_goto(codet &code)
 class code_function_callt:public codet
 {
 public:
-  DEPRECATED(SINCE(2018, 8, 26, "Use code_function_callt(...) instead"))
-  code_function_callt():codet(ID_function_call)
-  {
-    operands().resize(3);
-    lhs().make_nil();
-    op2().id(ID_arguments);
-  }
-
   explicit code_function_callt(exprt _function)
     : codet(
         ID_function_call,
@@ -1329,12 +1281,6 @@ inline code_returnt &to_code_return(codet &code)
 class code_labelt:public codet
 {
 public:
-  DEPRECATED(SINCE(2018, 6, 28, "use code_labelt(label, _code) instead"))
-  code_labelt():codet(ID_label)
-  {
-    operands().resize(1);
-  }
-
   DEPRECATED(SINCE(2019, 2, 6, "use code_labelt(label, _code) instead"))
   explicit code_labelt(const irep_idt &_label):codet(ID_label)
   {
@@ -1406,12 +1352,6 @@ inline code_labelt &to_code_label(codet &code)
 class code_switch_caset:public codet
 {
 public:
-  DEPRECATED(SINCE(2018, 6, 28, "use code_switch_caset(case_op, code) instead"))
-  code_switch_caset():codet(ID_switch_case)
-  {
-    operands().resize(2);
-  }
-
   code_switch_caset(exprt _case_op, codet _code)
     : codet(ID_switch_case, {std::move(_case_op), std::move(_code)})
   {
@@ -1783,12 +1723,6 @@ inline const code_asm_gcct &to_code_asm_gcc(const codet &code)
 class code_expressiont:public codet
 {
 public:
-  DEPRECATED(SINCE(2018, 6, 28, "use code_expressiont(expr) instead"))
-  code_expressiont():codet(ID_expression)
-  {
-    operands().resize(1);
-  }
-
   explicit code_expressiont(exprt expr)
     : codet(ID_expression, {std::move(expr)})
   {
