@@ -18,7 +18,6 @@ Date: May 2016
 #include <util/make_unique.h>
 #include <util/cmdline.h>
 #include <util/options.h>
-#include <util/deprecate.h>
 
 #include <goto-programs/remove_skip.h>
 
@@ -47,33 +46,6 @@ void instrument_cover_goals(
   basic_blocks->report_block_anomalies(
     function_id, goto_program, message_handler);
   instrumenters(function_id, goto_program, *basic_blocks);
-}
-
-/// Instruments goto program for a given coverage criterion
-/// \param symbol_table: the symbol table
-/// \param function_id: name of \p goto_program
-/// \param goto_program: the goto program
-/// \param criterion: the coverage criterion
-/// \param message_handler: a message handler
-/// \deprecated use instrument_cover_goals(goto_programt &goto_program,
-/// const cover_instrumenterst &instrumenters,
-/// message_handlert &message_handler, const irep_idt mode) instead
-DEPRECATED(SINCE(2018, 2, 9, "use instrument_cover_goals goto_programt &..."))
-void instrument_cover_goals(
-  const symbol_tablet &symbol_table,
-  const irep_idt &function_id,
-  goto_programt &goto_program,
-  coverage_criteriont criterion,
-  message_handlert &message_handler)
-{
-  goal_filterst goal_filters;
-  goal_filters.add(util_make_unique<internal_goals_filtert>(message_handler));
-
-  cover_instrumenterst instrumenters;
-  instrumenters.add_from_criterion(criterion, symbol_table, goal_filters);
-
-  instrument_cover_goals(
-    function_id, goto_program, instrumenters, ID_unknown, message_handler);
 }
 
 /// Create and add an instrumenter based on the given criterion
