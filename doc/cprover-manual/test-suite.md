@@ -202,7 +202,7 @@ Unwinding](../cbmc/unwinding/).
 In this tutorial, we present the automatic test suite generation
 functionality of CBMC, by applying the MC/DC code coverage criterion to
 a PID controller case study. In addition to `--cover mcdc`, other
-coverage criteria such as `branch`, `decision`, and `path`. are also
+coverage criteria such as `branch`, `decision`, and `path` are also
 available when calling CBMC.
 
 ### Coverage Criteria
