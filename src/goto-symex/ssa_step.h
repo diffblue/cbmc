@@ -191,9 +191,6 @@ public:
   {
   }
 
-  DEPRECATED(SINCE(2018, 4, 23, "Use output without ns param"))
-  void output(const namespacet &ns, std::ostream &out) const;
-
   void output(std::ostream &out) const;
 
   void validate(const namespacet &ns, const validation_modet vm) const;
