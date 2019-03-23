@@ -43,7 +43,7 @@ main.c
     <edge source="[0-9\.]*" target="[0-9\.]*">
       <data key="originfile">main.c</data>
       <data key="startline">29</data>
-      <data key="assumption.scope">main</data>
+      <data key="assumption.scope">remove_one</data>
     </edge>
     <node id="[0-9\.]*"/>
     <edge source="[0-9\.]*" target="[0-9\.]*">
