@@ -34,18 +34,6 @@ public:
   }
 };
 
-/// The NIL type, i.e., an invalid type, no value.
-/// \deprecated Use `optional<typet>` instead.
-// NOLINTNEXTLINE
-class DEPRECATED(SINCE(2018, 8, 22, "Use `optional<typet>` instead.")) nil_typet
-  : public typet
-{
-public:
-  nil_typet():typet(static_cast<const typet &>(get_nil_irep()))
-  {
-  }
-};
-
 /// The empty type
 class empty_typet:public typet
 {
