@@ -186,28 +186,6 @@ const mp_integer binary2integer(const std::string &n, bool is_signed)
   #endif
 }
 
-mp_integer::ullong_t integer2ulong(const mp_integer &n)
-{
-  PRECONDITION(n.is_ulong());
-  return n.to_ulong();
-}
-
-std::size_t integer2size_t(const mp_integer &n)
-{
-  PRECONDITION(n>=0 && n<=std::numeric_limits<std::size_t>::max());
-  PRECONDITION(n.is_ulong());
-  mp_integer::ullong_t ull = n.to_ulong();
-  return (std::size_t) ull;
-}
-
-unsigned integer2unsigned(const mp_integer &n)
-{
-  PRECONDITION(n>=0 && n<=std::numeric_limits<unsigned>::max());
-  PRECONDITION(n.is_ulong());
-  mp_integer::ullong_t ull = n.to_ulong();
-  return (unsigned)ull;
-}
-
 /// bitwise binary operation over two integers, given as a functor
 /// \param a: the first integer
 /// \param b: the second integer
