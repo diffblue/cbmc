@@ -23,7 +23,6 @@ Author: Malte Mues <mail.mues@gmail.com>
 #ifdef RUN_GDB_API_TESTS
 
 #include <cstdio>
-#include <cstdlib>
 #include <regex>
 #include <string>
 
@@ -31,16 +30,12 @@ Author: Malte Mues <mail.mues@gmail.com>
 #include <iostream>
 
 #include <memory-analyzer/gdb_api.cpp>
+#include <util/run.h>
 
 void compile_test_file()
 {
-  std::string test_file("memory-analyzer/test.c");
-
-  std::string cmd("gcc -g -o test ");
-  cmd += test_file;
-
-  const int r = system(cmd.c_str());
-  REQUIRE(!r);
+  REQUIRE(
+    run("gcc", {"gcc", "-g", "-o", "test", "memory-analyzer/test.c"}) == 0);
 }
 
 class gdb_api_testt : public gdb_apit
@@ -99,99 +94,117 @@ void gdb_api_internals_test()
   }
 }
 
+bool check_for_gdb()
+{
+  const bool has_gdb = run("gdb", {"gdb", "--version"}) == 0;
+
+  SECTION("check gdb is on the PATH")
+  {
+    REQUIRE(has_gdb);
+  }
+  return has_gdb;
+}
+
 #endif
 
 TEST_CASE("gdb api internals test", "[core][memory-analyzer]")
 {
 #ifdef RUN_GDB_API_TESTS
-  gdb_api_internals_test();
+  if(check_for_gdb())
+  {
+    gdb_api_internals_test();
+  }
 #endif
 }
 
 TEST_CASE("gdb api test", "[core][memory-analyzer]")
 {
 #ifdef RUN_GDB_API_TESTS
-  compile_test_file();
-
+  if(check_for_gdb())
   {
-    gdb_apit gdb_api("test", true);
+    compile_test_file();
+
+    {
+      gdb_apit gdb_api("test", true);
+      gdb_api.create_gdb_process();
+
+      try
+      {
+        const bool r = gdb_api.run_gdb_to_breakpoint("checkpoint");
+        REQUIRE(r);
+      }
+      catch(const gdb_interaction_exceptiont &e)
+      {
+        std::cerr
+          << "warning: cannot fully unit test GDB API as program cannot "
+          << "be run with gdb\n";
+        std::cerr << "warning: this may be due to not having the required "
+                  << "permissions (e.g., to invoke ptrace() or to disable ASLR)"
+                  << "\n";
+        std::cerr << "gdb_interaction_exceptiont:" << '\n';
+        std::cerr << e.what() << '\n';
+
+        std::ifstream file("gdb.txt");
+        CHECK_RETURN(file.is_open());
+        std::string line;
+
+        std::cerr << "=== gdb log begin ===\n";
+
+        while(getline(file, line))
+        {
+          std::cerr << line << '\n';
+        }
+
+        file.close();
+
+        std::cerr << "=== gdb log end ===\n";
+
+        return;
+      }
+    }
+
+    gdb_apit gdb_api("test");
     gdb_api.create_gdb_process();
 
-    try
+    SECTION("breakpoint is hit")
     {
       const bool r = gdb_api.run_gdb_to_breakpoint("checkpoint");
       REQUIRE(r);
     }
-    catch(const gdb_interaction_exceptiont &e)
+
+    SECTION("breakpoint is not hit")
     {
-      std::cerr << "warning: cannot fully unit test GDB API as program cannot "
-                << "be run with gdb\n";
-      std::cerr << "warning: this may be due to not having the required "
-                << "permissions (e.g., to invoke ptrace() or to disable ASLR)"
-                << "\n";
-      std::cerr << "gdb_interaction_exceptiont:" << '\n';
-      std::cerr << e.what() << '\n';
+      const bool r = gdb_api.run_gdb_to_breakpoint("checkpoint2");
+      REQUIRE(!r);
+    }
 
-      std::ifstream file("gdb.txt");
-      CHECK_RETURN(file.is_open());
-      std::string line;
+    SECTION("breakpoint does not exist")
+    {
+      REQUIRE_THROWS_AS(
+        gdb_api.run_gdb_to_breakpoint("checkpoint3"),
+        gdb_interaction_exceptiont);
+    }
 
-      std::cerr << "=== gdb log begin ===\n";
+    SECTION("query memory")
+    {
+      const bool r = gdb_api.run_gdb_to_breakpoint("checkpoint");
+      REQUIRE(r);
 
-      while(getline(file, line))
+      REQUIRE(gdb_api.get_value("x") == "8");
+      REQUIRE(gdb_api.get_value("s") == "abc");
+
+      const std::regex regex(R"(0x[1-9a-f][0-9a-f]*)");
+
       {
-        std::cerr << line << '\n';
+        std::string address = gdb_api.get_memory("p");
+        REQUIRE(std::regex_match(address, regex));
       }
 
-      file.close();
-
-      std::cerr << "=== gdb log end ===\n";
-
-      return;
+      {
+        std::string address = gdb_api.get_memory("vp");
+        REQUIRE(std::regex_match(address, regex));
+      }
     }
   }
-
-  gdb_apit gdb_api("test");
-  gdb_api.create_gdb_process();
-
-  SECTION("breakpoint is hit")
-  {
-    const bool r = gdb_api.run_gdb_to_breakpoint("checkpoint");
-    REQUIRE(r);
-  }
-
-  SECTION("breakpoint is not hit")
-  {
-    const bool r = gdb_api.run_gdb_to_breakpoint("checkpoint2");
-    REQUIRE(!r);
-  }
-
-  SECTION("breakpoint does not exist")
-  {
-    REQUIRE_THROWS_AS(
-      gdb_api.run_gdb_to_breakpoint("checkpoint3"), gdb_interaction_exceptiont);
-  }
-
-  SECTION("query memory")
-  {
-    const bool r = gdb_api.run_gdb_to_breakpoint("checkpoint");
-    REQUIRE(r);
-
-    REQUIRE(gdb_api.get_value("x") == "8");
-    REQUIRE(gdb_api.get_value("s") == "abc");
-
-    const std::regex regex(R"(0x[1-9a-f][0-9a-f]*)");
-
-    {
-      std::string address = gdb_api.get_memory("p");
-      REQUIRE(std::regex_match(address, regex));
-    }
-
-    {
-      std::string address = gdb_api.get_memory("vp");
-      REQUIRE(std::regex_match(address, regex));
-    }
-  }
-
 #endif
 }
