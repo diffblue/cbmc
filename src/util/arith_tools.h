@@ -10,7 +10,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_UTIL_ARITH_TOOLS_H
 #define CPROVER_UTIL_ARITH_TOOLS_H
 
-#include "deprecate.h"
 #include "invariant.h"
 #include "mp_arith.h"
 #include "optional.h"
@@ -25,10 +24,6 @@ class typet;
 /// \param [out] int_value: Integer value (only modified if conversion succeeds)
 /// \return False if, and only if, the conversion was successful.
 bool to_integer(const constant_exprt &expr, mp_integer &int_value);
-
-// returns 'true' on error
-DEPRECATED(SINCE(2018, 9, 29, "Use numeric_cast<unsigned>(e) instead"))
-bool to_unsigned_integer(const constant_exprt &expr, unsigned &uint_value);
 
 /// Numerical cast provides a unified way of converting from one numerical type
 /// to another.
