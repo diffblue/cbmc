@@ -15,6 +15,8 @@ Author: Michael Tautschig, tautschn@amazon.com
 #include <util/expr.h>
 #include <util/expr_util.h>
 
+#include "goto_symex_state.h"
+
 class goto_symex_is_constantt : public is_constantt
 {
 protected:
@@ -44,6 +46,12 @@ protected:
       return true;
       */
       return false;
+    }
+    else if(expr.id() == ID_symbol)
+    {
+      // we only ever assign to a single guard once, we can treat it as constant
+      return to_ssa_expr(expr).get_object_name() ==
+             goto_symex_statet::guard_identifier();
     }
 
     return is_constantt::is_constant(expr);
