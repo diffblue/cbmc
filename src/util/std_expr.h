@@ -1585,14 +1585,19 @@ inline index_exprt &to_index_expr(exprt &expr)
 class array_of_exprt:public unary_exprt
 {
 public:
-  DEPRECATED(SINCE(2018, 9, 21, "use array_of_exprt(what, type) instead"))
-  array_of_exprt():unary_exprt(ID_array_of)
-  {
-  }
-
   explicit array_of_exprt(exprt _what, array_typet _type)
     : unary_exprt(ID_array_of, std::move(_what), std::move(_type))
   {
+  }
+
+  const array_typet &type() const
+  {
+    return static_cast<const array_typet &>(unary_exprt::type());
+  }
+
+  array_typet &type()
+  {
+    return static_cast<array_typet &>(unary_exprt::type());
   }
 
   exprt &what()

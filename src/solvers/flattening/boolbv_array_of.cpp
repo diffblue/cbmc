@@ -18,7 +18,7 @@ bvt boolbvt::convert_array_of(const array_of_exprt &expr)
   DATA_INVARIANT(
     expr.type().id() == ID_array, "array_of expression shall have array type");
 
-  const array_typet &array_type=to_array_type(expr.type());
+  const array_typet &array_type = expr.type();
 
   if(is_unbounded_array(array_type))
     return conversion_failed(expr);
