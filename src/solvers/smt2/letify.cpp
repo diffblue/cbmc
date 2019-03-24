@@ -19,10 +19,12 @@ void letifyt::collect_bindings(
   seen_expressionst &map,
   std::vector<exprt> &let_order)
 {
+  // did we already see the expression?
   seen_expressionst::iterator entry = map.find(expr);
 
   if(entry != map.end())
   {
+    // yes, seen before, increase counter
     let_count_idt &count_id = entry->second;
     ++(count_id.count);
     return;
@@ -32,6 +34,7 @@ void letifyt::collect_bindings(
   if(expr.operands().empty())
     return;
 
+  // not seen before
   for(auto &op : expr.operands())
     collect_bindings(op, map, let_order);
 
@@ -46,6 +49,8 @@ void letifyt::collect_bindings(
   let_order.push_back(expr);
 }
 
+/// Construct a nested let expression for expressions
+/// in let_order that are used more than once
 exprt letifyt::letify(
   const exprt &expr,
   const std::vector<exprt> &let_order,
@@ -53,15 +58,16 @@ exprt letifyt::letify(
 {
   exprt result = substitute_let(expr, map);
 
-  // go backwards in let order
+  // we build inside out, so go backwards in let order
   for(auto r_it = let_order.rbegin(); r_it != let_order.rend(); r_it++)
   {
     const exprt &current = *r_it;
 
     auto m_it = map.find(current);
-    INVARIANT(m_it != map.end(), "expression should have been seen already");
+    PRECONDITION(m_it != map.end());
 
-    if(m_it->second.count >= LET_COUNT)
+    // Used more than once? Then a let pays off.
+    if(m_it->second.count > 1)
     {
       result = let_exprt(
         m_it->second.let_symbol, substitute_let(current, map), result);
@@ -92,7 +98,9 @@ exprt letifyt::substitute_let(const exprt &expr, const seen_expressionst &map)
   {
     op.visit([&map](exprt &expr) {
       seen_expressionst::const_iterator it = map.find(expr);
-      if(it != map.end() && it->second.count >= letifyt::LET_COUNT)
+
+      // replace subexpression by let symbol if used more than once
+      if(it != map.end() && it->second.count > 1)
         expr = it->second.let_symbol;
     });
   }
