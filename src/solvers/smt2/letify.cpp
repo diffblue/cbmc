@@ -19,6 +19,10 @@ void letifyt::collect_bindings(
   seen_expressionst &map,
   std::vector<exprt> &let_order)
 {
+  // do not letify things with no children
+  if(expr.operands().empty())
+    return;
+
   // did we already see the expression?
   seen_expressionst::iterator entry = map.find(expr);
 
@@ -29,10 +33,6 @@ void letifyt::collect_bindings(
     ++(count_id.count);
     return;
   }
-
-  // do not letify things with no children
-  if(expr.operands().empty())
-    return;
 
   // not seen before
   for(auto &op : expr.operands())
