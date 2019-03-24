@@ -22,8 +22,6 @@ protected:
   // to produce a fresh ID for each new let
   std::size_t let_id_count = 0;
 
-  static const std::size_t LET_COUNT = 2;
-
   struct let_count_idt
   {
     let_count_idt(std::size_t _count, const symbol_exprt &_let_symbol)
@@ -46,11 +44,10 @@ protected:
     seen_expressionst &map,
     std::vector<exprt> &let_order);
 
-  static exprt letify_rec(
+  static exprt letify(
     const exprt &expr,
-    std::vector<exprt> &let_order,
-    const seen_expressionst &map,
-    std::size_t i);
+    const std::vector<exprt> &let_order,
+    const seen_expressionst &map);
 
   static exprt substitute_let(const exprt &expr, const seen_expressionst &map);
 };
