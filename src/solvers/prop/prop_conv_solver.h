@@ -21,8 +21,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "literal_expr.h"
 #include "prop.h"
 #include "prop_conv.h"
+#include "solver_resource_limits.h"
 
-class prop_conv_solvert : public prop_convt
+class prop_conv_solvert : public prop_convt, public solver_resource_limitst
 {
 public:
   prop_conv_solvert(propt &_prop, message_handlert &message_handler)

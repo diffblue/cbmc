@@ -27,6 +27,7 @@ Author: Daniel Kroening, Peter Schrammel
 #include <solvers/flattening/bv_dimacs.h>
 #include <solvers/prop/prop.h>
 #include <solvers/prop/prop_conv.h>
+#include <solvers/prop/solver_resource_limits.h>
 #include <solvers/refinement/bv_refinement.h>
 #include <solvers/sat/dimacs_cnf.h>
 #include <solvers/sat/satcheck.h>
@@ -79,8 +80,21 @@ void solver_factoryt::set_prop_conv_time_limit(prop_convt &prop_conv)
 {
   const int timeout_seconds =
     options.get_signed_int_option("solver-time-limit");
+
   if(timeout_seconds > 0)
-    prop_conv.set_time_limit_seconds(timeout_seconds);
+  {
+    solver_resource_limitst *solver =
+      dynamic_cast<solver_resource_limitst *>(&prop_conv);
+    if(solver == nullptr)
+    {
+      messaget log(message_handler);
+      log.warning() << "cannot set solver time limit on "
+                    << prop_conv.decision_procedure_text() << messaget::eom;
+      return;
+    }
+
+    solver->set_time_limit_seconds(timeout_seconds);
+  }
 }
 
 void solver_factoryt::solvert::set_prop_conv(std::unique_ptr<prop_convt> p)
