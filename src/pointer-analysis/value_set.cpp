@@ -371,6 +371,64 @@ static std::string strip_first_field_from_suffix(
   return suffix.substr(field.length() + 1);
 }
 
+value_sett::entryt *value_sett::get_entry_for_symbol(
+  const irep_idt identifier,
+  const typet &type,
+  const std::string &suffix,
+  const namespacet &ns)
+{
+  if(
+    type.id() != ID_pointer && type.id() != ID_signedbv &&
+    type.id() != ID_unsignedbv && type.id() != ID_array &&
+    type.id() != ID_struct && type.id() != ID_struct_tag &&
+    type.id() != ID_union && type.id() != ID_union_tag)
+  {
+    return nullptr;
+  }
+
+  const typet &followed_type = type.id() == ID_struct_tag
+                                 ? ns.follow_tag(to_struct_tag_type(type))
+                                 : type.id() == ID_union_tag
+                                     ? ns.follow_tag(to_union_tag_type(type))
+                                     : type;
+
+  // look it up
+  value_sett::entryt *entry = find_entry(id2string(identifier) + suffix);
+
+  // try first component name as suffix if not yet found
+  if(
+    !entry &&
+    (followed_type.id() == ID_struct || followed_type.id() == ID_union))
+  {
+    const struct_union_typet &struct_union_type =
+      to_struct_union_type(followed_type);
+
+    const irep_idt &first_component_name =
+      struct_union_type.components().front().get_name();
+
+    entry = find_entry(
+      id2string(identifier) + "." + id2string(first_component_name) + suffix);
+  }
+
+  if(!entry)
+  {
+    // not found? try without suffix
+    entry = find_entry(identifier);
+  }
+
+  return entry;
+}
+
+const value_sett::entryt *value_sett::get_entry_for_symbol(
+  const irep_idt identifier,
+  const typet &type,
+  const std::string &suffix,
+  const namespacet &ns) const
+{
+  return const_cast<value_sett *>(this)->get_entry_for_symbol(
+    identifier, type, suffix, ns);
+}
+
 void value_sett::get_value_set_rec(
   const exprt &expr,
   object_mapt &dest,
@@ -418,43 +476,11 @@ void value_sett::get_value_set_rec(
   }
   else if(expr.id()==ID_symbol)
   {
-    irep_idt identifier=to_symbol_expr(expr).get_identifier();
+    const entryt *entry = get_entry_for_symbol(
+      to_symbol_expr(expr).get_identifier(), expr_type, suffix, ns);
 
-    // is it a pointer, integer, array or struct?
-    if(expr_type.id()==ID_pointer ||
-       expr_type.id()==ID_signedbv ||
-       expr_type.id()==ID_unsignedbv ||
-       expr_type.id()==ID_struct ||
-       expr_type.id()==ID_union ||
-       expr_type.id()==ID_array)
-    {
-      // look it up
-      const entryt *entry =
-        find_entry(id2string(identifier) + suffix);
-
-      // try first component name as suffix if not yet found
-      if(!entry && (expr_type.id() == ID_struct || expr_type.id() == ID_union))
-      {
-        const struct_union_typet &struct_union_type=
-          to_struct_union_type(expr_type);
-
-        const irep_idt &first_component_name =
-          struct_union_type.components().front().get_name();
-
-        entry = find_entry(
-          id2string(identifier) + "." + id2string(first_component_name) +
-          suffix);
-      }
-
-      // not found? try without suffix
-      if(!entry)
-        entry = find_entry(identifier);
-
-      if(entry)
-        make_union(dest, entry->object_map);
-      else
-        insert(dest, exprt(ID_unknown, original_type));
-    }
+    if(entry)
+      make_union(dest, entry->object_map);
     else
       insert(dest, exprt(ID_unknown, original_type));
   }
