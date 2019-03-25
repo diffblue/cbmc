@@ -328,6 +328,9 @@ public:
   /// \return a constant pointer to an entry if found, or null otherwise.
   ///   Note the pointer may be invalidated by insert operations, including
   ///   get_entry.
+  entryt *find_entry(const idt &id);
+
+  /// Const version of \ref find_entry
   const entryt *find_entry(const idt &id) const;
 
   /// Gets or inserts an entry in this value-set.
