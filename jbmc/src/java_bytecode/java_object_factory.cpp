@@ -24,10 +24,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 class java_object_factoryt
 {
-  /// The source location for new statements emitted during the operation of the
-  /// methods in this class.
-  const source_locationt &loc;
-
   const java_object_factory_parameterst object_factory_parameters;
 
   /// This is employed in conjunction with the depth above. Every time the
@@ -85,8 +81,7 @@ public:
     symbol_table_baset &_symbol_table,
     const select_pointer_typet &pointer_type_selector,
     message_handlert &log)
-    : loc(loc),
-      object_factory_parameters(_object_factory_parameters),
+    : object_factory_parameters(_object_factory_parameters),
       symbol_table(_symbol_table),
       ns(_symbol_table),
       pointer_type_selector(pointer_type_selector),
@@ -555,7 +550,7 @@ void java_object_factoryt::gen_nondet_pointer_init(
       if(update_in_place==update_in_placet::NO_UPDATE_IN_PLACE)
       {
         assignments.add(
-          code_assignt{expr, null_pointer_exprt{pointer_type}, loc});
+          code_assignt{expr, null_pointer_exprt{pointer_type}, location});
       }
       // Otherwise leave it as it is.
       return;
@@ -634,7 +629,8 @@ void java_object_factoryt::gen_nondet_pointer_init(
     update_in_placet::NO_UPDATE_IN_PLACE,
     location);
 
-  const code_assignt set_null_inst{expr, null_pointer_exprt{pointer_type}, loc};
+  const code_assignt set_null_inst{
+    expr, null_pointer_exprt{pointer_type}, location};
 
   const bool allow_null = depth > object_factory_parameters.min_null_tree_depth;
 
@@ -852,7 +848,7 @@ void java_object_factoryt::gen_nondet_struct_init(
         cases,
         java_int_type(),
         ID_java,
-        loc,
+        location,
         symbol_table));
     }
     else
@@ -880,7 +876,7 @@ void java_object_factoryt::gen_nondet_struct_init(
           assignments,
           object_factory_parameters.min_nondet_string_length,
           object_factory_parameters.max_nondet_string_length,
-          loc,
+          location,
           object_factory_parameters.function_id,
           symbol_table,
           object_factory_parameters.string_printable);
@@ -910,7 +906,7 @@ void java_object_factoryt::gen_nondet_struct_init(
       if(update_in_place == update_in_placet::MUST_UPDATE_IN_PLACE)
         continue;
       code_assignt code(me, from_integer(0, me.type()));
-      code.add_source_location() = loc;
+      code.add_source_location() = location;
       assignments.add(code);
     }
     else if(skip_special_string_fields && (name == "length" || name == "data"))
@@ -1063,10 +1059,11 @@ void java_object_factoryt::gen_nondet_init(
   {
     // types different from pointer or structure:
     // bool, int, float, byte, char, ...
-    exprt rhs = type.id() == ID_c_bool ? get_nondet_bool(type, loc)
-                                       : side_effect_expr_nondett(type, loc);
+    exprt rhs = type.id() == ID_c_bool
+                  ? get_nondet_bool(type, location)
+                  : side_effect_expr_nondett(type, location);
     code_assignt assign(expr, rhs);
-    assign.add_source_location()=loc;
+    assign.add_source_location() = location;
 
     assignments.add(assign);
   }
@@ -1112,12 +1109,12 @@ void java_object_factoryt::allocate_nondet_length_array(
     allocate_objects,
     assignments);
 
-  side_effect_exprt java_new_array(ID_java_new_array, lhs.type(), loc);
+  side_effect_exprt java_new_array(ID_java_new_array, lhs.type(), location);
   java_new_array.copy_to_operands(length_sym_expr);
   java_new_array.set(ID_length_upper_bound, max_length_expr);
   java_new_array.type().subtype().set(ID_element_type, element_type);
   code_assignt assign(lhs, java_new_array);
-  assign.add_source_location() = loc;
+  assign.add_source_location() = location;
   assignments.add(assign);
 }
 
@@ -1158,7 +1155,7 @@ void java_object_factoryt::array_primitive_init_code(
   assignments.statements().back().add_source_location() = location;
 
   // *array_data_init = NONDET(TYPE [max_length_expr]);
-  side_effect_expr_nondett nondet_data(array_type, loc);
+  side_effect_expr_nondett nondet_data(array_type, location);
   const dereference_exprt data_pointer_deref(
     tmp_finite_array_pointer, array_type);
   assignments.add(code_assignt(data_pointer_deref, std::move(nondet_data)));
@@ -1221,7 +1218,7 @@ void java_object_factoryt::array_loop_init_code(
       init_array_expr.type(), "array_data_init");
 
   code_assignt data_assign(array_init_symexpr, init_array_expr);
-  data_assign.add_source_location()=loc;
+  data_assign.add_source_location() = location;
   assignments.add(data_assign);
 
   const symbol_exprt &counter_expr =
