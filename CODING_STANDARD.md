@@ -185,7 +185,8 @@ Formatting is enforced using clang-format. For more information about this, see
 # C++ features
 - Do not use namespaces, except for anonymous namespaces.
 - Prefer use of `using` instead of `typedef`.
-- Prefer use of `class` instead of `struct`.
+- Prefer use of `class` instead of `struct` if there is an invariant between
+  members.
 - Write type modifiers before the type specifier.
 - Make references `const` whenever possible
 - Make member functions `const` whenever possible
@@ -235,6 +236,8 @@ Formatting is enforced using clang-format. For more information about this, see
   constructors, and `delete` in destructors. Never use `malloc` or `free`.
 - Prefer brace style initialisation (i.e. `type_name{arguments...}`) over
   parentheses for constructor calls
+- The [C++ Core Guidelines](http://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines)
+  are a useful reference for writing good modern C++.
 
 # CProver conventions
 - Avoid if at all possible using irept methods like `get(ID_name)`, instead cast
