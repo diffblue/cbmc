@@ -494,17 +494,6 @@ protected:
     const exprt &src,
     exprt &dest) const;
 
-  /// Extracts a member from a struct- or union-typed expression.
-  /// Usually that means making a `member_exprt`, but this can shortcut
-  /// extracting members from constants or with-expressions.
-  /// \param src: base struct-or-union-typed expression
-  /// \param component_name: member to extract
-  /// \param ns: global namespace
-  exprt make_member(
-    const exprt &src,
-    const irep_idt &component_name,
-    const namespacet &ns);
-
   // Subclass customisation points:
 
 protected:

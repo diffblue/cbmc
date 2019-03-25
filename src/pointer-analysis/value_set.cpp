@@ -1150,18 +1150,26 @@ void value_sett::assign(
       if(rhs.id()==ID_unknown ||
          rhs.id()==ID_invalid)
       {
+        // this branch is deemed dead as otherwise we'd be missing assignments
+        // that never happened in this branch
+        UNREACHABLE;
         rhs_member=exprt(rhs.id(), subtype);
       }
       else
       {
-        if(rhs.type() != lhs.type())
-          throw "value_sett::assign type mismatch: "
-                "rhs.type():\n"+rhs.type().pretty()+"\n"+
-                "lhs.type():\n"+lhs.type().pretty();
+        DATA_INVARIANT(
+          rhs.type() == lhs.type(),
+          "value_sett::assign types should match, got: "
+          "rhs.type():\n" +
+            rhs.type().pretty() + "\n" + "lhs.type():\n" + lhs.type().pretty());
 
-        rhs_member=make_member(rhs, name, ns);
+        const struct_union_typet &rhs_struct_union_type =
+          to_struct_union_type(ns.follow(rhs.type()));
 
-        assign(lhs_member, rhs_member, ns, false, add_to_sets);
+        const typet &rhs_subtype = rhs_struct_union_type.component_type(name);
+        rhs_member = simplify_expr(member_exprt{rhs, name, rhs_subtype}, ns);
+
+        assign(lhs_member, rhs_member, ns, true, add_to_sets);
       }
     }
   }
@@ -1182,10 +1190,11 @@ void value_sett::assign(
     }
     else
     {
-      if(rhs.type() != type)
-        throw "value_sett::assign type mismatch: "
-          "rhs.type():\n"+rhs.type().pretty()+"\n"+
-          "type:\n"+type.pretty();
+      DATA_INVARIANT(
+        rhs.type() == type,
+        "value_sett::assign types should match, got: "
+        "rhs.type():\n" +
+          rhs.type().pretty() + "\n" + "type:\n" + type.pretty());
 
       if(rhs.id()==ID_array_of)
       {
@@ -1582,20 +1591,4 @@ void value_sett::guard(
 
     assign(expr.op0(), address_of, ns, false, false);
   }
-}
-
-exprt value_sett::make_member(
-  const exprt &src,
-  const irep_idt &component_name,
-  const namespacet &ns)
-{
-  const struct_union_typet &struct_union_type=
-    to_struct_union_type(ns.follow(src.type()));
-
-  const typet &subtype = struct_union_type.component_type(component_name);
-  exprt member_expr = member_exprt(src, component_name, subtype);
-
-  simplify(member_expr, ns);
-
-  return member_expr;
 }
