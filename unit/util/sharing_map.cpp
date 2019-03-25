@@ -398,6 +398,7 @@ TEST_CASE("Sharing map views", "[core][util]")
 
 TEST_CASE("Sharing map sharing stats", "[core][util]")
 {
+#if !defined(_MSC_VER)
   SECTION("sharing stats")
   {
     std::vector<sharing_map_standardt> v;
@@ -483,6 +484,7 @@ TEST_CASE("Sharing map sharing stats", "[core][util]")
     REQUIRE(sms.num_leafs == 6);
     REQUIRE(sms.num_unique_leafs == 3);
   }
+#endif
 }
 
 TEST_CASE("Sharing map replace non-existing", "[.]")

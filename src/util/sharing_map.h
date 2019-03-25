@@ -322,6 +322,7 @@ public:
     delta_viewt &delta_view,
     const bool only_common = true) const;
 
+#if !defined(_MSC_VER)
   /// Stats about sharing between several sharing map instances. An instance of
   /// this class is returned by the get_sharing_map_stats_* functions.
   ///
@@ -350,6 +351,7 @@ public:
 
   template <class Iterator>
   static sharing_map_statst get_sharing_stats_map(Iterator begin, Iterator end);
+#endif
 
 protected:
   // helpers
@@ -546,6 +548,7 @@ SHARING_MAPT(std::size_t)
   return count;
 }
 
+#if !defined(_MSC_VER)
 /// Get sharing stats
 ///
 /// Complexity:
@@ -616,6 +619,7 @@ SHARING_MAPT3(Iterator, , sharing_map_statst)
   return get_sharing_stats<Iterator>(
     begin, end, [](const Iterator it) -> sharing_mapt & { return it->second; });
 }
+#endif
 
 /// Get a view of the elements in the map
 /// A view is a list of pairs with the components being const references to the
