@@ -45,9 +45,6 @@ class java_object_factoryt
   /// The symbol table.
   symbol_table_baset &symbol_table;
 
-  /// A namespace built from exclusively one symbol table - the one above.
-  namespacet ns;
-
   /// Resolves pointer types potentially using some heuristics, for example
   /// to replace pointers to interface types with pointers to concrete
   /// implementations.
@@ -83,7 +80,6 @@ public:
     message_handlert &log)
     : object_factory_parameters(_object_factory_parameters),
       symbol_table(_symbol_table),
-      ns(_symbol_table),
       pointer_type_selector(pointer_type_selector),
       allocate_objects(
         ID_java,
@@ -228,6 +224,7 @@ void java_object_factoryt::gen_pointer_target_init(
   PRECONDITION(expr.type().id() == ID_pointer);
   PRECONDITION(update_in_place != update_in_placet::MAY_UPDATE_IN_PLACE);
 
+  const namespacet ns(symbol_table);
   const typet &followed_target_type = ns.follow(target_type);
 
   if(followed_target_type.id() == ID_struct)
@@ -490,6 +487,7 @@ void java_object_factoryt::gen_nondet_pointer_init(
   const source_locationt &location)
 {
   PRECONDITION(expr.type().id()==ID_pointer);
+  const namespacet ns(symbol_table);
   const pointer_typet &replacement_pointer_type =
     pointer_type_selector.convert_pointer_type(
       pointer_type, generic_parameter_specialization_map, ns);
@@ -800,6 +798,7 @@ void java_object_factoryt::gen_nondet_struct_init(
   const update_in_placet &update_in_place,
   const source_locationt &location)
 {
+  const namespacet ns(symbol_table);
   PRECONDITION(ns.follow(expr.type()).id()==ID_struct);
   PRECONDITION(struct_type.id()==ID_struct);
 
@@ -1000,6 +999,7 @@ void java_object_factoryt::gen_nondet_init(
   const source_locationt &location)
 {
   const typet &type = override_type.has_value() ? *override_type : expr.type();
+  const namespacet ns(symbol_table);
   const typet &followed_type = ns.follow(type);
 
   if(type.id()==ID_pointer)
@@ -1304,6 +1304,7 @@ void java_object_factoryt::gen_nondet_array_init(
   PRECONDITION(expr.type().subtype().id() == ID_struct_tag);
   PRECONDITION(update_in_place != update_in_placet::MAY_UPDATE_IN_PLACE);
 
+  const namespacet ns(symbol_table);
   const typet &type = ns.follow(expr.type().subtype());
   const struct_typet &struct_type = to_struct_type(type);
   const typet &element_type =
@@ -1386,7 +1387,7 @@ bool java_object_factoryt::gen_nondet_enum_init(
 {
   const irep_idt &class_name = java_class_type.get_name();
   const irep_idt values_name = id2string(class_name) + ".$VALUES";
-  if(!ns.get_symbol_table().has_symbol(values_name))
+  if(!symbol_table.has_symbol(values_name))
   {
     log.warning() << values_name
                   << " is missing, so the corresponding Enum "
@@ -1395,6 +1396,7 @@ bool java_object_factoryt::gen_nondet_enum_init(
     return false;
   }
 
+  const namespacet ns(symbol_table);
   const symbolt &values = ns.lookup(values_name);
 
   // Access members (length and data) of $VALUES array
