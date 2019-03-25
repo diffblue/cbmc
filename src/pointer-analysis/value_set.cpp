@@ -1157,10 +1157,11 @@ void value_sett::assign(
       }
       else
       {
-        if(rhs.type() != lhs.type())
-          throw "value_sett::assign type mismatch: "
-                "rhs.type():\n"+rhs.type().pretty()+"\n"+
-                "lhs.type():\n"+lhs.type().pretty();
+        DATA_INVARIANT(
+          rhs.type() == lhs.type(),
+          "value_sett::assign types should match, got: "
+          "rhs.type():\n" +
+            rhs.type().pretty() + "\n" + "lhs.type():\n" + lhs.type().pretty());
 
         const struct_union_typet &rhs_struct_union_type =
           to_struct_union_type(ns.follow(rhs.type()));
@@ -1189,10 +1190,11 @@ void value_sett::assign(
     }
     else
     {
-      if(rhs.type() != type)
-        throw "value_sett::assign type mismatch: "
-          "rhs.type():\n"+rhs.type().pretty()+"\n"+
-          "type:\n"+type.pretty();
+      DATA_INVARIANT(
+        rhs.type() == type,
+        "value_sett::assign types should match, got: "
+        "rhs.type():\n" +
+          rhs.type().pretty() + "\n" + "type:\n" + type.pretty());
 
       if(rhs.id()==ID_array_of)
       {
