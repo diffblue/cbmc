@@ -29,6 +29,27 @@ void goto_symext::apply_goto_condition(
   const exprt &new_guard,
   const namespacet &ns)
 {
+  // It would be better to call try_filter_value_sets after apply_condition,
+  // and pass nullptr for value sets which apply_condition successfully updated
+  // already. However, try_filter_value_sets calls rename to do constant
+  // propagation, and apply_condition can update the constant propagator. Since
+  // apply condition will never succeed on both jump_taken_state and
+  // jump_not_taken_state, it should be possible to pass a reference to an
+  // unmodified goto_statet to use for renaming. But renaming needs a
+  // goto_symex_statet, not just a goto_statet, and we only have access to one
+  // of those. A future improvement would be to split rename into two parts:
+  // one part on goto_symex_statet which is non-const and deals with
+  // l2 thread reads, and one part on goto_statet which is const and could be
+  // used in try_filter_value_sets.
+
+  try_filter_value_sets(
+    current_state,
+    original_guard,
+    jump_taken_state.value_set,
+    &jump_taken_state.value_set,
+    &jump_not_taken_state.value_set,
+    ns);
+
   jump_taken_state.apply_condition(new_guard, current_state, ns);
 
   // Try to find a negative condition that implies an equality constraint on

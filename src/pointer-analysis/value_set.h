@@ -483,6 +483,8 @@ public:
     const std::string &suffix,
     const namespacet &ns) const;
 
+  void erase_value_from_entry(entryt &entry, const exprt &value_to_erase);
+
 protected:
   /// Reads the set of objects pointed to by `expr`, including making
   /// recursive lookups for dereference operations etc.

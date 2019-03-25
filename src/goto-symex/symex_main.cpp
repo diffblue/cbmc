@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <memory>
 
 #include <util/exception_utils.h>
+#include <util/expr_iterator.h>
 #include <util/expr_util.h>
 #include <util/make_unique.h>
 #include <util/mathematical_expr.h>
@@ -127,6 +128,13 @@ void goto_symext::symex_assume(statet &state, const exprt &cond)
   clean_expr(simplified_cond, state, false);
   simplified_cond = state.rename(std::move(simplified_cond), ns).get();
   do_simplify(simplified_cond);
+
+  // It would be better to call try_filter_value_sets after apply_condition,
+  // but it is not currently possible. See the comment at the beginning of
+  // \ref apply_goto_condition for more information.
+
+  try_filter_value_sets(
+    state, cond, state.value_set, &state.value_set, nullptr, ns);
 
   // apply_condition must come after rename because it might change the
   // constant propagator and the value-set and we read from those in rename
@@ -541,5 +549,158 @@ void goto_symext::symex_step(
 
   default:
     UNREACHABLE;
+  }
+}
+
+/// Check if an expression only contains one unique symbol (possibly repeated
+/// multiple times)
+/// \param expr: The expression to examine
+/// \return If only one unique symbol occurs in \p expr then return it;
+///   otherwise return an empty optionalt
+static optionalt<symbol_exprt>
+find_unique_pointer_typed_symbol(const exprt &expr)
+{
+  optionalt<symbol_exprt> return_value;
+  for(auto it = expr.depth_cbegin(); it != expr.depth_cend(); ++it)
+  {
+    const symbol_exprt *symbol_expr = expr_try_dynamic_cast<symbol_exprt>(*it);
+    if(symbol_expr && can_cast_type<pointer_typet>(symbol_expr->type()))
+    {
+      // If we already have a potential return value, check if it is the same
+      // symbol, and return an empty optionalt if not
+      if(return_value && *symbol_expr != *return_value)
+      {
+        return {};
+      }
+      return_value = *symbol_expr;
+    }
+  }
+
+  // Either expr contains no pointer-typed symbols or it contains one unique
+  // pointer-typed symbol, possibly repeated multiple times
+  return return_value;
+}
+
+/// This is a simplified version of value_set_dereferencet::build_reference_to.
+/// It ignores the ID_dynamic_object case (which doesn't occur in goto-symex)
+/// and gives up for integer addresses and non-trivial symbols
+/// \param value_set_element: An element of a value-set
+/// \param type: the type of the expression that might point to
+///   \p value_set_element
+/// \return An expression for the value of the pointer indicated by \p
+///   value_set_element if it is easy to determine, or an empty optionalt
+///   otherwise
+static optionalt<exprt>
+value_set_element_to_expr(exprt value_set_element, pointer_typet type)
+{
+  const object_descriptor_exprt *object_descriptor =
+    expr_try_dynamic_cast<object_descriptor_exprt>(value_set_element);
+  if(!object_descriptor)
+  {
+    return {};
+  }
+
+  const exprt &root_object = object_descriptor->root_object();
+  const exprt &object = object_descriptor->object();
+
+  if(root_object.id() == ID_null_object)
+  {
+    return null_pointer_exprt{type};
+  }
+  else if(root_object.id() == ID_integer_address)
+  {
+    return {};
+  }
+  else
+  {
+    // We should do something like
+    // value_set_dereference::dereference_type_compare, which deals with
+    // arrays having types containing void
+    if(object_descriptor->offset().is_zero() && object.type() == type.subtype())
+    {
+      return address_of_exprt(object);
+    }
+    else
+    {
+      return {};
+    }
+  }
+}
+
+void goto_symext::try_filter_value_sets(
+  goto_symex_statet &state,
+  exprt condition,
+  const value_sett &original_value_set,
+  value_sett *jump_taken_value_set,
+  value_sett *jump_not_taken_value_set,
+  const namespacet &ns)
+{
+  condition = state.rename<L1>(std::move(condition), ns).get();
+
+  optionalt<symbol_exprt> symbol_expr =
+    find_unique_pointer_typed_symbol(condition);
+
+  if(!symbol_expr)
+  {
+    return;
+  }
+
+  const pointer_typet &symbol_type = to_pointer_type(symbol_expr->type());
+
+  value_setst::valuest value_set_elements;
+  original_value_set.get_value_set(*symbol_expr, value_set_elements, ns);
+
+  // Try evaluating the condition with the symbol replaced by a pointer to each
+  // one of its possible values in turn. If that leads to a true for some
+  // value_set_element then we can delete it from the value set that will be
+  // used if the condition is false, and vice versa.
+  for(const auto &value_set_element : value_set_elements)
+  {
+    optionalt<exprt> possible_value =
+      value_set_element_to_expr(value_set_element, symbol_type);
+
+    if(!possible_value)
+    {
+      continue;
+    }
+
+    exprt modified_condition(condition);
+
+    address_of_aware_replace_symbolt replace_symbol{};
+    replace_symbol.insert(*symbol_expr, *possible_value);
+    replace_symbol(modified_condition);
+
+    // This do_simplify() is needed for the following reason: if `condition` is
+    // `*p == a` and we replace `p` with `&a` then we get `*&a == a`. Suppose
+    // our constant propagation knows that `a` is `1`. Without this call to
+    // do_simplify(), state.rename() turns this into `*&a == 1` (because
+    // rename() doesn't do constant propagation inside addresses), which
+    // do_simplify() turns into `a == 1`, which cannot be evaluated as true
+    // without another round of constant propagation.
+    // It would be sufficient to replace this call to do_simplify() with
+    // something that just replaces `*&x` with `x` whenever it finds it.
+    do_simplify(modified_condition);
+
+    const bool record_events = state.record_events;
+    state.record_events = false;
+    modified_condition = state.rename(std::move(modified_condition), ns).get();
+    state.record_events = record_events;
+
+    do_simplify(modified_condition);
+
+    if(jump_taken_value_set && modified_condition.is_false())
+    {
+      value_sett::entryt *entry = jump_taken_value_set->get_entry_for_symbol(
+        symbol_expr->get_identifier(), symbol_type, "", ns);
+      jump_taken_value_set->erase_value_from_entry(*entry, value_set_element);
+    }
+    else if(jump_not_taken_value_set && modified_condition.is_true())
+    {
+      value_sett::entryt *entry =
+        jump_not_taken_value_set->get_entry_for_symbol(
+          symbol_expr->get_identifier(), symbol_type, "", ns);
+      jump_not_taken_value_set->erase_value_from_entry(
+        *entry, value_set_element);
+    }
   }
 }
