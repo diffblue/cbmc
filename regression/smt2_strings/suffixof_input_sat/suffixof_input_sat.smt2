@@ -4,4 +4,3 @@
 (assert (not (= str suffix)))
 (assert (str.suffixof suffix str))
 (check-sat)
-(get-model)
