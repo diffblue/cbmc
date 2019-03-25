@@ -147,7 +147,7 @@ CATCH_TEST = unit_tests$(EXEEXT)
 N_CATCH_TESTS = $(shell \
                   cat $$(find . -name "*.cpp" \
                     -a -not -name "expr_undefined_casts.cpp") | \
-                  grep -c -E "(SCENARIO|TEST_CASE)")
+                  grep -E "(SCENARIO|TEST_CASE)" | grep -c -v '\[\.\]')
 
 CLEANFILES = $(CATCH_TEST) testing-utils/testing-utils$(LIBEXT)
 
