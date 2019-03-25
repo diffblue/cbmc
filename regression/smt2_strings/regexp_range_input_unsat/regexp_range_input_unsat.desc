@@ -1,4 +1,4 @@
-FUTURE cvc4_bug
+FUTURE cvc4_bug z3_bug
 regexp_range_input_unsat.smt2
 
 ^EXIT=0$
@@ -11,3 +11,6 @@ cvc4 (--strings-exp):
 re.range expects constant bounds
 (cvc4 1.7-prerelease [git master e1dc3932])
 
+z3:
+Returns "unknown"
+Z3 [version 4.8.3 - 64 bit]

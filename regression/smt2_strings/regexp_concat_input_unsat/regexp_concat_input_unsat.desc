@@ -1,4 +1,4 @@
-FUTURE cvc4_bug
+FUTURE cvc4_bug z3_bug
 regexp_concat_input_unsat.smt2
 
 ^EXIT=0$
@@ -12,3 +12,7 @@ Erroneously returns SAT.
 The obtained model is rubbish too, it assumes that
 "abc" matches "A"* + "ab"*
 (cvc4 1.7-prerelease [git master e1dc3932])
+
+z3:
+Returns "unknown"
+Z3 [version 4.8.3 - 64 bit]

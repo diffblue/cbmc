@@ -1,4 +1,4 @@
-FUTURE
+FUTURE z3_bug
 lex_order_input_unsat.smt2
 
 ^EXIT=0$
@@ -6,3 +6,7 @@ lex_order_input_unsat.smt2
 ^unsat$
 --
 error
+--
+z3:
+str.< not supported
+Z3 [version 4.8.3 - 64 bit]

@@ -1,4 +1,4 @@
-FUTURE
+FUTURE z3_bug
 str_in_re_input_sat.smt2
 
 ^EXIT=0$
@@ -6,3 +6,7 @@ str_in_re_input_sat.smt2
 ^sat$
 --
 error
+--
+z3:
+Returns "unknown"
+Z3 [version 4.8.3 - 64 bit]
