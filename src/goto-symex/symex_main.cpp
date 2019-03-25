@@ -23,8 +23,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/string2int.h>
 #include <util/symbol_table.h>
 
-#include <analyses/dirty.h>
-
 symex_configt::symex_configt(const optionst &options)
   : max_depth(options.get_unsigned_int_option("depth")),
     doing_path_exploration(options.is_set("paths")),
@@ -357,7 +355,9 @@ std::unique_ptr<goto_symext::statet> goto_symext::initialize_entry_point_state(
   if(emplace_safe_pointers_result.second)
     emplace_safe_pointers_result.first->second(start_function->body);
 
-  state->dirty.populate_dirty_for_function(entry_point_id, *start_function);
+  path_storage.dirty.populate_dirty_for_function(
+    entry_point_id, *start_function);
+  state->dirty = &path_storage.dirty;
 
   // make the first step onto the instruction pointed to by the initial program
   // counter

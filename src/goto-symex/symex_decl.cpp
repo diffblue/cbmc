@@ -17,8 +17,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <pointer-analysis/add_failed_symbols.h>
 
-#include <analyses/dirty.h>
-
 void goto_symext::symex_decl(statet &state)
 {
   const goto_programt::instructiont &instruction=*state.source.pc;
@@ -92,7 +90,7 @@ void goto_symext::symex_decl(statet &state, const symbol_exprt &expr)
       symex_targett::assignment_typet::HIDDEN:
       symex_targett::assignment_typet::STATE);
 
-  if(state.dirty(ssa.get_object_name()) && state.atomic_section_id == 0)
+  if(path_storage.dirty(ssa.get_object_name()) && state.atomic_section_id == 0)
     target.shared_write(
       state.guard.as_expr(),
       ssa,

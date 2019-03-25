@@ -16,7 +16,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <memory>
 #include <unordered_set>
 
-#include <analyses/dirty.h>
 #include <analyses/guard.h>
 
 #include <util/invariant.h>
@@ -30,6 +29,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "goto_state.h"
 #include "renaming_level.h"
 #include "symex_target_equation.h"
+
+class incremental_dirtyt;
 
 /// \brief Central data structure: state.
 ///
@@ -195,9 +196,7 @@ public:
 
   bool record_events;
 
-  // Local variables are considered 'dirty' if they've had an address taken and
-  // therefore may be referred to by a pointer.
-  incremental_dirtyt dirty;
+  const incremental_dirtyt *dirty = nullptr;
 
   goto_programt::const_targett saved_target;
 
