@@ -15,11 +15,6 @@ decision_proceduret::~decision_proceduret()
 {
 }
 
-literalt decision_proceduret::operator()(const exprt &expr)
-{
-  return convert(expr);
-}
-
 decision_proceduret::resultt decision_proceduret::operator()()
 {
   return dec_solve();

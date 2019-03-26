@@ -36,9 +36,6 @@ public:
   /// Convert a Boolean expression and return the corresponding literal
   virtual literalt convert(const exprt &expr) = 0;
 
-  /// Convert a Boolean expression and return the corresponding literal
-  literalt operator()(const exprt &);
-
   /// Result of running the decision procedure
   enum class resultt
   {
