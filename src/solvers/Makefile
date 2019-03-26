@@ -144,6 +144,7 @@ SRC = $(BOOLEFORCE_SRC) \
       bdd/miniBDD/miniBDD.cpp \
       prop/bdd_expr.cpp \
       prop/cover_goals.cpp \
+      prop/decision_procedure.cpp \
       prop/literal.cpp \
       prop/minimize.cpp \
       prop/prop.cpp \

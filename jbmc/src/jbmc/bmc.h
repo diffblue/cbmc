@@ -15,7 +15,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <list>
 #include <map>
 
-#include <util/decision_procedure.h>
 #include <util/invariant.h>
 #include <util/options.h>
 #include <util/ui_message.h>
@@ -30,6 +29,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/goto_model.h>
 #include <goto-programs/safety_checker.h>
 #include <goto-symex/memory_model.h>
+
+#include <solvers/prop/decision_procedure.h>
 
 class cbmc_solverst;
 

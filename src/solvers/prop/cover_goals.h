@@ -14,8 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <list>
 
-#include <util/decision_procedure.h>
-
+#include "decision_procedure.h"
 #include "literal.h"
 
 class message_handlert;
