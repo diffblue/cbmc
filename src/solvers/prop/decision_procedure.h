@@ -52,6 +52,9 @@ public:
 
   // return a textual description of the decision procedure
   virtual std::string decision_procedure_text() const=0;
+
+  /// Returns the number of incremental solver calls
+  virtual std::size_t get_number_of_solver_calls() const = 0;
 };
 
 inline decision_proceduret &operator<<(

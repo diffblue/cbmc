@@ -56,9 +56,6 @@ public:
 
   // Resource limits:
   virtual void set_time_limit_seconds(uint32_t) {}
-
-  /// Returns the number of incremental solver calls
-  virtual std::size_t get_number_of_solver_calls() const = 0;
 };
 
 //
