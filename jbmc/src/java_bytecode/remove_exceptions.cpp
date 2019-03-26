@@ -207,7 +207,7 @@ bool remove_exceptionst::function_or_callees_may_throw(
 /// Translates an exception landing-pad into instructions that copy the
 /// in-flight exception pointer to a nominated expression, then clear the
 /// in-flight exception (i.e. null the pointer), hence marking it caught.
-/// \param goto_program: body of the function containing this landingpad
+/// \param [out] goto_program: body of the function containing this landingpad
 ///   instruction
 /// \param instr_it: iterator pointing to the landingpad instruction.
 ///   Will be overwritten.
