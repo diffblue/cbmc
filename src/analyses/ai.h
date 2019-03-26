@@ -94,8 +94,7 @@ public:
   /// Get a copy of the abstract state before the given instruction, without
   /// needing to know what kind of domain or history is used. Note: intended
   /// for users of the abstract interpreter; derived classes should
-  /// use \ref get_state or \ref find_state to access the actual underlying
-  /// state.
+  /// use \ref get_state to access the actual underlying state.
   /// PRECONDITION(l is dereferenceable)
   /// \param l: The location before which we want the abstract state
   /// \return The abstract state before `l`. We return a pointer to a copy as
@@ -106,8 +105,7 @@ public:
   /// Get a copy of the abstract state after the given instruction, without
   /// needing to know what kind of domain or history is used. Note: intended
   /// for users of the abstract interpreter; derived classes should
-  /// use \ref get_state or \ref find_state to access the actual underlying
-  /// state.
+  /// use \ref get_state to access the actual underlying state.
   /// \param l: The location before which we want the abstract state
   /// \return The abstract state after `l`. We return a pointer to a copy as
   ///   the method should be const and there are some non-trivial cases
@@ -342,10 +340,6 @@ protected:
   /// doesn't exist
   virtual statet &get_state(locationt l)=0;
 
-  /// Get the state for the given location if it already exists; throw an
-  /// exception if it doesn't
-  virtual const statet &find_state(locationt l) const=0;
-
   /// Make a copy of a state
   virtual std::unique_ptr<statet> make_temporary_state(const statet &s)=0;
 };
@@ -457,18 +451,6 @@ protected:
   virtual statet &get_state(locationt l) override
   {
     return state_map[l]; // calls default constructor
-  }
-
-  /// Look up the analysis state for a given location, throwing an exception if
-  /// no state is known.
-  /// Used internally by the analysis.
-  const statet &find_state(locationt l) const override
-  {
-    typename state_mapt::const_iterator it=state_map.find(l);
-    if(it==state_map.end())
-      throw std::out_of_range("failed to find state");
-
-    return it->second;
   }
 
   /// Merge the state \p src, flowing from location \p from to
