@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_POINTER_ANALYSIS_VALUE_SET_H
 
 #include <set>
+#include <type_traits>
 #include <unordered_set>
 
 #include <util/mp_arith.h>
@@ -464,6 +465,20 @@ public:
     exprt &expr,
     const namespacet &ns) const;
 
+private:
+  /// Helper method for \ref get_entry_for_symbol
+  template <class maybe_const_value_sett>
+  static auto get_entry_for_symbol(
+    maybe_const_value_sett &value_set,
+    irep_idt identifier,
+    const typet &type,
+    const std::string &suffix,
+    const namespacet &ns) ->
+    typename std::conditional<std::is_const<maybe_const_value_sett>::value,
+                              const value_sett::entryt *,
+                              value_sett::entryt *>::type;
+
+public:
   /// Get the entry for the symbol and suffix
   /// \param identifier: The identifier for the symbol
   /// \param type: The type of the symbol

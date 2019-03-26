@@ -57,7 +57,8 @@ value_sett::entryt *value_sett::find_entry(const value_sett::idt &id)
 const value_sett::entryt *
 value_sett::find_entry(const value_sett::idt &id) const
 {
-  return const_cast<value_sett *>(this)->find_entry(id);
+  auto found = values.find(id);
+  return found == values.end() ? nullptr : &found->second;
 }
 
 value_sett::entryt &value_sett::get_entry(const entryt &e, const typet &type)
@@ -371,11 +372,16 @@ static std::string strip_first_field_from_suffix(
   return suffix.substr(field.length() + 1);
 }
 
-value_sett::entryt *value_sett::get_entry_for_symbol(
+template <class maybe_const_value_sett>
+auto value_sett::get_entry_for_symbol(
+  maybe_const_value_sett &value_set,
   const irep_idt identifier,
   const typet &type,
   const std::string &suffix,
-  const namespacet &ns)
+  const namespacet &ns) ->
+  typename std::conditional<std::is_const<maybe_const_value_sett>::value,
+                            const value_sett::entryt *,
+                            value_sett::entryt *>::type
 {
   if(
     type.id() != ID_pointer && type.id() != ID_signedbv &&
@@ -393,7 +399,7 @@ value_sett::entryt *value_sett::get_entry_for_symbol(
                                      : type;
 
   // look it up
-  value_sett::entryt *entry = find_entry(id2string(identifier) + suffix);
+  auto *entry = value_set.find_entry(id2string(identifier) + suffix);
 
   // try first component name as suffix if not yet found
   if(
@@ -406,27 +412,37 @@ value_sett::entryt *value_sett::get_entry_for_symbol(
     const irep_idt &first_component_name =
       struct_union_type.components().front().get_name();
 
-    entry = find_entry(
+    entry = value_set.find_entry(
       id2string(identifier) + "." + id2string(first_component_name) + suffix);
   }
 
   if(!entry)
   {
     // not found? try without suffix
-    entry = find_entry(identifier);
+    entry = value_set.find_entry(identifier);
   }
 
   return entry;
 }
 
+// Explicitly instantiate the two possible versions of the method above:
+
+value_sett::entryt *value_sett::get_entry_for_symbol(
+  irep_idt identifier,
+  const typet &type,
+  const std::string &suffix,
+  const namespacet &ns)
+{
+  return get_entry_for_symbol(*this, identifier, type, suffix, ns);
+}
+
 const value_sett::entryt *value_sett::get_entry_for_symbol(
-  const irep_idt identifier,
+  irep_idt identifier,
   const typet &type,
   const std::string &suffix,
   const namespacet &ns) const
 {
-  return const_cast<value_sett *>(this)->get_entry_for_symbol(
-    identifier, type, suffix, ns);
+  return get_entry_for_symbol(*this, identifier, type, suffix, ns);
 }
 
 void value_sett::get_value_set_rec(
