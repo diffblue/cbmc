@@ -297,6 +297,7 @@ bool java_bytecode_languaget::parse(
 /// without realising that is in fact the same field, inherited from that
 /// ancestor. This can lead to incorrect results when opaque types are cast
 /// to other opaque types and their fields do not alias as intended.
+/// We set opaque fields as final to avoid assuming they can be overridden.
 /// \param parse_tree: class parse tree
 /// \param symbol_table: global symbol table
 static void infer_opaque_type_fields(
@@ -335,6 +336,7 @@ static void infer_opaque_type_fields(
             components.emplace_back(component_name, fieldref.type());
             components.back().set_base_name(component_name);
             components.back().set_pretty_name(component_name);
+            components.back().set_is_final(true);
             break;
           }
           else
@@ -501,6 +503,8 @@ static void create_stub_global_symbol(
   // whereas a more restricted visbility would encourage separating them.
   // Neither is correct, as without the class file we can't know the truth.
   new_symbol.type.set(ID_C_access, ID_public);
+  // We set the field as final to avoid assuming they can be overridden.
+  new_symbol.type.set(ID_C_constant, true);
   new_symbol.pretty_name = new_symbol.name;
   new_symbol.mode = ID_java;
   new_symbol.is_type = false;
