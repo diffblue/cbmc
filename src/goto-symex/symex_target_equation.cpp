@@ -17,9 +17,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/throw_with_nested.h>
 #include <util/unwrap_nested_exception.h>
 
-// Can be removed once deprecated SSA_stept::output is removed
-#include <langapi/language_util.h>
-
 #include <solvers/flattening/bv_conversion_exceptions.h>
 #include <solvers/prop/literal_expr.h>
 #include <solvers/prop/prop.h>
@@ -682,13 +679,11 @@ void symex_target_equationt::merge_ireps(SSA_stept &SSA_step)
   // converted_io_args is merged in convert_io
 }
 
-void symex_target_equationt::output(
-  std::ostream &out,
-  const namespacet &ns) const
+void symex_target_equationt::output(std::ostream &out) const
 {
   for(const auto &step : SSA_steps)
   {
-    step.output(ns, out);
+    step.output(out);
     out << "--------------\n";
   }
 }

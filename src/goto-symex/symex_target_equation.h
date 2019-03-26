@@ -255,7 +255,7 @@ public:
     return it;
   }
 
-  void output(std::ostream &out, const namespacet &ns) const;
+  void output(std::ostream &out) const;
 
   void clear()
   {

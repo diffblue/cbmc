@@ -34,18 +34,6 @@ public:
   }
 };
 
-/// The NIL type, i.e., an invalid type, no value.
-/// \deprecated Use `optional<typet>` instead.
-// NOLINTNEXTLINE
-class DEPRECATED(SINCE(2018, 8, 22, "Use `optional<typet>` instead.")) nil_typet
-  : public typet
-{
-public:
-  nil_typet():typet(static_cast<const typet &>(get_nil_irep()))
-  {
-  }
-};
-
 /// The empty type
 class empty_typet:public typet
 {
@@ -747,16 +735,6 @@ public:
   {
     parameters().swap(_parameters);
     return_type().swap(_return_type);
-  }
-
-  /// \deprecated
-  DEPRECATED(SINCE(2018, 6, 4, "Use the two argument constructor instead"))
-  code_typet():typet(ID_code)
-  {
-    // make sure these properties are always there to avoid problems
-    // with irept comparisons
-    add(ID_parameters);
-    add_type(ID_return_type);
   }
 
   // used to be argumentt -- now uses standard terminology

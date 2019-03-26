@@ -164,7 +164,8 @@ void recursive_initializationt::initialize_nondet(
     lhs.id() != ID_symbol ||
     !is_array_size_parameter(to_symbol_expr(lhs).get_identifier()))
   {
-    body.add(code_assignt{lhs, side_effect_expr_nondett{lhs.type()}});
+    body.add(code_assignt{
+      lhs, side_effect_expr_nondett{lhs.type(), source_locationt{}}});
   }
 }
 
