@@ -30,6 +30,8 @@ Date:   December 2016
 
 #include <analyses/uncaught_exceptions_analysis.h>
 
+#include <linking/static_lifetime_init.h>
+
 #include "java_types.h"
 
 /// Lowers high-level exception descriptions into low-level operations suitable
@@ -119,6 +121,13 @@ protected:
   bool remove_added_instanceof;
   message_handlert &message_handler;
 
+  enum class instrumentation_resultt
+  {
+    DID_NOTHING,
+    ADDED_CODE_WITHOUT_MAY_THROW,
+    ADDED_CODE_WITH_MAY_THROW,
+  };
+
   symbol_exprt get_inflight_exception_global();
 
   bool function_or_callees_may_throw(const goto_programt &) const;
@@ -148,7 +157,7 @@ protected:
     const stack_catcht &,
     const std::vector<symbol_exprt> &);
 
-  bool instrument_function_call(
+  instrumentation_resultt instrument_function_call(
     const irep_idt &function_identifier,
     goto_programt &goto_program,
     const goto_programt::targett &,
@@ -421,7 +430,8 @@ bool remove_exceptionst::instrument_throw(
 
 /// instruments each function call that may escape exceptions with conditional
 /// GOTOS to the corresponding exception handlers
-bool remove_exceptionst::instrument_function_call(
+remove_exceptionst::instrumentation_resultt
+remove_exceptionst::instrument_function_call(
   const irep_idt &function_identifier,
   goto_programt &goto_program,
   const goto_programt::targett &instr_it,
@@ -455,6 +465,8 @@ bool remove_exceptionst::instrument_function_call(
       goto_program.insert_after(
         instr_it,
         goto_programt::make_assumption(no_exception_currently_in_flight));
+
+      return instrumentation_resultt::ADDED_CODE_WITHOUT_MAY_THROW;
     }
     else
     {
@@ -468,12 +480,12 @@ bool remove_exceptionst::instrument_function_call(
           next_it,
           no_exception_currently_in_flight,
           instr_it->source_location));
-    }
 
-    return true;
+      return instrumentation_resultt::ADDED_CODE_WITH_MAY_THROW;
+    }
   }
 
-  return false;
+  return instrumentation_resultt::DID_NOTHING;
 }
 
 /// instruments throws, function calls that may escape exceptions and exception
@@ -494,6 +506,7 @@ void remove_exceptionst::instrument_exceptions(
     function_or_callees_may_throw(goto_program);
 
   bool did_something = false;
+  bool added_goto_instruction = false;
 
   Forall_goto_program_instructions(instr_it, goto_program)
   {
@@ -577,15 +590,28 @@ void remove_exceptionst::instrument_exceptions(
     }
     else if(instr_it->type==THROW)
     {
-      did_something |= instrument_throw(
+      did_something = instrument_throw(
         function_identifier, goto_program, instr_it, stack_catch, locals);
     }
     else if(instr_it->type==FUNCTION_CALL)
     {
-      did_something |= instrument_function_call(
-        function_identifier, goto_program, instr_it, stack_catch, locals);
+      instrumentation_resultt result =
+        instrument_function_call(
+          function_identifier, goto_program, instr_it, stack_catch, locals);
+      did_something = result != instrumentation_resultt::DID_NOTHING;
+      added_goto_instruction =
+        result == instrumentation_resultt::ADDED_CODE_WITH_MAY_THROW;
     }
   }
+
+  // INITIALIZE_FUNCTION should not contain any exception handling branches for
+  // two reasons: (1) with symex-driven lazy loading it means that code that
+  // references @inflight_exception might be generated before
+  // @inflight_exception is initialized; (2) symex can analyze
+  // INITIALIZE_FUNCTION much faster if it doesn't contain any branching.
+  INVARIANT(
+    function_identifier != INITIALIZE_FUNCTION || !added_goto_instruction,
+    INITIALIZE_FUNCTION " should not contain any exception handling branches");
 
   if(did_something)
     remove_skip(goto_program);
