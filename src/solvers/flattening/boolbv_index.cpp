@@ -43,24 +43,40 @@ bvt boolbvt::convert_index(const index_exprt &expr)
     {
       // use array decision procedure
 
-      // free variables
-
-      bv.resize(width);
-      for(std::size_t i=0; i<width; i++)
-        bv[i]=prop.new_variable();
-
       if(has_byte_operator(expr))
-        record_array_index(to_index_expr(lower_byte_operators(expr, ns)));
+      {
+        const index_exprt final_expr =
+          to_index_expr(lower_byte_operators(expr, ns));
+        CHECK_RETURN(final_expr != expr);
+        bv = convert_bv(final_expr);
+
+        // record type if array is a symbol
+        const exprt &final_array = final_expr.array();
+        if(
+          final_array.id() == ID_symbol || final_array.id() == ID_nondet_symbol)
+        {
+          map.get_map_entry(final_array.get(ID_identifier), array_type);
+        }
+
+        // make sure we have the index in the cache
+        convert_bv(final_expr.index());
+      }
       else
+      {
+        // free variables
+        bv.reserve(width);
+        for(std::size_t i = 0; i < width; i++)
+          bv.push_back(prop.new_variable());
+
         record_array_index(expr);
 
-      // record type if array is a symbol
+        // record type if array is a symbol
+        if(array.id() == ID_symbol || array.id() == ID_nondet_symbol)
+          map.get_map_entry(array.get(ID_identifier), array_type);
 
-      if(array.id() == ID_symbol || array.id() == ID_nondet_symbol)
-        map.get_map_entry(array.get(ID_identifier), array_type);
-
-      // make sure we have the index in the cache
-      convert_bv(index);
+        // make sure we have the index in the cache
+        convert_bv(index);
+      }
 
       return bv;
     }
