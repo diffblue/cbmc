@@ -24,6 +24,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/goto_model.h>
 
 #include "ai_domain.h"
+#include "is_threaded.h"
 
 /// The basic interface of an abstract interpreter. This should be enough
 /// to create, run and query an abstract interpreter.
@@ -291,14 +292,6 @@ protected:
 
   virtual void fixedpoint(
     const goto_functionst &goto_functions,
-    const namespacet &ns)=0;
-
-  void sequential_fixedpoint(
-    const goto_functionst &goto_functions,
-    const namespacet &ns);
-
-  void concurrent_fixedpoint(
-    const goto_functionst &goto_functions,
     const namespacet &ns);
 
   /// Perform one step of abstract interpretation from location l
@@ -344,12 +337,6 @@ protected:
   // abstract methods
 
   virtual bool merge(const statet &src, locationt from, locationt to)=0;
-  // for concurrent fixedpoint
-  virtual bool merge_shared(
-    const statet &src,
-    locationt from,
-    locationt to,
-    const namespacet &ns)=0;
 
   /// Get the state for the given location, creating it in a default way if it
   /// doesn't exist
@@ -499,27 +486,10 @@ protected:
     return util_make_unique<domainT>(static_cast<const domainT &>(s));
   }
 
-  /// Internal: implementation of the fixed point function using
-  /// \ref ai_baset#sequential_fixedpoint(const goto_functionst&,
-  /// const namespacet&).
-  void fixedpoint(
-    const goto_functionst &goto_functions,
-    const namespacet &ns) override
-  {
-    sequential_fixedpoint(goto_functions, ns);
-  }
-
 private:
   /// This function exists to enforce that `domainT` is derived from
   /// \ref ai_domain_baset
   void dummy(const domainT &s) { const statet &x=s; (void)x; }
-
-  /// This function should not be implemented in sequential analyses
-  bool merge_shared(const statet &, locationt, locationt, const namespacet &)
-    override
-  {
-    throw "not implemented";
-  }
 };
 
 /// Base class for concurrency-aware abstract interpretation. See
@@ -548,11 +518,11 @@ public:
   {
   }
 
-  bool merge_shared(
+  virtual bool merge_shared(
     const statet &src,
     locationt from,
     locationt to,
-    const namespacet &ns) override
+    const namespacet &ns)
   {
     statet &dest=this->get_state(to);
     return static_cast<domainT &>(dest).merge_shared(
@@ -560,12 +530,95 @@ public:
   }
 
 protected:
+  using working_sett = ai_baset::working_sett;
+
   void fixedpoint(
     const goto_functionst &goto_functions,
     const namespacet &ns) override
   {
-    this->concurrent_fixedpoint(goto_functions, ns);
+    ai_baset::fixedpoint(goto_functions, ns);
+
+    is_threadedt is_threaded(goto_functions);
+
+    // construct an initial shared state collecting the results of all
+    // functions
+    goto_programt tmp;
+    tmp.add_instruction();
+    goto_programt::const_targett sh_target=tmp.instructions.begin();
+    statet &shared_state=ait<domainT>::get_state(sh_target);
+
+    struct wl_entryt
+    {
+    wl_entryt(
+      const irep_idt &_function_id,
+      const goto_programt &_goto_program,
+      locationt _location)
+    : function_id(_function_id),
+        goto_program(&_goto_program),
+        location(_location)
+        {
+        }
+
+      irep_idt function_id;
+      const goto_programt *goto_program;
+      locationt location;
+    };
+
+    typedef std::list<wl_entryt> thread_wlt;
+    thread_wlt thread_wl;
+
+    forall_goto_functions(it, goto_functions)
+      forall_goto_program_instructions(t_it, it->second.body)
+      {
+        if(is_threaded(t_it))
+        {
+          thread_wl.push_back(wl_entryt(it->first, it->second.body, t_it));
+
+          goto_programt::const_targett l_end=
+            it->second.body.instructions.end();
+          --l_end;
+
+          merge_shared(shared_state, l_end, sh_target, ns);
+        }
+      }
+
+    // now feed in the shared state into all concurrently executing
+    // functions, and iterate until the shared state stabilizes
+    bool new_shared=true;
+    while(new_shared)
+    {
+      new_shared=false;
+
+      for(const auto &wl_entry : thread_wl)
+      {
+        working_sett working_set;
+        ai_baset::put_in_working_set(working_set, wl_entry.location);
+
+        statet &begin_state = ait<domainT>::get_state(wl_entry.location);
+        ait<domainT>::merge(begin_state, sh_target, wl_entry.location);
+
+        while(!working_set.empty())
+        {
+          goto_programt::const_targett l=ai_baset::get_next(working_set);
+
+          ai_baset::visit(
+            wl_entry.function_id,
+            l,
+            working_set,
+            *(wl_entry.goto_program),
+            goto_functions,
+            ns);
+
+          // the underlying domain must make sure that the final state
+          // carries all possible values; otherwise we would need to
+          // merge over each and every state
+          if(l->is_end_function())
+            new_shared|=merge_shared(shared_state, l, sh_target, ns);
+        }
+      }
+    }
   }
+
 };
 
 #endif // CPROVER_ANALYSES_AI_H
