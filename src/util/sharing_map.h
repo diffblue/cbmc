@@ -221,18 +221,61 @@ protected:
 public:
   // interface
 
+  /// Erase element
+  ///
+  /// Complexity:
+  /// - Worst case: O(H * S + M)
+  /// - Best case: O(H)
+  ///
+  /// \param k: The key of the element to erase
+  /// \param key_exists: Hint to indicate whether the element is known to exist
+  ///   (possible values `unknown` or` true`)
   size_type erase(const key_type &k, const tvt &key_exists = tvt::unknown());
 
+  /// Erase all elements
+  ///
+  /// Complexity:
+  /// - Worst case: O(K * (H * S + M))
+  /// - Best case: O(K * H)
+  ///
+  /// \param ks: The keys of the element to erase
+  /// \param key_exists: Hint to indicate whether the elements are known to
+  ///   exist (possible values `unknown` or `true`). Applies to all elements
+  ///   (i.e., have to use `unknown` if for at least one element it is not known
+  ///   whether it exists)
   size_type erase_all(
     const keyst &ks,
     const tvt &key_exists = tvt::unknown()); // applies to all keys
 
+  /// Insert element, element must not exist in map
+  ///
+  /// Complexity:
+  /// - Worst case: O(H * S + M)
+  /// - Best case: O(H)
+  ///
+  /// \param k: The key of the element to insert
+  /// \param m: The mapped value to insert
   template <class valueU>
   void insert(const key_type &k, valueU &&m);
 
+  /// Replace element, element must exist in map
+  ///
+  /// Complexity:
+  /// - Worst case: O(H * S + M)
+  /// - Best case: O(H)
+  ///
+  /// \param k: The key of the element to insert
+  /// \param m: The mapped value to replace the old value with
   template <class valueU>
   void replace(const key_type &k, valueU &&m);
-
+  /// Find element
+  ///
+  /// Complexity:
+  /// - Worst case: O(H * log(S) + M)
+  /// - Best case: O(H)
+  ///
+  /// \param k: The key of the element to search
+  /// \return optionalt containing a const reference to the value if found
   optionalt<std::reference_wrapper<const mapped_type>>
   find(const key_type &k) const;
 
@@ -315,8 +358,51 @@ public:
   /// that are not shared between them (also see get_delta_view()).
   typedef std::vector<delta_view_itemt> delta_viewt;
 
+  /// Get a view of the elements in the map
+  /// A view is a list of pairs with the components being const references to
+  /// the keys and values in the map.
+  ///
+  /// Complexity:
+  /// - Worst case: O(N * H * log(S))
+  /// - Best case: O(N + H)
+  ///
+  /// \param [out] view: Empty view
   void get_view(viewt &view) const;
 
+  /// Get a delta view of the elements in the map
+  ///
+  /// Informally, a delta view of two maps is a view of the key-value pairs in
+  /// the maps that are contained in subtrees that are not shared between them.
+  ///
+  /// A delta view is represented as a list of structs, with each struct having
+  /// four members (`in_both`, `key`, `value1`, `value2`). The elements `key`,
+  /// `value1`, and `value2` are const references to the corresponding elements
+  /// in the map. The first element indicates whether the key exists in both
+  /// maps, the second element is the key, the third element is the mapped value
+  /// of the first map, and the fourth element is the mapped value of the second
+  /// map, or a dummy element if the key exists only in the first map (in which
+  /// case `in_both` is false).
+  ///
+  /// Calling `A.delta_view(B, ...)` yields a view such that for each element in
+  /// the view one of two things holds:
+  /// - the key is contained in both A and B, and in the maps the corresponding
+  ///   key-value pairs are not contained in a subtree that is shared between
+  ///   them
+  /// - the key is only contained in A
+  ///
+  /// When `only_common=true`, the first case above holds for every element in
+  /// the view.
+  ///
+  /// Complexity:
+  /// - Worst case: O(max(N1, N2) * H * log(S) * M1 * M2) (no sharing)
+  /// - Best case: O(1) (maximum sharing)
+  ///
+  /// The symbols N1, M1 refer to map A, and symbols N2, M2 refer to map B.
+  ///
+  /// \param other: other map
+  /// \param [out] delta_view: Empty delta view
+  /// \param only_common: Indicates if the returned delta view should only
+  ///   contain key-value pairs for keys that exist in both maps
   void get_delta_view(
     const sharing_mapt &other,
     delta_viewt &delta_view,
@@ -342,6 +428,16 @@ public:
     std::size_t num_unique_leafs = 0;
   };
 
+  /// Get sharing stats
+  ///
+  /// Complexity:
+  /// - Worst case: O(N * H * log(S))
+  /// - Best case: O(N + H)
+  ///
+  /// \param begin: begin iterator
+  /// \param end: end iterator
+  /// \param f: function applied to the iterator to get a sharing map
+  /// \return sharing stats
   template <class Iterator>
   static sharing_map_statst get_sharing_stats(
     Iterator begin,
@@ -349,6 +445,15 @@ public:
     std::function<sharing_mapt &(const Iterator)> f =
       [](const Iterator it) -> sharing_mapt & { return *it; });
 
+  /// Get sharing stats
+  ///
+  /// Complexity:
+  /// - Worst case: O(N * H * log(S))
+  /// - Best case: O(N + H)
+  ///
+  /// \param begin: begin iterator of a map
+  /// \param end: end iterator of a map
+  /// \return sharing stats
   template <class Iterator>
   static sharing_map_statst get_sharing_stats_map(Iterator begin, Iterator end);
 #endif
@@ -549,16 +654,6 @@ SHARING_MAPT(std::size_t)
 }
 
 #if !defined(_MSC_VER)
-/// Get sharing stats
-///
-/// Complexity:
-/// - Worst case: O(N * H * log(S))
-/// - Best case: O(N + H)
-///
-/// \param begin: begin iterator
-/// \param end: end iterator
-/// \param f: function applied to the iterator to get a sharing map
-/// \return sharing stats
 SHARING_MAPT3(Iterator, , sharing_map_statst)
 ::get_sharing_stats(
   Iterator begin,
@@ -604,15 +699,6 @@ SHARING_MAPT3(Iterator, , sharing_map_statst)
   return sms;
 }
 
-/// Get sharing stats
-///
-/// Complexity:
-/// - Worst case: O(N * H * log(S))
-/// - Best case: O(N + H)
-///
-/// \param begin: begin iterator of a map
-/// \param end: end iterator of a map
-/// \return sharing stats
 SHARING_MAPT3(Iterator, , sharing_map_statst)
 ::get_sharing_stats_map(Iterator begin, Iterator end)
 {
@@ -621,15 +707,6 @@ SHARING_MAPT3(Iterator, , sharing_map_statst)
 }
 #endif
 
-/// Get a view of the elements in the map
-/// A view is a list of pairs with the components being const references to the
-/// keys and values in the map.
-///
-/// Complexity:
-/// - Worst case: O(N * H * log(S))
-/// - Best case: O(N + H)
-///
-/// \param [out] view: Empty view
 SHARING_MAPT(void)::get_view(viewt &view) const
 {
   SM_ASSERT(view.empty());
@@ -654,39 +731,6 @@ SHARING_MAPT(void)
   iterate(n, depth, f);
 }
 
-/// Get a delta view of the elements in the map
-///
-/// Informally, a delta view of two maps is a view of the key-value pairs in the
-/// maps that are contained in subtrees that are not shared between them.
-///
-/// A delta view is represented as a list of structs, with each struct having
-/// four members (`in_both`, `key`, `value1`, `value2`). The elements `key`,
-/// `value1`, and `value2` are const references to the corresponding elements in
-/// the map. The first element indicates whether the key exists in both maps,
-/// the second element is the key, the third element is the mapped value of the
-/// first map, and the fourth element is the mapped value of the second map, or
-/// a dummy element if the key exists only in the first map (in which case
-/// `in_both` is false).
-///
-/// Calling `A.delta_view(B, ...)` yields a view such that for each element in
-/// the view one of two things holds:
-/// - the key is contained in both A and B, and in the maps the corresponding
-///   key-value pairs are not contained in a subtree that is shared between them
-/// - the key is only contained in A
-///
-/// When `only_common=true`, the first case above holds for every element in the
-/// view.
-///
-/// Complexity:
-/// - Worst case: O(max(N1, N2) * H * log(S) * M1 * M2) (no sharing)
-/// - Best case: O(1) (maximum sharing)
-///
-/// The symbols N1, M1 refer to map A, and symbols N2, M2 refer to map B.
-///
-/// \param other: other map
-/// \param [out] delta_view: Empty delta view
-/// \param only_common: Indicates if the returned delta view should only
-///   contain key-value pairs for keys that exist in both maps
 SHARING_MAPT(void)
 ::get_delta_view(
   const sharing_mapt &other,
@@ -827,15 +871,6 @@ SHARING_MAPT2(const, innert *)::get_container_node(const key_type &k) const
   return ip;
 }
 
-/// Erase element
-///
-/// Complexity:
-/// - Worst case: O(H * S + M)
-/// - Best case: O(H)
-///
-/// \param k: The key of the element to erase
-/// \param key_exists: Hint to indicate whether the element is known to exist
-///   (possible values `unknown` or` true`)
 SHARING_MAPT2(, size_type)::erase(const key_type &k, const tvt &key_exists)
 {
   SM_ASSERT(!key_exists.is_false());
@@ -897,17 +932,6 @@ SHARING_MAPT2(, size_type)::erase(const key_type &k, const tvt &key_exists)
   return 1;
 }
 
-/// Erase all elements
-///
-/// Complexity:
-/// - Worst case: O(K * (H * S + M))
-/// - Best case: O(K * H)
-///
-/// \param ks: The keys of the element to erase
-/// \param key_exists: Hint to indicate whether the elements are known to exist
-///   (possible values `unknown` or `true`). Applies to all elements (i.e., have
-///   to use `unknown` if for at least one element it is not known whether it
-///   exists)
 SHARING_MAPT2(, size_type)
 ::erase_all(const keyst &ks, const tvt &key_exists)
 {
@@ -921,14 +945,6 @@ SHARING_MAPT2(, size_type)
   return cnt;
 }
 
-/// Insert element, element must not exist in map
-///
-/// Complexity:
-/// - Worst case: O(H * S + M)
-/// - Best case: O(H)
-///
-/// \param k: The key of the element to insert
-/// \param m: The mapped value to insert
 SHARING_MAPT4(valueU, void)
 ::insert(const key_type &k, valueU &&m)
 {
@@ -939,14 +955,6 @@ SHARING_MAPT4(valueU, void)
   num++;
 }
 
-/// Replace element, element must exist in map
-///
-/// Complexity:
-/// - Worst case: O(H * S + M)
-/// - Best case: O(H)
-///
-/// \param k: The key of the element to insert
-/// \param m: The mapped value to replace the old value with
 SHARING_MAPT4(valueU, void)
 ::replace(const key_type &k, valueU &&m)
 {
@@ -963,14 +971,6 @@ SHARING_MAPT4(valueU, void)
   lp->set_value(std::forward<valueU>(m));
 }
 
-/// Find element
-///
-/// Complexity:
-/// - Worst case: O(H * log(S) + M)
-/// - Best case: O(H)
-///
-/// \param k: The key of the element to search
-/// \return optionalt containing a const reference to the value if found
 SHARING_MAPT2(optionalt<std::reference_wrapper<const, mapped_type>>)::find(
   const key_type &k) const
 {
