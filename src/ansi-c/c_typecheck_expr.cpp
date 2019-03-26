@@ -4211,47 +4211,17 @@ code_blockt c_typecheck_baset::instantiate_gcc_polymorphic_builtin(
     // before the operation.
 
     // _Bool __sync_bool_compare_and_swap(type *ptr, type old, type new, ...)
-    // { _Bool result = *ptr == old; if(result) *ptr = new; return result; }
 
-    const symbol_exprt result =
-      result_symbol(
-        identifier_with_type, c_bool_type(), source_location, symbol_table)
-        .symbol_expr();
-    block.add(codet{ID_decl_block, {code_declt{result}}});
-
-    // place operations on *ptr in an atomic section
-    block.add(code_expressiont{side_effect_expr_function_callt{
-      symbol_exprt::typeless(CPROVER_PREFIX "atomic_begin"),
-      {},
-      code_typet{{}, void_type()},
-      source_location}});
-
-    // build *ptr
-    const dereference_exprt deref_ptr{parameter_exprs[0]};
-
-    block.add(code_assignt{
-      result,
-      typecast_exprt::conditional_cast(
-        equal_exprt{deref_ptr, parameter_exprs[1]}, result.type())});
-
-    code_assignt assign{deref_ptr, parameter_exprs[2]};
-    assign.add_source_location() = source_location;
-    block.add(code_ifthenelset{result, std::move(assign)});
-
-    // this instruction implies an mfence, i.e., WRfence
-    block.add(code_expressiont{side_effect_expr_function_callt{
-      symbol_exprt::typeless(CPROVER_PREFIX "fence"),
-      {string_constantt{ID_WRfence}},
+    block.add(code_returnt{side_effect_expr_function_callt{
+      symbol_exprt::typeless(ID___atomic_compare_exchange),
+      {parameter_exprs[0],
+       address_of_exprt{parameter_exprs[1]},
+       address_of_exprt{parameter_exprs[2]},
+       from_integer(0, c_bool_type()),
+       from_integer(std::memory_order_seq_cst, signed_int_type()),
+       from_integer(std::memory_order_seq_cst, signed_int_type())},
       typet{},
       source_location}});
-
-    block.add(code_expressiont{side_effect_expr_function_callt{
-      symbol_exprt::typeless(CPROVER_PREFIX "atomic_end"),
-      {},
-      code_typet{{}, void_type()},
-      source_location}});
-
-    block.add(code_returnt{result});
   }
   else if(identifier == ID___sync_val_compare_and_swap)
   {
@@ -4377,6 +4347,227 @@ code_blockt c_typecheck_baset::instantiate_gcc_polymorphic_builtin(
       symbol_exprt::typeless(CPROVER_PREFIX "atomic_end"),
       {},
       code_typet{{}, void_type()},
+      source_location}});
+  }
+  else if(identifier == ID___atomic_load)
+  {
+    // void __atomic_load (type *ptr, type *ret, int memorder)
+    // This is the generic version of an atomic load. It returns the contents of
+    // *ptr in *ret.
+
+    block.add(code_expressiont{side_effect_expr_function_callt{
+      symbol_exprt::typeless(CPROVER_PREFIX "atomic_begin"),
+      {},
+      code_typet{{}, void_type()},
+      source_location}});
+
+    block.add(code_assignt{dereference_exprt{parameter_exprs[1]},
+                           dereference_exprt{parameter_exprs[0]}});
+
+    block.add(code_expressiont{side_effect_expr_function_callt{
+      symbol_exprt::typeless("__atomic_thread_fence"),
+      {parameter_exprs[2]},
+      typet{},
+      source_location}});
+
+    block.add(code_expressiont{side_effect_expr_function_callt{
+      symbol_exprt::typeless(CPROVER_PREFIX "atomic_end"),
+      {},
+      code_typet{{}, void_type()},
+      source_location}});
+  }
+  else if(identifier == ID___atomic_load_n)
+  {
+    // type __atomic_load_n (type *ptr, int memorder)
+    // This built-in function implements an atomic load operation. It returns
+    // the contents of *ptr.
+    const typet &type = code_type.return_type();
+
+    const symbol_exprt result =
+      result_symbol(identifier_w_type, type, source_location, symbol_table)
+        .symbol_expr();
+    block.add(codet{ID_decl_block, {code_declt{result}}});
+
+    block.add(code_expressiont{side_effect_expr_function_callt{
+      symbol_exprt::typeless(ID___atomic_load),
+      {parameter_exprs[0], address_of_exprt{result}, parameter_exprs[1]},
+      typet{},
+      source_location}});
+
+    block.add(code_returnt{result});
+  }
+  else if(identifier == ID___atomic_store)
+  {
+    //  void __atomic_store (type *ptr, type *val, int memorder)
+    //  This is the generic version of an atomic store. It stores the value of
+    //  *val into *ptr.
+
+    block.add(code_expressiont{side_effect_expr_function_callt{
+      symbol_exprt::typeless(CPROVER_PREFIX "atomic_begin"),
+      {},
+      code_typet{{}, void_type()},
+      source_location}});
+
+    block.add(code_assignt{dereference_exprt{parameter_exprs[0]},
+                           dereference_exprt{parameter_exprs[1]}});
+
+    block.add(code_expressiont{side_effect_expr_function_callt{
+      symbol_exprt::typeless("__atomic_thread_fence"),
+      {parameter_exprs[2]},
+      typet{},
+      source_location}});
+
+    block.add(code_expressiont{side_effect_expr_function_callt{
+      symbol_exprt::typeless(CPROVER_PREFIX "atomic_end"),
+      {},
+      code_typet{{}, void_type()},
+      source_location}});
+  }
+  else if(identifier == ID___atomic_store_n)
+  {
+    // void __atomic_store_n (type *ptr, type val, int memorder)
+    // This built-in function implements an atomic store operation. It writes
+    // val into *ptr.
+
+    block.add(code_expressiont{
+      side_effect_expr_function_callt{symbol_exprt::typeless(ID___atomic_store),
+                                      {parameter_exprs[0],
+                                       address_of_exprt{parameter_exprs[1]},
+                                       parameter_exprs[2]},
+                                      typet{},
+                                      source_location}});
+  }
+  else if(identifier == ID___atomic_exchange)
+  {
+    // void __atomic_exchange (type *ptr, type *val, type *ret, int memorder)
+    // This is the generic version of an atomic exchange. It stores the contents
+    // of *val into *ptr. The original value of *ptr is copied into *ret.
+
+    block.add(code_expressiont{side_effect_expr_function_callt{
+      symbol_exprt::typeless(CPROVER_PREFIX "atomic_begin"),
+      {},
+      code_typet{{}, void_type()},
+      source_location}});
+
+    block.add(code_assignt{dereference_exprt{parameter_exprs[2]},
+                           dereference_exprt{parameter_exprs[0]}});
+    block.add(code_assignt{dereference_exprt{parameter_exprs[0]},
+                           dereference_exprt{parameter_exprs[1]}});
+
+    block.add(code_expressiont{side_effect_expr_function_callt{
+      symbol_exprt::typeless("__atomic_thread_fence"),
+      {parameter_exprs[3]},
+      typet{},
+      source_location}});
+
+    block.add(code_expressiont{side_effect_expr_function_callt{
+      symbol_exprt::typeless(CPROVER_PREFIX "atomic_end"),
+      {},
+      code_typet{{}, void_type()},
+      source_location}});
+  }
+  else if(identifier == ID___atomic_exchange_n)
+  {
+    // type __atomic_exchange_n (type *ptr, type val, int memorder)
+    // This built-in function implements an atomic exchange operation. It writes
+    // val into *ptr, and returns the previous contents of *ptr.
+    const typet &type = code_type.return_type();
+
+    const symbol_exprt result =
+      result_symbol(identifier_w_type, type, source_location, symbol_table)
+        .symbol_expr();
+    block.add(codet{ID_decl_block, {code_declt{result}}});
+
+    block.add(code_expressiont{side_effect_expr_function_callt{
+      symbol_exprt::typeless(ID___atomic_exchange),
+      {parameter_exprs[0],
+       address_of_exprt{parameter_exprs[1]},
+       address_of_exprt{result},
+       parameter_exprs[2]},
+      typet{},
+      source_location}});
+
+    block.add(code_returnt{result});
+  }
+  else if(identifier == ID___atomic_compare_exchange)
+  {
+    // bool __atomic_compare_exchange (type *ptr, type *expected, type *desired,
+    // bool weak, int success_memorder, int failure_memorder)
+    // This built-in function implements an atomic compare and exchange
+    // operation. This compares the contents of *ptr with the contents of
+    // *expected. If equal, the operation is a read-modify-write operation that
+    // writes *desired into *ptr. If they are not equal, the operation is a read
+    // and the current contents of *ptr are written into *expected. weak is true
+    // for weak compare_exchange, which may fail spuriously, and false for the
+    // strong variation, which never fails spuriously. Many targets only offer
+    // the strong variation and ignore the parameter.
+
+    const symbol_exprt result =
+      result_symbol(
+        identifier_w_type, c_bool_type(), source_location, symbol_table)
+        .symbol_expr();
+    block.add(codet{ID_decl_block, {code_declt{result}}});
+
+    // place operations on *ptr in an atomic section
+    block.add(code_expressiont{side_effect_expr_function_callt{
+      symbol_exprt::typeless(CPROVER_PREFIX "atomic_begin"),
+      {},
+      code_typet{{}, void_type()},
+      source_location}});
+
+    // build *ptr
+    const dereference_exprt deref_ptr{parameter_exprs[0]};
+
+    block.add(code_assignt{
+      result,
+      typecast_exprt::conditional_cast(
+        equal_exprt{deref_ptr, dereference_exprt{parameter_exprs[1]}},
+        result.type())});
+
+    // we never fail spuriously, and ignore parameter_exprs[3]
+    code_assignt assign{deref_ptr, dereference_exprt{parameter_exprs[2]}};
+    assign.add_source_location() = source_location;
+    code_expressiont success_fence{side_effect_expr_function_callt{
+      symbol_exprt::typeless("__atomic_thread_fence"),
+      {parameter_exprs[4]},
+      typet{},
+      source_location}};
+    success_fence.add_source_location() = source_location;
+
+    code_expressiont failure_fence{side_effect_expr_function_callt{
+      symbol_exprt::typeless("__atomic_thread_fence"),
+      {parameter_exprs[5]},
+      typet{},
+      source_location}};
+    failure_fence.add_source_location() = source_location;
+
+    block.add(code_ifthenelset{
+      result,
+      code_blockt{{std::move(assign), std::move(success_fence)}},
+      std::move(failure_fence)});
+
+    block.add(code_expressiont{side_effect_expr_function_callt{
+      symbol_exprt::typeless(CPROVER_PREFIX "atomic_end"),
+      {},
+      code_typet{{}, void_type()},
+      source_location}});
+
+    block.add(code_returnt{result});
+  }
+  else if(identifier == ID___atomic_compare_exchange_n)
+  {
+    // bool __atomic_compare_exchange_n (type *ptr, type *expected, type
+    // desired, bool weak, int success_memorder, int failure_memorder)
+
+    block.add(code_returnt{side_effect_expr_function_callt{
+      symbol_exprt::typeless(ID___atomic_compare_exchange),
+      {parameter_exprs[0],
+       parameter_exprs[1],
+       address_of_exprt{parameter_exprs[2]},
+       parameter_exprs[3],
+       parameter_exprs[4],
+       parameter_exprs[5]},
+      typet{},
       source_location}});
   }
   else
