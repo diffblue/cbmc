@@ -12,6 +12,7 @@ public class Class {
   private boolean isMemberClass;
   private boolean isEnum;
 
+  @org.cprover.MustNotThrow
   public void cproverInitializeClassLiteral(
     String name,
     boolean isAnnotation,
