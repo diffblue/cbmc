@@ -14,3 +14,23 @@ Author: Daniel Kroening, kroening@kroening.com
 decision_proceduret::~decision_proceduret()
 {
 }
+
+literalt decision_proceduret::operator()(const exprt &expr)
+{
+  return convert(expr);
+}
+
+decision_proceduret::resultt decision_proceduret::operator()()
+{
+  return dec_solve();
+}
+
+void decision_proceduret::set_to_true(const exprt &expr)
+{
+  set_to(expr, true);
+}
+
+void decision_proceduret::set_to_false(const exprt &expr)
+{
+  set_to(expr, false);
+}
