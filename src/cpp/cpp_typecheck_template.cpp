@@ -377,8 +377,7 @@ void cpp_typecheckt::typecheck_class_template_member(
   }
 
   const cpp_idt &cpp_id=**(id_set.begin());
-  symbolt &template_symbol=
-    *symbol_table.get_writeable(cpp_id.identifier);
+  symbolt &template_symbol = symbol_table.get_writeable_ref(cpp_id.identifier);
 
   exprt &template_methods =
     static_cast<exprt &>(template_symbol.value.add(ID_template_methods));

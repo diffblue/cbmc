@@ -156,7 +156,7 @@ void cpp_typecheckt::static_and_dynamic_initialization()
 
   for(const irep_idt &d_it : dynamic_initializations)
   {
-    const symbolt &symbol=*symbol_table.lookup(d_it);
+    const symbolt &symbol = symbol_table.lookup_ref(d_it);
 
     if(symbol.is_extern)
       continue;
@@ -250,7 +250,7 @@ void cpp_typecheckt::do_not_typechecked()
           UNREACHABLE; // Don't know what to do!
 
         symbolt &writable_symbol =
-          *symbol_table.get_writeable(named_symbol.first);
+          symbol_table.get_writeable_ref(named_symbol.first);
         writable_symbol.value.swap(value);
         convert_function(writable_symbol);
       }

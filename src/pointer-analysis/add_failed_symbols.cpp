@@ -67,7 +67,7 @@ void add_failed_symbol_if_needed(
   if(symbol.type.get(ID_C_failed_symbol)!="")
     return;
 
-  add_failed_symbol(*symbol_table.get_writeable(symbol.name), symbol_table);
+  add_failed_symbol(symbol_table.get_writeable_ref(symbol.name), symbol_table);
 }
 
 /// Create a failed-dereference symbol for all symbols in the given table that

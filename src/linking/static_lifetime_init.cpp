@@ -57,7 +57,7 @@ static_lifetime_init(const irep_idt &identifier, symbol_tablet &symbol_table)
   {
     // C standard 6.9.2, paragraph 5
     // adjust the type to an array of size 1
-    symbolt &writable_symbol = *symbol_table.get_writeable(identifier);
+    symbolt &writable_symbol = symbol_table.get_writeable_ref(identifier);
     writable_symbol.type = type;
     writable_symbol.type.set(ID_size, from_integer(1, size_type()));
   }

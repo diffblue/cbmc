@@ -125,7 +125,8 @@ static void java_static_lifetime_init(
   bool string_refinement_enabled,
   message_handlert &message_handler)
 {
-  symbolt &initialize_symbol=*symbol_table.get_writeable(INITIALIZE_FUNCTION);
+  symbolt &initialize_symbol =
+    symbol_table.get_writeable_ref(INITIALIZE_FUNCTION);
   code_blockt &code_block=to_code_block(to_code(initialize_symbol.value));
   object_factory_parameters.function_id = initialize_symbol.name;
 
@@ -160,7 +161,7 @@ static void java_static_lifetime_init(
     ++symbol_it)
   {
     const auto &symname = *symbol_it;
-    const symbolt &sym=*symbol_table.lookup(symname);
+    const symbolt &sym = symbol_table.lookup_ref(symname);
     if(should_init_symbol(sym))
     {
       if(const symbolt *class_literal_init_method =
@@ -468,7 +469,7 @@ static optionalt<codet> record_return_value(
     return {};
 
   const symbolt &return_symbol =
-    *symbol_table.lookup(JAVA_ENTRY_POINT_RETURN_SYMBOL);
+    symbol_table.lookup_ref(JAVA_ENTRY_POINT_RETURN_SYMBOL);
 
   codet output(ID_output);
   output.operands().resize(2);
@@ -493,7 +494,7 @@ static code_blockt record_pointer_parameters(
       param_number++)
   {
     const symbolt &p_symbol =
-      *symbol_table.lookup(parameters[param_number].get_identifier());
+      symbol_table.lookup_ref(parameters[param_number].get_identifier());
 
     if(!can_cast_type<pointer_typet>(p_symbol.type))
       continue;

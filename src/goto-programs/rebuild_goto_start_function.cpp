@@ -76,8 +76,8 @@ template<typename maybe_lazy_goto_modelt>
 irep_idt rebuild_goto_start_function_baset<maybe_lazy_goto_modelt>::
 get_entry_point_mode() const
 {
-  const symbolt &current_entry_point=
-    *goto_model.symbol_table.lookup(goto_functionst::entry_point());
+  const symbolt &current_entry_point =
+    goto_model.symbol_table.lookup_ref(goto_functionst::entry_point());
   return current_entry_point.mode;
 }
 

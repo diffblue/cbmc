@@ -194,7 +194,7 @@ void cpp_typecheckt::typecheck_compound_type(
         to_struct_union_type(symbol.type).is_incomplete())
       {
         // a previously incomplete struct/union becomes complete
-        symbolt &writeable_symbol = *symbol_table.get_writeable(symbol_name);
+        symbolt &writeable_symbol = symbol_table.get_writeable_ref(symbol_name);
         writeable_symbol.type.swap(type);
         typecheck_compound_body(writeable_symbol);
       }
@@ -1426,8 +1426,8 @@ void cpp_typecheckt::convert_anon_struct_union_member(
   const irep_idt &access,
   struct_typet::componentst &components)
 {
-  symbolt &struct_union_symbol=
-    *symbol_table.get_writeable(follow(declaration.type()).get(ID_name));
+  symbolt &struct_union_symbol =
+    symbol_table.get_writeable_ref(follow(declaration.type()).get(ID_name));
 
   if(declaration.storage_spec().is_static() ||
      declaration.storage_spec().is_mutable())

@@ -63,7 +63,7 @@ void record_function_outputs(
     codet output(ID_output);
     output.operands().resize(2);
 
-    const symbolt &return_symbol=*symbol_table.lookup("return'");
+    const symbolt &return_symbol = symbol_table.lookup_ref("return'");
 
     output.op0()=
       address_of_exprt(
