@@ -127,12 +127,16 @@ public:
 
   void clear()
   {
+    // only the root node may be cleared which is an internal node
+    SN_ASSERT(is_internal());
+
     data.reset();
   }
 
   bool shares_with(const sharing_node_innert &other) const
   {
-    SN_ASSERT(data && other.data);
+    SN_ASSERT(data);
+    SN_ASSERT(other.data);
 
     return data == other.data;
   }
@@ -235,10 +239,24 @@ public:
     SN_ASSERT(is_container());
     // we need to check empty() first as the const version of find_leaf() must
     // not be called on an empty node
-    SN_ASSERT(empty() || as_const(this)->find_leaf(k) == nullptr);
+    PRECONDITION(empty() || as_const(this)->find_leaf(k) == nullptr);
 
     leaf_listt &c = get_container();
     c.push_front(leaft(k, v));
+
+    return &c.front();
+  }
+
+  // add leaf, key must not exist yet
+  leaft *place_leaf(const keyT &k, valueT &&v)
+  {
+    SN_ASSERT(is_container());
+    // we need to check empty() first as the const version of find_leaf() must
+    // not be called on an empty node
+    PRECONDITION(empty() || as_const(this)->find_leaf(k) == nullptr);
+
+    leaf_listt &c = get_container();
+    c.push_front(leaft(k, std::move(v)));
 
     return &c.front();
   }
@@ -356,10 +374,19 @@ SN_TYPE_PAR_DECL class d_leaft : public small_shared_pointeet<unsigned>
 {
 public:
 #if SN_SHARE_KEYS == 1
-  std::shared_ptr<keyT> k;
+  typedef std::shared_ptr<keyT> keyt;
 #else
-  keyT k;
+  typedef keyT keyt;
 #endif
+
+  d_leaft(const keyt &k, const valueT &v) : k(k), v(v)
+  {
+  }
+  d_leaft(const keyt &k, valueT &&v) : k(k), v(std::move(v))
+  {
+  }
+  keyt k;
+
   valueT v;
 };
 
@@ -373,30 +400,26 @@ public:
 
   sharing_node_leaft(const keyT &k, const valueT &v)
   {
-    SN_ASSERT(empty());
+    SN_ASSERT(!data);
 
-    auto &d = write();
-
-// Copy key
 #if SN_SHARE_KEYS == 1
     SN_ASSERT(d.k == nullptr);
-    d.k = std::make_shared<keyT>(k);
+    data = make_small_shared_ptr<d_lt>(std::make_shared<keyT>(k), v);
 #else
-    d.k = k;
+    data = make_small_shared_ptr<d_lt>(k, v);
 #endif
-
-    // Copy value
-    d.v = v;
   }
 
-  bool empty() const
+  sharing_node_leaft(const keyT &k, valueT &&v)
   {
-    return !data;
-  }
+    SN_ASSERT(!data);
 
-  void clear()
-  {
-    data.reset();
+#if SN_SHARE_KEYS == 1
+    SN_ASSERT(d.k == nullptr);
+    data = make_small_shared_ptr<d_lt>(std::make_shared<keyT>(k), std::move(v));
+#else
+    data = make_small_shared_ptr<d_lt>(k, std::move(v));
+#endif
   }
 
   bool shares_with(const sharing_node_leaft &other) const
@@ -411,14 +434,22 @@ public:
 
   void swap(sharing_node_leaft &other)
   {
+    SN_ASSERT(data);
+    SN_ASSERT(other.data);
+
     data.swap(other.data);
+  }
+
+  const d_lt &read() const
+  {
+    return *data;
   }
 
   // Accessors
 
   const keyT &get_key() const
   {
-    SN_ASSERT(!empty());
+    SN_ASSERT(data);
 
 #if SN_SHARE_KEYS == 1
     return *read().k;
@@ -429,40 +460,58 @@ public:
 
   const valueT &get_value() const
   {
-    SN_ASSERT(!empty());
+    SN_ASSERT(data);
 
     return read().v;
   }
 
   valueT &get_value()
   {
-    SN_ASSERT(!empty());
+    SN_ASSERT(data);
 
-    return write().v;
-  }
-
-  const d_lt &read() const
-  {
-    return *data;
-  }
-
-protected:
-  d_lt &write()
-  {
-    if(!data)
-    {
-      data = make_small_shared_ptr<d_lt>();
-    }
-    else if(data.use_count() > 1)
+    if(data.use_count() > 1)
     {
       data = make_small_shared_ptr<d_lt>(*data);
     }
 
     SN_ASSERT(data.use_count() == 1);
 
-    return *data;
+    return data->v;
   }
 
+  void set_value(const valueT &v)
+  {
+    SN_ASSERT(data);
+
+    if(data.use_count() > 1)
+    {
+      data = make_small_shared_ptr<d_lt>(data->k, v);
+    }
+    else
+    {
+      data->v = v;
+    }
+
+    SN_ASSERT(data.use_count() == 1);
+  }
+
+  void set_value(valueT &&v)
+  {
+    SN_ASSERT(data);
+
+    if(data.use_count() > 1)
+    {
+      data = make_small_shared_ptr<d_lt>(data->k, std::move(v));
+    }
+    else
+    {
+      data->v = std::move(v);
+    }
+
+    SN_ASSERT(data.use_count() == 1);
+  }
+
+protected:
   datat data;
 };
 

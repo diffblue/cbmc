@@ -16,24 +16,26 @@ Author: Daniel Poetzl
 #include <testing-utils/use_catch.h>
 #include <util/sharing_map.h>
 
-class smt : public sharing_mapt<irep_idt, std::string, irep_id_hash>
+typedef sharing_mapt<irep_idt, std::string, false, irep_id_hash>
+  sharing_map_standardt;
+
+class sharing_map_internalt : public sharing_map_standardt
 {
-  friend void sharing_map_interface_test();
-  friend void sharing_map_copy_test();
-  friend void sharing_map_collision_test();
-  friend void sharing_map_view_test();
-  friend void sharing_map_sharing_stats_test();
+  friend void sharing_map_internals_test();
 };
 
+typedef sharing_mapt<irep_idt, std::string, true, irep_id_hash>
+  sharing_map_error_checkt;
+
 // helpers
-void fill(smt &sm)
+void fill(sharing_map_standardt &sm)
 {
   sm.insert("i", "0");
   sm.insert("j", "1");
   sm.insert("k", "2");
 }
 
-void fill2(smt &sm)
+void fill2(sharing_map_standardt &sm)
 {
   sm.insert("l", "3");
   sm.insert("m", "4");
@@ -42,11 +44,98 @@ void fill2(smt &sm)
 
 // tests
 
-void sharing_map_interface_test()
+class some_keyt
+{
+public:
+  some_keyt() : s(0)
+  {
+  }
+
+  explicit some_keyt(size_t s) : s(s)
+  {
+  }
+
+  size_t s;
+
+  bool operator==(const some_keyt &other) const
+  {
+    return s == other.s;
+  }
+};
+
+class some_key_hasht
+{
+public:
+  size_t operator()(const some_keyt &k) const
+  {
+    return k.s & 0x3;
+  }
+};
+
+void sharing_map_internals_test()
+{
+  SECTION("count nodes")
+  {
+    std::set<const void *> marked;
+    sharing_map_internalt sm;
+    std::size_t count = 0;
+
+    count = sm.count_unmarked_nodes(false, marked, false);
+    REQUIRE(count == 0);
+    REQUIRE(marked.empty());
+
+    count = sm.count_unmarked_nodes(true, marked, false);
+    REQUIRE(count == 0);
+    REQUIRE(marked.empty());
+
+    sm.insert("i", "1");
+    count = sm.count_unmarked_nodes(false, marked, false);
+    REQUIRE(count == 8);
+    REQUIRE(marked.empty());
+
+    count = sm.count_unmarked_nodes(true, marked, false);
+    REQUIRE(count == 1);
+    REQUIRE(marked.empty());
+
+    sm.clear();
+    fill(sm);
+    count = sm.count_unmarked_nodes(true, marked, false);
+    REQUIRE(count == 3);
+    REQUIRE(marked.empty());
+  }
+
+  SECTION("marking")
+  {
+    std::set<const void *> marked;
+    sharing_map_internalt sm;
+
+    fill(sm);
+
+    sm.count_unmarked_nodes(false, marked, true);
+    REQUIRE(marked.empty());
+
+    sharing_map_internalt sm2(sm);
+    sm.count_unmarked_nodes(false, marked, true);
+    REQUIRE(marked.size() == 1);
+
+    marked.clear();
+    sharing_map_internalt sm3(sm);
+    sm3.insert("x", "0");
+    sm.count_unmarked_nodes(false, marked, true);
+    REQUIRE(marked.size() >= 2);
+  }
+}
+
+TEST_CASE("Sharing map internals test", "[core][util]")
+{
+  sharing_map_internals_test();
+}
+
+TEST_CASE("Sharing map interface", "[core][util]")
 {
   SECTION("Empty map")
   {
-    smt sm;
+    sharing_map_standardt sm;
 
     REQUIRE(sm.empty());
     REQUIRE(sm.size() == 0);
@@ -55,82 +144,52 @@ void sharing_map_interface_test()
 
   SECTION("Insert elements")
   {
-    smt sm;
+    sharing_map_standardt sm;
 
-    smt::const_find_type r1 = sm.insert(std::make_pair("i", "0"));
-    REQUIRE(r1.second);
-
-    smt::const_find_type r2 = sm.insert("j", "1");
-    REQUIRE(r2.second);
-
-    smt::const_find_type r3 = sm.insert(std::make_pair("i", "0"));
-    REQUIRE(!r3.second);
+    sm.insert("i", "0");
+    sm.insert("j", "1");
 
     REQUIRE(sm.size() == 2);
     REQUIRE(!sm.empty());
+    REQUIRE(sm.has_key("i"));
+    REQUIRE(sm.has_key("j"));
+    REQUIRE(!sm.has_key("k"));
   }
 
-  SECTION("Place elements")
+  SECTION("Replace elements")
   {
-    smt sm1;
-    smt sm2(sm1);
+    sharing_map_standardt sm;
+    fill(sm);
 
-    smt::find_type r1 = sm1.place("i", "0");
-    REQUIRE(r1.second);
-    REQUIRE(!sm2.has_key("i"));
-
-    std::string &s1 = r1.first;
-    s1 = "1";
-
-    REQUIRE(sm1.at("i") == "1");
+    sm.replace("i", "9");
+    auto r = sm.find("i");
+    REQUIRE(r);
+    REQUIRE(r->get() == "9");
   }
 
   SECTION("Retrieve elements")
   {
-    smt sm;
+    sharing_map_standardt sm;
     sm.insert("i", "0");
     sm.insert("j", "1");
-
-    const smt &sm2 = sm;
-
-    std::string s;
-    s = sm2.at("i");
-    REQUIRE(s == "0");
-
-    try
-    {
-      sm2.at("k");
-      REQUIRE(false);
-    }
-    catch(...)
-    {
-    }
-
-    s = sm2.at("j");
-    REQUIRE(s == "1");
 
     REQUIRE(sm.has_key("i"));
     REQUIRE(sm.has_key("j"));
     REQUIRE(!sm.has_key("k"));
 
-    std::string &s2 = sm.at("i");
-    s2 = "3";
-    REQUIRE(sm2.at("i") == "3");
-
     REQUIRE(sm.size() == 2);
 
-    smt::find_type r = sm.find("i");
-    REQUIRE(r.second);
-    r.first = "4";
-    REQUIRE(sm2.at("i") == "4");
+    auto r1 = sm.find("i");
+    REQUIRE(r1);
+    REQUIRE(r1->get() == "0");
 
-    smt::const_find_type rc = sm2.find("k");
-    REQUIRE(!rc.second);
+    auto r2 = sm.find("k");
+    REQUIRE(!r2);
   }
 
   SECTION("Remove elements")
   {
-    smt sm;
+    sharing_map_standardt sm;
     sm.insert("i", "0");
     sm.insert("j", "1");
 
@@ -146,7 +205,7 @@ void sharing_map_interface_test()
     sm.insert("i", "0");
     sm.insert("j", "1");
 
-    smt sm3(sm);
+    sharing_map_standardt sm3(sm);
 
     REQUIRE(sm.has_key("i"));
     REQUIRE(sm.has_key("j"));
@@ -164,102 +223,59 @@ void sharing_map_interface_test()
     sm3.erase("i");
     REQUIRE(!sm3.has_key("i"));
   }
-
-  SECTION("Subscript operator")
-  {
-    smt sm;
-
-    sm["i"];
-    REQUIRE(sm.has_key("i"));
-
-    sm["i"] = "0";
-    REQUIRE(sm.at("i") == "0");
-
-    sm["j"] = "1";
-    REQUIRE(sm.at("j") == "1");
-  }
 }
 
-void sharing_map_copy_test()
+TEST_CASE("Sharing map copying", "[core][util]")
 {
-  smt sm1;
-  const smt &sm2 = sm1;
-
+  sharing_map_standardt sm1;
   fill(sm1);
 
-  REQUIRE(sm2.find("i").first == "0");
-  REQUIRE(sm2.find("j").first == "1");
-  REQUIRE(sm2.find("k").first == "2");
+  sharing_map_standardt sm2(sm1);
 
-  smt sm3 = sm1;
-  const smt &sm4 = sm3;
+  REQUIRE(sm2.erase("i") == 1);
+  REQUIRE(!sm2.has_key("i"));
+  REQUIRE(sm1.has_key("i"));
 
-  REQUIRE(sm3.erase("l") == 0);
-  REQUIRE(sm3.erase("i") == 1);
+  sharing_map_standardt sm3(sm2);
+  REQUIRE(!sm3.has_key("i"));
+  sm3.insert("i", "0");
 
-  REQUIRE(!sm4.has_key("i"));
-  sm3.place("i", "3");
-  REQUIRE(sm4.find("i").first == "3");
+  REQUIRE(sm1.has_key("i"));
+  REQUIRE(!sm2.has_key("i"));
+  REQUIRE(sm3.has_key("i"));
 }
 
-class some_keyt
+TEST_CASE("Sharing map collisions", "[core][util]")
 {
-public:
-  some_keyt() : s(0)
-  {
-  }
+  typedef sharing_mapt<some_keyt, std::string, false, some_key_hasht>
+    sharing_map_collisionst;
 
-  some_keyt(size_t s) : s(s)
-  {
-  }
+  sharing_map_collisionst sm;
 
-  size_t s;
+  sm.insert(some_keyt(0), "a");
+  sm.insert(some_keyt(8), "b");
+  sm.insert(some_keyt(16), "c");
 
-  bool operator==(const some_keyt &other) const
-  {
-    return s == other.s;
-  }
-};
+  sm.insert(some_keyt(1), "d");
+  sm.insert(some_keyt(2), "e");
 
-class some_key_hash
-{
-public:
-  size_t operator()(const some_keyt &k) const
-  {
-    return k.s & 0x3;
-  }
-};
+  sm.erase(some_keyt(8));
 
-void sharing_map_collision_test()
-{
-  typedef sharing_mapt<some_keyt, std::string, some_key_hash> smt;
+  REQUIRE(sm.has_key(some_keyt(0)));
+  REQUIRE(sm.has_key(some_keyt(16)));
 
-  smt sm;
+  REQUIRE(sm.has_key(some_keyt(1)));
+  REQUIRE(sm.has_key(some_keyt(2)));
 
-  sm.insert(0, "a");
-  sm.insert(8, "b");
-  sm.insert(16, "c");
-
-  sm.insert(1, "d");
-  sm.insert(2, "e");
-
-  sm.erase(8);
-
-  REQUIRE(sm.has_key(0));
-  REQUIRE(sm.has_key(16));
-
-  REQUIRE(sm.has_key(1));
-  REQUIRE(sm.has_key(2));
-
-  REQUIRE(!sm.has_key(8));
+  REQUIRE(!sm.has_key(some_keyt(8)));
 }
 
-void sharing_map_view_test()
+TEST_CASE("Sharing map views", "[core][util]")
 {
   SECTION("View of empty map")
   {
-    smt sm;
-    smt::viewt view;
+    sharing_map_standardt sm;
+    sharing_map_standardt::viewt view;
 
     sm.get_view(view);
   }
@@ -268,8 +284,8 @@ void sharing_map_view_test()
   {
     typedef std::pair<dstringt, std::string> pt;
 
-    smt sm;
-    smt::viewt view;
+    sharing_map_standardt sm;
+    sharing_map_standardt::viewt view;
     std::vector<pt> pairs;
 
     auto sort_view = [&pairs, &view]() {
@@ -293,6 +309,7 @@ void sharing_map_view_test()
     REQUIRE((pairs[1] == pt("j", "1")));
     REQUIRE((pairs[2] == pt("k", "2")));
 
+    REQUIRE(!sm.has_key("l"));
     sm.insert("l", "3");
 
     view.clear();
@@ -307,13 +324,13 @@ void sharing_map_view_test()
 
   SECTION("Delta view (no sharing, same keys)")
   {
-    smt sm1;
+    sharing_map_standardt sm1;
     fill(sm1);
 
-    smt sm2;
+    sharing_map_standardt sm2;
     fill(sm2);
 
-    smt::delta_viewt delta_view;
+    sharing_map_standardt::delta_viewt delta_view;
 
     sm1.get_delta_view(sm2, delta_view);
     REQUIRE(delta_view.size() == 3);
@@ -325,12 +342,12 @@ void sharing_map_view_test()
 
   SECTION("delta view (all shared, same keys)")
   {
-    smt sm1;
+    sharing_map_standardt sm1;
     fill(sm1);
 
-    smt sm2(sm1);
+    sharing_map_standardt sm2(sm1);
 
-    smt::delta_viewt delta_view;
+    sharing_map_standardt::delta_viewt delta_view;
 
     sm1.get_delta_view(sm2, delta_view);
     REQUIRE(delta_view.size() == 0);
@@ -342,15 +359,13 @@ void sharing_map_view_test()
 
   SECTION("delta view (some sharing, same keys)")
   {
-    smt sm1;
+    sharing_map_standardt sm1;
     fill(sm1);
 
-    smt sm2(sm1);
-    auto r = sm2.find("i");
-    REQUIRE(r.second);
-    r.first = "3";
+    sharing_map_standardt sm2(sm1);
+    sm2.replace("i", "3");
 
-    smt::delta_viewt delta_view;
+    sharing_map_standardt::delta_viewt delta_view;
 
     sm1.get_delta_view(sm2, delta_view);
     REQUIRE(delta_view.size() > 0); // not everything is shared
@@ -364,13 +379,13 @@ void sharing_map_view_test()
 
   SECTION("delta view (no sharing, different keys)")
   {
-    smt sm1;
+    sharing_map_standardt sm1;
     fill(sm1);
 
-    smt sm2;
+    sharing_map_standardt sm2;
     fill2(sm2);
 
-    smt::delta_viewt delta_view;
+    sharing_map_standardt::delta_viewt delta_view;
 
     sm1.get_delta_view(sm2, delta_view);
     REQUIRE(delta_view.size() == 0);
@@ -381,58 +396,13 @@ void sharing_map_view_test()
   }
 }
 
-void sharing_map_sharing_stats_test()
+TEST_CASE("Sharing map sharing stats", "[core][util]")
 {
-  SECTION("count nodes")
-  {
-    std::set<const void *> marked;
-    smt sm;
-    int count = 0;
-
-    count = sm.count_unmarked_nodes(false, marked, false);
-    REQUIRE(count == 0);
-
-    count = sm.count_unmarked_nodes(true, marked, false);
-    REQUIRE(count == 0);
-
-    sm.insert("i", "1");
-    count = sm.count_unmarked_nodes(false, marked, false);
-    REQUIRE(count == 8);
-
-    count = sm.count_unmarked_nodes(true, marked, false);
-    REQUIRE(count == 1);
-
-    sm.clear();
-    fill(sm);
-    count = sm.count_unmarked_nodes(true, marked, false);
-    REQUIRE(count == 3);
-  }
-
-  SECTION("marking")
-  {
-    std::set<const void *> marked;
-    smt sm;
-
-    fill(sm);
-
-    sm.count_unmarked_nodes(false, marked, true);
-    REQUIRE(marked.empty());
-
-    smt sm2(sm);
-    sm.count_unmarked_nodes(false, marked, true);
-    REQUIRE(marked.size() == 1);
-
-    marked.clear();
-    smt sm3(sm);
-    sm3["x"];
-    sm.count_unmarked_nodes(false, marked, true);
-    REQUIRE(marked.size() >= 2);
-  }
-
+#if !defined(_MSC_VER)
   SECTION("sharing stats")
   {
-    std::vector<smt> v;
-    smt::sharing_map_statst sms;
+    std::vector<sharing_map_standardt> v;
+    sharing_map_standardt::sharing_map_statst sms;
 
     SECTION("sharing stats no sharing")
     {
@@ -442,58 +412,56 @@ void sharing_map_sharing_stats_test()
       REQUIRE(v.size() == 2);
 
       // Empty maps
-      sms = smt::get_sharing_stats(v.begin(), v.end());
+      sms = sharing_map_standardt::get_sharing_stats(v.begin(), v.end());
       REQUIRE(sms.num_nodes == 0);
       REQUIRE(sms.num_unique_nodes == 0);
       REQUIRE(sms.num_leafs == 0);
       REQUIRE(sms.num_unique_leafs == 0);
 
-      smt &sm1 = v.at(0);
-      smt &sm2 = v.at(1);
+      sharing_map_standardt &sm1 = v.at(0);
+      sharing_map_standardt &sm2 = v.at(1);
 
       fill(sm1);
       fill(sm2);
 
       // Non-empty maps
-      sms = smt::get_sharing_stats(v.begin(), v.end());
+      sms = sharing_map_standardt::get_sharing_stats(v.begin(), v.end());
       REQUIRE(sms.num_leafs == 6);
       REQUIRE(sms.num_unique_leafs == 6);
     }
 
     SECTION("sharing stats sharing 1")
     {
-      smt sm1;
+      sharing_map_standardt sm1;
       fill(sm1);
       v.push_back(sm1);
 
-      smt sm2(sm1);
+      sharing_map_standardt sm2(sm1);
       v.push_back(sm2);
 
-      sms = smt::get_sharing_stats(v.begin(), v.end());
+      sms = sharing_map_standardt::get_sharing_stats(v.begin(), v.end());
       REQUIRE(sms.num_leafs == 6);
       REQUIRE(sms.num_unique_leafs == 3);
     }
 
     SECTION("sharing stats sharing 2")
     {
-      smt sm1;
+      sharing_map_standardt sm1;
       fill(sm1);
       v.push_back(sm1);
 
-      smt sm2(sm1);
+      sharing_map_standardt sm2(sm1);
       v.push_back(sm2);
 
-      smt sm3(sm1);
-      // new
-      sm3["x"];
+      sharing_map_standardt sm3(sm1);
+      sm3.insert("x", "0");
       v.push_back(sm3);
 
-      smt sm4(sm1);
-      // existing
-      sm4["i"];
+      sharing_map_standardt sm4(sm1);
+      sm4.replace("i", "4");
       v.push_back(sm4);
 
-      sms = smt::get_sharing_stats(v.begin(), v.end());
+      sms = sharing_map_standardt::get_sharing_stats(v.begin(), v.end());
       REQUIRE(sms.num_leafs == 13);
       REQUIRE(sms.num_unique_leafs == 5);
     }
@@ -501,44 +469,44 @@ void sharing_map_sharing_stats_test()
 
   SECTION("sharing stats map")
   {
-    std::map<irep_idt, smt> m;
+    std::map<irep_idt, sharing_map_standardt> m;
 
-    smt sm1;
+    sharing_map_standardt sm1;
     fill(sm1);
 
-    smt sm2(sm1);
+    sharing_map_standardt sm2(sm1);
 
     m["a"] = sm1;
     m["b"] = sm2;
 
-    smt::sharing_map_statst sms;
-    sms = smt::get_sharing_stats_map(m.begin(), m.end());
+    sharing_map_standardt::sharing_map_statst sms;
+    sms = sharing_map_standardt::get_sharing_stats_map(m.begin(), m.end());
     REQUIRE(sms.num_leafs == 6);
     REQUIRE(sms.num_unique_leafs == 3);
   }
+#endif
 }
 
-TEST_CASE("Sharing map interface")
+TEST_CASE("Sharing map replace non-existing", "[.]")
 {
-  sharing_map_interface_test();
+  sharing_map_standardt sm;
+  fill(sm);
+
+  sm.replace("x", "0");
 }
 
-TEST_CASE("Sharing map copying")
+TEST_CASE("Sharing map replace with equal value", "[.]")
 {
-  sharing_map_copy_test();
+  sharing_map_error_checkt sm;
+
+  sm.insert("i", "0");
+  sm.replace("i", "0");
 }
 
-TEST_CASE("Sharing map collisions")
+TEST_CASE("Sharing map insert existing", "[.]")
 {
-  sharing_map_collision_test();
-}
+  sharing_map_standardt sm;
+  fill(sm);
 
-TEST_CASE("Sharing map views")
-{
-  sharing_map_view_test();
-}
-
-TEST_CASE("Sharing map sharing stats")
-{
-  sharing_map_sharing_stats_test();
+  sm.insert("i", "4");
 }
