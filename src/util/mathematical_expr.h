@@ -97,11 +97,6 @@ inline transt &to_trans_expr(exprt &expr)
 class power_exprt : public binary_exprt
 {
 public:
-  DEPRECATED(SINCE(2018, 9, 21, "use power_exprt(lhs, rhs) instead"))
-  power_exprt() : binary_exprt(ID_power)
-  {
-  }
-
   power_exprt(const exprt &_base, const exprt &_exp)
     : binary_exprt(_base, ID_power, _exp)
   {
@@ -146,11 +141,6 @@ inline power_exprt &to_power_expr(exprt &expr)
 class factorial_power_exprt : public binary_exprt
 {
 public:
-  DEPRECATED(SINCE(2018, 9, 21, "use factorial_power_exprt(lhs, rhs) instead"))
-  factorial_power_exprt() : binary_exprt(ID_factorial_power)
-  {
-  }
-
   factorial_power_exprt(const exprt &_base, const exprt &_exp)
     : binary_exprt(_base, ID_factorial_power, _exp)
   {
