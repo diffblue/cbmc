@@ -1,0 +1,14 @@
+CORE
+Test.class
+--function Test.f --trace --json-ui --trace-json-extended
+// Enable multi-line checking
+activate-multi-line-match
+^EXIT=10$
+^SIGNAL=0$
+VERIFICATION FAILED
+"type": \{\n\s*"id": "array",[^{]*\{[^}]*\},[\s\n]*"size": \{\n\s*"id": "constant"
+--
+"type": \{\n\s*"id": "array",[^{]*\{[^}]*\},[\s\n]*"size": \{\n\s*"id": "symbol"
+"type": \{\n\s*"id": "array",[^{]*\{[^}]*\},[\s\n]*"size": \{\n\s*"id": "nondet_symbol",
+--
+Check that symbols in array types in the trace, got replaced by actual values.
