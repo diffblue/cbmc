@@ -227,7 +227,7 @@ void acceleration_utilst::stash_variables(
       it!=vars.end();
       ++it)
   {
-    symbolt orig=*symbol_table.lookup(*it);
+    const symbolt &orig = symbol_table.lookup_ref(*it);
     symbolt stashed_sym=fresh_symbol("polynomial::stash", orig.type);
     substitution[orig.symbol_expr()]=stashed_sym.symbol_expr();
     program.assign(stashed_sym.symbol_expr(), orig.symbol_expr());

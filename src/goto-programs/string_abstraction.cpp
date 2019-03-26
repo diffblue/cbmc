@@ -163,7 +163,7 @@ void string_abstractiont::add_str_arguments(
     const irep_idt &name,
     goto_functionst::goto_functiont &fct)
 {
-  symbolt &fct_symbol=*symbol_table.get_writeable(name);
+  symbolt &fct_symbol = symbol_table.get_writeable_ref(name);
 
   code_typet::parameterst str_args;
 

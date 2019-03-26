@@ -1630,7 +1630,7 @@ void goto_program2codet::remove_const(typet &type)
     if(!const_removed.insert(identifier).second)
       return;
 
-    symbolt &symbol=*symbol_table.get_writeable(identifier);
+    symbolt &symbol = symbol_table.get_writeable_ref(identifier);
     INVARIANT(
       symbol.is_type,
       "Symbol "+id2string(identifier)+" should be a type");

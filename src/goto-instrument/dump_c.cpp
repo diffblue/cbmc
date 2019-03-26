@@ -89,7 +89,7 @@ void dump_ct::operator()(std::ostream &os)
   std::set<std::string> symbols_sorted;
   for(const auto &named_symbol : copied_symbol_table.symbols)
   {
-    symbolt &symbol=*copied_symbol_table.get_writeable(named_symbol.first);
+    symbolt &symbol = copied_symbol_table.get_writeable_ref(named_symbol.first);
     bool tag_added=false;
 
     // TODO we could get rid of some of the ID_anonymous by looking up

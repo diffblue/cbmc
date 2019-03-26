@@ -276,7 +276,7 @@ static void remove_complex(symbolt &symbol)
 void remove_complex(symbol_tablet &symbol_table)
 {
   for(const auto &named_symbol : symbol_table.symbols)
-    remove_complex(*symbol_table.get_writeable(named_symbol.first));
+    remove_complex(symbol_table.get_writeable_ref(named_symbol.first));
 }
 
 /// removes complex data type

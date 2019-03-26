@@ -365,8 +365,8 @@ get_inherited_component(
       return *resolved_component;
 
     // No, may be inherited from some parent class; check it is visible:
-    const symbolt &component_symbol =
-      *symbol_table.lookup(resolved_component->get_full_component_identifier());
+    const symbolt &component_symbol = symbol_table.lookup_ref(
+      resolved_component->get_full_component_identifier());
 
     irep_idt access = component_symbol.type.get(ID_access);
     if(access.empty())

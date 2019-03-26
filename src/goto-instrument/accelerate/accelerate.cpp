@@ -427,7 +427,7 @@ bool acceleratet::is_underapproximate(path_acceleratort &accelerator)
     if(it->id()==ID_symbol && it->type() == bool_typet())
     {
       const irep_idt &id=to_symbol_expr(*it).get_identifier();
-      const symbolt &sym=*symbol_table.lookup(id);
+      const symbolt &sym = symbol_table.lookup_ref(id);
 
       if(sym.module=="scratch")
       {

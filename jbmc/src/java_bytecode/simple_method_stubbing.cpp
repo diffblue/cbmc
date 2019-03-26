@@ -235,7 +235,7 @@ void java_simple_method_stubst::create_method_stub(symbolt &symbol)
 /// \param symname: Symbol name to consider stubbing
 void java_simple_method_stubst::check_method_stub(const irep_idt &symname)
 {
-  const symbolt &sym = *symbol_table.lookup(symname);
+  const symbolt &sym = symbol_table.lookup_ref(symname);
   if(!sym.is_type && sym.value.id() == ID_nil &&
     sym.type.id() == ID_code &&
     // do not stub internal locking calls as 'create_method_stub' does not
@@ -248,7 +248,7 @@ void java_simple_method_stubst::check_method_stub(const irep_idt &symname)
     sym.name !=
       "java::java.lang.Object.monitorexit:(Ljava/lang/Object;)V")
   {
-    create_method_stub(*symbol_table.get_writeable(symname));
+    create_method_stub(symbol_table.get_writeable_ref(symname));
   }
 }
 
