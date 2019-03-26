@@ -19,7 +19,8 @@ Author: Daniel Kroening, kroening@kroening.com
 class equalityt:public prop_conv_solvert
 {
 public:
-  explicit equalityt(propt &_prop) : prop_conv_solvert(_prop)
+  equalityt(propt &_prop, message_handlert &message_handler)
+    : prop_conv_solvert(_prop, message_handler)
   {
   }
 

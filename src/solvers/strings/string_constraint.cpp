@@ -22,7 +22,7 @@ static bool cannot_be_neg(const exprt &expr)
   satcheck_no_simplifiert sat_check(null_message_handler);
   symbol_tablet symbol_table;
   namespacet ns(symbol_table);
-  boolbvt solver(ns, sat_check);
+  boolbvt solver{ns, sat_check, null_message_handler};
   const exprt zero = from_integer(0, expr.type());
   const binary_relation_exprt non_neg(expr, ID_lt, zero);
   solver << non_neg;

@@ -22,11 +22,11 @@ Purpose: Find a satisfying assignment that minimizes a given set
 
 typedef std::set<exprt> minimization_listt;
 
-class bv_minimizet:public messaget
+class bv_minimizet
 {
 public:
-  explicit bv_minimizet(boolbvt &_boolbv):
-    boolbv(_boolbv)
+  bv_minimizet(boolbvt &_boolbv, message_handlert &message_handler)
+    : boolbv(_boolbv), log(message_handler)
   {
   }
 
@@ -34,6 +34,7 @@ public:
 
 protected:
   boolbvt &boolbv;
+  messaget log;
 
   void add_objective(
     class prop_minimizet &prop_minimize,
@@ -49,18 +50,20 @@ public:
   }
 
   bv_minimizing_dect(const namespacet &_ns, message_handlert &message_handler)
-    : bv_pointerst(_ns, satcheck), satcheck(message_handler)
+    : bv_pointerst(_ns, satcheck, message_handler),
+      satcheck(message_handler),
+      log(message_handler)
   {
   }
 
   void minimize(const minimization_listt &objectives)
   {
-    bv_minimizet bv_minimize(*this);
-    bv_minimize.set_message_handler(get_message_handler());
+    bv_minimizet bv_minimize{*this, log.get_message_handler()};
     bv_minimize(objectives);
   }
 
   satcheckt satcheck;
+  messaget log;
 };
 
 #endif // CPROVER_SOLVERS_FLATTENING_BV_MINIMIZE_H

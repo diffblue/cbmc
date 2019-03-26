@@ -180,13 +180,12 @@ string_refinementt::string_refinementt(const infot &info)
 static void
 display_index_set(messaget::mstreamt &stream, const index_set_pairt &index_set)
 {
-  const auto eom = messaget::eom;
   std::size_t count = 0;
   std::size_t count_current = 0;
   for(const auto &i : index_set.cumulative)
   {
     const exprt &s = i.first;
-    stream << "IS(" << format(s) << ")=={" << eom;
+    stream << "IS(" << format(s) << ")=={" << messaget::eom;
 
     for(const auto &j : i.second)
     {
@@ -197,13 +196,13 @@ display_index_set(messaget::mstreamt &stream, const index_set_pairt &index_set)
         count_current++;
         stream << "**";
       }
-      stream << "  " << format(j) << ";" << eom;
+      stream << "  " << format(j) << ";" << messaget::eom;
       count++;
     }
-    stream << "}" << eom;
+    stream << "}" << messaget::eom;
   }
   stream << count << " elements in index set (" << count_current
-         << " newly added)" << eom;
+         << " newly added)" << messaget::eom;
 }
 
 /// Instantiation of all constraints
@@ -316,7 +315,6 @@ static void add_equations_for_symbol_resolution(
   const namespacet &ns,
   messaget::mstreamt &stream)
 {
-  const auto eom = messaget::eom;
   const std::string log_message =
     "WARNING string_refinement.cpp generate_symbol_resolution_from_equations:";
   for(const equal_exprt &eq : equations)
@@ -326,14 +324,15 @@ static void add_equations_for_symbol_resolution(
     if(lhs.id() != ID_symbol)
     {
       stream << log_message << "non symbol lhs: " << format(lhs)
-             << " with rhs: " << format(rhs) << eom;
+             << " with rhs: " << format(rhs) << messaget::eom;
       continue;
     }
 
     if(lhs.type() != rhs.type())
     {
       stream << log_message << "non equal types lhs: " << format(lhs)
-             << "\n####################### rhs: " << format(rhs) << eom;
+             << "\n####################### rhs: " << format(rhs)
+             << messaget::eom;
       continue;
     }
 
@@ -366,7 +365,8 @@ static void add_equations_for_symbol_resolution(
       else
       {
         stream << log_message << "non struct with char pointer subexpr "
-               << format(rhs) << "\n  * of type " << format(rhs.type()) << eom;
+               << format(rhs) << "\n  * of type " << format(rhs.type())
+               << messaget::eom;
       }
     }
   }
@@ -473,7 +473,6 @@ union_find_replacet string_identifiers_resolution_from_equations(
   const namespacet &ns,
   messaget::mstreamt &stream)
 {
-  const auto eom = messaget::eom;
   const std::string log_message =
     "WARNING string_refinement.cpp "
     "string_identifiers_resolution_from_equations:";
@@ -509,7 +508,7 @@ union_find_replacet string_identifiers_resolution_from_equations(
       {
         stream << log_message << "non struct with string subtype "
                << format(eq.lhs()) << "\n  * of type "
-               << format(eq.lhs().type()) << eom;
+               << format(eq.lhs().type()) << messaget::eom;
       }
 
       for(const exprt &expr : extract_strings(eq.rhs(), ns))
@@ -618,31 +617,36 @@ static void output_equations(
 decision_proceduret::resultt string_refinementt::dec_solve()
 {
 #ifdef DEBUG
-  debug() << "dec_solve: Initial set of equations" << eom;
-  output_equations(debug(), equations);
+  log.debug() << "dec_solve: Initial set of equations" << messaget::eom;
+  output_equations(log.debug(), equations);
 #endif
 
-  debug() << "dec_solve: Build symbol solver from equations" << eom;
+  log.debug() << "dec_solve: Build symbol solver from equations"
+              << messaget::eom;
   // symbol_resolve is used by get and is kept between calls to dec_solve,
   // that's why we use a class member here
-  add_equations_for_symbol_resolution(symbol_resolve, equations, ns, debug());
+  add_equations_for_symbol_resolution(
+    symbol_resolve, equations, ns, log.debug());
 #ifdef DEBUG
-  debug() << "symbol resolve:" << eom;
+  log.debug() << "symbol resolve:" << messaget::eom;
   for(const auto &pair : symbol_resolve.to_vector())
-    debug() << format(pair.first) << " --> " << format(pair.second) << eom;
+    log.debug() << format(pair.first) << " --> " << format(pair.second)
+                << messaget::eom;
 #endif
 
   const union_find_replacet string_id_symbol_resolve =
-    string_identifiers_resolution_from_equations(equations, ns, debug());
+    string_identifiers_resolution_from_equations(equations, ns, log.debug());
 #ifdef DEBUG
-  debug() << "symbol resolve string:" << eom;
+  log.debug() << "symbol resolve string:" << messaget::eom;
   for(const auto &pair : string_id_symbol_resolve.to_vector())
   {
-    debug() << format(pair.first) << " --> " << format(pair.second) << eom;
+    log.debug() << format(pair.first) << " --> " << format(pair.second)
+                << messaget::eom;
   }
 #endif
 
-  debug() << "dec_solve: Replacing string ids in function applications" << eom;
+  log.debug() << "dec_solve: Replacing string ids in function applications"
+              << messaget::eom;
   for(equal_exprt &eq : equations)
   {
     if(can_cast_expr<function_application_exprt>(eq.rhs()))
@@ -658,11 +662,11 @@ decision_proceduret::resultt string_refinementt::dec_solve()
   make_char_array_pointer_associations(generator, equations);
 
 #ifdef DEBUG
-  output_equations(debug(), equations);
+  output_equations(log.debug(), equations);
 #endif
 
-  debug() << "dec_solve: compute dependency graph and remove function "
-          << "applications captured by the dependencies:" << eom;
+  log.debug() << "dec_solve: compute dependency graph and remove function "
+              << "applications captured by the dependencies:" << messaget::eom;
   std::vector<equal_exprt> local_equations;
   for(const equal_exprt &eq : equations)
   {
@@ -680,29 +684,30 @@ decision_proceduret::resultt string_refinementt::dec_solve()
   equations.clear();
 
 #ifdef DEBUG
-  dependencies.output_dot(debug());
+  dependencies.output_dot(log.debug());
 #endif
 
-  debug() << "dec_solve: add constraints" << eom;
+  log.debug() << "dec_solve: add constraints" << messaget::eom;
   dependencies.add_constraints(generator);
 
 #ifdef DEBUG
-  output_equations(debug(), equations);
+  output_equations(log.debug(), equations);
 #endif
 
 #ifdef DEBUG
-  debug() << "dec_solve: arrays_of_pointers:" << eom;
+  log.debug() << "dec_solve: arrays_of_pointers:" << messaget::eom;
   for(auto pair : generator.array_pool.get_arrays_of_pointers())
   {
-    debug() << "  * " << format(pair.first) << "\t--> " << format(pair.second)
-            << " : " << format(pair.second.type()) << eom;
+    log.debug() << "  * " << format(pair.first) << "\t--> "
+                << format(pair.second) << " : " << format(pair.second.type())
+                << messaget::eom;
   }
 #endif
 
   for(const auto &eq : local_equations)
   {
 #ifdef DEBUG
-    debug() << "dec_solve: set_to " << format(eq) << eom;
+    log.debug() << "dec_solve: set_to " << format(eq) << messaget::eom;
 #endif
     supert::set_to(eq, true);
   }
@@ -714,7 +719,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
     [&](string_constraintt constraint) {
       constraint.replace_expr(symbol_resolve);
       DATA_INVARIANT(
-        is_valid_string_constraint(error(), ns, constraint),
+        is_valid_string_constraint(log.error(), ns, constraint),
         string_refinement_invariantt(
           "string constraints satisfy their invariant"));
       return constraint;
@@ -758,21 +763,22 @@ decision_proceduret::resultt string_refinementt::dec_solve()
       axioms,
       generator,
       get,
-      debug(),
+      log.debug(),
       ns,
       config_.use_counter_example,
       symbol_resolve,
       not_contain_witnesses);
     if(satisfied)
     {
-      debug() << "check_SAT: the model is correct" << eom;
+      log.debug() << "check_SAT: the model is correct" << messaget::eom;
       return resultt::D_SATISFIABLE;
     }
-    debug() << "check_SAT: got SAT but the model is not correct" << eom;
+    log.debug() << "check_SAT: got SAT but the model is not correct"
+                << messaget::eom;
   }
   else
   {
-    debug() << "check_SAT: got UNSAT or ERROR" << eom;
+    log.debug() << "check_SAT: got UNSAT or ERROR" << messaget::eom;
     return initial_result;
   }
 
@@ -797,19 +803,20 @@ decision_proceduret::resultt string_refinementt::dec_solve()
         axioms,
         generator,
         get,
-        debug(),
+        log.debug(),
         ns,
         config_.use_counter_example,
         symbol_resolve,
         not_contain_witnesses);
       if(satisfied)
       {
-        debug() << "check_SAT: the model is correct" << eom;
+        log.debug() << "check_SAT: the model is correct" << messaget::eom;
         return resultt::D_SATISFIABLE;
       }
 
-      debug() << "check_SAT: got SAT but the model is not correct, refining..."
-              << eom;
+      log.debug()
+        << "check_SAT: got SAT but the model is not correct, refining..."
+        << messaget::eom;
 
       // Since the model is not correct although we got SAT, we need to refine
       // the property we are checking by adding more indices to the index set,
@@ -818,20 +825,20 @@ decision_proceduret::resultt string_refinementt::dec_solve()
       index_sets.current.clear();
       update_index_set(index_sets, ns, current_constraints);
 
-      display_index_set(debug(), index_sets);
+      display_index_set(log.debug(), index_sets);
 
       if(index_sets.current.empty())
       {
         if(axioms.not_contains.empty())
         {
-          error() << "dec_solve: current index set is empty, "
-                  << "this should not happen" << eom;
+          log.error() << "dec_solve: current index set is empty, "
+                      << "this should not happen" << messaget::eom;
           return resultt::D_ERROR;
         }
         else
         {
-          debug() << "dec_solve: current index set is empty, "
-                  << "adding counter examples" << eom;
+          log.debug() << "dec_solve: current index set is empty, "
+                      << "adding counter examples" << messaget::eom;
           for(const auto &counter : counter_examples)
             add_lemma(counter);
         }
@@ -844,13 +851,13 @@ decision_proceduret::resultt string_refinementt::dec_solve()
     }
     else
     {
-      debug() << "check_SAT: default return "
-              << static_cast<int>(refined_result) << eom;
+      log.debug() << "check_SAT: default return "
+                  << static_cast<int>(refined_result) << messaget::eom;
       return refined_result;
     }
   }
-  debug() << "string_refinementt::dec_solve reached the maximum number"
-          << "of steps allowed" << eom;
+  log.debug() << "string_refinementt::dec_solve reached the maximum number"
+              << "of steps allowed" << messaget::eom;
   return resultt::D_ERROR;
 }
 
@@ -920,7 +927,7 @@ void string_refinementt::add_lemma(
   if(simple_lemma.is_true())
   {
 #if 0
-    debug() << "string_refinementt::add_lemma : tautology" << eom;
+    log.debug() << "string_refinementt::add_lemma : tautology" << messaget::eom;
 #endif
     return;
   }
@@ -942,7 +949,7 @@ void string_refinementt::add_lemma(
       ++it;
   }
 
-  debug() << "adding lemma " << format(simple_lemma) << eom;
+  log.debug() << "adding lemma " << format(simple_lemma) << messaget::eom;
 
   prop.l_set_to_true(convert(simple_lemma));
 }
@@ -961,7 +968,6 @@ static optionalt<exprt> get_array(
   messaget::mstreamt &stream,
   const array_string_exprt &arr)
 {
-  const auto eom = messaget::eom;
   const exprt &size = arr.length();
   exprt arr_val = simplify_expr(adjust_if_recursive(super_get(arr), ns), ns);
   exprt size_val = super_get(size);
@@ -974,14 +980,14 @@ static optionalt<exprt> get_array(
   if(size_val.id() != ID_constant)
   {
     stream << "(sr::get_array) string of unknown size: " << format(size_val)
-           << eom;
+           << messaget::eom;
     return {};
   }
 
   auto n_opt = numeric_cast<std::size_t>(size_val);
   if(!n_opt)
   {
-    stream << "(sr::get_array) size is not valid" << eom;
+    stream << "(sr::get_array) size is not valid" << messaget::eom;
     return {};
   }
   std::size_t n = *n_opt;
@@ -989,15 +995,15 @@ static optionalt<exprt> get_array(
   if(n > MAX_CONCRETE_STRING_SIZE)
   {
     stream << "(sr::get_array) long string (size " << format(arr.length())
-           << " = " << n << ") " << format(arr) << eom;
+           << " = " << n << ") " << format(arr) << messaget::eom;
     stream << "(sr::get_array) consider reducing max-nondet-string-length so "
               "that no string exceeds "
            << MAX_CONCRETE_STRING_SIZE
            << " in length and "
               "make sure all functions returning strings are loaded"
-           << eom;
+           << messaget::eom;
     stream << "(sr::get_array) this can also happen on invalid object access"
-           << eom;
+           << messaget::eom;
     return nil_exprt();
   }
 
@@ -1035,26 +1041,26 @@ static exprt get_char_array_and_concretize(
   messaget::mstreamt &stream,
   const array_string_exprt &arr)
 {
-  const auto &eom = messaget::eom;
   stream << "- " << format(arr) << ":\n";
-  stream << std::string(4, ' ') << "- type: " << format(arr.type()) << eom;
+  stream << std::string(4, ' ') << "- type: " << format(arr.type())
+         << messaget::eom;
   const auto arr_model_opt = get_array(super_get, ns, stream, arr);
   if(arr_model_opt)
   {
     stream << std::string(4, ' ') << "- char_array: " << format(*arr_model_opt)
            << '\n';
     stream << std::string(4, ' ')
-           << "- type : " << format(arr_model_opt->type()) << eom;
+           << "- type : " << format(arr_model_opt->type()) << messaget::eom;
     const exprt simple = simplify_expr(*arr_model_opt, ns);
     stream << std::string(4, ' ')
-           << "- simplified_char_array: " << format(simple) << eom;
+           << "- simplified_char_array: " << format(simple) << messaget::eom;
     if(
       const auto concretized_array =
         get_array(super_get, ns, stream, to_array_string_expr(simple)))
     {
       stream << std::string(4, ' ')
              << "- concretized_char_array: " << format(*concretized_array)
-             << eom;
+             << messaget::eom;
 
       if(
         const auto array_expr =
@@ -1064,12 +1070,13 @@ static exprt get_char_array_and_concretize(
                << string_of_array(*array_expr) << "\"\n";
       }
       else
-        stream << std::string(2, ' ') << "- warning: not an array" << eom;
+        stream << std::string(2, ' ') << "- warning: not an array"
+               << messaget::eom;
       return *concretized_array;
     }
     return simple;
   }
-  stream << std::string(4, ' ') << "- incomplete model" << eom;
+  stream << std::string(4, ' ') << "- incomplete model" << messaget::eom;
   return arr;
 }
 
@@ -1315,7 +1322,6 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
   const std::unordered_map<string_not_contains_constraintt, symbol_exprt>
     &not_contain_witnesses)
 {
-  const auto eom = messaget::eom;
   // clang-format off
   const auto gen_symbol = [&](const irep_idt &id, const typet &type)
   {
@@ -1323,13 +1329,13 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
   };
   // clang-format on
 
-  stream << "string_refinementt::check_axioms:" << eom;
+  stream << "string_refinementt::check_axioms:" << messaget::eom;
 
-  stream << "symbol_resolve:" << eom;
+  stream << "symbol_resolve:" << messaget::eom;
   auto pairs = symbol_resolve.to_vector();
   for(const auto &pair : pairs)
     stream << "  - " << format(pair.first) << " --> " << format(pair.second)
-           << eom;
+           << messaget::eom;
 
 #ifdef DEBUG
   debug_model(
@@ -1340,7 +1346,7 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
   std::map<size_t, exprt> violated;
 
   stream << "string_refinement::check_axioms: " << axioms.universal.size()
-         << " universal axioms:" << eom;
+         << " universal axioms:" << messaget::eom;
   for(size_t i = 0; i < axioms.universal.size(); i++)
   {
     const string_constraintt &axiom = axioms.universal[i];
@@ -1368,18 +1374,18 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
     {
       stream << std::string(4, ' ')
              << "- violated_for: " << format(axiom.univ_var) << "="
-             << format(*witness) << eom;
+             << format(*witness) << messaget::eom;
       violated[i] = *witness;
     }
     else
-      stream << std::string(4, ' ') << "- correct" << eom;
+      stream << std::string(4, ' ') << "- correct" << messaget::eom;
   }
 
   // Maps from indexes of violated not_contains axiom to a witness of violation
   std::map<std::size_t, exprt> violated_not_contains;
 
   stream << "there are " << axioms.not_contains.size() << " not_contains axioms"
-         << eom;
+         << messaget::eom;
   for(std::size_t i = 0; i < axioms.not_contains.size(); i++)
   {
     const string_not_contains_constraintt &nc_axiom = axioms.not_contains[i];
@@ -1400,22 +1406,22 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
     {
       stream << std::string(4, ' ')
              << "- violated_for: " << univ_var.get_identifier() << "="
-             << format(*witness) << eom;
+             << format(*witness) << messaget::eom;
       violated_not_contains[i] = *witness;
     }
   }
 
   if(violated.empty() && violated_not_contains.empty())
   {
-    stream << "no violated property" << eom;
+    stream << "no violated property" << messaget::eom;
     return {true, std::vector<exprt>()};
   }
   else
   {
     stream << violated.size() << " universal string axioms can be violated"
-           << eom;
+           << messaget::eom;
     stream << violated_not_contains.size()
-           << " not_contains string axioms can be violated" << eom;
+           << " not_contains string axioms can be violated" << messaget::eom;
 
     if(use_counter_example)
     {
@@ -2083,7 +2089,7 @@ exprt string_refinementt::get(const exprt &expr) const
         dependencies.eval(arr, [&](const exprt &expr) { return get(expr); }))
       return *from_dependencies;
 
-    if(const auto arr_model_opt = get_array(super_get, ns, debug(), arr))
+    if(const auto arr_model_opt = get_array(super_get, ns, log.debug(), arr))
       return *arr_model_opt;
 
     if(generator.array_pool.created_strings().count(arr))
@@ -2117,7 +2123,7 @@ static optionalt<exprt> find_counter_example(
   message_handlert &message_handler)
 {
   satcheck_no_simplifiert sat_check(message_handler);
-  boolbvt solver(ns, sat_check);
+  boolbvt solver(ns, sat_check, message_handler);
   solver << axiom;
 
   if(solver() == decision_proceduret::resultt::D_SATISFIABLE)
@@ -2204,7 +2210,6 @@ static bool is_valid_string_constraint(
   const namespacet &ns,
   const string_constraintt &constraint)
 {
-  const auto eom = messaget::eom;
   const array_index_mapt body_indices = gather_indices(constraint.body);
   // Must validate for each string. Note that we have an invariant that the
   // second value in the pair is non-empty.
@@ -2220,7 +2225,7 @@ static bool is_valid_string_constraint(
       if(result.is_false())
       {
         stream << "Indices not equal: " << to_string(constraint)
-               << ", str: " << format(pair.first) << eom;
+               << ", str: " << format(pair.first) << messaget::eom;
         return false;
       }
     }
@@ -2229,7 +2234,7 @@ static bool is_valid_string_constraint(
     if(!is_linear_arithmetic_expr(rep, constraint.univ_var))
     {
       stream << "f is not linear: " << to_string(constraint)
-             << ", str: " << format(pair.first) << eom;
+             << ", str: " << format(pair.first) << messaget::eom;
       return false;
     }
 
@@ -2238,7 +2243,7 @@ static bool is_valid_string_constraint(
     if(!universal_only_in_index(constraint))
     {
       stream << "Universal variable outside of index:" << to_string(constraint)
-             << eom;
+             << messaget::eom;
       return false;
     }
   }

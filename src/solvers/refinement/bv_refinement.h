@@ -34,6 +34,7 @@ public:
   {
     const namespacet *ns=nullptr;
     propt *prop=nullptr;
+    message_handlert *message_handler = nullptr;
   };
 
   explicit bv_refinementt(const infot &info);

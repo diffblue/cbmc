@@ -21,9 +21,8 @@ Author: Daniel Kroening, kroening@kroening.com
 class counterexample_beautificationt
 {
 public:
-  virtual ~counterexample_beautificationt()
-  {
-  }
+  explicit counterexample_beautificationt(message_handlert &message_handler);
+  virtual ~counterexample_beautificationt() = default;
 
   void operator()(boolbvt &boolbv, const symex_target_equationt &equation);
 
@@ -41,6 +40,8 @@ protected:
 
   // the failed property
   symex_target_equationt::SSA_stepst::const_iterator failed;
+
+  messaget log;
 };
 
 #endif // CPROVER_GOTO_CHECKER_COUNTEREXAMPLE_BEAUTIFICATION_H

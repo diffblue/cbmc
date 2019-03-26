@@ -43,8 +43,8 @@ void bv_refinementt::arrays_overapproximated()
   std::list<lazy_constraintt>::iterator it=lazy_array_constraints.begin();
   while(it!=lazy_array_constraints.end())
   {
-    satcheck_no_simplifiert sat_check(get_message_handler());
-    bv_pointerst solver(ns, sat_check);
+    satcheck_no_simplifiert sat_check{log.get_message_handler()};
+    bv_pointerst solver{ns, sat_check, log.get_message_handler()};
     solver.unbounded_array=bv_pointerst::unbounded_arrayt::U_ALL;
 
     exprt current=(*it).lazy;
@@ -94,10 +94,10 @@ void bv_refinementt::arrays_overapproximated()
     }
   }
 
-  debug() << "BV-Refinement: " << nb_active
-          << " array expressions become active" << eom;
-  debug() << "BV-Refinement: " << lazy_array_constraints.size()
-          << " inactive array expressions" << eom;
+  log.debug() << "BV-Refinement: " << nb_active
+              << " array expressions become active" << messaget::eom;
+  log.debug() << "BV-Refinement: " << lazy_array_constraints.size()
+              << " inactive array expressions" << messaget::eom;
   if(nb_active > 0)
     progress=true;
 }

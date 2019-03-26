@@ -454,7 +454,7 @@ void prop_conv_solvert::ignoring(const exprt &expr)
 {
   // fall through
 
-  warning() << "warning: ignoring " << expr.pretty() << eom;
+  log.warning() << "warning: ignoring " << expr.pretty() << messaget::eom;
 }
 
 void prop_conv_solvert::post_process()
@@ -466,12 +466,12 @@ decision_proceduret::resultt prop_conv_solvert::dec_solve()
   // post-processing isn't incremental yet
   if(!post_processing_done)
   {
-    statistics() << "Post-processing" << eom;
+    log.statistics() << "Post-processing" << messaget::eom;
     post_process();
     post_processing_done=true;
   }
 
-  statistics() << "Solving with " << prop.solver_text() << eom;
+  log.statistics() << "Solving with " << prop.solver_text() << messaget::eom;
 
   switch(prop.prop_solve())
   {

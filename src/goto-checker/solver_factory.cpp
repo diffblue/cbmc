@@ -157,8 +157,8 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_default()
     solver->set_prop(util_make_unique<satcheckt>(message_handler));
   }
 
-  auto bv_pointers = util_make_unique<bv_pointerst>(ns, solver->prop());
-  bv_pointers->set_message_handler(message_handler);
+  auto bv_pointers =
+    util_make_unique<bv_pointerst>(ns, solver->prop(), message_handler);
 
   if(options.get_option("arrays-uf") == "never")
     bv_pointers->unbounded_array = bv_pointerst::unbounded_arrayt::U_NONE;
@@ -180,8 +180,8 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_dimacs()
 
   std::string filename = options.get_option("outfile");
 
-  auto bv_dimacs = util_make_unique<bv_dimacst>(ns, *prop, filename);
-  bv_dimacs->set_message_handler(message_handler);
+  auto bv_dimacs =
+    util_make_unique<bv_dimacst>(ns, *prop, message_handler, filename);
   return util_make_unique<solvert>(std::move(bv_dimacs), std::move(prop));
 }
 
@@ -209,9 +209,9 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_bv_refinement()
 
   info.refine_arrays = options.get_bool_option("refine-arrays");
   info.refine_arithmetic = options.get_bool_option("refine-arithmetic");
+  info.message_handler = &message_handler;
 
   auto prop_conv = util_make_unique<bv_refinementt>(info);
-  prop_conv->set_message_handler(message_handler);
   set_prop_conv_time_limit(*prop_conv);
   return util_make_unique<solvert>(std::move(prop_conv), std::move(prop));
 }
@@ -233,9 +233,9 @@ solver_factoryt::get_string_refinement()
       options.get_unsigned_int_option("max-node-refinement");
   info.refine_arrays = options.get_bool_option("refine-arrays");
   info.refine_arithmetic = options.get_bool_option("refine-arithmetic");
+  info.message_handler = &message_handler;
 
   auto prop_conv = util_make_unique<string_refinementt>(info);
-  prop_conv->set_message_handler(message_handler);
   set_prop_conv_time_limit(*prop_conv);
   return util_make_unique<solvert>(std::move(prop_conv), std::move(prop));
 }

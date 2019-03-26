@@ -190,7 +190,7 @@ SCENARIO("miniBDD", "[core][solver][miniBDD]")
   {
     mini_bdd_mgrt bdd_mgr;
     bdd_propt bdd_prop(bdd_mgr);
-    prop_conv_solvert solver(bdd_prop);
+    prop_conv_solvert solver(bdd_prop, null_message_handler);
 
     symbol_exprt var("x", bool_typet());
     literalt result = solver.convert(and_exprt(var, not_exprt(var)));
@@ -204,7 +204,7 @@ SCENARIO("miniBDD", "[core][solver][miniBDD]")
     namespacet ns(symbol_table);
     mini_bdd_mgrt bdd_mgr;
     bdd_propt bdd_prop(bdd_mgr);
-    boolbvt boolbv(ns, bdd_prop);
+    boolbvt boolbv(ns, bdd_prop, null_message_handler);
 
     unsignedbv_typet type(2);
     symbol_exprt var("x", type);
@@ -222,7 +222,7 @@ SCENARIO("miniBDD", "[core][solver][miniBDD]")
     namespacet ns(symbol_table);
     mini_bdd_mgrt bdd_mgr;
     bdd_propt bdd_prop(bdd_mgr);
-    boolbvt boolbv(ns, bdd_prop);
+    boolbvt boolbv(ns, bdd_prop, null_message_handler);
 
     unsignedbv_typet type(32);
     symbol_exprt var("x", type);
@@ -239,7 +239,7 @@ SCENARIO("miniBDD", "[core][solver][miniBDD]")
     namespacet ns(symbol_table);
     mini_bdd_mgrt bdd_mgr;
     bdd_propt bdd_prop(bdd_mgr);
-    boolbvt boolbv(ns, bdd_prop);
+    boolbvt boolbv(ns, bdd_prop, null_message_handler);
 
     unsignedbv_typet type(4);
     symbol_exprt var_x("x", type);
@@ -257,7 +257,7 @@ SCENARIO("miniBDD", "[core][solver][miniBDD]")
     namespacet ns(symbol_table);
     mini_bdd_mgrt bdd_mgr;
     bdd_propt bdd_prop(bdd_mgr);
-    boolbvt boolbv(ns, bdd_prop);
+    boolbvt boolbv(ns, bdd_prop, null_message_handler);
 
     unsignedbv_typet type(8);
     symbol_exprt var_x("x", type);
@@ -274,7 +274,7 @@ SCENARIO("miniBDD", "[core][solver][miniBDD]")
     namespacet ns(symbol_table);
     mini_bdd_mgrt bdd_mgr;
     bdd_propt bdd_prop(bdd_mgr);
-    boolbvt boolbv(ns, bdd_prop);
+    boolbvt boolbv(ns, bdd_prop, null_message_handler);
 
     unsignedbv_typet type(8);
     symbol_exprt var_x("x", type);

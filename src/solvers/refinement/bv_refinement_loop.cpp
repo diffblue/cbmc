@@ -10,10 +10,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/xml.h>
 
-bv_refinementt::bv_refinementt(const infot &info):
-  bv_pointerst(*info.ns, *info.prop),
-  progress(false),
-  config_(info)
+bv_refinementt::bv_refinementt(const infot &info)
+  : bv_pointerst(*info.ns, *info.prop, *info.message_handler),
+    progress(false),
+    config_(info)
 {
   // check features we need
   PRECONDITION(prop.has_set_assumptions());
@@ -24,10 +24,10 @@ bv_refinementt::bv_refinementt(const infot &info):
 decision_proceduret::resultt bv_refinementt::dec_solve()
 {
   // do the usual post-processing
-  status() << "BV-Refinement: post-processing" << eom;
+  log.status() << "BV-Refinement: post-processing" << messaget::eom;
   post_process();
 
-  debug() << "Solving with " << prop.solver_text() << eom;
+  log.debug() << "Solving with " << prop.solver_text() << messaget::eom;
 
   unsigned iteration=0;
 
@@ -36,14 +36,14 @@ decision_proceduret::resultt bv_refinementt::dec_solve()
   {
     iteration++;
 
-    status() << "BV-Refinement: iteration " << iteration << eom;
+    log.status() << "BV-Refinement: iteration " << iteration << messaget::eom;
 
     // output the very same information in a structured fashion
     if(config_.output_xml)
     {
       xmlt xml("refinement-iteration");
       xml.data=std::to_string(iteration);
-      status() << xml << '\n';
+      log.status() << xml << '\n';
     }
 
     switch(prop_solve())
@@ -52,27 +52,30 @@ decision_proceduret::resultt bv_refinementt::dec_solve()
       check_SAT();
       if(!progress)
       {
-        status() << "BV-Refinement: got SAT, and it simulates => SAT" << eom;
-        status() << "Total iterations: " << iteration << eom;
+        log.status() << "BV-Refinement: got SAT, and it simulates => SAT"
+                     << messaget::eom;
+        log.status() << "Total iterations: " << iteration << messaget::eom;
         return resultt::D_SATISFIABLE;
       }
       else
-        status() << "BV-Refinement: got SAT, and it is spurious, refining"
-                 << eom;
+        log.status() << "BV-Refinement: got SAT, and it is spurious, refining"
+                     << messaget::eom;
       break;
 
     case resultt::D_UNSATISFIABLE:
       check_UNSAT();
       if(!progress)
       {
-        status() << "BV-Refinement: got UNSAT, and the proof passes => UNSAT"
-                 << eom;
-        status() << "Total iterations: " << iteration << eom;
+        log.status()
+          << "BV-Refinement: got UNSAT, and the proof passes => UNSAT"
+          << messaget::eom;
+        log.status() << "Total iterations: " << iteration << messaget::eom;
         return resultt::D_UNSATISFIABLE;
       }
       else
-        status() << "BV-Refinement: got UNSAT, and the proof fails, refining"
-                 << eom;
+        log.status()
+          << "BV-Refinement: got UNSAT, and the proof fails, refining"
+          << messaget::eom;
       break;
 
     default:

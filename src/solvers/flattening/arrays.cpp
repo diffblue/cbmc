@@ -22,8 +22,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <unordered_set>
 
-arrayst::arrayst(const namespacet &_ns, propt &_prop)
-  : equalityt(_prop), ns(_ns)
+arrayst::arrayst(
+  const namespacet &_ns,
+  propt &_prop,
+  message_handlert &message_handler)
+  : equalityt(_prop, message_handler), ns(_ns)
 {
   lazy_arrays = false;        // will be set to true when --refine is used
   incremental_cache = false;  // for incremental solving
@@ -48,7 +51,7 @@ literalt arrayst::record_array_equality(
   // check types
   if(op0.type() != op1.type())
   {
-    error() << equality.pretty() << messaget::eom;
+    log.error() << equality.pretty() << messaget::eom;
     DATA_INVARIANT(
       false,
       "record_array_equality got equality without matching types");
@@ -116,7 +119,7 @@ void arrayst::collect_arrays(const exprt &a)
     // check types
     if(array_type != with_expr.old().type())
     {
-      error() << a.pretty() << messaget::eom;
+      log.error() << a.pretty() << messaget::eom;
       DATA_INVARIANT(false, "collect_arrays got 'with' without matching types");
     }
 
@@ -137,7 +140,7 @@ void arrayst::collect_arrays(const exprt &a)
     // check types
     if(array_type != update_expr.old().type())
     {
-      error() << a.pretty() << messaget::eom;
+      log.error() << a.pretty() << messaget::eom;
       DATA_INVARIANT(
         false,
         "collect_arrays got 'update' without matching types");
@@ -159,14 +162,14 @@ void arrayst::collect_arrays(const exprt &a)
     // check types
     if(array_type != if_expr.true_case().type())
     {
-      error() << a.pretty() << messaget::eom;
+      log.error() << a.pretty() << messaget::eom;
       DATA_INVARIANT(false, "collect_arrays got if without matching types");
     }
 
     // check types
     if(array_type != if_expr.false_case().type())
     {
-      error() << a.pretty() << messaget::eom;
+      log.error() << a.pretty() << messaget::eom;
       DATA_INVARIANT(false, "collect_arrays got if without matching types");
     }
 
@@ -520,7 +523,7 @@ void arrayst::add_array_constraints_with(
 
     if(index_expr.type()!=value.type())
     {
-      error() << expr.pretty() << messaget::eom;
+      log.error() << expr.pretty() << messaget::eom;
       DATA_INVARIANT(
         false,
         "with-expression operand should match array element type");
@@ -596,7 +599,7 @@ void arrayst::add_array_constraints_update(
 
     if(index_expr.type()!=value.type())
     {
-      prop.message.error() << expr.pretty() << messaget::eom;
+      prop.message.log.error() << expr.pretty() << messaget::eom;
       DATA_INVARIANT(
         false,
         "update operand should match array element type");

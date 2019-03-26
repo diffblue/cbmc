@@ -19,15 +19,15 @@ bvt boolbvt::convert_with(const exprt &expr)
 {
   if(expr.operands().size()<3)
   {
-    error().source_location=expr.find_source_location();
-    error() << "with takes at least three operands" << eom;
+    log.error().source_location = expr.find_source_location();
+    log.error() << "with takes at least three operands" << messaget::eom;
     throw 0;
   }
 
   if((expr.operands().size()%2)!=1)
   {
-    error().source_location=expr.find_source_location();
-    error() << "with takes an odd number of operands" << eom;
+    log.error().source_location = expr.find_source_location();
+    log.error() << "with takes an odd number of operands" << messaget::eom;
     throw 0;
   }
 
@@ -46,8 +46,8 @@ bvt boolbvt::convert_with(const exprt &expr)
 
   if(bv.size()!=width)
   {
-    error().source_location=expr.find_source_location();
-    error() << "unexpected operand 0 width" << eom;
+    log.error().source_location = expr.find_source_location();
+    log.error() << "unexpected operand 0 width" << messaget::eom;
     throw 0;
   }
 
@@ -100,8 +100,8 @@ void boolbvt::convert_with(
     return convert_with(
       ns.follow_tag(to_union_tag_type(type)), op1, op2, prev_bv, next_bv);
 
-  error().source_location=type.source_location();
-  error() << "unexpected with type: " << type.id() << eom;
+  log.error().source_location = type.source_location();
+  log.error() << "unexpected with type: " << type.id() << messaget::eom;
   throw 0;
 }
 
@@ -115,8 +115,9 @@ void boolbvt::convert_with_array(
   if(is_unbounded_array(type))
   {
     // can't do this
-    error().source_location=type.source_location();
-    error() << "convert_with_array called for unbounded array" << eom;
+    log.error().source_location = type.source_location();
+    log.error() << "convert_with_array called for unbounded array"
+                << messaget::eom;
     throw 0;
   }
 
@@ -126,8 +127,9 @@ void boolbvt::convert_with_array(
 
   if(!size.has_value())
   {
-    error().source_location=type.source_location();
-    error() << "convert_with_array expects constant array size" << eom;
+    log.error().source_location = type.source_location();
+    log.error() << "convert_with_array expects constant array size"
+                << messaget::eom;
     throw 0;
   }
 
@@ -135,8 +137,9 @@ void boolbvt::convert_with_array(
 
   if(*size * op2_bv.size() != prev_bv.size())
   {
-    error().source_location=type.source_location();
-    error() << "convert_with_array: unexpected operand 2 width" << eom;
+    log.error().source_location = type.source_location();
+    log.error() << "convert_with_array: unexpected operand 2 width"
+                << messaget::eom;
     throw 0;
   }
 
@@ -231,19 +234,18 @@ void boolbvt::convert_with_struct(
     {
       if(subtype != op2.type())
       {
-        error().source_location=type.source_location();
-        error() << "with/struct: component `" << component_name
-                << "' type does not match: "
-                << subtype.pretty() << " vs. "
-                << op2.type().pretty() << eom;
+        log.error().source_location = type.source_location();
+        log.error() << "with/struct: component `" << component_name
+                    << "' type does not match: " << subtype.pretty() << " vs. "
+                    << op2.type().pretty() << messaget::eom;
         throw 0;
       }
 
       if(sub_width!=op2_bv.size())
       {
-        error().source_location=type.source_location();
-        error() << "convert_with_struct: unexpected operand op2 width"
-                << eom;
+        log.error().source_location = type.source_location();
+        log.error() << "convert_with_struct: unexpected operand op2 width"
+                    << messaget::eom;
         throw 0;
       }
 
@@ -269,8 +271,9 @@ void boolbvt::convert_with_union(
 
   if(next_bv.size()<op2_bv.size())
   {
-    error().source_location=type.source_location();
-    error() << "convert_with_union: unexpected operand op2 width" << eom;
+    log.error().source_location = type.source_location();
+    log.error() << "convert_with_union: unexpected operand op2 width"
+                << messaget::eom;
     throw 0;
   }
 

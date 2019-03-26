@@ -20,17 +20,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /// Computes a satisfying assignment of minimal cost according to a const
 /// function using incremental SAT
-class prop_minimizet:public messaget
+class prop_minimizet
 {
 public:
-  explicit prop_minimizet(prop_convt &_prop_conv):
-    _iterations(0),
-    _number_satisfied(0),
-    _number_objectives(0),
-    _value(0),
-    prop_conv(_prop_conv)
-  {
-  }
+  prop_minimizet(prop_convt &_prop_conv, message_handlert &message_handler);
 
   void operator()();
 
@@ -77,9 +70,11 @@ public:
 
 protected:
   unsigned _iterations;
-  std::size_t _number_satisfied, _number_objectives;
+  std::size_t _number_satisfied;
+  std::size_t _number_objectives;
   weightt _value;
   prop_convt &prop_conv;
+  messaget log;
 
   literalt constraint();
   void fix_objectives();
