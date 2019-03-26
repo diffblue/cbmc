@@ -88,7 +88,7 @@ operator()(message_handlert &message_handler)
     _iterations++;
 
     constraint();
-    dec_result=prop_conv.dec_solve();
+    dec_result = prop_conv();
 
     switch(dec_result)
     {

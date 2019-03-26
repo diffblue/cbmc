@@ -123,7 +123,7 @@ void prop_minimizet::operator()()
         bvt assumptions;
         assumptions.push_back(c);
         prop_conv.set_assumptions(assumptions);
-        dec_result=prop_conv.dec_solve();
+        dec_result = prop_conv();
 
         switch(dec_result)
         {
@@ -153,6 +153,6 @@ void prop_minimizet::operator()()
 
     bvt assumptions; // no assumptions
     prop_conv.set_assumptions(assumptions);
-    prop_conv.dec_solve();
+    (void)prop_conv();
   }
 }

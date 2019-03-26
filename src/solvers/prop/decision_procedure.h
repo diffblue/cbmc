@@ -56,9 +56,6 @@ public:
   // solve the problem
   enum class resultt { D_SATISFIABLE, D_UNSATISFIABLE, D_ERROR };
 
-  // will eventually be protected, use below call operator
-  virtual resultt dec_solve()=0;
-
   resultt operator()()
   {
     return dec_solve();
@@ -69,6 +66,9 @@ public:
 
   /// Returns the number of incremental solver calls
   virtual std::size_t get_number_of_solver_calls() const = 0;
+
+protected:
+  virtual resultt dec_solve() = 0;
 };
 
 inline decision_proceduret &operator<<(

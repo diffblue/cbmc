@@ -103,7 +103,7 @@ void goto_symex_property_decidert::add_constraint_from_goals(
 
 decision_proceduret::resultt goto_symex_property_decidert::solve()
 {
-  return solver->prop_conv().dec_solve();
+  return solver->prop_conv()();
 }
 
 prop_convt &goto_symex_property_decidert::get_solver() const
