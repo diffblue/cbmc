@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_POINTER_ANALYSIS_VALUE_SET_H
 
 #include <set>
+#include <unordered_set>
 
 #include <util/mp_arith.h>
 #include <util/reference_counting.h>
@@ -483,7 +484,9 @@ public:
     const std::string &suffix,
     const namespacet &ns) const;
 
-  void erase_value_from_entry(entryt &entry, const exprt &value_to_erase);
+  void erase_values_from_entry(
+    entryt &entry,
+    const std::unordered_set<exprt, irep_hash> &values_to_erase);
 
 protected:
   /// Reads the set of objects pointed to by `expr`, including making

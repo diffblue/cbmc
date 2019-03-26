@@ -606,10 +606,10 @@ void goto_symext::try_filter_value_sets(
   value_setst::valuest value_set_elements;
   original_value_set.get_value_set(*symbol_expr, value_set_elements, ns);
 
-  std::vector<exprt> delete_from_jump_taken_value_set;
-  std::vector<exprt> delete_from_jump_not_taken_value_set;
-  delete_from_jump_taken_value_set.reserve(value_set_elements.size());
-  delete_from_jump_not_taken_value_set.reserve(value_set_elements.size());
+  std::unordered_set<exprt, irep_hash> erase_from_jump_taken_value_set;
+  std::unordered_set<exprt, irep_hash> erase_from_jump_not_taken_value_set;
+  erase_from_jump_taken_value_set.reserve(value_set_elements.size());
+  erase_from_jump_not_taken_value_set.reserve(value_set_elements.size());
 
   // Try evaluating the condition with the symbol replaced by a pointer to each
   // one of its possible values in turn. If that leads to a true for some
@@ -667,29 +667,25 @@ void goto_symext::try_filter_value_sets(
 
     if(jump_taken_value_set && modified_condition.is_false())
     {
-      delete_from_jump_taken_value_set.emplace_back(value_set_element);
+      erase_from_jump_taken_value_set.insert(value_set_element);
     }
     else if(jump_not_taken_value_set && modified_condition.is_true())
     {
-      delete_from_jump_not_taken_value_set.emplace_back(value_set_element);
+      erase_from_jump_not_taken_value_set.insert(value_set_element);
     }
   }
-  if(jump_taken_value_set && !delete_from_jump_taken_value_set.empty())
+  if(jump_taken_value_set && !erase_from_jump_taken_value_set.empty())
   {
     value_sett::entryt *entry = jump_taken_value_set->get_entry_for_symbol(
       symbol_expr->get_identifier(), symbol_type, "", ns);
-    for(const exprt &value_to_erase : delete_from_jump_taken_value_set)
-    {
-      jump_taken_value_set->erase_value_from_entry(*entry, value_to_erase);
-    }
+    jump_taken_value_set->erase_values_from_entry(
+      *entry, erase_from_jump_taken_value_set);
   }
-  if(jump_not_taken_value_set && !delete_from_jump_not_taken_value_set.empty())
+  if(jump_not_taken_value_set && !erase_from_jump_not_taken_value_set.empty())
   {
     value_sett::entryt *entry = jump_not_taken_value_set->get_entry_for_symbol(
       symbol_expr->get_identifier(), symbol_type, "", ns);
-    for(const exprt &value_to_erase : delete_from_jump_not_taken_value_set)
-    {
-      jump_not_taken_value_set->erase_value_from_entry(*entry, value_to_erase);
-    }
+    jump_not_taken_value_set->erase_values_from_entry(
+      *entry, erase_from_jump_not_taken_value_set);
   }
 }

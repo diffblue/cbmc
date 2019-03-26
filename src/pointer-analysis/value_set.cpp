@@ -1624,24 +1624,28 @@ void value_sett::guard(
   }
 }
 
-void value_sett::erase_value_from_entry(
+void value_sett::erase_values_from_entry(
   entryt &entry,
-  const exprt &value_to_erase)
+  const std::unordered_set<exprt, irep_hash> &values_to_erase)
 {
   std::vector<object_map_dt::key_type> keys_to_erase;
 
-  for(const auto &key_value : entry.object_map.read())
+  for(auto &key_value : entry.object_map.read())
   {
     const auto &rhs_object = to_expr(key_value);
-    if(rhs_object == value_to_erase)
+    if(values_to_erase.count(rhs_object))
     {
       keys_to_erase.emplace_back(key_value.first);
     }
   }
 
   DATA_INVARIANT(
-    keys_to_erase.size() == 1,
-    "value_sett::erase_value_from_entry() should erase exactly one value");
+    keys_to_erase.size() == values_to_erase.size(),
+    "value_sett::erase_value_from_entry() should erase exactly one value for "
+    "each element in the set it is given");
 
-  entry.object_map.write().erase(keys_to_erase[0]);
+  for(const auto &key_to_erase : keys_to_erase)
+  {
+    entry.object_map.write().erase(key_to_erase);
+  }
 }
