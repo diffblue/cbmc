@@ -15,7 +15,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iosfwd>
 #include <string>
 
+#include "literal.h"
+
 class exprt;
+class tvt;
 
 class decision_proceduret
 {
@@ -25,6 +28,9 @@ public:
   // get a value from satisfying instance if satisfiable
   // returns nil if not available
   virtual exprt get(const exprt &expr) const=0;
+
+  // specialized variant of get
+  virtual tvt l_get(literalt) const = 0;
 
   // print satisfying assignment
   virtual void print_assignment(std::ostream &out) const=0;
@@ -38,6 +44,14 @@ public:
 
   void set_to_false(const exprt &expr)
   { set_to(expr, false); }
+
+  // conversion to handle
+  virtual literalt convert(const exprt &expr) = 0;
+
+  literalt operator()(const exprt &expr)
+  {
+    return convert(expr);
+  }
 
   // solve the problem
   enum class resultt { D_SATISFIABLE, D_UNSATISFIABLE, D_ERROR };
