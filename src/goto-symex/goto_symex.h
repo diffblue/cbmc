@@ -315,6 +315,47 @@ protected:
   virtual void symex_other(statet &state);
 
   void symex_assert(const goto_programt::instructiont &, statet &);
+
+  /// Propagate constants and points-to information implied by a GOTO condition.
+  /// See \ref goto_statet::apply_condition for aspects of this which are common
+  /// to GOTO and ASSUME instructions.
+  /// \param current_state: state prior to the GOTO instruction
+  /// \param jump_taken_state: state following taking the GOTO
+  /// \param jump_not_taken_state: fall-through state
+  /// \param original_guard: the original GOTO condition
+  /// \param new_guard: GOTO condition, L2 renamed and simplified
+  /// \param ns: global namespace
+  void apply_goto_condition(
+    goto_symex_statet &current_state,
+    goto_statet &jump_taken_state,
+    goto_statet &jump_not_taken_state,
+    const exprt &original_guard,
+    const exprt &new_guard,
+    const namespacet &ns);
+
+  /// Try to filter value sets based on whether possible values of a
+  /// pointer-typed symbol make the condition true or false. We only do this
+  /// when there is only one pointer-typed symbol in \p condition.
+  /// \param state: The current state
+  /// \param condition: The condition which is being evaluated, which it expects
+  ///   will not have been cleaned or renamed. In practice, it's fine if it has
+  ///   been cleaned and renamed up to level L1.
+  /// \param original_value_set: The value set we will read from
+  /// \param jump_taken_value_set: The value set that will be used when the
+  ///   condition is true, so we remove any elements which we can tell will
+  ///   make the condition false, or nullptr if this shouldn't be done
+  /// \param jump_not_taken_value_set: The value set that will be used when the
+  ///   condition is false, so we remove any elements which we can tell will
+  ///   make the condition true, or nullptr if this shouldn't be done
+  /// \param ns: A namespace
+  void try_filter_value_sets(
+    goto_symex_statet &state,
+    exprt condition,
+    const value_sett &original_value_set,
+    value_sett *jump_taken_value_set,
+    value_sett *jump_not_taken_value_set,
+    const namespacet &ns);
+
   virtual void vcc(
     const exprt &,
     const std::string &msg,

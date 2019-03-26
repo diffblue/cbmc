@@ -21,6 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "mathematical_expr.h"
 #include "namespace.h"
 #include "pointer_offset_size.h"
+#include "pointer_offset_sum.h"
 #include "rational.h"
 #include "rational_tools.h"
 #include "simplify_utils.h"
@@ -904,7 +905,7 @@ bool simplify_exprt::simplify_dereference(exprt &expr)
       {
         index_exprt idx(
           old.array(),
-          plus_exprt(old.index(), pointer.op1()),
+          pointer_offset_sum(old.index(), pointer.op1()),
           old.array().type().subtype());
         simplify_rec(idx);
         expr.swap(idx);

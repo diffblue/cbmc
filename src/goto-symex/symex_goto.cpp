@@ -21,21 +21,35 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/simplify_expr.h>
 
-/// Propagate constants and points-to information implied by a GOTO condition.
-/// See \ref goto_statet::apply_condition for aspects of this which are common
-/// to GOTO and ASSUME instructions.
-/// \param current_state: state prior to the GOTO instruction
-/// \param jump_taken_state: state following taking the GOTO
-/// \param jump_not_taken_state: fall-through state
-/// \param new_guard: GOTO condition, L2 renamed and simplified
-/// \param ns: global namespace
-static void apply_goto_condition(
-  const goto_symex_statet &current_state,
+void goto_symext::apply_goto_condition(
+  goto_symex_statet &current_state,
   goto_statet &jump_taken_state,
   goto_statet &jump_not_taken_state,
+  const exprt &original_guard,
   const exprt &new_guard,
   const namespacet &ns)
 {
+  // It would be better to call try_filter_value_sets after apply_condition,
+  // and pass nullptr for value sets which apply_condition successfully updated
+  // already. However, try_filter_value_sets calls rename to do constant
+  // propagation, and apply_condition can update the constant propagator. Since
+  // apply condition will never succeed on both jump_taken_state and
+  // jump_not_taken_state, it should be possible to pass a reference to an
+  // unmodified goto_statet to use for renaming. But renaming needs a
+  // goto_symex_statet, not just a goto_statet, and we only have access to one
+  // of those. A future improvement would be to split rename into two parts:
+  // one part on goto_symex_statet which is non-const and deals with
+  // l2 thread reads, and one part on goto_statet which is const and could be
+  // used in try_filter_value_sets.
+
+  try_filter_value_sets(
+    current_state,
+    original_guard,
+    jump_taken_state.value_set,
+    &jump_taken_state.value_set,
+    &jump_not_taken_state.value_set,
+    ns);
+
   jump_taken_state.apply_condition(new_guard, current_state, ns);
 
   // Try to find a negative condition that implies an equality constraint on
@@ -269,7 +283,13 @@ void goto_symext::symex_goto(statet &state)
       auto &taken_state = backward ? state : goto_state_list.back().second;
       auto &not_taken_state = backward ? goto_state_list.back().second : state;
 
-      apply_goto_condition(state, taken_state, not_taken_state, new_guard, ns);
+      apply_goto_condition(
+        state,
+        taken_state,
+        not_taken_state,
+        instruction.get_condition(),
+        new_guard,
+        ns);
     }
 
     // produce new guard symbol

@@ -53,6 +53,7 @@ SRC = allocate_objects.cpp \
       parse_options.cpp \
       parser.cpp \
       pointer_offset_size.cpp \
+      pointer_offset_sum.cpp \
       pointer_predicates.cpp \
       rational.cpp \
       rational_tools.cpp \

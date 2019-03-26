@@ -48,8 +48,14 @@ bool value_sett::field_sensitive(const irep_idt &id, const typet &type)
   return type.id() == ID_struct || type.id() == ID_struct_tag;
 }
 
-const value_sett::entryt *value_sett::find_entry(const value_sett::idt &id)
-  const
+value_sett::entryt *value_sett::find_entry(const value_sett::idt &id)
+{
+  auto found = values.find(id);
+  return found == values.end() ? nullptr : &found->second;
+}
+
+const value_sett::entryt *
+value_sett::find_entry(const value_sett::idt &id) const
 {
   auto found = values.find(id);
   return found == values.end() ? nullptr : &found->second;
@@ -366,6 +372,79 @@ static std::string strip_first_field_from_suffix(
   return suffix.substr(field.length() + 1);
 }
 
+template <class maybe_const_value_sett>
+auto value_sett::get_entry_for_symbol(
+  maybe_const_value_sett &value_set,
+  const irep_idt identifier,
+  const typet &type,
+  const std::string &suffix,
+  const namespacet &ns) ->
+  typename std::conditional<std::is_const<maybe_const_value_sett>::value,
+                            const value_sett::entryt *,
+                            value_sett::entryt *>::type
+{
+  if(
+    type.id() != ID_pointer && type.id() != ID_signedbv &&
+    type.id() != ID_unsignedbv && type.id() != ID_array &&
+    type.id() != ID_struct && type.id() != ID_struct_tag &&
+    type.id() != ID_union && type.id() != ID_union_tag)
+  {
+    return nullptr;
+  }
+
+  const typet &followed_type = type.id() == ID_struct_tag
+                                 ? ns.follow_tag(to_struct_tag_type(type))
+                                 : type.id() == ID_union_tag
+                                     ? ns.follow_tag(to_union_tag_type(type))
+                                     : type;
+
+  // look it up
+  auto *entry = value_set.find_entry(id2string(identifier) + suffix);
+
+  // try first component name as suffix if not yet found
+  if(
+    !entry &&
+    (followed_type.id() == ID_struct || followed_type.id() == ID_union))
+  {
+    const struct_union_typet &struct_union_type =
+      to_struct_union_type(followed_type);
+
+    const irep_idt &first_component_name =
+      struct_union_type.components().front().get_name();
+
+    entry = value_set.find_entry(
+      id2string(identifier) + "." + id2string(first_component_name) + suffix);
+  }
+
+  if(!entry)
+  {
+    // not found? try without suffix
+    entry = value_set.find_entry(identifier);
+  }
+
+  return entry;
+}
+
+// Explicitly instantiate the two possible versions of the method above:
+
+value_sett::entryt *value_sett::get_entry_for_symbol(
+  irep_idt identifier,
+  const typet &type,
+  const std::string &suffix,
+  const namespacet &ns)
+{
+  return get_entry_for_symbol(*this, identifier, type, suffix, ns);
+}
+
+const value_sett::entryt *value_sett::get_entry_for_symbol(
+  irep_idt identifier,
+  const typet &type,
+  const std::string &suffix,
+  const namespacet &ns) const
+{
+  return get_entry_for_symbol(*this, identifier, type, suffix, ns);
+}
+
 void value_sett::get_value_set_rec(
   const exprt &expr,
   object_mapt &dest,
@@ -413,43 +492,11 @@ void value_sett::get_value_set_rec(
   }
   else if(expr.id()==ID_symbol)
   {
-    irep_idt identifier=to_symbol_expr(expr).get_identifier();
+    const entryt *entry = get_entry_for_symbol(
+      to_symbol_expr(expr).get_identifier(), expr_type, suffix, ns);
 
-    // is it a pointer, integer, array or struct?
-    if(expr_type.id()==ID_pointer ||
-       expr_type.id()==ID_signedbv ||
-       expr_type.id()==ID_unsignedbv ||
-       expr_type.id()==ID_struct ||
-       expr_type.id()==ID_union ||
-       expr_type.id()==ID_array)
-    {
-      // look it up
-      const entryt *entry =
-        find_entry(id2string(identifier) + suffix);
-
-      // try first component name as suffix if not yet found
-      if(!entry && (expr_type.id() == ID_struct || expr_type.id() == ID_union))
-      {
-        const struct_union_typet &struct_union_type=
-          to_struct_union_type(expr_type);
-
-        const irep_idt &first_component_name =
-          struct_union_type.components().front().get_name();
-
-        entry = find_entry(
-          id2string(identifier) + "." + id2string(first_component_name) +
-          suffix);
-      }
-
-      // not found? try without suffix
-      if(!entry)
-        entry = find_entry(identifier);
-
-      if(entry)
-        make_union(dest, entry->object_map);
-      else
-        insert(dest, exprt(ID_unknown, original_type));
-    }
+    if(entry)
+      make_union(dest, entry->object_map);
     else
       insert(dest, exprt(ID_unknown, original_type));
   }
@@ -1590,5 +1637,31 @@ void value_sett::guard(
     address_of.type()=expr.op0().type();
 
     assign(expr.op0(), address_of, ns, false, false);
+  }
+}
+
+void value_sett::erase_values_from_entry(
+  entryt &entry,
+  const std::unordered_set<exprt, irep_hash> &values_to_erase)
+{
+  std::vector<object_map_dt::key_type> keys_to_erase;
+
+  for(auto &key_value : entry.object_map.read())
+  {
+    const auto &rhs_object = to_expr(key_value);
+    if(values_to_erase.count(rhs_object))
+    {
+      keys_to_erase.emplace_back(key_value.first);
+    }
+  }
+
+  DATA_INVARIANT(
+    keys_to_erase.size() == values_to_erase.size(),
+    "value_sett::erase_value_from_entry() should erase exactly one value for "
+    "each element in the set it is given");
+
+  for(const auto &key_to_erase : keys_to_erase)
+  {
+    entry.object_map.write().erase(key_to_erase);
   }
 }

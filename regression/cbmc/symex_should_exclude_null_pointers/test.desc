@@ -3,15 +3,14 @@ main.c
 --show-vcc
 ^EXIT=0$
 ^SIGNAL=0$
-ptr4\$object
-ptr5\$object
-ptr6\$object
-ptr7\$object
-ptr8\$object
+ptr10\$object
 --
-ptr[1-3]\$object
+ptr[1-9]\$object
 ^warning: ignoring
 --
 ptrX\$object appearing in the VCCs indicates symex was unsure whether the pointer had a valid
 target, and uses the $object symbol as a referred object of last resort. ptr1-3 should be judged
-not-null by symex, so their $object symbols do not occur.
+not-null by local safe pointer analysis, so their $object symbols do not occur. ptr4-7 are
+not caught by local safe pointer analysis but they are judged safe by value-set filtering, i.e.
+goto_symext::try_filter_value_sets(). ptr8-9 are judged safe by local safe pointer analysis but
+not value-set filtering. ptr10 is not judged safe by either because it is not safe.

@@ -13,6 +13,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_POINTER_ANALYSIS_VALUE_SET_H
 
 #include <set>
+#include <type_traits>
+#include <unordered_set>
 
 #include <util/mp_arith.h>
 #include <util/reference_counting.h>
@@ -328,6 +330,9 @@ public:
   /// \return a constant pointer to an entry if found, or null otherwise.
   ///   Note the pointer may be invalidated by insert operations, including
   ///   get_entry.
+  entryt *find_entry(const idt &id);
+
+  /// Const version of \ref find_entry
   const entryt *find_entry(const idt &id) const;
 
   /// Gets or inserts an entry in this value-set.
@@ -459,6 +464,44 @@ public:
   bool eval_pointer_offset(
     exprt &expr,
     const namespacet &ns) const;
+
+private:
+  /// Helper method for \ref get_entry_for_symbol
+  template <class maybe_const_value_sett>
+  static auto get_entry_for_symbol(
+    maybe_const_value_sett &value_set,
+    irep_idt identifier,
+    const typet &type,
+    const std::string &suffix,
+    const namespacet &ns) ->
+    typename std::conditional<std::is_const<maybe_const_value_sett>::value,
+                              const value_sett::entryt *,
+                              value_sett::entryt *>::type;
+
+public:
+  /// Get the entry for the symbol and suffix
+  /// \param identifier: The identifier for the symbol
+  /// \param type: The type of the symbol
+  /// \param suffix: The suffix for the entry
+  /// \param ns: The global namespace, for following \p type if it is a
+  ///   struct tag type or a union tag type
+  /// \return The entry for the symbol and suffix
+  value_sett::entryt *get_entry_for_symbol(
+    irep_idt identifier,
+    const typet &type,
+    const std::string &suffix,
+    const namespacet &ns);
+
+  /// const version of /ref get_entry_for_symbol
+  const value_sett::entryt *get_entry_for_symbol(
+    irep_idt identifier,
+    const typet &type,
+    const std::string &suffix,
+    const namespacet &ns) const;
+
+  void erase_values_from_entry(
+    entryt &entry,
+    const std::unordered_set<exprt, irep_hash> &values_to_erase);
 
 protected:
   /// Reads the set of objects pointed to by `expr`, including making

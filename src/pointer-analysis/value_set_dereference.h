@@ -54,21 +54,6 @@ public:
   /// \param pointer: A pointer-typed expression, to be dereferenced.
   exprt dereference(const exprt &pointer);
 
-private:
-  const namespacet &ns;
-  symbol_tablet &new_symbol_table;
-  dereference_callbackt &dereference_callback;
-  /// language_mode: ID_java, ID_C or another language identifier
-  /// if we know the source language in use, irep_idt() otherwise.
-  const irep_idt language_mode;
-  /// Flag indicating whether `value_set_dereferencet::dereference` should
-  /// disregard an apparent attempt to dereference NULL
-  const bool exclude_null_derefs;
-
-  bool dereference_type_compare(
-    const typet &object_type,
-    const typet &dereference_type) const;
-
   /// Return value for `build_reference_to`; see that method for documentation.
   class valuet
   {
@@ -82,14 +67,40 @@ private:
     }
   };
 
-  valuet build_reference_to(const exprt &what, const exprt &pointer);
+  static valuet build_reference_to(
+    const exprt &what,
+    const exprt &pointer,
+    bool exclude_null_derefs,
+    irep_idt language_mode,
+    const namespacet &ns);
 
-  bool memory_model(exprt &value, const typet &type, const exprt &offset);
+  static bool dereference_type_compare(
+    const typet &object_type,
+    const typet &dereference_type,
+    const namespacet &ns);
 
-  bool memory_model_bytes(
+  static bool memory_model(
     exprt &value,
     const typet &type,
-    const exprt &offset);
+    const exprt &offset,
+    const namespacet &ns);
+
+  static bool memory_model_bytes(
+    exprt &value,
+    const typet &type,
+    const exprt &offset,
+    const namespacet &ns);
+
+private:
+  const namespacet &ns;
+  symbol_tablet &new_symbol_table;
+  dereference_callbackt &dereference_callback;
+  /// language_mode: ID_java, ID_C or another language identifier
+  /// if we know the source language in use, irep_idt() otherwise.
+  const irep_idt language_mode;
+  /// Flag indicating whether `value_set_dereferencet::dereference` should
+  /// disregard an apparent attempt to dereference NULL
+  const bool exclude_null_derefs;
 };
 
 #endif // CPROVER_POINTER_ANALYSIS_VALUE_SET_DEREFERENCE_H
