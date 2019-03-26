@@ -645,6 +645,15 @@ bool java_bytecode_languaget::typecheck(
   const std::string &)
 {
   PRECONDITION(language_options_initialized);
+  // There are various cases in the Java front-end where pre-existing symbols
+  // from a previous load are not handled. We just rule this case out for now;
+  // a user wishing to ensure a particular class is loaded should use
+  // --java-load-class (to force class-loading) or
+  // --lazy-methods-extra-entry-point (to ensure a method body is loaded)
+  // instead of creating two instances of the front-end.
+  INVARIANT(
+    symbol_table.begin() == symbol_table.end(),
+    "the Java front-end should only be used with an empty symbol table");
 
   java_internal_additions(symbol_table);
 
