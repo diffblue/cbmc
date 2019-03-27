@@ -56,9 +56,11 @@ getting an over-view of the solvers currently supported.
 
 Many (but not all) decision procedures have a notion of logical
 expression and can provide information about logical expressions
-within the solver.  `prop_convt` expands on the interface of
-`decision_proceduret` to add a data-type (`literalt`) and interfaces
-for manipulating logical expressions within the solver.
+within the solver.  `decision_proceduret` also has functions to
+get a handle (in the form of a `literalt`) on a particular
+Boolean expression within the solver, which is useful the
+retrieve to easily the truth value of that expression from
+a satisfying assignment.
 
 Within decision procedures it is common to reduce the logical
 expressions to equivalent expressions in a simpler language.  This is
@@ -75,7 +77,7 @@ processors, creating a good SAT solver is a very specialised skill, so
 CPROVER uses third-party SAT solvers.  By default this is MiniSAT, but
 others are supported (see the `sat/` directory).  To do this it needs a
 software interface to a SAT solver : this is `propt`.  It uses the
-same `literalt` to refer to Boolean variables, just as `prop_convt`
+same `literalt` to refer to Boolean variables, just as `decision_proceduret`
 uses them to refer to logical expressions.  `land`, `lor`, `lxor` and
 so on allow gates to be constructed to express the formulae to be
 solved.  If `cnf_handled_well` is true then you may also use `lcnf` to
@@ -83,7 +85,7 @@ build formulae.  Finally, `prop_solve` will run the decision procedure.
 
 As previously mentioned, many decision procedures reduce formulae to
 CNF and solve with a SAT solver.  `prop_conv_solvert` contains the
-foundations of this conversion.  It implements the `prop_convt` by
+foundations of this conversion.  It implements the `decision_proceduret` by
 having an instance of `propt` (a SAT solver) and reducing the
 expressions that are input into CNF.  The key entry point to this
 procedure is `prop_conv_solvert::convert` which then splits into

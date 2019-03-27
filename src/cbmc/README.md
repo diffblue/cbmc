@@ -96,7 +96,7 @@ each assertion was violated. This is constructed using `build_goto_trace`, which
 queries the backend asking what value was chosen for each program variable on
 the path from the start of the program to the relevant assertion. For more
 details on how the trace is populated see the documentation for
-`build_goto_trace` for `prop_convt::get`, the function used to query the
+`build_goto_trace` for `decision_proceduret::get`, the function used to query the
 backend.
 
 ## Path-symex

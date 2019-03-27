@@ -260,7 +260,7 @@ In the \ref goto-symex directory.
 
 **Key classes:**
 * \ref symex_target_equationt
-* \ref prop_convt
+* \ref decision_proceduret
 * \ref bmct
 * \ref counterexample_beautificationt
 
