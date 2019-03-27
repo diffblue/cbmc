@@ -13,11 +13,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <string>
 #include <map>
 
-#include <util/decision_procedure.h>
 #include <util/expr.h>
 #include <util/message.h>
 #include <util/std_expr.h>
 
+#include "decision_procedure.h"
 #include "literal.h"
 #include "literal_expr.h"
 #include "prop.h"
@@ -30,18 +30,7 @@ class prop_convt:public decision_proceduret
 public:
   virtual ~prop_convt() { }
 
-  // conversion to handle
-  virtual literalt convert(const exprt &expr)=0;
-
-  literalt operator()(const exprt &expr)
-  {
-    return convert(expr);
-  }
-
   using decision_proceduret::operator();
-
-  // specialised variant of get
-  virtual tvt l_get(literalt a) const=0;
 
   // incremental solving
   virtual void set_frozen(literalt a);
@@ -56,9 +45,6 @@ public:
 
   // Resource limits:
   virtual void set_time_limit_seconds(uint32_t) {}
-
-  /// Returns the number of incremental solver calls
-  virtual std::size_t get_number_of_solver_calls() const = 0;
 };
 
 //

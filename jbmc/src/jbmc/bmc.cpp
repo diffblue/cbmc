@@ -54,7 +54,7 @@ decision_proceduret::resultt bmct::run_decision_procedure()
 
   status() << "Running " << prop_conv.decision_procedure_text() << eom;
 
-  decision_proceduret::resultt dec_result = prop_conv.dec_solve();
+  decision_proceduret::resultt dec_result = prop_conv();
 
   {
     auto solver_stop = std::chrono::steady_clock::now();

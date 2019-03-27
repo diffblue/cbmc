@@ -8,7 +8,6 @@ SRC = allocate_objects.cpp \
       cmdline.cpp \
       config.cpp \
       cout_message.cpp \
-      decision_procedure.cpp \
       dstring.cpp \
       endianness_map.cpp \
       expr.cpp \

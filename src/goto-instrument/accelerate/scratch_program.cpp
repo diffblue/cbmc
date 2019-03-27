@@ -12,7 +12,8 @@ Author: Matt Lewis
 #include "scratch_program.h"
 
 #include <util/fixedbv.h>
-#include <util/decision_procedure.h>
+
+#include <solvers/prop/decision_procedure.h>
 
 #include <goto-symex/slice.h>
 
@@ -69,7 +70,7 @@ bool scratch_programt::check_sat(bool do_slice, guard_managert &guard_manager)
   std::cout << "Finished symex, invoking decision procedure.\n";
 #endif
 
-  return (checker->dec_solve()==decision_proceduret::resultt::D_SATISFIABLE);
+  return ((*checker)() == decision_proceduret::resultt::D_SATISFIABLE);
 }
 
 exprt scratch_programt::eval(const exprt &e)
