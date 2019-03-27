@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "cover_goals.h"
 
 #include <util/message.h>
+#include <util/threeval.h>
 
 #include "decision_procedure_incremental.h"
 #include "literal_expr.h"

@@ -49,7 +49,7 @@ public:
   decision_proceduret::resultt solve();
 
   /// Returns the solver instance
-  decision_procedure_incrementalt &get_solver() const;
+  const solver_factoryt::solvert &get_solver() const;
 
   /// Return the equation associated with this instance
   symex_target_equationt &get_equation() const;

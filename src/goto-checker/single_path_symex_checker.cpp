@@ -122,7 +122,7 @@ goto_tracet single_path_symex_checkert::build_full_trace() const
   build_goto_trace(
     property_decider->get_equation(),
     property_decider->get_equation().SSA_steps.end(),
-    property_decider->get_solver(),
+    property_decider->get_solver().decision_procedure(),
     ns,
     goto_trace);
 
@@ -135,14 +135,15 @@ goto_tracet single_path_symex_checkert::build_shortest_trace() const
   {
     // NOLINTNEXTLINE(whitespace/braces)
     counterexample_beautificationt{ui_message_handler}(
-      dynamic_cast<boolbvt &>(property_decider->get_solver()),
+      dynamic_cast<boolbvt &>(
+        property_decider->get_solver().decision_procedure()),
       property_decider->get_equation());
   }
 
   goto_tracet goto_trace;
   build_goto_trace(
     property_decider->get_equation(),
-    property_decider->get_solver(),
+    property_decider->get_solver().decision_procedure(),
     ns,
     goto_trace);
 
@@ -156,7 +157,7 @@ single_path_symex_checkert::build_trace(const irep_idt &property_id) const
   build_goto_trace(
     property_decider->get_equation(),
     ssa_step_matches_failing_property(property_id),
-    property_decider->get_solver(),
+    property_decider->get_solver().decision_procedure(),
     ns,
     goto_trace);
 

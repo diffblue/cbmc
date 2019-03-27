@@ -12,6 +12,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <fstream>
 
+#include <util/message.h>
+
 #include "smt2_conv.h"
 
 class smt2_stringstreamt
@@ -39,12 +41,6 @@ public:
 
   resultt dec_solve() override;
   std::string decision_procedure_text() const override;
-
-  // yes, we are incremental!
-  bool has_set_assumptions() const override
-  {
-    return true;
-  }
 
 protected:
   resultt read_result(std::istream &in);

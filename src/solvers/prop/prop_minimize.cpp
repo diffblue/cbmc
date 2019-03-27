@@ -16,7 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "literal_expr.h"
 
 prop_minimizet::prop_minimizet(
-  decision_procedure_incrementalt &_decision_procedure,
+  decision_procedure_assumptionst &_decision_procedure,
   message_handlert &message_handler)
   : decision_procedure(_decision_procedure), log(message_handler)
 {
@@ -96,9 +96,6 @@ literalt prop_minimizet::constraint()
 /// Try to cover all objectives
 void prop_minimizet::operator()()
 {
-  // we need to use assumptions
-  PRECONDITION(decision_procedure.has_set_assumptions());
-
   _iterations = 0;
   _number_satisfied = 0;
   _value = 0;

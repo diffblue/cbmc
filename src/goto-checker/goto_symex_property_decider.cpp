@@ -11,6 +11,8 @@ Author: Daniel Kroening, Peter Schrammel
 
 #include "goto_symex_property_decider.h"
 
+#include <solvers/prop/literal_expr.h>
+
 goto_symex_property_decidert::goto_symex_property_decidert(
   const optionst &options,
   ui_message_handlert &ui_message_handler,
@@ -108,10 +110,9 @@ decision_proceduret::resultt goto_symex_property_decidert::solve()
   return (*decision_procedure)();
 }
 
-decision_procedure_incrementalt &
-goto_symex_property_decidert::get_solver() const
+const solver_factoryt::solvert &goto_symex_property_decidert::get_solver() const
 {
-  return *decision_procedure;
+  return *solver;
 }
 
 symex_target_equationt &goto_symex_property_decidert::get_equation() const

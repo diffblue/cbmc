@@ -31,6 +31,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <solvers/flattening/c_bit_field_replacement_type.h>
 #include <solvers/floatbv/float_bv.h>
 #include <solvers/lowering/expr_lowering.h>
+#include <solvers/prop/literal_expr.h>
 
 // Mark different kinds of error conditions
 
@@ -62,6 +63,23 @@ tvt smt2_convt::l_get(literalt l) const
     l.var_no() < boolean_assignment.size(),
     "variable number shall be within bounds");
   return tvt(boolean_assignment[l.var_no()]^l.sign());
+}
+
+void smt2_convt::set_frozen(literalt)
+{
+  // not needed
+}
+
+void smt2_convt::set_all_frozen()
+{
+  // not needed
+}
+
+bool smt2_convt::is_in_conflict(literalt l) const
+{
+  // we cannot do that
+  UNREACHABLE;
+  return false;
 }
 
 void smt2_convt::write_header()

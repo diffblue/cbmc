@@ -22,7 +22,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <solvers/flattening/boolbv_width.h>
 #include <solvers/flattening/pointer_logic.h>
-#include <solvers/prop/decision_procedure_incremental.h>
+#include <solvers/prop/decision_procedure_assumptions.h>
 
 #include "letify.h"
 
@@ -31,7 +31,7 @@ class constant_exprt;
 class index_exprt;
 class member_exprt;
 
-class smt2_convt : public decision_procedure_incrementalt
+class smt2_convt : public decision_procedure_assumptionst
 {
 public:
   enum class solvert
@@ -114,9 +114,9 @@ public:
   bool emit_set_logic;
 
   literalt convert(const exprt &expr) override;
-  void set_frozen(literalt) override
-  { /* not needed */
-  }
+  void set_frozen(literalt) override;
+  void set_all_frozen() override;
+  bool is_in_conflict(literalt l) const override;
   void set_to(const exprt &expr, bool value) override;
   exprt get(const exprt &expr) const override;
   std::string decision_procedure_text() const override

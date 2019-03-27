@@ -15,7 +15,7 @@ goto_symex_fault_localizert::goto_symex_fault_localizert(
   const optionst &options,
   ui_message_handlert &ui_message_handler,
   const symex_target_equationt &equation,
-  decision_procedure_incrementalt &solver)
+  decision_procedure_assumptionst &solver)
   : options(options),
     ui_message_handler(ui_message_handler),
     equation(equation),

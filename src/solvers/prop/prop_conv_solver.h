@@ -16,13 +16,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/message.h>
 #include <util/std_expr.h>
 
-#include "decision_procedure_incremental.h"
+#include "decision_procedure_assumptions.h"
 #include "literal.h"
 #include "literal_expr.h"
 #include "prop.h"
 #include "solver_resource_limits.h"
 
-class prop_conv_solvert : public decision_procedure_incrementalt,
+class prop_conv_solvert : public decision_procedure_assumptionst,
                           public solver_resource_limitst
 {
 public:
@@ -57,10 +57,6 @@ public:
   {
     prop.set_assumptions(_assumptions);
   }
-  bool has_set_assumptions() const override
-  {
-    return prop.has_set_assumptions();
-  }
   void set_all_frozen() override
   {
     freeze_all = true;
@@ -69,10 +65,6 @@ public:
   bool is_in_conflict(literalt l) const override
   {
     return prop.is_in_conflict(l);
-  }
-  bool has_is_in_conflict() const override
-  {
-    return prop.has_is_in_conflict();
   }
 
   // get literal for expression, if available

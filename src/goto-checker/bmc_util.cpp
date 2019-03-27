@@ -368,13 +368,14 @@ std::chrono::duration<double> prepare_property_decider(
 {
   auto solver_start = std::chrono::steady_clock::now();
 
+  decision_proceduret &decision_procedure =
+    property_decider.get_solver().decision_procedure();
   messaget log(ui_message_handler);
   log.status() << "Passing problem to "
-               << property_decider.get_solver().decision_procedure_text()
-               << messaget::eom;
+               << decision_procedure.decision_procedure_text() << messaget::eom;
 
   convert_symex_target_equation(
-    equation, property_decider.get_solver(), ui_message_handler);
+    equation, decision_procedure, ui_message_handler);
   property_decider.update_properties_goals_from_symex_target_equation(
     properties);
   property_decider.convert_goals();
@@ -394,9 +395,10 @@ void run_property_decider(
 {
   auto solver_start = std::chrono::steady_clock::now();
 
+  const decision_proceduret &decision_procedure =
+    property_decider.get_solver().decision_procedure();
   messaget log(ui_message_handler);
-  log.status() << "Running "
-               << property_decider.get_solver().decision_procedure_text()
+  log.status() << "Running " << decision_procedure.decision_procedure_text()
                << messaget::eom;
 
   property_decider.add_constraint_from_goals(

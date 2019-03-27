@@ -14,13 +14,15 @@ Author: Daniel Kroening, Peter Schrammel
 
 #include <memory>
 
+#include <solvers/prop/decision_procedure.h>
+#include <solvers/prop/prop.h>
 #include <solvers/smt2/smt2_dec.h>
 
 class message_handlert;
 class namespacet;
 class optionst;
-class propt;
-class decision_proceduret;
+class decision_procedure_incrementalt;
+class decision_procedure_assumptionst;
 
 class solver_factoryt
 {
@@ -46,6 +48,7 @@ public:
 
     decision_proceduret &decision_procedure() const;
     decision_procedure_incrementalt &decision_procedure_incremental() const;
+    decision_procedure_assumptionst &decision_procedure_assumptions() const;
     propt &prop() const;
 
     void set_decision_procedure(std::unique_ptr<decision_proceduret> p);
