@@ -27,11 +27,13 @@ public:
   /// \param state: symbolic execution state
   /// \param lhs: non-expanded symbol
   /// \param target: symbolic execution equation store
+  /// \param allow_pointer_unsoundness: allow pointer unsoundness
   void field_assignments(
     const namespacet &ns,
     goto_symex_statet &state,
-    const exprt &lhs,
-    symex_targett &target);
+    const ssa_exprt &lhs,
+    symex_targett &target,
+    bool allow_pointer_unsoundness);
 
   /// Turn an expression \p expr into a field-sensitive SSA expression.
   /// Field-sensitive SSA expressions have individual symbols for each
@@ -81,7 +83,8 @@ private:
     goto_symex_statet &state,
     const exprt &lhs_fs,
     const exprt &lhs,
-    symex_targett &target);
+    symex_targett &target,
+    bool allow_pointer_unsoundness);
 };
 
 #endif // CPROVER_GOTO_SYMEX_FIELD_SENSITIVITY_H

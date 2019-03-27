@@ -434,8 +434,6 @@ void goto_symext::symex_assign_symbol(
     state.source,
     assignment_type);
 
-  state.field_sensitivity.field_assignments(ns, state, lhs_mod, target);
-
   // Restore the guard
   guard.pop_back();
 }
