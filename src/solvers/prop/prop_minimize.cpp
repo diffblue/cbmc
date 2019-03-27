@@ -23,16 +23,14 @@ prop_minimizet::prop_minimizet(
 }
 
 /// Add an objective
-void prop_minimizet::objective(
-  const literalt condition,
-  const weightt weight)
+void prop_minimizet::objective(const literalt condition, const weightt weight)
 {
-  if(weight>0)
+  if(weight > 0)
   {
     objectives[weight].push_back(objectivet(condition));
     _number_objectives++;
   }
-  else if(weight<0)
+  else if(weight < 0)
   {
     objectives[-weight].push_back(objectivet(!condition));
     _number_objectives++;
@@ -42,22 +40,20 @@ void prop_minimizet::objective(
 /// Fix objectives that are satisfied
 void prop_minimizet::fix_objectives()
 {
-  std::vector<objectivet> &entry=current->second;
-  bool found=false;
+  std::vector<objectivet> &entry = current->second;
+  bool found = false;
 
-  for(std::vector<objectivet>::iterator
-      o_it=entry.begin();
-      o_it!=entry.end();
+  for(std::vector<objectivet>::iterator o_it = entry.begin();
+      o_it != entry.end();
       ++o_it)
   {
-    if(!o_it->fixed &&
-       prop_conv.l_get(o_it->condition).is_false())
+    if(!o_it->fixed && prop_conv.l_get(o_it->condition).is_false())
     {
       _number_satisfied++;
-      _value+=current->first;
+      _value += current->first;
       prop_conv.set_to(literal_exprt(o_it->condition), false); // fix it
-      o_it->fixed=true;
-      found=true;
+      o_it->fixed = true;
+      found = true;
     }
   }
 
@@ -67,13 +63,12 @@ void prop_minimizet::fix_objectives()
 /// Build constraints that require us to improve on at least one goal, greedily.
 literalt prop_minimizet::constraint()
 {
-  std::vector<objectivet> &entry=current->second;
+  std::vector<objectivet> &entry = current->second;
 
   bvt or_clause;
 
-  for(std::vector<objectivet>::iterator
-      o_it=entry.begin();
-      o_it!=entry.end();
+  for(std::vector<objectivet>::iterator o_it = entry.begin();
+      o_it != entry.end();
       ++o_it)
   {
     if(!o_it->fixed)
@@ -84,7 +79,7 @@ literalt prop_minimizet::constraint()
   // i.e., no further improvement possible.
   if(or_clause.empty())
     return const_literal(false);
-  else if(or_clause.size()==1)
+  else if(or_clause.size() == 1)
     return or_clause.front();
   else
   {
@@ -103,15 +98,13 @@ void prop_minimizet::operator()()
   // we need to use assumptions
   PRECONDITION(prop_conv.has_set_assumptions());
 
-  _iterations=0;
-  _number_satisfied=0;
-  _value=0;
-  bool last_was_SAT=false;
+  _iterations = 0;
+  _number_satisfied = 0;
+  _value = 0;
+  bool last_was_SAT = false;
 
   // go from high weights to low ones
-  for(current=objectives.rbegin();
-      current!=objectives.rend();
-      current++)
+  for(current = objectives.rbegin(); current != objectives.rend(); current++)
   {
     log.status() << "weight " << current->first << messaget::eom;
 
@@ -119,10 +112,10 @@ void prop_minimizet::operator()()
     do
     {
       // We want to improve on one of the objectives, please!
-      literalt c=constraint();
+      literalt c = constraint();
 
       if(c.is_false())
-        dec_result=decision_proceduret::resultt::D_UNSATISFIABLE;
+        dec_result = decision_proceduret::resultt::D_UNSATISFIABLE;
       else
       {
         _iterations++;
@@ -135,22 +128,21 @@ void prop_minimizet::operator()()
         switch(dec_result)
         {
         case decision_proceduret::resultt::D_UNSATISFIABLE:
-          last_was_SAT=false;
+          last_was_SAT = false;
           break;
 
         case decision_proceduret::resultt::D_SATISFIABLE:
-          last_was_SAT=true;
+          last_was_SAT = true;
           fix_objectives(); // fix the ones we got
           break;
 
         default:
           log.error() << "decision procedure failed" << messaget::eom;
-          last_was_SAT=false;
+          last_was_SAT = false;
           return;
         }
       }
-    }
-    while(dec_result!=decision_proceduret::resultt::D_UNSATISFIABLE);
+    } while(dec_result != decision_proceduret::resultt::D_UNSATISFIABLE);
   }
 
   if(!last_was_SAT)
