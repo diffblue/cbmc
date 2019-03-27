@@ -43,7 +43,11 @@ void bmc_all_propertiest::goal_covered(const cover_goalst::goalt &)
       if(solver.l_get(cond).is_false())
       {
         g.second.status = goalt::statust::FAILURE;
-        build_goto_trace(bmc.equation, c, solver, bmc.ns, g.second.goto_trace);
+        if(bmc.options.get_bool_option("trace"))
+        {
+          build_goto_trace(
+            bmc.equation, c, solver, bmc.ns, g.second.goto_trace);
+        }
         break;
       }
     }

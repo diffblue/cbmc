@@ -227,7 +227,9 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
 
   if(
     cmdline.isset("trace") || cmdline.isset("compact-trace") ||
-    cmdline.isset("stack-trace") || cmdline.isset("stop-on-fail"))
+    cmdline.isset("stack-trace") || cmdline.isset("stop-on-fail") ||
+    (ui_message_handler.get_ui() != ui_message_handlert::uit::PLAIN &&
+     !cmdline.isset("cover")))
   {
     options.set_option("trace", true);
   }

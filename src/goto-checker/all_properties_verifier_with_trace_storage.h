@@ -45,14 +45,17 @@ public:
         break;
 
       // we've got an error trace
-      message_building_error_trace(log);
-      for(const auto &property_id : result.updated_properties)
+      if(options.get_bool_option("trace"))
       {
-        if(properties.at(property_id).status == property_statust::FAIL)
+        message_building_error_trace(log);
+        for(const auto &property_id : result.updated_properties)
         {
-          // get correctly truncated error trace for property and store it
-          (void)traces.insert(
-            incremental_goto_checker.build_trace(property_id));
+          if(properties.at(property_id).status == property_statust::FAIL)
+          {
+            // get correctly truncated error trace for property and store it
+            (void)traces.insert(
+              incremental_goto_checker.build_trace(property_id));
+          }
         }
       }
 
@@ -64,10 +67,7 @@ public:
 
   void report() override
   {
-    if(
-      options.get_bool_option("trace") ||
-      // currently --trace only affects plain text output
-      ui_message_handler.get_ui() != ui_message_handlert::uit::PLAIN)
+    if(options.get_bool_option("trace"))
     {
       const trace_optionst trace_options(options);
       output_properties_with_traces(
