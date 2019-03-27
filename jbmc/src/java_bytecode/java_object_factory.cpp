@@ -156,11 +156,6 @@ private:
     size_t depth,
     const source_locationt &location);
 
-  void gen_method_call_if_present(
-    code_blockt &assignments,
-    const exprt &instance_expr,
-    const irep_idt &method_name);
-
   void array_primitive_init_code(
     code_blockt &assignments,
     const exprt &init_array_expr,
@@ -589,7 +584,8 @@ void java_object_factoryt::gen_nondet_pointer_init(
     {
       const irep_idt &class_name = class_type->get_name();
       const irep_idt class_clinit = clinit_wrapper_name(class_name);
-      gen_method_call_if_present(assignments, expr, class_clinit);
+      if(const auto clinit_func = symbol_table.lookup(class_clinit))
+        assignments.add(code_function_callt{clinit_func->symbol_expr()});
     }
   }
 
@@ -953,7 +949,9 @@ void java_object_factoryt::gen_nondet_struct_init(
 
   const irep_idt init_method_name =
     "java::" + id2string(struct_tag) + ".cproverNondetInitialize:()V";
-  gen_method_call_if_present(assignments, expr, init_method_name);
+  if(const auto init_func = symbol_table.lookup(init_method_name))
+    assignments.add(
+      code_function_callt{init_func->symbol_expr(), {address_of_exprt{expr}}});
 }
 
 /// Initializes a primitive-typed or reference-typed object tree rooted at
@@ -1623,25 +1621,4 @@ void gen_nondet_init(
     pointer_type_selector,
     update_in_place,
     log);
-}
-
-/// Adds a call for the given method to the end of `assignments` if the method
-/// exists in the symbol table. Does nothing if the method does not exist.
-/// \param assignments: A code block that the method call will be appended to.
-/// \param instance_expr: The instance to call the method on. This argument is
-///   ignored if the method is static.
-/// \param method_name: The name of the method to be called.
-void java_object_factoryt::gen_method_call_if_present(
-  code_blockt &assignments,
-  const exprt &instance_expr,
-  const irep_idt &method_name)
-{
-  if(const auto func = symbol_table.lookup(method_name))
-  {
-    const java_method_typet &type = to_java_method_type(func->type);
-    code_function_callt fun_call(func->symbol_expr());
-    if(type.has_this())
-      fun_call.arguments().push_back(address_of_exprt(instance_expr));
-    assignments.add(fun_call);
-  }
 }
