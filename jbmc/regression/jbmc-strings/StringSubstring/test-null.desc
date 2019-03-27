@@ -1,0 +1,10 @@
+CORE
+Test.class
+--function Test.testNull
+^EXIT=0$
+^SIGNAL=0$
+VERIFICATION SUCCESSFUL
+--
+Null pointer check: FAILURE
+--
+Builtin function exclude the cases where one of the string arguments is null
