@@ -32,8 +32,11 @@ class member_exprt;
 class boolbvt:public arrayst
 {
 public:
-  boolbvt(const namespacet &_ns, propt &_prop)
-    : arrayst(_ns, _prop),
+  boolbvt(
+    const namespacet &_ns,
+    propt &_prop,
+    message_handlert &message_handler)
+    : arrayst(_ns, _prop, message_handler),
       unbounded_array(unbounded_arrayt::U_NONE),
       boolbv_width(_ns),
       bv_utils(_prop),
@@ -156,7 +159,7 @@ protected:
   virtual bvt convert_floatbv_op(const exprt &expr);
   virtual bvt convert_floatbv_typecast(const floatbv_typecast_exprt &expr);
   virtual bvt convert_member(const member_exprt &expr);
-  virtual bvt convert_with(const exprt &expr);
+  virtual bvt convert_with(const with_exprt &expr);
   virtual bvt convert_update(const exprt &expr);
   virtual bvt convert_case(const exprt &expr);
   virtual bvt convert_cond(const cond_exprt &);

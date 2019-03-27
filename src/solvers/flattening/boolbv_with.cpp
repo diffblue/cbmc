@@ -15,23 +15,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "bv_endianness_map.h"
 
-bvt boolbvt::convert_with(const exprt &expr)
+bvt boolbvt::convert_with(const with_exprt &expr)
 {
-  if(expr.operands().size()<3)
-  {
-    error().source_location=expr.find_source_location();
-    error() << "with takes at least three operands" << eom;
-    throw 0;
-  }
-
-  if((expr.operands().size()%2)!=1)
-  {
-    error().source_location=expr.find_source_location();
-    error() << "with takes an odd number of operands" << eom;
-    throw 0;
-  }
-
-  bvt bv=convert_bv(expr.op0());
+  bvt bv = convert_bv(expr.old());
 
   std::size_t width=boolbv_width(expr.type());
 
@@ -44,12 +30,10 @@ bvt boolbvt::convert_with(const exprt &expr)
       return conversion_failed(expr);
   }
 
-  if(bv.size()!=width)
-  {
-    error().source_location=expr.find_source_location();
-    error() << "unexpected operand 0 width" << eom;
-    throw 0;
-  }
+  DATA_INVARIANT_WITH_DIAGNOSTICS(
+    bv.size() == width,
+    "unexpected operand 0 width",
+    irep_pretty_diagnosticst{expr});
 
   bvt prev_bv;
   prev_bv.resize(width);
@@ -60,12 +44,7 @@ bvt boolbvt::convert_with(const exprt &expr)
   {
     bv.swap(prev_bv);
 
-    convert_with(
-      expr.op0().type(),
-      ops[op_no],
-      ops[op_no+1],
-      prev_bv,
-      bv);
+    convert_with(expr.old().type(), ops[op_no], ops[op_no + 1], prev_bv, bv);
   }
 
   return bv;
@@ -100,9 +79,8 @@ void boolbvt::convert_with(
     return convert_with(
       ns.follow_tag(to_union_tag_type(type)), op1, op2, prev_bv, next_bv);
 
-  error().source_location=type.source_location();
-  error() << "unexpected with type: " << type.id() << eom;
-  throw 0;
+  DATA_INVARIANT_WITH_DIAGNOSTICS(
+    false, "unexpected with type", irep_pretty_diagnosticst{type});
 }
 
 void boolbvt::convert_with_array(
@@ -112,33 +90,27 @@ void boolbvt::convert_with_array(
   const bvt &prev_bv,
   bvt &next_bv)
 {
-  if(is_unbounded_array(type))
-  {
-    // can't do this
-    error().source_location=type.source_location();
-    error() << "convert_with_array called for unbounded array" << eom;
-    throw 0;
-  }
+  // can't do this
+  DATA_INVARIANT_WITH_DIAGNOSTICS(
+    !is_unbounded_array(type),
+    "convert_with_array called for unbounded array",
+    irep_pretty_diagnosticst{type});
 
   const exprt &array_size=type.size();
 
   const auto size = numeric_cast<mp_integer>(array_size);
 
-  if(!size.has_value())
-  {
-    error().source_location=type.source_location();
-    error() << "convert_with_array expects constant array size" << eom;
-    throw 0;
-  }
+  DATA_INVARIANT_WITH_DIAGNOSTICS(
+    size.has_value(),
+    "convert_with_array expects constant array size",
+    irep_pretty_diagnosticst{type});
 
   const bvt &op2_bv=convert_bv(op2);
 
-  if(*size * op2_bv.size() != prev_bv.size())
-  {
-    error().source_location=type.source_location();
-    error() << "convert_with_array: unexpected operand 2 width" << eom;
-    throw 0;
-  }
+  DATA_INVARIANT_WITH_DIAGNOSTICS(
+    *size * op2_bv.size() == prev_bv.size(),
+    "convert_with_array: unexpected operand 2 width",
+    irep_pretty_diagnosticst{type});
 
   // Is the index a constant?
   if(const auto op1_value = numeric_cast<mp_integer>(op1))
@@ -229,23 +201,17 @@ void boolbvt::convert_with_struct(
 
     if(c.get_name() == component_name)
     {
-      if(subtype != op2.type())
-      {
-        error().source_location=type.source_location();
-        error() << "with/struct: component `" << component_name
-                << "' type does not match: "
-                << subtype.pretty() << " vs. "
-                << op2.type().pretty() << eom;
-        throw 0;
-      }
+      DATA_INVARIANT_WITH_DIAGNOSTICS(
+        subtype == op2.type(),
+        "with/struct: component `" + id2string(component_name) +
+          "' type does not match",
+        irep_pretty_diagnosticst{subtype},
+        irep_pretty_diagnosticst{op2.type()});
 
-      if(sub_width!=op2_bv.size())
-      {
-        error().source_location=type.source_location();
-        error() << "convert_with_struct: unexpected operand op2 width"
-                << eom;
-        throw 0;
-      }
+      DATA_INVARIANT_WITH_DIAGNOSTICS(
+        sub_width == op2_bv.size(),
+        "convert_with_struct: unexpected operand op2 width",
+        irep_pretty_diagnosticst{type});
 
       for(std::size_t i=0; i<sub_width; i++)
         next_bv[offset+i]=op2_bv[i];
@@ -267,12 +233,10 @@ void boolbvt::convert_with_union(
 
   const bvt &op2_bv=convert_bv(op2);
 
-  if(next_bv.size()<op2_bv.size())
-  {
-    error().source_location=type.source_location();
-    error() << "convert_with_union: unexpected operand op2 width" << eom;
-    throw 0;
-  }
+  DATA_INVARIANT_WITH_DIAGNOSTICS(
+    next_bv.size() >= op2_bv.size(),
+    "convert_with_union: unexpected operand op2 width",
+    irep_pretty_diagnosticst{type});
 
   if(config.ansi_c.endianness==configt::ansi_ct::endiannesst::IS_LITTLE_ENDIAN)
   {

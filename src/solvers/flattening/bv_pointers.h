@@ -17,7 +17,10 @@ Author: Daniel Kroening, kroening@kroening.com
 class bv_pointerst:public boolbvt
 {
 public:
-  bv_pointerst(const namespacet &_ns, propt &_prop);
+  bv_pointerst(
+    const namespacet &_ns,
+    propt &_prop,
+    message_handlert &message_handler);
 
   void post_process() override;
 

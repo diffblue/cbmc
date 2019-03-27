@@ -54,10 +54,11 @@ public:
 
 /*! \brief TO_BE_DOCUMENTED
 */
-class prop_conv_solvert : public prop_convt, public messaget
+class prop_conv_solvert : public prop_convt
 {
 public:
-  explicit prop_conv_solvert(propt &_prop) : prop(_prop)
+  prop_conv_solvert(propt &_prop, message_handlert &message_handler)
+    : prop(_prop), log(message_handler)
   {
   }
 
@@ -139,6 +140,8 @@ protected:
 
   // deliberately protected now to protect lower-level API
   propt &prop;
+
+  messaget log;
 };
 
 #endif // CPROVER_SOLVERS_PROP_PROP_CONV_H

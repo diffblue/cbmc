@@ -19,6 +19,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <solvers/prop/literal_expr.h>
 #include <solvers/prop/minimize.h>
 
+counterexample_beautificationt::counterexample_beautificationt(
+  message_handlert &message_handler)
+  : log(message_handler)
+{
+}
+
 void counterexample_beautificationt::get_minimization_list(
   prop_convt &prop_conv,
   const symex_target_equationt &equation,
@@ -92,7 +98,7 @@ operator()(boolbvt &boolbv, const symex_target_equationt &equation)
   boolbv.set_to(literal_exprt(failed->cond_literal), false);
 
   {
-    boolbv.status() << "Beautifying counterexample (guards)" << messaget::eom;
+    log.status() << "Beautifying counterexample (guards)" << messaget::eom;
 
     // compute weights for guards
     typedef std::map<literalt, unsigned> guard_countt;
@@ -117,8 +123,7 @@ operator()(boolbvt &boolbv, const symex_target_equationt &equation)
     }
 
     // give to propositional minimizer
-    prop_minimizet prop_minimize(boolbv);
-    prop_minimize.set_message_handler(boolbv.get_message_handler());
+    prop_minimizet prop_minimize{boolbv, log.get_message_handler()};
 
     for(const auto &g : guard_count)
       prop_minimize.objective(g.first, g.second);
@@ -128,7 +133,7 @@ operator()(boolbvt &boolbv, const symex_target_equationt &equation)
   }
 
   {
-    boolbv.status() << "Beautifying counterexample (values)" << messaget::eom;
+    log.status() << "Beautifying counterexample (values)" << messaget::eom;
 
     // get symbols we care about
     minimization_listt minimization_list;
@@ -136,8 +141,7 @@ operator()(boolbvt &boolbv, const symex_target_equationt &equation)
     get_minimization_list(boolbv, equation, minimization_list);
 
     // minimize
-    bv_minimizet bv_minimize(boolbv);
-    bv_minimize.set_message_handler(boolbv.get_message_handler());
+    bv_minimizet bv_minimize(boolbv, log.get_message_handler());
     bv_minimize(minimization_list);
   }
 }

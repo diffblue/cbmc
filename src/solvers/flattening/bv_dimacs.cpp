@@ -25,7 +25,7 @@ bool bv_dimacst::write_dimacs()
 
   if(!out)
   {
-    error() << "failed to open " << filename << eom;
+    log.error() << "failed to open " << filename << messaget::eom;
     return false;
   }
 

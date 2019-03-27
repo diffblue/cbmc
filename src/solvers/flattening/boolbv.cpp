@@ -191,7 +191,7 @@ bvt boolbvt::convert_bitvector(const exprt &expr)
   else if(expr.id()==ID_member)
     return convert_member(to_member_expr(expr));
   else if(expr.id()==ID_with)
-    return convert_with(expr);
+    return convert_with(to_with_expr(expr));
   else if(expr.id()==ID_update)
     return convert_update(expr);
   else if(expr.id()==ID_width)

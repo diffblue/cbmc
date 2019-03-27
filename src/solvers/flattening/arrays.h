@@ -29,7 +29,10 @@ class update_exprt;
 class arrayst:public equalityt
 {
 public:
-  arrayst(const namespacet &_ns, propt &_prop);
+  arrayst(
+    const namespacet &_ns,
+    propt &_prop,
+    message_handlert &message_handler);
 
   void post_process() override
   {

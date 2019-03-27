@@ -15,6 +15,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "literal_expr.h"
 
+prop_minimizet::prop_minimizet(
+  prop_convt &_prop_conv,
+  message_handlert &message_handler)
+  : prop_conv(_prop_conv), log(message_handler)
+{
+}
+
 /// Add an objective
 void prop_minimizet::objective(
   const literalt condition,
@@ -106,7 +113,7 @@ void prop_minimizet::operator()()
       current!=objectives.rend();
       current++)
   {
-    status() << "weight " << current->first << eom;
+    log.status() << "weight " << current->first << messaget::eom;
 
     decision_proceduret::resultt dec_result;
     do
@@ -137,7 +144,7 @@ void prop_minimizet::operator()()
           break;
 
         default:
-          error() << "decision procedure failed" << eom;
+          log.error() << "decision procedure failed" << messaget::eom;
           last_was_SAT=false;
           return;
         }

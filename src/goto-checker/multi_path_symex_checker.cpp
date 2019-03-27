@@ -104,7 +104,8 @@ goto_tracet multi_path_symex_checkert::build_shortest_trace() const
 {
   if(options.get_bool_option("beautify"))
   {
-    counterexample_beautificationt()(
+    // NOLINTNEXTLINE(whitespace/braces)
+    counterexample_beautificationt{ui_message_handler}(
       dynamic_cast<boolbvt &>(property_decider.get_solver()), equation);
   }
 

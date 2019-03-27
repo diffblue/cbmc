@@ -204,21 +204,23 @@ void bv_refinementt::check_SAT(approximationt &a)
     if(result.pack()==a.result_value) // ok
       return;
 
-    #ifdef DEBUG
+#ifdef DEBUG
     ieee_floatt rr(spec);
     rr.unpack(a.result_value);
 
-    debug() << "S1: " << o0 << " " << a.expr.id() << " " << o1
-              << " != " << rr << eom;
-    debug() << "S2: " << integer2binary(a.op0_value, spec.width())
-                        << " " << a.expr.id() << " " <<
-                           integer2binary(a.op1_value, spec.width())
-              << "!=" << integer2binary(a.result_value, spec.width()) << eom;
-    debug() << "S3: " << integer2binary(a.op0_value, spec.width())
-                        << " " << a.expr.id() << " " <<
-                           integer2binary(a.op1_value, spec.width())
-              << "==" << integer2binary(result.pack(), spec.width()) << eom;
-    #endif
+    log.debug() << "S1: " << o0 << " " << a.expr.id() << " " << o1
+                << " != " << rr << messaget::eom;
+    log.debug() << "S2: " << integer2binary(a.op0_value, spec.width()) << " "
+                << a.expr.id() << " "
+                << integer2binary(a.op1_value, spec.width())
+                << "!=" << integer2binary(a.result_value, spec.width())
+                << messaget::eom;
+    log.debug() << "S3: " << integer2binary(a.op0_value, spec.width()) << " "
+                << a.expr.id() << " "
+                << integer2binary(a.op1_value, spec.width())
+                << "==" << integer2binary(result.pack(), spec.width())
+                << messaget::eom;
+#endif
 
     if(a.over_state<config_.max_node_refinement)
     {
@@ -351,8 +353,8 @@ void bv_refinementt::check_SAT(approximationt &a)
     UNREACHABLE;
   }
 
-  status() << "Found spurious `" << a.as_string()
-           << "' (state " << a.over_state << ")" << eom;
+  log.status() << "Found spurious `" << a.as_string() << "' (state "
+               << a.over_state << ")" << messaget::eom;
 
   progress=true;
   if(a.over_state<MAX_STATE)
@@ -367,8 +369,8 @@ void bv_refinementt::check_UNSAT(approximationt &a)
   if(!this->conflicts_with(a))
     return;
 
-  status() << "Found assumption for `" << a.as_string()
-           << "' in proof (state " << a.under_state << ")" << eom;
+  log.status() << "Found assumption for `" << a.as_string()
+               << "' in proof (state " << a.under_state << ")" << messaget::eom;
 
   PRECONDITION(!a.under_assumptions.empty());
 
