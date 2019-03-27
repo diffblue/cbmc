@@ -69,10 +69,10 @@ public:
   objectivest objectives;
 
 protected:
-  unsigned _iterations;
-  std::size_t _number_satisfied;
-  std::size_t _number_objectives;
-  weightt _value;
+  unsigned _iterations = 0;
+  std::size_t _number_satisfied = 0;
+  std::size_t _number_objectives = 0;
+  weightt _value = 0;
   prop_convt &prop_conv;
   messaget log;
 

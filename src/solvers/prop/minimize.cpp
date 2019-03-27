@@ -18,12 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 prop_minimizet::prop_minimizet(
   prop_convt &_prop_conv,
   message_handlert &message_handler)
-  : _iterations(0),
-    _number_satisfied(0),
-    _number_objectives(0),
-    _value(0),
-    prop_conv(_prop_conv),
-    log(message_handler)
+  : prop_conv(_prop_conv), log(message_handler)
 {
 }
 
