@@ -149,6 +149,7 @@ SRC = $(BOOLEFORCE_SRC) \
       prop/minimize.cpp \
       prop/prop.cpp \
       prop/prop_conv.cpp \
+      prop/prop_conv_solver.cpp \
       qbf/qbf_quantor.cpp \
       qbf/qbf_qube.cpp \
       qbf/qbf_qube_core.cpp \

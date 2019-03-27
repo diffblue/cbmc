@@ -14,7 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/expr.h>
 
-#include <solvers/prop/prop_conv.h>
+#include <solvers/prop/prop_conv_solver.h>
 
 class equalityt:public prop_conv_solvert
 {
