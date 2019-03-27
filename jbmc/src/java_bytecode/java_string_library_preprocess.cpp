@@ -293,8 +293,9 @@ java_string_library_preprocesst::convert_exprt_to_string_exprt(
 }
 
 /// for each expression that is of a type implementing strings, we declare a new
-/// `cprover_string` whose contents is deduced from the expression and replace
-/// the expression by this cprover_string in the output list; in the other case
+/// `cprover_string` whose contents is deduced from the expression, replace
+/// the expression by this cprover_string in the output list, and add an
+/// assumption that the object is not null; in the other case
 /// the expression is kept as is for the output list. Also does the same thing
 /// for char array references.
 /// \param operands: a list of expressions
@@ -315,8 +316,12 @@ exprt::operandst java_string_library_preprocesst::process_operands(
   for(const auto &p : operands)
   {
     if(implements_java_char_sequence_pointer(p.type()))
+    {
+      init_code.add(code_assumet(
+        notequal_exprt(p, null_pointer_exprt(to_pointer_type(p.type())))));
       ops.push_back(convert_exprt_to_string_exprt(
         p, loc, symbol_table, function_id, init_code));
+    }
     else if(is_java_char_array_pointer_type(p.type()))
       ops.push_back(
         replace_char_array(p, loc, function_id, symbol_table, init_code));
