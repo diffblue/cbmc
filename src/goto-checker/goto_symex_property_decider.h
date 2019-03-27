@@ -49,7 +49,7 @@ public:
   decision_proceduret::resultt solve();
 
   /// Returns the solver instance
-  prop_convt &get_solver() const;
+  decision_procedure_incrementalt &get_solver() const;
 
   /// Return the equation associated with this instance
   symex_target_equationt &get_equation() const;
@@ -72,6 +72,7 @@ protected:
   ui_message_handlert &ui_message_handler;
   symex_target_equationt &equation;
   std::unique_ptr<solver_factoryt::solvert> solver;
+  decision_procedure_incrementalt *decision_procedure = nullptr;
 
   struct goalt
   {

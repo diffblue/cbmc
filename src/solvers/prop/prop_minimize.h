@@ -16,14 +16,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/message.h>
 
-#include "prop_conv.h"
+#include "decision_procedure_incremental.h"
 
 /// Computes a satisfying assignment of minimal cost according to a const
 /// function using incremental SAT
 class prop_minimizet
 {
 public:
-  prop_minimizet(prop_convt &_prop_conv, message_handlert &message_handler);
+  prop_minimizet(decision_procedure_incrementalt &, message_handlert &);
 
   void operator()();
 
@@ -71,7 +71,7 @@ protected:
   std::size_t _number_satisfied = 0;
   std::size_t _number_objectives = 0;
   weightt _value = 0;
-  prop_convt &prop_conv;
+  decision_procedure_incrementalt &decision_procedure;
   messaget log;
 
   literalt constraint();

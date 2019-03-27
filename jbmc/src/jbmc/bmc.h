@@ -30,7 +30,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/safety_checker.h>
 #include <goto-symex/memory_model.h>
 
-#include <solvers/prop/decision_procedure.h>
+#include <solvers/prop/decision_procedure_incremental.h>
 
 class cbmc_solverst;
 
@@ -68,7 +68,7 @@ public:
     const optionst &_options,
     const symbol_tablet &outer_symbol_table,
     ui_message_handlert &_message_handler,
-    prop_convt &_prop_conv,
+    decision_procedure_incrementalt &_decision_procedure,
     path_storaget &_path_storage,
     std::function<bool(void)> callback_after_symex,
     guard_managert &guard_manager)
@@ -86,7 +86,7 @@ public:
         options,
         path_storage,
         guard_manager),
-      prop_conv(_prop_conv),
+      decision_procedure(_decision_procedure),
       ui_message_handler(_message_handler),
       driver_callback_after_symex(callback_after_symex)
   {
@@ -141,7 +141,7 @@ protected:
     const optionst &_options,
     const symbol_tablet &outer_symbol_table,
     ui_message_handlert &_message_handler,
-    prop_convt &_prop_conv,
+    decision_procedure_incrementalt &_decision_procedure,
     symex_target_equationt &_equation,
     path_storaget &_path_storage,
     std::function<bool(void)> callback_after_symex,
@@ -160,7 +160,7 @@ protected:
         options,
         path_storage,
         guard_manager),
-      prop_conv(_prop_conv),
+      decision_procedure(_decision_procedure),
       ui_message_handler(_message_handler),
       driver_callback_after_symex(callback_after_symex)
   {
@@ -180,7 +180,7 @@ protected:
   guard_managert &guard_manager;
   path_storaget &path_storage;
   symex_bmct symex;
-  prop_convt &prop_conv;
+  decision_procedure_incrementalt &decision_procedure;
   std::unique_ptr<memory_model_baset> memory_model;
   // use gui format
   ui_message_handlert &ui_message_handler;
@@ -235,7 +235,7 @@ public:
     const optionst &_options,
     const symbol_tablet &outer_symbol_table,
     ui_message_handlert &_message_handler,
-    prop_convt &_prop_conv,
+    decision_procedure_incrementalt &_decision_procedure,
     symex_target_equationt &saved_equation,
     const goto_symex_statet &saved_state,
     path_storaget &path_storage,
@@ -245,7 +245,7 @@ public:
         _options,
         outer_symbol_table,
         _message_handler,
-        _prop_conv,
+        _decision_procedure,
         saved_equation,
         path_storage,
         callback_after_symex,

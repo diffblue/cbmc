@@ -145,10 +145,10 @@ SRC = $(BOOLEFORCE_SRC) \
       prop/bdd_expr.cpp \
       prop/cover_goals.cpp \
       prop/decision_procedure.cpp \
+      prop/decision_procedure_incremental.cpp \
       prop/literal.cpp \
       prop/prop_minimize.cpp \
       prop/prop.cpp \
-      prop/prop_conv.cpp \
       prop/prop_conv_solver.cpp \
       qbf/qbf_quantor.cpp \
       qbf/qbf_qube.cpp \

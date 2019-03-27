@@ -66,7 +66,7 @@ void functionst::add_function_constraints(const function_infot &info)
       implies_exprt implication(arguments_equal_expr,
                                 equal_exprt(*it1, *it2));
 
-      prop_conv.set_to_true(implication);
+      decision_procedure.set_to_true(implication);
     }
   }
 }

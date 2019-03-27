@@ -23,7 +23,9 @@ goto_symex_property_decidert::goto_symex_property_decidert(
     ns,
     ui_message_handler,
     ui_message_handler.get_ui() == ui_message_handlert::uit::XML_UI);
+
   solver = solvers.get_solver();
+  decision_procedure = &solver->decision_procedure_incremental();
 }
 
 exprt goto_symex_property_decidert::goalt::as_expr() const
@@ -69,7 +71,7 @@ void goto_symex_property_decidert::convert_goals()
     // Our goal is to falsify a property, i.e., we will
     // add the negation of the property as goal.
     goal_pair.second.condition =
-      !solver->prop_conv().convert(goal_pair.second.as_expr());
+      !decision_procedure->convert(goal_pair.second.as_expr());
   }
 }
 
@@ -78,7 +80,7 @@ void goto_symex_property_decidert::freeze_goal_variables()
   for(const auto &goal_pair : goal_map)
   {
     if(!goal_pair.second.condition.is_constant())
-      solver->prop_conv().set_frozen(goal_pair.second.condition);
+      decision_procedure->set_frozen(goal_pair.second.condition);
   }
 }
 
@@ -98,17 +100,18 @@ void goto_symex_property_decidert::add_constraint_from_goals(
   }
 
   // this is 'false' if there are no disjuncts
-  solver->prop_conv().set_to_true(disjunction(disjuncts));
+  decision_procedure->set_to_true(disjunction(disjuncts));
 }
 
 decision_proceduret::resultt goto_symex_property_decidert::solve()
 {
-  return solver->prop_conv()();
+  return (*decision_procedure)();
 }
 
-prop_convt &goto_symex_property_decidert::get_solver() const
+decision_procedure_incrementalt &
+goto_symex_property_decidert::get_solver() const
 {
-  return solver->prop_conv();
+  return *decision_procedure;
 }
 
 symex_target_equationt &goto_symex_property_decidert::get_equation() const
@@ -129,7 +132,7 @@ void goto_symex_property_decidert::update_properties_status_from_goals(
     {
       auto &status = properties.at(goal_pair.first).status;
       if(
-        solver->prop_conv().l_get(goal_pair.second.condition).is_true() &&
+        decision_procedure->l_get(goal_pair.second.condition).is_true() &&
         status != property_statust::FAIL)
       {
         status |= property_statust::FAIL;

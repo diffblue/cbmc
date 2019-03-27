@@ -6,27 +6,27 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include "prop_conv.h"
+#include "decision_procedure_incremental.h"
 #include <algorithm>
 
 /// determine whether a variable is in the final conflict
-bool prop_convt::is_in_conflict(literalt) const
+bool decision_procedure_incrementalt::is_in_conflict(literalt) const
 {
   UNREACHABLE;
   return false;
 }
 
-void prop_convt::set_assumptions(const bvt &)
+void decision_procedure_incrementalt::set_assumptions(const bvt &)
 {
   UNREACHABLE;
 }
 
-void prop_convt::set_frozen(const literalt)
+void decision_procedure_incrementalt::set_frozen(const literalt)
 {
   UNREACHABLE;
 }
 
-void prop_convt::set_frozen(const bvt &bv)
+void decision_procedure_incrementalt::set_frozen(const bvt &bv)
 {
   for(const auto &bit : bv)
     if(!bit.is_constant())

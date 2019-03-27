@@ -22,7 +22,7 @@ class bmc_all_propertiest : public cover_goalst::observert, public messaget
 public:
   bmc_all_propertiest(
     const goto_functionst &_goto_functions,
-    prop_convt &_solver,
+    decision_procedure_incrementalt &_solver,
     bmct &_bmc)
     : goto_functions(_goto_functions), solver(_solver), bmc(_bmc)
   {
@@ -96,7 +96,7 @@ public:
 
 protected:
   const goto_functionst &goto_functions;
-  prop_convt &solver;
+  decision_procedure_incrementalt &solver;
   bmct &bmc;
 
   virtual void report(const cover_goalst &cover_goals);

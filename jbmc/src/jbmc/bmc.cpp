@@ -42,19 +42,20 @@ void bmct::freeze_program_variables()
 
 decision_proceduret::resultt bmct::run_decision_procedure()
 {
-  status() << "Passing problem to " << prop_conv.decision_procedure_text()
-           << eom;
+  status() << "Passing problem to "
+           << decision_procedure.decision_procedure_text() << eom;
 
   auto solver_start = std::chrono::steady_clock::now();
 
-  convert_symex_target_equation(equation, prop_conv, get_message_handler());
+  convert_symex_target_equation(
+    equation, decision_procedure, get_message_handler());
 
   // hook for cegis to freeze synthesis program vars
   freeze_program_variables();
 
-  status() << "Running " << prop_conv.decision_procedure_text() << eom;
+  status() << "Running " << decision_procedure.decision_procedure_text() << eom;
 
-  decision_proceduret::resultt dec_result = prop_conv();
+  decision_proceduret::resultt dec_result = decision_procedure();
 
   {
     auto solver_stop = std::chrono::steady_clock::now();
@@ -207,11 +208,11 @@ safety_checkert::resultt bmct::stop_on_fail()
       {
         // NOLINTNEXTLINE(whitespace/braces)
         counterexample_beautificationt{ui_message_handler}(
-          dynamic_cast<boolbvt &>(prop_conv), equation);
+          dynamic_cast<boolbvt &>(decision_procedure), equation);
       }
 
       build_error_trace(
-        error_trace, ns, equation, prop_conv, ui_message_handler);
+        error_trace, ns, equation, decision_procedure, ui_message_handler);
       output_error_trace(error_trace, ns, trace_options(), ui_message_handler);
       output_graphml(error_trace, ns, options);
     }
@@ -265,12 +266,11 @@ int bmct::do_language_agnostic_bmc(
     {
       std::unique_ptr<solver_factoryt::solvert> cbmc_solver =
         solvers.get_solver();
-      prop_convt &pc = cbmc_solver->prop_conv();
       bmct bmc(
         opts,
         symbol_table,
         ui,
-        pc,
+        cbmc_solver->decision_procedure_incremental(),
         *worklist,
         callback_after_symex,
         guard_manager);
@@ -314,13 +314,12 @@ int bmct::do_language_agnostic_bmc(
     {
       std::unique_ptr<solver_factoryt::solvert> cbmc_solver =
         solvers.get_solver();
-      prop_convt &pc = cbmc_solver->prop_conv();
       path_storaget::patht &resume = worklist->peek();
       path_explorert pe(
         opts,
         symbol_table,
         ui,
-        pc,
+        cbmc_solver->decision_procedure_incremental(),
         resume.equation,
         resume.state,
         *worklist,

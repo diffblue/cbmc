@@ -20,9 +20,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/irep_hash_container.h>
 #endif
 
-#include <solvers/prop/prop_conv.h>
 #include <solvers/flattening/boolbv_width.h>
 #include <solvers/flattening/pointer_logic.h>
+#include <solvers/prop/decision_procedure_incremental.h>
 
 #include "letify.h"
 
@@ -31,7 +31,7 @@ class constant_exprt;
 class index_exprt;
 class member_exprt;
 
-class smt2_convt:public prop_convt
+class smt2_convt : public decision_procedure_incrementalt
 {
 public:
   enum class solvert

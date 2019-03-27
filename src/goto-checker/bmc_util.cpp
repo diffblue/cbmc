@@ -25,7 +25,7 @@ Author: Daniel Kroening, Peter Schrammel
 
 #include <linking/static_lifetime_init.h>
 
-#include <solvers/prop/prop_conv.h>
+#include <solvers/prop/decision_procedure.h>
 
 #include <util/make_unique.h>
 #include <util/ui_message.h>
@@ -42,13 +42,13 @@ void build_error_trace(
   goto_tracet &goto_trace,
   const namespacet &ns,
   const symex_target_equationt &symex_target_equation,
-  const prop_convt &prop_conv,
+  const decision_proceduret &decision_procedure,
   ui_message_handlert &ui_message_handler)
 {
   messaget log(ui_message_handler);
   message_building_error_trace(log);
 
-  build_goto_trace(symex_target_equation, prop_conv, ns, goto_trace);
+  build_goto_trace(symex_target_equation, decision_procedure, ns, goto_trace);
 }
 
 ssa_step_predicatet
@@ -56,9 +56,9 @@ ssa_step_matches_failing_property(const irep_idt &property_id)
 {
   return [property_id](
            symex_target_equationt::SSA_stepst::const_iterator step,
-           const prop_convt &prop_conv) {
+           const decision_proceduret &decision_procedure) {
     return step->is_assert() && step->get_property_id() == property_id &&
-           prop_conv.l_get(step->cond_literal).is_false();
+           decision_procedure.l_get(step->cond_literal).is_false();
   };
 }
 
@@ -105,14 +105,14 @@ void output_error_trace(
 
 void freeze_guards(
   const symex_target_equationt &equation,
-  prop_convt &prop_conv)
+  decision_procedure_incrementalt &decision_procedure)
 {
   for(const auto &step : equation.SSA_steps)
   {
     if(!step.guard_literal.is_constant())
-      prop_conv.set_frozen(step.guard_literal);
+      decision_procedure.set_frozen(step.guard_literal);
     if(step.is_assert() && !step.cond_literal.is_constant())
-      prop_conv.set_frozen(step.cond_literal);
+      decision_procedure.set_frozen(step.cond_literal);
   }
 }
 
@@ -162,14 +162,14 @@ void output_graphml(
 
 void convert_symex_target_equation(
   symex_target_equationt &equation,
-  prop_convt &prop_conv,
+  decision_proceduret &decision_procedure,
   message_handlert &message_handler)
 {
   messaget msg(message_handler);
   msg.status() << "converting SSA" << messaget::eom;
 
   // convert SSA
-  equation.convert(prop_conv);
+  equation.convert(decision_procedure);
 }
 
 std::unique_ptr<memory_model_baset>

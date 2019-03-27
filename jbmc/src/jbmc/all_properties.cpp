@@ -20,7 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/json.h>
 #include <util/xml.h>
 
-#include <solvers/prop/prop_conv.h>
+#include <solvers/prop/decision_procedure.h>
 #include <solvers/sat/satcheck.h>
 
 #include <goto-programs/json_goto_trace.h>
@@ -61,7 +61,7 @@ safety_checkert::resultt bmc_all_propertiest::operator()()
   auto solver_start = std::chrono::steady_clock::now();
 
   convert_symex_target_equation(
-    bmc.equation, bmc.prop_conv, get_message_handler());
+    bmc.equation, bmc.decision_procedure, get_message_handler());
   bmc.freeze_program_variables();
 
   // Collect _all_ goals in `goal_map'.
@@ -301,7 +301,8 @@ void bmc_all_propertiest::report(const cover_goalst &cover_goals)
 safety_checkert::resultt
 bmct::all_properties(const goto_functionst &goto_functions)
 {
-  bmc_all_propertiest bmc_all_properties(goto_functions, prop_conv, *this);
+  bmc_all_propertiest bmc_all_properties(
+    goto_functions, decision_procedure, *this);
   bmc_all_properties.set_message_handler(get_message_handler());
   return bmc_all_properties();
 }

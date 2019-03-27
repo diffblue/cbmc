@@ -13,8 +13,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/message.h>
 
+#include "decision_procedure_incremental.h"
 #include "literal_expr.h"
-#include "prop_conv.h"
 
 cover_goalst::~cover_goalst()
 {
@@ -28,8 +28,9 @@ void cover_goalst::mark()
     o->satisfying_assignment();
 
   for(auto &g : goals)
-    if(g.status==goalt::statust::UNKNOWN &&
-       prop_conv.l_get(g.condition).is_true())
+    if(
+      g.status == goalt::statust::UNKNOWN &&
+      decision_procedure.l_get(g.condition).is_true())
     {
       g.status=goalt::statust::COVERED;
       _number_covered++;
@@ -56,7 +57,7 @@ void cover_goalst::constraint()
       disjuncts.push_back(literal_exprt(g_it->condition));
 
   // this is 'false' if there are no disjuncts
-  prop_conv.set_to_true(disjunction(disjuncts));
+  decision_procedure.set_to_true(disjunction(disjuncts));
 }
 
 /// Build clause
@@ -67,7 +68,7 @@ void cover_goalst::freeze_goal_variables()
       g_it!=goals.end();
       g_it++)
     if(!g_it->condition.is_constant())
-      prop_conv.set_frozen(g_it->condition);
+      decision_procedure.set_frozen(g_it->condition);
 }
 
 /// Try to cover all goals
@@ -88,7 +89,7 @@ operator()(message_handlert &message_handler)
     _iterations++;
 
     constraint();
-    dec_result = prop_conv();
+    dec_result = decision_procedure();
 
     switch(dec_result)
     {

@@ -18,6 +18,8 @@ Author: Peter Schrammel
 
 #include <goto-symex/symex_target_equation.h>
 
+#include <solvers/prop/decision_procedure_incremental.h>
+
 #include "fault_localization_provider.h"
 
 class goto_symex_fault_localizert
@@ -27,7 +29,7 @@ public:
     const optionst &options,
     ui_message_handlert &ui_message_handler,
     const symex_target_equationt &equation,
-    prop_convt &solver);
+    decision_procedure_incrementalt &solver);
 
   fault_location_infot operator()(const irep_idt &failed_property_id);
 
@@ -35,7 +37,7 @@ protected:
   const optionst &options;
   ui_message_handlert &ui_message_handler;
   const symex_target_equationt &equation;
-  prop_convt &solver;
+  decision_procedure_incrementalt &solver;
 
   /// A localization point is a goto instruction that is potentially at fault
   typedef std::map<literalt, fault_location_infot::score_mapt::iterator>

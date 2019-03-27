@@ -28,7 +28,8 @@ class memory_model_baset;
 class message_handlert;
 class namespacet;
 class optionst;
-class prop_convt;
+class decision_proceduret;
+class decision_procedure_incrementalt;
 class symex_bmct;
 class symex_target_equationt;
 struct trace_optionst;
@@ -36,7 +37,7 @@ class ui_message_handlert;
 
 void convert_symex_target_equation(
   symex_target_equationt &,
-  prop_convt &,
+  decision_proceduret &,
   message_handlert &);
 
 /// Returns a function that checks whether an SSA step is an assertion
@@ -51,7 +52,7 @@ void build_error_trace(
   goto_tracet &,
   const namespacet &,
   const symex_target_equationt &,
-  const prop_convt &,
+  const decision_proceduret &,
   ui_message_handlert &);
 
 void output_error_trace(
@@ -60,7 +61,9 @@ void output_error_trace(
   const trace_optionst &,
   ui_message_handlert &);
 
-void freeze_guards(const symex_target_equationt &, prop_convt &);
+void freeze_guards(
+  const symex_target_equationt &,
+  decision_procedure_incrementalt &);
 
 void output_graphml(const goto_tracet &, const namespacet &, const optionst &);
 void output_graphml(

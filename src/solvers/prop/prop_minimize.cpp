@@ -16,9 +16,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "literal_expr.h"
 
 prop_minimizet::prop_minimizet(
-  prop_convt &_prop_conv,
+  decision_procedure_incrementalt &_decision_procedure,
   message_handlert &message_handler)
-  : prop_conv(_prop_conv), log(message_handler)
+  : decision_procedure(_decision_procedure), log(message_handler)
 {
 }
 
@@ -47,11 +47,12 @@ void prop_minimizet::fix_objectives()
       o_it != entry.end();
       ++o_it)
   {
-    if(!o_it->fixed && prop_conv.l_get(o_it->condition).is_false())
+    if(!o_it->fixed && decision_procedure.l_get(o_it->condition).is_false())
     {
       _number_satisfied++;
       _value += current->first;
-      prop_conv.set_to(literal_exprt(o_it->condition), false); // fix it
+      decision_procedure.set_to(
+        literal_exprt(o_it->condition), false); // fix it
       o_it->fixed = true;
       found = true;
     }
@@ -88,7 +89,7 @@ literalt prop_minimizet::constraint()
     forall_literals(it, or_clause)
       disjuncts.push_back(literal_exprt(*it));
 
-    return prop_conv.convert(disjunction(disjuncts));
+    return decision_procedure.convert(disjunction(disjuncts));
   }
 }
 
@@ -96,7 +97,7 @@ literalt prop_minimizet::constraint()
 void prop_minimizet::operator()()
 {
   // we need to use assumptions
-  PRECONDITION(prop_conv.has_set_assumptions());
+  PRECONDITION(decision_procedure.has_set_assumptions());
 
   _iterations = 0;
   _number_satisfied = 0;
@@ -122,8 +123,8 @@ void prop_minimizet::operator()()
 
         bvt assumptions;
         assumptions.push_back(c);
-        prop_conv.set_assumptions(assumptions);
-        dec_result = prop_conv();
+        decision_procedure.set_assumptions(assumptions);
+        dec_result = decision_procedure();
 
         switch(dec_result)
         {
@@ -151,7 +152,7 @@ void prop_minimizet::operator()()
     // Run solver again to get one.
 
     bvt assumptions; // no assumptions
-    prop_conv.set_assumptions(assumptions);
-    (void)prop_conv();
+    decision_procedure.set_assumptions(assumptions);
+    (void)decision_procedure();
   }
 }

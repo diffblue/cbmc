@@ -16,14 +16,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/message.h>
 #include <util/std_expr.h>
 
-#include "decision_procedure.h"
+#include "decision_procedure_incremental.h"
 #include "literal.h"
 #include "literal_expr.h"
 #include "prop.h"
-#include "prop_conv.h"
 #include "solver_resource_limits.h"
 
-class prop_conv_solvert : public prop_convt, public solver_resource_limitst
+class prop_conv_solvert : public decision_procedure_incrementalt,
+                          public solver_resource_limitst
 {
 public:
   prop_conv_solvert(propt &_prop, message_handlert &message_handler)
@@ -43,8 +43,8 @@ public:
   }
   exprt get(const exprt &expr) const override;
 
-  // overloading from prop_convt
-  using prop_convt::set_frozen;
+  // overloading from decision_proceduret
+  using decision_procedure_incrementalt::set_frozen;
   tvt l_get(literalt a) const override
   {
     return prop.l_get(a);

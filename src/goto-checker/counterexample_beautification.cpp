@@ -26,7 +26,7 @@ counterexample_beautificationt::counterexample_beautificationt(
 }
 
 void counterexample_beautificationt::get_minimization_list(
-  prop_convt &prop_conv,
+  decision_proceduret &decision_procedure,
   const symex_target_equationt &equation,
   minimization_listt &minimization_list)
 {
@@ -41,7 +41,7 @@ void counterexample_beautificationt::get_minimization_list(
       it->is_assignment() &&
       it->assignment_type == symex_targett::assignment_typet::STATE)
     {
-      if(!prop_conv.l_get(it->guard_literal).is_false())
+      if(!decision_procedure.l_get(it->guard_literal).is_false())
       {
         const typet &type = it->ssa_lhs.type();
 
@@ -69,7 +69,7 @@ void counterexample_beautificationt::get_minimization_list(
 
 symex_target_equationt::SSA_stepst::const_iterator
 counterexample_beautificationt::get_failed_property(
-  const prop_convt &prop_conv,
+  const decision_proceduret &decision_procedure,
   const symex_target_equationt &equation)
 {
   // find failed property
@@ -79,8 +79,9 @@ counterexample_beautificationt::get_failed_property(
       it != equation.SSA_steps.end();
       it++)
     if(
-      it->is_assert() && prop_conv.l_get(it->guard_literal).is_true() &&
-      prop_conv.l_get(it->cond_literal).is_false())
+      it->is_assert() &&
+      decision_procedure.l_get(it->guard_literal).is_true() &&
+      decision_procedure.l_get(it->cond_literal).is_false())
       return it;
 
   UNREACHABLE;
