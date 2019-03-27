@@ -210,21 +210,13 @@ static void clinit_wrapper_do_recursive_calls(
   {
     const auto base_name = base.type().get_identifier();
     irep_idt base_init_routine = clinit_wrapper_name(base_name);
-    auto findit = symbol_table.symbols.find(base_init_routine);
-    if(findit == symbol_table.symbols.end())
-      continue;
-
-    const code_function_callt call_base(findit->second.symbol_expr());
-    init_body.add(call_base);
+    if(const auto base_init_func = symbol_table.lookup(base_init_routine))
+      init_body.add(code_function_callt{base_init_func->symbol_expr()});
   }
 
   const irep_idt &real_clinit_name = clinit_function_name(class_name);
-  auto find_sym_it = symbol_table.symbols.find(real_clinit_name);
-  if(find_sym_it != symbol_table.symbols.end())
-  {
-    const code_function_callt call_real_init(find_sym_it->second.symbol_expr());
-    init_body.add(call_real_init);
-  }
+  if(const auto clinit_func = symbol_table.lookup(real_clinit_name))
+    init_body.add(code_function_callt{clinit_func->symbol_expr()});
 
   // If nondet-static option is given, add a standard nondet initialization for
   // each non-final static field of this class. Note this is the same invocation
