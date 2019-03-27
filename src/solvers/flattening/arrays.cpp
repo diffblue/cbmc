@@ -48,14 +48,10 @@ literalt arrayst::record_array_equality(
   const exprt &op0=equality.op0();
   const exprt &op1=equality.op1();
 
-  // check types
-  if(op0.type() != op1.type())
-  {
-    log.error() << equality.pretty() << messaget::eom;
-    DATA_INVARIANT(
-      false,
-      "record_array_equality got equality without matching types");
-  }
+  DATA_INVARIANT_WITH_DIAGNOSTICS(
+    op0.type() == op1.type(),
+    "record_array_equality got equality without matching types",
+    irep_pretty_diagnosticst{equality});
 
   DATA_INVARIANT(
     op0.type().id() == ID_array,
@@ -116,12 +112,10 @@ void arrayst::collect_arrays(const exprt &a)
   {
     const with_exprt &with_expr=to_with_expr(a);
 
-    // check types
-    if(array_type != with_expr.old().type())
-    {
-      log.error() << a.pretty() << messaget::eom;
-      DATA_INVARIANT(false, "collect_arrays got 'with' without matching types");
-    }
+    DATA_INVARIANT_WITH_DIAGNOSTICS(
+      array_type == with_expr.old().type(),
+      "collect_arrays got 'with' without matching types",
+      irep_pretty_diagnosticst{a});
 
     arrays.make_union(a, with_expr.old());
     collect_arrays(with_expr.old());
@@ -137,14 +131,10 @@ void arrayst::collect_arrays(const exprt &a)
   {
     const update_exprt &update_expr=to_update_expr(a);
 
-    // check types
-    if(array_type != update_expr.old().type())
-    {
-      log.error() << a.pretty() << messaget::eom;
-      DATA_INVARIANT(
-        false,
-        "collect_arrays got 'update' without matching types");
-    }
+    DATA_INVARIANT_WITH_DIAGNOSTICS(
+      array_type == update_expr.old().type(),
+      "collect_arrays got 'update' without matching types",
+      irep_pretty_diagnosticst{a});
 
     arrays.make_union(a, update_expr.old());
     collect_arrays(update_expr.old());
@@ -159,19 +149,15 @@ void arrayst::collect_arrays(const exprt &a)
   {
     const if_exprt &if_expr=to_if_expr(a);
 
-    // check types
-    if(array_type != if_expr.true_case().type())
-    {
-      log.error() << a.pretty() << messaget::eom;
-      DATA_INVARIANT(false, "collect_arrays got if without matching types");
-    }
+    DATA_INVARIANT_WITH_DIAGNOSTICS(
+      array_type == if_expr.true_case().type(),
+      "collect_arrays got if without matching types",
+      irep_pretty_diagnosticst{a});
 
-    // check types
-    if(array_type != if_expr.false_case().type())
-    {
-      log.error() << a.pretty() << messaget::eom;
-      DATA_INVARIANT(false, "collect_arrays got if without matching types");
-    }
+    DATA_INVARIANT_WITH_DIAGNOSTICS(
+      array_type == if_expr.false_case().type(),
+      "collect_arrays got if without matching types",
+      irep_pretty_diagnosticst{a});
 
     arrays.make_union(a, if_expr.true_case());
     arrays.make_union(a, if_expr.false_case());
@@ -521,13 +507,10 @@ void arrayst::add_array_constraints_with(
 
     index_exprt index_expr(expr, index, expr.type().subtype());
 
-    if(index_expr.type()!=value.type())
-    {
-      log.error() << expr.pretty() << messaget::eom;
-      DATA_INVARIANT(
-        false,
-        "with-expression operand should match array element type");
-    }
+    DATA_INVARIANT_WITH_DIAGNOSTICS(
+      index_expr.type() == value.type(),
+      "with-expression operand should match array element type",
+      irep_pretty_diagnosticst{expr});
 
     lazy_constraintt lazy(
       lazy_typet::ARRAY_WITH, equal_exprt(index_expr, value));
@@ -597,13 +580,10 @@ void arrayst::add_array_constraints_update(
   {
     index_exprt index_expr(expr, index, expr.type().subtype());
 
-    if(index_expr.type()!=value.type())
-    {
-      prop.message.log.error() << expr.pretty() << messaget::eom;
-      DATA_INVARIANT(
-        false,
-        "update operand should match array element type");
-    }
+    DATA_INVARIANT_WITH_DIAGNOSTICS(
+      index_expr.type()==value.type(),
+      "update operand should match array element type",
+      irep_pretty_diagnosticst{expr});
 
     set_to_true(equal_exprt(index_expr, value));
   }
