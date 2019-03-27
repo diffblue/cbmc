@@ -355,6 +355,17 @@ int janalyzer_parse_optionst::doit()
 
   register_languages();
 
+  if(cmdline.args.size() > 1)
+  {
+    error() << "Only one .class, .jar or .gbf file should be directly "
+      "specified on the command-line. To force loading another another class "
+      "use '--java-load-class somepackage.SomeClass' or "
+      "'--lazy-methods-extra-entry-point somepackage.SomeClass.method' along "
+      "with '--classpath'"
+            << messaget::eom;
+    return CPROVER_EXIT_USAGE_ERROR;
+  }
+
   goto_model =
     initialize_goto_model(cmdline.args, get_message_handler(), options);
 

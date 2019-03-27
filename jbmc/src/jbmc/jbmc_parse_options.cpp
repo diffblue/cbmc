@@ -530,6 +530,23 @@ int jbmc_parse_optionst::doit()
   stub_objects_are_not_null =
     options.get_bool_option("java-assume-inputs-non-null");
 
+  if(cmdline.args.empty())
+  {
+    error() << "Please provide a program to verify" << eom;
+    return 6;
+  }
+
+  if(cmdline.args.size() != 1)
+  {
+    error() << "Only one .class, .jar or .gbf file should be directly "
+      "specified on the command-line. To force loading another another class "
+      "use '--java-load-class somepackage.SomeClass' or "
+      "'--lazy-methods-extra-entry-point somepackage.SomeClass.method' along "
+      "with '--classpath'"
+            << messaget::eom;
+    return 6;
+  }
+
   if(!cmdline.isset("symex-driven-lazy-loading"))
   {
     std::unique_ptr<goto_modelt> goto_model_ptr;
@@ -716,12 +733,6 @@ int jbmc_parse_optionst::get_goto_program(
   std::unique_ptr<goto_modelt> &goto_model,
   const optionst &options)
 {
-  if(cmdline.args.empty())
-  {
-    error() << "Please provide a program to verify" << eom;
-    return 6;
-  }
-
   {
     lazy_goto_modelt lazy_goto_model=lazy_goto_modelt::from_handler_object(
       *this, options, get_message_handler());
