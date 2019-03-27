@@ -9,7 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Minimize some target function incrementally
 
-#include "minimize.h"
+#include "prop_minimize.h"
 
 #include <util/threeval.h>
 

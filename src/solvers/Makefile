@@ -146,7 +146,7 @@ SRC = $(BOOLEFORCE_SRC) \
       prop/cover_goals.cpp \
       prop/decision_procedure.cpp \
       prop/literal.cpp \
-      prop/minimize.cpp \
+      prop/prop_minimize.cpp \
       prop/prop.cpp \
       prop/prop_conv.cpp \
       qbf/qbf_quantor.cpp \

@@ -8,7 +8,7 @@ Author: Georg Weissenbacher, georg.weissenbacher@inf.ethz.ch
 
 #include "bv_minimize.h"
 
-#include <solvers/prop/minimize.h>
+#include <solvers/prop/prop_minimize.h>
 
 void bv_minimizet::add_objective(
   prop_minimizet &prop_minimize,

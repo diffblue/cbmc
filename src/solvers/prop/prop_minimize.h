@@ -9,8 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// SAT Minimizer
 
-#ifndef CPROVER_SOLVERS_PROP_MINIMIZE_H
-#define CPROVER_SOLVERS_PROP_MINIMIZE_H
+#ifndef CPROVER_SOLVERS_PROP_PROP_MINIMIZE_H
+#define CPROVER_SOLVERS_PROP_PROP_MINIMIZE_H
 
 #include <map>
 
@@ -82,4 +82,4 @@ protected:
   objectivest::reverse_iterator current;
 };
 
-#endif // CPROVER_SOLVERS_PROP_MINIMIZE_H
+#endif // CPROVER_SOLVERS_PROP_PROP_MINIMIZE_H
