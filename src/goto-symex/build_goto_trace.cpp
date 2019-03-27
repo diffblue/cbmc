@@ -167,6 +167,28 @@ static void update_internal_field(
   }
 }
 
+/// Replace nondet values that appear in \p type by their values as found by
+/// \p solver.
+static void replace_nondet_in_type(typet &type, const prop_convt &solver)
+{
+  if(type.id() == ID_array)
+  {
+    array_typet &array_type = to_array_type(type);
+    array_type.size() = solver.get(array_type.size());
+  }
+  if(type.has_subtype())
+    replace_nondet_in_type(type.subtype(), solver);
+}
+
+/// Replace nondet values that appear in the type of \p expr and its
+/// subexpressions type by their values as found by \p solver.
+static void replace_nondet_in_type(exprt &expr, const prop_convt &solver)
+{
+  replace_nondet_in_type(expr.type(), solver);
+  for(auto &sub : expr.operands())
+    replace_nondet_in_type(sub, solver);
+}
+
 void build_goto_trace(
   const symex_target_equationt &target,
   ssa_step_predicatet is_last_step_to_keep,
@@ -338,12 +360,14 @@ void build_goto_trace(
       {
         goto_trace_step.full_lhs = build_full_lhs_rec(
           prop_conv, ns, SSA_step.original_full_lhs, SSA_step.ssa_full_lhs);
+        replace_nondet_in_type(goto_trace_step.full_lhs, prop_conv);
       }
 
       if(SSA_step.ssa_full_lhs.is_not_nil())
       {
         goto_trace_step.full_lhs_value = prop_conv.get(SSA_step.ssa_full_lhs);
         simplify(goto_trace_step.full_lhs_value, ns);
+        replace_nondet_in_type(goto_trace_step.full_lhs_value, prop_conv);
       }
 
       for(const auto &j : SSA_step.converted_io_args)
