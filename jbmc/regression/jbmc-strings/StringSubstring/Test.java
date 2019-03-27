@@ -44,4 +44,10 @@ class Test {
         if(i == 4)
             assert !s[4].equals("foo");
     }
+
+    public void testNull(String s, int start, int end) {
+        // Check that the CProverString version excludes the null case
+        String sub = org.cprover.CProverString.substring(s, start, end);
+    }
+
 }
