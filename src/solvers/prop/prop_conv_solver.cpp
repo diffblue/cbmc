@@ -331,7 +331,7 @@ bool prop_conv_solvert::set_equality_to_true(const equal_exprt &expr)
   return true;
 }
 
-void prop_conv_solvert::set_to(const exprt &expr, bool value)
+void prop_conv_solvert::do_set_to(const exprt &expr, bool value)
 {
   PRECONDITION(expr.type().id() == ID_bool);
 
@@ -346,7 +346,7 @@ void prop_conv_solvert::set_to(const exprt &expr, bool value)
     {
       if(expr.operands().size() == 1)
       {
-        set_to(expr.op0(), !value);
+        do_set_to(expr.op0(), !value);
         return;
       }
     }
@@ -359,7 +359,7 @@ void prop_conv_solvert::set_to(const exprt &expr, bool value)
         if(expr.id() == ID_and)
         {
           forall_operands(it, expr)
-            set_to_true(*it);
+            do_set_to(*it, true);
 
           return;
         }
@@ -403,14 +403,14 @@ void prop_conv_solvert::set_to(const exprt &expr, bool value)
         {
           const implies_exprt &implies_expr = to_implies_expr(expr);
 
-          set_to_true(implies_expr.op0());
-          set_to_false(implies_expr.op1());
+          do_set_to(implies_expr.op0(), true);
+          do_set_to(implies_expr.op1(), false);
           return;
         }
         else if(expr.id() == ID_or) // !(a || b)  ==  (!a && !b)
         {
           forall_operands(it, expr)
-            set_to_false(*it);
+            do_set_to(*it, false);
           return;
         }
       }
@@ -492,4 +492,52 @@ void prop_conv_solvert::print_assignment(std::ostream &out) const
 std::size_t prop_conv_solvert::get_number_of_solver_calls() const
 {
   return prop.get_number_of_solver_calls();
+}
+
+const char *prop_conv_solvert::context_prefix = "prop_conv::context$";
+
+void prop_conv_solvert::set_to(const exprt &expr, bool value)
+{
+  if(context_literals.empty())
+  {
+    // We are in the root context.
+    do_set_to(expr, value);
+  }
+  else
+  {
+    // We have a child context. We add context_literal ==> expr to the formula.
+    do_set_to(or_exprt(literal_exprt(!context_literals.back()), expr), value);
+  }
+}
+
+void prop_conv_solvert::set_assumptions(const bvt &assumptions)
+{
+  bvt combined_assumptions;
+  combined_assumptions.reserve(context_literals.size() + assumptions.size());
+  combined_assumptions.insert(
+    combined_assumptions.end(),
+    context_literals.begin(),
+    context_literals.end());
+  combined_assumptions.insert(
+    combined_assumptions.end(), assumptions.begin(), assumptions.end());
+  prop.set_assumptions(combined_assumptions);
+}
+
+void prop_conv_solvert::push_context()
+{
+  // We create a new context literal.
+  literalt context_literal = prop_conv_solvert::convert(symbol_exprt(
+    context_prefix + std::to_string(context_literal_counter++), bool_typet()));
+
+  context_literals.push_back(context_literal);
+  prop.set_assumptions(context_literals);
+}
+
+void prop_conv_solvert::pop_context()
+{
+  PRECONDITION(!context_literals.empty());
+
+  // We remove the last context literal from the stack.
+  context_literals.pop_back();
+  prop.set_assumptions(context_literals);
 }

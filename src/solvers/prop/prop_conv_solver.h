@@ -16,14 +16,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/message.h>
 #include <util/std_expr.h>
 
-#include "decision_procedure_assumptions.h"
+#include "decision_procedure_contexts.h"
 #include "literal.h"
 #include "literal_expr.h"
 #include "prop.h"
 #include "solver_conflicts.h"
 #include "solver_resource_limits.h"
 
-class prop_conv_solvert : public decision_procedure_assumptionst,
+class prop_conv_solvert : public decision_procedure_contextst,
                           public solver_conflictst,
                           public solver_resource_limitst
 {
@@ -36,7 +36,6 @@ public:
   virtual ~prop_conv_solvert() = default;
 
   // overloading from decision_proceduret
-  void set_to(const exprt &expr, bool value) override;
   decision_proceduret::resultt dec_solve() override;
   void print_assignment(std::ostream &out) const override;
   std::string decision_procedure_text() const override
@@ -55,10 +54,7 @@ public:
   {
     prop.set_frozen(a);
   }
-  void set_assumptions(const bvt &_assumptions) override
-  {
-    prop.set_assumptions(_assumptions);
-  }
+
   void set_all_frozen() override
   {
     freeze_all = true;
@@ -68,6 +64,26 @@ public:
   {
     return prop.is_in_conflict(l);
   }
+
+  /// For a Boolean expression \p expr, add the constraint
+  /// 'current_context => expr' if \p value is `true`,
+  /// otherwise add 'current_context => not expr'
+  void set_to(const exprt &expr, bool value) override;
+
+  /// Set \p assumptions within current context.
+  /// These assumptions can be removed by passing empty \p assumptions.
+  /// These assumptions will also be dropped in the course of any context
+  /// operation (`push_context` or `pop_context`).
+  void set_assumptions(const bvt &assumptions) override;
+
+  /// Push a new context on the stack
+  /// This context becomes a child context nested in the current context.
+  void push_context() override;
+
+  /// Pop the current context
+  void pop_context() override;
+
+  static const char *context_prefix;
 
   // get literal for expression, if available
   bool literal(const symbol_exprt &expr, literalt &literal) const;
@@ -123,10 +139,18 @@ protected:
 
   virtual void ignoring(const exprt &expr);
 
-  // deliberately protected now to protect lower-level API
+  /// Actually adds the constraints to `prop`
+  void do_set_to(const exprt &expr, bool value);
+
   propt &prop;
 
   messaget log;
+
+  /// Context literals used as assumptions
+  bvt context_literals;
+
+  /// Unique context literal names
+  std::size_t context_literal_counter = 0;
 };
 
 #endif // CPROVER_SOLVERS_PROP_PROP_CONV_SOLVER_H
