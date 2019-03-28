@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "smt2_conv.h"
 #include "smt2_ast.h"
+#include "smt2_command.h"
 #include "smt2_util.h"
 
 #include <util/arith_tools.h>
@@ -34,6 +35,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <solvers/floatbv/float_bv.h>
 #include <solvers/lowering/expr_lowering.h>
 #include <solvers/prop/literal_expr.h>
+#include <util/make_unique.h>
 
 // Mark different kinds of error conditions
 
@@ -150,15 +152,16 @@ void smt2_convt::write_header()
     // clang-format on
   }
 
-  out << "(set-info :source \"" << notes << "\")" << "\n";
-
-  out << "(set-option :produce-models true)" << "\n";
+  out << smt2_commandt::set_info(
+           smt2_symbolt{":source"}, smt2_string_literalt(notes))
+      << smt2_commandt::set_option(
+           smt2_symbolt{":produce-models"}, smt2_symbolt{"true"});
 
   // We use a broad mixture of logics, so on some solvers
   // its better not to declare here.
   // set-logic should come after setting options
   if(emit_set_logic && !logic.empty())
-    out << "(set-logic " << logic << ")" << "\n";
+    out << smt2_commandt::set_logic(smt2_symbolt{logic});
 }
 
 void smt2_convt::write_footer(std::ostream &os)
@@ -172,10 +175,8 @@ void smt2_convt::write_footer(std::ostream &os)
 
     for(const auto &assumption : assumptions)
     {
-      os << "(assert "
-         << convert_literal(to_literal_expr(assumption).get_literal());
-      << ")"
-      << "\n";
+      os << smt2_commandt::_assert(
+        convert_literal(to_literal_expr(assumption).get_literal()));
     }
   }
 
@@ -183,20 +184,21 @@ void smt2_convt::write_footer(std::ostream &os)
   for(const auto &object : object_sizes)
     define_object_size(object.second, object.first);
 
-  os << "(check-sat)"
-     << "\n";
+  os << smt2_commandt::check_sat();
   os << "\n";
 
   if(solver!=solvert::BOOLECTOR)
   {
     for(const auto &id : smt2_identifiers)
-      os << "(get-value (|" << id << "|))"
-         << "\n";
+    {
+      os << smt2_commandt::get_value(
+        smt2_listt<smt2_astt>{{smt2_symbolt{"|" + id + "|"}}});
+    }
   }
 
   os << "\n";
 
-  os << "(exit)\n";
+  os << smt2_commandt::exit();
 
   os << "; end of SMT2 file"
      << "\n";
@@ -228,11 +230,13 @@ void smt2_convt::define_object_size(
       continue;
     }
 
-    out << "(assert (implies (= "
-        << "((_ extract " << h << " " << l << ") " << convert_expr(ptr)
-        << ") (_ bv" << number << " " << config.bv_encoding.object_bits << "))"
-        << "(= " << id << " (_ bv" << *object_size << " " << size_width
-        << "))))\n";
+    // (assert (implies (= ((_ extract h l) ptr) (_ bv number
+    // config.bv_encoding.object_bits)) (= id (_ bv object_size size_width))))
+    out << smt2_commandt::_assert(smt2_implies(
+      smt2_eq(
+        smt2_function_applicationt(smt2_extract(h, l), {convert_expr(ptr)}),
+        smt2_bv(number, config.bv_encoding.object_bits)),
+      smt2_eq(smt2_symbolt{id}, smt2_bv(*object_size, size_width))));
 
     ++number;
   }
@@ -686,6 +690,16 @@ smt2_astt smt2_convt::convert_address_of_rec(
         expr.id_string());
 }
 
+/// Create a name for the literal with the given number, add it to the set of
+/// identifiers and return a corresponding symbolt
+static smt2_symbolt
+literal_name(literalt::var_not var_no, std::set<std::string> &smt2_identifiers)
+{
+  std::string literal_name = "B" + std::to_string(var_no);
+  smt2_identifiers.insert(literal_name);
+  return smt2_symbolt("|" + literal_name + "|");
+}
+
 literalt smt2_convt::convert(const exprt &expr)
 {
   PRECONDITION(expr.type().id() == ID_bool);
@@ -703,16 +717,21 @@ literalt smt2_convt::convert(const exprt &expr)
 
   out << "\n";
 
-  exprt prepared_expr = prepare_for_convert_expr(expr);
+  auto prepared_expr_with_dependencies = prepare_for_convert_expr(expr);
+  for(const auto &command : prepared_expr_with_dependencies.first)
+    out << *command;
 
   literalt l(no_boolean_variables, false);
   no_boolean_variables++;
 
   out << "; convert\n";
-  out << "(define-fun " << convert_literal(l);
-  out << " () Bool ";
-  out << convert_expr(prepared_expr);
-  out << ")" << "\n";
+
+  // (define-fun l () Bool expr)
+  out << smt2_commandt::define_fun(
+    literal_name(l.var_no(), smt2_identifiers),
+    smt2_listt<smt2_pairt<smt2_symbolt, smt2_sortt>>{{}},
+    smt2_sortt::Bool(),
+    convert_expr(prepared_expr_with_dependencies.second));
 
   return l;
 }
@@ -733,9 +752,7 @@ smt2_astt smt2_convt::convert_literal(const literalt l)
   if(l == const_literal(true))
     return smt2_symbolt("true");
 
-  std::string literal_name = "B" + std::to_string(l.var_no());
-  smt2_identifiers.insert(literal_name);
-  auto literal_without_sign = smt2_symboltt("|" + literal_name + "|");
+  auto literal_without_sign = literal_name(l.var_no(), smt2_identifiers);
 
   if(!l.sign())
     return std::move(literal_without_sign);
@@ -2434,12 +2451,11 @@ smt2_convt::convert_floatbv_typecast(const floatbv_typecast_exprt &expr)
 
       if(use_FPA_theory)
       {
-        out << "((_ to_fp " << dst.get_e() << " "
-            << dst.get_f() + 1 << ") ";
-        convert_rounding_mode_FPA(expr.op1());
-        out << " ";
-        convert_expr(src);
-        out << ")";
+        return smt2_function_applicationt(
+          smt2_identifiert{smt2_symbolt{"to_fp"},
+                           {smt2_constantt::make(dst.get_e()),
+                            smt2_constantt::make(dst.get_f() + 1)}},
+          {convert_rounding_mode_FPA(expr.op1()), convert_expr(src)});
       }
       else
         return convert_floatbv(expr);
@@ -3025,7 +3041,7 @@ smt2_astt smt2_convt::convert_plus(const plus_exprt &expr)
 /// use_FPA_theory is enabled
 /// \par parameters: The expression representing the rounding mode.
 /// \return SMT-LIB output to out.
-void smt2_convt::convert_rounding_mode_FPA(const exprt &expr)
+smt2_astt smt2_convt::convert_rounding_mode_FPA(const exprt &expr)
 {
   PRECONDITION(use_FPA_theory);
 
@@ -3045,13 +3061,13 @@ void smt2_convt::convert_rounding_mode_FPA(const exprt &expr)
     mp_integer value = numeric_cast_v<mp_integer>(cexpr);
 
     if(value==0)
-      out << "roundNearestTiesToEven";
+      return smt2_symbolt{"roundNearestTiesToEven"};
     else if(value==1)
-      out << "roundTowardNegative";
+      return smt2_symbolt{"roundTowardNegative"};
     else if(value==2)
-      out << "roundTowardPositive";
+      return smt2_symbolt{"roundTowardPositive"};
     else if(value==3)
-      out << "roundTowardZero";
+      return smt2_symbolt{"roundTowardZero"};
     else
       INVARIANT_WITH_DIAGNOSTICS(
         false,
@@ -3062,23 +3078,19 @@ void smt2_convt::convert_rounding_mode_FPA(const exprt &expr)
   {
     std::size_t width=to_bitvector_type(expr.type()).get_width();
 
+    auto converted = convert_expr(expr);
     // Need to make the choice above part of the model
-    out << "(ite (= (_ bv0 " << width << ") ";
-    convert_expr(expr);
-    out << ") roundNearestTiesToEven ";
-
-    out << "(ite (= (_ bv1 " << width << ") ";
-    convert_expr(expr);
-    out << ") roundTowardNegative ";
-
-    out << "(ite (= (_ bv2 " << width << ") ";
-    convert_expr(expr);
-    out << ") roundTowardPositive ";
-
-    // TODO: add some kind of error checking here
-    out << "roundTowardZero";
-
-    out << ")))";
+    return smt2_ite(
+      smt2_eq(smt2_bv(0, width), converted),
+      smt2_symbolt{"roundNearestTiesToEven"},
+      smt2_ite(
+        smt2_eq(smt2_bv(1, width), converted),
+        smt2_symbolt{"roundTowardNegative"},
+        smt2_ite(
+          smt2_eq(smt2_bv(2, width), converted),
+          smt2_symbolt{"roundTowardPositve"},
+          // TODO: add some kind of error checking here
+          smt2_symbolt{"roundTowardZero"})));
   }
 }
 
@@ -3095,13 +3107,10 @@ smt2_astt smt2_convt::convert_floatbv_plus(const ieee_float_op_exprt &expr)
   {
     if(type.id()==ID_floatbv)
     {
-      out << "(fp.add ";
-      convert_rounding_mode_FPA(expr.rounding_mode());
-      out << " ";
-      convert_expr(expr.lhs());
-      out << " ";
-      convert_expr(expr.rhs());
-      out << ")";
+      return smt2_fp_add(
+        convert_rounding_mode_FPA(expr.rounding_mode()),
+        convert_expr(expr.lhs()),
+        convert_expr(expr.rhs()));
     }
     else if(type.id()==ID_complex)
     {
@@ -3215,13 +3224,10 @@ smt2_astt smt2_convt::convert_floatbv_minus(const ieee_float_op_exprt &expr)
 
   if(use_FPA_theory)
   {
-    out << "(fp.sub ";
-    convert_rounding_mode_FPA(expr.rounding_mode());
-    out << " ";
-    convert_expr(expr.lhs());
-    out << " ";
-    convert_expr(expr.rhs());
-    out << ")";
+    return smt2_fp_sub(
+      convert_rounding_mode_FPA(expr.rounding_mode()),
+      convert_expr(expr.lhs()),
+      convert_expr(expr.rhs()));
   }
   else
     return convert_floatbv(expr);
@@ -3271,13 +3277,10 @@ smt2_astt smt2_convt::convert_floatbv_div(const ieee_float_op_exprt &expr)
 
   if(use_FPA_theory)
   {
-    out << "(fp.div ";
-    convert_rounding_mode_FPA(expr.rounding_mode());
-    out << " ";
-    convert_expr(expr.lhs());
-    out << " ";
-    convert_expr(expr.rhs());
-    out << ")";
+    return smt2_fp_div(
+      convert_rounding_mode_FPA(expr.rounding_mode()),
+      convert_expr(expr.lhs()),
+      convert_expr(expr.rhs()));
   }
   else
     return convert_floatbv(expr);
@@ -3352,13 +3355,10 @@ smt2_astt smt2_convt::convert_floatbv_mult(const ieee_float_op_exprt &expr)
 
   if(use_FPA_theory)
   {
-    out << "(fp.mul ";
-    convert_rounding_mode_FPA(expr.rounding_mode());
-    out << " ";
-    convert_expr(expr.lhs());
-    out << " ";
-    convert_expr(expr.rhs());
-    out << ")";
+    return smt2_fp_mul(
+      convert_rounding_mode_FPA(expr.rounding_mode()),
+      convert_expr(expr.lhs()),
+      convert_expr(expr.rhs()));
   }
   else
     return convert_floatbv(expr);
@@ -3976,42 +3976,44 @@ void smt2_convt::set_to(const exprt &expr, bool value)
         CHECK_RETURN(id.type.is_nil());
 
         id.type=equal_expr.lhs().type();
-        find_symbols(id.type);
-        exprt prepared_rhs = prepare_for_convert_expr(equal_expr.rhs());
+        for(const auto &command : find_symbols(id.type))
+          out << *command;
+        const auto prepared_rhs_with_dependencies =
+          prepare_for_convert_expr(equal_expr.rhs());
+        const exprt &prepared_rhs = prepared_rhs_with_dependencies.second;
 
         std::string smt2_identifier=convert_identifier(identifier);
         smt2_identifiers.insert(smt2_identifier);
 
-        out << "; set_to true (equal)\n";
-        out << "(define-fun |" << smt2_identifier << "| () ";
+        for(const auto &command : prepared_rhs_with_dependencies.first)
+          out << *command;
 
-        out << convert_type(equal_expr.lhs().type());
-        out << " " << convert_expr(prepared_rhs);
-        out << ")" << "\n";
+        out << smt2_commentt{"set_to true (equal)"};
+        out << smt2_commandt::define_fun(
+          smt2_symbolt{"|" + smt2_identifier + "|"},
+          smt2_listt<smt2_pairt<smt2_symbolt, smt2_sortt>>{{}},
+          convert_type(equal_expr.lhs().type()),
+          convert_expr(prepared_rhs));
         return; // done
       }
     }
   }
 
-  exprt prepared_expr = prepare_for_convert_expr(expr);
+  const auto prepared_expr_with_dependencies = prepare_for_convert_expr(expr);
+  const exprt &prepared_expr = prepared_expr_with_dependencies.second;
 
 #if 0
   out << "; CONV: "
       << format(expr) << "\n";
 #endif
 
-  out << "; set_to " << (value?"true":"false") << "\n"
-      << "(assert ";
+  for(const auto &command : prepared_expr_with_dependencies.first)
+    out << *command;
 
-  if(!value)
-  {
-    out << "(not " << convert_expr(prepared_expr) << ")";
-  }
-  else
-    out << convert_expr(prepared_expr);
-
-  out << ")" << "\n"; // assert
-
+  smt2_astt assertion =
+    value ? convert_expr(prepared_expr) : smt2_not(convert_expr(prepared_expr));
+  out << "; set_to " << (value ? "true" : "false") << "\n"
+      << smt2_commandt::_assert(std::move(assertion));
   return;
 }
 
@@ -4053,7 +4055,8 @@ exprt smt2_convt::lower_byte_operators(const exprt &expr)
 ///    expressions.
 /// \param expr: expression to prepare
 /// \return equivalent expression suitable for convert_expr.
-exprt smt2_convt::prepare_for_convert_expr(const exprt &expr)
+std::pair<std::list<std::unique_ptr<smt2_command_or_commentt>>, exprt>
+smt2_convt::prepare_for_convert_expr(const exprt &expr)
 {
   // First, replace byte operators, because they may introduce new array
   // expressions that must be seen by find_symbols:
@@ -4063,15 +4066,14 @@ exprt smt2_convt::prepare_for_convert_expr(const exprt &expr)
     "lower_byte_operators should remove all byte operators");
 
   // Now create symbols for all composite expressions present in lowered_expr:
-  find_symbols(lowered_expr);
-
-  return lowered_expr;
+  return std::make_pair(find_symbols(lowered_expr), lowered_expr);
 }
 
-void smt2_convt::find_symbols(const exprt &expr)
+std::list<std::unique_ptr<smt2_command_or_commentt>>
+smt2_convt::find_symbols(const exprt &expr)
 {
   // recursive call on type
-  find_symbols(expr.type());
+  auto result = find_symbols(expr.type());
 
   if(expr.id() == ID_exists || expr.id() == ID_forall)
   {
@@ -4082,20 +4084,22 @@ void smt2_convt::find_symbols(const exprt &expr)
     identifiert &id = identifier_map[identifier];
     id.type = q_expr.symbol().type();
     id.is_bound = true;
-    find_symbols(q_expr.where());
-    return;
+
+    auto where_result = find_symbols(q_expr.where());
+    result.splice(result.end(), where_result);
+    return result;
   }
 
   // recursive call on operands
   forall_operands(it, expr)
-    find_symbols(*it);
+    result.splice(result.end(), find_symbols(*it));
 
   if(expr.id()==ID_symbol ||
      expr.id()==ID_nondet_symbol)
   {
     // we don't track function-typed symbols
     if(expr.type().id()==ID_code)
-      return;
+      return result;
 
     irep_idt identifier;
 
@@ -4114,12 +4118,12 @@ void smt2_convt::find_symbols(const exprt &expr)
       std::string smt2_identifier=convert_identifier(identifier);
       smt2_identifiers.insert(smt2_identifier);
 
-      out << "; find_symbols\n";
-      out << "(declare-fun |"
-          << smt2_identifier
-          << "| () ";
-      out << convert_type(expr.type()) << ")"
-          << "\n";
+      result.push_back(util_make_unique<smt2_commentt>("find_symbols"));
+      result.push_back(
+        util_make_unique<smt2_commandt>(smt2_commandt::declare_fun(
+          smt2_symbolt{"|" + smt2_identifier + "|"},
+          smt2_listt<smt2_sortt>{{}},
+          convert_type(expr.type()))));
     }
   }
   else if(expr.id()==ID_array_of)
@@ -4128,10 +4132,13 @@ void smt2_convt::find_symbols(const exprt &expr)
     {
       const irep_idt id =
         "array_of." + std::to_string(defined_expressions.size());
-      out << "; the following is a substitute for lambda i. x" << "\n";
-      out << "(declare-fun " << id << " () ";
-      out << convert_type(expr.type());
-      out << ")" << "\n";
+      result.push_back(util_make_unique<smt2_commentt>(
+        "the following is a substitute for lambda i. x"));
+      result.push_back(
+        util_make_unique<smt2_commandt>(smt2_commandt::declare_fun(
+          smt2_symbolt{id},
+          smt2_listt<smt2_sortt>{{}},
+          convert_type(expr.type()))));
 
       // use a quantifier instead of the lambda
       #if 0 // not really working in any solver yet!
@@ -4152,18 +4159,22 @@ void smt2_convt::find_symbols(const exprt &expr)
       const array_typet &array_type=to_array_type(expr.type());
 
       const irep_idt id = "array." + std::to_string(defined_expressions.size());
-      out << "; the following is a substitute for an array constructor" << "\n";
-      out << "(declare-fun " << id << " () ";
-      out << convert_type(array_type) << ")"
-          << "\n";
+      result.push_back(util_make_unique<smt2_commentt>(
+        "the following is a substitute for an array constructor"));
+      result.push_back(
+        util_make_unique<smt2_commandt>(smt2_commandt::declare_fun(
+          smt2_symbolt{id},
+          smt2_listt<smt2_sortt>{{}},
+          convert_type(array_type))));
 
       for(std::size_t i=0; i<expr.operands().size(); i++)
       {
-        out << "(assert (= (select " << id << " ";
-        out << convert_expr(from_integer(i, array_type.size().type()));
-        out << ") "; // select
-        out << convert_expr(expr.operands()[i]);
-        out << "))" << "\n"; // =, assert
+        result.push_back(
+          util_make_unique<smt2_commandt>(smt2_commandt::_assert(smt2_eq(
+            smt2_select(
+              smt2_symbolt{id},
+              convert_expr(from_integer(i, array_type.size().type()))),
+            convert_expr(expr.operands()[i])))));
       }
 
       defined_expressions[expr]=id;
@@ -4179,18 +4190,23 @@ void smt2_convt::find_symbols(const exprt &expr)
 
       const irep_idt id =
         "string." + std::to_string(defined_expressions.size());
-      out << "; the following is a substitute for a string" << "\n";
-      out << "(declare-fun " << id << " () ";
-      out << convert_type(array_type);
-      out << ")" << "\n";
+      result.push_back(util_make_unique<smt2_commentt>(
+        "the following is a substitute for a string"));
+
+      result.push_back(
+        util_make_unique<smt2_commandt>(smt2_commandt::declare_fun(
+          smt2_symbolt{id},
+          smt2_listt<smt2_sortt>{{}},
+          convert_type(array_type))));
 
       for(std::size_t i=0; i<tmp.operands().size(); i++)
       {
-        out << "(assert (= (select " << id;
-        out << convert_expr(from_integer(i, array_type.size().type()));
-        out << ") "; // select
-        out << convert_expr(tmp.operands()[i]);
-        out << "))" << "\n";
+        result.push_back(
+          util_make_unique<smt2_commandt>(smt2_commandt::_assert(smt2_eq(
+            smt2_select(
+              smt2_symbolt{id},
+              convert_expr(from_integer(i, array_type.size().type()))),
+            convert_expr(tmp.operands()[i])))));
       }
 
       defined_expressions[expr]=id;
@@ -4207,9 +4223,11 @@ void smt2_convt::find_symbols(const exprt &expr)
       {
         const irep_idt id =
           "object_size." + std::to_string(object_sizes.size());
-        out << "(declare-fun " << id << " () ";
-        out << convert_type(expr.type());
-        out << ")" << "\n";
+        result.push_back(
+          util_make_unique<smt2_commandt>(smt2_commandt::declare_fun(
+            smt2_symbolt{id},
+            smt2_listt<smt2_sortt>{{}},
+            convert_type(expr.type()))));
 
         object_sizes[expr]=id;
       }
@@ -4243,21 +4261,18 @@ void smt2_convt::find_symbols(const exprt &expr)
 
     if(bvfp_set.insert(function).second)
     {
-      out << "; this is a model for " << expr.id()
-          << " : " << type2id(expr.op0().type())
-          << " -> " << type2id(expr.type()) << "\n"
-          << "(define-fun " << function << " (";
+      result.push_back(util_make_unique<smt2_commentt>(
+        "this is a model for " + id2string(expr.id()) + " : " +
+        id2string(type2id(expr.op0().type())) + " -> " +
+        id2string(type2id(expr.type()))));
 
+      std::vector<smt2_pairt<smt2_symbolt, smt2_sortt>> args;
       for(std::size_t i = 0; i < expr.operands().size(); i++)
       {
-        if(i!=0)
-          out << " ";
-        out << "(op" << i << ' ' << convert_type(expr.operands()[i].type())
-            << ')';
+        args.emplace_back(
+          smt2_symbolt{"op" + std::to_string(i)},
+          convert_type(expr.operands()[i].type()));
       }
-
-      out << ") " << convert_type(expr.type()); // return type
-      out << ' ';
 
       exprt tmp1=expr;
       for(std::size_t i = 0; i < tmp1.operands().size(); i++)
@@ -4268,11 +4283,15 @@ void smt2_convt::find_symbols(const exprt &expr)
       tmp2=letify(tmp2);
       CHECK_RETURN(!tmp2.is_nil());
 
-      out << convert_expr(tmp2);
-
-      out << ")\n"; // define-fun
+      result.push_back(
+        util_make_unique<smt2_commandt>(smt2_commandt::define_fun(
+          smt2_symbolt{function},
+          smt2_listt<smt2_pairt<smt2_symbolt, smt2_sortt>>(std::move(args)),
+          convert_type(expr.type()),
+          convert_expr(tmp2))));
     }
   }
+  return result;
 }
 
 bool smt2_convt::use_array_theory(const exprt &expr)
@@ -4425,25 +4444,27 @@ smt2_sortt smt2_convt::convert_type(const typet &type)
   }
 }
 
-void smt2_convt::find_symbols(const typet &type)
+std::list<std::unique_ptr<smt2_command_or_commentt>>
+smt2_convt::find_symbols(const typet &type)
 {
   std::set<irep_idt> recstack;
-  find_symbols_rec(type, recstack);
+  return find_symbols_rec(type, recstack);
 }
 
-void smt2_convt::find_symbols_rec(
-  const typet &type,
-  std::set<irep_idt> &recstack)
+std::list<std::unique_ptr<smt2_command_or_commentt>>
+smt2_convt::find_symbols_rec(const typet &type, std::set<irep_idt> &recstack)
 {
   if(type.id()==ID_array)
   {
     const array_typet &array_type=to_array_type(type);
-    find_symbols(array_type.size());
-    find_symbols_rec(array_type.subtype(), recstack);
+    auto result = find_symbols(array_type.size());
+    auto rec_result = find_symbols_rec(array_type.subtype(), recstack);
+    result.splice(result.end(), rec_result);
+    return result;
   }
   else if(type.id()==ID_complex)
   {
-    find_symbols_rec(type.subtype(), recstack);
+    auto result = find_symbols_rec(type.subtype(), recstack);
 
     if(use_datatypes &&
        datatype_map.find(type)==datatype_map.end())
@@ -4452,23 +4473,26 @@ void smt2_convt::find_symbols_rec(
         "complex." + std::to_string(datatype_map.size());
       datatype_map[type] = smt_typename;
 
-      out << "(declare-datatypes () ((" << smt_typename << " "
-          << "(mk-" << smt_typename;
-
-      out << " (" << smt_typename << ".imag ";
-      out << convert_type(type.subtype());
-      out << ")";
-
-      out << " (" << smt_typename << ".real ";
-      out << convert_type(type.subtype());
-      out << ")";
-
-      out << "))))\n";
+      // (declare-datatypes () ((smt_typename (mk-smt_typename (
+      //  smt_typename.imag type_subtype) (smt_typename.real type_subtype)))))
+      result.push_back(util_make_unique<
+                       smt2_commandt>(smt2_commandt::declare_datatypes(
+        smt2_listt<smt2_datatype_declarationt>{{smt2_datatype_declarationt{
+          smt2_non_empty_listt<smt2_symbolt>{smt2_symbolt{smt_typename}, {}},
+          smt2_non_empty_listt<smt2_constructor_declarationt>{
+            smt2_constructor_declarationt{
+              smt2_symbolt{"mk-" + smt_typename},
+              {smt2_selector_declarationt{smt2_symbolt{smt_typename + ".imag"},
+                                          convert_type(type.subtype())},
+               smt2_selector_declarationt{smt2_symbolt{smt_typename + ".real "},
+                                          convert_type(type.subtype())}}},
+            {}}}}})));
     }
+    return result;
   }
   else if(type.id()==ID_vector)
   {
-    find_symbols_rec(type.subtype(), recstack);
+    auto result = find_symbols_rec(type.subtype(), recstack);
 
     if(use_datatypes &&
        datatype_map.find(type)==datatype_map.end())
@@ -4481,18 +4505,24 @@ void smt2_convt::find_symbols_rec(
         "vector." + std::to_string(datatype_map.size());
       datatype_map[type] = smt_typename;
 
-      out << "(declare-datatypes () ((" << smt_typename << " "
-          << "(mk-" << smt_typename;
+      std::vector<smt2_selector_declarationt> selectors;
 
       for(mp_integer i=0; i!=size; ++i)
       {
-        out << " (" << smt_typename << "." << i << " ";
-        out << convert_type(type.subtype());
-        out << ")";
+        selectors.emplace_back(
+          smt2_symbolt{smt_typename + "." + integer2string(i)},
+          convert_type(type.subtype()));
       }
-
-      out << "))))\n";
+      result.push_back(
+        util_make_unique<smt2_commandt>(smt2_commandt::declare_datatypes(
+          smt2_listt<smt2_datatype_declarationt>{{smt2_datatype_declarationt{
+            smt2_non_empty_listt<smt2_symbolt>{smt2_symbolt{smt_typename}, {}},
+            smt2_non_empty_listt<smt2_constructor_declarationt>{
+              {smt2_constructor_declarationt{smt2_symbolt{"mk-" + smt_typename},
+                                             std::move(selectors)}},
+              {}}}}})));
     }
+    return result;
   }
   else if(type.id() == ID_struct)
   {
@@ -4510,8 +4540,12 @@ void smt2_convt::find_symbols_rec(
     const struct_typet::componentst &components =
       to_struct_type(type).components();
 
+    std::list<std::unique_ptr<smt2_command_or_commentt>> result;
     for(const auto &component : components)
-      find_symbols_rec(component.type(), recstack);
+    {
+      auto tmp_result = find_symbols_rec(component.type(), recstack);
+      result.splice(result.end(), tmp_result);
+    }
 
     // Declare the corresponding SMT type if we haven't already.
     if(need_decl)
@@ -4527,25 +4561,29 @@ void smt2_convt::find_symbols_rec(
       //                                   (struct.0.component1 type1)
       //                                   ...
       //                                   (struct.0.componentN typeN)))))
-      out << "(declare-datatypes () ((" << smt_typename << " "
-          << "(mk-" << smt_typename << " ";
 
+      std::vector<smt2_selector_declarationt> selectors;
       for(const auto &component : components)
       {
-        out << "(" << smt_typename << "." << component.get_name()
-                      << " ";
-        out << convert_type(component.type());
-        out << ") ";
+        selectors.emplace_back(
+          smt2_symbolt{smt_typename + "." + id2string(component.get_name())},
+          convert_type(component.type()));
       }
-
-      out << "))))" << "\n";
+      result.push_back(
+        util_make_unique<smt2_commandt>(smt2_commandt::declare_datatypes(
+          smt2_listt<smt2_datatype_declarationt>{{smt2_datatype_declarationt{
+            smt2_non_empty_listt<smt2_symbolt>{smt2_symbolt{smt_typename}, {}},
+            smt2_non_empty_listt<smt2_constructor_declarationt>{
+              {smt2_constructor_declarationt{smt2_symbolt{"mk-" + smt_typename},
+                                             std::move(selectors)}},
+              {}}}}})));
 
       // Let's also declare convenience functions to update individual
-      // members of the struct whil we're at it.  The functions are
+      // members of the struct while we're at it.  The functions are
       // named like `update-struct.0.component1'.  Their declarations
       // look like:
       //
-      // (declare-fun update-struct.0.component1
+      // (define-fun update-struct.0.component1
       //         ((s struct.0)     ; first arg -- the struct to update
       //          (v type1))       ; second arg -- the value to update
       //         struct.0          ; the output type
@@ -4561,66 +4599,89 @@ void smt2_convt::find_symbols_rec(
           ++it)
       {
         const struct_union_typet::componentt &component=*it;
-        out << "(define-fun update-" << smt_typename << "."
-            << component.get_name() << " "
-            << "((s " << smt_typename << ") "
-            <<  "(v ";
-        convert_type(component.type());
-        out << ")) " << smt_typename << " "
-            << "(mk-" << smt_typename
-            << " ";
+        const smt2_symbolt s{"s"};
+        const smt2_symbolt v{"v"};
+        const smt2_sortt sort{smt2_symbolt{smt_typename}};
+        smt2_listt<smt2_pairt<smt2_symbolt, smt2_sortt>> arguments{
+          {smt2_pairt<smt2_symbolt, smt2_sortt>{s, sort},
+           smt2_pairt<smt2_symbolt, smt2_sortt>{
+             v, convert_type(component.type())}}};
 
-        for(struct_union_typet::componentst::const_iterator
-            it2=components.begin();
-            it2!=components.end();
+        std::vector<smt2_astt> mk_arguments;
+        for(struct_union_typet::componentst::const_iterator it2 =
+              components.begin();
+            it2 != components.end();
             ++it2)
         {
           if(it==it2)
-            out << "v ";
+            mk_arguments.push_back(v);
           else
           {
-            out << "(" << smt_typename << "."
-                << it2->get_name() << " s) ";
+            mk_arguments.push_back(smt2_function_applicationt{
+              smt2_identifiert{
+                smt2_symbolt{smt_typename + "." + id2string(it2->get_name())}},
+              {s}});
           }
         }
 
-        out << "))" << "\n";
+        result.push_back(
+          util_make_unique<smt2_commandt>(smt2_commandt::define_fun(
+            smt2_symbolt{"update-" + smt_typename + "." +
+                         id2string(component.get_name())},
+            std::move(arguments),
+            smt2_sortt{smt2_symbolt{smt_typename}},
+            smt2_function_applicationt{
+              smt2_identifiert{smt2_symbolt{"mk-" + smt_typename}},
+              std::move(mk_arguments)})));
       }
-
-      out << "\n";
     }
+    return result;
   }
   else if(type.id() == ID_union)
   {
     const union_typet::componentst &components =
       to_union_type(type).components();
-
+    std::list<std::unique_ptr<smt2_command_or_commentt>> result;
     for(const auto &component : components)
-      find_symbols_rec(component.type(), recstack);
+    {
+      auto tmp_result = find_symbols_rec(component.type(), recstack);
+      result.splice(result.end(), tmp_result);
+    }
+    return result;
   }
   else if(type.id()==ID_code)
   {
+    std::list<std::unique_ptr<smt2_command_or_commentt>> result;
     const code_typet::parameterst &parameters=
       to_code_type(type).parameters();
     for(const auto &param : parameters)
-      find_symbols_rec(param.type(), recstack);
+    {
+      auto tmp_result = find_symbols_rec(param.type(), recstack);
+      result.splice(result.end(), tmp_result);
+    }
 
-    find_symbols_rec(to_code_type(type).return_type(), recstack);
+    auto tmp_result =
+      find_symbols_rec(to_code_type(type).return_type(), recstack);
+    result.splice(result.end(), tmp_result);
+    return result;
   }
   else if(type.id()==ID_pointer)
   {
-    find_symbols_rec(type.subtype(), recstack);
+    return find_symbols_rec(type.subtype(), recstack);
   }
   else if(type.id() == ID_struct_tag)
   {
     const auto &struct_tag = to_struct_tag_type(type);
     const irep_idt &id = struct_tag.get_identifier();
 
+    std::list<std::unique_ptr<smt2_command_or_commentt>> result;
     if(recstack.find(id) == recstack.end())
     {
       recstack.insert(id);
-      find_symbols_rec(ns.follow_tag(struct_tag), recstack);
+      auto tmp_result = find_symbols_rec(ns.follow_tag(struct_tag), recstack);
+      result.splice(result.end(), tmp_result);
     }
+    return result;
   }
   else if(type.id() == ID_union_tag)
   {
@@ -4630,9 +4691,10 @@ void smt2_convt::find_symbols_rec(
     if(recstack.find(id) == recstack.end())
     {
       recstack.insert(id);
-      find_symbols_rec(ns.follow_tag(union_tag), recstack);
+      return find_symbols_rec(ns.follow_tag(union_tag), recstack);
     }
   }
+  return {};
 }
 
 std::size_t smt2_convt::get_number_of_solver_calls() const

@@ -10,8 +10,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_SOLVERS_SMT2_SMT2_CONV_H
 #define CPROVER_SOLVERS_SMT2_SMT2_CONV_H
 
-#include <sstream>
+#include <list>
+#include <memory>
 #include <set>
+#include <sstream>
 
 #include <util/std_expr.h>
 #include <util/byte_operators.h>
@@ -31,6 +33,7 @@ class typecast_exprt;
 class constant_exprt;
 class index_exprt;
 class member_exprt;
+class smt2_command_or_commentt;
 
 class smt2_convt : public stack_decision_proceduret
 {
@@ -111,7 +114,7 @@ protected:
   smt2_astt convert_minus(const minus_exprt &expr);
   smt2_astt convert_div(const div_exprt &expr);
   smt2_astt convert_mult(const mult_exprt &expr);
-  void convert_rounding_mode_FPA(const exprt &expr);
+  smt2_astt convert_rounding_mode_FPA(const exprt &expr);
   smt2_astt convert_floatbv_plus(const ieee_float_op_exprt &expr);
   smt2_astt convert_floatbv_minus(const ieee_float_op_exprt &expr);
   smt2_astt convert_floatbv_div(const ieee_float_op_exprt &expr);
@@ -133,11 +136,15 @@ protected:
   tvt l_get(literalt l) const;
 
   // auxiliary methods
-  exprt prepare_for_convert_expr(const exprt &expr);
+  std::pair<std::list<std::unique_ptr<smt2_command_or_commentt>>, exprt>
+  prepare_for_convert_expr(const exprt &expr);
   exprt lower_byte_operators(const exprt &expr);
-  void find_symbols(const exprt &expr);
-  void find_symbols(const typet &type);
-  void find_symbols_rec(const typet &type, std::set<irep_idt> &recstack);
+  std::list<std::unique_ptr<smt2_command_or_commentt>>
+  find_symbols(const exprt &expr);
+  std::list<std::unique_ptr<smt2_command_or_commentt>>
+  find_symbols(const typet &type);
+  std::list<std::unique_ptr<smt2_command_or_commentt>>
+  find_symbols_rec(const typet &type, std::set<irep_idt> &recstack);
 
   // letification
   letifyt letify;
