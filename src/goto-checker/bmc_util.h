@@ -22,13 +22,13 @@ Author: Daniel Kroening, Peter Schrammel
 #include "incremental_goto_checker.h"
 #include "properties.h"
 
+class decision_proceduret;
 class goto_symex_property_decidert;
 class goto_tracet;
 class memory_model_baset;
 class message_handlert;
 class namespacet;
 class optionst;
-class prop_convt;
 class symex_bmct;
 class symex_target_equationt;
 struct trace_optionst;
@@ -36,7 +36,7 @@ class ui_message_handlert;
 
 void convert_symex_target_equation(
   symex_target_equationt &,
-  prop_convt &,
+  decision_proceduret &,
   message_handlert &);
 
 /// Returns a function that checks whether an SSA step is an assertion
@@ -51,7 +51,7 @@ void build_error_trace(
   goto_tracet &,
   const namespacet &,
   const symex_target_equationt &,
-  const prop_convt &,
+  const decision_proceduret &,
   ui_message_handlert &);
 
 void output_error_trace(

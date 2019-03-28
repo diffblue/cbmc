@@ -90,7 +90,7 @@ protected:
   std::unique_ptr<propt> satcheck;
   bv_pointerst satchecker;
   smt2_dect z3;
-  prop_convt *checker;
+  decision_proceduret *checker;
   static optionst get_default_options();
 };
 

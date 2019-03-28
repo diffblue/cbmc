@@ -45,7 +45,10 @@ public:
   decision_proceduret::resultt solve();
 
   /// Returns the solver instance
-  prop_convt &get_solver() const;
+  decision_proceduret &get_decision_procedure() const;
+
+  /// Returns the solver instance
+  stack_decision_proceduret &get_stack_decision_procedure() const;
 
   /// Return the equation associated with this instance
   symex_target_equationt &get_equation() const;
