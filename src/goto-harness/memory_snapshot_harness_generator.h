@@ -22,7 +22,8 @@ Author: Daniel Poetzl
 // clang-format off
 #define MEMORY_SNAPSHOT_HARNESS_GENERATOR_OPTIONS                              \
   "(memory-snapshot):"                                                         \
-  "(initial-location):"                                                        \
+  "(initial-goto-location):"                                                   \
+  "(initial-source-location):"                                                 \
   "(havoc-variables):" // MEMORY_SNAPSHOT_HARNESS_GENERATOR_OPTIONS
 // clang-format on
 
@@ -31,9 +32,11 @@ Author: Daniel Poetzl
   "memory snapshot harness generator (--harness-type\n"                        \
   "  initialise-from-memory-snapshot)\n\n"                                     \
   "--memory-snapshot <file>      initialise memory from JSON memory snapshot\n"\
-  "--initial-location <func[:<n>]>\n"                                          \
+  "--initial-goto-location <func[:<n>]>\n"                                     \
   "                              use given function and location number as "   \
   "entry\n                              point\n"                               \
+  "--initial-source-location <file:n>\n"                                       \
+  "                              use given file and line as entry point\n"     \
   "--havoc-variables vars        initialise variables from vars to\n"          \
   "                              non-deterministic values"                     \
   // MEMORY_SNAPSHOT_HARNESS_GENERATOR_HELP
