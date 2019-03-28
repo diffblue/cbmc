@@ -7,3 +7,5 @@ assertion.* line 11 function java::Test.checkMinLength.*: SUCCESS
 assertion.* line 13 function java::Test.checkMinLength.*: SUCCESS
 assertion.* line 17 function java::Test.checkMinLength.*: FAILURE
 assertion.* line 19 function java::Test.checkMinLength.*: FAILURE
+--
+^Building error trace
