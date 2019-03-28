@@ -116,7 +116,6 @@ public:
   literalt convert(const exprt &expr) override;
   void set_frozen(literalt) override;
   void set_all_frozen() override;
-  bool is_in_conflict(literalt l) const override;
   void set_to(const exprt &expr, bool value) override;
   exprt get(const exprt &expr) const override;
   std::string decision_procedure_text() const override

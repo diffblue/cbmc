@@ -20,9 +20,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "literal.h"
 #include "literal_expr.h"
 #include "prop.h"
+#include "solver_conflicts.h"
 #include "solver_resource_limits.h"
 
 class prop_conv_solvert : public decision_procedure_assumptionst,
+                          public solver_conflictst,
                           public solver_resource_limitst
 {
 public:

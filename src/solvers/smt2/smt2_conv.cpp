@@ -75,13 +75,6 @@ void smt2_convt::set_all_frozen()
   // not needed
 }
 
-bool smt2_convt::is_in_conflict(literalt l) const
-{
-  // we cannot do that
-  UNREACHABLE;
-  return false;
-}
-
 void smt2_convt::write_header()
 {
   out << "; SMT 2" << "\n";

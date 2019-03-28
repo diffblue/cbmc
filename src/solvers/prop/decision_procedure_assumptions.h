@@ -20,9 +20,6 @@ public:
   /// Set assumptions for the next call to operator() to solve the problem
   virtual void set_assumptions(const bvt &) = 0;
 
-  /// Returns true if an assumption is in the final conflict
-  virtual bool is_in_conflict(literalt l) const = 0;
-
   virtual ~decision_procedure_assumptionst() = default;
 };
 
