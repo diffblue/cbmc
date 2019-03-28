@@ -368,3 +368,28 @@ SCENARIO("Test pretty printing auxiliary function", "[core][java_util_test]")
     }
   }
 }
+
+SCENARIO("Test symbol ownership.", "[core][java_util_test]")
+{
+  WHEN("We have a new symbol.")
+  {
+    symbolt symbol;
+
+    THEN("The symbol has no owner.")
+    {
+      REQUIRE(!owning_class(symbol).has_value());
+    }
+  }
+
+  WHEN("The owning class of a symbol is set.")
+  {
+    const auto owning_class = "java::java.lang.object";
+    symbolt symbol;
+    set_owning_class(symbol, owning_class);
+
+    THEN("Getting the owning class of a symbol returns the class set.")
+    {
+      REQUIRE(id2string(*::owning_class(symbol)) == owning_class);
+    }
+  }
+}

@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <unordered_set>
 
 #include <util/message.h>
+#include <util/optional.h>
 #include <util/std_expr.h>
 #include <util/symbol_table.h>
 
@@ -114,5 +115,15 @@ symbolt &fresh_java_symbol(
   const source_locationt &source_location,
   const irep_idt &function_name,
   symbol_table_baset &symbol_table);
+
+/// Gets the identifier of the class which owns a given \p symbol. If the symbol
+/// is not owned by a class the an empty optional is returned. This is used for
+/// method symbols and static field symbols to link them back to the class which
+/// owns them.
+optionalt<irep_idt> owning_class(const symbolt &symbol);
+
+/// Sets the identifier of the class which owns a given \p symbol to \p
+/// owning_class.
+void set_owning_class(symbolt &symbol, const irep_idt &owning_class);
 
 #endif // CPROVER_JAVA_BYTECODE_JAVA_UTILS_H

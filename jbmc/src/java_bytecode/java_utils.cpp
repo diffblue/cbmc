@@ -464,3 +464,14 @@ symbolt &fresh_java_symbol(
   return get_fresh_aux_symbol(
     type, name_prefix, basename_prefix, source_location, ID_java, symbol_table);
 }
+
+optionalt<irep_idt> owning_class(const symbolt &symbol)
+{
+  const irep_idt &class_id = symbol.type.get(ID_C_class);
+  return class_id.empty() ? optionalt<irep_idt>{} : class_id;
+}
+
+void set_owning_class(symbolt &symbol, const irep_idt &owning_class)
+{
+  symbol.type.set(ID_C_class, owning_class);
+}
