@@ -1,9 +1,9 @@
 FUTURE z3_bug
-str_in_re_input_unsat.smt2
+regexp_union_input_sat.smt2
 
 ^EXIT=0$
 ^SIGNAL=0$
-^unsat$
+^sat$
 --
 error
 --

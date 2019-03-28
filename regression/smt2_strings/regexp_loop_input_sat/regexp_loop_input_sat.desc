@@ -1,4 +1,4 @@
-FUTURE
+FUTURE cvc4_bug z3_bug
 regexp_loop_input_sat.smt2
 
 ^EXIT=0$
@@ -6,3 +6,11 @@ regexp_loop_input_sat.smt2
 ^sat$
 --
 error
+--
+cvc4 (--strings-exp):
+re.loop not supported
+(cvc4 1.7-prerelease [git master e1dc3932])
+
+z3:
+re.loop is only supported with constant bounds
+Z3 [version 4.8.3 - 64 bit]
