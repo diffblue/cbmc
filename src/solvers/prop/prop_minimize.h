@@ -9,8 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// SAT Minimizer
 
-#ifndef CPROVER_SOLVERS_PROP_MINIMIZE_H
-#define CPROVER_SOLVERS_PROP_MINIMIZE_H
+#ifndef CPROVER_SOLVERS_PROP_PROP_MINIMIZE_H
+#define CPROVER_SOLVERS_PROP_PROP_MINIMIZE_H
 
 #include <map>
 
@@ -49,23 +49,21 @@ public:
   typedef long long signed int weightt;
 
   // adds an objective with given weight
-  void objective(
-    const literalt condition,
-    const weightt weight=1);
+  void objective(const literalt condition, const weightt weight = 1);
 
   struct objectivet
   {
     literalt condition;
     bool fixed;
 
-    explicit objectivet(const literalt _condition):
-      condition(_condition), fixed(false)
+    explicit objectivet(const literalt _condition)
+      : condition(_condition), fixed(false)
     {
     }
   };
 
   // the map of objectives, sorted by weight
-  typedef std::map<weightt, std::vector<objectivet> > objectivest;
+  typedef std::map<weightt, std::vector<objectivet>> objectivest;
   objectivest objectives;
 
 protected:
@@ -82,4 +80,4 @@ protected:
   objectivest::reverse_iterator current;
 };
 
-#endif // CPROVER_SOLVERS_PROP_MINIMIZE_H
+#endif // CPROVER_SOLVERS_PROP_PROP_MINIMIZE_H
