@@ -36,32 +36,17 @@ void memory_snapshot_harness_generatort::handle_option(
   {
     memory_snapshot_file = require_exactly_one_value(option, values);
   }
-  else if(option == "initial-location")
+  else if(option == "initial-goto-location")
   {
-    const std::string initial_location =
-      require_exactly_one_value(option, values);
-
-    std::vector<std::string> start;
-    split_string(initial_location, ':', start, true);
-
-    if(
-      start.empty() || start.front().empty() ||
-      (start.size() == 2 && start.back().empty()) || start.size() > 2)
-    {
-      throw invalid_command_line_argument_exceptiont(
-        "invalid initial location specification", "--initial-location");
-    }
-
-    entry_function_name = start.front();
-
-    if(start.size() == 2)
-    {
-      location_number = optionalt<unsigned>(safe_string2unsigned(start.back()));
-    }
+    initial_goto_location_line = require_exactly_one_value(option, values);
   }
   else if(option == "havoc-variables")
   {
     variables_to_havoc.insert(values.begin(), values.end());
+  }
+  else if(option == "initial-source-location")
+  {
+    initial_source_location_line = require_exactly_one_value(option, values);
   }
   else
   {

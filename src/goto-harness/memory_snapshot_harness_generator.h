@@ -246,10 +246,10 @@ protected:
     goto_modelt &goto_model,
     const symbolt &function) const;
 
+  /// data to store the command-line options
   std::string memory_snapshot_file;
-
-  irep_idt entry_function_name;
-  optionalt<unsigned> location_number;
+  std::string initial_goto_location_line;
+  std::string initial_source_location_line;
   std::unordered_set<irep_idt> variables_to_havoc;
 
   /// data to initialize the entry function
