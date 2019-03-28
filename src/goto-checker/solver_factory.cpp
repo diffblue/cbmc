@@ -25,6 +25,8 @@ Author: Daniel Kroening, Peter Schrammel
 #endif
 
 #include <solvers/flattening/bv_dimacs.h>
+#include <solvers/prop/decision_procedure_assumptions.h>
+#include <solvers/prop/decision_procedure_contexts.h>
 #include <solvers/prop/decision_procedure_incremental.h>
 #include <solvers/prop/prop.h>
 #include <solvers/prop/solver_resource_limits.h>
@@ -89,6 +91,17 @@ solver_factoryt::solvert::decision_procedure_assumptions() const
   INVARIANT(
     solver != nullptr,
     "incremental decision procedure with solving under assumptions required");
+  return *solver;
+}
+
+decision_procedure_contextst &
+solver_factoryt::solvert::decision_procedure_contexts() const
+{
+  PRECONDITION(decision_procedure_ptr != nullptr);
+  decision_procedure_contextst *solver =
+    dynamic_cast<decision_procedure_contextst *>(&*decision_procedure_ptr);
+  INVARIANT(
+    solver != nullptr, "incremental decision procedure with contexts required");
   return *solver;
 }
 
