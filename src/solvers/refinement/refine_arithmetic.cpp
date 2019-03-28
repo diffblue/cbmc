@@ -23,14 +23,14 @@ void bv_refinementt::approximationt::add_over_assumption(literalt l)
 {
   // if it's a constant already, give up
   if(!l.is_constant())
-    over_assumptions.push_back(l);
+    over_assumptions.push_back(literal_exprt(l));
 }
 
 void bv_refinementt::approximationt::add_under_assumption(literalt l)
 {
   // if it's a constant already, give up
   if(!l.is_constant())
-    under_assumptions.push_back(l);
+    under_assumptions.push_back(literal_exprt(l));
 }
 
 bvt bv_refinementt::convert_floatbv_op(const exprt &expr)
@@ -454,8 +454,13 @@ void bv_refinementt::check_UNSAT(approximationt &a)
 bool bv_refinementt::conflicts_with(approximationt &a)
 {
   for(std::size_t i=0; i<a.under_assumptions.size(); i++)
-    if(prop.is_in_conflict(a.under_assumptions[i]))
+  {
+    if(prop.is_in_conflict(
+         to_literal_expr(a.under_assumptions[i]).get_literal()))
+    {
       return true;
+    }
+  }
 
   return false;
 }

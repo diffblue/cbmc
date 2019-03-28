@@ -11,13 +11,11 @@ Author: Peter Schrammel
 
 #include "goto_symex_fault_localizer.h"
 
-#include <solvers/prop/prop_conv.h>
-
 goto_symex_fault_localizert::goto_symex_fault_localizert(
   const optionst &options,
   ui_message_handlert &ui_message_handler,
   const symex_target_equationt &equation,
-  prop_convt &solver)
+  stack_decision_proceduret &solver)
   : options(options),
     ui_message_handler(ui_message_handler),
     equation(equation),
@@ -58,7 +56,7 @@ const SSA_stept &goto_symex_fault_localizert::collect_guards(
       step.assignment_type == symex_targett::assignment_typet::STATE &&
       !step.ignore)
     {
-      literalt l = solver.convert(step.guard_handle);
+      exprt l = solver.handle(step.guard_handle);
       if(!l.is_constant())
       {
         auto emplace_result = fault_location.scores.emplace(step.source.pc, 0);
@@ -79,21 +77,21 @@ bool goto_symex_fault_localizert::check(
   const localization_points_valuet &value)
 {
   PRECONDITION(value.size() == localization_points.size());
-  bvt assumptions;
+  std::vector<exprt> assumptions;
   localization_points_valuet::const_iterator v_it = value.begin();
   for(const auto &l : localization_points)
   {
     if(v_it->is_true())
       assumptions.push_back(l.first);
     else if(v_it->is_false())
-      assumptions.push_back(!l.first);
+      assumptions.push_back(solver.handle(not_exprt(l.first)));
     ++v_it;
   }
 
   // lock the failed assertion
-  assumptions.push_back(!solver.convert(failed_step.cond_handle));
+  assumptions.push_back(solver.handle(not_exprt(failed_step.cond_handle)));
 
-  solver.set_assumptions(assumptions);
+  solver.push(assumptions);
 
   return solver() != decision_proceduret::resultt::D_SATISFIABLE;
 }
@@ -104,11 +102,11 @@ void goto_symex_fault_localizert::update_scores(
   for(auto &l : localization_points)
   {
     auto &score = l.second->second;
-    if(solver.l_get(l.first).is_true())
+    if(solver.get(l.first).is_true())
     {
       score++;
     }
-    else if(solver.l_get(l.first).is_false() && score > 0)
+    else if(solver.get(l.first).is_false() && score > 0)
     {
       score--;
     }
@@ -135,6 +133,5 @@ void goto_symex_fault_localizert::localize_linear(
   }
 
   // clear assumptions
-  bvt assumptions;
-  solver.set_assumptions(assumptions);
+  solver.pop();
 }

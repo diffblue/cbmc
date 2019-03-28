@@ -365,7 +365,7 @@ bool prop_conv_solvert::set_equality_to_true(const equal_exprt &expr)
   return true;
 }
 
-void prop_conv_solvert::set_to(const exprt &expr, bool value)
+void prop_conv_solvert::add_constraints_to_prop(const exprt &expr, bool value)
 {
   PRECONDITION(expr.type().id() == ID_bool);
 
@@ -380,7 +380,7 @@ void prop_conv_solvert::set_to(const exprt &expr, bool value)
     {
       if(expr.operands().size() == 1)
       {
-        set_to(expr.op0(), !value);
+        add_constraints_to_prop(expr.op0(), !value);
         return;
       }
     }
@@ -393,7 +393,7 @@ void prop_conv_solvert::set_to(const exprt &expr, bool value)
         if(expr.id() == ID_and)
         {
           forall_operands(it, expr)
-            set_to_true(*it);
+            add_constraints_to_prop(*it, true);
 
           return;
         }
@@ -437,14 +437,14 @@ void prop_conv_solvert::set_to(const exprt &expr, bool value)
         {
           const implies_exprt &implies_expr = to_implies_expr(expr);
 
-          set_to_true(implies_expr.op0());
-          set_to_false(implies_expr.op1());
+          add_constraints_to_prop(implies_expr.op0(), true);
+          add_constraints_to_prop(implies_expr.op1(), false);
           return;
         }
         else if(expr.id() == ID_or) // !(a || b)  ==  (!a && !b)
         {
           forall_operands(it, expr)
-            set_to_false(*it);
+            add_constraints_to_prop(*it, false);
           return;
         }
       }
@@ -524,4 +524,53 @@ void prop_conv_solvert::print_assignment(std::ostream &out) const
 std::size_t prop_conv_solvert::get_number_of_solver_calls() const
 {
   return prop.get_number_of_solver_calls();
+}
+
+const char *prop_conv_solvert::context_prefix = "prop_conv::context$";
+
+void prop_conv_solvert::set_to(const exprt &expr, bool value)
+{
+  if(assumption_stack.empty())
+  {
+    // We are in the root context.
+    add_constraints_to_prop(expr, value);
+  }
+  else
+  {
+    // We have a child context. We add context_literal ==> expr to the formula.
+    add_constraints_to_prop(
+      or_exprt(literal_exprt(!assumption_stack.back()), expr), value);
+  }
+}
+
+void prop_conv_solvert::push(const std::vector<exprt> &assumptions)
+{
+  // We push the given assumptions as a single context onto the stack.
+  assumption_stack.reserve(assumption_stack.size() + assumptions.size());
+  for(const auto &assumption : assumptions)
+    assumption_stack.push_back(to_literal_expr(assumption).get_literal());
+  context_size_stack.push_back(assumptions.size());
+
+  prop.set_assumptions(assumption_stack);
+}
+
+void prop_conv_solvert::push()
+{
+  // We create a new context literal.
+  literalt context_literal = convert(symbol_exprt(
+    context_prefix + std::to_string(context_literal_counter++), bool_typet()));
+
+  assumption_stack.push_back(context_literal);
+  context_size_stack.push_back(1);
+
+  prop.set_assumptions(assumption_stack);
+}
+
+void prop_conv_solvert::pop()
+{
+  // We remove the context from the stack.
+  assumption_stack.resize(assumption_stack.size() - context_size_stack.back());
+  context_size_stack.pop_back();
+
+  prop.set_assumptions(assumption_stack);
 }

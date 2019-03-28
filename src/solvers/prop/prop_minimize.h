@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/message.h>
 
+#include "literal.h"
 #include "prop_conv.h"
 
 /// Computes a satisfying assignment of minimal cost according to a const

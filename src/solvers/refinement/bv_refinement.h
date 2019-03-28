@@ -57,8 +57,6 @@ protected:
   bvt convert_mod(const mod_exprt &expr) override;
   bvt convert_floatbv_op(const exprt &expr) override;
 
-  void set_assumptions(const bvt &_assumptions) override;
-
 private:
   // the list of operator approximations
   struct approximationt final
@@ -78,8 +76,8 @@ private:
     bvt op0_bv, op1_bv, op2_bv, result_bv;
     mp_integer op0_value, op1_value, op2_value, result_value;
 
-    bvt under_assumptions;
-    bvt over_assumptions;
+    std::vector<exprt> under_assumptions;
+    std::vector<exprt> over_assumptions;
 
     // the kind of under- or over-approximation
     unsigned under_state, over_state;
@@ -108,7 +106,7 @@ private:
 
   bool progress;
   std::list<approximationt> approximations;
-  bvt parent_assumptions;
+
 protected:
   // use gui format
   configt config_;
