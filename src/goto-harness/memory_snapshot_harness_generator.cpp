@@ -6,6 +6,8 @@ Author: Daniel Poetzl
 
 \******************************************************************/
 
+#include <algorithm>
+
 #include "memory_snapshot_harness_generator.h"
 
 #include <goto-programs/goto_convert.h>
@@ -349,4 +351,134 @@ void memory_snapshot_harness_generatort::generate(
   insert_harness_function_into_goto_model(goto_model, harness_function_symbol);
 
   goto_functions.update();
+}
+
+memory_snapshot_harness_generatort::entry_goto_locationt
+memory_snapshot_harness_generatort::parse_goto_location(
+  const std::string &cmdl_option)
+{
+  std::vector<std::string> start;
+  split_string(cmdl_option, ':', start, true);
+
+  if(
+    start.empty() || start.front().empty() ||
+    (start.size() == 2 && start.back().empty()) || start.size() > 2)
+  {
+    throw invalid_command_line_argument_exceptiont(
+      "invalid initial location specification", "--initial-location");
+  }
+
+  if(start.size() == 2)
+  {
+    const auto location_number = string2optional_unsigned(start.back());
+    CHECK_RETURN(location_number.has_value());
+    return entry_goto_locationt{start.front(), *location_number};
+  }
+  else
+  {
+    return entry_goto_locationt{start.front()};
+  }
+}
+
+memory_snapshot_harness_generatort::entry_source_locationt
+memory_snapshot_harness_generatort::parse_source_location(
+  const std::string &cmdl_option)
+{
+  std::string initial_file_string;
+  std::string initial_line_string;
+  split_string(
+    cmdl_option, ':', initial_file_string, initial_line_string, true);
+
+  if(initial_file_string.empty() || initial_line_string.empty())
+  {
+    throw invalid_command_line_argument_exceptiont(
+      "invalid initial location specification", "--initial-file-line");
+  }
+
+  const auto line_number = string2optional_unsigned(initial_line_string);
+  CHECK_RETURN(line_number.has_value());
+  return entry_source_locationt{initial_file_string, *line_number};
+}
+
+memory_snapshot_harness_generatort::entry_locationt
+memory_snapshot_harness_generatort::initialize_entry_via_goto(
+  const entry_goto_locationt &entry_goto_location,
+  const goto_functionst &goto_functions)
+{
+  PRECONDITION(!entry_goto_location.function_name.empty());
+  const irep_idt &function_name = entry_goto_location.function_name;
+
+  // by function(+location): search for the function then jump to n-th
+  // location, then check the number
+  const auto &goto_function =
+    goto_functions.function_map.find(entry_goto_location.function_name);
+  if(
+    goto_function != goto_functions.function_map.end() &&
+    goto_function->second.body_available())
+  {
+    const auto &goto_program = goto_function->second.body;
+
+    const auto corresponding_instruction =
+      entry_goto_location.find_first_corresponding_instruction(
+        goto_program.instructions);
+
+    if(corresponding_instruction != goto_program.instructions.end())
+      return entry_locationt{function_name, corresponding_instruction};
+  }
+  throw invalid_command_line_argument_exceptiont(
+    "could not find the specified entry point", "--initial-goto-location");
+}
+
+memory_snapshot_harness_generatort::entry_locationt
+memory_snapshot_harness_generatort::initialize_entry_via_source(
+  const entry_source_locationt &entry_source_location,
+  const goto_functionst &goto_functions)
+{
+  PRECONDITION(!entry_source_location.file_name.empty());
+
+  // by line: iterate over all instructions until source location match
+  for(const auto &entry : goto_functions.function_map)
+  {
+    const auto &goto_function = entry.second;
+    // if !body_available() then body.instruction.empty() and that's fine
+    const auto &goto_program = goto_function.body;
+
+    const auto corresponding_instruction =
+      entry_source_location.find_first_corresponding_instruction(
+        goto_program.instructions);
+
+    if(corresponding_instruction != goto_program.instructions.end())
+      return entry_locationt{entry.first, corresponding_instruction};
+  }
+  throw invalid_command_line_argument_exceptiont(
+    "could not find the specified entry point", "--initial-source-location");
+}
+
+goto_programt::const_targett memory_snapshot_harness_generatort::
+  entry_goto_locationt::find_first_corresponding_instruction(
+    const goto_programt::instructionst &instructions) const
+{
+  if(!location_number.has_value())
+    return instructions.begin();
+
+  return std::find_if(
+    instructions.begin(),
+    instructions.end(),
+    [this](const goto_programt::instructiont &instruction) {
+      return *location_number == instruction.location_number;
+    });
+}
+
+goto_programt::const_targett memory_snapshot_harness_generatort::
+  entry_source_locationt::find_first_corresponding_instruction(
+    const goto_programt::instructionst &instructions) const
+{
+  return std::find_if(
+    instructions.begin(),
+    instructions.end(),
+    [this](const goto_programt::instructiont &instruction) {
+      return instruction.source_location.get_file() == file_name &&
+             safe_string2unsigned(id2string(
+               instruction.source_location.get_line())) >= line_number;
+    });
 }
