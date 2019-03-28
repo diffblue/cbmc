@@ -16,13 +16,17 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/message.h>
 #include <util/std_expr.h>
 
+#include <solvers/conflict_provider.h>
+
 #include "literal.h"
 #include "literal_expr.h"
 #include "prop.h"
 #include "prop_conv.h"
 #include "solver_resource_limits.h"
 
-class prop_conv_solvert : public prop_convt, public solver_resource_limitst
+class prop_conv_solvert : public conflict_providert,
+                          public prop_convt,
+                          public solver_resource_limitst
 {
 public:
   prop_conv_solvert(propt &_prop, message_handlert &message_handler)
@@ -65,14 +69,7 @@ public:
     freeze_all = true;
   }
   literalt convert(const exprt &expr) override;
-  bool is_in_conflict(literalt l) const override
-  {
-    return prop.is_in_conflict(l);
-  }
-  bool has_is_in_conflict() const override
-  {
-    return prop.has_is_in_conflict();
-  }
+  bool is_in_conflict(const exprt &expr) const override;
 
   // get literal for expression, if available
   bool literal(const symbol_exprt &expr, literalt &literal) const;
