@@ -802,6 +802,7 @@ IREP_ID_ONE(statement_list_xor)
 IREP_ID_ONE(statement_list_xor_not)
 IREP_ID_ONE(statement_list_instruction)
 IREP_ID_ONE(statement_list_instructions)
+IREP_ID_ONE(par)
 
 // Projects depending on this code base that wish to extend the list of
 // available ids should provide a file local_irep_ids.def in their source tree
