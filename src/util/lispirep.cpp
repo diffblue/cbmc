@@ -46,7 +46,7 @@ void irep2lisp(const irept &src, lispexprt &dest)
   dest.value.clear();
   dest.type=lispexprt::List;
 
-#ifdef NAMED_SUB_IS_FORWARD_LIST
+#if NAMED_SUB_IS_FORWARD_LIST
   const std::size_t named_sub_size =
     std::distance(src.get_named_sub().begin(), src.get_named_sub().end());
 #else

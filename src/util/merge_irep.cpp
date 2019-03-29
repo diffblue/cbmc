@@ -46,7 +46,7 @@ bool to_be_merged_irept::operator == (const to_be_merged_irept &other) const
 
   if(sub.size()!=o_sub.size())
     return false;
-#ifdef NAMED_SUB_IS_FORWARD_LIST
+#if NAMED_SUB_IS_FORWARD_LIST
   if(
     std::distance(named_sub.begin(), named_sub.end()) !=
     std::distance(o_named_sub.begin(), o_named_sub.end()))
@@ -105,12 +105,12 @@ const merged_irept &merged_irepst::merged(const irept &irep)
   const irept::named_subt &src_named_sub=irep.get_named_sub();
   irept::named_subt &dest_named_sub=new_irep.get_named_sub();
 
-#ifdef NAMED_SUB_IS_FORWARD_LIST
+#if NAMED_SUB_IS_FORWARD_LIST
   irept::named_subt::iterator before = dest_named_sub.before_begin();
 #endif
   forall_named_irep(it, src_named_sub)
   {
-#ifdef NAMED_SUB_IS_FORWARD_LIST
+#if NAMED_SUB_IS_FORWARD_LIST
     dest_named_sub.emplace_after(
       before, it->first, merged(it->second)); // recursive call
     ++before;
@@ -209,12 +209,12 @@ const irept &merge_full_irept::merged(const irept &irep)
   const irept::named_subt &src_named_sub=irep.get_named_sub();
   irept::named_subt &dest_named_sub=new_irep.get_named_sub();
 
-#ifdef NAMED_SUB_IS_FORWARD_LIST
+#if NAMED_SUB_IS_FORWARD_LIST
   irept::named_subt::iterator before = dest_named_sub.before_begin();
 #endif
   forall_named_irep(it, src_named_sub)
   {
-#ifdef NAMED_SUB_IS_FORWARD_LIST
+#if NAMED_SUB_IS_FORWARD_LIST
     dest_named_sub.emplace_after(
       before, it->first, merged(it->second)); // recursive call
     ++before;
