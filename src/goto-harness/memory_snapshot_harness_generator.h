@@ -99,7 +99,7 @@ protected:
 
   /// Parse a command line option to extract the user specified entry goto
   ///   location
-  /// \param cmdl_option: a string of the format <func[:<n>]>
+  /// \param cmdl_option: a string of the format `name:number`
   /// \return correctly constructed entry goto location
   entry_goto_locationt parse_goto_location(const std::string &cmdl_option);
 
@@ -126,7 +126,7 @@ protected:
 
   /// Parse a command line option to extract the user specified entry source
   ///   location
-  /// \param cmdl_option: a string of the format <file:n>
+  /// \param cmdl_option: a string of the format `name:number`
   /// \return correctly constructed entry source location
   entry_source_locationt parse_source_location(const std::string &cmdl_option);
 
@@ -214,8 +214,12 @@ protected:
   ///     ..second_part..
   ///   }
   ///
+  /// \param func_init_done_var: symbol expression for the `func_init_done`
+  ///   variable
   /// \param goto_model: Model where the modification takes place
-  void add_init_section(goto_modelt &goto_model) const;
+  void add_init_section(
+    const symbol_exprt &func_init_done_var,
+    goto_modelt &goto_model) const;
 
   /// For each global symbol in the \p snapshot symbol table either:
   /// 1) add \ref code_assignt assigning a value from the \p snapshot to the

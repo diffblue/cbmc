@@ -66,105 +66,50 @@ void memory_snapshot_harness_generatort::validate_options(
       "--harness-type initialise-from-memory-snapshot");
   }
 
-  if(entry_function_name.empty())
-  {
-    INVARIANT(
-      !location_number.has_value(),
-      "when `function` is empty then the option --initial-location was not "
-      "given and thus `location_number` was not set");
-
-    throw invalid_command_line_argument_exceptiont(
-      "option --initial-location is required",
-      "--harness-type initialise-from-memory-snapshot");
-  }
-
-  const auto &goto_functions = goto_model.goto_functions;
-  const auto &goto_function =
-    goto_functions.function_map.find(entry_function_name);
-  if(goto_function == goto_functions.function_map.end())
+  if(initial_source_location_line.empty() == initial_goto_location_line.empty())
   {
     throw invalid_command_line_argument_exceptiont(
-      "unknown initial location specification", "--initial-location");
+      "choose either source or goto location to specify the entry point",
+      "--initial-source/goto-location");
   }
 
-  if(!goto_function->second.body_available())
+  if(!initial_source_location_line.empty())
   {
-    throw invalid_command_line_argument_exceptiont(
-      "given function `" + id2string(entry_function_name) +
-        "` does not have a body",
-      "--initial-location");
+    entry_location = initialize_entry_via_source(
+      parse_source_location(initial_source_location_line),
+      goto_model.goto_functions);
   }
-
-  if(location_number.has_value())
+  else
   {
-    const auto &goto_program = goto_function->second.body;
-    const auto opt_it = goto_program.get_target(*location_number);
-
-    if(!opt_it.has_value())
-    {
-      throw invalid_command_line_argument_exceptiont(
-        "no instruction with location number " +
-          std::to_string(*location_number) + " in function " +
-          id2string(entry_function_name),
-        "--initial-location");
-    }
-  }
-
-  if(goto_functions.function_map.count(INITIALIZE_FUNCTION) == 0)
-  {
-    throw invalid_command_line_argument_exceptiont(
-      "invalid input program: " + std::string(INITIALIZE_FUNCTION) +
-        " not found",
-      "<in>");
+    entry_location = initialize_entry_via_goto(
+      parse_goto_location(initial_goto_location_line),
+      goto_model.goto_functions);
   }
 
   const symbol_tablet &symbol_table = goto_model.symbol_table;
+
   const symbolt *called_function_symbol =
-    symbol_table.lookup(entry_function_name);
+    symbol_table.lookup(entry_location.function_name);
 
   if(called_function_symbol == nullptr)
   {
     throw invalid_command_line_argument_exceptiont(
-      "function `" + id2string(entry_function_name) +
+      "function `" + id2string(entry_location.function_name) +
         "` not found in the symbol table",
       "--initial-location");
   }
 }
 
 void memory_snapshot_harness_generatort::add_init_section(
+  const symbol_exprt &func_init_done_var,
   goto_modelt &goto_model) const
 {
   goto_functionst &goto_functions = goto_model.goto_functions;
-  symbol_tablet &symbol_table = goto_model.symbol_table;
 
   goto_functiont &goto_function =
-    goto_functions.function_map[entry_function_name];
-  const symbolt &function_symbol = symbol_table.lookup_ref(entry_function_name);
+    goto_functions.function_map[entry_location.function_name];
 
   goto_programt &goto_program = goto_function.body;
-
-  // introduce a symbol for a Boolean variable to indicate the point at which
-  // the function initialisation is completed
-  symbolt &func_init_done_symbol = get_fresh_aux_symbol(
-    bool_typet(),
-    id2string(entry_function_name),
-    "func_init_done",
-    function_symbol.location,
-    function_symbol.mode,
-    symbol_table);
-  func_init_done_symbol.is_static_lifetime = true;
-  func_init_done_symbol.value = false_exprt();
-
-  const symbol_exprt func_init_done_var = func_init_done_symbol.symbol_expr();
-
-  // initialise func_init_done_var in __CPROVER_initialize if it is present
-  // so that it's FALSE value is visible before the harnessed function is called
-  goto_programt &cprover_initialize =
-    goto_functions.function_map.find(INITIALIZE_FUNCTION)->second.body;
-  cprover_initialize.insert_before(
-    std::prev(cprover_initialize.instructions.end()),
-    goto_programt::make_assignment(
-      code_assignt(func_init_done_var, false_exprt())));
 
   const goto_programt::const_targett start_it =
     goto_program.instructions.begin();
@@ -182,9 +127,8 @@ void memory_snapshot_harness_generatort::add_init_section(
   goto_program.compute_location_numbers();
   goto_program.insert_after(
     ins_it2,
-    goto_programt::make_goto(goto_program.const_cast_target(
-      location_number.has_value() ? *goto_program.get_target(*location_number)
-                                  : start_it)));
+    goto_programt::make_goto(
+      goto_program.const_cast_target(entry_location.start_instruction)));
 }
 
 code_blockt memory_snapshot_harness_generatort::add_assignments_to_globals(
@@ -310,12 +254,27 @@ void memory_snapshot_harness_generatort::generate(
   goto_functionst &goto_functions = goto_model.goto_functions;
 
   const symbolt *called_function_symbol =
-    symbol_table.lookup(entry_function_name);
+    symbol_table.lookup(entry_location.function_name);
 
-  add_init_section(goto_model);
+  // introduce a symbol for a Boolean variable to indicate the point at which
+  // the function initialisation is completed
+  auto &func_init_done_symbol = get_fresh_aux_symbol(
+    bool_typet(),
+    id2string(entry_location.function_name),
+    "func_init_done",
+    source_locationt::nil(),
+    called_function_symbol->mode,
+    symbol_table);
+  func_init_done_symbol.is_static_lifetime = true;
+  func_init_done_symbol.value = false_exprt();
+  symbol_exprt func_init_done_var = func_init_done_symbol.symbol_expr();
+
+  add_init_section(func_init_done_var, goto_model);
 
   code_blockt harness_function_body =
     add_assignments_to_globals(snapshot, goto_model);
+
+  harness_function_body.add(code_assignt{func_init_done_var, false_exprt{}});
 
   add_call_with_nondet_arguments(
     *called_function_symbol, harness_function_body);
