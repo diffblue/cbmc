@@ -47,16 +47,6 @@ relative to the base address of the object. The function
 **\_\_CPROVER\_DYNAMIC\_OBJECT** returns true if the pointer passed as
 arguments points to a dynamically allocated object.
 
-#### \_\_CPROVER\_initialize
-
-```C
-void __CPROVER_initialize(void);
-```
-
-The function **\_\_CPROVER\_initialize** computes the initial state of
-the program. It is called prior to calling the main procedure of the
-program.
-
 #### \_\_CPROVER\_input, \_\_CPROVER\_output
 
 ```C
