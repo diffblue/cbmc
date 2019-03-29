@@ -50,27 +50,27 @@ operator()(renamedt<ssa_exprt, L0> l0_expr) const
     !l0_expr.get().get_level_1().empty() ||
     !l0_expr.get().get_level_2().empty())
   {
-    return renamedt<ssa_exprt, L1>{std::move(l0_expr.value)};
+    return renamedt<ssa_exprt, L1>{std::move(l0_expr.value())};
   }
 
   const irep_idt l0_name = l0_expr.get().get_l1_object_identifier();
 
   const auto it = current_names.find(l0_name);
   if(it == current_names.end())
-    return renamedt<ssa_exprt, L1>{std::move(l0_expr.value)};
+    return renamedt<ssa_exprt, L1>{std::move(l0_expr.value())};
 
   // rename!
-  l0_expr.value.set_level_1(it->second.second);
-  return renamedt<ssa_exprt, L1>{std::move(l0_expr.value)};
+  l0_expr.value().set_level_1(it->second.second);
+  return renamedt<ssa_exprt, L1>{std::move(l0_expr.value())};
 }
 
 renamedt<ssa_exprt, L2> symex_level2t::
 operator()(renamedt<ssa_exprt, L1> l1_expr) const
 {
   if(!l1_expr.get().get_level_2().empty())
-    return renamedt<ssa_exprt, L2>{std::move(l1_expr.value)};
-  l1_expr.value.set_level_2(current_count(l1_expr.get().get_identifier()));
-  return renamedt<ssa_exprt, L2>{std::move(l1_expr.value)};
+    return renamedt<ssa_exprt, L2>{std::move(l1_expr.value())};
+  l1_expr.value().set_level_2(current_count(l1_expr.get().get_identifier()));
+  return renamedt<ssa_exprt, L2>{std::move(l1_expr.value())};
 }
 
 void symex_level1t::restore_from(const current_namest &other)

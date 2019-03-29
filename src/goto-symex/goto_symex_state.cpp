@@ -261,12 +261,12 @@ goto_symex_statet::rename(exprt expr, const namespacet &ns)
     if(level == L0)
     {
       return renamedt<exprt, level>{
-        std::move(rename_ssa<L0>(std::move(ssa), ns).value)};
+        std::move(rename_ssa<L0>(std::move(ssa), ns).value())};
     }
     else if(level == L1)
     {
       return renamedt<exprt, level>{
-        std::move(rename_ssa<L1>(std::move(ssa), ns).value)};
+        std::move(rename_ssa<L1>(std::move(ssa), ns).value())};
     }
     else if(level==L2)
     {

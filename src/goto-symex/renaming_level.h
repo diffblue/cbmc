@@ -69,7 +69,7 @@ struct symex_renaming_levelt
 /// Wrapper for expressions or types which have been renamed up to a given
 /// \p level
 template <typename underlyingt, levelt level>
-class renamedt
+class renamedt : private underlyingt
 {
 public:
   static_assert(
@@ -79,16 +79,19 @@ public:
 
   const underlyingt &get() const
   {
-    return value;
+    return static_cast<const underlyingt &>(*this);
   }
 
   void simplify(const namespacet &ns)
   {
-    (void)::simplify(value, ns);
+    (void)::simplify(value(), ns);
   }
 
 private:
-  underlyingt value;
+  underlyingt &value()
+  {
+    return static_cast<underlyingt &>(*this);
+  };
 
   friend struct symex_level0t;
   friend struct symex_level1t;
@@ -96,7 +99,7 @@ private:
   friend class goto_symex_statet;
 
   /// Only the friend classes can create renamedt objects
-  explicit renamedt(underlyingt value) : value(std::move(value))
+  explicit renamedt(underlyingt value) : underlyingt(std::move(value))
   {
   }
 };
