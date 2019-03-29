@@ -32,7 +32,8 @@ public:
 
   explicit typet(const irep_idt &_id):irept(_id) { }
 
-#if defined(__clang__) || !defined(__GNUC__) || __GNUC__ >= 6
+  // the STL implementation shipped with GCC 5 is broken
+#if !defined(__GLIBCXX__) || __GLIBCXX__ >= 20181026
   typet(irep_idt _id, typet _subtype)
     : irept(std::move(_id), {}, {std::move(_subtype)})
   {
