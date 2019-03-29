@@ -232,7 +232,7 @@ static void clinit_wrapper_do_recursive_calls(
       symbol_table.symbols.end(),
       [&](const std::pair<irep_idt, symbolt> &symbol) {
         if(
-          symbol.second.type.get(ID_C_class) == class_name &&
+          owning_class(symbol.second) == class_name &&
           symbol.second.is_static_lifetime &&
           !symbol.second.type.get_bool(ID_C_constant))
         {
@@ -352,10 +352,9 @@ static void create_clinit_wrapper_symbols(
   wrapper_method_symbol.pretty_name = wrapper_method_symbol.name;
   wrapper_method_symbol.base_name = "clinit_wrapper";
   wrapper_method_symbol.type = wrapper_method_type;
-  // Note this use of a type-comment to provide a back-link from a method
-  // to its associated class is the same one used in
-  // java_bytecode_convert_methodt::convert
-  wrapper_method_symbol.type.set(ID_C_class, class_name);
+  // This provides a back-link from a method to its associated class, as is done
+  // for java_bytecode_convert_methodt::convert.
+  set_owning_class(wrapper_method_symbol, class_name);
   wrapper_method_symbol.mode = ID_java;
   bool failed = symbol_table.add(wrapper_method_symbol);
   INVARIANT(!failed, "clinit-wrapper symbol should be fresh");
@@ -453,21 +452,20 @@ code_blockt get_thread_safe_clinit_wrapper_body(
   message_handlert &message_handler)
 {
   const symbolt &wrapper_method_symbol = symbol_table.lookup_ref(function_id);
-  irep_idt class_name = wrapper_method_symbol.type.get(ID_C_class);
-  INVARIANT(
-    !class_name.empty(), "wrapper function should be annotated with its class");
+  const auto class_name = owning_class(wrapper_method_symbol);
+  INVARIANT(class_name, "Wrapper function should have an owning class.");
 
   const symbolt &clinit_state_sym =
-    symbol_table.lookup_ref(clinit_state_var_name(class_name));
+    symbol_table.lookup_ref(clinit_state_var_name(*class_name));
   const symbolt &clinit_thread_local_state_sym =
-    symbol_table.lookup_ref(clinit_thread_local_state_var_name(class_name));
+    symbol_table.lookup_ref(clinit_thread_local_state_var_name(*class_name));
 
   // Create a function-local variable "init_complete". This variable is used to
   // avoid inspecting the global state (clinit_state_sym) outside of
   // the critical-section.
   const symbolt &init_complete = add_new_variable_symbol(
     symbol_table,
-    clinit_local_init_complete_var_name(class_name),
+    clinit_local_init_complete_var_name(*class_name),
     bool_typet(),
     nil_exprt(),
     true,
@@ -598,7 +596,7 @@ code_blockt get_thread_safe_clinit_wrapper_body(
     code_blockt init_body;
     clinit_wrapper_do_recursive_calls(
       symbol_table,
-      class_name,
+      *class_name,
       init_body,
       nondet_static,
       object_factory_parameters,
@@ -666,12 +664,11 @@ code_ifthenelset get_clinit_wrapper_body(
   //   }
   // }
   const symbolt &wrapper_method_symbol = symbol_table.lookup_ref(function_id);
-  irep_idt class_name = wrapper_method_symbol.type.get(ID_C_class);
-  INVARIANT(
-    !class_name.empty(), "wrapper function should be annotated with its class");
+  const auto class_name = owning_class(wrapper_method_symbol);
+  INVARIANT(class_name, "Wrapper function should have an owning class.");
 
   const symbolt &already_run_symbol =
-    symbol_table.lookup_ref(clinit_already_run_variable_name(class_name));
+    symbol_table.lookup_ref(clinit_already_run_variable_name(*class_name));
 
   equal_exprt check_already_run(
     already_run_symbol.symbol_expr(),
@@ -683,7 +680,7 @@ code_ifthenelset get_clinit_wrapper_body(
 
   clinit_wrapper_do_recursive_calls(
     symbol_table,
-    class_name,
+    *class_name,
     init_body,
     nondet_static,
     object_factory_parameters,
@@ -766,12 +763,9 @@ void stub_global_initializer_factoryt::create_stub_global_initializer_symbols(
       continue;
     }
 
-    const irep_idt class_id =
-      global_symbol.type.get(ID_C_class);
-    INVARIANT(
-      !class_id.empty(),
-      "static field should be annotated with its defining class");
-    stub_globals_by_class.insert({class_id, stub_global});
+    const auto class_id = owning_class(global_symbol);
+    INVARIANT(class_id, "Static field should have a defining class.");
+    stub_globals_by_class.insert({*class_id, stub_global});
   }
 
   // For each distinct class that has stub globals, create a clinit symbol:
@@ -799,10 +793,9 @@ void stub_global_initializer_factoryt::create_stub_global_initializer_symbols(
     static_init_symbol.base_name = "clinit():V";
     static_init_symbol.mode = ID_java;
     static_init_symbol.type = thunk_type;
-    // Note this use of a type-comment to provide a back-link from a method
-    // to its associated class is the same one used in
-    // java_bytecode_convert_methodt::convert
-    static_init_symbol.type.set(ID_C_class, it->first);
+    // This provides a back-link from a method to its associated class, as is
+    // done for java_bytecode_convert_methodt::convert.
+    set_owning_class(static_init_symbol, it->first);
 
     bool failed = symbol_table.add(static_init_symbol);
     INVARIANT(!failed, "symbol should not already exist");
@@ -839,17 +832,16 @@ code_blockt stub_global_initializer_factoryt::get_stub_initializer_body(
   message_handlert &message_handler)
 {
   const symbolt &stub_initializer_symbol = symbol_table.lookup_ref(function_id);
-  irep_idt class_id = stub_initializer_symbol.type.get(ID_C_class);
+  const auto class_id = owning_class(stub_initializer_symbol);
   INVARIANT(
-    !class_id.empty(),
-    "synthetic static initializer should be annotated with its class");
+    class_id, "Synthetic static initializer should have an owning class.");
   code_blockt static_init_body;
 
   // Add a standard nondet initialisation for each global declared on this
   // class. Note this is the same invocation used in
   // java_static_lifetime_init.
 
-  auto class_globals = stub_globals_by_class.equal_range(class_id);
+  auto class_globals = stub_globals_by_class.equal_range(*class_id);
   INVARIANT(
     class_globals.first != class_globals.second,
     "class with synthetic clinit should have at least one global to init");

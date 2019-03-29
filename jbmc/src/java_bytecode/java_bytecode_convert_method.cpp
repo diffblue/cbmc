@@ -419,6 +419,8 @@ void java_bytecode_convert_methodt::convert(
     get_method_identifier(class_symbol.name, m);
 
   method_id=method_identifier;
+  set_owning_class(
+    symbol_table.get_writeable_ref(method_identifier), class_symbol.name);
 
   // Obtain a std::vector of java_method_typet::parametert objects from the
   // (function) type of the symbol
@@ -428,7 +430,6 @@ void java_bytecode_convert_methodt::convert(
   // to the symbol later.
   java_method_typet method_type =
     to_java_method_type(symbol_table.lookup_ref(method_identifier).type);
-  method_type.set(ID_C_class, class_symbol.name);
   method_type.set_is_final(m.is_final);
   method_return_type = method_type.return_type();
   java_method_typet::parameterst &parameters = method_type.parameters();
