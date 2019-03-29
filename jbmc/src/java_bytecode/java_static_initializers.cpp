@@ -232,7 +232,7 @@ static void clinit_wrapper_do_recursive_calls(
       symbol_table.symbols.end(),
       [&](const std::pair<irep_idt, symbolt> &symbol) {
         if(
-          owning_class(symbol.second) == class_name &&
+          declaring_class(symbol.second) == class_name &&
           symbol.second.is_static_lifetime &&
           !symbol.second.type.get_bool(ID_C_constant))
         {
@@ -354,7 +354,7 @@ static void create_clinit_wrapper_symbols(
   wrapper_method_symbol.type = wrapper_method_type;
   // This provides a back-link from a method to its associated class, as is done
   // for java_bytecode_convert_methodt::convert.
-  set_owning_class(wrapper_method_symbol, class_name);
+  set_declaring_class(wrapper_method_symbol, class_name);
   wrapper_method_symbol.mode = ID_java;
   bool failed = symbol_table.add(wrapper_method_symbol);
   INVARIANT(!failed, "clinit-wrapper symbol should be fresh");
@@ -452,7 +452,7 @@ code_blockt get_thread_safe_clinit_wrapper_body(
   message_handlert &message_handler)
 {
   const symbolt &wrapper_method_symbol = symbol_table.lookup_ref(function_id);
-  const auto class_name = owning_class(wrapper_method_symbol);
+  const auto class_name = declaring_class(wrapper_method_symbol);
   INVARIANT(class_name, "Wrapper function should have an owning class.");
 
   const symbolt &clinit_state_sym =
@@ -664,7 +664,7 @@ code_ifthenelset get_clinit_wrapper_body(
   //   }
   // }
   const symbolt &wrapper_method_symbol = symbol_table.lookup_ref(function_id);
-  const auto class_name = owning_class(wrapper_method_symbol);
+  const auto class_name = declaring_class(wrapper_method_symbol);
   INVARIANT(class_name, "Wrapper function should have an owning class.");
 
   const symbolt &already_run_symbol =
@@ -763,7 +763,7 @@ void stub_global_initializer_factoryt::create_stub_global_initializer_symbols(
       continue;
     }
 
-    const auto class_id = owning_class(global_symbol);
+    const auto class_id = declaring_class(global_symbol);
     INVARIANT(class_id, "Static field should have a defining class.");
     stub_globals_by_class.insert({*class_id, stub_global});
   }
@@ -795,7 +795,7 @@ void stub_global_initializer_factoryt::create_stub_global_initializer_symbols(
     static_init_symbol.type = thunk_type;
     // This provides a back-link from a method to its associated class, as is
     // done for java_bytecode_convert_methodt::convert.
-    set_owning_class(static_init_symbol, it->first);
+    set_declaring_class(static_init_symbol, it->first);
 
     bool failed = symbol_table.add(static_init_symbol);
     INVARIANT(!failed, "symbol should not already exist");
@@ -832,7 +832,7 @@ code_blockt stub_global_initializer_factoryt::get_stub_initializer_body(
   message_handlert &message_handler)
 {
   const symbolt &stub_initializer_symbol = symbol_table.lookup_ref(function_id);
-  const auto class_id = owning_class(stub_initializer_symbol);
+  const auto class_id = declaring_class(stub_initializer_symbol);
   INVARIANT(
     class_id, "Synthetic static initializer should have an owning class.");
   code_blockt static_init_body;

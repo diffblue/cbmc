@@ -77,7 +77,7 @@ tvt java_enum_static_init_unwind_handler(
     return tvt::unknown();
 
   const symbolt &function_symbol = symbol_table.lookup_ref(enum_function_id);
-  const auto class_id = owning_class(function_symbol);
+  const auto class_id = declaring_class(function_symbol);
   INVARIANT(class_id, "Java methods should have a defining class.");
 
   const typet &class_type = symbol_table.lookup_ref(*class_id).type;

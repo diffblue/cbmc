@@ -691,7 +691,7 @@ void java_bytecode_convert_classt::convert(
     new_symbol.type=field_type;
     // Provide a static field -> class link, like
     // java_bytecode_convert_method::convert does for method -> class.
-    set_owning_class(new_symbol, class_symbol.name);
+    set_declaring_class(new_symbol, class_symbol.name);
     new_symbol.type.set(ID_C_field, f.name);
     new_symbol.type.set(ID_C_constant, f.is_final);
     new_symbol.pretty_name=id2string(class_symbol.pretty_name)+

@@ -419,7 +419,7 @@ void java_bytecode_convert_methodt::convert(
     get_method_identifier(class_symbol.name, m);
 
   method_id=method_identifier;
-  set_owning_class(
+  set_declaring_class(
     symbol_table.get_writeable_ref(method_identifier), class_symbol.name);
 
   // Obtain a std::vector of java_method_typet::parametert objects from the

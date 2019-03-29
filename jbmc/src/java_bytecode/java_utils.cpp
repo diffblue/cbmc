@@ -465,13 +465,13 @@ symbolt &fresh_java_symbol(
     type, name_prefix, basename_prefix, source_location, ID_java, symbol_table);
 }
 
-optionalt<irep_idt> owning_class(const symbolt &symbol)
+optionalt<irep_idt> declaring_class(const symbolt &symbol)
 {
   const irep_idt &class_id = symbol.type.get(ID_C_class);
   return class_id.empty() ? optionalt<irep_idt>{} : class_id;
 }
 
-void set_owning_class(symbolt &symbol, const irep_idt &owning_class)
+void set_declaring_class(symbolt &symbol, const irep_idt &declaring_class)
 {
-  symbol.type.set(ID_C_class, owning_class);
+  symbol.type.set(ID_C_class, declaring_class);
 }

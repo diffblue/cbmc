@@ -369,27 +369,27 @@ SCENARIO("Test pretty printing auxiliary function", "[core][java_util_test]")
   }
 }
 
-SCENARIO("Test symbol ownership.", "[core][java_util_test]")
+SCENARIO("Test symbol declarers.", "[core][java_util_test]")
 {
   WHEN("We have a new symbol.")
   {
     symbolt symbol;
 
-    THEN("The symbol has no owner.")
+    THEN("The symbol has no declarer.")
     {
-      REQUIRE(!owning_class(symbol).has_value());
+      REQUIRE(!declaring_class(symbol).has_value());
     }
   }
 
-  WHEN("The owning class of a symbol is set.")
+  WHEN("The declaring class of a symbol is set.")
   {
-    const auto owning_class = "java::java.lang.object";
+    const auto declaring_class = "java::java.lang.object";
     symbolt symbol;
-    set_owning_class(symbol, owning_class);
+    set_declaring_class(symbol, declaring_class);
 
-    THEN("Getting the owning class of a symbol returns the class set.")
+    THEN("Getting the declaring class of a symbol returns the class set.")
     {
-      REQUIRE(id2string(*::owning_class(symbol)) == owning_class);
+      REQUIRE(id2string(*::declaring_class(symbol)) == declaring_class);
     }
   }
 }

@@ -116,14 +116,14 @@ symbolt &fresh_java_symbol(
   const irep_idt &function_name,
   symbol_table_baset &symbol_table);
 
-/// Gets the identifier of the class which owns a given \p symbol. If the symbol
-/// is not owned by a class the an empty optional is returned. This is used for
-/// method symbols and static field symbols to link them back to the class which
-/// owns them.
-optionalt<irep_idt> owning_class(const symbolt &symbol);
+/// Gets the identifier of the class which declared a given \p symbol. If the
+/// symbol is not declared by a class then an empty optional is returned. This
+/// is used for method symbols and static field symbols to link them back to the
+/// class which declared them.
+optionalt<irep_idt> declaring_class(const symbolt &symbol);
 
-/// Sets the identifier of the class which owns a given \p symbol to \p
-/// owning_class.
-void set_owning_class(symbolt &symbol, const irep_idt &owning_class);
+/// Sets the identifier of the class which declared a given \p symbol to \p
+/// declaring_class.
+void set_declaring_class(symbolt &symbol, const irep_idt &declaring_class);
 
 #endif // CPROVER_JAVA_BYTECODE_JAVA_UTILS_H
