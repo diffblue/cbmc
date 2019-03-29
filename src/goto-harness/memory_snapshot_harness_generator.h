@@ -22,7 +22,8 @@ Author: Daniel Poetzl
 // clang-format off
 #define MEMORY_SNAPSHOT_HARNESS_GENERATOR_OPTIONS                              \
   "(memory-snapshot):"                                                         \
-  "(initial-location):"                                                        \
+  "(initial-goto-location):"                                                   \
+  "(initial-source-location):"                                                 \
   "(havoc-variables):" // MEMORY_SNAPSHOT_HARNESS_GENERATOR_OPTIONS
 // clang-format on
 
@@ -31,9 +32,11 @@ Author: Daniel Poetzl
   "memory snapshot harness generator (--harness-type\n"                        \
   "  initialise-from-memory-snapshot)\n\n"                                     \
   "--memory-snapshot <file>      initialise memory from JSON memory snapshot\n"\
-  "--initial-location <func[:<n>]>\n"                                          \
+  "--initial-goto-location <func[:<n>]>\n"                                     \
   "                              use given function and location number as "   \
   "entry\n                              point\n"                               \
+  "--initial-source-location <file:n>\n"                                       \
+  "                              use given file and line as entry point\n"     \
   "--havoc-variables vars        initialise variables from vars to\n"          \
   "                              non-deterministic values"                     \
   // MEMORY_SNAPSHOT_HARNESS_GENERATOR_HELP
@@ -66,6 +69,103 @@ public:
     override;
 
 protected:
+  /// User provided goto location: function name and (maybe) location number;
+  /// the structure wraps this option with a parser
+  struct entry_goto_locationt
+  {
+    irep_idt function_name;
+    optionalt<unsigned> location_number;
+
+    entry_goto_locationt() = delete;
+    explicit entry_goto_locationt(irep_idt function_name)
+      : function_name(function_name)
+    {
+    }
+    explicit entry_goto_locationt(
+      irep_idt function_name,
+      unsigned location_number)
+      : function_name(function_name), location_number(location_number)
+    {
+    }
+
+    /// Returns the first \ref goto_programt::instructiont represented by this
+    ///   goto location, i.e. if there is no location number then the first
+    ///   instruction, otherwise the one with the right location number
+    /// \param instructions: list of instructions to be searched
+    /// \return iterator to the right instruction (or `end()`)
+    goto_programt::const_targett find_first_corresponding_instruction(
+      const goto_programt::instructionst &instructions) const;
+  };
+
+  /// Parse a command line option to extract the user specified entry goto
+  ///   location
+  /// \param cmdl_option: a string of the format `name:number`
+  /// \return correctly constructed entry goto location
+  entry_goto_locationt parse_goto_location(const std::string &cmdl_option);
+
+  /// User provided source location: file name and line number; the structure
+  /// wraps this option with a parser
+  struct entry_source_locationt
+  {
+    irep_idt file_name;
+    unsigned line_number;
+
+    entry_source_locationt() = delete;
+    explicit entry_source_locationt(irep_idt file_name, unsigned line_number)
+      : file_name(file_name), line_number(line_number)
+    {
+    }
+
+    /// Returns the first \ref goto_programt::instructiont represented by this
+    ///   source location, i.e. one with the same file name and line number
+    /// \param instructions: list of instructions to be searched
+    /// \return iterator to the right instruction (or `end()`)
+    goto_programt::const_targett find_first_corresponding_instruction(
+      const goto_programt::instructionst &instructions) const;
+  };
+
+  /// Parse a command line option to extract the user specified entry source
+  ///   location
+  /// \param cmdl_option: a string of the format `name:number`
+  /// \return correctly constructed entry source location
+  entry_source_locationt parse_source_location(const std::string &cmdl_option);
+
+  /// Wraps the information needed to identify the entry point. Initializes via
+  /// either \ref entry_goto_locationt or \ref entry_source_locationt
+  struct entry_locationt
+  {
+    irep_idt function_name;
+    goto_programt::const_targett start_instruction;
+
+    entry_locationt() = default;
+    explicit entry_locationt(
+      irep_idt function_name,
+      goto_programt::const_targett start_instruction)
+      : function_name(function_name), start_instruction(start_instruction)
+    {
+    }
+  };
+
+  /// Find and return the entry instruction (requested by the user as goto
+  ///   location: function name + location number)
+  /// \param entry_goto_location: user specified goto location
+  /// \param goto_functions: goto functions to be searched for the entry
+  ///   instruction
+  /// \return the correctly constructed entry location
+  entry_locationt initialize_entry_via_goto(
+    const entry_goto_locationt &entry_goto_location,
+    const goto_functionst &goto_functions);
+
+  /// Find and return the entry instruction (requested by the user as source
+  ///   location: file name + line number)
+  /// \param entry_source_location: user specified goto location
+  /// \param goto_functions: goto functions to be searched for the entry
+  ///   instruction
+  /// \return the correctly constructed entry location
+  entry_locationt initialize_entry_via_source(
+    const entry_source_locationt &entry_source_location,
+    const goto_functionst &goto_functions);
+
   /// Collect the memory-snapshot specific cmdline options (one at a time)
   /// \param option: memory-snapshot | initial-location | havoc-variables
   /// \param values: list of arguments related to a given option
@@ -114,8 +214,12 @@ protected:
   ///     ..second_part..
   ///   }
   ///
+  /// \param func_init_done_var: symbol expression for the `func_init_done`
+  ///   variable
   /// \param goto_model: Model where the modification takes place
-  void add_init_section(goto_modelt &goto_model) const;
+  void add_init_section(
+    const symbol_exprt &func_init_done_var,
+    goto_modelt &goto_model) const;
 
   /// For each global symbol in the \p snapshot symbol table either:
   /// 1) add \ref code_assignt assigning a value from the \p snapshot to the
@@ -146,11 +250,14 @@ protected:
     goto_modelt &goto_model,
     const symbolt &function) const;
 
+  /// data to store the command-line options
   std::string memory_snapshot_file;
-
-  irep_idt entry_function_name;
-  optionalt<unsigned> location_number;
+  std::string initial_goto_location_line;
+  std::string initial_source_location_line;
   std::unordered_set<irep_idt> variables_to_havoc;
+
+  /// data to initialize the entry function
+  entry_locationt entry_location;
 
   message_handlert &message_handler;
 };
