@@ -101,9 +101,9 @@ decision_proceduret::resultt bv_refinementt::prop_solve()
       approximation.under_assumptions.end());
   }
 
-  prop.set_assumptions(assumptions);
+  bv_pointerst::set_assumptions(assumptions);
   propt::resultt result=prop.prop_solve();
-  prop.set_assumptions(parent_assumptions);
+  bv_pointerst::set_assumptions(parent_assumptions);
 
   switch(result)
   {
@@ -136,5 +136,5 @@ void bv_refinementt::check_UNSAT()
 void bv_refinementt::set_assumptions(const bvt &_assumptions)
 {
   parent_assumptions=_assumptions;
-  prop.set_assumptions(_assumptions);
+  bv_pointerst::set_assumptions(_assumptions);
 }
