@@ -32,10 +32,17 @@ public:
 
   explicit typet(const irep_idt &_id):irept(_id) { }
 
+#if defined(__clang__) || !defined(__GNUC__) || __GNUC__ >= 6
   typet(irep_idt _id, typet _subtype)
     : irept(std::move(_id), {}, {std::move(_subtype)})
   {
   }
+#else
+  typet(irep_idt _id, typet _subtype) : irept(std::move(_id))
+  {
+    subtype() = std::move(_subtype);
+  }
+#endif
 
   const typet &subtype() const
   {
