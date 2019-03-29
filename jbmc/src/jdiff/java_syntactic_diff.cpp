@@ -12,6 +12,7 @@ Author: Peter Schrammel
 #include "java_syntactic_diff.h"
 
 #include <goto-programs/goto_model.h>
+#include <java_bytecode/java_utils.h>
 
 bool java_syntactic_difft::operator()()
 {
@@ -35,16 +36,16 @@ bool java_syntactic_difft::operator()()
     CHECK_RETURN(fun1 != nullptr);
     const symbolt *fun2 = goto_model2.symbol_table.lookup(it->first);
     CHECK_RETURN(fun2 != nullptr);
-    const irep_idt &class_name = fun1->type.get(ID_C_class);
+    const optionalt<irep_idt> class_name = declaring_class(*fun1);
     bool function_access_changed =
       fun1->type.get(ID_access) != fun2->type.get(ID_access);
     bool class_access_changed = false;
     bool field_access_changed = false;
-    if(!class_name.empty())
+    if(class_name)
     {
-      const symbolt *class1 = goto_model1.symbol_table.lookup(class_name);
+      const symbolt *class1 = goto_model1.symbol_table.lookup(*class_name);
       CHECK_RETURN(class1 != nullptr);
-      const symbolt *class2 = goto_model2.symbol_table.lookup(class_name);
+      const symbolt *class2 = goto_model2.symbol_table.lookup(*class_name);
       CHECK_RETURN(class2 != nullptr);
       class_access_changed =
         class1->type.get(ID_access) != class2->type.get(ID_access);

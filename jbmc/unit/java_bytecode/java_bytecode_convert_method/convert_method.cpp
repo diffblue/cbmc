@@ -8,10 +8,13 @@ Author: Diffblue Limited.
 
 #include <testing-utils/use_catch.h>
 
+#include <util/irep.h>
 #include <util/symbol_table.h>
 
 #include <java-testing-utils/load_java_class.h>
 #include <java-testing-utils/require_type.h>
+
+#include <java_bytecode/java_utils.h>
 
 SCENARIO(
   "java_bytecode_convert_bridge_method",
@@ -39,20 +42,29 @@ SCENARIO(
       {
         REQUIRE(function_type.get_bool(ID_is_bridge_method));
       }
+      THEN("The method should be marked as declared by its class")
+      {
+        REQUIRE(
+          id2string(*declaring_class(function_symbol)) ==
+          "java::ClassWithBridgeMethod");
+      }
     }
     WHEN("When parsing a non-bridge method")
     {
-      THEN("THe method should not be marked as a bridge method")
-      {
-        const symbolt function_symbol =
-          symbol_table.lookup_ref(method_name + ":(LClassWithBridgeMethod;)I");
+      const symbolt function_symbol =
+        symbol_table.lookup_ref(method_name + ":(LClassWithBridgeMethod;)I");
 
-        const java_method_typet &function_type =
-          require_type::require_java_method(function_symbol.type);
-        THEN("The method should be marked as a bridge method")
-        {
-          REQUIRE_FALSE(function_type.get_bool(ID_is_bridge_method));
-        }
+      const java_method_typet &function_type =
+        require_type::require_java_method(function_symbol.type);
+      THEN("The method should not be marked as a bridge method.")
+      {
+        REQUIRE_FALSE(function_type.get_bool(ID_is_bridge_method));
+      }
+      THEN("The method should be marked as declared by its class")
+      {
+        REQUIRE(
+          id2string(*declaring_class(function_symbol)) ==
+          "java::ClassWithBridgeMethod");
       }
     }
   }
@@ -78,20 +90,29 @@ SCENARIO(
       {
         REQUIRE(to_java_method_type(function_type).get_native());
       }
+      THEN("The method should be marked as declared by its class")
+      {
+        REQUIRE(
+          id2string(*declaring_class(function_symbol)) ==
+          "java::ClassWithNativeMethod");
+      }
     }
     WHEN("When parsing a non-native method")
     {
-      THEN("THe method should not be marked as a native method")
-      {
-        const symbolt function_symbol =
-          symbol_table.lookup_ref(method_name + ":(I)Z");
+      const symbolt function_symbol =
+        symbol_table.lookup_ref(method_name + ":(I)Z");
 
-        const java_method_typet &function_type =
-          require_type::require_java_method(function_symbol.type);
-        THEN("The method should be marked as a native method")
-        {
-          REQUIRE_FALSE(to_java_method_type(function_type).get_native());
-        }
+      const java_method_typet &function_type =
+        require_type::require_java_method(function_symbol.type);
+      THEN("The method should not be marked as a native method.")
+      {
+        REQUIRE_FALSE(to_java_method_type(function_type).get_native());
+      }
+      THEN("The method should be marked as declared by its class")
+      {
+        REQUIRE(
+          id2string(*declaring_class(function_symbol)) ==
+          "java::ClassWithNativeMethod");
       }
     }
   }
@@ -116,6 +137,12 @@ SCENARIO(
       {
         REQUIRE(function_type.get_is_final());
       }
+      THEN("The method should be marked as declared by its class")
+      {
+        REQUIRE(
+          id2string(*declaring_class(function_symbol)) ==
+          "java::ClassWithFinalMethod");
+      }
     }
     WHEN("When parsing a non-final method")
     {
@@ -127,6 +154,12 @@ SCENARIO(
       {
         REQUIRE(!function_type.get_is_final());
       }
+      THEN("The method should be marked as declared by its class")
+      {
+        REQUIRE(
+          id2string(*declaring_class(function_symbol)) ==
+          "java::ClassWithFinalMethod");
+      }
     }
     WHEN("When parsing an opaque method")
     {
@@ -137,6 +170,11 @@ SCENARIO(
       THEN("The method should be marked as final")
       {
         REQUIRE(function_type.get_is_final());
+      }
+      THEN("The method should be marked as declared by its class")
+      {
+        REQUIRE(
+          id2string(*declaring_class(function_symbol)) == "java::OpaqueClass");
       }
     }
   }
@@ -161,6 +199,12 @@ SCENARIO(
       {
         REQUIRE(method_type.get_is_varargs());
       }
+      THEN("The method should be marked as declared by its class")
+      {
+        REQUIRE(
+          id2string(*declaring_class(method_symbol)) ==
+          "java::ClassWithVarArgsMethod");
+      }
     }
     WHEN("When parsing a method with constant number of arguments")
     {
@@ -171,6 +215,36 @@ SCENARIO(
       THEN("The method should not be marked as varargs")
       {
         REQUIRE_FALSE(method_type.get_is_varargs());
+      }
+      THEN("The method should be marked as declared by its class")
+      {
+        REQUIRE(
+          id2string(*declaring_class(method_symbol)) ==
+          "java::ClassWithVarArgsMethod");
+      }
+    }
+  }
+}
+
+SCENARIO(
+  "java_bytecode_convert_static_method",
+  "[core][java_bytecode][java_bytecode_convert_method]")
+{
+  GIVEN("A class with a static method.")
+  {
+    const symbol_tablet symbol_table = load_java_class(
+      "ClassWithStaticMethod", "./java_bytecode/java_bytecode_convert_method");
+
+    WHEN("Parsing a static method.")
+    {
+      const symbolt method_symbol =
+        symbol_table.lookup_ref("java::ClassWithStaticMethod.staticFunc:()I");
+
+      THEN("The method should be marked as declared by its class")
+      {
+        REQUIRE(
+          id2string(*declaring_class(method_symbol)) ==
+          "java::ClassWithStaticMethod");
       }
     }
   }

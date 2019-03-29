@@ -368,3 +368,28 @@ SCENARIO("Test pretty printing auxiliary function", "[core][java_util_test]")
     }
   }
 }
+
+SCENARIO("Test symbol declarers.", "[core][java_util_test]")
+{
+  WHEN("We have a new symbol.")
+  {
+    symbolt symbol;
+
+    THEN("The symbol has no declarer.")
+    {
+      REQUIRE(!declaring_class(symbol).has_value());
+    }
+  }
+
+  WHEN("The declaring class of a symbol is set.")
+  {
+    const auto declaring_class = "java::java.lang.object";
+    symbolt symbol;
+    set_declaring_class(symbol, declaring_class);
+
+    THEN("Getting the declaring class of a symbol returns the class set.")
+    {
+      REQUIRE(id2string(*::declaring_class(symbol)) == declaring_class);
+    }
+  }
+}

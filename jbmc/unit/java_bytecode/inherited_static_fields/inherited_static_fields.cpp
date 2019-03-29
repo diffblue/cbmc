@@ -12,6 +12,7 @@ Author: Diffblue Ltd.
 #include <algorithm>
 
 #include <java_bytecode/java_types.h>
+#include <java_bytecode/java_utils.h>
 #include <util/expr_iterator.h>
 
 /// Check the full tree of expr for any symbol_exprts that have an identifier id
@@ -37,6 +38,12 @@ SCENARIO(
     {
       REQUIRE(symbol_table.has_symbol("java::Parent1.x"));
     }
+    THEN("Static field 'Parent1.x' should be declared by class Parent1")
+    {
+      REQUIRE(
+        id2string(*declaring_class(
+          symbol_table.lookup_ref("java::Parent1.x"))) == "java::Parent1");
+    }
     THEN("No static field 'Test1.x' should be created")
     {
       REQUIRE(!symbol_table.has_symbol("java::Test1.x"));
@@ -61,6 +68,14 @@ SCENARIO(
     THEN("A static field 'StaticInterface2.x' should exist")
     {
       REQUIRE(symbol_table.has_symbol("java::StaticInterface2.x"));
+    }
+    THEN(
+      "Static field 'java::StaticInterface2.x' should be declared by "
+      "StaticInterface2")
+    {
+      REQUIRE(
+        id2string(*declaring_class(symbol_table.lookup_ref(
+          "java::StaticInterface2.x"))) == "java::StaticInterface2");
     }
     THEN("No static field 'Test2.x' should be created")
     {
@@ -93,6 +108,14 @@ SCENARIO(
     {
       REQUIRE(symbol_table.has_symbol("java::OpaqueParent3.x"));
     }
+    THEN(
+      "Static field 'OpaqueParent3.x' should be declared by class "
+      "OpaqueParent3")
+    {
+      REQUIRE(
+        id2string(*declaring_class(symbol_table.lookup_ref(
+          "java::OpaqueParent3.x"))) == "java::OpaqueParent3");
+    }
     THEN("No static field 'Test3.x' should be created")
     {
       REQUIRE(!symbol_table.has_symbol("java::Test3.x"));
@@ -123,6 +146,14 @@ SCENARIO(
     THEN("A static field 'OpaqueInterface4.x' should exist")
     {
       REQUIRE(symbol_table.has_symbol("java::OpaqueInterface4.x"));
+    }
+    THEN(
+      "Static field 'OpaqueInterface4.x' should be declared by class "
+      "OpaqueInterface4")
+    {
+      REQUIRE(
+        id2string(*declaring_class(symbol_table.lookup_ref(
+          "java::OpaqueInterface4.x"))) == "java::OpaqueInterface4");
     }
     THEN("No static field 'Test4.x' should be created")
     {
@@ -191,6 +222,12 @@ SCENARIO(
     {
       REQUIRE(symbol_table.has_symbol("java::Parent6.x"));
     }
+    THEN("Static field 'Parent6.x' should be declared by class Parent6")
+    {
+      REQUIRE(
+        id2string(*declaring_class(
+          symbol_table.lookup_ref("java::Parent6.x"))) == "java::Parent6");
+    }
     THEN("No static field 'Test6.x' should be created")
     {
       REQUIRE(!symbol_table.has_symbol("java::Test6.x"));
@@ -217,9 +254,25 @@ SCENARIO(
     {
       REQUIRE(symbol_table.has_symbol("java::otherpackage.Parent7.x"));
     }
+    THEN(
+      "Static field 'otherpackage.Parent7.x' should be declared by class "
+      "otherpackage.Parent7")
+    {
+      REQUIRE(
+        id2string(*declaring_class(symbol_table.lookup_ref(
+          "java::otherpackage.Parent7.x"))) == "java::otherpackage.Parent7");
+    }
     THEN("A static field StaticInterface7.x should exist")
     {
       REQUIRE(symbol_table.has_symbol("java::StaticInterface7.x"));
+    }
+    THEN(
+      "Static field 'StaticInterface7.x' should be declared by class "
+      "StaticInterface7")
+    {
+      REQUIRE(
+        id2string(*declaring_class(symbol_table.lookup_ref(
+          "java::StaticInterface7.x"))) == "java::StaticInterface7");
     }
     THEN("No static field 'Test7.x' should be created")
     {
@@ -253,6 +306,12 @@ SCENARIO(
     {
       REQUIRE(symbol_table.has_symbol("java::Parent8.x"));
     }
+    THEN("Static field 'Parent8.x' should be declared by class Parent8")
+    {
+      REQUIRE(
+        id2string(*declaring_class(
+          symbol_table.lookup_ref("java::Parent8.x"))) == "java::Parent8");
+    }
     THEN("No static field 'Test8.x' should be created")
     {
       REQUIRE(!symbol_table.has_symbol("java::Test8.x"));
@@ -279,9 +338,21 @@ SCENARIO(
     {
       REQUIRE(symbol_table.has_symbol("java::Parent9.x"));
     }
+    THEN("Static field 'Parent9.x' should be declared by class Parent9")
+    {
+      REQUIRE(
+        id2string(*declaring_class(
+          symbol_table.lookup_ref("java::Parent9.x"))) == "java::Parent9");
+    }
     THEN("A static field StaticInterface9.x should exist")
     {
       REQUIRE(symbol_table.has_symbol("java::StaticInterface9.x"));
+    }
+    THEN("Static field 'Parent8.x' should be declared by StaticInterface9")
+    {
+      REQUIRE(
+        id2string(*declaring_class(symbol_table.lookup_ref(
+          "java::StaticInterface9.x"))) == "java::StaticInterface9");
     }
     THEN("No static field 'Test9.x' should be created")
     {
