@@ -2207,6 +2207,7 @@ void java_bytecode_convert_methodt::convert_invoke(
     symbol.mode = ID_java;
     assign_parameter_names(
       to_java_method_type(symbol.type), symbol.name, symbol_table);
+    set_declaring_class(symbol, arg0.get(ID_C_class));
 
     debug() << "Generating codet:  new opaque symbol: method '" << symbol.name
             << "'" << eom;

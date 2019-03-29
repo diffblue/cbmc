@@ -8,10 +8,13 @@ Author: Diffblue Limited.
 
 #include <testing-utils/use_catch.h>
 
+#include <util/irep.h>
 #include <util/symbol_table.h>
 
 #include <java-testing-utils/load_java_class.h>
 #include <java-testing-utils/require_type.h>
+
+#include <java_bytecode/java_utils.h>
 
 SCENARIO(
   "java_bytecode_convert_bridge_method",
@@ -137,6 +140,11 @@ SCENARIO(
       THEN("The method should be marked as final")
       {
         REQUIRE(function_type.get_is_final());
+      }
+      THEN("The method should be marked as declared by its class")
+      {
+        REQUIRE(
+          id2string(*declaring_class(function_symbol)) == "java::OpaqueClass");
       }
     }
   }
