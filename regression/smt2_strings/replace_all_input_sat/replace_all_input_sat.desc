@@ -1,5 +1,5 @@
 FUTURE z3_bug
-replace_all_const_sat.smt2
+replace_all_input_sat.smt2
 
 ^EXIT=0$
 ^SIGNAL=0$
