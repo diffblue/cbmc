@@ -47,14 +47,6 @@ relative to the base address of the object. The function
 **\_\_CPROVER\_DYNAMIC\_OBJECT** returns true if the pointer passed as
 arguments points to a dynamically allocated object.
 
-#### \_\_CPROVER\_is\_zero\_string, \_\_CPROVER\_zero\_string\_length, \_\_CPROVER\_buffer\_size
-
-```C
-_Bool __CPROVER_is_zero_string(const void *);
-__CPROVER_size_t __CPROVER_zero_string_length(const void *);
-__CPROVER_size_t __CPROVER_buffer_size(const void *);
-```
-
 #### \_\_CPROVER\_initialize
 
 ```C
