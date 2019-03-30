@@ -522,8 +522,8 @@ static void merge_names(
   {
     const auto p_it = goto_state.propagation.find(l1_identifier);
 
-    if(p_it != goto_state.propagation.end())
-      goto_state_rhs = p_it->second;
+    if(p_it.has_value())
+      goto_state_rhs = *p_it;
     else
       to_ssa_expr(goto_state_rhs).set_level_2(goto_count);
   }
@@ -531,8 +531,8 @@ static void merge_names(
   {
     const auto p_it = dest_state.propagation.find(l1_identifier);
 
-    if(p_it != dest_state.propagation.end())
-      dest_state_rhs = p_it->second;
+    if(p_it.has_value())
+      dest_state_rhs = *p_it;
     else
       to_ssa_expr(dest_state_rhs).set_level_2(dest_count);
   }
