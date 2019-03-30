@@ -22,6 +22,7 @@ Author: Malte Mues <mail.mues@gmail.com>
 #include <algorithm>
 #include <exception>
 #include <forward_list>
+#include <map>
 
 #include <util/exception_utils.h>
 
