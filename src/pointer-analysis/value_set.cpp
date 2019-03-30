@@ -48,14 +48,13 @@ bool value_sett::field_sensitive(const irep_idt &id, const typet &type)
   return type.id() == ID_struct || type.id() == ID_struct_tag;
 }
 
-value_sett::entryt *value_sett::find_entry(const value_sett::idt &id)
+value_sett::entryt *value_sett::find_entry(const irep_idt &id)
 {
   auto found = values.find(id);
   return found == values.end() ? nullptr : &found->second;
 }
 
-const value_sett::entryt *
-value_sett::find_entry(const value_sett::idt &id) const
+const value_sett::entryt *value_sett::find_entry(const irep_idt &id) const
 {
   auto found = values.find(id);
   return found == values.end() ? nullptr : &found->second;
@@ -70,8 +69,8 @@ value_sett::entryt &value_sett::get_entry(const entryt &e, const typet &type)
   else
     index=e.identifier;
 
-  std::pair<valuest::iterator, bool> r=
-    values.insert(std::pair<idt, entryt>(index, e));
+  std::pair<valuest::iterator, bool> r =
+    values.insert(std::pair<irep_idt, entryt>(index, e));
 
   return r.first->second;
 }

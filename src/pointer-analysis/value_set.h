@@ -72,8 +72,6 @@ public:
   /// in value sets.
   static object_numberingt object_numbering;
 
-  typedef irep_idt idt;
-
   /// Represents the offset into an object: either a unique integer offset,
   /// or an unknown value, represented by `!offset`.
   typedef optionalt<mp_integer> offsett;
@@ -249,16 +247,15 @@ public:
   struct entryt
   {
     object_mapt object_map;
-    idt identifier;
+    irep_idt identifier;
     std::string suffix;
 
     entryt()
     {
     }
 
-    entryt(const idt &_identifier, const std::string &_suffix):
-      identifier(_identifier),
-      suffix(_suffix)
+    entryt(const irep_idt &_identifier, const std::string &_suffix)
+      : identifier(_identifier), suffix(_suffix)
     {
     }
 
@@ -297,11 +294,11 @@ public:
   ///
   /// The components of the ID are thus duplicated in the `valuest` key and in
   /// `entryt` fields.
-  #ifdef USE_DSTRING
-  typedef std::map<idt, entryt> valuest;
-  #else
-  typedef std::unordered_map<idt, entryt, string_hash> valuest;
-  #endif
+#ifdef USE_DSTRING
+  typedef std::map<irep_idt, entryt> valuest;
+#else
+  typedef std::unordered_map<irep_idt, entryt, string_hash> valuest;
+#endif
 
   /// Gets values pointed to by `expr`, including following dereference
   /// operators (i.e. this is not a simple lookup in `valuest`).
@@ -314,9 +311,7 @@ public:
     const namespacet &ns) const;
 
   /// Appears to be unimplemented.
-  expr_sett &get(
-    const idt &identifier,
-    const std::string &suffix);
+  expr_sett &get(const irep_idt &identifier, const std::string &suffix);
 
   void clear()
   {
@@ -330,10 +325,10 @@ public:
   /// \return a constant pointer to an entry if found, or null otherwise.
   ///   Note the pointer may be invalidated by insert operations, including
   ///   get_entry.
-  entryt *find_entry(const idt &id);
+  entryt *find_entry(const irep_idt &id);
 
   /// Const version of \ref find_entry
-  const entryt *find_entry(const idt &id) const;
+  const entryt *find_entry(const irep_idt &id) const;
 
   /// Gets or inserts an entry in this value-set.
   /// \param e: entry to find. Its `id` and `suffix` fields will be used
