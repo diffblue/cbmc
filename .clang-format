@@ -60,6 +60,7 @@ ForEachMacros: [
   'forall_subtypes',
   'Forall_subtypes']
 IndentCaseLabels: 'false'
+IndentPPDirectives: AfterHash
 IndentWidth: '2'
 IndentWrappedFunctionNames: 'false'
 KeepEmptyLinesAtTheStartOfBlocks: 'false'
