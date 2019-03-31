@@ -41,7 +41,7 @@ void cpp_typecheckt::convert_parameter(
   if(!lookup(identifier, check_symbol))
     return;
 
-  symbolt symbol;
+  parameter_symbolt symbol;
 
   symbol.name=identifier;
   symbol.base_name=parameter.get_base_name();
@@ -49,9 +49,7 @@ void cpp_typecheckt::convert_parameter(
   symbol.mode = current_mode;
   symbol.module=module;
   symbol.type=parameter.type();
-  symbol.is_state_var=true;
   symbol.is_lvalue=!is_reference(symbol.type);
-  symbol.is_parameter=true;
 
   INVARIANT(!symbol.base_name.empty(), "parameter has base name");
 
