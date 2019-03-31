@@ -22,38 +22,26 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "remove_skip.h"
 #include "resolve_inherited_component.h"
 
-class remove_virtual_functionst
+class get_virtual_calleest
 {
 public:
-  remove_virtual_functionst(
-    symbol_table_baset &_symbol_table,
-    const class_hierarchyt &_class_hierarchy);
+  get_virtual_calleest(
+    const symbol_table_baset &_symbol_table,
+    const class_hierarchyt &_class_hierarchy)
+    : ns(_symbol_table),
+      symbol_table(_symbol_table),
+      class_hierarchy(_class_hierarchy)
+  {
+  }
 
-  void operator()(goto_functionst &goto_functions);
+  void get_functions(const exprt &, dispatch_table_entriest &) const;
 
-  bool remove_virtual_functions(
-    const irep_idt &function_id,
-    goto_programt &goto_program);
-
-  goto_programt::targett remove_virtual_function(
-    const irep_idt &function_id,
-    goto_programt &goto_program,
-    goto_programt::targett target,
-    const dispatch_table_entriest &functions,
-    virtual_dispatch_fallback_actiont fallback_action);
-
-  void get_functions(const exprt &, dispatch_table_entriest &);
-
-protected:
+private:
   const namespacet ns;
-  symbol_table_baset &symbol_table;
+  const symbol_table_baset &symbol_table;
 
   const class_hierarchyt &class_hierarchy;
 
-  goto_programt::targett remove_virtual_function(
-    const irep_idt &function_id,
-    goto_programt &goto_program,
-    goto_programt::targett target);
   typedef std::function<
     optionalt<resolve_inherited_componentt::inherited_componentt>(
       const irep_idt &,
@@ -70,14 +58,41 @@ protected:
   get_method(const irep_idt &class_id, const irep_idt &component_name) const;
 };
 
-remove_virtual_functionst::remove_virtual_functionst(
-  symbol_table_baset &_symbol_table,
-  const class_hierarchyt &_class_hierarchy)
-  : ns(_symbol_table),
-    symbol_table(_symbol_table),
-    class_hierarchy(_class_hierarchy)
+class remove_virtual_functionst
 {
-}
+public:
+  remove_virtual_functionst(
+    symbol_table_baset &_symbol_table,
+    const class_hierarchyt &_class_hierarchy)
+    : class_hierarchy(_class_hierarchy),
+      symbol_table(_symbol_table),
+      ns(symbol_table)
+  {
+  }
+
+  void operator()(goto_functionst &functions);
+
+  bool remove_virtual_functions(
+    const irep_idt &function_id,
+    goto_programt &goto_program);
+
+  goto_programt::targett remove_virtual_function(
+    const irep_idt &function_id,
+    goto_programt &goto_program,
+    goto_programt::targett target,
+    const dispatch_table_entriest &functions,
+    virtual_dispatch_fallback_actiont fallback_action);
+
+private:
+  const class_hierarchyt &class_hierarchy;
+  symbol_table_baset &symbol_table;
+  namespacet ns;
+
+  goto_programt::targett remove_virtual_function(
+    const irep_idt &function_id,
+    goto_programt &goto_program,
+    goto_programt::targett target);
+};
 
 /// Replace specified virtual function call with a static call to its
 /// most derived implementation
@@ -103,8 +118,9 @@ goto_programt::targett remove_virtual_functionst::remove_virtual_function(
     !code.arguments().empty(),
     "virtual function calls must have at least a this-argument");
 
+  get_virtual_calleest get_callees(symbol_table, class_hierarchy);
   dispatch_table_entriest functions;
-  get_functions(function, functions);
+  get_callees.get_functions(function, functions);
 
   return remove_virtual_function(
     function_id,
@@ -497,7 +513,7 @@ goto_programt::targett remove_virtual_functionst::remove_virtual_function(
 ///   -> [{"C", C.f}, {"B", C.f}, {"A", A.f}]
 /// \param entry_map: map of class identifiers to dispatch table entries
 /// \param resolve_function_call`: function to resolve abstract method call
-void remove_virtual_functionst::get_child_functions_rec(
+void get_virtual_calleest::get_child_functions_rec(
   const irep_idt &this_id,
   const optionalt<symbol_exprt> &last_method_defn,
   const irep_idt &component_name,
@@ -565,9 +581,9 @@ void remove_virtual_functionst::get_child_functions_rec(
 /// \param function: function that should be called
 /// \param [out] functions: is assigned a list of dispatch entries, i.e., pairs
 ///   of class names and function symbol to call when encountering the class.
-void remove_virtual_functionst::get_functions(
+void get_virtual_calleest::get_functions(
   const exprt &function,
-  dispatch_table_entriest &functions)
+  dispatch_table_entriest &functions) const
 {
   // class part of function to call
   const irep_idt class_id=function.get(ID_C_class);
@@ -650,7 +666,7 @@ void remove_virtual_functionst::get_functions(
 /// \param component_name: Name of the function to look up
 /// \return nil_exprt instance on error and a symbol_exprt pointing to
 ///   the method on success
-exprt remove_virtual_functionst::get_method(
+exprt get_virtual_calleest::get_method(
   const irep_idt &class_id,
   const irep_idt &component_name) const
 {
@@ -808,10 +824,10 @@ goto_programt::targett remove_virtual_function(
 
 void collect_virtual_function_callees(
   const exprt &function,
-  symbol_table_baset &symbol_table,
+  const symbol_table_baset &symbol_table,
   const class_hierarchyt &class_hierarchy,
   dispatch_table_entriest &overridden_functions)
 {
-  remove_virtual_functionst instance(symbol_table, class_hierarchy);
-  instance.get_functions(function, overridden_functions);
+  get_virtual_calleest get_callees(symbol_table, class_hierarchy);
+  get_callees.get_functions(function, overridden_functions);
 }
