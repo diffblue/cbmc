@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_typecheck.h"
 
+#include <util/arith_tools.h>
 #include <util/source_location.h>
 
 #include "cpp_convert_type.h"
@@ -40,6 +41,40 @@ void cpp_typecheckt::typecheck_code(codet &code)
   else if(statement==ID_decl_block)
   {
     // type checked already
+  }
+  else if(statement == ID_expression)
+  {
+    if(
+      !code.has_operands() || code.op0().id() != ID_side_effect ||
+      to_side_effect_expr(code.op0()).get_statement() != ID_assign)
+    {
+      c_typecheck_baset::typecheck_code(code);
+      return;
+    }
+
+    // as an extension, we support indexed access into signed/unsigned
+    // bitvectors, typically used with __CPROVER::(un)signedbv<N>
+    exprt &expr = code.op0();
+    if(
+      expr.operands().size() == 2 && expr.op0().id() == ID_index &&
+      expr.op0().operands().size() == 2)
+    {
+      exprt array = expr.op0().op0();
+      typecheck_expr(array);
+
+      if(array.type().id() == ID_signedbv || array.type().id() == ID_unsignedbv)
+      {
+        shl_exprt shl{from_integer(1, array.type()), expr.op0().op1()};
+        exprt rhs =
+          if_exprt{equal_exprt{expr.op1(), from_integer(0, array.type())},
+                   bitand_exprt{array, bitnot_exprt{shl}},
+                   bitor_exprt{array, shl}};
+        expr.op0() = expr.op0().op0();
+        expr.op1() = rhs;
+      }
+    }
+
+    c_typecheck_baset::typecheck_code(code);
   }
   else
     c_typecheck_baset::typecheck_code(code);
