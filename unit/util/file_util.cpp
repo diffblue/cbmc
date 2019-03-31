@@ -40,7 +40,7 @@ TEST_CASE("is_directory functionality", "[core][util][file_util]")
 {
   temp_dirt temp_dir("testXXXXXX");
 
-#ifdef _WIN32
+#ifdef _MSC_VER
   std::ofstream outfile(widen(temp_dir("file")));
 #else
   std::ofstream outfile(temp_dir("file"));

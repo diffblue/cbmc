@@ -42,7 +42,7 @@ void cl_message_handlert::print(
 
   if(full_path.has_value() && !line.empty())
   {
-#ifdef _WIN32
+#ifdef _MSC_VER
     std::ifstream in(widen(full_path.value()));
 #else
     std::ifstream in(full_path.value());

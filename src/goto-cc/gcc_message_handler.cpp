@@ -66,7 +66,7 @@ void gcc_message_handlert::print(
     const auto file_name = location.full_path();
     if(file_name.has_value() && !line.empty())
     {
-#ifdef _WIN32
+#ifdef _MSC_VER
       std::ifstream in(widen(file_name.value()));
 #else
       std::ifstream in(file_name.value());
