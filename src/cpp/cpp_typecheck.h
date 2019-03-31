@@ -257,7 +257,7 @@ protected:
 
   void default_dtor(const symbolt &symb, cpp_declarationt &dtor);
 
-  codet dtor(const symbolt &symb);
+  codet dtor(const symbolt &symb, const symbol_exprt &this_expr);
 
   void check_member_initializers(
     const struct_typet::basest &bases,
