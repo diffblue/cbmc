@@ -861,13 +861,9 @@ void cpp_typecheckt::typecheck_friend_declaration(
 
   if(declaration.is_template())
   {
-    return; // TODO
-
-#if 0
     error().source_location=declaration.type().source_location();
     error() << "friend template not supported" << eom;
     throw 0;
-#endif
   }
 
   // we distinguish these whether there is a declarator
@@ -890,11 +886,10 @@ void cpp_typecheckt::typecheck_friend_declaration(
       throw 0;
     }
 
-    // typecheck ftype
-
-    // TODO
-    //    typecheck_type(ftype);
-    //    symbol.type.add("ID_C_friends").move_to_sub(ftype);
+    cpp_save_scopet saved_scope(cpp_scopes);
+    cpp_scopes.go_to_global_scope();
+    typecheck_type(ftype);
+    symbol.type.add(ID_C_friends).move_to_sub(ftype);
 
     return;
   }
@@ -902,39 +897,30 @@ void cpp_typecheckt::typecheck_friend_declaration(
   // It should be a friend function.
   // Do the declarators.
 
+#ifdef DEBUG
+  std::cout << "friend declaration: " << declaration.pretty() << '\n';
+#endif
+
   for(auto &sub_it : declaration.declarators())
   {
-    bool has_value = sub_it.value().is_not_nil();
+#ifdef DEBUG
+    std::cout << "decl: " << sub_it.pretty() << "\n with value "
+              << sub_it.value().pretty() << '\n';
+    std::cout << "  scope: " << cpp_scopes.current_scope().prefix << '\n';
+#endif
 
-    if(!has_value)
-    {
-      // If no value is found, then we jump to the
-      // global scope, and we convert the declarator
-      // as if it were declared there
-      cpp_save_scopet saved_scope(cpp_scopes);
-      cpp_scopes.go_to_global_scope();
-      cpp_declarator_convertert cpp_declarator_converter(*this);
-      const symbolt &conv_symb=cpp_declarator_converter.convert(
-          declaration.type(), declaration.storage_spec(),
-          declaration.member_spec(), sub_it);
-      exprt symb_expr=cpp_symbol_expr(conv_symb);
-      symbol.type.add(ID_C_friends).move_to_sub(symb_expr);
-    }
-    else
-    {
-      cpp_declarator_convertert cpp_declarator_converter(*this);
-      cpp_declarator_converter.is_friend=true;
-
+    if(sub_it.value().is_not_nil())
       declaration.member_spec().set_inline(true);
 
-      const symbolt &conv_symb=cpp_declarator_converter.convert(
-        declaration.type(), declaration.storage_spec(),
-        declaration.member_spec(), sub_it);
-
-      exprt symb_expr=cpp_symbol_expr(conv_symb);
-
-      symbol.type.add(ID_C_friends).move_to_sub(symb_expr);
-    }
+    cpp_declarator_convertert cpp_declarator_converter(*this);
+    cpp_declarator_converter.is_friend = true;
+    const symbolt &conv_symb = cpp_declarator_converter.convert(
+      declaration.type(),
+      declaration.storage_spec(),
+      declaration.member_spec(),
+      sub_it);
+    exprt symb_expr = cpp_symbol_expr(conv_symb);
+    symbol.type.add(ID_C_friends).move_to_sub(symb_expr);
   }
 }
 
@@ -1322,7 +1308,13 @@ void cpp_typecheckt::typecheck_member_function(
   // move early, it must be visible before doing any value
   symbolt *new_symbol;
 
-  if(symbol_table.move(symbol, new_symbol))
+  const bool symbol_exists = symbol_table.move(symbol, new_symbol);
+  if(symbol_exists && new_symbol->is_weak)
+  {
+    // there might have been an earlier friend declaration
+    *new_symbol = std::move(symbol);
+  }
+  else if(symbol_exists)
   {
     error().source_location=symbol.location;
     error() << "failed to insert new method symbol: " << symbol.name << '\n'

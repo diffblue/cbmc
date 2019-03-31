@@ -1,6 +1,6 @@
 KNOWNBUG
 main.cpp
-
+--object-bits 10
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

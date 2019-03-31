@@ -1175,11 +1175,9 @@ void cpp_typecheckt::typecheck_expr_member(
         if(pcomp.is_nil())
         {
           error().source_location=expr.find_source_location();
-          error() << "error: `"
-                  << symbol_expr.get(ID_identifier)
+          error() << "error: `" << symbol_expr.get(ID_identifier)
                   << "' is not static member "
-                  << "of class `" << to_string(type) << "'"
-                  << eom;
+                  << "of class `" << to_string(op0.type()) << "'" << eom;
           throw 0;
         }
       }

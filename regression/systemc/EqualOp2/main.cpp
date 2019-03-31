@@ -1,5 +1,3 @@
-#include <cassert>
-
 template<class T>
 class myclass
 {
@@ -26,5 +24,5 @@ int main(int argc, char** argv)
   myclass<int> y(1);
   //x = y;
   x += 1;
-  assert(x == y);
+  __CPROVER_assert(x == y, "");
 }

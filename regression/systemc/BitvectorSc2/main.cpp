@@ -1,5 +1,3 @@
-#include <cassert>
-
 template <int W>
 class sc_uint {
   public:
@@ -56,7 +54,7 @@ int main(int argc, char** argv)
   z += y;
 
   sc_uint<10> w(3);
-  assert(z == w);
+  __CPROVER_assert(z == w, "");
 
   return 0;
 }
