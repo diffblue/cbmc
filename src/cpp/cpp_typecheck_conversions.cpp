@@ -911,6 +911,7 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
             ID_temporary_object, type, expr.source_location());
           tmp_object_expr.copy_to_operands(deref);
           tmp_object_expr.set(ID_C_lvalue, true);
+          tmp_object_expr.set(ID_mode, ID_cpp);
 
           new_expr.swap(tmp_object_expr);
           return true;
@@ -1390,6 +1391,7 @@ bool cpp_typecheckt::reference_binding(
       // create temporary object
       side_effect_exprt tmp(
         ID_temporary_object, type.subtype(), expr.source_location());
+      tmp.set(ID_mode, ID_cpp);
       // tmp.set(ID_C_lvalue, true);
       tmp.add_to_operands(std::move(new_expr));
       new_expr.swap(tmp);
