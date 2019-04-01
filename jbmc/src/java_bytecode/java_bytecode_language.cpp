@@ -1106,6 +1106,8 @@ bool java_bytecode_languaget::convert_single_method(
     // function:
     notify_static_method_calls(
       to_code(writable_symbol.value), needed_lazy_methods);
+    INVARIANT(
+      declaring_class(writable_symbol), "Method must have a declaring class.");
     return false;
   }
 
@@ -1124,6 +1126,7 @@ bool java_bytecode_languaget::convert_single_method(
       string_preprocess,
       class_hierarchy,
       threading_support);
+    INVARIANT(declaring_class(symbol), "Method must have a declaring class.");
     return false;
   }
 
@@ -1147,6 +1150,7 @@ bool java_bytecode_languaget::convert_single_method(
       needed_lazy_methods->add_all_needed_classes(*pointer_return_type);
   }
 
+  INVARIANT(declaring_class(symbol), "Method must have a declaring class.");
   return true;
 }
 
