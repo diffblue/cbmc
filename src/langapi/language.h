@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <string>
 #include <unordered_set>
 
+#include <util/invariant.h>
 #include <util/message.h>
 #include <util/std_types.h>
 #include <util/symbol.h>
@@ -122,6 +123,32 @@ public:
   virtual bool typecheck(
     symbol_tablet &symbol_table,
     const std::string &module)=0;
+
+  /// \brief Is it possible to call three-argument typecheck() on this object?
+  virtual bool can_keep_file_local()
+  {
+    return false;
+  }
+
+  /// \brief typecheck without removing specified entries from the symbol table
+  ///
+  /// Some concrete subclasses of \ref languaget discard unused symbols from a
+  /// goto binary as part of typechecking it. This function allows the caller
+  /// to specify a list of symbols that should be kept, even if that language's
+  /// typecheck() implementation would normally discard those symbols.
+  ///
+  /// This function should only be called on objects for which a call to
+  /// can_keep_symbols() returns `true`.
+  virtual bool typecheck(
+    symbol_tablet &symbol_table,
+    const std::string &module,
+    const bool keep_file_local)
+  {
+    INVARIANT(
+      false,
+      "three-argument typecheck should only be called for files written"
+      " in a language that allows file-local symbols, like C");
+  }
 
   // language id / description
 
