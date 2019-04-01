@@ -398,16 +398,6 @@ public:
   typedef goto_programt::const_targett locationt;
 
   /// Find the analysis result for a given location.
-  domainT &operator[](locationt l)
-  {
-    typename state_mapt::iterator it=state_map.find(l);
-    if(it==state_map.end())
-      throw std::out_of_range("failed to find state");
-
-    return it->second;
-  }
-
-  /// Find the analysis result for a given location.
   const domainT &operator[](locationt l) const
   {
     typename state_mapt::const_iterator it=state_map.find(l);

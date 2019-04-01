@@ -207,7 +207,9 @@ void invariant_propagationt::initialize(
 
   forall_goto_program_instructions(it, goto_program)
   {
-    invariant_sett &s = (*this)[it].invariant_set;
+    auto &domain = get_state(it);
+    invariant_sett &s =
+      static_cast<invariant_set_domaint &>(domain).invariant_set;
 
     if(it==goto_program.instructions.begin())
       s.make_true();
