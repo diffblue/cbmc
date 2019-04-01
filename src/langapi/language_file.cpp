@@ -253,7 +253,7 @@ bool language_filest::typecheck_module(
 
   if(module.file->language->typecheck(symbol_table, module.name))
   {
-    module.in_progress=false;
+    module.in_progress = false;
     return true;
   }
 

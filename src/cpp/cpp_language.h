@@ -42,9 +42,8 @@ public:
   bool generate_support_functions(
     symbol_tablet &symbol_table) override;
 
-  bool typecheck(
-    symbol_tablet &symbol_table,
-    const std::string &module) override;
+  bool
+  typecheck(symbol_tablet &symbol_table, const std::string &module) override;
 
   bool merge_symbol_table(
     symbol_tablet &dest,
