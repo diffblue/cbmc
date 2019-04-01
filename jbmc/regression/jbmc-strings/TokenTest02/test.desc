@@ -1,6 +1,6 @@
-FUTURE
+CORE
 TokenTest02.class
---max-nondet-string-length 1000 --unwind 15
+--max-nondet-string-length 1000 --unwind 15 --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
