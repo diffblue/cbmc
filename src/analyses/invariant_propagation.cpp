@@ -18,13 +18,15 @@ Author: Daniel Kroening, kroening@kroening.com
 void invariant_propagationt::make_all_true()
 {
   for(auto &state : state_map)
-    state.second.invariant_set.make_true();
+    static_cast<invariant_set_domaint &>(*(state.second))
+      .invariant_set.make_true();
 }
 
 void invariant_propagationt::make_all_false()
 {
   for(auto &state : state_map)
-    state.second.invariant_set.make_false();
+    static_cast<invariant_set_domaint &>(*(state.second))
+      .invariant_set.make_false();
 }
 
 void invariant_propagationt::add_objects(

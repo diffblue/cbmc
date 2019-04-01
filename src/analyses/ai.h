@@ -405,7 +405,7 @@ public:
     if(it==state_map.end())
       throw std::out_of_range("failed to find state");
 
-    return it->second;
+    return static_cast<const domainT &>(*(it->second));
   }
 
   /// Used internally by the analysis.
@@ -420,7 +420,7 @@ public:
       return d;
     }
 
-    return std::make_shared<domainT>(domainT(it->second));
+    return it->second;
   }
 
   /// Remove all analysis results.
@@ -433,8 +433,9 @@ public:
 protected:
   /// Map from locations to domain elements, for the results of a static
   /// analysis.
+  typedef std::shared_ptr<statet> s_ptrt;
   typedef std::
-    unordered_map<locationt, domainT, const_target_hash, pointee_address_equalt>
+    unordered_map<locationt, s_ptrt, const_target_hash, pointee_address_equalt>
       state_mapt;
   state_mapt state_map;
 
@@ -442,7 +443,15 @@ protected:
   /// if required. Used internally by the analysis.
   virtual statet &get_state(locationt l) override
   {
-    return state_map[l]; // calls default constructor
+    typename state_mapt::const_iterator it = state_map.find(l);
+    if(it == state_map.end())
+    {
+      auto p = state_map.insert(std::make_pair(l, std::make_shared<domainT>()));
+      CHECK_RETURN(p.second);
+      it = p.first;
+    }
+
+    return *(it->second);
   }
 
   /// Merge the state \p src, flowing from location \p from to

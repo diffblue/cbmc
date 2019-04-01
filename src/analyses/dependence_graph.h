@@ -257,7 +257,8 @@ public:
   {
     for(const auto &location_state : state_map)
     {
-      location_state.second.populate_dep_graph(*this, location_state.first);
+      std::static_pointer_cast<dep_graph_domaint>(location_state.second)
+        ->populate_dep_graph(*this, location_state.first);
     }
   }
 
@@ -278,17 +279,21 @@ public:
 
   virtual statet &get_state(goto_programt::const_targett l)
   {
-    std::pair<state_mapt::iterator, bool> entry=
-      state_map.insert(std::make_pair(l, dep_graph_domaint()));
-
-    if(entry.second)
+    typename state_mapt::const_iterator it = state_map.find(l);
+    if(it == state_map.end())
     {
+      auto d = std::make_shared<dep_graph_domaint>();
+      auto entry = state_map.insert(std::make_pair(l, d));
+      CHECK_RETURN(entry.second);
+
       const node_indext node_id=add_node();
-      entry.first->second.set_node_id(node_id);
+      d->set_node_id(node_id);
       nodes[node_id].PC=l;
+
+      it = entry.first;
     }
 
-    return entry.first->second;
+    return *(it->second);
   }
 
 protected:
