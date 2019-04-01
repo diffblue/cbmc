@@ -1,8 +1,0 @@
-CORE
-main.c
---generate-function-body '(?!__).*' --generate-function-body-options assert-false
-^EXIT=10$
-^SIGNAL=0$
-^VERIFICATION FAILED$
-^\[main.assertion.1\] .* assertion does_not_get_reached: SUCCESS$
-^\[should_be_generated.assertion.1\] .* assertion false: FAILURE$

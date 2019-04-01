@@ -1,7 +1,0 @@
-CORE
-main.c
---harness-type call-function --function test --associated-array-size array:size
-VERIFICATION SUCCESSFUL
-^EXIT=0$
-^SIGNAL=0$
---

@@ -1,9 +1,0 @@
-FUTURE
-main.c
---intervals
-^EXIT=0$
-^SIGNAL=0$
-^[main.assertion.1] line 8 assertion j < 0: SUCCESS$
-^[main.assertion.2] line 11 assertion j < 0: SUCCESS$
---
-^warning: ignoring

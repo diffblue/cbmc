@@ -1,8 +1,0 @@
-CORE
-conversion.c
---verbosity 3
-^EXIT=0$
-^SIGNAL=0$
---
-incompatible pointer types
-^CONVERSION ERROR$

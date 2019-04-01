@@ -1,9 +1,0 @@
-CORE
-NullPointer2.class
---stop-on-fail
-^EXIT=10$
-^SIGNAL=0$
-^  file NullPointer2\.java function NullPointer2\.main\(java\.lang\.String\[\]\) line 9 thread 0
-^VERIFICATION FAILED$
---
-^warning: ignoring

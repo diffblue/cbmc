@@ -1,8 +1,0 @@
-CORE
-Assume2.class
---function Assume2.foo
-^EXIT=10$
-^SIGNAL=0$
-^VERIFICATION FAILED$
---
-^warning: ignoring

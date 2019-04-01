@@ -1,9 +1,0 @@
-CORE
-NullPointer4.class
---stop-on-fail
-^EXIT=10$
-^SIGNAL=0$
-^  file NullPointer4\.java function NullPointer4\.main\(java.lang.String\[\]\) line 6 thread 0$
-^VERIFICATION FAILED$
---
-^warning: ignoring

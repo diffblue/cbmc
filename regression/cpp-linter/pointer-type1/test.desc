@@ -1,8 +1,0 @@
-CORE
-main.cpp
-
-^main\.cpp:24:  Pointer type name must have \* attached to the type name  \[whitespace/operators\] \[4\]$
-^main\.cpp:27:  Reference type name must have & attached to the type name  \[whitespace/operators\] \[4\]$
-^Total errors found: 2$
-^SIGNAL=0$
---

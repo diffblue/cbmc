@@ -1,7 +1,0 @@
-CORE
-main.c
---generate-function-body func --generate-function-body-options havoc,params:p --pointer-check
-^SIGNAL=0$
-^EXIT=0$
---
-^warning: ignoring

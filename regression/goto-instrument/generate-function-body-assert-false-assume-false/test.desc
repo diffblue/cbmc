@@ -1,8 +1,0 @@
-CORE
-main.c
---generate-function-body crashes_program --generate-function-body-options assert-false-assume-false
-^EXIT=10$
-^SIGNAL=0$
-^VERIFICATION FAILED$
-^\[main.assertion.1\] .* assertion 0: SUCCESS$
-^\[crashes_program.assertion.1\] .* assertion false: FAILURE$

@@ -1,9 +1,0 @@
-KNOWNBUG
-main.c
---check-code-contracts
-^EXIT=0$
-^SIGNAL=0$
-^VERIFICATION SUCCESSFUL$
---
---
-Loop invariant checking throws away more information than needed.

@@ -1,7 +1,0 @@
-CORE
-const-member.c
-
-^.*: .* is constant$
-^EXIT=(1|64)$
-^SIGNAL=0$
---

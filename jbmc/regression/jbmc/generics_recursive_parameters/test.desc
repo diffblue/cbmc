@@ -1,9 +1,0 @@
-CORE
-MutuallyRecursiveGenerics.class
---function MutuallyRecursiveGenerics.f
-^EXIT=0$
-^SIGNAL=0$
---
---
-This failed before due to infinite recursion in the way how the instantiated
-generic parameters were used. cf. TG-3067

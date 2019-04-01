@@ -1,8 +1,0 @@
-CORE
-main.c
---print-global-state-size
-^EXIT=0$
-^SIGNAL=0$
-^Total size of global objects: 40 bits$
---
-^warning: ignoring

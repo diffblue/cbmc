@@ -1,9 +1,0 @@
-CORE
-main.c
---show-threaded
-activate-multi-line-match
-x = 2;\nIs threaded: True
-^EXIT=0$
-^SIGNAL=0$
---
-^warning: ignoring

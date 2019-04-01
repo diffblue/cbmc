@@ -1,8 +1,0 @@
-CORE
-main.c
-
-^EXIT=6$
-^SIGNAL=0$
-^spawning threads out of atomic sections is not allowed
---
-^warning: ignoring

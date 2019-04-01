@@ -1,8 +1,0 @@
-CORE
-Test.class
---object-bits 8
-^EXIT=10$
-^SIGNAL=0$
-^VERIFICATION FAILED$
-^\[java::Test.main:\(\[Ljava/lang/String;\)V.assertion.1\] .*: FAILURE$
---

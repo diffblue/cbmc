@@ -1,9 +1,0 @@
-CORE
-test.class
---function test.main
-^EXIT=0$
-^SIGNAL=0$
-^VERIFICATION SUCCESSFUL$
---
-Dynamic cast check: FAILURE
-^warning: ignoring

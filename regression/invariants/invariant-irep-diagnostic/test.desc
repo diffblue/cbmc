@@ -1,9 +1,0 @@
-CORE
-dummy_parameter.c
-invariant-with-irep-diagnostics
-^EXIT=(0|127|134|137)$
-^SIGNAL=0$
---- begin invariant violation report ---
-Invariant check failed
-value: 8
-value: [dD]

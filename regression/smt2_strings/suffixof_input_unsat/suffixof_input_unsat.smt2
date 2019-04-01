@@ -1,5 +1,0 @@
-(declare-const str String)
-(declare-const suffix String)
-(assert (< (str.len str) (str.len suffix)))
-(assert (str.suffixof suffix str))
-(check-sat)

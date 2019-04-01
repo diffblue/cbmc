@@ -1,8 +1,0 @@
-CORE
-main.c
--o /dev/null
-^EXIT=1$
-^SIGNAL=0$
---
-^warning: ignoring
-^CONVERSION ERROR$

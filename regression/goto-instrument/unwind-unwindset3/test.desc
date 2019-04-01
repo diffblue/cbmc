@@ -1,9 +1,0 @@
-CORE
-main.c
---unwind 10 --unwindset main.0:
-^Unwinding loop
-^EXIT=0$
-^SIGNAL=0$
-^VERIFICATION SUCCESSFUL$
---
-^warning: ignoring

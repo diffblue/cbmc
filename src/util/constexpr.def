@@ -1,6 +1,0 @@
-#if defined(__GNUC__) || defined(__clang__)
-#define CBMC_CONSTEXPR constexpr
-#else
-#define CBMC_CONSTEXPR
-#endif
-

@@ -1,8 +1,0 @@
-CORE
-main.c
---pointer-check --show-properties
-^EXIT=0$
-^SIGNAL=0$
-^Property foo.pointer_dereference.1:$
---
-^warning: ignoring

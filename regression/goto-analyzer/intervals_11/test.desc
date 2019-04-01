@@ -1,9 +1,0 @@
-FUTURE
-main.c
---intervals
-^EXIT=0$
-^SIGNAL=0$
-^\[main.assertion.1\] line 30 assertion y\[i\]>=-1.0f \&\& y\[i\]<=1.0f: UNKNOWN$
-^\[main.assertion.2\] line 35 assertion y\[i\]>=-1.0f \&\& y\[i\]<=1.0f: UNKNOWN$
---
-^warning: ignoring

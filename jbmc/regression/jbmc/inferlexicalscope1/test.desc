@@ -1,7 +1,0 @@
-CORE
-test.class
---show-symbol-table --function test.main
-^EXIT=0$
-^SIGNAL=0$
-^pc7:
---

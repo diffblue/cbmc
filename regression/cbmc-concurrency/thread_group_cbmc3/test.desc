@@ -1,8 +1,0 @@
-CORE
-main.c
--D_TEST_2_
-^EXIT=10$
-^SIGNAL=0$
-^VERIFICATION FAILED$
---
-^warning: ignoring

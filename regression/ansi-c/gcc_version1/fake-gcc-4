@@ -1,4 +1,0 @@
-#!/bin/sh
-
-gcc -Wno-macro-redefined -U __clang_major__ -D __GNUC__=4 -D __GNUC_MINOR__=2 -D __GNUC_PATCHLEVEL__=1 "$@"
-

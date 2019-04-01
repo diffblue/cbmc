@@ -1,6 +1,0 @@
-CORE
-test.class
---show-goto-functions --function test.main
-^EXIT=0$
-^SIGNAL=0$
-test\.java line 5 function java::test.main:\(\)V bytecode-index 1

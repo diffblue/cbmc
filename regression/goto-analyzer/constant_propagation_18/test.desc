@@ -1,8 +1,0 @@
-CORE
-main.c
---constants --verify
-^EXIT=0$
-^SIGNAL=0$
-^\[main.assertion.1\] line 7 assertion \*p == 1: SUCCESS$
---
-^warning: ignoring

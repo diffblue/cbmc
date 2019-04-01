@@ -1,9 +1,0 @@
-CORE
-main.c
---verbosity 2
-: function has return void but a return statement returning signed int$
-^EXIT=0$
-^SIGNAL=0$
---
-^warning: ignoring
-^CONVERSION ERROR$

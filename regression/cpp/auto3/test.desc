@@ -1,9 +1,0 @@
-CORE
-main.cpp
--std=c++98
-^EXIT=(64|1)$
-^SIGNAL=0$
-parse error
---
-^warning: ignoring
-^CONVERSION ERROR$

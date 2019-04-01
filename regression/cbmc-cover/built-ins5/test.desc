@@ -1,9 +1,0 @@
-CORE
-main.c
---cover condition --unwind 5
-^EXIT=0$
-^SIGNAL=0$
-^\*\* 4 of 4 covered
---
-^warning: ignoring
-^\[.*<builtin-library-

@@ -1,3 +1,0 @@
-class what_not
-{
-};

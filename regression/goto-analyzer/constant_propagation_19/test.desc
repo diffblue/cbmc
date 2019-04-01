@@ -1,8 +1,0 @@
-CORE
-main.c
---constants --verify
-^EXIT=0$
-^SIGNAL=0$
-^\[main.assertion.1\] line 8 assertion x == 42: SUCCESS$
---
-^warning: ignoring

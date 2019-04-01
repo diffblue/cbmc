@@ -1,7 +1,0 @@
-#if defined __clang__
-  #pragma clang diagnostic ignored "-Wsign-compare"
-#elif defined __GNUC__
-  #pragma GCC diagnostic ignored "-Wsign-compare"
-#elif defined _MSC_VER
-  #pragma warning(disable:4018)
-#endif

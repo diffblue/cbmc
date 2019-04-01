@@ -1,6 +1,0 @@
-CORE
-FloatMultidim2.class
---function FloatMultidim2.f --unwind 3
-^EXIT=10$
-^SIGNAL=0$
-assertion at file FloatMultidim2.java line 14 .*: FAILURE

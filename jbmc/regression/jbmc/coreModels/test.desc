@@ -1,9 +1,0 @@
-CORE
-test.class
---no-lazy-methods --no-refine-strings --show-symbol-table --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
-^EXIT=0$
-^SIGNAL=0$
-^Symbol\s*\.*\: java\:\:org\.cprover\.CProver\.\<init\>\:\(\)V$
---
---
-tests that the core models are being loaded by checking if the constructor for the CProver class was

@@ -1,8 +1,0 @@
-CORE
-arrayread1.class
---unwind 3 --no-propagation --function arrayread1.main
-^EXIT=0$
-^SIGNAL=0$
-^VERIFICATION SUCCESSFUL$
---
-^warning: ignoring

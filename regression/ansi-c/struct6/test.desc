@@ -1,8 +1,0 @@
-CORE
-main.c
-
-^EXIT=(64|1)$
-^SIGNAL=0$
-: incomplete type not permitted here$
-^CONVERSION ERROR$
---

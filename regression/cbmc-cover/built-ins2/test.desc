@@ -1,9 +1,0 @@
-CORE
-main.c
---cover location --unwind 10
-^EXIT=0$
-^SIGNAL=0$
-^\*\* .* of .* covered \(100.0%\)
---
-^warning: ignoring
-^\[.*<builtin-library-

@@ -1,9 +1,0 @@
-CORE
-ArithmeticExceptionTest.class
---throw-runtime-exceptions --function ArithmeticExceptionTest.main
-^EXIT=10$
-^SIGNAL=0$
-^.*assertion at file ArithmeticExceptionTest.java line 7 function.*: FAILURE$
-^VERIFICATION FAILED
---
-^warning: ignoring

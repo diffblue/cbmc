@@ -1,9 +1,0 @@
-analyses # dubious - concerns call_graph and does_remove_const
-goto-programs
-goto-symex # dubious - spurious inclusion of symex_target_equation in graphml_witness
-json
-langapi # should go away
-linking
-mach-o # system
-util
-xmllang

@@ -1,9 +1,0 @@
-CORE
-StringConcatenation03.class
---max-nondet-string-length 1000
-^EXIT=10$
-^SIGNAL=0$
-^VERIFICATION FAILED$
-^\[.*assertion\.1\] .* line 11 .* FAILURE$
---
-^warning: ignoring

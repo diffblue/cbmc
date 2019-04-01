@@ -1,5 +1,0 @@
-(declare-const lower String)
-(declare-const upper String)
-(assert (str.in.re "c" (re.range lower upper)))
-(assert (str.in.re "d" (re.range upper lower)))
-(check-sat)

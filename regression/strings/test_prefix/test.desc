@@ -1,8 +1,0 @@
-FUTURE
-test.c
---refine-strings --string-max-length 1000
-^EXIT=10$
-^SIGNAL=0$
-^\[main.assertion.1\] assertion b: SUCCESS$
-^\[main.assertion.2\] assertion c: FAILURE$
---

@@ -1,9 +1,0 @@
-CORE pthread
-main.c
---bounds-check
-^EXIT=10$
-^SIGNAL=0$
-^\*\* 1 of 2 failed
-^VERIFICATION FAILED$
---
-^warning: ignoring

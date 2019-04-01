@@ -1,7 +1,0 @@
-CORE
-main.c
---trace --foo --refine-strings
-^EXIT=(64|1)$
-^SIGNAL=0$
-Unknown option: --foo
---

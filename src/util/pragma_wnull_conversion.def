@@ -1,5 +1,0 @@
-#if defined __clang__
-  #pragma clang diagnostic ignored "-Wnull-conversion"
-#elif defined __GNUC__
-#elif defined _MSC_VER
-#endif

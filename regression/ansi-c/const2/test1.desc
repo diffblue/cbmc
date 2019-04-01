@@ -1,7 +1,0 @@
-CORE
-main.c
--DTEST=1
-^EXIT=0$
-^SIGNAL=0$
---
-^.*: .* is constant$

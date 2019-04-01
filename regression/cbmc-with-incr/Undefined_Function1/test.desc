@@ -1,9 +1,0 @@
-CORE
-main.c
-
-^SIGNAL=0$
-^\*\*\*\* WARNING: no body for function f$
-^Counterexample:$
-^VERIFICATION FAILED$
---
-^warning: ignoring

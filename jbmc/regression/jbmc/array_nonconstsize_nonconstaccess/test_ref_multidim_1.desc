@@ -1,6 +1,0 @@
-CORE
-RefMultidim1.class
---function RefMultidim1.f --unwind 3
-^EXIT=10$
-^SIGNAL=0$
-assertion at file RefMultidim1.java line 15 .*: FAILURE

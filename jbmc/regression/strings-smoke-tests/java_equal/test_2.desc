@@ -1,9 +1,0 @@
-KNOWNBUG
-test_equal_2.class
---max-nondet-string-length 100
-^EXIT=0$
-^SIGNAL=0$
---
-non equal types
---
-https://github.com/diffblue/test-gen/issues/856

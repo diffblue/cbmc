@@ -1,8 +1,0 @@
-CORE
-b.c
-a.c --pointer-check
-^EXIT=0$
-^SIGNAL=0$
-^VERIFICATION SUCCESSFUL$
---
-^warning: ignoring

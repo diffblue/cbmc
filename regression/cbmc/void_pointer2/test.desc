@@ -1,8 +1,0 @@
-CORE broken-smt-backend
-main.c
---pointer-check --no-simplify --unwind 3
-^EXIT=0$
-^SIGNAL=0$
-^VERIFICATION SUCCESSFUL$
---
-^warning: ignoring

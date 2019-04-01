@@ -1,6 +1,0 @@
-(declare-const str String)
-(declare-const index Int)
-(assert (> index 4))
-(assert (= (str.at str index) "c"))
-(assert (= (str.at str index) "d"))
-(check-sat)

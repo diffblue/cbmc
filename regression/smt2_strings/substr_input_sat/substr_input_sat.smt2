@@ -1,8 +1,0 @@
-(declare-const str String)
-(declare-const lower Int)
-(declare-const upper Int)
-(assert (< lower upper))
-(define-fun substr () String (str.substr str lower upper))
-(assert (= substr "cde"))
-(assert (not (= str substr)))
-(check-sat)

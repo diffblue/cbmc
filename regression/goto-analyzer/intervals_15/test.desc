@@ -1,8 +1,0 @@
-CORE
-main.c
---intervals
-^EXIT=0$
-^SIGNAL=0$
-^\[main.assertion.1\] line 11 assertion j\s*<\s*52: UNKNOWN$
---
-^warning: ignoring

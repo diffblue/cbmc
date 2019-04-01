@@ -1,8 +1,0 @@
-CORE
-test.class
---function test.main
-^EXIT=10$
-^SIGNAL=0$
-VERIFICATION FAILED
-assertion at file test\.java line 10 .* FAILURE
---

@@ -1,8 +1,0 @@
-CORE
-Test.class
---max-nondet-string-length 20 --function Test.main
-^EXIT=0$
-^SIGNAL=0$
-^VERIFICATION SUCCESSFUL$
---
-non equal types

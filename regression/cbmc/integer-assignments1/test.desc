@@ -1,7 +1,0 @@
-CORE smt-backend broken-smt-backend
-main.c
---trace --smt2
-^EXIT=10$
-^SIGNAL=0$
-^  b=100 \(0b1100100\)$
---

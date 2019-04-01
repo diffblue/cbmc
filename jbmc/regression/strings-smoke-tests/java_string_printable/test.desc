@@ -1,9 +1,0 @@
-CORE
-Test.class
---function Test.check --max-nondet-string-length 100 --string-printable --java-assume-inputs-non-null --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
-^EXIT=10$
-^SIGNAL=0$
-assertion.* file Test.java line 6 .* SUCCESS
-assertion.* file Test.java line 8 .* FAILURE
---
-non equal types
