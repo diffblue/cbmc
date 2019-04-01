@@ -1,0 +1,13 @@
+CORE
+main.c
+final-link assertion-check suffix
+
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+^\*\*\*\* WARNING: no body for function
+--
+Check that CBMC symbolically executes a static function in a different
+file. Use a suffix.

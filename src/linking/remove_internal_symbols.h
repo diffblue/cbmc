@@ -14,8 +14,11 @@ Author: Daniel Kroening
 
 #include <util/message.h>
 
+#include <string>
+
 void remove_internal_symbols(
   class symbol_tablet &symbol_table,
-  message_handlert &);
+  message_handlert &,
+  const bool);
 
 #endif // CPROVER_LINKING_REMOVE_INTERNAL_SYMBOLS_H

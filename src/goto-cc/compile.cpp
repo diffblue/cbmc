@@ -34,6 +34,7 @@ Date: June 2006
 
 #include <goto-programs/goto_convert.h>
 #include <goto-programs/goto_convert_functions.h>
+#include <goto-programs/name_mangler.h>
 #include <goto-programs/read_goto_binary.h>
 #include <goto-programs/validate_goto_model.h>
 #include <goto-programs/write_goto_binary.h>
@@ -401,6 +402,13 @@ bool compilet::compile()
       else
         cfn = output_file_object;
 
+      if(keep_file_local)
+      {
+        function_name_manglert<file_name_manglert> mangler(
+          get_message_handler(), goto_model, file_local_mangle_suffix);
+        mangler.mangle();
+      }
+
       if(write_bin_object_file(cfn, goto_model))
         return true;
 
@@ -593,7 +601,7 @@ bool compilet::parse_source(const std::string &file_name)
     return true;
 
   // we just typecheck one file here
-  if(language_files.typecheck(goto_model.symbol_table))
+  if(language_files.typecheck(goto_model.symbol_table, keep_file_local))
   {
     error() << "CONVERSION ERROR" << eom;
     return true;
@@ -614,7 +622,10 @@ compilet::compilet(cmdlinet &_cmdline, message_handlert &mh, bool Werror)
   : messaget(mh),
     ns(goto_model.symbol_table),
     cmdline(_cmdline),
-    warning_is_fatal(Werror)
+    warning_is_fatal(Werror),
+    keep_file_local(cmdline.isset("export-function-local-symbols")),
+    file_local_mangle_suffix(
+      cmdline.isset("mangle-suffix") ? cmdline.get_value("mangle-suffix") : "")
 {
   mode=COMPILE_LINK_EXECUTABLE;
   echo_file_name=false;

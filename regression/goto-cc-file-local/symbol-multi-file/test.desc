@@ -1,0 +1,13 @@
+CORE
+main.c
+final-link show-symbol-table
+
+^EXIT=0$
+^SIGNAL=0$
+^Symbol......: __CPROVER_file_local_foo_c_foo$
+--
+^warning: ignoring
+^\*\*\*\* WARNING: no body for function
+--
+Check that a static function in a different file appears in the symbol
+table of the fully-linked binary

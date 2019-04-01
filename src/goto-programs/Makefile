@@ -32,6 +32,7 @@ SRC = adjust_float_expressions.cpp \
       link_to_library.cpp \
       loop_ids.cpp \
       mm_io.cpp \
+      name_mangler.cpp \
       osx_fat_reader.cpp \
       parameter_assignments.cpp \
       pointer_arithmetic.cpp \
