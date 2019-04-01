@@ -100,7 +100,8 @@ public:
   /// \return The abstract state before `l`. We return a pointer to a copy as
   ///   the method should be const and there are some non-trivial cases
   ///   including merging abstract states, etc.
-  virtual std::unique_ptr<statet> abstract_state_before(locationt l) const = 0;
+  virtual std::shared_ptr<const statet>
+  abstract_state_before(locationt l) const = 0;
 
   /// Get a copy of the abstract state after the given instruction, without
   /// needing to know what kind of domain or history is used. Note: intended
@@ -110,7 +111,7 @@ public:
   /// \return The abstract state after `l`. We return a pointer to a copy as
   ///   the method should be const and there are some non-trivial cases
   ///   including merging abstract states, etc.
-  virtual std::unique_ptr<statet> abstract_state_after(locationt l) const
+  virtual std::shared_ptr<const statet> abstract_state_after(locationt l) const
   {
     /// PRECONDITION(l is dereferenceable && std::next(l) is dereferenceable)
     /// Check relies on a DATA_INVARIANT of goto_programs
@@ -408,17 +409,18 @@ public:
   }
 
   /// Used internally by the analysis.
-  std::unique_ptr<statet> abstract_state_before(locationt t) const override
+  std::shared_ptr<const statet>
+  abstract_state_before(locationt t) const override
   {
     typename state_mapt::const_iterator it = state_map.find(t);
     if(it == state_map.end())
     {
-      std::unique_ptr<statet> d = util_make_unique<domainT>();
+      auto d = std::make_shared<domainT>();
       CHECK_RETURN(d->is_bottom());
       return d;
     }
 
-    return util_make_unique<domainT>(it->second);
+    return std::make_shared<domainT>(domainT(it->second));
   }
 
   /// Remove all analysis results.
