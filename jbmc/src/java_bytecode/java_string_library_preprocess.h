@@ -151,11 +151,6 @@ private:
     const irep_idt &function_id,
     symbol_table_baset &symbol_table);
 
-  code_blockt make_string_format_code(const java_method_typet &type,
-                                      const source_locationt &loc,
-                                      const irep_idt &function_id,
-                                      symbol_table_baset &symbol_table);
-
   code_blockt make_copy_string_code(
     const java_method_typet &type,
     const source_locationt &loc,
@@ -312,20 +307,6 @@ private:
     const java_method_typet &type,
     const source_locationt &loc,
     symbol_table_baset &symbol_table);
-
-  struct_exprt make_argument_for_format(const exprt &argv, std::size_t index,
-                                        const struct_typet &structured_type,
-                                        const source_locationt &loc,
-                                        const irep_idt &function_id,
-                                        symbol_table_baset &symbol_table,
-                                        code_blockt &code);
-
-  optionalt<symbol_exprt> get_primitive_value_of_object(
-      const exprt &object, irep_idt type_name, const source_locationt &loc,
-      const irep_idt &function_id, symbol_table_baset &symbol_table,
-      code_blockt &code);
-
-  dereference_exprt get_object_at_index(const exprt &argv, std::size_t index);
 };
 
 exprt make_nondet_infinite_char_array(

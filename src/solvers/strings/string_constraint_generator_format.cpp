@@ -239,17 +239,6 @@ static std::vector<format_elementt> parse_format_string(std::string s)
   return al;
 }
 
-/// Helper for add_axioms_for_format_specifier
-/// \param expr: a structured expression
-/// \param component_name: name of the desired component
-/// \return Expression in the component of `expr` named `component_name`.
-static exprt get_component_in_struct(const struct_exprt &expr,
-                                     irep_idt component_name) {
-  const struct_typet &type = to_struct_type(expr.type());
-  std::size_t number = type.component_number(component_name);
-  return expr.operands()[number];
-}
-
 /// Parse `s` and add axioms ensuring the output corresponds to the output of
 /// String.format. Assumes the argument is a structured expression which
 /// contains the fields: string expr, int, float, char, boolean, hashcode,
@@ -447,6 +436,9 @@ std::pair<exprt, string_constraintst> add_axioms_for_format(
     if(fe.is_format_specifier())
     {
       const format_specifiert &fs = fe.get_format_specifier();
+      std::function<exprt(const irep_idt &)> get_arg =
+          [](const irep_idt &) -> exprt { UNREACHABLE; };
+
       if(
         fs.conversion != format_specifiert::PERCENT_SIGN &&
         fs.conversion != format_specifiert::LINE_SEPARATOR)
@@ -470,36 +462,26 @@ std::pair<exprt, string_constraintst> add_axioms_for_format(
           arg = to_struct_expr(args[fs.index - 1]);
         }
 
-        std::function<exprt(const irep_idt &)> get_arg;
-        if(is_refined_string_type(arg.type()))
-        {
-          const array_string_exprt string_arg =
-            get_string_expr(array_pool, arg);
-          get_arg = [string_arg](const irep_idt &id) {
-            return format_arg_from_string(string_arg, id);
-          };
-        }
-        else
-        {
-          INVARIANT(
-            arg.id() == ID_struct,
-            "format argument should be a string or a struct");
-          get_arg = [&](const irep_idt &id) {
-            return get_component_in_struct(to_struct_expr(arg), id);
-          };
-        }
-        auto result = add_axioms_for_format_specifier(
-          fresh_symbol,
-          fs,
-          get_arg,
-          index_type,
-          char_type,
-          array_pool,
-          message,
-          ns);
-        merge(constraints, std::move(result.second));
-        intermediary_strings.push_back(result.first);
+        INVARIANT(
+          is_refined_string_type(arg.type()),
+          "arguments of format should be strings");
+        const array_string_exprt string_arg = get_string_expr(array_pool, arg);
+        get_arg = [string_arg](const irep_idt &id) {
+          return format_arg_from_string(string_arg, id);
+        };
       }
+
+      auto result = add_axioms_for_format_specifier(
+        fresh_symbol,
+        fs,
+        get_arg,
+        index_type,
+        char_type,
+        array_pool,
+        message,
+        ns);
+      merge(constraints, std::move(result.second));
+      intermediary_strings.push_back(result.first);
     }
     else
     {
