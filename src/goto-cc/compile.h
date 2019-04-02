@@ -96,6 +96,12 @@ protected:
   cmdlinet &cmdline;
   bool warning_is_fatal;
 
+  /// \brief Whether to keep implementations of file-local symbols
+  const bool keep_file_local;
+
+  /// \brief String to include in all mangled names
+  const std::string file_local_mangle_suffix;
+
   std::size_t function_body_count(const goto_functionst &) const;
 
   void add_compiler_specific_defines() const;

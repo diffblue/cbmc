@@ -71,11 +71,17 @@ static void get_symbols(
 ///          http://gcc.gnu.org/ml/gcc/2006-11/msg00006.html
 ///          on "extern inline"
 /// \param symbol_table: symbol table to clean up
+/// \param mh: log handler
+/// \param keep_file_local: keep file-local functions with bodies even if we
+///                         would otherwise remove them
 void remove_internal_symbols(
-  symbol_tablet &symbol_table)
+  symbol_tablet &symbol_table,
+  message_handlert &mh,
+  const bool keep_file_local)
 {
   namespacet ns(symbol_table);
   find_symbols_sett exported;
+  messaget log(mh);
 
   // we retain certain special ones
   find_symbols_sett special;
@@ -134,7 +140,13 @@ void remove_internal_symbols(
       // body? not local (i.e., "static")?
       if(has_body &&
          (!is_file_local || (config.main==symbol.name.c_str())))
+      {
         get_symbols(ns, symbol, exported);
+      }
+      else if(has_body && is_file_local && keep_file_local)
+      {
+        get_symbols(ns, symbol, exported);
+      }
     }
     else
     {

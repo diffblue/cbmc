@@ -27,6 +27,7 @@ const char *goto_cc_options_with_separated_argument[]=
   "--native-compiler",
   "--native-linker",
   "--print-rejected-preprocessed-source",
+  "--mangle-suffix",
   nullptr
 };
 
@@ -51,6 +52,7 @@ const char *goto_cc_options_without_argument[]=
   "--partial-inlining",
   "--validate-goto-model",
   "-?",
+  "--export-function-local-symbols",
   nullptr
 };
 
