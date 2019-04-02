@@ -1801,12 +1801,6 @@ void java_string_library_preprocesst::initialize_conversion_table()
   cprover_equivalent_to_java_function
     ["java::java.lang.String.equalsIgnoreCase:(Ljava/lang/String;)Z"]=
       ID_cprover_string_equals_ignore_case_func;
-  conversion_table
-      ["java::java.lang.String.format:(Ljava/lang/String;[Ljava/lang/Object;)"
-       "Ljava/lang/String;"] =
-          std::bind(&java_string_library_preprocesst::make_string_format_code,
-                    this, std::placeholders::_1, std::placeholders::_2,
-                    std::placeholders::_3, std::placeholders::_4);
 
   std::string format_signature = "java::org.cprover.CProverString.format:(";
   for(std::size_t i = 0; i < MAX_FORMAT_ARGS + 1; ++i)
