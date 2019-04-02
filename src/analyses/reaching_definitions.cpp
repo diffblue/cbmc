@@ -26,9 +26,34 @@ Date: February 2013
 #include "is_threaded.h"
 #include "dirty.h"
 
+/// This ensures that all domains are constructed with the appropriate pointer
+/// back to the analysis engine itself.  Using a factory is a tad verbose
+/// but it works well with the ait infrastructure.
+class rd_range_domain_factoryt : public ai_domain_factoryt<rd_range_domaint>
+{
+public:
+  rd_range_domain_factoryt(
+    sparse_bitvector_analysist<reaching_definitiont> *_bv_container)
+    : bv_container(_bv_container)
+  {
+    PRECONDITION(bv_container != nullptr);
+  }
+
+  std::unique_ptr<statet> make(locationt) const override
+  {
+    auto p = util_make_unique<rd_range_domaint>(bv_container);
+    CHECK_RETURN(p->is_bottom());
+    return std::unique_ptr<statet>(p.release());
+  }
+
+private:
+  sparse_bitvector_analysist<reaching_definitiont> *const bv_container;
+};
+
 reaching_definitions_analysist::reaching_definitions_analysist(
-  const namespacet &_ns):
-    concurrency_aware_ait<rd_range_domaint>(),
+  const namespacet &_ns)
+  : concurrency_aware_ait<rd_range_domaint>(
+      util_make_unique<rd_range_domain_factoryt>(this)),
     ns(_ns)
 {
 }
