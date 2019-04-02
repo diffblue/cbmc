@@ -243,9 +243,8 @@ static std::vector<format_elementt> parse_format_string(std::string s)
 /// \param expr: a structured expression
 /// \param component_name: name of the desired component
 /// \return Expression in the component of `expr` named `component_name`.
-static exprt
-get_component_in_struct(const struct_exprt &expr, irep_idt component_name)
-{
+static exprt get_component_in_struct(const struct_exprt &expr,
+                                     irep_idt component_name) {
   const struct_typet &type = to_struct_type(expr.type());
   std::size_t number = type.component_number(component_name);
   return expr.operands()[number];
@@ -266,16 +265,12 @@ get_component_in_struct(const struct_exprt &expr, irep_idt component_name)
 /// \param ns: namespace
 /// \return String expression representing the output of String.format.
 static std::pair<array_string_exprt, string_constraintst>
-add_axioms_for_format_specifier(
-  symbol_generatort &fresh_symbol,
-  const format_specifiert &fs,
-  const struct_exprt &arg,
-  const typet &index_type,
-  const typet &char_type,
-  array_poolt &array_pool,
-  const messaget &message,
-  const namespacet &ns)
-{
+add_axioms_for_format_specifier(symbol_generatort &fresh_symbol,
+                                const format_specifiert &fs,
+                                const struct_exprt &arg,
+                                const typet &index_type, const typet &char_type,
+                                array_poolt &array_pool,
+                                const messaget &message, const namespacet &ns) {
   string_constraintst constraints;
   const array_string_exprt res = array_pool.fresh_string(index_type, char_type);
   std::pair<exprt, string_constraintst> return_code;
@@ -283,45 +278,39 @@ add_axioms_for_format_specifier(
   {
   case format_specifiert::DECIMAL_INTEGER:
     return_code = add_axioms_for_string_of_int(
-      res, get_component_in_struct(arg, ID_int), 0, ns);
+        res, get_component_in_struct(arg, ID_int), 0, ns);
     return {res, std::move(return_code.second)};
   case format_specifiert::HEXADECIMAL_INTEGER:
     return_code =
-      add_axioms_from_int_hex(res, get_component_in_struct(arg, ID_int));
+        add_axioms_from_int_hex(res, get_component_in_struct(arg, ID_int));
     return {res, std::move(return_code.second)};
   case format_specifiert::SCIENTIFIC:
     return_code = add_axioms_from_float_scientific_notation(
-      fresh_symbol,
-      res,
-      get_component_in_struct(arg, ID_float),
-      array_pool,
-      ns);
+        fresh_symbol, res, get_component_in_struct(arg, ID_float), array_pool,
+        ns);
     return {res, std::move(return_code.second)};
   case format_specifiert::DECIMAL_FLOAT:
     return_code = add_axioms_for_string_of_float(
-      fresh_symbol,
-      res,
-      get_component_in_struct(arg, ID_float),
-      array_pool,
-      ns);
+        fresh_symbol, res, get_component_in_struct(arg, ID_float), array_pool,
+        ns);
     return {res, std::move(return_code.second)};
   case format_specifiert::CHARACTER:
     return_code =
-      add_axioms_from_char(res, get_component_in_struct(arg, ID_char));
+        add_axioms_from_char(res, get_component_in_struct(arg, ID_char));
     return {res, std::move(return_code.second)};
   case format_specifiert::BOOLEAN:
     return_code =
-      add_axioms_from_bool(res, get_component_in_struct(arg, ID_boolean));
+        add_axioms_from_bool(res, get_component_in_struct(arg, ID_boolean));
     return {res, std::move(return_code.second)};
   case format_specifiert::STRING:
   {
-    auto string_expr =
-      get_string_expr(array_pool, get_component_in_struct(arg, "string_expr"));
+    auto string_expr = get_string_expr(
+        array_pool, get_component_in_struct(arg, "string_expr"));
     return {std::move(string_expr), {}};
   }
   case format_specifiert::HASHCODE:
     return_code = add_axioms_for_string_of_int(
-      res, get_component_in_struct(arg, "hashcode"), 0, ns);
+        res, get_component_in_struct(arg, "hashcode"), 0, ns);
     return {res, std::move(return_code.second)};
   case format_specifiert::LINE_SEPARATOR:
     // TODO: the constant should depend on the system: System.lineSeparator()
@@ -341,15 +330,9 @@ add_axioms_for_format_specifier(
   {
     format_specifiert fs_lower = fs;
     fs_lower.conversion = tolower(fs.conversion);
-    auto format_specifier_result = add_axioms_for_format_specifier(
-      fresh_symbol,
-      fs_lower,
-      arg,
-      index_type,
-      char_type,
-      array_pool,
-      message,
-      ns);
+    auto format_specifier_result =
+        add_axioms_for_format_specifier(fresh_symbol, fs_lower, arg, index_type,
+                                        char_type, array_pool, message, ns);
 
     const exprt return_code_upper_case =
       fresh_symbol("return_code_upper_case", get_return_code_type());
@@ -434,14 +417,8 @@ std::pair<exprt, string_constraintst> add_axioms_for_format(
         }
 
         auto result = add_axioms_for_format_specifier(
-          fresh_symbol,
-          fs,
-          to_struct_expr(arg),
-          index_type,
-          char_type,
-          array_pool,
-          message,
-          ns);
+            fresh_symbol, fs, to_struct_expr(arg), index_type, char_type,
+            array_pool, message, ns);
         merge(constraints, std::move(result.second));
         intermediary_strings.push_back(result.first);
       }

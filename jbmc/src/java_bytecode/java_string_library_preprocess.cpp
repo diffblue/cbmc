@@ -1123,57 +1123,37 @@ code_blockt java_string_library_preprocesst::make_assign_function_from_call(
 ///   primitive value contained in the given object.
 optionalt<symbol_exprt>
 java_string_library_preprocesst::get_primitive_value_of_object(
-  const exprt &object,
-  irep_idt type_name,
-  const source_locationt &loc,
-  const irep_idt &function_id,
-  symbol_table_baset &symbol_table,
-  code_blockt &code)
-{
+    const exprt &object, irep_idt type_name, const source_locationt &loc,
+    const irep_idt &function_id, symbol_table_baset &symbol_table,
+    code_blockt &code) {
   optionalt<struct_tag_typet> object_type;
 
   typet value_type;
-  if(type_name==ID_boolean)
-  {
-    value_type=java_boolean_type();
+  if (type_name == ID_boolean) {
+    value_type = java_boolean_type();
     object_type = struct_tag_typet("java::java.lang.Boolean");
-  }
-  else if(type_name==ID_char)
-  {
-    value_type=java_char_type();
+  } else if (type_name == ID_char) {
+    value_type = java_char_type();
     object_type = struct_tag_typet("java::java.lang.Character");
-  }
-  else if(type_name==ID_byte)
-  {
-    value_type=java_byte_type();
+  } else if (type_name == ID_byte) {
+    value_type = java_byte_type();
     object_type = struct_tag_typet("java::java.lang.Byte");
-  }
-  else if(type_name==ID_short)
-  {
-    value_type=java_short_type();
+  } else if (type_name == ID_short) {
+    value_type = java_short_type();
     object_type = struct_tag_typet("java::java.lang.Short");
-  }
-  else if(type_name==ID_int)
-  {
-    value_type=java_int_type();
+  } else if (type_name == ID_int) {
+    value_type = java_int_type();
     object_type = struct_tag_typet("java::java.lang.Integer");
-  }
-  else if(type_name==ID_long)
-  {
-    value_type=java_long_type();
+  } else if (type_name == ID_long) {
+    value_type = java_long_type();
     object_type = struct_tag_typet("java::java.lang.Long");
-  }
-  else if(type_name==ID_float)
-  {
-    value_type=java_float_type();
+  } else if (type_name == ID_float) {
+    value_type = java_float_type();
     object_type = struct_tag_typet("java::java.lang.Float");
-  }
-  else if(type_name==ID_double)
-  {
-    value_type=java_double_type();
+  } else if (type_name == ID_double) {
+    value_type = java_double_type();
     object_type = struct_tag_typet("java::java.lang.Double");
-  }
-  else if(type_name==ID_void)
+  } else if (type_name == ID_void)
     return {};
   else
     UNREACHABLE;
@@ -1183,26 +1163,23 @@ java_string_library_preprocesst::get_primitive_value_of_object(
   // declare tmp_type_name to hold the value
   const std::string aux_name = "tmp_" + id2string(type_name);
   const symbolt &symbol =
-    fresh_java_symbol(value_type, aux_name, loc, function_id, symbol_table);
+      fresh_java_symbol(value_type, aux_name, loc, function_id, symbol_table);
   const auto value = symbol.symbol_expr();
 
   // Check that the type of the object is in the symbol table,
   // otherwise there is no safe way of finding its value.
-  if(
-    const auto maybe_symbol =
-      symbol_table.lookup(object_type->get_identifier()))
-  {
+  if (const auto maybe_symbol =
+          symbol_table.lookup(object_type->get_identifier())) {
     const struct_typet &struct_type = to_struct_type(maybe_symbol->type);
     // Check that the type has a value field
     const struct_union_typet::componentt &value_comp =
-      struct_type.get_component("value");
-    if(!value_comp.is_nil())
-    {
+        struct_type.get_component("value");
+    if (!value_comp.is_nil()) {
       const pointer_typet struct_pointer_type = pointer_type(struct_type);
       dereference_exprt deref{typecast_exprt(object, struct_pointer_type),
                               struct_pointer_type.subtype()};
-      const member_exprt deref_value{
-        std::move(deref), value_comp.get_name(), value_comp.type()};
+      const member_exprt deref_value{std::move(deref), value_comp.get_name(),
+                                     value_comp.type()};
       code.add(code_assignt(value, deref_value), loc);
       return value;
     }
@@ -1222,16 +1199,15 @@ java_string_library_preprocesst::get_primitive_value_of_object(
 /// \param argv: reference to an array of references
 /// \param index: index of the desired object
 /// \return An expression representing the object at position `index` of `argv`.
-dereference_exprt java_string_library_preprocesst::get_object_at_index(
-  const exprt &argv,
-  std::size_t index)
-{
+dereference_exprt
+java_string_library_preprocesst::get_object_at_index(const exprt &argv,
+                                                     std::size_t index) {
   const dereference_exprt deref_objs{argv, argv.type().subtype()};
   const pointer_typet empty_pointer = pointer_type(java_void_type());
   const pointer_typet pointer_of_pointer = pointer_type(empty_pointer);
   const member_exprt data_member{deref_objs, "data", pointer_of_pointer};
   const plus_exprt data_pointer_plus_index{
-    data_member, from_integer(index, java_int_type()), data_member.type()};
+      data_member, from_integer(index, java_int_type()), data_member.type()};
   return dereference_exprt{data_pointer_plus_index,
                            data_pointer_plus_index.type().subtype()};
 }
@@ -1268,35 +1244,27 @@ dereference_exprt java_string_library_preprocesst::get_object_at_index(
 /// \return An expression of type `structured_type` representing the possible
 ///         values of the argument at position `index` of `argv`.
 struct_exprt java_string_library_preprocesst::make_argument_for_format(
-  const exprt &argv,
-  std::size_t index,
-  const struct_typet &structured_type,
-  const source_locationt &loc,
-  const irep_idt &function_id,
-  symbol_table_baset &symbol_table,
-  code_blockt &code)
-{
+    const exprt &argv, std::size_t index, const struct_typet &structured_type,
+    const source_locationt &loc, const irep_idt &function_id,
+    symbol_table_baset &symbol_table, code_blockt &code) {
   // Declarations of the fields of arg_i_struct
   // arg_i_struct is { arg_i_string_expr, tmp_int, tmp_char, ... }
   struct_exprt arg_i_struct({}, structured_type);
   std::list<exprt> field_exprs;
-  for(const auto & comp : structured_type.components())
-  {
-    const irep_idt &name=comp.get_name();
-    const typet &type=comp.type();
+  for (const auto &comp : structured_type.components()) {
+    const irep_idt &name = comp.get_name();
+    const typet &type = comp.type();
     exprt field_expr;
-    if(name!="string_expr")
-    {
-      std::string tmp_name="tmp_"+id2string(name);
+    if (name != "string_expr") {
+      std::string tmp_name = "tmp_" + id2string(name);
       const symbolt &field_symbol =
-        fresh_java_symbol(type, tmp_name, loc, function_id, symbol_table);
+          fresh_java_symbol(type, tmp_name, loc, function_id, symbol_table);
       auto field_symbol_expr = field_symbol.symbol_expr();
       field_expr = field_symbol_expr;
       code.add(code_declt(field_symbol_expr), loc);
-    }
-    else
+    } else
       field_expr =
-        make_nondet_string_expr(loc, function_id, symbol_table, code);
+          make_nondet_string_expr(loc, function_id, symbol_table, code);
 
     field_exprs.push_back(field_expr);
     arg_i_struct.copy_to_operands(field_expr);
@@ -1305,7 +1273,7 @@ struct_exprt java_string_library_preprocesst::make_argument_for_format(
   // arg_i = argv[index]
   const exprt obj = get_object_at_index(argv, index);
   const symbolt &object_symbol = fresh_java_symbol(
-    obj.type(), "tmp_format_obj", loc, function_id, symbol_table);
+      obj.type(), "tmp_format_obj", loc, function_id, symbol_table);
   const symbol_exprt arg_i = object_symbol.symbol_expr();
 
   allocate_objectst allocate_objects(ID_java, loc, function_id, symbol_table);
@@ -1316,44 +1284,34 @@ struct_exprt java_string_library_preprocesst::make_argument_for_format(
   code.append(tmp);
 
   code.add(code_assignt(arg_i, obj), loc);
-  code.add(
-    code_assumet(
-      not_exprt(
-        equal_exprt(arg_i, null_pointer_exprt(to_pointer_type(arg_i.type()))))),
-    loc);
+  code.add(code_assumet(not_exprt(equal_exprt(
+               arg_i, null_pointer_exprt(to_pointer_type(arg_i.type()))))),
+           loc);
 
   code_blockt code_not_null;
 
   // Assigning all the fields of arg_i_struct
-  for(const auto &comp : structured_type.components())
-  {
-    const irep_idt &name=comp.get_name();
-    exprt field_expr=field_exprs.front();
+  for (const auto &comp : structured_type.components()) {
+    const irep_idt &name = comp.get_name();
+    exprt field_expr = field_exprs.front();
     field_exprs.pop_front();
 
-    if(name=="string_expr")
-    {
+    if (name == "string_expr") {
       const pointer_typet string_pointer =
-        java_reference_type(struct_tag_typet("java::java.lang.String"));
+          java_reference_type(struct_tag_typet("java::java.lang.String"));
       const typecast_exprt arg_i_as_string{arg_i, string_pointer};
-      code_assign_java_string_to_string_expr(
-        to_string_expr(field_expr),
-        arg_i_as_string,
-        loc,
-        symbol_table,
-        code_not_null);
-    }
-    else if(name==ID_int || name==ID_float || name==ID_char || name==ID_boolean)
-    {
+      code_assign_java_string_to_string_expr(to_string_expr(field_expr),
+                                             arg_i_as_string, loc, symbol_table,
+                                             code_not_null);
+    } else if (name == ID_int || name == ID_float || name == ID_char ||
+               name == ID_boolean) {
       const auto value = get_primitive_value_of_object(
-        arg_i, name, loc, function_id, symbol_table, code_not_null);
-      if(value.has_value())
+          arg_i, name, loc, function_id, symbol_table, code_not_null);
+      if (value.has_value())
         code_not_null.add(code_assignt(field_expr, *value), loc);
       else
         code_not_null.add(code_assignt(field_expr, nil_exprt()), loc);
-    }
-    else
-    {
+    } else {
       // TODO: date_time and hash_code not implemented
     }
   }
@@ -1374,16 +1332,13 @@ struct_exprt java_string_library_preprocesst::make_argument_for_format(
 ///   class of the arguments is not known, we give as argument to the internal
 //    format function a structure containing the different possible types.
 code_blockt java_string_library_preprocesst::make_string_format_code(
-  const java_method_typet &type,
-  const source_locationt &loc,
-  const irep_idt &function_id,
-  symbol_table_baset &symbol_table)
-{
-  PRECONDITION(type.parameters().size()==2);
+    const java_method_typet &type, const source_locationt &loc,
+    const irep_idt &function_id, symbol_table_baset &symbol_table) {
+  PRECONDITION(type.parameters().size() == 2);
   code_blockt code;
-  exprt::operandst args =
-    process_parameters(type.parameters(), loc, function_id, symbol_table, code);
-  INVARIANT(args.size()==2, "String.format should have two arguments");
+  exprt::operandst args = process_parameters(type.parameters(), loc,
+                                             function_id, symbol_table, code);
+  INVARIANT(args.size() == 2, "String.format should have two arguments");
 
   // The argument can be:
   // a string, an integer, a floating point, a character, a boolean,
@@ -1403,19 +1358,17 @@ code_blockt java_string_library_preprocesst::make_string_format_code(
   // containing each possible type used in format specifiers.
   std::vector<exprt> processed_args;
   processed_args.push_back(args[0]);
-  for(std::size_t i=0; i<MAX_FORMAT_ARGS; ++i)
-    processed_args.push_back(
-      make_argument_for_format(
+  for (std::size_t i = 0; i < MAX_FORMAT_ARGS; ++i)
+    processed_args.push_back(make_argument_for_format(
         args[1], i, structured_type, loc, function_id, symbol_table, code));
 
   const refined_string_exprt string_expr = string_expr_of_function(
-    ID_cprover_string_format_func, processed_args, loc, symbol_table, code);
+      ID_cprover_string_format_func, processed_args, loc, symbol_table, code);
   const exprt java_string = allocate_fresh_string(
-    type.return_type(), loc, function_id, symbol_table, code);
-  code.add(
-    code_assign_string_expr_to_java_string(
-      java_string, string_expr, symbol_table, true),
-    loc);
+      type.return_type(), loc, function_id, symbol_table, code);
+  code.add(code_assign_string_expr_to_java_string(java_string, string_expr,
+                                                  symbol_table, true),
+           loc);
   code.add(code_returnt(java_string), loc);
   return code;
 }
@@ -1849,15 +1802,11 @@ void java_string_library_preprocesst::initialize_conversion_table()
     ["java::java.lang.String.equalsIgnoreCase:(Ljava/lang/String;)Z"]=
       ID_cprover_string_equals_ignore_case_func;
   conversion_table
-    ["java::java.lang.String.format:(Ljava/lang/String;[Ljava/lang/Object;)"
-     "Ljava/lang/String;"] =
-      std::bind(
-        &java_string_library_preprocesst::make_string_format_code,
-        this,
-        std::placeholders::_1,
-        std::placeholders::_2,
-        std::placeholders::_3,
-        std::placeholders::_4);
+      ["java::java.lang.String.format:(Ljava/lang/String;[Ljava/lang/Object;)"
+       "Ljava/lang/String;"] =
+          std::bind(&java_string_library_preprocesst::make_string_format_code,
+                    this, std::placeholders::_1, std::placeholders::_2,
+                    std::placeholders::_3, std::placeholders::_4);
   cprover_equivalent_to_java_function
     ["java::java.lang.String.hashCode:()I"]=
       ID_cprover_string_hash_code_func;
