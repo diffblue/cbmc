@@ -30,7 +30,6 @@ exprt good_pointer_def(const exprt &pointer, const namespacet &);
 exprt null_object(const exprt &pointer);
 exprt null_pointer(const exprt &pointer);
 exprt integer_address(const exprt &pointer);
-exprt is_invalid_pointer(const exprt &pointer);
 exprt dynamic_object_lower_bound(
   const exprt &pointer,
   const exprt &offset);

@@ -2104,7 +2104,7 @@ exprt c_typecheck_baset::do_special_functions(
       throw 0;
     }
 
-    exprt same_object_expr = is_invalid_pointer(expr.arguments().front());
+    exprt same_object_expr = is_invalid_pointer_exprt{expr.arguments().front()};
     same_object_expr.add_source_location()=source_location;
 
     return same_object_expr;

@@ -105,7 +105,7 @@ exprt good_pointer_def(
 
   const not_exprt not_null(null_pointer(pointer));
 
-  const not_exprt not_invalid(is_invalid_pointer(pointer));
+  const not_exprt not_invalid{is_invalid_pointer_exprt{pointer}};
 
   const or_exprt bad_other(
     object_lower_bound(pointer, nil_exprt()),
@@ -137,11 +137,6 @@ exprt null_pointer(const exprt &pointer)
 {
   null_pointer_exprt null_pointer(to_pointer_type(pointer.type()));
   return same_object(pointer, null_pointer);
-}
-
-exprt is_invalid_pointer(const exprt &pointer)
-{
-  return is_invalid_pointer_exprt{pointer};
 }
 
 exprt dynamic_object_lower_bound(
