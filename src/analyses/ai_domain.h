@@ -27,8 +27,14 @@ class ai_baset;
 class ai_domain_baset
 {
 protected:
-  /// The default constructor is expected to produce 'false' or 'bottom'
+  /// The constructor is expected to produce 'false' or 'bottom'
+  /// A default constructor is not part of the domain interface
   ai_domain_baset()
+  {
+  }
+
+  /// A copy constructor is part of the domain interface
+  ai_domain_baset(const ai_domain_baset &old)
   {
   }
 
@@ -119,6 +125,54 @@ public:
       return false_exprt();
     else
       return true_exprt();
+  }
+};
+
+// No virtual interface is complete without a factory!
+class ai_domain_factory_baset
+{
+public:
+  typedef ai_domain_baset statet;
+  typedef ai_domain_baset::locationt locationt;
+
+  virtual ~ai_domain_factory_baset()
+  {
+  }
+
+  virtual std::unique_ptr<statet> make(locationt l) const = 0;
+  virtual std::unique_ptr<statet> copy(const statet &s) const = 0;
+};
+
+// It would be great to have a single (templated) default implementation.
+// However, a default constructor is not part of the ai_domain_baset interface
+// and there are some domains which don't have one.  So we need to separate the
+// methods.
+template <typename domainT>
+class ai_domain_factoryt : public ai_domain_factory_baset
+{
+public:
+  typedef ai_domain_factory_baset::statet statet;
+  typedef ai_domain_factory_baset::locationt locationt;
+
+  std::unique_ptr<statet> copy(const statet &s) const override
+  {
+    return util_make_unique<domainT>(static_cast<const domainT &>(s));
+  }
+};
+
+template <typename domainT>
+class ai_domain_factory_default_constructort
+  : public ai_domain_factoryt<domainT>
+{
+public:
+  typedef ai_domain_factory_baset::statet statet;
+  typedef ai_domain_factory_baset::locationt locationt;
+
+  std::unique_ptr<statet> make(locationt l) const override
+  {
+    auto p = util_make_unique<domainT>();
+    CHECK_RETURN(p->is_bottom());
+    return p;
   }
 };
 
