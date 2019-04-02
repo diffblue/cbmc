@@ -571,7 +571,7 @@ bool simplify_exprt::simplify_is_dynamic_object(exprt &expr)
   return result;
 }
 
-bool simplify_exprt::simplify_invalid_pointer(exprt &expr)
+bool simplify_exprt::simplify_is_invalid_pointer(exprt &expr)
 {
   if(expr.operands().size()!=1)
     return true;

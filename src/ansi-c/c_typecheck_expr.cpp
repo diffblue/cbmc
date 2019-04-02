@@ -2095,16 +2095,16 @@ exprt c_typecheck_baset::do_special_functions(
 
     return std::move(get_may_expr);
   }
-  else if(identifier==CPROVER_PREFIX "invalid_pointer")
+  else if(identifier == CPROVER_PREFIX "is_invalid_pointer")
   {
     if(expr.arguments().size()!=1)
     {
       error().source_location = f_op.source_location();
-      error() << "invalid_pointer expects one operand" << eom;
+      error() << "is_invalid_pointer expects one operand" << eom;
       throw 0;
     }
 
-    exprt same_object_expr = invalid_pointer(expr.arguments().front());
+    exprt same_object_expr = is_invalid_pointer(expr.arguments().front());
     same_object_expr.add_source_location()=source_location;
 
     return same_object_expr;

@@ -20,7 +20,7 @@ literalt bv_pointerst::convert_rest(const exprt &expr)
 
   const exprt::operandst &operands=expr.operands();
 
-  if(expr.id()==ID_invalid_pointer)
+  if(expr.id() == ID_is_invalid_pointer)
   {
     if(operands.size()==1 &&
        operands[0].type().id()==ID_pointer)

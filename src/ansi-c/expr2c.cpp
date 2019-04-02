@@ -3426,8 +3426,8 @@ std::string expr2ct::convert_with_precedence(
   else if(src.id() == ID_w_ok)
     return convert_function(src, "W_OK", precedence = 16);
 
-  else if(src.id()==ID_invalid_pointer)
-    return convert_function(src, "INVALID-POINTER", precedence=16);
+  else if(src.id() == ID_is_invalid_pointer)
+    return convert_function(src, "IS-INVALID-POINTER", precedence = 16);
 
   else if(src.id()==ID_good_pointer)
     return convert_function(src, "GOOD_POINTER", precedence=16);
@@ -3482,9 +3482,9 @@ std::string expr2ct::convert_with_precedence(
   else if(src.id()=="pointer_cons")
     return convert_function(src, "POINTER_CONS", precedence=16);
 
-  else if(src.id()==ID_invalid_pointer)
+  else if(src.id() == ID_is_invalid_pointer)
     return convert_function(
-      src, CPROVER_PREFIX "invalid_pointer", precedence = 16);
+      src, CPROVER_PREFIX "is_invalid_pointer", precedence = 16);
 
   else if(src.id() == ID_is_dynamic_object)
     return convert_function(src, "IS_DYNAMIC_OBJECT", precedence = 16);

@@ -2407,8 +2407,8 @@ bool simplify_exprt::simplify_node(exprt &expr)
   {
     result = simplify_is_dynamic_object(expr) && result;
   }
-  else if(expr.id()==ID_invalid_pointer)
-    result=simplify_invalid_pointer(expr) && result;
+  else if(expr.id() == ID_is_invalid_pointer)
+    result = simplify_is_invalid_pointer(expr) && result;
   else if(expr.id()==ID_object_size)
     result=simplify_object_size(expr) && result;
   else if(expr.id()==ID_good_pointer)

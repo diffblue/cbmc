@@ -1320,7 +1320,7 @@ void smt2_convt::convert_expr(const exprt &expr)
   {
     convert_is_dynamic_object(expr);
   }
-  else if(expr.id()==ID_invalid_pointer)
+  else if(expr.id() == ID_is_invalid_pointer)
   {
     DATA_INVARIANT(
       expr.operands().size() == 1,
