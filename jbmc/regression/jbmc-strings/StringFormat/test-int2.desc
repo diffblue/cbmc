@@ -1,0 +1,6 @@
+CORE symex-driven-lazy-loading-expected-failure
+Test.class
+--function Test.testInt --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar` --property "java::Test.testInt:(I)Ljava/lang/String;.assertion.2"
+^EXIT=0$
+^SIGNAL=0$
+line 18 assertion at file Test.java .*: SUCCESS
