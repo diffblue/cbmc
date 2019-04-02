@@ -240,10 +240,10 @@ static std::vector<format_elementt> parse_format_string(std::string s)
 }
 
 /// Parse `s` and add axioms ensuring the output corresponds to the output of
-/// String.format. Assumes the argument is a structured expression which
-/// contains the fields: string expr, int, float, char, boolean, hashcode,
-/// date_time. The correct component will be fetched depending on the format
-/// specifier.
+/// String.format. Assumes the argument is a string representing one of:
+/// string expr, int, float, char, boolean, hashcode, date_time.
+/// The correct type will be retrieved by calling get_arg with an id depending
+/// on the format specifier.
 /// \param fresh_symbol: generator of fresh symbols
 /// \param fs: a format specifier
 /// \param get_arg: a function returning the possible value of the argument to
