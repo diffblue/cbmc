@@ -15,6 +15,39 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/symbol_table.h>
 #include <util/std_expr.h>
 
+/// Pass the necessary arguments to the invariant_set_domaint's when constructed
+class invariant_set_domain_factoryt
+  : public ai_domain_factoryt<invariant_set_domaint>
+{
+public:
+  explicit invariant_set_domain_factoryt(invariant_propagationt &_ip) : ip(_ip)
+  {
+  }
+
+  std::unique_ptr<statet> make(locationt l) const override
+  {
+    auto p = util_make_unique<invariant_set_domaint>(
+      ip.value_sets, ip.object_store, ip.ns);
+    CHECK_RETURN(p->is_bottom());
+
+    return std::unique_ptr<statet>(p.release());
+  }
+
+private:
+  invariant_propagationt &ip;
+};
+
+invariant_propagationt::invariant_propagationt(
+  const namespacet &_ns,
+  value_setst &_value_sets)
+  : ait<invariant_set_domaint>(
+      util_make_unique<invariant_set_domain_factoryt>(*this)),
+    ns(_ns),
+    value_sets(_value_sets),
+    object_store(_ns)
+{
+}
+
 void invariant_propagationt::make_all_true()
 {
   for(auto &state : state_map)
@@ -207,20 +240,8 @@ void invariant_propagationt::initialize(
 {
   baset::initialize(function, goto_program);
 
-  forall_goto_program_instructions(it, goto_program)
-  {
-    auto &domain = get_state(it);
-    invariant_sett &s =
-      static_cast<invariant_set_domaint &>(domain).invariant_set;
-
-    s.set_value_sets(value_sets);
-    s.set_object_store(object_store);
-    s.set_namespace(ns);
-  }
-
   add_objects(goto_program);
 }
-
 
 void invariant_propagationt::simplify(goto_functionst &goto_functions)
 {
