@@ -335,6 +335,8 @@ public:
 /// \param symbol_table: the symbol table
 /// \param printable: if true, the nondet string must consist of printable
 ///   characters only
+/// \param allocate_objects: manages memory allocation and keeps track of the
+///   newly created symbols
 ///
 /// The code produced is of the form:
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -366,7 +368,8 @@ void initialize_nondet_string_fields(
   const source_locationt &loc,
   const irep_idt &function_id,
   symbol_table_baset &symbol_table,
-  bool printable)
+  bool printable,
+  allocate_objectst &allocate_objects)
 {
   PRECONDITION(
     java_string_library_preprocesst
@@ -402,11 +405,10 @@ void initialize_nondet_string_fields(
 
   /// \todo Refactor with make_nondet_string_expr
   // length_expr = nondet(int);
-  const symbolt length_sym = fresh_java_symbol(
-    java_int_type(), "tmp_object_factory", loc, function_id, symbol_table);
-  const symbol_exprt length_expr = length_sym.symbol_expr();
+  const symbol_exprt length_expr =
+    allocate_objects.allocate_automatic_local_object(
+      java_int_type(), "tmp_object_factory");
   const side_effect_expr_nondett nondet_length(length_expr.type(), loc);
-  code.add(code_declt(length_expr));
   code.add(code_assignt(length_expr, nondet_length));
 
   // assume (length_expr >= min_nondet_string_length);
@@ -709,17 +711,14 @@ symbol_exprt java_object_factoryt::gen_nondet_subtype_pointer_init(
   size_t depth,
   const source_locationt &location)
 {
-  symbolt new_symbol = fresh_java_symbol(
-    replacement_pointer,
-    "tmp_object_factory",
-    location,
-    object_factory_parameters.function_id,
-    symbol_table);
+  const symbol_exprt new_symbol_expr =
+    allocate_objects.allocate_automatic_local_object(
+      replacement_pointer, "tmp_object_factory");
 
   // Generate a new object into this new symbol
   gen_nondet_init(
     assignments,
-    new_symbol.symbol_expr(),
+    new_symbol_expr,
     false, // is_sub
     "",    // class_identifier
     false, // skip_classid
@@ -729,7 +728,7 @@ symbol_exprt java_object_factoryt::gen_nondet_subtype_pointer_init(
     update_in_placet::NO_UPDATE_IN_PLACE,
     location);
 
-  return new_symbol.symbol_expr();
+  return new_symbol_expr;
 }
 
 /// Creates an alternate_casest vector in which each item contains an
@@ -874,7 +873,8 @@ void java_object_factoryt::gen_nondet_struct_init(
           location,
           object_factory_parameters.function_id,
           symbol_table,
-          object_factory_parameters.string_printable);
+          object_factory_parameters.string_printable,
+          allocate_objects);
       }
 
       assignments.add(code_assignt(expr, *initial_object));
