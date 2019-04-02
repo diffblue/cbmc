@@ -213,11 +213,6 @@ void invariant_propagationt::initialize(
     invariant_sett &s =
       static_cast<invariant_set_domaint &>(domain).invariant_set;
 
-    if(it==goto_program.instructions.begin())
-      s.make_true();
-    else
-      s.make_false();
-
     s.set_value_sets(value_sets);
     s.set_object_store(object_store);
     s.set_namespace(ns);
