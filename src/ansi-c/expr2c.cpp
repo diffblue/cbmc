@@ -3427,7 +3427,7 @@ std::string expr2ct::convert_with_precedence(
     return convert_function(src, "W_OK", precedence = 16);
 
   else if(src.id() == ID_is_invalid_pointer)
-    return convert_function(src, "IS-INVALID-POINTER", precedence = 16);
+    return convert_function(src, "IS_INVALID_POINTER", precedence = 16);
 
   else if(src.id()==ID_good_pointer)
     return convert_function(src, "GOOD_POINTER", precedence=16);
