@@ -239,6 +239,18 @@ static std::vector<format_elementt> parse_format_string(std::string s)
   return al;
 }
 
+/// Expression which is true when the string is equal to the literal "null"
+static exprt is_null(const array_string_exprt &string)
+{
+  return and_exprt{
+    equal_exprt{string.length(), from_integer(4, string.length().type())},
+    and_exprt{
+      equal_exprt{string[0], from_integer('n', string[0].type())},
+      equal_exprt{string[1], from_integer('u', string[0].type())},
+      equal_exprt{string[2], from_integer('l', string[0].type())},
+      equal_exprt{string[3], from_integer('l', string[0].type())}}};
+}
+
 /// Parse `s` and add axioms ensuring the output corresponds to the output of
 /// String.format. Assumes the argument is a string representing one of:
 /// string expr, int, float, char, boolean, hashcode, date_time.
@@ -286,8 +298,30 @@ add_axioms_for_format_specifier(
         fresh_symbol, res, get_arg(ID_float), array_pool, ns);
     return {res, std::move(return_code.second)};
   case format_specifiert::CHARACTER:
-    return_code = add_axioms_from_char(res, get_arg(ID_char));
-    return {res, std::move(return_code.second)};
+  {
+    exprt arg_string = get_arg(ID_char);
+    array_string_exprt &string_expr = to_array_string_expr(arg_string);
+    // In the case the arg is null, the result will be equal to "null" and
+    // and otherwise we just take the 4th character of the string.
+    const exprt is_null_literal = is_null(string_expr);
+    constraints.existential.push_back(equal_exprt{
+      res.length(),
+      if_exprt{
+        is_null_literal,
+        from_integer(4, index_type),
+        from_integer(1, index_type)}});
+    constraints.existential.push_back(implies_exprt{
+      is_null_literal,
+      and_exprt{
+        equal_exprt{res[0], from_integer('n', char_type)},
+        equal_exprt{res[1], from_integer('u', char_type)},
+        equal_exprt{res[2], from_integer('l', char_type)},
+        equal_exprt{res[3], from_integer('l', char_type)}}});
+    constraints.existential.push_back(implies_exprt{
+      not_exprt{is_null_literal},
+      equal_exprt{res[0], typecast_exprt{string_expr[3], char_type}}});
+    return {res, constraints};
+  }
   case format_specifiert::BOOLEAN:
     return_code = add_axioms_from_bool(res, get_arg(ID_boolean));
     return {res, std::move(return_code.second)};
@@ -378,23 +412,18 @@ static exprt format_arg_from_string(
         shl_exprt{typecast_exprt{string[2], type}, 16},
         typecast_exprt{string[3], type}}};
   }
+
   if(id == ID_char)
   {
-    // We assume the string has length exactly 4 and ignore the first 3
-    // (unsigned16)string.content[3]
-    const unsignedbv_typet type{16};
-    return typecast_exprt{
-      index_exprt{string.content(), from_integer(3, string.length().type())},
-      type};
+    // Leave the string unchanged as the "null" string is used to represent null
+    return string;
   }
   if(id == ID_boolean)
   {
-    // We assume the string has length exactly 4 and ignore the first 3
-    // (bool)string.content[3]
-    const c_bool_typet type{8};
-    return typecast_exprt{
-      index_exprt{string.content(), from_integer(3, string.length().type())},
-      type};
+    // We assume the string has length exactly 4, if it is "null" return false
+    // and otherwise ignore the first 3 and return (bool)string.content[3]
+    return if_exprt{
+      is_null(string), false_exprt{}, typecast_exprt{string[3], bool_typet()}};
   }
   if(id == ID_float)
   {
