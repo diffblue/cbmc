@@ -303,7 +303,8 @@ add_axioms_for_format_specifier(
     return {res, std::move(return_code.second)};
   case format_specifiert::STRING:
   {
-    auto string_expr = get_string_expr(array_pool, get_arg("string_expr"));
+    const exprt arg_string = get_arg("string_expr");
+    const array_string_exprt string_expr = to_array_string_expr(arg_string);
     return {std::move(string_expr), {}};
   }
   case format_specifiert::HASHCODE:
@@ -365,6 +366,55 @@ add_axioms_for_format_specifier(
   }
 }
 
+/// Deserialize an argument for format from \p string.
+/// \p id should be one of: string_expr, int, char, boolean, float.
+/// The primitive values are expected to all be encoded using 4 characters.
+static exprt format_arg_from_string(
+  const array_string_exprt &string, const irep_idt &id)
+{
+  if(id == "string_expr")
+    return string;
+  if(id == ID_int)
+  {
+    // Assume the string has length 4
+    // (int64)string.content[0] << 48 | (int64) string.content[1] << 32 |
+    // (int64)string.content[2] << 16 | (int64) string.content[3]
+    const signedbv_typet type{64};
+    return bitor_exprt{
+      bitor_exprt{
+        shl_exprt{typecast_exprt{string[0], type}, 48},
+        shl_exprt{typecast_exprt{string[1], type}, 32}},
+      bitor_exprt{
+        shl_exprt{typecast_exprt{string[2], type}, 16},
+        typecast_exprt{string[3], type}}};
+  }
+  if(id == ID_char)
+  {
+    // We assume the string has length exactly 4 and ignore the first 3
+    // (unsigned16)string.content[3]
+    const unsignedbv_typet type{16};
+    return typecast_exprt{
+      index_exprt{string.content(), from_integer(3, string.length().type())},
+      type};
+  }
+  if(id == ID_boolean)
+  {
+    // We assume the string has length exactly 4 and ignore the first 3
+    // (bool)string.content[3]
+    const c_bool_typet type{8};
+    return typecast_exprt{
+      index_exprt{string.content(), from_integer(3, string.length().type())},
+      type};
+  }
+  if(id == ID_float)
+  {
+    // Deserialize an int and cast to float
+    const exprt as_int = format_arg_from_string(string, ID_int);
+    return typecast_exprt{as_int, floatbv_typet{}};
+  }
+  UNHANDLED_CASE;
+}
+
 /// Parse `s` and add axioms ensuring the output corresponds to the output of
 /// String.format.
 /// \param fresh_symbol: generator of fresh symbols
@@ -406,7 +456,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_format(
         {
           INVARIANT(
             arg_count < args.size(), "number of format must match specifiers");
-          arg = to_struct_expr(args[arg_count++]);
+          arg = args[arg_count++];
         }
         else
         {
@@ -419,12 +469,28 @@ std::pair<exprt, string_constraintst> add_axioms_for_format(
           arg = to_struct_expr(args[fs.index - 1]);
         }
 
+        std::function<exprt(const irep_idt &)> get_arg;
+        if(is_refined_string_type(arg.type()))
+        {
+          const array_string_exprt string_arg =
+            get_string_expr(array_pool, arg);
+          get_arg = [string_arg](const irep_idt &id) {
+            return format_arg_from_string(string_arg, id);
+          };
+        }
+        else
+        {
+          INVARIANT(
+            arg.id() == ID_struct,
+            "format argument should be a string or a struct");
+          get_arg = [&](const irep_idt &id) {
+            return get_component_in_struct(to_struct_expr(arg), id);
+          };
+        }
         auto result = add_axioms_for_format_specifier(
           fresh_symbol,
           fs,
-          [&](const irep_idt &id) {
-            return get_component_in_struct(to_struct_expr(arg), id);
-          },
+          get_arg,
           index_type,
           char_type,
           array_pool,
