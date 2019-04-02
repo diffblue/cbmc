@@ -1037,6 +1037,7 @@ bool java_bytecode_languaget::convert_single_method(
   // Nothing to do if body is already loaded
   if(symbol.value.is_not_nil())
     return false;
+  INVARIANT(declaring_class(symbol), "Method must have a declaring class.");
 
   // Get bytecode for specified function if we have it
   method_bytecodet::opt_reft cmb = method_bytecode.get(function_id);
@@ -1060,6 +1061,8 @@ bool java_bytecode_languaget::convert_single_method(
     // Add these to the needed_lazy_methods collection
     notify_static_method_calls(generated_code, needed_lazy_methods);
     writable_symbol.value = std::move(generated_code);
+    INVARIANT(
+      declaring_class(writable_symbol), "Method must have a declaring class.");
     return false;
   }
   else if(
@@ -1103,6 +1106,8 @@ bool java_bytecode_languaget::convert_single_method(
     // function:
     notify_static_method_calls(
       to_code(writable_symbol.value), needed_lazy_methods);
+    INVARIANT(
+      declaring_class(writable_symbol), "Method must have a declaring class.");
     return false;
   }
 
@@ -1121,6 +1126,7 @@ bool java_bytecode_languaget::convert_single_method(
       string_preprocess,
       class_hierarchy,
       threading_support);
+    INVARIANT(declaring_class(symbol), "Method must have a declaring class.");
     return false;
   }
 
@@ -1144,6 +1150,7 @@ bool java_bytecode_languaget::convert_single_method(
       needed_lazy_methods->add_all_needed_classes(*pointer_return_type);
   }
 
+  INVARIANT(declaring_class(symbol), "Method must have a declaring class.");
   return true;
 }
 
