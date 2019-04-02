@@ -141,7 +141,7 @@ exprt null_pointer(const exprt &pointer)
 
 exprt is_invalid_pointer(const exprt &pointer)
 {
-  return unary_exprt(ID_is_invalid_pointer, pointer, bool_typet());
+  return is_invalid_pointer_exprt{pointer};
 }
 
 exprt dynamic_object_lower_bound(
