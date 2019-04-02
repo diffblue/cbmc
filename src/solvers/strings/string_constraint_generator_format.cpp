@@ -285,7 +285,8 @@ add_axioms_for_format_specifier(
     return_code = add_axioms_for_string_of_int(res, get_arg(ID_int), 0, ns);
     return {res, std::move(return_code.second)};
   case format_specifiert::HEXADECIMAL_INTEGER:
-    return_code = add_axioms_from_int_hex(res, get_arg(ID_int));
+    return_code = add_axioms_for_string_of_int_with_radix(
+      res, get_arg(ID_int), from_integer(16, index_type), 16, ns);
     return {res, std::move(return_code.second)};
   case format_specifiert::SCIENTIFIC:
     return_code = add_axioms_from_float_scientific_notation(
