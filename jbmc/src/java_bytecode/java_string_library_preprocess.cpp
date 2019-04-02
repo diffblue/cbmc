@@ -1807,6 +1807,14 @@ void java_string_library_preprocesst::initialize_conversion_table()
           std::bind(&java_string_library_preprocesst::make_string_format_code,
                     this, std::placeholders::_1, std::placeholders::_2,
                     std::placeholders::_3, std::placeholders::_4);
+
+  std::string format_signature = "java::org.cprover.CProverString.format:(";
+  for(std::size_t i = 0; i < MAX_FORMAT_ARGS + 1; ++i)
+    format_signature += "Ljava/lang/String;";
+  format_signature += ")Ljava/lang/String;";
+  cprover_equivalent_to_java_string_returning_function[format_signature] =
+      ID_cprover_string_format_func;
+
   cprover_equivalent_to_java_function
     ["java::java.lang.String.hashCode:()I"]=
       ID_cprover_string_hash_code_func;
