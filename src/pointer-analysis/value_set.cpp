@@ -48,19 +48,17 @@ bool value_sett::field_sensitive(const irep_idt &id, const typet &type)
   return type.id() == ID_struct || type.id() == ID_struct_tag;
 }
 
-value_sett::entryt *value_sett::find_entry(const irep_idt &id)
-{
-  auto found = values.find(id);
-  return found == values.end() ? nullptr : &found->second;
-}
-
 const value_sett::entryt *value_sett::find_entry(const irep_idt &id) const
 {
   auto found = values.find(id);
-  return found == values.end() ? nullptr : &found->second;
+  return !found.has_value() ? nullptr : &(found->get());
 }
 
-value_sett::entryt &value_sett::get_entry(const entryt &e, const typet &type)
+void value_sett::update_entry(
+  const entryt &e,
+  const typet &type,
+  const object_mapt &new_values,
+  bool add_to_sets)
 {
   irep_idt index;
 
@@ -69,10 +67,27 @@ value_sett::entryt &value_sett::get_entry(const entryt &e, const typet &type)
   else
     index=e.identifier;
 
-  std::pair<valuest::iterator, bool> r =
-    values.insert(std::pair<irep_idt, entryt>(index, e));
-
-  return r.first->second;
+  auto existing_entry = values.find(index);
+  if(existing_entry.has_value())
+  {
+    entryt replacement = *existing_entry;
+    if(add_to_sets)
+    {
+      if(make_union(replacement.object_map, new_values))
+        values.replace(index, std::move(replacement));
+    }
+    else
+    {
+      replacement.object_map = new_values;
+      values.replace(index, std::move(replacement));
+    }
+  }
+  else
+  {
+    entryt new_entry = e;
+    new_entry.object_map = new_values;
+    values.insert(index, std::move(new_entry));
+  }
 }
 
 bool value_sett::insert(
@@ -103,7 +118,10 @@ void value_sett::output(
   const namespacet &ns,
   std::ostream &out) const
 {
-  for(const auto &values_entry : values)
+  valuest::viewt view;
+  values.get_view(view);
+
+  for(const auto &values_entry : view)
   {
     irep_idt identifier, display_name;
 
@@ -210,36 +228,26 @@ bool value_sett::make_union(const value_sett::valuest &new_values)
 {
   bool result=false;
 
-  valuest::iterator v_it=values.begin();
+  value_sett::valuest::delta_viewt delta_view;
 
-  for(valuest::const_iterator
-      it=new_values.begin();
-      it!=new_values.end();
-      ) // no it++
+  new_values.get_delta_view(values, delta_view, false);
+
+  for(const auto &delta_entry : delta_view)
   {
-    if(v_it==values.end() || it->first<v_it->first)
+    if(delta_entry.in_both)
     {
-      values.insert(v_it, *it);
-      result=true;
-      it++;
-      continue;
+      entryt merged_entry = *values.find(delta_entry.k);
+      if(make_union(merged_entry.object_map, delta_entry.m.object_map))
+      {
+        values.replace(delta_entry.k, std::move(merged_entry));
+        result = true;
+      }
     }
-    else if(v_it->first<it->first)
+    else
     {
-      v_it++;
-      continue;
+      values.insert(delta_entry.k, delta_entry.m);
+      result = true;
     }
-
-    assert(v_it->first==it->first);
-
-    entryt &e=v_it->second;
-    const entryt &new_e=it->second;
-
-    if(make_union(e.object_map, new_e.object_map))
-      result=true;
-
-    v_it++;
-    it++;
   }
 
   return result;
@@ -371,16 +379,11 @@ static std::string strip_first_field_from_suffix(
   return suffix.substr(field.length() + 1);
 }
 
-template <class maybe_const_value_sett>
-auto value_sett::get_entry_for_symbol(
-  maybe_const_value_sett &value_set,
-  const irep_idt identifier,
+optionalt<irep_idt> value_sett::get_index_of_symbol(
+  irep_idt identifier,
   const typet &type,
   const std::string &suffix,
-  const namespacet &ns) ->
-  typename std::conditional<std::is_const<maybe_const_value_sett>::value,
-                            const value_sett::entryt *,
-                            value_sett::entryt *>::type
+  const namespacet &ns) const
 {
   if(
     type.id() != ID_pointer && type.id() != ID_signedbv &&
@@ -388,8 +391,14 @@ auto value_sett::get_entry_for_symbol(
     type.id() != ID_struct && type.id() != ID_struct_tag &&
     type.id() != ID_union && type.id() != ID_union_tag)
   {
-    return nullptr;
+    return {};
   }
+
+  // look it up
+  irep_idt index = id2string(identifier) + suffix;
+  auto *entry = find_entry(index);
+  if(entry)
+    return std::move(index);
 
   const typet &followed_type = type.id() == ID_struct_tag
                                  ? ns.follow_tag(to_struct_tag_type(type))
@@ -397,13 +406,8 @@ auto value_sett::get_entry_for_symbol(
                                      ? ns.follow_tag(to_union_tag_type(type))
                                      : type;
 
-  // look it up
-  auto *entry = value_set.find_entry(id2string(identifier) + suffix);
-
   // try first component name as suffix if not yet found
-  if(
-    !entry &&
-    (followed_type.id() == ID_struct || followed_type.id() == ID_union))
+  if(followed_type.id() == ID_struct || followed_type.id() == ID_union)
   {
     const struct_union_typet &struct_union_type =
       to_struct_union_type(followed_type);
@@ -411,37 +415,19 @@ auto value_sett::get_entry_for_symbol(
     const irep_idt &first_component_name =
       struct_union_type.components().front().get_name();
 
-    entry = value_set.find_entry(
-      id2string(identifier) + "." + id2string(first_component_name) + suffix);
+    index =
+      id2string(identifier) + "." + id2string(first_component_name) + suffix;
+    entry = find_entry(index);
+    if(entry)
+      return std::move(index);
   }
 
-  if(!entry)
-  {
-    // not found? try without suffix
-    entry = value_set.find_entry(identifier);
-  }
+  // not found? try without suffix
+  entry = find_entry(identifier);
+  if(entry)
+    return std::move(identifier);
 
-  return entry;
-}
-
-// Explicitly instantiate the two possible versions of the method above:
-
-value_sett::entryt *value_sett::get_entry_for_symbol(
-  irep_idt identifier,
-  const typet &type,
-  const std::string &suffix,
-  const namespacet &ns)
-{
-  return get_entry_for_symbol(*this, identifier, type, suffix, ns);
-}
-
-const value_sett::entryt *value_sett::get_entry_for_symbol(
-  irep_idt identifier,
-  const typet &type,
-  const std::string &suffix,
-  const namespacet &ns) const
-{
-  return get_entry_for_symbol(*this, identifier, type, suffix, ns);
+  return {};
 }
 
 void value_sett::get_value_set_rec(
@@ -491,11 +477,11 @@ void value_sett::get_value_set_rec(
   }
   else if(expr.id()==ID_symbol)
   {
-    const entryt *entry = get_entry_for_symbol(
+    auto entry_index = get_index_of_symbol(
       to_symbol_expr(expr).get_identifier(), expr_type, suffix, ns);
 
-    if(entry)
-      make_union(dest, entry->object_map);
+    if(entry_index.has_value())
+      make_union(dest, find_entry(*entry_index)->object_map);
     else
       insert(dest, exprt(ID_unknown, original_type));
   }
@@ -1314,12 +1300,8 @@ void value_sett::assign_rec(
   {
     const irep_idt &identifier=to_symbol_expr(lhs).get_identifier();
 
-    entryt &e = get_entry(entryt(identifier, suffix), lhs.type());
-
-    if(add_to_sets)
-      make_union(e.object_map, values_rhs);
-    else
-      e.object_map=values_rhs;
+    update_entry(
+      entryt{identifier, suffix}, lhs.type(), values_rhs, add_to_sets);
   }
   else if(lhs.id()==ID_dynamic_object)
   {
@@ -1330,9 +1312,7 @@ void value_sett::assign_rec(
       "value_set::dynamic_object"+
       std::to_string(dynamic_object.get_instance());
 
-    entryt &e = get_entry(entryt(name, suffix), lhs.type());
-
-    make_union(e.object_map, values_rhs);
+    update_entry(entryt{name, suffix}, lhs.type(), values_rhs, true);
   }
   else if(lhs.id()==ID_dereference)
   {
@@ -1640,12 +1620,19 @@ void value_sett::guard(
 }
 
 void value_sett::erase_values_from_entry(
-  entryt &entry,
+  const irep_idt &index,
   const std::unordered_set<exprt, irep_hash> &values_to_erase)
 {
+  if(values_to_erase.empty())
+    return;
+
+  auto entry = find_entry(index);
+  if(!entry)
+    return;
+
   std::vector<object_map_dt::key_type> keys_to_erase;
 
-  for(auto &key_value : entry.object_map.read())
+  for(auto &key_value : entry->object_map.read())
   {
     const auto &rhs_object = to_expr(key_value);
     if(values_to_erase.count(rhs_object))
@@ -1659,8 +1646,10 @@ void value_sett::erase_values_from_entry(
     "value_sett::erase_value_from_entry() should erase exactly one value for "
     "each element in the set it is given");
 
+  entryt replacement = *entry;
   for(const auto &key_to_erase : keys_to_erase)
   {
-    entry.object_map.write().erase(key_to_erase);
+    replacement.object_map.write().erase(key_to_erase);
   }
+  values.replace(index, std::move(replacement));
 }

@@ -41,7 +41,10 @@ void value_sets_to_xml(
     xmlt &i=dest.new_element("instruction");
     i.new_element()=::xml(location);
 
-    for(const auto &values_entry : value_set.values)
+    value_sett::valuest::viewt view;
+    value_set.values.get_view(view);
+
+    for(const auto &values_entry : view)
     {
       xmlt &var=i.new_element("variable");
       var.new_element("identifier").data = id2string(values_entry.first);
