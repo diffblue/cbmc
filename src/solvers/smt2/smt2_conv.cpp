@@ -1316,11 +1316,11 @@ void smt2_convt::convert_expr(const exprt &expr)
     if(ext>0)
       out << ")"; // zero_extend
   }
-  else if(expr.id() == ID_dynamic_object)
+  else if(expr.id() == ID_is_dynamic_object)
   {
     convert_is_dynamic_object(expr);
   }
-  else if(expr.id()==ID_invalid_pointer)
+  else if(expr.id() == ID_is_invalid_pointer)
   {
     DATA_INVARIANT(
       expr.operands().size() == 1,

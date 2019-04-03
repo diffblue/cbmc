@@ -1686,7 +1686,7 @@ bool simplify_exprt::simplify_inequality_constant(exprt &expr)
       {
         if(
           expr.op0().op0().id() == ID_symbol ||
-          expr.op0().op0().id() == ID_dynamic_object ||
+          expr.op0().op0().id() == ID_is_dynamic_object ||
           expr.op0().op0().id() == ID_member ||
           expr.op0().op0().id() == ID_index ||
           expr.op0().op0().id() == ID_string_constant)
@@ -1701,11 +1701,12 @@ bool simplify_exprt::simplify_inequality_constant(exprt &expr)
               expr.op0().op0().id()==ID_address_of &&
               expr.op0().op0().operands().size()==1)
       {
-        if(expr.op0().op0().op0().id()==ID_symbol ||
-           expr.op0().op0().op0().id()==ID_dynamic_object ||
-           expr.op0().op0().op0().id()==ID_member ||
-           expr.op0().op0().op0().id()==ID_index ||
-           expr.op0().op0().op0().id()==ID_string_constant)
+        if(
+          expr.op0().op0().op0().id() == ID_symbol ||
+          expr.op0().op0().op0().id() == ID_is_dynamic_object ||
+          expr.op0().op0().op0().id() == ID_member ||
+          expr.op0().op0().op0().id() == ID_index ||
+          expr.op0().op0().op0().id() == ID_string_constant)
         {
           expr=false_exprt();
           return false;

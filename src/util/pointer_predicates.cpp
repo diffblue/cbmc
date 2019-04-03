@@ -70,7 +70,7 @@ exprt dynamic_size(const namespacet &ns)
 
 exprt dynamic_object(const exprt &pointer)
 {
-  exprt dynamic_expr(ID_dynamic_object, bool_typet());
+  exprt dynamic_expr(ID_is_dynamic_object, bool_typet());
   dynamic_expr.copy_to_operands(pointer);
   return dynamic_expr;
 }
@@ -105,7 +105,7 @@ exprt good_pointer_def(
 
   const not_exprt not_null(null_pointer(pointer));
 
-  const not_exprt not_invalid(invalid_pointer(pointer));
+  const not_exprt not_invalid{is_invalid_pointer_exprt{pointer}};
 
   const or_exprt bad_other(
     object_lower_bound(pointer, nil_exprt()),
@@ -137,11 +137,6 @@ exprt null_pointer(const exprt &pointer)
 {
   null_pointer_exprt null_pointer(to_pointer_type(pointer.type()));
   return same_object(pointer, null_pointer);
-}
-
-exprt invalid_pointer(const exprt &pointer)
-{
-  return unary_exprt(ID_invalid_pointer, pointer, bool_typet());
 }
 
 exprt dynamic_object_lower_bound(

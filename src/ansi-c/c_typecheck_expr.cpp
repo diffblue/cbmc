@@ -2095,16 +2095,16 @@ exprt c_typecheck_baset::do_special_functions(
 
     return std::move(get_may_expr);
   }
-  else if(identifier==CPROVER_PREFIX "invalid_pointer")
+  else if(identifier == CPROVER_PREFIX "is_invalid_pointer")
   {
     if(expr.arguments().size()!=1)
     {
       error().source_location = f_op.source_location();
-      error() << "invalid_pointer expects one operand" << eom;
+      error() << "is_invalid_pointer expects one operand" << eom;
       throw 0;
     }
 
-    exprt same_object_expr = invalid_pointer(expr.arguments().front());
+    exprt same_object_expr = is_invalid_pointer_exprt{expr.arguments().front()};
     same_object_expr.add_source_location()=source_location;
 
     return same_object_expr;
@@ -2165,11 +2165,10 @@ exprt c_typecheck_baset::do_special_functions(
       throw 0;
     }
 
-    exprt dynamic_object_expr=exprt(ID_dynamic_object, expr.type());
-    dynamic_object_expr.operands()=expr.arguments();
-    dynamic_object_expr.add_source_location()=source_location;
+    exprt is_dynamic_object_expr = is_dynamic_object_exprt(expr.arguments()[0]);
+    is_dynamic_object_expr.add_source_location() = source_location;
 
-    return dynamic_object_expr;
+    return is_dynamic_object_expr;
   }
   else if(identifier==CPROVER_PREFIX "POINTER_OFFSET")
   {
