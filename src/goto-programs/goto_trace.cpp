@@ -16,6 +16,7 @@ Author: Daniel Kroening
 #include <ostream>
 
 #include <util/arith_tools.h>
+#include <util/byte_operators.h>
 #include <util/format_expr.h>
 #include <util/range.h>
 #include <util/string_utils.h>
@@ -35,6 +36,12 @@ static optionalt<symbol_exprt> get_object_rec(const exprt &src)
     return get_object_rec(to_index_expr(src).array());
   else if(src.id()==ID_typecast)
     return get_object_rec(to_typecast_expr(src).op());
+  else if(
+    src.id() == ID_byte_extract_little_endian ||
+    src.id() == ID_byte_extract_big_endian)
+  {
+    return get_object_rec(to_byte_extract_expr(src).op());
+  }
   else
     return {}; // give up
 }
