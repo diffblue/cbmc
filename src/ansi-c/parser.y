@@ -24,6 +24,10 @@ extern char *yyansi_ctext;
 
 #include "literals/convert_integer_literal.h"
 
+#include <util/string_utils.h>
+
+#include <sstream>
+
 #include "ansi_c_y.tab.h"
 
 #ifdef _MSC_VER
@@ -2306,10 +2310,38 @@ statement_list:
           statement
         {
           init($$);
+          if(!PARSER.pragma_cprover.empty())
+          {
+            std::ostringstream oss;
+            join_strings(
+              oss,
+              PARSER.pragma_cprover.begin(),
+              PARSER.pragma_cprover.end(),
+              ',');
+            parser_stack($1).add_source_location().set_comment(oss.str());
+            Forall_operands(it, parser_stack($1))
+            {
+              it->add_source_location().set_comment(oss.str());
+            }
+          }
           mto($$, $1);
         }
         | statement_list statement
         {
+          if(!PARSER.pragma_cprover.empty())
+          {
+            std::ostringstream oss;
+            join_strings(
+              oss,
+              PARSER.pragma_cprover.begin(),
+              PARSER.pragma_cprover.end(),
+              ',');
+            parser_stack($2).add_source_location().set_comment(oss.str());
+            Forall_operands(it, parser_stack($2))
+            {
+              it->add_source_location().set_comment(oss.str());
+            }
+          }
           mto($$, $2);
         }
         ;

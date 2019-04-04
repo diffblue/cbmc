@@ -129,6 +129,24 @@ The goto-instrument program supports these checks:
 | `--uninitialized-check`      |  add checks for uninitialized locals (experimental)  |
 | `--error-label label`        |  check that given label is unreachable               |
 
+As all of these checks apply across the entire input program, we may wish to
+disable them for selected statements in the program. For example, unsigned
+overflows can be expected and acceptable in certain instructions even when
+elsewhere we do not expect them. To selectively disable automatically generated
+properties use `#pragma CPROVER check disable "<name_of_check>"`, which remains
+in effect until a `#pragma CPROVER check pop` (to re-enable all properties
+disabled before or since the last `#pragma CPROVER check push`) is provided.
+For example, for unsigned overflow checks, use
+```
+unsigned foo(unsigned x)
+{
+#pragma CPROVER check push
+#pragma CPROVER check disable "unsigned-overflow"
+  x = x + 1; // immediately follows the pragma, no unsigned overflow check here
+#pragma CPROVER check pop
+  x = x + 2; // unsigned overflow checks are generated here
+```
+
 #### Generating function bodies
 
 Sometimes implementations for called functions are not available in the goto

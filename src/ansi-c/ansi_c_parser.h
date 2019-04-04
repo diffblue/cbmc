@@ -57,6 +57,7 @@ public:
     parenthesis_counter=0;
     string_literal.clear();
     pragma_pack.clear();
+    pragma_cprover.clear();
 
     // set up global scope
     scopes.clear();
@@ -69,6 +70,7 @@ public:
   unsigned parenthesis_counter;
   std::string string_literal;
   std::list<exprt> pragma_pack;
+  std::list<irep_idt> pragma_cprover;
 
   typedef configt::ansi_ct::flavourt modet;
   modet mode;
