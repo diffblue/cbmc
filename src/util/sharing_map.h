@@ -157,14 +157,6 @@ Author: Daniel Poetzl
 /// For this to work, the type of the values stored in the map needs to have a
 /// defined equality operator (operator==).
 ///
-/// Several methods take a hint indicating whether the element is known not to
-/// be in the map (`false`), known to be in the map (`true`), or it is unknown
-/// whether the element is in the map (`unknown`). The value `unknown` is always
-/// valid. When `true` or `false` are given they need to be accurate, otherwise
-/// the behavior is undefined. A correct hint can prevent the need to follow a
-/// path from the root to a key-value pair twice (e.g., once for checking that
-/// it exists, and second for copying nodes).
-///
 /// In the descriptions of the methods of the sharing map we also give the
 /// complexity of the operations. We use the following symbols:
 /// - N: number of key-value pairs in the map
@@ -221,31 +213,14 @@ protected:
 public:
   // interface
 
-  /// Erase element
+  /// Erase element, element must exist in map
   ///
   /// Complexity:
   /// - Worst case: O(H * S + M)
   /// - Best case: O(H)
   ///
   /// \param k: The key of the element to erase
-  /// \param key_exists: Hint to indicate whether the element is known to exist
-  ///   (possible values `unknown` or` true`)
-  size_type erase(const key_type &k, const tvt &key_exists = tvt::unknown());
-
-  /// Erase all elements
-  ///
-  /// Complexity:
-  /// - Worst case: O(K * (H * S + M))
-  /// - Best case: O(K * H)
-  ///
-  /// \param ks: The keys of the element to erase
-  /// \param key_exists: Hint to indicate whether the elements are known to
-  ///   exist (possible values `unknown` or `true`). Applies to all elements
-  ///   (i.e., have to use `unknown` if for at least one element it is not known
-  ///   whether it exists)
-  size_type erase_all(
-    const keyst &ks,
-    const tvt &key_exists = tvt::unknown()); // applies to all keys
+  void erase(const key_type &k);
 
   /// Insert element, element must not exist in map
   ///
@@ -871,18 +846,10 @@ SHARING_MAPT2(const, innert *)::get_container_node(const key_type &k) const
   return ip;
 }
 
-SHARING_MAPT2(, size_type)::erase(const key_type &k, const tvt &key_exists)
+SHARING_MAPT(void)::erase(const key_type &k)
 {
-  SM_ASSERT(!key_exists.is_false());
-  SM_ASSERT(!key_exists.is_true() || has_key(k));
-
-  // check if key exists
-  if(key_exists.is_unknown() && !has_key(k))
-    return 0;
-
   innert *del = nullptr;
   std::size_t del_bit = 0;
-  std::size_t del_level = 0;
 
   std::size_t key = hash()(k);
   innert *ip = &map;
@@ -897,7 +864,6 @@ SHARING_MAPT2(, size_type)::erase(const key_type &k, const tvt &key_exists)
     {
       del = ip;
       del_bit=bit;
-      del_level = i;
     }
 
     ip = ip->add_child(bit);
@@ -905,44 +871,22 @@ SHARING_MAPT2(, size_type)::erase(const key_type &k, const tvt &key_exists)
     key >>= chunk;
   }
 
+  PRECONDITION(!ip->empty());
   const leaf_listt &ll = as_const(ip)->get_container();
+  PRECONDITION(!ll.empty());
 
   // forward list has one element
-  if(!ll.empty() && std::next(ll.begin()) == ll.end())
+  if(std::next(ll.begin()) == ll.end())
   {
-    if(del_level < steps - 1)
-    {
-      del->remove_child(del_bit);
-    }
-    else
-    {
-      SM_ASSERT(del_level == steps - 1);
-      del->remove_child(del_bit);
-    }
-
-    num--;
-    return 1;
+    PRECONDITION(equalT()(ll.front().get_key(), k));
+    del->remove_child(del_bit);
+  }
+  else
+  {
+    ip->remove_leaf(k);
   }
 
-  SM_ASSERT(!ll.empty());
-
-  ip->remove_leaf(k);
   num--;
-
-  return 1;
-}
-
-SHARING_MAPT2(, size_type)
-::erase_all(const keyst &ks, const tvt &key_exists)
-{
-  size_type cnt = 0;
-
-  for(const key_type &k : ks)
-  {
-    cnt+=erase(k, key_exists);
-  }
-
-  return cnt;
 }
 
 SHARING_MAPT4(valueU, void)

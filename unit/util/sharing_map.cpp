@@ -193,13 +193,12 @@ TEST_CASE("Sharing map interface", "[core][util]")
     sm.insert("i", "0");
     sm.insert("j", "1");
 
-    REQUIRE(sm.erase("k") == 0);
     REQUIRE(sm.size() == 2);
 
-    REQUIRE(sm.erase("i") == 1);
+    sm.erase("i");
     REQUIRE(!sm.has_key("i"));
 
-    REQUIRE(sm.erase("j") == 1);
+    sm.erase("j");
     REQUIRE(!sm.has_key("j"));
 
     sm.insert("i", "0");
@@ -232,7 +231,7 @@ TEST_CASE("Sharing map copying", "[core][util]")
 
   sharing_map_standardt sm2(sm1);
 
-  REQUIRE(sm2.erase("i") == 1);
+  sm2.erase("i");
   REQUIRE(!sm2.has_key("i"));
   REQUIRE(sm1.has_key("i"));
 
@@ -509,4 +508,12 @@ TEST_CASE("Sharing map insert existing", "[.]")
   fill(sm);
 
   sm.insert("i", "4");
+}
+
+TEST_CASE("Sharing map erase non-existing", "[.]")
+{
+  sharing_map_standardt sm;
+  fill(sm);
+
+  sm.erase("x");
 }

@@ -28,7 +28,12 @@ void goto_symext::symex_dead(statet &state)
   // information is not local to a path, but removing it from the propagation
   // map and value-set is safe as 1) it is local to a path and 2) this instance
   // can no longer appear
-  state.value_set.values.erase(l1_identifier);
+
+  if(state.value_set.values.has_key(l1_identifier))
+  {
+    state.value_set.values.erase(l1_identifier);
+  }
+
   state.propagation.erase(l1_identifier);
   // Remove from the local L2 renaming map; this means any reads from the dead
   // identifier will use generation 0 (e.g. x!N@M#0, where N and M are positive
