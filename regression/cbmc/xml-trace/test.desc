@@ -1,0 +1,25 @@
+CORE broken-smt-backend
+main.c
+--xml-ui --function test --little-endian
+^EXIT=10$
+^SIGNAL=0$
+VERIFICATION FAILED
+<assignment assignment_type="state" base_name="u" display_name="test::u" hidden="false" identifier="test::u" mode="C" step_nr="\d+" thread="0">
+<location file=".*" function="test" line="\d+" working-directory=".*"/>
+<type>union myunion</type>
+<full_lhs>byte_extract_little_endian\(u, 0ll?, .*int.*\)</full_lhs>
+<full_lhs_value>\d+ll?</full_lhs_value>
+<value>\{ \.i=\d+ll? \}</value>
+<value_expression>
+<union>
+<member member_name="i">
+<integer binary="\d+" c_type=".*int.*" width="\d+">\d+</integer>
+</member>
+</union>
+</value_expression>
+</assignment>
+--
+^warning: ignoring
+--
+Tests whether the assignment XML output contains all the required elements
+such as identifier, full_lhs, full_lhs_value and value.
