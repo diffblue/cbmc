@@ -154,10 +154,10 @@ protected:
   std::string floatbv_suffix(const exprt &) const;
   std::set<irep_idt> bvfp_set; // already converted
 
-  class smt2_symbolt : public nullary_exprt
+  class smt2_symbol_exprt : public nullary_exprt
   {
   public:
-    smt2_symbolt(const irep_idt &_identifier, const typet &_type)
+    smt2_symbol_exprt(const irep_idt &_identifier, const typet &_type)
       : nullary_exprt(ID_smt2_symbol, _type)
     { set(ID_identifier, _identifier); }
 
@@ -167,10 +167,10 @@ protected:
     }
   };
 
-  const smt2_symbolt &to_smt2_symbol(const exprt &expr)
+  const smt2_symbol_exprt &to_smt2_symbol(const exprt &expr)
   {
     assert(expr.id()==ID_smt2_symbol && !expr.has_operands());
-    return static_cast<const smt2_symbolt&>(expr);
+    return static_cast<const smt2_symbol_exprt &>(expr);
   }
 
   // flattens any non-bitvector type into a bitvector,

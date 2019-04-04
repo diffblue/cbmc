@@ -1893,7 +1893,8 @@ void smt2_convt::convert_expr(const exprt &expr)
       // width must be multiple of bytes
       DATA_INVARIANT(
         width % bits_per_byte == 0,
-        "bit width indicated by type of bswap expression should be a multiple "
+        "bit width indicated by type of bswap expression should "
+        "be a multiple "
         "of the number of bits per byte");
 
       const std::size_t bytes = width / bits_per_byte;
@@ -4461,8 +4462,8 @@ void smt2_convt::find_symbols(const exprt &expr)
 
       exprt tmp1=expr;
       for(std::size_t i = 0; i < tmp1.operands().size(); i++)
-        tmp1.operands()[i]=
-          smt2_symbolt("op"+std::to_string(i), tmp1.operands()[i].type());
+        tmp1.operands()[i] = smt2_symbol_exprt(
+          "op" + std::to_string(i), tmp1.operands()[i].type());
 
       exprt tmp2=float_bv(tmp1);
       tmp2=letify(tmp2);
