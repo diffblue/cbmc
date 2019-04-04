@@ -1,0 +1,6 @@
+CORE symex-driven-lazy-loading-expected-failure
+Test.class
+--function Test.testHex --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar` --property "java::Test.testHex:(I)Ljava/lang/String;.assertion.3"
+^EXIT=0$
+^SIGNAL=0$
+line 9 assertion at file Test.java .*: SUCCESS

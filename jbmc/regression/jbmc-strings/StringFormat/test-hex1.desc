@@ -1,0 +1,6 @@
+CORE
+Test.class
+--function Test.testHex --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar` --property "java::Test.testHex:(I)Ljava/lang/String;.assertion.1"
+^EXIT=10$
+^SIGNAL=0$
+line 5 assertion at file Test.java .*: FAILURE

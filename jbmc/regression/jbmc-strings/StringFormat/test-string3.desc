@@ -1,0 +1,6 @@
+CORE
+Test.class
+--function Test.string3 --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar` --max-nondet-string-length 5 --property "java::Test.string3:(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;.assertion.1"
+^EXIT=0$
+^SIGNAL=0$
+line 49 assertion at file Test.java .*: SUCCESS
