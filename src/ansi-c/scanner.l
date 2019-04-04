@@ -27,7 +27,9 @@
 static int isatty(int) { return 0; }
 #endif
 
+#include <util/prefix.h>
 #include <util/string_constant.h>
+#include <util/suffix.h>
 #include <util/unicode.h>
 
 #include "preprocessor_line.h"
@@ -221,7 +223,7 @@ float_s         {float}{float_suffix}|{integer}[fF]
 gcc_ext_float_s {float}{gcc_ext_float_suffix}
 cppstart        {ws}"#"{ws}
 cpplineno       {cppstart}"line"*{ws}{integer}{ws}.*{newline}
-cppdirective    {cppstart}.*
+cppdirective    {cppstart}({newline}|[^p].*|"p"[^r].*|"pr"[^a].*|"pra"[^g].*|"prag"[^m].*|"pragm"[^a].*)
 
 escape_sequence [\\][^\n]
 c_char [^'\\\n]|{escape_sequence}
@@ -231,6 +233,11 @@ char_lit        ("L"|"u"|"U")?[']{c_char}+[']
 string_lit      ("L"|"u"|"U"|"u8")?["]{s_char}*["]
 
 CPROVER_PREFIX  "__CPROVER_"
+
+arith_check     ("conversion"|"undefined-shift"|"nan"|"div-by-zero")
+memory_check    ("bounds"|"pointer"|"memory_leak")
+overflow_check  ("signed"|"unsigned"|"pointer"|"float")"-overflow"
+named_check     ["]({arith_check}|{memory_check}|{overflow_check})["]
 
 %x GRAMMAR
 %x COMMENT1
@@ -251,6 +258,8 @@ CPROVER_PREFIX  "__CPROVER_"
 %x GCC_ASM
 %x GCC_ASM_PAREN
 %x CPROVER_ID
+%x CPROVER_PRAGMA
+%x OTHER_PRAGMA
 
 %{
 void ansi_c_scanner_init()
@@ -321,7 +330,7 @@ void ansi_c_scanner_init()
                   preprocessor_line(yytext, PARSER);
                   PARSER.set_line_no(PARSER.get_line_no()-1);
                 }
-<STRING_LITERAL>{cppdirective} { /* ignore */ }
+<STRING_LITERAL>{cppstart}.* { /* ignore */ }
 <STRING_LITERAL>"/*" { yy_push_state(STRING_LITERAL_COMMENT); /* C comment, ignore */ }
 <STRING_LITERAL>"//".*\n { /* C++ comment, ignore */ }
 <STRING_LITERAL>. { // anything else: back to normal
@@ -388,8 +397,46 @@ void ansi_c_scanner_init()
                   PARSER.pragma_pack.clear();
                 }
 
-<GRAMMAR>{cppstart}"pragma"{ws}.* {
-                  // silently ignore other pragmas
+<GRAMMAR>{cppstart}"pragma"{ws}"CPROVER" { BEGIN(CPROVER_PRAGMA); }
+<CPROVER_PRAGMA>{ws}{newline} { BEGIN(GRAMMAR); }
+
+                /* CProver specific pragmas: hint to disable named checks */
+<CPROVER_PRAGMA>{ws}"check"{ws}"push" {
+                  PARSER.pragma_cprover.push_back(irep_idt{});
+                }
+<CPROVER_PRAGMA>{ws}"check"{ws}"pop" {
+                  if(!PARSER.pragma_cprover.empty())
+                    PARSER.pragma_cprover.pop_back();
+                }
+<CPROVER_PRAGMA>{ws}"check"{ws}"disable"{ws}{named_check} {
+                  std::string tmp(yytext);
+                  std::string::size_type p = tmp.find('"') + 1;
+                  std::string value =
+                    std::string("disable:") +
+                    std::string(tmp, p, tmp.size() - p - 1) +
+                    std::string("-check");
+                  if(PARSER.pragma_cprover.empty())
+                    PARSER.pragma_cprover.push_back(value);
+                  else
+                  {
+                    if(!PARSER.pragma_cprover.back().empty())
+                    {
+                      value =
+                        id2string(PARSER.pragma_cprover.back()) + "," + value;
+                    }
+                    PARSER.pragma_cprover.back() = value;
+                  }
+                }
+
+<CPROVER_PRAGMA>. {
+                  yyansi_cerror("Unsupported #pragma CPROVER");
+                  return TOK_SCANNER_ERROR;
+                }
+
+<GRAMMAR>{cppstart}"pragma" { BEGIN(OTHER_PRAGMA); }
+<OTHER_PRAGMA>.*{newline} {
+                  /* silently ignore other pragmas */
+                  BEGIN(GRAMMAR);
                 }
 
 <GRAMMAR>{cppstart}"ident"{ws}.* { /* ignore */ }

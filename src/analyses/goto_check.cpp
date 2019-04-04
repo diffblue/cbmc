@@ -29,6 +29,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
 #include <util/std_types.h>
+#include <util/string_utils.h>
 
 #include <langapi/language.h>
 #include <langapi/mode.h>
@@ -1690,6 +1691,32 @@ optionalt<exprt> goto_checkt::rw_ok_check(exprt expr)
     return {};
 }
 
+/// Set a Boolean flag to a new value (via `set_flag`) and restore the previous
+/// value when the entire object goes out of scope.
+class flag_resett
+{
+public:
+  /// Store the current value of \p flag and then set its value to \p new_value.
+  void set_flag(bool &flag, bool new_value)
+  {
+    if(flag != new_value)
+    {
+      flags_to_reset.emplace_back(&flag, flag);
+      flag = new_value;
+    }
+  }
+
+  /// Restore the values of all flags that have been modified via `set_flag`.
+  ~flag_resett()
+  {
+    for(const auto &flag_pair : flags_to_reset)
+      *flag_pair.first = flag_pair.second;
+  }
+
+private:
+  std::list<std::pair<bool *, bool>> flags_to_reset;
+};
+
 void goto_checkt::goto_check(
   const irep_idt &function_identifier,
   goto_functiont &goto_function)
@@ -1710,6 +1737,38 @@ void goto_checkt::goto_check(
   {
     current_target = it;
     goto_programt::instructiont &i=*it;
+
+    flag_resett flag_resetter;
+    if(!i.source_location.get_comment().empty())
+    {
+      auto disabled_checks = split_string(
+        id2string(i.source_location.get_comment()), ',', true, true);
+      for(const auto &d : disabled_checks)
+      {
+        if(d == "disable:bounds-check")
+          flag_resetter.set_flag(enable_bounds_check, false);
+        else if(d == "disable:pointer-check")
+          flag_resetter.set_flag(enable_pointer_check, false);
+        else if(d == "disable:memory-leak-check")
+          flag_resetter.set_flag(enable_memory_leak_check, false);
+        else if(d == "disable:div-by-zero-check")
+          flag_resetter.set_flag(enable_div_by_zero_check, false);
+        else if(d == "disable:signed-overflow-check")
+          flag_resetter.set_flag(enable_signed_overflow_check, false);
+        else if(d == "disable:unsigned-overflow-check")
+          flag_resetter.set_flag(enable_unsigned_overflow_check, false);
+        else if(d == "disable:pointer-overflow-check")
+          flag_resetter.set_flag(enable_pointer_overflow_check, false);
+        else if(d == "disable:float-overflow-check")
+          flag_resetter.set_flag(enable_float_overflow_check, false);
+        else if(d == "disable:conversion-check")
+          flag_resetter.set_flag(enable_conversion_check, false);
+        else if(d == "disable:undefined-shift-check")
+          flag_resetter.set_flag(enable_undefined_shift_check, false);
+        else if(d == "disable:nan-check")
+          flag_resetter.set_flag(enable_nan_check, false);
+      }
+    }
 
     new_code.clear();
 
