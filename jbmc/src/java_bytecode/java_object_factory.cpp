@@ -221,21 +221,19 @@ void java_object_factoryt::gen_pointer_target_init(
 
   const namespacet ns(symbol_table);
   const typet &followed_target_type = ns.follow(target_type);
+  PRECONDITION(followed_target_type.id() == ID_struct);
 
-  if(followed_target_type.id() == ID_struct)
+  const auto &target_class_type = to_java_class_type(followed_target_type);
+  if(has_prefix(id2string(target_class_type.get_tag()), "java::array["))
   {
-    const auto &target_class_type = to_java_class_type(followed_target_type);
-    if(has_prefix(id2string(target_class_type.get_tag()), "java::array["))
-    {
-      gen_nondet_array_init(
-        assignments, expr, depth + 1, update_in_place, location);
+    gen_nondet_array_init(
+      assignments, expr, depth + 1, update_in_place, location);
+    return;
+  }
+  if(target_class_type.get_base("java::java.lang.Enum"))
+  {
+    if(gen_nondet_enum_init(assignments, expr, target_class_type, location))
       return;
-    }
-    if(target_class_type.get_base("java::java.lang.Enum"))
-    {
-      if(gen_nondet_enum_init(assignments, expr, target_class_type, location))
-        return;
-    }
   }
 
   // obtain a target pointer to initialize; if in MUST_UPDATE_IN_PLACE mode we
@@ -485,6 +483,9 @@ void java_object_factoryt::gen_nondet_pointer_init(
 {
   PRECONDITION(expr.type().id()==ID_pointer);
   const namespacet ns(symbol_table);
+  const typet &subtype = pointer_type.subtype();
+  const typet &followed_subtype = ns.follow(subtype);
+  PRECONDITION(followed_subtype.id() == ID_struct);
   const pointer_typet &replacement_pointer_type =
     pointer_type_selector.convert_pointer_type(
       pointer_type, generic_parameter_specialization_map, ns);
@@ -518,43 +519,34 @@ void java_object_factoryt::gen_nondet_pointer_init(
   // if one is set below.
   recursion_set_entryt recursion_set_entry(recursion_set);
 
-  // If the pointed value is struct-typed, then we need to prevent the
-  // possibility of this code to loop infinitely when initializing a data
-  // structure with recursive types or unbounded depth.  We implement two
-  // mechanisms here. We keep a set of 'types seen', and detect when we perform
-  // a 2nd visit to the same type.  We also detect the depth in the chain of
-  // (recursive) calls to the methods of this class. The depth counter is
-  // incremented only when a pointer is deferenced, including pointers to
-  // arrays.
+  // We need to prevent the possibility of this code to loop infinitely when
+  // initializing a data structure with recursive types or unbounded depth.  We
+  // implement two mechanisms here. We keep a set of 'types seen', and
+  // detect when we perform a 2nd visit to the same type.  We also detect the
+  // depth in the chain of (recursive) calls to the methods of this class.
+  // The depth counter is incremented only when a pointer is deferenced,
+  // including pointers to arrays.
   //
   // When we visit for 2nd time a type AND the maximum depth is exceeded, we set
   // the pointer to NULL instead of recursively initializing the struct to which
   // it points.
-  const typet &subtype = pointer_type.subtype();
-  const typet &followed_subtype = ns.follow(subtype);
-  if(followed_subtype.id() == ID_struct)
+  const struct_typet &struct_type = to_struct_type(followed_subtype);
+  const irep_idt &struct_tag = struct_type.get_tag();
+
+  // If this is a recursive type of some kind AND the depth is exceeded, set
+  // the pointer to null.
+  if(
+    !recursion_set_entry.insert_entry(struct_tag) &&
+    depth >= object_factory_parameters.max_nondet_tree_depth)
   {
-    const struct_typet &struct_type = to_struct_type(followed_subtype);
-    const irep_idt &struct_tag=struct_type.get_tag();
-
-    // If this is a recursive type of some kind AND the depth is exceeded, set
-    // the pointer to null.
-    if(!recursion_set_entry.insert_entry(struct_tag) &&
-      depth>=object_factory_parameters.max_nondet_tree_depth)
+    if(update_in_place == update_in_placet::NO_UPDATE_IN_PLACE)
     {
-      if(update_in_place==update_in_placet::NO_UPDATE_IN_PLACE)
-      {
-        assignments.add(
-          code_assignt{expr, null_pointer_exprt{pointer_type}, location});
-      }
-      // Otherwise leave it as it is.
-      return;
+      assignments.add(
+        code_assignt{expr, null_pointer_exprt{pointer_type}, location});
     }
+    // Otherwise leave it as it is.
+    return;
   }
-
-  // If this is a void* we *must* initialise with null:
-  // (This can currently happen for some cases of #exception_value)
-  bool must_be_null = subtype == java_void_type();
 
   // If we may be about to initialize a non-null enum type, always run the
   // clinit_wrapper of its class first.
@@ -575,7 +567,7 @@ void java_object_factoryt::gen_nondet_pointer_init(
     const auto class_type =
       type_try_dynamic_cast<java_class_typet>(followed_subtype))
   {
-    if(class_type->get_base("java::java.lang.Enum") && !must_be_null)
+    if(class_type->get_base("java::java.lang.Enum"))
     {
       const irep_idt &class_name = class_type->get_name();
       const irep_idt class_clinit = clinit_wrapper_name(class_name);
@@ -630,13 +622,7 @@ void java_object_factoryt::gen_nondet_pointer_init(
 
   const bool allow_null = depth > object_factory_parameters.min_null_tree_depth;
 
-  if(must_be_null)
-  {
-    // Add the following code to assignments:
-    // <expr> = nullptr;
-    new_object_assignments.add(set_null_inst);
-  }
-  else if(!allow_null)
+  if(!allow_null)
   {
     // Add the following code to assignments:
     // <expr> = <aoe>;
