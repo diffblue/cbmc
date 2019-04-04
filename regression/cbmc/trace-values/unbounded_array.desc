@@ -1,0 +1,13 @@
+CORE broken-smt-backend
+unbounded_array.c
+--trace
+\{ \[0u?l?l?\]=1, \[1u?l?l?\]=2, \[\d+u?l?l?\]=42 \}
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+We generated output like { 1, 2, *, *, *, *, *, *, *, *, *, *, *, 42 } for
+arrays below a certain bound (100 elements), or possibly also empty arrays if
+the size wasn't fixed.

@@ -585,13 +585,14 @@ bvt bv_pointerst::convert_bitvector(const exprt &expr)
 }
 
 exprt bv_pointerst::bv_get_rec(
+  const exprt &expr,
   const bvt &bv,
   const std::vector<bool> &unknown,
   std::size_t offset,
   const typet &type) const
 {
   if(type.id()!=ID_pointer)
-    return SUB::bv_get_rec(bv, unknown, offset, type);
+    return SUB::bv_get_rec(expr, bv, unknown, offset, type);
 
   std::string value_addr, value_offset, value;
 
