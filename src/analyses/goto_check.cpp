@@ -1076,9 +1076,7 @@ void goto_checkt::pointer_validity_check(
 goto_checkt::conditionst
 goto_checkt::address_check(const exprt &address, const exprt &size)
 {
-  if(!enable_pointer_check)
-    return {};
-
+  PRECONDITION(local_bitvector_analysis);
   PRECONDITION(address.type().id() == ID_pointer);
   const auto &pointer_type = to_pointer_type(address.type());
 
@@ -1700,9 +1698,8 @@ void goto_checkt::goto_check(
 
   bool did_something = false;
 
-  if(enable_pointer_check)
-    local_bitvector_analysis =
-      util_make_unique<local_bitvector_analysist>(goto_function, ns);
+  local_bitvector_analysis =
+    util_make_unique<local_bitvector_analysist>(goto_function, ns);
 
   goto_programt &goto_program=goto_function.body;
 
