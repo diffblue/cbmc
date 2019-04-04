@@ -493,6 +493,10 @@ static void merge_names(
     return;
   }
 
+  // field sensitivity: only merge on individual fields
+  if(field_sensitivityt::is_divisible(ns, ssa))
+    return;
+
   // shared variables are renamed on every access anyway, we don't need to
   // merge anything
   const symbolt &symbol = ns.lookup(obj_identifier);

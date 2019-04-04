@@ -35,6 +35,16 @@ public:
     return static_cast<const exprt &>(find(ID_expression));
   }
 
+  /// Replace the underlying, original expression by \p expr while maintaining
+  /// SSA indices.
+  /// \param expr: expression to store
+  void set_expression(const exprt &expr)
+  {
+    type() = expr.type();
+    add(ID_expression, expr);
+    update_identifier();
+  }
+
   irep_idt get_object_name() const
   {
     const exprt &original_expr = get_original_expr();

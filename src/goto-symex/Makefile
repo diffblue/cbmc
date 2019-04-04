@@ -1,5 +1,6 @@
 SRC = auto_objects.cpp \
       build_goto_trace.cpp \
+      field_sensitivity.cpp \
       goto_state.cpp \
       goto_symex.cpp \
       goto_symex_state.cpp \

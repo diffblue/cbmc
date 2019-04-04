@@ -1,8 +1,6 @@
 CORE
 main.c
 --harness-type call-function --max-nondet-tree-depth 4 --min-null-tree-depth 1 --function test_function
-\[test_function.unwind.\d+\] line \d+ unwinding assertion loop 0: SUCCESS
-\[test_function.unwind.\d+\] line \d+ unwinding assertion loop 1: SUCCESS
 \[test_function.assertion.\d+\] line \d+ assertion list_walker->datum == \+\+i: SUCCESS
 ^EXIT=0$
 ^SIGNAL=0$

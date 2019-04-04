@@ -1,8 +1,9 @@
-CORE pthread
+CORE
 main.c
 
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
+(Starting CEGAR Loop|VCC\(s\), 0 remaining after simplification$)
 --
 ^warning: ignoring
