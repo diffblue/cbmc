@@ -1582,6 +1582,15 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
       PRECONDITION(op.size() == 1 && results.size() == 1);
       typet type=java_type_from_char(statement[2]);
       results[0] = typecast_exprt::conditional_cast(op[0], type);
+
+      // These types get converted/truncated then immediately turned back into
+      // ints again, so we just double-cast here.
+      if(
+        type == java_char_type() || type == java_byte_type() ||
+        type == java_short_type())
+      {
+        results[0] = typecast_exprt(results[0], java_int_type());
+      }
     }
     else if(statement=="new")
     {
