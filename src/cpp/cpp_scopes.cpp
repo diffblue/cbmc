@@ -76,7 +76,7 @@ void cpp_scopest::print_current(std::ostream &out) const
   do
   {
     scope->print_fields(out);
-    out << "\n";
+    out << '\n';
     scope=&scope->get_parent();
   }
   while(!scope->is_root_scope());

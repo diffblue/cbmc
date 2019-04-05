@@ -344,20 +344,24 @@ void cpp_declarator_convertert::handle_initializer(
   }
   else
   {
-    #if 0
-    cpp_typecheck.error().source_location=declarator.name());
+#if 0
+    cpp_typecheck.error().source_location=source_location;
 
     if(is_code)
-      cpp_typecheck.str << "body of function `"
+    {
+      cpp_typecheck.error() << "body of function `"
                         << symbol.display_name()
-                        << "' has already been defined";
+                        << "' has already been defined" << messaget::eom;
+    }
     else
-      cpp_typecheck.str << "symbol `"
+    {
+      cpp_typecheck.error() << "symbol `"
                         << symbol.display_name()
-                        << "' already has an initializer";
+                        << "' already has an initializer" << messaget::eom;
+    }
 
     throw 0;
-    #endif
+#endif
   }
 }
 

@@ -1325,12 +1325,9 @@ void cpp_typecheckt::typecheck_member_function(
   if(symbol_table.move(symbol, new_symbol))
   {
     error().source_location=symbol.location;
-    error() << "failed to insert new method symbol: "
-            << symbol.name << "\n"
-            << "name of previous symbol: "
-            << new_symbol->name << "\n"
-            << "location of previous symbol: "
-            << new_symbol->location << eom;
+    error() << "failed to insert new method symbol: " << symbol.name << '\n'
+            << "name of previous symbol: " << new_symbol->name << '\n'
+            << "location of previous symbol: " << new_symbol->location << eom;
 
     throw 0;
   }

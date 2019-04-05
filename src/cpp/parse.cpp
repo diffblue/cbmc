@@ -190,10 +190,8 @@ void new_scopet::print_rec(std::ostream &out, unsigned indent) const
       it!=id_map.end();
       it++)
   {
-    out << std::string(indent, ' ')
-        << it->first << ": "
-        << kind2string(it->second.kind)
-        << "\n";
+    out << std::string(indent, ' ') << it->first << ": "
+        << kind2string(it->second.kind) << '\n';
     it->second.print_rec(out, indent+2);
   }
 }
@@ -1455,7 +1453,7 @@ bool Parser::rDeclaration(cpp_declarationt &declaration)
 
 #ifdef DEBUG
     std::cout << std::string(__indent, ' ') << "Parser::rDeclaration 6 " << t
-              << "\n";
+              << '\n';
 #endif
 
     if(cv_q.is_not_nil() &&
@@ -1537,7 +1535,7 @@ bool Parser::rIntegralDeclaration(
   indenter _i;
   std::cout << std::string(__indent, ' ')
             << "Parser::rIntegralDeclaration 1  token: "
-            << static_cast<char>(lex.LookAhead(0)) << "\n";
+            << static_cast<char>(lex.LookAhead(0)) << '\n';
 #endif
 
   if(!optCvQualify(cv_q))
@@ -1593,9 +1591,8 @@ bool Parser::rIntegralDeclaration(
 
   default:
 #ifdef DEBUG
-    std::cout << std::string(__indent, ' ')
-              << "Parser::rIntegralDeclaration 6 "
-              << lex.LookAhead(0) << "\n";
+    std::cout << std::string(__indent, ' ') << "Parser::rIntegralDeclaration 6 "
+              << lex.LookAhead(0) << '\n';
 #endif
 
     if(!rDeclarators(declaration.declarators(), true))
@@ -1858,7 +1855,7 @@ bool Parser::isConstructorDecl()
 #ifdef DEBUG
   indenter _i;
   std::cout << std::string(__indent, ' ') << "Parser::isConstructorDecl "
-            << lex.LookAhead(0) << "  "<< lex.LookAhead(1) << "\n";
+            << lex.LookAhead(0) << "  " << lex.LookAhead(1) << '\n';
 #endif
 
   if(lex.LookAhead(0)!='(')
@@ -3261,8 +3258,8 @@ bool Parser::optPtrOperator(typet &ptrs)
     int t=lex.LookAhead(0);
 
 #ifdef DEBUG
-    std::cout << std::string(__indent, ' ') << "Parser::optPtrOperator 2 "
-              << t << "\n";
+    std::cout << std::string(__indent, ' ') << "Parser::optPtrOperator 2 " << t
+              << '\n';
 #endif
 
     if(t=='*')
@@ -3514,7 +3511,7 @@ bool Parser::rName(irept &name)
 
 #ifdef DEBUG
     std::cout << std::string(__indent, ' ') << "Parser::rName 2 "
-              << lex.LookAhead(0) << "\n";
+              << lex.LookAhead(0) << '\n';
 #endif
 
     switch(lex.LookAhead(0))
@@ -7283,7 +7280,7 @@ optionalt<codet> Parser::rStatement()
 #ifdef DEBUG
   indenter _i;
   std::cout << std::string(__indent, ' ') << "Parser::rStatement 0 "
-            << lex.LookAhead(0) << "\n";
+            << lex.LookAhead(0) << '\n';
 #endif
 
   switch(k=lex.LookAhead(0))
@@ -8113,7 +8110,7 @@ optionalt<codet> Parser::rExprStatement()
 
 #ifdef DEBUG
       std::cout << std::string(__indent, ' ') << "Parser::rExprStatement 5 "
-                << lex.LookAhead(0) << "\n";
+                << lex.LookAhead(0) << '\n';
 #endif
 
       if(lex.get_token(tk)!=';')
@@ -8212,7 +8209,7 @@ optionalt<codet> Parser::rDeclarationStatement()
 
 #ifdef DEBUG
     std::cout << std::string(__indent, ' ')
-              << "Parser::rDeclarationStatement 3 " << t << "\n";
+              << "Parser::rDeclarationStatement 3 " << t << '\n';
 #endif
 
     if(cv_q.is_not_nil() &&
