@@ -790,6 +790,13 @@ decision_proceduret::resultt string_refinementt::dec_solve()
   for(const auto &instance : initial_instances)
     add_lemma(instance);
 
+  // All generated strings should have non-negative length
+  for(const auto &string : generator.array_pool.created_strings())
+  {
+    add_lemma(binary_relation_exprt{
+      string.length(), ID_ge, from_integer(0, string.length().type())});
+  }
+
   while((loop_bound_--) > 0)
   {
     dependencies.clean_cache();
