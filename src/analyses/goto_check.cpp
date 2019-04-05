@@ -1718,7 +1718,18 @@ void goto_checkt::goto_check(
       assertions.clear();
 
     if(i.has_condition())
+    {
       check(i.get_condition());
+
+      if(has_subexpr(i.get_condition(), [](const exprt &expr) {
+           return expr.id() == ID_r_ok || expr.id() == ID_w_ok;
+         }))
+      {
+        auto rw_ok_cond = rw_ok_check(i.get_condition());
+        if(rw_ok_cond.has_value())
+          i.set_condition(*rw_ok_cond);
+      }
+    }
 
     // magic ERROR label?
     for(const auto &label : error_labels)
@@ -1762,6 +1773,16 @@ void goto_checkt::goto_check(
 
       // the LHS might invalidate any assertion
       invalidate(code_assign.lhs());
+
+      if(has_subexpr(code_assign.rhs(), [](const exprt &expr) {
+           return expr.id() == ID_r_ok || expr.id() == ID_w_ok;
+         }))
+      {
+        exprt &rhs = to_code_assign(i.code).rhs();
+        auto rw_ok_cond = rw_ok_check(rhs);
+        if(rw_ok_cond.has_value())
+          rhs = *rw_ok_cond;
+      }
     }
     else if(i.is_function_call())
     {
@@ -1807,9 +1828,20 @@ void goto_checkt::goto_check(
     {
       if(i.code.operands().size()==1)
       {
-        check(i.code.op0());
+        const code_returnt &code_return = to_code_return(i.code);
+        check(code_return.return_value());
         // the return value invalidate any assertion
-        invalidate(i.code.op0());
+        invalidate(code_return.return_value());
+
+        if(has_subexpr(code_return.return_value(), [](const exprt &expr) {
+             return expr.id() == ID_r_ok || expr.id() == ID_w_ok;
+           }))
+        {
+          exprt &return_value = to_code_return(i.code).return_value();
+          auto rw_ok_cond = rw_ok_check(return_value);
+          if(rw_ok_cond.has_value())
+            return_value = *rw_ok_cond;
+        }
       }
     }
     else if(i.is_throw())
@@ -1840,10 +1872,6 @@ void goto_checkt::goto_check(
     else if(i.is_assert())
     {
       bool is_user_provided=i.source_location.get_bool("user-provided");
-
-      auto rw_ok_cond = rw_ok_check(i.get_condition());
-      if(rw_ok_cond.has_value())
-        i.set_condition(*rw_ok_cond);
 
       if((is_user_provided && !enable_assertions &&
           i.source_location.get_property_class()!="error label") ||
