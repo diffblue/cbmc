@@ -21,6 +21,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <ansi-c/c_qualifiers.h>
 #include <ansi-c/expr2c_class.h>
 
+#include "cpp_name.h"
+
 class expr2cppt:public expr2ct
 {
 public:
@@ -166,6 +168,51 @@ std::string expr2cppt::convert_rec(
       dest+="struct";
 
     dest+=d;
+
+    return dest;
+  }
+  else if(src.id() == ID_struct_tag)
+  {
+    const struct_typet &struct_type = ns.follow_tag(to_struct_tag_type(src));
+
+    std::string dest = q;
+
+    if(src.get_bool(ID_C_class))
+      dest += "class";
+    else if(src.get_bool(ID_C_interface))
+      dest += "__interface"; // MS-specific
+    else
+      dest += "struct";
+
+    const irept &tag = struct_type.find(ID_tag);
+    if(!tag.id().empty())
+    {
+      if(tag.id() == ID_cpp_name)
+        dest += " " + to_cpp_name(tag).to_string();
+      else
+        dest += id2string(tag.id());
+    }
+
+    dest += d;
+
+    return dest;
+  }
+  else if(src.id() == ID_union_tag)
+  {
+    const union_typet &union_type = ns.follow_tag(to_union_tag_type(src));
+
+    std::string dest = q + "union";
+
+    const irept &tag = union_type.find(ID_tag);
+    if(!tag.id().empty())
+    {
+      if(tag.id() == ID_cpp_name)
+        dest += " " + to_cpp_name(tag).to_string();
+      else
+        dest += id2string(tag.id());
+    }
+
+    dest += d;
 
     return dest;
   }
