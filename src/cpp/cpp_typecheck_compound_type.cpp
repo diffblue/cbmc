@@ -1335,8 +1335,7 @@ void cpp_typecheckt::typecheck_member_function(
   // Is this in a class template?
   // If so, we defer typechecking until used.
   if(cpp_scopes.current_scope().get_parent().is_template_scope())
-  {
-  }
+    deferred_typechecking.insert(new_symbol->name);
   else // remember for later typechecking of body
     add_method_body(new_symbol);
 }
@@ -1360,9 +1359,11 @@ void cpp_typecheckt::add_this_to_method_type(
     subtype.set(ID_C_volatile, true);
 
   code_typet::parametert parameter(pointer_type(subtype));
-  parameter.set_identifier(ID_this); // check? Not qualified
+  parameter.set_identifier(ID_this);
   parameter.set_base_name(ID_this);
   parameter.set_this();
+  if(!cpp_scopes.current_scope().get_parent().is_template_scope())
+    convert_parameter(compound_symbol.mode, parameter);
 
   code_typet::parameterst &parameters = type.parameters();
   parameters.insert(parameters.begin(), parameter);

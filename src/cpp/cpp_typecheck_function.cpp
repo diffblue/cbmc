@@ -31,6 +31,7 @@ void cpp_typecheckt::convert_parameter(
     parameter.set_base_name(base_name);
   }
 
+  PRECONDITION(!cpp_scopes.current_scope().prefix.empty());
   irep_idt identifier=cpp_scopes.current_scope().prefix+
                       id2string(base_name);
 
@@ -147,6 +148,8 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
   symbol.value.type()=symbol.type;
 
   return_type = old_return_type;
+
+  deferred_typechecking.erase(symbol.name);
 }
 
 /// for function overloading
@@ -171,8 +174,7 @@ irep_idt cpp_typecheckt::function_identifier(const typet &type)
   code_typet::parameterst::const_iterator it=
     parameters.begin();
 
-  if(it!=parameters.end() &&
-     it->get_identifier()==ID_this)
+  if(it != parameters.end() && it->get_base_name() == ID_this)
   {
     const typet &pointer=it->type();
     const typet &symbol =pointer.subtype();

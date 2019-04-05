@@ -12,10 +12,10 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #ifndef CPROVER_CPP_CPP_TYPECHECK_H
 #define CPROVER_CPP_CPP_TYPECHECK_H
 
-#include <cassert>
-#include <set>
 #include <list>
 #include <map>
+#include <set>
+#include <unordered_set>
 
 #include <util/std_code.h>
 #include <util/std_types.h>
@@ -588,6 +588,7 @@ private:
   typedef std::list<irep_idt> dynamic_initializationst;
   dynamic_initializationst dynamic_initializations;
   bool disable_access_control;           // Disable protect and private
+  std::unordered_set<irep_idt> deferred_typechecking;
 };
 
 #endif // CPROVER_CPP_CPP_TYPECHECK_H
