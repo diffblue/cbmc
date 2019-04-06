@@ -312,4 +312,15 @@ public class Test {
         assert(false);
         return sb.toString();
     }
+
+    static boolean fromNonDetArray(String[] argv)
+    {
+        String s = argv[0];
+        String u = s.concat("llo");
+        if(u.equals("Hello")) {
+            return true;
+        }
+        return false;
+    }
+
 }

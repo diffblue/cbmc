@@ -790,6 +790,13 @@ decision_proceduret::resultt string_refinementt::dec_solve()
   for(const auto &instance : initial_instances)
     add_lemma(instance);
 
+  // All generated strings should have non-negative length
+  for(const auto &string : generator.array_pool.created_strings())
+  {
+    add_lemma(binary_relation_exprt{
+      string.length(), ID_ge, from_integer(0, string.length().type())});
+  }
+
   while((loop_bound_--) > 0)
   {
     dependencies.clean_cache();
@@ -2060,6 +2067,12 @@ exprt string_refinementt::get(const exprt &expr) const
     }
     const auto array = supert::get(current.get());
     const auto index = get(index_expr->index());
+
+    // If the underlying solver does not know about the existence of an array,
+    // it can return nil, which cannot be used in the expression returned here.
+    if(array.is_nil())
+      return index_exprt(current, index);
+
     const exprt unknown =
       from_integer(CHARACTER_FOR_UNKNOWN, index_expr->type());
     if(
@@ -2070,12 +2083,9 @@ exprt string_refinementt::get(const exprt &expr) const
       return sparse_array->to_if_expression(index);
     }
 
-    INVARIANT(
-      array.is_nil() || array.id() == ID_symbol ||
-        array.id() == ID_nondet_symbol,
-      std::string("apart from symbols, array valuations can be interpreted as "
-                  "sparse arrays, id: ") +
-        id2string(array.id()));
+    INVARIANT(array.id() == ID_symbol || array.id() == ID_nondet_symbol,
+              "Apart from symbols, array valuations can be interpreted as "
+              "sparse arrays. Array model : " + array.pretty());
     return index_exprt(array, index);
   }
 
