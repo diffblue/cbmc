@@ -112,6 +112,18 @@ public:
     {
     }
 
+    /// is a method or field 'final'?
+    bool get_is_final() const
+    {
+      return get_bool(ID_final);
+    }
+
+    /// is a method or field 'final'?
+    void set_is_final(const bool is_final)
+    {
+      set(ID_final, is_final);
+    }
+
     /// is a method 'native'?
     bool get_is_native() const
     {
@@ -135,6 +147,12 @@ public:
   componentst &components()
   {
     return (componentst &)(add(ID_components).get_sub());
+  }
+
+  const componentt &get_component(const irep_idt &component_name) const
+  {
+    return static_cast<const componentt &>(
+      class_typet::get_component(component_name));
   }
 
   const irep_idt &get_access() const

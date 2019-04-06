@@ -32,6 +32,10 @@ const pointer_typet require_pointer_to_tag(
   const typet &type,
   const irep_idt &identifier = irep_idt());
 
+java_class_typet::componentt require_component(
+  const java_class_typet &java_class_type,
+  const irep_idt &component_name);
+
 struct_typet::componentt require_component(
   const struct_typet &struct_type,
   const irep_idt &component_name);

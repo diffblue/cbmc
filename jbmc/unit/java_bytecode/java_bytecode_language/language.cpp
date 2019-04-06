@@ -36,9 +36,9 @@ SCENARIO(
       {
         const symbolt &opaque_class_symbol =
           symbol_table.lookup_ref(opaque_class_prefix);
-        const struct_typet &opaque_class_struct =
-          to_struct_type(opaque_class_symbol.type);
-        const struct_union_typet::componentt &field =
+        const auto &opaque_class_struct =
+          to_java_class_type(opaque_class_symbol.type);
+        const auto &field =
           require_type::require_component(opaque_class_struct, "field2");
         REQUIRE(field.get_is_final());
       }
