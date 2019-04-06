@@ -375,7 +375,7 @@ void java_bytecode_convert_classt::convert(
     {
       class_type.add_base(base);
     }
-    class_typet::componentt base_class_field;
+    java_class_typet::componentt base_class_field;
     base_class_field.type() = class_type.bases().at(0).type();
     base_class_field.set_name("@" + id2string(c.super_class));
     base_class_field.set_base_name("@" + id2string(c.super_class));
@@ -798,18 +798,18 @@ void java_bytecode_convert_classt::add_array_types(symbol_tablet &symbol_table)
     class_type.set_name(struct_tag_type_identifier);
 
     class_type.components().reserve(3);
-    class_typet::componentt base_class_component(
+    java_class_typet::componentt base_class_component(
       "@java.lang.Object", struct_tag_typet("java::java.lang.Object"));
     base_class_component.set_pretty_name("@java.lang.Object");
     base_class_component.set_base_name("@java.lang.Object");
     class_type.components().push_back(base_class_component);
 
-    class_typet::componentt length_component("length", java_int_type());
+    java_class_typet::componentt length_component("length", java_int_type());
     length_component.set_pretty_name("length");
     length_component.set_base_name("length");
     class_type.components().push_back(length_component);
 
-    class_typet::componentt data_component(
+    java_class_typet::componentt data_component(
       "data", java_reference_type(java_type_from_char(l)));
     data_component.set_pretty_name("data");
     data_component.set_base_name("data");

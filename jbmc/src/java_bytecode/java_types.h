@@ -101,7 +101,42 @@ inline bool can_cast_type<annotated_typet>(const typet &)
 
 class java_class_typet:public class_typet
 {
- public:
+public:
+  class componentt : public class_typet::componentt
+  {
+  public:
+    componentt() = default;
+
+    componentt(const irep_idt &_name, typet _type)
+      : class_typet::componentt(_name, std::move(_type))
+    {
+    }
+
+    /// is a method 'native'?
+    bool get_is_native() const
+    {
+      return get_bool(ID_is_native_method);
+    }
+
+    /// marks a method as 'native'
+    void set_is_native(const bool is_native)
+    {
+      set(ID_is_native_method, is_native);
+    }
+  };
+
+  using componentst = std::vector<componentt>;
+
+  const componentst &components() const
+  {
+    return (const componentst &)(find(ID_components).get_sub());
+  }
+
+  componentst &components()
+  {
+    return (componentst &)(add(ID_components).get_sub());
+  }
+
   const irep_idt &get_access() const
   {
     return get(ID_access);
