@@ -360,6 +360,48 @@ inline java_method_typet &to_java_method_type(typet &type)
   return static_cast<java_method_typet &>(type);
 }
 
+/// This is a specialization of reference_typet.
+/// The subtype is guaranteed to be a struct_tag_typet.
+class java_reference_typet : public reference_typet
+{
+public:
+  explicit java_reference_typet(
+    const struct_tag_typet &_subtype,
+    std::size_t _width)
+    : reference_typet(_subtype, _width)
+  {
+  }
+
+  struct_tag_typet &subtype()
+  {
+    return static_cast<struct_tag_typet &>(reference_typet::subtype());
+  }
+
+  const struct_tag_typet &subtype() const
+  {
+    return static_cast<const struct_tag_typet &>(reference_typet::subtype());
+  }
+};
+
+template <>
+inline bool can_cast_type<java_reference_typet>(const typet &type)
+{
+  return type.id() == ID_pointer &&
+         to_type_with_subtype(type).subtype().id() == ID_struct_tag;
+}
+
+inline const java_reference_typet &to_java_reference_type(const typet &type)
+{
+  PRECONDITION(can_cast_type<java_reference_typet>(type));
+  return static_cast<const java_reference_typet &>(type);
+}
+
+inline java_reference_typet &to_java_reference_type(typet &type)
+{
+  PRECONDITION(can_cast_type<java_reference_typet>(type));
+  return static_cast<java_reference_typet &>(type);
+}
+
 signedbv_typet java_int_type();
 signedbv_typet java_long_type();
 signedbv_typet java_short_type();
