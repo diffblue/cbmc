@@ -30,11 +30,30 @@ pointer_typet require_type::require_pointer(
   return pointer;
 }
 
+/// Checks that a class has a component with a specific name
+/// \param java_class_type: The class that should have the component
+/// \param component_name: The name of the component
+/// \return The component with the specified name
+java_class_typet::componentt require_type::require_component(
+  const java_class_typet &java_class_type,
+  const irep_idt &component_name)
+{
+  const auto &component = std::find_if(
+    java_class_type.components().begin(),
+    java_class_type.components().end(),
+    [&component_name](const java_class_typet::componentt &component) {
+      return component.get_name() == component_name;
+    });
+
+  REQUIRE(component != java_class_type.components().end());
+  return *component;
+}
+
 /// Checks a struct like type has a component with a specific name
 /// \param struct_type: The structure that should have the component
 /// \param component_name: The name of the component
 /// \return The component with the specified name
-struct_union_typet::componentt require_type::require_component(
+struct_typet::componentt require_type::require_component(
   const struct_typet &struct_type,
   const irep_idt &component_name)
 {

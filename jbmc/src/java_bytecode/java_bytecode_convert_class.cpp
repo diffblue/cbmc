@@ -740,10 +740,10 @@ void java_bytecode_convert_classt::convert(
   }
   else
   {
-    class_typet &class_type=to_class_type(class_symbol.type);
+    auto &class_type = to_java_class_type(class_symbol.type);
 
     class_type.components().emplace_back();
-    class_typet::componentt &component=class_type.components().back();
+    auto &component = class_type.components().back();
 
     component.set_name(f.name);
     component.set_base_name(f.name);

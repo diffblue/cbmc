@@ -332,7 +332,7 @@ static void infer_opaque_type_fields(
             symbolt &writable_class_symbol =
               symbol_table.get_writeable_ref(class_symbol_id);
             auto &components =
-              to_struct_type(writable_class_symbol.type).components();
+              to_java_class_type(writable_class_symbol.type).components();
             components.emplace_back(component_name, fieldref.type());
             components.back().set_base_name(component_name);
             components.back().set_pretty_name(component_name);
