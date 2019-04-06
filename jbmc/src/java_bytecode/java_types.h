@@ -411,11 +411,12 @@ floatbv_typet java_float_type();
 floatbv_typet java_double_type();
 c_bool_typet java_boolean_type();
 empty_typet java_void_type();
+java_reference_typet java_reference_type(const struct_tag_typet &subtype);
 reference_typet java_reference_type(const typet &subtype);
-reference_typet java_lang_object_type();
+java_reference_typet java_lang_object_type();
 struct_tag_typet java_classname(const std::string &);
 
-reference_typet java_array_type(const char subtype);
+java_reference_typet java_array_type(const char subtype);
 const typet &java_array_element_type(const struct_tag_typet &array_symbol);
 typet &java_array_element_type(struct_tag_typet &array_symbol);
 bool is_java_array_type(const typet &type);
