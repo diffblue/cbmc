@@ -91,7 +91,12 @@ reference_typet java_reference_type(const typet &subtype)
   return reference_type(subtype);
 }
 
-reference_typet java_lang_object_type()
+java_reference_typet java_reference_type(const struct_tag_typet &subtype)
+{
+  return to_java_reference_type(reference_type(subtype));
+}
+
+java_reference_typet java_lang_object_type()
 {
   static const auto result =
     java_reference_type(struct_tag_typet("java::java.lang.Object"));
@@ -102,7 +107,7 @@ reference_typet java_lang_object_type()
 /// java::array[]. Its ID_element_type is set to the corresponding primitive
 /// type, or void* for arrays of references.
 /// \param subtype: Character indicating the type of array
-reference_typet java_array_type(const char subtype)
+java_reference_typet java_array_type(const char subtype)
 {
   std::string subtype_str;
 
