@@ -96,7 +96,8 @@ void gdb_api_internals_test()
 
 bool check_for_gdb()
 {
-  const bool has_gdb = run("gdb", {"gdb", "--version"}) == 0;
+  const bool has_gdb =
+    run("gdb", {"gdb", "--version"}, "", "/dev/null", "/dev/null") == 0;
 
   SECTION("check gdb is on the PATH")
   {
