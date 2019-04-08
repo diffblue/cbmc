@@ -1806,7 +1806,10 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
     // (e.g. due to exceptional control flow)
     if(!start_new_block)
       start_new_block=address_pair.second.predecessors.size()>1;
-    // Start a new lexical block if we've just entered a try block
+    // Start a new lexical block if we've just entered a block in which
+    // exceptions are handled. This is usually the start of a try block, but a
+    // single try can be represented as multiple non-contiguous blocks in the
+    // exception table.
     if(!start_new_block && has_seen_previous_address)
     {
       for(const auto &exception_row : method.exception_table)
@@ -2335,105 +2338,81 @@ codet &java_bytecode_convert_methodt::do_exception_handling(
   const java_bytecode_convert_methodt::methodt &method,
   const std::set<method_offsett> &working_set,
   method_offsett cur_pc,
-  codet &c)
+  codet &code)
 {
-  std::vector<irep_idt> exception_ids;
-  std::vector<irep_idt> handler_labels;
+  // For each exception handler range that starts here add a CATCH-PUSH marker
+  // Each CATCH-PUSH records a list of all the exception id and handler label
+  // pairs handled for its exact block
 
-  // for each try-catch add a CATCH-PUSH instruction
-  // each CATCH-PUSH records a list of all the handler labels
-  // together with a list of all the exception ids
-
-  // be aware of different try-catch blocks with the same starting pc
-  method_offsett pos = 0;
-  method_offsett end_pc = 0;
-  while(pos < method.exception_table.size())
+  // Gather all try-catch blocks that have cur_pc as the starting pc
+  typedef std::vector<std::reference_wrapper<
+    const java_bytecode_convert_methodt::methodt::exceptiont>> exceptionst;
+  std::map<std::size_t, exceptionst> exceptions_by_end;
+  for(const java_bytecode_convert_methodt::methodt::exceptiont &exception
+    : method.exception_table)
   {
-    // check if this is the beginning of a try block
-    for(; pos < method.exception_table.size(); ++pos)
+    if(exception.start_pc == cur_pc)
+      exceptions_by_end[exception.end_pc].push_back(exception);
+  }
+  for(const auto &exceptions : exceptions_by_end)
+  {
+    // For each block with a distinct end position create one CATCH-PUSH
+    code_push_catcht catch_push;
+    // Fill in its exception_list
+    code_push_catcht::exception_listt &exception_list =
+      catch_push.exception_list();
+    for(const java_bytecode_convert_methodt::methodt::exceptiont &exception
+      : exceptions.second)
     {
-      // unexplored try-catch?
-      if(cur_pc == method.exception_table[pos].start_pc && end_pc == 0)
-      {
-        end_pc = method.exception_table[pos].end_pc;
-      }
-
-      // currently explored try-catch?
-      if(
-        cur_pc == method.exception_table[pos].start_pc &&
-        method.exception_table[pos].end_pc == end_pc)
-      {
-        exception_ids.push_back(
-          method.exception_table[pos].catch_type.get_identifier());
-        // record the exception handler in the CATCH-PUSH
-        // instruction by generating a label corresponding to
-        // the handler's pc
-        handler_labels.push_back(
-          label(std::to_string(method.exception_table[pos].handler_pc)));
-      }
-      else
-        break;
+      exception_list.emplace_back(
+        exception.catch_type.get_identifier(),
+        // Record the exception handler in the CATCH-PUSH instruction by
+        // generating a label corresponding to the handler's pc
+        label(std::to_string(exception.handler_pc)));
     }
-
-    // add the actual PUSH-CATCH instruction
-    if(!exception_ids.empty())
-    {
-      code_push_catcht catch_push;
-      INVARIANT(
-        exception_ids.size() == handler_labels.size(),
-        "Exception tags and handler labels should be 1-to-1");
-      code_push_catcht::exception_listt &exception_list =
-        catch_push.exception_list();
-      for(size_t i = 0; i < exception_ids.size(); ++i)
-      {
-        exception_list.push_back(
-          code_push_catcht::exception_list_entryt(
-            exception_ids[i], handler_labels[i]));
-      }
-
-      c = code_blockt({catch_push, c});
-    }
-    else
-    {
-      // advance
-      ++pos;
-    }
-
-    // reset
-    end_pc = 0;
-    exception_ids.clear();
-    handler_labels.clear();
+    // Prepend the CATCH-PUSH instruction
+    code = code_blockt({ std::move(catch_push), code });
   }
 
-  // next add the CATCH-POP instructions
-  size_t start_pc = 0;
-  // as the first try block may have start_pc 0, we
-  // must track it separately
-  bool first_handler = false;
-  // check if this is the end of a try block
-  for(const auto &exception_row : method.exception_table)
+  // Next add the CATCH-POP instructions
+  // exception_row.end_pc is exclusive so append a CATCH-POP instruction if
+  // this is the instruction before it.
+  // To do this, attempt to find all exception handlers that end at the
+  // earliest known instruction after this one.
+
+  // Dangerously, we assume that the next opcode in the bytecode after the end
+  // of the exception handler block (whose address matches the exclusive end
+  // position of the block) will be a successor of some code investigated
+  // before the instruction at the end of that handler and therefore in the
+  // working set.
+  // As an example of where this may fail, for non-obfuscated bytecode
+  // generated by most compilers the next opcode after the block ending at the
+  // end of the try block is the lexically next bit of code after the try
+  // block, i.e. the catch block. When there aren't any throwing statements in
+  // the try block this block will not be the successor of any instruction.
+
+  auto next_opcode_it = std::find_if(
+    working_set.begin(),
+    working_set.end(),
+    [cur_pc](method_offsett offset) { return offset > cur_pc; });
+  if(next_opcode_it != working_set.end())
   {
-    // add the CATCH-POP before the end of the try block
-    if(
-      cur_pc < exception_row.end_pc && !working_set.empty() &&
-      *working_set.begin() == exception_row.end_pc)
+    // Count the distinct start positions of handlers that end at this location
+    std::set<std::size_t> start_positions;  // Use a set to deduplicate
+    for(const auto &exception_row : method.exception_table)
     {
-      // have we already added a CATCH-POP for the current try-catch?
-      // (each row corresponds to a handler)
-      if(exception_row.start_pc != start_pc || !first_handler)
-      {
-        if(!first_handler)
-          first_handler = true;
-        // remember the beginning of the try-catch so that we don't add
-        // another CATCH-POP for the same try-catch
-        start_pc = exception_row.start_pc;
-        // add CATCH_POP instruction
-        code_pop_catcht catch_pop;
-        c = code_blockt({c, catch_pop});
-      }
+      // Check if the next instruction found is the (exclusive) end of a block
+      if(*next_opcode_it == exception_row.end_pc)
+        start_positions.insert(exception_row.start_pc);
+    }
+    for(std::size_t handler = 0; handler < start_positions.size(); ++handler)
+    {
+      // Append a CATCH-POP instruction before the end of the block
+      code = code_blockt({ code, code_pop_catcht() });
     }
   }
-  return c;
+
+  return code;
 }
 
 code_blockt java_bytecode_convert_methodt::convert_multianewarray(

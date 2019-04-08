@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 test.class
 --unwind 10
 ^\[java::test.main:\(\[Ljava/lang/String;\)V\.1\] line 7 no uncaught exception: FAILURE$
