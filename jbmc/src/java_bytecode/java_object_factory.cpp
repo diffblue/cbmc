@@ -794,77 +794,68 @@ void java_object_factoryt::gen_nondet_struct_init(
   // * Not if the object has already been initialised by our caller, in which
   //   case they will set `skip_classid`
   // * Not if we're re-initializing an existing object (i.e. update_in_place)
+  // * Always if it has a string type. Strings should not be partially updated,
+  //   and the `length` and `data` components of string types need to be
+  //   generated differently from object fields in the general case, see
+  //   \ref java_object_factoryt::initialize_nondet_string_fields.
 
-  bool skip_special_string_fields = false;
+  const bool is_char_sequence =
+    java_string_library_preprocesst::implements_java_char_sequence(struct_type);
+  const bool has_length_and_data =
+    struct_type.has_component("length") && struct_type.has_component("data");
+  const bool is_string_type = is_char_sequence && has_length_and_data;
+  const bool has_string_input_values =
+    !object_factory_parameters.string_input_values.empty();
 
-  if(!is_sub &&
-     !skip_classid &&
-     update_in_place != update_in_placet::MUST_UPDATE_IN_PLACE)
+  if(is_string_type && has_string_input_values && !skip_classid)
+  { // We're dealing with a string and we should set fixed input values.
+    // We create a switch statement where each case is an assignment
+    // of one of the fixed input strings to the input variable in question
+    const alternate_casest cases = get_string_input_values_code(
+      expr, object_factory_parameters.string_input_values, symbol_table);
+    assignments.add(generate_nondet_switch(
+      id2string(object_factory_parameters.function_id),
+      cases,
+      java_int_type(),
+      ID_java,
+      location,
+      symbol_table));
+  }
+  else if(
+    (!is_sub && !skip_classid &&
+     update_in_place != update_in_placet::MUST_UPDATE_IN_PLACE) ||
+    is_string_type)
   {
+    // Add an initial all-zero write. Most of the fields of this will be
+    // overwritten, but it helps to have a whole-structure write that analysis
+    // passes can easily recognise leaves no uninitialised state behind.
+
+    // This code mirrors the `remove_java_new` pass:
+    auto initial_object = zero_initializer(expr.type(), source_locationt(), ns);
+    CHECK_RETURN(initial_object.has_value());
     class_identifier = struct_tag;
+    const irep_idt qualified_clsid = "java::" + id2string(class_identifier);
+    set_class_identifier(
+      to_struct_expr(*initial_object), ns, struct_tag_typet(qualified_clsid));
 
-    const bool is_char_sequence =
-      java_string_library_preprocesst
-        ::implements_java_char_sequence(struct_type);
-    const bool has_length_and_data =
-      struct_type.has_component("length") && struct_type.has_component("data");
-    const bool has_string_input_values =
-      !object_factory_parameters.string_input_values.empty();
-
-    if(is_char_sequence && has_length_and_data && has_string_input_values)
-    { // We're dealing with a string and we should set fixed input values.
-      skip_special_string_fields = true;
-
-      // We create a switch statement where each case is an assignment
-      // of one of the fixed input strings to the input variable in question
-
-      const alternate_casest cases =
-        get_string_input_values_code(
-          expr,
-          object_factory_parameters.string_input_values,
-          symbol_table);
-      assignments.add(generate_nondet_switch(
-        id2string(object_factory_parameters.function_id),
-        cases,
-        java_int_type(),
-        ID_java,
+    // If the initialised type is a special-cased String type (one with length
+    // and data fields introduced by string-library preprocessing), initialise
+    // those fields with nondet values
+    if(is_string_type)
+    { // We're dealing with a string
+      initialize_nondet_string_fields(
+        to_struct_expr(*initial_object),
+        assignments,
+        object_factory_parameters.min_nondet_string_length,
+        object_factory_parameters.max_nondet_string_length,
         location,
-        symbol_table));
+        object_factory_parameters.function_id,
+        symbol_table,
+        object_factory_parameters.string_printable,
+        allocate_objects);
     }
-    else
-    {
-      // Add an initial all-zero write. Most of the fields of this will be
-      // overwritten, but it helps to have a whole-structure write that analysis
-      // passes can easily recognise leaves no uninitialised state behind.
 
-      // This code mirrors the `remove_java_new` pass:
-      auto initial_object =
-        zero_initializer(expr.type(), source_locationt(), ns);
-      CHECK_RETURN(initial_object.has_value());
-      const irep_idt qualified_clsid = "java::" + id2string(class_identifier);
-      set_class_identifier(
-        to_struct_expr(*initial_object), ns, struct_tag_typet(qualified_clsid));
-
-      // If the initialised type is a special-cased String type (one with length
-      // and data fields introduced by string-library preprocessing), initialise
-      // those fields with nondet values
-      if(is_char_sequence && has_length_and_data)
-      { // We're dealing with a string
-        skip_special_string_fields = true;
-        initialize_nondet_string_fields(
-          to_struct_expr(*initial_object),
-          assignments,
-          object_factory_parameters.min_nondet_string_length,
-          object_factory_parameters.max_nondet_string_length,
-          location,
-          object_factory_parameters.function_id,
-          symbol_table,
-          object_factory_parameters.string_printable,
-          allocate_objects);
-      }
-
-      assignments.add(code_assignt(expr, *initial_object));
-    }
+    assignments.add(code_assignt(expr, *initial_object));
   }
 
   for(const auto &component : components)
@@ -890,7 +881,7 @@ void java_object_factoryt::gen_nondet_struct_init(
       code.add_source_location() = location;
       assignments.add(code);
     }
-    else if(skip_special_string_fields && (name == "length" || name == "data"))
+    else if(is_string_type && (name == "length" || name == "data"))
     {
       // In this case these were set up above.
       continue;
