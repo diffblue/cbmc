@@ -1,0 +1,12 @@
+CORE
+Test.class
+--function Test.test --show-properties
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+This test checks that for a stubbed String constructor in the method to verify
+(such a constructor will be stubbed if no model for String is loaded), we still
+generate properties for this method.
+Note that verification would fail in this case because we don't know the correct
+implementation of the constructor.
