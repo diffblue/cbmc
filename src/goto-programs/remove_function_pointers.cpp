@@ -11,7 +11,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "remove_function_pointers.h"
 
+#include <algorithm>
 #include <cassert>
+#include <set>
+#include <map>
 
 #include <util/c_types.h>
 #include <util/fresh_symbol.h>
@@ -47,6 +50,12 @@ public:
   // a set of function symbols
   using functionst = remove_const_function_pointerst::functionst;
 
+  // to be used to list the targets for one call site
+  typedef std::set<irep_idt>  possible_fp_targetst;
+  // to be used to construct map from all program call sites
+  // to potential targets.
+  typedef  std::map<irep_idt, possible_fp_targetst> possible_fp_targets_mapt;
+
   /// Replace a call to a dynamic function at location
   /// target in the given goto-program by a case-split
   /// over a given set of functions
@@ -59,6 +68,11 @@ public:
     const irep_idt &function_id,
     goto_programt::targett target,
     const functionst &functions);
+
+possible_fp_targetst
+list_potential_targets(
+  goto_programt &goto_program,
+  goto_programt::targett target);
 
 protected:
   messaget log;
@@ -357,6 +371,117 @@ void remove_function_pointerst::remove_function_pointer(
   }
 
   remove_function_pointer(goto_program, function_id, target, functions);
+}
+
+
+/// For a call site, return a list of potential targets.
+/// param goto_program: the goto_program containing the call site
+/// param target: the actual callsite
+/// return: A list of potential function identifiers that can be
+///         the targets of this callsite.
+remove_function_pointerst::possible_fp_targetst
+remove_function_pointerst::list_potential_targets(
+  goto_programt &goto_program,
+  goto_programt::targett target)
+{
+  remove_function_pointerst::possible_fp_targetst targets;
+  bool found_functions;
+
+  const code_function_callt &code =
+    to_code_function_call(target->code);
+
+  const exprt &function = code.function();
+
+  // this better have the right type
+  code_typet call_type = to_code_type(function.type());
+
+  // refine the type in case the forward declaration was incomplete
+  if(call_type.has_ellipsis() &&
+     call_type.parameters().empty())
+  {
+    call_type.remove_ellipsis();
+    forall_expr(it, code.arguments())
+      call_type.parameters().push_back(
+        code_typet::parametert(it->type()));
+  }
+
+  const exprt &pointer = function.op0();
+  functionst functions;
+  does_remove_constt const_removal_check(goto_program, ns);
+  const auto does_remove_const = const_removal_check();
+  if(does_remove_const.first)
+  {
+    log.warning().source_location = does_remove_const.second;
+    log.warning() << "Cast from const to non-const pointer found, only worst case"
+                  << " function pointer removal will be done." << messaget::eom;
+    found_functions = false;
+  }
+  else
+  {
+    remove_const_function_pointerst fpr(
+      log.get_message_handler(), ns, symbol_table);
+
+    found_functions = fpr(pointer, functions);
+
+    // if found_functions is false, functions should be empty
+    // however, it is possible for found_functions to be true and functions
+    // to be empty (this happens if the pointer can only resolve to the null
+    // pointer)
+    CHECK_RETURN(found_functions || functions.empty());
+
+    if(functions.size() == 1)
+    {
+      to_code_function_call(target->code).function() = *functions.cbegin();
+      targets.insert(to_symbol_expr(*functions.cbegin()).get_identifier());
+      return targets;
+    }
+  }
+
+  if(!found_functions)
+  {
+    if(only_resolve_const_fps)
+    {
+      // If this mode is enabled, we only remove function pointers
+      // that we can resolve either to an exact funciton, or an exact subset
+      // (e.g. a variable index in a constant array).
+      // Since we haven't found functions, we would now resort to
+      // replacing the function pointer with any function with a valid signature
+      // Since we don't want to do that, we abort.
+      std::for_each(functions.cbegin(), functions.cend(),
+        [&](const symbol_exprt &tar){
+          targets.insert(tar.get_identifier());
+        });
+      return targets;
+    }
+
+    bool return_value_used = code.lhs().is_not_nil();
+
+    // get all type-compatible functions
+    // whose address is ever taken
+    for(const auto &t : type_map)
+    {
+      // address taken?
+      if(address_taken.find(t.first) == address_taken.end())
+        continue;
+
+      // type-compatible?
+      if(!is_type_compatible(return_value_used, call_type, t.second))
+        continue;
+
+      if(t.first == "pthread_mutex_cleanup")
+        continue;
+
+      symbol_exprt expr(t.first, t.second);
+      functions.insert(expr);
+    } 
+  }
+
+  std::for_each(functions.cbegin(), functions.cend(),
+        [&](const symbol_exprt &tar){
+          targets.insert(tar.get_identifier());
+        });
+
+  return targets;
 }
 
 void remove_function_pointerst::remove_function_pointer(
