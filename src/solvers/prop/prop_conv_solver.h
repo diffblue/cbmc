@@ -111,8 +111,10 @@ protected:
 
   bool post_processing_done = false;
 
-  // get a _boolean_ value from counterexample if not valid
-  virtual bool get_bool(const exprt &expr, tvt &value) const;
+  /// Get a _boolean_ value from the model if the formula is satisfiable.
+  /// If the argument is not a boolean expression from the formula,
+  /// {} is returned.
+  virtual optionalt<bool> get_bool(const exprt &expr) const;
 
   virtual literalt convert_rest(const exprt &expr);
   virtual literalt convert_bool(const exprt &expr);
