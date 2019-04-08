@@ -19,11 +19,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/mp_arith.h>
 #include <util/optional.h>
 
+#include <solvers/lowering/functions.h>
+
 #include "bv_utils.h"
 #include "boolbv_width.h"
 #include "boolbv_map.h"
 #include "arrays.h"
-#include "functions.h"
 
 class extractbit_exprt;
 class extractbits_exprt;

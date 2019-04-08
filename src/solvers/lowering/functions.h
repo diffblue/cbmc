@@ -9,8 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Uninterpreted Functions
 
-#ifndef CPROVER_SOLVERS_FLATTENING_FUNCTIONS_H
-#define CPROVER_SOLVERS_FLATTENING_FUNCTIONS_H
+#ifndef CPROVER_SOLVERS_LOWERING_FUNCTIONS_H
+#define CPROVER_SOLVERS_LOWERING_FUNCTIONS_H
 
 #include <map>
 #include <set>
@@ -57,4 +57,4 @@ protected:
                         const exprt::operandst &o2);
 };
 
-#endif // CPROVER_SOLVERS_FLATTENING_FUNCTIONS_H
+#endif // CPROVER_SOLVERS_LOWERING_FUNCTIONS_H
