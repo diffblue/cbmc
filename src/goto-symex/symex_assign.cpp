@@ -390,9 +390,10 @@ void goto_symext::symex_assign_symbol(
 
   do_simplify(l2_rhs);
 
-  ssa_exprt ssa_lhs = lhs_mod;
+  ssa_exprt l2_lhs = lhs_mod;
+  ssa_exprt l1_lhs = l2_lhs; // l2_lhs will be renamed to L2 by the following:
   state.assignment(
-    ssa_lhs,
+    l2_lhs,
     l2_rhs,
     ns,
     symex_config.simplify_opt,
@@ -400,25 +401,22 @@ void goto_symext::symex_assign_symbol(
     symex_config.allow_pointer_unsoundness);
 
   exprt ssa_full_lhs=full_lhs;
-  ssa_full_lhs=add_to_lhs(ssa_full_lhs, ssa_lhs);
+  ssa_full_lhs = add_to_lhs(ssa_full_lhs, l2_lhs);
   const bool record_events=state.record_events;
   state.record_events=false;
   exprt l2_full_lhs = state.rename(std::move(ssa_full_lhs), ns).get();
   state.record_events=record_events;
 
   // do the assignment
-  const symbolt &symbol = ns.lookup(ssa_lhs.get_object_name());
+  const symbolt &symbol = ns.lookup(l2_lhs.get_object_name());
 
   if(symbol.is_auxiliary)
     assignment_type=symex_targett::assignment_typet::HIDDEN;
 
   log.conditional_output(
-    log.debug(),
-    [this, &ssa_lhs](messaget::mstreamt &mstream) {
-      mstream << "Assignment to " << ssa_lhs.get_identifier()
-              << " ["
-              << pointer_offset_bits(ssa_lhs.type(), ns).value_or(0)
-              << " bits]"
+    log.debug(), [this, &l2_lhs](messaget::mstreamt &mstream) {
+      mstream << "Assignment to " << l2_lhs.get_identifier() << " ["
+              << pointer_offset_bits(l2_lhs.type(), ns).value_or(0) << " bits]"
               << messaget::eom;
     });
 
@@ -429,12 +427,24 @@ void goto_symext::symex_assign_symbol(
   get_original_name(original_lhs);
   target.assignment(
     conjunction(guard),
-    ssa_lhs,
+    l2_lhs,
     l2_full_lhs,
     original_lhs,
     l2_rhs,
     state.source,
     assignment_type);
+
+  if(field_sensitivityt::is_divisible(l1_lhs))
+  {
+    // Split composite symbol lhs into its components
+    state.field_sensitivity.field_assignments(
+      ns, state, l1_lhs, target, symex_config.allow_pointer_unsoundness);
+    // Erase the composite symbol from our working state. Note that we need to
+    // have it in the propagation table and the value set while doing the field
+    // assignments, thus we cannot skip putting it in there above.
+    state.propagation.erase(l1_lhs.get_identifier());
+    state.value_set.erase_symbol(l1_lhs, ns);
+  }
 
   // Restore the guard
   guard.pop_back();

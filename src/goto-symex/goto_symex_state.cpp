@@ -222,18 +222,6 @@ void goto_symex_statet::assignment(
     value_set.assign(l1_lhs, l1_rhs, ns, rhs_is_simplified, is_shared);
   }
 
-  if(field_sensitivityt::is_divisible(l1_lhs))
-  {
-    // Split composite symbol lhs into its components
-    field_sensitivity.field_assignments(
-      ns, *this, l1_lhs, *symex_target, allow_pointer_unsoundness);
-    // Erase the composite symbol from our working state. Note that we need to
-    // have it in the propagation table and the value set while doing the field
-    // assignments, thus we cannot skip putting it in there above.
-    propagation.erase(l1_identifier);
-    value_set.erase_symbol(l1_lhs, ns);
-  }
-
 #if 0
   std::cout << "Assigning " << l1_identifier << '\n';
   value_set.output(ns, std::cout);
