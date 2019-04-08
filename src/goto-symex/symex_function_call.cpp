@@ -351,23 +351,30 @@ pop_frame(goto_symext::statet &state, const path_storaget &path_storage)
     // restore L1 renaming
     state.level1.restore_from(frame.old_level1);
 
-    // clear function-locals from L2 renaming
-    for(auto c_it = state.get_level2().current_names.begin();
-        c_it != state.get_level2().current_names.end();) // no ++c_it
+    symex_renaming_levelt::current_namest::viewt view;
+    state.get_level2().current_names.get_view(view);
+
+    std::vector<irep_idt> keys_to_erase;
+
+    for(const auto &pair : view)
     {
-      const irep_idt l1_o_id=c_it->second.first.get_l1_object_identifier();
+      const irep_idt l1_o_id = pair.second.first.get_l1_object_identifier();
+
       // could use iteration over local_objects as l1_o_id is prefix
       if(
         frame.local_objects.find(l1_o_id) == frame.local_objects.end() ||
         (state.threads.size() > 1 &&
-         path_storage.dirty(c_it->second.first.get_object_name())))
+         path_storage.dirty(pair.second.first.get_object_name())))
       {
-        ++c_it;
         continue;
       }
-      auto cur = c_it;
-      ++c_it;
-      state.drop_l1_name(cur);
+
+      keys_to_erase.push_back(pair.first);
+    }
+
+    for(const irep_idt &key : keys_to_erase)
+    {
+      state.drop_existing_l1_name(key);
     }
   }
 

@@ -226,15 +226,15 @@ public:
   }
 
   /// Drops an L1 name from the local L2 map
-  void drop_l1_name(symex_renaming_levelt::current_namest::const_iterator it)
+  void drop_existing_l1_name(const irep_idt &l1_identifier)
   {
-    level2.current_names.erase(it);
+    level2.current_names.erase(l1_identifier);
   }
 
   /// Drops an L1 name from the local L2 map
   void drop_l1_name(const irep_idt &l1_identifier)
   {
-    level2.current_names.erase(l1_identifier);
+    level2.current_names.erase_if_exists(l1_identifier);
   }
 
   std::function<std::size_t(const irep_idt &)> get_l2_name_provider() const

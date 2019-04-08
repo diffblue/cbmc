@@ -90,9 +90,8 @@ void goto_symext::trigger_auto_object(const exprt &expr, statet &state)
         if(has_prefix(id2string(symbol.base_name), "auto_object"))
         {
           // done already?
-          if(
-            state.get_level2().current_names.find(ssa_expr.get_identifier()) ==
-            state.get_level2().current_names.end())
+          if(!state.get_level2().current_names.has_key(
+               ssa_expr.get_identifier()))
           {
             initialize_auto_object(e, state);
           }
