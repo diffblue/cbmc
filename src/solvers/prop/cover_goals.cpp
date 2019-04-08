@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "cover_goals.h"
 
 #include <util/message.h>
+#include <util/threeval.h>
 
 #include "literal_expr.h"
 #include "prop_conv.h"

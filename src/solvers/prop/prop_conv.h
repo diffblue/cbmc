@@ -10,17 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_SOLVERS_PROP_PROP_CONV_H
 #define CPROVER_SOLVERS_PROP_PROP_CONV_H
 
-#include <string>
-#include <map>
-
-#include <util/expr.h>
-#include <util/message.h>
-#include <util/std_expr.h>
-
 #include "decision_procedure.h"
-#include "literal.h"
-#include "literal_expr.h"
-#include "prop.h"
 
 // API that provides a "handle" in the form of a literalt
 // for expressions.

@@ -10,9 +10,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_SOLVERS_SMT2_SMT2_DEC_H
 #define CPROVER_SOLVERS_SMT2_SMT2_DEC_H
 
-#include <fstream>
-
 #include "smt2_conv.h"
+
+#include <util/message.h>
+
+#include <fstream>
 
 class smt2_stringstreamt
 {

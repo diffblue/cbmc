@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_SOLVERS_FLATTENING_FUNCTIONS_H
 #define CPROVER_SOLVERS_FLATTENING_FUNCTIONS_H
 
+#include <map>
 #include <set>
 
 #include <util/mathematical_expr.h>

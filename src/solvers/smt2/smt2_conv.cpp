@@ -31,6 +31,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <solvers/flattening/c_bit_field_replacement_type.h>
 #include <solvers/floatbv/float_bv.h>
 #include <solvers/lowering/expr_lowering.h>
+#include <solvers/prop/literal_expr.h>
 
 // Mark different kinds of error conditions
 

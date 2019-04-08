@@ -11,6 +11,11 @@ Author: Daniel Kroening, Peter Schrammel
 
 #include "goto_symex_property_decider.h"
 
+#include <solvers/prop/literal_expr.h>
+#include <solvers/prop/prop.h>
+
+#include <util/threeval.h>
+
 goto_symex_property_decidert::goto_symex_property_decidert(
   const optionst &options,
   ui_message_handlert &ui_message_handler,
