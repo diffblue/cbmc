@@ -47,7 +47,7 @@ void cpp_typecheckt::default_dtor(
 }
 
 /// produces destructor code for a class object
-codet cpp_typecheckt::dtor(const symbolt &symbol)
+codet cpp_typecheckt::dtor(const symbolt &symbol, const symbol_exprt &this_expr)
 {
   assert(symbol.type.id()==ID_struct ||
          symbol.type.id()==ID_union);
@@ -85,7 +85,7 @@ codet cpp_typecheckt::dtor(const symbolt &symbol)
 
       exprt ptrmember(ID_ptrmember);
       ptrmember.set(ID_component_name, c.get_name());
-      ptrmember.operands().push_back(exprt("cpp-this"));
+      ptrmember.operands().push_back(this_expr);
 
       code_assignt assign(ptrmember, address);
       block.add(assign);
@@ -113,8 +113,7 @@ codet cpp_typecheckt::dtor(const symbolt &symbol)
 
     exprt member(ID_ptrmember, type);
     member.set(ID_component_cpp_name, cppname);
-    member.operands().push_back(
-      symbol_exprt(ID_this, pointer_type(symbol.type)));
+    member.operands().push_back(this_expr);
     member.add_source_location() = source_location;
 
     const bool disabled_access_control = disable_access_control;
@@ -139,8 +138,7 @@ codet cpp_typecheckt::dtor(const symbolt &symbol)
     DATA_INVARIANT(bit->id() == ID_base, "base class expression expected");
     const symbolt &psymb = lookup(bit->type());
 
-    symbol_exprt this_ptr(ID_this, pointer_type(symbol.type));
-    dereference_exprt object(this_ptr, psymb.type);
+    dereference_exprt object{this_expr, psymb.type};
     object.add_source_location() = source_location;
 
     const bool disabled_access_control = disable_access_control;

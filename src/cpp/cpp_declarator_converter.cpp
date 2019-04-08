@@ -104,10 +104,15 @@ symbolt &cpp_declarator_convertert::convert(
     {
       // adjust type if it's a non-static member function
       if(final_type.id()==ID_code)
+      {
+        cpp_save_scopet save_scope(cpp_typecheck.cpp_scopes);
+        cpp_typecheck.cpp_scopes.go_to(*scope);
+
         cpp_typecheck.add_this_to_method_type(
           cpp_typecheck.lookup(scope->identifier),
           to_code_type(final_type),
           method_qualifier);
+      }
 
       get_final_identifier();
 

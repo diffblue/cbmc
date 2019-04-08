@@ -698,7 +698,7 @@ void cpp_typecheckt::typecheck_expr_address_of(exprt &expr)
     code_typet &code_type=to_code_type(op.type().subtype());
 
     code_typet::parameterst &args=code_type.parameters();
-    if(!args.empty() && args[0].get_base_name() == ID_this)
+    if(!args.empty() && args.front().get_this())
     {
       // it's a pointer to member function
       const struct_tag_typet symbol(code_type.get(ID_C_member_name));
@@ -2192,7 +2192,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
       to_code_type(expr.function().type()).parameters();
 
     if(
-      !parameters.empty() && parameters.front().get_base_name() == ID_this &&
+      !parameters.empty() && parameters.front().get_this() &&
       !expr.arguments().empty())
     {
       const code_typet::parametert &parameter = parameters.front();

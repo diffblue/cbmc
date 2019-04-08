@@ -31,6 +31,7 @@ void cpp_typecheckt::convert_parameter(
     parameter.set_base_name(base_name);
   }
 
+  PRECONDITION(!cpp_scopes.current_scope().prefix.empty());
   irep_idt identifier=cpp_scopes.current_scope().prefix+
                       id2string(base_name);
 
@@ -90,22 +91,6 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
   if(symbol.value.is_nil())
     return;
 
-  // if it is a destructor, add the implicit code
-  if(to_code_type(symbol.type).return_type().id() == ID_destructor)
-  {
-    const symbolt &msymb=lookup(symbol.type.get(ID_C_member_name));
-
-    assert(symbol.value.id()==ID_code);
-    assert(symbol.value.get(ID_statement)==ID_block);
-
-    if(
-      !symbol.value.has_operands() || !symbol.value.op0().has_operands() ||
-      symbol.value.op0().op0().id() != ID_already_typechecked)
-    {
-      symbol.value.copy_to_operands(dtor(msymb));
-    }
-  }
-
   // enter appropriate scope
   cpp_save_scopet saved_scope(cpp_scopes);
   cpp_scopet &function_scope=cpp_scopes.set_scope(symbol.name);
@@ -123,12 +108,28 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
     code_typet::parameterst &parameters=function_type.parameters();
     assert(parameters.size()>=1);
     code_typet::parametert &this_parameter_expr=parameters.front();
-    function_scope.this_expr=exprt(ID_symbol, this_parameter_expr.type());
-    function_scope.this_expr.set(
-      ID_identifier, this_parameter_expr.get_identifier());
+    function_scope.this_expr = symbol_exprt{
+      this_parameter_expr.get_identifier(), this_parameter_expr.type()};
   }
   else
     function_scope.this_expr.make_nil();
+
+  // if it is a destructor, add the implicit code
+  if(to_code_type(symbol.type).return_type().id() == ID_destructor)
+  {
+    const symbolt &msymb = lookup(symbol.type.get(ID_C_member_name));
+
+    PRECONDITION(symbol.value.id() == ID_code);
+    PRECONDITION(symbol.value.get(ID_statement) == ID_block);
+
+    if(
+      !symbol.value.has_operands() || !symbol.value.op0().has_operands() ||
+      symbol.value.op0().op0().id() != ID_already_typechecked)
+    {
+      symbol.value.copy_to_operands(
+        dtor(msymb, to_symbol_expr(function_scope.this_expr)));
+    }
+  }
 
   // do the function body
   start_typecheck_code();
@@ -147,6 +148,8 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
   symbol.value.type()=symbol.type;
 
   return_type = old_return_type;
+
+  deferred_typechecking.erase(symbol.name);
 }
 
 /// for function overloading
@@ -171,8 +174,7 @@ irep_idt cpp_typecheckt::function_identifier(const typet &type)
   code_typet::parameterst::const_iterator it=
     parameters.begin();
 
-  if(it!=parameters.end() &&
-     it->get_identifier()==ID_this)
+  if(it != parameters.end() && it->get_this())
   {
     const typet &pointer=it->type();
     const typet &symbol =pointer.subtype();
