@@ -1,0 +1,18 @@
+KNOWNBUG
+test.class
+--unwind 10
+^\[java::test.main:\(\[Ljava/lang/String;\)V\.1\] line 7 no uncaught exception: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+This test verifies that we can handle the exception table not being ordered
+test.main gives the following exception table:
+ from    to  target type
+    0     6    15   Class MyException
+    7    15    15   Class MyException
+    0     6    18   Class java/lang/Exception
+    7    15    18   Class java/lang/Exception
+This is not ordered in the sense that the two handlers for the block 0-6 are not next to each other.
