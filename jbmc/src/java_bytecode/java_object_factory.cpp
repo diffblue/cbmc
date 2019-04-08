@@ -803,12 +803,11 @@ void java_object_factoryt::gen_nondet_struct_init(
     java_string_library_preprocesst::implements_java_char_sequence(struct_type);
   const bool has_length_and_data =
     struct_type.has_component("length") && struct_type.has_component("data");
-  const bool skip_special_string_fields =
-    is_char_sequence && has_length_and_data;
+  const bool is_string_type = is_char_sequence && has_length_and_data;
   const bool has_string_input_values =
     !object_factory_parameters.string_input_values.empty();
 
-  if(skip_special_string_fields && has_string_input_values && !skip_classid)
+  if(is_string_type && has_string_input_values && !skip_classid)
   { // We're dealing with a string and we should set fixed input values.
     // We create a switch statement where each case is an assignment
     // of one of the fixed input strings to the input variable in question
@@ -825,7 +824,7 @@ void java_object_factoryt::gen_nondet_struct_init(
   else if(
     (!is_sub && !skip_classid &&
      update_in_place != update_in_placet::MUST_UPDATE_IN_PLACE) ||
-    skip_special_string_fields)
+    is_string_type)
   {
     // Add an initial all-zero write. Most of the fields of this will be
     // overwritten, but it helps to have a whole-structure write that analysis
@@ -842,7 +841,7 @@ void java_object_factoryt::gen_nondet_struct_init(
     // If the initialised type is a special-cased String type (one with length
     // and data fields introduced by string-library preprocessing), initialise
     // those fields with nondet values
-    if(skip_special_string_fields)
+    if(is_string_type)
     { // We're dealing with a string
       initialize_nondet_string_fields(
         to_struct_expr(*initial_object),
@@ -882,7 +881,7 @@ void java_object_factoryt::gen_nondet_struct_init(
       code.add_source_location() = location;
       assignments.add(code);
     }
-    else if(skip_special_string_fields && (name == "length" || name == "data"))
+    else if(is_string_type && (name == "length" || name == "data"))
     {
       // In this case these were set up above.
       continue;
