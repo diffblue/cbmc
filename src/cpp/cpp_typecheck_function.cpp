@@ -174,7 +174,7 @@ irep_idt cpp_typecheckt::function_identifier(const typet &type)
   code_typet::parameterst::const_iterator it=
     parameters.begin();
 
-  if(it != parameters.end() && it->get_base_name() == ID_this)
+  if(it != parameters.end() && it->get_this())
   {
     const typet &pointer=it->type();
     const typet &symbol =pointer.subtype();

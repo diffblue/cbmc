@@ -94,7 +94,7 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
         exprt new_object(ID_new_object, parameter.type());
         new_object.set(ID_C_lvalue, true);
 
-        if(parameter.get_base_name() == ID_this)
+        if(parameter.get_this())
         {
           fargs.has_object = true;
           new_object.type() = parameter.type().subtype();

@@ -576,15 +576,13 @@ bool cpp_typecheckt::standard_conversion_pointer_to_member(
       code_typet code1=to_code_type(expr.type().subtype());
       assert(!code1.parameters().empty());
       code_typet::parametert this1=code1.parameters()[0];
-      INVARIANT(
-        this1.get_base_name() == ID_this, "first parameter should be `this'");
+      INVARIANT(this1.get_this(), "first parameter should be `this'");
       code1.parameters().erase(code1.parameters().begin());
 
       code_typet code2=to_code_type(type.subtype());
       assert(!code2.parameters().empty());
       code_typet::parametert this2=code2.parameters()[0];
-      INVARIANT(
-        this2.get_base_name() == ID_this, "first parameter should be `this'");
+      INVARIANT(this2.get_this(), "first parameter should be `this'");
       code2.parameters().erase(code2.parameters().begin());
 
       if(this2.type().subtype().get_bool(ID_C_constant) &&

@@ -2075,7 +2075,7 @@ void cpp_typecheck_resolvet::apply_template_args(
 
     if(
       !code_type.parameters().empty() &&
-      code_type.parameters()[0].get_base_name() == ID_this)
+      code_type.parameters().front().get_this())
     {
       // do we have an object?
       if(fargs.has_object)
@@ -2129,9 +2129,7 @@ bool cpp_typecheck_resolvet::disambiguate_functions(
       const code_typet::parameterst &parameters=type.parameters();
       const code_typet::parametert &parameter=parameters.front();
 
-      INVARIANT(
-        parameter.get_base_name() == ID_this,
-        "first parameter should be `this'");
+      INVARIANT(parameter.get_this(), "first parameter should be `this'");
 
       if(type.return_type().id() == ID_constructor)
       {

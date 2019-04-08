@@ -106,11 +106,12 @@ void cpp_typecheckt::typecheck_type(typet &type)
         code_typet::parameterst &parameters =
           to_code_type(type.subtype()).parameters();
 
-        if(parameters.empty() || parameters.front().get_base_name() != ID_this)
+        if(parameters.empty() || !parameters.front().get_this())
         {
           // Add 'this' to the parameters
           code_typet::parametert a0(pointer_type(class_object));
           a0.set_base_name(ID_this);
+          a0.set_this();
           parameters.insert(parameters.begin(), a0);
         }
       }
