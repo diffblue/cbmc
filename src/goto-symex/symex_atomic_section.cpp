@@ -57,14 +57,8 @@ void goto_symext::symex_atomic_end(statet &state)
         it != pair.second.second.end();
         ++it)
       read_guard|=*it;
-    exprt read_guard_expr=read_guard.as_expr();
-    do_simplify(read_guard_expr);
 
-    target.shared_read(
-      read_guard_expr,
-      r,
-      atomic_section_id,
-      state.source);
+    target.shared_read(read_guard, r, atomic_section_id, state.source);
   }
 
   for(const auto &pair : state.written_in_atomic_section)

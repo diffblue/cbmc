@@ -23,7 +23,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "ssa_step.h"
 
 void symex_target_equationt::shared_read(
-  const exprt &guard,
+  const guardt &guard,
   const ssa_exprt &ssa_object,
   unsigned atomic_section_id,
   const sourcet &source)
@@ -31,7 +31,7 @@ void symex_target_equationt::shared_read(
   SSA_steps.emplace_back(source, goto_trace_stept::typet::SHARED_READ);
   SSA_stept &SSA_step=SSA_steps.back();
 
-  SSA_step.guard = guardt{guard, guard_manager};
+  SSA_step.guard = guard;
   SSA_step.ssa_lhs=ssa_object;
   SSA_step.atomic_section_id=atomic_section_id;
 

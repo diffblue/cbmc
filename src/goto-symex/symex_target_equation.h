@@ -48,11 +48,11 @@ public:
   virtual ~symex_target_equationt() = default;
 
   /// \copydoc symex_targett::shared_read()
-  virtual void shared_read(
-    const exprt &guard,
+  void shared_read(
+    const guardt &guard,
     const ssa_exprt &ssa_object,
     unsigned atomic_section_id,
-    const sourcet &source);
+    const sourcet &source) override;
 
   /// \copydoc symex_targett::shared_write()
   virtual void shared_write(
