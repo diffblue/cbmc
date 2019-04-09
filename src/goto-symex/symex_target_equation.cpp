@@ -147,7 +147,7 @@ void symex_target_equationt::assignment(
 }
 
 void symex_target_equationt::decl(
-  const exprt &guard,
+  const guardt &guard,
   const ssa_exprt &ssa_lhs,
   const exprt &initializer,
   const sourcet &source,
@@ -158,7 +158,7 @@ void symex_target_equationt::decl(
   SSA_steps.emplace_back(source, goto_trace_stept::typet::DECL);
   SSA_stept &SSA_step=SSA_steps.back();
 
-  SSA_step.guard = guardt{guard, guard_manager};
+  SSA_step.guard = guard;
   SSA_step.ssa_lhs=ssa_lhs;
   SSA_step.ssa_full_lhs = initializer;
   SSA_step.original_full_lhs=ssa_lhs.get_original_expr();

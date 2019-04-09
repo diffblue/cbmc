@@ -143,7 +143,7 @@ public:
   /// \param assignment_type: To distinguish between different types of
   ///  assignments (some may be hidden for the further analysis)
   virtual void decl(
-    const exprt &guard,
+    const guardt &guard,
     const ssa_exprt &ssa_lhs,
     const exprt &initializer,
     const sourcet &source,

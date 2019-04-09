@@ -81,12 +81,12 @@ public:
     assignment_typet assignment_type) override;
 
   /// \copydoc symex_targett::decl()
-  virtual void decl(
-    const exprt &guard,
+  void decl(
+    const guardt &guard,
     const ssa_exprt &ssa_lhs,
     const exprt &initializer,
     const sourcet &source,
-    assignment_typet assignment_type);
+    assignment_typet assignment_type) override;
 
   /// \copydoc symex_targett::dead()
   virtual void dead(
