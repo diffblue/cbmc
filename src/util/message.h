@@ -73,6 +73,11 @@ protected:
 class null_message_handlert:public message_handlert
 {
 public:
+  null_message_handlert() : message_handlert()
+  {
+    verbosity = 0;
+  }
+
   void print(unsigned level, const std::string &message) override
   {
     message_handlert::print(level, message);
