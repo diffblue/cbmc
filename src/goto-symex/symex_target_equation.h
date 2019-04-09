@@ -89,10 +89,10 @@ public:
     assignment_typet assignment_type) override;
 
   /// \copydoc symex_targett::dead()
-  virtual void dead(
-    const exprt &guard,
+  void dead(
+    const guardt &guard,
     const ssa_exprt &ssa_lhs,
-    const sourcet &source);
+    const sourcet &source) override;
 
   /// \copydoc symex_targett::function_call()
   void function_call(

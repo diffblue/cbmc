@@ -155,9 +155,9 @@ public:
   /// \param source: Pointer to location in the input GOTO program of this
   ///  removal
   virtual void dead(
-    const exprt &guard,
+    const guardt &guard,
     const ssa_exprt &ssa_lhs,
-    const sourcet &source)=0;
+    const sourcet &source) = 0;
 
   /// Record a function call.
   /// \param guard: Precondition for calling a function

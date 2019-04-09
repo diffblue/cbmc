@@ -173,7 +173,7 @@ void symex_target_equationt::decl(
 
 /// declare a fresh variable
 void symex_target_equationt::dead(
-  const exprt &,
+  const guardt &,
   const ssa_exprt &,
   const sourcet &)
 {
