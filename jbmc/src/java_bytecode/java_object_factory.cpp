@@ -106,7 +106,6 @@ public:
     code_blockt &assignments,
     const exprt &expr,
     bool is_sub,
-    irep_idt class_identifier,
     bool skip_classid,
     lifetimet lifetime,
     const optionalt<typet> &override_type,
@@ -132,7 +131,6 @@ private:
     code_blockt &assignments,
     const exprt &expr,
     bool is_sub,
-    irep_idt class_identifier,
     bool skip_classid,
     lifetimet lifetime,
     const struct_typet &struct_type,
@@ -262,7 +260,6 @@ void java_object_factoryt::gen_pointer_target_init(
     assignments,
     init_expr,
     false, // is_sub
-    "",    // class_identifier
     false, // skip_classid
     lifetime,
     {}, // no override type
@@ -706,7 +703,6 @@ symbol_exprt java_object_factoryt::gen_nondet_subtype_pointer_init(
     assignments,
     new_symbol_expr,
     false, // is_sub
-    "",    // class_identifier
     false, // skip_classid
     lifetime,
     {}, // no override_type
@@ -754,8 +750,6 @@ alternate_casest get_string_input_values_code(
 /// \param expr: Struct-typed lvalue expression to initialize
 /// \param is_sub: If true, `expr` is a substructure of a larger object, which
 ///   in Java necessarily means a base class
-/// \param class_identifier: Name of the parent class. Used to initialize the
-///   `@class_identifier` among others
 /// \param skip_classid: If true, skip initializing `@class_identifier`
 /// \param lifetime: Lifetime of the allocated objects (AUTOMATIC_LOCAL,
 ///   STATIC_GLOBAL, or DYNAMIC)
@@ -771,7 +765,6 @@ void java_object_factoryt::gen_nondet_struct_init(
   code_blockt &assignments,
   const exprt &expr,
   bool is_sub,
-  irep_idt class_identifier,
   bool skip_classid,
   lifetimet lifetime,
   const struct_typet &struct_type,
@@ -833,8 +826,7 @@ void java_object_factoryt::gen_nondet_struct_init(
     // This code mirrors the `remove_java_new` pass:
     auto initial_object = zero_initializer(expr.type(), source_locationt(), ns);
     CHECK_RETURN(initial_object.has_value());
-    class_identifier = struct_tag;
-    const irep_idt qualified_clsid = "java::" + id2string(class_identifier);
+    const irep_idt qualified_clsid = "java::" + id2string(struct_tag);
     set_class_identifier(
       to_struct_expr(*initial_object), ns, struct_tag_typet(qualified_clsid));
 
@@ -903,7 +895,6 @@ void java_object_factoryt::gen_nondet_struct_init(
         assignments,
         me,
         _is_sub,
-        class_identifier,
         false, // skip_classid
         lifetime,
         {}, // no override_type
@@ -938,9 +929,6 @@ void java_object_factoryt::gen_nondet_struct_init(
 /// \param is_sub:
 ///   If true, `expr` is a substructure of a larger object, which in Java
 ///   necessarily means a base class.
-/// \param class_identifier:
-///   Name of the parent class. Used to initialize the `@class_identifier` among
-///   others.
 /// \param skip_classid:
 ///   If true, skip initializing `@class_identifier`.
 /// \param lifetime:
@@ -965,7 +953,6 @@ void java_object_factoryt::gen_nondet_init(
   code_blockt &assignments,
   const exprt &expr,
   bool is_sub,
-  irep_idt class_identifier,
   bool skip_classid,
   lifetimet lifetime,
   const optionalt<typet> &override_type,
@@ -1022,7 +1009,6 @@ void java_object_factoryt::gen_nondet_init(
       assignments,
       expr,
       is_sub,
-      class_identifier,
       skip_classid,
       lifetime,
       struct_type,
@@ -1245,7 +1231,6 @@ void java_object_factoryt::array_loop_init_code(
     assignments,
     arraycellref,
     false,      // is_sub
-    irep_idt(), // class_identifier
     false,      // skip_classid
     // These are variable in number, so use dynamic allocator:
     lifetimet::DYNAMIC,
@@ -1464,7 +1449,6 @@ exprt object_factory(
     assignments,
     object,
     false, // is_sub
-    "",    // class_identifier
     false, // skip_classid
     lifetime,
     {}, // no override_type
@@ -1535,7 +1519,6 @@ void gen_nondet_init(
     assignments,
     expr,
     false, // is_sub
-    "",    // class_identifier
     skip_classid,
     lifetime,
     {}, // no override_type
