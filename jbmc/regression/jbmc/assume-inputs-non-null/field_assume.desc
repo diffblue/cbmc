@@ -1,0 +1,13 @@
+CORE
+My.class
+--function My.field --java-assume-inputs-non-null
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+\[java::My.field:\(\)V.assertion.1\].*FAILURE
+\[java::My.field:\(\)V.assertion.2\].*FAILURE
+--
+^warning: ignoring
+--
+Check that --java-assume-inputs-non-null does NOT constrain the fields of the
+containing object to be non-null.
