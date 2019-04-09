@@ -61,8 +61,5 @@ void goto_symext::symex_decl(statet &state, const symbol_exprt &expr)
 
   if(path_storage.dirty(ssa.get_object_name()) && state.atomic_section_id == 0)
     target.shared_write(
-      state.guard.as_expr(),
-      ssa,
-      state.atomic_section_id,
-      state.source);
+      state.guard, ssa, state.atomic_section_id, state.source);
 }

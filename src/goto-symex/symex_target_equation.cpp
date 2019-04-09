@@ -39,7 +39,7 @@ void symex_target_equationt::shared_read(
 }
 
 void symex_target_equationt::shared_write(
-  const exprt &guard,
+  const guardt &guard,
   const ssa_exprt &ssa_object,
   unsigned atomic_section_id,
   const sourcet &source)
@@ -47,7 +47,7 @@ void symex_target_equationt::shared_write(
   SSA_steps.emplace_back(source, goto_trace_stept::typet::SHARED_WRITE);
   SSA_stept &SSA_step=SSA_steps.back();
 
-  SSA_step.guard = guardt{guard, guard_manager};
+  SSA_step.guard = guard;
   SSA_step.ssa_lhs=ssa_object;
   SSA_step.atomic_section_id=atomic_section_id;
 

@@ -100,7 +100,7 @@ public:
   ///  takes place (if any)
   /// \param source: Pointer to location in the input GOTO program of this write
   virtual void shared_write(
-    const exprt &guard,
+    const guardt &guard,
     const ssa_exprt &ssa_object,
     unsigned atomic_section_id,
     const sourcet &source) = 0;

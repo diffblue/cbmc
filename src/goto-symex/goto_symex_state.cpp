@@ -528,11 +528,7 @@ bool goto_symex_statet::l2_thread_write_encoding(
   }
 
   // record a shared write
-  symex_target->shared_write(
-    guard.as_expr(),
-    expr,
-    atomic_section_id,
-    source);
+  symex_target->shared_write(guard, expr, atomic_section_id, source);
 
   // do we have threads?
   return threads.size() > 1;

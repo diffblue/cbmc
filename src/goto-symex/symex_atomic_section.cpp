@@ -73,14 +73,8 @@ void goto_symext::symex_atomic_end(statet &state)
         it != pair.second.end();
         ++it)
       write_guard|=*it;
-    exprt write_guard_expr=write_guard.as_expr();
-    do_simplify(write_guard_expr);
 
-    target.shared_write(
-      write_guard_expr,
-      w,
-      atomic_section_id,
-      state.source);
+    target.shared_write(write_guard, w, atomic_section_id, state.source);
   }
 
   target.atomic_end(
