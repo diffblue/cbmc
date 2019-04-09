@@ -480,8 +480,10 @@ void goto_symext::symex_goto(statet &state)
         });
 
       target.assignment(
-        guard.as_expr(),
-        new_lhs, new_lhs, guard_symbol_expr,
+        guard,
+        new_lhs,
+        new_lhs,
+        guard_symbol_expr,
         new_rhs,
         original_source,
         symex_targett::assignment_typet::GUARD);
