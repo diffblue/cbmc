@@ -79,8 +79,6 @@ std::string floating_point_to_java_string(float_type value)
     return raw_decimal;
   }();
   const bool is_lossless = [&] {
-    if(value == std::numeric_limits<float_type>::min())
-      return true;
     try
     {
       return std::stod(decimal) == value;

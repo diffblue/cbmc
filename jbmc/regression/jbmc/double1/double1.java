@@ -19,5 +19,13 @@ class double1
     d=java.lang.Double.NEGATIVE_INFINITY;
     d=java.lang.Double.NaN;
   }
+
+  public static String testLimit(double inputValue) {
+    if(0x1p-1022 == inputValue){
+      assert(false);
+      return "reach";
+    }
+    return "default";
+  }
 }
 

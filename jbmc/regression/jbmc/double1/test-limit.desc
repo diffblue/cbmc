@@ -1,0 +1,11 @@
+CORE
+double1.class
+ --function double1.testLimit --trace
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+INPUT arg0d: 0x1(\.0*)?p-1022 /\* 2.22507e-308
+--
+^warning: ignoring
+--
+Test double value are printed with sufficient precision
