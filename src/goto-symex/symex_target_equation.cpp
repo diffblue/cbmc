@@ -280,14 +280,14 @@ void symex_target_equationt::input(
 }
 
 void symex_target_equationt::assumption(
-  const exprt &guard,
+  const guardt &guard,
   const exprt &cond,
   const sourcet &source)
 {
   SSA_steps.emplace_back(source, goto_trace_stept::typet::ASSUME);
   SSA_stept &SSA_step=SSA_steps.back();
 
-  SSA_step.guard = guardt{guard, guard_manager};
+  SSA_step.guard = guard;
   SSA_step.cond_expr=cond;
 
   merge_ireps(SSA_step);

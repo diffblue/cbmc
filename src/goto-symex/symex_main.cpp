@@ -168,7 +168,7 @@ void goto_symext::symex_assume_l2(statet &state, const exprt &cond)
   if(state.threads.size()==1)
   {
     exprt tmp = state.guard.guard_expr(rewritten_cond);
-    target.assumption(state.guard.as_expr(), tmp, state.source);
+    target.assumption(state.guard, tmp, state.source);
   }
   // symex_target_equationt::convert_assertions would fail to
   // consider assumptions of threads that have a thread-id above that

@@ -234,10 +234,8 @@ public:
   /// \param cond: Condition this assumption represents
   /// \param source: Pointer to location in the input GOTO program of this
   ///  assumption
-  virtual void assumption(
-    const exprt &guard,
-    const exprt &cond,
-    const sourcet &source)=0;
+  virtual void
+  assumption(const guardt &guard, const exprt &cond, const sourcet &source) = 0;
 
   /// Record an assertion.
   /// \param guard: Precondition for reaching this assertion

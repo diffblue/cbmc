@@ -135,10 +135,8 @@ public:
     const std::list<exprt> &args);
 
   /// \copydoc symex_targett::assumption()
-  virtual void assumption(
-    const exprt &guard,
-    const exprt &cond,
-    const sourcet &source);
+  void assumption(const guardt &guard, const exprt &cond, const sourcet &source)
+    override;
 
   /// \copydoc symex_targett::assertion()
   virtual void assertion(
