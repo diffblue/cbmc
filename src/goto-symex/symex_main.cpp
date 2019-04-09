@@ -550,7 +550,7 @@ void goto_symext::execute_next_instruction(
   {
   case SKIP:
     if(!state.guard.is_false())
-      target.location(state.guard.as_expr(), state.source);
+      target.location(state.guard, state.source);
     symex_transition(state);
     break;
 
@@ -563,7 +563,7 @@ void goto_symext::execute_next_instruction(
 
   case LOCATION:
     if(!state.guard.is_false())
-      target.location(state.guard.as_expr(), state.source);
+      target.location(state.guard, state.source);
     symex_transition(state);
     break;
 

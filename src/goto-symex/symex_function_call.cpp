@@ -204,7 +204,7 @@ void goto_symext::symex_function_call_symbol(
   Forall_expr(it, code.arguments())
     *it = clean_expr(std::move(*it), state, false);
 
-  target.location(state.guard.as_expr(), state.source);
+  target.location(state.guard, state.source);
 
   PRECONDITION(code.function().id() == ID_symbol);
 

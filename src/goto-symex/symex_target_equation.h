@@ -110,9 +110,7 @@ public:
     bool hidden);
 
   /// \copydoc symex_targett::location()
-  virtual void location(
-    const exprt &guard,
-    const sourcet &source);
+  void location(const guardt &guard, const sourcet &source) override;
 
   /// \copydoc symex_targett::output()
   virtual void output(

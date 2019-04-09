@@ -235,7 +235,7 @@ void goto_symext::symex_goto(statet &state)
 
   if(new_guard.is_false())
   {
-    target.location(state.guard.as_expr(), state.source);
+    target.location(state.guard, state.source);
 
     // next instruction
     symex_transition(state);

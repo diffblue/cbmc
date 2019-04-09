@@ -189,9 +189,7 @@ public:
   /// \param guard: Precondition for reaching this location
   /// \param source: Pointer to location in the input GOTO program to be
   ///  recorded
-  virtual void location(
-    const exprt &guard,
-    const sourcet &source)=0;
+  virtual void location(const guardt &guard, const sourcet &source) = 0;
 
   /// Record an output.
   /// \param guard: Precondition for writing to the output

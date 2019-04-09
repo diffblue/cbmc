@@ -181,13 +181,13 @@ void symex_target_equationt::dead(
 }
 
 void symex_target_equationt::location(
-  const exprt &guard,
+  const guardt &guard,
   const sourcet &source)
 {
   SSA_steps.emplace_back(source, goto_trace_stept::typet::LOCATION);
   SSA_stept &SSA_step=SSA_steps.back();
 
-  SSA_step.guard = guardt{guard, guard_manager};
+  SSA_step.guard = guard;
 
   merge_ireps(SSA_step);
 }
