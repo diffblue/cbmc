@@ -148,10 +148,10 @@ public:
     const sourcet &source);
 
   /// \copydoc symex_targett::goto_instruction()
-  virtual void goto_instruction(
-    const exprt &guard,
+  void goto_instruction(
+    const guardt &guard,
     const renamedt<exprt, L2> &cond,
-    const sourcet &source);
+    const sourcet &source) override;
 
   /// \copydoc symex_targett::constraint()
   virtual void constraint(

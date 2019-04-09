@@ -257,7 +257,7 @@ public:
   /// \param source: Pointer to location in the input GOTO program of this
   ///  goto instruction
   virtual void goto_instruction(
-    const exprt &guard,
+    const guardt &guard,
     const renamedt<exprt, L2> &cond,
     const sourcet &source) = 0;
 
