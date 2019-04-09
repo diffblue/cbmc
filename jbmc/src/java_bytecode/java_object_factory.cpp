@@ -826,9 +826,10 @@ void java_object_factoryt::gen_nondet_struct_init(
     // This code mirrors the `remove_java_new` pass:
     auto initial_object = zero_initializer(expr.type(), source_locationt(), ns);
     CHECK_RETURN(initial_object.has_value());
-    const irep_idt qualified_clsid = "java::" + id2string(struct_tag);
     set_class_identifier(
-      to_struct_expr(*initial_object), ns, struct_tag_typet(qualified_clsid));
+      to_struct_expr(*initial_object),
+      ns,
+      struct_tag_typet("java::" + id2string(struct_tag)));
 
     // If the initialised type is a special-cased String type (one with length
     // and data fields introduced by string-library preprocessing), initialise
