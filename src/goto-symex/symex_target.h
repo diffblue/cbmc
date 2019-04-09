@@ -180,7 +180,7 @@ public:
   /// \param hidden: Should this step be recorded as hidden?
   ///  function return
   virtual void function_return(
-    const exprt &guard,
+    const guardt &guard,
     const irep_idt &function_id,
     const sourcet &source,
     bool hidden) = 0;

@@ -103,11 +103,11 @@ public:
     bool hidden) override;
 
   /// \copydoc symex_targett::function_return()
-  virtual void function_return(
-    const exprt &guard,
+  void function_return(
+    const guardt &guard,
     const irep_idt &function_id,
     const sourcet &source,
-    bool hidden);
+    bool hidden) override;
 
   /// \copydoc symex_targett::location()
   void location(const guardt &guard, const sourcet &source) override;

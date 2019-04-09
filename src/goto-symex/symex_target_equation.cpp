@@ -212,7 +212,7 @@ void symex_target_equationt::function_call(
 }
 
 void symex_target_equationt::function_return(
-  const exprt &guard,
+  const guardt &guard,
   const irep_idt &function_id,
   const sourcet &source,
   const bool hidden)
@@ -220,7 +220,7 @@ void symex_target_equationt::function_return(
   SSA_steps.emplace_back(source, goto_trace_stept::typet::FUNCTION_RETURN);
   SSA_stept &SSA_step=SSA_steps.back();
 
-  SSA_step.guard = guardt{guard, guard_manager};
+  SSA_step.guard = guard;
   SSA_step.called_function = function_id;
   SSA_step.hidden = hidden;
 
