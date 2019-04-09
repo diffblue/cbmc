@@ -132,7 +132,7 @@ void goto_symext::vcc(
   const exprt guarded_condition = state.guard.guard_expr(condition);
 
   state.remaining_vccs++;
-  target.assertion(state.guard.as_expr(), guarded_condition, msg, state.source);
+  target.assertion(state.guard, guarded_condition, msg, state.source);
 }
 
 void goto_symext::symex_assume(statet &state, const exprt &cond)

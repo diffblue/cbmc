@@ -294,7 +294,7 @@ void symex_target_equationt::assumption(
 }
 
 void symex_target_equationt::assertion(
-  const exprt &guard,
+  const guardt &guard,
   const exprt &cond,
   const std::string &msg,
   const sourcet &source)
@@ -302,7 +302,7 @@ void symex_target_equationt::assertion(
   SSA_steps.emplace_back(source, goto_trace_stept::typet::ASSERT);
   SSA_stept &SSA_step=SSA_steps.back();
 
-  SSA_step.guard = guardt{guard, guard_manager};
+  SSA_step.guard = guard;
   SSA_step.cond_expr=cond;
   SSA_step.comment=msg;
 

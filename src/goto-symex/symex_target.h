@@ -244,10 +244,10 @@ public:
   /// \param source: Pointer to location in the input GOTO program of this
   ///  assertion
   virtual void assertion(
-    const exprt &guard,
+    const guardt &guard,
     const exprt &cond,
     const std::string &msg,
-    const sourcet &source)=0;
+    const sourcet &source) = 0;
 
   /// Record a goto instruction.
   /// \param guard: Precondition for reaching this goto instruction

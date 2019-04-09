@@ -139,11 +139,11 @@ public:
     override;
 
   /// \copydoc symex_targett::assertion()
-  virtual void assertion(
-    const exprt &guard,
+  void assertion(
+    const guardt &guard,
     const exprt &cond,
     const std::string &msg,
-    const sourcet &source);
+    const sourcet &source) override;
 
   /// \copydoc symex_targett::goto_instruction()
   void goto_instruction(
