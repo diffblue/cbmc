@@ -23,8 +23,11 @@ Author: Michael Tautschnig, michael.tautschnig@qmul.ac.uk
 #include <util/std_expr.h>
 
 #include <solvers/bdd/bdd.h>
+#include <solvers/decision_procedure.h>
 
 #include <unordered_map>
+
+class propt;
 
 /// Conversion between \c exprt and \c bbdt
 /// This encapsulate a bdd_managert, thus BDDs created with this class should
@@ -36,6 +39,9 @@ class bdd_exprt
 public:
   bddt from_expr(const exprt &expr);
   exprt as_expr(const bddt &root) const;
+
+  /// Convert \p bdd to a solver literal
+  exprt as_solver_literal(decision_proceduret &solver, const bddt &bdd) const;
 
 protected:
   bdd_managert bdd_mgr;

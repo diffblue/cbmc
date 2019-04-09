@@ -10,6 +10,10 @@ Author: Michael Tautschnig, michael.tautschnig@qmul.ac.uk
 /// Conversion between exprt and miniBDD
 
 #include "bdd_expr.h"
+#include "bdd_strategy.h"
+#include "literal.h"
+#include "literal_expr.h"
+#include "prop_conv_solver.h"
 
 #include <util/expr_util.h>
 #include <util/format_expr.h>
@@ -175,4 +179,69 @@ exprt bdd_exprt::as_expr(const bddt &root) const
   std::unordered_map<bdd_nodet::idt, exprt> cache;
   bdd_nodet node = bdd_mgr.bdd_node(root);
   return as_expr(node, cache);
+}
+
+/// Internal state of the strategy to convert BDD nodes to solver literals
+struct handle_guard_strategyt
+{
+  const std::vector<exprt> &node_map;
+  decision_proceduret &solver;
+};
+
+template <>
+exprt bdd_strategyt<exprt, handle_guard_strategyt>::leaf(
+  const bdd_nodet::indext &index)
+{
+  return internal_state.solver.handle(internal_state.node_map[index]);
+}
+
+template <>
+exprt bdd_strategyt<exprt, handle_guard_strategyt>::make_false()
+{
+  return internal_state.solver.handle(false_exprt{});
+}
+
+template <>
+exprt bdd_strategyt<exprt, handle_guard_strategyt>::make_true()
+{
+  return internal_state.solver.handle(true_exprt{});
+}
+
+template <>
+exprt bdd_strategyt<exprt, handle_guard_strategyt>::make_not(const exprt &l1)
+{
+  return not_exprt{l1};
+}
+
+template <>
+exprt bdd_strategyt<exprt, handle_guard_strategyt>::make_and(
+  const exprt &l1,
+  const exprt &l2)
+{
+  return internal_state.solver.handle(and_exprt{l1, l2});
+}
+
+template <>
+exprt bdd_strategyt<exprt, handle_guard_strategyt>::make_or(
+  const exprt &l1,
+  const exprt &l2)
+{
+  return internal_state.solver.handle(or_exprt{l1, l2});
+}
+
+template <>
+exprt bdd_strategyt<exprt, handle_guard_strategyt>::make_if_then_else(
+  const exprt &i,
+  const exprt &t,
+  const exprt &e)
+{
+  return make_or(make_and(i, t), make_and(not_exprt{i}, e));
+}
+
+exprt bdd_exprt::as_solver_literal(decision_proceduret &solver, const bddt &bdd)
+  const
+{
+  bdd_strategyt<exprt, handle_guard_strategyt> strategy{
+    handle_guard_strategyt{node_map, solver}};
+  return strategy.apply(bdd_mgr.bdd_node(bdd));
 }

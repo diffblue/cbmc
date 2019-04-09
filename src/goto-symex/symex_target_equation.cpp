@@ -15,7 +15,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/format_expr.h>
 #include <util/std_expr.h>
 
+#include <analyses/guard_expr.h>
 #include <solvers/decision_procedure.h>
+#include <solvers/prop/bdd_expr.h>
 
 #include "goto_symex_state.h"
 #include "ssa_step.h"
@@ -364,6 +366,27 @@ void symex_target_equationt::convert_decls(
   }
 }
 
+/// Convert a guard to a solver handle.
+/// Version for the case the guard is represented as an exprt.
+/// \p manager is unused but is kept for uniformity with the BDD version.
+inline exprt convert_guard(
+  const guard_expr_managert &manager,
+  const exprt &guard,
+  decision_proceduret &decision_procedure)
+{
+  return decision_procedure.handle(guard);
+}
+
+/// Convert a guard to a solver handle.
+/// Version for the case the guard is represented as a BDD.
+inline exprt convert_guard(
+  const bdd_exprt &manager,
+  const bddt &guard,
+  decision_proceduret &decision_procedure)
+{
+  return manager.as_solver_literal(decision_procedure, guard);
+}
+
 void symex_target_equationt::convert_guards(
   decision_proceduret &decision_procedure)
 {
@@ -378,9 +401,11 @@ void symex_target_equationt::convert_guards(
         mstream << messaget::eom;
       });
 
-      step.guard_handle = step.guard.has_value()
-                            ? decision_procedure.handle(step.guard->as_expr())
-                            : false_exprt{};
+      step.guard_handle =
+        step.guard.has_value()
+          ? convert_guard(
+              guard_manager, step.guard->underlying(), decision_procedure)
+          : false_exprt{};
     }
   }
 }
