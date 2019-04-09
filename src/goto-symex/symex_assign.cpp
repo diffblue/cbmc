@@ -194,8 +194,10 @@ void symex_assignt::assign_non_struct_symbol(
       ? symex_targett::assignment_typet::HIDDEN
       : assignment_type;
 
+  guardt assignment_guard = state.guard;
+  assignment_guard.add(conjunction(guard));
   target.assignment(
-    make_and(state.guard.as_expr(), conjunction(guard)),
+    assignment_guard,
     l2_lhs,
     l2_full_lhs,
     get_original_name(l2_full_lhs),
