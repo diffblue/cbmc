@@ -20,6 +20,7 @@ Author: Michael Tautschnig, michael.tautschnig@qmul.ac.uk
 */
 
 #include <util/expr.h>
+#include <util/std_expr.h>
 
 #include <solvers/bdd/bdd.h>
 
