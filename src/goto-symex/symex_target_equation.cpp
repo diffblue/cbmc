@@ -114,10 +114,29 @@ void symex_target_equationt::assignment(
   const sourcet &source,
   assignment_typet assignment_type)
 {
+  assignment(
+    guardt{guard, guard_manager},
+    ssa_lhs,
+    ssa_full_lhs,
+    original_full_lhs,
+    ssa_rhs,
+    source,
+    assignment_type);
+}
+
+void symex_target_equationt::assignment(
+  const guardt &guard,
+  const ssa_exprt &ssa_lhs,
+  const exprt &ssa_full_lhs,
+  const exprt &original_full_lhs,
+  const exprt &ssa_rhs,
+  const symex_targett::sourcet &source,
+  symex_targett::assignment_typet assignment_type)
+{
   PRECONDITION(ssa_lhs.is_not_nil());
 
   SSA_steps.emplace_back(SSA_assignment_stept{source,
-                                              guardt{guard, guard_manager},
+                                              guard,
                                               ssa_lhs,
                                               ssa_full_lhs,
                                               original_full_lhs,

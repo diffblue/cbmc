@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_SYMEX_SYMEX_TARGET_H
 #define CPROVER_GOTO_SYMEX_SYMEX_TARGET_H
 
+#include <analyses/guard.h>
 #include <goto-programs/goto_program.h>
 
 #include "renaming_level.h"
@@ -123,6 +124,15 @@ public:
     const exprt &ssa_rhs,
     const sourcet &source,
     assignment_typet assignment_type)=0;
+
+  virtual void assignment(
+    const guardt &guard,
+    const ssa_exprt &ssa_lhs,
+    const exprt &ssa_full_lhs,
+    const exprt &original_full_lhs,
+    const exprt &ssa_rhs,
+    const sourcet &source,
+    assignment_typet assignment_type) = 0;
 
   /// Declare a fresh variable. The `cond_expr` is _lhs==lhs_.
   /// \param guard: Precondition for a declaration of this variable

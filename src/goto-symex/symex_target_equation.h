@@ -62,14 +62,23 @@ public:
     const sourcet &source);
 
   /// \copydoc symex_targett::assignment()
-  virtual void assignment(
+  void assignment(
     const exprt &guard,
     const ssa_exprt &ssa_lhs,
     const exprt &ssa_full_lhs,
     const exprt &original_full_lhs,
     const exprt &ssa_rhs,
     const sourcet &source,
-    assignment_typet assignment_type);
+    assignment_typet assignment_type) override;
+
+  void assignment(
+    const guardt &guard,
+    const ssa_exprt &ssa_lhs,
+    const exprt &ssa_full_lhs,
+    const exprt &original_full_lhs,
+    const exprt &ssa_rhs,
+    const sourcet &source,
+    assignment_typet assignment_type) override;
 
   /// \copydoc symex_targett::decl()
   virtual void decl(
