@@ -639,7 +639,6 @@ void symex_target_equationt::merge_ireps(SSA_stept &SSA_step)
   merge_irep(SSA_step.ssa_full_lhs);
   merge_irep(SSA_step.original_full_lhs);
   merge_irep(SSA_step.ssa_rhs);
-
   merge_irep(SSA_step.cond_expr);
 
   for(auto &step : SSA_step.io_args)
