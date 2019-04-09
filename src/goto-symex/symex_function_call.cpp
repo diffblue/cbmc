@@ -282,7 +282,7 @@ void goto_symext::symex_function_call_code(
 
   // record the call
   target.function_call(
-    state.guard.as_expr(), identifier, renamed_arguments, state.source, hidden);
+    state.guard, identifier, renamed_arguments, state.source, hidden);
 
   if(!goto_function.body_available())
   {

@@ -193,7 +193,7 @@ void symex_target_equationt::location(
 }
 
 void symex_target_equationt::function_call(
-  const exprt &guard,
+  const guardt &guard,
   const irep_idt &function_id,
   const std::vector<renamedt<exprt, L2>> &function_arguments,
   const sourcet &source,
@@ -202,7 +202,7 @@ void symex_target_equationt::function_call(
   SSA_steps.emplace_back(source, goto_trace_stept::typet::FUNCTION_CALL);
   SSA_stept &SSA_step=SSA_steps.back();
 
-  SSA_step.guard = guardt{guard, guard_manager};
+  SSA_step.guard = guard;
   SSA_step.called_function = function_id;
   for(const auto &arg : function_arguments)
     SSA_step.ssa_function_arguments.emplace_back(arg.get());

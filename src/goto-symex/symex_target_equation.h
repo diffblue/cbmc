@@ -95,12 +95,12 @@ public:
     const sourcet &source);
 
   /// \copydoc symex_targett::function_call()
-  virtual void function_call(
-    const exprt &guard,
+  void function_call(
+    const guardt &guard,
     const irep_idt &function_id,
     const std::vector<renamedt<exprt, L2>> &ssa_function_arguments,
     const sourcet &source,
-    bool hidden);
+    bool hidden) override;
 
   /// \copydoc symex_targett::function_return()
   virtual void function_return(
