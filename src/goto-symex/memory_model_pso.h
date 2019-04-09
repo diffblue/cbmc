@@ -17,8 +17,8 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 class memory_model_psot:public memory_model_tsot
 {
 public:
-  explicit memory_model_psot(const namespacet &_ns):
-    memory_model_tsot(_ns)
+  memory_model_psot(const namespacet &_ns, guard_managert &guard_manager)
+    : memory_model_tsot(_ns, guard_manager), guard_manager(guard_manager)
   {
   }
 
@@ -28,6 +28,10 @@ protected:
   virtual bool program_order_is_relaxed(
     partial_order_concurrencyt::event_it e1,
     partial_order_concurrencyt::event_it e2) const;
+
+private:
+  /// Used to initialize guards in SSA steps
+  guard_managert &guard_manager;
 };
 
 #endif // CPROVER_GOTO_SYMEX_MEMORY_MODEL_PSO_H

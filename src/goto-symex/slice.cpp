@@ -53,7 +53,8 @@ void symex_slicet::slice(symex_target_equationt &equation)
 
 void symex_slicet::slice(SSA_stept &SSA_step)
 {
-  get_symbols(SSA_step.guard);
+  if(SSA_step.guard.has_value())
+    get_symbols(SSA_step.guard->as_expr());
 
   switch(SSA_step.type)
   {
@@ -152,7 +153,8 @@ void symex_slicet::collect_open_variables(
   {
     const SSA_stept &SSA_step = *it;
 
-    get_symbols(SSA_step.guard);
+    if(SSA_step.guard.has_value())
+      get_symbols(SSA_step.guard->as_expr());
 
     switch(SSA_step.type)
     {

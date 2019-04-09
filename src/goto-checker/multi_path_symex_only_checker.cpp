@@ -26,7 +26,7 @@ multi_path_symex_only_checkert::multi_path_symex_only_checkert(
   : incremental_goto_checkert(options, ui_message_handler),
     goto_model(goto_model),
     ns(goto_model.get_symbol_table(), symex_symbol_table),
-    equation(ui_message_handler),
+    equation(ui_message_handler, guard_manager),
     symex(
       ui_message_handler,
       goto_model.get_symbol_table(),
@@ -68,7 +68,8 @@ void multi_path_symex_only_checkert::generate_equation()
 {
   symex.symex_from_entry_point_of(
     goto_symext::get_goto_function(goto_model), symex_symbol_table);
-  postprocess_equation(symex, equation, options, ns, ui_message_handler);
+  postprocess_equation(
+    symex, equation, options, ns, ui_message_handler, guard_manager);
 }
 
 void multi_path_symex_only_checkert::update_properties(

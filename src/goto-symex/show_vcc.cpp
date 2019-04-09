@@ -67,7 +67,7 @@ show_vcc_plain(messaget::mstreamt &out, const symex_target_equationt &equation)
               << format(p_it->cond_expr) << '\n';
 
 #ifdef DEBUG
-          out << "GUARD: " << format(p_it->guard) << '\n';
+          out << "GUARD: " << format(p_it->guard->as_expr()) << '\n';
           out << '\n';
 #endif
 

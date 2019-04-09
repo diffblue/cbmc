@@ -38,8 +38,10 @@ class decision_proceduret;
 class symex_target_equationt:public symex_targett
 {
 public:
-  explicit symex_target_equationt(message_handlert &message_handler)
-    : log(message_handler)
+  symex_target_equationt(
+    message_handlert &message_handler,
+    guard_managert &guard_manager)
+    : log(message_handler), guard_manager(guard_manager)
   {
   }
 
@@ -285,6 +287,9 @@ protected:
 
   // for unique function call argument identifiers
   std::size_t argument_count = 0;
+
+private:
+  guard_managert &guard_manager;
 };
 
 inline bool operator<(

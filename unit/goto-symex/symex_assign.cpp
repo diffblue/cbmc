@@ -74,7 +74,7 @@ SCENARIO(
   {
     exprt::operandst guard;
     guard.push_back(g);
-    symex_target_equationt target_equation{null_message_handler};
+    symex_target_equationt target_equation{null_message_handler, manager};
 
     WHEN("Symbol `foo` is assigned constant integer `475`")
     {
@@ -92,7 +92,8 @@ SCENARIO(
         REQUIRE(step.type == goto_trace_stept::typet::ASSIGNMENT);
         REQUIRE(step.assignment_type == symex_targett::assignment_typet::STATE);
         REQUIRE(step.cond_expr == equal_exprt{step.ssa_lhs, step.ssa_rhs});
-        REQUIRE(step.guard == g);
+        REQUIRE(step.guard.has_value());
+        REQUIRE(step.guard->as_expr() == g);
 
         THEN("The left-hand-side of the equation is foo!0#1")
         {
@@ -132,7 +133,7 @@ SCENARIO(
     WHEN("foo is assigned without a guard")
     {
       const exprt rhs1 = from_integer(5721, int_type);
-      symex_target_equationt target_equation{null_message_handler};
+      symex_target_equationt target_equation{null_message_handler, manager};
       symex_assignt symex_assign{state,
                                  symex_targett::assignment_typet::STATE,
                                  ns,
@@ -143,7 +144,8 @@ SCENARIO(
       {
         REQUIRE(target_equation.SSA_steps.size() == 1);
         SSA_stept step = target_equation.SSA_steps.back();
-        REQUIRE(step.guard == true_exprt{});
+        REQUIRE(step.guard.has_value());
+        REQUIRE(step.guard->is_true());
       }
       THEN("The propagation map maps 'foo' to 5721")
       {
@@ -164,7 +166,8 @@ SCENARIO(
               step.assignment_type == symex_targett::assignment_typet::STATE);
             REQUIRE(step.cond_expr.id() == ID_equal);
             REQUIRE(step.cond_expr == equal_exprt{step.ssa_lhs, step.ssa_rhs});
-            REQUIRE(step.guard == true_exprt{});
+            REQUIRE(step.guard.has_value());
+            REQUIRE(step.guard->is_true());
 
             THEN("The left-hand-side of the equation is foo!0#2")
             {
@@ -210,7 +213,7 @@ SCENARIO(
     const ssa_exprt struct1_ssa{struct1_sym};
 
     exprt::operandst guard;
-    symex_target_equationt target_equation{null_message_handler};
+    symex_target_equationt target_equation{null_message_handler, manager};
 
     WHEN("Symbol `struct1` is assigned `struct1 with [field1 <- 234]`")
     {

@@ -18,7 +18,7 @@ void memory_model_tsot::operator()(symex_target_equationt &equation)
 {
   statistics() << "Adding TSO constraints" << eom;
 
-  build_event_lists(equation);
+  build_event_lists(equation, guard_manager);
   build_clock_type();
 
   read_from(equation);
@@ -117,13 +117,21 @@ void memory_model_tsot::program_order(
              !code.get_bool(ID_WWfence))
             continue;
 
-          if(code.get_bool(ID_RRfence) ||
-             code.get_bool(ID_WRfence))
-            mb_guard_r=or_exprt(mb_guard_r, (*e_it2)->guard);
+          if(
+            (code.get_bool(ID_RRfence) || code.get_bool(ID_WRfence)) &&
+            (*e_it2)->guard.has_value())
+          {
+            mb_guard_r =
+              or_exprt(std::move(mb_guard_r), (*e_it2)->guard->as_expr());
+          }
 
-          if(code.get_bool(ID_RWfence) ||
-             code.get_bool(ID_WWfence))
-            mb_guard_w=or_exprt(mb_guard_w, (*e_it2)->guard);
+          if(
+            (code.get_bool(ID_RWfence) || code.get_bool(ID_WWfence)) &&
+            (*e_it2)->guard.has_value())
+          {
+            mb_guard_w =
+              or_exprt(std::move(mb_guard_w), (*e_it2)->guard->as_expr());
+          }
 
           continue;
         }

@@ -9,6 +9,7 @@ Author: Romain Brenguier <romain.brenguier@diffblue.com>
 #ifndef CPROVER_GOTO_SYMEX_SSA_STEP_H
 #define CPROVER_GOTO_SYMEX_SSA_STEP_H
 
+#include <analyses/guard.h>
 #include <goto-programs/goto_trace.h>
 
 #include "symex_target.h"
@@ -134,7 +135,7 @@ public:
   // we may choose to hide
   bool hidden = false;
 
-  exprt guard;
+  optionalt<guardt> guard;
   exprt guard_handle;
 
   // for ASSIGNMENT and DECL
@@ -175,7 +176,6 @@ public:
     : source(_source),
       type(_type),
       hidden(false),
-      guard(static_cast<const exprt &>(get_nil_irep())),
       guard_handle(false_exprt()),
       ssa_lhs(static_cast<const ssa_exprt &>(get_nil_irep())),
       ssa_full_lhs(static_cast<const exprt &>(get_nil_irep())),
@@ -200,7 +200,7 @@ class SSA_assignment_stept : public SSA_stept
 public:
   SSA_assignment_stept(
     symex_targett::sourcet source,
-    exprt guard,
+    guardt guard,
     ssa_exprt ssa_lhs,
     exprt ssa_full_lhs,
     exprt original_full_lhs,

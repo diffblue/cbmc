@@ -29,7 +29,7 @@ void symex_target_equationt::shared_read(
   SSA_steps.emplace_back(source, goto_trace_stept::typet::SHARED_READ);
   SSA_stept &SSA_step=SSA_steps.back();
 
-  SSA_step.guard=guard;
+  SSA_step.guard = guardt{guard, guard_manager};
   SSA_step.ssa_lhs=ssa_object;
   SSA_step.atomic_section_id=atomic_section_id;
 
@@ -45,7 +45,7 @@ void symex_target_equationt::shared_write(
   SSA_steps.emplace_back(source, goto_trace_stept::typet::SHARED_WRITE);
   SSA_stept &SSA_step=SSA_steps.back();
 
-  SSA_step.guard=guard;
+  SSA_step.guard = guardt{guard, guard_manager};
   SSA_step.ssa_lhs=ssa_object;
   SSA_step.atomic_section_id=atomic_section_id;
 
@@ -59,7 +59,7 @@ void symex_target_equationt::spawn(
 {
   SSA_steps.emplace_back(source, goto_trace_stept::typet::SPAWN);
   SSA_stept &SSA_step=SSA_steps.back();
-  SSA_step.guard=guard;
+  SSA_step.guard = guardt{guard, guard_manager};
 
   merge_ireps(SSA_step);
 }
@@ -70,7 +70,7 @@ void symex_target_equationt::memory_barrier(
 {
   SSA_steps.emplace_back(source, goto_trace_stept::typet::MEMORY_BARRIER);
   SSA_stept &SSA_step=SSA_steps.back();
-  SSA_step.guard=guard;
+  SSA_step.guard = guardt{guard, guard_manager};
 
   merge_ireps(SSA_step);
 }
@@ -83,7 +83,7 @@ void symex_target_equationt::atomic_begin(
 {
   SSA_steps.emplace_back(source, goto_trace_stept::typet::ATOMIC_BEGIN);
   SSA_stept &SSA_step=SSA_steps.back();
-  SSA_step.guard=guard;
+  SSA_step.guard = guardt{guard, guard_manager};
   SSA_step.atomic_section_id=atomic_section_id;
 
   merge_ireps(SSA_step);
@@ -97,7 +97,7 @@ void symex_target_equationt::atomic_end(
 {
   SSA_steps.emplace_back(source, goto_trace_stept::typet::ATOMIC_END);
   SSA_stept &SSA_step=SSA_steps.back();
-  SSA_step.guard=guard;
+  SSA_step.guard = guardt{guard, guard_manager};
   SSA_step.atomic_section_id=atomic_section_id;
 
   merge_ireps(SSA_step);
@@ -115,7 +115,7 @@ void symex_target_equationt::assignment(
   PRECONDITION(ssa_lhs.is_not_nil());
 
   SSA_steps.emplace_back(SSA_assignment_stept{source,
-                                              guard,
+                                              guardt{guard, guard_manager},
                                               ssa_lhs,
                                               ssa_full_lhs,
                                               original_full_lhs,
@@ -137,7 +137,7 @@ void symex_target_equationt::decl(
   SSA_steps.emplace_back(source, goto_trace_stept::typet::DECL);
   SSA_stept &SSA_step=SSA_steps.back();
 
-  SSA_step.guard=guard;
+  SSA_step.guard = guardt{guard, guard_manager};
   SSA_step.ssa_lhs=ssa_lhs;
   SSA_step.ssa_full_lhs = initializer;
   SSA_step.original_full_lhs=ssa_lhs.get_original_expr();
@@ -166,7 +166,7 @@ void symex_target_equationt::location(
   SSA_steps.emplace_back(source, goto_trace_stept::typet::LOCATION);
   SSA_stept &SSA_step=SSA_steps.back();
 
-  SSA_step.guard=guard;
+  SSA_step.guard = guardt{guard, guard_manager};
 
   merge_ireps(SSA_step);
 }
@@ -181,7 +181,7 @@ void symex_target_equationt::function_call(
   SSA_steps.emplace_back(source, goto_trace_stept::typet::FUNCTION_CALL);
   SSA_stept &SSA_step=SSA_steps.back();
 
-  SSA_step.guard = guard;
+  SSA_step.guard = guardt{guard, guard_manager};
   SSA_step.called_function = function_id;
   for(const auto &arg : function_arguments)
     SSA_step.ssa_function_arguments.emplace_back(arg.get());
@@ -199,7 +199,7 @@ void symex_target_equationt::function_return(
   SSA_steps.emplace_back(source, goto_trace_stept::typet::FUNCTION_RETURN);
   SSA_stept &SSA_step=SSA_steps.back();
 
-  SSA_step.guard = guard;
+  SSA_step.guard = guardt{guard, guard_manager};
   SSA_step.called_function = function_id;
   SSA_step.hidden = hidden;
 
@@ -215,7 +215,7 @@ void symex_target_equationt::output(
   SSA_steps.emplace_back(source, goto_trace_stept::typet::OUTPUT);
   SSA_stept &SSA_step=SSA_steps.back();
 
-  SSA_step.guard=guard;
+  SSA_step.guard = guardt{guard, guard_manager};
   for(const auto &arg : args)
     SSA_step.io_args.emplace_back(arg.get());
   SSA_step.io_id=output_id;
@@ -233,7 +233,7 @@ void symex_target_equationt::output_fmt(
   SSA_steps.emplace_back(source, goto_trace_stept::typet::OUTPUT);
   SSA_stept &SSA_step=SSA_steps.back();
 
-  SSA_step.guard=guard;
+  SSA_step.guard = guardt{guard, guard_manager};
   SSA_step.io_args=args;
   SSA_step.io_id=output_id;
   SSA_step.formatted=true;
@@ -251,7 +251,7 @@ void symex_target_equationt::input(
   SSA_steps.emplace_back(source, goto_trace_stept::typet::INPUT);
   SSA_stept &SSA_step=SSA_steps.back();
 
-  SSA_step.guard=guard;
+  SSA_step.guard = guardt{guard, guard_manager};
   SSA_step.io_args=args;
   SSA_step.io_id=input_id;
 
@@ -266,7 +266,7 @@ void symex_target_equationt::assumption(
   SSA_steps.emplace_back(source, goto_trace_stept::typet::ASSUME);
   SSA_stept &SSA_step=SSA_steps.back();
 
-  SSA_step.guard=guard;
+  SSA_step.guard = guardt{guard, guard_manager};
   SSA_step.cond_expr=cond;
 
   merge_ireps(SSA_step);
@@ -281,7 +281,7 @@ void symex_target_equationt::assertion(
   SSA_steps.emplace_back(source, goto_trace_stept::typet::ASSERT);
   SSA_stept &SSA_step=SSA_steps.back();
 
-  SSA_step.guard=guard;
+  SSA_step.guard = guardt{guard, guard_manager};
   SSA_step.cond_expr=cond;
   SSA_step.comment=msg;
 
@@ -296,7 +296,7 @@ void symex_target_equationt::goto_instruction(
   SSA_steps.emplace_back(source, goto_trace_stept::typet::GOTO);
   SSA_stept &SSA_step=SSA_steps.back();
 
-  SSA_step.guard=guard;
+  SSA_step.guard = guardt{guard, guard_manager};
   SSA_step.cond_expr = cond.get();
 
   merge_ireps(SSA_step);
@@ -311,7 +311,7 @@ void symex_target_equationt::constraint(
   SSA_steps.emplace_back(source, goto_trace_stept::typet::CONSTRAINT);
   SSA_stept &SSA_step=SSA_steps.back();
 
-  SSA_step.guard=true_exprt();
+  SSA_step.guard = guardt{true_exprt{}, guard_manager};
   SSA_step.cond_expr=cond;
   SSA_step.comment=msg;
 
@@ -378,7 +378,9 @@ void symex_target_equationt::convert_guards(
         mstream << messaget::eom;
       });
 
-      step.guard_handle = decision_procedure.handle(step.guard);
+      step.guard_handle = step.guard.has_value()
+                            ? decision_procedure.handle(step.guard->as_expr())
+                            : false_exprt{};
     }
   }
 }
@@ -587,8 +589,6 @@ void symex_target_equationt::convert_io(
 /// \param SSA_step The step you want to have shared values.
 void symex_target_equationt::merge_ireps(SSA_stept &SSA_step)
 {
-  merge_irep(SSA_step.guard);
-
   merge_irep(SSA_step.ssa_lhs);
   merge_irep(SSA_step.ssa_full_lhs);
   merge_irep(SSA_step.original_full_lhs);

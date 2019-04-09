@@ -409,7 +409,7 @@ void _check_with_strategy(
 
   {
     // Put initial state into the work list
-    symex_target_equationt equation(ui_message_handler);
+    symex_target_equationt equation(ui_message_handler, guard_manager);
     symex_bmct symex(
       ui_message_handler,
       goto_model.get_symbol_table(),
@@ -445,7 +445,7 @@ void _check_with_strategy(
       &resume.equation,
       symex_symbol_table);
     postprocess_equation(
-      symex, resume.equation, options, ns, ui_message_handler);
+      symex, resume.equation, options, ns, ui_message_handler, guard_manager);
 
     incremental_goto_checkert::resultt result(
       incremental_goto_checkert::resultt::progresst::DONE);

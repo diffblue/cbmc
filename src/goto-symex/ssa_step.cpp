@@ -119,7 +119,8 @@ void SSA_stept::output(std::ostream &out) const
   if(is_shared_read() || is_shared_write())
     out << format(ssa_lhs) << '\n';
 
-  out << "Guard: " << format(guard) << '\n';
+  if(guard.has_value())
+    out << "Guard: " << format(guard->as_expr()) << '\n';
 }
 
 /// Check that the SSA step is well-formed
@@ -127,7 +128,8 @@ void SSA_stept::output(std::ostream &out) const
 /// \param vm: validation mode to be used for reporting failures
 void SSA_stept::validate(const namespacet &ns, const validation_modet vm) const
 {
-  validate_full_expr(guard, ns, vm);
+  if(guard.has_value())
+    validate_full_expr(guard->as_expr(), ns, vm);
 
   switch(type)
   {
@@ -216,7 +218,7 @@ irep_idt SSA_stept::get_property_id() const
 
 SSA_assignment_stept::SSA_assignment_stept(
   symex_targett::sourcet source,
-  exprt _guard,
+  guardt _guard,
   ssa_exprt _ssa_lhs,
   exprt _ssa_full_lhs,
   exprt _original_full_lhs,
