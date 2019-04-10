@@ -22,15 +22,15 @@ Author: Daniel Kroening, kroening@kroening.com
 class functionst
 {
 public:
-  explicit functionst(prop_convt &_prop_conv):
-    prop_conv(_prop_conv) { }
+  explicit functionst(prop_convt &_prop_conv) : prop_conv(_prop_conv)
+  {
+  }
 
   virtual ~functionst()
   {
   }
 
-  void record(
-    const function_application_exprt &function_application);
+  void record(const function_application_exprt &function_application);
 
   virtual void post_process()
   {
@@ -53,8 +53,7 @@ protected:
   virtual void add_function_constraints();
   virtual void add_function_constraints(const function_infot &info);
 
-  exprt arguments_equal(const exprt::operandst &o1,
-                        const exprt::operandst &o2);
+  exprt arguments_equal(const exprt::operandst &o1, const exprt::operandst &o2);
 };
 
 #endif // CPROVER_SOLVERS_LOWERING_FUNCTIONS_H
