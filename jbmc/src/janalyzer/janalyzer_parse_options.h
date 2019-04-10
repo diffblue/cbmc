@@ -150,7 +150,7 @@ class optionst;
   JAVA_BYTECODE_LANGUAGE_OPTIONS
 // clang-format on
 
-class janalyzer_parse_optionst : public parse_options_baset, public messaget
+class janalyzer_parse_optionst : public parse_options_baset
 {
 public:
   virtual int doit() override;
