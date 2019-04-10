@@ -19,10 +19,8 @@ void functionst::record(const function_application_exprt &function_application)
 
 void functionst::add_function_constraints()
 {
-  for(function_mapt::const_iterator it = function_map.begin();
-      it != function_map.end();
-      it++)
-    add_function_constraints(it->second);
+  for(const auto &function : function_map)
+    add_function_constraints(function.second);
 }
 
 exprt functionst::arguments_equal(
