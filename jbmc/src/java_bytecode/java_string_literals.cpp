@@ -55,14 +55,6 @@ static array_exprt utf16_to_array(const std::wstring &in)
   return ret;
 }
 
-/// Creates or gets an existing constant global symbol for a given string
-/// literal.
-/// \param string_expr: string literal expression to convert
-/// \param symbol_table: global symbol table. If not already present, constant
-///   global symbols will be added.
-/// \param string_refinement_enabled: if true, string refinement's string data
-///   structure will also be initialised and added to the symbol table.
-/// \return a symbol_expr corresponding to the new or existing literal symbol.
 symbol_exprt get_or_create_string_literal_symbol(
   const exprt &string_expr,
   symbol_table_baset &symbol_table,
