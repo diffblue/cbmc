@@ -148,11 +148,28 @@ void java_simple_method_stubst::create_method_stub_at(
 void java_simple_method_stubst::create_method_stub(symbolt &symbol)
 {
   code_blockt new_instructions;
-  const java_method_typet &required_type = to_java_method_type(symbol.type);
+  java_method_typet &required_type = to_java_method_type(symbol.type);
 
   // synthetic source location that contains the opaque function name only
   source_locationt synthesized_source_location;
   synthesized_source_location.set_function(symbol.name);
+
+  // make sure all parameters are named
+  for(auto &parameter : required_type.parameters())
+  {
+    if(parameter.get_identifier().empty())
+    {
+      symbolt &parameter_symbol = fresh_java_symbol(
+        parameter.type(),
+        "#anon",
+        synthesized_source_location,
+        symbol.name,
+        symbol_table);
+      parameter_symbol.is_parameter = true;
+      parameter.set_base_name(parameter_symbol.base_name);
+      parameter.set_identifier(parameter_symbol.name);
+    }
+  }
 
   // Initialize the return value or `this` parameter under construction.
   // Note symbol.type is required_type, but with write access

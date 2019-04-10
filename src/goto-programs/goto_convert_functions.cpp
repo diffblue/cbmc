@@ -159,6 +159,15 @@ void goto_convert_functionst::convert_function(
      symbol.is_compiled()) /* goto_inline may have removed the body */
     return;
 
+  // we have a body, make sure all parameter names are valid
+  for(const auto &p : f.parameter_identifiers)
+  {
+    DATA_INVARIANT(!p.empty(), "parameter identifier should not be empty");
+    DATA_INVARIANT(
+      symbol_table.has_symbol(p),
+      "parameter identifier must be a known symbol");
+  }
+
   lifetimet parent_lifetime = lifetime;
   lifetime = identifier == INITIALIZE_FUNCTION ? lifetimet::STATIC_GLOBAL
                                                : lifetimet::AUTOMATIC_LOCAL;
