@@ -53,7 +53,7 @@ literalt boolbvt::convert_equality(const equal_exprt &expr)
   {
     // An empty bit-vector comparison. It's not clear
     // what this is meant to say.
-    return prop.new_variable();
+    return propositional.new_variable();
   }
 
   return bv_utils.equal(lhs_bv, rhs_bv);

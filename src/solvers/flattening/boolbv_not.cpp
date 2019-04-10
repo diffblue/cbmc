@@ -32,7 +32,7 @@ bvt boolbvt::convert_not(const not_exprt &expr)
       bv.resize(2);
 
       // this returns 'x' for 'z'
-      bv[0]=prop.lselect(has_x_or_z, const_literal(false), normal_bits_zero);
+      bv[0]=propositional.lselect(has_x_or_z, const_literal(false), normal_bits_zero);
       bv[1]=has_x_or_z;
 
       return bv;

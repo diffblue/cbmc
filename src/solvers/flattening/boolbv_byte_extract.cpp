@@ -131,7 +131,7 @@ bvt boolbvt::convert_byte_extract(const byte_extract_exprt &expr)
     for(std::size_t i=0; i<width; i++)
       // out of bounds?
       if(offset + i < 0 || offset + i >= op_bv.size())
-        bv[i]=prop.new_variable();
+        bv[i]=propositional.new_variable();
       else
         bv[i] = op_bv[numeric_cast_v<std::size_t>(offset) + i];
   }
@@ -139,11 +139,11 @@ bvt boolbvt::convert_byte_extract(const byte_extract_exprt &expr)
   {
     std::size_t bytes=op_bv.size()/byte_width;
 
-    if(prop.has_set_to())
+    if(propositional.has_set_to())
     {
       // free variables
       for(std::size_t i=0; i<width; i++)
-        bv[i]=prop.new_variable();
+        bv[i]=propositional.new_variable();
 
       // add implications
 
@@ -159,13 +159,13 @@ bvt boolbvt::convert_byte_extract(const byte_extract_exprt &expr)
 
         for(std::size_t j=0; j<width; j++)
           if(offset+j<op_bv.size())
-            equal_bv[j]=prop.lequal(bv[j], op_bv[offset+j]);
+            equal_bv[j]=propositional.lequal(bv[j], op_bv[offset+j]);
           else
             equal_bv[j]=const_literal(true);
 
-        prop.l_set_to_true(prop.limplies(
+        propositional.l_set_to_true(propositional.limplies(
           convert(equal_exprt(expr.offset(), from_integer(i, constant_type))),
-          prop.land(equal_bv)));
+          propositional.land(equal_bv)));
       }
     }
     else
@@ -192,7 +192,7 @@ bvt boolbvt::convert_byte_extract(const byte_extract_exprt &expr)
           if(i==0)
             bv[j]=l;
           else
-            bv[j]=prop.lselect(e, l, bv[j]);
+            bv[j]=propositional.lselect(e, l, bv[j]);
         }
       }
     }

@@ -20,7 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/irep_hash_container.h>
 #endif
 
-#include <solvers/prop/prop_conv.h>
+#include <solvers/propositional/propositional_conversion.h>
 #include <solvers/flattening/boolbv_width.h>
 #include <solvers/flattening/pointer_logic.h>
 

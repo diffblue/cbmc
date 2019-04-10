@@ -163,7 +163,7 @@ static void interrupt_solver(int signum)
 #endif
 
 template <typename T>
-propt::resultt satcheck_minisat2_baset<T>::do_prop_solve()
+propositionalt::resultt satcheck_minisat2_baset<T>::do_prop_solve()
 {
   PRECONDITION(status != statust::ERROR);
 

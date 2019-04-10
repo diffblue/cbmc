@@ -17,7 +17,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <memory>
 
 #include <solvers/bdd/bdd.h>
-#include <solvers/prop/bdd_expr.h>
+#include <solvers/propositional/bdd_expr.h>
 #include <util/make_unique.h>
 #include <util/std_expr.h>
 

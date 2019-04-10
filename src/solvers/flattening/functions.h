@@ -17,13 +17,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/mathematical_expr.h>
 
-#include <solvers/prop/prop_conv.h>
+#include <solvers/propositional/propositional_conversion.h>
 
 class functionst
 {
 public:
-  explicit functionst(prop_convt &_prop_conv):
-    prop_conv(_prop_conv) { }
+  explicit functionst(propositional_conversiont &_propositional_conversion):
+    propositional_conversion(_propositional_conversion) { }
 
   virtual ~functionst()
   {
@@ -38,7 +38,7 @@ public:
   }
 
 protected:
-  prop_convt &prop_conv;
+  propositional_conversiont &propositional_conversion;
 
   typedef std::set<function_application_exprt> applicationst;
 

@@ -34,14 +34,14 @@ class boolbvt:public arrayst
 public:
   boolbvt(
     const namespacet &_ns,
-    propt &_prop,
+    propositionalt &_propositional,
     message_handlert &message_handler)
-    : arrayst(_ns, _prop, message_handler),
+    : arrayst(_ns, _propositional, message_handler),
       unbounded_array(unbounded_arrayt::U_NONE),
       boolbv_width(_ns),
-      bv_utils(_prop),
+      bv_utils(_propositional),
       functions(*this),
-      map(_prop, boolbv_width)
+      map(_propositional, boolbv_width)
   {
   }
 

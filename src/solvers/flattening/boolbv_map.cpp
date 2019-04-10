@@ -10,7 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/threeval.h>
 
-#include <solvers/prop/prop.h>
+#include <solvers/propositional/propositional.h>
 
 #include "boolbv_width.h"
 
@@ -18,7 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 #endif
 
-std::string boolbv_mapt::map_entryt::get_value(const propt &prop) const
+std::string boolbv_mapt::map_entryt::get_value(const propositionalt &propositional) const
 {
   std::string result;
 
@@ -30,7 +30,7 @@ std::string boolbv_mapt::map_entryt::get_value(const propt &prop) const
 
     if(literal_map[i].is_set)
     {
-      tvt value=prop.l_get(literal_map[i].l);
+      tvt value=propositional.l_get(literal_map[i].l);
 
       if(value.is_true())
         ch='1';
@@ -108,7 +108,7 @@ void boolbv_mapt::get_literals(
       continue;
     }
 
-    l=prop.new_variable();
+    l=propositional.new_variable();
 
     mb.is_set=true;
     mb.l=l;
@@ -132,7 +132,7 @@ void boolbv_mapt::set_literals(
     const literalt &literal=*it;
 
     INVARIANT(
-      literal.is_constant() || literal.var_no() < prop.no_variables(),
+      literal.is_constant() || literal.var_no() < propositional.no_variables(),
       "variable number of non-constant literals shall be within bounds");
 
     const std::size_t bit = it - literals.begin();
@@ -143,7 +143,7 @@ void boolbv_mapt::set_literals(
 
     if(mb.is_set)
     {
-      prop.set_equal(mb.l, literal);
+      propositional.set_equal(mb.l, literal);
       continue;
     }
 

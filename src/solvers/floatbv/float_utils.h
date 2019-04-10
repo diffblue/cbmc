@@ -65,16 +65,16 @@ public:
 
   rounding_mode_bitst rounding_mode_bits;
 
-  explicit float_utilst(propt &_prop):
-    prop(_prop),
-    bv_utils(_prop)
+  explicit float_utilst(propositionalt &_propositional):
+    propositional(_propositional),
+    bv_utils(_propositional)
   {
   }
 
-  float_utilst(propt &_prop, const floatbv_typet &type):
+  float_utilst(propositionalt &_propositional, const floatbv_typet &type):
     spec(ieee_float_spect(type)),
-    prop(_prop),
-    bv_utils(_prop)
+    propositional(_propositional),
+    bv_utils(_propositional)
   {
   }
 
@@ -150,7 +150,7 @@ public:
   bvt debug2(const bvt &op0, const bvt &op1);
 
 protected:
-  propt &prop;
+  propositionalt &propositional;
   bv_utilst bv_utils;
 
   // unpacked

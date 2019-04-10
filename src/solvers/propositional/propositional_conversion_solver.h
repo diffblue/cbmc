@@ -19,19 +19,19 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "decision_procedure.h"
 #include "literal.h"
 #include "literal_expr.h"
-#include "prop.h"
-#include "prop_conv.h"
+#include "propositional.h"
+#include "propositional_conversion.h"
 #include "solver_resource_limits.h"
 
-class prop_conv_solvert : public prop_convt, public solver_resource_limitst
+class propositional_conversion_solvert : public propositional_conversiont, public solver_resource_limitst
 {
 public:
-  prop_conv_solvert(propt &_prop, message_handlert &message_handler)
-    : prop(_prop), log(message_handler)
+  propositional_conversion_solvert(propositionalt &_propositional, message_handlert &message_handler)
+    : propositional(_propositional), log(message_handler)
   {
   }
 
-  virtual ~prop_conv_solvert() = default;
+  virtual ~propositional_conversion_solvert() = default;
 
   // overloading from decision_proceduret
   void set_to(const exprt &expr, bool value) override;
@@ -43,23 +43,23 @@ public:
   }
   exprt get(const exprt &expr) const override;
 
-  // overloading from prop_convt
-  using prop_convt::set_frozen;
+  // overloading from propositional_conversiont
+  using propositional_conversiont::set_frozen;
   tvt l_get(literalt a) const override
   {
-    return prop.l_get(a);
+    return propositional.l_get(a);
   }
   void set_frozen(literalt a) override
   {
-    prop.set_frozen(a);
+    propositional.set_frozen(a);
   }
   void set_assumptions(const bvt &_assumptions) override
   {
-    prop.set_assumptions(_assumptions);
+    propositional.set_assumptions(_assumptions);
   }
   bool has_set_assumptions() const override
   {
-    return prop.has_set_assumptions();
+    return propositional.has_set_assumptions();
   }
   void set_all_frozen() override
   {
@@ -68,11 +68,11 @@ public:
   literalt convert(const exprt &expr) override;
   bool is_in_conflict(literalt l) const override
   {
-    return prop.is_in_conflict(l);
+    return propositional.is_in_conflict(l);
   }
   bool has_is_in_conflict() const override
   {
-    return prop.has_is_in_conflict();
+    return propositional.has_is_in_conflict();
   }
 
   // get literal for expression, if available
@@ -101,7 +101,7 @@ public:
 
   void set_time_limit_seconds(uint32_t lim) override
   {
-    prop.set_time_limit_seconds(lim);
+    propositional.set_time_limit_seconds(lim);
   }
 
   std::size_t get_number_of_solver_calls() const override;
@@ -130,7 +130,7 @@ protected:
   virtual void ignoring(const exprt &expr);
 
   // deliberately protected now to protect lower-level API
-  propt &prop;
+  propositionalt &propositional;
 
   messaget log;
 };

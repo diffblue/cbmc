@@ -15,10 +15,10 @@ Author: Daniel Kroening, kroening@kroening.com
 // API that provides a "handle" in the form of a literalt
 // for expressions.
 
-class prop_convt:public decision_proceduret
+class propositional_conversiont:public decision_proceduret
 {
 public:
-  virtual ~prop_convt() { }
+  virtual ~propositional_conversiont() { }
 
   using decision_proceduret::operator();
 

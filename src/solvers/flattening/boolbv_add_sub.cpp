@@ -107,7 +107,7 @@ bvt boolbvt::convert_add_sub(const exprt &expr)
         if(type.subtype().id()==ID_floatbv)
         {
           // needs to change due to rounding mode
-          float_utilst float_utils(prop, to_floatbv_type(type.subtype()));
+          float_utilst float_utils(propositional, to_floatbv_type(type.subtype()));
           tmp_result=float_utils.add_sub(tmp_result, tmp_op, subtract);
         }
         else
@@ -128,7 +128,7 @@ bvt boolbvt::convert_add_sub(const exprt &expr)
     else if(type.id()==ID_floatbv)
     {
       // needs to change due to rounding mode
-      float_utilst float_utils(prop, to_floatbv_type(arithmetic_type));
+      float_utilst float_utils(propositional, to_floatbv_type(arithmetic_type));
       bv=float_utils.add_sub(bv, op, subtract);
     }
     else if(no_overflow)

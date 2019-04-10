@@ -26,7 +26,7 @@ bvt boolbvt::convert_case(const exprt &expr)
 
   // make it free variables
   Forall_literals(it, bv)
-    *it=prop.new_variable();
+    *it=propositional.new_variable();
 
   DATA_INVARIANT(
     operands.size() >= 3, "case should have at least three operands");
@@ -58,9 +58,9 @@ bvt boolbvt::convert_case(const exprt &expr)
           "\noperand: " + std::to_string(op.size()) + '\n' + it->pretty());
 
       compare_literal=bv_utils.equal(compare_bv, op);
-      compare_literal=prop.land(!previous_compare, compare_literal);
+      compare_literal=propositional.land(!previous_compare, compare_literal);
 
-      previous_compare=prop.lor(previous_compare, compare_literal);
+      previous_compare=propositional.lor(previous_compare, compare_literal);
 
       what=VALUE;
       break;
@@ -75,8 +75,8 @@ bvt boolbvt::convert_case(const exprt &expr)
       {
         literalt value_literal=bv_utils.equal(bv, op);
 
-        prop.l_set_to_true(
-          prop.limplies(compare_literal, value_literal));
+        propositional.l_set_to_true(
+          propositional.limplies(compare_literal, value_literal));
       }
 
       what=COMPARE;

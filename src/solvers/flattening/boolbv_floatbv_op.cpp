@@ -36,7 +36,7 @@ bvt boolbvt::convert_floatbv_typecast(const floatbv_typecast_exprt &expr)
       typecast_exprt(op0, src_type.subtype()), op1, dest_type));
   }
 
-  float_utilst float_utils(prop);
+  float_utilst float_utils(propositional);
 
   float_utils.set_rounding_mode(convert_bv(op1));
 
@@ -99,7 +99,7 @@ bvt boolbvt::convert_floatbv_op(const exprt &expr)
     "both operands of a floating point operator must match the expression type",
     irep_pretty_diagnosticst{expr});
 
-  float_utilst float_utils(prop);
+  float_utilst float_utils(propositional);
 
   float_utils.set_rounding_mode(rounding_mode_as_bv);
 

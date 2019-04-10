@@ -40,7 +40,7 @@ bool boolbvt::literal(
       bit == 0,
       "boolean expressions shall be represented by a single bit and hence the "
       "only valid bit index is 0");
-    return prop_conv_solvert::literal(to_symbol_expr(expr), dest);
+    return propositional_conversion_solvert::literal(to_symbol_expr(expr), dest);
   }
   else
   {
@@ -143,7 +143,7 @@ boolbvt::convert_bv(const exprt &expr, optionalt<std::size_t> expected_width)
   forall_literals(it, cache_result.first->second)
   {
     if(freeze_all && !it->is_constant())
-      prop.set_frozen(*it);
+      propositional.set_frozen(*it);
 
     INVARIANT_WITH_DIAGNOSTICS(
       it->var_no() != literalt::unused_var_no(),
@@ -163,7 +163,7 @@ bvt boolbvt::conversion_failed(const exprt &expr)
 
   // try to make it free bits
   std::size_t width=boolbv_width(expr.type());
-  return prop.new_variables(width);
+  return propositional.new_variables(width);
 }
 
 /// Converts an expression into its gate-level representation and returns a
@@ -411,7 +411,7 @@ bvt boolbvt::convert_symbol(const exprt &expr)
         bv.begin(),
         bv.end(),
         [this](const literalt &l) {
-          return l.var_no() < prop.no_variables() || l.is_constant();
+          return l.var_no() < propositional.no_variables() || l.is_constant();
         }),
       "variable number of non-constant literals should be within bounds",
       id2string(identifier));
@@ -428,7 +428,7 @@ bvt boolbvt::convert_function_application(
   functions.record(expr);
 
   // make it free bits
-  return prop.new_variables(boolbv_width(expr.type()));
+  return propositional.new_variables(boolbv_width(expr.type()));
 }
 
 
@@ -520,7 +520,7 @@ literalt boolbvt::convert_rest(const exprt &expr)
 
     if(expr.op0().type().id()==ID_floatbv)
     {
-      float_utilst float_utils(prop, to_floatbv_type(expr.op0().type()));
+      float_utilst float_utils(propositional, to_floatbv_type(expr.op0().type()));
       return float_utils.is_NaN(bv);
     }
     else if(expr.op0().type().id() == ID_fixedbv)
@@ -532,8 +532,8 @@ literalt boolbvt::convert_rest(const exprt &expr)
     const bvt &bv=convert_bv(operands[0]);
     if(expr.op0().type().id()==ID_floatbv)
     {
-      float_utilst float_utils(prop, to_floatbv_type(expr.op0().type()));
-      return prop.land(
+      float_utilst float_utils(propositional, to_floatbv_type(expr.op0().type()));
+      return propositional.land(
         !float_utils.is_infinity(bv),
         !float_utils.is_NaN(bv));
     }
@@ -546,7 +546,7 @@ literalt boolbvt::convert_rest(const exprt &expr)
     const bvt &bv=convert_bv(operands[0]);
     if(expr.op0().type().id()==ID_floatbv)
     {
-      float_utilst float_utils(prop, to_floatbv_type(expr.op0().type()));
+      float_utilst float_utils(propositional, to_floatbv_type(expr.op0().type()));
       return float_utils.is_infinity(bv);
     }
     else if(expr.op0().type().id() == ID_fixedbv)
@@ -558,7 +558,7 @@ literalt boolbvt::convert_rest(const exprt &expr)
     if(expr.op0().type().id()==ID_floatbv)
     {
       const bvt &bv = convert_bv(operands[0]);
-      float_utilst float_utils(prop, to_floatbv_type(expr.op0().type()));
+      float_utilst float_utils(propositional, to_floatbv_type(expr.op0().type()));
       return float_utils.is_normal(bv);
     }
     else if(expr.op0().type().id() == ID_fixedbv)
@@ -626,7 +626,7 @@ exprt boolbvt::make_free_bv_expr(const typet &type)
   PRECONDITION(width != 0);
   bvt bv(width);
   for(auto &lit : bv)
-    lit = prop.new_variable();
+    lit = propositional.new_variable();
   return make_bv_expr(type, bv);
 }
 
@@ -655,7 +655,7 @@ void boolbvt::print_assignment(std::ostream &out) const
 {
   arrayst::print_assignment(out);
   for(const auto &pair : map.mapping)
-    out << pair.first << "=" << pair.second.get_value(prop) << '\n';
+    out << pair.first << "=" << pair.second.get_value(propositional) << '\n';
 }
 
 boolbvt::offset_mapt boolbvt::build_offset_map(const struct_typet &src)

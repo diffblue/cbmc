@@ -10,7 +10,7 @@ Author: Romain Brenguier <romain.brenguier@diffblue.com>
 #define CPROVER_GOTO_SYMEX_SSA_STEP_H
 
 #include <goto-programs/goto_trace.h>
-#include <solvers/prop/literal.h>
+#include <solvers/propositional/literal.h>
 
 #include "symex_target.h"
 

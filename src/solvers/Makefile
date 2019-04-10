@@ -142,14 +142,14 @@ SRC = $(BOOLEFORCE_SRC) \
       lowering/byte_operators.cpp \
       lowering/popcount.cpp \
       bdd/miniBDD/miniBDD.cpp \
-      prop/bdd_expr.cpp \
-      prop/cover_goals.cpp \
-      prop/decision_procedure.cpp \
-      prop/literal.cpp \
-      prop/prop_minimize.cpp \
-      prop/prop.cpp \
-      prop/prop_conv.cpp \
-      prop/prop_conv_solver.cpp \
+      propositional/bdd_expr.cpp \
+      propositional/cover_goals.cpp \
+      propositional/decision_procedure.cpp \
+      propositional/literal.cpp \
+      propositional/propositional_minimize.cpp \
+      propositional/propositional.cpp \
+      propositional/propositional_conversion.cpp \
+      propositional/propositional_conversion_solver.cpp \
       qbf/qbf_quantor.cpp \
       qbf/qbf_qube.cpp \
       qbf/qbf_qube_core.cpp \

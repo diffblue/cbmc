@@ -31,7 +31,7 @@ class arrayst:public equalityt
 public:
   arrayst(
     const namespacet &_ns,
-    propt &_prop,
+    propositionalt &_propositional,
     message_handlert &message_handler);
 
   void post_process() override

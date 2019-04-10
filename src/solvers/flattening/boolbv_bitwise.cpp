@@ -41,17 +41,17 @@ bvt boolbvt::convert_bitwise(const exprt &expr)
         for(std::size_t i=0; i<width; i++)
         {
           if(expr.id()==ID_bitand)
-            bv[i]=prop.land(bv[i], op[i]);
+            bv[i]=propositional.land(bv[i], op[i]);
           else if(expr.id()==ID_bitor)
-            bv[i]=prop.lor(bv[i], op[i]);
+            bv[i]=propositional.lor(bv[i], op[i]);
           else if(expr.id()==ID_bitxor)
-            bv[i]=prop.lxor(bv[i], op[i]);
+            bv[i]=propositional.lxor(bv[i], op[i]);
           else if(expr.id()==ID_bitnand)
-            bv[i]=prop.lnand(bv[i], op[i]);
+            bv[i]=propositional.lnand(bv[i], op[i]);
           else if(expr.id()==ID_bitnor)
-            bv[i]=prop.lnor(bv[i], op[i]);
+            bv[i]=propositional.lnor(bv[i], op[i]);
           else if(expr.id()==ID_bitxnor)
-            bv[i]=prop.lequal(bv[i], op[i]);
+            bv[i]=propositional.lequal(bv[i], op[i]);
           else
             UNIMPLEMENTED;
         }

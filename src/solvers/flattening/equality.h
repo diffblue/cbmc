@@ -14,13 +14,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/expr.h>
 
-#include <solvers/prop/prop_conv_solver.h>
+#include <solvers/propositional/propositional_conversion_solver.h>
 
-class equalityt:public prop_conv_solvert
+class equalityt:public propositional_conversion_solvert
 {
 public:
-  equalityt(propt &_prop, message_handlert &message_handler)
-    : prop_conv_solvert(_prop, message_handler)
+  equalityt(propositionalt &_propositional, message_handlert &message_handler)
+    : propositional_conversion_solvert(_propositional, message_handler)
   {
   }
 
@@ -29,7 +29,7 @@ public:
   void post_process() override
   {
     add_equality_constraints();
-    prop_conv_solvert::post_process();
+    propositional_conversion_solvert::post_process();
     typemap.clear(); // if called incrementally, don't do it twice
   }
 

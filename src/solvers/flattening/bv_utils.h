@@ -15,7 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/mp_arith.h>
 
-#include <solvers/prop/prop.h>
+#include <solvers/propositional/propositional.h>
 
 // Shares variables between var == const tests for registered variables.
 // Gives ~15% memory savings on some programs using constant arrays
@@ -26,7 +26,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class bv_utilst
 {
 public:
-  explicit bv_utilst(propt &_prop):prop(_prop) { }
+  explicit bv_utilst(propositionalt &_propositional):propositional(_propositional) { }
 
   enum class representationt { SIGNED, UNSIGNED };
 
@@ -139,10 +139,10 @@ public:
   }
 
   literalt is_zero(const bvt &op)
-  { return !prop.lor(op); }
+  { return !propositional.lor(op); }
 
   literalt is_not_zero(const bvt &op)
-  { return prop.lor(op); }
+  { return propositional.lor(op); }
 
   literalt is_int_min(const bvt &op)
   {
@@ -154,7 +154,7 @@ public:
   literalt is_one(const bvt &op);
 
   literalt is_all_ones(const bvt &op)
-  { return prop.land(op); }
+  { return propositional.land(op); }
 
   literalt lt_or_le(
     bool or_equal,
@@ -218,7 +218,7 @@ public:
   bvt verilog_bv_normal_bits(const bvt &);
 
 protected:
-  propt &prop;
+  propositionalt &propositional;
 
   void adder(
     bvt &sum,

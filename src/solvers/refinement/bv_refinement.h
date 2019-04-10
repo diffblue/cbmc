@@ -33,7 +33,7 @@ public:
   struct infot:public configt
   {
     const namespacet *ns=nullptr;
-    propt *prop=nullptr;
+    propositionalt *propositional=nullptr;
     message_handlert *message_handler = nullptr;
   };
 
@@ -43,7 +43,7 @@ public:
 
   std::string decision_procedure_text() const override
   {
-    return "refinement loop with "+prop.solver_text();
+    return "refinement loop with "+propositional.solver_text();
   }
 
 protected:
@@ -92,7 +92,7 @@ private:
     std::size_t id_nr;
   };
 
-  resultt prop_solve();
+  resultt propositional_solve();
   approximationt &add_approximation(const exprt &expr, bvt &bv);
   bool conflicts_with(approximationt &approximation);
   void check_SAT(approximationt &approximation);

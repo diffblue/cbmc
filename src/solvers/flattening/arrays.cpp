@@ -14,7 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 #include <util/std_types.h>
 
-#include <solvers/prop/prop.h>
+#include <solvers/propositional/propositional.h>
 
 #ifdef DEBUG
 #include <iostream>
@@ -24,9 +24,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 arrayst::arrayst(
   const namespacet &_ns,
-  propt &_prop,
+  propositionalt &_propositional,
   message_handlert &message_handler)
-  : equalityt(_prop, message_handler), ns(_ns)
+  : equalityt(_propositional, message_handler), ns(_ns)
 {
   lazy_arrays = false;        // will be set to true when --refine is used
   incremental_cache = false;  // for incremental solving
@@ -245,7 +245,7 @@ void arrayst::add_array_constraint(const lazy_constraintt &lazy, bool refine)
   else
   {
     // add the constraint eagerly
-    prop.l_set_to_true(convert(lazy.lazy));
+    propositional.l_set_to_true(convert(lazy.lazy));
   }
 }
 
@@ -337,7 +337,7 @@ void arrayst::add_array_Ackermann_constraints()
             add_array_constraint(lazy, true); // added lazily
 
 #if 0 // old code for adding, not significantly faster
-            prop.lcnf(!indices_equal_lit, convert(values_equal));
+            propositional.lcnf(!indices_equal_lit, convert(values_equal));
 #endif
           }
         }
@@ -420,7 +420,7 @@ void arrayst::add_array_constraints_equality(
     // add constraint
     // equality constraints are not added lazily
     // convert must be done to guarantee correct update of the index_set
-    prop.lcnf(!array_equality.l, convert(equality_expr));
+    propositional.lcnf(!array_equality.l, convert(equality_expr));
   }
 }
 
@@ -558,7 +558,7 @@ void arrayst::add_array_constraints_with(
           bv.reserve(2);
           bv.push_back(equality_lit);
           bv.push_back(guard_lit);
-          prop.lcnf(bv);
+          propositional.lcnf(bv);
         }
 #endif
       }
@@ -616,7 +616,7 @@ void arrayst::add_array_constraints_update(
         bv.reserve(2);
         bv.push_back(equality_lit);
         bv.push_back(guard_lit);
-        prop.lcnf(bv);
+        propositional.lcnf(bv);
       }
     }
   }
@@ -673,7 +673,7 @@ void arrayst::add_array_constraints_if(
     add_array_constraint(lazy, false); // added immediately
 
 #if 0 // old code for adding, not significantly faster
-    prop.lcnf(!cond_lit, convert(equal_exprt(index_expr1, index_expr2)));
+    propositional.lcnf(!cond_lit, convert(equal_exprt(index_expr1, index_expr2)));
 #endif
   }
 
@@ -692,7 +692,7 @@ void arrayst::add_array_constraints_if(
     add_array_constraint(lazy, false); // added immediately
 
 #if 0 // old code for adding, not significantly faster
-    prop.lcnf(cond_lit, convert(equal_exprt(index_expr1, index_expr2)));
+    propositional.lcnf(cond_lit, convert(equal_exprt(index_expr1, index_expr2)));
 #endif
   }
 }

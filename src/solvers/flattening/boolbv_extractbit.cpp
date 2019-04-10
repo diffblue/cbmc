@@ -28,7 +28,7 @@ literalt boolbvt::convert_extractbit(const extractbit_exprt &expr)
       numeric_cast_v<mp_integer>(to_constant_expr(index));
 
     if(index_as_integer < 0 || index_as_integer >= src_bv.size())
-      return prop.new_variable(); // out of range!
+      return propositional.new_variable(); // out of range!
     else
       return src_bv[numeric_cast_v<std::size_t>(index_as_integer)];
   }
@@ -56,29 +56,29 @@ literalt boolbvt::convert_extractbit(const extractbit_exprt &expr)
     equal_exprt equality(
       typecast_exprt::conditional_cast(index, index_type), exprt());
 
-    if(prop.has_set_to())
+    if(propositional.has_set_to())
     {
       // free variable
-      literalt literal = prop.new_variable();
+      literalt literal = propositional.new_variable();
 
       // add implications
       for(std::size_t i = 0; i < src_bv.size(); i++)
       {
         equality.rhs()=from_integer(i, index_type);
-        literalt equal = prop.lequal(literal, src_bv[i]);
-        prop.l_set_to_true(prop.limplies(convert(equality), equal));
+        literalt equal = propositional.lequal(literal, src_bv[i]);
+        propositional.l_set_to_true(propositional.limplies(convert(equality), equal));
       }
 
       return literal;
     }
     else
     {
-      literalt literal = prop.new_variable();
+      literalt literal = propositional.new_variable();
 
       for(std::size_t i = 0; i < src_bv.size(); i++)
       {
         equality.rhs()=from_integer(i, index_type);
-        literal = prop.lselect(convert(equality), src_bv[i], literal);
+        literal = propositional.lselect(convert(equality), src_bv[i], literal);
       }
 
       return literal;

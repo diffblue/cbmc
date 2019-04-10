@@ -36,7 +36,7 @@ literalt boolbvt::convert_bv_rel(const exprt &expr)
     {
       if(bvtype0==bvtypet::IS_FLOAT)
       {
-        float_utilst float_utils(prop, to_floatbv_type(op0.type()));
+        float_utilst float_utils(propositional, to_floatbv_type(op0.type()));
 
         if(rel==ID_le)
           return float_utils.relation(bv0, float_utilst::relt::LE, bv1);
@@ -69,7 +69,7 @@ literalt boolbvt::convert_bv_rel(const exprt &expr)
         #else
         literalt literal=bv_utils.rel(bv0, expr.id(), bv1, rep);
 
-        if(prop.has_set_to())
+        if(propositional.has_set_to())
         {
           // it's unclear if this helps
           if(bv0.size()>8)
@@ -77,9 +77,9 @@ literalt boolbvt::convert_bv_rel(const exprt &expr)
             literalt equal_lit=equality(op0, op1);
 
             if(or_equal)
-              prop.l_set_to_true(prop.limplies(equal_lit, literal));
+              propositional.l_set_to_true(propositional.limplies(equal_lit, literal));
             else
-              prop.l_set_to_true(prop.limplies(equal_lit, !literal));
+              propositional.l_set_to_true(propositional.limplies(equal_lit, !literal));
           }
         }
 

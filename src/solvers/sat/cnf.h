@@ -12,15 +12,15 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_SOLVERS_SAT_CNF_H
 #define CPROVER_SOLVERS_SAT_CNF_H
 
-#include <solvers/prop/prop.h>
+#include <solvers/propositional/propositional.h>
 
-class cnft:public propt
+class cnft:public propositionalt
 {
 public:
   // For CNF, we don't use index 0 as a matter of principle,
   // so we'll start counting variables at 1.
   explicit cnft(message_handlert &message_handler)
-    : propt(message_handler), _no_variables(1)
+    : propositionalt(message_handler), _no_variables(1)
   {
   }
   virtual ~cnft() { }

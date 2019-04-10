@@ -24,7 +24,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/goto_program.h>
 #include <goto-programs/goto_trace.h>
 
-#include <solvers/prop/literal.h>
+#include <solvers/propositional/literal.h>
 
 #include "renaming_level.h"
 #include "ssa_step.h"
@@ -32,7 +32,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 class decision_proceduret;
 class namespacet;
-class prop_convt;
+class propositional_conversiont;
 
 /// Inheriting the interface of symex_targett this class represents the SSA
 /// form of the input program as a list of \ref SSA_stept. It further extends
@@ -176,8 +176,8 @@ public:
   /// Interface method to initiate the conversion into a decision procedure
   /// format. The method iterates over the equation, i.e. over the SSA steps and
   /// converts each type of step separately.
-  /// \param prop_conv: A handle to a particular decision procedure interface
-  void convert(prop_convt &prop_conv);
+  /// \param propositional_conversion: A handle to a particular decision procedure interface
+  void convert(propositional_conversiont &propositional_conversion);
 
   /// Converts assignments: set the equality _lhs==rhs_ to _True_.
   /// \param decision_procedure: A handle to a particular decision procedure
@@ -186,16 +186,16 @@ public:
 
   /// Converts declarations: these are effectively ignored by the decision
   /// procedure.
-  /// \param prop_conv: A handle to a particular decision procedure interface
-  void convert_decls(prop_convt &prop_conv);
+  /// \param propositional_conversion: A handle to a particular decision procedure interface
+  void convert_decls(propositional_conversiont &propositional_conversion);
 
   /// Converts assumptions: convert the expression the assumption represents.
-  /// \param prop_conv: A handle to a particular decision procedure interface
-  void convert_assumptions(prop_convt &prop_conv);
+  /// \param propositional_conversion: A handle to a particular decision procedure interface
+  void convert_assumptions(propositional_conversiont &propositional_conversion);
 
   /// Converts assertions: build a disjunction of negated assertions.
-  /// \param prop_conv: A handle to a particular decision procedure interface
-  void convert_assertions(prop_convt &prop_conv);
+  /// \param propositional_conversion: A handle to a particular decision procedure interface
+  void convert_assertions(propositional_conversiont &propositional_conversion);
 
   /// Converts constraints: set the represented condition to _True_.
   /// \param decision_procedure: A handle to a particular decision procedure
@@ -204,12 +204,12 @@ public:
 
   /// Converts goto instructions: convert the expression representing the
   /// condition of this goto.
-  /// \param prop_conv: A handle to a particular decision procedure interface
-  void convert_goto_instructions(prop_convt &prop_conv);
+  /// \param propositional_conversion: A handle to a particular decision procedure interface
+  void convert_goto_instructions(propositional_conversiont &propositional_conversion);
 
   /// Converts guards: convert the expression the guard represents.
-  /// \param prop_conv: A handle to a particular decision procedure interface
-  void convert_guards(prop_convt &prop_conv);
+  /// \param propositional_conversion: A handle to a particular decision procedure interface
+  void convert_guards(propositional_conversiont &propositional_conversion);
 
   /// Converts function calls: for each argument build an equality between its
   /// symbol and the argument itself.

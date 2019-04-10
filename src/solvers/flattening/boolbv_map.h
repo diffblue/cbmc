@@ -15,7 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/type.h>
 #include <util/namespace.h>
 
-#include <solvers/prop/prop.h>
+#include <solvers/propositional/propositional.h>
 
 #include "boolbv_type.h"
 #include "boolbv_width.h"
@@ -23,8 +23,8 @@ Author: Daniel Kroening, kroening@kroening.com
 class boolbv_mapt
 {
 public:
-  boolbv_mapt(propt &_prop, const boolbv_widtht &_boolbv_width)
-    : prop(_prop), boolbv_width(_boolbv_width)
+  boolbv_mapt(propositionalt &_propositional, const boolbv_widtht &_boolbv_width)
+    : propositional(_propositional), boolbv_width(_boolbv_width)
   {
   }
 
@@ -49,7 +49,7 @@ public:
     typet type;
     literal_mapt literal_map;
 
-    std::string get_value(const propt &) const;
+    std::string get_value(const propositionalt &) const;
   };
 
   typedef std::unordered_map<irep_idt, map_entryt> mappingt;
@@ -77,7 +77,7 @@ public:
     const typet &type);
 
 protected:
-  propt &prop;
+  propositionalt &propositional;
   const boolbv_widtht &boolbv_width;
 };
 

@@ -7,8 +7,8 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 
-#ifndef CPROVER_SOLVERS_PROP_PROP_H
-#define CPROVER_SOLVERS_PROP_PROP_H
+#ifndef CPROVER_SOLVERS_PROPOSITIONAL_PROPOSITIONAL_H
+#define CPROVER_SOLVERS_PROPOSITIONAL_PROPOSITIONAL_H
 
 // decision procedure wrapper for boolean propositional logics
 
@@ -21,14 +21,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*! \brief TO_BE_DOCUMENTED
 */
-class propt
+class propositionalt
 {
 public:
-  explicit propt(message_handlert &message_handler) : log(message_handler)
+  explicit propositionalt(message_handlert &message_handler) : log(message_handler)
   {
   }
 
-  virtual ~propt() { }
+  virtual ~propositionalt() { }
 
   // boolean operators
   virtual literalt land(literalt a, literalt b)=0;

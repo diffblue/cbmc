@@ -27,7 +27,7 @@ bvt boolbvt::convert_cond(const cond_exprt &expr)
   DATA_INVARIANT(
     operands.size() % 2 == 0, "number of cond operands must be even");
 
-  if(prop.has_set_to())
+  if(propositional.has_set_to())
   {
     bool condition=true;
     literalt previous_cond=const_literal(false);
@@ -35,16 +35,16 @@ bvt boolbvt::convert_cond(const cond_exprt &expr)
 
     // make it free variables
     Forall_literals(it, bv)
-      *it=prop.new_variable();
+      *it=propositional.new_variable();
 
     forall_operands(it, expr)
     {
       if(condition)
       {
         cond_literal=convert(*it);
-        cond_literal=prop.land(!previous_cond, cond_literal);
+        cond_literal=propositional.land(!previous_cond, cond_literal);
 
-        previous_cond=prop.lor(previous_cond, cond_literal);
+        previous_cond=propositional.lor(previous_cond, cond_literal);
       }
       else
       {
@@ -52,7 +52,7 @@ bvt boolbvt::convert_cond(const cond_exprt &expr)
 
         literalt value_literal=bv_utils.equal(bv, op);
 
-        prop.l_set_to_true(prop.limplies(cond_literal, value_literal));
+        propositional.l_set_to_true(propositional.limplies(cond_literal, value_literal));
       }
 
       condition=!condition;
@@ -75,7 +75,7 @@ bvt boolbvt::convert_cond(const cond_exprt &expr)
       const bvt &op = convert_bv(value, bv.size());
 
       for(std::size_t j = 0; j < bv.size(); j++)
-        bv[j] = prop.lselect(cond_literal, op[j], bv[j]);
+        bv[j] = propositional.lselect(cond_literal, op[j], bv[j]);
     }
   }
 

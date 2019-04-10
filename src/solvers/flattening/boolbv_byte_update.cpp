@@ -119,7 +119,7 @@ bvt boolbvt::convert_byte_update(const byte_update_exprt &expr)
         std::size_t bv_o=map_op.map_bit(offset+bit);
         std::size_t value_bv_o=map_value.map_bit(bit);
 
-        bv[bv_o]=prop.lselect(equal, value_bv[value_bv_o], bv[bv_o]);
+        bv[bv_o]=propositional.lselect(equal, value_bv[value_bv_o], bv[bv_o]);
       }
   }
 
