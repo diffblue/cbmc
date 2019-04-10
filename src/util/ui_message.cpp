@@ -18,12 +18,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "xml_irep.h"
 
 ui_message_handlert::ui_message_handlert(
-  message_handlert *_message_handler,
+  std::unique_ptr<message_handlert> _message_handler,
   uit __ui,
   const std::string &program,
   bool always_flush,
   timestampert::clockt clock_type)
-  : message_handler(_message_handler),
+  : message_handlert(
+    __ui == uit::PLAIN ? std::move(*_message_handler.get()) : null_message_handlert()),
     _ui(__ui),
     always_flush(always_flush),
     time(timestampert::make(clock_type)),
@@ -79,24 +80,22 @@ ui_message_handlert ui_message_handlert::make(
   const auto always_flush = cmdline.isset("flush");
   std::unique_ptr<message_handlert> handler;
   if(ui == uit::PLAIN)
-  {
-    console_message_handler =
-      util_make_unique<console_message_handlert>(always_flush);
-    message_handler = &*console_message_handler;
-    return ui_message_handlert{
-      console_message_handlert{always_flush},
-      ui,
-      program,
-      always_flush,
-      timestamp};
-  }
+    handler = util_make_unique<console_message_handlert>(always_flush);
+  else
+    handler = util_make_unique<null_message_handlert>();
+
   return ui_message_handlert{
-    nullptr, ui, program, always_flush, timestamp};
+    std::move(handler), ui, program, always_flush, timestamp};
 }
 
-ui_message_handlert::ui_message_handlert(message_handlert &message_handler)
+ui_message_handlert::ui_message_handlert(
+  std::unique_ptr<message_handlert> message_handler)
   : ui_message_handlert(
-      &message_handler, uit::PLAIN, "", false, timestampert::clockt::NONE)
+      std::move(message_handler),
+      uit::PLAIN,
+      "",
+      false,
+      timestampert::clockt::NONE)
 {
 }
 
@@ -144,9 +143,9 @@ void ui_message_handlert::print(
       std::stringstream ss;
       const std::string timestamp = time->stamp();
       ss << timestamp << (timestamp.empty() ? "" : " ") << message;
-      message_handler->print(level, ss.str());
+      print(level, ss.str());
       if(always_flush)
-        message_handler->flush(level);
+        flush(level);
     }
     break;
 
@@ -308,7 +307,7 @@ void ui_message_handlert::flush(unsigned level)
   switch(get_ui())
   {
   case uit::PLAIN:
-    message_handler->flush(level);
+    flush(level);
     break;
 
   case uit::XML_UI:

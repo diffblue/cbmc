@@ -71,7 +71,8 @@ bool constant_simplification_mockt::ai_simplify(
 SCENARIO("ai_domain_baset::ai_simplify_lhs",
   "[core][analyses][ai][ai_simplify_lhs]")
 {
-  ui_message_handlert message_handler(null_message_handler);
+  ui_message_handlert message_handler{
+    util_make_unique<null_message_handlert>()};
   ansi_c_languaget language;
   language.set_message_handler(message_handler);
 

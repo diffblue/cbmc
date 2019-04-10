@@ -52,7 +52,8 @@ SCENARIO("get_cover_config is called", "[core]")
 
   goto_functiont dummy_function;
 
-  ui_message_handlert message_handler(null_message_handler);
+  ui_message_handlert message_handler{
+    util_make_unique<null_message_handlert>()};
 
   GIVEN("cover-only set to an unrecognised value")
   {
