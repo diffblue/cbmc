@@ -1,0 +1,12 @@
+KNOWNBUG
+main.c
+
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+We currently do not distinguish __CPROVER_r_ok and __CPROVER_w_ok at the
+implementation level. To make a meaningful distinction we would need to have
+predicates about lvalues vs rvalues.
