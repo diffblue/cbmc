@@ -46,7 +46,6 @@ private:
   };
 
   ui_message_handlert ui_message_handler;
-  messaget logger;
 
   /// Handle command line arguments that are common to all
   /// harness generators.
