@@ -22,6 +22,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 bool java_is_array_type(const typet &type);
 
+/// Returns true iff the argument represents a string type (CharSequence,
+/// StringBuilder, StringBuffer or String).
+/// The check for the length and data components is necessary in the case where
+/// string refinement is not activated. In this case, \p struct_type only
+/// contains the standard Object fields (or may have some other model entirely),
+/// and in particular may not have length and data fields.
+bool is_java_string_type(const struct_typet &struct_type);
+
 void generate_class_stub(
   const irep_idt &class_name,
   symbol_table_baset &symbol_table,
