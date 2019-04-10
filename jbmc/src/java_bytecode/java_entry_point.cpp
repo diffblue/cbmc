@@ -135,14 +135,10 @@ static void java_static_lifetime_init(
   // and we can refer to them later when we initialize input values.
   for(const auto &val : object_factory_parameters.string_input_values)
   {
-    exprt my_literal(ID_java_string_literal);
-    my_literal.set(ID_value, val);
     // We ignore the return value of the following call, we just need to
     // make sure the string is in the symbol table.
     get_or_create_string_literal_symbol(
-      my_literal,
-      symbol_table,
-      string_refinement_enabled);
+      val, symbol_table, string_refinement_enabled);
   }
 
   // We need to zero out all static variables, or nondet-initialize if they're
@@ -174,15 +170,13 @@ static void java_static_lifetime_init(
 
         bool class_is_array = is_java_array_tag(sym.name);
 
-        exprt name_literal(ID_java_string_literal);
-        name_literal.set(ID_value, to_class_type(class_symbol.type).get_tag());
-
         journalling_symbol_tablet journalling_table =
           journalling_symbol_tablet::wrap(symbol_table);
 
-        symbol_exprt class_name_literal =
-          get_or_create_string_literal_symbol(
-            name_literal, journalling_table, string_refinement_enabled);
+        symbol_exprt class_name_literal = get_or_create_string_literal_symbol(
+          to_class_type(class_symbol.type).get_tag(),
+          journalling_table,
+          string_refinement_enabled);
 
         // If that created any new symbols make sure we initialise those too:
         const auto &new_symbols = journalling_table.get_inserted();

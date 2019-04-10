@@ -207,3 +207,14 @@ symbol_exprt get_or_create_string_literal_symbol(
 
   return new_symbol.symbol_expr();
 }
+
+symbol_exprt get_or_create_string_literal_symbol(
+  const irep_idt &string_value,
+  symbol_table_baset &symbol_table,
+  bool string_refinement_enabled)
+{
+  exprt literal{ID_java_string_literal};
+  literal.set(ID_value, string_value);
+  return get_or_create_string_literal_symbol(
+    literal, symbol_table, string_refinement_enabled);
+}
