@@ -122,7 +122,7 @@ int goto_instrument_parse_optionst::doit()
     return CPROVER_EXIT_USAGE_ERROR;
   }
 
-  eval_verbosity(
+  messaget::eval_verbosity(
     cmdline.get_value("verbosity"), messaget::M_STATISTICS, ui_message_handler);
 
   {
@@ -264,7 +264,7 @@ int goto_instrument_parse_optionst::doit()
       // recalculate numbers, etc.
       goto_model.goto_functions.update();
 
-      status() << "Pointer Analysis" << eom;
+      log.status() << "Pointer Analysis" << messaget::eom;
       namespacet ns(goto_model.symbol_table);
       value_set_analysist value_set_analysis(ns);
       value_set_analysis(goto_model.goto_functions);
@@ -345,7 +345,7 @@ int goto_instrument_parse_optionst::doit()
       do_remove_returns();
       parameter_assignments(goto_model);
 
-      remove_unused_functions(goto_model, get_message_handler());
+      remove_unused_functions(goto_model, log.get_message_handler());
 
       if(!cmdline.isset("inline"))
       {
@@ -385,7 +385,7 @@ int goto_instrument_parse_optionst::doit()
       do_remove_returns();
       parameter_assignments(goto_model);
 
-      remove_unused_functions(goto_model, get_message_handler());
+      remove_unused_functions(goto_model, log.get_message_handler());
 
       if(!cmdline.isset("inline"))
       {
@@ -417,7 +417,7 @@ int goto_instrument_parse_optionst::doit()
 
       namespacet ns(goto_model.symbol_table);
 
-      status() << "Pointer Analysis" << eom;
+      log.status() << "Pointer Analysis" << messaget::eom;
       points_tot points_to;
       points_to(goto_model);
       points_to.output(std::cout);
@@ -431,7 +431,7 @@ int goto_instrument_parse_optionst::doit()
       // recalculate numbers, etc.
       goto_model.goto_functions.update();
 
-      status() << "Interval Analysis" << eom;
+      log.status() << "Interval Analysis" << messaget::eom;
       namespacet ns(goto_model.symbol_table);
       ait<interval_domaint> interval_analysis;
       interval_analysis(goto_model);
@@ -474,7 +474,7 @@ int goto_instrument_parse_optionst::doit()
         goto_model.goto_functions.update();
       }
 
-      status() << "Pointer Analysis" << eom;
+      log.status() << "Pointer Analysis" << messaget::eom;
       value_set_analysist value_set_analysis(ns);
       value_set_analysis(goto_model.goto_functions);
 
@@ -555,8 +555,8 @@ int goto_instrument_parse_optionst::doit()
 
     if(cmdline.isset("interpreter"))
     {
-      status() << "Starting interpreter" << eom;
-      interpreter(goto_model, get_message_handler());
+      log.status() << "Starting interpreter" << messaget::eom;
+      interpreter(goto_model, log.get_message_handler());
       return CPROVER_EXIT_SUCCESS;
     }
 
@@ -564,7 +564,7 @@ int goto_instrument_parse_optionst::doit()
        cmdline.isset("show-properties"))
     {
       const namespacet ns(goto_model.symbol_table);
-      show_properties(goto_model, get_message_handler(), get_ui());
+      show_properties(goto_model, log.get_message_handler(), get_ui());
       return CPROVER_EXIT_SUCCESS;
     }
 
@@ -600,9 +600,12 @@ int goto_instrument_parse_optionst::doit()
         for(auto const &ins : pair.second.body.instructions)
         {
           if(ins.code.is_not_nil())
-            status() << ins.code.pretty() << eom;
+            log.status() << ins.code.pretty() << messaget::eom;
           if(ins.has_condition())
-            status() << "[guard] " << ins.get_condition().pretty() << eom;
+          {
+            log.status() << "[guard] " << ins.get_condition().pretty()
+                         << messaget::eom;
+          }
         }
       return CPROVER_EXIT_SUCCESS;
     }
@@ -613,7 +616,7 @@ int goto_instrument_parse_optionst::doit()
     {
       show_goto_functions(
         goto_model,
-        get_message_handler(),
+        log.get_message_handler(),
         ui_message_handler.get_ui(),
         cmdline.isset("list-goto-functions"));
       return CPROVER_EXIT_SUCCESS;
@@ -659,7 +662,7 @@ int goto_instrument_parse_optionst::doit()
         #endif
         if(!out)
         {
-          error() << "failed to write to `" << cmdline.args[1] << "'";
+          log.error() << "failed to write to `" << cmdline.args[1] << "'";
           return CPROVER_EXIT_CONVERSION_FAILED;
         }
         (is_cpp ? dump_cpp : dump_c)(
@@ -738,7 +741,7 @@ int goto_instrument_parse_optionst::doit()
         #endif
         if(!out)
         {
-          error() << "failed to write to " << cmdline.args[1] << "'";
+          log.error() << "failed to write to " << cmdline.args[1] << "'";
           return CPROVER_EXIT_CONVERSION_FAILED;
         }
 
@@ -756,23 +759,27 @@ int goto_instrument_parse_optionst::doit()
 
       namespacet ns(goto_model.symbol_table);
 
-      status() << "Performing full inlining" << eom;
-      goto_inline(goto_model, get_message_handler());
+      log.status() << "Performing full inlining" << messaget::eom;
+      goto_inline(goto_model, log.get_message_handler());
 
-      status() << "Removing calls to functions without a body" << eom;
+      log.status() << "Removing calls to functions without a body"
+                   << messaget::eom;
       remove_calls_no_bodyt remove_calls_no_body;
       remove_calls_no_body(goto_model.goto_functions);
 
-      status() << "Accelerating" << eom;
+      log.status() << "Accelerating" << messaget::eom;
       guard_managert guard_manager;
       accelerate_functions(
-        goto_model, get_message_handler(), cmdline.isset("z3"), guard_manager);
+        goto_model,
+        log.get_message_handler(),
+        cmdline.isset("z3"),
+        guard_manager);
       remove_skip(goto_model);
     }
 
     if(cmdline.isset("horn-encoding"))
     {
-      status() << "Horn-clause encoding" << eom;
+      log.status() << "Horn-clause encoding" << messaget::eom;
       namespacet ns(goto_model.symbol_table);
 
       if(cmdline.args.size()==2)
@@ -785,8 +792,8 @@ int goto_instrument_parse_optionst::doit()
 
         if(!out)
         {
-          error() << "Failed to open output file "
-                  << cmdline.args[1] << eom;
+          log.error() << "Failed to open output file " << cmdline.args[1]
+                      << messaget::eom;
           return CPROVER_EXIT_CONVERSION_FAILED;
         }
 
@@ -802,8 +809,9 @@ int goto_instrument_parse_optionst::doit()
     {
       do_indirect_call_and_rtti_removal();
 
-      status() << "Removing unused functions" << eom;
-      remove_unused_functions(goto_model.goto_functions, get_message_handler());
+      log.status() << "Removing unused functions" << messaget::eom;
+      remove_unused_functions(
+        goto_model.goto_functions, log.get_message_handler());
     }
 
     if(cmdline.isset("undefined-function-is-assume-false"))
@@ -815,10 +823,11 @@ int goto_instrument_parse_optionst::doit()
     // write new binary?
     if(cmdline.args.size()==2)
     {
-      status() << "Writing GOTO program to `" << cmdline.args[1] << "'" << eom;
+      log.status() << "Writing GOTO program to `" << cmdline.args[1] << "'"
+                   << messaget::eom;
 
       if(write_goto_binary(
-        cmdline.args[1], goto_model, get_message_handler()))
+           cmdline.args[1], goto_model, log.get_message_handler()))
         return CPROVER_EXIT_CONVERSION_FAILED;
       else
         return CPROVER_EXIT_SUCCESS;
@@ -846,14 +855,12 @@ void goto_instrument_parse_optionst::do_indirect_call_and_rtti_removal(
 
   function_pointer_removal_done=true;
 
-  status() << "Function Pointer Removal" << eom;
+  log.status() << "Function Pointer Removal" << messaget::eom;
   remove_function_pointers(
-    get_message_handler(),
-    goto_model,
-    cmdline.isset("pointer-check"));
-  status() << "Virtual function removal" << eom;
+    log.get_message_handler(), goto_model, cmdline.isset("pointer-check"));
+  log.status() << "Virtual function removal" << messaget::eom;
   remove_virtual_functions(goto_model);
-  status() << "Cleaning inline assembler statements" << eom;
+  log.status() << "Cleaning inline assembler statements" << messaget::eom;
   remove_asm(goto_model);
 }
 
@@ -869,9 +876,9 @@ void goto_instrument_parse_optionst::do_remove_const_function_pointers_only()
     return;
   }
 
-  status() << "Removing const function pointers only" << eom;
+  log.status() << "Removing const function pointers only" << messaget::eom;
   remove_function_pointers(
-    get_message_handler(),
+    log.get_message_handler(),
     goto_model,
     cmdline.isset("pointer-check"),
     true); // abort if we can't resolve via const pointers
@@ -886,7 +893,7 @@ void goto_instrument_parse_optionst::do_partial_inlining()
 
   if(!cmdline.isset("inline"))
   {
-    status() << "Partial Inlining" << eom;
+    log.status() << "Partial Inlining" << messaget::eom;
     goto_partial_inline(goto_model, ui_message_handler);
   }
 }
@@ -898,17 +905,18 @@ void goto_instrument_parse_optionst::do_remove_returns()
 
   remove_returns_done=true;
 
-  status() << "Removing returns" << eom;
+  log.status() << "Removing returns" << messaget::eom;
   remove_returns(goto_model);
 }
 
 void goto_instrument_parse_optionst::get_goto_program()
 {
-  status() << "Reading GOTO program from `" << cmdline.args[0] << "'" << eom;
+  log.status() << "Reading GOTO program from `" << cmdline.args[0] << "'"
+               << messaget::eom;
 
   config.set(cmdline);
 
-  auto result = read_goto_binary(cmdline.args[0], get_message_handler());
+  auto result = read_goto_binary(cmdline.args[0], log.get_message_handler());
 
   if(!result.has_value())
     throw 0;
@@ -956,18 +964,18 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   // unwind loops
   if(cmdline.isset("unwind"))
   {
-    status() << "Unwinding loops" << eom;
+    log.status() << "Unwinding loops" << messaget::eom;
     options.set_option("unwind", cmdline.get_value("unwind"));
   }
 
   // skip over selected loops
   if(cmdline.isset("skip-loops"))
   {
-    status() << "Adding gotos to skip loops" << eom;
+    log.status() << "Adding gotos to skip loops" << messaget::eom;
     if(skip_loops(
-        goto_model,
-        cmdline.get_value("skip-loops"),
-        get_message_handler()))
+         goto_model,
+         cmdline.get_value("skip-loops"),
+         log.get_message_handler()))
       throw 0;
   }
 
@@ -979,12 +987,9 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     unsigned max_argc=
       safe_string2unsigned(cmdline.get_value("model-argc-argv"));
 
-    status() << "Adding up to " << max_argc
-             << " command line arguments" << eom;
-    if(model_argc_argv(
-        goto_model,
-        max_argc,
-        get_message_handler()))
+    log.status() << "Adding up to " << max_argc << " command line arguments"
+                 << messaget::eom;
+    if(model_argc_argv(goto_model, max_argc, log.get_message_handler()))
       throw 0;
   }
 
@@ -993,7 +998,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     remove_functions(
       goto_model,
       cmdline.get_values("remove-function-body"),
-      get_message_handler());
+      log.get_message_handler());
   }
 
   // we add the library in some cases, as some analyses benefit
@@ -1009,11 +1014,12 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     }
 
     // add the library
-    status() << "Adding CPROVER library (" << config.ansi_c.arch << ")" << eom;
+    log.status() << "Adding CPROVER library (" << config.ansi_c.arch << ")"
+                 << messaget::eom;
     link_to_library(
-      goto_model, get_message_handler(), cprover_cpp_library_factory);
+      goto_model, log.get_message_handler(), cprover_cpp_library_factory);
     link_to_library(
-      goto_model, get_message_handler(), cprover_c_library_factory);
+      goto_model, log.get_message_handler(), cprover_c_library_factory);
   }
 
   // now do full inlining, if requested
@@ -1029,14 +1035,14 @@ void goto_instrument_parse_optionst::instrument_goto_program()
       mutex_init_instrumentation(goto_model);
     }
 
-    status() << "Performing full inlining" << eom;
-    goto_inline(goto_model, get_message_handler(), true);
+    log.status() << "Performing full inlining" << messaget::eom;
+    goto_inline(goto_model, log.get_message_handler(), true);
   }
 
   if(cmdline.isset("show-custom-bitvector-analysis") ||
      cmdline.isset("custom-bitvector-analysis"))
   {
-    status() << "Propagating Constants" << eom;
+    log.status() << "Propagating Constants" << messaget::eom;
     constant_propagator_ait constant_propagator_ai(goto_model);
     remove_skip(goto_model);
   }
@@ -1050,13 +1056,13 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     // recalculate numbers, etc.
     goto_model.goto_functions.update();
 
-    status() << "Escape Analysis" << eom;
+    log.status() << "Escape Analysis" << messaget::eom;
     escape_analysist escape_analysis;
     escape_analysis(goto_model);
     escape_analysis.instrument(goto_model);
 
     // inline added functions, they are often small
-    goto_partial_inline(goto_model, get_message_handler());
+    goto_partial_inline(goto_model, log.get_message_handler());
 
     // recalculate numbers, etc.
     goto_model.goto_functions.update();
@@ -1065,7 +1071,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   // verify and set invariants and pre/post-condition pairs
   if(cmdline.isset("apply-code-contracts"))
   {
-    status() << "Applying Code Contracts" << eom;
+    log.status() << "Applying Code Contracts" << messaget::eom;
     code_contracts(goto_model);
   }
 
@@ -1096,7 +1102,8 @@ void goto_instrument_parse_optionst::instrument_goto_program()
 
     do_indirect_call_and_rtti_removal();
 
-    status() << "Inlining calls of function `" << function << "'" << eom;
+    log.status() << "Inlining calls of function `" << function << "'"
+                 << messaget::eom;
 
     if(!cmdline.isset("log"))
     {
@@ -1147,7 +1154,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   {
     do_indirect_call_and_rtti_removal();
 
-    status() << "Partial inlining" << eom;
+    log.status() << "Partial inlining" << messaget::eom;
     goto_partial_inline(goto_model, ui_message_handler, 0, true);
 
     goto_model.goto_functions.update();
@@ -1156,7 +1163,8 @@ void goto_instrument_parse_optionst::instrument_goto_program()
 
   if(cmdline.isset("remove-calls-no-body"))
   {
-    status() << "Removing calls to functions without a body" << eom;
+    log.status() << "Removing calls to functions without a body"
+                 << messaget::eom;
 
     remove_calls_no_bodyt remove_calls_no_body;
     remove_calls_no_body(goto_model.goto_functions);
@@ -1169,7 +1177,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   {
     do_indirect_call_and_rtti_removal();
 
-    status() << "Propagating Constants" << eom;
+    log.status() << "Propagating Constants" << messaget::eom;
 
     constant_propagator_ait constant_propagator_ai(goto_model);
     remove_skip(goto_model);
@@ -1186,12 +1194,12 @@ void goto_instrument_parse_optionst::instrument_goto_program()
       cmdline.get_value("generate-function-body-options"),
       object_factory_parameters,
       goto_model.symbol_table,
-      *message_handler);
+      log.get_message_handler());
     generate_function_bodies(
       std::regex(cmdline.get_value("generate-function-body")),
       *generate_implementation,
       goto_model,
-      *message_handler);
+      log.get_message_handler());
   }
 
   // add generic checks, if needed
@@ -1200,14 +1208,15 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   // check for uninitalized local variables
   if(cmdline.isset("uninitialized-check"))
   {
-    status() << "Adding checks for uninitialized local variables" << eom;
+    log.status() << "Adding checks for uninitialized local variables"
+                 << messaget::eom;
     add_uninitialized_locals_assertions(goto_model);
   }
 
   // check for maximum call stack size
   if(cmdline.isset("stack-depth"))
   {
-    status() << "Adding check for maximum call stack size" << eom;
+    log.status() << "Adding check for maximum call stack size" << messaget::eom;
     stack_depth(
       goto_model,
       safe_string2size_t(cmdline.get_value("stack-depth")));
@@ -1217,15 +1226,16 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   // lifetime
   if(cmdline.isset("nondet-static"))
   {
-    status() << "Adding nondeterministic initialization of static/global "
-                "variables" << eom;
+    log.status() << "Adding nondeterministic initialization of static/global "
+                    "variables"
+                 << messaget::eom;
     nondet_static(goto_model);
   }
 
   if(cmdline.isset("slice-global-inits"))
   {
-    status() << "Slicing away initializations of unused global variables"
-             << eom;
+    log.status() << "Slicing away initializations of unused global variables"
+                 << messaget::eom;
     slice_global_inits(goto_model);
   }
 
@@ -1234,10 +1244,8 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     do_indirect_call_and_rtti_removal();
     do_remove_returns();
 
-    status() << "String Abstraction" << eom;
-    string_abstraction(
-      goto_model,
-      get_message_handler());
+    log.status() << "String Abstraction" << messaget::eom;
+    string_abstraction(goto_model, log.get_message_handler());
   }
 
   // some analyses require function pointer removal and partial inlining
@@ -1250,20 +1258,20 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   {
     do_indirect_call_and_rtti_removal();
 
-    status() << "Pointer Analysis" << eom;
+    log.status() << "Pointer Analysis" << messaget::eom;
     value_set_analysist value_set_analysis(ns);
     value_set_analysis(goto_model.goto_functions);
 
     if(cmdline.isset("remove-pointers"))
     {
       // removing pointers
-      status() << "Removing Pointers" << eom;
+      log.status() << "Removing Pointers" << messaget::eom;
       remove_pointers(goto_model, value_set_analysis);
     }
 
     if(cmdline.isset("race-check"))
     {
-      status() << "Adding Race Checks" << eom;
+      log.status() << "Adding Race Checks" << messaget::eom;
       race_check(value_set_analysis, goto_model);
     }
 
@@ -1297,27 +1305,32 @@ void goto_instrument_parse_optionst::instrument_goto_program()
 
       if(mm=="tso")
       {
-        status() << "Adding weak memory (TSO) Instrumentation" << eom;
+        log.status() << "Adding weak memory (TSO) Instrumentation"
+                     << messaget::eom;
         model=TSO;
       }
       else if(mm=="pso")
       {
-        status() << "Adding weak memory (PSO) Instrumentation" << eom;
+        log.status() << "Adding weak memory (PSO) Instrumentation"
+                     << messaget::eom;
         model=PSO;
       }
       else if(mm=="rmo")
       {
-        status() << "Adding weak memory (RMO) Instrumentation" << eom;
+        log.status() << "Adding weak memory (RMO) Instrumentation"
+                     << messaget::eom;
         model=RMO;
       }
       else if(mm=="power")
       {
-        status() << "Adding weak memory (Power) Instrumentation" << eom;
+        log.status() << "Adding weak memory (Power) Instrumentation"
+                     << messaget::eom;
         model=Power;
       }
       else
       {
-        error() << "Unknown weak memory model `" << mm << "'" << eom;
+        log.error() << "Unknown weak memory model `" << mm << "'"
+                    << messaget::eom;
         model=Unknown;
       }
 
@@ -1345,14 +1358,14 @@ void goto_instrument_parse_optionst::instrument_goto_program()
           cmdline.isset("render-cluster-function"),
           cmdline.isset("cav11"),
           cmdline.isset("hide-internals"),
-          get_message_handler(),
+          log.get_message_handler(),
           cmdline.isset("ignore-arrays"));
     }
 
     // Interrupt handler
     if(cmdline.isset("isr"))
     {
-      status() << "Instrumenting interrupt handler" << eom;
+      log.status() << "Instrumenting interrupt handler" << messaget::eom;
       interrupt(
         value_set_analysis,
         goto_model,
@@ -1362,26 +1375,26 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     // Memory-mapped I/O
     if(cmdline.isset("mmio"))
     {
-      status() << "Instrumenting memory-mapped I/O" << eom;
+      log.status() << "Instrumenting memory-mapped I/O" << messaget::eom;
       mmio(value_set_analysis, goto_model);
     }
 
     if(cmdline.isset("concurrency"))
     {
-      status() << "Sequentializing concurrency" << eom;
+      log.status() << "Sequentializing concurrency" << messaget::eom;
       concurrency(value_set_analysis, goto_model);
     }
   }
 
   if(cmdline.isset("interval-analysis"))
   {
-    status() << "Interval analysis" << eom;
+    log.status() << "Interval analysis" << messaget::eom;
     interval_analysis(goto_model);
   }
 
   if(cmdline.isset("havoc-loops"))
   {
-    status() << "Havocking loops" << eom;
+    log.status() << "Havocking loops" << messaget::eom;
     havoc_loops(goto_model);
   }
 
@@ -1400,15 +1413,15 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     if(k==0)
       throw "please give k>=1";
 
-    status() << "Instrumenting k-induction for k=" << k << ", "
-             << (base_case?"base case":"step case") << eom;
+    log.status() << "Instrumenting k-induction for k=" << k << ", "
+                 << (base_case ? "base case" : "step case") << messaget::eom;
 
     k_induction(goto_model, base_case, step_case, k);
   }
 
   if(cmdline.isset("function-enter"))
   {
-    status() << "Function enter instrumentation" << eom;
+    log.status() << "Function enter instrumentation" << messaget::eom;
     function_enter(
       goto_model,
       cmdline.get_value("function-enter"));
@@ -1416,7 +1429,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
 
   if(cmdline.isset("function-exit"))
   {
-    status() << "Function exit instrumentation" << eom;
+    log.status() << "Function exit instrumentation" << messaget::eom;
     function_exit(
       goto_model,
       cmdline.get_value("function-exit"));
@@ -1424,7 +1437,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
 
   if(cmdline.isset("branch"))
   {
-    status() << "Branch instrumentation" << eom;
+    log.status() << "Branch instrumentation" << messaget::eom;
     branch(
       goto_model,
       cmdline.get_value("branch"));
@@ -1445,7 +1458,8 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   // nondet volatile?
   if(cmdline.isset("nondet-volatile"))
   {
-    status() << "Making volatile variables non-deterministic" << eom;
+    log.status() << "Making volatile variables non-deterministic"
+                 << messaget::eom;
     nondet_volatile(goto_model);
   }
 
@@ -1454,7 +1468,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   {
     do_indirect_call_and_rtti_removal();
 
-    status() << "Performing a reachability slice" << eom;
+    log.status() << "Performing a reachability slice" << messaget::eom;
     if(cmdline.isset("property"))
       reachability_slicer(goto_model, cmdline.get_values("property"));
     else
@@ -1465,7 +1479,8 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   {
     do_indirect_call_and_rtti_removal();
 
-    status() << "Performing a function pointer reachability slice" << eom;
+    log.status() << "Performing a function pointer reachability slice"
+                 << messaget::eom;
     function_path_reachability_slicer(
       goto_model, cmdline.get_comma_separated_values("fp-reachability-slice"));
   }
@@ -1476,7 +1491,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     do_indirect_call_and_rtti_removal();
     do_remove_returns();
 
-    status() << "Performing a full slice" << eom;
+    log.status() << "Performing a full slice" << messaget::eom;
     if(cmdline.isset("property"))
       property_slicer(goto_model, cmdline.get_values("property"));
     else
@@ -1486,13 +1501,13 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   // splice option
   if(cmdline.isset("splice-call"))
   {
-    status() << "Performing call splicing" << eom;
+    log.status() << "Performing call splicing" << messaget::eom;
     std::string callercallee=cmdline.get_value("splice-call");
     if(splice_call(
-        goto_model.goto_functions,
-        callercallee,
-        goto_model.symbol_table,
-        get_message_handler()))
+         goto_model.goto_functions,
+         callercallee,
+         goto_model.symbol_table,
+         log.get_message_handler()))
       throw 0;
   }
 
@@ -1501,12 +1516,12 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   {
     do_indirect_call_and_rtti_removal();
 
-    status() << "Slicing away initializations of unused global variables"
-             << eom;
+    log.status() << "Slicing away initializations of unused global variables"
+                 << messaget::eom;
     slice_global_inits(goto_model);
 
-    status() << "Performing an aggressive slice" << eom;
-    aggressive_slicert aggressive_slicer(goto_model, get_message_handler());
+    log.status() << "Performing an aggressive slice" << messaget::eom;
+    aggressive_slicert aggressive_slicer(goto_model, log.get_message_handler());
 
     if(cmdline.isset("aggressive-slice-call-depth"))
       aggressive_slicer.call_depth =
@@ -1529,7 +1544,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
 
     aggressive_slicer.doit();
 
-    status() << "Performing a reachability slice" << eom;
+    log.status() << "Performing a reachability slice" << messaget::eom;
     if(cmdline.isset("property"))
       reachability_slicer(goto_model, cmdline.get_values("property"));
     else
