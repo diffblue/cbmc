@@ -111,9 +111,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 // clang-format on
 
-class goto_instrument_parse_optionst:
-  public parse_options_baset,
-  public messaget
+class goto_instrument_parse_optionst : public parse_options_baset
 {
 public:
   virtual int doit();
@@ -125,7 +123,6 @@ public:
         argc,
         argv,
         ui_message_handler),
-      messaget(ui_message_handler),
       ui_message_handler(cmdline, "goto-instrument"),
       function_pointer_removal_done(false),
       partial_inlining_done(false),
