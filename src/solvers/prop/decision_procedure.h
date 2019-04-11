@@ -34,7 +34,13 @@ public:
   void set_to_false(const exprt &expr);
 
   /// Convert a Boolean expression and return the corresponding literal
+  /// This will go away, use handle(expr) instead
   virtual literalt convert(const exprt &expr) = 0;
+
+  /// Generate a handle for an expression; this offers an efficient way
+  /// to refer to the expression in subsequent calls to \ref get or
+  /// \ref set_to
+  virtual exprt handle(const exprt &expr) = 0;
 
   /// Result of running the decision procedure
   enum class resultt
@@ -54,6 +60,7 @@ public:
 
   /// Return value of literal \p l from satisfying assignment.
   /// Return tvt::UNKNOWN if not available
+  /// This will go away, use get instead.
   virtual tvt l_get(literalt l) const = 0;
 
   /// Print satisfying assignment to \p out
