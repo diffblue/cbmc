@@ -17,10 +17,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/unicode.h>
 
 #include "java_pointer_casts.h"
-#include "java_types.h"
-#include "java_utils.h"
 #include "java_root_class.h"
 #include "java_string_library_preprocess.h"
+#include "java_string_literal_expr.h"
+#include "java_types.h"
+#include "java_utils.h"
 
 void java_bytecode_typecheckt::typecheck_expr(exprt &expr)
 {
@@ -39,7 +40,7 @@ void java_bytecode_typecheckt::typecheck_expr(exprt &expr)
     typecheck_expr(*it);
 
   INVARIANT(
-    expr.id() != ID_java_string_literal,
+    !can_cast_expr<java_string_literal_exprt>(expr),
     "String literals should have been converted to constant globals "
     "before typecheck_expr");
 

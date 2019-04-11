@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_bytecode_convert_method_class.h"
 #include "java_static_initializers.h"
 #include "java_string_library_preprocess.h"
+#include "java_string_literal_expr.h"
 #include "java_types.h"
 #include "java_utils.h"
 #include "pattern.h"
@@ -1313,7 +1314,7 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
       PRECONDITION(op.empty() && results.size() == 1);
 
       INVARIANT(
-        arg0.id() != ID_java_string_literal && arg0.id() != ID_type,
+        !can_cast_expr<java_string_literal_exprt>(arg0) && arg0.id() != ID_type,
         "String and Class literals should have been lowered in "
         "generate_constant_global_variables");
 

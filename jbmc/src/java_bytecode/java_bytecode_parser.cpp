@@ -21,9 +21,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/string_constant.h>
 #include <util/optional.h>
 
-#include "java_bytecode_parse_tree.h"
-#include "java_types.h"
 #include "bytecode_info.h"
+#include "java_bytecode_parse_tree.h"
+#include "java_string_literal_expr.h"
+#include "java_types.h"
 
 #ifdef DEBUG
 #include <iostream>
@@ -839,9 +840,7 @@ void java_bytecode_parsert::rconstant_pool()
     case CONSTANT_String:
       {
         // ldc turns these into references to java.lang.String
-        exprt string_literal(ID_java_string_literal);
-        string_literal.set(ID_value, pool_entry(it->ref1).s);
-        it->expr=string_literal;
+        it->expr = java_string_literal_exprt{pool_entry(it->ref1).s};
       }
       break;
 

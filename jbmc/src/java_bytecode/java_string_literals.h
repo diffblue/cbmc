@@ -12,6 +12,8 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 #include <util/symbol_table.h>
 #include <util/std_expr.h>
 
+class java_string_literal_exprt;
+
 /// Creates or gets an existing constant global symbol for a given string
 /// literal.
 /// \param string_expr: string literal expression to convert
@@ -21,7 +23,7 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 ///   structure will also be initialised and added to the symbol table.
 /// \return a symbol_expr corresponding to the new or existing literal symbol.
 symbol_exprt get_or_create_string_literal_symbol(
-  const exprt &string_expr,
+  const java_string_literal_exprt &string_expr,
   symbol_table_baset &symbol_table,
   bool string_refinement_enabled);
 

@@ -8,6 +8,7 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 
 #include "java_string_literals.h"
 #include "java_root_class.h"
+#include "java_string_literal_expr.h"
 #include "java_types.h"
 #include "java_utils.h"
 
@@ -56,12 +57,11 @@ static array_exprt utf16_to_array(const std::wstring &in)
 }
 
 symbol_exprt get_or_create_string_literal_symbol(
-  const exprt &string_expr,
+  const java_string_literal_exprt &string_expr,
   symbol_table_baset &symbol_table,
   bool string_refinement_enabled)
 {
-  PRECONDITION(string_expr.id() == ID_java_string_literal);
-  const irep_idt value = string_expr.get(ID_value);
+  const irep_idt value = string_expr.value();
   const struct_tag_typet string_type("java::java.lang.String");
 
   const std::string escaped_symbol_name = escape_non_alnum(id2string(value));
@@ -213,8 +213,8 @@ symbol_exprt get_or_create_string_literal_symbol(
   symbol_table_baset &symbol_table,
   bool string_refinement_enabled)
 {
-  exprt literal{ID_java_string_literal};
-  literal.set(ID_value, string_value);
   return get_or_create_string_literal_symbol(
-    literal, symbol_table, string_refinement_enabled);
+    java_string_literal_exprt{string_value},
+    symbol_table,
+    string_refinement_enabled);
 }
