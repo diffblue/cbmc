@@ -85,7 +85,6 @@ Author: Daniel Kroening, kroening@kroening.com
 cbmc_parse_optionst::cbmc_parse_optionst(int argc, const char **argv)
   : parse_options_baset(CBMC_OPTIONS, argc, argv, ui_message_handler),
     xml_interfacet(cmdline),
-    messaget(ui_message_handler),
     ui_message_handler(cmdline, std::string("CBMC ") + CBMC_VERSION)
 {
 }
@@ -100,7 +99,6 @@ cbmc_parse_optionst::cbmc_parse_optionst(int argc, const char **argv)
       argv,
       ui_message_handler),
     xml_interfacet(cmdline),
-    messaget(ui_message_handler),
     ui_message_handler(cmdline, std::string("CBMC ") + CBMC_VERSION)
 {
 }
@@ -138,23 +136,26 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
 
   if(cmdline.isset("cover") && cmdline.isset("unwinding-assertions"))
   {
-    error() << "--cover and --unwinding-assertions must not be given together"
-            << eom;
+    log.error()
+      << "--cover and --unwinding-assertions must not be given together"
+      << messaget::eom;
     exit(CPROVER_EXIT_USAGE_ERROR);
   }
 
   if(cmdline.isset("partial-loops") && cmdline.isset("unwinding-assertions"))
   {
-    error() << "--partial-loops and --unwinding-assertions must not be given "
-            << "together" << eom;
+    log.error()
+      << "--partial-loops and --unwinding-assertions must not be given "
+      << "together" << messaget::eom;
     exit(CPROVER_EXIT_USAGE_ERROR);
   }
 
   if(cmdline.isset("reachability-slice") &&
      cmdline.isset("reachability-slice-fb"))
   {
-    error() << "--reachability-slice and --reachability-slice-fb must not be "
-            << "given together" << eom;
+    log.error()
+      << "--reachability-slice and --reachability-slice-fb must not be "
+      << "given together" << messaget::eom;
     exit(CPROVER_EXIT_USAGE_ERROR);
   }
 
@@ -163,7 +164,7 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
 
   if(cmdline.isset("show-symex-strategies"))
   {
-    status() << show_path_strategies() << eom;
+    log.status() << show_path_strategies() << messaget::eom;
     exit(CPROVER_EXIT_SUCCESS);
   }
 
@@ -248,7 +249,7 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
 
   if(cmdline.isset("slice-by-trace"))
   {
-    error() << "--slice-by-trace has been removed" << eom;
+    log.error() << "--slice-by-trace has been removed" << messaget::eom;
     exit(CPROVER_EXIT_USAGE_ERROR);
   }
 
@@ -339,7 +340,7 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
 
   if(cmdline.isset("smt1"))
   {
-    error() << "--smt1 is no longer supported" << eom;
+    log.error() << "--smt1 is no longer supported" << messaget::eom;
     exit(CPROVER_EXIT_USAGE_ERROR);
   }
 
@@ -457,15 +458,15 @@ int cbmc_parse_optionst::doit()
   optionst options;
   get_command_line_options(options);
 
-  eval_verbosity(
+  messaget::eval_verbosity(
     cmdline.get_value("verbosity"), messaget::M_STATISTICS, ui_message_handler);
 
   //
   // Print a banner
   //
-  status() << "CBMC version " << CBMC_VERSION << " " << sizeof(void *) * 8
-           << "-bit " << config.this_architecture() << " "
-           << config.this_operating_system() << eom;
+  log.status() << "CBMC version " << CBMC_VERSION << " " << sizeof(void *) * 8
+               << "-bit " << config.this_architecture() << " "
+               << config.this_operating_system() << messaget::eom;
 
   //
   // Unwinding of transition systems is done by hw-cbmc.
@@ -474,15 +475,16 @@ int cbmc_parse_optionst::doit()
   if(cmdline.isset("module") ||
      cmdline.isset("gen-interface"))
   {
-    error() << "This version of CBMC has no support for "
-               " hardware modules. Please use hw-cbmc." << eom;
+    log.error() << "This version of CBMC has no support for "
+                   " hardware modules. Please use hw-cbmc."
+                << messaget::eom;
     return CPROVER_EXIT_USAGE_ERROR;
   }
 
   register_languages();
 
   if(cmdline.isset("test-preprocessor"))
-    return test_c_preprocessor(get_message_handler())
+    return test_c_preprocessor(log.get_message_handler())
              ? CPROVER_EXIT_PREPROCESSOR_TEST_FAILED
              : CPROVER_EXIT_SUCCESS;
 
@@ -498,7 +500,7 @@ int cbmc_parse_optionst::doit()
       cmdline.args.size() != 1 ||
       is_goto_binary(cmdline.args[0], ui_message_handler))
     {
-      error() << "Please give exactly one source file" << eom;
+      log.error() << "Please give exactly one source file" << messaget::eom;
       return CPROVER_EXIT_INCORRECT_TASK;
     }
 
@@ -512,8 +514,8 @@ int cbmc_parse_optionst::doit()
 
     if(!infile)
     {
-      error() << "failed to open input file `"
-              << filename << "'" << eom;
+      log.error() << "failed to open input file `" << filename << "'"
+                  << messaget::eom;
       return CPROVER_EXIT_INCORRECT_TASK;
     }
 
@@ -522,19 +524,19 @@ int cbmc_parse_optionst::doit()
 
     if(language==nullptr)
     {
-      error() << "failed to figure out type of file `"
-              <<  filename << "'" << eom;
+      log.error() << "failed to figure out type of file `" << filename << "'"
+                  << messaget::eom;
       return CPROVER_EXIT_INCORRECT_TASK;
     }
 
     language->set_language_options(options);
-    language->set_message_handler(get_message_handler());
+    language->set_message_handler(log.get_message_handler());
 
-    status() << "Parsing " << filename << eom;
+    log.status() << "Parsing " << filename << messaget::eom;
 
     if(language->parse(infile, filename))
     {
-      error() << "PARSING ERROR" << eom;
+      log.error() << "PARSING ERROR" << messaget::eom;
       return CPROVER_EXIT_INCORRECT_TASK;
     }
 
@@ -543,7 +545,7 @@ int cbmc_parse_optionst::doit()
   }
 
   int get_goto_program_ret =
-    get_goto_program(goto_model, options, cmdline, *this, ui_message_handler);
+    get_goto_program(goto_model, options, cmdline, log, ui_message_handler);
 
   if(get_goto_program_ret!=-1)
     return get_goto_program_ret;
@@ -552,7 +554,7 @@ int cbmc_parse_optionst::doit()
      cmdline.isset("show-properties")) // use this one
   {
     show_properties(
-      goto_model, get_message_handler(), ui_message_handler.get_ui());
+      goto_model, log.get_message_handler(), ui_message_handler.get_ui());
     return CPROVER_EXIT_SUCCESS;
   }
 
@@ -746,7 +748,8 @@ void cbmc_parse_optionst::preprocessing(const optionst &options)
   {
     if(cmdline.args.size()!=1)
     {
-      error() << "Please provide one program to preprocess" << eom;
+      log.error() << "Please provide one program to preprocess"
+                  << messaget::eom;
       return;
     }
 
@@ -756,7 +759,7 @@ void cbmc_parse_optionst::preprocessing(const optionst &options)
 
     if(!infile)
     {
-      error() << "failed to open input file" << eom;
+      log.error() << "failed to open input file" << messaget::eom;
       return;
     }
 
@@ -765,14 +768,14 @@ void cbmc_parse_optionst::preprocessing(const optionst &options)
 
     if(language==nullptr)
     {
-      error() << "failed to figure out type of file" << eom;
+      log.error() << "failed to figure out type of file" << messaget::eom;
       return;
     }
 
-    language->set_message_handler(get_message_handler());
+    language->set_message_handler(log.get_message_handler());
 
     if(language->preprocess(infile, filename, std::cout))
-      error() << "PREPROCESSING ERROR" << eom;
+      log.error() << "PREPROCESSING ERROR" << messaget::eom;
   }
 }
 
@@ -788,7 +791,7 @@ bool cbmc_parse_optionst::process_goto_program(
 
     // add the library
     log.status() << "Adding CPROVER library (" << config.ansi_c.arch << ")"
-                 << eom;
+                 << messaget::eom;
     link_to_library(
       goto_model, log.get_message_handler(), cprover_cpp_library_factory);
     link_to_library(
@@ -798,7 +801,8 @@ bool cbmc_parse_optionst::process_goto_program(
       string_instrumentation(goto_model, log.get_message_handler());
 
     // remove function pointers
-    log.status() << "Removal of function pointers and virtual functions" << eom;
+    log.status() << "Removal of function pointers and virtual functions"
+                 << messaget::eom;
     remove_function_pointers(
       log.get_message_handler(),
       goto_model,
@@ -816,7 +820,7 @@ bool cbmc_parse_optionst::process_goto_program(
     rewrite_union(goto_model);
 
     // add generic checks
-    log.status() << "Generic Property Instrumentation" << eom;
+    log.status() << "Generic Property Instrumentation" << messaget::eom;
     goto_check(options, goto_model);
 
     // checks don't know about adjusted float expressions
@@ -828,13 +832,13 @@ bool cbmc_parse_optionst::process_goto_program(
     {
       log.status() << "Adding nondeterministic initialization "
                       "of static/global variables"
-                   << eom;
+                   << messaget::eom;
       nondet_static(goto_model);
     }
 
     if(options.get_bool_option("string-abstraction"))
     {
-      log.status() << "String Abstraction" << eom;
+      log.status() << "String Abstraction" << messaget::eom;
       string_abstraction(goto_model, log.get_message_handler());
     }
 
@@ -851,7 +855,7 @@ bool cbmc_parse_optionst::process_goto_program(
     if(options.get_bool_option("drop-unused-functions"))
     {
       // Entry point will have been set before and function pointers removed
-      log.status() << "Removing unused functions" << eom;
+      log.status() << "Removing unused functions" << messaget::eom;
       remove_unused_functions(goto_model, log.get_message_handler());
     }
 
@@ -880,7 +884,7 @@ bool cbmc_parse_optionst::process_goto_program(
     if(options.get_bool_option("reachability-slice-fb"))
     {
       log.status() << "Performing a forwards-backwards reachability slice"
-                   << eom;
+                   << messaget::eom;
       if(options.is_set("property"))
         reachability_slicer(
           goto_model, options.get_list_option("property"), true);
@@ -890,7 +894,7 @@ bool cbmc_parse_optionst::process_goto_program(
 
     if(options.get_bool_option("reachability-slice"))
     {
-      log.status() << "Performing a reachability slice" << eom;
+      log.status() << "Performing a reachability slice" << messaget::eom;
       if(options.is_set("property"))
         reachability_slicer(goto_model, options.get_list_option("property"));
       else
@@ -900,7 +904,7 @@ bool cbmc_parse_optionst::process_goto_program(
     // full slice?
     if(options.get_bool_option("full-slice"))
     {
-      log.status() << "Performing a full slice" << eom;
+      log.status() << "Performing a full slice" << messaget::eom;
       if(options.is_set("property"))
         property_slicer(goto_model, options.get_list_option("property"));
       else
