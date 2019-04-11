@@ -951,7 +951,7 @@ bool simplify_exprt::simplify_concatenation(exprt &expr)
 
 bool simplify_exprt::simplify_shifts(exprt &expr)
 {
-  if(!is_number(expr.type()))
+  if(!is_bitvector_type(expr.type()))
     return true;
 
   if(expr.operands().size()!=2)
@@ -972,11 +972,21 @@ bool simplify_exprt::simplify_shifts(exprt &expr)
 
   auto value = numeric_cast<mp_integer>(expr.op0());
 
+  if(
+    !value.has_value() && expr.op0().type().id() == ID_bv &&
+    expr.op0().id() == ID_constant)
+  {
+    const std::size_t width = to_bitvector_type(expr.op0().type()).get_width();
+    value =
+      bvrep2integer(to_constant_expr(expr.op0()).get_value(), width, false);
+  }
+
   if(!value.has_value())
     return true;
 
-  if(expr.op0().type().id()==ID_unsignedbv ||
-     expr.op0().type().id()==ID_signedbv)
+  if(
+    expr.op0().type().id() == ID_unsignedbv ||
+    expr.op0().type().id() == ID_signedbv || expr.op0().type().id() == ID_bv)
   {
     const std::size_t width = to_bitvector_type(expr.op0().type()).get_width();
 

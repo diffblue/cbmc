@@ -6,3 +6,6 @@ main.c
 ^VERIFICATION SUCCESSFUL$
 --
 ^warning: ignoring
+--
+This test is marked broken-smt-backend for performance reasons only: it passes,
+but takes 5 seconds to do so.
