@@ -260,7 +260,7 @@ bool boolbvt::type_conversion(
     {
       INVARIANT(
         src_width == dest_width,
-        "source bitvector with shall equal the destination bitvector width");
+        "source bitvector width shall equal the destination bitvector width");
       dest=src;
       return false;
     }
@@ -418,7 +418,7 @@ bool boolbvt::type_conversion(
       case bvtypet::IS_BV:
         INVARIANT(
           src_width == dest_width,
-          "source bitvector with shall equal the destination bitvector width");
+          "source bitvector width shall equal the destination bitvector width");
         dest = src;
         return false;
 
