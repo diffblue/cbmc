@@ -4,7 +4,12 @@ from __future__ import print_function
 
 def diff_to_added_lines(diff_file, repository_root, out_stream):
 
-  import unidiff
+  try:
+    import unidiff
+  except ImportError:
+    print("diff_to_added_lines.py requires unidiff, use `pip install --user unidiff` to install")
+    sys.exit(1)
+
   import os.path
   import json
 
