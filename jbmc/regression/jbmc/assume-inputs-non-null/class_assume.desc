@@ -1,0 +1,16 @@
+CORE
+My.class
+--function My.classArg --java-assume-inputs-non-null
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+\[java::My.classArg:\(LOther;\)V.assertion.1\].*SUCCESS
+\[java::My.classArg:\(LOther;\)V.assertion.2\].*FAILURE
+\[java::My.classArg:\(LOther;\)V.assertion.3\].*FAILURE
+\[java::My.classArg:\(LOther;\)V.assertion.4\].*FAILURE
+--
+^warning: ignoring
+--
+Check that --java-assume-inputs-non-null restricts inputs to non-null user-
+defined objects.
+Also verify that fields of input object are NOT constrained to be non-null.

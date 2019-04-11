@@ -1,0 +1,12 @@
+CORE
+My.class
+--function My.stringArg --java-assume-inputs-non-null
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+\[java::My.stringArg:\(Ljava/lang/String;\)V.assertion.1\].*SUCCESS
+\[java::My.stringArg:\(Ljava/lang/String;\)V.assertion.2\].*FAILURE
+--
+^warning: ignoring
+--
+Check that --java-assume-inputs-non-null restricts inputs to non-null strings

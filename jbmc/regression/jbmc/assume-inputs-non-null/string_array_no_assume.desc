@@ -1,0 +1,13 @@
+CORE
+My.class
+--function My.stringArrayArg
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+\[java::My.stringArrayArg:\(\[Ljava/lang/String;\)V.assertion.1\].*FAILURE
+\[java::My.stringArrayArg:\(\[Ljava/lang/String;\)V.assertion.2\].*FAILURE
+--
+^warning: ignoring
+--
+Sanity check: null inputs are allowed when not using
+--java-assume-inputs-non-null.
