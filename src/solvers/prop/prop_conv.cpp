@@ -7,7 +7,15 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include "prop_conv.h"
+
+#include "literal_expr.h"
+
 #include <algorithm>
+
+exprt prop_convt::handle(const exprt &expr)
+{
+  return literal_exprt(convert(expr));
+}
 
 /// determine whether a variable is in the final conflict
 bool prop_convt::is_in_conflict(literalt) const
