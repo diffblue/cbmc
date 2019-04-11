@@ -10,11 +10,30 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "literal_expr.h"
 
+#include <util/std_expr.h>
+
 #include <algorithm>
 
 exprt prop_convt::handle(const exprt &expr)
 {
-  return literal_exprt(convert(expr));
+  // We can only improve Booleans.
+  if(expr.type().id() != ID_bool)
+    return expr;
+
+  // We convert to a literal to obtain a 'small' handle
+  literalt l = convert(expr);
+
+  // The literal may be a constant as a result of non-trivial
+  // propagation. We return constants as such.
+  if(l.is_true())
+    return true_exprt();
+  else if(l.is_false())
+    return false_exprt();
+
+  // freeze to enable incremental use
+  set_frozen(l);
+
+  return literal_exprt(l);
 }
 
 /// determine whether a variable is in the final conflict
