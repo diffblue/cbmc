@@ -1,0 +1,17 @@
+CORE
+test.class
+--unwind 10
+^\[java::test.main:\(\[Ljava/lang/String;\)V\.assertion.1\] line 14 assertion at file test\.java line 14 function java::test.main:\(\[Ljava/lang/String;\)V bytecode-index 21: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+This test verifies that we can handle nested exception handlers
+test.main gives the following exception table:
+ from    to  target type
+    2     7    25   Class java/lang/Exception
+    8    22    25   Class java/lang/Exception
+    0     7    45   Class MyException
+    8    42    45   Class MyException
