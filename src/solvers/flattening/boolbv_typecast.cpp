@@ -415,31 +415,31 @@ bool boolbvt::type_conversion(
       }
       break;
 
-    case bvtypet::IS_BV:
-      INVARIANT(
-        src_width == dest_width,
-        "source bitvector with shall equal the destination bitvector width");
-      dest=src;
-      return false;
-
-    default:
-      if(src_type.id()==ID_bool)
-      {
-        // bool to integer
-
+      case bvtypet::IS_BV:
         INVARIANT(
-          src_width == 1, "bitvector of type boolean shall have width one");
-
-        for(std::size_t i=0; i<dest_width; i++)
-        {
-          if(i==0)
-            dest.push_back(src[0]);
-          else
-            dest.push_back(const_literal(false));
-        }
-
+          src_width == dest_width,
+          "source bitvector with shall equal the destination bitvector width");
+        dest = src;
         return false;
-      }
+
+      default:
+        if(src_type.id() == ID_bool)
+        {
+          // bool to integer
+
+          INVARIANT(
+            src_width == 1, "bitvector of type boolean shall have width one");
+
+          for(std::size_t i = 0; i < dest_width; i++)
+          {
+            if(i == 0)
+              dest.push_back(src[0]);
+            else
+              dest.push_back(const_literal(false));
+          }
+
+          return false;
+        }
     }
     break;
 
