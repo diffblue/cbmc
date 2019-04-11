@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_utils.h"
 
 #include "java_root_class.h"
+#include "java_string_library_preprocess.h"
 
 #include <util/fresh_symbol.h>
 #include <util/invariant.h>
@@ -27,6 +28,14 @@ bool java_is_array_type(const typet &type)
   if(type.id() != ID_struct)
     return false;
   return is_java_array_tag(to_struct_type(type).get_tag());
+}
+
+bool is_java_string_type(const struct_typet &struct_type)
+{
+  return java_string_library_preprocesst::implements_java_char_sequence(
+           struct_type) &&
+         struct_type.has_component("length") &&
+         struct_type.has_component("data");
 }
 
 unsigned java_local_variable_slots(const typet &t)

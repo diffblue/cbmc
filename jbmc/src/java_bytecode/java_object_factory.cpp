@@ -366,21 +366,10 @@ void initialize_nondet_string_fields(
   bool printable,
   allocate_objectst &allocate_objects)
 {
-  PRECONDITION(
-    java_string_library_preprocesst
-      ::implements_java_char_sequence(struct_expr.type()));
-
   namespacet ns(symbol_table);
-
   const struct_typet &struct_type =
     to_struct_type(ns.follow(struct_expr.type()));
-
-  // In case the type for String was not added to the symbol table,
-  // (typically when string refinement is not activated), `struct_type`
-  // just contains the standard Object fields (or may have some other model
-  // entirely), and in particular has no length and data fields.
-  PRECONDITION(
-    struct_type.has_component("length") && struct_type.has_component("data"));
+  PRECONDITION(is_java_string_type(struct_type));
 
   // We allow type StringBuffer and StringBuilder to be initialized
   // in the same way has String, because they have the same structure and
@@ -774,7 +763,6 @@ void java_object_factoryt::gen_nondet_struct_init(
 {
   const namespacet ns(symbol_table);
   PRECONDITION(ns.follow(expr.type()).id()==ID_struct);
-  PRECONDITION(struct_type.id()==ID_struct);
 
   typedef struct_typet::componentst componentst;
   const irep_idt &struct_tag=struct_type.get_tag();
@@ -792,15 +780,12 @@ void java_object_factoryt::gen_nondet_struct_init(
   //   generated differently from object fields in the general case, see
   //   \ref java_object_factoryt::initialize_nondet_string_fields.
 
-  const bool is_char_sequence =
-    java_string_library_preprocesst::implements_java_char_sequence(struct_type);
-  const bool has_length_and_data =
-    struct_type.has_component("length") && struct_type.has_component("data");
-  const bool is_string_type = is_char_sequence && has_length_and_data;
   const bool has_string_input_values =
     !object_factory_parameters.string_input_values.empty();
 
-  if(is_string_type && has_string_input_values && !skip_classid)
+  if(
+    is_java_string_type(struct_type) && has_string_input_values &&
+    !skip_classid)
   { // We're dealing with a string and we should set fixed input values.
     // We create a switch statement where each case is an assignment
     // of one of the fixed input strings to the input variable in question
@@ -817,7 +802,7 @@ void java_object_factoryt::gen_nondet_struct_init(
   else if(
     (!is_sub && !skip_classid &&
      update_in_place != update_in_placet::MUST_UPDATE_IN_PLACE) ||
-    is_string_type)
+    is_java_string_type(struct_type))
   {
     // Add an initial all-zero write. Most of the fields of this will be
     // overwritten, but it helps to have a whole-structure write that analysis
@@ -834,7 +819,7 @@ void java_object_factoryt::gen_nondet_struct_init(
     // If the initialised type is a special-cased String type (one with length
     // and data fields introduced by string-library preprocessing), initialise
     // those fields with nondet values
-    if(is_string_type)
+    if(is_java_string_type(struct_type))
     { // We're dealing with a string
       initialize_nondet_string_fields(
         to_struct_expr(*initial_object),
@@ -874,7 +859,8 @@ void java_object_factoryt::gen_nondet_struct_init(
       code.add_source_location() = location;
       assignments.add(code);
     }
-    else if(is_string_type && (name == "length" || name == "data"))
+    else if(
+      is_java_string_type(struct_type) && (name == "length" || name == "data"))
     {
       // In this case these were set up above.
       continue;
