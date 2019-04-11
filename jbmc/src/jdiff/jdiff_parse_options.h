@@ -40,7 +40,7 @@ class goto_modelt;
   "(compact-output)"
 // clang-format on
 
-class jdiff_parse_optionst : public parse_options_baset, public messaget
+class jdiff_parse_optionst : public parse_options_baset
 {
 public:
   virtual int doit();

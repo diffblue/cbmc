@@ -59,7 +59,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 janalyzer_parse_optionst::janalyzer_parse_optionst(int argc, const char **argv)
   : parse_options_baset(JANALYZER_OPTIONS, argc, argv, ui_message_handler),
-    messaget(ui_message_handler),
     ui_message_handler(cmdline, std::string("JANALYZER ") + CBMC_VERSION)
 {
 }
@@ -260,7 +259,8 @@ void janalyzer_parse_optionst::get_command_line_options(optionst &options)
       if(!options.get_bool_option("domain set"))
       {
         // Default to constants as it is light-weight but useful
-        status() << "Domain not specified, defaulting to --constants" << eom;
+        log.status() << "Domain not specified, defaulting to --constants"
+                     << messaget::eom;
         options.set_option("constants", true);
       }
     }
@@ -343,31 +343,33 @@ int janalyzer_parse_optionst::doit()
 
   optionst options;
   get_command_line_options(options);
-  eval_verbosity(
+  messaget::eval_verbosity(
     cmdline.get_value("verbosity"), messaget::M_STATISTICS, ui_message_handler);
 
   //
   // Print a banner
   //
-  status() << "JANALYZER version " << CBMC_VERSION << " " << sizeof(void *) * 8
-           << "-bit " << config.this_architecture() << " "
-           << config.this_operating_system() << eom;
+  log.status() << "JANALYZER version " << CBMC_VERSION << " "
+               << sizeof(void *) * 8 << "-bit " << config.this_architecture()
+               << " " << config.this_operating_system() << messaget::eom;
 
   register_languages();
 
   if(cmdline.args.size() > 1)
   {
-    error() << "Only one .class, .jar or .gbf file should be directly "
-      "specified on the command-line. To force loading another another class "
-      "use '--java-load-class somepackage.SomeClass' or "
-      "'--lazy-methods-extra-entry-point somepackage.SomeClass.method' along "
-      "with '--classpath'"
-            << messaget::eom;
+    log.error() << "Only one .class, .jar or .gbf file should be directly "
+                   "specified on the command-line. To force loading another "
+                   "another class "
+                   "use '--java-load-class somepackage.SomeClass' or "
+                   "'--lazy-methods-extra-entry-point "
+                   "somepackage.SomeClass.method' along "
+                   "with '--classpath'"
+                << messaget::eom;
     return CPROVER_EXIT_USAGE_ERROR;
   }
 
   goto_model =
-    initialize_goto_model(cmdline.args, get_message_handler(), options);
+    initialize_goto_model(cmdline.args, log.get_message_handler(), options);
 
   if(process_goto_program(options))
     return CPROVER_EXIT_INTERNAL_ERROR;
@@ -386,7 +388,7 @@ int janalyzer_parse_optionst::doit()
   {
     show_goto_functions(
       goto_model,
-      get_message_handler(),
+      log.get_message_handler(),
       get_ui(),
       cmdline.isset("list-goto-functions"));
     return CPROVER_EXIT_SUCCESS;
@@ -404,14 +406,15 @@ int janalyzer_parse_optionst::perform_analysis(const optionst &options)
 
     if(cmdline.isset("show-taint"))
     {
-      taint_analysis(goto_model, taint_file, get_message_handler(), true, "");
+      taint_analysis(
+        goto_model, taint_file, log.get_message_handler(), true, "");
       return CPROVER_EXIT_SUCCESS;
     }
     else
     {
       std::string json_file = cmdline.get_value("json");
       bool result = taint_analysis(
-        goto_model, taint_file, get_message_handler(), false, json_file);
+        goto_model, taint_file, log.get_message_handler(), false, json_file);
       return result ? CPROVER_EXIT_VERIFICATION_UNSAFE : CPROVER_EXIT_SUCCESS;
     }
   }
@@ -432,7 +435,8 @@ int janalyzer_parse_optionst::perform_analysis(const optionst &options)
       std::ofstream ofs(json_file);
       if(!ofs)
       {
-        error() << "Failed to open json output `" << json_file << "'" << eom;
+        log.error() << "Failed to open json output `" << json_file << "'"
+                    << messaget::eom;
         return CPROVER_EXIT_INTERNAL_ERROR;
       }
 
@@ -457,7 +461,8 @@ int janalyzer_parse_optionst::perform_analysis(const optionst &options)
       std::ofstream ofs(json_file);
       if(!ofs)
       {
-        error() << "Failed to open json output `" << json_file << "'" << eom;
+        log.error() << "Failed to open json output `" << json_file << "'"
+                    << messaget::eom;
         return CPROVER_EXIT_INTERNAL_ERROR;
       }
 
@@ -482,7 +487,8 @@ int janalyzer_parse_optionst::perform_analysis(const optionst &options)
       std::ofstream ofs(json_file);
       if(!ofs)
       {
-        error() << "Failed to open json output `" << json_file << "'" << eom;
+        log.error() << "Failed to open json output `" << json_file << "'"
+                    << messaget::eom;
         return CPROVER_EXIT_INTERNAL_ERROR;
       }
 
@@ -513,7 +519,7 @@ int janalyzer_parse_optionst::perform_analysis(const optionst &options)
 
   if(cmdline.isset("show-properties"))
   {
-    show_properties(goto_model, get_message_handler(), get_ui());
+    show_properties(goto_model, log.get_message_handler(), get_ui());
     return CPROVER_EXIT_SUCCESS;
   }
 
@@ -532,28 +538,29 @@ int janalyzer_parse_optionst::perform_analysis(const optionst &options)
 
     if(!out)
     {
-      error() << "Failed to open output file `" << outfile << "'" << eom;
+      log.error() << "Failed to open output file `" << outfile << "'"
+                  << messaget::eom;
       return CPROVER_EXIT_INTERNAL_ERROR;
     }
 
     // Build analyzer
-    status() << "Selecting abstract domain" << eom;
+    log.status() << "Selecting abstract domain" << messaget::eom;
     namespacet ns(goto_model.symbol_table); // Must live as long as the domain.
     std::unique_ptr<ai_baset> analyzer(build_analyzer(options, ns));
 
     if(analyzer == nullptr)
     {
-      status() << "Task / Interpreter / Domain combination not supported"
-               << messaget::eom;
+      log.status() << "Task / Interpreter / Domain combination not supported"
+                   << messaget::eom;
       return CPROVER_EXIT_INTERNAL_ERROR;
     }
 
     // Run
-    status() << "Computing abstract states" << eom;
+    log.status() << "Computing abstract states" << messaget::eom;
     (*analyzer)(goto_model);
 
     // Perform the task
-    status() << "Performing task" << eom;
+    log.status() << "Performing task" << messaget::eom;
     bool result = true;
     if(options.get_bool_option("show"))
     {
@@ -563,12 +570,12 @@ int janalyzer_parse_optionst::perform_analysis(const optionst &options)
     else if(options.get_bool_option("verify"))
     {
       result = static_verifier(
-        goto_model, *analyzer, options, get_message_handler(), out);
+        goto_model, *analyzer, options, log.get_message_handler(), out);
     }
     else if(options.get_bool_option("simplify"))
     {
       result = static_simplifier(
-        goto_model, *analyzer, options, get_message_handler(), out);
+        goto_model, *analyzer, options, log.get_message_handler(), out);
     }
     else if(options.get_bool_option("unreachable-instructions"))
     {
@@ -587,7 +594,7 @@ int janalyzer_parse_optionst::perform_analysis(const optionst &options)
     }
     else
     {
-      error() << "Unhandled task" << eom;
+      log.error() << "Unhandled task" << messaget::eom;
       return CPROVER_EXIT_INTERNAL_ERROR;
     }
 
@@ -596,7 +603,8 @@ int janalyzer_parse_optionst::perform_analysis(const optionst &options)
   }
 
   // Final defensive error case
-  error() << "no analysis option given -- consider reading --help" << eom;
+  log.error() << "no analysis option given -- consider reading --help"
+              << messaget::eom;
   return CPROVER_EXIT_USAGE_ERROR;
 }
 
@@ -605,23 +613,24 @@ bool janalyzer_parse_optionst::process_goto_program(const optionst &options)
   try
   {
     // remove function pointers
-    status() << "Removing function pointers and virtual functions" << eom;
+    log.status() << "Removing function pointers and virtual functions"
+                 << messaget::eom;
     remove_function_pointers(
-      get_message_handler(), goto_model, cmdline.isset("pointer-check"));
+      log.get_message_handler(), goto_model, cmdline.isset("pointer-check"));
 
     // Java virtual functions -> explicit dispatch tables:
     remove_virtual_functions(goto_model);
 
     // remove Java throw and catch
     // This introduces instanceof, so order is important:
-    remove_exceptions_using_instanceof(goto_model, get_message_handler());
+    remove_exceptions_using_instanceof(goto_model, log.get_message_handler());
 
     // Java instanceof -> clsid comparison:
     class_hierarchyt class_hierarchy(goto_model.symbol_table);
-    remove_instanceof(goto_model, class_hierarchy, get_message_handler());
+    remove_instanceof(goto_model, class_hierarchy, log.get_message_handler());
 
     // do partial inlining
-    status() << "Partial Inlining" << eom;
+    log.status() << "Partial Inlining" << messaget::eom;
     goto_partial_inline(goto_model, ui_message_handler);
 
     // remove returns, gcc vectors, complex
@@ -630,7 +639,7 @@ bool janalyzer_parse_optionst::process_goto_program(const optionst &options)
     remove_complex(goto_model);
 
     // add generic checks
-    status() << "Generic Property Instrumentation" << eom;
+    log.status() << "Generic Property Instrumentation" << messaget::eom;
     goto_check(options, goto_model);
 
     // recalculate numbers, etc.
@@ -642,13 +651,13 @@ bool janalyzer_parse_optionst::process_goto_program(const optionst &options)
 
   catch(const char *e)
   {
-    error() << e << eom;
+    log.error() << e << messaget::eom;
     return true;
   }
 
   catch(const std::string &e)
   {
-    error() << e << eom;
+    log.error() << e << messaget::eom;
     return true;
   }
 
@@ -659,7 +668,7 @@ bool janalyzer_parse_optionst::process_goto_program(const optionst &options)
 
   catch(const std::bad_alloc &)
   {
-    error() << "Out of memory" << eom;
+    log.error() << "Out of memory" << messaget::eom;
     return true;
   }
 

@@ -41,7 +41,7 @@ int goto_harness_parse_optionst::doit()
 {
   if(cmdline.isset("version"))
   {
-    logger.status() << CBMC_VERSION << '\n';
+    log.status() << CBMC_VERSION << '\n';
     return CPROVER_EXIT_SUCCESS;
   }
 
@@ -55,7 +55,7 @@ int goto_harness_parse_optionst::doit()
 
   // Read goto binary into goto-model
   auto read_goto_binary_result =
-    read_goto_binary(got_harness_config.in_file, logger.get_message_handler());
+    read_goto_binary(got_harness_config.in_file, log.get_message_handler());
   if(!read_goto_binary_result.has_value())
   {
     throw deserialization_exceptiont{"failed to read goto program from file `" +
@@ -89,7 +89,7 @@ int goto_harness_parse_optionst::doit()
 
   // Write end result to new goto-binary
   if(write_goto_binary(
-       got_harness_config.out_file, goto_model, logger.get_message_handler()))
+       got_harness_config.out_file, goto_model, log.get_message_handler()))
   {
     throw system_exceptiont{"failed to write goto program from file `" +
                             got_harness_config.out_file + "'"};
@@ -100,7 +100,7 @@ int goto_harness_parse_optionst::doit()
 
 void goto_harness_parse_optionst::help()
 {
-  logger.status()
+  log.status()
     << '\n'
     << banner_string("Goto-Harness", CBMC_VERSION) << '\n'
     << align_center_with_border("Copyright (C) 2019") << '\n'
@@ -127,8 +127,7 @@ goto_harness_parse_optionst::goto_harness_parse_optionst(
   int argc,
   const char *argv[])
   : parse_options_baset{GOTO_HARNESS_OPTIONS, argc, argv, ui_message_handler},
-    ui_message_handler(cmdline, std::string("GOTO-HARNESS ") + CBMC_VERSION),
-    logger(ui_message_handler)
+    ui_message_handler(cmdline, std::string("GOTO-HARNESS ") + CBMC_VERSION)
 {
 }
 
