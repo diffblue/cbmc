@@ -1101,7 +1101,7 @@ code_blockt java_string_library_preprocesst::make_assign_function_from_call(
     function_id, type, loc, symbol_table, false);
 }
 
-/// Used to provide our own implementation of the java.lang.Object.getClass()
+/// Used to provide our own implementation of the CProver.classIdentifier()
 /// function.
 /// \param type: type of the function called
 /// \param loc: location in the source
@@ -1109,12 +1109,10 @@ code_blockt java_string_library_preprocesst::make_assign_function_from_call(
 /// \param symbol_table: the symbol table
 /// \return Code corresponding to
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/// Class class1;
-/// string_expr1 = substr(this->@class_identifier, 6)
-/// class1=Class.forName(string_expr1)
-/// return class1
+/// string_expr1 = substr(obj->@class_identifier, 6)
+/// return string_expr1;
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-code_blockt java_string_library_preprocesst::make_object_get_class_code(
+code_blockt java_string_library_preprocesst::make_class_identifier_code(
   const java_method_typet &type,
   const source_locationt &loc,
   const irep_idt &function_id,
@@ -1123,21 +1121,14 @@ code_blockt java_string_library_preprocesst::make_object_get_class_code(
   java_method_typet::parameterst params = type.parameters();
   PRECONDITION(!params.empty());
   PRECONDITION(!params[0].get_identifier().empty());
-  const symbol_exprt this_obj(params[0].get_identifier(), params[0].type());
+  const symbol_exprt obj(params[0].get_identifier(), params[0].type());
 
   // Code to be returned
   code_blockt code;
 
-  // > Class class1;
-  const pointer_typet &class_type = to_pointer_type(type.return_type());
-  const symbolt &class1_sym = fresh_java_symbol(
-    class_type, "class_symbol", loc, function_id, symbol_table);
-  const symbol_exprt class1 = class1_sym.symbol_expr();
-  code.add(code_declt(class1), loc);
-
-  // class_identifier is this->@class_identifier
-  const member_exprt class_identifier(
-    checked_dereference(this_obj), "@class_identifier", string_typet());
+  // class_identifier is obj->@class_identifier
+  const member_exprt class_identifier{
+    checked_dereference(obj), "@class_identifier", string_typet()};
 
   // string_expr = cprover_string_literal(this->@class_identifier)
   const refined_string_exprt string_expr = string_expr_of_function(
@@ -1157,8 +1148,7 @@ code_blockt java_string_library_preprocesst::make_object_get_class_code(
     code);
 
   // string1 = (String*) string_expr
-  const pointer_typet string_ptr_type =
-    java_reference_type(symbol_table.lookup_ref("java::java.lang.String").type);
+  const typet &string_ptr_type = type.return_type();
   const exprt string1 = allocate_fresh_string(
     string_ptr_type, loc, function_id, symbol_table, code);
   code.add(
@@ -1166,19 +1156,8 @@ code_blockt java_string_library_preprocesst::make_object_get_class_code(
       string1, string_expr1, symbol_table, true),
     loc);
 
-  // > class1 = Class.forName(string1)
-  java_method_typet fun_type(
-    {java_method_typet::parametert(string_ptr_type)}, class_type);
-  code_function_callt fun_call(
-    class1,
-    symbol_exprt(
-      "java::java.lang.Class.forName:(Ljava/lang/String;)Ljava/lang/Class;",
-      std::move(fun_type)),
-    {string1});
-  code.add(fun_call, loc);
-
-  // > return class1;
-  code.add(code_returnt(class1), loc);
+  // > return string1;
+  code.add(code_returnt{string1}, loc);
   return code;
 }
 
@@ -1900,9 +1879,10 @@ void java_string_library_preprocesst::initialize_conversion_table()
   cprover_equivalent_to_java_string_returning_function
     ["java::java.lang.Long.toString:(JI)Ljava/lang/String;"]=
       ID_cprover_string_of_int_func;
-  conversion_table["java::java.lang.Object.getClass:()Ljava/lang/Class;"] =
+  conversion_table["java::org.cprover.CProver.classIdentifier:("
+                   "Ljava/lang/Object;)Ljava/lang/String;"] =
     std::bind(
-      &java_string_library_preprocesst::make_object_get_class_code,
+      &java_string_library_preprocesst::make_class_identifier_code,
       this,
       std::placeholders::_1,
       std::placeholders::_2,
