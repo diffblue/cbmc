@@ -143,7 +143,8 @@ void linkingt::detailed_conflict_report_rec(
     if(depth>0 &&
        !base_type_eq(t1.subtype(), t2.subtype(), ns))
     {
-      conflict_path=dereference_exprt(conflict_path);
+      if(conflict_path.type().id() == ID_pointer)
+        conflict_path = dereference_exprt(conflict_path);
 
       detailed_conflict_report_rec(
         old_symbol,
