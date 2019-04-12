@@ -15,7 +15,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <list>
 
 #include "decision_procedure.h"
-#include "literal.h"
+
+#include <util/expr.h>
 
 class message_handlert;
 class prop_convt;
@@ -41,10 +42,11 @@ public:
 
   struct goalt
   {
-    literalt condition;
+    exprt condition;
     enum class statust { UNKNOWN, COVERED, UNCOVERED, ERROR } status;
 
-    goalt():status(statust::UNKNOWN)
+    explicit goalt(exprt _condition)
+      : condition(std::move(_condition)), status(statust::UNKNOWN)
     {
     }
   };
@@ -71,10 +73,9 @@ public:
 
   // managing the goals
 
-  void add(const literalt condition)
+  void add(exprt condition)
   {
-    goals.push_back(goalt());
-    goals.back().condition=condition;
+    goals.emplace_back(std::move(condition));
   }
 
   // register an observer if you want to be told
@@ -103,7 +104,6 @@ protected:
 private:
   void mark();
   void constraint();
-  void freeze_goal_variables();
 };
 
 #endif // CPROVER_SOLVERS_PROP_COVER_GOALS_H
