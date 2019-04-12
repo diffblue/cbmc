@@ -299,7 +299,7 @@ void goto_convertt::do_scanf(
               copy(array_copy_statement, OTHER, dest);
               #else
               const index_exprt new_lhs(
-                dereference_exprt(ptr, *type), from_integer(0, index_type()));
+                dereference_exprt{ptr}, from_integer(0, index_type()));
               const side_effect_expr_nondett rhs(
                 type->subtype(), function.source_location());
               code_assignt assign(new_lhs, rhs);
@@ -310,7 +310,7 @@ void goto_convertt::do_scanf(
             else
             {
               // make it nondet for now
-              const dereference_exprt new_lhs(ptr, *type);
+              const dereference_exprt new_lhs{ptr};
               const side_effect_expr_nondett rhs(
                 *type, function.source_location());
               code_assignt assign(new_lhs, rhs);
@@ -1222,7 +1222,7 @@ void goto_convertt::do_function_call_symbol(
     }
 
     // build *ptr
-    dereference_exprt deref_ptr(arguments[0], arguments[0].type().subtype());
+    dereference_exprt deref_ptr{arguments[0]};
 
     dest.add(goto_programt::make_atomic_begin(function.source_location()));
 
@@ -1287,7 +1287,7 @@ void goto_convertt::do_function_call_symbol(
     }
 
     // build *ptr
-    dereference_exprt deref_ptr(arguments[0], arguments[0].type().subtype());
+    dereference_exprt deref_ptr{arguments[0]};
 
     dest.add(goto_programt::make_atomic_begin(function.source_location()));
 
@@ -1356,7 +1356,7 @@ void goto_convertt::do_function_call_symbol(
     }
 
     // build *ptr
-    dereference_exprt deref_ptr(arguments[0], arguments[0].type().subtype());
+    dereference_exprt deref_ptr{arguments[0]};
 
     dest.add(goto_programt::make_atomic_begin(function.source_location()));
 
@@ -1412,7 +1412,7 @@ void goto_convertt::do_function_call_symbol(
     }
 
     // build *ptr
-    dereference_exprt deref_ptr(arguments[0], arguments[0].type().subtype());
+    dereference_exprt deref_ptr{arguments[0]};
 
     dest.add(goto_programt::make_atomic_begin(function.source_location()));
 

@@ -87,7 +87,7 @@ bool simplify_exprt::simplify_address_of_arg(exprt &expr)
               from_integer((*step_size) * (*index) + address, index_type()),
               pointer_type);
 
-            expr = dereference_exprt(typecast_expr, expr.type());
+            expr = dereference_exprt{typecast_expr};
             result = true;
           }
         }
@@ -124,7 +124,7 @@ bool simplify_exprt::simplify_address_of_arg(exprt &expr)
             pointer_type.subtype()=expr.type();
             typecast_exprt typecast_expr(
               from_integer(address + *offset, index_type()), pointer_type);
-            expr = dereference_exprt(typecast_expr, expr.type());
+            expr = dereference_exprt{typecast_expr};
             result=true;
           }
         }

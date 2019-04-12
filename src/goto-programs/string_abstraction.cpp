@@ -964,7 +964,7 @@ bool string_abstractiont::build_symbol(const symbol_exprt &sym, exprt &dest)
   dest=str_symbol.symbol_expr();
   if(current_args.find(symbol.name)!=current_args.end() &&
       !is_ptr_argument(abstract_type))
-    dest=dereference_exprt(dest, dest.type().subtype());
+    dest = dereference_exprt{dest};
 
   return false;
 }
@@ -1218,10 +1218,9 @@ goto_programt::targett string_abstractiont::value_assignments(
           index_exprt(lhs, from_integer(i, a_size.type())),
           index_exprt(rhs, from_integer(i, a_size.type())));
   }
-  else if(lhs.type().id()==ID_pointer)
-    return value_assignments(dest, target,
-        dereference_exprt(lhs, lhs.type().subtype()),
-        dereference_exprt(rhs, rhs.type().subtype()));
+  else if(lhs.type().id() == ID_pointer)
+    return value_assignments(
+      dest, target, dereference_exprt{lhs}, dereference_exprt{rhs});
   else if(lhs.type()==string_struct)
     return value_assignments_string_struct(dest, target, lhs, rhs);
   else if(lhs.type().id()==ID_struct || lhs.type().id()==ID_union)

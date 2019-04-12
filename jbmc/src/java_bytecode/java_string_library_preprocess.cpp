@@ -602,7 +602,7 @@ exprt make_nondet_infinite_char_array(
   code.add(code_declt(data_pointer));
   code.add(make_allocate_code(data_pointer, array_type.size()));
   const exprt nondet_data = side_effect_expr_nondett(array_type, loc);
-  const exprt data = dereference_exprt(data_pointer, array_type);
+  const exprt data = dereference_exprt{data_pointer};
   code.add(code_assignt(data, nondet_data), loc);
   return data;
 }

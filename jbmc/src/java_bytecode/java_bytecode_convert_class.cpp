@@ -867,8 +867,8 @@ void java_bytecode_convert_classt::add_array_types(symbol_tablet &symbol_table)
     location.set_function(local_name);
     side_effect_exprt java_new_array(
       ID_java_new_array, java_reference_type(struct_tag_type), location);
-    dereference_exprt old_array(this_symbol.symbol_expr(), struct_tag_type);
-    dereference_exprt new_array(local_symexpr, struct_tag_type);
+    dereference_exprt old_array{this_symbol.symbol_expr()};
+    dereference_exprt new_array{local_symexpr};
     member_exprt old_length(
       old_array, length_component.get_name(), length_component.type());
     java_new_array.copy_to_operands(old_length);

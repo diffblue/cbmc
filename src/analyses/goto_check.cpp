@@ -1576,7 +1576,7 @@ void goto_checkt::check_rec(const exprt &expr, guardt &guard, bool address)
       const exprt new_address_casted =
         typecast_exprt::conditional_cast(new_address, new_pointer_type);
 
-      dereference_exprt new_deref(new_address_casted, expr.type());
+      dereference_exprt new_deref{new_address_casted};
       new_deref.add_source_location() = deref.source_location();
       pointer_validity_check(new_deref, guard);
 

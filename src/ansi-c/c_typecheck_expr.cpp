@@ -2009,7 +2009,7 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
   }
   else
   {
-    dereference_exprt tmp(f_op, f_op_type.subtype());
+    dereference_exprt tmp{f_op};
     tmp.set(ID_C_implicit, true);
     tmp.add_source_location()=f_op.source_location();
     f_op.swap(tmp);

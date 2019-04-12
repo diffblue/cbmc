@@ -1102,8 +1102,7 @@ void java_object_factoryt::array_primitive_init_code(
 
   // *array_data_init = NONDET(TYPE [max_length_expr]);
   side_effect_expr_nondett nondet_data(array_type, location);
-  const dereference_exprt data_pointer_deref(
-    tmp_finite_array_pointer, array_type);
+  const dereference_exprt data_pointer_deref{tmp_finite_array_pointer};
   assignments.add(code_assignt(data_pointer_deref, std::move(nondet_data)));
   assignments.statements().back().add_source_location() = location;
 
@@ -1201,9 +1200,8 @@ void java_object_factoryt::array_loop_init_code(
     assignments.add(std::move(max_test));
   }
 
-  const dereference_exprt arraycellref(
-    plus_exprt(array_init_symexpr, counter_expr, array_init_symexpr.type()),
-    array_init_symexpr.type().subtype());
+  const dereference_exprt arraycellref{
+    plus_exprt{array_init_symexpr, counter_expr, array_init_symexpr.type()}};
 
   bool new_item_is_primitive = arraycellref.type().id() != ID_pointer;
 
@@ -1303,7 +1301,7 @@ void java_object_factoryt::gen_nondet_array_init(
     is_valid_java_array(struct_type),
     "Java struct array does not conform to expectations");
 
-  dereference_exprt deref_expr(expr, expr.type().subtype());
+  dereference_exprt deref_expr(expr);
   const auto &comps = struct_type.components();
   const member_exprt length_expr(deref_expr, "length", comps[1].type());
   exprt init_array_expr = member_exprt(deref_expr, "data", comps[2].type());

@@ -1623,7 +1623,7 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
 
       const typecast_exprt pointer(op[0], java_array_type(statement[0]));
 
-      dereference_exprt array(pointer, pointer.type().subtype());
+      dereference_exprt array{pointer};
       PRECONDITION(pointer.type().subtype().id() == ID_struct_tag);
       array.set(ID_java_member_access, true);
 
@@ -2832,7 +2832,7 @@ exprt java_bytecode_convert_methodt::convert_aload(
   const char &type_char = statement[0];
   const typecast_exprt pointer(op[0], java_array_type(type_char));
 
-  dereference_exprt deref(pointer, pointer.type().subtype());
+  dereference_exprt deref{pointer};
   deref.set(ID_java_member_access, true);
 
   const member_exprt data_ptr(
@@ -2841,8 +2841,7 @@ exprt java_bytecode_convert_methodt::convert_aload(
   plus_exprt data_plus_offset(data_ptr, op[1], data_ptr.type());
   // tag it so it's easy to identify during instrumentation
   data_plus_offset.set(ID_java_array_access, true);
-  const typet &element_type = data_ptr.type().subtype();
-  const dereference_exprt element(data_plus_offset, element_type);
+  const dereference_exprt element{data_plus_offset};
   return java_bytecode_promotion(element);
 }
 
@@ -2881,7 +2880,7 @@ code_blockt java_bytecode_convert_methodt::convert_astore(
   const char type_char = statement[0];
   const typecast_exprt pointer(op[0], java_array_type(type_char));
 
-  dereference_exprt deref(pointer, pointer.type().subtype());
+  dereference_exprt deref{pointer};
   deref.set(ID_java_member_access, true);
 
   const member_exprt data_ptr(
@@ -2890,8 +2889,7 @@ code_blockt java_bytecode_convert_methodt::convert_astore(
   plus_exprt data_plus_offset(data_ptr, op[1], data_ptr.type());
   // tag it so it's easy to identify during instrumentation
   data_plus_offset.set(ID_java_array_access, true);
-  const typet &element_type = data_ptr.type().subtype();
-  const dereference_exprt element(data_plus_offset, element_type);
+  const dereference_exprt element{data_plus_offset};
 
   code_blockt block;
   block.add_source_location() = location;
