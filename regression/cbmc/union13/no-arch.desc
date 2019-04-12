@@ -1,0 +1,9 @@
+CORE broken-smt-backend
+main.c
+--arch none --little-endian
+(Starting CEGAR Loop|^Generated 1 VCC\(s\), 1 remaining after simplification$)
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
