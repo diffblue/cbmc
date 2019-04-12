@@ -1,0 +1,14 @@
+CORE
+My.class
+--function My.func --unwind 3 --max-nondet-array-length 10 --show-vcc
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+\$object
+invalid_object
+--
+This checks that no \$object or invalid_object references are generated when creating a multidimensional
+array (required for My.func's input parameter, which is an int[][]). Both of the unwanted terms are used
+by goto-symex to describe the result of a failed or unknown pointer dereference, and the object factory's
+initialisation code should be clear enough that this is never necessary.
