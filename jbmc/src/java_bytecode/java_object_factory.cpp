@@ -720,10 +720,8 @@ alternate_casest get_string_input_values_code(
   alternate_casest cases;
   for(const auto &val : string_input_values)
   {
-    exprt name_literal(ID_java_string_literal);
-    name_literal.set(ID_value, val);
     const symbol_exprt s =
-      get_or_create_string_literal_symbol(name_literal, symbol_table, true);
+      get_or_create_string_literal_symbol(val, symbol_table, true);
     cases.push_back(code_assignt(expr, s));
   }
   return cases;

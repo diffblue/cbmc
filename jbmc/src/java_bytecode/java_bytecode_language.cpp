@@ -26,19 +26,20 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/class_hierarchy.h>
 
+#include "ci_lazy_methods.h"
 #include "java_bytecode_concurrency_instrumentation.h"
 #include "java_bytecode_convert_class.h"
 #include "java_bytecode_convert_method.h"
-#include "java_bytecode_internal_additions.h"
 #include "java_bytecode_instrument.h"
-#include "java_bytecode_typecheck.h"
-#include "java_entry_point.h"
+#include "java_bytecode_internal_additions.h"
 #include "java_bytecode_parser.h"
+#include "java_bytecode_typecheck.h"
 #include "java_class_loader.h"
-#include "java_string_literals.h"
+#include "java_entry_point.h"
 #include "java_static_initializers.h"
+#include "java_string_literal_expr.h"
+#include "java_string_literals.h"
 #include "java_utils.h"
-#include "ci_lazy_methods.h"
 
 #include "expr2java.h"
 #include "load_method_by_regex.h"
@@ -417,12 +418,12 @@ static exprt get_ldc_result(
       address_of_exprt(
         get_or_create_class_literal_symbol(class_id, symbol_table));
   }
-  else if(ldc_arg0.id() == ID_java_string_literal)
+  else if(
+    const auto &literal =
+      expr_try_dynamic_cast<java_string_literal_exprt>(ldc_arg0))
   {
-    return
-      address_of_exprt(
-        get_or_create_string_literal_symbol(
-          ldc_arg0, symbol_table, string_refinement_enabled));
+    return address_of_exprt(get_or_create_string_literal_symbol(
+      *literal, symbol_table, string_refinement_enabled));
   }
   else
   {

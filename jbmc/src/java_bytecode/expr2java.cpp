@@ -23,6 +23,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <ansi-c/expr2c_class.h>
 
 #include "java_qualifiers.h"
+#include "java_string_literal_expr.h"
 #include "java_types.h"
 
 std::string expr2javat::convert(const typet &src)
@@ -414,8 +415,11 @@ std::string expr2javat::convert_with_precedence(
       id2string(src.get(ID_component_name)) +
       ")";
   }
-  else if(src.id()==ID_java_string_literal)
-    return '"'+MetaString(src.get_string(ID_value))+'"';
+  else if(
+    const auto &literal = expr_try_dynamic_cast<java_string_literal_exprt>(src))
+  {
+    return '"' + MetaString(id2string(literal->value())) + '"';
+  }
   else if(src.id()==ID_constant)
     return convert_constant(to_constant_expr(src), precedence=16);
   else
