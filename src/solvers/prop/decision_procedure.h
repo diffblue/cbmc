@@ -15,10 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iosfwd>
 #include <string>
 
-#include "literal.h"
-
 class exprt;
-class tvt;
 
 class decision_proceduret
 {
@@ -32,10 +29,6 @@ public:
 
   /// For a Boolean expression \p expr, add the constraint 'not expr'
   void set_to_false(const exprt &expr);
-
-  /// Convert a Boolean expression and return the corresponding literal
-  /// This will go away, use handle(expr) instead
-  virtual literalt convert(const exprt &expr) = 0;
 
   /// Generate a handle for an expression; this offers an efficient way
   /// to refer to the expression in subsequent calls to \ref get or
@@ -57,11 +50,6 @@ public:
   /// assignment if available.
   /// Return `nil` if not available
   virtual exprt get(const exprt &expr) const = 0;
-
-  /// Return value of literal \p l from satisfying assignment.
-  /// Return tvt::UNKNOWN if not available
-  /// This will go away, use get instead.
-  virtual tvt l_get(literalt l) const = 0;
 
   /// Print satisfying assignment to \p out
   virtual void print_assignment(std::ostream &out) const = 0;
