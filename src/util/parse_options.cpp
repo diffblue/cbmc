@@ -36,18 +36,6 @@ parse_options_baset::parse_options_baset(
     ui_message_handler(cmdline, program),
     log(ui_message_handler)
 {
-
-  // DO NOT USE log HERE!
-  //
-  // The usual pattern of use is that the application class inherits from
-  // messaget and parse_options_baset using a member variable of type
-  // message_handlert to construct the messaget part.
-  //
-  // C++'s rules of initialisation mean that the constructors for
-  // messaget and then parse_options_base run before those of message_handlert.
-  // This means that the message_handlert object is uninitialised.
-  // Using it here will likely cause a hard to debug failure somewhere in
-  // the messaget code.
 }
 
 void parse_options_baset::help()
