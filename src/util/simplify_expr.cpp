@@ -754,6 +754,12 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
         expr=f.to_expr();
         return false;
       }
+      else if(expr_type_id == ID_bv)
+      {
+        fixedbvt f{to_constant_expr(expr.op0())};
+        expr = from_integer(f.get_value(), expr_type);
+        return false;
+      }
     }
     else if(op_type_id==ID_floatbv)
     {
@@ -784,16 +790,47 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
         expr=fixedbv.to_expr();
         return false;
       }
+      else if(expr_type_id == ID_bv)
+      {
+        expr = from_integer(f.pack(), expr_type);
+        return false;
+      }
     }
     else if(op_type_id==ID_bv)
     {
-      if(expr_type_id==ID_unsignedbv ||
-         expr_type_id==ID_signedbv ||
-         expr_type_id==ID_floatbv)
+      if(
+        expr_type_id == ID_unsignedbv || expr_type_id == ID_signedbv ||
+        expr_type_id == ID_c_enum || expr_type_id == ID_c_enum_tag ||
+        expr_type_id == ID_c_bit_field)
       {
         const auto width = to_bv_type(op_type).get_width();
         const auto int_value = bvrep2integer(value, width, false);
-        expr=from_integer(int_value, expr_type);
+        if(expr_type_id != ID_c_enum_tag)
+          expr = from_integer(int_value, expr_type);
+        else
+        {
+          c_enum_tag_typet tag_type = to_c_enum_tag_type(expr_type);
+          expr = from_integer(int_value, ns.follow_tag(tag_type));
+          expr.type() = tag_type;
+        }
+        return false;
+      }
+      else if(expr_type_id == ID_floatbv)
+      {
+        const auto width = to_bv_type(op_type).get_width();
+        const auto int_value = bvrep2integer(value, width, false);
+        ieee_floatt ieee_float{to_floatbv_type(expr_type)};
+        ieee_float.unpack(int_value);
+        expr = ieee_float.to_expr();
+        return false;
+      }
+      else if(expr_type_id == ID_fixedbv)
+      {
+        const auto width = to_bv_type(op_type).get_width();
+        const auto int_value = bvrep2integer(value, width, false);
+        fixedbvt fixedbv{fixedbv_spect{to_fixedbv_type(expr_type)}};
+        fixedbv.set_value(int_value);
+        expr = fixedbv.to_expr();
         return false;
       }
     }
@@ -1573,7 +1610,8 @@ optionalt<exprt> simplify_exprt::bits2expr(
   if(
     type.id() == ID_unsignedbv || type.id() == ID_signedbv ||
     type.id() == ID_floatbv || type.id() == ID_fixedbv ||
-    type.id() == ID_c_bit_field || type.id() == ID_pointer)
+    type.id() == ID_c_bit_field || type.id() == ID_pointer ||
+    type.id() == ID_bv)
   {
     endianness_mapt map(type, little_endian, ns);
 
@@ -1769,7 +1807,7 @@ optionalt<std::string> simplify_exprt::expr2bits(
     if(
       type.id() == ID_unsignedbv || type.id() == ID_signedbv ||
       type.id() == ID_floatbv || type.id() == ID_fixedbv ||
-      type.id() == ID_c_bit_field)
+      type.id() == ID_c_bit_field || type.id() == ID_bv)
     {
       const auto width = to_bitvector_type(type).get_width();
 

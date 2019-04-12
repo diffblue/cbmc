@@ -2243,8 +2243,9 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
       // this just passes through
       convert_expr(src);
     }
-    else if(src_type.id()==ID_unsignedbv ||
-            src_type.id()==ID_signedbv)
+    else if(
+      src_type.id() == ID_unsignedbv || src_type.id() == ID_signedbv ||
+      src_type.id() == ID_bv)
     {
       // integer to pointer
 
