@@ -15,7 +15,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/threeval.h>
 
 #include "literal_expr.h"
-#include "prop_conv.h"
 
 cover_goalst::~cover_goalst()
 {
@@ -31,7 +30,7 @@ void cover_goalst::mark()
   for(auto &g : goals)
     if(
       g.status == goalt::statust::UNKNOWN &&
-      prop_conv.get(g.condition).is_true())
+      decision_procedure.get(g.condition).is_true())
     {
       g.status=goalt::statust::COVERED;
       _number_covered++;
@@ -54,7 +53,7 @@ void cover_goalst::constraint()
       disjuncts.push_back(g.condition);
 
   // this is 'false' if there are no disjuncts
-  prop_conv.set_to_true(disjunction(disjuncts));
+  decision_procedure.set_to_true(disjunction(disjuncts));
 }
 
 /// Try to cover all goals
@@ -71,7 +70,7 @@ operator()(message_handlert &message_handler)
     _iterations++;
 
     constraint();
-    dec_result = prop_conv();
+    dec_result = decision_procedure();
 
     switch(dec_result)
     {

@@ -19,17 +19,16 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/expr.h>
 
 class message_handlert;
-class prop_convt;
 
 /// Try to cover some given set of goals incrementally. This can be seen as a
 /// heuristic variant of SAT-based set-cover. No minimality guarantee.
 class cover_goalst
 {
 public:
-  explicit cover_goalst(prop_convt &_prop_conv):
-    _number_covered(0),
-    _iterations(0),
-    prop_conv(_prop_conv)
+  explicit cover_goalst(decision_proceduret &_decision_procedure)
+    : _number_covered(0),
+      _iterations(0),
+      decision_procedure(_decision_procedure)
   {
   }
 
@@ -96,7 +95,7 @@ public:
 protected:
   std::size_t _number_covered;
   unsigned _iterations;
-  prop_convt &prop_conv;
+  decision_proceduret &decision_procedure;
 
   typedef std::vector<observert *> observerst;
   observerst observers;
