@@ -29,8 +29,9 @@ void cover_goalst::mark()
     o->satisfying_assignment();
 
   for(auto &g : goals)
-    if(g.status==goalt::statust::UNKNOWN &&
-       prop_conv.l_get(g.condition).is_true())
+    if(
+      g.status == goalt::statust::UNKNOWN &&
+      prop_conv.get(g.condition).is_true())
     {
       g.status=goalt::statust::COVERED;
       _number_covered++;
@@ -50,18 +51,10 @@ void cover_goalst::constraint()
 
   for(const auto &g : goals)
     if(g.status == goalt::statust::UNKNOWN && !g.condition.is_false())
-      disjuncts.push_back(literal_exprt(g.condition));
+      disjuncts.push_back(g.condition);
 
   // this is 'false' if there are no disjuncts
   prop_conv.set_to_true(disjunction(disjuncts));
-}
-
-/// Build clause
-void cover_goalst::freeze_goal_variables()
-{
-  for(const auto &g : goals)
-    if(!g.condition.is_constant())
-      prop_conv.set_frozen(g.condition);
 }
 
 /// Try to cover all goals
@@ -71,10 +64,6 @@ operator()(message_handlert &message_handler)
   _iterations=_number_covered=0;
 
   decision_proceduret::resultt dec_result;
-
-  // We use incremental solving, so need to freeze some variables
-  // to prevent them from being eliminated.
-  freeze_goal_variables();
 
   do
   {

@@ -105,8 +105,7 @@ safety_checkert::resultt bmc_all_propertiest::operator()()
   {
     // Our goal is to falsify a property, i.e., we will
     // add the negation of the property as goal.
-    literalt p = !solver.convert(g.second.as_expr());
-    cover_goals.add(p);
+    cover_goals.add(not_exprt(g.second.as_expr()));
   }
 
   status() << "Running " << solver.decision_procedure_text() << eom;
