@@ -60,31 +60,38 @@ ui_message_handlert::ui_message_handlert(
   }
 }
 
-ui_message_handlert::ui_message_handlert(
+ui_message_handlert ui_message_handlert::make(
   const class cmdlinet &cmdline,
   const std::string &program)
-  : ui_message_handlert(
-      nullptr,
-      cmdline.isset("xml-ui") || cmdline.isset("xml-interface")
-        ? uit::XML_UI
-        : cmdline.isset("json-ui") || cmdline.isset("json-interface")
-            ? uit::JSON_UI
-            : uit::PLAIN,
-      program,
-      cmdline.isset("flush"),
-      cmdline.isset("timestamp") ? cmdline.get_value("timestamp") == "monotonic"
-                                     ? timestampert::clockt::MONOTONIC
-                                     : cmdline.get_value("timestamp") == "wall"
-                                         ? timestampert::clockt::WALL_CLOCK
-                                         : timestampert::clockt::NONE
-                                 : timestampert::clockt::NONE)
 {
-  if(get_ui() == uit::PLAIN)
+  const auto ui = cmdline.isset("xml-ui")
+                    ? uit::XML_UI
+                    : cmdline.isset("json-ui")
+                        ? uit::JSON_UI
+                        : uit::PLAIN;
+  const auto timestamp = cmdline.isset("timestamp")
+                            ? cmdline.get_value("timestamp") == "monotonic"
+                                ? timestampert::clockt::MONOTONIC
+                                : cmdline.get_value("timestamp") == "wall"
+                                    ? timestampert::clockt::WALL_CLOCK
+                                    : timestampert::clockt::NONE
+                            : timestampert::clockt::NONE;
+  const auto always_flush = cmdline.isset("flush");
+  std::unique_ptr<message_handlert> handler;
+  if(ui == uit::PLAIN)
   {
     console_message_handler =
       util_make_unique<console_message_handlert>(always_flush);
     message_handler = &*console_message_handler;
+    return ui_message_handlert{
+      console_message_handlert{always_flush},
+      ui,
+      program,
+      always_flush,
+      timestamp};
   }
+  return ui_message_handlert{
+    nullptr, ui, program, always_flush, timestamp};
 }
 
 ui_message_handlert::ui_message_handlert(message_handlert &message_handler)

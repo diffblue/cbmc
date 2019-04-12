@@ -21,7 +21,10 @@ class ui_message_handlert : public message_handlert
 public:
   enum class uit { PLAIN, XML_UI, JSON_UI };
 
-  ui_message_handlert(const class cmdlinet &, const std::string &program);
+  ui_message_handlert(
+    const class cmdlinet &cmdline, const std::string &program):
+    ui_message_handlert(make(cmdline, program))
+  { }
 
   explicit ui_message_handlert(message_handlert &);
   ui_message_handlert(ui_message_handlert &&) = default;
@@ -98,6 +101,9 @@ protected:
     else
       return std::string();
   }
+
+  static ui_message_handlert
+  make(const class cmdlinet &, const std::string &program);
 };
 
 #define OPT_FLUSH "(flush)"
