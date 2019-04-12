@@ -60,10 +60,19 @@ protected:
   optionalt<symbol_exprt>
   get_or_create_return_value_symbol(const irep_idt &function_id);
 
-  void do_function_call(
-    goto_programt::targett i_it,
-    goto_programt &goto_program,
-    bool is_stub);
+  /// Remove return of a complete function call
+  /// \param target: the function call instruction iterator
+  /// \param goto_program: the GOTO program to be updated
+  void do_function_call_complete(
+    goto_programt::targett target,
+    goto_programt &goto_program);
+
+  /// Remove return of a stub function call
+  /// \param target: the function call instruction iterator
+  /// \param goto_program: the GOTO program to be updated
+  void do_function_call_stub(
+    goto_programt::targett target,
+    goto_programt &goto_program);
 };
 
 optionalt<symbol_exprt>
@@ -157,7 +166,7 @@ bool remove_returnst::do_function_calls(
     if(!i_it->is_function_call())
       continue;
 
-    const auto &function_call = i_it->get_function_call();
+    code_function_callt function_call = i_it->get_function_call();
     INVARIANT(
       function_call.function().id() == ID_symbol,
       "indirect function calls should have been removed prior to running "
@@ -169,11 +178,18 @@ bool remove_returnst::do_function_calls(
       !function_call.lhs().is_not_nil())
       continue;
 
-    const auto &function_id =
-      to_symbol_expr(function_call.function()).get_identifier();
-    bool is_stub = function_is_stub(function_id);
+    if(function_is_stub(
+         to_symbol_expr(function_call.function()).get_identifier()))
+      do_function_call_stub(i_it, goto_program);
+    else
+      do_function_call_complete(i_it, goto_program);
 
-    do_function_call(i_it, goto_program, is_stub);
+    // fry the previous assignment
+    function_call.lhs().make_nil();
+
+    // update the call
+    i_it->set_function_call(function_call);
+
     requires_update = true;
   }
   return requires_update;
@@ -369,6 +385,7 @@ void restore_returns(goto_modelt &goto_model)
   rr.restore(goto_model.goto_functions);
 }
 
+
 irep_idt return_value_identifier(const irep_idt &identifier)
 {
   return id2string(identifier) + RETURN_VALUE_SUFFIX;
@@ -392,53 +409,47 @@ bool is_return_value_symbol(const symbol_exprt &symbol_expr)
   return is_return_value_identifier(symbol_expr.get_identifier());
 }
 
-void remove_returnst::do_function_call(
-  goto_programt::targett i_it,
-  goto_programt &goto_program,
-  bool is_stub)
+void remove_returnst::do_function_call_complete(
+  goto_programt::targett target,
+  goto_programt &goto_program)
 {
-  code_function_callt function_call = i_it->get_function_call();
-
-  const irep_idt function_id =
+  const auto &function_call = target->get_function_call();
+  const auto &function_id =
     to_symbol_expr(function_call.function()).get_identifier();
+
+  // The return type in the definition of the function may differ
+  // from the return type in the declaration.  We therefore do a
+  // cast.
+  optionalt<symbol_exprt> return_value =
+    get_or_create_return_value_symbol(function_id);
+  CHECK_RETURN(return_value.has_value());
 
   // replace "lhs=f(...)" by
   // "f(...); lhs=f#return_value; DEAD f#return_value;"
-  exprt rhs;
-
-  optionalt<symbol_exprt> return_value;
-
-  if(!is_stub)
-  {
-    return_value = get_or_create_return_value_symbol(function_id);
-    CHECK_RETURN(return_value.has_value());
-
-    // The return type in the definition of the function may differ
-    // from the return type in the declaration.  We therefore do a
-    // cast.
-    rhs = typecast_exprt::conditional_cast(
-      *return_value, function_call.lhs().type());
-  }
-  else
-  {
-    rhs = side_effect_expr_nondett(
-      function_call.lhs().type(), i_it->source_location);
-  }
-
   goto_programt::targett t_a = goto_program.insert_after(
-    i_it,
+    target,
     goto_programt::make_assignment(
-      code_assignt(function_call.lhs(), rhs), i_it->source_location));
+      code_assignt{function_call.lhs(),
+                   typecast_exprt::conditional_cast(
+                     *return_value, function_call.lhs().type())},
+      target->source_location));
 
-  // fry the previous assignment
-  function_call.lhs().make_nil();
+  goto_program.insert_after(
+    t_a, goto_programt::make_dead(*return_value, target->source_location));
+}
 
-  if(!is_stub)
-  {
-    goto_program.insert_after(
-      t_a, goto_programt::make_dead(*return_value, i_it->source_location));
-  }
+void remove_returnst::do_function_call_stub(
+  goto_programt::targett target,
+  goto_programt &goto_program)
+{
+  const auto &function_call = target->get_function_call();
 
-  // update the call
-  i_it->set_function_call(function_call);
+  // replace "lhs=f(...)" by "f(...); lhs=nondet;"
+  goto_program.insert_after(
+    target,
+    goto_programt::make_assignment(
+      code_assignt{function_call.lhs(),
+                   side_effect_expr_nondett{function_call.lhs().type(),
+                                            target->source_location}},
+      target->source_location));
 }
