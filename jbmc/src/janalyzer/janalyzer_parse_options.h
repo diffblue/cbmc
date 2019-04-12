@@ -159,7 +159,6 @@ public:
   janalyzer_parse_optionst(int argc, const char **argv);
 
 protected:
-  ui_message_handlert ui_message_handler;
   goto_modelt goto_model;
 
   void register_languages();

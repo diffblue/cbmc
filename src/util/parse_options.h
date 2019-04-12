@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "cmdline.h"
 #include "message.h"
+#include "ui_message.h"
 
 class parse_options_baset
 {
@@ -22,7 +23,7 @@ public:
     const std::string &optstring,
     int argc,
     const char **argv,
-    message_handlert &mh);
+    const std::string &program);
 
   cmdlinet cmdline;
 
@@ -34,12 +35,15 @@ public:
   virtual int main();
   virtual ~parse_options_baset() { }
 
+private:
+  bool parse_result;
+
 protected:
+  ui_message_handlert ui_message_handler;
   messaget log;
 
 private:
   void unknown_option_msg();
-  bool parse_result;
 };
 
 std::string

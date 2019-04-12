@@ -45,8 +45,6 @@ private:
     irep_idt harness_function_name;
   };
 
-  ui_message_handlert ui_message_handler;
-
   /// Handle command line arguments that are common to all
   /// harness generators.
   goto_harness_configt handle_common_options();

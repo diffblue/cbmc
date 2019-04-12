@@ -268,7 +268,8 @@ int goto_instrument_parse_optionst::doit()
       namespacet ns(goto_model.symbol_table);
       value_set_analysist value_set_analysis(ns);
       value_set_analysis(goto_model.goto_functions);
-      show_value_sets(ui_message_handler.get_ui(), goto_model, value_set_analysis);
+      show_value_sets(
+        ui_message_handler.get_ui(), goto_model, value_set_analysis);
       return CPROVER_EXIT_SUCCESS;
     }
 
@@ -345,7 +346,7 @@ int goto_instrument_parse_optionst::doit()
       do_remove_returns();
       parameter_assignments(goto_model);
 
-      remove_unused_functions(goto_model, log.get_message_handler());
+      remove_unused_functions(goto_model, ui_message_handler);
 
       if(!cmdline.isset("inline"))
       {
@@ -385,7 +386,7 @@ int goto_instrument_parse_optionst::doit()
       do_remove_returns();
       parameter_assignments(goto_model);
 
-      remove_unused_functions(goto_model, log.get_message_handler());
+      remove_unused_functions(goto_model, ui_message_handler);
 
       if(!cmdline.isset("inline"))
       {
@@ -556,7 +557,7 @@ int goto_instrument_parse_optionst::doit()
     if(cmdline.isset("interpreter"))
     {
       log.status() << "Starting interpreter" << messaget::eom;
-      interpreter(goto_model, log.get_message_handler());
+      interpreter(goto_model, ui_message_handler);
       return CPROVER_EXIT_SUCCESS;
     }
 
@@ -565,7 +566,7 @@ int goto_instrument_parse_optionst::doit()
     {
       const namespacet ns(goto_model.symbol_table);
       show_properties(
-        goto_model, log.get_message_handler(), ui_message_handler.get_ui());
+        goto_model, ui_message_handler, ui_message_handler.get_ui());
       return CPROVER_EXIT_SUCCESS;
     }
 
@@ -617,7 +618,7 @@ int goto_instrument_parse_optionst::doit()
     {
       show_goto_functions(
         goto_model,
-        log.get_message_handler(),
+        ui_message_handler,
         ui_message_handler.get_ui(),
         cmdline.isset("list-goto-functions"));
       return CPROVER_EXIT_SUCCESS;
@@ -761,7 +762,7 @@ int goto_instrument_parse_optionst::doit()
       namespacet ns(goto_model.symbol_table);
 
       log.status() << "Performing full inlining" << messaget::eom;
-      goto_inline(goto_model, log.get_message_handler());
+      goto_inline(goto_model, ui_message_handler);
 
       log.status() << "Removing calls to functions without a body"
                    << messaget::eom;
@@ -771,10 +772,7 @@ int goto_instrument_parse_optionst::doit()
       log.status() << "Accelerating" << messaget::eom;
       guard_managert guard_manager;
       accelerate_functions(
-        goto_model,
-        log.get_message_handler(),
-        cmdline.isset("z3"),
-        guard_manager);
+        goto_model, ui_message_handler, cmdline.isset("z3"), guard_manager);
       remove_skip(goto_model);
     }
 
@@ -827,8 +825,7 @@ int goto_instrument_parse_optionst::doit()
       log.status() << "Writing GOTO program to `" << cmdline.args[1] << "'"
                    << messaget::eom;
 
-      if(write_goto_binary(
-           cmdline.args[1], goto_model, log.get_message_handler()))
+      if(write_goto_binary(cmdline.args[1], goto_model, ui_message_handler))
         return CPROVER_EXIT_CONVERSION_FAILED;
       else
         return CPROVER_EXIT_SUCCESS;
@@ -858,7 +855,7 @@ void goto_instrument_parse_optionst::do_indirect_call_and_rtti_removal(
 
   log.status() << "Function Pointer Removal" << messaget::eom;
   remove_function_pointers(
-    log.get_message_handler(), goto_model, cmdline.isset("pointer-check"));
+    ui_message_handler, goto_model, cmdline.isset("pointer-check"));
   log.status() << "Virtual function removal" << messaget::eom;
   remove_virtual_functions(goto_model);
   log.status() << "Cleaning inline assembler statements" << messaget::eom;
@@ -879,7 +876,7 @@ void goto_instrument_parse_optionst::do_remove_const_function_pointers_only()
 
   log.status() << "Removing const function pointers only" << messaget::eom;
   remove_function_pointers(
-    log.get_message_handler(),
+    ui_message_handler,
     goto_model,
     cmdline.isset("pointer-check"),
     true); // abort if we can't resolve via const pointers
@@ -917,7 +914,7 @@ void goto_instrument_parse_optionst::get_goto_program()
 
   config.set(cmdline);
 
-  auto result = read_goto_binary(cmdline.args[0], log.get_message_handler());
+  auto result = read_goto_binary(cmdline.args[0], ui_message_handler);
 
   if(!result.has_value())
     throw 0;
@@ -974,9 +971,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   {
     log.status() << "Adding gotos to skip loops" << messaget::eom;
     if(skip_loops(
-         goto_model,
-         cmdline.get_value("skip-loops"),
-         log.get_message_handler()))
+         goto_model, cmdline.get_value("skip-loops"), ui_message_handler))
       throw 0;
   }
 
@@ -990,7 +985,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
 
     log.status() << "Adding up to " << max_argc << " command line arguments"
                  << messaget::eom;
-    if(model_argc_argv(goto_model, max_argc, log.get_message_handler()))
+    if(model_argc_argv(goto_model, max_argc, ui_message_handler))
       throw 0;
   }
 
@@ -999,7 +994,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     remove_functions(
       goto_model,
       cmdline.get_values("remove-function-body"),
-      log.get_message_handler());
+      ui_message_handler);
   }
 
   // we add the library in some cases, as some analyses benefit
@@ -1018,9 +1013,8 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     log.status() << "Adding CPROVER library (" << config.ansi_c.arch << ")"
                  << messaget::eom;
     link_to_library(
-      goto_model, log.get_message_handler(), cprover_cpp_library_factory);
-    link_to_library(
-      goto_model, log.get_message_handler(), cprover_c_library_factory);
+      goto_model, ui_message_handler, cprover_cpp_library_factory);
+    link_to_library(goto_model, ui_message_handler, cprover_c_library_factory);
   }
 
   // now do full inlining, if requested
@@ -1037,7 +1031,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     }
 
     log.status() << "Performing full inlining" << messaget::eom;
-    goto_inline(goto_model, log.get_message_handler(), true);
+    goto_inline(goto_model, ui_message_handler, true);
   }
 
   if(cmdline.isset("show-custom-bitvector-analysis") ||
@@ -1063,7 +1057,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     escape_analysis.instrument(goto_model);
 
     // inline added functions, they are often small
-    goto_partial_inline(goto_model, log.get_message_handler());
+    goto_partial_inline(goto_model, ui_message_handler);
 
     // recalculate numbers, etc.
     goto_model.goto_functions.update();
@@ -1109,24 +1103,15 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     if(!cmdline.isset("log"))
     {
       goto_function_inline(
-        goto_model,
-        function,
-        ui_message_handler,
-        true,
-        caching);
+        goto_model, function, ui_message_handler, true, caching);
     }
     else
     {
       std::string filename=cmdline.get_value("log");
       bool have_file=!filename.empty() && filename!="-";
 
-      jsont result=
-        goto_function_inline_and_log(
-          goto_model,
-          function,
-          ui_message_handler,
-          true,
-          caching);
+      jsont result = goto_function_inline_and_log(
+        goto_model, function, ui_message_handler, true, caching);
 
       if(have_file)
       {
@@ -1195,12 +1180,12 @@ void goto_instrument_parse_optionst::instrument_goto_program()
       cmdline.get_value("generate-function-body-options"),
       object_factory_parameters,
       goto_model.symbol_table,
-      log.get_message_handler());
+      ui_message_handler);
     generate_function_bodies(
       std::regex(cmdline.get_value("generate-function-body")),
       *generate_implementation,
       goto_model,
-      log.get_message_handler());
+      ui_message_handler);
   }
 
   // add generic checks, if needed
@@ -1246,7 +1231,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     do_remove_returns();
 
     log.status() << "String Abstraction" << messaget::eom;
-    string_abstraction(goto_model, log.get_message_handler());
+    string_abstraction(goto_model, ui_message_handler);
   }
 
   // some analyses require function pointer removal and partial inlining
@@ -1359,7 +1344,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
           cmdline.isset("render-cluster-function"),
           cmdline.isset("cav11"),
           cmdline.isset("hide-internals"),
-          log.get_message_handler(),
+          ui_message_handler,
           cmdline.isset("ignore-arrays"));
     }
 
@@ -1508,7 +1493,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
          goto_model.goto_functions,
          callercallee,
          goto_model.symbol_table,
-         log.get_message_handler()))
+         ui_message_handler))
       throw 0;
   }
 
@@ -1522,7 +1507,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     slice_global_inits(goto_model);
 
     log.status() << "Performing an aggressive slice" << messaget::eom;
-    aggressive_slicert aggressive_slicer(goto_model, log.get_message_handler());
+    aggressive_slicert aggressive_slicer(goto_model, ui_message_handler);
 
     if(cmdline.isset("aggressive-slice-call-depth"))
       aggressive_slicer.call_depth =

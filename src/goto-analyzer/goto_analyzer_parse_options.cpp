@@ -69,8 +69,11 @@ Author: Daniel Kroening, kroening@kroening.com
 goto_analyzer_parse_optionst::goto_analyzer_parse_optionst(
   int argc,
   const char **argv)
-  : parse_options_baset(GOTO_ANALYSER_OPTIONS, argc, argv, ui_message_handler),
-    ui_message_handler(cmdline, std::string("GOTO-ANALYZER ") + CBMC_VERSION)
+  : parse_options_baset(
+      GOTO_ANALYSER_OPTIONS,
+      argc,
+      argv,
+      std::string("GOTO-ANALYZER "))
 {
 }
 

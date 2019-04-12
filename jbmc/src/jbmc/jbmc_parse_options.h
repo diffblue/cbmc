@@ -117,7 +117,6 @@ public:
     bool body_available);
 
 protected:
-  ui_message_handlert ui_message_handler;
   java_object_factory_parameterst object_factory_params;
   bool stub_objects_are_not_null;
 

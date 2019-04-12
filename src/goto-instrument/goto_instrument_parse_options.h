@@ -122,8 +122,7 @@ public:
         GOTO_INSTRUMENT_OPTIONS,
         argc,
         argv,
-        ui_message_handler),
-      ui_message_handler(cmdline, "goto-instrument"),
+        "goto-instrument"),
       function_pointer_removal_done(false),
       partial_inlining_done(false),
       remove_returns_done(false)
@@ -131,7 +130,6 @@ public:
   }
 
 protected:
-  ui_message_handlert ui_message_handler;
   void register_languages();
 
   void get_goto_program();
