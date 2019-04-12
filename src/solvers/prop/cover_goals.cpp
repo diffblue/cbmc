@@ -48,13 +48,9 @@ void cover_goalst::constraint()
 
   // cover at least one unknown goal
 
-  for(std::list<goalt>::const_iterator
-      g_it=goals.begin();
-      g_it!=goals.end();
-      g_it++)
-    if(g_it->status==goalt::statust::UNKNOWN &&
-       !g_it->condition.is_false())
-      disjuncts.push_back(literal_exprt(g_it->condition));
+  for(const auto &g : goals)
+    if(g.status == goalt::statust::UNKNOWN && !g.condition.is_false())
+      disjuncts.push_back(literal_exprt(g.condition));
 
   // this is 'false' if there are no disjuncts
   prop_conv.set_to_true(disjunction(disjuncts));
@@ -63,12 +59,9 @@ void cover_goalst::constraint()
 /// Build clause
 void cover_goalst::freeze_goal_variables()
 {
-  for(std::list<goalt>::const_iterator
-      g_it=goals.begin();
-      g_it!=goals.end();
-      g_it++)
-    if(!g_it->condition.is_constant())
-      prop_conv.set_frozen(g_it->condition);
+  for(const auto &g : goals)
+    if(!g.condition.is_constant())
+      prop_conv.set_frozen(g.condition);
 }
 
 /// Try to cover all goals
