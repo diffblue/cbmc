@@ -1,0 +1,21 @@
+CORE
+main.c
+
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+This test makes sure we support bv_typet -> pointer type casts, avoiding
+warnings like:
+
+warning: ignoring typecast
+  * type: pointer
+      * width: 64
+      0: signedbv
+          * width: 32
+          * #c_type: signed_int
+  0: typecast
+      * type: bv
+          * width: 64
