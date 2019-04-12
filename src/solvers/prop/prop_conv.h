@@ -11,6 +11,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_SOLVERS_PROP_PROP_CONV_H
 
 #include "decision_procedure.h"
+#include "literal.h"
+
+class tvt;
 
 // API that provides a "handle" in the form of a literalt
 // for expressions.
@@ -29,6 +32,13 @@ public:
   /// but solver-specific representation.
   exprt handle(const exprt &expr) override;
 
+  /// Convert a Boolean expression and return the corresponding literal
+  virtual literalt convert(const exprt &expr) = 0;
+
+  /// Return value of literal \p l from satisfying assignment.
+  /// Return tvt::UNKNOWN if not available
+  virtual tvt l_get(literalt l) const = 0;
+
   // incremental solving
   virtual void set_frozen(literalt a);
   virtual void set_frozen(const bvt &);
@@ -40,10 +50,5 @@ public:
   virtual bool is_in_conflict(literalt l) const;
   virtual bool has_is_in_conflict() const { return false; }
 };
-
-//
-// an instance of the above that converts the
-// propositional skeleton by passing it to a propt
-//
 
 #endif // CPROVER_SOLVERS_PROP_PROP_CONV_H
