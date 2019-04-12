@@ -72,9 +72,6 @@ multi_path_symex_checkert::prepare_property_decider(propertiest &properties)
   std::chrono::duration<double> solver_runtime = ::prepare_property_decider(
     properties, equation, property_decider, ui_message_handler);
 
-  if(options.get_bool_option("localize-faults"))
-    freeze_guards(equation, property_decider.get_solver());
-
   return solver_runtime;
 }
 

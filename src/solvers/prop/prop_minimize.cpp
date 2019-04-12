@@ -11,28 +11,26 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "prop_minimize.h"
 
-#include <util/threeval.h>
-
-#include "literal_expr.h"
+#include <util/std_expr.h>
 
 prop_minimizet::prop_minimizet(
-  prop_convt &_prop_conv,
+  decision_proceduret &_decision_procedure,
   message_handlert &message_handler)
-  : prop_conv(_prop_conv), log(message_handler)
+  : decision_procedure(_decision_procedure), log(message_handler)
 {
 }
 
 /// Add an objective
-void prop_minimizet::objective(const literalt condition, const weightt weight)
+void prop_minimizet::objective(exprt condition, const weightt weight)
 {
   if(weight > 0)
   {
-    objectives[weight].push_back(objectivet(condition));
+    objectives[weight].emplace_back(std::move(condition));
     _number_objectives++;
   }
   else if(weight < 0)
   {
-    objectives[-weight].push_back(objectivet(!condition));
+    objectives[-weight].emplace_back(not_exprt(std::move(condition)));
     _number_objectives++;
   }
 }
@@ -45,11 +43,11 @@ void prop_minimizet::fix_objectives()
 
   for(auto &objective : entry)
   {
-    if(!objective.fixed && prop_conv.l_get(objective.condition).is_false())
+    if(!objective.fixed && decision_procedure.get(objective.condition).is_false())
     {
       _number_satisfied++;
       _value += current->first;
-      prop_conv.set_to(literal_exprt(objective.condition), false); // fix it
+      decision_procedure.set_to(objective.condition, false); // fix it
       objective.fixed = true;
       found = true;
     }
@@ -59,40 +57,28 @@ void prop_minimizet::fix_objectives()
 }
 
 /// Build constraints that require us to improve on at least one goal, greedily.
-literalt prop_minimizet::constraint()
+exprt prop_minimizet::constraint()
 {
   std::vector<objectivet> &entry = current->second;
 
-  bvt or_clause;
+  exprt::operandst disjuncts;
 
   for(const auto &objective : entry)
   {
     if(!objective.fixed)
-      or_clause.push_back(!objective.condition);
+      disjuncts.push_back(not_exprt(objective.condition));
   }
 
   // This returns false if the clause is empty,
   // i.e., no further improvement possible.
-  if(or_clause.empty())
-    return const_literal(false);
-  else if(or_clause.size() == 1)
-    return or_clause.front();
-  else
-  {
-    exprt::operandst disjuncts;
-    disjuncts.reserve(or_clause.size());
-    forall_literals(it, or_clause)
-      disjuncts.push_back(literal_exprt(*it));
-
-    return prop_conv.convert(disjunction(disjuncts));
-  }
+  return disjunction(disjuncts);
 }
 
 /// Try to cover all objectives
 void prop_minimizet::operator()()
 {
   // we need to use assumptions
-  PRECONDITION(prop_conv.has_set_assumptions());
+  PRECONDITION(decision_procedure.has_set_assumptions());
 
   _iterations = 0;
   _number_satisfied = 0;
@@ -108,7 +94,7 @@ void prop_minimizet::operator()()
     do
     {
       // We want to improve on one of the objectives, please!
-      literalt c = constraint();
+      auto c = constraint();
 
       if(c.is_false())
         dec_result = decision_proceduret::resultt::D_UNSATISFIABLE;
@@ -116,10 +102,10 @@ void prop_minimizet::operator()()
       {
         _iterations++;
 
-        bvt assumptions;
+        exprt::operandst assumptions;
         assumptions.push_back(c);
-        prop_conv.set_assumptions(assumptions);
-        dec_result = prop_conv();
+        decision_procedure.set_assumptions(assumptions);
+        dec_result = decision_procedure();
 
         switch(dec_result)
         {
@@ -146,8 +132,8 @@ void prop_minimizet::operator()()
     // We don't have a satisfying assignment to work with.
     // Run solver again to get one.
 
-    bvt assumptions; // no assumptions
-    prop_conv.set_assumptions(assumptions);
-    (void)prop_conv();
+    // no assumptions
+    decision_procedure.set_assumptions({});
+    (void)decision_procedure();
   }
 }

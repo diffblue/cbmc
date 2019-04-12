@@ -10,7 +10,6 @@ Author: Romain Brenguier <romain.brenguier@diffblue.com>
 #define CPROVER_GOTO_SYMEX_SSA_STEP_H
 
 #include <goto-programs/goto_trace.h>
-#include <solvers/prop/literal.h>
 
 #include "symex_target.h"
 
@@ -35,7 +34,7 @@ Author: Romain Brenguier <romain.brenguier@diffblue.com>
 /// which represent the condition guarding this step, i.e. what must hold for
 /// this step to be taken. Both `guard` and `cond_expr` will later be
 /// translated into verification condition for the SAT/SMT solver (or some
-/// other decision procedure), to be referred by their respective literals.
+/// other decision procedure), to be referred by their respective handles.
 /// Constraints usually arise from external conditions, such as memory models
 /// or partial orders: they represent assumptions with global effect.
 ///
@@ -136,7 +135,7 @@ public:
   bool hidden = false;
 
   exprt guard;
-  literalt guard_literal;
+  exprt guard_handle;
 
   // for ASSIGNMENT and DECL
   ssa_exprt ssa_lhs;
@@ -146,7 +145,7 @@ public:
 
   // for ASSUME/ASSERT/GOTO/CONSTRAINT
   exprt cond_expr;
-  literalt cond_literal;
+  exprt cond_handle;
   std::string comment;
 
   // for INPUT/OUTPUT
@@ -176,15 +175,15 @@ public:
     : source(_source),
       type(_type),
       hidden(false),
-      guard(static_cast<const exprt &>(get_nil_irep())),
-      guard_literal(const_literal(false)),
-      ssa_lhs(static_cast<const ssa_exprt &>(get_nil_irep())),
-      ssa_full_lhs(static_cast<const exprt &>(get_nil_irep())),
-      original_full_lhs(static_cast<const exprt &>(get_nil_irep())),
-      ssa_rhs(static_cast<const exprt &>(get_nil_irep())),
+      guard(nil_exprt()),
+      guard_handle(nil_exprt()),
+      ssa_lhs(nil_exprt()),
+      ssa_full_lhs(nil_exprt()),
+      original_full_lhs(nil_exprt()),
+      ssa_rhs(nil_exprt()),
       assignment_type(symex_targett::assignment_typet::STATE),
-      cond_expr(static_cast<const exprt &>(get_nil_irep())),
-      cond_literal(const_literal(false)),
+      cond_expr(nil_exprt()),
+      cond_handle(nil_exprt()),
       formatted(false),
       atomic_section_id(0),
       ignore(false)

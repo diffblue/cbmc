@@ -28,15 +28,15 @@ public:
 
 protected:
   void get_minimization_list(
-    prop_convt &prop_conv,
-    const symex_target_equationt &equation,
-    minimization_listt &minimization_list);
+    decision_proceduret &,
+    const symex_target_equationt &,
+    minimization_listt &);
 
   void minimize(const exprt &expr, class prop_minimizet &prop_minimize);
 
   symex_target_equationt::SSA_stepst::const_iterator get_failed_property(
-    const prop_convt &prop_conv,
-    const symex_target_equationt &equation);
+    const decision_proceduret &,
+    const symex_target_equationt &);
 
   // the failed property
   symex_target_equationt::SSA_stepst::const_iterator failed;

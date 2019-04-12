@@ -14,16 +14,17 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <map>
 
+#include <util/expr.h>
 #include <util/message.h>
 
-#include "prop_conv.h"
+#include "decision_procedure.h"
 
 /// Computes a satisfying assignment of minimal cost according to a const
 /// function using incremental SAT
 class prop_minimizet
 {
 public:
-  prop_minimizet(prop_convt &_prop_conv, message_handlert &message_handler);
+  prop_minimizet(decision_proceduret &_decision_procedure, message_handlert &message_handler);
 
   void operator()();
 
@@ -49,15 +50,15 @@ public:
   typedef long long signed int weightt;
 
   // adds an objective with given weight
-  void objective(const literalt condition, const weightt weight = 1);
+  void objective(exprt condition, const weightt weight = 1);
 
   struct objectivet
   {
-    literalt condition;
+    exprt condition;
     bool fixed;
 
-    explicit objectivet(const literalt _condition)
-      : condition(_condition), fixed(false)
+    explicit objectivet(exprt _condition)
+      : condition(std::move(_condition)), fixed(false)
     {
     }
   };
@@ -71,10 +72,10 @@ protected:
   std::size_t _number_satisfied = 0;
   std::size_t _number_objectives = 0;
   weightt _value = 0;
-  prop_convt &prop_conv;
+  decision_proceduret &decision_procedure;
   messaget log;
 
-  literalt constraint();
+  exprt constraint();
   void fix_objectives();
 
   objectivest::reverse_iterator current;

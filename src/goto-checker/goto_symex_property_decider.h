@@ -49,7 +49,7 @@ public:
   decision_proceduret::resultt solve();
 
   /// Returns the solver instance
-  prop_convt &get_solver() const;
+  decision_proceduret &get_solver() const;
 
   /// Return the equation associated with this instance
   symex_target_equationt &get_equation() const;
@@ -79,7 +79,7 @@ protected:
     std::vector<symex_target_equationt::SSA_stepst::iterator> instances;
 
     /// The goal variable
-    literalt condition;
+    exprt condition;
 
     exprt as_expr() const;
   };

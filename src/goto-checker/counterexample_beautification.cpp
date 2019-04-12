@@ -26,7 +26,7 @@ counterexample_beautificationt::counterexample_beautificationt(
 }
 
 void counterexample_beautificationt::get_minimization_list(
-  prop_convt &prop_conv,
+  decision_proceduret &decision_procedure,
   const symex_target_equationt &equation,
   minimization_listt &minimization_list)
 {
@@ -41,7 +41,7 @@ void counterexample_beautificationt::get_minimization_list(
       it->is_assignment() &&
       it->assignment_type == symex_targett::assignment_typet::STATE)
     {
-      if(!prop_conv.l_get(it->guard_literal).is_false())
+      if(!decision_procedure.get(it->guard_handle).is_false())
       {
         const typet &type = it->ssa_lhs.type();
 
@@ -69,7 +69,7 @@ void counterexample_beautificationt::get_minimization_list(
 
 symex_target_equationt::SSA_stepst::const_iterator
 counterexample_beautificationt::get_failed_property(
-  const prop_convt &prop_conv,
+  const decision_proceduret &decision_procedure,
   const symex_target_equationt &equation)
 {
   // find failed property
@@ -79,9 +79,11 @@ counterexample_beautificationt::get_failed_property(
       it != equation.SSA_steps.end();
       it++)
     if(
-      it->is_assert() && prop_conv.l_get(it->guard_literal).is_true() &&
-      prop_conv.l_get(it->cond_literal).is_false())
+      it->is_assert() && decision_procedure.get(it->guard_handle).is_true() &&
+      decision_procedure.get(it->cond_handle).is_false())
+    {
       return it;
+    }
 
   UNREACHABLE;
   return equation.SSA_steps.end();
@@ -95,13 +97,13 @@ operator()(boolbvt &boolbv, const symex_target_equationt &equation)
   failed = get_failed_property(boolbv, equation);
 
   // lock the failed assertion
-  boolbv.set_to(literal_exprt(failed->cond_literal), false);
+  boolbv.set_to(failed->cond_handle, false);
 
   {
     log.status() << "Beautifying counterexample (guards)" << messaget::eom;
 
     // compute weights for guards
-    typedef std::map<literalt, unsigned> guard_countt;
+    typedef std::map<exprt, std::size_t> guard_countt;
     guard_countt guard_count;
 
     for(symex_target_equationt::SSA_stepst::const_iterator it =
@@ -113,8 +115,8 @@ operator()(boolbvt &boolbv, const symex_target_equationt &equation)
         it->is_assignment() &&
         it->assignment_type != symex_targett::assignment_typet::HIDDEN)
       {
-        if(!it->guard_literal.is_constant())
-          guard_count[it->guard_literal]++;
+        if(!it->guard_handle.is_constant())
+          guard_count[it->guard_handle]++;
       }
 
       // reached failed assertion?

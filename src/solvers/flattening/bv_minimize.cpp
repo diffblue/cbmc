@@ -47,7 +47,7 @@ void bv_minimizet::add_objective(
           weight=-weight;
       }
 
-      prop_minimize.objective(lit, weight);
+      prop_minimize.objective(literal_exprt(lit), weight);
     }
   }
 }
