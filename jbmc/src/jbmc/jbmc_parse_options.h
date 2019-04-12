@@ -84,9 +84,7 @@ class optionst;
   "(symex-driven-lazy-loading)"
 // clang-format on
 
-class jbmc_parse_optionst:
-  public parse_options_baset,
-  public messaget
+class jbmc_parse_optionst : public parse_options_baset
 {
 public:
   virtual int doit() override;
