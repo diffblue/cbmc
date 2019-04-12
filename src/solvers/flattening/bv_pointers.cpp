@@ -253,11 +253,10 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
 
     if(op_type.id()==ID_pointer)
       return convert_bv(op);
-    else if(op_type.id()==ID_signedbv ||
-            op_type.id()==ID_unsignedbv ||
-            op_type.id()==ID_bool ||
-            op_type.id()==ID_c_enum ||
-            op_type.id()==ID_c_enum_tag)
+    else if(
+      op_type.id() == ID_signedbv || op_type.id() == ID_unsignedbv ||
+      op_type.id() == ID_bool || op_type.id() == ID_c_enum ||
+      op_type.id() == ID_c_enum_tag || op_type.id() == ID_bv)
     {
       // Cast from integer to pointer.
       // We just do a zero extension.
