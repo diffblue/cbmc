@@ -561,10 +561,7 @@ void smt2_convt::convert_address_of_rec(
         new_index_expr,
         pointer_type(array.type().subtype()));
 
-      plus_exprt plus_expr(
-        address_of_expr,
-        index,
-        address_of_expr.type());
+      plus_exprt plus_expr{address_of_expr, index};
 
       convert_expr(plus_expr);
     }

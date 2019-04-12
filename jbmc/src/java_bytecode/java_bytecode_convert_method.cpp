@@ -2838,7 +2838,7 @@ exprt java_bytecode_convert_methodt::convert_aload(
   const member_exprt data_ptr(
     deref, "data", pointer_type(java_type_from_char(type_char)));
 
-  plus_exprt data_plus_offset(data_ptr, op[1], data_ptr.type());
+  plus_exprt data_plus_offset{data_ptr, op[1]};
   // tag it so it's easy to identify during instrumentation
   data_plus_offset.set(ID_java_array_access, true);
   const dereference_exprt element{data_plus_offset};
@@ -2886,7 +2886,7 @@ code_blockt java_bytecode_convert_methodt::convert_astore(
   const member_exprt data_ptr(
     deref, "data", pointer_type(java_type_from_char(type_char)));
 
-  plus_exprt data_plus_offset(data_ptr, op[1], data_ptr.type());
+  plus_exprt data_plus_offset{data_ptr, op[1]};
   // tag it so it's easy to identify during instrumentation
   data_plus_offset.set(ID_java_array_access, true);
   const dereference_exprt element{data_plus_offset};

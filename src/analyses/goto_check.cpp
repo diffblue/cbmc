@@ -1106,7 +1106,7 @@ goto_checkt::address_check(const exprt &address, const exprt &size)
 
       binary_relation_exprt lb_check(a.first, ID_le, int_ptr);
 
-      plus_exprt ub(int_ptr, size, int_ptr.type());
+      plus_exprt ub{int_ptr, size};
 
       binary_relation_exprt ub_check(ub, ID_le, plus_exprt(a.first, a.second));
 

@@ -1201,7 +1201,7 @@ void java_object_factoryt::array_loop_init_code(
   }
 
   const dereference_exprt arraycellref{
-    plus_exprt{array_init_symexpr, counter_expr, array_init_symexpr.type()}};
+    plus_exprt{array_init_symexpr, counter_expr}};
 
   bool new_item_is_primitive = arraycellref.type().id() != ID_pointer;
 
