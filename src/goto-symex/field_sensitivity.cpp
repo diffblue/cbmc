@@ -133,7 +133,10 @@ exprt field_sensitivityt::get_fields(
       tmp.remove_level_2();
       tmp.set_expression(member);
       if(was_l2)
-        result.add_to_operands(state.rename(tmp, ns).get());
+      {
+        result.add_to_operands(
+          state.rename(get_fields(ns, state, tmp), ns).get());
+      }
       else
         result.add_to_operands(get_fields(ns, state, tmp));
     }
@@ -162,7 +165,10 @@ exprt field_sensitivityt::get_fields(
       tmp.remove_level_2();
       tmp.set_expression(index);
       if(was_l2)
-        result.add_to_operands(state.rename(tmp, ns).get());
+      {
+        result.add_to_operands(
+          state.rename(get_fields(ns, state, tmp), ns).get());
+      }
       else
         result.add_to_operands(get_fields(ns, state, tmp));
     }
