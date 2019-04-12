@@ -43,16 +43,14 @@ void prop_minimizet::fix_objectives()
   std::vector<objectivet> &entry = current->second;
   bool found = false;
 
-  for(std::vector<objectivet>::iterator o_it = entry.begin();
-      o_it != entry.end();
-      ++o_it)
+  for(auto &objective : entry)
   {
-    if(!o_it->fixed && prop_conv.l_get(o_it->condition).is_false())
+    if(!objective.fixed && prop_conv.l_get(objective.condition).is_false())
     {
       _number_satisfied++;
       _value += current->first;
-      prop_conv.set_to(literal_exprt(o_it->condition), false); // fix it
-      o_it->fixed = true;
+      prop_conv.set_to(literal_exprt(objective.condition), false); // fix it
+      objective.fixed = true;
       found = true;
     }
   }
@@ -67,12 +65,10 @@ literalt prop_minimizet::constraint()
 
   bvt or_clause;
 
-  for(std::vector<objectivet>::iterator o_it = entry.begin();
-      o_it != entry.end();
-      ++o_it)
+  for(const auto &objective : entry)
   {
-    if(!o_it->fixed)
-      or_clause.push_back(!o_it->condition);
+    if(!objective.fixed)
+      or_clause.push_back(!objective.condition);
   }
 
   // This returns false if the clause is empty,
