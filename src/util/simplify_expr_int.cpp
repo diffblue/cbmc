@@ -1357,8 +1357,23 @@ bool simplify_exprt::simplify_inequality(exprt &expr)
   {
     if(expr.id() == ID_equal || expr.id() == ID_notequal)
     {
-
+      // two constants compare equal when there values (as strings) are the same
+      // or both of them are pointers and both represent NULL in some way
       bool equal = (tmp0_const->get_value() == tmp1_const->get_value());
+      if(
+        !equal && tmp0_const->type().id() == ID_pointer &&
+        tmp1_const->type().id() == ID_pointer)
+      {
+        if(
+          !config.ansi_c.NULL_is_zero && (tmp0_const->get_value() == ID_NULL ||
+                                          tmp1_const->get_value() == ID_NULL))
+        {
+          // if NULL is not zero on this platform, we really don't know what it
+          // is and therefore cannot simplify
+          return true;
+        }
+        equal = tmp0_const->is_zero() && tmp1_const->is_zero();
+      }
       expr.make_bool(expr.id() == ID_equal ? equal : !equal);
       return false;
     }
