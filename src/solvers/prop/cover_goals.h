@@ -14,7 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <list>
 
-#include "decision_procedure.h"
+#include <solvers/decision_procedure.h>
 
 #include <util/expr.h>
 

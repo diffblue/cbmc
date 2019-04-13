@@ -16,7 +16,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/message.h>
 #include <util/std_expr.h>
 
-#include "decision_procedure.h"
 #include "literal.h"
 #include "literal_expr.h"
 #include "prop.h"

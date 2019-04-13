@@ -13,7 +13,7 @@ Author: Matt Lewis
 
 #include <util/fixedbv.h>
 
-#include <solvers/prop/decision_procedure.h>
+#include <solvers/decision_procedure.h>
 
 #include <goto-symex/slice.h>
 

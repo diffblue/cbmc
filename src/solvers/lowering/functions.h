@@ -17,7 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/mathematical_expr.h>
 
-#include <solvers/prop/decision_procedure.h>
+#include <solvers/decision_procedure.h>
 
 class functionst
 {

@@ -30,7 +30,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/safety_checker.h>
 #include <goto-symex/memory_model.h>
 
-#include <solvers/prop/decision_procedure.h>
+#include <solvers/decision_procedure.h>
 
 class cbmc_solverst;
 
