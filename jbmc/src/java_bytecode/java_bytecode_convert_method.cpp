@@ -1949,10 +1949,9 @@ code_switcht java_bytecode_convert_methodt::convert_switch(
       if(a_it == args.begin())
       {
         code_switch_caset code_case(nil_exprt(), std::move(code));
-        code_case.add_source_location() = location;
         code_case.set_default();
 
-        code_block.add(std::move(code_case));
+        code_block.add(std::move(code_case), location);
       }
       else
       {
@@ -1961,9 +1960,7 @@ code_switcht java_bytecode_convert_methodt::convert_switch(
         case_op.add_source_location() = location;
 
         code_switch_caset code_case(std::move(case_op), std::move(code));
-        code_case.add_source_location() = location;
-
-        code_block.add(std::move(code_case));
+        code_block.add(std::move(code_case), location);
       }
     }
   }
@@ -2853,15 +2850,15 @@ code_blockt java_bytecode_convert_methodt::convert_store(
     toassign = typecast_exprt::conditional_cast(toassign, var.type());
 
   code_blockt block;
+  block.add_source_location() = location;
 
   save_stack_entries(
     "stack_store",
     block,
     bytecode_write_typet::VARIABLE,
     var_name);
-  code_assignt assign(var, toassign);
-  assign.add_source_location() = location;
-  block.add(assign);
+
+  block.add(code_assignt{var, toassign}, location);
   return block;
 }
 
@@ -2886,9 +2883,8 @@ code_blockt java_bytecode_convert_methodt::convert_astore(
   save_stack_entries(
     "stack_astore", block, bytecode_write_typet::ARRAY_REF, "");
 
-  code_assignt array_put(element, op[2]);
-  array_put.add_source_location() = location;
-  block.add(array_put);
+  code_assignt array_put{dereference_exprt{data_plus_offset}, op[2]};
+  block.add(std::move(array_put), location);
   return block;
 }
 
