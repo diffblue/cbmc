@@ -9,8 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Decision Procedure Interface
 
-#ifndef CPROVER_SOLVERS_PROP_DECISION_PROCEDURE_H
-#define CPROVER_SOLVERS_PROP_DECISION_PROCEDURE_H
+#ifndef CPROVER_SOLVERS_DECISION_PROCEDURE_H
+#define CPROVER_SOLVERS_DECISION_PROCEDURE_H
 
 #include <iosfwd>
 #include <string>
@@ -75,4 +75,4 @@ operator<<(decision_proceduret &dest, const exprt &src)
   return dest;
 }
 
-#endif // CPROVER_SOLVERS_PROP_DECISION_PROCEDURE_H
+#endif // CPROVER_SOLVERS_DECISION_PROCEDURE_H

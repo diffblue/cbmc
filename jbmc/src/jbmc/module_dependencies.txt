@@ -9,6 +9,7 @@ jbmc
 langapi # should go away
 linking
 pointer-analysis
+solvers
 solvers/refinement
 solvers/prop
 solvers/sat

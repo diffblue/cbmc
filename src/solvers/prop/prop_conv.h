@@ -10,7 +10,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_SOLVERS_PROP_PROP_CONV_H
 #define CPROVER_SOLVERS_PROP_PROP_CONV_H
 
-#include "decision_procedure.h"
+#include <solvers/decision_procedure.h>
+
 #include "literal.h"
 
 class tvt;

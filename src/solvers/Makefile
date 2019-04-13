@@ -79,6 +79,7 @@ SRC = $(BOOLEFORCE_SRC) \
       $(PICOSAT_SRC) \
       $(SQUOLEM2_SRC) \
       $(CADICAL_SRC) \
+      decision_procedure.cpp \
       flattening/arrays.cpp \
       flattening/boolbv.cpp \
       flattening/boolbv_abs.cpp \
@@ -144,7 +145,6 @@ SRC = $(BOOLEFORCE_SRC) \
       bdd/miniBDD/miniBDD.cpp \
       prop/bdd_expr.cpp \
       prop/cover_goals.cpp \
-      prop/decision_procedure.cpp \
       prop/literal.cpp \
       prop/prop_minimize.cpp \
       prop/prop.cpp \
