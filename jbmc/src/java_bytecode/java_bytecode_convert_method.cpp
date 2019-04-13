@@ -1621,15 +1621,12 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
     {
       PRECONDITION(op.size() == 1 && results.size() == 1);
 
-      const typecast_exprt pointer(op[0], java_array_type(statement[0]));
-
-      dereference_exprt array{pointer};
-      PRECONDITION(pointer.type().subtype().id() == ID_struct_tag);
+      dereference_exprt array{
+        typecast_exprt{op[0], java_array_type(statement[0])}};
+      PRECONDITION(array.type().id() == ID_struct_tag);
       array.set(ID_java_member_access, true);
 
-      const member_exprt length(array, "length", java_int_type());
-
-      results[0]=length;
+      results[0] = member_exprt{std::move(array), "length", java_int_type()};
     }
     else if(statement=="tableswitch" ||
             statement=="lookupswitch")
@@ -1823,8 +1820,8 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
 
     if(start_new_block)
     {
-      code_labelt newlabel(label(std::to_string(address)), code_blockt());
-      root_block.add(newlabel);
+      root_block.add(
+        code_labelt{label(std::to_string(address)), code_blockt{}});
       root.branch.push_back(block_tree_nodet::get_leaf());
       assert((root.branch_addresses.empty() ||
               root.branch_addresses.back()<address) &&
@@ -2490,7 +2487,7 @@ code_blockt java_bytecode_convert_methodt::convert_newarray(
     constant_exprt size_limit = from_integer(max_array_length, java_int_type());
     binary_relation_exprt le_max_size(op[0], ID_le, size_limit);
     code_assumet assume_le_max_size(le_max_size);
-    block.add(assume_le_max_size);
+    block.add(std::move(assume_le_max_size));
   }
   const exprt tmp = tmp_variable("newarray", ref_type);
   block.add(code_assignt(tmp, java_new_array));
@@ -2693,10 +2690,10 @@ code_blockt java_bytecode_convert_methodt::convert_iinc(
 
   const exprt arg1_int_type =
     typecast_exprt::conditional_cast(arg1, java_int_type());
-  const code_assignt code_assign(
+  code_assignt code_assign(
     variable(arg0, 'i', address, NO_CAST),
     plus_exprt(variable(arg0, 'i', address, CAST_AS_NEEDED), arg1_int_type));
-  block.add(code_assign);
+  block.add(std::move(code_assign));
 
   return block;
 }
@@ -2829,20 +2826,16 @@ exprt java_bytecode_convert_methodt::convert_aload(
   const irep_idt &statement,
   const exprt::operandst &op) const
 {
-  const char &type_char = statement[0];
-  const typecast_exprt pointer(op[0], java_array_type(type_char));
-
-  dereference_exprt deref{pointer};
+  const char type_char = statement[0];
+  dereference_exprt deref{typecast_exprt{op[0], java_array_type(type_char)}};
   deref.set(ID_java_member_access, true);
 
-  const member_exprt data_ptr(
+  member_exprt data_ptr(
     deref, "data", pointer_type(java_type_from_char(type_char)));
-
-  plus_exprt data_plus_offset{data_ptr, op[1]};
+  plus_exprt data_plus_offset{std::move(data_ptr), op[1]};
   // tag it so it's easy to identify during instrumentation
   data_plus_offset.set(ID_java_array_access, true);
-  const dereference_exprt element{data_plus_offset};
-  return java_bytecode_promotion(element);
+  return java_bytecode_promotion(dereference_exprt{data_plus_offset});
 }
 
 code_blockt java_bytecode_convert_methodt::convert_store(
@@ -2878,18 +2871,14 @@ code_blockt java_bytecode_convert_methodt::convert_astore(
   const source_locationt &location)
 {
   const char type_char = statement[0];
-  const typecast_exprt pointer(op[0], java_array_type(type_char));
-
-  dereference_exprt deref{pointer};
+  dereference_exprt deref{typecast_exprt{op[0], java_array_type(type_char)}};
   deref.set(ID_java_member_access, true);
 
-  const member_exprt data_ptr(
+  member_exprt data_ptr(
     deref, "data", pointer_type(java_type_from_char(type_char)));
-
-  plus_exprt data_plus_offset{data_ptr, op[1]};
+  plus_exprt data_plus_offset{std::move(data_ptr), op[1]};
   // tag it so it's easy to identify during instrumentation
   data_plus_offset.set(ID_java_array_access, true);
-  const dereference_exprt element{data_plus_offset};
 
   code_blockt block;
   block.add_source_location() = location;
