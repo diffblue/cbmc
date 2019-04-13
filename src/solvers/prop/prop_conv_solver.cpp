@@ -42,19 +42,16 @@ literalt prop_conv_solvert::get_literal(const irep_idt &identifier)
   return literal;
 }
 
-/// get a boolean value from counter example if not valid
-bool prop_conv_solvert::get_bool(const exprt &expr, tvt &value) const
+optionalt<bool> prop_conv_solvert::get_bool(const exprt &expr) const
 {
   // trivial cases
 
   if(expr.is_true())
   {
-    value = tvt(true);
-    return false;
+    return true;
   }
   else if(expr.is_false())
   {
-    value = tvt(false);
     return false;
   }
   else if(expr.id() == ID_symbol)
@@ -62,60 +59,50 @@ bool prop_conv_solvert::get_bool(const exprt &expr, tvt &value) const
     symbolst::const_iterator result =
       symbols.find(to_symbol_expr(expr).get_identifier());
 
+    // This may fail if the symbol isn't Boolean or
+    // not in the formula.
     if(result == symbols.end())
-      return true;
+      return {};
 
-    value = prop.l_get(result->second);
-    return false;
+    return prop.l_get(result->second).is_true();
   }
 
   // sub-expressions
 
   if(expr.id() == ID_not)
   {
-    if(expr.type().id() == ID_bool && expr.operands().size() == 1)
+    if(expr.type().id() == ID_bool)
     {
-      if(get_bool(expr.op0(), value))
-        return true;
-      value = !value;
-      return false;
+      auto tmp = get_bool(to_not_expr(expr).op());
+      if(tmp.has_value())
+        return !*tmp;
+      else
+        return {};
     }
   }
   else if(expr.id() == ID_and || expr.id() == ID_or)
   {
     if(expr.type().id() == ID_bool && expr.operands().size() >= 1)
     {
-      value = tvt(expr.id() == ID_and);
-
       forall_operands(it, expr)
       {
-        tvt tmp;
-        if(get_bool(*it, tmp))
-          return true;
+        auto tmp = get_bool(*it);
+        if(!tmp.has_value())
+          return {};
 
         if(expr.id() == ID_and)
         {
-          if(tmp.is_false())
-          {
-            value = tvt(false);
+          if(*tmp == false)
             return false;
-          }
-
-          value = value && tmp;
         }
         else // or
         {
-          if(tmp.is_true())
-          {
-            value = tvt(true);
-            return false;
-          }
-
-          value = value || tmp;
+          if(*tmp == true)
+            return true;
         }
       }
 
-      return false;
+      return expr.id() == ID_and;
     }
   }
 
@@ -123,10 +110,9 @@ bool prop_conv_solvert::get_bool(const exprt &expr, tvt &value) const
 
   cachet::const_iterator cache_result = cache.find(expr);
   if(cache_result == cache.end())
-    return true;
-
-  value = prop.l_get(cache_result->second);
-  return false;
+    return {}; // not in formula
+  else
+    return prop.l_get(cache_result->second).is_true();
 }
 
 literalt prop_conv_solvert::convert(const exprt &expr)
@@ -459,18 +445,16 @@ decision_proceduret::resultt prop_conv_solvert::dec_solve()
 
 exprt prop_conv_solvert::get(const exprt &expr) const
 {
-  tvt value;
-
-  if(expr.type().id() == ID_bool && !get_bool(expr, value))
+  if(expr.type().id() == ID_bool)
   {
-    switch(value.get_value())
+    auto value = get_bool(expr);
+
+    if(value.has_value())
     {
-    case tvt::tv_enumt::TV_TRUE:
-      return true_exprt();
-    case tvt::tv_enumt::TV_FALSE:
-      return false_exprt();
-    case tvt::tv_enumt::TV_UNKNOWN:
-      return false_exprt(); // default
+      if(*value)
+        return true_exprt();
+      else
+        return false_exprt();
     }
   }
 
