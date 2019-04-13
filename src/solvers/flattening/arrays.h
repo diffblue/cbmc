@@ -83,7 +83,8 @@ protected:
     ARRAY_WITH,
     ARRAY_IF,
     ARRAY_OF,
-    ARRAY_TYPECAST
+    ARRAY_TYPECAST,
+    ARRAY_CONSTANT
   };
 
   struct lazy_constraintt
@@ -119,6 +120,9 @@ protected:
     const index_sett &index_set, const update_exprt &expr);
   void add_array_constraints_array_of(
     const index_sett &index_set, const array_of_exprt &exprt);
+  void add_array_constraints_array_constant(
+    const index_sett &index_set,
+    const array_exprt &exprt);
 
   void update_index_map(bool update_all);
   void update_index_map(std::size_t i);
