@@ -17,12 +17,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/mathematical_expr.h>
 
-#include <solvers/prop/prop_conv.h>
+#include <solvers/prop/decision_procedure.h>
 
 class functionst
 {
 public:
-  explicit functionst(prop_convt &_prop_conv) : prop_conv(_prop_conv)
+  explicit functionst(decision_proceduret &_decision_procedure)
+    : decision_procedure(_decision_procedure)
   {
   }
 
@@ -38,7 +39,7 @@ public:
   }
 
 protected:
-  prop_convt &prop_conv;
+  decision_proceduret &decision_procedure;
 
   typedef std::set<function_application_exprt> applicationst;
 
