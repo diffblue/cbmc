@@ -306,7 +306,7 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
     result.pointer_guard = dynamic_object(pointer_expr);
 
     // can't remove here, turn into *p
-    result.value=dereference_exprt(pointer_expr, dereference_type);
+    result.value = dereference_exprt{pointer_expr};
   }
   else if(root_object.id()==ID_integer_address)
   {

@@ -1214,7 +1214,7 @@ void shared_bufferst::cfg_visitort::weak_memory(
                     read_delayed_expr,
                     if_exprt(
                       choice1_expr,
-                      dereference_exprt(new_read_expr, vars.type),
+                      dereference_exprt{new_read_expr},
                       to_replace_expr),
                     to_replace_expr); // original_instruction.code.op1());
 

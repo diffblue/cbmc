@@ -67,7 +67,7 @@ exprt get_class_identifier_field(
   const auto &points_to=this_expr.type().subtype();
   if(points_to==empty_typet())
     this_expr=typecast_exprt(this_expr, pointer_type(suggested_type));
-  const dereference_exprt deref(this_expr, this_expr.type().subtype());
+  const dereference_exprt deref{this_expr};
   return build_class_identifier(deref, ns);
 }
 

@@ -1106,7 +1106,7 @@ goto_checkt::address_check(const exprt &address, const exprt &size)
 
       binary_relation_exprt lb_check(a.first, ID_le, int_ptr);
 
-      plus_exprt ub(int_ptr, size, int_ptr.type());
+      plus_exprt ub{int_ptr, size};
 
       binary_relation_exprt ub_check(ub, ID_le, plus_exprt(a.first, a.second));
 
@@ -1576,7 +1576,7 @@ void goto_checkt::check_rec(const exprt &expr, guardt &guard, bool address)
       const exprt new_address_casted =
         typecast_exprt::conditional_cast(new_address, new_pointer_type);
 
-      dereference_exprt new_deref(new_address_casted, expr.type());
+      dereference_exprt new_deref{new_address_casted};
       new_deref.add_source_location() = deref.source_location();
       pointer_validity_check(new_deref, guard);
 

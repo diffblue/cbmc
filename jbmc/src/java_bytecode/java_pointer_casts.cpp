@@ -21,9 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \return dereferenced pointer
 static exprt clean_deref(const exprt &ptr)
 {
-  return ptr.id()==ID_address_of
-             ? ptr.op0()
-             : dereference_exprt(ptr, ptr.type().subtype());
+  return ptr.id() == ID_address_of ? ptr.op0() : dereference_exprt{ptr};
 }
 
 /// \par parameters: pointer

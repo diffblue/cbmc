@@ -552,9 +552,7 @@ void string_instrumentationt::do_format_string_write(
         default: // everything else
         {
           const exprt &argument=arguments[argument_start_inx+args];
-          const typet &arg_type = argument.type();
-
-          const dereference_exprt lhs(argument, arg_type.subtype());
+          const dereference_exprt lhs{argument};
 
           side_effect_expr_nondett rhs(lhs.type(), target->source_location);
 
@@ -594,7 +592,7 @@ void string_instrumentationt::do_format_string_write(
       }
       else
       {
-        dereference_exprt lhs(arguments[i], arg_type.subtype());
+        dereference_exprt lhs{arguments[i]};
 
         side_effect_expr_nondett rhs(lhs.type(), target->source_location);
 
