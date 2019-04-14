@@ -48,7 +48,6 @@ cpp_idt &cpp_scopest::put_into_scope(
   {
     cpp_save_scopet saved_scope(*this);
     go_to(scope);
-    go_to_global_scope();
 
     cpp_idt &id=current_scope().insert(symbol.base_name);
     id.identifier=symbol.name;

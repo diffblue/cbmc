@@ -1,5 +1,3 @@
-#include <cassert>
-
 template<class T>
 T inc(T x)
 {
@@ -15,5 +13,5 @@ int main(int argc, char** argv)
   x = inc<int>(x);
   y = inc<unsigned char>(y);
 
-  assert(x == y);
+  __CPROVER_assert(x == y, "");
 }

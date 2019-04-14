@@ -85,11 +85,6 @@ public:
            id_class==id_classt::NAMESPACE;
   }
 
-  bool is_template_scope() const
-  {
-    return id_class==id_classt::TEMPLATE_SCOPE;
-  }
-
   cpp_scopet &get_parent() const
   {
     return static_cast<cpp_scopet &>(cpp_idt::get_parent());

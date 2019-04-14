@@ -64,11 +64,22 @@ symbolt &cpp_declarator_convertert::convert(
     cpp_typecheck_resolve.resolve_scope(
       declarator.name(), base_name, template_args);
 
+    cpp_scopet *friend_scope = nullptr;
+
+    if(is_friend)
+    {
+      friend_scope = &cpp_typecheck.cpp_scopes.current_scope();
+      save_scope.restore();
+    }
+
     scope=&cpp_typecheck.cpp_scopes.current_scope();
 
-    // check the declarator-part of the type, in that scope
+    // check the declarator-part of the type, in the current scope
     if(declarator.value().is_nil() || !cpp_typecheck.has_auto(final_type))
       cpp_typecheck.typecheck_type(final_type);
+
+    if(friend_scope)
+      scope = friend_scope;
   }
 
   is_code=is_code_type(final_type);
@@ -80,9 +91,9 @@ symbolt &cpp_declarator_convertert::convert(
   get_final_identifier();
 
   // first see if it is a member
-  if(scope->id_class==cpp_idt::id_classt::CLASS && !is_friend)
+  if(scope->id_class == cpp_idt::id_classt::CLASS)
   {
-    // it's a member! it must be declared already
+    // it's a member! it must be declared already, unless it's a friend
 
     typet &method_qualifier=
       static_cast<typet &>(declarator.method_qualifier());
@@ -118,7 +129,15 @@ symbolt &cpp_declarator_convertert::convert(
 
       // try again
       maybe_symbol=cpp_typecheck.symbol_table.get_writeable(final_identifier);
-      if(!maybe_symbol)
+      if(!maybe_symbol && is_friend)
+      {
+        symbolt &friend_symbol =
+          convert_new_symbol(storage_spec, member_spec, declarator);
+        // mark it as weak so that the full declaration can replace the symbol
+        friend_symbol.is_weak = true;
+        return friend_symbol;
+      }
+      else if(!maybe_symbol)
       {
         cpp_typecheck.error().source_location=
           declarator.name().source_location();
@@ -411,9 +430,7 @@ void cpp_declarator_convertert::get_final_identifier()
     }
   }
 
-  final_identifier=
-    scope->prefix+
-    identifier;
+  final_identifier = scope->prefix + identifier;
 }
 
 symbolt &cpp_declarator_convertert::convert_new_symbol(

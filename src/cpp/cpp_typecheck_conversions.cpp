@@ -1251,10 +1251,21 @@ bool cpp_typecheckt::reference_binding(
       return false;
   }
 
-  if(expr.get_bool(ID_C_lvalue))
+  if(expr.get_bool(ID_C_lvalue) || type.subtype().get_bool(ID_C_constant))
   {
     if(reference_compatible(expr, type, rank))
     {
+      if(!expr.get_bool(ID_C_lvalue))
+      {
+        // create temporary object
+        side_effect_exprt tmp{ID_temporary_object,
+                              {std::move(expr)},
+                              type.subtype(),
+                              expr.source_location()};
+        tmp.set(ID_mode, ID_cpp);
+        expr.swap(tmp);
+      }
+
       {
         address_of_exprt tmp(expr, reference_type(expr.type()));
         tmp.add_source_location()=expr.source_location();

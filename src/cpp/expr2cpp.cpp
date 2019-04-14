@@ -190,7 +190,7 @@ std::string expr2cppt::convert_rec(
       if(tag.id() == ID_cpp_name)
         dest += " " + to_cpp_name(tag).to_string();
       else
-        dest += id2string(tag.id());
+        dest += " " + id2string(tag.id());
     }
 
     dest += d;
@@ -209,7 +209,7 @@ std::string expr2cppt::convert_rec(
       if(tag.id() == ID_cpp_name)
         dest += " " + to_cpp_name(tag).to_string();
       else
-        dest += id2string(tag.id());
+        dest += " " + id2string(tag.id());
     }
 
     dest += d;

@@ -103,6 +103,40 @@ void cpp_typecheckt::show_instantiation_stack(std::ostream &out)
   }
 }
 
+/// Set up a scope as subscope of the template scope
+cpp_scopet &cpp_typecheckt::sub_scope_for_instantiation(
+  cpp_scopet &template_scope,
+  const std::string &suffix)
+{
+  cpp_scopet::id_sett id_set =
+    template_scope.lookup(suffix, cpp_scopet::SCOPE_ONLY);
+
+  CHECK_RETURN(id_set.size() <= 1);
+
+  if(id_set.size() == 1)
+  {
+    cpp_idt &cpp_id = **id_set.begin();
+    CHECK_RETURN(cpp_id.is_template_scope());
+
+    return static_cast<cpp_scopet &>(cpp_id);
+  }
+  else
+  {
+    cpp_scopet &sub_scope = template_scope.new_scope(suffix);
+    sub_scope.id_class = cpp_idt::id_classt::TEMPLATE_SCOPE;
+    sub_scope.prefix = template_scope.get_parent().prefix;
+    sub_scope.suffix = suffix;
+    sub_scope.add_using_scope(template_scope.get_parent());
+
+    const std::string subscope_name =
+      id2string(template_scope.identifier) + suffix;
+    cpp_scopes.id_map.insert(
+      cpp_scopest::id_mapt::value_type(subscope_name, &sub_scope));
+
+    return sub_scope;
+  }
+}
+
 const symbolt &cpp_typecheckt::class_template_symbol(
   const source_locationt &source_location,
   const symbolt &template_symbol,
@@ -131,10 +165,9 @@ const symbolt &cpp_typecheckt::class_template_symbol(
   INVARIANT_STRUCTURED(
     template_scope!=nullptr, nullptr_exceptiont, "template_scope is null");
 
-  irep_idt identifier=
-    id2string(template_scope->prefix)+
-    "tag-"+id2string(template_symbol.base_name)+
-    id2string(suffix);
+  irep_idt identifier = id2string(template_scope->get_parent().prefix) +
+                        "tag-" + id2string(template_symbol.base_name) +
+                        id2string(suffix);
 
   // already there?
   symbol_tablet::symbolst::const_iterator s_it=
@@ -171,9 +204,8 @@ const symbolt &cpp_typecheckt::class_template_symbol(
 
   id.id_class=cpp_idt::id_classt::CLASS;
   id.is_scope=true;
-  id.prefix=template_scope->prefix+
-            id2string(s_ptr->base_name)+
-            id2string(suffix)+"::";
+  id.prefix = template_scope->get_parent().prefix +
+              id2string(s_ptr->base_name) + id2string(suffix) + "::";
   id.class_identifier=s_ptr->name;
   id.id_class=cpp_idt::id_classt::CLASS;
 
@@ -318,18 +350,12 @@ const symbolt &cpp_typecheckt::instantiate_template(
     class_name=cpp_scopes.current_scope().get_parent().identifier;
 
   // sub-scope for fixing the prefix
-  std::string subscope_name=id2string(template_scope->identifier)+suffix;
+  cpp_scopet &sub_scope = sub_scope_for_instantiation(*template_scope, suffix);
 
   // let's see if we have the instance already
-  cpp_scopest::id_mapt::iterator scope_it=
-    cpp_scopes.id_map.find(subscope_name);
-
-  if(scope_it!=cpp_scopes.id_map.end())
   {
-    cpp_scopet &scope=cpp_scopes.get_scope(subscope_name);
-
-    const auto id_set =
-      scope.lookup(template_symbol.base_name, cpp_scopet::SCOPE_ONLY);
+    cpp_scopet::id_sett id_set =
+      sub_scope.lookup(template_symbol.base_name, cpp_scopet::SCOPE_ONLY);
 
     if(id_set.size()==1)
     {
@@ -349,20 +375,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
         return symb;
     }
 
-    cpp_scopes.go_to(scope);
-  }
-  else
-  {
-    // set up a scope as subscope of the template scope
-    cpp_scopet &sub_scope=
-      cpp_scopes.current_scope().new_scope(subscope_name);
-    sub_scope.id_class=cpp_idt::id_classt::TEMPLATE_SCOPE;
-    sub_scope.prefix=template_scope->get_parent().prefix;
-    sub_scope.suffix=suffix;
-    sub_scope.add_using_scope(template_scope->get_parent());
     cpp_scopes.go_to(sub_scope);
-    cpp_scopes.id_map.insert(
-      cpp_scopest::id_mapt::value_type(subscope_name, &sub_scope));
   }
 
   // store the information that the template has

@@ -158,8 +158,10 @@ void cpp_typecheckt::typecheck_class_template(
         previous_declaration.template_type());
     }
 
-    assert(cpp_scopes.id_map[symbol_name]->id_class ==
-           cpp_idt::id_classt::TEMPLATE_SCOPE);
+    INVARIANT(
+      cpp_scopes.id_map[symbol_name]->is_template_scope(),
+      "symbol should be in template scope");
+
     return;
   }
 
@@ -197,8 +199,10 @@ void cpp_typecheckt::typecheck_class_template(
 
   // link the template symbol with the template scope
   cpp_scopes.id_map[symbol_name]=&template_scope;
-  assert(cpp_scopes.id_map[symbol_name]->id_class ==
-         cpp_idt::id_classt::TEMPLATE_SCOPE);
+
+  INVARIANT(
+    cpp_scopes.id_map[symbol_name]->is_template_scope(),
+    "symbol should be in template scope");
 }
 
 /// typecheck function templates
@@ -300,8 +304,9 @@ void cpp_typecheckt::typecheck_function_template(
             id2string(new_symbol->base_name);
 
   // link the template symbol with the template scope
-  assert(template_scope.id_class==cpp_idt::id_classt::TEMPLATE_SCOPE);
   cpp_scopes.id_map[symbol_name] = &template_scope;
+  INVARIANT(
+    template_scope.is_template_scope(), "symbol should be in template scope");
 }
 
 /// typecheck class template members; these can be methods or static members
@@ -714,11 +719,7 @@ cpp_scopet &cpp_typecheckt::typecheck_template_parameters(
   std::string id_suffix="template::"+std::to_string(template_counter++);
 
   // produce a new scope for the template parameters
-  cpp_scopet &template_scope=
-    cpp_scopes.current_scope().new_scope(
-      cpp_scopes.current_scope().prefix+id_suffix);
-
-  template_scope.prefix=template_scope.get_parent().prefix+id_suffix;
+  cpp_scopet &template_scope = cpp_scopes.current_scope().new_scope(id_suffix);
   template_scope.id_class=cpp_idt::id_classt::TEMPLATE_SCOPE;
 
   cpp_scopes.go_to(template_scope);
@@ -820,9 +821,6 @@ cpp_scopet &cpp_typecheckt::typecheck_template_parameters(
     parameter.add_source_location()=declaration.find_location();
     #endif
   }
-
-  // continue without adding to the prefix
-  template_scope.prefix=template_scope.get_parent().prefix;
 
   return template_scope;
 }

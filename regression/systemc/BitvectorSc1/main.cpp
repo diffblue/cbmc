@@ -1,5 +1,3 @@
-#include <cassert>
-
 template <int W>
 class sc_uint {
   public:
@@ -41,8 +39,8 @@ int main(int argc, char** argv)
   x.test1();
   x.test2();
 
-  assert(x.to_uint() == 1);
-  assert(x.to_uint() == 2);
+  __CPROVER_assert(x.to_uint() == 1, "");
+  __CPROVER_assert(x.to_uint() == 2, "");
 
   return 0;
 }

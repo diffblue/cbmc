@@ -1,5 +1,3 @@
-#include <cassert>
-
 #define DEF_INSIDE
 
 template<class T>
@@ -35,8 +33,8 @@ int main (int argc, char *argv[])
   my_template<int> x;
   x.set(5);
   int y = x.get();
-  assert(y==5);
-  assert(z.get()==3);
+  __CPROVER_assert(y == 5, "");
+  __CPROVER_assert(z.get() == 3, "");
 
   return 0;
 }
