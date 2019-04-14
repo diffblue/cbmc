@@ -225,7 +225,7 @@ void build_goto_trace(
 
     const SSA_stept &SSA_step = *it;
 
-    if(prop_conv.l_get(SSA_step.guard_literal)!=tvt(true))
+    if(!prop_conv.get(SSA_step.guard_handle).is_true())
       continue;
 
     if(it->is_constraint() ||
@@ -388,7 +388,7 @@ void build_goto_trace(
         goto_trace_step.cond_expr = SSA_step.cond_expr;
 
         goto_trace_step.cond_value =
-          prop_conv.l_get(SSA_step.cond_literal).is_true();
+          prop_conv.get(SSA_step.cond_handle).is_true();
       }
 
       if(ssa_step_it == last_step_to_keep)
@@ -417,7 +417,7 @@ static bool is_failed_assertion_step(
   symex_target_equationt::SSA_stepst::const_iterator step,
   const prop_convt &prop_conv)
 {
-  return step->is_assert() && prop_conv.l_get(step->cond_literal).is_false();
+  return step->is_assert() && prop_conv.get(step->cond_handle).is_false();
 }
 
 void build_goto_trace(

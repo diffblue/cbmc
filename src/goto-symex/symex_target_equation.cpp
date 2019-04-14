@@ -18,7 +18,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/unwrap_nested_exception.h>
 
 #include <solvers/flattening/bv_conversion_exceptions.h>
-#include <solvers/prop/literal_expr.h>
 #include <solvers/prop/prop.h>
 #include <solvers/prop/prop_conv.h>
 
@@ -399,7 +398,7 @@ void symex_target_equationt::convert_guards(
   for(auto &step : SSA_steps)
   {
     if(step.ignore)
-      step.guard_literal=const_literal(false);
+      step.guard_handle = false_exprt();
     else
     {
       log.conditional_output(log.debug(), [&step](messaget::mstreamt &mstream) {
@@ -409,7 +408,7 @@ void symex_target_equationt::convert_guards(
 
       try
       {
-        step.guard_literal = prop_conv.convert(step.guard);
+        step.guard_handle = prop_conv.handle(step.guard);
       }
       catch(const bitvector_conversion_exceptiont &)
       {
@@ -429,7 +428,7 @@ void symex_target_equationt::convert_assumptions(
     if(step.is_assume())
     {
       if(step.ignore)
-        step.cond_literal=const_literal(true);
+        step.cond_handle = true_exprt();
       else
       {
         log.conditional_output(
@@ -440,7 +439,7 @@ void symex_target_equationt::convert_assumptions(
 
         try
         {
-          step.cond_literal = prop_conv.convert(step.cond_expr);
+          step.cond_handle = prop_conv.handle(step.cond_expr);
         }
         catch(const bitvector_conversion_exceptiont &)
         {
@@ -461,7 +460,7 @@ void symex_target_equationt::convert_goto_instructions(
     if(step.is_goto())
     {
       if(step.ignore)
-        step.cond_literal=const_literal(true);
+        step.cond_handle = true_exprt();
       else
       {
         log.conditional_output(
@@ -472,7 +471,7 @@ void symex_target_equationt::convert_goto_instructions(
 
         try
         {
-          step.cond_literal = prop_conv.convert(step.cond_expr);
+          step.cond_handle = prop_conv.handle(step.cond_expr);
         }
         catch(const bitvector_conversion_exceptiont &)
         {
@@ -534,7 +533,7 @@ void symex_target_equationt::convert_assertions(
       {
         step.converted = true;
         prop_conv.set_to_false(step.cond_expr);
-        step.cond_literal=const_literal(false);
+        step.cond_handle = false_exprt();
         return; // prevent further assumptions!
       }
       else if(step.is_assume())
@@ -573,7 +572,7 @@ void symex_target_equationt::convert_assertions(
       // do the conversion
       try
       {
-        step.cond_literal = prop_conv.convert(implication);
+        step.cond_handle = prop_conv.handle(implication);
       }
       catch(const bitvector_conversion_exceptiont &)
       {
@@ -583,17 +582,16 @@ void symex_target_equationt::convert_assertions(
       }
 
       // store disjunct
-      disjuncts.push_back(literal_exprt(!step.cond_literal));
+      disjuncts.push_back(not_exprt(step.cond_handle));
     }
     else if(step.is_assume())
     {
       // the assumptions have been converted before
       // avoid deep nesting of ID_and expressions
       if(assumption.id()==ID_and)
-        assumption.copy_to_operands(literal_exprt(step.cond_literal));
+        assumption.copy_to_operands(step.cond_handle);
       else
-        assumption=
-          and_exprt(assumption, literal_exprt(step.cond_literal));
+        assumption = and_exprt(assumption, step.cond_handle);
     }
   }
 

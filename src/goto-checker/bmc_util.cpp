@@ -58,7 +58,7 @@ ssa_step_matches_failing_property(const irep_idt &property_id)
            symex_target_equationt::SSA_stepst::const_iterator step,
            const prop_convt &prop_conv) {
     return step->is_assert() && step->get_property_id() == property_id &&
-           prop_conv.l_get(step->cond_literal).is_false();
+           prop_conv.get(step->cond_handle).is_false();
   };
 }
 
@@ -100,19 +100,6 @@ void output_error_trace(
     convert<json_stream_arrayt>(ns, goto_trace, json_trace, trace_options);
   }
   break;
-  }
-}
-
-void freeze_guards(
-  const symex_target_equationt &equation,
-  prop_convt &prop_conv)
-{
-  for(const auto &step : equation.SSA_steps)
-  {
-    if(!step.guard_literal.is_constant())
-      prop_conv.set_frozen(step.guard_literal);
-    if(step.is_assert() && !step.cond_literal.is_constant())
-      prop_conv.set_frozen(step.cond_literal);
   }
 }
 

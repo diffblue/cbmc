@@ -41,7 +41,7 @@ void counterexample_beautificationt::get_minimization_list(
       it->is_assignment() &&
       it->assignment_type == symex_targett::assignment_typet::STATE)
     {
-      if(!prop_conv.l_get(it->guard_literal).is_false())
+      if(!prop_conv.get(it->guard_handle).is_false())
       {
         const typet &type = it->ssa_lhs.type();
 
@@ -78,10 +78,14 @@ counterexample_beautificationt::get_failed_property(
         equation.SSA_steps.begin();
       it != equation.SSA_steps.end();
       it++)
+  {
     if(
-      it->is_assert() && prop_conv.l_get(it->guard_literal).is_true() &&
-      prop_conv.l_get(it->cond_literal).is_false())
+      it->is_assert() && prop_conv.get(it->guard_handle).is_true() &&
+      prop_conv.get(it->cond_handle).is_false())
+    {
       return it;
+    }
+  }
 
   UNREACHABLE;
   return equation.SSA_steps.end();
@@ -95,7 +99,7 @@ operator()(boolbvt &boolbv, const symex_target_equationt &equation)
   failed = get_failed_property(boolbv, equation);
 
   // lock the failed assertion
-  boolbv.set_to(literal_exprt(failed->cond_literal), false);
+  boolbv.set_to(failed->cond_handle, false);
 
   {
     log.status() << "Beautifying counterexample (guards)" << messaget::eom;
@@ -113,8 +117,9 @@ operator()(boolbvt &boolbv, const symex_target_equationt &equation)
         it->is_assignment() &&
         it->assignment_type != symex_targett::assignment_typet::HIDDEN)
       {
-        if(!it->guard_literal.is_constant())
-          guard_count[it->guard_literal]++;
+        literalt l = boolbv.convert(it->guard_handle);
+        if(!l.is_constant())
+          guard_count[l]++;
       }
 
       // reached failed assertion?

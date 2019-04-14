@@ -36,7 +36,7 @@ exprt goto_symex_property_decidert::goalt::as_expr() const
   exprt::operandst conjuncts;
   conjuncts.reserve(instances.size());
   for(const auto &inst : instances)
-    conjuncts.push_back(literal_exprt(inst->cond_literal));
+    conjuncts.push_back(inst->cond_handle);
   return conjunction(conjuncts);
 }
 
