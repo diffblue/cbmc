@@ -17,9 +17,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/throw_with_nested.h>
 #include <util/unwrap_nested_exception.h>
 
+#include <solvers/decision_procedure.h>
 #include <solvers/flattening/bv_conversion_exceptions.h>
-#include <solvers/prop/prop.h>
-#include <solvers/prop/prop_conv.h>
 
 #include "equation_conversion_exceptions.h"
 #include "goto_symex_state.h"
@@ -328,20 +327,19 @@ void symex_target_equationt::constraint(
   merge_ireps(SSA_step);
 }
 
-void symex_target_equationt::convert(
-  prop_convt &prop_conv)
+void symex_target_equationt::convert(decision_proceduret &decision_procedure)
 {
   try
   {
-    convert_guards(prop_conv);
-    convert_assignments(prop_conv);
-    convert_decls(prop_conv);
-    convert_assumptions(prop_conv);
-    convert_assertions(prop_conv);
-    convert_goto_instructions(prop_conv);
-    convert_function_calls(prop_conv);
-    convert_io(prop_conv);
-    convert_constraints(prop_conv);
+    convert_guards(decision_procedure);
+    convert_assignments(decision_procedure);
+    convert_decls(decision_procedure);
+    convert_assumptions(decision_procedure);
+    convert_assertions(decision_procedure);
+    convert_goto_instructions(decision_procedure);
+    convert_function_calls(decision_procedure);
+    convert_io(decision_procedure);
+    convert_constraints(decision_procedure);
   }
   catch(const equation_conversion_exceptiont &conversion_exception)
   {
@@ -369,7 +367,8 @@ void symex_target_equationt::convert_assignments(
   }
 }
 
-void symex_target_equationt::convert_decls(prop_convt &prop_conv)
+void symex_target_equationt::convert_decls(
+  decision_proceduret &decision_procedure)
 {
   for(auto &step : SSA_steps)
   {
@@ -379,7 +378,7 @@ void symex_target_equationt::convert_decls(prop_convt &prop_conv)
       // the satisfiability of the formula.
       try
       {
-        prop_conv.convert(step.cond_expr);
+        decision_procedure.handle(step.cond_expr);
         step.converted = true;
       }
       catch(const bitvector_conversion_exceptiont &)
@@ -393,7 +392,7 @@ void symex_target_equationt::convert_decls(prop_convt &prop_conv)
 }
 
 void symex_target_equationt::convert_guards(
-  prop_convt &prop_conv)
+  decision_proceduret &decision_procedure)
 {
   for(auto &step : SSA_steps)
   {
@@ -408,7 +407,7 @@ void symex_target_equationt::convert_guards(
 
       try
       {
-        step.guard_handle = prop_conv.handle(step.guard);
+        step.guard_handle = decision_procedure.handle(step.guard);
       }
       catch(const bitvector_conversion_exceptiont &)
       {
@@ -421,7 +420,7 @@ void symex_target_equationt::convert_guards(
 }
 
 void symex_target_equationt::convert_assumptions(
-  prop_convt &prop_conv)
+  decision_proceduret &decision_procedure)
 {
   for(auto &step : SSA_steps)
   {
@@ -439,7 +438,7 @@ void symex_target_equationt::convert_assumptions(
 
         try
         {
-          step.cond_handle = prop_conv.handle(step.cond_expr);
+          step.cond_handle = decision_procedure.handle(step.cond_expr);
         }
         catch(const bitvector_conversion_exceptiont &)
         {
@@ -453,7 +452,7 @@ void symex_target_equationt::convert_assumptions(
 }
 
 void symex_target_equationt::convert_goto_instructions(
-  prop_convt &prop_conv)
+  decision_proceduret &decision_procedure)
 {
   for(auto &step : SSA_steps)
   {
@@ -471,7 +470,7 @@ void symex_target_equationt::convert_goto_instructions(
 
         try
         {
-          step.cond_handle = prop_conv.handle(step.cond_expr);
+          step.cond_handle = decision_procedure.handle(step.cond_expr);
         }
         catch(const bitvector_conversion_exceptiont &)
         {
@@ -511,7 +510,7 @@ void symex_target_equationt::convert_constraints(
 }
 
 void symex_target_equationt::convert_assertions(
-  prop_convt &prop_conv)
+  decision_proceduret &decision_procedure)
 {
   // we find out if there is only _one_ assertion,
   // which allows for a simpler formula
@@ -532,12 +531,12 @@ void symex_target_equationt::convert_assertions(
       if(step.is_assert() && !step.ignore && !step.converted)
       {
         step.converted = true;
-        prop_conv.set_to_false(step.cond_expr);
+        decision_procedure.set_to_false(step.cond_expr);
         step.cond_handle = false_exprt();
         return; // prevent further assumptions!
       }
       else if(step.is_assume())
-        prop_conv.set_to_true(step.cond_expr);
+        decision_procedure.set_to_true(step.cond_expr);
     }
 
     UNREACHABLE; // unreachable
@@ -572,7 +571,7 @@ void symex_target_equationt::convert_assertions(
       // do the conversion
       try
       {
-        step.cond_handle = prop_conv.handle(implication);
+        step.cond_handle = decision_procedure.handle(implication);
       }
       catch(const bitvector_conversion_exceptiont &)
       {
@@ -596,7 +595,7 @@ void symex_target_equationt::convert_assertions(
   }
 
   // the below is 'true' if there are no assertions
-  prop_conv.set_to_true(disjunction(disjuncts));
+  decision_procedure.set_to_true(disjunction(disjuncts));
 }
 
 void symex_target_equationt::convert_function_calls(

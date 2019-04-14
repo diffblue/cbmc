@@ -16,7 +16,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/symbol.h>
 #include <util/threeval.h>
 
-#include <solvers/prop/literal_expr.h>
 #include <solvers/prop/prop_minimize.h>
 
 counterexample_beautificationt::counterexample_beautificationt(

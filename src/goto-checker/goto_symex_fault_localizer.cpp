@@ -58,11 +58,11 @@ const SSA_stept &goto_symex_fault_localizert::collect_guards(
       step.assignment_type == symex_targett::assignment_typet::STATE &&
       !step.ignore)
     {
-      if(!step.guard_handle.is_constant())
+      literalt l = solver.convert(step.guard_handle);
+      if(!l.is_constant())
       {
         auto emplace_result = fault_location.scores.emplace(step.source.pc, 0);
-        literalt guard_literal = solver.convert(step.guard_handle);
-        localization_points.emplace(guard_literal, emplace_result.first);
+        localization_points.emplace(l, emplace_result.first);
       }
     }
 

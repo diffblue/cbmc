@@ -18,6 +18,8 @@ Author: Peter Schrammel
 
 #include <goto-symex/symex_target_equation.h>
 
+#include <solvers/prop/prop_conv.h>
+
 #include "fault_localization_provider.h"
 
 class goto_symex_fault_localizert
