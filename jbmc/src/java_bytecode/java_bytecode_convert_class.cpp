@@ -859,7 +859,7 @@ void java_bytecode_convert_classt::add_array_types(symbol_tablet &symbol_table)
     local_symbol.type = java_reference_type(struct_tag_type);
     local_symbol.mode=ID_java;
     symbol_table.add(local_symbol);
-    const auto &local_symexpr=local_symbol.symbol_expr();
+    const auto local_symexpr = local_symbol.symbol_expr();
 
     code_declt declare_cloned(local_symexpr);
 

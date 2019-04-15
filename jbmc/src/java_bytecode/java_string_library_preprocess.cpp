@@ -468,10 +468,8 @@ refined_string_exprt java_string_library_preprocesst::decl_string_expr(
     array_type, "cprover_string_content", loc, function_id, symbol_table);
   const symbol_exprt content_field = sym_content.symbol_expr();
   code.add(code_declt(content_field), loc);
-  const refined_string_exprt str{
-    length_field, content_field, refined_string_type};
-  code.add(code_declt(length_field), loc);
-  return str;
+  code.add(code_declt{length_field}, loc);
+  return refined_string_exprt{length_field, content_field, refined_string_type};
 }
 
 /// add symbols with prefix cprover_string_length and cprover_string_data and
@@ -601,10 +599,10 @@ exprt make_nondet_infinite_char_array(
   const symbol_exprt data_pointer = data_sym.symbol_expr();
   code.add(code_declt(data_pointer));
   code.add(make_allocate_code(data_pointer, array_type.size()));
-  const exprt nondet_data = side_effect_expr_nondett(array_type, loc);
-  const exprt data = dereference_exprt{data_pointer};
-  code.add(code_assignt(data, nondet_data), loc);
-  return data;
+  side_effect_expr_nondett nondet_data{array_type, loc};
+  dereference_exprt data{data_pointer};
+  code.add(code_assignt{data, std::move(nondet_data)}, loc);
+  return std::move(data);
 }
 
 /// Add a call to a primitive of the string solver, letting it know that
@@ -847,8 +845,8 @@ void java_string_library_preprocesst::code_assign_java_string_to_string_expr(
 
   // Assignments
   code.add(code_assignt(lhs.length(), rhs_length), loc);
-  const exprt data_as_array = get_data(deref, symbol_table);
-  code.add(code_assignt(lhs.content(), data_as_array), loc);
+  exprt data_as_array = get_data(deref, symbol_table);
+  code.add(code_assignt{lhs.content(), std::move(data_as_array)}, loc);
 }
 
 /// Create a string expression whose value is given by a literal
@@ -868,9 +866,12 @@ java_string_library_preprocesst::string_literal_to_string_expr(
   symbol_table_baset &symbol_table,
   code_blockt &code)
 {
-  const constant_exprt expr(s, string_typet());
   return string_expr_of_function(
-    ID_cprover_string_literal_func, {expr}, loc, symbol_table, code);
+    ID_cprover_string_literal_func,
+    {constant_exprt{s, string_typet{}}},
+    loc,
+    symbol_table,
+    code);
 }
 
 /// Provide code for the String.valueOf(F) function.
