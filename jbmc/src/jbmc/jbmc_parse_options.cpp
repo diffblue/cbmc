@@ -552,18 +552,13 @@ int jbmc_parse_optionst::doit()
     return 6;
   }
 
+  std::unique_ptr<abstract_goto_modelt> goto_model_ptr;
+  int get_goto_program_ret = get_goto_program(goto_model_ptr, options);
+  if(get_goto_program_ret != -1)
+    return get_goto_program_ret;
+
   if(!cmdline.isset("symex-driven-lazy-loading"))
   {
-    std::unique_ptr<goto_modelt> goto_model_ptr;
-    int get_goto_program_ret=get_goto_program(goto_model_ptr, options);
-    if(get_goto_program_ret!=-1)
-      return get_goto_program_ret;
-
-    goto_modelt &goto_model = *goto_model_ptr;
-
-    if(cmdline.isset("property"))
-      ::set_properties(goto_model, cmdline.get_values("property"));
-
     if(
       options.get_bool_option("program-only") ||
       options.get_bool_option("show-vcc"))
@@ -571,13 +566,13 @@ int jbmc_parse_optionst::doit()
       if(options.get_bool_option("paths"))
       {
         all_properties_verifiert<java_single_path_symex_only_checkert> verifier(
-          options, ui_message_handler, goto_model);
+          options, ui_message_handler, *goto_model_ptr);
         (void)verifier();
       }
       else
       {
         all_properties_verifiert<java_multi_path_symex_only_checkert> verifier(
-          options, ui_message_handler, goto_model);
+          options, ui_message_handler, *goto_model_ptr);
         (void)verifier();
       }
 
@@ -591,13 +586,13 @@ int jbmc_parse_optionst::doit()
       if(options.get_bool_option("paths"))
       {
         stop_on_fail_verifiert<java_single_path_symex_checkert> verifier(
-          options, ui_message_handler, goto_model);
+          options, ui_message_handler, *goto_model_ptr);
         (void)verifier();
       }
       else
       {
         stop_on_fail_verifiert<java_multi_path_symex_checkert> verifier(
-          options, ui_message_handler, goto_model);
+          options, ui_message_handler, *goto_model_ptr);
         (void)verifier();
       }
 
@@ -612,7 +607,7 @@ int jbmc_parse_optionst::doit()
     {
       verifier = util_make_unique<
         stop_on_fail_verifiert<java_single_path_symex_checkert>>(
-        options, ui_message_handler, goto_model);
+        options, ui_message_handler, *goto_model_ptr);
     }
     else if(
       options.get_bool_option("stop-on-fail") &&
@@ -623,13 +618,13 @@ int jbmc_parse_optionst::doit()
         verifier =
           util_make_unique<stop_on_fail_verifier_with_fault_localizationt<
             java_multi_path_symex_checkert>>(
-            options, ui_message_handler, goto_model);
+            options, ui_message_handler, *goto_model_ptr);
       }
       else
       {
         verifier = util_make_unique<
           stop_on_fail_verifiert<java_multi_path_symex_checkert>>(
-          options, ui_message_handler, goto_model);
+          options, ui_message_handler, *goto_model_ptr);
       }
     }
     else if(
@@ -638,7 +633,7 @@ int jbmc_parse_optionst::doit()
     {
       verifier = util_make_unique<all_properties_verifier_with_trace_storaget<
         java_single_path_symex_checkert>>(
-        options, ui_message_handler, goto_model);
+        options, ui_message_handler, *goto_model_ptr);
     }
     else if(
       !options.get_bool_option("stop-on-fail") &&
@@ -649,13 +644,13 @@ int jbmc_parse_optionst::doit()
         verifier =
           util_make_unique<all_properties_verifier_with_fault_localizationt<
             java_multi_path_symex_checkert>>(
-            options, ui_message_handler, goto_model);
+            options, ui_message_handler, *goto_model_ptr);
       }
       else
       {
         verifier = util_make_unique<all_properties_verifier_with_trace_storaget<
           java_multi_path_symex_checkert>>(
-          options, ui_message_handler, goto_model);
+          options, ui_message_handler, *goto_model_ptr);
       }
     }
     else
@@ -665,7 +660,7 @@ int jbmc_parse_optionst::doit()
       // The `configure_bmc` callback passed will enable enum-unwind-static if
       // applicable.
       return bmct::do_language_agnostic_bmc(
-        options, goto_model, ui_message_handler, configure_bmc);
+        options, *goto_model_ptr, ui_message_handler, configure_bmc);
     }
 
     const resultt result = (*verifier)();
@@ -674,31 +669,8 @@ int jbmc_parse_optionst::doit()
   }
   else
   {
-    // Use symex-driven lazy loading:
-    lazy_goto_modelt lazy_goto_model =
-      lazy_goto_modelt::from_handler_object(*this, options, ui_message_handler);
-    lazy_goto_model.initialize(cmdline.args, options);
-
-    class_hierarchy =
-      util_make_unique<class_hierarchyt>(lazy_goto_model.symbol_table);
-
-    // The precise wording of this error matches goto-symex's complaint when no
-    // __CPROVER_start exists (if we just go ahead and run it anyway it will
-    // trip an invariant when it tries to load it)
-    if(!lazy_goto_model.symbol_table.has_symbol(goto_functionst::entry_point()))
-    {
-      log.error() << "the program has no entry point";
-      return 6;
-    }
-
-    // Add failed symbols for any symbol created prior to loading any
-    // particular function:
-    add_failed_symbols(lazy_goto_model.symbol_table);
-
-    if(cmdline.isset("validate-goto-model"))
-    {
-      lazy_goto_model.validate();
-    }
+    lazy_goto_modelt &lazy_goto_model =
+      dynamic_cast<lazy_goto_modelt &>(*goto_model_ptr);
 
     // Provide show-goto-functions and similar dump functions after symex
     // executes. If --paths is active, these dump routines run after every
@@ -722,11 +694,11 @@ int jbmc_parse_optionst::doit()
 }
 
 int jbmc_parse_optionst::get_goto_program(
-  std::unique_ptr<goto_modelt> &goto_model,
+  std::unique_ptr<abstract_goto_modelt> &goto_model_ptr,
   const optionst &options)
 {
-  lazy_goto_modelt lazy_goto_model = lazy_goto_modelt::from_handler_object(
-    *this, options, ui_message_handler);
+  lazy_goto_modelt lazy_goto_model =
+    lazy_goto_modelt::from_handler_object(*this, options, ui_message_handler);
   lazy_goto_model.initialize(cmdline.args, options);
 
   class_hierarchy =
@@ -743,30 +715,56 @@ int jbmc_parse_optionst::get_goto_program(
   // particular function:
   add_failed_symbols(lazy_goto_model.symbol_table);
 
+  if(!cmdline.isset("symex-driven-lazy-loading"))
+  {
     log.status() << "Generating GOTO Program" << messaget::eom;
     lazy_goto_model.load_all_functions();
 
-  // show symbol table or list symbols
-  if(show_loaded_symbols(lazy_goto_model))
-    return CPROVER_EXIT_SUCCESS;
+    // show symbol table or list symbols
+    if(show_loaded_symbols(lazy_goto_model))
+      return CPROVER_EXIT_SUCCESS;
 
-  // Move the model out of the local lazy_goto_model
-  // and into the caller's goto_model
-  goto_model = lazy_goto_modelt::process_whole_model_and_freeze(
-    std::move(lazy_goto_model));
-  if(goto_model == nullptr)
-    return 6;
+    // Move the model out of the local lazy_goto_model
+    // and into the caller's goto_model
+    goto_model_ptr = lazy_goto_modelt::process_whole_model_and_freeze(
+      std::move(lazy_goto_model));
+    if(goto_model_ptr == nullptr)
+      return 6;
 
-  if(cmdline.isset("validate-goto-model"))
+    goto_modelt &goto_model = dynamic_cast<goto_modelt &>(*goto_model_ptr);
+
+    if(cmdline.isset("validate-goto-model"))
+    {
+      goto_model.validate();
+    }
+
+    if(show_loaded_functions(goto_model))
+      return CPROVER_EXIT_SUCCESS;
+
+    if(cmdline.isset("property"))
+      ::set_properties(goto_model, cmdline.get_values("property"));
+  }
+  else
   {
-    goto_model->validate();
+    // The precise wording of this error matches goto-symex's complaint when no
+    // __CPROVER_start exists (if we just go ahead and run it anyway it will
+    // trip an invariant when it tries to load it)
+    if(!lazy_goto_model.symbol_table.has_symbol(goto_functionst::entry_point()))
+    {
+      log.error() << "the program has no entry point" << messaget::eom;
+      return 6;
+    }
+
+    if(cmdline.isset("validate-goto-model"))
+    {
+      lazy_goto_model.validate();
+    }
+
+    goto_model_ptr =
+      util_make_unique<lazy_goto_modelt>(std::move(lazy_goto_model));
   }
 
-  if(show_loaded_functions(*goto_model))
-    return CPROVER_EXIT_SUCCESS;
-
-    log.status() << config.object_bits_info() << messaget::eom;
-  }
+  log.status() << config.object_bits_info() << messaget::eom;
 
   return -1; // no error, continue
 }
