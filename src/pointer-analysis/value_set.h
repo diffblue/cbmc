@@ -63,7 +63,9 @@ public:
     return *this;
   }
 
-  static bool field_sensitive(const irep_idt &id, const typet &type);
+  /// Determines whether an identifier of a given type should have its fields
+  /// distinguished. Virtual so that subclasses can override this behaviour.
+  virtual bool field_sensitive(const irep_idt &id, const typet &type);
 
   /// Matches the location_number field of the instruction that corresponds
   /// to this value_sett instance in value_set_domaint's state map
