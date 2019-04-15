@@ -468,7 +468,7 @@ bool simplify_exprt::simplify_inequality_pointer_object(exprt &expr)
     {
       if(
         op.operands().size() != 1 ||
-        (op.op0().id() != ID_symbol && op.op0().id() != ID_is_dynamic_object &&
+        (op.op0().id() != ID_symbol && op.op0().id() != ID_dynamic_object &&
          op.op0().id() != ID_string_constant))
       {
         return true;
