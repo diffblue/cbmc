@@ -297,7 +297,7 @@ TEST_CASE("Sharing map collisions", "[core][util]")
   REQUIRE(!sm.has_key(some_keyt(8)));
 }
 
-TEST_CASE("Sharing map views", "[core][util]")
+TEST_CASE("Sharing map views and iteration", "[core][util]")
 {
   SECTION("View of empty map")
   {
@@ -347,6 +347,25 @@ TEST_CASE("Sharing map views", "[core][util]")
     sort_view();
 
     REQUIRE((pairs[3] == pt("l", "3")));
+  }
+
+  SECTION("Iterate")
+  {
+    sharing_map_standardt sm;
+    fill(sm);
+
+    typedef std::pair<dstringt, std::string> pt;
+    std::vector<pt> pairs;
+
+    sm.iterate([&pairs](const irep_idt &key, const std::string &value) {
+      pairs.push_back({key, value});
+    });
+
+    std::sort(pairs.begin(), pairs.end());
+    REQUIRE(pairs.size() == 3);
+    REQUIRE((pairs[0] == pt("i", "0")));
+    REQUIRE((pairs[1] == pt("j", "1")));
+    REQUIRE((pairs[2] == pt("k", "2")));
   }
 
   SECTION("Delta view (no sharing, same keys)")

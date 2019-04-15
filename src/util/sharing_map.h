@@ -444,6 +444,18 @@ public:
     delta_viewt &delta_view,
     const bool only_common = true) const;
 
+  /// Call a function for every key-value pair in the map.
+  ///
+  /// Complexity: as \ref sharing_mapt::get_view
+  void
+  iterate(std::function<void(const key_type &k, const mapped_type &m)> f) const
+  {
+    if(empty())
+      return;
+
+    iterate(map, 0, f);
+  }
+
 #if !defined(_MSC_VER)
   /// Stats about sharing between several sharing map instances. An instance of
   /// this class is returned by the get_sharing_map_stats_* functions.
