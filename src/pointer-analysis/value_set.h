@@ -232,6 +232,24 @@ public:
     object_numberingt::number_type n,
     const offsett &offset) const;
 
+  enum class insert_actiont
+  {
+    INSERT,
+    RESET_OFFSET,
+    NONE
+  };
+
+  /// Determines what would happen if object number \p n was inserted into map
+  /// \p dest with offset \p offset -- the possibilities being, nothing (the
+  /// entry is already present), a new entry would be inserted (no existing
+  /// entry with number \p n was found), or an existing entry's offset would be
+  /// reset (indicating there is already an entry with number \p n, but with
+  /// differing offset).
+  insert_actiont get_insert_action(
+    const object_mapt &dest,
+    object_numberingt::number_type n,
+    const offsett &offset) const;
+
   /// Adds an expression and offset to an object map. If the
   /// destination map has an existing element for the same expression
   /// with a differing offset its offset is marked unknown.
@@ -359,6 +377,13 @@ public:
   /// \param src: set to merge in
   /// \return true if anything changed.
   bool make_union(object_mapt &dest, const object_mapt &src) const;
+
+  /// Determines whether merging two RHS expression sets would cause any change
+  /// \param dest: set that would be merged into
+  /// \param src: set that would be merged in
+  /// \return true if anything changed.
+  bool make_union_would_change(const object_mapt &dest, const object_mapt &src)
+    const;
 
   /// Merges an entire existing value_sett's data into this one
   /// \param new_values: new values to merge in
