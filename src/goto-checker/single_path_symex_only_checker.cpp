@@ -143,6 +143,9 @@ void single_path_symex_only_checkert::update_properties(
   std::unordered_set<irep_idt> &updated_properties,
   const symex_target_equationt &equation)
 {
+  if(options.get_bool_option("symex-driven-lazy-loading"))
+    update_properties_from_goto_model(properties, goto_model);
+
   update_properties_status_from_symex_target_equation(
     properties, updated_properties, equation);
 }

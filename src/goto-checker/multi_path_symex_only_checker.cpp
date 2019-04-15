@@ -75,6 +75,9 @@ void multi_path_symex_only_checkert::update_properties(
   propertiest &properties,
   std::unordered_set<irep_idt> &updated_properties)
 {
+  if(options.get_bool_option("symex-driven-lazy-loading"))
+    update_properties_from_goto_model(properties, goto_model);
+
   update_properties_status_from_symex_target_equation(
     properties, updated_properties, equation);
   // Since we will not symex any further we can decide the status

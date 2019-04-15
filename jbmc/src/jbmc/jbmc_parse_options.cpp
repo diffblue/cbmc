@@ -514,22 +514,6 @@ int jbmc_parse_optionst::doit()
     return 0;
   }
 
-  std::function<void(bmct &, const symbol_tablet &)> configure_bmc = nullptr;
-  if(options.get_bool_option("java-unwind-enum-static"))
-  {
-    configure_bmc =
-      [](bmct &bmc, const symbol_tablet &symbol_table) {
-        bmc.add_loop_unwind_handler([&symbol_table](
-                                      const call_stackt &context,
-                                      unsigned loop_number,
-                                      unsigned unwind,
-                                      unsigned &max_unwind) {
-          return java_enum_static_init_unwind_handler(
-            context, loop_number, unwind, max_unwind, symbol_table);
-        });
-      };
-  }
-
   object_factory_params.set(options);
 
   stub_objects_are_not_null =
@@ -557,11 +541,15 @@ int jbmc_parse_optionst::doit()
   if(get_goto_program_ret != -1)
     return get_goto_program_ret;
 
-  if(!options.get_bool_option("symex-driven-lazy-loading"))
   {
     if(
       options.get_bool_option("program-only") ||
-      options.get_bool_option("show-vcc"))
+      options.get_bool_option("show-vcc") ||
+      (options.get_bool_option("symex-driven-lazy-loading") &&
+       (cmdline.isset("show-symbol-table") || cmdline.isset("list-symbols") ||
+        cmdline.isset("show-goto-functions") ||
+        cmdline.isset("list-goto-functions") ||
+        cmdline.isset("show-properties") || cmdline.isset("show-loops"))))
     {
       if(options.get_bool_option("paths"))
       {
@@ -574,6 +562,13 @@ int jbmc_parse_optionst::doit()
         all_properties_verifiert<java_multi_path_symex_only_checkert> verifier(
           options, ui_message_handler, *goto_model_ptr);
         (void)verifier();
+      }
+
+      if(options.get_bool_option("symex-driven-lazy-loading"))
+      {
+        // We can only output these after goto-symex has run.
+        (void)show_loaded_symbols(*goto_model_ptr);
+        (void)show_loaded_functions(*goto_model_ptr);
       }
 
       return CPROVER_EXIT_SUCCESS;
@@ -661,30 +656,6 @@ int jbmc_parse_optionst::doit()
     const resultt result = (*verifier)();
     verifier->report();
     return result_to_exit_code(result);
-  }
-  else
-  {
-    lazy_goto_modelt &lazy_goto_model =
-      dynamic_cast<lazy_goto_modelt &>(*goto_model_ptr);
-
-    // Provide show-goto-functions and similar dump functions after symex
-    // executes. If --paths is active, these dump routines run after every
-    // paths iteration. Its return value indicates that if we ran any dump
-    // function, then we should skip the actual solver phase.
-    auto callback_after_symex = [this, &lazy_goto_model]() {
-      if(show_loaded_symbols(lazy_goto_model))
-        return true;
-      return show_loaded_functions(lazy_goto_model);
-    };
-
-    // The `configure_bmc` callback passed will enable enum-unwind-static if
-    // applicable.
-    return bmct::do_language_agnostic_bmc(
-      options,
-      lazy_goto_model,
-      ui_message_handler,
-      configure_bmc,
-      callback_after_symex);
   }
 }
 
