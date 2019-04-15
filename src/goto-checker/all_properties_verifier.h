@@ -35,10 +35,6 @@ public:
 
   resultt operator()() override
   {
-    // have we got anything to check? otherwise we return PASS
-    if(!has_properties_to_check(properties))
-      return resultt::PASS;
-
     while(incremental_goto_checker(properties).progress !=
           incremental_goto_checkert::resultt::progresst::DONE)
     {
