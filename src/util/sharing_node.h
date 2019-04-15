@@ -511,6 +511,16 @@ public:
     SN_ASSERT(data.use_count() == 1);
   }
 
+  void mutate_value(std::function<void(valueT &)> mutator)
+  {
+    SN_ASSERT(data);
+
+    if(data.use_count() > 1)
+      data = make_small_shared_ptr<d_lt>(data->k, data->v);
+
+    mutator(data->v);
+  }
+
 protected:
   datat data;
 };

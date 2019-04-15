@@ -138,22 +138,25 @@ Author: Daniel Poetzl
 /// to one of the maps, nodes are copied and sharing is lessened as described in
 /// the following.
 ///
-/// The replace(), insert(), and erase() operations interact with sharing as
-/// follows:
+/// The replace(), insert(), update() and erase() operations interact with
+/// sharing as follows:
 /// - When a key-value pair is inserted into the map (or a value of an existing
-/// pair is replaced) and its position is in a shared subtree, already existing
-/// nodes from the root of the subtree to the position of the key-value pair are
-/// copied and integrated with the map, and new nodes are created as needed.
+/// pair is replaced or updated) and its position is in a shared subtree,
+/// already existing nodes from the root of the subtree to the position of the
+/// key-value pair are copied and integrated with the map, and new nodes are
+/// created as needed.
 /// - When a key-value pair is erased from the map that is in a shared subtree,
 /// nodes from the root of the subtree to the last node that will still exist on
 /// the path to the erased element after the element has been removed are
 /// copied and integrated with the map, and the remaining nodes are removed.
 ///
-/// The replace() operation is the only method where sharing could unnecessarily
-/// be broken. This would happen when replacing an old value with a new equal
-/// value. The sharing map provides a debug mode to detect such cases. When the
-/// template parameter `fail_if_equal` is set to true, then the replace() method
-/// yields an invariant violation when the new value is equal to the old value.
+/// The replace() and update() operations are the only method where sharing
+/// could unnecessarily  be broken. This would happen when replacing an old
+/// value with a new equal value, or calling update but making no change. The
+/// sharing map provides a debug mode to detect such cases. When the template
+/// parameter `fail_if_equal` is set to true, then the replace() and update()
+/// methods yield an invariant violation when the new value is equal to the old
+/// value.
 /// For this to work, the type of the values stored in the map needs to have a
 /// defined equality operator (operator==).
 ///
@@ -198,17 +201,48 @@ protected:
   typedef typename innert::to_mapt to_mapt;
   typedef typename innert::leaf_listt leaf_listt;
 
-  struct truet
+  struct falset
   {
     bool operator()(const mapped_type &lhs, const mapped_type &rhs)
     {
-      return true;
+      return false;
     }
   };
 
   typedef
-    typename std::conditional<fail_if_equal, std::equal_to<valueT>, truet>::type
-      value_equalt;
+    typename std::conditional<fail_if_equal, std::equal_to<valueT>, falset>::
+      type value_equalt;
+
+  struct noop_value_comparatort
+  {
+    explicit noop_value_comparatort(const mapped_type &)
+    {
+    }
+
+    bool operator()(const mapped_type &)
+    {
+      return false;
+    }
+  };
+
+  struct real_value_comparatort
+  {
+    mapped_type old_value;
+    explicit real_value_comparatort(const mapped_type &old_value)
+      : old_value(old_value)
+    {
+    }
+
+    bool operator()(const mapped_type &new_value)
+    {
+      return old_value == new_value;
+    }
+  };
+
+  typedef typename std::conditional<
+    fail_if_equal,
+    real_value_comparatort,
+    noop_value_comparatort>::type value_comparatort;
 
 public:
   // interface
@@ -256,6 +290,20 @@ public:
   /// \param m: The mapped value to replace the old value with
   template <class valueU>
   void replace(const key_type &k, valueU &&m);
+
+  /// Update an element in place; element must exist in map
+  ///
+  /// Rationale: this avoids copy-out / edit / replace sequences without leaking
+  ///   a non-const reference
+  ///
+  /// Complexity: as \ref sharing_mapt::replace
+  ///
+  /// \param k: The key of the element to update
+  /// \param mutator: function to apply to the existing value. Must not store
+  ///   the reference; should make some change to the stored value (if you are
+  ///   unsure if you need to make a change, use \ref find beforehand)
+  void update(const key_type &k, std::function<void(mapped_type &)> mutator);
+
   /// Find element
   ///
   /// Complexity:
@@ -922,10 +970,29 @@ SHARING_MAPT4(valueU, void)
   PRECONDITION(lp != nullptr); // key must exist in map
 
   INVARIANT(
-    value_equalt()(as_const(lp)->get_value(), m),
+    !value_equalt()(as_const(lp)->get_value(), m),
     "values should not be replaced with equal values to maximize sharing");
 
   lp->set_value(std::forward<valueU>(m));
+}
+
+SHARING_MAPT(void)
+::update(const key_type &k, std::function<void(mapped_type &)> mutator)
+{
+  innert *cp = get_container_node(k);
+  SM_ASSERT(cp != nullptr);
+
+  leaft *lp = cp->find_leaf(k);
+  PRECONDITION(lp != nullptr); // key must exist in map
+
+  value_comparatort comparator(as_const(lp)->get_value());
+
+  lp->mutate_value(mutator);
+
+  INVARIANT(
+    !comparator(as_const(lp)->get_value()),
+    "sharing_mapt::update should make some change. Consider using read-only "
+    "method to check if an update is needed beforehand");
 }
 
 SHARING_MAPT2(optionalt<std::reference_wrapper<const, mapped_type>>)::find(

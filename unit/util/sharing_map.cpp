@@ -19,6 +19,9 @@ Author: Daniel Poetzl
 typedef sharing_mapt<irep_idt, std::string, false, irep_id_hash>
   sharing_map_standardt;
 
+typedef sharing_mapt<irep_idt, std::string, true, irep_id_hash>
+  sharing_map_debugt;
+
 class sharing_map_internalt : public sharing_map_standardt
 {
   friend void sharing_map_internals_test();
@@ -28,14 +31,16 @@ typedef sharing_mapt<irep_idt, std::string, true, irep_id_hash>
   sharing_map_error_checkt;
 
 // helpers
-void fill(sharing_map_standardt &sm)
+template <class some_sharing_mapt>
+void fill(some_sharing_mapt &sm)
 {
   sm.insert("i", "0");
   sm.insert("j", "1");
   sm.insert("k", "2");
 }
 
-void fill2(sharing_map_standardt &sm)
+template <class some_sharing_mapt>
+void fill2(some_sharing_mapt &sm)
 {
   sm.insert("l", "3");
   sm.insert("m", "4");
@@ -156,7 +161,7 @@ TEST_CASE("Sharing map interface", "[core][util]")
     REQUIRE(!sm.has_key("k"));
   }
 
-  SECTION("Replace elements")
+  SECTION("Replace and update elements")
   {
     sharing_map_standardt sm;
     fill(sm);
@@ -165,6 +170,23 @@ TEST_CASE("Sharing map interface", "[core][util]")
     auto r = sm.find("i");
     REQUIRE(r);
     REQUIRE(r->get() == "9");
+
+    sm.update("i", [](std::string &str) { str += "0"; });
+    auto r2 = sm.find("i");
+    REQUIRE(r2);
+    REQUIRE(r2->get() == "90");
+
+    {
+      cbmc_invariants_should_throwt invariants_throw;
+      sharing_map_debugt debug_sm;
+      fill(debug_sm);
+      REQUIRE_NOTHROW(
+        debug_sm.update("i", [](std::string &str) { str += "1"; }));
+      REQUIRE_THROWS(debug_sm.update("i", [](std::string &str) {}));
+
+      REQUIRE_NOTHROW(debug_sm.replace("i", "abc"));
+      REQUIRE_THROWS(debug_sm.replace("i", "abc"));
+    }
   }
 
   SECTION("Retrieve elements")
