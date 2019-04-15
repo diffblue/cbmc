@@ -3486,6 +3486,9 @@ std::string expr2ct::convert_with_precedence(
     return convert_function(
       src, CPROVER_PREFIX "is_invalid_pointer", precedence = 16);
 
+  else if(src.id() == ID_dynamic_object)
+    return convert_function(src, "DYNAMIC_OBJECT", precedence = 16);
+
   else if(src.id() == ID_is_dynamic_object)
     return convert_function(src, "IS_DYNAMIC_OBJECT", precedence = 16);
 

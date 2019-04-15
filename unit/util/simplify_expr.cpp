@@ -183,3 +183,36 @@ TEST_CASE("Simplify shift")
     simplify_expr(lshr_exprt(from_integer(-4, signedbv_typet(8)), 1), ns) ==
     from_integer(126, signedbv_typet(8)));
 }
+
+TEST_CASE("Simplify dynamic object comparison", "[core][util]")
+{
+  const symbol_tablet symbol_table;
+  const namespacet ns(symbol_table);
+
+  dynamic_object_exprt dynamic_object(signedbv_typet(8));
+  dynamic_object.set_instance(1);
+
+  address_of_exprt address_of_dynamic_object(dynamic_object);
+
+  equal_exprt compare_null(
+    address_of_dynamic_object,
+    null_pointer_exprt(to_pointer_type(address_of_dynamic_object.type())));
+  REQUIRE(simplify_expr(compare_null, ns) == false_exprt());
+
+  typecast_exprt cast_address(
+    address_of_dynamic_object, pointer_type(signedbv_typet(16)));
+
+  equal_exprt compare_null_through_cast(
+    cast_address, null_pointer_exprt(to_pointer_type(cast_address.type())));
+  REQUIRE(simplify_expr(compare_null_through_cast, ns) == false_exprt());
+
+  dynamic_object_exprt other_dynamic_object(signedbv_typet(8));
+  dynamic_object.set_instance(2);
+  address_of_exprt address_of_other_dynamic_object(other_dynamic_object);
+
+  equal_exprt compare_pointer_objects(
+    pointer_object(address_of_dynamic_object),
+    pointer_object(address_of_other_dynamic_object));
+
+  REQUIRE(simplify_expr(compare_pointer_objects, ns) == false_exprt());
+}
