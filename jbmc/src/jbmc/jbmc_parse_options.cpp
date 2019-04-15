@@ -733,46 +733,45 @@ int jbmc_parse_optionst::get_goto_program(
   std::unique_ptr<goto_modelt> &goto_model,
   const optionst &options)
 {
+  lazy_goto_modelt lazy_goto_model = lazy_goto_modelt::from_handler_object(
+    *this, options, ui_message_handler);
+  lazy_goto_model.initialize(cmdline.args, options);
+
+  class_hierarchy =
+    util_make_unique<class_hierarchyt>(lazy_goto_model.symbol_table);
+
+  // Show the class hierarchy
+  if(cmdline.isset("show-class-hierarchy"))
   {
-    lazy_goto_modelt lazy_goto_model =
-      lazy_goto_modelt::from_handler_object(*this, options, ui_message_handler);
-    lazy_goto_model.initialize(cmdline.args, options);
+    show_class_hierarchy(*class_hierarchy, ui_message_handler);
+    return CPROVER_EXIT_SUCCESS;
+  }
 
-    class_hierarchy =
-      util_make_unique<class_hierarchyt>(lazy_goto_model.symbol_table);
-
-    // Show the class hierarchy
-    if(cmdline.isset("show-class-hierarchy"))
-    {
-      show_class_hierarchy(*class_hierarchy, ui_message_handler);
-      return CPROVER_EXIT_SUCCESS;
-    }
-
-    // Add failed symbols for any symbol created prior to loading any
-    // particular function:
-    add_failed_symbols(lazy_goto_model.symbol_table);
+  // Add failed symbols for any symbol created prior to loading any
+  // particular function:
+  add_failed_symbols(lazy_goto_model.symbol_table);
 
     log.status() << "Generating GOTO Program" << messaget::eom;
     lazy_goto_model.load_all_functions();
 
-    // show symbol table or list symbols
-    if(show_loaded_symbols(lazy_goto_model))
-      return CPROVER_EXIT_SUCCESS;
+  // show symbol table or list symbols
+  if(show_loaded_symbols(lazy_goto_model))
+    return CPROVER_EXIT_SUCCESS;
 
-    // Move the model out of the local lazy_goto_model
-    // and into the caller's goto_model
-    goto_model=lazy_goto_modelt::process_whole_model_and_freeze(
-      std::move(lazy_goto_model));
-    if(goto_model == nullptr)
-      return 6;
+  // Move the model out of the local lazy_goto_model
+  // and into the caller's goto_model
+  goto_model = lazy_goto_modelt::process_whole_model_and_freeze(
+    std::move(lazy_goto_model));
+  if(goto_model == nullptr)
+    return 6;
 
-    if(cmdline.isset("validate-goto-model"))
-    {
-      goto_model->validate();
-    }
+  if(cmdline.isset("validate-goto-model"))
+  {
+    goto_model->validate();
+  }
 
-    if(show_loaded_functions(*goto_model))
-      return CPROVER_EXIT_SUCCESS;
+  if(show_loaded_functions(*goto_model))
+    return CPROVER_EXIT_SUCCESS;
 
     log.status() << config.object_bits_info() << messaget::eom;
   }
@@ -792,83 +791,79 @@ void jbmc_parse_optionst::process_goto_function(
   bool using_symex_driven_loading =
     options.get_bool_option("symex-driven-lazy-loading");
 
+  // Removal of RTTI inspection:
+  remove_instanceof(
+    function.get_function_id(),
+    goto_function,
+    symbol_table,
+    *class_hierarchy,
+    log.get_message_handler());
+  // Java virtual functions -> explicit dispatch tables:
+  remove_virtual_functions(function);
+
+  auto function_is_stub = [&symbol_table, &model](const irep_idt &id) {
+    return symbol_table.lookup_ref(id).value.is_nil() &&
+           !model.can_produce_function(id);
+  };
+
+  remove_returns(function, function_is_stub);
+
+  replace_java_nondet(function);
+
+  // Similar removal of java nondet statements:
+  convert_nondet(function, ui_message_handler, object_factory_params, ID_java);
+
+  if(using_symex_driven_loading)
   {
-    // Removal of RTTI inspection:
-    remove_instanceof(
+    // remove exceptions
+    // If using symex-driven function loading we need to do this now so that
+    // symex doesn't have to cope with exception-handling constructs; however
+    // the results are slightly worse than running it in whole-program mode
+    // (e.g. dead catch sites will be retained)
+    remove_exceptions(
       function.get_function_id(),
-      goto_function,
+      goto_function.body,
       symbol_table,
-      *class_hierarchy,
-      log.get_message_handler());
-    // Java virtual functions -> explicit dispatch tables:
-    remove_virtual_functions(function);
-
-    auto function_is_stub = [&symbol_table, &model](const irep_idt &id) {
-      return symbol_table.lookup_ref(id).value.is_nil() &&
-             !model.can_produce_function(id);
-    };
-
-    remove_returns(function, function_is_stub);
-
-    replace_java_nondet(function);
-
-    // Similar removal of java nondet statements:
-    convert_nondet(
-      function, ui_message_handler, object_factory_params, ID_java);
-
-    if(using_symex_driven_loading)
-    {
-      // remove exceptions
-      // If using symex-driven function loading we need to do this now so that
-      // symex doesn't have to cope with exception-handling constructs; however
-      // the results are slightly worse than running it in whole-program mode
-      // (e.g. dead catch sites will be retained)
-      remove_exceptions(
-        function.get_function_id(),
-        goto_function.body,
-        symbol_table,
-        *class_hierarchy.get(),
-        ui_message_handler);
-    }
-
-    // add generic checks
-    goto_check(
-      function.get_function_id(), function.get_goto_function(), ns, options);
-
-    // Replace Java new side effects
-    remove_java_new(
-      function.get_function_id(),
-      goto_function,
-      symbol_table,
+      *class_hierarchy.get(),
       ui_message_handler);
+  }
 
-    // checks don't know about adjusted float expressions
-    adjust_float_expressions(goto_function, ns);
+  // add generic checks
+  goto_check(
+    function.get_function_id(), function.get_goto_function(), ns, options);
 
-    // add failed symbols for anything created relating to this particular
-    // function (note this means subseqent passes mustn't create more!):
-    journalling_symbol_tablet::changesett new_symbols =
-      symbol_table.get_inserted();
-    for(const irep_idt &new_symbol_name : new_symbols)
-    {
-      add_failed_symbol_if_needed(
-        symbol_table.lookup_ref(new_symbol_name),
-        symbol_table);
-    }
+  // Replace Java new side effects
+  remove_java_new(
+    function.get_function_id(),
+    goto_function,
+    symbol_table,
+    ui_message_handler);
 
-    // If using symex-driven function loading we must label the assertions
-    // now so symex sees its targets; otherwise we leave this until
-    // process_goto_functions, as we haven't run remove_exceptions yet, and that
-    // pass alters the CFG.
-    if(using_symex_driven_loading)
-    {
-      // label the assertions
-      label_properties(goto_function.body);
+  // checks don't know about adjusted float expressions
+  adjust_float_expressions(goto_function, ns);
 
-      goto_function.body.update();
-      function.compute_location_numbers();
-      goto_function.body.compute_loop_numbers();
-    }
+  // add failed symbols for anything created relating to this particular
+  // function (note this means subseqent passes mustn't create more!):
+  journalling_symbol_tablet::changesett new_symbols =
+    symbol_table.get_inserted();
+  for(const irep_idt &new_symbol_name : new_symbols)
+  {
+    add_failed_symbol_if_needed(
+      symbol_table.lookup_ref(new_symbol_name), symbol_table);
+  }
+
+  // If using symex-driven function loading we must label the assertions
+  // now so symex sees its targets; otherwise we leave this until
+  // process_goto_functions, as we haven't run remove_exceptions yet, and that
+  // pass alters the CFG.
+  if(using_symex_driven_loading)
+  {
+    // label the assertions
+    label_properties(goto_function.body);
+
+    goto_function.body.update();
+    function.compute_location_numbers();
+    goto_function.body.compute_loop_numbers();
   }
 }
 
@@ -930,95 +925,93 @@ bool jbmc_parse_optionst::process_goto_functions(
   goto_modelt &goto_model,
   const optionst &options)
 {
+  log.status() << "Running GOTO functions transformation passes"
+               << messaget::eom;
+
+  bool using_symex_driven_loading =
+    options.get_bool_option("symex-driven-lazy-loading");
+
+  // When using symex-driven lazy loading, *all* relevant processing is done
+  // during process_goto_function, so we have nothing to do here.
+  if(using_symex_driven_loading)
+    return false;
+
+  // remove catch and throw
+  remove_exceptions(
+    goto_model, *class_hierarchy.get(), log.get_message_handler());
+
+  // instrument library preconditions
+  instrument_preconditions(goto_model);
+
+  // ignore default/user-specified initialization
+  // of variables with static lifetime
+  if(cmdline.isset("nondet-static"))
   {
-    log.status() << "Running GOTO functions transformation passes"
+    log.status() << "Adding nondeterministic initialization "
+                    "of static/global variables"
                  << messaget::eom;
+    nondet_static(goto_model);
+  }
 
-    bool using_symex_driven_loading =
-      options.get_bool_option("symex-driven-lazy-loading");
+  // recalculate numbers, etc.
+  goto_model.goto_functions.update();
 
-    // When using symex-driven lazy loading, *all* relevant processing is done
-    // during process_goto_function, so we have nothing to do here.
-    if(using_symex_driven_loading)
-      return false;
+  if(cmdline.isset("drop-unused-functions"))
+  {
+    // Entry point will have been set before and function pointers removed
+    log.status() << "Removing unused functions" << messaget::eom;
+    remove_unused_functions(goto_model, log.get_message_handler());
+  }
 
-    // remove catch and throw
-    remove_exceptions(
-      goto_model, *class_hierarchy.get(), log.get_message_handler());
+  // remove skips such that trivial GOTOs are deleted
+  remove_skip(goto_model);
 
-    // instrument library preconditions
-    instrument_preconditions(goto_model);
+  // label the assertions
+  // This must be done after adding assertions and
+  // before using the argument of the "property" option.
+  // Do not re-label after using the property slicer because
+  // this would cause the property identifiers to change.
+  label_properties(goto_model);
 
-    // ignore default/user-specified initialization
-    // of variables with static lifetime
-    if(cmdline.isset("nondet-static"))
-    {
-      log.status() << "Adding nondeterministic initialization "
-                      "of static/global variables"
-                   << messaget::eom;
-      nondet_static(goto_model);
-    }
-
-    // recalculate numbers, etc.
-    goto_model.goto_functions.update();
-
-    if(cmdline.isset("drop-unused-functions"))
-    {
-      // Entry point will have been set before and function pointers removed
-      log.status() << "Removing unused functions" << messaget::eom;
-      remove_unused_functions(goto_model, log.get_message_handler());
-    }
-
-    // remove skips such that trivial GOTOs are deleted
-    remove_skip(goto_model);
-
-    // label the assertions
-    // This must be done after adding assertions and
-    // before using the argument of the "property" option.
-    // Do not re-label after using the property slicer because
-    // this would cause the property identifiers to change.
-    label_properties(goto_model);
-
-    // reachability slice?
-    if(cmdline.isset("reachability-slice-fb"))
-    {
-      if(cmdline.isset("reachability-slice"))
-      {
-        log.error() << "--reachability-slice and --reachability-slice-fb "
-                    << "must not be given together" << messaget::eom;
-        return true;
-      }
-
-      log.status() << "Performing a forwards-backwards reachability slice"
-                   << messaget::eom;
-      if(cmdline.isset("property"))
-        reachability_slicer(goto_model, cmdline.get_values("property"), true);
-      else
-        reachability_slicer(goto_model, true);
-    }
-
+  // reachability slice?
+  if(cmdline.isset("reachability-slice-fb"))
+  {
     if(cmdline.isset("reachability-slice"))
     {
-      log.status() << "Performing a reachability slice" << messaget::eom;
-      if(cmdline.isset("property"))
-        reachability_slicer(goto_model, cmdline.get_values("property"));
-      else
-        reachability_slicer(goto_model);
+      log.error() << "--reachability-slice and --reachability-slice-fb "
+                  << "must not be given together" << messaget::eom;
+      return true;
     }
 
-    // full slice?
-    if(cmdline.isset("full-slice"))
-    {
-      log.status() << "Performing a full slice" << messaget::eom;
-      if(cmdline.isset("property"))
-        property_slicer(goto_model, cmdline.get_values("property"));
-      else
-        full_slicer(goto_model);
-    }
-
-    // remove any skips introduced
-    remove_skip(goto_model);
+    log.status() << "Performing a forwards-backwards reachability slice"
+                 << messaget::eom;
+    if(cmdline.isset("property"))
+      reachability_slicer(goto_model, cmdline.get_values("property"), true);
+    else
+      reachability_slicer(goto_model, true);
   }
+
+  if(cmdline.isset("reachability-slice"))
+  {
+    log.status() << "Performing a reachability slice" << messaget::eom;
+    if(cmdline.isset("property"))
+      reachability_slicer(goto_model, cmdline.get_values("property"));
+    else
+      reachability_slicer(goto_model);
+  }
+
+  // full slice?
+  if(cmdline.isset("full-slice"))
+  {
+    log.status() << "Performing a full slice" << messaget::eom;
+    if(cmdline.isset("property"))
+      property_slicer(goto_model, cmdline.get_values("property"));
+    else
+      full_slicer(goto_model);
+  }
+
+  // remove any skips introduced
+  remove_skip(goto_model);
 
   return false;
 }
