@@ -655,12 +655,7 @@ int jbmc_parse_optionst::doit()
     }
     else
     {
-      // fall back until everything has been ported to goto-checker
-
-      // The `configure_bmc` callback passed will enable enum-unwind-static if
-      // applicable.
-      return bmct::do_language_agnostic_bmc(
-        options, *goto_model_ptr, ui_message_handler, configure_bmc);
+      UNREACHABLE;
     }
 
     const resultt result = (*verifier)();
