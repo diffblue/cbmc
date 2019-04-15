@@ -561,13 +561,6 @@ int jbmc_parse_optionst::doit()
 
     goto_modelt &goto_model = *goto_model_ptr;
 
-    if(cmdline.isset("show-properties"))
-    {
-      show_properties(
-        goto_model, log.get_message_handler(), ui_message_handler.get_ui());
-      return 0; // should contemplate EX_OK from sysexits.h
-    }
-
     if(set_properties(goto_model))
       return 7; // should contemplate EX_USAGE from sysexits.h
 
@@ -712,6 +705,8 @@ int jbmc_parse_optionst::doit()
     // paths iteration. Its return value indicates that if we ran any dump
     // function, then we should skip the actual solver phase.
     auto callback_after_symex = [this, &lazy_goto_model]() {
+      if(show_loaded_symbols(lazy_goto_model))
+        return true;
       return show_loaded_functions(lazy_goto_model);
     };
 
@@ -760,18 +755,9 @@ int jbmc_parse_optionst::get_goto_program(
     log.status() << "Generating GOTO Program" << messaget::eom;
     lazy_goto_model.load_all_functions();
 
-    // Show the symbol table before process_goto_functions mangles return
-    // values, etc
-    if(cmdline.isset("show-symbol-table"))
-    {
-      show_symbol_table(lazy_goto_model.symbol_table, ui_message_handler);
-      return 0;
-    }
-    else if(cmdline.isset("list-symbols"))
-    {
-      show_symbol_table_brief(lazy_goto_model.symbol_table, ui_message_handler);
-      return 0;
-    }
+    // show symbol table or list symbols
+    if(show_loaded_symbols(lazy_goto_model))
+      return CPROVER_EXIT_SUCCESS;
 
     // Move the model out of the local lazy_goto_model
     // and into the caller's goto_model
@@ -785,25 +771,8 @@ int jbmc_parse_optionst::get_goto_program(
       goto_model->validate();
     }
 
-    // show it?
-    if(cmdline.isset("show-loops"))
-    {
-      show_loop_ids(ui_message_handler.get_ui(), *goto_model);
-      return 0;
-    }
-
-    // show it?
-    if(
-      cmdline.isset("show-goto-functions") ||
-      cmdline.isset("list-goto-functions"))
-    {
-      show_goto_functions(
-        *goto_model,
-        log.get_message_handler(),
-        ui_message_handler.get_ui(),
-        cmdline.isset("list-goto-functions"));
-      return 0;
-    }
+    if(show_loaded_functions(*goto_model))
+      return CPROVER_EXIT_SUCCESS;
 
     log.status() << config.object_bits_info() << messaget::eom;
   }
@@ -903,7 +872,7 @@ void jbmc_parse_optionst::process_goto_function(
   }
 }
 
-bool jbmc_parse_optionst::show_loaded_functions(
+bool jbmc_parse_optionst::show_loaded_symbols(
   const abstract_goto_modelt &goto_model)
 {
   if(cmdline.isset("show-symbol-table"))
@@ -917,6 +886,12 @@ bool jbmc_parse_optionst::show_loaded_functions(
     return true;
   }
 
+  return false;
+}
+
+bool jbmc_parse_optionst::show_loaded_functions(
+  const abstract_goto_modelt &goto_model)
+{
   if(cmdline.isset("show-loops"))
   {
     show_loop_ids(ui_message_handler.get_ui(), goto_model.get_goto_functions());
