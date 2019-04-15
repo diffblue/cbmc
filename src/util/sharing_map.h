@@ -222,6 +222,19 @@ public:
   /// \param k: The key of the element to erase
   void erase(const key_type &k);
 
+  /// Erase element if it exists
+  ///
+  /// Complexity:
+  /// - Worst case: O(H * S + M)
+  /// - Best case: O(H)
+  ///
+  /// \param k: The key of the element to erase
+  void erase_if_exists(const key_type &k)
+  {
+    if(has_key(k))
+      erase(k);
+  }
+
   /// Insert element, element must not exist in map
   ///
   /// Complexity:

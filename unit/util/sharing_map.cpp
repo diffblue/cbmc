@@ -201,6 +201,12 @@ TEST_CASE("Sharing map interface", "[core][util]")
     sm.erase("j");
     REQUIRE(!sm.has_key("j"));
 
+    sm.erase_if_exists("j");
+    REQUIRE(!sm.has_key("j"));
+    sm.insert("j", "1");
+    sm.erase_if_exists("j");
+    REQUIRE(!sm.has_key("j"));
+
     sm.insert("i", "0");
     sm.insert("j", "1");
 
