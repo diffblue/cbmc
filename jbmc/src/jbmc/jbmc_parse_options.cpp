@@ -561,8 +561,8 @@ int jbmc_parse_optionst::doit()
 
     goto_modelt &goto_model = *goto_model_ptr;
 
-    if(set_properties(goto_model))
-      return 7; // should contemplate EX_USAGE from sysexits.h
+    if(cmdline.isset("property"))
+      ::set_properties(goto_model, cmdline.get_values("property"));
 
     if(
       options.get_bool_option("program-only") ||
@@ -719,14 +719,6 @@ int jbmc_parse_optionst::doit()
       configure_bmc,
       callback_after_symex);
   }
-}
-
-bool jbmc_parse_optionst::set_properties(goto_modelt &goto_model)
-{
-  if(cmdline.isset("property"))
-    ::set_properties(goto_model, cmdline.get_values("property"));
-
-  return false;
 }
 
 int jbmc_parse_optionst::get_goto_program(
