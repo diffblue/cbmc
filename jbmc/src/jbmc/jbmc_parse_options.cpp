@@ -828,7 +828,7 @@ void jbmc_parse_optionst::process_goto_function(
   adjust_float_expressions(goto_function, ns);
 
   // add failed symbols for anything created relating to this particular
-  // function (note this means subseqent passes mustn't create more!):
+  // function (note this means subsequent passes mustn't create more!):
   journalling_symbol_tablet::changesett new_symbols =
     symbol_table.get_inserted();
   for(const irep_idt &new_symbol_name : new_symbols)
