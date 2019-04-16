@@ -64,6 +64,28 @@ Author: Martin Brain, martin.brain@diffblue.com
 ** CPROVER_INVARIANT_* macros.
 */
 
+/// Set this to true to cause invariants to throw a C++ exception rather than
+/// abort the program. This is currently untested behaviour, and may fail to
+/// clean up partly-completed CBMC operations or release resources. You should
+/// probably only use this to gather or report more information about the
+/// failure and then abort. Default off.
+extern bool cbmc_invariants_should_throw;
+
+/// Helper to enable invariant throwing as above bounded to an object lifetime:
+struct cbmc_invariants_should_throwt
+{
+  bool old_state;
+  cbmc_invariants_should_throwt() : old_state(cbmc_invariants_should_throw)
+  {
+    cbmc_invariants_should_throw = true;
+  }
+
+  ~cbmc_invariants_should_throwt()
+  {
+    cbmc_invariants_should_throw = old_state;
+  }
+};
+
 /// A logic error, augmented with a distinguished field to hold a backtrace.
 /// Classes that extend this one should share the same initial constructor
 /// parameters: their constructor signature should be of the form:
@@ -230,10 +252,14 @@ CBMC_NORETURN
     backtrace,
     condition,
     std::forward<Params>(params)...);
-  // We now have a structured exception ready to use;
-  // in future this is the place to put a 'throw'.
-  report_exception_to_stderr(to_throw);
-  abort();
+
+  if(cbmc_invariants_should_throw)
+    throw to_throw;
+  else
+  {
+    report_exception_to_stderr(to_throw);
+    abort();
+  }
 }
 
 /// This is a wrapper function used by the macro 'INVARIANT(CONDITION, REASON)'.
