@@ -234,7 +234,7 @@ private:
 public:
   // Standard const iterator
 
-  typedef std::pair<const std::size_t, const T &> value_type;
+  typedef std::pair<const std::size_t, const T &> valuet;
 
   /// Const iterator
   ///
@@ -255,14 +255,14 @@ public:
     {
     }
 
-    const value_type operator*() const
+    const valuet operator*() const
     {
-      return value_type(idx, *(m.p + ii));
+      return valuet(idx, *(m.p + ii));
     }
 
-    const std::shared_ptr<value_type> operator->() const
+    const std::shared_ptr<valuet> operator->() const
     {
-      return std::make_shared<value_type>(idx, *(m.p + ii));
+      return std::make_shared<valuet>(idx, *(m.p + ii));
     }
 
     const_iterator operator++()
