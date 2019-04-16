@@ -86,6 +86,8 @@ private:
 /// are given as a struct containing a length and pointer to an array.
 array_string_exprt of_argument(array_poolt &array_pool, const exprt &arg);
 
+/// Return the array associated to the given pointer or creates a new one
+DEPRECATED("use pool.find(pointer, length) instead")
 const array_string_exprt &char_array_of_pointer(
   array_poolt &pool,
   const exprt &pointer,

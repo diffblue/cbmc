@@ -134,9 +134,6 @@ array_poolt::find(const exprt &pointer, const exprt &length)
   return *created_strings_value.insert(array).first;
 }
 
-/// Adds creates a new array if it does not already exists
-/// \todo This should be replaced
-/// by array_poolt.make_char_array_for_char_pointer
 const array_string_exprt &char_array_of_pointer(
   array_poolt &pool,
   const exprt &pointer,
