@@ -557,7 +557,7 @@ int jbmc_parse_optionst::doit()
   if(get_goto_program_ret != -1)
     return get_goto_program_ret;
 
-  if(!cmdline.isset("symex-driven-lazy-loading"))
+  if(!options.get_bool_option("symex-driven-lazy-loading"))
   {
     if(
       options.get_bool_option("program-only") ||
@@ -710,7 +710,7 @@ int jbmc_parse_optionst::get_goto_program(
   // particular function:
   add_failed_symbols(lazy_goto_model.symbol_table);
 
-  if(!cmdline.isset("symex-driven-lazy-loading"))
+  if(!options.get_bool_option("symex-driven-lazy-loading"))
   {
     log.status() << "Generating GOTO Program" << messaget::eom;
     lazy_goto_model.load_all_functions();
