@@ -63,10 +63,17 @@ property_infot::property_infot(
 {
 }
 
-/// Return the properties in the goto model and initialize them to NOT_CHECKED
 propertiest initialize_properties(const abstract_goto_modelt &goto_model)
 {
   propertiest properties;
+  update_properties_from_goto_model(properties, goto_model);
+  return properties;
+}
+
+void update_properties_from_goto_model(
+  propertiest &properties,
+  const abstract_goto_modelt &goto_model)
+{
   const auto &goto_functions = goto_model.get_goto_functions();
   for(const auto &function_pair : goto_functions.function_map)
   {
@@ -86,7 +93,6 @@ propertiest initialize_properties(const abstract_goto_modelt &goto_model)
         property_infot{i_it, description, property_statust::NOT_CHECKED});
     }
   }
-  return properties;
 }
 
 std::string
