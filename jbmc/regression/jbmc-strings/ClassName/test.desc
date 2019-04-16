@@ -4,5 +4,3 @@ test.class
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
-\[java::test\.main:\(\)V\.assertion\.1\] line 5 assertion at file test\.java line 5 function java::test\.main:\(\)V bytecode-index 8: SUCCESS$
-\[java::test\.main:\(\)V\.assertion\.2\] line 6 assertion at file test\.java line 6 function java::test\.main:\(\)V bytecode-index 19: SUCCESS$

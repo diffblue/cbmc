@@ -175,7 +175,7 @@ void goto_symext::clean_expr(
   const bool write)
 {
   replace_nondet(expr, path_storage.build_symex_nondet);
-  dereference(expr, state);
+  dereference(expr, state, write);
 
   // make sure all remaining byte extract operations use the root
   // object to avoid nesting of with/update and byte_update when on

@@ -170,6 +170,7 @@ void goto_symex_statet::assignment(
   {
     DATA_INVARIANT(!check_renaming_l1(lhs), "lhs renaming failed on l1");
   }
+  const ssa_exprt l1_lhs = lhs;
 
 #if 0
   PRECONDITION(l1_identifier != get_original_name(l1_identifier)
@@ -221,11 +222,11 @@ void goto_symex_statet::assignment(
     value_set.assign(l1_lhs, l1_rhs, ns, rhs_is_simplified, is_shared);
   }
 
-  #if 0
+#if 0
   std::cout << "Assigning " << l1_identifier << '\n';
   value_set.output(ns, std::cout);
   std::cout << "**********************\n";
-  #endif
+#endif
 }
 
 template <levelt level>
@@ -334,6 +335,10 @@ goto_symex_statet::rename(exprt expr, const namespacet &ns)
           c_expr.type() == to_if_expr(c_expr).false_case().type())),
       "Type of renamed expr should be the same as operands for with_exprt and "
       "if_exprt");
+
+    if(level == L2)
+      field_sensitivity.apply(ns, *this, expr, false);
+
     return renamedt<exprt, level>{std::move(expr)};
   }
 }
@@ -359,6 +364,10 @@ bool goto_symex_statet::l2_thread_read_encoding(
   {
     return false;
   }
+
+  // only continue if an indivisible object is being accessed
+  if(field_sensitivityt::is_divisible(expr))
+    return false;
 
   ssa_exprt ssa_l1=expr;
   ssa_l1.remove_level_2();
@@ -484,6 +493,10 @@ goto_symex_statet::write_is_shared_resultt goto_symex_statet::write_is_shared(
   {
     return write_is_shared_resultt::NOT_SHARED;
   }
+
+  // only continue if an indivisible object is being accessed
+  if(field_sensitivityt::is_divisible(expr))
+    return write_is_shared_resultt::NOT_SHARED;
 
   if(atomic_section_id != 0)
     return write_is_shared_resultt::IN_ATOMIC_SECTION;

@@ -483,6 +483,8 @@ public:
     const irep_idt &index,
     const std::unordered_set<exprt, irep_hash> &values_to_erase);
 
+  void erase_symbol(const symbol_exprt &symbol_expr, const namespacet &ns);
+
 protected:
   /// Reads the set of objects pointed to by `expr`, including making
   /// recursive lookups for dereference operations etc.
@@ -516,6 +518,16 @@ protected:
   void dereference_rec(
     const exprt &src,
     exprt &dest) const;
+
+  void erase_symbol_rec(
+    const typet &type,
+    const std::string &erase_prefix,
+    const namespacet &ns);
+
+  void erase_struct_union_symbol(
+    const struct_union_typet &struct_union_type,
+    const std::string &erase_prefix,
+    const namespacet &ns);
 
   // Subclass customisation points:
 

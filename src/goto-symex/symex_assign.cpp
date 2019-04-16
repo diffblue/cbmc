@@ -16,9 +16,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/cprover_prefix.h>
 #include <util/exception_utils.h>
 #include <util/pointer_offset_size.h>
+#include <util/simplify_expr.h>
 
 #include "goto_symex_state.h"
 
+// We can either use with_exprt or update_exprt when building expressions that
+// modify components of an array or a struct. Set USE_UPDATE to use
+// update_exprt.
 // #define USE_UPDATE
 
 void goto_symext::symex_assign(statet &state, const code_assignt &code)
@@ -198,6 +202,163 @@ void goto_symext::symex_assign_rec(
       "assignment to `" + lhs.id_string() + "' not handled");
 }
 
+/// Replace "with" (or "update") expressions in \p ssa_rhs by their update
+/// values and move the index or member to the left-hand side \p lhs_mod. This
+/// effectively undoes the work that \ref goto_symext::symex_assign_array and
+/// \ref goto_symext::symex_assign_struct_member have done, but now making use
+/// of the index/member that may only be known after renaming to L2 has taken
+/// place.
+/// \param [in, out] state: symbolic execution state to perform renaming
+/// \param [in,out] ssa_rhs: right-hand side
+/// \param [in,out] lhs_mod: left-hand side
+/// \param ns: namespace
+static void rewrite_with_to_field_symbols(
+  goto_symext::statet &state,
+  exprt &ssa_rhs,
+  ssa_exprt &lhs_mod,
+  const namespacet &ns)
+{
+#ifdef USE_UPDATE
+  while(ssa_rhs.id() == ID_update &&
+        to_update_expr(ssa_rhs).designator().size() == 1 &&
+        (lhs_mod.type().id() == ID_array || lhs_mod.type().id() == ID_struct ||
+         lhs_mod.type().id() == ID_struct_tag))
+  {
+    exprt field_sensitive_lhs;
+    const update_exprt &update = to_update_expr(ssa_rhs);
+    PRECONDITION(update.designator().size() == 1);
+    const exprt &designator = update.designator().front();
+
+    if(lhs_mod.type().id() == ID_array)
+    {
+      field_sensitive_lhs =
+        index_exprt(lhs_mod, to_index_designator(designator).index());
+    }
+    else
+    {
+      field_sensitive_lhs = member_exprt(
+        lhs_mod,
+        to_member_designator(designator).get_component_name(),
+        update.new_value().type());
+    }
+
+    state.field_sensitivity.apply(state, field_sensitive_lhs, true);
+
+    if(field_sensitive_lhs.id() != ID_symbol)
+      break;
+
+    ssa_rhs = update.new_value();
+    lhs_mod = to_ssa_expr(field_sensitive_lhs);
+  }
+#else
+  while(ssa_rhs.id() == ID_with &&
+        to_with_expr(ssa_rhs).operands().size() == 3 &&
+        (lhs_mod.type().id() == ID_array || lhs_mod.type().id() == ID_struct ||
+         lhs_mod.type().id() == ID_struct_tag))
+  {
+    exprt field_sensitive_lhs;
+    const with_exprt &with_expr = to_with_expr(ssa_rhs);
+
+    if(lhs_mod.type().id() == ID_array)
+    {
+      field_sensitive_lhs = index_exprt(lhs_mod, with_expr.where());
+    }
+    else
+    {
+      field_sensitive_lhs = member_exprt(
+        lhs_mod,
+        with_expr.where().get(ID_component_name),
+        with_expr.new_value().type());
+    }
+
+    state.field_sensitivity.apply(ns, state, field_sensitive_lhs, true);
+
+    if(field_sensitive_lhs.id() != ID_symbol)
+      break;
+
+    ssa_rhs = with_expr.new_value();
+    lhs_mod = to_ssa_expr(field_sensitive_lhs);
+  }
+#endif
+}
+
+/// Replace byte-update operations that only affect individual fields of an
+/// expression by assignments to just those fields. May generate "with" (or
+/// "update") expressions, which \ref rewrite_with_to_field_symbols will then
+/// take care of.
+/// \param [in,out] ssa_rhs: right-hand side
+/// \param [in,out] lhs_mod: left-hand side
+/// \param ns: namespace
+/// \param do_simplify: set to true if, and only if, simplification is enabled
+static void shift_indexed_access_to_lhs(
+  exprt &ssa_rhs,
+  ssa_exprt &lhs_mod,
+  const namespacet &ns,
+  bool do_simplify)
+{
+  if(
+    ssa_rhs.id() == ID_byte_update_little_endian ||
+    ssa_rhs.id() == ID_byte_update_big_endian)
+  {
+    byte_update_exprt &byte_update = to_byte_update_expr(ssa_rhs);
+    exprt byte_extract = byte_extract_exprt(
+      byte_update.id() == ID_byte_update_big_endian
+        ? ID_byte_extract_big_endian
+        : ID_byte_extract_little_endian,
+      lhs_mod,
+      byte_update.offset(),
+      byte_update.value().type());
+    if(do_simplify)
+      simplify(byte_extract, ns);
+
+    if(byte_extract.id() == ID_symbol)
+    {
+      ssa_rhs = byte_update.value();
+      lhs_mod = to_ssa_expr(byte_extract);
+    }
+    else if(byte_extract.id() == ID_index || byte_extract.id() == ID_member)
+    {
+      ssa_rhs = byte_update.value();
+
+      while(byte_extract.id() == ID_index || byte_extract.id() == ID_member)
+      {
+        if(byte_extract.id() == ID_index)
+        {
+          index_exprt &idx = to_index_expr(byte_extract);
+
+#ifdef USE_UPDATE
+          update_exprt new_rhs{idx.array(), exprt{}, ssa_rhs};
+          new_rhs.designator().push_back(index_designatort{idx.index()});
+#else
+          with_exprt new_rhs{idx.array(), idx.index(), ssa_rhs};
+#endif
+
+          ssa_rhs = new_rhs;
+          byte_extract = idx.array();
+        }
+        else
+        {
+          member_exprt &member = to_member_expr(byte_extract);
+          const irep_idt &component_name = member.get_component_name();
+
+#ifdef USE_UPDATE
+          update_exprt new_rhs{member.compound(), exprt{}, ssa_rhs};
+          new_rhs.designator().push_back(member_designatort{component_name});
+#else
+          with_exprt new_rhs(member.compound(), exprt(ID_member_name), ssa_rhs);
+          new_rhs.where().set(ID_component_name, component_name);
+#endif
+
+          ssa_rhs = new_rhs;
+          byte_extract = member.compound();
+        }
+      }
+
+      lhs_mod = to_ssa_expr(byte_extract);
+    }
+  }
+}
+
 void goto_symext::symex_assign_symbol(
   statet &state,
   const ssa_exprt &lhs, // L1
@@ -216,11 +377,23 @@ void goto_symext::symex_assign_symbol(
   }
 
   exprt l2_rhs = state.rename(std::move(ssa_rhs), ns).get();
+
+  ssa_exprt lhs_mod = lhs;
+
+  // Note the following two calls are specifically required for
+  // field-sensitivity. For example, with-expressions, which may have just been
+  // introduced by symex_assign_struct_member, are transformed into member
+  // expressions on the LHS. If we add an option to disable field-sensitivity
+  // in the future these should be omitted.
+  shift_indexed_access_to_lhs(l2_rhs, lhs_mod, ns, symex_config.simplify_opt);
+  rewrite_with_to_field_symbols(state, l2_rhs, lhs_mod, ns);
+
   do_simplify(l2_rhs);
 
-  ssa_exprt ssa_lhs=lhs;
+  ssa_exprt l2_lhs = lhs_mod;
+  ssa_exprt l1_lhs = l2_lhs; // l2_lhs will be renamed to L2 by the following:
   state.assignment(
-    ssa_lhs,
+    l2_lhs,
     l2_rhs,
     ns,
     symex_config.simplify_opt,
@@ -228,40 +401,50 @@ void goto_symext::symex_assign_symbol(
     symex_config.allow_pointer_unsoundness);
 
   exprt ssa_full_lhs=full_lhs;
-  ssa_full_lhs=add_to_lhs(ssa_full_lhs, ssa_lhs);
+  ssa_full_lhs = add_to_lhs(ssa_full_lhs, l2_lhs);
   const bool record_events=state.record_events;
   state.record_events=false;
   exprt l2_full_lhs = state.rename(std::move(ssa_full_lhs), ns).get();
   state.record_events=record_events;
 
   // do the assignment
-  const symbolt &symbol =
-    ns.lookup(to_symbol_expr(ssa_lhs.get_original_expr()));
+  const symbolt &symbol = ns.lookup(l2_lhs.get_object_name());
 
   if(symbol.is_auxiliary)
     assignment_type=symex_targett::assignment_typet::HIDDEN;
 
   log.conditional_output(
-    log.debug(),
-    [this, &ssa_lhs](messaget::mstreamt &mstream) {
-      mstream << "Assignment to " << ssa_lhs.get_identifier()
-              << " ["
-              << pointer_offset_bits(ssa_lhs.type(), ns).value_or(0)
-              << " bits]"
+    log.debug(), [this, &l2_lhs](messaget::mstreamt &mstream) {
+      mstream << "Assignment to " << l2_lhs.get_identifier() << " ["
+              << pointer_offset_bits(l2_lhs.type(), ns).value_or(0) << " bits]"
               << messaget::eom;
     });
 
   // Temporarily add the state guard
   guard.emplace_back(state.guard.as_expr());
 
+  exprt original_lhs = l2_full_lhs;
+  get_original_name(original_lhs);
   target.assignment(
     conjunction(guard),
-    ssa_lhs,
+    l2_lhs,
     l2_full_lhs,
-    add_to_lhs(full_lhs, ssa_lhs.get_original_expr()),
+    original_lhs,
     l2_rhs,
     state.source,
     assignment_type);
+
+  if(field_sensitivityt::is_divisible(l1_lhs))
+  {
+    // Split composite symbol lhs into its components
+    state.field_sensitivity.field_assignments(
+      ns, state, l1_lhs, target, symex_config.allow_pointer_unsoundness);
+    // Erase the composite symbol from our working state. Note that we need to
+    // have it in the propagation table and the value set while doing the field
+    // assignments, thus we cannot skip putting it in there above.
+    state.propagation.erase(l1_lhs.get_identifier());
+    state.value_set.erase_symbol(l1_lhs, ns);
+  }
 
   // Restore the guard
   guard.pop_back();

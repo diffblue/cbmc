@@ -279,9 +279,9 @@ protected:
   void initialize_auto_object(const exprt &, statet &);
   void process_array_expr(statet &, exprt &);
   exprt make_auto_object(const typet &, statet &);
-  virtual void dereference(exprt &, statet &);
+  virtual void dereference(exprt &, statet &, bool write);
 
-  void dereference_rec(exprt &, statet &);
+  void dereference_rec(exprt &, statet &, bool write);
   exprt address_arithmetic(
     const exprt &,
     statet &,

@@ -25,6 +25,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/goto_function.h>
 
 #include "call_stack.h"
+#include "field_sensitivity.h"
 #include "frame.h"
 #include "goto_state.h"
 #include "renaming_level.h"
@@ -114,6 +115,8 @@ public:
     bool rhs_is_simplified,
     bool record_value,
     bool allow_pointer_unsoundness=false);
+
+  field_sensitivityt field_sensitivity;
 
 protected:
   template <levelt>

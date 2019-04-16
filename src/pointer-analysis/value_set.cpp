@@ -1653,3 +1653,46 @@ void value_sett::erase_values_from_entry(
   }
   values.replace(index, std::move(replacement));
 }
+
+void value_sett::erase_struct_union_symbol(
+  const struct_union_typet &struct_union_type,
+  const std::string &erase_prefix,
+  const namespacet &ns)
+{
+  for(const auto &c : struct_union_type.components())
+  {
+    const typet &subtype = c.type();
+    const irep_idt &name = c.get_name();
+
+    // ignore methods and padding
+    if(subtype.id() == ID_code || c.get_is_padding())
+      continue;
+
+    erase_symbol_rec(subtype, erase_prefix + "." + id2string(name), ns);
+  }
+}
+
+void value_sett::erase_symbol_rec(
+  const typet &type,
+  const std::string &erase_prefix,
+  const namespacet &ns)
+{
+  if(type.id() == ID_struct_tag)
+    erase_struct_union_symbol(
+      ns.follow_tag(to_struct_tag_type(type)), erase_prefix, ns);
+  else if(type.id() == ID_union_tag)
+    erase_struct_union_symbol(
+      ns.follow_tag(to_union_tag_type(type)), erase_prefix, ns);
+  else if(type.id() == ID_array)
+    erase_symbol_rec(type.subtype(), erase_prefix + "[]", ns);
+  else if(values.has_key(erase_prefix))
+    values.erase(erase_prefix);
+}
+
+void value_sett::erase_symbol(
+  const symbol_exprt &symbol_expr,
+  const namespacet &ns)
+{
+  erase_symbol_rec(
+    symbol_expr.type(), id2string(symbol_expr.get_identifier()), ns);
+}
