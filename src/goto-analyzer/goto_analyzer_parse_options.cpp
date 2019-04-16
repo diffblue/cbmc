@@ -424,7 +424,7 @@ int goto_analyzer_parse_optionst::doit()
     show_goto_functions(
       goto_model,
       log.get_message_handler(),
-      get_ui(),
+      ui_message_handler.get_ui(),
       cmdline.isset("list-goto-functions"));
     return CPROVER_EXIT_SUCCESS;
   }
@@ -553,7 +553,8 @@ int goto_analyzer_parse_optionst::perform_analysis(const optionst &options)
 
   if(cmdline.isset("show-properties"))
   {
-    show_properties(goto_model, log.get_message_handler(), get_ui());
+    show_properties(
+      goto_model, log.get_message_handler(), ui_message_handler.get_ui());
     return CPROVER_EXIT_SUCCESS;
   }
 

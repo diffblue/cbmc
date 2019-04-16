@@ -174,11 +174,6 @@ protected:
   virtual int perform_analysis(const optionst &options);
 
   ai_baset *build_analyzer(const optionst &, const namespacet &ns);
-
-  ui_message_handlert::uit get_ui()
-  {
-    return ui_message_handler.get_ui();
-  }
 };
 
 #endif // CPROVER_GOTO_ANALYZER_GOTO_ANALYZER_PARSE_OPTIONS_H

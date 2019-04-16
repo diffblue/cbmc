@@ -268,7 +268,7 @@ int goto_instrument_parse_optionst::doit()
       namespacet ns(goto_model.symbol_table);
       value_set_analysist value_set_analysis(ns);
       value_set_analysis(goto_model.goto_functions);
-      show_value_sets(get_ui(), goto_model, value_set_analysis);
+      show_value_sets(ui_message_handler.get_ui(), goto_model, value_set_analysis);
       return CPROVER_EXIT_SUCCESS;
     }
 
@@ -564,7 +564,8 @@ int goto_instrument_parse_optionst::doit()
        cmdline.isset("show-properties"))
     {
       const namespacet ns(goto_model.symbol_table);
-      show_properties(goto_model, log.get_message_handler(), get_ui());
+      show_properties(
+        goto_model, log.get_message_handler(), ui_message_handler.get_ui());
       return CPROVER_EXIT_SUCCESS;
     }
 
@@ -584,7 +585,7 @@ int goto_instrument_parse_optionst::doit()
 
     if(cmdline.isset("show-loops"))
     {
-      show_loop_ids(get_ui(), goto_model);
+      show_loop_ids(ui_message_handler.get_ui(), goto_model);
       return CPROVER_EXIT_SUCCESS;
     }
 
@@ -637,7 +638,7 @@ int goto_instrument_parse_optionst::doit()
 
     if(cmdline.isset("show-locations"))
     {
-      show_locations(get_ui(), goto_model);
+      show_locations(ui_message_handler.get_ui(), goto_model);
       return CPROVER_EXIT_SUCCESS;
     }
 
