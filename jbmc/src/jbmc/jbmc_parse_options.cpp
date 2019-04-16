@@ -61,8 +61,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <langapi/mode.h>
 
-#include "bmc.h" // will go away
-
 #include <java_bytecode/convert_java_nondet.h>
 #include <java_bytecode/java_bytecode_language.h>
 #include <java_bytecode/java_enum_static_init_unwind_handler.h>
