@@ -541,122 +541,118 @@ int jbmc_parse_optionst::doit()
   if(get_goto_program_ret != -1)
     return get_goto_program_ret;
 
+  if(
+    options.get_bool_option("program-only") ||
+    options.get_bool_option("show-vcc") ||
+    (options.get_bool_option("symex-driven-lazy-loading") &&
+     (cmdline.isset("show-symbol-table") || cmdline.isset("list-symbols") ||
+      cmdline.isset("show-goto-functions") ||
+      cmdline.isset("list-goto-functions") ||
+      cmdline.isset("show-properties") || cmdline.isset("show-loops"))))
   {
-    if(
-      options.get_bool_option("program-only") ||
-      options.get_bool_option("show-vcc") ||
-      (options.get_bool_option("symex-driven-lazy-loading") &&
-       (cmdline.isset("show-symbol-table") || cmdline.isset("list-symbols") ||
-        cmdline.isset("show-goto-functions") ||
-        cmdline.isset("list-goto-functions") ||
-        cmdline.isset("show-properties") || cmdline.isset("show-loops"))))
+    if(options.get_bool_option("paths"))
     {
-      if(options.get_bool_option("paths"))
-      {
-        all_properties_verifiert<java_single_path_symex_only_checkert> verifier(
-          options, ui_message_handler, *goto_model_ptr);
-        (void)verifier();
-      }
-      else
-      {
-        all_properties_verifiert<java_multi_path_symex_only_checkert> verifier(
-          options, ui_message_handler, *goto_model_ptr);
-        (void)verifier();
-      }
-
-      if(options.get_bool_option("symex-driven-lazy-loading"))
-      {
-        // We can only output these after goto-symex has run.
-        (void)show_loaded_symbols(*goto_model_ptr);
-        (void)show_loaded_functions(*goto_model_ptr);
-      }
-
-      return CPROVER_EXIT_SUCCESS;
-    }
-
-    if(
-      options.get_bool_option("dimacs") ||
-      !options.get_option("outfile").empty())
-    {
-      if(options.get_bool_option("paths"))
-      {
-        stop_on_fail_verifiert<java_single_path_symex_checkert> verifier(
-          options, ui_message_handler, *goto_model_ptr);
-        (void)verifier();
-      }
-      else
-      {
-        stop_on_fail_verifiert<java_multi_path_symex_checkert> verifier(
-          options, ui_message_handler, *goto_model_ptr);
-        (void)verifier();
-      }
-
-      return CPROVER_EXIT_SUCCESS;
-    }
-
-    std::unique_ptr<goto_verifiert> verifier = nullptr;
-
-    if(
-      options.get_bool_option("stop-on-fail") &&
-      options.get_bool_option("paths"))
-    {
-      verifier = util_make_unique<
-        stop_on_fail_verifiert<java_single_path_symex_checkert>>(
+      all_properties_verifiert<java_single_path_symex_only_checkert> verifier(
         options, ui_message_handler, *goto_model_ptr);
-    }
-    else if(
-      options.get_bool_option("stop-on-fail") &&
-      !options.get_bool_option("paths"))
-    {
-      if(options.get_bool_option("localize-faults"))
-      {
-        verifier =
-          util_make_unique<stop_on_fail_verifier_with_fault_localizationt<
-            java_multi_path_symex_checkert>>(
-            options, ui_message_handler, *goto_model_ptr);
-      }
-      else
-      {
-        verifier = util_make_unique<
-          stop_on_fail_verifiert<java_multi_path_symex_checkert>>(
-          options, ui_message_handler, *goto_model_ptr);
-      }
-    }
-    else if(
-      !options.get_bool_option("stop-on-fail") &&
-      options.get_bool_option("paths"))
-    {
-      verifier = util_make_unique<all_properties_verifier_with_trace_storaget<
-        java_single_path_symex_checkert>>(
-        options, ui_message_handler, *goto_model_ptr);
-    }
-    else if(
-      !options.get_bool_option("stop-on-fail") &&
-      !options.get_bool_option("paths"))
-    {
-      if(options.get_bool_option("localize-faults"))
-      {
-        verifier =
-          util_make_unique<all_properties_verifier_with_fault_localizationt<
-            java_multi_path_symex_checkert>>(
-            options, ui_message_handler, *goto_model_ptr);
-      }
-      else
-      {
-        verifier = util_make_unique<all_properties_verifier_with_trace_storaget<
-          java_multi_path_symex_checkert>>(
-          options, ui_message_handler, *goto_model_ptr);
-      }
+      (void)verifier();
     }
     else
     {
-      UNREACHABLE;
+      all_properties_verifiert<java_multi_path_symex_only_checkert> verifier(
+        options, ui_message_handler, *goto_model_ptr);
+      (void)verifier();
     }
 
-    const resultt result = (*verifier)();
-    verifier->report();
-    return result_to_exit_code(result);
+    if(options.get_bool_option("symex-driven-lazy-loading"))
+    {
+      // We can only output these after goto-symex has run.
+      (void)show_loaded_symbols(*goto_model_ptr);
+      (void)show_loaded_functions(*goto_model_ptr);
+    }
+
+    return CPROVER_EXIT_SUCCESS;
   }
+
+  if(
+    options.get_bool_option("dimacs") || !options.get_option("outfile").empty())
+  {
+    if(options.get_bool_option("paths"))
+    {
+      stop_on_fail_verifiert<java_single_path_symex_checkert> verifier(
+        options, ui_message_handler, *goto_model_ptr);
+      (void)verifier();
+    }
+    else
+    {
+      stop_on_fail_verifiert<java_multi_path_symex_checkert> verifier(
+        options, ui_message_handler, *goto_model_ptr);
+      (void)verifier();
+    }
+
+    return CPROVER_EXIT_SUCCESS;
+  }
+
+  std::unique_ptr<goto_verifiert> verifier = nullptr;
+
+  if(
+    options.get_bool_option("stop-on-fail") && options.get_bool_option("paths"))
+  {
+    verifier =
+      util_make_unique<stop_on_fail_verifiert<java_single_path_symex_checkert>>(
+        options, ui_message_handler, *goto_model_ptr);
+  }
+  else if(
+    options.get_bool_option("stop-on-fail") &&
+    !options.get_bool_option("paths"))
+  {
+    if(options.get_bool_option("localize-faults"))
+    {
+      verifier =
+        util_make_unique<stop_on_fail_verifier_with_fault_localizationt<
+          java_multi_path_symex_checkert>>(
+          options, ui_message_handler, *goto_model_ptr);
+    }
+    else
+    {
+      verifier = util_make_unique<
+        stop_on_fail_verifiert<java_multi_path_symex_checkert>>(
+        options, ui_message_handler, *goto_model_ptr);
+    }
+  }
+  else if(
+    !options.get_bool_option("stop-on-fail") &&
+    options.get_bool_option("paths"))
+  {
+    verifier = util_make_unique<all_properties_verifier_with_trace_storaget<
+      java_single_path_symex_checkert>>(
+      options, ui_message_handler, *goto_model_ptr);
+  }
+  else if(
+    !options.get_bool_option("stop-on-fail") &&
+    !options.get_bool_option("paths"))
+  {
+    if(options.get_bool_option("localize-faults"))
+    {
+      verifier =
+        util_make_unique<all_properties_verifier_with_fault_localizationt<
+          java_multi_path_symex_checkert>>(
+          options, ui_message_handler, *goto_model_ptr);
+    }
+    else
+    {
+      verifier = util_make_unique<all_properties_verifier_with_trace_storaget<
+        java_multi_path_symex_checkert>>(
+        options, ui_message_handler, *goto_model_ptr);
+    }
+  }
+  else
+  {
+    UNREACHABLE;
+  }
+
+  const resultt result = (*verifier)();
+  verifier->report();
+  return result_to_exit_code(result);
 }
 
 int jbmc_parse_optionst::get_goto_program(
