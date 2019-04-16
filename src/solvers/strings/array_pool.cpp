@@ -8,10 +8,6 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 #include "array_pool.h"
 
-/// generate a new symbol expression of the given type with some prefix
-/// \par parameters: a prefix and a type
-/// \return a symbol of type tp whose name starts with "string_refinement#"
-///   followed by prefix
 symbol_exprt symbol_generatort::
 operator()(const irep_idt &prefix, const typet &type)
 {

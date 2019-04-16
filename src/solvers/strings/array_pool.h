@@ -22,6 +22,9 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 class symbol_generatort final
 {
 public:
+  /// Generate a new symbol expression of the given \p type with some \p prefix
+  /// \return a symbol of type \p type whose name starts with
+  ///   "string_refinement#" followed by \p prefix
   symbol_exprt
   operator()(const irep_idt &prefix, const typet &type = bool_typet());
 
