@@ -417,7 +417,7 @@ int jbmc_parse_optionst::doit()
   if(cmdline.isset("version"))
   {
     std::cout << CBMC_VERSION << '\n';
-    return 0; // should contemplate EX_OK from sysexits.h
+    return CPROVER_EXIT_SUCCESS;
   }
 
   messaget::eval_verbosity(
@@ -469,7 +469,7 @@ int jbmc_parse_optionst::doit()
     if(cmdline.args.size()!=1)
     {
       log.error() << "Please give exactly one source file" << messaget::eom;
-      return 6;
+      return CPROVER_EXIT_INCORRECT_TASK;
     }
 
     std::string filename=cmdline.args[0];
@@ -484,7 +484,7 @@ int jbmc_parse_optionst::doit()
     {
       log.error() << "failed to open input file `" << filename << "'"
                   << messaget::eom;
-      return 6;
+      return CPROVER_EXIT_INCORRECT_TASK;
     }
 
     std::unique_ptr<languaget> language=
@@ -494,7 +494,7 @@ int jbmc_parse_optionst::doit()
     {
       log.error() << "failed to figure out type of file `" << filename << "'"
                   << messaget::eom;
-      return 6;
+      return CPROVER_EXIT_INCORRECT_TASK;
     }
 
     language->set_language_options(options);
@@ -505,11 +505,11 @@ int jbmc_parse_optionst::doit()
     if(language->parse(infile, filename))
     {
       log.error() << "PARSING ERROR" << messaget::eom;
-      return 6;
+      return CPROVER_EXIT_PARSE_ERROR;
     }
 
     language->show_parse(std::cout);
-    return 0;
+    return CPROVER_EXIT_SUCCESS;
   }
 
   object_factory_params.set(options);
@@ -520,7 +520,7 @@ int jbmc_parse_optionst::doit()
   if(cmdline.args.empty())
   {
     log.error() << "Please provide a program to verify" << messaget::eom;
-    return 6;
+    return CPROVER_EXIT_INCORRECT_TASK;
   }
 
   if(cmdline.args.size() != 1)
@@ -531,7 +531,7 @@ int jbmc_parse_optionst::doit()
                    " or '--lazy-methods-extra-entry-point "
                    "somepackage.SomeClass.method' along with '--classpath'"
                 << messaget::eom;
-    return 6;
+    return CPROVER_EXIT_INCORRECT_TASK;
   }
 
   std::unique_ptr<abstract_goto_modelt> goto_model_ptr;
@@ -689,7 +689,7 @@ int jbmc_parse_optionst::get_goto_program(
     goto_model_ptr = lazy_goto_modelt::process_whole_model_and_freeze(
       std::move(lazy_goto_model));
     if(goto_model_ptr == nullptr)
-      return 6;
+      return CPROVER_EXIT_INTERNAL_ERROR;
 
     goto_modelt &goto_model = dynamic_cast<goto_modelt &>(*goto_model_ptr);
 
@@ -712,7 +712,7 @@ int jbmc_parse_optionst::get_goto_program(
     if(!lazy_goto_model.symbol_table.has_symbol(goto_functionst::entry_point()))
     {
       log.error() << "the program has no entry point" << messaget::eom;
-      return 6;
+      return CPROVER_EXIT_INCORRECT_TASK;
     }
 
     if(cmdline.isset("validate-goto-model"))
