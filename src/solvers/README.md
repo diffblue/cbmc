@@ -297,7 +297,6 @@ In the \ref solvers directory.
 **Key classes:**
 * symex_target_equationt
 * \ref propt
-* \ref bmct
 
 \dot
 digraph G {
