@@ -266,12 +266,12 @@ int goto_diff_parse_optionst::doit()
   {
     show_goto_functions(
       goto_model1,
-      log.get_message_handler(),
+      ui_message_handler,
       ui_message_handler.get_ui(),
       cmdline.isset("list-goto-functions"));
     show_goto_functions(
       goto_model2,
-      log.get_message_handler(),
+      ui_message_handler,
       ui_message_handler.get_ui(),
       cmdline.isset("list-goto-functions"));
     return CPROVER_EXIT_SUCCESS;
@@ -326,15 +326,14 @@ bool goto_diff_parse_optionst::process_goto_program(
     log.status() << "Adding CPROVER library (" << config.ansi_c.arch << ")"
                  << messaget::eom;
     link_to_library(
-      goto_model, log.get_message_handler(), cprover_cpp_library_factory);
-    link_to_library(
-      goto_model, log.get_message_handler(), cprover_c_library_factory);
+      goto_model, ui_message_handler, cprover_cpp_library_factory);
+    link_to_library(goto_model, ui_message_handler, cprover_c_library_factory);
 
     // remove function pointers
     log.status() << "Removal of function pointers and virtual functions"
                  << messaget::eom;
     remove_function_pointers(
-      log.get_message_handler(), goto_model, cmdline.isset("pointer-check"));
+      ui_message_handler, goto_model, cmdline.isset("pointer-check"));
 
     mm_io(goto_model);
 
@@ -367,10 +366,9 @@ bool goto_diff_parse_optionst::process_goto_program(
       // for coverage annotation:
       remove_skip(goto_model);
 
-      const auto cover_config = get_cover_config(
-        options, goto_model.symbol_table, log.get_message_handler());
-      if(instrument_cover_goals(
-           cover_config, goto_model, log.get_message_handler()))
+      const auto cover_config =
+        get_cover_config(options, goto_model.symbol_table, ui_message_handler);
+      if(instrument_cover_goals(cover_config, goto_model, ui_message_handler))
         return true;
     }
 

@@ -486,7 +486,7 @@ int cbmc_parse_optionst::doit()
   register_languages();
 
   if(cmdline.isset("test-preprocessor"))
-    return test_c_preprocessor(log.get_message_handler())
+    return test_c_preprocessor(ui_message_handler)
              ? CPROVER_EXIT_PREPROCESSOR_TEST_FAILED
              : CPROVER_EXIT_SUCCESS;
 
@@ -532,7 +532,7 @@ int cbmc_parse_optionst::doit()
     }
 
     language->set_language_options(options);
-    language->set_message_handler(log.get_message_handler());
+    language->set_message_handler(ui_message_handler);
 
     log.status() << "Parsing " << filename << messaget::eom;
 
@@ -556,7 +556,7 @@ int cbmc_parse_optionst::doit()
      cmdline.isset("show-properties")) // use this one
   {
     show_properties(
-      goto_model, log.get_message_handler(), ui_message_handler.get_ui());
+      goto_model, ui_message_handler, ui_message_handler.get_ui());
     return CPROVER_EXIT_SUCCESS;
   }
 
@@ -774,7 +774,7 @@ void cbmc_parse_optionst::preprocessing(const optionst &options)
       return;
     }
 
-    language->set_message_handler(log.get_message_handler());
+    language->set_message_handler(ui_message_handler);
 
     if(language->preprocess(infile, filename, std::cout))
       log.error() << "PREPROCESSING ERROR" << messaget::eom;

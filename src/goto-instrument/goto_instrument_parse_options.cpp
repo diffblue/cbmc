@@ -809,8 +809,7 @@ int goto_instrument_parse_optionst::doit()
       do_indirect_call_and_rtti_removal();
 
       log.status() << "Removing unused functions" << messaget::eom;
-      remove_unused_functions(
-        goto_model.goto_functions, log.get_message_handler());
+      remove_unused_functions(goto_model.goto_functions, ui_message_handler);
     }
 
     if(cmdline.isset("undefined-function-is-assume-false"))

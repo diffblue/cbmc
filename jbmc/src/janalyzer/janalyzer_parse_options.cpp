@@ -371,8 +371,7 @@ int janalyzer_parse_optionst::doit()
     return CPROVER_EXIT_USAGE_ERROR;
   }
 
-  goto_model =
-    initialize_goto_model(cmdline.args, log.get_message_handler(), options);
+  goto_model = initialize_goto_model(cmdline.args, ui_message_handler, options);
 
   if(process_goto_program(options))
     return CPROVER_EXIT_INTERNAL_ERROR;
@@ -391,7 +390,7 @@ int janalyzer_parse_optionst::doit()
   {
     show_goto_functions(
       goto_model,
-      log.get_message_handler(),
+      ui_message_handler,
       ui_message_handler.get_ui(),
       cmdline.isset("list-goto-functions"));
     return CPROVER_EXIT_SUCCESS;
@@ -409,15 +408,14 @@ int janalyzer_parse_optionst::perform_analysis(const optionst &options)
 
     if(cmdline.isset("show-taint"))
     {
-      taint_analysis(
-        goto_model, taint_file, log.get_message_handler(), true, "");
+      taint_analysis(goto_model, taint_file, ui_message_handler, true, "");
       return CPROVER_EXIT_SUCCESS;
     }
     else
     {
       std::string json_file = cmdline.get_value("json");
       bool result = taint_analysis(
-        goto_model, taint_file, log.get_message_handler(), false, json_file);
+        goto_model, taint_file, ui_message_handler, false, json_file);
       return result ? CPROVER_EXIT_VERIFICATION_UNSAFE : CPROVER_EXIT_SUCCESS;
     }
   }
@@ -523,7 +521,7 @@ int janalyzer_parse_optionst::perform_analysis(const optionst &options)
   if(cmdline.isset("show-properties"))
   {
     show_properties(
-      goto_model, log.get_message_handler(), ui_message_handler.get_ui());
+      goto_model, ui_message_handler, ui_message_handler.get_ui());
     return CPROVER_EXIT_SUCCESS;
   }
 
@@ -574,12 +572,12 @@ int janalyzer_parse_optionst::perform_analysis(const optionst &options)
     else if(options.get_bool_option("verify"))
     {
       result = static_verifier(
-        goto_model, *analyzer, options, log.get_message_handler(), out);
+        goto_model, *analyzer, options, ui_message_handler, out);
     }
     else if(options.get_bool_option("simplify"))
     {
       result = static_simplifier(
-        goto_model, *analyzer, options, log.get_message_handler(), out);
+        goto_model, *analyzer, options, ui_message_handler, out);
     }
     else if(options.get_bool_option("unreachable-instructions"))
     {
@@ -620,18 +618,18 @@ bool janalyzer_parse_optionst::process_goto_program(const optionst &options)
     log.status() << "Removing function pointers and virtual functions"
                  << messaget::eom;
     remove_function_pointers(
-      log.get_message_handler(), goto_model, cmdline.isset("pointer-check"));
+      ui_message_handler, goto_model, cmdline.isset("pointer-check"));
 
     // Java virtual functions -> explicit dispatch tables:
     remove_virtual_functions(goto_model);
 
     // remove Java throw and catch
     // This introduces instanceof, so order is important:
-    remove_exceptions_using_instanceof(goto_model, log.get_message_handler());
+    remove_exceptions_using_instanceof(goto_model, ui_message_handler);
 
     // Java instanceof -> clsid comparison:
     class_hierarchyt class_hierarchy(goto_model.symbol_table);
-    remove_instanceof(goto_model, class_hierarchy, log.get_message_handler());
+    remove_instanceof(goto_model, class_hierarchy, ui_message_handler);
 
     // do partial inlining
     log.status() << "Partial Inlining" << messaget::eom;
