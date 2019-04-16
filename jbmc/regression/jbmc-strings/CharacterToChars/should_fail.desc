@@ -1,0 +1,10 @@
+CORE
+C.class
+--function C.shouldFail --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+\[java::C\.shouldFail:\(\)V\.assertion.1\] line 16 assertion at file C\.java line 16 function java::C\.shouldFail:\(\)V bytecode-index 12: SUCCESS
+\[java::C\.shouldFail:\(\)V\.assertion.2\] line 17 assertion at file C\.java line 17 function java::C\.shouldFail:\(\)V bytecode-index 23: FAILURE
+--
+^warning: ignoring

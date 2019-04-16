@@ -321,15 +321,6 @@ exprt character_refine_preprocesst::expr_of_high_surrogate(
   return std::move(high_surrogate);
 }
 
-/// Converts function call to an assignment of an expression corresponding to
-/// the java method Character.highSurrogate:(C)Z
-codet character_refine_preprocesst::convert_high_surrogate(
-  conversion_inputt &target)
-{
-  return convert_char_function(
-    &character_refine_preprocesst::expr_of_high_surrogate, target);
-}
-
 /// Determines if the specified character is an ASCII lowercase character.
 /// \param chr: An expression of type character
 /// \param type: A type for the output
@@ -1141,16 +1132,6 @@ exprt character_refine_preprocesst::expr_of_low_surrogate(
   return plus_exprt(uDC00, mod_exprt(chr, u0400));
 }
 
-/// Converts function call to an assignment of an expression corresponding to
-/// the java method Character.lowSurrogate:(I)C
-/// \param target: a position in a goto program
-codet character_refine_preprocesst::convert_low_surrogate(
-  conversion_inputt &target)
-{
-  return convert_char_function(
-    &character_refine_preprocesst::expr_of_low_surrogate, target);
-}
-
 /// Returns the value obtained by reversing the order of the bytes in the
 /// specified char value.
 /// \param chr: An expression of type character
@@ -1172,37 +1153,6 @@ codet character_refine_preprocesst::convert_reverse_bytes(
 {
   return convert_char_function(
     &character_refine_preprocesst::expr_of_reverse_bytes, target);
-}
-
-/// Converts the specified character (Unicode code point) to its UTF-16
-/// representation stored in a char array. If the specified code point is a BMP
-/// (Basic Multilingual Plane or Plane 0) value, the resulting char array has
-/// the same value as codePoint. If the specified code point is a supplementary
-/// code point, the resulting char array has the corresponding surrogate pair.
-/// \param chr: An expression of type character
-/// \param type: A type for the output
-/// \return A character array expression of the given type
-exprt character_refine_preprocesst::expr_of_to_chars(
-  const exprt &chr, const typet &type)
-{
-  array_typet array_type=to_array_type(type);
-  const typet &char_type=array_type.subtype();
-  exprt low_surrogate=expr_of_low_surrogate(chr, char_type);
-  array_exprt case1({low_surrogate}, array_type);
-  exprt high_surrogate = expr_of_high_surrogate(chr, char_type);
-  array_exprt case2(
-    {std::move(low_surrogate), std::move(high_surrogate)}, array_type);
-  return if_exprt(
-    expr_of_is_bmp_code_point(chr, type), std::move(case1), std::move(case2));
-}
-
-/// Converts function call to an assignment of an expression corresponding to
-/// the java method Character.toChars:(I)[C
-/// \param target: a position in a goto program
-codet character_refine_preprocesst::convert_to_chars(conversion_inputt &target)
-{
-  return convert_char_function(
-    &character_refine_preprocesst::expr_of_to_chars, target);
 }
 
 /// Converts function call to an assignment of an expression corresponding to
@@ -1433,8 +1383,6 @@ void character_refine_preprocesst::initialize_conversion_table()
       &character_refine_preprocesst::convert_get_type_int;
   conversion_table["java::java.lang.Character.hashCode:()I"]=
       &character_refine_preprocesst::convert_hash_code;
-  conversion_table["java::java.lang.Character.highSurrogate:(I)C"]=
-      &character_refine_preprocesst::convert_high_surrogate;
   conversion_table["java::java.lang.Character.isAlphabetic:(I)Z"]=
       &character_refine_preprocesst::convert_is_alphabetic;
   conversion_table["java::java.lang.Character.isBmpCodePoint:(I)Z"]=
@@ -1523,8 +1471,6 @@ void character_refine_preprocesst::initialize_conversion_table()
       &character_refine_preprocesst::convert_is_whitespace_char;
   conversion_table["java::java.lang.Character.isWhitespace:(I)Z"]=
       &character_refine_preprocesst::convert_is_whitespace_int;
-  conversion_table["java::java.lang.Character.lowSurrogate:(I)C"]=
-      &character_refine_preprocesst::convert_is_low_surrogate;
 
   // Not supported "java::java.lang.Character.offsetByCodePoints:([CIIII)I"
   // Not supported "java::java.lang.Character.offsetByCodePoints:"
@@ -1532,8 +1478,6 @@ void character_refine_preprocesst::initialize_conversion_table()
 
   conversion_table["java::java.lang.Character.reverseBytes:(C)C"]=
       &character_refine_preprocesst::convert_reverse_bytes;
-  conversion_table["java::java.lang.Character.toChars:(I)[C"]=
-      &character_refine_preprocesst::convert_to_chars;
 
   // Not supported "java::java.lang.Character.toChars:(I[CI)I"
 
