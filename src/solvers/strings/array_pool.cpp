@@ -21,9 +21,6 @@ operator()(const irep_idt &prefix, const typet &type)
   return result;
 }
 
-/// Associate an actual finite length to infinite arrays
-/// \param s: array expression representing a string
-/// \return expression for the length of `s`
 exprt array_poolt::get_length(const array_string_exprt &s) const
 {
   if(s.length() == infinity_exprt(s.length().type()))
@@ -35,9 +32,6 @@ exprt array_poolt::get_length(const array_string_exprt &s) const
   return s.length();
 }
 
-/// construct a string expression whose length and content are new variables
-/// \par parameters: a type for string
-/// \return a string expression
 array_string_exprt
 array_poolt::fresh_string(const typet &index_type, const typet &char_type)
 {
@@ -49,8 +43,9 @@ array_poolt::fresh_string(const typet &index_type, const typet &char_type)
   return str;
 }
 
-// Make a new char array for a char pointer. The size of the char array is a
-// variable with no constraint.
+/// Helper function for \ref find.
+/// Make a new char array for a char pointer. The size of the char array is a
+/// variable with no constraint.
 array_string_exprt array_poolt::make_char_array_for_char_pointer(
   const exprt &char_pointer,
   const typet &char_array_type)
@@ -119,8 +114,6 @@ const std::set<array_string_exprt> &array_poolt::created_strings() const
   return created_strings_value;
 }
 
-/// Creates a new array if the pointer is not pointing to an array
-/// \todo This should be replaced by make_char_array_for_char_pointer
 const array_string_exprt &
 array_poolt::find(const exprt &pointer, const exprt &length)
 {
@@ -144,11 +137,6 @@ array_string_exprt of_argument(array_poolt &array_pool, const exprt &arg)
   return array_pool.find(string_argument.op1(), string_argument.op0());
 }
 
-/// casts an expression to a string expression, or fetches the actual
-/// string_exprt in the case of a symbol.
-/// \param pool: pool of arrays representing strings
-/// \param expr: an expression of refined string type
-/// \return a string expression
 array_string_exprt get_string_expr(array_poolt &pool, const exprt &expr)
 {
   PRECONDITION(is_refined_string_type(expr.type()));
