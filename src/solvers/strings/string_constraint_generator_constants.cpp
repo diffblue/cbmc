@@ -117,8 +117,7 @@ std::pair<exprt, string_constraintst> add_axioms_from_literal(
 {
   const function_application_exprt::argumentst &args = f.arguments();
   PRECONDITION(args.size() == 3); // Bad args to string literal?
-  const array_string_exprt res =
-    char_array_of_pointer(array_pool, args[1], args[0]);
+  const array_string_exprt res = array_pool.find(args[1], args[0]);
   return add_axioms_for_cprover_string(
     fresh_symbol, res, args[2], true_exprt());
 }

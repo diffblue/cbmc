@@ -123,14 +123,6 @@ array_poolt::find(const exprt &pointer, const exprt &length)
   return *created_strings_value.insert(array).first;
 }
 
-const array_string_exprt &char_array_of_pointer(
-  array_poolt &pool,
-  const exprt &pointer,
-  const exprt &length)
-{
-  return pool.find(pointer, length);
-}
-
 array_string_exprt of_argument(array_poolt &array_pool, const exprt &arg)
 {
   const auto string_argument = expr_checked_cast<struct_exprt>(arg);
@@ -141,5 +133,5 @@ array_string_exprt get_string_expr(array_poolt &pool, const exprt &expr)
 {
   PRECONDITION(is_refined_string_type(expr.type()));
   const refined_string_exprt &str = to_string_expr(expr);
-  return char_array_of_pointer(pool, str.content(), str.length());
+  return pool.find(str.content(), str.length());
 }

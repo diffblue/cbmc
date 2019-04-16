@@ -111,8 +111,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_insert(
   PRECONDITION(f.arguments().size() == 5 || f.arguments().size() == 7);
   array_string_exprt s1 = get_string_expr(pool, f.arguments()[2]);
   array_string_exprt s2 = get_string_expr(pool, f.arguments()[4]);
-  array_string_exprt res =
-    char_array_of_pointer(pool, f.arguments()[1], f.arguments()[0]);
+  array_string_exprt res = pool.find(f.arguments()[1], f.arguments()[0]);
   const exprt &offset = f.arguments()[3];
   if(f.arguments().size() == 7)
   {
@@ -150,7 +149,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_insert_int(
   PRECONDITION(f.arguments().size() == 5);
   const array_string_exprt s1 = get_string_expr(array_pool, f.arguments()[2]);
   const array_string_exprt res =
-    char_array_of_pointer(array_pool, f.arguments()[1], f.arguments()[0]);
+    array_pool.find(f.arguments()[1], f.arguments()[0]);
   const exprt &offset = f.arguments()[3];
   const typet &index_type = s1.length().type();
   const typet &char_type = s1.content().type().subtype();
@@ -176,7 +175,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_insert_bool(
   PRECONDITION(f.arguments().size() == 5);
   const array_string_exprt s1 = get_string_expr(array_pool, f.arguments()[0]);
   const array_string_exprt res =
-    char_array_of_pointer(array_pool, f.arguments()[1], f.arguments()[0]);
+    array_pool.find(f.arguments()[1], f.arguments()[0]);
   const exprt &offset = f.arguments()[3];
   const typet &index_type = s1.length().type();
   const typet &char_type = s1.content().type().subtype();
@@ -200,7 +199,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_insert_char(
 {
   PRECONDITION(f.arguments().size() == 5);
   const array_string_exprt res =
-    char_array_of_pointer(array_pool, f.arguments()[1], f.arguments()[0]);
+    array_pool.find(f.arguments()[1], f.arguments()[0]);
   const array_string_exprt s1 = get_string_expr(array_pool, f.arguments()[2]);
   const exprt &offset = f.arguments()[3];
   const typet &index_type = s1.length().type();
@@ -228,7 +227,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_insert_double(
 {
   PRECONDITION(f.arguments().size() == 5);
   const array_string_exprt res =
-    char_array_of_pointer(array_pool, f.arguments()[1], f.arguments()[0]);
+    array_pool.find(f.arguments()[1], f.arguments()[0]);
   const array_string_exprt s1 = get_string_expr(array_pool, f.arguments()[2]);
   const exprt &offset = f.arguments()[3];
   const typet &index_type = s1.length().type();
