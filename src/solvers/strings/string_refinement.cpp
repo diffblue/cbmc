@@ -1645,7 +1645,7 @@ compute_inverse_function(const exprt &qvar, const exprt &val, const exprt &f)
 /// \param index: an index expression
 /// \param qvar: a symbol expression
 /// \return a Boolean
-static bool find_qvar(const exprt &index, const symbol_exprt &qvar)
+static bool contains(const exprt &index, const symbol_exprt &qvar)
 {
   return std::find(index.depth_begin(), index.depth_end(), qvar) !=
          index.depth_end();
@@ -1877,7 +1877,7 @@ find_indexes(const exprt &expr, const exprt &str, const symbol_exprt &qvar)
     {
       const auto &arr = index_expr->array();
       const auto str_it = std::find(arr.depth_begin(), arr.depth_end(), str);
-      return str_it != arr.depth_end() && find_qvar(index_expr->index(), qvar);
+      return str_it != arr.depth_end() && contains(index_expr->index(), qvar);
     }
     return false;
   };
@@ -2157,7 +2157,7 @@ is_linear_arithmetic_expr(const exprt &expr, const symbol_exprt &var)
       it->id() != ID_plus && it->id() != ID_minus &&
       it->id() != ID_unary_minus && *it != var)
     {
-      if(find_qvar(*it, var))
+      if(contains(*it, var))
         return false;
       else
         it.next_sibling_or_parent();
