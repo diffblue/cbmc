@@ -420,95 +420,26 @@ void remove_function_pointerst::remove_function_pointer(
   const irep_idt &function_id,
   goto_programt::targett target)
 {
-  const code_function_callt &code = target->get_function_call();
+  goto_programt::const_targett const_target = target;
+  const auto functions =
+    get_function_pointer_targets(goto_program, const_target);
 
-  const auto &function = to_dereference_expr(code.function());
-
-  // this better have the right type
-  code_typet call_type=to_code_type(function.type());
-
-  // refine the type in case the forward declaration was incomplete
-  if(call_type.has_ellipsis() &&
-     call_type.parameters().empty())
+  if(only_remove_const_function_pointers_called)
   {
-    call_type.remove_ellipsis();
-    forall_expr(it, code.arguments())
-      call_type.parameters().push_back(
-        code_typet::parametert(it->type()));
+    auto call = target->get_function_call();
+    call.function() = *functions.cbegin();
+    target->set_function_call(call);
   }
-
-  bool found_functions;
-
-  const exprt &pointer = function.pointer();
-  remove_const_function_pointerst::functionst functions;
-  does_remove_constt const_removal_check(goto_program, ns);
-  const auto does_remove_const = const_removal_check();
-  if(does_remove_const.first)
+  else if(remove_const_found_functions || !only_resolve_const_fps)
   {
-    log.warning().source_location = does_remove_const.second;
-    log.warning() << "cast from const to non-const pointer found, "
-                  << "only worst case function pointer removal will be done."
-                  << messaget::eom;
-    found_functions=false;
+    // If this mode is enabled, we only remove function pointers
+    // that we can resolve either to an exact function, or an exact subset
+    // (e.g. a variable index in a constant array).
+    // Since we haven't found functions, we would now resort to
+    // replacing the function pointer with any function with a valid signature
+    // Since we don't want to do that, we abort.
+    remove_function_pointer(goto_program, function_id, target, functions);
   }
-  else
-  {
-    remove_const_function_pointerst fpr(
-      log.get_message_handler(), ns, symbol_table);
-
-    found_functions=fpr(pointer, functions);
-
-    // if found_functions is false, functions should be empty
-    // however, it is possible for found_functions to be true and functions
-    // to be empty (this happens if the pointer can only resolve to the null
-    // pointer)
-    CHECK_RETURN(found_functions || functions.empty());
-
-    if(functions.size()==1)
-    {
-      auto call = target->get_function_call();
-      call.function() = *functions.cbegin();
-      target->set_function_call(call);
-      return;
-    }
-  }
-
-  if(!found_functions)
-  {
-    if(only_resolve_const_fps)
-    {
-      // If this mode is enabled, we only remove function pointers
-      // that we can resolve either to an exact function, or an exact subset
-      // (e.g. a variable index in a constant array).
-      // Since we haven't found functions, we would now resort to
-      // replacing the function pointer with any function with a valid signature
-      // Since we don't want to do that, we abort.
-      return;
-    }
-
-    bool return_value_used=code.lhs().is_not_nil();
-
-    // get all type-compatible functions
-    // whose address is ever taken
-    for(const auto &t : type_map)
-    {
-      // address taken?
-      if(address_taken.find(t.first)==address_taken.end())
-        continue;
-
-      // type-compatible?
-      if(!is_type_compatible(return_value_used, call_type, t.second))
-        continue;
-
-      if(t.first=="pthread_mutex_cleanup")
-        continue;
-
-      symbol_exprt expr(t.first, t.second);
-      functions.insert(expr);
-    }
-  }
-
-  remove_function_pointer(goto_program, function_id, target, functions);
 }
 
 void remove_function_pointerst::remove_function_pointer(
