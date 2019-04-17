@@ -309,7 +309,7 @@ TEST_CASE("Sharing map views and iteration", "[core][util]")
 
   SECTION("View")
   {
-    typedef std::pair<dstringt, std::string> pt;
+    typedef std::pair<std::string, std::string> pt;
 
     sharing_map_standardt sm;
     sharing_map_standardt::viewt view;
@@ -319,7 +319,7 @@ TEST_CASE("Sharing map views and iteration", "[core][util]")
       pairs.clear();
       for(auto &p : view)
       {
-        pairs.push_back({p.first, p.second});
+        pairs.push_back({id2string(p.first), p.second});
       }
       std::sort(pairs.begin(), pairs.end());
     };
@@ -354,11 +354,11 @@ TEST_CASE("Sharing map views and iteration", "[core][util]")
     sharing_map_standardt sm;
     fill(sm);
 
-    typedef std::pair<dstringt, std::string> pt;
+    typedef std::pair<std::string, std::string> pt;
     std::vector<pt> pairs;
 
     sm.iterate([&pairs](const irep_idt &key, const std::string &value) {
-      pairs.push_back({key, value});
+      pairs.push_back({id2string(key), value});
     });
 
     std::sort(pairs.begin(), pairs.end());
