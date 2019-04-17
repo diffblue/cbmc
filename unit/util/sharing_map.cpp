@@ -19,9 +19,6 @@ Author: Daniel Poetzl
 typedef sharing_mapt<irep_idt, std::string, false, irep_id_hash>
   sharing_map_standardt;
 
-typedef sharing_mapt<irep_idt, std::string, true, irep_id_hash>
-  sharing_map_debugt;
-
 class sharing_map_internalt : public sharing_map_standardt
 {
   friend void sharing_map_internals_test();
@@ -178,7 +175,7 @@ TEST_CASE("Sharing map interface", "[core][util]")
 
     {
       cbmc_invariants_should_throwt invariants_throw;
-      sharing_map_debugt debug_sm;
+      sharing_map_error_checkt debug_sm;
       fill(debug_sm);
       REQUIRE_NOTHROW(
         debug_sm.update("i", [](std::string &str) { str += "1"; }));
