@@ -50,17 +50,15 @@ binary_relation_exprt length_le(const T &lhs, mp_integer i)
   return length_le(lhs, from_integer(i, lhs.length().type()));
 }
 
-template <typename T>
-equal_exprt length_eq(const T &lhs, const exprt &rhs)
+inline equal_exprt equal_to(const exprt &lhs, const exprt &rhs)
 {
-  PRECONDITION(rhs.type() == lhs.length().type());
-  return equal_exprt(lhs.length(), rhs);
+  PRECONDITION(rhs.type() == lhs.type());
+  return equal_exprt(lhs, rhs);
 }
 
-template <typename T>
-equal_exprt length_eq(const T &lhs, mp_integer i)
+inline equal_exprt equal_to(const exprt &lhs, mp_integer i)
 {
-  return length_eq(lhs, from_integer(i, lhs.length().type()));
+  return equal_to(lhs, from_integer(i, lhs.type()));
 }
 
 // Representation of strings as arrays

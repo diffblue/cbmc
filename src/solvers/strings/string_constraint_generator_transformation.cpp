@@ -54,7 +54,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_set_length(
   // a2 : forall i< min(|s1|, k) .res[i] = s1[i]
   // a3 : forall |s1| <= i < |res|. res[i] = 0
 
-  constraints.existential.push_back(length_eq(res, k));
+  constraints.existential.push_back(equal_to(res.length(), k));
 
   const symbol_exprt idx = fresh_symbol("QA_index_set_length", index_type);
   const string_constraintt a2(
