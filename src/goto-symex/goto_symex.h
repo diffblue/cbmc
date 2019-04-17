@@ -631,8 +631,8 @@ protected:
   /// The actual number of total and remaining VCCs should be assigned to
   /// the relevant members of goto_symex_statet. The members below are used to
   /// cache the values from goto_symex_statet after symbolic execution has
-  /// ended, so that \ref bmct can read those values even after the state has
-  /// been deallocated.
+  /// ended, so that the user of \ref goto_symext can read those values even
+  /// after the state has been deallocated.
 
   unsigned _total_vccs, _remaining_vccs;
   ///@}

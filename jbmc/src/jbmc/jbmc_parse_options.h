@@ -125,10 +125,10 @@ protected:
 
   void get_command_line_options(optionst &);
   int get_goto_program(
-    std::unique_ptr<goto_modelt> &goto_model, const optionst &);
+    std::unique_ptr<abstract_goto_modelt> &goto_model,
+    const optionst &);
   bool show_loaded_functions(const abstract_goto_modelt &goto_model);
-
-  bool set_properties(goto_modelt &goto_model);
+  bool show_loaded_symbols(const abstract_goto_modelt &goto_model);
 };
 
 #endif // CPROVER_JBMC_JBMC_PARSE_OPTIONS_H

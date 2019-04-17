@@ -1,6 +1,4 @@
-SRC = all_properties.cpp \
-      bmc.cpp \
-      jbmc_main.cpp \
+SRC = jbmc_main.cpp \
       jbmc_parse_options.cpp \
       # Empty last line
 

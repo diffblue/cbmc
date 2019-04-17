@@ -77,6 +77,11 @@ typedef std::unordered_map<irep_idt, property_infot> propertiest;
 /// Returns the properties in the goto model
 propertiest initialize_properties(const abstract_goto_modelt &);
 
+/// Updates \p properties with the assertions in \p goto_model
+void update_properties_from_goto_model(
+  propertiest &properties,
+  const abstract_goto_modelt &goto_model);
+
 std::string
 as_string(const irep_idt &property_id, const property_infot &property_info);
 
