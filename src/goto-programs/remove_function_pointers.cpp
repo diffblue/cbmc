@@ -144,6 +144,33 @@ protected:
     const goto_programt &goto_program,
     functionst &functions,
     const exprt &pointer);
+
+  /// From *fp() build the following sequence of instructions:
+  ///
+  /// if (fp=&f1) then goto loc1
+  /// if (fp=&f2) then goto loc2
+  /// ..
+  /// loc1: f1(); goto N+1;
+  /// loc2: f2(); goto N+1;
+  /// ..
+  ///
+  /// \param functions: set of function candidates
+  /// \param code: the original function call
+  /// \param function_id: name of the function
+  /// \param target: iterator to the target call-site
+  /// \return the GOTO program for the new code
+  goto_programt build_new_code(
+    const functionst &functions,
+    const code_function_callt &code,
+    const irep_idt &function_id,
+    goto_programt::targett target);
+
+  /// Log the statistics collected during this analysis
+  /// \param target: iterator to the target call-site
+  /// \param functions: the set of function candidates
+  void remove_function_pointer_log(
+    goto_programt::targett target,
+    const functionst &functions) const;
 };
 
 remove_function_pointerst::remove_function_pointerst(
@@ -449,76 +476,7 @@ void remove_function_pointerst::remove_function_pointer(
   const functionst &functions)
 {
   const code_function_callt &code = target->get_function_call();
-
   const exprt &function = code.function();
-  const exprt &pointer = to_dereference_expr(function).pointer();
-
-  // the final target is a skip
-  goto_programt final_skip;
-
-  goto_programt::targett t_final = final_skip.add(goto_programt::make_skip());
-
-  // build the calls and gotos
-
-  goto_programt new_code_calls;
-  goto_programt new_code_gotos;
-
-  for(const auto &fun : functions)
-  {
-    // call function
-    auto new_call = code;
-    new_call.function() = fun;
-
-    // the signature of the function might not match precisely
-    fix_argument_types(new_call);
-
-    goto_programt tmp;
-    fix_return_type(function_id, new_call, tmp);
-
-    auto call = new_code_calls.add(goto_programt::make_function_call(new_call));
-    new_code_calls.destructive_append(tmp);
-
-    // goto final
-    new_code_calls.add(goto_programt::make_goto(t_final, true_exprt()));
-
-    // goto to call
-    const address_of_exprt address_of(fun, pointer_type(fun.type()));
-
-    const auto casted_address =
-      typecast_exprt::conditional_cast(address_of, pointer.type());
-
-    new_code_gotos.add(
-      goto_programt::make_goto(call, equal_exprt(pointer, casted_address)));
-  }
-
-  // fall-through
-  if(add_safety_assertion)
-  {
-    goto_programt::targett t =
-      new_code_gotos.add(goto_programt::make_assertion(false_exprt()));
-    t->source_location.set_property_class("pointer dereference");
-    t->source_location.set_comment("invalid function pointer");
-  }
-  new_code_gotos.add(goto_programt::make_assumption(false_exprt()));
-
-  goto_programt new_code;
-
-  // patch them all together
-  new_code.destructive_append(new_code_gotos);
-  new_code.destructive_append(new_code_calls);
-  new_code.destructive_append(final_skip);
-
-  // set locations
-  Forall_goto_program_instructions(it, new_code)
-  {
-    irep_idt property_class=it->source_location.get_property_class();
-    irep_idt comment=it->source_location.get_comment();
-    it->source_location=target->source_location;
-    if(!property_class.empty())
-      it->source_location.set_property_class(property_class);
-    if(!comment.empty())
-      it->source_location.set_comment(comment);
-  }
 
   goto_programt::targett next_target=target;
   next_target++;
@@ -533,27 +491,7 @@ void remove_function_pointerst::remove_function_pointer(
   target->type=OTHER;
 
   // report statistics
-  log.statistics().source_location = target->source_location;
-  log.statistics() << "replacing function pointer by " << functions.size()
-                   << " possible targets" << messaget::eom;
-
-  // list the names of functions when verbosity is at debug level
-  log.conditional_output(
-    log.debug(), [&functions](messaget::mstreamt &mstream) {
-      mstream << "targets: ";
-
-      bool first = true;
-      for(const auto &function : functions)
-      {
-        if(!first)
-          mstream << ", ";
-
-        mstream << function.get_identifier();
-        first = false;
-      }
-
-      mstream << messaget::eom;
-    });
+  remove_function_pointer_log(target, functions);
 }
 
 bool remove_function_pointerst::remove_function_pointers(
@@ -684,4 +622,101 @@ possible_fp_targets_mapt get_function_pointer_targets(
     }
   }
   return target_map;
+}
+
+goto_programt remove_function_pointerst::build_new_code(
+  const functionst &functions,
+  const code_function_callt &code,
+  const irep_idt &function_id,
+  goto_programt::targett target)
+{
+  // the final target is a skip
+  goto_programt final_skip;
+  const exprt &pointer = to_dereference_expr(code.function()).pointer();
+  goto_programt::targett t_final = final_skip.add(goto_programt::make_skip());
+
+  goto_programt new_code_calls;
+  goto_programt new_code_gotos;
+  for(const auto &function : functions)
+  {
+    // call function
+    auto new_call = code;
+
+    new_call.function() = function;
+
+    // the signature of the function might not match precisely
+    fix_argument_types(new_call);
+
+    goto_programt tmp;
+    fix_return_type(function_id, new_call, tmp);
+
+    auto call = new_code_calls.add(goto_programt::make_function_call(new_call));
+    new_code_calls.destructive_append(tmp);
+
+    // goto final
+    new_code_calls.add(goto_programt::make_goto(t_final, true_exprt{}));
+
+    // goto to call
+    const auto casted_address = typecast_exprt::conditional_cast(
+      address_of_exprt{function, pointer_type(function.type())},
+      pointer.type());
+
+    const auto goto_it = new_code_gotos.add(
+      goto_programt::make_goto(call, equal_exprt{pointer, casted_address}));
+
+    // set locations for the above goto
+    irep_idt property_class = goto_it->source_location.get_property_class();
+    irep_idt comment = goto_it->source_location.get_comment();
+    goto_it->source_location = target->source_location;
+    if(!property_class.empty())
+      goto_it->source_location.set_property_class(property_class);
+    if(!comment.empty())
+      goto_it->source_location.set_comment(comment);
+  }
+
+  // fall-through
+  if(add_safety_assertion)
+  {
+    goto_programt::targett t =
+      new_code_gotos.add(goto_programt::make_assertion(false_exprt{}));
+    t->source_location.set_property_class("pointer dereference");
+    t->source_location.set_comment("invalid function pointer");
+  }
+  new_code_gotos.add(goto_programt::make_assumption(false_exprt{}));
+
+  goto_programt new_code;
+
+  // patch them all together
+  new_code.destructive_append(new_code_gotos);
+  new_code.destructive_append(new_code_calls);
+  new_code.destructive_append(final_skip);
+
+  return new_code;
+}
+
+void remove_function_pointerst::remove_function_pointer_log(
+  goto_programt::targett target,
+  const functionst &functions) const
+{
+  log.statistics().source_location = target->source_location;
+  log.statistics() << "replacing function pointer by " << functions.size()
+                   << " possible targets" << messaget::eom;
+
+  // list the names of functions when verbosity is at debug level
+  log.conditional_output(
+    log.debug(), [&functions](messaget::mstreamt &mstream) {
+      mstream << "targets: ";
+
+      bool first = true;
+      for(const auto &function : functions)
+      {
+        if(!first)
+          mstream << ", ";
+
+        mstream << function.get_identifier();
+        first = false;
+      }
+
+      mstream << messaget::eom;
+    });
 }
