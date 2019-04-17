@@ -176,44 +176,6 @@ std::pair<exprt, string_constraintst> add_axioms_for_equals_ignore_case(
   return {typecast_exprt(eq, f.type()), std::move(constraints)};
 }
 
-/// Value that is identical for strings with the same content
-///
-/// Add axioms stating that if two strings are equal then the values
-/// returned by this function are equal.
-/// These axioms are, for each string `s` on which hash was called:
-///   * \f$ hash(str)=hash(s) \lor |str| \ne |s|
-///       \lor (|str|=|s| \land \exists i<|s|.\ s[i]\ne str[i]) \f$
-/// \param f: function application with argument refined_string `str`
-/// \return integer expression `hash(str)`
-std::pair<exprt, string_constraintst>
-string_constraint_generatort::add_axioms_for_hash_code(
-  const function_application_exprt &f)
-{
-  PRECONDITION(f.arguments().size() == 1);
-  string_constraintst hash_constraints;
-  const array_string_exprt str = get_string_expr(array_pool, f.arguments()[0]);
-  const typet &return_type = f.type();
-  const typet &index_type = str.length_type();
-
-  auto pair = hash_code_of_string.insert(
-    std::make_pair(str, fresh_symbol("hash", return_type)));
-  const exprt hash = pair.first->second;
-
-  for(auto it : hash_code_of_string)
-  {
-    const symbol_exprt i = fresh_symbol("index_hash", index_type);
-    const equal_exprt c1(it.second, hash);
-    const notequal_exprt c2(it.first.length(), str.length());
-    const and_exprt c3(
-      equal_exprt(it.first.length(), str.length()),
-      and_exprt(
-        notequal_exprt(str[i], it.first[i]),
-        and_exprt(greater_than(str.length(), i), is_positive(i))));
-    hash_constraints.existential.push_back(or_exprt(c1, or_exprt(c2, c3)));
-  }
-  return {hash, std::move(hash_constraints)};
-}
-
 /// Lexicographic comparison of two strings
 ///
 /// Add axioms ensuring the result corresponds to that of the `String.compareTo`

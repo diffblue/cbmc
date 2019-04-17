@@ -430,9 +430,6 @@ allocates a new string before calling a primitive.
   * `cprover_string_equals_ignore_case` :
   \copybrief add_axioms_for_equals_ignore_case(symbol_generatort &fresh_symbol,const function_application_exprt &f, array_poolt &array_pool)
   \link add_axioms_for_equals_ignore_case(symbol_generatort &fresh_symbol,const function_application_exprt &f, array_poolt &array_pool) More... \endlink
-  * `cprover_string_hash_code` :
-  \copybrief string_constraint_generatort::add_axioms_for_hash_code
-  \link string_constraint_generatort::add_axioms_for_hash_code More... \endlink
   * `cprover_string_is_prefix` :
   \copybrief add_axioms_for_is_prefix
   \link add_axioms_for_is_prefix More... \endlink
