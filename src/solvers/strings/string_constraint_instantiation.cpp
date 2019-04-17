@@ -131,8 +131,9 @@ exprt sum_over_map(std::map<exprt, int> &m, const typet &type, bool negated)
           if(sum.is_nil())
             sum = t;
           else
-            plus_exprt(sum, t);
-          for(int i = 1; i < factor; i++)             sum = plus_exprt(sum, t);
+            sum = plus_exprt(sum, t);
+          for(int i = 1; i < factor; i++)
+            sum = plus_exprt(sum, t);
         }
         else if(factor < -1)
         {
