@@ -47,7 +47,9 @@ std::map<exprt, int> map_representation_of_sum(const exprt &f);
 /// \return a expression for the sum of each element in the map a number of
 ///   times given by the corresponding integer in the map. For a map x -> 2, y
 ///   -> -1 would give an expression $x + x - y$.
-exprt
-sum_over_map(std::map<exprt, int> &m, const typet &type, bool negated = false);
+exprt sum_over_map(
+  std::map<exprt, int> &m,
+  const typet &type,
+  bool negated = false);
 
 #endif // CPROVER_SOLVERS_REFINEMENT_STRING_CONSTRAINT_INSTANTIATION_H

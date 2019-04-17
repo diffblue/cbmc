@@ -88,69 +88,66 @@ std::map<exprt, int> map_representation_of_sum(const exprt &f)
   return elems;
 }
 
-exprt
-sum_over_map(std::map<exprt, int> &m, const typet &type, bool negated)
+exprt sum_over_map(std::map<exprt, int> &m, const typet &type, bool negated)
 {
-  exprt sum = nil_exprt();
-  mp_integer constants = 0;
-  typet index_type;
   if(m.empty())
     return from_integer(0, type);
-  else
-    index_type = m.begin()->first.type();
+
+  exprt sum = nil_exprt();
+  mp_integer constants = 0;
+  typet index_type = m.begin()->first.type();
 
   for(const auto &term : m)
   {
-    // We should group constants together...
     const exprt &t = term.first;
-    int second = negated ? (-term.second) : term.second;
+    int factor = negated ? (-term.second) : term.second;
     if(t.id() == ID_constant)
     {
+      // Constants are accumulated in the variable \c constants
       const auto int_value = numeric_cast_v<mp_integer>(to_constant_expr(t));
-      constants += int_value * second;
+      constants += int_value * factor;
     }
     else
     {
-      switch(second)
+      switch(factor)
       {
-        case -1:
+      case -1:
+        if(sum.is_nil())
+          sum = unary_minus_exprt(t);
+        else
+          sum = minus_exprt(sum, t);
+        break;
+
+      case 1:
+        if(sum.is_nil())
+          sum = t;
+        else
+          sum = plus_exprt(sum, t);
+        break;
+
+      default:
+        if(factor > 1)
+        {
+          if(sum.is_nil())
+            sum = t;
+          else
+            plus_exprt(sum, t);
+          for(int i = 1; i < factor; i++)             sum = plus_exprt(sum, t);
+        }
+        else if(factor < -1)
+        {
           if(sum.is_nil())
             sum = unary_minus_exprt(t);
           else
             sum = minus_exprt(sum, t);
-          break;
-
-        case 1:
-          if(sum.is_nil())
-            sum = t;
-          else
-            sum = plus_exprt(sum, t);
-          break;
-
-        default:
-          if(second > 1)
-          {
-            if(sum.is_nil())
-              sum = t;
-            else
-              plus_exprt(sum, t);
-            for(int i = 1; i < second; i++)
-              sum = plus_exprt(sum, t);
-          }
-          else if(second < -1)
-          {
-            if(sum.is_nil())
-              sum = unary_minus_exprt(t);
-            else
-              sum = minus_exprt(sum, t);
-            for(int i = -1; i > second; i--)
-              sum = minus_exprt(sum, t);
-          }
+          for(int i = -1; i > factor; i--)
+            sum = minus_exprt(sum, t);
+        }
       }
     }
   }
 
-  exprt index_const = from_integer(constants, index_type);
+  const exprt index_const = from_integer(constants, index_type);
   if(sum.is_not_nil())
     return plus_exprt(sum, index_const);
   else
