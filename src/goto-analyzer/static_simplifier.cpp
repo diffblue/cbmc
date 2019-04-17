@@ -186,7 +186,7 @@ bool static_simplifier(
   }
 
   // restore return types before writing the binary
-  restore_returns(goto_model);
+  restore_returns(m.get_message_handler(), goto_model);
   goto_model.goto_functions.update();
 
   m.status() << "Writing goto binary" << messaget::eom;

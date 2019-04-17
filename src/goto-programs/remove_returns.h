@@ -73,6 +73,7 @@ Date:   September 2009
 
 #include <functional>
 
+#include <util/message.h>
 #include <util/std_types.h>
 
 class goto_functionst;
@@ -82,18 +83,36 @@ class namespacet;
 class symbol_table_baset;
 class symbol_exprt;
 
-void remove_returns(symbol_table_baset &, goto_functionst &);
+void remove_returns(
+  message_handlert &m,
+  symbol_table_baset &,
+  goto_functionst &);
 
 typedef std::function<bool(const irep_idt &)> function_is_stubt;
 
-void remove_returns(goto_model_functiont &, function_is_stubt);
+/// Removes returns from a single function. Only usable with Java programs at
+/// the moment; to use it with other languages, they must annotate their stub
+/// functions with ID_C_incomplete as currently done in
+/// java_bytecode_convert_method.cpp.
+///
+/// This will generate \#return_value variables, if not already present, for
+/// both the function being altered *and* any callees.
+/// \param m: message to initialise remove_function_pointers with
+/// \param goto_model_function: function to transform
+/// \param function_is_stub: function that will be used to test whether a given
+///   callee has been or will be given a body. It should return true if so, or
+///   false if the function will remain a bodyless stub.
+void remove_returns(
+  message_handlert &m,
+  goto_model_functiont &goto_model_function,
+  function_is_stubt function_is_stub);
 
-void remove_returns(goto_modelt &);
+void remove_returns(message_handlert &m, goto_modelt &);
 
 // reverse the above operations
 void restore_returns(symbol_table_baset &, goto_functionst &);
 
-void restore_returns(goto_modelt &);
+void restore_returns(message_handlert &m, goto_modelt &);
 
 /// produces the identifier that is used to store the return
 /// value of the function with the given identifier
