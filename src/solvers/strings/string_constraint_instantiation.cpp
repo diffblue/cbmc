@@ -203,8 +203,10 @@ compute_inverse_function(const exprt &qvar, const exprt &val, const exprt &f)
 /// \param str: an array of characters
 /// \param val: an index expression
 /// \return instantiated formula
-exprt
-instantiate(const string_constraintt &axiom, const exprt &str, const exprt &val)
+exprt instantiate(
+  const string_constraintt &axiom,
+  const exprt &str,
+  const exprt &val)
 {
   exprt::operandst conjuncts;
   for(const auto &index : find_indexes(axiom.body, str, axiom.univ_var))
@@ -213,9 +215,9 @@ instantiate(const string_constraintt &axiom, const exprt &str, const exprt &val)
       compute_inverse_function(axiom.univ_var, val, index);
     implies_exprt instance(
       and_exprt(
-    binary_relation_exprt(axiom.univ_var, ID_ge, axiom.lower_bound),
-    binary_relation_exprt(axiom.univ_var, ID_lt, axiom.upper_bound)),
-    axiom.body);
+        binary_relation_exprt(axiom.univ_var, ID_ge, axiom.lower_bound),
+        binary_relation_exprt(axiom.univ_var, ID_lt, axiom.upper_bound)),
+      axiom.body);
     replace_expr(axiom.univ_var, univ_var_value, instance);
     conjuncts.push_back(instance);
   }
