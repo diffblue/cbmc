@@ -231,7 +231,7 @@ add_axioms_from_int_hex(const array_string_exprt &res, const exprt &i)
 
   size_t max_size = 8;
   constraints.existential.push_back(
-    and_exprt(length_gt(res, 0), length_le(res, max_size)));
+    and_exprt(greater_than(res.length(), 0), length_le(res, max_size)));
 
   for(size_t size = 1; size <= max_size; size++)
   {

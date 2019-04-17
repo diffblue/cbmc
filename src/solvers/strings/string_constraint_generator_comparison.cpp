@@ -208,7 +208,7 @@ string_constraint_generatort::add_axioms_for_hash_code(
       equal_exprt(it.first.length(), str.length()),
       and_exprt(
         notequal_exprt(str[i], it.first[i]),
-        and_exprt(length_gt(str, i), is_positive(i))));
+        and_exprt(greater_than(str.length(), i), is_positive(i))));
     hash_constraints.existential.push_back(or_exprt(c1, or_exprt(c2, c3)));
   }
   return {hash, std::move(hash_constraints)};
@@ -271,12 +271,13 @@ std::pair<exprt, string_constraintst> add_axioms_for_compare_to(
       typecast_exprt(s1.length(), return_type),
       typecast_exprt(s2.length(), return_type)));
   const or_exprt guard1(
-    and_exprt(length_le(s1, s2.length()), length_gt(s1, x)),
-    and_exprt(length_ge(s1, s2.length()), length_gt(s2, x)));
+    and_exprt(length_le(s1, s2.length()), greater_than(s1.length(), x)),
+    and_exprt(length_ge(s1, s2.length()), greater_than(s2.length(), x)));
   const and_exprt cond1(ret_char_diff, guard1);
   const or_exprt guard2(
-    and_exprt(length_gt(s2, s1.length()), length_eq(s1, x)),
-    and_exprt(length_gt(s1, s2.length()), length_eq(s2, x)));
+    and_exprt(greater_than(s2.length(), s1.length()), equal_to(s1.length(), x)),
+    and_exprt(
+      greater_than(s1.length(), s2.length()), equal_to(s2.length(), x)));
   const and_exprt cond2(ret_length_diff, guard2);
 
   const implies_exprt a3(

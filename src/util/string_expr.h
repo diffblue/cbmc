@@ -24,17 +24,15 @@ binary_relation_exprt length_ge(const T &lhs, const exprt &rhs)
   return binary_relation_exprt(lhs.length(), ID_ge, rhs);
 }
 
-template <typename T>
-binary_relation_exprt length_gt(const T &lhs, const exprt &rhs)
+inline binary_relation_exprt greater_than(const exprt &lhs, const exprt &rhs)
 {
-  PRECONDITION(rhs.type() == lhs.length().type());
-  return binary_relation_exprt(rhs, ID_lt, lhs.length());
+  PRECONDITION(rhs.type() == lhs.type());
+  return binary_relation_exprt(rhs, ID_lt, lhs);
 }
 
-template <typename T>
-binary_relation_exprt length_gt(const T &lhs, mp_integer i)
+inline binary_relation_exprt greater_than(const exprt &lhs, mp_integer i)
 {
-  return length_gt(lhs, from_integer(i, lhs.length().type()));
+  return greater_than(lhs, from_integer(i, lhs.type()));
 }
 
 template <typename T>

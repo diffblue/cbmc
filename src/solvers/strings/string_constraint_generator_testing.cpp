@@ -68,7 +68,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_is_prefix(
     const exprt witness = fresh_symbol("witness_not_isprefix", index_type);
     const exprt strings_differ_at_witness = and_exprt(
       is_positive(witness),
-      length_gt(prefix, witness),
+      greater_than(prefix.length(), witness),
       notequal_exprt(str[plus_exprt(witness, offset)], prefix[witness]));
     const exprt s1_does_not_start_with_s0 = or_exprt(
       not_exprt(offset_within_bounds),
@@ -201,11 +201,11 @@ std::pair<exprt, string_constraintst> add_axioms_for_is_suffix(
   const plus_exprt shifted(witness, minus_exprt(s1.length(), s0.length()));
   or_exprt constr3(
     and_exprt(
-      length_gt(s0, s1.length()),
+      greater_than(s0.length(), s1.length()),
       equal_exprt(witness, from_integer(-1, index_type))),
     and_exprt(
       notequal_exprt(s0[witness], s1[shifted]),
-      and_exprt(length_gt(s0, witness), is_positive(witness))));
+      and_exprt(greater_than(s0.length(), witness), is_positive(witness))));
   implies_exprt a3(not_exprt(issuffix), constr3);
 
   constraints.existential.push_back(a3);
