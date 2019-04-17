@@ -95,20 +95,6 @@ static void update_index_set(
   const namespacet &ns,
   const exprt &formula);
 
-/// Substitute `qvar` the universally quantified variable of `axiom`, by
-/// an index `val`, in `axiom`, so that the index used for `str` equals `val`.
-/// For instance, if `axiom` corresponds to \f$\forall q.\ s[q+x]='a' \land
-/// t[q]='b'\f$, `instantiate(axiom,s,v)` would return an expression for
-/// \f$s[v]='a' \land t[v-x]='b'\f$.
-/// \param axiom: a universally quantified formula
-/// \param str: an array of char variable
-/// \param val: an index expression
-/// \return `axiom` with substitued `qvar`
-static exprt instantiate(
-  const string_constraintt &axiom,
-  const exprt &str,
-  const exprt &val);
-
 static std::vector<exprt> instantiate(
   const string_not_contains_constraintt &axiom,
   const index_set_pairt &index_set,
@@ -1472,183 +1458,12 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
   return {false, std::vector<exprt>()};
 }
 
-/// \param f: an expression with only addition and subtraction
-/// \return a map where each leaf of the input is mapped to the number of times
-///   it is added. For instance, expression $x + x - y$ would give the map x ->
-///   2, y -> -1.
-static std::map<exprt, int> map_representation_of_sum(const exprt &f)
-{
-  // number of time the leaf should be added (can be negative)
-  std::map<exprt, int> elems;
-
-  std::list<std::pair<exprt, bool>> to_process;
-  to_process.emplace_back(f, true);
-
-  while(!to_process.empty())
-  {
-    exprt cur = to_process.back().first;
-    bool positive = to_process.back().second;
-    to_process.pop_back();
-    if(cur.id() == ID_plus)
-    {
-      for(const auto &op : cur.operands())
-        to_process.emplace_back(op, positive);
-    }
-    else if(cur.id() == ID_minus)
-    {
-      to_process.emplace_back(cur.op1(), !positive);
-      to_process.emplace_back(cur.op0(), positive);
-    }
-    else if(cur.id() == ID_unary_minus)
-    {
-      to_process.emplace_back(cur.op0(), !positive);
-    }
-    else
-    {
-      if(positive)
-        elems[cur] = elems[cur] + 1;
-      else
-        elems[cur] = elems[cur] - 1;
-    }
-  }
-  return elems;
-}
-
-/// \param m: a map from expressions to integers
-/// \param type: type for the returned expression
-/// \param negated: optinal Boolean asking to negates the sum
-/// \return a expression for the sum of each element in the map a number of
-///   times given by the corresponding integer in the map. For a map x -> 2, y
-///   -> -1 would give an expression $x + x - y$.
-static exprt
-sum_over_map(std::map<exprt, int> &m, const typet &type, bool negated = false)
-{
-  exprt sum = nil_exprt();
-  mp_integer constants = 0;
-  typet index_type;
-  if(m.empty())
-    return from_integer(0, type);
-  else
-    index_type = m.begin()->first.type();
-
-  for(const auto &term : m)
-  {
-    // We should group constants together...
-    const exprt &t = term.first;
-    int second = negated ? (-term.second) : term.second;
-    if(t.id() == ID_constant)
-    {
-      const auto int_value = numeric_cast_v<mp_integer>(to_constant_expr(t));
-      constants += int_value * second;
-    }
-    else
-    {
-      switch(second)
-      {
-      case -1:
-        if(sum.is_nil())
-          sum = unary_minus_exprt(t);
-        else
-          sum = minus_exprt(sum, t);
-        break;
-
-      case 1:
-        if(sum.is_nil())
-          sum = t;
-        else
-          sum = plus_exprt(sum, t);
-        break;
-
-      default:
-        if(second > 1)
-        {
-          if(sum.is_nil())
-            sum = t;
-          else
-            plus_exprt(sum, t);
-          for(int i = 1; i < second; i++)
-            sum = plus_exprt(sum, t);
-        }
-        else if(second < -1)
-        {
-          if(sum.is_nil())
-            sum = unary_minus_exprt(t);
-          else
-            sum = minus_exprt(sum, t);
-          for(int i = -1; i > second; i--)
-            sum = minus_exprt(sum, t);
-        }
-      }
-    }
-  }
-
-  exprt index_const = from_integer(constants, index_type);
-  if(sum.is_not_nil())
-    return plus_exprt(sum, index_const);
-  else
-    return index_const;
-}
-
 /// \param f: an expression with only plus and minus expr
 /// \return an equivalent expression in a canonical form
 exprt simplify_sum(const exprt &f)
 {
   std::map<exprt, int> map = map_representation_of_sum(f);
   return sum_over_map(map, f.type());
-}
-
-/// \param qvar: a symbol representing a universally quantified variable
-/// \param val: an expression
-/// \param f: an expression containing `+` and `-`
-///   operations in which `qvar` should appear exactly once.
-/// \return an expression corresponding of $f^{-1}(val)$ where $f$ is seen as
-///   a function of $qvar$, i.e. the value that is necessary for `qvar` for `f`
-///   to be equal to `val`. For instance, if `f` corresponds to the expression
-///   $q + x$, `compute_inverse_function(q,v,f)` returns an expression
-///   for $v - x$.
-static exprt
-compute_inverse_function(const exprt &qvar, const exprt &val, const exprt &f)
-{
-  exprt positive, negative;
-  // number of time the element should be added (can be negative)
-  // qvar has to be equal to val - f(0) if it appears positively in f
-  // (i.e. if f(qvar)=f(0) + qvar) and f(0) - val if it appears negatively
-  // in f. So we start by computing val - f(0).
-  std::map<exprt, int> elems = map_representation_of_sum(minus_exprt(val, f));
-
-  // true if qvar appears negatively in f (positively in elems):
-  bool neg = false;
-
-  auto it = elems.find(qvar);
-  INVARIANT(
-    it != elems.end(),
-    string_refinement_invariantt("a function must have an occurrence of qvar"));
-  if(it->second == 1 || it->second == -1)
-  {
-    neg = (it->second == 1);
-  }
-  else
-  {
-    INVARIANT(
-      it->second == 0,
-      string_refinement_invariantt(
-        "a proper function must have exactly one "
-        "occurrences after reduction, or it cancelled out, and it does not"
-        " have one"));
-  }
-
-  elems.erase(it);
-  return sum_over_map(elems, f.type(), neg);
-}
-
-/// look for the symbol and return true if it is found
-/// \param index: an index expression
-/// \param qvar: a symbol expression
-/// \return a Boolean
-static bool contains(const exprt &index, const symbol_exprt &qvar)
-{
-  return std::find(index.depth_begin(), index.depth_end(), qvar) !=
-         index.depth_end();
 }
 
 /// Add to the index set all the indices that appear in the formulas and the
@@ -1859,68 +1674,6 @@ static void update_index_set(
         to_process.push_back(*it);
     }
   }
-}
-
-/// Find indexes of `str` used in `expr` that contains `qvar`, for instance
-/// with arguments ``(str[k+1]=='a')``, `str`, and `k`, the function should
-/// return `k+1`.
-/// \param [in] expr: the expression to search
-/// \param [in] str: the string which must be indexed
-/// \param [in] qvar: the universal variable that must be in the index
-/// \return index expressions in `expr` on `str` containing `qvar`.
-static std::unordered_set<exprt, irep_hash>
-find_indexes(const exprt &expr, const exprt &str, const symbol_exprt &qvar)
-{
-  decltype(find_indexes(expr, str, qvar)) result;
-  auto index_str_containing_qvar = [&](const exprt &e) {
-    if(auto index_expr = expr_try_dynamic_cast<index_exprt>(e))
-    {
-      const auto &arr = index_expr->array();
-      const auto str_it = std::find(arr.depth_begin(), arr.depth_end(), str);
-      return str_it != arr.depth_end() && contains(index_expr->index(), qvar);
-    }
-    return false;
-  };
-
-  std::for_each(expr.depth_begin(), expr.depth_end(), [&](const exprt &e) {
-    if(index_str_containing_qvar(e))
-      result.insert(to_index_expr(e).index());
-  });
-  return result;
-}
-
-/// Instantiates a string constraint by substituting the quantifiers.
-/// For a string constraint of the form `forall q. P(x)`,
-/// substitute `q` the universally quantified variable of `axiom`, by
-/// an `index`, in `axiom`, so that the index used for `str` equals `val`.
-/// For instance, if `axiom` is `forall q. s[q+x] = 'a' && t[q] = 'b'`,
-/// `instantiate(axiom,s,v)` would return the expression
-/// `s[v] = 'a' && t[v-x] = 'b'`.
-/// If there are several such indexes, the conjunction of the instantiations is
-/// returned, for instance for a formula:
-/// `forall q. s[q+x]='a' && s[q]=c` we would get
-/// `s[v] = 'a' && s[v-x] = c && s[v+x] = 'a' && s[v] = c`.
-/// \param axiom: a universally quantified formula
-/// \param str: an array of characters
-/// \param val: an index expression
-/// \return instantiated formula
-static exprt
-instantiate(const string_constraintt &axiom, const exprt &str, const exprt &val)
-{
-  exprt::operandst conjuncts;
-  for(const auto &index : find_indexes(axiom.body, str, axiom.univ_var))
-  {
-    const exprt univ_var_value =
-      compute_inverse_function(axiom.univ_var, val, index);
-    implies_exprt instance(
-      and_exprt(
-        binary_relation_exprt(axiom.univ_var, ID_ge, axiom.lower_bound),
-        binary_relation_exprt(axiom.univ_var, ID_lt, axiom.upper_bound)),
-      axiom.body);
-    replace_expr(axiom.univ_var, univ_var_value, instance);
-    conjuncts.push_back(instance);
-  }
-  return conjunction(conjuncts);
 }
 
 /// Instantiates a quantified formula representing `not_contains` by
@@ -2157,7 +1910,7 @@ is_linear_arithmetic_expr(const exprt &expr, const symbol_exprt &var)
       it->id() != ID_plus && it->id() != ID_minus &&
       it->id() != ID_unary_minus && *it != var)
     {
-      if(contains(*it, var))
+      if(std::find(it->depth_begin(), it->depth_end(), var) != it->depth_end())
         return false;
       else
         it.next_sibling_or_parent();
