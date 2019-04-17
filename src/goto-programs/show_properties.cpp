@@ -163,25 +163,25 @@ void show_properties_json(
 
 void show_properties(
   const namespacet &ns,
-  message_handlert &message_handler,
-  ui_message_handlert::uit ui,
+  ui_message_handlert &ui_message_handler,
   const goto_functionst &goto_functions)
 {
+  ui_message_handlert::uit ui = ui_message_handler.get_ui();
   if(ui == ui_message_handlert::uit::JSON_UI)
-    show_properties_json(ns, message_handler, goto_functions);
+    show_properties_json(ns, ui_message_handler, goto_functions);
   else
     for(const auto &fct : goto_functions.function_map)
-      show_properties(ns, fct.first, message_handler, ui, fct.second.body);
+      show_properties(ns, fct.first, ui_message_handler, ui, fct.second.body);
 }
 
 void show_properties(
   const goto_modelt &goto_model,
-  message_handlert &message_handler,
-  ui_message_handlert::uit ui)
+  ui_message_handlert &ui_message_handler)
 {
+  ui_message_handlert::uit ui = ui_message_handler.get_ui();
   const namespacet ns(goto_model.symbol_table);
   if(ui == ui_message_handlert::uit::JSON_UI)
-    show_properties_json(ns, message_handler, goto_model.goto_functions);
+    show_properties_json(ns, ui_message_handler, goto_model.goto_functions);
   else
-    show_properties(ns, message_handler, ui, goto_model.goto_functions);
+    show_properties(ns, ui_message_handler, goto_model.goto_functions);
 }

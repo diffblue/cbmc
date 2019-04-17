@@ -32,13 +32,11 @@ class message_handlert;
 
 void show_properties(
   const goto_modelt &,
-  message_handlert &message_handler,
-  ui_message_handlert::uit ui);
+  ui_message_handlert &ui_message_handler);
 
 void show_properties(
   const namespacet &ns,
-  message_handlert &message_handler,
-  ui_message_handlert::uit ui,
+  ui_message_handlert &ui_message_handler,
   const goto_functionst &goto_functions);
 
 /// \brief Returns a source_locationt that corresponds

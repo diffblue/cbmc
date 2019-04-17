@@ -520,8 +520,7 @@ int janalyzer_parse_optionst::perform_analysis(const optionst &options)
 
   if(cmdline.isset("show-properties"))
   {
-    show_properties(
-      goto_model, ui_message_handler, ui_message_handler.get_ui());
+    show_properties(goto_model, ui_message_handler);
     return CPROVER_EXIT_SUCCESS;
   }
 

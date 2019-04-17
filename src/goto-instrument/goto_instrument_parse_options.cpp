@@ -565,8 +565,7 @@ int goto_instrument_parse_optionst::doit()
        cmdline.isset("show-properties"))
     {
       const namespacet ns(goto_model.symbol_table);
-      show_properties(
-        goto_model, ui_message_handler, ui_message_handler.get_ui());
+      show_properties(goto_model, ui_message_handler);
       return CPROVER_EXIT_SUCCESS;
     }
 

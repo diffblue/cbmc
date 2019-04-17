@@ -860,11 +860,7 @@ bool jbmc_parse_optionst::show_loaded_functions(
   if(cmdline.isset("show-properties"))
   {
     namespacet ns(goto_model.get_symbol_table());
-    show_properties(
-      ns,
-      ui_message_handler,
-      ui_message_handler.get_ui(),
-      goto_model.get_goto_functions());
+    show_properties(ns, ui_message_handler, goto_model.get_goto_functions());
     return true;
   }
 

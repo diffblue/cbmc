@@ -555,8 +555,7 @@ int cbmc_parse_optionst::doit()
   if(cmdline.isset("show-claims") || // will go away
      cmdline.isset("show-properties")) // use this one
   {
-    show_properties(
-      goto_model, ui_message_handler, ui_message_handler.get_ui());
+    show_properties(goto_model, ui_message_handler);
     return CPROVER_EXIT_SUCCESS;
   }
 
