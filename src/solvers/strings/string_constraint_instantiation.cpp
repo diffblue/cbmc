@@ -157,7 +157,7 @@ static exprt
 compute_inverse_function(const exprt &qvar, const exprt &val, const exprt &f)
 {
   exprt positive, negative;
-  // number of time the element should be added (can be negative)
+  // number of times the element should be added (can be negative)
   // qvar has to be equal to val - f(0) if it appears positively in f
   // (i.e. if f(qvar)=f(0) + qvar) and f(0) - val if it appears negatively
   // in f. So we start by computing val - f(0).
@@ -180,7 +180,7 @@ compute_inverse_function(const exprt &qvar, const exprt &val, const exprt &f)
       it->second == 0,
       string_refinement_invariantt(
         "a proper function must have exactly one "
-        "occurrences after reduction, or it cancelled out, and it does not"
+        "occurrence after reduction, or it cancelled out, and it does not"
         " have one"));
   }
 
