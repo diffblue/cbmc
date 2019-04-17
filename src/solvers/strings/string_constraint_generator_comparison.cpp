@@ -271,7 +271,9 @@ std::pair<exprt, string_constraintst> add_axioms_for_compare_to(
       typecast_exprt(s1.length(), return_type),
       typecast_exprt(s2.length(), return_type)));
   const or_exprt guard1(
-    and_exprt(length_le(s1, s2.length()), greater_than(s1.length(), x)),
+    and_exprt(
+      less_than_or_equal_to(s1.length(), s2.length()),
+      greater_than(s1.length(), x)),
     and_exprt(
       greater_or_equal_to(s1.length(), s2.length()),
       greater_than(s2.length(), x)));

@@ -230,8 +230,9 @@ add_axioms_from_int_hex(const array_string_exprt &res, const exprt &i)
   exprt f_char = from_integer('f', char_type);
 
   size_t max_size = 8;
-  constraints.existential.push_back(
-    and_exprt(greater_than(res.length(), 0), length_le(res, max_size)));
+  constraints.existential.push_back(and_exprt(
+    greater_than(res.length(), 0),
+    less_than_or_equal_to(res.length(), max_size)));
 
   for(size_t size = 1; size <= max_size; size++)
   {
@@ -370,7 +371,8 @@ string_constraintst add_axioms_for_correct_number_format(
   constraints.existential.push_back(contains_digit);
 
   // |str| <= max_size
-  constraints.existential.push_back(length_le(str, max_size));
+  constraints.existential.push_back(
+    less_than_or_equal_to(str.length(), max_size));
 
   // forall 1 <= i < |str| . is_digit_with_radix(str[i], radix)
   // We unfold the above because we know that it will be used for all i up to
