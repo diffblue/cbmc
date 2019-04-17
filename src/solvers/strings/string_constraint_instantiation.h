@@ -37,8 +37,8 @@ std::vector<exprt> instantiate_not_contains(
 
 /// \param f: an expression with only addition and subtraction
 /// \return a map where each leaf of the input is mapped to the number of times
-///   it is added. For instance, expression $x + x - y$ would give the map x ->
-///   2, y -> -1.
+///   it is added. For instance, expression $x + x - y + 3 - 5$ would give the
+///   map x -> 2, y -> -1, 3 -> 1, 5 -> -1.
 std::map<exprt, int> map_representation_of_sum(const exprt &f);
 
 /// \param m: a map from expressions to integers

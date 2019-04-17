@@ -52,7 +52,7 @@ find_indexes(const exprt &expr, const exprt &str, const symbol_exprt &qvar)
 
 std::map<exprt, int> map_representation_of_sum(const exprt &f)
 {
-  // number of time the leaf should be added (can be negative)
+  // number of times the leaf should be added (can be negative)
   std::map<exprt, int> elems;
 
   std::list<std::pair<exprt, bool>> to_process;
@@ -80,9 +80,9 @@ std::map<exprt, int> map_representation_of_sum(const exprt &f)
     else
     {
       if(positive)
-        elems[cur] = elems[cur] + 1;
+        ++elems[cur];
       else
-        elems[cur] = elems[cur] - 1;
+        --elems[cur];
     }
   }
   return elems;
