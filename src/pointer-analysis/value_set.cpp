@@ -70,16 +70,19 @@ void value_sett::update_entry(
   auto existing_entry = values.find(index);
   if(existing_entry.has_value())
   {
-    entryt replacement = *existing_entry;
     if(add_to_sets)
     {
-      if(make_union(replacement.object_map, new_values))
-        values.replace(index, std::move(replacement));
+      if(make_union_would_change(existing_entry->get().object_map, new_values))
+      {
+        values.update(index, [&new_values, this](entryt &entry) {
+          make_union(entry.object_map, new_values);
+        });
+      }
     }
     else
     {
-      replacement.object_map = new_values;
-      values.replace(index, std::move(replacement));
+      values.update(
+        index, [&new_values](entryt &entry) { entry.object_map = new_values; });
     }
   }
   else
@@ -90,8 +93,8 @@ void value_sett::update_entry(
   }
 }
 
-bool value_sett::insert(
-  object_mapt &dest,
+value_sett::insert_actiont value_sett::get_insert_action(
+  const object_mapt &dest,
   object_numberingt::number_type n,
   const offsett &offset) const
 {
@@ -100,108 +103,113 @@ bool value_sett::insert(
   if(entry==dest.read().end())
   {
     // new
-    dest.write()[n] = offset;
-    return true;
+    return insert_actiont::INSERT;
   }
   else if(!entry->second)
-    return false; // no change
+    return insert_actiont::NONE;
   else if(offset && *entry->second == *offset)
-    return false; // no change
+    return insert_actiont::NONE;
   else
-  {
-    dest.write()[n].reset();
-    return true;
-  }
+    return insert_actiont::RESET_OFFSET;
 }
 
-void value_sett::output(
-  const namespacet &ns,
-  std::ostream &out) const
+bool value_sett::insert(
+  object_mapt &dest,
+  object_numberingt::number_type n,
+  const offsett &offset) const
 {
-  valuest::viewt view;
-  values.get_view(view);
+  auto insert_action = get_insert_action(dest, n, offset);
+  if(insert_action == insert_actiont::NONE)
+    return false;
 
-  for(const auto &values_entry : view)
-  {
+  auto &new_offset = dest.write()[n];
+  if(insert_action == insert_actiont::INSERT)
+    new_offset = offset;
+  else
+    new_offset.reset();
+
+  return true;
+}
+
+void value_sett::output(const namespacet &ns, std::ostream &out) const
+{
+  values.iterate([&](const irep_idt &, const entryt &e) {
     irep_idt identifier, display_name;
-
-    const entryt &e = values_entry.second;
 
     if(has_prefix(id2string(e.identifier), "value_set::dynamic_object"))
     {
-      display_name=id2string(e.identifier)+e.suffix;
-      identifier="";
+      display_name = id2string(e.identifier) + e.suffix;
+      identifier = "";
     }
-    else if(e.identifier=="value_set::return_value")
+    else if(e.identifier == "value_set::return_value")
     {
-      display_name="RETURN_VALUE"+e.suffix;
-      identifier="";
+      display_name = "RETURN_VALUE" + e.suffix;
+      identifier = "";
     }
     else
     {
-      #if 0
-      const symbolt &symbol=ns.lookup(e.identifier);
-      display_name=id2string(symbol.display_name())+e.suffix;
-      identifier=symbol.name;
-      #else
-      identifier=id2string(e.identifier);
-      display_name=id2string(identifier)+e.suffix;
-      #endif
+#if 0
+        const symbolt &symbol=ns.lookup(e.identifier);
+        display_name=id2string(symbol.display_name())+e.suffix;
+        identifier=symbol.name;
+#else
+      identifier = id2string(e.identifier);
+      display_name = id2string(identifier) + e.suffix;
+#endif
     }
 
     out << display_name;
 
     out << " = { ";
 
-    const object_map_dt &object_map=e.object_map.read();
+    const object_map_dt &object_map = e.object_map.read();
 
-    std::size_t width=0;
+    std::size_t width = 0;
 
-    for(object_map_dt::const_iterator
-        o_it=object_map.begin();
-        o_it!=object_map.end();
+    for(object_map_dt::const_iterator o_it = object_map.begin();
+        o_it != object_map.end();
         o_it++)
     {
-      const exprt &o=object_numbering[o_it->first];
+      const exprt &o = object_numbering[o_it->first];
 
       std::string result;
 
-      if(o.id()==ID_invalid || o.id()==ID_unknown)
-        result=from_expr(ns, identifier, o);
+      if(o.id() == ID_invalid || o.id() == ID_unknown)
+        result = from_expr(ns, identifier, o);
       else
       {
-        result="<"+from_expr(ns, identifier, o)+", ";
+        result = "<" + from_expr(ns, identifier, o) + ", ";
 
         if(o_it->second)
           result += integer2string(*o_it->second) + "";
         else
-          result+='*';
+          result += '*';
 
         if(o.type().is_nil())
-          result+=", ?";
+          result += ", ?";
         else
-          result+=", "+from_type(ns, identifier, o.type());
+          result += ", " + from_type(ns, identifier, o.type());
 
-        result+='>';
+        result += '>';
       }
 
       out << result;
 
-      width+=result.size();
+      width += result.size();
 
       object_map_dt::const_iterator next(o_it);
       next++;
 
-      if(next!=object_map.end())
+      if(next != object_map.end())
       {
         out << ", ";
-        if(width>=40)
+        if(width >= 40)
           out << "\n      ";
       }
     }
 
     out << " } \n";
-  }
+  });
 }
 
 exprt value_sett::to_expr(const object_map_dt::value_type &it) const
@@ -236,10 +244,12 @@ bool value_sett::make_union(const value_sett::valuest &new_values)
   {
     if(delta_entry.in_both)
     {
-      entryt merged_entry = *values.find(delta_entry.k);
-      if(make_union(merged_entry.object_map, delta_entry.m.object_map))
+      if(make_union_would_change(
+           delta_entry.other_m.object_map, delta_entry.m.object_map))
       {
-        values.replace(delta_entry.k, std::move(merged_entry));
+        values.update(delta_entry.k, [&](entryt &existing_entry) {
+          make_union(existing_entry.object_map, delta_entry.m.object_map);
+        });
         result = true;
       }
     }
@@ -251,6 +261,24 @@ bool value_sett::make_union(const value_sett::valuest &new_values)
   }
 
   return result;
+}
+
+bool value_sett::make_union_would_change(
+  const object_mapt &dest,
+  const object_mapt &src) const
+{
+  for(const auto &number_and_offset : src.read())
+  {
+    if(
+      get_insert_action(
+        dest, number_and_offset.first, number_and_offset.second) !=
+      insert_actiont::NONE)
+    {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 bool value_sett::make_union(object_mapt &dest, const object_mapt &src) const

@@ -16,6 +16,8 @@ Author: Martin Brain, martin.brain@diffblue.com
 
 #include <iostream>
 
+bool cbmc_invariants_should_throw = false;
+
 // Backtraces compiler and C library specific
 // So we should include something explicitly from the C library
 // to check if the C library is glibc.
@@ -25,7 +27,6 @@ Author: Martin Brain, martin.brain@diffblue.com
 // GCC needs LINKFLAGS="-rdynamic" to give function names in the backtrace
 #include <execinfo.h>
 #include <cxxabi.h>
-
 
 /// Attempts to demangle the function name assuming the glibc
 /// format of stack entry:
