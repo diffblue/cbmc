@@ -60,6 +60,24 @@ public:
     goto_programt::targett target,
     const functionst &functions);
 
+  /// Go through the whole model and find all potential function the pointer at
+  ///   \p call site may point to
+  /// \param goto_model: model to search for potential functions
+  /// \param call_site: the call site of the function pointer under analysis
+  /// \return the set of the potential functions
+  functionst get_function_pointer_targets(
+    const goto_modelt &goto_model,
+    goto_programt::const_targett &call_site);
+
+  /// Go through a single function body and find all potential function the
+  ///   pointer at \p call site may point to
+  /// \param goto_program: function body to search for potential functions
+  /// \param call_site: the call site of the function pointer under analysis
+  /// \return the set of the potential functions
+  functionst get_function_pointer_targets(
+    const goto_programt &goto_program,
+    goto_programt::const_targett &call_site);
+
 protected:
   messaget log;
   const namespacet ns;
@@ -73,6 +91,12 @@ protected:
   // This can be activated in goto-instrument using
   // --remove-const-function-pointers instead of --remove-function-pointers
   bool only_resolve_const_fps;
+
+  // Internal variables for communication between function pointer collection
+  //   and the call modification.
+  bool remove_const_found_functions;
+  bool does_remove_const_success;
+  bool only_remove_const_function_pointers_called;
 
   /// Replace a call to a dynamic function at location
   /// target in the given goto-program by determining
@@ -104,6 +128,22 @@ protected:
     const irep_idt &in_function_id,
     code_function_callt &function_call,
     goto_programt &dest);
+
+  /// Refine the \p type in case the forward declaration was incomplete
+  /// \param type: the type to be refined
+  /// \param code: the function call code to get the arguments from
+  /// \return the refined call type
+  static code_typet
+  refine_call_type(const typet &type, const code_function_callt &code);
+
+  /// Try to remove the const function pointers
+  /// \param goto_program: the function body to run the const_removal_check on
+  /// \param functions: the list of functions the const removal found
+  /// \param pointer: the pointer to be resolved
+  void try_remove_const_fp(
+    const goto_programt &goto_program,
+    functionst &functions,
+    const exprt &pointer);
 };
 
 remove_function_pointerst::remove_function_pointerst(
@@ -261,6 +301,118 @@ void remove_function_pointerst::fix_return_type(
 
   dest.add(goto_programt::make_assignment(
     code_assignt(old_lhs, typecast_exprt(tmp_symbol_expr, old_lhs.type()))));
+}
+
+code_typet remove_function_pointerst::refine_call_type(
+  const typet &type,
+  const code_function_callt &code)
+{
+  PRECONDITION(can_cast_type<code_typet>(type));
+  code_typet call_type = to_code_type(type);
+
+  if(call_type.has_ellipsis() && call_type.parameters().empty())
+  {
+    call_type.remove_ellipsis();
+    for(const auto &argument : code.arguments())
+      call_type.parameters().push_back(code_typet::parametert{argument.type()});
+  }
+  return call_type;
+}
+
+void remove_function_pointerst::try_remove_const_fp(
+  const goto_programt &goto_program,
+  functionst &functions,
+  const exprt &pointer)
+{
+  PRECONDITION(functions.empty());
+
+  does_remove_constt const_removal_check(goto_program, ns);
+  const auto does_remove_const = const_removal_check();
+  does_remove_const_success = does_remove_const.first;
+
+  if(does_remove_const_success)
+  {
+    log.warning().source_location = does_remove_const.second;
+    log.warning() << "cast from const to non-const pointer found, "
+                  << "only worst case function pointer removal will be done."
+                  << messaget::eom;
+    remove_const_found_functions = false;
+  }
+  else
+  {
+    remove_const_function_pointerst fpr(
+      log.get_message_handler(), ns, symbol_table);
+
+    // if remove_const_function fails, functions should be empty
+    // however, it is possible for found_functions to be true and functions
+    // to be empty (this happens if the pointer can only resolve to the null
+    // pointer)
+    remove_const_found_functions = fpr(pointer, functions);
+    CHECK_RETURN(remove_const_found_functions || functions.empty());
+  }
+}
+
+remove_function_pointerst::functionst
+remove_function_pointerst::get_function_pointer_targets(
+  const goto_modelt &goto_model,
+  goto_programt::const_targett &call_site)
+{
+  functionst functions;
+  for(const auto &function_pair : goto_model.goto_functions.function_map)
+  {
+    const auto &function_body = function_pair.second.body;
+    const auto &candidates =
+      get_function_pointer_targets(function_body, call_site);
+    functions.insert(candidates.begin(), candidates.end());
+  }
+  return functions;
+}
+
+remove_function_pointerst::functionst
+remove_function_pointerst::get_function_pointer_targets(
+  const goto_programt &goto_program,
+  goto_programt::const_targett &call_site)
+{
+  PRECONDITION(call_site->is_function_call());
+
+  const code_function_callt &code = call_site->get_function_call();
+  const auto &function = to_dereference_expr(code.function());
+  const auto &refined_call_type = refine_call_type(function.type(), code);
+
+  functionst functions;
+  try_remove_const_fp(goto_program, functions, function.pointer());
+
+  only_remove_const_function_pointers_called =
+    !does_remove_const_success && functions.size() == 1;
+  if(
+    !only_remove_const_function_pointers_called &&
+    !remove_const_found_functions && !only_resolve_const_fps)
+  {
+    // get all type-compatible functions
+    // whose address is ever taken
+    for(const auto &type_pair : type_map)
+    {
+      const auto &candidate_function_name = type_pair.first;
+      const auto &candidate_function_type = type_pair.second;
+
+      // only accept as candidate functions such that:
+      // 1. their address was taken
+      // 2. their type is compatible with the call-site-function type
+      // 3. they're not pthread mutex clean-up
+      if(
+        address_taken.find(candidate_function_name) != address_taken.end() &&
+        is_type_compatible(
+          code.lhs().is_not_nil(),
+          refined_call_type,
+          candidate_function_type) &&
+        candidate_function_name != "pthread_mutex_cleanup")
+      {
+        functions.insert(
+          symbol_exprt{candidate_function_name, candidate_function_type});
+      }
+    }
+  }
+  return functions;
 }
 
 void remove_function_pointerst::remove_function_pointer(
@@ -565,4 +717,40 @@ void remove_function_pointers(message_handlert &_message_handler,
     goto_model.goto_functions,
     add_safety_assertion,
     only_remove_const_fps);
+}
+
+possible_fp_targets_mapt get_function_pointer_targets(
+  message_handlert &message_handler,
+  goto_modelt &goto_model)
+{
+  remove_function_pointerst rfp(
+    message_handler,
+    goto_model.symbol_table,
+    false,
+    false,
+    goto_model.goto_functions);
+
+  possible_fp_targets_mapt target_map;
+  const auto &goto_functions = goto_model.goto_functions;
+  for(const auto &function_pair : goto_functions.function_map)
+  {
+    const auto &instructions = function_pair.second.body.instructions;
+    for(auto target = instructions.begin(); target != instructions.end();
+        target++)
+    {
+      if(
+        target->is_function_call() &&
+        target->get_function_call().function().id() == ID_dereference)
+      {
+        const auto &function_id =
+          to_symbol_expr(
+            to_dereference_expr(target->get_function_call().function())
+              .pointer())
+            .get_identifier();
+        target_map.emplace(
+          function_id, rfp.get_function_pointer_targets(goto_model, target));
+      }
+    }
+  }
+  return target_map;
 }
