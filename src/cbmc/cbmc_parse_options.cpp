@@ -547,7 +547,7 @@ int cbmc_parse_optionst::doit()
   }
 
   int get_goto_program_ret =
-    get_goto_program(goto_model, options, cmdline, log, ui_message_handler);
+    get_goto_program(goto_model, options, cmdline, ui_message_handler);
 
   if(get_goto_program_ret!=-1)
     return get_goto_program_ret;
@@ -692,12 +692,12 @@ int cbmc_parse_optionst::get_goto_program(
   goto_modelt &goto_model,
   const optionst &options,
   const cmdlinet &cmdline,
-  messaget &log,
   ui_message_handlert &ui_message_handler)
 {
+  messaget log{ui_message_handler};
   if(cmdline.args.empty())
   {
-    log.error() << "Please provide a program to verify" << log.eom;
+    log.error() << "Please provide a program to verify" << messaget::eom;
     return CPROVER_EXIT_INCORRECT_TASK;
   }
 
@@ -739,7 +739,7 @@ int cbmc_parse_optionst::get_goto_program(
       return CPROVER_EXIT_SUCCESS;
     }
 
-    log.status() << config.object_bits_info() << log.eom;
+    log.status() << config.object_bits_info() << messaget::eom;
   }
 
   return -1; // no error, continue

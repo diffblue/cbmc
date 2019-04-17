@@ -106,7 +106,6 @@ public:
     goto_modelt &,
     const optionst &,
     const cmdlinet &,
-    messaget &,
     ui_message_handlert &);
 
 protected:

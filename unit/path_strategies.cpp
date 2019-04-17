@@ -398,7 +398,7 @@ void _check_with_strategy(
   goto_modelt goto_model;
   int ret;
   ret = cbmc_parse_optionst::get_goto_program(
-    goto_model, options, cmdline, log, ui_message_handler);
+    goto_model, options, cmdline, ui_message_handler);
   REQUIRE(ret == -1);
 
   symbol_tablet symex_symbol_table;
