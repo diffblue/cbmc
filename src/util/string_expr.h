@@ -16,12 +16,11 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include "refined_string_type.h"
 #include "std_expr.h"
 
-// Comparison on the length of the strings
-template <typename T>
-binary_relation_exprt length_ge(const T &lhs, const exprt &rhs)
+inline binary_relation_exprt
+greater_or_equal_to(const exprt &lhs, const exprt &rhs)
 {
-  PRECONDITION(rhs.type() == lhs.length().type());
-  return binary_relation_exprt(lhs.length(), ID_ge, rhs);
+  PRECONDITION(rhs.type() == lhs.type());
+  return binary_relation_exprt(lhs, ID_ge, rhs);
 }
 
 inline binary_relation_exprt greater_than(const exprt &lhs, const exprt &rhs)

@@ -345,7 +345,8 @@ string_constraintst add_axioms_for_correct_number_format(
     is_digit_with_radix(chr, strict_formatting, radix_as_char, radix_ul);
 
   // |str| > 0
-  const exprt non_empty = length_ge(str, from_integer(1, index_type));
+  const exprt non_empty =
+    greater_or_equal_to(str.length(), from_integer(1, index_type));
   constraints.existential.push_back(non_empty);
 
   if(strict_formatting)
@@ -365,7 +366,7 @@ string_constraintst add_axioms_for_correct_number_format(
   // str[0]='+' or '-' ==> |str| > 1
   const implies_exprt contains_digit(
     or_exprt(starts_with_minus, starts_with_plus),
-    length_ge(str, from_integer(2, index_type)));
+    greater_or_equal_to(str.length(), from_integer(2, index_type)));
   constraints.existential.push_back(contains_digit);
 
   // |str| <= max_size
@@ -378,7 +379,7 @@ string_constraintst add_axioms_for_correct_number_format(
   {
     /// index < length => is_digit_with_radix(str[index], radix)
     const implies_exprt character_at_index_is_digit(
-      length_ge(str, from_integer(index + 1, index_type)),
+      greater_or_equal_to(str.length(), from_integer(index + 1, index_type)),
       is_digit_with_radix(
         str[index], strict_formatting, radix_as_char, radix_ul));
     constraints.existential.push_back(character_at_index_is_digit);
