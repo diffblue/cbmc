@@ -78,9 +78,8 @@ private:
   // Add axioms corresponding to the String.hashCode java function
   // The specification is partial: the actual value is not actually computed
   // but we ensure that hash codes of equal strings are equal.
-  std::pair<exprt, string_constraintst> add_axioms_for_hash_code(
-    const function_application_exprt &f,
-    array_poolt &pool);
+  std::pair<exprt, string_constraintst>
+  add_axioms_for_hash_code(const function_application_exprt &f);
 
   // MEMBERS
   const messaget message;

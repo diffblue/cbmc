@@ -241,7 +241,7 @@ string_constraint_generatort::add_axioms_for_function_application(
   else if(id == ID_cprover_string_contains_func)
     return add_axioms_for_contains(fresh_symbol, expr, array_pool);
   else if(id == ID_cprover_string_hash_code_func)
-    return add_axioms_for_hash_code(expr, array_pool);
+    return add_axioms_for_hash_code(expr);
   else if(id == ID_cprover_string_index_of_func)
     return add_axioms_for_index_of(fresh_symbol, expr, array_pool);
   else if(id == ID_cprover_string_last_index_of_func)
