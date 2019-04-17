@@ -126,24 +126,13 @@ exprt sum_over_map(std::map<exprt, int> &m, const typet &type, bool negated)
         break;
 
       default:
-        if(factor > 1)
-        {
-          if(sum.is_nil())
-            sum = t;
-          else
-            sum = plus_exprt(sum, t);
-          for(int i = 1; i < factor; i++)
-            sum = plus_exprt(sum, t);
-        }
-        else if(factor < -1)
-        {
-          if(sum.is_nil())
-            sum = unary_minus_exprt(t);
-          else
-            sum = minus_exprt(sum, t);
-          for(int i = -1; i > factor; i--)
-            sum = minus_exprt(sum, t);
-        }
+      {
+        const mult_exprt to_add{t, from_integer(factor, t.type())};
+        if(sum.is_nil())
+          sum = to_add;
+        else
+          sum = plus_exprt(sum, to_add);
+      }
       }
     }
   }
