@@ -851,7 +851,6 @@ bool jbmc_parse_optionst::show_loaded_functions(
     show_goto_functions(
       ns,
       ui_message_handler,
-      ui_message_handler.get_ui(),
       goto_model.get_goto_functions(),
       cmdline.isset("list-goto-functions"));
     return true;

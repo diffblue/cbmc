@@ -25,12 +25,12 @@ Author: Peter Schrammel
 
 void show_goto_functions(
   const namespacet &ns,
-  message_handlert &message_handler,
-  ui_message_handlert::uit ui,
+  ui_message_handlert &ui_message_handler,
   const goto_functionst &goto_functions,
   bool list_only)
 {
-  messaget msg(message_handler);
+  ui_message_handlert::uit ui = ui_message_handler.get_ui();
+  messaget msg(ui_message_handler);
   switch(ui)
   {
   case ui_message_handlert::uit::XML_UI:
@@ -82,11 +82,10 @@ void show_goto_functions(
 
 void show_goto_functions(
   const goto_modelt &goto_model,
-  message_handlert &message_handler,
-  ui_message_handlert::uit ui,
+  ui_message_handlert &ui_message_handler,
   bool list_only)
 {
   const namespacet ns(goto_model.symbol_table);
   show_goto_functions(
-    ns, message_handler, ui, goto_model.goto_functions, list_only);
+    ns, ui_message_handler, goto_model.goto_functions, list_only);
 }

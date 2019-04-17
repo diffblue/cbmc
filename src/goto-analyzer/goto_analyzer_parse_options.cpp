@@ -424,10 +424,7 @@ int goto_analyzer_parse_optionst::doit()
     cmdline.isset("list-goto-functions"))
   {
     show_goto_functions(
-      goto_model,
-      ui_message_handler,
-      ui_message_handler.get_ui(),
-      cmdline.isset("list-goto-functions"));
+      goto_model, ui_message_handler, cmdline.isset("list-goto-functions"));
     return CPROVER_EXIT_SUCCESS;
   }
 
