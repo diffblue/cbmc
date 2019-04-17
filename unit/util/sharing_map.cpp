@@ -156,6 +156,10 @@ TEST_CASE("Sharing map interface", "[core][util]")
     REQUIRE(sm.has_key("i"));
     REQUIRE(sm.has_key("j"));
     REQUIRE(!sm.has_key("k"));
+
+    cbmc_invariants_should_throwt invariants_throw;
+
+    REQUIRE_THROWS(sm.insert("i", "4"));
   }
 
   SECTION("Replace and update elements")
@@ -172,17 +176,36 @@ TEST_CASE("Sharing map interface", "[core][util]")
     auto r2 = sm.find("i");
     REQUIRE(r2);
     REQUIRE(r2->get() == "90");
+  }
 
+  SECTION("Replace and update elements errors")
+  {
+    sharing_map_standardt sm;
+    fill(sm);
+
+    sharing_map_error_checkt debug_sm;
+    fill(debug_sm);
+
+    cbmc_invariants_should_throwt invariants_throw;
+
+    SECTION("Replace non-existing")
     {
-      cbmc_invariants_should_throwt invariants_throw;
-      sharing_map_error_checkt debug_sm;
-      fill(debug_sm);
-      REQUIRE_NOTHROW(
-        debug_sm.update("i", [](std::string &str) { str += "1"; }));
-      REQUIRE_THROWS(debug_sm.update("i", [](std::string &str) {}));
+      REQUIRE_THROWS(sm.replace("x", "0"));
+    }
 
-      REQUIRE_NOTHROW(debug_sm.replace("i", "abc"));
-      REQUIRE_THROWS(debug_sm.replace("i", "abc"));
+    SECTION("Update non-existing")
+    {
+      REQUIRE_THROWS(sm.update("x", [](std::string &str) {}));
+    }
+
+    SECTION("Replace with equal")
+    {
+      REQUIRE_THROWS(debug_sm.replace("i", "0"));
+    }
+
+    SECTION("Update with equal")
+    {
+      REQUIRE_THROWS(debug_sm.update("i", [](std::string &str) {}));
     }
   }
 
@@ -246,6 +269,10 @@ TEST_CASE("Sharing map interface", "[core][util]")
 
     sm3.erase("i");
     REQUIRE(!sm3.has_key("i"));
+
+    cbmc_invariants_should_throwt invariants_throw;
+
+    REQUIRE_THROWS(sm3.erase("x"));
   }
 }
 
@@ -620,36 +647,4 @@ TEST_CASE("Sharing map sharing stats", "[core][util]")
     REQUIRE(sms.num_unique_leafs == 3);
   }
 #endif
-}
-
-TEST_CASE("Sharing map replace non-existing", "[.]")
-{
-  sharing_map_standardt sm;
-  fill(sm);
-
-  sm.replace("x", "0");
-}
-
-TEST_CASE("Sharing map replace with equal value", "[.]")
-{
-  sharing_map_error_checkt sm;
-
-  sm.insert("i", "0");
-  sm.replace("i", "0");
-}
-
-TEST_CASE("Sharing map insert existing", "[.]")
-{
-  sharing_map_standardt sm;
-  fill(sm);
-
-  sm.insert("i", "4");
-}
-
-TEST_CASE("Sharing map erase non-existing", "[.]")
-{
-  sharing_map_standardt sm;
-  fill(sm);
-
-  sm.erase("x");
 }
