@@ -27,19 +27,19 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 /// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with arguments refined_string `s1` and
 ///   refined_string `s2`
-/// \param pool: pool of arrays representing strings
+/// \param array_pool: pool of arrays representing strings
 /// \return Boolean expression `eq`
 std::pair<exprt, string_constraintst> add_axioms_for_equals(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
-  array_poolt &pool)
+  array_poolt &array_pool)
 {
   PRECONDITION(f.type() == bool_typet() || f.type().id() == ID_c_bool);
   PRECONDITION(f.arguments().size() == 2);
 
   string_constraintst constraints;
-  array_string_exprt s1 = get_string_expr(pool, f.arguments()[0]);
-  array_string_exprt s2 = get_string_expr(pool, f.arguments()[1]);
+  array_string_exprt s1 = get_string_expr(array_pool, f.arguments()[0]);
+  array_string_exprt s2 = get_string_expr(array_pool, f.arguments()[1]);
   symbol_exprt eq = fresh_symbol("equal");
   typecast_exprt tc_eq(eq, f.type());
 
@@ -128,19 +128,19 @@ static exprt character_equals_ignore_case(
 /// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with arguments refined_string `s1` and
 ///   refined_string `s2`
-/// \param pool: pool of arrays representing strings
+/// \param array_pool: pool of arrays representing strings
 /// \return Boolean expression `eq`
 std::pair<exprt, string_constraintst> add_axioms_for_equals_ignore_case(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
-  array_poolt &pool)
+  array_poolt &array_pool)
 {
   PRECONDITION(f.type() == bool_typet() || f.type().id() == ID_c_bool);
   PRECONDITION(f.arguments().size() == 2);
   string_constraintst constraints;
   const symbol_exprt eq = fresh_symbol("equal_ignore_case");
-  const array_string_exprt s1 = get_string_expr(pool, f.arguments()[0]);
-  const array_string_exprt s2 = get_string_expr(pool, f.arguments()[1]);
+  const array_string_exprt s1 = get_string_expr(array_pool, f.arguments()[0]);
+  const array_string_exprt s2 = get_string_expr(array_pool, f.arguments()[1]);
   const typet char_type = s1.content().type().subtype();
   const exprt char_a = from_integer('a', char_type);
   const exprt char_A = from_integer('A', char_type);
@@ -233,19 +233,19 @@ string_constraint_generatort::add_axioms_for_hash_code(
 /// \param fresh_symbol: generator of fresh symbols
 /// \param f: function application with arguments refined_string `s1` and
 ///   refined_string `s2`
-/// \param pool: pool of arrays representing strings
+/// \param array_pool: pool of arrays representing strings
 /// \return integer expression `res`
 std::pair<exprt, string_constraintst> add_axioms_for_compare_to(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
-  array_poolt &pool)
+  array_poolt &array_pool)
 {
   PRECONDITION(f.arguments().size() == 2);
   const typet &return_type = f.type();
   PRECONDITION(return_type.id() == ID_signedbv);
   string_constraintst constraints;
-  const array_string_exprt &s1 = get_string_expr(pool, f.arguments()[0]);
-  const array_string_exprt &s2 = get_string_expr(pool, f.arguments()[1]);
+  const array_string_exprt &s1 = get_string_expr(array_pool, f.arguments()[0]);
+  const array_string_exprt &s2 = get_string_expr(array_pool, f.arguments()[1]);
   const symbol_exprt res = fresh_symbol("compare_to", return_type);
   const typet &index_type = s1.length().type();
 

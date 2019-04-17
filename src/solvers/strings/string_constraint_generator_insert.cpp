@@ -100,18 +100,18 @@ exprt length_constraint_for_insert(
 /// \param f: function application with arguments integer `|res|`, character
 ///   pointer `&res[0]`, refined_string `s1`, refined_string`s2`, integer
 ///   `offset`, optional integer `start` and optional integer `end`
-/// \param pool: pool of arrays representing strings
+/// \param array_pool: pool of arrays representing strings
 /// \return an integer expression which is different from zero if there is an
 ///   exception to signal
 std::pair<exprt, string_constraintst> add_axioms_for_insert(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
-  array_poolt &pool)
+  array_poolt &array_pool)
 {
   PRECONDITION(f.arguments().size() == 5 || f.arguments().size() == 7);
-  array_string_exprt s1 = get_string_expr(pool, f.arguments()[2]);
-  array_string_exprt s2 = get_string_expr(pool, f.arguments()[4]);
-  array_string_exprt res = pool.find(f.arguments()[1], f.arguments()[0]);
+  array_string_exprt s1 = get_string_expr(array_pool, f.arguments()[2]);
+  array_string_exprt s2 = get_string_expr(array_pool, f.arguments()[4]);
+  array_string_exprt res = array_pool.find(f.arguments()[1], f.arguments()[0]);
   const exprt &offset = f.arguments()[3];
   if(f.arguments().size() == 7)
   {
@@ -120,7 +120,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_insert(
     const typet &char_type = s1.content().type().subtype();
     const typet &index_type = s1.length().type();
     const array_string_exprt substring =
-      pool.fresh_string(index_type, char_type);
+      array_pool.fresh_string(index_type, char_type);
     return combine_results(
       add_axioms_for_substring(fresh_symbol, substring, s2, start, end),
       add_axioms_for_insert(fresh_symbol, res, s1, substring, offset));
