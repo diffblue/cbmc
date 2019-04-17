@@ -96,7 +96,7 @@ exprt letifyt::substitute_let(const exprt &expr, const seen_expressionst &map)
 
   for(auto &op : tmp.operands())
   {
-    op.visit([&map](exprt &expr) {
+    op.visit_pre([&map](exprt &expr) {
       seen_expressionst::const_iterator it = map.find(expr);
 
       // replace subexpression by let symbol if used more than once

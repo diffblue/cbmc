@@ -26,15 +26,12 @@ void find_symbols(
   bool current,
   bool next)
 {
-  if(src.id() == ID_symbol && current)
-    dest.insert(to_symbol_expr(src).get_identifier());
-  else if(src.id() == ID_next_symbol && next)
-    dest.insert(src.get(ID_identifier));
-  else
-  {
-    forall_operands(it, src)
-      find_symbols(*it, dest, current, next);
-  }
+  src.visit_pre([&dest, current, next](const exprt &e) {
+    if(e.id() == ID_symbol && current)
+      dest.insert(to_symbol_expr(e).get_identifier());
+    else if(e.id() == ID_next_symbol && next)
+      dest.insert(e.get(ID_identifier));
+  });
 }
 
 bool has_symbol(
@@ -68,26 +65,20 @@ void find_symbols(
   const exprt &src,
   std::set<exprt> &dest)
 {
-  if(src.id()==ID_symbol || src.id()==ID_next_symbol)
-    dest.insert(src);
-  else
-  {
-    forall_operands(it, src)
-      find_symbols(*it, dest);
-  }
+  src.visit_pre([&dest](const exprt &e) {
+    if(e.id() == ID_symbol || e.id() == ID_next_symbol)
+      dest.insert(e);
+  });
 }
 
 void find_symbols(
   const exprt &src,
   std::set<symbol_exprt> &dest)
 {
-  if(src.id()==ID_symbol)
-    dest.insert(to_symbol_expr(src));
-  else
-  {
-    forall_operands(it, src)
-      find_symbols(*it, dest);
-  }
+  src.visit_pre([&dest](const exprt &e) {
+    if(e.id() == ID_symbol)
+      dest.insert(to_symbol_expr(e));
+  });
 }
 
 void find_symbols(kindt kind, const typet &src, find_symbols_sett &dest);
