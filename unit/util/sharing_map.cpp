@@ -439,6 +439,98 @@ TEST_CASE("Sharing map views and iteration", "[core][util]")
   }
 }
 
+TEST_CASE("Sharing map view validity", "[core][util]")
+{
+  SECTION("View validity")
+  {
+    sharing_map_standardt sm;
+    sharing_map_standardt::viewt view;
+
+    fill(sm);
+    fill2(sm);
+
+    sharing_map_standardt sm2(sm);
+    sm2.replace("l", "8");
+
+    sm.get_view(view);
+
+    std::size_t i_idx = 0;
+    std::size_t k_idx = 0;
+
+    for(std::size_t i = 0; i < view.size(); i++)
+    {
+      if(view[i].first == "i")
+        i_idx = i;
+
+      if(view[i].first == "k")
+        k_idx = i;
+    }
+
+    sm.erase("i");
+    sm.replace("k", "7");
+    sm.insert("o", "6");
+
+    for(std::size_t i = 0; i < view.size(); i++)
+    {
+      if(i == i_idx || i == k_idx)
+        continue;
+
+      auto &p = view[i];
+
+      REQUIRE(&p.second == &sm.find(p.first)->get());
+    }
+  }
+
+  SECTION("Delta view validity")
+  {
+    sharing_map_standardt sm;
+
+    sharing_map_standardt::delta_viewt delta_view;
+
+    fill(sm);
+    fill2(sm);
+
+    sharing_map_standardt sm2(sm);
+
+    sm2.erase("i");
+    sm2.erase("j");
+    sm2.erase("k");
+
+    sm2.erase("m");
+    sm2.erase("n");
+
+    sm.get_delta_view(sm2, delta_view, false);
+
+    REQUIRE(delta_view.size() == 5);
+
+    std::size_t i_idx = 0;
+    std::size_t k_idx = 0;
+
+    for(std::size_t i = 0; i < delta_view.size(); i++)
+    {
+      if(delta_view[i].k == "i")
+        i_idx = i;
+
+      if(delta_view[i].k == "k")
+        k_idx = i;
+    }
+
+    sm.erase("i");
+    sm.replace("k", "7");
+    sm.insert("o", "6");
+
+    for(std::size_t i = 0; i < delta_view.size(); i++)
+    {
+      if(i == i_idx || i == k_idx)
+        continue;
+
+      auto &delta_item = delta_view[i];
+
+      REQUIRE(&delta_item.m == &sm.find(delta_item.k)->get());
+    }
+  }
+}
+
 TEST_CASE("Sharing map sharing stats", "[core][util]")
 {
 #if !defined(_MSC_VER)
