@@ -14,10 +14,8 @@ Author: Jesse Sigal, jesse.sigal@diffblue.com
 #include <unordered_set>
 #include <util/expr_iterator.h>
 
-/// look for the symbol and return true if it is found
-/// \param index: an index expression
-/// \param qvar: a symbol expression
-/// \return a Boolean
+/// Look for symbol \p qvar in the expression \p index and return true if found
+/// \return True, iff \p qvar appears in \p index.
 static bool contains(const exprt &index, const symbol_exprt &qvar)
 {
   return std::find(index.depth_begin(), index.depth_end(), qvar) !=
