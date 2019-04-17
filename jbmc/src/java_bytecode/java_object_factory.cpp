@@ -8,6 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "java_object_factory.h"
 
+#include <util/array_element_from_pointer.h>
 #include <util/expr_initializer.h>
 #include <util/nondet.h>
 #include <util/nondet_bool.h>
@@ -1200,10 +1201,10 @@ void java_object_factoryt::array_loop_init_code(
     assignments.add(std::move(max_test));
   }
 
-  const dereference_exprt arraycellref{
-    plus_exprt{array_init_symexpr, counter_expr}};
+  const dereference_exprt element_at_counter =
+    array_element_from_pointer(array_init_symexpr, counter_expr);
 
-  bool new_item_is_primitive = arraycellref.type().id() != ID_pointer;
+  bool new_item_is_primitive = element_at_counter.type().id() != ID_pointer;
 
   // Use a temporary to initialise a new, or update an existing, non-primitive.
   // This makes it clearer that in a sequence like
@@ -1213,17 +1214,17 @@ void java_object_factoryt::array_loop_init_code(
   exprt init_expr;
   if(new_item_is_primitive)
   {
-    init_expr = arraycellref;
+    init_expr = element_at_counter;
   }
   else
   {
     init_expr = allocate_objects.allocate_automatic_local_object(
-      arraycellref.type(), "new_array_item");
+      element_at_counter.type(), "new_array_item");
 
     // If we're updating an existing array item, read the existing object that
     // we (may) alter:
     if(update_in_place != update_in_placet::NO_UPDATE_IN_PLACE)
-      assignments.add(code_assignt(init_expr, arraycellref));
+      assignments.add(code_assignt(init_expr, element_at_counter));
   }
 
   // MUST_UPDATE_IN_PLACE only applies to this object.
@@ -1249,7 +1250,7 @@ void java_object_factoryt::array_loop_init_code(
   {
     // We used a temporary variable to update or initialise an array item;
     // now write it into the array:
-    assignments.add(code_assignt(arraycellref, init_expr));
+    assignments.add(code_assignt(element_at_counter, init_expr));
   }
 
   exprt java_one=from_integer(1, java_int_type());
@@ -1389,11 +1390,9 @@ bool java_object_factoryt::gen_nondet_enum_init(
     allocate_objects,
     assignments);
 
-  // Generate statement using pointer arithmetic to access array element:
-  // expr = (expr.type())*(enum_array_expr + index_expr);
-  plus_exprt plus(enum_array_expr, index_expr);
-  const dereference_exprt arraycellref(plus);
-  code_assignt enum_assign(expr, typecast_exprt(arraycellref, expr.type()));
+  const dereference_exprt element_at_index =
+    array_element_from_pointer(enum_array_expr, index_expr);
+  code_assignt enum_assign(expr, typecast_exprt(element_at_index, expr.type()));
   assignments.add(enum_assign);
 
   return true;
