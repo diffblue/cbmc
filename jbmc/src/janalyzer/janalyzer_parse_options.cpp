@@ -634,7 +634,7 @@ bool janalyzer_parse_optionst::process_goto_program(const optionst &options)
     goto_partial_inline(goto_model, ui_message_handler);
 
     // remove returns, gcc vectors, complex
-    remove_returns(goto_model);
+    remove_returns(log.get_message_handler(), goto_model);
     remove_vector(goto_model);
     remove_complex(goto_model);
 

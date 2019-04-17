@@ -764,7 +764,7 @@ void jbmc_parse_optionst::process_goto_function(
            !model.can_produce_function(id);
   };
 
-  remove_returns(function, function_is_stub);
+  remove_returns(log.get_message_handler(), function, function_is_stub);
 
   replace_java_nondet(function);
 
