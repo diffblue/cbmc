@@ -23,6 +23,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/make_unique.h>
 #include <util/unicode.h>
 #include <util/version.h>
+#include <util/xml.h>
 
 #include <langapi/language.h>
 
@@ -83,7 +84,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "xml_interface.h"
 
 cbmc_parse_optionst::cbmc_parse_optionst(int argc, const char **argv)
-  : parse_options_baset(CBMC_OPTIONS, argc, argv, ui_message_handler),
+  : parse_options_baset(cbmc_options.to_option_string(), argc, argv, ui_message_handler),
     xml_interfacet(cmdline),
     ui_message_handler(cmdline, std::string("CBMC ") + CBMC_VERSION)
 {
@@ -92,9 +93,9 @@ cbmc_parse_optionst::cbmc_parse_optionst(int argc, const char **argv)
 ::cbmc_parse_optionst::cbmc_parse_optionst(
   int argc,
   const char **argv,
-  const std::string &extra_options)
+  const cmdline_definitiont &extra_options)
   : parse_options_baset(
-      CBMC_OPTIONS + extra_options,
+      (cbmc_options + extra_options).to_option_string(),
       argc,
       argv,
       ui_message_handler),
@@ -921,121 +922,35 @@ bool cbmc_parse_optionst::process_goto_program(
 /// display command line help
 void cbmc_parse_optionst::help()
 {
-  // clang-format off
-  std::cout << '\n' << banner_string("CBMC", CBMC_VERSION) << '\n'
-            << align_center_with_border("Copyright (C) 2001-2018") << '\n'
-            << align_center_with_border("Daniel Kroening, Edmund Clarke") << '\n' // NOLINT(*)
-            << align_center_with_border("Carnegie Mellon University, Computer Science Department") << '\n' // NOLINT(*)
-            << align_center_with_border("kroening@kroening.com") << '\n' // NOLINT(*)
-            << align_center_with_border("Protected in part by U.S. patent 7,225,417") << '\n' // NOLINT(*)
-            <<
-    "\n"
-    "Usage:                       Purpose:\n"
-    "\n"
-    " cbmc [-?] [-h] [--help]      show help\n"
-    " cbmc file.c ...              source file names\n"
-    "\n"
-    "Analysis options:\n"
-    HELP_SHOW_PROPERTIES
-    " --symex-coverage-report f    generate a Cobertura XML coverage report in f\n" // NOLINT(*)
-    " --property id                only check one specific property\n"
-    " --stop-on-fail               stop analysis once a failed property is detected\n" // NOLINT(*)
-    " --trace                      give a counterexample trace for failed properties\n" //NOLINT(*)
-    "\n"
-    "C/C++ frontend options:\n"
-    " -I path                      set include path (C/C++)\n"
-    " -D macro                     define preprocessor macro (C/C++)\n"
-    " --preprocess                 stop after preprocessing\n"
-    " --16, --32, --64             set width of int\n"
-    " --LP64, --ILP64, --LLP64,\n"
-    "   --ILP32, --LP32            set width of int, long and pointers\n"
-    " --little-endian              allow little-endian word-byte conversions\n"
-    " --big-endian                 allow big-endian word-byte conversions\n"
-    " --unsigned-char              make \"char\" unsigned by default\n"
-    " --mm model                   set memory model (default: sc)\n"
-    " --arch                       set architecture (default: "
-                                   << configt::this_architecture() << ")\n"
-    " --os                         set operating system (default: "
-                                   << configt::this_operating_system() << ")\n"
-    " --c89/99/11                  set C language standard (default: "
-                                   << (configt::ansi_ct::default_c_standard()==
-                                       configt::ansi_ct::c_standardt::C89?"c89":
-                                       configt::ansi_ct::default_c_standard()==
-                                       configt::ansi_ct::c_standardt::C99?"c99":
-                                       configt::ansi_ct::default_c_standard()==
-                                       configt::ansi_ct::c_standardt::C11?"c11":"") << ")\n" // NOLINT(*)
-    " --cpp98/03/11                set C++ language standard (default: "
-                                   << (configt::cppt::default_cpp_standard()==
-                                       configt::cppt::cpp_standardt::CPP98?"cpp98": // NOLINT(*)
-                                       configt::cppt::default_cpp_standard()==
-                                       configt::cppt::cpp_standardt::CPP03?"cpp03": // NOLINT(*)
-                                       configt::cppt::default_cpp_standard()==
-                                       configt::cppt::cpp_standardt::CPP11?"cpp11":"") << ")\n" // NOLINT(*)
-    #ifdef _WIN32
-    " --gcc                        use GCC as preprocessor\n"
-    #endif
-    " --no-arch                    don't set up an architecture\n"
-    " --no-library                 disable built-in abstract C library\n"
-    " --round-to-nearest           rounding towards nearest even (default)\n"
-    " --round-to-plus-inf          rounding towards plus infinity\n"
-    " --round-to-minus-inf         rounding towards minus infinity\n"
-    " --round-to-zero              rounding towards zero\n"
-    HELP_ANSI_C_LANGUAGE
-    HELP_FUNCTIONS
-    "\n"
-    "Program representations:\n"
-    " --show-parse-tree            show parse tree\n"
-    " --show-symbol-table          show loaded symbol table\n"
-    HELP_SHOW_GOTO_FUNCTIONS
-    "\n"
-    "Program instrumentation options:\n"
-    HELP_GOTO_CHECK
-    " --no-assertions              ignore user assertions\n"
-    " --no-assumptions             ignore user assumptions\n"
-    " --error-label label          check that label is unreachable\n"
-    " --cover CC                   create test-suite with coverage criterion CC\n" // NOLINT(*)
-    " --mm MM                      memory consistency model for concurrent programs\n" // NOLINT(*)
-    HELP_REACHABILITY_SLICER
-    HELP_REACHABILITY_SLICER_FB
-    " --full-slice                 run full slicer (experimental)\n" // NOLINT(*)
-    " --drop-unused-functions      drop functions trivially unreachable from main function\n" // NOLINT(*)
-    "\n"
-    "Semantic transformations:\n"
-    // NOLINTNEXTLINE(whitespace/line_length)
-    " --nondet-static              add nondeterministic initialization of variables with static lifetime\n"
-    "\n"
-    "BMC options:\n"
-    HELP_BMC
-    "\n"
-    "Backend options:\n"
-    " --object-bits n              number of bits used for object addresses\n"
-    " --dimacs                     generate CNF in DIMACS format\n"
-    " --beautify                   beautify the counterexample (greedy heuristic)\n" // NOLINT(*)
-    " --localize-faults            localize faults (experimental)\n"
-    " --smt2                       use default SMT2 solver (Z3)\n"
-    " --boolector                  use Boolector\n"
-    " --cprover-smt2               use CPROVER SMT2 solver\n"
-    " --cvc4                       use CVC4\n"
-    " --mathsat                    use MathSAT\n"
-    " --yices                      use Yices\n"
-    " --z3                         use Z3\n"
-    " --refine                     use refinement procedure (experimental)\n"
-    HELP_STRING_REFINEMENT_CBMC
-    " --outfile filename           output formula to given file\n"
-    " --arrays-uf-never            never turn arrays into uninterpreted functions\n" // NOLINT(*)
-    " --arrays-uf-always           always turn arrays into uninterpreted functions\n" // NOLINT(*)
-    "\n"
-    "Other options:\n"
-    " --version                    show version and exit\n"
-    " --xml-ui                     use XML-formatted output\n"
-    " --xml-interface              bi-directional XML interface\n"
-    " --json-ui                    use JSON-formatted output\n"
-    // NOLINTNEXTLINE(whitespace/line_length)
-    HELP_VALIDATE
-    HELP_GOTO_TRACE
-    HELP_FLUSH
-    " --verbosity #                verbosity level\n"
-    HELP_TIMESTAMP
-    "\n";
-  // clang-format on
+  switch(ui_message_handler.get_ui())
+  {
+    case ui_message_handlert::uit::PLAIN:
+    // clang-format off
+    log.result()
+      << '\n' << banner_string("CBMC", CBMC_VERSION) << '\n'
+      << align_center_with_border("Copyright (C) 2001-2018") << '\n'
+      << align_center_with_border("Daniel Kroening, Edmund Clarke")
+      << '\n' // NOLINT(*)
+      << align_center_with_border(
+        "Carnegie Mellon University, Computer Science Department")
+      << '\n' // NOLINT(*)
+      << align_center_with_border("kroening@kroening.com") << '\n' // NOLINT(*)
+      << align_center_with_border("Protected in part by U.S. patent 7,225,417")
+      << '\n' // NOLINT(*)
+      <<
+      "\n"
+      "Usage:                       Purpose:\n"
+      "\n"
+      " cbmc [-?] [-h] [--help]      show help\n"
+      " cbmc file.c ...              source file names\n"
+      << cbmc_options.to_help_text(30, 80) << messaget::eom;
+    // clang-format on
+    break;
+    case ui_message_handlert::uit::JSON_UI:
+      ui_message_handler.get_json_stream().push_back(cbmc_options.to_json());
+      break;
+    case ui_message_handlert::uit::XML_UI:
+      log.result() << cbmc_options.to_xml();
+      break;
+  }
 }
