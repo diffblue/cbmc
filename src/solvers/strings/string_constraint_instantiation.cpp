@@ -50,20 +50,24 @@ find_indexes(const exprt &expr, const exprt &str, const symbol_exprt &qvar)
   return result;
 }
 
-std::map<exprt, int> map_representation_of_sum(const exprt &f)
+linear_functiont::linear_functiont(const exprt &f)
 {
-  // number of times the leaf should be added (can be negative)
-  std::map<exprt, int> elems;
-
+  type = f.type();
+  // list of expressions to process with a boolean flag telling whether they
+  // appear positively or negatively (true is for positive)
   std::list<std::pair<exprt, bool>> to_process;
   to_process.emplace_back(f, true);
 
   while(!to_process.empty())
   {
-    exprt cur = to_process.back().first;
+    const exprt cur = to_process.back().first;
     bool positive = to_process.back().second;
     to_process.pop_back();
-    if(cur.id() == ID_plus)
+    if(auto integer = numeric_cast<mp_integer>(cur))
+    {
+      constant_coefficient += positive ? integer.value() : -integer.value();
+    }
+    else if(cur.id() == ID_plus)
     {
       for(const auto &op : cur.operands())
         to_process.emplace_back(op, positive);
@@ -80,68 +84,48 @@ std::map<exprt, int> map_representation_of_sum(const exprt &f)
     else
     {
       if(positive)
-        ++elems[cur];
+        ++coefficients[cur];
       else
-        --elems[cur];
+        --coefficients[cur];
     }
   }
-  return elems;
 }
 
-exprt sum_over_map(std::map<exprt, int> &m, const typet &type, bool negated)
+exprt linear_functiont::to_expr(bool negated) const
 {
-  if(m.empty())
-    return from_integer(0, type);
+  exprt sum = nil_exprt{};
+  const exprt constant_expr = from_integer(constant_coefficient, type);
+  if(constant_coefficient != 0)
+    sum = negated ? (exprt)unary_minus_exprt{constant_expr} : constant_expr;
 
-  exprt sum = nil_exprt();
-  mp_integer constants = 0;
-  typet index_type = m.begin()->first.type();
-
-  for(const auto &term : m)
+  for(const auto &term : coefficients)
   {
     const exprt &t = term.first;
-    int factor = negated ? (-term.second) : term.second;
-    if(t.id() == ID_constant)
+    const mp_integer factor = negated ? (-term.second) : term.second;
+    if(factor == -1)
     {
-      // Constants are accumulated in the variable \c constants
-      const auto int_value = numeric_cast_v<mp_integer>(to_constant_expr(t));
-      constants += int_value * factor;
+      if(sum.is_nil())
+        sum = unary_minus_exprt(t);
+      else
+        sum = minus_exprt(sum, t);
     }
-    else
+    else if(factor == 1)
     {
-      switch(factor)
-      {
-      case -1:
-        if(sum.is_nil())
-          sum = unary_minus_exprt(t);
-        else
-          sum = minus_exprt(sum, t);
-        break;
-
-      case 1:
-        if(sum.is_nil())
-          sum = t;
-        else
-          sum = plus_exprt(sum, t);
-        break;
-
-      default:
-      {
-        const mult_exprt to_add{t, from_integer(factor, t.type())};
-        if(sum.is_nil())
-          sum = to_add;
-        else
-          sum = plus_exprt(sum, to_add);
-      }
-      }
+      if(sum.is_nil())
+        sum = t;
+      else
+        sum = plus_exprt(sum, t);
+    }
+    else if(factor != 0)
+    {
+      const mult_exprt to_add{t, from_integer(factor, t.type())};
+      if(sum.is_nil())
+        sum = to_add;
+      else
+        sum = plus_exprt(sum, to_add);
     }
   }
-
-  const exprt index_const = from_integer(constants, index_type);
-  if(sum.is_not_nil())
-    return plus_exprt(sum, index_const);
-  else
-    return index_const;
+  return sum.is_nil() ? from_integer(0, type) : sum;
 }
 
 /// \param qvar: a symbol representing a universally quantified variable
@@ -161,14 +145,14 @@ compute_inverse_function(const exprt &qvar, const exprt &val, const exprt &f)
   // qvar has to be equal to val - f(0) if it appears positively in f
   // (i.e. if f(qvar)=f(0) + qvar) and f(0) - val if it appears negatively
   // in f. So we start by computing val - f(0).
-  std::map<exprt, int> elems = map_representation_of_sum(minus_exprt(val, f));
+  linear_functiont linear_function{minus_exprt(val, f)};
 
-  // true if qvar appears negatively in f (positively in elems):
+  // true if qvar appears negatively in f (positively in linear_function):
   bool neg = false;
 
-  auto it = elems.find(qvar);
+  auto it = linear_function.coefficients.find(qvar);
   INVARIANT(
-    it != elems.end(),
+    it != linear_function.coefficients.end(),
     string_refinement_invariantt("a function must have an occurrence of qvar"));
   if(it->second == 1 || it->second == -1)
   {
@@ -184,8 +168,8 @@ compute_inverse_function(const exprt &qvar, const exprt &val, const exprt &f)
         " have one"));
   }
 
-  elems.erase(it);
-  return sum_over_map(elems, f.type(), neg);
+  linear_function.coefficients.erase(it);
+  return linear_function.to_expr(neg);
 }
 
 /// Instantiates a string constraint by substituting the quantifiers.

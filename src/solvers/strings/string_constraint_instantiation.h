@@ -35,21 +35,22 @@ std::vector<exprt> instantiate_not_contains(
   const std::unordered_map<string_not_contains_constraintt, symbol_exprt>
     &witnesses);
 
-/// \param f: an expression with only addition and subtraction
-/// \return a map where each leaf of the input is mapped to the number of times
-///   it is added. For instance, expression $x + x - y + 3 - 5$ would give the
-///   map x -> 2, y -> -1, 3 -> 1, 5 -> -1.
-std::map<exprt, int> map_representation_of_sum(const exprt &f);
+/// Canonical representation of linear function, for instance, expression
+/// $x + x - y + 5 - 3$ would given by \c constant_coefficient 2 and
+/// \p coefficients: x -> 2, y -> -1
+struct linear_functiont
+{
+  mp_integer constant_coefficient;
+  std::unordered_map<exprt, mp_integer, irep_hash> coefficients;
+  typet type;
 
-/// \param m: a map from expressions to integers
-/// \param type: type for the returned expression
-/// \param negated: optinal Boolean asking to negates the sum
-/// \return a expression for the sum of each element in the map a number of
-///   times given by the corresponding integer in the map. For a map x -> 2, y
-///   -> -1 would give an expression $x + x - y$.
-exprt sum_over_map(
-  std::map<exprt, int> &m,
-  const typet &type,
-  bool negated = false);
+  /// Put an expression \p f composed of additions and subtractions into
+  /// its cannonical representation
+  explicit linear_functiont(const exprt &f);
+
+  /// \param negated: optional Boolean asking to negate the function
+  /// \return an expression corresponding to the linear function
+  exprt to_expr(bool negated = false) const;
+};
 
 #endif // CPROVER_SOLVERS_REFINEMENT_STRING_CONSTRAINT_INSTANTIATION_H

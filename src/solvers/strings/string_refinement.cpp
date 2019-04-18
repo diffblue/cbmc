@@ -1462,8 +1462,7 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
 /// \return an equivalent expression in a canonical form
 exprt simplify_sum(const exprt &f)
 {
-  std::map<exprt, int> map = map_representation_of_sum(f);
-  return sum_over_map(map, f.type());
+  return linear_functiont{f}.to_expr();
 }
 
 /// Add to the index set all the indices that appear in the formulas and the
