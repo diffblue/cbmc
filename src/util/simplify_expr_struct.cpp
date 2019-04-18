@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "arith_tools.h"
 #include "byte_operators.h"
+#include "expr_util.h"
 #include "invariant.h"
 #include "namespace.h"
 #include "pointer_offset_size.h"
@@ -276,15 +277,7 @@ bool simplify_exprt::simplify_member(exprt &expr)
   }
   else if(op.id()==ID_if)
   {
-    const if_exprt &if_expr=to_if_expr(op);
-    exprt cond=if_expr.cond();
-
-    member_exprt member_false=to_member_expr(expr);
-    member_false.compound()=if_expr.false_case();
-
-    to_member_expr(expr).compound()=if_expr.true_case();
-
-    expr=if_exprt(cond, expr, member_false, expr.type());
+    expr = lift_if(expr, 0);
     simplify_rec(expr);
 
     return false;

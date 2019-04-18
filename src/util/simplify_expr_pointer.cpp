@@ -498,16 +498,11 @@ bool simplify_exprt::simplify_pointer_object(exprt &expr)
 
   if(op.id()==ID_if)
   {
-    const if_exprt &if_expr=to_if_expr(op);
-    exprt cond=if_expr.cond();
-
-    exprt p_o_false=expr;
-    p_o_false.op0()=if_expr.false_case();
-
-    expr.op0()=if_expr.true_case();
-
-    expr=if_exprt(cond, expr, p_o_false, expr.type());
-    simplify_rec(expr);
+    if_exprt if_expr = lift_if(expr, 0);
+    simplify_pointer_object(if_expr.true_case());
+    simplify_pointer_object(if_expr.false_case());
+    simplify_if(if_expr);
+    expr.swap(if_expr);
 
     return false;
   }

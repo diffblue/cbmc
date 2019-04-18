@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "simplify_expr_class.h"
 
 #include "arith_tools.h"
+#include "expr_util.h"
 #include "namespace.h"
 #include "pointer_offset_size.h"
 #include "replace_expr.h"
@@ -213,15 +214,7 @@ bool simplify_exprt::simplify_index(exprt &expr)
   }
   else if(array.id()==ID_if)
   {
-    const if_exprt &if_expr=to_if_expr(array);
-    exprt cond=if_expr.cond();
-
-    index_exprt idx_false=to_index_expr(expr);
-    idx_false.array()=if_expr.false_case();
-
-    to_index_expr(expr).array()=if_expr.true_case();
-
-    expr=if_exprt(cond, expr, idx_false, expr.type());
+    expr = lift_if(expr, 0);
     simplify_rec(expr);
 
     return false;
