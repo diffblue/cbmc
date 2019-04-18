@@ -4421,6 +4421,36 @@ public:
     operands().push_back(condition);
     operands().push_back(value);
   }
+
+  std::size_t get_n_cases() const
+  {
+    return operands().size() / 2;
+  }
+
+  const exprt &condition(std::size_t case_index) const
+  {
+    return operands().at(case_index * 2);
+  }
+
+  const exprt &value(std::size_t case_index) const
+  {
+    return operands().at((case_index * 2) + 1);
+  }
+
+  exprt &condition(std::size_t case_index)
+  {
+    return operands().at(case_index * 2);
+  }
+
+  exprt &value(std::size_t case_index)
+  {
+    return operands().at((case_index * 2) + 1);
+  }
+
+  bool is_exclusive() const
+  {
+    return get_bool(ID_exclusive);
+  }
 };
 
 template <>
