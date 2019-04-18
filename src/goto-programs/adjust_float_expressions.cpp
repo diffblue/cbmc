@@ -118,7 +118,7 @@ void adjust_float_expressions(exprt &expr, const exprt &rounding_mode)
                                 irep_idt());
 
       expr.operands().resize(3);
-      expr.op2()=rounding_mode;
+      to_ieee_float_op_expr(expr).rounding_mode() = rounding_mode;
     }
   }
 
@@ -138,7 +138,7 @@ void adjust_float_expressions(exprt &expr, const exprt &rounding_mode)
       // the representation.
       expr.id(ID_floatbv_typecast);
       expr.operands().resize(2);
-      expr.op1()=rounding_mode;
+      to_floatbv_typecast_expr(expr).rounding_mode() = rounding_mode;
     }
     else if(
       dest_type.id() == ID_floatbv &&
@@ -148,7 +148,7 @@ void adjust_float_expressions(exprt &expr, const exprt &rounding_mode)
       // casts from integer to float-type might round
       expr.id(ID_floatbv_typecast);
       expr.operands().resize(2);
-      expr.op1()=rounding_mode;
+      to_floatbv_typecast_expr(expr).rounding_mode() = rounding_mode;
     }
     else if(
       dest_type.id() == ID_floatbv &&
@@ -174,7 +174,7 @@ void adjust_float_expressions(exprt &expr, const exprt &rounding_mode)
        */
       expr.id(ID_floatbv_typecast);
       expr.operands().resize(2);
-      expr.op1()=
+      to_floatbv_typecast_expr(expr).rounding_mode() =
         from_integer(ieee_floatt::ROUND_TO_ZERO, rounding_mode.type());
     }
   }
