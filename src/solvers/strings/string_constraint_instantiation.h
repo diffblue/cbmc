@@ -54,6 +54,12 @@ struct linear_functiont
   /// \param negated: optional Boolean asking to negate the function
   /// \return an expression corresponding to the linear function
   exprt to_expr(bool negated = false) const;
+
+  /// Return an expression `y` such that `f(var <- y) = val`.
+  /// The coefficient of \p var in the linear function must be 1 or -1.
+  /// For instance, if `f` corresponds to the expression `q + x`, `solve(q,v,f)`
+  /// returns the expression `v - x`.
+  static exprt solve(linear_functiont f, const exprt &var, const exprt &val);
 };
 
 #endif // CPROVER_SOLVERS_REFINEMENT_STRING_CONSTRAINT_INSTANTIATION_H

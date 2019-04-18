@@ -136,48 +136,24 @@ exprt linear_functiont::to_expr(bool negated) const
   return sum.is_nil() ? from_integer(0, type) : sum;
 }
 
-/// \param qvar: a symbol representing a universally quantified variable
-/// \param val: an expression
-/// \param f: an expression containing `+` and `-`
-///   operations in which `qvar` should appear exactly once.
-/// \return an expression corresponding of $f^{-1}(val)$ where $f$ is seen as
-///   a function of $qvar$, i.e. the value that is necessary for `qvar` for `f`
-///   to be equal to `val`. For instance, if `f` corresponds to the expression
-///   $q + x$, `compute_inverse_function(q,v,f)` returns an expression
-///   for $v - x$.
-static exprt
-compute_inverse_function(const exprt &qvar, const exprt &val, const exprt &f)
+exprt linear_functiont::solve(
+  linear_functiont f,
+  const exprt &var,
+  const exprt &val)
 {
-  exprt positive, negative;
-  // number of times the element should be added (can be negative)
-  // qvar has to be equal to val - f(0) if it appears positively in f
-  // (i.e. if f(qvar)=f(0) + qvar) and f(0) - val if it appears negatively
-  // in f. So we start by computing val - f(0).
-  linear_functiont linear_function{minus_exprt(val, f)};
+  auto it = f.coefficients.find(var);
+  PRECONDITION(it != f.coefficients.end());
+  PRECONDITION(it->second == 1 || it->second == -1);
+  const bool positive = it->second == 1;
 
-  // true if qvar appears negatively in f (positively in linear_function):
-  bool neg = false;
+  // Transform `f` into `f(var <- 0)`
+  f.coefficients.erase(it);
+  // Transform `f(var <- 0)` into `f(var <- 0) - val`
+  f.add(linear_functiont{unary_minus_exprt{val}});
 
-  auto it = linear_function.coefficients.find(qvar);
-  INVARIANT(
-    it != linear_function.coefficients.end(),
-    string_refinement_invariantt("a function must have an occurrence of qvar"));
-  if(it->second == 1 || it->second == -1)
-  {
-    neg = (it->second == 1);
-  }
-  else
-  {
-    INVARIANT(
-      it->second == 0,
-      string_refinement_invariantt(
-        "a proper function must have exactly one "
-        "occurrence after reduction, or it cancelled out, and it does not"
-        " have one"));
-  }
-
-  linear_function.coefficients.erase(it);
-  return linear_function.to_expr(neg);
+  // If the coefficient of var is 1 then solution `val - f(var <- 0),
+  // otherwise `f(var <- 0) - val`
+  return f.to_expr(positive);
 }
 
 /// Instantiates a string constraint by substituting the quantifiers.
@@ -204,7 +180,7 @@ exprt instantiate(
   for(const auto &index : find_indexes(axiom.body, str, axiom.univ_var))
   {
     const exprt univ_var_value =
-      compute_inverse_function(axiom.univ_var, val, index);
+      linear_functiont::solve(linear_functiont{index}, axiom.univ_var, val);
     implies_exprt instance(
       and_exprt(
         binary_relation_exprt(axiom.univ_var, ID_ge, axiom.lower_bound),
