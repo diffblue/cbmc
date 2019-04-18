@@ -363,16 +363,20 @@ void goto_convertt::clean_expr(
         expr.operands().size() == 2,
         "side-effect assignment expressions must have two operands");
 
-      if(expr.op1().id()==ID_side_effect &&
-         to_side_effect_expr(expr.op1()).get_statement()==ID_function_call)
+      auto &side_effect_assign = to_side_effect_expr_assign(expr);
+
+      if(
+        side_effect_assign.rhs().id() == ID_side_effect &&
+        to_side_effect_expr(side_effect_assign.rhs()).get_statement() ==
+          ID_function_call)
       {
-        clean_expr(expr.op0(), dest, mode);
-        exprt lhs=expr.op0();
+        clean_expr(side_effect_assign.lhs(), dest, mode);
+        exprt lhs = side_effect_assign.lhs();
 
         // turn into code
         code_assignt assignment;
         assignment.lhs()=lhs;
-        assignment.rhs()=expr.op1();
+        assignment.rhs() = side_effect_assign.rhs();
         assignment.add_source_location()=expr.source_location();
         convert_assign(assignment, dest, mode);
 
@@ -423,7 +427,7 @@ void goto_convertt::clean_expr(
     // This is simply replaced by the literal
     DATA_INVARIANT(
       expr.operands().size() == 1, "ID_compound_literal has a single operand");
-    expr=expr.op0();
+    expr = to_unary_expr(expr).op();
   }
 }
 
@@ -439,8 +443,8 @@ void goto_convertt::clean_expr_address_of(
   {
     DATA_INVARIANT(
       expr.operands().size() == 1, "ID_compound_literal has a single operand");
-    clean_expr(expr.op0(), dest, mode);
-    expr = make_compound_literal(expr.op0(), dest, mode);
+    clean_expr(to_unary_expr(expr).op(), dest, mode);
+    expr = make_compound_literal(to_unary_expr(expr).op(), dest, mode);
   }
   else if(expr.id()==ID_string_constant)
   {

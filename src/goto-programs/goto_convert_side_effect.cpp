@@ -44,13 +44,14 @@ void goto_convertt::remove_assignment(
 
   if(statement==ID_assign)
   {
-    exprt new_lhs = skip_typecast(expr.op0());
+    auto &old_assignment = to_side_effect_expr_assign(expr);
+    exprt new_lhs = skip_typecast(old_assignment.lhs());
     exprt new_rhs =
-      typecast_exprt::conditional_cast(expr.op1(), new_lhs.type());
-    code_assignt assign(std::move(new_lhs), std::move(new_rhs));
-    assign.add_source_location() = expr.source_location();
+      typecast_exprt::conditional_cast(old_assignment.rhs(), new_lhs.type());
+    code_assignt new_assignment(std::move(new_lhs), std::move(new_rhs));
+    new_assignment.add_source_location() = expr.source_location();
 
-    convert_assign(assign, dest, mode);
+    convert_assign(new_assignment, dest, mode);
   }
   else if(statement==ID_assign_plus ||
           statement==ID_assign_minus ||
@@ -285,19 +286,14 @@ void goto_convertt::remove_post(
 }
 
 void goto_convertt::remove_function_call(
-  side_effect_exprt &expr,
+  side_effect_expr_function_callt &expr,
   goto_programt &dest,
   const irep_idt &mode,
   bool result_is_used)
 {
-  INVARIANT_WITH_DIAGNOSTICS(
-    expr.operands().size() == 2,
-    "function_call expects two operands",
-    expr.find_source_location());
-
   if(!result_is_used)
   {
-    code_function_callt call(expr.op0(), expr.op1().operands());
+    code_function_callt call(expr.function(), expr.arguments());
     call.add_source_location()=expr.source_location();
     convert_function_call(call, dest, mode);
     expr.make_nil();
@@ -305,18 +301,13 @@ void goto_convertt::remove_function_call(
   }
 
   // get name of function, if available
-
-  INVARIANT_WITH_DIAGNOSTICS(
-    expr.id() == ID_side_effect && expr.get(ID_statement) == ID_function_call,
-    "expects function call",
-    expr.find_source_location());
-
   std::string new_base_name = "return_value";
   irep_idt new_symbol_mode = mode;
 
-  if(expr.op0().id()==ID_symbol)
+  if(expr.function().id() == ID_symbol)
   {
-    const irep_idt &identifier = to_symbol_expr(expr.op0()).get_identifier();
+    const irep_idt &identifier =
+      to_symbol_expr(expr.function()).get_identifier();
     const symbolt &symbol = ns.lookup(identifier);
 
     new_base_name+='_';
@@ -341,7 +332,7 @@ void goto_convertt::remove_function_call(
   {
     goto_programt tmp_program2;
     code_function_callt call(
-      new_symbol.symbol_expr(), expr.op0(), expr.op1().operands());
+      new_symbol.symbol_expr(), expr.function(), expr.arguments());
     call.add_source_location()=new_symbol.location;
     convert_function_call(call, dest, mode);
   }
@@ -395,7 +386,7 @@ void goto_convertt::remove_cpp_delete(
 
   codet tmp(expr.get_statement());
   tmp.add_source_location()=expr.source_location();
-  tmp.copy_to_operands(expr.op0());
+  tmp.copy_to_operands(to_unary_expr(expr).op());
   tmp.set(ID_destructor, expr.find(ID_destructor));
 
   convert_cpp_delete(tmp, dest);
@@ -451,7 +442,8 @@ void goto_convertt::remove_temporary_object(
 
   if(expr.operands().size()==1)
   {
-    const code_assignt assignment(new_symbol.symbol_expr(), expr.op0());
+    const code_assignt assignment(
+      new_symbol.symbol_expr(), to_unary_expr(expr).op());
 
     convert(assignment, dest, mode);
   }
@@ -559,7 +551,8 @@ void goto_convertt::remove_side_effect(
   const irep_idt &statement=expr.get_statement();
 
   if(statement==ID_function_call)
-    remove_function_call(expr, dest, mode, result_is_used);
+    remove_function_call(
+      to_side_effect_expr_function_call(expr), dest, mode, result_is_used);
   else if(statement==ID_assign ||
           statement==ID_assign_plus ||
           statement==ID_assign_minus ||

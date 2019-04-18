@@ -165,9 +165,11 @@ void goto_inlinet::replace_return(
   {
     if(it->is_return())
     {
+      const auto &code_return = it->get_return();
+
       if(lhs.is_not_nil())
       {
-        if(it->code.operands().size()!=1)
+        if(!code_return.has_return_value())
         {
           warning().source_location=it->code.find_source_location();
           warning() << "return expects one operand!\n"
@@ -178,14 +180,16 @@ void goto_inlinet::replace_return(
         // a typecast may be necessary if the declared return type at the call
         // site differs from the defined return type
         it->code = code_assignt(
-          lhs, typecast_exprt::conditional_cast(it->code.op0(), lhs.type()));
+          lhs,
+          typecast_exprt::conditional_cast(
+            code_return.return_value(), lhs.type()));
         it->type=ASSIGN;
 
         it++;
       }
-      else if(!it->code.operands().empty())
+      else if(code_return.has_return_value())
       {
-        it->code=code_expressiont(it->code.op0());
+        it->code = code_expressiont(code_return.return_value());
         it->type=OTHER;
         it++;
       }

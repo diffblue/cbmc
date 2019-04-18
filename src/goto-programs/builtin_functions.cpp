@@ -567,10 +567,7 @@ void goto_convertt::cpp_new_initializer(
 exprt goto_convertt::get_array_argument(const exprt &src)
 {
   if(src.id()==ID_typecast)
-  {
-    assert(src.operands().size()==1);
-    return get_array_argument(src.op0());
-  }
+    return get_array_argument(to_typecast_expr(src).op());
 
   if(src.id()!=ID_address_of)
   {
@@ -579,25 +576,25 @@ exprt goto_convertt::get_array_argument(const exprt &src)
     throw 0;
   }
 
-  assert(src.operands().size()==1);
+  const auto &address_of_expr = to_address_of_expr(src);
 
-  if(src.op0().id()!=ID_index)
+  if(address_of_expr.object().id() != ID_index)
   {
     error().source_location=src.find_source_location();
     error() << "expected array-element as argument" << eom;
     throw 0;
   }
 
-  assert(src.op0().operands().size()==2);
+  const auto &index_expr = to_index_expr(address_of_expr.object());
 
-  if(src.op0().op0().type().id() != ID_array)
+  if(index_expr.array().type().id() != ID_array)
   {
     error().source_location=src.find_source_location();
     error() << "expected array as argument" << eom;
     throw 0;
   }
 
-  return src.op0().op0();
+  return index_expr.array();
 }
 
 void goto_convertt::do_array_op(
@@ -633,10 +630,12 @@ exprt make_va_list(const exprt &expr)
     return make_va_list(to_typecast_expr(expr).op());
 
   // if it's an address of an lvalue, we take that
-  if(expr.id()==ID_address_of &&
-     expr.operands().size()==1 &&
-     is_lvalue(expr.op0()))
-    return expr.op0();
+  if(expr.id() == ID_address_of)
+  {
+    const auto &address_of_expr = to_address_of_expr(expr);
+    if(is_lvalue(address_of_expr.object()))
+      return address_of_expr.object();
+  }
 
   return expr;
 }

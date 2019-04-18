@@ -119,7 +119,7 @@ protected:
     const irep_idt &mode,
     bool result_is_used);
   void remove_function_call(
-    side_effect_exprt &expr,
+    side_effect_expr_function_callt &expr,
     goto_programt &dest,
     const irep_idt &mode,
     bool result_is_used);
