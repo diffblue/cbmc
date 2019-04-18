@@ -92,7 +92,7 @@ void collect_decisions_rec(const exprt &src, std::set<exprt> &dest)
     }
     else if(src.id() == ID_not)
     {
-      collect_decisions_rec(src.op0(), dest);
+      collect_decisions_rec(to_not_expr(src).op(), dest);
     }
     else
     {

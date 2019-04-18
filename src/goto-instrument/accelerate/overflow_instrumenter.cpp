@@ -104,12 +104,12 @@ void overflow_instrumentert::overflow_expr(
 
   if(expr.id()==ID_typecast)
   {
-    if(expr.op0().id()==ID_constant)
-    {
-      return;
-    }
+    const auto &typecast_expr = to_typecast_expr(expr);
 
-    const typet &old_type = expr.op0().type();
+    if(typecast_expr.op().id() == ID_constant)
+      return;
+
+    const typet &old_type = typecast_expr.op().type();
     const std::size_t new_width = to_bitvector_type(expr.type()).get_width();
     const std::size_t old_width = to_bitvector_type(old_type).get_width();
 
@@ -124,13 +124,15 @@ void overflow_instrumentert::overflow_expr(
           return;
         }
 
-        cases.insert(
-          binary_relation_exprt(expr.op0(), ID_gt,
-            from_integer(power(2, new_width - 1) - 1, old_type)));
+        cases.insert(binary_relation_exprt(
+          typecast_expr.op(),
+          ID_gt,
+          from_integer(power(2, new_width - 1) - 1, old_type)));
 
-        cases.insert(
-            binary_relation_exprt(expr.op0(), ID_lt,
-              from_integer(-power(2, new_width - 1), old_type)));
+        cases.insert(binary_relation_exprt(
+          typecast_expr.op(),
+          ID_lt,
+          from_integer(-power(2, new_width - 1), old_type)));
       }
       else if(old_type.id()==ID_unsignedbv)
       {
@@ -141,9 +143,10 @@ void overflow_instrumentert::overflow_expr(
           return;
         }
 
-        cases.insert(
-            binary_relation_exprt(expr.op0(), ID_gt,
-              from_integer(power(2, new_width - 1) - 1, old_type)));
+        cases.insert(binary_relation_exprt(
+          typecast_expr.op(),
+          ID_gt,
+          from_integer(power(2, new_width - 1) - 1, old_type)));
       }
     }
     else if(type.id()==ID_unsignedbv)
@@ -151,15 +154,15 @@ void overflow_instrumentert::overflow_expr(
       if(old_type.id()==ID_signedbv)
       {
         // signed -> unsigned
-        cases.insert(
-            binary_relation_exprt(expr.op0(), ID_lt,
-              from_integer(0, old_type)));
+        cases.insert(binary_relation_exprt(
+          typecast_expr.op(), ID_lt, from_integer(0, old_type)));
         if(new_width < old_width - 1)
         {
           // Need to check for overflow as well as signedness.
-          cases.insert(
-              binary_relation_exprt(expr.op0(), ID_gt,
-                from_integer(power(2, new_width - 1) - 1, old_type)));
+          cases.insert(binary_relation_exprt(
+            typecast_expr.op(),
+            ID_gt,
+            from_integer(power(2, new_width - 1) - 1, old_type)));
         }
       }
       else if(old_type.id()==ID_unsignedbv)
@@ -171,20 +174,23 @@ void overflow_instrumentert::overflow_expr(
           return;
         }
 
-        cases.insert(
-            binary_relation_exprt(expr.op0(), ID_gt,
-              from_integer(power(2, new_width - 1) - 1, old_type)));
+        cases.insert(binary_relation_exprt(
+          typecast_expr.op(),
+          ID_gt,
+          from_integer(power(2, new_width - 1) - 1, old_type)));
       }
     }
   }
   else if(expr.id()==ID_div)
   {
+    const auto &div_expr = to_div_expr(expr);
+
     // Undefined for signed INT_MIN / -1
     if(type.id()==ID_signedbv)
     {
       equal_exprt int_min_eq(
-        expr.op0(), to_signedbv_type(type).smallest_expr());
-      equal_exprt minus_one_eq(expr.op1(), from_integer(-1, type));
+        div_expr.dividend(), to_signedbv_type(type).smallest_expr());
+      equal_exprt minus_one_eq(div_expr.divisor(), from_integer(-1, type));
 
       cases.insert(and_exprt(int_min_eq, minus_one_eq));
     }
@@ -195,9 +201,9 @@ void overflow_instrumentert::overflow_expr(
     {
       // Overflow on unary- can only happen with the smallest
       // representable number.
-      cases.insert(
-          equal_exprt(expr.op0(),
-            to_signedbv_type(type).smallest_expr()));
+      cases.insert(equal_exprt(
+        to_unary_minus_expr(expr).op(),
+        to_signedbv_type(type).smallest_expr()));
     }
   }
   else if(expr.id()==ID_plus ||
@@ -229,14 +235,14 @@ void overflow_instrumentert::overflow_expr(
         overflow.op0()=tmp;
         overflow.op1()=expr.operands()[i];
 
-        fix_types(overflow);
+        fix_types(to_binary_expr(overflow));
 
         cases.insert(overflow);
       }
     }
     else
     {
-      fix_types(overflow);
+      fix_types(to_binary_expr(overflow));
       cases.insert(overflow);
     }
   }
@@ -265,7 +271,7 @@ void overflow_instrumentert::overflow_expr(const exprt &expr, exprt &overflow)
   }
 }
 
-void overflow_instrumentert::fix_types(exprt &overflow)
+void overflow_instrumentert::fix_types(binary_exprt &overflow)
 {
   typet &t1=overflow.op0().type();
   typet &t2=overflow.op1().type();

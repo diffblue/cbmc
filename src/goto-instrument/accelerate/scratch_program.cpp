@@ -112,13 +112,14 @@ static void fix_types(exprt &expr)
      expr.id()==ID_ge ||
      expr.id()==ID_le)
   {
-    exprt &lhs=expr.op0();
-    exprt &rhs=expr.op1();
+    auto &rel_expr = to_binary_relation_expr(expr);
+    exprt &lhs = rel_expr.lhs();
+    exprt &rhs = rel_expr.rhs();
 
     if(lhs.type()!=rhs.type())
     {
       typecast_exprt typecast(rhs, lhs.type());
-      expr.op1().swap(typecast);
+      rel_expr.rhs().swap(typecast);
     }
   }
 }

@@ -128,7 +128,7 @@ public:
     expr_sett &nonrecursive,
     scratch_programt &program);
   bool assign_array(
-    const exprt &lhs,
+    const index_exprt &lhs,
     const exprt &rhs,
     scratch_programt &program);
 

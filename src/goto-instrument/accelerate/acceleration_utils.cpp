@@ -331,8 +331,7 @@ void acceleration_utilst::push_nondet(exprt &expr)
     push_nondet(*it);
   }
 
-  if(expr.id()==ID_not &&
-     expr.op0().id()==ID_nondet)
+  if(expr.id() == ID_not && to_not_expr(expr).op().id() == ID_nondet)
   {
     expr = side_effect_expr_nondett(expr.type(), expr.source_location());
   }
@@ -342,8 +341,8 @@ void acceleration_utilst::push_nondet(exprt &expr)
           expr.id()==ID_le ||
           expr.id()==ID_ge)
   {
-    if(expr.op0().id()==ID_nondet ||
-       expr.op1().id()==ID_nondet)
+    const auto &rel_expr = to_binary_relation_expr(expr);
+    if(rel_expr.lhs().id() == ID_nondet || rel_expr.rhs().id() == ID_nondet)
     {
       expr = side_effect_expr_nondett(expr.type(), expr.source_location());
     }
@@ -887,7 +886,7 @@ bool acceleration_utilst::do_nonrecursive(
   // for these variables by just forward simulating the path and
   // taking the expressions we get at the end.
   replace_mapt state;
-  expr_sett array_writes;
+  std::unordered_set<index_exprt, irep_hash> array_writes;
   expr_sett arrays_written;
   expr_sett arrays_read;
 
@@ -938,21 +937,22 @@ bool acceleration_utilst::do_nonrecursive(
 
       if(lhs.id()==ID_index)
       {
-        replace_expr(state, lhs.op1());
-        array_writes.insert(lhs);
+        auto &lhs_index_expr = to_index_expr(lhs);
+        replace_expr(state, lhs_index_expr.index());
+        array_writes.insert(lhs_index_expr);
 
-        if(arrays_written.find(lhs.op0())!=arrays_written.end())
+        if(arrays_written.find(lhs_index_expr.array()) != arrays_written.end())
         {
           // We've written to this array before -- be conservative and bail
           // out now.
 #ifdef DEBUG
-          std::cout << "Bailing out on array written to twice in loop: " <<
-            expr2c(lhs.op0(), ns) << '\n';
+          std::cout << "Bailing out on array written to twice in loop: "
+                    << expr2c(lhs_index_expr.array(), ns) << '\n';
 #endif
           return false;
         }
 
-        arrays_written.insert(lhs.op0());
+        arrays_written.insert(lhs_index_expr.array());
       }
 
       replace_expr(state, rhs);
@@ -992,12 +992,10 @@ bool acceleration_utilst::do_nonrecursive(
     }
   }
 
-  for(expr_sett::iterator it=array_writes.begin();
-      it!=array_writes.end();
-      ++it)
+  for(auto it = array_writes.begin(); it != array_writes.end(); ++it)
   {
-    const exprt &lhs=*it;
-    const exprt &rhs=state[*it];
+    const auto &lhs = *it;
+    const auto &rhs = state[*it];
 
     if(!assign_array(lhs, rhs, program))
     {
@@ -1013,7 +1011,7 @@ bool acceleration_utilst::do_nonrecursive(
 }
 
 bool acceleration_utilst::assign_array(
-  const exprt &lhs,
+  const index_exprt &lhs,
   const exprt &rhs,
   scratch_programt &program)
 {
@@ -1081,7 +1079,7 @@ bool acceleration_utilst::assign_array(
   {
     if(idx.id()==ID_pointer_offset)
     {
-      poly.from_expr(idx.op0());
+      poly.from_expr(to_unary_expr(idx).op());
     }
     else
     {
@@ -1204,10 +1202,13 @@ void acceleration_utilst::gather_array_accesses(
   const exprt &e,
   expr_sett &arrays)
 {
-  if(e.id()==ID_index ||
-     e.id()==ID_dereference)
+  if(e.id() == ID_index)
   {
-    arrays.insert(e.op0());
+    arrays.insert(to_index_expr(e).array());
+  }
+  else if(e.id() == ID_dereference)
+  {
+    arrays.insert(to_dereference_expr(e).pointer());
   }
 
   forall_operands(it, e)
