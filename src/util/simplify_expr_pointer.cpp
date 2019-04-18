@@ -171,6 +171,49 @@ bool simplify_exprt::simplify_address_of_arg(exprt &expr)
       return result;
     }
   }
+  else if(expr.id() == ID_cond)
+  {
+    bool result = true;
+    const auto &cond_expr = to_cond_expr(expr);
+    cond_exprt new_cond_expr({}, cond_expr.type(), cond_expr.is_exclusive());
+
+    for(std::size_t i = 0; i < cond_expr.get_n_cases(); ++i)
+    {
+      exprt condition = cond_expr.condition(i);
+      exprt value = cond_expr.value(i);
+
+      if(!simplify_rec(condition))
+        result = false;
+
+      if(condition.is_false())
+        continue;
+
+      if(!simplify_address_of_arg(value))
+        result = false;
+
+      if(condition.is_true() && (cond_expr.is_exclusive() || i == 0))
+      {
+        expr.swap(value);
+        return false;
+      }
+
+      new_cond_expr.add_case(condition, value);
+
+      if(condition.is_true())
+        break;
+    }
+
+    if(new_cond_expr.get_n_cases() == 1)
+    {
+      expr = new_cond_expr.value(0);
+      return false;
+    }
+
+    if(!result)
+      expr = std::move(new_cond_expr);
+
+    return result;
+  }
 
   return true;
 }
@@ -227,6 +270,16 @@ bool simplify_exprt::simplify_pointer_offset(exprt &expr)
     simplify_pointer_offset(if_expr.false_case());
     simplify_if(if_expr);
     expr.swap(if_expr);
+
+    return false;
+  }
+  else if(ptr.id() == ID_cond)
+  {
+    cond_exprt cond_expr = lift_cond(expr, 0);
+    for(std::size_t i = 0; i < cond_expr.get_n_cases(); ++i)
+      simplify_pointer_offset(cond_expr.value(i));
+    simplify_cond(cond_expr);
+    expr.swap(cond_expr);
 
     return false;
   }
@@ -506,6 +559,16 @@ bool simplify_exprt::simplify_pointer_object(exprt &expr)
 
     return false;
   }
+  else if(op.id() == ID_cond)
+  {
+    cond_exprt cond_expr = lift_cond(expr, 0);
+    for(std::size_t i = 0; i < cond_expr.get_n_cases(); ++i)
+      simplify_pointer_object(cond_expr.value(i));
+    simplify_cond(cond_expr);
+    expr.swap(cond_expr);
+
+    return false;
+  }
 
   return result;
 }
@@ -524,6 +587,16 @@ bool simplify_exprt::simplify_is_dynamic_object(exprt &expr)
     simplify_is_dynamic_object(if_expr.false_case());
     simplify_if(if_expr);
     expr.swap(if_expr);
+
+    return false;
+  }
+  else if(op.id() == ID_cond)
+  {
+    cond_exprt cond_expr = lift_cond(expr, 0);
+    for(std::size_t i = 0; i < cond_expr.get_n_cases(); ++i)
+      simplify_is_dynamic_object(cond_expr.value(i));
+    simplify_cond(cond_expr);
+    expr.swap(cond_expr);
 
     return false;
   }

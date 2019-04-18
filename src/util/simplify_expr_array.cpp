@@ -219,6 +219,13 @@ bool simplify_exprt::simplify_index(exprt &expr)
 
     return false;
   }
+  else if(array.id() == ID_cond)
+  {
+    expr = lift_cond(expr, 0);
+    simplify_rec(expr);
+
+    return false;
+  }
 
   return result;
 }

@@ -1319,6 +1319,15 @@ bool simplify_exprt::simplify_inequality(exprt &expr)
     return simplify_inequality(expr);
   }
 
+  // if rhs is ID_cond (and lhs is not), swap operands for == and !=
+  if(
+    (expr.id() == ID_equal || expr.id() == ID_notequal) &&
+    tmp0.id() != ID_cond && tmp1.id() == ID_cond)
+  {
+    expr.op0().swap(expr.op1());
+    return simplify_inequality(expr);
+  }
+
   if(tmp0.id()==ID_if && tmp0.operands().size()==3)
   {
     if_exprt if_expr=lift_if(expr, 0);
@@ -1326,6 +1335,17 @@ bool simplify_exprt::simplify_inequality(exprt &expr)
     simplify_inequality(if_expr.false_case());
     simplify_if(if_expr);
     expr.swap(if_expr);
+
+    return false;
+  }
+
+  if(tmp0.id() == ID_cond)
+  {
+    cond_exprt cond_expr = lift_cond(expr, 0);
+    for(std::size_t i = 0; i < cond_expr.get_n_cases(); ++i)
+      simplify_inequality(cond_expr.value(i));
+    simplify_cond(cond_expr);
+    expr.swap(cond_expr);
 
     return false;
   }
@@ -1683,6 +1703,17 @@ bool simplify_exprt::simplify_inequality_constant(exprt &expr)
     simplify_inequality_constant(if_expr.false_case());
     simplify_if(if_expr);
     expr.swap(if_expr);
+
+    return false;
+  }
+
+  if(expr.op0().id() == ID_cond)
+  {
+    cond_exprt cond_expr = lift_cond(expr, 0);
+    for(std::size_t i = 0; i < cond_expr.get_n_cases(); ++i)
+      simplify_inequality_constant(cond_expr.value(i));
+    simplify_cond(cond_expr);
+    expr.swap(cond_expr);
 
     return false;
   }

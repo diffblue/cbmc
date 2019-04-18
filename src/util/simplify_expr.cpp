@@ -1237,6 +1237,50 @@ bool simplify_exprt::simplify_if_preorder(if_exprt &expr)
   return result;
 }
 
+bool simplify_exprt::simplify_cond_preorder(cond_exprt &expr)
+{
+  cond_exprt new_expr({}, expr.type(), expr.is_exclusive());
+  bool result = true;
+
+#ifdef USE_LOCAL_REPLACE_MAP
+#  error "TODO: implement simplify_cond_preorder use of replacement maps"
+#endif
+
+  for(std::size_t i = 0; i < expr.get_n_cases(); ++i)
+  {
+    exprt condition = as_const(expr).condition(i);
+    if(!simplify_rec(condition))
+      result = false;
+
+    if(condition.is_true() && (i == 0 || expr.is_exclusive()))
+    {
+      expr.swap(expr.value(i));
+      simplify_rec(expr);
+      return false;
+    }
+
+    if(!condition.is_false())
+    {
+      exprt value = as_const(expr).value(i);
+      if(!simplify_rec(value))
+        result = false;
+      new_expr.add_case(condition, value);
+    }
+    else
+    {
+      result = false;
+    }
+
+    if(condition.is_true())
+      break;
+  }
+
+  if(!result)
+    expr = std::move(new_expr);
+
+  return result;
+}
+
 bool simplify_exprt::simplify_if(if_exprt &expr)
 {
   exprt &cond=expr.cond();
@@ -1343,6 +1387,27 @@ bool simplify_exprt::simplify_if(if_exprt &expr)
   return result;
 }
 
+bool simplify_exprt::simplify_cond(cond_exprt &expr)
+{
+  optionalt<exprt> unique_value;
+  for(std::size_t i = 0; i < expr.get_n_cases(); ++i)
+  {
+    const exprt &value = as_const(expr).value(i);
+    if(!unique_value.has_value())
+      unique_value = value;
+    else if(value != *unique_value)
+      return true;
+  }
+
+  if(unique_value.has_value())
+  {
+    expr.swap(*unique_value);
+    return false;
+  }
+
+  return true;
+}
+
 bool simplify_exprt::get_values(
   const exprt &expr,
   value_listt &value_list)
@@ -1364,6 +1429,14 @@ bool simplify_exprt::get_values(
 
     return get_values(expr.op1(), value_list) ||
            get_values(expr.operands().back(), value_list);
+  }
+  else if(expr.id() == ID_cond)
+  {
+    bool ret = false;
+    const auto &cond = to_cond_expr(expr);
+    for(std::size_t i = 0; i < cond.get_n_cases(); ++i)
+      ret |= get_values(cond.value(i), value_list);
+    return ret;
   }
 
   return true;
@@ -1877,6 +1950,15 @@ bool simplify_exprt::simplify_byte_extract(byte_extract_exprt &expr)
     expr.swap(if_expr);
     return false;
   }
+  else if(expr.op().id() == ID_cond)
+  {
+    cond_exprt cond_expr = lift_cond(expr, 0);
+    for(std::size_t i = 0; i < cond_expr.get_n_cases(); ++i)
+      simplify_byte_extract(to_byte_extract_expr(cond_expr.value(i)));
+    simplify_cond(cond_expr);
+    expr.swap(cond_expr);
+    return false;
+  }
 
   const auto el_size = pointer_offset_bits(expr.type(), ns);
 
@@ -2387,6 +2469,8 @@ bool simplify_exprt::simplify_node_preorder(exprt &expr)
   }
   else if(expr.id()==ID_if)
     result=simplify_if_preorder(to_if_expr(expr));
+  else if(expr.id() == ID_cond)
+    result = simplify_cond_preorder(to_cond_expr(expr));
   else
   {
     if(expr.has_operands())
@@ -2423,6 +2507,8 @@ bool simplify_exprt::simplify_node(exprt &expr)
     result=simplify_inequality(expr) && result;
   else if(expr.id()==ID_if)
     result=simplify_if(to_if_expr(expr)) && result;
+  else if(expr.id() == ID_cond)
+    result = simplify_cond(to_cond_expr(expr)) && result;
   else if(expr.id()==ID_lambda)
     result=simplify_lambda(expr) && result;
   else if(expr.id()==ID_with)

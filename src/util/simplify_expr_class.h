@@ -27,6 +27,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class bswap_exprt;
 class byte_extract_exprt;
 class byte_update_exprt;
+class cond_exprt;
 class exprt;
 class extractbits_exprt;
 class if_exprt;
@@ -81,6 +82,8 @@ public:
   bool simplify_bitwise(exprt &expr);
   bool simplify_if_preorder(if_exprt &expr);
   bool simplify_if(if_exprt &expr);
+  bool simplify_cond_preorder(cond_exprt &expr);
+  bool simplify_cond(cond_exprt &expr);
   bool simplify_bitnot(exprt &expr);
   bool simplify_not(exprt &expr);
   bool simplify_boolean(exprt &expr);

@@ -282,6 +282,13 @@ bool simplify_exprt::simplify_member(exprt &expr)
 
     return false;
   }
+  else if(op.id() == ID_cond)
+  {
+    expr = lift_cond(expr, 0);
+    simplify_rec(expr);
+
+    return false;
+  }
 
   return true;
 }
