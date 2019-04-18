@@ -518,7 +518,6 @@ allocates a new string before calling a primitive.
      Pointer to char array association
      is now handled by `string_constraint_generatort`, there is no need for
      explicit conversion.
-  * `cprover_string_intern` : Never tested.
   * `cprover_string_is_empty` :
     Should use `cprover_string_length(s) == 0` instead.
   * `cprover_string_is_suffix` : Should use `cprover_string_is_prefix` with an
