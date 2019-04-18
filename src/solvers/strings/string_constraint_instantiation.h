@@ -48,6 +48,9 @@ struct linear_functiont
   /// its cannonical representation
   explicit linear_functiont(const exprt &f);
 
+  /// Make this function the sum of the current function with \p other
+  void add(const linear_functiont &other);
+
   /// \param negated: optional Boolean asking to negate the function
   /// \return an expression corresponding to the linear function
   exprt to_expr(bool negated = false) const;

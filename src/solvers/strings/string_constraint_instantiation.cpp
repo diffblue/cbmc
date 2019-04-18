@@ -91,6 +91,14 @@ linear_functiont::linear_functiont(const exprt &f)
   }
 }
 
+void linear_functiont::add(const linear_functiont &other)
+{
+  PRECONDITION(type == other.type);
+  constant_coefficient += other.constant_coefficient;
+  for(auto pair : other.coefficients)
+    coefficients[pair.first] += pair.second;
+}
+
 exprt linear_functiont::to_expr(bool negated) const
 {
   exprt sum = nil_exprt{};
