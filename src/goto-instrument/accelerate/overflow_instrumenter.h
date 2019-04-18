@@ -51,7 +51,7 @@ class overflow_instrumentert
   void accumulate_overflow(goto_programt::targett t, const exprt &expr,
       goto_programt::targetst &added);
 
-  void fix_types(exprt &overflow);
+  void fix_types(binary_exprt &overflow);
 
   goto_programt &program;
   symbol_tablet &symbol_table;

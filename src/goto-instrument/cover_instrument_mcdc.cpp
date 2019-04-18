@@ -208,7 +208,7 @@ collect_mcdc_controlling_nested(const std::set<exprt> &decisions)
           // expansion of such an operand is stored in ''res''.
           if(operands[i].id() == ID_not)
           {
-            exprt no = operands[i].op0();
+            exprt no = to_not_expr(operands[i]).op();
             if(!is_condition(no))
             {
               changed = true;
@@ -271,7 +271,7 @@ std::set<signed> sign_of_expr(const exprt &e, const exprt &E)
   // or, ''E'' is the negation of ''e''?
   if(E.id() == ID_not)
   {
-    if(e == E.op0())
+    if(e == to_not_expr(E).op())
     {
       signs.insert(-1);
       return signs;

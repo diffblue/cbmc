@@ -113,23 +113,27 @@ void _rw_set_loct::read_write_rec(
   }
   else if(expr.id()==ID_member)
   {
-    assert(expr.operands().size()==1);
-    const std::string &component_name=expr.get_string(ID_component_name);
+    const auto &member_expr = to_member_expr(expr);
+    const std::string &component_name =
+      id2string(member_expr.get_component_name());
     read_write_rec(
-      expr.op0(), r, w, "." + component_name + suffix, guard_conjuncts);
+      member_expr.compound(),
+      r,
+      w,
+      "." + component_name + suffix,
+      guard_conjuncts);
   }
   else if(expr.id()==ID_index)
   {
     // we don't distinguish the array elements for now
-    assert(expr.operands().size()==2);
-    read_write_rec(expr.op0(), r, w, "[]" + suffix, guard_conjuncts);
-    read(expr.op1(), guard_conjuncts);
+    const auto &index_expr = to_index_expr(expr);
+    read_write_rec(index_expr.array(), r, w, "[]" + suffix, guard_conjuncts);
+    read(index_expr.index(), guard_conjuncts);
   }
   else if(expr.id()==ID_dereference)
   {
-    assert(expr.operands().size()==1);
     set_track_deref();
-    read(expr.op0(), guard_conjuncts);
+    read(to_dereference_expr(expr).pointer(), guard_conjuncts);
 
     exprt tmp=expr;
     #ifdef LOCAL_MAY
@@ -166,8 +170,7 @@ void _rw_set_loct::read_write_rec(
   }
   else if(expr.id()==ID_typecast)
   {
-    assert(expr.operands().size()==1);
-    read_write_rec(expr.op0(), r, w, suffix, guard_conjuncts);
+    read_write_rec(to_typecast_expr(expr).op(), r, w, suffix, guard_conjuncts);
   }
   else if(expr.id()==ID_address_of)
   {
@@ -175,16 +178,16 @@ void _rw_set_loct::read_write_rec(
   }
   else if(expr.id()==ID_if)
   {
-    assert(expr.operands().size()==3);
-    read(expr.op0(), guard_conjuncts);
+    const auto &if_expr = to_if_expr(expr);
+    read(if_expr.cond(), guard_conjuncts);
 
     exprt::operandst true_guard = guard_conjuncts;
-    true_guard.push_back(expr.op0());
-    read_write_rec(expr.op1(), r, w, suffix, true_guard);
+    true_guard.push_back(if_expr.cond());
+    read_write_rec(if_expr.true_case(), r, w, suffix, true_guard);
 
     exprt::operandst false_guard = guard_conjuncts;
-    false_guard.push_back(not_exprt(expr.op0()));
-    read_write_rec(expr.op2(), r, w, suffix, false_guard);
+    false_guard.push_back(not_exprt(if_expr.cond()));
+    read_write_rec(if_expr.false_case(), r, w, suffix, false_guard);
   }
   else
   {

@@ -1277,10 +1277,11 @@ void dump_ct::cleanup_expr(exprt &expr)
     }
   }
   else if(
-    expr.id() == ID_typecast && expr.op0().id() == ID_typecast &&
-    expr.type() == expr.op0().type())
+    expr.id() == ID_typecast &&
+    to_typecast_expr(expr).op().id() == ID_typecast &&
+    expr.type() == to_typecast_expr(expr).op().type())
   {
-    exprt tmp=expr.op0();
+    exprt tmp = to_typecast_expr(expr).op();
     expr.swap(tmp);
   }
   else if(expr.id()==ID_code &&
