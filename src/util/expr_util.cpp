@@ -216,6 +216,24 @@ if_exprt lift_if(const exprt &src, std::size_t operand_number)
   return result;
 }
 
+cond_exprt lift_cond(const exprt &src, std::size_t operand_number)
+{
+  PRECONDITION(operand_number < src.operands().size());
+  PRECONDITION(src.operands()[operand_number].id() == ID_cond);
+
+  const cond_exprt cond_expr = to_cond_expr(src.operands()[operand_number]);
+  cond_exprt result({}, src.type(), cond_expr.is_exclusive());
+
+  for(std::size_t i = 0; i < cond_expr.get_n_cases(); ++i)
+  {
+    exprt new_value = src;
+    new_value.operands()[operand_number] = cond_expr.value(i);
+    result.add_case(cond_expr.condition(i), new_value);
+  }
+
+  return result;
+}
+
 const exprt &skip_typecast(const exprt &expr)
 {
   if(expr.id()!=ID_typecast)

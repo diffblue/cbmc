@@ -26,6 +26,7 @@ class symbol_exprt;
 class update_exprt;
 class with_exprt;
 class if_exprt;
+class cond_exprt;
 class symbolt;
 class typet;
 class namespacet;
@@ -73,6 +74,9 @@ bool has_subtype(const typet &, const irep_idt &id, const namespacet &);
 
 /// lift up an if_exprt one level
 if_exprt lift_if(const exprt &, std::size_t operand_number);
+
+/// lift up an cond_exprt one level
+cond_exprt lift_cond(const exprt &, std::size_t operand_number);
 
 /// find the expression nested inside typecasts, if any
 const exprt &skip_typecast(const exprt &expr);
