@@ -48,7 +48,6 @@ public:
   goto_diff_parse_optionst(int argc, const char **argv);
 
 protected:
-  ui_message_handlert ui_message_handler;
   void register_languages();
 
   void get_command_line_options(optionst &options);

@@ -289,7 +289,7 @@ void compound_block_locationst::check_compound_block_locations(
 
   goto_modelt gm;
   int ret;
-  ret = cbmc_parse_optionst::get_goto_program(gm, opts, cmdline, log, mh);
+  ret = cbmc_parse_optionst::get_goto_program(gm, opts, cmdline, mh);
   REQUIRE(ret == -1);
 
   const auto found = gm.goto_functions.function_map.find("main");

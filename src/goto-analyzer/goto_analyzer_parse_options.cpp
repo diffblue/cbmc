@@ -69,8 +69,11 @@ Author: Daniel Kroening, kroening@kroening.com
 goto_analyzer_parse_optionst::goto_analyzer_parse_optionst(
   int argc,
   const char **argv)
-  : parse_options_baset(GOTO_ANALYSER_OPTIONS, argc, argv, ui_message_handler),
-    ui_message_handler(cmdline, std::string("GOTO-ANALYZER ") + CBMC_VERSION)
+  : parse_options_baset(
+      GOTO_ANALYSER_OPTIONS,
+      argc,
+      argv,
+      std::string("GOTO-ANALYZER "))
 {
 }
 
@@ -398,8 +401,7 @@ int goto_analyzer_parse_optionst::doit()
 
   register_languages();
 
-  goto_model =
-    initialize_goto_model(cmdline.args, log.get_message_handler(), options);
+  goto_model = initialize_goto_model(cmdline.args, ui_message_handler, options);
 
   if(process_goto_program(options))
     return CPROVER_EXIT_INTERNAL_ERROR;
@@ -422,10 +424,7 @@ int goto_analyzer_parse_optionst::doit()
     cmdline.isset("list-goto-functions"))
   {
     show_goto_functions(
-      goto_model,
-      log.get_message_handler(),
-      get_ui(),
-      cmdline.isset("list-goto-functions"));
+      goto_model, ui_message_handler, cmdline.isset("list-goto-functions"));
     return CPROVER_EXIT_SUCCESS;
   }
 
@@ -443,15 +442,14 @@ int goto_analyzer_parse_optionst::perform_analysis(const optionst &options)
 
     if(cmdline.isset("show-taint"))
     {
-      taint_analysis(
-        goto_model, taint_file, log.get_message_handler(), true, "");
+      taint_analysis(goto_model, taint_file, ui_message_handler, true, "");
       return CPROVER_EXIT_SUCCESS;
     }
     else
     {
       std::string json_file=cmdline.get_value("json");
       bool result = taint_analysis(
-        goto_model, taint_file, log.get_message_handler(), false, json_file);
+        goto_model, taint_file, ui_message_handler, false, json_file);
       return result ? CPROVER_EXIT_VERIFICATION_UNSAFE : CPROVER_EXIT_SUCCESS;
     }
   }
@@ -553,7 +551,7 @@ int goto_analyzer_parse_optionst::perform_analysis(const optionst &options)
 
   if(cmdline.isset("show-properties"))
   {
-    show_properties(goto_model, log.get_message_handler(), get_ui());
+    show_properties(goto_model, ui_message_handler);
     return CPROVER_EXIT_SUCCESS;
   }
 
@@ -607,13 +605,13 @@ int goto_analyzer_parse_optionst::perform_analysis(const optionst &options)
     }
     else if(options.get_bool_option("show-on-source"))
     {
-      show_on_source(goto_model, *analyzer, log.get_message_handler());
+      show_on_source(goto_model, *analyzer, ui_message_handler);
       return CPROVER_EXIT_SUCCESS;
     }
     else if(options.get_bool_option("verify"))
     {
       result = static_verifier(
-        goto_model, *analyzer, options, log.get_message_handler(), out);
+        goto_model, *analyzer, options, ui_message_handler, out);
     }
     else if(options.get_bool_option("simplify"))
     {
@@ -621,7 +619,7 @@ int goto_analyzer_parse_optionst::perform_analysis(const optionst &options)
       output_stream.close();
       output_stream.open(outfile, std::ios::binary);
       result = static_simplifier(
-        goto_model, *analyzer, options, log.get_message_handler(), out);
+        goto_model, *analyzer, options, ui_message_handler, out);
     }
     else if(options.get_bool_option("unreachable-instructions"))
     {
@@ -681,7 +679,7 @@ bool goto_analyzer_parse_optionst::process_goto_program(
     log.status() << "Removing function pointers and virtual functions"
                  << messaget::eom;
     remove_function_pointers(
-      log.get_message_handler(), goto_model, cmdline.isset("pointer-check"));
+      ui_message_handler, goto_model, cmdline.isset("pointer-check"));
 
     // do partial inlining
     log.status() << "Partial Inlining" << messaget::eom;

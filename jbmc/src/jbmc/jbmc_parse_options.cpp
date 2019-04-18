@@ -75,8 +75,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <java_bytecode/simple_method_stubbing.h>
 
 jbmc_parse_optionst::jbmc_parse_optionst(int argc, const char **argv)
-  : parse_options_baset(JBMC_OPTIONS, argc, argv, ui_message_handler),
-    ui_message_handler(cmdline, std::string("JBMC ") + CBMC_VERSION)
+  : parse_options_baset(
+      JBMC_OPTIONS,
+      argc,
+      argv,
+      std::string("JBMC ") + CBMC_VERSION)
 {
 }
 
@@ -88,8 +91,7 @@ jbmc_parse_optionst::jbmc_parse_optionst(int argc, const char **argv)
       JBMC_OPTIONS + extra_options,
       argc,
       argv,
-      ui_message_handler),
-    ui_message_handler(cmdline, std::string("JBMC ") + CBMC_VERSION)
+      std::string("JBMC ") + CBMC_VERSION)
 {
 }
 
@@ -134,7 +136,7 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
     exit(CPROVER_EXIT_SUCCESS);
   }
 
-  parse_path_strategy_options(cmdline, options, log.get_message_handler());
+  parse_path_strategy_options(cmdline, options, ui_message_handler);
 
   if(cmdline.isset("program-only"))
     options.set_option("program-only", true);
@@ -421,9 +423,7 @@ int jbmc_parse_optionst::doit()
   }
 
   messaget::eval_verbosity(
-    cmdline.get_value("verbosity"),
-    messaget::M_STATISTICS,
-    log.get_message_handler());
+    cmdline.get_value("verbosity"), messaget::M_STATISTICS, ui_message_handler);
 
   //
   // command line options
@@ -498,7 +498,7 @@ int jbmc_parse_optionst::doit()
     }
 
     language->set_language_options(options);
-    language->set_message_handler(log.get_message_handler());
+    language->set_message_handler(ui_message_handler);
 
     log.status() << "Parsing " << filename << messaget::eom;
 
@@ -747,7 +747,7 @@ void jbmc_parse_optionst::process_goto_function(
     goto_function,
     symbol_table,
     *class_hierarchy,
-    log.get_message_handler());
+    ui_message_handler);
   // Java virtual functions -> explicit dispatch tables:
   remove_virtual_functions(function);
 
@@ -851,7 +851,6 @@ bool jbmc_parse_optionst::show_loaded_functions(
     show_goto_functions(
       ns,
       ui_message_handler,
-      ui_message_handler.get_ui(),
       goto_model.get_goto_functions(),
       cmdline.isset("list-goto-functions"));
     return true;
@@ -860,11 +859,7 @@ bool jbmc_parse_optionst::show_loaded_functions(
   if(cmdline.isset("show-properties"))
   {
     namespacet ns(goto_model.get_symbol_table());
-    show_properties(
-      ns,
-      log.get_message_handler(),
-      ui_message_handler.get_ui(),
-      goto_model.get_goto_functions());
+    show_properties(ns, ui_message_handler, goto_model.get_goto_functions());
     return true;
   }
 
@@ -887,8 +882,7 @@ bool jbmc_parse_optionst::process_goto_functions(
     return false;
 
   // remove catch and throw
-  remove_exceptions(
-    goto_model, *class_hierarchy.get(), log.get_message_handler());
+  remove_exceptions(goto_model, *class_hierarchy.get(), ui_message_handler);
 
   // instrument library preconditions
   instrument_preconditions(goto_model);
@@ -910,7 +904,7 @@ bool jbmc_parse_optionst::process_goto_functions(
   {
     // Entry point will have been set before and function pointers removed
     log.status() << "Removing unused functions" << messaget::eom;
-    remove_unused_functions(goto_model, log.get_message_handler());
+    remove_unused_functions(goto_model, ui_message_handler);
   }
 
   // remove skips such that trivial GOTOs are deleted

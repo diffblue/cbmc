@@ -10,6 +10,5 @@ Author: Diffblue Ltd.
 
 int main(int argc, const char *argv[])
 {
-  auto parse_options = goto_harness_parse_optionst(argc, argv);
-  return parse_options.main();
+  return goto_harness_parse_optionst{argc, argv}.main();
 }

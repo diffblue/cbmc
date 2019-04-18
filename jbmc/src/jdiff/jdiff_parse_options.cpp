@@ -62,8 +62,11 @@ Author: Peter Schrammel
 #include <goto-diff/unified_diff.h>
 
 jdiff_parse_optionst::jdiff_parse_optionst(int argc, const char **argv)
-  : parse_options_baset(JDIFF_OPTIONS, argc, argv, ui_message_handler),
-    ui_message_handler(cmdline, std::string("JDIFF ") + CBMC_VERSION)
+  : parse_options_baset(
+      JDIFF_OPTIONS,
+      argc,
+      argv,
+      std::string("JDIFF ") + CBMC_VERSION)
 {
 }
 
@@ -224,15 +227,9 @@ int jdiff_parse_optionst::doit()
     cmdline.isset("list-goto-functions"))
   {
     show_goto_functions(
-      goto_model1,
-      log.get_message_handler(),
-      ui_message_handler.get_ui(),
-      cmdline.isset("list-goto-functions"));
+      goto_model1, ui_message_handler, cmdline.isset("list-goto-functions"));
     show_goto_functions(
-      goto_model2,
-      log.get_message_handler(),
-      ui_message_handler.get_ui(),
-      cmdline.isset("list-goto-functions"));
+      goto_model2, ui_message_handler, cmdline.isset("list-goto-functions"));
     return CPROVER_EXIT_SUCCESS;
   }
 
@@ -277,18 +274,18 @@ bool jdiff_parse_optionst::process_goto_program(
     log.status() << "Removing function pointers and virtual functions"
                  << messaget::eom;
     remove_function_pointers(
-      log.get_message_handler(), goto_model, cmdline.isset("pointer-check"));
+      ui_message_handler, goto_model, cmdline.isset("pointer-check"));
 
     // Java virtual functions -> explicit dispatch tables:
     remove_virtual_functions(goto_model);
 
     // remove Java throw and catch
     // This introduces instanceof, so order is important:
-    remove_exceptions_using_instanceof(goto_model, log.get_message_handler());
+    remove_exceptions_using_instanceof(goto_model, ui_message_handler);
 
     // Java instanceof -> clsid comparison:
     class_hierarchyt class_hierarchy(goto_model.symbol_table);
-    remove_instanceof(goto_model, class_hierarchy, log.get_message_handler());
+    remove_instanceof(goto_model, class_hierarchy, ui_message_handler);
 
     mm_io(goto_model);
 
@@ -321,10 +318,9 @@ bool jdiff_parse_optionst::process_goto_program(
     // instrument cover goals
     if(cmdline.isset("cover"))
     {
-      const auto cover_config = get_cover_config(
-        options, goto_model.symbol_table, log.get_message_handler());
-      if(instrument_cover_goals(
-           cover_config, goto_model, log.get_message_handler()))
+      const auto cover_config =
+        get_cover_config(options, goto_model.symbol_table, ui_message_handler);
+      if(instrument_cover_goals(cover_config, goto_model, ui_message_handler))
         return true;
     }
 

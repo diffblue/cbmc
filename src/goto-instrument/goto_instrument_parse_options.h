@@ -122,8 +122,7 @@ public:
         GOTO_INSTRUMENT_OPTIONS,
         argc,
         argv,
-        ui_message_handler),
-      ui_message_handler(cmdline, "goto-instrument"),
+        "goto-instrument"),
       function_pointer_removal_done(false),
       partial_inlining_done(false),
       remove_returns_done(false)
@@ -131,7 +130,6 @@ public:
   }
 
 protected:
-  ui_message_handlert ui_message_handler;
   void register_languages();
 
   void get_goto_program();
@@ -147,11 +145,6 @@ protected:
   bool remove_returns_done;
 
   goto_modelt goto_model;
-
-  ui_message_handlert::uit get_ui()
-  {
-    return ui_message_handler.get_ui();
-  }
 };
 
 #endif // CPROVER_GOTO_INSTRUMENT_GOTO_INSTRUMENT_PARSE_OPTIONS_H

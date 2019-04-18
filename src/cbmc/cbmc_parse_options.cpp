@@ -83,9 +83,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "xml_interface.h"
 
 cbmc_parse_optionst::cbmc_parse_optionst(int argc, const char **argv)
-  : parse_options_baset(CBMC_OPTIONS, argc, argv, ui_message_handler),
-    xml_interfacet(cmdline),
-    ui_message_handler(cmdline, std::string("CBMC ") + CBMC_VERSION)
+  : parse_options_baset(
+      CBMC_OPTIONS,
+      argc,
+      argv,
+      std::string("CBMC ") + CBMC_VERSION),
+    xml_interfacet(cmdline)
 {
 }
 
@@ -97,9 +100,8 @@ cbmc_parse_optionst::cbmc_parse_optionst(int argc, const char **argv)
       CBMC_OPTIONS + extra_options,
       argc,
       argv,
-      ui_message_handler),
-    xml_interfacet(cmdline),
-    ui_message_handler(cmdline, std::string("CBMC ") + CBMC_VERSION)
+      std::string("CBMC ") + CBMC_VERSION),
+    xml_interfacet(cmdline)
 {
 }
 
@@ -484,7 +486,7 @@ int cbmc_parse_optionst::doit()
   register_languages();
 
   if(cmdline.isset("test-preprocessor"))
-    return test_c_preprocessor(log.get_message_handler())
+    return test_c_preprocessor(ui_message_handler)
              ? CPROVER_EXIT_PREPROCESSOR_TEST_FAILED
              : CPROVER_EXIT_SUCCESS;
 
@@ -530,7 +532,7 @@ int cbmc_parse_optionst::doit()
     }
 
     language->set_language_options(options);
-    language->set_message_handler(log.get_message_handler());
+    language->set_message_handler(ui_message_handler);
 
     log.status() << "Parsing " << filename << messaget::eom;
 
@@ -545,7 +547,7 @@ int cbmc_parse_optionst::doit()
   }
 
   int get_goto_program_ret =
-    get_goto_program(goto_model, options, cmdline, log, ui_message_handler);
+    get_goto_program(goto_model, options, cmdline, ui_message_handler);
 
   if(get_goto_program_ret!=-1)
     return get_goto_program_ret;
@@ -553,8 +555,7 @@ int cbmc_parse_optionst::doit()
   if(cmdline.isset("show-claims") || // will go away
      cmdline.isset("show-properties")) // use this one
   {
-    show_properties(
-      goto_model, log.get_message_handler(), ui_message_handler.get_ui());
+    show_properties(goto_model, ui_message_handler);
     return CPROVER_EXIT_SUCCESS;
   }
 
@@ -690,12 +691,12 @@ int cbmc_parse_optionst::get_goto_program(
   goto_modelt &goto_model,
   const optionst &options,
   const cmdlinet &cmdline,
-  messaget &log,
   ui_message_handlert &ui_message_handler)
 {
+  messaget log{ui_message_handler};
   if(cmdline.args.empty())
   {
-    log.error() << "Please provide a program to verify" << log.eom;
+    log.error() << "Please provide a program to verify" << messaget::eom;
     return CPROVER_EXIT_INCORRECT_TASK;
   }
 
@@ -732,12 +733,11 @@ int cbmc_parse_optionst::get_goto_program(
       show_goto_functions(
         goto_model,
         ui_message_handler,
-        ui_message_handler.get_ui(),
         cmdline.isset("list-goto-functions"));
       return CPROVER_EXIT_SUCCESS;
     }
 
-    log.status() << config.object_bits_info() << log.eom;
+    log.status() << config.object_bits_info() << messaget::eom;
   }
 
   return -1; // no error, continue
@@ -772,7 +772,7 @@ void cbmc_parse_optionst::preprocessing(const optionst &options)
       return;
     }
 
-    language->set_message_handler(log.get_message_handler());
+    language->set_message_handler(ui_message_handler);
 
     if(language->preprocess(infile, filename, std::cout))
       log.error() << "PREPROCESSING ERROR" << messaget::eom;

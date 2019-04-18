@@ -30,15 +30,13 @@ class goto_functionst;
 
 void show_goto_functions(
   const namespacet &ns,
-  message_handlert &message_handler,
-  ui_message_handlert::uit ui,
+  ui_message_handlert &ui_message_handler,
   const goto_functionst &goto_functions,
-  bool list_only = false);
+  bool list_only);
 
 void show_goto_functions(
   const goto_modelt &,
-  message_handlert &message_handler,
-  ui_message_handlert::uit ui,
-  bool list_only = false);
+  ui_message_handlert &ui_message_handler,
+  bool list_only);
 
 #endif // CPROVER_GOTO_PROGRAMS_SHOW_GOTO_FUNCTIONS_H
