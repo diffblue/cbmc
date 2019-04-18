@@ -521,6 +521,12 @@ void value_sett::get_value_set_rec(
     get_value_set_rec(expr.op1(), dest, suffix, original_type, ns);
     get_value_set_rec(expr.op2(), dest, suffix, original_type, ns);
   }
+  else if(expr.id() == ID_cond)
+  {
+    const auto &cond_expr = to_cond_expr(expr);
+    for(std::size_t i = 0; i < cond_expr.get_n_cases(); ++i)
+      get_value_set_rec(cond_expr.value(i), dest, suffix, original_type, ns);
+  }
   else if(expr.id()==ID_address_of)
   {
     if(expr.operands().size()!=1)
