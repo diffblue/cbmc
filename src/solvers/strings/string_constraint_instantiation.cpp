@@ -156,6 +156,15 @@ exprt linear_functiont::solve(
   return f.to_expr(positive);
 }
 
+std::string linear_functiont::format()
+{
+  std::ostringstream stream;
+  stream << constant_coefficient;
+  for(const auto &pair : coefficients)
+    stream << " + " << pair.second << " * " << ::format(pair.first);
+  return stream.str();
+}
+
 /// Instantiates a string constraint by substituting the quantifiers.
 /// For a string constraint of the form `forall q. P(x)`,
 /// substitute `q` the universally quantified variable of `axiom`, by

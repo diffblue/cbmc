@@ -58,6 +58,9 @@ public:
   /// returns the expression `v - x`.
   static exprt solve(linear_functiont f, const exprt &var, const exprt &val);
 
+  /// Format the linear function as a string, can be used for debugging
+  std::string format();
+
 private:
   mp_integer constant_coefficient;
   std::unordered_map<exprt, mp_integer, irep_hash> coefficients;
