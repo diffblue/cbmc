@@ -90,6 +90,9 @@ symbolt &cpp_declarator_convertert::convert(
 
   get_final_identifier();
 
+  if(is_typedef)
+    final_type.set(ID_C_typedef, final_identifier);
+
   // first see if it is a member
   if(scope->id_class == cpp_idt::id_classt::CLASS)
   {
