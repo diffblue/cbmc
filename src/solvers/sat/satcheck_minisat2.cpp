@@ -133,6 +133,8 @@ void satcheck_minisat2_baset<T>::lcnf(const bvt &bv)
 
     Minisat::vec<Minisat::Lit> c;
 
+    cnf_dumper.add_clause(bv);
+
     convert(bv, c);
 
     // Note the underscore.
@@ -214,6 +216,7 @@ propt::resultt satcheck_minisat2_baset<T>::do_prop_solve()
             alarm(time_limit_seconds);
         }
 
+        cnf_dumper.dump_formula();
         lbool solver_result=solver->solveLimited(solver_assumptions);
 
         if(old_handler!=SIG_ERR)
