@@ -155,6 +155,9 @@ void goto_symext::symex_assign_rec(
   else if(lhs.id()==ID_if)
     symex_assign_if(
       state, to_if_expr(lhs), full_lhs, rhs, guard, assignment_type);
+  else if(lhs.id() == ID_cond)
+    symex_assign_cond(
+      state, to_cond_expr(lhs), full_lhs, rhs, guard, assignment_type);
   else if(lhs.id()==ID_typecast)
     symex_assign_typecast(
       state, to_typecast_expr(lhs), full_lhs, rhs, guard, assignment_type);
@@ -611,6 +614,44 @@ void goto_symext::symex_assign_if(
       state, lhs.false_case(), full_lhs, rhs, guard, assignment_type);
     guard.pop_back();
   }
+}
+
+void goto_symext::symex_assign_cond(
+  statet &state,
+  const cond_exprt &lhs,
+  const exprt &full_lhs,
+  const exprt &rhs,
+  exprt::operandst &guard,
+  assignment_typet assignment_type)
+{
+  std::size_t old_guard_size = guard.size();
+
+  for(std::size_t i = 0; i < lhs.get_n_cases(); ++i)
+  {
+    exprt renamed_guard = state.rename(lhs.condition(i), ns).get();
+    do_simplify(renamed_guard);
+    if(!renamed_guard.is_false())
+    {
+      guard.push_back(renamed_guard);
+      symex_assign_rec(
+        state, lhs.value(i), full_lhs, rhs, guard, assignment_type);
+      guard.pop_back();
+    }
+
+    // If this one is a certainty the remaining cases are irrelevant:
+    if(renamed_guard.is_true())
+      break;
+
+    // If the conditions are non-exclusive, further cases can only happen if
+    // this one did not. If they are exclusive then they can be tested
+    // independently.
+    if(!lhs.is_exclusive())
+      guard.push_back(not_exprt(renamed_guard));
+  }
+
+  // Restore the guard to its state before entering this function:
+  INVARIANT(guard.size() >= old_guard_size, "must not shrink the guard!");
+  guard.resize(old_guard_size);
 }
 
 void goto_symext::symex_assign_byte_extract(

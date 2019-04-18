@@ -534,6 +534,13 @@ protected:
     const exprt &rhs,
     exprt::operandst &,
     assignment_typet);
+  void symex_assign_cond(
+    statet &,
+    const cond_exprt &lhs,
+    const exprt &full_lhs,
+    const exprt &rhs,
+    exprt::operandst &,
+    assignment_typet);
   void symex_assign_byte_extract(
     statet &,
     const byte_extract_exprt &lhs,
