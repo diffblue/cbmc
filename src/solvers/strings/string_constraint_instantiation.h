@@ -38,12 +38,9 @@ std::vector<exprt> instantiate_not_contains(
 /// Canonical representation of linear function, for instance, expression
 /// $x + x - y + 5 - 3$ would given by \c constant_coefficient 2 and
 /// \p coefficients: x -> 2, y -> -1
-struct linear_functiont
+class linear_functiont
 {
-  mp_integer constant_coefficient;
-  std::unordered_map<exprt, mp_integer, irep_hash> coefficients;
-  typet type;
-
+public:
   /// Put an expression \p f composed of additions and subtractions into
   /// its cannonical representation
   explicit linear_functiont(const exprt &f);
@@ -60,6 +57,11 @@ struct linear_functiont
   /// For instance, if `f` corresponds to the expression `q + x`, `solve(q,v,f)`
   /// returns the expression `v - x`.
   static exprt solve(linear_functiont f, const exprt &var, const exprt &val);
+
+private:
+  mp_integer constant_coefficient;
+  std::unordered_map<exprt, mp_integer, irep_hash> coefficients;
+  typet type;
 };
 
 #endif // CPROVER_SOLVERS_REFINEMENT_STRING_CONSTRAINT_INSTANTIATION_H
