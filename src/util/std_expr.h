@@ -4394,6 +4394,8 @@ inline popcount_exprt &to_popcount_expr(exprt &expr)
 /// this is a parametric version of an if-expression: it returns
 /// the value of the first case (using the ordering of the operands)
 /// whose condition evaluates to true.
+/// It can be exclusive, in which case the creator asserts that the conditions
+/// are mutually exclusive (i.e. they may be processed in any order).
 class cond_exprt : public multi_ary_exprt
 {
 public:
@@ -4402,9 +4404,11 @@ public:
   {
   }
 
-  cond_exprt(operandst _operands, typet _type)
+  cond_exprt(operandst _operands, typet _type, bool exclusive = false)
     : multi_ary_exprt(ID_cond, std::move(_operands), std::move(_type))
   {
+    if(exclusive)
+      set(ID_exclusive, true);
   }
 
   /// adds a case to a cond expression
