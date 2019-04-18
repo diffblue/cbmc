@@ -159,7 +159,7 @@ TEST_CASE("Sharing map interface", "[core][util]")
 
     cbmc_invariants_should_throwt invariants_throw;
 
-    REQUIRE_THROWS(sm.insert("i", "4"));
+    REQUIRE_THROWS_AS(sm.insert("i", "4"), invariant_failedt);
   }
 
   SECTION("Replace and update elements")
@@ -190,22 +190,24 @@ TEST_CASE("Sharing map interface", "[core][util]")
 
     SECTION("Replace non-existing")
     {
-      REQUIRE_THROWS(sm.replace("x", "0"));
+      REQUIRE_THROWS_AS(sm.replace("x", "0"), invariant_failedt);
     }
 
     SECTION("Update non-existing")
     {
-      REQUIRE_THROWS(sm.update("x", [](std::string &str) {}));
+      REQUIRE_THROWS_AS(
+        sm.update("x", [](std::string &str) {}), invariant_failedt);
     }
 
     SECTION("Replace with equal")
     {
-      REQUIRE_THROWS(debug_sm.replace("i", "0"));
+      REQUIRE_THROWS_AS(debug_sm.replace("i", "0"), invariant_failedt);
     }
 
     SECTION("Update with equal")
     {
-      REQUIRE_THROWS(debug_sm.update("i", [](std::string &str) {}));
+      REQUIRE_THROWS_AS(
+        debug_sm.update("i", [](std::string &str) {}), invariant_failedt);
     }
   }
 
@@ -272,7 +274,7 @@ TEST_CASE("Sharing map interface", "[core][util]")
 
     cbmc_invariants_should_throwt invariants_throw;
 
-    REQUIRE_THROWS(sm3.erase("x"));
+    REQUIRE_THROWS_AS(sm3.erase("x"), invariant_failedt);
   }
 }
 
