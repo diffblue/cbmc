@@ -107,11 +107,11 @@ exprt value_set_dereferencet::dereference(const exprt &pointer)
         may_fail=true;
   }
 
+  exprt failure_value;
+
   if(may_fail)
   {
     // first see if we have a "failed object" for this pointer
-
-    exprt failure_value;
 
     if(
       const symbolt *failed_symbol =
@@ -138,36 +138,61 @@ exprt value_set_dereferencet::dereference(const exprt &pointer)
       failure_value=symbol.symbol_expr();
       failure_value.set(ID_C_invalid_object, true);
     }
-
-    valuet value;
-    value.value=failure_value;
-    value.pointer_guard=true_exprt();
-    values.push_front(value);
   }
 
   // now build big case split, but we only do "good" objects
 
-  exprt value=nil_exprt();
-
-  for(std::list<valuet>::const_iterator
-      it=values.begin();
-      it!=values.end();
-      it++)
+  optionalt<exprt> value_without_condition;
+  cond_exprt cond({}, type, true);
+  for(const auto &alias_value : values)
   {
-    if(it->value.is_not_nil())
+    if(alias_value.value.is_not_nil())
     {
-      if(value.is_nil()) // first?
-        value=it->value;
+      if(alias_value.pointer_guard.is_false())
+      {
+        INVARIANT(
+          !value_without_condition.has_value(),
+          "can't discriminate between two different catch-all aliases");
+        value_without_condition = alias_value.value;
+      }
       else
-        value=if_exprt(it->pointer_guard, it->value, value);
+      {
+        cond.add_case(alias_value.pointer_guard, alias_value.value);
+        INVARIANT(
+          alias_value.value.type() == type,
+          "deref value types should match the pointer being derefd");
+      }
     }
   }
 
-  #if 0
-  std::cout << "R: " << format(value) << "\n\n";
-  #endif
+  // I'd like to put an invariant here that values without a pointer guard, such
+  // as integer_address, cannot co-occur with failed objects, but this isn't the
+  // case. There's no way to write a GOTO condition to discriminate between the
+  // two however, so purely by historical accident, the failed object takes
+  // precedence:
 
-  return value;
+  if(may_fail || value_without_condition.has_value())
+  {
+    // The cases must be disjoint, so add
+    // "!(p == &o1 || p == &o2 || p == &o3 || ...) => failure-value"
+    exprt::operandst other_case_conditions;
+    for(std::size_t i = 0; i < cond.get_n_cases(); ++i)
+      other_case_conditions.push_back(cond.condition(i));
+    cond.add_case(
+      not_exprt(disjunction(other_case_conditions)),
+      may_fail ? failure_value : *value_without_condition);
+  }
+
+#if 0
+  std::cout << "R: " << format(cond) << "\n\n";
+#endif
+
+  if(cond.get_n_cases() == 0)
+    return nil_exprt();
+  else if(cond.get_n_cases() == 1)
+    return cond.value(0);
+  else
+    return std::move(cond);
 }
 
 /// Check if the two types have matching number of ID_pointer levels, with
