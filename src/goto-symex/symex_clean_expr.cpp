@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/byte_operators.h>
 #include <util/c_types.h>
+#include <util/expr_iterator.h>
 #include <util/pointer_offset_size.h>
 #include <util/simplify_expr.h>
 
@@ -169,6 +170,33 @@ replace_nondet(exprt &expr, symex_nondet_generatort &build_symex_nondet)
   }
 }
 
+static void lower_cond_expr(exprt &expr)
+{
+  for(auto it = expr.depth_begin(), itend = expr.depth_end(); it != itend; ++it)
+  {
+    if(it->id() == ID_cond)
+    {
+      exprt new_expr;
+      const auto &cond_expr = to_cond_expr(*it);
+      INVARIANT(cond_expr.get_n_cases() >= 1, "cond_expr should not be empty");
+      for(std::size_t i = cond_expr.get_n_cases() - 1;; --i)
+      {
+        if(i == cond_expr.get_n_cases() - 1)
+          new_expr = cond_expr.value(i);
+        else
+        {
+          new_expr =
+            if_exprt(cond_expr.condition(i), cond_expr.value(i), new_expr);
+        }
+        if(i == 0)
+          break;
+      }
+
+      it.mutate() = std::move(new_expr);
+    }
+  }
+}
+
 void goto_symext::clean_expr(
   exprt &expr,
   statet &state,
@@ -176,6 +204,12 @@ void goto_symext::clean_expr(
 {
   replace_nondet(expr, path_storage.build_symex_nondet);
   dereference(expr, state, write);
+
+  // We know how to handle cond_exprt on the LHS (symex_assign_rec does this),
+  // but cond_exprt on the RHS is currently patchily handled, especially by the
+  // Java string solver. For now, lower such expressions to nested if_exprts.
+  if(!write)
+    lower_cond_expr(expr);
 
   // make sure all remaining byte extract operations use the root
   // object to avoid nesting of with/update and byte_update when on
