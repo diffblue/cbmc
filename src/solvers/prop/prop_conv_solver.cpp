@@ -66,6 +66,10 @@ optionalt<bool> prop_conv_solvert::get_bool(const exprt &expr) const
 
     return prop.l_get(result->second).is_true();
   }
+  else if(expr.id() == ID_literal)
+  {
+    return prop.l_get(to_literal_expr(expr).get_literal()).is_true();
+  }
 
   // sub-expressions
 

@@ -58,10 +58,11 @@ const SSA_stept &goto_symex_fault_localizert::collect_guards(
       step.assignment_type == symex_targett::assignment_typet::STATE &&
       !step.ignore)
     {
-      if(!step.guard_literal.is_constant())
+      literalt l = solver.convert(step.guard_handle);
+      if(!l.is_constant())
       {
         auto emplace_result = fault_location.scores.emplace(step.source.pc, 0);
-        localization_points.emplace(step.guard_literal, emplace_result.first);
+        localization_points.emplace(l, emplace_result.first);
       }
     }
 
@@ -90,7 +91,7 @@ bool goto_symex_fault_localizert::check(
   }
 
   // lock the failed assertion
-  assumptions.push_back(!failed_step.cond_literal);
+  assumptions.push_back(!solver.convert(failed_step.cond_handle));
 
   solver.set_assumptions(assumptions);
 

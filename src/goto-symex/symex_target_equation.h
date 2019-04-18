@@ -24,15 +24,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/goto_program.h>
 #include <goto-programs/goto_trace.h>
 
-#include <solvers/prop/literal.h>
-
 #include "renaming_level.h"
 #include "ssa_step.h"
 #include "symex_target.h"
 
 class decision_proceduret;
 class namespacet;
-class prop_convt;
+class decision_proceduret;
 
 /// Inheriting the interface of symex_targett this class represents the SSA
 /// form of the input program as a list of \ref SSA_stept. It further extends
@@ -176,51 +174,49 @@ public:
   /// Interface method to initiate the conversion into a decision procedure
   /// format. The method iterates over the equation, i.e. over the SSA steps and
   /// converts each type of step separately.
-  /// \param prop_conv: A handle to a particular decision procedure interface
-  void convert(prop_convt &prop_conv);
+  /// \param decision_procedure: A handle to a decision procedure interface
+  void convert(decision_proceduret &decision_procedure);
 
   /// Converts assignments: set the equality _lhs==rhs_ to _True_.
-  /// \param decision_procedure: A handle to a particular decision procedure
+  /// \param decision_procedure: A handle to a decision procedure
   ///  interface
   void convert_assignments(decision_proceduret &decision_procedure);
 
   /// Converts declarations: these are effectively ignored by the decision
   /// procedure.
-  /// \param prop_conv: A handle to a particular decision procedure interface
-  void convert_decls(prop_convt &prop_conv);
+  /// \param decision_procedure: A handle to a decision procedure
+  ///  interface
+  void convert_decls(decision_proceduret &decision_procedure);
 
   /// Converts assumptions: convert the expression the assumption represents.
-  /// \param prop_conv: A handle to a particular decision procedure interface
-  void convert_assumptions(prop_convt &prop_conv);
+  /// \param decision_procedure: A handle to a decision procedure interface
+  void convert_assumptions(decision_proceduret &decision_procedure);
 
   /// Converts assertions: build a disjunction of negated assertions.
-  /// \param prop_conv: A handle to a particular decision procedure interface
-  void convert_assertions(prop_convt &prop_conv);
+  /// \param decision_procedure: A handle to a decision procedure interface
+  void convert_assertions(decision_proceduret &decision_procedure);
 
   /// Converts constraints: set the represented condition to _True_.
-  /// \param decision_procedure: A handle to a particular decision procedure
-  ///  interface
+  /// \param decision_procedure: A handle to a decision procedure interface
   void convert_constraints(decision_proceduret &decision_procedure);
 
   /// Converts goto instructions: convert the expression representing the
   /// condition of this goto.
-  /// \param prop_conv: A handle to a particular decision procedure interface
-  void convert_goto_instructions(prop_convt &prop_conv);
+  /// \param decision_procedure: A handle to a decision procedure interface
+  void convert_goto_instructions(decision_proceduret &decision_procedure);
 
   /// Converts guards: convert the expression the guard represents.
-  /// \param prop_conv: A handle to a particular decision procedure interface
-  void convert_guards(prop_convt &prop_conv);
+  /// \param decision_procedure: A handle to a decision procedure interface
+  void convert_guards(decision_proceduret &decision_procedure);
 
   /// Converts function calls: for each argument build an equality between its
   /// symbol and the argument itself.
-  /// \param decision_procedure: A handle to a particular decision procedure
-  ///  interface
+  /// \param decision_procedure: A handle to a decision procedure interface
   void convert_function_calls(decision_proceduret &decision_procedure);
 
   /// Converts I/O: for each argument build an equality between its
   /// symbol and the argument itself.
-  /// \param decision_procedure: A handle to a particular decision procedure
-  ///  interface
+  /// \param decision_procedure: A handle to a decision procedure interface
   void convert_io(decision_proceduret &decision_procedure);
 
   exprt make_expression() const;
