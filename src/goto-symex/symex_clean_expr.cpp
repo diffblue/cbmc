@@ -50,6 +50,27 @@ process_array_expr(exprt &expr, bool do_simplify, const namespacet &ns)
 
     if_expr.type()=if_expr.true_case().type();
   }
+  else if(expr.id() == ID_cond)
+  {
+    cond_exprt &cond_expr = to_cond_expr(expr);
+    typet result_type;
+    for(std::size_t i = 0; i < cond_expr.get_n_cases(); ++i)
+    {
+      process_array_expr(cond_expr.value(i), do_simplify, ns);
+      if(i == 0)
+        result_type = cond_expr.value(i).type();
+      else if(cond_expr.value(i).type() != result_type)
+      {
+        cond_expr.value(i) = byte_extract_exprt(
+          byte_extract_id(),
+          cond_expr.value(i),
+          from_integer(0, index_type()),
+          result_type);
+      }
+    }
+
+    cond_expr.type() = result_type;
+  }
   else if(expr.id()==ID_address_of)
   {
     // strip
