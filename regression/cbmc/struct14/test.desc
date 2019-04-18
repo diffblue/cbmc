@@ -1,0 +1,11 @@
+CORE
+main.c
+
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+With field-sensitive SSA encoding we need to make sure that each struct member
+is treated as non-deterministic unless initialised.

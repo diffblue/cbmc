@@ -64,8 +64,17 @@ void goto_symext::symex_decl(statet &state, const symbol_exprt &expr)
   }
 
   // L2 renaming
-  std::size_t generation = state.increase_generation(l1_identifier, ssa);
-  CHECK_RETURN(generation == 1);
+  const exprt fields = state.field_sensitivity.get_fields(ns, state, ssa);
+  std::set<symbol_exprt> fields_set;
+  find_symbols(fields, fields_set);
+
+  for(const auto &l1_symbol : fields_set)
+  {
+    ssa_exprt field_ssa = to_ssa_expr(l1_symbol);
+    std::size_t field_generation =
+      state.increase_generation(l1_symbol.get_identifier(), field_ssa);
+    CHECK_RETURN(field_generation == 1);
+  }
 
   const bool record_events=state.record_events;
   state.record_events=false;
