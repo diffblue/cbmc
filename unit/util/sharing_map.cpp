@@ -19,9 +19,6 @@ Author: Daniel Poetzl
 typedef sharing_mapt<irep_idt, std::string, false, irep_id_hash>
   sharing_map_standardt;
 
-typedef sharing_mapt<irep_idt, std::string, true, irep_id_hash>
-  sharing_map_debugt;
-
 class sharing_map_internalt : public sharing_map_standardt
 {
   friend void sharing_map_internals_test();
@@ -159,6 +156,10 @@ TEST_CASE("Sharing map interface", "[core][util]")
     REQUIRE(sm.has_key("i"));
     REQUIRE(sm.has_key("j"));
     REQUIRE(!sm.has_key("k"));
+
+    cbmc_invariants_should_throwt invariants_throw;
+
+    REQUIRE_THROWS_AS(sm.insert("i", "4"), invariant_failedt);
   }
 
   SECTION("Replace and update elements")
@@ -175,17 +176,38 @@ TEST_CASE("Sharing map interface", "[core][util]")
     auto r2 = sm.find("i");
     REQUIRE(r2);
     REQUIRE(r2->get() == "90");
+  }
 
+  SECTION("Replace and update elements errors")
+  {
+    sharing_map_standardt sm;
+    fill(sm);
+
+    sharing_map_error_checkt debug_sm;
+    fill(debug_sm);
+
+    cbmc_invariants_should_throwt invariants_throw;
+
+    SECTION("Replace non-existing")
     {
-      cbmc_invariants_should_throwt invariants_throw;
-      sharing_map_debugt debug_sm;
-      fill(debug_sm);
-      REQUIRE_NOTHROW(
-        debug_sm.update("i", [](std::string &str) { str += "1"; }));
-      REQUIRE_THROWS(debug_sm.update("i", [](std::string &str) {}));
+      REQUIRE_THROWS_AS(sm.replace("x", "0"), invariant_failedt);
+    }
 
-      REQUIRE_NOTHROW(debug_sm.replace("i", "abc"));
-      REQUIRE_THROWS(debug_sm.replace("i", "abc"));
+    SECTION("Update non-existing")
+    {
+      REQUIRE_THROWS_AS(
+        sm.update("x", [](std::string &str) {}), invariant_failedt);
+    }
+
+    SECTION("Replace with equal")
+    {
+      REQUIRE_THROWS_AS(debug_sm.replace("i", "0"), invariant_failedt);
+    }
+
+    SECTION("Update with equal")
+    {
+      REQUIRE_THROWS_AS(
+        debug_sm.update("i", [](std::string &str) {}), invariant_failedt);
     }
   }
 
@@ -249,6 +271,10 @@ TEST_CASE("Sharing map interface", "[core][util]")
 
     sm3.erase("i");
     REQUIRE(!sm3.has_key("i"));
+
+    cbmc_invariants_should_throwt invariants_throw;
+
+    REQUIRE_THROWS_AS(sm3.erase("x"), invariant_failedt);
   }
 }
 
@@ -309,7 +335,7 @@ TEST_CASE("Sharing map views and iteration", "[core][util]")
 
   SECTION("View")
   {
-    typedef std::pair<dstringt, std::string> pt;
+    typedef std::pair<std::string, std::string> pt;
 
     sharing_map_standardt sm;
     sharing_map_standardt::viewt view;
@@ -319,7 +345,7 @@ TEST_CASE("Sharing map views and iteration", "[core][util]")
       pairs.clear();
       for(auto &p : view)
       {
-        pairs.push_back({p.first, p.second});
+        pairs.push_back({id2string(p.first), p.second});
       }
       std::sort(pairs.begin(), pairs.end());
     };
@@ -354,11 +380,11 @@ TEST_CASE("Sharing map views and iteration", "[core][util]")
     sharing_map_standardt sm;
     fill(sm);
 
-    typedef std::pair<dstringt, std::string> pt;
+    typedef std::pair<std::string, std::string> pt;
     std::vector<pt> pairs;
 
     sm.iterate([&pairs](const irep_idt &key, const std::string &value) {
-      pairs.push_back({key, value});
+      pairs.push_back({id2string(key), value});
     });
 
     std::sort(pairs.begin(), pairs.end());
@@ -439,6 +465,98 @@ TEST_CASE("Sharing map views and iteration", "[core][util]")
     delta_view.clear();
     sm1.get_delta_view(sm2, delta_view, false);
     REQUIRE(delta_view.size() == 3);
+  }
+}
+
+TEST_CASE("Sharing map view validity", "[core][util]")
+{
+  SECTION("View validity")
+  {
+    sharing_map_standardt sm;
+    sharing_map_standardt::viewt view;
+
+    fill(sm);
+    fill2(sm);
+
+    sharing_map_standardt sm2(sm);
+    sm2.replace("l", "8");
+
+    sm.get_view(view);
+
+    std::size_t i_idx = 0;
+    std::size_t k_idx = 0;
+
+    for(std::size_t i = 0; i < view.size(); i++)
+    {
+      if(view[i].first == "i")
+        i_idx = i;
+
+      if(view[i].first == "k")
+        k_idx = i;
+    }
+
+    sm.erase("i");
+    sm.replace("k", "7");
+    sm.insert("o", "6");
+
+    for(std::size_t i = 0; i < view.size(); i++)
+    {
+      if(i == i_idx || i == k_idx)
+        continue;
+
+      auto &p = view[i];
+
+      REQUIRE(&p.second == &sm.find(p.first)->get());
+    }
+  }
+
+  SECTION("Delta view validity")
+  {
+    sharing_map_standardt sm;
+
+    sharing_map_standardt::delta_viewt delta_view;
+
+    fill(sm);
+    fill2(sm);
+
+    sharing_map_standardt sm2(sm);
+
+    sm2.erase("i");
+    sm2.erase("j");
+    sm2.erase("k");
+
+    sm2.erase("m");
+    sm2.erase("n");
+
+    sm.get_delta_view(sm2, delta_view, false);
+
+    REQUIRE(delta_view.size() == 5);
+
+    std::size_t i_idx = 0;
+    std::size_t k_idx = 0;
+
+    for(std::size_t i = 0; i < delta_view.size(); i++)
+    {
+      if(delta_view[i].k == "i")
+        i_idx = i;
+
+      if(delta_view[i].k == "k")
+        k_idx = i;
+    }
+
+    sm.erase("i");
+    sm.replace("k", "7");
+    sm.insert("o", "6");
+
+    for(std::size_t i = 0; i < delta_view.size(); i++)
+    {
+      if(i == i_idx || i == k_idx)
+        continue;
+
+      auto &delta_item = delta_view[i];
+
+      REQUIRE(&delta_item.m == &sm.find(delta_item.k)->get());
+    }
   }
 }
 
@@ -531,36 +649,4 @@ TEST_CASE("Sharing map sharing stats", "[core][util]")
     REQUIRE(sms.num_unique_leafs == 3);
   }
 #endif
-}
-
-TEST_CASE("Sharing map replace non-existing", "[.]")
-{
-  sharing_map_standardt sm;
-  fill(sm);
-
-  sm.replace("x", "0");
-}
-
-TEST_CASE("Sharing map replace with equal value", "[.]")
-{
-  sharing_map_error_checkt sm;
-
-  sm.insert("i", "0");
-  sm.replace("i", "0");
-}
-
-TEST_CASE("Sharing map insert existing", "[.]")
-{
-  sharing_map_standardt sm;
-  fill(sm);
-
-  sm.insert("i", "4");
-}
-
-TEST_CASE("Sharing map erase non-existing", "[.]")
-{
-  sharing_map_standardt sm;
-  fill(sm);
-
-  sm.erase("x");
 }
