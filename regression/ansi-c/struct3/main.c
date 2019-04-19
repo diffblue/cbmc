@@ -1,5 +1,3 @@
-//#define STATIC_ASSERT(condition) \
-//  int some_array##__LINE__[(condition) ? 1 : -1];
 #define STATIC_ASSERT(condition) \
   _Static_assert((condition), "assertion");
 

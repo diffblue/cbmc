@@ -1,7 +1,10 @@
 #ifdef __GNUC__
 
-#define STATIC_ASSERT(condition) \
-  int some_array##__LINE__[(condition) ? 1 : -1]
+#  define CONCAT(a, b) a##b
+#  define CONCAT2(a, b) CONCAT(a, b)
+
+#  define STATIC_ASSERT(condition)                                             \
+    int CONCAT2(some_array, __LINE__)[(condition) ? 1 : -1]
 
 int getopt_long(int i, char * const* s);
 int getopt_long_nn(int, char * const*);
