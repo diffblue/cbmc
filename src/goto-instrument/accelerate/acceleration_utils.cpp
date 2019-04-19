@@ -992,10 +992,10 @@ bool acceleration_utilst::do_nonrecursive(
     }
   }
 
-  for(auto it = array_writes.begin(); it != array_writes.end(); ++it)
+  for(const auto &write : array_writes)
   {
-    const auto &lhs = *it;
-    const auto &rhs = state[*it];
+    const auto &lhs = write;
+    const auto &rhs = state[write];
 
     if(!assign_array(lhs, rhs, program))
     {
