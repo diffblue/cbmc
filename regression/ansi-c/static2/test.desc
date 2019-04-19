@@ -1,4 +1,4 @@
-CORE
+CORE test-c++-front-end
 main.c
 main2.c --function foo
 ^main symbol `foo' is ambiguous$

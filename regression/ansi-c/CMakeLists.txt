@@ -6,4 +6,10 @@ else()
 add_test_pl_tests(
     "$<TARGET_FILE:goto-cc>"
 )
+add_test_pl_profile(
+    "ansi-c-c++-front-end"
+    "$<TARGET_FILE:goto-cc> -xc++ -D_Bool=bool"
+    "-C;-I;test-c++-front-end;-s;c++-front-end"
+    "CORE"
+)
 endif()
