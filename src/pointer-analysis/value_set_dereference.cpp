@@ -36,13 +36,20 @@ exprt value_set_dereferencet::dereference(const exprt &pointer)
     throw "dereference expected pointer type, but got "+
           pointer.type().pretty();
 
-  // we may get ifs due to recursive calls
+  // we may get ifs or conds due to recursive calls
   if(pointer.id()==ID_if)
   {
     const if_exprt &if_expr=to_if_expr(pointer);
     exprt true_case = dereference(if_expr.true_case());
     exprt false_case = dereference(if_expr.false_case());
     return if_exprt(if_expr.cond(), true_case, false_case);
+  }
+  else if(pointer.id() == ID_cond)
+  {
+    cond_exprt result = to_cond_expr(pointer);
+    for(std::size_t i = 0; i < result.get_n_cases(); ++i)
+      result.value(i) = dereference(result.value(i));
+    return std::move(result);
   }
 
   // type of the object

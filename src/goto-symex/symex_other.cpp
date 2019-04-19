@@ -55,6 +55,21 @@ void goto_symext::havoc_rec(
     guard_f.add(not_exprt(if_expr.cond()));
     havoc_rec(state, guard_f, if_expr.false_case());
   }
+  else if(dest.id() == ID_cond)
+  {
+    const auto &cond_expr = to_cond_expr(dest);
+    for(std::size_t i = 0; i < cond_expr.get_n_cases(); ++i)
+    {
+      guardt guard = state.guard;
+      if(!cond_expr.is_exclusive())
+      {
+        for(std::size_t j = 0; j < i; ++j)
+          guard.add(not_exprt(cond_expr.condition(j)));
+      }
+      guard.add(cond_expr.condition(i));
+      havoc_rec(state, guard, cond_expr.value(i));
+    }
+  }
   else if(dest.id()==ID_typecast)
   {
     havoc_rec(state, guard, to_typecast_expr(dest).op());

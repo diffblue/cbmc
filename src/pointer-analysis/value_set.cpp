@@ -1175,6 +1175,12 @@ void value_sett::get_reference_set_rec(
     get_reference_set_rec(expr.op2(), dest, ns);
     return;
   }
+  else if(expr.id() == ID_cond)
+  {
+    const auto &cond_expr = to_cond_expr(expr);
+    for(std::size_t i = 0; i < cond_expr.get_n_cases(); ++i)
+      get_reference_set_rec(cond_expr.value(i), dest, ns);
+  }
 
   insert(dest, exprt(ID_unknown, expr.type()));
 }

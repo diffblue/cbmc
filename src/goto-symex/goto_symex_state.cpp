@@ -579,6 +579,16 @@ void goto_symex_statet::rename_address(exprt &expr, const namespacet &ns)
 
       if_expr.type()=if_expr.true_case().type();
     }
+    else if(expr.id() == ID_cond)
+    {
+      cond_exprt &cond_expr = to_cond_expr(expr);
+      for(std::size_t i = 0; i < cond_expr.get_n_cases(); ++i)
+      {
+        cond_expr.condition(i) =
+          rename<level>(std::move(cond_expr.condition(i)), ns).get();
+        rename_address<level>(cond_expr.value(i), ns);
+      }
+    }
     else if(expr.id()==ID_member)
     {
       member_exprt &member_expr=to_member_expr(expr);

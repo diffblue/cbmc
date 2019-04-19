@@ -123,6 +123,18 @@ exprt goto_symext::address_arithmetic(
 
     result=if_expr;
   }
+  else if(expr.id() == ID_cond)
+  {
+    cond_exprt cond_expr = to_cond_expr(expr);
+    for(std::size_t i = 0; i < cond_expr.get_n_cases(); ++i)
+    {
+      dereference_rec(cond_expr.condition(i), state, false);
+      cond_expr.value(i) =
+        address_arithmetic(cond_expr.value(i), state, keep_array);
+    }
+
+    result = std::move(cond_expr);
+  }
   else if(expr.id()==ID_symbol ||
           expr.id()==ID_string_constant ||
           expr.id()==ID_label ||

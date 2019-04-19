@@ -89,6 +89,37 @@ static exprt build_full_lhs_rec(
     else
       return std::move(tmp2);
   }
+  else if(id == ID_cond)
+  {
+    const auto &original_cond_expr = to_cond_expr(src_original);
+    const auto &ssa_cond_expr = to_cond_expr(src_ssa);
+    cond_exprt result(
+      {}, src_original.type(), original_cond_expr.is_exclusive());
+    for(std::size_t i = 0; i < original_cond_expr.get_n_cases(); ++i)
+    {
+      exprt condition =
+        decision_procedure.get(to_cond_expr(src_ssa).condition(i));
+      if(condition.is_false())
+        continue;
+
+      exprt value = build_full_lhs_rec(
+        decision_procedure,
+        ns,
+        original_cond_expr.value(i),
+        ssa_cond_expr.value(i));
+
+      if(
+        condition.is_true() &&
+        (result.get_n_cases() == 0 || result.is_exclusive()))
+      {
+        return value;
+      }
+
+      result.add_case(condition, value);
+    }
+
+    return std::move(result);
+  }
   else if(id==ID_typecast)
   {
     typecast_exprt tmp=to_typecast_expr(src_original);
