@@ -1954,7 +1954,7 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
       // We only convert the arg_type,
       // and don't typecheck it -- that could cause all
       // sorts of trouble.
-      cpp_convert_plain_type(arg_type);
+      cpp_convert_plain_type(arg_type, cpp_typecheck.get_message_handler());
 
       guess_template_args(arg_type, it->type());
     }

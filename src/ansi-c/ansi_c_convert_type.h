@@ -51,8 +51,8 @@ public:
   // qualifiers
   c_qualifierst c_qualifiers;
 
-  void read(const typet &type);
-  void write(typet &type);
+  virtual void read(const typet &type);
+  virtual void write(typet &type);
 
   source_locationt source_location;
 
@@ -64,7 +64,7 @@ public:
   {
   }
 
-  void clear()
+  virtual void clear()
   {
     unsigned_cnt=signed_cnt=char_cnt=int_cnt=short_cnt=
     long_cnt=double_cnt=float_cnt=c_bool_cnt=proper_bool_cnt=complex_cnt=
@@ -90,7 +90,9 @@ public:
   }
 
 protected:
-  void read_rec(const typet &type);
+  virtual void read_rec(const typet &type);
+  virtual void build_type_with_subtype(typet &type) const;
+  virtual void set_attributes(typet &type) const;
 };
 
 #endif // CPROVER_ANSI_C_ANSI_C_CONVERT_TYPE_H

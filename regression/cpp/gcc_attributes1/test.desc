@@ -1,5 +1,5 @@
-CORE gcc-only test-c++-front-end
-main.c
+CORE gcc-only
+main.cpp
 
 ^EXIT=0$
 ^SIGNAL=0$
