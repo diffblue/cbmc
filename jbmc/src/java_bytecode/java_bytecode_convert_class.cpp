@@ -677,10 +677,37 @@ void java_bytecode_convert_classt::convert(
   else
     field_type = *java_type_from_string(f.descriptor);
 
+  // determine access
+  irep_idt access;
+
+  if(f.is_private)
+    access = ID_private;
+  else if(f.is_protected)
+    access = ID_protected;
+  else if(f.is_public)
+    access = ID_public;
+  else
+    access = ID_default;
+
+  auto &class_type = to_java_class_type(class_symbol.type);
+
   // is this a static field?
   if(f.is_static)
   {
-    // Create the symbol; we won't add to the struct type.
+    const irep_idt field_identifier =
+      id2string(class_symbol.name) + "." + id2string(f.name);
+
+    class_type.static_members().emplace_back();
+    auto &component = class_type.static_members().back();
+
+    component.set_name(field_identifier);
+    component.set_base_name(f.name);
+    component.set_pretty_name(f.name);
+    component.set_access(access);
+    component.set_is_final(f.is_final);
+    component.type() = field_type;
+
+    // Create the symbol
     symbolt new_symbol;
 
     new_symbol.is_static_lifetime=true;
@@ -740,26 +767,15 @@ void java_bytecode_convert_classt::convert(
   }
   else
   {
-    auto &class_type = to_java_class_type(class_symbol.type);
-
     class_type.components().emplace_back();
     auto &component = class_type.components().back();
 
     component.set_name(f.name);
     component.set_base_name(f.name);
     component.set_pretty_name(f.name);
-    component.type()=field_type;
-
-    if(f.is_private)
-      component.set_access(ID_private);
-    else if(f.is_protected)
-      component.set_access(ID_protected);
-    else if(f.is_public)
-      component.set_access(ID_public);
-    else
-      component.set_access(ID_default);
-
+    component.set_access(access);
     component.set_is_final(f.is_final);
+    component.type() = field_type;
 
     // Load annotations
     if(!f.annotations.empty())

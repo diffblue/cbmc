@@ -155,6 +155,19 @@ public:
       class_typet::get_component(component_name));
   }
 
+  using static_membert = componentt;
+  using static_memberst = std::vector<componentt>;
+
+  const static_memberst &static_members() const
+  {
+    return (const static_memberst &)class_typet::static_members();
+  }
+
+  static_memberst &static_members()
+  {
+    return (static_memberst &)class_typet::static_members();
+  }
+
   const irep_idt &get_access() const
   {
     return get(ID_access);
