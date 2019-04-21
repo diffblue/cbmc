@@ -330,6 +330,19 @@ public:
     return (methodst &)(add(ID_methods).get_sub());
   }
 
+  using static_membert = componentt;
+  using static_memberst = componentst;
+
+  const static_memberst &static_members() const
+  {
+    return (const static_memberst &)(find(ID_static_members).get_sub());
+  }
+
+  static_memberst &static_members()
+  {
+    return (static_memberst &)(add(ID_static_members).get_sub());
+  }
+
   bool is_abstract() const
   {
     return get_bool(ID_abstract);
