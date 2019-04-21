@@ -325,7 +325,7 @@ public:
     return (const methodst &)(find(ID_methods).get_sub());
   }
 
-  componentst &methods()
+  methodst &methods()
   {
     return (methodst &)(add(ID_methods).get_sub());
   }
