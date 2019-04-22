@@ -1919,21 +1919,13 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
 
     // These aren't really function calls, but either conversions or
     // initializations.
-    if(expr.arguments().empty())
-    {
-      // create temporary object
-      side_effect_exprt tmp_object_expr(
-        ID_temporary_object, pod, expr.source_location());
-      tmp_object_expr.set(ID_C_lvalue, true);
-      tmp_object_expr.set(ID_mode, ID_cpp);
-      expr.swap(tmp_object_expr);
-    }
-    else if(expr.arguments().size()==1)
+    if(expr.arguments().size() <= 1)
     {
       exprt typecast("explicit-typecast");
       typecast.type()=pod;
       typecast.add_source_location()=expr.source_location();
-      typecast.copy_to_operands(expr.arguments().front());
+      if(!expr.arguments().empty())
+        typecast.copy_to_operands(expr.arguments().front());
       typecheck_expr_explicit_typecast(typecast);
       expr.swap(typecast);
     }
