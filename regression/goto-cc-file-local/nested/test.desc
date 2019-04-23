@@ -1,0 +1,15 @@
+CORE
+foo/bar/baz/main.c
+show-symbol-table use_find
+
+^EXIT=0$
+^SIGNAL=0$
+^Symbol......: __CPROVER_file_local_main_c_foo$
+--
+^warning: ignoring
+^\*\*\*\* WARNING: no body for function
+^Symbol......: __CPROVER_file_local_foo_bar_baz_main_c_foo$
+--
+This test checks that a file that we compile several directories up from
+its actual location will get mangled based on its basename, not its
+entire path.

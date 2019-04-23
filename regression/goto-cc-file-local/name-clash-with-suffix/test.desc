@@ -1,0 +1,18 @@
+CORE
+foo/bar/baz/main.c
+use_find out-file-counter final-link wall suffix assertion-check
+^EXIT=0$
+^SIGNAL=0$
+--
+^.*warning: function `__CPROVER_file_local_main_c_static_fun' in module `main' is shadowed by a definition in module `main'
+^warning: ignoring
+^\*\*\*\* WARNING: no body for function
+--
+This test contains two identically-named static functions in two
+identically-named files in different directories. By default, the
+name-mangling scheme would have the static functions identical names when
+they got exported. This test ensures the functions each get a unique
+suffix.
+
+CBMC should work on the finally-linked binary because the functions have
+been correctly mangled.
