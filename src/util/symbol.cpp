@@ -142,7 +142,9 @@ bool symbolt::is_well_formed() const
   // Exception: Java symbols' base names do not have type signatures
   // (for example, they can have name "someclass.method:(II)V" and base name
   // "method")
-  if(!has_suffix(id2string(name), id2string(base_name)) && mode != ID_java)
+  if(
+    !has_suffix(id2string(name), id2string(base_name)) && mode != ID_java &&
+    mode != ID_cpp)
   {
     bool criterion_must_hold = true;
 

@@ -1,10 +1,10 @@
 default: tests.log
 
 test:
-	@../test.pl -e -p -c ../../../src/cbmc/cbmc
+	@../test.pl -e -p -c "../../../src/cbmc/cbmc --validate-goto-model --validate-ssa-equation"
 
 tests.log: ../test.pl
-	@../test.pl -e -p -c ../../../src/cbmc/cbmc
+	@../test.pl -e -p -c "../../../src/cbmc/cbmc --validate-goto-model --validate-ssa-equation"
 
 show:
 	@for dir in *; do \

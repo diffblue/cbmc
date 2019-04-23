@@ -302,7 +302,8 @@ void cpp_declarator_convertert::combine_types(
         if(symbol.value.is_nil())
         {
           symbol_parameter.set_base_name(decl_parameter.get_base_name());
-          symbol_parameter.set_identifier(decl_parameter.get_identifier());
+          // set an empty identifier when no body is available
+          symbol_parameter.set_identifier(irep_idt());
           symbol_parameter.add_source_location()=
             decl_parameter.source_location();
         }
@@ -470,6 +471,13 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
 
     if(member_spec.is_inline())
       to_code_type(symbol.type).set_inlined(true);
+
+    if(symbol.value.is_nil())
+    {
+      // we don't need the identifiers
+      for(auto &parameter : to_code_type(symbol.type).parameters())
+        parameter.set_identifier(irep_idt());
+    }
   }
   else
   {
