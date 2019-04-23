@@ -32,7 +32,7 @@ public:
 
   tvt l_get(literalt a) const override final;
 
-  void lcnf(const bvt &bv) override final;
+  void lcnf(const bvt &bv) override;
   void set_assignment(literalt a, bool value) override;
 
   // extra MiniSat feature: solve with assumptions

@@ -180,6 +180,7 @@ SRC = $(BOOLEFORCE_SRC) \
       sat/cnf.cpp \
       sat/cnf_clause_list.cpp \
       sat/dimacs_cnf.cpp \
+      sat/icnf.cpp \
       sat/pbs_dimacs_cnf.cpp \
       sat/resolution_proof.cpp \
       smt2/letify.cpp \
