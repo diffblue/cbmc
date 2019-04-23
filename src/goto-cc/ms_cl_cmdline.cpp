@@ -61,7 +61,9 @@ bool ms_cl_cmdlinet::parse(const std::vector<std::string> &arguments)
     {
       process_non_cl_option(arguments[i]);
 
-      if(arguments[i] == "--verbosity" || arguments[i] == "--function")
+      if(
+        arguments[i] == "--verbosity" || arguments[i] == "--function" ||
+        arguments[i] == "--mangle-suffix")
       {
         if(i < arguments.size() - 1)
         {

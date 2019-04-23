@@ -29,10 +29,10 @@ for src in *.c; do
 
   if [[ "${is_windows}" == "true" ]]; then
     "${goto_cc}"                        \
-        /export-function-local-symbols  \
-        /verbosity 10                   \
+        --export-function-local-symbols \
+        --verbosity 10                  \
         ${suffix}                       \
-        /c"${base}.c"                   \
+        /c "${base}.c"                  \
         /Fo"${OUT_FILE}"
 
   elif [[ "${is_windows}" == "false" ]]; then
@@ -52,11 +52,11 @@ if is_in final-link "$ALL_ARGS"; then
   OUT_FILE=final-link.gb
   if [[ "${is_windows}" == "true" ]]; then
     "${goto_cc}"                        \
-        /export-function-local-symbols  \
-        /verbosity 10                   \
+        --export-function-local-symbols \
+        --verbosity 10                  \
         ${suffix}                       \
         ./*.gb                          \
-        /Fe "${OUT_FILE}"
+        /Fe"${OUT_FILE}"
 
   elif [[ "${is_windows}" == "false" ]]; then
     "${goto_cc}"                        \
