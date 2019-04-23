@@ -10,10 +10,10 @@ ifeq ($(filter-out OSX MSVC,$(BUILD_ENV_)),)
 endif
 
 test:
-	@../test.pl -e -p -c ../../../src/cbmc/cbmc $(no_pthread)
+	@../test.pl -e -p -c "../../../src/cbmc/cbmc --validate-goto-model --validate-ssa-equation" $(no_pthread)
 
 tests.log: ../test.pl
-	@../test.pl -e -p -c ../../../src/cbmc/cbmc $(no_pthread)
+	@../test.pl -e -p -c "../../../src/cbmc/cbmc --validate-goto-model --validate-ssa-equation" $(no_pthread)
 
 show:
 	@for dir in *; do \

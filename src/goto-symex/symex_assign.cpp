@@ -286,11 +286,13 @@ static void rewrite_with_to_field_symbols(
 /// expression by assignments to just those fields. May generate "with" (or
 /// "update") expressions, which \ref rewrite_with_to_field_symbols will then
 /// take care of.
+/// \param [in, out] state: symbolic execution state to perform renaming
 /// \param [in,out] ssa_rhs: right-hand side
 /// \param [in,out] lhs_mod: left-hand side
 /// \param ns: namespace
 /// \param do_simplify: set to true if, and only if, simplification is enabled
 static void shift_indexed_access_to_lhs(
+  goto_symext::statet &state,
   exprt &ssa_rhs,
   ssa_exprt &lhs_mod,
   const namespacet &ns,
@@ -354,6 +356,9 @@ static void shift_indexed_access_to_lhs(
         }
       }
 
+      // We may have shifted the previous lhs into the rhs; as the lhs is only
+      // L1-renamed, we need to rename again.
+      ssa_rhs = state.rename(ssa_rhs, ns).get();
       lhs_mod = to_ssa_expr(byte_extract);
     }
   }
@@ -385,7 +390,8 @@ void goto_symext::symex_assign_symbol(
   // introduced by symex_assign_struct_member, are transformed into member
   // expressions on the LHS. If we add an option to disable field-sensitivity
   // in the future these should be omitted.
-  shift_indexed_access_to_lhs(l2_rhs, lhs_mod, ns, symex_config.simplify_opt);
+  shift_indexed_access_to_lhs(
+    state, l2_rhs, lhs_mod, ns, symex_config.simplify_opt);
   rewrite_with_to_field_symbols(state, l2_rhs, lhs_mod, ns);
 
   do_simplify(l2_rhs);
