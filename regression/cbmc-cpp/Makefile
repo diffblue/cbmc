@@ -10,10 +10,10 @@ else
 endif
 
 test:
-	@../test.pl -e -p -c ../../../src/cbmc/cbmc $(gcc_only)
+	@../test.pl -e -p -c "../../../src/cbmc/cbmc --validate-goto-model --validate-ssa-equation" $(gcc_only)
 
 tests.log: ../test.pl
-	@../test.pl -e -p -c ../../../src/cbmc/cbmc $(gcc_only)
+	@../test.pl -e -p -c "../../../src/cbmc/cbmc --validate-goto-model --validate-ssa-equation" $(gcc_only)
 
 show:
 	@for dir in *; do \
