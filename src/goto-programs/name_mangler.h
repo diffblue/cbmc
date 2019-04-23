@@ -84,6 +84,20 @@ public:
     for(const auto &sym : old_syms)
       model.symbol_table.erase(sym);
 
+    for(const auto &sym_pair : model.symbol_table)
+    {
+      const symbolt &sym = sym_pair.second;
+
+      exprt e = sym.value;
+      typet t = sym.type;
+      if(rename(e) && rename(t))
+        continue;
+
+      symbolt &new_sym = model.symbol_table.get_writeable_ref(sym.name);
+      new_sym.value = e;
+      new_sym.type = t;
+    }
+
     for(auto &fun : model.goto_functions.function_map)
     {
       if(!fun.second.body_available())

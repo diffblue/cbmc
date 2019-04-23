@@ -43,14 +43,18 @@ public:
     type_map.insert(std::pair<irep_idt, irep_idt>(old_id, new_id));
   }
 
-  void operator()(exprt &dest) const
+  /// Rename symbols in \p dest.
+  /// \return True if, and only if, the expression was not modified.
+  bool operator()(exprt &dest) const
   {
-    rename(dest);
+    return rename(dest);
   }
 
-  void operator()(typet &dest) const
+  /// Rename symbols in \p dest.
+  /// \return True if, and only if, the type was not modified.
+  bool operator()(typet &dest) const
   {
-    rename(dest);
+    return rename(dest);
   }
 
   rename_symbolt();

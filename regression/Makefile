@@ -25,6 +25,7 @@ DIRS = cbmc \
        goto-cc-goto-analyzer \
        systemc \
        contracts \
+       goto-cc-file-local \
        # Empty last line
 
 # Run all test directories in sequence
