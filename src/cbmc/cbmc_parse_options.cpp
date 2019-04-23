@@ -308,6 +308,9 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   if(cmdline.isset("dimacs"))
     options.set_option("dimacs", true);
 
+  if(cmdline.isset("icnf"))
+    options.set_option("icnf", true);
+
   if(cmdline.isset("refine-arrays"))
   {
     options.set_option("refine", true);
@@ -1010,6 +1013,7 @@ void cbmc_parse_optionst::help()
     "Backend options:\n"
     " --object-bits n              number of bits used for object addresses\n"
     " --dimacs                     generate CNF in DIMACS format\n"
+    " --dimacs                     generate incremental CNF in iCNF format\n"
     " --beautify                   beautify the counterexample (greedy heuristic)\n" // NOLINT(*)
     " --localize-faults            localize faults (experimental)\n"
     " --smt2                       use default SMT2 solver (Z3)\n"

@@ -30,6 +30,7 @@ Author: Daniel Kroening, Peter Schrammel
 #include <solvers/prop/solver_resource_limits.h>
 #include <solvers/refinement/bv_refinement.h>
 #include <solvers/sat/dimacs_cnf.h>
+#include <solvers/sat/icnf.h>
 #include <solvers/sat/satcheck.h>
 #include <solvers/strings/string_refinement.h>
 
@@ -163,12 +164,27 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_default()
     !options.get_bool_option("sat-preprocessor")) // no simplifier
   {
     // simplifier won't work with beautification
-    solver->set_prop(
-      util_make_unique<satcheck_no_simplifiert>(message_handler));
+
+    if(options.get_bool_option("icnf"))
+    {
+      auto filename = options.get_option("outfile");
+      solver->set_prop(util_make_unique<icnft<satcheck_no_simplifiert>>(
+        message_handler, filename));
+    }
+    else
+      solver->set_prop(
+        util_make_unique<satcheck_no_simplifiert>(message_handler));
   }
   else // with simplifier
   {
-    solver->set_prop(util_make_unique<satcheckt>(message_handler));
+    if(options.get_bool_option("icnf"))
+    {
+      auto filename = options.get_option("outfile");
+      solver->set_prop(
+        util_make_unique<icnft<satcheckt>>(message_handler, filename));
+    }
+    else
+      solver->set_prop(util_make_unique<satcheckt>(message_handler));
   }
 
   auto bv_pointers =
