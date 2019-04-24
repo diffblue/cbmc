@@ -30,7 +30,6 @@ class code_assignt;
 class code_function_callt;
 class exprt;
 class goto_symex_statet;
-class guardt;
 class if_exprt;
 class index_exprt;
 class symbol_exprt;
@@ -363,7 +362,7 @@ protected:
   // with false we continue.
   virtual bool should_stop_unwind(
     const symex_targett::sourcet &source,
-    const goto_symex_statet::call_stackt &context,
+    const call_stackt &context,
     unsigned unwind);
 
   virtual void loop_bound_exceeded(statet &, const exprt &guard);
