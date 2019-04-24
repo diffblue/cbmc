@@ -1,4 +1,4 @@
-CORE gcc-only
+CORE gcc-only test-c++-front-end
 preproc.i
 -mcpu=cortex-a15 -o linked-object.gb object.intel
 ^EXIT=(64|1)$

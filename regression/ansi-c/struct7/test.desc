@@ -1,8 +1,8 @@
-CORE
+CORE test-c++-front-end
 main.c
 
 ^EXIT=(64|1)$
 ^SIGNAL=0$
-: duplicate member .*$
+(: duplicate member .*|already in compound scope)$
 ^CONVERSION ERROR$
 --
