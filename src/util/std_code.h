@@ -734,7 +734,7 @@ inline const code_ifthenelset &to_code_ifthenelse(const codet &code)
 {
   PRECONDITION(code.get_statement() == ID_ifthenelse);
   const code_ifthenelset &ret = static_cast<const code_ifthenelset &>(code);
-  validate_expr(code);
+  validate_expr(ret);
   return ret;
 }
 
@@ -742,7 +742,7 @@ inline code_ifthenelset &to_code_ifthenelse(codet &code)
 {
   PRECONDITION(code.get_statement() == ID_ifthenelse);
   code_ifthenelset &ret = static_cast<code_ifthenelset &>(code);
-  validate_expr(code);
+  validate_expr(ret);
   return ret;
 }
 
@@ -796,7 +796,7 @@ inline const code_switcht &to_code_switch(const codet &code)
 {
   PRECONDITION(code.get_statement() == ID_switch);
   const code_switcht &ret = static_cast<const code_switcht &>(code);
-  validate_expr(code);
+  validate_expr(ret);
   return ret;
 }
 
@@ -804,7 +804,7 @@ inline code_switcht &to_code_switch(codet &code)
 {
   PRECONDITION(code.get_statement() == ID_switch);
   code_switcht &ret = static_cast<code_switcht &>(code);
-  validate_expr(code);
+  validate_expr(ret);
   return ret;
 }
 
@@ -858,7 +858,7 @@ inline const code_whilet &to_code_while(const codet &code)
 {
   PRECONDITION(code.get_statement() == ID_while);
   const code_whilet &ret = static_cast<const code_whilet &>(code);
-  validate_expr(code);
+  validate_expr(ret);
   return ret;
 }
 
@@ -866,7 +866,7 @@ inline code_whilet &to_code_while(codet &code)
 {
   PRECONDITION(code.get_statement() == ID_while);
   code_whilet &ret = static_cast<code_whilet &>(code);
-  validate_expr(code);
+  validate_expr(ret);
   return ret;
 }
 
@@ -920,7 +920,7 @@ inline const code_dowhilet &to_code_dowhile(const codet &code)
 {
   PRECONDITION(code.get_statement() == ID_dowhile);
   const code_dowhilet &ret = static_cast<const code_dowhilet &>(code);
-  validate_expr(code);
+  validate_expr(ret);
   return ret;
 }
 
@@ -928,7 +928,7 @@ inline code_dowhilet &to_code_dowhile(codet &code)
 {
   PRECONDITION(code.get_statement() == ID_dowhile);
   code_dowhilet &ret = static_cast<code_dowhilet &>(code);
-  validate_expr(code);
+  validate_expr(ret);
   return ret;
 }
 
@@ -1017,7 +1017,7 @@ inline const code_fort &to_code_for(const codet &code)
 {
   PRECONDITION(code.get_statement() == ID_for);
   const code_fort &ret = static_cast<const code_fort &>(code);
-  validate_expr(code);
+  validate_expr(ret);
   return ret;
 }
 
@@ -1025,7 +1025,7 @@ inline code_fort &to_code_for(codet &code)
 {
   PRECONDITION(code.get_statement() == ID_for);
   code_fort &ret = static_cast<code_fort &>(code);
-  validate_expr(code);
+  validate_expr(ret);
   return ret;
 }
 
@@ -1069,7 +1069,7 @@ inline const code_gotot &to_code_goto(const codet &code)
 {
   PRECONDITION(code.get_statement() == ID_goto);
   const code_gotot &ret = static_cast<const code_gotot &>(code);
-  validate_expr(code);
+  validate_expr(ret);
   return ret;
 }
 
@@ -1077,7 +1077,7 @@ inline code_gotot &to_code_goto(codet &code)
 {
   PRECONDITION(code.get_statement() == ID_goto);
   code_gotot &ret = static_cast<code_gotot &>(code);
-  validate_expr(code);
+  validate_expr(ret);
   return ret;
 }
 
@@ -1335,7 +1335,7 @@ inline const code_labelt &to_code_label(const codet &code)
 {
   PRECONDITION(code.get_statement() == ID_label);
   const code_labelt &ret = static_cast<const code_labelt &>(code);
-  validate_expr(code);
+  validate_expr(ret);
   return ret;
 }
 
@@ -1343,7 +1343,7 @@ inline code_labelt &to_code_label(codet &code)
 {
   PRECONDITION(code.get_statement() == ID_label);
   code_labelt &ret = static_cast<code_labelt &>(code);
-  validate_expr(code);
+  validate_expr(ret);
   return ret;
 }
 
@@ -1408,7 +1408,7 @@ inline const code_switch_caset &to_code_switch_case(const codet &code)
 {
   PRECONDITION(code.get_statement() == ID_switch_case);
   const code_switch_caset &ret = static_cast<const code_switch_caset &>(code);
-  validate_expr(code);
+  validate_expr(ret);
   return ret;
 }
 
@@ -1416,7 +1416,7 @@ inline code_switch_caset &to_code_switch_case(codet &code)
 {
   PRECONDITION(code.get_statement() == ID_switch_case);
   code_switch_caset &ret = static_cast<code_switch_caset &>(code);
-  validate_expr(code);
+  validate_expr(ret);
   return ret;
 }
 
@@ -1493,7 +1493,7 @@ to_code_gcc_switch_case_range(const codet &code)
   PRECONDITION(code.get_statement() == ID_gcc_switch_case_range);
   const code_gcc_switch_case_ranget &ret =
     static_cast<const code_gcc_switch_case_ranget &>(code);
-  validate_expr(code);
+  validate_expr(ret);
   return ret;
 }
 
@@ -1502,7 +1502,7 @@ inline code_gcc_switch_case_ranget &to_code_gcc_switch_case_range(codet &code)
   PRECONDITION(code.get_statement() == ID_gcc_switch_case_range);
   code_gcc_switch_case_ranget &ret =
     static_cast<code_gcc_switch_case_ranget &>(code);
-  validate_expr(code);
+  validate_expr(ret);
   return ret;
 }
 
@@ -1705,7 +1705,7 @@ inline code_asm_gcct &to_code_asm_gcc(codet &code)
   PRECONDITION(code.get_statement() == ID_asm);
   PRECONDITION(to_code_asm(code).get_flavor() == ID_gcc);
   code_asm_gcct &ret = static_cast<code_asm_gcct &>(code);
-  validate_expr(code);
+  validate_expr(ret);
   return ret;
 }
 
@@ -1714,7 +1714,7 @@ inline const code_asm_gcct &to_code_asm_gcc(const codet &code)
   PRECONDITION(code.get_statement() == ID_asm);
   PRECONDITION(to_code_asm(code).get_flavor() == ID_gcc);
   const code_asm_gcct &ret = static_cast<const code_asm_gcct &>(code);
-  validate_expr(code);
+  validate_expr(ret);
   return ret;
 }
 
@@ -1759,7 +1759,7 @@ inline code_expressiont &to_code_expression(codet &code)
 {
   PRECONDITION(code.get_statement() == ID_expression);
   code_expressiont &ret = static_cast<code_expressiont &>(code);
-  validate_expr(code);
+  validate_expr(ret);
   return ret;
 }
 
@@ -1767,7 +1767,7 @@ inline const code_expressiont &to_code_expression(const codet &code)
 {
   PRECONDITION(code.get_statement() == ID_expression);
   const code_expressiont &ret = static_cast<const code_expressiont &>(code);
-  validate_expr(code);
+  validate_expr(ret);
   return ret;
 }
 
@@ -2368,7 +2368,7 @@ inline const code_try_catcht &to_code_try_catch(const codet &code)
 {
   PRECONDITION(code.get_statement() == ID_try_catch);
   const code_try_catcht &ret = static_cast<const code_try_catcht &>(code);
-  validate_expr(code);
+  validate_expr(ret);
   return ret;
 }
 
@@ -2376,7 +2376,7 @@ inline code_try_catcht &to_code_try_catch(codet &code)
 {
   PRECONDITION(code.get_statement() == ID_try_catch);
   code_try_catcht &ret = static_cast<code_try_catcht &>(code);
-  validate_expr(code);
+  validate_expr(ret);
   return ret;
 }
 
