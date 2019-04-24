@@ -1624,7 +1624,7 @@ to_code_gcc_switch_case_range(const codet &code)
   PRECONDITION(code.get_statement() == ID_gcc_switch_case_range);
   const code_gcc_switch_case_ranget &ret =
     static_cast<const code_gcc_switch_case_ranget &>(code);
-  validate_expr(ret);
+  //validate_expr(ret);
   return ret;
 }
 
@@ -1633,7 +1633,7 @@ inline code_gcc_switch_case_ranget &to_code_gcc_switch_case_range(codet &code)
   PRECONDITION(code.get_statement() == ID_gcc_switch_case_range);
   code_gcc_switch_case_ranget &ret =
     static_cast<code_gcc_switch_case_ranget &>(code);
-  validate_expr(ret);
+  //validate_expr(ret);
   return ret;
 }
 
@@ -1819,12 +1819,6 @@ protected:
   using code_asmt::op2;
   using code_asmt::op3;
 };
-
-template <>
-inline bool can_cast_expr<code_asm_gcct>(const exprt &base)
-{
-  return detail::can_cast_code_impl(base, ID_asm);
-}
 
 inline void validate_expr(const code_asm_gcct &x)
 {
