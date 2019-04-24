@@ -1,8 +1,11 @@
 int identifier_\u0201_;
 int \u0201_abc;
 
-#define STATIC_ASSERT(condition) \
-  int some_array##__LINE__[(condition) ? 1 : -1];
+#define CONCAT(a, b) a##b
+#define CONCAT2(a, b) CONCAT(a, b)
+
+#define STATIC_ASSERT(condition)                                               \
+  int CONCAT2(some_array, __LINE__)[(condition) ? 1 : -1]
 
 char my_string[]="\u0201";
 STATIC_ASSERT(sizeof(my_string)==3);
