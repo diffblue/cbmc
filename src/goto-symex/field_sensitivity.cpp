@@ -267,8 +267,7 @@ void field_sensitivityt::field_assignments_rec(
   {
     const std::size_t array_size =
       numeric_cast_v<std::size_t>(to_constant_expr(type->size()));
-    PRECONDITION(
-      lhs_fs.has_operands() && lhs_fs.operands().size() == array_size);
+    PRECONDITION(lhs_fs.operands().size() == array_size);
 
     exprt::operandst::const_iterator fs_it = lhs_fs.operands().begin();
     for(std::size_t i = 0; i < array_size; ++i)
