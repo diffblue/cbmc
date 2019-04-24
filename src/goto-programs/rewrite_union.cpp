@@ -101,17 +101,16 @@ void rewrite_union(exprt &expr)
 
 void rewrite_union(goto_functionst::goto_functiont &goto_function)
 {
-  Forall_goto_program_instructions(it, goto_function.body)
-  {
-    rewrite_union(it->code);
-
-    if(it->has_condition())
-    {
-      exprt c = it->get_condition();
-      rewrite_union(c);
-      it->set_condition(c);
-    }
-  }
+  for(auto &instruction : goto_function.body.instructions)
+    instruction.transform([](exprt src) -> optionalt<exprt> {
+      if(!have_to_rewrite_union(src))
+        return {};
+      else
+      {
+        rewrite_union(src);
+        return src;
+      }
+    });
 }
 
 void rewrite_union(goto_functionst &goto_functions)
