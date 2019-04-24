@@ -1,5 +1,5 @@
 add_test_pl_tests(
-    "$<TARGET_FILE:cbmc> --validate-goto-model" -X smt-backend
+    "$<TARGET_FILE:cbmc> --validate-goto-model --validate-ssa-equation" -X smt-backend
 )
 
 add_test_pl_profile(
