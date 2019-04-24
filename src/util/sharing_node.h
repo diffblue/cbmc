@@ -234,7 +234,8 @@ public:
   }
 
   // add leaf, key must not exist yet
-  leaft *place_leaf(const keyT &k, const valueT &v)
+  template <class valueU>
+  leaft *place_leaf(const keyT &k, valueU &&v)
   {
     SN_ASSERT(is_container());
     // we need to check empty() first as the const version of find_leaf() must
@@ -242,21 +243,7 @@ public:
     PRECONDITION(empty() || as_const(this)->find_leaf(k) == nullptr);
 
     leaf_listt &c = get_container();
-    c.push_front(leaft(k, v));
-
-    return &c.front();
-  }
-
-  // add leaf, key must not exist yet
-  leaft *place_leaf(const keyT &k, valueT &&v)
-  {
-    SN_ASSERT(is_container());
-    // we need to check empty() first as the const version of find_leaf() must
-    // not be called on an empty node
-    PRECONDITION(empty() || as_const(this)->find_leaf(k) == nullptr);
-
-    leaf_listt &c = get_container();
-    c.push_front(leaft(k, std::move(v)));
+    c.push_front(leaft(k, std::forward<valueU>(v)));
 
     return &c.front();
   }
@@ -379,10 +366,8 @@ public:
   typedef keyT keyt;
 #endif
 
-  d_leaft(const keyt &k, const valueT &v) : k(k), v(v)
-  {
-  }
-  d_leaft(const keyt &k, valueT &&v) : k(k), v(std::move(v))
+  template <class valueU>
+  d_leaft(const keyt &k, valueU &&v) : k(k), v(std::forward<valueU>(v))
   {
   }
   keyt k;
@@ -398,27 +383,17 @@ public:
 
   typedef d_leaft<SN_TYPE_ARGS> d_lt;
 
-  sharing_node_leaft(const keyT &k, const valueT &v)
+  template <class valueU>
+  sharing_node_leaft(const keyT &k, valueU &&v)
   {
     SN_ASSERT(!data);
 
 #if SN_SHARE_KEYS == 1
     SN_ASSERT(d.k == nullptr);
-    data = make_small_shared_ptr<d_lt>(std::make_shared<keyT>(k), v);
+    data = make_small_shared_ptr<d_lt>(
+      std::make_shared<keyT>(k), std::forward<valueU>(v));
 #else
-    data = make_small_shared_ptr<d_lt>(k, v);
-#endif
-  }
-
-  sharing_node_leaft(const keyT &k, valueT &&v)
-  {
-    SN_ASSERT(!data);
-
-#if SN_SHARE_KEYS == 1
-    SN_ASSERT(d.k == nullptr);
-    data = make_small_shared_ptr<d_lt>(std::make_shared<keyT>(k), std::move(v));
-#else
-    data = make_small_shared_ptr<d_lt>(k, std::move(v));
+    data = make_small_shared_ptr<d_lt>(k, std::forward<valueU>(v));
 #endif
   }
 
@@ -479,33 +454,18 @@ public:
     return data->v;
   }
 
-  void set_value(const valueT &v)
+  template <class valueU>
+  void set_value(valueU &&v)
   {
     SN_ASSERT(data);
 
     if(data.use_count() > 1)
     {
-      data = make_small_shared_ptr<d_lt>(data->k, v);
+      data = make_small_shared_ptr<d_lt>(data->k, std::forward<valueU>(v));
     }
     else
     {
-      data->v = v;
-    }
-
-    SN_ASSERT(data.use_count() == 1);
-  }
-
-  void set_value(valueT &&v)
-  {
-    SN_ASSERT(data);
-
-    if(data.use_count() > 1)
-    {
-      data = make_small_shared_ptr<d_lt>(data->k, std::move(v));
-    }
-    else
-    {
-      data->v = std::move(v);
+      data->v = std::forward<valueU>(v);
     }
 
     SN_ASSERT(data.use_count() == 1);
