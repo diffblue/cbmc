@@ -364,6 +364,51 @@ static void shift_indexed_access_to_lhs(
   }
 }
 
+/// Assign a struct expression to a symbol. If \ref symex_assign_symbol was used
+/// then we would assign the whole symbol, before extracting its components,
+/// with results like `x = {1, 2}; x..field1 = x.field1; x..field2 = x.field2;`
+/// This abbreviates the process, directly producing
+/// `x..field1 = 1; x..field2 = 2;`
+/// \param state: goto-symex state
+/// \param lhs: symbol to assign (already renamed to L1)
+/// \param full_lhs: expression skeleton corresponding to \p lhs, to be included
+///   in the result trace
+/// \param rhs: struct expression to assign to \p lhs
+/// \param guard: guard conjuncts that must hold for this assignment to be made
+/// \param assignment_type: assignment type (see
+///   \ref symex_targett::assignment_typet)
+void goto_symext::symex_assign_from_struct(
+  statet &state,
+  const ssa_exprt &lhs, // L1
+  const exprt &full_lhs,
+  const struct_exprt &rhs,
+  exprt::operandst &guard,
+  assignment_typet assignment_type)
+{
+  const struct_typet &type = to_struct_type(ns.follow(lhs.type()));
+  const struct_union_typet::componentst &components = type.components();
+  PRECONDITION(rhs.operands().size() == components.size());
+
+  for(std::size_t i = 0; i < components.size(); ++i)
+  {
+    const auto &comp = components[i];
+    exprt lhs_field = member_exprt(lhs, comp.get_name(), comp.type());
+    state.field_sensitivity.apply(ns, state, lhs_field, true);
+    INVARIANT(
+      lhs_field.id() == ID_symbol,
+      "member of symbol should be susceptible to field-sensitivity");
+
+    const exprt &rhs_field = rhs.operands()[i];
+    symex_assign_symbol(
+      state,
+      to_ssa_expr(lhs_field),
+      full_lhs,
+      rhs_field,
+      guard,
+      assignment_type);
+  }
+}
+
 void goto_symext::symex_assign_symbol(
   statet &state,
   const ssa_exprt &lhs, // L1
@@ -372,6 +417,14 @@ void goto_symext::symex_assign_symbol(
   exprt::operandst &guard,
   assignment_typet assignment_type)
 {
+  // Shortcut the common case of a whole-struct initializer:
+  if(rhs.id() == ID_struct)
+  {
+    symex_assign_from_struct(
+      state, lhs, full_lhs, to_struct_expr(rhs), guard, assignment_type);
+    return;
+  }
+
   exprt ssa_rhs=rhs;
 
   // put assignment guard into the rhs
