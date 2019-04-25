@@ -378,6 +378,9 @@ TEST_CASE("Sharing map views and iteration", "[core][util]")
   SECTION("Iterate")
   {
     sharing_map_standardt sm;
+
+    sm.iterate([](const irep_idt &key, const std::string &value) {});
+
     fill(sm);
 
     typedef std::pair<std::string, std::string> pt;
@@ -392,6 +395,23 @@ TEST_CASE("Sharing map views and iteration", "[core][util]")
     REQUIRE((pairs[0] == pt("i", "0")));
     REQUIRE((pairs[1] == pt("j", "1")));
     REQUIRE((pairs[2] == pt("k", "2")));
+  }
+
+  SECTION("Delta view (one empty)")
+  {
+    sharing_map_standardt sm1;
+    fill(sm1);
+
+    sharing_map_standardt sm2;
+
+    sharing_map_standardt::delta_viewt delta_view;
+
+    sm1.get_delta_view(sm2, delta_view, false);
+    REQUIRE(delta_view.size() == 3);
+
+    delta_view.clear();
+    sm2.get_delta_view(sm1, delta_view, false);
+    REQUIRE(delta_view.empty());
   }
 
   SECTION("Delta view (no sharing, same keys)")
