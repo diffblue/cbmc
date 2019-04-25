@@ -201,18 +201,6 @@ protected:
   typedef typename innert::to_mapt to_mapt;
   typedef typename innert::leaf_listt leaf_listt;
 
-  struct falset
-  {
-    bool operator()(const mapped_type &lhs, const mapped_type &rhs)
-    {
-      return false;
-    }
-  };
-
-  typedef
-    typename std::conditional<fail_if_equal, std::equal_to<valueT>, falset>::
-      type value_equalt;
-
   struct noop_value_comparatort
   {
     explicit noop_value_comparatort(const mapped_type &)
@@ -982,7 +970,7 @@ SHARING_MAPT4(valueU, void)
   PRECONDITION(lp != nullptr); // key must exist in map
 
   INVARIANT(
-    !value_equalt()(as_const(lp)->get_value(), m),
+    !value_comparatort(as_const(lp)->get_value())(m),
     "values should not be replaced with equal values to maximize sharing");
 
   lp->set_value(std::forward<valueU>(m));
