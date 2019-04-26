@@ -453,7 +453,7 @@ public:
     if(empty())
       return;
 
-    iterate(map, 0, f);
+    iterate(map, f);
   }
 
 #if !defined(_MSC_VER)
@@ -525,12 +525,10 @@ protected:
   }
 
   void iterate(
-    const baset &n,
-    const unsigned start_depth,
+    const innert &n,
     std::function<void(const key_type &k, const mapped_type &m)> f) const;
 
-  void gather_all(const baset &n, const unsigned depth, delta_viewt &delta_view)
-    const;
+  void gather_all(const innert &n, delta_viewt &delta_view) const;
 
   std::size_t count_unmarked_nodes(
     bool leafs_only,
@@ -559,42 +557,37 @@ protected:
 
 SHARING_MAPT(void)
 ::iterate(
-  const baset &n,
-  unsigned start_depth,
+  const innert &n,
   std::function<void(const key_type &k, const mapped_type &m)> f) const
 {
-  typedef std::pair<unsigned, const baset *> stack_itemt;
+  SM_ASSERT(!n.empty());
 
-  std::stack<stack_itemt> stack;
-  stack.push({start_depth, &n});
+  std::stack<const innert *> stack;
+  stack.push(&n);
 
   do
   {
-    const stack_itemt &si = stack.top();
-
-    const unsigned depth = si.first;
-    const baset *bp = si.second;
-
+    const innert *ip = stack.top();
     stack.pop();
 
-    if(depth < steps) // internal
+    SM_ASSERT(!ip->empty());
+
+    if(ip->is_internal())
     {
-      const innert *ip = static_cast<const innert *>(bp);
       const to_mapt &m = ip->get_to_map();
       SM_ASSERT(!m.empty());
 
       for(const auto &item : m)
       {
         const innert *i = &item.second;
-        stack.push({depth + 1, i});
+        stack.push(i);
       }
     }
-    else // container
+    else
     {
-      SM_ASSERT(depth == steps);
+      SM_ASSERT(ip->is_container());
 
-      const innert *cp = static_cast<const innert *>(bp);
-      const leaf_listt &ll = cp->get_container();
+      const leaf_listt &ll = ip->get_container();
       SM_ASSERT(!ll.empty());
 
       for(const auto &l : ll)
@@ -766,17 +759,17 @@ SHARING_MAPT(void)::get_view(viewt &view) const
     view.push_back(view_itemt(k, m));
   };
 
-  iterate(map, 0, f);
+  iterate(map, f);
 }
 
 SHARING_MAPT(void)
-::gather_all(const baset &n, unsigned depth, delta_viewt &delta_view) const
+::gather_all(const innert &n, delta_viewt &delta_view) const
 {
   auto f = [&delta_view](const key_type &k, const mapped_type &m) {
     delta_view.push_back(delta_view_itemt(false, k, m, dummy));
   };
 
-  iterate(n, depth, f);
+  iterate(n, f);
 }
 
 SHARING_MAPT(void)
@@ -794,7 +787,7 @@ SHARING_MAPT(void)
   {
     if(!only_common)
     {
-      gather_all(map, 0, delta_view);
+      gather_all(map, delta_view);
     }
 
     return;
@@ -838,7 +831,7 @@ SHARING_MAPT(void)
         {
           if(!only_common)
           {
-            gather_all(item.second, depth + 1, delta_view);
+            gather_all(item.second, delta_view);
           }
         }
         else if(!item.second.shares_with(*p))
