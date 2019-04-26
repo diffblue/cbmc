@@ -163,6 +163,16 @@ public:
     return data.is_derived_v();
   }
 
+  bool is_defined_internal() const
+  {
+    return !empty() && is_internal();
+  }
+
+  bool is_defined_container() const
+  {
+    return !empty() && is_container();
+  }
+
   const d_it &read_internal() const
   {
     SN_ASSERT(!empty());

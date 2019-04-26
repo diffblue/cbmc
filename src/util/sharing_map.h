@@ -894,6 +894,8 @@ SHARING_MAPT2(, innert *)::get_container_node(const key_type &k)
     key >>= chunk;
   }
 
+  SM_ASSERT(ip->is_container());
+
   return ip;
 }
 
@@ -915,6 +917,8 @@ SHARING_MAPT2(const, innert *)::get_container_node(const key_type &k) const
 
     key >>= chunk;
   }
+
+  SM_ASSERT(ip->is_defined_container());
 
   return ip;
 }
