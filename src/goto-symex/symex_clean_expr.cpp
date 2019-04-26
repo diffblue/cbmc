@@ -128,6 +128,7 @@ void goto_symext::process_array_expr(statet &state, exprt &expr)
     ns, state.symbol_table, symex_dereference_state, language_mode, false);
 
   expr = dereference.dereference(expr);
+  lift_lets(state, expr, symex_targett::assignment_typet::STATE);
 
   ::process_array_expr(expr, symex_config.simplify_opt, ns);
 }
@@ -222,6 +223,7 @@ void goto_symext::clean_expr(
 {
   replace_nondet(expr, path_storage.build_symex_nondet);
   dereference(expr, state, write);
+  lift_lets(state, expr, symex_targett::assignment_typet::STATE);
 
   // make sure all remaining byte extract operations use the root
   // object to avoid nesting of with/update and byte_update when on

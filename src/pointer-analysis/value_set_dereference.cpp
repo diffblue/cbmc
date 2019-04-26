@@ -76,9 +76,24 @@ exprt value_set_dereferencet::dereference(const exprt &pointer)
 
   std::list<valuet> values;
 
+  exprt compare_against_pointer = pointer;
+
+  if(pointer.id() != ID_symbol && retained_values.size() >= 2)
+  {
+    symbolt fresh_binder = get_fresh_aux_symbol(
+      pointer.type(),
+      "derefd_pointer",
+      "derefd_pointer",
+      source_locationt(),
+      language_mode,
+      new_symbol_table);
+
+    compare_against_pointer = fresh_binder.symbol_expr();
+  }
+
   for(const auto &value : retained_values)
   {
-    values.push_back(build_reference_to(value, pointer, ns));
+    values.push_back(build_reference_to(value, compare_against_pointer, ns));
 #if 0
     std::cout << "V: " << format(value.pointer_guard) << " --> ";
     std::cout << format(value.value);
@@ -160,9 +175,12 @@ exprt value_set_dereferencet::dereference(const exprt &pointer)
     }
   }
 
-  #if 0
+  if(compare_against_pointer != pointer)
+    value = let_exprt(to_symbol_expr(compare_against_pointer), pointer, value);
+
+#if 0
   std::cout << "R: " << format(value) << "\n\n";
-  #endif
+#endif
 
   return value;
 }
