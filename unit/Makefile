@@ -29,6 +29,7 @@ SRC += analyses/ai/ai.cpp \
        goto-programs/goto_trace_output.cpp \
        goto-programs/xml_expr.cpp \
        goto-symex/ssa_equation.cpp \
+       goto-symex/is_constant.cpp \
        interpreter/interpreter.cpp \
        json/json_parser.cpp \
        json_symbol_table.cpp \
