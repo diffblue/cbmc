@@ -503,6 +503,12 @@ protected:
 
   typedef symex_targett::assignment_typet assignment_typet;
 
+  void lift_lets(statet &, exprt &, assignment_typet);
+  void lift_let(
+    statet &state,
+    const let_exprt &let_expr,
+    assignment_typet assignment_type);
+
   void symex_assign_rec(
     statet &,
     const exprt &lhs,

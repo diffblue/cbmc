@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/byte_operators.h>
 #include <util/c_types.h>
+#include <util/expr_iterator.h>
 #include <util/pointer_offset_size.h>
 #include <util/simplify_expr.h>
 
@@ -166,6 +167,51 @@ replace_nondet(exprt &expr, symex_nondet_generatort &build_symex_nondet)
   {
     Forall_operands(it, expr)
       replace_nondet(*it, build_symex_nondet);
+  }
+}
+
+void goto_symext::lift_let(
+  statet &state,
+  const let_exprt &let_expr,
+  assignment_typet assignment_type)
+{
+  exprt let_value = let_expr.value();
+  clean_expr(let_value, state, false);
+  let_value = state.rename(std::move(let_value), ns).get();
+  do_simplify(let_value);
+
+  exprt::operandst value_assignment_guard;
+  symex_assign_symbol(
+    state,
+    to_ssa_expr(state.rename<L1>(let_expr.symbol(), ns).get()),
+    nil_exprt(),
+    let_value,
+    value_assignment_guard,
+    assignment_type);
+}
+
+void goto_symext::lift_lets(
+  statet &state,
+  exprt &rhs,
+  assignment_typet assignment_type)
+{
+  for(auto it = rhs.depth_begin(), itend = rhs.depth_end(); it != itend;)
+  {
+    if(it->id() == ID_let)
+    {
+      // Visit post-order, so more-local definitions are made before usage:
+      exprt &replaced_expr = it.mutate();
+      let_exprt &replaced_let = to_let_expr(replaced_expr);
+      lift_lets(state, replaced_let.value(), assignment_type);
+      lift_lets(state, replaced_let.where(), assignment_type);
+
+      lift_let(state, replaced_let, assignment_type);
+      replaced_expr = replaced_let.where();
+
+      it.next_sibling_or_parent();
+    }
+    else
+      ++it;
   }
 }
 
