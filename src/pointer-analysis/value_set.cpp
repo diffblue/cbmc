@@ -962,6 +962,18 @@ void value_sett::get_value_set_rec(
 
     // we could have checked object size to be more precise
   }
+  else if(expr.id() == ID_let)
+  {
+    const auto &let_expr = to_let_expr(expr);
+    // This depends on copying `value_sett` being cheap -- which it is, because
+    // our backing store is sharing_mapt.
+    value_sett value_set_with_local_definition = *this;
+    value_set_with_local_definition.assign(
+      let_expr.symbol(), let_expr.value(), ns, false, false);
+
+    value_set_with_local_definition.get_value_set_rec(
+      let_expr.where(), dest, suffix, original_type, ns);
+  }
   else
   {
     #if 0
