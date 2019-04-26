@@ -26,13 +26,6 @@ public:
 
   using decision_proceduret::operator();
 
-  /// returns a 'handle', which is an expression that
-  /// has the same value as the argument in any model
-  /// that is generated.
-  /// This may be the expression itself or a more compact
-  /// but solver-specific representation.
-  exprt handle(const exprt &expr) override;
-
   /// Convert a Boolean expression and return the corresponding literal
   virtual literalt convert(const exprt &expr) = 0;
 

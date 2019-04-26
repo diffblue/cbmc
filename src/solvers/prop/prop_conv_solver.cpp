@@ -15,6 +15,28 @@ bool prop_conv_solvert::is_in_conflict(const exprt &expr) const
   return prop.is_in_conflict(to_literal_expr(expr).get_literal());
 }
 
+exprt prop_conv_solvert::handle(const exprt &expr)
+{
+  // We can only improve Booleans.
+  if(expr.type().id() != ID_bool)
+    return expr;
+
+  // We convert to a literal to obtain a 'small' handle
+  literalt l = convert(expr);
+
+  // The literal may be a constant as a result of non-trivial
+  // propagation. We return constants as such.
+  if(l.is_true())
+    return true_exprt();
+  else if(l.is_false())
+    return false_exprt();
+
+  // freeze to enable incremental use
+  set_frozen(l);
+
+  return literal_exprt(l);
+}
+
 bool prop_conv_solvert::literal(const symbol_exprt &expr, literalt &dest) const
 {
   PRECONDITION(expr.type().id() == ID_bool);

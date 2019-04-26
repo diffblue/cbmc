@@ -64,6 +64,9 @@ public:
   {
     return prop.has_set_assumptions();
   }
+
+  exprt handle(const exprt &expr) override;
+
   void set_all_frozen() override
   {
     freeze_all = true;
