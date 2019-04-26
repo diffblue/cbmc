@@ -74,16 +74,7 @@ void goto_symex_property_decidert::convert_goals()
     // Our goal is to falsify a property, i.e., we will
     // add the negation of the property as goal.
     goal_pair.second.condition =
-      !solver->prop_conv().convert(goal_pair.second.as_expr());
-  }
-}
-
-void goto_symex_property_decidert::freeze_goal_variables()
-{
-  for(const auto &goal_pair : goal_map)
-  {
-    if(!goal_pair.second.condition.is_constant())
-      solver->prop_conv().set_frozen(goal_pair.second.condition);
+      solver->prop_conv().handle(not_exprt(goal_pair.second.as_expr()));
   }
 }
 
@@ -98,7 +89,7 @@ void goto_symex_property_decidert::add_constraint_from_goals(
       select_property(goal_pair.first) &&
       !goal_pair.second.condition.is_false())
     {
-      disjuncts.push_back(literal_exprt(goal_pair.second.condition));
+      disjuncts.push_back(goal_pair.second.condition);
     }
   }
 
@@ -134,7 +125,7 @@ void goto_symex_property_decidert::update_properties_status_from_goals(
     {
       auto &status = properties.at(goal_pair.first).status;
       if(
-        solver->prop_conv().l_get(goal_pair.second.condition).is_true() &&
+        solver->prop_conv().get(goal_pair.second.condition).is_true() &&
         status != property_statust::FAIL)
       {
         status |= property_statust::FAIL;

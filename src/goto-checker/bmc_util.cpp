@@ -365,7 +365,6 @@ std::chrono::duration<double> prepare_property_decider(
   property_decider.update_properties_goals_from_symex_target_equation(
     properties);
   property_decider.convert_goals();
-  property_decider.freeze_goal_variables();
 
   auto solver_stop = std::chrono::steady_clock::now();
   return std::chrono::duration<double>(solver_stop - solver_start);

@@ -46,15 +46,9 @@ public:
   }
   exprt get(const exprt &expr) const override;
 
-  // overloading from prop_convt
-  using prop_convt::set_frozen;
   tvt l_get(literalt a) const override
   {
     return prop.l_get(a);
-  }
-  void set_frozen(literalt a) override
-  {
-    prop.set_frozen(a);
   }
   void set_assumptions(const bvt &_assumptions) override
   {
@@ -67,10 +61,10 @@ public:
 
   exprt handle(const exprt &expr) override;
 
-  void set_all_frozen() override
-  {
-    freeze_all = true;
-  }
+  void set_frozen(literalt);
+  void set_frozen(const bvt &);
+  void set_all_frozen();
+
   literalt convert(const exprt &expr) override;
   bool is_in_conflict(const exprt &expr) const override;
 
