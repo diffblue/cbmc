@@ -60,18 +60,20 @@ public:
   public:
     exprt value;
     exprt pointer_guard;
-    bool ignore;
 
-    valuet():value(nil_exprt()), pointer_guard(false_exprt()), ignore(false)
+    valuet() : value(nil_exprt()), pointer_guard(false_exprt())
     {
     }
   };
 
+  static bool should_ignore_value(
+    const exprt &what,
+    bool exclude_null_derefs,
+    const irep_idt &language_mode);
+
   static valuet build_reference_to(
     const exprt &what,
     const exprt &pointer,
-    bool exclude_null_derefs,
-    irep_idt language_mode,
     const namespacet &ns);
 
   static bool dereference_type_compare(
