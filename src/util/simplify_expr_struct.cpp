@@ -289,6 +289,21 @@ bool simplify_exprt::simplify_member(exprt &expr)
 
     return false;
   }
+  else if(op.id() == ID_let)
+  {
+    // Push a member operator inside a let binding, to avoid the let bisecting
+    // structures we otherwise know how to analyse, such as
+    // (let x = 1 in ({x, x})).field1 --> let x = 1 in ({x, x}.field1) -->
+    // let x = 1 in x
+    member_exprt pushed_in_member = to_member_expr(expr);
+    pushed_in_member.op() = to_let_expr(op).where();
+    expr = op;
+    to_let_expr(expr).where() = pushed_in_member;
+    to_let_expr(expr).type() = to_let_expr(expr).where().type();
+
+    simplify_rec(expr);
+    return false;
+  }
 
   return true;
 }
