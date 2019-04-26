@@ -248,6 +248,18 @@ public:
     return get_bool(ID_incomplete_class);
   }
 
+  /// is class an enumeration?
+  bool get_is_enumeration() const
+  {
+    return get_bool(ID_enumeration);
+  }
+
+  /// marks class as an enumeration
+  void set_is_enumeration(const bool is_enumeration)
+  {
+    set(ID_enumeration, is_enumeration);
+  }
+
   // it may be better to introduce a class like
   // class java_lambda_method_handlet : private irept
   // {

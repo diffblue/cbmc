@@ -332,7 +332,7 @@ void java_bytecode_convert_classt::convert(
     class_type.set(
       ID_java_enum_static_unwind,
       std::to_string(c.enum_elements+1));
-    class_type.set(ID_enumeration, true);
+    class_type.set_is_enumeration(true);
   }
 
   if(c.is_public)
