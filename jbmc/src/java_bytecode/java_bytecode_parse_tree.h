@@ -85,7 +85,7 @@ struct java_bytecode_parse_treet
   {
     irep_idt base_name;
     bool is_native = false, is_abstract = false, is_synchronized = false,
-         is_bridge = false, is_varargs = false;
+         is_bridge = false, is_varargs = false, is_synthetic = false;
     source_locationt source_location;
 
     typedef std::vector<instructiont> instructionst;

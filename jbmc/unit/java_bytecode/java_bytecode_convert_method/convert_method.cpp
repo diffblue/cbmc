@@ -249,3 +249,40 @@ SCENARIO(
     }
   }
 }
+
+SCENARIO(
+  "java_bytecode_convert_synthetic_method",
+  "[core][java_bytecode][java_bytecode_convert_method]")
+{
+  GIVEN("A class with a synthetic method.")
+  {
+    const symbol_tablet symbol_table = load_java_class(
+      "ClassWithSyntheticMethod",
+      "./java_bytecode/java_bytecode_convert_method");
+
+    WHEN("Parsing a synthetic method.")
+    {
+      const java_method_typet *const synthetic_method =
+        type_try_dynamic_cast<java_method_typet>(symbol_table.lookup_ref(
+          "java::ClassWithSyntheticMethod.access$000:()I").type);
+      REQUIRE(synthetic_method);
+
+      THEN("The method should be marked as synthetic.")
+      {
+        REQUIRE(synthetic_method->is_synthetic());
+      }
+    }
+    WHEN("Parsing a non synthetic method.")
+    {
+      const java_method_typet *const non_synthetic_method =
+        type_try_dynamic_cast<java_method_typet>(symbol_table.lookup_ref(
+          "java::ClassWithSyntheticMethod.inaccessible:()I").type);
+      REQUIRE(non_synthetic_method);
+
+      THEN("The method should not be marked as synthetic.")
+      {
+        REQUIRE(!non_synthetic_method->is_synthetic());
+      }
+    }
+  }
+}

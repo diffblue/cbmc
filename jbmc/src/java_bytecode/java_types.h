@@ -418,6 +418,16 @@ public:
   {
     set(ID_is_varargs_method, is_varargs);
   }
+
+  bool is_synthetic() const
+  {
+    return get_bool(ID_synthetic);
+  }
+
+  void set_is_synthetic(bool is_synthetic)
+  {
+    set(ID_synthetic, is_synthetic);
+  }
 };
 
 template <>
