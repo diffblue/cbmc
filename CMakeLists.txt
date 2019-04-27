@@ -65,7 +65,8 @@ endif()
 set(enable_cbmc_tests on CACHE BOOL "Whether CBMC tests should be enabled")
 
 set(sat_impl "minisat2" CACHE STRING
-    "This setting controls the SAT library which is used. Valid values are 'minisat2' and 'glucose'"
+    "This setting controls the SAT library which is used. Valid values are
+    'minisat2', 'glucose', or 'cadical'"
 )
 
 if(${enable_cbmc_tests})

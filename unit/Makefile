@@ -69,6 +69,7 @@ SRC += analyses/ai/ai.cpp \
        solvers/lowering/byte_operators.cpp \
        solvers/prop/bdd_expr.cpp \
        solvers/sat/external_sat.cpp \
+       solvers/sat/satcheck_cadical.cpp \
        solvers/sat/satcheck_minisat2.cpp \
        solvers/strings/array_pool/array_pool.cpp \
        solvers/strings/string_constraint_generator_valueof/calculate_max_string_length.cpp \
@@ -227,6 +228,9 @@ EXCLUDED_TESTS += gdb_api.cpp
 endif
 ifeq ($(MINISAT2),)
 EXCLUDED_TESTS += satcheck_minisat2.cpp
+endif
+ifeq ($(CADICAL),)
+EXCLUDED_TESTS += satcheck_cadical.cpp
 endif
 
 N_CATCH_TESTS = $(shell \

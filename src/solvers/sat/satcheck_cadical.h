@@ -12,15 +12,17 @@ Author: Michael Tautschnig
 
 #include "cnf.h"
 
+#include <solvers/hardness_collector.h>
+
 namespace CaDiCaL // NOLINT(readability/namespace)
 {
   class Solver; // NOLINT(readability/identifiers)
 }
 
-class satcheck_cadicalt:public cnf_solvert
+class satcheck_cadicalt : public cnf_solvert, public hardness_collectort
 {
 public:
-  satcheck_cadicalt();
+  explicit satcheck_cadicalt(message_handlert &message_handler);
   virtual ~satcheck_cadicalt();
 
   const std::string solver_text() override;
@@ -32,19 +34,37 @@ public:
   void set_assumptions(const bvt &_assumptions) override;
   bool has_set_assumptions() const override
   {
-    return false;
+    return true;
   }
   bool has_is_in_conflict() const override
   {
-    return false;
+    return true;
   }
   bool is_in_conflict(literalt a) const override;
+
+  void
+  with_solver_hardness(std::function<void(solver_hardnesst &)> handler) override
+  {
+    if(solver_hardness.has_value())
+    {
+      handler(solver_hardness.value());
+    }
+  }
+
+  void enable_hardness_collection() override
+  {
+    solver_hardness = solver_hardnesst{};
+  }
 
 protected:
   resultt do_prop_solve() override;
 
   // NOLINTNEXTLINE(readability/identifiers)
   CaDiCaL::Solver * solver;
+
+  bvt assumptions;
+
+  optionalt<solver_hardnesst> solver_hardness;
 };
 
 #endif // CPROVER_SOLVERS_SAT_SATCHECK_CADICAL_H
