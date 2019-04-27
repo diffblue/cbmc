@@ -30,9 +30,13 @@ public:
   /// For a Boolean expression \p expr, add the constraint 'not expr'
   void set_to_false(const exprt &expr);
 
-  /// Generate a handle for an expression; this offers an efficient way
+  /// Generate a handle, which is an expression that
+  /// has the same value as the argument in any model
+  /// that is generated; this offers an efficient way
   /// to refer to the expression in subsequent calls to \ref get or
-  /// \ref set_to
+  /// \ref set_to.
+  /// The returned expression may be the expression itself or a more compact
+  /// but solver-specific representation.
   virtual exprt handle(const exprt &expr) = 0;
 
   /// Result of running the decision procedure

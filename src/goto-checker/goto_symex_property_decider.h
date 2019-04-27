@@ -79,7 +79,7 @@ protected:
     std::vector<symex_target_equationt::SSA_stepst::iterator> instances;
 
     /// The goal variable
-    literalt condition;
+    exprt condition;
 
     exprt as_expr() const;
   };

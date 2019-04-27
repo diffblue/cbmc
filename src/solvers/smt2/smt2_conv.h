@@ -113,10 +113,8 @@ public:
   bool use_array_of_bool;
   bool emit_set_logic;
 
+  exprt handle(const exprt &expr) override;
   literalt convert(const exprt &expr) override;
-  void set_frozen(literalt) override
-  { /* not needed */
-  }
   void set_to(const exprt &expr, bool value) override;
   exprt get(const exprt &expr) const override;
   std::string decision_procedure_text() const override

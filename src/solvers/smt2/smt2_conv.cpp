@@ -661,6 +661,15 @@ literalt smt2_convt::convert(const exprt &expr)
   return l;
 }
 
+exprt smt2_convt::handle(const exprt &expr)
+{
+  // We can only improve Booleans.
+  if(expr.type().id() != ID_bool)
+    return expr;
+
+  return literal_exprt(convert(expr));
+}
+
 void smt2_convt::convert_literal(const literalt l)
 {
   if(l==const_literal(false))

@@ -26,13 +26,6 @@ public:
 
   using decision_proceduret::operator();
 
-  /// returns a 'handle', which is an expression that
-  /// has the same value as the argument in any model
-  /// that is generated.
-  /// This may be the expression itself or a more compact
-  /// but solver-specific representation.
-  exprt handle(const exprt &expr) override;
-
   /// Convert a Boolean expression and return the corresponding literal
   virtual literalt convert(const exprt &expr) = 0;
 
@@ -41,11 +34,8 @@ public:
   virtual tvt l_get(literalt l) const = 0;
 
   // incremental solving
-  virtual void set_frozen(literalt a);
-  virtual void set_frozen(const bvt &);
   virtual void set_assumptions(const bvt &_assumptions);
   virtual bool has_set_assumptions() const { return false; }
-  virtual void set_all_frozen() {}
 };
 
 #endif // CPROVER_SOLVERS_PROP_PROP_CONV_H
