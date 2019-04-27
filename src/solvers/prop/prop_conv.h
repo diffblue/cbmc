@@ -46,10 +46,6 @@ public:
   virtual void set_assumptions(const bvt &_assumptions);
   virtual bool has_set_assumptions() const { return false; }
   virtual void set_all_frozen() {}
-
-  // returns true if an assumption is in the final conflict
-  virtual bool is_in_conflict(literalt l) const;
-  virtual bool has_is_in_conflict() const { return false; }
 };
 
 #endif // CPROVER_SOLVERS_PROP_PROP_CONV_H

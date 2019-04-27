@@ -36,13 +36,6 @@ exprt prop_convt::handle(const exprt &expr)
   return literal_exprt(l);
 }
 
-/// determine whether a variable is in the final conflict
-bool prop_convt::is_in_conflict(literalt) const
-{
-  UNREACHABLE;
-  return false;
-}
-
 void prop_convt::set_assumptions(const bvt &)
 {
   UNREACHABLE;
