@@ -124,9 +124,6 @@ SCENARIO(
   symbol_table.insert(test_program_symbol);
   namespacet ns(symbol_table);
 
-  goto_programt test_program;
-  auto virtual_call_inst = test_program.add_instruction(FUNCTION_CALL);
-
   const symbolt &callee_symbol =
     symbol_table.lookup_ref("java::VirtualFunctionsTestParent.f:()V");
 
@@ -141,9 +138,12 @@ SCENARIO(
     // null pointer:
     {null_pointer_exprt(
       to_pointer_type(to_code_type(callee.type()).parameters()[0].type()))});
-  virtual_call_inst->code = call;
 
-  test_program.add_instruction(END_FUNCTION);
+  goto_programt test_program;
+  auto virtual_call_inst =
+    test_program.add(goto_programt::make_function_call(call));
+
+  test_program.add(goto_programt::make_end_function());
 
   WHEN("Resolving virtual callsite to a single callee")
   {

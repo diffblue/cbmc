@@ -993,7 +993,8 @@ void string_abstractiont::build_new_symbol(const symbolt &symbol,
 
   if(symbol.is_static_lifetime)
   {
-    goto_programt::targett dummy_loc=initialization.add_instruction();
+    goto_programt::targett dummy_loc =
+      initialization.add(goto_programt::instructiont());
     dummy_loc->source_location=symbol.location;
     make_decl_and_def(initialization, dummy_loc, identifier, symbol.name);
     initialization.instructions.erase(dummy_loc);
@@ -1249,20 +1250,18 @@ goto_programt::targett string_abstractiont::value_assignments_if(
 {
   goto_programt tmp;
 
-  goto_programt::targett goto_else=tmp.add_instruction(GOTO);
-  goto_programt::targett goto_out=tmp.add_instruction(GOTO);
-  goto_programt::targett else_target=tmp.add_instruction(SKIP);
-  goto_programt::targett out_target=tmp.add_instruction(SKIP);
+  goto_programt::targett goto_else =
+    tmp.add(goto_programt::make_incomplete_goto(
+      boolean_negate(rhs.cond()), target->source_location));
+  goto_programt::targett goto_out = tmp.add(
+    goto_programt::make_incomplete_goto(true_exprt(), target->source_location));
+  goto_programt::targett else_target =
+    tmp.add(goto_programt::make_skip(target->source_location));
+  goto_programt::targett out_target =
+    tmp.add(goto_programt::make_skip(target->source_location));
 
-  *goto_else = goto_programt::make_goto(
-    else_target, boolean_negate(rhs.cond()), target->source_location);
-
-  *goto_out =
-    goto_programt::make_goto(out_target, true_exprt(), target->source_location);
-
-  else_target->source_location=target->source_location;
-
-  out_target->source_location=target->source_location;
+  goto_else->complete_goto(else_target);
+  goto_out->complete_goto(out_target);
 
   value_assignments(tmp, goto_out, lhs, rhs.true_case());
   value_assignments(tmp, else_target, lhs, rhs.false_case());
