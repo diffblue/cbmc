@@ -141,7 +141,7 @@ exprt &_newstack(parsert &parser, unsigned &x);
 
 #define newstack(x) _newstack(PARSER, (x))
 
-#define stack(x) (PARSER.stack[x])
+#define parser_stack(x) (PARSER.stack[x])
 #define stack_expr(x) (PARSER.stack[x])
 #define stack_type(x) \
   (static_cast<typet &>(static_cast<irept &>(PARSER.stack[x])))

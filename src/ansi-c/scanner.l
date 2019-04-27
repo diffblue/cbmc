@@ -50,7 +50,7 @@ extern int yyansi_cdebug;
 #endif
 
 #define loc() \
-  { newstack(yyansi_clval); PARSER.set_source_location(stack(yyansi_clval)); }
+  { newstack(yyansi_clval); PARSER.set_source_location(parser_stack(yyansi_clval)); }
 
 int make_identifier()
 {
@@ -84,8 +84,8 @@ int make_identifier()
   
   if(PARSER.cpp98)
   {
-    stack(yyansi_clval).id(ID_symbol);
-    stack(yyansi_clval).set(ID_C_base_name, final_base_name);
+    parser_stack(yyansi_clval).id(ID_symbol);
+    parser_stack(yyansi_clval).set(ID_C_base_name, final_base_name);
     return TOK_IDENTIFIER;
   }
   else
@@ -100,18 +100,18 @@ int make_identifier()
 
     PARSER.tag_following=false;
 
-    stack(yyansi_clval).set(ID_C_base_name, base_name);
-    stack(yyansi_clval).set(ID_identifier, identifier);
-    stack(yyansi_clval).set(ID_C_id_class, static_cast<int>(result));
+    parser_stack(yyansi_clval).set(ID_C_base_name, base_name);
+    parser_stack(yyansi_clval).set(ID_identifier, identifier);
+    parser_stack(yyansi_clval).set(ID_C_id_class, static_cast<int>(result));
 
     if(result==ansi_c_id_classt::ANSI_C_TYPEDEF)
     {
-      stack(yyansi_clval).id(ID_typedef_type);
+      parser_stack(yyansi_clval).id(ID_typedef_type);
       return TOK_TYPEDEFNAME;
     }
     else
     {
-      stack(yyansi_clval).id(ID_symbol);
+      parser_stack(yyansi_clval).id(ID_symbol);
       return TOK_IDENTIFIER;
     }
   }
@@ -298,8 +298,8 @@ void ansi_c_scanner_init()
 
 <GRAMMAR>{char_lit} {
                   newstack(yyansi_clval);
-                  stack(yyansi_clval)=convert_character_literal(yytext, true);
-                  PARSER.set_source_location(stack(yyansi_clval));
+                  parser_stack(yyansi_clval)=convert_character_literal(yytext, true);
+                  PARSER.set_source_location(parser_stack(yyansi_clval));
                   return TOK_CHARACTER;
                 }
 
@@ -325,9 +325,9 @@ void ansi_c_scanner_init()
 <STRING_LITERAL>"/*" { yy_push_state(STRING_LITERAL_COMMENT); /* C comment, ignore */ }
 <STRING_LITERAL>"//".*\n { /* C++ comment, ignore */ }
 <STRING_LITERAL>. { // anything else: back to normal
-                  source_locationt l=stack(yyansi_clval).source_location();
-                  stack(yyansi_clval)=convert_string_literal(PARSER.string_literal);
-                  stack(yyansi_clval).add_source_location().swap(l);
+                  source_locationt l=parser_stack(yyansi_clval).source_location();
+                  parser_stack(yyansi_clval)=convert_string_literal(PARSER.string_literal);
+                  parser_stack(yyansi_clval).add_source_location().swap(l);
                   yy_pop_state(); // back to normal
                   yyless(0); // put back
                   return TOK_STRING;
@@ -1483,8 +1483,8 @@ __decltype          { if(PARSER.cpp98 &&
 {identifier}    { return make_identifier(); }
 
 {integer_s}     { newstack(yyansi_clval);
-                  stack(yyansi_clval)=convert_integer_literal(yytext);
-                  PARSER.set_source_location(stack(yyansi_clval));
+                  parser_stack(yyansi_clval)=convert_integer_literal(yytext);
+                  PARSER.set_source_location(parser_stack(yyansi_clval));
                   return TOK_INTEGER;
                 }
 
@@ -1494,14 +1494,14 @@ __decltype          { if(PARSER.cpp98 &&
                       return TOK_SCANNER_ERROR;
                     }
                     newstack(yyansi_clval);
-                    stack(yyansi_clval)=convert_float_literal(yytext);
-                    PARSER.set_source_location(stack(yyansi_clval));
+                    parser_stack(yyansi_clval)=convert_float_literal(yytext);
+                    PARSER.set_source_location(parser_stack(yyansi_clval));
                     return TOK_FLOATING;
                   }
 
 {float_s}       { newstack(yyansi_clval);
-                  stack(yyansi_clval)=convert_float_literal(yytext);
-                  PARSER.set_source_location(stack(yyansi_clval));
+                  parser_stack(yyansi_clval)=convert_float_literal(yytext);
+                  PARSER.set_source_location(parser_stack(yyansi_clval));
                   return TOK_FLOATING;
                 }
 
@@ -1536,9 +1536,9 @@ __decltype          { if(PARSER.cpp98 &&
                   return '{';
                 }
 <MSC_ASM>[^{^}^\n]* { loc();
-                  source_locationt l=stack(yyansi_clval).source_location();
-                  stack(yyansi_clval)=string_constantt(yytext);
-                  stack(yyansi_clval).add_source_location()=l;
+                  source_locationt l=parser_stack(yyansi_clval).source_location();
+                  parser_stack(yyansi_clval)=string_constantt(yytext);
+                  parser_stack(yyansi_clval).add_source_location()=l;
                   BEGIN(GRAMMAR);
                   return TOK_ASM_STRING;
                 }
@@ -1551,7 +1551,7 @@ __decltype          { if(PARSER.cpp98 &&
 .               { // anything else: back to normal
                   PARSER.asm_block_following=false;
                   loc();
-                  stack(yyansi_clval)=string_constantt(PARSER.string_literal);
+                  parser_stack(yyansi_clval)=string_constantt(PARSER.string_literal);
                   BEGIN(GRAMMAR);
                   yyless(0); // put back
                   return TOK_ASM_STRING;
@@ -1687,8 +1687,8 @@ __decltype          { if(PARSER.cpp98 &&
                   }
                 }
 {integer_s}     { newstack(yyansi_clval);
-                  stack(yyansi_clval)=convert_integer_literal(yytext);
-                  PARSER.set_source_location(stack(yyansi_clval));
+                  parser_stack(yyansi_clval)=convert_integer_literal(yytext);
+                  PARSER.set_source_location(parser_stack(yyansi_clval));
                   return TOK_INTEGER;
                 }
 {ws}            { /* ignore */ }

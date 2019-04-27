@@ -37,7 +37,7 @@ public:
 
   symbol_table_buildert(const symbol_table_buildert &) = delete;
   symbol_table_buildert &operator=(const symbol_table_buildert &) = delete;
-  symbol_table_buildert &operator=(symbol_table_buildert &&) = default;
+  symbol_table_buildert &operator=(symbol_table_buildert &&) = delete;
 
   static symbol_table_buildert wrap(symbol_table_baset &base_symbol_table)
   {
