@@ -833,10 +833,35 @@ void string_instrumentationt::invalidate_buffer(
     from_integer(0, cntr_sym.type),
     target->source_location));
 
-  goto_programt::targett check=dest.add_instruction();
+  exprt bufp;
 
-  goto_programt::targett invalidate=dest.add_instruction(ASSIGN);
-  invalidate->source_location=target->source_location;
+  if(buf_type.id()==ID_pointer)
+    bufp=buffer;
+  else
+  {
+    index_exprt index(
+      buffer, from_integer(0, index_type()), buf_type.subtype());
+    bufp=address_of_exprt(index);
+  }
+
+  exprt condition;
+
+  if(limit==0)
+    condition =
+      binary_relation_exprt(cntr_sym.symbol_expr(), ID_ge, buffer_size(bufp));
+  else
+    condition = binary_relation_exprt(
+      cntr_sym.symbol_expr(), ID_gt, from_integer(limit, unsigned_int_type()));
+
+  goto_programt::targett check = dest.add(
+    goto_programt::make_incomplete_goto(condition, target->source_location));
+
+  goto_programt::targett invalidate = dest.add(goto_programt::instructiont(
+    static_cast<const codet &>(get_nil_irep()),
+    target->source_location,
+    ASSIGN,
+    nil_exprt(),
+    {}));
 
   const plus_exprt plus(
     cntr_sym.symbol_expr(), from_integer(1, unsigned_int_type()));
@@ -850,30 +875,10 @@ void string_instrumentationt::invalidate_buffer(
   goto_programt::targett exit =
     dest.add(goto_programt::make_skip(target->source_location));
 
-  exprt cnt_bs, bufp;
-
-  if(buf_type.id()==ID_pointer)
-    bufp=buffer;
-  else
-  {
-    index_exprt index(
-      buffer, from_integer(0, index_type()), buf_type.subtype());
-    bufp=address_of_exprt(index);
-  }
+  check->complete_goto(exit);
 
   const plus_exprt b_plus_i(bufp, cntr_sym.symbol_expr());
   const dereference_exprt deref(b_plus_i, buf_type.subtype());
-
-  exprt condition;
-
-  if(limit==0)
-    condition =
-      binary_relation_exprt(cntr_sym.symbol_expr(), ID_ge, buffer_size(bufp));
-  else
-    condition = binary_relation_exprt(
-      cntr_sym.symbol_expr(), ID_gt, from_integer(limit, unsigned_int_type()));
-
-  *check = goto_programt::make_goto(exit, condition, target->source_location);
 
   const side_effect_expr_nondett nondet(
     buf_type.subtype(), target->source_location);

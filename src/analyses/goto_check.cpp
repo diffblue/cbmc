@@ -1438,13 +1438,16 @@ void goto_checkt::add_guarded_claim(
     goto_program_instruction_typet type=
       enable_assert_to_assume?ASSUME:ASSERT;
 
-    goto_programt::targett t=new_code.add_instruction(type);
+    goto_programt::targett t = new_code.add(goto_programt::instructiont(
+      static_cast<const codet &>(get_nil_irep()),
+      source_location,
+      type,
+      std::move(new_expr),
+      {}));
 
     std::string source_expr_string;
     get_language_from_mode(mode)->from_expr(src_expr, source_expr_string, ns);
 
-    t->set_condition(std::move(new_expr));
-    t->source_location=source_location;
     t->source_location.set_comment(comment+" in "+source_expr_string);
     t->source_location.set_property_class(property_class);
   }
@@ -1739,10 +1742,13 @@ void goto_checkt::goto_check(
         goto_program_instruction_typet type=
           enable_assert_to_assume?ASSUME:ASSERT;
 
-        goto_programt::targett t=new_code.add_instruction(type);
+        goto_programt::targett t = new_code.add(goto_programt::instructiont(
+          static_cast<const codet &>(get_nil_irep()),
+          i.source_location,
+          type,
+          false_exprt(),
+          {}));
 
-        t->set_condition(false_exprt());
-        t->source_location=i.source_location;
         t->source_location.set_property_class("error label");
         t->source_location.set_comment("error label "+label);
         t->source_location.set("user-provided", true);
