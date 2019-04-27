@@ -57,6 +57,8 @@ public:
 
   value_sett(const value_sett &other) = default;
 
+  value_sett &operator=(const value_sett &other) = delete;
+
   value_sett &operator=(value_sett &&other)
   {
     values = std::move(other.values);
