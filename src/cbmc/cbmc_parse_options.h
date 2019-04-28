@@ -31,8 +31,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <solvers/strings/string_refinement.h>
 
-#include "xml_interface.h"
-
 class goto_functionst;
 class optionst;
 
@@ -82,7 +80,7 @@ class optionst;
   "(claim):(show-claims)(floatbv)(all-claims)(all-properties)" // legacy, and will eventually disappear // NOLINT(whitespace/line_length)
 // clang-format on
 
-class cbmc_parse_optionst : public parse_options_baset, public xml_interfacet
+class cbmc_parse_optionst : public parse_options_baset
 {
 public:
   virtual int doit() override;

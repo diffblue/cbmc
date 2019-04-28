@@ -9,8 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// XML Interface
 
-#ifndef CPROVER_CBMC_XML_INTERFACE_H
-#define CPROVER_CBMC_XML_INTERFACE_H
+#ifndef CPROVER_XMLLANG_XML_INTERFACE_H
+#define CPROVER_XMLLANG_XML_INTERFACE_H
 
 #include <util/cmdline.h>
 
@@ -29,4 +29,4 @@ protected:
   void get_xml_options(const xmlt &xml, cmdlinet &cmdline);
 };
 
-#endif // CPROVER_CBMC_XML_INTERFACE_H
+#endif // CPROVER_XMLLANG_XML_INTERFACE_H

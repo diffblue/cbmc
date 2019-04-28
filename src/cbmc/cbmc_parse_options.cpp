@@ -79,8 +79,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <langapi/mode.h>
 
+#include <xmllang/xml_interface.h>
+
 #include "c_test_input_generator.h"
-#include "xml_interface.h"
 
 cbmc_parse_optionst::cbmc_parse_optionst(int argc, const char **argv)
   : parse_options_baset(
