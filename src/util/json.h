@@ -61,6 +61,11 @@ public:
     return kind==kindt::J_ARRAY;
   }
 
+  bool is_boolean() const
+  {
+    return kind == kindt::J_TRUE || kind == kindt::J_FALSE;
+  }
+
   bool is_true() const
   {
     return kind==kindt::J_TRUE;
