@@ -610,23 +610,15 @@ SHARING_MAPT(std::size_t)
 
   unsigned count = 0;
 
-  // depth, node pointer
-  typedef std::pair<unsigned, const baset *> stack_itemt;
-
-  std::stack<stack_itemt> stack;
-  stack.push({0, &map});
+  std::stack<const innert *> stack;
+  stack.push(&map);
 
   do
   {
-    const stack_itemt &si = stack.top();
-
-    const unsigned depth = si.first;
-    const baset *bp = si.second;
-
+    const innert *ip = stack.top();
     stack.pop();
 
     // internal node or container node
-    const innert *ip = static_cast<const innert *>(bp);
     const unsigned use_count = ip->use_count();
     const void *raw_ptr = ip->is_internal()
                             ? (const void *)&ip->read_internal()
@@ -650,20 +642,22 @@ SHARING_MAPT(std::size_t)
       count++;
     }
 
-    if(depth < steps) // internal
+    if(ip->is_internal())
     {
+      SM_ASSERT(!ip->empty());
+
       const to_mapt &m = ip->get_to_map();
       SM_ASSERT(!m.empty());
 
       for(const auto &item : m)
       {
         const innert *i = &item.second;
-        stack.push({depth + 1, i});
+        stack.push(i);
       }
     }
-    else // container
+    else
     {
-      SM_ASSERT(depth == steps);
+      SM_ASSERT(ip->is_defined_container());
 
       const leaf_listt &ll = ip->get_container();
       SM_ASSERT(!ll.empty());
