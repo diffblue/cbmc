@@ -13,30 +13,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <iostream>
 
+#include <util/cmdline.h>
 #include <util/message.h>
 
 #include <xmllang/xml_parser.h>
 
-/// XML User Interface
-void xml_interfacet::get_xml_options(cmdlinet &cmdline)
-{
-  if(cmdline.isset("xml-interface"))
-  {
-    null_message_handlert message_handler;
-    xmlt xml;
-
-    parse_xml(std::cin, "", message_handler, xml);
-
-    get_xml_options(xml, cmdline);
-
-    cmdline.set("xml-ui");
-  }
-}
-
-/// XML User Interface
-void xml_interfacet::get_xml_options(
-  const xmlt &xml,
-  cmdlinet &cmdline)
+/// Parse commandline options from \p xml into \p cmdline
+static void get_xml_options(const xmlt &xml, cmdlinet &cmdline)
 {
   for(const auto &e : xml.elements)
   {
@@ -60,5 +43,22 @@ void xml_interfacet::get_xml_options(
     {
       cmdline.set(xml.get_attribute("name"));
     }
+  }
+}
+
+void xml_interface(cmdlinet &cmdline, message_handlert &message_handler)
+{
+  if(cmdline.isset("xml-interface"))
+  {
+    xmlt xml;
+
+    parse_xml(std::cin, "", message_handler, xml);
+
+    get_xml_options(xml, cmdline);
+
+    // Add this so that it gets propagated into optionst;
+    // the ui_message_handlert::uit has already been set on the basis
+    // of the xml-interface flag.
+    cmdline.set("xml-ui");
   }
 }

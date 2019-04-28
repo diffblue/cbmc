@@ -88,9 +88,9 @@ cbmc_parse_optionst::cbmc_parse_optionst(int argc, const char **argv)
       CBMC_OPTIONS,
       argc,
       argv,
-      std::string("CBMC ") + CBMC_VERSION),
-    xml_interfacet(cmdline)
+      std::string("CBMC ") + CBMC_VERSION)
 {
+  xml_interface(cmdline, ui_message_handler);
 }
 
 ::cbmc_parse_optionst::cbmc_parse_optionst(
@@ -101,9 +101,9 @@ cbmc_parse_optionst::cbmc_parse_optionst(int argc, const char **argv)
       CBMC_OPTIONS + extra_options,
       argc,
       argv,
-      std::string("CBMC ") + CBMC_VERSION),
-    xml_interfacet(cmdline)
+      std::string("CBMC ") + CBMC_VERSION)
 {
+  xml_interface(cmdline, ui_message_handler);
 }
 
 void cbmc_parse_optionst::set_default_options(optionst &options)
