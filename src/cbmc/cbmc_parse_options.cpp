@@ -700,83 +700,75 @@ int cbmc_parse_optionst::get_goto_program(
     return CPROVER_EXIT_INCORRECT_TASK;
   }
 
+  goto_model = initialize_goto_model(cmdline.args, ui_message_handler, options);
+
+  if(cmdline.isset("show-symbol-table"))
   {
-    goto_model =
-      initialize_goto_model(cmdline.args, ui_message_handler, options);
-
-    if(cmdline.isset("show-symbol-table"))
-    {
-      show_symbol_table(goto_model, ui_message_handler);
-      return CPROVER_EXIT_SUCCESS;
-    }
-
-    if(cbmc_parse_optionst::process_goto_program(goto_model, options, log))
-      return CPROVER_EXIT_INTERNAL_ERROR;
-
-    if(cmdline.isset("validate-goto-model"))
-    {
-      goto_model.validate();
-    }
-
-    // show it?
-    if(cmdline.isset("show-loops"))
-    {
-      show_loop_ids(ui_message_handler.get_ui(), goto_model);
-      return CPROVER_EXIT_SUCCESS;
-    }
-
-    // show it?
-    if(
-      cmdline.isset("show-goto-functions") ||
-      cmdline.isset("list-goto-functions"))
-    {
-      show_goto_functions(
-        goto_model,
-        ui_message_handler,
-        cmdline.isset("list-goto-functions"));
-      return CPROVER_EXIT_SUCCESS;
-    }
-
-    log.status() << config.object_bits_info() << messaget::eom;
+    show_symbol_table(goto_model, ui_message_handler);
+    return CPROVER_EXIT_SUCCESS;
   }
+
+  if(cbmc_parse_optionst::process_goto_program(goto_model, options, log))
+    return CPROVER_EXIT_INTERNAL_ERROR;
+
+  if(cmdline.isset("validate-goto-model"))
+  {
+    goto_model.validate();
+  }
+
+  // show it?
+  if(cmdline.isset("show-loops"))
+  {
+    show_loop_ids(ui_message_handler.get_ui(), goto_model);
+    return CPROVER_EXIT_SUCCESS;
+  }
+
+  // show it?
+  if(
+    cmdline.isset("show-goto-functions") ||
+    cmdline.isset("list-goto-functions"))
+  {
+    show_goto_functions(
+      goto_model, ui_message_handler, cmdline.isset("list-goto-functions"));
+    return CPROVER_EXIT_SUCCESS;
+  }
+
+  log.status() << config.object_bits_info() << messaget::eom;
 
   return -1; // no error, continue
 }
 
 void cbmc_parse_optionst::preprocessing(const optionst &options)
 {
+  if(cmdline.args.size() != 1)
   {
-    if(cmdline.args.size()!=1)
-    {
-      log.error() << "Please provide one program to preprocess"
-                  << messaget::eom;
-      return;
-    }
-
-    std::string filename=cmdline.args[0];
-
-    std::ifstream infile(filename);
-
-    if(!infile)
-    {
-      log.error() << "failed to open input file" << messaget::eom;
-      return;
-    }
-
-    std::unique_ptr<languaget> language=get_language_from_filename(filename);
-    language->set_language_options(options);
-
-    if(language==nullptr)
-    {
-      log.error() << "failed to figure out type of file" << messaget::eom;
-      return;
-    }
-
-    language->set_message_handler(ui_message_handler);
-
-    if(language->preprocess(infile, filename, std::cout))
-      log.error() << "PREPROCESSING ERROR" << messaget::eom;
+    log.error() << "Please provide one program to preprocess" << messaget::eom;
+    return;
   }
+
+  std::string filename = cmdline.args[0];
+
+  std::ifstream infile(filename);
+
+  if(!infile)
+  {
+    log.error() << "failed to open input file" << messaget::eom;
+    return;
+  }
+
+  std::unique_ptr<languaget> language = get_language_from_filename(filename);
+  language->set_language_options(options);
+
+  if(language == nullptr)
+  {
+    log.error() << "failed to figure out type of file" << messaget::eom;
+    return;
+  }
+
+  language->set_message_handler(ui_message_handler);
+
+  if(language->preprocess(infile, filename, std::cout))
+    log.error() << "PREPROCESSING ERROR" << messaget::eom;
 }
 
 bool cbmc_parse_optionst::process_goto_program(
@@ -784,136 +776,134 @@ bool cbmc_parse_optionst::process_goto_program(
   const optionst &options,
   messaget &log)
 {
+  // Remove inline assembler; this needs to happen before
+  // adding the library.
+  remove_asm(goto_model);
+
+  // add the library
+  log.status() << "Adding CPROVER library (" << config.ansi_c.arch << ")"
+               << messaget::eom;
+  link_to_library(
+    goto_model, log.get_message_handler(), cprover_cpp_library_factory);
+  link_to_library(
+    goto_model, log.get_message_handler(), cprover_c_library_factory);
+
+  if(options.get_bool_option("string-abstraction"))
+    string_instrumentation(goto_model, log.get_message_handler());
+
+  // remove function pointers
+  log.status() << "Removal of function pointers and virtual functions"
+               << messaget::eom;
+  remove_function_pointers(
+    log.get_message_handler(),
+    goto_model,
+    options.get_bool_option("pointer-check"));
+
+  mm_io(goto_model);
+
+  // instrument library preconditions
+  instrument_preconditions(goto_model);
+
+  // remove returns, gcc vectors, complex
+  remove_returns(goto_model);
+  remove_vector(goto_model);
+  remove_complex(goto_model);
+  rewrite_union(goto_model);
+
+  // add generic checks
+  log.status() << "Generic Property Instrumentation" << messaget::eom;
+  goto_check(options, goto_model);
+
+  // checks don't know about adjusted float expressions
+  adjust_float_expressions(goto_model);
+
+  // ignore default/user-specified initialization
+  // of variables with static lifetime
+  if(options.get_bool_option("nondet-static"))
   {
-    // Remove inline assembler; this needs to happen before
-    // adding the library.
-    remove_asm(goto_model);
-
-    // add the library
-    log.status() << "Adding CPROVER library (" << config.ansi_c.arch << ")"
+    log.status() << "Adding nondeterministic initialization "
+                    "of static/global variables"
                  << messaget::eom;
-    link_to_library(
-      goto_model, log.get_message_handler(), cprover_cpp_library_factory);
-    link_to_library(
-      goto_model, log.get_message_handler(), cprover_c_library_factory);
-
-    if(options.get_bool_option("string-abstraction"))
-      string_instrumentation(goto_model, log.get_message_handler());
-
-    // remove function pointers
-    log.status() << "Removal of function pointers and virtual functions"
-                 << messaget::eom;
-    remove_function_pointers(
-      log.get_message_handler(),
-      goto_model,
-      options.get_bool_option("pointer-check"));
-
-    mm_io(goto_model);
-
-    // instrument library preconditions
-    instrument_preconditions(goto_model);
-
-    // remove returns, gcc vectors, complex
-    remove_returns(goto_model);
-    remove_vector(goto_model);
-    remove_complex(goto_model);
-    rewrite_union(goto_model);
-
-    // add generic checks
-    log.status() << "Generic Property Instrumentation" << messaget::eom;
-    goto_check(options, goto_model);
-
-    // checks don't know about adjusted float expressions
-    adjust_float_expressions(goto_model);
-
-    // ignore default/user-specified initialization
-    // of variables with static lifetime
-    if(options.get_bool_option("nondet-static"))
-    {
-      log.status() << "Adding nondeterministic initialization "
-                      "of static/global variables"
-                   << messaget::eom;
-      nondet_static(goto_model);
-    }
-
-    if(options.get_bool_option("string-abstraction"))
-    {
-      log.status() << "String Abstraction" << messaget::eom;
-      string_abstraction(goto_model, log.get_message_handler());
-    }
-
-    // add failed symbols
-    // needs to be done before pointer analysis
-    add_failed_symbols(goto_model.symbol_table);
-
-    // recalculate numbers, etc.
-    goto_model.goto_functions.update();
-
-    // add loop ids
-    goto_model.goto_functions.compute_loop_numbers();
-
-    if(options.get_bool_option("drop-unused-functions"))
-    {
-      // Entry point will have been set before and function pointers removed
-      log.status() << "Removing unused functions" << messaget::eom;
-      remove_unused_functions(goto_model, log.get_message_handler());
-    }
-
-    // remove skips such that trivial GOTOs are deleted and not considered
-    // for coverage annotation:
-    remove_skip(goto_model);
-
-    // instrument cover goals
-    if(options.is_set("cover"))
-    {
-      const auto cover_config = get_cover_config(
-        options, goto_model.symbol_table, log.get_message_handler());
-      if(instrument_cover_goals(
-           cover_config, goto_model, log.get_message_handler()))
-        return true;
-    }
-
-    // label the assertions
-    // This must be done after adding assertions and
-    // before using the argument of the "property" option.
-    // Do not re-label after using the property slicer because
-    // this would cause the property identifiers to change.
-    label_properties(goto_model);
-
-    // reachability slice?
-    if(options.get_bool_option("reachability-slice-fb"))
-    {
-      log.status() << "Performing a forwards-backwards reachability slice"
-                   << messaget::eom;
-      if(options.is_set("property"))
-        reachability_slicer(
-          goto_model, options.get_list_option("property"), true);
-      else
-        reachability_slicer(goto_model, true);
-    }
-
-    if(options.get_bool_option("reachability-slice"))
-    {
-      log.status() << "Performing a reachability slice" << messaget::eom;
-      if(options.is_set("property"))
-        reachability_slicer(goto_model, options.get_list_option("property"));
-      else
-        reachability_slicer(goto_model);
-    }
-
-    // full slice?
-    if(options.get_bool_option("full-slice"))
-    {
-      log.status() << "Performing a full slice" << messaget::eom;
-      if(options.is_set("property"))
-        property_slicer(goto_model, options.get_list_option("property"));
-      else
-        full_slicer(goto_model);
-    }
-
-    // remove any skips introduced since coverage instrumentation
-    remove_skip(goto_model);
+    nondet_static(goto_model);
   }
+
+  if(options.get_bool_option("string-abstraction"))
+  {
+    log.status() << "String Abstraction" << messaget::eom;
+    string_abstraction(goto_model, log.get_message_handler());
+  }
+
+  // add failed symbols
+  // needs to be done before pointer analysis
+  add_failed_symbols(goto_model.symbol_table);
+
+  // recalculate numbers, etc.
+  goto_model.goto_functions.update();
+
+  // add loop ids
+  goto_model.goto_functions.compute_loop_numbers();
+
+  if(options.get_bool_option("drop-unused-functions"))
+  {
+    // Entry point will have been set before and function pointers removed
+    log.status() << "Removing unused functions" << messaget::eom;
+    remove_unused_functions(goto_model, log.get_message_handler());
+  }
+
+  // remove skips such that trivial GOTOs are deleted and not considered
+  // for coverage annotation:
+  remove_skip(goto_model);
+
+  // instrument cover goals
+  if(options.is_set("cover"))
+  {
+    const auto cover_config = get_cover_config(
+      options, goto_model.symbol_table, log.get_message_handler());
+    if(instrument_cover_goals(
+         cover_config, goto_model, log.get_message_handler()))
+      return true;
+  }
+
+  // label the assertions
+  // This must be done after adding assertions and
+  // before using the argument of the "property" option.
+  // Do not re-label after using the property slicer because
+  // this would cause the property identifiers to change.
+  label_properties(goto_model);
+
+  // reachability slice?
+  if(options.get_bool_option("reachability-slice-fb"))
+  {
+    log.status() << "Performing a forwards-backwards reachability slice"
+                 << messaget::eom;
+    if(options.is_set("property"))
+      reachability_slicer(
+        goto_model, options.get_list_option("property"), true);
+    else
+      reachability_slicer(goto_model, true);
+  }
+
+  if(options.get_bool_option("reachability-slice"))
+  {
+    log.status() << "Performing a reachability slice" << messaget::eom;
+    if(options.is_set("property"))
+      reachability_slicer(goto_model, options.get_list_option("property"));
+    else
+      reachability_slicer(goto_model);
+  }
+
+  // full slice?
+  if(options.get_bool_option("full-slice"))
+  {
+    log.status() << "Performing a full slice" << messaget::eom;
+    if(options.is_set("property"))
+      property_slicer(goto_model, options.get_list_option("property"));
+    else
+      full_slicer(goto_model);
+  }
+
+  // remove any skips introduced since coverage instrumentation
+  remove_skip(goto_model);
 
   return false;
 }
