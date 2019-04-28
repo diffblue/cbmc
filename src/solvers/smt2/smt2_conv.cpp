@@ -42,6 +42,70 @@ Author: Daniel Kroening, kroening@kroening.com
 // General todos
 #define SMT2_TODO(S) PRECONDITION_WITH_DIAGNOSTICS(false, "TODO: " S)
 
+smt2_convt::smt2_convt(
+  const namespacet &_ns,
+  const std::string &_benchmark,
+  const std::string &_notes,
+  const std::string &_logic,
+  solvert _solver,
+  std::ostream &_out)
+  : use_FPA_theory(false),
+    use_datatypes(false),
+    use_array_of_bool(false),
+    emit_set_logic(true),
+    ns(_ns),
+    out(_out),
+    benchmark(_benchmark),
+    notes(_notes),
+    logic(_logic),
+    solver(_solver),
+    boolbv_width(_ns),
+    pointer_logic(_ns),
+    no_boolean_variables(0)
+{
+  // We set some defaults differently
+  // for some solvers.
+
+  switch(solver)
+  {
+  case solvert::GENERIC:
+    break;
+
+  case solvert::BOOLECTOR:
+    break;
+
+  case solvert::CPROVER_SMT2:
+    use_array_of_bool = true;
+    emit_set_logic = false;
+    break;
+
+  case solvert::CVC3:
+    break;
+
+  case solvert::CVC4:
+    break;
+
+  case solvert::MATHSAT:
+    break;
+
+  case solvert::YICES:
+    break;
+
+  case solvert::Z3:
+    use_array_of_bool = true;
+    emit_set_logic = false;
+    use_datatypes = true;
+    break;
+  }
+
+  write_header();
+}
+
+std::string smt2_convt::decision_procedure_text() const
+{
+  return "SMT2";
+}
+
 void smt2_convt::print_assignment(std::ostream &os) const
 {
   // Boolean stuff

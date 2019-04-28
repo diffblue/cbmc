@@ -52,61 +52,9 @@ public:
     const std::string &_notes,
     const std::string &_logic,
     solvert _solver,
-    std::ostream &_out)
-    : use_FPA_theory(false),
-      use_datatypes(false),
-      use_array_of_bool(false),
-      emit_set_logic(true),
-      ns(_ns),
-      out(_out),
-      benchmark(_benchmark),
-      notes(_notes),
-      logic(_logic),
-      solver(_solver),
-      boolbv_width(_ns),
-      pointer_logic(_ns),
-      no_boolean_variables(0)
-  {
-    // We set some defaults differently
-    // for some solvers.
-
-    switch(solver)
-    {
-    case solvert::GENERIC:
-      break;
-
-    case solvert::BOOLECTOR:
-      break;
-
-    case solvert::CPROVER_SMT2:
-      use_array_of_bool = true;
-      emit_set_logic = false;
-      break;
-
-    case solvert::CVC3:
-      break;
-
-    case solvert::CVC4:
-      break;
-
-    case solvert::MATHSAT:
-      break;
-
-    case solvert::YICES:
-      break;
-
-    case solvert::Z3:
-      use_array_of_bool=true;
-      emit_set_logic=false;
-      use_datatypes=true;
-      break;
-    }
-
-    write_header();
-  }
+    std::ostream &_out);
 
   ~smt2_convt() override = default;
-  resultt dec_solve() override;
 
   bool use_FPA_theory;
   bool use_datatypes;
@@ -116,10 +64,7 @@ public:
   exprt handle(const exprt &expr) override;
   void set_to(const exprt &expr, bool value) override;
   exprt get(const exprt &expr) const override;
-  std::string decision_procedure_text() const override
-  {
-    return "SMT2";
-  }
+  std::string decision_procedure_text() const override;
   void print_assignment(std::ostream &out) const override;
 
   /// Unimplemented
@@ -130,10 +75,6 @@ public:
 
   /// Currently, only implements a single stack element (no nested contexts)
   void pop() override;
-
-  void convert_expr(const exprt &);
-  void convert_type(const typet &);
-  void convert_literal(const literalt);
 
   std::size_t get_number_of_solver_calls() const override;
 
@@ -147,6 +88,8 @@ protected:
   boolbv_widtht boolbv_width;
 
   std::size_t number_of_solver_calls = 0;
+
+  resultt dec_solve() override;
 
   void write_header();
   void write_footer(std::ostream &);
@@ -180,6 +123,10 @@ protected:
   void convert_update(const exprt &expr);
 
   std::string convert_identifier(const irep_idt &identifier);
+
+  void convert_expr(const exprt &);
+  void convert_type(const typet &);
+  void convert_literal(const literalt);
 
   literalt convert(const exprt &expr);
   tvt l_get(literalt l) const;
