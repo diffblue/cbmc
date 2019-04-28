@@ -31,7 +31,7 @@ class constant_exprt;
 class index_exprt;
 class member_exprt;
 
-class smt2_convt:public prop_convt
+class smt2_convt : public stack_decision_proceduret
 {
 public:
   enum class solvert
@@ -114,7 +114,6 @@ public:
   bool emit_set_logic;
 
   exprt handle(const exprt &expr) override;
-  literalt convert(const exprt &expr) override;
   void set_to(const exprt &expr, bool value) override;
   exprt get(const exprt &expr) const override;
   std::string decision_procedure_text() const override
@@ -122,7 +121,6 @@ public:
     return "SMT2";
   }
   void print_assignment(std::ostream &out) const override;
-  tvt l_get(literalt l) const override;
 
   /// Unimplemented
   void push() override;
@@ -182,6 +180,9 @@ protected:
   void convert_update(const exprt &expr);
 
   std::string convert_identifier(const irep_idt &identifier);
+
+  literalt convert(const exprt &expr);
+  tvt l_get(literalt l) const;
 
   // auxiliary methods
   exprt prepare_for_convert_expr(const exprt &expr);
