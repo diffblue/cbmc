@@ -1,0 +1,15 @@
+{
+  "arguments": [
+    "main.c"
+  ],
+  "options": {
+    "function": "foo",
+    "unwind": 3,
+    "property": [
+      "foo.assertion.1",
+      "foo.assertion.3"
+    ],
+    "trace": true,
+    "show-properties": false
+  }	
+}
