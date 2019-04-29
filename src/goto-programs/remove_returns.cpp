@@ -14,6 +14,7 @@ Date:   September 2009
 #include "remove_returns.h"
 
 #include <util/c_types.h>
+#include <util/exception_utils.h>
 #include <util/fresh_symbol.h>
 #include <util/std_expr.h>
 #include <util/suffix.h>
@@ -483,9 +484,18 @@ void remove_returnst::do_function_call_complete(
   const possible_fp_targetst &possible_fp_targets,
   goto_programt &goto_program)
 {
-  PRECONDITION(!possible_fp_targets.empty());
-
+  PRECONDITION(target->is_function_call());
   const auto &function_call = target->get_function_call();
+  PRECONDITION(function_call.function().id() == ID_dereference);
+  const auto &function_symbol =
+    to_dereference_expr(function_call.function()).pointer();
+  PRECONDITION(function_symbol.id() == ID_symbol);
+  const auto &function_id = to_symbol_expr(function_symbol).get_identifier();
+  if(possible_fp_targets.empty())
+    throw incorrect_goto_program_exceptiont{
+      "the function pointer " + id2string(function_id) +
+        " does not have any potential targets",
+      target->source_location};
 
   cond_exprt rhs(exprt::operandst{}, function_call.lhs().type());
   std::vector<symbol_exprt> return_values;
@@ -503,6 +513,8 @@ void remove_returnst::do_function_call_complete(
     symbol_table);
   symbol_exprt pointer_lhs_expr = pointer_lhs_symbol.symbol_expr();
 
+  exprt::operandst disjunction_operands;
+
   for(const auto &target_expr : possible_fp_targets)
   {
     irep_idt target_id = target_expr.get_identifier();
@@ -517,14 +529,16 @@ void remove_returnst::do_function_call_complete(
     CHECK_RETURN(return_value.has_value());
     return_values.push_back(*return_value);
 
-    rhs.add_case(
-      equal_exprt{function_call.function(),
-                  address_of_exprt{target_symbol->symbol_expr()}},
-      address_of_exprt{*return_value});
+    const auto f_equals_f_i = equal_exprt{
+      function_call.function(), address_of_exprt{target_symbol->symbol_expr()}};
+    disjunction_operands.push_back(f_equals_f_i);
+    rhs.add_case(f_equals_f_i, address_of_exprt{*return_value});
   }
 
   // replace "lhs=*f(...)" by
   //
+  // assert(f==f1 || f==f2 || ..); // so that the user knows
+  // assume(f==f1 || f==f2 || ..); // so that we abort this execution
   // T* p_lhs = lhs = (f == f1 ? &f1#return_value : f == f2
   //                           ? &f2#return_value .. );
   // f*(...);
@@ -533,6 +547,14 @@ void remove_returnst::do_function_call_complete(
   // DEAD f2#return_value;
   // ..
   // DEAD p_lhs
+  goto_program.insert_before(
+    target,
+    goto_programt::make_assertion(
+      disjunction(disjunction_operands), target->source_location));
+  goto_program.insert_before(
+    target,
+    goto_programt::make_assumption(
+      disjunction(disjunction_operands), target->source_location));
   goto_program.insert_before(
     target,
     goto_programt::make_assignment(
