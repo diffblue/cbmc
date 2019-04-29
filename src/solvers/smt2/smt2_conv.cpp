@@ -104,10 +104,10 @@ void smt2_convt::write_footer(std::ostream &os)
   {
     os << "; assumptions\n";
 
-    forall_literals(it, assumptions)
+    for(const auto &assumption : assumptions)
     {
       os << "(assert ";
-      convert_literal(*it);
+      convert_literal(to_literal_expr(assumption).get_literal());
       os << ")"
          << "\n";
     }
@@ -688,6 +688,23 @@ void smt2_convt::convert_literal(const literalt l)
 
     smt2_identifiers.insert("B"+std::to_string(l.var_no()));
   }
+}
+
+void smt2_convt::push()
+{
+  UNIMPLEMENTED;
+}
+
+void smt2_convt::push(const std::vector<exprt> &_assumptions)
+{
+  INVARIANT(assumptions.empty(), "nested contexts are not supported");
+
+  assumptions = _assumptions;
+}
+
+void smt2_convt::pop()
+{
+  assumptions.clear();
 }
 
 std::string smt2_convt::convert_identifier(const irep_idt &identifier)

@@ -37,10 +37,6 @@ public:
   /// Convert the instances of a property into a goal variable
   void convert_goals();
 
-  /// Prevent the solver to optimize-away the goal variables
-  /// (necessary for incremental solving)
-  void freeze_goal_variables();
-
   /// Add disjunction of negated selected properties to the equation
   void add_constraint_from_goals(
     std::function<bool(const irep_idt &property_id)> select_property);

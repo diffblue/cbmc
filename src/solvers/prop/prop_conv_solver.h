@@ -37,7 +37,6 @@ public:
   virtual ~prop_conv_solvert() = default;
 
   // overloading from decision_proceduret
-  void set_to(const exprt &expr, bool value) override;
   decision_proceduret::resultt dec_solve() override;
   void print_assignment(std::ostream &out) const override;
   std::string decision_procedure_text() const override
@@ -50,14 +49,6 @@ public:
   {
     return prop.l_get(a);
   }
-  void set_assumptions(const bvt &_assumptions) override
-  {
-    prop.set_assumptions(_assumptions);
-  }
-  bool has_set_assumptions() const override
-  {
-    return prop.has_set_assumptions();
-  }
 
   exprt handle(const exprt &expr) override;
 
@@ -67,6 +58,18 @@ public:
 
   literalt convert(const exprt &expr) override;
   bool is_in_conflict(const exprt &expr) const override;
+
+  /// For a Boolean expression \p expr, add the constraint
+  /// 'current_context => expr' if \p value is `true`,
+  /// otherwise add 'current_context => not expr'
+  void set_to(const exprt &expr, bool value) override;
+
+  void push() override;
+
+  /// Push \p assumptions in form of `literal_exprt`
+  void push(const std::vector<exprt> &assumptions) override;
+
+  void pop() override;
 
   // get literal for expression, if available
   bool literal(const symbol_exprt &expr, literalt &literal) const;
@@ -124,10 +127,26 @@ protected:
 
   virtual void ignoring(const exprt &expr);
 
-  // deliberately protected now to protect lower-level API
   propt &prop;
 
   messaget log;
+
+  static const char *context_prefix;
+
+  /// Assumptions on the stack
+  bvt assumption_stack;
+
+  /// To generate unique literal names for contexts
+  std::size_t context_literal_counter = 0;
+
+  /// `assumption_stack` is segmented in contexts;
+  /// Number of assumptions in each context on the stack
+  std::vector<size_t> context_size_stack;
+
+private:
+  /// Helper method used by `set_to` for adding the constraints to `prop`.
+  /// This method is private because it must not be used by derived classes.
+  void add_constraints_to_prop(const exprt &expr, bool value);
 };
 
 #endif // CPROVER_SOLVERS_PROP_PROP_CONV_SOLVER_H

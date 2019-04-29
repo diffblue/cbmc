@@ -87,7 +87,7 @@ decision_proceduret::resultt bv_refinementt::dec_solve()
 decision_proceduret::resultt bv_refinementt::prop_solve()
 {
   // this puts the underapproximations into effect
-  bvt assumptions=parent_assumptions;
+  std::vector<exprt> assumptions;
 
   for(const approximationt &approximation : approximations)
   {
@@ -101,9 +101,9 @@ decision_proceduret::resultt bv_refinementt::prop_solve()
       approximation.under_assumptions.end());
   }
 
-  prop.set_assumptions(assumptions);
+  push(assumptions);
   propt::resultt result=prop.prop_solve();
-  prop.set_assumptions(parent_assumptions);
+  pop();
 
   switch(result)
   {
@@ -131,10 +131,4 @@ void bv_refinementt::check_UNSAT()
 
   for(approximationt &approximation : this->approximations)
     check_UNSAT(approximation);
-}
-
-void bv_refinementt::set_assumptions(const bvt &_assumptions)
-{
-  parent_assumptions=_assumptions;
-  prop.set_assumptions(_assumptions);
 }

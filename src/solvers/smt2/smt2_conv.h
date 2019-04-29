@@ -123,10 +123,15 @@ public:
   }
   void print_assignment(std::ostream &out) const override;
   tvt l_get(literalt l) const override;
-  void set_assumptions(const bvt &bv) override
-  {
-    assumptions = bv;
-  }
+
+  /// Unimplemented
+  void push() override;
+
+  /// Currently, only implements a single stack element (no nested contexts)
+  void push(const std::vector<exprt> &_assumptions) override;
+
+  /// Currently, only implements a single stack element (no nested contexts)
+  void pop() override;
 
   void convert_expr(const exprt &);
   void convert_type(const typet &);
@@ -140,7 +145,7 @@ protected:
   std::string benchmark, notes, logic;
   solvert solver;
 
-  bvt assumptions;
+  std::vector<exprt> assumptions;
   boolbv_widtht boolbv_width;
 
   std::size_t number_of_solver_calls = 0;

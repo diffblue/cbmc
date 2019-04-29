@@ -95,9 +95,6 @@ literalt prop_minimizet::constraint()
 /// Try to cover all objectives
 void prop_minimizet::operator()()
 {
-  // we need to use assumptions
-  PRECONDITION(prop_conv.has_set_assumptions());
-
   _iterations = 0;
   _number_satisfied = 0;
   _value = 0;
@@ -120,9 +117,7 @@ void prop_minimizet::operator()()
       {
         _iterations++;
 
-        bvt assumptions;
-        assumptions.push_back(c);
-        prop_conv.set_assumptions(assumptions);
+        prop_conv.push({literal_exprt{c}});
         dec_result = prop_conv();
 
         switch(dec_result)
@@ -150,8 +145,7 @@ void prop_minimizet::operator()()
     // We don't have a satisfying assignment to work with.
     // Run solver again to get one.
 
-    bvt assumptions; // no assumptions
-    prop_conv.set_assumptions(assumptions);
+    prop_conv.pop();
     (void)prop_conv();
   }
 }
