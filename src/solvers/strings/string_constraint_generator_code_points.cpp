@@ -196,7 +196,6 @@ std::pair<exprt, string_constraintst> add_axioms_for_code_point_count(
 {
   PRECONDITION(f.arguments().size() == 3);
   string_constraintst constraints;
-  const array_string_exprt str = get_string_expr(array_pool, f.arguments()[0]);
   const exprt &begin = f.arguments()[1];
   const exprt &end = f.arguments()[2];
   const typet &return_type = f.type();

@@ -173,8 +173,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_constrain_characters(
   PRECONDITION(args[2].type().id() == ID_string);
   PRECONDITION(args[2].id() == ID_constant);
 
-  const array_string_exprt s =
-    char_array_of_pointer(array_pool, args[1], args[0]);
+  const array_string_exprt s = array_pool.find(args[1], args[0]);
   const irep_idt &char_set_string = to_constant_expr(args[2]).get_value();
   const exprt &start =
     args.size() >= 4 ? args[3] : from_integer(0, s.length().type());
@@ -340,8 +339,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_copy(
 {
   const auto &args = f.arguments();
   PRECONDITION(args.size() == 3 || args.size() == 5);
-  const array_string_exprt res =
-    char_array_of_pointer(array_pool, args[1], args[0]);
+  const array_string_exprt res = array_pool.find(args[1], args[0]);
   const array_string_exprt str = get_string_expr(array_pool, args[2]);
   const typet &index_type = str.length().type();
   const exprt offset = args.size() == 3 ? from_integer(0, index_type) : args[3];

@@ -603,7 +603,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_format(
 {
   PRECONDITION(f.arguments().size() >= 3);
   const array_string_exprt res =
-    char_array_of_pointer(array_pool, f.arguments()[1], f.arguments()[0]);
+    array_pool.find(f.arguments()[1], f.arguments()[0]);
   const array_string_exprt s1 = get_string_expr(array_pool, f.arguments()[2]);
 
   if(s1.length().id() == ID_constant && s1.content().id() == ID_array)
