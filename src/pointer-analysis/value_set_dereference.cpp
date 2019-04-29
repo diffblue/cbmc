@@ -67,26 +67,23 @@ exprt value_set_dereferencet::dereference(const exprt &pointer)
 
   // get the values of these
 
+  std::vector<exprt> retained_values;
+  for(const auto &value : points_to_set)
+  {
+    if(!should_ignore_value(value, exclude_null_derefs, language_mode))
+      retained_values.push_back(value);
+  }
+
   std::list<valuet> values;
 
-  for(value_setst::valuest::const_iterator
-      it=points_to_set.begin();
-      it!=points_to_set.end();
-      it++)
+  for(const auto &value : retained_values)
   {
-    valuet value =
-      build_reference_to(*it, pointer, exclude_null_derefs, language_mode, ns);
-
+    values.push_back(build_reference_to(value, pointer, ns));
 #if 0
     std::cout << "V: " << format(value.pointer_guard) << " --> ";
     std::cout << format(value.value);
-    if(value.ignore)
-      std::cout << " (ignored)";
     std::cout << '\n';
 #endif
-
-    if(!value.ignore)
-      values.push_back(value);
   }
 
   // can this fail?
@@ -243,31 +240,59 @@ bool value_set_dereferencet::dereference_type_compare(
   return false;
 }
 
+/// Determine whether possible alias `what` should be ignored when replacing a
+/// pointer by its referees.
+/// We currently ignore a `null` object when \p exclude_null_derefs is true
+/// (pass true if you know the dereferenced pointer cannot be null), and also
+/// ignore integer addresses when \p language_mode is "java"
 /// \param what: value set entry to convert to an expression: either
 ///   ID_unknown, ID_invalid, or an object_descriptor_exprt giving a referred
 ///   object and offset.
-/// \param pointer_expr: pointer expression that may point to `what`
 /// \param exclude_null_derefs: Ignore value-set entries that indicate a
 ///   given dereference may follow a null pointer
 /// \param language_mode: Mode for any new symbols created to represent a
 ///   dereference failure
+/// \return true if \p what should be ignored as a possible alias
+bool value_set_dereferencet::should_ignore_value(
+  const exprt &what,
+  bool exclude_null_derefs,
+  const irep_idt &language_mode)
+{
+  if(what.id() == ID_unknown || what.id() == ID_invalid)
+  {
+    return false;
+  }
+
+  const object_descriptor_exprt &o = to_object_descriptor_expr(what);
+
+  const exprt &root_object = o.root_object();
+  if(root_object.id() == ID_null_object)
+  {
+    return exclude_null_derefs;
+  }
+  else if(root_object.id() == ID_integer_address)
+  {
+    return language_mode == ID_java;
+  }
+
+  return false;
+}
+
+/// \param what: value set entry to convert to an expression: either
+///   ID_unknown, ID_invalid, or an object_descriptor_exprt giving a referred
+///   object and offset.
+/// \param pointer_expr: pointer expression that may point to `what`
 /// \param ns: A namespace
-/// \return a `valuet` object containing `guard`, `value` and `ignore` fields.
-///   The `ignore` field is true for a `null` object when `exclude_null_derefs`
-///   is true (set by our creator when they know \p what cannot be null)
-////  and for integer addresses in java mode.
+/// \return a `valuet` object containing `guard` and `value` fields.
 ///   The guard is an appropriate check to determine whether `pointer_expr`
 ///   really points to `what`; for example `pointer_expr == &what`.
 ///   The value corresponds to the dereferenced pointer_expr assuming it is
 ///   pointing to the object described by `what`.
 ///   For example, we might return
-///   `{.value = global, .pointer_guard = (pointer_expr == &global),
-///     .ignore = false}`
+///   `{.value = global, .pointer_guard = (pointer_expr == &global)}`
 value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
   const exprt &what,
   const exprt &pointer_expr,
-  const bool exclude_null_derefs,
-  const irep_idt language_mode,
   const namespacet &ns)
 {
   const typet &dereference_type = pointer_expr.type().subtype();
@@ -294,10 +319,6 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
 
   if(root_object.id() == ID_null_object)
   {
-    if(exclude_null_derefs)
-    {
-      result.ignore = true;
-    }
   }
   else if(root_object.id()==ID_dynamic_object)
   {
@@ -312,12 +333,6 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
   {
     // This is stuff like *((char *)5).
     // This is turned into an access to __CPROVER_memory[...].
-
-    if(language_mode == ID_java)
-    {
-      result.ignore = true;
-      return result;
-    }
 
     const symbolt &memory_symbol=ns.lookup(CPROVER_PREFIX "memory");
     const symbol_exprt symbol_expr(memory_symbol.name, memory_symbol.type);

@@ -623,18 +623,15 @@ void goto_symext::try_filter_value_sets(
     }
 
     const bool exclude_null_derefs = false;
-    value_set_dereferencet::valuet possible_value =
-      value_set_dereferencet::build_reference_to(
-        value_set_element,
-        *symbol_expr,
-        exclude_null_derefs,
-        language_mode,
-        ns);
-
-    if(possible_value.ignore)
+    if(value_set_dereferencet::should_ignore_value(
+         value_set_element, exclude_null_derefs, language_mode))
     {
       continue;
     }
+
+    value_set_dereferencet::valuet possible_value =
+      value_set_dereferencet::build_reference_to(
+        value_set_element, *symbol_expr, ns);
 
     exprt replacement_expr =
       possible_value.value.is_nil()
