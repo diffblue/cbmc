@@ -453,7 +453,7 @@ public:
     if(empty())
       return;
 
-    iterate(map, 0, f);
+    iterate(map, f);
   }
 
 #if !defined(_MSC_VER)
@@ -525,12 +525,15 @@ protected:
   }
 
   void iterate(
-    const baset &n,
-    const unsigned start_depth,
+    const innert &n,
     std::function<void(const key_type &k, const mapped_type &m)> f) const;
 
-  void gather_all(const baset &n, const unsigned depth, delta_viewt &delta_view)
-    const;
+  void gather_all(const innert &n, delta_viewt &delta_view) const;
+
+  bool is_singular(const leaf_listt &ll) const
+  {
+    return !ll.empty() && std::next(ll.begin()) == ll.end();
+  }
 
   std::size_t count_unmarked_nodes(
     bool leafs_only,
@@ -559,42 +562,37 @@ protected:
 
 SHARING_MAPT(void)
 ::iterate(
-  const baset &n,
-  unsigned start_depth,
+  const innert &n,
   std::function<void(const key_type &k, const mapped_type &m)> f) const
 {
-  typedef std::pair<unsigned, const baset *> stack_itemt;
+  SM_ASSERT(!n.empty());
 
-  std::stack<stack_itemt> stack;
-  stack.push({start_depth, &n});
+  std::stack<const innert *> stack;
+  stack.push(&n);
 
   do
   {
-    const stack_itemt &si = stack.top();
-
-    const unsigned depth = si.first;
-    const baset *bp = si.second;
-
+    const innert *ip = stack.top();
     stack.pop();
 
-    if(depth < steps) // internal
+    SM_ASSERT(!ip->empty());
+
+    if(ip->is_internal())
     {
-      const innert *ip = static_cast<const innert *>(bp);
       const to_mapt &m = ip->get_to_map();
       SM_ASSERT(!m.empty());
 
       for(const auto &item : m)
       {
         const innert *i = &item.second;
-        stack.push({depth + 1, i});
+        stack.push(i);
       }
     }
-    else // container
+    else
     {
-      SM_ASSERT(depth == steps);
+      SM_ASSERT(ip->is_container());
 
-      const innert *cp = static_cast<const innert *>(bp);
-      const leaf_listt &ll = cp->get_container();
+      const leaf_listt &ll = ip->get_container();
       SM_ASSERT(!ll.empty());
 
       for(const auto &l : ll)
@@ -617,23 +615,15 @@ SHARING_MAPT(std::size_t)
 
   unsigned count = 0;
 
-  // depth, node pointer
-  typedef std::pair<unsigned, const baset *> stack_itemt;
-
-  std::stack<stack_itemt> stack;
-  stack.push({0, &map});
+  std::stack<const innert *> stack;
+  stack.push(&map);
 
   do
   {
-    const stack_itemt &si = stack.top();
-
-    const unsigned depth = si.first;
-    const baset *bp = si.second;
-
+    const innert *ip = stack.top();
     stack.pop();
 
     // internal node or container node
-    const innert *ip = static_cast<const innert *>(bp);
     const unsigned use_count = ip->use_count();
     const void *raw_ptr = ip->is_internal()
                             ? (const void *)&ip->read_internal()
@@ -657,20 +647,22 @@ SHARING_MAPT(std::size_t)
       count++;
     }
 
-    if(depth < steps) // internal
+    if(ip->is_internal())
     {
+      SM_ASSERT(!ip->empty());
+
       const to_mapt &m = ip->get_to_map();
       SM_ASSERT(!m.empty());
 
       for(const auto &item : m)
       {
         const innert *i = &item.second;
-        stack.push({depth + 1, i});
+        stack.push(i);
       }
     }
-    else // container
+    else
     {
-      SM_ASSERT(depth == steps);
+      SM_ASSERT(ip->is_defined_container());
 
       const leaf_listt &ll = ip->get_container();
       SM_ASSERT(!ll.empty());
@@ -766,17 +758,17 @@ SHARING_MAPT(void)::get_view(viewt &view) const
     view.push_back(view_itemt(k, m));
   };
 
-  iterate(map, 0, f);
+  iterate(map, f);
 }
 
 SHARING_MAPT(void)
-::gather_all(const baset &n, unsigned depth, delta_viewt &delta_view) const
+::gather_all(const innert &n, delta_viewt &delta_view) const
 {
   auto f = [&delta_view](const key_type &k, const mapped_type &m) {
     delta_view.push_back(delta_view_itemt(false, k, m, dummy));
   };
 
-  iterate(n, depth, f);
+  iterate(n, f);
 }
 
 SHARING_MAPT(void)
@@ -794,13 +786,13 @@ SHARING_MAPT(void)
   {
     if(!only_common)
     {
-      gather_all(map, 0, delta_view);
+      gather_all(map, delta_view);
     }
 
     return;
   }
 
-  typedef std::tuple<unsigned, const baset *, const baset *> stack_itemt;
+  typedef std::pair<const innert *, const innert *> stack_itemt;
   std::stack<stack_itemt> stack;
 
   // We do a DFS "in lockstep" simultaneously on both maps. For
@@ -810,70 +802,105 @@ SHARING_MAPT(void)
   // The stack contains the children of already visited nodes that we
   // still have to visit during the traversal.
 
-  stack.push(stack_itemt(0, &map, &other.map));
+  if(map.shares_with(other.map))
+    return;
+
+  stack.push(stack_itemt(&map, &other.map));
 
   do
   {
     const stack_itemt &si = stack.top();
 
-    const unsigned depth = std::get<0>(si);
-    const baset *bp1 = std::get<1>(si);
-    const baset *bp2 = std::get<2>(si);
+    const innert *ip1 = si.first;
+    const innert *ip2 = si.second;
 
     stack.pop();
 
-    if(depth < steps) // internal
+    SM_ASSERT(!ip1->empty());
+    SM_ASSERT(!ip2->empty());
+
+    if(ip1->is_internal() && ip2->is_container())
     {
-      const innert *ip1 = static_cast<const innert *>(bp1);
-      const innert *ip2 = static_cast<const innert *>(bp2);
+      // The container *ip2 contains one element as only containers at the
+      // bottom of the tree can have more than one element. This happens when
+      // two different keys have the same hash code. It is known here that *ip2
+      // is not at the bottom of the tree, as *ip1 (the corresponding node in
+      // the other map) is an internal node, and internal nodes cannot be at the
+      // bottom of the map.
+      SM_ASSERT(is_singular(ip2->get_container()));
 
-      const to_mapt &m = ip1->get_to_map();
-
-      for(const auto &item : m)
+      for(const auto &item : ip1->get_to_map())
       {
-        const innert *p;
+        const innert &child = item.second;
+        SM_ASSERT(!child.shares_with(*ip2));
+        stack.push(stack_itemt(&child, ip2));
+      }
 
+      continue;
+    }
+
+    if(ip1->is_internal())
+    {
+      SM_ASSERT(ip2->is_internal());
+
+      for(const auto &item : ip1->get_to_map())
+      {
+        const innert &child = item.second;
+
+        const innert *p;
         p = ip2->find_child(item.first);
-        if(p==nullptr)
+
+        if(p == nullptr)
         {
           if(!only_common)
           {
-            gather_all(item.second, depth + 1, delta_view);
+            gather_all(child, delta_view);
           }
         }
-        else if(!item.second.shares_with(*p))
+        else if(!child.shares_with(*p))
         {
-          stack.push(stack_itemt(depth + 1, &item.second, p));
+          stack.push(stack_itemt(&child, p));
         }
       }
+
+      continue;
     }
-    else // container
+
+    SM_ASSERT(ip1->is_container());
+
+    if(ip2->is_internal())
     {
-      SM_ASSERT(depth == steps);
+      SM_ASSERT(is_singular(ip1->get_container()));
 
-      const innert *cp1 = static_cast<const innert *>(bp1);
-      const innert *cp2 = static_cast<const innert *>(bp2);
-
-      const leaf_listt &ll1 = cp1->get_container();
-
-      for(const auto &l1 : ll1)
+      for(const auto &item : ip2->get_to_map())
       {
-        const key_type &k1=l1.get_key();
-        const leaft *p;
+        const innert &child = item.second;
+        SM_ASSERT(!ip1->shares_with(child));
+        stack.push(stack_itemt(ip1, &child));
+      }
 
-        p = cp2->find_leaf(k1);
+      continue;
+    }
 
-        if(p != nullptr)
+    SM_ASSERT(ip2->is_container());
+
+    for(const auto &l1 : ip1->get_container())
+    {
+      const key_type &k1 = l1.get_key();
+      const leaft *p;
+
+      p = ip2->find_leaf(k1);
+
+      if(p != nullptr)
+      {
+        if(!l1.shares_with(*p))
         {
-          if(!l1.shares_with(*p))
-          {
-            delta_view.push_back({true, k1, l1.get_value(), p->get_value()});
-          }
+          delta_view.push_back({true, k1, l1.get_value(), p->get_value()});
         }
-        else if(!only_common)
-        {
-          delta_view.push_back({false, l1.get_key(), l1.get_value(), dummy});
-        }
+      }
+      else if(!only_common)
+      {
+        delta_view.push_back({false, l1.get_key(), l1.get_value(), dummy});
       }
     }
   }
@@ -893,6 +920,8 @@ SHARING_MAPT2(, innert *)::get_container_node(const key_type &k)
 
     key >>= chunk;
   }
+
+  SM_ASSERT(ip->is_container());
 
   return ip;
 }
@@ -915,6 +944,8 @@ SHARING_MAPT2(const, innert *)::get_container_node(const key_type &k) const
 
     key >>= chunk;
   }
+
+  SM_ASSERT(ip->is_defined_container());
 
   return ip;
 }
