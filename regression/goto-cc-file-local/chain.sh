@@ -23,28 +23,59 @@ goto_instrument=$2
 cbmc=$3
 is_windows=$4
 
-for src in *.c; do
+if [[ "${is_windows}" != "true" && "${is_windows}" != "false" ]]; then
+  (>&2 echo "\$is_windows should be true or false (got '" "${is_windows}" "')")
+  exit 1
+fi
+
+if is_in use_find "$ALL_ARGS"; then
+  SRC=$(find . -name "*.c")
+else
+  SRC=*.c
+fi
+
+echo "Source files are ${SRC}"
+
+wall=""
+if is_in wall "$ALL_ARGS"; then
+  if [[ "${is_windows}" == "true" ]]; then
+    wall="/Wall"
+  else
+    wall="-Wall"
+  fi
+fi
+
+cnt=0
+for src in ${SRC}; do
+  cnt=$((cnt + 1))
+  out_suffix=""
+  if is_in out-file-counter "$ALL_ARGS"; then
+    out_suffix="_$cnt"
+    if is_in suffix "$ALL_ARGS"; then
+      suffix="--mangle-suffix custom_$cnt"
+    fi
+  fi
+
   base=${src%.c}
-  OUT_FILE="${base}.gb"
+  OUT_FILE=$(basename "${base}${out_suffix}")".gb"
 
   if [[ "${is_windows}" == "true" ]]; then
     "${goto_cc}"                        \
-        /export-function-local-symbols  \
-        /verbosity 10                   \
+        --export-function-local-symbols \
+        --verbosity 10                  \
+        ${wall}                         \
         ${suffix}                       \
-        /c"${base}.c"                   \
+        /c "${base}.c"                  \
         /Fo"${OUT_FILE}"
 
-  elif [[ "${is_windows}" == "false" ]]; then
+  else
     "${goto_cc}"                        \
         --export-function-local-symbols \
         --verbosity 10                  \
+        ${wall}                         \
         ${suffix}                       \
         -c "${base}.c"                  \
         -o "${OUT_FILE}"
-  else
-    (>&2 echo "\$is_windows should be true or false (got '" "${is_windows}" "')")
-    exit 1
   fi
 done
 
@@ -52,16 +83,18 @@ if is_in final-link "$ALL_ARGS"; then
   OUT_FILE=final-link.gb
   if [[ "${is_windows}" == "true" ]]; then
     "${goto_cc}"                        \
-        /export-function-local-symbols  \
-        /verbosity 10                   \
+        --export-function-local-symbols \
+        --verbosity 10                  \
+        ${wall}                         \
         ${suffix}                       \
         ./*.gb                          \
-        /Fe "${OUT_FILE}"
+        /Fe"${OUT_FILE}"
 
-  elif [[ "${is_windows}" == "false" ]]; then
+  else
     "${goto_cc}"                        \
         --export-function-local-symbols \
         --verbosity 10                  \
+        ${wall}                         \
         ${suffix}                       \
         ./*.gb                          \
         -o "${OUT_FILE}"

@@ -1,0 +1,20 @@
+CORE
+foo/bar/baz/main.c
+use_find out-file-counter final-link wall
+^EXIT=0$
+^SIGNAL=0$
+^.*warning: function `__CPROVER_file_local_main_c_static_fun' in module `main' is shadowed by a definition in module `main'
+--
+^warning: ignoring
+^\*\*\*\* WARNING: no body for function
+--
+This test contains two identically-named static functions in two
+identically-named files in different directories. The name-mangling
+scheme will give the static functions identical names when they get
+exported. This test ensures that the compiler emits a warning about
+this.
+
+CBMC spins forever when run on the final object file, since the `foo'
+implementation of `static_fun` is the one that is kept. There is thus an
+infinite loop where foo/static_fun() calls bar(), and bar() calls
+foo/static_fun() instead of bar/static_fun().

@@ -8,18 +8,20 @@ Author: Kareem Khazem <karkhaz@karkhaz.com>, 2019
 
 #include "name_mangler.h"
 
+#include <util/get_base_name.h>
+
 #include <iomanip>
 #include <sstream>
 
 irep_idt file_name_manglert::
 operator()(const symbolt &src, const std::string &extra_info)
 {
+  std::string basename = get_base_name(src.location.get_file().c_str(), false);
+
   std::stringstream ss;
   ss << CPROVER_PREFIX << "file_local_";
   ss << std::regex_replace(
-          std::regex_replace(src.location.get_file().c_str(), forbidden, "_"),
-          multi_under,
-          "_")
+          std::regex_replace(basename, forbidden, "_"), multi_under, "_")
      << "_";
 
   if(extra_info != "")
