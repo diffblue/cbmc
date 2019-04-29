@@ -128,7 +128,7 @@ void goto_symext::process_array_expr(statet &state, exprt &expr)
     ns, state.symbol_table, symex_dereference_state, language_mode, false);
 
   expr = dereference.dereference(expr);
-  lift_lets(state, expr, symex_targett::assignment_typet::STATE);
+  lift_lets(state, expr);
 
   ::process_array_expr(expr, symex_config.simplify_opt, ns);
 }
@@ -171,10 +171,7 @@ replace_nondet(exprt &expr, symex_nondet_generatort &build_symex_nondet)
   }
 }
 
-void goto_symext::lift_let(
-  statet &state,
-  const let_exprt &let_expr,
-  assignment_typet assignment_type)
+void goto_symext::lift_let(statet &state, const let_exprt &let_expr)
 {
   exprt let_value = let_expr.value();
   clean_expr(let_value, state, false);
@@ -188,13 +185,10 @@ void goto_symext::lift_let(
     nil_exprt(),
     let_value,
     value_assignment_guard,
-    assignment_type);
+    symex_targett::assignment_typet::HIDDEN);
 }
 
-void goto_symext::lift_lets(
-  statet &state,
-  exprt &rhs,
-  assignment_typet assignment_type)
+void goto_symext::lift_lets(statet &state, exprt &rhs)
 {
   for(auto it = rhs.depth_begin(), itend = rhs.depth_end(); it != itend;)
   {
@@ -203,10 +197,10 @@ void goto_symext::lift_lets(
       // Visit post-order, so more-local definitions are made before usage:
       exprt &replaced_expr = it.mutate();
       let_exprt &replaced_let = to_let_expr(replaced_expr);
-      lift_lets(state, replaced_let.value(), assignment_type);
-      lift_lets(state, replaced_let.where(), assignment_type);
+      lift_lets(state, replaced_let.value());
+      lift_lets(state, replaced_let.where());
 
-      lift_let(state, replaced_let, assignment_type);
+      lift_let(state, replaced_let);
       replaced_expr = replaced_let.where();
 
       it.next_sibling_or_parent();
@@ -223,7 +217,7 @@ void goto_symext::clean_expr(
 {
   replace_nondet(expr, path_storage.build_symex_nondet);
   dereference(expr, state, write);
-  lift_lets(state, expr, symex_targett::assignment_typet::STATE);
+  lift_lets(state, expr);
 
   // make sure all remaining byte extract operations use the root
   // object to avoid nesting of with/update and byte_update when on
