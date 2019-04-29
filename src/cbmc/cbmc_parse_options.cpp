@@ -1020,7 +1020,6 @@ void cbmc_parse_optionst::help()
     " --version                    show version and exit\n"
     HELP_XML_INTERFACE
     HELP_JSON_INTERFACE
-    // NOLINTNEXTLINE(whitespace/line_length)
     HELP_VALIDATE
     HELP_GOTO_TRACE
     HELP_FLUSH
