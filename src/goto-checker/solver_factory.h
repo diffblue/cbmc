@@ -20,7 +20,8 @@ class message_handlert;
 class namespacet;
 class optionst;
 class propt;
-class prop_convt;
+class decision_proceduret;
+class stack_decision_proceduret;
 
 class solver_factoryt
 {
@@ -38,21 +39,24 @@ public:
   {
   public:
     solvert() = default;
-    explicit solvert(std::unique_ptr<prop_convt> p);
-    solvert(std::unique_ptr<prop_convt> p1, std::unique_ptr<propt> p2);
-    solvert(std::unique_ptr<prop_convt> p1, std::unique_ptr<std::ofstream> p2);
+    explicit solvert(std::unique_ptr<decision_proceduret> p);
+    solvert(std::unique_ptr<decision_proceduret> p1, std::unique_ptr<propt> p2);
+    solvert(
+      std::unique_ptr<decision_proceduret> p1,
+      std::unique_ptr<std::ofstream> p2);
 
-    prop_convt &prop_conv() const;
+    decision_proceduret &decision_procedure() const;
+    stack_decision_proceduret &stack_decision_procedure() const;
     propt &prop() const;
 
-    void set_prop_conv(std::unique_ptr<prop_convt> p);
+    void set_decision_procedure(std::unique_ptr<decision_proceduret> p);
     void set_prop(std::unique_ptr<propt> p);
     void set_ofstream(std::unique_ptr<std::ofstream> p);
 
     // the objects are deleted in the opposite order they appear below
     std::unique_ptr<std::ofstream> ofstream_ptr;
     std::unique_ptr<propt> prop_ptr;
-    std::unique_ptr<prop_convt> prop_conv_ptr;
+    std::unique_ptr<decision_proceduret> decision_procedure_ptr;
   };
 
   /// Returns a solvert object
@@ -74,10 +78,11 @@ protected:
 
   smt2_dect::solvert get_smt2_solver_type() const;
 
-  /// Sets the timeout of \p prop_conv if the `solver-time-limit` option
-  /// has a positive value (in seconds).
+  /// Sets the timeout of \p decision_procedure if the `solver-time-limit`
+  /// option has a positive value (in seconds).
   /// \note Most solvers silently ignore the time limit at the moment.
-  void set_prop_conv_time_limit(prop_convt &prop_conv);
+  void
+  set_decision_procedure_time_limit(decision_proceduret &decision_procedure);
 
   // consistency checks during solver creation
   void no_beautification();

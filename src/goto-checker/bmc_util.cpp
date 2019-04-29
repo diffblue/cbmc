@@ -25,7 +25,7 @@ Author: Daniel Kroening, Peter Schrammel
 
 #include <linking/static_lifetime_init.h>
 
-#include <solvers/prop/prop_conv.h>
+#include <solvers/decision_procedure.h>
 
 #include <util/make_unique.h>
 #include <util/ui_message.h>
@@ -42,13 +42,13 @@ void build_error_trace(
   goto_tracet &goto_trace,
   const namespacet &ns,
   const symex_target_equationt &symex_target_equation,
-  const prop_convt &prop_conv,
+  const decision_proceduret &decision_procedure,
   ui_message_handlert &ui_message_handler)
 {
   messaget log(ui_message_handler);
   message_building_error_trace(log);
 
-  build_goto_trace(symex_target_equation, prop_conv, ns, goto_trace);
+  build_goto_trace(symex_target_equation, decision_procedure, ns, goto_trace);
 }
 
 ssa_step_predicatet
@@ -149,14 +149,14 @@ void output_graphml(
 
 void convert_symex_target_equation(
   symex_target_equationt &equation,
-  prop_convt &prop_conv,
+  decision_proceduret &decision_procedure,
   message_handlert &message_handler)
 {
   messaget msg(message_handler);
   msg.status() << "converting SSA" << messaget::eom;
 
   // convert SSA
-  equation.convert(prop_conv);
+  equation.convert(decision_procedure);
 }
 
 std::unique_ptr<memory_model_baset>
@@ -356,12 +356,13 @@ std::chrono::duration<double> prepare_property_decider(
   auto solver_start = std::chrono::steady_clock::now();
 
   messaget log(ui_message_handler);
-  log.status() << "Passing problem to "
-               << property_decider.get_solver().decision_procedure_text()
-               << messaget::eom;
+  log.status()
+    << "Passing problem to "
+    << property_decider.get_decision_procedure().decision_procedure_text()
+    << messaget::eom;
 
   convert_symex_target_equation(
-    equation, property_decider.get_solver(), ui_message_handler);
+    equation, property_decider.get_decision_procedure(), ui_message_handler);
   property_decider.update_properties_goals_from_symex_target_equation(
     properties);
   property_decider.convert_goals();
@@ -381,9 +382,10 @@ void run_property_decider(
   auto solver_start = std::chrono::steady_clock::now();
 
   messaget log(ui_message_handler);
-  log.status() << "Running "
-               << property_decider.get_solver().decision_procedure_text()
-               << messaget::eom;
+  log.status()
+    << "Running "
+    << property_decider.get_decision_procedure().decision_procedure_text()
+    << messaget::eom;
 
   property_decider.add_constraint_from_goals(
     [&properties](const irep_idt &property_id) {

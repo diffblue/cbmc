@@ -90,7 +90,7 @@ goto_tracet multi_path_symex_checkert::build_full_trace() const
   build_goto_trace(
     equation,
     equation.SSA_steps.end(),
-    property_decider.get_solver(),
+    property_decider.get_decision_procedure(),
     ns,
     goto_trace);
 
@@ -103,11 +103,13 @@ goto_tracet multi_path_symex_checkert::build_shortest_trace() const
   {
     // NOLINTNEXTLINE(whitespace/braces)
     counterexample_beautificationt{ui_message_handler}(
-      dynamic_cast<boolbvt &>(property_decider.get_solver()), equation);
+      dynamic_cast<boolbvt &>(property_decider.get_stack_decision_procedure()),
+      equation);
   }
 
   goto_tracet goto_trace;
-  build_goto_trace(equation, property_decider.get_solver(), ns, goto_trace);
+  build_goto_trace(
+    equation, property_decider.get_decision_procedure(), ns, goto_trace);
 
   return goto_trace;
 }
@@ -119,7 +121,7 @@ multi_path_symex_checkert::build_trace(const irep_idt &property_id) const
   build_goto_trace(
     equation,
     ssa_step_matches_failing_property(property_id),
-    property_decider.get_solver(),
+    property_decider.get_decision_procedure(),
     ns,
     goto_trace);
 
@@ -146,7 +148,10 @@ fault_location_infot
 multi_path_symex_checkert::localize_fault(const irep_idt &property_id) const
 {
   goto_symex_fault_localizert fault_localizer(
-    options, ui_message_handler, equation, property_decider.get_solver());
+    options,
+    ui_message_handler,
+    equation,
+    property_decider.get_stack_decision_procedure());
 
   return fault_localizer(property_id);
 }
