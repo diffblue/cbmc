@@ -80,7 +80,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <langapi/mode.h>
 
 #include <json/json_interface.h>
-#include <xmllang/xml_interface.h>
 
 #include "c_test_input_generator.h"
 
@@ -1021,8 +1020,7 @@ void cbmc_parse_optionst::help()
     "\n"
     "Other options:\n"
     " --version                    show version and exit\n"
-    " --xml-ui                     use XML-formatted output\n"
-    " --xml-interface              bi-directional XML interface\n"
+    HELP_XML_INTERFACE
     " --json-ui                    use JSON-formatted output\n"
     " --json-interface             bi-directional JSON interface\n"
     // NOLINTNEXTLINE(whitespace/line_length)
