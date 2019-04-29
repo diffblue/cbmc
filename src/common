@@ -85,7 +85,7 @@ else
   endif
 endif
 ifeq ($(origin YACC),default)
-  YACC   = bison -y
+  YACC   = bison
 endif
   YFLAGS ?= -v
 ifeq ($(origin LEX),default)
