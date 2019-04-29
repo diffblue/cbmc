@@ -1,0 +1,12 @@
+CORE broken-smt-backend
+--json-interface
+< test.json
+activate-multi-line-match
+^EXIT=10$
+^SIGNAL=0$
+Not unwinding loop foo\.0 iteration 3 file main\.c line 5 function foo thread 0
+\{\n\s*"description": "assertion 0",\n\s*"property": "foo\.assertion\.(1|3)",\n\s*"status": "SUCCESS"\n\s*\}
+\{\n\s*"description": "assertion 0",\n\s*"property": "foo\.assertion\.(1|3)",\n\s*"status": "FAILURE",\n\s*"trace": \[
+VERIFICATION FAILED
+--
+"property": "foo\.assertion\.2"

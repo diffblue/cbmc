@@ -1,4 +1,5 @@
-SRC = json_lex.yy.cpp \
+SRC = json_interface.cpp \
+      json_lex.yy.cpp \
       json_parser.cpp \
       json_y.tab.cpp \
       # Empty last line

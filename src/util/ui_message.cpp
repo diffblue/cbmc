@@ -67,7 +67,9 @@ ui_message_handlert::ui_message_handlert(
       nullptr,
       cmdline.isset("xml-ui") || cmdline.isset("xml-interface")
         ? uit::XML_UI
-        : cmdline.isset("json-ui") ? uit::JSON_UI : uit::PLAIN,
+        : cmdline.isset("json-ui") || cmdline.isset("json-interface")
+            ? uit::JSON_UI
+            : uit::PLAIN,
       program,
       cmdline.isset("flush"),
       cmdline.isset("timestamp") ? cmdline.get_value("timestamp") == "monotonic"
