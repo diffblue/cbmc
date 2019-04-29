@@ -321,6 +321,10 @@ protected:
   /// Symbolically execute a DEAD instruction
   /// \param state: Symbolic execution state for current instruction
   virtual void symex_dead(statet &state);
+  /// Kill a symbol, as if it had been the subject of a DEAD instruction
+  /// \param state: Symbolic execution state
+  /// \param symbol_expr: Symbol to kill
+  void symex_dead(statet &state, const symbol_exprt &symbol_expr);
   /// Symbolically execute an OTHER instruction
   /// \param state: Symbolic execution state for current instruction
   virtual void symex_other(statet &state);
