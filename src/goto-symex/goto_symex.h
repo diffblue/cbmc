@@ -288,6 +288,11 @@ protected:
 
   void trigger_auto_object(const exprt &, statet &);
   void initialize_auto_object(const exprt &, statet &);
+
+  /// Given an expression, find the root object and the offset into it.
+  ///
+  /// The extra complication to be considered here is that the expression may
+  /// have any number of ternary expressions mixed with type casts.
   void process_array_expr(statet &, exprt &);
   exprt make_auto_object(const typet &, statet &);
   virtual void dereference(exprt &, statet &, bool write);
@@ -507,7 +512,16 @@ protected:
 
   typedef symex_targett::assignment_typet assignment_typet;
 
+  /// Execute any let expressions in \p expr using \ref symex_assign_symbol.
+  /// The assignments will be made in bottom-up topological but otherwise
+  /// arbitrary order (i.e. in `(let x = let y = 0 in x + y) + (let z = 0 in z)
+  /// we will define `y` before `x`, but `z` and `x` could come in either order)
   void lift_lets(statet &, exprt &);
+
+  /// Execute a single let expression, which should not have any nested let
+  /// expressions (use \ref lift_lets instead if there might be).
+  /// The caller is responsible for killing the newly-defined variable when
+  /// appropriate.
   void lift_let(statet &state, const let_exprt &let_expr);
 
   void symex_assign_rec(
