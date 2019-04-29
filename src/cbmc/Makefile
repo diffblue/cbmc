@@ -2,7 +2,6 @@ SRC = c_test_input_generator.cpp \
       cbmc_languages.cpp \
       cbmc_main.cpp \
       cbmc_parse_options.cpp \
-      xml_interface.cpp \
       # Empty last line
 
 OBJ += ../ansi-c/ansi-c$(LIBEXT) \

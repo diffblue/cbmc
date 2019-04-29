@@ -1,4 +1,5 @@
 SRC = graphml.cpp \
+      xml_interface.cpp \
       xml_lex.yy.cpp \
       xml_parse_tree.cpp \
       xml_parser.cpp \

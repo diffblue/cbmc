@@ -102,7 +102,6 @@ testing-utils-clean:
 BMC_DEPS =../src/cbmc/c_test_input_generator$(OBJEXT) \
           ../src/cbmc/cbmc_languages$(OBJEXT) \
           ../src/cbmc/cbmc_parse_options$(OBJEXT) \
-          ../src/cbmc/xml_interface$(OBJEXT) \
           ../src/goto-instrument/source_lines$(OBJEXT) \
           ../src/goto-instrument/cover$(OBJEXT) \
           ../src/goto-instrument/cover_basic_blocks$(OBJEXT) \

@@ -79,17 +79,18 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <langapi/mode.h>
 
+#include <xmllang/xml_interface.h>
+
 #include "c_test_input_generator.h"
-#include "xml_interface.h"
 
 cbmc_parse_optionst::cbmc_parse_optionst(int argc, const char **argv)
   : parse_options_baset(
       CBMC_OPTIONS,
       argc,
       argv,
-      std::string("CBMC ") + CBMC_VERSION),
-    xml_interfacet(cmdline)
+      std::string("CBMC ") + CBMC_VERSION)
 {
+  xml_interface(cmdline, ui_message_handler);
 }
 
 ::cbmc_parse_optionst::cbmc_parse_optionst(
@@ -100,9 +101,9 @@ cbmc_parse_optionst::cbmc_parse_optionst(int argc, const char **argv)
       CBMC_OPTIONS + extra_options,
       argc,
       argv,
-      std::string("CBMC ") + CBMC_VERSION),
-    xml_interfacet(cmdline)
+      std::string("CBMC ") + CBMC_VERSION)
 {
+  xml_interface(cmdline, ui_message_handler);
 }
 
 void cbmc_parse_optionst::set_default_options(optionst &options)
