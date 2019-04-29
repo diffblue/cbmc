@@ -34,6 +34,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <java_bytecode/java_bytecode_language.h>
 
+#include <json/json_interface.h>
+#include <xmllang/xml_interface.h>
+
 class goto_functionst;
 class optionst;
 
@@ -49,7 +52,8 @@ class optionst;
   "(object-bits):" \
   "(classpath):(cp):(main-class):" \
   "(no-assertions)(no-assumptions)" \
-  "(xml-ui)(json-ui)" \
+  OPT_XML_INTERFACE \
+  OPT_JSON_INTERFACE \
   "(smt1)(smt2)(fpa)(cvc3)(cvc4)(boolector)(yices)(z3)(mathsat)" \
   "(no-sat-preprocessor)" \
   "(beautify)" \
