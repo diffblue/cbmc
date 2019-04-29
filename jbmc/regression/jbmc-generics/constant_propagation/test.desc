@@ -3,7 +3,6 @@ Test.class
 --function Test.main --show-vcc
 ^EXIT=0$
 ^SIGNAL=0$
-^\{-\d+\} symex_dynamic::dynamic_object1#2 = \{ \{ \{ "java::GenericSub" \}, NULL, 0 \} \}$
 ^\{-\d+\} symex_dynamic::dynamic_object1#2\.\.@Generic\.\.@java.lang.Object\.\.@class_identifier = "java::GenericSub"$
 ^\{-\d+\} symex_dynamic::dynamic_object1#2\.\.@Generic\.\.key = NULL$
 ^\{-\d+\} symex_dynamic::dynamic_object1#3\.\.@Generic\.\.x = 5$
