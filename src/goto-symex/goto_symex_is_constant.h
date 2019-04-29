@@ -22,16 +22,18 @@ protected:
   {
     if(expr.id() == ID_mult)
     {
+      bool found_non_constant = false;
+
       // propagate stuff with sizeof in it
       forall_operands(it, expr)
       {
         if(it->find(ID_C_c_sizeof_type).is_not_nil())
           return true;
         else if(!is_constant(*it))
-          return false;
+          found_non_constant = true;
       }
 
-      return true;
+      return !found_non_constant;
     }
     else if(expr.id() == ID_with)
     {
