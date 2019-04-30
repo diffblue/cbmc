@@ -985,7 +985,11 @@ int gcc_modet::gcc_hybrid_binary(compilet &compiler)
 
     if(result==0)
       result = hybrid_binary(
-        native_tool, goto_binary, *it, get_message_handler());
+        native_tool,
+        goto_binary,
+        *it,
+        compiler.mode == compilet::COMPILE_LINK_EXECUTABLE,
+        get_message_handler());
   }
 
   return result;

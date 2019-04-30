@@ -212,7 +212,11 @@ int ld_modet::ld_hybrid_binary(compilet &compiler)
     std::string native_linker = linker_name(cmdline, base_name);
 
     result = hybrid_binary(
-      native_linker, goto_binary, output_file, get_message_handler());
+      native_linker,
+      goto_binary,
+      output_file,
+      compiler.mode == compilet::COMPILE_LINK_EXECUTABLE,
+      get_message_handler());
   }
 
   return result;

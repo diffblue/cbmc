@@ -17,6 +17,8 @@ Date: July 2016
 #include "gcc_message_handler.h"
 #include "goto_cc_mode.h"
 
+class compilet;
+
 class as_modet:public goto_cc_modet
 {
 public:
@@ -35,7 +37,7 @@ protected:
 
   int run_as(); // call as with original command line
 
-  int as_hybrid_binary();
+  int as_hybrid_binary(const compilet &compiler);
 };
 
 #endif // CPROVER_GOTO_CC_AS_MODE_H

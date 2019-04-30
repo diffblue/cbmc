@@ -241,7 +241,7 @@ int as_modet::doit()
   // We can generate hybrid ELF and Mach-O binaries
   // containing both executable machine code and the goto-binary.
   if(produce_hybrid_binary)
-    return as_hybrid_binary();
+    return as_hybrid_binary(compiler);
 
   return EX_OK;
 }
@@ -270,7 +270,7 @@ int as_modet::run_as()
   return run(new_argv[0], new_argv, cmdline.stdin_file, "", "");
 }
 
-int as_modet::as_hybrid_binary()
+int as_modet::as_hybrid_binary(const compilet &compiler)
 {
   std::string output_file="a.out";
 
@@ -301,7 +301,11 @@ int as_modet::as_hybrid_binary()
   if(result == 0)
   {
     result = hybrid_binary(
-      native_tool_name, saved, output_file, get_message_handler());
+      native_tool_name,
+      saved,
+      output_file,
+      compiler.mode == compilet::COMPILE_LINK_EXECUTABLE,
+      get_message_handler());
   }
 
   return result;

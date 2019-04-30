@@ -1,0 +1,14 @@
+CORE
+10
+main.c -L. -lour_archive --verbosity
+^EXIT=0$
+^SIGNAL=0$
+^Reading: .*/foo.o$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+We need to make sure main.c is listed before the archive for the Linux linker to
+pick up dependencies - thus "main.c" is given as an argument on line 3 in this
+file and the "10" in line 2 is a dummy to be appended at the end, setting the
+verbosity as needed.
