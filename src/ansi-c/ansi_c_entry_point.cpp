@@ -122,12 +122,13 @@ bool ansi_c_entry_point(
 
   irep_idt main_symbol;
 
-  // find main symbol
-  if(config.main!="")
+  // find main symbol, if any is given
+  if(config.main.has_value())
   {
     std::list<irep_idt> matches;
 
-    forall_symbol_base_map(it, symbol_table.symbol_base_map, config.main)
+    forall_symbol_base_map(
+      it, symbol_table.symbol_base_map, config.main.value())
     {
       // look it up
       symbol_tablet::symbolst::const_iterator s_it=
@@ -143,15 +144,15 @@ bool ansi_c_entry_point(
     if(matches.empty())
     {
       messaget message(message_handler);
-      message.error() << "main symbol `" << config.main
-                      << "' not found" << messaget::eom;
+      message.error() << "main symbol `" << config.main.value() << "' not found"
+                      << messaget::eom;
       return true; // give up
     }
 
     if(matches.size()>=2)
     {
       messaget message(message_handler);
-      message.error() << "main symbol `" << config.main
+      message.error() << "main symbol `" << config.main.value()
                       << "' is ambiguous" << messaget::eom;
       return true;
     }

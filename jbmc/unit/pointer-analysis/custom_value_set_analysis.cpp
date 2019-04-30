@@ -171,7 +171,7 @@ SCENARIO("test_value_set_analysis",
   GIVEN("Normal and custom value-set analysis of CustomVSATest::test")
   {
     config.set_arch("none");
-    config.main = "";
+    config.main = {};
 
     // This classpath is the default, but the config object
     // is global and previous unit tests may have altered it

@@ -97,7 +97,7 @@ TEST_CASE("json symbol table read/write consistency")
   register_language(new_ansi_c_language);
 
   cmdlinet cmdline;
-  config.main = "main";
+  config.main = std::string("main");
   config.set(cmdline);
 
   goto_modelt goto_model;

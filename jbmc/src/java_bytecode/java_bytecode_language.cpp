@@ -249,10 +249,10 @@ bool java_bytecode_languaget::parse(
       java_cp_include_files);
     if(config.java.main_class.empty())
     {
-      const std::string &entry_method = config.main;
       // If we have an entry method, we can derive a main class.
-      if(!entry_method.empty())
+      if(config.main.has_value())
       {
+        const std::string &entry_method = config.main.value();
         const auto last_dot_position = entry_method.find_last_of('.');
         main_class = entry_method.substr(0, last_dot_position);
       }

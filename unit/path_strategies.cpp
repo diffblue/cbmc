@@ -381,7 +381,7 @@ void _check_with_strategy(
   register_language(new_ansi_c_language);
   cmdlinet cmdline;
   cmdline.args.push_back(tmp());
-  config.main = "main";
+  config.main = std::string("main");
   config.set(cmdline);
 
   optionst options;

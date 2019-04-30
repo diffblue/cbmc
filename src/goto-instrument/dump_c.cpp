@@ -202,12 +202,14 @@ void dump_ct::operator()(std::ostream &os)
       goto_functionst::function_mapt::const_iterator func_entry=
         goto_functions.function_map.find(symbol.name);
 
-      if(!harness &&
-         func_entry!=goto_functions.function_map.end() &&
-         func_entry->second.body_available() &&
-         (symbol.name==ID_main ||
-          (!config.main.empty() && symbol.name==config.main)))
+      if(
+        !harness && func_entry != goto_functions.function_map.end() &&
+        func_entry->second.body_available() &&
+        (symbol.name == ID_main ||
+         (config.main.has_value() && symbol.name == config.main.value())))
+      {
         skip_function_main=true;
+      }
     }
   }
 
