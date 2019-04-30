@@ -324,6 +324,31 @@ std::ostream &format_rec(std::ostream &os, const exprt &expr)
         os << ' ' << format(s);
       return os << " }";
     }
+    else if(statement == ID_dead)
+    {
+      return os << "dead " << format(to_code_dead(code).symbol()) << ";";
+    }
+    else if(statement == ID_decl)
+    {
+      const auto &declaration_symb = to_code_decl(code).symbol();
+      return os << "decl " << format(declaration_symb.type()) << " "
+                << format(declaration_symb) << ";";
+    }
+    else if(statement == ID_function_call)
+    {
+      const auto &func_call = to_code_function_call(code);
+      os << to_symbol_expr(func_call.function()).get_identifier() << "(";
+
+      // Join all our arguments together.
+      join_strings(
+        os,
+        func_call.arguments().begin(),
+        func_call.arguments().end(),
+        ", ",
+        [](const exprt &expr) { return format(expr); });
+
+      return os << ");";
+    }
     else
       return fallback_format_rec(os, expr);
   }

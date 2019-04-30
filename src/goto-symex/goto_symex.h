@@ -64,6 +64,10 @@ struct symex_configt final
   /// executed in the goto_symex_statet (in the assignment method).
   bool run_validation_checks;
 
+  /// \brief Prints out the path that symex is actively taking during execution,
+  /// includes diagnostic information about call stack and guard size.
+  bool show_symex_steps;
+
   /// \brief Construct a symex_configt using options specified in an
   /// \ref optionst
   explicit symex_configt(const optionst &options);
@@ -223,6 +227,13 @@ protected:
   /// \param state: Symbolic execution state for current instruction
   virtual void
   symex_step(const get_goto_functiont &get_goto_function, statet &state);
+
+  /// Prints the route of symex as it walks through the code. Used for
+  /// debugging.
+  void print_symex_step(statet &state);
+
+  messaget::mstreamt &
+  print_callstack_entry(const symex_targett::sourcet &target);
 
 public:
 
