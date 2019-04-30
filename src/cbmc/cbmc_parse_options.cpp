@@ -79,9 +79,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <langapi/mode.h>
 
-#include <json/json_interface.h>
-#include <xmllang/xml_interface.h>
-
 #include "c_test_input_generator.h"
 
 cbmc_parse_optionst::cbmc_parse_optionst(int argc, const char **argv)
@@ -1021,11 +1018,8 @@ void cbmc_parse_optionst::help()
     "\n"
     "Other options:\n"
     " --version                    show version and exit\n"
-    " --xml-ui                     use XML-formatted output\n"
-    " --xml-interface              bi-directional XML interface\n"
-    " --json-ui                    use JSON-formatted output\n"
-    " --json-interface             bi-directional JSON interface\n"
-    // NOLINTNEXTLINE(whitespace/line_length)
+    HELP_XML_INTERFACE
+    HELP_JSON_INTERFACE
     HELP_VALIDATE
     HELP_GOTO_TRACE
     HELP_FLUSH

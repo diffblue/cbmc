@@ -81,6 +81,8 @@ jbmc_parse_optionst::jbmc_parse_optionst(int argc, const char **argv)
       argv,
       std::string("JBMC ") + CBMC_VERSION)
 {
+  json_interface(cmdline, ui_message_handler);
+  xml_interface(cmdline, ui_message_handler);
 }
 
 ::jbmc_parse_optionst::jbmc_parse_optionst(
@@ -93,6 +95,8 @@ jbmc_parse_optionst::jbmc_parse_optionst(int argc, const char **argv)
       argv,
       std::string("JBMC ") + CBMC_VERSION)
 {
+  json_interface(cmdline, ui_message_handler);
+  xml_interface(cmdline, ui_message_handler);
 }
 
 void jbmc_parse_optionst::set_default_options(optionst &options)
@@ -1090,8 +1094,8 @@ void jbmc_parse_optionst::help()
     "\n"
     "Other options:\n"
     " --version                    show version and exit\n"
-    " --xml-ui                     use XML-formatted output\n"
-    " --json-ui                    use JSON-formatted output\n"
+    HELP_XML_INTERFACE
+    HELP_JSON_INTERFACE
     HELP_VALIDATE
     HELP_GOTO_TRACE
     HELP_FLUSH

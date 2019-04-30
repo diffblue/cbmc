@@ -31,6 +31,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <solvers/strings/string_refinement.h>
 
+#include <json/json_interface.h>
+#include <xmllang/xml_interface.h>
+
 class goto_functionst;
 class optionst;
 
@@ -47,9 +50,8 @@ class optionst;
   "(object-bits):" \
   OPT_GOTO_CHECK \
   "(no-assertions)(no-assumptions)" \
-  "(xml-ui)(xml-interface)" \
-  "(json-interface)" \
-  "(json-ui)" \
+  OPT_XML_INTERFACE \
+  OPT_JSON_INTERFACE \
   "(smt1)(smt2)(fpa)(cvc3)(cvc4)(boolector)(yices)(z3)(mathsat)" \
   "(cprover-smt2)" \
   "(no-sat-preprocessor)" \

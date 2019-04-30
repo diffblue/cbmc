@@ -6,6 +6,7 @@ goto-programs
 goto-symex
 java_bytecode
 jbmc
+json
 langapi # should go away
 linking
 pointer-analysis
@@ -15,3 +16,4 @@ solvers/prop
 solvers/sat
 solvers/strings
 util
+xmllang

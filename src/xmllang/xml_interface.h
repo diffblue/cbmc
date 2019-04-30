@@ -31,4 +31,14 @@ class message_handlert;
 /// \endcode
 void xml_interface(cmdlinet &, message_handlert &);
 
+// clang-format off
+#define OPT_XML_INTERFACE \
+  "(xml-ui)" \
+  "(xml-interface)"
+
+#define HELP_XML_INTERFACE \
+  " --xml-ui                     use XML-formatted output\n" \
+  " --xml-interface              bi-directional XML interface\n"
+// clang-format on
+
 #endif // CPROVER_XMLLANG_XML_INTERFACE_H
