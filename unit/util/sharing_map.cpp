@@ -27,6 +27,11 @@ class sharing_map_internalt : public sharing_map_standardt
 typedef sharing_mapt<irep_idt, std::string, true, irep_id_hash>
   sharing_map_error_checkt;
 
+class sharing_map_unsignedt : public sharing_mapt<unsigned, std::string, false>
+{
+  friend void sharing_map_internals_test();
+};
+
 // helpers
 template <class some_sharing_mapt>
 void fill(some_sharing_mapt &sm)
@@ -92,7 +97,7 @@ void sharing_map_internals_test()
 
     sm.insert("i", "1");
     count = sm.count_unmarked_nodes(false, marked, false);
-    REQUIRE(count == 8);
+    REQUIRE(count == 3);
     REQUIRE(marked.empty());
 
     count = sm.count_unmarked_nodes(true, marked, false);
@@ -125,6 +130,195 @@ void sharing_map_internals_test()
     sm3.insert("x", "0");
     sm.count_unmarked_nodes(false, marked, true);
     REQUIRE(marked.size() >= 2);
+  }
+
+  SECTION("single map shape")
+  {
+    std::set<const void *> marked;
+    std::size_t count = 0;
+    std::size_t chunk = 3;
+
+    sharing_map_unsignedt sm;
+
+    count = sm.count_unmarked_nodes(false, marked, false);
+    REQUIRE(count == 0);
+
+    sm.insert(0, "a");
+    count = sm.count_unmarked_nodes(false, marked, false);
+    REQUIRE(count == 3);
+
+    SECTION("first node decisive")
+    {
+      sm.insert(1, "b");
+      count = sm.count_unmarked_nodes(false, marked, false);
+      REQUIRE(count == 5);
+
+      sm.replace(1, "c");
+      count = sm.count_unmarked_nodes(false, marked, false);
+      REQUIRE(count == 5);
+
+      sm.erase(1);
+      count = sm.count_unmarked_nodes(false, marked, false);
+      REQUIRE(count == 3);
+    }
+
+    SECTION("second node decisive")
+    {
+      sm.insert(1 << chunk, "b");
+      count = sm.count_unmarked_nodes(false, marked, false);
+      REQUIRE(count == 6);
+
+      sm.replace(1 << chunk, "c");
+      count = sm.count_unmarked_nodes(false, marked, false);
+      REQUIRE(count == 6);
+
+      sm.erase(1 << chunk);
+      count = sm.count_unmarked_nodes(false, marked, false);
+      REQUIRE(count == 4);
+    }
+
+    SECTION("third node decisive")
+    {
+      sm.insert(1 << (2 * chunk), "b");
+      count = sm.count_unmarked_nodes(false, marked, false);
+      REQUIRE(count == 7);
+
+      sm.replace(1 << (2 * chunk), "c");
+      count = sm.count_unmarked_nodes(false, marked, false);
+      REQUIRE(count == 7);
+
+      sm.erase(1 << (2 * chunk));
+      count = sm.count_unmarked_nodes(false, marked, false);
+      REQUIRE(count == 5);
+    }
+  }
+
+  SECTION("two maps shape")
+  {
+    std::set<const void *> marked;
+    std::size_t chunk = 3;
+
+    sharing_map_unsignedt sm1;
+    sharing_map_unsignedt sm2;
+
+    SECTION("left map deeper")
+    {
+      sm1.insert(0, "a");
+      sm1.insert(1 << (2 * chunk), "b");
+
+      sm2.insert(0, "c");
+      sm2.insert(1, "d");
+
+      sharing_map_unsignedt::delta_viewt delta_view;
+      sm1.get_delta_view(sm2, delta_view, false);
+
+      REQUIRE(delta_view.size() == 2);
+
+      const bool b0 = delta_view[0].is_in_both_maps();
+      const bool b1 = delta_view[1].is_in_both_maps();
+
+      REQUIRE((b0 || b1));
+      REQUIRE(!(b0 && b1));
+
+      if(b0)
+      {
+        REQUIRE(delta_view[0].k == 0);
+        REQUIRE(delta_view[0].m == "a");
+        REQUIRE(delta_view[0].get_other_map_value() == "c");
+
+        REQUIRE(delta_view[1].k == 1 << (2 * chunk));
+        REQUIRE(delta_view[1].m == "b");
+      }
+      else
+      {
+        REQUIRE(delta_view[0].k == 1 << (2 * chunk));
+        REQUIRE(delta_view[0].m == "b");
+
+        REQUIRE(delta_view[1].k == 0);
+        REQUIRE(delta_view[1].m == "a");
+        REQUIRE(delta_view[1].get_other_map_value() == "c");
+      }
+    }
+
+    SECTION("right map deeper")
+    {
+      sm1.insert(0, "c");
+      sm1.insert(1, "d");
+
+      sm2.insert(0, "a");
+      sm2.insert(1 << (2 * chunk), "b");
+
+      sharing_map_unsignedt::delta_viewt delta_view;
+      sm1.get_delta_view(sm2, delta_view, false);
+
+      REQUIRE(delta_view.size() == 2);
+
+      const bool b0 = delta_view[0].is_in_both_maps();
+      const bool b1 = delta_view[1].is_in_both_maps();
+
+      REQUIRE((b0 || b1));
+      REQUIRE(!(b0 && b1));
+
+      if(b0)
+      {
+        REQUIRE(delta_view[0].k == 0);
+        REQUIRE(delta_view[0].m == "c");
+        REQUIRE(delta_view[0].get_other_map_value() == "a");
+
+        REQUIRE(delta_view[1].k == 1);
+        REQUIRE(delta_view[1].m == "d");
+      }
+      else
+      {
+        REQUIRE(delta_view[0].k == 1);
+        REQUIRE(delta_view[0].m == "d");
+
+        REQUIRE(delta_view[1].k == 0);
+        REQUIRE(delta_view[1].m == "c");
+        REQUIRE(delta_view[1].get_other_map_value() == "a");
+      }
+    }
+  }
+
+  SECTION("two maps shape, sharing")
+  {
+    std::set<const void *> marked;
+    std::size_t chunk = 3;
+
+    std::vector<sharing_map_unsignedt> v;
+    v.reserve(2);
+
+    v.push_back(sharing_map_unsignedt());
+    sharing_map_unsignedt &sm1 = v.front();
+
+    SECTION("additional element in second map")
+    {
+      sm1.insert(0, "a");
+
+      v.emplace_back(sm1);
+      sharing_map_unsignedt &sm2 = v.back();
+
+      sm2.insert(1 << (2 * chunk), "b");
+
+#if !defined(_MSC_VER)
+      sharing_map_unsignedt::sharing_map_statst sms;
+
+      sms = sharing_map_unsignedt::get_sharing_stats(v.begin(), v.end());
+      REQUIRE(sms.num_leafs == 3);
+      REQUIRE(sms.num_unique_leafs == 2);
+      REQUIRE(sms.num_nodes == 3 + 7);
+      REQUIRE(sms.num_unique_nodes == 3 + 5);
+#endif
+
+      sharing_map_unsignedt::delta_viewt delta_view;
+      sm1.get_delta_view(sm2, delta_view, false);
+      REQUIRE(delta_view.size() == 0);
+
+      delta_view.clear();
+      sm2.get_delta_view(sm1, delta_view, false);
+      REQUIRE(delta_view.size() == 1);
+      REQUIRE(delta_view[0].k == (1 << (2 * chunk)));
+    }
   }
 }
 
