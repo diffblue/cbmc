@@ -258,10 +258,10 @@ void check_call_sequence(const goto_modelt &goto_model)
   std::string line;
   while(std::getline(std::cin, line))
   {
-    if(line!="" && line[line.size()-1]=='\r')
+    if(!line.empty() && line[line.size() - 1] == '\r')
       line.resize(line.size()-1);
 
-    if(line!="")
+    if(!line.empty())
       sequence.push_back(line);
   }
 

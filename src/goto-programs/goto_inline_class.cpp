@@ -331,7 +331,7 @@ void goto_inlinet::expand_function_call(
 
 #ifdef DEBUG
   std::cout << "Expanding call:\n";
-  dest.output_instruction(ns, "", std::cout, *target);
+  dest.output_instruction(ns, irep_idt(), std::cout, *target);
 #endif
 
   exprt lhs;

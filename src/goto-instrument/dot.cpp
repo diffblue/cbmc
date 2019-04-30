@@ -104,7 +104,7 @@ void dott::write_dot_subgraph(
       if(it==instructions.end() ||
          seen.find(it)!=seen.end()) continue;
 
-      std::stringstream tmp("");
+      std::stringstream tmp;
       if(it->is_goto())
       {
         if(it->get_condition().is_true())
@@ -192,12 +192,12 @@ void dott::write_dot_subgraph(
       std::set<goto_programt::const_targett> fres;
       find_next(instructions, it, tres, fres);
 
-      std::string tlabel="true";
-      std::string flabel="false";
-      if(fres.empty() || tres.empty())
+      std::string tlabel;
+      std::string flabel;
+      if(!fres.empty() && !tres.empty())
       {
-        tlabel="";
-        flabel="";
+        tlabel = "true";
+        flabel = "false";
       }
 
       typedef std::set<goto_programt::const_targett> t;
@@ -338,14 +338,13 @@ void dott::write_edge(
   out << "Node_" << subgraphscount << "_" << from.location_number;
   out << " -> ";
   out << "Node_" << subgraphscount << "_" << to.location_number << " ";
-  if(label!="")
-    {
-      out << "[fontsize=20,label=\"" << label << "\"";
-      if(from.is_backwards_goto() &&
-          from.location_number > to.location_number)
-        out << ",color=red";
-      out << "]";
-    }
+  if(!label.empty())
+  {
+    out << "[fontsize=20,label=\"" << label << "\"";
+    if(from.is_backwards_goto() && from.location_number > to.location_number)
+      out << ",color=red";
+    out << "]";
+  }
   out << ";\n";
 }
 

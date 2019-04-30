@@ -278,7 +278,7 @@ solver_factoryt::get_smt2(smt2_dect::solvert solver)
 
   const std::string &filename = options.get_option("outfile");
 
-  if(filename == "")
+  if(filename.empty())
   {
     if(solver == smt2_dect::solvert::GENERIC)
     {

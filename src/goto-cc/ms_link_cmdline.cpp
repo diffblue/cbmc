@@ -325,7 +325,7 @@ static std::string to_upper_string(const std::string &s)
 
 void ms_link_cmdlinet::process_link_option(const std::string &s)
 {
-  if(s == "")
+  if(s.empty())
     return;
 
   if(s[0] != '/' && s[0] != '-')

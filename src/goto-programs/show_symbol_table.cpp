@@ -46,7 +46,7 @@ void show_symbol_table_brief_plain(
 
     std::unique_ptr<languaget> ptr;
 
-    if(symbol.mode=="")
+    if(symbol.mode.empty())
       ptr=get_default_language();
     else
     {
@@ -86,7 +86,7 @@ void show_symbol_table_plain(
 
     std::unique_ptr<languaget> ptr;
 
-    if(symbol.mode=="")
+    if(symbol.mode.empty())
     {
       ptr=get_default_language();
     }
@@ -174,7 +174,7 @@ static void show_symbol_table_json_ui(
 
     std::unique_ptr<languaget> ptr;
 
-    if(symbol.mode=="")
+    if(symbol.mode.empty())
     {
       ptr=get_default_language();
     }
@@ -248,7 +248,7 @@ static void show_symbol_table_brief_json_ui(
 
     std::unique_ptr<languaget> ptr;
 
-    if(symbol.mode=="")
+    if(symbol.mode.empty())
     {
       ptr=get_default_language();
     }

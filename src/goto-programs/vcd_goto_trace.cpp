@@ -142,7 +142,7 @@ void output_vcd(
           {
             std::string binary=as_vcd_binary(step.full_lhs_value, ns);
 
-            if(binary!="")
+            if(!binary.empty())
               out << "b" << binary << " V" << number << " " << "\n";
           }
         }

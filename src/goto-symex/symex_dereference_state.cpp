@@ -43,8 +43,7 @@ symex_dereference_statet::get_or_create_failed_symbol(const exprt &expr)
     const irep_idt &failed_symbol = ptr_symbol.type.get(ID_C_failed_symbol);
 
     const symbolt *symbol;
-    if(failed_symbol!="" &&
-        !ns.lookup(failed_symbol, symbol))
+    if(!failed_symbol.empty() && !ns.lookup(failed_symbol, symbol))
     {
       symbolt sym=*symbol;
       symbolt *sym_ptr=nullptr;
@@ -63,8 +62,7 @@ symex_dereference_statet::get_or_create_failed_symbol(const exprt &expr)
     const irep_idt &failed_symbol = ptr_symbol.type.get(ID_C_failed_symbol);
 
     const symbolt *symbol;
-    if(failed_symbol!="" &&
-        !ns.lookup(failed_symbol, symbol))
+    if(!failed_symbol.empty() && !ns.lookup(failed_symbol, symbol))
     {
       symbolt sym=*symbol;
       symbolt *sym_ptr=nullptr;
@@ -93,7 +91,7 @@ void symex_dereference_statet::get_value_set(
 #endif
 
 #if 0
-  std::cout << "E: " << from_expr(goto_symex.ns, "", expr) << '\n';
+  std::cout << "E: " << from_expr(goto_symex.ns, irep_idt(), expr) << '\n';
 #endif
 
 #if 0
@@ -101,7 +99,7 @@ void symex_dereference_statet::get_value_set(
   for(value_setst::valuest::const_iterator it=value_set.begin();
       it!=value_set.end();
       it++)
-    std::cout << from_expr(goto_symex.ns, "", *it) << '\n';
+    std::cout << from_expr(goto_symex.ns, irep_idt(), *it) << '\n';
   std::cout << "**************************\n";
 #endif
 }

@@ -61,8 +61,7 @@ void show_properties(
 
     const irep_idt &comment=source_location.get_comment();
     const irep_idt &property_class=source_location.get_property_class();
-    const irep_idt description=
-      (comment==""?"assertion":comment);
+    const irep_idt description = (comment.empty() ? "assertion" : comment);
 
     irep_idt property_id=source_location.get_property_id();
 
@@ -125,8 +124,7 @@ void convert_properties_json(
     const irep_idt &comment=source_location.get_comment();
     // const irep_idt &function=location.get_function();
     const irep_idt &property_class=source_location.get_property_class();
-    const irep_idt description=
-      (comment==""?"assertion":comment);
+    const irep_idt description = (comment.empty() ? "assertion" : comment);
 
     irep_idt property_id=source_location.get_property_id();
 

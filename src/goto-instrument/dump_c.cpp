@@ -454,7 +454,7 @@ void dump_ct::convert_compound(
     if(comp_type.id()==ID_c_bit_field &&
        to_c_bit_field_type(comp_type).get_width()==0)
     {
-      comp_name="";
+      comp_name.clear();
       s=type_to_string(comp_type);
     }
 
@@ -504,7 +504,7 @@ void dump_ct::convert_compound(
       typedef_map.insert({typedef_str, typedef_infot(typedef_str)});
     PRECONDITION(!td_map_entry.second);
     if(!td_map_entry.first->second.early)
-      td_map_entry.first->second.type_decl_str="";
+      td_map_entry.first->second.type_decl_str.clear();
     os << "typedef ";
   }
 

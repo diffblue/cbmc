@@ -397,9 +397,7 @@ void cpp_declarator_convertert::get_final_identifier()
   std::string identifier=id2string(base_name);
 
   // main is always "C" linkage, as a matter of principle
-  if(is_code &&
-     base_name==ID_main &&
-     scope->prefix=="")
+  if(is_code && base_name == ID_main && scope->prefix.empty())
   {
     linkage_spec=ID_C;
   }

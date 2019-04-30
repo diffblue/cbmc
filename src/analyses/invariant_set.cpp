@@ -63,8 +63,7 @@ bool inv_object_storet::get(const exprt &expr, unsigned &n)
 unsigned inv_object_storet::add(const exprt &expr)
 {
   std::string s=build_string(expr);
-
-  assert(s!="");
+  CHECK_RETURN(!s.empty());
 
   mapt::number_type n=map.number(s);
 
@@ -137,7 +136,7 @@ std::string inv_object_storet::build_string(const exprt &expr) const
   // we don't know what mode (language) we are in, so we rely on the default
   // language to be reasonable for from_expr
   if(is_constant_address(expr))
-    return from_expr(ns, "", expr);
+    return from_expr(ns, irep_idt(), expr);
 
   if(expr.id()==ID_member)
   {
@@ -391,8 +390,8 @@ void invariant_sett::strengthen_rec(const exprt &expr)
     throw "non-Boolean argument to strengthen()";
 
   #if 0
-  std::cout << "S: " << from_expr(*ns, "", expr) << '\n';
-  #endif
+  std::cout << "S: " << from_expr(*ns, irep_idt(), expr) << '\n';
+#endif
 
   if(is_false)
   {
@@ -594,8 +593,8 @@ tvt invariant_sett::implies_rec(const exprt &expr) const
     throw "implies: non-Boolean expression";
 
   #if 0
-  std::cout << "I: " << from_expr(*ns, "", expr) << '\n';
-  #endif
+  std::cout << "I: " << from_expr(*ns, irep_idt(), expr) << '\n';
+#endif
 
   if(is_false) // can't get any stronger
     return tvt(true);

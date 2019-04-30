@@ -671,7 +671,7 @@ void guarded_range_domaint::output(
     out << itr->first << ":" << itr->second.first;
     // we don't know what mode (language) we are in, so we rely on the default
     // language to be reasonable for from_expr
-    out << " if " << from_expr(ns, "", itr->second.second);
+    out << " if " << from_expr(ns, irep_idt(), itr->second.second);
   }
   out << "]";
 }

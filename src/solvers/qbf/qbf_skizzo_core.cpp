@@ -68,7 +68,7 @@ propt::resultt qbf_skizzo_coret::prop_solve()
     write_qdimacs_cnf(out);
   }
 
-  std::string options="";
+  std::string options;
 
   // solve it
   system((
@@ -87,7 +87,7 @@ propt::resultt qbf_skizzo_coret::prop_solve()
 
       std::getline(in, line);
 
-      if(line!="" && line[line.size()-1]=='\r')
+      if(!line.empty() && line[line.size() - 1] == '\r')
         line.resize(line.size()-1);
 
       if(line=="The instance evaluates to TRUE.")
@@ -161,7 +161,7 @@ bool qbf_skizzo_coret::get_certificate(void)
 
       std::getline(in, line);
 
-      if(line!="" && line[line.size()-1]=='\r')
+      if(!line.empty() && line[line.size() - 1] == '\r')
         line.resize(line.size()-1);
 
       if(line.compare(0, key.size(), key)==0)
@@ -205,7 +205,7 @@ bool qbf_skizzo_coret::get_certificate(void)
     {
       std::getline(in, line);
 
-      if(line!="" && line[line.size()-1]=='\r')
+      if(!line.empty() && line[line.size() - 1] == '\r')
         line.resize(line.size()-1);
 
       if(line.compare(0, key.size(), key)==0)

@@ -295,7 +295,7 @@ irep_idt get_string_argument_rec(const exprt &src)
     }
   }
 
-  return "";
+  return irep_idt();
 }
 
 irep_idt get_string_argument(const exprt &src, const namespacet &ns)
@@ -323,7 +323,7 @@ void goto_symext::symex_printf(
   const irep_idt format_string=
     get_string_argument(operands[0], ns);
 
-  if(format_string!="")
+  if(!format_string.empty())
     target.output_fmt(
       state.guard.as_expr(),
       state.source, "printf", format_string, args);

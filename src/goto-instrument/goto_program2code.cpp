@@ -1864,7 +1864,7 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
       // Replace by a function call to nondet_...
       // We first search for a suitable one in the symbol table.
 
-      irep_idt id="";
+      irep_idt id;
 
       for(symbol_tablet::symbolst::const_iterator
           it=symbol_table.symbols.begin();
@@ -1886,11 +1886,11 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
 
       // none found? make one
 
-      if(id=="")
+      if(id.empty())
       {
-        irep_idt base_name="";
+        irep_idt base_name;
 
-        if(expr.type().get(ID_C_c_type)!="")
+        if(!expr.type().get(ID_C_c_type).empty())
         {
           irep_idt suffix;
           suffix=expr.type().get(ID_C_c_type);
@@ -1900,7 +1900,7 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
             base_name="nondet_"+id2string(suffix);
         }
 
-        if(base_name=="")
+        if(base_name.empty())
         {
           unsigned count=0;
           while(symbol_table.symbols.find("nondet_"+std::to_string(count))!=

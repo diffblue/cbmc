@@ -16,7 +16,7 @@ Author: Diffblue Ltd.
 /// given radix.
 static size_t expected_length(unsigned long radix, const typet &type)
 {
-  std::string longest("");
+  std::string longest;
   if(radix == 2)
   {
     if(type == unsignedbv_typet(32))

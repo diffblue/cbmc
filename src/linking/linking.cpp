@@ -79,7 +79,7 @@ std::string linkingt::type_to_string_verbose(
     std::string result=followed.id_string();
 
     const std::string &tag=followed.get_string(ID_tag);
-    if(tag!="")
+    if(!tag.empty())
       result+=" "+tag;
 
     if(to_struct_union_type(followed).is_incomplete())
@@ -359,8 +359,8 @@ void linkingt::detailed_conflict_report_rec(
   if(!msg.empty())
   {
     error() << '\n';
-    error() << "reason for conflict at " << expr_to_string("", conflict_path)
-            << ": " << msg << '\n';
+    error() << "reason for conflict at "
+            << expr_to_string(irep_idt(), conflict_path) << ": " << msg << '\n';
 
     error() << '\n';
     error() << type_to_string_verbose(old_symbol, t1) << '\n';

@@ -34,7 +34,7 @@ void xmlt::output(std::ostream &out, unsigned indent) const
   // 'name' needs to be set, or we produce mal-formed
   // XML.
 
-  if(name=="")
+  if(name.empty())
     return;
 
   do_indent(out, indent);
@@ -213,7 +213,7 @@ void xmlt::set_attribute(
 /// \return the unescaped string
 std::string xmlt::unescape(const std::string &str)
 {
-  std::string result("");
+  std::string result;
 
   result.reserve(str.size());
 

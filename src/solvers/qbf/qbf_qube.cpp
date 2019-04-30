@@ -55,7 +55,7 @@ propt::resultt qbf_qubet::prop_solve()
     write_qdimacs_cnf(out);
   }
 
-  std::string options="";
+  std::string options;
 
   // solve it
   int res=system(
@@ -75,7 +75,7 @@ propt::resultt qbf_qubet::prop_solve()
 
       std::getline(in, line);
 
-      if(line!="" && line[line.size()-1]=='\r')
+      if(!line.empty() && line[line.size() - 1] == '\r')
         line.resize(line.size()-1);
 
       if(line=="s cnf 0")

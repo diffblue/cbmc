@@ -133,8 +133,6 @@ irep_idt partial_order_concurrencyt::rw_clock_id(
     return id2string(id(event))+"$rclk$"+std::to_string(axiom);
   else
     UNREACHABLE;
-
-  return "";
 }
 
 symbol_exprt partial_order_concurrencyt::clock(

@@ -107,7 +107,7 @@ SCENARIO("split_string", "[core][utils][string_utils][split_string]")
   }
   GIVEN("An empty string")
   {
-    std::string string = "";
+    std::string string;
     WHEN("Splitting it")
     {
       expected_resultst expected_results;

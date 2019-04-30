@@ -60,7 +60,7 @@ bool cpp_languaget::preprocess(
   const std::string &path,
   std::ostream &outstream)
 {
-  if(path=="")
+  if(path.empty())
     return c_preprocess(instream, outstream, get_message_handler());
 
   // check extension
@@ -123,7 +123,7 @@ bool cpp_languaget::typecheck(
   symbol_tablet &symbol_table,
   const std::string &module)
 {
-  if(module=="")
+  if(module.empty())
     return false;
 
   symbol_tablet new_symbol_table;

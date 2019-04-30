@@ -126,7 +126,7 @@ void convert_decl(
   {
     base_name = symbol->base_name;
     display_name = symbol->display_name();
-    if(type_string == "")
+    if(type_string.empty())
       type_string = from_type(ns, identifier, symbol->type);
 
     json_assignment["mode"] = json_stringt(symbol->mode);

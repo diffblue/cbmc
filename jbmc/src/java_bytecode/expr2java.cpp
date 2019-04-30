@@ -246,8 +246,7 @@ std::string expr2javat::convert_rec(
   qualifierst &new_qualifiers = *clone;
   new_qualifiers.read(src);
 
-  const std::string d=
-    declarator==""?declarator:(" "+declarator);
+  const std::string d = declarator.empty() ? declarator : (" " + declarator);
 
   const std::string q=
     new_qualifiers.as_string();
@@ -278,7 +277,7 @@ std::string expr2javat::convert_rec(
     // so we make one up, loosely inspired by the syntax
     // of lambda expressions.
 
-    std::string dest="";
+    std::string dest;
 
     dest+='(';
     const java_method_typet::parameterst &parameters = method_type.parameters();

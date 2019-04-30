@@ -24,7 +24,7 @@ void get_local_identifiers(
   // add parameters
   for(const auto &identifier : goto_function.parameter_identifiers)
   {
-    if(identifier != "")
+    if(!identifier.empty())
       dest.insert(identifier);
   }
 }

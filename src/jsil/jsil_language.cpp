@@ -134,7 +134,7 @@ bool jsil_languaget::to_expr(
   // parsing
 
   jsil_parser.clear();
-  jsil_parser.set_file("");
+  jsil_parser.set_file(irep_idt());
   jsil_parser.in=&instream;
   jsil_parser.set_message_handler(get_message_handler());
   jsil_scanner_init();

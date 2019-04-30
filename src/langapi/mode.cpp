@@ -109,7 +109,7 @@ std::unique_ptr<languaget> get_language_from_filename(
   std::string extension=
     std::string(filename, ext_pos+1, std::string::npos);
 
-  if(extension=="")
+  if(extension.empty())
     return nullptr;
 
   for(languagest::const_iterator

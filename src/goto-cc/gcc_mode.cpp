@@ -484,7 +484,7 @@ int gcc_modet::doit()
     cmdline.isset("mtune") ? cmdline.get_value("mtune") :
     cmdline.isset("mcpu")  ? cmdline.get_value("mcpu")  : "";
 
-  if(target_cpu!="")
+  if(!target_cpu.empty())
   {
     // Work out what CPROVER architecture we should target.
     for(auto &pair : arch_map)
@@ -659,7 +659,7 @@ int gcc_modet::doit()
   }
   else
   {
-    compiler.output_file_object="";
+    compiler.output_file_object.clear();
     compiler.output_file_executable="a.out";
   }
 
@@ -683,8 +683,9 @@ int gcc_modet::doit()
         {
           compiler.add_input_file(arg_it->arg);
         }
-        else if(language=="c" || language=="c++" ||
-                (language=="" && needs_preprocessing(arg_it->arg)))
+        else if(
+          language == "c" || language == "c++" ||
+          (language.empty() && needs_preprocessing(arg_it->arg)))
         {
           std::string new_suffix;
 
@@ -720,14 +721,14 @@ int gcc_modet::doit()
         {
           language=arg_it->arg;
           if(language=="none")
-            language="";
+            language.clear();
         }
       }
       else if(has_prefix(arg_it->arg, "-x"))
       {
         language=std::string(arg_it->arg, 2, std::string::npos);
         if(language=="none")
-          language="";
+          language.clear();
       }
     }
   }
@@ -820,7 +821,7 @@ int gcc_modet::preprocess(
   }
 
   // language, if given
-  if(language!="")
+  if(!language.empty())
   {
     new_argv.push_back("-x");
     new_argv.push_back(language);

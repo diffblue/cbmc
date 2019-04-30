@@ -15,7 +15,7 @@ SCENARIO("java_type_from_string", "[core][java_types]")
 
   GIVEN("Ljava/lang/Integer;")
   {
-    const auto integer_type = java_type_from_string("Ljava/lang/Integer;", "");
+    const auto integer_type = java_type_from_string("Ljava/lang/Integer;");
     REQUIRE(integer_type.has_value());
   }
 
@@ -35,7 +35,7 @@ SCENARIO("java_type_from_string", "[core][java_types]")
   GIVEN("Ljava/util/List<Ljava/lang/Integer>;")
   {
     const auto integer_list_type =
-      java_type_from_string("Ljava/util/List<Ljava/lang/Integer;>;", "");
+      java_type_from_string("Ljava/util/List<Ljava/lang/Integer;>;");
     REQUIRE(integer_list_type.has_value());
   }
 

@@ -166,7 +166,7 @@ void cpp_typecheck_resolvet::remove_duplicates(
     else if(old_id.id() == ID_type && old_id.type().id() == ID_union_tag)
       id = to_union_tag_type(old_id.type()).get_identifier();
 
-    if(id=="")
+    if(id.empty())
     {
       if(other.insert(old_id).second)
         identifiers.push_back(old_id);
@@ -446,7 +446,7 @@ void cpp_typecheck_resolvet::disambiguate_functions(
     {
       std::size_t template_distance=0;
 
-      if(old_id.type().get(ID_C_template) != "")
+      if(!old_id.type().get(ID_C_template).empty())
         template_distance = old_id.type()
                               .find(ID_C_template_arguments)
                               .find(ID_arguments)
@@ -872,7 +872,7 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
     recursive=false;
   }
 
-  std::string final_base_name="";
+  std::string final_base_name;
   template_args.make_nil();
 
   while(pos!=cpp_name.get_sub().end())
@@ -1011,7 +1011,7 @@ struct_tag_typet cpp_typecheck_resolvet::disambiguate_template_classes(
     if(!cpp_declaration.is_class_template())
       continue;
     irep_idt specialization_of=cpp_declaration.get_specialization_of();
-    if(specialization_of!="")
+    if(!specialization_of.empty())
       primary_templates.insert(specialization_of);
     else
       primary_templates.insert(id);
@@ -1270,7 +1270,7 @@ void cpp_typecheck_resolvet::show_identifiers(
       else if(id_expr.id() == ID_pod_constructor)
       {
         out << "constructor ";
-        id="";
+        id.clear();
       }
       else if(id_expr.id()==ID_template_function_instance)
       {

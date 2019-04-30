@@ -97,8 +97,7 @@ optionalt<codet> cpp_typecheckt::cpp_destructor(
       }
     }
 
-    // there is always a destructor for non-PODs
-    assert(dtor_name!="");
+    INVARIANT(!dtor_name.empty(), "non-PODs should have a destructor");
 
     cpp_namet cpp_name(dtor_name, source_location);
 

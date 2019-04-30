@@ -43,7 +43,7 @@ bool ansi_c_languaget::preprocess(
   std::ostream &outstream)
 {
   // stdin?
-  if(path=="")
+  if(path.empty())
     return c_preprocess(instream, outstream, get_message_handler());
 
   return c_preprocess(path, outstream, get_message_handler());

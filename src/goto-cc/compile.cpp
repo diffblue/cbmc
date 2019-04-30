@@ -389,7 +389,7 @@ bool compilet::compile()
 
       std::string cfn;
 
-      if(output_file_object=="")
+      if(output_file_object.empty())
       {
         const std::string file_name_with_obj_ext =
           get_base_name(file_name, true) + "." + object_file_extension;
@@ -433,7 +433,7 @@ bool compilet::parse(
   // Using '-x', the type of a file can be overridden;
   // otherwise, it's guessed from the extension.
 
-  if(override_language!="")
+  if(!override_language.empty())
   {
     if(override_language=="c++" || override_language=="c++-header")
       languagep = get_language_from_mode(ID_cpp);

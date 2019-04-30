@@ -169,7 +169,7 @@ void string_abstractiont::add_str_arguments(
 
   for(const auto &identifier : fct.parameter_identifiers)
   {
-    if(identifier=="")
+    if(identifier.empty())
       continue; // ignore
 
     const symbolt &param_symbol = ns.lookup(identifier);
@@ -949,7 +949,7 @@ bool string_abstractiont::build_symbol(const symbol_exprt &sym, exprt &dest)
   const typet &abstract_type=build_abstraction_type(symbol.type);
   CHECK_RETURN(!abstract_type.is_nil());
 
-  irep_idt identifier="";
+  irep_idt identifier;
 
   if(current_args.find(symbol.name)!=current_args.end())
     identifier=id2string(symbol.name)+arg_suffix;

@@ -155,7 +155,7 @@ public:
     const goto_programt &goto_program,
     std::ostream &out) const
   {
-    output(goto_program, "", out);
+    output(goto_program, irep_idt(), out);
   }
 
   virtual bool has_location(locationt l) const=0;

@@ -241,7 +241,7 @@ void weak_memory(
     const std::pair<m_itt, m_itt> ran=
       shared_buffers.cycles_loc.equal_range(*it);
     for(m_itt ran_it=ran.first; ran_it!=ran.second; ran_it++)
-      message.result() << ((*it)==""?"fence":*it) << ", "
+      message.result() << (it->empty() ? "fence" : *it) << ", "
                        << ran_it->second << messaget::eom;
   }
 

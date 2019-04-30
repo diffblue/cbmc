@@ -317,7 +317,7 @@ constant_exprt smt2_convt::parse_literal(
 
   mp_integer value;
 
-  if(src.id()!=irep_idt())
+  if(!src.id().empty())
   {
     const std::string &s=src.id_string();
 
@@ -832,7 +832,6 @@ std::string smt2_convt::type2id(const typet &type) const
   else
   {
     UNREACHABLE;
-    return "";
   }
 }
 

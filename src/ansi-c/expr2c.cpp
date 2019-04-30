@@ -195,8 +195,7 @@ std::string expr2ct::convert_rec(
 
   std::string q=new_qualifiers.as_string();
 
-  std::string d=
-    declarator==""?declarator:" "+declarator;
+  std::string d = declarator.empty() ? declarator : " " + declarator;
 
   if(src.find(ID_C_typedef).is_not_nil())
   {
@@ -288,13 +287,13 @@ std::string expr2ct::convert_rec(
     if(width==config.ansi_c.int_width)
     {
       if(is_signed)
-        sign_str="";
+        sign_str.clear();
       return q+sign_str+"int"+d;
     }
     else if(width==config.ansi_c.long_int_width)
     {
       if(is_signed)
-        sign_str="";
+        sign_str.clear();
       return q+sign_str+"long int"+d;
     }
     else if(width==config.ansi_c.char_width)
@@ -305,19 +304,19 @@ std::string expr2ct::convert_rec(
     else if(width==config.ansi_c.short_int_width)
     {
       if(is_signed)
-        sign_str="";
+        sign_str.clear();
       return q+sign_str+"short int"+d;
     }
     else if(width==config.ansi_c.long_long_int_width)
     {
       if(is_signed)
-        sign_str="";
+        sign_str.clear();
       return q+sign_str+"long long int"+d;
     }
     else if(width==128)
     {
       if(is_signed)
-        sign_str="";
+        sign_str.clear();
       return q + sign_str + "__int128" + d;
     }
     else
@@ -337,7 +336,7 @@ std::string expr2ct::convert_rec(
     std::string dest=q+"union";
 
     const irep_idt &tag=union_type.get_tag();
-    if(tag!="")
+    if(!tag.empty())
       dest+=" "+id2string(tag);
 
     if(!union_type.is_incomplete())
@@ -421,7 +420,7 @@ std::string expr2ct::convert_rec(
     // The star gets attached to the declarator.
     std::string new_declarator="*";
 
-    if(q != "" && (!declarator.empty() || subtype.id() == ID_pointer))
+    if(!q.empty() && (!declarator.empty() || subtype.id() == ID_pointer))
     {
       new_declarator+=" "+q;
     }
@@ -449,7 +448,7 @@ std::string expr2ct::convert_rec(
 
     std::string dest=q+"struct";
     const std::string &tag=ns.follow_tag(struct_tag_type).get_string(ID_tag);
-    if(tag!="")
+    if(!tag.empty())
       dest+=" "+tag;
     dest+=d;
 
@@ -462,7 +461,7 @@ std::string expr2ct::convert_rec(
 
     std::string dest=q+"union";
     const std::string &tag=ns.follow_tag(union_tag_type).get_string(ID_tag);
-    if(tag!="")
+    if(!tag.empty())
       dest+=" "+tag;
     dest+=d;
 
@@ -480,9 +479,7 @@ std::string expr2ct::convert_rec(
 
     if(parameters.empty())
     {
-      if(code_type.has_ellipsis())
-        dest+=""; // empty!
-      else
+      if(!code_type.has_ellipsis())
         dest+="void"; // means 'no parameters'
     }
     else
@@ -642,7 +639,7 @@ std::string expr2ct::convert_struct_type(
   std::string dest=qualifiers+"struct";
 
   const irep_idt &tag=struct_type.get_tag();
-  if(tag!="")
+  if(!tag.empty())
     dest+=" "+id2string(tag);
 
   if(inc_struct_body && !struct_type.is_incomplete())
@@ -1530,7 +1527,7 @@ std::string expr2ct::convert_member(
 
   irep_idt component_name=src.get_component_name();
 
-  if(component_name!="")
+  if(!component_name.empty())
   {
     const exprt &comp_expr = struct_union_type.get_component(component_name);
 
@@ -1825,7 +1822,7 @@ std::string expr2ct::convert_constant(
   {
     dest=ieee_floatt(to_constant_expr(src)).to_ansi_c_string();
 
-    if(dest!="" && isdigit(dest[dest.size()-1]))
+    if(!dest.empty() && isdigit(dest[dest.size() - 1]))
     {
       if(dest.find('.')==std::string::npos)
         dest+=".0";
@@ -1879,7 +1876,7 @@ std::string expr2ct::convert_constant(
   {
     dest=fixedbvt(to_constant_expr(src)).to_ansi_c_string();
 
-    if(dest!="" && isdigit(dest[dest.size()-1]))
+    if(!dest.empty() && isdigit(dest[dest.size() - 1]))
     {
       if(src.type()==float_type())
         dest+='f';

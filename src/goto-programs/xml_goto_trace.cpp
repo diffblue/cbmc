@@ -37,7 +37,7 @@ void convert(
     const source_locationt &source_location=step.pc->source_location;
 
     xmlt xml_location;
-    if(source_location.is_not_nil() && source_location.get_file()!="")
+    if(source_location.is_not_nil() && !source_location.get_file().empty())
       xml_location=xml(source_location);
 
     switch(step.type)
@@ -53,7 +53,7 @@ void convert(
         xml_failure.set_attribute("reason", id2string(step.comment));
         xml_failure.set_attribute("property", id2string(step.property_id));
 
-        if(xml_location.name!="")
+        if(!xml_location.name.empty())
           xml_failure.new_element().swap(xml_location);
       }
       break;
@@ -66,7 +66,7 @@ void convert(
           lhs_object.has_value()?lhs_object->get_identifier():irep_idt();
         xmlt &xml_assignment=dest.new_element("assignment");
 
-        if(xml_location.name!="")
+        if(!xml_location.name.empty())
           xml_assignment.new_element().swap(xml_location);
 
         {
@@ -121,7 +121,7 @@ void convert(
         xml_output.set_attribute("thread", std::to_string(step.thread_nr));
         xml_output.set_attribute("step_nr", std::to_string(step.step_nr));
 
-        if(xml_location.name!="")
+        if(!xml_location.name.empty())
           xml_output.new_element().swap(xml_location);
 
         for(const auto &arg : step.io_args)
@@ -151,7 +151,7 @@ void convert(
             new_element(xml(arg, ns));
         }
 
-        if(xml_location.name!="")
+        if(!xml_location.name.empty())
           xml_input.new_element().swap(xml_location);
       }
       break;
@@ -172,7 +172,7 @@ void convert(
       xml_function.set_attribute("identifier", id2string(symbol.name));
       xml_function.new_element() = xml(symbol.location);
 
-      if(xml_location.name != "")
+      if(!xml_location.name.empty())
         xml_call_return.new_element().swap(xml_location);
     }
     break;
@@ -193,7 +193,7 @@ void convert(
         xml_function.set_attribute("identifier", id2string(symbol.name));
         xml_function.new_element()=xml(symbol.location);
 
-        if(xml_location.name!="")
+        if(!xml_location.name.empty())
           xml_call_return.new_element().swap(xml_location);
       }
       break;
@@ -202,7 +202,7 @@ void convert(
       if(source_location!=previous_source_location)
       {
         // just the source location
-        if(xml_location.name!="")
+        if(!xml_location.name.empty())
         {
           xmlt &xml_location_only=dest.new_element("location-only");
 
@@ -217,7 +217,7 @@ void convert(
       }
     }
 
-    if(source_location.is_not_nil() && source_location.get_file()!="")
+    if(source_location.is_not_nil() && !source_location.get_file().empty())
       previous_source_location=source_location;
   }
 }
