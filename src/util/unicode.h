@@ -31,6 +31,26 @@ std::string utf16_native_endian_to_java(const std::wstring &in);
 
 std::vector<std::string> narrow_argv(int argc, const wchar_t **argv_wide);
 
+/// \param utf16_char: UTF-16 character in architecture-native endianness
+///   encoding
+/// \return UTF-8 encoding of the same codepoint
+std::string utf16_native_endian_to_utf8(char16_t utf16_char);
+
+/// \param utf16_str: UTF-16 string in architecture-native endianness encoding
+/// \return UTF-8 encoding of the string
+std::string utf16_native_endian_to_utf8(const std::u16string &utf16_str);
+
+/// \param hex: representation of a BMP codepoint as a four-digit string
+///   (e.g.\ "0041" for \\u0041)
+/// \return encoding of the codepoint as a single UTF-16 character in
+///   architecture-native endianness encoding
+char16_t codepoint_hex_to_utf16_native_endian(const std::string &hex);
+
+/// \param hex: representation of a BMP codepoint as a four-digit string
+///   (e.g.\ "0041" for \\u0041)
+/// \return UTF-8 encoding of the codepoint
+std::string codepoint_hex_to_utf8(const std::string &hex);
+
 template <typename It>
 std::vector<const char *> to_c_str_array(It b, It e)
 {

@@ -8,11 +8,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "unicode.h"
 
-#include <cstring>
-#include <locale>
-#include <iomanip>
-#include <sstream>
+#include <codecvt>
 #include <cstdint>
+#include <cstring>
+#include <iomanip>
+#include <locale>
+#include <sstream>
+
+#include "invariant.h"
 
 #ifdef _WIN32
 #include <util/pragma_push.def>
@@ -314,4 +317,34 @@ std::string utf16_native_endian_to_java(const std::wstring &in)
   for(const auto ch : in)
     utf16_native_endian_to_java(ch, result, loc);
   return result.str();
+}
+
+std::string utf16_native_endian_to_utf8(const char16_t utf16_char)
+{
+  return utf16_native_endian_to_utf8(std::u16string(1, utf16_char));
+}
+
+std::string utf16_native_endian_to_utf8(const std::u16string &utf16_str)
+{
+#ifdef _MSC_VER
+  // Workaround for Visual Studio bug, see
+  // https://stackoverflow.com/questions/32055357
+  std::wstring wide_string(utf16_str.begin(), utf16_str.end());
+  return std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t>{}
+    .to_bytes(wide_string);
+#else
+  return std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t>{}
+    .to_bytes(utf16_str);
+#endif
+}
+
+char16_t codepoint_hex_to_utf16_native_endian(const std::string &hex)
+{
+  PRECONDITION(hex.length() == 4);
+  return std::strtol(hex.c_str(), nullptr, 16);
+}
+
+std::string codepoint_hex_to_utf8(const std::string &hex)
+{
+  return utf16_native_endian_to_utf8(codepoint_hex_to_utf16_native_endian(hex));
 }

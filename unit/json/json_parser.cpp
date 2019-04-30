@@ -84,17 +84,22 @@ SCENARIO("Loading JSON files")
       }
     }
   }
-  GIVEN("A JSON file containing a hexadecimal Unicode character")
+  GIVEN("A JSON file containing hexadecimal Unicode symbols")
   {
     temporary_filet unicode_json_file("cbmc_unit_json_parser_unicode", ".json");
     const std::string unicode_json_path = unicode_json_file();
     {
       std::ofstream unicode_json_out(unicode_json_path);
       unicode_json_out << "{\n"
-                       << "  \"special character\": \"\\u0001\"\n"
+                       << "  \"one\": \"\\u0001\",\n"
+                       << "  \"latin\": \"\\u0042\",\n"
+                       << "  \"grave\": \"\\u00E0\",\n"
+                       << "  \"trema\": \"\\u00FF\",\n"
+                       << "  \"high\": \"\\uFFFF\",\n"
+                       << "  \"several\": \"a\\u0041b\\u2FC3\\uFFFF\"\n"
                        << "}\n";
     }
-    WHEN("Loading the JSON file with the special character")
+    WHEN("Loading the JSON file with the Unicode symbols")
     {
       jsont unicode_json;
       const auto unicode_parse_error =
@@ -105,9 +110,25 @@ SCENARIO("Loading JSON files")
         REQUIRE(unicode_json.is_object());
 
         const json_objectt &json_object = to_json_object(unicode_json);
-        REQUIRE(json_object.find("special character") != json_object.end());
-        REQUIRE(json_object["special character"].value.size() == 1);
-        REQUIRE(json_object["special character"].value == "\u0001");
+
+        REQUIRE(json_object.find("one") != json_object.end());
+        REQUIRE(json_object["one"].value.size() == 1);
+        REQUIRE(json_object["one"].value == u8"\u0001");
+
+        REQUIRE(json_object.find("latin") != json_object.end());
+        REQUIRE(json_object["latin"].value == "B");
+
+        REQUIRE(json_object.find("grave") != json_object.end());
+        REQUIRE(json_object["grave"].value == "à");
+
+        REQUIRE(json_object.find("trema") != json_object.end());
+        REQUIRE(json_object["trema"].value == "ÿ");
+
+        REQUIRE(json_object.find("high") != json_object.end());
+        REQUIRE(json_object["high"].value == u8"\uFFFF");
+
+        REQUIRE(json_object.find("several") != json_object.end());
+        REQUIRE(json_object["several"].value == u8"aAb\u2FC3\uFFFF");
       }
     }
   }
