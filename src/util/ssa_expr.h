@@ -152,16 +152,29 @@ public:
   }
 };
 
-/// Cast a generic exprt to an \ref ssa_exprt. This is an unchecked conversion.
-/// \a expr must be known to be \ref  ssa_exprt.
+inline bool is_ssa_expr(const exprt &expr)
+{
+  return expr.id() == ID_symbol && expr.get_bool(ID_C_SSA_symbol);
+}
+
+template <>
+inline bool can_cast_expr<ssa_exprt>(const exprt &base)
+{
+  return is_ssa_expr(base);
+}
+
+inline void validate_expr(const ssa_exprt &expr)
+{
+  ssa_exprt::check(expr);
+}
+
+/// Cast a generic exprt to an \ref ssa_exprt.
 /// \param expr: Source expression
 /// \return Object of type \ref ssa_exprt
 /// \ingroup gr_std_expr
 inline const ssa_exprt &to_ssa_expr(const exprt &expr)
 {
-  PRECONDITION(
-    expr.id() == ID_symbol && expr.get_bool(ID_C_SSA_symbol) &&
-    !expr.has_operands());
+  ssa_exprt::check(expr);
   return static_cast<const ssa_exprt &>(expr);
 }
 
@@ -169,16 +182,8 @@ inline const ssa_exprt &to_ssa_expr(const exprt &expr)
 /// \ingroup gr_std_expr
 inline ssa_exprt &to_ssa_expr(exprt &expr)
 {
-  PRECONDITION(
-    expr.id() == ID_symbol && expr.get_bool(ID_C_SSA_symbol) &&
-    !expr.has_operands());
+  ssa_exprt::check(expr);
   return static_cast<ssa_exprt &>(expr);
-}
-
-inline bool is_ssa_expr(const exprt &expr)
-{
-  return expr.id()==ID_symbol &&
-         expr.get_bool(ID_C_SSA_symbol);
 }
 
 #endif // CPROVER_UTIL_SSA_EXPR_H
