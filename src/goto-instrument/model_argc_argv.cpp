@@ -53,8 +53,8 @@ bool model_argc_argv(
     return true;
   }
 
-  const symbolt &main_symbol=
-    ns.lookup(config.main.empty()?ID_main:config.main);
+  const symbolt &main_symbol =
+    ns.lookup(config.main.has_value() ? config.main.value() : ID_main);
 
   if(main_symbol.mode!=ID_C)
   {

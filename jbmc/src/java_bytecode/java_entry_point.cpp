@@ -533,14 +533,14 @@ main_function_resultt get_main_symbol(
   messaget message(message_handler);
 
   // find main symbol
-  if(config.main!="")
+  if(config.main.has_value())
   {
     // Add java:: prefix
-    std::string main_identifier="java::"+config.main;
+    std::string main_identifier = "java::" + config.main.value();
 
     std::string error_message;
-    irep_idt main_symbol_id=
-      resolve_friendly_method_name(config.main, symbol_table, error_message);
+    irep_idt main_symbol_id = resolve_friendly_method_name(
+      config.main.value(), symbol_table, error_message);
 
     if(main_symbol_id==irep_idt())
     {

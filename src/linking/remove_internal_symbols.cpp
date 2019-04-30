@@ -138,8 +138,9 @@ void remove_internal_symbols(
     else if(is_function)
     {
       // body? not local (i.e., "static")?
-      if(has_body &&
-         (!is_file_local || (config.main==symbol.name.c_str())))
+      if(
+        has_body && (!is_file_local || (config.main.has_value() &&
+                                        symbol.name == config.main.value())))
       {
         get_symbols(ns, symbol, exported);
       }

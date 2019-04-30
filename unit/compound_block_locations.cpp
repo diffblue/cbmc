@@ -277,7 +277,7 @@ void compound_block_locationst::check_compound_block_locations(
   register_language(new_ansi_c_language);
   cmdlinet cmdline;
   cmdline.args.push_back(tmp());
-  config.main = "main";
+  config.main = std::string("main");
   config.set(cmdline);
 
   optionst opts;

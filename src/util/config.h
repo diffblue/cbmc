@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "ieee_float.h"
 #include "irep.h"
+#include "optional.h"
 
 class cmdlinet;
 class symbol_tablet;
@@ -169,7 +170,7 @@ public:
   } bv_encoding;
 
   // this is the function to start executing
-  std::string main;
+  optionalt<std::string> main;
 
   void set_arch(const irep_idt &);
 
