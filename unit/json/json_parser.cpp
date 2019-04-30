@@ -84,4 +84,31 @@ SCENARIO("Loading JSON files")
       }
     }
   }
+  GIVEN("A JSON file containing a hexadecimal Unicode character")
+  {
+    temporary_filet unicode_json_file("cbmc_unit_json_parser_unicode", ".json");
+    const std::string unicode_json_path = unicode_json_file();
+    {
+      std::ofstream unicode_json_out(unicode_json_path);
+      unicode_json_out << "{\n"
+                       << "  \"special character\": \"\\u0001\"\n"
+                       << "}\n";
+    }
+    WHEN("Loading the JSON file with the special character")
+    {
+      jsont unicode_json;
+      const auto unicode_parse_error =
+        parse_json(unicode_json_path, null_message_handler, unicode_json);
+      THEN("The JSON file should be parsed correctly")
+      {
+        REQUIRE_FALSE(unicode_parse_error);
+        REQUIRE(unicode_json.is_object());
+
+        const json_objectt &json_object = to_json_object(unicode_json);
+        REQUIRE(json_object.find("special character") != json_object.end());
+        REQUIRE(json_object["special character"].value.size() == 1);
+        REQUIRE(json_object["special character"].value == "\u0001");
+      }
+    }
+  }
 }

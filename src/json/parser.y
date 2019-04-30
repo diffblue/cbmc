@@ -46,8 +46,15 @@ static std::string convert_TOK_STRING()
       case 'r':  result+='\r'; break;
       case 't':  result+='\t'; break;
       case 'u':
+      {
+        // Character in hexadecimal Unicode representation, in the format
+        // \uABCD, i.e. the following four digits are part of this character.
+        assert(p + 4 < yyjsontext + len - 1);
+        std::string hex(++p, 4);
+        result += std::stoi(hex, nullptr, 16);
+        p += 3;
         break;
-        
+      }
       default:; /* an error */
       }
     }
