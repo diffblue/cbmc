@@ -39,7 +39,7 @@ public:
     const symbol_tablet &,
     goto_functionst &,
     bool show_full,
-    const std::string &json_file_name);
+    const optionalt<std::string> &json_file_name);
 
 protected:
   messaget log;
@@ -224,12 +224,12 @@ bool taint_analysist::operator()(
   const symbol_tablet &symbol_table,
   goto_functionst &goto_functions,
   bool show_full,
-  const std::string &json_file_name)
+  const optionalt<std::string> &json_file_name)
 {
   try
   {
     json_arrayt json_result;
-    bool use_json=!json_file_name.empty();
+    bool use_json = json_file_name.has_value();
 
     log.status() << "Reading taint file `" << taint_file_name << "'"
                  << messaget::eom;
@@ -378,17 +378,17 @@ bool taint_analysist::operator()(
 
     if(use_json)
     {
-      std::ofstream json_out(json_file_name);
+      std::ofstream json_out(json_file_name.value());
 
       if(!json_out)
       {
-        log.error() << "Failed to open json output `" << json_file_name << "'"
-                    << messaget::eom;
+        log.error() << "Failed to open json output `" << json_file_name.value()
+                    << "'" << messaget::eom;
         return true;
       }
 
-      log.status() << "Analysis result is written to `" << json_file_name << "'"
-                   << messaget::eom;
+      log.status() << "Analysis result is written to `"
+                   << json_file_name.value() << "'" << messaget::eom;
 
       json_out << json_result << '\n';
     }
@@ -418,7 +418,7 @@ bool taint_analysis(
   const std::string &taint_file_name,
   message_handlert &message_handler,
   bool show_full,
-  const std::string &json_file_name)
+  const optionalt<std::string> &json_file_name)
 {
   taint_analysist taint_analysis(message_handler);
   return taint_analysis(
