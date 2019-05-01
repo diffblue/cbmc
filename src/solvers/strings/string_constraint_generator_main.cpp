@@ -313,6 +313,8 @@ string_constraint_generatort::add_axioms_for_function_application(
     return add_axioms_for_format(fresh_symbol, expr, array_pool, message, ns);
   else if(id == ID_cprover_string_constrain_characters_func)
     return add_axioms_for_constrain_characters(fresh_symbol, expr, array_pool);
+  else if(id == ID_cprover_string_concat_int_func)
+    return add_axioms_for_concat_integer(fresh_symbol, expr, array_pool, ns);
   else
   {
     std::string msg(

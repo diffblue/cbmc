@@ -204,6 +204,11 @@ std::pair<exprt, string_constraintst> add_axioms_for_concat_code_point(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
   array_poolt &array_pool);
+std::pair<exprt, string_constraintst> add_axioms_for_concat_integer(
+  symbol_generatort &fresh_symbol,
+  const function_application_exprt &f,
+  array_poolt &array_pool,
+  const namespacet &ns);
 std::pair<exprt, string_constraintst> add_axioms_for_constant(
   const array_string_exprt &res,
   irep_idt sval,
