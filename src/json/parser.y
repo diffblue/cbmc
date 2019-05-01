@@ -51,10 +51,11 @@ static std::string convert_TOK_STRING()
       {
         // Character in hexadecimal Unicode representation, in the format
         // \uABCD, i.e. the following four digits are part of this character.
-        assert(p + 4 < yyjsontext + len - 1);
+        char *last_hex_digit = p + 4;
+        assert(last_hex_digit < yyjsontext + len - 1);
         std::string hex(++p, 4);
         result += codepoint_hex_to_utf8(hex);
-        p += 3;
+        p = last_hex_digit;
         break;
       }
       default:; /* an error */
