@@ -175,6 +175,7 @@ void run_property_decider(
   "(program-only)" \
   "(show-loops)" \
   "(show-vcc)" \
+  "(show-goto-symex-steps)" \
   "(slice-formula)" \
   "(unwinding-assertions)" \
   "(no-unwinding-assertions)" \
@@ -192,6 +193,8 @@ void run_property_decider(
 #define HELP_BMC \
   " --paths [strategy]           explore paths one at a time\n" \
   " --show-symex-strategies      list strategies for use with --paths\n" \
+  " --show-goto-symex-steps      show which steps symex travels, includes " \
+  "                              diagnostic information\n" \
   " --program-only               only show program expression\n" \
   " --show-loops                 show the loops in the program\n" \
   " --depth nr                   limit search depth\n" \

@@ -118,6 +118,7 @@ void cbmc_parse_optionst::set_default_options(optionst &options)
   options.set_option("simple-slice", true);
   options.set_option("simplify", true);
   options.set_option("simplify-if", true);
+  options.set_option("show-goto-symex-steps", false);
 
   // Other default
   options.set_option("arrays-uf", "auto");
@@ -441,6 +442,9 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   {
     options.set_option("validate-goto-model", true);
   }
+
+  if(cmdline.isset("show-goto-symex-steps"))
+    options.set_option("show-goto-symex-steps", true);
 
   PARSE_OPTIONS_GOTO_TRACE(cmdline, options);
 }

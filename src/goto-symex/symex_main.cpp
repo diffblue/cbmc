@@ -26,6 +26,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/string2int.h>
 #include <util/symbol_table.h>
 
+#include <util/format.h>
+#include <util/format_expr.h>
+#include <util/format_type.h>
+#include <util/std_types.h>
+
 symex_configt::symex_configt(const optionst &options)
   : max_depth(options.get_unsigned_int_option("depth")),
     doing_path_exploration(options.is_set("paths")),
@@ -38,7 +43,8 @@ symex_configt::symex_configt(const optionst &options)
     unwinding_assertions(options.get_bool_option("unwinding-assertions")),
     partial_loops(options.get_bool_option("partial-loops")),
     debug_level(unsafe_string2int(options.get_option("debug-level"))),
-    run_validation_checks(options.get_bool_option("validate-ssa-equation"))
+    run_validation_checks(options.get_bool_option("validate-ssa-equation")),
+    show_symex_steps(options.get_bool_option("show-goto-symex-steps"))
 {
 }
 
@@ -409,17 +415,103 @@ goto_symext::get_goto_function(abstract_goto_modelt &goto_model)
   };
 }
 
+messaget::mstreamt &
+goto_symext::print_callstack_entry(const symex_targett::sourcet &source)
+{
+  log.status() << source.function_id
+               << " location number: " << source.pc->location_number;
+
+  return log.status();
+}
+
+void goto_symext::print_symex_step(statet &state)
+{
+  // If we're showing the route, begin outputting debug info, and don't print
+  // instructions we don't run.
+
+  // We also skip dead instructions as they don't add much to step-based
+  // debugging and if there's no code block at this point.
+  if(
+    !symex_config.show_symex_steps || state.guard.is_false() ||
+    state.source.pc->type == DEAD ||
+    (state.source.pc->code.is_nil() && state.source.pc->type != END_FUNCTION))
+  {
+    return;
+  }
+
+  if(state.source.pc->code.is_not_nil())
+  {
+    auto guard_expression = state.guard.as_expr();
+    std::size_t size = 0;
+    for(auto it = guard_expression.depth_begin();
+        it != guard_expression.depth_end();
+        ++it)
+    {
+      size++;
+    }
+
+    log.status() << "[Guard size: " << size << "] "
+                 << format(state.source.pc->code);
+
+    if(
+      state.source.pc->source_location.is_not_nil() &&
+      !state.source.pc->source_location.get_java_bytecode_index().empty())
+    {
+      log.status()
+        << " bytecode index: "
+        << state.source.pc->source_location.get_java_bytecode_index();
+    }
+
+    log.status() << messaget::eom;
+  }
+
+  // Print the method we're returning too.
+  const auto &call_stack = state.threads[state.source.thread_nr].call_stack;
+  if(state.source.pc->type == END_FUNCTION)
+  {
+    log.status() << messaget::eom;
+
+    if(!call_stack.empty())
+    {
+      log.status() << "Returning to: ";
+      print_callstack_entry(call_stack.back().calling_location)
+        << messaget::eom;
+    }
+
+    log.status() << messaget::eom;
+  }
+
+  // On a function call print the entire call stack.
+  if(state.source.pc->type == FUNCTION_CALL)
+  {
+    log.status() << messaget::eom;
+
+    if(!call_stack.empty())
+    {
+      log.status() << "Call stack:" << messaget::eom;
+
+      for(auto &frame : call_stack)
+      {
+        print_callstack_entry(frame.calling_location) << messaget::eom;
+      }
+
+      print_callstack_entry(state.source) << messaget::eom;
+
+      // Add the method we're about to enter with no location number.
+      log.status() << format(
+                        to_code_function_call(state.source.pc->code).function())
+                   << messaget::eom << messaget::eom;
+    }
+  }
+}
+
 /// do just one step
 void goto_symext::symex_step(
   const get_goto_functiont &get_goto_function,
   statet &state)
 {
-  #if 0
-  std::cout << "\ninstruction type is " << state.source.pc->type << '\n';
-  std::cout << "Location: " << state.source.pc->source_location << '\n';
-  std::cout << "Guard: " << format(state.guard.as_expr()) << '\n';
-  std::cout << "Code: " << format(state.source.pc->code) << '\n';
-  #endif
+  // Print debug statements if they've been enabled.
+  print_symex_step(state);
 
   PRECONDITION(!state.threads.empty());
   PRECONDITION(!state.call_stack().empty());
