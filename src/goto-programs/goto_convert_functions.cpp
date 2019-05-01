@@ -182,9 +182,8 @@ void goto_convert_functionst::convert_function(
     end_location.make_nil();
 
   goto_programt tmp_end_function;
-  goto_programt::targett end_function=tmp_end_function.add_instruction();
-  end_function->type=END_FUNCTION;
-  end_function->source_location=end_location;
+  goto_programt::targett end_function =
+    tmp_end_function.add(goto_programt::make_end_function(end_location));
 
   targets=targetst();
   targets.set_return(end_function);

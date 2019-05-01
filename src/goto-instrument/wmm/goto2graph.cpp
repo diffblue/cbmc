@@ -1245,9 +1245,7 @@ void inline instrumentert::add_instr_to_interleaving(
   }
 
   /* add this instruction to the interleaving */
-  goto_programt::targett current_instruction=interleaving.add_instruction();
-  goto_programt::instructiont new_instruction(*it);
-  current_instruction->swap(new_instruction);
+  interleaving.add(goto_programt::instructiont(*it));
 }
 
 bool instrumentert::is_cfg_spurious(const event_grapht::critical_cyclet &cyc)

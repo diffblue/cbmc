@@ -298,9 +298,8 @@ void goto_convertt::copy(
   goto_program_instruction_typet type,
   goto_programt &dest)
 {
-  goto_programt::targett t=dest.add_instruction(type);
-  t->code=code;
-  t->source_location=code.source_location();
+  dest.add(goto_programt::instructiont(
+    code, code.source_location(), type, nil_exprt(), {}));
 }
 
 void goto_convertt::convert_label(
@@ -827,9 +826,8 @@ void goto_convertt::convert_skip(
   const codet &code,
   goto_programt &dest)
 {
-  goto_programt::targett t=dest.add_instruction(SKIP);
-  t->source_location=code.source_location();
-  t->code=code;
+  dest.add(goto_programt::instructiont(
+    code, code.source_location(), SKIP, nil_exprt(), {}));
 }
 
 void goto_convertt::convert_assume(
@@ -900,7 +898,7 @@ void goto_convertt::convert_for(
 
   // do the v label
   goto_programt tmp_v;
-  goto_programt::targett v=tmp_v.add_instruction();
+  goto_programt::targett v = tmp_v.add(goto_programt::instructiont());
 
   // do the z label
   goto_programt tmp_z;
@@ -990,9 +988,10 @@ void goto_convertt::convert_while(
   // do the v label
   goto_programt::targett v=tmp_branch.instructions.begin();
 
-  // do the y label
+  // y: goto v;
   goto_programt tmp_y;
-  goto_programt::targett y=tmp_y.add_instruction();
+  goto_programt::targett y = tmp_y.add(
+    goto_programt::make_goto(v, true_exprt(), code.source_location()));
 
   // set the targets
   targets.set_break(z);
@@ -1001,9 +1000,6 @@ void goto_convertt::convert_while(
   // do the x label
   goto_programt tmp_x;
   convert(code.body(), tmp_x, mode);
-
-  // y: if(c) goto v;
-  *y = goto_programt::make_goto(v, true_exprt(), code.source_location());
 
   // loop invariant
   convert_loop_invariant(code, y, mode);
@@ -1047,7 +1043,8 @@ void goto_convertt::convert_dowhile(
 
   // do the y label
   goto_programt tmp_y;
-  goto_programt::targett y=tmp_y.add_instruction();
+  goto_programt::targett y =
+    tmp_y.add(goto_programt::make_incomplete_goto(cond, condition_location));
 
   // do the z label
   goto_programt tmp_z;
@@ -1071,7 +1068,7 @@ void goto_convertt::convert_dowhile(
   goto_programt::targett w=tmp_w.instructions.begin();
 
   // y: if(c) goto w;
-  *y = goto_programt::make_goto(w, cond, condition_location);
+  y->complete_goto(w);
 
   // loop invariant
   convert_loop_invariant(code, y, mode);
@@ -1315,9 +1312,8 @@ void goto_convertt::convert_gcc_computed_goto(
   goto_programt &dest)
 {
   // this instruction will turn into OTHER during post-processing
-  goto_programt::targett t=dest.add_instruction(NO_INSTRUCTION_TYPE);
-  t->source_location=code.source_location();
-  t->code=code;
+  goto_programt::targett t = dest.add(goto_programt::instructiont(
+    code, code.source_location(), NO_INSTRUCTION_TYPE, nil_exprt(), {}));
 
   // remember it to do this later
   targets.computed_gotos.push_back(t);
@@ -1327,10 +1323,8 @@ void goto_convertt::convert_start_thread(
   const codet &code,
   goto_programt &dest)
 {
-  goto_programt::targett start_thread=
-    dest.add_instruction(START_THREAD);
-  start_thread->source_location=code.source_location();
-  start_thread->code=code;
+  goto_programt::targett start_thread = dest.add(goto_programt::instructiont(
+    code, code.source_location(), START_THREAD, nil_exprt(), {}));
 
   // remember it to do target later
   targets.gotos.emplace_back(
@@ -1543,7 +1537,8 @@ void goto_convertt::generate_ifthenelse(
 
   // do the x label
   goto_programt tmp_x;
-  goto_programt::targett x=tmp_x.add_instruction();
+  goto_programt::targett x =
+    tmp_x.add(goto_programt::make_incomplete_goto(true_exprt()));
 
   // do the z label
   goto_programt tmp_z;
@@ -1571,8 +1566,8 @@ void goto_convertt::generate_ifthenelse(
 
   // x: goto z;
   CHECK_RETURN(!tmp_w.instructions.empty());
-  *x = goto_programt::make_goto(
-    z, true_exprt(), tmp_w.instructions.back().source_location);
+  x->complete_goto(z);
+  x->source_location = tmp_w.instructions.back().source_location;
 
   dest.destructive_append(tmp_v);
   dest.destructive_append(tmp_w);
@@ -1894,13 +1889,21 @@ void goto_convertt::generate_thread_block(
   goto_programt::targett c = body.add(goto_programt::make_skip());
   convert(thread_body, body, mode);
 
-  goto_programt::targett e=postamble.add_instruction(END_THREAD);
+  goto_programt::targett e = postamble.add(goto_programt::instructiont(
+    static_cast<const codet &>(get_nil_irep()),
+    thread_body.source_location(),
+    END_THREAD,
+    nil_exprt(),
+    {}));
   e->source_location=thread_body.source_location();
   goto_programt::targett z = postamble.add(goto_programt::make_skip());
 
-  goto_programt::targett a=preamble.add_instruction(START_THREAD);
-  a->source_location=thread_body.source_location();
-  a->targets.push_back(c);
+  preamble.add(goto_programt::instructiont(
+    static_cast<const codet &>(get_nil_irep()),
+    thread_body.source_location(),
+    START_THREAD,
+    nil_exprt(),
+    {c}));
   preamble.add(goto_programt::make_goto(z, thread_body.source_location()));
 
   dest.destructive_append(preamble);

@@ -48,8 +48,9 @@ void goto_unwindt::copy_segment(
 
   for(goto_programt::const_targett t=start; t!=end; t++)
   {
-    goto_programt::targett t_new=goto_program.add_instruction();
-    *t_new=*t;
+    // copy the instruction
+    goto_programt::targett t_new =
+      goto_program.add(goto_programt::instructiont(*t));
     unwind_log.insert(t_new, t->location_number);
     target_vector.push_back(t_new); // store copied instruction
   }
