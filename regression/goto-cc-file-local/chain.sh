@@ -4,6 +4,8 @@
 #
 # Author: Kareem Khazem <karkhaz@karkhaz.com>
 
+set -e
+
 is_in()
 {
   [[ "$2" =~ $1 ]] && return 0 || return 1
@@ -81,6 +83,7 @@ done
 
 if is_in final-link "$ALL_ARGS"; then
   OUT_FILE=final-link.gb
+  rm -f ${OUT_FILE}
   if [[ "${is_windows}" == "true" ]]; then
     "${goto_cc}"                        \
         --export-function-local-symbols \
