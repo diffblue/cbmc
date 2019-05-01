@@ -737,6 +737,8 @@ void remove_virtual_functionst::operator()(goto_functionst &functions)
 
 /// Remove virtual function calls from all functions in the specified
 /// list and replace them with their most derived implementations
+/// \param symbol_table: symbol table associated with \p goto_functions
+/// \param goto_functions: functions from which to remove virtual function calls
 void remove_virtual_functions(
   symbol_table_baset &symbol_table,
   goto_functionst &goto_functions)
@@ -747,18 +749,67 @@ void remove_virtual_functions(
   rvf(goto_functions);
 }
 
+/// Remove virtual function calls from all functions in the specified
+/// list and replace them with their most derived implementations
+/// \param symbol_table: symbol table associated with \p goto_functions
+/// \param goto_functions: functions from which to remove virtual function calls
+/// \param class_hierarchy: class hierarchy derived from symbol_table
+///   This should already be populated (i.e. class_hierarchyt::operator() has
+///   already been called)
+void remove_virtual_functions(
+  symbol_table_baset &symbol_table,
+  goto_functionst &goto_functions,
+  const class_hierarchyt &class_hierarchy)
+{
+  remove_virtual_functionst rvf(symbol_table, class_hierarchy);
+  rvf(goto_functions);
+}
+
 /// Remove virtual function calls from the specified model
+/// \param goto_model: model from which to remove virtual functions
 void remove_virtual_functions(goto_modelt &goto_model)
 {
   remove_virtual_functions(
     goto_model.symbol_table, goto_model.goto_functions);
 }
 
+/// Remove virtual function calls from the specified model
+/// \param goto_model: model from which to remove virtual functions
+/// \param class_hierarchy: class hierarchy derived from model.symbol_table
+///   This should already be populated (i.e. class_hierarchyt::operator() has
+///   already been called)
+void remove_virtual_functions(
+  goto_modelt &goto_model,
+  const class_hierarchyt &class_hierarchy)
+{
+  remove_virtual_functions(
+    goto_model.symbol_table, goto_model.goto_functions, class_hierarchy);
+}
+
 /// Remove virtual function calls from the specified model function
+/// May change the location numbers in `function`.
+/// \param function: function from which virtual functions should be converted
+///   to explicit dispatch tables.
 void remove_virtual_functions(goto_model_functiont &function)
 {
   class_hierarchyt class_hierarchy;
   class_hierarchy(function.get_symbol_table());
+  remove_virtual_functionst rvf(function.get_symbol_table(), class_hierarchy);
+  rvf.remove_virtual_functions(
+    function.get_function_id(), function.get_goto_function().body);
+}
+
+/// Remove virtual function calls from the specified model function
+/// May change the location numbers in `function`.
+/// \param function: function from which virtual functions should be converted
+///   to explicit dispatch tables.
+/// \param class_hierarchy: class hierarchy derived from function.symbol_table
+///   This should already be populated (i.e. class_hierarchyt::operator() has
+///   already been called)
+void remove_virtual_functions(
+  goto_model_functiont &function,
+  const class_hierarchyt &class_hierarchy)
+{
   remove_virtual_functionst rvf(function.get_symbol_table(), class_hierarchy);
   rvf.remove_virtual_functions(
     function.get_function_id(), function.get_goto_function().body);
