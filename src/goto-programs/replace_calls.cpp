@@ -106,7 +106,7 @@ void replace_callst::operator()(
         const exprt &rhs = ca.rhs();
 
         INVARIANT(
-          rhs != return_value_symbol(id, ns),
+          rhs != return_value_symbol(to_code_type(f_it1->second.type)),
           "returns must not be removed before replacing calls");
       }
     }

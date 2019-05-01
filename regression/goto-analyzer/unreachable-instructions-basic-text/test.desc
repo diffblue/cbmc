@@ -5,7 +5,7 @@ unreachable.c
 ^SIGNAL=0$
 not_called
 // 28 file unreachable.c line 5 function not_called$
-not_called#return_value = x \+ x;$
+signedbv32#return_value = x \+ x;$
 // 29 file unreachable.c line 5 function not_called$
 GOTO 1$
 dead_inside

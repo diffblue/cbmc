@@ -154,7 +154,7 @@ void load_and_test_method(
   // Then test both situations.
   THEN("Replace nondet should work after remove returns has been called.")
   {
-    remove_returns(model_function, [](const irep_idt &) { return false; });
+    remove_returns(model_function);
 
     replace_java_nondet(model_function);
 
@@ -165,7 +165,7 @@ void load_and_test_method(
   {
     replace_java_nondet(model_function);
 
-    remove_returns(model_function, [](const irep_idt &) { return false; });
+    remove_returns(model_function);
 
     validate_nondet_method_removed(goto_function.body.instructions);
   }
@@ -176,7 +176,7 @@ void load_and_test_method(
     "Replace and convert nondet should work after remove returns has been "
     "called.")
   {
-    remove_returns(model_function, [](const irep_idt &) { return false; });
+    remove_returns(model_function);
 
     replace_java_nondet(model_function);
 
@@ -193,7 +193,7 @@ void load_and_test_method(
 
     convert_nondet(model_function, null_message_handler, params, ID_java);
 
-    remove_returns(model_function, [](const irep_idt &) { return false; });
+    remove_returns(model_function);
 
     validate_nondets_converted(goto_function.body.instructions);
   }

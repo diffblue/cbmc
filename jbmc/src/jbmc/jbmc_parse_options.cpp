@@ -786,12 +786,7 @@ void jbmc_parse_optionst::process_goto_function(
   // Java virtual functions -> explicit dispatch tables:
   remove_virtual_functions(function, *class_hierarchy);
 
-  auto function_is_stub = [&symbol_table, &model](const irep_idt &id) {
-    return symbol_table.lookup_ref(id).value.is_nil() &&
-           !model.can_produce_function(id);
-  };
-
-  remove_returns(function, function_is_stub);
+  remove_returns(function);
 
   replace_java_nondet(function);
 

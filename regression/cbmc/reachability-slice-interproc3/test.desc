@@ -3,6 +3,6 @@ main.c
 --reachability-slice-fb --show-goto-functions
 ^EXIT=0$
 ^SIGNAL=0$
-main#return_value = 1;
+signedbv32#return_value = 1;
 --
 ^warning: ignoring

@@ -33,7 +33,7 @@ TEST_CASE("Return-value removal", "[core][goto-programs][remove_returns]")
   REQUIRE(is_return_value_symbol(a_rv_symbol));
   REQUIRE(is_return_value_identifier(a_rv_symbol.get_identifier()));
 
-  irep_idt a_rv_id = return_value_identifier("a");
+  irep_idt a_rv_id = return_value_identifier("a", ns);
 
   REQUIRE(is_return_value_identifier(a_rv_id));
 
