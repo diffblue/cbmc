@@ -19,6 +19,8 @@ Date:   September 2009
 
 #include "remove_skip.h"
 
+#define RETURN_VALUE_SUFFIX "#return_value"
+
 class remove_returnst
 {
 public:
@@ -61,7 +63,8 @@ protected:
 optionalt<symbol_exprt>
 remove_returnst::get_or_create_return_value_symbol(const irep_idt &function_id)
 {
-  const irep_idt symbol_name = id2string(function_id) + RETURN_VALUE_SUFFIX;
+  const namespacet ns(symbol_table);
+  const irep_idt symbol_name = return_value_identifier(function_id, ns);
   const symbolt *existing_symbol = symbol_table.lookup(symbol_name);
   if(existing_symbol != nullptr)
     return existing_symbol->symbol_expr();
@@ -292,7 +295,8 @@ bool remove_returnst::restore_returns(
   const irep_idt function_id=f_it->first;
 
   // do we have X#return_value?
-  std::string rv_name=id2string(function_id)+RETURN_VALUE_SUFFIX;
+  const namespacet ns(symbol_table);
+  auto rv_name = return_value_identifier(function_id, ns);
 
   symbol_tablet::symbolst::const_iterator rv_it=
     symbol_table.symbols.find(rv_name);
@@ -367,7 +371,7 @@ void remove_returnst::undo_function_calls(
       if(assign.rhs().id()!=ID_symbol)
         continue;
 
-      irep_idt rv_name=id2string(function_id)+RETURN_VALUE_SUFFIX;
+      irep_idt rv_name = return_value_identifier(function_id, ns);
       const symbol_exprt &rhs=to_symbol_expr(assign.rhs());
       if(rhs.get_identifier()!=rv_name)
         continue;
@@ -408,4 +412,9 @@ void restore_returns(goto_modelt &goto_model)
 {
   remove_returnst rr(goto_model.symbol_table);
   rr.restore(goto_model.goto_functions);
+}
+
+irep_idt return_value_identifier(const irep_idt &identifier, const namespacet &)
+{
+  return id2string(identifier) + RETURN_VALUE_SUFFIX;
 }
