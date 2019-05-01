@@ -76,13 +76,6 @@ public:
     const irep_idt &function_id,
     goto_programt &goto_program);
 
-  goto_programt::targett remove_virtual_function(
-    const irep_idt &function_id,
-    goto_programt &goto_program,
-    goto_programt::targett target,
-    const dispatch_table_entriest &functions,
-    virtual_dispatch_fallback_actiont fallback_action);
-
 private:
   const class_hierarchyt &class_hierarchy;
   symbol_table_baset &symbol_table;
@@ -93,42 +86,6 @@ private:
     goto_programt &goto_program,
     goto_programt::targett target);
 };
-
-/// Replace specified virtual function call with a static call to its
-/// most derived implementation
-/// \param function_id: The identifier of the function we are currently
-///   analysing
-/// \param [in,out] goto_program: GOTO program to modify
-/// \param target: iterator to a function in the supplied GOTO program
-///   to replace. Must point to a virtual function call.
-/// \return Returns a pointer to the statement in the supplied GOTO
-///   program after replaced function call
-goto_programt::targett remove_virtual_functionst::remove_virtual_function(
-  const irep_idt &function_id,
-  goto_programt &goto_program,
-  goto_programt::targett target)
-{
-  const code_function_callt &code = target->get_function_call();
-
-  const exprt &function=code.function();
-  INVARIANT(
-    function.id()==ID_virtual_function,
-    "remove_virtual_function must take a virtual function call instruction");
-  INVARIANT(
-    !code.arguments().empty(),
-    "virtual function calls must have at least a this-argument");
-
-  get_virtual_calleest get_callees(symbol_table, class_hierarchy);
-  dispatch_table_entriest functions;
-  get_callees.get_functions(function, functions);
-
-  return remove_virtual_function(
-    function_id,
-    goto_program,
-    target,
-    functions,
-    virtual_dispatch_fallback_actiont::CALL_LAST_FUNCTION);
-}
 
 /// Create a concrete function call to replace a virtual one
 /// \param [in,out] call: the function call to update
@@ -285,6 +242,7 @@ static void process_this_argument(
 /// implementation. If there's a type mismatch between implementation
 /// and the instance type or if fallback_action is set to
 /// ASSUME_FALSE, then function is substituted with a call to ASSUME(false)
+/// \param symbol_table: Symbol table associated with \p goto_program
 /// \param function_id: The identifier of the function we are currently
 ///   analysing
 /// \param [in,out] goto_program: GOTO program to modify
@@ -297,7 +255,8 @@ static void process_this_argument(
 ///   with the most derived matching call
 /// \return Returns a pointer to the statement in the supplied GOTO
 ///   program after replaced function call
-goto_programt::targett remove_virtual_functionst::remove_virtual_function(
+static goto_programt::targett replace_virtual_function_with_dispatch_table(
+  symbol_table_baset &symbol_table,
   const irep_idt &function_id,
   goto_programt &goto_program,
   goto_programt::targett target,
@@ -308,6 +267,7 @@ goto_programt::targett remove_virtual_functionst::remove_virtual_function(
     target->is_function_call(),
     "remove_virtual_function must target a FUNCTION_CALL instruction");
 
+  namespacet ns(symbol_table);
   goto_programt::targett next_target = std::next(target);
 
   if(functions.empty())
@@ -497,6 +457,43 @@ goto_programt::targett remove_virtual_functionst::remove_virtual_function(
   remove_skip(goto_program, target, next_target);
 
   return next_target;
+}
+
+/// Replace specified virtual function call with a static call to its
+/// most derived implementation
+/// \param function_id: The identifier of the function we are currently
+///   analysing
+/// \param [in,out] goto_program: GOTO program to modify
+/// \param target: iterator to a function in the supplied GOTO program
+///   to replace. Must point to a virtual function call.
+/// \return Returns a pointer to the statement in the supplied GOTO
+///   program after replaced function call
+goto_programt::targett remove_virtual_functionst::remove_virtual_function(
+  const irep_idt &function_id,
+  goto_programt &goto_program,
+  goto_programt::targett target)
+{
+  const code_function_callt &code = target->get_function_call();
+
+  const exprt &function = code.function();
+  INVARIANT(
+    function.id() == ID_virtual_function,
+    "remove_virtual_function must take a virtual function call instruction");
+  INVARIANT(
+    !code.arguments().empty(),
+    "virtual function calls must have at least a this-argument");
+
+  get_virtual_calleest get_callees(symbol_table, class_hierarchy);
+  dispatch_table_entriest functions;
+  get_callees.get_functions(function, functions);
+
+  return replace_virtual_function_with_dispatch_table(
+    symbol_table,
+    function_id,
+    goto_program,
+    target,
+    functions,
+    virtual_dispatch_fallback_actiont::CALL_LAST_FUNCTION);
 }
 
 /// Used by get_functions to track the most-derived parent that provides an
@@ -740,6 +737,8 @@ void remove_virtual_functionst::operator()(goto_functionst &functions)
 
 /// Remove virtual function calls from all functions in the specified
 /// list and replace them with their most derived implementations
+/// \param symbol_table: symbol table associated with \p goto_functions
+/// \param goto_functions: functions from which to remove virtual function calls
 void remove_virtual_functions(
   symbol_table_baset &symbol_table,
   goto_functionst &goto_functions)
@@ -750,18 +749,67 @@ void remove_virtual_functions(
   rvf(goto_functions);
 }
 
+/// Remove virtual function calls from all functions in the specified
+/// list and replace them with their most derived implementations
+/// \param symbol_table: symbol table associated with \p goto_functions
+/// \param goto_functions: functions from which to remove virtual function calls
+/// \param class_hierarchy: class hierarchy derived from symbol_table
+///   This should already be populated (i.e. class_hierarchyt::operator() has
+///   already been called)
+void remove_virtual_functions(
+  symbol_table_baset &symbol_table,
+  goto_functionst &goto_functions,
+  const class_hierarchyt &class_hierarchy)
+{
+  remove_virtual_functionst rvf(symbol_table, class_hierarchy);
+  rvf(goto_functions);
+}
+
 /// Remove virtual function calls from the specified model
+/// \param goto_model: model from which to remove virtual functions
 void remove_virtual_functions(goto_modelt &goto_model)
 {
   remove_virtual_functions(
     goto_model.symbol_table, goto_model.goto_functions);
 }
 
+/// Remove virtual function calls from the specified model
+/// \param goto_model: model from which to remove virtual functions
+/// \param class_hierarchy: class hierarchy derived from model.symbol_table
+///   This should already be populated (i.e. class_hierarchyt::operator() has
+///   already been called)
+void remove_virtual_functions(
+  goto_modelt &goto_model,
+  const class_hierarchyt &class_hierarchy)
+{
+  remove_virtual_functions(
+    goto_model.symbol_table, goto_model.goto_functions, class_hierarchy);
+}
+
 /// Remove virtual function calls from the specified model function
+/// May change the location numbers in `function`.
+/// \param function: function from which virtual functions should be converted
+///   to explicit dispatch tables.
 void remove_virtual_functions(goto_model_functiont &function)
 {
   class_hierarchyt class_hierarchy;
   class_hierarchy(function.get_symbol_table());
+  remove_virtual_functionst rvf(function.get_symbol_table(), class_hierarchy);
+  rvf.remove_virtual_functions(
+    function.get_function_id(), function.get_goto_function().body);
+}
+
+/// Remove virtual function calls from the specified model function
+/// May change the location numbers in `function`.
+/// \param function: function from which virtual functions should be converted
+///   to explicit dispatch tables.
+/// \param class_hierarchy: class hierarchy derived from function.symbol_table
+///   This should already be populated (i.e. class_hierarchyt::operator() has
+///   already been called)
+void remove_virtual_functions(
+  goto_model_functiont &function,
+  const class_hierarchyt &class_hierarchy)
+{
   remove_virtual_functionst rvf(function.get_symbol_table(), class_hierarchy);
   rvf.remove_virtual_functions(
     function.get_function_id(), function.get_goto_function().body);
@@ -793,12 +841,13 @@ goto_programt::targett remove_virtual_function(
   const dispatch_table_entriest &dispatch_table,
   virtual_dispatch_fallback_actiont fallback_action)
 {
-  class_hierarchyt class_hierarchy;
-  class_hierarchy(symbol_table);
-  remove_virtual_functionst rvf(symbol_table, class_hierarchy);
-
-  goto_programt::targett next = rvf.remove_virtual_function(
-    function_id, goto_program, instruction, dispatch_table, fallback_action);
+  goto_programt::targett next = replace_virtual_function_with_dispatch_table(
+    symbol_table,
+    function_id,
+    goto_program,
+    instruction,
+    dispatch_table,
+    fallback_action);
 
   goto_program.update();
 

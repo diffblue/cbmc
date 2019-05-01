@@ -753,7 +753,7 @@ void jbmc_parse_optionst::process_goto_function(
     *class_hierarchy,
     ui_message_handler);
   // Java virtual functions -> explicit dispatch tables:
-  remove_virtual_functions(function);
+  remove_virtual_functions(function, *class_hierarchy);
 
   auto function_is_stub = [&symbol_table, &model](const irep_idt &id) {
     return symbol_table.lookup_ref(id).value.is_nil() &&

@@ -26,18 +26,31 @@ class goto_model_functiont;
 class goto_modelt;
 class symbol_table_baset;
 
+// For all of the following the class-hierarchy and non-class-hierarchy
+// overloads are equivalent, but the class-hierarchy-taking one saves time if
+// you already have a class-hierarchy object available.
+
 void remove_virtual_functions(
   goto_modelt &goto_model);
+
+void remove_virtual_functions(
+  goto_modelt &goto_model,
+  const class_hierarchyt &class_hierarchy);
 
 void remove_virtual_functions(
   symbol_table_baset &symbol_table,
   goto_functionst &goto_functions);
 
-/// Remove virtual functions from one function.
-/// May change the location numbers in `function`.
-/// \param function: function from which virtual functions should be converted
-///   to explicit dispatch tables.
+void remove_virtual_functions(
+  symbol_table_baset &symbol_table,
+  goto_functionst &goto_functions,
+  const class_hierarchyt &class_hierarchy);
+
 void remove_virtual_functions(goto_model_functiont &function);
+
+void remove_virtual_functions(
+  goto_model_functiont &function,
+  const class_hierarchyt &class_hierarchy);
 
 /// Specifies remove_virtual_function's behaviour when the actual supplied
 /// parameter does not match any of the possible callee types
