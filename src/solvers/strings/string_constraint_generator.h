@@ -71,13 +71,6 @@ public:
   make_array_pointer_association(const function_application_exprt &expr);
 
 private:
-  /// Add axioms corresponding to the String.intern java function
-  /// \todo This does not work at the moment because of the way we treat
-  /// string pointers.
-  /// \deprecated Not tested.
-  std::pair<symbol_exprt, string_constraintst>
-  add_axioms_for_intern(const function_application_exprt &f);
-
   exprt associate_array_to_pointer(const function_application_exprt &f);
 
   exprt associate_length_to_array(const function_application_exprt &f);
@@ -95,9 +88,6 @@ private:
   // To each string on which hash_code was called we associate a symbol
   // representing the return value of the hash_code function.
   std::map<array_string_exprt, exprt> hash_code_of_string;
-
-  // Pool used for the intern method
-  std::map<array_string_exprt, symbol_exprt> intern_of_string;
 };
 
 // Type used by primitives to signal errors
