@@ -18,7 +18,26 @@ Author: Daniel Kroening, kroening@kroening.com
 void unwindsett::parse_unwind(const std::string &unwind)
 {
   if(!unwind.empty())
-    global_limit = unsafe_string2unsigned(unwind);
+  {
+    global_iteration_limit = unsafe_string2unsigned(unwind);
+    global_recursion_limit = global_iteration_limit;
+  }
+}
+
+void unwindsett::parse_unwind_loops(const std::string &unwind)
+{
+  if(!unwind.empty())
+  {
+    global_iteration_limit = unsafe_string2unsigned(unwind);
+  }
+}
+
+void unwindsett::parse_unwind_recursion(const std::string &unwind)
+{
+  if(!unwind.empty())
+  {
+    global_recursion_limit = unsafe_string2unsigned(unwind);
+  }
 }
 
 void unwindsett::parse_unwindset(const std::string &unwindset)
@@ -60,26 +79,28 @@ void unwindsett::parse_unwindset(const std::string &unwindset)
   }
 }
 
-optionalt<unsigned>
-unwindsett::get_limit(const irep_idt &loop_id, unsigned thread_nr) const
+optionalt<unsigned> unwindsett::get_limit(
+  const irep_idt &loop_id,
+  unsigned thread_nr,
+  bool is_iteration) const
 {
   // We use the most specific limit we have
 
-  // thread x loop
+  // thread x loop or function
   auto tl_it =
     thread_loop_map.find(std::pair<irep_idt, unsigned>(loop_id, thread_nr));
 
   if(tl_it != thread_loop_map.end())
     return tl_it->second;
 
-  // loop
+  // loop or function
   auto l_it = loop_map.find(loop_id);
 
   if(l_it != loop_map.end())
     return l_it->second;
 
   // global, if any
-  return global_limit;
+  return is_iteration ? global_iteration_limit : global_recursion_limit;
 }
 
 void unwindsett::parse_unwindset_file(const std::string &file_name)

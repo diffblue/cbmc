@@ -1,0 +1,7 @@
+CORE
+Test.class
+--unwind-loops 3 --unwind-recursion 5
+Not unwinding loop java::Test\.main:\(\[Ljava/lang/String;\)V\.0 iteration 3
+Not unwinding recursion Test\.recurse_down_from\(int\) iteration 6
+^EXIT=0$
+^SIGNAL=0$

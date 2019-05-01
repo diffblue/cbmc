@@ -175,6 +175,15 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
   if(cmdline.isset("unwind"))
     options.set_option("unwind", cmdline.get_value("unwind"));
 
+  if(cmdline.isset("unwind-loops"))
+    options.set_option("unwind-loops", cmdline.get_value("unwind-loops"));
+
+  if(cmdline.isset("unwind-recursion"))
+  {
+    options.set_option(
+      "unwind-recursion", cmdline.get_value("unwind-recursion"));
+  }
+
   if(cmdline.isset("depth"))
     options.set_option("depth", cmdline.get_value("depth"));
 

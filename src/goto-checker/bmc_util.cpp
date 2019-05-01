@@ -192,6 +192,9 @@ void setup_symex(
   symex.last_source_location.make_nil();
 
   symex.unwindset.parse_unwind(options.get_option("unwind"));
+  symex.unwindset.parse_unwind_loops(options.get_option("unwind-loops"));
+  symex.unwindset.parse_unwind_recursion(
+    options.get_option("unwind-recursion"));
   symex.unwindset.parse_unwindset(options.get_option("unwindset"));
 }
 

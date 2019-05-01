@@ -135,7 +135,7 @@ bool symex_bmct::should_stop_unwind(
   // / --unwind options to decide:
   if(abort_unwind_decision.is_unknown())
   {
-    auto limit = unwindset.get_limit(id, source.thread_nr);
+    auto limit = unwindset.get_limit(id, source.thread_nr, true);
 
     if(!limit.has_value())
       abort_unwind_decision = tvt(false);
@@ -178,7 +178,7 @@ bool symex_bmct::get_unwind_recursion(
   // / --unwind options to decide:
   if(abort_unwind_decision.is_unknown())
   {
-    auto limit = unwindset.get_limit(id, thread_nr);
+    auto limit = unwindset.get_limit(id, thread_nr, false);
 
     if(!limit.has_value())
       abort_unwind_decision = tvt(false);
