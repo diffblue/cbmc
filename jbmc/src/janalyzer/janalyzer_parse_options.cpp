@@ -410,7 +410,9 @@ int janalyzer_parse_optionst::perform_analysis(const optionst &options)
     }
     else
     {
-      std::string json_file = cmdline.get_value("json");
+      optionalt<std::string> json_file;
+      if(cmdline.isset("json"))
+        json_file = cmdline.get_value("json");
       bool result = taint_analysis(
         goto_model, taint_file, ui_message_handler, false, json_file);
       return result ? CPROVER_EXIT_VERIFICATION_UNSAFE : CPROVER_EXIT_SUCCESS;
