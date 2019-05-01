@@ -76,13 +76,6 @@ public:
     const irep_idt &function_id,
     goto_programt &goto_program);
 
-  goto_programt::targett remove_virtual_function(
-    const irep_idt &function_id,
-    goto_programt &goto_program,
-    goto_programt::targett target,
-    const dispatch_table_entriest &functions,
-    virtual_dispatch_fallback_actiont fallback_action);
-
 private:
   const class_hierarchyt &class_hierarchy;
   symbol_table_baset &symbol_table;
@@ -249,6 +242,7 @@ static void process_this_argument(
 /// implementation. If there's a type mismatch between implementation
 /// and the instance type or if fallback_action is set to
 /// ASSUME_FALSE, then function is substituted with a call to ASSUME(false)
+/// \param symbol_table: Symbol table associated with \p goto_program
 /// \param function_id: The identifier of the function we are currently
 ///   analysing
 /// \param [in,out] goto_program: GOTO program to modify
@@ -261,7 +255,8 @@ static void process_this_argument(
 ///   with the most derived matching call
 /// \return Returns a pointer to the statement in the supplied GOTO
 ///   program after replaced function call
-goto_programt::targett remove_virtual_functionst::remove_virtual_function(
+static goto_programt::targett replace_virtual_function_with_dispatch_table(
+  symbol_table_baset &symbol_table,
   const irep_idt &function_id,
   goto_programt &goto_program,
   goto_programt::targett target,
@@ -272,6 +267,7 @@ goto_programt::targett remove_virtual_functionst::remove_virtual_function(
     target->is_function_call(),
     "remove_virtual_function must target a FUNCTION_CALL instruction");
 
+  namespacet ns(symbol_table);
   goto_programt::targett next_target = std::next(target);
 
   if(functions.empty())
@@ -491,7 +487,8 @@ goto_programt::targett remove_virtual_functionst::remove_virtual_function(
   dispatch_table_entriest functions;
   get_callees.get_functions(function, functions);
 
-  return remove_virtual_function(
+  return replace_virtual_function_with_dispatch_table(
+    symbol_table,
     function_id,
     goto_program,
     target,
@@ -793,12 +790,13 @@ goto_programt::targett remove_virtual_function(
   const dispatch_table_entriest &dispatch_table,
   virtual_dispatch_fallback_actiont fallback_action)
 {
-  class_hierarchyt class_hierarchy;
-  class_hierarchy(symbol_table);
-  remove_virtual_functionst rvf(symbol_table, class_hierarchy);
-
-  goto_programt::targett next = rvf.remove_virtual_function(
-    function_id, goto_program, instruction, dispatch_table, fallback_action);
+  goto_programt::targett next = replace_virtual_function_with_dispatch_table(
+    symbol_table,
+    function_id,
+    goto_program,
+    instruction,
+    dispatch_table,
+    fallback_action);
 
   goto_program.update();
 
