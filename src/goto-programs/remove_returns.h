@@ -75,12 +75,11 @@ Date:   September 2009
 
 #include <util/std_types.h>
 
-#define RETURN_VALUE_SUFFIX "#return_value"
-
 class goto_functionst;
 class goto_model_functiont;
 class goto_modelt;
 class symbol_table_baset;
+class namespacet;
 
 void remove_returns(symbol_table_baset &, goto_functionst &);
 
@@ -94,5 +93,9 @@ void remove_returns(goto_modelt &);
 void restore_returns(symbol_table_baset &, goto_functionst &);
 
 void restore_returns(goto_modelt &);
+
+/// produces the identifier that is used to store the return
+/// value of the function with the given identifier
+irep_idt return_value_identifier(const irep_idt &, const namespacet &);
 
 #endif // CPROVER_GOTO_PROGRAMS_REMOVE_RETURNS_H
