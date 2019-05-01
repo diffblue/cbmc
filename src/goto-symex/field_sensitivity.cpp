@@ -18,37 +18,37 @@ Author: Michael Tautschnig
 
 // #define ENABLE_ARRAY_FIELD_SENSITIVITY
 
-void field_sensitivityt::apply(
+exprt field_sensitivityt::apply(
   const namespacet &ns,
   goto_symex_statet &state,
-  exprt &expr,
+  exprt expr,
   bool write) const
 {
   if(!run_apply)
-    return;
+    return expr;
 
   if(expr.id() != ID_address_of)
   {
     Forall_operands(it, expr)
-      apply(ns, state, *it, write);
+      *it = apply(ns, state, std::move(*it), write);
   }
 
   if(expr.id() == ID_symbol && expr.get_bool(ID_C_SSA_symbol) && !write)
   {
-    expr = get_fields(ns, state, to_ssa_expr(expr));
+    return get_fields(ns, state, to_ssa_expr(expr));
   }
   else if(
     !write && expr.id() == ID_member &&
     to_member_expr(expr).struct_op().id() == ID_struct)
   {
-    simplify(expr, ns);
+    return simplify_expr(std::move(expr), ns);
   }
 #ifdef ENABLE_ARRAY_FIELD_SENSITIVITY
   else if(
     !write && expr.id() == ID_index &&
     to_index_expr(expr).array().id() == ID_array)
   {
-    simplify(expr, ns);
+    return simplify_expr(std::move(expr), ns);
   }
 #endif // ENABLE_ARRAY_FIELD_SENSITIVITY
   else if(expr.id() == ID_member)
@@ -73,9 +73,9 @@ void field_sensitivityt::apply(
       member.struct_op() = tmp.get_original_expr();
       tmp.set_expression(member);
       if(was_l2)
-        expr = state.rename(tmp, ns).get();
+        return state.rename(std::move(tmp), ns).get();
       else
-        expr.swap(tmp);
+        return std::move(tmp);
     }
   }
 #ifdef ENABLE_ARRAY_FIELD_SENSITIVITY
@@ -102,12 +102,13 @@ void field_sensitivityt::apply(
       index.array() = tmp.get_original_expr();
       tmp.set_expression(index);
       if(was_l2)
-        expr = state.rename(tmp, ns).get();
+        return state.rename(std::move(tmp), ns).get();
       else
-        expr.swap(tmp);
+        return std::move(tmp);
     }
   }
 #endif // ENABLE_ARRAY_FIELD_SENSITIVITY
+  return expr;
 }
 
 exprt field_sensitivityt::get_fields(
@@ -187,8 +188,7 @@ void field_sensitivityt::field_assignments(
   symex_targett &target,
   bool allow_pointer_unsoundness)
 {
-  exprt lhs_fs = lhs;
-  apply(ns, state, lhs_fs, false);
+  const exprt lhs_fs = apply(ns, state, lhs, false);
 
   bool run_apply_bak = run_apply;
   run_apply = false;

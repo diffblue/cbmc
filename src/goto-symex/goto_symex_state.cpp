@@ -337,7 +337,7 @@ goto_symex_statet::rename(exprt expr, const namespacet &ns)
       "if_exprt");
 
     if(level == L2)
-      field_sensitivity.apply(ns, *this, expr, false);
+      expr = field_sensitivity.apply(ns, *this, std::move(expr), false);
 
     return renamedt<exprt, level>{std::move(expr)};
   }
