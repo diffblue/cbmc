@@ -269,48 +269,77 @@ void local_bitvector_analysist::build()
     switch(instruction.type)
     {
     case ASSIGN:
-      {
-        const code_assignt &code_assign=to_code_assign(instruction.code);
-        assign_lhs(
-          code_assign.lhs(), code_assign.rhs(), loc_info_src, loc_info_dest);
-      }
+    {
+      const code_assignt &code_assign = to_code_assign(instruction.code);
+      assign_lhs(
+        code_assign.lhs(), code_assign.rhs(), loc_info_src, loc_info_dest);
       break;
+    }
 
     case DECL:
-      {
-        const code_declt &code_decl=to_code_decl(instruction.code);
-        assign_lhs(
-          code_decl.symbol(),
-          exprt(ID_uninitialized),
-          loc_info_src,
-          loc_info_dest);
-      }
+    {
+      const code_declt &code_decl = to_code_decl(instruction.code);
+      assign_lhs(
+        code_decl.symbol(),
+        exprt(ID_uninitialized),
+        loc_info_src,
+        loc_info_dest);
       break;
+    }
 
     case DEAD:
-      {
-        const code_deadt &code_dead=to_code_dead(instruction.code);
-        assign_lhs(
-          code_dead.symbol(),
-          exprt(ID_uninitialized),
-          loc_info_src,
-          loc_info_dest);
-      }
+    {
+      const code_deadt &code_dead = to_code_dead(instruction.code);
+      assign_lhs(
+        code_dead.symbol(),
+        exprt(ID_uninitialized),
+        loc_info_src,
+        loc_info_dest);
       break;
+    }
 
     case FUNCTION_CALL:
-      {
-        const code_function_callt &code_function_call=
-          to_code_function_call(instruction.code);
-        if(code_function_call.lhs().is_not_nil())
-          assign_lhs(
-            code_function_call.lhs(), nil_exprt(), loc_info_src, loc_info_dest);
-      }
+    {
+      const code_function_callt &code_function_call =
+        to_code_function_call(instruction.code);
+      if(code_function_call.lhs().is_not_nil())
+        assign_lhs(
+          code_function_call.lhs(), nil_exprt(), loc_info_src, loc_info_dest);
       break;
+    }
 
-    default:
-      {
-      }
+    case CATCH:
+    case THROW:
+#if 0
+      DATA_INVARIANT(false, "Exceptions must be removed before analysis");
+      break;
+#endif
+    case RETURN:
+#if 0
+      DATA_INVARIANT(false, "Returns must be removed before analysis");
+      break;
+#endif
+    case ATOMIC_BEGIN: // Ignoring is a valid over-approximation
+    case ATOMIC_END:   // Ignoring is a valid over-approximation
+    case LOCATION:     // No action required
+    case START_THREAD: // Require a concurrent analysis at higher level
+    case END_THREAD:   // Require a concurrent analysis at higher level
+    case SKIP:         // No action required
+    case ASSERT:       // No action required
+    case ASSUME:       // Ignoring is a valid over-approximation
+    case GOTO:         // Ignoring the guard is a valid over-approximation
+    case END_FUNCTION: // No action required
+      break;
+    case OTHER:
+#if 0
+      DATA_INVARIANT(
+        false, "Unclear what is a safe over-approximation of OTHER");
+#endif
+      break;
+    case INCOMPLETE_GOTO:
+    case NO_INSTRUCTION_TYPE:
+      DATA_INVARIANT(false, "Only complete instructions can be analyzed");
+      break;
     }
 
     for(const auto &succ : node.successors)

@@ -215,7 +215,7 @@ std::ostream &goto_programt::output_instruction(
     out << "END THREAD" << '\n';
     break;
 
-  default:
+  case INCOMPLETE_GOTO:
     UNREACHABLE;
   }
 
@@ -285,27 +285,38 @@ std::list<exprt> expressions_read(
     break;
 
   case FUNCTION_CALL:
-    {
-      const code_function_callt &function_call =
-        instruction.get_function_call();
-      forall_expr(it, function_call.arguments())
-        dest.push_back(*it);
-      if(function_call.lhs().is_not_nil())
-        parse_lhs_read(function_call.lhs(), dest);
-    }
+  {
+    const code_function_callt &function_call = instruction.get_function_call();
+    forall_expr(it, function_call.arguments())
+      dest.push_back(*it);
+    if(function_call.lhs().is_not_nil())
+      parse_lhs_read(function_call.lhs(), dest);
     break;
+  }
 
   case ASSIGN:
-    {
-      const code_assignt &assignment = instruction.get_assign();
-      dest.push_back(assignment.rhs());
-      parse_lhs_read(assignment.lhs(), dest);
-    }
+  {
+    const code_assignt &assignment = instruction.get_assign();
+    dest.push_back(assignment.rhs());
+    parse_lhs_read(assignment.lhs(), dest);
     break;
+  }
 
-  default:
-    {
-    }
+  case CATCH:
+  case THROW:
+  case DEAD:
+  case DECL:
+  case ATOMIC_BEGIN:
+  case ATOMIC_END:
+  case START_THREAD:
+  case END_THREAD:
+  case END_FUNCTION:
+  case LOCATION:
+  case SKIP:
+  case OTHER:
+  case INCOMPLETE_GOTO:
+  case NO_INSTRUCTION_TYPE:
+    break;
   }
 
   return dest;
@@ -331,9 +342,25 @@ std::list<exprt> expressions_written(
     dest.push_back(instruction.get_assign().lhs());
     break;
 
-  default:
-    {
-    }
+  case CATCH:
+  case THROW:
+  case GOTO:
+  case RETURN:
+  case DEAD:
+  case DECL:
+  case ATOMIC_BEGIN:
+  case ATOMIC_END:
+  case START_THREAD:
+  case END_THREAD:
+  case END_FUNCTION:
+  case ASSERT:
+  case ASSUME:
+  case LOCATION:
+  case SKIP:
+  case OTHER:
+  case INCOMPLETE_GOTO:
+  case NO_INSTRUCTION_TYPE:
+    break;
   }
 
   return dest;
@@ -489,9 +516,11 @@ std::string as_string(
   case END_THREAD:
     return "END THREAD";
 
-  default:
+  case INCOMPLETE_GOTO:
     UNREACHABLE;
   }
+
+  UNREACHABLE;
 }
 
 /// Assign each loop in the goto program a unique index. Every backwards goto is
@@ -969,7 +998,20 @@ void goto_programt::instructiont::transform(
   }
   break;
 
-  default:
+  case GOTO:
+  case ASSUME:
+  case ASSERT:
+  case SKIP:
+  case START_THREAD:
+  case END_THREAD:
+  case LOCATION:
+  case END_FUNCTION:
+  case ATOMIC_BEGIN:
+  case ATOMIC_END:
+  case THROW:
+  case CATCH:
+  case INCOMPLETE_GOTO:
+  case NO_INSTRUCTION_TYPE:
     if(has_condition())
     {
       auto new_condition = f(get_condition());
@@ -1015,7 +1057,20 @@ void goto_programt::instructiont::apply(
   }
   break;
 
-  default:
+  case GOTO:
+  case ASSUME:
+  case ASSERT:
+  case SKIP:
+  case START_THREAD:
+  case END_THREAD:
+  case LOCATION:
+  case END_FUNCTION:
+  case ATOMIC_BEGIN:
+  case ATOMIC_END:
+  case THROW:
+  case CATCH:
+  case INCOMPLETE_GOTO:
+  case NO_INSTRUCTION_TYPE:
     if(has_condition())
       f(get_condition());
   }
@@ -1108,8 +1163,15 @@ std::ostream &operator<<(std::ostream &out, goto_program_instruction_typet t)
   case FUNCTION_CALL:
     out << "FUNCTION_CALL";
     break;
-  default:
-    out << "?";
+  case THROW:
+    out << "THROW";
+    break;
+  case CATCH:
+    out << "CATCH";
+    break;
+  case INCOMPLETE_GOTO:
+    out << "INCOMPLETE_GOTO";
+    break;
   }
 
   return out;

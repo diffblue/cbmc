@@ -293,7 +293,11 @@ bool compilet::find_library(const std::string &name)
                   << eom;
         return warning_is_fatal;
 
-      default:
+      case file_typet::THIN_ARCHIVE:
+      case file_typet::NORMAL_ARCHIVE:
+      case file_typet::SOURCE_FILE:
+      case file_typet::FAILED_TO_OPEN_FILE:
+      case file_typet::UNKNOWN:
         break;
       }
     }

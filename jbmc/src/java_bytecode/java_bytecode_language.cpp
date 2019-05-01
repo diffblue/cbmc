@@ -793,41 +793,41 @@ bool java_bytecode_languaget::typecheck(
   // that are reachable from this entry point.
   switch(lazy_methods_mode)
   {
-    case LAZY_METHODS_MODE_CONTEXT_INSENSITIVE:
-      // ci = context-insensitive
-      if(do_ci_lazy_method_conversion(symbol_table))
-        return true;
-      break;
-    case LAZY_METHODS_MODE_EAGER:
-      {
-        symbol_table_buildert symbol_table_builder =
-          symbol_table_buildert::wrap(symbol_table);
+  case LAZY_METHODS_MODE_CONTEXT_INSENSITIVE:
+    // ci = context-insensitive
+    if(do_ci_lazy_method_conversion(symbol_table))
+      return true;
+    break;
+  case LAZY_METHODS_MODE_EAGER:
+  {
+    symbol_table_buildert symbol_table_builder =
+      symbol_table_buildert::wrap(symbol_table);
 
-        journalling_symbol_tablet journalling_symbol_table =
-          journalling_symbol_tablet::wrap(symbol_table_builder);
+    journalling_symbol_tablet journalling_symbol_table =
+      journalling_symbol_tablet::wrap(symbol_table_builder);
 
-        // Convert all synthetic methods:
-        for(const auto &function_id_and_type : synthetic_methods)
-        {
-          convert_single_method(
-            function_id_and_type.first, journalling_symbol_table);
-        }
-        // Convert all methods for which we have bytecode now
-        for(const auto &method_sig : method_bytecode)
-        {
-          convert_single_method(method_sig.first, journalling_symbol_table);
-        }
-        // Now convert all newly added string methods
-        for(const auto &fn_name : journalling_symbol_table.get_inserted())
-        {
-          if(string_preprocess.implements_function(fn_name))
-            convert_single_method(fn_name, symbol_table);
-        }
-      }
-      break;
-    default:
-      // Our caller is in charge of elaborating methods on demand.
-      break;
+    // Convert all synthetic methods:
+    for(const auto &function_id_and_type : synthetic_methods)
+    {
+      convert_single_method(
+        function_id_and_type.first, journalling_symbol_table);
+    }
+    // Convert all methods for which we have bytecode now
+    for(const auto &method_sig : method_bytecode)
+    {
+      convert_single_method(method_sig.first, journalling_symbol_table);
+    }
+    // Now convert all newly added string methods
+    for(const auto &fn_name : journalling_symbol_table.get_inserted())
+    {
+      if(string_preprocess.implements_function(fn_name))
+        convert_single_method(fn_name, symbol_table);
+    }
+  }
+  break;
+  case LAZY_METHODS_MODE_EXTERNAL_DRIVER:
+    // Our caller is in charge of elaborating methods on demand.
+    break;
   }
 
   // now instrument runtime exceptions

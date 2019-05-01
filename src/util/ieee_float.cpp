@@ -688,7 +688,8 @@ void ieee_floatt::divide_and_round(
         ++dividend;
       break;
 
-    default:
+    case NONDETERMINISTIC:
+    case UNKNOWN:
       UNREACHABLE;
     }
   }

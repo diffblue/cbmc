@@ -536,9 +536,27 @@ void custom_bitvector_domaint::transform(
     }
     break;
 
-  default:
-    {
-    }
+  case CATCH:
+  case THROW:
+    DATA_INVARIANT(false, "Exceptions must be removed before analysis");
+    break;
+  case RETURN:
+    DATA_INVARIANT(false, "Returns must be removed before analysis");
+    break;
+  case ATOMIC_BEGIN: // Ignoring is a valid over-approximation
+  case ATOMIC_END:   // Ignoring is a valid over-approximation
+  case END_FUNCTION: // No action required
+  case LOCATION:     // No action required
+  case START_THREAD: // Require a concurrent analysis at higher level
+  case END_THREAD:   // Require a concurrent analysis at higher level
+  case SKIP:         // No action required
+  case ASSERT:       // No action required
+  case ASSUME:       // Ignoring is a valid over-approximation
+    break;
+  case INCOMPLETE_GOTO:
+  case NO_INSTRUCTION_TYPE:
+    DATA_INVARIANT(false, "Only complete instructions can be analyzed");
+    break;
   }
 }
 

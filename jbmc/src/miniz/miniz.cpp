@@ -7105,8 +7105,9 @@ const char *mz_zip_get_error_string(mz_zip_error mz_err)
             return "validation failed";
         case MZ_ZIP_WRITE_CALLBACK_FAILED:
             return "write calledback failed";
-        default:
-            break;
+        case MZ_ZIP_TOTAL_ERRORS:
+          // not an actual error, just the maximum index
+          break;
     }
 
     return "unknown error";

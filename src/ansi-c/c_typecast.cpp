@@ -417,8 +417,13 @@ void c_typecastt::implicit_typecast_arithmetic(
   case RATIONAL:   new_type=rational_typet(); break;
   case REAL:       new_type=real_typet(); break;
   case INTEGER:    new_type=integer_typet(); break;
-  case COMPLEX: return; // do nothing
-  default: return;
+  case COMPLEX:
+  case OTHER:
+  case VOIDPTR:
+  case FIXEDBV:
+  case LARGE_UNSIGNED_INT:
+  case LARGE_SIGNED_INT:
+    return; // do nothing
   }
 
   if(new_type != expr.type())

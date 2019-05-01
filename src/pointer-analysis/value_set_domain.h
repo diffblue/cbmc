@@ -103,7 +103,17 @@ void value_set_domain_templatet<VST>::transform(
   }
   break;
 
-  default:
+  case ASSERT:
+  case SKIP:
+  case START_THREAD:
+  case END_THREAD:
+  case LOCATION:
+  case ATOMIC_BEGIN:
+  case ATOMIC_END:
+  case THROW:
+  case CATCH:
+  case INCOMPLETE_GOTO:
+  case NO_INSTRUCTION_TYPE:
   {
     // do nothing
   }

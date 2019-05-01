@@ -1044,7 +1044,8 @@ bool Parser::rTemplateDecl(cpp_declarationt &decl)
     decl.swap(body);
     break;
 
-   default:
+  case num_tdks:
+  case tdk_unknown:
     UNREACHABLE;
     break;
   }

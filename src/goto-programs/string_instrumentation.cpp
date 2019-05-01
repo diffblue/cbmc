@@ -203,19 +203,8 @@ void string_instrumentationt::instrument(
   goto_programt &dest,
   goto_programt::targett it)
 {
-  switch(it->type)
-  {
-  case ASSIGN:
-    break;
-
-  case FUNCTION_CALL:
+  if(it->is_function_call())
     do_function_call(dest, it);
-    break;
-
-  default:
-    {
-    }
-  }
 }
 
 void string_instrumentationt::do_function_call(
@@ -549,7 +538,10 @@ void string_instrumentationt::do_format_string_write(
           // nothing
           break;
         }
-        default: // everything else
+        case format_tokent::token_typet::POINTER:
+        case format_tokent::token_typet::CHAR:
+        case format_tokent::token_typet::FLOAT:
+        case format_tokent::token_typet::INT:
         {
           const exprt &argument=arguments[argument_start_inx+args];
           const dereference_exprt lhs{argument};

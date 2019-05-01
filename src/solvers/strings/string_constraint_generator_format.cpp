@@ -384,12 +384,9 @@ add_axioms_for_format_specifier(
     message.warning() << "unimplemented format specifier: " << fs.conversion
                       << message.eom;
     return {array_pool.fresh_string(index_type, char_type), {}};
-  default:
-    message.error() << "invalid format specifier: " << fs.conversion
-                    << message.eom;
-    INVARIANT(
-      false, "format specifier must belong to [bBhHsScCdoxXeEfgGaAtT%n]");
   }
+
+  INVARIANT(false, "format specifier must belong to [bBhHsScCdoxXeEfgGaAtT%n]");
 }
 
 /// Deserialize an argument for format from \p string.

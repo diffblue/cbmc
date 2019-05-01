@@ -71,144 +71,136 @@ void taint_analysist::instrument(
 
     goto_programt insert_before, insert_after;
 
-    switch(instruction.type)
+    if(instruction.is_function_call())
     {
-    case FUNCTION_CALL:
+      const code_function_callt &function_call =
+        instruction.get_function_call();
+      const exprt &function = function_call.function();
+
+      if(function.id() == ID_symbol)
       {
-        const code_function_callt &function_call =
-          instruction.get_function_call();
-        const exprt &function=function_call.function();
+        const irep_idt &identifier = to_symbol_expr(function).get_identifier();
 
-        if(function.id()==ID_symbol)
+        std::set<irep_idt> identifiers;
+
+        identifiers.insert(identifier);
+
+        irep_idt class_id = function.get(ID_C_class);
+        if(class_id.empty())
         {
-          const irep_idt &identifier=
-            to_symbol_expr(function).get_identifier();
+        }
+        else
+        {
+          std::string suffix = std::string(
+            id2string(identifier), class_id.size(), std::string::npos);
 
-          std::set<irep_idt> identifiers;
+          class_hierarchyt::idst parents =
+            class_hierarchy.get_parents_trans(class_id);
+          for(const auto &p : parents)
+            identifiers.insert(id2string(p) + suffix);
+        }
 
-          identifiers.insert(identifier);
-
-          irep_idt class_id=function.get(ID_C_class);
-          if(class_id.empty())
+        for(const auto &rule : taint.rules)
+        {
+          bool match = false;
+          for(const auto &i : identifiers)
           {
-          }
-          else
-          {
-            std::string suffix=
-              std::string(
-                id2string(identifier), class_id.size(), std::string::npos);
-
-            class_hierarchyt::idst parents=
-              class_hierarchy.get_parents_trans(class_id);
-            for(const auto &p : parents)
-              identifiers.insert(id2string(p)+suffix);
-          }
-
-          for(const auto &rule : taint.rules)
-          {
-            bool match=false;
-            for(const auto &i : identifiers)
-              if(i==rule.function_identifier ||
-                 has_prefix(
-                   id2string(i),
-                   "java::"+id2string(rule.function_identifier)+":"))
-              {
-                match=true;
-                break;
-              }
-
-            if(match)
+            if(
+              i == rule.function_identifier ||
+              has_prefix(
+                id2string(i),
+                "java::" + id2string(rule.function_identifier) + ":"))
             {
-              log.debug() << "MATCH " << rule.id << " on " << identifier
-                          << messaget::eom;
+              match = true;
+              break;
+            }
+          }
 
-              exprt where=nil_exprt();
+          if(match)
+          {
+            log.debug() << "MATCH " << rule.id << " on " << identifier
+                        << messaget::eom;
 
-              const code_typet &code_type=to_code_type(function.type());
+            exprt where = nil_exprt();
 
-              bool have_this=
-                !code_type.parameters().empty() &&
-                code_type.parameters().front().get_bool(ID_C_this);
+            const code_typet &code_type = to_code_type(function.type());
 
-              switch(rule.where)
+            bool have_this = !code_type.parameters().empty() &&
+                             code_type.parameters().front().get_bool(ID_C_this);
+
+            switch(rule.where)
+            {
+            case taint_parse_treet::rulet::RETURN_VALUE:
+            {
+              const symbolt &return_value_symbol =
+                ns.lookup(id2string(identifier) + "#return_value");
+              where = return_value_symbol.symbol_expr();
+              break;
+            }
+
+            case taint_parse_treet::rulet::PARAMETER:
+            {
+              unsigned nr =
+                have_this ? rule.parameter_number : rule.parameter_number - 1;
+              if(function_call.arguments().size() > nr)
+                where = function_call.arguments()[nr];
+              break;
+            }
+
+            case taint_parse_treet::rulet::THIS:
+              if(have_this)
               {
-              case taint_parse_treet::rulet::RETURN_VALUE:
-                {
-                  const symbolt &return_value_symbol=
-                    ns.lookup(id2string(identifier)+"#return_value");
-                  where=return_value_symbol.symbol_expr();
-                }
-                break;
-
-              case taint_parse_treet::rulet::PARAMETER:
-                {
-                  unsigned nr=
-                    have_this?rule.parameter_number:rule.parameter_number-1;
-                  if(function_call.arguments().size()>nr)
-                    where=function_call.arguments()[nr];
-                }
-                break;
-
-              case taint_parse_treet::rulet::THIS:
-                if(have_this)
-                {
-                  DATA_INVARIANT(
-                    !function_call.arguments().empty(),
-                    "`this` implies at least one argument in function call");
-                  where=function_call.arguments()[0];
-                }
-                break;
+                DATA_INVARIANT(
+                  !function_call.arguments().empty(),
+                  "`this` implies at least one argument in function call");
+                where = function_call.arguments()[0];
               }
+              break;
+            }
 
-              switch(rule.kind)
-              {
-              case taint_parse_treet::rulet::SOURCE:
-                {
-                  codet code_set_may("set_may");
-                  code_set_may.operands().resize(2);
-                  code_set_may.op0()=where;
-                  code_set_may.op1()=
-                    address_of_exprt(string_constantt(rule.taint));
-                  insert_after.add(goto_programt::make_other(
-                    code_set_may, instruction.source_location));
-                }
-                break;
+            switch(rule.kind)
+            {
+            case taint_parse_treet::rulet::SOURCE:
+            {
+              codet code_set_may("set_may");
+              code_set_may.operands().resize(2);
+              code_set_may.op0() = where;
+              code_set_may.op1() =
+                address_of_exprt(string_constantt(rule.taint));
+              insert_after.add(goto_programt::make_other(
+                code_set_may, instruction.source_location));
+              break;
+            }
 
-              case taint_parse_treet::rulet::SINK:
-                {
-                  binary_predicate_exprt get_may(
-                    where,
-                    "get_may",
-                    address_of_exprt(string_constantt(rule.taint)));
-                  goto_programt::targett t =
-                    insert_before.add(goto_programt::make_assertion(
-                      not_exprt(get_may), instruction.source_location));
-                  t->source_location.set_property_class(
-                    "taint rule "+id2string(rule.id));
-                  t->source_location.set_comment(rule.message);
-                }
-                break;
+            case taint_parse_treet::rulet::SINK:
+            {
+              binary_predicate_exprt get_may(
+                where,
+                "get_may",
+                address_of_exprt(string_constantt(rule.taint)));
+              goto_programt::targett t =
+                insert_before.add(goto_programt::make_assertion(
+                  not_exprt(get_may), instruction.source_location));
+              t->source_location.set_property_class(
+                "taint rule " + id2string(rule.id));
+              t->source_location.set_comment(rule.message);
+              break;
+            }
 
-              case taint_parse_treet::rulet::SANITIZER:
-                {
-                  codet code_clear_may("clear_may");
-                  code_clear_may.operands().resize(2);
-                  code_clear_may.op0()=where;
-                  code_clear_may.op1()=
-                    address_of_exprt(string_constantt(rule.taint));
-                  insert_after.add(goto_programt::make_other(
-                    code_clear_may, instruction.source_location));
-                }
-                break;
-              }
+            case taint_parse_treet::rulet::SANITIZER:
+            {
+              codet code_clear_may("clear_may");
+              code_clear_may.operands().resize(2);
+              code_clear_may.op0() = where;
+              code_clear_may.op1() =
+                address_of_exprt(string_constantt(rule.taint));
+              insert_after.add(goto_programt::make_other(
+                code_clear_may, instruction.source_location));
+              break;
+            }
             }
           }
         }
-      }
-      break;
-
-    default:
-      {
       }
     }
 

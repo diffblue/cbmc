@@ -43,17 +43,29 @@ bool value_set_domain_fivrt::transform(
     break;
 
   case FUNCTION_CALL:
-    {
-      const code_function_callt &code=
-        to_code_function_call(from_l->code);
+  {
+    const code_function_callt &code = to_code_function_call(from_l->code);
 
-      value_set.do_function_call(function_to, code.arguments(), ns);
-      break;
-    }
+    value_set.do_function_call(function_to, code.arguments(), ns);
+    break;
+  }
 
-  default:
-    {
-    }
+  case CATCH:
+  case THROW:
+  case GOTO:
+  case DECL:
+  case DEAD:
+  case ATOMIC_BEGIN:
+  case ATOMIC_END:
+  case START_THREAD:
+  case END_THREAD:
+  case LOCATION:
+  case SKIP:
+  case ASSERT:
+  case ASSUME:
+  case INCOMPLETE_GOTO:
+  case NO_INSTRUCTION_TYPE:
+    break;
   }
 
   return value_set.handover();

@@ -73,8 +73,26 @@ void local_cfgt::build(const goto_programt &goto_program)
     case END_THREAD:
       break; // no successor
 
-    default:
-      node.successors.push_back(loc_nr+1);
+    case CATCH:
+    case RETURN:
+    case ATOMIC_BEGIN:
+    case ATOMIC_END:
+    case LOCATION:
+    case SKIP:
+    case OTHER:
+    case ASSERT:
+    case ASSUME:
+    case FUNCTION_CALL:
+    case DECL:
+    case DEAD:
+    case ASSIGN:
+      node.successors.push_back(loc_nr + 1);
+      break;
+
+    case INCOMPLETE_GOTO:
+    case NO_INSTRUCTION_TYPE:
+      DATA_INVARIANT(false, "Only complete instructions can be analyzed");
+      break;
     }
   }
 }

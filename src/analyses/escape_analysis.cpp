@@ -253,9 +253,33 @@ void escape_domaint::transform(
     // This is the edge to the call site.
     break;
 
-  default:
-    {
-    }
+  case GOTO: // Ignoring the guard is a valid over-approximation
+    break;
+  case CATCH:
+  case THROW:
+    DATA_INVARIANT(false, "Exceptions must be removed before analysis");
+    break;
+  case RETURN:
+    DATA_INVARIANT(false, "Returns must be removed before analysis");
+    break;
+  case ATOMIC_BEGIN: // Ignoring is a valid over-approximation
+  case ATOMIC_END:   // Ignoring is a valid over-approximation
+  case LOCATION:     // No action required
+  case START_THREAD: // Require a concurrent analysis at higher level
+  case END_THREAD:   // Require a concurrent analysis at higher level
+  case ASSERT:       // No action required
+  case ASSUME:       // Ignoring is a valid over-approximation
+  case SKIP:         // No action required
+    break;
+  case OTHER:
+#if 0
+    DATA_INVARIANT(false, "Unclear what is a safe over-approximation of OTHER");
+#endif
+    break;
+  case INCOMPLETE_GOTO:
+  case NO_INSTRUCTION_TYPE:
+    DATA_INVARIANT(false, "Only complete instructions can be analyzed");
+    break;
   }
 }
 
@@ -444,78 +468,58 @@ void escape_analysist::instrument(
 
       const goto_programt::instructiont &instruction=*i_it;
 
-      switch(instruction.type)
+      if(instruction.type == ASSIGN)
       {
-      case ASSIGN:
-        {
-          const code_assignt &code_assign=to_code_assign(instruction.code);
+        const code_assignt &code_assign = to_code_assign(instruction.code);
 
-          std::set<irep_idt> cleanup_functions;
-          operator[](i_it).check_lhs(code_assign.lhs(), cleanup_functions);
-          insert_cleanup(
-            f_it->second,
-            i_it,
-            code_assign.lhs(),
-            cleanup_functions,
-            false,
-            ns);
+        std::set<irep_idt> cleanup_functions;
+        operator[](i_it).check_lhs(code_assign.lhs(), cleanup_functions);
+        insert_cleanup(
+          f_it->second, i_it, code_assign.lhs(), cleanup_functions, false, ns);
+      }
+      else if(instruction.type == DEAD)
+      {
+        const code_deadt &code_dead = to_code_dead(instruction.code);
+
+        std::set<irep_idt> cleanup_functions1;
+
+        escape_domaint &d = operator[](i_it);
+
+        const escape_domaint::cleanup_mapt::const_iterator m_it =
+          d.cleanup_map.find("&" + id2string(code_dead.get_identifier()));
+
+        // does it have a cleanup function for the object?
+        if(m_it != d.cleanup_map.end())
+        {
+          cleanup_functions1.insert(
+            m_it->second.cleanup_functions.begin(),
+            m_it->second.cleanup_functions.end());
         }
-        break;
 
-      case DEAD:
+        std::set<irep_idt> cleanup_functions2;
+
+        d.check_lhs(code_dead.symbol(), cleanup_functions2);
+
+        insert_cleanup(
+          f_it->second, i_it, code_dead.symbol(), cleanup_functions1, true, ns);
+        insert_cleanup(
+          f_it->second,
+          i_it,
+          code_dead.symbol(),
+          cleanup_functions2,
+          false,
+          ns);
+
+        for(const auto &c : cleanup_functions1)
         {
-          const code_deadt &code_dead=to_code_dead(instruction.code);
-
-          std::set<irep_idt> cleanup_functions1;
-
-          escape_domaint &d=operator[](i_it);
-
-          const escape_domaint::cleanup_mapt::const_iterator m_it=
-            d.cleanup_map.find("&"+id2string(code_dead.get_identifier()));
-
-          // does it have a cleanup function for the object?
-          if(m_it!=d.cleanup_map.end())
-          {
-            cleanup_functions1.insert(
-              m_it->second.cleanup_functions.begin(),
-              m_it->second.cleanup_functions.end());
-          }
-
-          std::set<irep_idt> cleanup_functions2;
-
-          d.check_lhs(code_dead.symbol(), cleanup_functions2);
-
-          insert_cleanup(
-            f_it->second,
-            i_it,
-            code_dead.symbol(),
-            cleanup_functions1,
-            true,
-            ns);
-          insert_cleanup(
-            f_it->second,
-            i_it,
-            code_dead.symbol(),
-            cleanup_functions2,
-            false,
-            ns);
-
-          for(const auto &c : cleanup_functions1)
-          {
-            (void)c;
-            i_it++;
-          }
-
-          for(const auto &c : cleanup_functions2)
-          {
-            (void)c;
-            i_it++;
-          }
+          (void)c;
+          i_it++;
         }
-        break;
 
-      default:
+        for(const auto &c : cleanup_functions2)
         {
+          (void)c;
+          i_it++;
         }
       }
     }

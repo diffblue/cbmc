@@ -82,7 +82,7 @@ operator()(message_handlert &message_handler)
       mark();
       break;
 
-    default:
+    case decision_proceduret::resultt::D_ERROR:
     {
       messaget log(message_handler);
       log.error() << "decision procedure has failed" << messaget::eom;

@@ -47,17 +47,29 @@ bool value_set_domain_fit::transform(
     break;
 
   case FUNCTION_CALL:
-    {
-      const code_function_callt &code = from_l->get_function_call();
+  {
+    const code_function_callt &code = from_l->get_function_call();
 
-      value_set.do_function_call(function_to, code.arguments(), ns);
-    }
+    value_set.do_function_call(function_to, code.arguments(), ns);
     break;
+  }
 
-  default:
-    {
-      // do nothing
-    }
+  case CATCH:
+  case THROW:
+  case DECL:
+  case DEAD:
+  case ATOMIC_BEGIN:
+  case ATOMIC_END:
+  case START_THREAD:
+  case END_THREAD:
+  case LOCATION:
+  case SKIP:
+  case ASSERT:
+  case ASSUME:
+  case INCOMPLETE_GOTO:
+  case NO_INSTRUCTION_TYPE:
+    // do nothing
+    break;
   }
 
   return (value_set.changed);

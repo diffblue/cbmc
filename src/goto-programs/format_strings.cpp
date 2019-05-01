@@ -257,7 +257,10 @@ optionalt<typet> get_type(const format_tokent &token)
       else
         return unsigned_long_long_int_type();
 
-    default:
+    case format_tokent::length_modifierst::LEN_t:
+    case format_tokent::length_modifierst::LEN_j:
+    case format_tokent::length_modifierst::LEN_L:
+    case format_tokent::length_modifierst::LEN_undef:
       if(token.representation==format_tokent::representationt::SIGNED_DEC)
         return signed_int_type();
       else
@@ -269,14 +272,27 @@ optionalt<typet> get_type(const format_tokent &token)
     {
     case format_tokent::length_modifierst::LEN_l: return double_type();
     case format_tokent::length_modifierst::LEN_L: return long_double_type();
-    default: return float_type();
+    case format_tokent::length_modifierst::LEN_h:
+    case format_tokent::length_modifierst::LEN_hh:
+    case format_tokent::length_modifierst::LEN_j:
+    case format_tokent::length_modifierst::LEN_ll:
+    case format_tokent::length_modifierst::LEN_t:
+    case format_tokent::length_modifierst::LEN_undef:
+      return float_type();
     }
 
   case format_tokent::token_typet::CHAR:
     switch(token.length_modifier)
     {
     case format_tokent::length_modifierst::LEN_l: return wchar_t_type();
-    default: return char_type();
+    case format_tokent::length_modifierst::LEN_h:
+    case format_tokent::length_modifierst::LEN_hh:
+    case format_tokent::length_modifierst::LEN_j:
+    case format_tokent::length_modifierst::LEN_L:
+    case format_tokent::length_modifierst::LEN_ll:
+    case format_tokent::length_modifierst::LEN_t:
+    case format_tokent::length_modifierst::LEN_undef:
+      return char_type();
     }
 
   case format_tokent::token_typet::POINTER:
@@ -287,10 +303,18 @@ optionalt<typet> get_type(const format_tokent &token)
     {
     case format_tokent::length_modifierst::LEN_l:
       return array_typet(wchar_t_type(), nil_exprt());
-    default: return array_typet(char_type(), nil_exprt());
+    case format_tokent::length_modifierst::LEN_h:
+    case format_tokent::length_modifierst::LEN_hh:
+    case format_tokent::length_modifierst::LEN_j:
+    case format_tokent::length_modifierst::LEN_L:
+    case format_tokent::length_modifierst::LEN_ll:
+    case format_tokent::length_modifierst::LEN_t:
+    case format_tokent::length_modifierst::LEN_undef:
+      return array_typet(char_type(), nil_exprt());
     }
 
-  default:
+  case format_tokent::token_typet::TEXT:
+  case format_tokent::token_typet::UNKNOWN:
     return {};
   }
 

@@ -1096,13 +1096,15 @@ bool configt::set(const cmdlinet &cmdline)
 
 std::string configt::ansi_ct::os_to_string(ost os)
 {
+  // clang-format off
   switch(os)
   {
   case ost::OS_LINUX: return "linux";
   case ost::OS_MACOS: return "macos";
   case ost::OS_WIN: return "win";
-  default: return "none";
+  case ost::NO_OS: return "none";
   }
+  // clang-format on
 
   UNREACHABLE;
 }
