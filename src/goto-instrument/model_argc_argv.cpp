@@ -104,8 +104,7 @@ bool model_argc_argv(
       << "}";
   std::istringstream iss(oss.str());
 
-  ansi_c_languaget ansi_c_language;
-  ansi_c_language.set_message_handler(message_handler);
+  ansi_c_languaget ansi_c_language(message_handler);
   configt::ansi_ct::preprocessort pp=config.ansi_c.preprocessor;
   config.ansi_c.preprocessor=configt::ansi_ct::preprocessort::NONE;
   ansi_c_language.parse(iss, "");

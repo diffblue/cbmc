@@ -207,8 +207,7 @@ public:
   virtual std::unique_ptr<languaget> new_language()=0;
 
   // constructor / destructor
-
-  languaget() { }
+  explicit languaget(message_handlert &);
   virtual ~languaget() { }
 };
 

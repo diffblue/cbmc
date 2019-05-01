@@ -250,11 +250,11 @@ static void show_symbol_table_brief_json_ui(
 
     if(symbol.mode.empty())
     {
-      ptr=get_default_language();
+      ptr = get_default_language(message_handler);
     }
     else
     {
-      ptr=get_language_from_mode(symbol.mode);
+      ptr = get_language_from_mode(symbol.mode, message_handler);
     }
 
     if(!ptr)

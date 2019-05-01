@@ -1405,13 +1405,17 @@ void dump_c(
   const namespacet &ns,
   std::ostream &out)
 {
+  null_message_handlert mh;
+
   dump_ct goto2c(
     src,
     use_system_headers,
     use_all_headers,
     include_harness,
     ns,
-    new_ansi_c_language);
+    new_ansi_c_language,
+    mh);
+
   out << goto2c;
 }
 
@@ -1423,12 +1427,16 @@ void dump_cpp(
   const namespacet &ns,
   std::ostream &out)
 {
+  null_message_handlert mh;
+
   dump_ct goto2cpp(
     src,
     use_system_headers,
     use_all_headers,
     include_harness,
     ns,
-    new_cpp_language);
+    new_cpp_language,
+    mh);
+
   out << goto2cpp;
 }

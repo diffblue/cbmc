@@ -99,8 +99,7 @@ void add_library(
 
   std::istringstream in(src);
 
-  ansi_c_languaget ansi_c_language;
-  ansi_c_language.set_message_handler(message_handler);
+  ansi_c_languaget ansi_c_language(message_handler);
   ansi_c_language.parse(in, "");
 
   ansi_c_language.typecheck(symbol_table, "<built-in-library>");

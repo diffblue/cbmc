@@ -18,6 +18,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/cprover_prefix.h>
 #include <util/std_types.h>
 
+languaget::languaget(message_handlert &message_handler)
+  : messaget(message_handler)
+{
+}
+
 bool languaget::final(symbol_table_baset &)
 {
   return false;
