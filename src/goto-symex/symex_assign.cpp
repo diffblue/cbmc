@@ -271,7 +271,8 @@ static void rewrite_with_to_field_symbols(
         with_expr.new_value().type());
     }
 
-    state.field_sensitivity.apply(ns, state, field_sensitive_lhs, true);
+    field_sensitive_lhs = state.field_sensitivity.apply(
+      ns, state, std::move(field_sensitive_lhs), true);
 
     if(field_sensitive_lhs.id() != ID_symbol)
       break;
@@ -392,8 +393,8 @@ void goto_symext::symex_assign_from_struct(
   for(std::size_t i = 0; i < components.size(); ++i)
   {
     const auto &comp = components[i];
-    exprt lhs_field = member_exprt(lhs, comp.get_name(), comp.type());
-    state.field_sensitivity.apply(ns, state, lhs_field, true);
+    const exprt lhs_field = state.field_sensitivity.apply(
+      ns, state, member_exprt{lhs, comp.get_name(), comp.type()}, true);
     INVARIANT(
       lhs_field.id() == ID_symbol,
       "member of symbol should be susceptible to field-sensitivity");

@@ -45,11 +45,11 @@ public:
   /// existing member or index expressions into symbols are performed.
   /// \param ns: a namespace to resolve type symbols/tag types
   /// \param [in,out] state: symbolic execution state
-  /// \param [in,out] expr: an expression to be (recursively) transformed - this
-  ///   parameter is both input and output.
+  /// \param expr: an expression to be (recursively) transformed.
   /// \param write: set to true if the expression is to be used as an lvalue.
-  void
-  apply(const namespacet &ns, goto_symex_statet &state, exprt &expr, bool write)
+  /// \return the transformed expression
+  exprt
+  apply(const namespacet &ns, goto_symex_statet &state, exprt expr, bool write)
     const;
 
   /// Compute an expression representing the individual components of a

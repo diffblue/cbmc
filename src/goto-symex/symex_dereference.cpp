@@ -244,7 +244,7 @@ void goto_symext::dereference_rec(exprt &expr, statet &state, bool write)
 
     // ...and may have introduced a member-of-symbol construct with a
     // corresponding SSA symbol:
-    state.field_sensitivity.apply(ns, state, expr, write);
+    expr = state.field_sensitivity.apply(ns, state, std::move(expr), write);
   }
   else if(
     expr.id() == ID_index && to_index_expr(expr).array().id() == ID_member &&
@@ -359,8 +359,8 @@ void goto_symext::dereference(exprt &expr, statet &state, bool write)
   // from different frames. Would be enough to rename
   // symbols whose address is taken.
   PRECONDITION(!state.call_stack().empty());
-  exprt l1_expr = state.rename<L1>(expr, ns).get();
-  state.field_sensitivity.apply(ns, state, l1_expr, write);
+  exprt l1_expr = state.field_sensitivity.apply(
+    ns, state, state.rename<L1>(expr, ns).get(), write);
 
   // start the recursion!
   dereference_rec(l1_expr, state, write);
@@ -394,5 +394,5 @@ void goto_symext::dereference(exprt &expr, statet &state, bool write)
       "simplify re-introduced dereferencing");
   }
 
-  state.field_sensitivity.apply(ns, state, expr, write);
+  expr = state.field_sensitivity.apply(ns, state, std::move(expr), write);
 }
