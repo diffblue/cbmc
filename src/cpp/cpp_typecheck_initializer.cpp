@@ -171,7 +171,7 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
     // we need a constructor
 
     symbol_exprt expr_symbol(symbol.name, symbol.type);
-    already_typechecked(expr_symbol);
+    already_typechecked_exprt::make_already_typechecked(expr_symbol);
 
     exprt::operandst ops;
     ops.push_back(symbol.value);
@@ -297,7 +297,7 @@ void cpp_typecheckt::zero_initializer(
 
     exprt zero =
       typecast_exprt::conditional_cast(from_integer(0, enum_type), type);
-    already_typechecked(zero);
+    already_typechecked_exprt::make_already_typechecked(zero);
 
     code_assignt assign;
     assign.lhs()=object;
@@ -306,7 +306,7 @@ void cpp_typecheckt::zero_initializer(
 
     typecheck_expr(assign.lhs());
     assign.lhs().type().set(ID_C_constant, false);
-    already_typechecked(assign.lhs());
+    already_typechecked_exprt::make_already_typechecked(assign.lhs());
 
     typecheck_code(assign);
     ops.push_back(assign);
@@ -327,7 +327,7 @@ void cpp_typecheckt::zero_initializer(
 
     typecheck_expr(assign.lhs());
     assign.lhs().type().set(ID_C_constant, false);
-    already_typechecked(assign.lhs());
+    already_typechecked_exprt::make_already_typechecked(assign.lhs());
 
     typecheck_code(assign);
     ops.push_back(assign);

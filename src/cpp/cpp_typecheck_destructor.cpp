@@ -81,7 +81,7 @@ codet cpp_typecheckt::dtor(const symbolt &symbol, const symbol_exprt &this_expr)
       address_of_exprt address(var);
       assert(address.type() == c.type());
 
-      already_typechecked(address);
+      already_typechecked_exprt::make_already_typechecked(address);
 
       exprt ptrmember(ID_ptrmember);
       ptrmember.set(ID_component_name, c.get_name());

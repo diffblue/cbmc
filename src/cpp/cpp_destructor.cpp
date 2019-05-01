@@ -109,7 +109,7 @@ optionalt<codet> cpp_typecheckt::cpp_destructor(
       std::move(member), {}, uninitialized_typet{}, source_location);
 
     typecheck_side_effect_function_call(function_call);
-    already_typechecked(function_call);
+    already_typechecked_exprt::make_already_typechecked(function_call);
 
     code_expressiont new_code(function_call);
     new_code.add_source_location() = source_location;

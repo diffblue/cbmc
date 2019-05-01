@@ -833,7 +833,7 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
   const cpp_template_args_non_tct &template_args)
 {
   // old stuff
-  assert(template_args.id()!=ID_already_typechecked);
+  PRECONDITION(template_args.id() != ID_already_typechecked);
 
   assert(template_symbol.type.get_bool(ID_is_template));
 

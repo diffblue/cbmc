@@ -643,7 +643,7 @@ void c_typecheck_baset::typecheck_declaration(
     typecheck_type(declaration.type());
 
     // mark as 'already typechecked'
-    make_already_typechecked(declaration.type());
+    already_typechecked_typet::make_already_typechecked(declaration.type());
 
     irept contract;
 

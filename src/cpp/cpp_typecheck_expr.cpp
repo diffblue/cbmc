@@ -384,9 +384,7 @@ void cpp_typecheckt::typecheck_function_expr(
 
       typecheck_side_effect_function_call(function_call);
 
-      exprt tmp(ID_already_typechecked);
-      tmp.copy_to_operands(function_call);
-      function_call.swap(tmp);
+      already_typechecked_exprt::make_already_typechecked(function_call);
 
       expr.op0().swap(function_call);
       typecheck_function_expr(expr, fargs);
@@ -502,9 +500,7 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
     exprt member(ID_member);
     member.add(ID_component_cpp_name) = cpp_name;
 
-    exprt tmp(ID_already_typechecked);
-    tmp.copy_to_operands(expr.op0());
-    member.copy_to_operands(tmp);
+    member.copy_to_operands(already_typechecked_exprt{expr.op0()});
 
     side_effect_expr_function_callt function_call(
       std::move(member), {}, uninitialized_typet{}, expr.source_location());
@@ -524,9 +520,8 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
     if(expr.id()==ID_ptrmember)
     {
       add_implicit_dereference(function_call);
-      exprt tmp(ID_already_typechecked);
-      tmp.add_to_operands(std::move(function_call));
-      expr.op0().swap(tmp);
+      already_typechecked_exprt::make_already_typechecked(function_call);
+      expr.op0().swap(function_call);
       typecheck_expr(expr);
       return true;
     }
@@ -588,9 +583,7 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
           exprt member(ID_member);
           member.add(ID_component_cpp_name) = cpp_name;
 
-          exprt tmp(ID_already_typechecked);
-          tmp.copy_to_operands(expr.op0());
-          member.copy_to_operands(tmp);
+          member.copy_to_operands(already_typechecked_exprt{expr.op0()});
 
           side_effect_expr_function_callt function_call(
             std::move(member),
@@ -646,9 +639,8 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
           if(expr.id()==ID_ptrmember)
           {
             add_implicit_dereference(function_call);
-            exprt tmp(ID_already_typechecked);
-            tmp.add_to_operands(std::move(function_call));
-            expr.op0()=tmp;
+            already_typechecked_exprt::make_already_typechecked(function_call);
+            expr.op0() = function_call;
             typecheck_expr(expr);
             return true;
           }
@@ -795,11 +787,7 @@ void cpp_typecheckt::typecheck_expr_new(exprt &expr)
   exprt object_expr(ID_new_object, expr.type().subtype());
   object_expr.set(ID_C_lvalue, true);
 
-  {
-    exprt tmp(ID_already_typechecked);
-    tmp.add_to_operands(std::move(object_expr));
-    object_expr.swap(tmp);
-  }
+  already_typechecked_exprt::make_already_typechecked(object_expr);
 
   // not yet typechecked-stuff
   exprt &initializer=static_cast<exprt &>(expr.add(ID_initializer));
@@ -1040,7 +1028,7 @@ void cpp_typecheckt::typecheck_expr_delete(exprt &expr)
   new_object.add_source_location()=expr.source_location();
   new_object.set(ID_C_lvalue, true);
 
-  already_typechecked(new_object);
+  already_typechecked_exprt::make_already_typechecked(new_object);
 
   auto destructor_code = cpp_destructor(expr.source_location(), new_object);
 
@@ -2251,14 +2239,11 @@ void cpp_typecheckt::typecheck_function_call_arguments(
       {
         // create a temporary for the parameter
 
-        exprt arg(ID_already_typechecked);
-        arg.copy_to_operands(*arg_it);
-
         exprt temporary;
         new_temporary(
           arg_it->source_location(),
           parameter.type().subtype(),
-          arg,
+          already_typechecked_exprt{*arg_it},
           temporary);
         arg_it->swap(temporary);
       }
@@ -2452,12 +2437,9 @@ void cpp_typecheckt::typecheck_side_effect_assignment(side_effect_exprt &expr)
   const cpp_namet cpp_name(strop, expr.source_location());
 
   // expr.op0() is already typechecked
-  exprt already_typechecked(ID_already_typechecked);
-  already_typechecked.add_to_operands(std::move(expr.op0()));
-
   exprt member(ID_member);
   member.set(ID_component_cpp_name, cpp_name);
-  member.add_to_operands(std::move(already_typechecked));
+  member.add_to_operands(already_typechecked_exprt{expr.op0()});
 
   side_effect_expr_function_callt new_expr(
     std::move(member),
@@ -2523,12 +2505,9 @@ void cpp_typecheckt::typecheck_side_effect_inc_dec(
 
   const cpp_namet cpp_name(str_op, expr.source_location());
 
-  exprt already_typechecked(ID_already_typechecked);
-  already_typechecked.add_to_operands(std::move(expr.op0()));
-
   exprt member(ID_member);
   member.set(ID_component_cpp_name, cpp_name);
-  member.add_to_operands(std::move(already_typechecked));
+  member.add_to_operands(already_typechecked_exprt{expr.op0()});
 
   side_effect_expr_function_callt new_expr(
     std::move(member), {}, uninitialized_typet{}, expr.source_location());
