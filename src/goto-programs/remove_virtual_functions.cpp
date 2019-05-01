@@ -94,42 +94,6 @@ private:
     goto_programt::targett target);
 };
 
-/// Replace specified virtual function call with a static call to its
-/// most derived implementation
-/// \param function_id: The identifier of the function we are currently
-///   analysing
-/// \param [in,out] goto_program: GOTO program to modify
-/// \param target: iterator to a function in the supplied GOTO program
-///   to replace. Must point to a virtual function call.
-/// \return Returns a pointer to the statement in the supplied GOTO
-///   program after replaced function call
-goto_programt::targett remove_virtual_functionst::remove_virtual_function(
-  const irep_idt &function_id,
-  goto_programt &goto_program,
-  goto_programt::targett target)
-{
-  const code_function_callt &code = target->get_function_call();
-
-  const exprt &function=code.function();
-  INVARIANT(
-    function.id()==ID_virtual_function,
-    "remove_virtual_function must take a virtual function call instruction");
-  INVARIANT(
-    !code.arguments().empty(),
-    "virtual function calls must have at least a this-argument");
-
-  get_virtual_calleest get_callees(symbol_table, class_hierarchy);
-  dispatch_table_entriest functions;
-  get_callees.get_functions(function, functions);
-
-  return remove_virtual_function(
-    function_id,
-    goto_program,
-    target,
-    functions,
-    virtual_dispatch_fallback_actiont::CALL_LAST_FUNCTION);
-}
-
 /// Create a concrete function call to replace a virtual one
 /// \param [in,out] call: the function call to update
 /// \param function_symbol: the function to be called
@@ -497,6 +461,42 @@ goto_programt::targett remove_virtual_functionst::remove_virtual_function(
   remove_skip(goto_program, target, next_target);
 
   return next_target;
+}
+
+/// Replace specified virtual function call with a static call to its
+/// most derived implementation
+/// \param function_id: The identifier of the function we are currently
+///   analysing
+/// \param [in,out] goto_program: GOTO program to modify
+/// \param target: iterator to a function in the supplied GOTO program
+///   to replace. Must point to a virtual function call.
+/// \return Returns a pointer to the statement in the supplied GOTO
+///   program after replaced function call
+goto_programt::targett remove_virtual_functionst::remove_virtual_function(
+  const irep_idt &function_id,
+  goto_programt &goto_program,
+  goto_programt::targett target)
+{
+  const code_function_callt &code = target->get_function_call();
+
+  const exprt &function = code.function();
+  INVARIANT(
+    function.id() == ID_virtual_function,
+    "remove_virtual_function must take a virtual function call instruction");
+  INVARIANT(
+    !code.arguments().empty(),
+    "virtual function calls must have at least a this-argument");
+
+  get_virtual_calleest get_callees(symbol_table, class_hierarchy);
+  dispatch_table_entriest functions;
+  get_callees.get_functions(function, functions);
+
+  return remove_virtual_function(
+    function_id,
+    goto_program,
+    target,
+    functions,
+    virtual_dispatch_fallback_actiont::CALL_LAST_FUNCTION);
 }
 
 /// Used by get_functions to track the most-derived parent that provides an
