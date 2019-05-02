@@ -264,11 +264,20 @@ static assignmentt rewrite_with_to_field_symbols(
        lhs_mod.type().id() == ID_struct_tag))
     {
       exprt field_sensitive_lhs;
+      expr_skeletont lhs_skeleton;
       const with_exprt &with_expr = to_with_expr(ssa_rhs);
 
       if(lhs_mod.type().id() == ID_array)
       {
         field_sensitive_lhs = index_exprt(lhs_mod, with_expr.where());
+        // Access in an array can appear as an index_exprt or a byte_extract
+        auto index_reverted = expr_skeletont::clear_innermost_index_expr(
+          assignment.original_lhs_skeleton);
+        lhs_skeleton = index_reverted
+                         ? *index_reverted
+                         : get_value_or_abort(
+                             expr_skeletont::clear_innermost_byte_extract_expr(
+                               assignment.original_lhs_skeleton));
       }
       else
       {
@@ -276,6 +285,9 @@ static assignmentt rewrite_with_to_field_symbols(
           lhs_mod,
           with_expr.where().get(ID_component_name),
           with_expr.new_value().type());
+        lhs_skeleton =
+          get_value_or_abort(expr_skeletont::clear_innermost_member_expr(
+            assignment.original_lhs_skeleton));
       }
 
       field_sensitive_lhs = state.field_sensitivity.apply(
@@ -286,6 +298,7 @@ static assignmentt rewrite_with_to_field_symbols(
 
       ssa_rhs = with_expr.new_value();
       lhs_mod = to_ssa_expr(field_sensitive_lhs);
+      assignment.original_lhs_skeleton = lhs_skeleton;
     }
   }
   return assignment;
