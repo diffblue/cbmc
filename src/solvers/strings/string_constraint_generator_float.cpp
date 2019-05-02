@@ -210,7 +210,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_string_of_float(
   const floatbv_typet &type = to_floatbv_type(f.type());
   const ieee_float_spect float_spec(type);
   const typet &char_type = res.content().type().subtype();
-  const typet &index_type = res.length().type();
+  const typet &index_type = res.length_type();
 
   // We will look at the first 5 digits of the fractional part.
   // shifted is floor(f * 1e5)
@@ -264,7 +264,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_fractional_part(
   string_constraintst constraints;
   const typet &type = int_expr.type();
   const typet &char_type = res.content().type().subtype();
-  const typet &index_type = res.length().type();
+  const typet &index_type = res.length_type();
   const exprt ten = from_integer(10, type);
   const exprt zero_char = from_integer('0', char_type);
   const exprt nine_char = from_integer('9', char_type);
@@ -292,7 +292,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_fractional_part(
   {
     // after_end is |res| <= j
     binary_relation_exprt after_end(
-      res.length(), ID_le, from_integer(j, res.length().type()));
+      res.length(), ID_le, from_integer(j, res.length_type()));
     mult_exprt ten_sum(sum, ten);
 
     // sum = 10 * sum + after_end ? 0 : (res[j]-'0')
@@ -311,7 +311,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_fractional_part(
     if(j > 1)
     {
       not_exprt no_trailing_zero(and_exprt(
-        equal_exprt(res.length(), from_integer(j + 1, res.length().type())),
+        equal_exprt(res.length(), from_integer(j + 1, res.length_type())),
         equal_exprt(res[j], zero_char)));
       digit_constraints.push_back(no_trailing_zero);
     }
@@ -355,7 +355,7 @@ std::pair<exprt, string_constraintst> add_axioms_from_float_scientific_notation(
   const ieee_float_spect float_spec = ieee_float_spect::single_precision();
   const typet float_type = float_spec.to_type();
   const signedbv_typet int_type(32);
-  const typet &index_type = res.length().type();
+  const typet &index_type = res.length_type();
   const typet &char_type = res.content().type().subtype();
 
   // This is used for rounding float to integers.

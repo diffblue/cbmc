@@ -46,7 +46,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_set_length(
     array_pool.find(f.arguments()[1], f.arguments()[0]);
   const array_string_exprt s1 = get_string_expr(array_pool, f.arguments()[2]);
   const exprt &k = f.arguments()[3];
-  const typet &index_type = s1.length().type();
+  const typet &index_type = s1.length_type();
   const typet &char_type = s1.content().type().subtype();
 
   // We add axioms:
@@ -128,7 +128,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_substring(
   const exprt &start,
   const exprt &end)
 {
-  const typet &index_type = str.length().type();
+  const typet &index_type = str.length_type();
   PRECONDITION(start.type() == index_type);
   PRECONDITION(end.type() == index_type);
 
@@ -190,7 +190,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_trim(
   const array_string_exprt &str = get_string_expr(array_pool, f.arguments()[2]);
   const array_string_exprt &res =
     array_pool.find(f.arguments()[1], f.arguments()[0]);
-  const typet &index_type = str.length().type();
+  const typet &index_type = str.length_type();
   const typet &char_type = str.content().type().subtype();
   const symbol_exprt idx = fresh_symbol("index_trim", index_type);
   const exprt space_char = from_integer(' ', char_type);
@@ -314,7 +314,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_replace(
 
     constraints.existential.push_back(equal_exprt(res.length(), str.length()));
 
-    symbol_exprt qvar = fresh_symbol("QA_replace", str.length().type());
+    symbol_exprt qvar = fresh_symbol("QA_replace", str.length_type());
     implies_exprt case1(
       equal_exprt(str[qvar], old_char), equal_exprt(res[qvar], new_char));
     implies_exprt case2(
@@ -343,7 +343,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_delete_char_at(
   const array_string_exprt res =
     array_pool.find(f.arguments()[1], f.arguments()[0]);
   const array_string_exprt str = get_string_expr(array_pool, f.arguments()[2]);
-  exprt index_one = from_integer(1, str.length().type());
+  exprt index_one = from_integer(1, str.length_type());
   return add_axioms_for_delete(
     fresh_symbol,
     res,
@@ -377,9 +377,9 @@ std::pair<exprt, string_constraintst> add_axioms_for_delete(
   const exprt &end,
   array_poolt &array_pool)
 {
-  PRECONDITION(start.type() == str.length().type());
-  PRECONDITION(end.type() == str.length().type());
-  const typet &index_type = str.length().type();
+  PRECONDITION(start.type() == str.length_type());
+  PRECONDITION(end.type() == str.length_type());
+  const typet &index_type = str.length_type();
   const typet &char_type = str.content().type().subtype();
   const array_string_exprt sub1 =
     array_pool.fresh_string(index_type, char_type);
@@ -387,7 +387,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_delete(
     array_pool.fresh_string(index_type, char_type);
   return combine_results(
     add_axioms_for_substring(
-      fresh_symbol, sub1, str, from_integer(0, str.length().type()), start),
+      fresh_symbol, sub1, str, from_integer(0, str.length_type()), start),
     combine_results(
       add_axioms_for_substring(fresh_symbol, sub2, str, end, str.length()),
       add_axioms_for_concat(fresh_symbol, res, sub1, sub2)));

@@ -42,7 +42,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_index_of(
   const exprt &from_index)
 {
   string_constraintst constraints;
-  const typet &index_type = str.length().type();
+  const typet &index_type = str.length_type();
   symbol_exprt index = fresh_symbol("index_of", index_type);
   symbol_exprt contains = fresh_symbol("contains_in_index_of");
 
@@ -115,7 +115,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_index_of_string(
   const exprt &from_index)
 {
   string_constraintst constraints;
-  const typet &index_type = haystack.length().type();
+  const typet &index_type = haystack.length_type();
   symbol_exprt offset = fresh_symbol("index_of", index_type);
   symbol_exprt contains = fresh_symbol("contains_substring");
 
@@ -208,7 +208,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_last_index_of_string(
   const exprt &from_index)
 {
   string_constraintst constraints;
-  const typet &index_type = haystack.length().type();
+  const typet &index_type = haystack.length_type();
   symbol_exprt offset = fresh_symbol("index_of", index_type);
   symbol_exprt contains = fresh_symbol("contains_substring");
 
@@ -295,7 +295,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_index_of(
   PRECONDITION(args.size() == 2 || args.size() == 3);
   const array_string_exprt str = get_string_expr(array_pool, args[0]);
   const exprt &c = args[1];
-  const typet &index_type = str.length().type();
+  const typet &index_type = str.length_type();
   const typet &char_type = str.content().type().subtype();
   PRECONDITION(f.type() == index_type);
   const exprt from_index =
@@ -349,7 +349,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_last_index_of(
   const exprt &from_index)
 {
   string_constraintst constraints;
-  const typet &index_type = str.length().type();
+  const typet &index_type = str.length_type();
   const symbol_exprt index = fresh_symbol("last_index_of", index_type);
   const symbol_exprt contains = fresh_symbol("contains_in_last_index_of");
 
@@ -420,7 +420,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_last_index_of(
   PRECONDITION(args.size() == 2 || args.size() == 3);
   const array_string_exprt str = get_string_expr(array_pool, args[0]);
   const exprt c = args[1];
-  const typet &index_type = str.length().type();
+  const typet &index_type = str.length_type();
   const typet &char_type = str.content().type().subtype();
   PRECONDITION(f.type() == index_type);
 

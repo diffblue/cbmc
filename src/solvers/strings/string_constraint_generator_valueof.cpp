@@ -220,7 +220,7 @@ add_axioms_from_int_hex(const array_string_exprt &res, const exprt &i)
   const typet &type = i.type();
   PRECONDITION(type.id() == ID_signedbv);
   string_constraintst constraints;
-  const typet &index_type = res.length().type();
+  const typet &index_type = res.length_type();
   const typet &char_type = res.content().type().subtype();
   exprt sixteen = from_integer(16, index_type);
   exprt minus_char = from_integer('-', char_type);
@@ -337,7 +337,7 @@ string_constraintst add_axioms_for_correct_number_format(
 {
   string_constraintst constraints;
   const typet &char_type = str.content().type().subtype();
-  const typet &index_type = str.length().type();
+  const typet &index_type = str.length_type();
 
   const exprt &chr = str[0];
   const equal_exprt starts_with_minus(chr, from_integer('-', char_type));

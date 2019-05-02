@@ -780,7 +780,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
   for(const auto &string : generator.array_pool.created_strings())
   {
     add_lemma(binary_relation_exprt{
-      string.length(), ID_ge, from_integer(0, string.length().type())});
+      string.length(), ID_ge, from_integer(0, string.length_type())});
   }
 
   while((loop_bound_--) > 0)
@@ -1383,7 +1383,7 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
   {
     const string_not_contains_constraintt &nc_axiom = axioms.not_contains[i];
     const symbol_exprt univ_var = generator.fresh_symbol(
-      "not_contains_univ_var", nc_axiom.s0.length().type());
+      "not_contains_univ_var", nc_axiom.s0.length_type());
     const exprt negated_axiom = negation_of_not_contains_constraint(
       nc_axiom, univ_var, [&](const exprt &expr) {
         return simplify_expr(get(expr), ns);

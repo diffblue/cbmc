@@ -141,7 +141,7 @@ string_constraintst add_constraint_on_characters(
   const char &high_char = char_set[2];
 
   // Add constraint
-  const symbol_exprt qvar = fresh_symbol("char_constr", s.length().type());
+  const symbol_exprt qvar = fresh_symbol("char_constr", s.length_type());
   const exprt chr = s[qvar];
   const and_exprt char_in_set(
     binary_relation_exprt(chr, ID_ge, from_integer(low_char, chr.type())),
@@ -176,7 +176,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_constrain_characters(
   const array_string_exprt s = array_pool.find(args[1], args[0]);
   const irep_idt &char_set_string = to_constant_expr(args[2]).get_value();
   const exprt &start =
-    args.size() >= 4 ? args[3] : from_integer(0, s.length().type());
+    args.size() >= 4 ? args[3] : from_integer(0, s.length_type());
   const exprt &end = args.size() >= 5 ? args[4] : s.length();
   auto constraints = add_constraint_on_characters(
     fresh_symbol, s, start, end, char_set_string.c_str());
@@ -339,7 +339,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_copy(
   PRECONDITION(args.size() == 3 || args.size() == 5);
   const array_string_exprt res = array_pool.find(args[1], args[0]);
   const array_string_exprt str = get_string_expr(array_pool, args[2]);
-  const typet &index_type = str.length().type();
+  const typet &index_type = str.length_type();
   const exprt offset = args.size() == 3 ? from_integer(0, index_type) : args[3];
   const exprt count = args.size() == 3 ? str.length() : args[4];
   return add_axioms_for_substring(

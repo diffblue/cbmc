@@ -43,7 +43,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_equals(
   symbol_exprt eq = fresh_symbol("equal");
   typecast_exprt tc_eq(eq, f.type());
 
-  typet index_type = s1.length().type();
+  typet index_type = s1.length_type();
 
   // Axiom 1.
   constraints.existential.push_back(
@@ -145,7 +145,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_equals_ignore_case(
   const exprt char_a = from_integer('a', char_type);
   const exprt char_A = from_integer('A', char_type);
   const exprt char_Z = from_integer('Z', char_type);
-  const typet index_type = s1.length().type();
+  const typet index_type = s1.length_type();
 
   const implies_exprt a1(eq, equal_exprt(s1.length(), s2.length()));
   constraints.existential.push_back(a1);
@@ -193,7 +193,7 @@ string_constraint_generatort::add_axioms_for_hash_code(
   string_constraintst hash_constraints;
   const array_string_exprt str = get_string_expr(array_pool, f.arguments()[0]);
   const typet &return_type = f.type();
-  const typet &index_type = str.length().type();
+  const typet &index_type = str.length_type();
 
   auto pair = hash_code_of_string.insert(
     std::make_pair(str, fresh_symbol("hash", return_type)));
@@ -247,7 +247,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_compare_to(
   const array_string_exprt &s1 = get_string_expr(array_pool, f.arguments()[0]);
   const array_string_exprt &s2 = get_string_expr(array_pool, f.arguments()[1]);
   const symbol_exprt res = fresh_symbol("compare_to", return_type);
-  const typet &index_type = s1.length().type();
+  const typet &index_type = s1.length_type();
 
   const equal_exprt res_null(res, from_integer(0, return_type));
   const implies_exprt a1(res_null, equal_exprt(s1.length(), s2.length()));

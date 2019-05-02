@@ -38,10 +38,10 @@ std::pair<exprt, string_constraintst> add_axioms_for_insert(
   const array_string_exprt &s2,
   const exprt &offset)
 {
-  PRECONDITION(offset.type() == s1.length().type());
+  PRECONDITION(offset.type() == s1.length_type());
 
   string_constraintst constraints;
-  const typet &index_type = s1.length().type();
+  const typet &index_type = s1.length_type();
   const exprt offset1 =
     maximum(from_integer(0, index_type), minimum(s1.length(), offset));
 
@@ -118,7 +118,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_insert(
     const exprt &start = f.arguments()[5];
     const exprt &end = f.arguments()[6];
     const typet &char_type = s1.content().type().subtype();
-    const typet &index_type = s1.length().type();
+    const typet &index_type = s1.length_type();
     const array_string_exprt substring =
       array_pool.fresh_string(index_type, char_type);
     return combine_results(
@@ -151,7 +151,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_insert_int(
   const array_string_exprt res =
     array_pool.find(f.arguments()[1], f.arguments()[0]);
   const exprt &offset = f.arguments()[3];
-  const typet &index_type = s1.length().type();
+  const typet &index_type = s1.length_type();
   const typet &char_type = s1.content().type().subtype();
   const array_string_exprt s2 = array_pool.fresh_string(index_type, char_type);
   return combine_results(
@@ -177,7 +177,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_insert_bool(
   const array_string_exprt res =
     array_pool.find(f.arguments()[1], f.arguments()[0]);
   const exprt &offset = f.arguments()[3];
-  const typet &index_type = s1.length().type();
+  const typet &index_type = s1.length_type();
   const typet &char_type = s1.content().type().subtype();
   const array_string_exprt s2 = array_pool.fresh_string(index_type, char_type);
   return combine_results(
@@ -202,7 +202,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_insert_char(
     array_pool.find(f.arguments()[1], f.arguments()[0]);
   const array_string_exprt s1 = get_string_expr(array_pool, f.arguments()[2]);
   const exprt &offset = f.arguments()[3];
-  const typet &index_type = s1.length().type();
+  const typet &index_type = s1.length_type();
   const typet &char_type = s1.content().type().subtype();
   const array_string_exprt s2 = array_pool.fresh_string(index_type, char_type);
   return combine_results(
@@ -230,7 +230,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_insert_double(
     array_pool.find(f.arguments()[1], f.arguments()[0]);
   const array_string_exprt s1 = get_string_expr(array_pool, f.arguments()[2]);
   const exprt &offset = f.arguments()[3];
-  const typet &index_type = s1.length().type();
+  const typet &index_type = s1.length_type();
   const typet &char_type = s1.content().type().subtype();
   const array_string_exprt s2 = array_pool.fresh_string(index_type, char_type);
   return combine_results(
