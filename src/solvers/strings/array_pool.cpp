@@ -129,9 +129,9 @@ array_string_exprt of_argument(array_poolt &array_pool, const exprt &arg)
   return array_pool.find(string_argument.op1(), string_argument.op0());
 }
 
-array_string_exprt get_string_expr(array_poolt &pool, const exprt &expr)
+array_string_exprt get_string_expr(array_poolt &array_pool, const exprt &expr)
 {
   PRECONDITION(is_refined_string_type(expr.type()));
   const refined_string_exprt &str = to_string_expr(expr);
-  return pool.find(str.content(), str.length());
+  return array_pool.find(str.content(), str.length());
 }

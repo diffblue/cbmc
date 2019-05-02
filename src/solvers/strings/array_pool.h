@@ -98,9 +98,9 @@ private:
 array_string_exprt of_argument(array_poolt &array_pool, const exprt &arg);
 
 /// Fetch the string_exprt corresponding to the given refined_string_exprt
-/// \param pool: pool of arrays representing strings
+/// \param array_pool: pool of arrays representing strings
 /// \param expr: an expression of refined string type
 /// \return a string expression
-array_string_exprt get_string_expr(array_poolt &pool, const exprt &expr);
+array_string_exprt get_string_expr(array_poolt &array_pool, const exprt &expr);
 
 #endif // CPROVER_SOLVERS_STRINGS_ARRAY_POOL_H

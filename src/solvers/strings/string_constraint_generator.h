@@ -141,11 +141,11 @@ std::pair<exprt, string_constraintst> add_axioms_for_char_at(
 std::pair<exprt, string_constraintst> add_axioms_for_code_point_at(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
-  array_poolt &pool);
+  array_poolt &array_pool);
 std::pair<exprt, string_constraintst> add_axioms_for_code_point_before(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
-  array_poolt &pool);
+  array_poolt &array_pool);
 std::pair<exprt, string_constraintst> add_axioms_for_contains(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
@@ -153,11 +153,11 @@ std::pair<exprt, string_constraintst> add_axioms_for_contains(
 std::pair<exprt, string_constraintst> add_axioms_for_equals(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
-  array_poolt &pool);
+  array_poolt &array_pool);
 std::pair<exprt, string_constraintst> add_axioms_for_equals_ignore_case(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
-  array_poolt &pool);
+  array_poolt &array_pool);
 
 std::pair<exprt, string_constraintst> add_axioms_for_is_empty(
   symbol_generatort &fresh_symbol,
@@ -231,7 +231,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_format(
 std::pair<exprt, string_constraintst> add_axioms_for_insert(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
-  array_poolt &pool);
+  array_poolt &array_pool);
 std::pair<exprt, string_constraintst> add_axioms_for_insert_int(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
@@ -402,7 +402,7 @@ DEPRECATED(SINCE(2017, 10, 5, "Java specific, should be implemented in Java"))
 std::pair<exprt, string_constraintst> add_axioms_for_code_point_count(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,
-  array_poolt &pool);
+  array_poolt &array_pool);
 
 /// Add axioms corresponding the String.offsetByCodePointCount java function
 /// \todo This function is underspecified, it should return the index within
