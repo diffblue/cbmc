@@ -184,16 +184,14 @@ std::pair<exprt, string_constraintst> add_axioms_for_equals_ignore_case(
 ///   * \f$ hash(str)=hash(s) \lor |str| \ne |s|
 ///       \lor (|str|=|s| \land \exists i<|s|.\ s[i]\ne str[i]) \f$
 /// \param f: function application with argument refined_string `str`
-/// \param pool: pool of arrays representing strings
 /// \return integer expression `hash(str)`
 std::pair<exprt, string_constraintst>
 string_constraint_generatort::add_axioms_for_hash_code(
-  const function_application_exprt &f,
-  array_poolt &pool)
+  const function_application_exprt &f)
 {
   PRECONDITION(f.arguments().size() == 1);
   string_constraintst hash_constraints;
-  const array_string_exprt str = get_string_expr(pool, f.arguments()[0]);
+  const array_string_exprt str = get_string_expr(array_pool, f.arguments()[0]);
   const typet &return_type = f.type();
   const typet &index_type = str.length().type();
 
