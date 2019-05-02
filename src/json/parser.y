@@ -18,6 +18,8 @@
 %{
 #include "json_parser.h"
 
+#include <util/unicode.h>
+
 int yyjsonlex();
 extern char *yyjsontext;
 extern int yyjsonleng; // really an int, not a size_t
@@ -49,10 +51,11 @@ static std::string convert_TOK_STRING()
       {
         // Character in hexadecimal Unicode representation, in the format
         // \uABCD, i.e. the following four digits are part of this character.
-        assert(p + 4 < yyjsontext + len - 1);
+        char *last_hex_digit = p + 4;
+        assert(last_hex_digit < yyjsontext + len - 1);
         std::string hex(++p, 4);
-        result += std::stoi(hex, nullptr, 16);
-        p += 3;
+        result += codepoint_hex_to_utf8(hex);
+        p = last_hex_digit;
         break;
       }
       default:; /* an error */
