@@ -172,14 +172,12 @@ void remove_returnst::replace_returns(
   const auto return_symbol =
     get_or_create_return_value_symbol(return_type, function_symbol.mode);
 
-  goto_programt &goto_program = function.body;
-
-  Forall_goto_program_instructions(i_it, goto_program)
+  for(auto &i : function.body.instructions)
   {
-    if(i_it->is_return())
+    if(i.is_return())
     {
       INVARIANT(
-        i_it->code.operands().size() == 1,
+        i.code.operands().size() == 1,
         "return instructions should have one operand");
 
       if(return_symbol.has_value())
@@ -187,17 +185,16 @@ void remove_returnst::replace_returns(
         // The return type may differ from the type of the symbol.
         // We therefore do a cast.
         auto rhs = typecast_exprt::conditional_cast(
-          i_it->get_return().return_value(), return_symbol->type());
+          i.get_return().return_value(), return_symbol->type());
 
         // replace "return x;" by "return_type#return_value=x;"
         code_assignt assignment(*return_symbol, rhs);
 
         // Now turn the `return' into `assignment'.
-        *i_it =
-          goto_programt::make_assignment(assignment, i_it->source_location);
+        i = goto_programt::make_assignment(assignment, i.source_location);
       }
       else
-        i_it->turn_into_skip();
+        i.turn_into_skip();
     }
   }
 }
@@ -359,11 +356,11 @@ bool remove_returnst::restore_returns(
 
   bool did_something = false;
 
-  Forall_goto_program_instructions(i_it, goto_program)
+  for(auto &i : goto_program.instructions)
   {
-    if(i_it->is_assign())
+    if(i.is_assign())
     {
-      const auto &assign = i_it->get_assign();
+      const auto &assign = i.get_assign();
 
       if(
         assign.lhs().id() != ID_symbol ||
@@ -372,8 +369,7 @@ bool remove_returnst::restore_returns(
 
       // replace "return_type#return_value=x;" by "return x;"
       const exprt rhs = assign.rhs();
-      *i_it =
-        goto_programt::make_return(code_returnt(rhs), i_it->source_location);
+      i = goto_programt::make_return(code_returnt(rhs), i.source_location);
       did_something = true;
     }
   }
