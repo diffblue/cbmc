@@ -70,6 +70,11 @@ public:
     return to_array_type(type()).size();
   }
 
+  const typet &length_type() const
+  {
+    return to_array_type(type()).size().type();
+  }
+
   exprt &content()
   {
     return *this;
