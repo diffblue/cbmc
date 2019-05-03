@@ -87,10 +87,9 @@ protected:
   goto_programt::const_targett current_target;
   guard_managert guard_manager;
 
-  void check_rec(
-    const exprt &expr,
-    guardt &guard,
-    bool address);
+  void check_rec_address(const exprt &expr, guardt &guard);
+
+  void check_rec(const exprt &expr, guardt &guard);
   void check(const exprt &expr);
 
   struct conditiont
@@ -1454,37 +1453,40 @@ void goto_checkt::add_guarded_claim(
   }
 }
 
-void goto_checkt::check_rec(const exprt &expr, guardt &guard, bool address)
+void goto_checkt::check_rec_address(const exprt &expr, guardt &guard)
 {
   // we don't look into quantifiers
-  if(expr.id()==ID_exists || expr.id()==ID_forall)
+  if(expr.id() == ID_exists || expr.id() == ID_forall)
     return;
 
-  if(address)
+  if(expr.id() == ID_dereference)
   {
-    if(expr.id()==ID_dereference)
-    {
-      assert(expr.operands().size()==1);
-      check_rec(expr.op0(), guard, false);
-    }
-    else if(expr.id()==ID_index)
-    {
-      assert(expr.operands().size()==2);
-      check_rec(expr.op0(), guard, true);
-      check_rec(expr.op1(), guard, false);
-    }
-    else
-    {
-      forall_operands(it, expr)
-        check_rec(*it, guard, true);
-    }
-    return;
+    assert(expr.operands().size() == 1);
+    check_rec(expr.op0(), guard);
   }
+  else if(expr.id() == ID_index)
+  {
+    assert(expr.operands().size() == 2);
+    check_rec_address(expr.op0(), guard);
+    check_rec(expr.op1(), guard);
+  }
+  else
+  {
+    forall_operands(it, expr)
+      check_rec_address(*it, guard);
+  }
+}
+
+void goto_checkt::check_rec(const exprt &expr, guardt &guard)
+{
+  // we don't look into quantifiers
+  if(expr.id() == ID_exists || expr.id() == ID_forall)
+    return;
 
   if(expr.id()==ID_address_of)
   {
     assert(expr.operands().size()==1);
-    check_rec(expr.op0(), guard, true);
+    check_rec_address(expr.op0(), guard);
     return;
   }
   else if(expr.id()==ID_and || expr.id()==ID_or)
@@ -1501,7 +1503,7 @@ void goto_checkt::check_rec(const exprt &expr, guardt &guard, bool address)
         throw "`"+expr.id_string()+"' takes Boolean operands only, but got "+
               op.pretty();
 
-      check_rec(op, guard, false);
+      check_rec(op, guard);
 
       if(expr.id()==ID_or)
         guard.add(not_exprt(op));
@@ -1525,19 +1527,19 @@ void goto_checkt::check_rec(const exprt &expr, guardt &guard, bool address)
       throw msg;
     }
 
-    check_rec(expr.op0(), guard, false);
+    check_rec(expr.op0(), guard);
 
     {
       guardt old_guard=guard;
       guard.add(expr.op0());
-      check_rec(expr.op1(), guard, false);
+      check_rec(expr.op1(), guard);
       guard = std::move(old_guard);
     }
 
     {
       guardt old_guard=guard;
       guard.add(not_exprt(expr.op0()));
-      check_rec(expr.op2(), guard, false);
+      check_rec(expr.op2(), guard);
       guard = std::move(old_guard);
     }
 
@@ -1550,7 +1552,7 @@ void goto_checkt::check_rec(const exprt &expr, guardt &guard, bool address)
     const dereference_exprt &deref=
       to_dereference_expr(member.struct_op());
 
-    check_rec(deref.pointer(), guard, false);
+    check_rec(deref.pointer(), guard);
 
     // avoid building the following expressions when pointer_validity_check
     // would return immediately anyway
@@ -1589,7 +1591,7 @@ void goto_checkt::check_rec(const exprt &expr, guardt &guard, bool address)
   }
 
   forall_operands(it, expr)
-    check_rec(*it, guard, false);
+    check_rec(*it, guard);
 
   if(expr.id()==ID_index)
   {
@@ -1652,7 +1654,7 @@ void goto_checkt::check_rec(const exprt &expr, guardt &guard, bool address)
 void goto_checkt::check(const exprt &expr)
 {
   guardt guard{true_exprt{}, guard_manager};
-  check_rec(expr, guard, false);
+  check_rec(expr, guard);
 }
 
 /// expand the r_ok and w_ok predicates
