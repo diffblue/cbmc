@@ -16,17 +16,16 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include "refined_string_type.h"
 #include "std_expr.h"
 
-inline binary_relation_exprt
-greater_or_equal_to(const exprt &lhs, const exprt &rhs)
+inline binary_relation_exprt greater_or_equal_to(exprt lhs, exprt rhs)
 {
   PRECONDITION(rhs.type() == lhs.type());
-  return binary_relation_exprt(lhs, ID_ge, rhs);
+  return binary_relation_exprt(std::move(lhs), ID_ge, std::move(rhs));
 }
 
-inline binary_relation_exprt greater_than(const exprt &lhs, const exprt &rhs)
+inline binary_relation_exprt greater_than(exprt lhs, exprt rhs)
 {
   PRECONDITION(rhs.type() == lhs.type());
-  return binary_relation_exprt(rhs, ID_lt, lhs);
+  return binary_relation_exprt(std::move(rhs), ID_lt, std::move(lhs));
 }
 
 inline binary_relation_exprt greater_than(const exprt &lhs, mp_integer i)
@@ -34,11 +33,10 @@ inline binary_relation_exprt greater_than(const exprt &lhs, mp_integer i)
   return binary_relation_exprt(from_integer(i, lhs.type()), ID_lt, lhs);
 }
 
-inline binary_relation_exprt
-less_than_or_equal_to(const exprt &lhs, const exprt &rhs)
+inline binary_relation_exprt less_than_or_equal_to(exprt lhs, exprt rhs)
 {
   PRECONDITION(rhs.type() == lhs.type());
-  return binary_relation_exprt(lhs, ID_le, rhs);
+  return binary_relation_exprt(std::move(lhs), ID_le, std::move(rhs));
 }
 
 inline binary_relation_exprt
@@ -47,10 +45,10 @@ less_than_or_equal_to(const exprt &lhs, mp_integer i)
   return binary_relation_exprt(lhs, ID_le, from_integer(i, lhs.type()));
 }
 
-inline equal_exprt equal_to(const exprt &lhs, const exprt &rhs)
+inline equal_exprt equal_to(exprt lhs, exprt rhs)
 {
   PRECONDITION(rhs.type() == lhs.type());
-  return equal_exprt(lhs, rhs);
+  return equal_exprt(std::move(lhs), std::move(rhs));
 }
 
 inline equal_exprt equal_to(const exprt &lhs, mp_integer i)
