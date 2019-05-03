@@ -94,6 +94,13 @@ protected:
   /// \param guard: the condition for the check (unmodified here)
   void check_rec_address(const exprt &expr, guardt &guard);
 
+  /// Check a logical operation: check each operand in separation while
+  /// extending the guarding condition as follows.
+  ///  a /\ b /\ c ==> check(a, TRUE), check(b, a), check (c, a /\ b)
+  ///  a \/ b \/ c ==> check(a, TRUE), check(b, ~a), check (c, ~a /\ ~b)
+  /// \param expr: the expression to be checked
+  /// \param guard: the condition for the check (extended with the previous
+  ///   operands (or their negations) for recursively calls)
   void check_rec_logical_op(const exprt &expr, guardt &guard);
 
   void check_rec(const exprt &expr, guardt &guard);
@@ -1485,24 +1492,21 @@ void goto_checkt::check_rec_address(const exprt &expr, guardt &guard)
 
 void goto_checkt::check_rec_logical_op(const exprt &expr, guardt &guard)
 {
-  if(!expr.is_boolean())
-    throw "`"+expr.id_string()+"' must be Boolean, but got "+
-      expr.pretty();
+  INVARIANT(
+    expr.is_boolean(),
+    "`" + expr.id_string() + "' must be Boolean, but got " + expr.pretty());
 
-  guardt old_guard=guard;
+  guardt old_guard = guard;
 
   for(const auto &op : expr.operands())
   {
-    if(!op.is_boolean())
-      throw "`"+expr.id_string()+"' takes Boolean operands only, but got "+
-        op.pretty();
+    INVARIANT(
+      op.is_boolean(),
+      "`" + expr.id_string() + "' takes Boolean operands only, but got " +
+        op.pretty());
 
     check_rec(op, guard);
-
-    if(expr.id()==ID_or)
-      guard.add(not_exprt(op));
-    else
-      guard.add(op);
+    guard.add(expr.id() == ID_or ? not_exprt(op) : op);
   }
 
   guard = std::move(old_guard);
