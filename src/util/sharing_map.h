@@ -370,23 +370,35 @@ public:
   {
   public:
     delta_view_itemt(
-      const bool in_both,
       const key_type &k,
       const mapped_type &m,
-      const mapped_type &other_m) :
-        in_both(in_both),
-        k(k),
-        m(m),
-        other_m(other_m) {}
+      const mapped_type &other_m)
+      : k(k), m(m), other_m(&other_m)
+    {
+    }
 
-    // if true key is in both maps, if false key is only in the map
-    // from which the view was obtained
-    const bool in_both;
+    delta_view_itemt(const key_type &k, const mapped_type &m)
+      : k(k), m(m), other_m(nullptr)
+    {
+    }
 
     const key_type &k;
 
     const mapped_type &m;
-    const mapped_type &other_m;
+
+    bool is_in_both_maps() const
+    {
+      return other_m != nullptr;
+    }
+
+    const mapped_type &get_other_map_value() const
+    {
+      PRECONDITION(is_in_both_maps());
+      return *other_m;
+    }
+
+  private:
+    const mapped_type *other_m;
   };
 
   /// Delta view of the key-value pairs in two maps. A delta view of two maps is
@@ -411,13 +423,12 @@ public:
   /// the maps that are contained in subtrees that are not shared between them.
   ///
   /// A delta view is represented as a list of structs, with each struct having
-  /// four members (`in_both`, `key`, `value1`, `value2`). The elements `key`,
-  /// `value1`, and `value2` are const references to the corresponding elements
-  /// in the map. The first element indicates whether the key exists in both
-  /// maps, the second element is the key, the third element is the mapped value
-  /// of the first map, and the fourth element is the mapped value of the second
-  /// map, or a dummy element if the key exists only in the first map (in which
-  /// case `in_both` is false).
+  /// three members (`key`, `value1`, `value2`). The elements `key`, `value1`,
+  /// and `value2` are const references to the corresponding elements in the
+  /// map, with the third being absent if the key only existed in the queried
+  /// map. The first element is the key, the second element is the mapped value
+  /// of the first map, and the third element is the mapped value of the second
+  /// map if present.
   ///
   /// Calling `A.delta_view(B, ...)` yields a view such that for each element in
   /// the view one of two things holds:
@@ -539,9 +550,6 @@ protected:
     bool leafs_only,
     std::set<const void *> &marked,
     bool mark = true) const;
-
-  // dummy element returned when no element was found
-  static mapped_type dummy;
 
   static const std::string not_found_msg;
 
@@ -765,7 +773,7 @@ SHARING_MAPT(void)
 ::gather_all(const innert &n, delta_viewt &delta_view) const
 {
   auto f = [&delta_view](const key_type &k, const mapped_type &m) {
-    delta_view.push_back(delta_view_itemt(false, k, m, dummy));
+    delta_view.push_back(delta_view_itemt(k, m));
   };
 
   iterate(n, f);
@@ -895,12 +903,12 @@ SHARING_MAPT(void)
       {
         if(!l1.shares_with(*p))
         {
-          delta_view.push_back({true, k1, l1.get_value(), p->get_value()});
+          delta_view.push_back({k1, l1.get_value(), p->get_value()});
         }
       }
       else if(!only_common)
       {
-        delta_view.push_back({false, l1.get_key(), l1.get_value(), dummy});
+        delta_view.push_back({k1, l1.get_value()});
       }
     }
   }
@@ -1052,8 +1060,6 @@ SHARING_MAPT2(optionalt<std::reference_wrapper<const, mapped_type>>)::find(
 // static constants
 
 SHARING_MAPT(const std::string)::not_found_msg="key not found";
-
-SHARING_MAPT2(, mapped_type)::dummy;
 
 SHARING_MAPT(const std::size_t)::bits = 18;
 SHARING_MAPT(const std::size_t)::chunk = 3;
