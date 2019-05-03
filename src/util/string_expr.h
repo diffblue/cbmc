@@ -31,7 +31,7 @@ inline binary_relation_exprt greater_than(const exprt &lhs, const exprt &rhs)
 
 inline binary_relation_exprt greater_than(const exprt &lhs, mp_integer i)
 {
-  return greater_than(lhs, from_integer(i, lhs.type()));
+  return binary_relation_exprt(from_integer(i, lhs.type()), ID_lt, lhs);
 }
 
 inline binary_relation_exprt
@@ -44,7 +44,7 @@ less_than_or_equal_to(const exprt &lhs, const exprt &rhs)
 inline binary_relation_exprt
 less_than_or_equal_to(const exprt &lhs, mp_integer i)
 {
-  return less_than_or_equal_to(lhs, from_integer(i, lhs.type()));
+  return binary_relation_exprt(lhs, ID_le, from_integer(i, lhs.type()));
 }
 
 inline equal_exprt equal_to(const exprt &lhs, const exprt &rhs)
@@ -55,7 +55,7 @@ inline equal_exprt equal_to(const exprt &lhs, const exprt &rhs)
 
 inline equal_exprt equal_to(const exprt &lhs, mp_integer i)
 {
-  return equal_to(lhs, from_integer(i, lhs.type()));
+  return equal_exprt(lhs, from_integer(i, lhs.type()));
 }
 
 // Representation of strings as arrays
