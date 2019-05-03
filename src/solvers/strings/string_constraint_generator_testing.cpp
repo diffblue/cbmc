@@ -43,7 +43,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_is_prefix(
 {
   string_constraintst constraints;
   const symbol_exprt isprefix = fresh_symbol("isprefix");
-  const typet &index_type = str.length().type();
+  const typet &index_type = str.length_type();
   const exprt offset_within_bounds = and_exprt(
     binary_relation_exprt(offset, ID_ge, from_integer(0, offset.type())),
     binary_relation_exprt(offset, ID_le, str.length()),
@@ -112,7 +112,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_is_prefix(
   const array_string_exprt &s1 =
     get_string_expr(array_pool, args[swap_arguments ? 0u : 1u]);
   const exprt offset =
-    args.size() == 2 ? from_integer(0, s0.length().type()) : args[2];
+    args.size() == 2 ? from_integer(0, s0.length_type()) : args[2];
   auto pair = add_axioms_for_is_prefix(fresh_symbol, s0, s1, offset);
   return {typecast_exprt(pair.first, f.type()), std::move(pair.second)};
 }
@@ -185,7 +185,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_is_suffix(
     get_string_expr(array_pool, args[swap_arguments ? 1u : 0u]);
   const array_string_exprt &s1 =
     get_string_expr(array_pool, args[swap_arguments ? 0u : 1u]);
-  const typet &index_type = s0.length().type();
+  const typet &index_type = s0.length_type();
 
   implies_exprt a1(issuffix, greater_or_equal_to(s1.length(), s0.length()));
   constraints.existential.push_back(a1);
@@ -243,7 +243,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_contains(
   string_constraintst constraints;
   const array_string_exprt s0 = get_string_expr(array_pool, f.arguments()[0]);
   const array_string_exprt s1 = get_string_expr(array_pool, f.arguments()[1]);
-  const typet &index_type = s0.length().type();
+  const typet &index_type = s0.length_type();
   const symbol_exprt contains = fresh_symbol("contains");
   const symbol_exprt startpos = fresh_symbol("startpos_contains", index_type);
 

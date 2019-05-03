@@ -54,8 +54,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_concat_substr(
 
   // Axiom 2.
   constraints.universal.push_back([&] {
-    const symbol_exprt idx =
-      fresh_symbol("QA_index_concat", res.length().type());
+    const symbol_exprt idx = fresh_symbol("QA_index_concat", res.length_type());
     return string_constraintt(
       idx, zero_if_negative(s1.length()), equal_exprt(s1[idx], res[idx]));
   }());
@@ -63,7 +62,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_concat_substr(
   // Axiom 3.
   constraints.universal.push_back([&] {
     const symbol_exprt idx2 =
-      fresh_symbol("QA_index_concat2", res.length().type());
+      fresh_symbol("QA_index_concat2", res.length_type());
     const equal_exprt res_eq(
       res[plus_exprt(idx2, s1.length())], s2[plus_exprt(start1, idx2)]);
     const minus_exprt upper_bound(res.length(), s1.length());
@@ -85,12 +84,12 @@ exprt length_constraint_for_concat_substr(
   const exprt &start,
   const exprt &end)
 {
-  PRECONDITION(res.length().type().id() == ID_signedbv);
+  PRECONDITION(res.length_type().id() == ID_signedbv);
   const exprt start1 = maximum(start, from_integer(0, start.type()));
   const exprt end1 = maximum(minimum(end, s2.length()), start1);
   const plus_exprt res_length(s1.length(), minus_exprt(end1, start1));
   const exprt overflow = sum_overflows(res_length);
-  const exprt max_int = to_signedbv_type(res.length().type()).largest_expr();
+  const exprt max_int = to_signedbv_type(res.length_type()).largest_expr();
   return equal_exprt(res.length(), if_exprt(overflow, max_int, res_length));
 }
 
@@ -111,7 +110,7 @@ exprt length_constraint_for_concat_char(
   const array_string_exprt &s1)
 {
   return equal_exprt(
-    res.length(), plus_exprt(s1.length(), from_integer(1, s1.length().type())));
+    res.length(), plus_exprt(s1.length(), from_integer(1, s1.length_type())));
 }
 
 /// Add axioms enforcing that `res` is equal to the concatenation of `s1` and
@@ -129,7 +128,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_concat(
   const array_string_exprt &s1,
   const array_string_exprt &s2)
 {
-  exprt index_zero = from_integer(0, s2.length().type());
+  exprt index_zero = from_integer(0, s2.length_type());
   return add_axioms_for_concat_substr(
     fresh_symbol, res, s1, s2, index_zero, s2.length());
 }
@@ -150,7 +149,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_concat_code_point(
     array_pool.find(f.arguments()[1], f.arguments()[0]);
   const array_string_exprt s1 = get_string_expr(array_pool, f.arguments()[2]);
   const typet &char_type = s1.content().type().subtype();
-  const typet &index_type = s1.length().type();
+  const typet &index_type = s1.length_type();
   const array_string_exprt code_point =
     array_pool.fresh_string(index_type, char_type);
   return combine_results(

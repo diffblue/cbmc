@@ -131,7 +131,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_code_point_at(
   const exprt &pos = f.arguments()[1];
 
   const symbol_exprt result = fresh_symbol("char", return_type);
-  const exprt index1 = from_integer(1, str.length().type());
+  const exprt index1 = from_integer(1, str.length_type());
   const exprt &char1 = str[pos];
   const exprt &char2 = str[plus_exprt(pos, index1)];
   const typecast_exprt char1_as_int(char1, return_type);

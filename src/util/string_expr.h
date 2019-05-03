@@ -70,6 +70,11 @@ public:
     return to_array_type(type()).size();
   }
 
+  const typet &length_type() const
+  {
+    return to_array_type(type()).size().type();
+  }
+
   exprt &content()
   {
     return *this;
@@ -87,7 +92,7 @@ public:
 
   index_exprt operator[](int i) const
   {
-    return index_exprt(content(), from_integer(i, length().type()));
+    return index_exprt(content(), from_integer(i, length_type()));
   }
 };
 

@@ -245,12 +245,11 @@ static std::vector<format_elementt> parse_format_string(std::string s)
 static exprt is_null(const array_string_exprt &string)
 {
   return and_exprt{
-    equal_exprt{string.length(), from_integer(4, string.length().type())},
-    and_exprt{
-      equal_exprt{string[0], from_integer('n', string[0].type())},
-      equal_exprt{string[1], from_integer('u', string[0].type())},
-      equal_exprt{string[2], from_integer('l', string[0].type())},
-      equal_exprt{string[3], from_integer('l', string[0].type())}}};
+    equal_exprt{string.length(), from_integer(4, string.length_type())},
+    and_exprt{equal_exprt{string[0], from_integer('n', string[0].type())},
+              equal_exprt{string[1], from_integer('u', string[0].type())},
+              equal_exprt{string[2], from_integer('l', string[0].type())},
+              equal_exprt{string[3], from_integer('l', string[0].type())}}};
 }
 
 /// Parse `s` and add axioms ensuring the output corresponds to the output of
@@ -457,7 +456,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_format(
   std::vector<array_string_exprt> intermediary_strings;
   std::size_t arg_count = 0;
   const typet &char_type = res.content().type().subtype();
-  const typet &index_type = res.length().type();
+  const typet &index_type = res.length_type();
 
   for(const format_elementt &fe : format_strings)
   {
