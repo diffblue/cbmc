@@ -94,6 +94,8 @@ protected:
   /// \param guard: the condition for the check (unmodified here)
   void check_rec_address(const exprt &expr, guardt &guard);
 
+  void check_rec_logical_op(const exprt &expr, guardt &guard);
+
   void check_rec(const exprt &expr, guardt &guard);
   void check(const exprt &expr);
 
@@ -1481,6 +1483,31 @@ void goto_checkt::check_rec_address(const exprt &expr, guardt &guard)
   }
 }
 
+void goto_checkt::check_rec_logical_op(const exprt &expr, guardt &guard)
+{
+  if(!expr.is_boolean())
+    throw "`"+expr.id_string()+"' must be Boolean, but got "+
+      expr.pretty();
+
+  guardt old_guard=guard;
+
+  for(const auto &op : expr.operands())
+  {
+    if(!op.is_boolean())
+      throw "`"+expr.id_string()+"' takes Boolean operands only, but got "+
+        op.pretty();
+
+    check_rec(op, guard);
+
+    if(expr.id()==ID_or)
+      guard.add(not_exprt(op));
+    else
+      guard.add(op);
+  }
+
+  guard = std::move(old_guard);
+}
+
 void goto_checkt::check_rec(const exprt &expr, guardt &guard)
 {
   // we don't look into quantifiers
@@ -1495,27 +1522,7 @@ void goto_checkt::check_rec(const exprt &expr, guardt &guard)
   }
   else if(expr.id()==ID_and || expr.id()==ID_or)
   {
-    if(!expr.is_boolean())
-      throw "`"+expr.id_string()+"' must be Boolean, but got "+
-            expr.pretty();
-
-    guardt old_guard=guard;
-
-    for(const auto &op : expr.operands())
-    {
-      if(!op.is_boolean())
-        throw "`"+expr.id_string()+"' takes Boolean operands only, but got "+
-              op.pretty();
-
-      check_rec(op, guard);
-
-      if(expr.id()==ID_or)
-        guard.add(not_exprt(op));
-      else
-        guard.add(op);
-    }
-
-    guard = std::move(old_guard);
+    check_rec_logical_op(expr, guard);
     return;
   }
   else if(expr.id()==ID_if)
