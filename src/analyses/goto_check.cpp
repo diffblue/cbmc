@@ -87,6 +87,11 @@ protected:
   goto_programt::const_targett current_target;
   guard_managert guard_manager;
 
+  /// Check an address-of expression:
+  ///  if it is a dereference then check the pointer
+  ///  if it is an index then address-check the array and then check the index
+  /// \param expr: the expression to be checked
+  /// \param guard: the condition for the check (unmodified here)
   void check_rec_address(const exprt &expr, guardt &guard);
 
   void check_rec(const exprt &expr, guardt &guard);
@@ -1461,19 +1466,18 @@ void goto_checkt::check_rec_address(const exprt &expr, guardt &guard)
 
   if(expr.id() == ID_dereference)
   {
-    assert(expr.operands().size() == 1);
-    check_rec(expr.op0(), guard);
+    check_rec(to_dereference_expr(expr).pointer(), guard);
   }
   else if(expr.id() == ID_index)
   {
-    assert(expr.operands().size() == 2);
-    check_rec_address(expr.op0(), guard);
-    check_rec(expr.op1(), guard);
+    const index_exprt &index_expr = to_index_expr(expr);
+    check_rec_address(index_expr.array(), guard);
+    check_rec(index_expr.index(), guard);
   }
   else
   {
-    forall_operands(it, expr)
-      check_rec_address(*it, guard);
+    for(const auto &operand : expr.operands())
+      check_rec_address(operand, guard);
   }
 }
 
