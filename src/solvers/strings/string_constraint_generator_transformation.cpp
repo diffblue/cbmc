@@ -54,7 +54,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_set_length(
   // a2 : forall i< min(|s1|, k) .res[i] = s1[i]
   // a3 : forall |s1| <= i < |res|. res[i] = 0
 
-  constraints.existential.push_back(length_eq(res, k));
+  constraints.existential.push_back(equal_to(res.length(), k));
 
   const symbol_exprt idx = fresh_symbol("QA_index_set_length", index_type);
   const string_constraintt a2(
@@ -197,18 +197,19 @@ std::pair<exprt, string_constraintst> add_axioms_for_trim(
 
   // Axiom 1.
   constraints.existential.push_back(
-    length_ge(str, plus_exprt(idx, res.length())));
+    greater_or_equal_to(str.length(), plus_exprt(idx, res.length())));
 
   binary_relation_exprt a2(idx, ID_ge, from_integer(0, index_type));
   constraints.existential.push_back(a2);
 
-  const exprt a3 = length_ge(str, idx);
+  const exprt a3 = greater_or_equal_to(str.length(), idx);
   constraints.existential.push_back(a3);
 
-  const exprt a4 = length_ge(res, from_integer(0, index_type));
+  const exprt a4 =
+    greater_or_equal_to(res.length(), from_integer(0, index_type));
   constraints.existential.push_back(a4);
 
-  const exprt a5 = length_le(res, str.length());
+  const exprt a5 = less_than_or_equal_to(res.length(), str.length());
   constraints.existential.push_back(a5);
 
   symbol_exprt n = fresh_symbol("QA_index_trim", index_type);
