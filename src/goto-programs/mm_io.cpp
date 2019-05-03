@@ -56,8 +56,7 @@ void mm_io(
           const code_typet &ct=to_code_type(mm_io_r.type());
 
           irep_idt identifier=to_symbol_expr(mm_io_r).get_identifier();
-          irep_idt r_identifier = return_value_identifier(identifier, ns);
-          symbol_exprt return_value(r_identifier, ct.return_type());
+          auto return_value = return_value_symbol(identifier, ns);
           if_exprt if_expr(integer_address(d.pointer()), return_value, d);
           if(!replace_expr(d, if_expr, a.rhs()))
             it->set_assign(a);

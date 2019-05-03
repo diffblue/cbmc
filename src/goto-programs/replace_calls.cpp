@@ -97,16 +97,18 @@ void replace_callst::operator()(
     PRECONDITION(base_type_eq(f_it1->second.type, f_it2->second.type, ns));
 
     // check that returns have not been removed
-    goto_programt::const_targett next_it = std::next(it);
-    if(next_it != goto_program.instructions.end() && next_it->is_assign())
+    if(to_code_type(f_it1->second.type).return_type().id() != ID_empty)
     {
-      const code_assignt &ca = next_it->get_assign();
-      const exprt &rhs = ca.rhs();
+      goto_programt::const_targett next_it = std::next(it);
+      if(next_it != goto_program.instructions.end() && next_it->is_assign())
+      {
+        const code_assignt &ca = next_it->get_assign();
+        const exprt &rhs = ca.rhs();
 
-      INVARIANT(
-        rhs.id() != ID_symbol || to_symbol_expr(rhs).get_identifier() !=
-                                   return_value_identifier(id, ns),
-        "returns must not be removed before replacing calls");
+        INVARIANT(
+          rhs != return_value_symbol(id, ns),
+          "returns must not be removed before replacing calls");
+      }
     }
 
     // Finally modify the call

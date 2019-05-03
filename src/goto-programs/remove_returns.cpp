@@ -64,10 +64,10 @@ optionalt<symbol_exprt>
 remove_returnst::get_or_create_return_value_symbol(const irep_idt &function_id)
 {
   const namespacet ns(symbol_table);
-  const irep_idt symbol_name = return_value_identifier(function_id, ns);
-  const symbolt *existing_symbol = symbol_table.lookup(symbol_name);
-  if(existing_symbol != nullptr)
-    return existing_symbol->symbol_expr();
+  const auto symbol_expr = return_value_symbol(function_id, ns);
+  const auto symbol_name = symbol_expr.get_identifier();
+  if(symbol_table.has_symbol(symbol_name))
+    return symbol_expr;
 
   const symbolt &function_symbol = symbol_table.lookup_ref(function_id);
   const typet &return_type = to_code_type(function_symbol.type).return_type();
@@ -296,7 +296,8 @@ bool remove_returnst::restore_returns(
 
   // do we have X#return_value?
   const namespacet ns(symbol_table);
-  auto rv_name = return_value_identifier(function_id, ns);
+  auto rv_symbol = return_value_symbol(function_id, ns);
+  auto rv_name = rv_symbol.get_identifier();
 
   symbol_tablet::symbolst::const_iterator rv_it=
     symbol_table.symbols.find(rv_name);
@@ -368,12 +369,8 @@ void remove_returnst::undo_function_calls(
 
       const code_assignt &assign = next->get_assign();
 
-      if(assign.rhs().id()!=ID_symbol)
-        continue;
-
-      irep_idt rv_name = return_value_identifier(function_id, ns);
-      const symbol_exprt &rhs=to_symbol_expr(assign.rhs());
-      if(rhs.get_identifier()!=rv_name)
+      const auto rv_symbol = return_value_symbol(function_id, ns);
+      if(assign.rhs() != rv_symbol)
         continue;
 
       // restore the previous assignment
@@ -414,7 +411,10 @@ void restore_returns(goto_modelt &goto_model)
   rr.restore(goto_model.goto_functions);
 }
 
-irep_idt return_value_identifier(const irep_idt &identifier, const namespacet &)
+symbol_exprt
+return_value_symbol(const irep_idt &identifier, const namespacet &ns)
 {
-  return id2string(identifier) + RETURN_VALUE_SUFFIX;
+  const symbolt &function_symbol = ns.lookup(identifier);
+  const typet &return_type = to_code_type(function_symbol.type).return_type();
+  return symbol_exprt(id2string(identifier) + RETURN_VALUE_SUFFIX, return_type);
 }
