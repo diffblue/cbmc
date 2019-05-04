@@ -99,6 +99,102 @@ inline bool can_cast_type<annotated_typet>(const typet &)
   return true;
 }
 
+class java_method_typet : public code_typet
+{
+public:
+  using code_typet::parameterst;
+  using code_typet::parametert;
+
+  /// Constructs a new code type, i.e. method type
+  /// \param _parameters: the vector of method parameters
+  /// \param _return_type: the return type
+  java_method_typet(parameterst &&_parameters, typet &&_return_type)
+    : code_typet(std::move(_parameters), std::move(_return_type))
+  {
+    set(ID_C_java_method_type, true);
+  }
+
+  /// Constructs a new code type, i.e. method type
+  /// \param _parameters: the vector of method parameters
+  /// \param _return_type: the return type
+  java_method_typet(parameterst &&_parameters, const typet &_return_type)
+    : code_typet(std::move(_parameters), _return_type)
+  {
+    set(ID_C_java_method_type, true);
+  }
+
+  const std::vector<irep_idt> throws_exceptions() const
+  {
+    std::vector<irep_idt> exceptions;
+    for(const auto &e : find(ID_exceptions_thrown_list).get_sub())
+      exceptions.push_back(e.id());
+    return exceptions;
+  }
+
+  void add_throws_exceptions(irep_idt exception)
+  {
+    add(ID_exceptions_thrown_list).get_sub().push_back(irept(exception));
+  }
+
+  bool get_is_final() const
+  {
+    return get_bool(ID_final);
+  }
+
+  void set_is_final(bool is_final)
+  {
+    set(ID_final, is_final);
+  }
+
+  bool get_native() const
+  {
+    return get_bool(ID_is_native_method);
+  }
+
+  void set_native(bool is_native)
+  {
+    set(ID_is_native_method, is_native);
+  }
+
+  bool get_is_varargs() const
+  {
+    return get_bool(ID_is_varargs_method);
+  }
+
+  void set_is_varargs(bool is_varargs)
+  {
+    set(ID_is_varargs_method, is_varargs);
+  }
+
+  bool is_synthetic() const
+  {
+    return get_bool(ID_synthetic);
+  }
+
+  void set_is_synthetic(bool is_synthetic)
+  {
+    set(ID_synthetic, is_synthetic);
+  }
+};
+
+template <>
+inline bool can_cast_type<java_method_typet>(const typet &type)
+{
+  return type.id() == ID_code && type.get_bool(ID_C_java_method_type);
+}
+
+inline const java_method_typet &to_java_method_type(const typet &type)
+{
+  PRECONDITION(can_cast_type<java_method_typet>(type));
+  return static_cast<const java_method_typet &>(type);
+}
+
+inline java_method_typet &to_java_method_type(typet &type)
+{
+  PRECONDITION(can_cast_type<java_method_typet>(type));
+  return static_cast<java_method_typet &>(type);
+}
+
 class java_class_typet:public class_typet
 {
 public:
@@ -350,102 +446,6 @@ template <>
 inline bool can_cast_type<java_class_typet>(const typet &type)
 {
   return can_cast_type<class_typet>(type);
-}
-
-class java_method_typet : public code_typet
-{
-public:
-  using code_typet::parameterst;
-  using code_typet::parametert;
-
-  /// Constructs a new code type, i.e. method type
-  /// \param _parameters: the vector of method parameters
-  /// \param _return_type: the return type
-  java_method_typet(parameterst &&_parameters, typet &&_return_type)
-    : code_typet(std::move(_parameters), std::move(_return_type))
-  {
-    set(ID_C_java_method_type, true);
-  }
-
-  /// Constructs a new code type, i.e. method type
-  /// \param _parameters: the vector of method parameters
-  /// \param _return_type: the return type
-  java_method_typet(parameterst &&_parameters, const typet &_return_type)
-    : code_typet(std::move(_parameters), _return_type)
-  {
-    set(ID_C_java_method_type, true);
-  }
-
-  const std::vector<irep_idt> throws_exceptions() const
-  {
-    std::vector<irep_idt> exceptions;
-    for(const auto &e : find(ID_exceptions_thrown_list).get_sub())
-      exceptions.push_back(e.id());
-    return exceptions;
-  }
-
-  void add_throws_exceptions(irep_idt exception)
-  {
-    add(ID_exceptions_thrown_list).get_sub().push_back(irept(exception));
-  }
-
-  bool get_is_final() const
-  {
-    return get_bool(ID_final);
-  }
-
-  void set_is_final(bool is_final)
-  {
-    set(ID_final, is_final);
-  }
-
-  bool get_native() const
-  {
-    return get_bool(ID_is_native_method);
-  }
-
-  void set_native(bool is_native)
-  {
-    set(ID_is_native_method, is_native);
-  }
-
-  bool get_is_varargs() const
-  {
-    return get_bool(ID_is_varargs_method);
-  }
-
-  void set_is_varargs(bool is_varargs)
-  {
-    set(ID_is_varargs_method, is_varargs);
-  }
-
-  bool is_synthetic() const
-  {
-    return get_bool(ID_synthetic);
-  }
-
-  void set_is_synthetic(bool is_synthetic)
-  {
-    set(ID_synthetic, is_synthetic);
-  }
-};
-
-template <>
-inline bool can_cast_type<java_method_typet>(const typet &type)
-{
-  return type.id() == ID_code && type.get_bool(ID_C_java_method_type);
-}
-
-inline const java_method_typet &to_java_method_type(const typet &type)
-{
-  PRECONDITION(can_cast_type<java_method_typet>(type));
-  return static_cast<const java_method_typet &>(type);
-}
-
-inline java_method_typet &to_java_method_type(typet &type)
-{
-  PRECONDITION(can_cast_type<java_method_typet>(type));
-  return static_cast<java_method_typet &>(type);
 }
 
 /// This is a specialization of reference_typet.
