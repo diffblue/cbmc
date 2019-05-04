@@ -208,28 +208,16 @@ public:
     {
     }
 
-    /// is a method or field 'final'?
+    /// is a field 'final'?
     bool get_is_final() const
     {
       return get_bool(ID_final);
     }
 
-    /// is a method or field 'final'?
+    /// is a field 'final'?
     void set_is_final(const bool is_final)
     {
       set(ID_final, is_final);
-    }
-
-    /// is a method 'native'?
-    bool get_is_native() const
-    {
-      return get_bool(ID_is_native_method);
-    }
-
-    /// marks a method as 'native'
-    void set_is_native(const bool is_native)
-    {
-      set(ID_is_native_method, is_native);
     }
   };
 
@@ -249,6 +237,64 @@ public:
   {
     return static_cast<const componentt &>(
       class_typet::get_component(component_name));
+  }
+
+  class methodt : public class_typet::methodt
+  {
+  public:
+    methodt() = delete;
+
+    methodt(const irep_idt &_name, java_method_typet _type)
+      : class_typet::methodt(_name, std::move(_type))
+    {
+    }
+
+    const java_method_typet &type() const
+    {
+      return static_cast<const java_method_typet &>(
+        class_typet::methodt::type());
+    }
+
+    java_method_typet &type()
+    {
+      return static_cast<java_method_typet &>(class_typet::methodt::type());
+    }
+
+    /// is a method 'final'?
+    bool get_is_final() const
+    {
+      return get_bool(ID_final);
+    }
+
+    /// is a method 'final'?
+    void set_is_final(const bool is_final)
+    {
+      set(ID_final, is_final);
+    }
+
+    /// is a method 'native'?
+    bool get_is_native() const
+    {
+      return get_bool(ID_is_native_method);
+    }
+
+    /// marks a method as 'native'
+    void set_is_native(const bool is_native)
+    {
+      set(ID_is_native_method, is_native);
+    }
+  };
+
+  using methodst = std::vector<methodt>;
+
+  const methodst &methods() const
+  {
+    return (const methodst &)(find(ID_methods).get_sub());
+  }
+
+  methodst &methods()
+  {
+    return (methodst &)(add(ID_methods).get_sub());
   }
 
   using static_membert = componentt;
