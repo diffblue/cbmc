@@ -47,15 +47,15 @@ protected:
 
   goto_programt::targett lower_java_new(
     const irep_idt &function_identifier,
-    exprt lhs,
-    side_effect_exprt rhs,
+    const exprt &lhs,
+    const side_effect_exprt &rhs,
     goto_programt &,
     goto_programt::targett);
 
   goto_programt::targett lower_java_new_array(
     const irep_idt &function_identifier,
-    exprt lhs,
-    side_effect_exprt rhs,
+    const exprt &lhs,
+    const side_effect_exprt &rhs,
     goto_programt &,
     goto_programt::targett);
 };
@@ -74,8 +74,8 @@ protected:
 ///   destruction when replacing the instruction.
 goto_programt::targett remove_java_newt::lower_java_new(
   const irep_idt &function_identifier,
-  exprt lhs,
-  side_effect_exprt rhs,
+  const exprt &lhs,
+  const side_effect_exprt &rhs,
   goto_programt &dest,
   goto_programt::targett target)
 {
@@ -123,8 +123,8 @@ goto_programt::targett remove_java_newt::lower_java_new(
 ///   destruction when replacing the instruction.
 goto_programt::targett remove_java_newt::lower_java_new_array(
   const irep_idt &function_identifier,
-  exprt lhs,
-  side_effect_exprt rhs,
+  const exprt &lhs,
+  const side_effect_exprt &rhs,
   goto_programt &dest,
   goto_programt::targett target)
 {
@@ -325,24 +325,31 @@ goto_programt::targett remove_java_newt::lower_java_new(
   goto_programt &goto_program,
   goto_programt::targett target)
 {
-  const auto maybe_code_assign =
-    expr_try_dynamic_cast<code_assignt>(target->code);
-  if(!maybe_code_assign)
+  if(!target->is_assign())
     return target;
 
-  const exprt &lhs = maybe_code_assign->lhs();
-  const exprt &rhs = maybe_code_assign->rhs();
-
-  if(rhs.id() == ID_side_effect && rhs.get(ID_statement) == ID_java_new)
+  if(as_const(*target).get_assign().rhs().id() == ID_side_effect)
   {
-    return lower_java_new(
-      function_identifier, lhs, to_side_effect_expr(rhs), goto_program, target);
-  }
+    // we make a copy, as we intend to destroy the assignment
+    // inside lower_java_new and lower_java_new_array
+    const auto code_assign = target->get_assign();
 
-  if(rhs.id() == ID_side_effect && rhs.get(ID_statement) == ID_java_new_array)
-  {
-    return lower_java_new_array(
-      function_identifier, lhs, to_side_effect_expr(rhs), goto_program, target);
+    const exprt &lhs = code_assign.lhs();
+    const exprt &rhs = code_assign.rhs();
+
+    const auto &side_effect_expr = to_side_effect_expr(rhs);
+    const auto &statement = side_effect_expr.get_statement();
+
+    if(statement == ID_java_new)
+    {
+      return lower_java_new(
+        function_identifier, lhs, side_effect_expr, goto_program, target);
+    }
+    else if(statement == ID_java_new_array)
+    {
+      return lower_java_new_array(
+        function_identifier, lhs, side_effect_expr, goto_program, target);
+    }
   }
 
   return target;
