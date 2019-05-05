@@ -12,6 +12,8 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #ifndef CPROVER_GOTO_SYMEX_GOTO_STATE_H
 #define CPROVER_GOTO_SYMEX_GOTO_STATE_H
 
+#include <util/sharing_map.h>
+
 #include <analyses/guard.h>
 #include <analyses/local_safe_pointers.h>
 #include <pointer-analysis/value_set.h>
@@ -54,7 +56,7 @@ public:
   // "constants" can include symbols, but only in the context of an address-of
   // op (i.e. &x can be propagated), and an address-taken thing should only be
   // L1.
-  std::map<irep_idt, exprt> propagation;
+  sharing_mapt<irep_idt, exprt> propagation;
 
   void output_propagation_map(std::ostream &);
 

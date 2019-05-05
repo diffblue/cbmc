@@ -201,8 +201,14 @@ void goto_symex_statet::assignment(
   // for value propagation -- the RHS is L2
 
   if(!is_shared && record_value && goto_symex_is_constantt()(rhs))
-    propagation[l1_identifier] = rhs;
-  else
+  {
+    const auto propagation_entry = propagation.find(l1_identifier);
+    if(!propagation_entry.has_value())
+      propagation.insert(l1_identifier, rhs);
+    else if(propagation_entry->get() != rhs)
+      propagation.replace(l1_identifier, rhs);
+  }
+  else if(propagation.has_key(l1_identifier))
     propagation.erase(l1_identifier);
 
   {
@@ -289,8 +295,8 @@ goto_symex_statet::rename(exprt expr, const namespacet &ns)
         // L1 identifiers are used for propagation!
         auto p_it = propagation.find(ssa.get_identifier());
 
-        if(p_it != propagation.end())
-          expr=p_it->second; // already L2
+        if(p_it.has_value())
+          expr = *p_it; // already L2
         else
           ssa = set_indices<L2>(std::move(ssa), ns).get();
       }

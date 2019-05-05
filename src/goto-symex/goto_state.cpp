@@ -17,7 +17,10 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 /// because there aren't any current callers.
 void goto_statet::output_propagation_map(std::ostream &out)
 {
-  for(const auto &name_value : propagation)
+  sharing_mapt<irep_idt, exprt>::viewt view;
+  propagation.get_view(view);
+
+  for(const auto &name_value : view)
   {
     out << name_value.first << " <- " << format(name_value.second) << "\n";
   }
@@ -86,7 +89,11 @@ void goto_statet::apply_condition(
         increase_generation(
           l1_identifier, l1_lhs, previous_state.get_l2_name_provider());
 
-        propagation[l1_identifier] = rhs;
+        const auto propagation_entry = propagation.find(l1_identifier);
+        if(!propagation_entry.has_value())
+          propagation.insert(l1_identifier, rhs);
+        else if(propagation_entry->get() != rhs)
+          propagation.replace(l1_identifier, rhs);
 
         value_set.assign(l1_lhs, rhs, ns, true, false);
       }
