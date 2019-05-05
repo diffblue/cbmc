@@ -670,3 +670,45 @@ TEST_CASE("Sharing map sharing stats", "[core][util]")
   }
 #endif
 }
+
+struct no_default_constructort
+{
+  no_default_constructort() = delete;
+  explicit no_default_constructort(int val) : val(val)
+  {
+  }
+  no_default_constructort(const no_default_constructort &) = default;
+
+  int val;
+};
+
+TEST_CASE("Sharing map with a non-default-constructable value", "[core][util]")
+{
+  typedef sharing_mapt<int, no_default_constructort>
+    sharing_map_no_default_constructort;
+
+  sharing_map_no_default_constructort map1;
+
+  map1.insert(0, no_default_constructort{0});
+  map1.insert(1, no_default_constructort{1});
+
+  sharing_map_no_default_constructort map2 = map1;
+  map2.replace(1, no_default_constructort{3});
+  map2.insert(2, no_default_constructort{2});
+
+  sharing_map_no_default_constructort::delta_viewt delta_view;
+  map2.get_delta_view(map1, delta_view, false);
+
+  REQUIRE(delta_view.size() == 2);
+  const auto &entry_1 = delta_view[delta_view[0].k == 1 ? 0 : 1];
+  const auto &entry_2 = delta_view[delta_view[0].k == 1 ? 1 : 0];
+
+  REQUIRE(entry_1.k == 1);
+  REQUIRE(entry_1.is_in_both_maps());
+  REQUIRE(entry_1.m.val == 3);
+  REQUIRE(entry_1.get_other_map_value().val == 1);
+
+  REQUIRE(entry_2.k == 2);
+  REQUIRE(!entry_2.is_in_both_maps());
+  REQUIRE(entry_2.m.val == 2);
+}

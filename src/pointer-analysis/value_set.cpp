@@ -242,10 +242,11 @@ bool value_sett::make_union(const value_sett::valuest &new_values)
 
   for(const auto &delta_entry : delta_view)
   {
-    if(delta_entry.in_both)
+    if(delta_entry.is_in_both_maps())
     {
       if(make_union_would_change(
-           delta_entry.other_m.object_map, delta_entry.m.object_map))
+           delta_entry.get_other_map_value().object_map,
+           delta_entry.m.object_map))
       {
         values.update(delta_entry.k, [&](entryt &existing_entry) {
           make_union(existing_entry.object_map, delta_entry.m.object_map);
