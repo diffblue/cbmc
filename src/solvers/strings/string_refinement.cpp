@@ -737,6 +737,13 @@ decision_proceduret::resultt string_refinementt::dec_solve()
   for(const exprt &lemma : generator.constraints.existential)
     add_lemma(lemma);
 
+  // All generated strings should have non-negative length
+  for(const auto &string : generator.array_pool.created_strings())
+  {
+    add_lemma(greater_or_equal_to(
+      string.length(), from_integer(0, string.length_type())));
+  }
+
   // Initial try without index set
   const auto get = [this](const exprt &expr) { return this->get(expr); };
   dependencies.clean_cache();
@@ -775,13 +782,6 @@ decision_proceduret::resultt string_refinementt::dec_solve()
     generate_instantiations(index_sets, axioms, not_contain_witnesses);
   for(const auto &instance : initial_instances)
     add_lemma(instance);
-
-  // All generated strings should have non-negative length
-  for(const auto &string : generator.array_pool.created_strings())
-  {
-    add_lemma(binary_relation_exprt{
-      string.length(), ID_ge, from_integer(0, string.length_type())});
-  }
 
   while((loop_bound_--) > 0)
   {
