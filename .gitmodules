@@ -1,3 +1,6 @@
 [submodule "jbmc/lib/java-models-library"]
 	path = jbmc/lib/java-models-library
 	url = https://github.com/diffblue/java-models-library.git
+[submodule "lib/variant"]
+	path = lib/variant
+	url = https://github.com/mpark/variant.git
