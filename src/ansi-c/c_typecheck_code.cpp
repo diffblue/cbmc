@@ -243,7 +243,16 @@ void c_typecheck_baset::typecheck_decl(codet &code)
   }
 
   ansi_c_declarationt declaration;
+  irep_idt comment = code.source_location().get_comment();
   declaration.swap(code.op0());
+  if(!comment.empty())
+  {
+    for(auto &d : declaration.declarators())
+    {
+      if(d.source_location().get_comment().empty())
+        d.add_source_location().set_comment(comment);
+    }
+  }
 
   if(declaration.get_is_static_assert())
   {

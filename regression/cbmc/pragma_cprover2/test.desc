@@ -1,0 +1,11 @@
+CORE
+main.c
+--signed-overflow-check
+^\[main.overflow\.1\] line 21 arithmetic overflow on signed \+ in n \+ n: FAILURE$
+^\[main.overflow\.2\] line 22 arithmetic overflow on signed \+ in x \+ n: FAILURE$
+^\*\* 2 of 2 failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
