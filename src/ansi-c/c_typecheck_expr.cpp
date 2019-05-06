@@ -2056,6 +2056,8 @@ exprt c_typecheck_baset::do_special_functions(
       throw 0;
     }
 
+    typecheck_function_call_arguments(expr);
+
     exprt same_object_expr=
       same_object(expr.arguments()[0], expr.arguments()[1]);
     same_object_expr.add_source_location()=source_location;
@@ -2105,6 +2107,8 @@ exprt c_typecheck_baset::do_special_functions(
       throw 0;
     }
 
+    typecheck_function_call_arguments(expr);
+
     exprt same_object_expr = is_invalid_pointer_exprt{expr.arguments().front()};
     same_object_expr.add_source_location()=source_location;
 
@@ -2118,6 +2122,8 @@ exprt c_typecheck_baset::do_special_functions(
       error() << "buffer_size expects one operand" << eom;
       throw 0;
     }
+
+    typecheck_function_call_arguments(expr);
 
     exprt buffer_size_expr("buffer_size", size_type());
     buffer_size_expr.operands()=expr.arguments();
@@ -2133,6 +2139,8 @@ exprt c_typecheck_baset::do_special_functions(
       error() << "is_zero_string expects one operand" << eom;
       throw 0;
     }
+
+    typecheck_function_call_arguments(expr);
 
     predicate_exprt is_zero_string_expr("is_zero_string");
     is_zero_string_expr.operands()=expr.arguments();
@@ -2150,6 +2158,8 @@ exprt c_typecheck_baset::do_special_functions(
       throw 0;
     }
 
+    typecheck_function_call_arguments(expr);
+
     exprt zero_string_length_expr("zero_string_length", size_type());
     zero_string_length_expr.operands()=expr.arguments();
     zero_string_length_expr.set(ID_C_lvalue, true); // make it an lvalue
@@ -2166,6 +2176,8 @@ exprt c_typecheck_baset::do_special_functions(
       throw 0;
     }
 
+    typecheck_function_call_arguments(expr);
+
     exprt is_dynamic_object_expr = is_dynamic_object_exprt(expr.arguments()[0]);
     is_dynamic_object_expr.add_source_location() = source_location;
 
@@ -2180,6 +2192,8 @@ exprt c_typecheck_baset::do_special_functions(
       throw 0;
     }
 
+    typecheck_function_call_arguments(expr);
+
     exprt pointer_offset_expr=pointer_offset(expr.arguments().front());
     pointer_offset_expr.add_source_location()=source_location;
 
@@ -2193,6 +2207,8 @@ exprt c_typecheck_baset::do_special_functions(
       error() << "object_size expects one operand" << eom;
       throw 0;
     }
+
+    typecheck_function_call_arguments(expr);
 
     unary_exprt object_size_expr(
       ID_object_size, expr.arguments()[0], size_type());
@@ -2209,6 +2225,8 @@ exprt c_typecheck_baset::do_special_functions(
       throw 0;
     }
 
+    typecheck_function_call_arguments(expr);
+
     exprt pointer_object_expr = pointer_object(expr.arguments().front());
     pointer_object_expr.add_source_location() = source_location;
 
@@ -2218,14 +2236,14 @@ exprt c_typecheck_baset::do_special_functions(
           identifier=="__builtin_bswap32" ||
           identifier=="__builtin_bswap64")
   {
-    typecheck_function_call_arguments(expr);
-
     if(expr.arguments().size()!=1)
     {
       error().source_location = f_op.source_location();
       error() << identifier << " expects one operand" << eom;
       throw 0;
     }
+
+    typecheck_function_call_arguments(expr);
 
     // these are hard-wired to 8 bits according to the gcc manual
     bswap_exprt bswap_expr(expr.arguments().front(), 8, expr.type());
@@ -2235,14 +2253,14 @@ exprt c_typecheck_baset::do_special_functions(
   }
   else if(identifier=="__builtin_nontemporal_load")
   {
-    typecheck_function_call_arguments(expr);
-
     if(expr.arguments().size()!=1)
     {
       error().source_location = f_op.source_location();
       error() << identifier << " expects one operand" << eom;
       throw 0;
     }
+
+    typecheck_function_call_arguments(expr);
 
     // these return the subtype of the argument
     exprt &ptr_arg=expr.arguments().front();
@@ -2268,6 +2286,8 @@ exprt c_typecheck_baset::do_special_functions(
       error() << identifier << " expects six arguments" << eom;
       throw 0;
     }
+
+    typecheck_function_call_arguments(expr);
 
     // This gets 5 integers followed by a float or double.
     // The five integers are the return values for the cases
@@ -2315,6 +2335,8 @@ exprt c_typecheck_baset::do_special_functions(
       throw 0;
     }
 
+    typecheck_function_call_arguments(expr);
+
     isnan_exprt isnan_expr(expr.arguments().front());
     isnan_expr.add_source_location()=source_location;
 
@@ -2330,6 +2352,8 @@ exprt c_typecheck_baset::do_special_functions(
       error() << "isfinite expects one operand" << eom;
       throw 0;
     }
+
+    typecheck_function_call_arguments(expr);
 
     isfinite_exprt isfinite_expr(expr.arguments().front());
     isfinite_expr.add_source_location()=source_location;
@@ -2378,6 +2402,8 @@ exprt c_typecheck_baset::do_special_functions(
       throw 0;
     }
 
+    typecheck_function_call_arguments(expr);
+
     abs_exprt abs_expr(expr.arguments().front());
     abs_expr.add_source_location()=source_location;
 
@@ -2391,6 +2417,8 @@ exprt c_typecheck_baset::do_special_functions(
       error() << "allocate expects two operands" << eom;
       throw 0;
     }
+
+    typecheck_function_call_arguments(expr);
 
     side_effect_exprt malloc_expr(ID_allocate, expr.type(), source_location);
     malloc_expr.operands()=expr.arguments();
@@ -2406,6 +2434,8 @@ exprt c_typecheck_baset::do_special_functions(
       error() << identifier << " expects two operands" << eom;
       throw 0;
     }
+
+    typecheck_function_call_arguments(expr);
 
     irep_idt id = identifier == CPROVER_PREFIX "r_ok" ? ID_r_ok : ID_w_ok;
 
@@ -2427,6 +2457,8 @@ exprt c_typecheck_baset::do_special_functions(
       throw 0;
     }
 
+    typecheck_function_call_arguments(expr);
+
     isinf_exprt isinf_expr(expr.arguments().front());
     isinf_expr.add_source_location()=source_location;
 
@@ -2440,6 +2472,8 @@ exprt c_typecheck_baset::do_special_functions(
       error() << identifier << " expects one operand" << eom;
       throw 0;
     }
+
+    typecheck_function_call_arguments(expr);
 
     // returns 1 for +inf and -1 for -inf, and 0 otherwise
 
@@ -2467,6 +2501,8 @@ exprt c_typecheck_baset::do_special_functions(
       error() << identifier << " expects one operand" << eom;
       throw 0;
     }
+
+    typecheck_function_call_arguments(expr);
 
     const exprt &fp_value = expr.arguments()[0];
 
@@ -2496,6 +2532,8 @@ exprt c_typecheck_baset::do_special_functions(
       throw 0;
     }
 
+    typecheck_function_call_arguments(expr);
+
     sign_exprt sign_expr(expr.arguments().front());
     sign_expr.add_source_location()=source_location;
 
@@ -2515,6 +2553,8 @@ exprt c_typecheck_baset::do_special_functions(
       throw 0;
     }
 
+    typecheck_function_call_arguments(expr);
+
     popcount_exprt popcount_expr(expr.arguments().front(), expr.type());
     popcount_expr.add_source_location()=source_location;
 
@@ -2528,6 +2568,8 @@ exprt c_typecheck_baset::do_special_functions(
       error() << "equal expects two operands" << eom;
       throw 0;
     }
+
+    typecheck_function_call_arguments(expr);
 
     equal_exprt equality_expr(
       expr.arguments().front(), expr.arguments().back());
@@ -2557,6 +2599,8 @@ exprt c_typecheck_baset::do_special_functions(
       throw 0;
     }
 
+    typecheck_function_call_arguments(expr);
+
     return typecast_exprt(expr.arguments()[0], expr.type());
   }
   else if(identifier=="__builtin_object_size")
@@ -2571,6 +2615,8 @@ exprt c_typecheck_baset::do_special_functions(
       error() << "__builtin_object_size expects two arguments" << eom;
       throw 0;
     }
+
+    typecheck_function_call_arguments(expr);
 
     make_constant(expr.arguments()[1]);
 
@@ -2614,6 +2660,8 @@ exprt c_typecheck_baset::do_special_functions(
       throw 0;
     }
 
+    typecheck_function_call_arguments(expr);
+
     exprt arg0 =
       typecast_exprt::conditional_cast(expr.arguments()[0], bool_typet());
     make_constant(arg0);
@@ -2633,6 +2681,9 @@ exprt c_typecheck_baset::do_special_functions(
       error() << "__builtin_constant_p expects one argument" << eom;
       throw 0;
     }
+
+    // do not typecheck the argument - it is never evaluated, and thus side
+    // effects must not show up either
 
     // try to produce constant
     exprt tmp1=expr.arguments().front();
@@ -2670,6 +2721,8 @@ exprt c_typecheck_baset::do_special_functions(
       error() << "__builtin_classify_type expects one argument" << eom;
       throw 0;
     }
+
+    typecheck_function_call_arguments(expr);
 
     exprt object=expr.arguments()[0];
 
@@ -2742,6 +2795,8 @@ exprt c_typecheck_baset::do_special_functions(
       error() << "__sync_* primitives take as least one argument" << eom;
       throw 0;
     }
+
+    typecheck_function_call_arguments(expr);
 
     exprt &ptr_arg=expr.arguments().front();
 
