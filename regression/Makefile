@@ -26,6 +26,7 @@ DIRS = cbmc \
        systemc \
        contracts \
        goto-cc-file-local \
+       linking-goto-binaries \
        # Empty last line
 
 # Run all test directories in sequence

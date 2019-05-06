@@ -97,6 +97,8 @@ static bool link_functions(
         rename_symbols_in_function(src_func, final_id, rename_symbol);
 
         in_dest_symbol_table.body.swap(src_func.body);
+        in_dest_symbol_table.parameter_identifiers.swap(
+          src_func.parameter_identifiers);
         in_dest_symbol_table.type=src_func.type;
       }
       else if(src_func.body.instructions.empty() ||

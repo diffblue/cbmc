@@ -1,0 +1,9 @@
+CORE
+main.c
+supp.c
+^EXIT=0$
+^SIGNAL=0$
+\[main.assertion.1\] line [0-9]+ assertion ten == 10: SUCCESS
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
