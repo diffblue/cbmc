@@ -512,7 +512,13 @@ void goto_symext::symex_step(
 {
   // Print debug statements if they've been enabled.
   print_symex_step(state);
+  execute_next_instruction(get_goto_function, state);
+}
 
+void goto_symext::execute_next_instruction(
+  const get_goto_functiont &get_goto_function,
+  statet &state)
+{
   PRECONDITION(!state.threads.empty());
   PRECONDITION(!state.call_stack().empty());
 

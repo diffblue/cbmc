@@ -218,6 +218,16 @@ protected:
     const get_goto_functiont &get_goto_function);
 
   /// \brief Called for each step in the symbolic execution
+  /// This calls \ref print_symex_step to print symex's current instruction if
+  /// required, then \ref execute_instruction to execute the actual instruction
+  /// body.
+  /// \param get_goto_function: The delegate to retrieve function bodies (see
+  ///   \ref get_goto_functiont)
+  /// \param state: Symbolic execution state for current instruction
+  virtual void
+  symex_step(const get_goto_functiont &get_goto_function, statet &state);
+
+  /// \brief Executes the instruction `state.source.pc`
   /// Case-switches over the type of the instruction being executed and calls
   /// another function appropriate to the instruction type, for example
   /// \ref symex_function_call if the current instruction is a function call,
@@ -225,8 +235,9 @@ protected:
   /// \param get_goto_function: The delegate to retrieve function bodies (see
   ///   \ref get_goto_functiont)
   /// \param state: Symbolic execution state for current instruction
-  virtual void
-  symex_step(const get_goto_functiont &get_goto_function, statet &state);
+  void execute_next_instruction(
+    const get_goto_functiont &get_goto_function,
+    statet &state);
 
   /// Prints the route of symex as it walks through the code. Used for
   /// debugging.
