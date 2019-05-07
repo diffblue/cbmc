@@ -55,12 +55,15 @@ operator()(renamedt<ssa_exprt, L0> l0_expr) const
 
   const irep_idt l0_name = l0_expr.get().get_l1_object_identifier();
 
-  const auto it = current_names.find(l0_name);
-  if(it == current_names.end())
+  const auto r_opt = current_names.find(l0_name);
+
+  if(!r_opt)
+  {
     return renamedt<ssa_exprt, L1>{std::move(l0_expr.value())};
+  }
 
   // rename!
-  l0_expr.value().set_level_1(it->second.second);
+  l0_expr.value().set_level_1(r_opt->get().second);
   return renamedt<ssa_exprt, L1>{std::move(l0_expr.value())};
 }
 
@@ -75,18 +78,21 @@ operator()(renamedt<ssa_exprt, L1> l1_expr) const
 
 void symex_level1t::restore_from(const current_namest &other)
 {
-  auto it = current_names.begin();
-  for(const auto &pair : other)
+  current_namest::delta_viewt delta_view;
+  other.get_delta_view(current_names, delta_view, false);
+
+  for(const auto &delta_item : delta_view)
   {
-    while(it != current_names.end() && it->first < pair.first)
-      ++it;
-    if(it == current_names.end() || pair.first < it->first)
-      current_names.insert(it, pair);
-    else if(it != current_names.end())
+    if(!delta_item.is_in_both_maps())
     {
-      PRECONDITION(it->first == pair.first);
-      it->second = pair.second;
-      ++it;
+      current_names.insert(delta_item.k, delta_item.m);
+    }
+    else
+    {
+      if(delta_item.m != delta_item.get_other_map_value())
+      {
+        current_names.replace(delta_item.k, delta_item.m);
+      }
     }
   }
 }

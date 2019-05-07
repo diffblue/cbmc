@@ -414,39 +414,6 @@ void goto_symext::merge_goto(
   }
 }
 
-/// Applies f to `(k, ssa, i, j)` if the first map maps k to (ssa, i) and
-/// the second to (ssa', j). If the first map has an entry for k but not the
-/// second one then j is 0, and when the first map has no entry for k then i = 0
-static void for_each2(
-  const std::map<irep_idt, std::pair<ssa_exprt, unsigned>> &first_map,
-  const std::map<irep_idt, std::pair<ssa_exprt, unsigned>> &second_map,
-  const std::function<void(const ssa_exprt &, unsigned, unsigned)> &f)
-{
-  auto second_it = second_map.begin();
-  for(const auto &first_pair : first_map)
-  {
-    while(second_it != second_map.end() && second_it->first < first_pair.first)
-    {
-      f(second_it->second.first, 0, second_it->second.second);
-      ++second_it;
-    }
-    const ssa_exprt &ssa = first_pair.second.first;
-    const unsigned count = first_pair.second.second;
-    if(second_it != second_map.end() && second_it->first == first_pair.first)
-    {
-      f(ssa, count, second_it->second.second);
-      ++second_it;
-    }
-    else
-      f(ssa, count, 0);
-  }
-  while(second_it != second_map.end())
-  {
-    f(second_it->second.first, 0, second_it->second.second);
-    ++second_it;
-  }
-}
-
 /// Helper function for \c phi_function which merges the names of an identifier
 /// for two different states.
 /// \param goto_state: first state
@@ -596,23 +563,58 @@ void goto_symext::phi_function(
   // this gets the diff between the guards
   diff_guard -= dest_state.guard;
 
-  for_each2(
-    goto_state.get_level2().current_names,
-    dest_state.get_level2().current_names,
-    [&](const ssa_exprt &ssa, unsigned goto_count, unsigned dest_count) {
-      merge_names(
-        goto_state,
-        dest_state,
-        ns,
-        diff_guard,
-        log,
-        symex_config.simplify_opt,
-        target,
-        path_storage.dirty,
-        ssa,
-        goto_count,
-        dest_count);
-    });
+  symex_renaming_levelt::current_namest::delta_viewt delta_view;
+  goto_state.get_level2().current_names.get_delta_view(
+    dest_state.get_level2().current_names, delta_view, false);
+
+  for(const auto &delta_item : delta_view)
+  {
+    const ssa_exprt &ssa = delta_item.m.first;
+    unsigned goto_count = delta_item.m.second;
+    unsigned dest_count = !delta_item.is_in_both_maps()
+                            ? 0
+                            : delta_item.get_other_map_value().second;
+
+    merge_names(
+      goto_state,
+      dest_state,
+      ns,
+      diff_guard,
+      log,
+      symex_config.simplify_opt,
+      target,
+      path_storage.dirty,
+      ssa,
+      goto_count,
+      dest_count);
+  }
+
+  delta_view.clear();
+  dest_state.get_level2().current_names.get_delta_view(
+    goto_state.get_level2().current_names, delta_view, false);
+
+  for(const auto &delta_item : delta_view)
+  {
+    if(delta_item.is_in_both_maps())
+      continue;
+
+    const ssa_exprt &ssa = delta_item.m.first;
+    unsigned goto_count = 0;
+    unsigned dest_count = delta_item.m.second;
+
+    merge_names(
+      goto_state,
+      dest_state,
+      ns,
+      diff_guard,
+      log,
+      symex_config.simplify_opt,
+      target,
+      path_storage.dirty,
+      ssa,
+      goto_count,
+      dest_count);
+  }
 }
 
 void goto_symext::loop_bound_exceeded(

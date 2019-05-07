@@ -16,6 +16,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <unordered_set>
 
 #include <util/irep.h>
+#include <util/sharing_map.h>
 #include <util/simplify_expr.h>
 #include <util/ssa_expr.h>
 
@@ -42,27 +43,26 @@ struct symex_renaming_levelt
   symex_renaming_levelt(symex_renaming_levelt &&other) = default;
 
   /// Map identifier to ssa_exprt and counter
-  typedef std::map<irep_idt, std::pair<ssa_exprt, unsigned>> current_namest;
+  typedef sharing_mapt<irep_idt, std::pair<ssa_exprt, unsigned>> current_namest;
   current_namest current_names;
 
   /// Counter corresponding to an identifier
   unsigned current_count(const irep_idt &identifier) const
   {
-    const auto it = current_names.find(identifier);
-    return it == current_names.end() ? 0 : it->second.second;
-  }
-
-  /// Increase the counter corresponding to an identifier
-  static void increase_counter(const current_namest::iterator &it)
-  {
-    ++it->second.second;
+    const auto r_opt = current_names.find(identifier);
+    return !r_opt ? 0 : r_opt->get().second;
   }
 
   /// Add the \c ssa_exprt of current_names to vars
   void get_variables(std::unordered_set<ssa_exprt, irep_hash> &vars) const
   {
-    for(const auto &pair : current_names)
+    current_namest::viewt view;
+    current_names.get_view(view);
+
+    for(const auto &pair : view)
+    {
       vars.insert(pair.second.first);
+    }
   }
 };
 

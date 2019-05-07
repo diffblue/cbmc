@@ -31,13 +31,22 @@ std::size_t goto_statet::increase_generation(
   const ssa_exprt &lhs,
   std::function<std::size_t(const irep_idt &)> fresh_l2_name_provider)
 {
-  auto current_emplace_res =
-    level2.current_names.emplace(l1_identifier, std::make_pair(lhs, 0));
+  std::size_t n = fresh_l2_name_provider(l1_identifier);
 
-  current_emplace_res.first->second.second =
-    fresh_l2_name_provider(l1_identifier);
+  const auto r_opt = level2.current_names.find(l1_identifier);
 
-  return current_emplace_res.first->second.second;
+  if(!r_opt)
+  {
+    level2.current_names.insert(l1_identifier, std::make_pair(lhs, n));
+  }
+  else
+  {
+    std::pair<ssa_exprt, unsigned> copy = r_opt->get();
+    copy.second = n;
+    level2.current_names.replace(l1_identifier, std::move(copy));
+  }
+
+  return n;
 }
 
 /// Given a condition that must hold on this path, propagate as much knowledge
