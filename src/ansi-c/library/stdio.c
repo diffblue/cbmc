@@ -259,10 +259,10 @@ char *fgets(char *str, int size, FILE *stream)
   if(size>0)
   {
     int str_length=__VERIFIER_nondet_int();
-    __CPROVER_assume(str_length>0 && str_length<size);
+    __CPROVER_assume(str_length >= 0 && str_length < size);
     // check that the memory is accessible
-    (void)*(char *)str;
-    (void)*(((const char *)str) + str_length - 1);
+    __CPROVER_precondition(
+      __CPROVER_w_ok(str, str_length + 1), "fgets buffer writeable");
     char contents_nondet[str_length];
     __CPROVER_array_replace(str, contents_nondet);
     if(!error)
