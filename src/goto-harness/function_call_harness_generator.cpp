@@ -90,57 +90,20 @@ void function_call_harness_generatort::handle_option(
   const std::string &option,
   const std::list<std::string> &values)
 {
-  if(option == FUNCTION_HARNESS_GENERATOR_FUNCTION_OPT)
+  auto &require_exactly_one_value =
+    harness_options_parsert::require_exactly_one_value;
+
+  if(p_impl->recursive_initialization_config.handle_option(option, values))
+  {
+    // the option belongs to recursive initialization
+  }
+  else if(option == FUNCTION_HARNESS_GENERATOR_FUNCTION_OPT)
   {
     p_impl->function = require_exactly_one_value(option, values);
   }
-  else if(option == FUNCTION_HARNESS_GENERATOR_NONDET_GLOBALS_OPT)
+  else if(option == COMMON_HARNESS_GENERATOR_NONDET_GLOBALS_OPT)
   {
     p_impl->nondet_globals = true;
-  }
-  else if(option == FUNCTION_HARNESS_GENERATOR_MIN_NULL_TREE_DEPTH_OPT)
-  {
-    auto const value = require_exactly_one_value(option, values);
-    auto const min_null_tree_depth = string2optional<std::size_t>(value, 10);
-    if(min_null_tree_depth.has_value())
-    {
-      p_impl->recursive_initialization_config.min_null_tree_depth =
-        min_null_tree_depth.value();
-    }
-    else
-    {
-      throw invalid_command_line_argument_exceptiont{
-        "failed to convert `" + value + "' to integer",
-        "--" FUNCTION_HARNESS_GENERATOR_MIN_NULL_TREE_DEPTH_OPT};
-    }
-  }
-  else if(option == FUNCTION_HARNESS_GENERATOR_MAX_NONDET_TREE_DEPTH_OPT)
-  {
-    auto const value = require_exactly_one_value(option, values);
-    auto const max_nondet_tree_depth = string2optional<std::size_t>(value, 10);
-    if(max_nondet_tree_depth.has_value())
-    {
-      p_impl->recursive_initialization_config.max_nondet_tree_depth =
-        max_nondet_tree_depth.value();
-    }
-    else
-    {
-      throw invalid_command_line_argument_exceptiont{
-        "failed to convert `" + value + "' to integer",
-        "--" FUNCTION_HARNESS_GENERATOR_MAX_NONDET_TREE_DEPTH_OPT};
-    }
-  }
-  else if(option == FUNCTION_HARNESS_GENERATOR_MAX_ARRAY_SIZE_OPT)
-  {
-    p_impl->recursive_initialization_config.max_dynamic_array_size =
-      require_one_size_value(
-        FUNCTION_HARNESS_GENERATOR_MAX_ARRAY_SIZE_OPT, values);
-  }
-  else if(option == FUNCTION_HARNESS_GENERATOR_MIN_ARRAY_SIZE_OPT)
-  {
-    p_impl->recursive_initialization_config.min_dynamic_array_size =
-      require_one_size_value(
-        FUNCTION_HARNESS_GENERATOR_MIN_ARRAY_SIZE_OPT, values);
   }
   else if(option == FUNCTION_HARNESS_GENERATOR_TREAT_POINTER_AS_ARRAY_OPT)
   {
@@ -285,25 +248,8 @@ void function_call_harness_generatort::validate_options(
   {
     throw invalid_command_line_argument_exceptiont{
       "min dynamic array size cannot be greater than max dynamic array size",
-      "--" FUNCTION_HARNESS_GENERATOR_MIN_ARRAY_SIZE_OPT
-      " --" FUNCTION_HARNESS_GENERATOR_MAX_ARRAY_SIZE_OPT};
-  }
-}
-
-std::size_t function_call_harness_generatort::require_one_size_value(
-  const std::string &option,
-  const std::list<std::string> &values)
-{
-  auto const string_value = require_exactly_one_value(option, values);
-  auto value = string2optional<std::size_t>(string_value, 10);
-  if(value.has_value())
-  {
-    return value.value();
-  }
-  else
-  {
-    throw invalid_command_line_argument_exceptiont{
-      "failed to parse `" + string_value + "' as integer", "--" + option};
+      "--" COMMON_HARNESS_GENERATOR_MIN_ARRAY_SIZE_OPT
+      " --" COMMON_HARNESS_GENERATOR_MAX_ARRAY_SIZE_OPT};
   }
 }
 

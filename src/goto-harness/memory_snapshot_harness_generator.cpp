@@ -9,6 +9,7 @@ Author: Daniel Poetzl
 #include <algorithm>
 
 #include "memory_snapshot_harness_generator.h"
+#include "memory_snapshot_harness_generator_options.h"
 
 #include <goto-programs/goto_convert.h>
 
@@ -26,25 +27,75 @@ Author: Daniel Poetzl
 #include <linking/static_lifetime_init.h>
 
 #include "goto_harness_generator_factory.h"
-#include "recursive_initialization.h"
 
 void memory_snapshot_harness_generatort::handle_option(
   const std::string &option,
   const std::list<std::string> &values)
 {
-  if(option == "memory-snapshot")
+  auto &require_exactly_one_value =
+    harness_options_parsert::require_exactly_one_value;
+  if(recursive_initialization_config.handle_option(option, values))
+  {
+    // the option belongs to recursive initialization
+  }
+  else if(option == MEMORY_SNAPSHOT_HARNESS_TREAT_POINTER_AS_ARRAY_OPT)
+  {
+    recursive_initialization_config.pointers_to_treat_as_arrays.insert(
+      values.begin(), values.end());
+  }
+  else if(option == MEMORY_SNAPSHOT_HARNESS_ASSOCIATED_ARRAY_SIZE_OPT)
+  {
+    for(auto const &array_size_pair : values)
+    {
+      try
+      {
+        std::string array;
+        std::string size;
+        split_string(array_size_pair, ':', array, size);
+        // --associated-array-size implies --treat-pointer-as-array
+        // but it is not an error to specify both, so we don't check
+        // for duplicates here
+        recursive_initialization_config.pointers_to_treat_as_arrays.insert(
+          array);
+        auto const inserted =
+          recursive_initialization_config
+            .array_name_to_associated_array_size_variable.emplace(array, size);
+        if(!inserted.second)
+        {
+          throw invalid_command_line_argument_exceptiont{
+            "can not have two associated array sizes for one array",
+            "--" MEMORY_SNAPSHOT_HARNESS_ASSOCIATED_ARRAY_SIZE_OPT};
+        }
+      }
+      catch(const deserialization_exceptiont &)
+      {
+        throw invalid_command_line_argument_exceptiont{
+          "`" + array_size_pair +
+            "' is in an invalid format for array size pair",
+          "--" MEMORY_SNAPSHOT_HARNESS_ASSOCIATED_ARRAY_SIZE_OPT,
+          "array_name:size_name, where both are the names of global "
+          "variables"};
+      }
+    }
+  }
+  else if(option == MEMORY_SNAPSHOT_HARNESS_SNAPSHOT_OPT)
   {
     memory_snapshot_file = require_exactly_one_value(option, values);
   }
-  else if(option == "initial-goto-location")
+  else if(option == MEMORY_SNAPSHOT_HARNESS_INITIAL_GOTO_LOC_OPT)
   {
     initial_goto_location_line = require_exactly_one_value(option, values);
   }
-  else if(option == "havoc-variables")
+  else if(option == MEMORY_SNAPSHOT_HARNESS_HAVOC_VARIABLES_OPT)
   {
-    variables_to_havoc.insert(values.begin(), values.end());
+    std::vector<std::string> havoc_candidates;
+    split_string(values.front(), ',', havoc_candidates, true);
+    for(const auto &candidate : havoc_candidates)
+    {
+      variables_to_havoc.insert(candidate);
+    }
   }
-  else if(option == "initial-source-location")
+  else if(option == MEMORY_SNAPSHOT_HARNESS_INITIAL_SOURCE_LOC_OPT)
   {
     initial_source_location_line = require_exactly_one_value(option, values);
   }
@@ -153,7 +204,7 @@ code_blockt memory_snapshot_harness_generatort::add_assignments_to_globals(
   goto_modelt &goto_model) const
 {
   recursive_initializationt recursive_initialization{
-    recursive_initialization_configt{}, goto_model};
+    recursive_initialization_config, goto_model};
 
   code_blockt code;
   for(const auto &pair : snapshot)
