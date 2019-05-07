@@ -33,6 +33,7 @@ protected:
   std::string convert_java_new(const exprt &src);
   std::string convert_code_java_new(const exprt &src, unsigned precedence);
   std::string convert_code_java_delete(const exprt &src, unsigned precedence);
+  std::string convert_symbol(const exprt &) override;
   virtual std::string convert_struct(
     const exprt &src, unsigned &precedence) override;
   virtual std::string convert_code(const codet &src, unsigned indent) override;

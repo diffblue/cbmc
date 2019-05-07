@@ -375,6 +375,17 @@ std::string expr2javat::convert_code_java_delete(
   return dest;
 }
 
+std::string expr2javat::convert_symbol(const exprt &src)
+{
+  const symbolt &symbol = ns.lookup(to_symbol_expr(src));
+  if(!symbol.pretty_name.empty())
+    return id2string(symbol.pretty_name);
+  else if(!symbol.base_name.empty())
+    return id2string(symbol.base_name);
+  else
+    return id2string(symbol.name);
+}
+
 std::string expr2javat::convert_with_precedence(
   const exprt &src,
   unsigned &precedence)
@@ -384,7 +395,12 @@ std::string expr2javat::convert_with_precedence(
     precedence = 15;
     return convert_java_this();
   }
-  if(src.id()==ID_java_instanceof)
+  else if(src.id() == ID_symbol)
+  {
+    precedence = 16;
+    return convert_symbol(to_symbol_expr(src));
+  }
+  else if(src.id() == ID_java_instanceof)
   {
     precedence = 15;
     return convert_java_instanceof(src);
