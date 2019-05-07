@@ -259,7 +259,7 @@ char *fgets(char *str, int size, FILE *stream)
   if(size>0)
   {
     int str_length=__VERIFIER_nondet_int();
-    __CPROVER_assume(str_length>=0 && str_length<size);
+    __CPROVER_assume(str_length>0 && str_length<size);
     // check that the memory is accessible
     (void)*(char *)str;
     (void)*(((const char *)str) + str_length - 1);

@@ -5,6 +5,6 @@ main.c
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
 \[main.assertion.3\] line 16 assertion p\[1\] == 'b': FAILURE
-\*\* 2 of \d+ failed
+\*\* 1 of \d+ failed
 --
 ^warning: ignoring
