@@ -561,7 +561,7 @@ void java_bytecode_convert_methodt::convert(
   method_symbol.location.set_function(method_identifier);
 
   for(const auto &exception_name : m.throws_exception_table)
-    method_type.add_throws_exceptions(exception_name);
+    method_type.add_throws_exception(exception_name);
 
   const std::string signature_string = pretty_signature(method_type);
 

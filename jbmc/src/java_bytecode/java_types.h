@@ -131,7 +131,7 @@ public:
     return exceptions;
   }
 
-  void add_throws_exceptions(irep_idt exception)
+  void add_throws_exception(irep_idt exception)
   {
     add(ID_exceptions_thrown_list).get_sub().push_back(irept(exception));
   }
