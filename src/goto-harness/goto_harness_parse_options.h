@@ -17,11 +17,13 @@ Author: Diffblue Ltd.
 
 #include "function_harness_generator_options.h"
 #include "goto_harness_generator_factory.h"
+#include "memory_snapshot_harness_generator_options.h"
 
 // clang-format off
 #define GOTO_HARNESS_OPTIONS                                                   \
   "(version)"                                                                  \
   GOTO_HARNESS_FACTORY_OPTIONS                                                 \
+  COMMON_HARNESS_GENERATOR_OPTIONS                                             \
   FUNCTION_HARNESS_GENERATOR_OPTIONS                                           \
   MEMORY_SNAPSHOT_HARNESS_GENERATOR_OPTIONS                                    \
 // end GOTO_HARNESS_OPTIONS
