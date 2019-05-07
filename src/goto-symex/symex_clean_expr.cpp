@@ -186,6 +186,9 @@ void goto_symext::lift_let(statet &state, const let_exprt &let_expr)
     let_value,
     value_assignment_guard,
     symex_targett::assignment_typet::HIDDEN);
+
+  // Schedule the bound variable to be cleaned up at the end of symex_step:
+  instruction_local_symbols.push_back(let_expr.symbol());
 }
 
 void goto_symext::lift_lets(statet &state, exprt &rhs)

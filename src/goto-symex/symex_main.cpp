@@ -513,6 +513,7 @@ void goto_symext::symex_step(
   // Print debug statements if they've been enabled.
   print_symex_step(state);
   execute_next_instruction(get_goto_function, state);
+  kill_instruction_local_symbols(state);
 }
 
 void goto_symext::execute_next_instruction(
@@ -650,6 +651,13 @@ void goto_symext::execute_next_instruction(
   case INCOMPLETE_GOTO:
     DATA_INVARIANT(false, "symex got unexpected instruction type");
   }
+}
+
+void goto_symext::kill_instruction_local_symbols(statet &state)
+{
+  for(const auto &symbol_expr : instruction_local_symbols)
+    symex_dead(state, symbol_expr);
+  instruction_local_symbols.clear();
 }
 
 /// Check if an expression only contains one unique symbol (possibly repeated

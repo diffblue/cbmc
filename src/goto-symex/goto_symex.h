@@ -219,8 +219,8 @@ protected:
 
   /// \brief Called for each step in the symbolic execution
   /// This calls \ref print_symex_step to print symex's current instruction if
-  /// required, then \ref execute_instruction to execute the actual instruction
-  /// body.
+  /// required, then \ref execute_next_instruction to execute the actual
+  /// instruction body.
   /// \param get_goto_function: The delegate to retrieve function bodies (see
   ///   \ref get_goto_functiont)
   /// \param state: Symbolic execution state for current instruction
@@ -238,6 +238,11 @@ protected:
   void execute_next_instruction(
     const get_goto_functiont &get_goto_function,
     statet &state);
+
+  /// Kills any variables in \ref instruction_local_symbols (these are currently
+  /// always let-bound variables defined in the course of executing the current
+  /// instruction), then clears \ref instruction_local_symbols.
+  void kill_instruction_local_symbols(statet &state);
 
   /// Prints the route of symex as it walks through the code. Used for
   /// debugging.
@@ -280,6 +285,11 @@ protected:
   /// A monotonically increasing index for each encountered ATOMIC_BEGIN
   /// instruction
   unsigned atomic_section_counter;
+
+  /// Variables that should be killed at the end of the current symex_step
+  /// invocation. Currently this is used for let-bound variables executed during
+  /// symex, whose lifetime is at most one instruction long.
+  std::vector<symbol_exprt> instruction_local_symbols;
 
   /// The messaget to write log messages to
   mutable messaget log;
@@ -531,8 +541,8 @@ protected:
 
   /// Execute a single let expression, which should not have any nested let
   /// expressions (use \ref lift_lets instead if there might be).
-  /// The caller is responsible for killing the newly-defined variable when
-  /// appropriate.
+  /// Records the newly-defined variable in \ref instruction_local_symbols,
+  /// meaning it will be killed when \ref symex_step concludes.
   void lift_let(statet &state, const let_exprt &let_expr);
 
   void symex_assign_rec(
