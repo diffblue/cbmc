@@ -150,7 +150,10 @@ std::string expr2javat::convert_struct(
 
       dest+=sep;
       dest+='.';
-      dest += id2string(c.get_pretty_name());
+      irep_idt field_name = c.get_pretty_name();
+      if(field_name.empty())
+        field_name = c.get_name();
+      dest += id2string(field_name);
       dest+='=';
       dest+=tmp;
     }
