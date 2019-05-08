@@ -548,6 +548,7 @@ protected:
   void add_item_if_not_shared(
     const innert &container,
     const innert &inner,
+    const std::size_t level,
     delta_viewt &delta_view,
     const bool only_common) const;
 
@@ -564,6 +565,7 @@ protected:
     bool mark = true) const;
 
   static const std::string not_found_msg;
+  static const std::size_t dummy_level;
 
   // config
   static const std::size_t bits;
@@ -792,67 +794,61 @@ SHARING_MAPT(void)
 SHARING_MAPT(void)::add_item_if_not_shared(
   const innert &container,
   const innert &inner,
+  const std::size_t level,
   delta_viewt &delta_view,
   const bool only_common) const
 {
-  SM_ASSERT(!container.empty());
-  SM_ASSERT(!inner.empty());
+  const leaft &l1 = container.get_container().front();
 
-  std::stack<const innert *> stack;
-  stack.push(&inner);
+  const auto &k = l1.get_key();
+  std::size_t key = hash()(k);
 
-  do
+  key >>= level * chunk;
+
+  const innert *ip = &inner;
+  SM_ASSERT(ip->is_defined_internal());
+
+  while(true)
   {
-    const innert *ip = stack.top();
-    stack.pop();
+    std::size_t bit = key & mask;
+
+    ip = ip->find_child(bit);
+
+    // only in first map
+    if(ip == nullptr)
+    {
+      if(!only_common)
+      {
+        delta_view.push_back({k, l1.get_value()});
+      }
+
+      return;
+    }
 
     SM_ASSERT(!ip->empty());
 
-    if(ip->is_internal())
+    // potentially in both maps
+    if(ip->is_container())
     {
-      const to_mapt &m = ip->get_to_map();
-      SM_ASSERT(!m.empty());
-
-      for(const auto &item : m)
-      {
-        const innert *i = &item.second;
-        stack.push(i);
-      }
-    }
-    else
-    {
-      SM_ASSERT(ip->is_container());
-
-      if(ip->shares_with(container))
+      if(container.shares_with(*ip))
         return;
 
-      const leaft &l1 = container.get_container().front();
-
-      const leaf_listt &ll = ip->get_container();
-      SM_ASSERT(!ll.empty());
-
-      for(const auto &l : ll)
+      for(const auto &l2 : ip->get_container())
       {
-        if(l1.shares_with(l))
+        if(l1.shares_with(l2))
           return;
 
-        if(l1.get_key() == l.get_key())
+        if(l1.get_key() == l2.get_key())
         {
-          // element is in both maps and not shared
-          delta_view.push_back(
-            {true, l1.get_key(), l1.get_value(), l.get_value()});
+          delta_view.push_back({k, l1.get_value(), l2.get_value()});
           return;
         }
       }
-    }
-  }
-  while(!stack.empty());
 
-  // element is only in first map
-  if(!only_common)
-  {
-    const leaft &l1 = container.get_container().front();
-    delta_view.push_back({false, l1.get_key(), l1.get_value(), dummy});
+      return;
+    }
+
+    key >>= chunk;
   }
 }
 
@@ -880,6 +876,8 @@ SHARING_MAPT(void)
   typedef std::pair<const innert *, const innert *> stack_itemt;
   std::stack<stack_itemt> stack;
 
+  std::stack<std::size_t> level_stack;
+
   // We do a DFS "in lockstep" simultaneously on both maps. For
   // corresponding nodes we check whether they are shared between the
   // maps, and if not, we recurse into the corresponding subtrees.
@@ -891,6 +889,7 @@ SHARING_MAPT(void)
     return;
 
   stack.push(stack_itemt(&map, &other.map));
+  level_stack.push(0);
 
   do
   {
@@ -900,6 +899,9 @@ SHARING_MAPT(void)
     const innert *ip2 = si.second;
 
     stack.pop();
+
+    const std::size_t level = level_stack.top();
+    level_stack.pop();
 
     SM_ASSERT(!ip1->empty());
     SM_ASSERT(!ip2->empty());
@@ -920,6 +922,11 @@ SHARING_MAPT(void)
         if(!child.shares_with(*ip2))
         {
           stack.push(stack_itemt(&child, ip2));
+
+          // The level is not needed when the node of the left map is an
+          // internal node, and the node of the right map is a container node,
+          // hence we just push a dummy element
+          level_stack.push(dummy_level);
         }
       }
 
@@ -947,6 +954,7 @@ SHARING_MAPT(void)
         else if(!child.shares_with(*p))
         {
           stack.push(stack_itemt(&child, p));
+          level_stack.push(level + 1);
         }
       }
 
@@ -958,8 +966,9 @@ SHARING_MAPT(void)
     if(ip2->is_internal())
     {
       SM_ASSERT(is_singular(ip1->get_container()));
+      SM_ASSERT(level != dummy_level);
 
-      add_item_if_not_shared(*ip1, *ip2, delta_view, only_common);
+      add_item_if_not_shared(*ip1, *ip2, level, delta_view, only_common);
 
       continue;
     }
@@ -1283,6 +1292,7 @@ SHARING_MAPT2(optionalt<std::reference_wrapper<const, mapped_type>>)::find(
 // static constants
 
 SHARING_MAPT(const std::string)::not_found_msg="key not found";
+SHARING_MAPT(const std::size_t)::dummy_level = 0xff;
 
 SHARING_MAPT(const std::size_t)::bits = 30;
 SHARING_MAPT(const std::size_t)::chunk = 3;
