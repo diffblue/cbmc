@@ -22,12 +22,6 @@ Author: Diffblue Ltd.
 /// \param index: index of the element to access
 /// \return expression representing the (\p index)'th element of the array
 dereference_exprt
-array_element_from_pointer(const exprt &pointer, const exprt &index)
-{
-  PRECONDITION(can_cast_type<pointer_typet>(pointer.type()));
-  PRECONDITION(
-    index.type().id() == ID_signedbv || index.type().id() == ID_unsignedbv);
-  return dereference_exprt{plus_exprt{pointer, index}};
-}
+array_element_from_pointer(const exprt &pointer, const exprt &index);
 
 #endif // CPROVER_UTIL_ARRAY_ELEMENT_FROM_POINTER_H
