@@ -469,7 +469,8 @@ void interpretert::evaluate(
       num_dynamic_objects++;
       buffer << "interpreter::dynamic_object" << num_dynamic_objects;
       irep_idt id(buffer.str().c_str());
-      mp_integer address=build_memory_map(id, expr.type().subtype());
+      mp_integer address =
+        build_memory_map(symbol_exprt{id, expr.type().subtype()});
       // TODO: check array of type
       // TODO: interpret zero-initialization argument
       dest.push_back(address);
@@ -875,7 +876,7 @@ void interpretert::evaluate(
       mp_integer address=result[0];
       if(address>0 && address<memory.size())
       {
-        auto obj_type=get_type(address_to_identifier(address));
+        auto obj_type = address_to_symbol(address).type();
 
         mp_integer offset=address_to_offset(address);
         mp_integer byte_offset;
@@ -1107,7 +1108,7 @@ mp_integer interpretert::evaluate_address(
         return m_it2->second;
     }
     mp_integer address=memory.size();
-    build_memory_map(to_symbol_expr(expr).get_identifier(), expr.type());
+    build_memory_map(to_symbol_expr(expr));
     return address;
   }
   else if(expr.id()==ID_dereference)
