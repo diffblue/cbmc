@@ -9,6 +9,8 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 #ifndef CPROVER_JAVA_BYTECODE_JAVA_STATIC_INITIALIZERS_H
 #define CPROVER_JAVA_BYTECODE_JAVA_STATIC_INITIALIZERS_H
 
+#include "assignments_from_json.h"
+#include "ci_lazy_methods_needed.h"
 #include "java_object_factory_parameters.h"
 #include "select_pointer_type.h"
 #include "synthetic_methods_map.h"
@@ -64,12 +66,21 @@ code_ifthenelset get_clinit_wrapper_body(
 ///   is supported as a file format.
 /// \param symbol_table: used to look up and create new symbols
 /// \param message_handler: used to log any errors with parsing the input file
+/// \param needed_lazy_methods: used to mark any runtime types given in the
+///   input file as needed
+/// \param max_user_array_length: maximum value for constant or variable length
+///   arrays. Any arrays that were specified to be of nondeterministic length in
+///   the input file will be limited by this value.
+/// \param references: map to keep track of reference-equal objets.
 /// \return the body of the user_specified_clinit function as a code block.
 code_blockt get_user_specified_clinit_body(
   const irep_idt &class_id,
   const std::string &static_values_file,
   symbol_table_baset &symbol_table,
-  message_handlert &message_handler);
+  message_handlert &message_handler,
+  optionalt<ci_lazy_methods_neededt> needed_lazy_methods,
+  size_t max_user_array_length,
+  std::unordered_map<std::string, object_creation_referencet> &references);
 
 class stub_global_initializer_factoryt
 {

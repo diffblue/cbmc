@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_LANGUAGE_H
 #define CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_LANGUAGE_H
 
+#include "assignments_from_json.h"
 #include "ci_lazy_methods.h"
 #include "ci_lazy_methods_needed.h"
 #include "java_class_loader.h"
@@ -227,6 +228,12 @@ private:
   std::unordered_set<std::string> no_load_classes;
 
   std::vector<load_extra_methodst> extra_methods;
+
+  /// Map used in all calls to functions that deterministically create objects
+  /// (currently only \ref assign_from_json).
+  /// It tracks objects that should be reference-equal to each other by mapping
+  /// IDs of such objects to symbols that store their values.
+  std::unordered_map<std::string, object_creation_referencet> references;
 };
 
 std::unique_ptr<languaget> new_java_bytecode_language();

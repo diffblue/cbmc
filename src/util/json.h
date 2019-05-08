@@ -446,4 +446,16 @@ inline const json_objectt &to_json_object(const jsont &json)
   return static_cast<const json_objectt &>(json);
 }
 
+inline json_stringt &to_json_string(jsont &json)
+{
+  PRECONDITION(json.kind == jsont::kindt::J_STRING);
+  return static_cast<json_stringt &>(json);
+}
+
+inline const json_stringt &to_json_string(const jsont &json)
+{
+  PRECONDITION(json.kind == jsont::kindt::J_STRING);
+  return static_cast<const json_stringt &>(json);
+}
+
 #endif // CPROVER_UTIL_JSON_H

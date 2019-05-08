@@ -1112,7 +1112,13 @@ bool java_bytecode_languaget::convert_single_method(
       INVARIANT(
         class_name, "user_specified_clinit must be declared by a class.");
       writable_symbol.value = get_user_specified_clinit_body(
-        *class_name, static_values_file, symbol_table, get_message_handler());
+        *class_name,
+        static_values_file,
+        symbol_table,
+        get_message_handler(),
+        needed_lazy_methods,
+        max_user_array_length,
+        references);
       break;
     }
     case synthetic_method_typet::STUB_CLASS_STATIC_INITIALIZER:

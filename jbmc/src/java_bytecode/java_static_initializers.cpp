@@ -755,7 +755,10 @@ code_blockt get_user_specified_clinit_body(
   const irep_idt &class_id,
   const std::string &static_values_file,
   symbol_table_baset &symbol_table,
-  message_handlert &message_handler)
+  message_handlert &message_handler,
+  optionalt<ci_lazy_methods_neededt> needed_lazy_methods,
+  size_t max_user_array_length,
+  std::unordered_map<std::string, object_creation_referencet> &references)
 {
   jsont json;
   if(
@@ -792,9 +795,15 @@ code_blockt get_user_specified_clinit_body(
         code_blockt body;
         for(const auto &value_pair : static_field_values)
         {
-          // TODO append code to `body` to assign value_pair.first to
-          // TODO value_pair.second
-          (void)value_pair;
+          assign_from_json(
+            value_pair.first,
+            value_pair.second,
+            clinit_function_name(class_id),
+            body,
+            symbol_table,
+            needed_lazy_methods,
+            max_user_array_length,
+            references);
         }
         return body;
       }
