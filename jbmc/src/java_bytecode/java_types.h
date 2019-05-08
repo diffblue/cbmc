@@ -219,6 +219,18 @@ public:
     {
       set(ID_final, is_final);
     }
+
+    /// marks a component as enum constant
+    bool get_is_enum_constant() const
+    {
+      return get_bool(ID_is_enum_constant);
+    }
+
+    /// is a field an enum constant?
+    void set_is_enum_constant(const bool is_enum_constant)
+    {
+      set(ID_is_enum_constant, is_enum_constant);
+    }
   };
 
   using componentst = std::vector<componentt>;
