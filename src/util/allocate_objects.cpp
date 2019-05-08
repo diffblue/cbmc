@@ -121,7 +121,7 @@ symbol_exprt allocate_objectst::allocate_automatic_local_object(
   return aux_symbol.symbol_expr();
 }
 
-exprt allocate_objectst::allocate_dynamic_object(
+exprt allocate_objectst::allocate_dynamic_object_symbol(
   code_blockt &output_code,
   const exprt &target_expr,
   const typet &allocate_type)
@@ -165,7 +165,16 @@ exprt allocate_objectst::allocate_dynamic_object(
   code.add_source_location() = source_location;
   output_code.add(code);
 
-  return dereference_exprt(malloc_sym.symbol_expr());
+  return malloc_sym.symbol_expr();
+}
+
+exprt allocate_objectst::allocate_dynamic_object(
+  code_blockt &output_code,
+  const exprt &target_expr,
+  const typet &allocate_type)
+{
+  return dereference_exprt(
+    allocate_dynamic_object_symbol(output_code, target_expr, allocate_type));
 }
 
 exprt allocate_objectst::allocate_non_dynamic_object(

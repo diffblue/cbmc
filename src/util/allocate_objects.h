@@ -71,16 +71,20 @@ public:
   /// `alloc_site$1 = ALLOCATE(object_size, FALSE);`
   /// `*p = alloc_site$1;`
   ///
-  /// The function returns a dereference expressiont that dereferences the
-  /// allocation site variable (e.g., `*alloc_site$1`) and which can be used to
-  /// initialize the allocated memory.
-  ///
   /// \param output_code: Code block to which the necessary code is added
   /// \param target_expr: A pointer to the allocated memory will be assigned to
   ///   this (lvalue) expression
   /// \param allocate_type: Type of the object allocated
-  /// \return A dereference_exprt that dereferences the pointer to the allocated
-  ///   memory, or an empty expression when `allocate_type` is void
+  /// \return The pointer to the allocated memory, or an empty expression
+  ///   when `allocate_type` is void
+  exprt allocate_dynamic_object_symbol(
+    code_blockt &output_code,
+    const exprt &target_expr,
+    const typet &allocate_type);
+
+  /// Generate the same code as \ref allocate_dynamic_object_symbol, but
+  /// return a dereference_exprt that dereferences the newly created pointer
+  /// to the allocated memory.
   exprt allocate_dynamic_object(
     code_blockt &output_code,
     const exprt &target_expr,
