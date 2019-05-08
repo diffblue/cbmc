@@ -447,6 +447,25 @@ bool simplify_exprt::simplify_inequality_address_of(exprt &expr)
 
     return false;
   }
+  else if(
+    tmp0.op0().id() == ID_dynamic_object &&
+    tmp1.op0().id() == ID_dynamic_object)
+  {
+    bool equal = to_dynamic_object_expr(tmp0.op0()).get_instance() ==
+                 to_dynamic_object_expr(tmp1.op0()).get_instance();
+
+    expr.make_bool(expr.id() == ID_equal ? equal : !equal);
+
+    return false;
+  }
+  else if(
+    (tmp0.op0().id() == ID_symbol && tmp1.op0().id() == ID_dynamic_object) ||
+    (tmp0.op0().id() == ID_dynamic_object && tmp1.op0().id() == ID_symbol))
+  {
+    expr.make_bool(expr.id() != ID_equal);
+
+    return false;
+  }
 
   return true;
 }
@@ -458,6 +477,7 @@ bool simplify_exprt::simplify_inequality_pointer_object(exprt &expr)
   DATA_INVARIANT(
     expr.operands().size() == 2, "(in)equalities have two operands");
 
+  exprt::operandst new_inequality_ops;
   forall_operands(it, expr)
   {
     PRECONDITION(it->id() == ID_pointer_object);
@@ -474,16 +494,23 @@ bool simplify_exprt::simplify_inequality_pointer_object(exprt &expr)
         return true;
       }
     }
-    else if(op.id() != ID_constant || op.get(ID_value) != ID_NULL)
+    else if(op.id() != ID_constant || !op.is_zero())
     {
       return true;
     }
+
+    if(new_inequality_ops.empty())
+      new_inequality_ops.push_back(op);
+    else
+    {
+      new_inequality_ops.push_back(typecast_exprt::conditional_cast(
+        op, new_inequality_ops.front().type()));
+      simplify_node(new_inequality_ops.back());
+    }
   }
 
-  bool equal=expr.op0().op0()==expr.op1().op0();
-
-  expr.make_bool(expr.id()==ID_equal?equal:!equal);
-
+  expr.operands() = std::move(new_inequality_ops);
+  simplify_inequality(expr);
   return false;
 }
 
