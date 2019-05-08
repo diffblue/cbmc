@@ -997,9 +997,9 @@ SHARING_MAPT2(, innert *)::get_container_node(const key_type &k)
 
   std::size_t key = hash()(k);
   innert *ip = &map;
-  SM_ASSERT(ip->is_internal());
+  SM_ASSERT(ip->is_defined_internal());
 
-  for(std::size_t i = 0; i < steps; i++)
+  while(true)
   {
     std::size_t bit = key & mask;
 
@@ -1024,10 +1024,9 @@ SHARING_MAPT2(const, innert *)::get_container_node(const key_type &k) const
 
   std::size_t key = hash()(k);
   const innert *ip = &map;
-
   SM_ASSERT(ip->is_defined_internal());
 
-  for(std::size_t i = 0; i < steps; i++)
+  while(true)
   {
     std::size_t bit = key & mask;
 
@@ -1058,7 +1057,7 @@ SHARING_MAPT(void)::erase(const key_type &k)
   std::size_t key = hash()(k);
   innert *ip = &map;
 
-  for(std::size_t i = 0; i < steps; i++)
+  while(true)
   {
     std::size_t bit = key & mask;
 
@@ -1072,7 +1071,9 @@ SHARING_MAPT(void)::erase(const key_type &k)
 
     ip = ip->add_child(bit);
 
-    if(ip->is_defined_container())
+    SM_ASSERT(!ip->empty());
+
+    if(ip->is_container())
       break;
 
     key >>= chunk;
@@ -1180,7 +1181,9 @@ SHARING_MAPT4(valueU, void)
   // The root cannot be a container node
   SM_ASSERT(ip->is_internal());
 
-  for(std::size_t i = 0; i < steps; i++)
+  std::size_t i = 0;
+
+  while(true)
   {
     std::size_t bit = key & mask;
 
@@ -1203,12 +1206,20 @@ SHARING_MAPT4(valueU, void)
       return;
     }
 
-    if(child->is_container() && i < steps - 1)
+    if(child->is_container())
     {
-      // Migrate the elements downwards
-      innert *cp = migrate(i, key, bit, *ip);
+      if(i < steps - 1)
+      {
+        // Migrate the elements downwards
+        innert *cp = migrate(i, key, bit, *ip);
 
-      cp->place_leaf(k, std::forward<valueU>(m));
+        cp->place_leaf(k, std::forward<valueU>(m));
+      }
+      else
+      {
+        // Add to the bottom container
+        child->place_leaf(k, std::forward<valueU>(m));
+      }
 
       num++;
 
@@ -1219,14 +1230,8 @@ SHARING_MAPT4(valueU, void)
 
     ip = child;
     key >>= chunk;
+    i++;
   }
-
-  SM_ASSERT(ip->is_defined_container());
-
-  // Add to the bottom container
-  ip->place_leaf(k, std::forward<valueU>(m));
-
-  num++;
 }
 
 SHARING_MAPT4(valueU, void)
