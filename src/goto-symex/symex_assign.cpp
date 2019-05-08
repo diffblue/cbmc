@@ -426,16 +426,16 @@ void goto_symext::symex_assign_symbol(
     return;
   }
 
-  exprt ssa_rhs=rhs;
+  exprt guarded_rhs = rhs;
 
   // put assignment guard into the rhs
   if(!guard.empty())
   {
-    if_exprt tmp_ssa_rhs(conjunction(guard), ssa_rhs, lhs, ssa_rhs.type());
-    tmp_ssa_rhs.swap(ssa_rhs);
+    guarded_rhs =
+      if_exprt{conjunction(guard), std::move(guarded_rhs), lhs, rhs.type()};
   }
 
-  exprt l2_rhs = state.rename(std::move(ssa_rhs), ns).get();
+  exprt l2_rhs = state.rename(std::move(guarded_rhs), ns).get();
 
   ssa_exprt lhs_mod = lhs;
 
