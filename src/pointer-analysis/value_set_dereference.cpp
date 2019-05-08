@@ -72,6 +72,26 @@ exprt value_set_dereferencet::dereference(const exprt &pointer)
     exprt false_case = dereference(if_expr.false_case());
     return if_exprt(if_expr.cond(), true_case, false_case);
   }
+  else if(pointer.id() == ID_typecast)
+  {
+    const exprt *underlying = &pointer;
+    // Note this isn't quite the same as skip_typecast, which would also skip
+    // things such as int-to-ptr typecasts which we shouldn't ignore
+    while(underlying->id() == ID_typecast &&
+          underlying->type().id() == ID_pointer)
+    {
+      underlying = &to_typecast_expr(*underlying).op();
+    }
+
+    if(underlying->id() == ID_if && underlying->type().id() == ID_pointer)
+    {
+      const auto &if_expr = to_if_expr(*underlying);
+      return if_exprt(
+        if_expr.cond(),
+        dereference(typecast_exprt(if_expr.true_case(), pointer.type())),
+        dereference(typecast_exprt(if_expr.false_case(), pointer.type())));
+    }
+  }
 
   // type of the object
   const typet &type=pointer.type().subtype();
