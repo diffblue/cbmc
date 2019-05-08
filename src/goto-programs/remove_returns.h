@@ -95,6 +95,10 @@ void restore_returns(symbol_table_baset &, goto_functionst &);
 
 void restore_returns(goto_modelt &);
 
+/// produces the identifier that is used to store the return
+/// value of the function with the given identifier
+irep_idt return_value_identifier(const irep_idt &);
+
 /// produces the symbol that is used to store the return
 /// value of the function with the given identifier
 symbol_exprt return_value_symbol(const irep_idt &, const namespacet &);

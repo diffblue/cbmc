@@ -295,13 +295,9 @@ bool remove_returnst::restore_returns(
   const irep_idt function_id=f_it->first;
 
   // do we have X#return_value?
-  const namespacet ns(symbol_table);
-  auto rv_symbol = return_value_symbol(function_id, ns);
-  auto rv_name = rv_symbol.get_identifier();
-
+  auto rv_name = return_value_identifier(function_id);
   symbol_tablet::symbolst::const_iterator rv_it=
     symbol_table.symbols.find(rv_name);
-
   if(rv_it==symbol_table.symbols.end())
     return true;
 
@@ -411,10 +407,15 @@ void restore_returns(goto_modelt &goto_model)
   rr.restore(goto_model.goto_functions);
 }
 
+irep_idt return_value_identifier(const irep_idt &identifier)
+{
+  return id2string(identifier) + RETURN_VALUE_SUFFIX;
+}
+
 symbol_exprt
 return_value_symbol(const irep_idt &identifier, const namespacet &ns)
 {
   const symbolt &function_symbol = ns.lookup(identifier);
   const typet &return_type = to_code_type(function_symbol.type).return_type();
-  return symbol_exprt(id2string(identifier) + RETURN_VALUE_SUFFIX, return_type);
+  return symbol_exprt(return_value_identifier(identifier), return_type);
 }
