@@ -1,0 +1,10 @@
+CORE
+double_deref_with_cast.c
+--show-vcc
+^\{-[0-9]+\} derefd_pointer::derefd_pointer!0#1 =
+^\{1\} \(derefd_pointer::derefd_pointer!0#1 = address_of\(symex_dynamic::dynamic_object[1-9]+\) \? main::argc!0@1#1 = [12] : main::argc!0@1#1 = [12]
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+See README for details about these tests
