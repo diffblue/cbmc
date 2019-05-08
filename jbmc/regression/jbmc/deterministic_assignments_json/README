@@ -1,0 +1,6 @@
+This directory contains tests for the --static-values feature: reading initial
+values of static fields from a JSON file.
+Most of the tests are in StaticValues.java, some more tests are included in
+Color.java, and all other classes are used to create instances of various kinds
+of objects to use in the tests.
+The initial static field values are read from the file clinit-state.json.
