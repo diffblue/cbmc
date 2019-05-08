@@ -208,8 +208,12 @@ void ansi_c_internal_additions(std::string &code)
       // https://gcc.gnu.org/onlinedocs/gcc/Floating-Types.html
       // For clang, __float128 is a keyword.
       // For gcc, this is a typedef and not a keyword.
-      if(config.ansi_c.mode != configt::ansi_ct::flavourt::CLANG)
+      if(
+        config.ansi_c.mode != configt::ansi_ct::flavourt::CLANG &&
+        config.ansi_c.gcc__float128_type)
+      {
         code += "typedef " CPROVER_PREFIX "Float128 __float128;\n";
+      }
     }
     else if(config.ansi_c.arch == "ppc64le")
     {
@@ -222,8 +226,12 @@ void ansi_c_internal_additions(std::string &code)
       // https://gcc.gnu.org/onlinedocs/gcc/Floating-Types.html
       // For clang, __float128 is a keyword.
       // For gcc, this is a typedef and not a keyword.
-      if(config.ansi_c.mode != configt::ansi_ct::flavourt::CLANG)
+      if(
+        config.ansi_c.mode != configt::ansi_ct::flavourt::CLANG &&
+        config.ansi_c.gcc__float128_type)
+      {
         code+="typedef long double __float128;\n";
+      }
     }
 
     if(

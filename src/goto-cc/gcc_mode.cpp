@@ -539,7 +539,9 @@ int gcc_modet::doit()
   const auto gcc_float128_minor_version =
     config.ansi_c.arch == "x86_64" ? 3u : 5u;
 
-  config.ansi_c.Float128_type =
+  // __float128 exists (as a typedef) since gcc 4.5 everywhere,
+  // and since 4.3 on x86_64
+  config.ansi_c.gcc__float128_type =
     gcc_version.flavor == gcc_versiont::flavort::GCC &&
     gcc_version.is_at_least(4u, gcc_float128_minor_version);
 
