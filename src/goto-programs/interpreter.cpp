@@ -427,8 +427,15 @@ struct_typet::componentt interpretert::get_component(
   const irep_idt &object,
   const mp_integer &offset)
 {
-  const symbolt &symbol=ns.lookup(object);
-  const typet real_type=ns.follow(symbol.type);
+  const symbolt &symbol = ns.lookup(object);
+  return get_component(symbol.type, offset);
+}
+
+/// Retrieves the member at \p offset of an object of type \p object_type.
+struct_typet::componentt
+interpretert::get_component(const typet &object_type, const mp_integer &offset)
+{
+  const typet real_type = ns.follow(object_type);
   if(real_type.id()!=ID_struct)
     throw "request for member of non-struct";
 

@@ -197,9 +197,13 @@ protected:
   bool unbounded_size(const typet &);
   mp_integer get_size(const typet &type);
 
+  DEPRECATED("use the object_type version instead")
   struct_typet::componentt get_component(
     const irep_idt &object,
     const mp_integer &offset);
+
+  struct_typet::componentt
+  get_component(const typet &object_type, const mp_integer &offset);
 
   typet get_type(const irep_idt &id) const;
 
