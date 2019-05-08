@@ -196,6 +196,8 @@ gen_clinit_eqexpr(const exprt &expr, const clinit_statest state)
 /// \param class_name: name of the class to generate clinit wrapper calls for
 /// \param [out] init_body: appended with calls to clinit wrapper
 /// \param nondet_static: true if nondet-static option was given
+/// \param replace_clinit: true iff calls to clinit are replaced with calls to
+///   user_specified_clinit.
 /// \param object_factory_parameters: object factory parameters used to populate
 ///   nondet-initialized globals and objects reachable from them (only needed
 ///   if nondet-static is true)
@@ -207,6 +209,7 @@ static void clinit_wrapper_do_recursive_calls(
   const irep_idt &class_name,
   code_blockt &init_body,
   const bool nondet_static,
+  const bool replace_clinit,
   const java_object_factory_parameterst &object_factory_parameters,
   const select_pointer_typet &pointer_type_selector,
   message_handlert &message_handler)
@@ -220,8 +223,10 @@ static void clinit_wrapper_do_recursive_calls(
       init_body.add(code_function_callt{base_init_func->symbol_expr()});
   }
 
-  const irep_idt &real_clinit_name = clinit_function_name(class_name);
-  if(const auto clinit_func = symbol_table.lookup(real_clinit_name))
+  const irep_idt &clinit_name = replace_clinit
+                                  ? user_specified_clinit_name(class_name)
+                                  : clinit_function_name(class_name);
+  if(const auto clinit_func = symbol_table.lookup(clinit_name))
     init_body.add(code_function_callt{clinit_func->symbol_expr()});
 
   // If nondet-static option is given, add a standard nondet initialization for
@@ -482,6 +487,8 @@ static void create_clinit_wrapper_symbols(
 ///   name created by `create_clinit_wrapper_symbols`)
 /// \param symbol_table: global symbol table
 /// \param nondet_static: true if nondet-static option was given
+/// \param replace_clinit: true iff calls to clinit are replaced with calls to
+///   user_specified_clinit.
 /// \param object_factory_parameters: object factory parameters used to populate
 ///   nondet-initialized globals and objects reachable from them (only needed
 ///   if nondet-static is true)
@@ -493,6 +500,7 @@ code_blockt get_thread_safe_clinit_wrapper_body(
   const irep_idt &function_id,
   symbol_table_baset &symbol_table,
   const bool nondet_static,
+  const bool replace_clinit,
   const java_object_factory_parameterst &object_factory_parameters,
   const select_pointer_typet &pointer_type_selector,
   message_handlert &message_handler)
@@ -645,6 +653,7 @@ code_blockt get_thread_safe_clinit_wrapper_body(
       *class_name,
       init_body,
       nondet_static,
+      replace_clinit,
       object_factory_parameters,
       pointer_type_selector,
       message_handler);
@@ -674,6 +683,8 @@ code_blockt get_thread_safe_clinit_wrapper_body(
 ///   name created by `create_clinit_wrapper_symbols`)
 /// \param symbol_table: global symbol table
 /// \param nondet_static: true if nondet-static option was given
+/// \param replace_clinit: true iff calls to clinit are replaced with calls to
+///   user_specified_clinit.
 /// \param object_factory_parameters: object factory parameters used to populate
 ///   nondet-initialized globals and objects reachable from them (only needed
 ///   if nondet-static is true)
@@ -685,6 +696,7 @@ code_ifthenelset get_clinit_wrapper_body(
   const irep_idt &function_id,
   symbol_table_baset &symbol_table,
   const bool nondet_static,
+  const bool replace_clinit,
   const java_object_factory_parameterst &object_factory_parameters,
   const select_pointer_typet &pointer_type_selector,
   message_handlert &message_handler)
@@ -729,6 +741,7 @@ code_ifthenelset get_clinit_wrapper_body(
     *class_name,
     init_body,
     nondet_static,
+    replace_clinit,
     object_factory_parameters,
     pointer_type_selector,
     message_handler);

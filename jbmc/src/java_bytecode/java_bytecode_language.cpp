@@ -1091,6 +1091,7 @@ bool java_bytecode_languaget::convert_single_method(
           function_id,
           symbol_table,
           nondet_static,
+          !static_values_file.empty(),
           object_factory_parameters,
           get_pointer_type_selector(),
           get_message_handler());
@@ -1099,6 +1100,7 @@ bool java_bytecode_languaget::convert_single_method(
           function_id,
           symbol_table,
           nondet_static,
+          !static_values_file.empty(),
           object_factory_parameters,
           get_pointer_type_selector(),
           get_message_handler());
