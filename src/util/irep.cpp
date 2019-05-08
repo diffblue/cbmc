@@ -519,7 +519,7 @@ std::size_t irept::number_of_non_comments(const named_subt &named_sub)
 
 std::size_t irept::hash() const
 {
-  #ifdef HASH_CODE
+#if HASH_CODE
   if(read().hash_code!=0)
     return read().hash_code;
   #endif
@@ -543,7 +543,7 @@ std::size_t irept::hash() const
 
   result = hash_finalize(result, sub.size() + number_of_named_ireps);
 
-#ifdef HASH_CODE
+#if HASH_CODE
   read().hash_code=result;
 #endif
 #ifdef IREP_HASH_STATS
