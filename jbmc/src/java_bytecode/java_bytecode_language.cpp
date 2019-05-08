@@ -87,6 +87,10 @@ void parse_java_language_options(const cmdlinet &cmd, optionst &options)
     options.set_option(
       "java-cp-include-files", cmd.get_value("java-cp-include-files"));
   }
+  if(cmd.isset("static-values"))
+  {
+    options.set_option("static-values", cmd.get_value("static-values"));
+  }
 }
 
 /// Consume options that are java bytecode specific.
@@ -177,6 +181,7 @@ void java_bytecode_languaget::set_language_options(const optionst &options)
     java_cp_include_files=".*";
 
   nondet_static = options.get_bool_option("nondet-static");
+  static_values_file = options.get_option("static-values");
 
   language_options_initialized=true;
 }
