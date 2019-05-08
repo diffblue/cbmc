@@ -2,16 +2,12 @@ version: 0.2
 
 phases:
   install:
+    runtime-versions:
+      java: openjdk8
     commands:
       - sed -i 's#/archive.ubuntu.com#/us-east-1.ec2.archive.ubuntu.com#g' /etc/apt/sources.list
-      - add-apt-repository ppa:ubuntu-toolchain-r/test -y
-      - apt-key adv --keyserver keyserver.ubuntu.com --recv-keys BA9EF27F
-      - add-apt-repository ppa:openjdk-r/ppa -y
       - apt-get update -y
-      - apt-get install -y g++-5 clang-7 flex bison make git libwww-perl patch ccache libc6-dev-i386 jq
-      - apt-get install -y openjdk-8-jdk
-      - update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 1
-      - update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-5 1
+      - apt-get install -y clang-7 flex bison make git libwww-perl patch ccache libc6-dev-i386 jq
   build:
     commands:
       - echo Build started on `date`
