@@ -564,7 +564,6 @@ protected:
     std::set<const void *> &marked,
     bool mark = true) const;
 
-  static const std::string not_found_msg;
   static const std::size_t dummy_level;
 
   // config
@@ -1291,7 +1290,6 @@ SHARING_MAPT2(optionalt<std::reference_wrapper<const, mapped_type>>)::find(
 
 // static constants
 
-SHARING_MAPT(const std::string)::not_found_msg="key not found";
 SHARING_MAPT(const std::size_t)::dummy_level = 0xff;
 
 SHARING_MAPT(const std::size_t)::bits = 30;
