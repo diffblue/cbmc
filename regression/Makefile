@@ -27,6 +27,7 @@ DIRS = cbmc \
        contracts \
        goto-cc-file-local \
        linking-goto-binaries \
+       symtab2gb \
        # Empty last line
 
 # Run all test directories in sequence

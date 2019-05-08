@@ -19,6 +19,7 @@ DIRS = analyses \
        linking \
        pointer-analysis \
        solvers \
+       symtab2gb \
        util \
        xmllang \
        # Empty last line
@@ -29,6 +30,7 @@ all: cbmc.dir \
      goto-diff.dir \
      goto-instrument.dir \
      goto-harness.dir \
+     symtab2gb.dir \
      # Empty last line
 
 ###############################################################################
@@ -69,6 +71,8 @@ goto-diff.dir: languages goto-programs.dir pointer-analysis.dir \
                solvers.dir goto-symex.dir
 
 goto-cc.dir: languages goto-programs.dir linking.dir
+
+symtab2gb.dir: util.dir goto-programs.dir json-symtab-language.dir
 
 # building for a particular directory
 

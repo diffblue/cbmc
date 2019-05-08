@@ -141,6 +141,7 @@ set_target_properties(
     linking
     pointer-analysis
     solvers
+    symtab2gb
     testing-utils
     unit
     util
