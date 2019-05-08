@@ -48,6 +48,29 @@ code_ifthenelset get_clinit_wrapper_body(
   const select_pointer_typet &pointer_type_selector,
   message_handlert &message_handler);
 
+/// Create the body of a user_specified_clinit function for a given class, which
+/// includes assignments for all static fields of the class to values read from
+/// an input file. If the file could not be parsed or an entry for this class
+/// could not be found in it, the user_specified_clinit function will only
+/// contain a call to the "real" clinit function, and not include any
+/// assignments itself. If an entry for this class is found but some of its
+/// static fields are not mentioned in the input file, those fields will be
+/// assigned default values (zero or null).
+/// \param class_id: the id of the class to create a user_specified_clinit
+///   function body for.
+/// \param static_values_file: input file containing values of static fields.
+///   The format is expected to be a map whose keys are class names, and whose
+///   values are maps from static field names to values. Currently only JSON
+///   is supported as a file format.
+/// \param symbol_table: used to look up and create new symbols
+/// \param message_handler: used to log any errors with parsing the input file
+/// \return the body of the user_specified_clinit function as a code block.
+code_blockt get_user_specified_clinit_body(
+  const irep_idt &class_id,
+  const std::string &static_values_file,
+  symbol_table_baset &symbol_table,
+  message_handlert &message_handler);
+
 class stub_global_initializer_factoryt
 {
   /// Maps class symbols onto the stub globals that belong to them

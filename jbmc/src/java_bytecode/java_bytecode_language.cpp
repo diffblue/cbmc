@@ -1106,7 +1106,15 @@ bool java_bytecode_languaget::convert_single_method(
           get_message_handler());
       break;
     case synthetic_method_typet::USER_SPECIFIED_STATIC_INITIALIZER:
+    {
+      const auto class_name =
+        declaring_class(symbol_table.lookup_ref(function_id));
+      INVARIANT(
+        class_name, "user_specified_clinit must be declared by a class.");
+      writable_symbol.value = get_user_specified_clinit_body(
+        *class_name, static_values_file, symbol_table, get_message_handler());
       break;
+    }
     case synthetic_method_typet::STUB_CLASS_STATIC_INITIALIZER:
       writable_symbol.value =
         stub_global_initializer_factory.get_stub_initializer_body(
