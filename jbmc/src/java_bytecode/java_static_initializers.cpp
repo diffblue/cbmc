@@ -52,6 +52,7 @@ static typet clinit_states_type()
 // Disable linter here to allow a std::string constant, since that holds
 // a length, whereas a cstr would require strlen every time.
 const std::string clinit_wrapper_suffix = "::clinit_wrapper"; // NOLINT(*)
+const std::string user_specified_clinit_suffix = "::user_specified_clinit"; // NOLINT(*)
 const std::string clinit_function_suffix = ".<clinit>:()V"; // NOLINT(*)
 
 /// Get the Java static initializer wrapper name for a given class (the wrapper
@@ -63,6 +64,11 @@ const std::string clinit_function_suffix = ".<clinit>:()V"; // NOLINT(*)
 irep_idt clinit_wrapper_name(const irep_idt &class_name)
 {
   return id2string(class_name) + clinit_wrapper_suffix;
+}
+
+irep_idt user_specified_clinit_name(const irep_idt &class_name)
+{
+  return id2string(class_name) + user_specified_clinit_suffix;
 }
 
 /// Check if function_id is a clinit wrapper
@@ -331,6 +337,21 @@ static void create_clinit_wrapper_function_symbol(
     clinit_wrapper_name(class_name),
     "clinit_wrapper",
     synthetic_method_typet::STATIC_INITIALIZER_WRAPPER,
+    symbol_table,
+    synthetic_methods);
+}
+
+// Create symbol for the "user_specified_clinit"
+static void create_user_specified_clinit_function_symbol(
+  const irep_idt &class_name,
+  symbol_tablet &symbol_table,
+  synthetic_methods_mapt &synthetic_methods)
+{
+  create_function_symbol(
+    class_name,
+    user_specified_clinit_name(class_name),
+    "user_specified_clinit",
+    synthetic_method_typet::USER_SPECIFIED_STATIC_INITIALIZER,
     symbol_table,
     synthetic_methods);
 }
@@ -716,17 +737,27 @@ code_ifthenelset get_clinit_wrapper_body(
   return code_ifthenelset(std::move(check_already_run), std::move(init_body));
 }
 
-/// Create static initializer wrappers for all classes that need them.
+/// Create static initializer wrappers and possibly user-specified functions for
+/// initial static field value assignments for all classes that need them.
+/// For each class that will require a static initializer wrapper, create a
+/// function named package.classname::clinit_wrapper, and a corresponding
+/// global tracking whether it has run or not. If a file containing initial
+/// static values is given, also create a function named
+/// package.classname::user_specified_clinit.
 /// \param symbol_table: global symbol table
 /// \param synthetic_methods: synthetic methods map. Will be extended noting
 ///   that any wrapper belongs to this code, and so `get_clinit_wrapper_body`
 ///   should be used to produce the method body when required.
 /// \param thread_safe: if true state variables required to make the
 ///   clinit_wrapper thread safe will be created.
-void create_static_initializer_wrappers(
+/// \param is_user_clinit_needed: determines whether or not a symbol for the
+///   synthetic user_specified_clinit function should be created. This is true
+///   if a file was given with the --static-values option and false otherwise.
+void create_static_initializer_symbols(
   symbol_tablet &symbol_table,
   synthetic_methods_mapt &synthetic_methods,
-  const bool thread_safe)
+  const bool thread_safe,
+  const bool is_user_clinit_needed)
 {
   // Top-sort the class hierarchy, such that we visit parents before children,
   // and can so identify parents that need static initialisation by whether we
@@ -743,6 +774,11 @@ void create_static_initializer_wrappers(
     {
       create_clinit_wrapper_symbols(
         class_identifier, symbol_table, synthetic_methods, thread_safe);
+      if(is_user_clinit_needed)
+      {
+        create_user_specified_clinit_function_symbol(
+          class_identifier, symbol_table, synthetic_methods);
+      }
     }
   }
 }

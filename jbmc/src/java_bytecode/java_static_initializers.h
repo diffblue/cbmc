@@ -20,13 +20,15 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 #include <util/symbol_table.h>
 
 irep_idt clinit_wrapper_name(const irep_idt &class_name);
+irep_idt user_specified_clinit_name(const irep_idt &class_name);
 
 bool is_clinit_wrapper_function(const irep_idt &function_id);
 
-void create_static_initializer_wrappers(
+void create_static_initializer_symbols(
   symbol_tablet &symbol_table,
   synthetic_methods_mapt &synthetic_methods,
-  const bool thread_safe);
+  const bool thread_safe,
+  const bool is_user_clinit_needed);
 
 code_blockt get_thread_safe_clinit_wrapper_body(
   const irep_idt &function_id,
