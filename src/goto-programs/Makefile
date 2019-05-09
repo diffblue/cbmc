@@ -62,7 +62,6 @@ SRC = adjust_float_expressions.cpp \
       show_properties.cpp \
       show_symbol_table.cpp \
       slice_global_inits.cpp \
-      string_abstraction.cpp \
       string_instrumentation.cpp \
       system_library_symbols.cpp \
       validate_goto_model.cpp \

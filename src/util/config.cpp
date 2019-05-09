@@ -1040,11 +1040,6 @@ bool configt::set(const cmdlinet &cmdline)
   if(cmdline.isset("LP32"))
     ansi_c.set_LP32();  // int=16, long=32, pointer=32
 
-  if(cmdline.isset("string-abstraction"))
-    ansi_c.string_abstraction=true;
-  else
-    ansi_c.string_abstraction=false;
-
   if(cmdline.isset("no-library"))
     ansi_c.lib=configt::ansi_ct::libt::LIB_NONE;
 
@@ -1227,7 +1222,7 @@ void configt::set_from_symbol_table(
   ansi_c.NULL_is_zero=true;
 
   // mode, preprocessor (and all preprocessor command line options),
-  // lib, string_abstraction not stored in namespace
+  // lib not stored in namespace
 
   set_object_bits_from_symbol_table(symbol_table);
 }

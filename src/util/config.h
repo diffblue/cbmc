@@ -128,8 +128,6 @@ public:
     enum class libt { LIB_NONE, LIB_FULL };
     libt lib;
 
-    bool string_abstraction;
-
     static const std::size_t default_object_bits=8;
   } ansi_c;
 

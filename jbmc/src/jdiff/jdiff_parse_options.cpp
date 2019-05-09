@@ -43,7 +43,6 @@ Author: Peter Schrammel
 #include <goto-programs/rewrite_union.h>
 #include <goto-programs/set_properties.h>
 #include <goto-programs/show_properties.h>
-#include <goto-programs/string_abstraction.h>
 #include <goto-programs/string_instrumentation.h>
 
 #include <goto-instrument/cover.h>

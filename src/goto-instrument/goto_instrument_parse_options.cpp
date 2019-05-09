@@ -41,7 +41,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/show_properties.h>
 #include <goto-programs/show_symbol_table.h>
 #include <goto-programs/slice_global_inits.h>
-#include <goto-programs/string_abstraction.h>
 #include <goto-programs/string_instrumentation.h>
 #include <goto-programs/validate_goto_model.h>
 #include <goto-programs/write_goto_binary.h>
@@ -1218,15 +1217,6 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     log.status() << "Slicing away initializations of unused global variables"
                  << messaget::eom;
     slice_global_inits(goto_model);
-  }
-
-  if(cmdline.isset("string-abstraction"))
-  {
-    do_indirect_call_and_rtti_removal();
-    do_remove_returns();
-
-    log.status() << "String Abstraction" << messaget::eom;
-    string_abstraction(goto_model, ui_message_handler);
   }
 
   // some analyses require function pointer removal and partial inlining

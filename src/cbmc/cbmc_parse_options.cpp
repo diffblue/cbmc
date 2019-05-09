@@ -64,7 +64,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/show_goto_functions.h>
 #include <goto-programs/show_properties.h>
 #include <goto-programs/show_symbol_table.h>
-#include <goto-programs/string_abstraction.h>
 #include <goto-programs/string_instrumentation.h>
 #include <goto-programs/validate_goto_model.h>
 
@@ -830,12 +829,6 @@ bool cbmc_parse_optionst::process_goto_program(
                     "of static/global variables"
                  << messaget::eom;
     nondet_static(goto_model);
-  }
-
-  if(options.get_bool_option("string-abstraction"))
-  {
-    log.status() << "String Abstraction" << messaget::eom;
-    string_abstraction(goto_model, log.get_message_handler());
   }
 
   // add failed symbols
