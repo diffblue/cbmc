@@ -291,6 +291,50 @@ static bool needs_clinit_wrapper(
   return false;
 }
 
+static void create_function_symbol(
+  const irep_idt &class_name,
+  const irep_idt &function_name,
+  const irep_idt &function_base_name,
+  const synthetic_method_typet &synthetic_method_type,
+  symbol_tablet &symbol_table,
+  synthetic_methods_mapt &synthetic_methods)
+{
+  symbolt function_symbol;
+  const java_method_typet function_type({}, java_void_type());
+  function_symbol.name = function_name;
+  function_symbol.pretty_name = function_symbol.name;
+  function_symbol.base_name = function_base_name;
+  function_symbol.type = function_type;
+  // This provides a back-link from a method to its associated class, as is done
+  // for java_bytecode_convert_methodt::convert.
+  set_declaring_class(function_symbol, class_name);
+  function_symbol.mode = ID_java;
+  bool failed = symbol_table.add(function_symbol);
+  INVARIANT(!failed, id2string(function_base_name) + " symbol should be fresh");
+
+  auto insert_result =
+    synthetic_methods.emplace(function_symbol.name, synthetic_method_type);
+  INVARIANT(
+    insert_result.second,
+    "synthetic methods map should not already contain entry for " +
+      id2string(function_base_name));
+}
+
+// Create symbol for the "clinit_wrapper"
+static void create_clinit_wrapper_function_symbol(
+  const irep_idt &class_name,
+  symbol_tablet &symbol_table,
+  synthetic_methods_mapt &synthetic_methods)
+{
+  create_function_symbol(
+    class_name,
+    clinit_wrapper_name(class_name),
+    "clinit_wrapper",
+    synthetic_method_typet::STATIC_INITIALIZER_WRAPPER,
+    symbol_table,
+    synthetic_methods);
+}
+
 /// Creates a static initializer wrapper symbol for the given class, along with
 /// a global boolean that tracks if it has been run already.
 /// \param class_name: class symbol name
@@ -345,27 +389,8 @@ static void create_clinit_wrapper_symbols(
       true);
   }
 
-  // Create symbol for the "clinit_wrapper"
-  symbolt wrapper_method_symbol;
-  const java_method_typet wrapper_method_type({}, java_void_type());
-  wrapper_method_symbol.name = clinit_wrapper_name(class_name);
-  wrapper_method_symbol.pretty_name = wrapper_method_symbol.name;
-  wrapper_method_symbol.base_name = "clinit_wrapper";
-  wrapper_method_symbol.type = wrapper_method_type;
-  // This provides a back-link from a method to its associated class, as is done
-  // for java_bytecode_convert_methodt::convert.
-  set_declaring_class(wrapper_method_symbol, class_name);
-  wrapper_method_symbol.mode = ID_java;
-  bool failed = symbol_table.add(wrapper_method_symbol);
-  INVARIANT(!failed, "clinit-wrapper symbol should be fresh");
-
-  auto insert_result = synthetic_methods.emplace(
-    wrapper_method_symbol.name,
-    synthetic_method_typet::STATIC_INITIALIZER_WRAPPER);
-  INVARIANT(
-    insert_result.second,
-    "synthetic methods map should not already contain entry for "
-    "clinit wrapper");
+  create_clinit_wrapper_function_symbol(
+    class_name, symbol_table, synthetic_methods);
 }
 
 /// Thread safe version of the static initializer.
