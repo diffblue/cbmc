@@ -722,6 +722,12 @@ IREP_ID_ONE(to_member)
 IREP_ID_ONE(pointer_to_member)
 IREP_ID_ONE(tuple)
 IREP_ID_ONE(function_body)
+IREP_ID_ONE(get_may)
+IREP_ID_ONE(set_may)
+IREP_ID_ONE(clear_may)
+IREP_ID_ONE(get_must)
+IREP_ID_ONE(set_must)
+IREP_ID_ONE(clear_must)
 
 // Projects depending on this code base that wish to extend the list of
 // available ids should provide a file local_irep_ids.def in their source tree

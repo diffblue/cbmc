@@ -2911,8 +2911,7 @@ std::string expr2ct::convert_code(
   if(statement==ID_array_replace)
     return convert_code_array_replace(src, indent);
 
-  if(statement=="set_may" ||
-     statement=="set_must")
+  if(statement == ID_set_may || statement == ID_set_must)
     return indent_str(indent) + convert_function(src, id2string(statement)) +
            ";";
 
@@ -3451,10 +3450,10 @@ std::string expr2ct::convert_with_precedence(
   else if(src.id()==ID_pointer_object)
     return convert_function(src, "POINTER_OBJECT");
 
-  else if(src.id()=="get_must")
+  else if(src.id() == ID_get_must)
     return convert_function(src, CPROVER_PREFIX "get_must");
 
-  else if(src.id()=="get_may")
+  else if(src.id() == ID_get_may)
     return convert_function(src, CPROVER_PREFIX "get_may");
 
   else if(src.id()=="object_value")

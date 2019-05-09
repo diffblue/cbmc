@@ -162,7 +162,7 @@ void taint_analysist::instrument(
             {
             case taint_parse_treet::rulet::SOURCE:
             {
-              codet code_set_may("set_may");
+              codet code_set_may{ID_set_may};
               code_set_may.operands().resize(2);
               code_set_may.op0() = where;
               code_set_may.op1() =
@@ -174,10 +174,10 @@ void taint_analysist::instrument(
 
             case taint_parse_treet::rulet::SINK:
             {
-              binary_predicate_exprt get_may(
+              binary_predicate_exprt get_may{
                 where,
-                "get_may",
-                address_of_exprt(string_constantt(rule.taint)));
+                ID_get_may,
+                address_of_exprt(string_constantt(rule.taint))};
               goto_programt::targett t =
                 insert_before.add(goto_programt::make_assertion(
                   not_exprt(get_may), instruction.source_location));
@@ -189,7 +189,7 @@ void taint_analysist::instrument(
 
             case taint_parse_treet::rulet::SANITIZER:
             {
-              codet code_clear_may("clear_may");
+              codet code_clear_may{ID_clear_may};
               code_clear_may.operands().resize(2);
               code_clear_may.op0() = where;
               code_clear_may.op1() =

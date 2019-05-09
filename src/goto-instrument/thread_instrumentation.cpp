@@ -41,10 +41,10 @@ void thread_exit_instrumentation(goto_programt &goto_program)
   const string_constantt mutex_locked_string("mutex-locked");
 
   // NULL is any
-  binary_predicate_exprt get_may(
+  binary_predicate_exprt get_may{
     null_pointer_exprt(pointer_type(empty_typet())),
-    "get_may",
-    address_of_exprt(mutex_locked_string));
+    ID_get_may,
+    address_of_exprt(mutex_locked_string)};
 
   *end = goto_programt::make_assertion(not_exprt(get_may), source_location);
 
