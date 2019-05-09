@@ -27,6 +27,7 @@ SRC += analyses/ai/ai.cpp \
        goto-programs/goto_program_table_consistency.cpp \
        goto-programs/goto_program_validate.cpp \
        goto-programs/goto_trace_output.cpp \
+       goto-programs/remove_returns.cpp \
        goto-programs/xml_expr.cpp \
        goto-symex/ssa_equation.cpp \
        goto-symex/is_constant.cpp \

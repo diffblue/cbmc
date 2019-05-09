@@ -14,6 +14,7 @@ Date:   September 2009
 #include "remove_returns.h"
 
 #include <util/std_expr.h>
+#include <util/suffix.h>
 
 #include "goto_model.h"
 
@@ -418,4 +419,14 @@ return_value_symbol(const irep_idt &identifier, const namespacet &ns)
   const symbolt &function_symbol = ns.lookup(identifier);
   const typet &return_type = to_code_type(function_symbol.type).return_type();
   return symbol_exprt(return_value_identifier(identifier), return_type);
+}
+
+bool is_return_value_identifier(const irep_idt &id)
+{
+  return has_suffix(id2string(id), RETURN_VALUE_SUFFIX);
+}
+
+bool is_return_value_symbol(const symbol_exprt &symbol_expr)
+{
+  return is_return_value_identifier(symbol_expr.get_identifier());
 }
