@@ -4131,6 +4131,12 @@ public:
   }
 };
 
+template <>
+inline bool can_cast_expr<nil_exprt>(const exprt &base)
+{
+  return base.id() == ID_nil;
+}
+
 /// \brief The null pointer constant
 class null_pointer_exprt:public constant_exprt
 {
