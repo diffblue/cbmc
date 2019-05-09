@@ -10,7 +10,6 @@ SRC = armcc_cmdline.cpp \
       gcc_cmdline.cpp \
       gcc_message_handler.cpp \
       gcc_mode.cpp \
-      gcc_version.cpp \
       goto_cc_cmdline.cpp \
       goto_cc_languages.cpp \
       goto_cc_main.cpp \
