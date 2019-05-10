@@ -151,9 +151,9 @@ goto_symex_statet::set_indices<L2>(ssa_exprt ssa_expr, const namespacet &ns)
   return level2(level1(level0(std::move(ssa_expr), ns, source.thread_nr)));
 }
 
-void goto_symex_statet::assignment(
-  ssa_exprt &lhs, // L0/L1
-  const exprt &rhs,  // L2
+renamedt<ssa_exprt, L2> goto_symex_statet::assignment(
+  ssa_exprt lhs,    // L0/L1
+  const exprt &rhs, // L2
   const namespacet &ns,
   bool rhs_is_simplified,
   bool record_value,
@@ -182,7 +182,8 @@ void goto_symex_statet::assignment(
 
   // do the l2 renaming
   increase_generation(l1_identifier, lhs);
-  lhs = set_indices<L2>(std::move(lhs), ns).get();
+  renamedt<ssa_exprt, L2> l2_lhs = set_indices<L2>(std::move(lhs), ns);
+  lhs = l2_lhs.get();
 
   // in case we happen to be multi-threaded, record the memory access
   bool is_shared=l2_thread_write_encoding(lhs, ns);
@@ -233,6 +234,8 @@ void goto_symex_statet::assignment(
   value_set.output(ns, std::cout);
   std::cout << "**********************\n";
 #endif
+
+  return l2_lhs;
 }
 
 template <levelt level>
@@ -444,19 +447,20 @@ bool goto_symex_statet::l2_thread_read_encoding(
 
     const bool record_events_bak=record_events;
     record_events=false;
-    assignment(ssa_l1, tmp, ns, true, true);
+    ssa_exprt ssa_l2 = assignment(std::move(ssa_l1), tmp, ns, true, true).get();
     record_events=record_events_bak;
 
     symex_target->assignment(
       guard_as_expr,
-      ssa_l1,
-      ssa_l1,
-      ssa_l1.get_original_expr(),
+      ssa_l2,
+      ssa_l2,
+      ssa_l2.get_original_expr(),
       tmp,
       source,
       symex_targett::assignment_typet::PHI);
 
-    expr = set_indices<L2>(std::move(ssa_l1), ns).get();
+    // TODO: are we setting l2 indices of something that is already l2?
+    expr = set_indices<L2>(std::move(ssa_l2), ns).get();
 
     a_s_read.second.push_back(guard);
     if(!no_write.op().is_false())
