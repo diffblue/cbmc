@@ -472,7 +472,7 @@ void goto_symext::symex_assign_symbol(
 
   exprt ssa_full_lhs = add_to_lhs(full_lhs, l2_lhs);
   state.record_events.push(false);
-  exprt l2_full_lhs = state.rename(std::move(ssa_full_lhs), ns).get();
+  const exprt l2_full_lhs = state.rename(std::move(ssa_full_lhs), ns).get();
   state.record_events.pop();
 
   // do the assignment
