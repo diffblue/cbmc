@@ -1,6 +1,6 @@
 CORE
 Test.class
---function Test.checkAbort --trace
+--function Test.checkAbort --trace --max-nondet-string-length 1000000000
 ^EXIT=10$
 ^SIGNAL=0$
 dynamic_object[0-9]*=\(assignment removed\)
@@ -8,3 +8,4 @@ dynamic_object[0-9]*=\(assignment removed\)
 --
 This tests that the object does not appear in the trace, because concretizing
 a string of the required length may take too much memory.
+max-nondet-string-length is set big enough to cause an overflow.
