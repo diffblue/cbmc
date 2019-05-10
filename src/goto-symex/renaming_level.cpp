@@ -97,26 +97,29 @@ void symex_level1t::restore_from(const current_namest &other)
   }
 }
 
-void get_original_name(exprt &expr)
+exprt get_original_name(exprt expr)
 {
-  get_original_name(expr.type());
+  expr.type() = get_original_name(std::move(expr.type()));
 
   if(expr.id() == ID_symbol && expr.get_bool(ID_C_SSA_symbol))
-    expr = to_ssa_expr(expr).get_original_expr();
+    return to_ssa_expr(expr).get_original_expr();
   else
+  {
     Forall_operands(it, expr)
-      get_original_name(*it);
+      *it = get_original_name(std::move(*it));
+    return expr;
+  }
 }
 
-void get_original_name(typet &type)
+typet get_original_name(typet type)
 {
   // rename all the symbols with their last known value
 
   if(type.id() == ID_array)
   {
     auto &array_type = to_array_type(type);
-    get_original_name(array_type.subtype());
-    get_original_name(array_type.size());
+    array_type.subtype() = get_original_name(std::move(array_type.subtype()));
+    array_type.size() = get_original_name(std::move(array_type.size()));
   }
   else if(type.id() == ID_struct || type.id() == ID_union)
   {
@@ -124,10 +127,12 @@ void get_original_name(typet &type)
     struct_union_typet::componentst &components = s_u_type.components();
 
     for(auto &component : components)
-      get_original_name(component.type());
+      component.type() = get_original_name(std::move(component.type()));
   }
   else if(type.id() == ID_pointer)
   {
-    get_original_name(to_pointer_type(type).subtype());
+    type.subtype() =
+      get_original_name(std::move(to_pointer_type(type).subtype()));
   }
+  return type;
 }

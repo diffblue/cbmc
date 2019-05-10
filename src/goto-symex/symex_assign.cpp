@@ -491,8 +491,7 @@ void goto_symext::symex_assign_symbol(
   // Temporarily add the state guard
   guard.emplace_back(state.guard.as_expr());
 
-  exprt original_lhs = l2_full_lhs;
-  get_original_name(original_lhs);
+  const exprt original_lhs = get_original_name(l2_full_lhs);
   target.assignment(
     conjunction(guard),
     l2_lhs,
