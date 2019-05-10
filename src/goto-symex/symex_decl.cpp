@@ -76,14 +76,13 @@ void goto_symext::symex_decl(statet &state, const symbol_exprt &expr)
     CHECK_RETURN(field_generation == 1);
   }
 
-  const bool record_events=state.record_events;
-  state.record_events=false;
+  state.record_events.push(false);
   exprt expr_l2 = state.rename(std::move(ssa), ns).get();
   INVARIANT(
     expr_l2.id() == ID_symbol && expr_l2.get_bool(ID_C_SSA_symbol),
     "symbol to declare should not be replaced by constant propagation");
   ssa = to_ssa_expr(expr_l2);
-  state.record_events=record_events;
+  state.record_events.pop();
 
   // we hide the declaration of auxiliary variables
   // and if the statement itself is hidden

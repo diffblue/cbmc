@@ -528,11 +528,10 @@ static void merge_names(
       simplify(rhs, ns);
   }
 
-  const bool record_events = dest_state.record_events;
-  dest_state.record_events = false;
+  dest_state.record_events.push(false);
   const ssa_exprt new_lhs =
     dest_state.assignment(ssa, rhs, ns, true, true).get();
-  dest_state.record_events = record_events;
+  dest_state.record_events.pop();
 
   log.conditional_output(
     log.debug(), [ns, &new_lhs](messaget::mstreamt &mstream) {

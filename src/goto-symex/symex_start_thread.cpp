@@ -85,8 +85,7 @@ void goto_symext::symex_start_thread(statet &state)
     ssa_exprt rhs = pair.second.first;
 
     exprt::operandst lhs_conditions;
-    const bool record_events=state.record_events;
-    state.record_events=false;
+    state.record_events.push(false);
     symex_assign_symbol(
       state,
       lhs_l1,
@@ -94,7 +93,7 @@ void goto_symext::symex_start_thread(statet &state)
       rhs,
       lhs_conditions,
       symex_targett::assignment_typet::HIDDEN);
-    state.record_events=record_events;
+    state.record_events.pop();
   }
 
   // initialize all variables marked thread-local

@@ -38,7 +38,7 @@ goto_symex_statet::goto_symex_statet(
     source(_source),
     guard_manager(manager),
     symex_target(nullptr),
-    record_events(true),
+    record_events({true}),
     fresh_l2_name_provider(fresh_l2_name_provider)
 {
   threads.emplace_back(guard_manager);
@@ -445,10 +445,9 @@ bool goto_symex_statet::l2_thread_read_encoding(
     else
       tmp = if_exprt{cond.as_expr(), l2_true_case.get(), l2_false_case.get()};
 
-    const bool record_events_bak=record_events;
-    record_events=false;
+    record_events.push(false);
     ssa_exprt ssa_l2 = assignment(std::move(ssa_l1), tmp, ns, true, true).get();
-    record_events=record_events_bak;
+    record_events.pop();
 
     symex_target->assignment(
       guard_as_expr,
@@ -470,7 +469,7 @@ bool goto_symex_statet::l2_thread_read_encoding(
   }
 
   // No event and no fresh index, but avoid constant propagation
-  if(!record_events)
+  if(!record_events.top())
   {
     expr = set_indices<L2>(std::move(ssa_l1), ns).get();
     return true;
@@ -492,7 +491,7 @@ goto_symex_statet::write_is_shared_resultt goto_symex_statet::write_is_shared(
   const ssa_exprt &expr,
   const namespacet &ns) const
 {
-  if(!record_events)
+  if(!record_events.top())
     return write_is_shared_resultt::NOT_SHARED;
 
   PRECONDITION(dirty != nullptr);

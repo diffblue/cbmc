@@ -198,7 +198,7 @@ public:
   write_is_shared_resultt
   write_is_shared(const ssa_exprt &expr, const namespacet &ns) const;
 
-  bool record_events;
+  std::stack<bool> record_events;
 
   const incremental_dirtyt *dirty = nullptr;
 

@@ -747,10 +747,9 @@ void goto_symext::try_filter_value_sets(
     // something that just replaces `*&x` with `x` whenever it finds it.
     do_simplify(modified_condition);
 
-    const bool record_events = state.record_events;
-    state.record_events = false;
+    state.record_events.push(false);
     modified_condition = state.rename(std::move(modified_condition), ns).get();
-    state.record_events = record_events;
+    state.record_events.pop();
 
     do_simplify(modified_condition);
 
