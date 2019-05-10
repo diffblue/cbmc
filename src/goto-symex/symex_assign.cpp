@@ -298,18 +298,18 @@ static assignmentt rewrite_with_to_field_symbols(
 /// "update") expressions, which \ref rewrite_with_to_field_symbols will then
 /// take care of.
 /// \param [in, out] state: symbolic execution state to perform renaming
-/// \param ssa_rhs: right-hand side
-/// \param lhs_mod: left-hand side
+/// \param assignment: assignment to transform
 /// \param ns: namespace
 /// \param do_simplify: set to true if, and only if, simplification is enabled
 /// \return updated assignment
 static assignmentt shift_indexed_access_to_lhs(
   goto_symext::statet &state,
-  exprt ssa_rhs,
-  ssa_exprt lhs_mod,
+  assignmentt assignment,
   const namespacet &ns,
   bool do_simplify)
 {
+  exprt &ssa_rhs = assignment.rhs;
+  ssa_exprt &lhs_mod = assignment.lhs;
   if(
     ssa_rhs.id() == ID_byte_update_little_endian ||
     ssa_rhs.id() == ID_byte_update_big_endian)
@@ -373,7 +373,7 @@ static assignmentt shift_indexed_access_to_lhs(
                          state.rename(std::move(ssa_rhs), ns).get()};
     }
   }
-  return assignmentt{std::move(lhs_mod), std::move(ssa_rhs)};
+  return assignment;
 }
 
 /// Assign a struct expression to a symbol. If \ref symex_assign_symbol was used
@@ -454,7 +454,7 @@ void goto_symext::symex_assign_symbol(
   // expressions on the LHS. If we add an option to disable field-sensitivity
   // in the future these should be omitted.
   auto assignment = shift_indexed_access_to_lhs(
-    state, std::move(l2_rhs), lhs, ns, symex_config.simplify_opt);
+    state, assignmentt{lhs, std::move(l2_rhs)}, ns, symex_config.simplify_opt);
   assignment = rewrite_with_to_field_symbols(state, std::move(assignment), ns);
 
   do_simplify(assignment.rhs);
