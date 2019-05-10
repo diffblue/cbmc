@@ -283,20 +283,27 @@ static void rewrite_with_to_field_symbols(
 #endif
 }
 
+/// Structure to hold the result of shift_indexed_access_to_lhs
+struct assignmentt final
+{
+  ssa_exprt lhs;
+  exprt rhs;
+};
+
 /// Replace byte-update operations that only affect individual fields of an
 /// expression by assignments to just those fields. May generate "with" (or
 /// "update") expressions, which \ref rewrite_with_to_field_symbols will then
 /// take care of.
 /// \param [in, out] state: symbolic execution state to perform renaming
 /// \param ssa_rhs: right-hand side
-/// \param [in,out] lhs_mod: left-hand side
+/// \param lhs_mod: left-hand side
 /// \param ns: namespace
 /// \param do_simplify: set to true if, and only if, simplification is enabled
-/// \return updated right-hand side
-static exprt shift_indexed_access_to_lhs(
+/// \return updated assignment
+static assignmentt shift_indexed_access_to_lhs(
   goto_symext::statet &state,
   exprt ssa_rhs,
-  ssa_exprt &lhs_mod,
+  ssa_exprt lhs_mod,
   const namespacet &ns,
   bool do_simplify)
 {
@@ -317,8 +324,7 @@ static exprt shift_indexed_access_to_lhs(
 
     if(byte_extract.id() == ID_symbol)
     {
-      lhs_mod = to_ssa_expr(byte_extract);
-      return byte_update.value();
+      return assignmentt{to_ssa_expr(byte_extract), byte_update.value()};
     }
     else if(byte_extract.id() == ID_index || byte_extract.id() == ID_member)
     {
@@ -360,11 +366,11 @@ static exprt shift_indexed_access_to_lhs(
 
       // We may have shifted the previous lhs into the rhs; as the lhs is only
       // L1-renamed, we need to rename again.
-      lhs_mod = to_ssa_expr(byte_extract);
-      return state.rename(std::move(ssa_rhs), ns).get();
+      return assignmentt{to_ssa_expr(byte_extract),
+                         state.rename(std::move(ssa_rhs), ns).get()};
     }
   }
-  return ssa_rhs;
+  return assignmentt{std::move(lhs_mod), std::move(ssa_rhs)};
 }
 
 /// Assign a struct expression to a symbol. If \ref symex_assign_symbol was used
@@ -439,24 +445,22 @@ void goto_symext::symex_assign_symbol(
     return state.rename(std::move(guarded_rhs), ns).get();
   }();
 
-  ssa_exprt lhs_mod = lhs;
-
   // Note the following two calls are specifically required for
   // field-sensitivity. For example, with-expressions, which may have just been
   // introduced by symex_assign_struct_member, are transformed into member
   // expressions on the LHS. If we add an option to disable field-sensitivity
   // in the future these should be omitted.
-  l2_rhs = shift_indexed_access_to_lhs(
-    state, std::move(l2_rhs), lhs_mod, ns, symex_config.simplify_opt);
-  rewrite_with_to_field_symbols(state, l2_rhs, lhs_mod, ns);
+  auto assignment = shift_indexed_access_to_lhs(
+    state, std::move(l2_rhs), lhs, ns, symex_config.simplify_opt);
+  rewrite_with_to_field_symbols(state, assignment.rhs, assignment.lhs, ns);
 
-  do_simplify(l2_rhs);
+  do_simplify(assignment.rhs);
 
-  ssa_exprt l2_lhs = lhs_mod;
+  ssa_exprt l2_lhs = std::move(assignment.lhs);
   ssa_exprt l1_lhs = l2_lhs; // l2_lhs will be renamed to L2 by the following:
   state.assignment(
     l2_lhs,
-    l2_rhs,
+    assignment.rhs,
     ns,
     symex_config.simplify_opt,
     symex_config.constant_propagation,
@@ -492,7 +496,7 @@ void goto_symext::symex_assign_symbol(
     l2_lhs,
     l2_full_lhs,
     original_lhs,
-    l2_rhs,
+    assignment.rhs,
     state.source,
     assignment_type);
 
