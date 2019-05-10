@@ -196,8 +196,7 @@ SCENARIO(
 {
   const symbol_tablet symbol_table = load_java_class_lazy(
     "ExternalLambdaAccessor",
-    "./java_bytecode/java_bytecode_parse_lambdas/lambda_examples/"
-    "openjdk_8_classes",
+    "./java_bytecode/java_bytecode_parse_lambdas/lambda_examples",
     "ExternalLambdaAccessor.test");
 
   THEN("Then the lambdas should be loaded")
