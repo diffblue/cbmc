@@ -121,6 +121,8 @@ Formatting is enforced using clang-format. For more information about this, see
   functionality should remain in place for at least six months from the date of
   deprecation. Before deprecating code, all in-tree uses should be replaced or
   marked as deprecated.
+- In the brief of function descriptions, prefer imperatives such as
+  `Remove first element...` over `Removes first element...`.
 
 # Naming
 - Identifiers should make clear the purpose of the thing they are naming. 
