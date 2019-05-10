@@ -8,8 +8,9 @@ Author: Diffblue Ltd
 
 #include "object_factory_parameters.h"
 
-#include <util/cmdline.h>
-#include <util/options.h>
+#include "cmdline.h"
+#include "magic.h"
+#include "options.h"
 
 void object_factory_parameterst::set(const optionst &options)
 {
@@ -68,12 +69,19 @@ void parse_object_factory_options(const cmdlinet &cmdline, optionst &options)
     options.set_option(
       "min-null-tree-depth", cmdline.get_value("min-null-tree-depth"));
   }
+
   if(cmdline.isset("max-nondet-string-length"))
   {
     options.set_option(
       "max-nondet-string-length",
       cmdline.get_value("max-nondet-string-length"));
   }
+  else if(!cmdline.isset("no-refine-strings"))
+  {
+    options.set_option(
+      "max-nondet-string-length", MAX_NONDET_STRING_LENGTH_DEFAULT);
+  }
+
   if(cmdline.isset("string-printable"))
   {
     options.set_option("string-printable", true);

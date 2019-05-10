@@ -1,11 +1,11 @@
 CORE
 Test.class
---function Test.check
+--function Test.check --max-nondet-string-length 1000000000
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
 file Test.java line 20 .*: FAILURE$
 --
 --
---max-nondet-string-length is not used on purpose, because this tests the behaviour
-of string refinement on very large strings.
+This tests the behaviour of string refinement on very large strings.
+max-nondet-string-length is set big enough to cause an overflow.
