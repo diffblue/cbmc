@@ -470,8 +470,7 @@ void goto_symext::symex_assign_symbol(
                          symex_config.allow_pointer_unsoundness)
                        .get();
 
-  exprt ssa_full_lhs=full_lhs;
-  ssa_full_lhs = add_to_lhs(ssa_full_lhs, l2_lhs);
+  exprt ssa_full_lhs = add_to_lhs(full_lhs, l2_lhs);
   state.record_events.push(false);
   exprt l2_full_lhs = state.rename(std::move(ssa_full_lhs), ns).get();
   state.record_events.pop();
