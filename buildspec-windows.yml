@@ -1,5 +1,10 @@
 version: 0.2
 
+env:
+  variables:
+    # CodeBuild console doesn't display color codes correctly
+    TESTPL_COLOR_OUTPUT: 0
+
 phases:
   install:
     commands:
