@@ -103,4 +103,12 @@ irep_idt return_value_identifier(const irep_idt &);
 /// value of the function with the given identifier
 symbol_exprt return_value_symbol(const irep_idt &, const namespacet &);
 
+/// Returns true if \p id is a special return-value symbol produced by
+/// \ref return_value_identifier
+bool is_return_value_identifier(const irep_idt &id);
+
+/// Returns true if \p symbol_expr is a special return-value symbol produced by
+/// \ref return_value_symbol
+bool is_return_value_symbol(const symbol_exprt &symbol_expr);
+
 #endif // CPROVER_GOTO_PROGRAMS_REMOVE_RETURNS_H
