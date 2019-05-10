@@ -74,6 +74,10 @@ void parse_object_factory_options(const cmdlinet &cmdline, optionst &options)
       "max-nondet-string-length",
       cmdline.get_value("max-nondet-string-length"));
   }
+  else if(!cmdline.isset("no-refine-strings"))
+  {
+    options.set_option("max-nondet-string-length", 10000);
+  }
   if(cmdline.isset("string-printable"))
   {
     options.set_option("string-printable", true);
