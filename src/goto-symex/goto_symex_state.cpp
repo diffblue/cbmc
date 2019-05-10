@@ -47,7 +47,8 @@ goto_symex_statet::goto_symex_statet(
 
 goto_symex_statet::~goto_symex_statet()=default;
 
-/// write to a variable
+/// Check that \p expr is correctly renamed to level 2 and return true in case
+/// an error is detected.
 static bool check_renaming(const exprt &expr);
 
 static bool check_renaming(const typet &type)
@@ -458,8 +459,8 @@ bool goto_symex_statet::l2_thread_read_encoding(
       source,
       symex_targett::assignment_typet::PHI);
 
-    // TODO: are we setting l2 indices of something that is already l2?
-    expr = set_indices<L2>(std::move(ssa_l2), ns).get();
+    INVARIANT(!check_renaming(ssa_l2), "expr should be renamed to L2");
+    expr = std::move(ssa_l2);
 
     a_s_read.second.push_back(guard);
     if(!no_write.op().is_false())
