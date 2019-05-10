@@ -202,6 +202,13 @@ void goto_symext::symex_assign_rec(
       "assignment to `" + lhs.id_string() + "' not handled");
 }
 
+/// Assignment from the rhs value to the lhs variable
+struct assignmentt final
+{
+  ssa_exprt lhs;
+  exprt rhs;
+};
+
 /// Replace "with" (or "update") expressions in \p ssa_rhs by their update
 /// values and move the index or member to the left-hand side \p lhs_mod. This
 /// effectively undoes the work that \ref goto_symext::symex_assign_array and
@@ -209,13 +216,14 @@ void goto_symext::symex_assign_rec(
 /// of the index/member that may only be known after renaming to L2 has taken
 /// place.
 /// \param [in, out] state: symbolic execution state to perform renaming
-/// \param [in,out] ssa_rhs: right-hand side
-/// \param [in,out] lhs_mod: left-hand side
+/// \param ssa_rhs: right-hand side
+/// \param lhs_mod: left-hand side
 /// \param ns: namespace
-static void rewrite_with_to_field_symbols(
+/// \return the updated assignment
+static assignmentt rewrite_with_to_field_symbols(
   goto_symext::statet &state,
-  exprt &ssa_rhs,
-  ssa_exprt &lhs_mod,
+  exprt ssa_rhs,
+  ssa_exprt lhs_mod,
   const namespacet &ns)
 {
 #ifdef USE_UPDATE
@@ -281,14 +289,8 @@ static void rewrite_with_to_field_symbols(
     lhs_mod = to_ssa_expr(field_sensitive_lhs);
   }
 #endif
+  return assignmentt{std::move(lhs_mod), std::move(ssa_rhs)};
 }
-
-/// Structure to hold the result of shift_indexed_access_to_lhs
-struct assignmentt final
-{
-  ssa_exprt lhs;
-  exprt rhs;
-};
 
 /// Replace byte-update operations that only affect individual fields of an
 /// expression by assignments to just those fields. May generate "with" (or
@@ -452,7 +454,8 @@ void goto_symext::symex_assign_symbol(
   // in the future these should be omitted.
   auto assignment = shift_indexed_access_to_lhs(
     state, std::move(l2_rhs), lhs, ns, symex_config.simplify_opt);
-  rewrite_with_to_field_symbols(state, assignment.rhs, assignment.lhs, ns);
+  assignment = rewrite_with_to_field_symbols(
+    state, std::move(assignment.rhs), std::move(assignment.lhs), ns);
 
   do_simplify(assignment.rhs);
 
