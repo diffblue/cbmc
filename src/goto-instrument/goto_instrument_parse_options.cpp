@@ -649,7 +649,7 @@ int goto_instrument_parse_optionst::doit()
 
       // restore RETURN instructions in case remove_returns had been
       // applied
-      restore_returns(log.get_message_handler(), goto_model);
+      restore_returns(goto_model, log.get_message_handler());
 
       if(cmdline.args.size()==2)
       {
@@ -899,7 +899,7 @@ void goto_instrument_parse_optionst::do_remove_returns()
   remove_returns_done=true;
 
   log.status() << "Removing returns" << messaget::eom;
-  remove_returns(log.get_message_handler(), goto_model);
+  remove_returns(goto_model, log.get_message_handler());
 }
 
 void goto_instrument_parse_optionst::get_goto_program()
