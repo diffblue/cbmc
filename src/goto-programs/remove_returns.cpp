@@ -196,8 +196,8 @@ bool remove_returnst::do_function_calls(
     INVARIANT(
       function_call.function().id() == ID_symbol ||
         function_call.function().id() == ID_dereference,
-      "indirect function calls should have been removed prior to running "
-      "remove-returns");
+      "only direct function calls (via a symbol) or indirect function calls "
+      "(via a dereference) are supported");
 
     bool is_function_pointer = function_call.function().id() == ID_dereference;
 
