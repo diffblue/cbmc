@@ -43,7 +43,7 @@ SCENARIO(
   WHEN("remove_returns is invoked")
   {
     remove_returns(
-      null_message_handler, goto_model.symbol_table, goto_model.goto_functions);
+      goto_model.symbol_table, null_message_handler, goto_model.goto_functions);
     THEN("function f should not contain any return instructions")
     {
       const auto &goto_functions = goto_model.goto_functions;
@@ -65,7 +65,7 @@ SCENARIO(
 
   WHEN("restore_returns is invoked")
   {
-    restore_returns(null_message_handler, goto_model);
+    restore_returns(goto_model, null_message_handler);
     THEN("function f should have a skip instruction")
     {
       int number_of_returns = 0;

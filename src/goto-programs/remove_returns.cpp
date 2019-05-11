@@ -30,8 +30,8 @@ class remove_returnst
 {
 public:
   explicit remove_returnst(
-    message_handlert &m,
-    symbol_table_baset &_symbol_table)
+    symbol_table_baset &_symbol_table,
+    message_handlert &m)
     : log(m), symbol_table(_symbol_table)
   {
   }
@@ -282,27 +282,27 @@ void remove_returnst::operator()(
 
 /// removes returns
 void remove_returns(
-  message_handlert &m,
   symbol_table_baset &symbol_table,
+  message_handlert &m,
   goto_functionst &goto_functions)
 {
-  remove_returnst rr(m, symbol_table);
+  remove_returnst rr(symbol_table, m);
   rr(goto_functions);
 }
 
 void remove_returns(
-  message_handlert &m,
   goto_model_functiont &goto_model_function,
+  message_handlert &m,
   function_is_stubt function_is_stub)
 {
-  remove_returnst rr(m, goto_model_function.get_symbol_table());
+  remove_returnst rr(goto_model_function.get_symbol_table(), m);
   rr(goto_model_function, function_is_stub);
 }
 
 /// removes returns
-void remove_returns(message_handlert &m, goto_modelt &goto_model)
+void remove_returns(goto_modelt &goto_model, message_handlert &m)
 {
-  remove_returnst rr(m, goto_model.symbol_table);
+  remove_returnst rr(goto_model.symbol_table, m);
   rr.build_fp_targets(goto_model);
   rr(goto_model.goto_functions);
 }
@@ -420,12 +420,11 @@ void remove_returnst::restore(goto_functionst &goto_functions)
 }
 
 /// restores return statements
-void restore_returns(message_handlert &m, goto_modelt &goto_model)
+void restore_returns(goto_modelt &goto_model, message_handlert &m)
 {
-  remove_returnst rr(m, goto_model.symbol_table);
+  remove_returnst rr(goto_model.symbol_table, m);
   rr.restore(goto_model.goto_functions);
 }
-
 
 irep_idt return_value_identifier(const irep_idt &identifier)
 {

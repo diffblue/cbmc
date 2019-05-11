@@ -810,7 +810,7 @@ bool cbmc_parse_optionst::process_goto_program(
   instrument_preconditions(goto_model);
 
   // remove returns, gcc vectors, complex
-  remove_returns(log.get_message_handler(), goto_model);
+  remove_returns(goto_model, log.get_message_handler());
   remove_vector(goto_model);
   remove_complex(goto_model);
   rewrite_union(goto_model);

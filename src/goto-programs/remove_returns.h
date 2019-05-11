@@ -84,8 +84,8 @@ class symbol_table_baset;
 class symbol_exprt;
 
 void remove_returns(
+  symbol_table_baset &symbol_table,
   message_handlert &m,
-  symbol_table_baset &,
   goto_functionst &);
 
 typedef std::function<bool(const irep_idt &)> function_is_stubt;
@@ -103,16 +103,16 @@ typedef std::function<bool(const irep_idt &)> function_is_stubt;
 ///   callee has been or will be given a body. It should return true if so, or
 ///   false if the function will remain a bodyless stub.
 void remove_returns(
-  message_handlert &m,
   goto_model_functiont &goto_model_function,
+  message_handlert &m,
   function_is_stubt function_is_stub);
 
-void remove_returns(message_handlert &m, goto_modelt &);
+void remove_returns(goto_modelt &goto_model, message_handlert &m);
 
 // reverse the above operations
 void restore_returns(symbol_table_baset &, goto_functionst &);
 
-void restore_returns(message_handlert &m, goto_modelt &);
+void restore_returns(goto_modelt &goto_model, message_handlert &m);
 
 /// produces the identifier that is used to store the return
 /// value of the function with the given identifier
