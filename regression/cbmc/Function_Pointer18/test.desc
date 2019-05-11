@@ -1,0 +1,11 @@
+CORE
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+\[f2.assertion.1\] line [0-9]+ assertion 0: SUCCESS
+\[main.assertion.1\] line [0-9]+ assertion x == 1: SUCCESS
+\[main.assertion.2\] line [0-9]+ assertion x == 2: SUCCESS
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
