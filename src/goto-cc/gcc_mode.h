@@ -16,8 +16,9 @@ Date: June 2006
 
 #include "compile.h"
 #include "gcc_message_handler.h"
-#include "gcc_version.h"
 #include "goto_cc_mode.h"
+
+#include <ansi-c/gcc_version.h>
 
 #include <set>
 
