@@ -150,9 +150,12 @@ protected:
   /// if (fp=&f1) then goto loc1
   /// if (fp=&f2) then goto loc2
   /// ..
-  /// loc1: f1(); goto N+1;
-  /// loc2: f2(); goto N+1;
+  /// if (fp=&fn) then goto locN
+  /// loc1:  f1(); goto N+1;
+  /// loc2:  f2(); goto N+1;
   /// ..
+  /// locN:  fn(); goto N+1;
+  /// locN+1:
   ///
   /// \param functions: set of function candidates
   /// \param code: the original function call
