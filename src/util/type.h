@@ -139,6 +139,16 @@ public:
 
     validate_type(type, ns, vm);
   }
+
+  void visit(std::function<void(const typet &)> f) const
+  {
+    f(*this);
+    for(const auto &sub_irep : get_sub())
+    {
+      const typet &subtype = static_cast<const typet &>(sub_irep);
+      subtype.visit(f);
+    }
+  }
 };
 
 /// Type with a single subtype.
