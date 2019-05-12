@@ -4460,4 +4460,79 @@ inline cond_exprt &to_cond_expr(exprt &expr)
   return ret;
 }
 
+/// \brief Expression to define a mapping from an argument (index) to elements.
+/// This enables constructing an array via an anonymous function.
+class lambda_exprt : public binary_exprt
+{
+public:
+  explicit lambda_exprt(symbol_exprt arg, exprt body, array_typet _type)
+    : binary_exprt(std::move(arg), ID_lambda, std::move(body), std::move(_type))
+  {
+  }
+
+  const array_typet &type() const
+  {
+    return static_cast<const array_typet &>(binary_exprt::type());
+  }
+
+  array_typet &type()
+  {
+    return static_cast<array_typet &>(binary_exprt::type());
+  }
+
+  const symbol_exprt &arg() const
+  {
+    return static_cast<const symbol_exprt &>(op0());
+  }
+
+  symbol_exprt &arg()
+  {
+    return static_cast<symbol_exprt &>(op0());
+  }
+
+  const exprt &body() const
+  {
+    return op1();
+  }
+
+  exprt &body()
+  {
+    return op1();
+  }
+};
+
+template <>
+inline bool can_cast_expr<lambda_exprt>(const exprt &base)
+{
+  return base.id() == ID_lambda;
+}
+
+inline void validate_expr(const lambda_exprt &value)
+{
+  validate_operands(value, 2, "'Lambda' must have two operands");
+}
+
+/// \brief Cast an exprt to a \ref lambda_exprt
+///
+/// \a expr must be known to be \ref lambda_exprt.
+///
+/// \param expr: Source expression
+/// \return Object of type \ref lambda_exprt
+inline const lambda_exprt &to_lambda_expr(const exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_lambda);
+  const lambda_exprt &ret = static_cast<const lambda_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
+}
+
+/// \copydoc to_lambda_expr(const exprt &)
+inline lambda_exprt &to_lambda_expr(exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_lambda);
+  lambda_exprt &ret = static_cast<lambda_exprt &>(expr);
+  validate_expr(ret);
+  return ret;
+}
+
 #endif // CPROVER_UTIL_STD_EXPR_H
