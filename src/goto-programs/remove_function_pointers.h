@@ -29,6 +29,11 @@ class symbol_tablet;
 using possible_fp_targetst = remove_const_function_pointerst::functionst;
 using possible_fp_targets_mapt = std::map<irep_idt, possible_fp_targetst>;
 
+/// Go through the whole model and find all potential function the pointer at
+///   all call sites
+/// \param message_handler: a message handler for reporting
+/// \param goto_model: model to search for potential functions
+/// \return a map from ids to sets of function candidates
 possible_fp_targets_mapt get_function_pointer_targets(
   message_handlert &message_handler,
   goto_modelt &goto_model);
@@ -40,6 +45,20 @@ void remove_function_pointers(
   goto_modelt &goto_model,
   bool add_safety_assertion,
   bool only_remove_const_fps=false);
+
+/// Replace all calls to a dynamic function by a case-split over a given set of
+///   candidate functions
+/// \param _message_handler: a message handler for reporting
+/// \param goto_model: model to search for potential functions
+/// \param target_map: candidate functions
+/// \param add_safety_assertion: check that at least one function matches
+/// \param only_remove_const_fps: restrict the pointer remove to const
+void remove_function_pointers(
+  message_handlert &_message_handler,
+  goto_modelt &goto_model,
+  const possible_fp_targets_mapt &target_map,
+  bool add_safety_assertion,
+  bool only_remove_const_fps = false);
 
 void remove_function_pointers(
   message_handlert &_message_handler,
