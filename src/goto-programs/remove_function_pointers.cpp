@@ -230,7 +230,7 @@ protected:
     const functionst &functions) const;
 
   /// Extract function name from \p called_functions
-  /// \param: called_function: the function call expression
+  /// \param called_function: the function call expression
   /// \return function identifier
   irep_idt get_callee_id(const exprt &called_function) const;
 };
