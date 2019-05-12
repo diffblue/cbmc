@@ -294,7 +294,7 @@ bvt boolbvt::convert_bitvector(const exprt &expr)
   else if(expr.id()==ID_complex_imag)
     return convert_complex_imag(to_complex_imag_expr(expr));
   else if(expr.id()==ID_lambda)
-    return convert_lambda(expr);
+    return convert_lambda(to_lambda_expr(expr));
   else if(expr.id()==ID_array_of)
     return convert_array_of(to_array_of_expr(expr));
   else if(expr.id()==ID_let)
@@ -316,28 +316,21 @@ bvt boolbvt::convert_bitvector(const exprt &expr)
   return conversion_failed(expr);
 }
 
-bvt boolbvt::convert_lambda(const exprt &expr)
+bvt boolbvt::convert_lambda(const lambda_exprt &expr)
 {
   std::size_t width=boolbv_width(expr.type());
 
   if(width==0)
     return conversion_failed(expr);
 
-  DATA_INVARIANT(
-    expr.operands().size() == 2, "lambda expression should have two operands");
-
-  if(expr.type().id()!=ID_array)
-    return conversion_failed(expr);
-
-  const exprt &array_size=
-    to_array_type(expr.type()).size();
+  const exprt &array_size = expr.type().size();
 
   const auto size = numeric_cast<mp_integer>(array_size);
 
   if(!size.has_value())
     return conversion_failed(expr);
 
-  typet counter_type=expr.op0().type();
+  typet counter_type = expr.arg().type();
 
   bvt bv;
   bv.resize(width);
@@ -346,10 +339,10 @@ bvt boolbvt::convert_lambda(const exprt &expr)
   {
     exprt counter=from_integer(i, counter_type);
 
-    exprt expr_op1(expr.op1());
-    replace_expr(expr.op0(), counter, expr_op1);
+    exprt body = expr.body();
+    replace_expr(expr.arg(), counter, body);
 
-    const bvt &tmp=convert_bv(expr_op1);
+    const bvt &tmp = convert_bv(body);
 
     INVARIANT(
       *size * tmp.size() == width,
