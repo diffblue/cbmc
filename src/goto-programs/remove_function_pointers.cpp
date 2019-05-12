@@ -416,6 +416,7 @@ void remove_function_pointerst::remove_function_pointer(
     t->source_location.set_property_class("pointer dereference");
     t->source_location.set_comment("invalid function pointer");
   }
+  new_code_gotos.add(goto_programt::make_assumption(false_exprt()));
 
   goto_programt new_code;
 
