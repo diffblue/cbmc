@@ -746,14 +746,8 @@ static exprt unpack_rec(
     // a basic type; we turn that into extractbits while considering
     // endianness
     auto bits_opt = pointer_offset_bits(src.type(), ns);
-    mp_integer bits;
-
-    if(bits_opt.has_value())
-      bits = *bits_opt;
-    else if(max_bytes.has_value())
-      bits = *max_bytes * 8;
-    else
-      throw non_constant_widtht(src, nil_exprt());
+    DATA_INVARIANT(bits_opt.has_value(), "basic type should have a fixed size");
+    mp_integer bits = *bits_opt;
 
     exprt::operandst byte_operands;
     for(mp_integer i=0; i<bits; i+=8)
