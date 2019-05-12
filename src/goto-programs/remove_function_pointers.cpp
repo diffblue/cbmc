@@ -94,9 +94,42 @@ protected:
 
   // Internal variables for communication between function pointer collection
   //   and the call modification.
-  bool remove_const_found_functions;
-  bool does_remove_const_success;
-  bool only_remove_const_function_pointers_called;
+  std::map<irep_idt, bool> remove_const_found_functions;
+  std::map<irep_idt, bool> does_remove_const_success;
+  std::map<irep_idt, bool> only_remove_const_function_pointers_called;
+
+  void set_remove_const_found_functions(const irep_idt &id, bool value)
+  {
+    if(remove_const_found_functions.count(id) == 0 || !value)
+      remove_const_found_functions[id] = value;
+  }
+  void set_does_remove_const_success(const irep_idt &id, bool value)
+  {
+    if(does_remove_const_success.count(id) == 0 || value)
+      does_remove_const_success[id] = value;
+  }
+  void
+  set_only_remove_const_function_pointers_called(const irep_idt &id, bool value)
+  {
+    if(only_remove_const_function_pointers_called.count(id) == 0 || !value)
+      only_remove_const_function_pointers_called[id] = value;
+  }
+
+  bool did_remove_const_success(const irep_idt &id) const
+  {
+    CHECK_RETURN(does_remove_const_success.count(id) > 0);
+    return does_remove_const_success.at(id);
+  }
+  bool was_only_remove_const_function_pointers_called(const irep_idt &id) const
+  {
+    CHECK_RETURN(only_remove_const_function_pointers_called.count(id) > 0);
+    return only_remove_const_function_pointers_called.at(id);
+  }
+  bool did_remove_const_found_functions(const irep_idt &id) const
+  {
+    CHECK_RETURN(remove_const_found_functions.count(id) > 0);
+    return remove_const_found_functions.at(id);
+  }
 
   /// Replace a call to a dynamic function at location
   /// target in the given goto-program by determining
@@ -357,21 +390,22 @@ code_typet remove_function_pointerst::refine_call_type(
 void remove_function_pointerst::try_remove_const_fp(
   const goto_programt &goto_program,
   functionst &functions,
-  const exprt &pointer)
+  const exprt &pointer,
+  const irep_idt &callee_id)
 {
   PRECONDITION(functions.empty());
 
   does_remove_constt const_removal_check(goto_program, ns);
   const auto does_remove_const = const_removal_check();
-  does_remove_const_success = does_remove_const.first;
+  set_does_remove_const_success(callee_id, does_remove_const.first);
 
-  if(does_remove_const_success)
+  if(does_remove_const.first)
   {
     log.warning().source_location = does_remove_const.second;
     log.warning() << "cast from const to non-const pointer found, "
                   << "only worst case function pointer removal will be done."
                   << messaget::eom;
-    remove_const_found_functions = false;
+    set_remove_const_found_functions(callee_id, false);
   }
   else
   {
@@ -382,8 +416,9 @@ void remove_function_pointerst::try_remove_const_fp(
     // however, it is possible for found_functions to be true and functions
     // to be empty (this happens if the pointer can only resolve to the null
     // pointer)
-    remove_const_found_functions = fpr(pointer, functions);
-    CHECK_RETURN(remove_const_found_functions || functions.empty());
+    bool temp = fpr(pointer, functions);
+    set_remove_const_found_functions(callee_id, temp);
+    CHECK_RETURN(temp || functions.empty());
   }
 }
 
@@ -415,13 +450,14 @@ remove_function_pointerst::get_function_pointer_targets(
   const auto &refined_call_type = refine_call_type(function.type(), code);
 
   functionst functions;
-  try_remove_const_fp(goto_program, functions, function.pointer());
+  auto callee_id = get_callee_id(function);
+  try_remove_const_fp(goto_program, functions, function.pointer(), callee_id);
 
-  only_remove_const_function_pointers_called =
-    !does_remove_const_success && functions.size() == 1;
+  set_only_remove_const_function_pointers_called(
+    callee_id, !did_remove_const_success(callee_id) && functions.size() == 1);
   if(
-    !only_remove_const_function_pointers_called &&
-    !remove_const_found_functions && !only_resolve_const_fps)
+    !was_only_remove_const_function_pointers_called(callee_id) &&
+    !did_remove_const_found_functions(callee_id) && !only_resolve_const_fps)
   {
     // get all type-compatible functions
     // whose address is ever taken
@@ -459,13 +495,15 @@ void remove_function_pointerst::remove_function_pointer(
   const auto functions =
     get_function_pointer_targets(goto_program, const_target);
 
-  if(only_remove_const_function_pointers_called)
+  auto callee_id = get_callee_id(target->get_function_call().function());
+  if(was_only_remove_const_function_pointers_called(callee_id))
   {
     auto call = target->get_function_call();
     call.function() = *functions.cbegin();
     target->set_function_call(call);
   }
-  else if(remove_const_found_functions || !only_resolve_const_fps)
+  else if(
+    did_remove_const_found_functions(callee_id) || !only_resolve_const_fps)
   {
     // If this mode is enabled, we only remove function pointers
     // that we can resolve either to an exact function, or an exact subset
@@ -619,13 +657,14 @@ possible_fp_targets_mapt get_function_pointer_targets(
         target->is_function_call() &&
         target->get_function_call().function().id() == ID_dereference)
       {
-        const auto &function_id =
-          to_symbol_expr(
-            to_dereference_expr(target->get_function_call().function())
-              .pointer())
-            .get_identifier();
-        target_map.emplace(
-          function_id, rfp.get_function_pointer_targets(goto_model, target));
+        const auto &function = target->get_function_call().function();
+        irep_idt callee_id = get_callee_id(function);
+        CHECK_RETURN(!callee_id.empty());
+        if(target_map.count(callee_id) == 0)
+        {
+          target_map.emplace(
+            callee_id, get_function_pointer_targets(goto_functions, target));
+        }
       }
     }
   }
