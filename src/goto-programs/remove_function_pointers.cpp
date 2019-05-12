@@ -543,6 +543,8 @@ void remove_function_pointerst::remove_function_pointer_non_const(
   const code_function_callt &code = target->get_function_call();
   const exprt &function = code.function();
 
+  auto new_code = build_new_code(functions, code, function_id, target);
+
   goto_programt::targett next_target=target;
   next_target++;
 
