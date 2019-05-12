@@ -50,6 +50,8 @@ public:
   }
 };
 
+void configure_gcc(const gcc_versiont &);
+
 std::ostream &operator<<(std::ostream &, const gcc_versiont &);
 
 #endif

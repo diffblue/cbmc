@@ -28,6 +28,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <ansi-c/c_preprocess.h>
 #include <ansi-c/cprover_library.h>
+#include <ansi-c/gcc_version.h>
 
 #include <assembler/remove_asm.h>
 
@@ -489,6 +490,14 @@ int cbmc_parse_optionst::doit()
   }
 
   register_languages();
+
+  // configure gcc, if required
+  if(config.ansi_c.preprocessor == configt::ansi_ct::preprocessort::GCC)
+  {
+    gcc_versiont gcc_version;
+    gcc_version.get("gcc");
+    configure_gcc(gcc_version);
+  }
 
   if(cmdline.isset("test-preprocessor"))
     return test_c_preprocessor(ui_message_handler)
