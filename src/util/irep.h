@@ -115,7 +115,7 @@ struct ref_count_ift<true>
 ///
 /// * \c hash_code : if HASH_CODE is activated, this is used to cache the
 ///   result of the hash function.
-template <typename treet, bool sharing = true>
+template <typename treet, typename named_subtreest, bool sharing = true>
 class tree_nodet : public ref_count_ift<sharing>
 {
 public:
@@ -125,12 +125,7 @@ public:
   // named_subt has to provide stable references; we can
   // use std::forward_list or std::vector< unique_ptr<T> > to save
   // memory and increase efficiency.
-
-#ifdef NAMED_SUB_IS_FORWARD_LIST
-  typedef std::forward_list<std::pair<irep_namet, treet>> named_subt;
-#else
-  typedef std::map<irep_namet, treet> named_subt;
-#endif
+  using named_subt = named_subtreest;
 
   friend treet;
 
@@ -179,11 +174,11 @@ public:
 };
 
 /// Base class for tree-like data structures with sharing
-template <typename derivedt>
+template <typename derivedt, typename named_subtreest>
 class sharing_treet
 {
 public:
-  using dt = tree_nodet<derivedt, true>;
+  using dt = tree_nodet<derivedt, named_subtreest, true>;
   using subt = typename dt::subt;
   using named_subt = typename dt::named_subt;
 
@@ -288,15 +283,16 @@ public:
 };
 
 // Static field initialization
-template <typename derivedt>
-typename sharing_treet<derivedt>::dt sharing_treet<derivedt>::empty_d;
+template <typename derivedt, typename named_subtreest>
+typename sharing_treet<derivedt, named_subtreest>::dt
+  sharing_treet<derivedt, named_subtreest>::empty_d;
 
 /// Base class for tree-like data structures without sharing
-template <typename derivedt>
+template <typename derivedt, typename named_subtreest>
 class non_sharing_treet
 {
 public:
-  using dt = tree_nodet<derivedt, false>;
+  using dt = tree_nodet<derivedt, named_subtreest, false>;
   using subt = typename dt::subt;
   using named_subt = typename dt::named_subt;
 
@@ -384,9 +380,16 @@ protected:
 /// assignment and then recurse on the expression on either side.
 class irept
 #ifdef SHARING
-  : public sharing_treet<irept>
+  : public sharing_treet<
+      irept,
 #else
-  : public non_sharing_treet<irept>
+  : public non_sharing_treet<
+      irept,
+#endif
+#ifdef NAMED_SUB_IS_FORWARD_LIST
+      std::forward_list<std::pair<irep_namet, irept>>
+#else
+      std::map<irep_namet, irept>>
 #endif
 {
 public:
@@ -532,8 +535,8 @@ struct diagnostics_helpert<irep_pretty_diagnosticst>
   }
 };
 
-template <typename derivedt>
-void sharing_treet<derivedt>::detach()
+template <typename derivedt, typename named_subtreest>
+void sharing_treet<derivedt, named_subtreest>::detach()
 {
 #ifdef IREP_DEBUG
   std::cout << "DETACH1: " << data << '\n';
@@ -567,8 +570,8 @@ void sharing_treet<derivedt>::detach()
 #endif
 }
 
-template <typename derivedt>
-void sharing_treet<derivedt>::remove_ref(dt *old_data)
+template <typename derivedt, typename named_subtreest>
+void sharing_treet<derivedt, named_subtreest>::remove_ref(dt *old_data)
 {
   if(old_data == &empty_d)
     return;
@@ -605,8 +608,9 @@ void sharing_treet<derivedt>::remove_ref(dt *old_data)
 
 /// Does the same as remove_ref, but using an explicit stack instead of
 /// recursion.
-template <typename derivedt>
-void sharing_treet<derivedt>::nonrecursive_destructor(dt *old_data)
+template <typename derivedt, typename named_subtreest>
+void sharing_treet<derivedt, named_subtreest>::nonrecursive_destructor(
+  dt *old_data)
 {
   std::vector<dt *> stack(1, old_data);
 
