@@ -13,11 +13,15 @@ Date:   September 2009
 
 #include "remove_returns.h"
 
+#include <util/c_types.h>
+#include <util/exception_utils.h>
+#include <util/fresh_symbol.h>
 #include <util/std_expr.h>
 #include <util/suffix.h>
 
 #include "goto_model.h"
 
+#include "remove_function_pointers.h"
 #include "remove_skip.h"
 
 #define RETURN_VALUE_SUFFIX "#return_value"
@@ -25,8 +29,10 @@ Date:   September 2009
 class remove_returnst
 {
 public:
-  explicit remove_returnst(symbol_table_baset &_symbol_table):
-    symbol_table(_symbol_table)
+  explicit remove_returnst(
+    symbol_table_baset &_symbol_table,
+    message_handlert &m)
+    : log(m), symbol_table(_symbol_table)
   {
   }
 
@@ -40,8 +46,18 @@ public:
   void restore(
     goto_functionst &goto_functions);
 
+  /// Build the internal map to know the potential function pointer targets
+  /// \param goto_model: The model to search for the targets
+  void build_fp_targets(goto_modelt &goto_model)
+  {
+    possible_fp_targets_map =
+      get_function_pointer_targets(log.get_message_handler(), goto_model);
+  }
+
 protected:
+  messaget log;
   symbol_table_baset &symbol_table;
+  possible_fp_targets_mapt possible_fp_targets_map;
 
   void replace_returns(
     const irep_idt &function_id,
@@ -59,6 +75,29 @@ protected:
 
   optionalt<symbol_exprt>
   get_or_create_return_value_symbol(const irep_idt &function_id);
+
+  /// Remove return of a complete function call
+  /// \param target: the function call instruction iterator
+  /// \param goto_program: the GOTO program to be updated
+  void do_function_call_complete(
+    goto_programt::targett target,
+    goto_programt &goto_program);
+
+  /// Remove return of a complete function call of a function pointer
+  /// \param target: the function call instruction iterator
+  /// \param possible_fp_targets: functions the pointer may point to
+  /// \param goto_program: the GOTO program to be updated
+  void do_function_call_complete(
+    goto_programt::targett target,
+    const possible_fp_targetst &possible_fp_targets,
+    goto_programt &goto_program);
+
+  /// Remove return of a stub function call
+  /// \param target: the function call instruction iterator
+  /// \param goto_program: the GOTO program to be updated
+  void do_function_call_stub(
+    goto_programt::targett target,
+    goto_programt &goto_program);
 };
 
 optionalt<symbol_exprt>
@@ -149,72 +188,59 @@ bool remove_returnst::do_function_calls(
 
   Forall_goto_program_instructions(i_it, goto_program)
   {
-    if(i_it->is_function_call())
+    if(!i_it->is_function_call())
+      continue;
+
+    code_function_callt function_call = i_it->get_function_call();
+
+    INVARIANT(
+      function_call.function().id() == ID_symbol ||
+        function_call.function().id() == ID_dereference,
+      "only direct function calls (via a symbol) or indirect function calls "
+      "(via a dereference) are supported");
+
+    bool is_function_pointer = function_call.function().id() == ID_dereference;
+
+    const auto &function_symbol =
+      is_function_pointer
+        ? to_dereference_expr(function_call.function()).pointer()
+        : function_call.function();
+    const auto &function_id = to_symbol_expr(function_symbol).get_identifier();
+
+    // Do we return anything?
+    if(
+      to_code_type(function_call.function().type()).return_type() ==
+        empty_typet() ||
+      !function_call.lhs().is_not_nil())
+      continue;
+
+    if(is_function_pointer)
     {
-      code_function_callt function_call = i_it->get_function_call();
-
-      INVARIANT(
-        function_call.function().id() == ID_symbol,
-        "indirect function calls should have been removed prior to running "
-        "remove-returns");
-
-      const irep_idt function_id =
-        to_symbol_expr(function_call.function()).get_identifier();
-
-      // Do we return anything?
-      if(
-        to_code_type(function_call.function().type()).return_type() !=
-          empty_typet() &&
-        function_call.lhs().is_not_nil())
-      {
-        // replace "lhs=f(...)" by
-        // "f(...); lhs=f#return_value; DEAD f#return_value;"
-
-        exprt rhs;
-
-        bool is_stub = function_is_stub(function_id);
-        optionalt<symbol_exprt> return_value;
-
-        if(!is_stub)
-        {
-          return_value = get_or_create_return_value_symbol(function_id);
-          CHECK_RETURN(return_value.has_value());
-
-          // The return type in the definition of the function may differ
-          // from the return type in the declaration.  We therefore do a
-          // cast.
-          rhs = typecast_exprt::conditional_cast(
-            *return_value, function_call.lhs().type());
-        }
-        else
-        {
-          rhs = side_effect_expr_nondett(
-            function_call.lhs().type(), i_it->source_location);
-        }
-
-        goto_programt::targett t_a = goto_program.insert_after(
-          i_it,
-          goto_programt::make_assignment(
-            code_assignt(function_call.lhs(), rhs), i_it->source_location));
-
-        // fry the previous assignment
-        function_call.lhs().make_nil();
-
-        if(!is_stub)
-        {
-          goto_program.insert_after(
-            t_a,
-            goto_programt::make_dead(*return_value, i_it->source_location));
-        }
-
-        // update the call
-        i_it->set_function_call(function_call);
-
-        requires_update = true;
-      }
+      // f may point to {f1,f2,..}=possible_fp_targets_map[function_id]
+      // lhs=*f(..) => *f(..); lhs = (f == f1 ? f1#return_value : f == f2 ? ..);
+      do_function_call_complete(
+        i_it, possible_fp_targets_map[function_id], goto_program);
     }
-  }
+    else if(function_is_stub(function_id))
+    {
+      // stub:
+      // lhs=f(..) => f(..); lhs=nondet;
+      do_function_call_stub(i_it, goto_program);
+    }
+    else
+    {
+      // lhs=f(..) => f(..); lhs=f#return_value;
+      do_function_call_complete(i_it, goto_program);
+    }
 
+    // fry the previous assignment
+    function_call.lhs().make_nil();
+
+    // update the call
+    i_it->set_function_call(function_call);
+
+    requires_update = true;
+  }
   return requires_update;
 }
 
@@ -257,35 +283,27 @@ void remove_returnst::operator()(
 /// removes returns
 void remove_returns(
   symbol_table_baset &symbol_table,
+  message_handlert &m,
   goto_functionst &goto_functions)
 {
-  remove_returnst rr(symbol_table);
+  remove_returnst rr(symbol_table, m);
   rr(goto_functions);
 }
 
-/// Removes returns from a single function. Only usable with Java programs at
-/// the moment; to use it with other languages, they must annotate their stub
-/// functions with ID_C_incomplete as currently done in
-/// java_bytecode_convert_method.cpp.
-///
-/// This will generate \#return_value variables, if not already present, for
-/// both the function being altered *and* any callees.
-/// \param goto_model_function: function to transform
-/// \param function_is_stub: function that will be used to test whether a given
-///   callee has been or will be given a body. It should return true if so, or
-///   false if the function will remain a bodyless stub.
 void remove_returns(
   goto_model_functiont &goto_model_function,
+  message_handlert &m,
   function_is_stubt function_is_stub)
 {
-  remove_returnst rr(goto_model_function.get_symbol_table());
+  remove_returnst rr(goto_model_function.get_symbol_table(), m);
   rr(goto_model_function, function_is_stub);
 }
 
 /// removes returns
-void remove_returns(goto_modelt &goto_model)
+void remove_returns(goto_modelt &goto_model, message_handlert &m)
 {
-  remove_returnst rr(goto_model.symbol_table);
+  remove_returnst rr(goto_model.symbol_table, m);
+  rr.build_fp_targets(goto_model);
   rr(goto_model.goto_functions);
 }
 
@@ -402,9 +420,9 @@ void remove_returnst::restore(goto_functionst &goto_functions)
 }
 
 /// restores return statements
-void restore_returns(goto_modelt &goto_model)
+void restore_returns(goto_modelt &goto_model, message_handlert &m)
 {
-  remove_returnst rr(goto_model.symbol_table);
+  remove_returnst rr(goto_model.symbol_table, m);
   rr.restore(goto_model.goto_functions);
 }
 
@@ -429,4 +447,142 @@ bool is_return_value_identifier(const irep_idt &id)
 bool is_return_value_symbol(const symbol_exprt &symbol_expr)
 {
   return is_return_value_identifier(symbol_expr.get_identifier());
+}
+
+void remove_returnst::do_function_call_complete(
+  goto_programt::targett target,
+  goto_programt &goto_program)
+{
+  const auto &function_call = target->get_function_call();
+  const auto &function_id =
+    to_symbol_expr(function_call.function()).get_identifier();
+
+  // The return type in the definition of the function may differ
+  // from the return type in the declaration.  We therefore do a
+  // cast.
+  optionalt<symbol_exprt> return_value =
+    get_or_create_return_value_symbol(function_id);
+  CHECK_RETURN(return_value.has_value());
+
+  // replace "lhs=f(...)" by
+  // "f(...); lhs=f#return_value; DEAD f#return_value;"
+  goto_programt::targett t_a = goto_program.insert_after(
+    target,
+    goto_programt::make_assignment(
+      code_assignt{function_call.lhs(),
+                   typecast_exprt::conditional_cast(
+                     *return_value, function_call.lhs().type())},
+      target->source_location));
+
+  goto_program.insert_after(
+    t_a, goto_programt::make_dead(*return_value, target->source_location));
+}
+
+void remove_returnst::do_function_call_complete(
+  goto_programt::targett target,
+  const possible_fp_targetst &possible_fp_targets,
+  goto_programt &goto_program)
+{
+  PRECONDITION(target->is_function_call());
+  const auto &function_call = target->get_function_call();
+  PRECONDITION(function_call.function().id() == ID_dereference);
+  const auto &function_symbol =
+    to_dereference_expr(function_call.function()).pointer();
+  PRECONDITION(function_symbol.id() == ID_symbol);
+  const auto &function_id = to_symbol_expr(function_symbol).get_identifier();
+  if(possible_fp_targets.empty())
+    throw incorrect_goto_program_exceptiont{
+      "the function pointer " + id2string(function_id) +
+        " does not have any potential targets",
+      target->source_location};
+
+  cond_exprt rhs(exprt::operandst{}, function_call.lhs().type());
+  std::vector<symbol_exprt> return_values;
+
+  const auto &first_target_id = possible_fp_targets.begin()->get_identifier();
+  const auto first_target_symbol = symbol_table.lookup(first_target_id);
+  CHECK_RETURN(first_target_symbol);
+
+  auto &pointer_lhs_symbol = get_fresh_aux_symbol(
+    pointer_type(function_call.lhs().type()),
+    "", // no name prefix
+    "p_lhs",
+    target->source_location,
+    first_target_symbol->mode,
+    symbol_table);
+  symbol_exprt pointer_lhs_expr = pointer_lhs_symbol.symbol_expr();
+
+  exprt::operandst disjunction_operands;
+
+  for(const auto &target_expr : possible_fp_targets)
+  {
+    irep_idt target_id = target_expr.get_identifier();
+    const symbolt *target_symbol = symbol_table.lookup(target_id);
+    CHECK_RETURN(target_symbol);
+
+    // The return type in the definition of the function may differ
+    // from the return type in the declaration.  We therefore do a
+    // cast.
+    optionalt<symbol_exprt> return_value =
+      get_or_create_return_value_symbol(target_id);
+    CHECK_RETURN(return_value.has_value());
+    return_values.push_back(*return_value);
+
+    const auto f_equals_f_i = equal_exprt{
+      function_call.function(), address_of_exprt{target_symbol->symbol_expr()}};
+    disjunction_operands.push_back(f_equals_f_i);
+    rhs.add_case(f_equals_f_i, address_of_exprt{*return_value});
+  }
+
+  // replace "lhs=*f(...)" by
+  //
+  // assert(f==f1 || f==f2 || ..); // so that the user knows
+  // assume(f==f1 || f==f2 || ..); // so that we abort this execution
+  // T* p_lhs = lhs = (f == f1 ? &f1#return_value : f == f2
+  //                           ? &f2#return_value .. );
+  // f*(...);
+  // lhs = *p_lhs;
+  // DEAD f1#return_value;
+  // DEAD f2#return_value;
+  // ..
+  // DEAD p_lhs
+  goto_program.insert_before(
+    target,
+    goto_programt::make_assertion(
+      disjunction(disjunction_operands), target->source_location));
+  goto_program.insert_before(
+    target,
+    goto_programt::make_assumption(
+      disjunction(disjunction_operands), target->source_location));
+  goto_program.insert_before(
+    target,
+    goto_programt::make_assignment(
+      code_assignt{pointer_lhs_expr, rhs}, target->source_location));
+  goto_programt::targett t_a = goto_program.insert_after(
+    target,
+    goto_programt::make_assignment(
+      code_assignt{function_call.lhs(), dereference_exprt{pointer_lhs_expr}},
+      target->source_location));
+
+  for(const auto &return_value : return_values)
+    t_a = goto_program.insert_after(
+      t_a, goto_programt::make_dead(return_value, target->source_location));
+  goto_program.insert_after(
+    t_a, goto_programt::make_dead(pointer_lhs_expr, target->source_location));
+}
+
+void remove_returnst::do_function_call_stub(
+  goto_programt::targett target,
+  goto_programt &goto_program)
+{
+  const auto &function_call = target->get_function_call();
+
+  // replace "lhs=f(...)" by "f(...); lhs=nondet;"
+  goto_program.insert_after(
+    target,
+    goto_programt::make_assignment(
+      code_assignt{function_call.lhs(),
+                   side_effect_expr_nondett{function_call.lhs().type(),
+                                            target->source_location}},
+      target->source_location));
 }
