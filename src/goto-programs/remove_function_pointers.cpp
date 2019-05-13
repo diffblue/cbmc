@@ -25,6 +25,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <analyses/does_remove_const.h>
 
 #include "remove_skip.h"
+#include "collect_function_pointer_targets.h"
 #include "compute_called_functions.h"
 #include "remove_const_function_pointers.h"
 
@@ -45,8 +46,6 @@ public:
     goto_functionst &goto_functions,
     const possible_fp_targets_mapt &target_map);
 
-  // a set of function symbols
-  using functionst = remove_const_function_pointerst::functionst;
   /// Call the function pointer removal within the \p goto_program
   /// \param goto_program: program to modify
   /// \param function_id: identifier of the function pointer to be removed
