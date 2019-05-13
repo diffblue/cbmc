@@ -96,11 +96,13 @@ protected:
   /// \param goto_program: The goto program that contains target
   /// \param function_id: Name of function containing the target
   /// \param target: location with function call with function pointer
+  /// \param stateful_targets: the set of functions to consider
   void remove_function_pointer(
     goto_programt &goto_program,
     const irep_idt &function_id,
-    goto_programt::targett target);
 
+    goto_programt::targett target,
+    const fp_state_targetst &stateful_targets);
 
   void fix_argument_types(code_function_callt &function_call);
   void fix_return_type(
@@ -216,19 +218,18 @@ void remove_function_pointerst::fix_return_type(
 void remove_function_pointerst::remove_function_pointer(
   goto_programt &goto_program,
   const irep_idt &function_id,
-  goto_programt::targett target)
+  goto_programt::targett target,
+  const fp_state_targetst &stateful_targets)
 {
-  goto_programt::const_targett const_target = target;
-  const auto functions =
-    get_function_pointer_targets(goto_program, const_target);
-
-  if(only_remove_const_function_pointers_called)
+  const auto &fp_state = stateful_targets.first;
+  const auto &functions = stateful_targets.second;
+  if(fp_state.precise_const_removal)
   {
     auto call = target->get_function_call();
     call.function() = *functions.cbegin();
     target->set_function_call(call);
   }
-  else if(remove_const_found_functions || !only_resolve_const_fps)
+  else if(fp_state.remove_const_found_functions || !only_resolve_const_fps)
   {
     // If this mode is enabled, we only remove function pointers
     // that we can resolve either to an exact function, or an exact subset
