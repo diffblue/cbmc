@@ -109,27 +109,12 @@ protected:
     const irep_idt &function_id,
     goto_programt::targett target);
 
-  bool is_type_compatible(
-    bool return_value_used,
-    const code_typet &call_type,
-    const code_typet &function_type);
-
-  bool arg_is_type_compatible(
-    const typet &call_type,
-    const typet &function_type);
 
   void fix_argument_types(code_function_callt &function_call);
   void fix_return_type(
     const irep_idt &in_function_id,
     code_function_callt &function_call,
     goto_programt &dest);
-
-  /// Refine the \p type in case the forward declaration was incomplete
-  /// \param type: the type to be refined
-  /// \param code: the function call code to get the arguments from
-  /// \return the refined call type
-  static code_typet
-  refine_call_type(const typet &type, const code_function_callt &code);
 
   /// Try to remove the const function pointers
   /// \param goto_program: the function body to run the const_removal_check on
@@ -188,81 +173,6 @@ remove_function_pointerst::remove_function_pointerst(
     add_safety_assertion(_add_safety_assertion),
     only_resolve_const_fps(only_resolve_const_fps)
 {
-
-bool remove_function_pointerst::arg_is_type_compatible(
-  const typet &call_type,
-  const typet &function_type)
-{
-  if(call_type == function_type)
-    return true;
-
-  // any integer-vs-enum-vs-pointer is ok
-  if(
-    call_type.id() == ID_signedbv || call_type.id() == ID_unsigned ||
-    call_type.id() == ID_bool || call_type.id() == ID_c_bool ||
-    call_type.id() == ID_c_enum_tag || call_type.id() == ID_c_enum ||
-    call_type.id() == ID_pointer)
-  {
-    return function_type.id() == ID_signedbv ||
-           function_type.id() == ID_unsigned || function_type.id() == ID_bool ||
-           function_type.id() == ID_c_bool ||
-           function_type.id() == ID_pointer ||
-           function_type.id() == ID_c_enum ||
-           function_type.id() == ID_c_enum_tag;
-  }
-
-  return pointer_offset_bits(call_type, ns) ==
-         pointer_offset_bits(function_type, ns);
-}
-
-bool remove_function_pointerst::is_type_compatible(
-  bool return_value_used,
-  const code_typet &call_type,
-  const code_typet &function_type)
-{
-  // we are willing to ignore anything that's returned
-  // if we call with 'void'
-  if(!return_value_used)
-  {
-  }
-  else if(call_type.return_type() == empty_typet())
-  {
-    // ok
-  }
-  else
-  {
-    if(!arg_is_type_compatible(call_type.return_type(),
-                               function_type.return_type()))
-      return false;
-  }
-
-  // let's look at the parameters
-  const code_typet::parameterst &call_parameters=call_type.parameters();
-  const code_typet::parameterst &function_parameters=function_type.parameters();
-
-  if(function_type.has_ellipsis() &&
-     function_parameters.empty())
-  {
-    // always ok
-  }
-  else if(call_type.has_ellipsis() &&
-          call_parameters.empty())
-  {
-    // always ok
-  }
-  else
-  {
-    // we are quite strict here, could be much more generous
-    if(call_parameters.size()!=function_parameters.size())
-      return false;
-
-    for(std::size_t i=0; i<call_parameters.size(); i++)
-      if(!arg_is_type_compatible(call_parameters[i].type(),
-                                 function_parameters[i].type()))
-        return false;
-  }
-
-  return true;
 }
 
 void remove_function_pointerst::fix_argument_types(
@@ -322,22 +232,6 @@ void remove_function_pointerst::fix_return_type(
 
   dest.add(goto_programt::make_assignment(
     code_assignt(old_lhs, typecast_exprt(tmp_symbol_expr, old_lhs.type()))));
-}
-
-code_typet remove_function_pointerst::refine_call_type(
-  const typet &type,
-  const code_function_callt &code)
-{
-  PRECONDITION(can_cast_type<code_typet>(type));
-  code_typet call_type = to_code_type(type);
-
-  if(call_type.has_ellipsis() && call_type.parameters().empty())
-  {
-    call_type.remove_ellipsis();
-    for(const auto &argument : code.arguments())
-      call_type.parameters().push_back(code_typet::parametert{argument.type()});
-  }
-  return call_type;
 }
 
 void remove_function_pointerst::try_remove_const_fp(
