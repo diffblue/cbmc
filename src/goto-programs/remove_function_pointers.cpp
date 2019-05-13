@@ -60,15 +60,6 @@ public:
     goto_programt::targett target,
     const functionst &functions);
 
-  /// Go through the whole model and find all potential function the pointer at
-  ///   \p call site may point to
-  /// \param goto_model: model to search for potential functions
-  /// \param call_site: the call site of the function pointer under analysis
-  /// \return the set of the potential functions
-  functionst get_function_pointer_targets(
-    const goto_modelt &goto_model,
-    goto_programt::const_targett &call_site);
-
   /// Go through a single function body and find all potential function the
   ///   pointer at \p call site may point to
   /// \param goto_program: function body to search for potential functions
@@ -261,22 +252,6 @@ void remove_function_pointerst::try_remove_const_fp(
     remove_const_found_functions = fpr(pointer, functions);
     CHECK_RETURN(remove_const_found_functions || functions.empty());
   }
-}
-
-remove_function_pointerst::functionst
-remove_function_pointerst::get_function_pointer_targets(
-  const goto_modelt &goto_model,
-  goto_programt::const_targett &call_site)
-{
-  functionst functions;
-  for(const auto &function_pair : goto_model.goto_functions.function_map)
-  {
-    const auto &function_body = function_pair.second.body;
-    const auto &candidates =
-      get_function_pointer_targets(function_body, call_site);
-    functions.insert(candidates.begin(), candidates.end());
-  }
-  return functions;
 }
 
 remove_function_pointerst::functionst

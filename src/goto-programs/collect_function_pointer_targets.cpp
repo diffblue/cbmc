@@ -72,6 +72,29 @@ operator()(const goto_functionst &goto_functions)
   }
   return target_map;
 }
+
+fp_state_targetst
+collect_function_pointer_targetst::get_function_pointer_targets(
+  const goto_functionst &goto_functions,
+  goto_programt::const_targett &call_site)
+{
+  PRECONDITION(initialised);
+
+  fp_state_targetst stateful_targets;
+  auto &fp_state = stateful_targets.first;
+  auto &functions = stateful_targets.second;
+
+  for(const auto &function_pair : goto_functions.function_map)
+  {
+    const auto &function_body = function_pair.second.body;
+    const auto &candidates =
+      get_function_pointer_targets(function_body, call_site);
+
+    functions.insert(candidates.second.begin(), candidates.second.end());
+    fp_state.merge(candidates.first);
+  }
+  return stateful_targets;
+}
 code_typet collect_function_pointer_targetst::refine_call_type(
   const typet &type,
   const code_function_callt &code)
