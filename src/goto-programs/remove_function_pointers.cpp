@@ -472,9 +472,6 @@ void remove_function_pointers(message_handlert &_message_handler,
     only_remove_const_fps);
 }
 
-possible_fp_targets_mapt get_function_pointer_targets(
-  message_handlert &message_handler,
-  goto_modelt &goto_model)
 {
   remove_function_pointerst rfp(
     message_handler,
@@ -483,29 +480,6 @@ possible_fp_targets_mapt get_function_pointer_targets(
     false,
     goto_model.goto_functions);
 
-  possible_fp_targets_mapt target_map;
-  const auto &goto_functions = goto_model.goto_functions;
-  for(const auto &function_pair : goto_functions.function_map)
-  {
-    const auto &instructions = function_pair.second.body.instructions;
-    for(auto target = instructions.begin(); target != instructions.end();
-        target++)
-    {
-      if(
-        target->is_function_call() &&
-        target->get_function_call().function().id() == ID_dereference)
-      {
-        const auto &function_id =
-          to_symbol_expr(
-            to_dereference_expr(target->get_function_call().function())
-              .pointer())
-            .get_identifier();
-        target_map.emplace(
-          function_id, rfp.get_function_pointer_targets(goto_model, target));
-      }
-    }
-  }
-  return target_map;
 }
 
 goto_programt remove_function_pointerst::build_new_code(

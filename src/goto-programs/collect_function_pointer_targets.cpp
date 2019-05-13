@@ -38,6 +38,40 @@ void collect_function_pointer_targetst::initialise_type_map(
     type_map.emplace(fmap_pair.first, fmap_pair.second.type);
 }
 
+possible_fp_targets_mapt collect_function_pointer_targetst::
+operator()(const goto_functionst &goto_functions)
+{
+  if(!initialised)
+  {
+    initialise_taken_addresses(goto_functions);
+    initialise_type_map(goto_functions);
+    initialised = true;
+  }
+
+  possible_fp_targets_mapt target_map;
+  for(const auto &function_pair : goto_functions.function_map)
+  {
+    const auto &instructions = function_pair.second.body.instructions;
+    for(auto target = instructions.begin(); target != instructions.end();
+        target++)
+    {
+      if(
+        target->is_function_call() &&
+        target->get_function_call().function().id() == ID_dereference)
+      {
+        const auto &function = target->get_function_call().function();
+        irep_idt callee_id = get_callee_id(function);
+        CHECK_RETURN(!callee_id.empty());
+        if(target_map.count(callee_id) == 0)
+        {
+          target_map.emplace(
+            callee_id, get_function_pointer_targets(goto_functions, target));
+        }
+      }
+    }
+  }
+  return target_map;
+}
 code_typet collect_function_pointer_targetst::refine_call_type(
   const typet &type,
   const code_function_callt &code)
