@@ -38,7 +38,12 @@ public:
     bool only_resolve_const_fps,
     const goto_functionst &goto_functions);
 
-  void operator()(goto_functionst &goto_functions);
+  /// Call the function pointer removal via an operator
+  /// \param goto_functions: functions to modify
+  /// \param target_map: candidate functions
+  void operator()(
+    goto_functionst &goto_functions,
+    const possible_fp_targets_mapt &target_map);
 
   bool remove_function_pointers(
     goto_programt &goto_program,
@@ -280,7 +285,9 @@ bool remove_function_pointerst::remove_function_pointers(
   return did_something;
 }
 
-void remove_function_pointerst::operator()(goto_functionst &functions)
+void remove_function_pointerst::operator()(
+  goto_functionst &functions,
+  const possible_fp_targets_mapt &target_map)
 {
   bool did_something=false;
 
@@ -291,7 +298,7 @@ void remove_function_pointerst::operator()(goto_functionst &functions)
   {
     goto_programt &goto_program=f_it->second.body;
 
-    if(remove_function_pointers(goto_program, f_it->first))
+    if(remove_function_pointers(goto_program, f_it->first, target_map))
       did_something=true;
   }
 
@@ -348,6 +355,23 @@ void remove_function_pointers(message_handlert &_message_handler,
     goto_model.goto_functions,
     add_safety_assertion,
     only_remove_const_fps);
+}
+
+void remove_function_pointers(
+  message_handlert &_message_handler,
+  goto_modelt &goto_model,
+  const possible_fp_targets_mapt &target_map,
+  bool add_safety_assertion,
+  bool only_remove_const_fps)
+{
+  remove_function_pointerst rfp(
+    _message_handler,
+    goto_model.symbol_table,
+    add_safety_assertion,
+    only_remove_const_fps,
+    goto_model.goto_functions);
+
+  rfp(goto_model.goto_functions, target_map);
 }
 
 {
