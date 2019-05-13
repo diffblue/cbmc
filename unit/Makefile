@@ -74,7 +74,7 @@ SRC += analyses/ai/ai.cpp \
        util/sharing_node.cpp \
        util/simplify_expr.cpp \
        util/small_map.cpp \
-       util/small_shared_two_way_ptr.cpp \
+       util/small_shared_n_way_ptr.cpp \
        util/std_expr.cpp \
        util/string2int.cpp \
        util/string_utils/join_string.cpp \
