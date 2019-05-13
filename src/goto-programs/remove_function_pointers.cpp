@@ -109,11 +109,6 @@ protected:
     const irep_idt &function_id,
     goto_programt::targett target);
 
-  std::unordered_set<irep_idt> address_taken;
-
-  typedef std::map<irep_idt, code_typet> type_mapt;
-  type_mapt type_map;
-
   bool is_type_compatible(
     bool return_value_used,
     const code_typet &call_type,
@@ -193,15 +188,6 @@ remove_function_pointerst::remove_function_pointerst(
     add_safety_assertion(_add_safety_assertion),
     only_resolve_const_fps(only_resolve_const_fps)
 {
-  for(const auto &s : symbol_table.symbols)
-    compute_address_taken_functions(s.second.value, address_taken);
-
-  compute_address_taken_functions(goto_functions, address_taken);
-
-  // build type map
-  forall_goto_functions(f_it, goto_functions)
-    type_map.emplace(f_it->first, f_it->second.type);
-}
 
 bool remove_function_pointerst::arg_is_type_compatible(
   const typet &call_type,
