@@ -55,7 +55,6 @@ public:
     const irep_idt &function_id,
     const possible_fp_targets_mapt &target_map);
 
-
 protected:
   messaget log;
   const namespacet ns;
@@ -93,7 +92,6 @@ protected:
   void remove_function_pointer(
     goto_programt &goto_program,
     const irep_idt &function_id,
-
     goto_programt::targett target,
     const fp_state_targetst &stateful_targets);
 
