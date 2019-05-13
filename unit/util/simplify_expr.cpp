@@ -20,7 +20,7 @@ Author: Michael Tautschnig
 #include <util/std_expr.h>
 #include <util/symbol_table.h>
 
-TEST_CASE("Simplify pointer_offset(address of array index)")
+TEST_CASE("Simplify pointer_offset(address of array index)", "[core][util]")
 {
   config.set_arch("none");
 
@@ -42,7 +42,7 @@ TEST_CASE("Simplify pointer_offset(address of array index)")
   REQUIRE(offset_value==1);
 }
 
-TEST_CASE("Simplify const pointer offset")
+TEST_CASE("Simplify const pointer offset", "[core][util]")
 {
   config.set_arch("none");
 
@@ -63,7 +63,7 @@ TEST_CASE("Simplify const pointer offset")
   REQUIRE(offset_value==1234);
 }
 
-TEST_CASE("Simplify byte extract")
+TEST_CASE("Simplify byte extract", "[core][util]")
 {
   // this test does require a proper architecture to be set so that byte extract
   // uses adequate endianness
@@ -84,7 +84,7 @@ TEST_CASE("Simplify byte extract")
   REQUIRE(simp == s);
 }
 
-TEST_CASE("expr2bits and bits2expr respect bit order")
+TEST_CASE("expr2bits and bits2expr respect bit order", "[core][util]")
 {
   symbol_tablet symbol_table;
   namespacet ns(symbol_table);
@@ -109,7 +109,7 @@ TEST_CASE("expr2bits and bits2expr respect bit order")
   REQUIRE(deadbeef == *should_be_deadbeef2);
 }
 
-TEST_CASE("Simplify extractbit")
+TEST_CASE("Simplify extractbit", "[core][util]")
 {
   // this test does require a proper architecture to be set so that byte extract
   // uses adequate endianness
@@ -139,7 +139,7 @@ TEST_CASE("Simplify extractbit")
   REQUIRE(eb2 == true_exprt());
 }
 
-TEST_CASE("Simplify extractbits")
+TEST_CASE("Simplify extractbits", "[core][util]")
 {
   // this test does require a proper architecture to be set so that byte extract
   // uses adequate endianness
@@ -158,7 +158,7 @@ TEST_CASE("Simplify extractbits")
   REQUIRE(eb == from_integer(0xbe, unsignedbv_typet(8)));
 }
 
-TEST_CASE("Simplify shift")
+TEST_CASE("Simplify shift", "[core][util]")
 {
   const symbol_tablet symbol_table;
   const namespacet ns(symbol_table);
@@ -207,7 +207,7 @@ TEST_CASE("Simplify dynamic object comparison", "[core][util]")
   REQUIRE(simplify_expr(compare_null_through_cast, ns) == false_exprt());
 
   dynamic_object_exprt other_dynamic_object(signedbv_typet(8));
-  dynamic_object.set_instance(2);
+  other_dynamic_object.set_instance(2);
   address_of_exprt address_of_other_dynamic_object(other_dynamic_object);
 
   equal_exprt compare_pointer_objects(
@@ -215,4 +215,32 @@ TEST_CASE("Simplify dynamic object comparison", "[core][util]")
     pointer_object(address_of_other_dynamic_object));
 
   REQUIRE(simplify_expr(compare_pointer_objects, ns) == false_exprt());
+
+  symbol_exprt s{"foo", signedbv_typet{8}};
+  address_of_exprt address_of_symbol{s};
+
+  equal_exprt compare_symbol_dynamic{address_of_dynamic_object,
+                                     address_of_symbol};
+
+  REQUIRE(simplify_expr(compare_symbol_dynamic, ns) == false_exprt{});
+}
+
+TEST_CASE("Simplify pointer_object equality", "[core][util]")
+{
+  // this test requires a proper architecture to be set up so that pointers have
+  // a width
+  const cmdlinet cmdline;
+  config.set(cmdline);
+
+  symbol_tablet symbol_table;
+  namespacet ns(symbol_table);
+
+  exprt p_o_void =
+    pointer_object(null_pointer_exprt{pointer_type(empty_typet{})});
+  exprt p_o_int =
+    pointer_object(null_pointer_exprt{pointer_type(signedbv_typet(32))});
+
+  exprt simp = simplify_expr(equal_exprt{p_o_void, p_o_int}, ns);
+
+  REQUIRE(simp.is_true());
 }
