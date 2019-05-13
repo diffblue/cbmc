@@ -326,7 +326,11 @@ bool remove_function_pointers(
       only_remove_const_fps,
       goto_functions);
 
-  return rfp.remove_function_pointers(goto_program, function_id);
+  return rfp.remove_function_pointers(
+    goto_program,
+    function_id,
+    get_function_pointer_targets(
+      _message_handler, goto_functions, symbol_table, only_remove_const_fps));
 }
 
 void remove_function_pointers(
@@ -344,7 +348,10 @@ void remove_function_pointers(
       only_remove_const_fps,
       goto_functions);
 
-  rfp(goto_functions);
+  rfp(
+    goto_functions,
+    get_function_pointer_targets(
+      _message_handler, goto_functions, symbol_table, only_remove_const_fps));
 }
 
 void remove_function_pointers(message_handlert &_message_handler,
