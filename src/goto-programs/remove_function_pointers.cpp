@@ -121,7 +121,7 @@ protected:
   /// \param target: iterator to the target call-site
   /// \return the GOTO program for the new code
   goto_programt build_new_code(
-    const functionst &functions,
+    const possible_fp_targetst &functions,
     const code_function_callt &code,
     const irep_idt &function_id,
     goto_programt::targett target);
@@ -131,8 +131,7 @@ protected:
   /// \param functions: the set of function candidates
   void remove_function_pointer_log(
     goto_programt::targett target,
-    const functionst &functions) const;
-
+    const possible_fp_targetst &functions) const;
 };
 
 remove_function_pointerst::remove_function_pointerst(
@@ -389,7 +388,7 @@ void remove_function_pointers(
 }
 
 goto_programt remove_function_pointerst::build_new_code(
-  const functionst &functions,
+  const possible_fp_targetst &functions,
   const code_function_callt &code,
   const irep_idt &function_id,
   goto_programt::targett target)
@@ -460,7 +459,7 @@ goto_programt remove_function_pointerst::build_new_code(
 
 void remove_function_pointerst::remove_function_pointer_log(
   goto_programt::targett target,
-  const functionst &functions) const
+  const possible_fp_targetst &functions) const
 {
   log.statistics().source_location = target->source_location;
   log.statistics() << "replacing function pointer by " << functions.size()
