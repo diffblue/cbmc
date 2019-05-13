@@ -21,6 +21,7 @@ Date:   September 2009
 
 #include "goto_model.h"
 
+#include "collect_function_pointer_targets.h"
 #include "remove_function_pointers.h"
 #include "remove_skip.h"
 
@@ -50,8 +51,10 @@ public:
   /// \param goto_model: The model to search for the targets
   void build_fp_targets(goto_modelt &goto_model)
   {
-    possible_fp_targets_map =
-      get_function_pointer_targets(log.get_message_handler(), goto_model);
+    possible_fp_targets_map = get_function_pointer_targets(
+      log.get_message_handler(),
+      goto_model.goto_functions,
+      goto_model.symbol_table);
   }
 
 protected:
@@ -219,7 +222,7 @@ bool remove_returnst::do_function_calls(
       // f may point to {f1,f2,..}=possible_fp_targets_map[function_id]
       // lhs=*f(..) => *f(..); lhs = (f == f1 ? f1#return_value : f == f2 ? ..);
       do_function_call_complete(
-        i_it, possible_fp_targets_map[function_id], goto_program);
+        i_it, possible_fp_targets_map[function_id].second, goto_program);
     }
     else if(function_is_stub(function_id))
     {

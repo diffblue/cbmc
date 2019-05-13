@@ -17,9 +17,9 @@
 #include <util/c_types.h>
 #include <util/std_code.h>
 
+#include <goto-programs/collect_function_pointer_targets.h>
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/goto_model.h>
-#include <goto-programs/remove_function_pointers.h>
 
 SCENARIO(
   "List potential targets works for ellipsis",
@@ -146,12 +146,12 @@ SCENARIO(
       }
     }
 
-    auto target_map =
-      get_function_pointer_targets(null_message_handler, goto_model);
+    auto target_map = get_function_pointer_targets(
+      null_message_handler, goto_model.goto_functions, goto_model.symbol_table);
     THEN("there should be 4 targets recognised")
     {
       REQUIRE(target_map.size() == 1);
-      REQUIRE(target_map.begin()->second.size() == 2);
+      REQUIRE(target_map.begin()->second.second.size() == 2);
     }
   }
 }
