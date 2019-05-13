@@ -45,21 +45,8 @@ public:
     goto_functionst &goto_functions,
     const possible_fp_targets_mapt &target_map);
 
-  bool remove_function_pointers(
-    goto_programt &goto_program,
-    const irep_idt &function_id);
-
   // a set of function symbols
   using functionst = remove_const_function_pointerst::functionst;
-
-  /// Replace a call to a dynamic function at location
-  /// target in the given goto-program by a case-split
-  /// over a given set of functions
-  /// \param goto_program: The goto program that contains target
-  /// \param function_id: Name of function containing the target
-  /// \param target: location with function call with function pointer
-  /// \param functions: The set of functions to consider
-  void remove_function_pointer(
   /// Call the function pointer removal within the \p goto_program
   /// \param goto_program: program to modify
   /// \param function_id: identifier of the function pointer to be removed
@@ -83,6 +70,19 @@ protected:
   // This can be activated in goto-instrument using
   // --remove-const-function-pointers instead of --remove-function-pointers
   bool only_resolve_const_fps;
+
+  /// Replace a call to a dynamic function at location
+  /// \p target in the given goto-program by a case-split
+  /// over a given set of functions
+  /// \param goto_program: The goto program that contains target
+  /// \param function_id: Name of function containing the target
+  /// \param target: location with function call with function pointer
+  /// \param functions: the set of functions to consider
+  void remove_function_pointer(
+    goto_programt &goto_program,
+    const irep_idt &function_id,
+    goto_programt::targett target,
+    const possible_fp_targetst &functions);
 
   /// Replace a call to a dynamic function at location
   /// target in the given goto-program by determining
@@ -239,7 +239,7 @@ void remove_function_pointerst::remove_function_pointer(
   goto_programt &goto_program,
   const irep_idt &function_id,
   goto_programt::targett target,
-  const functionst &functions)
+  const possible_fp_targetst &functions)
 {
   const code_function_callt &code = target->get_function_call();
   const exprt &function = code.function();
