@@ -427,8 +427,15 @@ struct_typet::componentt interpretert::get_component(
   const irep_idt &object,
   const mp_integer &offset)
 {
-  const symbolt &symbol=ns.lookup(object);
-  const typet real_type=ns.follow(symbol.type);
+  const symbolt &symbol = ns.lookup(object);
+  return get_component(symbol.type, offset);
+}
+
+/// Retrieves the member at \p offset of an object of type \p object_type.
+struct_typet::componentt
+interpretert::get_component(const typet &object_type, const mp_integer &offset)
+{
+  const typet real_type = ns.follow(object_type);
   if(real_type.id()!=ID_struct)
     throw "request for member of non-struct";
 
@@ -614,19 +621,17 @@ exprt interpretert::get_value(
     {
       // We want the symbol pointed to
       mp_integer address = rhs[numeric_cast_v<std::size_t>(offset)];
-      irep_idt identifier=address_to_identifier(address);
+      const symbol_exprt &symbol_expr = address_to_symbol(address);
       mp_integer offset_from_address = address_to_offset(address);
-      const typet type_from_identifier = get_type(identifier);
-      const symbol_exprt symbol_expr(identifier, type_from_identifier);
 
       if(offset_from_address == 0)
         return address_of_exprt(symbol_expr);
 
       if(
-        type_from_identifier.id() == ID_struct ||
-        type_from_identifier.id() == ID_struct_tag)
+        symbol_expr.type().id() == ID_struct ||
+        symbol_expr.type().id() == ID_struct_tag)
       {
-        const auto c = get_component(identifier, offset_from_address);
+        const auto c = get_component(symbol_expr.type(), offset_from_address);
         member_exprt member_expr(symbol_expr, c);
         return address_of_exprt(member_expr);
       }
@@ -715,7 +720,7 @@ void interpretert::assign(
       if(show)
       {
         status() << total_steps << " ** assigning "
-                 << address_to_identifier(address_val) << "["
+                 << address_to_symbol(address_val).get_identifier() << "["
                  << address_to_offset(address_val)
                  << "]:=" << rhs[numeric_cast_v<std::size_t>(i)] << "\n"
                  << eom;
@@ -763,7 +768,7 @@ void interpretert::execute_function_call()
 #if 0
   const memory_cellt &cell=memory[address];
 #endif
-  const irep_idt &identifier = address_to_identifier(address);
+  const irep_idt &identifier = address_to_symbol(address).get_identifier();
   trace_step.called_function = identifier;
 
   const goto_functionst::function_mapt::const_iterator f_it=
@@ -808,7 +813,7 @@ void interpretert::execute_function_call()
     for(const auto &id : locals)
     {
       const symbolt &symbol=ns.lookup(id);
-      frame.local_map[id]=build_memory_map(id, symbol.type);
+      frame.local_map[id] = build_memory_map(symbol.symbol_expr());
     }
 
     // assign the arguments
@@ -856,7 +861,7 @@ void interpretert::build_memory_map()
 {
   // put in a dummy for NULL
   memory.resize(1);
-  inverse_memory_map[0] = ID_null_object;
+  inverse_memory_map[0] = {};
 
   num_dynamic_objects=0;
   dynamic_types.clear();
@@ -887,7 +892,7 @@ void interpretert::build_memory_map(const symbolt &symbol)
     mp_integer address=memory.size();
     memory.resize(numeric_cast_v<std::size_t>(address + size));
     memory_map[symbol.name]=address;
-    inverse_memory_map[address]=symbol.name;
+    inverse_memory_map[address] = symbol.symbol_expr();
   }
 }
 
@@ -919,21 +924,19 @@ typet interpretert::concretize_type(const typet &type)
 
 /// Populates dynamic entries of the memory map
 /// \return Updates the memory map to include variable id if it does not exist
-mp_integer interpretert::build_memory_map(
-  const irep_idt &id,
-  const typet &type)
+mp_integer interpretert::build_memory_map(const symbol_exprt &symbol_expr)
 {
-  typet alloc_type=concretize_type(type);
+  typet alloc_type = concretize_type(symbol_expr.type());
   mp_integer size=get_size(alloc_type);
-  auto it=dynamic_types.find(id);
+  auto it = dynamic_types.find(symbol_expr.get_identifier());
 
   if(it!=dynamic_types.end())
   {
-    mp_integer address=memory_map[id];
+    mp_integer address = memory_map[symbol_expr.get_identifier()];
     mp_integer current_size=base_address_to_alloc_size(address);
     // current size <= size already recorded
     if(size<=current_size)
-      return memory_map[id];
+      return memory_map[symbol_expr.get_identifier()];
   }
 
   // The current size is bigger then the one previously recorded
@@ -944,9 +947,10 @@ mp_integer interpretert::build_memory_map(
 
   mp_integer address=memory.size();
   memory.resize(numeric_cast_v<std::size_t>(address + size));
-  memory_map[id]=address;
-  inverse_memory_map[address]=id;
-  dynamic_types.insert(std::pair<const irep_idt, typet>(id, alloc_type));
+  memory_map[symbol_expr.get_identifier()] = address;
+  inverse_memory_map[address] = symbol_expr;
+  dynamic_types.insert(
+    std::pair<const irep_idt, typet>(symbol_expr.get_identifier(), alloc_type));
 
   return address;
 }
@@ -1065,7 +1069,7 @@ void interpretert::print_memory(bool input_flags)
   {
     mp_integer i=cell_address.first;
     const memory_cellt &cell=cell_address.second;
-    const auto identifier=address_to_identifier(i);
+    const auto identifier = address_to_symbol(i).get_identifier();
     const auto offset=address_to_offset(i);
     debug() << identifier << "[" << offset << "]"
             << "=" << cell.value << eom;
