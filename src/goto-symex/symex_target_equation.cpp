@@ -14,13 +14,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/format_expr.h>
 #include <util/std_expr.h>
-#include <util/throw_with_nested.h>
-#include <util/unwrap_nested_exception.h>
 
 #include <solvers/decision_procedure.h>
-#include <solvers/flattening/bv_conversion_exceptions.h>
 
-#include "equation_conversion_exceptions.h"
 #include "goto_symex_state.h"
 #include "ssa_step.h"
 
@@ -329,24 +325,15 @@ void symex_target_equationt::constraint(
 
 void symex_target_equationt::convert(decision_proceduret &decision_procedure)
 {
-  try
-  {
-    convert_guards(decision_procedure);
-    convert_assignments(decision_procedure);
-    convert_decls(decision_procedure);
-    convert_assumptions(decision_procedure);
-    convert_assertions(decision_procedure);
-    convert_goto_instructions(decision_procedure);
-    convert_function_calls(decision_procedure);
-    convert_io(decision_procedure);
-    convert_constraints(decision_procedure);
-  }
-  catch(const equation_conversion_exceptiont &conversion_exception)
-  {
-    // unwrap the except and throw like normal
-    const std::string full_error = unwrap_exception(conversion_exception);
-    throw full_error;
-  }
+  convert_guards(decision_procedure);
+  convert_assignments(decision_procedure);
+  convert_decls(decision_procedure);
+  convert_assumptions(decision_procedure);
+  convert_assertions(decision_procedure);
+  convert_goto_instructions(decision_procedure);
+  convert_function_calls(decision_procedure);
+  convert_io(decision_procedure);
+  convert_constraints(decision_procedure);
 }
 
 void symex_target_equationt::convert_assignments(
@@ -376,17 +363,8 @@ void symex_target_equationt::convert_decls(
     {
       // The result is not used, these have no impact on
       // the satisfiability of the formula.
-      try
-      {
-        decision_procedure.handle(step.cond_expr);
-        step.converted = true;
-      }
-      catch(const bitvector_conversion_exceptiont &)
-      {
-        util_throw_with_nested(
-          equation_conversion_exceptiont(
-            "Error converting decls for step", step));
-      }
+      decision_procedure.handle(step.cond_expr);
+      step.converted = true;
     }
   }
 }
@@ -405,16 +383,7 @@ void symex_target_equationt::convert_guards(
         mstream << messaget::eom;
       });
 
-      try
-      {
-        step.guard_handle = decision_procedure.handle(step.guard);
-      }
-      catch(const bitvector_conversion_exceptiont &)
-      {
-        util_throw_with_nested(
-          equation_conversion_exceptiont(
-            "Error converting guard for step", step));
-      }
+      step.guard_handle = decision_procedure.handle(step.guard);
     }
   }
 }
@@ -436,16 +405,7 @@ void symex_target_equationt::convert_assumptions(
             mstream << messaget::eom;
           });
 
-        try
-        {
-          step.cond_handle = decision_procedure.handle(step.cond_expr);
-        }
-        catch(const bitvector_conversion_exceptiont &)
-        {
-          util_throw_with_nested(
-            equation_conversion_exceptiont(
-              "Error converting assumptions for step", step));
-        }
+        step.cond_handle = decision_procedure.handle(step.cond_expr);
       }
     }
   }
@@ -468,16 +428,7 @@ void symex_target_equationt::convert_goto_instructions(
             mstream << messaget::eom;
           });
 
-        try
-        {
-          step.cond_handle = decision_procedure.handle(step.cond_expr);
-        }
-        catch(const bitvector_conversion_exceptiont &)
-        {
-          util_throw_with_nested(
-            equation_conversion_exceptiont(
-              "Error converting goto instructions for step", step));
-        }
+        step.cond_handle = decision_procedure.handle(step.cond_expr);
       }
     }
   }
@@ -495,16 +446,8 @@ void symex_target_equationt::convert_constraints(
         mstream << messaget::eom;
       });
 
-      try
-      {
-        decision_procedure.set_to_true(step.cond_expr);
-        step.converted = true;
-      }
-      catch(const bitvector_conversion_exceptiont &)
-      {
-        util_throw_with_nested(equation_conversion_exceptiont(
-          "Error converting constraints for step", step));
-      }
+      decision_procedure.set_to_true(step.cond_expr);
+      step.converted = true;
     }
   }
 }
@@ -569,16 +512,7 @@ void symex_target_equationt::convert_assertions(
         step.cond_expr);
 
       // do the conversion
-      try
-      {
-        step.cond_handle = decision_procedure.handle(implication);
-      }
-      catch(const bitvector_conversion_exceptiont &)
-      {
-        util_throw_with_nested(
-          equation_conversion_exceptiont(
-            "Error converting assertions for step", step));
-      }
+      step.cond_handle = decision_procedure.handle(implication);
 
       // store disjunct
       disjuncts.push_back(not_exprt(step.cond_handle));

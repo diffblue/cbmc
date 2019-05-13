@@ -15,12 +15,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/expr_util.h>
 #include <util/pointer_offset_size.h>
 #include <util/std_expr.h>
-#include <util/throw_with_nested.h>
 
 #include <solvers/lowering/expr_lowering.h>
-#include <solvers/lowering/flatten_byte_extract_exceptions.h>
 
-#include "bv_conversion_exceptions.h"
 #include "bv_endianness_map.h"
 
 bvt map_bv(const bv_endianness_mapt &map, const bvt &src)
@@ -45,15 +42,7 @@ bvt boolbvt::convert_byte_extract(const byte_extract_exprt &expr)
   // unbounded arrays
   if(is_unbounded_array(expr.op().type()))
   {
-    try
-    {
-      return convert_bv(lower_byte_extract(expr, ns));
-    }
-    catch(const flatten_byte_extract_exceptiont &)
-    {
-      util_throw_with_nested(
-        bitvector_conversion_exceptiont("Can't convert byte_extraction", expr));
-    }
+    return convert_bv(lower_byte_extract(expr, ns));
   }
 
   const std::size_t width = boolbv_width(expr.type());
