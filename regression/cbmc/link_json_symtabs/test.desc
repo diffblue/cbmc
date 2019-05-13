@@ -1,0 +1,11 @@
+CORE
+one.json_symtab
+two.json_symtab
+^EXIT=0$
+^SIGNAL=0$
+\[1\] file two.adb line [0-9]+ assertion: SUCCESS
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+The two symbol tables are generated from the respective Ada files. The file `two` contains CPROVER start and initialize and call the function defined in `one`.
