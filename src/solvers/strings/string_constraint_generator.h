@@ -75,18 +75,8 @@ private:
 
   exprt associate_length_to_array(const function_application_exprt &f);
 
-  // Add axioms corresponding to the String.hashCode java function
-  // The specification is partial: the actual value is not actually computed
-  // but we ensure that hash codes of equal strings are equal.
-  std::pair<exprt, string_constraintst>
-  add_axioms_for_hash_code(const function_application_exprt &f);
-
   // MEMBERS
   const messaget message;
-
-  // To each string on which hash_code was called we associate a symbol
-  // representing the return value of the hash_code function.
-  std::map<array_string_exprt, exprt> hash_code_of_string;
 };
 
 // Type used by primitives to signal errors
