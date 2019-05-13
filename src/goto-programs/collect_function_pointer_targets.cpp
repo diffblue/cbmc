@@ -10,6 +10,9 @@ Author: diffblue
 /// Program Transformation
 
 #include "collect_function_pointer_targets.h"
+
+#include <analyses/does_remove_const.h>
+
 collect_function_pointer_targetst::collect_function_pointer_targetst(
   message_handlert &message_handler,
   const symbol_tablet &symbol_table,
@@ -95,6 +98,31 @@ collect_function_pointer_targetst::get_function_pointer_targets(
   }
   return stateful_targets;
 }
+fp_state_targetst collect_function_pointer_targetst::try_remove_const_fp(
+  const goto_programt &goto_program,
+  const exprt &pointer)
+{
+  fp_state_targetst stateful_targets;
+  auto &fp_state = stateful_targets.first;
+  auto &functions = stateful_targets.second;
+
+  does_remove_constt const_removal_check(goto_program, ns);
+  fp_state.code_removes_const = const_removal_check().first;
+
+  if(fp_state.code_removes_const)
+  {
+    fp_state.remove_const_found_functions = false;
+  }
+  else
+  {
+    remove_const_function_pointerst fpr(
+      log.get_message_handler(), ns, symbol_table);
+    fp_state.remove_const_found_functions = fpr(pointer, functions);
+    CHECK_RETURN(fp_state.remove_const_found_functions || functions.empty());
+  }
+  return stateful_targets;
+}
+
 code_typet collect_function_pointer_targetst::refine_call_type(
   const typet &type,
   const code_function_callt &code)

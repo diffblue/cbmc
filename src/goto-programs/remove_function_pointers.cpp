@@ -107,15 +107,6 @@ protected:
     code_function_callt &function_call,
     goto_programt &dest);
 
-  /// Try to remove the const function pointers
-  /// \param goto_program: the function body to run the const_removal_check on
-  /// \param functions: the list of functions the const removal found
-  /// \param pointer: the pointer to be resolved
-  void try_remove_const_fp(
-    const goto_programt &goto_program,
-    functionst &functions,
-    const exprt &pointer);
-
   /// From *fp() build the following sequence of instructions:
   ///
   /// if (fp=&f1) then goto loc1
@@ -219,39 +210,6 @@ void remove_function_pointerst::fix_return_type(
 
   dest.add(goto_programt::make_assignment(
     code_assignt(old_lhs, typecast_exprt(tmp_symbol_expr, old_lhs.type()))));
-}
-
-void remove_function_pointerst::try_remove_const_fp(
-  const goto_programt &goto_program,
-  functionst &functions,
-  const exprt &pointer)
-{
-  PRECONDITION(functions.empty());
-
-  does_remove_constt const_removal_check(goto_program, ns);
-  const auto does_remove_const = const_removal_check();
-  does_remove_const_success = does_remove_const.first;
-
-  if(does_remove_const_success)
-  {
-    log.warning().source_location = does_remove_const.second;
-    log.warning() << "cast from const to non-const pointer found, "
-                  << "only worst case function pointer removal will be done."
-                  << messaget::eom;
-    remove_const_found_functions = false;
-  }
-  else
-  {
-    remove_const_function_pointerst fpr(
-      log.get_message_handler(), ns, symbol_table);
-
-    // if remove_const_function fails, functions should be empty
-    // however, it is possible for found_functions to be true and functions
-    // to be empty (this happens if the pointer can only resolve to the null
-    // pointer)
-    remove_const_found_functions = fpr(pointer, functions);
-    CHECK_RETURN(remove_const_found_functions || functions.empty());
-  }
 }
 
 remove_function_pointerst::functionst
