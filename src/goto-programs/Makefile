@@ -3,6 +3,7 @@ SRC = adjust_float_expressions.cpp \
       class_hierarchy.cpp \
       class_identifier.cpp \
       compute_called_functions.cpp \
+      collect_function_pointer_targets.cpp \
       destructor.cpp \
       destructor_tree.cpp \
       elf_reader.cpp \
