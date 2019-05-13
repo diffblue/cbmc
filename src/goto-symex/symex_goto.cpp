@@ -310,7 +310,8 @@ void goto_symext::symex_goto(statet &state)
 
       ssa_exprt new_lhs =
         state.rename_ssa<L1>(ssa_exprt{guard_symbol_expr}, ns).get();
-      state.assignment(new_lhs, new_rhs, ns, true, false);
+      new_lhs =
+        state.assignment(std::move(new_lhs), new_rhs, ns, true, false).get();
 
       guardt guard{true_exprt{}, guard_manager};
 
@@ -527,11 +528,10 @@ static void merge_names(
       simplify(rhs, ns);
   }
 
-  ssa_exprt new_lhs = ssa;
-  const bool record_events = dest_state.record_events;
-  dest_state.record_events = false;
-  dest_state.assignment(new_lhs, rhs, ns, true, true);
-  dest_state.record_events = record_events;
+  dest_state.record_events.push(false);
+  const ssa_exprt new_lhs =
+    dest_state.assignment(ssa, rhs, ns, true, true).get();
+  dest_state.record_events.pop();
 
   log.conditional_output(
     log.debug(), [ns, &new_lhs](messaget::mstreamt &mstream) {

@@ -38,7 +38,7 @@ goto_symex_statet::goto_symex_statet(
     source(_source),
     guard_manager(manager),
     symex_target(nullptr),
-    record_events(true),
+    record_events({true}),
     fresh_l2_name_provider(fresh_l2_name_provider)
 {
   threads.emplace_back(guard_manager);
@@ -47,7 +47,8 @@ goto_symex_statet::goto_symex_statet(
 
 goto_symex_statet::~goto_symex_statet()=default;
 
-/// write to a variable
+/// Check that \p expr is correctly renamed to level 2 and return true in case
+/// an error is detected.
 static bool check_renaming(const exprt &expr);
 
 static bool check_renaming(const typet &type)
@@ -151,9 +152,9 @@ goto_symex_statet::set_indices<L2>(ssa_exprt ssa_expr, const namespacet &ns)
   return level2(level1(level0(std::move(ssa_expr), ns, source.thread_nr)));
 }
 
-void goto_symex_statet::assignment(
-  ssa_exprt &lhs, // L0/L1
-  const exprt &rhs,  // L2
+renamedt<ssa_exprt, L2> goto_symex_statet::assignment(
+  ssa_exprt lhs,    // L0/L1
+  const exprt &rhs, // L2
   const namespacet &ns,
   bool rhs_is_simplified,
   bool record_value,
@@ -182,7 +183,8 @@ void goto_symex_statet::assignment(
 
   // do the l2 renaming
   increase_generation(l1_identifier, lhs);
-  lhs = set_indices<L2>(std::move(lhs), ns).get();
+  renamedt<ssa_exprt, L2> l2_lhs = set_indices<L2>(std::move(lhs), ns);
+  lhs = l2_lhs.get();
 
   // in case we happen to be multi-threaded, record the memory access
   bool is_shared=l2_thread_write_encoding(lhs, ns);
@@ -233,6 +235,8 @@ void goto_symex_statet::assignment(
   value_set.output(ns, std::cout);
   std::cout << "**********************\n";
 #endif
+
+  return l2_lhs;
 }
 
 template <levelt level>
@@ -442,21 +446,21 @@ bool goto_symex_statet::l2_thread_read_encoding(
     else
       tmp = if_exprt{cond.as_expr(), l2_true_case.get(), l2_false_case.get()};
 
-    const bool record_events_bak=record_events;
-    record_events=false;
-    assignment(ssa_l1, tmp, ns, true, true);
-    record_events=record_events_bak;
+    record_events.push(false);
+    ssa_exprt ssa_l2 = assignment(std::move(ssa_l1), tmp, ns, true, true).get();
+    record_events.pop();
 
     symex_target->assignment(
       guard_as_expr,
-      ssa_l1,
-      ssa_l1,
-      ssa_l1.get_original_expr(),
+      ssa_l2,
+      ssa_l2,
+      ssa_l2.get_original_expr(),
       tmp,
       source,
       symex_targett::assignment_typet::PHI);
 
-    expr = set_indices<L2>(std::move(ssa_l1), ns).get();
+    INVARIANT(!check_renaming(ssa_l2), "expr should be renamed to L2");
+    expr = std::move(ssa_l2);
 
     a_s_read.second.push_back(guard);
     if(!no_write.op().is_false())
@@ -466,7 +470,7 @@ bool goto_symex_statet::l2_thread_read_encoding(
   }
 
   // No event and no fresh index, but avoid constant propagation
-  if(!record_events)
+  if(!record_events.top())
   {
     expr = set_indices<L2>(std::move(ssa_l1), ns).get();
     return true;
@@ -488,7 +492,7 @@ goto_symex_statet::write_is_shared_resultt goto_symex_statet::write_is_shared(
   const ssa_exprt &expr,
   const namespacet &ns) const
 {
-  if(!record_events)
+  if(!record_events.top())
     return write_is_shared_resultt::NOT_SHARED;
 
   PRECONDITION(dirty != nullptr);

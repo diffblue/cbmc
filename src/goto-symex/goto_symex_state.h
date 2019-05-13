@@ -108,13 +108,14 @@ public:
   template <levelt level = L2>
   void rename(typet &type, const irep_idt &l1_identifier, const namespacet &ns);
 
-  void assignment(
-    ssa_exprt &lhs, // L0/L1
-    const exprt &rhs,  // L2
+  /// \return lhs renamed to level 2
+  renamedt<ssa_exprt, L2> assignment(
+    ssa_exprt lhs,    // L0/L1
+    const exprt &rhs, // L2
     const namespacet &ns,
     bool rhs_is_simplified,
     bool record_value,
-    bool allow_pointer_unsoundness=false);
+    bool allow_pointer_unsoundness = false);
 
   field_sensitivityt field_sensitivity;
 
@@ -197,7 +198,7 @@ public:
   write_is_shared_resultt
   write_is_shared(const ssa_exprt &expr, const namespacet &ns) const;
 
-  bool record_events;
+  std::stack<bool> record_events;
 
   const incremental_dirtyt *dirty = nullptr;
 

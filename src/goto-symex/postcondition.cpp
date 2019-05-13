@@ -130,8 +130,8 @@ void postconditiont::strengthen(exprt &dest)
        SSA_step.ssa_lhs.type().id()==ID_struct)
       return;
 
-    equal_exprt equality(SSA_step.ssa_lhs, SSA_step.ssa_rhs);
-    get_original_name(equality);
+    exprt equality =
+      get_original_name(equal_exprt{SSA_step.ssa_lhs, SSA_step.ssa_rhs});
 
     if(dest.is_true())
       dest.swap(equality);
@@ -169,8 +169,7 @@ bool postconditiont::is_used(
         it!=expr_set.end();
         it++)
     {
-      exprt tmp(*it);
-      get_original_name(tmp);
+      const exprt tmp = get_original_name(*it);
       find_symbols(tmp, symbols);
     }
 

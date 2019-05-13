@@ -222,9 +222,15 @@ void field_sensitivityt::field_assignments_rec(
     exprt ssa_rhs = state.rename(lhs, ns).get();
     simplify(ssa_rhs, ns);
 
-    ssa_exprt ssa_lhs = to_ssa_expr(lhs_fs);
-    state.assignment(
-      ssa_lhs, ssa_rhs, ns, true, true, allow_pointer_unsoundness);
+    const ssa_exprt ssa_lhs = state
+                                .assignment(
+                                  to_ssa_expr(lhs_fs),
+                                  ssa_rhs,
+                                  ns,
+                                  true,
+                                  true,
+                                  allow_pointer_unsoundness)
+                                .get();
 
     // do the assignment
     target.assignment(

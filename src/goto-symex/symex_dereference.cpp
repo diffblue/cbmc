@@ -202,7 +202,6 @@ void goto_symext::dereference_rec(exprt &expr, statet &state, bool write)
 {
   if(expr.id()==ID_dereference)
   {
-    dereference_exprt to_check = to_dereference_expr(expr);
     bool expr_is_not_null = false;
 
     if(state.threads.size() == 1)
@@ -210,7 +209,8 @@ void goto_symext::dereference_rec(exprt &expr, statet &state, bool write)
       const irep_idt &expr_function = state.source.function_id;
       if(!expr_function.empty())
       {
-        get_original_name(to_check);
+        const dereference_exprt to_check =
+          to_dereference_expr(get_original_name(expr));
 
         expr_is_not_null = path_storage.safe_pointers.at(expr_function)
                              .is_safe_dereference(to_check, state.source.pc);

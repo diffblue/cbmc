@@ -148,9 +148,9 @@ struct symex_level2t : public symex_renaming_levelt
 };
 
 /// Undo all levels of renaming
-void get_original_name(exprt &expr);
+exprt get_original_name(exprt expr);
 
 /// Undo all levels of renaming
-void get_original_name(typet &type);
+typet get_original_name(typet type);
 
 #endif // CPROVER_GOTO_SYMEX_RENAMING_LEVEL_H

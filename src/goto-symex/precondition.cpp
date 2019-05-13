@@ -140,8 +140,7 @@ void preconditiont::compute_rec(exprt &dest)
   }
   else if(dest==SSA_step.ssa_lhs.get_original_expr())
   {
-    dest=SSA_step.ssa_rhs;
-    get_original_name(dest);
+    dest = get_original_name(SSA_step.ssa_rhs);
   }
   else
     Forall_operands(it, dest)
