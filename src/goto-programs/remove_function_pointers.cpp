@@ -60,10 +60,14 @@ public:
   /// \param target: location with function call with function pointer
   /// \param functions: The set of functions to consider
   void remove_function_pointer(
+  /// Call the function pointer removal within the \p goto_program
+  /// \param goto_program: program to modify
+  /// \param function_id: identifier of the function pointer to be removed
+  /// \param target_map: candidate functions
+  bool remove_function_pointers(
     goto_programt &goto_program,
     const irep_idt &function_id,
-    goto_programt::targett target,
-    const functionst &functions);
+    const possible_fp_targets_mapt &target_map);
 
 
 protected:
@@ -263,7 +267,8 @@ void remove_function_pointerst::remove_function_pointer(
 
 bool remove_function_pointerst::remove_function_pointers(
   goto_programt &goto_program,
-  const irep_idt &function_id)
+  const irep_idt &function_id,
+  const possible_fp_targets_mapt &target_map)
 {
   bool did_something=false;
 
@@ -271,11 +276,16 @@ bool remove_function_pointerst::remove_function_pointers(
     if(target->is_function_call())
     {
       const code_function_callt &code = target->get_function_call();
+      const auto &callee = code.function();
 
       if(code.function().id()==ID_dereference)
       {
-        remove_function_pointer(goto_program, function_id, target);
-        did_something=true;
+        auto callee_id =
+          collect_function_pointer_targetst::get_callee_id(callee);
+        CHECK_RETURN(target_map.count(callee_id) > 0);
+        remove_function_pointer(
+          goto_program, function_id, target, target_map.at(callee_id));
+        did_something = true;
       }
     }
 
