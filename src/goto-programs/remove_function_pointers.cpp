@@ -384,16 +384,6 @@ void remove_function_pointers(
   rfp(goto_model.goto_functions, target_map);
 }
 
-{
-  remove_function_pointerst rfp(
-    message_handler,
-    goto_model.symbol_table,
-    false,
-    false,
-    goto_model.goto_functions);
-
-}
-
 goto_programt remove_function_pointerst::build_new_code(
   const possible_fp_targetst &functions,
   const code_function_callt &code,
