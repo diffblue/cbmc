@@ -84,12 +84,6 @@ protected:
   // --remove-const-function-pointers instead of --remove-function-pointers
   bool only_resolve_const_fps;
 
-  // Internal variables for communication between function pointer collection
-  //   and the call modification.
-  bool remove_const_found_functions;
-  bool does_remove_const_success;
-  bool only_remove_const_function_pointers_called;
-
   /// Replace a call to a dynamic function at location
   /// target in the given goto-program by determining
   /// functions that have a compatible signature
