@@ -21,8 +21,14 @@ void goto_symext::symex_dead(statet &state)
   const goto_programt::instructiont &instruction=*state.source.pc;
 
   const code_deadt &code = instruction.get_dead();
+  symex_dead(state, code.symbol());
+}
 
-  ssa_exprt ssa = state.rename_ssa<L1>(ssa_exprt{code.symbol()}, ns).get();
+void goto_symext::symex_dead(statet &state, const symbol_exprt &symbol_expr)
+{
+  ssa_exprt to_rename = is_ssa_expr(symbol_expr) ? to_ssa_expr(symbol_expr)
+                                                 : ssa_exprt{symbol_expr};
+  ssa_exprt ssa = state.rename_ssa<L1>(to_rename, ns).get();
 
   const exprt fields = state.field_sensitivity.get_fields(ns, state, ssa);
   find_symbols_sett fields_set;

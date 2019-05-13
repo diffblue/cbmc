@@ -218,6 +218,16 @@ protected:
     const get_goto_functiont &get_goto_function);
 
   /// \brief Called for each step in the symbolic execution
+  /// This calls \ref print_symex_step to print symex's current instruction if
+  /// required, then \ref execute_next_instruction to execute the actual
+  /// instruction body.
+  /// \param get_goto_function: The delegate to retrieve function bodies (see
+  ///   \ref get_goto_functiont)
+  /// \param state: Symbolic execution state for current instruction
+  virtual void
+  symex_step(const get_goto_functiont &get_goto_function, statet &state);
+
+  /// \brief Executes the instruction `state.source.pc`
   /// Case-switches over the type of the instruction being executed and calls
   /// another function appropriate to the instruction type, for example
   /// \ref symex_function_call if the current instruction is a function call,
@@ -225,8 +235,14 @@ protected:
   /// \param get_goto_function: The delegate to retrieve function bodies (see
   ///   \ref get_goto_functiont)
   /// \param state: Symbolic execution state for current instruction
-  virtual void
-  symex_step(const get_goto_functiont &get_goto_function, statet &state);
+  void execute_next_instruction(
+    const get_goto_functiont &get_goto_function,
+    statet &state);
+
+  /// Kills any variables in \ref instruction_local_symbols (these are currently
+  /// always let-bound variables defined in the course of executing the current
+  /// instruction), then clears \ref instruction_local_symbols.
+  void kill_instruction_local_symbols(statet &state);
 
   /// Prints the route of symex as it walks through the code. Used for
   /// debugging.
@@ -270,6 +286,11 @@ protected:
   /// instruction
   unsigned atomic_section_counter;
 
+  /// Variables that should be killed at the end of the current symex_step
+  /// invocation. Currently this is used for let-bound variables executed during
+  /// symex, whose lifetime is at most one instruction long.
+  std::vector<symbol_exprt> instruction_local_symbols;
+
   /// The messaget to write log messages to
   mutable messaget log;
 
@@ -288,6 +309,11 @@ protected:
 
   void trigger_auto_object(const exprt &, statet &);
   void initialize_auto_object(const exprt &, statet &);
+
+  /// Given an expression, find the root object and the offset into it.
+  ///
+  /// The extra complication to be considered here is that the expression may
+  /// have any number of ternary expressions mixed with type casts.
   void process_array_expr(statet &, exprt &);
   exprt make_auto_object(const typet &, statet &);
   virtual void dereference(exprt &, statet &, bool write);
@@ -321,6 +347,10 @@ protected:
   /// Symbolically execute a DEAD instruction
   /// \param state: Symbolic execution state for current instruction
   virtual void symex_dead(statet &state);
+  /// Kill a symbol, as if it had been the subject of a DEAD instruction
+  /// \param state: Symbolic execution state
+  /// \param symbol_expr: Symbol to kill
+  void symex_dead(statet &state, const symbol_exprt &symbol_expr);
   /// Symbolically execute an OTHER instruction
   /// \param state: Symbolic execution state for current instruction
   virtual void symex_other(statet &state);
@@ -502,6 +532,18 @@ protected:
   void havoc_rec(statet &state, const guardt &guard, const exprt &dest);
 
   typedef symex_targett::assignment_typet assignment_typet;
+
+  /// Execute any let expressions in \p expr using \ref symex_assign_symbol.
+  /// The assignments will be made in bottom-up topological but otherwise
+  /// arbitrary order (i.e. in `(let x = let y = 0 in x + y) + (let z = 0 in z)
+  /// we will define `y` before `x`, but `z` and `x` could come in either order)
+  void lift_lets(statet &, exprt &);
+
+  /// Execute a single let expression, which should not have any nested let
+  /// expressions (use \ref lift_lets instead if there might be).
+  /// Records the newly-defined variable in \ref instruction_local_symbols,
+  /// meaning it will be killed when \ref symex_step concludes.
+  void lift_let(statet &state, const let_exprt &let_expr);
 
   void symex_assign_rec(
     statet &,

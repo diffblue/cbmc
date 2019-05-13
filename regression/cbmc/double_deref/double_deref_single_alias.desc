@@ -1,0 +1,10 @@
+CORE
+double_deref_single_alias.c
+--show-vcc
+\{1\} main::argc!0@1#1 = 1
+^EXIT=0$
+^SIGNAL=0$
+--
+derefd_pointer::derefd_pointer
+--
+See README for details about these tests

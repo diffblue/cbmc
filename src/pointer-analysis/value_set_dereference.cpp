@@ -22,6 +22,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/c_types.h>
 #include <util/config.h>
 #include <util/cprover_prefix.h>
+#include <util/expr_iterator.h>
 #include <util/format_type.h>
 #include <util/fresh_symbol.h>
 #include <util/options.h>
@@ -29,6 +30,33 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_predicates.h>
 #include <util/simplify_expr.h>
 #include <util/ssa_expr.h>
+
+/// Returns true if \p expr is complicated enough that a local definition (using
+/// a let expression) is preferable to repeating it, potentially many times.
+/// Of course this is just a heuristic -- currently we allow any expression that
+/// only involves one symbol, such as "x", "(type*)x", "x[0]" (but not "x[y]").
+/// Particularly we want to make sure to insist on a local definition of \p expr
+/// is a large if-expression, such as `p == &o1 ? o1 : p == &o2 ? o2 : ...`, as
+/// can result from dereferencing a subexpression (though note that \ref
+/// value_set_dereferencet::dereference special-cases if_exprt, and therefore
+/// handles the specific case of a double-dereference (**p) without an
+/// intervening member operator, typecast, pointer arithmetic, etc.)
+static bool should_use_local_definition_for(const exprt &expr)
+{
+  bool seen_symbol = false;
+  for(auto it = expr.depth_begin(), itend = expr.depth_end(); it != itend; ++it)
+  {
+    if(it->id() == ID_symbol)
+    {
+      if(seen_symbol)
+        return true;
+      else
+        seen_symbol = true;
+    }
+  }
+
+  return false;
+}
 
 exprt value_set_dereferencet::dereference(const exprt &pointer)
 {
@@ -43,6 +71,26 @@ exprt value_set_dereferencet::dereference(const exprt &pointer)
     exprt true_case = dereference(if_expr.true_case());
     exprt false_case = dereference(if_expr.false_case());
     return if_exprt(if_expr.cond(), true_case, false_case);
+  }
+  else if(pointer.id() == ID_typecast)
+  {
+    const exprt *underlying = &pointer;
+    // Note this isn't quite the same as skip_typecast, which would also skip
+    // things such as int-to-ptr typecasts which we shouldn't ignore
+    while(underlying->id() == ID_typecast &&
+          underlying->type().id() == ID_pointer)
+    {
+      underlying = &to_typecast_expr(*underlying).op();
+    }
+
+    if(underlying->id() == ID_if && underlying->type().id() == ID_pointer)
+    {
+      const auto &if_expr = to_if_expr(*underlying);
+      return if_exprt(
+        if_expr.cond(),
+        dereference(typecast_exprt(if_expr.true_case(), pointer.type())),
+        dereference(typecast_exprt(if_expr.false_case(), pointer.type())));
+    }
   }
 
   // type of the object
@@ -76,9 +124,24 @@ exprt value_set_dereferencet::dereference(const exprt &pointer)
 
   std::list<valuet> values;
 
+  exprt compare_against_pointer = pointer;
+
+  if(retained_values.size() >= 2 && should_use_local_definition_for(pointer))
+  {
+    symbolt fresh_binder = get_fresh_aux_symbol(
+      pointer.type(),
+      "derefd_pointer",
+      "derefd_pointer",
+      source_locationt(),
+      language_mode,
+      new_symbol_table);
+
+    compare_against_pointer = fresh_binder.symbol_expr();
+  }
+
   for(const auto &value : retained_values)
   {
-    values.push_back(build_reference_to(value, pointer, ns));
+    values.push_back(build_reference_to(value, compare_against_pointer, ns));
 #if 0
     std::cout << "V: " << format(value.pointer_guard) << " --> ";
     std::cout << format(value.value);
@@ -160,9 +223,12 @@ exprt value_set_dereferencet::dereference(const exprt &pointer)
     }
   }
 
-  #if 0
+  if(compare_against_pointer != pointer)
+    value = let_exprt(to_symbol_expr(compare_against_pointer), pointer, value);
+
+#if 0
   std::cout << "R: " << format(value) << "\n\n";
-  #endif
+#endif
 
   return value;
 }
