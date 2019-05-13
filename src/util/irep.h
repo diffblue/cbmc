@@ -23,7 +23,7 @@ Author: Daniel Kroening, kroening@kroening.com
 // #define NAMED_SUB_IS_FORWARD_LIST
 
 #ifdef NAMED_SUB_IS_FORWARD_LIST
-#include <forward_list>
+#  include "forward_list_as_map.h"
 #else
 #include <map>
 #endif
@@ -387,7 +387,7 @@ class irept
       irept,
 #endif
 #ifdef NAMED_SUB_IS_FORWARD_LIST
-      std::forward_list<std::pair<irep_namet, irept>>
+      forward_list_as_mapt<irep_namet, irept>>
 #else
       std::map<irep_namet, irept>>
 #endif
