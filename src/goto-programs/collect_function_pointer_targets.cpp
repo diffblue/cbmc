@@ -54,6 +54,43 @@ code_typet collect_function_pointer_targetst::refine_call_type(
   return call_type;
 }
 
+irep_idt
+collect_function_pointer_targetst::get_callee_id(const exprt &called_function)
+{
+  irep_idt callee_id;
+  bool contains_code = false;
+  auto type_contains_code = [&contains_code](const typet &t) {
+    if(t.id() == ID_code)
+      contains_code = true;
+  };
+
+  called_function.visit_post(
+    [&callee_id, &type_contains_code, &contains_code](const exprt &e) {
+      if(e.id() == ID_symbol)
+      {
+        e.type().visit(type_contains_code);
+        if(contains_code)
+        {
+          callee_id = to_symbol_expr(e).get_identifier();
+          return;
+        }
+      }
+      if(e.id() == ID_dereference)
+      {
+        const auto &pointer = to_dereference_expr(e).pointer();
+        if(pointer.id() == ID_symbol)
+          callee_id = to_symbol_expr(pointer).get_identifier();
+        if(pointer.id() == ID_member)
+        {
+          pointer.type().visit(type_contains_code);
+          if(contains_code)
+            callee_id = to_member_expr(pointer).get_component_name();
+        }
+      }
+    });
+  return callee_id;
+}
+
 bool collect_function_pointer_targetst::arg_is_type_compatible(
   const typet &call_type,
   const typet &function_type,
