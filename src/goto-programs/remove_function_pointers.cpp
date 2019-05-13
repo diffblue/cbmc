@@ -60,14 +60,6 @@ public:
     goto_programt::targett target,
     const functionst &functions);
 
-  /// Go through a single function body and find all potential function the
-  ///   pointer at \p call site may point to
-  /// \param goto_program: function body to search for potential functions
-  /// \param call_site: the call site of the function pointer under analysis
-  /// \return the set of the potential functions
-  functionst get_function_pointer_targets(
-    const goto_programt &goto_program,
-    goto_programt::const_targett &call_site);
 
 protected:
   messaget log;
@@ -210,53 +202,6 @@ void remove_function_pointerst::fix_return_type(
 
   dest.add(goto_programt::make_assignment(
     code_assignt(old_lhs, typecast_exprt(tmp_symbol_expr, old_lhs.type()))));
-}
-
-remove_function_pointerst::functionst
-remove_function_pointerst::get_function_pointer_targets(
-  const goto_programt &goto_program,
-  goto_programt::const_targett &call_site)
-{
-  PRECONDITION(call_site->is_function_call());
-
-  const code_function_callt &code = call_site->get_function_call();
-  const auto &function = to_dereference_expr(code.function());
-  const auto &refined_call_type = refine_call_type(function.type(), code);
-
-  functionst functions;
-  try_remove_const_fp(goto_program, functions, function.pointer());
-
-  only_remove_const_function_pointers_called =
-    !does_remove_const_success && functions.size() == 1;
-  if(
-    !only_remove_const_function_pointers_called &&
-    !remove_const_found_functions && !only_resolve_const_fps)
-  {
-    // get all type-compatible functions
-    // whose address is ever taken
-    for(const auto &type_pair : type_map)
-    {
-      const auto &candidate_function_name = type_pair.first;
-      const auto &candidate_function_type = type_pair.second;
-
-      // only accept as candidate functions such that:
-      // 1. their address was taken
-      // 2. their type is compatible with the call-site-function type
-      // 3. they're not pthread mutex clean-up
-      if(
-        address_taken.find(candidate_function_name) != address_taken.end() &&
-        is_type_compatible(
-          code.lhs().is_not_nil(),
-          refined_call_type,
-          candidate_function_type) &&
-        candidate_function_name != "pthread_mutex_cleanup")
-      {
-        functions.insert(
-          symbol_exprt{candidate_function_name, candidate_function_type});
-      }
-    }
-  }
-  return functions;
 }
 
 void remove_function_pointerst::remove_function_pointer(

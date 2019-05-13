@@ -98,6 +98,57 @@ collect_function_pointer_targetst::get_function_pointer_targets(
   }
   return stateful_targets;
 }
+
+fp_state_targetst
+collect_function_pointer_targetst::get_function_pointer_targets(
+  const goto_programt &goto_program,
+  goto_programt::const_targett &call_site)
+{
+  PRECONDITION(call_site->is_function_call());
+
+  const code_function_callt &code = call_site->get_function_call();
+  const auto &function = to_dereference_expr(code.function());
+  const auto &refined_call_type = refine_call_type(function.type(), code);
+
+  auto stateful_targets = try_remove_const_fp(goto_program, function.pointer());
+  auto &fp_state = stateful_targets.first;
+  auto &functions = stateful_targets.second;
+
+  fp_state.precise_const_removal =
+    !fp_state.code_removes_const && functions.size() == 1;
+
+  if(
+    !fp_state.precise_const_removal && !fp_state.remove_const_found_functions &&
+    !only_resolve_const_fps)
+  {
+    // get all type-compatible functions
+    // whose address is ever taken
+    for(const auto &type_pair : type_map)
+    {
+      const auto &candidate_function_name = type_pair.first;
+      const auto &candidate_function_type = type_pair.second;
+
+      // only accept as candidate functions such that:
+      // 1. their address was taken
+      // 2. their type is compatible with the call-site-function type
+      // 3. they're not pthread mutex clean-up
+      if(
+        address_taken.find(candidate_function_name) != address_taken.end() &&
+        is_type_compatible(
+          code.lhs().is_not_nil(),
+          refined_call_type,
+          candidate_function_type,
+          ns) &&
+        candidate_function_name != "pthread_mutex_cleanup")
+      {
+        functions.insert(
+          symbol_exprt{candidate_function_name, candidate_function_type});
+      }
+    }
+  }
+  return stateful_targets;
+}
+
 fp_state_targetst collect_function_pointer_targetst::try_remove_const_fp(
   const goto_programt &goto_program,
   const exprt &pointer)
