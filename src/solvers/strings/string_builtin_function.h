@@ -216,7 +216,7 @@ public:
   exprt length_constraint() const override
   {
     return and_exprt(
-      equal_exprt(result.length(), input.length()),
+      equal_exprt(array_pool.get_length(result), array_pool.get_length(input)),
       equal_exprt(return_code, from_integer(0, return_code.type())));
   };
 };
@@ -267,7 +267,7 @@ public:
   exprt length_constraint() const override
   {
     return and_exprt(
-      equal_exprt(result.length(), input.length()),
+      equal_exprt(array_pool.get_length(result), array_pool.get_length(input)),
       equal_exprt(return_code, from_integer(0, return_code.type())));
   };
 };

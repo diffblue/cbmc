@@ -43,10 +43,10 @@ std::pair<exprt, string_constraintst> add_axioms_for_code_point(
   exprt hex0400 = from_integer(0x0400, type);
 
   binary_relation_exprt small(code_point, ID_lt, hex010000);
-  implies_exprt a1(small, equal_to(res.length(), 1));
+  implies_exprt a1(small, equal_to(array_pool.get_length(res), 1));
   constraints.existential.push_back(a1);
 
-  implies_exprt a2(not_exprt(small), equal_to(res.length(), 2));
+  implies_exprt a2(not_exprt(small), equal_to(array_pool.get_length(res), 2));
   constraints.existential.push_back(a2);
 
   typecast_exprt code_point_as_char(code_point, char_type);
@@ -166,10 +166,10 @@ std::pair<exprt, string_constraintst> add_axioms_for_code_point_before(
   array_string_exprt str = get_string_expr(array_pool, args[0]);
   string_constraintst constraints;
 
-  const exprt &char1 =
-    str[minus_exprt(args[1], from_integer(2, str.length().type()))];
-  const exprt &char2 =
-    str[minus_exprt(args[1], from_integer(1, str.length().type()))];
+  const exprt &char1 = str[minus_exprt(
+    args[1], from_integer(2, array_pool.get_length(str).type()))];
+  const exprt &char2 = str[minus_exprt(
+    args[1], from_integer(1, array_pool.get_length(str).type()))];
   const typecast_exprt char1_as_int(char1, return_type);
   const typecast_exprt char2_as_int(char2, return_type);
 

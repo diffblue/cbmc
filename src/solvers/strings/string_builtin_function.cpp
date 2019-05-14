@@ -207,12 +207,12 @@ string_constraintst string_concat_char_builtin_functiont::constraints(
   constraints.universal.push_back([&] {
     const symbol_exprt idx =
       generator.fresh_symbol("QA_index_concat_char", result.length_type());
-    const exprt upper_bound = zero_if_negative(input.length());
+    const exprt upper_bound = zero_if_negative(array_pool.get_length(input));
     return string_constraintt(
       idx, upper_bound, equal_exprt(input[idx], result[idx]));
   }());
   constraints.existential.push_back(
-    equal_exprt(result[input.length()], character));
+    equal_exprt(result[array_pool.get_length(input)], character));
   constraints.existential.push_back(
     equal_exprt(return_code, from_integer(0, return_code.type())));
   return constraints;
@@ -256,14 +256,16 @@ string_constraintst string_set_char_builtin_functiont::constraints(
   constraints.existential.push_back(implies_exprt(
     and_exprt(
       binary_relation_exprt(from_integer(0, position.type()), ID_le, position),
-      binary_relation_exprt(position, ID_lt, result.length())),
+      binary_relation_exprt(position, ID_lt, array_pool.get_length(result))),
     equal_exprt(result[position], character)));
   constraints.universal.push_back([&] {
     const symbol_exprt q =
       generator.fresh_symbol("QA_char_set", position.type());
     const equal_exprt a3_body(result[q], input[q]);
     return string_constraintt(
-      q, minimum(zero_if_negative(result.length()), position), a3_body);
+      q,
+      minimum(zero_if_negative(array_pool.get_length(result)), position),
+      a3_body);
   }());
   constraints.universal.push_back([&] {
     const symbol_exprt q2 =
@@ -271,7 +273,10 @@ string_constraintst string_set_char_builtin_functiont::constraints(
     const plus_exprt lower_bound(position, from_integer(1, position.type()));
     const equal_exprt a4_body(result[q2], input[q2]);
     return string_constraintt(
-      q2, lower_bound, zero_if_negative(result.length()), a4_body);
+      q2,
+      lower_bound,
+      zero_if_negative(array_pool.get_length(result)),
+      a4_body);
   }());
   return constraints;
 }
@@ -279,7 +284,7 @@ string_constraintst string_set_char_builtin_functiont::constraints(
 exprt string_set_char_builtin_functiont::length_constraint() const
 {
   const exprt out_of_bounds = or_exprt(
-    binary_relation_exprt(position, ID_ge, input.length()),
+    binary_relation_exprt(position, ID_ge, array_pool.get_length(input)),
     binary_relation_exprt(
       position, ID_lt, from_integer(0, input.length_type())));
   const exprt return_value = if_exprt(
@@ -287,7 +292,7 @@ exprt string_set_char_builtin_functiont::length_constraint() const
     from_integer(1, return_code.type()),
     from_integer(0, return_code.type()));
   return and_exprt(
-    equal_exprt(result.length(), input.length()),
+    equal_exprt(array_pool.get_length(result), array_pool.get_length(input)),
     equal_exprt(return_code, return_value));
 }
 
@@ -389,7 +394,9 @@ string_constraintst string_to_lower_case_builtin_functiont::constraints(
       return if_exprt(is_upper_case(input[idx]), converted, non_converted);
     }();
     return string_constraintt(
-      idx, zero_if_negative(result.length()), conditional_convert);
+      idx,
+      zero_if_negative(array_pool.get_length(result)),
+      conditional_convert);
   }());
   return constraints;
 }
@@ -433,7 +440,7 @@ string_constraintst string_to_upper_case_builtin_functiont::constraints(
       minus_exprt(input[idx], from_integer(0x20, char_type));
     return string_constraintt(
       idx,
-      zero_if_negative(result.length()),
+      zero_if_negative(array_pool.get_length(result)),
       equal_exprt(
         result[idx],
         if_exprt(is_lower_case(input[idx]), converted, input[idx])));
@@ -599,7 +606,7 @@ exprt string_of_int_builtin_functiont::length_constraint() const
 
   const exprt size_expr_with_sign = if_exprt(
     negative_arg, plus_exprt(size_expr, from_integer(1, type)), size_expr);
-  return equal_exprt(result.length(), size_expr_with_sign);
+  return equal_exprt(array_pool.get_length(result), size_expr_with_sign);
 }
 
 string_builtin_function_with_no_evalt::string_builtin_function_with_no_evalt(

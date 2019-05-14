@@ -281,7 +281,8 @@ std::pair<exprt, string_constraintst> add_axioms_for_fractional_part(
   // a3 : int_expr = sum_j 10^j (j < |res| ? res[j] - '0' : 0)
 
   const and_exprt a1(
-    greater_than(res.length(), 1), less_than_or_equal_to(res.length(), max));
+    greater_than(array_pool.get_length(res), 1),
+    less_than_or_equal_to(array_pool.get_length(res), max));
   constraints.existential.push_back(a1);
 
   equal_exprt starts_with_dot(res[0], from_integer('.', char_type));
@@ -294,7 +295,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_fractional_part(
   {
     // after_end is |res| <= j
     binary_relation_exprt after_end(
-      res.length(), ID_le, from_integer(j, res.length_type()));
+      array_pool.get_length(res), ID_le, from_integer(j, res.length_type()));
     mult_exprt ten_sum(sum, ten);
 
     // sum = 10 * sum + after_end ? 0 : (res[j]-'0')
@@ -313,7 +314,8 @@ std::pair<exprt, string_constraintst> add_axioms_for_fractional_part(
     if(j > 1)
     {
       not_exprt no_trailing_zero(and_exprt(
-        equal_exprt(res.length(), from_integer(j + 1, res.length_type())),
+        equal_exprt(
+          array_pool.get_length(res), from_integer(j + 1, res.length_type())),
         equal_exprt(res[j], zero_char)));
       digit_constraints.push_back(no_trailing_zero);
     }

@@ -44,8 +44,8 @@ std::pair<exprt, string_constraintst> add_axioms_for_insert(
 
   string_constraintst constraints;
   const typet &index_type = s1.length_type();
-  const exprt offset1 =
-    maximum(from_integer(0, index_type), minimum(s1.length(), offset));
+  const exprt offset1 = maximum(
+    from_integer(0, index_type), minimum(array_pool.get_length(s1), offset));
 
   // Axiom 1.
   constraints.existential.push_back(
@@ -62,7 +62,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_insert(
     const symbol_exprt i = fresh_symbol("QA_insert2", index_type);
     return string_constraintt(
       i,
-      zero_if_negative(s2.length()),
+      zero_if_negative(array_pool.get_length(s2)),
       equal_exprt(res[plus_exprt(i, offset1)], s2[i]));
   }());
 
@@ -72,8 +72,8 @@ std::pair<exprt, string_constraintst> add_axioms_for_insert(
     return string_constraintt(
       i,
       offset1,
-      zero_if_negative(s1.length()),
-      equal_exprt(res[plus_exprt(i, s2.length())], s1[i]));
+      zero_if_negative(array_pool.get_length(s1)),
+      equal_exprt(res[plus_exprt(i, array_pool.get_length(s2))], s1[i]));
   }());
 
   return {from_integer(0, get_return_code_type()), std::move(constraints)};
@@ -87,7 +87,9 @@ exprt length_constraint_for_insert(
   const array_string_exprt &s2,
   array_poolt &array_pool)
 {
-  return equal_exprt(res.length(), plus_exprt(s1.length(), s2.length()));
+  return equal_exprt(
+    array_pool.get_length(res),
+    plus_exprt(array_pool.get_length(s1), array_pool.get_length(s2)));
 }
 
 /// Insertion of a string in another at a specific index
