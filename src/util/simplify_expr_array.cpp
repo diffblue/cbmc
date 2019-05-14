@@ -55,6 +55,7 @@ bool simplify_exprt::simplify_index(exprt &expr)
       exprt tmp = lambda_expr.body();
       replace_expr(lambda_expr.arg(), expr.op1(), tmp);
       expr.swap(tmp);
+      simplify_rec(expr);
       return false;
     }
   }
