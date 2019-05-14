@@ -66,16 +66,6 @@ inline equal_exprt equal_to(const exprt &lhs, mp_integer i)
 class array_string_exprt : public exprt
 {
 public:
-  exprt &length()
-  {
-    return to_array_type(type()).size();
-  }
-
-  const exprt &length() const
-  {
-    return to_array_type(type()).size();
-  }
-
   const typet &length_type() const
   {
     return to_array_type(type()).size().type();
