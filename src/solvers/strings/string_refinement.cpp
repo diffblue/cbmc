@@ -740,10 +740,11 @@ decision_proceduret::resultt string_refinementt::dec_solve()
     add_lemma(lemma);
 
   // All generated strings should have non-negative length
-  for(const auto &string : generator.array_pool.created_strings())
+  for(const auto &pair : generator.array_pool.created_strings())
   {
-    add_lemma(greater_or_equal_to(
-      string.length(), from_integer(0, string.length_type())));
+    exprt length = generator.array_pool.get_length(pair.first);
+    add_lemma(
+      binary_relation_exprt{length, ID_ge, from_integer(0, length.type())});
   }
 
   // Initial try without index set

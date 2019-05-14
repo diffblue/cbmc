@@ -76,7 +76,8 @@ public:
   /// Creates a new array if the pointer is not pointing to an array
   const array_string_exprt &find(const exprt &pointer, const exprt &length);
 
-  const std::set<array_string_exprt> &created_strings() const;
+  const std::unordered_map<array_string_exprt, exprt, irep_hash> &
+  created_strings() const;
 
   /// Construct a string expression whose length and content are new variables
   /// \param index_type: type used to index characters of the strings

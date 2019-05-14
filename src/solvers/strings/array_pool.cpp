@@ -163,9 +163,12 @@ void array_poolt::insert(
   attempt_assign_length_from_type(array_expr, length_of_array, fresh_symbol);
 }
 
-const std::set<array_string_exprt> &array_poolt::created_strings() const
+/// Return a map mapping all array_string_exprt of the array_pool to their
+/// length.
+const std::unordered_map<array_string_exprt, exprt, irep_hash> &
+array_poolt::created_strings() const
 {
-  return created_strings_value;
+  return length_of_array;
 }
 
 const array_string_exprt &
