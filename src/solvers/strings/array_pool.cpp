@@ -57,6 +57,8 @@ array_poolt::fresh_string(const typet &index_type, const typet &char_type)
   symbol_exprt content = fresh_symbol("string_content", array_type);
   array_string_exprt str = to_array_string_expr(content);
   created_strings_value.insert(str);
+  arrays_of_pointers.emplace(
+    address_of_exprt(index_exprt(str, from_integer(0, index_type))), str);
   return str;
 }
 
