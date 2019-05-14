@@ -1826,7 +1826,6 @@ exprt string_refinementt::get(const exprt &expr) const
   if(is_char_array_type(ecopy.type(), ns))
   {
     array_string_exprt &arr = to_array_string_expr(ecopy);
-    arr.length() = generator.array_pool.get_length(arr);
 
     if(
       const auto from_dependencies =
