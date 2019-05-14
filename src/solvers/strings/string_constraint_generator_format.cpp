@@ -210,8 +210,7 @@ static format_specifiert format_specifier_of_match(std::smatch &m)
   if(tT == "T")
     flag.push_back(format_specifiert::DATE_TIME_UPPER);
 
-  INVARIANT(
-    m[6].str().length() == 1, "format conversion should be one character");
+  INVARIANT(m[6].length() == 1, "format conversion should be one character");
   char conversion = m[6].str()[0];
 
   return format_specifiert(index, flag, width, precision, dt, conversion);
