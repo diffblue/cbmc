@@ -366,7 +366,7 @@ add_axioms_for_format_specifier(
     const exprt return_code_upper_case =
       fresh_symbol("return_code_upper_case", get_return_code_type());
     const string_to_upper_case_builtin_functiont upper_case_function(
-      return_code_upper_case, res, format_specifier_result.first);
+      return_code_upper_case, res, format_specifier_result.first, array_pool);
     auto upper_case_constraints = upper_case_function.constraints(fresh_symbol);
     merge(upper_case_constraints, std::move(format_specifier_result.second));
     return {res, std::move(upper_case_constraints)};
