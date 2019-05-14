@@ -28,12 +28,7 @@ std::size_t to_be_merged_irept::hash() const
         result, static_cast<const merged_irept &>(it->second).hash());
   }
 
-#ifdef NAMED_SUB_IS_FORWARD_LIST
-  const std::size_t named_sub_size =
-    std::distance(named_sub.begin(), named_sub.end());
-#else
   const std::size_t named_sub_size = named_sub.size();
-#endif
   result = hash_finalize(result, named_sub_size + sub.size());
 
   return result;
