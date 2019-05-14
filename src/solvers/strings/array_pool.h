@@ -86,8 +86,7 @@ private:
   std::unordered_map<exprt, array_string_exprt, irep_hash> arrays_of_pointers;
 
   /// Associate length to arrays of infinite size
-  std::unordered_map<array_string_exprt, symbol_exprt, irep_hash>
-    length_of_array;
+  std::unordered_map<array_string_exprt, exprt, irep_hash> length_of_array;
 
   /// Generate fresh symbols
   symbol_generatort &fresh_symbol;
