@@ -995,8 +995,8 @@ static optionalt<exprt> get_array(
 
   if(n > MAX_CONCRETE_STRING_SIZE)
   {
-    stream << "(sr::get_array) long string (size " << format(size) << " = " << n
-           << ") " << format(arr) << messaget::eom;
+    stream << "(sr::get_array) long string (size = " << n << ") " << format(arr)
+           << messaget::eom;
     stream << "(sr::get_array) consider reducing max-nondet-string-length so "
               "that no string exceeds "
            << MAX_CONCRETE_STRING_SIZE
