@@ -144,7 +144,7 @@ static void attempt_assign_length_from_type(
 
 void array_poolt::insert(
   const exprt &pointer_expr,
-  array_string_exprt &array_expr)
+  const array_string_exprt &array_expr)
 {
   const auto it_bool =
     arrays_of_pointers.insert(std::make_pair(pointer_expr, array_expr));

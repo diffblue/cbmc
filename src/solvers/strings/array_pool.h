@@ -71,7 +71,7 @@ public:
   /// \return expression for the length of `s`, or empty optional
   optionalt<exprt> get_length_if_exists(const array_string_exprt &s) const;
 
-  void insert(const exprt &pointer_expr, array_string_exprt &array);
+  void insert(const exprt &pointer_expr, const array_string_exprt &array);
 
   /// Creates a new array if the pointer is not pointing to an array
   const array_string_exprt &find(const exprt &pointer, const exprt &length);
