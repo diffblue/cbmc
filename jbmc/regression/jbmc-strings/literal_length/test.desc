@@ -1,0 +1,12 @@
+CORE
+test.class
+--function test.main --trace
+^EXIT=10$
+^SIGNAL=0$
+^\[.*assertion.1\].* line 6.* FAILURE$
+abc_constarray=\{ 'a', 'b', 'c' \}
+--
+--
+Check that the string literal used in the constructor is properly concretized
+in the trace even if it is not part of the equation.
+This is necessary for test generation.
