@@ -32,6 +32,15 @@ exprt array_poolt::get_length(const array_string_exprt &s) const
   return s.length();
 }
 
+optionalt<exprt>
+array_poolt::get_length_if_exists(const array_string_exprt &s) const
+{
+  auto find_result = length_of_array.find(s);
+  if(find_result != length_of_array.end())
+    return find_result->second;
+  return {};
+}
+
 array_string_exprt
 array_poolt::fresh_string(const typet &index_type, const typet &char_type)
 {
