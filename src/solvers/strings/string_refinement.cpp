@@ -977,8 +977,6 @@ static optionalt<exprt> get_array(
   size_val = simplify_expr(size_val, ns);
   const typet char_type = arr.type().subtype();
   const typet &index_type = size.type();
-  const array_typet empty_ret_type(char_type, from_integer(0, index_type));
-  const array_of_exprt empty_ret(from_integer(0, char_type), empty_ret_type);
 
   if(size_val.id() != ID_constant)
   {
