@@ -74,7 +74,7 @@ public:
   void insert(const exprt &pointer_expr, const array_string_exprt &array);
 
   /// Creates a new array if the pointer is not pointing to an array
-  const array_string_exprt &find(const exprt &pointer, const exprt &length);
+  array_string_exprt find(const exprt &pointer, const exprt &length);
 
   const std::unordered_map<array_string_exprt, exprt, irep_hash> &
   created_strings() const;
@@ -100,9 +100,6 @@ private:
 
   /// Generate fresh symbols
   symbol_generatort &fresh_symbol;
-
-  /// Strings created in the pool
-  std::set<array_string_exprt> created_strings_value;
 
   array_string_exprt make_char_array_for_char_pointer(
     const exprt &char_pointer,

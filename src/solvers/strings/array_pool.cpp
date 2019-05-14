@@ -56,7 +56,6 @@ array_poolt::fresh_string(const typet &index_type, const typet &char_type)
   array_typet array_type{char_type, infinity_exprt(index_type)};
   symbol_exprt content = fresh_symbol("string_content", array_type);
   array_string_exprt str = to_array_string_expr(content);
-  created_strings_value.insert(str);
   arrays_of_pointers.emplace(
     address_of_exprt(index_exprt(str, from_integer(0, index_type))), str);
 
@@ -156,7 +155,7 @@ void array_poolt::insert(
 {
   const auto it_bool =
     arrays_of_pointers.insert(std::make_pair(pointer_expr, array_expr));
-  created_strings_value.insert(array_expr);
+
   INVARIANT(
     it_bool.second, "should not associate two arrays to the same pointer");
 
@@ -171,13 +170,12 @@ array_poolt::created_strings() const
   return length_of_array;
 }
 
-const array_string_exprt &
-array_poolt::find(const exprt &pointer, const exprt &length)
+array_string_exprt array_poolt::find(const exprt &pointer, const exprt &length)
 {
   const array_typet array_type(pointer.type().subtype(), length);
   const array_string_exprt array =
     make_char_array_for_char_pointer(pointer, array_type);
-  return *created_strings_value.insert(array).first;
+  return array;
 }
 
 array_string_exprt of_argument(array_poolt &array_pool, const exprt &arg)
