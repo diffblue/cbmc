@@ -53,10 +53,12 @@ public:
     return arrays_of_pointers;
   }
 
-  /// Associate an actual finite length to infinite arrays
+  /// Get the length of an array_string_exprt from the array_pool. If the length
+  /// does not yet exist, create a new symbol and add it to the pool.
+  ///
   /// \param s: array expression representing a string
   /// \return expression for the length of `s`
-  exprt get_length(const array_string_exprt &s) const;
+  exprt get_length(const array_string_exprt &s);
 
   /// As opposed to get_length(), do not create a new symbol if the length
   /// of the array_string_exprt does not have one in the array_pool, but instead

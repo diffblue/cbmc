@@ -21,15 +21,17 @@ operator()(const irep_idt &prefix, const typet &type)
   return result;
 }
 
-exprt array_poolt::get_length(const array_string_exprt &s) const
+exprt array_poolt::get_length(const array_string_exprt &s)
 {
-  if(s.length() == infinity_exprt(s.length().type()))
+  auto emplace_result =
+    length_of_array.emplace(s, symbol_exprt(s.length_type()));
+  if(emplace_result.second)
   {
-    auto it = length_of_array.find(s);
-    if(it != length_of_array.end())
-      return it->second;
+    emplace_result.first->second =
+      fresh_symbol("string_length", s.length_type());
   }
-  return s.length();
+
+  return emplace_result.first->second;
 }
 
 optionalt<exprt>
