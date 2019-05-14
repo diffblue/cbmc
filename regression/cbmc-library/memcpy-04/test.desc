@@ -1,0 +1,11 @@
+CORE
+main.c
+
+^\[publish.assertion.1\] line 18 should pass: SUCCESS$
+^\[publish.assertion.2\] line 19 should fail: FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
