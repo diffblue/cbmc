@@ -1836,9 +1836,12 @@ exprt string_refinementt::get(const exprt &expr) const
     if(const auto arr_model_opt = get_array(super_get, ns, log.debug(), arr))
       return *arr_model_opt;
 
-    if(generator.array_pool.created_strings().count(arr))
+    if(
+      const auto &length_from_pool =
+        generator.array_pool.get_length_if_exists(arr))
     {
-      const exprt length = super_get(arr.length());
+      const exprt length = super_get(length_from_pool.value());
+
       if(const auto n = numeric_cast<std::size_t>(length))
       {
         const interval_sparse_arrayt sparse_array(
