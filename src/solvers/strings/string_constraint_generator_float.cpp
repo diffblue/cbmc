@@ -223,8 +223,8 @@ std::pair<exprt, string_constraintst> add_axioms_for_string_of_float(
   const mod_exprt fractional_part(shifted, max_non_exponent_notation);
   const array_string_exprt fractional_part_str =
     array_pool.fresh_string(index_type, char_type);
-  auto result1 =
-    add_axioms_for_fractional_part(fractional_part_str, fractional_part, 6);
+  auto result1 = add_axioms_for_fractional_part(
+    fractional_part_str, fractional_part, 6, array_pool);
 
   // The axiom added to convert to integer should always be satisfiable even
   // when the preconditions are not satisfied.
@@ -234,11 +234,11 @@ std::pair<exprt, string_constraintst> add_axioms_for_string_of_float(
   // part of the float.
   const array_string_exprt integer_part_str =
     array_pool.fresh_string(index_type, char_type);
-  auto result2 =
-    add_axioms_for_string_of_int(integer_part_str, integer_part, 8, ns);
+  auto result2 = add_axioms_for_string_of_int(
+    integer_part_str, integer_part, 8, ns, array_pool);
 
   auto result3 = add_axioms_for_concat(
-    fresh_symbol, res, integer_part_str, fractional_part_str);
+    fresh_symbol, res, integer_part_str, fractional_part_str, array_pool);
   merge(result3.second, std::move(result1.second));
   merge(result3.second, std::move(result2.second));
 
@@ -253,11 +253,13 @@ std::pair<exprt, string_constraintst> add_axioms_for_string_of_float(
 /// \param int_expr: an integer expression
 /// \param max_size: a maximal size for the string, this includes the
 ///   potential minus sign and therefore should be greater than 2
+/// \param array_pool: pool of arrays representing strings
 /// \return code 0 on success
 std::pair<exprt, string_constraintst> add_axioms_for_fractional_part(
   const array_string_exprt &res,
   const exprt &int_expr,
-  size_t max_size)
+  size_t max_size,
+  array_poolt &array_pool)
 {
   PRECONDITION(int_expr.type().id() == ID_signedbv);
   PRECONDITION(max_size >= 2);
@@ -462,7 +464,7 @@ std::pair<exprt, string_constraintst> add_axioms_from_float_scientific_notation(
   array_string_exprt string_expr_integer_part =
     array_pool.fresh_string(index_type, char_type);
   auto result1 = add_axioms_for_string_of_int(
-    string_expr_integer_part, dec_significand_int, 3, ns);
+    string_expr_integer_part, dec_significand_int, 3, ns, array_pool);
   minus_exprt fractional_part(
     dec_significand, floatbv_of_int_expr(dec_significand_int, float_spec));
 
@@ -482,7 +484,7 @@ std::pair<exprt, string_constraintst> add_axioms_from_float_scientific_notation(
   array_string_exprt string_fractional_part =
     array_pool.fresh_string(index_type, char_type);
   auto result2 = add_axioms_for_fractional_part(
-    string_fractional_part, fractional_part_shifted, 6);
+    string_fractional_part, fractional_part_shifted, 6, array_pool);
 
   // string_expr_with_fractional_part =
   //   concat(string_with_do, string_fractional_part)
@@ -492,29 +494,31 @@ std::pair<exprt, string_constraintst> add_axioms_from_float_scientific_notation(
     fresh_symbol,
     string_expr_with_fractional_part,
     string_expr_integer_part,
-    string_fractional_part);
+    string_fractional_part,
+    array_pool);
 
   // string_expr_with_E = concat(string_fraction, string_lit_E)
   const array_string_exprt stringE =
     array_pool.fresh_string(index_type, char_type);
-  auto result4 = add_axioms_for_constant(stringE, "E");
+  auto result4 = add_axioms_for_constant(stringE, "E", array_pool);
   const array_string_exprt string_expr_with_E =
     array_pool.fresh_string(index_type, char_type);
   auto result5 = add_axioms_for_concat(
     fresh_symbol,
     string_expr_with_E,
     string_expr_with_fractional_part,
-    stringE);
+    stringE,
+    array_pool);
 
   // exponent_string = string_of_int(decimal_exponent)
   const array_string_exprt exponent_string =
     array_pool.fresh_string(index_type, char_type);
-  auto result6 =
-    add_axioms_for_string_of_int(exponent_string, decimal_exponent, 3, ns);
+  auto result6 = add_axioms_for_string_of_int(
+    exponent_string, decimal_exponent, 3, ns, array_pool);
 
   // string_expr = concat(string_expr_with_E, exponent_string)
   auto result7 = add_axioms_for_concat(
-    fresh_symbol, res, string_expr_with_E, exponent_string);
+    fresh_symbol, res, string_expr_with_E, exponent_string, array_pool);
 
   const exprt return_code = maximum(
     result1.first,

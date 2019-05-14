@@ -77,9 +77,9 @@ std::pair<exprt, string_constraintst> add_axioms_for_set_length(
 /// Substring of a string between two indices
 ///
 // NOLINTNEXTLINE
-/// \copybrief add_axioms_for_substring(symbol_generatort &fresh_symbol, const array_string_exprt &res, const array_string_exprt &str, const exprt &start, const exprt &end)
+/// \copybrief add_axioms_for_substring(symbol_generatort &fresh_symbol, const array_string_exprt &res, const array_string_exprt &str, const exprt &start, const exprt &end, array_poolt &)
 // NOLINTNEXTLINE
-/// \link string_constraint_generatort::add_axioms_for_substring(symbol_generatort &fresh_symbol, const array_string_exprt &res, const array_string_exprt &str, const exprt &start, const exprt &end)
+/// \link string_constraint_generatort::add_axioms_for_substring(symbol_generatort &fresh_symbol, const array_string_exprt &res, const array_string_exprt &str, const exprt &start, const exprt &end, array_poolt &)
 ///   (More...) \endlink
 /// \warning The specification may not be correct for the case where the string
 /// is shorter than the end index
@@ -103,7 +103,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_substring(
   const array_string_exprt res = array_pool.find(args[1], args[0]);
   const exprt &i = args[3];
   const exprt j = args.size() == 5 ? args[4] : str.length();
-  return add_axioms_for_substring(fresh_symbol, res, str, i, j);
+  return add_axioms_for_substring(fresh_symbol, res, str, i, j, array_pool);
 }
 
 /// Add axioms ensuring that `res` corresponds to the substring of `str`
@@ -120,13 +120,15 @@ std::pair<exprt, string_constraintst> add_axioms_for_substring(
 /// \param str: array of characters expression
 /// \param start: integer expression
 /// \param end: integer expression
+/// \param array_pool: pool of arrays representing strings
 /// \return integer expression equal to zero
 std::pair<exprt, string_constraintst> add_axioms_for_substring(
   symbol_generatort &fresh_symbol,
   const array_string_exprt &res,
   const array_string_exprt &str,
   const exprt &start,
-  const exprt &end)
+  const exprt &end,
+  array_poolt &array_pool)
 {
   const typet &index_type = str.length_type();
   PRECONDITION(start.type() == index_type);
@@ -254,11 +256,13 @@ std::pair<exprt, string_constraintst> add_axioms_for_trim(
 /// \param get_string_expr: Function that yields an array_string_exprt
 ///   corresponding to either `expr1` or `expr2`, for the case where they are
 ///   not primitive chars.
+/// \param array_pool: pool of arrays representing strings
 /// \return Optional pair of two expressions
 static optionalt<std::pair<exprt, exprt>> to_char_pair(
   exprt expr1,
   exprt expr2,
-  std::function<array_string_exprt(const exprt &)> get_string_expr)
+  std::function<array_string_exprt(const exprt &)> get_string_expr,
+  array_poolt &array_pool)
 {
   if(
     (expr1.type().id() == ID_unsignedbv || expr1.type().id() == ID_char) &&
@@ -304,10 +308,11 @@ std::pair<exprt, string_constraintst> add_axioms_for_replace(
   array_string_exprt str = get_string_expr(array_pool, f.arguments()[2]);
   array_string_exprt res = array_pool.find(f.arguments()[1], f.arguments()[0]);
   if(
-    const auto maybe_chars =
-      to_char_pair(f.arguments()[3], f.arguments()[4], [&](const exprt &e) {
-        return get_string_expr(array_pool, e);
-      }))
+    const auto maybe_chars = to_char_pair(
+      f.arguments()[3],
+      f.arguments()[4],
+      [&](const exprt &e) { return get_string_expr(array_pool, e); },
+      array_pool))
   {
     const auto old_char = maybe_chars->first;
     const auto new_char = maybe_chars->second;
@@ -387,10 +392,16 @@ std::pair<exprt, string_constraintst> add_axioms_for_delete(
     array_pool.fresh_string(index_type, char_type);
   return combine_results(
     add_axioms_for_substring(
-      fresh_symbol, sub1, str, from_integer(0, str.length_type()), start),
+      fresh_symbol,
+      sub1,
+      str,
+      from_integer(0, str.length_type()),
+      start,
+      array_pool),
     combine_results(
-      add_axioms_for_substring(fresh_symbol, sub2, str, end, str.length()),
-      add_axioms_for_concat(fresh_symbol, res, sub1, sub2)));
+      add_axioms_for_substring(
+        fresh_symbol, sub2, str, end, str.length(), array_pool),
+      add_axioms_for_concat(fresh_symbol, res, sub1, sub2, array_pool)));
 }
 
 /// Remove a portion of a string

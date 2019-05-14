@@ -34,6 +34,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 /// \param s2: an array of characters expression
 /// \param start_index: integer expression
 /// \param end_index: integer expression
+/// \param array_pool: pool of arrays representing strings
 /// \return integer expression `0`
 std::pair<exprt, string_constraintst> add_axioms_for_concat_substr(
   symbol_generatort &fresh_symbol,
@@ -41,7 +42,8 @@ std::pair<exprt, string_constraintst> add_axioms_for_concat_substr(
   const array_string_exprt &s1,
   const array_string_exprt &s2,
   const exprt &start_index,
-  const exprt &end_index)
+  const exprt &end_index,
+  array_poolt &array_pool)
 {
   string_constraintst constraints;
   const typet &index_type = start_index.type();
@@ -49,8 +51,8 @@ std::pair<exprt, string_constraintst> add_axioms_for_concat_substr(
   const exprt end1 = maximum(minimum(end_index, s2.length()), start1);
 
   // Axiom 1.
-  constraints.existential.push_back(
-    length_constraint_for_concat_substr(res, s1, s2, start_index, end_index));
+  constraints.existential.push_back(length_constraint_for_concat_substr(
+    res, s1, s2, start_index, end_index, array_pool));
 
   // Axiom 2.
   constraints.universal.push_back([&] {
@@ -82,7 +84,8 @@ exprt length_constraint_for_concat_substr(
   const array_string_exprt &s1,
   const array_string_exprt &s2,
   const exprt &start,
-  const exprt &end)
+  const exprt &end,
+  array_poolt &array_pool)
 {
   PRECONDITION(res.length_type().id() == ID_signedbv);
   const exprt start1 = maximum(start, from_integer(0, start.type()));
@@ -98,7 +101,8 @@ exprt length_constraint_for_concat_substr(
 exprt length_constraint_for_concat(
   const array_string_exprt &res,
   const array_string_exprt &s1,
-  const array_string_exprt &s2)
+  const array_string_exprt &s2,
+  array_poolt &array_pool)
 {
   return equal_exprt(res.length(), plus_exprt(s1.length(), s2.length()));
 }
@@ -107,7 +111,8 @@ exprt length_constraint_for_concat(
 /// of `s1` with
 exprt length_constraint_for_concat_char(
   const array_string_exprt &res,
-  const array_string_exprt &s1)
+  const array_string_exprt &s1,
+  array_poolt &array_pool)
 {
   return equal_exprt(
     res.length(), plus_exprt(s1.length(), from_integer(1, s1.length_type())));
@@ -121,16 +126,24 @@ exprt length_constraint_for_concat_char(
 /// \param res: string_expression corresponding to the result
 /// \param s1: the string expression to append to
 /// \param s2: the string expression to append to the first one
+/// \param array_pool: pool of arrays representing strings
 /// \return an integer expression
 std::pair<exprt, string_constraintst> add_axioms_for_concat(
   symbol_generatort &fresh_symbol,
   const array_string_exprt &res,
   const array_string_exprt &s1,
-  const array_string_exprt &s2)
+  const array_string_exprt &s2,
+  array_poolt &array_pool)
 {
   exprt index_zero = from_integer(0, s2.length_type());
   return add_axioms_for_concat_substr(
-    fresh_symbol, res, s1, s2, index_zero, s2.length());
+    fresh_symbol,
+    res,
+    s1,
+    s2,
+    index_zero,
+    array_pool.get_length(s2),
+    array_pool);
 }
 
 /// Add axioms corresponding to the StringBuilder.appendCodePoint(I) function
@@ -153,6 +166,6 @@ std::pair<exprt, string_constraintst> add_axioms_for_concat_code_point(
   const array_string_exprt code_point =
     array_pool.fresh_string(index_type, char_type);
   return combine_results(
-    add_axioms_for_code_point(code_point, f.arguments()[3]),
-    add_axioms_for_concat(fresh_symbol, res, s1, code_point));
+    add_axioms_for_code_point(code_point, f.arguments()[3], array_pool),
+    add_axioms_for_concat(fresh_symbol, res, s1, code_point, array_pool));
 }

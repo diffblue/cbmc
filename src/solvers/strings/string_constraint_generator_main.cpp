@@ -125,6 +125,7 @@ void merge(string_constraintst &result, string_constraintst other)
 /// \param char_set: a string of the form "<low_char>-<high_char>" where
 ///   `<low_char>` and `<high_char>` are two characters, which represents the
 ///   set of characters that are between `low_char` and `high_char`.
+/// \param array_pool: pool of arrays representing strings
 /// \return a string expression that is linked to the argument through axioms
 ///   that are added to the list
 string_constraintst add_constraint_on_characters(
@@ -132,7 +133,8 @@ string_constraintst add_constraint_on_characters(
   const array_string_exprt &s,
   const exprt &start,
   const exprt &end,
-  const std::string &char_set)
+  const std::string &char_set,
+  array_poolt &array_pool)
 {
   // Parse char_set
   PRECONDITION(char_set.length() == 3);
@@ -179,7 +181,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_constrain_characters(
     args.size() >= 4 ? args[3] : from_integer(0, s.length_type());
   const exprt &end = args.size() >= 5 ? args[4] : s.length();
   auto constraints = add_constraint_on_characters(
-    fresh_symbol, s, start, end, char_set_string.c_str());
+    fresh_symbol, s, start, end, char_set_string.c_str(), array_pool);
   return {from_integer(0, get_return_code_type()), std::move(constraints)};
 }
 
@@ -341,7 +343,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_copy(
   const exprt offset = args.size() == 3 ? from_integer(0, index_type) : args[3];
   const exprt count = args.size() == 3 ? str.length() : args[4];
   return add_axioms_for_substring(
-    fresh_symbol, res, str, offset, plus_exprt(offset, count));
+    fresh_symbol, res, str, offset, plus_exprt(offset, count), array_pool);
 }
 
 /// Length of a string

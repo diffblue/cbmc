@@ -18,11 +18,13 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 /// equal.
 /// \param res: array of characters for the result
 /// \param sval: a string constant
+/// \param array_pool: pool of arrays representing strings
 /// \param guard: condition under which the axiom should apply, true by default
 /// \return integer expression equal to zero
 std::pair<exprt, string_constraintst> add_axioms_for_constant(
   const array_string_exprt &res,
   irep_idt sval,
+  array_poolt &array_pool,
   const exprt &guard)
 {
   string_constraintst constraints;
@@ -75,6 +77,7 @@ add_axioms_for_empty_string(const function_application_exprt &f)
 /// \param res: string expression for the result
 /// \param arg: expression of type string typet
 /// \param guard: condition under which `res` should be equal to arg
+/// \param array_pool: pool of arrays representing strings
 /// \return 0 if constraints were added, 1 if expression could not be handled
 ///   and no constraint was added. Expression we can handle are of the form
 ///   \f$ e := "<string constant>" | (expr)? e : e \f$
@@ -82,7 +85,8 @@ std::pair<exprt, string_constraintst> add_axioms_for_cprover_string(
   symbol_generatort &fresh_symbol,
   const array_string_exprt &res,
   const exprt &arg,
-  const exprt &guard)
+  const exprt &guard,
+  array_poolt &array_pool)
 {
   if(const auto if_expr = expr_try_dynamic_cast<if_exprt>(arg))
   {
@@ -90,12 +94,13 @@ std::pair<exprt, string_constraintst> add_axioms_for_cprover_string(
     const and_exprt guard_false(guard, not_exprt(if_expr->cond()));
     return combine_results(
       add_axioms_for_cprover_string(
-        fresh_symbol, res, if_expr->true_case(), guard_true),
+        fresh_symbol, res, if_expr->true_case(), guard_true, array_pool),
       add_axioms_for_cprover_string(
-        fresh_symbol, res, if_expr->false_case(), guard_false));
+        fresh_symbol, res, if_expr->false_case(), guard_false, array_pool));
   }
   else if(const auto constant_expr = expr_try_dynamic_cast<constant_exprt>(arg))
-    return add_axioms_for_constant(res, constant_expr->get_value(), guard);
+    return add_axioms_for_constant(
+      res, constant_expr->get_value(), array_pool, guard);
   else
     return {from_integer(1, get_return_code_type()), {}};
 }
@@ -119,5 +124,5 @@ std::pair<exprt, string_constraintst> add_axioms_from_literal(
   PRECONDITION(args.size() == 3); // Bad args to string literal?
   const array_string_exprt res = array_pool.find(args[1], args[0]);
   return add_axioms_for_cprover_string(
-    fresh_symbol, res, args[2], true_exprt());
+    fresh_symbol, res, args[2], true_exprt(), array_pool);
 }

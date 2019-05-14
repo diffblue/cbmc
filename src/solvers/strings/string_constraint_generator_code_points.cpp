@@ -16,10 +16,12 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 /// code point to a utf-16 string
 /// \param res: array of characters corresponding to the result fo the function
 /// \param code_point: an expression representing a java code point
+/// \param array_pool: pool of arrays representing strings
 /// \return integer expression equal to zero
 std::pair<exprt, string_constraintst> add_axioms_for_code_point(
   const array_string_exprt &res,
-  const exprt &code_point)
+  const exprt &code_point,
+  array_poolt &array_pool)
 {
   string_constraintst constraints;
   const typet &char_type = res.content().type().subtype();

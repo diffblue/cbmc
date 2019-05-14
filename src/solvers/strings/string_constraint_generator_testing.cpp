@@ -34,12 +34,14 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 /// \param prefix: an array of characters
 /// \param str: an array of characters
 /// \param offset: an integer
+/// \param array_pool: pool of arrays representing strings
 /// \return Boolean expression `isprefix`
 std::pair<exprt, string_constraintst> add_axioms_for_is_prefix(
   symbol_generatort &fresh_symbol,
   const array_string_exprt &prefix,
   const array_string_exprt &str,
-  const exprt &offset)
+  const exprt &offset,
+  array_poolt &array_pool)
 {
   string_constraintst constraints;
   const symbol_exprt isprefix = fresh_symbol("isprefix");
@@ -113,7 +115,8 @@ std::pair<exprt, string_constraintst> add_axioms_for_is_prefix(
     get_string_expr(array_pool, args[swap_arguments ? 0u : 1u]);
   const exprt offset =
     args.size() == 2 ? from_integer(0, s0.length_type()) : args[2];
-  auto pair = add_axioms_for_is_prefix(fresh_symbol, s0, s1, offset);
+  auto pair =
+    add_axioms_for_is_prefix(fresh_symbol, s0, s1, offset, array_pool);
   return {typecast_exprt(pair.first, f.type()), std::move(pair.second)};
 }
 
