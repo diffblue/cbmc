@@ -95,7 +95,7 @@ refined_string_exprt make_refined_string_exprt(
   array_poolt &array_pool)
 {
   return refined_string_exprt(
-    array_pool.get_length(arr), get_data_pointer(arr));
+    array_pool.get_or_create_length(arr), get_data_pointer(arr));
 }
 
 /// For a constant `string_exprt`, creates a full index set.

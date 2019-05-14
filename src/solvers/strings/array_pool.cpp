@@ -21,13 +21,14 @@ operator()(const irep_idt &prefix, const typet &type)
   return result;
 }
 
-exprt array_poolt::get_length(const array_string_exprt &s)
+exprt array_poolt::get_or_create_length(const array_string_exprt &s)
 {
   if(const auto &if_expr = expr_try_dynamic_cast<if_exprt>((exprt)s))
   {
-    return if_exprt{if_expr->cond(),
-                    get_length(to_array_string_expr(if_expr->true_case())),
-                    get_length(to_array_string_expr(if_expr->false_case()))};
+    return if_exprt{
+      if_expr->cond(),
+      get_or_create_length(to_array_string_expr(if_expr->true_case())),
+      get_or_create_length(to_array_string_expr(if_expr->false_case()))};
   }
 
   auto emplace_result =
@@ -60,7 +61,7 @@ array_poolt::fresh_string(const typet &index_type, const typet &char_type)
     address_of_exprt(index_exprt(str, from_integer(0, index_type))), str);
 
   // add length to length_of_array map
-  get_length(str);
+  get_or_create_length(str);
 
   return str;
 }
@@ -111,7 +112,7 @@ array_string_exprt array_poolt::make_char_array_for_char_pointer(
     arrays_of_pointers.insert({char_pointer, array_sym});
 
   // add length to length_of_array map
-  get_length(array_sym);
+  get_or_create_length(array_sym);
 
   return to_array_string_expr(insert_result.first->second);
 }

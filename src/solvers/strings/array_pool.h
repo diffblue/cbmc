@@ -62,7 +62,7 @@ public:
   /// each of the parts.
   /// \param s: array expression representing a string
   /// \return expression for the length of `s`
-  exprt get_length(const array_string_exprt &s);
+  exprt get_or_create_length(const array_string_exprt &s);
 
   /// As opposed to get_length(), do not create a new symbol if the length
   /// of the array_string_exprt does not have one in the array_pool, but instead

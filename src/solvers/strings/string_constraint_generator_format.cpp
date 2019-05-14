@@ -249,7 +249,7 @@ static std::vector<format_elementt> parse_format_string(std::string s)
 static exprt is_null(const array_string_exprt &string, array_poolt &array_pool)
 {
   return and_exprt{
-    equal_exprt{array_pool.get_length(string),
+    equal_exprt{array_pool.get_or_create_length(string),
                 from_integer(4, string.length_type())},
     and_exprt{equal_exprt{string[0], from_integer('n', string[0].type())},
               equal_exprt{string[1], from_integer('u', string[0].type())},
@@ -328,7 +328,7 @@ add_axioms_for_format_specifier(
     // and otherwise we just take the 4th character of the string.
     const exprt is_null_literal = is_null(string_expr, array_pool);
     constraints.existential.push_back(
-      equal_exprt{array_pool.get_length(res),
+      equal_exprt{array_pool.get_or_create_length(res),
                   if_exprt{is_null_literal,
                            from_integer(4, index_type),
                            from_integer(1, index_type)}});
@@ -554,8 +554,8 @@ std::pair<exprt, string_constraintst> add_axioms_for_format(
 
   if(intermediary_strings.empty())
   {
-    constraints.existential.push_back(
-      equal_exprt(array_pool.get_length(res), from_integer(0, index_type)));
+    constraints.existential.push_back(equal_exprt(
+      array_pool.get_or_create_length(res), from_integer(0, index_type)));
     return {return_code, constraints};
   }
 
@@ -569,7 +569,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_format(
       res,
       str,
       from_integer(0, index_type),
-      array_pool.get_length(str),
+      array_pool.get_or_create_length(str),
       array_pool);
     merge(constraints, std::move(result.second));
     return {result.first, std::move(constraints)};
@@ -640,11 +640,11 @@ std::pair<exprt, string_constraintst> add_axioms_for_format(
   const array_string_exprt s1 = get_string_expr(array_pool, f.arguments()[2]);
 
   if(
-    array_pool.get_length(s1).id() == ID_constant &&
+    array_pool.get_or_create_length(s1).id() == ID_constant &&
     s1.content().id() == ID_array)
   {
-    const auto length =
-      numeric_cast_v<std::size_t>(to_constant_expr(array_pool.get_length(s1)));
+    const auto length = numeric_cast_v<std::size_t>(
+      to_constant_expr(array_pool.get_or_create_length(s1)));
     std::string s =
       utf16_constant_array_to_java(to_array_expr(s1.content()), length);
     // List of arguments after s

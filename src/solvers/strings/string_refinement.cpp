@@ -743,7 +743,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
   // All generated strings should have non-negative length
   for(const auto &pair : generator.array_pool.created_strings())
   {
-    exprt length = generator.array_pool.get_length(pair.first);
+    exprt length = generator.array_pool.get_or_create_length(pair.first);
     add_lemma(
       binary_relation_exprt{length, ID_ge, from_integer(0, length.type())});
   }

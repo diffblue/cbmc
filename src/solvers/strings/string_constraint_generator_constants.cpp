@@ -28,7 +28,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_constant(
   const exprt &guard)
 {
   string_constraintst constraints;
-  const typet index_type = array_pool.get_length(res).type();
+  const typet index_type = array_pool.get_or_create_length(res).type();
   const typet &char_type = res.content().type().subtype();
   std::string c_str = id2string(sval);
   std::wstring str;
@@ -52,8 +52,8 @@ std::pair<exprt, string_constraintst> add_axioms_for_constant(
 
   const exprt s_length = from_integer(str.size(), index_type);
 
-  constraints.existential.push_back(
-    implies_exprt(guard, equal_exprt(array_pool.get_length(res), s_length)));
+  constraints.existential.push_back(implies_exprt(
+    guard, equal_exprt(array_pool.get_or_create_length(res), s_length)));
   return {from_integer(0, get_return_code_type()), std::move(constraints)};
 }
 

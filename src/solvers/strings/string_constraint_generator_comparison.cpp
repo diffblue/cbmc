@@ -47,14 +47,17 @@ std::pair<exprt, string_constraintst> add_axioms_for_equals(
 
   // Axiom 1.
   constraints.existential.push_back(implies_exprt(
-    eq, equal_exprt(array_pool.get_length(s1), array_pool.get_length(s2))));
+    eq,
+    equal_exprt(
+      array_pool.get_or_create_length(s1),
+      array_pool.get_or_create_length(s2))));
 
   // Axiom 2.
   constraints.universal.push_back([&] {
     const symbol_exprt qvar = fresh_symbol("QA_equal", index_type);
     return string_constraintt(
       qvar,
-      zero_if_negative(array_pool.get_length(s1)),
+      zero_if_negative(array_pool.get_or_create_length(s1)),
       implies_exprt(eq, equal_exprt(s1[qvar], s2[qvar])));
   }());
 
@@ -63,12 +66,15 @@ std::pair<exprt, string_constraintst> add_axioms_for_equals(
     const symbol_exprt witness = fresh_symbol("witness_unequal", index_type);
     const exprt zero = from_integer(0, index_type);
     const and_exprt bound_witness(
-      binary_relation_exprt(witness, ID_lt, array_pool.get_length(s1)),
+      binary_relation_exprt(
+        witness, ID_lt, array_pool.get_or_create_length(s1)),
       binary_relation_exprt(witness, ID_ge, zero));
     const and_exprt witnessing(
       bound_witness, notequal_exprt(s1[witness], s2[witness]));
     const and_exprt diff_length(
-      notequal_exprt(array_pool.get_length(s1), array_pool.get_length(s2)),
+      notequal_exprt(
+        array_pool.get_or_create_length(s1),
+        array_pool.get_or_create_length(s2)),
       equal_exprt(witness, from_integer(-1, index_type)));
     return implies_exprt(not_exprt(eq), or_exprt(diff_length, witnessing));
   }());
@@ -148,7 +154,10 @@ std::pair<exprt, string_constraintst> add_axioms_for_equals_ignore_case(
   const typet index_type = s1.length_type();
 
   const implies_exprt a1(
-    eq, equal_exprt(array_pool.get_length(s1), array_pool.get_length(s2)));
+    eq,
+    equal_exprt(
+      array_pool.get_or_create_length(s1),
+      array_pool.get_or_create_length(s2)));
   constraints.existential.push_back(a1);
 
   const symbol_exprt qvar = fresh_symbol("QA_equal_ignore_case", index_type);
@@ -156,7 +165,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_equals_ignore_case(
     character_equals_ignore_case(s1[qvar], s2[qvar], char_a, char_A, char_Z);
   const string_constraintt a2(
     qvar,
-    zero_if_negative(array_pool.get_length(s1)),
+    zero_if_negative(array_pool.get_or_create_length(s1)),
     implies_exprt(eq, constr2));
   constraints.universal.push_back(a2);
 
@@ -164,7 +173,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_equals_ignore_case(
     fresh_symbol("witness_unequal_ignore_case", index_type);
   const exprt zero = from_integer(0, witness.type());
   const and_exprt bound_witness(
-    binary_relation_exprt(witness, ID_lt, array_pool.get_length(s1)),
+    binary_relation_exprt(witness, ID_lt, array_pool.get_or_create_length(s1)),
     binary_relation_exprt(witness, ID_ge, zero));
   const exprt witness_eq = character_equals_ignore_case(
     s1[witness], s2[witness], char_a, char_A, char_Z);
@@ -172,7 +181,9 @@ std::pair<exprt, string_constraintst> add_axioms_for_equals_ignore_case(
   const implies_exprt a3(
     not_exprt(eq),
     or_exprt(
-      notequal_exprt(array_pool.get_length(s1), array_pool.get_length(s2)),
+      notequal_exprt(
+        array_pool.get_or_create_length(s1),
+        array_pool.get_or_create_length(s2)),
       and_exprt(bound_witness, witness_diff)));
   constraints.existential.push_back(a3);
 
@@ -217,13 +228,15 @@ std::pair<exprt, string_constraintst> add_axioms_for_compare_to(
   const equal_exprt res_null(res, from_integer(0, return_type));
   const implies_exprt a1(
     res_null,
-    equal_exprt(array_pool.get_length(s1), array_pool.get_length(s2)));
+    equal_exprt(
+      array_pool.get_or_create_length(s1),
+      array_pool.get_or_create_length(s2)));
   constraints.existential.push_back(a1);
 
   const symbol_exprt i = fresh_symbol("QA_compare_to", index_type);
   const string_constraintt a2(
     i,
-    zero_if_negative(array_pool.get_length(s1)),
+    zero_if_negative(array_pool.get_or_create_length(s1)),
     implies_exprt(res_null, equal_exprt(s1[i], s2[i])));
   constraints.universal.push_back(a2);
 
@@ -235,24 +248,31 @@ std::pair<exprt, string_constraintst> add_axioms_for_compare_to(
   const equal_exprt ret_length_diff(
     res,
     minus_exprt(
-      typecast_exprt(array_pool.get_length(s1), return_type),
-      typecast_exprt(array_pool.get_length(s2), return_type)));
+      typecast_exprt(array_pool.get_or_create_length(s1), return_type),
+      typecast_exprt(array_pool.get_or_create_length(s2), return_type)));
   const or_exprt guard1(
     and_exprt(
       less_than_or_equal_to(
-        array_pool.get_length(s1), array_pool.get_length(s2)),
-      greater_than(array_pool.get_length(s1), x)),
+        array_pool.get_or_create_length(s1),
+        array_pool.get_or_create_length(s2)),
+      greater_than(array_pool.get_or_create_length(s1), x)),
     and_exprt(
-      greater_or_equal_to(array_pool.get_length(s1), array_pool.get_length(s2)),
-      greater_than(array_pool.get_length(s2), x)));
+      greater_or_equal_to(
+        array_pool.get_or_create_length(s1),
+        array_pool.get_or_create_length(s2)),
+      greater_than(array_pool.get_or_create_length(s2), x)));
   const and_exprt cond1(ret_char_diff, guard1);
   const or_exprt guard2(
     and_exprt(
-      greater_than(array_pool.get_length(s2), array_pool.get_length(s1)),
-      equal_to(array_pool.get_length(s1), x)),
+      greater_than(
+        array_pool.get_or_create_length(s2),
+        array_pool.get_or_create_length(s1)),
+      equal_to(array_pool.get_or_create_length(s1), x)),
     and_exprt(
-      greater_than(array_pool.get_length(s1), array_pool.get_length(s2)),
-      equal_to(array_pool.get_length(s2), x)));
+      greater_than(
+        array_pool.get_or_create_length(s1),
+        array_pool.get_or_create_length(s2)),
+      equal_to(array_pool.get_or_create_length(s2), x)));
   const and_exprt cond2(ret_length_diff, guard2);
 
   const implies_exprt a3(

@@ -48,11 +48,11 @@ std::pair<exprt, string_constraintst> add_axioms_for_is_prefix(
   const typet &index_type = str.length_type();
   const exprt offset_within_bounds = and_exprt(
     binary_relation_exprt(offset, ID_ge, from_integer(0, offset.type())),
-    binary_relation_exprt(offset, ID_le, array_pool.get_length(str)),
+    binary_relation_exprt(offset, ID_le, array_pool.get_or_create_length(str)),
     binary_relation_exprt(
-      minus_exprt(array_pool.get_length(str), offset),
+      minus_exprt(array_pool.get_or_create_length(str), offset),
       ID_ge,
-      array_pool.get_length(prefix)));
+      array_pool.get_or_create_length(prefix)));
 
   // Axiom 1.
   constraints.existential.push_back(
@@ -65,7 +65,8 @@ std::pair<exprt, string_constraintst> add_axioms_for_is_prefix(
       isprefix, equal_exprt(str[plus_exprt(qvar, offset)], prefix[qvar]));
     return string_constraintt(
       qvar,
-      maximum(from_integer(0, index_type), array_pool.get_length(prefix)),
+      maximum(
+        from_integer(0, index_type), array_pool.get_or_create_length(prefix)),
       body);
   }());
 
@@ -74,13 +75,13 @@ std::pair<exprt, string_constraintst> add_axioms_for_is_prefix(
     const exprt witness = fresh_symbol("witness_not_isprefix", index_type);
     const exprt strings_differ_at_witness = and_exprt(
       is_positive(witness),
-      greater_than(array_pool.get_length(prefix), witness),
+      greater_than(array_pool.get_or_create_length(prefix), witness),
       notequal_exprt(str[plus_exprt(witness, offset)], prefix[witness]));
     const exprt s1_does_not_start_with_s0 = or_exprt(
       not_exprt(offset_within_bounds),
       not_exprt(greater_or_equal_to(
-        array_pool.get_length(str),
-        plus_exprt(array_pool.get_length(prefix), offset))),
+        array_pool.get_or_create_length(str),
+        plus_exprt(array_pool.get_or_create_length(prefix), offset))),
       strings_differ_at_witness);
     return implies_exprt(not_exprt(isprefix), s1_does_not_start_with_s0);
   }());
@@ -148,8 +149,8 @@ std::pair<exprt, string_constraintst> add_axioms_for_is_empty(
   array_string_exprt s0 = get_string_expr(array_pool, f.arguments()[0]);
   string_constraintst constraints;
   constraints.existential = {
-    implies_exprt(is_empty, equal_to(array_pool.get_length(s0), 0)),
-    implies_exprt(equal_to(array_pool.get_length(s0), 0), is_empty)};
+    implies_exprt(is_empty, equal_to(array_pool.get_or_create_length(s0), 0)),
+    implies_exprt(equal_to(array_pool.get_or_create_length(s0), 0), is_empty)};
   return {typecast_exprt(is_empty, f.type()), std::move(constraints)};
 }
 
@@ -198,29 +199,39 @@ std::pair<exprt, string_constraintst> add_axioms_for_is_suffix(
 
   implies_exprt a1(
     issuffix,
-    greater_or_equal_to(array_pool.get_length(s1), array_pool.get_length(s0)));
+    greater_or_equal_to(
+      array_pool.get_or_create_length(s1),
+      array_pool.get_or_create_length(s0)));
   constraints.existential.push_back(a1);
 
   symbol_exprt qvar = fresh_symbol("QA_suffix", index_type);
   const plus_exprt qvar_shifted(
-    qvar, minus_exprt(array_pool.get_length(s1), array_pool.get_length(s0)));
+    qvar,
+    minus_exprt(
+      array_pool.get_or_create_length(s1),
+      array_pool.get_or_create_length(s0)));
   string_constraintt a2(
     qvar,
-    zero_if_negative(array_pool.get_length(s0)),
+    zero_if_negative(array_pool.get_or_create_length(s0)),
     implies_exprt(issuffix, equal_exprt(s0[qvar], s1[qvar_shifted])));
   constraints.universal.push_back(a2);
 
   symbol_exprt witness = fresh_symbol("witness_not_suffix", index_type);
   const plus_exprt shifted(
-    witness, minus_exprt(array_pool.get_length(s1), array_pool.get_length(s0)));
+    witness,
+    minus_exprt(
+      array_pool.get_or_create_length(s1),
+      array_pool.get_or_create_length(s0)));
   or_exprt constr3(
     and_exprt(
-      greater_than(array_pool.get_length(s0), array_pool.get_length(s1)),
+      greater_than(
+        array_pool.get_or_create_length(s0),
+        array_pool.get_or_create_length(s1)),
       equal_exprt(witness, from_integer(-1, index_type))),
     and_exprt(
       notequal_exprt(s0[witness], s1[shifted]),
       and_exprt(
-        greater_than(array_pool.get_length(s0), witness),
+        greater_than(array_pool.get_or_create_length(s0), witness),
         is_positive(witness))));
   implies_exprt a3(not_exprt(issuffix), constr3);
 
@@ -264,10 +275,13 @@ std::pair<exprt, string_constraintst> add_axioms_for_contains(
 
   const implies_exprt a1(
     contains,
-    greater_or_equal_to(array_pool.get_length(s0), array_pool.get_length(s1)));
+    greater_or_equal_to(
+      array_pool.get_or_create_length(s0),
+      array_pool.get_or_create_length(s1)));
   constraints.existential.push_back(a1);
 
-  minus_exprt length_diff(array_pool.get_length(s0), array_pool.get_length(s1));
+  minus_exprt length_diff(
+    array_pool.get_or_create_length(s0), array_pool.get_or_create_length(s1));
   and_exprt bounds(
     is_positive(startpos), binary_relation_exprt(startpos, ID_le, length_diff));
   implies_exprt a2(contains, bounds);
@@ -281,7 +295,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_contains(
   const plus_exprt qvar_shifted(qvar, startpos);
   string_constraintt a4(
     qvar,
-    zero_if_negative(array_pool.get_length(s1)),
+    zero_if_negative(array_pool.get_or_create_length(s1)),
     implies_exprt(contains, equal_exprt(s1[qvar], s0[qvar_shifted])));
   constraints.universal.push_back(a4);
 
@@ -291,9 +305,10 @@ std::pair<exprt, string_constraintst> add_axioms_for_contains(
     and_exprt(
       not_exprt(contains),
       greater_or_equal_to(
-        array_pool.get_length(s0), array_pool.get_length(s1))),
+        array_pool.get_or_create_length(s0),
+        array_pool.get_or_create_length(s1))),
     from_integer(0, index_type),
-    array_pool.get_length(s1),
+    array_pool.get_or_create_length(s1),
     s0,
     s1};
   constraints.not_contains.push_back(a5);

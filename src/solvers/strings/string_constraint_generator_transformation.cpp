@@ -54,20 +54,21 @@ std::pair<exprt, string_constraintst> add_axioms_for_set_length(
   // a2 : forall i< min(|s1|, k) .res[i] = s1[i]
   // a3 : forall |s1| <= i < |res|. res[i] = 0
 
-  constraints.existential.push_back(equal_to(array_pool.get_length(res), k));
+  constraints.existential.push_back(
+    equal_to(array_pool.get_or_create_length(res), k));
 
   const symbol_exprt idx = fresh_symbol("QA_index_set_length", index_type);
   const string_constraintt a2(
     idx,
-    zero_if_negative(minimum(array_pool.get_length(s1), k)),
+    zero_if_negative(minimum(array_pool.get_or_create_length(s1), k)),
     equal_exprt(s1[idx], res[idx]));
   constraints.universal.push_back(a2);
 
   symbol_exprt idx2 = fresh_symbol("QA_index_set_length2", index_type);
   string_constraintt a3(
     idx2,
-    zero_if_negative(array_pool.get_length(s1)),
-    zero_if_negative(array_pool.get_length(res)),
+    zero_if_negative(array_pool.get_or_create_length(s1)),
+    zero_if_negative(array_pool.get_or_create_length(res)),
     equal_exprt(res[idx2], from_integer(0, char_type)));
   constraints.universal.push_back(a3);
 
@@ -102,7 +103,8 @@ std::pair<exprt, string_constraintst> add_axioms_for_substring(
   const array_string_exprt str = get_string_expr(array_pool, args[2]);
   const array_string_exprt res = array_pool.find(args[1], args[0]);
   const exprt &i = args[3];
-  const exprt j = args.size() == 5 ? args[4] : array_pool.get_length(str);
+  const exprt j =
+    args.size() == 5 ? args[4] : array_pool.get_or_create_length(str);
   return add_axioms_for_substring(fresh_symbol, res, str, i, j, array_pool);
 }
 
@@ -136,18 +138,19 @@ std::pair<exprt, string_constraintst> add_axioms_for_substring(
 
   string_constraintst constraints;
   const exprt start1 = maximum(start, from_integer(0, start.type()));
-  const exprt end1 = maximum(minimum(end, array_pool.get_length(str)), start1);
+  const exprt end1 =
+    maximum(minimum(end, array_pool.get_or_create_length(str)), start1);
 
   // Axiom 1.
-  constraints.existential.push_back(
-    equal_exprt(array_pool.get_length(res), minus_exprt(end1, start1)));
+  constraints.existential.push_back(equal_exprt(
+    array_pool.get_or_create_length(res), minus_exprt(end1, start1)));
 
   // Axiom 2.
   constraints.universal.push_back([&] {
     const symbol_exprt idx = fresh_symbol("QA_index_substring", index_type);
     return string_constraintt(
       idx,
-      zero_if_negative(array_pool.get_length(res)),
+      zero_if_negative(array_pool.get_or_create_length(res)),
       equal_exprt(res[idx], str[plus_exprt(start1, idx)]));
   }());
 
@@ -199,20 +202,22 @@ std::pair<exprt, string_constraintst> add_axioms_for_trim(
 
   // Axiom 1.
   constraints.existential.push_back(greater_or_equal_to(
-    array_pool.get_length(str), plus_exprt(idx, array_pool.get_length(res))));
+    array_pool.get_or_create_length(str),
+    plus_exprt(idx, array_pool.get_or_create_length(res))));
 
   binary_relation_exprt a2(idx, ID_ge, from_integer(0, index_type));
   constraints.existential.push_back(a2);
 
-  const exprt a3 = greater_or_equal_to(array_pool.get_length(str), idx);
+  const exprt a3 =
+    greater_or_equal_to(array_pool.get_or_create_length(str), idx);
   constraints.existential.push_back(a3);
 
   const exprt a4 = greater_or_equal_to(
-    array_pool.get_length(res), from_integer(0, index_type));
+    array_pool.get_or_create_length(res), from_integer(0, index_type));
   constraints.existential.push_back(a4);
 
   const exprt a5 = less_than_or_equal_to(
-    array_pool.get_length(res), array_pool.get_length(str));
+    array_pool.get_or_create_length(res), array_pool.get_or_create_length(str));
   constraints.existential.push_back(a5);
 
   symbol_exprt n = fresh_symbol("QA_index_trim", index_type);
@@ -224,9 +229,11 @@ std::pair<exprt, string_constraintst> add_axioms_for_trim(
   constraints.universal.push_back([&] {
     const symbol_exprt n2 = fresh_symbol("QA_index_trim2", index_type);
     const minus_exprt bound(
-      minus_exprt(array_pool.get_length(str), idx), array_pool.get_length(res));
+      minus_exprt(array_pool.get_or_create_length(str), idx),
+      array_pool.get_or_create_length(res));
     const binary_relation_exprt eqn2(
-      str[plus_exprt(idx, plus_exprt(array_pool.get_length(res), n2))],
+      str[plus_exprt(
+        idx, plus_exprt(array_pool.get_or_create_length(res), n2))],
       ID_le,
       space_char);
     return string_constraintt(n2, zero_if_negative(bound), eqn2);
@@ -234,18 +241,20 @@ std::pair<exprt, string_constraintst> add_axioms_for_trim(
 
   symbol_exprt n3 = fresh_symbol("QA_index_trim3", index_type);
   equal_exprt eqn3(res[n3], str[plus_exprt(n3, idx)]);
-  string_constraintt a8(n3, zero_if_negative(array_pool.get_length(res)), eqn3);
+  string_constraintt a8(
+    n3, zero_if_negative(array_pool.get_or_create_length(res)), eqn3);
   constraints.universal.push_back(a8);
 
   // Axiom 9.
   constraints.existential.push_back([&] {
     const plus_exprt index_before(
       idx,
-      minus_exprt(array_pool.get_length(res), from_integer(1, index_type)));
+      minus_exprt(
+        array_pool.get_or_create_length(res), from_integer(1, index_type)));
     const binary_relation_exprt no_space_before(
       str[index_before], ID_gt, space_char);
     return or_exprt(
-      equal_exprt(idx, array_pool.get_length(str)),
+      equal_exprt(idx, array_pool.get_or_create_length(str)),
       and_exprt(
         binary_relation_exprt(str[idx], ID_gt, space_char), no_space_before));
   }());
@@ -276,9 +285,9 @@ static optionalt<std::pair<exprt, exprt>> to_char_pair(
   const auto expr1_str = get_string_expr(expr1);
   const auto expr2_str = get_string_expr(expr2);
   const auto expr1_length =
-    numeric_cast<std::size_t>(array_pool.get_length(expr1_str));
+    numeric_cast<std::size_t>(array_pool.get_or_create_length(expr1_str));
   const auto expr2_length =
-    numeric_cast<std::size_t>(array_pool.get_length(expr2_str));
+    numeric_cast<std::size_t>(array_pool.get_or_create_length(expr2_str));
   if(expr1_length && expr2_length && *expr1_length == 1 && *expr2_length == 1)
     return std::make_pair(exprt(expr1_str[0]), exprt(expr2_str[0]));
   return {};
@@ -324,8 +333,9 @@ std::pair<exprt, string_constraintst> add_axioms_for_replace(
     const auto old_char = maybe_chars->first;
     const auto new_char = maybe_chars->second;
 
-    constraints.existential.push_back(
-      equal_exprt(array_pool.get_length(res), array_pool.get_length(str)));
+    constraints.existential.push_back(equal_exprt(
+      array_pool.get_or_create_length(res),
+      array_pool.get_or_create_length(str)));
 
     symbol_exprt qvar = fresh_symbol("QA_replace", str.length_type());
     implies_exprt case1(
@@ -335,7 +345,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_replace(
       equal_exprt(res[qvar], str[qvar]));
     string_constraintt a2(
       qvar,
-      zero_if_negative(array_pool.get_length(res)),
+      zero_if_negative(array_pool.get_or_create_length(res)),
       and_exprt(case1, case2));
     constraints.universal.push_back(a2);
     return {from_integer(0, f.type()), std::move(constraints)};
@@ -410,7 +420,12 @@ std::pair<exprt, string_constraintst> add_axioms_for_delete(
       array_pool),
     combine_results(
       add_axioms_for_substring(
-        fresh_symbol, sub2, str, end, array_pool.get_length(str), array_pool),
+        fresh_symbol,
+        sub2,
+        str,
+        end,
+        array_pool.get_or_create_length(str),
+        array_pool),
       add_axioms_for_concat(fresh_symbol, res, sub1, sub2, array_pool)));
 }
 
