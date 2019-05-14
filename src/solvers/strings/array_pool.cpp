@@ -59,6 +59,10 @@ array_poolt::fresh_string(const typet &index_type, const typet &char_type)
   created_strings_value.insert(str);
   arrays_of_pointers.emplace(
     address_of_exprt(index_exprt(str, from_integer(0, index_type))), str);
+
+  // add length to length_of_array map
+  get_length(str);
+
   return str;
 }
 
@@ -106,6 +110,10 @@ array_string_exprt array_poolt::make_char_array_for_char_pointer(
     to_array_string_expr(fresh_symbol(symbol_name, char_array_type));
   const auto insert_result =
     arrays_of_pointers.insert({char_pointer, array_sym});
+
+  // add length to length_of_array map
+  get_length(array_sym);
+
   return to_array_string_expr(insert_result.first->second);
 }
 

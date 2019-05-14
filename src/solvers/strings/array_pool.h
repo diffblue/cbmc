@@ -87,6 +87,11 @@ public:
 
 private:
   /// Associate arrays to char pointers
+  /// Invariant: Each array_string_exprt in this map has a corresponding entry
+  ///            in length_of_array.
+  ///            This is enforced whenever we add an element to
+  ///            `arrays_of_pointers`, i.e. fresh_string()
+  ///            and make_char_array_for_char_pointer().
   std::unordered_map<exprt, array_string_exprt, irep_hash> arrays_of_pointers;
 
   /// Associate length to arrays of infinite size
