@@ -952,6 +952,9 @@ void string_refinementt::add_lemma(
 }
 
 /// Get a model of the size of the input string.
+/// First ask the solver for a size value. If the solver has no value, get the
+/// size directly from the type. This is the case for string literals that are
+/// not part of the decision procedure (e.g. literals in return values).
 /// If the size value is not a constant or not a valid integer (size_t),
 /// return no value.
 /// \param super_get: function returning the valuation of an expression
@@ -970,19 +973,22 @@ static optionalt<exprt> get_valid_array_size(
   const array_poolt &array_pool)
 {
   const auto &size_from_pool = array_pool.get_length_if_exists(arr);
-  const exprt size = size_from_pool.has_value()
-                       ? size_from_pool.value()
-                       : exprt(ID_unknown, arr.length_type());
-
-  exprt size_val = super_get(size);
-  size_val = simplify_expr(size_val, ns);
-
-  if(size_val.id() != ID_constant)
+  exprt size_val;
+  if(size_from_pool.has_value())
   {
-    stream << "(sr::get_valid_array_size) string of unknown size: "
-           << format(size_val) << messaget::eom;
-    return {};
+    const exprt size = size_from_pool.value();
+    size_val = simplify_expr(super_get(size), ns);
+    if(size_val.id() != ID_constant)
+    {
+      stream << "(sr::get_valid_array_size) string of unknown size: "
+             << format(size_val) << messaget::eom;
+      return {};
+    }
   }
+  else if(to_array_type(arr.type()).size().id() == ID_constant)
+    size_val = simplify_expr(to_array_type(arr.type()).size(), ns);
+  else
+    return {};
 
   auto n_opt = numeric_cast<std::size_t>(size_val);
   if(!n_opt)
