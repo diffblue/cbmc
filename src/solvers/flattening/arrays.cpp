@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/format_expr.h>
 #include <util/namespace.h>
+#include <util/replace_expr.h>
 #include <util/std_expr.h>
 #include <util/std_types.h>
 
@@ -38,8 +39,8 @@ void arrayst::record_array_index(const index_exprt &index)
   //   entry for the root of the equivalence class
   //   because this map is accessed during building the error trace
   std::size_t number=arrays.number(index.array());
-  index_map[number].insert(index.index());
-  update_indices.insert(number);
+  if(index_map[number].insert(index.index()).second)
+    update_indices.insert(number);
 }
 
 literalt arrayst::record_array_equality(
@@ -82,11 +83,24 @@ void arrayst::collect_indices(const exprt &expr)
 {
   if(expr.id()!=ID_index)
   {
+    if(expr.id() == ID_lambda)
+      array_comprehension_args.insert(
+        to_array_comprehension_expr(expr).arg().get_identifier());
+
     forall_operands(op, expr) collect_indices(*op);
   }
   else
   {
     const index_exprt &e = to_index_expr(expr);
+
+    if(
+      e.index().id() == ID_symbol &&
+      array_comprehension_args.count(
+        to_symbol_expr(e.index()).get_identifier()) != 0)
+    {
+      return;
+    }
+
     collect_indices(e.index()); // necessary?
 
     const typet &array_op_type = e.array().type();
@@ -214,6 +228,9 @@ void arrayst::collect_arrays(const exprt &a)
     arrays.make_union(a, a.op0());
     collect_arrays(a.op0());
   }
+  else if(a.id() == ID_lambda)
+  {
+  }
   else
   {
     DATA_INVARIANT(
@@ -257,17 +274,32 @@ void arrayst::add_array_constraints()
   // reduce initial index map
   update_index_map(true);
 
-  // add constraints for if, with, array_of
+  // add constraints for if, with, array_of, lambda
+  std::set<std::size_t> roots_to_process, updated_roots;
   for(std::size_t i=0; i<arrays.size(); i++)
+    roots_to_process.insert(arrays.find_number(i));
+
+  while(!roots_to_process.empty())
   {
-    // take a copy as arrays may get modified by add_array_constraints
-    // in case of nested unbounded arrays
-    exprt a=arrays[i];
+    for(std::size_t i = 0; i < arrays.size(); i++)
+    {
+      if(roots_to_process.count(arrays.find_number(i)) == 0)
+        continue;
 
-    add_array_constraints(index_map[arrays.find_number(i)], a);
+      // take a copy as arrays may get modified by add_array_constraints
+      // in case of nested unbounded arrays
+      exprt a = arrays[i];
 
-    // we have to update before it gets used in the next add_* call
-    update_index_map(false);
+      add_array_constraints(index_map[arrays.find_number(i)], a);
+
+      // we have to update before it gets used in the next add_* call
+      for(const std::size_t u : update_indices)
+        updated_roots.insert(arrays.find_number(u));
+      update_index_map(false);
+    }
+
+    roots_to_process = std::move(updated_roots);
+    updated_roots.clear();
   }
 
   // add constraints for equalities
@@ -438,6 +470,11 @@ void arrayst::add_array_constraints(
     return add_array_constraints_array_of(index_set, to_array_of_expr(expr));
   else if(expr.id() == ID_array)
     return add_array_constraints_array_constant(index_set, to_array_expr(expr));
+  else if(expr.id() == ID_lambda)
+  {
+    return add_array_constraints_comprehension(
+      index_set, to_array_comprehension_expr(expr));
+  }
   else if(expr.id()==ID_symbol ||
           expr.id()==ID_nondet_symbol ||
           expr.id()==ID_constant ||
@@ -724,6 +761,28 @@ void arrayst::add_array_constraints_array_constant(
         add_array_constraint(lazy, true); // added lazily
       }
     }
+  }
+}
+
+void arrayst::add_array_constraints_comprehension(
+  const index_sett &index_set,
+  const array_comprehension_exprt &expr)
+{
+  // we got x=lambda(i: e)
+  // get all other array index applications
+  // and add constraints x[j]=e[i/j]
+
+  for(const auto &index : index_set)
+  {
+    index_exprt index_expr{expr, index};
+    exprt comprehension_body = expr.body();
+    replace_expr(expr.arg(), index, comprehension_body);
+
+    // add constraint
+    lazy_constraintt lazy(
+      lazy_typet::ARRAY_COMPREHENSION,
+      equal_exprt(index_expr, comprehension_body));
+    add_array_constraint(lazy, false); // added immediately
   }
 }
 
