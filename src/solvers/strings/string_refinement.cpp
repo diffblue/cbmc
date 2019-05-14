@@ -951,6 +951,49 @@ void string_refinementt::add_lemma(
   prop.l_set_to_true(convert(simple_lemma));
 }
 
+/// Get a model of the size of the input string.
+/// If the size value is not a constant or not a valid integer (size_t),
+/// return no value.
+/// \param super_get: function returning the valuation of an expression
+///   in a model
+/// \param ns: namespace
+/// \param stream: output stream for warning messages
+/// \param arr: expression of type array representing a string
+/// \param array_pool: pool of arrays representing strings
+/// \return an optional expression representing the size of the array that can
+///         be cast to size_t
+static optionalt<exprt> get_valid_array_size(
+  const std::function<exprt(const exprt &)> &super_get,
+  const namespacet &ns,
+  messaget::mstreamt &stream,
+  const array_string_exprt &arr,
+  const array_poolt &array_pool)
+{
+  const auto &size_from_pool = array_pool.get_length_if_exists(arr);
+  const exprt size = size_from_pool.has_value()
+                       ? size_from_pool.value()
+                       : exprt(ID_unknown, arr.length_type());
+
+  exprt size_val = super_get(size);
+  size_val = simplify_expr(size_val, ns);
+
+  if(size_val.id() != ID_constant)
+  {
+    stream << "(sr::get_valid_array_size) string of unknown size: "
+           << format(size_val) << messaget::eom;
+    return {};
+  }
+
+  auto n_opt = numeric_cast<std::size_t>(size_val);
+  if(!n_opt)
+  {
+    stream << "(sr::get_valid_array_size) size is not valid" << messaget::eom;
+    return {};
+  }
+
+  return size_val;
+}
+
 /// Get a model of an array and put it in a certain form.
 /// If the model is incomplete or if it is too big, return no value.
 /// \param super_get: function returning the valuation of an expression
@@ -967,46 +1010,36 @@ static optionalt<exprt> get_array(
   const array_string_exprt &arr,
   const array_poolt &array_pool)
 {
-  const auto &size_from_pool = array_pool.get_length_if_exists(arr);
-  const exprt size = size_from_pool.has_value()
-                       ? size_from_pool.value()
-                       : exprt(ID_unknown, arr.length_type());
-
-  exprt arr_val = simplify_expr(adjust_if_recursive(super_get(arr), ns), ns);
-  exprt size_val = super_get(size);
-  size_val = simplify_expr(size_val, ns);
-  const typet char_type = arr.type().subtype();
-  const typet &index_type = size.type();
-
-  if(size_val.id() != ID_constant)
+  const auto size =
+    get_valid_array_size(super_get, ns, stream, arr, array_pool);
+  if(!size.has_value())
   {
-    stream << "(sr::get_array) string of unknown size: " << format(size_val)
-           << messaget::eom;
     return {};
   }
 
-  auto n_opt = numeric_cast<std::size_t>(size_val);
-  if(!n_opt)
-  {
-    stream << "(sr::get_array) size is not valid" << messaget::eom;
-    return {};
-  }
-  std::size_t n = *n_opt;
+  const size_t n = numeric_cast<std::size_t>(size.value()).value();
 
   if(n > MAX_CONCRETE_STRING_SIZE)
   {
-    stream << "(sr::get_array) long string (size = " << n << ") " << format(arr)
-           << messaget::eom;
-    stream << "(sr::get_array) consider reducing max-nondet-string-length so "
+    stream << "(sr::get_valid_array_size) long string (size "
+           << " = " << n << ") " << format(arr) << messaget::eom;
+    stream << "(sr::get_valid_array_size) consider reducing "
+              "max-nondet-string-length so "
               "that no string exceeds "
            << MAX_CONCRETE_STRING_SIZE
            << " in length and "
               "make sure all functions returning strings are loaded"
            << messaget::eom;
-    stream << "(sr::get_array) this can also happen on invalid object access"
+    stream << "(sr::get_valid_array_size) this can also happen on invalid "
+              "object access"
            << messaget::eom;
     return nil_exprt();
   }
+
+  const exprt arr_val =
+    simplify_expr(adjust_if_recursive(super_get(arr), ns), ns);
+  const typet char_type = arr.type().subtype();
+  const typet &index_type = size.value().type();
 
   if(
     const auto &array = interval_sparse_arrayt::of_expr(
