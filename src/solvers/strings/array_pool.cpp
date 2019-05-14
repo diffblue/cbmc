@@ -146,19 +146,13 @@ void array_poolt::insert(
   const exprt &pointer_expr,
   array_string_exprt &array_expr)
 {
-  const exprt &length = array_expr.length();
-  if(length == infinity_exprt(length.type()))
-  {
-    auto pair = length_of_array.insert(
-      std::make_pair(array_expr, fresh_symbol("string_length", length.type())));
-    array_expr.length() = pair.first->second;
-  }
-
   const auto it_bool =
     arrays_of_pointers.insert(std::make_pair(pointer_expr, array_expr));
   created_strings_value.insert(array_expr);
   INVARIANT(
     it_bool.second, "should not associate two arrays to the same pointer");
+
+  attempt_assign_length_from_type(array_expr, length_of_array, fresh_symbol);
 }
 
 const std::set<array_string_exprt> &array_poolt::created_strings() const
