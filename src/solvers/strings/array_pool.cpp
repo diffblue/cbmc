@@ -114,9 +114,6 @@ array_string_exprt array_poolt::make_char_array_for_char_pointer(
 /// Then add an entry from `array_expr` to that size in the `length_of_array`
 /// map.
 ///
-/// If `array_expr` is an `if_exprt`, recursively add entries for the parts of
-/// the `if_exprt`, but not for the `if_exprt`s themselves.
-///
 /// This function should only be used at the creation of the
 /// `array_string_exprt`s, as it is the only place where we can reliably refer
 /// to the size in the type of the array.
@@ -125,32 +122,24 @@ static void attempt_assign_length_from_type(
   std::unordered_map<array_string_exprt, exprt, irep_hash> &length_of_array,
   symbol_generatort &symbol_generator)
 {
-  if(const auto &if_expr = expr_try_dynamic_cast<if_exprt>((exprt)array_expr))
-  {
-    attempt_assign_length_from_type(
-      to_array_string_expr(if_expr->true_case()),
-      length_of_array,
-      symbol_generator);
-    attempt_assign_length_from_type(
-      to_array_string_expr(if_expr->false_case()),
-      length_of_array,
-      symbol_generator);
-  }
-  else
-  {
-    const exprt &size_from_type = to_array_type(array_expr.type()).size();
-    const exprt &size_to_assign =
-      size_from_type != infinity_exprt(size_from_type.type())
-        ? size_from_type
-        : symbol_generator("string_length", array_expr.length_type());
+  DATA_INVARIANT(
+    array_expr.id() != ID_if,
+    "attempt_assign_length_from_type does not handle if exprts");
+  // This invariant seems always true, but I don't know why.
+  // If we find a case where this is violated, try calling
+  // attempt_assign_length_from_type on the true and false cases.
+  const exprt &size_from_type = to_array_type(array_expr.type()).size();
+  const exprt &size_to_assign =
+    size_from_type != infinity_exprt(size_from_type.type())
+      ? size_from_type
+      : symbol_generator("string_length", array_expr.length_type());
 
-    const auto emplace_result =
-      length_of_array.emplace(array_expr, size_to_assign);
-    INVARIANT(
-      emplace_result.second,
-      "attempt_assign_length_from_type should only be called when no entry"
-      "for the array_string_exprt exists in the length_of_array map");
-  }
+  const auto emplace_result =
+    length_of_array.emplace(array_expr, size_to_assign);
+  INVARIANT(
+    emplace_result.second,
+    "attempt_assign_length_from_type should only be called when no entry"
+    "for the array_string_exprt exists in the length_of_array map");
 }
 
 void array_poolt::insert(
