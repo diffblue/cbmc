@@ -967,7 +967,11 @@ static optionalt<exprt> get_array(
   const array_string_exprt &arr,
   const array_poolt &array_pool)
 {
-  const exprt &size = arr.length();
+  const auto &size_from_pool = array_pool.get_length_if_exists(arr);
+  const exprt size = size_from_pool.has_value()
+                       ? size_from_pool.value()
+                       : exprt(ID_unknown, arr.length_type());
+
   exprt arr_val = simplify_expr(adjust_if_recursive(super_get(arr), ns), ns);
   exprt size_val = super_get(size);
   size_val = simplify_expr(size_val, ns);
@@ -993,8 +997,8 @@ static optionalt<exprt> get_array(
 
   if(n > MAX_CONCRETE_STRING_SIZE)
   {
-    stream << "(sr::get_array) long string (size " << format(arr.length())
-           << " = " << n << ") " << format(arr) << messaget::eom;
+    stream << "(sr::get_array) long string (size " << format(size) << " = " << n
+           << ") " << format(arr) << messaget::eom;
     stream << "(sr::get_array) consider reducing max-nondet-string-length so "
               "that no string exceeds "
            << MAX_CONCRETE_STRING_SIZE
