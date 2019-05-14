@@ -105,7 +105,8 @@ refined_string_exprt make_refined_string_exprt(
 std::set<exprt>
 full_index_set(const array_string_exprt &s, array_poolt &array_pool)
 {
-  const mp_integer n = numeric_cast_v<mp_integer>(to_constant_expr(s.length()));
+  const mp_integer n = numeric_cast_v<mp_integer>(
+    to_constant_expr(to_array_type(s.type()).size()));
   std::set<exprt> ret;
   for(mp_integer i = 0; i < n; ++i)
     ret.insert(from_integer(i));
