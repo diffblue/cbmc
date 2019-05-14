@@ -59,9 +59,11 @@ public:
   {
   public:
     exprt value;
+    exprt pointer;
     exprt pointer_guard;
 
-    valuet() : value(nil_exprt()), pointer_guard(false_exprt())
+    valuet()
+      : value{nil_exprt{}}, pointer{nil_exprt{}}, pointer_guard{false_exprt{}}
     {
     }
   };
