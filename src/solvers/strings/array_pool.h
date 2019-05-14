@@ -56,6 +56,10 @@ public:
   /// Get the length of an array_string_exprt from the array_pool. If the length
   /// does not yet exist, create a new symbol and add it to the pool.
   ///
+  /// If the array_string_exprt is an `if` expression, the true and false parts
+  /// are handled independently (and recursively). That is, no new length symbol
+  /// is added to the pool for `if` expressions, but symbols may be added for
+  /// each of the parts.
   /// \param s: array expression representing a string
   /// \return expression for the length of `s`
   exprt get_length(const array_string_exprt &s);

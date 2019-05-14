@@ -23,6 +23,13 @@ operator()(const irep_idt &prefix, const typet &type)
 
 exprt array_poolt::get_length(const array_string_exprt &s)
 {
+  if(const auto &if_expr = expr_try_dynamic_cast<if_exprt>((exprt)s))
+  {
+    return if_exprt{if_expr->cond(),
+                    get_length(to_array_string_expr(if_expr->true_case())),
+                    get_length(to_array_string_expr(if_expr->false_case()))};
+  }
+
   auto emplace_result =
     length_of_array.emplace(s, symbol_exprt(s.length_type()));
   if(emplace_result.second)
