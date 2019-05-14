@@ -107,7 +107,8 @@ static optionalt<exprt> get_array(
   const std::function<exprt(const exprt &)> &super_get,
   const namespacet &ns,
   messaget::mstreamt &stream,
-  const array_string_exprt &arr);
+  const array_string_exprt &arr,
+  const array_poolt &array_pool);
 
 static exprt substitute_array_access(
   const index_exprt &index_expr,
@@ -957,12 +958,14 @@ void string_refinementt::add_lemma(
 /// \param ns: namespace
 /// \param stream: output stream for warning messages
 /// \param arr: expression of type array representing a string
+/// \param array_pool: pool of arrays representing strings
 /// \return an optional array expression or array_of_exprt
 static optionalt<exprt> get_array(
   const std::function<exprt(const exprt &)> &super_get,
   const namespacet &ns,
   messaget::mstreamt &stream,
-  const array_string_exprt &arr)
+  const array_string_exprt &arr,
+  const array_poolt &array_pool)
 {
   const exprt &size = arr.length();
   exprt arr_val = simplify_expr(adjust_if_recursive(super_get(arr), ns), ns);
@@ -1030,17 +1033,19 @@ static std::string string_of_array(const array_exprt &arr)
 /// \param ns: namespace
 /// \param stream: output stream
 /// \param arr: array expression
+/// \param array_pool: pool of arrays representing strings
 /// \return expression corresponding to `arr` in the model
 static exprt get_char_array_and_concretize(
   const std::function<exprt(const exprt &)> &super_get,
   const namespacet &ns,
   messaget::mstreamt &stream,
-  const array_string_exprt &arr)
+  const array_string_exprt &arr,
+  array_poolt &array_pool)
 {
   stream << "- " << format(arr) << ":\n";
   stream << std::string(4, ' ') << "- type: " << format(arr.type())
          << messaget::eom;
-  const auto arr_model_opt = get_array(super_get, ns, stream, arr);
+  const auto arr_model_opt = get_array(super_get, ns, stream, arr, array_pool);
   if(arr_model_opt)
   {
     stream << std::string(4, ' ') << "- char_array: " << format(*arr_model_opt)
@@ -1051,8 +1056,8 @@ static exprt get_char_array_and_concretize(
     stream << std::string(4, ' ')
            << "- simplified_char_array: " << format(simple) << messaget::eom;
     if(
-      const auto concretized_array =
-        get_array(super_get, ns, stream, to_array_string_expr(simple)))
+      const auto concretized_array = get_array(
+        super_get, ns, stream, to_array_string_expr(simple), array_pool))
     {
       stream << std::string(4, ' ')
              << "- concretized_char_array: " << format(*concretized_array)
@@ -1083,14 +1088,15 @@ void debug_model(
   messaget::mstreamt &stream,
   const namespacet &ns,
   const std::function<exprt(const exprt &)> &super_get,
-  const std::vector<symbol_exprt> &symbols)
+  const std::vector<symbol_exprt> &symbols,
+  array_poolt &array_pool)
 {
   stream << "debug_model:" << '\n';
   for(const auto &pointer_array : generator.array_pool.get_arrays_of_pointers())
   {
     const auto arr = pointer_array.second;
     const exprt model =
-      get_char_array_and_concretize(super_get, ns, stream, arr);
+      get_char_array_and_concretize(super_get, ns, stream, arr, array_pool);
 
     stream << "- " << format(arr) << ":\n"
            << "  - pointer: " << format(pointer_array.first) << "\n"
@@ -1335,7 +1341,12 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
 
 #ifdef DEBUG
   debug_model(
-    generator, stream, ns, get, generator.fresh_symbol.created_symbols);
+    generator,
+    stream,
+    ns,
+    get,
+    generator.fresh_symbol.created_symbols,
+    generator.array_pool);
 #endif
 
   // Maps from indexes of violated universal axiom to a witness of violation
@@ -1833,7 +1844,9 @@ exprt string_refinementt::get(const exprt &expr) const
         dependencies.eval(arr, [&](const exprt &expr) { return get(expr); }))
       return *from_dependencies;
 
-    if(const auto arr_model_opt = get_array(super_get, ns, log.debug(), arr))
+    if(
+      const auto arr_model_opt =
+        get_array(super_get, ns, log.debug(), arr, generator.array_pool))
       return *arr_model_opt;
 
     if(
