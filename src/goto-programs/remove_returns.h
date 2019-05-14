@@ -73,6 +73,7 @@ Date:   September 2009
 
 #include <functional>
 
+#include <util/std_code.h>
 #include <util/std_types.h>
 
 class goto_functionst;
@@ -110,5 +111,10 @@ bool is_return_value_identifier(const irep_idt &id);
 /// Returns true if \p symbol_expr is a special return-value symbol produced by
 /// \ref return_value_symbol
 bool is_return_value_symbol(const symbol_exprt &symbol_expr);
+
+/// Check if the \p function_call returns anything
+/// \param function_call: the function call to be investigated
+/// \return true if non-void return type and non-nil lhs
+bool does_function_call_return(const code_function_callt &function_call);
 
 #endif // CPROVER_GOTO_PROGRAMS_REMOVE_RETURNS_H
