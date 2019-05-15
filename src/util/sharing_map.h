@@ -1284,7 +1284,7 @@ SHARING_MAPT2(optionalt<std::reference_wrapper<const, mapped_type>>)::find(
 
 SHARING_MAPT(const std::string)::not_found_msg="key not found";
 
-SHARING_MAPT(const std::size_t)::bits = 18;
+SHARING_MAPT(const std::size_t)::bits = 30;
 SHARING_MAPT(const std::size_t)::chunk = 3;
 
 SHARING_MAPT(const std::size_t)::mask = 0xffff >> (16 - chunk);
