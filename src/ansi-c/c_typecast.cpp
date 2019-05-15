@@ -213,11 +213,15 @@ bool check_c_implicit_typecast(
       const irept &src_subtype =src_type.subtype();
 
       if(src_subtype == dest_subtype)
+      {
         return false;
+      }
       else if(
         has_a_void_pointer(src_type) || // from void to anything
         has_a_void_pointer(dest_type))  // to void from anything
+      {
         return false;
+      }
     }
 
     if(dest_type.id()==ID_array &&

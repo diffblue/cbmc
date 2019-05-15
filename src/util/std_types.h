@@ -29,7 +29,7 @@ class namespacet;
 /// if the given typet is a constant
 inline bool is_constant(const typet &type)
 {
-  return type.id() == ID_constant;
+  return type.get_bool(ID_C_constant);
 }
 
 /// The Boolean type
