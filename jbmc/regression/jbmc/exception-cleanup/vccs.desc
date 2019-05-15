@@ -3,6 +3,8 @@ Test.class
 --function Test.main --show-vcc
 ^EXIT=0$
 ^SIGNAL=0$
+file Test\.java line 6 function java::Test.main:\(I\)V
+no uncaught exception
 --
 file Test\.java line 42 function java::Test\.unreachable:\(\)V bytecode-index 5
 assertion at file Test\.java line 42 function java::Test\.unreachable:\(\)V bytecode-index 5
