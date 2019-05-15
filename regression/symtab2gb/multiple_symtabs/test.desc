@@ -1,0 +1,10 @@
+CORE
+entry_point.json_symtab
+user.json_symtab library.json_symtab
+^EXIT=10$
+^SIGNAL=0$
+^\[1\] file library.adb line \d+ assertion: FAILURE$
+^\[2\] file library.adb line \d+ assertion: FAILURE$
+^VERIFICATION FAILED$
+--
+error
