@@ -35,8 +35,8 @@ Author: Daniel Poetzl
 
 #include "invariant.h"
 #include "make_unique.h"
+#include "small_shared_n_way_ptr.h"
 #include "small_shared_ptr.h"
-#include "small_shared_two_way_ptr.h"
 
 #ifdef SN_INTERNAL_CHECKS
 #define SN_ASSERT(b) INVARIANT(b, "Sharing node internal invariant")
@@ -70,7 +70,7 @@ const T *as_const(T *t)
 
 // Inner nodes (internal nodes or container nodes)
 
-typedef small_shared_two_way_pointeet<unsigned> d_baset;
+typedef small_shared_n_way_pointee_baset<2, unsigned> d_baset;
 
 SN_TYPE_PAR_DECL class sharing_node_innert;
 
@@ -105,7 +105,7 @@ class sharing_node_baset
 SN_TYPE_PAR_DEF class sharing_node_innert : public sharing_node_baset
 {
 public:
-  typedef small_shared_two_way_ptrt<SN_PTR_TYPE_ARGS> datat;
+  typedef small_shared_n_way_ptrt<SN_PTR_TYPE_ARGS> datat;
   typedef typename datat::use_countt use_countt;
 
   typedef d_internalt<SN_TYPE_ARGS> d_it;
@@ -155,12 +155,12 @@ public:
 
   bool is_internal() const
   {
-    return data.is_derived_u();
+    return data.template is_derived<0>();
   }
 
   bool is_container() const
   {
-    return data.is_derived_v();
+    return data.template is_derived<1>();
   }
 
   bool is_defined_internal() const
@@ -177,14 +177,14 @@ public:
   {
     SN_ASSERT(!empty());
 
-    return *data.get_derived_u();
+    return *data.template get_derived<0>();
   }
 
   const d_ct &read_container() const
   {
     SN_ASSERT(!empty());
 
-    return *data.get_derived_v();
+    return *data.template get_derived<1>();
   }
 
   // Accessors
@@ -334,32 +334,34 @@ protected:
   {
     if(!data)
     {
-      data = make_shared_derived_u<SN_PTR_TYPE_ARGS>();
+      data = make_shared_2<0, SN_PTR_TYPE_ARGS>();
     }
     else if(data.use_count() > 1)
     {
-      data = make_shared_derived_u<SN_PTR_TYPE_ARGS>(*data.get_derived_u());
+      data =
+        make_shared_2<0, SN_PTR_TYPE_ARGS>(*data.template get_derived<0>());
     }
 
     SN_ASSERT(data.use_count() == 1);
 
-    return *data.get_derived_u();
+    return *data.template get_derived<0>();
   }
 
   d_ct &write_container()
   {
     if(!data)
     {
-      data = make_shared_derived_v<SN_PTR_TYPE_ARGS>();
+      data = make_shared_2<1, SN_PTR_TYPE_ARGS>();
     }
     else if(data.use_count() > 1)
     {
-      data = make_shared_derived_v<SN_PTR_TYPE_ARGS>(*data.get_derived_v());
+      data =
+        make_shared_2<1, SN_PTR_TYPE_ARGS>(*data.template get_derived<1>());
     }
 
     SN_ASSERT(data.use_count() == 1);
 
-    return *data.get_derived_v();
+    return *data.template get_derived<1>();
   }
 
   datat data;
