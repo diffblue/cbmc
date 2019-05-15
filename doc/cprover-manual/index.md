@@ -8,7 +8,9 @@
 
 [A Short Tutorial](cbmc/tutorial/),
 [Loop Unwinding](cbmc/unwinding/),
-[Assertion Checking](cbmc/assertions/)
+[Assertion Checking](cbmc/assertions/),
+[Memory Analyzer](cbmc/memory-analyzer/),
+[Program Harness](cbmc/goto-harness/)
 
 ## 4. [Test Suite Generation](test-suite/)
 
