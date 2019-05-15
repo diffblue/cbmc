@@ -24,40 +24,94 @@ Author: Malte Mues <mail.mues@gmail.com>
 
 #include <util/exception_utils.h>
 
+/// Interface for running and querying GDB
 class gdb_apit
 {
 public:
   using commandst = std::forward_list<std::string>;
+  struct memory_addresst
+  {
+    bool null_address;
+    std::string address_string;
+    memory_addresst() : null_address(true)
+    {
+    }
+    explicit memory_addresst(const std::string &address_string)
+      : null_address(address_string == "0x0"), address_string(address_string)
+    {
+    }
 
+    bool is_null() const
+    {
+      return null_address;
+    }
+    bool operator<(const memory_addresst &other) const
+    {
+      return address_string < other.address_string;
+    }
+    std::string string() const
+    {
+      return address_string;
+    }
+  };
+
+  /// Create a \ref gdb_apit object
+  /// \param binary: the binary to run with gdb
+  /// \param log: boolean indicating whether gdb input and output should be
+  ///   logged
   explicit gdb_apit(const char *binary, const bool log = false);
+
+  /// Terminate the gdb process and close open streams (for reading from and
+  /// writing to gdb)
   ~gdb_apit();
 
   struct pointer_valuet
   {
+    pointer_valuet() = delete;
     pointer_valuet(
-      const std::string &address = "",
-      const std::string &pointee = "",
-      const std::string &character = "",
-      const optionalt<std::string> &string = nullopt)
+      const std::string &address,
+      const std::string &pointee,
+      const std::string &character,
+      const optionalt<std::string> &string)
       : address(address), pointee(pointee), character(character), string(string)
     {
     }
 
-    const std::string address;
+    const memory_addresst address;
     const std::string pointee;
     const std::string character;
     const optionalt<std::string> string;
   };
 
+  /// Create a new gdb process for analysing the binary indicated by the member
+  /// variable `binary`
   void create_gdb_process();
-  void terminate_gdb_process();
 
+  /// Run gdb to the given breakpoint
+  /// \param breakpoint the breakpoint to set (can be e.g. a line number or a
+  ///   function name)
+  /// \return true if something failed
   bool run_gdb_to_breakpoint(const std::string &breakpoint);
+
+  /// Run gdb with the given core file
+  /// \param corefile: core dump
   void run_gdb_from_core(const std::string &corefile);
 
+  /// Get value of the given value expression
+  /// \param expr: an expression of non-pointer type or pointer to char
+  /// \return value of the expression; if the expression is of type pointer to
+  ///   char and represents a string, the string value is returned; otherwise
+  ///   the value is returned just as it is printed by gdb
   std::string get_value(const std::string &expr);
+
+  /// Get the memory address pointed to by the given pointer expression
+  /// \param expr: an expression of pointer type (e.g., `&x` with `x` being of
+  ///   type `int` or `p` with `p` being of type `int *`)
+  /// \return memory address in hex format
   pointer_valuet get_memory(const std::string &expr);
 
+  /// Return the vector of commands that have been written to gdb so far
+  /// \return the list of commands
   const commandst &get_command_log();
 
 protected:
