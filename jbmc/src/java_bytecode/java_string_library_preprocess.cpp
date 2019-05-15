@@ -1602,14 +1602,6 @@ void java_string_library_preprocesst::initialize_conversion_table()
   cprover_equivalent_to_java_string_returning_function
     ["java::java.lang.String.valueOf:(C)Ljava/lang/String;"]=
       ID_cprover_string_of_char_func;
-  conversion_table["java::java.lang.String.valueOf:(D)Ljava/lang/String;"] =
-    std::bind(
-      &java_string_library_preprocesst::make_float_to_string_code,
-      this,
-      std::placeholders::_1,
-      std::placeholders::_2,
-      std::placeholders::_3,
-      std::placeholders::_4);
   conversion_table["java::java.lang.String.valueOf:(F)Ljava/lang/String;"] =
     std::bind(
       &java_string_library_preprocesst::make_float_to_string_code,
@@ -1641,9 +1633,6 @@ void java_string_library_preprocesst::initialize_conversion_table()
   cprover_equivalent_to_java_assign_and_return_function
     ["java::java.lang.StringBuilder.append:(C)Ljava/lang/StringBuilder;"]=
       ID_cprover_string_concat_char_func;
-  cprover_equivalent_to_java_assign_and_return_function
-    ["java::java.lang.StringBuilder.append:(D)Ljava/lang/StringBuilder;"] =
-      ID_cprover_string_concat_double_func;
   cprover_equivalent_to_java_assign_and_return_function
     ["java::org.cprover.CProverString.append:(Ljava/lang/StringBuilder;Ljava/"
      "lang/CharSequence;II)"
@@ -1741,12 +1730,6 @@ void java_string_library_preprocesst::initialize_conversion_table()
   cprover_equivalent_to_java_assign_and_return_function
     ["java::java.lang.StringBuffer.append:(C)Ljava/lang/StringBuffer;"]=
       ID_cprover_string_concat_char_func;
-  cprover_equivalent_to_java_assign_and_return_function
-    ["java::java.lang.StringBuffer.append:(D)Ljava/lang/StringBuffer;"]=
-      ID_cprover_string_concat_double_func;
-  cprover_equivalent_to_java_assign_and_return_function
-    ["java::java.lang.StringBuffer.append:(F)Ljava/lang/StringBuffer;"]=
-      ID_cprover_string_concat_float_func;
   cprover_equivalent_to_java_assign_and_return_function
     ["java::java.lang.StringBuffer.append:(J)Ljava/lang/StringBuffer;"]=
       ID_cprover_string_concat_long_func;
