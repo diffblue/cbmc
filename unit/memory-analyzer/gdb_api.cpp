@@ -179,7 +179,7 @@ TEST_CASE("gdb api test", "[core][memory-analyzer]")
 
     {
       auto value = gdb_api.get_memory("s");
-      REQUIRE(std::regex_match(value.address, hex_addr));
+      REQUIRE(std::regex_match(value.address.string(), hex_addr));
       REQUIRE(value.pointee.empty());
       REQUIRE(value.character.empty());
       REQUIRE(*value.string == "abc");
@@ -187,7 +187,7 @@ TEST_CASE("gdb api test", "[core][memory-analyzer]")
 
     {
       auto value = gdb_api.get_memory("p");
-      REQUIRE(std::regex_match(value.address, hex_addr));
+      REQUIRE(std::regex_match(value.address.string(), hex_addr));
       REQUIRE(value.pointee == "x");
       REQUIRE(value.character.empty());
       REQUIRE(!value.string);
@@ -195,7 +195,7 @@ TEST_CASE("gdb api test", "[core][memory-analyzer]")
 
     {
       auto value = gdb_api.get_memory("vp");
-      REQUIRE(std::regex_match(value.address, hex_addr));
+      REQUIRE(std::regex_match(value.address.string(), hex_addr));
       REQUIRE(value.pointee == "x");
       REQUIRE(value.character.empty());
       REQUIRE(!value.string);
@@ -203,7 +203,7 @@ TEST_CASE("gdb api test", "[core][memory-analyzer]")
 
     {
       auto value = gdb_api.get_memory("np");
-      REQUIRE(value.address == "0x0");
+      REQUIRE(value.address.is_null());
       REQUIRE(value.pointee.empty());
       REQUIRE(value.character.empty());
       REQUIRE(!value.string);
@@ -211,7 +211,7 @@ TEST_CASE("gdb api test", "[core][memory-analyzer]")
 
     {
       auto value = gdb_api.get_memory("vp_string");
-      REQUIRE(std::regex_match(value.address, hex_addr));
+      REQUIRE(std::regex_match(value.address.string(), hex_addr));
       REQUIRE(value.pointee.empty());
       REQUIRE(value.character.empty());
       REQUIRE(!value.string);
@@ -225,7 +225,7 @@ TEST_CASE("gdb api test", "[core][memory-analyzer]")
 
     {
       auto value = gdb_api.get_memory("&x");
-      REQUIRE(std::regex_match(value.address, hex_addr));
+      REQUIRE(std::regex_match(value.address.string(), hex_addr));
       REQUIRE(value.pointee == "x");
       REQUIRE(value.character.empty());
       REQUIRE(!value.string);
