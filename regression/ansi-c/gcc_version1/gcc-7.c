@@ -5,3 +5,5 @@ _Float64 f64;
 _Float64x f64x;
 _Float128 f128;
 _Float128x f128x;
+
+__float128 gcc_f128;

@@ -565,7 +565,7 @@ void ansi_c_scanner_init()
                     return make_identifier();
                 }
 
-"_Float128"     { if(PARSER.Float128_type)
+"_Float128"     { if(PARSER.ts_18661_3_Floatn_types)
                   { loc(); return TOK_GCC_FLOAT128; }
                   else
                     return make_identifier();

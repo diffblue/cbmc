@@ -76,7 +76,6 @@ bool ansi_c_languaget::parse(
   ansi_c_parser.set_message_handler(get_message_handler());
   ansi_c_parser.for_has_scope=config.ansi_c.for_has_scope;
   ansi_c_parser.ts_18661_3_Floatn_types=config.ansi_c.ts_18661_3_Floatn_types;
-  ansi_c_parser.Float128_type = config.ansi_c.Float128_type;
   ansi_c_parser.cpp98=false; // it's not C++
   ansi_c_parser.cpp11=false; // it's not C++
   ansi_c_parser.mode=config.ansi_c.mode;

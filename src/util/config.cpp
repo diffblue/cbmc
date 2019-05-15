@@ -948,7 +948,7 @@ bool configt::set(const cmdlinet &cmdline)
   }
 
   if(ansi_c.preprocessor == ansi_ct::preprocessort::GCC)
-    ansi_c.Float128_type = true;
+    ansi_c.gcc__float128_type = true;
 
   set_arch(arch);
 

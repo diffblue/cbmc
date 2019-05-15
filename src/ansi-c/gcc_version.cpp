@@ -142,3 +142,23 @@ std::ostream &operator<<(std::ostream &out, const gcc_versiont &v)
 {
   return out << v.v_major << '.' << v.v_minor << '.' << v.v_patchlevel;
 }
+
+void configure_gcc(const gcc_versiont &gcc_version)
+{
+  // ISO/IEC TS 18661-3:2015 support was introduced with gcc 7.0
+  if(
+    gcc_version.flavor == gcc_versiont::flavort::GCC &&
+    gcc_version.is_at_least(7u))
+  {
+    config.ansi_c.ts_18661_3_Floatn_types = true;
+  }
+
+  const auto gcc_float128_minor_version =
+    config.ansi_c.arch == "x86_64" ? 3u : 5u;
+
+  // __float128 exists (as a typedef) since gcc 4.5 everywhere,
+  // and since 4.3 on x86_64
+  config.ansi_c.gcc__float128_type =
+    gcc_version.flavor == gcc_versiont::flavort::GCC &&
+    gcc_version.is_at_least(4u, gcc_float128_minor_version);
+}
