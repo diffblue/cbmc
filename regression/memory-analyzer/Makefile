@@ -1,17 +1,18 @@
 default: clean tests.log
 
+GOTO_GCC_EXE=../../../src/goto-cc/goto-gcc
+MEMORY_ANALYZER_EXE=../../../src/memory-analyzer/memory-analyzer
+
 clean:
 	find -name '*.exe' -execdir $(RM) '{}' \;
 	find -name '*.out' -execdir $(RM) '{}' \;
 	$(RM) tests.log
 
 test:
-	-@ln -s goto-cc ../../src/goto-cc/goto-gcc
-	@../test.pl -p -c ../chain.sh
+	@../test.pl -e -p -c "../chain.sh $(MEMORY_ANALYZER_EXE) $(GOTO_GCC_EXE)"
 
 tests.log: ../test.pl
-	-@ln -s goto-cc ../../src/goto-cc/goto-gcc
-	@../test.pl -p -c ../chain.sh
+	@../test.pl -e -p -c "../chain.sh $(MEMORY_ANALYZER_EXE) $(GOTO_GCC_EXE)"
 
 show:
 	@for dir in *; do \

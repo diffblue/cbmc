@@ -1,11 +1,12 @@
 #!/bin/bash
 
-MEMORY_ANALYZER="../../../src/memory-analyzer/memory-analyzer"
-
 set -e
 
-NAME=${*:$#}
-NAME=${NAME%.exe}
+memory_analyzer=$1
+goto_gcc=$2
+name=${*:$#}
+name=${name%.gb}
+args=${*:3:$#-3}
 
-../../../src/goto-cc/goto-gcc -g -std=c11 -o $NAME.exe $NAME.c
-$MEMORY_ANALYZER $@
+$goto_gcc -g -std=c11 -o "${name}.gb" "${name}.c"
+$memory_analyzer $args "${name}.gb"
