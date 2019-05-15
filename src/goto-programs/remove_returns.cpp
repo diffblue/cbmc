@@ -162,10 +162,7 @@ bool remove_returnst::do_function_calls(
         to_symbol_expr(function_call.function()).get_identifier();
 
       // Do we return anything?
-      if(
-        to_code_type(function_call.function().type()).return_type() !=
-          empty_typet() &&
-        function_call.lhs().is_not_nil())
+      if(does_function_call_return(function_call))
       {
         // replace "lhs=f(...)" by
         // "f(...); lhs=f#return_value; DEAD f#return_value;"
@@ -429,4 +426,11 @@ bool is_return_value_identifier(const irep_idt &id)
 bool is_return_value_symbol(const symbol_exprt &symbol_expr)
 {
   return is_return_value_identifier(symbol_expr.get_identifier());
+}
+
+bool does_function_call_return(const code_function_callt &function_call)
+{
+  return to_code_type(function_call.function().type()).return_type() !=
+           empty_typet() &&
+         function_call.lhs().is_not_nil();
 }

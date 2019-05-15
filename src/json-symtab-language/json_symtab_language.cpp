@@ -13,6 +13,8 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 #include <json/json_parser.h>
 #include <util/namespace.h>
 
+#include <linking/linking.h>
+
 /// Parse a goto program in json form.
 /// \param instream: The input stream
 /// \param path: A file path
@@ -34,10 +36,12 @@ bool json_symtab_languaget::typecheck(
 {
   (void)module; // unused parameter
 
+  symbol_tablet new_symbol_table;
+
   try
   {
-    symbol_table_from_json(parsed_json_file, symbol_table);
-    return false;
+    symbol_table_from_json(parsed_json_file, new_symbol_table);
+    return linking(symbol_table, new_symbol_table, get_message_handler());
   }
   catch(const std::string &str)
   {

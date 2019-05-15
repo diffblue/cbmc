@@ -14,6 +14,7 @@ Date: Oct 2018
 #include <util/invariant.h>
 
 #include "goto_functions.h"
+#include "remove_returns.h"
 
 namespace
 {
@@ -132,7 +133,7 @@ void validate_goto_modelt::check_returns_removed()
         const auto &function_call = instr.get_function_call();
         DATA_CHECK(
           vm,
-          function_call.lhs().is_nil(),
+          !does_function_call_return(function_call),
           "function call lhs return should be nil");
       }
     }

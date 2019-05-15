@@ -217,10 +217,11 @@ SCENARIO("Validation of a goto program", "[core][goto-programs][validate]")
 
   WHEN("not all returns have been removed - a function call lhs is not nil")
   {
+    // int h();
     symbolt h;
     h.name = "h";
     h.mode = ID_C;
-    h.type = code_typet({}, empty_typet{});
+    h.type = code_typet({}, signed_int_type());
     h.value = code_blockt{};
     goto_model.symbol_table.add(h);
 
