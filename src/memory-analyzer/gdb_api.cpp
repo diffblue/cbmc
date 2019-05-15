@@ -10,14 +10,6 @@ Author: Malte Mues <mail.mues@gmail.com>
 /// \file
 /// Low-level interface to gdb
 
-// clang-format off
-#if defined(__linux__) || \
-    defined(__FreeBSD_kernel__) || \
-    defined(__GNU__) || \
-    defined(__unix__) || \
-    defined(__CYGWIN__) || \
-    defined(__MACH__)
-// clang-format on
 
 #include <cctype>
 #include <cerrno>
@@ -506,5 +498,3 @@ gdb_apit::r_or(const std::string &regex_left, const std::string &regex_right)
 {
   return R"((?:)" + regex_left + '|' + regex_right + R"())";
 }
-
-#endif

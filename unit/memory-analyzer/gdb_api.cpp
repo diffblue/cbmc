@@ -9,19 +9,6 @@ Author: Malte Mues <mail.mues@gmail.com>
 
 #include <testing-utils/use_catch.h>
 
-// clang-format off
-#if defined(__linux__) || \
-    defined(__FreeBSD_kernel__) || \
-    defined(__GNU__) || \
-    defined(__unix__) || \
-    defined(__CYGWIN__) || \
-    defined(__MACH__)
-#define RUN_GDB_API_TESTS
-#endif
-// clang-format on
-
-#ifdef RUN_GDB_API_TESTS
-
 #include <cstdio>
 #include <regex>
 #include <string>
@@ -103,18 +90,13 @@ void gdb_api_internals_test()
   }
 }
 
-#endif
-
 TEST_CASE("gdb api internals test", "[core][memory-analyzer]")
 {
-#ifdef RUN_GDB_API_TESTS
   gdb_api_internals_test();
-#endif
 }
 
 TEST_CASE("gdb api test", "[core][memory-analyzer]")
 {
-#ifdef RUN_GDB_API_TESTS
   check_for_gdb();
   compile_test_file();
 
@@ -249,5 +231,4 @@ TEST_CASE("gdb api test", "[core][memory-analyzer]")
       REQUIRE(!value.string);
     }
   }
-#endif
 }

@@ -10,15 +10,6 @@ Author: Malte Mues <mail.mues@gmail.com>
 /// \file
 /// This code does the command line parsing for the memory-analyzer tool
 
-// clang-format off
-#if defined(__linux__) || \
-    defined(__FreeBSD_kernel__) || \
-    defined(__GNU__) || \
-    defined(__unix__) || \
-    defined(__CYGWIN__) || \
-    defined(__MACH__)
-// clang-format on
-
 #ifndef CPROVER_MEMORY_ANALYZER_MEMORY_ANALYZER_PARSE_OPTIONS_H
 #define CPROVER_MEMORY_ANALYZER_MEMORY_ANALYZER_PARSE_OPTIONS_H
 
@@ -49,4 +40,3 @@ protected:
 };
 
 #endif // CPROVER_MEMORY_ANALYZER_MEMORY_ANALYZER_PARSE_OPTIONS_H
-#endif

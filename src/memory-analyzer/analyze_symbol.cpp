@@ -7,15 +7,6 @@ Author: Malte Mues <mail.mues@gmail.com>
 
 \*******************************************************************/
 
-// clang-format off
-#if defined(__linux__) || \
-    defined(__FreeBSD_kernel__) || \
-    defined(__GNU__) || \
-    defined(__unix__) || \
-    defined(__CYGWIN__) || \
-    defined(__MACH__)
-// clang-format on
-
 #include "analyze_symbol.h"
 
 #include <algorithm>
@@ -408,4 +399,3 @@ void symbol_analyzert::process_outstanding_assignments()
   }
 }
 
-#endif

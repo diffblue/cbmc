@@ -31,9 +31,20 @@ all: cbmc.dir \
      goto-diff.dir \
      goto-instrument.dir \
      goto-harness.dir \
-     memory-analyzer.dir \
      symtab2gb.dir \
      # Empty last line
+
+ifeq ($(OS),Windows_NT)
+  detected_OS := Windows
+else
+  detected_OS := $(shell sh -c 'uname 2>/dev/null || echo Unknown')
+endif
+
+ifeq ($(detected_OS),Linux)
+  all: memory-analyzer.dir
+else ifeq ($(WITH_MEMORY_ANALYZER),1)
+  all: memory-analyzer.dir
+endif
 
 ###############################################################################
 

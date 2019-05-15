@@ -10,15 +10,6 @@ Author: Malte Mues <mail.mues@gmail.com>
 /// \file
 /// Commandline parser for the memory analyzer executing main work.
 
-// clang-format off
-#if defined(__linux__) || \
-    defined(__FreeBSD_kernel__) || \
-    defined(__GNU__) || \
-    defined(__unix__) || \
-    defined(__CYGWIN__) || \
-    defined(__MACH__)
-// clang-format on
-
 #include "memory_analyzer_parse_options.h"
 #include "analyze_symbol.h"
 #include "gdb_api.h"
@@ -183,5 +174,3 @@ void memory_analyzer_parse_optionst::help()
     << " --output-file <file>         write snapshot to file\n"
     << messaget::eom;
 }
-
-#endif

@@ -53,3 +53,7 @@ add_subdirectory(goto-harness)
 add_subdirectory(goto-cc-file-local)
 add_subdirectory(linking-goto-binaries)
 add_subdirectory(symtab2gb)
+
+if(WITH_MEMORY_ANALYZER)
+add_subdirectory(memory-analyzer)
+endif()

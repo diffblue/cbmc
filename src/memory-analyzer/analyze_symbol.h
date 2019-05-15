@@ -7,14 +7,6 @@ Author: Malte Mues <mail.mues@gmail.com>
 
 \*******************************************************************/
 
-// clang-format off
-#if defined(__linux__) || \
-    defined(__FreeBSD_kernel__) || \
-    defined(__GNU__) || \
-    defined(__unix__) || \
-    defined(__CYGWIN__) || \
-    defined(__MACH__)
-// clang-format on
 
 #ifndef CPROVER_MEMORY_ANALYZER_ANALYZE_SYMBOL_H
 #define CPROVER_MEMORY_ANALYZER_ANALYZE_SYMBOL_H
@@ -98,4 +90,3 @@ private:
 };
 
 #endif // CPROVER_MEMORY_ANALYZER_ANALYZE_SYMBOL_H
-#endif

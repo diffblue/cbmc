@@ -34,7 +34,6 @@ SRC += analyses/ai/ai.cpp \
        interpreter/interpreter.cpp \
        json/json_parser.cpp \
        json_symbol_table.cpp \
-       memory-analyzer/gdb_api.cpp \
        path_strategies.cpp \
        pointer-analysis/value_set.cpp \
        solvers/bdd/miniBDD/miniBDD.cpp \
@@ -84,6 +83,23 @@ SRC += analyses/ai/ai.cpp \
        util/symbol.cpp \
        util/unicode.cpp \
        # Empty last line
+
+ifeq ($(OS),Windows_NT)
+    detected_OS := Windows
+else
+    detected_OS := $(shell sh -c 'uname 2>/dev/null || echo Unknown')
+endif
+
+ifeq ($(detected_OS),Linux)
+  ifneq ($(WITH_MEMORY_ANALYZER),0)
+    # only set if it wasn't explicitly unset
+    WITH_MEMORY_ANALYZER=1
+  endif
+endif
+
+ifeq ($(WITH_MEMORY_ANALYZER),1)
+  SRC += memory-analyzer/gdb_api.cpp
+endif
 
 INCLUDES= -I ../src/ -I.
 
@@ -145,9 +161,14 @@ CPROVER_LIBS =../src/ansi-c/ansi-c$(LIBEXT) \
 OBJ += $(CPROVER_LIBS) testing-utils/testing-utils$(LIBEXT)
 
 CATCH_TEST = unit_tests$(EXEEXT)
+EXCLUDED_TESTS=expr_undefined_casts.cpp
+ifneq ($(WITH_MEMORY_ANALYZER),1)
+EXCLUDED_TESTS += gdb_api.cpp
+endif
+
 N_CATCH_TESTS = $(shell \
                   cat $$(find . -name "*.cpp" \
-                    -a -not -name "expr_undefined_casts.cpp") | \
+                $$(printf ' -not -name %s ' $(EXCLUDED_TESTS))) | \
                   grep -E "(SCENARIO|TEST_CASE)" | grep -c -v '\[\.\]')
 
 CLEANFILES = $(CATCH_TEST) testing-utils/testing-utils$(LIBEXT)

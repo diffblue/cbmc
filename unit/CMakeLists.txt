@@ -13,6 +13,11 @@ file(GLOB_RECURSE sources "*.cpp" "*.h")
 
 file(GLOB_RECURSE testing_utils "testing-utils/*.cpp" "testing-utils/*.h")
 
+if(NOT WITH_MEMORY_ANALYZER)
+    file(GLOB_RECURSE memory_analyzer_sources "memory-analyzer/*.cpp")
+    list(REMOVE_ITEM sources ${memory_analyzer_sources})
+endif()
+
 list(REMOVE_ITEM sources
     # Don't build
     ${CMAKE_CURRENT_SOURCE_DIR}/elf_reader.cpp
