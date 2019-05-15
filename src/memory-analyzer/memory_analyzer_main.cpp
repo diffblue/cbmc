@@ -1,5 +1,13 @@
-// Copyright 2018 Author: Malte Mues <mail.mues@gmail.com>
+/*******************************************************************\
 
+Module: Symbol Analyzer
+
+Author: Malte Mues <mail.mues@gmail.com>
+
+\*******************************************************************/
+
+/// \file
+/// Memory analyzer interface
 
 #include "memory_analyzer_parse_options.h"
 

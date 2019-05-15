@@ -14,6 +14,7 @@ Author: Malte Mues <mail.mues@gmail.com>
 #include "analyze_symbol.h"
 #include "gdb_api.h"
 
+#include <algorithm>
 #include <fstream>
 
 #include <ansi-c/ansi_c_language.h>
@@ -67,10 +68,18 @@ int memory_analyzer_parse_optionst::doit()
   const bool core_file = cmdline.isset("core-file");
   const bool breakpoint = cmdline.isset("breakpoint");
 
-  if(!(core_file ^ breakpoint))
+  if(core_file && breakpoint)
   {
     throw invalid_command_line_argument_exceptiont(
-      "need to provide either option --core-file or option --breakpoint", "");
+      "cannot start gdb from both core-file and breakpoint",
+      "--core-file/--breakpoint");
+  }
+
+  if(!core_file && !breakpoint)
+  {
+    throw invalid_command_line_argument_exceptiont(
+      "need to provide either core-file or breakpoint for gdb",
+      "--core-file/--breakpoint");
   }
 
   const bool output_file = cmdline.isset("output-file");
@@ -87,20 +96,6 @@ int memory_analyzer_parse_optionst::doit()
 
   std::string binary = cmdline.args.front();
 
-  gdb_apit gdb_api(binary.c_str());
-  gdb_api.create_gdb_process();
-
-  if(core_file)
-  {
-    std::string core_file = cmdline.get_value("core-file");
-    gdb_api.run_gdb_from_core(core_file);
-  }
-  else if(breakpoint)
-  {
-    std::string breakpoint = cmdline.get_value("breakpoint");
-    gdb_api.run_gdb_to_breakpoint(breakpoint);
-  }
-
   const std::string symbol_list(cmdline.get_value("symbols"));
   std::vector<std::string> result;
   split_string(symbol_list, ',', result, true, true);
@@ -110,14 +105,32 @@ int memory_analyzer_parse_optionst::doit()
   if(!opt.has_value())
   {
     throw deserialization_exceptiont(
-      "cannot read goto binary `" + binary + "`");
+      "cannot read goto binary `" + binary + "'");
   }
 
   const goto_modelt goto_model(std::move(opt.value()));
 
-  symbol_analyzert analyzer(goto_model.symbol_table, gdb_api);
+  gdb_value_extractort gdb_value_extractor(
+    goto_model.symbol_table, binary.c_str());
+  gdb_value_extractor.create_gdb_process();
 
-  analyzer.analyze_symbols(result);
+  if(core_file)
+  {
+    std::string core_file = cmdline.get_value("core-file");
+    gdb_value_extractor.run_gdb_from_core(core_file);
+  }
+  else if(breakpoint)
+  {
+    std::string breakpoint = cmdline.get_value("breakpoint");
+    gdb_value_extractor.run_gdb_to_breakpoint(breakpoint);
+  }
+
+  std::vector<irep_idt> result_ids(result.size());
+  std::transform(
+    result.begin(), result.end(), result_ids.begin(), [](std::string &name) {
+      return irep_idt{name};
+    });
+  gdb_value_extractor.analyze_symbols(result_ids);
 
   std::ofstream file;
 
@@ -131,12 +144,12 @@ int memory_analyzer_parse_optionst::doit()
 
   if(symtab_snapshot)
   {
-    symbol_tablet snapshot = analyzer.get_snapshot_as_symbol_table();
+    symbol_tablet snapshot = gdb_value_extractor.get_snapshot_as_symbol_table();
     show_symbol_table(snapshot, ui_message_handler);
   }
   else
   {
-    std::string snapshot = analyzer.get_snapshot_as_c_code();
+    std::string snapshot = gdb_value_extractor.get_snapshot_as_c_code();
     out << snapshot;
   }
 
@@ -163,14 +176,17 @@ void memory_analyzer_parse_optionst::help()
     << '\n'
     << "Usage:                       Purpose:\n"
     << '\n'
-    << " memory-analyzer [-?] [-h] [--help]  show help\n"
-    << " memory-analyzer --version           show version\n"
-    << " memory-analyzer <options> <binary>  analyze binary"
+    << " memory-analyzer [-?] [-h] [--help]                         show help\n"
+    << " memory-analyzer --version                                  show"
+    << " version\n"
+    << " memory-analyzer --symbols <symbol-list> <options> <binary> analyze"
+    << " binary\n"
     << "\n"
     << " --core-file <file>           analyze from core file\n"
     << " --breakpoint <breakpoint>    analyze from breakpoint\n"
     << " --symbols <symbol-list>      list of symbols to analyze\n"
     << " --symtab-snapshot            output snapshot as symbol table\n"
     << " --output-file <file>         write snapshot to file\n"
+    << " --json-ui                    output snapshot in JSON format\n"
     << messaget::eom;
 }
