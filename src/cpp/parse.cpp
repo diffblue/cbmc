@@ -4127,6 +4127,8 @@ bool Parser::rArgDeclaration(cpp_declarationt &declaration)
   if(!rDeclarator(arg_declarator, kArgDeclarator, true, false))
     return false;
 
+  arg_declarator.set_is_parameter(true);
+
   declaration.declarators().push_back(arg_declarator);
 
   int t=lex.LookAhead(0);

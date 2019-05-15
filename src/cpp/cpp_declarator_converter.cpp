@@ -53,6 +53,9 @@ symbolt &cpp_declarator_convertert::convert(
   final_type=declarator.merge_type(declaration_type);
   assert(final_type.is_not_nil());
 
+  cpp_storage_spect final_storage_spec = storage_spec;
+  final_storage_spec |= cpp_storage_spect(final_type);
+
   cpp_template_args_non_tct template_args;
 
   // run resolver on scope
@@ -135,7 +138,7 @@ symbolt &cpp_declarator_convertert::convert(
       if(!maybe_symbol && is_friend)
       {
         symbolt &friend_symbol =
-          convert_new_symbol(storage_spec, member_spec, declarator);
+          convert_new_symbol(final_storage_spec, member_spec, declarator);
         // mark it as weak so that the full declaration can replace the symbol
         friend_symbol.is_weak = true;
         return friend_symbol;
@@ -191,7 +194,7 @@ symbolt &cpp_declarator_convertert::convert(
         type, declarator.member_initializers());
     }
 
-    if(!storage_spec.is_extern())
+    if(!final_storage_spec.is_extern())
       symbol.is_extern=false;
 
     // initializer?
@@ -217,10 +220,10 @@ symbolt &cpp_declarator_convertert::convert(
     const auto maybe_symbol=
       cpp_typecheck.symbol_table.get_writeable(final_identifier);
     if(!maybe_symbol)
-      return convert_new_symbol(storage_spec, member_spec, declarator);
+      return convert_new_symbol(final_storage_spec, member_spec, declarator);
     symbolt &symbol=*maybe_symbol;
 
-    if(!storage_spec.is_extern())
+    if(!final_storage_spec.is_extern())
       symbol.is_extern = false;
 
     if(declarator.get_bool(ID_C_template_case))
@@ -447,6 +450,9 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
   symbol.base_name=base_name;
   symbol.value=declarator.value();
   symbol.location=declarator.name().source_location();
+  symbol.is_extern = storage_spec.is_extern();
+  symbol.is_parameter = declarator.get_is_parameter();
+  symbol.is_weak = storage_spec.is_weak();
   symbol.mode=linkage_spec==ID_auto?ID_cpp:linkage_spec;
   symbol.module=cpp_typecheck.module;
   symbol.type=final_type;
@@ -459,49 +465,40 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
      symbol.value.is_not_nil())
     symbol.is_macro=true;
 
-  if(member_spec.is_inline())
-    to_code_type(symbol.type).set_inlined(true);
-
-  if(!symbol.is_type)
+  if(is_code && !symbol.is_type)
   {
-    if(is_code)
-    {
-      // it is a function
-      if(storage_spec.is_static())
-        symbol.is_file_local=true;
-    }
-    else
-    {
-      // it is a variable
-      symbol.is_state_var=true;
-      symbol.is_lvalue = !is_reference(symbol.type) &&
-                         !(symbol.type.get_bool(ID_C_constant) &&
-                         is_number(symbol.type) &&
-                         symbol.value.id() == ID_constant);
+    // it is a function
+    symbol.is_static_lifetime = false;
+    symbol.is_thread_local = false;
 
-      if(cpp_typecheck.cpp_scopes.current_scope().is_global_scope())
-      {
-        symbol.is_static_lifetime=true;
+    symbol.is_file_local = storage_spec.is_static();
 
-        if(storage_spec.is_extern())
-          symbol.is_extern=true;
-      }
-      else
-      {
-        if(storage_spec.is_static())
-        {
-          symbol.is_static_lifetime=true;
-          symbol.is_file_local=true;
-        }
-        else if(storage_spec.is_extern())
-        {
-          cpp_typecheck.error().source_location=storage_spec.location();
-          cpp_typecheck.error() << "external storage not permitted here"
-                                << messaget::eom;
-          throw 0;
-        }
-      }
-    }
+    if(member_spec.is_inline())
+      to_code_type(symbol.type).set_inlined(true);
+  }
+  else
+  {
+    symbol.is_lvalue =
+      !is_reference(symbol.type) &&
+      !(symbol.type.get_bool(ID_C_constant) && is_number(symbol.type) &&
+        symbol.value.id() == ID_constant);
+
+    symbol.is_static_lifetime =
+      !symbol.is_macro && !symbol.is_type &&
+      (cpp_typecheck.cpp_scopes.current_scope().is_global_scope() ||
+       storage_spec.is_static());
+
+    symbol.is_thread_local =
+      (!symbol.is_static_lifetime && !storage_spec.is_extern()) ||
+      storage_spec.is_thread_local();
+
+    symbol.is_file_local =
+      symbol.is_macro ||
+      (!cpp_typecheck.cpp_scopes.current_scope().is_global_scope() &&
+       !storage_spec.is_extern()) ||
+      (cpp_typecheck.cpp_scopes.current_scope().is_global_scope() &&
+       storage_spec.is_static()) ||
+      symbol.is_parameter;
   }
 
   if(symbol.is_static_lifetime)

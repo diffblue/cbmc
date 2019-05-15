@@ -17,6 +17,7 @@ SRC = cpp_constructor.cpp \
       cpp_parser.cpp \
       cpp_scope.cpp \
       cpp_scopes.cpp \
+      cpp_storage_spec.cpp \
       cpp_token_buffer.cpp \
       cpp_type2name.cpp \
       cpp_typecheck.cpp \
