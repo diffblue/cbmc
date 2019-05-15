@@ -27,7 +27,7 @@ void cpp_typecheckt::typecheck_type(typet &type)
 
   try
   {
-    cpp_convert_plain_type(type);
+    cpp_convert_plain_type(type, get_message_handler());
   }
 
   catch(const char *err)

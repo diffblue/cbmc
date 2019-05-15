@@ -66,7 +66,7 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
 
     if(has_auto(symbol.type))
     {
-      cpp_convert_auto(symbol.type, symbol.value.type());
+      cpp_convert_auto(symbol.type, symbol.value.type(), get_message_handler());
       typecheck_type(symbol.type);
       implicit_typecast(symbol.value, symbol.type);
     }
@@ -152,7 +152,7 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
     }
     else if(has_auto(symbol.type))
     {
-      cpp_convert_auto(symbol.type, symbol.value.type());
+      cpp_convert_auto(symbol.type, symbol.value.type(), get_message_handler());
       typecheck_type(symbol.type);
       implicit_typecast(symbol.value, symbol.type);
     }

@@ -233,7 +233,7 @@ void cpp_typecheckt::typecheck_function_template(
   typet function_type=
     declarator.merge_type(declaration.type());
 
-  cpp_convert_plain_type(function_type);
+  cpp_convert_plain_type(function_type, get_message_handler());
 
   irep_idt symbol_name=
     function_template_identifier(
