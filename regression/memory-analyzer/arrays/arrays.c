@@ -62,7 +62,7 @@ void setup()
     test_struct->childs[i].options[0] = your_options.options[0];
     test_struct->childs[i].options[1].text = your_options.options[1].text;
   }
-  test_struct->initalized = true;
+  test_struct->initialized = true;
 }
 
 int manipulate_data()

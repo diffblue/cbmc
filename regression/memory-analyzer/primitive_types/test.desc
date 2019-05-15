@@ -1,5 +1,0 @@
-FUTURE
-primitive_types.exe
---breakpoint my_function --symbols e,f,f_1,d,g,h
-^EXIT=0$
-^SIGNAL=0$

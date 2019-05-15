@@ -24,7 +24,7 @@ struct a_sub_typet
 struct a_typet
 {
   int config[10];
-  bool initalized;
+  bool initialized;
   unsigned char values[70];
   struct a_sub_typet childs[4];
 } * test_struct;

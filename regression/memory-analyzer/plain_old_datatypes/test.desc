@@ -1,0 +1,17 @@
+CORE
+plain_old_datatypes.gb
+--breakpoint my_function --symbols e,f,f_1,d,g,h
+^EXIT=0$
+^SIGNAL=0$
+char tmp\[\];
+struct mapping_things tmp\$0;
+char tmp\$1\[\];
+e = 17;
+f = &e;
+f_1 = &e;
+tmp = \"test2\";
+d = \{ .a=4, .b=tmp, .c=-32 \};
+tmp\$0 = \{ .a=0, .b=\(\(char \*\)0\), .c=0 \};
+g = &tmp\$0;
+tmp\$1 = \"test\";
+h = tmp\$1;

@@ -1,5 +1,5 @@
 CORE
-main.exe
+main.gb
 --breakpoint checkpoint --symbols p
 ^EXIT=0$
 ^SIGNAL=0$

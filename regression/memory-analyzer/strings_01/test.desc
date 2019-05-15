@@ -1,8 +1,8 @@
-KNOWNBUG
-main.exe
+CORE
+main.gb
 --breakpoint checkpoint --symbols s
-char tmp\[4\];
-tmp = "abc";
+char tmp\[\];
+tmp = \"abc\";
 s = tmp;
 ^EXIT=0$
 ^SIGNAL=0$

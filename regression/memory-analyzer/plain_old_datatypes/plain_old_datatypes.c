@@ -5,7 +5,7 @@
 /// Pointer references are tested and ensured, that for example f and f_1 are
 /// pointing to the same int value location after running memory-analyzer.
 
-#include "primitive_types.h"
+#include "plain_old_datatypes.h"
 int my_function(char *s)
 {
   int a = 10;
