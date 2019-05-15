@@ -721,11 +721,9 @@ void goto_symext::try_filter_value_sets(
   // one of its possible values in turn. If that leads to a true for some
   // value_set_element then we can delete it from the value set that will be
   // used if the condition is false, and vice versa.
-  for(const exprt &value_set_element : value_set_elements)
+  for(const auto &value_set_element : value_set_elements)
   {
-    if(
-      value_set_element.id() == ID_unknown ||
-      value_set_element.id() == ID_invalid)
+    if(value_set_element.id() == ID_unknown)
     {
       continue;
     }
@@ -737,17 +735,19 @@ void goto_symext::try_filter_value_sets(
       continue;
     }
 
-    value_set_dereferencet::valuet value =
+    value_set_dereferencet::valuet possible_value =
       value_set_dereferencet::build_reference_to(
         value_set_element, *symbol_expr, ns);
 
-    if(value.pointer.is_nil())
-      continue;
+    exprt replacement_expr =
+      possible_value.value.is_nil()
+        ? static_cast<exprt>(null_pointer_exprt{symbol_type})
+        : static_cast<exprt>(address_of_exprt{possible_value.value});
 
     exprt modified_condition(condition);
 
     address_of_aware_replace_symbolt replace_symbol{};
-    replace_symbol.insert(*symbol_expr, value.pointer);
+    replace_symbol.insert(*symbol_expr, replacement_expr);
     replace_symbol(modified_condition);
 
     // This do_simplify() is needed for the following reason: if `condition` is

@@ -15,9 +15,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <map>
 #include <unordered_set>
 
-#include <util/expr_iterator.h>
 #include <util/irep.h>
-#include <util/range.h>
 #include <util/sharing_map.h>
 #include <util/simplify_expr.h>
 #include <util/ssa_expr.h>
@@ -89,9 +87,6 @@ public:
     (void)::simplify(value(), ns);
   }
 
-  using mutator_functiont =
-    std::function<optionalt<renamedt>(const renamedt &)>;
-
 private:
   underlyingt &value()
   {
@@ -103,50 +98,11 @@ private:
   friend struct symex_level2t;
   friend class goto_symex_statet;
 
-  template <levelt make_renamed_level>
-  friend renamedt<exprt, make_renamed_level>
-  make_renamed(constant_exprt constant);
-
-  template <levelt selectively_mutate_level>
-  friend void selectively_mutate(
-    renamedt<exprt, selectively_mutate_level> &renamed,
-    typename renamedt<exprt, selectively_mutate_level>::mutator_functiont
-      get_mutated_expr);
-
   /// Only the friend classes can create renamedt objects
   explicit renamedt(underlyingt value) : underlyingt(std::move(value))
   {
   }
 };
-
-template <levelt level>
-renamedt<exprt, level> make_renamed(constant_exprt constant)
-{
-  return renamedt<exprt, level>(std::move(constant));
-}
-
-/// This permits replacing subexpressions of the renamed value, so long as
-/// each replacement is consistent with our current renaming level (for
-/// example, replacing subexpressions of L2 expressions with ones which are
-/// themselves L2 renamed).
-/// The passed function will be called with each expression node in preorder
-/// (i.e. parent expressions before children), and should return an empty
-/// optional to make no change or a renamed expression to make a change.
-template <levelt level>
-void selectively_mutate(
-  renamedt<exprt, level> &renamed,
-  typename renamedt<exprt, level>::mutator_functiont get_mutated_expr)
-{
-  for(auto it = renamed.depth_begin(), itend = renamed.depth_end(); it != itend;
-      ++it)
-  {
-    optionalt<renamedt<exprt, level>> replacement =
-      get_mutated_expr(static_cast<const renamedt<exprt, level> &>(*it));
-
-    if(replacement)
-      it.mutate() = std::move(replacement->value());
-  }
-}
 
 /// Functor to set the level 0 renaming of SSA expressions.
 /// Level 0 corresponds to threads.
