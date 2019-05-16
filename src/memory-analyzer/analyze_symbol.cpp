@@ -64,7 +64,7 @@ void gdb_value_extractort::analyze_symbol(const irep_idt &symbol_name)
 
     add_assignment(symbol_expr, target_expr);
   }
-  catch(gdb_interaction_exceptiont e)
+  catch(const gdb_interaction_exceptiont &e)
   {
     throw analysis_exceptiont(e.what());
   }
