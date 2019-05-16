@@ -1,0 +1,8 @@
+KNOWNBUG
+main.gb
+--breakpoint checkpoint --symbols p
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+p has type void*, the value it points to has type void; right now we can't initialize expression of that type

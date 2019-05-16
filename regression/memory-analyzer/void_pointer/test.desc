@@ -1,0 +1,8 @@
+KNOWNBUG
+void_pointer.gb
+--breakpoint void_pointer.c:17 --symbols a_void_pointer,a_second_void_pointer,a_third_void_pointer,blob
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+void pointer unsupported for now

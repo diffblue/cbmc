@@ -105,3 +105,7 @@ add_subdirectory(goto-analyzer)
 add_subdirectory(goto-diff)
 add_subdirectory(goto-harness)
 add_subdirectory(symtab2gb)
+
+if(UNIX OR WITH_MEMORY_ANALYZER)
+add_subdirectory(memory-analyzer)
+endif()

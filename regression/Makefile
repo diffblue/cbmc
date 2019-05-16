@@ -30,6 +30,23 @@ DIRS = cbmc \
        symtab2gb \
        # Empty last line
 
+ifeq ($(OS),Windows_NT)
+    detected_OS := Windows
+else
+    detected_OS := $(shell sh -c 'uname 2>/dev/null || echo Unknown')
+endif
+
+ifeq ($(detected_OS),Linux)
+  ifneq ($(WITH_MEMORY_ANALYZER),0)
+    # only set if it wasn't explicitly unset
+    WITH_MEMORY_ANALYZER=1
+  endif
+endif
+
+ifeq ($(WITH_MEMORY_ANALYZER),1)
+  DIRS += memory-analyzer
+endif
+
 # Run all test directories in sequence
 .PHONY: test
 test:

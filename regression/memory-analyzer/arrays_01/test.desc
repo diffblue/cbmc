@@ -1,0 +1,6 @@
+CORE
+main.gb
+--breakpoint checkpoint --symbols array
+array = \{ 1, 4, 3 \};
+^EXIT=0$
+^SIGNAL=0$

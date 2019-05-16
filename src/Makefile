@@ -17,6 +17,7 @@ DIRS = analyses \
        json-symtab-language \
        langapi \
        linking \
+       memory-analyzer \
        pointer-analysis \
        solvers \
        symtab2gb \
@@ -32,6 +33,18 @@ all: cbmc.dir \
      goto-harness.dir \
      symtab2gb.dir \
      # Empty last line
+
+ifeq ($(OS),Windows_NT)
+  detected_OS := Windows
+else
+  detected_OS := $(shell sh -c 'uname 2>/dev/null || echo Unknown')
+endif
+
+ifeq ($(detected_OS),Linux)
+  all: memory-analyzer.dir
+else ifeq ($(WITH_MEMORY_ANALYZER),1)
+  all: memory-analyzer.dir
+endif
 
 ###############################################################################
 
@@ -71,6 +84,8 @@ goto-diff.dir: languages goto-programs.dir pointer-analysis.dir \
                solvers.dir goto-symex.dir
 
 goto-cc.dir: languages goto-programs.dir linking.dir
+
+memory-analyzer.dir: util.dir goto-programs.dir ansi-c.dir
 
 symtab2gb.dir: util.dir goto-programs.dir json-symtab-language.dir
 

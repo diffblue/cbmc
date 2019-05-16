@@ -1,0 +1,23 @@
+CORE
+cycles.gb
+--breakpoint process_buffer --symbols buffer
+cycle_buffer_entry_t tmp;
+char tmp\$0\[\];
+struct cycle_buffer_entry tmp\$1;
+char tmp\$2\[\];
+struct cycle_buffer_entry tmp\$3;
+char tmp\$4\[\];
+struct cycle_buffer_entry tmp\$5;
+char tmp\$6\[\];
+tmp\$0 = \"snow\";
+tmp\$2 = \"sun\";
+tmp\$4 = \"rain\";
+tmp\$6 = \"thunder storm\";
+tmp\$5 = \{ .data=tmp\$6, .next=\(\(struct cycle_buffer_entry \*\)0\) \};
+tmp\$3 = \{ .data=tmp\$4, .next=&tmp\$5 \};
+tmp\$1 = \{ .data=tmp\$2, .next=&tmp\$3 \};
+tmp = \{ .data=tmp\$0, .next=&tmp\$1 \};
+buffer = \{ .start=&tmp, .end=&tmp\$5 \};
+buffer.start->next->next->next->next = &tmp;
+^EXIT=0$
+^SIGNAL=0$

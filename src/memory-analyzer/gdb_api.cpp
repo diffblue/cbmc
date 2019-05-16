@@ -10,20 +10,14 @@ Author: Malte Mues <mail.mues@gmail.com>
 /// \file
 /// Low-level interface to gdb
 
-// clang-format off
-#if defined(__linux__) || \
-    defined(__FreeBSD_kernel__) || \
-    defined(__GNU__) || \
-    defined(__unix__) || \
-    defined(__CYGWIN__) || \
-    defined(__MACH__)
-// clang-format on
 
 #include <cctype>
 #include <cerrno>
 #include <cstdio>
 #include <cstring>
 #include <regex>
+
+#include <iostream>
 
 #include "gdb_api.h"
 
@@ -34,17 +28,11 @@ Author: Malte Mues <mail.mues@gmail.com>
 
 #include <sys/wait.h>
 
-/// Create a gdb_apit object
-///
-/// \param binary the binary to run with gdb
-/// \param log boolean indicating whether gdb input and output should be logged
 gdb_apit::gdb_apit(const char *binary, const bool log)
   : binary(binary), log(log), gdb_state(gdb_statet::NOT_CREATED)
 {
 }
 
-/// Terminate the gdb process and close open streams (for reading from and
-/// writing to gdb)
 gdb_apit::~gdb_apit()
 {
   PRECONDITION(
@@ -68,8 +56,6 @@ gdb_apit::~gdb_apit()
   wait(NULL);
 }
 
-/// Create a new gdb process for analysing the binary indicated by the member
-/// variable `binary`
 void gdb_apit::create_gdb_process()
 {
   PRECONDITION(gdb_state == gdb_statet::NOT_CREATED);
@@ -173,7 +159,6 @@ void gdb_apit::write_to_gdb(const std::string &command)
   fflush(command_stream);
 }
 
-/// Return the vector of commands that have been written to gdb so far
 const gdb_apit::commandst &gdb_apit::get_command_log()
 {
   PRECONDITION(log);
@@ -259,9 +244,6 @@ bool gdb_apit::most_recent_line_has_tag(const std::string &tag)
   return has_prefix(line, tag);
 }
 
-/// Run gdb with the given core file
-///
-/// \param corefile core dump
 void gdb_apit::run_gdb_from_core(const std::string &corefile)
 {
   PRECONDITION(gdb_state == gdb_statet::CREATED);
@@ -275,10 +257,6 @@ void gdb_apit::run_gdb_from_core(const std::string &corefile)
   gdb_state = gdb_statet::STOPPED;
 }
 
-/// Run gdb to the given breakpoint
-///
-/// \param breakpoint the breakpoint to set (can be e.g. a line number or a
-///   function name)
 bool gdb_apit::run_gdb_to_breakpoint(const std::string &breakpoint)
 {
   PRECONDITION(gdb_state == gdb_statet::CREATED);
@@ -353,70 +331,63 @@ std::string gdb_apit::eval_expr(const std::string &expr)
   return value;
 }
 
-/// Get the memory address pointed to by the given pointer expression
-///
-/// \param expr an expression of pointer type (e.g., `&x` with `x` being of type
-///   `int` or `p` with `p` being of type `int *`)
-/// \return memory address in hex format
-std::string gdb_apit::get_memory(const std::string &expr)
+gdb_apit::pointer_valuet gdb_apit::get_memory(const std::string &expr)
 {
   PRECONDITION(gdb_state == gdb_statet::STOPPED);
 
-  std::string mem;
+  std::string value = eval_expr(expr);
 
-  // regex matching a hex memory address followed by an optional identifier in
-  // angle brackets (e.g., `0x601060 <x>`)
-  std::regex regex(R"(^(0x[1-9a-f][0-9a-f]*)( <.*>)?)");
-
-  const std::string value = eval_expr(expr);
+  std::regex regex(
+    r_hex_addr + r_opt(' ' + r_id) + r_opt(' ' + r_or(r_char, r_string)));
 
   std::smatch result;
-  if(regex_match(value, result, regex))
+  const bool b = regex_match(value, result, regex);
+  CHECK_RETURN(b);
+
+  optionalt<std::string> opt_string;
+  const std::string string = result[4];
+
+  if(!string.empty())
   {
-    // return hex address only
-    return result[1];
-  }
-  else
-  {
-    throw gdb_interaction_exceptiont(
-      "value `" + value +
-      "` is not a memory address or has unrecognised format");
+    const std::size_t len = string.length();
+
+    INVARIANT(
+      len >= 4,
+      "pointer-string should be: backslash, quotes, .., backslash, quotes");
+    INVARIANT(
+      string[0] == '\\',
+      "pointer-string should be: backslash, quotes, .., backslash, quotes");
+    INVARIANT(
+      string[1] == '"',
+      "pointer-string should be: backslash, quotes, .., backslash, quotes");
+    INVARIANT(
+      string[len - 2] == '\\',
+      "pointer-string should be: backslash, quotes, .., backslash, quotes");
+    INVARIANT(
+      string[len - 1] == '"',
+      "pointer-string should be: backslash, quotes, .., backslash, quotes");
+
+    opt_string = string.substr(2, len - 4);
   }
 
-  UNREACHABLE;
+  return pointer_valuet(result[1], result[2], result[3], opt_string);
 }
 
-/// Get value of the given value expression
-///
-/// \param expr an expression of non-pointer type or pointer to char
-/// \return value of the expression; if the expression is of type pointer to
-///   char and represents a string, the string value is returned; otherwise the
-///   value is returned just as it is printed by gdb
 std::string gdb_apit::get_value(const std::string &expr)
 {
   PRECONDITION(gdb_state == gdb_statet::STOPPED);
 
   const std::string value = eval_expr(expr);
 
+  // Get char value
   {
-    // get string from char pointer
-    const std::regex regex(R"(0x[1-9a-f][0-9a-f]* \\"(.*)\\")");
+    // matches e.g. 99 'c' and extracts c
+    std::regex regex(R"([^ ]+ '([^']+)')");
 
     std::smatch result;
-    if(regex_match(value, result, regex))
-    {
-      return result[1];
-    }
-  }
+    const bool b = regex_match(value, result, regex);
 
-  // this case will go away eventually, once client code has been refactored to
-  // use get_memory() instead
-  {
-    // get void pointer address
-    const std::regex regex(R"(0x[1-9a-f][0-9a-f]*)");
-
-    std::smatch result;
-    if(regex_match(value, result, regex))
+    if(b)
     {
       return result[1];
     }
@@ -500,4 +471,13 @@ void gdb_apit::check_command_accepted()
   CHECK_RETURN(was_accepted);
 }
 
-#endif
+std::string gdb_apit::r_opt(const std::string &regex)
+{
+  return R"((?:)" + regex + R"()?)";
+}
+
+std::string
+gdb_apit::r_or(const std::string &regex_left, const std::string &regex_right)
+{
+  return R"((?:)" + regex_left + '|' + regex_right + R"())";
+}

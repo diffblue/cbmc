@@ -1,0 +1,27 @@
+FUTURE
+arrays.gb
+--breakpoint manipulate_data --symbols test_struct
+analyzing symbol: test_struct
+GENERATED CODE:
+\{
+  char _test_struct_childs0_options0_text_1\[\]="accept";
+  char _test_struct_childs0_options1_text_2\[\]="unique0";
+  char _test_struct_childs1_options1_text_3\[\]="unique1";
+  char _test_struct_childs2_options1_text_4\[\]="unique2";
+  char _test_struct_childs3_options1_text_5\[\]="unique3";
+  struct a_typet test_struct_0=\{ .config=\{ 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 \}, .initalized=0,
+    .values=\{ 243, 243, 243, 243, 243, 243, 243, 243, 243, 243, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 171, 171, 171, 171, 171, 171, 171, 171, 171, 171 \}, .childs=\{ \{ .id=12, .options=\{ \{ .text=\(char \*\)&_test_struct_childs0_options0_text_1 \},
+    \{ .text=\(char \*\)&_test_struct_childs0_options1_text_2 \} \} \},
+    \{ .id=13, .options=\{ \{ .text=\(char \*\)&_test_struct_childs0_options0_text_1 \},
+    \{ .text=\(char \*\)&_test_struct_childs1_options1_text_3 \} \} \},
+    \{ .id=14, .options=\{ \{ .text=\(char \*\)&_test_struct_childs0_options0_text_1 \},
+    \{ .text=\(char \*\)&_test_struct_childs2_options1_text_4 \} \} \},
+    \{ .id=15, .options=\{ \{ .text=\(char \*\)&_test_struct_childs0_options0_text_1 \},
+    \{ .text=\(char \*\)&_test_struct_childs3_options1_text_5 \} \} \} \} \};
+  test_struct = &test_struct_0;
+\}
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+`values` is an array of unsigned chars which we currently cannot extract from GDB

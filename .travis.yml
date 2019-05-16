@@ -108,6 +108,7 @@ jobs:
       env:
         - COMPILER="ccache /usr/bin/g++-5"
         - EXTRA_CXXFLAGS="-D_GLIBCXX_DEBUG"
+        - WITH_MEMORY_ANALYZER=1
 
     # OS X using clang++
     - stage: Test different OS/CXX/Flags
@@ -118,7 +119,9 @@ jobs:
       before_install:
         - HOMEBREW_NO_AUTO_UPDATE=1 brew install ccache parallel gdb
         - export PATH=$PATH:/usr/local/opt/ccache/libexec
-      env: COMPILER="ccache clang++"
+      env:
+        - COMPILER="ccache clang++"
+        - WITH_MEMORY_ANALYZER=0
 
     # Ubuntu Linux with glibc using g++-5, debug mode
     - stage: Test different OS/CXX/Flags
@@ -144,6 +147,7 @@ jobs:
       env:
         - COMPILER="ccache /usr/bin/g++-5"
         - EXTRA_CXXFLAGS="-DDEBUG"
+        - WITH_MEMORY_ANALYZER=1
       script: echo "Not running any tests for a debug build."
 
     # Ubuntu Linux with glibc using clang++-7, debug mode, disable USE_DSTRING
@@ -175,6 +179,7 @@ jobs:
         - COMPILER="ccache /usr/bin/clang++-7"
         - EXTRA_CXXFLAGS="-Qunused-arguments -fcolor-diagnostics -DDEBUG -DUSE_STD_STRING"
         - CCACHE_CPP2=yes
+        - WITH_MEMORY_ANALYZER=1
       script: echo "Not running any tests for a debug build."
 
     # cmake build using g++-7, enable NAMED_SUB_IS_FORWARD_LIST
@@ -200,7 +205,7 @@ jobs:
       install:
         - ccache -z
         - ccache --max-size=1G
-        - cmake -H. -Bbuild '-DCMAKE_BUILD_TYPE=Release' '-DCMAKE_CXX_COMPILER=/usr/bin/g++-7' '-DCMAKE_CXX_FLAGS=-DNAMED_SUB_IS_FORWARD_LIST'
+        - cmake -H. -Bbuild '-DCMAKE_BUILD_TYPE=Release' '-DCMAKE_CXX_COMPILER=/usr/bin/g++-7' '-DCMAKE_CXX_FLAGS=-DNAMED_SUB_IS_FORWARD_LIST' '-DWITH_MEMORY_ANALYZER=On'
         - git submodule update --init --recursive
         - cmake --build build -- -j4
       script: (cd build; bin/unit "[core][irept]")
@@ -228,7 +233,7 @@ jobs:
       install:
         - ccache -z
         - ccache --max-size=1G
-        - cmake -H. -Bbuild '-DCMAKE_BUILD_TYPE=Release'  '-DCMAKE_CXX_COMPILER=/usr/bin/g++-7' '-DCMAKE_USE_CUDD=true' -DCMAKE_CXX_FLAGS="-DBDD_GUARDS"
+        - cmake -H. -Bbuild '-DCMAKE_BUILD_TYPE=Release'  '-DCMAKE_CXX_COMPILER=/usr/bin/g++-7' '-DCMAKE_USE_CUDD=true' -DCMAKE_CXX_FLAGS="-DBDD_GUARDS" '-DWITH_MEMORY_ANALYZER=On'
         - git submodule update --init --recursive
         - cmake --build build -- -j4
       script: (cd build; ctest -V -L CORE -j2)
@@ -264,7 +269,7 @@ jobs:
       install:
         - ccache -z
         - ccache --max-size=1G
-        - cmake -H. -Bbuild '-DCMAKE_BUILD_TYPE=Release' '-DCMAKE_CXX_COMPILER=/usr/bin/clang++-7' '-DCMAKE_CXX_FLAGS=-Qunused-arguments'
+        - cmake -H. -Bbuild '-DCMAKE_BUILD_TYPE=Release' '-DCMAKE_CXX_COMPILER=/usr/bin/clang++-7' '-DCMAKE_CXX_FLAGS=-Qunused-arguments' '-DWITH_MEMORY_ANALYZER=On'
         - git submodule update --init --recursive
         - cmake --build build -- -j4
       script: (cd build; ctest -V -L CORE -j2)
@@ -321,6 +326,7 @@ jobs:
       env:
         - NAME="COVERITY_SCAN"
         - COMPILER="ccache g++"
+        - WITH_MEMORY_ANALYZER=1
       script: echo "This is coverity build. No need for tests."
 
 install:

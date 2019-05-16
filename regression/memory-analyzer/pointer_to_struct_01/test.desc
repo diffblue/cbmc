@@ -1,0 +1,9 @@
+CORE
+main.gb
+--breakpoint checkpoint --symbols p
+struct S tmp;
+tmp = \{ \.next=\(\(struct S \*\)(NULL|0)\) \};
+p = &tmp;
+p->next = &tmp;
+^EXIT=0$
+^SIGNAL=0$
