@@ -724,6 +724,7 @@ IREP_ID_ONE(clear_may)
 IREP_ID_ONE(get_must)
 IREP_ID_ONE(set_must)
 IREP_ID_ONE(clear_must)
+IREP_ID_ONE(pragma)
 
 // Projects depending on this code base that wish to extend the list of
 // available ids should provide a file local_irep_ids.def in their source tree
