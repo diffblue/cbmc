@@ -150,6 +150,18 @@ private:
     const exprt &zero_expr,
     const source_locationt &location);
 
+  /// Call \ref get_subexpression_at_offset to get the correct member
+  ///   expression.
+  /// \param expr: the input pointer expression (needed to get the right type)
+  /// \param pointer_value: pointer value with structure name and offset as the
+  ///   pointee member
+  /// \param location: the source location
+  /// \return \ref member_exprt that the \p pointer_value points to
+  exprt get_pointer_to_member_value(
+    const exprt &expr,
+    const pointer_valuet &pointer_value,
+    const source_locationt &location);
+
   /// Similar to \ref get_char_pointer_value. Doesn't re-call
   ///   \ref gdb_apit::get_memory, calls \ref get_expr_value on _dereferenced_
   ///   \p expr (the result of which is assigned to a new symbol).
@@ -184,6 +196,12 @@ private:
   /// \param expr: expression to be extracted
   /// \return the value as a string
   std::string get_gdb_value(const exprt &expr);
+
+  /// Analyzes the \p pointer_value to decide if it point to a struct or a
+  ///   union (or array)
+  /// \param pointer_value: pointer value to be analyzed
+  /// \return true if pointing to a member
+  bool points_to_member(const pointer_valuet &pointer_value) const;
 };
 
 #endif // CPROVER_MEMORY_ANALYZER_ANALYZE_SYMBOL_H
