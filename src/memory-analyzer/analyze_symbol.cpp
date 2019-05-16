@@ -287,7 +287,14 @@ exprt gdb_value_extractort::get_non_char_pointer_value(
   }
   else
   {
-    return it->second;
+    const auto &known_value = it->second;
+    const auto &expected_type = expr.type().subtype();
+    if(known_value.is_not_nil() && known_value.type() != expected_type)
+    {
+      return symbol_exprt{to_symbol_expr(known_value).get_identifier(),
+                          expected_type};
+    }
+    return known_value;
   }
 }
 
@@ -340,7 +347,9 @@ exprt gdb_value_extractort::get_pointer_value(
       }
       else
       {
-        return address_of_exprt(target_expr);
+        const auto result_expr = address_of_exprt(target_expr);
+        CHECK_RETURN(result_expr.type() == zero_expr.type());
+        return result_expr;
       }
     }
   }
