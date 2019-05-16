@@ -1,0 +1,11 @@
+CORE
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Pull request #4444 introduced optimisations during symbolic execution that
+caused this test to spuriously fail (as the branch `ptr == 0` was removed).
