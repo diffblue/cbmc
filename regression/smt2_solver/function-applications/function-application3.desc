@@ -1,0 +1,7 @@
+CORE
+function-application3.smt2
+
+^EXIT=20$
+^SIGNAL=0$
+^\(error "line 4: wrong number of arguments for function"\)$
+--

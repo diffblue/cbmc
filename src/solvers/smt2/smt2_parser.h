@@ -136,7 +136,7 @@ protected:
   exprt let_expression();
   exprt quantifier_expression(irep_idt);
   exprt function_application(
-    const irep_idt &identifier,
+    const symbol_exprt &function,
     const exprt::operandst &op);
 
   /// Apply typecast to signedbv to expressions in vector
