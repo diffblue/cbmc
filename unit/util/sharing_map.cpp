@@ -111,6 +111,10 @@ void sharing_map_internals_test()
     REQUIRE(marked.size() >= 2);
   }
 
+  // These tests check whether the internal representation of the map has the
+  // expected shape after a series of operations. This is done by checking
+  // whether the map has a number of nodes (inner nodes, container nodes, and
+  // leaf nodes) that is consistent with the expected shape.
   SECTION("single map shape")
   {
     std::set<const void *> marked;
