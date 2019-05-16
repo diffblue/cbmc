@@ -535,6 +535,24 @@ protected:
     return lp;
   }
 
+  /// Move a container node (containing a single leaf) further down the tree
+  /// such as to resolve a collision with another key-value pair. This method is
+  /// called by `insert()` to resolve a collision between a key-value pair to be
+  /// newly inserted, and a key-value pair existing in the map.
+  ///
+  /// \param i: the depth of the inner node pointing to the container node with
+  ///   a single leaf
+  /// \param key_suffix: hash code of the existing key in the map, shifted to
+  ///   the right by `chunk * i` bits (i.e., \p key_suffix is the rest of the
+  ///   hash code used to determine the position of the key-value pair below
+  ///   level \p i
+  /// \param bit_last: last portion of the hash code of the key existing in the
+  ///   map (`inner[bit_last]` points to the container node to move further down
+  ///   the tree)
+  /// \param inner: inner node of which the child `inner[bit_last]` is the
+  ///   container node to move further down the tree
+  /// \return pointer to the container to which the element to be newly inserted
+  ///   can be added
   innert *migrate(
     const std::size_t i,
     const std::size_t key_suffix,
@@ -545,6 +563,20 @@ protected:
     const innert &n,
     std::function<void(const key_type &k, const mapped_type &m)> f) const;
 
+  /// Add a delta item to the delta view if the value in the \p container (which
+  /// must only contain a single leaf) is not shared with any of the values in
+  /// the subtree below \p inner. This method is called by `get_delta_view()`
+  /// when a container containing a single leaf is encountered in the first map,
+  /// and the corresponding node in the second map is an inner node.
+  ///
+  /// \param container: container node containing a single leaf, part of the
+  ///   first map in a call `map1.get_delta_view(map2, ...)`
+  /// \param inner: inner node which is part of the second map
+  /// \param level: depth of the nodes in the maps (both \p container and \p
+  ///   inner must be at the same depth in their respective maps)
+  /// \param delta_view: delta view to add delta items to
+  /// \param only_common: flag indicating if only items are added to the delta
+  ///   view for which the keys are in both maps
   void add_item_if_not_shared(
     const innert &container,
     const innert &inner,
