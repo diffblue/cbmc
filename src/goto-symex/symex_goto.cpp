@@ -110,10 +110,14 @@ static optionalt<renamedt<exprt, L2>> try_evaluate_pointer_comparison(
   {
     if(
       value_set_element.id() == ID_unknown ||
-      value_set_element.id() == ID_invalid)
+      value_set_element.id() == ID_invalid ||
+      !to_object_descriptor_expr(value_set_element)
+         .root_object()
+         .type()
+         .get(ID_C_is_failed_symbol)
+         .empty())
     {
-      // If ID_unknown or ID_invalid are in the value-set then we can't
-      // conclude anything about it
+      // We can't conclude anything about the value-set
       return {};
     }
 
