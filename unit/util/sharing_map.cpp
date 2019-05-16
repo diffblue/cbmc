@@ -176,94 +176,7 @@ void sharing_map_internals_test()
     }
   }
 
-  SECTION("two maps shape")
-  {
-    std::set<const void *> marked;
-    std::size_t chunk = 3;
-
-    sharing_map_unsignedt sm1;
-    sharing_map_unsignedt sm2;
-
-    SECTION("left map deeper")
-    {
-      sm1.insert(0, "a");
-      sm1.insert(1 << (2 * chunk), "b");
-
-      sm2.insert(0, "c");
-      sm2.insert(1, "d");
-
-      sharing_map_unsignedt::delta_viewt delta_view;
-      sm1.get_delta_view(sm2, delta_view, false);
-
-      REQUIRE(delta_view.size() == 2);
-
-      const bool b0 = delta_view[0].is_in_both_maps();
-      const bool b1 = delta_view[1].is_in_both_maps();
-
-      REQUIRE((b0 || b1));
-      REQUIRE(!(b0 && b1));
-
-      if(b0)
-      {
-        REQUIRE(delta_view[0].k == 0);
-        REQUIRE(delta_view[0].m == "a");
-        REQUIRE(delta_view[0].get_other_map_value() == "c");
-
-        REQUIRE(delta_view[1].k == 1 << (2 * chunk));
-        REQUIRE(delta_view[1].m == "b");
-      }
-      else
-      {
-        REQUIRE(delta_view[0].k == 1 << (2 * chunk));
-        REQUIRE(delta_view[0].m == "b");
-
-        REQUIRE(delta_view[1].k == 0);
-        REQUIRE(delta_view[1].m == "a");
-        REQUIRE(delta_view[1].get_other_map_value() == "c");
-      }
-    }
-
-    SECTION("right map deeper")
-    {
-      sm1.insert(0, "c");
-      sm1.insert(1, "d");
-
-      sm2.insert(0, "a");
-      sm2.insert(1 << (2 * chunk), "b");
-
-      sharing_map_unsignedt::delta_viewt delta_view;
-      sm1.get_delta_view(sm2, delta_view, false);
-
-      REQUIRE(delta_view.size() == 2);
-
-      const bool b0 = delta_view[0].is_in_both_maps();
-      const bool b1 = delta_view[1].is_in_both_maps();
-
-      REQUIRE((b0 || b1));
-      REQUIRE(!(b0 && b1));
-
-      if(b0)
-      {
-        REQUIRE(delta_view[0].k == 0);
-        REQUIRE(delta_view[0].m == "c");
-        REQUIRE(delta_view[0].get_other_map_value() == "a");
-
-        REQUIRE(delta_view[1].k == 1);
-        REQUIRE(delta_view[1].m == "d");
-      }
-      else
-      {
-        REQUIRE(delta_view[0].k == 1);
-        REQUIRE(delta_view[0].m == "d");
-
-        REQUIRE(delta_view[1].k == 0);
-        REQUIRE(delta_view[1].m == "c");
-        REQUIRE(delta_view[1].get_other_map_value() == "a");
-      }
-    }
-  }
-
-  SECTION("two maps shape, sharing")
+  SECTION("delta view (sharing, one of the maps is deeper)")
   {
     std::set<const void *> marked;
     std::size_t chunk = 3;
@@ -683,6 +596,93 @@ TEST_CASE("Sharing map views and iteration", "[core][util]")
     delta_view.clear();
     sm1.get_delta_view(sm2, delta_view, false);
     REQUIRE(delta_view.size() == 3);
+  }
+
+  SECTION("delta view (no sharing, one of the maps is deeper)")
+  {
+    std::set<const void *> marked;
+    std::size_t chunk = 3;
+
+    sharing_map_unsignedt sm1;
+    sharing_map_unsignedt sm2;
+
+    SECTION("left map deeper")
+    {
+      sm1.insert(0, "a");
+      sm1.insert(1 << (2 * chunk), "b");
+
+      sm2.insert(0, "c");
+      sm2.insert(1, "d");
+
+      sharing_map_unsignedt::delta_viewt delta_view;
+      sm1.get_delta_view(sm2, delta_view, false);
+
+      REQUIRE(delta_view.size() == 2);
+
+      const bool b0 = delta_view[0].is_in_both_maps();
+      const bool b1 = delta_view[1].is_in_both_maps();
+
+      REQUIRE((b0 || b1));
+      REQUIRE(!(b0 && b1));
+
+      if(b0)
+      {
+        REQUIRE(delta_view[0].k == 0);
+        REQUIRE(delta_view[0].m == "a");
+        REQUIRE(delta_view[0].get_other_map_value() == "c");
+
+        REQUIRE(delta_view[1].k == 1 << (2 * chunk));
+        REQUIRE(delta_view[1].m == "b");
+      }
+      else
+      {
+        REQUIRE(delta_view[0].k == 1 << (2 * chunk));
+        REQUIRE(delta_view[0].m == "b");
+
+        REQUIRE(delta_view[1].k == 0);
+        REQUIRE(delta_view[1].m == "a");
+        REQUIRE(delta_view[1].get_other_map_value() == "c");
+      }
+    }
+
+    SECTION("right map deeper")
+    {
+      sm1.insert(0, "c");
+      sm1.insert(1, "d");
+
+      sm2.insert(0, "a");
+      sm2.insert(1 << (2 * chunk), "b");
+
+      sharing_map_unsignedt::delta_viewt delta_view;
+      sm1.get_delta_view(sm2, delta_view, false);
+
+      REQUIRE(delta_view.size() == 2);
+
+      const bool b0 = delta_view[0].is_in_both_maps();
+      const bool b1 = delta_view[1].is_in_both_maps();
+
+      REQUIRE((b0 || b1));
+      REQUIRE(!(b0 && b1));
+
+      if(b0)
+      {
+        REQUIRE(delta_view[0].k == 0);
+        REQUIRE(delta_view[0].m == "c");
+        REQUIRE(delta_view[0].get_other_map_value() == "a");
+
+        REQUIRE(delta_view[1].k == 1);
+        REQUIRE(delta_view[1].m == "d");
+      }
+      else
+      {
+        REQUIRE(delta_view[0].k == 1);
+        REQUIRE(delta_view[0].m == "d");
+
+        REQUIRE(delta_view[1].k == 0);
+        REQUIRE(delta_view[1].m == "c");
+        REQUIRE(delta_view[1].get_other_map_value() == "a");
+      }
+    }
   }
 }
 
