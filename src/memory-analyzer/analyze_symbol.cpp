@@ -13,7 +13,10 @@ Author: Malte Mues <mail.mues@gmail.com>
 #include <util/c_types_util.h>
 #include <util/config.h>
 #include <util/expr_initializer.h>
+#include <util/pointer_offset_size.h>
+#include <util/string2int.h>
 #include <util/string_constant.h>
+#include <util/string_utils.h>
 
 gdb_value_extractort::gdb_value_extractort(
   const symbol_tablet &symbol_table,
@@ -165,6 +168,84 @@ exprt gdb_value_extractort::get_char_pointer_value(
   }
 }
 
+exprt gdb_value_extractort::get_pointer_to_member_value(
+  const exprt &expr,
+  const pointer_valuet &pointer_value,
+  const source_locationt &location)
+{
+  PRECONDITION(expr.type().id() == ID_pointer);
+  PRECONDITION(!is_c_char_type(expr.type().subtype()));
+  const auto &memory_location = pointer_value.address;
+  std::string memory_location_string = memory_location.string();
+  PRECONDITION(memory_location_string != "0x0");
+  PRECONDITION(!pointer_value.pointee.empty());
+
+  std::string struct_name;
+  size_t member_offset;
+  if(pointer_value.has_known_offset())
+  {
+    std::string member_offset_string;
+    split_string(
+      pointer_value.pointee, '+', struct_name, member_offset_string, true);
+    member_offset = safe_string2size_t(member_offset_string);
+  }
+  else
+  {
+    struct_name = pointer_value.pointee;
+    member_offset = 0;
+  }
+
+  const symbolt *struct_symbol = symbol_table.lookup(struct_name);
+  DATA_INVARIANT(struct_symbol != nullptr, "unknown struct");
+  const auto maybe_struct_size =
+    pointer_offset_size(struct_symbol->symbol_expr().type(), ns);
+  bool found = false;
+  CHECK_RETURN(maybe_struct_size.has_value());
+  for(const auto &value_pair : values)
+  {
+    const auto &value_symbol_expr = value_pair.second;
+    if(to_symbol_expr(value_symbol_expr).get_identifier() == struct_name)
+    {
+      found = true;
+      break;
+    }
+  }
+
+  if(!found)
+  {
+    const typet target_type = expr.type().subtype();
+
+    symbol_exprt dummy("tmp", expr.type());
+    code_blockt assignments;
+
+    auto emplace_pair = values.emplace(
+      memory_location,
+      allocate_objects.allocate_automatic_local_object(
+        assignments, dummy, target_type));
+    const symbol_exprt &new_symbol = to_symbol_expr(emplace_pair.first->second);
+
+    dereference_exprt dereference_expr(expr);
+
+    const auto zero_expr = zero_initializer(target_type, location, ns);
+    CHECK_RETURN(zero_expr);
+
+    // add assignment of value to newly created symbol
+    add_assignment(new_symbol, *zero_expr);
+
+    const auto &struct_symbol = values.find(memory_location);
+
+    const auto maybe_member_expr = get_subexpression_at_offset(
+      struct_symbol->second, member_offset, expr.type().subtype(), ns);
+    CHECK_RETURN(maybe_member_expr.has_value());
+    return *maybe_member_expr;
+  }
+
+  const auto maybe_member_expr = get_subexpression_at_offset(
+    struct_symbol->symbol_expr(), member_offset, expr.type().subtype(), ns);
+  CHECK_RETURN(maybe_member_expr.has_value());
+  return *maybe_member_expr;
+}
+
 exprt gdb_value_extractort::get_non_char_pointer_value(
   const exprt &expr,
   const memory_addresst &memory_location,
@@ -206,8 +287,30 @@ exprt gdb_value_extractort::get_non_char_pointer_value(
   }
   else
   {
-    return it->second;
+    const auto &known_value = it->second;
+    const auto &expected_type = expr.type().subtype();
+    if(known_value.is_not_nil() && known_value.type() != expected_type)
+    {
+      return symbol_exprt{to_symbol_expr(known_value).get_identifier(),
+                          expected_type};
+    }
+    return known_value;
   }
+}
+
+bool gdb_value_extractort::points_to_member(
+  const pointer_valuet &pointer_value) const
+{
+  if(pointer_value.has_known_offset())
+    return true;
+
+  const symbolt *pointee_symbol = symbol_table.lookup(pointer_value.pointee);
+  if(pointee_symbol == nullptr)
+    return false;
+  const auto &pointee_type = pointee_symbol->type;
+  return pointee_type.id() == ID_struct_tag ||
+         pointee_type.id() == ID_union_tag || pointee_type.id() == ID_array ||
+         pointee_type.id() == ID_struct || pointee_type.id() == ID_union;
 }
 
 exprt gdb_value_extractort::get_pointer_value(
@@ -234,7 +337,9 @@ exprt gdb_value_extractort::get_pointer_value(
     else
     {
       const exprt target_expr =
-        get_non_char_pointer_value(expr, memory_location, location);
+        points_to_member(value)
+          ? get_pointer_to_member_value(expr, value, location)
+          : get_non_char_pointer_value(expr, memory_location, location);
 
       if(target_expr.id() == ID_nil)
       {
@@ -242,7 +347,9 @@ exprt gdb_value_extractort::get_pointer_value(
       }
       else
       {
-        return address_of_exprt(target_expr);
+        const auto result_expr = address_of_exprt(target_expr);
+        CHECK_RETURN(result_expr.type() == zero_expr.type());
+        return result_expr;
       }
     }
   }
@@ -323,7 +430,11 @@ exprt gdb_value_extractort::get_expr_value(
 
     return get_pointer_value(expr, zero_expr, location);
   }
-  UNIMPLEMENTED;
+  else if(type.id() == ID_union_tag)
+  {
+    return get_union_value(expr, zero_expr, location);
+  }
+  UNREACHABLE;
 }
 
 exprt gdb_value_extractort::get_struct_value(
@@ -356,6 +467,28 @@ exprt gdb_value_extractort::get_struct_value(
     operand = get_expr_value(member_expr, operand, location);
   }
 
+  return new_expr;
+}
+
+exprt gdb_value_extractort::get_union_value(
+  const exprt &expr,
+  const exprt &zero_expr,
+  const source_locationt &location)
+{
+  PRECONDITION(zero_expr.id() == ID_union);
+
+  PRECONDITION(expr.type().id() == ID_union_tag);
+  PRECONDITION(expr.type() == zero_expr.type());
+
+  exprt new_expr(zero_expr);
+
+  const union_tag_typet &union_tag_type = to_union_tag_type(expr.type());
+  const union_typet &union_type = ns.follow_tag(union_tag_type);
+
+  CHECK_RETURN(new_expr.operands().size() == 1);
+  const union_typet::componentt &component = union_type.components()[0];
+  auto &operand = new_expr.operands()[0];
+  operand = get_expr_value(member_exprt{expr, component}, operand, location);
   return new_expr;
 }
 

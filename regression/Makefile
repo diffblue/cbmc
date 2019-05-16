@@ -44,7 +44,8 @@ ifeq ($(detected_OS),Linux)
 endif
 
 ifeq ($(WITH_MEMORY_ANALYZER),1)
-  DIRS += memory-analyzer
+  DIRS += snapshot-harness \
+          memory-analyzer
 endif
 
 # Run all test directories in sequence

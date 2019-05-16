@@ -131,6 +131,23 @@ void memory_snapshot_harness_generatort::add_init_section(
       goto_program.const_cast_target(entry_location.start_instruction)));
 }
 
+const symbolt &memory_snapshot_harness_generatort::fresh_symbol_copy(
+  const symbolt &snapshot_symbol,
+  symbol_tablet &symbol_table) const
+{
+  symbolt &tmp_symbol = get_fresh_aux_symbol(
+    snapshot_symbol.type,
+    "", // no prefix name
+    id2string(snapshot_symbol.base_name),
+    snapshot_symbol.location,
+    snapshot_symbol.mode,
+    symbol_table);
+  tmp_symbol.is_static_lifetime = true;
+  tmp_symbol.value = snapshot_symbol.value;
+
+  return tmp_symbol;
+}
+
 code_blockt memory_snapshot_harness_generatort::add_assignments_to_globals(
   const symbol_tablet &snapshot,
   goto_modelt &goto_model) const
@@ -141,17 +158,30 @@ code_blockt memory_snapshot_harness_generatort::add_assignments_to_globals(
   code_blockt code;
   for(const auto &pair : snapshot)
   {
-    const symbolt &symbol = pair.second;
-    if(!symbol.is_static_lifetime)
+    const symbolt &snapshot_symbol = pair.second;
+    symbol_tablet &symbol_table = goto_model.symbol_table;
+
+    auto should_get_fresh = [&symbol_table](const symbolt &symbol) {
+      return symbol_table.lookup(symbol.base_name) == nullptr &&
+             !symbol.is_type;
+    };
+    const symbolt &fresh_or_snapshot_symbol =
+      should_get_fresh(snapshot_symbol)
+        ? fresh_symbol_copy(snapshot_symbol, symbol_table)
+        : snapshot_symbol;
+
+    if(!fresh_or_snapshot_symbol.is_static_lifetime)
       continue;
 
-    if(variables_to_havoc.count(symbol.base_name) == 0)
+    if(variables_to_havoc.count(fresh_or_snapshot_symbol.base_name) == 0)
     {
-      code.add(code_assignt{symbol.symbol_expr(), symbol.value});
+      code.add(code_assignt{fresh_or_snapshot_symbol.symbol_expr(),
+                            fresh_or_snapshot_symbol.value});
     }
     else
     {
-      recursive_initialization.initialize(symbol.symbol_expr(), 0, {}, code);
+      recursive_initialization.initialize(
+        fresh_or_snapshot_symbol.symbol_expr(), 0, {}, code);
     }
   }
   return code;

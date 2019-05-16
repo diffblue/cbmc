@@ -221,12 +221,23 @@ protected:
     const symbol_exprt &func_init_done_var,
     goto_modelt &goto_model) const;
 
+  /// Introduce a new symbol into \p symbol_table with the same name and type as
+  ///   \p snapshot_symbol
+  /// \param snapshot_symbol: the unknown symbol to be introduced
+  /// \param symbol_table: the symbol table to be updated
+  /// \return the new symbol
+  const symbolt &fresh_symbol_copy(
+    const symbolt &snapshot_symbol,
+    symbol_tablet &symbol_table) const;
+
   /// For each global symbol in the \p snapshot symbol table either:
   /// 1) add \ref code_assignt assigning a value from the \p snapshot to the
   ///    symbol
   /// or
   /// 2) recursively initialise the symbol to a non-deterministic value of the
-  ///    right type
+  ///    right type.
+  /// Malloc(ed) pointers point to temporaries which do not exists in the symbol
+  ///   table: for these we introduce fresh symbols.
   /// \param snapshot: snapshot to load the symbols and their values from
   /// \param goto_model: model to initialise the havoc-ing
   /// \return the block of code where the assignments are added

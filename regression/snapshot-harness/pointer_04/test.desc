@@ -1,0 +1,12 @@
+CORE
+main.c
+x,p1,p2 --harness-type initialise-with-memory-snapshot --initial-goto-location main:4
+^EXIT=0$
+^SIGNAL=0$
+\[main.assertion.1\] line [0-9]+ assertion \&p1 == \*p2: SUCCESS
+\[main.assertion.2\] line [0-9]+ assertion \*p2 == p1: SUCCESS
+\[main.assertion.3\] line [0-9]+ assertion \*p1 == 3: SUCCESS
+\[main.assertion.4\] line [0-9]+ assertion \*p2 == \&x: SUCCESS
+\[main.assertion.5\] line [0-9]+ assertion \*\*p2 == x: SUCCESS
+--
+^warning: ignoring

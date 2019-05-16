@@ -138,6 +138,16 @@ private:
     const exprt &zero_expr,
     const source_locationt &location);
 
+  /// For each of the members of the struct: call \ref get_expr_value
+  /// \param expr: struct expression to be analysed
+  /// \param zero_expr: struct with zero-initialised members
+  /// \param location: the source location
+  /// \return the value of the struct from \ref gdb_apit
+  exprt get_union_value(
+    const exprt &expr,
+    const exprt &zero_expr,
+    const source_locationt &location);
+
   /// Call \ref gdb_apit::get_memory on \p expr then split based on the
   ///   points-to type being `char` type or not. These have dedicated functions.
   /// \param expr: the input pointer expression
@@ -148,6 +158,18 @@ private:
   exprt get_pointer_value(
     const exprt &expr,
     const exprt &zero_expr,
+    const source_locationt &location);
+
+  /// Call \ref get_subexpression_at_offset to get the correct member
+  ///   expression.
+  /// \param expr: the input pointer expression (needed to get the right type)
+  /// \param pointer_value: pointer value with structure name and offset as the
+  ///   pointee member
+  /// \param location: the source location
+  /// \return \ref member_exprt that the \p pointer_value points to
+  exprt get_pointer_to_member_value(
+    const exprt &expr,
+    const pointer_valuet &pointer_value,
     const source_locationt &location);
 
   /// Similar to \ref get_char_pointer_value. Doesn't re-call
@@ -184,6 +206,12 @@ private:
   /// \param expr: expression to be extracted
   /// \return the value as a string
   std::string get_gdb_value(const exprt &expr);
+
+  /// Analyzes the \p pointer_value to decide if it point to a struct or a
+  ///   union (or array)
+  /// \param pointer_value: pointer value to be analyzed
+  /// \return true if pointing to a member
+  bool points_to_member(const pointer_valuet &pointer_value) const;
 };
 
 #endif // CPROVER_MEMORY_ANALYZER_ANALYZE_SYMBOL_H

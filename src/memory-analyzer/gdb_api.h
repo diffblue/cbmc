@@ -19,6 +19,7 @@ Author: Malte Mues <mail.mues@gmail.com>
 #define CPROVER_MEMORY_ANALYZER_GDB_API_H
 #include <unistd.h>
 
+#include <algorithm>
 #include <exception>
 #include <forward_list>
 
@@ -81,6 +82,12 @@ public:
     const std::string pointee;
     const std::string character;
     const optionalt<std::string> string;
+
+    bool has_known_offset() const
+    {
+      return std::any_of(
+        pointee.begin(), pointee.end(), [](char c) { return c == '+'; });
+    }
   };
 
   /// Create a new gdb process for analysing the binary indicated by the member
