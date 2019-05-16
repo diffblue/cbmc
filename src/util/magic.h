@@ -16,6 +16,4 @@ const std::size_t MAX_CONCRETE_STRING_SIZE = 1 << 26;
 // The top end of the range of integers for which dstrings are precomputed
 constexpr std::size_t DSTRING_NUMBERS_MAX = 64;
 
-const int MAX_NONDET_STRING_LENGTH_DEFAULT = 10000;
-
 #endif
