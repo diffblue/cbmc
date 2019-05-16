@@ -21,7 +21,6 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 #define CPROVER_SOLVERS_REFINEMENT_STRING_REFINEMENT_H
 
 #include <limits>
-#include <util/magic.h>
 #include <util/replace_expr.h>
 #include <util/string_expr.h>
 #include <util/union_find_replace.h>
@@ -46,8 +45,7 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
   " --string-input-value st      restrict non-null strings to a fixed value st;\n" /* NOLINT(*) */ \
   "                              the switch can be used multiple times to give\n" /* NOLINT(*) */ \
   "                              several strings\n" /* NOLINT(*) */ \
-  " --max-nondet-string-length n bound the length of nondet (e.g. input) strings;\n" /* NOLINT(*) */ \
-  "                              set to " + std::to_string(MAX_NONDET_STRING_LENGTH_DEFAULT) + " by default\n" /* NOLINT(*) */
+  " --max-nondet-string-length n bound the length of nondet (e.g. input) strings\n" /* NOLINT(*) */
 
 // The integration of the string solver into CBMC is incomplete. Therefore,
 // it is not turned on by default and not all options are available.
