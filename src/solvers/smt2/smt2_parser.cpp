@@ -291,26 +291,22 @@ exprt smt2_parsert::quantifier_expression(irep_idt id)
 }
 
 exprt smt2_parsert::function_application(
-  const irep_idt &,
-  const exprt::operandst &)
+  const symbol_exprt &function,
+  const exprt::operandst &op)
 {
-  #if 0
-  const auto &f = id_map[identifier];
+  const auto &function_type = to_mathematical_function_type(function.type());
 
   // check the arguments
-  if(op.size()!=f.type.variables().size())
+  if(op.size() != function_type.domain().size())
     throw error("wrong number of arguments for function");
 
   for(std::size_t i=0; i<op.size(); i++)
   {
-    if(op[i].type() != f.type.variables()[i].type())
+    if(op[i].type() != function_type.domain()[i])
       throw error("wrong type for arguments for function");
   }
 
-  return function_application_exprt(
-    symbol_exprt(identifier, f.type), op, f.type.range());
-  #endif
-  return nil_exprt();
+  return function_application_exprt(function, op);
 }
 
 exprt::operandst smt2_parsert::cast_bv_to_signed(const exprt::operandst &op)
@@ -826,7 +822,7 @@ exprt smt2_parsert::function_application()
         {
           if(id_it->second.type.id()==ID_mathematical_function)
           {
-            return function_application_exprt(
+            return function_application(
               symbol_exprt(final_id, id_it->second.type), op);
           }
           else
