@@ -421,7 +421,11 @@ exprt gdb_value_extractort::get_expr_value(
 
     return get_pointer_value(expr, zero_expr, location);
   }
-  UNIMPLEMENTED;
+  else if(type.id() == ID_union_tag)
+  {
+    return get_union_value(expr, zero_expr, location);
+  }
+  UNREACHABLE;
 }
 
 exprt gdb_value_extractort::get_struct_value(
@@ -454,6 +458,28 @@ exprt gdb_value_extractort::get_struct_value(
     operand = get_expr_value(member_expr, operand, location);
   }
 
+  return new_expr;
+}
+
+exprt gdb_value_extractort::get_union_value(
+  const exprt &expr,
+  const exprt &zero_expr,
+  const source_locationt &location)
+{
+  PRECONDITION(zero_expr.id() == ID_union);
+
+  PRECONDITION(expr.type().id() == ID_union_tag);
+  PRECONDITION(expr.type() == zero_expr.type());
+
+  exprt new_expr(zero_expr);
+
+  const union_tag_typet &union_tag_type = to_union_tag_type(expr.type());
+  const union_typet &union_type = ns.follow_tag(union_tag_type);
+
+  CHECK_RETURN(new_expr.operands().size() == 1);
+  const union_typet::componentt &component = union_type.components()[0];
+  auto &operand = new_expr.operands()[0];
+  operand = get_expr_value(member_exprt{expr, component}, operand, location);
   return new_expr;
 }
 

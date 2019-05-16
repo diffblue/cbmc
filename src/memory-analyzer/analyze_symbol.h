@@ -138,6 +138,16 @@ private:
     const exprt &zero_expr,
     const source_locationt &location);
 
+  /// For each of the members of the struct: call \ref get_expr_value
+  /// \param expr: struct expression to be analysed
+  /// \param zero_expr: struct with zero-initialised members
+  /// \param location: the source location
+  /// \return the value of the struct from \ref gdb_apit
+  exprt get_union_value(
+    const exprt &expr,
+    const exprt &zero_expr,
+    const source_locationt &location);
+
   /// Call \ref gdb_apit::get_memory on \p expr then split based on the
   ///   points-to type being `char` type or not. These have dedicated functions.
   /// \param expr: the input pointer expression
