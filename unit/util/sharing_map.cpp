@@ -499,22 +499,43 @@ TEST_CASE("Sharing map collisions", "[core][util]")
 
   sharing_map_collisionst sm;
 
-  sm.insert(some_keyt(0), "a");
-  sm.insert(some_keyt(8), "b");
-  sm.insert(some_keyt(16), "c");
+  SECTION("Basic")
+  {
+    sm.insert(some_keyt(0), "a");
+    sm.insert(some_keyt(8), "b");
+    sm.insert(some_keyt(16), "c");
 
-  sm.insert(some_keyt(1), "d");
-  sm.insert(some_keyt(2), "e");
+    sm.insert(some_keyt(1), "d");
+    sm.insert(some_keyt(2), "e");
 
-  sm.erase(some_keyt(8));
+    sm.erase(some_keyt(8));
 
-  REQUIRE(sm.has_key(some_keyt(0)));
-  REQUIRE(sm.has_key(some_keyt(16)));
+    REQUIRE(sm.has_key(some_keyt(0)));
+    REQUIRE(sm.has_key(some_keyt(16)));
 
-  REQUIRE(sm.has_key(some_keyt(1)));
-  REQUIRE(sm.has_key(some_keyt(2)));
+    REQUIRE(sm.has_key(some_keyt(1)));
+    REQUIRE(sm.has_key(some_keyt(2)));
 
-  REQUIRE(!sm.has_key(some_keyt(8)));
+    REQUIRE(!sm.has_key(some_keyt(8)));
+  }
+
+  SECTION("Delta view")
+  {
+    sm.insert(some_keyt(0), "a");
+
+    sharing_map_collisionst sm2;
+
+    sm2.insert(some_keyt(8), "b");
+    sm2.insert(some_keyt(16), "c");
+
+    sharing_map_collisionst::delta_viewt delta_view;
+
+    sm.get_delta_view(sm2, delta_view, false);
+
+    REQUIRE(delta_view.size() == 1);
+    REQUIRE(delta_view[0].k == some_keyt(0));
+    REQUIRE(!delta_view[0].is_in_both_maps());
+  }
 }
 
 TEST_CASE("Sharing map views and iteration", "[core][util]")
