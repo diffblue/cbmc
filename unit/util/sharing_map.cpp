@@ -49,33 +49,12 @@ void fill2(some_sharing_mapt &sm)
   sm.insert("n", "5");
 }
 
-// tests
-
-class some_keyt
+class key_hasht
 {
 public:
-  some_keyt() : s(0)
+  std::size_t operator()(const std::size_t &k) const
   {
-  }
-
-  explicit some_keyt(size_t s) : s(s)
-  {
-  }
-
-  size_t s;
-
-  bool operator==(const some_keyt &other) const
-  {
-    return s == other.s;
-  }
-};
-
-class some_key_hasht
-{
-public:
-  size_t operator()(const some_keyt &k) const
-  {
-    return k.s & 0x3;
+    return k & 0x3;
   }
 };
 
@@ -494,46 +473,46 @@ TEST_CASE("Sharing map copying", "[core][util]")
 
 TEST_CASE("Sharing map collisions", "[core][util]")
 {
-  typedef sharing_mapt<some_keyt, std::string, false, some_key_hasht>
+  typedef sharing_mapt<std::size_t, std::string, false, key_hasht>
     sharing_map_collisionst;
 
   sharing_map_collisionst sm;
 
   SECTION("Basic")
   {
-    sm.insert(some_keyt(0), "a");
-    sm.insert(some_keyt(8), "b");
-    sm.insert(some_keyt(16), "c");
+    sm.insert(0, "a");
+    sm.insert(8, "b");
+    sm.insert(16, "c");
 
-    sm.insert(some_keyt(1), "d");
-    sm.insert(some_keyt(2), "e");
+    sm.insert(1, "d");
+    sm.insert(2, "e");
 
-    sm.erase(some_keyt(8));
+    sm.erase(8);
 
-    REQUIRE(sm.has_key(some_keyt(0)));
-    REQUIRE(sm.has_key(some_keyt(16)));
+    REQUIRE(sm.has_key(0));
+    REQUIRE(sm.has_key(16));
 
-    REQUIRE(sm.has_key(some_keyt(1)));
-    REQUIRE(sm.has_key(some_keyt(2)));
+    REQUIRE(sm.has_key(1));
+    REQUIRE(sm.has_key(2));
 
-    REQUIRE(!sm.has_key(some_keyt(8)));
+    REQUIRE(!sm.has_key(8));
   }
 
   SECTION("Delta view")
   {
-    sm.insert(some_keyt(0), "a");
+    sm.insert(0, "a");
 
     sharing_map_collisionst sm2;
 
-    sm2.insert(some_keyt(8), "b");
-    sm2.insert(some_keyt(16), "c");
+    sm2.insert(8, "b");
+    sm2.insert(16, "c");
 
     sharing_map_collisionst::delta_viewt delta_view;
 
     sm.get_delta_view(sm2, delta_view, false);
 
     REQUIRE(delta_view.size() == 1);
-    REQUIRE(delta_view[0].k == some_keyt(0));
+    REQUIRE(delta_view[0].k == 0);
     REQUIRE(!delta_view[0].is_in_both_maps());
   }
 }
