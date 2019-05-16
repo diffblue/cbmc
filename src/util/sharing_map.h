@@ -535,9 +535,22 @@ protected:
     return lp;
   }
 
+  innert *migrate(
+    const std::size_t i,
+    const std::size_t key_suffix,
+    const std::size_t bit_last,
+    innert &inner);
+
   void iterate(
     const innert &n,
     std::function<void(const key_type &k, const mapped_type &m)> f) const;
+
+  void add_item_if_not_shared(
+    const innert &container,
+    const innert &inner,
+    const std::size_t level,
+    delta_viewt &delta_view,
+    const bool only_common) const;
 
   void gather_all(const innert &n, delta_viewt &delta_view) const;
 
@@ -551,7 +564,7 @@ protected:
     std::set<const void *> &marked,
     bool mark = true) const;
 
-  static const std::string not_found_msg;
+  static const std::size_t dummy_level;
 
   // config
   static const std::size_t bits;
@@ -592,8 +605,7 @@ SHARING_MAPT(void)
 
       for(const auto &item : m)
       {
-        const innert *i = &item.second;
-        stack.push(i);
+        stack.push(&item.second);
       }
     }
     else
@@ -664,8 +676,7 @@ SHARING_MAPT(std::size_t)
 
       for(const auto &item : m)
       {
-        const innert *i = &item.second;
-        stack.push(i);
+        stack.push(&item.second);
       }
     }
     else
@@ -779,6 +790,67 @@ SHARING_MAPT(void)
   iterate(n, f);
 }
 
+SHARING_MAPT(void)::add_item_if_not_shared(
+  const innert &container,
+  const innert &inner,
+  const std::size_t level,
+  delta_viewt &delta_view,
+  const bool only_common) const
+{
+  const leaft &l1 = container.get_container().front();
+
+  const auto &k = l1.get_key();
+  std::size_t key = hash()(k);
+
+  key >>= level * chunk;
+
+  const innert *ip = &inner;
+  SM_ASSERT(ip->is_defined_internal());
+
+  while(true)
+  {
+    std::size_t bit = key & mask;
+
+    ip = ip->find_child(bit);
+
+    // only in first map
+    if(ip == nullptr)
+    {
+      if(!only_common)
+      {
+        delta_view.push_back({k, l1.get_value()});
+      }
+
+      return;
+    }
+
+    SM_ASSERT(!ip->empty());
+
+    // potentially in both maps
+    if(ip->is_container())
+    {
+      if(container.shares_with(*ip))
+        return;
+
+      for(const auto &l2 : ip->get_container())
+      {
+        if(l1.shares_with(l2))
+          return;
+
+        if(l1.get_key() == l2.get_key())
+        {
+          delta_view.push_back({k, l1.get_value(), l2.get_value()});
+          return;
+        }
+      }
+
+      return;
+    }
+
+    key >>= chunk;
+  }
+}
+
 SHARING_MAPT(void)
 ::get_delta_view(
   const sharing_mapt &other,
@@ -803,6 +875,8 @@ SHARING_MAPT(void)
   typedef std::pair<const innert *, const innert *> stack_itemt;
   std::stack<stack_itemt> stack;
 
+  std::stack<std::size_t> level_stack;
+
   // We do a DFS "in lockstep" simultaneously on both maps. For
   // corresponding nodes we check whether they are shared between the
   // maps, and if not, we recurse into the corresponding subtrees.
@@ -814,6 +888,7 @@ SHARING_MAPT(void)
     return;
 
   stack.push(stack_itemt(&map, &other.map));
+  level_stack.push(0);
 
   do
   {
@@ -823,6 +898,9 @@ SHARING_MAPT(void)
     const innert *ip2 = si.second;
 
     stack.pop();
+
+    const std::size_t level = level_stack.top();
+    level_stack.pop();
 
     SM_ASSERT(!ip1->empty());
     SM_ASSERT(!ip2->empty());
@@ -840,8 +918,15 @@ SHARING_MAPT(void)
       for(const auto &item : ip1->get_to_map())
       {
         const innert &child = item.second;
-        SM_ASSERT(!child.shares_with(*ip2));
-        stack.push(stack_itemt(&child, ip2));
+        if(!child.shares_with(*ip2))
+        {
+          stack.push(stack_itemt(&child, ip2));
+
+          // The level is not needed when the node of the left map is an
+          // internal node, and the node of the right map is a container node,
+          // hence we just push a dummy element
+          level_stack.push(dummy_level);
+        }
       }
 
       continue;
@@ -868,6 +953,7 @@ SHARING_MAPT(void)
         else if(!child.shares_with(*p))
         {
           stack.push(stack_itemt(&child, p));
+          level_stack.push(level + 1);
         }
       }
 
@@ -879,13 +965,9 @@ SHARING_MAPT(void)
     if(ip2->is_internal())
     {
       SM_ASSERT(is_singular(ip1->get_container()));
+      SM_ASSERT(level != dummy_level);
 
-      for(const auto &item : ip2->get_to_map())
-      {
-        const innert &child = item.second;
-        SM_ASSERT(!ip1->shares_with(child));
-        stack.push(stack_itemt(ip1, &child));
-      }
+      add_item_if_not_shared(*ip1, *ip2, level, delta_view, only_common);
 
       continue;
     }
@@ -903,11 +985,13 @@ SHARING_MAPT(void)
       {
         if(!l1.shares_with(*p))
         {
+          SM_ASSERT(other.has_key(k1));
           delta_view.push_back({k1, l1.get_value(), p->get_value()});
         }
       }
       else if(!only_common)
       {
+        SM_ASSERT(!other.has_key(k1));
         delta_view.push_back({k1, l1.get_value()});
       }
     }
@@ -917,21 +1001,28 @@ SHARING_MAPT(void)
 
 SHARING_MAPT2(, innert *)::get_container_node(const key_type &k)
 {
+  SM_ASSERT(has_key(k));
+
   std::size_t key = hash()(k);
   innert *ip = &map;
+  SM_ASSERT(ip->is_defined_internal());
 
-  for(std::size_t i = 0; i < steps; i++)
+  while(true)
   {
     std::size_t bit = key & mask;
 
     ip = ip->add_child(bit);
+    SM_ASSERT(ip != nullptr);
+    SM_ASSERT(!ip->empty());
+
+    if(ip->is_container())
+      return ip;
 
     key >>= chunk;
   }
 
-  SM_ASSERT(ip->is_container());
-
-  return ip;
+  UNREACHABLE;
+  return nullptr;
 }
 
 SHARING_MAPT2(const, innert *)::get_container_node(const key_type &k) const
@@ -941,32 +1032,40 @@ SHARING_MAPT2(const, innert *)::get_container_node(const key_type &k) const
 
   std::size_t key = hash()(k);
   const innert *ip = &map;
+  SM_ASSERT(ip->is_defined_internal());
 
-  for(std::size_t i = 0; i < steps; i++)
+  while(true)
   {
     std::size_t bit = key & mask;
 
     ip = ip->find_child(bit);
+
     if(ip == nullptr)
       return nullptr;
+
+    SM_ASSERT(!ip->empty());
+
+    if(ip->is_container())
+      return ip;
 
     key >>= chunk;
   }
 
-  SM_ASSERT(ip->is_defined_container());
-
-  return ip;
+  UNREACHABLE;
+  return nullptr;
 }
 
 SHARING_MAPT(void)::erase(const key_type &k)
 {
+  SM_ASSERT(has_key(k));
+
   innert *del = nullptr;
   std::size_t del_bit = 0;
 
   std::size_t key = hash()(k);
   innert *ip = &map;
 
-  for(std::size_t i = 0; i < steps; i++)
+  while(true)
   {
     std::size_t bit = key & mask;
 
@@ -979,6 +1078,11 @@ SHARING_MAPT(void)::erase(const key_type &k)
     }
 
     ip = ip->add_child(bit);
+
+    SM_ASSERT(!ip->empty());
+
+    if(ip->is_container())
+      break;
 
     key >>= chunk;
   }
@@ -1001,14 +1105,141 @@ SHARING_MAPT(void)::erase(const key_type &k)
   num--;
 }
 
+SHARING_MAPT2(, innert *)::migrate(
+  const std::size_t step,
+  const std::size_t key_suffix,
+  const std::size_t bit_last,
+  innert &inner)
+{
+  SM_ASSERT(step < steps - 1);
+  SM_ASSERT(inner.is_defined_internal());
+
+  const innert &child = *inner.find_child(bit_last);
+  SM_ASSERT(child.is_defined_container());
+
+  const leaf_listt &ll = child.get_container();
+
+  // Only containers at the bottom can contain more than two elements
+  SM_ASSERT(is_singular(ll));
+
+  const leaft &leaf = ll.front();
+  std::size_t key_existing = hash()(leaf.get_key());
+
+  key_existing >>= chunk * step;
+
+  // Copy the container
+  innert container_copy(child);
+
+  // Delete existing container
+  inner.remove_child(bit_last);
+
+  // Add internal node
+  innert *ip = inner.add_child(bit_last);
+  SM_ASSERT(ip->empty());
+
+  // Find place for both elements
+
+  std::size_t i = step + 1;
+  std::size_t key = key_suffix;
+
+  key_existing >>= chunk;
+  key >>= chunk;
+
+  SM_ASSERT(i < steps);
+
+  do
+  {
+    std::size_t bit_existing = key_existing & mask;
+    std::size_t bit = key & mask;
+
+    if(bit != bit_existing)
+    {
+      // Place found
+
+      innert *cp2 = ip->add_child(bit_existing);
+      cp2->swap(container_copy);
+
+      innert *cp1 = ip->add_child(bit);
+      return cp1;
+    }
+
+    SM_ASSERT(bit == bit_existing);
+    ip = ip->add_child(bit);
+
+    key >>= chunk;
+    key_existing >>= chunk;
+
+    i++;
+  } while(i < steps);
+
+  leaft leaf_copy(as_const(&container_copy)->get_container().front());
+  ip->get_container().push_front(leaf_copy);
+
+  return ip;
+}
+
 SHARING_MAPT4(valueU, void)
 ::insert(const key_type &k, valueU &&m)
 {
-  innert *cp = get_container_node(k);
-  SM_ASSERT(cp != nullptr);
+  SM_ASSERT(!has_key(k));
 
-  cp->place_leaf(k, std::forward<valueU>(m));
-  num++;
+  std::size_t key = hash()(k);
+  innert *ip = &map;
+
+  // The root cannot be a container node
+  SM_ASSERT(ip->is_internal());
+
+  std::size_t i = 0;
+
+  while(true)
+  {
+    std::size_t bit = key & mask;
+
+    SM_ASSERT(ip != nullptr);
+    SM_ASSERT(ip->is_internal());
+    SM_ASSERT(i == 0 || !ip->empty());
+
+    innert *child = ip->add_child(bit);
+
+    // Place is unoccupied
+    if(child->empty())
+    {
+      // Create container and insert leaf
+      child->place_leaf(k, std::forward<valueU>(m));
+
+      SM_ASSERT(child->is_defined_container());
+
+      num++;
+
+      return;
+    }
+
+    if(child->is_container())
+    {
+      if(i < steps - 1)
+      {
+        // Migrate the elements downwards
+        innert *cp = migrate(i, key, bit, *ip);
+
+        cp->place_leaf(k, std::forward<valueU>(m));
+      }
+      else
+      {
+        // Add to the bottom container
+        child->place_leaf(k, std::forward<valueU>(m));
+      }
+
+      num++;
+
+      return;
+    }
+
+    SM_ASSERT(i == steps - 1 || child->is_defined_internal());
+
+    ip = child;
+    key >>= chunk;
+    i++;
+  }
 }
 
 SHARING_MAPT4(valueU, void)
@@ -1059,9 +1290,9 @@ SHARING_MAPT2(optionalt<std::reference_wrapper<const, mapped_type>>)::find(
 
 // static constants
 
-SHARING_MAPT(const std::string)::not_found_msg="key not found";
+SHARING_MAPT(const std::size_t)::dummy_level = 0xff;
 
-SHARING_MAPT(const std::size_t)::bits = 18;
+SHARING_MAPT(const std::size_t)::bits = 30;
 SHARING_MAPT(const std::size_t)::chunk = 3;
 
 SHARING_MAPT(const std::size_t)::mask = 0xffff >> (16 - chunk);
