@@ -55,5 +55,6 @@ add_subdirectory(linking-goto-binaries)
 add_subdirectory(symtab2gb)
 
 if(WITH_MEMORY_ANALYZER)
-add_subdirectory(memory-analyzer)
+  add_subdirectory(snapshot-harness)
+  add_subdirectory(memory-analyzer)
 endif()
