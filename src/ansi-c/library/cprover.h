@@ -150,4 +150,16 @@ __CPROVER_bool __CPROVER_get_may(const void *, const char *);
 #define __CPROVER_danger_number_of_vars 1
 #define __CPROVER_danger_number_of_consts 1
 
+// detect overflow
+// NOLINTNEXTLINE(build/deprecated)
+__CPROVER_bool __CPROVER_overflow_minus();
+// NOLINTNEXTLINE(build/deprecated)
+__CPROVER_bool __CPROVER_overflow_mult();
+// NOLINTNEXTLINE(build/deprecated)
+__CPROVER_bool __CPROVER_overflow_plus();
+// NOLINTNEXTLINE(build/deprecated)
+__CPROVER_bool __CPROVER_overflow_shl();
+// NOLINTNEXTLINE(build/deprecated)
+__CPROVER_bool __CPROVER_overflow_unary_minus();
+
 #endif // CPROVER_ANSI_C_LIBRARY_CPROVER_H
