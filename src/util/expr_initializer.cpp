@@ -132,7 +132,8 @@ optionalt<exprt> expr_initializert<nondet>::expr_initializer_rec(
       if(!tmpval.has_value())
         return {};
 
-      if(array_type.size().id()==ID_infinity)
+      const auto array_size = numeric_cast<mp_integer>(array_type.size());
+      if(array_type.size().id() == ID_infinity || !array_size.has_value())
       {
         if(nondet)
           return side_effect_expr_nondett(type, source_location);
@@ -140,15 +141,6 @@ optionalt<exprt> expr_initializert<nondet>::expr_initializer_rec(
         array_of_exprt value(*tmpval, array_type);
         value.add_source_location()=source_location;
         return std::move(value);
-      }
-
-      const auto array_size = numeric_cast<mp_integer>(array_type.size());
-      if(!array_size.has_value())
-      {
-        if(nondet)
-          return side_effect_expr_nondett(type, source_location);
-        else
-          return {};
       }
 
       if(*array_size < 0)
