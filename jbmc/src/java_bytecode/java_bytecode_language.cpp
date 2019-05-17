@@ -345,10 +345,11 @@ static void infer_opaque_type_fields(
             // Not present here: check the superclass.
             INVARIANT(
               !class_type->bases().empty(),
-              "class '" + id2string(class_symbol->name)
-                + "' (which was missing a field '" + id2string(component_name)
-                + "' referenced from method '" + id2string(method.name)
-                + "') should have an opaque superclass");
+              "class '" + id2string(class_symbol->name) +
+                "' (which was missing a field '" + id2string(component_name) +
+                "' referenced from method '" + id2string(method.name) +
+                "' of class '" + id2string(parse_tree.parsed_class.name) +
+                "') should have an opaque superclass");
             const auto &superclass_type = class_type->bases().front().type();
             class_symbol_id = superclass_type.get_identifier();
             class_type = &to_java_class_type(ns.follow(superclass_type));
