@@ -9,6 +9,10 @@ Author: Michael Tautschnig
 #ifndef CPROVER_GOTO_SYMEX_FIELD_SENSITIVITY_H
 #define CPROVER_GOTO_SYMEX_FIELD_SENSITIVITY_H
 
+/// Limit the size of arrays for which field_sensitivity gets applied.
+/// Necessary because large constant arrays slow-down the process.
+static constexpr unsigned max_field_sensitive_array_size = 64;
+
 class exprt;
 class ssa_exprt;
 class namespacet;
