@@ -112,6 +112,22 @@ float __CPROVER_fabsf(float x);
 
 These functions return the absolute value of the given argument.
 
+#### \_\_CPROVER\_overflow\_minus, \_\_CPROVER\_overflow\_mult, \_\_CPROVER\_overflow\_plus, \_\_CPROVER\_overflow\_shl, \_\_CPROVER\_overflow\_unary\_minus
+
+```C
+__CPROVER_bool __CPROVER_overflow_minus();
+__CPROVER_bool __CPROVER_overflow_mult();
+__CPROVER_bool __CPROVER_overflow_plus();
+__CPROVER_bool __CPROVER_overflow_shl();
+__CPROVER_bool __CPROVER_overflow_unary_minus();
+```
+
+These functions take two (`__CPROVER_overflow_unary_minus` only takes one)
+arguments of any numeric type. They return true, if, and only if, the named
+operation would overflow when applied to the arguments. For example,
+`__CPROVER_overflow_plus(x, y)` returns true if `x + y` would result in an
+arithmetic overflow.
+
 #### \_\_CPROVER\_array\_equal, \_\_CPROVER\_array\_copy, \_\_CPROVER\_array\_set
 
 ```C

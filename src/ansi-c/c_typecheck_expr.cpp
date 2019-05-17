@@ -2811,6 +2811,46 @@ exprt c_typecheck_baset::do_special_functions(
 
     return expr;
   }
+  else if(
+    identifier == CPROVER_PREFIX "overflow_minus" ||
+    identifier == CPROVER_PREFIX "overflow_mult" ||
+    identifier == CPROVER_PREFIX "overflow_plus" ||
+    identifier == CPROVER_PREFIX "overflow_shl" ||
+    identifier == CPROVER_PREFIX "overflow_unary_minus")
+  {
+    exprt overflow{identifier, typet{}, exprt::operandst{expr.arguments()}};
+    overflow.add_source_location() = f_op.source_location();
+
+    if(identifier == CPROVER_PREFIX "overflow_minus")
+    {
+      overflow.id(ID_minus);
+      typecheck_expr_binary_arithmetic(overflow);
+    }
+    else if(identifier == CPROVER_PREFIX "overflow_mult")
+    {
+      overflow.id(ID_mult);
+      typecheck_expr_binary_arithmetic(overflow);
+    }
+    else if(identifier == CPROVER_PREFIX "overflow_plus")
+    {
+      overflow.id(ID_plus);
+      typecheck_expr_binary_arithmetic(overflow);
+    }
+    else if(identifier == CPROVER_PREFIX "overflow_shl")
+    {
+      overflow.id(ID_shl);
+      typecheck_expr_shifts(to_shift_expr(overflow));
+    }
+    else if(identifier == CPROVER_PREFIX "overflow_unary_minus")
+    {
+      overflow.id(ID_unary_minus);
+      typecheck_expr_unary_arithmetic(overflow);
+    }
+
+    overflow.id("overflow-" + overflow.id_string());
+    overflow.type() = bool_typet{};
+    return overflow;
+  }
   else
     return nil_exprt();
 }

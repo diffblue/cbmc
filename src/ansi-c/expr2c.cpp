@@ -3793,11 +3793,13 @@ std::string expr2ct::convert_with_precedence(
   else if(src.id()==ID_cond)
     return convert_cond(src, precedence);
 
-  else if(src.id()==ID_overflow_unary_minus ||
-      src.id()==ID_overflow_minus ||
-      src.id()==ID_overflow_mult ||
-      src.id()==ID_overflow_plus)
+  else if(
+    src.id() == ID_overflow_unary_minus || src.id() == ID_overflow_minus ||
+    src.id() == ID_overflow_mult || src.id() == ID_overflow_plus ||
+    src.id() == ID_overflow_shl)
+  {
     return convert_overflow(src, precedence);
+  }
 
   else if(src.id()==ID_unknown)
     return "*";

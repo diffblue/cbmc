@@ -98,3 +98,9 @@ void __CPROVER_k_induction_hint(unsigned min, unsigned max,
 // format string-related
 int __CPROVER_scanf(const char *, ...);
 
+// detect overflow
+__CPROVER_bool __CPROVER_overflow_minus();
+__CPROVER_bool __CPROVER_overflow_mult();
+__CPROVER_bool __CPROVER_overflow_plus();
+__CPROVER_bool __CPROVER_overflow_shl();
+__CPROVER_bool __CPROVER_overflow_unary_minus();
