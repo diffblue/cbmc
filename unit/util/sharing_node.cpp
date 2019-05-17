@@ -8,7 +8,7 @@
 #include <util/sharing_node.h>
 
 // could be an internal node or a container node
-class innert : public sharing_node_innert<int, int>
+class innert : public sharing_nodet<int, int>
 {
 public:
   friend void sharing_node_internals_test();
@@ -62,7 +62,7 @@ TEST_CASE("Sharing node", "[core][util]")
 {
   SECTION("Leaf test")
   {
-    typedef sharing_node_leaft<int, int> leaft;
+    typedef sharing_nodet<int, int> leaft;
 
     // Basic leaf
     {
@@ -90,8 +90,8 @@ TEST_CASE("Sharing node", "[core][util]")
 
       REQUIRE(leaf2.shares_with(leaf1));
 
-      auto &v = leaf2.get_value();
-      v = 3;
+      leaf2.set_value(3);
+
       REQUIRE(leaf2.get_value() == 3);
       REQUIRE(!leaf2.shares_with(leaf1));
     }
@@ -99,7 +99,7 @@ TEST_CASE("Sharing node", "[core][util]")
 
   SECTION("Inner node test")
   {
-    typedef sharing_node_innert<int, int> innert;
+    typedef sharing_nodet<int, int> innert;
 
     // Empty container
     {
@@ -138,8 +138,8 @@ TEST_CASE("Sharing node", "[core][util]")
 
       innert c2(c1);
       auto leaf = c2.find_leaf(1);
-      auto &v = leaf->get_value();
-      v = 7;
+
+      leaf->set_value(7);
 
       REQUIRE(!c1.shares_with(c2));
 
@@ -184,8 +184,8 @@ TEST_CASE("Sharing node", "[core][util]")
 
   SECTION("Combined")
   {
-    typedef sharing_node_leaft<int, int> leaft;
-    typedef sharing_node_innert<int, int> innert;
+    typedef sharing_nodet<int, int> leaft;
+    typedef sharing_nodet<int, int> innert;
 
     innert map;
 

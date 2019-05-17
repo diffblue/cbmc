@@ -193,10 +193,8 @@ public:
   typedef std::vector<key_type> keyst;
 
 protected:
-  typedef sharing_node_innert<key_type, mapped_type> innert;
-  typedef sharing_node_leaft<key_type, mapped_type> leaft;
-
-  typedef sharing_node_baset baset;
+  typedef sharing_nodet<key_type, mapped_type> innert;
+  typedef sharing_nodet<key_type, mapped_type> leaft;
 
   typedef typename innert::to_mapt to_mapt;
   typedef typename innert::leaf_listt leaf_listt;
@@ -721,7 +719,7 @@ SHARING_MAPT(std::size_t)
       for(const auto &l : ll)
       {
         const unsigned leaf_use_count = l.use_count();
-        const void *leaf_raw_ptr = &l.read();
+        const void *leaf_raw_ptr = &l.read_leaf();
 
         if(leaf_use_count >= 2)
         {
@@ -1286,7 +1284,7 @@ SHARING_MAPT4(valueU, void)
   PRECONDITION(lp != nullptr); // key must exist in map
 
   INVARIANT(
-    !value_equalt()(as_const(lp)->get_value(), m),
+    !value_equalt()(lp->get_value(), m),
     "values should not be replaced with equal values to maximize sharing");
 
   lp->set_value(std::forward<valueU>(m));
@@ -1301,12 +1299,12 @@ SHARING_MAPT(void)
   leaft *lp = cp->find_leaf(k);
   PRECONDITION(lp != nullptr); // key must exist in map
 
-  value_comparatort comparator(as_const(lp)->get_value());
+  value_comparatort comparator(lp->get_value());
 
   lp->mutate_value(mutator);
 
   INVARIANT(
-    !comparator(as_const(lp)->get_value()),
+    !comparator(lp->get_value()),
     "sharing_mapt::update should make some change. Consider using read-only "
     "method to check if an update is needed beforehand");
 }
