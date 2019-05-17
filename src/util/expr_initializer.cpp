@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "arith_tools.h"
 #include "c_types.h"
+#include "magic.h"
 #include "namespace.h"
 #include "pointer_offset_size.h"
 #include "std_code.h"
@@ -133,7 +134,9 @@ optionalt<exprt> expr_initializert<nondet>::expr_initializer_rec(
         return {};
 
       const auto array_size = numeric_cast<mp_integer>(array_type.size());
-      if(array_type.size().id() == ID_infinity || !array_size.has_value())
+      if(
+        array_type.size().id() == ID_infinity || !array_size.has_value() ||
+        *array_size > MAX_FLATTENED_ARRAY_SIZE)
       {
         if(nondet)
           return side_effect_expr_nondett(type, source_location);
