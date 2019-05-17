@@ -23,6 +23,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/config.h>
 #include <util/cprover_prefix.h>
 #include <util/expr_iterator.h>
+#include <util/expr_util.h>
 #include <util/format_type.h>
 #include <util/fresh_symbol.h>
 #include <util/options.h>
@@ -361,7 +362,9 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
   const exprt &pointer_expr,
   const namespacet &ns)
 {
-  const typet &dereference_type = pointer_expr.type().subtype();
+  const pointer_typet &pointer_type =
+    type_checked_cast<pointer_typet>(pointer_expr.type());
+  const typet &dereference_type = pointer_type.subtype();
 
   if(what.id()==ID_unknown ||
      what.id()==ID_invalid)
@@ -385,6 +388,7 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
 
   if(root_object.id() == ID_null_object)
   {
+    result.pointer = null_pointer_exprt{pointer_type};
   }
   else if(root_object.id()==ID_dynamic_object)
   {
@@ -394,6 +398,7 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
 
     // can't remove here, turn into *p
     result.value = dereference_exprt{pointer_expr};
+    result.pointer = pointer_expr;
   }
   else if(root_object.id()==ID_integer_address)
   {
@@ -414,6 +419,7 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
         memory_symbol.type.subtype());
 
       result.value=index_expr;
+      result.pointer = address_of_exprt{index_expr};
     }
     else if(
       dereference_type_compare(
@@ -424,6 +430,8 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
         pointer_offset(pointer_expr),
         memory_symbol.type.subtype());
       result.value=typecast_exprt(index_expr, dereference_type);
+      result.pointer =
+        typecast_exprt{address_of_exprt{index_expr}, pointer_type};
     }
     else
     {
@@ -440,6 +448,7 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
           symbol_expr,
           pointer_offset(pointer_expr),
           dereference_type);
+        result.pointer = address_of_exprt{result.value};
       }
     }
   }
@@ -472,6 +481,8 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
       // This is great, we are almost done.
 
       result.value = typecast_exprt::conditional_cast(object, dereference_type);
+      result.pointer =
+        typecast_exprt::conditional_cast(object_pointer, pointer_type);
     }
     else if(
       root_object_type.id() == ID_array &&
@@ -515,9 +526,12 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
         // TODO: need to assert well-alignedness
       }
 
-      result.value = typecast_exprt::conditional_cast(
-        index_exprt(root_object, adjusted_offset, root_object_type.subtype()),
-        dereference_type);
+      const index_exprt &index_expr =
+        index_exprt(root_object, adjusted_offset, root_object_type.subtype());
+      result.value =
+        typecast_exprt::conditional_cast(index_expr, dereference_type);
+      result.pointer = typecast_exprt::conditional_cast(
+        address_of_exprt{index_expr}, pointer_type);
     }
     else
     {
@@ -531,11 +545,15 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
         // Successfully found a member, array index, or combination thereof
         // that matches the desired type and offset:
         result.value = subexpr.value();
+        result.pointer = typecast_exprt::conditional_cast(
+          address_of_exprt{skip_typecast(subexpr.value())}, pointer_type);
         return result;
       }
 
       // we extract something from the root object
       result.value=o.root_object();
+      result.pointer = typecast_exprt::conditional_cast(
+        address_of_exprt{skip_typecast(o.root_object())}, pointer_type);
 
       // this is relative to the root object
       exprt offset;

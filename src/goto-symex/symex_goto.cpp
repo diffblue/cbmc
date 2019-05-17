@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 /// Symbolic Execution
 
 #include "goto_symex.h"
+#include "goto_symex_is_constant.h"
 
 #include <algorithm>
 
@@ -19,6 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_offset_size.h>
 #include <util/std_expr.h>
 
+#include <pointer-analysis/value_set_dereference.h>
 #include <util/simplify_expr.h>
 
 void goto_symext::apply_goto_condition(
@@ -65,6 +67,165 @@ void goto_symext::apply_goto_condition(
   }
 }
 
+/// Try to evaluate a simple pointer comparison.
+/// \param operation: ID_equal or ID_not_equal
+/// \param symbol_expr: The symbol expression in the condition
+/// \param other_operand: The other expression in the condition - must pass
+///   goto_symex_is_constant, and since it is pointer-typed it must therefore
+///   be an address of expression, a typecast of an address of expression or a
+///   null pointer
+/// \param value_set: The value-set for looking up what the symbol can point to
+/// \param language_mode: The language mode
+/// \param ns: A namespace
+/// \return If we were able to evaluate the condition as true or false then we
+///   return that, otherwise we return an empty optionalt
+static optionalt<renamedt<exprt, L2>> try_evaluate_pointer_comparison(
+  const irep_idt &operation,
+  const symbol_exprt &symbol_expr,
+  const exprt &other_operand,
+  const value_sett &value_set,
+  const irep_idt language_mode,
+  const namespacet &ns)
+{
+  const constant_exprt *constant_expr =
+    expr_try_dynamic_cast<constant_exprt>(other_operand);
+
+  INVARIANT(
+    skip_typecast(other_operand).id() == ID_address_of ||
+      (constant_expr && constant_expr->get_value() == ID_NULL),
+    "An expression that passes goto_symex_is_constant and has "
+    "pointer-type must be an address of expression (possibly with some "
+    "typecasts) or a null pointer");
+
+  const ssa_exprt *ssa_symbol_expr =
+    expr_try_dynamic_cast<ssa_exprt>(symbol_expr);
+
+  value_setst::valuest value_set_elements;
+  value_set.get_value_set(
+    ssa_symbol_expr->get_l1_object(), value_set_elements, ns);
+
+  bool constant_found = false;
+
+  for(const auto &value_set_element : value_set_elements)
+  {
+    if(
+      value_set_element.id() == ID_unknown ||
+      value_set_element.id() == ID_invalid ||
+      !to_object_descriptor_expr(value_set_element)
+         .root_object()
+         .type()
+         .get(ID_C_is_failed_symbol)
+         .empty())
+    {
+      // We can't conclude anything about the value-set
+      return {};
+    }
+
+    if(!constant_found)
+    {
+      if(value_set_dereferencet::should_ignore_value(
+           value_set_element, false, language_mode))
+      {
+        continue;
+      }
+
+      value_set_dereferencet::valuet value =
+        value_set_dereferencet::build_reference_to(
+          value_set_element, symbol_expr, ns);
+
+      if(value.pointer == other_operand)
+      {
+        constant_found = true;
+        // We can't break because we have to make sure we find any instances of
+        // ID_unknown or ID_invalid
+      }
+    }
+  }
+
+  if(!constant_found)
+  {
+    // The symbol cannot possibly have the value \p other_operand because it
+    // isn't in the symbol's value-set
+    return operation == ID_equal ? make_renamed<L2>(false_exprt{})
+                                 : make_renamed<L2>(true_exprt{});
+  }
+  else if(value_set_elements.size() == 1)
+  {
+    // The symbol must have the value \p other_operand because it is the only
+    // thing in the symbol's value-set
+    return operation == ID_equal ? make_renamed<L2>(true_exprt{})
+                                 : make_renamed<L2>(false_exprt{});
+  }
+  else
+  {
+    return {};
+  }
+}
+
+/// Check if we have a simple pointer comparison, and if so try to evaluate it.
+/// \param renamed_expr: The L2-renamed expression to check
+/// \param value_set: The value-set for looking up what the symbol can point to
+/// \param language_mode: The language mode
+/// \param ns: A namespace
+/// \return If we were able to evaluate the condition as true or false then we
+///   return that, otherwise we return an empty optionalt
+static optionalt<renamedt<exprt, L2>> try_evaluate_pointer_comparison(
+  const renamedt<exprt, L2> &renamed_expr,
+  const value_sett &value_set,
+  const irep_idt &language_mode,
+  const namespacet &ns)
+{
+  const exprt &expr = renamed_expr.get();
+
+  if(expr.id() != ID_equal && expr.id() != ID_notequal)
+    return {};
+
+  if(!can_cast_type<pointer_typet>(expr.op0().type()))
+    return {};
+
+  exprt lhs = expr.op0(), rhs = expr.op1();
+  if(can_cast_expr<symbol_exprt>(rhs))
+    std::swap(lhs, rhs);
+
+  const symbol_exprt *symbol_expr_lhs =
+    expr_try_dynamic_cast<symbol_exprt>(lhs);
+
+  if(!symbol_expr_lhs)
+    return {};
+
+  if(!goto_symex_is_constantt()(rhs))
+    return {};
+
+  return try_evaluate_pointer_comparison(
+    expr.id(), *symbol_expr_lhs, rhs, value_set, language_mode, ns);
+}
+
+/// Try to evaluate pointer comparisons where they can be trivially determined
+/// using the value-set. This is optional as all it does is allow symex to
+/// resolve some comparisons itself and therefore create a simpler formula for
+/// the SAT solver.
+/// \param [in,out] condition: An L2-renamed expression with boolean type
+/// \param value_set: The value-set for determining what pointer-typed symbols
+///   might possibly point to
+/// \param language_mode: The language mode
+/// \param ns: A namespace
+/// \return The possibly modified condition
+static renamedt<exprt, L2> try_evaluate_pointer_comparisons(
+  renamedt<exprt, L2> condition,
+  const value_sett &value_set,
+  const irep_idt &language_mode,
+  const namespacet &ns)
+{
+  selectively_mutate(
+    condition,
+    [&value_set, &language_mode, &ns](const renamedt<exprt, L2> &expr) {
+      return try_evaluate_pointer_comparison(
+        expr, value_set, language_mode, ns);
+    });
+
+  return condition;
+}
+
 void goto_symext::symex_goto(statet &state)
 {
   const goto_programt::instructiont &instruction=*state.source.pc;
@@ -73,6 +234,8 @@ void goto_symext::symex_goto(statet &state)
   clean_expr(new_guard, state, false);
 
   renamedt<exprt, L2> renamed_guard = state.rename(std::move(new_guard), ns);
+  renamed_guard = try_evaluate_pointer_comparisons(
+    std::move(renamed_guard), state.value_set, language_mode, ns);
   if(symex_config.simplify_opt)
     renamed_guard.simplify(ns);
   new_guard = renamed_guard.get();

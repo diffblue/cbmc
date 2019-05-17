@@ -1,0 +1,60 @@
+CORE paths-lifo-expected-failure
+test.c
+--function test --show-vcc
+^EXIT=0$
+^SIGNAL=0$
+test::1::unconditionally_reachable_1[^\s]+ = 7$
+test::1::unconditionally_reachable_2[^\s]+ = 7$
+test::1::unconditionally_reachable_3[^\s]+ = 7$
+test::1::unconditionally_reachable_4[^\s]+ = 7$
+test::1::unconditionally_reachable_5[^\s]+ = 7$
+test::1::unconditionally_reachable_6[^\s]+ = 7$
+test::1::unconditionally_reachable_7[^\s]+ = 7$
+test::1::unconditionally_reachable_8[^\s]+ = 7$
+test::1::unconditionally_reachable_9[^\s]+ = 7$
+test::1::unconditionally_reachable_10[^\s]+ = 7$
+test::1::possibly_reachable_1[^\s]+ = \(goto_symex::\\guard[^\s]+ \? 7 : test::1::possibly_reachable_1[^\s]+\)$
+test::1::possibly_reachable_2[^\s]+ = \(goto_symex::\\guard[^\s]+ \? 7 : test::1::possibly_reachable_2[^\s]+\)$
+test::1::possibly_reachable_3[^\s]+ = \(goto_symex::\\guard[^\s]+ \? 7 : test::1::possibly_reachable_3[^\s]+\)$
+test::1::possibly_reachable_4[^\s]+ = \(goto_symex::\\guard[^\s]+ \? 7 : test::1::possibly_reachable_4[^\s]+\)$
+test::1::possibly_reachable_5[^\s]+ = \(goto_symex::\\guard[^\s]+ \? 7 : test::1::possibly_reachable_5[^\s]+\)$
+test::1::possibly_reachable_6[^\s]+ = \(goto_symex::\\guard[^\s]+ \? 7 : test::1::possibly_reachable_6[^\s]+\)$
+test::1::possibly_reachable_7[^\s]+ = \(goto_symex::\\guard[^\s]+ \? 7 : test::1::possibly_reachable_7[^\s]+\)$
+--
+test::1::unconditionally_reachable_1[^\s]+ = \(goto_symex::\\guard[^\s]+ \? 7 : test::1::unconditionally_reachable_1[^\s]+\)$
+test::1::unconditionally_reachable_2[^\s]+ = \(goto_symex::\\guard[^\s]+ \? 7 : test::1::unconditionally_reachable_2[^\s]+\)$
+test::1::unconditionally_reachable_3[^\s]+ = \(goto_symex::\\guard[^\s]+ \? 7 : test::1::unconditionally_reachable_3[^\s]+\)$
+test::1::unconditionally_reachable_4[^\s]+ = \(goto_symex::\\guard[^\s]+ \? 7 : test::1::unconditionally_reachable_4[^\s]+\)$
+test::1::unconditionally_reachable_5[^\s]+ = \(goto_symex::\\guard[^\s]+ \? 7 : test::1::unconditionally_reachable_5[^\s]+\)$
+test::1::unconditionally_reachable_6[^\s]+ = \(goto_symex::\\guard[^\s]+ \? 7 : test::1::unconditionally_reachable_6[^\s]+\)$
+test::1::unconditionally_reachable_7[^\s]+ = \(goto_symex::\\guard[^\s]+ \? 7 : test::1::unconditionally_reachable_7[^\s]+\)$
+test::1::unconditionally_reachable_8[^\s]+ = \(goto_symex::\\guard[^\s]+ \? 7 : test::1::unconditionally_reachable_8[^\s]+\)$
+test::1::unconditionally_reachable_9[^\s]+ = \(goto_symex::\\guard[^\s]+ \? 7 : test::1::unconditionally_reachable_9[^\s]+\)$
+test::1::unconditionally_reachable_10[^\s]+ = \(goto_symex::\\guard[^\s]+ \? 7 : test::1::unconditionally_reachable_10[^\s]+\)$
+test::1::unconditionally_reachable_11[^\s]+ = \(goto_symex::\\guard[^\s]+ \? 7 : test::1::unconditionally_reachable_11[^\s]+\)$
+test::1::unconditionally_reachable_12[^\s]+ = \(goto_symex::\\guard[^\s]+ \? 7 : test::1::unconditionally_reachable_12[^\s]+\)$
+test::1::unreachable_1[^\s]+ = 7$
+test::1::unreachable_2[^\s]+ = 7$
+test::1::unreachable_3[^\s]+ = 7$
+test::1::unreachable_4[^\s]+ = 7$
+test::1::unreachable_5[^\s]+ = 7$
+test::1::unreachable_6[^\s]+ = 7$
+test::1::unreachable_7[^\s]+ = 7$
+test::1::unreachable_8[^\s]+ = 7$
+test::1::unreachable_9[^\s]+ = 7$
+test::1::unreachable_10[^\s]+ = 7$
+test::1::unreachable_11[^\s]+ = 7$
+test::1::unreachable_12[^\s]+ = 7$
+^warning: ignoring
+unreachable_1[3-9]
+unreachable[2-9][0-9]
+unconditionally_reachable_1[3-9]
+unconditionally_reachable[2-9][0-9]
+possibly_reachable_[8-9]
+possibly_reachable_[1-9][0-9]
+--
+Pointer comparisons will be resolved in symex by a mixture of constant
+propagation and value-set filtering in try_evaluate_pointer_comparisons.
+
+The expected failure for path-symex is because the lines we check for
+possibly_reachable_* would only appear when there is convergence behaviour.
