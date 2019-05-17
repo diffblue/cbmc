@@ -915,6 +915,8 @@ bool configt::set(const cmdlinet &cmdline)
       ansi_c.preprocessor=ansi_ct::preprocessort::GCC;
       ansi_c.mode=ansi_ct::flavourt::VISUAL_STUDIO;
       #endif
+
+      cpp.cpp_standard = cppt::cpp_standardt::CPP14;
     }
   }
   else if(os=="macos")
