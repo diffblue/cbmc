@@ -1,6 +1,6 @@
 CORE
 main.c
---unsigned-overflow-check --pointer-check
+--unsigned-overflow-check --pointer-check --arrays-uf-always
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
