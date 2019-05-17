@@ -65,11 +65,20 @@ __CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
 
 inline void *calloc(__CPROVER_size_t nmemb, __CPROVER_size_t size)
 {
+__CPROVER_HIDE:;
+#pragma CPROVER check push
+#pragma CPROVER check disable "unsigned-overflow"
+  if(__CPROVER_overflow_mult(nmemb, size))
+    return (void *)0;
+  // This is now safe; still do it within the scope of the pragma to avoid an
+  // unnecessary assertion to be generated.
+  __CPROVER_size_t alloc_size = nmemb * size;
+#pragma CPROVER check pop
+
+  void *malloc_res;
   // realistically, calloc may return NULL,
   // and __CPROVER_allocate doesn't, but no one cares
-  __CPROVER_HIDE:;
-  void *malloc_res;
-  malloc_res = __CPROVER_allocate(nmemb * size, 1);
+  malloc_res = __CPROVER_allocate(alloc_size, 1);
 
   // make sure it's not recorded as deallocated
   __CPROVER_deallocated =
@@ -79,7 +88,7 @@ inline void *calloc(__CPROVER_size_t nmemb, __CPROVER_size_t size)
   __CPROVER_bool record_malloc = __VERIFIER_nondet___CPROVER_bool();
   __CPROVER_malloc_object =
     record_malloc ? malloc_res : __CPROVER_malloc_object;
-  __CPROVER_malloc_size = record_malloc ? nmemb * size : __CPROVER_malloc_size;
+  __CPROVER_malloc_size = record_malloc ? alloc_size : __CPROVER_malloc_size;
   __CPROVER_malloc_is_new_array =
     record_malloc ? 0 : __CPROVER_malloc_is_new_array;
 
