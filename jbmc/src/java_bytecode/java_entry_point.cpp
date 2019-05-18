@@ -188,6 +188,8 @@ static void java_static_lifetime_init(
         // For arguments we can't parse yet:
         side_effect_expr_nondett nondet_bool(java_boolean_type(), sym.location);
 
+        const auto &java_class_type = to_java_class_type(class_symbol.type);
+
         // Argument order is: name, isAnnotation, isArray, isInterface,
         // isSynthetic, isLocalClass, isMemberClass, isEnum
 
@@ -198,19 +200,19 @@ static void java_static_lifetime_init(
            // name:
            address_of_exprt(class_name_literal),
            // isAnnotation:
-           constant_bool(class_symbol.type.get_bool(ID_is_annotation)),
+           constant_bool(java_class_type.get_is_annotation()),
            // isArray:
            constant_bool(class_is_array),
            // isInterface:
-           constant_bool(class_symbol.type.get_bool(ID_interface)),
+           constant_bool(java_class_type.get_interface()),
            // isSynthetic:
-           constant_bool(class_symbol.type.get_bool(ID_synthetic)),
+           constant_bool(java_class_type.get_synthetic()),
            // isLocalClass:
            nondet_bool,
            // isMemberClass:
            nondet_bool,
            // isEnum:
-           constant_bool(class_symbol.type.get_bool(ID_enumeration))});
+           constant_bool(java_class_type.get_is_enumeration())});
 
         // First initialize the object as prior to a constructor:
         namespacet ns(symbol_table);

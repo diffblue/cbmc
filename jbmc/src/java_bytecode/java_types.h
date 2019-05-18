@@ -402,6 +402,54 @@ public:
     set(ID_enumeration, is_enumeration);
   }
 
+  /// is class abstract?
+  bool get_abstract() const
+  {
+    return get_bool(ID_abstract);
+  }
+
+  /// marks class abstract
+  void set_abstract(bool abstract)
+  {
+    set(ID_abstract, abstract);
+  }
+
+  /// is class synthetic?
+  bool get_synthetic() const
+  {
+    return get_bool(ID_synthetic);
+  }
+
+  /// marks class synthetic
+  void set_synthetic(bool synthetic)
+  {
+    set(ID_synthetic, synthetic);
+  }
+
+  /// is class an annotation?
+  bool get_is_annotation() const
+  {
+    return get_bool(ID_is_annotation);
+  }
+
+  /// marks class an annotation
+  void set_is_annotation(bool is_annotation)
+  {
+    set(ID_is_annotation, is_annotation);
+  }
+
+  /// is class an interface?
+  bool get_interface() const
+  {
+    return get_bool(ID_interface);
+  }
+
+  /// marks class an interface
+  void set_interface(bool interface)
+  {
+    set(ID_interface, interface);
+  }
+
   // it may be better to introduce a class like
   // class java_lambda_method_handlet : private irept
   // {
