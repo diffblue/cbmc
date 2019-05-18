@@ -535,8 +535,26 @@ protected:
     return lp;
   }
 
+  /// Move a container node (containing a single leaf) further down the tree
+  /// such as to resolve a collision with another key-value pair. This method is
+  /// called by `insert()` to resolve a collision between a key-value pair to be
+  /// newly inserted, and a key-value pair existing in the map.
+  ///
+  /// \param starting_level: the depth of the inner node pointing to the
+  ///   container node with a single leaf
+  /// \param key_suffix: hash code of the existing key in the map, shifted to
+  ///   the right by `chunk * starting_level` bits (i.e., \p key_suffix is the
+  ///   rest of the hash code used to determine the position of the key-value
+  ///   pair below level \p starting_level
+  /// \param bit_last: last portion of the hash code of the key existing in the
+  ///   map (`inner[bit_last]` points to the container node to move further down
+  ///   the tree)
+  /// \param inner: inner node of which the child `inner[bit_last]` is the
+  ///   container node to move further down the tree
+  /// \return pointer to the container to which the element to be newly inserted
+  ///   can be added
   innert *migrate(
-    const std::size_t i,
+    const std::size_t starting_level,
     const std::size_t key_suffix,
     const std::size_t bit_last,
     innert &inner);
@@ -545,6 +563,20 @@ protected:
     const innert &n,
     std::function<void(const key_type &k, const mapped_type &m)> f) const;
 
+  /// Add a delta item to the delta view if the value in the \p container (which
+  /// must only contain a single leaf) is not shared with any of the values in
+  /// the subtree below \p inner. This method is called by `get_delta_view()`
+  /// when a container containing a single leaf is encountered in the first map,
+  /// and the corresponding node in the second map is an inner node.
+  ///
+  /// \param container: container node containing a single leaf, part of the
+  ///   first map in a call `map1.get_delta_view(map2, ...)`
+  /// \param inner: inner node which is part of the second map
+  /// \param level: depth of the nodes in the maps (both \p container and \p
+  ///   inner must be at the same depth in their respective maps)
+  /// \param delta_view: delta view to add delta items to
+  /// \param only_common: flag indicating if only items are added to the delta
+  ///   view for which the keys are in both maps
   void add_item_if_not_shared(
     const innert &container,
     const innert &inner,
@@ -572,7 +604,7 @@ protected:
 
   // derived config
   static const std::size_t mask;
-  static const std::size_t steps;
+  static const std::size_t levels;
 
   // key-value map
   innert map;
@@ -1108,12 +1140,12 @@ SHARING_MAPT(void)::erase(const key_type &k)
 }
 
 SHARING_MAPT2(, innert *)::migrate(
-  const std::size_t step,
+  const std::size_t starting_level,
   const std::size_t key_suffix,
   const std::size_t bit_last,
   innert &inner)
 {
-  SM_ASSERT(step < steps - 1);
+  SM_ASSERT(starting_level < levels - 1);
   SM_ASSERT(inner.is_defined_internal());
 
   const innert &child = *inner.find_child(bit_last);
@@ -1127,7 +1159,7 @@ SHARING_MAPT2(, innert *)::migrate(
   const leaft &leaf = ll.front();
   std::size_t key_existing = hash()(leaf.get_key());
 
-  key_existing >>= chunk * step;
+  key_existing >>= chunk * starting_level;
 
   // Copy the container
   innert container_copy(child);
@@ -1141,13 +1173,13 @@ SHARING_MAPT2(, innert *)::migrate(
 
   // Find place for both elements
 
-  std::size_t i = step + 1;
+  std::size_t level = starting_level + 1;
   std::size_t key = key_suffix;
 
   key_existing >>= chunk;
   key >>= chunk;
 
-  SM_ASSERT(i < steps);
+  SM_ASSERT(level < levels);
 
   do
   {
@@ -1171,8 +1203,8 @@ SHARING_MAPT2(, innert *)::migrate(
     key >>= chunk;
     key_existing >>= chunk;
 
-    i++;
-  } while(i < steps);
+    level++;
+  } while(level < levels);
 
   leaft leaf_copy(as_const(&container_copy)->get_container().front());
   ip->get_container().push_front(leaf_copy);
@@ -1191,7 +1223,7 @@ SHARING_MAPT4(valueU, void)
   // The root cannot be a container node
   SM_ASSERT(ip->is_internal());
 
-  std::size_t i = 0;
+  std::size_t level = 0;
 
   while(true)
   {
@@ -1199,7 +1231,7 @@ SHARING_MAPT4(valueU, void)
 
     SM_ASSERT(ip != nullptr);
     SM_ASSERT(ip->is_internal());
-    SM_ASSERT(i == 0 || !ip->empty());
+    SM_ASSERT(level == 0 || !ip->empty());
 
     innert *child = ip->add_child(bit);
 
@@ -1218,10 +1250,10 @@ SHARING_MAPT4(valueU, void)
 
     if(child->is_container())
     {
-      if(i < steps - 1)
+      if(level < levels - 1)
       {
         // Migrate the elements downwards
-        innert *cp = migrate(i, key, bit, *ip);
+        innert *cp = migrate(level, key, bit, *ip);
 
         cp->place_leaf(k, std::forward<valueU>(m));
       }
@@ -1236,11 +1268,11 @@ SHARING_MAPT4(valueU, void)
       return;
     }
 
-    SM_ASSERT(i == steps - 1 || child->is_defined_internal());
+    SM_ASSERT(level == levels - 1 || child->is_defined_internal());
 
     ip = child;
     key >>= chunk;
-    i++;
+    level++;
   }
 }
 
@@ -1298,6 +1330,6 @@ SHARING_MAPT(const std::size_t)::bits = 30;
 SHARING_MAPT(const std::size_t)::chunk = 3;
 
 SHARING_MAPT(const std::size_t)::mask = 0xffff >> (16 - chunk);
-SHARING_MAPT(const std::size_t)::steps = bits / chunk;
+SHARING_MAPT(const std::size_t)::levels = bits / chunk;
 
 #endif
