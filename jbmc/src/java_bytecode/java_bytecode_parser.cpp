@@ -36,7 +36,6 @@ public:
   explicit java_bytecode_parsert(bool skip_instructions)
     : skip_instructions(skip_instructions)
   {
-    populate_bytecode_mnemonics_table();
   }
 
   virtual bool parse();
@@ -72,14 +71,6 @@ public:
   constant_poolt constant_pool;
 
 protected:
-  class bytecodet
-  {
-  public:
-    irep_idt mnemonic;
-    char format;
-  };
-
-  std::vector<bytecodet> bytecodes;
   const bool skip_instructions = false;
 
   pool_entryt &pool_entry(u2 index)
@@ -102,23 +93,6 @@ protected:
   const typet type_entry(u2 index)
   {
     return *java_type_from_string(id2string(pool_entry(index).s));
-  }
-
-  void populate_bytecode_mnemonics_table()
-  {
-    // This is only useful for rbytecodes, which in turn is only useful to
-    // parse method instructions.
-    if(skip_instructions)
-      return;
-
-    // pre-hash the mnemonics, so we do this only once
-    bytecodes.resize(256);
-    for(const bytecode_infot *p=bytecode_info; p->mnemonic!=nullptr; p++)
-    {
-      assert(p->opcode<bytecodes.size());
-      bytecodes[p->opcode].mnemonic=p->mnemonic;
-      bytecodes[p->opcode].format=p->format;
-    }
   }
 
   void rClassFile();
@@ -954,9 +928,6 @@ void java_bytecode_parsert::rfields(classt &parsed_class)
 void java_bytecode_parsert::rbytecode(
   methodt::instructionst &instructions)
 {
-  INVARIANT(
-    bytecodes.size() == 256, "bytecode mnemonics should have been populated");
-
   u4 code_length=read_u4();
 
   u4 address;
@@ -978,19 +949,20 @@ void java_bytecode_parsert::rbytecode(
       // [ifald]load, [ifald]store, ret and iinc
       // All of these have either format of v, or V
       INVARIANT(
-        bytecodes[bytecode].format == 'v' || bytecodes[bytecode].format == 'V',
-        "Unexpected wide instruction: " +
-          id2string(bytecodes[bytecode].mnemonic));
+        bytecode_info[bytecode].format == 'v' ||
+          bytecode_info[bytecode].format == 'V',
+        std::string("Unexpected wide instruction: ") +
+          bytecode_info[bytecode].mnemonic);
     }
 
     instructions.push_back(instructiont());
     instructiont &instruction=instructions.back();
-    instruction.statement=bytecodes[bytecode].mnemonic;
+    instruction.bytecode = bytecode;
     instruction.address=start_of_instruction;
     instruction.source_location
       .set_java_bytecode_index(std::to_string(bytecode_index));
 
-    switch(bytecodes[bytecode].format)
+    switch(bytecode_info[bytecode].format)
     {
     case ' ': // no further bytes
       break;

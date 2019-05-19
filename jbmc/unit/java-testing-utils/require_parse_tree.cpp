@@ -95,8 +95,9 @@ void require_parse_tree::require_instructions_match_expectation(
 void require_parse_tree::expected_instructiont::require_instructions_equal(
   java_bytecode_parse_treet::instructiont actual_instruction) const
 {
-  REQUIRE(actual_instruction.statement == instruction_mnemoic);
-  REQUIRE(actual_instruction.args.size() == instruction_arguments.size());
+  REQUIRE(
+    instruction_mnemoic == bytecode_info[actual_instruction.bytecode].mnemonic);
+  REQUIRE(instruction_arguments.size() == actual_instruction.args.size());
   auto actual_arg_it = actual_instruction.args.begin();
   for(const exprt &expected_arg : actual_instruction.args)
   {

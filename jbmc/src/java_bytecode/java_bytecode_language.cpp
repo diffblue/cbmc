@@ -316,8 +316,9 @@ static void infer_opaque_type_fields(
     for(const java_bytecode_parse_treet::instructiont &instruction :
           method.instructions)
     {
-      if(instruction.statement == "getfield" ||
-         instruction.statement == "putfield")
+      const std::string statement =
+        bytecode_info[instruction.bytecode].mnemonic;
+      if(statement == "getfield" || statement == "putfield")
       {
         const fieldref_exprt &fieldref =
           expr_dynamic_cast<fieldref_exprt>(instruction.args[0]);
@@ -461,11 +462,15 @@ static void generate_constant_global_variables(
     {
       // ldc* instructions are Java bytecode "load constant" ops, which can
       // retrieve a numeric constant, String literal, or Class literal.
-      if(instruction.statement == "ldc" ||
-         instruction.statement == "ldc2" ||
-         instruction.statement == "ldc_w" ||
-         instruction.statement == "ldc2_w")
+      const std::string statement =
+        bytecode_info[instruction.bytecode].mnemonic;
+      // clang-format off
+      if(statement == "ldc" ||
+         statement == "ldc2" ||
+         statement == "ldc_w" ||
+         statement == "ldc2_w")
       {
+        // clang-format on
         INVARIANT(
           instruction.args.size() != 0,
           "ldc instructions should have an argument");
@@ -589,8 +594,9 @@ static void create_stub_global_symbols(
     for(const java_bytecode_parse_treet::instructiont &instruction :
           method.instructions)
     {
-      if(instruction.statement == "getstatic" ||
-         instruction.statement == "putstatic")
+      const std::string statement =
+        bytecode_info[instruction.bytecode].mnemonic;
+      if(statement == "getstatic" || statement == "putstatic")
       {
         INVARIANT(
           instruction.args.size() > 0,

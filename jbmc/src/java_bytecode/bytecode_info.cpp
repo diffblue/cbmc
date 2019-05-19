@@ -271,10 +271,9 @@ struct bytecode_infot const bytecode_info[]=
 { nullptr,          0xfd, '\0',0, 0, '\0'}, // zero-initialized NOLINT (*)
 { "impdep1",        0xfe, ' ', 0, 0, ' ' }, // ; reserved for implementation-dependent operations within debuggers; should not appear in any class file  NOLINT(*)
 { "impdep2",        0xff, ' ', 0, 0, ' ' }, // ; reserved for implementation-dependent operations within debuggers; should not appear in any class file  NOLINT(*)
-{ nullptr,          0x00, '\0',0, 0, '\0'}, // zero-initialized NOLINT (*)
 };
 // clang-format on
 
 static_assert(
-  sizeof(bytecode_info) == sizeof(bytecode_infot) * 257,
+  sizeof(bytecode_info) == sizeof(bytecode_infot) * 256,
   "bytecode table has right size");
