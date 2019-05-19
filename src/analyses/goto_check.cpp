@@ -1534,7 +1534,7 @@ void goto_checkt::check_rec_logical_op(const exprt &expr, guardt &guard)
         op.pretty());
 
     check_rec(op, guard);
-    guard.add(expr.id() == ID_or ? not_exprt(op) : op);
+    guard.add(expr.id() == ID_or ? boolean_negate(op) : op);
   }
 
   guard = std::move(old_guard);
@@ -1641,8 +1641,7 @@ void goto_checkt::check_rec(const exprt &expr, guardt &guard)
 
   if(expr.id()==ID_address_of)
   {
-    assert(expr.operands().size()==1);
-    check_rec_address(expr.op0(), guard);
+    check_rec_address(to_address_of_expr(expr).object(), guard);
     return;
   }
   else if(expr.id()==ID_and || expr.id()==ID_or)
