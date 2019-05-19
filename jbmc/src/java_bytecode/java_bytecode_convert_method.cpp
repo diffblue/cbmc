@@ -94,11 +94,6 @@ static void assign_parameter_names(
   }
 }
 
-static bool operator==(const irep_idt &what, const patternt &pattern)
-{
-  return pattern==what;
-}
-
 static bool is_constructor(const irep_idt &method_name)
 {
   return id2string(method_name).find("<init>") != std::string::npos;
