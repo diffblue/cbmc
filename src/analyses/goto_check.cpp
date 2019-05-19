@@ -123,6 +123,18 @@ protected:
   ///   sub-expressions
   bool check_rec_member(const member_exprt &member, guardt &guard);
 
+  /// Check that a division is valid: check for division by zero, overflow and
+  ///   NaN (for floating point numbers).
+  /// \param div_expr: the expression to be checked
+  /// \param guard: the condition for the check (unmodified here)
+  void check_rec_div(const div_exprt &div_expr, guardt &guard);
+
+  /// Check that an arithmetic operation is valid: overflow check, NaN-check
+  ///   (for floating point numbers), and pointer overflow check.
+  /// \param expr: the expression to be checked
+  /// \param guard: the condition for the check (unmodified here)
+  void check_rec_arithmetic_op(const exprt &expr, guardt &guard);
+
   void check_rec(const exprt &expr, guardt &guard);
   void check(const exprt &expr);
 
@@ -1598,6 +1610,36 @@ bool goto_checkt::check_rec_member(const member_exprt &member, guardt &guard)
   return false;
 }
 
+void goto_checkt::check_rec_div(const div_exprt &div_expr, guardt &guard)
+{
+  div_by_zero_check(to_div_expr(div_expr), guard);
+
+  if(div_expr.type().id() == ID_signedbv)
+    integer_overflow_check(div_expr, guard);
+  else if(div_expr.type().id() == ID_floatbv)
+  {
+    nan_check(div_expr, guard);
+    float_overflow_check(div_expr, guard);
+  }
+}
+
+void goto_checkt::check_rec_arithmetic_op(const exprt &expr, guardt &guard)
+{
+  if(expr.type().id() == ID_signedbv || expr.type().id() == ID_unsignedbv)
+  {
+    integer_overflow_check(expr, guard);
+  }
+  else if(expr.type().id() == ID_floatbv)
+  {
+    nan_check(expr, guard);
+    float_overflow_check(expr, guard);
+  }
+  else if(expr.type().id() == ID_pointer)
+  {
+    pointer_overflow_check(expr, guard);
+  }
+}
+
 void goto_checkt::check_rec(const exprt &expr, guardt &guard)
 {
   // we don't look into quantifiers
@@ -1637,15 +1679,7 @@ void goto_checkt::check_rec(const exprt &expr, guardt &guard)
   }
   else if(expr.id()==ID_div)
   {
-    div_by_zero_check(to_div_expr(expr), guard);
-
-    if(expr.type().id()==ID_signedbv)
-      integer_overflow_check(expr, guard);
-    else if(expr.type().id()==ID_floatbv)
-    {
-      nan_check(expr, guard);
-      float_overflow_check(expr, guard);
-    }
+    check_rec_div(to_div_expr(expr), guard);
   }
   else if(expr.id()==ID_shl || expr.id()==ID_ashr || expr.id()==ID_lshr)
   {
@@ -1663,20 +1697,7 @@ void goto_checkt::check_rec(const exprt &expr, guardt &guard)
           expr.id()==ID_mult ||
           expr.id()==ID_unary_minus)
   {
-    if(expr.type().id()==ID_signedbv ||
-       expr.type().id()==ID_unsignedbv)
-    {
-      integer_overflow_check(expr, guard);
-    }
-    else if(expr.type().id()==ID_floatbv)
-    {
-      nan_check(expr, guard);
-      float_overflow_check(expr, guard);
-    }
-    else if(expr.type().id()==ID_pointer)
-    {
-      pointer_overflow_check(expr, guard);
-    }
+    check_rec_arithmetic_op(expr, guard);
   }
   else if(expr.id()==ID_typecast)
     conversion_check(expr, guard);
