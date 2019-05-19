@@ -1481,15 +1481,11 @@ void goto_checkt::add_guarded_property(
 
   if(assertions.insert(guarded_expr).second)
   {
-    goto_program_instruction_typet type=
-      enable_assert_to_assume?ASSUME:ASSERT;
-
-    goto_programt::targett t = new_code.add(goto_programt::instructiont(
-      static_cast<const codet &>(get_nil_irep()),
-      source_location,
-      type,
-      std::move(new_expr),
-      {}));
+    auto t = new_code.add(
+      enable_assert_to_assume ? goto_programt::make_assumption(
+                                  std::move(guarded_expr), source_location)
+                              : goto_programt::make_assertion(
+                                  std::move(guarded_expr), source_location));
 
     std::string source_expr_string;
     get_language_from_mode(mode)->from_expr(src_expr, source_expr_string, ns);
@@ -1856,15 +1852,10 @@ void goto_checkt::goto_check(
     {
       if(std::find(i.labels.begin(), i.labels.end(), label)!=i.labels.end())
       {
-        goto_program_instruction_typet type=
-          enable_assert_to_assume?ASSUME:ASSERT;
-
-        goto_programt::targett t = new_code.add(goto_programt::instructiont(
-          static_cast<const codet &>(get_nil_irep()),
-          i.source_location,
-          type,
-          false_exprt(),
-          {}));
+        auto t = new_code.add(
+          enable_assert_to_assume
+            ? goto_programt::make_assumption(false_exprt{}, i.source_location)
+            : goto_programt::make_assertion(false_exprt{}, i.source_location));
 
         t->source_location.set_property_class("error label");
         t->source_location.set_comment("error label "+label);
