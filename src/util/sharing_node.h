@@ -271,7 +271,7 @@ public:
 
   leaft *find_leaf(const keyT &k)
   {
-    SN_ASSERT(is_container()); // empty() is allowed
+    SN_ASSERT(is_defined_container());
 
     leaf_listt &c = get_container();
 
@@ -283,9 +283,7 @@ public:
         return &n;
     }
 
-    // If we return nullptr the call must be followed by a call to
-    // place_leaf(k, ...), as otherwise the container would be copied
-    // needlessly in get_container() above
+    UNREACHABLE;
     return nullptr;
   }
 
@@ -396,6 +394,14 @@ public:
     SN_ASSERT(is_defined_leaf());
 
     return read_leaf().v;
+  }
+
+  template <class valueU>
+  void make_leaf(const keyT &k, valueU &&v)
+  {
+    SN_ASSERT(!data);
+
+    data = make_shared_3<2, SN_PTR_TYPE_ARGS>(k, std::forward<valueU>(v));
   }
 
   template <class valueU>
