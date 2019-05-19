@@ -70,17 +70,10 @@ void show_symbol_table_plain(
 {
   out << '\n' << "Symbols:" << '\n' << '\n';
 
-  // we want to sort alphabetically
-  std::vector<std::string> symbols;
-  symbols.reserve(symbol_table.symbols.size());
-
-  for(const auto &symbol_pair : symbol_table.symbols)
-    symbols.push_back(id2string(symbol_pair.first));
-  std::sort(symbols.begin(), symbols.end());
-
   const namespacet ns(symbol_table);
 
-  for(const irep_idt &id : symbols)
+  // we want to sort alphabetically
+  for(const irep_idt &id : symbol_table.sorted_symbol_names())
   {
     const symbolt &symbol=ns.lookup(id);
 

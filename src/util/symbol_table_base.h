@@ -136,6 +136,10 @@ public:
 
   void show(std::ostream &out) const;
 
+  /// Build and return a lexicographically sorted vector of symbol names from
+  /// all symbols stored in this symbol table.
+  std::vector<irep_idt> sorted_symbol_names() const;
+
   class iteratort
   {
   private:

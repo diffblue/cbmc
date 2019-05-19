@@ -33,22 +33,30 @@ bool symbol_table_baset::remove(const irep_idt &name)
   return false;
 }
 
+std::vector<irep_idt> symbol_table_baset::sorted_symbol_names() const
+{
+  std::vector<irep_idt> sorted_names;
+  sorted_names.reserve(symbols.size());
+
+  for(const auto &elem : symbols)
+    sorted_names.push_back(elem.first);
+
+  std::sort(
+    sorted_names.begin(),
+    sorted_names.end(),
+    [](const irep_idt &a, const irep_idt &b) { return a.compare(b) < 0; });
+
+  return sorted_names;
+}
+
 /// Print the contents of the symbol table.
 /// \param out: The ostream to direct output to.
 void symbol_table_baset::show(std::ostream &out) const
 {
-  std::vector<irep_idt> sorted_names;
-  sorted_names.reserve(symbols.size());
-  for(const auto &elem : symbols)
-    sorted_names.push_back(elem.first);
-  std::sort(
-    sorted_names.begin(),
-    sorted_names.end(),
-    [](const irep_idt &a, const irep_idt &b) { return a.compare(b); });
   out << "\n"
       << "Symbols:"
       << "\n";
-  for(const auto &name : sorted_names)
+  for(const auto &name : sorted_symbol_names())
     out << symbols.at(name);
 }
 
