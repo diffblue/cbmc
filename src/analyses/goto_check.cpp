@@ -136,11 +136,19 @@ protected:
 
   std::string array_name(const exprt &);
 
-  void add_guarded_claim(
-    const exprt &expr,
+  /// Include the \p asserted_expr in the code conditioned by the \p guard.
+  /// \param asserted_expr: expression to be asserted
+  /// \param comment: human readable comment
+  /// \param property_class: classification of the property
+  /// \param source_location: the source location of the original expression
+  /// \param src_expr: the original expression to be included in the comment
+  /// \param guard: the condition under which the asserted expression should be
+  ///   taken into account
+  void add_guarded_property(
+    const exprt &asserted_expr,
     const std::string &comment,
     const std::string &property_class,
-    const source_locationt &,
+    const source_locationt &source_location,
     const exprt &src_expr,
     const guardt &guard);
 
@@ -257,7 +265,7 @@ void goto_checkt::div_by_zero_check(
   exprt zero=from_integer(0, expr.op1().type());
   const notequal_exprt inequality(expr.op1(), std::move(zero));
 
-  add_guarded_claim(
+  add_guarded_property(
     inequality,
     "division by zero",
     "division-by-zero",
@@ -283,7 +291,7 @@ void goto_checkt::undefined_shift_check(
     binary_relation_exprt inequality(
       expr.distance(), ID_ge, from_integer(0, distance_type));
 
-    add_guarded_claim(
+    add_guarded_property(
       inequality,
       "shift distance is negative",
       "undefined-shift",
@@ -299,7 +307,7 @@ void goto_checkt::undefined_shift_check(
     exprt width_expr=
       from_integer(to_bitvector_type(op_type).get_width(), distance_type);
 
-    add_guarded_claim(
+    add_guarded_property(
       binary_relation_exprt(expr.distance(), ID_lt, std::move(width_expr)),
       "shift distance too large",
       "undefined-shift",
@@ -312,7 +320,7 @@ void goto_checkt::undefined_shift_check(
       binary_relation_exprt inequality(
         expr.op(), ID_ge, from_integer(0, op_type));
 
-      add_guarded_claim(
+      add_guarded_property(
         inequality,
         "shift operand is negative",
         "undefined-shift",
@@ -323,7 +331,7 @@ void goto_checkt::undefined_shift_check(
   }
   else
   {
-    add_guarded_claim(
+    add_guarded_property(
       false_exprt(),
       "shift of non-integer type",
       "undefined-shift",
@@ -345,7 +353,7 @@ void goto_checkt::mod_by_zero_check(
   exprt zero=from_integer(0, expr.op1().type());
   const notequal_exprt inequality(expr.op1(), std::move(zero));
 
-  add_guarded_claim(
+  add_guarded_property(
     inequality,
     "division by zero",
     "division-by-zero",
@@ -375,7 +383,7 @@ void goto_checkt::mod_overflow_check(const mod_exprt &expr, const guardt &guard)
     notequal_exprt minus_one_neq(
       expr.op1(), from_integer(-1, expr.op1().type()));
 
-    add_guarded_claim(
+    add_guarded_property(
       or_exprt(int_min_neq, minus_one_neq),
       "result of signed mod is not representable",
       "overflow",
@@ -426,7 +434,7 @@ void goto_checkt::conversion_check(
         const binary_relation_exprt no_overflow_lower(
           expr.op0(), ID_ge, from_integer(-power(2, new_width - 1), old_type));
 
-        add_guarded_claim(
+        add_guarded_property(
           and_exprt(no_overflow_lower, no_overflow_upper),
           "arithmetic overflow on signed type conversion",
           "overflow",
@@ -445,7 +453,7 @@ void goto_checkt::conversion_check(
           ID_le,
           from_integer(power(2, new_width - 1) - 1, old_type));
 
-        add_guarded_claim(
+        add_guarded_property(
           no_overflow_upper,
           "arithmetic overflow on unsigned to signed type conversion",
           "overflow",
@@ -466,7 +474,7 @@ void goto_checkt::conversion_check(
         const binary_relation_exprt no_overflow_lower(
           expr.op0(), ID_gt, lower.to_expr());
 
-        add_guarded_claim(
+        add_guarded_property(
           and_exprt(no_overflow_lower, no_overflow_upper),
           "arithmetic overflow on float to signed integer type conversion",
           "overflow",
@@ -489,7 +497,7 @@ void goto_checkt::conversion_check(
           const binary_relation_exprt no_overflow_lower(
             expr.op0(), ID_ge, from_integer(0, old_type));
 
-          add_guarded_claim(
+          add_guarded_property(
             no_overflow_lower,
             "arithmetic overflow on signed to unsigned type conversion",
             "overflow",
@@ -506,7 +514,7 @@ void goto_checkt::conversion_check(
           const binary_relation_exprt no_overflow_lower(
             expr.op0(), ID_ge, from_integer(0, old_type));
 
-          add_guarded_claim(
+          add_guarded_property(
             and_exprt(no_overflow_lower, no_overflow_upper),
             "arithmetic overflow on signed to unsigned type conversion",
             "overflow",
@@ -524,7 +532,7 @@ void goto_checkt::conversion_check(
         const binary_relation_exprt no_overflow_upper(
           expr.op0(), ID_le, from_integer(power(2, new_width) - 1, old_type));
 
-        add_guarded_claim(
+        add_guarded_property(
           no_overflow_upper,
           "arithmetic overflow on unsigned to unsigned type conversion",
           "overflow",
@@ -545,7 +553,7 @@ void goto_checkt::conversion_check(
         const binary_relation_exprt no_overflow_lower(
           expr.op0(), ID_gt, lower.to_expr());
 
-        add_guarded_claim(
+        add_guarded_property(
           and_exprt(no_overflow_lower, no_overflow_upper),
           "arithmetic overflow on float to unsigned integer type conversion",
           "overflow",
@@ -589,7 +597,7 @@ void goto_checkt::integer_overflow_check(
       equal_exprt minus_one_eq(
         expr.op1(), from_integer(-1, type));
 
-      add_guarded_claim(
+      add_guarded_property(
         not_exprt(and_exprt(int_min_eq, minus_one_eq)),
         "arithmetic overflow on signed division",
         "overflow",
@@ -610,7 +618,7 @@ void goto_checkt::integer_overflow_check(
       equal_exprt int_min_eq(
         expr.op0(), to_signedbv_type(type).smallest_expr());
 
-      add_guarded_claim(
+      add_guarded_property(
         not_exprt(int_min_eq),
         "arithmetic overflow on signed unary minus",
         "overflow",
@@ -709,7 +717,7 @@ void goto_checkt::integer_overflow_check(
       // a shift that's too far isn't an overflow;
       // a shift of zero isn't overflow;
       // else check the top bits
-      add_guarded_claim(
+      add_guarded_property(
         disjunction({neg_value_shift,
                      neg_dist_shift,
                      dist_too_large,
@@ -752,7 +760,7 @@ void goto_checkt::integer_overflow_check(
       std::string kind=
         type.id()==ID_unsignedbv?"unsigned":"signed";
 
-      add_guarded_claim(
+      add_guarded_property(
         not_exprt(overflow),
         "arithmetic overflow on "+kind+" "+expr.id_string(),
         "overflow",
@@ -766,7 +774,7 @@ void goto_checkt::integer_overflow_check(
     std::string kind=
       type.id()==ID_unsignedbv?"unsigned":"signed";
 
-    add_guarded_claim(
+    add_guarded_property(
       not_exprt(overflow),
       "arithmetic overflow on "+kind+" "+expr.id_string(),
       "overflow",
@@ -805,7 +813,7 @@ void goto_checkt::float_overflow_check(
 
       or_exprt overflow_check(op0_inf, not_exprt(new_inf));
 
-      add_guarded_claim(
+      add_guarded_property(
         overflow_check,
         "arithmetic overflow on floating-point typecast",
         "overflow",
@@ -818,7 +826,7 @@ void goto_checkt::float_overflow_check(
       // non-float-to-float
       const isinf_exprt new_inf(expr);
 
-      add_guarded_claim(
+      add_guarded_property(
         not_exprt(new_inf),
         "arithmetic overflow on floating-point typecast",
         "overflow",
@@ -839,7 +847,7 @@ void goto_checkt::float_overflow_check(
 
     or_exprt overflow_check(op0_inf, not_exprt(new_inf));
 
-    add_guarded_claim(
+    add_guarded_property(
       overflow_check,
       "arithmetic overflow on floating-point division",
       "overflow",
@@ -876,7 +884,7 @@ void goto_checkt::float_overflow_check(
         expr.id()==ID_minus?"subtraction":
         expr.id()==ID_mult?"multiplication":"";
 
-      add_guarded_claim(
+      add_guarded_property(
         overflow_check,
         "arithmetic overflow on floating-point "+kind,
         "overflow",
@@ -996,7 +1004,7 @@ void goto_checkt::nan_check(
   else
     UNREACHABLE;
 
-  add_guarded_claim(
+  add_guarded_property(
     boolean_negate(isnan),
     "NaN on " + expr.id_string(),
     "NaN",
@@ -1024,7 +1032,7 @@ void goto_checkt::pointer_rel_check(
     {
       exprt same_object=::same_object(expr.op0(), expr.op1());
 
-      add_guarded_claim(
+      add_guarded_property(
         same_object,
         "same object violation",
         "pointer",
@@ -1052,7 +1060,7 @@ void goto_checkt::pointer_overflow_check(
   exprt overflow("overflow-" + expr.id_string(), bool_typet());
   overflow.operands() = expr.operands();
 
-  add_guarded_claim(
+  add_guarded_property(
     not_exprt(overflow),
     "pointer arithmetic overflow on " + expr.id_string(),
     "overflow",
@@ -1077,7 +1085,7 @@ void goto_checkt::pointer_validity_check(
 
   for(const auto &c : conditions)
   {
-    add_guarded_claim(
+    add_guarded_property(
       c.assertion,
       "dereference failure: "+c.description,
       "pointer dereference",
@@ -1276,7 +1284,7 @@ void goto_checkt::bounds_check(
         binary_relation_exprt inequality(
           effective_offset, ID_ge, std::move(zero));
 
-        add_guarded_claim(
+        add_guarded_property(
           inequality,
           name+" lower bound",
           "array bounds",
@@ -1333,7 +1341,7 @@ void goto_checkt::bounds_check(
       and_exprt(dynamic_object(pointer), not_exprt(malloc_object(pointer, ns))),
       inequality);
 
-    add_guarded_claim(
+    add_guarded_property(
       precond,
       name+" dynamic object upper bound",
       "array bounds",
@@ -1394,7 +1402,7 @@ void goto_checkt::bounds_check(
       ID_lt,
       type_size_opt.value());
 
-    add_guarded_claim(
+    add_guarded_property(
       implies_exprt(type_matches_size, inequality),
       name + " upper bound",
       "array bounds",
@@ -1410,7 +1418,7 @@ void goto_checkt::bounds_check(
     inequality.op1() = typecast_exprt::conditional_cast(
       inequality.op1(), inequality.op0().type());
 
-    add_guarded_claim(
+    add_guarded_property(
       implies_exprt(type_matches_size, inequality),
       name+" upper bound",
       "array bounds",
@@ -1420,34 +1428,29 @@ void goto_checkt::bounds_check(
   }
 }
 
-void goto_checkt::add_guarded_claim(
-  const exprt &_expr,
+void goto_checkt::add_guarded_property(
+  const exprt &asserted_expr,
   const std::string &comment,
   const std::string &property_class,
   const source_locationt &source_location,
   const exprt &src_expr,
   const guardt &guard)
 {
-  exprt expr(_expr);
-
   // first try simplifier on it
-  if(enable_simplify)
-    simplify(expr, ns);
+  exprt simplified_expr =
+    enable_simplify ? simplify_expr(asserted_expr, ns) : asserted_expr;
 
   // throw away trivial properties?
-  if(!retain_trivial && expr.is_true())
+  if(!retain_trivial && simplified_expr.is_true())
     return;
 
   // add the guard
+  exprt guarded_expr =
+    guard.is_true()
+      ? std::move(simplified_expr)
+      : implies_exprt{guard.as_expr(), std::move(simplified_expr)};
 
-  exprt new_expr;
-
-  if(guard.is_true())
-    new_expr.swap(expr);
-  else
-    new_expr = implies_exprt(guard.as_expr(), std::move(expr));
-
-  if(assertions.insert(new_expr).second)
+  if(assertions.insert(guarded_expr).second)
   {
     goto_program_instruction_typet type=
       enable_assert_to_assume?ASSUME:ASSERT;
@@ -1890,7 +1893,7 @@ void goto_checkt::goto_check(
             pointer,
             null_pointer_exprt(to_pointer_type(pointer.type())));
 
-          add_guarded_claim(
+          add_guarded_property(
             not_eq_null,
             "this is null on method invocation",
             "pointer dereference",
@@ -1939,7 +1942,7 @@ void goto_checkt::goto_check(
         const notequal_exprt not_eq_null(
           pointer, null_pointer_exprt(to_pointer_type(pointer.type())));
 
-        add_guarded_claim(
+        add_guarded_property(
           not_eq_null,
           "throwing null",
           "pointer dereference",
@@ -2014,7 +2017,7 @@ void goto_checkt::goto_check(
         equal_exprt eq(
           leak_expr,
           null_pointer_exprt(to_pointer_type(leak.type)));
-        add_guarded_claim(
+        add_guarded_property(
           eq,
           "dynamically allocated memory never freed",
           "memory-leak",
