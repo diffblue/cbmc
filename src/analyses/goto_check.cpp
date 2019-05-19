@@ -103,6 +103,14 @@ protected:
   ///   operands (or their negations) for recursively calls)
   void check_rec_logical_op(const exprt &expr, guardt &guard);
 
+  /// Check an if expression: check the if-condition alone, and then check the
+  ///   true/false-cases with the guard extended with if-condition and it's
+  ///   negation, respectively.
+  /// \param if_expr: the expression to be checked
+  /// \param guard: the condition for the check (extended with the (negation of
+  ///   the) if-condition for recursively calls)
+  void check_rec_if(const if_exprt &if_expr, guardt &guard);
+
   void check_rec(const exprt &expr, guardt &guard);
   void check(const exprt &expr);
 
@@ -1515,6 +1523,29 @@ void goto_checkt::check_rec_logical_op(const exprt &expr, guardt &guard)
   guard = std::move(old_guard);
 }
 
+void goto_checkt::check_rec_if(const if_exprt &if_expr, guardt &guard)
+{
+  INVARIANT(
+    if_expr.cond().is_boolean(),
+    "first argument of if must be boolean, but got " + if_expr.cond().pretty());
+
+  check_rec(if_expr.cond(), guard);
+
+  {
+    guardt old_guard = guard;
+    guard.add(if_expr.cond());
+    check_rec(if_expr.true_case(), guard);
+    guard = std::move(old_guard);
+  }
+
+  {
+    guardt old_guard = guard;
+    guard.add(not_exprt{if_expr.cond()});
+    check_rec(if_expr.false_case(), guard);
+    guard = std::move(old_guard);
+  }
+}
+
 void goto_checkt::check_rec(const exprt &expr, guardt &guard)
 {
   // we don't look into quantifiers
@@ -1532,35 +1563,9 @@ void goto_checkt::check_rec(const exprt &expr, guardt &guard)
     check_rec_logical_op(expr, guard);
     return;
   }
-  else if(expr.id()==ID_if)
+  else if(expr.id() == ID_if)
   {
-    if(expr.operands().size()!=3)
-      throw "if takes three arguments";
-
-    if(!expr.op0().is_boolean())
-    {
-      std::string msg=
-        "first argument of if must be boolean, but got "
-        +expr.op0().pretty();
-      throw msg;
-    }
-
-    check_rec(expr.op0(), guard);
-
-    {
-      guardt old_guard=guard;
-      guard.add(expr.op0());
-      check_rec(expr.op1(), guard);
-      guard = std::move(old_guard);
-    }
-
-    {
-      guardt old_guard=guard;
-      guard.add(not_exprt(expr.op0()));
-      check_rec(expr.op2(), guard);
-      guard = std::move(old_guard);
-    }
-
+    check_rec_if(to_if_expr(expr), guard);
     return;
   }
   else if(expr.id()==ID_member &&
