@@ -804,7 +804,7 @@ void goto_checkt::integer_overflow_check(
 
       add_guarded_property(
         not_exprt(overflow),
-        "arithmetic overflow on "+kind+" "+expr.id_string(),
+        "arithmetic overflow on " + kind + " " + expr.id_string(),
         "overflow",
         expr.find_source_location(),
         expr,
@@ -818,7 +818,7 @@ void goto_checkt::integer_overflow_check(
 
     add_guarded_property(
       not_exprt(overflow),
-      "arithmetic overflow on "+kind+" "+expr.id_string(),
+      "arithmetic overflow on " + kind + " " + expr.id_string(),
       "overflow",
       expr.find_source_location(),
       expr,
@@ -928,7 +928,7 @@ void goto_checkt::float_overflow_check(
 
       add_guarded_property(
         overflow_check,
-        "arithmetic overflow on floating-point "+kind,
+        "arithmetic overflow on floating-point " + kind,
         "overflow",
         expr.find_source_location(),
         expr,
@@ -1129,7 +1129,7 @@ void goto_checkt::pointer_validity_check(
   {
     add_guarded_property(
       c.assertion,
-      "dereference failure: "+c.description,
+      "dereference failure: " + c.description,
       "pointer dereference",
       expr.find_source_location(),
       expr,
@@ -1328,7 +1328,7 @@ void goto_checkt::bounds_check(
 
         add_guarded_property(
           inequality,
-          name+" lower bound",
+          name + " lower bound",
           "array bounds",
           expr.find_source_location(),
           expr,
@@ -1385,7 +1385,7 @@ void goto_checkt::bounds_check(
 
     add_guarded_property(
       precond,
-      name+" dynamic object upper bound",
+      name + " dynamic object upper bound",
       "array bounds",
       expr.find_source_location(),
       expr,
@@ -1462,7 +1462,7 @@ void goto_checkt::bounds_check(
 
     add_guarded_property(
       implies_exprt(type_matches_size, inequality),
-      name+" upper bound",
+      name + " upper bound",
       "array bounds",
       expr.find_source_location(),
       expr,
@@ -1503,7 +1503,7 @@ void goto_checkt::add_guarded_property(
     std::string source_expr_string;
     get_language_from_mode(mode)->from_expr(src_expr, source_expr_string, ns);
 
-    t->source_location.set_comment(comment+" in "+source_expr_string);
+    t->source_location.set_comment(comment + " in " + source_expr_string);
     t->source_location.set_property_class(property_class);
   }
 }
@@ -1652,12 +1652,12 @@ void goto_checkt::check_rec(const exprt &expr, guardt &guard)
   if(expr.id() == ID_exists || expr.id() == ID_forall)
     return;
 
-  if(expr.id()==ID_address_of)
+  if(expr.id() == ID_address_of)
   {
     check_rec_address(to_address_of_expr(expr).object(), guard);
     return;
   }
-  else if(expr.id()==ID_and || expr.id()==ID_or)
+  else if(expr.id() == ID_and || expr.id() == ID_or)
   {
     check_rec_logical_op(expr, guard);
     return;
