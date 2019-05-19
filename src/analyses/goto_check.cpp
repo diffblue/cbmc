@@ -79,6 +79,11 @@ public:
     const irep_idt &function_identifier,
     goto_functiont &goto_function);
 
+  /// Fill the list of allocations \ref allocationst with <address, size> for
+  ///   every allocation instruction. Also check that each allocation is
+  ///   well-formed.
+  /// \param goto_functions: goto functions from which the allocations are to be
+  ///   collected
   void collect_allocations(const goto_functionst &goto_functions);
 
 protected:
@@ -135,7 +140,15 @@ protected:
   /// \param guard: the condition for the check (unmodified here)
   void check_rec_arithmetic_op(const exprt &expr, guardt &guard);
 
+  /// Recursively descend into \p expr and run the appropriate check for each
+  ///   sub-expression, while collecting the condition for the check in \p
+  ///   guard.
+  /// \param expr: the expression to be checked
+  /// \param guard: the condition for when the check should be made
   void check_rec(const exprt &expr, guardt &guard);
+
+  /// Initiate the recursively analysis of \p expr with its `guard' set to TRUE.
+  /// \param expr: the expression to be checked
   void check(const exprt &expr);
 
   struct conditiont
