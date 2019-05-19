@@ -111,6 +111,18 @@ protected:
   ///   the) if-condition for recursively calls)
   void check_rec_if(const if_exprt &if_expr, guardt &guard);
 
+  /// Check that a member expression is valid:
+  /// - check the structure this expression is a member of (via pointer of its
+  ///   dereference)
+  /// - run pointer-validity check on `*(s+member_offset)' instead of
+  ///   `s->member' to avoid checking safety of `s'
+  /// - check all operands of the expression
+  /// \param member: the expression to be checked
+  /// \param guard: the condition for the check (unmodified here)
+  /// \return true if no more checks are required for \p member or its
+  ///   sub-expressions
+  bool check_rec_member(const member_exprt &member, guardt &guard);
+
   void check_rec(const exprt &expr, guardt &guard);
   void check(const exprt &expr);
 
@@ -1546,6 +1558,46 @@ void goto_checkt::check_rec_if(const if_exprt &if_expr, guardt &guard)
   }
 }
 
+bool goto_checkt::check_rec_member(const member_exprt &member, guardt &guard)
+{
+  const dereference_exprt &deref = to_dereference_expr(member.struct_op());
+
+  check_rec(deref.pointer(), guard);
+
+  // avoid building the following expressions when pointer_validity_check
+  // would return immediately anyway
+  if(!enable_pointer_check)
+    return true;
+
+  // we rewrite s->member into *(s+member_offset)
+  // to avoid requiring memory safety of the entire struct
+  auto member_offset_opt = member_offset_expr(member, ns);
+
+  if(member_offset_opt.has_value())
+  {
+    pointer_typet new_pointer_type = to_pointer_type(deref.pointer().type());
+    new_pointer_type.subtype() = member.type();
+
+    const exprt char_pointer = typecast_exprt::conditional_cast(
+      deref.pointer(), pointer_type(char_type()));
+
+    const exprt new_address_casted = typecast_exprt::conditional_cast(
+      typecast_exprt{
+        plus_exprt{char_pointer,
+                   typecast_exprt::conditional_cast(
+                     member_offset_opt.value(), pointer_diff_type())},
+        char_pointer.type()},
+      new_pointer_type);
+
+    dereference_exprt new_deref{new_address_casted};
+    new_deref.add_source_location() = deref.source_location();
+    pointer_validity_check(new_deref, guard);
+
+    return true;
+  }
+  return false;
+}
+
 void goto_checkt::check_rec(const exprt &expr, guardt &guard)
 {
   // we don't look into quantifiers
@@ -1568,49 +1620,12 @@ void goto_checkt::check_rec(const exprt &expr, guardt &guard)
     check_rec_if(to_if_expr(expr), guard);
     return;
   }
-  else if(expr.id()==ID_member &&
-          to_member_expr(expr).struct_op().id()==ID_dereference)
+  else if(
+    expr.id() == ID_member &&
+    to_member_expr(expr).struct_op().id() == ID_dereference)
   {
-    const member_exprt &member=to_member_expr(expr);
-    const dereference_exprt &deref=
-      to_dereference_expr(member.struct_op());
-
-    check_rec(deref.pointer(), guard);
-
-    // avoid building the following expressions when pointer_validity_check
-    // would return immediately anyway
-    if(!enable_pointer_check)
+    if(check_rec_member(to_member_expr(expr), guard))
       return;
-
-    // we rewrite s->member into *(s+member_offset)
-    // to avoid requiring memory safety of the entire struct
-    auto member_offset_opt = member_offset_expr(member, ns);
-
-    if(member_offset_opt.has_value())
-    {
-      pointer_typet new_pointer_type = to_pointer_type(deref.pointer().type());
-      new_pointer_type.subtype() = expr.type();
-
-      const exprt char_pointer =
-        typecast_exprt::conditional_cast(
-          deref.pointer(), pointer_type(char_type()));
-
-      const exprt new_address = typecast_exprt(
-        plus_exprt(
-          char_pointer,
-          typecast_exprt::conditional_cast(
-            member_offset_opt.value(), pointer_diff_type())),
-        char_pointer.type());
-
-      const exprt new_address_casted =
-        typecast_exprt::conditional_cast(new_address, new_pointer_type);
-
-      dereference_exprt new_deref{new_address_casted};
-      new_deref.add_source_location() = deref.source_location();
-      pointer_validity_check(new_deref, guard);
-
-      return;
-    }
   }
 
   forall_operands(it, expr)
