@@ -25,7 +25,7 @@ public:
   }
 
   // match with '?'
-  bool operator==(const irep_idt &what) const
+  bool operator==(const std::string &what) const
   {
     for(std::size_t i = 0; i < what.size(); i++)
       if(p[i] == 0)
@@ -35,6 +35,25 @@ public:
 
     return p[what.size()] == 0;
   }
+
+#ifndef USE_STD_STRING
+  bool operator==(const irep_idt &what) const
+  {
+    return (*this) == id2string(what);
+  }
+#endif
+
+  friend bool operator==(const std::string &what, const patternt &p)
+  {
+    return p == what;
+  }
+
+#ifndef USE_STD_STRING
+  friend bool operator==(const irep_idt &what, const patternt &p)
+  {
+    return p == what;
+  }
+#endif
 
 protected:
   const char *p;
