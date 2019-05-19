@@ -188,6 +188,10 @@ protected:
   typedef std::set<exprt> assertionst;
   assertionst assertions;
 
+  /// Remove all assertions containing the symbol in \p lhs as well as all
+  ///   assertions containing dereference.
+  /// \param lhs: the left-hand-side expression whose symbol should be
+  ///   invalidated
   void invalidate(const exprt &lhs);
 
   bool enable_bounds_check;
@@ -261,21 +265,14 @@ void goto_checkt::invalidate(const exprt &lhs)
   else if(lhs.id()==ID_symbol)
   {
     // clear all assertions about 'symbol'
-    find_symbols_sett find_symbols_set;
-    find_symbols_set.insert(to_symbol_expr(lhs).get_identifier());
+    find_symbols_sett find_symbols_set{to_symbol_expr(lhs).get_identifier()};
 
-    for(assertionst::iterator
-        it=assertions.begin();
-        it!=assertions.end();
-        ) // no it++
+    for(auto it = assertions.begin(); it != assertions.end();)
     {
-      assertionst::iterator next=it;
-      next++;
-
       if(has_symbol(*it, find_symbols_set) || has_subexpr(*it, ID_dereference))
-        assertions.erase(it);
-
-      it=next;
+        it = assertions.erase(it);
+      else
+        ++it;
     }
   }
   else
