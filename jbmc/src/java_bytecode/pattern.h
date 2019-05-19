@@ -55,6 +55,18 @@ public:
   }
 #endif
 
+  friend bool operator!=(const std::string &what, const patternt &p)
+  {
+    return !(p == what);
+  }
+
+#ifndef USE_STD_STRING
+  friend bool operator!=(const irep_idt &what, const patternt &p)
+  {
+    return !(p == what);
+  }
+#endif
+
 protected:
   const char *p;
 };

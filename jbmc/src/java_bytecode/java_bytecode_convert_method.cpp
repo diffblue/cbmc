@@ -1007,14 +1007,16 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
     // a new maximal key
     assert(a_entry.first==--address_map.end());
 
-    if(i_it->statement!="goto" &&
-       i_it->statement!="return" &&
-       !(i_it->statement==patternt("?return")) &&
-       i_it->statement!="athrow" &&
-       i_it->statement!="jsr" &&
-       i_it->statement!="jsr_w" &&
-       i_it->statement!="ret")
+    // clang-format off
+    if(i_it->statement != "goto" &&
+       i_it->statement != "return" &&
+       i_it->statement != patternt("?return") &&
+       i_it->statement != "athrow" &&
+       i_it->statement != "jsr" &&
+       i_it->statement != "jsr_w" &&
+       i_it->statement != "ret")
     {
+      // clang-format on
       instructionst::const_iterator next=i_it;
       if(++next!=instructions.end())
         a_entry.first->second.successors.push_back(next->address);
