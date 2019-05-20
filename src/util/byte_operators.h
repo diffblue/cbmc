@@ -72,8 +72,9 @@ inline byte_extract_exprt &to_byte_extract_expr(exprt &expr)
 irep_idt byte_extract_id();
 irep_idt byte_update_id();
 
-/*! \brief TO_BE_DOCUMENTED
-*/
+/// Expression corresponding to \c op() where the bytes starting at
+/// position \c offset (given in number of bytes) have been updated with
+/// \c value.
 class byte_update_exprt : public ternary_exprt
 {
 public:
