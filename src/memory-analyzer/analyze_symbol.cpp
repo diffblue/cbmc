@@ -242,6 +242,28 @@ exprt gdb_value_extractort::get_pointer_to_member_value(
     return *maybe_member_expr;
   }
 
+  const auto it = values.find(memory_location);
+  // if the structure we are pointing to does not exists we need to build a
+  // temporary object for it: get the type from symbol table, query gdb for
+  // value, allocate new object for it and then store into assignments
+  if(it == values.end())
+  {
+    const auto symbol_expr = struct_symbol->symbol_expr();
+    const auto zero = zero_initializer(symbol_expr.type(), location, ns);
+    CHECK_RETURN(zero.has_value());
+    const auto val = get_expr_value(symbol_expr, *zero, location);
+
+    symbol_exprt dummy("tmp", pointer_type(symbol_expr.type()));
+    code_blockt assignments;
+
+    const symbol_exprt new_symbol =
+      to_symbol_expr(allocate_objects.allocate_automatic_local_object(
+        assignments, dummy, symbol_expr.type()));
+
+    add_assignment(new_symbol, val);
+    values[memory_location] = val;
+  }
+
   const auto maybe_member_expr = get_subexpression_at_offset(
     struct_symbol->symbol_expr(), member_offset, expr.type().subtype(), ns);
   DATA_INVARIANT(
