@@ -1526,14 +1526,6 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
       PRECONDITION(!stack.empty() && results.empty());
       convert_dup2_x2(op, results);
     }
-    else if(statement=="dconst")
-    {
-      PRECONDITION(op.empty() && results.size() == 1);
-    }
-    else if(statement=="fconst")
-    {
-      PRECONDITION(op.empty() && results.size() == 1);
-    }
     else if(statement=="getfield")
     {
       PRECONDITION(op.size() == 1 && results.size() == 1);
