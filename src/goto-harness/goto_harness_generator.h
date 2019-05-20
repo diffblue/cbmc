@@ -16,26 +16,27 @@ Author: Diffblue Ltd.
 
 class goto_modelt;
 
-class harness_options_parsert
+// NOLINTNEXTLINE(readability/namespace)
+namespace harness_options_parser
 {
-public:
-  /// Returns the only value of a single element list,
-  /// throws an exception if not passed a single element list
-  static std::string require_exactly_one_value(
-    const std::string &option,
-    const std::list<std::string> &values);
+/// Returns the only value of a single element list,
+/// throws an exception if not passed a single element list
+std::string require_exactly_one_value(
+  const std::string &option,
+  const std::list<std::string> &values);
 
-  /// Asserts that the list of values to an option passed is empty
-  static void assert_no_values(
-    const std::string &option,
-    const std::list<std::string> &values);
+/// Asserts that the list of values to an option passed is empty
+void assert_no_values(
+  const std::string &option,
+  const std::list<std::string> &values);
 
-  /// Returns the only Nat value of a single element list,
-  /// throws an exception if not passed a single element list (or not Nat)
-  static std::size_t require_one_size_value(
-    const std::string &option,
-    const std::list<std::string> &values);
-};
+/// Returns the only Nat value of a single element list,
+/// throws an exception if not passed a single element list (or not Nat)
+std::size_t require_one_size_value(
+  const std::string &option,
+  const std::list<std::string> &values);
+// NOLINTNEXTLINE(readability/namespace)
+} // namespace harness_options_parser
 
 class goto_harness_generatort
 {

@@ -33,7 +33,7 @@ void memory_snapshot_harness_generatort::handle_option(
   const std::list<std::string> &values)
 {
   auto &require_exactly_one_value =
-    harness_options_parsert::require_exactly_one_value;
+    harness_options_parser::require_exactly_one_value;
   if(recursive_initialization_config.handle_option(option, values))
   {
     // the option belongs to recursive initialization

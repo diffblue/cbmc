@@ -15,7 +15,10 @@ Author: Diffblue Ltd.
 #include <util/invariant.h>
 #include <util/string2int.h>
 
-std::string harness_options_parsert::require_exactly_one_value(
+// NOLINTNEXTLINE(readability/namespace)
+namespace harness_options_parser
+{
+std::string require_exactly_one_value(
   const std::string &option,
   const std::list<std::string> &values)
 {
@@ -28,14 +31,14 @@ std::string harness_options_parsert::require_exactly_one_value(
   return values.front();
 }
 
-void harness_options_parsert::assert_no_values(
+void assert_no_values(
   const std::string &option,
   const std::list<std::string> &values)
 {
   PRECONDITION_WITH_DIAGNOSTICS(values.empty(), option);
 }
 
-std::size_t harness_options_parsert::require_one_size_value(
+std::size_t require_one_size_value(
   const std::string &option,
   const std::list<std::string> &values)
 {
@@ -51,3 +54,5 @@ std::size_t harness_options_parsert::require_one_size_value(
       "failed to parse `" + string_value + "' as integer", "--" + option};
   }
 }
+// NOLINTNEXTLINE(readability/namespace)
+} // namespace harness_options_parser

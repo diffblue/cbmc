@@ -12,7 +12,7 @@ Author: Diffblue Ltd.
 #include "common_harness_generator_options.h"
 
 #define FUNCTION_HARNESS_GENERATOR_FUNCTION_OPT "function"
-#define COMMON_HARNESS_GENERATOR_NONDET_GLOBALS_OPT "nondet-globals"
+#define FUNCTION_HARNESS_GENERATOR_NONDET_GLOBALS_OPT "nondet-globals"
 #define FUNCTION_HARNESS_GENERATOR_TREAT_POINTER_AS_ARRAY_OPT                  \
   "treat-pointer-as-array"
 #define FUNCTION_HARNESS_GENERATOR_ASSOCIATED_ARRAY_SIZE_OPT                   \
@@ -23,7 +23,7 @@ Author: Diffblue Ltd.
 // clang-format off
 #define FUNCTION_HARNESS_GENERATOR_OPTIONS                                     \
   "(" FUNCTION_HARNESS_GENERATOR_FUNCTION_OPT "):"                             \
-  "(" COMMON_HARNESS_GENERATOR_NONDET_GLOBALS_OPT ")"                          \
+  "(" FUNCTION_HARNESS_GENERATOR_NONDET_GLOBALS_OPT ")"                        \
   "(" FUNCTION_HARNESS_GENERATOR_TREAT_POINTER_AS_ARRAY_OPT "):"               \
   "(" FUNCTION_HARNESS_GENERATOR_ASSOCIATED_ARRAY_SIZE_OPT "):"                \
   "(" FUNCTION_HARNESS_GENERATOR_TREAT_POINTER_AS_CSTRING "):"                 \
@@ -36,7 +36,7 @@ Author: Diffblue Ltd.
   "function harness generator (--harness-type call-function)\n\n"              \
   "--" FUNCTION_HARNESS_GENERATOR_FUNCTION_OPT                                 \
   "                    the function the harness should call\n"                 \
-  "--" COMMON_HARNESS_GENERATOR_NONDET_GLOBALS_OPT                             \
+  "--" FUNCTION_HARNESS_GENERATOR_NONDET_GLOBALS_OPT                           \
   "              set global variables to non-deterministic values\n"           \
   "                              in harness\n"                                 \
   COMMON_HARNESS_GENERATOR_HELP                                                \

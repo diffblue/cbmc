@@ -91,7 +91,7 @@ void function_call_harness_generatort::handle_option(
   const std::list<std::string> &values)
 {
   auto &require_exactly_one_value =
-    harness_options_parsert::require_exactly_one_value;
+    harness_options_parser::require_exactly_one_value;
 
   if(p_impl->recursive_initialization_config.handle_option(option, values))
   {
@@ -101,7 +101,7 @@ void function_call_harness_generatort::handle_option(
   {
     p_impl->function = require_exactly_one_value(option, values);
   }
-  else if(option == COMMON_HARNESS_GENERATOR_NONDET_GLOBALS_OPT)
+  else if(option == FUNCTION_HARNESS_GENERATOR_NONDET_GLOBALS_OPT)
   {
     p_impl->nondet_globals = true;
   }
