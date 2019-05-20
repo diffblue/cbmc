@@ -96,6 +96,7 @@ add_subdirectory(langapi)
 add_subdirectory(linking)
 add_subdirectory(pointer-analysis)
 add_subdirectory(solvers)
+add_subdirectory(statement-list)
 add_subdirectory(util)
 
 add_subdirectory(cbmc)

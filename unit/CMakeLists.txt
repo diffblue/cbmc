@@ -57,6 +57,7 @@ target_link_libraries(
         goto-symex
         cbmc-lib
         json-symtab-language
+        statement-list
 )
 
 add_test(
