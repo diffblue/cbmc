@@ -338,28 +338,51 @@ exprt gdb_value_extractort::get_pointer_value(
 
   if(!memory_location.is_null())
   {
-    if(is_c_char_type(expr.type().subtype()))
+    // pointers-to-char can point to members as well, e.g. char[]
+    if(points_to_member(value))
     {
-      return get_char_pointer_value(expr, memory_location, location);
+      const auto target_expr =
+        get_pointer_to_member_value(expr, value, location);
+      CHECK_RETURN(target_expr.is_not_nil());
+      const auto result_expr = address_of_exprt(target_expr);
+      CHECK_RETURN(result_expr.type() == zero_expr.type());
+      return result_expr;
     }
-    else
-    {
-      const exprt target_expr =
-        points_to_member(value)
-          ? get_pointer_to_member_value(expr, value, location)
-          : get_non_char_pointer_value(expr, memory_location, location);
 
-      if(target_expr.id() == ID_nil)
-      {
-        outstanding_assignments[expr] = memory_location;
-      }
-      else
-      {
-        const auto result_expr = address_of_exprt(target_expr);
-        CHECK_RETURN(result_expr.type() == zero_expr.type());
-        return result_expr;
-      }
+    // non-member: split for char/non-char
+    const auto target_expr =
+      is_c_char_type(expr.type().subtype())
+        ? get_char_pointer_value(expr, memory_location, location)
+        : get_non_char_pointer_value(expr, memory_location, location);
+
+    // postpone if we cannot resolve now
+    if(target_expr.is_nil())
+    {
+      outstanding_assignments[expr] = memory_location;
+      return zero_expr;
     }
+
+    // the pointee was (probably) dynamically allocated (but the allocation
+    // would not be visible in the snapshot) so we pretend it is statically
+    // allocated (we have the value) and return address to the first element
+    // of the array (instead of the array as char*)
+    if(target_expr.type().id() == ID_array)
+    {
+      const auto result_indexed_expr = get_subexpression_at_offset(
+        target_expr, 0, zero_expr.type().subtype(), ns);
+      CHECK_RETURN(result_indexed_expr.has_value());
+      const auto result_expr = address_of_exprt{*result_indexed_expr};
+      return result_expr;
+    }
+
+    // if the types match return right away
+    if(target_expr.type() == zero_expr.type())
+      return target_expr;
+
+    // otherwise the address of target should type-match
+    const auto result_expr = address_of_exprt(target_expr);
+    CHECK_RETURN(result_expr.type() == zero_expr.type());
+    return result_expr;
   }
 
   return zero_expr;
