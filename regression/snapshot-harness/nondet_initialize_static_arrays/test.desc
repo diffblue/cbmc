@@ -1,0 +1,8 @@
+CORE
+main.c
+p --harness-type initialise-with-memory-snapshot --initial-goto-location main:4 --min-null-tree-depth 10 --max-nondet-tree-depth 4 --havoc-variables p
+^EXIT=0$
+^SIGNAL=0$
+VERIFICATION SUCCESSFUL
+--
+^warning: ignoring

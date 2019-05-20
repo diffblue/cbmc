@@ -1,0 +1,8 @@
+CORE
+main.c
+first,second,array_size,prefix,prefix_size --harness-type initialise-with-memory-snapshot --initial-goto-location main:4 --havoc-variables prefix --size-of-array prefix:prefix_size --max-array-size 4
+^SIGNAL=0$
+^EXIT=0$
+VERIFICATION SUCCESSFUL
+--
+unwinding assertion loop \d+: FAILURE
