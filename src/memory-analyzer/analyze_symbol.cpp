@@ -160,10 +160,13 @@ exprt gdb_value_extractort::get_char_pointer_value(
 
     values.insert(std::make_pair(memory_location, new_symbol));
 
+    // check that we are returning objects of the right type
+    CHECK_RETURN(new_symbol.type().subtype() == expr.type().subtype());
     return new_symbol;
   }
   else
   {
+    CHECK_RETURN(it->second.type().subtype() == expr.type().subtype());
     return it->second;
   }
 }
@@ -174,7 +177,6 @@ exprt gdb_value_extractort::get_pointer_to_member_value(
   const source_locationt &location)
 {
   PRECONDITION(expr.type().id() == ID_pointer);
-  PRECONDITION(!is_c_char_type(expr.type().subtype()));
   const auto &memory_location = pointer_value.address;
   std::string memory_location_string = memory_location.string();
   PRECONDITION(memory_location_string != "0x0");
@@ -242,7 +244,11 @@ exprt gdb_value_extractort::get_pointer_to_member_value(
 
   const auto maybe_member_expr = get_subexpression_at_offset(
     struct_symbol->symbol_expr(), member_offset, expr.type().subtype(), ns);
-  CHECK_RETURN(maybe_member_expr.has_value());
+  DATA_INVARIANT(
+    maybe_member_expr.has_value(), "structure doesn't have member");
+
+  // check that we return the right type
+  CHECK_RETURN(maybe_member_expr->type() == expr.type().subtype());
   return *maybe_member_expr;
 }
 
