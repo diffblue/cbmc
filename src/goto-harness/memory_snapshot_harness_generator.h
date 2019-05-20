@@ -239,6 +239,11 @@ protected:
     goto_modelt &goto_model,
     const symbolt &function) const;
 
+  /// Recursively compute the pointer depth
+  /// \param t: input type
+  /// \return pointer depth of type \p t
+  size_t pointer_depth(const typet &t) const;
+
   /// data to store the command-line options
   std::string memory_snapshot_file;
   std::string initial_goto_location_line;

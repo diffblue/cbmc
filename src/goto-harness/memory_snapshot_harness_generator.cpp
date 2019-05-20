@@ -199,6 +199,14 @@ const symbolt &memory_snapshot_harness_generatort::fresh_symbol_copy(
   return tmp_symbol;
 }
 
+size_t memory_snapshot_harness_generatort::pointer_depth(const typet &t) const
+{
+  if(t.id() != ID_pointer)
+    return 0;
+  else
+    return pointer_depth(t.subtype()) + 1;
+}
+
 code_blockt memory_snapshot_harness_generatort::add_assignments_to_globals(
   const symbol_tablet &snapshot,
   goto_modelt &goto_model) const
@@ -206,8 +214,28 @@ code_blockt memory_snapshot_harness_generatort::add_assignments_to_globals(
   recursive_initializationt recursive_initialization{
     recursive_initialization_config, goto_model};
 
+  using snapshot_pairt = std::pair<irep_idt, symbolt>;
+  std::vector<snapshot_pairt> ordered_snapshot_symbols;
+  for(auto pair : snapshot)
+  {
+    const auto name = id2string(pair.first);
+    if(name.find(CPROVER_PREFIX) != 0)
+      ordered_snapshot_symbols.push_back(pair);
+  }
+
+  // sort the snapshot symbols so that the non-pointer symbols are first, then
+  // pointers, then pointers-to-pointers, etc. so that we don't assign
+  // uninitialized values
+  std::stable_sort(
+    ordered_snapshot_symbols.begin(),
+    ordered_snapshot_symbols.end(),
+    [this](const snapshot_pairt &left, const snapshot_pairt &right) {
+      return pointer_depth(left.second.symbol_expr().type()) <
+             pointer_depth(right.second.symbol_expr().type());
+    });
+
   code_blockt code;
-  for(const auto &pair : snapshot)
+  for(const auto &pair : ordered_snapshot_symbols)
   {
     const symbolt &snapshot_symbol = pair.second;
     symbol_tablet &symbol_table = goto_model.symbol_table;
