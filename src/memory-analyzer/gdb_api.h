@@ -90,6 +90,17 @@ public:
     }
   };
 
+  /// Get the allocated size estimate for a pointer by evaluating
+  /// `malloc_usable_size'. The function returns the number of usable bytes in
+  /// the block pointed to by the pointer to a block of memory allocated by
+  /// `malloc' or a related function. The value may be greater than the
+  /// requested size of the allocation because of alignment and minimum size
+  /// constraints.
+  /// \param pointer_expr: expression with a pointer name
+  /// \return 1 if the pointer was not allocated with malloc otherwise return
+  ///   the result of calling `malloc_usable_size'
+  size_t query_malloc_size(const std::string &pointer_expr);
+
   /// Create a new gdb process for analysing the binary indicated by the member
   /// variable `binary`
   void create_gdb_process();

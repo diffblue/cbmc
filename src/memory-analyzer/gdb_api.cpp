@@ -24,6 +24,7 @@ Author: Malte Mues <mail.mues@gmail.com>
 #include <goto-programs/goto_model.h>
 
 #include <util/prefix.h>
+#include <util/string2int.h>
 #include <util/string_utils.h>
 
 #include <sys/wait.h>
@@ -54,6 +55,47 @@ gdb_apit::~gdb_apit()
   fclose(response_stream);
 
   wait(NULL);
+}
+
+size_t gdb_apit::query_malloc_size(const std::string &pointer_expr)
+{
+#ifdef __linux__
+  write_to_gdb("-var-create tmp * malloc_usable_size(" + pointer_expr + ")");
+#elif __APPLE__
+  write_to_gdb("-var-create tmp * malloc_size(" + pointer_expr + ")");
+#else
+  // Under non-linux/OSX system we simple return 1, i.e. as if the \p
+  // pointer_expr was not dynamically allocated.
+  return 1;
+#endif
+
+  if(!was_command_accepted())
+  {
+    return 1;
+  }
+
+  write_to_gdb("-var-evaluate-expression tmp");
+  gdb_output_recordt record = get_most_recent_record("^done", true);
+
+  write_to_gdb("-var-delete tmp");
+  check_command_accepted();
+
+  const auto it = record.find("value");
+  CHECK_RETURN(it != record.end());
+
+  const std::string value = it->second;
+
+  INVARIANT(
+    value.back() != '"' ||
+      (value.length() >= 2 && value[value.length() - 2] == '\\'),
+    "quotes should have been stripped off from value");
+  INVARIANT(value.back() != '\n', "value should not end in a newline");
+
+  const auto result = string2optional_size_t(value);
+  if(result.has_value())
+    return *result;
+  else
+    return 1;
 }
 
 void gdb_apit::create_gdb_process()
