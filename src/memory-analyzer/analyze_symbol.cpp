@@ -294,18 +294,60 @@ exprt gdb_value_extractort::get_non_char_pointer_value(
     symbol_exprt dummy("tmp", expr.type());
     code_blockt assignments;
 
+    const auto zero_expr = zero_initializer(target_type, location, ns);
+    CHECK_RETURN(zero_expr);
+
+    // Check if pointer was dynamically allocated (via malloc). If so we will
+    // replace the pointee with a static array filled with values stored at the
+    // expected positions. Since the allocated size is over-approximation we may
+    // end up querying pass the allocated bounds and building larger array with
+    // meaningless values.
+    size_t allocated_size =
+      gdb_api.query_malloc_size(c_converter.convert(expr));
+    // get the sizeof(target_type) and thus the number of elements
+    const auto target_size_bits = pointer_offset_bits(target_type, ns);
+    CHECK_RETURN(target_size_bits.has_value());
+    const auto number_of_elements = allocated_size / (*target_size_bits / 8);
+    if(number_of_elements > 1)
+    {
+      array_exprt::operandst elements;
+      // build the operands by querying for an index expression
+      for(size_t i = 0; i < number_of_elements; i++)
+      {
+        const auto sub_expr_value = get_expr_value(
+          index_exprt{expr, from_integer(i, index_type())},
+          *zero_expr,
+          location);
+        elements.push_back(sub_expr_value);
+      }
+      CHECK_RETURN(elements.size() == number_of_elements);
+
+      // knowing the number of elements we can build the type
+      const typet target_array_type =
+        array_typet{target_type, from_integer(elements.size(), index_type())};
+
+      array_exprt new_array{elements, to_array_type(target_array_type)};
+
+      // allocate a new symbol for the temporary static array
+      symbol_exprt array_dummy("tmp", pointer_type(target_array_type));
+      const auto array_symbol =
+        allocate_objects.allocate_automatic_local_object(
+          assignments, array_dummy, target_array_type);
+
+      // add assignment of value to newly created symbol
+      add_assignment(array_symbol, new_array);
+      values[memory_location] = array_symbol;
+      return array_symbol;
+    }
+
     const symbol_exprt new_symbol =
       to_symbol_expr(allocate_objects.allocate_automatic_local_object(
         assignments, dummy, target_type));
 
     dereference_exprt dereference_expr(expr);
 
-    const auto zero_expr = zero_initializer(target_type, location, ns);
-    CHECK_RETURN(zero_expr);
-
     const exprt target_expr =
       get_expr_value(dereference_expr, *zero_expr, location);
-
     // add assignment of value to newly created symbol
     add_assignment(new_symbol, target_expr);
 
