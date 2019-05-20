@@ -167,9 +167,16 @@ TEST_CASE("gdb api test", "[core][memory-analyzer]")
     const bool r = gdb_api.run_gdb_to_breakpoint("checkpoint");
     REQUIRE(r);
 
-    REQUIRE(gdb_api.get_value("x") == "8");
-    REQUIRE(gdb_api.get_value("y") == "2.5");
-    REQUIRE(gdb_api.get_value("z") == "c");
+    const auto &x_value = gdb_api.get_value("x");
+    const auto &y_value = gdb_api.get_value("y");
+    const auto &z_value = gdb_api.get_value("z");
+
+    REQUIRE(x_value.has_value());
+    REQUIRE(*x_value == "8");
+    REQUIRE(y_value.has_value());
+    REQUIRE(*y_value == "2.5");
+    REQUIRE(z_value.has_value());
+    REQUIRE(*z_value == "c");
   }
 
   SECTION("query pointers")

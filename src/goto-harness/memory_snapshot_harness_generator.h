@@ -13,34 +13,12 @@ Author: Daniel Poetzl
 #include <string>
 
 #include "goto_harness_generator.h"
+#include "recursive_initialization.h"
 
 #include <goto-programs/goto_model.h>
 
 #include <util/message.h>
 #include <util/optional.h>
-
-// clang-format off
-#define MEMORY_SNAPSHOT_HARNESS_GENERATOR_OPTIONS                              \
-  "(memory-snapshot):"                                                         \
-  "(initial-goto-location):"                                                   \
-  "(initial-source-location):"                                                 \
-  "(havoc-variables):" // MEMORY_SNAPSHOT_HARNESS_GENERATOR_OPTIONS
-// clang-format on
-
-// clang-format off
-#define MEMORY_SNAPSHOT_HARNESS_GENERATOR_HELP                                 \
-  "memory snapshot harness generator (--harness-type\n"                        \
-  "  initialise-from-memory-snapshot)\n\n"                                     \
-  "--memory-snapshot <file>      initialise memory from JSON memory snapshot\n"\
-  "--initial-goto-location <func[:<n>]>\n"                                     \
-  "                              use given function and location number as "   \
-  "entry\n                              point\n"                               \
-  "--initial-source-location <file:n>\n"                                       \
-  "                              use given file and line as entry point\n"     \
-  "--havoc-variables vars        initialise variables from vars to\n"          \
-  "                              non-deterministic values"                     \
-  // MEMORY_SNAPSHOT_HARNESS_GENERATOR_HELP
-// clang-format on
 
 /// Generates a harness which first assigns global variables with values from
 /// a given memory snapshot and then calls a specified function. The called
@@ -261,6 +239,11 @@ protected:
     goto_modelt &goto_model,
     const symbolt &function) const;
 
+  /// Recursively compute the pointer depth
+  /// \param t: input type
+  /// \return pointer depth of type \p t
+  size_t pointer_depth(const typet &t) const;
+
   /// data to store the command-line options
   std::string memory_snapshot_file;
   std::string initial_goto_location_line;
@@ -271,6 +254,8 @@ protected:
   entry_locationt entry_location;
 
   message_handlert &message_handler;
+
+  recursive_initialization_configt recursive_initialization_config;
 };
 
 #endif // CPROVER_GOTO_HARNESS_MEMORY_SNAPSHOT_HARNESS_GENERATOR_H

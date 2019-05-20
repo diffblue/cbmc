@@ -18,6 +18,9 @@ Author: Diffblue Ltd.
 #include <util/optional.h>
 #include <util/std_types.h>
 
+#include "function_harness_generator_options.h"
+#include "goto_harness_generator.h"
+
 struct recursive_initialization_configt
 {
   std::size_t min_null_tree_depth = 1;
@@ -35,6 +38,15 @@ struct recursive_initialization_configt
   std::set<irep_idt> pointers_to_treat_as_cstrings;
 
   std::string to_string() const; // for debugging purposes
+
+  /// Parse the options specific for recursive initialisation
+  /// \param option: the user option name
+  /// \param values: the (one-or-more) values for this option
+  /// \return true if the option belonged to recursive initialisation and was
+  ///   successfully parsed here
+  bool handle_option(
+    const std::string &option,
+    const std::list<std::string> &values);
 };
 
 /// Class for generating initialisation code

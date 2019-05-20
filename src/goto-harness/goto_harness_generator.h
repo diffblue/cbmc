@@ -16,6 +16,28 @@ Author: Diffblue Ltd.
 
 class goto_modelt;
 
+// NOLINTNEXTLINE(readability/namespace)
+namespace harness_options_parser
+{
+/// Returns the only value of a single element list,
+/// throws an exception if not passed a single element list
+std::string require_exactly_one_value(
+  const std::string &option,
+  const std::list<std::string> &values);
+
+/// Asserts that the list of values to an option passed is empty
+void assert_no_values(
+  const std::string &option,
+  const std::list<std::string> &values);
+
+/// Returns the only Nat value of a single element list,
+/// throws an exception if not passed a single element list (or not Nat)
+std::size_t require_one_size_value(
+  const std::string &option,
+  const std::list<std::string> &values);
+// NOLINTNEXTLINE(readability/namespace)
+} // namespace harness_options_parser
+
 class goto_harness_generatort
 {
 public:
@@ -36,17 +58,6 @@ protected:
 
   /// Check if options are in a sane state, throw otherwise
   virtual void validate_options(const goto_modelt &goto_model) = 0;
-
-  /// Returns the only value of a single element list,
-  /// throws an exception if not passed a single element list
-  static std::string require_exactly_one_value(
-    const std::string &option,
-    const std::list<std::string> &values);
-
-  /// Asserts that the list of values to an option passed is empty
-  static void assert_no_values(
-    const std::string &option,
-    const std::list<std::string> &values);
 };
 
 #endif // CPROVER_GOTO_HARNESS_GOTO_HARNESS_GENERATOR_H

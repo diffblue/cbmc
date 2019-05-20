@@ -16,8 +16,64 @@ Author: Diffblue Ltd.
 #include <util/optional_utils.h>
 #include <util/std_code.h>
 #include <util/std_expr.h>
+#include <util/string2int.h>
 
 #include <functional>
+
+bool recursive_initialization_configt::handle_option(
+  const std::string &option,
+  const std::list<std::string> &values)
+{
+  if(option == COMMON_HARNESS_GENERATOR_MIN_NULL_TREE_DEPTH_OPT)
+  {
+    auto const value =
+      harness_options_parser::require_exactly_one_value(option, values);
+    auto const user_min_null_tree_depth =
+      string2optional<std::size_t>(value, 10);
+    if(user_min_null_tree_depth.has_value())
+    {
+      min_null_tree_depth = user_min_null_tree_depth.value();
+    }
+    else
+    {
+      throw invalid_command_line_argument_exceptiont{
+        "failed to convert `" + value + "' to integer",
+        "--" COMMON_HARNESS_GENERATOR_MIN_NULL_TREE_DEPTH_OPT};
+    }
+    return true;
+  }
+  else if(option == COMMON_HARNESS_GENERATOR_MAX_NONDET_TREE_DEPTH_OPT)
+  {
+    auto const value =
+      harness_options_parser::require_exactly_one_value(option, values);
+    auto const user_max_nondet_tree_depth =
+      string2optional<std::size_t>(value, 10);
+    if(user_max_nondet_tree_depth.has_value())
+    {
+      max_nondet_tree_depth = user_max_nondet_tree_depth.value();
+    }
+    else
+    {
+      throw invalid_command_line_argument_exceptiont{
+        "failed to convert `" + value + "' to integer",
+        "--" COMMON_HARNESS_GENERATOR_MAX_NONDET_TREE_DEPTH_OPT};
+    }
+    return true;
+  }
+  else if(option == COMMON_HARNESS_GENERATOR_MAX_ARRAY_SIZE_OPT)
+  {
+    max_dynamic_array_size = harness_options_parser::require_one_size_value(
+      COMMON_HARNESS_GENERATOR_MAX_ARRAY_SIZE_OPT, values);
+    return true;
+  }
+  else if(option == COMMON_HARNESS_GENERATOR_MIN_ARRAY_SIZE_OPT)
+  {
+    min_dynamic_array_size = harness_options_parser::require_one_size_value(
+      COMMON_HARNESS_GENERATOR_MIN_ARRAY_SIZE_OPT, values);
+    return true;
+  }
+  return false;
+}
 
 recursive_initializationt::recursive_initializationt(
   recursive_initialization_configt initialization_config,

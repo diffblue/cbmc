@@ -100,9 +100,9 @@ constant_exprt convert_member_name_to_enum_value(
 /// Convert id to a Boolean value
 /// \param bool_value: A string that is compared to "true" ignoring case.
 /// \return a constant of type Boolean
-bool id2boolean(const irep_idt &bool_value)
+bool id2boolean(const std::string &bool_value)
 {
-  std::string string_value = id2string(bool_value);
+  std::string string_value = bool_value;
   std::transform(
     string_value.begin(), string_value.end(), string_value.begin(), ::tolower);
   if(string_value == "true")
