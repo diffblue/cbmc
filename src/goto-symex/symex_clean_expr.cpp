@@ -173,8 +173,7 @@ replace_nondet(exprt &expr, symex_nondet_generatort &build_symex_nondet)
 
 void goto_symext::lift_let(statet &state, const let_exprt &let_expr)
 {
-  exprt let_value = let_expr.value();
-  clean_expr(let_value, state, false);
+  exprt let_value = clean_expr(let_expr.value(), state, false);
   let_value = state.rename(std::move(let_value), ns).get();
   do_simplify(let_value);
 
@@ -213,8 +212,8 @@ void goto_symext::lift_lets(statet &state, exprt &rhs)
   }
 }
 
-void goto_symext::clean_expr(
-  exprt &expr,
+exprt goto_symext::clean_expr(
+  exprt expr,
   statet &state,
   const bool write)
 {
@@ -227,4 +226,5 @@ void goto_symext::clean_expr(
   // lhs
   if(write)
     adjust_byte_extract_rec(expr, ns);
+  return expr;
 }

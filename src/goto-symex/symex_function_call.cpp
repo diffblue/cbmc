@@ -134,8 +134,8 @@ void goto_symext::parameter_assignments(
         assignment_type =
           symex_targett::assignment_typet::VISIBLE_ACTUAL_PARAMETER;
 
-      clean_expr(lhs, state, true);
-      clean_expr(rhs, state, false);
+      lhs = to_symbol_expr(clean_expr(std::move(lhs), state, true));
+      rhs = clean_expr(std::move(rhs), state, false);
 
       exprt::operandst lhs_conditions;
       symex_assign_rec(
@@ -193,12 +193,12 @@ void goto_symext::symex_function_call_symbol(
   code_function_callt code = original_code;
 
   if(code.lhs().is_not_nil())
-    clean_expr(code.lhs(), state, true);
+    code.lhs() = clean_expr(std::move(code.lhs()), state, true);
 
-  clean_expr(code.function(), state, false);
+  code.function() = clean_expr(std::move(code.function()), state, false);
 
   Forall_expr(it, code.arguments())
-    clean_expr(*it, state, false);
+    *it = clean_expr(std::move(*it), state, false);
 
   target.location(state.guard.as_expr(), state.source);
 

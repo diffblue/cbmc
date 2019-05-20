@@ -290,7 +290,7 @@ void goto_symext::symex_va_start(
     state.symbol_table);
   va_array.value = array;
 
-  clean_expr(array, state, false);
+  array = clean_expr(std::move(array), state, false);
   array = state.rename(std::move(array), ns).get();
   do_simplify(array);
   symex_assign(state, code_assignt{va_array.symbol_expr(), std::move(array)});
@@ -446,8 +446,8 @@ void goto_symext::symex_cpp_new(
 
   if(do_array)
   {
-    exprt size_arg = static_cast<const exprt &>(code.find(ID_size));
-    clean_expr(size_arg, state, false);
+    exprt size_arg =
+      clean_expr(static_cast<const exprt &>(code.find(ID_size)), state, false);
     symbol.type = array_typet(pointer_type.subtype(), size_arg);
   }
   else

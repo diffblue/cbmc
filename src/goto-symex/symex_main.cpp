@@ -87,8 +87,7 @@ void goto_symext::symex_assert(
   const goto_programt::instructiont &instruction,
   statet &state)
 {
-  exprt condition = instruction.get_condition();
-  clean_expr(condition, state, false);
+  exprt condition = clean_expr(instruction.get_condition(), state, false);
 
   // First, push negations in and perhaps convert existential quantifiers into
   // universals:
@@ -131,9 +130,7 @@ void goto_symext::vcc(
 
 void goto_symext::symex_assume(statet &state, const exprt &cond)
 {
-  exprt simplified_cond=cond;
-
-  clean_expr(simplified_cond, state, false);
+  exprt simplified_cond = clean_expr(cond, state, false);
   simplified_cond = state.rename(std::move(simplified_cond), ns).get();
   do_simplify(simplified_cond);
 

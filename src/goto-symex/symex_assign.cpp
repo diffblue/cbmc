@@ -27,14 +27,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 void goto_symext::symex_assign(statet &state, const code_assignt &code)
 {
-  exprt lhs=code.lhs();
-  exprt rhs=code.rhs();
+  exprt lhs = clean_expr(code.lhs(), state, true);
+  exprt rhs = clean_expr(code.rhs(), state, false);
 
   DATA_INVARIANT(
     lhs.type() == rhs.type(), "assignments must be type consistent");
 
-  clean_expr(lhs, state, true);
-  clean_expr(rhs, state, false);
 
   if(rhs.id()==ID_side_effect)
   {
