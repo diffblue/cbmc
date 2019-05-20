@@ -436,11 +436,12 @@ void arrayst::add_array_constraints(
     return add_array_constraints_if(index_set, to_if_expr(expr));
   else if(expr.id()==ID_array_of)
     return add_array_constraints_array_of(index_set, to_array_of_expr(expr));
+  else if(expr.id() == ID_array)
+    return add_array_constraints_array_constant(index_set, to_array_expr(expr));
   else if(expr.id()==ID_symbol ||
           expr.id()==ID_nondet_symbol ||
           expr.id()==ID_constant ||
           expr.id()=="zero_string" ||
-          expr.id()==ID_array ||
           expr.id()==ID_string_constant)
   {
   }
@@ -644,6 +645,85 @@ void arrayst::add_array_constraints_array_of(
     lazy_constraintt lazy(
       lazy_typet::ARRAY_OF, equal_exprt(index_expr, expr.what()));
     add_array_constraint(lazy, false); // added immediately
+  }
+}
+
+void arrayst::add_array_constraints_array_constant(
+  const index_sett &index_set,
+  const array_exprt &expr)
+{
+  // we got x = { v, ... } - add constraint x[i] = v
+  const exprt::operandst &operands = expr.operands();
+
+  for(const auto &index : index_set)
+  {
+    const typet &subtype = expr.type().subtype();
+    const index_exprt index_expr{expr, index, subtype};
+
+    if(index.is_constant())
+    {
+      // We have a constant index - just pick the element at that index from the
+      // array constant.
+
+      const std::size_t i =
+        numeric_cast_v<std::size_t>(to_constant_expr(index));
+      // if the access is out of bounds, we leave it unconstrained
+      if(i >= operands.size())
+        continue;
+
+      const exprt v = operands[i];
+      DATA_INVARIANT(
+        index_expr.type() == v.type(),
+        "array operand type should match array element type");
+
+      // add constraint
+      lazy_constraintt lazy{lazy_typet::ARRAY_CONSTANT,
+                            equal_exprt{index_expr, v}};
+      add_array_constraint(lazy, false); // added immediately
+    }
+    else
+    {
+      // We have a non-constant index into an array constant. We need to build a
+      // case statement testing the index against all possible values. Whenever
+      // neighbouring array elements are the same, we can test the index against
+      // the range rather than individual elements. This should be particularly
+      // helpful when we have arrays of zeros, as is the case for initializers.
+
+      std::vector<std::pair<std::size_t, std::size_t>> ranges;
+
+      for(std::size_t i = 0; i < operands.size(); ++i)
+      {
+        if(ranges.empty() || operands[i] != operands[ranges.back().first])
+          ranges.emplace_back(i, i);
+        else
+          ranges.back().second = i;
+      }
+
+      for(const auto &range : ranges)
+      {
+        exprt index_constraint;
+
+        if(range.first == range.second)
+        {
+          index_constraint =
+            equal_exprt{index, from_integer(range.first, index.type())};
+        }
+        else
+        {
+          index_constraint = and_exprt{
+            binary_predicate_exprt{
+              from_integer(range.first, index.type()), ID_le, index},
+            binary_predicate_exprt{
+              index, ID_le, from_integer(range.second, index.type())}};
+        }
+
+        lazy_constraintt lazy{
+          lazy_typet::ARRAY_CONSTANT,
+          implies_exprt{index_constraint,
+                        equal_exprt{index_expr, operands[range.first]}}};
+        add_array_constraint(lazy, true); // added lazily
+      }
+    }
   }
 }
 

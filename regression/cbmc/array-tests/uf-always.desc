@@ -1,0 +1,10 @@
+CORE
+uf-always.c
+--arrays-uf-always
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+This test is extracted from main.c to showcase a bug in the array encoding.
