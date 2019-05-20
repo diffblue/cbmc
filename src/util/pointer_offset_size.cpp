@@ -694,12 +694,18 @@ optionalt<exprt> get_subexpression_at_offset(
     if(*target_size_bits <= *elem_size_bits)
     {
       const mp_integer elem_size_bytes = *elem_size_bits / 8;
-      return get_subexpression_at_offset(
-        index_exprt(
-          expr, from_integer(offset_bytes / elem_size_bytes, index_type())),
-        offset_bytes % elem_size_bytes,
-        target_type_raw,
-        ns);
+      const auto offset_inside_elem = offset_bytes % elem_size_bytes;
+      const auto target_size_bytes = *target_size_bits / 8;
+      // only recurse if the cell completely contains the target
+      if(offset_inside_elem + target_size_bytes <= elem_size_bytes)
+      {
+        return get_subexpression_at_offset(
+          index_exprt(
+            expr, from_integer(offset_bytes / elem_size_bytes, index_type())),
+          offset_inside_elem,
+          target_type_raw,
+          ns);
+      }
     }
   }
 
