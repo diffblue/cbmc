@@ -567,7 +567,7 @@ protected:
   /// \param only_common: flag indicating if only items are added to the delta
   ///   view for which the keys are in both maps
   void add_item_if_not_shared(
-    const innert &container,
+    const leaft &leaf,
     const innert &inner,
     const std::size_t level,
     delta_viewt &delta_view,
@@ -629,9 +629,13 @@ SHARING_MAPT(void)
         stack.push(&item.second);
       }
     }
+    else if(ip->is_leaf())
+    {
+      f(ip->get_key(), ip->get_value());
+    }
     else
     {
-      SM_ASSERT(ip->is_container());
+      SM_ASSERT(ip->is_defined_container());
 
       const leaf_listt &ll = ip->get_container();
       SM_ASSERT(!ll.empty());
@@ -662,13 +666,15 @@ SHARING_MAPT(std::size_t)
   do
   {
     const innert *ip = stack.top();
+    SM_ASSERT(!ip->empty());
     stack.pop();
 
-    // internal node or container node
     const unsigned use_count = ip->use_count();
-    const void *raw_ptr = ip->is_internal()
-                            ? (const void *)&ip->read_internal()
-                            : (const void *)&ip->read_container();
+
+    const void *raw_ptr =
+      ip->is_internal() ? (const void *)&ip->read_internal()
+                        : ip->is_leaf() ? (const void *)&ip->read_leaf()
+                                        : (const void *)&ip->read_container();
 
     if(use_count >= 2)
     {
@@ -683,14 +689,12 @@ SHARING_MAPT(std::size_t)
       }
     }
 
-    if(!leafs_only)
-    {
-      count++;
-    }
-
     if(ip->is_internal())
     {
-      SM_ASSERT(!ip->empty());
+      if(!leafs_only)
+      {
+        count++;
+      }
 
       const to_mapt &m = ip->get_to_map();
       SM_ASSERT(!m.empty());
@@ -700,32 +704,25 @@ SHARING_MAPT(std::size_t)
         stack.push(&item.second);
       }
     }
+    else if(ip->is_leaf())
+    {
+      count++;
+    }
     else
     {
       SM_ASSERT(ip->is_defined_container());
+
+      if(!leafs_only)
+      {
+        count++;
+      }
 
       const leaf_listt &ll = ip->get_container();
       SM_ASSERT(!ll.empty());
 
       for(const auto &l : ll)
       {
-        const unsigned leaf_use_count = l.use_count();
-        const void *leaf_raw_ptr = &l.read_leaf();
-
-        if(leaf_use_count >= 2)
-        {
-          if(marked.find(leaf_raw_ptr) != marked.end())
-          {
-            continue;
-          }
-
-          if(mark)
-          {
-            marked.insert(leaf_raw_ptr);
-          }
-        }
-
-        count++;
+        stack.push(&l);
       }
     }
   } while(!stack.empty());
@@ -812,15 +809,13 @@ SHARING_MAPT(void)
 }
 
 SHARING_MAPT(void)::add_item_if_not_shared(
-  const innert &container,
+  const leaft &leaf,
   const innert &inner,
   const std::size_t level,
   delta_viewt &delta_view,
   const bool only_common) const
 {
-  const leaft &l1 = container.get_container().front();
-
-  const auto &k = l1.get_key();
+  const auto &k = leaf.get_key();
   std::size_t key = hash()(k);
 
   key >>= level * chunk;
@@ -839,7 +834,7 @@ SHARING_MAPT(void)::add_item_if_not_shared(
     {
       if(!only_common)
       {
-        delta_view.push_back({k, l1.get_value()});
+        delta_view.push_back({k, leaf.get_value()});
       }
 
       return;
@@ -850,22 +845,35 @@ SHARING_MAPT(void)::add_item_if_not_shared(
     // potentially in both maps
     if(ip->is_container())
     {
-      if(container.shares_with(*ip))
-        return;
-
       for(const auto &l2 : ip->get_container())
       {
-        if(l1.shares_with(l2))
+        if(leaf.shares_with(l2))
           return;
 
-        if(l1.get_key() == l2.get_key())
+        if(leaf.get_key() == l2.get_key())
         {
-          delta_view.push_back({k, l1.get_value(), l2.get_value()});
+          delta_view.push_back({k, leaf.get_value(), l2.get_value()});
           return;
         }
       }
 
-      delta_view.push_back({k, l1.get_value()});
+      delta_view.push_back({k, leaf.get_value()});
+
+      return;
+    }
+
+    if(ip->is_leaf())
+    {
+      if(ip->shares_with(leaf))
+        return;
+
+      if(equalT()(leaf.get_key(), ip->get_key()))
+      {
+        delta_view.push_back({k, leaf.get_value(), ip->get_value()});
+        return;
+      }
+
+      delta_view.push_back({k, leaf.get_value()});
 
       return;
     }
@@ -920,6 +928,8 @@ SHARING_MAPT(void)
     const innert *ip1 = si.first;
     const innert *ip2 = si.second;
 
+    SM_ASSERT(!ip1->shares_with(*ip2));
+
     stack.pop();
 
     const std::size_t level = level_stack.top();
@@ -928,94 +938,129 @@ SHARING_MAPT(void)
     SM_ASSERT(!ip1->empty());
     SM_ASSERT(!ip2->empty());
 
-    if(ip1->is_internal() && ip2->is_container())
-    {
-      // The container *ip2 contains one element as only containers at the
-      // bottom of the tree can have more than one element. This happens when
-      // two different keys have the same hash code. It is known here that *ip2
-      // is not at the bottom of the tree, as *ip1 (the corresponding node in
-      // the other map) is an internal node, and internal nodes cannot be at the
-      // bottom of the map.
-      SM_ASSERT(is_singular(ip2->get_container()));
-
-      for(const auto &item : ip1->get_to_map())
-      {
-        const innert &child = item.second;
-        if(!child.shares_with(*ip2))
-        {
-          stack.push(stack_itemt(&child, ip2));
-
-          // The level is not needed when the node of the left map is an
-          // internal node, and the node of the right map is a container node,
-          // hence we just push a dummy element
-          level_stack.push(dummy_level);
-        }
-      }
-
-      continue;
-    }
-
     if(ip1->is_internal())
     {
-      SM_ASSERT(ip2->is_internal());
+      SM_ASSERT(!ip2->is_container());
 
-      for(const auto &item : ip1->get_to_map())
+      if(ip2->is_internal())
       {
-        const innert &child = item.second;
-
-        const innert *p;
-        p = ip2->find_child(item.first);
-
-        if(p == nullptr)
+        for(const auto &item : ip1->get_to_map())
         {
-          if(!only_common)
+          const innert &child = item.second;
+
+          const innert *p;
+          p = ip2->find_child(item.first);
+
+          if(p == nullptr)
           {
-            gather_all(child, delta_view);
+            if(!only_common)
+            {
+              gather_all(child, delta_view);
+            }
+          }
+          else if(!child.shares_with(*p))
+          {
+            stack.push(stack_itemt(&child, p));
+            level_stack.push(level + 1);
           }
         }
-        else if(!child.shares_with(*p))
+      }
+      else
+      {
+        SM_ASSERT(ip2->is_leaf());
+
+        for(const auto &item : ip1->get_to_map())
         {
-          stack.push(stack_itemt(&child, p));
-          level_stack.push(level + 1);
+          const innert &child = item.second;
+
+          if(!child.shares_with(*ip2))
+          {
+            stack.push(stack_itemt(&child, ip2));
+
+            // The level is not needed when the node of the left map is an
+            // internal node, and the node of the right map is a leaf node,
+            // hence we just push a dummy element
+            level_stack.push(dummy_level);
+          }
         }
       }
-
-      continue;
     }
-
-    SM_ASSERT(ip1->is_container());
-
-    if(ip2->is_internal())
+    else if(ip1->is_leaf())
     {
-      SM_ASSERT(is_singular(ip1->get_container()));
-      SM_ASSERT(level != dummy_level);
+      SM_ASSERT(!ip2->is_container());
 
-      add_item_if_not_shared(*ip1, *ip2, level, delta_view, only_common);
-
-      continue;
-    }
-
-    SM_ASSERT(ip2->is_container());
-
-    for(const auto &l1 : ip1->get_container())
-    {
-      const key_type &k1 = l1.get_key();
-      const leaft *p;
-
-      p = ip2->find_leaf(k1);
-
-      if(p != nullptr)
+      if(ip2->is_internal())
       {
-        if(!l1.shares_with(*p))
+        SM_ASSERT(level != dummy_level);
+
+        add_item_if_not_shared(*ip1, *ip2, level, delta_view, only_common);
+      }
+      else
+      {
+        SM_ASSERT(ip2->is_leaf());
+
+        if(equalT()(ip1->get_key(), ip2->get_key()))
         {
-          SM_ASSERT(other.has_key(k1));
-          delta_view.push_back({k1, l1.get_value(), p->get_value()});
+          delta_view.push_back(
+            {ip1->get_key(), ip1->get_value(), ip2->get_value()});
+        }
+        else if(!only_common)
+        {
+          delta_view.push_back({ip1->get_key(), ip1->get_value()});
         }
       }
-      else if(!only_common)
+    }
+    else
+    {
+      SM_ASSERT(ip1->is_container());
+      SM_ASSERT(!ip2->is_internal());
+
+      if(ip2->is_leaf())
       {
-        SM_ASSERT(!other.has_key(k1));
-        delta_view.push_back({k1, l1.get_value()});
+        for(const auto &l1 : ip1->get_container())
+        {
+          if(l1.shares_with(*ip2))
+          {
+            continue;
+          }
+
+          const key_type &k1 = l1.get_key();
+
+          if(equalT()(k1, ip2->get_key()))
+          {
+            delta_view.push_back({k1, l1.get_value(), ip2->get_value()});
+          }
+          else if(!only_common)
+          {
+            delta_view.push_back({k1, l1.get_value()});
+          }
+        }
+      }
+      else
+      {
+        SM_ASSERT(ip2->is_container());
+
+        for(const auto &l1 : ip1->get_container())
+        {
+          const key_type &k1 = l1.get_key();
+          const leaft *p;
+
+          p = ip2->find_leaf(k1);
+
+          if(p != nullptr)
+          {
+            if(!l1.shares_with(*p))
+            {
+              SM_ASSERT(other.has_key(k1));
+              delta_view.push_back({k1, l1.get_value(), p->get_value()});
+            }
+          }
+          else if(!only_common)
+          {
+            SM_ASSERT(!other.has_key(k1));
+            delta_view.push_back({k1, l1.get_value()});
+          }
+        }
       }
     }
   }
