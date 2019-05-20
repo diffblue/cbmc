@@ -68,13 +68,17 @@ public:
 
   struct pointer_valuet
   {
-    pointer_valuet() = delete;
     pointer_valuet(
-      const std::string &address,
-      const std::string &pointee,
-      const std::string &character,
-      const optionalt<std::string> &string)
-      : address(address), pointee(pointee), character(character), string(string)
+      const std::string &address = "",
+      const std::string &pointee = "",
+      const std::string &character = "",
+      const optionalt<std::string> &string = nullopt,
+      const bool valid = false)
+      : address(address),
+        pointee(pointee),
+        character(character),
+        string(string),
+        valid(valid)
     {
     }
 
@@ -88,6 +92,8 @@ public:
       return std::any_of(
         pointee.begin(), pointee.end(), [](char c) { return c == '+'; });
     }
+
+    bool valid;
   };
 
   /// Get the allocated size estimate for a pointer by evaluating
@@ -115,17 +121,12 @@ public:
   /// \param corefile: core dump
   void run_gdb_from_core(const std::string &corefile);
 
-  /// Get value of the given value expression
-  /// \param expr: an expression of non-pointer type or pointer to char
-  /// \return value of the expression; if the expression is of type pointer to
-  ///   char and represents a string, the string value is returned; otherwise
-  ///   the value is returned just as it is printed by gdb
-  std::string get_value(const std::string &expr);
-
   /// Get the memory address pointed to by the given pointer expression
   /// \param expr: an expression of pointer type (e.g., `&x` with `x` being of
   ///   type `int` or `p` with `p` being of type `int *`)
   /// \return memory address in hex format
+  optionalt<std::string> get_value(const std::string &expr);
+
   pointer_valuet get_memory(const std::string &expr);
 
   /// Return the vector of commands that have been written to gdb so far

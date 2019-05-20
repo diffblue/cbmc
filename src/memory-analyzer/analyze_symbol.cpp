@@ -325,6 +325,8 @@ exprt gdb_value_extractort::get_pointer_value(
 
   std::string c_expr = c_converter.convert(expr);
   const pointer_valuet value = gdb_api.get_memory(c_expr);
+  if(!value.valid)
+    return zero_expr;
 
   const auto memory_location = value.address;
 
@@ -395,26 +397,53 @@ exprt gdb_value_extractort::get_expr_value(
   {
     INVARIANT(zero_expr.is_constant(), "zero initializer is a constant");
 
-    return from_integer(string2integer(get_gdb_value(expr)), expr.type());
+    std::string c_expr = c_converter.convert(expr);
+    const auto maybe_value = gdb_api.get_value(c_expr);
+    if(!maybe_value.has_value())
+      return zero_expr;
+    const std::string value = *maybe_value;
+
+    const mp_integer int_rep = string2integer(value);
+
+    return from_integer(int_rep, type);
   }
   else if(is_c_char_type(type))
   {
     INVARIANT(zero_expr.is_constant(), "zero initializer is a constant");
 
-    return zero_expr; // currently left at 0
+    // check the char-value and return as bitvector-type value
+    std::string c_expr = c_converter.convert(expr);
+    const auto maybe_value = gdb_api.get_value(c_expr);
+    if(!maybe_value.has_value() || maybe_value->empty())
+      return zero_expr;
+    const std::string value = *maybe_value;
+
+    const mp_integer int_rep = value[0];
+    return from_integer(int_rep, type);
   }
   else if(type.id() == ID_c_bool)
   {
     INVARIANT(zero_expr.is_constant(), "zero initializer is a constant");
 
-    return from_c_boolean_value(id2boolean(get_gdb_value(expr)), type);
+    std::string c_expr = c_converter.convert(expr);
+    const auto maybe_value = gdb_api.get_value(c_expr);
+    if(!maybe_value.has_value())
+      return zero_expr;
+    const std::string value = *maybe_value;
+
+    return from_c_boolean_value(id2boolean(value), type);
   }
   else if(type.id() == ID_c_enum)
   {
     INVARIANT(zero_expr.is_constant(), "zero initializer is a constant");
 
-    return convert_member_name_to_enum_value(
-      get_gdb_value(expr), to_c_enum_type(type));
+    std::string c_expr = c_converter.convert(expr);
+    const auto maybe_value = gdb_api.get_value(c_expr);
+    if(!maybe_value.has_value())
+      return zero_expr;
+    const std::string value = *maybe_value;
+
+    return convert_member_name_to_enum_value(value, to_c_enum_type(type));
   }
   else if(type.id() == ID_struct_tag)
   {
@@ -503,5 +532,8 @@ void gdb_value_extractort::process_outstanding_assignments()
 
 std::string gdb_value_extractort::get_gdb_value(const exprt &expr)
 {
-  return gdb_api.get_value(c_converter.convert(expr));
+  std::string c_expr = c_converter.convert(expr);
+  const auto maybe_value = gdb_api.get_value(c_expr);
+  CHECK_RETURN(maybe_value.has_value());
+  return *maybe_value;
 }
