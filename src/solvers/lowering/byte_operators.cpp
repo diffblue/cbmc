@@ -1497,7 +1497,7 @@ static exprt lower_byte_update_struct(
         array_typet{bv_typet{8}, src_size_opt.value()}};
 
       byte_update_exprt bu = src;
-      bu.op() = lower_byte_extract(byte_extract_expr, ns);
+      bu.set_op() = lower_byte_extract(byte_extract_expr, ns);
 
       return lower_byte_extract(
         byte_extract_exprt{
@@ -1615,7 +1615,7 @@ static exprt lower_byte_update_union(
     "lower_byte_update of union of unknown size is not supported");
 
   byte_update_exprt bu = src;
-  bu.op() = member_exprt{src.op(), max_comp_name, max_comp_type};
+  bu.set_op() = member_exprt{src.op(), max_comp_name, max_comp_type};
   bu.type() = max_comp_type;
 
   return union_exprt{

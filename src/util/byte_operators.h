@@ -90,6 +90,18 @@ public:
   exprt &op() { return op0(); }
   exprt &offset() { return op1(); }
   exprt &value() { return op2(); }
+  void set_op(exprt e)
+  {
+    op0() = std::move(e);
+  }
+  void set_offset(exprt e)
+  {
+    op1() = std::move(e);
+  }
+  void set_value(exprt e)
+  {
+    op2() = std::move(e);
+  }
 
   const exprt &op() const { return op0(); }
   const exprt &offset() const { return op1(); }

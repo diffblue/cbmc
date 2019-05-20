@@ -2064,7 +2064,7 @@ bool simplify_exprt::simplify_byte_update(byte_update_exprt &expr)
     expr.offset() == to_byte_update_expr(expr.op()).offset() &&
     expr.value().type() == to_byte_update_expr(expr.op()).value().type())
   {
-    expr.op()=expr.op().op0();
+    expr.set_op()=expr.op().op0();
     return false;
   }
 
@@ -2140,8 +2140,8 @@ bool simplify_exprt::simplify_byte_update(byte_update_exprt &expr)
             plus_exprt new_offset(offset, compo_offset);
             simplify_node(new_offset);
             exprt new_value(with.new_value());
-            expr.offset().swap(new_offset);
-            expr.value().swap(new_value);
+            expr.set_offset().swap(new_offset);
+            expr.set_value().swap(new_value);
             simplify_byte_update(expr); // do this recursively
             return false;
           }
@@ -2167,8 +2167,8 @@ bool simplify_exprt::simplify_byte_update(byte_update_exprt &expr)
           plus_exprt new_offset(offset, index_offset);
           simplify_node(new_offset);
           exprt new_value(with.new_value());
-          expr.offset().swap(new_offset);
-          expr.value().swap(new_value);
+          expr.set_offset().swap(new_offset);
+          expr.set_value().swap(new_value);
           simplify_byte_update(expr); // do this recursively
           return false;
         }
