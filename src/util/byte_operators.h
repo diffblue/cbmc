@@ -20,8 +20,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "invariant.h"
 #include "std_expr.h"
 
-/*! \brief TO_BE_DOCUMENTED
-*/
+/// Expression of type \c type extracted from some object \c op starting at
+/// position \c offset (given in number of bytes).
+/// The object can either be interpreted in big endian or little endian, which
+/// is reflected by the \c id of the expression which is either
+/// \c ID_byte_extract_big_endian or \c ID_byte_extract_little_endian
 class byte_extract_exprt:public binary_exprt
 {
 public:
