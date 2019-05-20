@@ -1160,7 +1160,6 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
           string2integer(
             std::string(id2string(statement), statement.size()-1, 1)),
           java_int_type());
-      statement=std::string(id2string(statement), 0, statement.size()-2);
     }
 
     typet catch_type;
@@ -1288,7 +1287,8 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
       assert(op.size()==3 && results.empty());
       c = convert_astore(statement, op, i_it->source_location);
     }
-    else if(statement==patternt("?store"))
+    else if(
+      statement == patternt("?store") || statement == patternt("?store_?"))
     {
       // store value into some local variable
       PRECONDITION(op.size() == 1 && results.empty());
@@ -1300,7 +1300,7 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
       PRECONDITION(op.size() == 2 && results.size() == 1);
       results[0] = convert_aload(statement, op);
     }
-    else if(statement==patternt("?load"))
+    else if(statement == patternt("?load") || statement == patternt("?load_?"))
     {
       // load a value from a local variable
       results[0]=
@@ -1355,7 +1355,7 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
       assert(results.size()==1);
       results[0]=from_integer(-1, java_int_type());
     }
-    else if(statement==patternt("?const"))
+    else if(statement == patternt("?const_?"))
     {
       assert(results.size()==1);
       results = convert_const(statement, to_constant_expr(arg0), results);
