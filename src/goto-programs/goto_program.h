@@ -977,6 +977,17 @@ public:
       {});
   }
 
+  static instructiont
+  make_incomplete_goto(const source_locationt &l = source_locationt::nil())
+  {
+    return instructiont(
+      static_cast<const codet &>(get_nil_irep()),
+      l,
+      INCOMPLETE_GOTO,
+      true_exprt(),
+      {});
+  }
+
   static instructiont make_incomplete_goto(
     const code_gotot &_code,
     const source_locationt &l = source_locationt::nil())
