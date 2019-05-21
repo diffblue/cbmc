@@ -575,11 +575,6 @@ protected:
 
   void gather_all(const innert &n, delta_viewt &delta_view) const;
 
-  bool is_singular(const leaf_listt &ll) const
-  {
-    return !ll.empty() && std::next(ll.begin()) == ll.end();
-  }
-
   std::size_t count_unmarked_nodes(
     bool leafs_only,
     std::set<const void *> &marked,
