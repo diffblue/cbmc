@@ -27,7 +27,16 @@ class sharing_map_internalt : public sharing_map_standardt
 typedef sharing_mapt<irep_idt, std::string, true, irep_id_hash>
   sharing_map_error_checkt;
 
-class sharing_map_unsignedt : public sharing_mapt<unsigned, std::string, false>
+struct unsigned_hasht
+{
+  std::size_t operator()(const unsigned v) const
+  {
+    return static_cast<std::size_t>(v);
+  }
+};
+
+class sharing_map_unsignedt
+  : public sharing_mapt<unsigned, std::string, false, unsigned_hasht>
 {
   friend void sharing_map_internals_test();
 };
@@ -76,7 +85,7 @@ void sharing_map_internals_test()
 
     sm.insert("i", "1");
     count = sm.count_unmarked_nodes(false, marked, false);
-    REQUIRE(count == 3);
+    REQUIRE(count == 2);
     REQUIRE(marked.empty());
 
     count = sm.count_unmarked_nodes(true, marked, false);
@@ -119,7 +128,8 @@ void sharing_map_internals_test()
   {
     std::set<const void *> marked;
     std::size_t count = 0;
-    std::size_t chunk = 3;
+    const std::size_t chunk = sharing_map_unsignedt::chunk;
+    const std::size_t levels = sharing_map_unsignedt::levels;
 
     sharing_map_unsignedt sm;
 
@@ -128,58 +138,94 @@ void sharing_map_internals_test()
 
     sm.insert(0, "a");
     count = sm.count_unmarked_nodes(false, marked, false);
-    REQUIRE(count == 3);
+    REQUIRE(count == 2);
 
     SECTION("first node decisive")
     {
       sm.insert(1, "b");
       count = sm.count_unmarked_nodes(false, marked, false);
-      REQUIRE(count == 5);
+      REQUIRE(count == 3);
 
       sm.replace(1, "c");
       count = sm.count_unmarked_nodes(false, marked, false);
-      REQUIRE(count == 5);
+      REQUIRE(count == 3);
 
       sm.erase(1);
       count = sm.count_unmarked_nodes(false, marked, false);
-      REQUIRE(count == 3);
+      REQUIRE(count == 2);
     }
 
     SECTION("second node decisive")
     {
       sm.insert(1 << chunk, "b");
       count = sm.count_unmarked_nodes(false, marked, false);
-      REQUIRE(count == 6);
+      REQUIRE(count == 4);
 
       sm.replace(1 << chunk, "c");
       count = sm.count_unmarked_nodes(false, marked, false);
-      REQUIRE(count == 6);
+      REQUIRE(count == 4);
 
       sm.erase(1 << chunk);
       count = sm.count_unmarked_nodes(false, marked, false);
-      REQUIRE(count == 4);
+      REQUIRE(count == 3);
     }
 
     SECTION("third node decisive")
     {
       sm.insert(1 << (2 * chunk), "b");
       count = sm.count_unmarked_nodes(false, marked, false);
-      REQUIRE(count == 7);
+      REQUIRE(count == 5);
 
       sm.replace(1 << (2 * chunk), "c");
       count = sm.count_unmarked_nodes(false, marked, false);
-      REQUIRE(count == 7);
+      REQUIRE(count == 5);
 
       sm.erase(1 << (2 * chunk));
       count = sm.count_unmarked_nodes(false, marked, false);
-      REQUIRE(count == 5);
+      REQUIRE(count == 4);
+    }
+
+    SECTION("last non-container node is decisive")
+    {
+      sm.insert(1 << (chunk * (levels - 1)), "b");
+      count = sm.count_unmarked_nodes(false, marked, false);
+      REQUIRE(count == levels + 2); // inner nodes + leafs
+
+      sm.replace(1 << (chunk * (levels - 1)), "c");
+      count = sm.count_unmarked_nodes(false, marked, false);
+      REQUIRE(count == levels + 2); // inner nodes + leafs
+
+      sm.erase(1 << (chunk * (levels - 1)));
+      count = sm.count_unmarked_nodes(false, marked, false);
+      REQUIRE(count == levels + 1); // inner nodes + leafs
+    }
+
+    SECTION("stored in container node")
+    {
+      // existing leaf will be migrated to the bottom
+      sm.insert(1 << (chunk * levels), "b");
+      count = sm.count_unmarked_nodes(false, marked, false);
+      REQUIRE(count == levels + 1 + 2); // inner nodes + container + leafs
+
+      sm.replace(1 << (chunk * levels), "c");
+      count = sm.count_unmarked_nodes(false, marked, false);
+      REQUIRE(count == levels + 1 + 2); // inner nodes + container + leafs
+
+      sm.erase(1 << (chunk * levels));
+      count = sm.count_unmarked_nodes(false, marked, false);
+      REQUIRE(count == levels + 1 + 1); // inner nodes + container + leafs
+
+      // existing leaf still in container, not migrating necessary
+      sm.insert(1 << (chunk * levels), "d");
+      count = sm.count_unmarked_nodes(false, marked, false);
+      REQUIRE(count == levels + 1 + 2); // inner nodes + container + leafs
     }
   }
 
   SECTION("delta view (sharing, one of the maps is deeper)")
   {
     std::set<const void *> marked;
-    std::size_t chunk = 3;
+    std::size_t chunk = sharing_map_unsignedt::chunk;
 
     std::vector<sharing_map_unsignedt> v;
     v.reserve(2);
@@ -200,10 +246,10 @@ void sharing_map_internals_test()
       sharing_map_unsignedt::sharing_map_statst sms;
 
       sms = sharing_map_unsignedt::get_sharing_stats(v.begin(), v.end());
-      REQUIRE(sms.num_leafs == 3);
-      REQUIRE(sms.num_unique_leafs == 2);
-      REQUIRE(sms.num_nodes == 3 + 7);
-      REQUIRE(sms.num_unique_nodes == 3 + 5);
+      REQUIRE(sms.num_leafs == 1 + 2);
+      REQUIRE(sms.num_unique_leafs == 1 + 1);
+      REQUIRE(sms.num_nodes == 2 + 5);
+      REQUIRE(sms.num_unique_nodes == 2 + 4);
 #endif
 
       sharing_map_unsignedt::delta_viewt delta_view;
