@@ -194,11 +194,10 @@ public:
   typedef std::vector<key_type> keyst;
 
 protected:
-  typedef sharing_nodet<key_type, mapped_type> innert;
-  typedef sharing_nodet<key_type, mapped_type> leaft;
+  typedef sharing_nodet<key_type, mapped_type> nodet;
 
-  typedef typename innert::to_mapt to_mapt;
-  typedef typename innert::leaf_listt leaf_listt;
+  typedef typename nodet::to_mapt to_mapt;
+  typedef typename nodet::leaf_listt leaf_listt;
 
   struct falset
   {
@@ -519,8 +518,8 @@ public:
 protected:
   // helpers
 
-  leaft &get_leaf_node(const key_type &k);
-  const leaft *get_leaf_node(const key_type &k) const;
+  nodet &get_leaf_node(const key_type &k);
+  const nodet *get_leaf_node(const key_type &k) const;
 
   /// Move a leaf node further down the tree such as to resolve a collision with
   /// another key-value pair. This method is called by `insert()` to resolve a
@@ -545,12 +544,12 @@ protected:
     const std::size_t starting_level,
     const std::size_t key_suffix,
     const std::size_t bit_last,
-    innert &inner,
+    nodet &inner,
     const key_type &k,
     valueU &&m);
 
   void iterate(
-    const innert &n,
+    const nodet &n,
     std::function<void(const key_type &k, const mapped_type &m)> f) const;
 
   /// Add a delta item to the delta view if the value in the \p container (which
@@ -568,13 +567,13 @@ protected:
   /// \param only_common: flag indicating if only items are added to the delta
   ///   view for which the keys are in both maps
   void add_item_if_not_shared(
-    const leaft &leaf,
-    const innert &inner,
+    const nodet &leaf,
+    const nodet &inner,
     const std::size_t level,
     delta_viewt &delta_view,
     const bool only_common) const;
 
-  void gather_all(const innert &n, delta_viewt &delta_view) const;
+  void gather_all(const nodet &n, delta_viewt &delta_view) const;
 
   std::size_t count_unmarked_nodes(
     bool leafs_only,
@@ -592,7 +591,7 @@ protected:
   static const std::size_t levels;
 
   // key-value map
-  innert map;
+  nodet map;
 
   // number of elements in the map
   size_type num = 0;
@@ -600,17 +599,17 @@ protected:
 
 SHARING_MAPT(void)
 ::iterate(
-  const innert &n,
+  const nodet &n,
   std::function<void(const key_type &k, const mapped_type &m)> f) const
 {
   SM_ASSERT(!n.empty());
 
-  std::stack<const innert *> stack;
+  std::stack<const nodet *> stack;
   stack.push(&n);
 
   do
   {
-    const innert *ip = stack.top();
+    const nodet *ip = stack.top();
     stack.pop();
 
     SM_ASSERT(!ip->empty());
@@ -656,12 +655,12 @@ SHARING_MAPT(std::size_t)
 
   unsigned count = 0;
 
-  std::stack<const innert *> stack;
+  std::stack<const nodet *> stack;
   stack.push(&map);
 
   do
   {
-    const innert *ip = stack.top();
+    const nodet *ip = stack.top();
     SM_ASSERT(!ip->empty());
     stack.pop();
 
@@ -795,7 +794,7 @@ SHARING_MAPT(void)::get_view(viewt &view) const
 }
 
 SHARING_MAPT(void)
-::gather_all(const innert &n, delta_viewt &delta_view) const
+::gather_all(const nodet &n, delta_viewt &delta_view) const
 {
   auto f = [&delta_view](const key_type &k, const mapped_type &m) {
     delta_view.push_back(delta_view_itemt(k, m));
@@ -805,8 +804,8 @@ SHARING_MAPT(void)
 }
 
 SHARING_MAPT(void)::add_item_if_not_shared(
-  const leaft &leaf,
-  const innert &inner,
+  const nodet &leaf,
+  const nodet &inner,
   const std::size_t level,
   delta_viewt &delta_view,
   const bool only_common) const
@@ -816,7 +815,7 @@ SHARING_MAPT(void)::add_item_if_not_shared(
 
   key >>= level * chunk;
 
-  const innert *ip = &inner;
+  const nodet *ip = &inner;
   SM_ASSERT(ip->is_defined_internal());
 
   while(true)
@@ -899,7 +898,7 @@ SHARING_MAPT(void)
     return;
   }
 
-  typedef std::pair<const innert *, const innert *> stack_itemt;
+  typedef std::pair<const nodet *, const nodet *> stack_itemt;
   std::stack<stack_itemt> stack;
 
   std::stack<std::size_t> level_stack;
@@ -921,8 +920,8 @@ SHARING_MAPT(void)
   {
     const stack_itemt &si = stack.top();
 
-    const innert *ip1 = si.first;
-    const innert *ip2 = si.second;
+    const nodet *ip1 = si.first;
+    const nodet *ip2 = si.second;
 
     SM_ASSERT(!ip1->shares_with(*ip2));
 
@@ -942,9 +941,9 @@ SHARING_MAPT(void)
       {
         for(const auto &item : ip1->get_to_map())
         {
-          const innert &child = item.second;
+          const nodet &child = item.second;
 
-          const innert *p;
+          const nodet *p;
           p = ip2->find_child(item.first);
 
           if(p == nullptr)
@@ -967,7 +966,7 @@ SHARING_MAPT(void)
 
         for(const auto &item : ip1->get_to_map())
         {
-          const innert &child = item.second;
+          const nodet &child = item.second;
 
           if(!child.shares_with(*ip2))
           {
@@ -1039,7 +1038,7 @@ SHARING_MAPT(void)
         for(const auto &l1 : ip1->get_container())
         {
           const key_type &k1 = l1.get_key();
-          const leaft *p;
+          const nodet *p;
 
           p = ip2->find_leaf(k1);
 
@@ -1063,12 +1062,12 @@ SHARING_MAPT(void)
   while(!stack.empty());
 }
 
-SHARING_MAPT2(, leaft &)::get_leaf_node(const key_type &k)
+SHARING_MAPT2(, nodet &)::get_leaf_node(const key_type &k)
 {
   SM_ASSERT(has_key(k));
 
   std::size_t key = hash()(k);
-  innert *ip = &map;
+  nodet *ip = &map;
   SM_ASSERT(ip->is_defined_internal());
 
   while(true)
@@ -1095,13 +1094,13 @@ SHARING_MAPT2(, leaft &)::get_leaf_node(const key_type &k)
   }
 }
 
-SHARING_MAPT2(const, leaft *)::get_leaf_node(const key_type &k) const
+SHARING_MAPT2(const, nodet *)::get_leaf_node(const key_type &k) const
 {
   if(empty())
     return nullptr;
 
   std::size_t key = hash()(k);
-  const innert *ip = &map;
+  const nodet *ip = &map;
   SM_ASSERT(ip->is_defined_internal());
 
   while(true)
@@ -1139,11 +1138,11 @@ SHARING_MAPT(void)::erase(const key_type &k)
 {
   SM_ASSERT(has_key(k));
 
-  innert *del = nullptr;
+  nodet *del = nullptr;
   std::size_t del_bit = 0;
 
   std::size_t key = hash()(k);
-  innert *ip = &map;
+  nodet *ip = &map;
 
   while(true)
   {
@@ -1206,23 +1205,23 @@ SHARING_MAPT4(valueU, void)
   const std::size_t starting_level,
   const std::size_t key_suffix,
   const std::size_t bit_last,
-  innert &inner,
+  nodet &inner,
   const key_type &k,
   valueU &&m)
 {
   SM_ASSERT(starting_level < levels - 1);
   SM_ASSERT(inner.is_defined_internal());
 
-  leaft &leaf = inner.add_child(bit_last);
+  nodet &leaf = inner.add_child(bit_last);
   SM_ASSERT(leaf.is_defined_leaf());
 
   std::size_t key_existing = hash()(leaf.get_key());
   key_existing >>= chunk * starting_level;
 
-  leaft leaf_kept;
+  nodet leaf_kept;
   leaf_kept.swap(leaf);
 
-  innert *ip = &leaf;
+  nodet *ip = &leaf;
   SM_ASSERT(ip->empty());
 
   // Find place for both elements
@@ -1246,11 +1245,11 @@ SHARING_MAPT4(valueU, void)
     {
       // Place found
 
-      innert &l1 = ip->add_child(bit_existing);
+      nodet &l1 = ip->add_child(bit_existing);
       SM_ASSERT(l1.empty());
       l1.swap(leaf_kept);
 
-      innert &l2 = ip->add_child(bit);
+      nodet &l2 = ip->add_child(bit);
       SM_ASSERT(l2.empty());
       l2.make_leaf(k, std::forward<valueU>(m));
 
@@ -1285,7 +1284,7 @@ SHARING_MAPT4(valueU, void)
   SM_ASSERT(!has_key(k));
 
   std::size_t key = hash()(k);
-  innert *ip = &map;
+  nodet *ip = &map;
 
   // The root must be an internal node
   SM_ASSERT(ip->is_internal());
@@ -1300,7 +1299,7 @@ SHARING_MAPT4(valueU, void)
     SM_ASSERT(ip->is_internal());
     SM_ASSERT(level == 0 || !ip->empty());
 
-    innert &child = ip->add_child(bit);
+    nodet &child = ip->add_child(bit);
 
     // Place is unoccupied
     if(child.empty())
@@ -1359,7 +1358,7 @@ SHARING_MAPT4(valueU, void)
 SHARING_MAPT4(valueU, void)
 ::replace(const key_type &k, valueU &&m)
 {
-  leaft &lp = get_leaf_node(k);
+  nodet &lp = get_leaf_node(k);
 
   INVARIANT(
     !value_equalt()(lp.get_value(), m),
@@ -1371,7 +1370,7 @@ SHARING_MAPT4(valueU, void)
 SHARING_MAPT(void)
 ::update(const key_type &k, std::function<void(mapped_type &)> mutator)
 {
-  leaft &lp = get_leaf_node(k);
+  nodet &lp = get_leaf_node(k);
 
   value_comparatort comparator(lp.get_value());
 
@@ -1386,7 +1385,7 @@ SHARING_MAPT(void)
 SHARING_MAPT2(optionalt<std::reference_wrapper<const, mapped_type>>)::find(
   const key_type &k) const
 {
-  const leaft *lp = get_leaf_node(k);
+  const nodet *lp = get_leaf_node(k);
 
   if(lp == nullptr)
     return {};
