@@ -16,6 +16,13 @@ const T &as_const(T &value)
   return static_cast<const T &>(value);
 }
 
+/// Return a pointer to the same object but ensures the type is pointer to const
+template <typename T>
+const T *as_const_ptr(T *t)
+{
+  return t;
+}
+
 /// Deleted to avoid calling as_const on an xvalue
 template <typename T>
 void as_const(T &&) = delete;

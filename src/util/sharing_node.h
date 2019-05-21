@@ -33,6 +33,7 @@ Author: Daniel Poetzl
 #include <map>
 #endif
 
+#include "as_const.h"
 #include "invariant.h"
 #include "make_unique.h"
 #include "small_shared_n_way_ptr.h"
@@ -60,12 +61,6 @@ Author: Daniel Poetzl
 #define SN_PTR_TYPE_ARGS \
   d_internalt<SN_TYPE_ARGS>, d_containert<SN_TYPE_ARGS>, d_leaft<SN_TYPE_ARGS>
 // clang-format on
-
-template <class T>
-const T *as_const(T *t)
-{
-  return t;
-}
 
 typedef small_shared_n_way_pointee_baset<3, unsigned> d_baset;
 
@@ -289,19 +284,17 @@ public:
 
   // add leaf, key must not exist yet
   template <class valueU>
-  leaft *place_leaf(const keyT &k, valueU &&v)
+  void place_leaf(const keyT &k, valueU &&v)
   {
     SN_ASSERT(is_container()); // empty() is allowed
 
     // we need to check empty() first as the const version of find_leaf() must
     // not be called on an empty node
-    PRECONDITION(empty() || as_const(this)->find_leaf(k) == nullptr);
+    PRECONDITION(empty() || as_const_ptr(this)->find_leaf(k) == nullptr);
 
     leaf_listt &c = get_container();
     c.emplace_front(k, std::forward<valueU>(v));
     SN_ASSERT(c.front().is_defined_leaf());
-
-    return &c.front();
   }
 
   // remove leaf, key must exist
@@ -359,12 +352,12 @@ public:
     return nullptr;
   }
 
-  typename d_it::innert *add_child(const std::size_t n)
+  typename d_it::innert &add_child(const std::size_t n)
   {
     SN_ASSERT(is_internal()); // empty() is allowed
 
     to_mapt &m = get_to_map();
-    return &m[n];
+    return m[n];
   }
 
   void remove_child(const std::size_t n)

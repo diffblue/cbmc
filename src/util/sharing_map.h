@@ -27,6 +27,7 @@ Author: Daniel Poetzl
 #include <type_traits>
 #include <vector>
 
+#include "as_const.h"
 #include "irep.h"
 #include "optional.h"
 #include "sharing_node.h"
@@ -518,7 +519,7 @@ public:
 protected:
   // helpers
 
-  leaft *get_leaf_node(const key_type &k);
+  leaft &get_leaf_node(const key_type &k);
   const leaft *get_leaf_node(const key_type &k) const;
 
   /// Move a leaf node further down the tree such as to resolve a collision with
@@ -1062,7 +1063,7 @@ SHARING_MAPT(void)
   while(!stack.empty());
 }
 
-SHARING_MAPT2(, leaft *)::get_leaf_node(const key_type &k)
+SHARING_MAPT2(, leaft &)::get_leaf_node(const key_type &k)
 {
   SM_ASSERT(has_key(k));
 
@@ -1074,9 +1075,8 @@ SHARING_MAPT2(, leaft *)::get_leaf_node(const key_type &k)
   {
     std::size_t bit = key & mask;
 
-    ip = ip->add_child(bit);
-    SM_ASSERT(ip != nullptr);
-    SM_ASSERT(!ip->empty()); // since the key must exist in the map
+    ip = &ip->add_child(bit);
+    PRECONDITION(!ip->empty()); // since the key must exist in the map
 
     if(ip->is_internal())
     {
@@ -1085,17 +1085,14 @@ SHARING_MAPT2(, leaft *)::get_leaf_node(const key_type &k)
     }
     else if(ip->is_leaf())
     {
-      return ip;
+      return *ip;
     }
     else
     {
       SM_ASSERT(ip->is_defined_container());
-      return ip->find_leaf(k);
+      return *ip->find_leaf(k);
     }
   }
-
-  UNREACHABLE;
-  return nullptr;
 }
 
 SHARING_MAPT2(const, leaft *)::get_leaf_node(const key_type &k) const
@@ -1152,7 +1149,7 @@ SHARING_MAPT(void)::erase(const key_type &k)
   {
     std::size_t bit = key & mask;
 
-    const to_mapt &m = as_const(ip)->get_to_map();
+    const to_mapt &m = as_const_ptr(ip)->get_to_map();
 
     if(m.size() > 1 || del == nullptr)
     {
@@ -1160,7 +1157,7 @@ SHARING_MAPT(void)::erase(const key_type &k)
       del_bit=bit;
     }
 
-    ip = ip->add_child(bit);
+    ip = &ip->add_child(bit);
 
     PRECONDITION(!ip->empty());
 
@@ -1181,7 +1178,8 @@ SHARING_MAPT(void)::erase(const key_type &k)
     else
     {
       SM_ASSERT(ip->is_defined_container());
-      const leaf_listt &ll = as_const(ip)->get_container();
+      const leaf_listt &ll = as_const_ptr(ip)->get_container();
+      PRECONDITION(!ll.empty());
 
       // forward list has one element
       if(std::next(ll.begin()) == ll.end())
@@ -1215,7 +1213,7 @@ SHARING_MAPT4(valueU, void)
   SM_ASSERT(starting_level < levels - 1);
   SM_ASSERT(inner.is_defined_internal());
 
-  leaft &leaf = *inner.add_child(bit_last);
+  leaft &leaf = inner.add_child(bit_last);
   SM_ASSERT(leaf.is_defined_leaf());
 
   std::size_t key_existing = hash()(leaf.get_key());
@@ -1248,19 +1246,19 @@ SHARING_MAPT4(valueU, void)
     {
       // Place found
 
-      innert *l1 = ip->add_child(bit_existing);
-      SM_ASSERT(l1->empty());
-      l1->swap(leaf_kept);
+      innert &l1 = ip->add_child(bit_existing);
+      SM_ASSERT(l1.empty());
+      l1.swap(leaf_kept);
 
-      innert *l2 = ip->add_child(bit);
-      SM_ASSERT(l2->empty());
-      l2->make_leaf(k, std::forward<valueU>(m));
+      innert &l2 = ip->add_child(bit);
+      SM_ASSERT(l2.empty());
+      l2.make_leaf(k, std::forward<valueU>(m));
 
       return;
     }
 
     SM_ASSERT(bit == bit_existing);
-    ip = ip->add_child(bit);
+    ip = &ip->add_child(bit);
 
     key >>= chunk;
     key_existing >>= chunk;
@@ -1302,39 +1300,39 @@ SHARING_MAPT4(valueU, void)
     SM_ASSERT(ip->is_internal());
     SM_ASSERT(level == 0 || !ip->empty());
 
-    innert *child = ip->add_child(bit);
+    innert &child = ip->add_child(bit);
 
     // Place is unoccupied
-    if(child->empty())
+    if(child.empty())
     {
       if(level < levels - 1)
       {
         // Create leaf
-        child->make_leaf(k, m);
+        child.make_leaf(k, m);
       }
       else
       {
         SM_ASSERT(level == levels - 1);
 
         // Create container and insert leaf
-        child->place_leaf(k, std::forward<valueU>(m));
+        child.place_leaf(k, std::forward<valueU>(m));
 
-        SM_ASSERT(child->is_defined_container());
+        SM_ASSERT(child.is_defined_container());
       }
 
       num++;
 
       return;
     }
-    else if(child->is_internal())
+    else if(child.is_internal())
     {
-      ip = child;
+      ip = &child;
       key >>= chunk;
       level++;
 
       continue;
     }
-    else if(child->is_leaf())
+    else if(child.is_leaf())
     {
       // migrate leaf downwards
       migrate(level, key, bit, *ip, k, std::forward<valueU>(m));
@@ -1345,11 +1343,11 @@ SHARING_MAPT4(valueU, void)
     }
     else
     {
-      SM_ASSERT(child->is_defined_container());
+      SM_ASSERT(child.is_defined_container());
       SM_ASSERT(level == levels - 1);
 
       // Add to the container
-      child->place_leaf(k, std::forward<valueU>(m));
+      child.place_leaf(k, std::forward<valueU>(m));
 
       num++;
 
@@ -1361,28 +1359,26 @@ SHARING_MAPT4(valueU, void)
 SHARING_MAPT4(valueU, void)
 ::replace(const key_type &k, valueU &&m)
 {
-  leaft *lp = get_leaf_node(k);
-  PRECONDITION(lp != nullptr); // key must exist in map
+  leaft &lp = get_leaf_node(k);
 
   INVARIANT(
-    !value_equalt()(lp->get_value(), m),
+    !value_equalt()(lp.get_value(), m),
     "values should not be replaced with equal values to maximize sharing");
 
-  lp->set_value(std::forward<valueU>(m));
+  lp.set_value(std::forward<valueU>(m));
 }
 
 SHARING_MAPT(void)
 ::update(const key_type &k, std::function<void(mapped_type &)> mutator)
 {
-  leaft *lp = get_leaf_node(k);
-  PRECONDITION(lp != nullptr); // key must exist in map
+  leaft &lp = get_leaf_node(k);
 
-  value_comparatort comparator(lp->get_value());
+  value_comparatort comparator(lp.get_value());
 
-  lp->mutate_value(mutator);
+  lp.mutate_value(mutator);
 
   INVARIANT(
-    !comparator(lp->get_value()),
+    !comparator(lp.get_value()),
     "sharing_mapt::update should make some change. Consider using read-only "
     "method to check if an update is needed beforehand");
 }
