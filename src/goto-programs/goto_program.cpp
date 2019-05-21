@@ -74,6 +74,7 @@ std::ostream &goto_programt::output_instruction(
     break;
 
   case GOTO:
+  case INCOMPLETE_GOTO:
     if(!instruction.get_condition().is_true())
     {
       out << "IF " << from_expr(ns, identifier, instruction.get_condition())
@@ -82,14 +83,20 @@ std::ostream &goto_programt::output_instruction(
 
     out << "GOTO ";
 
-    for(instructiont::targetst::const_iterator
-        gt_it=instruction.targets.begin();
-        gt_it!=instruction.targets.end();
-        gt_it++)
+    if(instruction.is_incomplete_goto())
     {
-      if(gt_it!=instruction.targets.begin())
-        out << ", ";
-      out << (*gt_it)->target_number;
+      out << "(incomplete)";
+    }
+    else
+    {
+      for(auto gt_it = instruction.targets.begin();
+          gt_it != instruction.targets.end();
+          gt_it++)
+      {
+        if(gt_it != instruction.targets.begin())
+          out << ", ";
+        out << (*gt_it)->target_number;
+      }
     }
 
     out << '\n';
@@ -214,9 +221,6 @@ std::ostream &goto_programt::output_instruction(
   case END_THREAD:
     out << "END THREAD" << '\n';
     break;
-
-  case INCOMPLETE_GOTO:
-    UNREACHABLE;
   }
 
   return out;
