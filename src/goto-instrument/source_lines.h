@@ -22,6 +22,7 @@ Author: Mark R. Tuttle
 
 #include <map>
 #include <set>
+#include <string>
 
 class source_locationt;
 
