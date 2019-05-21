@@ -298,7 +298,8 @@ public:
     PRECONDITION(empty() || as_const(this)->find_leaf(k) == nullptr);
 
     leaf_listt &c = get_container();
-    c.push_front(leaft(k, std::forward<valueU>(v)));
+    c.emplace_front(k, std::forward<valueU>(v));
+    SN_ASSERT(c.front().is_defined_leaf());
 
     return &c.front();
   }
