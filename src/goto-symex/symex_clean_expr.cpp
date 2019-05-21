@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/byte_operators.h>
 #include <util/c_types.h>
 #include <util/expr_iterator.h>
+#include <util/nodiscard.h>
 #include <util/pointer_offset_size.h>
 #include <util/simplify_expr.h>
 
@@ -212,10 +213,8 @@ void goto_symext::lift_lets(statet &state, exprt &rhs)
   }
 }
 
-exprt goto_symext::clean_expr(
-  exprt expr,
-  statet &state,
-  const bool write)
+NODISCARD exprt
+goto_symext::clean_expr(exprt expr, statet &state, const bool write)
 {
   replace_nondet(expr, path_storage.build_symex_nondet);
   dereference(expr, state, write);
