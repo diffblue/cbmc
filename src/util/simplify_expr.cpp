@@ -1902,7 +1902,7 @@ bool simplify_exprt::simplify_byte_extract(byte_extract_exprt &expr)
       expr.op().id() == ID_byte_update_big_endian) ||
      (expr.id() == ID_byte_extract_little_endian &&
       expr.op().id() == ID_byte_update_little_endian)) &&
-    expr.offset() == to_byte_update_expr(expr.op()).offset())
+    expr.offset() == to_byte_update_expr(as_const(expr).op()).offset())
   {
     const auto &op_byte_update = to_byte_update_expr(expr.op());
 
@@ -2057,20 +2057,22 @@ bool simplify_exprt::simplify_byte_extract(byte_extract_exprt &expr)
 
 bool simplify_exprt::simplify_byte_update(byte_update_exprt &expr)
 {
+  const byte_update_exprt &expr_const = expr;
   // byte_update(byte_update(root, offset, value), offset, value2) =>
   // byte_update(root, offset, value2)
   if(
-    expr.id() == expr.op().id() &&
-    expr.offset() == to_byte_update_expr(expr.op()).offset() &&
-    expr.value().type() == to_byte_update_expr(expr.op()).value().type())
+    expr_const.id() == expr_const.op().id() &&
+    expr_const.offset() == to_byte_update_expr(expr_const.op()).offset() &&
+    expr_const.value().type() ==
+      to_byte_update_expr(expr_const.op()).value().type())
   {
-    expr.set_op()=expr.op().op0();
+    expr.set_op(expr_const.op().op0());
     return false;
   }
 
-  const exprt &root=expr.op();
-  const exprt &offset=expr.offset();
-  const exprt &value=expr.value();
+  const exprt &root = expr_const.op();
+  const exprt &offset = expr_const.offset();
+  const exprt &value = expr_const.value();
   const auto val_size = pointer_offset_bits(value.type(), ns);
   const auto root_size = pointer_offset_bits(root.type(), ns);
 
@@ -2140,8 +2142,8 @@ bool simplify_exprt::simplify_byte_update(byte_update_exprt &expr)
             plus_exprt new_offset(offset, compo_offset);
             simplify_node(new_offset);
             exprt new_value(with.new_value());
-            expr.set_offset().swap(new_offset);
-            expr.set_value().swap(new_value);
+            expr.set_offset(std::move(new_offset));
+            expr.set_value(std::move(new_value));
             simplify_byte_update(expr); // do this recursively
             return false;
           }
@@ -2167,8 +2169,8 @@ bool simplify_exprt::simplify_byte_update(byte_update_exprt &expr)
           plus_exprt new_offset(offset, index_offset);
           simplify_node(new_offset);
           exprt new_value(with.new_value());
-          expr.set_offset().swap(new_offset);
-          expr.set_value().swap(new_value);
+          expr.set_offset(std::move(new_offset));
+          expr.set_value(std::move(new_value));
           simplify_byte_update(expr); // do this recursively
           return false;
         }
@@ -2235,7 +2237,7 @@ bool simplify_exprt::simplify_byte_update(byte_update_exprt &expr)
       }
 
       if(result_expr.is_nil())
-        result_expr=expr.op();
+        result_expr = as_const(expr).op();
 
       exprt member_name(ID_member_name);
       member_name.set(ID_component_name, component.get_name());
