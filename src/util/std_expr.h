@@ -4462,10 +4462,13 @@ inline cond_exprt &to_cond_expr(exprt &expr)
 
 /// \brief Expression to define a mapping from an argument (index) to elements.
 /// This enables constructing an array via an anonymous function.
-class lambda_exprt : public binary_exprt
+class array_comprehension_exprt : public binary_exprt
 {
 public:
-  explicit lambda_exprt(symbol_exprt arg, exprt body, array_typet _type)
+  explicit array_comprehension_exprt(
+    symbol_exprt arg,
+    exprt body,
+    array_typet _type)
     : binary_exprt(std::move(arg), ID_lambda, std::move(body), std::move(_type))
   {
   }
@@ -4502,35 +4505,38 @@ public:
 };
 
 template <>
-inline bool can_cast_expr<lambda_exprt>(const exprt &base)
+inline bool can_cast_expr<array_comprehension_exprt>(const exprt &base)
 {
   return base.id() == ID_lambda;
 }
 
-inline void validate_expr(const lambda_exprt &value)
+inline void validate_expr(const array_comprehension_exprt &value)
 {
-  validate_operands(value, 2, "'Lambda' must have two operands");
+  validate_operands(value, 2, "'Array comprehension' must have two operands");
 }
 
-/// \brief Cast an exprt to a \ref lambda_exprt
+/// \brief Cast an exprt to a \ref array_comprehension_exprt
 ///
-/// \a expr must be known to be \ref lambda_exprt.
+/// \a expr must be known to be \ref array_comprehension_exprt.
 ///
 /// \param expr: Source expression
-/// \return Object of type \ref lambda_exprt
-inline const lambda_exprt &to_lambda_expr(const exprt &expr)
+/// \return Object of type \ref array_comprehension_exprt
+inline const array_comprehension_exprt &
+to_array_comprehension_expr(const exprt &expr)
 {
   PRECONDITION(expr.id() == ID_lambda);
-  const lambda_exprt &ret = static_cast<const lambda_exprt &>(expr);
+  const array_comprehension_exprt &ret =
+    static_cast<const array_comprehension_exprt &>(expr);
   validate_expr(ret);
   return ret;
 }
 
-/// \copydoc to_lambda_expr(const exprt &)
-inline lambda_exprt &to_lambda_expr(exprt &expr)
+/// \copydoc to_array_comprehension_expr(const exprt &)
+inline array_comprehension_exprt &to_array_comprehension_expr(exprt &expr)
 {
   PRECONDITION(expr.id() == ID_lambda);
-  lambda_exprt &ret = static_cast<lambda_exprt &>(expr);
+  array_comprehension_exprt &ret =
+    static_cast<array_comprehension_exprt &>(expr);
   validate_expr(ret);
   return ret;
 }

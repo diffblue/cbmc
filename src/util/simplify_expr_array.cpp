@@ -48,12 +48,12 @@ bool simplify_exprt::simplify_index(exprt &expr)
   {
     // simplify (lambda i: e)(x) to e[i/x]
 
-    const lambda_exprt &lambda_expr = to_lambda_expr(array);
+    const auto &comprehension = to_array_comprehension_expr(array);
 
-    if(expr.op1().type() == lambda_expr.arg().type())
+    if(expr.op1().type() == comprehension.arg().type())
     {
-      exprt tmp = lambda_expr.body();
-      replace_expr(lambda_expr.arg(), expr.op1(), tmp);
+      exprt tmp = comprehension.body();
+      replace_expr(comprehension.arg(), expr.op1(), tmp);
       expr.swap(tmp);
       simplify_rec(expr);
       return false;
