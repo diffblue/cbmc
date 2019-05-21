@@ -59,7 +59,7 @@ Author: Daniel Poetzl
 #define SN_TYPE_ARGS keyT, valueT, equalT
 
 #define SN_PTR_TYPE_ARGS \
-  d_internalt<SN_TYPE_ARGS>, d_containert<SN_TYPE_ARGS>, d_leaft<SN_TYPE_ARGS>
+  d_containert<SN_TYPE_ARGS>, d_leaft<SN_TYPE_ARGS>, d_internalt<SN_TYPE_ARGS>
 // clang-format on
 
 typedef small_shared_n_way_pointee_baset<3, unsigned> d_baset;
@@ -132,10 +132,10 @@ public:
 
 #if SN_SHARE_KEYS == 1
     SN_ASSERT(d.k == nullptr);
-    data = make_shared_3<2, SN_PTR_TYPE_ARGS>(
+    data = make_shared_3<1, SN_PTR_TYPE_ARGS>(
       std::make_shared<keyT>(k), std::forward<valueU>(v));
 #else
-    data = make_shared_3<2, SN_PTR_TYPE_ARGS>(k, std::forward<valueU>(v));
+    data = make_shared_3<1, SN_PTR_TYPE_ARGS>(k, std::forward<valueU>(v));
 #endif
   }
 
@@ -174,17 +174,17 @@ public:
 
   bool is_internal() const
   {
-    return data.template is_derived<0>();
+    return data.template is_derived<2>();
   }
 
   bool is_container() const
   {
-    return data.template is_derived<1>();
+    return data.template is_derived<0>();
   }
 
   bool is_leaf() const
   {
-    return data.template is_derived<2>();
+    return data.template is_derived<1>();
   }
 
   bool is_defined_internal() const
@@ -206,21 +206,21 @@ public:
   {
     SN_ASSERT(!empty());
 
-    return *data.template get_derived<0>();
+    return *data.template get_derived<2>();
   }
 
   const d_ct &read_container() const
   {
     SN_ASSERT(!empty());
 
-    return *data.template get_derived<1>();
+    return *data.template get_derived<0>();
   }
 
   const d_lt &read_leaf() const
   {
     SN_ASSERT(!empty());
 
-    return *data.template get_derived<2>();
+    return *data.template get_derived<1>();
   }
 
   // Accessors
@@ -395,7 +395,7 @@ public:
   {
     SN_ASSERT(!data);
 
-    data = make_shared_3<2, SN_PTR_TYPE_ARGS>(k, std::forward<valueU>(v));
+    data = make_shared_3<1, SN_PTR_TYPE_ARGS>(k, std::forward<valueU>(v));
   }
 
   template <class valueU>
@@ -406,11 +406,11 @@ public:
     if(data.use_count() > 1)
     {
       data =
-        make_shared_3<2, SN_PTR_TYPE_ARGS>(get_key(), std::forward<valueU>(v));
+        make_shared_3<1, SN_PTR_TYPE_ARGS>(get_key(), std::forward<valueU>(v));
     }
     else
     {
-      data.template get_derived<2>()->v = std::forward<valueU>(v);
+      data.template get_derived<1>()->v = std::forward<valueU>(v);
     }
 
     SN_ASSERT(data.use_count() == 1);
@@ -422,10 +422,10 @@ public:
 
     if(data.use_count() > 1)
     {
-      data = make_shared_3<2, SN_PTR_TYPE_ARGS>(read_leaf());
+      data = make_shared_3<1, SN_PTR_TYPE_ARGS>(read_leaf());
     }
 
-    mutator(data.template get_derived<2>()->v);
+    mutator(data.template get_derived<1>()->v);
 
     SN_ASSERT(data.use_count() == 1);
   }
@@ -437,16 +437,16 @@ protected:
 
     if(!data)
     {
-      data = make_shared_3<0, SN_PTR_TYPE_ARGS>();
+      data = make_shared_3<2, SN_PTR_TYPE_ARGS>();
     }
     else if(data.use_count() > 1)
     {
-      data = make_shared_3<0, SN_PTR_TYPE_ARGS>(read_internal());
+      data = make_shared_3<2, SN_PTR_TYPE_ARGS>(read_internal());
     }
 
     SN_ASSERT(data.use_count() == 1);
 
-    return *data.template get_derived<0>();
+    return *data.template get_derived<2>();
   }
 
   d_ct &write_container()
@@ -455,16 +455,16 @@ protected:
 
     if(!data)
     {
-      data = make_shared_3<1, SN_PTR_TYPE_ARGS>();
+      data = make_shared_3<0, SN_PTR_TYPE_ARGS>();
     }
     else if(data.use_count() > 1)
     {
-      data = make_shared_3<1, SN_PTR_TYPE_ARGS>(read_container());
+      data = make_shared_3<0, SN_PTR_TYPE_ARGS>(read_container());
     }
 
     SN_ASSERT(data.use_count() == 1);
 
-    return *data.template get_derived<1>();
+    return *data.template get_derived<0>();
   }
 
   datat data;
