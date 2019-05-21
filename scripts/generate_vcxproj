@@ -16,6 +16,9 @@ function doit {
   for dir in $dirs ; do
     sources="`(cd $dest/src/$dir; make sources)`"
     for s in $sources ; do
+      if [ "$s" = "goto_instrument_main.cpp" ] && [ "$1" != "goto-instrument" ] ; then
+        continue
+      fi
       echo "    <ClCompile Include=\"src\\${dir}\\${s}\"/>" >> $dest/$1.vcxproj
     done
   done
@@ -50,11 +53,11 @@ function doit {
   echo "</Project>" >> $dest/$1.vcxproj.filters
 }
 
-dirs="big-int langapi util ansi-c assembler cpp java_bytecode xmllang solvers goto-symex analyses pointer-analysis goto-programs linking cbmc"
+dirs="big-int langapi util ansi-c assembler cpp json json-symtab-language xmllang solvers goto-symex analyses pointer-analysis goto-programs linking goto-checker goto-instrument cbmc"
 doit cbmc
 
-dirs="big-int langapi util ansi-c assembler cpp java_bytecode xmllang solvers goto-symex analyses pointer-analysis goto-programs linking jsil goto-cc"
+dirs="big-int langapi util ansi-c assembler cpp json xmllang goto-programs linking goto-cc"
 doit goto-cc
 
-dirs="big-int langapi util ansi-c assembler cpp java_bytecode xmllang solvers goto-symex analyses pointer-analysis goto-programs linking goto-instrument"
+dirs="big-int langapi util ansi-c assembler cpp json xmllang solvers goto-symex analyses pointer-analysis goto-programs linking goto-instrument"
 doit goto-instrument
