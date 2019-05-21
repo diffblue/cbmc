@@ -89,26 +89,22 @@ void goto_symext::symex_other(
   else if(statement==ID_cpp_delete ||
           statement=="cpp_delete[]")
   {
-    codet clean_code=code;
-    clean_expr(clean_code, state, false);
+    const codet clean_code = to_code(clean_expr(code, state, false));
     symex_cpp_delete(state, clean_code);
   }
   else if(statement==ID_printf)
   {
-    codet clean_code=code;
-    clean_expr(clean_code, state, false);
+    const codet clean_code = to_code(clean_expr(code, state, false));
     symex_printf(state, clean_code);
   }
   else if(statement==ID_input)
   {
-    codet clean_code(code);
-    clean_expr(clean_code, state, false);
+    const codet clean_code = to_code(clean_expr(code, state, false));
     symex_input(state, clean_code);
   }
   else if(statement==ID_output)
   {
-    codet clean_code(code);
-    clean_expr(clean_code, state, false);
+    const codet clean_code = to_code(clean_expr(code, state, false));
     symex_output(state, clean_code);
   }
   else if(statement==ID_decl)
@@ -138,10 +134,8 @@ void goto_symext::symex_other(
       "expected array_copy/array_replace statement to have two operands");
 
     // we need to add dereferencing for both operands
-    exprt dest_array(code.op0());
-    clean_expr(dest_array, state, false);
-    exprt src_array(code.op1());
-    clean_expr(src_array, state, false);
+    exprt dest_array = clean_expr(code.op0(), state, false);
+    exprt src_array = clean_expr(code.op1(), state, false);
 
     // obtain the actual arrays
     process_array_expr(state, dest_array);
@@ -190,15 +184,13 @@ void goto_symext::symex_other(
       "expected array_set statement to have two operands");
 
     // we need to add dereferencing for the first operand
-    exprt array_expr(code.op0());
-    clean_expr(array_expr, state, false);
+    exprt array_expr = clean_expr(code.op0(), state, false);
 
     // obtain the actual array(s)
     process_array_expr(state, array_expr);
 
     // prepare to build the array_of
-    exprt value = code.op1();
-    clean_expr(value, state, false);
+    exprt value = clean_expr(code.op1(), state, false);
 
     // we might have a memset-style update of a non-array type - convert to a
     // byte array
@@ -237,10 +229,8 @@ void goto_symext::symex_other(
       "expected array_equal statement to have three operands");
 
     // we need to add dereferencing for the first two
-    exprt array1(code.op0());
-    clean_expr(array1, state, false);
-    exprt array2(code.op1());
-    clean_expr(array2, state, false);
+    exprt array1 = clean_expr(code.op0(), state, false);
+    exprt array2 = clean_expr(code.op1(), state, false);
 
     // obtain the actual arrays
     process_array_expr(state, array1);
@@ -270,8 +260,7 @@ void goto_symext::symex_other(
       code.operands().size() == 1,
       "expected havoc_object statement to have one operand");
 
-    exprt object(code.op0());
-    clean_expr(object, state, false);
+    exprt object = clean_expr(code.op0(), state, false);
 
     process_array_expr(state, object);
     havoc_rec(state, guardt(true_exprt(), guard_manager), object);

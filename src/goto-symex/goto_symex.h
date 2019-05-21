@@ -305,7 +305,7 @@ protected:
   /// \param expr: The expression to clean up
   /// \param state
   /// \param write
-  void clean_expr(exprt &expr, statet &state, bool write);
+  exprt clean_expr(exprt expr, statet &state, bool write);
 
   void trigger_auto_object(const exprt &, statet &);
   void initialize_auto_object(const exprt &, statet &);
