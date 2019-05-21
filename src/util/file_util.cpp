@@ -50,7 +50,7 @@ Date: January 2012
 /// \return current working directory
 std::string get_current_working_directory()
 {
-  #ifndef _WIN32
+#ifndef _WIN32
   errno=0;
   char *wd=realpath(".", nullptr);
 
@@ -60,13 +60,19 @@ std::string get_current_working_directory()
 
   std::string working_directory=wd;
   free(wd);
-  #else
-  char buffer[4096];
+#else
+  TCHAR buffer[4096];
   DWORD retval=GetCurrentDirectory(4096, buffer);
   if(retval == 0)
     throw system_exceptiont("failed to get current directory of process");
+
+#  ifdef UNICODE
+  std::string working_directory(narrow(buffer));
+#  else
   std::string working_directory(buffer);
-  #endif
+#  endif
+
+#endif
 
   return working_directory;
 }
