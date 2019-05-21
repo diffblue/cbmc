@@ -4462,6 +4462,14 @@ inline cond_exprt &to_cond_expr(exprt &expr)
 
 /// \brief Expression to define a mapping from an argument (index) to elements.
 /// This enables constructing an array via an anonymous function.
+/// Not all kinds of array comprehension can be expressed, only those of the
+/// form `[f(x) | x in {0, 1, ... array_size-1}]`.
+/// The LHS and RHS are the argument (`x`) and body (`f(x)`) of the anonymous
+/// function, respectively. The range is given by the type of the expression,
+/// which has to be an \ref array_typet (which includes a value for
+/// `array_size`).
+/// For legacy reasons, the ID of an array_comprehension_exprt is ID_lambda,
+/// even though it cannot be used to represent arbitrary lambda functions.
 class array_comprehension_exprt : public binary_exprt
 {
 public:
