@@ -976,9 +976,8 @@ void value_sett::get_value_set_rec(
   }
   else
   {
-    #if 0
-    std::cout << "WARNING: not doing " << expr.id() << '\n';
-    #endif
+    // for example: expr.id() == ID_nondet_symbol
+    insert(dest, exprt(ID_unknown, original_type));
   }
 
   #ifdef DEBUG
