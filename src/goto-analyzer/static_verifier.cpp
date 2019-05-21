@@ -66,7 +66,7 @@ static void static_verifier_xml(
 {
   m.status() << "Writing XML report" << messaget::eom;
 
-  xmlt xml_result;
+  xmlt xml_result{"cprover"};
 
   for(const auto &result : results)
   {

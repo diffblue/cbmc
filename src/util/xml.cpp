@@ -34,8 +34,7 @@ void xmlt::output(std::ostream &out, unsigned indent) const
   // 'name' needs to be set, or we produce mal-formed
   // XML.
 
-  if(name.empty())
-    return;
+  PRECONDITION(!name.empty());
 
   do_indent(out, indent);
 
