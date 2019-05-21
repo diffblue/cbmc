@@ -150,6 +150,7 @@ class optionst;
   "(show-on-source)" \
   "(location-sensitive)(concurrent)" \
   "(no-simplify-slicing)" \
+  "(xml-ui)"              \
   OPT_VALIDATE \
 // clang-format on
 

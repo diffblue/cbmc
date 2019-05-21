@@ -747,6 +747,7 @@ void goto_analyzer_parse_optionst::help()
     " --dependence-graph           data and control dependencies between instructions\n" // NOLINT(*)
     "\n"
     "Output options:\n"
+    " --xml-ui                     output results as XML\n"
     " --text file_name             output results in plain text to given file\n"
     // NOLINTNEXTLINE(whitespace/line_length)
     " --json file_name             output results in JSON format to given file\n"

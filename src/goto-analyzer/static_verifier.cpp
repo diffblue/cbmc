@@ -17,6 +17,7 @@ Author: Martin Brain, martin.brain@cs.ox.ac.uk
 #include <goto-programs/goto_model.h>
 
 #include <analyses/ai.h>
+#include <util/ui_message.h>
 
 struct static_verifier_resultt
 {
@@ -156,67 +157,104 @@ static void static_verifier_console(
 {
   irep_idt last_function_id;
   irep_idt function_file;
-
-  for(const auto &result : results)
-  {
-    if(last_function_id != result.function_id)
-    {
-      if(!last_function_id.empty())
-        m.status() << '\n';
-      last_function_id = result.function_id;
-      const auto &symbol = ns.lookup(last_function_id);
-      m.status() << messaget::underline << "Function " << symbol.display_name();
-      function_file = symbol.location.get_file();
-      if(!function_file.empty())
-        m.status() << ' ' << function_file;
-      if(!symbol.location.get_line().empty())
-        m.status() << ':' << symbol.location.get_line();
-      m.status() << messaget::reset << messaget::eom;
-    }
-
-    m.result() << messaget::faint << '['
-               << result.source_location.get_property_id() << ']'
-               << messaget::reset;
-
-    if(
-      !result.source_location.get_file().empty() &&
-      result.source_location.get_file() != function_file)
-    {
-      m.result() << " file " << result.source_location.get_file();
-    }
-
-    if(!result.source_location.get_line().empty())
-      m.result() << " line " << result.source_location.get_line();
-
-    if(!result.source_location.get_comment().empty())
-      m.result() << ' ' << result.source_location.get_comment();
-
-    m.result() << ": ";
-
-    switch(result.status)
+  ui_message_handlert *ui_message_handler =
+    dynamic_cast<ui_message_handlert *>(&m.get_message_handler());
+  auto const status_to_string =
+    [](static_verifier_resultt::statust status) -> std::string {
+    switch(status)
     {
     case static_verifier_resultt::TRUE:
-      m.result() << m.green << "SUCCESS" << m.reset;
-      break;
-
+      return "SUCCESS";
     case static_verifier_resultt::FALSE:
-      m.result() << m.red << "FAILURE" << m.reset << " (if reachable)";
-      break;
-
+      return "FAILURE";
     case static_verifier_resultt::BOTTOM:
-      m.result() << m.green << "SUCCESS" << m.reset << " (unreachable)";
-      break;
-
+      return "SUCCESS";
     case static_verifier_resultt::UNKNOWN:
-      m.result() << m.yellow << "UNKNOWN" << m.reset;
-      break;
+      return "UNKNOWN";
+    default:
+      INVARIANT(false, "result is one of TRUE, FALSE, BOTTOM or UNKNOWN");
+      return "";
+    }
+  };
+  if(
+    ui_message_handler != nullptr &&
+    ui_message_handler->get_ui() == ui_message_handlert::uit::XML_UI)
+  {
+    for(const auto &result : results)
+    {
+      xmlt xml_result{
+        "result",
+        xmlt::attributest{
+          {"property", id2string(result.source_location.get_property_id())},
+          {"status", status_to_string(result.status)}},
+        {}};
+      m.result() << xml_result;
+    }
+  }
+  else
+  {
+    for(const auto &result : results)
+    {
+      if(last_function_id != result.function_id)
+      {
+        if(!last_function_id.empty())
+          m.status() << '\n';
+        last_function_id = result.function_id;
+        const auto &symbol = ns.lookup(last_function_id);
+        m.status() << messaget::underline << "Function "
+                   << symbol.display_name();
+        function_file = symbol.location.get_file();
+        if(!function_file.empty())
+          m.status() << ' ' << function_file;
+        if(!symbol.location.get_line().empty())
+          m.status() << ':' << symbol.location.get_line();
+        m.status() << messaget::reset << messaget::eom;
+      }
+
+      m.result() << messaget::faint << '['
+                 << result.source_location.get_property_id() << ']'
+                 << messaget::reset;
+
+      if(
+        !result.source_location.get_file().empty() &&
+        result.source_location.get_file() != function_file)
+      {
+        m.result() << " file " << result.source_location.get_file();
+      }
+
+      if(!result.source_location.get_line().empty())
+        m.result() << " line " << result.source_location.get_line();
+
+      if(!result.source_location.get_comment().empty())
+        m.result() << ' ' << result.source_location.get_comment();
+
+      m.result() << ": ";
+
+      switch(result.status)
+      {
+      case static_verifier_resultt::TRUE:
+        m.result() << m.green << "SUCCESS" << m.reset;
+        break;
+
+      case static_verifier_resultt::FALSE:
+        m.result() << m.red << "FAILURE" << m.reset << " (if reachable)";
+        break;
+
+      case static_verifier_resultt::BOTTOM:
+        m.result() << m.green << "SUCCESS" << m.reset << " (unreachable)";
+        break;
+
+      case static_verifier_resultt::UNKNOWN:
+        m.result() << m.yellow << "UNKNOWN" << m.reset;
+        break;
+      }
+
+      m.result() << messaget::eom;
     }
 
-    m.result() << messaget::eom;
+    if(!results.empty())
+      m.result() << '\n';
   }
-
-  if(!results.empty())
-    m.result() << '\n';
 }
 
 /// Runs the analyzer and then prints out the domain
