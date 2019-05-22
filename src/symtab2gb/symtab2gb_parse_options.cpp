@@ -16,10 +16,12 @@ Author: Diffblue Ltd.
 
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/goto_model.h>
-#include <goto-programs/link_goto_model.h>
 #include <goto-programs/write_goto_binary.h>
+
 #include <json-symtab-language/json_symtab_language.h>
 #include <langapi/mode.h>
+
+#include <linking/linking.h>
 
 #include <util/config.h>
 #include <util/exception_utils.h>
@@ -67,7 +69,7 @@ static void run_symtab2gb(
   auto const symtab_language = new_json_symtab_language();
   symtab_language->set_message_handler(message_handler);
 
-  goto_modelt linked_goto_model{};
+  symbol_tablet linked_symbol_table;
 
   for(std::size_t ix = 0; ix < symtab_files.size(); ++ix)
   {
@@ -85,11 +87,18 @@ static void run_symtab2gb(
         "failed to typecheck symbol table from file '" + symtab_filename + "'"};
     }
     config.set_from_symbol_table(symtab);
-    goto_modelt goto_model{};
-    goto_model.symbol_table = symtab;
-    goto_convert(goto_model, message_handler);
-    link_goto_model(linked_goto_model, goto_model, message_handler);
+
+    if(failed(linking(linked_symbol_table, symtab, message_handler)))
+    {
+      throw invalid_source_file_exceptiont{"failed to link `" +
+                                           symtab_filename + "'"};
+    }
   }
+
+  goto_modelt linked_goto_model;
+  linked_goto_model.symbol_table.swap(linked_symbol_table);
+  goto_convert(linked_goto_model, message_handler);
+
   if(failed(write_goto_binary(out_file, linked_goto_model)))
   {
     throw system_exceptiont{"failed to write goto binary to " + gb_filename};
