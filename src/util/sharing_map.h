@@ -106,12 +106,7 @@ Author: Daniel Poetzl
 // clang-format on
 
 /// A map implemented as a tree where subtrees can be shared between different
-/// maps.
-///
-/// The map is implemented as a fixed-height n-ary trie. The height H and the
-/// maximum number of children per inner node S are determined by the two
-/// configuration parameters `bits` and `chunks` in sharing_map.h. It holds
-/// that H = `bits` / `chunks` and S = 2 ^ `chunks`.
+/// maps. The map is implemented as a variable-height n-ary trie.
 ///
 /// When inserting a key-value pair into the map, first the hash of its key is
 /// computed. The `bits` number of lower order bits of the hash are deemed
@@ -122,16 +117,21 @@ Author: Daniel Poetzl
 /// different keys yield the same "string"), are handled by chaining the
 /// corresponding key-value pairs in a `std::forward_list`.
 ///
+/// The depth at which a key-value pair will be stored (when calling insert())
+/// depends on the shortest unique prefix of its hash code (treated as a string)
+/// with respect to the hash codes of the key-value pairs already in the map.
+///
 /// The use of a trie in combination with hashing has the advantage that the
 /// tree is unlikely to degenerate (if the number of hash collisions is low).
 /// This makes re-balancing operations unnecessary which do not interact well
 /// with sharing. A disadvantage is that the height of the tree is likely
-/// greater than if the elements had been stored in a balanced tree (with
-/// greater differences for sparser maps).
+/// greater than if the elements had been stored in a balanced tree.
 ///
-/// The nodes in the sharing map are objects of type sharing_nodet. Each sharing
-/// node has a `shared_ptr` to an object of type `dt` which can be shared
-/// between nodes.
+/// The nodes in the sharing map are objects of type sharing_nodet. A sharing
+/// node has a shared pointer (of type small_shared_n_way_ptrt) which can point
+/// to objects of type d_internalt, d_leaft, or d_containert (representing
+/// internal nodes, leaf nodes, and container nodes, the latter being used for
+/// chaining leafs in a linked list on hash collisions).
 ///
 /// Sharing is initially generated when a map is assigned to another map or
 /// copied via the copy constructor. Then both maps contain a pointer to the
@@ -139,7 +139,7 @@ Author: Daniel Poetzl
 /// to one of the maps, nodes are copied and sharing is lessened as described in
 /// the following.
 ///
-/// The replace(), insert(), update() and erase() operations interact with
+/// The replace(), update(), insert(), and erase() operations interact with
 /// sharing as follows:
 /// - When a key-value pair is inserted into the map (or a value of an existing
 /// pair is replaced or updated) and its position is in a shared subtree,
@@ -151,7 +151,7 @@ Author: Daniel Poetzl
 /// the path to the erased element after the element has been removed are
 /// copied and integrated with the map, and the remaining nodes are removed.
 ///
-/// The replace() and update() operations are the only method where sharing
+/// The replace() and update() operations are the only methods where sharing
 /// could unnecessarily  be broken. This would happen when replacing an old
 /// value with a new equal value, or calling update but making no change. The
 /// sharing map provides a debug mode to detect such cases. When the template
@@ -165,7 +165,7 @@ Author: Daniel Poetzl
 /// complexity of the operations. We use the following symbols:
 /// - N: number of key-value pairs in the map
 /// - M: maximum number of key-value pairs that are chained in a leaf node
-/// - H: height of the tree
+/// - H: maximum height of the tree
 /// - S: maximum number of children per internal node
 ///
 /// The first two symbols denote dynamic properties of a given map, whereas the
