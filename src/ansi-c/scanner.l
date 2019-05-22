@@ -402,11 +402,14 @@ void ansi_c_scanner_init()
 
                 /* CProver specific pragmas: hint to disable named checks */
 <CPROVER_PRAGMA>{ws}"check"{ws}"push" {
-                  PARSER.pragma_cprover.push_back(irep_idt{});
+                  PARSER.pragma_cprover.push_back({});
                 }
 <CPROVER_PRAGMA>{ws}"check"{ws}"pop" {
                   if(!PARSER.pragma_cprover.empty())
+                  {
                     PARSER.pragma_cprover.pop_back();
+                    PARSER.set_pragma_cprover();
+                  }
                 }
 <CPROVER_PRAGMA>{ws}"check"{ws}"disable"{ws}{named_check} {
                   std::string tmp(yytext);
@@ -416,16 +419,10 @@ void ansi_c_scanner_init()
                     std::string(tmp, p, tmp.size() - p - 1) +
                     std::string("-check");
                   if(PARSER.pragma_cprover.empty())
-                    PARSER.pragma_cprover.push_back(value);
+                    PARSER.pragma_cprover.push_back({value});
                   else
-                  {
-                    if(!PARSER.pragma_cprover.back().empty())
-                    {
-                      value =
-                        id2string(PARSER.pragma_cprover.back()) + "," + value;
-                    }
-                    PARSER.pragma_cprover.back() = value;
-                  }
+                    PARSER.pragma_cprover.back().insert(value);
+                  PARSER.set_pragma_cprover();
                 }
 
 <CPROVER_PRAGMA>. {

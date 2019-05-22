@@ -29,7 +29,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
 #include <util/std_types.h>
-#include <util/string_utils.h>
 
 #include <langapi/language.h>
 #include <langapi/mode.h>
@@ -1805,35 +1804,31 @@ void goto_checkt::goto_check(
     goto_programt::instructiont &i=*it;
 
     flag_resett flag_resetter;
-    if(!i.source_location.get_comment().empty())
+    const auto &pragmas = i.source_location.get_pragmas();
+    for(const auto &d : pragmas)
     {
-      auto disabled_checks = split_string(
-        id2string(i.source_location.get_comment()), ',', true, true);
-      for(const auto &d : disabled_checks)
-      {
-        if(d == "disable:bounds-check")
-          flag_resetter.set_flag(enable_bounds_check, false);
-        else if(d == "disable:pointer-check")
-          flag_resetter.set_flag(enable_pointer_check, false);
-        else if(d == "disable:memory-leak-check")
-          flag_resetter.set_flag(enable_memory_leak_check, false);
-        else if(d == "disable:div-by-zero-check")
-          flag_resetter.set_flag(enable_div_by_zero_check, false);
-        else if(d == "disable:signed-overflow-check")
-          flag_resetter.set_flag(enable_signed_overflow_check, false);
-        else if(d == "disable:unsigned-overflow-check")
-          flag_resetter.set_flag(enable_unsigned_overflow_check, false);
-        else if(d == "disable:pointer-overflow-check")
-          flag_resetter.set_flag(enable_pointer_overflow_check, false);
-        else if(d == "disable:float-overflow-check")
-          flag_resetter.set_flag(enable_float_overflow_check, false);
-        else if(d == "disable:conversion-check")
-          flag_resetter.set_flag(enable_conversion_check, false);
-        else if(d == "disable:undefined-shift-check")
-          flag_resetter.set_flag(enable_undefined_shift_check, false);
-        else if(d == "disable:nan-check")
-          flag_resetter.set_flag(enable_nan_check, false);
-      }
+      if(d.first == "disable:bounds-check")
+        flag_resetter.set_flag(enable_bounds_check, false);
+      else if(d.first == "disable:pointer-check")
+        flag_resetter.set_flag(enable_pointer_check, false);
+      else if(d.first == "disable:memory-leak-check")
+        flag_resetter.set_flag(enable_memory_leak_check, false);
+      else if(d.first == "disable:div-by-zero-check")
+        flag_resetter.set_flag(enable_div_by_zero_check, false);
+      else if(d.first == "disable:signed-overflow-check")
+        flag_resetter.set_flag(enable_signed_overflow_check, false);
+      else if(d.first == "disable:unsigned-overflow-check")
+        flag_resetter.set_flag(enable_unsigned_overflow_check, false);
+      else if(d.first == "disable:pointer-overflow-check")
+        flag_resetter.set_flag(enable_pointer_overflow_check, false);
+      else if(d.first == "disable:float-overflow-check")
+        flag_resetter.set_flag(enable_float_overflow_check, false);
+      else if(d.first == "disable:conversion-check")
+        flag_resetter.set_flag(enable_conversion_check, false);
+      else if(d.first == "disable:undefined-shift-check")
+        flag_resetter.set_flag(enable_undefined_shift_check, false);
+      else if(d.first == "disable:nan-check")
+        flag_resetter.set_flag(enable_nan_check, false);
     }
 
     new_code.clear();

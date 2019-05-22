@@ -5,12 +5,12 @@ int foo(int x)
 
 int main()
 {
-  int n;
+  int m, n;
 
 #pragma CPROVER check push
 #pragma CPROVER check disable "signed-overflow"
   // do not generate assertions for the following statements
-  int x = n + n;
+  int x = m = n + n;
   ++n;
   n++;
   n += 1;

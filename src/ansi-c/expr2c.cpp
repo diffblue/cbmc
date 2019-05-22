@@ -27,6 +27,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_predicates.h>
 #include <util/prefix.h>
 #include <util/string_constant.h>
+#include <util/string_utils.h>
 #include <util/suffix.h>
 #include <util/symbol.h>
 
@@ -2796,11 +2797,31 @@ std::string expr2ct::convert_code(
 {
   static bool comment_done=false;
 
-  if(!comment_done && !src.source_location().get_comment().empty())
+  if(
+    !comment_done && (!src.source_location().get_comment().empty() ||
+                      !src.source_location().get_pragmas().empty()))
   {
     comment_done=true;
-    std::string dest=indent_str(indent);
-    dest+="/* "+id2string(src.source_location().get_comment())+" */\n";
+    std::string dest;
+    if(!src.source_location().get_comment().empty())
+    {
+      dest += indent_str(indent);
+      dest += "/* " + id2string(src.source_location().get_comment()) + " */\n";
+    }
+    if(!src.source_location().get_pragmas().empty())
+    {
+      std::ostringstream oss;
+      oss << indent_str(indent) << "/* ";
+      const auto &pragmas = src.source_location().get_pragmas();
+      join_strings(
+        oss,
+        pragmas.begin(),
+        pragmas.end(),
+        ',',
+        [](const std::pair<irep_idt, irept> &p) { return p.first; });
+      oss << " */\n";
+      dest += oss.str();
+    }
     dest+=convert_code(src, indent);
     comment_done=false;
     return dest;

@@ -2019,10 +2019,6 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
     throw 0;
   }
 
-  irep_idt comment = expr.source_location().get_comment();
-  if(!comment.empty() && f_op.source_location().get_comment().empty())
-    f_op.add_source_location().set_comment(comment);
-
   const code_typet &code_type=to_code_type(f_op.type());
 
   expr.type()=code_type.return_type();

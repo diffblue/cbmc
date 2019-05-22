@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_ANSI_C_ANSI_C_PARSER_H
 
 #include <cassert>
+#include <set>
 
 #include <util/parser.h>
 #include <util/expr.h>
@@ -69,7 +70,7 @@ public:
   unsigned parenthesis_counter;
   std::string string_literal;
   std::list<exprt> pragma_pack;
-  std::list<irep_idt> pragma_cprover;
+  std::list<std::set<irep_idt>> pragma_cprover;
 
   typedef configt::ansi_ct::flavourt modet;
   modet mode;
@@ -144,6 +145,16 @@ public:
     irep_idt identifier;
     lookup(base_name, identifier, false, true);
     return identifier;
+  }
+
+  void set_pragma_cprover()
+  {
+    source_location.remove(ID_pragma);
+    for(const auto &pragma_set : pragma_cprover)
+    {
+      for(const auto &pragma : pragma_set)
+        source_location.add_pragma(pragma);
+    }
   }
 };
 

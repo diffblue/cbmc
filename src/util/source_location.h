@@ -192,6 +192,16 @@ public:
 
   optionalt<std::string> full_path() const;
 
+  void add_pragma(const irep_idt &pragma)
+  {
+    add(ID_pragma).add(pragma);
+  }
+
+  const irept::named_subt &get_pragmas() const
+  {
+    return find(ID_pragma).get_named_sub();
+  }
+
 protected:
   std::string as_string(bool print_cwd) const;
 };
