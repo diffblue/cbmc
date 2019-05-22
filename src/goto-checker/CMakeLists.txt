@@ -3,4 +3,4 @@ add_library(goto-checker ${sources})
 
 generic_includes(goto-checker)
 
-target_link_libraries(goto-checker goto-programs goto-symex solvers util)
+target_link_libraries(goto-checker goto-programs goto-symex solvers util xml goto-instrument-lib)
