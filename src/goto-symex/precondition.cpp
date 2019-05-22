@@ -112,9 +112,8 @@ void preconditiont::compute_rec(exprt &dest)
 
     // aliasing may happen here
 
-    value_setst::valuest expr_set;
-    value_sets.get_values(
-      SSA_step.source.function_id, target, deref_expr.pointer(), expr_set);
+    value_setst::valuest expr_set = value_sets.get_values(
+      SSA_step.source.function_id, target, deref_expr.pointer());
     std::unordered_set<irep_idt> symbols;
 
     for(value_setst::valuest::const_iterator

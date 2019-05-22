@@ -147,6 +147,16 @@ void goto_program_dereferencet::get_value_set(
   value_sets.get_values(current_function, current_target, expr, dest);
 }
 
+/// Gets the value set corresponding to the current target and
+/// expression \p expr.
+/// \param expr: an expression
+/// \return the value set
+std::list<exprt>
+goto_program_dereferencet::get_value_set(const exprt &expr) const
+{
+  return value_sets.get_values(current_function, current_target, expr);
+}
+
 /// Remove dereference expressions contained in `expr`.
 /// \param expr: an expression
 /// \param checks_only: when true, execute the substitution on a copy of expr

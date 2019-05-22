@@ -58,6 +58,7 @@ protected:
 
 public:
   // interface value_sets
+  DEPRECATED(SINCE(2019, 05, 22, "Use the version returning list instead"))
   void get_values(
     const irep_idt &function_id,
     locationt l,
@@ -72,6 +73,11 @@ public:
     state.value_set.to_target_index = l->location_number;
     state.value_set.get_value_set(expr, dest, ns);
   }
+
+  std::list<exprt> get_values(
+    const irep_idt &function_id,
+    locationt l,
+    const exprt &expr) override;
 };
 
 #endif // CPROVER_POINTER_ANALYSIS_VALUE_SET_ANALYSIS_FI_H

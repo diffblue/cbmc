@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "value_set_fi.h"
 
 #include <cassert>
+#include <iterator>
 #include <ostream>
 
 #include <util/symbol_table.h>
@@ -297,6 +298,12 @@ void value_set_fit::get_value_set(
   std::list<exprt> &value_set,
   const namespacet &ns) const
 {
+  value_set = get_value_set(expr, ns);
+}
+
+std::list<exprt>
+value_set_fit::get_value_set(const exprt &expr, const namespacet &ns) const
+{
   object_mapt object_map;
   get_value_set(expr, object_map, ns);
 
@@ -336,21 +343,24 @@ void value_set_fit::get_value_set(
       flat_map.write()[it->first]=it->second;
   }
 
+  std::list<exprt> result;
   forall_objects(fit, flat_map.read())
-    value_set.push_back(to_expr(*fit));
+    result.push_back(to_expr(*fit));
 
-  #if 0
+#if 0
   // Sanity check!
   for(std::list<exprt>::const_iterator it=value_set.begin();
       it!=value_set.end();
       it++)
     assert(it->type().id()!="#REF");
-  #endif
+#endif
 
-  #if 0
+#if 0
   for(expr_sett::const_iterator it=value_set.begin(); it!=value_set.end(); it++)
     std::cout << "GET_VALUE_SET: " << format(*it) << '\n';
-  #endif
+#endif
+
+  return result;
 }
 
 void value_set_fit::get_value_set(
