@@ -14,7 +14,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "invariant.h"
 
-template<typename T>
+/// \tparam empty: pointer to empty data, if unspecified use a reference to
+///   T::blank
+template <typename T, const T &empty = T::blank>
 // NOLINTNEXTLINE(readability/identifiers)
 class reference_counting
 {
@@ -67,7 +69,7 @@ public:
   const T &read() const
   {
     if(d==nullptr)
-      return T::blank;
+      return empty;
     return *d;
   }
 
@@ -115,8 +117,8 @@ public:
   }
 };
 
-template<class T>
-void reference_counting<T>::remove_ref(dt *old_d)
+template <class T, const T &empty>
+void reference_counting<T, empty>::remove_ref(dt *old_d)
 {
   if(old_d==nullptr)
     return;
@@ -144,8 +146,8 @@ void reference_counting<T>::remove_ref(dt *old_d)
   }
 }
 
-template<class T>
-void reference_counting<T>::detach()
+template <class T, const T &empty>
+void reference_counting<T, empty>::detach()
 {
   #ifdef REFERENCE_COUNTING_DEBUG
   std::cout << "DETACH1: " << d << '\n';
@@ -179,20 +181,20 @@ void reference_counting<T>::detach()
   #endif
 }
 
-template<class T>
+template <class T, const T &empty>
 bool operator==(
-  const reference_counting<T> &o1,
-  const reference_counting<T> &o2)
+  const reference_counting<T, empty> &o1,
+  const reference_counting<T, empty> &o2)
 {
   if(o1.get_d()==o2.get_d())
     return true;
   return o1.read()==o2.read();
 }
 
-template<class T>
+template <class T, const T &empty>
 inline bool operator!=(
-  const reference_counting<T> &i1,
-  const reference_counting<T> &i2)
+  const reference_counting<T, empty> &i1,
+  const reference_counting<T, empty> &i2)
 { return !(i1==i2); }
 
 #endif // CPROVER_UTIL_REFERENCE_COUNTING_H
