@@ -30,7 +30,6 @@ SRC = add_malloc_may_fail_variable_initializations.cpp \
       json_expr.cpp \
       json_goto_trace.cpp \
       label_function_pointer_call_sites.cpp \
-      link_goto_model.cpp \
       link_to_library.cpp \
       loop_ids.cpp \
       mm_io.cpp \

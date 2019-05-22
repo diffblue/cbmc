@@ -19,6 +19,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/symbol.h>
 #include <util/typecheck.h>
 
+#include <unordered_set>
+
 class casting_replace_symbolt : public replace_symbolt
 {
 private:
