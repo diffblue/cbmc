@@ -18,7 +18,6 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 ///   Ghosh.
 
 #include "string_refinement.h"
-#include "string_constraint_instantiation.h"
 
 #include <iomanip>
 #include <numeric>
@@ -29,6 +28,8 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 #include <util/expr_util.h>
 #include <util/magic.h>
 #include <util/simplify_expr.h>
+
+#include "string_constraint_instantiation.h"
 
 static bool is_valid_string_constraint(
   messaget::mstreamt &stream,
