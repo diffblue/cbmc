@@ -11,7 +11,7 @@ Author: Diffblue Ltd.
 
 #if __has_cpp_attribute(nodiscard)
 #  ifdef __clang__
-#    pragma GCC diagnostic ignored "-Wc++17-extensions"
+#    pragma GCC diagnostic ignored "-Wc++1z-extensions"
 #  endif
 // NOLINTNEXTLINE(whitespace/braces)
 #  define NODISCARD [[nodiscard]]
