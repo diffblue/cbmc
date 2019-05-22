@@ -556,32 +556,33 @@ bool compilet::parse_stdin(languaget &language)
   return false;
 }
 
-/// Writes the goto functions of \p src_goto_model to a binary format object
-/// file.
-/// \param file_name: Target file to serialize \p src_goto_model to
-/// \param src_goto_model: goto model to serialize
-/// \return true on error, false otherwise
 bool compilet::write_bin_object_file(
   const std::string &file_name,
-  const goto_modelt &src_goto_model)
+  const goto_modelt &src_goto_model,
+  bool validate_goto_model,
+  message_handlert &message_handler)
 {
+  messaget log(message_handler);
+
   if(validate_goto_model)
   {
-    status() << "Validating goto model" << eom;
+    log.status() << "Validating goto model" << messaget::eom;
     src_goto_model.validate();
   }
 
-  statistics() << "Writing binary format object '" << file_name << "'" << eom;
+  log.statistics() << "Writing binary format object '" << file_name << "'"
+                   << messaget::eom;
 
   // symbols
-  statistics() << "Symbols in table: "
-               << src_goto_model.symbol_table.symbols.size() << eom;
+  log.statistics() << "Symbols in table: "
+                   << src_goto_model.symbol_table.symbols.size()
+                   << messaget::eom;
 
   std::ofstream outfile(file_name, std::ios::binary);
 
   if(!outfile.is_open())
   {
-    error() << "Error opening file '" << file_name << "'" << eom;
+    log.error() << "Error opening file '" << file_name << "'" << messaget::eom;
     return true;
   }
 
@@ -590,12 +591,11 @@ bool compilet::write_bin_object_file(
 
   const auto cnt = function_body_count(src_goto_model.goto_functions);
 
-  statistics() << "Functions: "
-               << src_goto_model.goto_functions.function_map.size() << "; "
-               << cnt << " have a body." << eom;
+  log.statistics() << "Functions: "
+                   << src_goto_model.goto_functions.function_map.size() << "; "
+                   << cnt << " have a body." << messaget::eom;
 
   outfile.close();
-  wrote_object=true;
 
   return false;
 }
@@ -661,8 +661,7 @@ compilet::~compilet()
     delete_directory(dir);
 }
 
-std::size_t
-compilet::function_body_count(const goto_functionst &functions) const
+std::size_t compilet::function_body_count(const goto_functionst &functions)
 {
   std::size_t count = 0;
 

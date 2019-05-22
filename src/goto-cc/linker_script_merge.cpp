@@ -25,16 +25,28 @@ Author: Kareem Khazem <karkhaz@karkhaz.com>, 2017
 
 #include <goto-programs/read_goto_binary.h>
 
+#include "compile.h"
+
 int linker_script_merget::add_linker_script_definitions()
 {
   if(!cmdline.isset('T'))
     return 0;
 
+  auto original_goto_model =
+    read_goto_binary(goto_binary, log.get_message_handler());
+
+  if(!original_goto_model.has_value())
+  {
+    log.error() << "Unable to read goto binary for linker script merging"
+                << messaget::eom;
+    return 1;
+  }
+
   temporary_filet linker_def_outfile("goto-cc-linker-info", ".json");
   std::list<irep_idt> linker_defined_symbols;
   int fail = get_linker_script_data(
     linker_defined_symbols,
-    compiler.goto_model.symbol_table,
+    original_goto_model->symbol_table,
     elf_binary,
     linker_def_outfile());
   // ignore linker script parsing failures until the code is tested more widely
@@ -55,16 +67,6 @@ int linker_script_merget::add_linker_script_definitions()
     log.error() << "Malformed linker-script JSON document" << messaget::eom;
     data.output(log.error());
     return fail;
-  }
-
-  auto original_goto_model =
-    read_goto_binary(goto_binary, log.get_message_handler());
-
-  if(!original_goto_model.has_value())
-  {
-    log.error() << "Unable to read goto binary for linker script merging"
-                << messaget::eom;
-    return 1;
   }
 
   fail=1;
@@ -106,7 +108,11 @@ int linker_script_merget::add_linker_script_definitions()
     return fail;
   }
 
-  fail = compiler.write_bin_object_file(goto_binary, *original_goto_model);
+  fail = compilet::write_bin_object_file(
+    goto_binary,
+    *original_goto_model,
+    cmdline.isset("validate-goto-model"),
+    log.get_message_handler());
 
   if(fail!=0)
   {
@@ -118,13 +124,11 @@ int linker_script_merget::add_linker_script_definitions()
 }
 
 linker_script_merget::linker_script_merget(
-  compilet &compiler,
   const std::string &elf_binary,
   const std::string &goto_binary,
   const cmdlinet &cmdline,
   message_handlert &message_handler)
-  : compiler(compiler),
-    elf_binary(elf_binary),
+  : elf_binary(elf_binary),
     goto_binary(goto_binary),
     cmdline(cmdline),
     log(message_handler),

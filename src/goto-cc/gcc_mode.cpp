@@ -972,8 +972,10 @@ int gcc_modet::gcc_hybrid_binary(compilet &compiler)
      output_files.size()==1)
   {
     linker_script_merget ls_merge(
-      compiler, output_files.front(), goto_binaries.front(),
-      cmdline, gcc_message_handler);
+      output_files.front(),
+      goto_binaries.front(),
+      cmdline,
+      gcc_message_handler);
     result=ls_merge.add_linker_script_definitions();
   }
 

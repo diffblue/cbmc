@@ -68,7 +68,18 @@ public:
 
   bool parse_source(const std::string &);
 
-  bool write_bin_object_file(const std::string &, const goto_modelt &);
+  /// Writes the goto functions of \p src_goto_model to a binary format object
+  /// file.
+  /// \param file_name: Target file to serialize \p src_goto_model to
+  /// \param src_goto_model: goto model to serialize
+  /// \param validate_goto_model: enable goto-model validation
+  /// \param message_handler: message handler
+  /// \return true on error, false otherwise
+  static bool write_bin_object_file(
+    const std::string &file_name,
+    const goto_modelt &src_goto_model,
+    bool validate_goto_model,
+    message_handlert &message_handler);
 
   /// \brief Has this compiler written any object files?
   bool wrote_object_files() const { return wrote_object; }
@@ -88,8 +99,6 @@ public:
   }
 
 protected:
-  namespacet ns;
-
   std::string working_directory;
   std::string override_language;
 
@@ -105,7 +114,22 @@ protected:
   /// \brief String to include in all mangled names
   const std::string file_local_mangle_suffix;
 
-  std::size_t function_body_count(const goto_functionst &) const;
+  static std::size_t function_body_count(const goto_functionst &);
+
+  bool write_bin_object_file(
+    const std::string &file_name,
+    const goto_modelt &src_goto_model)
+  {
+    if(write_bin_object_file(
+         file_name, src_goto_model, validate_goto_model, get_message_handler()))
+    {
+      return true;
+    }
+
+    wrote_object = true;
+
+    return false;
+  }
 
   void add_compiler_specific_defines() const;
 
