@@ -237,6 +237,7 @@ public:
 
   /// Set of expressions; only used for the `get` API, not for internal
   /// data representation.
+  DEPRECATED(SINCE(2019, 05, 22, "Only used in deprecated function"))
   typedef std::set<exprt> expr_sett;
 
   /// Set of dynamic object numbers, equivalent to a set of
@@ -270,6 +271,7 @@ public:
     const namespacet &ns) const;
 
   /// Appears to be unimplemented.
+  DEPRECATED(SINCE(2019, 05, 22, "Unimplemented"))
   expr_sett &get(const irep_idt &identifier, const std::string &suffix);
 
   void clear()
