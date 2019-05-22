@@ -183,24 +183,6 @@ array_exprt interval_sparse_arrayt::concretize(
   return array;
 }
 
-void equation_symbol_mappingt::add(const std::size_t i, const exprt &expr)
-{
-  equations_containing[expr].push_back(i);
-  strings_in_equation[i].push_back(expr);
-}
-
-std::vector<exprt>
-equation_symbol_mappingt::find_expressions(const std::size_t i)
-{
-  return strings_in_equation[i];
-}
-
-std::vector<std::size_t>
-equation_symbol_mappingt::find_equations(const exprt &expr)
-{
-  return equations_containing[expr];
-}
-
 /// Construct a string_builtin_functiont object from a function application
 /// \return a unique pointer to the created object
 static std::unique_ptr<string_builtin_functiont> to_string_builtin_function(

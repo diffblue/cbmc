@@ -29,6 +29,7 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 #include <util/magic.h>
 #include <util/simplify_expr.h>
 
+#include "equation_symbol_mapping.h"
 #include "string_constraint_instantiation.h"
 
 static bool is_valid_string_constraint(

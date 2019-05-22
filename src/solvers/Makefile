@@ -160,6 +160,7 @@ SRC = $(BOOLEFORCE_SRC) \
       refinement/refine_arithmetic.cpp \
       refinement/refine_arrays.cpp \
       strings/array_pool.cpp \
+      strings/equation_symbol_mapping.cpp \
       strings/string_builtin_function.cpp \
       strings/string_refinement.cpp \
       strings/string_refinement_util.cpp \
