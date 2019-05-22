@@ -31,6 +31,7 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 
 #include "equation_symbol_mapping.h"
 #include "string_constraint_instantiation.h"
+#include "string_dependencies.h"
 
 static bool is_valid_string_constraint(
   messaget::mstreamt &stream,

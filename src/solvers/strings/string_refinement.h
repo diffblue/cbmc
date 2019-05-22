@@ -27,6 +27,7 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 
 #include "string_constraint.h"
 #include "string_constraint_generator.h"
+#include "string_dependencies.h"
 #include "string_refinement_invariant.h"
 #include "string_refinement_util.h"
 
