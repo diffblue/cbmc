@@ -567,10 +567,10 @@ static array_exprt unpack_struct(
     // us with unknown alignment of subsequent members, and queuing them up as
     // bit fields is not possible either as the total width of the concatenation
     // could not be determined.
-    if(
-      !component_bits.has_value() &&
-      (std::next(it) != components.end() || bit_fields.has_value()))
-      throw non_constant_widtht(src, nil_exprt());
+    DATA_INVARIANT(
+      component_bits.has_value() ||
+        (std::next(it) == components.end() && !bit_fields.has_value()),
+      "members of non-constant width should come last in a struct");
 
     member_exprt member(src, comp.get_name(), comp.type());
     if(src.id() == ID_struct)
@@ -1173,12 +1173,11 @@ exprt lower_byte_extract(const byte_extract_exprt &src, const namespacet &ns)
   if(!size_bits.has_value())
   {
     auto op0_bits = pointer_offset_bits(unpacked.op().type(), ns);
-    if(!op0_bits.has_value())
-    {
-      throw non_const_byte_extraction_sizet(unpacked);
-    }
-    else
-      size_bits=op0_bits;
+    // all cases with non-constant width should have been handled above
+    DATA_INVARIANT(
+      op0_bits.has_value(),
+      "the extracted width or the source width must be known");
+    size_bits = op0_bits;
   }
 
   mp_integer num_elements =
