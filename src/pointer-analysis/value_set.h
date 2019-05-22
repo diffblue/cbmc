@@ -243,6 +243,7 @@ public:
   /// Set of dynamic object numbers, equivalent to a set of
   /// `dynamic_object_exprt`s with corresponding IDs. Used only in internal
   /// implementation details.
+  DEPRECATED(SINCE(2019, 05, 22, "Unused"))
   typedef std::set<unsigned int> dynamic_object_id_sett;
 
   /// Map representing the entire value set, mapping from string LHS IDs
