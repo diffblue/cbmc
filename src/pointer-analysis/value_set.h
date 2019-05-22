@@ -264,7 +264,7 @@ public:
   /// \param [out] dest: assigned a set of expressions that `expr` may point to
   /// \param ns: global namespace
   void get_value_set(
-    const exprt &expr,
+    exprt expr,
     value_setst::valuest &dest,
     const namespacet &ns) const;
 
@@ -461,7 +461,7 @@ protected:
   /// \param ns: global namespace
   /// \param is_simplified: if false, simplify `expr` before reading.
   void get_value_set(
-    const exprt &expr,
+    exprt expr,
     object_mapt &dest,
     const namespacet &ns,
     bool is_simplified) const;

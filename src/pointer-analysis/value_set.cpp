@@ -352,12 +352,12 @@ bool value_sett::eval_pointer_offset(
 }
 
 void value_sett::get_value_set(
-  const exprt &expr,
+  exprt expr,
   value_setst::valuest &dest,
   const namespacet &ns) const
 {
   object_mapt object_map;
-  get_value_set(expr, object_map, ns, false);
+  get_value_set(std::move(expr), object_map, ns, false);
 
   for(object_map_dt::const_iterator
       it=object_map.read().begin();
@@ -373,16 +373,15 @@ void value_sett::get_value_set(
 }
 
 void value_sett::get_value_set(
-  const exprt &expr,
+  exprt expr,
   object_mapt &dest,
   const namespacet &ns,
   bool is_simplified) const
 {
-  exprt tmp(expr);
   if(!is_simplified)
-    simplify(tmp, ns);
+    simplify(expr, ns);
 
-  get_value_set_rec(tmp, dest, "", tmp.type(), ns);
+  get_value_set_rec(expr, dest, "", expr.type(), ns);
 }
 
 /// Check if 'suffix' starts with 'field'.
