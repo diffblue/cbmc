@@ -80,6 +80,7 @@ public:
   /// Represents the offset into an object: either a unique integer offset,
   /// or an unknown value, represented by `!offset`.
   typedef optionalt<mp_integer> offsett;
+  DEPRECATED(SINCE(2019, 05, 22, "Unused"))
   bool offset_is_zero(const offsett &offset) const
   {
     return offset && offset->is_zero();
