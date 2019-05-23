@@ -1,0 +1,46 @@
+version: 0.2
+
+env:
+  variables:
+    # CodeBuild console doesn't display color codes correctly
+    TESTPL_COLOR_OUTPUT: 0
+
+phases:
+  install:
+    runtime-versions:
+      java: openjdk8
+    commands:
+      - sed -i 's#/archive.ubuntu.com#/us-east-1.ec2.archive.ubuntu.com#g' /etc/apt/sources.list
+      - apt-get update -y
+      - apt-get install -y flex bison make git libwww-perl patch ccache libc6-dev-i386 jq gdb lcov curl python-pip
+      - pip install codecov
+  build:
+    commands:
+      - echo Build started on `date`
+      - make -C src minisat2-download
+      - make -C jbmc/src setup-submodules
+      - make -C src CXX="ccache g++" -j2 CPROVER_WITH_PROFILING=1
+      - make -C unit CXX="ccache g++" -j2 CPROVER_WITH_PROFILING=1
+      - make -C jbmc/src CXX="ccache g++" -j2 CPROVER_WITH_PROFILING=1
+      - make -C jbmc/unit CXX="ccache g++" -j2 CPROVER_WITH_PROFILING=1
+  post_build:
+    commands:
+      - make -C unit test 
+      - make -C regression test CPROVER_WITH_PROFILING=1
+      - make -C regression/cbmc test-paths-lifo
+      - env PATH=$PATH:`pwd`/src/solvers make -C regression/cbmc test-cprover-smt2
+      - make -C jbmc/unit test
+      - make -C jbmc/regression test
+      - lcov --capture --directory . --output-file ./lcov.info
+      - VCS_PULL_REQUEST=$(echo $CODEBUILD_SOURCE_VERSION | sed 's/pr\///g')
+      - COV_SCRIPT=/root/.cache/codecov.sh
+      - if [ ! -f "$COV_SCRIPT" ]; then curl -s https://codecov.io/bash > "$COV_SCRIPT"; fi
+      - echo "$CODEBUILD_INITIATOR" | grep GitHub && bash "$COV_SCRIPT" -t "$CODECOV_TOKEN" || true      
+      - echo Build completed on `date`
+cache:
+  paths:
+    - '/var/cache/apt/**/*'
+    - '/var/lib/apt/lists/**/*'
+    - '/root/.ccache/**/*'
+    - '/root/.cache/codecov.sh'
+  
