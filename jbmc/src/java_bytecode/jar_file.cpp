@@ -20,10 +20,7 @@ void jar_filet::initialize_file_index()
 {
   const size_t file_count=m_zip_archive.get_num_files();
   for(size_t index=0; index<file_count; index++)
-  {
-    const auto filename=m_zip_archive.get_filename(index);
-    m_name_to_index.emplace(filename, index);
-  }
+    m_name_to_index.emplace(m_zip_archive.get_filename(index), index);
 }
 
 /// This constructor creates a jar_file object whose contents
