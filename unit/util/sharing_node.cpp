@@ -8,7 +8,7 @@
 #include <util/sharing_node.h>
 
 // could be an internal node or a container node
-class innert : public sharing_node_innert<int, int>
+class innert : public sharing_nodet<int, int>
 {
 public:
   friend void sharing_node_internals_test();
@@ -62,7 +62,7 @@ TEST_CASE("Sharing node", "[core][util]")
 {
   SECTION("Leaf test")
   {
-    typedef sharing_node_leaft<int, int> leaft;
+    typedef sharing_nodet<int, int> leaft;
 
     // Basic leaf
     {
@@ -90,8 +90,8 @@ TEST_CASE("Sharing node", "[core][util]")
 
       REQUIRE(leaf2.shares_with(leaf1));
 
-      auto &v = leaf2.get_value();
-      v = 3;
+      leaf2.set_value(3);
+
       REQUIRE(leaf2.get_value() == 3);
       REQUIRE(!leaf2.shares_with(leaf1));
     }
@@ -99,7 +99,7 @@ TEST_CASE("Sharing node", "[core][util]")
 
   SECTION("Inner node test")
   {
-    typedef sharing_node_innert<int, int> innert;
+    typedef sharing_nodet<int, int> innert;
 
     // Empty container
     {
@@ -138,8 +138,8 @@ TEST_CASE("Sharing node", "[core][util]")
 
       innert c2(c1);
       auto leaf = c2.find_leaf(1);
-      auto &v = leaf->get_value();
-      v = 7;
+
+      leaf->set_value(7);
 
       REQUIRE(!c1.shares_with(c2));
 
@@ -173,71 +173,6 @@ TEST_CASE("Sharing node", "[core][util]")
 
       REQUIRE(i.get_to_map().empty());
       REQUIRE(ci.find_child(0) == nullptr);
-
-      innert *p;
-
-      p = i.add_child(1);
-
-      REQUIRE(p != nullptr);
     }
-  }
-
-  SECTION("Combined")
-  {
-    typedef sharing_node_leaft<int, int> leaft;
-    typedef sharing_node_innert<int, int> innert;
-
-    innert map;
-
-    REQUIRE(map.empty());
-
-    innert *ip;
-    innert *cp;
-    leaft *lp;
-
-    // Add 0 -> 0 -> (0, 1)
-
-    ip = &map;
-
-    ip = ip->add_child(0);
-    REQUIRE(ip != nullptr);
-
-    cp = ip->add_child(0);
-    REQUIRE(cp != nullptr);
-
-    lp = cp->place_leaf(0, 1);
-    REQUIRE(lp != nullptr);
-
-    // Add 1 -> 2 -> (3, 4)
-
-    ip = &map;
-
-    ip = ip->add_child(1);
-    REQUIRE(ip != nullptr);
-
-    cp = ip->add_child(2);
-    REQUIRE(cp != nullptr);
-
-    lp = cp->place_leaf(3, 4);
-    REQUIRE(lp != nullptr);
-
-    // Add 1 -> 3 -> (4, 5)
-
-    ip = &map;
-
-    ip = ip->add_child(1);
-    REQUIRE(ip != nullptr);
-
-    cp = ip->add_child(3);
-    REQUIRE(cp != nullptr);
-
-    lp = cp->place_leaf(4, 5);
-    REQUIRE(lp != nullptr);
-
-    // Copy
-
-    innert map2(map);
-
-    REQUIRE(map2.shares_with(map));
   }
 }

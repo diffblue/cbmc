@@ -27,6 +27,7 @@ Author: Daniel Poetzl
 #include <type_traits>
 #include <vector>
 
+#include "as_const.h"
 #include "irep.h"
 #include "optional.h"
 #include "sharing_node.h"
@@ -105,12 +106,7 @@ Author: Daniel Poetzl
 // clang-format on
 
 /// A map implemented as a tree where subtrees can be shared between different
-/// maps.
-///
-/// The map is implemented as a fixed-height n-ary trie. The height H and the
-/// maximum number of children per inner node S are determined by the two
-/// configuration parameters `bits` and `chunks` in sharing_map.h. It holds
-/// that H = `bits` / `chunks` and S = 2 ^ `chunks`.
+/// maps. The map is implemented as a variable-height n-ary trie.
 ///
 /// When inserting a key-value pair into the map, first the hash of its key is
 /// computed. The `bits` number of lower order bits of the hash are deemed
@@ -121,16 +117,21 @@ Author: Daniel Poetzl
 /// different keys yield the same "string"), are handled by chaining the
 /// corresponding key-value pairs in a `std::forward_list`.
 ///
+/// The depth at which a key-value pair will be stored (when calling insert())
+/// depends on the shortest unique prefix of its hash code (treated as a string)
+/// with respect to the hash codes of the key-value pairs already in the map.
+///
 /// The use of a trie in combination with hashing has the advantage that the
 /// tree is unlikely to degenerate (if the number of hash collisions is low).
 /// This makes re-balancing operations unnecessary which do not interact well
 /// with sharing. A disadvantage is that the height of the tree is likely
-/// greater than if the elements had been stored in a balanced tree (with
-/// greater differences for sparser maps).
+/// greater than if the elements had been stored in a balanced tree.
 ///
-/// The nodes in the sharing map are objects of type sharing_nodet. Each sharing
-/// node has a `shared_ptr` to an object of type `dt` which can be shared
-/// between nodes.
+/// The nodes in the sharing map are objects of type sharing_nodet. A sharing
+/// node has a shared pointer (of type small_shared_n_way_ptrt) which can point
+/// to objects of type d_internalt, d_leaft, or d_containert (representing
+/// internal nodes, leaf nodes, and container nodes, the latter being used for
+/// chaining leafs in a linked list on hash collisions).
 ///
 /// Sharing is initially generated when a map is assigned to another map or
 /// copied via the copy constructor. Then both maps contain a pointer to the
@@ -138,7 +139,7 @@ Author: Daniel Poetzl
 /// to one of the maps, nodes are copied and sharing is lessened as described in
 /// the following.
 ///
-/// The replace(), insert(), update() and erase() operations interact with
+/// The replace(), update(), insert(), and erase() operations interact with
 /// sharing as follows:
 /// - When a key-value pair is inserted into the map (or a value of an existing
 /// pair is replaced or updated) and its position is in a shared subtree,
@@ -150,7 +151,7 @@ Author: Daniel Poetzl
 /// the path to the erased element after the element has been removed are
 /// copied and integrated with the map, and the remaining nodes are removed.
 ///
-/// The replace() and update() operations are the only method where sharing
+/// The replace() and update() operations are the only methods where sharing
 /// could unnecessarily  be broken. This would happen when replacing an old
 /// value with a new equal value, or calling update but making no change. The
 /// sharing map provides a debug mode to detect such cases. When the template
@@ -164,7 +165,7 @@ Author: Daniel Poetzl
 /// complexity of the operations. We use the following symbols:
 /// - N: number of key-value pairs in the map
 /// - M: maximum number of key-value pairs that are chained in a leaf node
-/// - H: height of the tree
+/// - H: maximum height of the tree
 /// - S: maximum number of children per internal node
 ///
 /// The first two symbols denote dynamic properties of a given map, whereas the
@@ -193,13 +194,10 @@ public:
   typedef std::vector<key_type> keyst;
 
 protected:
-  typedef sharing_node_innert<key_type, mapped_type> innert;
-  typedef sharing_node_leaft<key_type, mapped_type> leaft;
+  typedef sharing_nodet<key_type, mapped_type> nodet;
 
-  typedef sharing_node_baset baset;
-
-  typedef typename innert::to_mapt to_mapt;
-  typedef typename innert::leaf_listt leaf_listt;
+  typedef typename nodet::to_mapt to_mapt;
+  typedef typename nodet::leaf_listt leaf_listt;
 
   struct falset
   {
@@ -251,7 +249,7 @@ public:
   ///
   /// Complexity:
   /// - Worst case: O(H * S + M)
-  /// - Best case: O(H)
+  /// - Best case: O(1)
   ///
   /// \param k: The key of the element to erase
   void erase(const key_type &k);
@@ -260,7 +258,7 @@ public:
   ///
   /// Complexity:
   /// - Worst case: O(H * S + M)
-  /// - Best case: O(H)
+  /// - Best case: O(1)
   ///
   /// \param k: The key of the element to erase
   void erase_if_exists(const key_type &k)
@@ -273,7 +271,7 @@ public:
   ///
   /// Complexity:
   /// - Worst case: O(H * S + M)
-  /// - Best case: O(H)
+  /// - Best case: O(1)
   ///
   /// \param k: The key of the element to insert
   /// \param m: The mapped value to insert
@@ -284,7 +282,7 @@ public:
   ///
   /// Complexity:
   /// - Worst case: O(H * S + M)
-  /// - Best case: O(H)
+  /// - Best case: O(1)
   ///
   /// \param k: The key of the element to insert
   /// \param m: The mapped value to replace the old value with
@@ -308,7 +306,7 @@ public:
   ///
   /// Complexity:
   /// - Worst case: O(H * log(S) + M)
-  /// - Best case: O(H)
+  /// - Best case: O(1)
   ///
   /// \param k: The key of the element to search
   /// \return optionalt containing a const reference to the value if found
@@ -352,7 +350,7 @@ public:
   ///
   /// Complexity:
   /// - Worst case: O(H * log(S) + M)
-  /// - Best case: O(H)
+  /// - Best case: O(1)
   bool has_key(const key_type &k) const
   {
     return get_leaf_node(k)!=nullptr;
@@ -520,47 +518,38 @@ public:
 protected:
   // helpers
 
-  innert *get_container_node(const key_type &k);
-  const innert *get_container_node(const key_type &k) const;
+  nodet &get_leaf_node(const key_type &k);
+  const nodet *get_leaf_node(const key_type &k) const;
 
-  const leaft *get_leaf_node(const key_type &k) const
-  {
-    const innert *cp = get_container_node(k);
-    if(cp == nullptr)
-      return nullptr;
-
-    const leaft *lp;
-    lp = cp->find_leaf(k);
-
-    return lp;
-  }
-
-  /// Move a container node (containing a single leaf) further down the tree
-  /// such as to resolve a collision with another key-value pair. This method is
-  /// called by `insert()` to resolve a collision between a key-value pair to be
-  /// newly inserted, and a key-value pair existing in the map.
+  /// Move a leaf node further down the tree such as to resolve a collision with
+  /// another key-value pair. This method is called by `insert()` to resolve a
+  /// collision between a key-value pair to be newly inserted, and a key-value
+  /// pair existing in the map.
   ///
-  /// \param starting_level: the depth of the inner node pointing to the
-  ///   container node with a single leaf
+  /// \param starting_level: the depth of the inner node pointing to the leaf
+  ///   existing in the map
   /// \param key_suffix: hash code of the existing key in the map, shifted to
   ///   the right by `chunk * starting_level` bits (i.e., \p key_suffix is the
   ///   rest of the hash code used to determine the position of the key-value
   ///   pair below level \p starting_level
   /// \param bit_last: last portion of the hash code of the key existing in the
-  ///   map (`inner[bit_last]` points to the container node to move further down
-  ///   the tree)
+  ///   map (`inner[bit_last]` points to the leaf node to move further down the
+  ///   tree)
   /// \param inner: inner node of which the child `inner[bit_last]` is the
-  ///   container node to move further down the tree
-  /// \return pointer to the container to which the element to be newly inserted
-  ///   can be added
-  innert *migrate(
+  ///   leaf node to move further down the tree
+  /// \param k: key of the element to be newly inserted
+  /// \param m: value of the element to be newly inserted
+  template <class valueU>
+  void migrate(
     const std::size_t starting_level,
     const std::size_t key_suffix,
     const std::size_t bit_last,
-    innert &inner);
+    nodet &inner,
+    const key_type &k,
+    valueU &&m);
 
   void iterate(
-    const innert &n,
+    const nodet &n,
     std::function<void(const key_type &k, const mapped_type &m)> f) const;
 
   /// Add a delta item to the delta view if the value in the \p container (which
@@ -569,27 +558,22 @@ protected:
   /// when a container containing a single leaf is encountered in the first map,
   /// and the corresponding node in the second map is an inner node.
   ///
-  /// \param container: container node containing a single leaf, part of the
-  ///   first map in a call `map1.get_delta_view(map2, ...)`
+  /// \param leaf: leaf node which is part of the first map in a call
+  ///   `map1.get_delta_view(map2, ...)`
   /// \param inner: inner node which is part of the second map
-  /// \param level: depth of the nodes in the maps (both \p container and \p
-  ///   inner must be at the same depth in their respective maps)
+  /// \param level: depth of the nodes in the maps (both \p leaf and \p inner
+  ///   must be at the same depth in their respective maps)
   /// \param delta_view: delta view to add delta items to
   /// \param only_common: flag indicating if only items are added to the delta
   ///   view for which the keys are in both maps
   void add_item_if_not_shared(
-    const innert &container,
-    const innert &inner,
+    const nodet &leaf,
+    const nodet &inner,
     const std::size_t level,
     delta_viewt &delta_view,
     const bool only_common) const;
 
-  void gather_all(const innert &n, delta_viewt &delta_view) const;
-
-  bool is_singular(const leaf_listt &ll) const
-  {
-    return !ll.empty() && std::next(ll.begin()) == ll.end();
-  }
+  void gather_all(const nodet &n, delta_viewt &delta_view) const;
 
   std::size_t count_unmarked_nodes(
     bool leafs_only,
@@ -607,7 +591,7 @@ protected:
   static const std::size_t levels;
 
   // key-value map
-  innert map;
+  nodet map;
 
   // number of elements in the map
   size_type num = 0;
@@ -615,17 +599,17 @@ protected:
 
 SHARING_MAPT(void)
 ::iterate(
-  const innert &n,
+  const nodet &n,
   std::function<void(const key_type &k, const mapped_type &m)> f) const
 {
   SM_ASSERT(!n.empty());
 
-  std::stack<const innert *> stack;
+  std::stack<const nodet *> stack;
   stack.push(&n);
 
   do
   {
-    const innert *ip = stack.top();
+    const nodet *ip = stack.top();
     stack.pop();
 
     SM_ASSERT(!ip->empty());
@@ -640,9 +624,13 @@ SHARING_MAPT(void)
         stack.push(&item.second);
       }
     }
+    else if(ip->is_leaf())
+    {
+      f(ip->get_key(), ip->get_value());
+    }
     else
     {
-      SM_ASSERT(ip->is_container());
+      SM_ASSERT(ip->is_defined_container());
 
       const leaf_listt &ll = ip->get_container();
       SM_ASSERT(!ll.empty());
@@ -667,19 +655,21 @@ SHARING_MAPT(std::size_t)
 
   unsigned count = 0;
 
-  std::stack<const innert *> stack;
+  std::stack<const nodet *> stack;
   stack.push(&map);
 
   do
   {
-    const innert *ip = stack.top();
+    const nodet *ip = stack.top();
+    SM_ASSERT(!ip->empty());
     stack.pop();
 
-    // internal node or container node
     const unsigned use_count = ip->use_count();
-    const void *raw_ptr = ip->is_internal()
-                            ? (const void *)&ip->read_internal()
-                            : (const void *)&ip->read_container();
+
+    const void *raw_ptr =
+      ip->is_internal() ? (const void *)&ip->read_internal()
+                        : ip->is_leaf() ? (const void *)&ip->read_leaf()
+                                        : (const void *)&ip->read_container();
 
     if(use_count >= 2)
     {
@@ -694,14 +684,12 @@ SHARING_MAPT(std::size_t)
       }
     }
 
-    if(!leafs_only)
-    {
-      count++;
-    }
-
     if(ip->is_internal())
     {
-      SM_ASSERT(!ip->empty());
+      if(!leafs_only)
+      {
+        count++;
+      }
 
       const to_mapt &m = ip->get_to_map();
       SM_ASSERT(!m.empty());
@@ -711,32 +699,25 @@ SHARING_MAPT(std::size_t)
         stack.push(&item.second);
       }
     }
+    else if(ip->is_leaf())
+    {
+      count++;
+    }
     else
     {
       SM_ASSERT(ip->is_defined_container());
+
+      if(!leafs_only)
+      {
+        count++;
+      }
 
       const leaf_listt &ll = ip->get_container();
       SM_ASSERT(!ll.empty());
 
       for(const auto &l : ll)
       {
-        const unsigned leaf_use_count = l.use_count();
-        const void *leaf_raw_ptr = &l.read();
-
-        if(leaf_use_count >= 2)
-        {
-          if(marked.find(leaf_raw_ptr) != marked.end())
-          {
-            continue;
-          }
-
-          if(mark)
-          {
-            marked.insert(leaf_raw_ptr);
-          }
-        }
-
-        count++;
+        stack.push(&l);
       }
     }
   } while(!stack.empty());
@@ -813,7 +794,7 @@ SHARING_MAPT(void)::get_view(viewt &view) const
 }
 
 SHARING_MAPT(void)
-::gather_all(const innert &n, delta_viewt &delta_view) const
+::gather_all(const nodet &n, delta_viewt &delta_view) const
 {
   auto f = [&delta_view](const key_type &k, const mapped_type &m) {
     delta_view.push_back(delta_view_itemt(k, m));
@@ -823,20 +804,18 @@ SHARING_MAPT(void)
 }
 
 SHARING_MAPT(void)::add_item_if_not_shared(
-  const innert &container,
-  const innert &inner,
+  const nodet &leaf,
+  const nodet &inner,
   const std::size_t level,
   delta_viewt &delta_view,
   const bool only_common) const
 {
-  const leaft &l1 = container.get_container().front();
-
-  const auto &k = l1.get_key();
+  const auto &k = leaf.get_key();
   std::size_t key = hash()(k);
 
   key >>= level * chunk;
 
-  const innert *ip = &inner;
+  const nodet *ip = &inner;
   SM_ASSERT(ip->is_defined_internal());
 
   while(true)
@@ -850,7 +829,7 @@ SHARING_MAPT(void)::add_item_if_not_shared(
     {
       if(!only_common)
       {
-        delta_view.push_back({k, l1.get_value()});
+        delta_view.push_back({k, leaf.get_value()});
       }
 
       return;
@@ -861,22 +840,35 @@ SHARING_MAPT(void)::add_item_if_not_shared(
     // potentially in both maps
     if(ip->is_container())
     {
-      if(container.shares_with(*ip))
-        return;
-
       for(const auto &l2 : ip->get_container())
       {
-        if(l1.shares_with(l2))
+        if(leaf.shares_with(l2))
           return;
 
-        if(l1.get_key() == l2.get_key())
+        if(leaf.get_key() == l2.get_key())
         {
-          delta_view.push_back({k, l1.get_value(), l2.get_value()});
+          delta_view.push_back({k, leaf.get_value(), l2.get_value()});
           return;
         }
       }
 
-      delta_view.push_back({k, l1.get_value()});
+      delta_view.push_back({k, leaf.get_value()});
+
+      return;
+    }
+
+    if(ip->is_leaf())
+    {
+      if(ip->shares_with(leaf))
+        return;
+
+      if(equalT()(leaf.get_key(), ip->get_key()))
+      {
+        delta_view.push_back({k, leaf.get_value(), ip->get_value()});
+        return;
+      }
+
+      delta_view.push_back({k, leaf.get_value()});
 
       return;
     }
@@ -906,7 +898,7 @@ SHARING_MAPT(void)
     return;
   }
 
-  typedef std::pair<const innert *, const innert *> stack_itemt;
+  typedef std::pair<const nodet *, const nodet *> stack_itemt;
   std::stack<stack_itemt> stack;
 
   std::stack<std::size_t> level_stack;
@@ -928,8 +920,10 @@ SHARING_MAPT(void)
   {
     const stack_itemt &si = stack.top();
 
-    const innert *ip1 = si.first;
-    const innert *ip2 = si.second;
+    const nodet *ip1 = si.first;
+    const nodet *ip2 = si.second;
+
+    SM_ASSERT(!ip1->shares_with(*ip2));
 
     stack.pop();
 
@@ -939,133 +933,174 @@ SHARING_MAPT(void)
     SM_ASSERT(!ip1->empty());
     SM_ASSERT(!ip2->empty());
 
-    if(ip1->is_internal() && ip2->is_container())
-    {
-      // The container *ip2 contains one element as only containers at the
-      // bottom of the tree can have more than one element. This happens when
-      // two different keys have the same hash code. It is known here that *ip2
-      // is not at the bottom of the tree, as *ip1 (the corresponding node in
-      // the other map) is an internal node, and internal nodes cannot be at the
-      // bottom of the map.
-      SM_ASSERT(is_singular(ip2->get_container()));
-
-      for(const auto &item : ip1->get_to_map())
-      {
-        const innert &child = item.second;
-        if(!child.shares_with(*ip2))
-        {
-          stack.push(stack_itemt(&child, ip2));
-
-          // The level is not needed when the node of the left map is an
-          // internal node, and the node of the right map is a container node,
-          // hence we just push a dummy element
-          level_stack.push(dummy_level);
-        }
-      }
-
-      continue;
-    }
-
     if(ip1->is_internal())
     {
-      SM_ASSERT(ip2->is_internal());
+      SM_ASSERT(!ip2->is_container());
 
-      for(const auto &item : ip1->get_to_map())
+      if(ip2->is_internal())
       {
-        const innert &child = item.second;
-
-        const innert *p;
-        p = ip2->find_child(item.first);
-
-        if(p == nullptr)
+        for(const auto &item : ip1->get_to_map())
         {
-          if(!only_common)
+          const nodet &child = item.second;
+
+          const nodet *p;
+          p = ip2->find_child(item.first);
+
+          if(p == nullptr)
           {
-            gather_all(child, delta_view);
+            if(!only_common)
+            {
+              gather_all(child, delta_view);
+            }
+          }
+          else if(!child.shares_with(*p))
+          {
+            stack.push(stack_itemt(&child, p));
+            level_stack.push(level + 1);
           }
         }
-        else if(!child.shares_with(*p))
+      }
+      else
+      {
+        SM_ASSERT(ip2->is_leaf());
+
+        for(const auto &item : ip1->get_to_map())
         {
-          stack.push(stack_itemt(&child, p));
-          level_stack.push(level + 1);
+          const nodet &child = item.second;
+
+          if(!child.shares_with(*ip2))
+          {
+            stack.push(stack_itemt(&child, ip2));
+
+            // The level is not needed when the node of the left map is an
+            // internal node, and the node of the right map is a leaf node,
+            // hence we just push a dummy element
+            level_stack.push(dummy_level);
+          }
         }
       }
-
-      continue;
     }
-
-    SM_ASSERT(ip1->is_container());
-
-    if(ip2->is_internal())
+    else if(ip1->is_leaf())
     {
-      SM_ASSERT(is_singular(ip1->get_container()));
-      SM_ASSERT(level != dummy_level);
+      SM_ASSERT(!ip2->is_container());
 
-      add_item_if_not_shared(*ip1, *ip2, level, delta_view, only_common);
-
-      continue;
-    }
-
-    SM_ASSERT(ip2->is_container());
-
-    for(const auto &l1 : ip1->get_container())
-    {
-      const key_type &k1 = l1.get_key();
-      const leaft *p;
-
-      p = ip2->find_leaf(k1);
-
-      if(p != nullptr)
+      if(ip2->is_internal())
       {
-        if(!l1.shares_with(*p))
+        SM_ASSERT(level != dummy_level);
+
+        add_item_if_not_shared(*ip1, *ip2, level, delta_view, only_common);
+      }
+      else
+      {
+        SM_ASSERT(ip2->is_leaf());
+
+        if(equalT()(ip1->get_key(), ip2->get_key()))
         {
-          SM_ASSERT(other.has_key(k1));
-          delta_view.push_back({k1, l1.get_value(), p->get_value()});
+          delta_view.push_back(
+            {ip1->get_key(), ip1->get_value(), ip2->get_value()});
+        }
+        else if(!only_common)
+        {
+          delta_view.push_back({ip1->get_key(), ip1->get_value()});
         }
       }
-      else if(!only_common)
+    }
+    else
+    {
+      SM_ASSERT(ip1->is_container());
+      SM_ASSERT(!ip2->is_internal());
+
+      if(ip2->is_leaf())
       {
-        SM_ASSERT(!other.has_key(k1));
-        delta_view.push_back({k1, l1.get_value()});
+        for(const auto &l1 : ip1->get_container())
+        {
+          if(l1.shares_with(*ip2))
+          {
+            continue;
+          }
+
+          const key_type &k1 = l1.get_key();
+
+          if(equalT()(k1, ip2->get_key()))
+          {
+            delta_view.push_back({k1, l1.get_value(), ip2->get_value()});
+          }
+          else if(!only_common)
+          {
+            delta_view.push_back({k1, l1.get_value()});
+          }
+        }
+      }
+      else
+      {
+        SM_ASSERT(ip2->is_container());
+
+        for(const auto &l1 : ip1->get_container())
+        {
+          const key_type &k1 = l1.get_key();
+          const nodet *p;
+
+          p = ip2->find_leaf(k1);
+
+          if(p != nullptr)
+          {
+            if(!l1.shares_with(*p))
+            {
+              SM_ASSERT(other.has_key(k1));
+              delta_view.push_back({k1, l1.get_value(), p->get_value()});
+            }
+          }
+          else if(!only_common)
+          {
+            SM_ASSERT(!other.has_key(k1));
+            delta_view.push_back({k1, l1.get_value()});
+          }
+        }
       }
     }
   }
   while(!stack.empty());
 }
 
-SHARING_MAPT2(, innert *)::get_container_node(const key_type &k)
+SHARING_MAPT2(, nodet &)::get_leaf_node(const key_type &k)
 {
   SM_ASSERT(has_key(k));
 
   std::size_t key = hash()(k);
-  innert *ip = &map;
+  nodet *ip = &map;
   SM_ASSERT(ip->is_defined_internal());
 
   while(true)
   {
     std::size_t bit = key & mask;
 
-    ip = ip->add_child(bit);
-    SM_ASSERT(ip != nullptr);
-    SM_ASSERT(!ip->empty());
+    ip = &ip->add_child(bit);
+    PRECONDITION(!ip->empty()); // since the key must exist in the map
 
-    if(ip->is_container())
-      return ip;
-
-    key >>= chunk;
+    if(ip->is_internal())
+    {
+      key >>= chunk;
+      continue;
+    }
+    else if(ip->is_leaf())
+    {
+      return *ip;
+    }
+    else
+    {
+      SM_ASSERT(ip->is_defined_container());
+      return *ip->find_leaf(k);
+    }
   }
-
-  UNREACHABLE;
-  return nullptr;
 }
 
-SHARING_MAPT2(const, innert *)::get_container_node(const key_type &k) const
+SHARING_MAPT2(const, nodet *)::get_leaf_node(const key_type &k) const
 {
   if(empty())
     return nullptr;
 
   std::size_t key = hash()(k);
-  const innert *ip = &map;
+  const nodet *ip = &map;
   SM_ASSERT(ip->is_defined_internal());
 
   while(true)
@@ -1079,10 +1114,20 @@ SHARING_MAPT2(const, innert *)::get_container_node(const key_type &k) const
 
     SM_ASSERT(!ip->empty());
 
-    if(ip->is_container())
-      return ip;
-
-    key >>= chunk;
+    if(ip->is_internal())
+    {
+      key >>= chunk;
+      continue;
+    }
+    else if(ip->is_leaf())
+    {
+      return equalT()(ip->get_key(), k) ? ip : nullptr;
+    }
+    else
+    {
+      SM_ASSERT(ip->is_defined_container());
+      return ip->find_leaf(k); // returns nullptr if leaf is not found
+    }
   }
 
   UNREACHABLE;
@@ -1093,17 +1138,17 @@ SHARING_MAPT(void)::erase(const key_type &k)
 {
   SM_ASSERT(has_key(k));
 
-  innert *del = nullptr;
+  nodet *del = nullptr;
   std::size_t del_bit = 0;
 
   std::size_t key = hash()(k);
-  innert *ip = &map;
+  nodet *ip = &map;
 
   while(true)
   {
     std::size_t bit = key & mask;
 
-    const to_mapt &m = as_const(ip)->get_to_map();
+    const to_mapt &m = as_const_ptr(ip)->get_to_map();
 
     if(m.size() > 1 || del == nullptr)
     {
@@ -1111,64 +1156,72 @@ SHARING_MAPT(void)::erase(const key_type &k)
       del_bit=bit;
     }
 
-    ip = ip->add_child(bit);
+    ip = &ip->add_child(bit);
 
-    SM_ASSERT(!ip->empty());
+    PRECONDITION(!ip->empty());
 
-    if(ip->is_container())
-      break;
+    if(ip->is_internal())
+    {
+      key >>= chunk;
+      continue;
+    }
+    else if(ip->is_leaf())
+    {
+      PRECONDITION(equalT()(ip->get_key(), k));
+      del->remove_child(del_bit);
 
-    key >>= chunk;
+      num--;
+
+      return;
+    }
+    else
+    {
+      SM_ASSERT(ip->is_defined_container());
+      const leaf_listt &ll = as_const_ptr(ip)->get_container();
+      PRECONDITION(!ll.empty());
+
+      // forward list has one element
+      if(std::next(ll.begin()) == ll.end())
+      {
+        PRECONDITION(equalT()(ll.front().get_key(), k));
+        del->remove_child(del_bit);
+      }
+      else
+      {
+        ip->remove_leaf(k);
+      }
+
+      num--;
+
+      return;
+    }
   }
 
-  PRECONDITION(!ip->empty());
-  const leaf_listt &ll = as_const(ip)->get_container();
-  PRECONDITION(!ll.empty());
-
-  // forward list has one element
-  if(std::next(ll.begin()) == ll.end())
-  {
-    PRECONDITION(equalT()(ll.front().get_key(), k));
-    del->remove_child(del_bit);
-  }
-  else
-  {
-    ip->remove_leaf(k);
-  }
-
-  num--;
+  UNREACHABLE;
 }
 
-SHARING_MAPT2(, innert *)::migrate(
+SHARING_MAPT4(valueU, void)
+::migrate(
   const std::size_t starting_level,
   const std::size_t key_suffix,
   const std::size_t bit_last,
-  innert &inner)
+  nodet &inner,
+  const key_type &k,
+  valueU &&m)
 {
   SM_ASSERT(starting_level < levels - 1);
   SM_ASSERT(inner.is_defined_internal());
 
-  const innert &child = *inner.find_child(bit_last);
-  SM_ASSERT(child.is_defined_container());
+  nodet &leaf = inner.add_child(bit_last);
+  SM_ASSERT(leaf.is_defined_leaf());
 
-  const leaf_listt &ll = child.get_container();
-
-  // Only containers at the bottom can contain more than two elements
-  SM_ASSERT(is_singular(ll));
-
-  const leaft &leaf = ll.front();
   std::size_t key_existing = hash()(leaf.get_key());
-
   key_existing >>= chunk * starting_level;
 
-  // Copy the container
-  innert container_copy(child);
+  nodet leaf_kept;
+  leaf_kept.swap(leaf);
 
-  // Delete existing container
-  inner.remove_child(bit_last);
-
-  // Add internal node
-  innert *ip = inner.add_child(bit_last);
+  nodet *ip = &leaf;
   SM_ASSERT(ip->empty());
 
   // Find place for both elements
@@ -1183,6 +1236,8 @@ SHARING_MAPT2(, innert *)::migrate(
 
   do
   {
+    SM_ASSERT(ip->empty());
+
     std::size_t bit_existing = key_existing & mask;
     std::size_t bit = key & mask;
 
@@ -1190,15 +1245,19 @@ SHARING_MAPT2(, innert *)::migrate(
     {
       // Place found
 
-      innert *cp2 = ip->add_child(bit_existing);
-      cp2->swap(container_copy);
+      nodet &l1 = ip->add_child(bit_existing);
+      SM_ASSERT(l1.empty());
+      l1.swap(leaf_kept);
 
-      innert *cp1 = ip->add_child(bit);
-      return cp1;
+      nodet &l2 = ip->add_child(bit);
+      SM_ASSERT(l2.empty());
+      l2.make_leaf(k, std::forward<valueU>(m));
+
+      return;
     }
 
     SM_ASSERT(bit == bit_existing);
-    ip = ip->add_child(bit);
+    ip = &ip->add_child(bit);
 
     key >>= chunk;
     key_existing >>= chunk;
@@ -1206,10 +1265,17 @@ SHARING_MAPT2(, innert *)::migrate(
     level++;
   } while(level < levels);
 
-  leaft leaf_copy(as_const(&container_copy)->get_container().front());
-  ip->get_container().push_front(leaf_copy);
+  // Hash collision, create container and add both elements to it
 
-  return ip;
+  PRECONDITION(!equalT()(k, leaf_kept.get_key()));
+
+  SM_ASSERT(ip->empty());
+  // Make container and add existing leaf
+  ip->get_container().push_front(leaf_kept);
+
+  SM_ASSERT(ip->is_defined_container());
+  // Insert new element in same container
+  ip->place_leaf(k, std::forward<valueU>(m));
 }
 
 SHARING_MAPT4(valueU, void)
@@ -1218,9 +1284,9 @@ SHARING_MAPT4(valueU, void)
   SM_ASSERT(!has_key(k));
 
   std::size_t key = hash()(k);
-  innert *ip = &map;
+  nodet *ip = &map;
 
-  // The root cannot be a container node
+  // The root must be an internal node
   SM_ASSERT(ip->is_internal());
 
   std::size_t level = 0;
@@ -1233,80 +1299,85 @@ SHARING_MAPT4(valueU, void)
     SM_ASSERT(ip->is_internal());
     SM_ASSERT(level == 0 || !ip->empty());
 
-    innert *child = ip->add_child(bit);
+    nodet &child = ip->add_child(bit);
 
     // Place is unoccupied
-    if(child->empty())
-    {
-      // Create container and insert leaf
-      child->place_leaf(k, std::forward<valueU>(m));
-
-      SM_ASSERT(child->is_defined_container());
-
-      num++;
-
-      return;
-    }
-
-    if(child->is_container())
+    if(child.empty())
     {
       if(level < levels - 1)
       {
-        // Migrate the elements downwards
-        innert *cp = migrate(level, key, bit, *ip);
-
-        cp->place_leaf(k, std::forward<valueU>(m));
+        // Create leaf
+        child.make_leaf(k, m);
       }
       else
       {
-        // Add to the bottom container
-        child->place_leaf(k, std::forward<valueU>(m));
+        SM_ASSERT(level == levels - 1);
+
+        // Create container and insert leaf
+        child.place_leaf(k, std::forward<valueU>(m));
+
+        SM_ASSERT(child.is_defined_container());
       }
 
       num++;
 
       return;
     }
+    else if(child.is_internal())
+    {
+      ip = &child;
+      key >>= chunk;
+      level++;
 
-    SM_ASSERT(level == levels - 1 || child->is_defined_internal());
+      continue;
+    }
+    else if(child.is_leaf())
+    {
+      // migrate leaf downwards
+      migrate(level, key, bit, *ip, k, std::forward<valueU>(m));
 
-    ip = child;
-    key >>= chunk;
-    level++;
+      num++;
+
+      return;
+    }
+    else
+    {
+      SM_ASSERT(child.is_defined_container());
+      SM_ASSERT(level == levels - 1);
+
+      // Add to the container
+      child.place_leaf(k, std::forward<valueU>(m));
+
+      num++;
+
+      return;
+    }
   }
 }
 
 SHARING_MAPT4(valueU, void)
 ::replace(const key_type &k, valueU &&m)
 {
-  innert *cp = get_container_node(k);
-  SM_ASSERT(cp != nullptr);
-
-  leaft *lp = cp->find_leaf(k);
-  PRECONDITION(lp != nullptr); // key must exist in map
+  nodet &lp = get_leaf_node(k);
 
   INVARIANT(
-    !value_equalt()(as_const(lp)->get_value(), m),
+    !value_equalt()(lp.get_value(), m),
     "values should not be replaced with equal values to maximize sharing");
 
-  lp->set_value(std::forward<valueU>(m));
+  lp.set_value(std::forward<valueU>(m));
 }
 
 SHARING_MAPT(void)
 ::update(const key_type &k, std::function<void(mapped_type &)> mutator)
 {
-  innert *cp = get_container_node(k);
-  SM_ASSERT(cp != nullptr);
+  nodet &lp = get_leaf_node(k);
 
-  leaft *lp = cp->find_leaf(k);
-  PRECONDITION(lp != nullptr); // key must exist in map
+  value_comparatort comparator(lp.get_value());
 
-  value_comparatort comparator(as_const(lp)->get_value());
-
-  lp->mutate_value(mutator);
+  lp.mutate_value(mutator);
 
   INVARIANT(
-    !comparator(as_const(lp)->get_value()),
+    !comparator(lp.get_value()),
     "sharing_mapt::update should make some change. Consider using read-only "
     "method to check if an update is needed beforehand");
 }
@@ -1314,7 +1385,7 @@ SHARING_MAPT(void)
 SHARING_MAPT2(optionalt<std::reference_wrapper<const, mapped_type>>)::find(
   const key_type &k) const
 {
-  const leaft *lp = get_leaf_node(k);
+  const nodet *lp = get_leaf_node(k);
 
   if(lp == nullptr)
     return {};
