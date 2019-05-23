@@ -3,7 +3,7 @@ Test.class
 --function Test.checkAbort --trace
 ^EXIT=10$
 ^SIGNAL=0$
-dynamic_object[0-9]*=\(assignment removed\)
+dynamic_object[0-9]*=.*\?.*
 --
 --
 This tests that the object does not appear in the trace, because concretizing

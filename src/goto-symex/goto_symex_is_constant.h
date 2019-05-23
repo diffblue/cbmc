@@ -47,6 +47,20 @@ protected:
       */
       return false;
     }
+    else if(expr.id() == ID_if)
+    {
+      // don't treat nested if_exprt as constant (even when they are!) as this
+      // may give rise to large expressions that we repeatedly pass to the
+      // simplifier; this is observable on regression/cbmc-library/memmove-01
+      const if_exprt &if_expr = to_if_expr(expr);
+      if(
+        if_expr.true_case().id() == ID_if || if_expr.false_case().id() == ID_if)
+      {
+        return false;
+      }
+    }
+    else if(expr.id() == ID_nondet_symbol)
+      return true;
 
     return is_constantt::is_constant(expr);
   }
