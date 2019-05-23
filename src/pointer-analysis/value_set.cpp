@@ -33,7 +33,7 @@ Author: Daniel Kroening, kroening@kroening.com
 // Due to a large number of functions defined inline, `value_sett` and
 // associated types are documented in its header file, `value_set.h`.
 
-const value_sett::object_map_dt value_sett::object_map_dt::blank{};
+const value_sett::object_map_dt value_sett::empty_object_map{};
 object_numberingt value_sett::object_numbering;
 
 bool value_sett::field_sensitive(const irep_idt &id, const typet &type)

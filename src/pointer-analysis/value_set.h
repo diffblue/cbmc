@@ -89,73 +89,10 @@ public:
   /// offsets (`offsett` instances). This is the RHS set of a single row of
   /// the enclosing `value_sett`, such as `{ null, dynamic_object1 }`.
   /// The set is represented as a map from numbered `exprt`s to `offsett`
-  /// instead of a set of pairs to make lookup by `exprt` easier. All
-  /// methods matching the interface of `std::map` forward those methods
-  /// to the internal map.
-  class object_map_dt
-  {
-    typedef std::map<object_numberingt::number_type, offsett> data_typet;
-    data_typet data;
+  /// instead of a set of pairs to make lookup by `exprt` easier.
+  using object_map_dt = std::map<object_numberingt::number_type, offsett>;
 
-  public:
-    // NOLINTNEXTLINE(readability/identifiers)
-    typedef data_typet::iterator iterator;
-    // NOLINTNEXTLINE(readability/identifiers)
-    typedef data_typet::const_iterator const_iterator;
-    // NOLINTNEXTLINE(readability/identifiers)
-    typedef data_typet::value_type value_type;
-    // NOLINTNEXTLINE(readability/identifiers)
-    typedef data_typet::key_type key_type;
-
-    iterator begin() { return data.begin(); }
-    const_iterator begin() const { return data.begin(); }
-    const_iterator cbegin() const { return data.cbegin(); }
-
-    iterator end() { return data.end(); }
-    const_iterator end() const { return data.end(); }
-    const_iterator cend() const { return data.cend(); }
-
-    size_t size() const { return data.size(); }
-    bool empty() const { return data.empty(); }
-
-    void erase(key_type i) { data.erase(i); }
-    void erase(const_iterator it) { data.erase(it); }
-
-    offsett &operator[](key_type i)
-    {
-      return data[i];
-    }
-    offsett &at(key_type i)
-    {
-      return data.at(i);
-    }
-    const offsett &at(key_type i) const
-    {
-      return data.at(i);
-    }
-
-    template <typename It>
-    void insert(It b, It e) { data.insert(b, e); }
-
-    template <typename T>
-    const_iterator find(T &&t) const { return data.find(std::forward<T>(t)); }
-
-    static const object_map_dt blank;
-
-    object_map_dt()=default;
-
-    bool operator==(const object_map_dt &other) const
-    {
-      return data==other.data;
-    }
-    bool operator!=(const object_map_dt &other) const
-    {
-      return !(*this==other);
-    }
-
-  protected:
-    ~object_map_dt()=default;
-  };
+  static const object_map_dt empty_object_map;
 
   /// Converts an `object_map_dt` element `object_number -> offset` into an
   /// `object_descriptor_exprt` with
@@ -175,7 +112,7 @@ public:
   ///
   /// Then the set { dynamic_object1 }, represented by an `object_map_dt`, can
   /// be shared between the two `value_sett` instances.
-  typedef reference_counting<object_map_dt> object_mapt;
+  using object_mapt = reference_counting<object_map_dt, empty_object_map>;
 
   /// Sets an element in object map `dest` to match an existing element `it`
   /// from a different map. Any existing element for the same `exprt` is
