@@ -1,0 +1,11 @@
+CORE
+main.c
+
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+Value-set filtering did not take into account arithemetic over pointers and thus
+spuriously failed an invariant.
