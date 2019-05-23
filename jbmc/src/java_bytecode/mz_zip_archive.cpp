@@ -103,3 +103,16 @@ std::string mz_zip_archivet::extract(const size_t index)
   }
   throw std::runtime_error("Could not extract the file");
 }
+
+void mz_zip_archivet::extract_to_file(
+  const size_t index,
+  const std::string &path)
+{
+  const auto id = static_cast<mz_uint>(index);
+  if(
+    mz_zip_reader_extract_to_file(m_state.get(), id, path.c_str(), 0) !=
+    MZ_TRUE)
+  {
+    throw std::runtime_error("Could not extract the file");
+  }
+}

@@ -51,6 +51,12 @@ public:
   /// \throw Throws std::runtime_error if file cannot be extracted
   /// \return Contents of the file in the archive
   std::string extract(size_t index);
+  /// Write contents of nth file in the archive to a file
+  /// \param index: id of the file in the archive
+  /// \param path:  path to which to write the contents of the file
+  /// \throw Throws std::runtime_error if file cannot be written
+  void extract_to_file(size_t index, const std::string &path);
+
 private:
   std::unique_ptr<mz_zip_archive_statet> m_state;
 };
