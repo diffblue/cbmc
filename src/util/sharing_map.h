@@ -249,7 +249,7 @@ public:
   ///
   /// Complexity:
   /// - Worst case: O(H * S + M)
-  /// - Best case: O(H)
+  /// - Best case: O(1)
   ///
   /// \param k: The key of the element to erase
   void erase(const key_type &k);
@@ -258,7 +258,7 @@ public:
   ///
   /// Complexity:
   /// - Worst case: O(H * S + M)
-  /// - Best case: O(H)
+  /// - Best case: O(1)
   ///
   /// \param k: The key of the element to erase
   void erase_if_exists(const key_type &k)
@@ -271,7 +271,7 @@ public:
   ///
   /// Complexity:
   /// - Worst case: O(H * S + M)
-  /// - Best case: O(H)
+  /// - Best case: O(1)
   ///
   /// \param k: The key of the element to insert
   /// \param m: The mapped value to insert
@@ -282,7 +282,7 @@ public:
   ///
   /// Complexity:
   /// - Worst case: O(H * S + M)
-  /// - Best case: O(H)
+  /// - Best case: O(1)
   ///
   /// \param k: The key of the element to insert
   /// \param m: The mapped value to replace the old value with
@@ -306,7 +306,7 @@ public:
   ///
   /// Complexity:
   /// - Worst case: O(H * log(S) + M)
-  /// - Best case: O(H)
+  /// - Best case: O(1)
   ///
   /// \param k: The key of the element to search
   /// \return optionalt containing a const reference to the value if found
@@ -350,7 +350,7 @@ public:
   ///
   /// Complexity:
   /// - Worst case: O(H * log(S) + M)
-  /// - Best case: O(H)
+  /// - Best case: O(1)
   bool has_key(const key_type &k) const
   {
     return get_leaf_node(k)!=nullptr;
