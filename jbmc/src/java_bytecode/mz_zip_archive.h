@@ -28,7 +28,7 @@ public:
   /// Loads a zip buffer
   /// \param data: pointer to the memory buffer
   /// \param size: size of the buffer
-  /// \throw Throws std::runtime_error if file cannot be opened
+  /// \throw Throws std::runtime_error if data is not in correct format
   mz_zip_archivet(const void *data, size_t size);
 
   mz_zip_archivet(const mz_zip_archivet &)=delete;

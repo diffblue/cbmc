@@ -31,7 +31,7 @@ public:
   /// Open a JAR file of size \p size loaded in memory at address \p data.
   /// \param data: memory buffer with the contents of the jar file
   /// \param size: size  of the memory buffer
-  /// \throw Throws std::runtime_error if file cannot be opened
+  /// \throw Throws std::runtime_error if data is not in correct format
   jar_filet(const void *data, size_t size);
 
   jar_filet(const jar_filet &)=delete;
