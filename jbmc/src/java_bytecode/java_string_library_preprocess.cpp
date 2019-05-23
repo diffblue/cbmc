@@ -950,6 +950,22 @@ code_blockt java_string_library_preprocesst::make_float_to_string_code(
     string_literal_to_string_expr("-Infinity", loc, symbol_table, code);
   string_expr_list.push_back(minus_infinity);
 
+  // Case of 0.0
+  // Note: for zeros we must use equal_exprt and not ieee_float_equal_exprt,
+  // the latter disregards the sign
+  condition_list.push_back(equal_exprt(arg, zero));
+  const refined_string_exprt zero_string =
+    string_literal_to_string_expr("0.0", loc, symbol_table, code);
+  string_expr_list.push_back(zero_string);
+
+  // Case of -0.0
+  ieee_floatt minus_zero_float(float_spec);
+  minus_zero_float.from_float(-0.0f);
+  condition_list.push_back(equal_exprt(arg, minus_zero_float.to_expr()));
+  const refined_string_exprt minus_zero_string =
+    string_literal_to_string_expr("-0.0", loc, symbol_table, code);
+  string_expr_list.push_back(minus_zero_string);
+
   // Case of simple notation
   ieee_floatt bound_inf_float(float_spec);
   ieee_floatt bound_sup_float(float_spec);
