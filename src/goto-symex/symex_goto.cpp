@@ -70,10 +70,9 @@ void goto_symext::apply_goto_condition(
 /// Try to evaluate a simple pointer comparison.
 /// \param operation: ID_equal or ID_not_equal
 /// \param symbol_expr: The symbol expression in the condition
-/// \param other_operand: The other expression in the condition - must pass
-///   goto_symex_is_constant, and since it is pointer-typed it must therefore
-///   be an address of expression, a typecast of an address of expression or a
-///   null pointer
+/// \param other_operand: The other expression in the condition; we only support
+///   an address of expression, a typecast of an address of expression or a
+///   null pointer, and return an empty optionalt in all other cases
 /// \param value_set: The value-set for looking up what the symbol can point to
 /// \param language_mode: The language mode
 /// \param ns: A namespace
@@ -90,12 +89,12 @@ static optionalt<renamedt<exprt, L2>> try_evaluate_pointer_comparison(
   const constant_exprt *constant_expr =
     expr_try_dynamic_cast<constant_exprt>(other_operand);
 
-  INVARIANT(
-    skip_typecast(other_operand).id() == ID_address_of ||
-      (constant_expr && constant_expr->get_value() == ID_NULL),
-    "An expression that passes goto_symex_is_constant and has "
-    "pointer-type must be an address of expression (possibly with some "
-    "typecasts) or a null pointer");
+  if(
+    skip_typecast(other_operand).id() != ID_address_of &&
+    (!constant_expr || constant_expr->get_value() != ID_NULL))
+  {
+    return {};
+  }
 
   const ssa_exprt *ssa_symbol_expr =
     expr_try_dynamic_cast<ssa_exprt>(symbol_expr);
