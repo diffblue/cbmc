@@ -74,10 +74,6 @@ public:
 protected:
   const namespacet &ns;
   std::size_t null_object, invalid_object;
-
-  exprt pointer_expr(
-    const mp_integer &offset,
-    const exprt &object) const;
 };
 
 #endif // CPROVER_SOLVERS_FLATTENING_POINTER_LOGIC_H
