@@ -29,6 +29,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/options.h>
 #include <util/pointer_offset_size.h>
 #include <util/pointer_predicates.h>
+#include <util/range.h>
 #include <util/simplify_expr.h>
 #include <util/ssa_expr.h>
 
@@ -123,8 +124,6 @@ exprt value_set_dereferencet::dereference(const exprt &pointer)
       retained_values.push_back(value);
   }
 
-  std::list<valuet> values;
-
   exprt compare_against_pointer = pointer;
 
   if(retained_values.size() >= 2 && should_use_local_definition_for(pointer))
@@ -147,8 +146,10 @@ exprt value_set_dereferencet::dereference(const exprt &pointer)
   std::cout << "}\n" << std::flush;
 #endif
 
-  for(const auto &value : retained_values)
-    values.push_back(build_reference_to(value, compare_against_pointer, ns));
+  std::list<valuet> values =
+    make_range(retained_values).map([&](const exprt &value) {
+      return build_reference_to(value, compare_against_pointer, ns);
+    });
 
   // can this fail?
   bool may_fail;
