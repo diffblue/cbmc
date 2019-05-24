@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_LANGUAGE_H
 #define CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_LANGUAGE_H
 
+#include "assignments_from_json.h"
 #include "ci_lazy_methods.h"
 #include "ci_lazy_methods_needed.h"
 #include "java_class_loader.h"
@@ -39,7 +40,8 @@ Author: Daniel Kroening, kroening@kroening.com
   "(no-lazy-methods)" \
   "(lazy-methods-extra-entry-point):" \
   "(java-load-class):" \
-  "(java-no-load-class):"
+  "(java-no-load-class):" \
+  "(static-values):"
 
 #define JAVA_BYTECODE_LANGUAGE_OPTIONS_HELP /*NOLINT*/ \
   " --disable-uncaught-exception-check\n" \
@@ -71,7 +73,13 @@ Author: Daniel Kroening, kroening@kroening.com
   "                              METHODNAME can be a regex that will be matched\n" /* NOLINT(*) */ \
   "                              against all symbols. If missing a java:: prefix\n"    /* NOLINT(*) */ \
   "                              will be added. If no descriptor is found, all\n"/* NOLINT(*) */ \
-  "                              overloads of a method will also be added.\n"
+  "                              overloads of a method will also be added.\n" \
+  " --static-values f            Load initial values of static fields from the given\n"/* NOLINT(*) */ \
+  "                              JSON file. We assign static fields to these values\n"/* NOLINT(*) */ \
+  "                              instead of calling the normal static initializer\n"/* NOLINT(*) */ \
+  "                              (clinit) method.\n" \
+  "                              The argument can be a relative or absolute path to\n"/* NOLINT(*) */ \
+  "                              the file.\n"
 // clang-format on
 
 class symbolt;
@@ -197,6 +205,10 @@ protected:
   java_string_library_preprocesst string_preprocess;
   std::string java_cp_include_files;
   bool nondet_static;
+  /// Path to a JSON file which contains initial values of static fields (right
+  /// after the static initializer of the class was run). This is read from the
+  /// --static-values command-line option.
+  std::string static_values_file;
 
   // list of classes to force load even without reference from the entry point
   std::vector<irep_idt> java_load_classes;
@@ -216,6 +228,12 @@ private:
   std::unordered_set<std::string> no_load_classes;
 
   std::vector<load_extra_methodst> extra_methods;
+
+  /// Map used in all calls to functions that deterministically create objects
+  /// (currently only \ref assign_from_json).
+  /// It tracks objects that should be reference-equal to each other by mapping
+  /// IDs of such objects to symbols that store their values.
+  std::unordered_map<std::string, object_creation_referencet> references;
 };
 
 std::unique_ptr<languaget> new_java_bytecode_language();

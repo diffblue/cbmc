@@ -121,25 +121,7 @@ symbol_exprt allocate_objectst::allocate_automatic_local_object(
   return aux_symbol.symbol_expr();
 }
 
-/// Generates code for allocating a dynamic object. A new variable with basename
-/// prefix `alloc_site` is introduced to which the allocated memory is assigned.
-/// Then, the variable is assigned to `target_expr`. For example, with
-/// `target_expr` being `*p` the following code is generated:
-///
-/// `alloc_site$1 = ALLOCATE(object_size, FALSE);`
-/// `*p = alloc_site$1;`
-///
-/// The function returns a dereference expressiont that dereferences the
-/// allocation site variable (e.g., `*alloc_site$1`) and which can be used to
-/// initialize the allocated memory.
-///
-/// \param output_code: Code block to which the necessary code is added
-/// \param target_expr: A pointer to the allocated memory will be assigned to
-///   this (lvalue) expression
-/// \param allocate_type: Type of the object allocated
-/// \return A dereference_exprt that dereferences the pointer to the allocated
-///   memory, or an empty expression when `allocate_type` is void
-exprt allocate_objectst::allocate_dynamic_object(
+exprt allocate_objectst::allocate_dynamic_object_symbol(
   code_blockt &output_code,
   const exprt &target_expr,
   const typet &allocate_type)
@@ -183,7 +165,16 @@ exprt allocate_objectst::allocate_dynamic_object(
   code.add_source_location() = source_location;
   output_code.add(code);
 
-  return dereference_exprt(malloc_sym.symbol_expr());
+  return malloc_sym.symbol_expr();
+}
+
+exprt allocate_objectst::allocate_dynamic_object(
+  code_blockt &output_code,
+  const exprt &target_expr,
+  const typet &allocate_type)
+{
+  return dereference_exprt(
+    allocate_dynamic_object_symbol(output_code, target_expr, allocate_type));
 }
 
 exprt allocate_objectst::allocate_non_dynamic_object(

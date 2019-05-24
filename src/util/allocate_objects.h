@@ -62,6 +62,29 @@ public:
     const typet &allocate_type,
     const irep_idt &basename_prefix = "tmp");
 
+  /// Generates code for allocating a dynamic object. A new variable with
+  /// basename prefix `alloc_site` is introduced to which the allocated memory
+  /// is assigned.
+  /// Then, the variable is assigned to `target_expr`. For example, with
+  /// `target_expr` being `*p` the following code is generated:
+  ///
+  /// `alloc_site$1 = ALLOCATE(object_size, FALSE);`
+  /// `*p = alloc_site$1;`
+  ///
+  /// \param output_code: Code block to which the necessary code is added
+  /// \param target_expr: A pointer to the allocated memory will be assigned to
+  ///   this (lvalue) expression
+  /// \param allocate_type: Type of the object allocated
+  /// \return The pointer to the allocated memory, or an empty expression
+  ///   when `allocate_type` is void
+  exprt allocate_dynamic_object_symbol(
+    code_blockt &output_code,
+    const exprt &target_expr,
+    const typet &allocate_type);
+
+  /// Generate the same code as \ref allocate_dynamic_object_symbol, but
+  /// return a dereference_exprt that dereferences the newly created pointer
+  /// to the allocated memory.
   exprt allocate_dynamic_object(
     code_blockt &output_code,
     const exprt &target_expr,

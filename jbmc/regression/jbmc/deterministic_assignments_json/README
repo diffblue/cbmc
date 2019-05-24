@@ -1,0 +1,10 @@
+This directory contains tests for the --static-values feature: reading initial
+values of static fields from a JSON file.
+Most of the tests are in StaticValues.java, some more tests are included in
+Color.java, and all other classes are used to create instances of various kinds
+of objects to use in the tests.
+The initial static field values are read from the file clinit-state.json.
+The script generate-json.sh (which calls org.cprover.JsonGenerator in the Maven
+project) can be used to generate output similar to the contents of
+clinit-state.json (with slightly less pretty-printing/newlines, which are not
+supported in the custom writers and were manually added to clinit-state.json).

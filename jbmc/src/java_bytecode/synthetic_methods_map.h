@@ -27,6 +27,12 @@ enum class synthetic_method_typet
   /// These are generated for both user and stub types, to ensure the actual
   /// static initializer is only run once on any given path.
   STATIC_INITIALIZER_WRAPPER,
+  /// Only exists if the `--static-values` option was used.
+  /// If a given type has an entry in the file given by this option, the "user
+  /// specified static initializer" contains a sequence of assignments from
+  /// static field expressions to values read from the file.
+  /// Otherwise, this function simply calls the regular clinit.
+  USER_SPECIFIED_STATIC_INITIALIZER,
   /// A generated (synthetic) static initializer function for a stub type.
   /// Because we don't have the bytecode for a stub type (by definition), we
   /// generate a static initializer function to initialize its static fields.

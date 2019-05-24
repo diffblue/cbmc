@@ -10,11 +10,12 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 #include "java_object_factory.h"
 #include "java_utils.h"
 #include <goto-programs/class_hierarchy.h>
-#include <util/std_types.h>
-#include <util/std_expr.h>
-#include <util/std_code.h>
-#include <util/suffix.h>
+#include <json/json_parser.h>
 #include <util/arith_tools.h>
+#include <util/std_code.h>
+#include <util/std_expr.h>
+#include <util/std_types.h>
+#include <util/suffix.h>
 
 /// The three states in which a `<clinit>` method for a class can be before,
 /// after, and during static class initialization. These states are only used
@@ -52,6 +53,7 @@ static typet clinit_states_type()
 // Disable linter here to allow a std::string constant, since that holds
 // a length, whereas a cstr would require strlen every time.
 const std::string clinit_wrapper_suffix = "::clinit_wrapper"; // NOLINT(*)
+const std::string user_specified_clinit_suffix = "::user_specified_clinit"; // NOLINT(*)
 const std::string clinit_function_suffix = ".<clinit>:()V"; // NOLINT(*)
 
 /// Get the Java static initializer wrapper name for a given class (the wrapper
@@ -63,6 +65,11 @@ const std::string clinit_function_suffix = ".<clinit>:()V"; // NOLINT(*)
 irep_idt clinit_wrapper_name(const irep_idt &class_name)
 {
   return id2string(class_name) + clinit_wrapper_suffix;
+}
+
+irep_idt user_specified_clinit_name(const irep_idt &class_name)
+{
+  return id2string(class_name) + user_specified_clinit_suffix;
 }
 
 /// Check if function_id is a clinit wrapper
@@ -190,6 +197,8 @@ gen_clinit_eqexpr(const exprt &expr, const clinit_statest state)
 /// \param class_name: name of the class to generate clinit wrapper calls for
 /// \param [out] init_body: appended with calls to clinit wrapper
 /// \param nondet_static: true if nondet-static option was given
+/// \param replace_clinit: true iff calls to clinit are replaced with calls to
+///   user_specified_clinit.
 /// \param object_factory_parameters: object factory parameters used to populate
 ///   nondet-initialized globals and objects reachable from them (only needed
 ///   if nondet-static is true)
@@ -201,6 +210,7 @@ static void clinit_wrapper_do_recursive_calls(
   const irep_idt &class_name,
   code_blockt &init_body,
   const bool nondet_static,
+  const bool replace_clinit,
   const java_object_factory_parameterst &object_factory_parameters,
   const select_pointer_typet &pointer_type_selector,
   message_handlert &message_handler)
@@ -214,8 +224,10 @@ static void clinit_wrapper_do_recursive_calls(
       init_body.add(code_function_callt{base_init_func->symbol_expr()});
   }
 
-  const irep_idt &real_clinit_name = clinit_function_name(class_name);
-  if(const auto clinit_func = symbol_table.lookup(real_clinit_name))
+  const irep_idt &clinit_name = replace_clinit
+                                  ? user_specified_clinit_name(class_name)
+                                  : clinit_function_name(class_name);
+  if(const auto clinit_func = symbol_table.lookup(clinit_name))
     init_body.add(code_function_callt{clinit_func->symbol_expr()});
 
   // If nondet-static option is given, add a standard nondet initialization for
@@ -291,6 +303,65 @@ static bool needs_clinit_wrapper(
   return false;
 }
 
+static void create_function_symbol(
+  const irep_idt &class_name,
+  const irep_idt &function_name,
+  const irep_idt &function_base_name,
+  const synthetic_method_typet &synthetic_method_type,
+  symbol_tablet &symbol_table,
+  synthetic_methods_mapt &synthetic_methods)
+{
+  symbolt function_symbol;
+  const java_method_typet function_type({}, java_void_type());
+  function_symbol.name = function_name;
+  function_symbol.pretty_name = function_symbol.name;
+  function_symbol.base_name = function_base_name;
+  function_symbol.type = function_type;
+  // This provides a back-link from a method to its associated class, as is done
+  // for java_bytecode_convert_methodt::convert.
+  set_declaring_class(function_symbol, class_name);
+  function_symbol.mode = ID_java;
+  bool failed = symbol_table.add(function_symbol);
+  INVARIANT(!failed, id2string(function_base_name) + " symbol should be fresh");
+
+  auto insert_result =
+    synthetic_methods.emplace(function_symbol.name, synthetic_method_type);
+  INVARIANT(
+    insert_result.second,
+    "synthetic methods map should not already contain entry for " +
+      id2string(function_base_name));
+}
+
+// Create symbol for the "clinit_wrapper"
+static void create_clinit_wrapper_function_symbol(
+  const irep_idt &class_name,
+  symbol_tablet &symbol_table,
+  synthetic_methods_mapt &synthetic_methods)
+{
+  create_function_symbol(
+    class_name,
+    clinit_wrapper_name(class_name),
+    "clinit_wrapper",
+    synthetic_method_typet::STATIC_INITIALIZER_WRAPPER,
+    symbol_table,
+    synthetic_methods);
+}
+
+// Create symbol for the "user_specified_clinit"
+static void create_user_specified_clinit_function_symbol(
+  const irep_idt &class_name,
+  symbol_tablet &symbol_table,
+  synthetic_methods_mapt &synthetic_methods)
+{
+  create_function_symbol(
+    class_name,
+    user_specified_clinit_name(class_name),
+    "user_specified_clinit",
+    synthetic_method_typet::USER_SPECIFIED_STATIC_INITIALIZER,
+    symbol_table,
+    synthetic_methods);
+}
+
 /// Creates a static initializer wrapper symbol for the given class, along with
 /// a global boolean that tracks if it has been run already.
 /// \param class_name: class symbol name
@@ -345,27 +416,8 @@ static void create_clinit_wrapper_symbols(
       true);
   }
 
-  // Create symbol for the "clinit_wrapper"
-  symbolt wrapper_method_symbol;
-  const java_method_typet wrapper_method_type({}, java_void_type());
-  wrapper_method_symbol.name = clinit_wrapper_name(class_name);
-  wrapper_method_symbol.pretty_name = wrapper_method_symbol.name;
-  wrapper_method_symbol.base_name = "clinit_wrapper";
-  wrapper_method_symbol.type = wrapper_method_type;
-  // This provides a back-link from a method to its associated class, as is done
-  // for java_bytecode_convert_methodt::convert.
-  set_declaring_class(wrapper_method_symbol, class_name);
-  wrapper_method_symbol.mode = ID_java;
-  bool failed = symbol_table.add(wrapper_method_symbol);
-  INVARIANT(!failed, "clinit-wrapper symbol should be fresh");
-
-  auto insert_result = synthetic_methods.emplace(
-    wrapper_method_symbol.name,
-    synthetic_method_typet::STATIC_INITIALIZER_WRAPPER);
-  INVARIANT(
-    insert_result.second,
-    "synthetic methods map should not already contain entry for "
-    "clinit wrapper");
+  create_clinit_wrapper_function_symbol(
+    class_name, symbol_table, synthetic_methods);
 }
 
 /// Thread safe version of the static initializer.
@@ -436,6 +488,8 @@ static void create_clinit_wrapper_symbols(
 ///   name created by `create_clinit_wrapper_symbols`)
 /// \param symbol_table: global symbol table
 /// \param nondet_static: true if nondet-static option was given
+/// \param replace_clinit: true iff calls to clinit are replaced with calls to
+///   user_specified_clinit.
 /// \param object_factory_parameters: object factory parameters used to populate
 ///   nondet-initialized globals and objects reachable from them (only needed
 ///   if nondet-static is true)
@@ -447,6 +501,7 @@ code_blockt get_thread_safe_clinit_wrapper_body(
   const irep_idt &function_id,
   symbol_table_baset &symbol_table,
   const bool nondet_static,
+  const bool replace_clinit,
   const java_object_factory_parameterst &object_factory_parameters,
   const select_pointer_typet &pointer_type_selector,
   message_handlert &message_handler)
@@ -599,6 +654,7 @@ code_blockt get_thread_safe_clinit_wrapper_body(
       *class_name,
       init_body,
       nondet_static,
+      replace_clinit,
       object_factory_parameters,
       pointer_type_selector,
       message_handler);
@@ -628,6 +684,8 @@ code_blockt get_thread_safe_clinit_wrapper_body(
 ///   name created by `create_clinit_wrapper_symbols`)
 /// \param symbol_table: global symbol table
 /// \param nondet_static: true if nondet-static option was given
+/// \param replace_clinit: true iff calls to clinit are replaced with calls to
+///   user_specified_clinit.
 /// \param object_factory_parameters: object factory parameters used to populate
 ///   nondet-initialized globals and objects reachable from them (only needed
 ///   if nondet-static is true)
@@ -639,6 +697,7 @@ code_ifthenelset get_clinit_wrapper_body(
   const irep_idt &function_id,
   symbol_table_baset &symbol_table,
   const bool nondet_static,
+  const bool replace_clinit,
   const java_object_factory_parameterst &object_factory_parameters,
   const select_pointer_typet &pointer_type_selector,
   message_handlert &message_handler)
@@ -683,6 +742,7 @@ code_ifthenelset get_clinit_wrapper_body(
     *class_name,
     init_body,
     nondet_static,
+    replace_clinit,
     object_factory_parameters,
     pointer_type_selector,
     message_handler);
@@ -691,17 +751,91 @@ code_ifthenelset get_clinit_wrapper_body(
   return code_ifthenelset(std::move(check_already_run), std::move(init_body));
 }
 
-/// Create static initializer wrappers for all classes that need them.
+code_blockt get_user_specified_clinit_body(
+  const irep_idt &class_id,
+  const std::string &static_values_file,
+  symbol_table_baset &symbol_table,
+  message_handlert &message_handler,
+  optionalt<ci_lazy_methods_neededt> needed_lazy_methods,
+  size_t max_user_array_length,
+  std::unordered_map<std::string, object_creation_referencet> &references)
+{
+  jsont json;
+  if(
+    !static_values_file.empty() &&
+    !parse_json(static_values_file, message_handler, json) && json.is_object())
+  {
+    const auto &json_object = to_json_object(json);
+    const auto class_entry =
+      json_object.find(id2string(strip_java_namespace_prefix(class_id)));
+    if(class_entry != json_object.end())
+    {
+      const auto &class_json_value = class_entry->second;
+      if(class_json_value.is_object())
+      {
+        const auto &class_json_object = to_json_object(class_json_value);
+        std::map<symbol_exprt, jsont> static_field_values;
+        for(const auto &symbol_pair : symbol_table)
+        {
+          const symbolt &symbol = symbol_pair.second;
+          if(
+            declaring_class(symbol) && *declaring_class(symbol) == class_id &&
+            symbol.is_static_lifetime)
+          {
+            const symbol_exprt &static_field_expr = symbol.symbol_expr();
+            const auto &static_field_entry =
+              class_json_object.find(id2string(symbol.base_name));
+            if(static_field_entry != class_json_object.end())
+            {
+              static_field_values.insert(
+                {static_field_expr, static_field_entry->second});
+            }
+          }
+        }
+        code_blockt body;
+        for(const auto &value_pair : static_field_values)
+        {
+          assign_from_json(
+            value_pair.first,
+            value_pair.second,
+            clinit_function_name(class_id),
+            body,
+            symbol_table,
+            needed_lazy_methods,
+            max_user_array_length,
+            references);
+        }
+        return body;
+      }
+    }
+  }
+  const irep_idt &real_clinit_name = clinit_function_name(class_id);
+  if(const auto clinit_func = symbol_table.lookup(real_clinit_name))
+    return code_blockt{{code_function_callt{clinit_func->symbol_expr()}}};
+  return code_blockt{};
+}
+
+/// Create static initializer wrappers and possibly user-specified functions for
+/// initial static field value assignments for all classes that need them.
+/// For each class that will require a static initializer wrapper, create a
+/// function named package.classname::clinit_wrapper, and a corresponding
+/// global tracking whether it has run or not. If a file containing initial
+/// static values is given, also create a function named
+/// package.classname::user_specified_clinit.
 /// \param symbol_table: global symbol table
 /// \param synthetic_methods: synthetic methods map. Will be extended noting
 ///   that any wrapper belongs to this code, and so `get_clinit_wrapper_body`
 ///   should be used to produce the method body when required.
 /// \param thread_safe: if true state variables required to make the
 ///   clinit_wrapper thread safe will be created.
-void create_static_initializer_wrappers(
+/// \param is_user_clinit_needed: determines whether or not a symbol for the
+///   synthetic user_specified_clinit function should be created. This is true
+///   if a file was given with the --static-values option and false otherwise.
+void create_static_initializer_symbols(
   symbol_tablet &symbol_table,
   synthetic_methods_mapt &synthetic_methods,
-  const bool thread_safe)
+  const bool thread_safe,
+  const bool is_user_clinit_needed)
 {
   // Top-sort the class hierarchy, such that we visit parents before children,
   // and can so identify parents that need static initialisation by whether we
@@ -718,6 +852,11 @@ void create_static_initializer_wrappers(
     {
       create_clinit_wrapper_symbols(
         class_identifier, symbol_table, synthetic_methods, thread_safe);
+      if(is_user_clinit_needed)
+      {
+        create_user_specified_clinit_function_symbol(
+          class_identifier, symbol_table, synthetic_methods);
+      }
     }
   }
 }

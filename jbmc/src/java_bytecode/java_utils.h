@@ -77,6 +77,13 @@ irep_idt resolve_friendly_method_name(
   const symbol_table_baset &symbol_table,
   std::string &error);
 
+/// Given a pointer type to a Java class and a type representing a more specific
+/// Java class, return a pointer type to the more specific class with the same
+/// structure as the original pointer type.
+pointer_typet pointer_to_replacement_type(
+  const pointer_typet &given_pointer_type,
+  const java_class_typet &replacement_class_type);
+
 /// Dereference an expression and flag it for a null-pointer check
 /// \param expr: expression to dereference and check
 dereference_exprt checked_dereference(const exprt &expr);

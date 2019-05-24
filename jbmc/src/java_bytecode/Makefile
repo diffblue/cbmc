@@ -1,4 +1,5 @@
-SRC = bytecode_info.cpp \
+SRC = assignments_from_json.cpp \
+      bytecode_info.cpp \
       character_refine_preprocess.cpp \
       ci_lazy_methods.cpp \
       ci_lazy_methods_needed.cpp \

@@ -9,6 +9,8 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 #ifndef CPROVER_JAVA_BYTECODE_JAVA_STATIC_INITIALIZERS_H
 #define CPROVER_JAVA_BYTECODE_JAVA_STATIC_INITIALIZERS_H
 
+#include "assignments_from_json.h"
+#include "ci_lazy_methods_needed.h"
 #include "java_object_factory_parameters.h"
 #include "select_pointer_type.h"
 #include "synthetic_methods_map.h"
@@ -20,18 +22,21 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 #include <util/symbol_table.h>
 
 irep_idt clinit_wrapper_name(const irep_idt &class_name);
+irep_idt user_specified_clinit_name(const irep_idt &class_name);
 
 bool is_clinit_wrapper_function(const irep_idt &function_id);
 
-void create_static_initializer_wrappers(
+void create_static_initializer_symbols(
   symbol_tablet &symbol_table,
   synthetic_methods_mapt &synthetic_methods,
-  const bool thread_safe);
+  const bool thread_safe,
+  const bool is_user_clinit_needed);
 
 code_blockt get_thread_safe_clinit_wrapper_body(
   const irep_idt &function_id,
   symbol_table_baset &symbol_table,
   const bool nondet_static,
+  const bool replace_clinit,
   const java_object_factory_parameterst &object_factory_parameters,
   const select_pointer_typet &pointer_type_selector,
   message_handlert &message_handler);
@@ -40,9 +45,42 @@ code_ifthenelset get_clinit_wrapper_body(
   const irep_idt &function_id,
   symbol_table_baset &symbol_table,
   const bool nondet_static,
+  const bool replace_clinit,
   const java_object_factory_parameterst &object_factory_parameters,
   const select_pointer_typet &pointer_type_selector,
   message_handlert &message_handler);
+
+/// Create the body of a user_specified_clinit function for a given class, which
+/// includes assignments for all static fields of the class to values read from
+/// an input file. If the file could not be parsed or an entry for this class
+/// could not be found in it, the user_specified_clinit function will only
+/// contain a call to the "real" clinit function, and not include any
+/// assignments itself. If an entry for this class is found but some of its
+/// static fields are not mentioned in the input file, those fields will be
+/// assigned default values (zero or null).
+/// \param class_id: the id of the class to create a user_specified_clinit
+///   function body for.
+/// \param static_values_file: input file containing values of static fields.
+///   The format is expected to be a map whose keys are class names, and whose
+///   values are maps from static field names to values. Currently only JSON
+///   is supported as a file format.
+/// \param symbol_table: used to look up and create new symbols
+/// \param message_handler: used to log any errors with parsing the input file
+/// \param needed_lazy_methods: used to mark any runtime types given in the
+///   input file as needed
+/// \param max_user_array_length: maximum value for constant or variable length
+///   arrays. Any arrays that were specified to be of nondeterministic length in
+///   the input file will be limited by this value.
+/// \param references: map to keep track of reference-equal objets.
+/// \return the body of the user_specified_clinit function as a code block.
+code_blockt get_user_specified_clinit_body(
+  const irep_idt &class_id,
+  const std::string &static_values_file,
+  symbol_table_baset &symbol_table,
+  message_handlert &message_handler,
+  optionalt<ci_lazy_methods_neededt> needed_lazy_methods,
+  size_t max_user_array_length,
+  std::unordered_map<std::string, object_creation_referencet> &references);
 
 class stub_global_initializer_factoryt
 {

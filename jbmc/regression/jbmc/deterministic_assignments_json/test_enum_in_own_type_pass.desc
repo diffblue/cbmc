@@ -1,0 +1,8 @@
+CORE
+Color.class
+--unwind 1 --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar` --static-values clinit-state.json --function Color.testEnumInOwnTypePass
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--

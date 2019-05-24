@@ -87,6 +87,10 @@ void parse_java_language_options(const cmdlinet &cmd, optionst &options)
     options.set_option(
       "java-cp-include-files", cmd.get_value("java-cp-include-files"));
   }
+  if(cmd.isset("static-values"))
+  {
+    options.set_option("static-values", cmd.get_value("static-values"));
+  }
 }
 
 /// Consume options that are java bytecode specific.
@@ -177,6 +181,7 @@ void java_bytecode_languaget::set_language_options(const optionst &options)
     java_cp_include_files=".*";
 
   nondet_static = options.get_bool_option("nondet-static");
+  static_values_file = options.get_option("static-values");
 
   language_options_initialized=true;
 }
@@ -784,11 +789,11 @@ bool java_bytecode_languaget::typecheck(
       symbol_table, symbol_table_journal.get_inserted(), synthetic_methods);
   }
 
-  // For each class that will require a static initializer wrapper, create a
-  // function named package.classname::clinit_wrapper, and a corresponding
-  // global tracking whether it has run or not:
-  create_static_initializer_wrappers(
-    symbol_table, synthetic_methods, threading_support);
+  create_static_initializer_symbols(
+    symbol_table,
+    synthetic_methods,
+    threading_support,
+    !static_values_file.empty());
 
   // Now incrementally elaborate methods
   // that are reachable from this entry point.
@@ -1086,6 +1091,7 @@ bool java_bytecode_languaget::convert_single_method(
           function_id,
           symbol_table,
           nondet_static,
+          !static_values_file.empty(),
           object_factory_parameters,
           get_pointer_type_selector(),
           get_message_handler());
@@ -1094,10 +1100,27 @@ bool java_bytecode_languaget::convert_single_method(
           function_id,
           symbol_table,
           nondet_static,
+          !static_values_file.empty(),
           object_factory_parameters,
           get_pointer_type_selector(),
           get_message_handler());
       break;
+    case synthetic_method_typet::USER_SPECIFIED_STATIC_INITIALIZER:
+    {
+      const auto class_name =
+        declaring_class(symbol_table.lookup_ref(function_id));
+      INVARIANT(
+        class_name, "user_specified_clinit must be declared by a class.");
+      writable_symbol.value = get_user_specified_clinit_body(
+        *class_name,
+        static_values_file,
+        symbol_table,
+        get_message_handler(),
+        needed_lazy_methods,
+        max_user_array_length,
+        references);
+      break;
+    }
     case synthetic_method_typet::STUB_CLASS_STATIC_INITIALIZER:
       writable_symbol.value =
         stub_global_initializer_factory.get_stub_initializer_body(
