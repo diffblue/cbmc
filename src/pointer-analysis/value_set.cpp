@@ -371,7 +371,7 @@ void value_sett::get_value_set(
   #endif
 }
 
-std::list<exprt>
+std::vector<exprt>
 value_sett::get_value_set(exprt expr, const namespacet &ns) const
 {
   const object_mapt object_map = get_value_set(std::move(expr), ns, false);

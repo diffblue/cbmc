@@ -151,7 +151,7 @@ void goto_program_dereferencet::get_value_set(
 /// expression \p expr.
 /// \param expr: an expression
 /// \return the value set
-std::list<exprt>
+std::vector<exprt>
 goto_program_dereferencet::get_value_set(const exprt &expr) const
 {
   return value_sets.get_values(current_function, current_target, expr);

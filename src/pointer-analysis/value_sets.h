@@ -28,7 +28,7 @@ public:
   typedef std::list<exprt> valuest;
 
   // this is not const to allow a lazy evaluation
-  DEPRECATED(SINCE(2019, 05, 22, "use list returning version instead"))
+  DEPRECATED(SINCE(2019, 05, 22, "use vector returning version instead"))
   virtual void get_values(
     const irep_idt &function_id,
     goto_programt::const_targett l,
@@ -36,7 +36,7 @@ public:
     valuest &dest) = 0;
 
   // this is not const to allow a lazy evaluation
-  virtual valuest get_values(
+  virtual std::vector<exprt> get_values(
     const irep_idt &function_id,
     goto_programt::const_targett l,
     const exprt &expr) = 0;

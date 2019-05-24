@@ -275,7 +275,7 @@ public:
   /// \param expr: query expression
   /// \param ns: global namespace
   /// \return list of expressions that `expr` may point to
-  std::list<exprt> get_value_set(exprt expr, const namespacet &ns) const;
+  std::vector<exprt> get_value_set(exprt expr, const namespacet &ns) const;
 
   /// Appears to be unimplemented.
   DEPRECATED(SINCE(2019, 05, 22, "Unimplemented"))

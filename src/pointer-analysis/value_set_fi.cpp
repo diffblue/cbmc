@@ -298,10 +298,14 @@ void value_set_fit::get_value_set(
   std::list<exprt> &value_set,
   const namespacet &ns) const
 {
-  value_set = get_value_set(expr, ns);
+  std::vector<exprt> result_as_vector = get_value_set(expr, ns);
+  std::move(
+    result_as_vector.begin(),
+    result_as_vector.end(),
+    std::back_inserter(value_set));
 }
 
-std::list<exprt>
+std::vector<exprt>
 value_set_fit::get_value_set(const exprt &expr, const namespacet &ns) const
 {
   object_mapt object_map;
@@ -343,7 +347,7 @@ value_set_fit::get_value_set(const exprt &expr, const namespacet &ns) const
       flat_map.write()[it->first]=it->second;
   }
 
-  std::list<exprt> result;
+  std::vector<exprt> result;
   forall_objects(fit, flat_map.read())
     result.push_back(to_expr(*fit));
 

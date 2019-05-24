@@ -76,7 +76,7 @@ public:
   }
 
   // interface value_sets
-  std::list<exprt>
+  std::vector<exprt>
   get_values(const irep_idt &, locationt l, const exprt &expr) override
   {
     return (*this)[l].value_set.get_value_set(expr, baset::ns);

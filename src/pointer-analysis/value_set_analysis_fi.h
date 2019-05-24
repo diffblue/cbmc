@@ -74,7 +74,7 @@ public:
     state.value_set.get_value_set(expr, dest, ns);
   }
 
-  std::list<exprt> get_values(
+  std::vector<exprt> get_values(
     const irep_idt &function_id,
     locationt l,
     const exprt &expr) override;

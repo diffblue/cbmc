@@ -34,11 +34,11 @@ protected:
   goto_symext::statet &state;
   const namespacet &ns;
 
-  DEPRECATED(SINCE(2019, 05, 22, "use list returning version instead"))
+  DEPRECATED(SINCE(2019, 05, 22, "use vector returning version instead"))
   void get_value_set(const exprt &expr, value_setst::valuest &value_set)
     const override;
 
-  value_setst::valuest get_value_set(const exprt &expr) const override;
+  std::vector<exprt> get_value_set(const exprt &expr) const override;
 
   const symbolt *get_or_create_failed_symbol(const exprt &expr) override;
 };

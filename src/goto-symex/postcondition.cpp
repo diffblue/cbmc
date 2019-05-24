@@ -160,16 +160,13 @@ bool postconditiont::is_used(
   else if(expr.id()==ID_dereference)
   {
     // aliasing may happen here
-    value_setst::valuest expr_set =
+    std::vector<exprt> expr_set =
       value_set.get_value_set(to_dereference_expr(expr).pointer(), ns);
     std::unordered_set<irep_idt> symbols;
 
-    for(value_setst::valuest::const_iterator
-        it=expr_set.begin();
-        it!=expr_set.end();
-        it++)
+    for(const exprt &e : expr_set)
     {
-      const exprt tmp = get_original_name(*it);
+      const exprt tmp = get_original_name(e);
       find_symbols(tmp, symbols);
     }
 
