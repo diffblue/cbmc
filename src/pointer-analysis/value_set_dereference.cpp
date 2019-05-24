@@ -97,8 +97,9 @@ exprt value_set_dereferencet::dereference(const exprt &pointer)
   // type of the object
   const typet &type=pointer.type().subtype();
 
-#if 0
-  std::cout << "DEREF: " << format(pointer) << '\n';
+#ifdef DEBUG
+  std::cout << "value_set_dereferencet::dereference pointer=" << format(pointer)
+            << '\n';
 #endif
 
   // collect objects the pointer may point to
@@ -106,12 +107,11 @@ exprt value_set_dereferencet::dereference(const exprt &pointer)
 
   dereference_callback.get_value_set(pointer, points_to_set);
 
-#if 0
-  for(value_setst::valuest::const_iterator
-      it=points_to_set.begin();
-      it!=points_to_set.end();
-      it++)
-    std::cout << "P: " << format(*it) << '\n';
+#ifdef DEBUG
+  std::cout << "value_set_dereferencet::dereference points_to_set={";
+  for(auto p : points_to_set)
+    std::cout << format(p) << "; ";
+  std::cout << "}\n" << std::flush;
 #endif
 
   // get the values of these
@@ -140,15 +140,15 @@ exprt value_set_dereferencet::dereference(const exprt &pointer)
     compare_against_pointer = fresh_binder.symbol_expr();
   }
 
+#ifdef DEBUG
+  std::cout << "value_set_dereferencet::dereference retained_values={";
   for(const auto &value : retained_values)
-  {
-    values.push_back(build_reference_to(value, compare_against_pointer, ns));
-#if 0
-    std::cout << "V: " << format(value.pointer_guard) << " --> ";
-    std::cout << format(value.value);
-    std::cout << '\n';
+    std::cout << format(value) << "; ";
+  std::cout << "}\n" << std::flush;
 #endif
-  }
+
+  for(const auto &value : retained_values)
+    values.push_back(build_reference_to(value, compare_against_pointer, ns));
 
   // can this fail?
   bool may_fail;
@@ -227,8 +227,10 @@ exprt value_set_dereferencet::dereference(const exprt &pointer)
   if(compare_against_pointer != pointer)
     value = let_exprt(to_symbol_expr(compare_against_pointer), pointer, value);
 
-#if 0
-  std::cout << "R: " << format(value) << "\n\n";
+#ifdef DEBUG
+  std::cout << "value_set_derefencet::dereference value=" << format(value)
+            << '\n'
+            << std::flush;
 #endif
 
   return value;
