@@ -116,13 +116,10 @@ exprt value_set_dereferencet::dereference(const exprt &pointer)
 #endif
 
   // get the values of these
-
-  std::vector<exprt> retained_values;
-  for(const auto &value : points_to_set)
-  {
-    if(!should_ignore_value(value, exclude_null_derefs, language_mode))
-      retained_values.push_back(value);
-  }
+  const std::vector<exprt> retained_values =
+    make_range(points_to_set).filter([&](const exprt &value) {
+      return !should_ignore_value(value, exclude_null_derefs, language_mode);
+    });
 
   exprt compare_against_pointer = pointer;
 
