@@ -25,6 +25,7 @@ irep_idt clinit_wrapper_name(const irep_idt &class_name);
 irep_idt user_specified_clinit_name(const irep_idt &class_name);
 
 bool is_clinit_wrapper_function(const irep_idt &function_id);
+bool is_clinit_function(const irep_idt &function_id);
 
 void create_static_initializer_symbols(
   symbol_tablet &symbol_table,

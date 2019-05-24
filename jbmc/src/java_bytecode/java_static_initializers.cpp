@@ -80,6 +80,14 @@ bool is_clinit_wrapper_function(const irep_idt &function_id)
   return has_suffix(id2string(function_id), clinit_wrapper_suffix);
 }
 
+/// Check if function_id is a clinit
+/// \param function_id: some function identifier
+/// \return true if the passed identifier is a clinit
+bool is_clinit_function(const irep_idt &function_id)
+{
+  return has_suffix(id2string(function_id), clinit_function_suffix);
+}
+
 /// Add a new symbol to the symbol table.
 /// Note: assumes that a symbol with this name does not exist.
 /// /param name: name of the symbol to be generated
