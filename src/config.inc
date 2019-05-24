@@ -8,6 +8,11 @@ else
   CXXFLAGS += -Wall -pedantic -Werror -Wno-deprecated-declarations -Wswitch-enum
 endif
 
+ifeq ($(CPROVER_WITH_PROFILING),1)
+  CXXFLAGS += -fprofile-arcs -ftest-coverage
+  LINKFLAGS += -lgcov -fprofile-arcs
+endif
+
 # Select optimisation or debug info
 #CXXFLAGS += -O2 -DNDEBUG
 #CXXFLAGS += -O0 -g

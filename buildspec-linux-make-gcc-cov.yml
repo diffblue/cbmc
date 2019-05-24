@@ -43,4 +43,3 @@ cache:
     - '/var/lib/apt/lists/**/*'
     - '/root/.ccache/**/*'
     - '/root/.cache/codecov.sh'
-  
