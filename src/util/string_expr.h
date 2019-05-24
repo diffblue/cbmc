@@ -45,6 +45,12 @@ less_than_or_equal_to(const exprt &lhs, mp_integer i)
   return binary_relation_exprt(lhs, ID_le, from_integer(i, lhs.type()));
 }
 
+inline binary_relation_exprt less_than(exprt lhs, exprt rhs)
+{
+  PRECONDITION(rhs.type() == lhs.type());
+  return binary_relation_exprt(std::move(lhs), ID_lt, std::move(rhs));
+}
+
 inline equal_exprt equal_to(exprt lhs, exprt rhs)
 {
   PRECONDITION(rhs.type() == lhs.type());
