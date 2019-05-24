@@ -131,7 +131,10 @@ bool value_sett::insert(
   return true;
 }
 
-void value_sett::output(const namespacet &ns, std::ostream &out) const
+void value_sett::output(
+  const namespacet &ns,
+  std::ostream &out,
+  const std::string &indent) const
 {
   values.iterate([&](const irep_idt &, const entryt &e) {
     irep_idt identifier, display_name;
@@ -158,9 +161,7 @@ void value_sett::output(const namespacet &ns, std::ostream &out) const
 #endif
     }
 
-    out << display_name;
-
-    out << " = { ";
+    out << indent << display_name << " = { ";
 
     const object_map_dt &object_map = e.object_map.read();
 
@@ -204,7 +205,7 @@ void value_sett::output(const namespacet &ns, std::ostream &out) const
       {
         out << ", ";
         if(width >= 40)
-          out << "\n      ";
+          out << "\n" << std::string(' ', indent.size()) << "      ";
       }
     }
 

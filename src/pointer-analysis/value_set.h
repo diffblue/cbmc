@@ -305,9 +305,11 @@ public:
   /// Pretty-print this value-set
   /// \param ns: global namespace
   /// \param [out] out: stream to write to
+  /// \param indent: string to use for indentation of the output
   void output(
     const namespacet &ns,
-    std::ostream &out) const;
+    std::ostream &out,
+    const std::string &indent = "") const;
 
   /// Stores the LHS ID -> RHS expression set map. See `valuest` documentation
   /// for more detail.
