@@ -541,3 +541,34 @@ gdb_apit::r_or(const std::string &regex_left, const std::string &regex_right)
 {
   return R"((?:)" + regex_left + '|' + regex_right + R"())";
 }
+
+std::string gdb_apit::get_value_from_record(
+  const gdb_output_recordt &record,
+  const std::string &value_name)
+{
+  const auto it = record.find(value_name);
+  CHECK_RETURN(it != record.end());
+  const auto value = it->second;
+
+  INVARIANT(
+    value.back() != '"' ||
+      (value.length() >= 2 && value[value.length() - 2] == '\\'),
+    "quotes should have been stripped off from value");
+  INVARIANT(value.back() != '\n', "value should not end in a newline");
+
+  return value;
+}
+
+std::string gdb_apit::get_register_value(const gdb_output_recordt &record)
+{
+  // we expect the record of form:
+  // {[register-values]->[name=name_string, value=\"value_string\"],..}
+  auto record_value = get_value_from_record(record, "register-values");
+  std::string value_eq_quotes = "value=\"";
+  auto value_eq_quotes_size = value_eq_quotes.size();
+
+  auto starting_pos = record_value.find(value_eq_quotes) + value_eq_quotes_size;
+  auto ending_pos = record_value.find('\"', starting_pos);
+  auto value_length = ending_pos - starting_pos;
+  return std::string{record_value, starting_pos, value_length};
+}

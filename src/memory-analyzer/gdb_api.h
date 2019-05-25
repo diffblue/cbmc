@@ -177,6 +177,19 @@ protected:
   bool was_command_accepted();
   void check_command_accepted();
 
+  /// Locate and return the value for a given name
+  /// \param record: gdb record to search
+  /// \param value_name: name of the value to be extracted
+  /// \return the value associated with \p value_name
+  std::string get_value_from_record(
+    const gdb_output_recordt &record,
+    const std::string &value_name);
+
+  /// Parse the record produced by listing register value
+  /// \param record: gdb record for one register value
+  /// \return get the value associated with some register value
+  std::string get_register_value(const gdb_output_recordt &record);
+
   static std::string r_opt(const std::string &regex);
 
   static std::string
