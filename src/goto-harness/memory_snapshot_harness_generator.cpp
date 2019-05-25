@@ -207,6 +207,18 @@ size_t memory_snapshot_harness_generatort::pointer_depth(const typet &t) const
     return pointer_depth(t.subtype()) + 1;
 }
 
+bool memory_snapshot_harness_generatort::refers_to(
+  const exprt &expr,
+  const irep_idt &name) const
+{
+  if(expr.id() == ID_symbol)
+    return to_symbol_expr(expr).get_identifier() == name;
+  return std::any_of(
+    expr.operands().begin(),
+    expr.operands().end(),
+    [this, name](const exprt &subexpr) { return refers_to(subexpr, name); });
+}
+
 code_blockt memory_snapshot_harness_generatort::add_assignments_to_globals(
   const symbol_tablet &snapshot,
   goto_modelt &goto_model) const
@@ -230,8 +242,11 @@ code_blockt memory_snapshot_harness_generatort::add_assignments_to_globals(
     ordered_snapshot_symbols.begin(),
     ordered_snapshot_symbols.end(),
     [this](const snapshot_pairt &left, const snapshot_pairt &right) {
-      return pointer_depth(left.second.symbol_expr().type()) <
-             pointer_depth(right.second.symbol_expr().type());
+      if(refers_to(right.second.value, left.first))
+        return true;
+      else
+        return pointer_depth(left.second.symbol_expr().type()) <
+               pointer_depth(right.second.symbol_expr().type());
     });
 
   code_blockt code;
