@@ -160,6 +160,10 @@ protected:
 
   gdb_statet gdb_state;
 
+  /// track the allocated size for each malloc call
+  /// maps hexadecimal address to the number of bytes
+  std::map<std::string, size_t> allocated_memory;
+
   typedef std::map<std::string, std::string> gdb_output_recordt;
   static gdb_output_recordt parse_gdb_output_record(const std::string &s);
 
@@ -177,6 +181,10 @@ protected:
   bool was_command_accepted();
   void check_command_accepted();
 
+  /// Intercepts the gdb-analysis at the malloc call-site to add the
+  /// corresponding information into \ref allocated_memory.
+  void collect_malloc_calls();
+
   /// Locate and return the value for a given name
   /// \param record: gdb record to search
   /// \param value_name: name of the value to be extracted
@@ -184,6 +192,11 @@ protected:
   std::string get_value_from_record(
     const gdb_output_recordt &record,
     const std::string &value_name);
+
+  /// Check if the breakpoint we hit is inside a malloc
+  /// \param stopped_record: gdb record pertaining to a breakpoint being hit
+  /// \return true if the breakpoint the gdb stopped at was malloc
+  bool hit_malloc_breakpoint(const gdb_output_recordt &stopped_record);
 
   /// Parse the record produced by listing register value
   /// \param record: gdb record for one register value
@@ -210,6 +223,9 @@ protected:
   // regex group for string (optional part of the output of gdb when printing a
   // pointer), matches e.g. \"abc\" and extracts \"abc\"
   const std::string r_string = R"((\\".*\\"))";
+
+  // name of malloc function
+  const std::string malloc_name = "malloc";
 };
 
 class gdb_interaction_exceptiont : public cprover_exception_baset

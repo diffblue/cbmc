@@ -300,9 +300,57 @@ void gdb_apit::run_gdb_from_core(const std::string &corefile)
   gdb_state = gdb_statet::STOPPED;
 }
 
+void gdb_apit::collect_malloc_calls()
+{
+  // this is what the registers look like at the function call entry:
+  //
+  // reg. name         hex. value   dec. value
+  // 0: rax            0xffffffff   4294967295
+  // 1: rbx            0x20000000   536870912
+  // 2: rcx            0x591        1425
+  // 3: rdx            0x591        1425
+  // 4: rsi            0x1          1
+  // 5: rdi            0x591        1425
+  // ...
+  // rax will eventually contain the return value and
+  // rdi now stores the first (integer) argument
+  // in the machine interface they are referred to by numbers, hence:
+  write_to_gdb("-data-list-register-values d 5");
+  auto record = get_most_recent_record("^done", true);
+  auto allocated_size = safe_string2size_t(get_register_value(record));
+
+  write_to_gdb("-exec-finish");
+  if(!most_recent_line_has_tag("*running"))
+  {
+    throw gdb_interaction_exceptiont("could not run program");
+  }
+  record = get_most_recent_record("*stopped");
+  auto frame_content = get_value_from_record(record, "frame");
+
+  // the malloc breakpoint may be inside another malloc function
+  if(frame_content.find("func=\"malloc\"") != std::string::npos)
+  {
+    // so we need to finish the outer malloc as well
+    write_to_gdb("-exec-finish");
+    if(!most_recent_line_has_tag("*running"))
+    {
+      throw gdb_interaction_exceptiont("could not run program");
+    }
+    record = get_most_recent_record("*stopped");
+  }
+
+  // now we can read the rax register to the the allocated memory address
+  write_to_gdb("-data-list-register-values x 0");
+  record = get_most_recent_record("^done", true);
+  allocated_memory[get_register_value(record)] = allocated_size;
+}
+
 bool gdb_apit::run_gdb_to_breakpoint(const std::string &breakpoint)
 {
   PRECONDITION(gdb_state == gdb_statet::CREATED);
+
+  write_to_gdb("-break-insert " + malloc_name);
+  bool malloc_is_known = was_command_accepted();
 
   std::string command("-break-insert");
   command += " " + breakpoint;
@@ -321,6 +369,30 @@ bool gdb_apit::run_gdb_to_breakpoint(const std::string &breakpoint)
   }
 
   gdb_output_recordt record = get_most_recent_record("*stopped");
+
+  // malloc function is known, i.e. present among the symbols
+  if(malloc_is_known)
+  {
+    // stop at every entry into malloc call
+    while(hit_malloc_breakpoint(record))
+    {
+      // and store the information about the allocated memory
+      collect_malloc_calls();
+      write_to_gdb("-exec-continue");
+      if(!most_recent_line_has_tag("*running"))
+      {
+        throw gdb_interaction_exceptiont("could not run program");
+      }
+      record = get_most_recent_record("*stopped");
+    }
+
+    write_to_gdb("-break-delete 1");
+    if(!was_command_accepted())
+    {
+      throw gdb_interaction_exceptiont("could not delete breakpoint at malloc");
+    }
+  }
+
   const auto it = record.find("reason");
   CHECK_RETURN(it != record.end());
 
@@ -557,6 +629,18 @@ std::string gdb_apit::get_value_from_record(
   INVARIANT(value.back() != '\n', "value should not end in a newline");
 
   return value;
+}
+
+bool gdb_apit::hit_malloc_breakpoint(const gdb_output_recordt &stopped_record)
+{
+  const auto it = stopped_record.find("reason");
+  CHECK_RETURN(it != stopped_record.end());
+
+  if(it->second != "breakpoint-hit")
+    return false;
+
+  return safe_string2size_t(get_value_from_record(stopped_record, "bkptno")) ==
+         1;
 }
 
 std::string gdb_apit::get_register_value(const gdb_output_recordt &record)
