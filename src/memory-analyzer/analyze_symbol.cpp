@@ -325,17 +325,27 @@ exprt gdb_value_extractort::get_pointer_to_member_value(
 
 exprt gdb_value_extractort::get_non_char_pointer_value(
   const exprt &expr,
-  const memory_addresst &memory_location,
+  const pointer_valuet &value,
   const source_locationt &location)
 {
   PRECONDITION(expr.type().id() == ID_pointer);
   PRECONDITION(!is_c_char_type(expr.type().subtype()));
+  const auto &memory_location = value.address;
   PRECONDITION(!memory_location.is_null());
 
   auto it = values.find(memory_location);
 
   if(it == values.end())
   {
+    if(!value.pointee.empty() && value.pointee != c_converter.convert(expr))
+    {
+      analyze_symbol(value.pointee);
+      const auto pointee_symbol = symbol_table.lookup(value.pointee);
+      CHECK_RETURN(pointee_symbol != nullptr);
+      const auto pointee_symbol_expr = pointee_symbol->symbol_expr();
+      return pointee_symbol_expr;
+    }
+
     values.insert(std::make_pair(memory_location, nil_exprt()));
 
     const typet target_type = expr.type().subtype();
@@ -351,13 +361,10 @@ exprt gdb_value_extractort::get_non_char_pointer_value(
     // expected positions. Since the allocated size is over-approximation we may
     // end up querying pass the allocated bounds and building larger array with
     // meaningless values.
-    size_t allocated_size =
-      gdb_api.query_malloc_size(c_converter.convert(expr));
+    mp_integer allocated_size = get_malloc_size(c_converter.convert(expr));
     // get the sizeof(target_type) and thus the number of elements
-    const auto target_size_bits = pointer_offset_bits(target_type, ns);
-    CHECK_RETURN(target_size_bits.has_value());
-    const auto number_of_elements = allocated_size / (*target_size_bits / 8);
-    if(number_of_elements > 1)
+    const auto number_of_elements = allocated_size / get_type_size(target_type);
+    if(allocated_size != 1 && number_of_elements > 1)
     {
       array_exprt::operandst elements;
       // build the operands by querying for an index expression
@@ -386,6 +393,7 @@ exprt gdb_value_extractort::get_non_char_pointer_value(
       // add assignment of value to newly created symbol
       add_assignment(array_symbol, new_array);
       values[memory_location] = array_symbol;
+      CHECK_RETURN(array_symbol.type().id() == ID_array);
       return array_symbol;
     }
 
@@ -408,6 +416,8 @@ exprt gdb_value_extractort::get_non_char_pointer_value(
   {
     const auto &known_value = it->second;
     const auto &expected_type = expr.type().subtype();
+    if(find_dynamic_allocation(memory_location) != dynamically_allocated.end())
+      return known_value;
     if(known_value.is_not_nil() && known_value.type() != expected_type)
     {
       return symbol_exprt{to_symbol_expr(known_value).get_identifier(),

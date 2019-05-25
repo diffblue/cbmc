@@ -278,12 +278,12 @@ private:
   ///   \ref gdb_apit::get_memory, calls \ref get_expr_value on _dereferenced_
   ///   \p expr (the result of which is assigned to a new symbol).
   /// \param expr: the pointer expression to be analysed
-  /// \param memory_location: pointer value from \ref gdb_apit::get_memory
+  /// \param value: pointer value from \ref gdb_apit::get_memory
   /// \param location: the source location
   /// \return symbol expression associated with \p memory_location
   exprt get_non_char_pointer_value(
     const exprt &expr,
-    const memory_addresst &memory_location,
+    const pointer_valuet &value,
     const source_locationt &location);
 
   /// If \p memory_location is found among \ref values then return the symbol
