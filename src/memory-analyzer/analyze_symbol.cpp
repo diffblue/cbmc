@@ -103,14 +103,29 @@ void gdb_value_extractort::analyze_symbols(const std::vector<irep_idt> &symbols)
   // record addresses of given symbols
   for(const auto &id : symbols)
   {
-    const symbol_exprt &symbol_expr = ns.lookup(id).symbol_expr();
-    const address_of_exprt aoe(symbol_expr);
+    const symbolt &symbol = ns.lookup(id);
+    if(symbol.type.id() != ID_pointer || is_c_char_type(symbol.type.subtype()))
+    {
+      const symbol_exprt &symbol_expr = ns.lookup(id).symbol_expr();
+      const address_of_exprt aoe(symbol_expr);
 
-    const std::string c_expr = c_converter.convert(aoe);
-    const pointer_valuet &value = gdb_api.get_memory(c_expr);
-    CHECK_RETURN(value.pointee.empty() || (id == value.pointee));
+      const std::string c_expr = c_converter.convert(aoe);
+      const pointer_valuet &value = gdb_api.get_memory(c_expr);
+      CHECK_RETURN(value.pointee.empty() || (id == value.pointee));
 
-    values.insert({value.address, symbol_expr});
+      memory_map[id] = value;
+    }
+    else
+    {
+      const std::string c_symbol = c_converter.convert(symbol.symbol_expr());
+      const pointer_valuet &symbol_value = gdb_api.get_memory(c_symbol);
+      size_t symbol_size = gdb_api.query_malloc_size(c_symbol);
+
+      if(symbol_size > 1)
+        dynamically_allocated.emplace_back(
+          symbol_value.address, symbol_size, id);
+      memory_map[id] = symbol_value;
+    }
   }
 
   for(const auto &id : symbols)
