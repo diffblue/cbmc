@@ -91,6 +91,103 @@ private:
   ///   value of `symbol`.
   std::map<memory_addresst, exprt> values;
 
+  struct memory_scopet
+  {
+  private:
+    size_t begin_int;
+    mp_integer byte_size;
+    irep_idt name;
+
+    /// Convert base-16 memory address to a natural number
+    /// \param point: the memory address to be converted
+    /// \return base-10 unsigned integer equal in value to \p point
+    size_t address2size_t(const memory_addresst &point) const;
+
+    /// Helper function that check if a point in memory points inside this scope
+    /// \param point_int: memory point as natural number
+    /// \return true if the point is inside this scope
+    bool check_containment(const size_t &point_int) const
+    {
+      return point_int >= begin_int && (begin_int + byte_size) > point_int;
+    }
+
+  public:
+    memory_scopet(
+      const memory_addresst &begin,
+      const mp_integer &byte_size,
+      const irep_idt &name);
+
+    /// Check if \p point points somewhere in this memory scope
+    /// \param point: memory address to be check for presence
+    /// \return true if \p point is inside *this
+    bool contains(const memory_addresst &point) const
+    {
+      return check_containment(address2size_t(point));
+    }
+
+    /// Compute the distance of \p point from the beginning of this scope
+    /// \param point: memory address to have the offset computed
+    /// \param member_size: size of one element of this scope in bytes
+    /// \return `n' such that \p point is the n-th element of this scope
+    mp_integer
+    distance(const memory_addresst &point, mp_integer member_size) const;
+
+    /// Getter for the name of this memory scope
+    /// \return the name as irep id
+    irep_idt id() const
+    {
+      return name;
+    }
+
+    /// Getter for the allocation size of this memory scope
+    /// \return the size in bytes
+    mp_integer size() const
+    {
+      return byte_size;
+    }
+  };
+
+  /// Keep track of the dynamically allocated memory
+  std::vector<memory_scopet> dynamically_allocated;
+
+  /// Keep track of the memory location for the analyzed symbols
+  std::map<irep_idt, pointer_valuet> memory_map;
+
+  bool has_known_memory_location(const irep_idt &id) const
+  {
+    return memory_map.count(id) != 0;
+  }
+
+  /// Search for a memory scope allocated under \p name
+  /// \param name: name of the pointer used during allocation
+  /// \return iterator to the right memory scope
+  std::vector<memory_scopet>::iterator find_dynamic_allocation(irep_idt name);
+
+  /// Search for a memory scope allocated under \p name
+  /// \param point: potentially dynamically allocated memory address
+  /// \return iterator to the right memory scope
+  std::vector<memory_scopet>::iterator
+  find_dynamic_allocation(const memory_addresst &point);
+
+  /// Search for the size of the allocated memory for \p name
+  /// \param name: name of the pointer used during allocation
+  /// \return the size if have a record of \p name's allocation (1 otherwise)
+  mp_integer get_malloc_size(irep_idt name);
+
+  /// Build the pointee string for address \p point assuming it points to a
+  ///   dynamic allocation of `n' elements each of size \p member_size. E.g.:
+  ///
+  ///   int *p = (int*)malloc(sizeof(int)*4);
+  ///   int *q = &(p[2]);
+  ///
+  ///   get_malloc_pointee(get_memory(q), sizeof(int)) -> "p+8"
+  ///
+  /// \param point: potentially dynamically allocated memory address
+  /// \param member_size: size of each allocated element
+  /// \return pointee as a string if we have a record of the allocation
+  optionalt<std::string>
+  get_malloc_pointee(const memory_addresst &point, mp_integer member_size);
+
   /// Assign the gdb-extracted value for \p symbol_name to its symbol
   ///   expression and then process outstanding assignments that this
   ///   extraction introduced.

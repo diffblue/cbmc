@@ -7,6 +7,8 @@ Author: Malte Mues <mail.mues@gmail.com>
 
 \*******************************************************************/
 
+#include <cstdlib>
+
 #include "analyze_symbol.h"
 
 #include <util/c_types.h>
@@ -27,6 +29,73 @@ gdb_value_extractort::gdb_value_extractort(
     c_converter(ns, expr2c_configurationt::clean_configuration),
     allocate_objects(ID_C, source_locationt(), irep_idt{}, this->symbol_table)
 {
+}
+
+gdb_value_extractort::memory_scopet::memory_scopet(
+  const memory_addresst &begin,
+  const mp_integer &byte_size,
+  const irep_idt &name)
+  : begin_int(safe_string2size_t(begin.address_string, 0)),
+    byte_size(byte_size),
+    name(name)
+{
+}
+
+size_t gdb_value_extractort::memory_scopet::address2size_t(
+  const memory_addresst &point) const
+{
+  return safe_string2size_t(point.address_string, 0);
+}
+
+mp_integer gdb_value_extractort::memory_scopet::distance(
+  const memory_addresst &point,
+  mp_integer member_size) const
+{
+  auto point_int = address2size_t(point);
+  CHECK_RETURN(check_containment(point_int));
+  return (point_int - begin_int) / member_size;
+}
+
+std::vector<gdb_value_extractort::memory_scopet>::iterator
+gdb_value_extractort::find_dynamic_allocation(irep_idt name)
+{
+  return std::find_if(
+    dynamically_allocated.begin(),
+    dynamically_allocated.end(),
+    [&name](const memory_scopet &scope) { return scope.id() == name; });
+}
+
+std::vector<gdb_value_extractort::memory_scopet>::iterator
+gdb_value_extractort::find_dynamic_allocation(const memory_addresst &point)
+{
+  return std::find_if(
+    dynamically_allocated.begin(),
+    dynamically_allocated.end(),
+    [&point](const memory_scopet &memory_scope) {
+      return memory_scope.contains(point);
+    });
+}
+
+mp_integer gdb_value_extractort::get_malloc_size(irep_idt name)
+{
+  const auto scope_it = find_dynamic_allocation(name);
+  if(scope_it == dynamically_allocated.end())
+    return 1;
+  else
+    return scope_it->size();
+}
+
+optionalt<std::string> gdb_value_extractort::get_malloc_pointee(
+  const memory_addresst &point,
+  mp_integer member_size)
+{
+  const auto scope_it = find_dynamic_allocation(point);
+  if(scope_it == dynamically_allocated.end())
+    return {};
+
+  const auto pointer_distance = scope_it->distance(point, member_size);
+  return id2string(scope_it->id()) +
+         (pointer_distance > 0 ? "+" + integer2string(pointer_distance) : "");
 }
 
 void gdb_value_extractort::analyze_symbols(const std::vector<irep_idt> &symbols)
