@@ -307,8 +307,10 @@ private:
   /// Analyzes the \p pointer_value to decide if it point to a struct or a
   ///   union (or array)
   /// \param pointer_value: pointer value to be analyzed
+  /// \param expected_type: type of the potential member
   /// \return true if pointing to a member
-  bool points_to_member(const pointer_valuet &pointer_value) const;
+  bool
+  points_to_member(pointer_valuet &pointer_value, const typet &expected_type);
 };
 
 #endif // CPROVER_MEMORY_ANALYZER_ANALYZE_SYMBOL_H

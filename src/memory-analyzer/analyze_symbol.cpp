@@ -438,10 +438,21 @@ exprt gdb_value_extractort::get_non_char_pointer_value(
 }
 
 bool gdb_value_extractort::points_to_member(
-  const pointer_valuet &pointer_value) const
+  pointer_valuet &pointer_value,
+  const typet &expected_type)
 {
   if(pointer_value.has_known_offset())
     return true;
+
+  if(pointer_value.pointee.empty())
+  {
+    const auto maybe_pointee = get_malloc_pointee(
+      pointer_value.address, get_type_size(expected_type.subtype()));
+    if(maybe_pointee.has_value())
+      pointer_value.pointee = *maybe_pointee;
+    if(pointer_value.pointee.find("+") != std::string::npos)
+      return true;
+  }
 
   const symbolt *pointee_symbol = symbol_table.lookup(pointer_value.pointee);
   if(pointee_symbol == nullptr)
@@ -472,7 +483,7 @@ exprt gdb_value_extractort::get_pointer_value(
   if(!memory_location.is_null())
   {
     // pointers-to-char can point to members as well, e.g. char[]
-    if(points_to_member(value))
+    if(points_to_member(value, expr.type()))
     {
       const auto target_expr =
         get_pointer_to_member_value(expr, value, location);
