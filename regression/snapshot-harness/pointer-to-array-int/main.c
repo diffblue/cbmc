@@ -31,14 +31,10 @@ int main()
   checkpoint();
 
   assert(first == second);
-  // The following assertions will be check in the following PR once
-  // dynamically allocated snapshots are properly implemented.
-  /* assert(array_size >= prefix_size); */
-  /* assert(prefix_size >= 0); */
-  /* assert(second[prefix_size] != 6); */
-  /* assert(second[4] == 4); */
+  assert(array_size >= prefix_size);
+  assert(prefix_size >= 0);
+  assert(second[prefix_size] != 6);
+  assert(second[4] == 4);
 
-  /* for(int i = 0; i < prefix_size; i++) */
-  /*   assert(second[i] != prefix[i]); */
   return 0;
 }
