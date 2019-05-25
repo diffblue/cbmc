@@ -464,7 +464,12 @@ exprt gdb_value_extractort::get_pointer_value(
   PRECONDITION(expr.type() == zero_expr.type());
 
   std::string c_expr = c_converter.convert(expr);
-  const pointer_valuet value = gdb_api.get_memory(c_expr);
+  const auto known_pointer = memory_map.find(c_expr);
+
+  pointer_valuet value = (known_pointer == memory_map.end() ||
+                          known_pointer->second.pointee == c_expr)
+                           ? gdb_api.get_memory(c_expr)
+                           : known_pointer->second;
   if(!value.valid)
     return zero_expr;
 
@@ -487,7 +492,7 @@ exprt gdb_value_extractort::get_pointer_value(
     const auto target_expr =
       is_c_char_type(expr.type().subtype())
         ? get_char_pointer_value(expr, memory_location, location)
-        : get_non_char_pointer_value(expr, memory_location, location);
+        : get_non_char_pointer_value(expr, value, location);
 
     // postpone if we cannot resolve now
     if(target_expr.is_nil())
@@ -505,7 +510,10 @@ exprt gdb_value_extractort::get_pointer_value(
       const auto result_indexed_expr = get_subexpression_at_offset(
         target_expr, 0, zero_expr.type().subtype(), ns);
       CHECK_RETURN(result_indexed_expr.has_value());
+      if(result_indexed_expr->type() == zero_expr.type())
+        return *result_indexed_expr;
       const auto result_expr = address_of_exprt{*result_indexed_expr};
+      CHECK_RETURN(result_expr.type() == zero_expr.type());
       return result_expr;
     }
 
@@ -515,7 +523,8 @@ exprt gdb_value_extractort::get_pointer_value(
 
     // otherwise the address of target should type-match
     const auto result_expr = address_of_exprt(target_expr);
-    CHECK_RETURN(result_expr.type() == zero_expr.type());
+    if(result_expr.type() != zero_expr.type())
+      return typecast_exprt{result_expr, zero_expr.type()};
     return result_expr;
   }
 
