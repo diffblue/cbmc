@@ -290,73 +290,31 @@ exprt gdb_value_extractort::get_pointer_to_member_value(
 
   const symbolt *struct_symbol = symbol_table.lookup(struct_name);
   DATA_INVARIANT(struct_symbol != nullptr, "unknown struct");
-  const auto maybe_struct_size =
-    pointer_offset_size(struct_symbol->symbol_expr().type(), ns);
-  bool found = false;
-  CHECK_RETURN(maybe_struct_size.has_value());
-  for(const auto &value_pair : values)
+
+  if(!has_known_memory_location(struct_name))
   {
-    const auto &value_symbol_expr = value_pair.second;
-    if(to_symbol_expr(value_symbol_expr).get_identifier() == struct_name)
-    {
-      found = true;
-      break;
-    }
+    memory_map[struct_name] = gdb_api.get_memory(struct_name);
+    analyze_symbol(irep_idt{struct_name});
   }
 
-  if(!found)
+  const auto &struct_symbol_expr = struct_symbol->symbol_expr();
+  if(struct_symbol->type.id() == ID_array)
   {
-    const typet target_type = expr.type().subtype();
-
-    symbol_exprt dummy("tmp", expr.type());
-    code_blockt assignments;
-
-    auto emplace_pair = values.emplace(
-      memory_location,
-      allocate_objects.allocate_automatic_local_object(
-        assignments, dummy, target_type));
-    const symbol_exprt &new_symbol = to_symbol_expr(emplace_pair.first->second);
-
-    dereference_exprt dereference_expr(expr);
-
-    const auto zero_expr = zero_initializer(target_type, location, ns);
-    CHECK_RETURN(zero_expr);
-
-    // add assignment of value to newly created symbol
-    add_assignment(new_symbol, *zero_expr);
-
-    const auto &struct_symbol = values.find(memory_location);
-
-    const auto maybe_member_expr = get_subexpression_at_offset(
-      struct_symbol->second, member_offset, expr.type().subtype(), ns);
-    CHECK_RETURN(maybe_member_expr.has_value());
-    return *maybe_member_expr;
+    return index_exprt{
+      struct_symbol_expr,
+      from_integer(
+        member_offset / get_type_size(expr.type().subtype()), index_type())};
   }
-
-  const auto it = values.find(memory_location);
-  // if the structure we are pointing to does not exists we need to build a
-  // temporary object for it: get the type from symbol table, query gdb for
-  // value, allocate new object for it and then store into assignments
-  if(it == values.end())
+  if(struct_symbol->type.id() == ID_pointer)
   {
-    const auto symbol_expr = struct_symbol->symbol_expr();
-    const auto zero = zero_initializer(symbol_expr.type(), location, ns);
-    CHECK_RETURN(zero.has_value());
-    const auto val = get_expr_value(symbol_expr, *zero, location);
-
-    symbol_exprt dummy("tmp", pointer_type(symbol_expr.type()));
-    code_blockt assignments;
-
-    const symbol_exprt new_symbol =
-      to_symbol_expr(allocate_objects.allocate_automatic_local_object(
-        assignments, dummy, symbol_expr.type()));
-
-    add_assignment(new_symbol, val);
-    values[memory_location] = val;
+    return dereference_exprt{
+      plus_exprt{struct_symbol_expr,
+                 from_integer(member_offset, size_type()),
+                 expr.type()}};
   }
 
   const auto maybe_member_expr = get_subexpression_at_offset(
-    struct_symbol->symbol_expr(), member_offset, expr.type().subtype(), ns);
+    struct_symbol_expr, member_offset, expr.type().subtype(), ns);
   DATA_INVARIANT(
     maybe_member_expr.has_value(), "structure doesn't have member");
 
