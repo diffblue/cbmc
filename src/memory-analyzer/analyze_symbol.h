@@ -81,7 +81,7 @@ private:
   allocate_objectst allocate_objects;
 
   /// Sequence of assignments collected during \ref analyze_symbols
-  std::vector<std::pair<exprt, exprt>> assignments;
+  std::map<exprt, exprt> assignments;
 
   /// Mapping pointer expression for which \ref get_non_char_pointer_value
   ///   returned nil expression to memory location (from \ref gdb_apit).

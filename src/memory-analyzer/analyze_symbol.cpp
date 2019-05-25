@@ -217,7 +217,8 @@ symbol_tablet gdb_value_extractort::get_snapshot_as_symbol_table()
 
 void gdb_value_extractort::add_assignment(const exprt &lhs, const exprt &value)
 {
-  assignments.push_back(std::make_pair(lhs, value));
+  if(assignments.count(lhs) == 0)
+    assignments.emplace(std::make_pair(lhs, value));
 }
 
 exprt gdb_value_extractort::get_char_pointer_value(
