@@ -1,0 +1,11 @@
+CORE
+main.c
+p,q --harness-type initialise-with-memory-snapshot --initial-goto-location main:4
+^EXIT=0$
+^SIGNAL=0$
+\[main.assertion.1\] line [0-9]+ assertion p == q: SUCCESS
+\[main.assertion.2\] line [0-9]+ assertion \*p == \*q: SUCCESS
+\[main.assertion.3\] line [0-9]+ assertion \*q == \*p: SUCCESS
+VERIFICATION SUCCESSFUL
+--
+^warning: ignoring
