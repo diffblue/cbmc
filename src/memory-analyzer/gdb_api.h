@@ -88,10 +88,10 @@ public:
     {
     }
 
-    const memory_addresst address;
-    const std::string pointee;
-    const std::string character;
-    const optionalt<std::string> string;
+    memory_addresst address;
+    std::string pointee;
+    std::string character;
+    optionalt<std::string> string;
 
     bool has_known_offset() const
     {
