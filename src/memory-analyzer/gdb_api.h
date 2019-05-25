@@ -31,6 +31,9 @@ class gdb_apit
 {
 public:
   using commandst = std::forward_list<std::string>;
+
+  /// Memory address imbued with the explicit boolean data indicating if the
+  /// address is null or not.
   struct memory_addresst
   {
     bool null_address;
@@ -67,6 +70,8 @@ public:
   /// writing to gdb)
   ~gdb_apit();
 
+  /// Data associated with the value of a pointer, i.e. not only the address but
+  /// also the pointee (if known), string (in the case of char*), etc.
   struct pointer_valuet
   {
     pointer_valuet(
@@ -128,6 +133,9 @@ public:
   /// \return memory address in hex format
   optionalt<std::string> get_value(const std::string &expr);
 
+  /// Get the value of a pointer associated with \p expr
+  /// \param expr: the expression to be analyzed
+  /// \return the \p pointer_valuet filled with data gdb produced for \p expr
   pointer_valuet get_memory(const std::string &expr);
 
   /// Return the vector of commands that have been written to gdb so far

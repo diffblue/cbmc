@@ -9,7 +9,8 @@ Author: Malte Mues <mail.mues@gmail.com>
 
 /// \file
 /// Low-level interface to gdb
-
+///
+/// Implementation of the GDB/MI API for extracting values of expressions.
 
 #include <cctype>
 #include <cerrno>
