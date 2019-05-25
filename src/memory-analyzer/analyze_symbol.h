@@ -188,6 +188,11 @@ private:
   optionalt<std::string>
   get_malloc_pointee(const memory_addresst &point, mp_integer member_size);
 
+  /// Wrapper for call get_offset_pointer_bits
+  /// \param type: type to get the size of
+  /// \return the size of the type in bytes
+  mp_integer get_type_size(const typet &type) const;
+
   /// Assign the gdb-extracted value for \p symbol_name to its symbol
   ///   expression and then process outstanding assignments that this
   ///   extraction introduced.

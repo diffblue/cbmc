@@ -98,6 +98,13 @@ optionalt<std::string> gdb_value_extractort::get_malloc_pointee(
          (pointer_distance > 0 ? "+" + integer2string(pointer_distance) : "");
 }
 
+mp_integer gdb_value_extractort::get_type_size(const typet &type) const
+{
+  const auto maybe_size = pointer_offset_bits(type, ns);
+  CHECK_RETURN(maybe_size.has_value());
+  return *maybe_size / 8;
+}
+
 void gdb_value_extractort::analyze_symbols(const std::vector<irep_idt> &symbols)
 {
   // record addresses of given symbols
