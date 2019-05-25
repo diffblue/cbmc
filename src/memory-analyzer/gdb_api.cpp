@@ -60,43 +60,13 @@ gdb_apit::~gdb_apit()
 
 size_t gdb_apit::query_malloc_size(const std::string &pointer_expr)
 {
-#ifdef __linux__
-  write_to_gdb("-var-create tmp * malloc_usable_size(" + pointer_expr + ")");
-#elif __APPLE__
-  write_to_gdb("-var-create tmp * malloc_size(" + pointer_expr + ")");
-#else
-  // Under non-linux/OSX system we simple return 1, i.e. as if the \p
-  // pointer_expr was not dynamically allocated.
-  return 1;
-#endif
+  const auto maybe_address_string = get_value(pointer_expr);
+  CHECK_RETURN(maybe_address_string.has_value());
 
-  if(!was_command_accepted())
-  {
+  if(allocated_memory.count(*maybe_address_string) == 0)
     return 1;
-  }
-
-  write_to_gdb("-var-evaluate-expression tmp");
-  gdb_output_recordt record = get_most_recent_record("^done", true);
-
-  write_to_gdb("-var-delete tmp");
-  check_command_accepted();
-
-  const auto it = record.find("value");
-  CHECK_RETURN(it != record.end());
-
-  const std::string value = it->second;
-
-  INVARIANT(
-    value.back() != '"' ||
-      (value.length() >= 2 && value[value.length() - 2] == '\\'),
-    "quotes should have been stripped off from value");
-  INVARIANT(value.back() != '\n', "value should not end in a newline");
-
-  const auto result = string2optional_size_t(value);
-  if(result.has_value())
-    return *result;
   else
-    return 1;
+    return allocated_memory[*maybe_address_string];
 }
 
 void gdb_apit::create_gdb_process()
