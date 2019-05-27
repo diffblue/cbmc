@@ -559,7 +559,6 @@ void c_typecheck_baset::typecheck_array_type(array_typet &type)
   if(size.is_not_nil())
   {
     typecheck_expr(size);
-    make_index_type(size);
 
     // The size need not be a constant!
     // We simplify it, for the benefit of array initialisation.
@@ -587,10 +586,13 @@ void c_typecheck_baset::typecheck_array_type(array_typet &type)
         throw 0;
       }
 
+      implicit_typecast(tmp_size, size_type());
+      simplify(tmp_size, *this);
       size=tmp_size;
     }
     else if(tmp_size.id()==ID_infinity)
     {
+      tmp_size.type() = size_type();
       size=tmp_size;
     }
     else if(tmp_size.id()==ID_symbol &&
@@ -602,6 +604,7 @@ void c_typecheck_baset::typecheck_array_type(array_typet &type)
       // Of course we can modify a 'const' symbol, e.g.,
       // using a pointer type cast. Interestingly,
       // at least gcc 4.2.1 makes the very same mistake!
+      implicit_typecast(tmp_size, size_type());
       size=tmp_size;
     }
     else
@@ -985,7 +988,7 @@ void c_typecheck_baset::typecheck_compound_body(
 
         // make it zero-length
         c_type.id(ID_array);
-        c_type.set(ID_size, from_integer(0, index_type()));
+        c_type.set(ID_size, from_integer(0, size_type()));
       }
     }
   }
