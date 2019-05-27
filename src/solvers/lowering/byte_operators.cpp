@@ -1787,6 +1787,10 @@ static exprt lower_byte_update_struct(
     }
     else if(!offset_bytes.has_value())
     {
+      // The offset to update is not constant; abort the attempt to update
+      // indiviual struct members and instead turn the operand-to-be-updated
+      // into a byte array, which we know how to update even if the offset is
+      // non-constant.
       const irep_idt extract_opcode = src.id() == ID_byte_update_little_endian
                                         ? ID_byte_extract_little_endian
                                         : ID_byte_extract_big_endian;
@@ -1802,6 +1806,7 @@ static exprt lower_byte_update_struct(
 
       byte_update_exprt bu = src;
       bu.set_op(lower_byte_extract(byte_extract_expr, ns));
+      bu.type() = bu.op().type();
 
       return lower_byte_extract(
         byte_extract_exprt{
