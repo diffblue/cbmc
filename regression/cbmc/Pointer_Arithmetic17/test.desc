@@ -1,0 +1,13 @@
+CORE
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Field-sensitivity caused a regression such that dereferencing results in an
+invalid object even though the pointer should point into an allocated object.
+Test derived from SV-COMP's ldv-regression/test_27-1.c. The problem was resolved
+in 8ff892778d (Simplify and apply field sensitivity before value-set-deref).
