@@ -647,6 +647,22 @@ void goto_convertt::do_function_call_symbol(
     throw 0;
   }
 
+  // User-provided function definitions always take precedence over built-ins.
+  // Front-ends do not (yet) consistently set ID_C_incomplete, thus also test
+  // whether the symbol actually has some non-nil value (which might be
+  // "compiled").
+  if(!symbol->type.get_bool(ID_C_incomplete) && symbol->value.is_not_nil())
+  {
+    do_function_call_symbol(*symbol);
+
+    code_function_callt function_call(lhs, function, arguments);
+    function_call.add_source_location() = function.source_location();
+
+    copy(function_call, FUNCTION_CALL, dest);
+
+    return;
+  }
+
   if(identifier==CPROVER_PREFIX "assume" ||
      identifier=="__VERIFIER_assume")
   {
@@ -702,7 +718,7 @@ void goto_convertt::do_function_call_symbol(
     a->source_location.set("user-provided", true);
   }
   else if(
-    identifier == "assert" && symbol->type.get_bool(ID_C_incomplete) &&
+    identifier == "assert" &&
     to_code_type(symbol->type).return_type() == signed_int_type())
   {
     if(arguments.size()!=1)
