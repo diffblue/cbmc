@@ -124,6 +124,11 @@ bvt boolbvt::convert_index(const index_exprt &expr)
       symbol_exprt result(identifier, expr.type());
       bv = convert_bv(result);
 
+      // return an unconstrained value in case of an empty array (the access is
+      // necessarily out-of-bounds)
+      if(!array.has_operands())
+        return bv;
+
       equal_exprt value_equality(result, array.op0());
 
       binary_relation_exprt lower_bound(
