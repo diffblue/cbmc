@@ -1822,7 +1822,8 @@ static exprt lower_byte_update_struct(
     {
       offset = from_integer(0, src.offset().type());
       INVARIANT(
-        value_as_byte_array.operands().size() > -*offset_bytes,
+        value_as_byte_array.id() != ID_array ||
+          value_as_byte_array.operands().size() > -*offset_bytes,
         "members past the update should be handled above");
       first = numeric_cast_v<std::size_t>(-*offset_bytes);
     }
