@@ -167,9 +167,7 @@ replace_nondet(exprt &expr, symex_nondet_generatort &build_symex_nondet)
 {
   if(expr.id() == ID_side_effect && expr.get(ID_statement) == ID_nondet)
   {
-    nondet_symbol_exprt new_expr = build_symex_nondet(expr.type());
-    new_expr.add_source_location() = expr.source_location();
-    expr.swap(new_expr);
+    expr = build_symex_nondet(expr.type(), expr.source_location());
   }
   else
   {

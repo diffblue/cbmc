@@ -22,7 +22,7 @@
 class symex_nondet_generatort
 {
 public:
-  nondet_symbol_exprt operator()(const typet &type);
+  nondet_symbol_exprt operator()(typet type, source_locationt location);
 
 private:
   std::size_t nondet_count = 0;
