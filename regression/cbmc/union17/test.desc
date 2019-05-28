@@ -1,0 +1,13 @@
+CORE broken-smt-backend
+main.c
+--no-simplify
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+This test passes when simplification is enabled (which gets rid of
+byte-extracting a union of non-constant size), but yielded a wrong verification
+outcome with both the SAT back-end before. The SMT back-end fails for it would
+like to flatten an array of non-constant size.
