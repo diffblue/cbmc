@@ -236,6 +236,7 @@ public:
   DEPRECATED(SINCE(2019, 1, 19, "use typecast_exprt() instead"))
   void make_typecast(const typet &_type);
 
+  DEPRECATED(SINCE(2019, 5, 28, "use make_boolean_expr(value) instead"))
   void make_bool(bool value);
 
   bool is_constant() const;
