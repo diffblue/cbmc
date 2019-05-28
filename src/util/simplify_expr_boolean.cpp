@@ -75,7 +75,7 @@ bool simplify_exprt::simplify_boolean(exprt &expr)
 
     if(operands.empty())
     {
-      expr.make_bool(negate);
+      expr = make_boolean_expr(negate);
       return false;
     }
     else if(operands.size()==1)
@@ -135,13 +135,13 @@ bool simplify_exprt::simplify_boolean(exprt &expr)
          op.type().id()==ID_bool &&
          expr_set.find(op.op0())!=expr_set.end())
       {
-        expr.make_bool(expr.id()==ID_or);
+        expr = make_boolean_expr(expr.id() == ID_or);
         return false;
       }
 
     if(operands.empty())
     {
-      expr.make_bool(expr.id()==ID_and);
+      expr = make_boolean_expr(expr.id() == ID_and);
       return false;
     }
     else if(operands.size()==1)

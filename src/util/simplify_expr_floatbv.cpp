@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "arith_tools.h"
 #include "expr.h"
+#include "expr_util.h"
 #include "ieee_float.h"
 #include "invariant.h"
 #include "namespace.h"
@@ -27,7 +28,7 @@ bool simplify_exprt::simplify_isinf(exprt &expr)
   if(expr.op0().is_constant())
   {
     ieee_floatt value(to_constant_expr(expr.op0()));
-    expr.make_bool(value.is_infinity());
+    expr = make_boolean_expr(value.is_infinity());
     return false;
   }
 
@@ -42,7 +43,7 @@ bool simplify_exprt::simplify_isnan(exprt &expr)
   if(expr.op0().is_constant())
   {
     ieee_floatt value(to_constant_expr(expr.op0()));
-    expr.make_bool(value.is_NaN());
+    expr = make_boolean_expr(value.is_NaN());
     return false;
   }
 
@@ -57,7 +58,7 @@ bool simplify_exprt::simplify_isnormal(exprt &expr)
   if(expr.op0().is_constant())
   {
     ieee_floatt value(to_constant_expr(expr.op0()));
-    expr.make_bool(value.is_normal());
+    expr = make_boolean_expr(value.is_normal());
     return false;
   }
 
@@ -119,7 +120,7 @@ bool simplify_exprt::simplify_sign(exprt &expr)
     if(type.id()==ID_floatbv)
     {
       ieee_floatt value(to_constant_expr(expr.op0()));
-      expr.make_bool(value.get_sign());
+      expr = make_boolean_expr(value.get_sign());
       return false;
     }
     else if(type.id()==ID_signedbv ||
@@ -128,7 +129,7 @@ bool simplify_exprt::simplify_sign(exprt &expr)
       mp_integer value;
       if(!to_integer(expr.op0(), value))
       {
-        expr.make_bool(value>=0);
+        expr = make_boolean_expr(value>=0);
         return false;
       }
     }
@@ -381,9 +382,9 @@ bool simplify_exprt::simplify_ieee_float_relation(exprt &expr)
     ieee_floatt f1(to_constant_expr(expr.op1()));
 
     if(expr.id()==ID_ieee_float_notequal)
-      expr.make_bool(f0.ieee_not_equal(f1));
+      expr = make_boolean_expr(f0.ieee_not_equal(f1));
     else if(expr.id()==ID_ieee_float_equal)
-      expr.make_bool(f0.ieee_equal(f1));
+      expr = make_boolean_expr(f0.ieee_equal(f1));
     else
       UNREACHABLE;
 

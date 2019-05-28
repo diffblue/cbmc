@@ -115,7 +115,7 @@ bool simplify_exprt::simplify_sign(exprt &expr)
     if(type.id()==ID_floatbv)
     {
       ieee_floatt value(to_constant_expr(expr.op0()));
-      expr.make_bool(value.get_sign());
+      expr = make_boolean_expr(value.get_sign());
       return false;
     }
     else if(type.id()==ID_signedbv ||
@@ -124,7 +124,7 @@ bool simplify_exprt::simplify_sign(exprt &expr)
       const auto value = numeric_cast<mp_integer>(expr.op0());
       if(value.has_value())
       {
-        expr.make_bool(*value >= 0);
+        expr = make_boolean_expr(*value >= 0);
         return false;
       }
     }
@@ -561,7 +561,7 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
 
       if(expr_type_id==ID_bool)
       {
-        expr.make_bool(int_value!=0);
+        expr = make_boolean_expr(int_value != 0);
         return false;
       }
 
@@ -646,7 +646,7 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
 
       if(expr_type_id==ID_bool)
       {
-        expr.make_bool(int_value!=0);
+        expr = make_boolean_expr(int_value != 0);
         return false;
       }
 

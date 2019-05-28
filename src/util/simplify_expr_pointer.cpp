@@ -443,7 +443,7 @@ bool simplify_exprt::simplify_inequality_address_of(exprt &expr)
     bool equal = to_symbol_expr(tmp0.op0()).get_identifier() ==
                  to_symbol_expr(tmp1.op0()).get_identifier();
 
-    expr.make_bool(expr.id()==ID_equal?equal:!equal);
+    expr = make_boolean_expr(expr.id() == ID_equal ? equal : !equal);
 
     return false;
   }
@@ -454,7 +454,7 @@ bool simplify_exprt::simplify_inequality_address_of(exprt &expr)
     bool equal = to_dynamic_object_expr(tmp0.op0()).get_instance() ==
                  to_dynamic_object_expr(tmp1.op0()).get_instance();
 
-    expr.make_bool(expr.id() == ID_equal ? equal : !equal);
+    expr = make_boolean_expr(expr.id() == ID_equal ? equal : !equal);
 
     return false;
   }
@@ -462,7 +462,7 @@ bool simplify_exprt::simplify_inequality_address_of(exprt &expr)
     (tmp0.op0().id() == ID_symbol && tmp1.op0().id() == ID_dynamic_object) ||
     (tmp0.op0().id() == ID_dynamic_object && tmp1.op0().id() == ID_symbol))
   {
-    expr.make_bool(expr.id() != ID_equal);
+    expr = make_boolean_expr(expr.id() != ID_equal);
 
     return false;
   }
@@ -580,7 +580,8 @@ bool simplify_exprt::simplify_is_dynamic_object(exprt &expr)
       const irep_idt identifier=to_symbol_expr(op.op0()).get_identifier();
 
       // this is for the benefit of symex
-      expr.make_bool(has_prefix(id2string(identifier), SYMEX_DYNAMIC_PREFIX));
+      expr = make_boolean_expr(
+        has_prefix(id2string(identifier), SYMEX_DYNAMIC_PREFIX));
       return false;
     }
     else if(op.op0().id()==ID_string_constant)
