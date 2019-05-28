@@ -1478,19 +1478,19 @@ bool simplify_exprt::simplify_inequality(exprt &expr)
 
     expr.op0().swap(expr.op1());
 
-    // one is constant
-    simplify_inequality_constant(expr);
+    // RHS is constant, LHS is not
+    simplify_inequality_rhs_is_constant(expr);
     return false;
   }
   else if(tmp1_const)
   {
-    // one is constant
-    return simplify_inequality_constant(expr);
+    // RHS is constant, LHS is not
+    return simplify_inequality_rhs_is_constant(expr);
   }
   else
   {
     // both are not constant
-    return simplify_inequality_not_constant(expr);
+    return simplify_inequality_no_constant(expr);
   }
 }
 
@@ -1542,7 +1542,7 @@ bool simplify_exprt::eliminate_common_addends(
   return true;
 }
 
-bool simplify_exprt::simplify_inequality_not_constant(exprt &expr)
+bool simplify_exprt::simplify_inequality_no_constant(exprt &expr)
 {
   exprt::operandst &operands=expr.operands();
 
@@ -1556,7 +1556,7 @@ bool simplify_exprt::simplify_inequality_not_constant(exprt &expr)
   if(expr.id()==ID_notequal)
   {
     expr.id(ID_equal);
-    simplify_inequality_not_constant(expr);
+    simplify_inequality_no_constant(expr);
     expr = boolean_negate(expr);
     simplify_node(expr);
     return false;
@@ -1566,7 +1566,7 @@ bool simplify_exprt::simplify_inequality_not_constant(exprt &expr)
     expr.id(ID_ge);
     // swap operands
     expr.op0().swap(expr.op1());
-    simplify_inequality_not_constant(expr);
+    simplify_inequality_no_constant(expr);
     expr = boolean_negate(expr);
     simplify_node(expr);
     return false;
@@ -1574,7 +1574,7 @@ bool simplify_exprt::simplify_inequality_not_constant(exprt &expr)
   else if(expr.id()==ID_lt)
   {
     expr.id(ID_ge);
-    simplify_inequality_not_constant(expr);
+    simplify_inequality_no_constant(expr);
     expr = boolean_negate(expr);
     simplify_node(expr);
     return false;
@@ -1584,7 +1584,7 @@ bool simplify_exprt::simplify_inequality_not_constant(exprt &expr)
     expr.id(ID_ge);
     // swap operands
     expr.op0().swap(expr.op1());
-    simplify_inequality_not_constant(expr);
+    simplify_inequality_no_constant(expr);
     return false;
   }
 
@@ -1670,8 +1670,9 @@ bool simplify_exprt::simplify_inequality_not_constant(exprt &expr)
   return true;
 }
 
-/// \par parameters: an inequality with a constant on the RHS
-bool simplify_exprt::simplify_inequality_constant(exprt &expr)
+/// \par expr: an inequality where the RHS is a constant
+/// and the LHS is not
+bool simplify_exprt::simplify_inequality_rhs_is_constant(exprt &expr)
 {
   // the constant is always on the RHS
   PRECONDITION(expr.op1().is_constant());
@@ -1679,8 +1680,8 @@ bool simplify_exprt::simplify_inequality_constant(exprt &expr)
   if(expr.op0().id()==ID_if && expr.op0().operands().size()==3)
   {
     if_exprt if_expr=lift_if(expr, 0);
-    simplify_inequality_constant(if_expr.true_case());
-    simplify_inequality_constant(if_expr.false_case());
+    simplify_inequality_rhs_is_constant(if_expr.true_case());
+    simplify_inequality_rhs_is_constant(if_expr.false_case());
     simplify_if(if_expr);
     expr.swap(if_expr);
 
@@ -1693,7 +1694,7 @@ bool simplify_exprt::simplify_inequality_constant(exprt &expr)
     if(expr.id()==ID_notequal)
     {
       expr.id(ID_equal);
-      simplify_inequality_constant(expr);
+      simplify_inequality_rhs_is_constant(expr);
       expr = boolean_negate(expr);
       simplify_node(expr);
       return false;
@@ -1909,7 +1910,7 @@ bool simplify_exprt::simplify_inequality_constant(exprt &expr)
     if(expr.id()==ID_notequal)
     {
       expr.id(ID_equal);
-      simplify_inequality_constant(expr);
+      simplify_inequality_rhs_is_constant(expr);
       expr = boolean_negate(expr);
       simplify_node(expr);
       return false;
@@ -1927,13 +1928,13 @@ bool simplify_exprt::simplify_inequality_constant(exprt &expr)
       expr.id(ID_ge);
       ++i;
       expr.op1()=from_integer(i, expr.op1().type());
-      simplify_inequality_constant(expr);
+      simplify_inequality_rhs_is_constant(expr);
       return false;
     }
     else if(expr.id()==ID_lt)
     {
       expr.id(ID_ge);
-      simplify_inequality_constant(expr);
+      simplify_inequality_rhs_is_constant(expr);
       expr = boolean_negate(expr);
       simplify_node(expr);
       return false;
@@ -1951,7 +1952,7 @@ bool simplify_exprt::simplify_inequality_constant(exprt &expr)
       expr.id(ID_ge);
       ++i;
       expr.op1()=from_integer(i, expr.op1().type());
-      simplify_inequality_constant(expr);
+      simplify_inequality_rhs_is_constant(expr);
       expr = boolean_negate(expr);
       simplify_node(expr);
       return false;
