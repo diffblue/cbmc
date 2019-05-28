@@ -388,7 +388,10 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
 
   if(root_object.id() == ID_null_object)
   {
-    result.pointer = null_pointer_exprt{pointer_type};
+    if(o.offset().is_zero())
+      result.pointer = null_pointer_exprt{pointer_type};
+    else
+      return valuet{};
   }
   else if(root_object.id()==ID_dynamic_object)
   {

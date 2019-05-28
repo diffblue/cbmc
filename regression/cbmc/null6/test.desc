@@ -1,0 +1,12 @@
+CORE broken-smt-backend
+main.c
+
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+When building a reference to a null object we need to consider the offset;
+build_reference_to had failed to do so, which confused value-set based
+filtering.
