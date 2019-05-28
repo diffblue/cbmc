@@ -96,6 +96,8 @@ exprt field_sensitivityt::apply(
       // place the entire index expression, not just the array operand, in an
       // SSA expression
       ssa_exprt tmp = to_ssa_expr(index.array());
+      auto l2_index = state.rename(index.index(), ns);
+      l2_index.simplify(ns);
       bool was_l2 = !tmp.get_level_2().empty();
       exprt l2_size =
         state.rename(to_array_type(index.array().type()).size(), ns).get();
@@ -112,16 +114,29 @@ exprt field_sensitivityt::apply(
       if(
         l2_size.id() == ID_constant &&
         numeric_cast_v<mp_integer>(to_constant_expr(l2_size)) <=
-          max_field_sensitive_array_size &&
-        index.id() == ID_constant)
+          max_field_sensitive_array_size)
       {
-        tmp.remove_level_2();
-        index.array() = tmp.get_original_expr();
-        tmp.set_expression(index);
-        if(was_l2)
-          return state.rename(std::move(tmp), ns).get();
-        else
-          return std::move(tmp);
+        if(l2_index.get().id() == ID_constant)
+        {
+          // place the entire index expression, not just the array operand,
+          // in an SSA expression
+          ssa_exprt ssa_array = to_ssa_expr(index.array());
+          ssa_array.remove_level_2();
+          index.array() = ssa_array.get_original_expr();
+          index.index() = l2_index.get();
+          tmp.set_expression(index);
+          if(was_l2)
+            return state.rename(std::move(tmp), ns).get();
+          else
+            return std::move(tmp);
+        }
+        else if(!write)
+        {
+          // Expand the array and return `{array[0]; array[1]; ...}[index]`
+          exprt expanded_array =
+            get_fields(ns, state, to_ssa_expr(index.array()));
+          return index_exprt{std::move(expanded_array), index.index()};
+        }
       }
     }
   }
