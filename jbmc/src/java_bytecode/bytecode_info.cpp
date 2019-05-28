@@ -15,7 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 // clang-format off
 struct bytecode_infot const bytecode_info[]=
 {
-{ "aaload",         0x32, ' ', 2, 1, ' ' }, // arrayref, index → value; load onto the stack a reference from an array  NOLINT(*)
+{ "aaload",         0x32, ' ', 2, 1, 'a' }, // arrayref, index → value; load onto the stack a reference from an array  NOLINT(*)
 { "aastore",        0x53, ' ', 3, 0, ' ' }, // arrayref, index, value →; store into a reference in an array  NOLINT(*)
 { "aconst_null",    0x01, ' ', 0, 1, 'a' }, // → null; push a null reference onto the stack  NOLINT(*)
 { "aload",          0x19, 'v', 0, 1, 'a' }, // → objectref; load a reference onto the stack from a local variable #index  NOLINT(*)
