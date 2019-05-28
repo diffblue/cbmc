@@ -76,6 +76,12 @@ process_array_expr(exprt &expr, bool do_simplify, const namespacet &ns)
 
     expr = ode.root_object();
 
+    // If we arrive at a void-typed object (typically the result of failing to
+    // dereference a void* pointer) there is nothing else to be done - it has
+    // void-type and the caller needs to handle this case gracefully.
+    if(expr.type().id() == ID_empty)
+      return;
+
     if(!ode.offset().is_zero())
     {
       if(expr.type().id() != ID_array)
