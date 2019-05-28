@@ -221,10 +221,12 @@ public:
 
     bool operator==(const entryt &other) const
     {
-      return
-        identifier==other.identifier &&
-        suffix==other.suffix &&
-        object_map==other.object_map;
+      // Note that the object_map comparison below is duplicating the code of
+      // operator== defined in reference_counting.h because old versions of
+      // clang (3.7 and 3.8) do not resolve the template instantiation correctly
+      return identifier == other.identifier && suffix == other.suffix &&
+             (object_map.get_d() == other.object_map.get_d() ||
+              object_map.read() == other.object_map.read());
     }
     bool operator!=(const entryt &other) const
     {
