@@ -92,7 +92,7 @@ void irept::set(const irep_namet &name, const long long value)
 
 void irept::remove(const irep_namet &name)
 {
-#ifdef NAMED_SUB_IS_FORWARD_LIST
+#if NAMED_SUB_IS_FORWARD_LIST
   return get_named_sub().remove(name);
 #else
   named_subt &s = get_named_sub();
@@ -120,7 +120,7 @@ irept &irept::add(const irep_namet &name, irept irep)
 {
   named_subt &s = get_named_sub();
 
-#ifdef NAMED_SUB_IS_FORWARD_LIST
+#if NAMED_SUB_IS_FORWARD_LIST
   return s.add(name, std::move(irep));
 #else
   std::pair<named_subt::iterator, bool> entry = s.emplace(

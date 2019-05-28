@@ -182,7 +182,7 @@ jobs:
         - WITH_MEMORY_ANALYZER=1
       script: echo "Not running any tests for a debug build."
 
-    # cmake build using g++-7, enable NAMED_SUB_IS_FORWARD_LIST
+    # cmake build using g++-7, disable NAMED_SUB_IS_FORWARD_LIST
     - stage: Test different OS/CXX/Flags
       os: linux
       sudo: false
@@ -205,7 +205,7 @@ jobs:
       install:
         - ccache -z
         - ccache --max-size=1G
-        - cmake -H. -Bbuild '-DCMAKE_BUILD_TYPE=Release' '-DCMAKE_CXX_COMPILER=/usr/bin/g++-7' '-DCMAKE_CXX_FLAGS=-DNAMED_SUB_IS_FORWARD_LIST' '-DWITH_MEMORY_ANALYZER=On'
+        - cmake -H. -Bbuild '-DCMAKE_BUILD_TYPE=Release' '-DCMAKE_CXX_COMPILER=/usr/bin/g++-7' '-DCMAKE_CXX_FLAGS=-DNAMED_SUB_IS_FORWARD_LIST=0' '-DWITH_MEMORY_ANALYZER=On'
         - git submodule update --init --recursive
         - cmake --build build -- -j4
       script: (cd build; bin/unit "[core][irept]")

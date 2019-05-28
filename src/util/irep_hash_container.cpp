@@ -55,7 +55,7 @@ void irep_hash_container_baset::pack(
   {
     // we pack: the irep id, the sub size, the subs, the named-sub size, and
     // each of the named subs with their ids
-#ifdef NAMED_SUB_IS_FORWARD_LIST
+#if NAMED_SUB_IS_FORWARD_LIST
     const std::size_t named_sub_size =
       std::distance(named_sub.begin(), named_sub.end());
 #else
