@@ -1349,119 +1349,13 @@ bool simplify_exprt::simplify_inequality(exprt &expr)
   if(tmp1.type().id()==ID_c_enum_tag)
     tmp1.type()=ns.follow_tag(to_c_enum_tag_type(tmp1.type()));
 
-  const auto tmp0_const = expr_try_dynamic_cast<constant_exprt>(tmp0);
-  const auto tmp1_const = expr_try_dynamic_cast<constant_exprt>(tmp1);
+  const bool tmp0_const = tmp0.is_constant();
+  const bool tmp1_const = tmp1.is_constant();
 
   // are _both_ constant?
   if(tmp0_const && tmp1_const)
   {
-    if(expr.id() == ID_equal || expr.id() == ID_notequal)
-    {
-      // two constants compare equal when there values (as strings) are the same
-      // or both of them are pointers and both represent NULL in some way
-      bool equal = (tmp0_const->get_value() == tmp1_const->get_value());
-      if(
-        !equal && tmp0_const->type().id() == ID_pointer &&
-        tmp1_const->type().id() == ID_pointer)
-      {
-        if(
-          !config.ansi_c.NULL_is_zero && (tmp0_const->get_value() == ID_NULL ||
-                                          tmp1_const->get_value() == ID_NULL))
-        {
-          // if NULL is not zero on this platform, we really don't know what it
-          // is and therefore cannot simplify
-          return true;
-        }
-        equal = tmp0_const->is_zero() && tmp1_const->is_zero();
-      }
-      expr.make_bool(expr.id() == ID_equal ? equal : !equal);
-      return false;
-    }
-
-    if(tmp0.type().id() == ID_fixedbv)
-    {
-      fixedbvt f0(to_constant_expr(tmp0));
-      fixedbvt f1(to_constant_expr(tmp1));
-
-      if(expr.id() == ID_ge)
-        expr.make_bool(f0>=f1);
-      else if(expr.id()==ID_le)
-        expr.make_bool(f0<=f1);
-      else if(expr.id()==ID_gt)
-        expr.make_bool(f0>f1);
-      else if(expr.id()==ID_lt)
-        expr.make_bool(f0<f1);
-      else
-        UNREACHABLE;
-
-      return false;
-    }
-    else if(tmp0.type().id()==ID_floatbv)
-    {
-      ieee_floatt f0(to_constant_expr(tmp0));
-      ieee_floatt f1(to_constant_expr(tmp1));
-
-      if(expr.id() == ID_ge)
-        expr.make_bool(f0>=f1);
-      else if(expr.id()==ID_le)
-        expr.make_bool(f0<=f1);
-      else if(expr.id()==ID_gt)
-        expr.make_bool(f0>f1);
-      else if(expr.id()==ID_lt)
-        expr.make_bool(f0<f1);
-      else
-        UNREACHABLE;
-
-      return false;
-    }
-    else if(tmp0.type().id()==ID_rational)
-    {
-      rationalt r0, r1;
-
-      if(to_rational(tmp0, r0))
-        return true;
-
-      if(to_rational(tmp1, r1))
-        return true;
-
-      if(expr.id() == ID_ge)
-        expr.make_bool(r0>=r1);
-      else if(expr.id()==ID_le)
-        expr.make_bool(r0<=r1);
-      else if(expr.id()==ID_gt)
-        expr.make_bool(r0>r1);
-      else if(expr.id()==ID_lt)
-        expr.make_bool(r0<r1);
-      else
-        UNREACHABLE;
-
-      return false;
-    }
-    else
-    {
-      const auto v0 = numeric_cast<mp_integer>(tmp0);
-
-      if(!v0.has_value())
-        return true;
-
-      const auto v1 = numeric_cast<mp_integer>(tmp1);
-
-      if(!v1.has_value())
-        return true;
-
-      if(expr.id() == ID_ge)
-        expr.make_bool(*v0 >= *v1);
-      else if(expr.id()==ID_le)
-        expr.make_bool(*v0 <= *v1);
-      else if(expr.id()==ID_gt)
-        expr.make_bool(*v0 > *v1);
-      else if(expr.id()==ID_lt)
-        expr.make_bool(*v0 < *v1);
-      else
-        UNREACHABLE;
-
-      return false;
-    }
+    return simplify_inequality_both_constant(expr);
   }
   else if(tmp0_const)
   {
@@ -1491,6 +1385,133 @@ bool simplify_exprt::simplify_inequality(exprt &expr)
   {
     // both are not constant
     return simplify_inequality_no_constant(expr);
+  }
+}
+
+/// simplifies inequalities for the case in which both sides
+/// of the inequality are constants
+bool simplify_exprt::simplify_inequality_both_constant(exprt &expr)
+{
+  PRECONDITION(expr.operands().size() == 2);
+
+  exprt tmp0 = expr.op0();
+  exprt tmp1 = expr.op1();
+
+  if(tmp0.type().id() == ID_c_enum_tag)
+    tmp0.type() = ns.follow_tag(to_c_enum_tag_type(tmp0.type()));
+
+  if(tmp1.type().id() == ID_c_enum_tag)
+    tmp1.type() = ns.follow_tag(to_c_enum_tag_type(tmp1.type()));
+
+  const auto &tmp0_const = to_constant_expr(tmp0);
+  const auto &tmp1_const = to_constant_expr(tmp1);
+
+  if(expr.id() == ID_equal || expr.id() == ID_notequal)
+  {
+    // two constants compare equal when there values (as strings) are the same
+    // or both of them are pointers and both represent NULL in some way
+    bool equal = (tmp0_const.get_value() == tmp1_const.get_value());
+    if(
+      !equal && tmp0_const.type().id() == ID_pointer &&
+      tmp1_const.type().id() == ID_pointer)
+    {
+      if(
+        !config.ansi_c.NULL_is_zero && (tmp0_const.get_value() == ID_NULL ||
+                                        tmp1_const.get_value() == ID_NULL))
+      {
+        // if NULL is not zero on this platform, we really don't know what it
+        // is and therefore cannot simplify
+        return true;
+      }
+      equal = tmp0_const.is_zero() && tmp1_const.is_zero();
+    }
+    expr.make_bool(expr.id() == ID_equal ? equal : !equal);
+    return false;
+  }
+
+  if(tmp0.type().id() == ID_fixedbv)
+  {
+    fixedbvt f0(tmp0_const);
+    fixedbvt f1(tmp1_const);
+
+    if(expr.id() == ID_ge)
+      expr.make_bool(f0 >= f1);
+    else if(expr.id() == ID_le)
+      expr.make_bool(f0 <= f1);
+    else if(expr.id() == ID_gt)
+      expr.make_bool(f0 > f1);
+    else if(expr.id() == ID_lt)
+      expr.make_bool(f0 < f1);
+    else
+      UNREACHABLE;
+
+    return false;
+  }
+  else if(tmp0.type().id() == ID_floatbv)
+  {
+    ieee_floatt f0(tmp0_const);
+    ieee_floatt f1(tmp1_const);
+
+    if(expr.id() == ID_ge)
+      expr.make_bool(f0 >= f1);
+    else if(expr.id() == ID_le)
+      expr.make_bool(f0 <= f1);
+    else if(expr.id() == ID_gt)
+      expr.make_bool(f0 > f1);
+    else if(expr.id() == ID_lt)
+      expr.make_bool(f0 < f1);
+    else
+      UNREACHABLE;
+
+    return false;
+  }
+  else if(tmp0.type().id() == ID_rational)
+  {
+    rationalt r0, r1;
+
+    if(to_rational(tmp0, r0))
+      return true;
+
+    if(to_rational(tmp1, r1))
+      return true;
+
+    if(expr.id() == ID_ge)
+      expr.make_bool(r0 >= r1);
+    else if(expr.id() == ID_le)
+      expr.make_bool(r0 <= r1);
+    else if(expr.id() == ID_gt)
+      expr.make_bool(r0 > r1);
+    else if(expr.id() == ID_lt)
+      expr.make_bool(r0 < r1);
+    else
+      UNREACHABLE;
+
+    return false;
+  }
+  else
+  {
+    const auto v0 = numeric_cast<mp_integer>(tmp0_const);
+
+    if(!v0.has_value())
+      return true;
+
+    const auto v1 = numeric_cast<mp_integer>(tmp1_const);
+
+    if(!v1.has_value())
+      return true;
+
+    if(expr.id() == ID_ge)
+      expr.make_bool(*v0 >= *v1);
+    else if(expr.id() == ID_le)
+      expr.make_bool(*v0 <= *v1);
+    else if(expr.id() == ID_gt)
+      expr.make_bool(*v0 > *v1);
+    else if(expr.id() == ID_lt)
+      expr.make_bool(*v0 < *v1);
+    else
+      UNREACHABLE;
+
+    return false;
   }
 }
 
