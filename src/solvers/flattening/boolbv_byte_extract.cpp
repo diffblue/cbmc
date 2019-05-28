@@ -38,14 +38,14 @@ bvt map_bv(const bv_endianness_mapt &map, const bvt &src)
 
 bvt boolbvt::convert_byte_extract(const byte_extract_exprt &expr)
 {
+  const std::size_t width = boolbv_width(expr.type());
+
   // array logic does not handle byte operators, thus lower when operating on
   // unbounded arrays
-  if(is_unbounded_array(expr.op().type()))
+  if(is_unbounded_array(expr.op().type()) || is_unbounded_array(expr.type()) || width == 0)
   {
     return convert_bv(lower_byte_extract(expr, ns));
   }
-
-  const std::size_t width = boolbv_width(expr.type());
 
   // special treatment for bit-fields and big-endian:
   // we need byte granularity
@@ -62,9 +62,6 @@ bvt boolbvt::convert_byte_extract(const byte_extract_exprt &expr)
     return;
   }
   #endif
-
-  if(width==0)
-    return conversion_failed(expr);
 
   // see if the byte number is constant and within bounds, else work from the
   // root object
