@@ -131,6 +131,7 @@ public:
   static tvt objects_equal(const exprt &a, const exprt &b);
   static tvt objects_equal_address_of(const exprt &a, const exprt &b);
   bool simplify_address_of_arg(exprt &expr);
+  bool simplify_inequality_both_constant(exprt &);
   bool simplify_inequality_no_constant(exprt &);
   bool simplify_inequality_rhs_is_constant(exprt &);
   bool simplify_inequality_address_of(exprt &expr);
