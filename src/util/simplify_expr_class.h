@@ -25,6 +25,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "replace_expr.h"
 #endif
 
+class binary_relation_exprt;
 class bswap_exprt;
 class byte_extract_exprt;
 class byte_update_exprt;
@@ -129,7 +130,7 @@ public:
   bool simplify_bitnot(exprt &expr);
   bool simplify_not(exprt &expr);
   bool simplify_boolean(exprt &expr);
-  bool simplify_inequality(exprt &expr);
+  resultt<> simplify_inequality(const binary_relation_exprt &);
   bool simplify_ieee_float_relation(exprt &expr);
   bool simplify_lambda(exprt &expr);
   bool simplify_with(exprt &expr);
@@ -176,11 +177,11 @@ public:
   static tvt objects_equal(const exprt &a, const exprt &b);
   static tvt objects_equal_address_of(const exprt &a, const exprt &b);
   bool simplify_address_of_arg(exprt &expr);
-  bool simplify_inequality_both_constant(exprt &);
-  bool simplify_inequality_no_constant(exprt &);
-  bool simplify_inequality_rhs_is_constant(exprt &);
-  bool simplify_inequality_address_of(exprt &expr);
-  bool simplify_inequality_pointer_object(exprt &expr);
+  resultt<> simplify_inequality_both_constant(const binary_relation_exprt &);
+  resultt<> simplify_inequality_no_constant(const binary_relation_exprt &);
+  resultt<> simplify_inequality_rhs_is_constant(const binary_relation_exprt &);
+  resultt<> simplify_inequality_address_of(const binary_relation_exprt &);
+  resultt<> simplify_inequality_pointer_object(const binary_relation_exprt &);
 
   // main recursion
   bool simplify_node(exprt &expr);

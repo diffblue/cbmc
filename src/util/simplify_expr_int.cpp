@@ -1293,41 +1293,38 @@ bool simplify_exprt::simplify_bitnot(exprt &expr)
 }
 
 /// simplifies inequalities !=, <=, <, >=, >, and also ==
-bool simplify_exprt::simplify_inequality(exprt &expr)
+simplify_exprt::resultt<> simplify_exprt::simplify_inequality(
+  const binary_relation_exprt &expr)
 {
-  exprt::operandst &operands=expr.operands();
-
   if(expr.type().id()!=ID_bool)
-    return true;
-
-  if(operands.size()!=2)
-    return true;
+    return unchanged(expr);
 
   exprt tmp0=expr.op0();
   exprt tmp1=expr.op1();
 
   // types must match
   if(tmp0.type() != tmp1.type())
-    return true;
+    return unchanged(expr);
 
   // if rhs is ID_if (and lhs is not), swap operands for == and !=
   if((expr.id()==ID_equal || expr.id()==ID_notequal) &&
      tmp0.id()!=ID_if &&
      tmp1.id()==ID_if)
   {
-    expr.op0().swap(expr.op1());
-    return simplify_inequality(expr);
+    auto tmp = expr;
+    tmp.op0().swap(tmp.op1());
+    return changed(simplify_inequality(tmp));
   }
 
   if(tmp0.id()==ID_if && tmp0.operands().size()==3)
   {
     if_exprt if_expr=lift_if(expr, 0);
-    simplify_inequality(if_expr.true_case());
-    simplify_inequality(if_expr.false_case());
+    // true_case and false_case are now inequalities
+    if_expr.true_case() = simplify_inequality(to_binary_relation_expr(if_expr.true_case()));
+    if_expr.false_case() = simplify_inequality(to_binary_relation_expr(if_expr.false_case()));
     simplify_if(if_expr);
-    expr.swap(if_expr);
 
-    return false;
+    return changed(if_expr);
   }
 
   // see if we are comparing pointers that are address_of
@@ -1361,20 +1358,21 @@ bool simplify_exprt::simplify_inequality(exprt &expr)
   {
     // we want the constant on the RHS
 
-    if(expr.id()==ID_ge)
-      expr.id(ID_le);
-    else if(expr.id()==ID_le)
-      expr.id(ID_ge);
-    else if(expr.id()==ID_gt)
-      expr.id(ID_lt);
-    else if(expr.id()==ID_lt)
-      expr.id(ID_gt);
+    auto swapped_expr = expr;
 
-    expr.op0().swap(expr.op1());
+    if(expr.id()==ID_ge)
+      swapped_expr.id(ID_le);
+    else if(expr.id()==ID_le)
+      swapped_expr.id(ID_ge);
+    else if(expr.id()==ID_gt)
+      swapped_expr.id(ID_lt);
+    else if(expr.id()==ID_lt)
+      swapped_expr.id(ID_gt);
+
+    swapped_expr.op0().swap(swapped_expr.op1());
 
     // RHS is constant, LHS is not
-    simplify_inequality_rhs_is_constant(expr);
-    return false;
+    return changed(simplify_inequality_rhs_is_constant(swapped_expr));
   }
   else if(tmp1_const)
   {
@@ -1390,10 +1388,9 @@ bool simplify_exprt::simplify_inequality(exprt &expr)
 
 /// simplifies inequalities for the case in which both sides
 /// of the inequality are constants
-bool simplify_exprt::simplify_inequality_both_constant(exprt &expr)
+simplify_exprt::resultt<> simplify_exprt::simplify_inequality_both_constant(
+  const binary_relation_exprt &expr)
 {
-  PRECONDITION(expr.operands().size() == 2);
-
   exprt tmp0 = expr.op0();
   exprt tmp1 = expr.op1();
 
@@ -1421,11 +1418,14 @@ bool simplify_exprt::simplify_inequality_both_constant(exprt &expr)
       {
         // if NULL is not zero on this platform, we really don't know what it
         // is and therefore cannot simplify
-        return true;
+        return unchanged(expr);
       }
+
       equal = tmp0_const.is_zero() && tmp1_const.is_zero();
     }
+
     expr.make_bool(expr.id() == ID_equal ? equal : !equal);
+
     return false;
   }
 
@@ -1470,10 +1470,10 @@ bool simplify_exprt::simplify_inequality_both_constant(exprt &expr)
     rationalt r0, r1;
 
     if(to_rational(tmp0, r0))
-      return true;
+      return unchanged(expr);
 
     if(to_rational(tmp1, r1))
-      return true;
+      return unchanged(expr);
 
     if(expr.id() == ID_ge)
       expr.make_bool(r0 >= r1);
@@ -1493,12 +1493,12 @@ bool simplify_exprt::simplify_inequality_both_constant(exprt &expr)
     const auto v0 = numeric_cast<mp_integer>(tmp0_const);
 
     if(!v0.has_value())
-      return true;
+      return unchanged(expr);
 
     const auto v1 = numeric_cast<mp_integer>(tmp1_const);
 
     if(!v1.has_value())
-      return true;
+      return unchanged(expr);
 
     if(expr.id() == ID_ge)
       expr.make_bool(*v0 >= *v1);
@@ -1693,7 +1693,8 @@ bool simplify_exprt::simplify_inequality_no_constant(exprt &expr)
 
 /// \par expr: an inequality where the RHS is a constant
 /// and the LHS is not
-bool simplify_exprt::simplify_inequality_rhs_is_constant(exprt &expr)
+simplify_exprt::resultt<> simplify_exprt::simplify_inequality_rhs_is_constant(
+  const binary_relation_exprt &expr)
 {
   // the constant is always on the RHS
   PRECONDITION(expr.op1().is_constant());
@@ -1714,11 +1715,12 @@ bool simplify_exprt::simplify_inequality_rhs_is_constant(exprt &expr)
   {
     if(expr.id()==ID_notequal)
     {
-      expr.id(ID_equal);
-      simplify_inequality_rhs_is_constant(expr);
-      expr = boolean_negate(expr);
-      simplify_node(expr);
-      return false;
+      auto tmp1 = expr;
+      tmp1.id(ID_equal);
+      exprt tmp2 = simplify_inequality_rhs_is_constant(tmp1);
+      tmp2 = boolean_negate(tmp2);
+      simplify_node(tmp2);
+      return changed(tmp2);
     }
 
     // very special case for pointers
@@ -1738,8 +1740,7 @@ bool simplify_exprt::simplify_inequality_rhs_is_constant(exprt &expr)
           expr.op0().op0().id() == ID_index ||
           expr.op0().op0().id() == ID_string_constant)
         {
-          expr=false_exprt();
-          return false;
+          return changed(false_exprt());
         }
       }
       else if(expr.op0().id()==ID_typecast &&
@@ -1755,8 +1756,7 @@ bool simplify_exprt::simplify_inequality_rhs_is_constant(exprt &expr)
           expr.op0().op0().op0().id() == ID_index ||
           expr.op0().op0().op0().id() == ID_string_constant)
         {
-          expr=false_exprt();
-          return false;
+          return changed(false_exprt());
         }
       }
       else if(expr.op0().id()==ID_typecast &&
@@ -1779,7 +1779,7 @@ bool simplify_exprt::simplify_inequality_rhs_is_constant(exprt &expr)
     }
 
     // all we are doing with pointers
-    return true;
+    return unchanged(expr);
   }
 
   // is it a separation predicate?
@@ -1815,8 +1815,7 @@ bool simplify_exprt::simplify_inequality_rhs_is_constant(exprt &expr)
         expr.op1()=from_integer(i, expr.op1().type());
 
         simplify_plus(expr.op0());
-        simplify_inequality(expr);
-        return false;
+        return changed(simplify_inequality(expr));
       }
     }
   }
