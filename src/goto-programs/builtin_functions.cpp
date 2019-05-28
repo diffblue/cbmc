@@ -602,19 +602,23 @@ void goto_convertt::do_array_op(
 
 exprt make_va_list(const exprt &expr)
 {
-  // we first strip any typecast
-  if(expr.id()==ID_typecast)
-    return make_va_list(to_typecast_expr(expr).op());
+  exprt result = skip_typecast(expr);
 
   // if it's an address of an lvalue, we take that
-  if(expr.id() == ID_address_of)
+  if(result.id() == ID_address_of)
   {
-    const auto &address_of_expr = to_address_of_expr(expr);
+    const auto &address_of_expr = to_address_of_expr(result);
     if(is_lvalue(address_of_expr.object()))
-      return address_of_expr.object();
+      result = address_of_expr.object();
   }
 
-  return expr;
+  while(result.type().id() == ID_array &&
+        to_array_type(result.type()).size().is_one())
+  {
+    result = index_exprt{result, from_integer(0, index_type())};
+  }
+
+  return result;
 }
 
 /// add function calls to function queue for later processing
