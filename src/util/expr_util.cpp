@@ -281,3 +281,11 @@ bool is_constantt::is_constant_address_of(const exprt &expr) const
 
   return false;
 }
+
+constant_exprt make_boolean_expr(bool value)
+{
+  if(value)
+    return true_exprt();
+  else
+    return false_exprt();
+}
