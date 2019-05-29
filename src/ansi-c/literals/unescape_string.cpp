@@ -44,7 +44,7 @@ std::basic_string<T> unescape_string_templ(const std::string &src)
 
   for(unsigned i=0; i<src.size(); i++)
   {
-    T ch = narrow_cast<T>(narrow_cast<unsigned char>(src[i]));
+    T ch = narrow_cast<T>(src[i]);
 
     if(ch=='\\') // escape?
     {
@@ -52,7 +52,7 @@ std::basic_string<T> unescape_string_templ(const std::string &src)
       i++;
       assert(i<src.size()); // backslash can't be last character
 
-      ch = narrow_cast<T>(narrow_cast<unsigned char>(src[i]));
+      ch = narrow_cast<T>(src[i]);
       switch(ch)
       {
       case '\\': dest.push_back(ch); break;
