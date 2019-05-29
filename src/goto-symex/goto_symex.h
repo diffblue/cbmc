@@ -557,14 +557,14 @@ protected:
     const ssa_exprt &lhs,
     const exprt &full_lhs,
     const struct_exprt &rhs,
-    exprt::operandst &,
+    const exprt::operandst &,
     assignment_typet);
   void symex_assign_symbol(
     statet &,
     const ssa_exprt &lhs,
     const exprt &full_lhs,
     const exprt &rhs,
-    exprt::operandst &,
+    const exprt::operandst &,
     assignment_typet);
   void symex_assign_typecast(
     statet &,
