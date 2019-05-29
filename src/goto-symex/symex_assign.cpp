@@ -569,8 +569,6 @@ void goto_symext::symex_assign_array(
   //   a'==a WITH [i:=e]
 
   with_exprt new_rhs(lhs_array, lhs_index, rhs);
-  new_rhs.type() = lhs_index_type;
-
   exprt new_full_lhs=add_to_lhs(full_lhs, lhs);
 
   symex_assign_rec(
