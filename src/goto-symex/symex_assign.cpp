@@ -568,8 +568,8 @@ void goto_symext::symex_assign_array(
   // into
   //   a'==a WITH [i:=e]
 
-  with_exprt new_rhs(lhs_array, lhs_index, rhs);
-  exprt new_full_lhs=add_to_lhs(full_lhs, lhs);
+  const with_exprt new_rhs{lhs_array, lhs_index, rhs};
+  const exprt new_full_lhs = add_to_lhs(full_lhs, lhs);
 
   symex_assign_rec(
     state, lhs_array, new_full_lhs, new_rhs, guard, assignment_type);
