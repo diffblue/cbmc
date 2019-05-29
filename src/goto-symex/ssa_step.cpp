@@ -213,3 +213,25 @@ irep_idt SSA_stept::get_property_id() const
 
   return property_id;
 }
+
+SSA_assignment_stept::SSA_assignment_stept(
+  symex_targett::sourcet source,
+  exprt _guard,
+  ssa_exprt _ssa_lhs,
+  exprt _ssa_full_lhs,
+  exprt _original_full_lhs,
+  exprt _ssa_rhs,
+  exprt _cond_expr,
+  symex_targett::assignment_typet _assignment_type,
+  bool _hidden)
+  : SSA_stept(source, goto_trace_stept::typet::ASSIGNMENT)
+{
+  guard = std::move(_guard);
+  ssa_lhs = std::move(_ssa_lhs);
+  ssa_full_lhs = std::move(_ssa_full_lhs);
+  original_full_lhs = std::move(_original_full_lhs);
+  ssa_rhs = std::move(_ssa_rhs);
+  assignment_type = _assignment_type;
+  cond_expr = std::move(_cond_expr);
+  hidden = _hidden;
+}

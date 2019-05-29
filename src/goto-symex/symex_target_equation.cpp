@@ -114,21 +114,19 @@ void symex_target_equationt::assignment(
 {
   PRECONDITION(ssa_lhs.is_not_nil());
 
-  SSA_steps.emplace_back(source, goto_trace_stept::typet::ASSIGNMENT);
-  SSA_stept &SSA_step=SSA_steps.back();
+  SSA_steps.emplace_back(SSA_assignment_stept{
+    source,
+    guard,
+    ssa_lhs,
+    ssa_full_lhs,
+    original_full_lhs,
+    ssa_rhs,
+    equal_exprt(ssa_lhs, ssa_rhs),
+    assignment_type,
+    assignment_type != assignment_typet::STATE &&
+      assignment_type != assignment_typet::VISIBLE_ACTUAL_PARAMETER});
 
-  SSA_step.guard=guard;
-  SSA_step.ssa_lhs=ssa_lhs;
-  SSA_step.ssa_full_lhs=ssa_full_lhs;
-  SSA_step.original_full_lhs=original_full_lhs;
-  SSA_step.ssa_rhs=ssa_rhs;
-  SSA_step.assignment_type=assignment_type;
-
-  SSA_step.cond_expr=equal_exprt(SSA_step.ssa_lhs, SSA_step.ssa_rhs);
-  SSA_step.hidden=(assignment_type!=assignment_typet::STATE &&
-                   assignment_type!=assignment_typet::VISIBLE_ACTUAL_PARAMETER);
-
-  merge_ireps(SSA_step);
+  merge_ireps(SSA_steps.back());
 }
 
 void symex_target_equationt::decl(
