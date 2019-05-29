@@ -29,6 +29,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/options.h>
 #include <util/pointer_offset_size.h>
 #include <util/pointer_predicates.h>
+#include <util/range.h>
 #include <util/simplify_expr.h>
 #include <util/ssa_expr.h>
 
@@ -97,8 +98,9 @@ exprt value_set_dereferencet::dereference(const exprt &pointer)
   // type of the object
   const typet &type=pointer.type().subtype();
 
-#if 0
-  std::cout << "DEREF: " << format(pointer) << '\n';
+#ifdef DEBUG
+  std::cout << "value_set_dereferencet::dereference pointer=" << format(pointer)
+            << '\n';
 #endif
 
   // collect objects the pointer may point to
@@ -106,24 +108,18 @@ exprt value_set_dereferencet::dereference(const exprt &pointer)
 
   dereference_callback.get_value_set(pointer, points_to_set);
 
-#if 0
-  for(value_setst::valuest::const_iterator
-      it=points_to_set.begin();
-      it!=points_to_set.end();
-      it++)
-    std::cout << "P: " << format(*it) << '\n';
+#ifdef DEBUG
+  std::cout << "value_set_dereferencet::dereference points_to_set={";
+  for(auto p : points_to_set)
+    std::cout << format(p) << "; ";
+  std::cout << "}\n" << std::flush;
 #endif
 
   // get the values of these
-
-  std::vector<exprt> retained_values;
-  for(const auto &value : points_to_set)
-  {
-    if(!should_ignore_value(value, exclude_null_derefs, language_mode))
-      retained_values.push_back(value);
-  }
-
-  std::list<valuet> values;
+  const std::vector<exprt> retained_values =
+    make_range(points_to_set).filter([&](const exprt &value) {
+      return !should_ignore_value(value, exclude_null_derefs, language_mode);
+    });
 
   exprt compare_against_pointer = pointer;
 
@@ -140,15 +136,17 @@ exprt value_set_dereferencet::dereference(const exprt &pointer)
     compare_against_pointer = fresh_binder.symbol_expr();
   }
 
+#ifdef DEBUG
+  std::cout << "value_set_dereferencet::dereference retained_values={";
   for(const auto &value : retained_values)
-  {
-    values.push_back(build_reference_to(value, compare_against_pointer, ns));
-#if 0
-    std::cout << "V: " << format(value.pointer_guard) << " --> ";
-    std::cout << format(value.value);
-    std::cout << '\n';
+    std::cout << format(value) << "; ";
+  std::cout << "}\n" << std::flush;
 #endif
-  }
+
+  std::list<valuet> values =
+    make_range(retained_values).map([&](const exprt &value) {
+      return build_reference_to(value, compare_against_pointer, ns);
+    });
 
   // can this fail?
   bool may_fail;
@@ -227,8 +225,10 @@ exprt value_set_dereferencet::dereference(const exprt &pointer)
   if(compare_against_pointer != pointer)
     value = let_exprt(to_symbol_expr(compare_against_pointer), pointer, value);
 
-#if 0
-  std::cout << "R: " << format(value) << "\n\n";
+#ifdef DEBUG
+  std::cout << "value_set_derefencet::dereference value=" << format(value)
+            << '\n'
+            << std::flush;
 #endif
 
   return value;

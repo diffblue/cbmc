@@ -13,6 +13,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/symbol_table.h>
 
+#ifdef DEBUG
+#  include <iostream>
+#endif
+
 /// Get or create a failed symbol for the given pointer-typed expression. These
 /// are used as placeholders when dereferencing expressions that are illegal to
 /// dereference, such as null pointers. The \ref add_failed_symbols pass must
@@ -84,10 +88,10 @@ void symex_dereference_statet::get_value_set(
 {
   state.value_set.get_value_set(expr, value_set, ns);
 
-#if 0
-  std::cout << "**************************\n";
-  state.value_set.output(goto_symex.ns, std::cout);
-  std::cout << "**************************\n";
+#ifdef DEBUG
+  std::cout << "symex_dereference_statet state.value_set={\n";
+  state.value_set.output(ns, std::cout, "  - ");
+  std::cout << "}" << std::endl;
 #endif
 
 #if 0
