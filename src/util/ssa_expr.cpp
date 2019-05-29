@@ -13,6 +13,78 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/arith_tools.h>
 
+ssa_exprt::ssa_exprt(const exprt &expr) : symbol_exprt(expr.type())
+{
+  set(ID_C_SSA_symbol, true);
+  add(ID_expression, expr);
+  update_identifier();
+}
+
+void ssa_exprt::set_expression(const exprt &expr)
+{
+  type() = expr.type();
+  add(ID_expression, expr);
+  update_identifier();
+}
+
+irep_idt ssa_exprt::get_object_name() const
+{
+  const exprt &original_expr = get_original_expr();
+
+  if(original_expr.id() == ID_symbol)
+    return to_symbol_expr(original_expr).get_identifier();
+
+  object_descriptor_exprt ode(original_expr);
+  return to_symbol_expr(ode.root_object()).get_identifier();
+}
+
+const ssa_exprt ssa_exprt::get_l1_object() const
+{
+  object_descriptor_exprt ode(get_original_expr());
+
+  ssa_exprt root(ode.root_object());
+  root.set(ID_L0, get(ID_L0));
+  root.set(ID_L1, get(ID_L1));
+  root.update_identifier();
+
+  return root;
+}
+
+const irep_idt ssa_exprt::get_l1_object_identifier() const
+{
+#if 0
+  return get_l1_object().get_identifier();
+#else
+  // the above is the clean version, this is the fast one, using
+  // an identifier cached during build_identifier
+  return get(ID_L1_object_identifier);
+#endif
+}
+
+void ssa_exprt::set_level_0(unsigned i)
+{
+  set(ID_L0, i);
+  update_identifier();
+}
+
+void ssa_exprt::set_level_1(unsigned i)
+{
+  set(ID_L1, i);
+  update_identifier();
+}
+
+void ssa_exprt::set_level_2(unsigned i)
+{
+  set(ID_L2, i);
+  update_identifier();
+}
+
+void ssa_exprt::remove_level_2()
+{
+  remove(ID_L2);
+  set_identifier(get_l1_object_identifier());
+}
+
 /// If \p expr is a symbol "s" add to \p os "s!l0@l1#l2" and to \p l1_object_os
 /// "s!l0@l1".
 /// If \p expr is a member or index expression, recursively apply the procedure
