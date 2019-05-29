@@ -1439,13 +1439,12 @@ void goto_convertt::do_function_call_symbol(
 
     // void __sync_lock_release (type *ptr, ...)
   }
-  else if(identifier=="__builtin_isgreater" ||
-          identifier=="__builtin_isgreater" ||
-          identifier=="__builtin_isgreaterequal" ||
-          identifier=="__builtin_isless" ||
-          identifier=="__builtin_islessequal" ||
-          identifier=="__builtin_islessgreater" ||
-          identifier=="__builtin_isunordered")
+  else if(
+    identifier == "__builtin_isgreater" ||
+    identifier == "__builtin_isgreaterequal" ||
+    identifier == "__builtin_isless" || identifier == "__builtin_islessequal" ||
+    identifier == "__builtin_islessgreater" ||
+    identifier == "__builtin_isunordered")
   {
     // these support two double or two float arguments; we call the
     // appropriate internal version
