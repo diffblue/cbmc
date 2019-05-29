@@ -1069,8 +1069,18 @@ void goto_convertt::do_function_call_symbol(
 
     if(lhs.is_not_nil())
     {
+      exprt list_arg_cast = list_arg;
+      if(
+        list_arg.type().id() == ID_pointer &&
+        to_pointer_type(list_arg.type()).subtype().id() == ID_empty)
+      {
+        list_arg_cast =
+          typecast_exprt{list_arg, pointer_type(pointer_type(empty_typet{}))};
+      }
+
       typet t=pointer_type(lhs.type());
-      dereference_exprt rhs{typecast_exprt(dereference_exprt{list_arg}, t)};
+      dereference_exprt rhs{
+        typecast_exprt{dereference_exprt{std::move(list_arg_cast)}, t}};
       rhs.add_source_location()=function.source_location();
       dest.add(
         goto_programt::make_assignment(lhs, rhs, function.source_location()));
@@ -1125,6 +1135,14 @@ void goto_convertt::do_function_call_symbol(
       error().source_location=dest_expr.find_source_location();
       error() << "va_start argument expected to be lvalue" << eom;
       throw 0;
+    }
+
+    if(
+      dest_expr.type().id() == ID_pointer &&
+      to_pointer_type(dest_expr.type()).subtype().id() == ID_empty)
+    {
+      dest_expr =
+        typecast_exprt{dest_expr, pointer_type(pointer_type(empty_typet{}))};
     }
 
     side_effect_exprt rhs{
