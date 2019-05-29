@@ -285,13 +285,10 @@ goto_symex_statet::rename(exprt expr, const namespacet &ns)
       rename<level>(expr.type(), ssa.get_identifier(), ns);
       ssa.update_type();
 
-      if(l2_thread_read_encoding(ssa, ns))
+      // renaming taken care of by l2_thread_encoding, or already at L2
+      if(l2_thread_read_encoding(ssa, ns) || !ssa.get_level_2().empty())
       {
-        // renaming taken care of by l2_thread_encoding
-      }
-      else if(!ssa.get_level_2().empty())
-      {
-        // already at L2
+        return renamedt<exprt, level>(std::move(ssa));
       }
       else
       {
@@ -300,11 +297,15 @@ goto_symex_statet::rename(exprt expr, const namespacet &ns)
         auto p_it = propagation.find(ssa.get_identifier());
 
         if(p_it.has_value())
-          expr = *p_it; // already L2
+        {
+          return renamedt<exprt, level>(*p_it); // already L2
+        }
         else
+        {
           ssa = set_indices<L2>(std::move(ssa), ns).get();
+          return renamedt<exprt, level>(std::move(ssa));
+        }
       }
-      return renamedt<exprt, level>(std::move(ssa));
     }
   }
   else if(expr.id()==ID_symbol)
