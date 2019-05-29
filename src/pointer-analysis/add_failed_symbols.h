@@ -12,12 +12,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_POINTER_ANALYSIS_ADD_FAILED_SYMBOLS_H
 #define CPROVER_POINTER_ANALYSIS_ADD_FAILED_SYMBOLS_H
 
-#include <util/irep.h>
+#include <util/expr.h>
 #include <util/optional.h>
 
 class symbol_table_baset;
 class symbolt;
-class exprt;
 class namespacet;
 class symbol_exprt;
 
@@ -30,5 +29,11 @@ irep_idt failed_symbol_id(const irep_idt &identifier);
 
 optionalt<symbol_exprt>
 get_failed_symbol(const symbol_exprt &expr, const namespacet &ns);
+
+/// Return true if, and only if, \p expr is the result of failed dereferencing.
+inline bool is_failed_symbol(const exprt &expr)
+{
+  return expr.type().get_bool(ID_C_is_failed_symbol);
+}
 
 #endif // CPROVER_POINTER_ANALYSIS_ADD_FAILED_SYMBOLS_H
