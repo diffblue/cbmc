@@ -457,16 +457,16 @@ void goto_symext::symex_assign_symbol(
 
   do_simplify(assignment.rhs);
 
-  ssa_exprt &l1_lhs = assignment.lhs;
-  ssa_exprt l2_lhs = state
-                       .assignment(
-                         assignment.lhs,
-                         assignment.rhs,
-                         ns,
-                         symex_config.simplify_opt,
-                         symex_config.constant_propagation,
-                         symex_config.allow_pointer_unsoundness)
-                       .get();
+  const ssa_exprt &l1_lhs = assignment.lhs;
+  const ssa_exprt l2_lhs = state
+                             .assignment(
+                               assignment.lhs,
+                               assignment.rhs,
+                               ns,
+                               symex_config.simplify_opt,
+                               symex_config.constant_propagation,
+                               symex_config.allow_pointer_unsoundness)
+                             .get();
 
   exprt ssa_full_lhs = add_to_lhs(full_lhs, l2_lhs);
   state.record_events.push(false);
