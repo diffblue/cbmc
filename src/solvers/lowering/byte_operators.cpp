@@ -1751,6 +1751,10 @@ static exprt lower_byte_update_struct(
   const optionalt<exprt> &non_const_update_bound,
   const namespacet &ns)
 {
+  const irep_idt extract_opcode = src.id() == ID_byte_update_little_endian
+                                    ? ID_byte_extract_little_endian
+                                    : ID_byte_extract_big_endian;
+
   exprt::operandst elements;
   elements.reserve(struct_type.components().size());
 
@@ -1789,10 +1793,6 @@ static exprt lower_byte_update_struct(
       // indiviual struct members and instead turn the operand-to-be-updated
       // into a byte array, which we know how to update even if the offset is
       // non-constant.
-      const irep_idt extract_opcode = src.id() == ID_byte_update_little_endian
-                                        ? ID_byte_extract_little_endian
-                                        : ID_byte_extract_big_endian;
-
       auto src_size_opt = size_of_expr(src.type(), ns);
       CHECK_RETURN(src_size_opt.has_value());
 
@@ -1816,6 +1816,10 @@ static exprt lower_byte_update_struct(
         ns);
     }
 
+    // We now need to figure out how many bytes to consume from the update
+    // value. If the size of the update is unknown, then we need to leave some
+    // of this work to a back-end solver via the non_const_update_bound branch
+    // below.
     mp_integer update_elements = (*element_width + 7) / 8;
     std::size_t first = 0;
     if(*offset_bytes < 0)
@@ -1835,6 +1839,9 @@ static exprt lower_byte_update_struct(
         "members before the update should be handled above");
     }
 
+    // Now that we have an idea on how many bytes we need from the update value,
+    // determine the exact range [first, end) in the update value, and create
+    // that sequence of bytes (via instantiate_byte_array).
     std::size_t end = first + numeric_cast_v<std::size_t>(update_elements);
     if(value_as_byte_array.id() == ID_array)
       end = std::min(end, value_as_byte_array.operands().size());
@@ -1842,6 +1849,40 @@ static exprt lower_byte_update_struct(
       instantiate_byte_array(value_as_byte_array, first, end, ns);
     const std::size_t update_size = update_values.size();
 
+    // With an upper bound on the size of the update established, construct the
+    // actual update expression. If the exact size of the update is unknown,
+    // make the size expression conditional.
+    exprt update_size_expr = from_integer(update_size, size_type());
+    array_exprt update_expr{std::move(update_values),
+                            array_typet{bv_typet{8}, update_size_expr}};
+    optionalt<exprt> member_update_bound;
+    if(non_const_update_bound.has_value())
+    {
+      // The size of the update is not constant, and thus is to be symbolically
+      // bound; first see how many bytes we have left in the update:
+      // non_const_update_bound > first ? non_const_update_bound - first: 0
+      const exprt remaining_update_bytes = typecast_exprt::conditional_cast(
+        if_exprt{
+          binary_predicate_exprt{
+            *non_const_update_bound,
+            ID_gt,
+            from_integer(first, non_const_update_bound->type())},
+          minus_exprt{*non_const_update_bound,
+                      from_integer(first, non_const_update_bound->type())},
+          from_integer(0, non_const_update_bound->type())},
+        size_type());
+      // Now take the minimum of update-bytes-left and the previously computed
+      // size of the member to be updated:
+      update_size_expr = if_exprt{
+        binary_predicate_exprt{update_size_expr, ID_lt, remaining_update_bytes},
+        update_size_expr,
+        remaining_update_bytes};
+      simplify(update_size_expr, ns);
+      member_update_bound = std::move(update_size_expr);
+    }
+
+    // We have established the bytes to use for the update, but now need to
+    // account for sub-byte members.
     const std::size_t shift =
       numeric_cast_v<std::size_t>(member_offset_bits % 8);
     const std::size_t element_bits_int =
@@ -1858,20 +1899,17 @@ static exprt lower_byte_update_struct(
         member.op0().swap(member.op1());
     }
 
-    byte_update_exprt bu{
-      src.id(),
-      std::move(member),
-      offset,
-      array_exprt{
-        std::move(update_values),
-        array_typet{bv_typet{8}, from_integer(update_size, size_type())}}};
+    // Finally construct the updated member.
+    byte_update_exprt bu{src.id(), std::move(member), offset, update_expr};
+    exprt updated_element =
+      lower_byte_update(bu, update_expr, member_update_bound, ns);
 
     if(shift == 0)
-      elements.push_back(lower_byte_operators(bu, ns));
+      elements.push_back(updated_element);
     else
     {
       elements.push_back(typecast_exprt::conditional_cast(
-        extractbits_exprt{lower_byte_operators(bu, ns),
+        extractbits_exprt{updated_element,
                           element_bits_int - 1 + (little_endian ? shift : 0),
                           (little_endian ? shift : 0),
                           bv_typet{element_bits_int}},
@@ -2020,6 +2058,28 @@ static exprt lower_byte_update(
     {
       update_bytes =
         instantiate_byte_array(value_as_byte_array, 0, (type_bits + 7) / 8, ns);
+    }
+
+    if(non_const_update_bound.has_value())
+    {
+      const exprt src_as_bytes = unpack_rec(
+        src.op(),
+        src.id() == ID_byte_update_little_endian,
+        mp_integer{0},
+        mp_integer{update_bytes.size()},
+        ns);
+      CHECK_RETURN(src_as_bytes.id() == ID_array);
+      CHECK_RETURN(src_as_bytes.operands().size() == update_bytes.size());
+      for(std::size_t i = 0; i < update_bytes.size(); ++i)
+      {
+        update_bytes[i] =
+          if_exprt{binary_predicate_exprt{
+                     from_integer(i, non_const_update_bound->type()),
+                     ID_lt,
+                     *non_const_update_bound},
+                   update_bytes[i],
+                   src_as_bytes.operands()[i]};
+      }
     }
 
     const std::size_t update_size = update_bytes.size();
