@@ -289,3 +289,13 @@ constant_exprt make_boolean_expr(bool value)
   else
     return false_exprt();
 }
+
+exprt make_and(exprt a, exprt b)
+{
+  if(b.id() == ID_and)
+  {
+    b.add_to_operands(std::move(a));
+    return b;
+  }
+  return and_exprt{std::move(a), std::move(b)};
+}

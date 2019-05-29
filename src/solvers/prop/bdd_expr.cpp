@@ -91,18 +91,6 @@ bddt bdd_exprt::from_expr(const exprt &expr)
   return from_expr_rec(expr);
 }
 
-/// Conjunction of two expressions. If the second is already an `and_exprt`
-/// add to its operands instead of creating a new expression.
-static exprt make_and(exprt a, exprt b)
-{
-  if(b.id() == ID_and)
-  {
-    b.add_to_operands(std::move(a));
-    return b;
-  }
-  return and_exprt{std::move(a), std::move(b)};
-}
-
 /// Disjunction of two expressions. If the second is already an `or_exprt`
 /// add to its operands instead of creating a new expression.
 static exprt make_or(exprt a, exprt b)
