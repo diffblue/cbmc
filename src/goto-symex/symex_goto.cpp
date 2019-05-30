@@ -18,10 +18,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/expr_util.h>
 #include <util/invariant.h>
 #include <util/pointer_offset_size.h>
+#include <util/simplify_expr.h>
 #include <util/std_expr.h>
 
+#include <pointer-analysis/add_failed_symbols.h>
 #include <pointer-analysis/value_set_dereference.h>
-#include <util/simplify_expr.h>
 
 void goto_symext::apply_goto_condition(
   goto_symex_statet &current_state,
@@ -110,11 +111,8 @@ static optionalt<renamedt<exprt, L2>> try_evaluate_pointer_comparison(
     if(
       value_set_element.id() == ID_unknown ||
       value_set_element.id() == ID_invalid ||
-      !to_object_descriptor_expr(value_set_element)
-         .root_object()
-         .type()
-         .get(ID_C_is_failed_symbol)
-         .empty())
+      is_failed_symbol(
+        to_object_descriptor_expr(value_set_element).root_object()))
     {
       // We can't conclude anything about the value-set
       return {};
