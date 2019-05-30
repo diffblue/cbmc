@@ -12,6 +12,36 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <util/ssa_expr.h>
 #include <util/symbol_table.h>
 
+TEST_CASE("Constructor of ssa_exprt", "[unit][util][ssa_expr]")
+{
+  GIVEN("An expression containing member access, array access and a symbol")
+  {
+    const signedbv_typet int_type{32};
+    const array_typet array_type{int_type, from_integer(10, int_type)};
+    std::vector<struct_typet::componentt> components;
+    components.emplace_back("array_field", array_type);
+    const struct_typet struct_type{components};
+    const symbol_exprt symbol{"sym", struct_type};
+    const index_exprt index{member_exprt{symbol, components.back()},
+                            from_integer(9, int_type)};
+
+    WHEN("construct an ssa_exprt from `sym.array_field[9]`")
+    {
+      const ssa_exprt ssa{index};
+      THEN("the ssa_exprt has identifier 'sym..array_field[[9]]'")
+      {
+        REQUIRE(ssa.get_identifier() == "sym..array_field[[9]]");
+      }
+      THEN("the ssa_exprt has no level set")
+      {
+        REQUIRE(ssa.get_level_0() == irep_idt{});
+        REQUIRE(ssa.get_level_1() == irep_idt{});
+        REQUIRE(ssa.get_level_2() == irep_idt{});
+      }
+    }
+  }
+}
+
 TEST_CASE("Set level", "[unit][util][ssa_expr]")
 {
   GIVEN("An SSA expression constructed from a symbol")
