@@ -195,6 +195,13 @@ protected:
   virtual void typecheck_function_call_arguments(
     side_effect_expr_function_callt &expr);
   virtual exprt do_special_functions(side_effect_expr_function_callt &expr);
+  virtual optionalt<symbol_exprt> typecheck_gcc_polymorphic_builtin(
+    const irep_idt &identifier,
+    const exprt::operandst &arguments,
+    const source_locationt &source_location);
+  virtual code_blockt instantiate_gcc_polymorphic_builtin(
+    const irep_idt &identifier,
+    const symbol_exprt &function_symbol);
 
   virtual void make_index_type(exprt &expr);
   virtual void make_constant(exprt &expr);

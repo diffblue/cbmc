@@ -28,11 +28,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/adjust_float_expressions.h>
 
-#include "builtin_factory.h"
-#include "c_typecast.h"
-#include "c_qualifiers.h"
 #include "anonymous_member.h"
+#include "builtin_factory.h"
+#include "c_qualifiers.h"
+#include "c_typecast.h"
 #include "padding.h"
+#include "type2name.h"
 
 void c_typecheck_baset::typecheck_expr(exprt &expr)
 {
@@ -1945,6 +1946,71 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
       {
         // yes, it's a builtin
       }
+      else if(
+        auto gcc_polymorphic = typecheck_gcc_polymorphic_builtin(
+          identifier, expr.arguments(), f_op.source_location()))
+      {
+        irep_idt identifier_with_type = gcc_polymorphic->get_identifier();
+        auto &parameters = to_code_type(gcc_polymorphic->type()).parameters();
+        INVARIANT(
+          !parameters.empty(),
+          "GCC polymorphic built-ins should have at least one parameter");
+        if(parameters.front().type().id() == ID_pointer)
+        {
+          identifier_with_type =
+            id2string(identifier) + "_" +
+            type2name(parameters.front().type().subtype(), *this);
+        }
+        else
+        {
+          identifier_with_type = id2string(identifier) + "_" +
+                                 type2name(parameters.front().type(), *this);
+        }
+        gcc_polymorphic->set_identifier(identifier_with_type);
+
+        if(!symbol_table.has_symbol(identifier_with_type))
+        {
+          for(std::size_t i = 0; i < parameters.size(); ++i)
+          {
+            const std::string base_name = "p_" + std::to_string(i);
+
+            parameter_symbolt new_symbol;
+
+            new_symbol.name =
+              id2string(identifier_with_type) + "::" + base_name;
+            new_symbol.base_name = base_name;
+            new_symbol.location = f_op.source_location();
+            new_symbol.type = parameters[i].type();
+            new_symbol.is_parameter = true;
+            new_symbol.is_lvalue = true;
+            new_symbol.mode = ID_C;
+
+            parameters[i].set_identifier(new_symbol.name);
+            parameters[i].set_base_name(new_symbol.base_name);
+
+            symbol_table.add(new_symbol);
+          }
+
+          symbolt new_symbol;
+
+          new_symbol.name = identifier_with_type;
+          new_symbol.base_name = identifier_with_type;
+          new_symbol.location = f_op.source_location();
+          new_symbol.type = gcc_polymorphic->type();
+          new_symbol.mode = ID_C;
+          code_blockt implementation =
+            instantiate_gcc_polymorphic_builtin(identifier, *gcc_polymorphic);
+          typet parent_return_type = return_type;
+          return_type = to_code_type(gcc_polymorphic->type()).return_type();
+          typecheck_code(implementation);
+          return_type = parent_return_type;
+          new_symbol.value = implementation;
+
+          symbol_table.add(new_symbol);
+        }
+
+        f_op = std::move(*gcc_polymorphic);
+      }
       else
       {
         // This is an undeclared function that's not a builtin.
@@ -2764,48 +2830,6 @@ exprt c_typecheck_baset::do_special_functions(
     tmp.add_source_location()=source_location;
 
     return tmp;
-  }
-  else if(identifier=="__sync_fetch_and_add" ||
-          identifier=="__sync_fetch_and_sub" ||
-          identifier=="__sync_fetch_and_or" ||
-          identifier=="__sync_fetch_and_and" ||
-          identifier=="__sync_fetch_and_xor" ||
-          identifier=="__sync_fetch_and_nand" ||
-          identifier=="__sync_add_and_fetch" ||
-          identifier=="__sync_sub_and_fetch" ||
-          identifier=="__sync_or_and_fetch" ||
-          identifier=="__sync_and_and_fetch" ||
-          identifier=="__sync_xor_and_fetch" ||
-          identifier=="__sync_nand_and_fetch" ||
-          identifier=="__sync_val_compare_and_swap" ||
-          identifier=="__sync_lock_test_and_set" ||
-          identifier=="__sync_lock_release")
-  {
-    // These are polymorphic, see
-    // http://gcc.gnu.org/onlinedocs/gcc-4.1.1/gcc/Atomic-Builtins.html
-
-    // adjust return type of function to match pointer subtype
-    if(expr.arguments().empty())
-    {
-      error().source_location = f_op.source_location();
-      error() << "__sync_* primitives take as least one argument" << eom;
-      throw 0;
-    }
-
-    typecheck_function_call_arguments(expr);
-
-    exprt &ptr_arg=expr.arguments().front();
-
-    if(ptr_arg.type().id()!=ID_pointer)
-    {
-      error().source_location = f_op.source_location();
-      error() << "__sync_* primitives take pointer as first argument" << eom;
-      throw 0;
-    }
-
-    expr.type()=expr.arguments().front().type().subtype();
-
-    return expr;
   }
   else if(
     identifier == CPROVER_PREFIX "overflow_minus" ||

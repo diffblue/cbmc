@@ -90,3 +90,111 @@ inline int __builtin_clzll(unsigned long long int x)
 
   return __builtin_popcountll(~x);
 }
+
+/* FUNCTION: __atomic_test_and_set */
+
+void __atomic_thread_fence(int memorder);
+
+inline _Bool __atomic_test_and_set(void *ptr, int memorder)
+{
+__CPROVER_HIDE:;
+  __CPROVER_atomic_begin();
+  _Bool result = *(char *)ptr == 1;
+  *(char *)ptr = 1;
+  __atomic_thread_fence(memorder);
+  __CPROVER_atomic_end();
+  return result;
+}
+
+/* FUNCTION: __atomic_clear */
+
+void __atomic_thread_fence(int memorder);
+
+inline void __atomic_clear(_Bool *ptr, int memorder)
+{
+__CPROVER_HIDE:;
+  __CPROVER_atomic_begin();
+  *(char *)ptr = 0;
+  __atomic_thread_fence(memorder);
+  __CPROVER_atomic_end();
+}
+
+/* FUNCTION: __atomic_thread_fence */
+
+#if __STDC_VERSION__ >= 201112L
+// GCC 4.8 did claim to support C++11, but failed to ship stdatomic.h
+#  if !defined(__GNUC__) || (__GNUC__ * 100 + __GNUC_MINOR__) >= 409
+#    include <stdatomic.h>
+#  endif
+#endif
+
+#ifndef __ATOMIC_RELAXED
+#  define __ATOMIC_RELAXED 0
+#endif
+
+#ifndef __ATOMIC_CONSUME
+#  define __ATOMIC_CONSUME 1
+#endif
+
+#ifndef __ATOMIC_ACQUIRE
+#  define __ATOMIC_ACQUIRE 2
+#endif
+
+#ifndef __ATOMIC_RELEASE
+#  define __ATOMIC_RELEASE 3
+#endif
+
+#ifndef __ATOMIC_ACQ_REL
+#  define __ATOMIC_ACQ_REL 4
+#endif
+
+#ifndef __ATOMIC_SEQ_CST
+#  define __ATOMIC_SEQ_CST 5
+#endif
+
+inline void __atomic_thread_fence(int memorder)
+{
+__CPROVER_HIDE:;
+  if(memorder == __ATOMIC_CONSUME || memorder == __ATOMIC_ACQUIRE)
+    __CPROVER_fence("RRfence", "RWfence", "RRcumul", "RWcumul");
+  else if(memorder == __ATOMIC_RELEASE)
+    __CPROVER_fence("WRfence", "WWfence", "WRcumul", "WWcumul");
+  else if(memorder == __ATOMIC_ACQ_REL || memorder == __ATOMIC_SEQ_CST)
+    __CPROVER_fence(
+      "WWfence",
+      "RRfence",
+      "RWfence",
+      "WRfence",
+      "WWcumul",
+      "RRcumul",
+      "RWcumul",
+      "WRcumul");
+}
+
+/* FUNCTION: __atomic_signal_fence */
+
+void __atomic_thread_fence(int memorder);
+
+inline void __atomic_signal_fence(int memorder)
+{
+__CPROVER_HIDE:;
+  __atomic_thread_fence(memorder);
+}
+
+/* FUNCTION: __atomic_always_lock_free */
+
+inline _Bool __atomic_always_lock_free(__CPROVER_size_t size, void *ptr)
+{
+__CPROVER_HIDE:;
+  (void)ptr;
+  return size <= sizeof(__CPROVER_size_t);
+}
+
+/* FUNCTION: __atomic_is_lock_free */
+
+inline _Bool __atomic_is_lock_free(__CPROVER_size_t size, void *ptr)
+{
+__CPROVER_HIDE:;
+  (void)ptr;
+  return size <= sizeof(__CPROVER_size_t);
+}

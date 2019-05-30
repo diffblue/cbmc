@@ -1,0 +1,8 @@
+CORE
+main.c
+--show-goto-functions
+^EXIT=0$
+^SIGNAL=0$
+^__sync_lock_release_S8
+^__sync_lock_release_S32
+--
