@@ -37,7 +37,7 @@ private:
   bool has_gb_arch;
 };
 
-bool is_osx_fat_magic(char hdr[4]);
+bool is_osx_fat_header(char hdr[8]);
 
 class osx_mach_o_readert
 {
@@ -74,6 +74,6 @@ private:
   void process_sections_64(uint32_t nsects, bool need_swap);
 };
 
-bool is_osx_mach_object(char hdr[4]);
+bool is_osx_mach_object(char hdr[8]);
 
 #endif // CPROVER_GOTO_PROGRAMS_OSX_FAT_READER_H
