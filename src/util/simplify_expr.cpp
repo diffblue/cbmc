@@ -2405,131 +2405,131 @@ bool simplify_exprt::simplify_node_preorder(exprt &expr)
 bool simplify_exprt::simplify_node(exprt &expr)
 {
   if(!expr.has_operands())
-    return true;
+    return true; // no change
 
-  // #define DEBUGX
+    // #define DEBUGX
 
-  #ifdef DEBUGX
+#ifdef DEBUGX
   exprt old(expr);
-  #endif
+#endif
 
-  bool result=true;
+  bool no_change = true;
 
-  result=sort_and_join(expr) && result;
+  no_change = sort_and_join(expr) && no_change;
 
   if(expr.id()==ID_typecast)
-    result=simplify_typecast(expr) && result;
+    no_change = simplify_typecast(expr) && no_change;
   else if(expr.id()==ID_equal || expr.id()==ID_notequal ||
           expr.id()==ID_gt    || expr.id()==ID_lt ||
           expr.id()==ID_ge    || expr.id()==ID_le)
-    result=simplify_inequality(expr) && result;
+    no_change = simplify_inequality(expr) && no_change;
   else if(expr.id()==ID_if)
-    result=simplify_if(to_if_expr(expr)) && result;
+    no_change = simplify_if(to_if_expr(expr)) && no_change;
   else if(expr.id()==ID_lambda)
-    result=simplify_lambda(expr) && result;
+    no_change = simplify_lambda(expr) && no_change;
   else if(expr.id()==ID_with)
-    result=simplify_with(expr) && result;
+    no_change = simplify_with(expr) && no_change;
   else if(expr.id()==ID_update)
-    result=simplify_update(expr) && result;
+    no_change = simplify_update(expr) && no_change;
   else if(expr.id()==ID_index)
-    result=simplify_index(expr) && result;
+    no_change = simplify_index(expr) && no_change;
   else if(expr.id()==ID_member)
-    result=simplify_member(expr) && result;
+    no_change = simplify_member(expr) && no_change;
   else if(expr.id()==ID_byte_update_little_endian ||
           expr.id()==ID_byte_update_big_endian)
-    result=simplify_byte_update(to_byte_update_expr(expr)) && result;
+    no_change = simplify_byte_update(to_byte_update_expr(expr)) && no_change;
   else if(expr.id()==ID_byte_extract_little_endian ||
           expr.id()==ID_byte_extract_big_endian)
-    result=simplify_byte_extract(to_byte_extract_expr(expr)) && result;
+    no_change = simplify_byte_extract(to_byte_extract_expr(expr)) && no_change;
   else if(expr.id()==ID_pointer_object)
-    result=simplify_pointer_object(expr) && result;
+    no_change = simplify_pointer_object(expr) && no_change;
   else if(expr.id() == ID_is_dynamic_object)
   {
-    result = simplify_is_dynamic_object(expr) && result;
+    no_change = simplify_is_dynamic_object(expr) && no_change;
   }
   else if(expr.id() == ID_is_invalid_pointer)
-    result = simplify_is_invalid_pointer(expr) && result;
+    no_change = simplify_is_invalid_pointer(expr) && no_change;
   else if(expr.id()==ID_object_size)
-    result=simplify_object_size(expr) && result;
+    no_change = simplify_object_size(expr) && no_change;
   else if(expr.id()==ID_good_pointer)
-    result=simplify_good_pointer(expr) && result;
+    no_change = simplify_good_pointer(expr) && no_change;
   else if(expr.id()==ID_div)
-    result=simplify_div(expr) && result;
+    no_change = simplify_div(expr) && no_change;
   else if(expr.id()==ID_mod)
-    result=simplify_mod(expr) && result;
+    no_change = simplify_mod(expr) && no_change;
   else if(expr.id()==ID_bitnot)
-    result=simplify_bitnot(expr) && result;
+    no_change = simplify_bitnot(expr) && no_change;
   else if(expr.id()==ID_bitand ||
           expr.id()==ID_bitor ||
           expr.id()==ID_bitxor)
-    result=simplify_bitwise(expr) && result;
+    no_change = simplify_bitwise(expr) && no_change;
   else if(expr.id()==ID_ashr || expr.id()==ID_lshr || expr.id()==ID_shl)
-    result=simplify_shifts(expr) && result;
+    no_change = simplify_shifts(expr) && no_change;
   else if(expr.id()==ID_power)
-    result=simplify_power(expr) && result;
+    no_change = simplify_power(expr) && no_change;
   else if(expr.id()==ID_plus)
-    result=simplify_plus(expr) && result;
+    no_change = simplify_plus(expr) && no_change;
   else if(expr.id()==ID_minus)
-    result=simplify_minus(expr) && result;
+    no_change = simplify_minus(expr) && no_change;
   else if(expr.id()==ID_mult)
-    result=simplify_mult(expr) && result;
+    no_change = simplify_mult(expr) && no_change;
   else if(expr.id()==ID_floatbv_plus ||
           expr.id()==ID_floatbv_minus ||
           expr.id()==ID_floatbv_mult ||
           expr.id()==ID_floatbv_div)
-    result=simplify_floatbv_op(expr) && result;
+    no_change = simplify_floatbv_op(expr) && no_change;
   else if(expr.id()==ID_floatbv_typecast)
-    result=simplify_floatbv_typecast(expr) && result;
+    no_change = simplify_floatbv_typecast(expr) && no_change;
   else if(expr.id()==ID_unary_minus)
-    result=simplify_unary_minus(expr) && result;
+    no_change = simplify_unary_minus(expr) && no_change;
   else if(expr.id()==ID_unary_plus)
-    result=simplify_unary_plus(expr) && result;
+    no_change = simplify_unary_plus(expr) && no_change;
   else if(expr.id()==ID_not)
-    result=simplify_not(expr) && result;
+    no_change = simplify_not(expr) && no_change;
   else if(expr.id()==ID_implies ||
           expr.id()==ID_or      || expr.id()==ID_xor ||
           expr.id()==ID_and)
-    result=simplify_boolean(expr) && result;
+    no_change = simplify_boolean(expr) && no_change;
   else if(expr.id()==ID_dereference)
-    result=simplify_dereference(expr) && result;
+    no_change = simplify_dereference(expr) && no_change;
   else if(expr.id()==ID_address_of)
-    result=simplify_address_of(expr) && result;
+    no_change = simplify_address_of(expr) && no_change;
   else if(expr.id()==ID_pointer_offset)
-    result=simplify_pointer_offset(expr) && result;
+    no_change = simplify_pointer_offset(expr) && no_change;
   else if(expr.id()==ID_extractbit)
-    result=simplify_extractbit(expr) && result;
+    no_change = simplify_extractbit(expr) && no_change;
   else if(expr.id()==ID_concatenation)
-    result=simplify_concatenation(expr) && result;
+    no_change = simplify_concatenation(expr) && no_change;
   else if(expr.id()==ID_extractbits)
-    result = simplify_extractbits(to_extractbits_expr(expr)) && result;
+    no_change = simplify_extractbits(to_extractbits_expr(expr)) && no_change;
   else if(expr.id()==ID_ieee_float_equal ||
           expr.id()==ID_ieee_float_notequal)
-    result=simplify_ieee_float_relation(expr) && result;
+    no_change = simplify_ieee_float_relation(expr) && no_change;
   else if(expr.id() == ID_bswap)
-    result = simplify_bswap(to_bswap_expr(expr)) && result;
+    no_change = simplify_bswap(to_bswap_expr(expr)) && no_change;
   else if(expr.id()==ID_isinf)
-    result=simplify_isinf(expr) && result;
+    no_change = simplify_isinf(expr) && no_change;
   else if(expr.id()==ID_isnan)
-    result=simplify_isnan(expr) && result;
+    no_change = simplify_isnan(expr) && no_change;
   else if(expr.id()==ID_isnormal)
-    result=simplify_isnormal(expr) && result;
+    no_change = simplify_isnormal(expr) && no_change;
   else if(expr.id()==ID_abs)
-    result=simplify_abs(expr) && result;
+    no_change = simplify_abs(expr) && no_change;
   else if(expr.id()==ID_sign)
-    result=simplify_sign(expr) && result;
+    no_change = simplify_sign(expr) && no_change;
   else if(expr.id() == ID_popcount)
-    result = simplify_popcount(to_popcount_expr(expr)) && result;
+    no_change = simplify_popcount(to_popcount_expr(expr)) && no_change;
   else if(expr.id() == ID_function_application)
-    result = simplify_function_application(expr) && result;
+    no_change = simplify_function_application(expr) && no_change;
   else if(expr.id() == ID_complex_real || expr.id() == ID_complex_imag)
-    result = simplify_complex(expr) && result;
+    no_change = simplify_complex(expr) && no_change;
 
 #ifdef DEBUGX
   if(
-    !result
-#ifdef DEBUG_ON_DEMAND
+    !no_change
+#  ifdef DEBUG_ON_DEMAND
     && debug_on
-#endif
+#  endif
   )
   {
     std::cout << "===== " << old.id() << ": " << format(old) << '\n'
@@ -2537,7 +2537,7 @@ bool simplify_exprt::simplify_node(exprt &expr)
   }
 #endif
 
-  return result;
+  return no_change;
 }
 
 /// \return returns true if expression unchanged; returns false if changed
