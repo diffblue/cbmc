@@ -40,15 +40,16 @@ INCLUDES= -I ..
 
 LIBS =
 
-CLEANFILES = goto-cc$(EXEEXT) goto-cl$(EXEEXT)
+CLEANFILES = goto-cc$(EXEEXT) goto-gcc$(EXEEXT) goto-cl$(EXEEXT)
 
 include ../config.inc
 include ../common
 
 ifeq ($(BUILD_ENV_),MSVC)
 all: goto-cl$(EXEEXT)
+else
+all: goto-gcc$(EXEEXT)
 endif
-all: goto-cc$(EXEEXT)
 
 ifneq ($(wildcard ../jsil/Makefile),)
   OBJ += ../jsil/jsil$(LIBEXT)
@@ -56,6 +57,9 @@ ifneq ($(wildcard ../jsil/Makefile),)
 endif
 
 ###############################################################################
+
+goto-gcc$(EXEEXT): goto-cc$(EXEEXT)
+	ln -sf goto-cc$(EXEEXT) goto-gcc$(EXEEXT)
 
 goto-cc$(EXEEXT): $(OBJ)
 	$(LINKBIN)
