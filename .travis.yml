@@ -107,7 +107,6 @@ jobs:
       # env: COMPILER=g++-5 SAN_FLAGS="-fsanitize=undefined -fno-sanitize-recover -fno-omit-frame-pointer"
       env:
         - COMPILER="ccache /usr/bin/g++-5"
-        - EXTRA_CXXFLAGS="-D_GLIBCXX_DEBUG"
         - WITH_MEMORY_ANALYZER=1
 
     # OS X using clang++

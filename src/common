@@ -210,8 +210,8 @@ first_target: all
 
 HOSTCXX ?= $(CXX)
 
-CP_CFLAGS += $(CFLAGS) $(INCLUDES)
-CP_CXXFLAGS += $(CXXFLAGS) $(INCLUDES)
+CP_CFLAGS += $(CFLAGS) $(CP_EXTRA_CFLAGS) $(INCLUDES)
+CP_CXXFLAGS += $(CXXFLAGS) $(CP_EXTRA_CXXFLAGS) $(INCLUDES)
 
 OBJ += $(patsubst %.cpp, %$(OBJEXT), $(filter %.cpp, $(SRC)))
 OBJ += $(patsubst %.cc, %$(OBJEXT), $(filter %.cc, $(SRC)))

@@ -4,6 +4,7 @@ env:
   variables:
     # CodeBuild console doesn't display color codes correctly
     TESTPL_COLOR_OUTPUT: 0
+    CP_EXTRA_CXXFLAGS: -D_GLIBCXX_DEBUG
 
 phases:
   install:
