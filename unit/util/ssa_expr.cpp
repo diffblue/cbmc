@@ -108,3 +108,36 @@ TEST_CASE("Set expression", "[unit][util][ssa_expr]")
     }
   }
 }
+
+TEST_CASE("ssa_exprt::get_object_name", "[unit][util][ssa_expr]")
+{
+  GIVEN("An ssa_exprt constructed from a symbol")
+  {
+    const signedbv_typet int_type{32};
+    const symbol_exprt symbol{"sym", int_type};
+    const ssa_exprt ssa{symbol};
+
+    THEN("The object name is the same as the symbol name")
+    {
+      REQUIRE(ssa.get_object_name() == "sym");
+    }
+  }
+
+  GIVEN("An expression containing member access, array access and a symbol")
+  {
+    const signedbv_typet int_type{32};
+    const array_typet array_type{int_type, from_integer(10, int_type)};
+    std::vector<struct_typet::componentt> components;
+    components.emplace_back("array_field", array_type);
+    const struct_typet struct_type{components};
+    const symbol_exprt symbol{"sym", struct_type};
+    const index_exprt index{member_exprt{symbol, components.back()},
+                            from_integer(9, int_type)};
+    const ssa_exprt ssa{symbol};
+
+    THEN("The object name is the same as the symbol")
+    {
+      REQUIRE(ssa.get_object_name() == "sym");
+    }
+  }
+}
