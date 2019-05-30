@@ -574,3 +574,13 @@ void prop_conv_solvert::pop()
 
   prop.set_assumptions(assumption_stack);
 }
+
+// This method out-of-line because gcc-5.5.0-12ubuntu1 20171010 miscompiles it
+// when inline (in certain build configurations, notably -O2 -g0) by producing
+// a non-virtual thunk with c++03 ABI but a function body with c++11 ABI, the
+// mismatch leading to a missing vtable entry and consequent null-pointer deref
+// whenever this function is called.
+std::string prop_conv_solvert::decision_procedure_text() const
+{
+  return "propositional reduction";
+}
