@@ -7,6 +7,8 @@ Author: Malte Mues <mail.mues@gmail.com>
 
 \*******************************************************************/
 
+#include <cstdlib>
+
 #include "analyze_symbol.h"
 
 #include <util/c_types.h>
@@ -29,19 +31,108 @@ gdb_value_extractort::gdb_value_extractort(
 {
 }
 
+gdb_value_extractort::memory_scopet::memory_scopet(
+  const memory_addresst &begin,
+  const mp_integer &byte_size,
+  const irep_idt &name)
+  : begin_int(safe_string2size_t(begin.address_string, 0)),
+    byte_size(byte_size),
+    name(name)
+{
+}
+
+size_t gdb_value_extractort::memory_scopet::address2size_t(
+  const memory_addresst &point) const
+{
+  return safe_string2size_t(point.address_string, 0);
+}
+
+mp_integer gdb_value_extractort::memory_scopet::distance(
+  const memory_addresst &point,
+  mp_integer member_size) const
+{
+  auto point_int = address2size_t(point);
+  CHECK_RETURN(check_containment(point_int));
+  return (point_int - begin_int) / member_size;
+}
+
+std::vector<gdb_value_extractort::memory_scopet>::iterator
+gdb_value_extractort::find_dynamic_allocation(irep_idt name)
+{
+  return std::find_if(
+    dynamically_allocated.begin(),
+    dynamically_allocated.end(),
+    [&name](const memory_scopet &scope) { return scope.id() == name; });
+}
+
+std::vector<gdb_value_extractort::memory_scopet>::iterator
+gdb_value_extractort::find_dynamic_allocation(const memory_addresst &point)
+{
+  return std::find_if(
+    dynamically_allocated.begin(),
+    dynamically_allocated.end(),
+    [&point](const memory_scopet &memory_scope) {
+      return memory_scope.contains(point);
+    });
+}
+
+mp_integer gdb_value_extractort::get_malloc_size(irep_idt name)
+{
+  const auto scope_it = find_dynamic_allocation(name);
+  if(scope_it == dynamically_allocated.end())
+    return 1;
+  else
+    return scope_it->size();
+}
+
+optionalt<std::string> gdb_value_extractort::get_malloc_pointee(
+  const memory_addresst &point,
+  mp_integer member_size)
+{
+  const auto scope_it = find_dynamic_allocation(point);
+  if(scope_it == dynamically_allocated.end())
+    return {};
+
+  const auto pointer_distance = scope_it->distance(point, member_size);
+  return id2string(scope_it->id()) +
+         (pointer_distance > 0 ? "+" + integer2string(pointer_distance) : "");
+}
+
+mp_integer gdb_value_extractort::get_type_size(const typet &type) const
+{
+  const auto maybe_size = pointer_offset_bits(type, ns);
+  CHECK_RETURN(maybe_size.has_value());
+  return *maybe_size / 8;
+}
+
 void gdb_value_extractort::analyze_symbols(const std::vector<irep_idt> &symbols)
 {
   // record addresses of given symbols
   for(const auto &id : symbols)
   {
-    const symbol_exprt &symbol_expr = ns.lookup(id).symbol_expr();
-    const address_of_exprt aoe(symbol_expr);
+    const symbolt &symbol = ns.lookup(id);
+    if(symbol.type.id() != ID_pointer || is_c_char_type(symbol.type.subtype()))
+    {
+      const symbol_exprt &symbol_expr = ns.lookup(id).symbol_expr();
+      const address_of_exprt aoe(symbol_expr);
 
-    const std::string c_expr = c_converter.convert(aoe);
-    const pointer_valuet &value = gdb_api.get_memory(c_expr);
-    CHECK_RETURN(value.pointee.empty() || (id == value.pointee));
+      const std::string c_expr = c_converter.convert(aoe);
+      const pointer_valuet &value = gdb_api.get_memory(c_expr);
+      CHECK_RETURN(value.pointee.empty() || (id == value.pointee));
 
-    values.insert({value.address, symbol_expr});
+      memory_map[id] = value;
+    }
+    else
+    {
+      const std::string c_symbol = c_converter.convert(symbol.symbol_expr());
+      const pointer_valuet &symbol_value = gdb_api.get_memory(c_symbol);
+      size_t symbol_size = gdb_api.query_malloc_size(c_symbol);
+
+      if(symbol_size > 1)
+        dynamically_allocated.emplace_back(
+          symbol_value.address, symbol_size, id);
+      memory_map[id] = symbol_value;
+    }
   }
 
   for(const auto &id : symbols)
@@ -126,7 +217,8 @@ symbol_tablet gdb_value_extractort::get_snapshot_as_symbol_table()
 
 void gdb_value_extractort::add_assignment(const exprt &lhs, const exprt &value)
 {
-  assignments.push_back(std::make_pair(lhs, value));
+  if(assignments.count(lhs) == 0)
+    assignments.emplace(std::make_pair(lhs, value));
 }
 
 exprt gdb_value_extractort::get_char_pointer_value(
@@ -199,73 +291,31 @@ exprt gdb_value_extractort::get_pointer_to_member_value(
 
   const symbolt *struct_symbol = symbol_table.lookup(struct_name);
   DATA_INVARIANT(struct_symbol != nullptr, "unknown struct");
-  const auto maybe_struct_size =
-    pointer_offset_size(struct_symbol->symbol_expr().type(), ns);
-  bool found = false;
-  CHECK_RETURN(maybe_struct_size.has_value());
-  for(const auto &value_pair : values)
+
+  if(!has_known_memory_location(struct_name))
   {
-    const auto &value_symbol_expr = value_pair.second;
-    if(to_symbol_expr(value_symbol_expr).get_identifier() == struct_name)
-    {
-      found = true;
-      break;
-    }
+    memory_map[struct_name] = gdb_api.get_memory(struct_name);
+    analyze_symbol(irep_idt{struct_name});
   }
 
-  if(!found)
+  const auto &struct_symbol_expr = struct_symbol->symbol_expr();
+  if(struct_symbol->type.id() == ID_array)
   {
-    const typet target_type = expr.type().subtype();
-
-    symbol_exprt dummy("tmp", expr.type());
-    code_blockt assignments;
-
-    auto emplace_pair = values.emplace(
-      memory_location,
-      allocate_objects.allocate_automatic_local_object(
-        assignments, dummy, target_type));
-    const symbol_exprt &new_symbol = to_symbol_expr(emplace_pair.first->second);
-
-    dereference_exprt dereference_expr(expr);
-
-    const auto zero_expr = zero_initializer(target_type, location, ns);
-    CHECK_RETURN(zero_expr);
-
-    // add assignment of value to newly created symbol
-    add_assignment(new_symbol, *zero_expr);
-
-    const auto &struct_symbol = values.find(memory_location);
-
-    const auto maybe_member_expr = get_subexpression_at_offset(
-      struct_symbol->second, member_offset, expr.type().subtype(), ns);
-    CHECK_RETURN(maybe_member_expr.has_value());
-    return *maybe_member_expr;
+    return index_exprt{
+      struct_symbol_expr,
+      from_integer(
+        member_offset / get_type_size(expr.type().subtype()), index_type())};
   }
-
-  const auto it = values.find(memory_location);
-  // if the structure we are pointing to does not exists we need to build a
-  // temporary object for it: get the type from symbol table, query gdb for
-  // value, allocate new object for it and then store into assignments
-  if(it == values.end())
+  if(struct_symbol->type.id() == ID_pointer)
   {
-    const auto symbol_expr = struct_symbol->symbol_expr();
-    const auto zero = zero_initializer(symbol_expr.type(), location, ns);
-    CHECK_RETURN(zero.has_value());
-    const auto val = get_expr_value(symbol_expr, *zero, location);
-
-    symbol_exprt dummy("tmp", pointer_type(symbol_expr.type()));
-    code_blockt assignments;
-
-    const symbol_exprt new_symbol =
-      to_symbol_expr(allocate_objects.allocate_automatic_local_object(
-        assignments, dummy, symbol_expr.type()));
-
-    add_assignment(new_symbol, val);
-    values[memory_location] = val;
+    return dereference_exprt{
+      plus_exprt{struct_symbol_expr,
+                 from_integer(member_offset, size_type()),
+                 expr.type()}};
   }
 
   const auto maybe_member_expr = get_subexpression_at_offset(
-    struct_symbol->symbol_expr(), member_offset, expr.type().subtype(), ns);
+    struct_symbol_expr, member_offset, expr.type().subtype(), ns);
   DATA_INVARIANT(
     maybe_member_expr.has_value(), "structure doesn't have member");
 
@@ -276,17 +326,27 @@ exprt gdb_value_extractort::get_pointer_to_member_value(
 
 exprt gdb_value_extractort::get_non_char_pointer_value(
   const exprt &expr,
-  const memory_addresst &memory_location,
+  const pointer_valuet &value,
   const source_locationt &location)
 {
   PRECONDITION(expr.type().id() == ID_pointer);
   PRECONDITION(!is_c_char_type(expr.type().subtype()));
+  const auto &memory_location = value.address;
   PRECONDITION(!memory_location.is_null());
 
   auto it = values.find(memory_location);
 
   if(it == values.end())
   {
+    if(!value.pointee.empty() && value.pointee != c_converter.convert(expr))
+    {
+      analyze_symbol(value.pointee);
+      const auto pointee_symbol = symbol_table.lookup(value.pointee);
+      CHECK_RETURN(pointee_symbol != nullptr);
+      const auto pointee_symbol_expr = pointee_symbol->symbol_expr();
+      return pointee_symbol_expr;
+    }
+
     values.insert(std::make_pair(memory_location, nil_exprt()));
 
     const typet target_type = expr.type().subtype();
@@ -302,13 +362,10 @@ exprt gdb_value_extractort::get_non_char_pointer_value(
     // expected positions. Since the allocated size is over-approximation we may
     // end up querying pass the allocated bounds and building larger array with
     // meaningless values.
-    size_t allocated_size =
-      gdb_api.query_malloc_size(c_converter.convert(expr));
+    mp_integer allocated_size = get_malloc_size(c_converter.convert(expr));
     // get the sizeof(target_type) and thus the number of elements
-    const auto target_size_bits = pointer_offset_bits(target_type, ns);
-    CHECK_RETURN(target_size_bits.has_value());
-    const auto number_of_elements = allocated_size / (*target_size_bits / 8);
-    if(number_of_elements > 1)
+    const auto number_of_elements = allocated_size / get_type_size(target_type);
+    if(allocated_size != 1 && number_of_elements > 1)
     {
       array_exprt::operandst elements;
       // build the operands by querying for an index expression
@@ -337,6 +394,7 @@ exprt gdb_value_extractort::get_non_char_pointer_value(
       // add assignment of value to newly created symbol
       add_assignment(array_symbol, new_array);
       values[memory_location] = array_symbol;
+      CHECK_RETURN(array_symbol.type().id() == ID_array);
       return array_symbol;
     }
 
@@ -359,6 +417,8 @@ exprt gdb_value_extractort::get_non_char_pointer_value(
   {
     const auto &known_value = it->second;
     const auto &expected_type = expr.type().subtype();
+    if(find_dynamic_allocation(memory_location) != dynamically_allocated.end())
+      return known_value;
     if(known_value.is_not_nil() && known_value.type() != expected_type)
     {
       return symbol_exprt{to_symbol_expr(known_value).get_identifier(),
@@ -369,10 +429,21 @@ exprt gdb_value_extractort::get_non_char_pointer_value(
 }
 
 bool gdb_value_extractort::points_to_member(
-  const pointer_valuet &pointer_value) const
+  pointer_valuet &pointer_value,
+  const typet &expected_type)
 {
   if(pointer_value.has_known_offset())
     return true;
+
+  if(pointer_value.pointee.empty())
+  {
+    const auto maybe_pointee = get_malloc_pointee(
+      pointer_value.address, get_type_size(expected_type.subtype()));
+    if(maybe_pointee.has_value())
+      pointer_value.pointee = *maybe_pointee;
+    if(pointer_value.pointee.find("+") != std::string::npos)
+      return true;
+  }
 
   const symbolt *pointee_symbol = symbol_table.lookup(pointer_value.pointee);
   if(pointee_symbol == nullptr)
@@ -394,7 +465,12 @@ exprt gdb_value_extractort::get_pointer_value(
   PRECONDITION(expr.type() == zero_expr.type());
 
   std::string c_expr = c_converter.convert(expr);
-  const pointer_valuet value = gdb_api.get_memory(c_expr);
+  const auto known_pointer = memory_map.find(c_expr);
+
+  pointer_valuet value = (known_pointer == memory_map.end() ||
+                          known_pointer->second.pointee == c_expr)
+                           ? gdb_api.get_memory(c_expr)
+                           : known_pointer->second;
   if(!value.valid)
     return zero_expr;
 
@@ -403,7 +479,7 @@ exprt gdb_value_extractort::get_pointer_value(
   if(!memory_location.is_null())
   {
     // pointers-to-char can point to members as well, e.g. char[]
-    if(points_to_member(value))
+    if(points_to_member(value, expr.type()))
     {
       const auto target_expr =
         get_pointer_to_member_value(expr, value, location);
@@ -417,7 +493,7 @@ exprt gdb_value_extractort::get_pointer_value(
     const auto target_expr =
       is_c_char_type(expr.type().subtype())
         ? get_char_pointer_value(expr, memory_location, location)
-        : get_non_char_pointer_value(expr, memory_location, location);
+        : get_non_char_pointer_value(expr, value, location);
 
     // postpone if we cannot resolve now
     if(target_expr.is_nil())
@@ -435,7 +511,10 @@ exprt gdb_value_extractort::get_pointer_value(
       const auto result_indexed_expr = get_subexpression_at_offset(
         target_expr, 0, zero_expr.type().subtype(), ns);
       CHECK_RETURN(result_indexed_expr.has_value());
+      if(result_indexed_expr->type() == zero_expr.type())
+        return *result_indexed_expr;
       const auto result_expr = address_of_exprt{*result_indexed_expr};
+      CHECK_RETURN(result_expr.type() == zero_expr.type());
       return result_expr;
     }
 
@@ -445,7 +524,8 @@ exprt gdb_value_extractort::get_pointer_value(
 
     // otherwise the address of target should type-match
     const auto result_expr = address_of_exprt(target_expr);
-    CHECK_RETURN(result_expr.type() == zero_expr.type());
+    if(result_expr.type() != zero_expr.type())
+      return typecast_exprt{result_expr, zero_expr.type()};
     return result_expr;
   }
 

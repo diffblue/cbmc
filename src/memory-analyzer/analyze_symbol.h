@@ -81,7 +81,7 @@ private:
   allocate_objectst allocate_objects;
 
   /// Sequence of assignments collected during \ref analyze_symbols
-  std::vector<std::pair<exprt, exprt>> assignments;
+  std::map<exprt, exprt> assignments;
 
   /// Mapping pointer expression for which \ref get_non_char_pointer_value
   ///   returned nil expression to memory location (from \ref gdb_apit).
@@ -90,6 +90,108 @@ private:
   /// Storing pairs <address, symbol> such that at `address` is stored the
   ///   value of `symbol`.
   std::map<memory_addresst, exprt> values;
+
+  struct memory_scopet
+  {
+  private:
+    size_t begin_int;
+    mp_integer byte_size;
+    irep_idt name;
+
+    /// Convert base-16 memory address to a natural number
+    /// \param point: the memory address to be converted
+    /// \return base-10 unsigned integer equal in value to \p point
+    size_t address2size_t(const memory_addresst &point) const;
+
+    /// Helper function that check if a point in memory points inside this scope
+    /// \param point_int: memory point as natural number
+    /// \return true if the point is inside this scope
+    bool check_containment(const size_t &point_int) const
+    {
+      return point_int >= begin_int && (begin_int + byte_size) > point_int;
+    }
+
+  public:
+    memory_scopet(
+      const memory_addresst &begin,
+      const mp_integer &byte_size,
+      const irep_idt &name);
+
+    /// Check if \p point points somewhere in this memory scope
+    /// \param point: memory address to be check for presence
+    /// \return true if \p point is inside *this
+    bool contains(const memory_addresst &point) const
+    {
+      return check_containment(address2size_t(point));
+    }
+
+    /// Compute the distance of \p point from the beginning of this scope
+    /// \param point: memory address to have the offset computed
+    /// \param member_size: size of one element of this scope in bytes
+    /// \return `n' such that \p point is the n-th element of this scope
+    mp_integer
+    distance(const memory_addresst &point, mp_integer member_size) const;
+
+    /// Getter for the name of this memory scope
+    /// \return the name as irep id
+    irep_idt id() const
+    {
+      return name;
+    }
+
+    /// Getter for the allocation size of this memory scope
+    /// \return the size in bytes
+    mp_integer size() const
+    {
+      return byte_size;
+    }
+  };
+
+  /// Keep track of the dynamically allocated memory
+  std::vector<memory_scopet> dynamically_allocated;
+
+  /// Keep track of the memory location for the analyzed symbols
+  std::map<irep_idt, pointer_valuet> memory_map;
+
+  bool has_known_memory_location(const irep_idt &id) const
+  {
+    return memory_map.count(id) != 0;
+  }
+
+  /// Search for a memory scope allocated under \p name
+  /// \param name: name of the pointer used during allocation
+  /// \return iterator to the right memory scope
+  std::vector<memory_scopet>::iterator find_dynamic_allocation(irep_idt name);
+
+  /// Search for a memory scope allocated under \p name
+  /// \param point: potentially dynamically allocated memory address
+  /// \return iterator to the right memory scope
+  std::vector<memory_scopet>::iterator
+  find_dynamic_allocation(const memory_addresst &point);
+
+  /// Search for the size of the allocated memory for \p name
+  /// \param name: name of the pointer used during allocation
+  /// \return the size if have a record of \p name's allocation (1 otherwise)
+  mp_integer get_malloc_size(irep_idt name);
+
+  /// Build the pointee string for address \p point assuming it points to a
+  ///   dynamic allocation of `n' elements each of size \p member_size. E.g.:
+  ///
+  ///   int *p = (int*)malloc(sizeof(int)*4);
+  ///   int *q = &(p[2]);
+  ///
+  ///   get_malloc_pointee(get_memory(q), sizeof(int)) -> "p+8"
+  ///
+  /// \param point: potentially dynamically allocated memory address
+  /// \param member_size: size of each allocated element
+  /// \return pointee as a string if we have a record of the allocation
+  optionalt<std::string>
+  get_malloc_pointee(const memory_addresst &point, mp_integer member_size);
+
+  /// Wrapper for call get_offset_pointer_bits
+  /// \param type: type to get the size of
+  /// \return the size of the type in bytes
+  mp_integer get_type_size(const typet &type) const;
 
   /// Assign the gdb-extracted value for \p symbol_name to its symbol
   ///   expression and then process outstanding assignments that this
@@ -176,12 +278,12 @@ private:
   ///   \ref gdb_apit::get_memory, calls \ref get_expr_value on _dereferenced_
   ///   \p expr (the result of which is assigned to a new symbol).
   /// \param expr: the pointer expression to be analysed
-  /// \param memory_location: pointer value from \ref gdb_apit::get_memory
+  /// \param value: pointer value from \ref gdb_apit::get_memory
   /// \param location: the source location
   /// \return symbol expression associated with \p memory_location
   exprt get_non_char_pointer_value(
     const exprt &expr,
-    const memory_addresst &memory_location,
+    const pointer_valuet &value,
     const source_locationt &location);
 
   /// If \p memory_location is found among \ref values then return the symbol
@@ -210,8 +312,10 @@ private:
   /// Analyzes the \p pointer_value to decide if it point to a struct or a
   ///   union (or array)
   /// \param pointer_value: pointer value to be analyzed
+  /// \param expected_type: type of the potential member
   /// \return true if pointing to a member
-  bool points_to_member(const pointer_valuet &pointer_value) const;
+  bool
+  points_to_member(pointer_valuet &pointer_value, const typet &expected_type);
 };
 
 #endif // CPROVER_MEMORY_ANALYZER_ANALYZE_SYMBOL_H

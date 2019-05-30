@@ -1,0 +1,15 @@
+FUTURE
+main.c
+array,iterator1,iterator2 --harness-type initialise-with-memory-snapshot --initial-goto-location main:4
+^EXIT=10$
+^SIGNAL=0$
+\[main.assertion.1\] line [0-9]+ assertion \*iterator1 \>= 1.10 \&\& \*iterator1 \<= 1.12: SUCCESS
+\[main.assertion.2\] line [0-9]+ assertion iterator1 != iterator2: SUCCESS
+\[main.assertion.3\] line [0-9]+ assertion iterator2 == \&array\[9\]: SUCCESS
+\[main.pointer_dereference.13\] line [0-9]+ dereference failure: pointer outside object bounds in \*iterator2: FAILURE
+\[main.assertion.4\] line [0-9]+ assertion \*iterator2 == 0: FAILURE
+VERIFICATION FAILED
+--
+unwinding assertion loop \d+: FAILURE
+--
+memory analyzer does not yet allow extract floating point values

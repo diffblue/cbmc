@@ -2,6 +2,6 @@ CORE
 main.gb
 --breakpoint checkpoint --symbols x,p
 x = 3;
-p = &x;
+p = \(void \*\)\&x;
 ^EXIT=0$
 ^SIGNAL=0$

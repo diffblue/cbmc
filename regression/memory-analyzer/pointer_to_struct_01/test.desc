@@ -1,8 +1,7 @@
 CORE
 main.gb
 --breakpoint checkpoint --symbols p
-struct S tmp;
-tmp = \{ \.next=\(\(struct S \*\)0\) \};
-p = \&tmp;
+st = \{ .next=\&st \};
+p = \&st;
 ^EXIT=0$
 ^SIGNAL=0$

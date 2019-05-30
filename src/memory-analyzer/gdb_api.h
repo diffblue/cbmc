@@ -31,6 +31,9 @@ class gdb_apit
 {
 public:
   using commandst = std::forward_list<std::string>;
+
+  /// Memory address imbued with the explicit boolean data indicating if the
+  /// address is null or not.
   struct memory_addresst
   {
     bool null_address;
@@ -67,6 +70,8 @@ public:
   /// writing to gdb)
   ~gdb_apit();
 
+  /// Data associated with the value of a pointer, i.e. not only the address but
+  /// also the pointee (if known), string (in the case of char*), etc.
   struct pointer_valuet
   {
     pointer_valuet(
@@ -83,10 +88,10 @@ public:
     {
     }
 
-    const memory_addresst address;
-    const std::string pointee;
-    const std::string character;
-    const optionalt<std::string> string;
+    memory_addresst address;
+    std::string pointee;
+    std::string character;
+    optionalt<std::string> string;
 
     bool has_known_offset() const
     {
@@ -97,15 +102,10 @@ public:
     bool valid;
   };
 
-  /// Get the allocated size estimate for a pointer by evaluating
-  /// `malloc_usable_size'. The function returns the number of usable bytes in
-  /// the block pointed to by the pointer to a block of memory allocated by
-  /// `malloc' or a related function. The value may be greater than the
-  /// requested size of the allocation because of alignment and minimum size
-  /// constraints.
+  /// Get the exact allocated size for a pointer \p pointer_expr.
   /// \param pointer_expr: expression with a pointer name
   /// \return 1 if the pointer was not allocated with malloc otherwise return
-  ///   the result of calling `malloc_usable_size'
+  ///   the number of allocated bytes
   size_t query_malloc_size(const std::string &pointer_expr);
 
   /// Create a new gdb process for analysing the binary indicated by the member
@@ -128,6 +128,9 @@ public:
   /// \return memory address in hex format
   optionalt<std::string> get_value(const std::string &expr);
 
+  /// Get the value of a pointer associated with \p expr
+  /// \param expr: the expression to be analyzed
+  /// \return the \p pointer_valuet filled with data gdb produced for \p expr
   pointer_valuet get_memory(const std::string &expr);
 
   /// Return the vector of commands that have been written to gdb so far
@@ -152,6 +155,10 @@ protected:
 
   gdb_statet gdb_state;
 
+  /// track the allocated size for each malloc call
+  /// maps hexadecimal address to the number of bytes
+  std::map<std::string, size_t> allocated_memory;
+
   typedef std::map<std::string, std::string> gdb_output_recordt;
   static gdb_output_recordt parse_gdb_output_record(const std::string &s);
 
@@ -168,6 +175,28 @@ protected:
   bool most_recent_line_has_tag(const std::string &tag);
   bool was_command_accepted();
   void check_command_accepted();
+
+  /// Intercepts the gdb-analysis at the malloc call-site to add the
+  /// corresponding information into \ref allocated_memory.
+  void collect_malloc_calls();
+
+  /// Locate and return the value for a given name
+  /// \param record: gdb record to search
+  /// \param value_name: name of the value to be extracted
+  /// \return the value associated with \p value_name
+  std::string get_value_from_record(
+    const gdb_output_recordt &record,
+    const std::string &value_name);
+
+  /// Check if the breakpoint we hit is inside a malloc
+  /// \param stopped_record: gdb record pertaining to a breakpoint being hit
+  /// \return true if the breakpoint the gdb stopped at was malloc
+  bool hit_malloc_breakpoint(const gdb_output_recordt &stopped_record);
+
+  /// Parse the record produced by listing register value
+  /// \param record: gdb record for one register value
+  /// \return get the value associated with some register value
+  std::string get_register_value(const gdb_output_recordt &record);
 
   static std::string r_opt(const std::string &regex);
 
@@ -189,6 +218,9 @@ protected:
   // regex group for string (optional part of the output of gdb when printing a
   // pointer), matches e.g. \"abc\" and extracts \"abc\"
   const std::string r_string = R"((\\".*\\"))";
+
+  // name of malloc function
+  const std::string malloc_name = "malloc";
 };
 
 class gdb_interaction_exceptiont : public cprover_exception_baset

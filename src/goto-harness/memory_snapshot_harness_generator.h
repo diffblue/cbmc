@@ -244,6 +244,12 @@ protected:
   /// \return pointer depth of type \p t
   size_t pointer_depth(const typet &t) const;
 
+  /// Recursively test pointer reference
+  /// \param expr: expression to be tested
+  /// \param name: name to be located
+  /// \return true if \p expr refers to an object named \p name
+  bool refers_to(const exprt &expr, const irep_idt &name) const;
+
   /// data to store the command-line options
   std::string memory_snapshot_file;
   std::string initial_goto_location_line;
