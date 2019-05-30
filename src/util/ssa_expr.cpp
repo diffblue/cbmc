@@ -13,11 +13,41 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/arith_tools.h>
 
+/// If \p expr is:
+/// - a symbol_exprt "s" add "s" to the stream \p os
+///   - a member_exprt, apply recursively and add "..component_name"
+///   - an index_exprt where the index is a constant, apply recursively on the
+///     array and add "[[index]]"
+/// \return the stream \p os
+static std::ostream &
+initialize_ssa_identifier(std::ostream &os, const exprt &expr)
+{
+  if(auto member = expr_try_dynamic_cast<member_exprt>(expr))
+  {
+    return initialize_ssa_identifier(os, member->struct_op())
+           << ".." << member->get_component_name();
+  }
+  if(auto index = expr_try_dynamic_cast<index_exprt>(expr))
+  {
+    const auto idx =
+      numeric_cast_v<mp_integer>(to_constant_expr(index->index()));
+    return initialize_ssa_identifier(os, index->array()) << "[[" << idx << "]]";
+  }
+  if(auto symbol = expr_try_dynamic_cast<symbol_exprt>(expr))
+    return os << symbol->get_identifier();
+
+  UNREACHABLE;
+}
+
 ssa_exprt::ssa_exprt(const exprt &expr) : symbol_exprt(expr.type())
 {
   set(ID_C_SSA_symbol, true);
   add(ID_expression, expr);
-  update_identifier();
+  std::ostringstream os;
+  initialize_ssa_identifier(os, expr);
+  const std::string id = os.str();
+  set_identifier(id);
+  set(ID_L1_object_identifier, id);
 }
 
 void ssa_exprt::set_expression(const exprt &expr)
