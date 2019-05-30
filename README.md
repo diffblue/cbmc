@@ -2,6 +2,7 @@
 ![Build Status][codebuild_img]
 ![Build Status][codebuild_windows_img]
 [![Build Status][coverity_img]][coverity]
+[![Build Status][codecov_img]][codecov]
 
 [CProver Wiki](http://www.cprover.org/wiki)
 
@@ -59,3 +60,5 @@ License
 [codebuild_windows_img]: https://codebuild.us-east-1.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoiTFQ4Q0lCSEc1Rk5NcmlzaFZDdU44Vk8zY0c1VCtIVWMwWnJMRitmVFI5bE94Q3dhekVPMWRobFU2Q0xTTlpDSWZUQ3J1eksrWW1rSll1OExXdll2bExZPSIsIml2UGFyYW1ldGVyU3BlYyI6InpqcloyaEdxbjBiQUtvNysiLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=develop
 [coverity]: https://scan.coverity.com/projects/diffblue-cbmc
 [coverity_img]: https://scan.coverity.com/projects/13552/badge.svg
+[codecov]: https://codecov.io/gh/diffblue/cbmc
+[codecov_img]: https://codecov.io/gh/diffblue/cbmc/branch/develop/graphs/badge.svg
