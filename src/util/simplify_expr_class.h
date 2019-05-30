@@ -36,6 +36,7 @@ class member_exprt;
 class namespacet;
 class popcount_exprt;
 class tvt;
+class typecast_exprt;
 
 #define forall_value_list(it, value_list) \
   for(simplify_exprt::value_listt::const_iterator it=(value_list).begin(); \
@@ -111,7 +112,7 @@ public:
 
   // These below all return 'true' if the simplification wasn't applicable.
   // If false is returned, the expression has changed.
-  bool simplify_typecast(exprt &expr);
+  resultt<> simplify_typecast(const typecast_exprt &);
   bool simplify_extractbit(exprt &expr);
   bool simplify_extractbits(extractbits_exprt &expr);
   bool simplify_concatenation(exprt &expr);
