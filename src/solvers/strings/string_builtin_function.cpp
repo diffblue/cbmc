@@ -25,7 +25,7 @@ string_transformation_builtin_functiont::
     const exprt &return_code,
     const std::vector<exprt> &fun_args,
     array_poolt &array_pool)
-  : string_builtin_functiont(return_code)
+  : string_builtin_functiont(return_code, array_pool)
 {
   PRECONDITION(fun_args.size() > 2);
   const auto arg1 = expr_checked_cast<struct_exprt>(fun_args[2]);
@@ -37,7 +37,7 @@ string_insertion_builtin_functiont::string_insertion_builtin_functiont(
   const exprt &return_code,
   const std::vector<exprt> &fun_args,
   array_poolt &array_pool)
-  : string_builtin_functiont(return_code)
+  : string_builtin_functiont(return_code, array_pool)
 {
   PRECONDITION(fun_args.size() > 4);
   const auto arg1 = expr_checked_cast<struct_exprt>(fun_args[2]);
@@ -53,7 +53,7 @@ string_concatenation_builtin_functiont::string_concatenation_builtin_functiont(
   const exprt &return_code,
   const std::vector<exprt> &fun_args,
   array_poolt &array_pool)
-  : string_insertion_builtin_functiont(return_code)
+  : string_insertion_builtin_functiont(return_code, array_pool)
 {
   PRECONDITION(fun_args.size() >= 4 && fun_args.size() <= 6);
   const auto arg1 = expr_checked_cast<struct_exprt>(fun_args[2]);
@@ -144,11 +144,17 @@ string_constraintst string_concatenation_builtin_functiont::constraints(
   auto pair = [&]() -> std::pair<exprt, string_constraintst> {
     if(args.size() == 0)
       return add_axioms_for_concat(
-        generator.fresh_symbol, result, input1, input2);
+        generator.fresh_symbol, result, input1, input2, array_pool);
     if(args.size() == 2)
     {
       return add_axioms_for_concat_substr(
-        generator.fresh_symbol, result, input1, input2, args[0], args[1]);
+        generator.fresh_symbol,
+        result,
+        input1,
+        input2,
+        args[0],
+        args[1],
+        array_pool);
     }
     UNREACHABLE;
   }();
@@ -159,10 +165,10 @@ string_constraintst string_concatenation_builtin_functiont::constraints(
 exprt string_concatenation_builtin_functiont::length_constraint() const
 {
   if(args.size() == 0)
-    return length_constraint_for_concat(result, input1, input2);
+    return length_constraint_for_concat(result, input1, input2, array_pool);
   if(args.size() == 2)
     return length_constraint_for_concat_substr(
-      result, input1, input2, args[0], args[1]);
+      result, input1, input2, args[0], args[1], array_pool);
   UNREACHABLE;
 }
 
@@ -201,12 +207,13 @@ string_constraintst string_concat_char_builtin_functiont::constraints(
   constraints.universal.push_back([&] {
     const symbol_exprt idx =
       generator.fresh_symbol("QA_index_concat_char", result.length_type());
-    const exprt upper_bound = zero_if_negative(input.length());
+    const exprt upper_bound =
+      zero_if_negative(array_pool.get_or_create_length(input));
     return string_constraintt(
       idx, upper_bound, equal_exprt(input[idx], result[idx]));
   }());
   constraints.existential.push_back(
-    equal_exprt(result[input.length()], character));
+    equal_exprt(result[array_pool.get_or_create_length(input)], character));
   constraints.existential.push_back(
     equal_exprt(return_code, from_integer(0, return_code.type())));
   return constraints;
@@ -214,7 +221,7 @@ string_constraintst string_concat_char_builtin_functiont::constraints(
 
 exprt string_concat_char_builtin_functiont::length_constraint() const
 {
-  return length_constraint_for_concat_char(result, input);
+  return length_constraint_for_concat_char(result, input, array_pool);
 }
 
 optionalt<exprt> string_set_char_builtin_functiont::eval(
@@ -250,14 +257,18 @@ string_constraintst string_set_char_builtin_functiont::constraints(
   constraints.existential.push_back(implies_exprt(
     and_exprt(
       binary_relation_exprt(from_integer(0, position.type()), ID_le, position),
-      binary_relation_exprt(position, ID_lt, result.length())),
+      binary_relation_exprt(
+        position, ID_lt, array_pool.get_or_create_length(result))),
     equal_exprt(result[position], character)));
   constraints.universal.push_back([&] {
     const symbol_exprt q =
       generator.fresh_symbol("QA_char_set", position.type());
     const equal_exprt a3_body(result[q], input[q]);
     return string_constraintt(
-      q, minimum(zero_if_negative(result.length()), position), a3_body);
+      q,
+      minimum(
+        zero_if_negative(array_pool.get_or_create_length(result)), position),
+      a3_body);
   }());
   constraints.universal.push_back([&] {
     const symbol_exprt q2 =
@@ -265,7 +276,10 @@ string_constraintst string_set_char_builtin_functiont::constraints(
     const plus_exprt lower_bound(position, from_integer(1, position.type()));
     const equal_exprt a4_body(result[q2], input[q2]);
     return string_constraintt(
-      q2, lower_bound, zero_if_negative(result.length()), a4_body);
+      q2,
+      lower_bound,
+      zero_if_negative(array_pool.get_or_create_length(result)),
+      a4_body);
   }());
   return constraints;
 }
@@ -273,7 +287,8 @@ string_constraintst string_set_char_builtin_functiont::constraints(
 exprt string_set_char_builtin_functiont::length_constraint() const
 {
   const exprt out_of_bounds = or_exprt(
-    binary_relation_exprt(position, ID_ge, input.length()),
+    binary_relation_exprt(
+      position, ID_ge, array_pool.get_or_create_length(input)),
     binary_relation_exprt(
       position, ID_lt, from_integer(0, input.length_type())));
   const exprt return_value = if_exprt(
@@ -281,7 +296,9 @@ exprt string_set_char_builtin_functiont::length_constraint() const
     from_integer(1, return_code.type()),
     from_integer(0, return_code.type()));
   return and_exprt(
-    equal_exprt(result.length(), input.length()),
+    equal_exprt(
+      array_pool.get_or_create_length(result),
+      array_pool.get_or_create_length(input)),
     equal_exprt(return_code, return_value));
 }
 
@@ -383,7 +400,9 @@ string_constraintst string_to_lower_case_builtin_functiont::constraints(
       return if_exprt(is_upper_case(input[idx]), converted, non_converted);
     }();
     return string_constraintt(
-      idx, zero_if_negative(result.length()), conditional_convert);
+      idx,
+      zero_if_negative(array_pool.get_or_create_length(result)),
+      conditional_convert);
   }());
   return constraints;
 }
@@ -427,7 +446,7 @@ string_constraintst string_to_upper_case_builtin_functiont::constraints(
       minus_exprt(input[idx], from_integer(0x20, char_type));
     return string_constraintt(
       idx,
-      zero_if_negative(result.length()),
+      zero_if_negative(array_pool.get_or_create_length(result)),
       equal_exprt(
         result[idx],
         if_exprt(is_lower_case(input[idx]), converted, input[idx])));
@@ -491,7 +510,7 @@ string_constraintst string_insertion_builtin_functiont::constraints(
   if(args.size() == 1)
   {
     auto pair = add_axioms_for_insert(
-      generator.fresh_symbol, result, input1, input2, args[0]);
+      generator.fresh_symbol, result, input1, input2, args[0], array_pool);
     pair.second.existential.push_back(equal_exprt(pair.first, return_code));
     return pair.second;
   }
@@ -503,7 +522,7 @@ string_constraintst string_insertion_builtin_functiont::constraints(
 exprt string_insertion_builtin_functiont::length_constraint() const
 {
   if(args.size() == 1)
-    return length_constraint_for_insert(result, input1, input2);
+    return length_constraint_for_insert(result, input1, input2, array_pool);
   if(args.size() == 3)
     UNIMPLEMENTED;
   UNREACHABLE;
@@ -518,7 +537,7 @@ string_creation_builtin_functiont::string_creation_builtin_functiont(
   const exprt &return_code,
   const std::vector<exprt> &fun_args,
   array_poolt &array_pool)
-  : string_builtin_functiont(return_code)
+  : string_builtin_functiont(return_code, array_pool)
 {
   PRECONDITION(fun_args.size() >= 3);
   result = array_pool.find(fun_args[1], fun_args[0]);
@@ -562,7 +581,7 @@ string_constraintst string_of_int_builtin_functiont::constraints(
   string_constraint_generatort &generator) const
 {
   auto pair = add_axioms_for_string_of_int_with_radix(
-    result, arg, radix, 0, generator.ns);
+    result, arg, radix, 0, generator.ns, array_pool);
   pair.second.existential.push_back(equal_exprt(pair.first, return_code));
   return pair.second;
 }
@@ -593,14 +612,15 @@ exprt string_of_int_builtin_functiont::length_constraint() const
 
   const exprt size_expr_with_sign = if_exprt(
     negative_arg, plus_exprt(size_expr, from_integer(1, type)), size_expr);
-  return equal_exprt(result.length(), size_expr_with_sign);
+  return equal_exprt(
+    array_pool.get_or_create_length(result), size_expr_with_sign);
 }
 
 string_builtin_function_with_no_evalt::string_builtin_function_with_no_evalt(
   const exprt &return_code,
   const function_application_exprt &f,
   array_poolt &array_pool)
-  : string_builtin_functiont(return_code), function_application(f)
+  : string_builtin_functiont(return_code, array_pool), function_application(f)
 {
   const std::vector<exprt> &fun_args = f.arguments();
   std::size_t i = 0;

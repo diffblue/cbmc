@@ -21,25 +21,48 @@ operator()(const irep_idt &prefix, const typet &type)
   return result;
 }
 
-exprt array_poolt::get_length(const array_string_exprt &s) const
+exprt array_poolt::get_or_create_length(const array_string_exprt &s)
 {
-  if(s.length() == infinity_exprt(s.length().type()))
+  if(const auto &if_expr = expr_try_dynamic_cast<if_exprt>((exprt)s))
   {
-    auto it = length_of_array.find(s);
-    if(it != length_of_array.end())
-      return it->second;
+    return if_exprt{
+      if_expr->cond(),
+      get_or_create_length(to_array_string_expr(if_expr->true_case())),
+      get_or_create_length(to_array_string_expr(if_expr->false_case()))};
   }
-  return s.length();
+
+  auto emplace_result =
+    length_of_array.emplace(s, symbol_exprt(s.length_type()));
+  if(emplace_result.second)
+  {
+    emplace_result.first->second =
+      fresh_symbol("string_length", s.length_type());
+  }
+
+  return emplace_result.first->second;
+}
+
+optionalt<exprt>
+array_poolt::get_length_if_exists(const array_string_exprt &s) const
+{
+  auto find_result = length_of_array.find(s);
+  if(find_result != length_of_array.end())
+    return find_result->second;
+  return {};
 }
 
 array_string_exprt
 array_poolt::fresh_string(const typet &index_type, const typet &char_type)
 {
-  symbol_exprt length = fresh_symbol("string_length", index_type);
-  array_typet array_type(char_type, length);
+  array_typet array_type{char_type, infinity_exprt(index_type)};
   symbol_exprt content = fresh_symbol("string_content", array_type);
   array_string_exprt str = to_array_string_expr(content);
-  created_strings_value.insert(str);
+  arrays_of_pointers.emplace(
+    address_of_exprt(index_exprt(str, from_integer(0, index_type))), str);
+
+  // add length to length_of_array map
+  get_or_create_length(str);
+
   return str;
 }
 
@@ -87,40 +110,73 @@ array_string_exprt array_poolt::make_char_array_for_char_pointer(
     to_array_string_expr(fresh_symbol(symbol_name, char_array_type));
   const auto insert_result =
     arrays_of_pointers.insert({char_pointer, array_sym});
+
+  // add length to length_of_array map
+  get_or_create_length(array_sym);
+
   return to_array_string_expr(insert_result.first->second);
+}
+
+/// Given an array_string_exprt, get the size of the underlying array. If that
+/// size is undefined, create a new symbol for the size.
+/// Then add an entry from `array_expr` to that size in the `length_of_array`
+/// map.
+///
+/// This function should only be used at the creation of the
+/// `array_string_exprt`s, as it is the only place where we can reliably refer
+/// to the size in the type of the array.
+static void attempt_assign_length_from_type(
+  const array_string_exprt &array_expr,
+  std::unordered_map<array_string_exprt, exprt, irep_hash> &length_of_array,
+  symbol_generatort &symbol_generator)
+{
+  DATA_INVARIANT(
+    array_expr.id() != ID_if,
+    "attempt_assign_length_from_type does not handle if exprts");
+  // This invariant seems always true, but I don't know why.
+  // If we find a case where this is violated, try calling
+  // attempt_assign_length_from_type on the true and false cases.
+  const exprt &size_from_type = to_array_type(array_expr.type()).size();
+  const exprt &size_to_assign =
+    size_from_type != infinity_exprt(size_from_type.type())
+      ? size_from_type
+      : symbol_generator("string_length", array_expr.length_type());
+
+  const auto emplace_result =
+    length_of_array.emplace(array_expr, size_to_assign);
+  INVARIANT(
+    emplace_result.second,
+    "attempt_assign_length_from_type should only be called when no entry"
+    "for the array_string_exprt exists in the length_of_array map");
 }
 
 void array_poolt::insert(
   const exprt &pointer_expr,
-  array_string_exprt &array_expr)
+  const array_string_exprt &array_expr)
 {
-  const exprt &length = array_expr.length();
-  if(length == infinity_exprt(length.type()))
-  {
-    auto pair = length_of_array.insert(
-      std::make_pair(array_expr, fresh_symbol("string_length", length.type())));
-    array_expr.length() = pair.first->second;
-  }
-
   const auto it_bool =
     arrays_of_pointers.insert(std::make_pair(pointer_expr, array_expr));
-  created_strings_value.insert(array_expr);
+
   INVARIANT(
     it_bool.second, "should not associate two arrays to the same pointer");
+
+  attempt_assign_length_from_type(array_expr, length_of_array, fresh_symbol);
 }
 
-const std::set<array_string_exprt> &array_poolt::created_strings() const
+/// Return a map mapping all array_string_exprt of the array_pool to their
+/// length.
+const std::unordered_map<array_string_exprt, exprt, irep_hash> &
+array_poolt::created_strings() const
 {
-  return created_strings_value;
+  return length_of_array;
 }
 
-const array_string_exprt &
-array_poolt::find(const exprt &pointer, const exprt &length)
+array_string_exprt array_poolt::find(const exprt &pointer, const exprt &length)
 {
   const array_typet array_type(pointer.type().subtype(), length);
   const array_string_exprt array =
     make_char_array_for_char_pointer(pointer, array_type);
-  return *created_strings_value.insert(array).first;
+  return array;
 }
 
 array_string_exprt of_argument(array_poolt &array_pool, const exprt &arg)

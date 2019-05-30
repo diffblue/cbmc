@@ -53,17 +53,31 @@ public:
     return arrays_of_pointers;
   }
 
-  /// Associate an actual finite length to infinite arrays
+  /// Get the length of an array_string_exprt from the array_pool. If the length
+  /// does not yet exist, create a new symbol and add it to the pool.
+  ///
+  /// If the array_string_exprt is an `if` expression, the true and false parts
+  /// are handled independently (and recursively). That is, no new length symbol
+  /// is added to the pool for `if` expressions, but symbols may be added for
+  /// each of the parts.
   /// \param s: array expression representing a string
   /// \return expression for the length of `s`
-  exprt get_length(const array_string_exprt &s) const;
+  exprt get_or_create_length(const array_string_exprt &s);
 
-  void insert(const exprt &pointer_expr, array_string_exprt &array);
+  /// As opposed to get_length(), do not create a new symbol if the length
+  /// of the array_string_exprt does not have one in the array_pool, but instead
+  /// return an empty optional.
+  /// \param s: array expression representing a string
+  /// \return expression for the length of `s`, or empty optional
+  optionalt<exprt> get_length_if_exists(const array_string_exprt &s) const;
+
+  void insert(const exprt &pointer_expr, const array_string_exprt &array);
 
   /// Creates a new array if the pointer is not pointing to an array
-  const array_string_exprt &find(const exprt &pointer, const exprt &length);
+  array_string_exprt find(const exprt &pointer, const exprt &length);
 
-  const std::set<array_string_exprt> &created_strings() const;
+  const std::unordered_map<array_string_exprt, exprt, irep_hash> &
+  created_strings() const;
 
   /// Construct a string expression whose length and content are new variables
   /// \param index_type: type used to index characters of the strings
@@ -74,17 +88,18 @@ public:
 
 private:
   /// Associate arrays to char pointers
+  /// Invariant: Each array_string_exprt in this map has a corresponding entry
+  ///            in length_of_array.
+  ///            This is enforced whenever we add an element to
+  ///            `arrays_of_pointers`, i.e. fresh_string()
+  ///            and make_char_array_for_char_pointer().
   std::unordered_map<exprt, array_string_exprt, irep_hash> arrays_of_pointers;
 
   /// Associate length to arrays of infinite size
-  std::unordered_map<array_string_exprt, symbol_exprt, irep_hash>
-    length_of_array;
+  std::unordered_map<array_string_exprt, exprt, irep_hash> length_of_array;
 
   /// Generate fresh symbols
   symbol_generatort &fresh_symbol;
-
-  /// Strings created in the pool
-  std::set<array_string_exprt> created_strings_value;
 
   array_string_exprt make_char_array_for_char_pointer(
     const exprt &char_pointer,

@@ -88,18 +88,25 @@ exprt get_data_pointer(const array_string_exprt &arr)
 
 /// Creates a `string_exprt` of the proper string type.
 /// \param [in] str: string to convert
+/// \param array_pool: pool of arrays representing strings
 /// \return corresponding `string_exprt`
-refined_string_exprt make_refined_string_exprt(const array_string_exprt &arr)
+refined_string_exprt make_refined_string_exprt(
+  const array_string_exprt &arr,
+  array_poolt &array_pool)
 {
-  return refined_string_exprt(arr.length(), get_data_pointer(arr));
+  return refined_string_exprt(
+    array_pool.get_or_create_length(arr), get_data_pointer(arr));
 }
 
 /// For a constant `string_exprt`, creates a full index set.
 /// \param [in] s: `string_exprt` to create index set for
+/// \param array_pool: pool of arrays representing strings
 /// \return the corresponding index set
-std::set<exprt> full_index_set(const array_string_exprt &s)
+std::set<exprt>
+full_index_set(const array_string_exprt &s, array_poolt &array_pool)
 {
-  const mp_integer n = numeric_cast_v<mp_integer>(to_constant_expr(s.length()));
+  const mp_integer n = numeric_cast_v<mp_integer>(
+    to_constant_expr(to_array_type(s.type()).size()));
   std::set<exprt> ret;
   for(mp_integer i = 0; i < n; ++i)
     ret.insert(from_integer(i));
@@ -179,17 +186,20 @@ SCENARIO(
   // initialize architecture with sensible default values
   config.set_arch("none");
 
+  symbol_generatort symbol_generator;
+  array_poolt array_pool(symbol_generator);
+
   // Creating strings
   const auto ab_array = make_string_exprt("ab");
   const auto b_array = make_string_exprt("b");
   const auto a_array = make_string_exprt("a");
   const auto empty_array = make_string_exprt("");
   const auto cd_array = make_string_exprt("cd");
-  const auto ab = make_refined_string_exprt(ab_array);
-  const auto b = make_refined_string_exprt(b_array);
-  const auto a = make_refined_string_exprt(a_array);
-  const auto empty = make_refined_string_exprt(empty_array);
-  const auto cd = make_refined_string_exprt(cd_array);
+  const auto ab = make_refined_string_exprt(ab_array, array_pool);
+  const auto b = make_refined_string_exprt(b_array, array_pool);
+  const auto a = make_refined_string_exprt(a_array, array_pool);
+  const auto empty = make_refined_string_exprt(empty_array, array_pool);
+  const auto cd = make_refined_string_exprt(cd_array, array_pool);
 
   GIVEN("The not_contains axioms of String.lastIndexOf(String, Int)")
   {
@@ -247,8 +257,8 @@ SCENARIO(
     WHEN("we instantiate and simplify")
     {
       // Making index sets
-      const std::set<exprt> index_set_ab = full_index_set(ab_array);
-      const std::set<exprt> index_set_b = full_index_set(b_array);
+      const std::set<exprt> index_set_ab = full_index_set(ab_array, array_pool);
+      const std::set<exprt> index_set_b = full_index_set(b_array, array_pool);
 
       // List of new lemmas to be returned
       std::vector<exprt> lemmas;
@@ -305,7 +315,7 @@ SCENARIO(
     WHEN("we instantiate and simplify")
     {
       // Making index sets
-      const std::set<exprt> index_set_a = full_index_set(a_array);
+      const std::set<exprt> index_set_a = full_index_set(a_array, array_pool);
 
       // Instantiate the lemmas
       std::vector<exprt> lemmas = instantiate_not_contains(
@@ -355,8 +365,8 @@ SCENARIO(
     WHEN("we instantiate and simplify")
     {
       // Making index sets
-      const std::set<exprt> index_set_a = full_index_set(a_array);
-      const std::set<exprt> index_set_b = full_index_set(b_array);
+      const std::set<exprt> index_set_a = full_index_set(a_array, array_pool);
+      const std::set<exprt> index_set_b = full_index_set(b_array, array_pool);
 
       // Instantiate the lemmas
       std::vector<exprt> lemmas = instantiate_not_contains(
@@ -406,7 +416,7 @@ SCENARIO(
     WHEN("we instantiate and simplify")
     {
       // Making index sets
-      const std::set<exprt> index_set_a = full_index_set(a_array);
+      const std::set<exprt> index_set_a = full_index_set(a_array, array_pool);
       const std::set<exprt> index_set_empty = {
         generator.fresh_symbol("z", t.length_type())};
 
@@ -459,7 +469,7 @@ SCENARIO(
     WHEN("we instantiate and simplify")
     {
       // Making index sets
-      const std::set<exprt> index_set_ab = full_index_set(ab_array);
+      const std::set<exprt> index_set_ab = full_index_set(ab_array, array_pool);
 
       // Instantiate the lemmas
       std::vector<exprt> lemmas = instantiate_not_contains(
@@ -510,8 +520,8 @@ SCENARIO(
     WHEN("we instantiate and simplify")
     {
       // Making index sets
-      const std::set<exprt> index_set_ab = full_index_set(ab_array);
-      const std::set<exprt> index_set_cd = full_index_set(cd_array);
+      const std::set<exprt> index_set_ab = full_index_set(ab_array, array_pool);
+      const std::set<exprt> index_set_cd = full_index_set(cd_array, array_pool);
 
       // Instantiate the lemmas
       std::vector<exprt> lemmas = instantiate_not_contains(

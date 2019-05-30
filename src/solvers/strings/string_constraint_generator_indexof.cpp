@@ -34,12 +34,14 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 /// \param str: an array of characters expression
 /// \param c: a character expression
 /// \param from_index: an integer expression
+/// \param array_pool: pool of arrays representing strings
 /// \return integer expression `index`
 std::pair<exprt, string_constraintst> add_axioms_for_index_of(
   symbol_generatort &fresh_symbol,
   const array_string_exprt &str,
   const exprt &c,
-  const exprt &from_index)
+  const exprt &from_index,
+  array_poolt &array_pool)
 {
   string_constraintst constraints;
   const typet &index_type = str.length_type();
@@ -49,7 +51,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_index_of(
   exprt minus1 = from_integer(-1, index_type);
   and_exprt a1(
     binary_relation_exprt(index, ID_ge, minus1),
-    binary_relation_exprt(index, ID_lt, str.length()));
+    binary_relation_exprt(index, ID_lt, array_pool.get_or_create_length(str)));
   constraints.existential.push_back(a1);
 
   equal_exprt a2(not_exprt(contains), equal_exprt(index, minus1));
@@ -76,7 +78,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_index_of(
   string_constraintt a5(
     m,
     lower_bound,
-    zero_if_negative(str.length()),
+    zero_if_negative(array_pool.get_or_create_length(str)),
     implies_exprt(not_exprt(contains), not_exprt(equal_exprt(str[m], c))));
   constraints.universal.push_back(a5);
 
@@ -106,13 +108,15 @@ std::pair<exprt, string_constraintst> add_axioms_for_index_of(
 /// \param haystack: an array of character expression
 /// \param needle: an array of character expression
 /// \param from_index: an integer expression
+/// \param array_pool: pool of arrays representing strings
 /// \return integer expression `index` representing the first index of `needle`
 ///   in `haystack`
 std::pair<exprt, string_constraintst> add_axioms_for_index_of_string(
   symbol_generatort &fresh_symbol,
   const array_string_exprt &haystack,
   const array_string_exprt &needle,
-  const exprt &from_index)
+  const exprt &from_index,
+  array_poolt &array_pool)
 {
   string_constraintst constraints;
   const typet &index_type = haystack.length_type();
@@ -124,7 +128,11 @@ std::pair<exprt, string_constraintst> add_axioms_for_index_of_string(
     and_exprt(
       binary_relation_exprt(from_index, ID_le, offset),
       binary_relation_exprt(
-        offset, ID_le, minus_exprt(haystack.length(), needle.length()))));
+        offset,
+        ID_le,
+        minus_exprt(
+          array_pool.get_or_create_length(haystack),
+          array_pool.get_or_create_length(needle)))));
   constraints.existential.push_back(a1);
 
   equal_exprt a2(
@@ -134,36 +142,40 @@ std::pair<exprt, string_constraintst> add_axioms_for_index_of_string(
   symbol_exprt qvar = fresh_symbol("QA_index_of_string", index_type);
   string_constraintt a3(
     qvar,
-    zero_if_negative(needle.length()),
+    zero_if_negative(array_pool.get_or_create_length(needle)),
     implies_exprt(
       contains, equal_exprt(haystack[plus_exprt(qvar, offset)], needle[qvar])));
   constraints.universal.push_back(a3);
 
   // string_not contains_constraintt are formulas of the form:
   // forall x in [lb,ub[. p(x) => exists y in [lb,ub[. s1[x+y] != s2[y]
-  const string_not_contains_constraintt a4 = {from_index,
-                                              offset,
-                                              contains,
-                                              from_integer(0, index_type),
-                                              needle.length(),
-                                              haystack,
-                                              needle};
+  const string_not_contains_constraintt a4 = {
+    from_index,
+    offset,
+    contains,
+    from_integer(0, index_type),
+    array_pool.get_or_create_length(needle),
+    haystack,
+    needle};
   constraints.not_contains.push_back(a4);
 
   const string_not_contains_constraintt a5 = {
     from_index,
     plus_exprt( // Add 1 for inclusive upper bound.
-      minus_exprt(haystack.length(), needle.length()),
+      minus_exprt(
+        array_pool.get_or_create_length(haystack),
+        array_pool.get_or_create_length(needle)),
       from_integer(1, index_type)),
     not_exprt(contains),
     from_integer(0, index_type),
-    needle.length(),
+    array_pool.get_or_create_length(needle),
     haystack,
     needle};
   constraints.not_contains.push_back(a5);
 
   const implies_exprt a6(
-    equal_exprt(needle.length(), from_integer(0, index_type)),
+    equal_exprt(
+      array_pool.get_or_create_length(needle), from_integer(0, index_type)),
     equal_exprt(offset, from_index));
   constraints.existential.push_back(a6);
 
@@ -199,13 +211,15 @@ std::pair<exprt, string_constraintst> add_axioms_for_index_of_string(
 /// \param haystack: an array of characters expression
 /// \param needle: an array of characters expression
 /// \param from_index: integer expression
+/// \param array_pool: pool of arrays representing strings
 /// \return integer expression `index` representing the last index of `needle`
 ///         in `haystack` before or at `from_index`, or -1 if there is none
 std::pair<exprt, string_constraintst> add_axioms_for_last_index_of_string(
   symbol_generatort &fresh_symbol,
   const array_string_exprt &haystack,
   const array_string_exprt &needle,
-  const exprt &from_index)
+  const exprt &from_index,
+  array_poolt &array_pool)
 {
   string_constraintst constraints;
   const typet &index_type = haystack.length_type();
@@ -217,7 +231,11 @@ std::pair<exprt, string_constraintst> add_axioms_for_last_index_of_string(
     and_exprt(
       binary_relation_exprt(from_integer(-1, index_type), ID_le, offset),
       binary_relation_exprt(
-        offset, ID_le, minus_exprt(haystack.length(), needle.length())),
+        offset,
+        ID_le,
+        minus_exprt(
+          array_pool.get_or_create_length(haystack),
+          array_pool.get_or_create_length(needle))),
       binary_relation_exprt(offset, ID_le, from_index)));
   constraints.existential.push_back(a1);
 
@@ -228,11 +246,15 @@ std::pair<exprt, string_constraintst> add_axioms_for_last_index_of_string(
   symbol_exprt qvar = fresh_symbol("QA_index_of_string", index_type);
   equal_exprt constr3(haystack[plus_exprt(qvar, offset)], needle[qvar]);
   const string_constraintt a3(
-    qvar, zero_if_negative(needle.length()), implies_exprt(contains, constr3));
+    qvar,
+    zero_if_negative(array_pool.get_or_create_length(needle)),
+    implies_exprt(contains, constr3));
   constraints.universal.push_back(a3);
 
   // end_index is min(from_index, |str| - |substring|)
-  minus_exprt length_diff(haystack.length(), needle.length());
+  minus_exprt length_diff(
+    array_pool.get_or_create_length(haystack),
+    array_pool.get_or_create_length(needle));
   if_exprt end_index(
     binary_relation_exprt(from_index, ID_le, length_diff),
     from_index,
@@ -243,7 +265,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_last_index_of_string(
     plus_exprt(end_index, from_integer(1, index_type)),
     contains,
     from_integer(0, index_type),
-    needle.length(),
+    array_pool.get_or_create_length(needle),
     haystack,
     needle};
   constraints.not_contains.push_back(a4);
@@ -253,13 +275,14 @@ std::pair<exprt, string_constraintst> add_axioms_for_last_index_of_string(
     plus_exprt(end_index, from_integer(1, index_type)),
     not_exprt(contains),
     from_integer(0, index_type),
-    needle.length(),
+    array_pool.get_or_create_length(needle),
     haystack,
     needle};
   constraints.not_contains.push_back(a5);
 
   const implies_exprt a6(
-    equal_exprt(needle.length(), from_integer(0, index_type)),
+    equal_exprt(
+      array_pool.get_or_create_length(needle), from_integer(0, index_type)),
     equal_exprt(offset, from_index));
   constraints.existential.push_back(a6);
 
@@ -270,9 +293,9 @@ std::pair<exprt, string_constraintst> add_axioms_for_last_index_of_string(
 ///
 /// If the target is a character:
 // NOLINTNEXTLINE
-/// \copybrief add_axioms_for_index_of(symbol_generatort &fresh_symbol, const array_string_exprt&,const exprt&,const exprt&)
+/// \copybrief add_axioms_for_index_of(symbol_generatort &fresh_symbol, const array_string_exprt&,const exprt&,const exprt&, array_poolt &)
 // NOLINTNEXTLINE
-/// \link add_axioms_for_index_of(symbol_generatort &fresh_symbol, const array_string_exprt&,const exprt&,const exprt&)
+/// \link add_axioms_for_index_of(symbol_generatort &fresh_symbol, const array_string_exprt&,const exprt&,const exprt&, array_poolt &)
 /// (More...) \endlink
 ///
 /// If the target is a refined_string:
@@ -304,7 +327,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_index_of(
   if(c.type().id() == ID_unsignedbv || c.type().id() == ID_signedbv)
   {
     return add_axioms_for_index_of(
-      fresh_symbol, str, typecast_exprt(c, char_type), from_index);
+      fresh_symbol, str, typecast_exprt(c, char_type), from_index, array_pool);
   }
   else
   {
@@ -314,7 +337,8 @@ std::pair<exprt, string_constraintst> add_axioms_for_index_of(
         "c can only be a (un)signedbv or a refined "
         "string and the (un)signedbv case is already handled"));
     array_string_exprt sub = get_string_expr(array_pool, c);
-    return add_axioms_for_index_of_string(fresh_symbol, str, sub, from_index);
+    return add_axioms_for_index_of_string(
+      fresh_symbol, str, sub, from_index, array_pool);
   }
 }
 
@@ -340,13 +364,15 @@ std::pair<exprt, string_constraintst> add_axioms_for_index_of(
 /// \param str: an array of characters expression
 /// \param c: a character expression
 /// \param from_index: an integer expression
+/// \param array_pool: pool of arrays representing strings
 /// \return integer expression `index` representing the last index of `needle`
 ///   in `haystack` before or at `from_index`, or `-1` if there is none
 std::pair<exprt, string_constraintst> add_axioms_for_last_index_of(
   symbol_generatort &fresh_symbol,
   const array_string_exprt &str,
   const exprt &c,
-  const exprt &from_index)
+  const exprt &from_index,
+  array_poolt &array_pool)
 {
   string_constraintst constraints;
   const typet &index_type = str.length_type();
@@ -357,7 +383,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_last_index_of(
   const and_exprt a1(
     binary_relation_exprt(index, ID_ge, minus1),
     binary_relation_exprt(index, ID_le, from_index),
-    binary_relation_exprt(index, ID_lt, str.length()));
+    binary_relation_exprt(index, ID_lt, array_pool.get_or_create_length(str)));
   constraints.existential.push_back(a1);
 
   const notequal_exprt a2(contains, equal_exprt(index, minus1));
@@ -369,9 +395,10 @@ std::pair<exprt, string_constraintst> add_axioms_for_last_index_of(
   const exprt index1 = from_integer(1, index_type);
   const plus_exprt from_index_plus_one(from_index, index1);
   const if_exprt end_index(
-    binary_relation_exprt(from_index_plus_one, ID_le, str.length()),
+    binary_relation_exprt(
+      from_index_plus_one, ID_le, array_pool.get_or_create_length(str)),
     from_index_plus_one,
-    str.length());
+    array_pool.get_or_create_length(str));
 
   const symbol_exprt n = fresh_symbol("QA_last_index_of1", index_type);
   const string_constraintt a4(
@@ -395,9 +422,9 @@ std::pair<exprt, string_constraintst> add_axioms_for_last_index_of(
 ///
 /// If the target is a character:
 // NOLINTNEXTLINE
-/// \copybrief add_axioms_for_last_index_of(symbol_generatort &fresh_symbol, const array_string_exprt&,const exprt&,const exprt&)
+/// \copybrief add_axioms_for_last_index_of(symbol_generatort &fresh_symbol, const array_string_exprt&,const exprt&,const exprt&, array_poolt &)
 // NOLINTNEXTLINE
-/// \link add_axioms_for_last_index_of(symbol_generatort &fresh_symbol, const array_string_exprt&,const exprt&,const exprt&)
+/// \link add_axioms_for_last_index_of(symbol_generatort &fresh_symbol, const array_string_exprt&,const exprt&,const exprt&, array_poolt &)
 ///   (More...) \endlink
 ///
 /// If the target is a refined_string:
@@ -424,17 +451,18 @@ std::pair<exprt, string_constraintst> add_axioms_for_last_index_of(
   const typet &char_type = str.content().type().subtype();
   PRECONDITION(f.type() == index_type);
 
-  const exprt from_index = args.size() == 2 ? str.length() : args[2];
+  const exprt from_index =
+    args.size() == 2 ? array_pool.get_or_create_length(str) : args[2];
 
   if(c.type().id() == ID_unsignedbv || c.type().id() == ID_signedbv)
   {
     return add_axioms_for_last_index_of(
-      fresh_symbol, str, typecast_exprt(c, char_type), from_index);
+      fresh_symbol, str, typecast_exprt(c, char_type), from_index, array_pool);
   }
   else
   {
     const array_string_exprt sub = get_string_expr(array_pool, c);
     return add_axioms_for_last_index_of_string(
-      fresh_symbol, str, sub, from_index);
+      fresh_symbol, str, sub, from_index, array_pool);
   }
 }

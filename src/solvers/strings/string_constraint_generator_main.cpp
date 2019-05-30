@@ -85,7 +85,7 @@ exprt string_constraint_generatort::associate_length_to_array(
   array_string_exprt array_expr = to_array_string_expr(f.arguments()[0]);
   const exprt &new_length = f.arguments()[1];
 
-  const auto &length = array_pool.get_length(array_expr);
+  const auto &length = array_pool.get_or_create_length(array_expr);
   constraints.existential.push_back(equal_exprt(length, new_length));
   return from_integer(0, f.type());
 }
@@ -125,6 +125,7 @@ void merge(string_constraintst &result, string_constraintst other)
 /// \param char_set: a string of the form "<low_char>-<high_char>" where
 ///   `<low_char>` and `<high_char>` are two characters, which represents the
 ///   set of characters that are between `low_char` and `high_char`.
+/// \param array_pool: pool of arrays representing strings
 /// \return a string expression that is linked to the argument through axioms
 ///   that are added to the list
 string_constraintst add_constraint_on_characters(
@@ -132,7 +133,8 @@ string_constraintst add_constraint_on_characters(
   const array_string_exprt &s,
   const exprt &start,
   const exprt &end,
-  const std::string &char_set)
+  const std::string &char_set,
+  array_poolt &array_pool)
 {
   // Parse char_set
   PRECONDITION(char_set.length() == 3);
@@ -177,9 +179,10 @@ std::pair<exprt, string_constraintst> add_axioms_for_constrain_characters(
   const irep_idt &char_set_string = to_constant_expr(args[2]).get_value();
   const exprt &start =
     args.size() >= 4 ? args[3] : from_integer(0, s.length_type());
-  const exprt &end = args.size() >= 5 ? args[4] : s.length();
+  const exprt &end =
+    args.size() >= 5 ? args[4] : array_pool.get_or_create_length(s);
   auto constraints = add_constraint_on_characters(
-    fresh_symbol, s, start, end, char_set_string.c_str());
+    fresh_symbol, s, start, end, char_set_string.c_str(), array_pool);
   return {from_integer(0, get_return_code_type()), std::move(constraints)};
 }
 
@@ -339,9 +342,10 @@ std::pair<exprt, string_constraintst> add_axioms_for_copy(
   const array_string_exprt str = get_string_expr(array_pool, args[2]);
   const typet &index_type = str.length_type();
   const exprt offset = args.size() == 3 ? from_integer(0, index_type) : args[3];
-  const exprt count = args.size() == 3 ? str.length() : args[4];
+  const exprt count =
+    args.size() == 3 ? array_pool.get_or_create_length(str) : args[4];
   return add_axioms_for_substring(
-    fresh_symbol, res, str, offset, plus_exprt(offset, count));
+    fresh_symbol, res, str, offset, plus_exprt(offset, count), array_pool);
 }
 
 /// Length of a string
@@ -356,7 +360,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_length(
 {
   PRECONDITION(f.arguments().size() == 1);
   const array_string_exprt str = get_string_expr(array_pool, f.arguments()[0]);
-  return {str.length(), {}};
+  return {array_pool.get_or_create_length(str), {}};
 }
 
 /// \param x: an expression

@@ -108,7 +108,8 @@ static optionalt<exprt> get_array(
   const std::function<exprt(const exprt &)> &super_get,
   const namespacet &ns,
   messaget::mstreamt &stream,
-  const array_string_exprt &arr);
+  const array_string_exprt &arr,
+  const array_poolt &array_pool);
 
 static exprt substitute_array_access(
   const index_exprt &index_expr,
@@ -741,10 +742,11 @@ decision_proceduret::resultt string_refinementt::dec_solve()
     add_lemma(lemma);
 
   // All generated strings should have non-negative length
-  for(const auto &string : generator.array_pool.created_strings())
+  for(const auto &pair : generator.array_pool.created_strings())
   {
-    add_lemma(greater_or_equal_to(
-      string.length(), from_integer(0, string.length_type())));
+    exprt length = generator.array_pool.get_or_create_length(pair.first);
+    add_lemma(
+      binary_relation_exprt{length, ID_ge, from_integer(0, length.type())});
   }
 
   // Initial try without index set
@@ -950,6 +952,55 @@ void string_refinementt::add_lemma(
   prop.l_set_to_true(convert(simple_lemma));
 }
 
+/// Get a model of the size of the input string.
+/// First ask the solver for a size value. If the solver has no value, get the
+/// size directly from the type. This is the case for string literals that are
+/// not part of the decision procedure (e.g. literals in return values).
+/// If the size value is not a constant or not a valid integer (size_t),
+/// return no value.
+/// \param super_get: function returning the valuation of an expression
+///   in a model
+/// \param ns: namespace
+/// \param stream: output stream for warning messages
+/// \param arr: expression of type array representing a string
+/// \param array_pool: pool of arrays representing strings
+/// \return an optional expression representing the size of the array that can
+///         be cast to size_t
+static optionalt<exprt> get_valid_array_size(
+  const std::function<exprt(const exprt &)> &super_get,
+  const namespacet &ns,
+  messaget::mstreamt &stream,
+  const array_string_exprt &arr,
+  const array_poolt &array_pool)
+{
+  const auto &size_from_pool = array_pool.get_length_if_exists(arr);
+  exprt size_val;
+  if(size_from_pool.has_value())
+  {
+    const exprt size = size_from_pool.value();
+    size_val = simplify_expr(super_get(size), ns);
+    if(size_val.id() != ID_constant)
+    {
+      stream << "(sr::get_valid_array_size) string of unknown size: "
+             << format(size_val) << messaget::eom;
+      return {};
+    }
+  }
+  else if(to_array_type(arr.type()).size().id() == ID_constant)
+    size_val = simplify_expr(to_array_type(arr.type()).size(), ns);
+  else
+    return {};
+
+  auto n_opt = numeric_cast<std::size_t>(size_val);
+  if(!n_opt)
+  {
+    stream << "(sr::get_valid_array_size) size is not valid" << messaget::eom;
+    return {};
+  }
+
+  return size_val;
+}
+
 /// Get a model of an array and put it in a certain form.
 /// If the model is incomplete or if it is too big, return no value.
 /// \param super_get: function returning the valuation of an expression
@@ -957,51 +1008,45 @@ void string_refinementt::add_lemma(
 /// \param ns: namespace
 /// \param stream: output stream for warning messages
 /// \param arr: expression of type array representing a string
+/// \param array_pool: pool of arrays representing strings
 /// \return an optional array expression or array_of_exprt
 static optionalt<exprt> get_array(
   const std::function<exprt(const exprt &)> &super_get,
   const namespacet &ns,
   messaget::mstreamt &stream,
-  const array_string_exprt &arr)
+  const array_string_exprt &arr,
+  const array_poolt &array_pool)
 {
-  const exprt &size = arr.length();
-  exprt arr_val = simplify_expr(adjust_if_recursive(super_get(arr), ns), ns);
-  exprt size_val = super_get(size);
-  size_val = simplify_expr(size_val, ns);
-  const typet char_type = arr.type().subtype();
-  const typet &index_type = size.type();
-  const array_typet empty_ret_type(char_type, from_integer(0, index_type));
-  const array_of_exprt empty_ret(from_integer(0, char_type), empty_ret_type);
-
-  if(size_val.id() != ID_constant)
+  const auto size =
+    get_valid_array_size(super_get, ns, stream, arr, array_pool);
+  if(!size.has_value())
   {
-    stream << "(sr::get_array) string of unknown size: " << format(size_val)
-           << messaget::eom;
     return {};
   }
 
-  auto n_opt = numeric_cast<std::size_t>(size_val);
-  if(!n_opt)
-  {
-    stream << "(sr::get_array) size is not valid" << messaget::eom;
-    return {};
-  }
-  std::size_t n = *n_opt;
+  const size_t n = numeric_cast<std::size_t>(size.value()).value();
 
   if(n > MAX_CONCRETE_STRING_SIZE)
   {
-    stream << "(sr::get_array) long string (size " << format(arr.length())
+    stream << "(sr::get_valid_array_size) long string (size "
            << " = " << n << ") " << format(arr) << messaget::eom;
-    stream << "(sr::get_array) consider reducing max-nondet-string-length so "
+    stream << "(sr::get_valid_array_size) consider reducing "
+              "max-nondet-string-length so "
               "that no string exceeds "
            << MAX_CONCRETE_STRING_SIZE
            << " in length and "
               "make sure all functions returning strings are loaded"
            << messaget::eom;
-    stream << "(sr::get_array) this can also happen on invalid object access"
+    stream << "(sr::get_valid_array_size) this can also happen on invalid "
+              "object access"
            << messaget::eom;
     return nil_exprt();
   }
+
+  const exprt arr_val =
+    simplify_expr(adjust_if_recursive(super_get(arr), ns), ns);
+  const typet char_type = arr.type().subtype();
+  const typet &index_type = size.value().type();
 
   if(
     const auto &array = interval_sparse_arrayt::of_expr(
@@ -1030,17 +1075,19 @@ static std::string string_of_array(const array_exprt &arr)
 /// \param ns: namespace
 /// \param stream: output stream
 /// \param arr: array expression
+/// \param array_pool: pool of arrays representing strings
 /// \return expression corresponding to `arr` in the model
 static exprt get_char_array_and_concretize(
   const std::function<exprt(const exprt &)> &super_get,
   const namespacet &ns,
   messaget::mstreamt &stream,
-  const array_string_exprt &arr)
+  const array_string_exprt &arr,
+  array_poolt &array_pool)
 {
   stream << "- " << format(arr) << ":\n";
   stream << std::string(4, ' ') << "- type: " << format(arr.type())
          << messaget::eom;
-  const auto arr_model_opt = get_array(super_get, ns, stream, arr);
+  const auto arr_model_opt = get_array(super_get, ns, stream, arr, array_pool);
   if(arr_model_opt)
   {
     stream << std::string(4, ' ') << "- char_array: " << format(*arr_model_opt)
@@ -1051,8 +1098,8 @@ static exprt get_char_array_and_concretize(
     stream << std::string(4, ' ')
            << "- simplified_char_array: " << format(simple) << messaget::eom;
     if(
-      const auto concretized_array =
-        get_array(super_get, ns, stream, to_array_string_expr(simple)))
+      const auto concretized_array = get_array(
+        super_get, ns, stream, to_array_string_expr(simple), array_pool))
     {
       stream << std::string(4, ' ')
              << "- concretized_char_array: " << format(*concretized_array)
@@ -1083,14 +1130,15 @@ void debug_model(
   messaget::mstreamt &stream,
   const namespacet &ns,
   const std::function<exprt(const exprt &)> &super_get,
-  const std::vector<symbol_exprt> &symbols)
+  const std::vector<symbol_exprt> &symbols,
+  array_poolt &array_pool)
 {
   stream << "debug_model:" << '\n';
   for(const auto &pointer_array : generator.array_pool.get_arrays_of_pointers())
   {
     const auto arr = pointer_array.second;
     const exprt model =
-      get_char_array_and_concretize(super_get, ns, stream, arr);
+      get_char_array_and_concretize(super_get, ns, stream, arr, array_pool);
 
     stream << "- " << format(arr) << ":\n"
            << "  - pointer: " << format(pointer_array.first) << "\n"
@@ -1335,7 +1383,12 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
 
 #ifdef DEBUG
   debug_model(
-    generator, stream, ns, get, generator.fresh_symbol.created_symbols);
+    generator,
+    stream,
+    ns,
+    get,
+    generator.fresh_symbol.created_symbols,
+    generator.array_pool);
 #endif
 
   // Maps from indexes of violated universal axiom to a witness of violation
@@ -1827,19 +1880,23 @@ exprt string_refinementt::get(const exprt &expr) const
   if(is_char_array_type(ecopy.type(), ns))
   {
     array_string_exprt &arr = to_array_string_expr(ecopy);
-    arr.length() = generator.array_pool.get_length(arr);
 
     if(
       const auto from_dependencies =
         dependencies.eval(arr, [&](const exprt &expr) { return get(expr); }))
       return *from_dependencies;
 
-    if(const auto arr_model_opt = get_array(super_get, ns, log.debug(), arr))
+    if(
+      const auto arr_model_opt =
+        get_array(super_get, ns, log.debug(), arr, generator.array_pool))
       return *arr_model_opt;
 
-    if(generator.array_pool.created_strings().count(arr))
+    if(
+      const auto &length_from_pool =
+        generator.array_pool.get_length_if_exists(arr))
     {
-      const exprt length = super_get(arr.length());
+      const exprt length = super_get(length_from_pool.value());
+
       if(const auto n = numeric_cast<std::size_t>(length))
       {
         const interval_sparse_arrayt sparse_array(

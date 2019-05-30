@@ -29,6 +29,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 /// \param s1: array of characters expression
 /// \param s2: array of characters expression
 /// \param offset: integer expression
+/// \param array_pool: pool of arrays representing strings
 /// \return an expression expression which is different from zero if there is
 ///   an exception to signal
 std::pair<exprt, string_constraintst> add_axioms_for_insert(
@@ -36,17 +37,20 @@ std::pair<exprt, string_constraintst> add_axioms_for_insert(
   const array_string_exprt &res,
   const array_string_exprt &s1,
   const array_string_exprt &s2,
-  const exprt &offset)
+  const exprt &offset,
+  array_poolt &array_pool)
 {
   PRECONDITION(offset.type() == s1.length_type());
 
   string_constraintst constraints;
   const typet &index_type = s1.length_type();
-  const exprt offset1 =
-    maximum(from_integer(0, index_type), minimum(s1.length(), offset));
+  const exprt offset1 = maximum(
+    from_integer(0, index_type),
+    minimum(array_pool.get_or_create_length(s1), offset));
 
   // Axiom 1.
-  constraints.existential.push_back(length_constraint_for_insert(res, s1, s2));
+  constraints.existential.push_back(
+    length_constraint_for_insert(res, s1, s2, array_pool));
 
   // Axiom 2.
   constraints.universal.push_back([&] { // NOLINT
@@ -59,7 +63,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_insert(
     const symbol_exprt i = fresh_symbol("QA_insert2", index_type);
     return string_constraintt(
       i,
-      zero_if_negative(s2.length()),
+      zero_if_negative(array_pool.get_or_create_length(s2)),
       equal_exprt(res[plus_exprt(i, offset1)], s2[i]));
   }());
 
@@ -69,8 +73,9 @@ std::pair<exprt, string_constraintst> add_axioms_for_insert(
     return string_constraintt(
       i,
       offset1,
-      zero_if_negative(s1.length()),
-      equal_exprt(res[plus_exprt(i, s2.length())], s1[i]));
+      zero_if_negative(array_pool.get_or_create_length(s1)),
+      equal_exprt(
+        res[plus_exprt(i, array_pool.get_or_create_length(s2))], s1[i]));
   }());
 
   return {from_integer(0, get_return_code_type()), std::move(constraints)};
@@ -81,17 +86,22 @@ std::pair<exprt, string_constraintst> add_axioms_for_insert(
 exprt length_constraint_for_insert(
   const array_string_exprt &res,
   const array_string_exprt &s1,
-  const array_string_exprt &s2)
+  const array_string_exprt &s2,
+  array_poolt &array_pool)
 {
-  return equal_exprt(res.length(), plus_exprt(s1.length(), s2.length()));
+  return equal_exprt(
+    array_pool.get_or_create_length(res),
+    plus_exprt(
+      array_pool.get_or_create_length(s1),
+      array_pool.get_or_create_length(s2)));
 }
 
 /// Insertion of a string in another at a specific index
 ///
 // NOLINTNEXTLINE
-/// \copybrief add_axioms_for_insert(symbol_generatort &fresh_symbol, const array_string_exprt &, const array_string_exprt &, const array_string_exprt &, const exprt &)
+/// \copybrief add_axioms_for_insert(symbol_generatort &fresh_symbol, const array_string_exprt &, const array_string_exprt &, const array_string_exprt &, const exprt &, array_poolt &)
 // NOLINTNEXTLINE
-/// \link add_axioms_for_insert(symbol_generatort &fresh_symbol, const array_string_exprt&,const array_string_exprt&,const array_string_exprt&,const exprt&)
+/// \link add_axioms_for_insert(symbol_generatort &fresh_symbol, const array_string_exprt&,const array_string_exprt&,const array_string_exprt&,const exprt&,array_poolt &)
 ///   (More...) \endlink
 ///
 /// If `start` and `end` arguments are given then `substring(s2, start, end)`
@@ -122,12 +132,14 @@ std::pair<exprt, string_constraintst> add_axioms_for_insert(
     const array_string_exprt substring =
       array_pool.fresh_string(index_type, char_type);
     return combine_results(
-      add_axioms_for_substring(fresh_symbol, substring, s2, start, end),
-      add_axioms_for_insert(fresh_symbol, res, s1, substring, offset));
+      add_axioms_for_substring(
+        fresh_symbol, substring, s2, start, end, array_pool),
+      add_axioms_for_insert(
+        fresh_symbol, res, s1, substring, offset, array_pool));
   }
   else // 5 arguments
   {
-    return add_axioms_for_insert(fresh_symbol, res, s1, s2, offset);
+    return add_axioms_for_insert(fresh_symbol, res, s1, s2, offset, array_pool);
   }
 }
 
@@ -155,8 +167,8 @@ std::pair<exprt, string_constraintst> add_axioms_for_insert_int(
   const typet &char_type = s1.content().type().subtype();
   const array_string_exprt s2 = array_pool.fresh_string(index_type, char_type);
   return combine_results(
-    add_axioms_for_string_of_int(s2, f.arguments()[4], 0, ns),
-    add_axioms_for_insert(fresh_symbol, res, s1, s2, offset));
+    add_axioms_for_string_of_int(s2, f.arguments()[4], 0, ns, array_pool),
+    add_axioms_for_insert(fresh_symbol, res, s1, s2, offset, array_pool));
 }
 
 /// add axioms corresponding to the StringBuilder.insert(Z) java function
@@ -181,8 +193,8 @@ std::pair<exprt, string_constraintst> add_axioms_for_insert_bool(
   const typet &char_type = s1.content().type().subtype();
   const array_string_exprt s2 = array_pool.fresh_string(index_type, char_type);
   return combine_results(
-    add_axioms_from_bool(s2, f.arguments()[4]),
-    add_axioms_for_insert(fresh_symbol, res, s1, s2, offset));
+    add_axioms_from_bool(s2, f.arguments()[4], array_pool),
+    add_axioms_for_insert(fresh_symbol, res, s1, s2, offset, array_pool));
 }
 
 /// Add axioms corresponding to the StringBuilder.insert(C) java function
@@ -206,8 +218,8 @@ std::pair<exprt, string_constraintst> add_axioms_for_insert_char(
   const typet &char_type = s1.content().type().subtype();
   const array_string_exprt s2 = array_pool.fresh_string(index_type, char_type);
   return combine_results(
-    add_axioms_from_char(s2, f.arguments()[4]),
-    add_axioms_for_insert(fresh_symbol, res, s1, s2, offset));
+    add_axioms_from_char(s2, f.arguments()[4], array_pool),
+    add_axioms_for_insert(fresh_symbol, res, s1, s2, offset, array_pool));
 }
 
 /// add axioms corresponding to the StringBuilder.insert(D) java function
@@ -236,7 +248,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_insert_double(
   return combine_results(
     add_axioms_for_string_of_float(
       fresh_symbol, s2, f.arguments()[4], array_pool, ns),
-    add_axioms_for_insert(fresh_symbol, res, s1, s2, offset));
+    add_axioms_for_insert(fresh_symbol, res, s1, s2, offset, array_pool));
 }
 
 /// Add axioms corresponding to the StringBuilder.insert(F) java function

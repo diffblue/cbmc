@@ -64,8 +64,10 @@ private:
   string_builtin_functiont() = default;
 
 protected:
-  explicit string_builtin_functiont(exprt return_code)
-    : return_code(std::move(return_code))
+  array_poolt &array_pool;
+
+  string_builtin_functiont(exprt return_code, array_poolt &array_pool)
+    : return_code(std::move(return_code)), array_pool(array_pool)
   {
   }
 };
@@ -80,8 +82,9 @@ public:
   string_transformation_builtin_functiont(
     exprt return_code,
     array_string_exprt result,
-    array_string_exprt input)
-    : string_builtin_functiont(std::move(return_code)),
+    array_string_exprt input,
+    array_poolt &array_pool)
+    : string_builtin_functiont(std::move(return_code), array_pool),
       result(std::move(result)),
       input(std::move(input))
   {
@@ -213,7 +216,9 @@ public:
   exprt length_constraint() const override
   {
     return and_exprt(
-      equal_exprt(result.length(), input.length()),
+      equal_exprt(
+        array_pool.get_or_create_length(result),
+        array_pool.get_or_create_length(input)),
       equal_exprt(return_code, from_integer(0, return_code.type())));
   };
 };
@@ -235,11 +240,13 @@ public:
   string_to_upper_case_builtin_functiont(
     exprt return_code,
     array_string_exprt result,
-    array_string_exprt input)
+    array_string_exprt input,
+    array_poolt &array_pool)
     : string_transformation_builtin_functiont(
         std::move(return_code),
         std::move(result),
-        std::move(input))
+        std::move(input),
+        array_pool)
   {
   }
 
@@ -262,7 +269,9 @@ public:
   exprt length_constraint() const override
   {
     return and_exprt(
-      equal_exprt(result.length(), input.length()),
+      equal_exprt(
+        array_pool.get_or_create_length(result),
+        array_pool.get_or_create_length(input)),
       equal_exprt(return_code, from_integer(0, return_code.type())));
   };
 };
@@ -321,8 +330,10 @@ public:
   }
 
 protected:
-  explicit string_insertion_builtin_functiont(const exprt &return_code)
-    : string_builtin_functiont(return_code)
+  explicit string_insertion_builtin_functiont(
+    const exprt &return_code,
+    array_poolt &array_pool)
+    : string_builtin_functiont(return_code, array_pool)
   {
   }
 };

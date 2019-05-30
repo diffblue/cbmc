@@ -108,7 +108,7 @@ public:
     TEXT
   } format_typet;
 
-  explicit format_elementt(format_typet _type) : type(_type)
+  explicit format_elementt(format_typet _type) : type(_type), fstring("")
   {
   }
 
@@ -116,7 +116,7 @@ public:
   {
   }
 
-  explicit format_elementt(format_specifiert fs) : type(SPECIFIER)
+  explicit format_elementt(format_specifiert fs) : type(SPECIFIER), fstring("")
   {
     fspec.push_back(fs);
   }
@@ -186,6 +186,11 @@ static bool check_format_string(std::string s)
 }
 #endif
 
+static exprt format_arg_from_string(
+  const array_string_exprt &string,
+  const irep_idt &id,
+  array_poolt &array_pool);
+
 /// Helper function for parsing format strings.
 /// This follows the implementation in openJDK of the java.util.Formatter class:
 /// http://hg.openjdk.java.net/jdk7/jdk7/jdk/file/9b8c96f96a0f/src/share/classes/java/util/Formatter.java#l2660
@@ -205,8 +210,7 @@ static format_specifiert format_specifier_of_match(std::smatch &m)
   if(tT == "T")
     flag.push_back(format_specifiert::DATE_TIME_UPPER);
 
-  INVARIANT(
-    m[6].str().length() == 1, "format conversion should be one character");
+  INVARIANT(m[6].length() == 1, "format conversion should be one character");
   char conversion = m[6].str()[0];
 
   return format_specifiert(index, flag, width, precision, dt, conversion);
@@ -242,10 +246,11 @@ static std::vector<format_elementt> parse_format_string(std::string s)
 }
 
 /// Expression which is true when the string is equal to the literal "null"
-static exprt is_null(const array_string_exprt &string)
+static exprt is_null(const array_string_exprt &string, array_poolt &array_pool)
 {
   return and_exprt{
-    equal_exprt{string.length(), from_integer(4, string.length_type())},
+    equal_exprt{array_pool.get_or_create_length(string),
+                from_integer(4, string.length_type())},
     and_exprt{equal_exprt{string[0], from_integer('n', string[0].type())},
               equal_exprt{string[1], from_integer('u', string[0].type())},
               equal_exprt{string[2], from_integer('l', string[0].type())},
@@ -259,8 +264,7 @@ static exprt is_null(const array_string_exprt &string)
 /// on the format specifier.
 /// \param fresh_symbol: generator of fresh symbols
 /// \param fs: a format specifier
-/// \param get_arg: a function returning the possible value of the argument to
-///   format given their type.
+/// \param string_arg: format string from argument
 /// \param index_type: type for indexes in strings
 /// \param char_type: type of characters
 /// \param array_pool: pool of arrays representing strings
@@ -271,7 +275,7 @@ static std::pair<array_string_exprt, string_constraintst>
 add_axioms_for_format_specifier(
   symbol_generatort &fresh_symbol,
   const format_specifiert &fs,
-  const std::function<exprt(const irep_idt &)> &get_arg,
+  const array_string_exprt &string_arg,
   const typet &index_type,
   const typet &char_type,
   array_poolt &array_pool,
@@ -284,33 +288,50 @@ add_axioms_for_format_specifier(
   switch(fs.conversion)
   {
   case format_specifiert::DECIMAL_INTEGER:
-    return_code = add_axioms_for_string_of_int(res, get_arg(ID_int), 0, ns);
+    return_code = add_axioms_for_string_of_int(
+      res,
+      format_arg_from_string(string_arg, ID_int, array_pool),
+      0,
+      ns,
+      array_pool);
     return {res, std::move(return_code.second)};
   case format_specifiert::HEXADECIMAL_INTEGER:
     return_code = add_axioms_for_string_of_int_with_radix(
-      res, get_arg(ID_int), from_integer(16, index_type), 16, ns);
+      res,
+      format_arg_from_string(string_arg, ID_int, array_pool),
+      from_integer(16, index_type),
+      16,
+      ns,
+      array_pool);
     return {res, std::move(return_code.second)};
   case format_specifiert::SCIENTIFIC:
     return_code = add_axioms_from_float_scientific_notation(
-        fresh_symbol, res, get_arg(ID_float), array_pool, ns);
+      fresh_symbol,
+      res,
+      format_arg_from_string(string_arg, ID_float, array_pool),
+      array_pool,
+      ns);
     return {res, std::move(return_code.second)};
   case format_specifiert::DECIMAL_FLOAT:
     return_code = add_axioms_for_string_of_float(
-        fresh_symbol, res, get_arg(ID_float), array_pool, ns);
+      fresh_symbol,
+      res,
+      format_arg_from_string(string_arg, ID_float, array_pool),
+      array_pool,
+      ns);
     return {res, std::move(return_code.second)};
   case format_specifiert::CHARACTER:
   {
-    exprt arg_string = get_arg(ID_char);
+    exprt arg_string = format_arg_from_string(string_arg, ID_char, array_pool);
     array_string_exprt &string_expr = to_array_string_expr(arg_string);
     // In the case the arg is null, the result will be equal to "null" and
     // and otherwise we just take the 4th character of the string.
-    const exprt is_null_literal = is_null(string_expr);
-    constraints.existential.push_back(equal_exprt{
-      res.length(),
-      if_exprt{
-        is_null_literal,
-        from_integer(4, index_type),
-        from_integer(1, index_type)}});
+    const exprt is_null_literal = is_null(string_expr, array_pool);
+    constraints.existential.push_back(
+      equal_exprt{array_pool.get_or_create_length(res),
+                  if_exprt{is_null_literal,
+                           from_integer(4, index_type),
+                           from_integer(1, index_type)}});
     constraints.existential.push_back(implies_exprt{
       is_null_literal,
       and_exprt{
@@ -324,23 +345,31 @@ add_axioms_for_format_specifier(
     return {res, constraints};
   }
   case format_specifiert::BOOLEAN:
-    return_code = add_axioms_from_bool(res, get_arg(ID_boolean));
+    return_code = add_axioms_from_bool(
+      res,
+      format_arg_from_string(string_arg, ID_boolean, array_pool),
+      array_pool);
     return {res, std::move(return_code.second)};
   case format_specifiert::STRING:
   {
-    const exprt arg_string = get_arg("string_expr");
+    const exprt arg_string = string_arg;
     const array_string_exprt string_expr = to_array_string_expr(arg_string);
     return {std::move(string_expr), {}};
   }
   case format_specifiert::HASHCODE:
-    return_code = add_axioms_for_string_of_int(res, get_arg("hashcode"), 0, ns);
+    return_code = add_axioms_for_string_of_int(
+      res,
+      format_arg_from_string(string_arg, "hashcode", array_pool),
+      0,
+      ns,
+      array_pool);
     return {res, std::move(return_code.second)};
   case format_specifiert::LINE_SEPARATOR:
     // TODO: the constant should depend on the system: System.lineSeparator()
-    return_code = add_axioms_for_constant(res, "\n");
+    return_code = add_axioms_for_constant(res, "\n", array_pool);
     return {res, std::move(return_code.second)};
   case format_specifiert::PERCENT_SIGN:
-    return_code = add_axioms_for_constant(res, "%");
+    return_code = add_axioms_for_constant(res, "%", array_pool);
     return {res, std::move(return_code.second)};
   case format_specifiert::SCIENTIFIC_UPPER:
   case format_specifiert::GENERAL_UPPER:
@@ -356,7 +385,7 @@ add_axioms_for_format_specifier(
     auto format_specifier_result = add_axioms_for_format_specifier(
       fresh_symbol,
       fs_lower,
-      get_arg,
+      string_arg,
       index_type,
       char_type,
       array_pool,
@@ -366,7 +395,7 @@ add_axioms_for_format_specifier(
     const exprt return_code_upper_case =
       fresh_symbol("return_code_upper_case", get_return_code_type());
     const string_to_upper_case_builtin_functiont upper_case_function(
-      return_code_upper_case, res, format_specifier_result.first);
+      return_code_upper_case, res, format_specifier_result.first, array_pool);
     auto upper_case_constraints = upper_case_function.constraints(fresh_symbol);
     merge(upper_case_constraints, std::move(format_specifier_result.second));
     return {res, std::move(upper_case_constraints)};
@@ -392,7 +421,9 @@ add_axioms_for_format_specifier(
 /// \p id should be one of: string_expr, int, char, boolean, float.
 /// The primitive values are expected to all be encoded using 4 characters.
 static exprt format_arg_from_string(
-  const array_string_exprt &string, const irep_idt &id)
+  const array_string_exprt &string,
+  const irep_idt &id,
+  array_poolt &array_pool)
 {
   if(id == "string_expr")
     return string;
@@ -420,13 +451,14 @@ static exprt format_arg_from_string(
   {
     // We assume the string has length exactly 4, if it is "null" return false
     // and otherwise ignore the first 3 and return (bool)string.content[3]
-    return if_exprt{
-      is_null(string), false_exprt{}, typecast_exprt{string[3], bool_typet()}};
+    return if_exprt{is_null(string, array_pool),
+                    false_exprt{},
+                    typecast_exprt{string[3], bool_typet()}};
   }
   if(id == ID_float)
   {
     // Deserialize an int and cast to float
-    const exprt as_int = format_arg_from_string(string, ID_int);
+    const exprt as_int = format_arg_from_string(string, ID_int, array_pool);
     return typecast_exprt{as_int, floatbv_typet{}};
   }
   UNHANDLED_CASE;
@@ -458,13 +490,13 @@ std::pair<exprt, string_constraintst> add_axioms_for_format(
   const typet &char_type = res.content().type().subtype();
   const typet &index_type = res.length_type();
 
+  array_string_exprt string_arg;
+
   for(const format_elementt &fe : format_strings)
   {
     if(fe.is_format_specifier())
     {
       const format_specifiert &fs = fe.get_format_specifier();
-      std::function<exprt(const irep_idt &)> get_arg =
-          [](const irep_idt &) -> exprt { UNREACHABLE; };
 
       if(
         fs.conversion != format_specifiert::PERCENT_SIGN &&
@@ -492,16 +524,13 @@ std::pair<exprt, string_constraintst> add_axioms_for_format(
         INVARIANT(
           is_refined_string_type(arg.type()),
           "arguments of format should be strings");
-        const array_string_exprt string_arg = get_string_expr(array_pool, arg);
-        get_arg = [string_arg](const irep_idt &id) {
-          return format_arg_from_string(string_arg, id);
-        };
+        string_arg = get_string_expr(array_pool, arg);
       }
 
       auto result = add_axioms_for_format_specifier(
         fresh_symbol,
         fs,
-        get_arg,
+        string_arg,
         index_type,
         char_type,
         array_pool,
@@ -514,8 +543,8 @@ std::pair<exprt, string_constraintst> add_axioms_for_format(
     {
       const array_string_exprt str =
         array_pool.fresh_string(index_type, char_type);
-      auto result =
-        add_axioms_for_constant(str, fe.get_format_text().get_content());
+      auto result = add_axioms_for_constant(
+        str, fe.get_format_text().get_content(), array_pool);
       merge(constraints, result.second);
       intermediary_strings.push_back(str);
     }
@@ -525,8 +554,8 @@ std::pair<exprt, string_constraintst> add_axioms_for_format(
 
   if(intermediary_strings.empty())
   {
-    constraints.existential.push_back(
-      equal_exprt(res.length(), from_integer(0, index_type)));
+    constraints.existential.push_back(equal_exprt(
+      array_pool.get_or_create_length(res), from_integer(0, index_type)));
     return {return_code, constraints};
   }
 
@@ -536,7 +565,12 @@ std::pair<exprt, string_constraintst> add_axioms_for_format(
   {
     // Copy the first string
     auto result = add_axioms_for_substring(
-      fresh_symbol, res, str, from_integer(0, index_type), str.length());
+      fresh_symbol,
+      res,
+      str,
+      from_integer(0, index_type),
+      array_pool.get_or_create_length(str),
+      array_pool);
     merge(constraints, std::move(result.second));
     return {result.first, std::move(constraints)};
   }
@@ -547,14 +581,15 @@ std::pair<exprt, string_constraintst> add_axioms_for_format(
     const array_string_exprt &intermediary = intermediary_strings[i];
     const array_string_exprt fresh =
       array_pool.fresh_string(index_type, char_type);
-    auto result = add_axioms_for_concat(fresh_symbol, fresh, str, intermediary);
+    auto result =
+      add_axioms_for_concat(fresh_symbol, fresh, str, intermediary, array_pool);
     return_code = maximum(return_code, result.first);
     merge(constraints, std::move(result.second));
     str = fresh;
   }
 
-  auto result =
-    add_axioms_for_concat(fresh_symbol, res, str, intermediary_strings.back());
+  auto result = add_axioms_for_concat(
+    fresh_symbol, res, str, intermediary_strings.back(), array_pool);
   merge(constraints, std::move(result.second));
   return {maximum(result.first, return_code), std::move(constraints)};
 }
@@ -604,10 +639,12 @@ std::pair<exprt, string_constraintst> add_axioms_for_format(
     array_pool.find(f.arguments()[1], f.arguments()[0]);
   const array_string_exprt s1 = get_string_expr(array_pool, f.arguments()[2]);
 
-  if(s1.length().id() == ID_constant && s1.content().id() == ID_array)
+  if(
+    array_pool.get_or_create_length(s1).id() == ID_constant &&
+    s1.content().id() == ID_array)
   {
-    const auto length =
-      numeric_cast_v<std::size_t>(to_constant_expr(s1.length()));
+    const auto length = numeric_cast_v<std::size_t>(
+      to_constant_expr(array_pool.get_or_create_length(s1)));
     std::string s =
       utf16_constant_array_to_java(to_array_expr(s1.content()), length);
     // List of arguments after s
