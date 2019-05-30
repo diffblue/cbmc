@@ -94,11 +94,17 @@ goto_programt::targett remove_java_newt::lower_java_new(
   malloc_expr.copy_to_operands(*object_size);
   // could use true and get rid of the code below
   malloc_expr.copy_to_operands(false_exprt());
-  *target =
-    goto_programt::make_assignment(code_assignt(lhs, malloc_expr), location);
+
+  auto malloc_expr_casted =
+    typecast_exprt::conditional_cast(malloc_expr, lhs.type());
+
+  *target = goto_programt::make_assignment(
+    code_assignt(lhs, malloc_expr_casted), location);
 
   // zero-initialize the object
-  dereference_exprt deref(lhs, object_type);
+  auto lhs_casted = typecast_exprt::conditional_cast(lhs, rhs.type());
+
+  dereference_exprt deref(lhs_casted, object_type);
   auto zero_object = zero_initializer(object_type, location, ns);
   CHECK_RETURN(zero_object.has_value());
   set_class_identifier(
@@ -147,8 +153,11 @@ goto_programt::targett remove_java_newt::lower_java_new_array(
   // code use true and get rid of the code below
   malloc_expr.copy_to_operands(false_exprt());
 
-  *target =
-    goto_programt::make_assignment(code_assignt(lhs, malloc_expr), location);
+  auto lhs_casted = typecast_exprt::conditional_cast(lhs, malloc_expr.type());
+
+  *target = goto_programt::make_assignment(
+    code_assignt(lhs_casted, malloc_expr), location);
+
   goto_programt::targett next = std::next(target);
 
   const struct_typet &struct_type = to_struct_type(ns.follow(object_type));
@@ -159,7 +168,7 @@ goto_programt::targett remove_java_newt::lower_java_new_array(
   PRECONDITION(struct_type.components().size() == 3);
 
   // Init base class:
-  dereference_exprt deref(lhs, object_type);
+  dereference_exprt deref(lhs_casted, object_type);
   auto zero_object = zero_initializer(object_type, location, ns);
   CHECK_RETURN(zero_object.has_value());
   set_class_identifier(
@@ -328,15 +337,17 @@ goto_programt::targett remove_java_newt::lower_java_new(
   if(!target->is_assign())
     return target;
 
-  if(as_const(*target).get_assign().rhs().id() == ID_side_effect)
+  // we make a copy of lhs/rhs, as we intend to destroy the assignment
+  // inside lower_java_new and lower_java_new_array
+  const auto &code_assign = target->get_assign();
+  auto rhs = code_assign.rhs();
+  auto lhs = code_assign.lhs();
+
+  if(rhs.id() == ID_typecast) // follow one typecast
+    rhs = to_typecast_expr(rhs).op();
+
+  if(rhs.id() == ID_side_effect)
   {
-    // we make a copy, as we intend to destroy the assignment
-    // inside lower_java_new and lower_java_new_array
-    const auto code_assign = target->get_assign();
-
-    const exprt &lhs = code_assign.lhs();
-    const exprt &rhs = code_assign.rhs();
-
     const auto &side_effect_expr = to_side_effect_expr(rhs);
     const auto &statement = side_effect_expr.get_statement();
 
