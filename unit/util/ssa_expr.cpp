@@ -141,3 +141,34 @@ TEST_CASE("ssa_exprt::get_object_name", "[unit][util][ssa_expr]")
     }
   }
 }
+
+TEST_CASE("ssa_exprt::get_l1_object", "[unit][util][ssa_expr]")
+{
+  GIVEN("An ssa_exprt containing member access, array access and a symbol")
+  {
+    const signedbv_typet int_type{32};
+    const array_typet array_type{int_type, from_integer(10, int_type)};
+    std::vector<struct_typet::componentt> components;
+    components.emplace_back("array_field", array_type);
+    const struct_typet struct_type{components};
+    const symbol_exprt symbol{"sym", struct_type};
+    const index_exprt index{member_exprt{symbol, components.back()},
+                            from_integer(9, int_type)};
+    ssa_exprt ssa{symbol};
+    ssa.set_level_0(1);
+    ssa.set_level_1(3);
+    ssa.set_level_2(7);
+
+    WHEN("get_l1_object is called")
+    {
+      const ssa_exprt l1_object = ssa.get_l1_object();
+      THEN("level 0 and level 1 are the same, l2 is removed")
+      {
+        REQUIRE(l1_object.get_level_0() == "1");
+        REQUIRE(l1_object.get_level_1() == "3");
+        REQUIRE(l1_object.get_level_2() == irep_idt{});
+        REQUIRE(l1_object.get_identifier() == "sym!1@3");
+      }
+    }
+  }
+}
