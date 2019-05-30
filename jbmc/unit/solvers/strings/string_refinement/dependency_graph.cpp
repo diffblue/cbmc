@@ -10,7 +10,7 @@ Author: Diffblue Ltd.
 #include <testing-utils/use_catch.h>
 
 #include <java_bytecode/java_types.h>
-#include <solvers/strings/string_refinement_util.h>
+#include <solvers/strings/string_dependencies.h>
 #include <util/arith_tools.h>
 #include <util/std_expr.h>
 #include <util/std_types.h>
