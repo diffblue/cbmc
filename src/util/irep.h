@@ -20,11 +20,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef HASH_CODE
 #  define HASH_CODE 1
 #endif
-#ifndef NAMED_SUB_IS_FORWARD_LIST
-#  define NAMED_SUB_IS_FORWARD_LIST 1
-#endif
+// #define NAMED_SUB_IS_FORWARD_LIST
 
-#if NAMED_SUB_IS_FORWARD_LIST
+#ifdef NAMED_SUB_IS_FORWARD_LIST
 #  include "forward_list_as_map.h"
 #else
 #include <map>
@@ -388,7 +386,7 @@ class irept
   : public non_sharing_treet<
       irept,
 #endif
-#if NAMED_SUB_IS_FORWARD_LIST
+#ifdef NAMED_SUB_IS_FORWARD_LIST
       forward_list_as_mapt<irep_namet, irept>>
 #else
       std::map<irep_namet, irept>>
