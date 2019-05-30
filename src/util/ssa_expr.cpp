@@ -50,71 +50,6 @@ ssa_exprt::ssa_exprt(const exprt &expr) : symbol_exprt(expr.type())
   set(ID_L1_object_identifier, id);
 }
 
-void ssa_exprt::set_expression(const exprt &expr)
-{
-  type() = expr.type();
-  add(ID_expression, expr);
-  update_identifier();
-}
-
-irep_idt ssa_exprt::get_object_name() const
-{
-  const exprt &original_expr = get_original_expr();
-
-  if(original_expr.id() == ID_symbol)
-    return to_symbol_expr(original_expr).get_identifier();
-
-  object_descriptor_exprt ode(original_expr);
-  return to_symbol_expr(ode.root_object()).get_identifier();
-}
-
-const ssa_exprt ssa_exprt::get_l1_object() const
-{
-  object_descriptor_exprt ode(get_original_expr());
-
-  ssa_exprt root(ode.root_object());
-  root.set(ID_L0, get(ID_L0));
-  root.set(ID_L1, get(ID_L1));
-  root.update_identifier();
-
-  return root;
-}
-
-const irep_idt ssa_exprt::get_l1_object_identifier() const
-{
-#if 0
-  return get_l1_object().get_identifier();
-#else
-  // the above is the clean version, this is the fast one, using
-  // an identifier cached during build_identifier
-  return get(ID_L1_object_identifier);
-#endif
-}
-
-void ssa_exprt::set_level_0(unsigned i)
-{
-  set(ID_L0, i);
-  update_identifier();
-}
-
-void ssa_exprt::set_level_1(unsigned i)
-{
-  set(ID_L1, i);
-  update_identifier();
-}
-
-void ssa_exprt::set_level_2(unsigned i)
-{
-  set(ID_L2, i);
-  update_identifier();
-}
-
-void ssa_exprt::remove_level_2()
-{
-  remove(ID_L2);
-  set_identifier(get_l1_object_identifier());
-}
-
 /// If \p expr is a symbol "s" add to \p os "s!l0@l1#l2" and to \p l1_object_os
 /// "s!l0@l1".
 /// If \p expr is a member or index expression, recursively apply the procedure
@@ -177,20 +112,6 @@ static void build_ssa_identifier_rec(
     UNREACHABLE;
 }
 
-/* Used to determine whether or not an identifier can be built
-   * before trying and getting an exception */
-bool ssa_exprt::can_build_identifier(const exprt &expr)
-{
-  if(expr.id()==ID_symbol)
-    return true;
-  else if(expr.id() == ID_member)
-    return can_build_identifier(to_member_expr(expr).compound());
-  else if(expr.id() == ID_index)
-    return can_build_identifier(to_index_expr(expr).array());
-  else
-    return false;
-}
-
 static std::pair<irep_idt, irep_idt> build_identifier(
   const exprt &expr,
   const irep_idt &l0,
@@ -205,13 +126,97 @@ static std::pair<irep_idt, irep_idt> build_identifier(
   return std::make_pair(irep_idt(oss.str()), irep_idt(l1_object_oss.str()));
 }
 
+static void update_identifier(ssa_exprt &ssa)
+{
+  const irep_idt &l0 = ssa.get_level_0();
+  const irep_idt &l1 = ssa.get_level_1();
+  const irep_idt &l2 = ssa.get_level_2();
+
+  auto idpair = build_identifier(ssa.get_original_expr(), l0, l1, l2);
+  ssa.set_identifier(idpair.first);
+  ssa.set(ID_L1_object_identifier, idpair.second);
+}
+
+void ssa_exprt::set_expression(const exprt &expr)
+{
+  type() = expr.type();
+  add(ID_expression, expr);
+  ::update_identifier(*this);
+}
+
+irep_idt ssa_exprt::get_object_name() const
+{
+  const exprt &original_expr = get_original_expr();
+
+  if(original_expr.id() == ID_symbol)
+    return to_symbol_expr(original_expr).get_identifier();
+
+  object_descriptor_exprt ode(original_expr);
+  return to_symbol_expr(ode.root_object()).get_identifier();
+}
+
+const ssa_exprt ssa_exprt::get_l1_object() const
+{
+  object_descriptor_exprt ode(get_original_expr());
+
+  ssa_exprt root(ode.root_object());
+  root.set(ID_L0, get(ID_L0));
+  root.set(ID_L1, get(ID_L1));
+  ::update_identifier(root);
+
+  return root;
+}
+
+const irep_idt ssa_exprt::get_l1_object_identifier() const
+{
+#if 0
+  return get_l1_object().get_identifier();
+#else
+  // the above is the clean version, this is the fast one, using
+  // an identifier cached during build_identifier
+  return get(ID_L1_object_identifier);
+#endif
+}
+
+void ssa_exprt::set_level_0(unsigned i)
+{
+  set(ID_L0, i);
+  ::update_identifier(*this);
+}
+
+void ssa_exprt::set_level_1(unsigned i)
+{
+  set(ID_L1, i);
+  ::update_identifier(*this);
+}
+
+void ssa_exprt::set_level_2(unsigned i)
+{
+  set(ID_L2, i);
+  ::update_identifier(*this);
+}
+
+void ssa_exprt::remove_level_2()
+{
+  remove(ID_L2);
+  set_identifier(get_l1_object_identifier());
+}
+
+/* Used to determine whether or not an identifier can be built
+   * before trying and getting an exception */
+bool ssa_exprt::can_build_identifier(const exprt &expr)
+{
+  if(expr.id() == ID_symbol)
+    return true;
+  else if(expr.id() == ID_member)
+    return can_build_identifier(to_member_expr(expr).compound());
+  else if(expr.id() == ID_index)
+    return can_build_identifier(to_index_expr(expr).array());
+  else
+    return false;
+}
+
 void ssa_exprt::update_identifier()
 {
-  const irep_idt &l0 = get_level_0();
-  const irep_idt &l1 = get_level_1();
-  const irep_idt &l2 = get_level_2();
-
-  auto idpair = build_identifier(get_original_expr(), l0, l1, l2);
-  set_identifier(idpair.first);
-  set(ID_L1_object_identifier, idpair.second);
+  ::update_identifier(*this);
 }

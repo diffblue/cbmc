@@ -75,6 +75,7 @@ public:
     return get(ID_L2);
   }
 
+  DEPRECATED(SINCE(2019, 05, 29, "Should only be used internally"))
   void update_identifier();
 
   /// Used to determine whether or not an identifier can be built before trying
