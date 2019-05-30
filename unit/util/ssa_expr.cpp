@@ -31,6 +31,7 @@ TEST_CASE("Constructor of ssa_exprt", "[unit][util][ssa_expr]")
       THEN("the ssa_exprt has identifier 'sym..array_field[[9]]'")
       {
         REQUIRE(ssa.get_identifier() == "sym..array_field[[9]]");
+        REQUIRE(ssa.get_l1_object_identifier() == "sym..array_field[[9]]");
       }
       THEN("the ssa_exprt has no level set")
       {
@@ -58,6 +59,7 @@ TEST_CASE("Set level", "[unit][util][ssa_expr]")
       REQUIRE(ssa.get_level_2() == irep_idt{});
       REQUIRE(ssa.get_original_expr() == symbol);
       REQUIRE(ssa.get_identifier() == "sym!1");
+      REQUIRE(ssa.get_l1_object_identifier() == "sym!1");
     }
 
     WHEN("set_level_1")
@@ -68,6 +70,7 @@ TEST_CASE("Set level", "[unit][util][ssa_expr]")
       REQUIRE(ssa.get_level_2() == irep_idt{});
       REQUIRE(ssa.get_original_expr() == symbol);
       REQUIRE(ssa.get_identifier() == "sym@3");
+      REQUIRE(ssa.get_l1_object_identifier() == "sym@3");
     }
 
     WHEN("set_level_2")
@@ -78,6 +81,7 @@ TEST_CASE("Set level", "[unit][util][ssa_expr]")
       REQUIRE(ssa.get_level_2() == "7");
       REQUIRE(ssa.get_original_expr() == symbol);
       REQUIRE(ssa.get_identifier() == "sym#7");
+      REQUIRE(ssa.get_l1_object_identifier() == "sym");
     }
   }
 }
@@ -108,9 +112,10 @@ TEST_CASE("Set expression", "[unit][util][ssa_expr]")
       {
         REQUIRE(ssa.get_original_expr() == index);
       }
-      THEN("The identifier is updated")
+      THEN("The identifiers are updated")
       {
         REQUIRE(ssa.get_identifier() == "sym!1@3#7[[9]]");
+        REQUIRE(ssa.get_l1_object_identifier() == "sym!1@3[[9]]");
       }
     }
   }
