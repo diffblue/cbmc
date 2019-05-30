@@ -846,7 +846,7 @@ bool simplify_exprt::simplify_extractbit(exprt &expr)
     src_bit_width,
     numeric_cast_v<std::size_t>(*index_converted_to_int));
 
-  expr.make_bool(bit);
+  expr = make_boolean_expr(bit);
 
   return false;
 }
@@ -1425,7 +1425,7 @@ bool simplify_exprt::simplify_inequality_both_constant(exprt &expr)
       }
       equal = tmp0_const.is_zero() && tmp1_const.is_zero();
     }
-    expr.make_bool(expr.id() == ID_equal ? equal : !equal);
+    expr = make_boolean_expr(expr.id() == ID_equal ? equal : !equal);
     return false;
   }
 
@@ -1435,13 +1435,13 @@ bool simplify_exprt::simplify_inequality_both_constant(exprt &expr)
     fixedbvt f1(tmp1_const);
 
     if(expr.id() == ID_ge)
-      expr.make_bool(f0 >= f1);
+      expr = make_boolean_expr(f0 >= f1);
     else if(expr.id() == ID_le)
-      expr.make_bool(f0 <= f1);
+      expr = make_boolean_expr(f0 <= f1);
     else if(expr.id() == ID_gt)
-      expr.make_bool(f0 > f1);
+      expr = make_boolean_expr(f0 > f1);
     else if(expr.id() == ID_lt)
-      expr.make_bool(f0 < f1);
+      expr = make_boolean_expr(f0 < f1);
     else
       UNREACHABLE;
 
@@ -1453,13 +1453,13 @@ bool simplify_exprt::simplify_inequality_both_constant(exprt &expr)
     ieee_floatt f1(tmp1_const);
 
     if(expr.id() == ID_ge)
-      expr.make_bool(f0 >= f1);
+      expr = make_boolean_expr(f0 >= f1);
     else if(expr.id() == ID_le)
-      expr.make_bool(f0 <= f1);
+      expr = make_boolean_expr(f0 <= f1);
     else if(expr.id() == ID_gt)
-      expr.make_bool(f0 > f1);
+      expr = make_boolean_expr(f0 > f1);
     else if(expr.id() == ID_lt)
-      expr.make_bool(f0 < f1);
+      expr = make_boolean_expr(f0 < f1);
     else
       UNREACHABLE;
 
@@ -1476,13 +1476,13 @@ bool simplify_exprt::simplify_inequality_both_constant(exprt &expr)
       return true;
 
     if(expr.id() == ID_ge)
-      expr.make_bool(r0 >= r1);
+      expr = make_boolean_expr(r0 >= r1);
     else if(expr.id() == ID_le)
-      expr.make_bool(r0 <= r1);
+      expr = make_boolean_expr(r0 <= r1);
     else if(expr.id() == ID_gt)
-      expr.make_bool(r0 > r1);
+      expr = make_boolean_expr(r0 > r1);
     else if(expr.id() == ID_lt)
-      expr.make_bool(r0 < r1);
+      expr = make_boolean_expr(r0 < r1);
     else
       UNREACHABLE;
 
@@ -1501,13 +1501,13 @@ bool simplify_exprt::simplify_inequality_both_constant(exprt &expr)
       return true;
 
     if(expr.id() == ID_ge)
-      expr.make_bool(*v0 >= *v1);
+      expr = make_boolean_expr(*v0 >= *v1);
     else if(expr.id() == ID_le)
-      expr.make_bool(*v0 <= *v1);
+      expr = make_boolean_expr(*v0 <= *v1);
     else if(expr.id() == ID_gt)
-      expr.make_bool(*v0 > *v1);
+      expr = make_boolean_expr(*v0 > *v1);
     else if(expr.id() == ID_lt)
-      expr.make_bool(*v0 < *v1);
+      expr = make_boolean_expr(*v0 < *v1);
     else
       UNREACHABLE;
 
@@ -1669,7 +1669,7 @@ bool simplify_exprt::simplify_inequality_no_constant(exprt &expr)
 
     if(ok)
     {
-      expr.make_bool(result);
+      expr = make_boolean_expr(result);
       return false;
     }
   }

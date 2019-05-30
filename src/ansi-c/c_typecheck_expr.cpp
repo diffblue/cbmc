@@ -245,7 +245,7 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
     subtypes[1].remove(ID_C_volatile);
     subtypes[1].remove(ID_C_restricted);
 
-    expr.make_bool(gcc_types_compatible_p(subtypes[0], subtypes[1]));
+    expr = make_boolean_expr(gcc_types_compatible_p(subtypes[0], subtypes[1]));
     expr.add_source_location()=source_location;
   }
   else if(expr.id()==ID_clang_builtin_convertvector)
