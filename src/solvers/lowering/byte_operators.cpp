@@ -21,8 +21,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/simplify_expr.h>
 #include <util/string_constant.h>
 
-#include "flatten_byte_extract_exceptions.h"
-
 static exprt bv_to_expr(
   const exprt &bitvector_expr,
   const typet &target_type,

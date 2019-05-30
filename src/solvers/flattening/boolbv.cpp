@@ -171,9 +171,6 @@ bvt boolbvt::conversion_failed(const exprt &expr)
 /// \param expr: Expression to convert
 /// \return A vector of literals corresponding to the outputs of the Boolean
 ///   circuit
-/// \throws bitvector_conversion_exceptiont raised if converting byte_extraction
-/// goes wrong.
-/// TODO: extend for other types of conversion exception (diffblue/cbmc#2103).
 bvt boolbvt::convert_bitvector(const exprt &expr)
 {
   if(expr.type().id()==ID_bool)

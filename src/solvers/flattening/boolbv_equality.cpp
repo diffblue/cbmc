@@ -13,8 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <solvers/lowering/expr_lowering.h>
 
-#include "bv_conversion_exceptions.h"
-
 literalt boolbvt::convert_equality(const equal_exprt &expr)
 {
   const bool equality_types_match = expr.lhs().type() == expr.rhs().type();
