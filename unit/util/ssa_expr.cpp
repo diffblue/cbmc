@@ -57,6 +57,7 @@ TEST_CASE("Set level", "[unit][util][ssa_expr]")
       REQUIRE(ssa.get_level_1() == irep_idt{});
       REQUIRE(ssa.get_level_2() == irep_idt{});
       REQUIRE(ssa.get_original_expr() == symbol);
+      REQUIRE(ssa.get_identifier() == "sym!1");
     }
 
     WHEN("set_level_1")
@@ -66,6 +67,7 @@ TEST_CASE("Set level", "[unit][util][ssa_expr]")
       REQUIRE(ssa.get_level_1() == "3");
       REQUIRE(ssa.get_level_2() == irep_idt{});
       REQUIRE(ssa.get_original_expr() == symbol);
+      REQUIRE(ssa.get_identifier() == "sym@3");
     }
 
     WHEN("set_level_2")
@@ -75,6 +77,7 @@ TEST_CASE("Set level", "[unit][util][ssa_expr]")
       REQUIRE(ssa.get_level_1() == irep_idt{});
       REQUIRE(ssa.get_level_2() == "7");
       REQUIRE(ssa.get_original_expr() == symbol);
+      REQUIRE(ssa.get_identifier() == "sym#7");
     }
   }
 }
@@ -104,6 +107,10 @@ TEST_CASE("Set expression", "[unit][util][ssa_expr]")
       THEN("The underlying expression has been replaced")
       {
         REQUIRE(ssa.get_original_expr() == index);
+      }
+      THEN("The identifier is updated")
+      {
+        REQUIRE(ssa.get_identifier() == "sym!1@3#7[[9]]");
       }
     }
   }
