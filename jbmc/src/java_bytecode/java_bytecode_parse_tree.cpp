@@ -161,7 +161,7 @@ void java_bytecode_parse_treet::methodt::output(std::ostream &out) const
       out << "    // " << i.source_location << '\n';
 
     out << "    " << i.address << ": ";
-    out << i.statement;
+    out << bytecode_info[i.bytecode].mnemonic;
 
     bool first = true;
     for(const auto &arg : i.args)

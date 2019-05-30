@@ -304,8 +304,6 @@ protected:
     const methodt &,
     const java_class_typet::java_lambda_method_handlest &);
 
-  const bytecode_infot &get_bytecode_info(const irep_idt &statement);
-
   codet get_clinit_call(const irep_idt &classname);
 
   bool is_method_inherited(

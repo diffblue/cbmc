@@ -590,18 +590,6 @@ void java_bytecode_convert_methodt::convert(
       to_java_class_type(class_symbol.type).lambda_method_handles());
 }
 
-const bytecode_infot &java_bytecode_convert_methodt::get_bytecode_info(
-  const irep_idt &statement)
-{
-  for(const bytecode_infot *p=bytecode_info; p->mnemonic!=nullptr; p++)
-    if(statement==p->mnemonic)
-      return *p;
-
-  error() << "failed to find bytecode mnemonic `"
-          << statement << '\'' << eom;
-  throw 0;
-}
-
 static irep_idt get_if_cmp_operator(const irep_idt &stmt)
 {
   if(stmt==patternt("if_?cmplt"))
@@ -1007,14 +995,16 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
     // a new maximal key
     assert(a_entry.first==--address_map.end());
 
+    const std::string statement = bytecode_info[i_it->bytecode].mnemonic;
+
     // clang-format off
-    if(i_it->statement != "goto" &&
-       i_it->statement != "return" &&
-       i_it->statement != patternt("?return") &&
-       i_it->statement != "athrow" &&
-       i_it->statement != "jsr" &&
-       i_it->statement != "jsr_w" &&
-       i_it->statement != "ret")
+    if(statement != "goto" &&
+       statement != "return" &&
+       statement != patternt("?return") &&
+       statement != "athrow" &&
+       statement != "jsr" &&
+       statement != "jsr_w" &&
+       statement != "ret")
     {
       // clang-format on
       instructionst::const_iterator next=i_it;
@@ -1022,25 +1012,27 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
         a_entry.first->second.successors.push_back(next->address);
     }
 
-    if(i_it->statement=="athrow" ||
-       i_it->statement=="putfield" ||
-       i_it->statement=="getfield" ||
-       i_it->statement=="checkcast" ||
-       i_it->statement=="newarray" ||
-       i_it->statement=="anewarray" ||
-       i_it->statement=="idiv" ||
-       i_it->statement=="ldiv" ||
-       i_it->statement=="irem" ||
-       i_it->statement=="lrem" ||
-       i_it->statement==patternt("?astore") ||
-       i_it->statement==patternt("?aload") ||
-       i_it->statement=="invokestatic" ||
-       i_it->statement=="invokevirtual" ||
-       i_it->statement=="invokespecial" ||
-       i_it->statement=="invokeinterface" ||
-       (threading_support && (i_it->statement=="monitorenter" ||
-       i_it->statement=="monitorexit")))
+    // clang-format off
+    if(statement == "athrow" ||
+       statement == "putfield" ||
+       statement == "getfield" ||
+       statement == "checkcast" ||
+       statement == "newarray" ||
+       statement == "anewarray" ||
+       statement == "idiv" ||
+       statement == "ldiv" ||
+       statement == "irem" ||
+       statement == "lrem" ||
+       statement == patternt("?astore") ||
+       statement == patternt("?aload") ||
+       statement == "invokestatic" ||
+       statement == "invokevirtual" ||
+       statement == "invokespecial" ||
+       statement == "invokeinterface" ||
+       (threading_support &&
+        (statement == "monitorenter" || statement == "monitorexit")))
     {
+      // clang-format on
       const std::vector<method_offsett> handler =
         try_catch_handler(i_it->address, method.exception_table);
       std::list<method_offsett> &successors = a_entry.first->second.successors;
@@ -1048,14 +1040,16 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
       targets.insert(handler.begin(), handler.end());
     }
 
-    if(i_it->statement=="goto" ||
-       i_it->statement==patternt("if_?cmp??") ||
-       i_it->statement==patternt("if??") ||
-       i_it->statement=="ifnonnull" ||
-       i_it->statement=="ifnull" ||
-       i_it->statement=="jsr" ||
-       i_it->statement=="jsr_w")
+    // clang-format off
+    if(statement == "goto" ||
+       statement == patternt("if_?cmp??") ||
+       statement == patternt("if??") ||
+       statement == "ifnonnull" ||
+       statement == "ifnull" ||
+       statement == "jsr" ||
+       statement == "jsr_w")
     {
+      // clang-format on
       PRECONDITION(!i_it->args.empty());
 
       auto target = numeric_cast_v<unsigned>(to_constant_expr(i_it->args[0]));
@@ -1063,8 +1057,7 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
 
       a_entry.first->second.successors.push_back(target);
 
-      if(i_it->statement=="jsr" ||
-         i_it->statement=="jsr_w")
+      if(statement == "jsr" || statement == "jsr_w")
       {
         auto next = std::next(i_it);
         DATA_INVARIANT(
@@ -1073,8 +1066,7 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
         jsr_ret_targets.push_back(next->address);
       }
     }
-    else if(i_it->statement=="tableswitch" ||
-            i_it->statement=="lookupswitch")
+    else if(statement == "tableswitch" || statement == "lookupswitch")
     {
       bool is_label=true;
       for(const auto &arg : i_it->args)
@@ -1088,7 +1080,7 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
         is_label=!is_label;
       }
     }
-    else if(i_it->statement=="ret")
+    else if(statement == "ret")
     {
       // Finish these later, once we've seen all jsr instructions.
       ret_instructions.push_back(i_it);
@@ -1144,11 +1136,11 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
       stack.empty() || instruction.predecessors.size() <= 1 ||
       has_prefix(stack.front().get_string(ID_C_base_name), "$stack"));
 
-    irep_idt statement=i_it->statement;
     exprt arg0=i_it->args.size()>=1?i_it->args[0]:nil_exprt();
     exprt arg1=i_it->args.size()>=2?i_it->args[1]:nil_exprt();
 
-    const bytecode_infot &stmt_bytecode_info = get_bytecode_info(statement);
+    const bytecode_infot &stmt_bytecode_info = bytecode_info[i_it->bytecode];
+    std::string statement = stmt_bytecode_info.mnemonic;
 
     // deal with _idx suffixes
     if(statement.size()>=2 &&

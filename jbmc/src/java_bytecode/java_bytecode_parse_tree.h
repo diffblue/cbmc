@@ -56,7 +56,7 @@ struct java_bytecode_parse_treet
   {
     source_locationt source_location;
     unsigned address;
-    irep_idt statement;
+    u8 bytecode;
     typedef std::vector<exprt> argst;
     argst args;
   };

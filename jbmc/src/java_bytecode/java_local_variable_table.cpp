@@ -184,7 +184,8 @@ static bool is_store_to_slot(
   const java_bytecode_convert_methodt::instructiont &inst,
   unsigned slotidx)
 {
-  const std::string prevstatement=id2string(inst.statement);
+  const std::string prevstatement = bytecode_info[inst.bytecode].mnemonic;
+
   if(!(prevstatement.size()>=1 && prevstatement.substr(1, 5)=="store"))
     return false;
 
