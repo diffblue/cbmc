@@ -17,7 +17,12 @@ class ssa_exprt:public symbol_exprt
 {
 public:
   /// Constructor
-  /// \param expr: Expression to be converted to SSA symbol
+  /// \param expr: Expression to be converted to SSA symbol. A valid argument
+  ///   must be one of these:
+  ///   - a symbol_exprt
+  ///   - a member_exprt where the accessed struct would be a valid argument
+  ///   - an index_exprt where the index is a constant and the array would be
+  ///     a valid argument
   explicit ssa_exprt(const exprt &expr);
 
   void update_type()
