@@ -1,4 +1,6 @@
-#include <assert.h>
+#ifdef __GNUC__
+
+#  include <assert.h>
 
 typedef typeof(((__builtin_va_list*)0)[0][0]) __va_list_tag_type;
 
@@ -18,3 +20,13 @@ int main()
 {
   my_f(1, 2);
 }
+
+#else
+
+// __builtin_va_list is GCC/Clang-only
+
+int main()
+{
+}
+
+#endif
