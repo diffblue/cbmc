@@ -1,0 +1,24 @@
+﻿FUNCTION_BLOCK "Div_Real"
+VERSION : 0.1
+   VAR_INPUT 
+      "I0.0" : Real;
+      "I0.1" : Real;
+   END_VAR
+
+   VAR_OUTPUT 
+      "O0.0" : Real;
+   END_VAR
+
+
+BEGIN
+NETWORK
+TITLE = 
+      L #"I0.0";
+      L #"I0.1";
+      /R;
+      T #"O0.0";
+      NOP 0;
+NETWORK
+TITLE = 
+END_FUNCTION_BLOCK
+

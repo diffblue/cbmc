@@ -23,6 +23,7 @@ DIRS = cbmc \
        goto-cc-cbmc \
        cbmc-cpp \
        goto-cc-goto-analyzer \
+       statement-list \
        systemc \
        contracts \
        goto-cc-file-local \

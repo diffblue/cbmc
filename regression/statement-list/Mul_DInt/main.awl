@@ -1,0 +1,24 @@
+﻿FUNCTION_BLOCK "Mul_DInt"
+VERSION : 0.1
+   VAR_INPUT 
+      "I0.0" : DInt;
+      "I0.1" : DInt;
+   END_VAR
+
+   VAR_OUTPUT 
+      "O0.0" : DInt;
+   END_VAR
+
+
+BEGIN
+NETWORK
+TITLE = 
+      L #"I0.0";
+      L #"I0.1";
+      *D;
+      T #"O0.0";
+      NOP 0;
+NETWORK
+TITLE = 
+END_FUNCTION_BLOCK
+

@@ -1,0 +1,18 @@
+CORE
+main.awl
+--show-parse-tree
+^EXIT=0$
+^SIGNAL=0$
+^Name: "Mul_DInt"$
+^Version: 0[.]1$
+^  \* type: statement_list_dint$
+^  \* identifier: "I0[.]0"$
+^  \* identifier: "I0[.]1"$
+^  \* identifier: "O0[.]0"$
+^statement_list_load	"I0[.]0"$
+^statement_list_load	"I0[.]1"$
+^statement_list_accu_dint_mul$
+^statement_list_transfer	"O0[.]0"$
+^statement_list_nop	0$
+--
+^warning: ignoring
