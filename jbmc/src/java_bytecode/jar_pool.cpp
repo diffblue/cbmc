@@ -13,11 +13,7 @@ jar_filet &jar_poolt::operator()(const std::string &file_name)
 {
   const auto it = m_archives.find(file_name);
   if(it == m_archives.end())
-  {
-    // VS: Can't construct in place
-    auto file = jar_filet(file_name);
-    return m_archives.emplace(file_name, std::move(file)).first->second;
-  }
+    return m_archives.emplace(file_name, jar_filet(file_name)).first->second;
   else
     return it->second;
 }

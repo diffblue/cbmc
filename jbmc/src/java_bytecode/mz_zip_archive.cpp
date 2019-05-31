@@ -73,13 +73,17 @@ size_t mz_zip_archivet::get_num_files()
 
 std::string mz_zip_archivet::get_filename(const size_t index)
 {
-  const auto id=static_cast<mz_uint>(index);
-  std::vector<char> buffer;
-  buffer.resize(mz_zip_reader_get_filename(m_state.get(), id, nullptr, 0));
-  mz_zip_reader_get_filename(m_state.get(), id, buffer.data(), buffer.size());
-  // Buffer may contain junk returned after \0
-  const auto null_char_it=std::find(buffer.cbegin(), buffer.cend(), '\0');
-  return { buffer.cbegin(), null_char_it };
+  const auto id = static_cast<mz_uint>(index);
+  mz_uint name_size = mz_zip_reader_get_filename(m_state.get(), id, nullptr, 0);
+  if(name_size == 0)
+    return {}; // Failure
+  // It is valid to directly write to a string's buffer (see C++11 standard,
+  // basic_string general requirements [string.require], 21.4.1.5)
+  std::string buffer(name_size, '\0');
+  mz_zip_reader_get_filename(m_state.get(), id, &buffer[0], buffer.size());
+  // Buffer contains trailing \0
+  buffer.resize(name_size - 1);
+  return buffer;
 }
 
 std::string mz_zip_archivet::extract(const size_t index)
@@ -89,12 +93,26 @@ std::string mz_zip_archivet::extract(const size_t index)
   const mz_bool stat_ok=mz_zip_reader_file_stat(m_state.get(), id, &file_stat);
   if(stat_ok==MZ_TRUE)
   {
-    std::vector<char> buffer(file_stat.m_uncomp_size);
-    const mz_bool read_ok=mz_zip_reader_extract_to_mem(
-      m_state.get(), id, buffer.data(), buffer.size(), 0);
-    if(read_ok==MZ_TRUE)
-      return { buffer.cbegin(), buffer.cend() };
+    // It is valid to directly write to a string's buffer (see C++11 standard,
+    // basic_string general requirements [string.require], 21.4.1.5)
+    std::string buffer(file_stat.m_uncomp_size, '\0');
+    const mz_bool read_ok = mz_zip_reader_extract_to_mem(
+      m_state.get(), id, &buffer[0], buffer.size(), 0);
+    if(read_ok == MZ_TRUE)
+      return buffer;
   }
   throw std::runtime_error("Could not extract the file");
 }
 
+void mz_zip_archivet::extract_to_file(
+  const size_t index,
+  const std::string &path)
+{
+  const auto id = static_cast<mz_uint>(index);
+  if(
+    mz_zip_reader_extract_to_file(m_state.get(), id, path.c_str(), 0) !=
+    MZ_TRUE)
+  {
+    throw std::runtime_error("Could not extract the file");
+  }
+}
