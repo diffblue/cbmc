@@ -1274,7 +1274,12 @@ static exprt lower_byte_update_byte_array_vector_non_const(
     or_exprt{std::move(lower_bound), std::move(upper_bound)},
     index_exprt{src.op(), array_comprehension_index},
     typecast_exprt::conditional_cast(
-      index_exprt{value_as_byte_array, array_comprehension_index}, subtype)};
+      index_exprt{
+        value_as_byte_array,
+        minus_exprt{array_comprehension_index,
+                    typecast_exprt::conditional_cast(
+                      src.offset(), array_comprehension_index.type())}},
+      subtype)};
 
   return simplify_expr(
     array_comprehension_exprt{array_comprehension_index,
