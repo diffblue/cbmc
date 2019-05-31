@@ -12,5 +12,6 @@ else
   git config remote.origin.fetch +refs/heads/$TRAVIS_BRANCH:refs/remotes/origin/$TRAVIS_BRANCH
   git fetch --unshallow
   git checkout $TMP_HEAD
-  $script_folder/run_diff.sh CPPLINT origin/$TRAVIS_BRANCH # Check for errors compared to merge target
+  MERGE_BASE=$(git merge-base ${TRAVIS_COMMIT_RANGE%...*} ${TRAVIS_COMMIT_RANGE#*...})
+  $script_folder/run_diff.sh CPPLINT $MERGE_BASE
 fi
