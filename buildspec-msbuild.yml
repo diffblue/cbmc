@@ -1,0 +1,39 @@
+version: 0.2
+
+env:
+  variables:
+    # CodeBuild console doesn't display color codes correctly
+    TESTPL_COLOR_OUTPUT: 0
+
+phases:
+  install:
+    commands:
+      - choco install cyg-get -y --no-progress
+      - cyg-get bash patch bison flex make wget perl jq
+      - nuget install clcache -OutputDirectory "c:\tools" -ExcludeVersion -Version 4.1.0
+
+  build:
+    commands:
+      - |
+        $env:Path = "C:\tools\cygwin\bin;$env:Path"
+        bash -c "make -C src minisat2-download DOWNLOADER=wget"
+
+      - |
+        $env:Path = "C:\tools\cygwin\bin;c:\tools\clcache\clcache-4.1.0;$env:Path"
+        $env:CLCACHE_DIR = "C:\clcache"
+        $env:CLCACHE_BASEDIR = (Get-Item -Path ".\").FullName
+        cmd /c 'bash -c "cd scripts ; ./generate_vcxproj"'
+        cmd /c 'call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64 && bash -c "make CXX=clcache.exe -j4 -C src BUILD_ENV=MSVC generated_files"'
+        $env:Path = "C:\Program Files (x86)\MSBuild\14.0\Bin;$env:Path"
+        msbuild /p:CLToolExe=clcache.exe /m:4 cbmc.vcxproj
+
+      - |
+        # display cache stats
+        $env:Path = "C:\tools\cygwin\bin;c:\tools\clcache\clcache-4.1.0;$env:Path"
+        $env:CLCACHE_DIR = "C:\clcache"
+        $env:CLCACHE_BASEDIR = (Get-Item -Path ".\").FullName
+        cmd /c 'clcache -s'
+
+cache:
+  paths:
+    - 'c:\clcache\**\*'
