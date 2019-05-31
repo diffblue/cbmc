@@ -292,6 +292,19 @@ constant_exprt make_boolean_expr(bool value)
 
 exprt make_and(exprt a, exprt b)
 {
+  PRECONDITION(a.type().id() == ID_bool && b.type().id() == ID_bool);
+  if(b.is_constant())
+  {
+    if(b.get(ID_value) == ID_false)
+      return false_exprt{};
+    return a;
+  }
+  if(a.is_constant())
+  {
+    if(a.get(ID_value) == ID_false)
+      return false_exprt{};
+    return b;
+  }
   if(b.id() == ID_and)
   {
     b.add_to_operands(std::move(a));

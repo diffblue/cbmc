@@ -101,7 +101,8 @@ protected:
 constant_exprt make_boolean_expr(bool);
 
 /// Conjunction of two expressions. If the second is already an `and_exprt`
-/// add to its operands instead of creating a new expression.
+/// add to its operands instead of creating a new expression. If one is `true`,
+/// return the other expression. If one is `false` returns `false`.
 exprt make_and(exprt a, exprt b);
 
 #endif // CPROVER_UTIL_EXPR_UTIL_H
