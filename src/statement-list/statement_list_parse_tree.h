@@ -170,6 +170,9 @@ public:
     /// Prints the function in a human-readable form to the given output
     /// stream.
     virtual void output(std::ostream &out) const;
+
+    // destructor
+    virtual ~functiont() = default;
   };
   using functionst = std::list<functiont>;
 
