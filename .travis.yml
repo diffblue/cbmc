@@ -18,7 +18,9 @@ jobs:
         clang-format-7 --version
         # build a pathspec that excludes the files in .clang-format-ignore
         while read file ; do echo EXCLUDES+="':(top,exclude)$file' " ; done < .clang-format-ignore
-        git-clang-format-7 --binary clang-format-7 "${TRAVIS_BRANCH}" -- $EXCLUDES
+        MERGE_BASE=$(git merge-base ${TRAVIS_COMMIT_RANGE%...*} ${TRAVIS_COMMIT_RANGE#*...})
+        echo "Checking for formatting errors introduced since $MERGE_BASE"
+        git-clang-format-7 --binary clang-format-7 $MERGE_BASE -- $EXCLUDES
         git diff > formatted.diff
         if [[ -s formatted.diff ]] ; then
           echo 'Formatting error! The following diff shows the required changes'
