@@ -10,5 +10,10 @@ int main()
   assert(result == x_before);
   assert(x == x_before + v);
 
+  x_before = x;
+  result = __atomic_fetch_nand(p, x, 0);
+  assert(result == x_before);
+  assert(x == ~x_before);
+
   return 0;
 }

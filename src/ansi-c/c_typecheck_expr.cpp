@@ -207,11 +207,13 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
     typecheck_expr_sizeof(expr);
   else if(expr.id()==ID_alignof)
     typecheck_expr_alignof(expr);
-  else if(expr.id()==ID_plus || expr.id()==ID_minus ||
-          expr.id()==ID_mult || expr.id()==ID_div ||
-          expr.id()==ID_mod ||
-          expr.id()==ID_bitand || expr.id()==ID_bitxor || expr.id()==ID_bitor)
+  else if(
+    expr.id() == ID_plus || expr.id() == ID_minus || expr.id() == ID_mult ||
+    expr.id() == ID_div || expr.id() == ID_mod || expr.id() == ID_bitand ||
+    expr.id() == ID_bitxor || expr.id() == ID_bitor || expr.id() == ID_bitnand)
+  {
     typecheck_expr_binary_arithmetic(expr);
+  }
   else if(expr.id()==ID_shl || expr.id()==ID_shr)
     typecheck_expr_shifts(to_shift_expr(expr));
   else if(expr.id()==ID_comma)
@@ -3136,9 +3138,9 @@ void c_typecheck_baset::typecheck_expr_binary_arithmetic(exprt &expr)
       }
     }
   }
-  else if(expr.id()==ID_bitand ||
-          expr.id()==ID_bitxor ||
-          expr.id()==ID_bitor)
+  else if(
+    expr.id() == ID_bitand || expr.id() == ID_bitnand ||
+    expr.id() == ID_bitxor || expr.id() == ID_bitor)
   {
     if(type0==type1)
     {
@@ -3151,6 +3153,8 @@ void c_typecheck_baset::typecheck_expr_binary_arithmetic(exprt &expr)
       {
         if(expr.id()==ID_bitand)
           expr.id(ID_and);
+        else if(expr.id() == ID_bitnand)
+          expr.id(ID_nand);
         else if(expr.id()==ID_bitor)
           expr.id(ID_or);
         else if(expr.id()==ID_bitxor)
