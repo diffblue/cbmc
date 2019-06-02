@@ -19,6 +19,7 @@ class string_constraint_generatort;
 class string_builtin_functiont
 {
 public:
+  string_builtin_functiont() = delete;
   string_builtin_functiont(const string_builtin_functiont &) = delete;
   virtual ~string_builtin_functiont() = default;
 
@@ -59,9 +60,6 @@ public:
   {
     return true;
   }
-
-private:
-  string_builtin_functiont() = default;
 
 protected:
   array_poolt &array_pool;
