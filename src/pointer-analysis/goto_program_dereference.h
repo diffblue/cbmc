@@ -65,8 +65,11 @@ protected:
 
   const symbolt *get_or_create_failed_symbol(const exprt &expr) override;
 
+  DEPRECATED(SINCE(2019, 05, 22, "use vector returning version instead"))
   void
   get_value_set(const exprt &expr, value_setst::valuest &dest) const override;
+
+  std::vector<exprt> get_value_set(const exprt &expr) const override;
 
   void dereference_instruction(
     goto_programt::targett target,

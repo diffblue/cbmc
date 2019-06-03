@@ -107,3 +107,10 @@ void symex_dereference_statet::get_value_set(
   std::cout << "**************************\n";
 #endif
 }
+
+/// Just forwards a value-set query to `state.value_set`
+std::vector<exprt>
+symex_dereference_statet::get_value_set(const exprt &expr) const
+{
+  return state.value_set.get_value_set(expr, ns);
+}

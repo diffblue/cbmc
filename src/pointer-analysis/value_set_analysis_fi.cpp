@@ -195,3 +195,17 @@ bool value_set_analysis_fit::check_type(const typet &type)
 
   return false;
 }
+
+std::vector<exprt> value_set_analysis_fit::get_values(
+  const irep_idt &function_id,
+  flow_insensitive_analysis_baset::locationt l,
+  const exprt &expr)
+{
+  state.value_set.from_function =
+    state.value_set.function_numbering.number(function_id);
+  state.value_set.to_function =
+    state.value_set.function_numbering.number(function_id);
+  state.value_set.from_target_index = l->location_number;
+  state.value_set.to_target_index = l->location_number;
+  return state.value_set.get_value_set(expr, ns);
+}

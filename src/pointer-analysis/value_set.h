@@ -80,6 +80,7 @@ public:
   /// Represents the offset into an object: either a unique integer offset,
   /// or an unknown value, represented by `!offset`.
   typedef optionalt<mp_integer> offsett;
+  DEPRECATED(SINCE(2019, 05, 22, "Unused"))
   bool offset_is_zero(const offsett &offset) const
   {
     return offset && offset->is_zero();
@@ -236,11 +237,13 @@ public:
 
   /// Set of expressions; only used for the `get` API, not for internal
   /// data representation.
+  DEPRECATED(SINCE(2019, 05, 22, "Only used in deprecated function"))
   typedef std::set<exprt> expr_sett;
 
   /// Set of dynamic object numbers, equivalent to a set of
   /// `dynamic_object_exprt`s with corresponding IDs. Used only in internal
   /// implementation details.
+  DEPRECATED(SINCE(2019, 05, 22, "Unused"))
   typedef std::set<unsigned int> dynamic_object_id_sett;
 
   /// Map representing the entire value set, mapping from string LHS IDs
@@ -258,17 +261,24 @@ public:
   /// `entryt` fields.
   typedef sharing_mapt<irep_idt, entryt> valuest;
 
-  /// Gets values pointed to by `expr`, including following dereference
+  /// Gets values pointed to by \p expr, including following dereference
   /// operators (i.e. this is not a simple lookup in `valuest`).
-  /// \param expr: query expression
-  /// \param [out] dest: assigned a set of expressions that `expr` may point to
-  /// \param ns: global namespace
+  DEPRECATED(
+    SINCE(2019, 05, 22, "Use get_value_set(exprt, const namespacet &) instead"))
   void get_value_set(
-    const exprt &expr,
+    exprt expr,
     value_setst::valuest &dest,
     const namespacet &ns) const;
 
+  /// Gets values pointed to by `expr`, including following dereference
+  /// operators (i.e. this is not a simple lookup in `valuest`).
+  /// \param expr: query expression
+  /// \param ns: global namespace
+  /// \return list of expressions that `expr` may point to
+  std::vector<exprt> get_value_set(exprt expr, const namespacet &ns) const;
+
   /// Appears to be unimplemented.
+  DEPRECATED(SINCE(2019, 05, 22, "Unimplemented"))
   expr_sett &get(const irep_idt &identifier, const std::string &suffix);
 
   void clear()
@@ -454,17 +464,24 @@ public:
   void erase_symbol(const symbol_exprt &symbol_expr, const namespacet &ns);
 
 protected:
-  /// Reads the set of objects pointed to by `expr`, including making
+  /// Reads the set of objects pointed to by \p expr, including making
   /// recursive lookups for dereference operations etc.
-  /// \param expr: query expression
-  /// \param [out] dest: overwritten by the set of object numbers pointed to
-  /// \param ns: global namespace
-  /// \param is_simplified: if false, simplify `expr` before reading.
+  DEPRECATED(
+    SINCE(2019, 05, 22, "Use the version returning object_mapt instead"))
   void get_value_set(
-    const exprt &expr,
+    exprt expr,
     object_mapt &dest,
     const namespacet &ns,
     bool is_simplified) const;
+
+  /// Reads the set of objects pointed to by `expr`, including making
+  /// recursive lookups for dereference operations etc.
+  /// \param expr: query expression
+  /// \param ns: global namespace
+  /// \param is_simplified: if false, simplify `expr` before reading.
+  /// \return the set of object numbers pointed to
+  object_mapt
+  get_value_set(exprt expr, const namespacet &ns, bool is_simplified) const;
 
   /// See the other overload of `get_reference_set`. This one returns object
   /// numbers and offsets instead of expressions.

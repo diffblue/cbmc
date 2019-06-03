@@ -21,6 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/simplify_expr.h>
 
 #include <langapi/language_util.h>
+#include <util/range.h>
 
 #ifdef DEBUG
 #include <iostream>
@@ -308,8 +309,7 @@ bool value_sett::eval_pointer_offset(
   {
     assert(expr.operands().size()==1);
 
-    object_mapt reference_set;
-    get_value_set(expr.op0(), reference_set, ns, true);
+    const object_mapt reference_set = get_value_set(expr.op0(), ns, true);
 
     exprt new_expr;
     mp_integer previous_offset=0;
@@ -352,12 +352,11 @@ bool value_sett::eval_pointer_offset(
 }
 
 void value_sett::get_value_set(
-  const exprt &expr,
+  exprt expr,
   value_setst::valuest &dest,
   const namespacet &ns) const
 {
-  object_mapt object_map;
-  get_value_set(expr, object_map, ns, false);
+  object_mapt object_map = get_value_set(std::move(expr), ns, false);
 
   for(object_map_dt::const_iterator
       it=object_map.read().begin();
@@ -372,17 +371,37 @@ void value_sett::get_value_set(
   #endif
 }
 
+std::vector<exprt>
+value_sett::get_value_set(exprt expr, const namespacet &ns) const
+{
+  const object_mapt object_map = get_value_set(std::move(expr), ns, false);
+  return make_range(object_map.read())
+    .map([&](const object_map_dt::value_type &pair) { return to_expr(pair); });
+}
+
 void value_sett::get_value_set(
-  const exprt &expr,
+  exprt expr,
   object_mapt &dest,
   const namespacet &ns,
   bool is_simplified) const
 {
-  exprt tmp(expr);
   if(!is_simplified)
-    simplify(tmp, ns);
+    simplify(expr, ns);
 
-  get_value_set_rec(tmp, dest, "", tmp.type(), ns);
+  get_value_set_rec(expr, dest, "", expr.type(), ns);
+}
+
+value_sett::object_mapt value_sett::get_value_set(
+  exprt expr,
+  const namespacet &ns,
+  bool is_simplified) const
+{
+  if(!is_simplified)
+    simplify(expr, ns);
+
+  object_mapt dest;
+  get_value_set_rec(expr, dest, "", expr.type(), ns);
+  return dest;
 }
 
 /// Check if 'suffix' starts with 'field'.
@@ -1304,8 +1323,7 @@ void value_sett::assign(
   else
   {
     // basic type
-    object_mapt values_rhs;
-    get_value_set(rhs, values_rhs, ns, is_simplified);
+    object_mapt values_rhs = get_value_set(rhs, ns, is_simplified);
 
     // Permit custom subclass to alter the read values prior to write:
     adjust_assign_rhs_values(rhs, ns, values_rhs);
