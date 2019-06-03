@@ -27,6 +27,49 @@ struct static_verifier_resultt
   irep_idt function_id;
 };
 
+void static_verifier(
+  const abstract_goto_modelt &abstract_goto_model,
+  const ai_baset &ai,
+  propertiest &properties)
+{
+  const namespacet ns{abstract_goto_model.get_symbol_table()};
+  // this is mutable because we want to change the property status
+  // in this loop
+  for(auto &property : properties)
+  {
+    auto &property_status = property.second.status;
+    const goto_programt::const_targett &property_location = property.second.pc;
+    exprt condition = property_location->get_condition();
+    const std::unique_ptr<ai_baset::statet> predecessor_state_copy =
+      ai.abstract_state_before(property_location);
+    // simplify the condition given the domain information we have
+    // about the state right before the assertion is evaluated
+    predecessor_state_copy->ai_simplify(condition, ns);
+    // if the condition simplifies to true the assertion always succeeds
+    if(condition.is_true())
+    {
+      property_status = property_statust::PASS;
+    }
+    // if the condition simplifies to false the assertion always fails
+    else if(condition.is_false())
+    {
+      property_status = property_statust::FAIL;
+    }
+    // if the domain state is bottom then the assertion is definitely
+    // unreachable
+    else if(predecessor_state_copy->is_bottom())
+    {
+      property_status = property_statust::NOT_REACHABLE;
+    }
+    // if the condition isn't definitely true, false or unreachable
+    // we don't know whether or not it may fail
+    else
+    {
+      property_status = property_statust::UNKNOWN;
+    }
+  }
+}
+
 /// Makes a status message string from a status.
 static const char *message(const static_verifier_resultt::statust &status)
 {

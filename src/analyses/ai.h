@@ -68,12 +68,12 @@ public:
   }
 
   /// Run abstract interpretation on a whole program
-  void operator()(const goto_modelt &goto_model)
+  void operator()(const abstract_goto_modelt &goto_model)
   {
-    const namespacet ns(goto_model.symbol_table);
-    initialize(goto_model.goto_functions);
-    entry_state(goto_model.goto_functions);
-    fixedpoint(goto_model.goto_functions, ns);
+    const namespacet ns(goto_model.get_symbol_table());
+    initialize(goto_model.get_goto_functions());
+    entry_state(goto_model.get_goto_functions());
+    fixedpoint(goto_model.get_goto_functions(), ns);
     finalize();
   }
 
@@ -374,7 +374,7 @@ protected:
 ///    \ref ai_baset#operator()(const irep_idt&,const goto_programt&, <!--
 ///    --> const namespacet&),
 ///    \ref ai_baset#operator()(const goto_functionst&,const namespacet&)
-///    and \ref ai_baset#operator()(const goto_modelt&)
+///    and \ref ai_baset#operator()(const abstract_goto_modelt&)
 /// 2. Accessing the results of an analysis, by looking up the result
 ///    for a given location \p l using
 ///    \ref ait#operator[](goto_programt::const_targett).

@@ -12,6 +12,7 @@ target_link_libraries(goto-analyzer-lib
     cpp
     linking
     big-int
+    goto-checker
     goto-programs
     analyses
     pointer-analysis
