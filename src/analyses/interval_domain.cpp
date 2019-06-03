@@ -486,6 +486,8 @@ bool interval_domaint::ai_simplify(
   bool unchanged=true;
   interval_domaint d(*this);
 
+  condition = simplify_expr(condition, ns);
+
   // merge intervals to properly handle conjunction
   if(condition.id()==ID_and)              // May be directly representable
   {
