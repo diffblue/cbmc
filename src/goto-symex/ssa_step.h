@@ -195,4 +195,19 @@ public:
   void validate(const namespacet &ns, const validation_modet vm) const;
 };
 
+class SSA_assignment_stept : public SSA_stept
+{
+public:
+  SSA_assignment_stept(
+    symex_targett::sourcet source,
+    exprt guard,
+    ssa_exprt ssa_lhs,
+    exprt ssa_full_lhs,
+    exprt original_full_lhs,
+    exprt ssa_rhs,
+    exprt cond_expr,
+    symex_targett::assignment_typet assignment_type,
+    bool hidden);
+};
+
 #endif // CPROVER_GOTO_SYMEX_SSA_STEP_H

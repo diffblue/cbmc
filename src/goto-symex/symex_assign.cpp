@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/c_types.h>
 #include <util/cprover_prefix.h>
 #include <util/exception_utils.h>
+#include <util/expr_util.h>
 #include <util/pointer_offset_size.h>
 #include <util/simplify_expr.h>
 
@@ -79,9 +80,13 @@ void goto_symext::symex_assign(statet &state, const code_assignt &code)
   }
 }
 
-exprt goto_symext::add_to_lhs(
-  const exprt &lhs,
-  const exprt &what)
+/// Store the \p what expression by recursively descending into the operands
+/// of \p lhs until the first operand \c op0 is _nil_: this _nil_ operand
+/// is then replaced with \p what.
+/// \param lhs: Non-symbol pointed-to expression
+/// \param what: The expression to be added to the \p lhs
+/// \return The resulting expression
+static exprt add_to_lhs(const exprt &lhs, const exprt &what)
 {
   PRECONDITION(lhs.id() != ID_symbol);
   exprt tmp_what=what;
@@ -387,7 +392,7 @@ void goto_symext::symex_assign_from_struct(
   const ssa_exprt &lhs, // L1
   const exprt &full_lhs,
   const struct_exprt &rhs,
-  exprt::operandst &guard,
+  const exprt::operandst &guard,
   assignment_typet assignment_type)
 {
   const struct_typet &type = to_struct_type(ns.follow(lhs.type()));
@@ -419,7 +424,7 @@ void goto_symext::symex_assign_symbol(
   const ssa_exprt &lhs, // L1
   const exprt &full_lhs,
   const exprt &rhs,
-  exprt::operandst &guard,
+  const exprt::operandst &guard,
   assignment_typet assignment_type)
 {
   // Shortcut the common case of a whole-struct initializer:
@@ -452,16 +457,16 @@ void goto_symext::symex_assign_symbol(
 
   do_simplify(assignment.rhs);
 
-  ssa_exprt &l1_lhs = assignment.lhs;
-  ssa_exprt l2_lhs = state
-                       .assignment(
-                         assignment.lhs,
-                         assignment.rhs,
-                         ns,
-                         symex_config.simplify_opt,
-                         symex_config.constant_propagation,
-                         symex_config.allow_pointer_unsoundness)
-                       .get();
+  const ssa_exprt &l1_lhs = assignment.lhs;
+  const ssa_exprt l2_lhs = state
+                             .assignment(
+                               assignment.lhs,
+                               assignment.rhs,
+                               ns,
+                               symex_config.simplify_opt,
+                               symex_config.constant_propagation,
+                               symex_config.allow_pointer_unsoundness)
+                             .get();
 
   exprt ssa_full_lhs = add_to_lhs(full_lhs, l2_lhs);
   state.record_events.push(false);
@@ -481,12 +486,12 @@ void goto_symext::symex_assign_symbol(
               << messaget::eom;
     });
 
-  // Temporarily add the state guard
-  guard.emplace_back(state.guard.as_expr());
+  const exprt assignment_guard =
+    make_and(state.guard.as_expr(), conjunction(guard));
 
   const exprt original_lhs = get_original_name(l2_full_lhs);
   target.assignment(
-    conjunction(guard),
+    assignment_guard,
     l2_lhs,
     l2_full_lhs,
     original_lhs,
@@ -505,9 +510,6 @@ void goto_symext::symex_assign_symbol(
     state.propagation.erase_if_exists(l1_lhs.get_identifier());
     state.value_set.erase_symbol(l1_lhs, ns);
   }
-
-  // Restore the guard
-  guard.pop_back();
 }
 
 void goto_symext::symex_assign_typecast(
@@ -564,10 +566,8 @@ void goto_symext::symex_assign_array(
   // into
   //   a'==a WITH [i:=e]
 
-  with_exprt new_rhs(lhs_array, lhs_index, rhs);
-  new_rhs.type() = lhs_index_type;
-
-  exprt new_full_lhs=add_to_lhs(full_lhs, lhs);
+  const with_exprt new_rhs{lhs_array, lhs_index, rhs};
+  const exprt new_full_lhs = add_to_lhs(full_lhs, lhs);
 
   symex_assign_rec(
     state, lhs_array, new_full_lhs, new_rhs, guard, assignment_type);
