@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <memory>
 
 #include <util/expr.h>
+#include <util/narrow.h>
 
 class qualifierst
 {
@@ -149,8 +150,9 @@ public:
 
   virtual std::size_t count() const override
   {
-    return is_constant+is_volatile+is_restricted+is_atomic+
-           is_ptr32+is_ptr64+is_noreturn;
+    return narrow_cast<std::size_t>(
+      is_constant + is_volatile + is_restricted + is_atomic + is_ptr32 +
+      is_ptr64 + is_noreturn);
   }
 };
 

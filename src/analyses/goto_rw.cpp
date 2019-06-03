@@ -163,8 +163,8 @@ void rw_range_sett::get_objects_byte_extract(
       be.op().type(),
       be.id()==ID_byte_extract_little_endian,
       ns);
-    range_spect offset =
-      range_start + map.map_bit(numeric_cast_v<std::size_t>(*index));
+    range_spect offset = narrow_cast<range_spect>(
+      range_start + map.map_bit(numeric_cast_v<std::size_t>(*index)));
     get_objects_rec(mode, be.op(), offset, size);
   }
 }
@@ -318,8 +318,8 @@ void rw_range_sett::get_objects_array(
 
   range_spect offset=0;
   range_spect full_r_s=range_start==-1 ? 0 : range_start;
-  range_spect full_r_e=
-    size==-1 ? sub_size*expr.operands().size() : full_r_s+size;
+  range_spect full_r_e = narrow_cast<range_spect>(
+    size == -1 ? sub_size * expr.operands().size() : full_r_s + size);
 
   forall_operands(it, expr)
   {

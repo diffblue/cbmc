@@ -134,7 +134,8 @@ literalt boolbvt::convert_overflow(const exprt &expr)
     if(rep == bv_utilst::representationt::UNSIGNED)
     {
       // get top result bits
-      result.erase(result.begin(), result.begin() + old_size);
+      result.erase(
+        result.begin(), result.begin() + narrow_cast<std::ptrdiff_t>(old_size));
 
       // one of the top bits is non-zero
       overflow=prop.lor(result);
@@ -143,7 +144,9 @@ literalt boolbvt::convert_overflow(const exprt &expr)
     {
       // get top result bits plus sign bit
       DATA_INVARIANT(old_size != 0, "zero-size operand");
-      result.erase(result.begin(), result.begin() + old_size - 1);
+      result.erase(
+        result.begin(),
+        result.begin() + narrow_cast<std::ptrdiff_t>(old_size) - 1);
 
       // the sign bit has changed
       literalt sign_change=!prop.lequal(bv0.back(), result.front());

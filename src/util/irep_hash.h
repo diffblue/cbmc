@@ -72,6 +72,8 @@ static FORCE_INLINE uint64_t ROTL64(uint64_t x, int8_t r)
 
 #ifdef IREP_HASH_BASIC
 
+#  include "narrow.h"
+
 template<int>
 std::size_t basic_hash_combine(
   std::size_t h1,
@@ -82,7 +84,8 @@ inline std::size_t basic_hash_combine<32>(
   std::size_t h1,
   std::size_t h2)
 {
-  return ROTL32(h1, 7)^h2;
+  return narrow_cast<std::size_t>(
+    ROTL32(narrow_cast<uint32_t>(h1), 7) ^ narrow_cast<uint32_t>(h2));
 }
 
 template<>

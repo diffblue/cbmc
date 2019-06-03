@@ -16,6 +16,7 @@ Author: CM Wintersteiger, 2006
 #include <iostream>
 #include <fstream>
 
+#include <util/narrow.h>
 #include <util/prefix.h>
 
 // clang-format off
@@ -226,7 +227,7 @@ bool gcc_cmdlinet::parse(int argc, const char **argv)
   add_arg(argv[0]);
 
   argst current_args;
-  current_args.reserve(argc - 1);
+  current_args.reserve(narrow_cast<std::size_t>(argc - 1));
 
   for(int i=1; i<argc; i++)
     current_args.push_back(argv[i]);

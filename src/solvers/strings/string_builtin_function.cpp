@@ -132,8 +132,8 @@ std::vector<mp_integer> string_concatenation_builtin_functiont::eval(
   std::vector<mp_integer> eval_result(input1_value);
   eval_result.insert(
     eval_result.end(),
-    input2_value.begin() + numeric_cast_v<std::size_t>(start_index),
-    input2_value.begin() + numeric_cast_v<std::size_t>(end_index));
+    input2_value.begin() + numeric_cast_v<std::ptrdiff_t>(start_index),
+    input2_value.begin() + numeric_cast_v<std::ptrdiff_t>(end_index));
   return eval_result;
 }
 
@@ -474,9 +474,9 @@ std::vector<mp_integer> string_insertion_builtin_functiont::eval(
 
   std::vector<mp_integer> eval_result(input1_value);
   eval_result.insert(
-    eval_result.begin() + numeric_cast_v<std::size_t>(offset),
-    input2_value.begin() + numeric_cast_v<std::size_t>(start),
-    input2_value.begin() + numeric_cast_v<std::size_t>(end));
+    eval_result.begin() + numeric_cast_v<std::ptrdiff_t>(offset),
+    input2_value.begin() + numeric_cast_v<std::ptrdiff_t>(start),
+    input2_value.begin() + numeric_cast_v<std::ptrdiff_t>(end));
   return eval_result;
 }
 

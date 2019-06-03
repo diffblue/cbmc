@@ -53,7 +53,8 @@ bvt boolbvt::convert_mult(const mult_exprt &expr)
       bv=bv_utils.signed_multiplier(bv, op);
 
       // cut it down again
-      bv.erase(bv.begin(), bv.begin()+fraction_bits);
+      bv.erase(
+        bv.begin(), bv.begin() + narrow_cast<std::ptrdiff_t>(fraction_bits));
     }
 
     return bv;

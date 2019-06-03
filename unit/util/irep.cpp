@@ -153,7 +153,7 @@ SCENARIO("irept_memory", "[core][utils][irept]")
       irep.add("a_new_element", irep2);
       REQUIRE(!irept::is_comment("a_new_element"));
       REQUIRE(irep.find("a_new_element").id() == "second_irep");
-      std::size_t named_sub_size =
+      auto named_sub_size =
         std::distance(irep.get_named_sub().begin(), irep.get_named_sub().end());
       REQUIRE(named_sub_size == 1);
 

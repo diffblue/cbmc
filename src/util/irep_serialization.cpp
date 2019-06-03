@@ -17,6 +17,7 @@ Date: May 2007
 #include <iostream>
 
 #include "exception_utils.h"
+#include "narrow.h"
 #include "string_hash.h"
 
 void irep_serializationt::write_irep(
@@ -142,7 +143,7 @@ void write_gb_word(std::ostream &out, std::size_t u)
 
     if(u==0)
     {
-      out.put(value);
+      out.put(narrow_cast<char>(value));
       break;
     }
 

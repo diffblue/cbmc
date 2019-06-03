@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <vector>
 
 #include "invariant.h"
+#include "narrow.h"
 #include "numbering.h"
 
 // Standard union find with weighting and path compression.
@@ -163,7 +164,8 @@ public:
   bool make_union(typename numbering<T>::const_iterator it_a,
                   typename numbering<T>::const_iterator it_b)
   {
-    size_type na=it_a-numbers.begin(), nb=it_b-numbers.begin();
+    size_type na = narrow_cast<size_type>(it_a - numbers.begin()),
+              nb = narrow_cast<size_type>(it_b - numbers.begin());
     bool is_union=find_number(na)==find_number(nb);
     uuf.make_union(na, nb);
     return is_union;
@@ -186,12 +188,14 @@ public:
   bool same_set(typename numbering<T>::const_iterator it_a,
                 typename numbering<T>::const_iterator it_b) const
   {
-    return uuf.same_set(it_a-numbers.begin(), it_b-numbers.begin());
+    return uuf.same_set(
+      narrow_cast<size_type>(it_a - numbers.begin()),
+      narrow_cast<size_type>(it_b - numbers.begin()));
   }
 
   const T &find(typename numbering<T>::const_iterator it) const
   {
-    return numbers[find_number(it-numbers.begin())];
+    return numbers[find_number(narrow_cast<size_type>(it - numbers.begin()))];
   }
 
   const T &find(const T &a)
@@ -201,7 +205,7 @@ public:
 
   size_type find_number(typename numbering<T>::const_iterator it) const
   {
-    return find_number(it-numbers.begin());
+    return find_number(narrow_cast<size_type>(it - numbers.begin()));
   }
 
   size_type find_number(size_type a) const
@@ -230,7 +234,7 @@ public:
 
   bool is_root(typename numbering<T>::const_iterator it) const
   {
-    return uuf.is_root(it-numbers.begin());
+    return uuf.is_root(narrow_cast<size_type>(it - numbers.begin()));
   }
 
   size_type number(const T &a)
@@ -253,7 +257,7 @@ public:
 
   void isolate(typename numbering<T>::const_iterator it)
   {
-    uuf.isolate(it-numbers.begin());
+    uuf.isolate(narrow_cast<size_type>(it - numbers.begin()));
   }
 
   void isolate(const T &a)
