@@ -281,3 +281,22 @@ resultt determine_result(const propertiest &properties)
   }
   UNREACHABLE;
 }
+
+std::string
+as_string(const assumption_infot &assumption_info)
+{
+  return assumption_info.description;
+}
+
+xmlt xml(const assumption_infot &assumption_info)
+{
+  xmlt xml_assumption("assumption");
+  xml_assumption.data = assumption_info.description;
+  return xml_assumption;
+}
+
+json_objectt
+json(const assumption_infot &assumption_info)
+{
+  return json_objectt{{"description", json_stringt{assumption_info.description}}};
+}

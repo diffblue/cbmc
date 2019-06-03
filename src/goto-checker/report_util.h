@@ -26,11 +26,13 @@ void report_inconclusive(ui_message_handlert &);
 void report_error(ui_message_handlert &);
 
 void output_properties(
+  const assumptionst &assumptions,
   const propertiest &properties,
   std::size_t iterations,
   ui_message_handlert &ui_message_handler);
 
 void output_properties_with_traces(
+  const assumptionst &assumptions,
   const propertiest &properties,
   const goto_trace_storaget &traces,
   const trace_optionst &trace_options,
@@ -38,6 +40,7 @@ void output_properties_with_traces(
   ui_message_handlert &ui_message_handler);
 
 void output_properties_with_fault_localization(
+  const assumptionst &assumptions,
   const propertiest &properties,
   const std::unordered_map<irep_idt, fault_location_infot> &,
   std::size_t iterations,

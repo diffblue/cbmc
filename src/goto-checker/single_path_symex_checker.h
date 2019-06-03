@@ -34,7 +34,7 @@ public:
     ui_message_handlert &ui_message_handler,
     abstract_goto_modelt &goto_model);
 
-  resultt operator()(propertiest &) override;
+  resultt operator()(assumptionst &, propertiest &) override;
 
   goto_tracet build_full_trace() const override;
   goto_tracet build_shortest_trace() const override;

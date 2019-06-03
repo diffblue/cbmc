@@ -39,7 +39,7 @@ multi_path_symex_only_checkert::multi_path_symex_only_checkert(
 }
 
 incremental_goto_checkert::resultt multi_path_symex_only_checkert::
-operator()(propertiest &properties)
+operator()(assumptionst &assumptions, propertiest &properties)
 {
   generate_equation();
 
@@ -60,7 +60,7 @@ operator()(propertiest &properties)
   }
 
   resultt result(resultt::progresst::DONE);
-  update_properties(properties, result.updated_properties);
+  update_properties(assumptions, properties, result.updated_properties);
   return result;
 }
 
@@ -72,6 +72,7 @@ void multi_path_symex_only_checkert::generate_equation()
 }
 
 void multi_path_symex_only_checkert::update_properties(
+  assumptionst &assumptions,
   propertiest &properties,
   std::unordered_set<irep_idt> &updated_properties)
 {
@@ -79,7 +80,7 @@ void multi_path_symex_only_checkert::update_properties(
     update_properties_from_goto_model(properties, goto_model);
 
   update_properties_status_from_symex_target_equation(
-    properties, updated_properties, equation);
+    assumptions, properties, updated_properties, equation, ns);
   // Since we will not symex any further we can decide the status
   // of all properties that do not occur in the equation now.
   // The current behavior is PASS.

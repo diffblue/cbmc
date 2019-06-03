@@ -206,10 +206,11 @@ bool symex_bmct::get_unwind_recursion(
   return abort;
 }
 
-void symex_bmct::no_body(const irep_idt &identifier)
+void symex_bmct::no_body(const symex_targett::sourcet &source, const irep_idt &identifier)
 {
   if(body_warnings.insert(identifier).second)
   {
+    // assumptions.emplace_back();
     log.warning() << "**** WARNING: no body for function " << identifier
                   << log.eom;
   }

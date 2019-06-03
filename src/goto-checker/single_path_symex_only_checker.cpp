@@ -33,7 +33,7 @@ single_path_symex_only_checkert::single_path_symex_only_checkert(
 }
 
 incremental_goto_checkert::resultt single_path_symex_only_checkert::
-operator()(propertiest &properties)
+operator()(assumptionst &assumptions, propertiest &properties)
 {
   resultt result(resultt::progresst::DONE);
 
@@ -45,7 +45,7 @@ operator()(propertiest &properties)
 
     (void)resume_path(path);
 
-    update_properties(properties, result.updated_properties, path.equation);
+    update_properties(assumptions, properties, result.updated_properties, path.equation);
 
     worklist->pop();
   }
@@ -139,6 +139,7 @@ void single_path_symex_only_checkert::setup_symex(symex_bmct &symex)
 }
 
 void single_path_symex_only_checkert::update_properties(
+  assumptionst &assumptions,
   propertiest &properties,
   std::unordered_set<irep_idt> &updated_properties,
   const symex_target_equationt &equation)
@@ -147,7 +148,7 @@ void single_path_symex_only_checkert::update_properties(
     update_properties_from_goto_model(properties, goto_model);
 
   update_properties_status_from_symex_target_equation(
-    properties, updated_properties, equation);
+    assumptions, properties, updated_properties, equation, ns);
 }
 
 void single_path_symex_only_checkert::final_update_properties(

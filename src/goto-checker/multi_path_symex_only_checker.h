@@ -24,7 +24,7 @@ public:
     ui_message_handlert &ui_message_handler,
     abstract_goto_modelt &goto_model);
 
-  resultt operator()(propertiest &) override;
+  resultt operator()(assumptionst &, propertiest &) override;
 
 protected:
   abstract_goto_modelt &goto_model;
@@ -38,9 +38,10 @@ protected:
   /// Generates the equation by running goto-symex
   virtual void generate_equation();
 
-  /// Updates the \p properties from the `equation` and
+  /// Updates the \p assumptions and \p properties from the `equation` and
   /// adds their property IDs to \p updated_properties.
   virtual void update_properties(
+    assumptionst &assumptions,
     propertiest &properties,
     std::unordered_set<irep_idt> &updated_properties);
 };

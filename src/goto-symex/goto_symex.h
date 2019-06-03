@@ -444,8 +444,11 @@ protected:
   virtual void loop_bound_exceeded(statet &state, const exprt &guard);
 
   /// Log a warning that a function has no body
+  /// \param source: source where the function call appeared
   /// \param identifier: The name of the function with no body
-  virtual void no_body(const irep_idt &identifier)
+  virtual void no_body(
+    const symex_targett::sourcet &source,
+    const irep_idt &identifier)
   {
   }
 

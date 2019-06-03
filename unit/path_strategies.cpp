@@ -453,7 +453,7 @@ void _check_with_strategy(
     if(symex.get_remaining_vccs() > 0)
     {
       update_properties_status_from_symex_target_equation(
-        properties, result.updated_properties, resume.equation);
+        assumptions, properties, result.updated_properties, resume.equation, ns);
 
       goto_symex_property_decidert property_decider(
         options, ui_message_handler, resume.equation, ns);

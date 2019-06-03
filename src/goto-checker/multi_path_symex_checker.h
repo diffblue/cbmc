@@ -41,7 +41,7 @@ public:
   ///   only a subset of properties P_i+1 in the following invocation,
   ///   but the caller may not add properties to P_i+1 that have not been
   ///   in P_i. Such additional properties will be ignored.
-  resultt operator()(propertiest &) override;
+  resultt operator()(assumptionst &, propertiest &) override;
 
   goto_tracet build_full_trace() const override;
   goto_tracet build_shortest_trace() const override;

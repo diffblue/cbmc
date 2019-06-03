@@ -279,7 +279,7 @@ void goto_symext::symex_function_call_code(
 
   if(!goto_function.body_available())
   {
-    no_body(identifier);
+    no_body(state.source, identifier);
 
     // record the return
     target.function_return(

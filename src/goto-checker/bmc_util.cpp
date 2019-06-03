@@ -30,6 +30,8 @@ Author: Daniel Kroening, Peter Schrammel
 #include <util/make_unique.h>
 #include <util/ui_message.h>
 
+#include <langapi/language_util.h>
+
 #include "goto_symex_property_decider.h"
 #include "symex_bmc.h"
 
@@ -236,12 +238,24 @@ void slice(
 }
 
 void update_properties_status_from_symex_target_equation(
+  assumptionst &assumptions,
   propertiest &properties,
   std::unordered_set<irep_idt> &updated_properties,
-  const symex_target_equationt &equation)
+  const symex_target_equationt &equation,
+  const namespacet &ns)
 {
   for(const auto &step : equation.SSA_steps)
   {
+    if(step.is_assume())
+    {
+      const std::string comment = step.comment.empty() ?
+        from_expr(ns, step.source.function_id, step.source.pc->get_condition()) :
+        step.comment;
+      assumptions.emplace_back(step.source.pc, comment);
+
+      continue;
+    }
+
     if(!step.is_assert())
       continue;
 
