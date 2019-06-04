@@ -146,7 +146,7 @@ java_class_loader_baset::get_class_from_jar(
             << eom;
 
     std::istringstream istream(*data);
-    return java_bytecode_parse(istream, get_message_handler());
+    return java_bytecode_parse(istream, class_name, get_message_handler());
   }
   catch(const std::runtime_error &)
   {
@@ -172,7 +172,7 @@ java_class_loader_baset::get_class_from_directory(
   {
     debug() << "Getting class '" << class_name << "' from file " << full_path
             << eom;
-    return java_bytecode_parse(full_path, get_message_handler());
+    return java_bytecode_parse(full_path, class_name, get_message_handler());
   }
   else
     return {};

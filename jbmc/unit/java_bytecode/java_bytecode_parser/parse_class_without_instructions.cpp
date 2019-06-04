@@ -57,11 +57,11 @@ SCENARIO(
 {
   WHEN("Loading a class without instructions")
   {
-    auto loaded =
-      java_bytecode_parse(
-        "./java_bytecode/java_bytecode_parser/Trivial$Inner.class",
-        null_message_handler,
-        true);
+    auto loaded = java_bytecode_parse(
+      "./java_bytecode/java_bytecode_parser/Trivial$Inner.class",
+      "Trivial$Inner",
+      null_message_handler,
+      true);
     THEN("Loading should succeed")
     {
       REQUIRE(loaded);
@@ -90,11 +90,11 @@ SCENARIO(
 
   WHEN("Loading the same class normally")
   {
-    auto loaded =
-      java_bytecode_parse(
-        "./java_bytecode/java_bytecode_parser/Trivial$Inner.class",
-        null_message_handler,
-        false);
+    auto loaded = java_bytecode_parse(
+      "./java_bytecode/java_bytecode_parser/Trivial$Inner.class",
+      "Trivial$Inner",
+      null_message_handler,
+      false);
     THEN("Loading should succeed")
     {
       REQUIRE(loaded);

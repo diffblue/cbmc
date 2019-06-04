@@ -14,6 +14,7 @@ Author: Diffblue Ltd.
 #include <testing-utils/free_form_cmdline.h>
 #include <testing-utils/message.h>
 #include <testing-utils/use_catch.h>
+#include <util/config.h>
 #include <util/options.h>
 
 class test_java_bytecode_languaget : public java_bytecode_languaget
@@ -177,6 +178,7 @@ SCENARIO(
       optionst options;
       parse_java_language_options(command_line, options);
       language.set_language_options(options);
+      config.java.main_class = "AnnotationsEverywhere";
 
       std::istringstream java_code_stream("ignored");
       language.parse(java_code_stream, "AnnotationsEverywhere.class");

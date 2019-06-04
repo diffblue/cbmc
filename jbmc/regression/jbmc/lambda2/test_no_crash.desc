@@ -1,5 +1,5 @@
 CORE symex-driven-lazy-loading-expected-failure
-SymStream.class
+org.symphonyoss.symphony.clients.model.SymStream
 --no-lazy-methods --show-goto-functions
 ^EXIT=0$
 ^SIGNAL=0$
