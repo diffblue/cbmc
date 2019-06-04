@@ -88,6 +88,14 @@ bool is_clinit_function(const irep_idt &function_id)
   return has_suffix(id2string(function_id), clinit_function_suffix);
 }
 
+/// Check if function_id is a user-specified clinit
+/// \param function_id: some function identifier
+/// \return true if the passed identifier is a clinit
+bool is_user_specified_clinit_function(const irep_idt &function_id)
+{
+  return has_suffix(id2string(function_id), user_specified_clinit_suffix);
+}
+
 /// Add a new symbol to the symbol table.
 /// Note: assumes that a symbol with this name does not exist.
 /// /param name: name of the symbol to be generated
