@@ -40,18 +40,36 @@ Author:
 
 #include <util/run.h>
 
-bool is_osx_fat_magic(char hdr[4])
+struct fat_header_prefixt
 {
-  uint32_t *magic=reinterpret_cast<uint32_t*>(hdr);
+  uint32_t magic;
+  uint32_t n_architectures;
+};
 
-  switch(*magic)
-  {
-  case CPROVER_FAT_MAGIC:
-  case CPROVER_FAT_CIGAM:
-    return true;
-  }
+static uint32_t u32_to_native_endian(uint32_t input)
+{
+  const uint8_t *input_as_bytes = reinterpret_cast<uint8_t *>(&input);
+  return (((uint32_t)input_as_bytes[0]) << 24) |
+         (((uint32_t)input_as_bytes[1]) << 16) |
+         (((uint32_t)input_as_bytes[2]) << 8) |
+         (((uint32_t)input_as_bytes[3]) << 0);
+}
 
-  return false;
+bool is_osx_fat_header(char header_bytes[8])
+{
+  struct fat_header_prefixt *header =
+    reinterpret_cast<struct fat_header_prefixt *>(header_bytes);
+
+  // Unfortunately for us, both Java class files and Mach fat binaries use the
+  // magic number 0xCAFEBABE. Therefore we must also check the second field,
+  // number of architectures, is in a sensible range (I use at 1 <= archs < 20,
+  // the same criterion used by `GNU file`).
+  // Luckily the class file format stores the file version here, which cannot
+  // fall in this range.
+  uint32_t n_architectures_native =
+    u32_to_native_endian(header->n_architectures);
+  return u32_to_native_endian(header->magic) == CPROVER_FAT_MAGIC &&
+         n_architectures_native >= 1 && n_architectures_native < 20;
 }
 
 osx_fat_readert::osx_fat_readert(
@@ -68,12 +86,12 @@ osx_fat_readert::osx_fat_readert(
   if(!in)
     throw system_exceptiont("failed to read OSX fat header");
 
-  if(!is_osx_fat_magic(reinterpret_cast<char*>(&(fh.magic))))
-    throw deserialization_exceptiont("OSX fat header malformed (magic)");
+  if(!is_osx_fat_header(reinterpret_cast<char *>(&(fh.magic))))
+    throw deserialization_exceptiont("OSX fat header malformed");
 
   static_assert(
     sizeof(fh.nfat_arch) == 4, "fat_header::nfat_arch is of type uint32_t");
-  unsigned narch=__builtin_bswap32(fh.nfat_arch);
+  unsigned narch = u32_to_native_endian(fh.nfat_arch);
 
   for(unsigned i=0; !has_gb_arch && i<narch; ++i)
   {
@@ -86,9 +104,9 @@ osx_fat_readert::osx_fat_readert(
       sizeof(fa.cputype) == 4 && sizeof(fa.cpusubtype) == 4 &&
         sizeof(fa.size) == 4,
       "This requires a specific fat architecture");
-    int cputype=__builtin_bswap32(fa.cputype);
-    int cpusubtype=__builtin_bswap32(fa.cpusubtype);
-    unsigned size=__builtin_bswap32(fa.size);
+    int cputype = u32_to_native_endian(fa.cputype);
+    int cpusubtype = u32_to_native_endian(fa.cpusubtype);
+    unsigned size = u32_to_native_endian(fa.size);
 
     has_gb_arch=cputype==CPU_TYPE_HPPA &&
                 cpusubtype==CPU_SUBTYPE_HPPA_7100LC &&

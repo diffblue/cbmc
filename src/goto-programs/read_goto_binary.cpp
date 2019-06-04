@@ -68,19 +68,24 @@ static bool read_goto_binary(
   std::ifstream in(filename, std::ios::binary);
   #endif
 
+  messaget message(message_handler);
+
   if(!in)
   {
-    messaget message(message_handler);
     message.error() << "Failed to open `" << filename << "'"
                     << messaget::eom;
     return true;
   }
 
-  char hdr[4];
-  hdr[0]=in.get();
-  hdr[1]=in.get();
-  hdr[2]=in.get();
-  hdr[3]=in.get();
+  char hdr[8];
+  in.read(hdr, 8);
+  if(!in)
+  {
+    message.error() << "Failed to read header from `" << filename << "'"
+                    << messaget::eom;
+    return true;
+  }
+
   in.seekg(0);
 
   if(hdr[0]==0x7f && hdr[1]=='G' && hdr[2]=='B' && hdr[3]=='F')
@@ -114,7 +119,7 @@ static bool read_goto_binary(
       messaget(message_handler).error() << s << messaget::eom;
     }
   }
-  else if(is_osx_fat_magic(hdr))
+  else if(is_osx_fat_header(hdr))
   {
     messaget message(message_handler);
 
@@ -226,7 +231,7 @@ bool is_goto_binary(
       // ignore any errors
     }
   }
-  else if(is_osx_fat_magic(hdr))
+  else if(is_osx_fat_header(hdr))
   {
     // this _may_ have a goto binary as hppa7100LC architecture
     try
