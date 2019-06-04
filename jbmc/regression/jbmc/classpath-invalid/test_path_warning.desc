@@ -1,8 +1,10 @@
-KNOWNBUG
-Test.class
+CORE
+Test
 --classpath `../../../../scripts/format_classpath.sh ./NotHere .`
 ^EXIT=0$
 ^SIGNAL=0$
-^Warning: path './NotHere' does not exist$
+Warning: failed to access directory `./NotHere'
 --
 --
+Note: 'java' does not emit such a warning.
+It silently ignores non-existing directories.

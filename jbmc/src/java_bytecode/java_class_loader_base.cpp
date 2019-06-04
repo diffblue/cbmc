@@ -21,12 +21,28 @@ void java_class_loader_baset::add_classpath_entry(const std::string &path)
 {
   if(has_suffix(path, ".jar"))
   {
-    classpath_entries.push_back(classpath_entryt(classpath_entryt::JAR, path));
+    if(std::ifstream(path).good())
+    {
+      classpath_entries.push_back(
+        classpath_entryt(classpath_entryt::JAR, path));
+    }
+    else
+    {
+      warning() << "Warning: failed to access JAR file `" << path << "'" << eom;
+    }
   }
   else
   {
-    classpath_entries.push_back(
-      classpath_entryt(classpath_entryt::DIRECTORY, path));
+    if(is_directory(path))
+    {
+      classpath_entries.push_back(
+        classpath_entryt(classpath_entryt::DIRECTORY, path));
+    }
+    else
+    {
+      warning() << "Warning: failed to access directory `" << path << "'"
+                << eom;
+    }
   }
 }
 
