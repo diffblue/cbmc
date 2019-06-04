@@ -14,7 +14,6 @@ phases:
   build:
     commands:
       - echo Build started on `date`
-      - git submodule update --init --recursive
       - make -C src minisat2-download
       - make -C jbmc/src setup-submodules
       - make -C src CXX='ccache /usr/bin/clang++-3.8' CXX_FLAGS='-Qunused-arguments -DDEBUG'
