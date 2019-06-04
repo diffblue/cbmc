@@ -78,7 +78,7 @@ cbmc.dir: languages solvers.dir goto-symex.dir analyses.dir \
           goto-instrument.dir goto-checker.dir
 
 goto-analyzer.dir: languages analyses.dir goto-programs.dir linking.dir \
-                   goto-instrument.dir
+                   goto-instrument.dir goto-checker.dir
 
 goto-diff.dir: languages goto-programs.dir pointer-analysis.dir \
                linking.dir analyses.dir goto-instrument.dir \
