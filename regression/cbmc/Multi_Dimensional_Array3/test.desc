@@ -1,4 +1,4 @@
-CORE
+CORE broken-smt-backend
 main.c
 
 ^EXIT=0$
@@ -6,3 +6,6 @@ main.c
 ^VERIFICATION SUCCESSFUL$
 --
 ^warning: ignoring
+--
+With the SMT backend this incorrect result because of the bug documented here:
+https://github.com/diffblue/cbmc/issues/4749
