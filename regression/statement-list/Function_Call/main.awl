@@ -1,0 +1,16 @@
+﻿FUNCTION_BLOCK "Function_Call"
+VERSION : 0.1
+   VAR_INPUT 
+      In1 : Bool;
+   END_VAR
+
+
+BEGIN
+NETWORK
+TITLE = 
+      CALL "__Function"
+      (  param                   := #In1
+      );
+
+END_FUNCTION_BLOCK
+

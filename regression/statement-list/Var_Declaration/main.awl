@@ -1,0 +1,60 @@
+FUNCTION "Var_assign_FC" : Bool
+VERSION : 0.1
+   VAR_INPUT 
+      inFC : Bool;
+   END_VAR
+
+   VAR_OUTPUT 
+      outFC : Bool;
+   END_VAR
+
+   VAR_IN_OUT 
+      inoutFC : Bool;
+   END_VAR
+
+   VAR_TEMP 
+      tempFC : Bool;
+   END_VAR
+
+   VAR CONSTANT 
+      constFC : Bool;
+   END_VAR
+
+
+BEGIN
+NETWORK
+TITLE = 
+END_FUNCTION
+
+FUNCTION_BLOCK "Var_assign_FB"
+VERSION : 0.1
+   VAR_INPUT 
+      "! #$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~" : Bool := true;
+   END_VAR
+
+   VAR_OUTPUT 
+      out : Int := 6;
+   END_VAR
+
+   VAR_IN_OUT 
+      inout : Real := 4.5;
+   END_VAR
+
+   VAR 
+      static : DInt := 134142;
+   END_VAR
+
+   VAR_TEMP 
+      temp : Bool;
+   END_VAR
+
+   VAR CONSTANT 
+      "constant" : Bool;
+   END_VAR
+
+
+BEGIN
+NETWORK
+TITLE = 
+END_FUNCTION_BLOCK
+
