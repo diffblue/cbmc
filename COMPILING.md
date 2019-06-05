@@ -286,6 +286,13 @@ To work with Eclipse, do the following:
 5. Click "Finish"
 6. Select Project -> Build All
 
+You can also select the repository's root folder as the "Existing Code 
+Location". This has the advantage that you can build both CBMC and JBMC without
+the need to integrate JBMC as a separate project. Be aware that you need to 
+change the build location (Select project in Eclipse -> Properties -> C/C++ 
+Build) to one of the src directories.
+
+
 # OPTIONS AND VARIABLES
 
 ## Compiling with CUDD
