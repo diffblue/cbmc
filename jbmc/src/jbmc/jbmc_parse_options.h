@@ -53,6 +53,7 @@ class optionst;
   "(classpath):(cp):" \
   OPT_JAVA_JAR \
   "(main-class):" \
+  OPT_JAVA_GOTO_BINARY \
   "(no-assertions)(no-assumptions)" \
   OPT_XML_INTERFACE \
   OPT_JSON_INTERFACE \

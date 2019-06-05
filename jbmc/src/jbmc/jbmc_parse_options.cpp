@@ -1069,6 +1069,8 @@ void jbmc_parse_optionst::help()
     HELP_JAVA_CLASS_NAME
     " jbmc\n"
     HELP_JAVA_JAR
+    " jbmc\n"
+    HELP_JAVA_GOTO_BINARY
     "\n"
     HELP_JAVA_CLASSPATH
     HELP_FUNCTIONS

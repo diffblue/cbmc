@@ -692,6 +692,8 @@ void janalyzer_parse_optionst::help()
     HELP_JAVA_CLASS_NAME
     " janalyzer\n"
     HELP_JAVA_JAR
+    " janalyzer\n"
+    HELP_JAVA_GOTO_BINARY
     "\n"
     HELP_JAVA_CLASSPATH
     HELP_FUNCTIONS

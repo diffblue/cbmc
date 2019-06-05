@@ -125,6 +125,7 @@ class optionst;
   "(classpath):(cp):" \
   OPT_JAVA_JAR \
   "(main-class):" \
+  OPT_JAVA_GOTO_BINARY \
   "(16)(32)(64)(LP64)(ILP64)(LLP64)(ILP32)(LP32)" \
   "(little-endian)(big-endian)" \
   OPT_SHOW_GOTO_FUNCTIONS \

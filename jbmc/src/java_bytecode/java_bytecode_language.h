@@ -161,6 +161,17 @@ Author: Daniel Kroening, kroening@kroening.com
   "                              of the class specified by --main-class or the main\n" /* NOLINT(*) */ \
   "                              class specified in the JAR manifest\n" \
   "                              (checked in this order).\n"
+
+#define OPT_JAVA_GOTO_BINARY /* NOLINT(*) */ \
+  "(gb):"
+
+#define HELP_JAVA_GOTO_BINARY /* NOLINT(*) */ \
+  "    --gb goto-binary          goto-binary file to be checked\n" \
+  "                              The entry point is the method specified by\n" \
+  "                              --function, or otherwise, the\n" \
+  "                              public static void main(String[])\n" \
+  "                              of the class specified by --main-class\n" \
+  "                              (checked in this order).\n"
 // clang-format on
 
 class symbolt;
