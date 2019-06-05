@@ -1205,10 +1205,19 @@ void goto_instrument_parse_optionst::instrument_goto_program()
 
   // ignore default/user-specified initialization of variables with static
   // lifetime
-  if(cmdline.isset("nondet-static"))
+  if(cmdline.isset("nondet-static-exclude"))
   {
-    log.status() << "Adding nondeterministic initialization of static/global "
-                    "variables"
+    log.status() << "Adding nondeterministic initialization "
+                    "of static/global variables except for "
+                    "the specified ones."
+                 << messaget::eom;
+
+    nondet_static(goto_model, cmdline.get_values("nondet-static-exclude"));
+  }
+  else if(cmdline.isset("nondet-static"))
+  {
+    log.status() << "Adding nondeterministic initialization "
+                    "of static/global variables"
                  << messaget::eom;
     nondet_static(goto_model);
   }
@@ -1607,6 +1616,8 @@ void goto_instrument_parse_optionst::help()
     " --isr <function>             instruments an interrupt service routine\n"
     " --mmio                       instruments memory-mapped I/O\n"
     " --nondet-static              add nondeterministic initialization of variables with static lifetime\n" // NOLINT(*)
+    " --nondet-static-exclude e    same as nondet-static except for the variable e\n" //NOLINT(*)
+    "                              (use multiple times if required)\n"
     " --check-invariant function   instruments invariant checking function\n"
     " --remove-pointers            converts pointer arithmetic to base+offset expressions\n" // NOLINT(*)
     " --splice-call caller,callee  prepends a call to callee in the body of caller\n"  // NOLINT(*)

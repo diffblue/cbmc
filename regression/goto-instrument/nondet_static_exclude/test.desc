@@ -1,0 +1,18 @@
+CORE
+main_1.c main.c 
+--nondet-static --nondet-static-exclude test1 --nondet-static-exclude test3 --nondet-static-exclude test4 --nondet-static-exclude main_1.c:value
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+assertion test1 == (NULL|0): SUCCESS
+assertion test2.a == 5: FAILURE
+assertion test3.a == 1: SUCCESS
+assertion test3.b == 4: SUCCESS
+assertion test4->a == 1: SUCCESS
+assertion test4->b == 4: SUCCESS
+assertion test5->a == 5: FAILURE
+assertion test5->b == 2: FAILURE
+assertion value == 7: FAILURE
+assertion value == 5: SUCCESS
+--
+--

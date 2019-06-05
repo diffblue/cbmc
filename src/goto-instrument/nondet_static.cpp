@@ -46,6 +46,12 @@ bool is_nondet_initializable_static(
 
   const symbolt &symbol = ns.lookup(id);
 
+  // is the symbol explicitly marked as not to be nondet initialized?
+  if(symbol.value.get_bool(ID_C_no_nondet_initialization))
+  {
+    return false;
+  }
+
   // is the type explicitly marked as not to be nondet initialized?
   if(symbol.type.get_bool(ID_C_no_nondet_initialization))
     return false;
@@ -110,24 +116,22 @@ void nondet_static(
         nondet_static(ns, goto_functions, fsym.get_identifier());
     }
   }
+
+  // update counters etc.
+  goto_functions.update();
 }
 
 /// Nondeterministically initializes global scope variables in
 /// CPROVER_initialize function.
 /// \param ns: Namespace for resolving type information.
 /// \param [out] goto_functions: Existing goto-functions to be updated.
-void nondet_static(
-  const namespacet &ns,
-  goto_functionst &goto_functions)
+void nondet_static(const namespacet &ns, goto_functionst &goto_functions)
 {
   nondet_static(ns, goto_functions, INITIALIZE_FUNCTION);
-
-  // update counters etc.
-  goto_functions.update();
 }
 
-/// Main entry point of the module. Nondeterministically initializes global
-/// scope variables, except for constants (such as string literals, final
+/// First main entry point of the module. Nondeterministically initializes
+/// global scope variables, except for constants (such as string literals, final
 /// fields) and internal variables (such as CPROVER and symex variables,
 /// language specific internal variables).
 /// \param [out] goto_model: Existing goto-model to be updated.
@@ -135,4 +139,60 @@ void nondet_static(goto_modelt &goto_model)
 {
   const namespacet ns(goto_model.symbol_table);
   nondet_static(ns, goto_model.goto_functions);
+}
+
+/// Second main entry point of the module. Nondeterministically initializes
+/// global scope variables, except for constants (such as string literals, final
+/// fields), internal variables (such as CPROVER and symex variables,
+/// language specific internal variables) and variables passed to except_value.
+/// \param [out] goto_model: Existing goto-model to be updated.
+/// \param except_values: list of symbol names that should not be updated.
+void nondet_static(
+  goto_modelt &goto_model,
+  const optionst::value_listt &except_values)
+{
+  const namespacet ns(goto_model.symbol_table);
+  std::set<std::string> to_exclude;
+
+  for(auto const &except : except_values)
+  {
+    const bool file_prefix_found = except.find(":") != std::string::npos;
+
+    if(file_prefix_found)
+    {
+      to_exclude.insert(except);
+      if(has_prefix(except, "./"))
+      {
+        to_exclude.insert(except.substr(2, except.length() - 2));
+      }
+      else
+      {
+        to_exclude.insert("./" + except);
+      }
+    }
+    else
+    {
+      irep_idt symbol_name(except);
+      symbolt lookup_results = ns.lookup(symbol_name);
+      to_exclude.insert(
+        id2string(lookup_results.location.get_file()) + ":" + except);
+    }
+  }
+
+  symbol_tablet &symbol_table = goto_model.symbol_table;
+
+  for(symbol_tablet::iteratort symbol_it = symbol_table.begin();
+      symbol_it != symbol_table.end();
+      symbol_it++)
+  {
+    symbolt &symbol = symbol_it.get_writeable_symbol();
+    std::string qualified_name = id2string(symbol.location.get_file()) + ":" +
+                                 id2string(symbol.display_name());
+    if(to_exclude.find(qualified_name) != to_exclude.end())
+    {
+      symbol.value.set(ID_C_no_nondet_initialization, 1);
+    }
+  }
+
+  nondet_static(ns, goto_model.goto_functions, INITIALIZE_FUNCTION);
 }

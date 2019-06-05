@@ -1,0 +1,12 @@
+CORE
+package1/file.c package2/file.c main.c
+--nondet-static-exclude package1/file.c:myVal --nondet-static-exclude package2/file.c:myVal2
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+method2 myVal: SUCCESS
+method2 myVal2: FAILURE
+method1 myVal: FAILURE
+method1 myVal2: SUCCESS
+--
+--
