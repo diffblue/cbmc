@@ -17,7 +17,7 @@ INCLUDES= -I ..
 include ../config.inc
 include ../common
 
-CLEANFILES = stl$(LIBEXT) \
+CLEANFILES = statement-list$(LIBEXT) \
   statement_list_y.tab.h statement_list_y.tab.cpp \
   statement_list_lex.yy.cpp statement_list_y.tab.cpp.output \
   statement_list_y.output
