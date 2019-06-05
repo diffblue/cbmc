@@ -112,6 +112,10 @@ src/goto-instrument/goto-instrument
 src/goto-instrument/goto-instrument.exe
 src/solvers/smt2_solver
 src/solvers/smt2_solver.exe
+src/memory-analyzer/memory-analyzer
+src/memory-analyzer/memory-analyzer.exe
+src/symtab2gb/symtab2gb
+src/symtab2gb/symtab2gb.exe
 src/goto-diff/goto-diff
 src/goto-diff/goto-diff.exe
 src/clobber/clobber
