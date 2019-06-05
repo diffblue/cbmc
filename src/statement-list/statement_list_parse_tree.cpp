@@ -11,99 +11,78 @@ Author: Matthias Weiss, matthias.weiss@diffblue.com
 
 #include "statement_list_parse_tree.h"
 
-void statement_list_parse_treet::output(std::ostream &out) const
+void statement_list_parse_treet::tia_modulet::add_var_input_entry(
+  const var_declarationt &declaration)
 {
-  for(const auto &function_block : function_blocks)
-  {
-    out << "============== Function Block ==============\n";
-    function_block.output(out);
-    out << "\n";
-  }
-
-  for(const auto &function : functions)
-  {
-    out << "================= Function =================\n";
-    function.output(out);
-    out << "\n";
-  }
+  var_input.push_back(declaration);
 }
 
-void statement_list_parse_treet::functiont::output(std::ostream &out) const
+void statement_list_parse_treet::tia_modulet::add_var_inout_entry(
+  const var_declarationt &declaration)
 {
-  out << "Name: " << name << "\n";
-  out << "Version: " << version << "\n\n";
-
-  out << "--------- Input Variables ----------\n\n";
-  for(const auto &declaration : var_input)
-  {
-    declaration.output(out);
-    out << "\n\n";
-  }
-
-  out << "--------- In/Out Variables ---------\n\n";
-  for(const auto &declaration : var_inout)
-  {
-    declaration.output(out);
-    out << "\n\n";
-  }
-
-  out << "--------- Output Variables ---------\n\n";
-  for(const auto &declaration : var_output)
-  {
-    declaration.output(out);
-    out << "\n\n";
-  }
-
-  out << "------------- Networks -------------\n\n";
-  for(const auto &network : networks)
-  {
-    network.output(out);
-    out << "\n";
-  }
+  var_inout.push_back(declaration);
 }
 
-void statement_list_parse_treet::function_blockt::output(
-  std::ostream &out) const
+void statement_list_parse_treet::tia_modulet::add_var_output_entry(
+  const var_declarationt &declaration)
 {
-  statement_list_parse_treet::functiont::output(out);
+  var_output.push_back(declaration);
 }
 
-void statement_list_parse_treet::var_declarationt::output(
-  std::ostream &out) const
+void statement_list_parse_treet::tia_modulet::add_var_constant_entry(
+  const var_declarationt &declaration)
 {
-  out << variable.pretty() << "\n";
-  out << "  * initial_value: (default)";
+  var_constant.push_back(declaration);
 }
 
-void statement_list_parse_treet::networkt::output(std::ostream &out) const
+void statement_list_parse_treet::tia_modulet::add_var_temp_entry(
+  const var_declarationt &declaration)
 {
-  out << "Title: " << title.value_or("(none)") << "\n";
-  out << "Instructions: ";
-  if(instructions.empty())
-    out << "(none)";
-  out << "\n";
-  for(const auto &instruction : instructions)
-  {
-    instruction.output(out);
-    out << "\n";
-  }
+  var_temp.push_back(declaration);
 }
 
-void statement_list_parse_treet::instructiont::output(std::ostream &out) const
+void statement_list_parse_treet::function_blockt::add_var_static_entry(
+  const var_declarationt &declaration)
 {
-  for(const auto &token : tokens)
-  {
-    out << token.get_statement();
-    for(const auto expr : token.operands())
-    {
-      if(expr.id() == ID_symbol)
-        out << "\t" << expr.get(ID_identifier);
-      else if(expr.id() == ID_constant)
-        out << "\t" << expr.get(ID_value);
-      else
-        out << "\t" << expr.id();
-    }
-  }
+  var_static.push_back(declaration);
+}
+
+void statement_list_parse_treet::tia_modulet::add_network(networkt &network)
+{
+  networks.push_back(network);
+}
+
+void statement_list_parse_treet::networkt::set_title(const std::string &value)
+{
+  if(value.empty())
+    title.reset();
+  else
+    title = value;
+}
+
+statement_list_parse_treet::networkt::networkt(const std::string &title)
+{
+  set_title(title);
+}
+
+void statement_list_parse_treet::networkt::add_instruction(
+  const instructiont &inst)
+{
+  instructions.push_back(inst);
+}
+
+statement_list_parse_treet::tia_modulet::tia_modulet(
+  const irep_idt &name,
+  const std::string &version)
+  : name(name), version(version)
+{
+}
+
+statement_list_parse_treet::function_blockt::function_blockt(
+  const irep_idt &name,
+  const std::string &version)
+  : tia_modulet(name, version)
+{
 }
 
 void statement_list_parse_treet::add_function_block(function_blockt &block)
@@ -126,4 +105,24 @@ void statement_list_parse_treet::swap(statement_list_parse_treet &other)
 {
   function_blocks.swap(other.function_blocks);
   functions.swap(other.functions);
+}
+
+statement_list_parse_treet::functiont::functiont(
+  const irep_idt &name,
+  const std::string &version,
+  const typet &return_type)
+  : tia_modulet(name, version), return_type(return_type)
+{
+}
+
+void statement_list_parse_treet::instructiont::add_token(const codet &token)
+{
+  tokens.push_back(token);
+}
+
+statement_list_parse_treet::var_declarationt::var_declarationt(
+  const irep_idt &identifier,
+  const typet &type)
+  : variable(symbol_exprt(identifier, type))
+{
 }

@@ -11,6 +11,7 @@ Author: Matthias Weiss, matthias.weiss@diffblue.com
 
 #include "statement_list_language.h"
 #include "converters/expr2statement_list.h"
+#include "statement_list_parse_tree_io.h"
 #include "statement_list_parser.h"
 #include "statement_list_typecheck.h"
 
@@ -68,7 +69,7 @@ bool statement_list_languaget::parse(
 
 void statement_list_languaget::show_parse(std::ostream &out)
 {
-  parse_tree.output(out);
+  output_parse_tree(out, parse_tree);
 }
 
 bool statement_list_languaget::can_keep_file_local()
