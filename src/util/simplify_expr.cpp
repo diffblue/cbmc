@@ -272,60 +272,50 @@ bool simplify_exprt::simplify_function_application(exprt &expr)
   return true;
 }
 
-bool simplify_exprt::simplify_typecast(exprt &expr)
+simplify_exprt::resultt<>
+simplify_exprt::simplify_typecast(const typecast_exprt &expr)
 {
-  if(expr.operands().size()!=1)
-    return true;
-
   const typet &expr_type = expr.type();
-  const typet &op_type = expr.op0().type();
+  const typet &op_type = expr.op().type();
 
   // eliminate casts of infinity
-  if(expr.op0().id()==ID_infinity)
+  if(expr.op().id() == ID_infinity)
   {
     typet new_type=expr.type();
-    exprt tmp;
-    tmp.swap(expr.op0());
+    exprt tmp = expr.op();
     tmp.type()=new_type;
-    expr.swap(tmp);
-    return false;
+    return std::move(tmp);
   }
 
   // casts from NULL to any integer
-  if(op_type.id()==ID_pointer &&
-     expr.op0().is_constant() &&
-     to_constant_expr(expr.op0()).get_value()==ID_NULL &&
-     (expr_type.id()==ID_unsignedbv || expr_type.id()==ID_signedbv) &&
-     config.ansi_c.NULL_is_zero)
+  if(
+    op_type.id() == ID_pointer && expr.op().is_constant() &&
+    to_constant_expr(expr.op()).get_value() == ID_NULL &&
+    (expr_type.id() == ID_unsignedbv || expr_type.id() == ID_signedbv) &&
+    config.ansi_c.NULL_is_zero)
   {
-    exprt tmp=from_integer(0, expr_type);
-    expr.swap(tmp);
-    return false;
+    return from_integer(0, expr_type);
   }
 
   // casts from pointer to integer
   // where width of integer >= width of pointer
   // (void*)(intX)expr -> (void*)expr
-  if(expr_type.id()==ID_pointer &&
-     expr.op0().id()==ID_typecast &&
-     expr.op0().operands().size()==1 &&
-     (op_type.id()==ID_signedbv || op_type.id()==ID_unsignedbv) &&
-     to_bitvector_type(op_type).get_width()>=
-     to_bitvector_type(expr_type).get_width())
+  if(
+    expr_type.id() == ID_pointer && expr.op().id() == ID_typecast &&
+    expr.op().operands().size() == 1 &&
+    (op_type.id() == ID_signedbv || op_type.id() == ID_unsignedbv) &&
+    to_bitvector_type(op_type).get_width() >=
+      to_bitvector_type(expr_type).get_width())
   {
-    exprt tmp=expr.op0().op0();
-    expr.op0().swap(tmp);
-    simplify_typecast(expr); // rec. call
-    return false;
+    auto new_expr = expr;
+    new_expr.op() = expr.op().op0();
+    return changed(simplify_typecast(new_expr)); // rec. call
   }
 
   // eliminate redundant typecasts
-  if(expr.type() == expr.op0().type())
+  if(expr.type() == expr.op().type())
   {
-    exprt tmp;
-    tmp.swap(expr.op0());
-    expr.swap(tmp);
-    return false;
+    return expr.op();
   }
 
   // eliminate casts to proper bool
@@ -333,18 +323,16 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
   {
     // rewrite (bool)x to x!=0
     binary_relation_exprt inequality(
-      expr.op0(),
+      expr.op(),
       op_type.id() == ID_floatbv ? ID_ieee_float_notequal : ID_notequal,
       from_integer(0, op_type));
     inequality.add_source_location()=expr.source_location();
     simplify_node(inequality);
-    expr.swap(inequality);
-    return false;
+    return std::move(inequality);
   }
 
   // circular casts through types shorter than `int`
-  if(op_type==signedbv_typet(32) &&
-     expr.op0().id()==ID_typecast)
+  if(op_type == signedbv_typet(32) && expr.op().id() == ID_typecast)
   {
     if(expr_type==c_bool_typet(8) ||
        expr_type==signedbv_typet(8) ||
@@ -352,11 +340,10 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
        expr_type==unsignedbv_typet(16))
     {
       // We checked that the id was ID_typecast in the enclosing `if`
-      const auto &typecast=expr_checked_cast<typecast_exprt>(expr.op0());
+      const auto &typecast = expr_checked_cast<typecast_exprt>(expr.op());
       if(typecast.op().type()==expr_type)
       {
-        expr = typecast.op();
-        return false;
+        return typecast.op();
       }
     }
   }
@@ -366,81 +353,80 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
      op_type.id()!=ID_bool)
   {
     // rewrite (_Bool)x to (_Bool)(x!=0)
-    exprt inequality = is_not_zero(expr.op0(), ns);
+    exprt inequality = is_not_zero(expr.op(), ns);
     simplify_node(inequality);
-    expr.op0()=inequality;
-    simplify_typecast(expr); // recursive call
-    return false;
+    auto new_expr = expr;
+    new_expr.op() = std::move(inequality);
+    return changed(simplify_typecast(new_expr)); // recursive call
   }
 
   // eliminate typecasts from NULL
-  if(expr_type.id()==ID_pointer &&
-     expr.op0().is_constant() &&
-     (to_constant_expr(expr.op0()).get_value()==ID_NULL ||
-      (expr.op0().is_zero() && config.ansi_c.NULL_is_zero)))
+  if(
+    expr_type.id() == ID_pointer && expr.op().is_constant() &&
+    (to_constant_expr(expr.op()).get_value() == ID_NULL ||
+     (expr.op().is_zero() && config.ansi_c.NULL_is_zero)))
   {
-    exprt tmp=expr.op0();
+    exprt tmp = expr.op();
     tmp.type()=expr.type();
     to_constant_expr(tmp).set_value(ID_NULL);
-    expr.swap(tmp);
-    return false;
+    return std::move(tmp);
   }
 
   // eliminate duplicate pointer typecasts
   // (T1 *)(T2 *)x -> (T1 *)x
-  if(expr_type.id()==ID_pointer &&
-     expr.op0().id()==ID_typecast &&
-     op_type.id()==ID_pointer &&
-     expr.op0().operands().size()==1)
+  if(
+    expr_type.id() == ID_pointer && expr.op().id() == ID_typecast &&
+    op_type.id() == ID_pointer && expr.op().operands().size() == 1)
   {
-    exprt tmp;
-    tmp.swap(expr.op0().op0());
-    expr.op0().swap(tmp);
-    // recursive call
-    simplify_node(expr);
-    return false;
+    auto new_expr = expr;
+    new_expr.op() = expr.op().op0();
+    return changed(simplify_typecast(new_expr)); // recursive call
   }
 
   // casts from integer to pointer and back:
   // (int)(void *)int -> (int)(size_t)int
-  if((expr_type.id()==ID_signedbv || expr_type.id()==ID_unsignedbv) &&
-     expr.op0().id()==ID_typecast &&
-     expr.op0().operands().size()==1 &&
-     op_type.id()==ID_pointer)
+  if(
+    (expr_type.id() == ID_signedbv || expr_type.id() == ID_unsignedbv) &&
+    expr.op().id() == ID_typecast && expr.op().operands().size() == 1 &&
+    op_type.id() == ID_pointer)
   {
-    expr.op0().type()=size_type();
-    simplify_typecast(expr.op0()); // rec. call
-    simplify_typecast(expr); // rec. call
-    return false;
+    auto inner_cast = to_typecast_expr(expr.op());
+    inner_cast.type() = size_type();
+
+    auto outer_cast = expr;
+    outer_cast.op() = simplify_typecast(inner_cast); // rec. call
+    return changed(simplify_typecast(outer_cast));   // rec. call
   }
 
   // mildly more elaborate version of the above:
   // (int)((T*)0 + int) -> (int)(sizeof(T)*(size_t)int) if NULL is zero
-  if(config.ansi_c.NULL_is_zero &&
-     (expr_type.id()==ID_signedbv || expr_type.id()==ID_unsignedbv) &&
-     op_type.id()==ID_pointer &&
-     expr.op0().id()==ID_plus &&
-     expr.op0().operands().size()==2 &&
-     ((expr.op0().op0().id()==ID_typecast &&
-     expr.op0().op0().operands().size()==1 &&
-       expr.op0().op0().op0().is_zero()) ||
-      (expr.op0().op0().is_constant() &&
-       to_constant_expr(expr.op0().op0()).get_value()==ID_NULL)))
+  if(
+    config.ansi_c.NULL_is_zero &&
+    (expr_type.id() == ID_signedbv || expr_type.id() == ID_unsignedbv) &&
+    op_type.id() == ID_pointer && expr.op().id() == ID_plus &&
+    expr.op().operands().size() == 2 &&
+    ((expr.op().op0().id() == ID_typecast &&
+      expr.op().op0().operands().size() == 1 &&
+      expr.op().op0().op0().is_zero()) ||
+     (expr.op().op0().is_constant() &&
+      to_constant_expr(expr.op().op0()).get_value() == ID_NULL)))
   {
     auto sub_size = pointer_offset_size(to_pointer_type(op_type).subtype(), ns);
     if(sub_size.has_value())
     {
+      auto new_expr = expr;
+
       // void*
       if(*sub_size == 0 || *sub_size == 1)
-        expr.op0()=typecast_exprt(expr.op0().op1(), size_type());
+        new_expr.op() = typecast_exprt(expr.op().op1(), size_type());
       else
-        expr.op0() = mult_exprt(
+        new_expr.op() = mult_exprt(
           from_integer(*sub_size, size_type()),
-          typecast_exprt(expr.op0().op1(), size_type()));
+          typecast_exprt(expr.op().op1(), size_type()));
 
-      simplify_rec(expr.op0());
-      simplify_typecast(expr); // rec. call
-      return false;
+      simplify_rec(new_expr.op()); // rec. call
+
+      return changed(simplify_typecast(new_expr)); // rec. call
     }
   }
 
@@ -462,13 +448,13 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
 
     if(!enlarge)
     {
-      irep_idt op_id=expr.op0().id();
+      irep_idt op_id = expr.op().id();
 
       if(op_id==ID_plus || op_id==ID_minus || op_id==ID_mult ||
          op_id==ID_unary_minus ||
          op_id==ID_bitxor || op_id==ID_bitor || op_id==ID_bitand)
       {
-        exprt result=expr.op0();
+        exprt result = expr.op();
 
         if(
           result.operands().size() >= 1 && result.op0().type() == result.type())
@@ -477,13 +463,13 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
 
           Forall_operands(it, result)
           {
-            *it = typecast_exprt(*it, expr.type());
-            simplify_typecast(*it); // recursive call
+            auto new_operand = typecast_exprt(*it, expr.type());
+            *it = simplify_typecast(new_operand); // recursive call
           }
 
           simplify_node(result); // possibly recursive call
-          expr.swap(result);
-          return false;
+
+          return std::move(result);
         }
       }
       else if(op_id==ID_ashr || op_id==ID_lshr || op_id==ID_shl)
@@ -495,18 +481,20 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
   // Push a numerical typecast into pointer arithmetic
   // (T)(ptr + int) ---> (T)((size_t)ptr + sizeof(subtype)*(size_t)int)
   //
-  if((expr_type.id()==ID_signedbv || expr_type.id()==ID_unsignedbv) &&
-     op_type.id()==ID_pointer &&
-     expr.op0().id()==ID_plus)
+  if(
+    (expr_type.id() == ID_signedbv || expr_type.id() == ID_unsignedbv) &&
+    op_type.id() == ID_pointer && expr.op().id() == ID_plus)
   {
     const auto step = pointer_offset_size(to_pointer_type(op_type).subtype(), ns);
 
     if(step.has_value() && *step != 0)
     {
       const typet size_t_type(size_type());
-      expr.op0().type()=size_t_type;
+      auto new_expr = expr;
 
-      for(auto &op : expr.op0().operands())
+      new_expr.op().type() = size_t_type;
+
+      for(auto &op : new_expr.op().operands())
       {
         if(op.type().id()==ID_pointer)
         {
@@ -520,28 +508,28 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
         }
       }
 
-      simplify_rec(expr);
-      return false;
+      simplify_rec(new_expr);
+      return std::move(new_expr);
     }
   }
 
   #if 0
   // (T)(a?b:c) --> a?(T)b:(T)c
-  if(expr.op0().id()==ID_if &&
-     expr.op0().operands().size()==3)
+  if(expr.op().id()==ID_if &&
+     expr.op().operands().size()==3)
   {
-    typecast_exprt tmp_op1(expr.op0().op1(), expr_type);
-    typecast_exprt tmp_op2(expr.op0().op2(), expr_type);
+    typecast_exprt tmp_op1(expr.op().op1(), expr_type);
+    typecast_exprt tmp_op2(expr.op().op2(), expr_type);
     simplify_typecast(tmp_op1);
     simplify_typecast(tmp_op2);
-    expr=if_exprt(expr.op0().op0(), tmp_op1, tmp_op2, expr_type);
-    simplify_if(to_if_expr(expr));
-    return false;
+    auto new_expr=if_exprt(expr.op().op0(), tmp_op1, tmp_op2, expr_type);
+    simplify_if(new_expr);
+    return std::move(new_expr);
   }
   #endif
 
   const irep_idt &expr_type_id=expr_type.id();
-  const exprt &operand=expr.op0();
+  const exprt &operand = expr.op();
   const irep_idt &op_type_id=op_type.id();
 
   if(operand.is_constant())
@@ -561,8 +549,7 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
 
       if(expr_type_id==ID_bool)
       {
-        expr = make_boolean_expr(int_value != 0);
-        return false;
+        return make_boolean_expr(int_value != 0);
       }
 
       if(expr_type_id==ID_unsignedbv ||
@@ -571,8 +558,7 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
          expr_type_id==ID_c_bit_field ||
          expr_type_id==ID_integer)
       {
-        expr=from_integer(int_value, expr_type);
-        return false;
+        return from_integer(int_value, expr_type);
       }
       else if(expr_type_id == ID_c_enum_tag)
       {
@@ -581,8 +567,7 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
         {
           exprt tmp = from_integer(int_value, c_enum_type);
           tmp.type() = expr_type; // we maintain the tag type
-          expr = tmp;
-          return false;
+          return std::move(tmp);
         }
       }
     }
@@ -605,13 +590,11 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
       {
         if(operand.is_true())
         {
-          expr=from_integer(1, expr_type);
-          return false;
+          return from_integer(1, expr_type);
         }
         else if(operand.is_false())
         {
-          expr=from_integer(0, expr_type);
-          return false;
+          return from_integer(0, expr_type);
         }
       }
       else if(expr_type_id==ID_c_enum_tag)
@@ -622,16 +605,14 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
           unsigned int_value = operand.is_true() ? 1u : 0u;
           exprt tmp=from_integer(int_value, c_enum_type);
           tmp.type()=expr_type; // we maintain the tag type
-          expr=tmp;
-          return false;
+          return std::move(tmp);
         }
       }
       else if(expr_type_id==ID_pointer &&
               operand.is_false() &&
               config.ansi_c.NULL_is_zero)
       {
-        expr=null_pointer_exprt(to_pointer_type(expr_type));
-        return false;
+        return null_pointer_exprt(to_pointer_type(expr_type));
       }
     }
     else if(op_type_id==ID_unsignedbv ||
@@ -642,32 +623,28 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
       mp_integer int_value;
 
       if(to_integer(to_constant_expr(operand), int_value))
-        return true;
+        return unchanged(expr);
 
       if(expr_type_id==ID_bool)
       {
-        expr = make_boolean_expr(int_value != 0);
-        return false;
+        return make_boolean_expr(int_value != 0);
       }
 
       if(expr_type_id==ID_c_bool)
       {
-        expr=from_integer(int_value!=0, expr_type);
-        return false;
+        return from_integer(int_value != 0, expr_type);
       }
 
       if(expr_type_id==ID_integer)
       {
-        expr=from_integer(int_value, expr_type);
-        return false;
+        return from_integer(int_value, expr_type);
       }
 
       if(expr_type_id==ID_natural)
       {
         if(int_value>=0)
         {
-          expr=from_integer(int_value, expr_type);
-          return false;
+          return from_integer(int_value, expr_type);
         }
       }
 
@@ -676,12 +653,12 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
          expr_type_id==ID_bv ||
          expr_type_id==ID_c_bit_field)
       {
-        expr=from_integer(int_value, expr_type);
+        auto result = from_integer(int_value, expr_type);
 
         if(c_sizeof_type.is_not_nil())
-          expr.set(ID_C_c_sizeof_type, c_sizeof_type);
+          result.set(ID_C_c_sizeof_type, c_sizeof_type);
 
-        return false;
+        return std::move(result);
       }
 
       if(expr_type_id==ID_c_enum_tag)
@@ -691,15 +668,13 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
         {
           exprt tmp=from_integer(int_value, c_enum_type);
           tmp.type()=expr_type; // we maintain the tag type
-          expr=tmp;
-          return false;
+          return std::move(tmp);
         }
       }
 
       if(expr_type_id==ID_c_enum)
       {
-        expr=from_integer(int_value, expr_type);
-        return false;
+        return from_integer(int_value, expr_type);
       }
 
       if(expr_type_id==ID_fixedbv)
@@ -711,9 +686,7 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
         fixedbvt f;
         f.spec=fixedbv_spect(f_expr_type);
         f.from_integer(int_value);
-        expr=f.to_expr();
-
-        return false;
+        return f.to_expr();
       }
 
       if(expr_type_id==ID_floatbv)
@@ -724,16 +697,14 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
 
         ieee_floatt f(f_expr_type);
         f.from_integer(int_value);
-        expr=f.to_expr();
 
-        return false;
+        return f.to_expr();
       }
 
       if(expr_type_id==ID_rational)
       {
         rationalt r(int_value);
-        expr=from_rational(r);
-        return false;
+        return from_rational(r);
       }
     }
     else if(op_type_id==ID_fixedbv)
@@ -742,42 +713,37 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
          expr_type_id==ID_signedbv)
       {
         // cast from fixedbv to int
-        fixedbvt f(to_constant_expr(expr.op0()));
-        expr=from_integer(f.to_integer(), expr_type);
-        return false;
+        fixedbvt f(to_constant_expr(expr.op()));
+        return from_integer(f.to_integer(), expr_type);
       }
       else if(expr_type_id==ID_fixedbv)
       {
         // fixedbv to fixedbv
-        fixedbvt f(to_constant_expr(expr.op0()));
+        fixedbvt f(to_constant_expr(expr.op()));
         f.round(fixedbv_spect(to_fixedbv_type(expr_type)));
-        expr=f.to_expr();
-        return false;
+        return f.to_expr();
       }
       else if(expr_type_id == ID_bv)
       {
-        fixedbvt f{to_constant_expr(expr.op0())};
-        expr = from_integer(f.get_value(), expr_type);
-        return false;
+        fixedbvt f{to_constant_expr(expr.op())};
+        return from_integer(f.get_value(), expr_type);
       }
     }
     else if(op_type_id==ID_floatbv)
     {
-      ieee_floatt f(to_constant_expr(expr.op0()));
+      ieee_floatt f(to_constant_expr(expr.op()));
 
       if(expr_type_id==ID_unsignedbv ||
          expr_type_id==ID_signedbv)
       {
         // cast from float to int
-        expr=from_integer(f.to_integer(), expr_type);
-        return false;
+        return from_integer(f.to_integer(), expr_type);
       }
       else if(expr_type_id==ID_floatbv)
       {
         // float to double or double to float
         f.change_spec(ieee_float_spect(to_floatbv_type(expr_type)));
-        expr=f.to_expr();
-        return false;
+        return f.to_expr();
       }
       else if(expr_type_id==ID_fixedbv)
       {
@@ -787,13 +753,11 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
         factor.from_integer(power(2, fixedbv.spec.get_fraction_bits()));
         f*=factor;
         fixedbv.set_value(f.to_integer());
-        expr=fixedbv.to_expr();
-        return false;
+        return fixedbv.to_expr();
       }
       else if(expr_type_id == ID_bv)
       {
-        expr = from_integer(f.pack(), expr_type);
-        return false;
+        return from_integer(f.pack(), expr_type);
       }
     }
     else if(op_type_id==ID_bv)
@@ -806,14 +770,14 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
         const auto width = to_bv_type(op_type).get_width();
         const auto int_value = bvrep2integer(value, width, false);
         if(expr_type_id != ID_c_enum_tag)
-          expr = from_integer(int_value, expr_type);
+          return from_integer(int_value, expr_type);
         else
         {
           c_enum_tag_typet tag_type = to_c_enum_tag_type(expr_type);
-          expr = from_integer(int_value, ns.follow_tag(tag_type));
-          expr.type() = tag_type;
+          auto result = from_integer(int_value, ns.follow_tag(tag_type));
+          result.type() = tag_type;
+          return std::move(result);
         }
-        return false;
       }
       else if(expr_type_id == ID_floatbv)
       {
@@ -821,8 +785,7 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
         const auto int_value = bvrep2integer(value, width, false);
         ieee_floatt ieee_float{to_floatbv_type(expr_type)};
         ieee_float.unpack(int_value);
-        expr = ieee_float.to_expr();
-        return false;
+        return ieee_float.to_expr();
       }
       else if(expr_type_id == ID_fixedbv)
       {
@@ -830,8 +793,7 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
         const auto int_value = bvrep2integer(value, width, false);
         fixedbvt fixedbv{fixedbv_spect{to_fixedbv_type(expr_type)}};
         fixedbv.set_value(int_value);
-        expr = fixedbv.to_expr();
-        return false;
+        return fixedbv.to_expr();
       }
     }
     else if(op_type_id==ID_c_enum_tag) // enum to int
@@ -841,9 +803,9 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
       if(base_type.id()==ID_signedbv || base_type.id()==ID_unsignedbv)
       {
         // enum constants use the representation of their base type
-        expr.op0().type()=base_type;
-        simplify_typecast(expr);
-        return false;
+        auto new_expr = expr;
+        new_expr.op().type() = base_type;
+        return changed(simplify_typecast(new_expr)); // recursive call
       }
     }
     else if(op_type_id==ID_c_enum) // enum to int
@@ -852,9 +814,9 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
       if(base_type.id()==ID_signedbv || base_type.id()==ID_unsignedbv)
       {
         // enum constants use the representation of their base type
-        expr.op0().type()=base_type;
-        simplify_typecast(expr);
-        return false;
+        auto new_expr = expr;
+        new_expr.op().type() = base_type;
+        return changed(simplify_typecast(new_expr)); // recursive call
       }
     }
   }
@@ -868,12 +830,10 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
        to_bitvector_type(expr_type).get_width()<=
          to_bitvector_type(operand.type()).get_width())
     {
-      exprt tmp;
-      tmp.swap(expr.op0().op0());
-      expr.op0().swap(tmp);
+      auto new_expr = expr;
+      new_expr.op() = expr.op().op0();
       // might enable further simplification
-      simplify_typecast(expr); // recursive call
-      return false;
+      return changed(simplify_typecast(new_expr)); // recursive call
     }
   }
   else if(operand.id()==ID_address_of)
@@ -885,14 +845,15 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
       o.type().id() == ID_array &&
       expr_type == pointer_type(o.type().subtype()))
     {
-      expr=address_of_exprt(index_exprt(o, from_integer(0, size_type())));
+      auto result =
+        address_of_exprt(index_exprt(o, from_integer(0, size_type())));
 
-      simplify_rec(expr);
-      return false;
+      simplify_rec(result);
+      return std::move(result);
     }
   }
 
-  return true;
+  return unchanged(expr);
 }
 
 bool simplify_exprt::simplify_dereference(exprt &expr)
@@ -2405,131 +2366,138 @@ bool simplify_exprt::simplify_node_preorder(exprt &expr)
 bool simplify_exprt::simplify_node(exprt &expr)
 {
   if(!expr.has_operands())
-    return true;
+    return true; // no change
 
-  // #define DEBUGX
+    // #define DEBUGX
 
-  #ifdef DEBUGX
+#ifdef DEBUGX
   exprt old(expr);
-  #endif
+#endif
 
-  bool result=true;
+  bool no_change = true;
 
-  result=sort_and_join(expr) && result;
+  no_change = sort_and_join(expr) && no_change;
 
   if(expr.id()==ID_typecast)
-    result=simplify_typecast(expr) && result;
+  {
+    auto r = simplify_typecast(to_typecast_expr(expr));
+    if(r.has_changed())
+    {
+      no_change = false;
+      expr = r.expr;
+    }
+  }
   else if(expr.id()==ID_equal || expr.id()==ID_notequal ||
           expr.id()==ID_gt    || expr.id()==ID_lt ||
           expr.id()==ID_ge    || expr.id()==ID_le)
-    result=simplify_inequality(expr) && result;
+    no_change = simplify_inequality(expr) && no_change;
   else if(expr.id()==ID_if)
-    result=simplify_if(to_if_expr(expr)) && result;
+    no_change = simplify_if(to_if_expr(expr)) && no_change;
   else if(expr.id()==ID_lambda)
-    result=simplify_lambda(expr) && result;
+    no_change = simplify_lambda(expr) && no_change;
   else if(expr.id()==ID_with)
-    result=simplify_with(expr) && result;
+    no_change = simplify_with(expr) && no_change;
   else if(expr.id()==ID_update)
-    result=simplify_update(expr) && result;
+    no_change = simplify_update(expr) && no_change;
   else if(expr.id()==ID_index)
-    result=simplify_index(expr) && result;
+    no_change = simplify_index(expr) && no_change;
   else if(expr.id()==ID_member)
-    result=simplify_member(expr) && result;
+    no_change = simplify_member(expr) && no_change;
   else if(expr.id()==ID_byte_update_little_endian ||
           expr.id()==ID_byte_update_big_endian)
-    result=simplify_byte_update(to_byte_update_expr(expr)) && result;
+    no_change = simplify_byte_update(to_byte_update_expr(expr)) && no_change;
   else if(expr.id()==ID_byte_extract_little_endian ||
           expr.id()==ID_byte_extract_big_endian)
-    result=simplify_byte_extract(to_byte_extract_expr(expr)) && result;
+    no_change = simplify_byte_extract(to_byte_extract_expr(expr)) && no_change;
   else if(expr.id()==ID_pointer_object)
-    result=simplify_pointer_object(expr) && result;
+    no_change = simplify_pointer_object(expr) && no_change;
   else if(expr.id() == ID_is_dynamic_object)
   {
-    result = simplify_is_dynamic_object(expr) && result;
+    no_change = simplify_is_dynamic_object(expr) && no_change;
   }
   else if(expr.id() == ID_is_invalid_pointer)
-    result = simplify_is_invalid_pointer(expr) && result;
+    no_change = simplify_is_invalid_pointer(expr) && no_change;
   else if(expr.id()==ID_object_size)
-    result=simplify_object_size(expr) && result;
+    no_change = simplify_object_size(expr) && no_change;
   else if(expr.id()==ID_good_pointer)
-    result=simplify_good_pointer(expr) && result;
+    no_change = simplify_good_pointer(expr) && no_change;
   else if(expr.id()==ID_div)
-    result=simplify_div(expr) && result;
+    no_change = simplify_div(expr) && no_change;
   else if(expr.id()==ID_mod)
-    result=simplify_mod(expr) && result;
+    no_change = simplify_mod(expr) && no_change;
   else if(expr.id()==ID_bitnot)
-    result=simplify_bitnot(expr) && result;
+    no_change = simplify_bitnot(expr) && no_change;
   else if(expr.id()==ID_bitand ||
           expr.id()==ID_bitor ||
           expr.id()==ID_bitxor)
-    result=simplify_bitwise(expr) && result;
+    no_change = simplify_bitwise(expr) && no_change;
   else if(expr.id()==ID_ashr || expr.id()==ID_lshr || expr.id()==ID_shl)
-    result=simplify_shifts(expr) && result;
+    no_change = simplify_shifts(expr) && no_change;
   else if(expr.id()==ID_power)
-    result=simplify_power(expr) && result;
+    no_change = simplify_power(expr) && no_change;
   else if(expr.id()==ID_plus)
-    result=simplify_plus(expr) && result;
+    no_change = simplify_plus(expr) && no_change;
   else if(expr.id()==ID_minus)
-    result=simplify_minus(expr) && result;
+    no_change = simplify_minus(expr) && no_change;
   else if(expr.id()==ID_mult)
-    result=simplify_mult(expr) && result;
+    no_change = simplify_mult(expr) && no_change;
   else if(expr.id()==ID_floatbv_plus ||
           expr.id()==ID_floatbv_minus ||
           expr.id()==ID_floatbv_mult ||
           expr.id()==ID_floatbv_div)
-    result=simplify_floatbv_op(expr) && result;
+    no_change = simplify_floatbv_op(expr) && no_change;
   else if(expr.id()==ID_floatbv_typecast)
-    result=simplify_floatbv_typecast(expr) && result;
+    no_change = simplify_floatbv_typecast(expr) && no_change;
   else if(expr.id()==ID_unary_minus)
-    result=simplify_unary_minus(expr) && result;
+    no_change = simplify_unary_minus(expr) && no_change;
   else if(expr.id()==ID_unary_plus)
-    result=simplify_unary_plus(expr) && result;
+    no_change = simplify_unary_plus(expr) && no_change;
   else if(expr.id()==ID_not)
-    result=simplify_not(expr) && result;
+    no_change = simplify_not(expr) && no_change;
   else if(expr.id()==ID_implies ||
           expr.id()==ID_or      || expr.id()==ID_xor ||
           expr.id()==ID_and)
-    result=simplify_boolean(expr) && result;
+    no_change = simplify_boolean(expr) && no_change;
   else if(expr.id()==ID_dereference)
-    result=simplify_dereference(expr) && result;
+    no_change = simplify_dereference(expr) && no_change;
   else if(expr.id()==ID_address_of)
-    result=simplify_address_of(expr) && result;
+    no_change = simplify_address_of(expr) && no_change;
   else if(expr.id()==ID_pointer_offset)
-    result=simplify_pointer_offset(expr) && result;
+    no_change = simplify_pointer_offset(expr) && no_change;
   else if(expr.id()==ID_extractbit)
-    result=simplify_extractbit(expr) && result;
+    no_change = simplify_extractbit(expr) && no_change;
   else if(expr.id()==ID_concatenation)
-    result=simplify_concatenation(expr) && result;
+    no_change = simplify_concatenation(expr) && no_change;
   else if(expr.id()==ID_extractbits)
-    result = simplify_extractbits(to_extractbits_expr(expr)) && result;
+    no_change = simplify_extractbits(to_extractbits_expr(expr)) && no_change;
   else if(expr.id()==ID_ieee_float_equal ||
           expr.id()==ID_ieee_float_notequal)
-    result=simplify_ieee_float_relation(expr) && result;
+    no_change = simplify_ieee_float_relation(expr) && no_change;
   else if(expr.id() == ID_bswap)
-    result = simplify_bswap(to_bswap_expr(expr)) && result;
+    no_change = simplify_bswap(to_bswap_expr(expr)) && no_change;
   else if(expr.id()==ID_isinf)
-    result=simplify_isinf(expr) && result;
+    no_change = simplify_isinf(expr) && no_change;
   else if(expr.id()==ID_isnan)
-    result=simplify_isnan(expr) && result;
+    no_change = simplify_isnan(expr) && no_change;
   else if(expr.id()==ID_isnormal)
-    result=simplify_isnormal(expr) && result;
+    no_change = simplify_isnormal(expr) && no_change;
   else if(expr.id()==ID_abs)
-    result=simplify_abs(expr) && result;
+    no_change = simplify_abs(expr) && no_change;
   else if(expr.id()==ID_sign)
-    result=simplify_sign(expr) && result;
+    no_change = simplify_sign(expr) && no_change;
   else if(expr.id() == ID_popcount)
-    result = simplify_popcount(to_popcount_expr(expr)) && result;
+    no_change = simplify_popcount(to_popcount_expr(expr)) && no_change;
   else if(expr.id() == ID_function_application)
-    result = simplify_function_application(expr) && result;
+    no_change = simplify_function_application(expr) && no_change;
   else if(expr.id() == ID_complex_real || expr.id() == ID_complex_imag)
-    result = simplify_complex(expr) && result;
+    no_change = simplify_complex(expr) && no_change;
 
 #ifdef DEBUGX
   if(
-    !result
-#ifdef DEBUG_ON_DEMAND
+    !no_change
+#  ifdef DEBUG_ON_DEMAND
     && debug_on
-#endif
+#  endif
   )
   {
     std::cout << "===== " << old.id() << ": " << format(old) << '\n'
@@ -2537,7 +2505,7 @@ bool simplify_exprt::simplify_node(exprt &expr)
   }
 #endif
 
-  return result;
+  return no_change;
 }
 
 /// \return returns true if expression unchanged; returns false if changed

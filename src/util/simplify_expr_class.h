@@ -17,8 +17,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <set>
 
-#include "type.h"
+#include "expr.h"
 #include "mp_arith.h"
+#include "type.h"
 // #define USE_LOCAL_REPLACE_MAP
 #ifdef USE_LOCAL_REPLACE_MAP
 #include "replace_expr.h"
@@ -35,6 +36,7 @@ class member_exprt;
 class namespacet;
 class popcount_exprt;
 class tvt;
+class typecast_exprt;
 
 #define forall_value_list(it, value_list) \
   for(simplify_exprt::value_listt::const_iterator it=(value_list).begin(); \
@@ -62,10 +64,55 @@ public:
 
   bool do_simplify_if;
 
+  template <typename T = exprt>
+  struct resultt
+  {
+    bool has_changed() const
+    {
+      return expr_changed == CHANGED;
+    }
+
+    enum expr_changedt
+    {
+      CHANGED,
+      UNCHANGED
+    } expr_changed;
+
+    T expr;
+
+    /// conversion to expression, to enable chaining
+    operator T() const
+    {
+      return expr;
+    }
+
+    /// conversion from expression, thus not 'explicit'
+    /// marks the expression as "CHANGED"
+    // NOLINTNEXTLINE(runtime/explicit)
+    resultt(T _expr) : expr_changed(CHANGED), expr(std::move(_expr))
+    {
+    }
+
+    resultt(expr_changedt _expr_changed, T _expr)
+      : expr_changed(_expr_changed), expr(std::move(_expr))
+    {
+    }
+  };
+
+  static resultt<> unchanged(exprt expr)
+  {
+    return resultt<>(resultt<>::UNCHANGED, std::move(expr));
+  }
+
+  static resultt<> changed(resultt<> result)
+  {
+    result.expr_changed = resultt<>::CHANGED;
+    return result;
+  }
+
   // These below all return 'true' if the simplification wasn't applicable.
   // If false is returned, the expression has changed.
-
-  bool simplify_typecast(exprt &expr);
+  resultt<> simplify_typecast(const typecast_exprt &);
   bool simplify_extractbit(exprt &expr);
   bool simplify_extractbits(extractbits_exprt &expr);
   bool simplify_concatenation(exprt &expr);
