@@ -127,6 +127,13 @@ Author: Daniel Kroening, kroening@kroening.com
   "                              or if static initializers have side-effects such as\n" /* NOLINT(*) */ \
   "                              updating another class' static field.\n" /* NOLINT(*) */
 
+#define HELP_JAVA_CLASS_NAME /* NOLINT(*) */ \
+  "    class-name                name of class\n" \
+  "                              The entry point is the method specified by\n" /* NOLINT(*) */ \
+  "                              --function, or otherwise, the\n" \
+  "                              public static void main(String[])\n" \
+  "                              method of the given class.\n"
+
 #define OPT_JAVA_JAR /* NOLINT(*) */ \
   "(jar):"
 
