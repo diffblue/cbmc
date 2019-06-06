@@ -334,17 +334,18 @@ bool constant_propagator_domaint::two_way_propagate_rec(
   }
   else if(expr.id() == ID_not)
   {
-    if(expr.op0().id() == ID_equal || expr.op0().id() == ID_notequal)
+    const auto &op = to_not_expr(expr).op();
+
+    if(op.id() == ID_equal || op.id() == ID_notequal)
     {
-      exprt subexpr = expr.op0();
+      exprt subexpr = op;
       subexpr.id(subexpr.id() == ID_equal ? ID_notequal : ID_equal);
       change = two_way_propagate_rec(subexpr, ns, cp);
     }
-    else if(expr.op0().id() == ID_symbol && expr.type() == bool_typet())
+    else if(op.id() == ID_symbol && expr.type() == bool_typet())
     {
       // Treat `IF !x` like `IF x == FALSE`:
-      change =
-        two_way_propagate_rec(equal_exprt(expr.op0(), false_exprt()), ns, cp);
+      change = two_way_propagate_rec(equal_exprt(op, false_exprt()), ns, cp);
     }
   }
   else if(expr.id() == ID_symbol)
@@ -359,8 +360,8 @@ bool constant_propagator_domaint::two_way_propagate_rec(
   {
     // Treat "symbol != constant" like "symbol == !constant" when the constant
     // is a boolean.
-    exprt lhs = expr.op0();
-    exprt rhs = expr.op1();
+    exprt lhs = to_notequal_expr(expr).lhs();
+    exprt rhs = to_notequal_expr(expr).rhs();
 
     if(lhs.is_constant() && !rhs.is_constant())
       std::swap(lhs, rhs);
@@ -384,8 +385,8 @@ bool constant_propagator_domaint::two_way_propagate_rec(
   }
   else if(expr.id() == ID_equal)
   {
-    exprt lhs = expr.op0();
-    exprt rhs = expr.op1();
+    exprt lhs = to_equal_expr(expr).lhs();
+    exprt rhs = to_equal_expr(expr).rhs();
 
     replace_typecast_of_bool(lhs, rhs, ns);
 

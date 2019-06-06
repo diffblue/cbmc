@@ -168,7 +168,7 @@ protected:
   void mod_by_zero_check(const mod_exprt &, const guardt &);
   void mod_overflow_check(const mod_exprt &, const guardt &);
   void undefined_shift_check(const shift_exprt &, const guardt &);
-  void pointer_rel_check(const exprt &, const guardt &);
+  void pointer_rel_check(const binary_relation_exprt &, const guardt &);
   void pointer_overflow_check(const exprt &, const guardt &);
   void pointer_validity_check(const dereference_exprt &, const guardt &);
   conditionst address_check(const exprt &address, const exprt &size);
@@ -450,12 +450,10 @@ void goto_checkt::conversion_check(
 
   if(expr.id()==ID_typecast)
   {
+    const auto &op = to_typecast_expr(expr).op();
+
     // conversion to signed int may overflow
-
-    if(expr.operands().size()!=1)
-      throw "typecast takes one operand";
-
-    const typet &old_type = expr.op0().type();
+    const typet &old_type = op.type();
 
     if(type.id()==ID_signedbv)
     {
@@ -468,12 +466,10 @@ void goto_checkt::conversion_check(
           return; // always ok
 
         const binary_relation_exprt no_overflow_upper(
-          expr.op0(),
-          ID_le,
-          from_integer(power(2, new_width - 1) - 1, old_type));
+          op, ID_le, from_integer(power(2, new_width - 1) - 1, old_type));
 
         const binary_relation_exprt no_overflow_lower(
-          expr.op0(), ID_ge, from_integer(-power(2, new_width - 1), old_type));
+          op, ID_ge, from_integer(-power(2, new_width - 1), old_type));
 
         add_guarded_property(
           and_exprt(no_overflow_lower, no_overflow_upper),
@@ -490,9 +486,7 @@ void goto_checkt::conversion_check(
           return; // always ok
 
         const binary_relation_exprt no_overflow_upper(
-          expr.op0(),
-          ID_le,
-          from_integer(power(2, new_width - 1) - 1, old_type));
+          op, ID_le, from_integer(power(2, new_width - 1) - 1, old_type));
 
         add_guarded_property(
           no_overflow_upper,
@@ -508,12 +502,12 @@ void goto_checkt::conversion_check(
         ieee_floatt upper(to_floatbv_type(old_type));
         upper.from_integer(power(2, new_width-1));
         const binary_relation_exprt no_overflow_upper(
-          expr.op0(), ID_lt, upper.to_expr());
+          op, ID_lt, upper.to_expr());
 
         ieee_floatt lower(to_floatbv_type(old_type));
         lower.from_integer(-power(2, new_width-1)-1);
         const binary_relation_exprt no_overflow_lower(
-          expr.op0(), ID_gt, lower.to_expr());
+          op, ID_gt, lower.to_expr());
 
         add_guarded_property(
           and_exprt(no_overflow_lower, no_overflow_upper),
@@ -536,7 +530,7 @@ void goto_checkt::conversion_check(
         {
           // only need lower bound check
           const binary_relation_exprt no_overflow_lower(
-            expr.op0(), ID_ge, from_integer(0, old_type));
+            op, ID_ge, from_integer(0, old_type));
 
           add_guarded_property(
             no_overflow_lower,
@@ -550,10 +544,10 @@ void goto_checkt::conversion_check(
         {
           // need both
           const binary_relation_exprt no_overflow_upper(
-            expr.op0(), ID_le, from_integer(power(2, new_width) - 1, old_type));
+            op, ID_le, from_integer(power(2, new_width) - 1, old_type));
 
           const binary_relation_exprt no_overflow_lower(
-            expr.op0(), ID_ge, from_integer(0, old_type));
+            op, ID_ge, from_integer(0, old_type));
 
           add_guarded_property(
             and_exprt(no_overflow_lower, no_overflow_upper),
@@ -571,7 +565,7 @@ void goto_checkt::conversion_check(
           return; // always ok
 
         const binary_relation_exprt no_overflow_upper(
-          expr.op0(), ID_le, from_integer(power(2, new_width) - 1, old_type));
+          op, ID_le, from_integer(power(2, new_width) - 1, old_type));
 
         add_guarded_property(
           no_overflow_upper,
@@ -587,12 +581,12 @@ void goto_checkt::conversion_check(
         ieee_floatt upper(to_floatbv_type(old_type));
         upper.from_integer(power(2, new_width)-1);
         const binary_relation_exprt no_overflow_upper(
-          expr.op0(), ID_lt, upper.to_expr());
+          op, ID_lt, upper.to_expr());
 
         ieee_floatt lower(to_floatbv_type(old_type));
         lower.from_integer(-1);
         const binary_relation_exprt no_overflow_lower(
-          expr.op0(), ID_gt, lower.to_expr());
+          op, ID_gt, lower.to_expr());
 
         add_guarded_property(
           and_exprt(no_overflow_lower, no_overflow_upper),
@@ -627,16 +621,15 @@ void goto_checkt::integer_overflow_check(
 
   if(expr.id()==ID_div)
   {
-    assert(expr.operands().size()==2);
-
     // undefined for signed division INT_MIN/-1
     if(type.id()==ID_signedbv)
     {
-      equal_exprt int_min_eq(
-        expr.op0(), to_signedbv_type(type).smallest_expr());
+      const auto &div_expr = to_div_expr(expr);
 
-      equal_exprt minus_one_eq(
-        expr.op1(), from_integer(-1, type));
+      equal_exprt int_min_eq(
+        div_expr.dividend(), to_signedbv_type(type).smallest_expr());
+
+      equal_exprt minus_one_eq(div_expr.divisor(), from_integer(-1, type));
 
       add_guarded_property(
         not_exprt(and_exprt(int_min_eq, minus_one_eq)),
@@ -657,7 +650,7 @@ void goto_checkt::integer_overflow_check(
       // representable number 100....0
 
       equal_exprt int_min_eq(
-        expr.op0(), to_signedbv_type(type).smallest_expr());
+        to_unary_minus_expr(expr).op(), to_signedbv_type(type).smallest_expr());
 
       add_guarded_property(
         not_exprt(int_min_eq),
@@ -774,7 +767,7 @@ void goto_checkt::integer_overflow_check(
     return;
   }
 
-  exprt overflow("overflow-"+expr.id_string(), bool_typet());
+  multi_ary_exprt overflow("overflow-" + expr.id_string(), bool_typet());
   overflow.operands()=expr.operands();
 
   if(expr.operands().size()>=3)
@@ -844,18 +837,14 @@ void goto_checkt::float_overflow_check(
   {
     // Can overflow if casting from larger
     // to smaller type.
-    assert(expr.operands().size()==1);
-
-    if(expr.op0().type().id() == ID_floatbv)
+    const auto &op = to_typecast_expr(expr).op();
+    if(op.type().id() == ID_floatbv)
     {
       // float-to-float
-      const isinf_exprt op0_inf(expr.op0());
-      const isinf_exprt new_inf(expr);
-
-      or_exprt overflow_check(op0_inf, not_exprt(new_inf));
+      or_exprt overflow_check{isinf_exprt(op), not_exprt(isinf_exprt(expr))};
 
       add_guarded_property(
-        overflow_check,
+        std::move(overflow_check),
         "arithmetic overflow on floating-point typecast",
         "overflow",
         expr.find_source_location(),
@@ -865,10 +854,8 @@ void goto_checkt::float_overflow_check(
     else
     {
       // non-float-to-float
-      const isinf_exprt new_inf(expr);
-
       add_guarded_property(
-        not_exprt(new_inf),
+        not_exprt(isinf_exprt(expr)),
         "arithmetic overflow on floating-point typecast",
         "overflow",
         expr.find_source_location(),
@@ -880,16 +867,12 @@ void goto_checkt::float_overflow_check(
   }
   else if(expr.id()==ID_div)
   {
-    assert(expr.operands().size()==2);
-
     // Can overflow if dividing by something small
-    const isinf_exprt new_inf(expr);
-    const isinf_exprt op0_inf(expr.op0());
-
-    or_exprt overflow_check(op0_inf, not_exprt(new_inf));
+    or_exprt overflow_check(
+      isinf_exprt(to_div_expr(expr).dividend()), not_exprt(isinf_exprt(expr)));
 
     add_guarded_property(
-      overflow_check,
+      std::move(overflow_check),
       "arithmetic overflow on floating-point division",
       "overflow",
       expr.find_source_location(),
@@ -914,11 +897,10 @@ void goto_checkt::float_overflow_check(
     if(expr.operands().size()==2)
     {
       // Can overflow
-      const isinf_exprt new_inf(expr);
-      const isinf_exprt op0_inf(expr.op0());
-      const isinf_exprt op1_inf(expr.op1());
-
-      or_exprt overflow_check(op0_inf, op1_inf, not_exprt(new_inf));
+      or_exprt overflow_check(
+        isinf_exprt(to_binary_expr(expr).op0()),
+        isinf_exprt(to_binary_expr(expr).op1()),
+        not_exprt(isinf_exprt(expr)));
 
       std::string kind=
         expr.id()==ID_plus?"addition":
@@ -926,7 +908,7 @@ void goto_checkt::float_overflow_check(
         expr.id()==ID_mult?"multiplication":"";
 
       add_guarded_property(
-        overflow_check,
+        std::move(overflow_check),
         "arithmetic overflow on floating-point " + kind,
         "overflow",
         expr.find_source_location(),
@@ -940,8 +922,7 @@ void goto_checkt::float_overflow_check(
       assert(expr.id()!=ID_minus);
 
       // break up
-      exprt tmp=make_binary(expr);
-      float_overflow_check(tmp, guard);
+      float_overflow_check(make_binary(expr), guard);
       return;
     }
   }
@@ -970,16 +951,18 @@ void goto_checkt::nan_check(
 
   if(expr.id()==ID_div)
   {
-    assert(expr.operands().size()==2);
+    const auto &div_expr = to_div_expr(expr);
 
     // there a two ways to get a new NaN on division:
     // 0/0 = NaN and x/inf = NaN
     // (note that x/0 = +-inf for x!=0 and x!=inf)
     const and_exprt zero_div_zero(
-      ieee_float_equal_exprt(expr.op0(), from_integer(0, expr.op0().type())),
-      ieee_float_equal_exprt(expr.op1(), from_integer(0, expr.op1().type())));
+      ieee_float_equal_exprt(
+        div_expr.op0(), from_integer(0, div_expr.dividend().type())),
+      ieee_float_equal_exprt(
+        div_expr.op1(), from_integer(0, div_expr.divisor().type())));
 
-    const isinf_exprt div_inf(expr.op1());
+    const isinf_exprt div_inf(div_expr.op1());
 
     isnan=or_exprt(zero_div_zero, div_inf);
   }
@@ -988,16 +971,18 @@ void goto_checkt::nan_check(
     if(expr.operands().size()>=3)
       return nan_check(make_binary(expr), guard);
 
-    assert(expr.operands().size()==2);
+    const auto &mult_expr = to_mult_expr(expr);
 
     // Inf * 0 is NaN
     const and_exprt inf_times_zero(
-      isinf_exprt(expr.op0()),
-      ieee_float_equal_exprt(expr.op1(), from_integer(0, expr.op1().type())));
+      isinf_exprt(mult_expr.op0()),
+      ieee_float_equal_exprt(
+        mult_expr.op1(), from_integer(0, mult_expr.op1().type())));
 
     const and_exprt zero_times_inf(
-      ieee_float_equal_exprt(expr.op1(), from_integer(0, expr.op1().type())),
-      isinf_exprt(expr.op0()));
+      ieee_float_equal_exprt(
+        mult_expr.op1(), from_integer(0, mult_expr.op1().type())),
+      isinf_exprt(mult_expr.op0()));
 
     isnan=or_exprt(inf_times_zero, zero_times_inf);
   }
@@ -1006,41 +991,41 @@ void goto_checkt::nan_check(
     if(expr.operands().size()>=3)
       return nan_check(make_binary(expr), guard);
 
-    assert(expr.operands().size()==2);
+    const auto &plus_expr = to_plus_expr(expr);
 
     // -inf + +inf = NaN and +inf + -inf = NaN,
     // i.e., signs differ
-    ieee_float_spect spec=ieee_float_spect(to_floatbv_type(expr.type()));
+    ieee_float_spect spec = ieee_float_spect(to_floatbv_type(plus_expr.type()));
     exprt plus_inf=ieee_floatt::plus_infinity(spec).to_expr();
     exprt minus_inf=ieee_floatt::minus_infinity(spec).to_expr();
 
-    isnan=
-      or_exprt(
-        and_exprt(
-          equal_exprt(expr.op0(), minus_inf),
-          equal_exprt(expr.op1(), plus_inf)),
-        and_exprt(
-          equal_exprt(expr.op0(), plus_inf),
-          equal_exprt(expr.op1(), minus_inf)));
+    isnan = or_exprt(
+      and_exprt(
+        equal_exprt(plus_expr.op0(), minus_inf),
+        equal_exprt(plus_expr.op1(), plus_inf)),
+      and_exprt(
+        equal_exprt(plus_expr.op0(), plus_inf),
+        equal_exprt(plus_expr.op1(), minus_inf)));
   }
   else if(expr.id()==ID_minus)
   {
-    assert(expr.operands().size()==2);
     // +inf - +inf = NaN and -inf - -inf = NaN,
     // i.e., signs match
 
-    ieee_float_spect spec=ieee_float_spect(to_floatbv_type(expr.type()));
+    const auto &minus_expr = to_minus_expr(expr);
+
+    ieee_float_spect spec =
+      ieee_float_spect(to_floatbv_type(minus_expr.type()));
     exprt plus_inf=ieee_floatt::plus_infinity(spec).to_expr();
     exprt minus_inf=ieee_floatt::minus_infinity(spec).to_expr();
 
-    isnan=
-      or_exprt(
-        and_exprt(
-          equal_exprt(expr.op0(), plus_inf),
-          equal_exprt(expr.op1(), plus_inf)),
-        and_exprt(
-          equal_exprt(expr.op0(), minus_inf),
-          equal_exprt(expr.op1(), minus_inf)));
+    isnan = or_exprt(
+      and_exprt(
+        equal_exprt(minus_expr.op0(), plus_inf),
+        equal_exprt(minus_expr.op1(), plus_inf)),
+      and_exprt(
+        equal_exprt(minus_expr.op0(), minus_inf),
+        equal_exprt(minus_expr.op1(), minus_inf)));
   }
   else
     UNREACHABLE;
@@ -1055,14 +1040,11 @@ void goto_checkt::nan_check(
 }
 
 void goto_checkt::pointer_rel_check(
-  const exprt &expr,
+  const binary_relation_exprt &expr,
   const guardt &guard)
 {
   if(!enable_pointer_check)
     return;
-
-  if(expr.operands().size()!=2)
-    throw expr.id_string()+" takes two arguments";
 
   if(expr.op0().type().id()==ID_pointer &&
      expr.op1().type().id()==ID_pointer)
@@ -1296,9 +1278,9 @@ void goto_checkt::bounds_check(
   if(index.type().id()!=ID_unsignedbv)
   {
     // we undo typecasts to signedbv
-    if(index.id()==ID_typecast &&
-       index.operands().size()==1 &&
-       index.op0().type().id()==ID_unsignedbv)
+    if(
+      index.id() == ID_typecast &&
+      to_typecast_expr(index).op().type().id() == ID_unsignedbv)
     {
       // ok
     }
@@ -1707,7 +1689,7 @@ void goto_checkt::check_rec(const exprt &expr, guardt &guard)
     conversion_check(expr, guard);
   else if(expr.id()==ID_le || expr.id()==ID_lt ||
           expr.id()==ID_ge || expr.id()==ID_gt)
-    pointer_rel_check(expr, guard);
+    pointer_rel_check(to_binary_relation_expr(expr), guard);
   else if(expr.id()==ID_dereference)
   {
     pointer_validity_check(to_dereference_expr(expr), guard);

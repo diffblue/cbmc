@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/arith_tools.h>
 #include <util/base_exceptions.h>
+#include <util/byte_operators.h>
 #include <util/c_types.h>
 #include <util/expr_util.h>
 #include <util/namespace.h>
@@ -425,13 +426,13 @@ void invariant_sett::strengthen_rec(const exprt &expr)
     // special rule: x <= (a & b)
     // implies:      x<=a && x<=b
 
-    if(rel.op1().id() == ID_bitand)
+    if(rel.rhs().id() == ID_bitand)
     {
       const exprt &bitand_op = rel.op1();
 
       forall_operands(it, bitand_op)
       {
-        exprt tmp(expr);
+        auto tmp(rel);
         tmp.op1()=*it;
         strengthen_rec(tmp);
       }
@@ -506,7 +507,7 @@ void invariant_sett::strengthen_rec(const exprt &expr)
 
       forall_operands(it, bitand_op)
       {
-        exprt tmp(equal_expr);
+        auto tmp(equal_expr);
         tmp.op1()=*it;
         tmp.id(ID_le);
         strengthen_rec(tmp);
@@ -516,7 +517,7 @@ void invariant_sett::strengthen_rec(const exprt &expr)
     }
     else if(equal_expr.op0().id() == ID_bitand)
     {
-      exprt tmp(equal_expr);
+      auto tmp(equal_expr);
       std::swap(tmp.op0(), tmp.op1());
       strengthen_rec(tmp);
       return;
@@ -628,8 +629,8 @@ tvt invariant_sett::implies_rec(const exprt &expr) const
 
     std::pair<unsigned, unsigned> p;
 
-    bool ob0 = get_object(rel.op0(), p.first);
-    bool ob1 = get_object(rel.op1(), p.second);
+    bool ob0 = get_object(rel.lhs(), p.first);
+    bool ob1 = get_object(rel.rhs(), p.second);
 
     if(ob0 || ob1)
       return tvt::unknown();
@@ -757,7 +758,8 @@ void invariant_sett::nnf(exprt &expr, bool negate)
     {
       // !a<=b <-> !b=>a <-> b<a
       expr.id(ID_lt);
-      std::swap(expr.op0(), expr.op1());
+      auto &rel = to_binary_relation_expr(expr);
+      std::swap(rel.lhs(), rel.rhs());
     }
   }
   else if(expr.id()==ID_lt)
@@ -766,7 +768,8 @@ void invariant_sett::nnf(exprt &expr, bool negate)
     {
       // !a<b <-> !b>a <-> b<=a
       expr.id(ID_le);
-      std::swap(expr.op0(), expr.op1());
+      auto &rel = to_binary_relation_expr(expr);
+      std::swap(rel.lhs(), rel.rhs());
     }
   }
   else if(expr.id()==ID_ge)
@@ -776,7 +779,8 @@ void invariant_sett::nnf(exprt &expr, bool negate)
     else
     {
       expr.id(ID_le);
-      std::swap(expr.op0(), expr.op1());
+      auto &rel = to_binary_relation_expr(expr);
+      std::swap(rel.lhs(), rel.rhs());
     }
   }
   else if(expr.id()==ID_gt)
@@ -786,7 +790,8 @@ void invariant_sett::nnf(exprt &expr, bool negate)
     else
     {
       expr.id(ID_lt);
-      std::swap(expr.op0(), expr.op1());
+      auto &rel = to_binary_relation_expr(expr);
+      std::swap(rel.lhs(), rel.rhs());
     }
   }
   else if(expr.id()==ID_equal)
@@ -1000,15 +1005,13 @@ void invariant_sett::modifies(const exprt &lhs)
   else if(lhs.id()==ID_if)
   {
     // we just assume both are changed
-    assert(lhs.operands().size()==3);
-    modifies(lhs.op1());
-    modifies(lhs.op2());
+    modifies(to_if_expr(lhs).op1());
+    modifies(to_if_expr(lhs).op2());
   }
   else if(lhs.id()==ID_typecast)
   {
     // just go down
-    assert(lhs.operands().size()==1);
-    modifies(lhs.op0());
+    modifies(to_typecast_expr(lhs).op());
   }
   else if(lhs.id()=="valid_object")
   {
@@ -1020,8 +1023,7 @@ void invariant_sett::modifies(const exprt &lhs)
           lhs.id()==ID_byte_extract_big_endian)
   {
     // just go down
-    assert(lhs.operands().size()==2);
-    modifies(lhs.op0());
+    modifies(to_byte_extract_expr(lhs).op0());
   }
   else if(lhs.id() == ID_null_object ||
           lhs.id() == "is_zero_string" ||
