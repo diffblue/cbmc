@@ -33,6 +33,7 @@ SRC += analyses/ai/ai.cpp \
        goto-symex/ssa_equation.cpp \
        goto-symex/is_constant.cpp \
        goto-symex/symex_level0.cpp \
+       goto-symex/symex_level1.cpp \
        interpreter/interpreter.cpp \
        json/json_parser.cpp \
        json_symbol_table.cpp \
