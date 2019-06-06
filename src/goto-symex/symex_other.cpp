@@ -256,11 +256,9 @@ void goto_symext::symex_other(
   }
   else if(statement==ID_havoc_object)
   {
-    DATA_INVARIANT(
-      code.operands().size() == 1,
-      "expected havoc_object statement to have one operand");
+    const auto &havoc_object_statement = to_code_havoc_object(code);
 
-    exprt object = clean_expr(code.op0(), state, false);
+    exprt object = clean_expr(havoc_object_statement.object(), state, false);
 
     process_array_expr(state, object);
     havoc_rec(state, guardt(true_exprt(), guard_manager), object);
