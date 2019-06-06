@@ -74,6 +74,8 @@ struct symex_level2t
 {
   symex_renaming_levelt current_names;
 
+  /// Set L2 tag to correspond to the current count of the identifier of
+  /// \p l1_expr's
   renamedt<ssa_exprt, L2> operator()(renamedt<ssa_exprt, L1> l1_expr) const;
 
   /// Counter corresponding to an identifier
