@@ -803,8 +803,8 @@ ssa_exprt goto_symex_statet::add_object(
   if(const auto old_value = level1.insert_or_replace(renamed, l1_index))
   {
     // save old L1 name
-    if(!frame.old_level1.has_key(l0_name))
-      frame.old_level1.insert(l0_name, *old_value);
+    if(!frame.old_level1.has(renamed))
+      frame.old_level1.insert(renamed, old_value->second);
   }
 
   const ssa_exprt ssa = rename_ssa<L1>(renamed.get(), ns).get();

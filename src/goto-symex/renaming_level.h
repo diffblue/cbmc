@@ -74,7 +74,7 @@ struct symex_level1t
   renamedt<ssa_exprt, L1> operator()(renamedt<ssa_exprt, L0> l0_expr) const;
 
   /// Insert the content of \p other into this renaming
-  void restore_from(const symex_renaming_levelt &other);
+  void restore_from(const symex_level1t &other);
 
 private:
   symex_renaming_levelt current_names;

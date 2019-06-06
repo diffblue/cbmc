@@ -116,10 +116,10 @@ operator()(renamedt<ssa_exprt, L1> l1_expr) const
   return renamedt<ssa_exprt, L2>{std::move(l1_expr.value())};
 }
 
-void symex_level1t::restore_from(const symex_renaming_levelt &other)
+void symex_level1t::restore_from(const symex_level1t &other)
 {
   symex_renaming_levelt::delta_viewt delta_view;
-  other.get_delta_view(current_names, delta_view, false);
+  other.current_names.get_delta_view(current_names, delta_view, false);
 
   for(const auto &delta_item : delta_view)
   {
