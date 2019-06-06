@@ -27,7 +27,7 @@ class renamedt : private underlyingt
 public:
   static_assert(
     std::is_base_of<exprt, underlyingt>::value ||
-    std::is_base_of<typet, underlyingt>::value,
+      std::is_base_of<typet, underlyingt>::value,
     "underlyingt should inherit from exprt or typet");
 
   const underlyingt &get() const
@@ -41,7 +41,7 @@ public:
   }
 
   using mutator_functiont =
-  std::function<optionalt<renamedt>(const renamedt &)>;
+    std::function<optionalt<renamedt>(const renamedt &)>;
 
 private:
   underlyingt &value()
@@ -62,7 +62,7 @@ private:
   friend void selectively_mutate(
     renamedt<exprt, selectively_mutate_level> &renamed,
     typename renamedt<exprt, selectively_mutate_level>::mutator_functiont
-    get_mutated_expr);
+      get_mutated_expr);
 
   /// Only the friend classes can create renamedt objects
   explicit renamedt(underlyingt value) : underlyingt(std::move(value))
