@@ -268,6 +268,8 @@ class java_bytecode_languaget:public languaget
 public:
   void set_language_options(const optionst &) override;
 
+  void set_message_handler(message_handlert &message_handler) override;
+
   virtual bool preprocess(
     std::istream &instream,
     const std::string &path,
