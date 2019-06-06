@@ -13,9 +13,9 @@ src/goto-analyzer/taint_driver_scripts/.idea/*
 /*.idea
 /*.includes
 # Eclipse
-src/.cproject
-src/.project
-src/.settings/*
+.cproject
+.project
+.settings
 # Visual Studio
 Debug/*
 Release/*
