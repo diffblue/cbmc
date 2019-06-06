@@ -56,8 +56,6 @@ struct symex_level0t
 /// This is to preserve locality in case of recursion
 struct symex_level1t
 {
-  symex_renaming_levelt current_names;
-
   /// Assume \p ssa is not already known
   void insert(ssa_exprt ssa, unsigned index);
 
@@ -74,6 +72,9 @@ struct symex_level1t
 
   /// Insert the content of \p other into this renaming
   void restore_from(const symex_renaming_levelt &other);
+
+private:
+  symex_renaming_levelt current_names;
 };
 
 /// Functor to set the level 2 renaming of SSA expressions.
