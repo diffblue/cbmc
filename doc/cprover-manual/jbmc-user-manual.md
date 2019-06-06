@@ -41,7 +41,7 @@ input arguments at index 3:
 Now let's run the following command to let JBMC tell us about potential errors
 in our program.
 ```
-$ jbmc tutorial/ExampleArray.class
+$ jbmc tutorial.ExampleArray
 ```
 
 The output contains the following:
@@ -77,7 +77,7 @@ safe as follows:
 ```
 then when running JBMC on that corrected version:
 ```
-$ jbmc tutorial/ExampleArraySafe.class
+$ jbmc tutorial.ExampleArraySafe
 ```
 
 all the automatic assertions become valid, meaning that there is no
@@ -123,7 +123,7 @@ depends on an input):
 To limit the number of times the for-loop is unwound, we use the `--unwind N`
 options, in which case the following call to JBMC:
 ```
-$ jbmc tutorial/ExampleUnwind.class --function tutorial.ExampleUnwind.isPrime --unwind 10
+$ jbmc tutorial.ExampleUnwind --function tutorial.ExampleUnwind.isPrime --unwind 10
 ```
 will terminate correctly. In this case, we will see `VERIFICATION SUCCESSFUL`,
 as no automatic assertions are violated.
@@ -139,7 +139,7 @@ JBMC will try to refute. On line 7, we check the assertion that all odd
 numbers greater than 1 are prime. To be sure that this always holds, we run
 JBMC on the example, with a reasonable `unwind` value:
 ```
-$ jbmc tutorial/ExampleUnwind.class --function tutorial.ExampleUnwind.doSomething --unwind 10
+$ jbmc tutorial.ExampleUnwind --function tutorial.ExampleUnwind.doSomething --unwind 10
 ```
 Unsurprisingly JBMC doesn't agree, and prints an assertion failure
 (truncated here for readability):
@@ -188,7 +188,7 @@ from `java.lang.String`, e.g.
 The following command line (note that the current directory is also added to
 the classpath):
 ```
-$ jbmc tutorial/ExampleModels.class --cp <path_to_cbmc>/jbmc/src/java_bytecode/library/core-models.jar:.
+$ jbmc tutorial.ExampleModels --cp <path_to_cbmc>/jbmc/src/java_bytecode/library/core-models.jar:.
 ```
 will flag this violation (truncated):
 ```plaintext
@@ -223,7 +223,7 @@ Consider the following code:
 
 When given the `--throw-runtime-exceptions` options:
 ```
-$ jbmc tutorial/ExampleExceptions --tutorial.ExampleExceptions.strLength --throw-runtime-exceptions
+$ jbmc tutorial.ExampleExceptions --tutorial.ExampleExceptions.strLength --throw-runtime-exceptions
 ```
 JBMC will signal that the `str.length()` call may throw a runtime exception
 and that this exception is not caught.
@@ -245,7 +245,7 @@ VERIFICATION SUCCESSFUL
 
 When analyzing this function without runtime exception support:
 ```
-$ jbmc tutorial/ExampleExceptions
+$ jbmc tutorial.ExampleExceptions
 ```
 JBMC only reports the error as a null pointer check failure:
 ```
