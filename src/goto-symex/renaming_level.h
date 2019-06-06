@@ -42,6 +42,9 @@ void get_variables(
 /// The renaming is built for one particular interleaving.
 struct symex_level0t
 {
+  /// Rename \p ssa_expr using \p thread_nr as L0 tag, unless \p ssa_expr is
+  /// a guard, a shared variable or a function. \p ns is queried to decide
+  /// whether we are in one of these cases.
   renamedt<ssa_exprt, L0> operator()(
     ssa_exprt ssa_expr,
     const namespacet &ns,
