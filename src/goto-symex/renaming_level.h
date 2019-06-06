@@ -65,6 +65,9 @@ struct symex_level1t
   optionalt<std::pair<ssa_exprt, unsigned>>
   insert_or_replace(const renamedt<ssa_exprt, L0> &ssa, unsigned index);
 
+  /// \return true if \p ssa has an associated index
+  bool has(const renamedt<ssa_exprt, L0> &ssa) const;
+
   /// \return an SSA expression similar to \p l0_expr where the L1 tag has been
   ///   set to the value in \ref current_names of the l1 object identifier of
   ///   \p l0_expr

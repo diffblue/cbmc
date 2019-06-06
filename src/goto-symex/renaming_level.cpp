@@ -78,6 +78,11 @@ optionalt<std::pair<ssa_exprt, unsigned>> symex_level1t::insert_or_replace(
   return {};
 }
 
+bool symex_level1t::has(const renamedt<ssa_exprt, L0> &ssa) const
+{
+  return current_names.has_key(ssa.get().get_identifier());
+}
+
 renamedt<ssa_exprt, L1> symex_level1t::
 operator()(renamedt<ssa_exprt, L0> l0_expr) const
 {
