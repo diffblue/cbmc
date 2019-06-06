@@ -38,6 +38,7 @@ SCENARIO("Level 1 renaming", "[core][goto-symex][symex-level1]")
     {
       THEN("Renaming leaves it unchanged")
       {
+        REQUIRE(!symex_level1.has(l0_symbol));
         auto renamed = symex_level1(l0_symbol);
         REQUIRE(renamed.get().get_identifier() == "foo!50");
       }
@@ -48,6 +49,7 @@ SCENARIO("Level 1 renaming", "[core][goto-symex][symex-level1]")
       symex_level1.insert(l0_symbol, 12134);
       THEN("The symbol is renamed to the index inserted")
       {
+        REQUIRE(symex_level1.has(l0_symbol));
         auto renamed = symex_level1(l0_symbol);
         REQUIRE(renamed.get().get_identifier() == "foo!50@12134");
       }
@@ -63,6 +65,7 @@ SCENARIO("Level 1 renaming", "[core][goto-symex][symex-level1]")
         auto renamed2 = symex_level1(l0_symbol);
         REQUIRE(renamed2.get().get_identifier() == "foo!50@43950");
       }
+      REQUIRE(symex_level1.has(l0_symbol));
     }
 
     WHEN("insert_or_replace is called with a symbol not already inserted")
@@ -74,6 +77,7 @@ SCENARIO("Level 1 renaming", "[core][goto-symex][symex-level1]")
       }
       THEN("The symbol is renamed to the index inserted")
       {
+        REQUIRE(symex_level1.has(l0_symbol));
         auto renamed = symex_level1(l0_symbol);
         REQUIRE(renamed.get().get_identifier() == "foo!50@20051");
       }
