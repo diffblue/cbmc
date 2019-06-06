@@ -722,7 +722,7 @@ void goto_symext::phi_function(
   // this gets the diff between the guards
   diff_guard -= dest_state.guard;
 
-  symex_renaming_levelt::current_namest::delta_viewt delta_view;
+  symex_renaming_levelt::delta_viewt delta_view;
   goto_state.get_level2().current_names.get_delta_view(
     dest_state.get_level2().current_names, delta_view, false);
 

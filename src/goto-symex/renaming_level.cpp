@@ -17,6 +17,19 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 #include "goto_symex_state.h"
 
+void get_variables(
+  const symex_renaming_levelt &current_names,
+  std::unordered_set<ssa_exprt, irep_hash> &vars)
+{
+  symex_renaming_levelt::viewt view;
+  current_names.get_view(view);
+
+  for(const auto &pair : view)
+  {
+    vars.insert(pair.second.first);
+  }
+}
+
 renamedt<ssa_exprt, L0> symex_level0t::
 operator()(ssa_exprt ssa_expr, const namespacet &ns, unsigned thread_nr) const
 {
@@ -76,9 +89,9 @@ operator()(renamedt<ssa_exprt, L1> l1_expr) const
   return renamedt<ssa_exprt, L2>{std::move(l1_expr.value())};
 }
 
-void symex_level1t::restore_from(const current_namest &other)
+void symex_level1t::restore_from(const symex_renaming_levelt &other)
 {
-  current_namest::delta_viewt delta_view;
+  symex_renaming_levelt::delta_viewt delta_view;
   other.get_delta_view(current_names, delta_view, false);
 
   for(const auto &delta_item : delta_view)
@@ -95,6 +108,12 @@ void symex_level1t::restore_from(const current_namest &other)
       }
     }
   }
+}
+
+unsigned symex_level2t::current_count(const irep_idt &identifier) const
+{
+  const auto r_opt = current_names.find(identifier);
+  return !r_opt ? 0 : r_opt->get().second;
 }
 
 exprt get_original_name(exprt expr)

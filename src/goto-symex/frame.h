@@ -32,7 +32,7 @@ struct framet
   exprt return_value = nil_exprt();
   bool hidden_function = false;
 
-  symex_renaming_levelt::current_namest old_level1;
+  symex_renaming_levelt old_level1;
 
   std::set<irep_idt> local_objects;
 

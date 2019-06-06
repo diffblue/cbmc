@@ -52,7 +52,7 @@ void goto_symext::symex_start_thread(statet &state)
   // create a copy of the local variables for the new thread
   framet &frame = state.call_stack().top();
 
-  symex_renaming_levelt::current_namest::viewt view;
+  symex_renaming_levelt::viewt view;
   state.get_level2().current_names.get_view(view);
 
   for(const auto &pair : view)

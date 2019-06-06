@@ -343,7 +343,7 @@ pop_frame(goto_symext::statet &state, const path_storaget &path_storage)
     // restore L1 renaming
     state.level1.restore_from(frame.old_level1);
 
-    symex_renaming_levelt::current_namest::viewt view;
+    symex_renaming_levelt::viewt view;
     state.get_level2().current_names.get_view(view);
 
     std::vector<irep_idt> keys_to_erase;
