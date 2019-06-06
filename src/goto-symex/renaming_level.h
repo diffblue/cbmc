@@ -58,6 +58,9 @@ struct symex_level1t
 {
   symex_renaming_levelt current_names;
 
+  /// \return an SSA expression similar to \p l0_expr where the L1 tag has been
+  ///   set to the value in \ref current_names of the l1 object identifier of
+  ///   \p l0_expr
   renamedt<ssa_exprt, L1> operator()(renamedt<ssa_exprt, L0> l0_expr) const;
 
   /// Insert the content of \p other into this renaming
