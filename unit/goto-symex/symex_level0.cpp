@@ -72,7 +72,7 @@ SCENARIO("Level 0 renaming", "[core][goto-symex][symex-level0]")
 
     WHEN("The non-shared symbol is renamed")
     {
-      auto renamed = symex_level0t{}(ssa_nonshared, ns, 423);
+      auto renamed = symex_level0(ssa_nonshared, ns, 423);
 
       THEN("Its L0 tag is set to the thread index")
       {
@@ -82,7 +82,7 @@ SCENARIO("Level 0 renaming", "[core][goto-symex][symex-level0]")
 
     WHEN("The shared symbol is renamed")
     {
-      auto renamed = symex_level0t{}(ssa_shared, ns, 423);
+      auto renamed = symex_level0(ssa_shared, ns, 423);
 
       THEN("Its L0 tag is unchanged")
       {
@@ -92,7 +92,7 @@ SCENARIO("Level 0 renaming", "[core][goto-symex][symex-level0]")
 
     WHEN("The guard is renamed")
     {
-      auto renamed = symex_level0t{}(ssa_guard, ns, 423);
+      auto renamed = symex_level0(ssa_guard, ns, 423);
 
       THEN("Its L0 tag is unchanged")
       {
@@ -104,7 +104,7 @@ SCENARIO("Level 0 renaming", "[core][goto-symex][symex-level0]")
 
     WHEN("The function is renamed")
     {
-      auto renamed = symex_level0t{}(ssa_fun, ns, 423);
+      auto renamed = symex_level0(ssa_fun, ns, 423);
 
       THEN("Its L0 tag is unchanged")
       {

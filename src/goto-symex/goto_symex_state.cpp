@@ -135,21 +135,22 @@ template <>
 renamedt<ssa_exprt, L0>
 goto_symex_statet::set_indices<L0>(ssa_exprt ssa_expr, const namespacet &ns)
 {
-  return level0(std::move(ssa_expr), ns, source.thread_nr);
+  return symex_level0(std::move(ssa_expr), ns, source.thread_nr);
 }
 
 template <>
 renamedt<ssa_exprt, L1>
 goto_symex_statet::set_indices<L1>(ssa_exprt ssa_expr, const namespacet &ns)
 {
-  return level1(level0(std::move(ssa_expr), ns, source.thread_nr));
+  return level1(symex_level0(std::move(ssa_expr), ns, source.thread_nr));
 }
 
 template <>
 renamedt<ssa_exprt, L2>
 goto_symex_statet::set_indices<L2>(ssa_exprt ssa_expr, const namespacet &ns)
 {
-  return level2(level1(level0(std::move(ssa_expr), ns, source.thread_nr)));
+  return level2(
+    level1(symex_level0(std::move(ssa_expr), ns, source.thread_nr)));
 }
 
 renamedt<ssa_exprt, L2> goto_symex_statet::assignment(

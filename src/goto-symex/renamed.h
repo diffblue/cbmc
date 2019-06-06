@@ -49,7 +49,8 @@ private:
     return static_cast<underlyingt &>(*this);
   };
 
-  friend struct symex_level0t;
+  friend renamedt<ssa_exprt, L0>
+  symex_level0(ssa_exprt, const namespacet &, unsigned);
   friend struct symex_level1t;
   friend struct symex_level2t;
   friend class goto_symex_statet;

@@ -37,19 +37,14 @@ void get_variables(
   const symex_renaming_levelt &current_names,
   std::unordered_set<ssa_exprt, irep_hash> &vars);
 
-/// Functor to set the level 0 renaming of SSA expressions.
+/// Set the level 0 renaming of SSA expressions.
 /// Level 0 corresponds to threads.
 /// The renaming is built for one particular interleaving.
-struct symex_level0t
-{
-  /// Rename \p ssa_expr using \p thread_nr as L0 tag, unless \p ssa_expr is
-  /// a guard, a shared variable or a function. \p ns is queried to decide
-  /// whether we are in one of these cases.
-  renamedt<ssa_exprt, L0> operator()(
-    ssa_exprt ssa_expr,
-    const namespacet &ns,
-    unsigned thread_nr) const;
-};
+/// Rename \p ssa_expr using \p thread_nr as L0 tag, unless \p ssa_expr is
+/// a guard, a shared variable or a function. \p ns is queried to decide
+/// whether we are in one of these cases.
+renamedt<ssa_exprt, L0>
+symex_level0(ssa_exprt ssa_expr, const namespacet &ns, unsigned thread_nr);
 
 /// Functor to set the level 1 renaming of SSA expressions.
 /// Level 1 corresponds to function frames.

@@ -30,8 +30,8 @@ void get_variables(
   }
 }
 
-renamedt<ssa_exprt, L0> symex_level0t::
-operator()(ssa_exprt ssa_expr, const namespacet &ns, unsigned thread_nr) const
+renamedt<ssa_exprt, L0>
+symex_level0(ssa_exprt ssa_expr, const namespacet &ns, unsigned thread_nr)
 {
   // already renamed?
   if(!ssa_expr.get_level_0().empty())
