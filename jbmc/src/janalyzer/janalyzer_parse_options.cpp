@@ -693,6 +693,9 @@ void janalyzer_parse_optionst::help()
     " janalyzer\n"
     HELP_JAVA_JAR
     "\n"
+    HELP_JAVA_CLASSPATH
+    HELP_FUNCTIONS
+    "\n"
     "Task options:\n"
     " --show                       display the abstract domains\n"
     // NOLINTNEXTLINE(whitespace/line_length)
@@ -728,10 +731,7 @@ void janalyzer_parse_optionst::help()
     " --taint file_name            perform taint analysis using rules in given file\n"
     "\n"
     "Java Bytecode frontend options:\n"
-    " --classpath dir/jar          set the classpath\n"
-    " --main-class class-name      set the name of the main class\n"
     JAVA_BYTECODE_LANGUAGE_OPTIONS_HELP
-    HELP_FUNCTIONS
     "\n"
     "Program representations:\n"
     " --show-parse-tree            show parse tree\n"

@@ -50,8 +50,9 @@ class optionst;
   "(debug-level):(no-propagation)(no-simplify-if)" \
   "(document-subgoals)(outfile):" \
   "(object-bits):" \
-  "(classpath):(cp):(main-class):" \
+  "(classpath):(cp):" \
   OPT_JAVA_JAR \
+  "(main-class):" \
   "(no-assertions)(no-assumptions)" \
   OPT_XML_INTERFACE \
   OPT_JSON_INTERFACE \

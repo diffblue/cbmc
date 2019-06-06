@@ -127,6 +127,22 @@ Author: Daniel Kroening, kroening@kroening.com
   "                              or if static initializers have side-effects such as\n" /* NOLINT(*) */ \
   "                              updating another class' static field.\n" /* NOLINT(*) */
 
+#ifdef _WIN32
+  #define JAVA_CLASSPATH_SEPARATOR ";"
+#else
+  #define JAVA_CLASSPATH_SEPARATOR ":"
+#endif
+
+#define HELP_JAVA_CLASSPATH /* NOLINT(*) */ \
+  " -classpath dirs/jars\n" \
+  " -cp dirs/jars\n" \
+  " --classpath dirs/jars        set class search path of directories and\n" \
+  "                              jar files\n" \
+  "                              A " JAVA_CLASSPATH_SEPARATOR \
+  " separated list of directories and JAR\n" \
+  "                               archives to search for class files.\n" \
+  " --main-class class-name      set the name of the main class\n"
+
 #define HELP_JAVA_CLASS_NAME /* NOLINT(*) */ \
   "    class-name                name of class\n" \
   "                              The entry point is the method specified by\n" /* NOLINT(*) */ \

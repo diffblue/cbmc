@@ -1070,6 +1070,9 @@ void jbmc_parse_optionst::help()
     " jbmc\n"
     HELP_JAVA_JAR
     "\n"
+    HELP_JAVA_CLASSPATH
+    HELP_FUNCTIONS
+    "\n"
     "Analysis options:\n"
     HELP_SHOW_PROPERTIES
     " --symex-coverage-report f    generate a Cobertura XML coverage report in f\n" // NOLINT(*)
@@ -1077,8 +1080,6 @@ void jbmc_parse_optionst::help()
     " --stop-on-fail               stop analysis once a failed property is detected\n" // NOLINT(*)
     " --trace                      give a counterexample trace for failed properties\n" //NOLINT(*)
     HELP_JAVA_TRACE_VALIDATION
-    "\n"
-    HELP_FUNCTIONS
     "\n"
     "Program representations:\n"
     " --show-parse-tree            show parse tree\n"
@@ -1098,8 +1099,6 @@ void jbmc_parse_optionst::help()
     " --full-slice                 run full slicer (experimental)\n" // NOLINT(*)
     "\n"
     "Java Bytecode frontend options:\n"
-    " --classpath dir/jar          set the classpath\n"
-    " --main-class class-name      set the name of the main class\n"
     JAVA_BYTECODE_LANGUAGE_OPTIONS_HELP
     // This one is handled by jbmc_parse_options not by the Java frontend,
     // hence its presence here:
