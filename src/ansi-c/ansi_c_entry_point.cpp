@@ -299,6 +299,12 @@ bool generate_ansi_c_start_function(
 
       const symbolt &argv_symbol=ns.lookup("argv'");
 
+      // nondetermininistic assignment to argc' and argv'
+      init_code.add(
+        code_havoc_objectt(address_of_exprt(argc_symbol.symbol_expr())));
+      init_code.add(
+        code_havoc_objectt(address_of_exprt(argv_symbol.symbol_expr())));
+
       {
         // assume argc is at least one
         exprt one=from_integer(1, argc_symbol.type);
