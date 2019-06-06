@@ -56,6 +56,28 @@ operator()(ssa_exprt ssa_expr, const namespacet &ns, unsigned thread_nr) const
   return renamedt<ssa_exprt, L0>{ssa_expr};
 }
 
+void symex_level1t::insert(ssa_exprt ssa, unsigned index)
+{
+  const irep_idt identifier = ssa.get_identifier();
+  current_names.insert(identifier, std::make_pair(std::move(ssa), index));
+}
+
+optionalt<std::pair<ssa_exprt, unsigned>> symex_level1t::insert_or_replace(
+  ssa_exprt ssa, 
+  unsigned index)
+{
+  const irep_idt identifier = ssa.get_identifier();
+  const auto old_value = current_names.find(identifier);
+  if(old_value)
+  {
+    std::pair<ssa_exprt, unsigned> result = *old_value;
+    current_names.replace(identifier, std::make_pair(std::move(ssa), index));
+    return result;
+  }
+  current_names.insert(identifier, std::make_pair(std::move(ssa), index));
+  return {};
+}
+
 renamedt<ssa_exprt, L1> symex_level1t::
 operator()(renamedt<ssa_exprt, L0> l0_expr) const
 {

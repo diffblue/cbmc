@@ -798,23 +798,13 @@ ssa_exprt goto_symex_statet::add_object(
 
   ssa_exprt ssa = rename_ssa<L0>(ssa_exprt{expr}, ns).get();
   const irep_idt l0_name = ssa.get_identifier();
-  const std::size_t l1_index = index_generator(l0_name);
+  const auto l1_index = narrow_cast<unsigned>(index_generator(l0_name));
 
-  const auto r_opt = level1.current_names.find(l0_name);
-
-  if(!r_opt)
-  {
-    level1.current_names.insert(l0_name, std::make_pair(ssa, l1_index));
-  }
-  else
+  if(const auto old_value = level1.insert_or_replace(ssa, l1_index))
   {
     // save old L1 name
     if(!frame.old_level1.has_key(l0_name))
-    {
-      frame.old_level1.insert(l0_name, r_opt->get());
-    }
-
-    level1.current_names.replace(l0_name, std::make_pair(ssa, l1_index));
+      frame.old_level1.insert(l0_name, *old_value);
   }
 
   ssa = rename_ssa<L1>(std::move(ssa), ns).get();
