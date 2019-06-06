@@ -796,18 +796,18 @@ ssa_exprt goto_symex_statet::add_object(
 {
   framet &frame = call_stack().top();
 
-  ssa_exprt ssa = rename_ssa<L0>(ssa_exprt{expr}, ns).get();
-  const irep_idt l0_name = ssa.get_identifier();
+  const renamedt<ssa_exprt, L0> renamed = rename_ssa<L0>(ssa_exprt{expr}, ns);
+  const irep_idt l0_name = renamed.get_identifier();
   const auto l1_index = narrow_cast<unsigned>(index_generator(l0_name));
 
-  if(const auto old_value = level1.insert_or_replace(ssa, l1_index))
+  if(const auto old_value = level1.insert_or_replace(renamed, l1_index))
   {
     // save old L1 name
     if(!frame.old_level1.has_key(l0_name))
       frame.old_level1.insert(l0_name, *old_value);
   }
 
-  ssa = rename_ssa<L1>(std::move(ssa), ns).get();
+  const ssa_exprt ssa = rename_ssa<L1>(renamed.get(), ns).get();
   const bool inserted = frame.local_objects.insert(ssa.get_identifier()).second;
   INVARIANT(inserted, "l1_name expected to be unique by construction");
 

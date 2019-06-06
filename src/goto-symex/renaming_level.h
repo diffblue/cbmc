@@ -57,13 +57,13 @@ struct symex_level0t
 struct symex_level1t
 {
   /// Assume \p ssa is not already known
-  void insert(ssa_exprt ssa, unsigned index);
+  void insert(const renamedt<ssa_exprt, L0> &ssa, unsigned index);
 
   /// Set the index for \p ssa to index.
   /// \return if an index for \p ssa was already know, returns it's previous
   ///   value.
   optionalt<std::pair<ssa_exprt, unsigned>>
-  insert_or_replace(ssa_exprt ssa, unsigned index);
+  insert_or_replace(const renamedt<ssa_exprt, L0> &ssa, unsigned index);
 
   /// \return an SSA expression similar to \p l0_expr where the L1 tag has been
   ///   set to the value in \ref current_names of the l1 object identifier of

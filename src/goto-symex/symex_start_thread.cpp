@@ -67,13 +67,14 @@ void goto_symext::symex_start_thread(statet &state)
     ssa_exprt lhs(pair.second.first.get_original_expr());
 
     // get L0 name for current thread
-    renamedt<ssa_exprt, L0> l0_lhs = symex_level0t{}(std::move(lhs), ns , t);
+    const renamedt<ssa_exprt, L0> l0_lhs =
+      symex_level0t{}(std::move(lhs), ns, t);
     const irep_idt &l0_name = l0_lhs.get().get_identifier();
     std::size_t l1_index = path_storage.get_unique_l1_index(l0_name, 0);
     CHECK_RETURN(l1_index == 0);
 
     // set up L1 name
-    state.level1.insert(l0_lhs.get(), 0);
+    state.level1.insert(l0_lhs, 0);
 
     const ssa_exprt lhs_l1 = state.rename_ssa<L1>(l0_lhs.get(), ns).get();
     const irep_idt l1_name = lhs_l1.get_l1_object_identifier();
