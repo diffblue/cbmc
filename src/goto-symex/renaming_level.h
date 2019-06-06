@@ -50,6 +50,7 @@ struct symex_renaming_levelt
   }
 
   /// Add the \c ssa_exprt of current_names to vars
+  DEPRECATED(SINCE(2019, 6, 5, "Unused"))
   void get_variables(std::unordered_set<ssa_exprt, irep_hash> &vars) const
   {
     current_namest::viewt view;
