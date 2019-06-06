@@ -51,6 +51,7 @@ class optionst;
   "(document-subgoals)(outfile):" \
   "(object-bits):" \
   "(classpath):(cp):(main-class):" \
+  OPT_JAVA_JAR \
   "(no-assertions)(no-assumptions)" \
   OPT_XML_INTERFACE \
   OPT_JSON_INTERFACE \

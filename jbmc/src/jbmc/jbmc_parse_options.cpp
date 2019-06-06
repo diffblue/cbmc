@@ -1071,6 +1071,8 @@ void jbmc_parse_optionst::help()
     "                              manifest (checked in this order), the behavior is\n" // NOLINT(*)
     "                              the same as running jbmc on the corresponding\n" // NOLINT(*)
     "                              class file."
+    " jbmc\n"
+    HELP_JAVA_JAR
     "\n"
     "Analysis options:\n"
     HELP_SHOW_PROPERTIES

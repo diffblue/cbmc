@@ -126,6 +126,18 @@ Author: Daniel Kroening, kroening@kroening.com
   "                              to potentially changing their order of execution,\n" /* NOLINT(*) */ \
   "                              or if static initializers have side-effects such as\n" /* NOLINT(*) */ \
   "                              updating another class' static field.\n" /* NOLINT(*) */
+
+#define OPT_JAVA_JAR /* NOLINT(*) */ \
+  "(jar):"
+
+#define HELP_JAVA_JAR /* NOLINT(*) */ \
+  "    -jar jarfile             JAR file to be checked\n" \
+  "                              The entry point is the method specified by\n" \
+  "                              --function or otherwise, the\n" \
+  "                              public static void main(String[]) method\n" \
+  "                              of the class specified by --main-class or the main\n" /* NOLINT(*) */ \
+  "                              class specified in the JAR manifest\n" \
+  "                              (checked in this order).\n"
 // clang-format on
 
 class symbolt;

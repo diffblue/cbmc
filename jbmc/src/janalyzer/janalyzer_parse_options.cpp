@@ -694,6 +694,8 @@ void janalyzer_parse_optionst::help()
     "                              manifest (checked in this order), the behavior is\n" // NOLINT(*)
     "                              the same as running janalyzer on the corresponding\n" // NOLINT(*)
     "                              class file."
+    " janalyzer\n"
+    HELP_JAVA_JAR
     "\n"
     "Task options:\n"
     " --show                       display the abstract domains\n"
