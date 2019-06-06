@@ -112,7 +112,7 @@ operator()(renamedt<ssa_exprt, L1> l1_expr) const
 {
   if(!l1_expr.get().get_level_2().empty())
     return renamedt<ssa_exprt, L2>{std::move(l1_expr.value())};
-  l1_expr.value().set_level_2(current_count(l1_expr.get().get_identifier()));
+  l1_expr.value().set_level_2(latest_index(l1_expr.get().get_identifier()));
   return renamedt<ssa_exprt, L2>{std::move(l1_expr.value())};
 }
 
@@ -137,7 +137,7 @@ void symex_level1t::restore_from(const symex_level1t &other)
   }
 }
 
-unsigned symex_level2t::current_count(const irep_idt &identifier) const
+unsigned symex_level2t::latest_index(const irep_idt &identifier) const
 {
   const auto r_opt = current_names.find(identifier);
   return !r_opt ? 0 : r_opt->get().second;

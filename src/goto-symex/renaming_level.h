@@ -92,7 +92,7 @@ struct symex_level2t
   renamedt<ssa_exprt, L2> operator()(renamedt<ssa_exprt, L1> l1_expr) const;
 
   /// Counter corresponding to an identifier
-  unsigned current_count(const irep_idt &identifier) const;
+  unsigned latest_index(const irep_idt &identifier) const;
 };
 
 /// Undo all levels of renaming

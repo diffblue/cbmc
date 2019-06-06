@@ -437,7 +437,7 @@ bool goto_symex_statet::l2_thread_read_encoding(
     if(a_s_read.second.empty())
     {
       increase_generation(l1_identifier, ssa_l1);
-      a_s_read.first=level2.current_count(l1_identifier);
+      a_s_read.first = level2.latest_index(l1_identifier);
     }
     const renamedt<ssa_exprt, L2> l2_false_case = set_indices<L2>(ssa_l1, ns);
 
