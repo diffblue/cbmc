@@ -27,6 +27,7 @@ SRC += analyses/ai/ai.cpp \
        goto-programs/goto_program_table_consistency.cpp \
        goto-programs/goto_program_validate.cpp \
        goto-programs/goto_trace_output.cpp \
+       goto-programs/is_goto_binary.cpp \
        goto-programs/osx_fat_reader.cpp \
        goto-programs/remove_returns.cpp \
        goto-programs/xml_expr.cpp \
