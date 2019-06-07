@@ -1,6 +1,6 @@
 /*******************************************************************\
 
-Module: Unit tests for java_types
+Module: Unit tests for java_static_initializers
 
 Author: Diffblue Ltd.
 
