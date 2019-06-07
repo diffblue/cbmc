@@ -203,7 +203,7 @@ static format_specifiert format_specifier_of_match(std::smatch &m)
   int index = m[1].str().empty() ? -1 : std::stoi(m[1].str());
   std::string flag = m[2].str();
   int width = m[3].str().empty() ? -1 : std::stoi(m[3].str());
-  int precision = m[4].str().empty() ? -1 : std::stoi(m[4].str());
+  int precision = m[4].str().empty() ? -1 : std::stoi(m[4].str().substr(1));
   std::string tT = m[5].str();
 
   bool dt = !tT.empty();

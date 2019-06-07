@@ -49,4 +49,14 @@ public class Test {
     assert(s.length() != 1 || u.charAt(0) == u.charAt(u.length() - 1));
     return u;
   }
+
+  public static String float1(float f) {
+    String u = String.format("Pi is %.2f.", 3.14);
+    // We are not checking the exactness of the string produced, just that
+    // the solver will not crash.
+    assert(u.length() > 0);
+    assert(u.charAt(0) == 'P');
+    return u;
+  }
+
 }
