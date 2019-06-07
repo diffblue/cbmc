@@ -1603,8 +1603,8 @@ code_blockt java_bytecode_convert_methodt::convert_instructions(
     {
       PRECONDITION(op.size() == 1 && results.size() == 1);
 
-      dereference_exprt array{
-        typecast_exprt{op[0], java_array_type(statement[0])}};
+      // any array type is fine here, so we go for a reference array
+      dereference_exprt array{typecast_exprt{op[0], java_array_type('a')}};
       PRECONDITION(array.type().id() == ID_struct_tag);
       array.set(ID_java_member_access, true);
 
