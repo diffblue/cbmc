@@ -17,13 +17,13 @@ class ssa_exprt:public symbol_exprt
 {
 public:
   /// Constructor
-  /// \param expr: Expression to be converted to SSA symbol
-  explicit ssa_exprt(const exprt &expr) : symbol_exprt(expr.type())
-  {
-    set(ID_C_SSA_symbol, true);
-    add(ID_expression, expr);
-    update_identifier();
-  }
+  /// \param expr: Expression to be converted to SSA symbol. A valid argument
+  ///   must be one of these:
+  ///   - a symbol_exprt
+  ///   - a member_exprt where the accessed struct would be a valid argument
+  ///   - an index_exprt where the index is a constant and the array would be
+  ///     a valid argument
+  explicit ssa_exprt(const exprt &expr);
 
   void update_type()
   {
@@ -38,46 +38,13 @@ public:
   /// Replace the underlying, original expression by \p expr while maintaining
   /// SSA indices.
   /// \param expr: expression to store
-  void set_expression(const exprt &expr)
-  {
-    type() = expr.type();
-    add(ID_expression, expr);
-    update_identifier();
-  }
+  void set_expression(const exprt &expr);
 
-  irep_idt get_object_name() const
-  {
-    const exprt &original_expr = get_original_expr();
+  irep_idt get_object_name() const;
 
-    if(original_expr.id() == ID_symbol)
-      return to_symbol_expr(original_expr).get_identifier();
+  const ssa_exprt get_l1_object() const;
 
-    object_descriptor_exprt ode(original_expr);
-    return to_symbol_expr(ode.root_object()).get_identifier();
-  }
-
-  const ssa_exprt get_l1_object() const
-  {
-    object_descriptor_exprt ode(get_original_expr());
-
-    ssa_exprt root(ode.root_object());
-    root.set(ID_L0, get(ID_L0));
-    root.set(ID_L1, get(ID_L1));
-    root.update_identifier();
-
-    return root;
-  }
-
-  const irep_idt get_l1_object_identifier() const
-  {
-    #if 0
-    return get_l1_object().get_identifier();
-    #else
-    // the above is the clean version, this is the fast one, using
-    // an identifier cached during build_identifier
-    return get(ID_L1_object_identifier);
-    #endif
-  }
+  const irep_idt get_l1_object_identifier() const;
 
   const irep_idt get_original_name() const
   {
@@ -85,29 +52,13 @@ public:
     return o.get_identifier();
   }
 
-  void set_level_0(unsigned i)
-  {
-    set(ID_L0, i);
-    update_identifier();
-  }
+  void set_level_0(unsigned i);
 
-  void set_level_1(unsigned i)
-  {
-    set(ID_L1, i);
-    update_identifier();
-  }
+  void set_level_1(unsigned i);
 
-  void set_level_2(unsigned i)
-  {
-    set(ID_L2, i);
-    update_identifier();
-  }
+  void set_level_2(unsigned i);
 
-  void remove_level_2()
-  {
-    remove(ID_L2);
-    set_identifier(get_l1_object_identifier());
-  }
+  void remove_level_2();
 
   const irep_idt get_level_0() const
   {
@@ -124,6 +75,7 @@ public:
     return get(ID_L2);
   }
 
+  DEPRECATED(SINCE(2019, 05, 29, "Should only be used internally"))
   void update_identifier();
 
   /// Used to determine whether or not an identifier can be built before trying
