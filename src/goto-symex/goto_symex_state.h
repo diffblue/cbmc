@@ -70,7 +70,6 @@ public:
   guard_managert &guard_manager;
   symex_target_equationt *symex_target;
 
-  symex_level0t level0;
   symex_level1t level1;
 
   /// Rewrites symbol expressions in \ref exprt, applying a suffix to each

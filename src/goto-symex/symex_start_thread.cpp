@@ -52,7 +52,7 @@ void goto_symext::symex_start_thread(statet &state)
   // create a copy of the local variables for the new thread
   framet &frame = state.call_stack().top();
 
-  symex_renaming_levelt::current_namest::viewt view;
+  symex_renaming_levelt::viewt view;
   state.get_level2().current_names.get_view(view);
 
   for(const auto &pair : view)
@@ -67,16 +67,15 @@ void goto_symext::symex_start_thread(statet &state)
     ssa_exprt lhs(pair.second.first.get_original_expr());
 
     // get L0 name for current thread
-    lhs.set_level_0(t);
-    const irep_idt &l0_name = lhs.get_identifier();
+    const renamedt<ssa_exprt, L0> l0_lhs = symex_level0(std::move(lhs), ns, t);
+    const irep_idt &l0_name = l0_lhs.get().get_identifier();
     std::size_t l1_index = path_storage.get_unique_l1_index(l0_name, 0);
     CHECK_RETURN(l1_index == 0);
 
     // set up L1 name
-    state.level1.current_names.insert(
-      lhs.get_l1_object_identifier(), std::make_pair(lhs, 0));
+    state.level1.insert(l0_lhs, 0);
 
-    const ssa_exprt lhs_l1 = state.rename_ssa<L1>(std::move(lhs), ns).get();
+    const ssa_exprt lhs_l1 = state.rename_ssa<L1>(l0_lhs.get(), ns).get();
     const irep_idt l1_name = lhs_l1.get_l1_object_identifier();
     // store it
     new_thread.call_stack.back().local_objects.insert(l1_name);

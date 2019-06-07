@@ -135,21 +135,22 @@ template <>
 renamedt<ssa_exprt, L0>
 goto_symex_statet::set_indices<L0>(ssa_exprt ssa_expr, const namespacet &ns)
 {
-  return level0(std::move(ssa_expr), ns, source.thread_nr);
+  return symex_level0(std::move(ssa_expr), ns, source.thread_nr);
 }
 
 template <>
 renamedt<ssa_exprt, L1>
 goto_symex_statet::set_indices<L1>(ssa_exprt ssa_expr, const namespacet &ns)
 {
-  return level1(level0(std::move(ssa_expr), ns, source.thread_nr));
+  return level1(symex_level0(std::move(ssa_expr), ns, source.thread_nr));
 }
 
 template <>
 renamedt<ssa_exprt, L2>
 goto_symex_statet::set_indices<L2>(ssa_exprt ssa_expr, const namespacet &ns)
 {
-  return level2(level1(level0(std::move(ssa_expr), ns, source.thread_nr)));
+  return level2(
+    level1(symex_level0(std::move(ssa_expr), ns, source.thread_nr)));
 }
 
 renamedt<ssa_exprt, L2> goto_symex_statet::assignment(
@@ -437,7 +438,7 @@ bool goto_symex_statet::l2_thread_read_encoding(
     if(a_s_read.second.empty())
     {
       increase_generation(l1_identifier, ssa_l1);
-      a_s_read.first=level2.current_count(l1_identifier);
+      a_s_read.first = level2.latest_index(l1_identifier);
     }
     const renamedt<ssa_exprt, L2> l2_false_case = set_indices<L2>(ssa_l1, ns);
 
@@ -796,28 +797,18 @@ ssa_exprt goto_symex_statet::add_object(
 {
   framet &frame = call_stack().top();
 
-  ssa_exprt ssa = rename_ssa<L0>(ssa_exprt{expr}, ns).get();
-  const irep_idt l0_name = ssa.get_identifier();
-  const std::size_t l1_index = index_generator(l0_name);
+  const renamedt<ssa_exprt, L0> renamed = rename_ssa<L0>(ssa_exprt{expr}, ns);
+  const irep_idt l0_name = renamed.get_identifier();
+  const auto l1_index = narrow_cast<unsigned>(index_generator(l0_name));
 
-  const auto r_opt = level1.current_names.find(l0_name);
-
-  if(!r_opt)
-  {
-    level1.current_names.insert(l0_name, std::make_pair(ssa, l1_index));
-  }
-  else
+  if(const auto old_value = level1.insert_or_replace(renamed, l1_index))
   {
     // save old L1 name
-    if(!frame.old_level1.has_key(l0_name))
-    {
-      frame.old_level1.insert(l0_name, r_opt->get());
-    }
-
-    level1.current_names.replace(l0_name, std::make_pair(ssa, l1_index));
+    if(!frame.old_level1.has(renamed))
+      frame.old_level1.insert(renamed, old_value->second);
   }
 
-  ssa = rename_ssa<L1>(std::move(ssa), ns).get();
+  const ssa_exprt ssa = rename_ssa<L1>(renamed.get(), ns).get();
   const bool inserted = frame.local_objects.insert(ssa.get_identifier()).second;
   INVARIANT(inserted, "l1_name expected to be unique by construction");
 
