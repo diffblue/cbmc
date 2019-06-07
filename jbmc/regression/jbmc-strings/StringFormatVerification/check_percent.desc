@@ -1,0 +1,12 @@
+FUTURE
+test.class
+--max-nondet-string-length 20 --function test.check_percent --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^ignoring
+--
+This test passes but doesn't actually reach the assertion due to conflicting lemmas in the string solver.
+The problem is that String.format does not work when the argument list is empty (which is a valid thing
+to do if all format specifiers are of type %% or %n).

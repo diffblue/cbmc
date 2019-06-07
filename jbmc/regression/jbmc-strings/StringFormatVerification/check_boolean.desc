@@ -1,0 +1,8 @@
+CORE
+test.class
+--max-nondet-string-length 20 --function test.check_boolean --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^ignoring
