@@ -205,11 +205,10 @@ bool is_goto_binary(
   // 1. goto binaries, marked with 0x7f GBF
   // 2. ELF binaries, marked with 0x7f ELF
 
-  char hdr[4];
-  hdr[0]=in.get();
-  hdr[1]=in.get();
-  hdr[2]=in.get();
-  hdr[3]=in.get();
+  char hdr[8];
+  in.read(hdr, 8);
+  if(!in)
+    return false;
 
   if(hdr[0]==0x7f && hdr[1]=='G' && hdr[2]=='B' && hdr[3]=='F')
   {
