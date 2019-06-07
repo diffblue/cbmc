@@ -206,7 +206,7 @@ bool simplify_exprt::simplify_function_application(exprt &expr)
     // things that are non-constant.
     if(
       first_address_of.object().id() != ID_index ||
-      first_address_of.object().id() != ID_index)
+      second_address_of.object().id() != ID_index)
     {
       return true;
     }
