@@ -71,8 +71,12 @@ void symbol_factoryt::gen_nondet_init(
 
     code_blockt non_null_inst;
 
-    exprt init_expr =
-      allocate_objects.allocate_object(non_null_inst, expr, subtype, lifetime);
+    typet object_type = subtype;
+    if(object_type.id() == ID_empty)
+      object_type = char_type();
+
+    exprt init_expr = allocate_objects.allocate_object(
+      non_null_inst, expr, object_type, lifetime);
 
     gen_nondet_init(non_null_inst, init_expr, depth + 1, recursion_set, true);
 

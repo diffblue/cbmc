@@ -1,0 +1,6 @@
+CORE
+main.c
+--generate-function-body 'havoc_struct' --generate-function-body-options 'havoc,params:.*'
+^VERIFICATION SUCCESSFUL$
+^SIGNAL=0$
+^EXIT=0$
