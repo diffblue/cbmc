@@ -41,3 +41,14 @@ $(patsubst %, %_dep, $(DIRS)):
 	if [ -e $(patsubst %_dep, %, $@)/. ] ; then \
 		$(MAKE) $(MAKEARGS) -C $(patsubst %_dep, %, $@) dep ; \
 	fi
+
+# minisat 2 download, for your convenience
+
+minisat2-download:
+	@echo "Downloading Minisat 2.2.0"
+	@lwp-download https://github.com/niklasso/minisat/archive/releases/2.2.0.tar.gz
+	@tar xfz 2.2.0.tar.gz
+	@rm -Rf ../minisat-2.2.0
+	@mv minisat-releases-2.2.0 ../minisat-2.2.0
+	@(cd ../minisat-2.2.0; patch -p1 < ../scripts/minisat-2.2.0-patch)
+	@rm 2.2.0.tar.gz

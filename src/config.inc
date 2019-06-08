@@ -48,7 +48,7 @@ LINKBIN = $(CXX) $(LINKFLAGS) -o $@ $(LIBS)
 #CHAFF = ../../zChaff
 #BOOLEFORCE = ../../booleforce-0.4
 #MINISAT = ../../MiniSat-p_v1.14
-MINISAT2 = ../../../../minisat-2.2.0
+MINISAT2 = ../../minisat-2.2.0
 #SMVSAT =
 
 LANGUAGES = ansi-c csp intrep pvs smvlang verilog vhdl netlist cpp specc \
