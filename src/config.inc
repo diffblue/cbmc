@@ -11,7 +11,7 @@ BUILD_ENV = AUTO
 #CHAFF = ../../zChaff
 #BOOLEFORCE = ../../booleforce-0.4
 #MINISAT = ../../MiniSat-p_v1.14
-MINISAT2 = ../../../../minisat-2.2.0
+MINISAT2 = ../../minisat-2.2.0
 #SMVSAT =
 
 # Signing identity for MacOS Gatekeeper
