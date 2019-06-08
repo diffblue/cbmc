@@ -10,7 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <stdlib.h>
 #include <string.h>
 
-#ifdef __LINUX__
+#ifdef __linux__
 #include <unistd.h>
 #endif
 

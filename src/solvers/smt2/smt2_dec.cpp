@@ -7,6 +7,7 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include <stdlib.h>
+#include <unistd.h>
 
 #include <str_getline.h>
 #include <std_expr.h>
