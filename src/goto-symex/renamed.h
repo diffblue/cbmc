@@ -17,9 +17,10 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <util/optional.h>
 #include <util/simplify_expr.h>
 
-class typet;
+class constant_exprt;
 class exprt;
 class ssa_exprt;
+class typet;
 
 /// Symex renaming level names.
 enum levelt
