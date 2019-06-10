@@ -19,7 +19,7 @@ values if they are not initialised. Goto programs can be serialised
 in a binary (wrapped in ELF headers) format or in XML (see the various
 `_serialization` files).
 
-The `cbmc` option `--show-goto-programs` is often a good starting point
+The `cbmc` option `--show-goto-functions` is often a good starting point
 as it outputs goto-programs in a human readable form. However there are
 a few things to be aware of. Functions have an internal name (for
 example `c::f00`) and a ‘pretty name’ (for example `f00`) and which is
