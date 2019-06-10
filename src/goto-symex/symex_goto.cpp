@@ -100,9 +100,8 @@ static optionalt<renamedt<exprt, L2>> try_evaluate_pointer_comparison(
   const ssa_exprt *ssa_symbol_expr =
     expr_try_dynamic_cast<ssa_exprt>(symbol_expr);
 
-  value_setst::valuest value_set_elements;
-  value_set.get_value_set(
-    ssa_symbol_expr->get_l1_object(), value_set_elements, ns);
+  const std::vector<exprt> value_set_elements =
+    value_set.get_value_set(ssa_symbol_expr->get_l1_object(), ns);
 
   bool constant_found = false;
 
