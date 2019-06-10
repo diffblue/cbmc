@@ -47,90 +47,6 @@ goto_symex_statet::goto_symex_statet(
 
 goto_symex_statet::~goto_symex_statet()=default;
 
-/// Check that \p expr is correctly renamed to level 2 and return true in case
-/// an error is detected.
-static bool check_renaming(const exprt &expr);
-
-static bool check_renaming(const typet &type)
-{
-  if(type.id()==ID_array)
-    return check_renaming(to_array_type(type).size());
-  else if(type.id() == ID_struct || type.id() == ID_union)
-  {
-    for(const auto &c : to_struct_union_type(type).components())
-      if(check_renaming(c.type()))
-        return true;
-  }
-  else if(type.has_subtype())
-    return check_renaming(to_type_with_subtype(type).subtype());
-
-  return false;
-}
-
-static bool check_renaming_l1(const exprt &expr)
-{
-  if(check_renaming(expr.type()))
-    return true;
-
-  if(expr.id()==ID_symbol)
-  {
-    const auto &type = expr.type();
-    if(!expr.get_bool(ID_C_SSA_symbol))
-      return type.id() != ID_code && type.id() != ID_mathematical_function;
-    if(!to_ssa_expr(expr).get_level_2().empty())
-      return true;
-    if(to_ssa_expr(expr).get_original_expr().type() != type)
-      return true;
-  }
-  else
-  {
-    forall_operands(it, expr)
-      if(check_renaming_l1(*it))
-        return true;
-  }
-
-  return false;
-}
-
-static bool check_renaming(const exprt &expr)
-{
-  if(check_renaming(expr.type()))
-    return true;
-
-  if(
-    expr.id() == ID_address_of &&
-    to_address_of_expr(expr).object().id() == ID_symbol)
-  {
-    return check_renaming_l1(to_address_of_expr(expr).object());
-  }
-  else if(
-    expr.id() == ID_address_of &&
-    to_address_of_expr(expr).object().id() == ID_index)
-  {
-    const auto index_expr = to_index_expr(to_address_of_expr(expr).object());
-    return check_renaming_l1(index_expr.array()) ||
-           check_renaming(index_expr.index());
-  }
-  else if(expr.id()==ID_symbol)
-  {
-    const auto &type = expr.type();
-    if(!expr.get_bool(ID_C_SSA_symbol))
-      return type.id() != ID_code && type.id() != ID_mathematical_function;
-    if(to_ssa_expr(expr).get_level_2().empty())
-      return true;
-    if(to_ssa_expr(expr).get_original_expr().type() != type)
-      return true;
-  }
-  else
-  {
-    forall_operands(it, expr)
-      if(check_renaming(*it))
-        return true;
-  }
-
-  return false;
-}
-
 template <>
 renamedt<ssa_exprt, L0>
 goto_symex_statet::set_indices<L0>(ssa_exprt ssa_expr, const namespacet &ns)
@@ -170,7 +86,7 @@ renamedt<ssa_exprt, L2> goto_symex_statet::assignment(
   lhs.update_type();
   if(run_validation_checks)
   {
-    DATA_INVARIANT(!check_renaming_l1(lhs), "lhs renaming failed on l1");
+    DATA_INVARIANT(is_l1_renamed(lhs), "lhs renaming failed on l1");
   }
   const ssa_exprt l1_lhs = lhs;
 
@@ -192,8 +108,8 @@ renamedt<ssa_exprt, L2> goto_symex_statet::assignment(
 
   if(run_validation_checks)
   {
-    DATA_INVARIANT(!check_renaming(lhs), "lhs renaming failed on l2");
-    DATA_INVARIANT(!check_renaming(rhs), "rhs renaming failed on l2");
+    DATA_INVARIANT(is_l2_renamed(lhs), "lhs renaming failed on l2");
+    DATA_INVARIANT(is_l2_renamed(rhs), "rhs renaming failed on l2");
   }
 
   // see #305 on GitHub for a simple example and possible discussion
@@ -224,8 +140,8 @@ renamedt<ssa_exprt, L2> goto_symex_statet::assignment(
 
     if(run_validation_checks)
     {
-      DATA_INVARIANT(!check_renaming_l1(l1_lhs), "lhs renaming failed on l1");
-      DATA_INVARIANT(!check_renaming_l1(l1_rhs), "rhs renaming failed on l1");
+      DATA_INVARIANT(is_l1_renamed(l1_lhs), "lhs renaming failed on l1");
+      DATA_INVARIANT(is_l1_renamed(l1_rhs), "rhs renaming failed on l1");
     }
 
     value_set.assign(l1_lhs, l1_rhs, ns, rhs_is_simplified, is_shared);
@@ -461,7 +377,7 @@ bool goto_symex_statet::l2_thread_read_encoding(
       source,
       symex_targett::assignment_typet::PHI);
 
-    INVARIANT(!check_renaming(ssa_l2), "expr should be renamed to L2");
+    INVARIANT(is_l2_renamed(ssa_l2), "expr should be renamed to L2");
     expr = std::move(ssa_l2);
 
     a_s_read.second.push_back(guard);

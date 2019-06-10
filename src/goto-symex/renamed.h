@@ -11,6 +11,16 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #ifndef CPROVER_GOTO_SYMEX_RENAMED_H
 #define CPROVER_GOTO_SYMEX_RENAMED_H
 
+#include <functional>
+#include <type_traits>
+#include <util/nodiscard.h>
+#include <util/optional.h>
+#include <util/simplify_expr.h>
+
+class typet;
+class exprt;
+class ssa_exprt;
+
 /// Symex renaming level names.
 enum levelt
 {
@@ -65,6 +75,10 @@ private:
     typename renamedt<exprt, selectively_mutate_level>::mutator_functiont
       get_mutated_expr);
 
+  friend optionalt<renamedt<exprt, L1>> check_l1_renaming(exprt expr);
+  friend optionalt<renamedt<exprt, L2>> check_l2_renaming(exprt expr);
+  friend optionalt<renamedt<typet, L2>> check_l2_renaming(typet type);
+
   /// Only the friend classes can create renamedt objects
   explicit renamedt(underlyingt value) : underlyingt(std::move(value))
   {
@@ -99,5 +113,23 @@ void selectively_mutate(
       it.mutate() = std::move(replacement->value());
   }
 }
+
+/// \return true if \p expr has been renamed to level 2
+bool is_l2_renamed(const exprt &expr);
+
+/// \return true if \p type has been renamed to level 2
+bool is_l2_renamed(const typet &type);
+
+/// \return true if \p expr has been renamed to level 1
+bool is_l1_renamed(const exprt &expr);
+
+/// \return a renamed object if \p expr has been renamed to level 1
+NODISCARD optionalt<renamedt<exprt, L1>> check_l1_renaming(exprt expr);
+
+/// \return a renamed object if \p expr has been renamed to level 2
+NODISCARD optionalt<renamedt<exprt, L2>> check_l2_renaming(exprt expr);
+
+/// \return a renamed object if \p type has been renamed to level 2
+NODISCARD optionalt<renamedt<typet, L2>> check_l2_renaming(typet type);
 
 #endif // CPROVER_GOTO_SYMEX_RENAMED_H

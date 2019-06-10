@@ -12,6 +12,7 @@ SRC = auto_objects.cpp \
       path_storage.cpp \
       postcondition.cpp \
       precondition.cpp \
+      renamed.cpp \
       renaming_level.cpp \
       show_program.cpp \
       show_vcc.cpp \
