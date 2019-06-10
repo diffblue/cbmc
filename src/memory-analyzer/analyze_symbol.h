@@ -286,6 +286,18 @@ private:
     const pointer_valuet &value,
     const source_locationt &location);
 
+  /// Extract the function name from \p pointer_value, check it has a symbol and
+  ///   return the associated symbol expression
+  /// \param expr: the pointer-to-function expression
+  /// \param pointer_value: pointer value with the function name as the pointee
+  ///   member
+  /// \param location: the source location
+  /// \return symbol expression for the function pointed at by \p pointer_value
+  exprt get_pointer_to_function_value(
+    const exprt &expr,
+    const pointer_valuet &pointer_value,
+    const source_locationt &location);
+
   /// If \p memory_location is found among \ref values then return the symbol
   ///   expression associated with it.
   /// Otherwise we add the appropriate \ref values mapping:

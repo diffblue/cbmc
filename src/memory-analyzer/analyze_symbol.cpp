@@ -324,6 +324,27 @@ exprt gdb_value_extractort::get_pointer_to_member_value(
   return *maybe_member_expr;
 }
 
+exprt gdb_value_extractort::get_pointer_to_function_value(
+  const exprt &expr,
+  const pointer_valuet &pointer_value,
+  const source_locationt &location)
+{
+  PRECONDITION(expr.type().id() == ID_pointer);
+  PRECONDITION(expr.type().subtype().id() == ID_code);
+  PRECONDITION(!pointer_value.address.is_null());
+
+  const auto &function_name = pointer_value.pointee;
+  CHECK_RETURN(!function_name.empty());
+  const auto function_symbol = symbol_table.lookup(function_name);
+  if(function_symbol == nullptr)
+  {
+    throw invalid_source_file_exceptiont{
+      "input source code does not contain function: " + function_name};
+  }
+  CHECK_RETURN(function_symbol->type.id() == ID_code);
+  return function_symbol->symbol_expr();
+}
+
 exprt gdb_value_extractort::get_non_char_pointer_value(
   const exprt &expr,
   const pointer_valuet &value,
@@ -484,9 +505,20 @@ exprt gdb_value_extractort::get_pointer_value(
       const auto target_expr =
         get_pointer_to_member_value(expr, value, location);
       CHECK_RETURN(target_expr.is_not_nil());
-      const auto result_expr = address_of_exprt(target_expr);
+      const address_of_exprt result_expr{target_expr};
       CHECK_RETURN(result_expr.type() == zero_expr.type());
-      return result_expr;
+      return std::move(result_expr);
+    }
+
+    // pointer to function
+    if(expr.type().subtype().id() == ID_code)
+    {
+      const auto target_expr =
+        get_pointer_to_function_value(expr, value, location);
+      CHECK_RETURN(target_expr.is_not_nil());
+      const address_of_exprt result_expr{target_expr};
+      CHECK_RETURN(result_expr.type() == zero_expr.type());
+      return std::move(result_expr);
     }
 
     // non-member: split for char/non-char
@@ -513,9 +545,9 @@ exprt gdb_value_extractort::get_pointer_value(
       CHECK_RETURN(result_indexed_expr.has_value());
       if(result_indexed_expr->type() == zero_expr.type())
         return *result_indexed_expr;
-      const auto result_expr = address_of_exprt{*result_indexed_expr};
+      const address_of_exprt result_expr{*result_indexed_expr};
       CHECK_RETURN(result_expr.type() == zero_expr.type());
-      return result_expr;
+      return std::move(result_expr);
     }
 
     // if the types match return right away
@@ -523,10 +555,10 @@ exprt gdb_value_extractort::get_pointer_value(
       return target_expr;
 
     // otherwise the address of target should type-match
-    const auto result_expr = address_of_exprt(target_expr);
+    const address_of_exprt result_expr{target_expr};
     if(result_expr.type() != zero_expr.type())
       return typecast_exprt{result_expr, zero_expr.type()};
-    return result_expr;
+    return std::move(result_expr);
   }
 
   return zero_expr;
