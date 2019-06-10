@@ -20,6 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/resolve_inherited_component.h>
 
+DEPRECATED(SINCE(2019, 6, 10, "use is_java_array_type instead"))
 bool java_is_array_type(const typet &type);
 
 /// Returns true iff the argument represents a string type (CharSequence,
