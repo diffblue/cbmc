@@ -24,6 +24,16 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "dump_c_class.h"
 #include "goto_program2code.h"
 
+dump_c_configurationt dump_c_configurationt::default_configuration =
+  dump_c_configurationt();
+
+dump_c_configurationt dump_c_configurationt::type_header_configuration =
+  dump_c_configurationt()
+    .disable_include_function_decls()
+    .disable_include_function_bodies()
+    .disable_include_global_vars()
+    .enable_include_headers();
+
 inline std::ostream &operator << (std::ostream &out, dump_ct &src)
 {
   src(out);
@@ -192,7 +202,9 @@ void dump_ct::operator()(std::ostream &os)
         }
       }
     }
-    else if(symbol.is_static_lifetime && symbol.type.id()!=ID_code)
+    else if(
+      symbol.is_static_lifetime && symbol.type.id() != ID_code &&
+      !symbol.type.get_bool(ID_C_no_dump))
       convert_global_variable(
           symbol,
           global_var_stream,
@@ -259,6 +271,9 @@ void dump_ct::operator()(std::ostream &os)
   if(!system_headers.empty())
     os << '\n';
 
+  if(!global_decl_header_stream.str().empty() && dump_c_config.include_headers)
+    os << global_decl_header_stream.str() << '\n';
+
   if(global_var_stream.str().find("NULL")!=std::string::npos ||
      func_body_stream.str().find("NULL")!=std::string::npos)
   {
@@ -282,18 +297,20 @@ void dump_ct::operator()(std::ostream &os)
        << "#endif\n\n";
   }
 
-  if(!global_decl_stream.str().empty())
+  if(!global_decl_stream.str().empty() && dump_c_config.include_global_decls)
     os << global_decl_stream.str() << '\n';
 
-  dump_typedefs(os);
+  if(dump_c_config.include_typedefs)
+    dump_typedefs(os);
 
-  if(!func_decl_stream.str().empty())
+  if(!func_decl_stream.str().empty() && dump_c_config.include_function_decls)
     os << func_decl_stream.str() << '\n';
-  if(!compound_body_stream.str().empty())
+  if(!compound_body_stream.str().empty() && dump_c_config.include_compounds)
     os << compound_body_stream.str() << '\n';
-  if(!global_var_stream.str().empty())
+  if(!global_var_stream.str().empty() && dump_c_config.include_global_vars)
     os << global_var_stream.str() << '\n';
-  os << func_body_stream.str();
+  if(dump_c_config.include_function_bodies)
+    os << func_body_stream.str();
 }
 
 /// declare compound types
@@ -301,16 +318,30 @@ void dump_ct::convert_compound_declaration(
     const symbolt &symbol,
     std::ostream &os_body)
 {
-  if(!symbol.location.get_function().empty())
+  if(
+    !symbol.location.get_function().empty() ||
+    symbol.type.get_bool(ID_C_no_dump))
     return;
 
   // do compound type body
   if(symbol.type.id() == ID_struct)
-    convert_compound(symbol.type, struct_tag_typet(symbol.name), true, os_body);
+    convert_compound(
+      symbol.type,
+      struct_tag_typet(symbol.name),
+      dump_c_config.follow_compounds,
+      os_body);
   else if(symbol.type.id() == ID_union)
-    convert_compound(symbol.type, union_tag_typet(symbol.name), true, os_body);
+    convert_compound(
+      symbol.type,
+      union_tag_typet(symbol.name),
+      dump_c_config.follow_compounds,
+      os_body);
   else if(symbol.type.id() == ID_c_enum)
-    convert_compound(symbol.type, c_enum_tag_typet(symbol.name), true, os_body);
+    convert_compound(
+      symbol.type,
+      c_enum_tag_typet(symbol.name),
+      dump_c_config.follow_compounds,
+      os_body);
 }
 
 void dump_ct::convert_compound(
@@ -372,7 +403,7 @@ void dump_ct::convert_compound(
 {
   const irep_idt &name=type.get(ID_tag);
 
-  if(!converted_compound.insert(name).second)
+  if(!converted_compound.insert(name).second || type.get_bool(ID_C_no_dump))
     return;
 
   // make sure typedef names used in the declaration are available
