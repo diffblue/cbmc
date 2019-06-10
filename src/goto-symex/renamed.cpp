@@ -14,9 +14,6 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <util/std_expr.h>
 bool is_l1_renamed(const exprt &expr)
 {
-  if(!is_l2_renamed(expr.type()))
-    return false;
-
   if(expr.id() == ID_symbol)
   {
     const auto &type = expr.type();
