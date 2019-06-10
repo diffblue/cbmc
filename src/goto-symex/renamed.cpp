@@ -12,6 +12,18 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include "renamed.h"
 #include <util/ssa_expr.h>
 #include <util/std_expr.h>
+
+template <levelt level>
+renamedt<exprt, level> make_renamed(constant_exprt constant)
+{
+  return renamedt<exprt, level>(std::move(constant));
+}
+
+// Force template instantiations for the three levels
+template renamedt<exprt, L0> make_renamed(constant_exprt constant);
+template renamedt<exprt, L1> make_renamed(constant_exprt constant);
+template renamedt<exprt, L2> make_renamed(constant_exprt constant);
+
 bool is_l1_renamed(const exprt &expr)
 {
   if(expr.id() == ID_symbol)

@@ -87,10 +87,7 @@ private:
 };
 
 template <levelt level>
-renamedt<exprt, level> make_renamed(constant_exprt constant)
-{
-  return renamedt<exprt, level>(std::move(constant));
-}
+renamedt<exprt, level> make_renamed(constant_exprt constant);
 
 /// This permits replacing subexpressions of the renamed value, so long as
 /// each replacement is consistent with our current renaming level (for
