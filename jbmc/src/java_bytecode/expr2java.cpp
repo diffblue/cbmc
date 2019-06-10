@@ -26,6 +26,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "java_qualifiers.h"
 #include "java_string_literal_expr.h"
 #include "java_types.h"
+#include "java_utils.h"
 
 std::string expr2javat::convert(const typet &src)
 {
@@ -309,6 +310,40 @@ std::string expr2javat::convert_rec(
     dest+=" -> "+convert(return_type);
 
     return q + dest;
+  }
+  else if(src.id() == ID_pointer)
+  {
+    std::string dest;
+
+    if(can_cast_type<java_reference_typet>(src))
+    {
+      const auto &java_reference_type = to_java_reference_type(src);
+
+      if(is_java_array_type(java_reference_type))
+      {
+        const auto &element_type =
+          java_array_element_type(java_reference_type.subtype());
+
+        dest = convert_rec(element_type, java_qualifierst(ns), "");
+
+        dest += "[]";
+      }
+      else
+      {
+        const auto &id = java_reference_type.subtype().get_identifier();
+        dest = id2string(strip_java_namespace_prefix(id));
+      }
+    }
+    else
+    {
+      // Java doesn't have a syntax for pointers, we invent one
+      dest = "PTR<";
+      dest +=
+        convert_rec(to_pointer_type(src).subtype(), java_qualifierst(ns), "");
+      dest += '>';
+    }
+
+    return q + dest + d;
   }
   else
     return expr2ct::convert_rec(src, qualifiers, declarator);
