@@ -1,0 +1,9 @@
+FUTURE
+test.class
+--max-nondet-string-length 20 --function test.fail_leading_spaces --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+--
+Flags and width in format specifiers are not supported yet.
