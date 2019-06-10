@@ -726,4 +726,20 @@ void symex_transition(
   goto_programt::const_targett to,
   bool is_backwards_goto);
 
+/// Try to evaluate pointer comparisons where they can be trivially determined
+/// using the value-set. This is optional as all it does is allow symex to
+/// resolve some comparisons itself and therefore create a simpler formula for
+/// the SAT solver.
+/// \param [in,out] condition: An L2-renamed expression with boolean type
+/// \param value_set: The value-set for determining what pointer-typed symbols
+///   might possibly point to
+/// \param language_mode: The language mode
+/// \param ns: A namespace
+/// \return The possibly modified condition
+renamedt<exprt, L2> try_evaluate_pointer_comparisons(
+  renamedt<exprt, L2> condition,
+  const value_sett &value_set,
+  const irep_idt &language_mode,
+  const namespacet &ns);
+
 #endif // CPROVER_GOTO_SYMEX_GOTO_SYMEX_H
