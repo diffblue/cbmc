@@ -287,7 +287,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_format(
   symbol_generatort &fresh_symbol,
   const array_string_exprt &res,
   const std::string &s,
-  const exprt::operandst &args,
+  const std::vector<array_string_exprt> &args,
   array_poolt &array_pool,
   const messaget &message,
   const namespacet &ns)
@@ -311,13 +311,11 @@ std::pair<exprt, string_constraintst> add_axioms_for_format(
         fs.conversion != format_specifiert::PERCENT_SIGN &&
         fs.conversion != format_specifiert::LINE_SEPARATOR)
       {
-        exprt arg;
-
         if(fs.index == -1)
         {
           INVARIANT(
             arg_count < args.size(), "number of format must match specifiers");
-          arg = args[arg_count++];
+          string_arg = args[arg_count++];
         }
         else
         {
@@ -327,13 +325,8 @@ std::pair<exprt, string_constraintst> add_axioms_for_format(
             "number of format must match specifiers");
 
           // first argument `args[0]` corresponds to index 1
-          arg = to_struct_expr(args[fs.index - 1]);
+          string_arg = args[fs.index - 1];
         }
-
-        INVARIANT(
-          is_refined_string_type(arg.type()),
-          "arguments of format should be strings");
-        string_arg = get_string_expr(array_pool, arg);
       }
 
       auto result = add_axioms_for_format_specifier(

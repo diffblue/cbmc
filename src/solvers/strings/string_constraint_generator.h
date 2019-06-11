@@ -219,7 +219,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_format(
   symbol_generatort &fresh_symbol,
   const array_string_exprt &res,
   const std::string &s,
-  const exprt::operandst &args,
+  const std::vector<array_string_exprt> &args,
   array_poolt &array_pool,
   const messaget &message,
   const namespacet &ns);
