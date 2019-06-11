@@ -137,6 +137,11 @@ void value_sett::output(
   std::ostream &out,
   const std::string &indent) const
 {
+  output(out, indent);
+}
+
+void value_sett::output(std::ostream &out, const std::string &indent) const
+{
   values.iterate([&](const irep_idt &, const entryt &e) {
     irep_idt identifier, display_name;
 
