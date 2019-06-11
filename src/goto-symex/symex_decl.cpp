@@ -59,8 +59,10 @@ void goto_symext::symex_decl(statet &state, const symbol_exprt &expr)
     else
       rhs=exprt(ID_invalid);
 
-    exprt l1_rhs = state.rename<L1>(std::move(rhs), ns).get();
-    state.value_set.assign(ssa, l1_rhs, ns, true, false);
+    renamedt<exprt, L1> l1_rhs = state.rename<L1>(std::move(rhs), ns);
+    auto l1_ssa = check_l1_renaming(ssa);
+    CHECK_RETURN(l1_ssa.has_value());
+    state.value_set.assign(*l1_ssa, l1_rhs, ns, true, false);
   }
 
   // L2 renaming

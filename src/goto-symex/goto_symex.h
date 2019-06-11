@@ -392,9 +392,9 @@ protected:
   void try_filter_value_sets(
     goto_symex_statet &state,
     exprt condition,
-    const value_sett &original_value_set,
-    value_sett *jump_taken_value_set,
-    value_sett *jump_not_taken_value_set,
+    const symex_value_sett &original_value_set,
+    symex_value_sett *jump_taken_value_set,
+    symex_value_sett *jump_not_taken_value_set,
     const namespacet &ns);
 
   virtual void vcc(

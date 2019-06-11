@@ -689,9 +689,9 @@ find_unique_pointer_typed_symbol(const exprt &expr)
 void goto_symext::try_filter_value_sets(
   goto_symex_statet &state,
   exprt condition,
-  const value_sett &original_value_set,
-  value_sett *jump_taken_value_set,
-  value_sett *jump_not_taken_value_set,
+  const symex_value_sett &original_value_set,
+  symex_value_sett *jump_taken_value_set,
+  symex_value_sett *jump_not_taken_value_set,
   const namespacet &ns)
 {
   condition = state.rename<L1>(std::move(condition), ns).get();
@@ -704,10 +704,10 @@ void goto_symext::try_filter_value_sets(
     return;
   }
 
-  const pointer_typet &symbol_type = to_pointer_type(symbol_expr->type());
-
+  const auto l1_symbol_expr = check_l1_renaming(*symbol_expr);
+  CHECK_RETURN(l1_symbol_expr);
   const std::vector<exprt> value_set_elements =
-    original_value_set.get_value_set(*symbol_expr, ns);
+    original_value_set.get_value_set(*l1_symbol_expr, ns);
 
   std::unordered_set<exprt, irep_hash> erase_from_jump_taken_value_set;
   std::unordered_set<exprt, irep_hash> erase_from_jump_not_taken_value_set;
@@ -775,16 +775,12 @@ void goto_symext::try_filter_value_sets(
   }
   if(jump_taken_value_set && !erase_from_jump_taken_value_set.empty())
   {
-    auto entry_index = jump_taken_value_set->get_index_of_symbol(
-      symbol_expr->get_identifier(), symbol_type, "", ns);
-    jump_taken_value_set->erase_values_from_entry(
-      *entry_index, erase_from_jump_taken_value_set);
+    jump_taken_value_set->erase(
+      *symbol_expr, ns, erase_from_jump_taken_value_set);
   }
   if(jump_not_taken_value_set && !erase_from_jump_not_taken_value_set.empty())
   {
-    auto entry_index = jump_not_taken_value_set->get_index_of_symbol(
-      symbol_expr->get_identifier(), symbol_type, "", ns);
-    jump_not_taken_value_set->erase_values_from_entry(
-      *entry_index, erase_from_jump_not_taken_value_set);
+    jump_not_taken_value_set->erase(
+      *symbol_expr, ns, erase_from_jump_not_taken_value_set);
   }
 }

@@ -104,7 +104,11 @@ void goto_statet::apply_condition(
         else if(propagation_entry->get() != rhs)
           propagation.replace(l1_identifier, rhs);
 
-        value_set.assign(l1_lhs, rhs, ns, true, false);
+        auto l1_lhs_checked = check_l1_renaming(l1_lhs);
+        CHECK_RETURN(l1_lhs_checked);
+        auto l1_rhs_checked = check_l1_renaming(rhs);
+        CHECK_RETURN(l1_rhs_checked);
+        value_set.assign(*l1_lhs_checked, *l1_rhs_checked, ns, true, false);
       }
     }
   }

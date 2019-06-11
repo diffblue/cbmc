@@ -83,7 +83,7 @@ static optionalt<renamedt<exprt, L2>> try_evaluate_pointer_comparison(
   const irep_idt &operation,
   const symbol_exprt &symbol_expr,
   const exprt &other_operand,
-  const value_sett &value_set,
+  const symex_value_sett &value_set,
   const irep_idt language_mode,
   const namespacet &ns)
 {
@@ -102,8 +102,10 @@ static optionalt<renamedt<exprt, L2>> try_evaluate_pointer_comparison(
 
   ssa_exprt l1_expr{*ssa_symbol_expr};
   l1_expr.remove_level_2();
+  const auto checked_l1_expr = check_l1_renaming((exprt)l1_expr);
+  CHECK_RETURN(checked_l1_expr);
   const std::vector<exprt> value_set_elements =
-    value_set.get_value_set(l1_expr, ns);
+    value_set.get_value_set(*checked_l1_expr, ns);
 
   bool constant_found = false;
 
@@ -169,7 +171,7 @@ static optionalt<renamedt<exprt, L2>> try_evaluate_pointer_comparison(
 ///   return that, otherwise we return an empty optionalt
 static optionalt<renamedt<exprt, L2>> try_evaluate_pointer_comparison(
   const renamedt<exprt, L2> &renamed_expr,
-  const value_sett &value_set,
+  const symex_value_sett &value_set,
   const irep_idt &language_mode,
   const namespacet &ns)
 {
@@ -210,7 +212,7 @@ static optionalt<renamedt<exprt, L2>> try_evaluate_pointer_comparison(
 /// \return The possibly modified condition
 static renamedt<exprt, L2> try_evaluate_pointer_comparisons(
   renamedt<exprt, L2> condition,
-  const value_sett &value_set,
+  const symex_value_sett &value_set,
   const irep_idt &language_mode,
   const namespacet &ns)
 {

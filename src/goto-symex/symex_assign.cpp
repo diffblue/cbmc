@@ -508,7 +508,9 @@ void goto_symext::symex_assign_symbol(
     // have it in the propagation table and the value set while doing the field
     // assignments, thus we cannot skip putting it in there above.
     state.propagation.erase_if_exists(l1_lhs.get_identifier());
-    state.value_set.erase_symbol(l1_lhs, ns);
+    auto l1_lhs_checked = check_l1_renaming(l1_lhs);
+    CHECK_RETURN(l1_lhs_checked);
+    state.value_set.erase_symbol(*l1_lhs_checked, ns);
   }
 }
 

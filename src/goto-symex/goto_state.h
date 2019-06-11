@@ -16,9 +16,9 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 #include <analyses/guard.h>
 #include <analyses/local_safe_pointers.h>
-#include <pointer-analysis/value_set.h>
 
 #include "renaming_level.h"
+#include "symex_value_set.h"
 
 /// Container for data that varies per program point, e.g. the constant
 /// propagator state, when state needs to branch. This is copied out of
@@ -40,7 +40,7 @@ public:
   }
 
   /// Uses level 1 names, and is used to do dereferencing
-  value_sett value_set;
+  symex_value_sett value_set;
 
   // A guard is a particular condition that has to pass for an instruction
   // to be executed. The easiest example is an if/else: each instruction along

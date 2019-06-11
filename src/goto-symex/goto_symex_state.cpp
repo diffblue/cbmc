@@ -138,13 +138,13 @@ renamedt<ssa_exprt, L2> goto_symex_statet::assignment(
     ssa_exprt l1_lhs(lhs);
     l1_lhs.remove_level_2();
 
-    if(run_validation_checks)
-    {
-      DATA_INVARIANT(is_l1_renamed(l1_lhs), "lhs renaming failed on l1");
-      DATA_INVARIANT(is_l1_renamed(l1_rhs), "rhs renaming failed on l1");
-    }
+    auto l1_lhs_checked = check_l1_renaming(l1_lhs);
+    DATA_INVARIANT(l1_lhs_checked, "lhs renaming failed on l1");
+    auto l1_rhs_checked = check_l1_renaming(l1_rhs);
+    DATA_INVARIANT(l1_rhs_checked, "rhs renaming failed on l1");
 
-    value_set.assign(l1_lhs, l1_rhs, ns, rhs_is_simplified, is_shared);
+    value_set.assign(
+      *l1_lhs_checked, *l1_rhs_checked, ns, rhs_is_simplified, is_shared);
   }
 
 #if 0

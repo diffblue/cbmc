@@ -86,7 +86,10 @@ void symex_dereference_statet::get_value_set(
   const exprt &expr,
   value_setst::valuest &value_set) const
 {
-  state.value_set.get_value_set(expr, value_set, ns);
+  auto l1_expr = check_l1_renaming(expr);
+  CHECK_RETURN(l1_expr);
+  for(const auto e : state.value_set.get_value_set(*l1_expr, ns))
+    value_set.push_back(e);
 
 #ifdef DEBUG
   std::cout << "symex_dereference_statet state.value_set={\n";
@@ -112,5 +115,7 @@ void symex_dereference_statet::get_value_set(
 std::vector<exprt>
 symex_dereference_statet::get_value_set(const exprt &expr) const
 {
-  return state.value_set.get_value_set(expr, ns);
+  auto l1_expr = check_l1_renaming(expr);
+  CHECK_RETURN(l1_expr);
+  return state.value_set.get_value_set(*l1_expr, ns);
 }
