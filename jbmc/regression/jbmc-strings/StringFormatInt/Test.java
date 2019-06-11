@@ -9,4 +9,19 @@ public class Test {
       assert(false);
     return u;
   }
+
+  public static void testIntLength(int i) {
+    String u = String.format("Hello %d !", i);
+    assert u.length() == 20;
+  }
+
+  public static void testIntLengthConstPASS() {
+    String u = String.format("Hello %d !", -12345);
+    assert u.length() == 14;
+  }
+
+  public static void testIntLengthConstFAIL() {
+    String u = String.format("Hello %d !", -12345);
+    assert u.length() != 14;
+  }
 }
