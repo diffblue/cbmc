@@ -161,18 +161,35 @@ public:
 
   janalyzer_parse_optionst(int argc, const char **argv);
 
+  bool process_goto_functions(goto_modelt &goto_model, const optionst &options);
+
+  void process_goto_function(
+    goto_model_functiont &function,
+    const abstract_goto_modelt &model,
+    const optionst &options);
+
+  bool can_generate_function_body(const irep_idt &name);
+
+  bool generate_function_body(
+    const irep_idt &function_name,
+    symbol_table_baset &symbol_table,
+    goto_functiont &function,
+    bool body_available);
+
 protected:
-  goto_modelt goto_model;
+  std::unique_ptr<class_hierarchyt> class_hierarchy;
 
   void register_languages();
 
   void get_command_line_options(optionst &options);
 
-  bool process_goto_program(const optionst &options);
+  virtual int
+  perform_analysis(goto_modelt &goto_model, const optionst &options);
 
-  virtual int perform_analysis(const optionst &options);
-
-  ai_baset *build_analyzer(const optionst &, const namespacet &ns);
+  ai_baset *build_analyzer(
+    goto_modelt &goto_model,
+    const optionst &,
+    const namespacet &ns);
 };
 
 #endif // CPROVER_JANALYZER_JANALYZER_PARSE_OPTIONS_H

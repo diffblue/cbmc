@@ -17,15 +17,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <memory>
 
 #include <ansi-c/ansi_c_language.h>
-#include <java_bytecode/java_bytecode_language.h>
 
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/goto_inline.h>
-#include <goto-programs/initialize_goto_model.h>
 #include <goto-programs/read_goto_binary.h>
 #include <goto-programs/remove_complex.h>
 #include <goto-programs/remove_function_pointers.h>
 #include <goto-programs/remove_returns.h>
+#include <goto-programs/remove_skip.h>
 #include <goto-programs/remove_vector.h>
 #include <goto-programs/remove_virtual_functions.h>
 #include <goto-programs/set_properties.h>
@@ -39,11 +38,15 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <analyses/is_threaded.h>
 #include <analyses/local_may_alias.h>
 
+#include <java_bytecode/java_bytecode_language.h>
+#include <java_bytecode/lazy_goto_model.h>
 #include <java_bytecode/remove_exceptions.h>
 #include <java_bytecode/remove_instanceof.h>
 
 #include <langapi/language.h>
 #include <langapi/mode.h>
+
+#include <linking/static_lifetime_init.h>
 
 #include <util/config.h>
 #include <util/exit_codes.h>
@@ -274,6 +277,7 @@ void janalyzer_parse_optionst::get_command_line_options(optionst &options)
 /// Ideally this should be a pure function of options.
 /// However at the moment some domains require the goto_model
 ai_baset *janalyzer_parse_optionst::build_analyzer(
+  goto_modelt &goto_model,
   const optionst &options,
   const namespacet &ns)
 {
@@ -371,10 +375,23 @@ int janalyzer_parse_optionst::doit()
     return CPROVER_EXIT_USAGE_ERROR;
   }
 
-  goto_model = initialize_goto_model(cmdline.args, ui_message_handler, options);
+  lazy_goto_modelt lazy_goto_model =
+    lazy_goto_modelt::from_handler_object(*this, options, ui_message_handler);
+  lazy_goto_model.initialize(cmdline.args, options);
 
-  if(process_goto_program(options))
+  class_hierarchy =
+    util_make_unique<class_hierarchyt>(lazy_goto_model.symbol_table);
+
+  log.status() << "Generating GOTO Program" << messaget::eom;
+  lazy_goto_model.load_all_functions();
+
+  std::unique_ptr<abstract_goto_modelt> goto_model_ptr =
+    lazy_goto_modelt::process_whole_model_and_freeze(
+      std::move(lazy_goto_model));
+  if(goto_model_ptr == nullptr)
     return CPROVER_EXIT_INTERNAL_ERROR;
+
+  goto_modelt &goto_model = dynamic_cast<goto_modelt &>(*goto_model_ptr);
 
   // show it?
   if(cmdline.isset("show-symbol-table"))
@@ -393,11 +410,13 @@ int janalyzer_parse_optionst::doit()
     return CPROVER_EXIT_SUCCESS;
   }
 
-  return perform_analysis(options);
+  return perform_analysis(goto_model, options);
 }
 
 /// Depending on the command line mode, run one of the analysis tasks
-int janalyzer_parse_optionst::perform_analysis(const optionst &options)
+int janalyzer_parse_optionst::perform_analysis(
+  goto_modelt &goto_model,
+  const optionst &options)
 {
   if(options.get_bool_option("taint"))
   {
@@ -546,7 +565,7 @@ int janalyzer_parse_optionst::perform_analysis(const optionst &options)
     // Build analyzer
     log.status() << "Selecting abstract domain" << messaget::eom;
     namespacet ns(goto_model.symbol_table); // Must live as long as the domain.
-    std::unique_ptr<ai_baset> analyzer(build_analyzer(options, ns));
+    std::unique_ptr<ai_baset> analyzer(build_analyzer(goto_model, options, ns));
 
     if(analyzer == nullptr)
     {
@@ -608,70 +627,76 @@ int janalyzer_parse_optionst::perform_analysis(const optionst &options)
   return CPROVER_EXIT_USAGE_ERROR;
 }
 
-bool janalyzer_parse_optionst::process_goto_program(const optionst &options)
+bool janalyzer_parse_optionst::process_goto_functions(
+  goto_modelt &goto_model,
+  const optionst &options)
 {
-  try
-  {
-    // remove function pointers
-    log.status() << "Removing function pointers and virtual functions"
-                 << messaget::eom;
-    remove_function_pointers(
-      ui_message_handler, goto_model, cmdline.isset("pointer-check"));
+  log.status() << "Running GOTO functions transformation passes"
+               << messaget::eom;
 
-    // Java virtual functions -> explicit dispatch tables:
-    remove_virtual_functions(goto_model);
+  // remove catch and throw
+  remove_exceptions(goto_model, *class_hierarchy.get(), ui_message_handler);
 
-    // remove Java throw and catch
-    // This introduces instanceof, so order is important:
-    remove_exceptions_using_instanceof(goto_model, ui_message_handler);
+  // recalculate numbers, etc.
+  goto_model.goto_functions.update();
 
-    // Java instanceof -> clsid comparison:
-    class_hierarchyt class_hierarchy(goto_model.symbol_table);
-    remove_instanceof(goto_model, class_hierarchy, ui_message_handler);
+  // remove skips such that trivial GOTOs are deleted
+  remove_skip(goto_model);
 
-    // do partial inlining
-    log.status() << "Partial Inlining" << messaget::eom;
-    goto_partial_inline(goto_model, ui_message_handler);
+  // label the assertions
+  // This must be done after adding assertions and
+  // before using the argument of the "property" option.
+  // Do not re-label after using the property slicer because
+  // this would cause the property identifiers to change.
+  label_properties(goto_model);
 
-    // remove returns, gcc vectors, complex
-    remove_returns(goto_model);
-    remove_vector(goto_model);
-    remove_complex(goto_model);
+  return false;
+}
 
-    // add generic checks
-    log.status() << "Generic Property Instrumentation" << messaget::eom;
-    goto_check(options, goto_model);
+void janalyzer_parse_optionst::process_goto_function(
+  goto_model_functiont &function,
+  const abstract_goto_modelt &model,
+  const optionst &options)
+{
+  journalling_symbol_tablet &symbol_table = function.get_symbol_table();
+  namespacet ns(symbol_table);
+  goto_functionst::goto_functiont &goto_function = function.get_goto_function();
 
-    // recalculate numbers, etc.
-    goto_model.goto_functions.update();
+  // Removal of RTTI inspection:
+  remove_instanceof(
+    function.get_function_id(),
+    goto_function,
+    symbol_table,
+    *class_hierarchy,
+    ui_message_handler);
+  // Java virtual functions -> explicit dispatch tables:
+  remove_virtual_functions(function, *class_hierarchy);
 
-    // add loop ids
-    goto_model.goto_functions.compute_loop_numbers();
-  }
+  auto function_is_stub = [&symbol_table, &model](const irep_idt &id) {
+    return symbol_table.lookup_ref(id).value.is_nil() &&
+           !model.can_produce_function(id);
+  };
 
-  catch(const char *e)
-  {
-    log.error() << e << messaget::eom;
-    return true;
-  }
+  remove_returns(function, function_is_stub);
 
-  catch(const std::string &e)
-  {
-    log.error() << e << messaget::eom;
-    return true;
-  }
+  // add generic checks
+  goto_check(
+    function.get_function_id(), function.get_goto_function(), ns, options);
+}
 
-  catch(int)
-  {
-    return true;
-  }
+bool janalyzer_parse_optionst::can_generate_function_body(const irep_idt &name)
+{
+  static const irep_idt initialize_id = INITIALIZE_FUNCTION;
 
-  catch(const std::bad_alloc &)
-  {
-    log.error() << "Out of memory" << messaget::eom;
-    return true;
-  }
+  return name != goto_functionst::entry_point() && name != initialize_id;
+}
 
+bool janalyzer_parse_optionst::generate_function_body(
+  const irep_idt &function_name,
+  symbol_table_baset &symbol_table,
+  goto_functiont &function,
+  bool body_available)
+{
   return false;
 }
 
