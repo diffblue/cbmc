@@ -25,7 +25,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 class namespacet;
 
-/// State type in value_set_domaint, used in value-set analysis and goto-symex.
+/// Used in value-set analysis and goto-symex.
 /// Represents a mapping from expressions to the addresses that may be stored
 /// there; for example, a global that is either null or points to a
 /// heap-allocated object, which itself has two fields, one pointing to another
