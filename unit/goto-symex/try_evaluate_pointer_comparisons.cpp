@@ -127,6 +127,19 @@ SCENARIO(
         REQUIRE(result.get() == renamed_comparison.get());
       }
     }
+
+    WHEN("Evaluating ptr1 != &value1")
+    {
+      const notequal_exprt comparison{ptr1, address1};
+      const renamedt<exprt, L2> renamed_comparison =
+        state.rename(comparison, ns);
+      auto result = try_evaluate_pointer_comparisons(
+        renamed_comparison, value_set, ID_java, ns);
+      THEN("Evaluation leaves the expression unchanged")
+      {
+        REQUIRE(result.get() == renamed_comparison.get());
+      }
+    }
   }
 
   GIVEN("A struct whose first element can only point to `&value1`")
