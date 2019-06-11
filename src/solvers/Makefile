@@ -164,6 +164,7 @@ SRC = $(BOOLEFORCE_SRC) \
       strings/format_specifier.cpp \
       strings/string_builtin_function.cpp \
       strings/string_dependencies.cpp \
+      strings/string_format_builtin_function.cpp \
       strings/string_refinement.cpp \
       strings/string_refinement_util.cpp \
       strings/string_constraint.cpp \

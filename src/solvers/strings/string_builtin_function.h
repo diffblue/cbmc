@@ -44,6 +44,10 @@ public:
 
   /// Add constraints ensuring that the value of result expression of the
   /// builtin function corresponds to the value of the function call.
+  /// The constraints are only added when deemed necessary, i.e. when
+  /// maybe_testing_function() returns true, or when testing function depends on
+  /// the result of this function.
+  /// This logic is implemented in add_constraints().
   virtual string_constraintst
   constraints(string_constraint_generatort &constraint_generator) const = 0;
 
