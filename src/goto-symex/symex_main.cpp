@@ -706,8 +706,8 @@ void goto_symext::try_filter_value_sets(
 
   const pointer_typet &symbol_type = to_pointer_type(symbol_expr->type());
 
-  value_setst::valuest value_set_elements;
-  original_value_set.get_value_set(*symbol_expr, value_set_elements, ns);
+  const std::vector<exprt> value_set_elements =
+    original_value_set.get_value_set(*symbol_expr, ns);
 
   std::unordered_set<exprt, irep_hash> erase_from_jump_taken_value_set;
   std::unordered_set<exprt, irep_hash> erase_from_jump_not_taken_value_set;

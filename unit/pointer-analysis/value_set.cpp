@@ -108,8 +108,7 @@ SCENARIO(
 
     WHEN("We query what a1.x points to")
     {
-      std::list<exprt> a1_x_result;
-      value_set.get_value_set(a1_x, a1_x_result, ns);
+      const std::vector<exprt> a1_x_result = value_set.get_value_set(a1_x, ns);
 
       THEN("It should point to 'a2'")
       {
@@ -121,8 +120,7 @@ SCENARIO(
 
     WHEN("We query what a1.y points to")
     {
-      std::list<exprt> a1_y_result;
-      value_set.get_value_set(a1_y, a1_y_result, ns);
+      const std::vector<exprt> a1_y_result = value_set.get_value_set(a1_y, ns);
 
       THEN("It should point to 'a3'")
       {
@@ -139,8 +137,8 @@ SCENARIO(
 
       member_exprt member_of_with(a1_with, A_x);
 
-      std::list<exprt> matching_with_result;
-      value_set.get_value_set(member_of_with, matching_with_result, ns);
+      const std::vector<exprt> matching_with_result =
+        value_set.get_value_set(member_of_with, ns);
 
       THEN("It should be NULL")
       {
@@ -157,8 +155,8 @@ SCENARIO(
 
       member_exprt member_of_with(a1_with, A_y);
 
-      std::list<exprt> non_matching_with_result;
-      value_set.get_value_set(member_of_with, non_matching_with_result, ns);
+      const std::vector<exprt> non_matching_with_result =
+        value_set.get_value_set(member_of_with, ns);
 
       THEN("It should point to 'a3'")
       {
@@ -173,8 +171,8 @@ SCENARIO(
       with_exprt a1_with(
         a1_symbol.symbol_expr(), member_exprt(nil_exprt(), A_x), null_A_ptr);
 
-      std::list<exprt> maybe_matching_with_result;
-      value_set.get_value_set(a1_with, maybe_matching_with_result, ns);
+      const std::vector<exprt> maybe_matching_with_result =
+        value_set.get_value_set(a1_with, ns);
 
       THEN("It may point to NULL")
       {
@@ -213,9 +211,8 @@ SCENARIO(
 
       member_exprt member_of_constant(struct_constant, A_x);
 
-      std::list<exprt> member_of_constant_result;
-      value_set.get_value_set(
-        member_of_constant, member_of_constant_result, ns);
+      auto member_of_constant_result = value_set.get_value_set(
+        member_of_constant, ns);
 
       THEN("It should point to 'a2'")
       {
@@ -265,8 +262,8 @@ SCENARIO(
 
       index_exprt index_of_arr(arr, i3.symbol_expr());
 
-      std::list<exprt> index_of_arr_result;
-      value_set.get_value_set(index_of_arr, index_of_arr_result, ns);
+      const std::vector<exprt> index_of_arr_result =
+        value_set.get_value_set(index_of_arr, ns);
 
       THEN("We should get either &i1 or &i2, but not unknown")
       {
@@ -294,8 +291,8 @@ SCENARIO(
 
       index_exprt index_of_arr(arr, i3.symbol_expr());
 
-      std::list<exprt> index_of_arr_result;
-      value_set.get_value_set(index_of_arr, index_of_arr_result, ns);
+      std::vector<exprt> index_of_arr_result =
+        value_set.get_value_set(index_of_arr, ns);
 
       THEN("We should get &i1")
       {
