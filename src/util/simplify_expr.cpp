@@ -181,12 +181,24 @@ bool simplify_exprt::simplify_function_application(exprt &expr)
     auto &first_argument = to_string_expr(function_app.arguments().at(0));
     auto &second_argument = to_string_expr(function_app.arguments().at(1));
 
-    if(
-      first_argument.content().id() != ID_address_of ||
-      second_argument.content().id() != ID_address_of)
+    const auto first_value_opt = try_get_string_data_array(first_argument, ns);
+
+    if(!first_value_opt)
     {
       return true;
     }
+
+    const array_exprt &first_value = first_value_opt->get();
+
+    const auto second_value_opt =
+      try_get_string_data_array(second_argument, ns);
+
+    if(!second_value_opt)
+    {
+      return true;
+    }
+
+    const array_exprt &second_value = second_value_opt->get();
 
     mp_integer offset_int = 0;
     if(function_app.arguments().size() == 3)
@@ -196,51 +208,6 @@ bool simplify_exprt::simplify_function_application(exprt &expr)
         return true;
       offset_int = numeric_cast_v<mp_integer>(to_constant_expr(offset));
     }
-
-    const address_of_exprt &first_address_of =
-      to_address_of_expr(first_argument.content());
-    const address_of_exprt &second_address_of =
-      to_address_of_expr(second_argument.content());
-
-    // Constants are got via address_of expressions, so this helps filter out
-    // things that are non-constant.
-    if(
-      first_address_of.object().id() != ID_index ||
-      second_address_of.object().id() != ID_index)
-    {
-      return true;
-    }
-
-    const index_exprt &first_index_expression =
-      to_index_expr(first_address_of.object());
-    const index_exprt &second_index_expression =
-      to_index_expr(second_address_of.object());
-
-    const exprt &first_string_array = first_index_expression.array();
-    const exprt &second_string_array = second_index_expression.array();
-
-    // Check if our symbols type is an array.
-    if(
-      first_string_array.type().id() != ID_array ||
-      second_string_array.type().id() != ID_array)
-    {
-      return true;
-    }
-
-    // get their initial values from the symbol table
-    const symbolt *symbol_ptr = nullptr;
-    if(ns.lookup(
-         to_symbol_expr(first_string_array).get_identifier(), symbol_ptr))
-      return true;
-    const exprt &first_value = symbol_ptr->value;
-    if(ns.lookup(
-         to_symbol_expr(second_string_array).get_identifier(), symbol_ptr))
-      return true;
-    const exprt &second_value = symbol_ptr->value;
-
-    // only compare if both are arrays
-    if(first_value.id() != ID_array || second_value.id() != ID_array)
-      return true;
 
     // test whether second_value is a prefix of first_value
     bool is_prefix =
@@ -1824,6 +1791,46 @@ optionalt<std::string> simplify_exprt::expr2bits(
   }
 
   return {};
+}
+
+optionalt<std::reference_wrapper<const array_exprt>>
+  simplify_exprt::try_get_string_data_array(
+    const refined_string_exprt &s,
+    const namespacet &ns)
+{
+  if(s.content().id() != ID_address_of)
+  {
+    return {};
+  }
+
+  const auto &content = to_address_of_expr(s.content());
+
+  if(content.object().id() != ID_index)
+  {
+    return {};
+  }
+
+  const auto &array_start = to_index_expr(content.object());
+
+  if(array_start.array().id() != ID_symbol ||
+     array_start.array().type().id() != ID_array)
+  {
+    return {};
+  }
+
+  const auto &array = to_symbol_expr(array_start.array());
+
+  const symbolt *symbol_ptr = nullptr;
+
+  if(ns.lookup(array.get_identifier(), symbol_ptr) ||
+     symbol_ptr->value.id() != ID_array)
+  {
+    return {};
+  }
+
+  const auto &char_seq = to_array_expr(symbol_ptr->value);
+
+  return optionalt<std::reference_wrapper<const array_exprt>>(char_seq);
 }
 
 bool simplify_exprt::simplify_byte_extract(byte_extract_exprt &expr)
