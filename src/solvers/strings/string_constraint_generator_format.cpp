@@ -229,11 +229,15 @@ add_axioms_for_format_specifier(
 /// Deserialize an argument for format from \p string.
 /// \p id should be one of: string_expr, int, char, boolean, float.
 /// The primitive values are expected to all be encoded using 4 characters.
+/// The characters of `string` must be of type `unsignedbv_typet(16)`.
 exprt format_arg_from_string(
   const array_string_exprt &string,
   const irep_idt &id,
   array_poolt &array_pool)
 {
+  PRECONDITION(
+    to_array_type(string.content().type()).subtype() == unsignedbv_typet(16));
+
   if(id == "string_expr")
     return string;
   if(id == ID_int)
