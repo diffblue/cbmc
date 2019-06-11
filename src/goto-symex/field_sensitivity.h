@@ -15,7 +15,36 @@ class namespacet;
 class goto_symex_statet;
 class symex_targett;
 
-/// \brief Control granularity of object accesses
+/// Control granularity of object accesses
+///
+/// [Field sensitivity](\ref field_sensitivityt) is a transformation of the
+/// instructions goto-program which mainly replaces some expressions by symbols
+/// but can also add assignments to the target equations produced by symbolic
+/// execution.
+/// The main goal of this transformation is to allow more constants to be
+/// propagated during symbolic execution.
+/// Note that field sensitivity is not applied as a single pass over the
+/// whole goto program but instead applied as the symbolic execution unfolds.
+///
+/// ### Member access
+/// A member expression `struct_expr.field_name` is replaced by the
+/// symbol `struct_expr..field_name`; note the use of `..` to visually
+/// distinguish the symbol from the member expression. This is valid for
+/// both lvalues and rvalues. See \ref field_sensitivityt::apply.
+///
+/// ### Symbols representing structs
+/// In an rvalue, a symbol struct_expr which has a struct type with fields
+/// field1, field2, etc, will be replaced by
+/// `{struct_expr..field_name1; struct_expr..field_name2; …}`.
+/// See \ref field_sensitivityt::get_fields.
+///
+/// ### Assignment to a struct
+/// When the symbol is on the left-hand-side, for instance for an assignment
+/// `struct_expr = other_struct`, the assignment is replaced by a sequence
+/// of assignments:
+/// `struct_expr..field_name1 = other_struct..field_name1;`
+/// `struct_expr..field_name2 = other_struct..field_name2;` etc.
+/// See \ref field_sensitivityt::field_assignments.
 class field_sensitivityt
 {
 public:

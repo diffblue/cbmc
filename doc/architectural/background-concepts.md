@@ -646,6 +646,10 @@ technique from an SSA compared to a CFG (or, even worse, an AST). That
 being said, the CPROVER framework takes a different route, opting to convert to
 intermediate representation known as GOTO programs instead.
 
+\subsection field_sensitivity_section Field Sensitivity
+
+\copydoc field_sensitivityt
+
 \section analysis_techniques_section Analysis techniques
 
 \subsection BMC_section Bounded model checking
