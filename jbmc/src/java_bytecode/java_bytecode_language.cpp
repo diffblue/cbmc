@@ -8,6 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "java_bytecode_language.h"
 
+#include <fstream>
 #include <string>
 
 #include <linking/static_lifetime_init.h>
@@ -295,21 +296,8 @@ void java_bytecode_languaget::set_message_handler(
   languaget::set_message_handler(message_handler);
 }
 
-/// We set the main class (i.e.\ class to start the class loading analysis from,
-/// see \ref java_class_loadert) depending on the file type of `path`.
-/// `path` can be the name of either a .class file or a .jar file.
-/// If it is a .class file, the top-level class in this file is the main class.
-/// If it is a .jar file, we first check for the main class in three steps
-/// 1) the argument of the --main-class command-line option,
-/// 2) the class implied by the argument of the --function option,
-/// 3) the manifest file of the JAR.
-/// If no main class was found, all classes in the JAR file are loaded.
-bool java_bytecode_languaget::parse(
-  std::istream &,
-  const std::string &path)
+void java_bytecode_languaget::initialize_class_loader()
 {
-  PRECONDITION(language_options.has_value());
-
   java_class_loader.clear_classpath();
 
   for(const auto &p : config.java.classpath)
@@ -328,6 +316,45 @@ bool java_bytecode_languaget::parse(
 
     java_class_loader.set_extra_class_refs_function(get_string_base_classes);
   }
+}
+
+void java_bytecode_languaget::parse_from_main_class()
+{
+  if(!main_class.empty())
+  {
+    status() << "Java main class: " << main_class << eom;
+    const auto &parse_trees = java_class_loader(main_class);
+    if(parse_trees.empty() || !parse_trees.front().loading_successful)
+    {
+      throw invalid_source_file_exceptiont(
+        "Error: Could not find or load main class " + id2string(main_class));
+    }
+  }
+}
+
+/// We set the main class (i.e.\ class to start the class loading analysis,
+/// see \ref java_class_loadert) when we have have been given a main class.
+bool java_bytecode_languaget::parse()
+{
+  PRECONDITION(language_options.has_value());
+  initialize_class_loader();
+  main_class = config.java.main_class;
+  parse_from_main_class();
+  return false;
+}
+
+/// We set the main class (i.e.\ class to start the class loading analysis,
+/// see \ref java_class_loadert)
+/// when we have a JAR file given via the -jar option:
+///    a) the argument of the --main-class command-line option,
+///    b) the manifest file of the JAR
+///    If no main class was found, all classes in the JAR file are loaded.
+bool java_bytecode_languaget::parse(
+  std::istream &instream,
+  const std::string &path)
+{
+  PRECONDITION(language_options.has_value());
+  initialize_class_loader();
 
   // look at extension
   if(has_suffix(path, ".class"))
@@ -337,6 +364,13 @@ bool java_bytecode_languaget::parse(
   }
   else if(has_suffix(path, ".jar"))
   {
+    std::ifstream jar_file(path);
+    if(!jar_file.good())
+    {
+      throw invalid_source_file_exceptiont(
+        "Error: Unable to access jarfile " + path);
+    }
+
     // build an object to potentially limit which classes are loaded
     java_class_loader_limitt class_loader_limit(
       get_message_handler(), language_options->java_cp_include_files);
@@ -380,12 +414,7 @@ bool java_bytecode_languaget::parse(
   else
     UNREACHABLE;
 
-  if(!main_class.empty())
-  {
-    status() << "Java main class: " << main_class << eom;
-    java_class_loader(main_class);
-  }
-
+  parse_from_main_class();
   return false;
 }
 

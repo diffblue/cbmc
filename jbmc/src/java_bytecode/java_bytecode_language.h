@@ -259,6 +259,9 @@ struct java_bytecode_language_optionst
   /// turning `if(x) A.clinit() else B.clinit()` into
   /// `A.clinit(); B.clinit(); if(x) ...`
   bool should_lift_clinit_calls;
+
+  /// If set then a JAR file has been given via the -jar option.
+  optionalt<std::string> main_jar;
 };
 
 #define JAVA_CLASS_MODEL_SUFFIX "@class_model"
@@ -274,6 +277,12 @@ public:
     std::istream &instream,
     const std::string &path,
     std::ostream &outstream) override;
+
+  // This is an extension to languaget
+  // required because parsing of Java programs can be initiated without
+  // opening a file first or providing a path to a file
+  // as dictated by \ref languaget.
+  virtual bool parse();
 
   bool parse(
     std::istream &instream,
@@ -386,6 +395,8 @@ private:
   /// IDs of such objects to symbols that store their values.
   std::unordered_map<std::string, object_creation_referencet> references;
 
+  void parse_from_main_class();
+  void initialize_class_loader();
 };
 
 std::unique_ptr<languaget> new_java_bytecode_language();
