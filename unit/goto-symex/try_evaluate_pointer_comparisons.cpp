@@ -38,6 +38,7 @@ SCENARIO(
   const symbol_exprt value2{"value2", int_type};
   const address_of_exprt address2{value2};
   const symbol_exprt b{"b", bool_typet{}};
+  const null_pointer_exprt null_ptr{ptr_type};
 
   // Add symbols to symbol table
   symbol_tablet symbol_table;
@@ -138,6 +139,19 @@ SCENARIO(
       THEN("Evaluation leaves the expression unchanged")
       {
         REQUIRE(result.get() == renamed_comparison.get());
+      }
+    }
+
+    WHEN("Evaluating ptr1 != nullptr")
+    {
+      const notequal_exprt comparison{ptr1, null_ptr};
+      const renamedt<exprt, L2> renamed_comparison =
+        state.rename(comparison, ns);
+      auto result = try_evaluate_pointer_comparisons(
+        renamed_comparison, value_set, ID_java, ns);
+      THEN("Evaluation succeeds")
+      {
+        REQUIRE(result.get() == true_exprt{});
       }
     }
   }
