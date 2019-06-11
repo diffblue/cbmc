@@ -10,6 +10,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <testing-utils/use_catch.h>
 
 #include <goto-symex/goto_symex.h>
+#include <util/arith_tools.h>
 #include <util/c_types.h>
 
 static void add_to_symbol_table(
@@ -124,6 +125,57 @@ SCENARIO(
       THEN("Evaluation leaves the expression unchanged")
       {
         REQUIRE(result.get() == renamed_comparison.get());
+      }
+    }
+  }
+
+  GIVEN("A struct whose first element can only point to `&value1`")
+  {
+    // member is `struct_symbol.pointer_field`
+    const member_exprt member = [&]() {
+      std::vector<struct_typet::componentt> components;
+      components.emplace_back("pointer_field", ptr_type);
+      const struct_typet struct_type{components};
+      const symbol_exprt struct_symbol{"struct_symbol", struct_type};
+      add_to_symbol_table(symbol_table, struct_symbol);
+      return member_exprt{struct_symbol, components.back()};
+    }();
+
+    value_sett value_set;
+    const renamedt<exprt, L1> member_l1 = state.rename<L1>(member, ns);
+    const renamedt<exprt, L1> address1_l1 = state.rename<L1>(address1, ns);
+
+    // struct_symbol..pointer_field <- &value1
+    {
+      field_sensitivityt field_sensitivity;
+      const exprt index_fs =
+        field_sensitivity.apply(ns, state, member_l1.get(), true);
+      value_set.assign(index_fs, address1_l1.get(), ns, false, false);
+    }
+
+    WHEN("Evaluating struct_symbol.pointer_field == &value1")
+    {
+      const equal_exprt comparison{member, address1};
+      const renamedt<exprt, L2> renamed_comparison =
+        state.rename(comparison, ns);
+      auto result = try_evaluate_pointer_comparisons(
+        renamed_comparison, value_set, ID_java, ns);
+      THEN("Evaluation succeeds")
+      {
+        REQUIRE(result.get() == true_exprt{});
+      }
+    }
+
+    WHEN("Evaluating struct_symbol.pointer_field == &value2")
+    {
+      const equal_exprt comparison{member, address2};
+      const renamedt<exprt, L2> renamed_comparison =
+        state.rename(comparison, ns);
+      auto result = try_evaluate_pointer_comparisons(
+        renamed_comparison, value_set, ID_java, ns);
+      THEN("Evaluation succeeds")
+      {
+        REQUIRE(result.get() == false_exprt{});
       }
     }
   }
