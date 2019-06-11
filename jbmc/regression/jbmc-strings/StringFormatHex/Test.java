@@ -9,4 +9,14 @@ public class Test {
       assert(false);
     return u;
   }
+
+  public static void testHexLengthConstPASS() {
+    String u = String.format("di%xlue", 255);
+    assert u.length() == 7;
+  }
+
+  public static void testHexLengthConstFAIL() {
+    String u = String.format("di%xlue", 255);
+    assert u.length() != 7;
+  }
 }
