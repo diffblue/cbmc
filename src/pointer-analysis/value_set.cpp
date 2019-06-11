@@ -20,9 +20,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/prefix.h>
 #include <util/simplify_expr.h>
 
-#include <util/range.h>
+#include <goto-symex/renamed.h>
 #include <util/format_expr.h>
 #include <util/format_type.h>
+#include <util/range.h>
 
 #ifdef DEBUG
 #include <iostream>
@@ -137,6 +138,11 @@ void value_sett::output(
   const namespacet &,
   std::ostream &out,
   const std::string &indent) const
+{
+  output(out, indent);
+}
+
+void value_sett::output(std::ostream &out, const std::string &indent) const
 {
   values.iterate([&](const irep_idt &, const entryt &e) {
     irep_idt identifier, display_name;
