@@ -77,6 +77,7 @@ private:
       get_mutated_expr);
 
   friend optionalt<renamedt<exprt, L1>> check_l1_renaming(exprt expr);
+  friend optionalt<renamedt<ssa_exprt, L1>> check_l1_renaming(ssa_exprt expr);
   friend optionalt<renamedt<exprt, L2>> check_l2_renaming(exprt expr);
   friend optionalt<renamedt<typet, L2>> check_l2_renaming(typet type);
 
@@ -123,6 +124,8 @@ bool is_l1_renamed(const exprt &expr);
 
 /// \return a renamed object if \p expr has been renamed to level 1
 NODISCARD optionalt<renamedt<exprt, L1>> check_l1_renaming(exprt expr);
+
+NODISCARD optionalt<renamedt<ssa_exprt, L1>> check_l1_renaming(ssa_exprt expr);
 
 /// \return a renamed object if \p expr has been renamed to level 2
 NODISCARD optionalt<renamedt<exprt, L2>> check_l2_renaming(exprt expr);

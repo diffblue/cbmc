@@ -112,6 +112,13 @@ optionalt<renamedt<exprt, L1>> check_l1_renaming(exprt expr)
   return {};
 }
 
+optionalt<renamedt<ssa_exprt, L1>> check_l1_renaming(ssa_exprt expr)
+{
+  if(is_l1_renamed(expr))
+    return renamedt<ssa_exprt, L1>(std::move(expr));
+  return {};
+}
+
 optionalt<renamedt<exprt, L2>> check_l2_renaming(exprt expr)
 {
   if(is_l2_renamed(expr))
