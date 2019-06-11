@@ -104,9 +104,8 @@ exprt value_set_dereferencet::dereference(const exprt &pointer)
 #endif
 
   // collect objects the pointer may point to
-  value_setst::valuest points_to_set;
-
-  dereference_callback.get_value_set(pointer, points_to_set);
+  const std::vector<exprt> points_to_set =
+    dereference_callback.get_value_set(pointer);
 
 #ifdef DEBUG
   std::cout << "value_set_dereferencet::dereference points_to_set={";
