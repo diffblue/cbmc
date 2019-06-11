@@ -1,5 +1,5 @@
 CORE
-test.class
+test
 --no-lazy-methods --no-refine-strings --show-symbol-table --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
 ^EXIT=0$
 ^SIGNAL=0$

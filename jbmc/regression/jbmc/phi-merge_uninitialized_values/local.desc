@@ -1,5 +1,5 @@
 CORE 
-PhiMergeUninitialized.class
+PhiMergeUninitialized
 --function PhiMergeUninitialized.dynamicAllocationUninitialized --show-vcc
 activate-multi-line-match
 ^EXIT=0$

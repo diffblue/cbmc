@@ -1,5 +1,5 @@
 CORE
-My.class
+My
 --function My.intervalUnion --java-assume-inputs-interval [-3:-2],[5:],[1:2]
 ^EXIT=10$
 ^SIGNAL=0$

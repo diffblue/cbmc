@@ -1,5 +1,5 @@
 CORE
-static_init.class
+static_init
 --function static_init.main --java-threading
 ^EXIT=0$
 ^SIGNAL=0$

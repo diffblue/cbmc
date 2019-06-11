@@ -1,5 +1,5 @@
 CORE
-Test.class
+Test
 --list-symbols
 ^java::Test\.main:\(\[Ljava/lang/String;\)V \(struct java::array\[reference\] \*\) -> void$
 ^EXIT=0$

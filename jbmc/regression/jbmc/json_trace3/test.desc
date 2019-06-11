@@ -1,5 +1,5 @@
 CORE
-Test.class
+Test
 --trace --json-ui --unwind 5 --function Test.main
 activate-multi-line-match
 ^EXIT=10$

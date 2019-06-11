@@ -357,12 +357,7 @@ bool java_bytecode_languaget::parse(
   initialize_class_loader();
 
   // look at extension
-  if(has_suffix(path, ".class"))
-  {
-    // override main_class
-    main_class=java_class_loadert::file_to_class_name(path);
-  }
-  else if(has_suffix(path, ".jar"))
+  if(has_suffix(path, ".jar"))
   {
     std::ifstream jar_file(path);
     if(!jar_file.good())
@@ -412,7 +407,7 @@ bool java_bytecode_languaget::parse(
       java_class_loader.add_classpath_entry(path);
   }
   else
-    UNREACHABLE;
+    main_class = config.java.main_class;
 
   parse_from_main_class();
   return false;

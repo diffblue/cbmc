@@ -1,5 +1,5 @@
 CORE
-A.class
+A
 --function 'A.me3:()V' --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar` --java-threading
 ^EXIT=0$
 ^SIGNAL=0$

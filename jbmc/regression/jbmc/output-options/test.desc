@@ -1,5 +1,5 @@
 CORE symex-driven-lazy-loading-expected-failure
-Main.class
+Main
 --verbosity 10 --unwind 2 --disable-uncaught-exception-check --throw-assertion-error
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$

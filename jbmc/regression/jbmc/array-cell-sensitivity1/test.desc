@@ -1,5 +1,5 @@
 CORE
-Test.class
+Test
 --function Test.main --show-vcc
 symex_dynamic::dynamic_2_array#2\[\[0\]\] = symex_dynamic::dynamic_2_array#2\[0\]
 symex_dynamic::dynamic_2_array#2\[\[1\]\] = symex_dynamic::dynamic_2_array#2\[1\]

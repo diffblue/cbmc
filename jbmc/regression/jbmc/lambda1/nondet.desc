@@ -1,5 +1,5 @@
 CORE
-Nondet.class
+Nondet
 --function Nondet.test --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
 line 6 assertion.*FAILURE$
 ^EXIT=10$

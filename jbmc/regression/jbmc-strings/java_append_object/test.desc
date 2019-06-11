@@ -1,5 +1,5 @@
 KNOWNBUG
-test_append_object.class
+test_append_object
 --max-nondet-string-length 1000
 ^EXIT=10$
 ^SIGNAL=0$

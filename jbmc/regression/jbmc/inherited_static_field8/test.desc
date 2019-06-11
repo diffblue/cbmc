@@ -1,5 +1,5 @@
 CORE
-Test.class
+Test
 --function Test.main
 assertion at file Test\.java line 6 .* SUCCESS
 assertion at file Test\.java line 7 .* FAILURE

@@ -1,5 +1,5 @@
 CORE
-test_contains.class
+test_contains
 --max-nondet-string-length 100 --function test_contains.main
 ^EXIT=0$
 ^SIGNAL=0$

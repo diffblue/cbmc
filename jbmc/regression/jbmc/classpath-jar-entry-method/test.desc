@@ -1,6 +1,6 @@
 CORE
-jar_file.jar
---function RelevantClass.entry --verbosity 10
+
+-jar jar_file.jar --function RelevantClass.entry --verbosity 10
 ^EXIT=10$
 ^SIGNAL=0$
 VERIFICATION FAILED

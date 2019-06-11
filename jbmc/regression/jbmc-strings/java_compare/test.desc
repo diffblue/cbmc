@@ -1,5 +1,5 @@
 CORE
-test_compare.class
+test_compare
 --max-nondet-string-length 1000 --function test_compare.main
 ^EXIT=10$
 ^SIGNAL=0$

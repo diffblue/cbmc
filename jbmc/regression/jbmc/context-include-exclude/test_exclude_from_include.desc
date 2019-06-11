@@ -1,5 +1,5 @@
 CORE
-Main.class
+Main
 --context-include Main.main --context-include 'Main.<clinit' --context-include org.cprover.MyClass --context-exclude 'org.cprover.MyClass$Inner.'
 ^EXIT=10$
 ^SIGNAL=0$

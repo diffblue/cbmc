@@ -1,5 +1,5 @@
 KNOWNBUG
-test_contains.class
+test_contains
 --max-nondet-string-length 100 --string-printable --function test_contains.main
 ^EXIT=0$
 ^SIGNAL=0$

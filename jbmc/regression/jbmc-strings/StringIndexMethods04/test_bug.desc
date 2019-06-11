@@ -1,5 +1,5 @@
 KNOWNBUG
-StringIndexMethods04.class
+StringIndexMethods04
 --max-nondet-string-length 1000 --function StringIndexMethods04.mainBug
 ^EXIT=10$
 ^SIGNAL=0$

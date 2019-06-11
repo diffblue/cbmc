@@ -1,5 +1,5 @@
 CORE
-Thrower.class
+Thrower
 --function Thrower.test --assert-no-exceptions-thrown --throw-runtime-exceptions
 line 39 assertion at file Thrower.java line 39 .*: FAILURE
 line 42 assertion at file Thrower.java line 42 .*: FAILURE

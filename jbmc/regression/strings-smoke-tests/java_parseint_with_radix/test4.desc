@@ -1,5 +1,5 @@
 CORE
-Test4.class
+Test4
 --max-nondet-string-length 1000 --function Test4.main
 ^EXIT=10$
 ^SIGNAL=0$

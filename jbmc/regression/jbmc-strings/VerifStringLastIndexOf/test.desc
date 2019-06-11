@@ -1,5 +1,5 @@
 THOROUGH
-Test.class
+Test
 --function Test.check --max-nondet-string-length 50 --unwind 50 --java-assume-inputs-non-null
 ^EXIT=10$
 ^SIGNAL=0$

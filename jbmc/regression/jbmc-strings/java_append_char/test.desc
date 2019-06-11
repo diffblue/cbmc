@@ -1,5 +1,5 @@
 CORE
-test_append_char.class
+test_append_char
 --max-nondet-string-length 1000 --function test_append_char.main --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
 ^EXIT=10$
 ^SIGNAL=0$

@@ -1,5 +1,5 @@
 CORE
-TestGenTest.class
+TestGenTest
 --function TestGenTest.f --trace --json-ui
 "data": "(java::TestGenTest|TestGenTest@class_model)",$
 ^EXIT=10$

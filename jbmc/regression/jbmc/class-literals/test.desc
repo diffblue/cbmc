@@ -1,5 +1,5 @@
 CORE bdd-expected-timeout
-Test.class
+Test
 --function Test.main
 ^EXIT=0$
 ^SIGNAL=0$

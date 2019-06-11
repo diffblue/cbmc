@@ -1,5 +1,5 @@
 CORE
-Test.class
+Test
 --classpath `../../../../scripts/format_classpath.sh . annotations . ignored-method` --verbosity 10
 ^Ignoring method:  'java::Test\.main:\(\[Ljava/lang/String;\)V'$
 ^VERIFICATION FAILED$

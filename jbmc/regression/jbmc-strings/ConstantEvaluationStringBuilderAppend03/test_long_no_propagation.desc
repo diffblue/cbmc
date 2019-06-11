@@ -1,5 +1,5 @@
 CORE symex-driven-lazy-loading-expected-failure
-Test.class
+Test
 --function Test.testLongNoPropagation --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar` --property 'java::Test.testLongNoPropagation:(J)V.assertion.1'
 ^Generated [0-9]+ VCC\(s\), 1 remaining after simplification$
 ^EXIT=10$

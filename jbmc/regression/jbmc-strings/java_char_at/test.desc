@@ -1,5 +1,5 @@
 CORE
-test_char_at.class
+test_char_at
 --max-nondet-string-length 1000 --function test_char_at.main
 ^EXIT=10$
 ^SIGNAL=0$

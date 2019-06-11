@@ -521,10 +521,10 @@ int jbmc_parse_optionst::doit()
     return CPROVER_EXIT_USAGE_ERROR;
   }
 
-  if(cmdline.args.size() == 1)
+  if((cmdline.args.size() == 1) && !cmdline.isset("show-parse-tree"))
   {
     std::string main_class = cmdline.args[0];
-    // 'java' accepts slashes instead of dots
+    // `java` accepts slashes and dots as package separators
     std::replace(main_class.begin(), main_class.end(), '/', '.');
     config.java.main_class = main_class;
     cmdline.args.pop_back();

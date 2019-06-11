@@ -1,5 +1,5 @@
 CORE
-Test.class
+Test
 --function Test.main
 Stub static field x found for non-stub type java::Test\. In future this will be a fatal error\.
 assertion at file Test\.java line 6 .* FAILURE

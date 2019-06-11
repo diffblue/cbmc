@@ -1,5 +1,5 @@
 CORE
-Test.class
+Test
 --function Test.main --show-vcc --max-field-sensitivity-array-size 9
 ^EXIT=0$
 ^SIGNAL=0$

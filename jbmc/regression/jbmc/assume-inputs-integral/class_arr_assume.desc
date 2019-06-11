@@ -1,5 +1,5 @@
 KNOWNBUG
-My.class
+My
 --function My.arrayArg --java-assume-inputs-integral
 ^EXIT=10$
 ^SIGNAL=0$

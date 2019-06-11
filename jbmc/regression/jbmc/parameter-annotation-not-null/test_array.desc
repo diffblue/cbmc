@@ -1,5 +1,5 @@
 CORE
-Main.class
+Main
 --function Main.test2 --classpath `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
 ^EXIT=10$
 ^SIGNAL=0$

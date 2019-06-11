@@ -1,5 +1,5 @@
 FUTURE
-test_append_int.class
+test_append_int
 --max-nondet-string-length 1000
 ^EXIT=0$
 ^SIGNAL=0$

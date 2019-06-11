@@ -1,5 +1,5 @@
 KNOWNBUG
-map1.class
+map1
 --taint taint.json
 ^EXIT=0$
 ^SIGNAL=0$

@@ -1,5 +1,5 @@
 CORE
-annotations.class
+annotations
 --no-lazy-methods --show-symbol-table --function annotations.main
 ^EXIT=0$
 ^SIGNAL=0$

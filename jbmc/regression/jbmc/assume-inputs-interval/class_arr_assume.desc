@@ -1,5 +1,5 @@
 KNOWNBUG
-My.class
+My
 --function My.classArrArg --java-assume-inputs-interval [1:3]
 ^EXIT=10$
 ^SIGNAL=0$

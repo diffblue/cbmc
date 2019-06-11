@@ -1,5 +1,5 @@
 FUTURE
-RegionMatches.class
+RegionMatches
 --max-nondet-string-length 1000 --function RegionMatches.constant --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar` --property "java::RegionMatches.constant:(I)V.assertion.4"
 ^EXIT=10$
 ^SIGNAL=0$

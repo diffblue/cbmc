@@ -1,6 +1,6 @@
 CORE
-target/jar-file.jar
---verbosity 10
+
+-jar target/jar-file.jar --verbosity 10
 ^EXIT=6$
 ^SIGNAL=0$
 Getting class 'org\.cprover\.first\.RelevantClass' from JAR target\/jar-file.jar

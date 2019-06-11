@@ -1,5 +1,5 @@
 CORE
-Test.class
+Test
 --max-nondet-string-length 20 --unwind 30 --function Test.verifyNonNull --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
 ^EXIT=0$
 ^SIGNAL=0$

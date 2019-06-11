@@ -1,5 +1,5 @@
 CORE
-ExcludedProperties.class
+ExcludedProperties
 --context-exclude org.cprover.other --show-symbol-table --function ExcludedProperties.parameters
 ^EXIT=0$
 ^SIGNAL=0$

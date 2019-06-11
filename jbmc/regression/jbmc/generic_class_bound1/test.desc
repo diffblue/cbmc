@@ -1,5 +1,5 @@
 CORE symex-driven-lazy-loading-expected-failure
-Gn.class
+Gn
 --no-lazy-methods --no-refine-strings
 ^EXIT=10$
 ^SIGNAL=0$

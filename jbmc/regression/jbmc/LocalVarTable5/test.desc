@@ -1,5 +1,5 @@
 CORE
-test.class
+test
 --show-goto-functions --function test.main
 dead anonlocal::1i
 dead anonlocal::2i

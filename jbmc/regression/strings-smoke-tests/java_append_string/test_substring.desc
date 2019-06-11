@@ -1,5 +1,5 @@
 CORE
-test_append_string.class
+test_append_string
  --max-nondet-string-length 10 --function test_append_string.check --java-assume-inputs-non-null
 ^EXIT=10$
 ^SIGNAL=0$

@@ -1,5 +1,5 @@
 CORE
-Test_binary_min.class
+Test_binary_min
 --max-nondet-string-length 1000 --function Test_binary_min.main
 ^EXIT=10$
 ^SIGNAL=0$

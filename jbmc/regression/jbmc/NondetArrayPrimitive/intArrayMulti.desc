@@ -1,5 +1,5 @@
 CORE
-NondetArrayPrimitive.class
+NondetArrayPrimitive
 --function NondetArrayPrimitive.intArrayMulti --max-nondet-array-length 51 --unwind 4
 ^VERIFICATION FAILED$
 ^EXIT=10$

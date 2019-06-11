@@ -1,5 +1,5 @@
 CORE
-test.class
+test
 --throw-runtime-exceptions --function test.main
 ^EXIT=10$
 ^SIGNAL=0$

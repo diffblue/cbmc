@@ -1,5 +1,5 @@
 CORE
-test_trim.class
+test_trim
 --max-nondet-string-length 100 --function test_trim.main
 ^EXIT=10$
 ^SIGNAL=0$

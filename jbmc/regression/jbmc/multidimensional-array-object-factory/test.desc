@@ -1,5 +1,5 @@
 CORE
-My.class
+My
 --function My.func --unwind 3 --max-nondet-array-length 10 --show-vcc
 ^EXIT=0$
 ^SIGNAL=0$

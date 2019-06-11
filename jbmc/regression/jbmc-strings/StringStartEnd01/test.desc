@@ -1,5 +1,5 @@
 THOROUGH
-StringStartEnd01.class
+StringStartEnd01
 --max-nondet-string-length 1000 --unwind 30
 ^EXIT=0$
 ^SIGNAL=0$

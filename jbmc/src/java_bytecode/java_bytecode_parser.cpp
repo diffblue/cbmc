@@ -1824,8 +1824,7 @@ java_bytecode_parse(
   return std::move(java_bytecode_parser.parse_tree);
 }
 
-optionalt<java_bytecode_parse_treet>
-java_bytecode_parse(
+optionalt<java_bytecode_parse_treet> java_bytecode_parse(
   const std::string &file,
   message_handlert &message_handler,
   bool skip_instructions)
@@ -1834,9 +1833,6 @@ java_bytecode_parse(
 
   if(!in)
   {
-    messaget message(message_handler);
-    message.error() << "failed to open input file '" << file << '\''
-                    << messaget::eom;
     return {};
   }
 

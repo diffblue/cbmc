@@ -1,5 +1,5 @@
 CORE
-Test.class
+Test
 --function Test.main --show-vcc --no-array-field-sensitivity
 ^EXIT=0$
 ^SIGNAL=0$

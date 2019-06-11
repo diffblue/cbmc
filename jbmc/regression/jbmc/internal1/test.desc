@@ -1,5 +1,5 @@
 CORE
-com/diffblue/javatest/nestedobjects/subpackage/Order.class
+com.diffblue.javatest.nestedobjects.subpackage.Order
 --json-ui --function 'com.diffblue.javatest.nestedobjects.subpackage.Order.setItem:(Lcom/diffblue/javatest/nestedobjects/subpackage/Item;)Z' --trace
 activate-multi-line-match
 ^EXIT=10$

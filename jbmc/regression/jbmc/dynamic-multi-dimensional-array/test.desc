@@ -1,5 +1,5 @@
 CORE
-TestClass.class
+TestClass
 --function TestClass.f --unwind 2
 ^EXIT=0$
 ^SIGNAL=0$

@@ -1,5 +1,5 @@
 CORE
-test_substring.class
+test_substring
 --max-nondet-string-length 1000 --function test_substring.main
 ^EXIT=0$
 ^SIGNAL=0$

@@ -1,5 +1,5 @@
 CORE
-Test.class
+Test
 --function Test.f --trace --json-ui --trace-json-extended
 // Enable multi-line checking
 activate-multi-line-match

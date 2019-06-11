@@ -1,5 +1,5 @@
 CORE
-Test.class
+Test
 --unwind 10 --max-nondet-string-length 6 --function Test.testFail
 ^EXIT=10$
 ^SIGNAL=0$

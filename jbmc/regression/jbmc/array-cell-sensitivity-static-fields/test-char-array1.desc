@@ -1,5 +1,5 @@
 CORE symex-driven-lazy-loading-expected-failure
-Test.class
+Test
 --function Test.charArray --property "java::Test.charArray:()[C.assertion.1"
 Generated 0 VCC[(]s[)], 0 remaining after simplification
 assertion at file Test.java line 20 .*: SUCCESS

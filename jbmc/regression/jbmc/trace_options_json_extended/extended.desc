@@ -1,5 +1,5 @@
 CORE
-Test.class
+Test
 --trace --json-ui --trace-json-extended --function Test.main
 ^EXIT=10$
 ^SIGNAL=0$

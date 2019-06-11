@@ -1,5 +1,5 @@
 CORE
-A.class
+A
 --function A.me3 --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar` --java-threading --unwind 3
 ^EXIT=0$
 ^SIGNAL=0$

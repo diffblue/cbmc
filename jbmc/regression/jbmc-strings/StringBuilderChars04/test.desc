@@ -1,5 +1,5 @@
 CORE
-StringBuilderChars04.class
+StringBuilderChars04
 --max-nondet-string-length 1000 --unwind 100 --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
 ^EXIT=10$
 ^SIGNAL=0$

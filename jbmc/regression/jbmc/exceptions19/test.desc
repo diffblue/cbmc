@@ -1,5 +1,5 @@
 CORE
-exception_handler.class
+exception_handler
 --function exception_handler.f
 ^EXIT=0$
 ^SIGNAL=0$

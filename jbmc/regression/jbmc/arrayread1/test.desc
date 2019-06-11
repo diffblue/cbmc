@@ -1,5 +1,5 @@
 CORE
-arrayread1.class
+arrayread1
 --unwind 3 --no-propagation --function arrayread1.main
 ^EXIT=0$
 ^SIGNAL=0$

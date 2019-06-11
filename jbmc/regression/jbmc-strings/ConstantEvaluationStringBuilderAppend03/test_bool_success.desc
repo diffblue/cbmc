@@ -1,5 +1,5 @@
 CORE
-Test.class
+Test
 --function Test.testBooleanSuccess --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
 ^Generated [0-9]+ VCC\(s\), 0 remaining after simplification$
 ^EXIT=0$

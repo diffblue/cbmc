@@ -1,5 +1,5 @@
 KNOWNBUG
-test.class
+test
 --verbosity 10 --function test.g
 ^EXIT=0$
 ^SIGNAL=0$

@@ -1,5 +1,5 @@
 KNOWNBUG
-Test.class
+Test
 --max-nondet-string-length 5 --unwind 10 --function Test.verify --throw-runtime-exceptions
 ^EXIT=0$
 ^SIGNAL=0$

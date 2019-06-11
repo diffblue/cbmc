@@ -1,5 +1,5 @@
 CORE
-StringMiscellaneous02.class
+StringMiscellaneous02
 --max-nondet-string-length 1000 --unwind 30
 ^EXIT=10$
 ^SIGNAL=0$

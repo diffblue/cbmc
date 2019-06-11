@@ -1,5 +1,5 @@
 CORE
-Test.class
+Test
 --function Test.fromNonDetArray --depth 10000 --unwind 5 --throw-runtime-exceptions  --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar` --trace
 ^EXIT=10$
 ^SIGNAL=0$

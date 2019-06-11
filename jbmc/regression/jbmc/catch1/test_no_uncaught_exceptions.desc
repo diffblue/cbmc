@@ -1,5 +1,5 @@
 CORE
-catch1.class
+catch1
 --disable-uncaught-exception-check
 ^EXIT=0$
 ^SIGNAL=0$

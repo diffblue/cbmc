@@ -1,5 +1,5 @@
 CORE
-Test.class
+Test
 --function Test.checkAbort --trace --max-nondet-string-length 100000000
 ^EXIT=10$
 ^SIGNAL=0$

@@ -1,5 +1,5 @@
 CORE
-static_init_order.class
+static_init_order
 --function static_init_order.test2 --java-threading
 ^EXIT=10$
 ^SIGNAL=0$

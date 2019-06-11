@@ -1,5 +1,5 @@
 CORE
-iterator1.class
+iterator1
 --unwind 3 --function iterator1.f
 ^EXIT=10$
 ^SIGNAL=0$

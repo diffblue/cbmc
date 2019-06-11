@@ -1,5 +1,5 @@
 CORE
-E.class
+E
 --function E.f --show-goto-functions
 IF.*"java::D"
 IF.*"java::O"

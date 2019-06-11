@@ -1,5 +1,5 @@
 CORE
-StringValueOf08.class
+StringValueOf08
 --max-nondet-string-length 100 --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar`
 ^EXIT=10$
 ^SIGNAL=0$
