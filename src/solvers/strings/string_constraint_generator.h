@@ -211,12 +211,6 @@ std::pair<exprt, string_constraintst> add_axioms_for_delete_char_at(
   array_poolt &array_pool);
 std::pair<exprt, string_constraintst> add_axioms_for_format(
   symbol_generatort &fresh_symbol,
-  const function_application_exprt &f,
-  array_poolt &array_pool,
-  const messaget &message,
-  const namespacet &ns);
-std::pair<exprt, string_constraintst> add_axioms_for_format(
-  symbol_generatort &fresh_symbol,
   const array_string_exprt &res,
   const std::string &s,
   const std::vector<array_string_exprt> &args,
