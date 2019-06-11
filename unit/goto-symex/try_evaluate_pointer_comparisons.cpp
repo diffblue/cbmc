@@ -156,6 +156,58 @@ SCENARIO(
     }
   }
 
+  GIVEN(
+    "A value set in which pointer symbol `ptr1` can point to `&value1` or "
+    "`unknown`")
+  {
+    value_sett value_set;
+    const exprt unknown_expr{ID_unknown, ptr_type};
+    const if_exprt if_expr{b, address1, unknown_expr};
+    const renamedt<exprt, L1> ptr1_l1 = state.rename<L1>(ptr1, ns);
+    const renamedt<exprt, L1> if_expr_l1 = state.rename<L1>(if_expr, ns);
+    // ptr1 <- b ? &value1 : unknown
+    value_set.assign(ptr1_l1.get(), if_expr_l1.get(), ns, false, false);
+
+    WHEN("Evaluating ptr1 == &value1")
+    {
+      const equal_exprt comparison{ptr1, address1};
+      const renamedt<exprt, L2> renamed_comparison =
+        state.rename(comparison, ns);
+      auto result = try_evaluate_pointer_comparisons(
+        renamed_comparison, value_set, ID_java, ns);
+      THEN("Evaluation leaves the expression unchanged")
+      {
+        REQUIRE(result.get() == renamed_comparison.get());
+      }
+    }
+
+    WHEN("Evaluating ptr1 != &value1")
+    {
+      const notequal_exprt comparison{ptr1, address1};
+      const renamedt<exprt, L2> renamed_comparison =
+        state.rename(comparison, ns);
+      auto result = try_evaluate_pointer_comparisons(
+        renamed_comparison, value_set, ID_java, ns);
+      THEN("Evaluation leaves the expression unchanged")
+      {
+        REQUIRE(result.get() == renamed_comparison.get());
+      }
+    }
+
+    WHEN("Evaluating ptr1 != nullptr")
+    {
+      const notequal_exprt comparison{ptr1, null_ptr};
+      const renamedt<exprt, L2> renamed_comparison =
+        state.rename(comparison, ns);
+      auto result = try_evaluate_pointer_comparisons(
+        renamed_comparison, value_set, ID_java, ns);
+      THEN("Evaluation leaves the expression unchanged")
+      {
+        REQUIRE(result.get() == renamed_comparison.get());
+      }
+    }
+  }
+
   GIVEN("A struct whose first element can only point to `&value1`")
   {
     // member is `struct_symbol.pointer_field`
