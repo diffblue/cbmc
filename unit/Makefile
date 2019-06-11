@@ -49,6 +49,7 @@ SRC += analyses/ai/ai.cpp \
        solvers/strings/string_constraint_generator_valueof/get_numeric_value_from_character.cpp \
        solvers/strings/string_constraint_generator_valueof/is_digit_with_radix.cpp \
        solvers/strings/string_format_builtin_function/length_for_format_specifier.cpp \
+       solvers/strings/string_format_builtin_function/length_of_decimal_int.cpp \
        solvers/strings/string_refinement/concretize_array.cpp \
        solvers/strings/string_refinement/sparse_array.cpp \
        solvers/strings/string_refinement/substitute_array_list.cpp \
