@@ -235,6 +235,45 @@ bool simplify_exprt::simplify_function_application(exprt &expr)
     expr = from_integer(is_prefix ? 1 : 0, expr.type());
     return false;
   }
+  else if(func_id == ID_cprover_string_char_at_func)
+  {
+    if(function_app.arguments().at(1).id() != ID_constant)
+    {
+      return true;
+    }
+
+    const auto &index = to_constant_expr(function_app.arguments().at(1));
+
+    const refined_string_exprt &s =
+      to_string_expr(function_app.arguments().at(0));
+
+    const auto char_seq_opt = try_get_string_data_array(s, ns);
+
+    if(!char_seq_opt)
+    {
+      return true;
+    }
+
+    const array_exprt &char_seq = char_seq_opt->get();
+
+    const auto i_opt = numeric_cast<std::size_t>(index);
+
+    if(!i_opt || *i_opt >= char_seq.operands().size())
+    {
+      return true;
+    }
+
+    const auto &c = to_constant_expr(char_seq.operands().at(*i_opt));
+
+    if(c.type() != expr.type())
+    {
+      return true;
+    }
+
+    expr = c;
+
+    return false;
+  }
 
   return true;
 }
