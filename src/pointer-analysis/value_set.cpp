@@ -16,12 +16,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/arith_tools.h>
 #include <util/c_types.h>
+#include <util/format_expr.h>
+#include <util/format_type.h>
 #include <util/pointer_offset_size.h>
 #include <util/prefix.h>
-#include <util/simplify_expr.h>
-
-#include <langapi/language_util.h>
 #include <util/range.h>
+#include <util/simplify_expr.h>
 
 #ifdef DEBUG
 #include <iostream>
@@ -133,7 +133,7 @@ bool value_sett::insert(
 }
 
 void value_sett::output(
-  const namespacet &ns,
+  const namespacet &,
   std::ostream &out,
   const std::string &indent) const
 {
@@ -174,29 +174,29 @@ void value_sett::output(
     {
       const exprt &o = object_numbering[o_it->first];
 
-      std::string result;
+      std::ostringstream stream;
 
       if(o.id() == ID_invalid || o.id() == ID_unknown)
-        result = from_expr(ns, identifier, o);
+        stream << format(o);
       else
       {
-        result = "<" + from_expr(ns, identifier, o) + ", ";
+        stream << "<" << format(o) << ", ";
 
         if(o_it->second)
-          result += integer2string(*o_it->second);
+          stream << *o_it->second;
         else
-          result += '*';
+          stream << '*';
 
         if(o.type().is_nil())
-          result += ", ?";
+          stream << ", ?";
         else
-          result += ", " + from_type(ns, identifier, o.type());
+          stream << ", " << format(o.type());
 
-        result += '>';
+        stream << '>';
       }
 
+      const std::string result = stream.str();
       out << result;
-
       width += result.size();
 
       object_map_dt::const_iterator next(o_it);
