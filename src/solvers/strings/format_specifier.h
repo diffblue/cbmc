@@ -1,10 +1,8 @@
 /*******************************************************************\
 
-Module: Format specifers for String.format
+Module: Format specifiers for String.format
 
 Author: Romain Brenguier, Joel Allred
-
-Date:   June 2019
 
 \*******************************************************************/
 

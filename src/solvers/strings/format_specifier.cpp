@@ -1,6 +1,6 @@
 /*******************************************************************\
 
-Module: Format specifers for String.format
+Module: Format specifiers for String.format
 
 Author: Romain Brenguier, Joel Allred
 
@@ -42,7 +42,7 @@ static format_specifiert format_specifier_of_match(std::smatch &m)
 
 std::vector<format_elementt> parse_format_string(std::string s)
 {
-  std::string format_specifier =
+  const std::string format_specifier =
     "%(\\d+\\$)?([-#+ 0,(\\<]*)?(\\d+)?(\\.\\d+)?([tT])?([a-zA-Z%])";
   std::regex regex(format_specifier);
   std::vector<format_elementt> al;
