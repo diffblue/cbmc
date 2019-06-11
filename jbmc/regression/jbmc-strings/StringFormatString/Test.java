@@ -13,6 +13,23 @@ public class Test {
     return u;
   }
 
+  public static void string1Length(String s) {
+    if (s == null)
+      return;
+    String u = String.format("Hello %s !", s);
+    assert u.length() == 10;
+  }
+
+  public static void string1LengthConstPASS() {
+    String u = String.format("Hello %s !", "world");
+    assert u.length() == 13;
+  }
+
+  public static void string1LengthConstFAIL() {
+    String u = String.format("Hello %s !", "world");
+    assert u.length() != 13;
+  }
+
   public static String string2(String s, String t) {
     if (s == null || t == null)
       return "null null";
