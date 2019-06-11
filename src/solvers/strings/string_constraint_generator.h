@@ -224,6 +224,17 @@ std::pair<exprt, string_constraintst> add_axioms_for_format(
   const messaget &message,
   const namespacet &ns);
 
+/// Deserialize an argument for format from \p string.
+/// \p id should be one of: string_expr, int, char, boolean, float.
+/// The primitive values are expected to all be encoded using 4 characters.
+exprt format_arg_from_string(
+  const array_string_exprt &string,
+  const irep_idt &id,
+  array_poolt &array_pool);
+
+/// Expression which is true when the string is equal to the literal "null"
+exprt is_null(const array_string_exprt &string, array_poolt &array_pool);
+
 std::pair<exprt, string_constraintst> add_axioms_for_insert(
   symbol_generatort &fresh_symbol,
   const function_application_exprt &f,

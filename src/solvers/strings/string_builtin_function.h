@@ -484,4 +484,16 @@ public:
   }
 };
 
+/// Given a function `get_value` which gives a valuation to expressions, attempt
+/// to find the current value of the array `a`. If the valuation of some
+/// characters are missing, then return an empty optional.
+optionalt<std::vector<mp_integer>> eval_string(
+  const array_string_exprt &a,
+  const std::function<exprt(const exprt &)> &get_value);
+
+/// Make a string from a constant array
+array_string_exprt make_string(
+  const std::vector<mp_integer> &array,
+  const array_typet &array_type);
+
 #endif // CPROVER_SOLVERS_REFINEMENT_STRING_BUILTIN_FUNCTION_H
