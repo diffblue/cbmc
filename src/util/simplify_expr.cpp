@@ -262,6 +262,115 @@ static simplify_exprt::resultt<> simplify_string_compare_to(
     first_shorter ? char1 - char2 : char2 - char1, expr.type());
 }
 
+/// Simplify String.indexOf function when arguments are constant
+///
+/// \param expr: the expression to simplify
+/// \param ns: namespace
+/// \return: the modified expression or an unchanged expression
+static simplify_exprt::resultt<> simplify_string_index_of(
+  const function_application_exprt &expr,
+  const namespacet &ns)
+{
+  std::size_t starting_index = 0;
+
+  // Determine starting index for the comparison (if given)
+  if(expr.arguments().size() == 3)
+  {
+    auto &starting_index_expr = expr.arguments().at(2);
+
+    if(starting_index_expr.id() != ID_constant)
+    {
+      return simplify_exprt::unchanged(expr);
+    }
+
+    const mp_integer idx =
+      numeric_cast_v<mp_integer>(to_constant_expr(starting_index_expr));
+
+    // Negative indices are treated like 0
+    if(idx > 0)
+    {
+      starting_index = numeric_cast_v<std::size_t>(idx);
+    }
+  }
+
+  const refined_string_exprt &s1 = to_string_expr(expr.arguments().at(0));
+
+  const auto s1_data_opt = try_get_string_data_array(s1, ns);
+
+  if(!s1_data_opt)
+  {
+    return simplify_exprt::unchanged(expr);
+  }
+
+  const array_exprt &s1_data = s1_data_opt->get();
+
+  if(starting_index >= s1_data.operands().size())
+  {
+    return from_integer(-1, expr.type());
+  }
+
+  // Iterator pointing to the character in the first string at which the second
+  // string or character was found
+  exprt::operandst::const_iterator it;
+
+  if(can_cast_expr<refined_string_exprt>(expr.arguments().at(1)))
+  {
+    // Second argument is a string
+
+    const refined_string_exprt &s2 =
+      to_string_expr(expr.arguments().at(1));
+
+    const auto s2_data_opt = try_get_string_data_array(s2, ns);
+
+    if(!s2_data_opt)
+    {
+      return simplify_exprt::unchanged(expr);
+    }
+
+    const array_exprt &s2_data = s2_data_opt->get();
+
+    it = std::search(
+      std::next(s1_data.operands().begin(), starting_index),
+      s1_data.operands().end(),
+      s2_data.operands().begin(),
+      s2_data.operands().end());
+  }
+  else if(expr.arguments().at(1).id() == ID_constant)
+  {
+    // Second argument is a constant character
+
+    const constant_exprt &c1 = to_constant_expr(expr.arguments().at(1));
+    const auto c1_val = numeric_cast_v<mp_integer>(c1);
+
+    auto pred = [&](const exprt &c2)
+    {
+      const auto c2_val = numeric_cast_v<mp_integer>(to_constant_expr(c2));
+
+      return c1_val == c2_val;
+    };
+
+    it = std::find_if(
+      std::next(s1_data.operands().begin(), starting_index),
+      s1_data.operands().end(),
+      pred);
+  }
+  else
+  {
+    return simplify_exprt::unchanged(expr);
+  }
+
+  if(it == s1_data.operands().end())
+  {
+    return from_integer(-1, expr.type());
+  }
+  else
+  {
+    const std::size_t idx = std::distance(s1_data.operands().begin(), it);
+
+    return from_integer(idx, expr.type());
+  }
+}
+
 simplify_exprt::resultt<> simplify_exprt::simplify_function_application(
   const function_application_exprt &expr)
 {
@@ -344,6 +453,10 @@ simplify_exprt::resultt<> simplify_exprt::simplify_function_application(
   else if(func_id == ID_cprover_string_compare_to_func)
   {
     return simplify_string_compare_to(expr, ns);
+  }
+  else if(func_id == ID_cprover_string_index_of_func)
+  {
+    return simplify_string_index_of(expr, ns);
   }
   else if(func_id == ID_cprover_string_char_at_func)
   {
