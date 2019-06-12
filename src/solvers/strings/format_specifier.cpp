@@ -27,8 +27,10 @@ static format_specifiert format_specifier_of_match(std::smatch &m)
   std::string flag = m[2].str();
   int width = m[3].str().empty() ? -1 : std::stoi(m[3].str());
   int precision = m[4].str().empty() ? -1 : std::stoi(m[4].str());
+  // `tT` values:  "t" = date/time, "T" = uppercase date/time
   std::string tT = m[5].str();
 
+  // date/time
   bool dt = !tT.empty();
   if(tT == "T")
     flag.push_back(format_specifiert::DATE_TIME_UPPER);
@@ -40,6 +42,8 @@ static format_specifiert format_specifier_of_match(std::smatch &m)
   return format_specifiert(index, flag, width, precision, dt, conversion);
 }
 
+/// Regexp is taken directly from openJDK implementation:
+///  http://hg.openjdk.java.net/jdk7/jdk7/jdk/file/9b8c96f96a0f/src/share/classes/java/util/Formatter.java#l2506
 std::vector<format_elementt> parse_format_string(std::string s)
 {
   const std::string format_specifier =
