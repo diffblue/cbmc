@@ -58,13 +58,13 @@ public:
     int _width,
     int _precision,
     bool _dt,
-    char c)
+    char conversion)
     : index(_index),
       flag(_flag),
       width(_width),
       precision(_precision),
       dt(_dt),
-      conversion(c)
+      conversion(conversion)
   {
   }
 };
