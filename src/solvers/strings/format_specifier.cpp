@@ -23,6 +23,7 @@ Date:   June 2019
 ///   conversion type.
 static format_specifiert format_specifier_of_match(std::smatch &m)
 {
+  PRECONDITION(m.size() == 7);
   int index = m[1].str().empty() ? -1 : std::stoi(m[1].str());
   std::string flag = m[2].str();
   int width = m[3].str().empty() ? -1 : std::stoi(m[3].str());
