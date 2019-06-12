@@ -8,18 +8,6 @@
 
 #include "string_constraint_generator.h"
 
-/// Given a function `get_value` which gives a valuation to expressions, attempt
-/// to find the current value of the array `a`. If the valuation of some
-/// characters are missing, then return an empty optional.
-static optionalt<std::vector<mp_integer>> eval_string(
-  const array_string_exprt &a,
-  const std::function<exprt(const exprt &)> &get_value);
-
-/// Make a string from a constant array
-static array_string_exprt make_string(
-  const std::vector<mp_integer> &array,
-  const array_typet &array_type);
-
 string_transformation_builtin_functiont::
   string_transformation_builtin_functiont(
     const exprt &return_code,
@@ -110,7 +98,7 @@ make_string(Iter begin, Iter end, const array_typet &array_type)
   return to_array_string_expr(array_expr);
 }
 
-static array_string_exprt
+array_string_exprt
 make_string(const std::vector<mp_integer> &array, const array_typet &array_type)
 {
   return make_string(array.begin(), array.end(), array_type);

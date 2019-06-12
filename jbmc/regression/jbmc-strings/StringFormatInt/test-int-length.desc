@@ -1,0 +1,7 @@
+CORE
+Test.class
+--function Test.testIntLength --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar` --property "java::Test.testIntLength:(I)V.assertion.1"
+ 
+^EXIT=10$
+^SIGNAL=0$
+line 15 assertion at file Test.java .*: FAILURE

@@ -3,4 +3,4 @@ Test.class
 --function Test.testInt --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar` --property "java::Test.testInt:(I)Ljava/lang/String;.assertion.3"
 ^EXIT=10$
 ^SIGNAL=0$
-line 20 assertion at file Test.java .*: FAILURE
+line 9 assertion at file Test.java .*: FAILURE

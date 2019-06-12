@@ -44,6 +44,10 @@ public:
 
   /// Add constraints ensuring that the value of result expression of the
   /// builtin function corresponds to the value of the function call.
+  /// The constraints are only added when deemed necessary, i.e. when
+  /// maybe_testing_function() returns true, or when testing function depends on
+  /// the result of this function.
+  /// This logic is implemented in add_constraints().
   virtual string_constraintst
   constraints(string_constraint_generatort &constraint_generator) const = 0;
 
@@ -483,5 +487,17 @@ public:
     UNIMPLEMENTED;
   }
 };
+
+/// Given a function `get_value` which gives a valuation to expressions, attempt
+/// to find the current value of the array `a`. If the valuation of some
+/// characters are missing, then return an empty optional.
+optionalt<std::vector<mp_integer>> eval_string(
+  const array_string_exprt &a,
+  const std::function<exprt(const exprt &)> &get_value);
+
+/// Make a string from a constant array
+array_string_exprt make_string(
+  const std::vector<mp_integer> &array,
+  const array_typet &array_type);
 
 #endif // CPROVER_SOLVERS_REFINEMENT_STRING_BUILTIN_FUNCTION_H

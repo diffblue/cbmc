@@ -1,25 +1,4 @@
 public class Test {
-  public static String testHex(int i) {
-    String u = String.format("di%xlue", i);
-    if (u.equals("diffblue"))
-      assert(false);
-    else if (u.startsWith("di"))
-      assert(false);
-    else
-      assert(false);
-    return u;
-  }
-
-  public static String testInt(int i) {
-    String u = String.format("Hello %d !", i);
-    if (u.equals("Hello 10 !"))
-      assert(false);
-    else if (!u.startsWith("Hello"))
-      assert(false);
-    else
-      assert(false);
-    return u;
-  }
 
   public static String string1(String s) {
     if (s == null)
@@ -32,6 +11,23 @@ public class Test {
     else
       assert(false);
     return u;
+  }
+
+  public static void string1Length(String s) {
+    if (s == null)
+      return;
+    String u = String.format("Hello %s !", s);
+    assert u.length() == 10;
+  }
+
+  public static void string1LengthConstPASS() {
+    String u = String.format("Hello %s !", "world");
+    assert u.length() == 13;
+  }
+
+  public static void string1LengthConstFAIL() {
+    String u = String.format("Hello %s !", "world");
+    assert u.length() != 13;
   }
 
   public static String string2(String s, String t) {

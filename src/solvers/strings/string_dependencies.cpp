@@ -7,6 +7,7 @@ Author: Diffblue Ltd.
 \*******************************************************************/
 
 #include "string_dependencies.h"
+#include "string_format_builtin_function.h"
 #include <unordered_set>
 #include <util/expr_iterator.h>
 #include <util/graph.h>
@@ -41,6 +42,10 @@ static std::unique_ptr<string_builtin_functiont> to_string_builtin_function(
 
   if(id == ID_cprover_string_concat_char_func)
     return util_make_unique<string_concat_char_builtin_functiont>(
+      return_code, fun_app.arguments(), array_pool);
+
+  if(id == ID_cprover_string_format_func)
+    return util_make_unique<string_format_builtin_functiont>(
       return_code, fun_app.arguments(), array_pool);
 
   if(id == ID_cprover_string_of_int_func)

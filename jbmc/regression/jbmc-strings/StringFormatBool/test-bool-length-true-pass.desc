@@ -1,0 +1,10 @@
+KNOWNBUG
+Test.class
+--function Test.testBoolLengthTrue --cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar` --property "java::Test.testBoolLengthTrue:()Ljava/lang/String;.assertion.2"
+^EXIT=0$
+^SIGNAL=0$
+line 29 assertion at file Test.java .*: SUCCESS
+--
+--
+There seems to be some constraints missing, as the length of the 'true'
+boolean can be either 4 or 5.

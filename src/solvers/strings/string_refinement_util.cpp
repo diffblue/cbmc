@@ -7,6 +7,7 @@ Author: Diffblue Ltd.
 \*******************************************************************/
 
 #include "string_refinement_util.h"
+#include "string_format_builtin_function.h"
 #include <algorithm>
 #include <functional>
 #include <iostream>

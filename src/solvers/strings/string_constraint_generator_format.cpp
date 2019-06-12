@@ -19,141 +19,9 @@ Date:   May 2017
 #include <util/std_expr.h>
 #include <util/unicode.h>
 
+#include "format_specifier.h"
 #include "string_builtin_function.h"
 #include "string_constraint_generator.h"
-
-// Format specifier describes how a value should be printed.
-class format_specifiert
-{
-public:
-  // Constants describing the meaning of characters in format specifiers.
-  static const char DECIMAL_INTEGER = 'd';
-  static const char OCTAL_INTEGER = 'o';
-  static const char HEXADECIMAL_INTEGER = 'x';
-  static const char HEXADECIMAL_INTEGER_UPPER = 'X';
-  static const char SCIENTIFIC = 'e';
-  static const char SCIENTIFIC_UPPER = 'E';
-  static const char GENERAL = 'g';
-  static const char GENERAL_UPPER = 'G';
-  static const char DECIMAL_FLOAT = 'f';
-  static const char HEXADECIMAL_FLOAT = 'a';
-  static const char HEXADECIMAL_FLOAT_UPPER = 'A';
-  static const char CHARACTER = 'c';
-  static const char CHARACTER_UPPER = 'C';
-  static const char DATE_TIME = 't';
-  static const char DATE_TIME_UPPER = 'T';
-  static const char BOOLEAN = 'b';
-  static const char BOOLEAN_UPPER = 'B';
-  static const char STRING = 's';
-  static const char STRING_UPPER = 'S';
-  static const char HASHCODE = 'h';
-  static const char HASHCODE_UPPER = 'H';
-  static const char LINE_SEPARATOR = 'n';
-  static const char PERCENT_SIGN = '%';
-
-  int index = -1;
-  std::string flag;
-  int width;
-  int precision;
-  bool dt = false;
-  char conversion;
-
-  format_specifiert(
-    int _index,
-    std::string _flag,
-    int _width,
-    int _precision,
-    bool _dt,
-    char c)
-    : index(_index),
-      flag(_flag),
-      width(_width),
-      precision(_precision),
-      dt(_dt),
-      conversion(c)
-  {
-  }
-};
-
-// Format text represent a constant part of a format string.
-class format_textt
-{
-public:
-  format_textt() = default;
-
-  explicit format_textt(std::string _content) : content(_content)
-  {
-  }
-
-  format_textt(const format_textt &fs) : content(fs.content)
-  {
-  }
-
-  std::string get_content() const
-  {
-    return content;
-  }
-
-private:
-  std::string content;
-};
-
-// A format element is either a specifier or text.
-class format_elementt
-{
-public:
-  typedef enum
-  {
-    SPECIFIER,
-    TEXT
-  } format_typet;
-
-  explicit format_elementt(format_typet _type) : type(_type), fstring("")
-  {
-  }
-
-  explicit format_elementt(std::string s) : type(TEXT), fstring(s)
-  {
-  }
-
-  explicit format_elementt(format_specifiert fs) : type(SPECIFIER), fstring("")
-  {
-    fspec.push_back(fs);
-  }
-
-  bool is_format_specifier() const
-  {
-    return type == SPECIFIER;
-  }
-
-  bool is_format_text() const
-  {
-    return type == TEXT;
-  }
-
-  format_specifiert get_format_specifier() const
-  {
-    PRECONDITION(is_format_specifier());
-    return fspec.back();
-  }
-
-  format_textt &get_format_text()
-  {
-    PRECONDITION(is_format_text());
-    return fstring;
-  }
-
-  const format_textt &get_format_text() const
-  {
-    PRECONDITION(is_format_text());
-    return fstring;
-  }
-
-private:
-  format_typet type;
-  format_textt fstring;
-  std::vector<format_specifiert> fspec;
-};
 
 #if 0
 // This code is deactivated as it is not used for now, but ultimalety this
@@ -186,67 +54,8 @@ static bool check_format_string(std::string s)
 }
 #endif
 
-static exprt format_arg_from_string(
-  const array_string_exprt &string,
-  const irep_idt &id,
-  array_poolt &array_pool);
-
-/// Helper function for parsing format strings.
-/// This follows the implementation in openJDK of the java.util.Formatter class:
-/// http://hg.openjdk.java.net/jdk7/jdk7/jdk/file/9b8c96f96a0f/src/share/classes/java/util/Formatter.java#l2660
-/// \param m: a match in a regular expression
-/// \return Format specifier represented by the matched string. The groups in
-///   the match should represent: index, flag, width, precision, date and
-///   conversion type.
-static format_specifiert format_specifier_of_match(std::smatch &m)
-{
-  int index = m[1].str().empty() ? -1 : std::stoi(m[1].str());
-  std::string flag = m[2].str();
-  int width = m[3].str().empty() ? -1 : std::stoi(m[3].str());
-  int precision = m[4].str().empty() ? -1 : std::stoi(m[4].str());
-  std::string tT = m[5].str();
-
-  bool dt = !tT.empty();
-  if(tT == "T")
-    flag.push_back(format_specifiert::DATE_TIME_UPPER);
-
-  INVARIANT(m[6].length() == 1, "format conversion should be one character");
-  char conversion = m[6].str()[0];
-
-  return format_specifiert(index, flag, width, precision, dt, conversion);
-}
-
-/// Parse the given string into format specifiers and text.
-/// This follows the implementation in openJDK of the java.util.Formatter class:
-/// http://hg.openjdk.java.net/jdk7/jdk7/jdk/file/9b8c96f96a0f/src/share/classes/java/util/Formatter.java#l2513
-/// \param s: a string
-/// \return A vector of format_elementt.
-static std::vector<format_elementt> parse_format_string(std::string s)
-{
-  std::string format_specifier =
-    "%(\\d+\\$)?([-#+ 0,(\\<]*)?(\\d+)?(\\.\\d+)?([tT])?([a-zA-Z%])";
-  std::regex regex(format_specifier);
-  std::vector<format_elementt> al;
-  std::smatch match;
-
-  while(std::regex_search(s, match, regex))
-  {
-    if(match.position() != 0)
-    {
-      std::string pre_match = s.substr(0, match.position());
-      al.emplace_back(pre_match);
-    }
-
-    al.emplace_back(format_specifier_of_match(match));
-    s = match.suffix();
-  }
-
-  al.emplace_back(s);
-  return al;
-}
-
 /// Expression which is true when the string is equal to the literal "null"
-static exprt is_null(const array_string_exprt &string, array_poolt &array_pool)
+exprt is_null(const array_string_exprt &string, array_poolt &array_pool)
 {
   return and_exprt{
     equal_exprt{array_pool.get_or_create_length(string),
@@ -420,11 +229,15 @@ add_axioms_for_format_specifier(
 /// Deserialize an argument for format from \p string.
 /// \p id should be one of: string_expr, int, char, boolean, float.
 /// The primitive values are expected to all be encoded using 4 characters.
-static exprt format_arg_from_string(
+/// The characters of `string` must be of type `unsignedbv_typet(16)`.
+exprt format_arg_from_string(
   const array_string_exprt &string,
   const irep_idt &id,
   array_poolt &array_pool)
 {
+  PRECONDITION(
+    to_array_type(string.content().type()).subtype() == unsignedbv_typet(16));
+
   if(id == "string_expr")
     return string;
   if(id == ID_int)
@@ -478,7 +291,7 @@ std::pair<exprt, string_constraintst> add_axioms_for_format(
   symbol_generatort &fresh_symbol,
   const array_string_exprt &res,
   const std::string &s,
-  const exprt::operandst &args,
+  const std::vector<array_string_exprt> &args,
   array_poolt &array_pool,
   const messaget &message,
   const namespacet &ns)
@@ -502,13 +315,11 @@ std::pair<exprt, string_constraintst> add_axioms_for_format(
         fs.conversion != format_specifiert::PERCENT_SIGN &&
         fs.conversion != format_specifiert::LINE_SEPARATOR)
       {
-        exprt arg;
-
         if(fs.index == -1)
         {
           INVARIANT(
             arg_count < args.size(), "number of format must match specifiers");
-          arg = args[arg_count++];
+          string_arg = args[arg_count++];
         }
         else
         {
@@ -518,13 +329,8 @@ std::pair<exprt, string_constraintst> add_axioms_for_format(
             "number of format must match specifiers");
 
           // first argument `args[0]` corresponds to index 1
-          arg = to_struct_expr(args[fs.index - 1]);
+          string_arg = args[fs.index - 1];
         }
-
-        INVARIANT(
-          is_refined_string_type(arg.type()),
-          "arguments of format should be strings");
-        string_arg = get_string_expr(array_pool, arg);
       }
 
       auto result = add_axioms_for_format_specifier(
@@ -611,52 +417,4 @@ utf16_constant_array_to_java(const array_exprt &arr, std::size_t length)
     out[i] = numeric_cast_v<unsigned>(to_constant_expr(arr.operands()[i]));
 
   return utf16_native_endian_to_java(out);
-}
-
-/// Formatted string using a format string and list of arguments
-///
-/// Add axioms to specify the Java String.format function.
-/// \todo This is correct only if the first argument (ie the format string) is
-/// constant or does not contain format specifiers.
-/// \param fresh_symbol: generator of fresh symbols
-/// \param f: a function application
-/// \param array_pool: pool of arrays representing strings
-/// \param message: message handler for warnings
-/// \param ns: namespace
-/// \return A string expression representing the return value of the
-///   String.format function on the given arguments, assuming the first argument
-///   in the function application is a constant. Otherwise the first argument is
-///   returned.
-std::pair<exprt, string_constraintst> add_axioms_for_format(
-  symbol_generatort &fresh_symbol,
-  const function_application_exprt &f,
-  array_poolt &array_pool,
-  const messaget &message,
-  const namespacet &ns)
-{
-  PRECONDITION(f.arguments().size() >= 3);
-  const array_string_exprt res =
-    array_pool.find(f.arguments()[1], f.arguments()[0]);
-  const array_string_exprt s1 = get_string_expr(array_pool, f.arguments()[2]);
-
-  if(
-    array_pool.get_or_create_length(s1).id() == ID_constant &&
-    s1.content().id() == ID_array)
-  {
-    const auto length = numeric_cast_v<std::size_t>(
-      to_constant_expr(array_pool.get_or_create_length(s1)));
-    std::string s =
-      utf16_constant_array_to_java(to_array_expr(s1.content()), length);
-    // List of arguments after s
-    std::vector<exprt> args(f.arguments().begin() + 3, f.arguments().end());
-    return add_axioms_for_format(
-      fresh_symbol, res, s, args, array_pool, message, ns);
-  }
-  else
-  {
-    message.warning()
-      << "ignoring format function with non constant first argument"
-      << message.eom;
-    return {from_integer(1, f.type()), {}};
-  }
 }
