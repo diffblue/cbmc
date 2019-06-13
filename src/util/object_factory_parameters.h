@@ -15,7 +15,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/irep.h>
 #include <util/optional.h>
-#include <analyses/interval_domain.h>
+
+#include "integer_interval.h"
 #include "mp_arith.h"
 
 class cmdlinet;
