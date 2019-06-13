@@ -455,7 +455,6 @@ void goto_symext::symex_assign_symbol(
 
   do_simplify(assignment.rhs);
 
-  const ssa_exprt &l1_lhs = assignment.lhs;
   const ssa_exprt l2_lhs = state
                              .assignment(
                                assignment.lhs,
@@ -497,6 +496,7 @@ void goto_symext::symex_assign_symbol(
     state.source,
     assignment_type);
 
+  const ssa_exprt &l1_lhs = assignment.lhs;
   if(field_sensitivityt::is_divisible(l1_lhs))
   {
     // Split composite symbol lhs into its components
