@@ -434,16 +434,15 @@ void goto_symext::symex_assign_symbol(
     return;
   }
 
-  exprt l2_rhs = [&]() {
-    exprt guarded_rhs = rhs;
-    // put assignment guard into the rhs
-    if(!guard.empty())
-    {
-      guarded_rhs =
-        if_exprt{conjunction(guard), std::move(guarded_rhs), lhs, rhs.type()};
-    }
-    return state.rename(std::move(guarded_rhs), ns).get();
-  }();
+  exprt l2_rhs =
+    state
+      .rename(
+        // put assignment guard into the rhs
+        guard.empty()
+          ? rhs
+          : static_cast<exprt>(if_exprt{conjunction(guard), rhs, lhs}),
+        ns)
+      .get();
 
   // Note the following two calls are specifically required for
   // field-sensitivity. For example, with-expressions, which may have just been
