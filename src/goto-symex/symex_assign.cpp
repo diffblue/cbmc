@@ -395,8 +395,7 @@ void goto_symext::symex_assign_from_struct(
   const exprt::operandst &guard,
   assignment_typet assignment_type)
 {
-  const struct_typet &type = to_struct_type(ns.follow(lhs.type()));
-  const struct_union_typet::componentst &components = type.components();
+  const auto &components = to_struct_type(ns.follow(lhs.type())).components();
   PRECONDITION(rhs.operands().size() == components.size());
 
   for(std::size_t i = 0; i < components.size(); ++i)
