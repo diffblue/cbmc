@@ -16,6 +16,10 @@ Author: Michael Tautschnig, 2018
 
 #include <cstring>
 
+#if defined(__APPLE__)
+#  include <sys/stat.h>
+#endif
+
 int hybrid_binary(
   const std::string &compiler_or_linker,
   const std::string &goto_binary_file,
@@ -85,6 +89,23 @@ int hybrid_binary(
       "-output", output_file };
 
     result = run(lipo_argv[0], lipo_argv);
+
+    if(result == 0)
+    {
+      // lipo creates an output file, but it does not set execute permissions,
+      // so the user is unable to directly execute the output file until its
+      // chmod +x
+      mode_t current_umask = umask(0);
+      umask(current_umask);
+      int chmod_result = chmod(
+        output_file.c_str(), (S_IRWXU | S_IRWXG | S_IRWXO) & ~current_umask);
+      if(chmod_result != 0)
+      {
+        message.error() << "Setting execute permissions failed: "
+                        << std::strerror(errno) << messaget::eom;
+        result = chmod_result;
+      }
+    }
   }
   else
   {
