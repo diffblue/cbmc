@@ -221,7 +221,6 @@ SSA_assignment_stept::SSA_assignment_stept(
   exprt _ssa_full_lhs,
   exprt _original_full_lhs,
   exprt _ssa_rhs,
-  exprt _cond_expr,
   symex_targett::assignment_typet _assignment_type)
   : SSA_stept(source, goto_trace_stept::typet::ASSIGNMENT)
 {
@@ -231,7 +230,7 @@ SSA_assignment_stept::SSA_assignment_stept(
   original_full_lhs = std::move(_original_full_lhs);
   ssa_rhs = std::move(_ssa_rhs);
   assignment_type = _assignment_type;
-  cond_expr = std::move(_cond_expr);
+  cond_expr = equal_exprt{ssa_lhs, ssa_rhs};
   hidden =
     assignment_type != symex_targett::assignment_typet::STATE &&
     assignment_type !=

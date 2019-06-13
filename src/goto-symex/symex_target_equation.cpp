@@ -121,7 +121,6 @@ void symex_target_equationt::assignment(
     ssa_full_lhs,
     original_full_lhs,
     ssa_rhs,
-    equal_exprt(ssa_lhs, ssa_rhs),
     assignment_type});
 
   merge_ireps(SSA_steps.back());
