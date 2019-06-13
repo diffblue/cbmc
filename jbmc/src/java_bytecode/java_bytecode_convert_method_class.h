@@ -289,10 +289,6 @@ protected:
     const address_mapt &amap,
     bool allow_merge = true);
 
-  optionalt<symbolt> get_lambda_method_symbol(
-    const java_class_typet::java_lambda_method_handlest &lambda_method_handles,
-    const size_t index);
-
   // conversion
   void convert(const symbolt &class_symbol, const methodt &);
 
@@ -300,9 +296,7 @@ protected:
     const methodt &method,
     const java_method_typet &method_type);
 
-  code_blockt convert_instructions(
-    const methodt &,
-    const java_class_typet::java_lambda_method_handlest &);
+  code_blockt convert_instructions(const methodt &);
 
   codet get_clinit_call(const irep_idt &classname);
 
@@ -346,9 +340,10 @@ protected:
       &ret_instructions) const;
 
   optionalt<exprt> convert_invoke_dynamic(
-    const java_class_typet::java_lambda_method_handlest &lambda_method_handles,
     const source_locationt &location,
-    const exprt &arg0);
+    std::size_t instruction_address,
+    const exprt &arg0,
+    codet &result_code);
 
   code_blockt convert_astore(
     const irep_idt &statement,

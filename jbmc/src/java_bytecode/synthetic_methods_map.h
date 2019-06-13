@@ -36,7 +36,13 @@ enum class synthetic_method_typet
   /// A generated (synthetic) static initializer function for a stub type.
   /// Because we don't have the bytecode for a stub type (by definition), we
   /// generate a static initializer function to initialize its static fields.
-  STUB_CLASS_STATIC_INITIALIZER
+  STUB_CLASS_STATIC_INITIALIZER,
+  /// A generated constructor for a class capturing the parameters of an
+  /// invokedynamic instruction
+  INVOKEDYNAMIC_CAPTURE_CONSTRUCTOR,
+  /// A generated method for a class capturing the parameters of an
+  /// invokedynamic instruction
+  INVOKEDYNAMIC_METHOD
 };
 
 /// Maps method names on to a synthetic method kind.
