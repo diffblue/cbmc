@@ -7,4 +7,6 @@ class Other {
   float floatField;
   double doubleField;
 
+  int[] intArrField;
+
 }

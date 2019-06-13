@@ -7,6 +7,8 @@ class My {
   float floatField;
   double doubleField;
 
+  int[] intArrField;
+
   public static void numericalArg(byte byteArg, short shortArg, int intArg,
    long longArg, float floatArg, double doubleArg) {
     if (byteArg > 3) {
@@ -105,6 +107,36 @@ class My {
       assert false;
     } else if (doubleField < 1) {
       assert false;
+    } else {
+      assert false;
+    }
+  }
+
+  public void classArrArg(Other other, int [] intArr) {
+    if (other.intArrField.length > 3) {
+      if (other.intArrField[2] > 3) {
+        assert false;
+      } else if (other.intArrField[2] < 1) {
+        assert false;
+      } else {
+        assert false;
+      }
+    } else if (intArr.length > 3) {
+      if (intArr[2] > 3) {
+        assert false;
+      } else if (intArr[2] < 1) {
+        assert false;
+      } else {
+        assert false;
+      }
+    } else if (intArrField.length > 3) {
+      if (intArrField[2] > 3) {
+        assert false;
+      } else if (intArrField[2] < 1) {
+        assert false;
+      } else {
+        assert false;
+      }
     } else {
       assert false;
     }
